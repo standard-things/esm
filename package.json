@@ -1,0 +1,26 @@
+{
+  "name": "reify",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Ben Newman <ben@benjamn.com>",
+  "description": "Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjamn/reify.git"
+  },
+  "keywords": [
+    "ecmascript",
+    "modules",
+    "import",
+    "export",
+    "commonjs",
+    "require",
+    "exports",
+    "node"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/benjamn/reify#readme",
+  "bugs": {
+    "url": "https://github.com/benjamn/reify/issues"
+  }
+}
