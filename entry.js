@@ -1,5 +1,6 @@
 var hasOwn = Object.prototype.hasOwnProperty;
 var settersMap = Object.create(null);
+var setterUtils = require("./setter-utils.js");
 
 function Entry(id) {
   this.id = id;
@@ -48,7 +49,12 @@ Ep.runModuleSetters = function (module) {
       if (typeof setter === "function" &&
           ! (hasOwn.call(setter, "last") &&
              value === setter.last)) {
-        if (setter(setter.last = value) === true) {
+        var result = setter.call(
+          setterUtils,
+          setter.last = value
+        );
+
+        if (result === true) {
           shouldRunParentSetters = true;
         }
       }
