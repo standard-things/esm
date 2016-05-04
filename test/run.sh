@@ -6,7 +6,7 @@ set -u
 cd $(dirname $0)
 
 mocha \
-    --require reify \
+    --require "../index.js" \
     --reporter spec \
     --full-trace \
     tests.js
