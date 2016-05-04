@@ -23,7 +23,13 @@
   "bugs": {
     "url": "https://github.com/benjamn/reify/issues"
   },
+  "scripts": {
+    "test": "test/run.sh"
+  },
   "dependencies": {
     "acorn": "^3.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
   }
 }
