@@ -27,9 +27,9 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "^3.1.0"
+    "acorn": "~3.1.0"
   },
   "devDependencies": {
-    "mocha": "^2.4.5"
+    "mocha": "~2.4.5"
   }
 }
