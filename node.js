@@ -1,7 +1,7 @@
 var Module = require("module");
 var Entry = require("./entry.js").Entry;
+var compile = require("./compiler.js").compile;
 var Mp = Module.prototype;
-var load = Mp.load;
 
 Mp.import = function (id, setters) {
   var module = this;
@@ -30,10 +30,18 @@ Mp.import = function (id, setters) {
 
 // Override Module.prototype.load to call Entry.runModuleSetters whenever
 // a module has loaded.
+var load = Mp.load;
 Mp.load = function () {
   var result = load.apply(this, arguments);
   Entry.runModuleSetters(this);
   return result;
+};
+
+// Override Module.prototype._compile to compile any code that will be
+// evaluated as a module.
+var _compile = Mp._compile;
+Mp._compile = function (content, filename) {
+  return _compile.call(this, compile(content), filename);
 };
 
 // This method can be overridden by client code to implement custom export
