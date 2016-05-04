@@ -1,1 +1,1 @@
-require("./node.js");
+require("./lib/node.js");
