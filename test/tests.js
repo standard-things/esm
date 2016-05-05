@@ -24,6 +24,12 @@ describe("export statements", function () {
       c: "c"
     });
   });
+
+  it("should allow named re-exports", function test() {
+    import { a, v } from "./export-some.js";
+    assert.strictEqual(a, "a");
+    assert.strictEqual(v, "b");
+  });
 });
 
 describe("built-in modules", function () {
