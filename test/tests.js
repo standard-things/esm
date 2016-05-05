@@ -25,3 +25,12 @@ describe("export statements", function () {
     });
   });
 });
+
+describe("built-in modules", function () {
+  it("should fire setters if already loaded", function () {
+    // The "module" module is loaded in ../lib/node.js befoe we begin
+    // compiling anything.
+    import { Module as M } from "module";
+    assert.ok(module instanceof M);
+  });
+});
