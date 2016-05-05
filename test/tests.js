@@ -6,6 +6,14 @@ describe("import statements", function () {
     assert.strictEqual(name, "name.js");
     assert.strictEqual(id.split("/").pop(), "name.js");
   });
+
+  it("should cope with dependency cycles", function () {
+    import { check as aCheck } from "./cycle-a";
+    aCheck();
+
+    import { check as bCheck } from "./cycle-a";
+    bCheck();
+  });
 });
 
 describe("export statements", function () {
