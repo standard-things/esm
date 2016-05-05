@@ -5,7 +5,7 @@
 
 **Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.**
 
-Well, ok, one caveat: this package isn't ready for production use just yet. As of this writing, the repository is all of two days old! Watch this space to find out when `reify` is safe to use.
+Well, ok, one caveat: this package isn't ready for production use just yet. As of this writing, the repository is all of two days old! Watch this space to find out when `reify` is safe to use.
 
 Installation
 ---
