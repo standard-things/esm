@@ -1,4 +1,8 @@
 var path = require("path");
 
-exports.name = path.basename(__filename);
-exports.id = module.id;
+export var id = module.id,
+  name = path.basename(__filename);
+
+export function foo() {
+  return "foo";
+}
