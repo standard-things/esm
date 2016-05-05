@@ -26,9 +26,11 @@ describe("export statements", function () {
   });
 
   it("should allow named re-exports", function test() {
-    import { a, v } from "./export-some.js";
+    import { a, c, v, si } from "./export-some.js";
     assert.strictEqual(a, "a");
+    assert.strictEqual(c(), "c");
     assert.strictEqual(v, "b");
+    assert.strictEqual(si, "cee");
   });
 });
 
