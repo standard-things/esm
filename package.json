@@ -1,6 +1,6 @@
 {
   "name": "reify",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "index.js",
   "author": "Ben Newman <ben@benjamn.com>",
   "description": "Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.",
