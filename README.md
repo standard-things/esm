@@ -3,7 +3,7 @@
 1. to make (something abstract) more concrete or real.<br>
    _"these instincts are, in humans, reified as verbal constructs"_
 
-**Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.**
+**Enable ECMAScript 2015 modules in Node ~~today~~ soon. No caveats. Full stop.**
 
 Installation
 ---
