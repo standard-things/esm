@@ -3,7 +3,9 @@
 1. to make (something abstract) more concrete or real.<br>
    _"these instincts are, in humans, reified as verbal constructs"_
 
-**Enable ECMAScript 2015 modules in Node ~~today~~ soon. No caveats. Full stop.**
+**Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.**
+
+Well, ok, one caveat: this package isn't ready for production use just yet. As of this writing, the repository is all of two days old! Watch this space to find out when `reify` is safe to use.
 
 Installation
 ---
