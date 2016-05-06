@@ -50,3 +50,17 @@ describe("built-in modules", function () {
     assert.ok(module instanceof M);
   });
 });
+
+describe("compiler", function () {
+  it("should not get confused by string literals", function () {
+    assert.strictEqual(
+      'a; import b from "c"; d',
+      'a; import b ' + 'from "c"; d'
+    );
+
+    assert.strictEqual(
+      'a; export {a} from "a"; b;',
+      'a; export {a' + '} from "a"; b;'
+    );
+  });
+});
