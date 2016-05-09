@@ -40,6 +40,11 @@ describe("export statements", function () {
     assert.strictEqual(v, "b");
     assert.strictEqual(si, "cee");
   });
+
+  it("should be able to contain import statements", function () {
+    import { outer } from "./nested";
+    assert.deepEqual(outer(), ["a", "b", "c"]);
+  });
 });
 
 describe("built-in modules", function () {
