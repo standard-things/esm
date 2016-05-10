@@ -89,7 +89,10 @@ describe("compiler", function () {
 
 describe("Node REPL", function () {
   import { createContext } from "vm";
-  import { Readable, Writable } from "stream";
+
+  if (/^0\.6\./.test(process.version)) {
+    return;
+  }
 
   it("should work with global context", function (done) {
     var repl = require("repl").start({
