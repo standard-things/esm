@@ -68,4 +68,16 @@ describe("compiler", function () {
       'a; export {a' + '} from "a"; b;'
     );
   });
+
+  it("should not be enabled for nested node_modules", function () {
+    var threw = true;
+    try {
+      import "disabled";
+      threw = false;
+    } catch (e) {
+      assert.ok(e instanceof SyntaxError);
+      assert.ok(/Unexpected token/.test(e.message));
+    }
+    assert.strictEqual(threw, true);
+  });
 });
