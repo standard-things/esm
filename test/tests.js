@@ -76,7 +76,7 @@ describe("compiler", function () {
       threw = false;
     } catch (e) {
       assert.ok(e instanceof SyntaxError);
-      assert.ok(/Unexpected token/.test(e.message));
+      assert.ok(/unexpected/i.test(e.message));
     }
     assert.strictEqual(threw, true);
   });
