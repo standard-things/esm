@@ -91,17 +91,9 @@ describe("Node REPL", function () {
   import { createContext } from "vm";
   import { Readable, Writable } from "stream";
 
-  var input = new Readable;
-  input._read = function () {};
-
-  var output = new Writable;
-  output._write = function () {};
-
   it("should work with global context", function (done) {
     var repl = require("repl").start({
-      useGlobal: true,
-      input: input,
-      output: output
+      useGlobal: true
     });
 
     assert.strictEqual(typeof assertStrictEqual, "undefined");
@@ -120,9 +112,7 @@ describe("Node REPL", function () {
 
   it("should work with non-global context", function (done) {
     var repl = require("repl").start({
-      useGlobal: false,
-      input: input,
-      output: output
+      useGlobal: false
     });
 
     var context = createContext({
@@ -134,7 +124,7 @@ describe("Node REPL", function () {
       context,
       "repl", // filename
       function (err, result) {
-        // Use the globally-defined assertStrictEqual to test itself!
+        // Use context.strictEqual to test itself!
         context.strictEqual(typeof context.strictEqual, "function");
         done();
       }
