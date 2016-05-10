@@ -11,8 +11,7 @@ Usage
 ---
 
 1. Run `npm install --save reify` in your package or app directory.
-2. Add `"reify": true` to your `package.json` file.
-3. Call `require("reify")` before importing modules that contain `import` and `export` statements.
+2. Call `require("reify")` before importing modules that contain `import` and `export` statements.
 
 Benefits
 ---
