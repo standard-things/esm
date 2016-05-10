@@ -7,13 +7,12 @@
 
 Well, ok, one caveat: this package isn't ready for production use just yet. As of this writing, the repository is all of two days old! Watch this space to find out when `reify` is safe to use.
 
-Installation
----
-Run `npm install --save reify` in your package or app directory (wherever your `package.json` lives).
-
 Usage
 ---
-Call `require("reify")` before importing modules that contain `import` and `export` statements.
+
+1. Run `npm install --save reify` in your package or app directory.
+2. Add `"reify": true` to your `package.json` file.
+3. Call `require("reify")` before importing modules that contain `import` and `export` statements.
 
 Benefits
 ---
