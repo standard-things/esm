@@ -86,3 +86,55 @@ describe("compiler", function () {
     assert.strictEqual(a, assert);
   });
 });
+
+describe("Node REPL", function () {
+  import { createContext } from "vm";
+  import { Readable, Writable } from "stream";
+  var input = new Readable;
+  var output = new Writable;
+  output._write = function () {};
+
+  it("should work with global context", function (done) {
+    var repl = require("repl").start({
+      useGlobal: true,
+      input: input,
+      output: output
+    });
+
+    assert.strictEqual(typeof assertStrictEqual, "undefined");
+
+    repl.eval(
+      'import { strictEqual as assertStrictEqual } from "assert"',
+      null, // context
+      "repl", // filename
+      function (err, result) {
+        // Use the globally-defined assertStrictEqual to test itself!
+        assertStrictEqual(typeof assertStrictEqual, "function");
+        done();
+      }
+    );
+  });
+
+  it("should work with non-global context", function (done) {
+    var repl = require("repl").start({
+      useGlobal: false,
+      input: input,
+      output: output
+    });
+
+    var context = createContext({
+      module: module
+    });
+
+    repl.eval(
+      'import { strictEqual } from "assert"',
+      context,
+      "repl", // filename
+      function (err, result) {
+        // Use the globally-defined assertStrictEqual to test itself!
+        context.strictEqual(typeof context.strictEqual, "function");
+        done();
+      }
+    );
+  });
+});
