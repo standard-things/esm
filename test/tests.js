@@ -90,7 +90,10 @@ describe("compiler", function () {
 describe("Node REPL", function () {
   import { createContext } from "vm";
   import { Readable, Writable } from "stream";
+
   var input = new Readable;
+  input._read = function () {};
+
   var output = new Writable;
   output._write = function () {};
 
