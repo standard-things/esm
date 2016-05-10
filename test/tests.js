@@ -80,4 +80,9 @@ describe("compiler", function () {
     }
     assert.strictEqual(threw, true);
   });
+
+  it("should be enabled for packages that depend on reify", function () {
+    import a from "enabled";
+    assert.strictEqual(a, assert);
+  });
 });
