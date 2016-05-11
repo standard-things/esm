@@ -85,6 +85,11 @@ describe("compiler", function () {
     import a from "enabled";
     assert.strictEqual(a, assert);
   });
+
+  it("should preserve line numbers", function () {
+    import check from "./lines.js";
+    check();
+  });
 });
 
 describe("Node REPL", function () {
