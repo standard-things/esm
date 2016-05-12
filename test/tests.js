@@ -50,6 +50,11 @@ describe("export statements", function () {
     import g, { check } from "./default-function";
     check(g);
   });
+
+  it("should support default expressions", function () {
+    import count from "./default-expression";
+    assert.strictEqual(count, 1);
+  });
 });
 
 describe("built-in modules", function () {
