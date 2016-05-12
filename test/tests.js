@@ -14,6 +14,24 @@ describe("import statements", function () {
     import { check as bCheck } from "./cycle-a";
     bCheck();
   });
+
+  it("should support combinations of import styles", function () {
+    import * as abc1 from "./abc";
+    import abc2, * as abc3 from "./abc";
+    import { default as abc4 } from "./abc";
+    import abc5, { a as ay, b as bee, c } from "./abc";
+
+    assert.deepEqual(abc1, {
+      a: "a",
+      b: "b",
+      c: "c"
+    });
+
+    assert.deepEqual(abc1, abc2);
+    assert.deepEqual(abc1, abc3);
+    assert.deepEqual(abc1, abc4);
+    assert.deepEqual(abc1, abc5);
+  });
 });
 
 describe("export statements", function () {
@@ -81,6 +99,118 @@ describe("export statements", function () {
       assert.strictEqual(val, "value-3");
       done();
     }, 0);
+  });
+
+  import { Script } from "vm";
+
+  var canUseClasses = false;
+  var canUseLetConst = false;
+
+  try {
+    // Test if we have
+    new Script("class A {}");
+    canUseClasses = true;
+  } catch (e) {}
+
+  try {
+    // Test if we have
+    new Script("let x; const y = 1234");
+    canUseLetConst = true;
+  } catch (e) {}
+
+  it("should support all default syntax", function () {
+    import number from "./export/default/number";
+    assert.strictEqual(number, 42);
+
+    import object from "./export/default/object";
+    assert.deepEqual(object, {
+      foo: 42
+    });
+
+    import array from "./export/default/array";
+    assert.deepEqual(array, [1, 2, 3]);
+
+    import func from "./export/default/function";
+    assert.strictEqual(func(), func);
+
+    import ident from "./export/default/identifier";
+    assert.strictEqual(ident, 42);
+
+    if (! canUseClasses) {
+      return;
+    }
+
+    import C from "./export/default/anon-class";
+    assert.strictEqual(new C(1234).value, 1234);
+
+    import C from "./export/default/named-class";
+    assert.strictEqual(new C(56, 78).sum, 56 + 78);
+  });
+
+  it("should support basic declaration syntax", function () {
+    import { a, b, c, d } from "./export/declarations/basic";
+
+    assert.strictEqual(a, 1);
+    assert.strictEqual(b(), d);
+    assert.strictEqual(c, "c");
+    assert.strictEqual(d(), b);
+  });
+
+  canUseLetConst &&
+  it("should support block declaration syntax", function () {
+    import { a, b, c } from "./export/declarations/block";
+
+    assert.strictEqual(a, 1);
+    assert.strictEqual(b, 2);
+    assert.strictEqual(c, 3);
+  });
+
+  it("should support all named export syntax", function () {
+    var exp = require("./export/names");
+
+    assert.strictEqual(exp.foo, "foo");
+    assert.strictEqual(exp.bar, "bar");
+    assert.strictEqual(exp.baz, "baz");
+    assert.strictEqual(exp.foo2, "foo");
+    assert.strictEqual(exp.foo3, "foo");
+    assert.strictEqual(exp.baz2, "baz");
+    assert.strictEqual(exp.default, "foo");
+
+    import foo from "./export/names";
+    assert.strictEqual(foo, "foo");
+  });
+
+  it("should support all export-from syntax", function () {
+    import all, { a, b, c, ay, bee, foo } from "./export/from";
+
+    assert.deepEqual(all, {
+      a: "a",
+      ay: "a",
+      b: "b",
+      bee: "b",
+      c: "c",
+      "default": {
+        a: "a",
+        b: "b",
+        c: "c"
+      },
+      foo: {
+        a: "a",
+        b: "b",
+        c: "c"
+      }
+    });
+
+    assert.strictEqual(a, "a");
+    assert.strictEqual(b, "b");
+    assert.strictEqual(c, "c");
+    assert.strictEqual(ay, "a");
+    assert.strictEqual(bee, "b");
+    assert.deepEqual(foo, {
+      a: "a",
+      b: "b",
+      c: "c"
+    });
   });
 });
 
