@@ -131,6 +131,7 @@ describe("compiler", function () {
 
 describe("Node REPL", function () {
   import { createContext } from "vm";
+  import "../repl.js";
 
   it("should work with global context", function (done) {
     var repl = require("repl").start({

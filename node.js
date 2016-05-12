@@ -1,8 +1,8 @@
 var fs = require("fs");
 var path = require("path");
 var hasOwn = Object.prototype.hasOwnProperty;
-var compile = require("./compiler.js").compile;
-var Module = require("./module.js").Module;
+var compile = require("./lib/compiler.js").compile;
+var Module = require("./lib/module.js").Module;
 var Mp = Module.prototype;
 var isEnabledCache = Object.create(null);
 
@@ -102,6 +102,3 @@ function readPkgInfo(dir) {
 
   return null;
 }
-
-// Enable import and export statements in the default Node REPL.
-require("./repl");
