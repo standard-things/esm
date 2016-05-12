@@ -75,12 +75,12 @@ describe("export statements", function () {
     assert.strictEqual(def, "default-3");
     assert.strictEqual(val, "value-2");
 
-    setImmediate(function () {
+    setTimeout(function () {
       oneLastExport();
       assert.strictEqual(def, "default-3");
       assert.strictEqual(val, "value-3");
       done();
-    });
+    }, 0);
   });
 });
 
