@@ -1,6 +1,6 @@
 {
   "name": "reify",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "main": "index.js",
   "browser": "lib/empty.js",
   "author": "Ben Newman <ben@benjamn.com>",
