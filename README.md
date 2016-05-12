@@ -5,13 +5,28 @@
 
 **Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.**
 
-Well, ok, one caveat: this package isn't ready for production use just yet. As of this writing, the repository is all of two days old! Watch this space to find out when `reify` is safe to use.
-
 Usage
 ---
 
-1. Run `npm install --save reify` in your package or app directory.
-2. Call `require("reify")` before importing modules that contain `import` and `export` statements.
+1. Run `npm install --save reify` in your package or app directory. The
+   `--save` is important because reification only applies to modules in
+   packages that explicitly depend on the `reify` package.
+2. Call `require("reify")` before importing modules that contain `import`
+   and `export` statements.
+
+You can also easily `reify` the Node REPL:
+
+```sh
+% node
+> require("reify/repl")
+{}
+> import { strictEqual } from "assert"
+> strictEqual(2 + 2, 5)
+AssertionError: 4 === 5
+    at repl:1:1
+    at REPLServer.defaultEval (repl.js:272:27)
+  ...
+```
 
 Benefits
 ---
