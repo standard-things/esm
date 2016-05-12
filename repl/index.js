@@ -1,7 +1,7 @@
 var vm = require("vm");
-var compile = require("./lib/compiler.js").compile;
+var compile = require("../lib/compiler.js").compile;
 
-require("./node.js");
+require("../node");
 
 function wrap(name) {
   var method = vm[name];
