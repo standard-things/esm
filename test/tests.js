@@ -45,6 +45,11 @@ describe("export statements", function () {
     import { outer } from "./nested";
     assert.deepEqual(outer(), ["a", "b", "c"]);
   });
+
+  it("should support default declarations", function () {
+    import g, { check } from "./default-function";
+    check(g);
+  });
 });
 
 describe("built-in modules", function () {
