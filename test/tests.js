@@ -55,6 +55,33 @@ describe("export statements", function () {
     import count from "./default-expression";
     assert.strictEqual(count, 1);
   });
+
+  it("should be able to invoke setters later", function (done) {
+    import def, {
+      val,
+      exportAgain,
+      exportYetAgain,
+      oneLastExport
+    } from "./export-later";
+
+    assert.strictEqual(def, "default-1");
+    assert.strictEqual(val, "value-1");
+
+    exportAgain();
+    assert.strictEqual(def, "default-2");
+    assert.strictEqual(val, "value-2");
+
+    exportYetAgain();
+    assert.strictEqual(def, "default-3");
+    assert.strictEqual(val, "value-2");
+
+    setImmediate(function () {
+      oneLastExport();
+      assert.strictEqual(def, "default-3");
+      assert.strictEqual(val, "value-3");
+      done();
+    });
+  });
 });
 
 describe("built-in modules", function () {
