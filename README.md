@@ -1,9 +1,13 @@
-# re•i•fy <sub>_verb, formal_</sub> [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify)
+# re•i•fy <sub>_verb, transitive_</sub> &nbsp; [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify)
 
-1. to make (something abstract) more concrete or real.<br>
+**re•i•fied** <sub>past</sub> &nbsp; **re•i•fies** <sub>present</sub> &nbsp; **re•i•fy•ing** <sub>participle</sub>
+
+1. to make (something abstract) more concrete or real<br>
    _"these instincts are, in humans, reified as verbal constructs"_
+2. to regard or treat (an idea, concept, etc.) as if having material existence
+3. **to enable ECMAScript 2015 modules in *any* version of [Node.js](https://nodejs.org)**
 
-**Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.**
+**re•i•fi•ca•tion** <sub>noun</sub> &nbsp; **re•i•fi•er** <sub>noun</sub>
 
 Usage
 ---
