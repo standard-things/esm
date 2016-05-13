@@ -1,6 +1,9 @@
 {
   "name": "reify-test-package",
   "private": true,
+  "reify": {
+    "cache-directory": ".cache/path/for/tests"
+  },
   "dependencies": {
     "reify": "*"
   }
