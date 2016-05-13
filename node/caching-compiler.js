@@ -1,46 +1,26 @@
 var fs = require("fs");
 var path = require("path");
-var compile = require("./compiler.js").compile;
+var compile = require("../lib/compiler.js").compile;
 var hasOwn = Object.prototype.hasOwnProperty;
-var isEnabledCache = Object.create(null);
+
+// Map from absolute file paths to the package.json that governs them.
+var pkgJsonCache = Object.create(null);
 
 exports.compile = function (content, filename) {
-  return isEnabled(filename)
-    ? compile(content)
-    : content;
-};
-
-function isEnabled(filename) {
-  if (hasOwn.call(isEnabledCache, filename)) {
-    return isEnabledCache[filename];
-  }
-
-  try {
-    var stat = fs.statSync(filename);
-  } catch (e) {
-    return isEnabledCache[filename] = false;
-  }
-
-  if (stat.isDirectory()) {
-    if (path.basename(filename) === "node_modules") {
-      return isEnabledCache[filename] = false;
+  var pkg = getPkgJson(filename);
+  if (pkg) {
+    if (hasOwn.call(pkg, "reify") && ! pkg.reify) {
+      // An explicit "reify": false property in package.json disables
+      // reification even if "reify" is listed as a dependency.
+      return content;
     }
 
-    var pkg = readPkgInfo(filename);
-    if (pkg) {
-      if (hasOwn.call(pkg, "reify")) {
-        // An explicit "reify": false property in package.json disables
-        // reification even if "reify" is listed as a dependency.
-        return isEnabledCache[filename] = !! pkg.reify;
-      }
+    function check(name) {
+      return typeof pkg[name] === "object" &&
+        hasOwn.call(pkg[name], "reify");
+    }
 
-      function check(name) {
-        return typeof pkg[name] === "object" &&
-          hasOwn.call(pkg[name], "reify");
-      }
-
-      return isEnabledCache[filename] =
-        check("dependencies") ||
+    if (check("dependencies") ||
         check("peerDependencies") ||
         // Use case: a package.json file may have "reify" in its
         // "devDependencies" section because it expects another package or
@@ -48,14 +28,40 @@ function isEnabled(filename) {
         // own copy of the "reify" package during development. Disabling
         // reification in production when it was enabled in development
         // would be dangerous in this case.
-        check("devDependencies");
+        check("devDependencies")) {
+      return compile(content);
+    }
+  }
+
+  return content;
+};
+
+function getPkgJson(filename) {
+  if (hasOwn.call(pkgJsonCache, filename)) {
+    return pkgJsonCache[filename];
+  }
+
+  try {
+    var stat = fs.statSync(filename);
+  } catch (e) {
+    return pkgJsonCache[filename] = null;
+  }
+
+  if (stat.isDirectory()) {
+    if (path.basename(filename) === "node_modules") {
+      return pkgJsonCache[filename] = null;
+    }
+
+    var pkg = readPkgInfo(filename);
+    if (pkg) {
+      return pkgJsonCache[filename] = pkg;
     }
   }
 
   var parentDir = path.dirname(filename);
-  return isEnabledCache[filename] =
+  return pkgJsonCache[filename] =
     parentDir !== filename &&
-    isEnabled(parentDir);
+    getPkgJson(parentDir);
 }
 
 function readPkgInfo(dir) {
