@@ -1,0 +1,7 @@
+{
+  "name": "reify-test-package",
+  "private": true,
+  "dependencies": {
+    "reify": "*"
+  }
+}
