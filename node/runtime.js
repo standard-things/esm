@@ -1,4 +1,4 @@
-var Module = require("../lib/runtime.js").Module;
+var Module = require("../lib/runtime.js").enable(module.constructor);
 var Mp = Module.prototype;
 
 exports.Module = Module;
