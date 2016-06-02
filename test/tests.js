@@ -39,19 +39,14 @@ describe("import statements", function () {
 
 describe("export statements", function () {
   it("should allow * exports", function () {
-    import Default, {
+    import def, {
       a, b, c as d,
     } from "./export-all.js";
 
     assert.strictEqual(a, "a");
     assert.strictEqual(b, "b");
     assert.strictEqual(d, "c");
-
-    assert.deepEqual(Default, {
-      a: "a",
-      b: "b",
-      c: "c"
-    });
+    assert.strictEqual(def, "default");
   });
 
   it("should allow named re-exports", function test() {
@@ -184,26 +179,9 @@ describe("export statements", function () {
   });
 
   it("should support all export-from syntax", function () {
-    import all, { a, b, c, ay, bee, foo } from "./export/from";
+    import def, { a, b, c, ay, bee, foo } from "./export/from";
 
-    assert.deepEqual(all, {
-      a: "a",
-      ay: "a",
-      b: "b",
-      bee: "b",
-      c: "c",
-      "default": {
-        a: "a",
-        b: "b",
-        c: "c"
-      },
-      foo: {
-        a: "a",
-        b: "b",
-        c: "c"
-      }
-    });
-
+    assert.strictEqual(def, "a");
     assert.strictEqual(a, "a");
     assert.strictEqual(b, "b");
     assert.strictEqual(c, "c");
@@ -213,6 +191,13 @@ describe("export statements", function () {
       a: "a",
       b: "b",
       c: "c"
+    });
+  });
+
+  it("should support export { default } from ... syntax", function () {
+    import object from "./export/default/from";
+    assert.deepEqual(object, {
+      foo: 42
     });
   });
 });
