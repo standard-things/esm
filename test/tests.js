@@ -35,6 +35,11 @@ describe("import statements", function () {
     assert.deepEqual(abc1, abc4);
     assert.deepEqual(abc1, abc5);
   });
+
+  it("should import module.exports as default, by default", function () {
+    import def from "./export/common.js";
+    assert.strictEqual(def, "pure CommonJS");
+  });
 });
 
 describe("export statements", function () {
