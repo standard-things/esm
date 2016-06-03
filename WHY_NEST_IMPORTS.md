@@ -15,12 +15,12 @@ Because I respect the intelligence and free opinions of those who support
 this restriction, I have written this document with three goals in mind:
 
   1. to provide real-world examples of the problems that nested `import`
-     statements can solve,
+     statements can solve, [#](#real-world-examples)
   2. to entertain and carefully critique every reason one might have for
-     supporting the restriction, and
+     supporting the restriction, [#](#objections-and-critiques) and
   3. to show how nested `import` statements can be implemented correctly
      and efficiently in all versions of Node and most other CommonJS
-     module systems, today.
+     module systems, today. [#](#but-how)
 
 **Note:** this document does not take a position on the usefulness or
 advisability of nested `export` statements. I have never personally
