@@ -239,17 +239,17 @@ of formal grammar that allows the non-terminal *ModuleItem* symbol to
 produce an *ImportDeclaration*, an *ExportDeclaration*, or a
 *StatementListItem*:
 
-*Module* :<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ModuleBody* <sub>opt</sub><br>
-*ModuleBody* :<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ModuleItemList*<br>
-*ModuleItemList* :<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ModuleItem*<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ModuleItemList* *ModuleItem*<br>
-*ModuleItem* :<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ImportDeclaration*<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *ExportDeclaration*<br>
-&nbsp;&nbsp;&nbsp;&nbsp; *StatementListItem*
+&nbsp;&nbsp;&nbsp;&nbsp; *Module* :<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ModuleBody* <sub>opt</sub><br>
+&nbsp;&nbsp;&nbsp;&nbsp; *ModuleBody* :<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ModuleItemList*<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *ModuleItemList* :<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ModuleItem*<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ModuleItemList* *ModuleItem*<br>
+&nbsp;&nbsp;&nbsp;&nbsp; *ModuleItem* :<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ImportDeclaration*<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *ExportDeclaration*<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; *StatementListItem*
 
 The astute specification reader will note that *StatementListItem* can
 never produce another *ImportDeclaration*, which establishes the
