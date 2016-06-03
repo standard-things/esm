@@ -114,15 +114,6 @@ tests from running at all! Compare this behavior to that of the original
 code, where each test captures any and all exceptions resulting from its
 own particular `import` statement and `strictEqual(check(), ...)` call.
 
-### Colocation of `import` statements with consuming code
-
-When you delete code that contains a nested `import` statement, you don't
-have to scroll up to the top of the file and search through a laundry list
-of other `import` statements, then search through the rest of the file for
-any other references to the imported symbols. The scope of the nested
-`import` statement is obvious, so it's easy to tell when it's safe to
-delete.
-
 ### Lazy evaluation
 
 As the previous example suggests, putting all your `import` statements at
@@ -151,6 +142,15 @@ using the CommonJS `require` function, and JavaScript modules will remain
 an awkward hybrid of modern and legacy styles.
 
 Is that a future we can tolerate?
+
+### Colocation of `import` statements with consuming code
+
+When you delete code that contains a nested `import` statement, you don't
+have to scroll up to the top of the file and search through a laundry list
+of other `import` statements, then search through the rest of the file for
+any other references to the imported symbols. The scope of the nested
+`import` statement is obvious, so it's easy to tell when it's safe to
+delete.
 
 ### Optimistic imports
 
