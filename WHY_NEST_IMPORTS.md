@@ -11,7 +11,7 @@ Because I respect the intelligence and free opinions of those who support this r
   1. to provide real-world examples of the problems that nested `import` statements can solve,
   2. to entertain and carefully critique every reason one might have for supporting the restriction, and
   3. to show how nested `import` statements can be implemented correctly and efficiently in all versions of Node and most other CommonJS module systems, today.
-  
+
 **Note:** this document does not take a position on the usefulness or advisability of nested `export` statements. I have never personally encountered a scenario that called for putting `export` statements inside conditional blocks or nested function scopes, and I appreciate the concern that doing so would make it difficult or impossible to know exactly which symbols the module provides.
 
 ### Who am I?
@@ -34,7 +34,7 @@ If you're not yet convinced of the importance of `import` and `export`, please t
 
   * allow dependency cycles (like CommonJS), but handle them more gracefully with [*live bindings*](http://www.2ality.com/2015/07/es6-module-exports.html),
   * can be easily understood with static (i.e., compile-time) analysis, enabling powerful new [tools](http://rollupjs.org/), and
-  * put an end to the long and unnecessarily divisive debate over competing JavaScript module systems.
+  * put an end to the long and polarizing debate over competing JavaScript module systems.
 
 ## Real-world examples
 
@@ -50,12 +50,12 @@ describe("fancy feature #5", () => {
     import { check } from "./client.js";
     strictEqual(check(), "client ok");
   });
-  
+
   it("should work on the client", () => {
     import { check } from "./server.js";
     strictEqual(check(), "server ok");
   });
-  
+
   it("should work on both client and server", () => {
     import { check } from "./both.js";
     strictEqual(check(), "both ok");
@@ -96,17 +96,17 @@ When you delete code that contains a nested `import` statement, you don't have t
 
 As the previous example suggests, putting all your `import` statements at the top level of your modules means you pay the performance cost of evaluating all your modules at startup time, even if they are not used until much later, or in some cases never used at all!
 
-If you have the ability to nest `import` statements in the immediate scope where the imported symbols will be used, then you can take full advantage of your application's specific needs, and there is nothing to stop you from front-loading the work of importing dependencies if that makes sense for your application.
+If you have the ability to nest `import` statements in the immediate scope where the imported symbols will be used, then you can take full advantage of your application's specific needs---and there is nothing to stop you from front-loading the work of importing dependencies if that makes sense for your application.
 
 Eager evaluation of the entire dependency tree is fine for long-running applications like servers, but not so great for short-lived, multi-purpose utilities like command-line tools, or client-side applications that must evaluate modules while the user waits. For example, the [WebTorrent Desktop app](https://webtorrent.io/) was able to reduce startup time dramatically [by deferring `require` calls](https://mobile.twitter.com/WebTorrentApp/status/737890973733244928). This optimization would not have been possible if they could only use `import` statements at the top level.
 
-To put it in even stronger terms, if we do not allow ourselves to nest `import` statements, then serious applications will never be able to stop using the CommonJS `require` function, and JavaScript modules will continue to be an awkward hybrid of modern and legacy styles.
+To put it in even stronger terms, if we do not allow ourselves to nest `import` statements, then serious applications will never be able to stop using the CommonJS `require` function, and JavaScript modules will remain an awkward hybrid of modern and legacy styles.
 
-Ask yourself: is that a future you really want?
+Is that a future we can tolerate?
 
 ### Optimistic imports
 
-Perhaps you would like to use a module if it is available, but it's not the end of the world if it's not installed:
+Perhaps you would like to use a module if it is available, but it's hardly the end of the world if it's not:
 
 ```js
 try {
@@ -159,7 +159,7 @@ http://www.ecma-international.org/ecma-262/6.0/index.html#sec-modules
 * Babel renaming
 * SystemJS limitations
 
-### Reasoning about conditional imports is hard
+### "Reasoning about conditional imports is hard"
 
 There are an infinite variety of ways to write hard-to-understand spaghetti code, some more problematic than others.
 
