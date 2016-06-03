@@ -229,9 +229,15 @@ imports](https://www.safaribooksonline.com/library/view/scala-cookbook/978144934
 
 ### "The specification forbids nested `import` statements"
 
-There is definitely some merit to this argument, but I want to spend a moment understanding exactly what it would mean to change the spec, if that's what we decide to do.
+There is definitely some merit to this argument, but I want to spend a
+moment understanding exactly what it would mean to change the spec, if
+that's what we decide to do.
 
-This argument is based on a single [fragment](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-modules) of formal grammar that allows the non-terminal *ModuleItem* symbol to produce an *ImportDeclaration*, an *ExportDeclaration*, or a *StatementListItem*:
+This argument is based on a single
+[fragment](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-modules)
+of formal grammar that allows the non-terminal *ModuleItem* symbol to
+produce an *ImportDeclaration*, an *ExportDeclaration*, or a
+*StatementListItem*:
 
 *Module* :<br>
 &nbsp;&nbsp;&nbsp;&nbsp; *ModuleBody* <sub>opt</sub><br>
@@ -245,19 +251,41 @@ This argument is based on a single [fragment](http://www.ecma-international.org/
 &nbsp;&nbsp;&nbsp;&nbsp; *ExportDeclaration*<br>
 &nbsp;&nbsp;&nbsp;&nbsp; *StatementListItem*
 
-The astute specification reader will note that *StatementListItem* can never produce another *ImportDeclaration*, which establishes the restriction that we've been talking about.
+The astute specification reader will note that *StatementListItem* can
+never produce another *ImportDeclaration*, which establishes the
+restriction that we've been talking about.
 
-Now, the ECMAScript specification is a highly technical document, and significant implications are not always accompanied by extensive verbal justifications. However, it is worth emphasizing that this snippet of grammar is the *only* indication in the entire spec that `import` statements should be restricted to the top level of modules.
+Now, the ECMAScript specification is a highly technical document, and
+significant implications are not always accompanied by extensive verbal
+justifications. However, it is worth emphasizing that this snippet of
+grammar is the *only* indication in the entire spec that `import`
+statements should be restricted to the top level of modules.
 
-In other words, if we were to relax the rules for where `import` statements can appear, this part of the grammar would *absolutely* have to be updated, but it would be a very easy change to make, since nothing else in the spec assumes that `import` statements can only appear at the top level.
+In other words, if we were to relax the rules for where `import`
+statements can appear, this part of the grammar would *absolutely* have to
+be updated, but it would be a very easy change to make, since nothing else
+in the spec assumes that `import` statements can only appear at the top
+level.
 
 ### "Nested `import` statements are difficult to transpile"
 
-While it would be easy to change the ECMAScript specification to allow nested `import` statements, and it would be relatively straightforward for native implementations to support them, it might not be so easy for existing *transpilers* to handle arbitrarily nested `import` statements.
+While it would be easy to change the ECMAScript specification to allow
+nested `import` statements, and it would be relatively straightforward for
+native implementations to support them, it might not be so easy for
+existing *transpilers* to handle arbitrarily nested `import` statements.
 
-The three most prevalent modules transforms currently in use are Babel's [CommonJS](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-commonjs) and [SystemJS](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-systemjs) transforms, and [TypeScript](https://www.typescriptlang.org/docs/handbook/modules.html).
+The three most prevalent modules transforms currently in use are Babel's
+[CommonJS](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-commonjs)
+and
+[SystemJS](https://www.npmjs.com/package/babel-plugin-transform-es2015-modules-systemjs)
+transforms, and
+[TypeScript](https://www.typescriptlang.org/docs/handbook/modules.html).
 
-Babel's CommonJS transform achieves [live binding](http://www.2ality.com/2015/07/es6-module-exports.html) by saving a reference to the `exports` object of the imported module, then rewriting all references to the imported symbols as property lookups against that object:
+Babel's CommonJS transform achieves [live
+binding](http://www.2ality.com/2015/07/es6-module-exports.html) by saving
+a reference to the `exports` object of the imported module, then rewriting
+all references to the imported symbols as property lookups against that
+object:
 
 ```js
 import { a, b } from "./asdf";
@@ -270,11 +298,23 @@ var _asdf = require("./asdf");
 var _zxcv = require("./zxcv");
 console.log(_asdf.a + _asdf.b + _zxcv.c);
 ```
-Although debugging can be tricky because of the renaming, this approach works well enough that I decided to use it when implementing the Meteor 1.3 module system, and I don't regret that choice.
 
-Purely for [performance reasons](https://phabricator.babeljs.io/T1760#53350), it's convenient if the rewriting uses a single globally-defined map, rather than a map for each scope. So it would not be impossible for Babel to support nested `import` statements, just a bit slower. Instead, the Babel compiler throws an exception when it encounters a nested `import` statement.
+Although debugging can be tricky because of the renaming, this approach
+works well enough that I decided to use it when implementing the Meteor
+1.3 module system, and I don't regret that choice.
 
-TypeScript only officially supports top-level `import` statements. I don't fully understand the implementation details, but I find it somewhat disturbing that nested `import` statements seem to be tolerated without compilation errors, even though they are totally broken at runtime:
+Purely for [performance
+reasons](https://phabricator.babeljs.io/T1760#53350), it's convenient if
+the rewriting uses a single globally-defined map, rather than a map for
+each scope. So it would not be impossible for Babel to support nested
+`import` statements, just a bit slower. Instead, the Babel compiler throws
+an exception when it encounters a nested `import` statement.
+
+TypeScript only officially supports top-level `import` statements. I don't
+fully understand the implementation details, but I find it somewhat
+disturbing that nested `import` statements seem to be tolerated without
+compilation errors, even though they are totally broken at runtime:
+
 ```js
 import a from "./asdf";
 function foo() {
@@ -283,7 +323,9 @@ function foo() {
 }
 console.log(a + foo());
 ```
+
 becomes:
+
 ```js
 define(["require", "exports", "./asdf"], function (require, exports, asdf_1) {
     "use strict";
@@ -293,11 +335,20 @@ define(["require", "exports", "./asdf"], function (require, exports, asdf_1) {
     console.log(asdf_1.default + foo());
 });
 ```
-Where does that `zxcv_1` variable come from? I'm afraid the answer is "nowhere," friends.
 
-The Babel SystemJS transform targets the `System.register` API, which is&mdash;how do I put this gently?&mdash;well, it's an API you would never want to write by hand. Unfortunately for us, that awkwardness was conceived under the assumption that `import` statements will only appear at the top level, as all imported symbols must be hoisted into a single enclosing scope, and updated using a series of setter functions.
+Where does that `zxcv_1` variable come from? I'm afraid the answer is
+"nowhere," friends.
 
-If you don't believe me, read [this](https://github.com/ModuleLoader/es6-module-loader/blob/master/docs/system-register.md) and then behold the consequences:
+The Babel SystemJS transform targets the `System.register` API, which
+is&mdash;how do I put this gently?&mdash;well, it's an API you would never
+want to write by hand. Unfortunately for us, that awkwardness was
+conceived under the assumption that `import` statements will only appear
+at the top level, as all imported symbols must be hoisted into a single
+enclosing scope, and updated using a series of setter functions.
+
+If you don't believe me, read
+[this](https://github.com/ModuleLoader/es6-module-loader/blob/master/docs/system-register.md)
+and then behold the consequences:
 
 ```js
 import { a, b } from "./asdf";
@@ -326,9 +377,16 @@ System.register(["./asdf", "./zxcv"], function (_export, _context) {
 });
 ```
 
-The one good thing about this transform is that it uses normal variables for `a`, `b`, and `c`, so the debugging experience is somewhat better than the other transforms, as long as you have souce maps enabled.
+The one good thing about this transform is that it uses normal variables
+for `a`, `b`, and `c`, so the debugging experience is somewhat better than
+the other transforms, as long as you have souce maps enabled.
 
-**tl;dr** All three transform fail to support nested `import` statements for different reasons, but none of those reasons are really fundamental. It would be a mistake to let these imperfect implementations influence our decision about nested `import` statements, and if anyone tries to tell you that nested `import` statements are impossible to transpile, I assure you they are mistaken.
+**tl;dr** All three transform fail to support nested `import` statements
+for different reasons, but none of those reasons are really
+fundamental. It would be a mistake to let these imperfect implementations
+influence our decision about nested `import` statements, and if anyone
+tries to tell you that nested `import` statements are impossible to
+transpile, I assure you they are mistaken.
 
 ### "Reasoning about conditional imports is hard"
 
