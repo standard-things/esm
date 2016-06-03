@@ -379,7 +379,7 @@ System.register(["./asdf", "./zxcv"], function (_export, _context) {
 
 The one good thing about this transform is that it uses normal variables
 for `a`, `b`, and `c`, so the debugging experience is somewhat better than
-the other transforms, as long as you have souce maps enabled.
+the other transforms, as long as you have source maps enabled.
 
 **tl;dr** All three transform fail to support nested `import` statements
 for different reasons, but none of those reasons are really
@@ -408,7 +408,7 @@ write linter rules that forbid them, and tools like Webpack or Browserify
 can refuse to compile them.
 
 Given the potential benefits, and the debatability of the drawbacks, it
-would be a mistake for the ECMAScript langauge specification to enforce
+would be a mistake for the ECMAScript language specification to enforce
 the top-level restriction before we've experienced the alternative.
 
 # But how?!
