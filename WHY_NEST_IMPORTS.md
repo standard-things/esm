@@ -14,9 +14,13 @@ conditional blocks or other nested scopes.
 Because I respect the intelligence and free opinions of those who support
 this restriction, I have written this document with three goals in mind:
 
-  1. to provide real-world examples of the problems that nested `import` statements can solve,
-  2. to entertain and carefully critique every reason one might have for supporting the restriction, and
-  3. to show how nested `import` statements can be implemented correctly and efficiently in all versions of Node and most other CommonJS module systems, today.
+  1. to provide real-world examples of the problems that nested `import`
+     statements can solve,
+  2. to entertain and carefully critique every reason one might have for
+     supporting the restriction, and
+  3. to show how nested `import` statements can be implemented correctly
+     and efficiently in all versions of Node and most other CommonJS
+     module systems, today.
 
 **Note:** this document does not take a position on the usefulness or
 advisability of nested `export` statements. I have never personally
@@ -204,17 +208,20 @@ string literals, which means it's usually impossible to make sense of
 
 Why? Nested `import` statements still have string literal source
 identifiers, and still require symbols to be named individually. The only
-new behavior is that some nested `import` statements might never be
-evaluated. Because that question is difficult to answer at compile time,
-we have to assume the worst, and imagine that the `import` statement
-always executes. In other words, the potential use of an imported symbol
-is no different from the 100%-certain use of an imported symbol, as far as
-static analysis is concerned.
+new behavior is that some nested `import` statements might not be
+evaluated at runtime. Because that question is difficult to answer at
+compile time, we have to assume the worst, and imagine that all `import`
+statements always execute. In other words, the potential use of an
+imported symbol is no different from the 100%-certain use of an imported
+symbol, as far as static analysis is concerned.
 
 Think about it: if you couldn't nest `import` statements, you would have
 to hoist them to the top level of the module anyway, where they would be
-guaranteed to execute, even when the module is not needed at
-runtime. What's the point of that?
+guaranteed to execute, even if it turns out the module is not needed at
+runtime. Static analysis only cares&mdash;and only *can* care&mdash;about
+the set of symbols that might possibly be imported by one module from
+another module, and that set is not affected by the placement of `import`
+statements.
 
 Finally, languages that are much more concerned with static analysis than
 JavaScript, such as Scala, somehow [get away with nesting
@@ -241,3 +248,18 @@ other programmers who abuse them.
 Used tastefully, nested `import` statements have the potential to improve
 the readability and maintainability of your code immensely, for all the
 reasons discussed in other sections.
+
+I firmly believe our community has the ability to develop conventions for
+appropriate use of nested `import` statements. If nested imports prove
+mostly unproblematic, that's great. If they must be used sparingly, we'll
+write linter rules that forbid them, and tools like Webpack or Browserify
+can refuse to compile them.
+
+Given the potential benefits, and the debatability of the drawbacks, it
+would be a mistake for the ECMAScript langauge specification to enforce
+the top-level restriction before we've experienced the alternative.
+
+# But how?!
+
+Dear readers: that is exactly what
+[`reify`](https://github.com/benjamn/reify) does.
