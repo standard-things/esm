@@ -262,7 +262,7 @@ grammar is the *only* indication in the entire spec that `import`
 statements should be restricted to the top level of modules.
 
 In other words, if we were to relax the rules for where `import`
-statements can appear, this part of the grammar would *absolutely* have to
+statements can appear, this part of the grammar would absolutely have to
 be updated, but it would be a very easy change to make, since nothing else
 in the spec assumes that `import` statements can only appear at the top
 level.
@@ -386,7 +386,7 @@ for different reasons, but none of those reasons are really
 fundamental. It would be a mistake to let these imperfect implementations
 influence our decision about nested `import` statements, and if anyone
 tries to tell you that nested `import` statements are impossible to
-transpile, I assure you they are mistaken.
+transpile, I assure you they are misinformed.
 
 ### "Reasoning about conditional imports is hard"
 
