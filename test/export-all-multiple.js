@@ -1,3 +1,3 @@
-import * as Abc from "./abc";
+import * as n from "./abc";
 export * from "./def";
-export {Abc};
+export { n as Abc };
