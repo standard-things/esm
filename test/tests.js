@@ -54,6 +54,19 @@ describe("export statements", function () {
     assert.strictEqual(def, "default");
   });
 
+  it("should allow re-exporting import * alongside export *", function () {
+    import {
+      Abc, d, e, f,
+    } from "./export-all-multiple.js";
+
+    assert.strictEqual(Abc.a, "a");
+    assert.strictEqual(Abc.b, "b");
+    assert.strictEqual(Abc.c, "c");
+    assert.strictEqual(d, "d");
+    assert.strictEqual(e, "e");
+    assert.strictEqual(f, "f");
+  });
+
   it("should allow named re-exports", function test() {
     import { a, c, v, si } from "./export-some.js";
     assert.strictEqual(a, "a");
