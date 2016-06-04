@@ -67,6 +67,15 @@ describe("export statements", function () {
     assert.strictEqual(f, "f");
   });
 
+  it("should tolerate mutual * exports", function () {
+    import { a as aa, b as ab } from "./export/all-mutual-a.js";
+    import { a as ba, b as bb } from "./export/all-mutual-b.js";
+    assert.strictEqual(aa, "a");
+    assert.strictEqual(ab, "b");
+    assert.strictEqual(ba, "a");
+    assert.strictEqual(bb, "b");
+  });
+
   it("should allow named re-exports", function test() {
     import { a, c, v, si } from "./export-some.js";
     assert.strictEqual(a, "a");
