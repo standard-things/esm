@@ -229,6 +229,16 @@ describe("export statements", function () {
   });
 });
 
+describe("parent setters", function () {
+  it("should be run when children update exports", function () {
+    import { c } from "./setters/parent";
+    import { increment } from "./setters/grandchild";
+    assert.strictEqual(c, 0);
+    increment();
+    assert.strictEqual(c, 1);
+  });
+});
+
 describe("built-in modules", function () {
   it("should fire setters if already loaded", function () {
     // The "module" module is required in ../lib/node.js before we begin
