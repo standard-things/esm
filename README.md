@@ -40,7 +40,9 @@ to be easily human readable and writable, in part because that makes it
 easier to explain.
 
 I will explain the `Module.prototype.import` method first, then the
-`Module.prototype.export` method after that.
+`Module.prototype.export` method after that. Note that this `Module` is
+the constructor of the CommonJS `module` object, and the `import` and
+`export` methods are custom additions to `Module.prototype`.
 
 Here we go:
 
