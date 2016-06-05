@@ -152,12 +152,12 @@ module.export({
 });
 ```
 
-It's important that we registering getter functions rather than storing
+It's important that we register getter functions rather than storing
 computed values, because the values of exported variables can change, and
 we want other modules always to import the newest values.
 
 But what about `export default` statements? It would be a mistake to defer
-evaluation of the default expression until later, so wrapping it in a
+evaluation of the `default` expression until later, so wrapping it in a
 getter function is not exactly what we want.
 
 The important point to understand here is that `module.import` does not
@@ -190,9 +190,9 @@ module.export("default", (def => def).bind(null, getDefault()));
 ```
 
 What about `export ... from "./module"` statements? The key insight here
-is that *`export` statements with a `from "..."` clause are really just
+is that **`export` statements with a `from "..."` clause are really just
 `import` statements that update the `exports` object instead of updating
-local variables*:
+local variables**:
 
 ```js
 export { a, b as c } from "./module";
@@ -220,7 +220,7 @@ module.import("./module", {
 ```
 
 While these examples have not covered every possible syntax for `import`
-and `export` statements, they should provide the intuition necessary to
+and `export` statements, I hope they provide the intuition necessary to
 imagine how any statement could be compiled.
 
 When I have some time, I hope to implement a [live-compiling text
