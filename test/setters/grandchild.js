@@ -1,4 +1,4 @@
-export let c = 0;
+export var c = 0;
 export function increment() {
   ++c;
   module.export();
