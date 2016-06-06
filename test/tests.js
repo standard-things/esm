@@ -1,8 +1,5 @@
 var assert = require("assert");
 
-// Make test timing more consistent by importing parser module eagerly.
-require("../lib/parser.js");
-
 describe("import statements", function () {
   it("should work in nested scopes", function () {
     import { name, id } from "./name";

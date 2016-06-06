@@ -28,7 +28,9 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "~3.2.0"
+    "acorn": "~3.2.0",
+    "ast-types": "~0.8.16",
+    "magic-string": "~0.15.0"
   },
   "devDependencies": {
     "mocha": "~2.5.3"
