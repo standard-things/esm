@@ -131,24 +131,20 @@ parent module, the getters for the `id` module will run, updating its
 `module.exports` object, so that the `module.import` method has access to
 the latest exported values.
 
-There are two styles of `module.export` calls, one for single exports and
-another for multiple exports:
+There are three styles of `module.export` calls, one for multiple exports,
+another for updating the value of a single export, and another for
+bulk-updating the values of all exported variables.
 
-```js
-export function func(x) { ... };
-```
-becomes
-```js
-function func (x) { ... };
-module.export("func", () => func);
-```
-
-and
+The first style is to pass a single object literal of getter functions to
+`module.export`. The `reify` compiler does this for you for every kind of
+named `export` declaration:
 
 ```js
 export const a = "a", b = "b", ...;
 ```
+
 becomes
+
 ```js
 const a = "a", b = "b", ...;
 module.export({
@@ -158,9 +154,56 @@ module.export({
 });
 ```
 
-It's important that we register getter functions rather than storing
-computed values, because the values of exported variables can change, and
-we want other modules always to import the newest values.
+The above code registers getter functions for the variables `a`, `b`, ...,
+so that `module.import` can easily retrieve the latest values of those
+variables at any time. It's important that we register getter functions
+rather than storing computed values, so that other modules always can
+import the newest values.
+
+Suppose you change the value of an exported variable after the module has
+finished loading. Then you need to let the module system know about the
+update, and that's where the second style of `module.export` comes
+in. This update is manual right now, but soon it will be provided
+automatically by the `reify` compiler (see #27):
+
+```js
+export let value = 0;
+export function increment(by) {
+  return value += by;
+};
+```
+
+should become
+
+```js
+module.export({
+  value: () => value,
+  increment: () => increment,
+});
+let value = 0;
+function increment(by) {
+  return module.export("value", value += by);
+};
+```
+
+When called with a string as its first argument, `module.export` updates
+the variable named by the string and returns the value of its second
+argument.
+
+The third and final way to call `module.export` is without any arguments.
+This style is useful when you have no way of knowing which exported
+variables may have been updated:
+
+```js
+export let value = 0;
+
+function runCommand(command) {
+  eval(command);
+  module.export(); // Picks up new value.
+}
+
+runCommand("value = 1234");
+```
 
 But what about `export default` declarations? It would be a mistake to defer
 evaluation of the `default` expression until later, so wrapping it in a
