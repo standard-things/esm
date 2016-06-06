@@ -14,7 +14,7 @@ Usage
      `--save` is important because reification only applies to modules in
      packages that explicitly depend on the `reify` package.
   2. Call `require("reify")` before importing modules that contain `import`
-     and `export` statements.
+     and `export` declarations.
 
 You can also easily `reify` the Node REPL:
 
@@ -97,7 +97,7 @@ the actual `exports` object is never exposed to the caller of
 `module.import`.
 
 Notice that this compilation strategy works equally well no matter where
-the `import` statement appears:
+the `import` declaration appears:
 
 ```js
 if (condition) {
@@ -117,9 +117,9 @@ if (condition) {
 ```
 
 See [`WHY_NEST_IMPORTS.md`](WHY_NEST_IMPORTS.md) for a much more detailed
-discussion of why nested `import` statements are worthwhile.
+discussion of why nested `import` declarations are worthwhile.
 
-What about `export` statements? One option would be to transform them into
+What about `export` declarations? One option would be to transform them into
 CommonJS code that updates the `exports` object, since interoperability
 with Node and CommonJS is certainly a goal of this approach.
 
@@ -162,7 +162,7 @@ It's important that we register getter functions rather than storing
 computed values, because the values of exported variables can change, and
 we want other modules always to import the newest values.
 
-But what about `export default` statements? It would be a mistake to defer
+But what about `export default` declarations? It would be a mistake to defer
 evaluation of the `default` expression until later, so wrapping it in a
 getter function is not exactly what we want.
 
@@ -182,22 +182,9 @@ simply becomes
 exports.default = getDefault();
 ```
 
-Now, if you are really committed to using `module.export` for everything
-(and never touching `exports` directly), then of course you can get it to
-work by evaluating the default expression and binding its value to a
-getter function, like so:
-
-```js
-module.export("default", (def => () => def)(getDefault()));
-```
-or (if you prefer `Function.prototype.bind`)
-```js
-module.export("default", (def => def).bind(null, getDefault()));
-```
-
-What about `export ... from "./module"` statements? The key insight here
-is that **`export` statements with a `from "..."` clause are really just
-`import` statements that update the `exports` object instead of updating
+What about `export ... from "./module"` declarations? The key insight here
+is that **`export` declarations with a `from "..."` clause are really just
+`import` declarations that update the `exports` object instead of updating
 local variables**:
 
 ```js
@@ -211,7 +198,7 @@ module.import("./module", {
 });
 ```
 
-This strategy cleanly generalizes to `export * from "..."` statements:
+This strategy cleanly generalizes to `export * from "..."` declarations:
 
 ```js
 export * from "./module";
@@ -226,8 +213,8 @@ module.import("./module", {
 ```
 
 While these examples have not covered every possible syntax for `import`
-and `export` statements, I hope they provide the intuition necessary to
-imagine how any statement could be compiled.
+and `export` declarations, I hope they provide the intuition necessary to
+imagine how any declaration could be compiled.
 
 When I have some time, I hope to implement a [live-compiling text
 editor](https://github.com/benjamn/reify/issues/15) to enable
