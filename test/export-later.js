@@ -5,11 +5,8 @@ export var val = "value-1";
 
 export function exportAgain() {
   export default "default-2";
-
-  strictEqual(
-    module.export("val", val = "value-2"),
-    "value-2"
-  );
+  val = +(val.split("-")[1]);
+  val = "value-" + ++val;
 }
 
 export function exportYetAgain() {
@@ -17,6 +14,8 @@ export function exportYetAgain() {
 }
 
 export function oneLastExport() {
-  val = "value-3";
-  module.export();
+  strictEqual(
+    val = "value-3",
+    "value-3"
+  );
 }
