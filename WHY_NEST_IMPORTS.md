@@ -215,12 +215,13 @@ seems unavoidable.
 that just happens to allow for more efficient bundle splitting: [`async`
 functions](https://tc39.github.io/ecmascript-asyncawait/).**
 
-The difference between an `async` function and a normal function is that
-an `async` function always returns a `Promise`, so callers of the `async`
-function must be prepared to tolerate a delay before the function produces
-its result. This delay is exactly what the runtime module system needs to
-guarantee that any modules imported by the `async` function are available
-(but not yet evaluated) before the `async` function begins execution.
+The key difference between an `async` function and a normal function is
+that an `async` function always returns a `Promise`, so callers of the
+`async` function must be prepared to tolerate a delay before the function
+produces its result. This delay is exactly what the runtime module system
+needs to guarantee that any modules imported by the `async` function are
+available (but not yet evaluated) before the `async` function begins
+execution.
 
 This tiny window of freedom allows smart bundling tools to produce
 multiple smaller bundles. Specifically, any modules that are imported only
