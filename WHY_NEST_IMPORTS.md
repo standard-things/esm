@@ -478,7 +478,7 @@ import { c } from "./zxcv";
 console.log(a + b + c);
 ```
 
-becomes (brace yourself):
+is compiled (by Babel) thus:
 
 ```js
 System.register(["./asdf", "./zxcv"], function (_export, _context) {
@@ -499,12 +499,12 @@ System.register(["./asdf", "./zxcv"], function (_export, _context) {
 });
 ```
 
-The one advantage of this transform is that it uses normal variables for
-`a`, `b`, and `c`, so the debugging experience is somewhat better than the
-other transforms, as long as you have source maps enabled.
+The one big advantage of this transform is that it uses normal variables
+for `a`, `b`, and `c`, so the debugging experience is somewhat better than
+the other transforms, as long as you have source maps enabled.
 
-**tl;dr** All three transform fail to support nested `import` declarations
-for different reasons, but none of those reasons are really
+**tl;dr** All three transforms fail to support nested `import`
+declarations for different reasons, but none of those reasons are really
 fundamental. It would be a mistake to let these imperfect implementations
 influence our decision about nested `import` declarations, and if anyone
 tries to tell you that nested `import` declarations are impossible to
