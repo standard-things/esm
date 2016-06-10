@@ -182,6 +182,125 @@ the `console` object.
 
 ### Automatic code splitting
 
+In order for nested `import` declarations to work, the runtime module
+system must ensure that the source module is available at the time of the
+`import`. In Node, where all modules are immediately available on disk,
+this guarantee has never posed much of a problem. In contexts where
+modules must be fetched from a server, and fetching all modules would be
+prohibitively expensive, some sort of bundling step becomes necessary.
+
+Thankfully, because ECMAScript `import` declarations always have
+statically analyzable source identifier strings, bundling tools have a
+much easier time understanding `import` declarations than they do
+understanding CommonJS `require(id)` calls.
+
+One simplistic but effective strategy for bundling an app with nested
+`import` declarations is to imagine (for lack of any better idea) that all
+`import` declarations in the app might be evaluated during startup, which
+means every imported module must be included in a single monolithic bundle
+that loads before the app runs.
+
+This simple strategy will always work, but it may not be obvious how it
+could ever be improved. After all, if you have an `import` declaration
+nested inside an ordinary function, that doesn't really help you know when
+the `import` declaration will be evaluated, unless you happen to have
+special insight into when the function might be called.
+
+In fact, unless we introduce some sort of asynchronous `import`
+declaration syntax or [alternate runtime
+API](https://whatwg.github.io/loader), the monolithic bundling approach
+seems unavoidable.
+
+**Fortunately ECMAScript 2016 introduces a powerful new language feature
+that just happens to allow for more efficient bundle splitting: [`async`
+functions](https://tc39.github.io/ecmascript-asyncawait/).**
+
+The difference between an `async` function and a normal function is that
+an `async` function always returns a `Promise`, so callers of the `async`
+function must be prepared to tolerate a delay before the function produces
+its result. This delay is exactly what the runtime module system needs to
+guarantee that any modules imported by the `async` function are available
+(but not yet evaluated) before the `async` function begins execution.
+
+This tiny window of freedom allows smart bundling tools to produce
+multiple smaller bundles. Specifically, any modules that are imported only
+by `async` functions can be split into a separate bundle, and that bundle
+can be loaded whenever is convenient, as long as the corresponding `async`
+function can trust that the bundle has loaded. Waiting to load the bundle
+until the moment the `async` function is called is one option, but
+probably not the best option, unless the bundle is very rarely used.
+Instead, the `async` bundle should be loaded as soon as the app is idle,
+some time after startup, so that in most cases the `async` function will
+not actually have to wait for the bundle to load.
+
+For example, suppose you have an app with a "Settings" panel that most
+users do not use frequently, and that never needs to be loaded when the
+app first loads (unless the user goes directly to the `/settings` URL).
+You will probably have a Router that dispatches actions based on changes
+to the URL:
+
+```js
+import { Router } from "example-router";
+
+Router.route({
+  "/"(params) {
+    import { MainApp } from "./app";
+    MainApp.render(params);
+  },
+
+  "/settings"(params) {
+    import { Settings } from "./settings";
+    Settings.render(params);
+  }
+});
+```
+
+As written, this code would force the bundler to include `example-router`,
+`./app`, `./settings`, and all their dependencies in a single monolithic
+bundle. However, if we imagine that the router supports `async` handler
+functions, then a small tweak opens up exciting new possibilities:
+
+```js
+import { Router } from "example-router";
+
+Router.route({
+  async "/"(params) {
+    import { MainApp } from "./app";
+    MainApp.render(params);
+  },
+
+  async "/settings"(params) {
+    import { Settings } from "./settings";
+    Settings.render(params);
+
+    // Since we're in an async function, it's easy to consume any
+    // Promise-based API as well:
+    const log = await System.import("logger-v" + Settings.version);
+    log("rendered /settings");
+  },
+});
+```
+
+Now, because the `/` and `/settings` handler functions are `async`, a
+smart bundler has the freedom to produce one bundle for `example-router`
+(and all its dependencies), another bundle for all the dependencies of the
+`/` handler not already included in the first bundle, and another bundle
+for the dependencies of the `/settings` handler not already included in
+the other two bundles.
+
+I say "freedom" because the bundler has room to optimize: perhaps you know
+that the `/` route is likely to be loaded first, and so it makes sense for
+the bundler to put all the dependencies of `./app` into the initial bundle
+(which also includes `example-router`). Perhaps `./app` and `./settings`
+share some dependencies, so it makes sense to have a fourth bundle loaded
+by both handlers in addition to their own unique dependencies. Perhaps the
+bundler decides it makes sense for every module to be loaded individually!
+
+All of these alternatives are possible, and it's up to the bundling tool
+to make the right decisions (perhaps with some input from the developer).
+The essential insight is that the developer should use `async` functions
+wherever asynchronous delays are acceptable, so that the bundler has room
+to deliver modules as efficiently as it can.
 
 ## Objections and critiques
 
