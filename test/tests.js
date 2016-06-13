@@ -162,11 +162,11 @@ describe("export statements", function () {
       return;
     }
 
-    import C from "./export/default/anon-class";
-    assert.strictEqual(new C(1234).value, 1234);
+    import Anon from "./export/default/anon-class";
+    assert.strictEqual(new Anon(1234).value, 1234);
 
-    import C from "./export/default/named-class";
-    assert.strictEqual(new C(56, 78).sum, 56 + 78);
+    import Named from "./export/default/named-class";
+    assert.strictEqual(new Named(56, 78).sum, 56 + 78);
   });
 
   it("should support basic declaration syntax", function () {
