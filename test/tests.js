@@ -202,6 +202,23 @@ describe("export statements", function () {
     assert.strictEqual(foo, "foo");
   });
 
+  it("should tolerate one-to-many renamed exports", function () {
+    import { x, y, append } from "./export/renamed";
+
+    assert.strictEqual(x, y);
+    assert.strictEqual(x, "a");
+
+    assert.strictEqual(append("b"), "ab");
+
+    assert.strictEqual(x, y);
+    assert.strictEqual(x, "ab");
+
+    assert.strictEqual(append("c"), "abc");
+
+    assert.strictEqual(x, y);
+    assert.strictEqual(x, "abc");
+  });
+
   it("should support all export-from syntax", function () {
     import def, { a, b, c, ay, bee, foo } from "./export/from";
 
