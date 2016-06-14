@@ -158,15 +158,13 @@ describe("export statements", function () {
     import ident from "./export/default/identifier";
     assert.strictEqual(ident, 42);
 
-    if (! canUseClasses) {
-      return;
+    if (canUseClasses) {
+      import Anon from "./export/default/anon-class";
+      assert.strictEqual(new Anon(1234).value, 1234);
+
+      import Named from "./export/default/named-class";
+      assert.strictEqual(new Named(56, 78).sum, 56 + 78);
     }
-
-    import Anon from "./export/default/anon-class";
-    assert.strictEqual(new Anon(1234).value, 1234);
-
-    import Named from "./export/default/named-class";
-    assert.strictEqual(new Named(56, 78).sum, 56 + 78);
   });
 
   it("should support basic declaration syntax", function () {
