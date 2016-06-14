@@ -44,12 +44,16 @@ I will explain the `Module.prototype.import` method first, then the
 the constructor of the CommonJS `module` object, and the `import` and
 `export` methods are custom additions to `Module.prototype`.
 
+### `module.import(id, setters)`
+
 Here we go:
 
 ```js
 import a, { b, c as d } from "./module";
 ```
+
 becomes
+
 ```js
 // Local symbols are declared as ordinary variables.
 let a, b, d;
@@ -119,6 +123,8 @@ if (condition) {
 See [`WHY_NEST_IMPORTS.md`](WHY_NEST_IMPORTS.md) for a much more detailed
 discussion of why nested `import` declarations are worthwhile.
 
+### `module.export(getters)`
+
 What about `export` declarations? One option would be to transform them into
 CommonJS code that updates the `exports` object, since interoperability
 with Node and CommonJS is certainly a goal of this approach.
@@ -131,13 +137,9 @@ parent module, the getters for the `id` module will run, updating its
 `module.exports` object, so that the `module.import` method has access to
 the latest exported values.
 
-There are three styles of `module.export` calls, one for multiple exports,
-another for updating the value of a single export, and another for
-bulk-updating the values of all exported variables.
-
-The first style is to pass a single object literal of getter functions to
-`module.export`. The `reify` compiler does this for you for every kind of
-named `export` declaration:
+The `module.export` method is called with a single object literal whose
+keys are exported symbol names and whose values are getter functions for
+those exported symbols. So, for example,
 
 ```js
 export const a = "a", b = "b", ...;
@@ -146,25 +148,79 @@ export const a = "a", b = "b", ...;
 becomes
 
 ```js
-const a = "a", b = "b", ...;
 module.export({
   a: () => a,
   b: () => b,
   ...
 });
+const a = "a", b = "b", ...;
 ```
 
-The above code registers getter functions for the variables `a`, `b`, ...,
-so that `module.import` can easily retrieve the latest values of those
+This code registers getter functions for the variables `a`, `b`, ..., so
+that `module.import` can easily retrieve the latest values of those
 variables at any time. It's important that we register getter functions
 rather than storing computed values, so that other modules always can
 import the newest values.
 
-Suppose you change the value of an exported variable after the module has
-finished loading. Then you need to let the module system know about the
-update, and that's where the second style of `module.export` comes
-in. This update is manual right now, but soon it will be provided
-automatically by the `reify` compiler (see #27):
+Export remapping works, too:
+
+```js
+let c = 123;
+export { c as see }
+```
+
+becomes
+
+```js
+module.export({ see: () => c });
+let c = 123;
+```
+
+Note that the `module.export` call is "hoisted" to the top of the block
+where it appears. This is safe because the getter functions work equally
+well anywhere in the scope where the exported variable is declared, and
+important to ensure getters are registered as early as possible.
+
+What about `export default` declarations? It would be a mistake to defer
+evaluation of the `default` expression until later, so wrapping it in a
+getter function is not exactly what we want.
+
+The important point to understand here is that `module.import` does not
+assume a getter function has been registered by `module.export` for every
+imported symbol. Instead, `parentModule.import` only really cares about
+the contents of `childModule.exports`. While the `childModule.export`
+method helps keep `childModule.exports` up to date, that level of
+sophistication isn't strictly necessary in every situation, and `default`
+exports are one such situation:
+
+```js
+export default getDefault();
+```
+
+simply becomes
+
+```js
+exports.default = getDefault();
+```
+
+### `module.runModuleSetters()`
+
+Now, suppose you change the value of an exported local variable after the
+module has finished loading. Then you need to let the module system know
+about the update, and that's where `module.runModuleSetters` comes in. The
+module system calls this method on your behalf whenever a module finishes
+loading, but you can also call it manually, or simply let `reify` generate
+code that calls `module.runModuleSetters` for you whenever you assign to
+an exported local variable.
+
+Calling `module.runModuleSetters()` with no arguments causes any setters
+that depend on the current module to be rerun, *but only if the value a
+setter would receive is different from the last value passed to the
+setter*.
+
+If you pass an argument to `module.runModuleSetters`, the value of that
+argument will be returned as-is, so that you can easily wrap assignment
+expressions with calls to `module.runModuleSetters`:
 
 ```js
 export let value = 0;
@@ -182,48 +238,32 @@ module.export({
 });
 let value = 0;
 function increment(by) {
-  return module.export("value", value += by);
+  return module.runModuleSetters(value += by);
 };
 ```
 
-When called with a string as its first argument, `module.export` updates
-the variable named by the string and returns the value of its second
-argument.
+Note that `module.runModuleSetters(argument)` does not actually use
+`argument`. However, by having `module.runModuleSetters(argument)` return
+`argument` unmodified, we can run setters immediately after the assignment
+without interfering with evaluation of the larger expression.
 
-The third and final way to call `module.export` is without any arguments.
-This style is useful when you have no way of knowing which exported
-variables may have been updated:
+Because `module.runModuleSetters` runs any setters that have new values,
+it's also useful for potentially risky expressions that are difficult to
+analyze statically:
 
 ```js
 export let value = 0;
 
 function runCommand(command) {
-  eval(command);
-  module.export(); // Picks up new value.
+  // This picks up any new values of any exported local variables that may
+  // have been modified by eval.
+  return module.runModuleSetters(eval(command));
 }
 
 runCommand("value = 1234");
 ```
 
-But what about `export default` declarations? It would be a mistake to defer
-evaluation of the `default` expression until later, so wrapping it in a
-getter function is not exactly what we want.
-
-The important point to understand here is that `module.import` does not
-assume a getter function has been registered by `module.export` for every
-imported symbol. Instead, `parentModule.import` only cares about the
-contents of `childModule.exports`. While the `childModule.export` method
-helps keep `childModule.exports` up to date, that level of sophistication
-isn't strictly necessary in every situation, and `default` exports are one
-such situation:
-
-```js
-export default getDefault();
-```
-simply becomes
-```js
-exports.default = getDefault();
-```
+### `export`s that are really `import`s
 
 What about `export ... from "./module"` declarations? The key insight here
 is that **`export` declarations with a `from "..."` clause are really just
