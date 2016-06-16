@@ -314,6 +314,11 @@ describe("compiler", function () {
     import check from "./lines.js";
     check();
   });
+
+  it("should not force strict mode", function () {
+    var foo = 1234;
+    delete foo;
+  });
 });
 
 describe("Node REPL", function () {
