@@ -239,6 +239,35 @@ describe("export statements", function () {
       foo: 42
     });
   });
+
+  it("should support braceless-if nested imports", function () {
+    assert.strictEqual(typeof x, "undefined");
+    for (var i = 0; i < 2; ++i) {
+      if (i === 0) import { a as x } from "./abc";
+      if (i === 1) import { b as x } from "./abc";
+      assert.strictEqual(x, i ? "b": "a");
+    }
+    assert.strictEqual(x, "b");
+  });
+
+  it("should support switch-case nested imports", function () {
+    assert.strictEqual(typeof x, "undefined");
+
+    for (var i = 0; i < 2; ++i) {
+      switch (i) {
+      case 0:
+        import { a as x } from "./abc";
+        break;
+      case 1:
+        import { b as x } from "./abc";
+        break;
+      }
+
+      assert.strictEqual(x, i ? "b": "a");
+    }
+
+    assert.strictEqual(x, "b");
+  });
 });
 
 describe("parent setters", function () {
