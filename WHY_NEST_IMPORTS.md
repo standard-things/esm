@@ -301,6 +301,60 @@ The essential insight is that the developer should use `async` functions
 wherever asynchronous delays are acceptable, so that the bundler has room
 to deliver modules as efficiently as it can.
 
+
+### Imperative `import`s when you need them
+
+TC39 has [discussed](https://github.com/tc39/ecma262/issues/368) at great
+length whether `import` declarations should be *declarative* or
+*imperative*. In short, declarative `import` declarations take effect
+before any other code in the scope where the declaration appears, whereas
+imperative declarations may be interleaved with other declarations and
+statements.
+
+For selfish reasons, I was initially skeptical of declarative `import`
+declarations, because the imperative semantics are easier to implement
+with a [transpiler](https://github.com/benjamn/reify#how-it-works).
+Declarative `import` declarations require "hoisting" code to the
+beginning of the enclosing block, whereas imperative declarations can
+simply be rewritten in place.
+
+However, as I began to investigate the consequences of hoisting, I too
+became convinced that relying on the interleaving of `import` declarations
+with other statements is almost always a source of bugs, because you can
+only rarely know with confidence whether a particular `import` declaration
+is the first evaluator of the imported module.
+
+With that said, there are occasionally scenarios where it's frustrating
+that you can't just put a `debugger` statement before an `import`
+declaration and step into the imported module, wrap an `import`
+declaration with timing code, or carefully manage the order of exports
+between two mutually dependent modules.
+
+For those few scenarios, nested `import` declarations provide a convenient
+way of achieving imperative behavior: simply wrap the `import` in a
+`{...}` block!
+
+```js
+// The debugger might hit this breakpoint before the "./xy" module is
+// imported (if it has not been imported before), but the "./ab" module
+// will always be imported before the debugger statement, even though it
+// comes later in the program, because it is declaratively hoisted above
+// other statements in the enclosing block.
+debugger;
+{
+  import { x, y } from "./xy";
+}
+import { a, b } from "./ab";
+```
+
+This syntax is clunky and probably ill-advised for production code (as
+your linter will be eager to let you know), but it's extremely useful when
+you need it in development. Most importantly, I believe it clears the way
+for embracing declarative `import` declarations by default, since nested
+`import`s provide an escape hatch in the rare edge cases when you think
+you want imperative `import`s.
+
+
 ## Objections and critiques
 
 ### "Nested `import` declarations prevent static analysis"
