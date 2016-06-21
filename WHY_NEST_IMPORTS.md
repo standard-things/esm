@@ -351,10 +351,10 @@ This syntax is clunky and probably ill-advised for production code (as
 linters of the future will surely let you know), but it's extremely useful
 when you need it in development.
 
-In other words, nested `import` declarations clear the way for embracing
-declarative `import` semantics by default, because nested `import`s
-provide an adequate escape hatch in the rare cases when you think you need
-imperative `import` semantics.
+In other words, **nested `import` declarations clear the way for embracing
+declarative `import` semantics by default**, because nested `import`
+declarations provide a graceful escape hatch in rare cases when you think
+you need imperative `import` semantics.
 
 
 ## Objections and critiques
