@@ -335,11 +335,11 @@ way of achieving imperative behavior: simply wrap the `import` in a
 `{...}` block!
 
 ```js
-// The debugger might hit this breakpoint before the "./xy" module is
+// Execution might hit this debugger statement before the "./xy" module is
 // imported (if it has not been imported before), but the "./ab" module
-// will always be imported before the debugger statement, even though it
-// comes later in the program, because it is declaratively hoisted above
-// other statements in the enclosing block.
+// will always be imported before the debugger statement, even though the
+// import comes later in the program, because it is declaratively hoisted
+// above other statements in the enclosing block.
 debugger;
 {
   import { x, y } from "./xy";
@@ -348,11 +348,11 @@ import { a, b } from "./ab";
 ```
 
 This syntax is clunky and probably ill-advised for production code (as
-your linter will be eager to let you know), but it's extremely useful when
-you need it in development. Most importantly, I believe it clears the way
-for embracing declarative `import` declarations by default, since nested
-`import`s provide an escape hatch in the rare edge cases when you think
-you want imperative `import`s.
+your linter will likely let you know), but it's extremely useful when you
+need it in development. Most importantly, I believe it clears the way for
+embracing declarative `import` declarations by default, since nested
+`import`s provide an escape hatch in rare edge cases when you think you
+want imperative `import`s.
 
 
 ## Objections and critiques
