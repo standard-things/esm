@@ -174,9 +174,46 @@ Without the ability to nest `import` declarations inside `try`-`catch`
 blocks, there would be no way to achieve this progressive enhancement of
 the `console` object.
 
+
 ### "Isomorphic" code
 
+TODO
+
+
 ### Dead code elimination
+
+Nested `import` declarations make certain static optimizations
+significantly more effective; for example, constant propagation and dead
+code elimination.
+
+A sophisticated bundling tool might eliminate obviously unreachable code
+based on the values of certain known constants:
+
+```js
+if (__USER_ROLE__ === "admin") {
+  import { setUpAdminTools } from "../admin/tools";
+  setUpAdminTools(user.id);
+}
+```
+
+Ideally this code would disappear completely from your public JavaScript
+assets (where `__USER_ROLE__ !== "admin"`), along with the
+`../admin/tools` module, assuming it is not used elsewhere by non-admin
+code.
+
+Without the ability to nest `import` declarations inside conditional
+blocks, dead code elimination becomes the responsibility of the imported
+module. You would likely have to wrap the entire body of the
+`../admin/tools` module with a conditional block, and even then the empty
+`../admin/tools` module would still be included in the public bundle,
+which might constitute a leak of sensitive information.
+
+> Aside: when `__USER_ROLE__ === "admin"`, note that the body of the
+condition must remain a block statement, so that `setUpAdminTools` remains
+scoped to that block, rather than becoming visible to surrounding code.
+In other words, nested `import`s are still important even after dead code
+elimination has taken place.
+
 
 ### Automatic code splitting
 
