@@ -534,6 +534,32 @@ Given the potential benefits, and the debatability of the drawbacks, it
 would be a mistake for the ECMAScript language specification to enforce
 the top-level restriction before we've experienced the alternative.
 
-# But how?!
+# But how?
 
-Why, dear readers: that is exactly what [`reify`](https://github.com/benjamn/reify) does.
+Native implementations have more freedom to invent and implement new
+semantics than transpilers do, because transpilers must always find a way
+of simulating new semantics using existing language features.
+
+This proposal ultimately aims to influence native implementations, but
+transpilers have proven effective in validating new syntax and semantics
+ahead of changes to the language specification. Since changes to the
+specification tend to be a prerequisite for native implementations, a
+transpiler is often the best place to start.
+
+For that reason, I have implemented a high-fidelity transpiler called
+[`reify`](https://github.com/benjamn/reify) that implements nested
+`import` declarations as efficiently and correctly as possible (without
+native support). In particular, imported symbols are implemented by
+ordinary local variables whose values are updated automatically whenever
+the exported values change. Hoisting is fully supported, so that `import`
+and `export` declarations take effect at the beginning of their enclosing
+blocks. This compilation strategy works in every version of Node (0.6 to
+6.0) and interoperates seamlessly with Node's CommonJS module system.
+
+Who uses my transpiler? Because I work for Meteor Development Group, and
+nested `import`s have particular value for "isomorphic" JavaScript
+applications, I have had the opportunity to validate the transpiler across
+a wide range of development environments, by enabling nested `import`
+declarations for all Meteor 1.3.3 apps. This experiment is ongoing, but
+the benefits are tangible, and so far the only drawbacks have been
+straightforward to fix.
