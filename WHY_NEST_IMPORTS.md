@@ -143,8 +143,6 @@ To put it in even stronger terms, if we do not allow ourselves to nest
 stop using the CommonJS `require` function, and JavaScript modules will
 remain an awkward hybrid of modern and legacy styles.
 
-Is that a future we can tolerate?
-
 ### Colocation of `import` declarations with consuming code
 
 When you delete code that contains a nested `import` declaration, you
