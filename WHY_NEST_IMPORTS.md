@@ -332,7 +332,7 @@ between two mutually dependent modules.
 
 For those few scenarios, nested `import` declarations provide a convenient
 way of achieving imperative behavior: simply wrap the `import` in a
-`{...}` block!
+`{...}` block statement:
 
 ```js
 // Execution might hit this debugger statement before the "./xy" module is
