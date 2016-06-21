@@ -183,8 +183,8 @@ TODO
 ### Dead code elimination
 
 Nested `import` declarations make certain static optimizations
-significantly more effective; for example, constant propagation and dead
-code elimination.
+significantly more effective; for example, dead code elimination via
+constant propagation.
 
 A sophisticated bundling tool might eliminate obviously unreachable code
 based on the values of certain known constants:
