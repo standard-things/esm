@@ -481,6 +481,12 @@ be updated, but it would be a very easy change to make, since nothing else
 in the spec assumes that `import` declarations can only appear at the top
 level.
 
+Of course I wouldn't be a very responsible member of TC39 if I wrote this
+document and then made no effort to bring it to the committee's attention,
+so that's why [I'll be sharing what I've learned at the July 2016
+meeting](https://github.com/tc39/agendas/pull/195).
+
+
 ### "Nested `import` declarations are difficult to transpile"
 
 While it would be easy to change the ECMAScript specification to allow
