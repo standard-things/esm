@@ -639,9 +639,9 @@ of simulating new semantics using existing language features.
 
 This proposal ultimately aims to influence native implementations, but
 transpilers have proven effective in validating new syntax and semantics
-ahead of changes to the language specification. Since changes to the
-specification tend to be a prerequisite for native implementations, a
-transpiler is often the best place to start.
+before any changes are made to the language specification. Since changes
+to the specification tend to be a prerequisite for native implementations,
+a transpiler is often the best place to start.
 
 For that reason, I have implemented a high-fidelity transpiler called
 [`reify`](https://github.com/benjamn/reify) that implements nested
