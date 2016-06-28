@@ -270,6 +270,16 @@ describe("export statements", function () {
   });
 });
 
+describe("module.runModuleSetters", function () {
+  it("should be called after eval(...)", function () {
+    import { value, run } from "./eval";
+    assert.strictEqual(value, "original");
+    var result = run('localValue = "modified"');
+    assert.strictEqual(value, result);
+    assert.strictEqual(value, "modified");
+  });
+});
+
 describe("parent setters", function () {
   it("should be run when children update exports", function () {
     import { c } from "./setters/parent";
