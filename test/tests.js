@@ -358,6 +358,11 @@ describe("compiler", function () {
     var foo = 1234;
     delete foo;
   });
+
+  it('should not hoist above "use strict"', function () {
+    import { check } from "./strict";
+    assert.strictEqual(check(), true);
+  });
 });
 
 describe("Node REPL", function () {
