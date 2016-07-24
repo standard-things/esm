@@ -1,6 +1,6 @@
-# re•i•fy <sub>_verb, transitive_</sub> &nbsp; [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify)
+# re&middot;i&middot;fy <sub>_verb, transitive_</sub> &nbsp; [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify)
 
-**re•i•fied** <sub>past</sub> &nbsp; **re•i•fies** <sub>present</sub> &nbsp; **re•i•fy•ing** <sub>participle</sub> &nbsp; **re•i•fi•ca•tion** <sub>noun</sub> &nbsp; **re•i•fi•er** <sub>noun</sub>
+**re&middot;i&middot;fied** <sub>past</sub> &nbsp; **re&middot;i&middot;fies** <sub>present</sub> &nbsp; **re&middot;i&middot;fy&middot;ing** <sub>participle</sub> &nbsp; **re&middot;i&middot;fi&middot;ca&middot;tion** <sub>noun</sub> &nbsp; **re&middot;i&middot;fi&middot;er** <sub>noun</sub>
 
   1. to make (something abstract) more concrete or real<br>
      _"these instincts are, in humans, reified as verbal constructs"_
