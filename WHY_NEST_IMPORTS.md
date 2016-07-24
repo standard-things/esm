@@ -477,9 +477,10 @@ declarations should be restricted to the top level of modules.
 
 In other words, if we were to relax the rules for where `import`
 declarations can appear, this part of the grammar would absolutely have to
-be updated, but it would be a very easy change to make, since nothing else
+be updated, <strike>but it would be a very easy change to make, since nothing else
 in the spec assumes that `import` declarations can only appear at the top
-level.
+level.</strike> **Edit**: this was overly optimistic, but the necessary
+changes appear feasible, and I'm working on a pull request.
 
 Of course I wouldn't be a very responsible member of TC39 if I wrote this
 document and then made no effort to bring it to the committee's attention,
