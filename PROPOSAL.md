@@ -4,7 +4,7 @@
 
 **Champion:** Ben Newman (Meteor Development Group)
 
-**Specification:** See attached [commits](commits).
+**Specification:** Work in progress; see attached [commits](commits).
 
 
 ## Summary
@@ -426,8 +426,9 @@ of the runtime at all!
 From the perspective of the fetching process, all _ModuleSpecifier_ strings
 are treated the same, whether top-level or nested. Without fancy static analysis,
 all requested module identifiers must be considered as dependencies that might
-be immediately evaluated by the module. So again, nested `import` declarations
-do not invite any new performance problems.
+be immediately evaluated by the module. Moving `import` declarations in and out
+of nested scopes does not affect the set of dependencies requested by the module.
+So again, nested `import` declarations do not invite any new performance problems.
 
 And while it might seem easier to parse `import` declarations at the top
 level, remember that parsing the top level still requires examining the entire
