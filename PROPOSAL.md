@@ -9,7 +9,7 @@
 
 ## Summary
 
-This proposal argues for relaxing the current restriction that `import` declarations may only appear at the top level of a module.
+This proposal argues for relaxing the current restriction that `import` declarations may appear only at the top level of a module.
 
 Specifically, this proposal would allow `import` declarations that are
 
