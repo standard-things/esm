@@ -1,5 +1,7 @@
 # The case for nested `import` declarations
 
+Official ECMA262 [proposal](https://github.com/benjamn/reify/blob/master/PROPOSAL.md).
+
 ## Context
 
 Since the publication of the [ECMASCript 2015
@@ -441,11 +443,19 @@ Finally, languages that are much more concerned with static analysis than
 JavaScript, such as Scala, somehow [get away with nesting
 imports](https://www.safaribooksonline.com/library/view/scala-cookbook/9781449340292/ch07s07.html).
 
+
 ### "The specification forbids nested `import` declarations"
 
 There is definitely some merit to this argument, but I want to spend a
 moment understanding exactly what it would mean to change the spec, if
 that's what we decide to do.
+
+**Edit:** [Here](https://github.com/benjamn/reify/blob/master/PROPOSAL.md) is my
+official proposal, and [here](https://github.com/tc39/ecma262/pull/646) is the
+pull request I have submitted to https://github.com/tc39/ecma262. The rest of
+this section is preserved for posterity.
+
+<hr>
 
 This argument is based on a single
 [fragment](http://www.ecma-international.org/ecma-262/6.0/index.html#sec-modules)
