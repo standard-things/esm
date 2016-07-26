@@ -333,8 +333,11 @@ into the global environment).
 
 If you need to use an imported value outside the block where it was imported,
 you would need to assign it to a variable in the outer scope. If you are
-worried about the symbol changing values due to live binding, then you should
-assign a closure that refers to the current value to some outer variable.
+worried about the symbol changing values due to live binding, then you can
+create a closure in the scope of the `import` declaration that refers to the
+current value of the imported symbol, assign the closure function to some
+outer variable, and call that function to access the latest value of the
+imported symbol.
 
 
 ### Synchronous evaluation
@@ -356,17 +359,15 @@ const { a, b } = await loader.import("./c");
 
 This desugaring story has a number of fundamental flaws that lead me to
 conclude that nested `import` declarations should not be explained through
-desugaring, and the `loader.import` API should continue to serve the important
-role of enabling _explicit_ asynchronous module loading.
+desugaring, and that the `loader.import` API should continue to serve the
+important role of enabling _explicit_ asynchronous module loading.
 
 Problems with desugaring to asynchronous forms:
 
 * JavaScript has a strong precedent against any kind of implicit asynchronicity,
-  or non-cooperative preemption,which is why we have `yield` and `await` instead
-  of full coroutines or threads.
-  
-* Asynchronous module loading should be done explicitly using the
-  `Promise`-based Loader API (or `<script type=module>`).
+  or non-cooperative preemption, which is why we have `yield` and `await` instead
+  of full coroutines or threads. Asynchronous module loading should be done
+  explicitly using the `Promise`-based Loader API (or `<script type=module>`).
 
 * Conditional imports with dynamic conditions would summon the spectre of
   [Zalgo](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
@@ -378,17 +379,18 @@ Problems with desugaring to asynchronous forms:
 * A sequence of `import` declarations would have to be awaited in series
   rather than in parallel, because interleaving module execution is not
   acceptable, but that would mean missing the important opportunity to
-  fetch module sources in parallel.
+  fetch module _sources_ in parallel.
 
 * The `const { a, b } =` destructuring above does not behave identically
-  to live, immutable bindings, and it's not immediately obvious how any
-  simple desugaring could faithfully achieve those semantics.
+  to live immutable bindings, and it's not immediately obvious how any
+  simple desugaring could faithfully achieve live-binding semantics.
 
-* Most importantly, if a runtime strategy for synchronously evaluating
-  `import` declaration exists, we should strongly prefer it over any
-  asynchronous alternative.
+* Most importantly, assuming a reasonable runtime strategy for synchronously
+  evaluating `import` declarations exists (and it does!), we should strongly
+  prefer it over any asynchronous alternative.
 
-#### How synchronous `import` declarations work in browsers
+
+#### How synchronous `import` declarations would work in browsers
 
 When designing the JavaScript specification, we have a unique responsibility
 to consider the burdens we may be imposing on client-side implementations
@@ -414,18 +416,19 @@ loads the original entry point module must first
 1. asynchronously fetch the sources of the requested modules (in parallel);
 1. scan the requested modules for additional dependencies;
 1. fetch their sources in parallel;
-1. etc. etc. until closure reached.
+1. etc. etc. until closure reached; and
+1. only then begin evaluating the entry point module, with full confidence
+   that all requested modules will be immediately available.
 
 This process certainly sounds expensive, but it is really no different from
 what the browser must already do to support top-level `import` declarations.
-
 Think about it: if you can't nest `import` declarations, you have to hoist
 them manually to the top level anyway, which does not change the HTTP workload
 of the runtime at all!
 
 From the perspective of the fetching process, all _ModuleSpecifier_ strings
 are treated the same, whether top-level or nested. Without fancy static analysis,
-all requested module identifiers must be considered as dependencies that might
+all requested module identifiers must be regarded as dependencies that _might_
 be immediately evaluated by the module. Moving `import` declarations in and out
 of nested scopes does not affect the set of dependencies requested by the module.
 So again, nested `import` declarations do not invite any new performance problems.
@@ -442,9 +445,9 @@ for later, if desired.
 Though this process may involve many HTTP requests for a large application,
 those requests can be highly parallel, and performance will benefit from
 technologies like HTTP/2 and Service Workers. I would just recommend that
-the fetching protocol should permit servers to return more modules than
-requested, so that the depth of the request tree can be minimized by
-sophisticated servers.
+the fetching protocol permit servers to return more modules than requested,
+so that the depth of the request tree can be minimized by sophisticated
+developers.
 
 ## Conclusion
 
@@ -458,3 +461,7 @@ objection that nested `import` declarations are "forbidden by the ECMAScript
 specification."
 
 That's exactly what I'm trying to change, after all.
+
+## FAQ
+
+TBD
