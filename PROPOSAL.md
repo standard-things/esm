@@ -4,7 +4,7 @@
 
 **Champion:** Ben Newman (Meteor Development Group)
 
-**Specification:** Work in progress; see attached [commits](commits).
+**Specification:** Work in progress; see attached [commits](https://github.com/tc39/ecma262/pull/646/commits).
 
 
 ## Summary
@@ -453,8 +453,8 @@ declarative, lexically scoped, synchronous `import` declarations are viable
 and desirable.
 
 More generally, I hope that the existence of this proposal will invite
-specific technical objections, and finally put to rest the question-begging
-objection that nested `import` declarations are forbidden by the ECMAScript
-specification.
+specific technical discussion, and finally put to rest the question-begging
+objection that nested `import` declarations are "forbidden by the ECMAScript
+specification."
 
 That's exactly what I'm trying to change, after all.
