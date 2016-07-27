@@ -193,6 +193,7 @@ This modification has a few subtleties worth highlighting:
     is _Module_.
   * Rely on runtime errors.
 
+
 ### Declarative hoisting
 
 TC39 has [previously discussed](https://github.com/tc39/ecma262/issues/368) at length whether `import` declarations should be *declarative* or *imperative*. In short, declarative `import` declarations take effect before any other code in the scope where the declaration appears, whereas imperative declarations may be interleaved with other declarations and statements.
@@ -294,7 +295,7 @@ What then is the deadline for completing any asynchronous module fetching?  Alth
 In other words, the `System.import(id)` or `<script type=module>` that loads the original entry point module must first
 
 1. fetch the source for the entry point module;
-1. scan it for _ModuleSpecifier_ strings (which fortunately does not require a full parse);
+1. scan it for requested module identifier strings (which does not require a full parse!);
 1. resolve those requested module identifiers relative to the parent module;
 1. asynchronously fetch the sources of the requested modules (in parallel);
 1. scan the requested modules for additional dependencies;
@@ -305,7 +306,7 @@ In other words, the `System.import(id)` or `<script type=module>` that loads the
 
 This process certainly sounds expensive, but it is really no different from what the browser must already do to support top-level `import` declarations.  Think about it: if you can't nest `import` declarations, you have to hoist them manually to the top level anyway, which does not change the HTTP workload of the runtime at all!
 
-From the perspective of the fetching process, all _ModuleSpecifier_ strings are treated the same, whether top-level or nested. Without fancy static analysis, all requested module identifiers must be regarded as dependencies that _might_ be immediately evaluated by the module. Moving `import` declarations in and out of nested scopes does not affect the set of dependencies requested by the module.  So again, nested `import` declarations do not invite any new performance problems.
+From the perspective of the fetching process, all requested module identifier strings are treated the same, whether top-level or nested. Without fancy static analysis, all requested module identifiers must be regarded as dependencies that _might_ be immediately evaluated by the module. Moving `import` declarations in and out of nested scopes does not affect the set of dependencies requested by the module.  So again, nested `import` declarations do not invite any new performance problems.
 
 And while it might seem easier to parse `import` declarations at the top level, remember that parsing the top level still requires examining the entire module. It should come as some relief (regardless of this proposal) that this process does not require a full parse, because the runtime can simply tokenize the module source until it hits an `import` or `export` token, then begin parsing from that starting point. This works equally well whether the declaration is at the top level or in some nested scope. The token stream can even be saved for later, if desired.
 
