@@ -97,12 +97,8 @@ try {
   import esc from "enhanced-super-console";
   console = esc;
 } catch (e) {
-  if (e.code !== "MODULE_NOT_FOUND") {
-    // Let unexpected exceptions propagate.
-    throw e;
-  }
   // That's ok, we'll just stick to the usual implementations of
-  // console.log, .error, .trace, etc.
+  // console.log, .error, .trace, etc., or stub them out.
 }
 ```
 
