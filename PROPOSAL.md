@@ -128,7 +128,7 @@ Ideally this code would disappear completely from your public JavaScript assets 
 
 Without the ability to nest `import` declarations inside conditional blocks, dead code elimination becomes the responsibility of the imported module. You would likely have to wrap the entire body of the `../admin/tools` module with a conditional block, and even then the empty `../admin/tools` module would still be included in the public bundle, which might constitute a leak of sensitive information.
 
-Worse still, as long as `import` declarations are restricted to the top level, the `import`s of `../admin/tools` cannot be included in the conditional block, making any kind of dead module elimination impossible!
+Worse still, as long as `import` declarations are restricted to the top level, the `import`s of `../admin/tools` cannot be included in the conditional block, making any kind of dead module elimination impossible.
 
 
 ## Semantic details
@@ -270,7 +270,7 @@ might be interpreted as
 const { a, b } = await loader.import("./c");
 ```
 
-This desugaring story has a number of fundamental flaws that lead me to conclude that nested `import` declarations should not be explained through desugaring, and that the `loader.import` API should continue to serve the important role of enabling _explicit_ asynchronous module loading.
+This desugaring story has a number of fundamental flaws that lead me to believe nested `import` declarations should not be explained through desugaring, and that the `loader.import` API should continue to serve the important role of enabling _explicit_ asynchronous module loading.
 
 Problems with desugaring to asynchronous forms:
 
