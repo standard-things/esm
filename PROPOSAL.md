@@ -72,7 +72,9 @@ describe("fancy feature #5", () => {
 });
 ```
 
-This manual renaming is annoying, but that's not the worst of it. Since the `import` declarations are evaluated before the tests are defined, any exceptions thrown by importing the modules will prevent your tests from running at all! Compare this behavior to that of the original code, where each test captures any and all exceptions resulting from its own particular `import` declaration and `strictEqual(check(), ...)` call.
+This manual renaming is annoying, and potentially surprising to developers coming from other languages (or even Node), so there needs to be a good reason why it's necessary in JavaScript. Conversely, if it isn't necessary, because there exists a reasonable implementation of nested `import` declarations, then it becomes harder to claim we have a good reason for the top-level restriction.
+
+In the second version of this code, since the `import` declarations are evaluated before the tests are defined, any exceptions thrown by importing the modules will prevent your tests from running at all! Compare this behavior to that of the original code, where each test captures any and all exceptions resulting from its own particular `import` declaration and `strictEqual(check(), ...)` call.
 
 ### Lazy evaluation
 
