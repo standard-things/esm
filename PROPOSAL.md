@@ -13,11 +13,11 @@ This proposal argues for relaxing the current restriction that `import` declarat
 
 Specifically, this proposal would allow `import` declarations that are
 
-1. **backwards compatible** with the semantics of existing top-level `import` declarations;
 1. **nestable** within functions and blocks, enabling multiple new and worthwhile `import` idioms;
 1. **hoisted** to the beginning of the enclosing scope; that is, _declarative_ rather than _imperative_;
-1. **lexically scoped** to the enclosing block; and
-1. **synchronously evaluated**, with clear and manageable consequences for runtime module fetching.
+1. **lexically scoped** to the enclosing block;
+1. **synchronously evaluated**, with clear and manageable consequences for runtime module fetching; and
+1. **backwards compatible** with the semantics of existing top-level `import` declarations.
 
 At this time, no changes are proposed regarding the placement or semantics of `export` declarations. In the opinion of the author, keeping all `export` declarations at the top level remains important for many of the static properties of the ECMAScript module system.
 
