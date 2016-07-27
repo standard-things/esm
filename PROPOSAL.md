@@ -276,7 +276,7 @@ Problems with desugaring to asynchronous forms:
 
 * JavaScript has a strong precedent against any kind of implicit asynchronicity, or non-cooperative preemption, which is why we have `yield` and `await` instead of full coroutines or threads. Asynchronous module loading should be done explicitly using the `Promise`-based Loader API (or `<script type=module>`).
 
-* Conditional imports with dynamic conditions would summon the spectre of [Zalgo](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
+* Conditional imports with dynamic conditions would summon the spectre of [Z&#856;&#844;&#859;&#864;&#794;&#844;&#804;&#846;&#809;&#798;&#827;&#801;&#807;&#841;&#809;&#824;a&#789;&#780;&#784;&#850;&#862;&#783;&#771;&#768;&#819;&#813;&#800;&#866;&#857;&#827;&#826;&#860;&#813;l&#786;&#786;&#779;&#835;&#768;&#862;&#825;&#839;&#845;&#853;&#837;&#798;&#822;g&#850;&#833;&#772;&#850;&#850;&#776;&#793;&#791;&#866;&#806;&#812;&#840;&#814;&#805;&#824;o&#833;&#786;&#785;&#830;&#789;&#780;&#862;&#793;&#854;&#799;&#804;&#815;&#815;](http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony).
 
 * If we make nested `import` declarations asynchronous, then for consistency we should make top-level `import` declarations behave the same way, but that would likely be a backwards-incompatible change.
 
