@@ -207,22 +207,40 @@ However, as I began to investigate the consequences of hoisting, I too became co
 
 With that said, there are occasionally scenarios where it's frustrating that you can't just put a `debugger` statement before an `import` declaration and step into the imported module, wrap an `import` declaration with timing code, or carefully manage the order of exports between two mutually dependent modules.
 
-For those few scenarios, nested `import` declarations provide a convenient way of achieving imperative behavior: simply wrap the `import` in a `{...}` block statement:
+For those few scenarios, nested `import` declarations provide a convenient way of achieving imperative behavior: simply wrap the `import` in a `{...}` block statement or a function:
 
 ```js
+import { a, b } from "./ab";
+
 // Execution might hit this debugger statement before the "./xy" module is
-// imported (if it has not been imported before), but the "./ab" module
-// will always be imported before the debugger statement, even though the
-// import comes later in the program, because it is declaratively hoisted
-// above other statements in the enclosing block.
+// imported, if it has not been imported before.
 debugger;
 {
   import { x, y } from "./xy";
 }
-import { a, b } from "./ab";
+
+console.log("x", getX());
+
+// Imperatively import { x } from "./xy", and return it.
+function getX() {
+  import { x } from "./xy";
+  return x;
+}
+
+// If you care about the latest live value of x, return a closure.
+function getXFn() {
+  import { x } from "./xy";
+  return () => x;
+}
+
+const getX2 = getXFn();
+
+setTimeout(() => {
+  console.log("current x:", getX2());
+}, delay);
 ```
 
-This syntax is clunky and probably ill-advised for production code (as linters of the future will surely let you know), but it's extremely useful when you need it in development.
+Even if you find this syntax clunky, and even if you don't end up using it in production code, you have to admit it's useful when you need it in development.
 
 In other words, **nested `import` declarations clear the way for embracing declarative `import` semantics by default**, because nested `import` declarations provide a graceful escape hatch in rare cases when you think you need imperative `import` semantics.
 
