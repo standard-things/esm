@@ -34,6 +34,6 @@
     "magic-string": "~0.16.0"
   },
   "devDependencies": {
-    "mocha": "~2.5.3"
+    "mocha": "~3.0.2"
   }
 }
