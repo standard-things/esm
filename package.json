@@ -31,7 +31,7 @@
     "acorn": "~3.2.0",
     "acorn-es7-plugin": "~1.0.17",
     "ast-types": "~0.8.16",
-    "magic-string": "~0.15.0"
+    "magic-string": "~0.16.0"
   },
   "devDependencies": {
     "mocha": "~2.5.3"
