@@ -75,7 +75,7 @@ describe("fancy feature #5", () => {
     strictEqual(check(), "client ok");
   });
 
-  it("should work on the client", () => {
+  it("should work on the server", () => {
     import { check } from "./server.js";
     strictEqual(check(), "server ok");
   });
