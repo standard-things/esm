@@ -379,6 +379,21 @@ describe("compiler", function () {
 
     assert.strictEqual(without.indexOf("var foo;"), 0);
   });
+
+  it("should allow pre-parsed ASTs via options.ast", function () {
+    import { parse, compile } from "../lib/compiler.js";
+
+    var code = 'import foo from "./foo"';
+    var ast = parse(code);
+    var illegal = code.replace(/\bfoo\b/g, "+@#");
+    var compiled = compile(illegal, {
+      ast: ast,
+      generateLetDeclarations: true
+    });
+
+    assert.strictEqual(compiled.indexOf("let foo"), 0);
+    assert(compiled.indexOf('"./+@#"') >= 0);
+  });
 });
 
 describe("Node REPL", function () {
