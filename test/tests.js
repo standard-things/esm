@@ -406,6 +406,46 @@ describe("compiler", function () {
     assert.strictEqual(result.code.indexOf("let foo"), 0);
     assert(result.code.indexOf('"./+@#"') >= 0);
   });
+
+  it("should transform AST when options.ast truthy", function () {
+    import { compile } from "../lib/compiler.js";
+
+    var code = [
+      "console.log(foo, bar);",
+      'import foo from "./foo"',
+      'import bar from "./bar"',
+      "export default foo + bar;"
+    ].join("\n");
+
+    var result = compile(code, { ast: true });
+    var ast = result.ast;
+
+    function isVarDecl(node, names) {
+      assert.strictEqual(node.type, "VariableDeclaration");
+      assert.deepEqual(node.declarations.map(function (decl) {
+        return decl.id.name;
+      }), names);
+    }
+
+    function isCallExprStmt(node, objectName, propertyName) {
+      assert.strictEqual(node.type, "ExpressionStatement");
+      assert.strictEqual(node.expression.type, "CallExpression");
+      assert.strictEqual(
+        node.expression.callee.object.name, objectName);
+      assert.strictEqual(
+        node.expression.callee.property.name, propertyName);
+    }
+
+    assert.strictEqual(ast.type, "Program");
+    assert.strictEqual(ast.body.length, 6);
+
+    isVarDecl(ast.body[0], ["foo"]);
+    isCallExprStmt(ast.body[1], "module", "import");
+    isVarDecl(ast.body[2], ["bar"]);
+    isCallExprStmt(ast.body[3], "module", "import");
+    isCallExprStmt(ast.body[4], "console", "log");
+    isCallExprStmt(ast.body[5], "module", "export");
+  });
 });
 
 describe("Node REPL", function () {
