@@ -363,6 +363,22 @@ describe("compiler", function () {
     import { check } from "./strict";
     assert.strictEqual(check(), true);
   });
+
+  it("should respect options.generateLetDeclarations", function () {
+    import { compile } from "../lib/compiler.js";
+
+    var withLet = compile('import foo from "./foo"', {
+      generateLetDeclarations: true
+    });
+
+    assert.strictEqual(withLet.indexOf("let foo;"), 0);
+
+    var without = compile('import foo from "./foo"', {
+      generateLetDeclarations: false
+    });
+
+    assert.strictEqual(without.indexOf("var foo;"), 0);
+  });
 });
 
 describe("Node REPL", function () {
