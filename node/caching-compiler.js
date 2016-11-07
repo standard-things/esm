@@ -35,8 +35,8 @@ function readWithCache(info, content) {
     }
   }
 
-  var options = {};
-  content = compile(content, options);
+  var options = { ast: false };
+  content = compile(content, options).code;
   if (options.identical) {
     // Don't bother caching result if compiler made no changes.
     return content;

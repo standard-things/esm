@@ -1,5 +1,10 @@
 var vm = require("vm");
 var compile = require("../lib/compiler.js").compile;
+var compileOptions = {
+  // Don't modify the AST while compiling, and don't return the AST from
+  // the compile function.
+  ast: false
+};
 
 require("../node");
 
@@ -15,7 +20,7 @@ function wrap(name) {
   }
 
   vm[name] = function (code) {
-    var args = [compile(code)];
+    var args = [compile(code, compileOptions).code];
     for (var i = 1; i < arguments.length; ++i) {
       args.push(arguments[i]);
     }

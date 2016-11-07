@@ -1,4 +1,5 @@
 var assert = require("assert");
+var hasOwn = Object.prototype.hasOwnProperty;
 
 describe("import statements", function () {
   it("should work in nested scopes", function () {
@@ -369,30 +370,41 @@ describe("compiler", function () {
 
     var withLet = compile('import foo from "./foo"', {
       generateLetDeclarations: true
-    });
+    }).code;
 
     assert.strictEqual(withLet.indexOf("let foo;"), 0);
 
     var without = compile('import foo from "./foo"', {
       generateLetDeclarations: false
-    });
+    }).code;
 
     assert.strictEqual(without.indexOf("var foo;"), 0);
+
+    // No options.generateLetDeclarations is the same as
+    // { generateLetDeclarations: false }.
+    assert.strictEqual(compile(
+      'import foo from "./foo"'
+    ).code.indexOf("var foo;"), 0);
   });
 
-  it("should allow pre-parsed ASTs via options.ast", function () {
+  it("should allow pre-parsed ASTs via options.parse", function () {
     import { parse, compile } from "../lib/compiler.js";
 
     var code = 'import foo from "./foo"';
     var ast = parse(code);
     var illegal = code.replace(/\bfoo\b/g, "+@#");
-    var compiled = compile(illegal, {
-      ast: ast,
-      generateLetDeclarations: true
+    var result = compile(illegal, {
+      generateLetDeclarations: true,
+      parse: function (code) {
+        // If you really want to avoid parsing, you can provide an
+        // options.parse function that returns whatever AST you like.
+        return ast;
+      }
     });
 
-    assert.strictEqual(compiled.indexOf("let foo"), 0);
-    assert(compiled.indexOf('"./+@#"') >= 0);
+    assert.strictEqual(hasOwn.call(result, "ast"), false);
+    assert.strictEqual(result.code.indexOf("let foo"), 0);
+    assert(result.code.indexOf('"./+@#"') >= 0);
   });
 });
 
