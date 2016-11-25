@@ -124,6 +124,17 @@ describe("export declarations", function () {
     }, 0);
   });
 
+  it("should support destructuring declarations", function () {
+    import { a, c as b, d, x, y, rest } from "./export/destructuring.js";
+
+    assert.strictEqual(a, "a");
+    assert.strictEqual(b, "b");
+    assert.strictEqual(d, 1234);
+    assert.strictEqual(x, 1);
+    assert.strictEqual(y, 2);
+    assert.deepEqual(rest, [a, b, d]);
+  });
+
   import { Script } from "vm";
 
   var canUseClasses = false;
