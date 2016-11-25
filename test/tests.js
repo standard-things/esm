@@ -1,7 +1,7 @@
 var assert = require("assert");
 var hasOwn = Object.prototype.hasOwnProperty;
 
-describe("import statements", function () {
+describe("import declarations", function () {
   it("should work in nested scopes", function () {
     import { name, id } from "./name";
     assert.strictEqual(name, "name.js");
@@ -40,7 +40,7 @@ describe("import statements", function () {
   });
 });
 
-describe("export statements", function () {
+describe("export declarations", function () {
   it("should allow * exports", function () {
     import def, {
       a, b, c as d,
@@ -82,7 +82,7 @@ describe("export statements", function () {
     assert.strictEqual(si, "cee");
   });
 
-  it("should be able to contain import statements", function () {
+  it("should be able to contain import declarations", function () {
     import { outer } from "./nested";
     assert.deepEqual(outer(), ["a", "b", "c"]);
   });
