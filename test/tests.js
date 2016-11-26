@@ -124,32 +124,28 @@ describe("export declarations", function () {
     }, 0);
   });
 
-  it("should support destructuring declarations", function () {
-    import { a, c as b, d, x, y, rest } from "./export/destructuring.js";
-
-    assert.strictEqual(a, "a");
-    assert.strictEqual(b, "b");
-    assert.strictEqual(d, 1234);
-    assert.strictEqual(x, 1);
-    assert.strictEqual(y, 2);
-    assert.deepEqual(rest, [a, b, d]);
-  });
-
   import { Script } from "vm";
 
   var canUseClasses = false;
   var canUseLetConst = false;
+  var canUseDestructuring = false;
 
   try {
-    // Test if we have
+    // Test if Node supports class syntax.
     new Script("class A {}");
     canUseClasses = true;
   } catch (e) {}
 
   try {
-    // Test if we have
+    // Test if Node supports block declaration syntax.
     new Script("let x; const y = 1234");
     canUseLetConst = true;
+  } catch (e) {}
+
+  try {
+    // Test if Node supports destructuring declarations.
+    new Script("var { x, y } = {}");
+    canUseDestructuring = true;
   } catch (e) {}
 
   it("should support all default syntax", function () {
@@ -188,8 +184,8 @@ describe("export declarations", function () {
     assert.strictEqual(d(), b);
   });
 
-  canUseLetConst &&
-  it("should support block declaration syntax", function () {
+  (canUseLetConst ? it : xit)(
+    "should support block declaration syntax", function () {
     import { a, b, c } from "./export/declarations/block";
 
     assert.strictEqual(a, 1);
@@ -279,6 +275,18 @@ describe("export declarations", function () {
     }
 
     assert.strictEqual(x, "b");
+  });
+
+  (canUseDestructuring ? it : xit)(
+    "should support destructuring declarations", function () {
+    import { a, c as b, d, x, y, rest } from "./export/destructuring.js";
+
+    assert.strictEqual(a, "a");
+    assert.strictEqual(b, "b");
+    assert.strictEqual(d, 1234);
+    assert.strictEqual(x, 1);
+    assert.strictEqual(y, 2);
+    assert.deepEqual(rest, [a, b, d]);
   });
 });
 
