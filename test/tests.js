@@ -103,7 +103,7 @@ describe("export declarations", function () {
       exportAgain,
       exportYetAgain,
       oneLastExport
-    } from "./export-later";
+    } from "./export/later";
 
     assert.strictEqual(def, "default-1");
     assert.strictEqual(val, "value-1");
@@ -287,6 +287,16 @@ describe("export declarations", function () {
     assert.strictEqual(x, 1);
     assert.strictEqual(y, 2);
     assert.deepEqual(rest, [a, b, d]);
+  });
+
+  (canUseDestructuring ? it : xit)(
+  "should invoke destructuring setters later", function () {
+    import { x, y, swap } from "./export/swap-later.js";
+    assert.strictEqual(x, 1);
+    assert.strictEqual(y, 2);
+    swap();
+    assert.strictEqual(x, 2);
+    assert.strictEqual(y, 1);
   });
 });
 
