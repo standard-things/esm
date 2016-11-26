@@ -13,8 +13,18 @@ var reifyVersion = require("../package.json")
   .version.split(".", 2).join(".");
 
 exports.compile = function (content, filename) {
-  var info = getPkgInfo(filename);
+  if (filename === "repl") {
+    // Treat the REPL as if there was no filename.
+    filename = null;
+  }
+  var info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
   return info ? readWithCache(info, content) : content;
+};
+
+// Used when compile filename argument is falsy. Enables in-memory
+// caching, at least.
+var fallbackPkgInfo = {
+  cache: Object.create(null)
 };
 
 function readWithCache(info, content) {

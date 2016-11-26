@@ -1,14 +1,9 @@
 var vm = require("vm");
-var compile = require("../lib/compiler.js").compile;
-var compileOptions = {
-  // Don't modify the AST while compiling, and don't return the AST from
-  // the compile function.
-  ast: false
-};
+var compile = require("../node/caching-compiler.js").compile;
 
 require("../node");
 
-function wrap(name) {
+function wrap(name, optionsArgIndex) {
   var method = vm[name];
 
   if (typeof method !== "function") {
@@ -20,7 +15,9 @@ function wrap(name) {
   }
 
   vm[name] = function (code) {
-    var args = [compile(code, compileOptions).code];
+    var options = arguments[optionsArgIndex];
+    var filename = options && options.filename;
+    var args = [compile(code, filename)];
     for (var i = 1; i < arguments.length; ++i) {
       args.push(arguments[i]);
     }
@@ -35,7 +32,7 @@ function wrap(name) {
 // Enable import and export statements in the default Node REPL.
 // Custom REPLs can still define their own eval functions that circumvent
 // this compilation step, but that's a feature, not a drawback.
-wrap("createScript");
-wrap("runInContext");
-wrap("runInNewContext");
-wrap("runInThisContext");
+wrap("createScript", 1);
+wrap("runInContext", 2);
+wrap("runInNewContext", 2);
+wrap("runInThisContext", 1);
