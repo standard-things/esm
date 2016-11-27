@@ -454,7 +454,8 @@ describe("compiler", function () {
   });
 
   it("should allow pre-parsed ASTs via options.parse", function () {
-    import { parse, compile } from "../lib/compiler.js";
+    import { compile } from "../lib/compiler.js";
+    import { parse } from "../lib/parsers/default.js";
 
     var code = 'import foo from "./foo"';
     var ast = parse(code);
