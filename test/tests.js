@@ -503,6 +503,10 @@ describe("compiler", function () {
         node.expression.callee.property.name, propertyName);
     }
 
+    if (ast.type === "File") {
+      ast = ast.program;
+    }
+
     assert.strictEqual(ast.type, "Program");
     assert.strictEqual(ast.body.length, 6);
 
