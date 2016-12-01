@@ -31,7 +31,7 @@
     "acorn": "~3.3.0",
     "acorn-es7-plugin": "~1.1.0",
     "ast-types": "~0.9.0",
-    "magic-string": "~0.16.0"
+    "magic-string": "~0.17.1"
   },
   "devDependencies": {
     "babylon": "^6.14.1",
