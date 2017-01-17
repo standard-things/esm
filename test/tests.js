@@ -517,6 +517,18 @@ describe("compiler", function () {
     isCallExprStmt(ast.body[4], "console", "log");
     isCallExprStmt(ast.body[5], "module", "export");
   });
+
+  it("should not get confused by shebang", function () {
+    import { compile } from "../lib/compiler.js";
+
+    var code = [
+      "#!/usr/bin/env node -r reify",
+      'import foo from "./foo"',
+    ].join("\n");
+
+    var withShebang = compile(code).code;
+    assert.strictEqual(withShebang.indexOf('var foo'), 0)
+  });
 });
 
 describe("Node REPL", function () {
