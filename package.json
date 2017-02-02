@@ -28,7 +28,7 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "~3.3.0",
+    "acorn": "~4.0.5",
     "acorn-es7-plugin": "~1.1.0",
     "ast-types": "~0.9.0",
     "magic-string": "~0.18.0"
