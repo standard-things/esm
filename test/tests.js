@@ -163,6 +163,9 @@ describe("export declarations", function () {
     import func from "./export/default/function";
     assert.strictEqual(func(), func);
 
+    import anonFunc from "./export/default/anon-function";
+    assert.strictEqual(anonFunc(3), 4);
+
     import ident from "./export/default/identifier";
     assert.strictEqual(ident, 42);
 
