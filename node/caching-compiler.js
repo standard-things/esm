@@ -17,8 +17,17 @@ exports.compile = function (content, filename) {
     // Treat the REPL as if there was no filename.
     filename = null;
   }
-  var info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
-  return info ? readWithCache(info, content) : content;
+  
+  try {
+    var info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
+    return info ? readWithCache(info, content) : content;
+  } catch(e) {
+    if (filename) {
+      e.message += ' while processing file: ' + filename;
+    }
+    throw e;
+  }
+
 };
 
 // Used when compile filename argument is falsy. Enables in-memory
