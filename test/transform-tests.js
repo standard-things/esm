@@ -16,7 +16,7 @@ function walk(dir) {
     var stat = statSync(absPath);
     if (stat.isDirectory()) {
       walk(absPath);
-    } else if (item.endsWith(".js") &&
+    } else if (/\.js$/i.test(item) &&
                stat.isFile()) {
       jsFiles[absPath] = readFileSync(absPath, "utf8");
     }
