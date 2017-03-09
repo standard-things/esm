@@ -42,12 +42,12 @@ describe("compiler.transform", function () {
       ast: true,
       parse: require("../lib/parsers/babylon.js").parse
     });
-  });
+  }).timeout(5000);
 
   it("gives the same results as compile with acorn", function () {
     check({
       ast: true,
       parse: require("../lib/parsers/acorn.js").parse
     });
-  });
+  }).timeout(5000);
 });
