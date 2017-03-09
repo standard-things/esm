@@ -1,0 +1,26 @@
+{
+  "name": "babel-plugin-transform-es2015-modules-reify",
+  "author": "Ben Newman <ben@benjamn.com>",
+  "description": "Babel plugin for transforming ES2015 import/export to Reify's module.{import,export} API",
+  "version": "0.4.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benjamn/reify/tree/master/packages/babel-plugin-transform-es2015-modules-reify"
+  },
+  "keywords": [
+    "modules",
+    "import",
+    "export",
+    "transform",
+    "babel",
+    "plugin",
+    "babel-plugin",
+    "reify",
+    "meteor"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "reify": "^0.4.10"
+  }
+}
