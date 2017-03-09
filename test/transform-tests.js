@@ -1,34 +1,12 @@
 import assert from "assert";
-import { join } from "path";
-import {
-  readdirSync,
-  readFileSync,
-  statSync,
-} from "fs";
 import { compile, transform } from "../lib/compiler.js";
 import { prettyPrint } from "recast";
-
-var jsFiles = Object.create(null);
-
-function walk(dir) {
-  readdirSync(dir).forEach(function (item) {
-    var absPath = join(dir, item);
-    var stat = statSync(absPath);
-    if (stat.isDirectory()) {
-      walk(absPath);
-    } else if (/\.js$/i.test(item) &&
-               stat.isFile()) {
-      jsFiles[absPath] = readFileSync(absPath, "utf8");
-    }
-  });
-}
-
-walk(__dirname);
+import { files } from "./all-files.js";
 
 describe("compiler.transform", function () {
   function check(options) {
-    Object.keys(jsFiles).forEach(function (absPath) {
-      var code = jsFiles[absPath];
+    Object.keys(files).forEach(function (absPath) {
+      var code = files[absPath];
       assert.strictEqual(
         prettyPrint(compile(code, options).ast).code,
         prettyPrint(transform(options.parse(code), options)).code,
