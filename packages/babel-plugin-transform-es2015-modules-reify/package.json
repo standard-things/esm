@@ -20,7 +20,7 @@
     "meteor"
   ],
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "reify": "^0.4.10"
   }
 }
