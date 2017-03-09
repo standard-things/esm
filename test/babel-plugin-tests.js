@@ -3,6 +3,8 @@ import { relative } from "path";
 import { transformFromAst } from "babel-core";
 import { files } from "./all-files.js";
 import { parse } from "../lib/parsers/babylon.js";
+import reifyPlugin from "babel-plugin-transform-es2015-modules-reify";
+import es2015Preset from "babel-preset-es2015";
 
 var filesToTest = Object.create(null);
 
@@ -40,14 +42,14 @@ describe("babel-plugin-transform-es2015-modules-reify", function () {
 
     it("compiles " + relPath, function () {
       check(code, {
-        plugins: ["transform-es2015-modules-reify"]
+        plugins: [reifyPlugin]
       });
     });
 
     it("compiles " + relPath + " with es2015", function () {
       check(code, {
-        plugins: ["transform-es2015-modules-reify"],
-        presets: ["es2015"]
+        plugins: [reifyPlugin],
+        presets: [es2015Preset]
       });
     });
   });
