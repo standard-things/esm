@@ -21,6 +21,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "babel-types": "^6.23.0",
     "reify": "^0.4.10"
   }
 }

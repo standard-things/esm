@@ -1,14 +1,20 @@
-module.exports = function (Babel) {
-  var t = Babel.types;
+module.exports = function () {
   var transform = require("reify/lib/compiler.js").transform;
   var parse = require("reify/lib/parsers/babylon.js").parse;
+  var validators = require("babel-types/lib/validators");
+  var ibs = validators.isBlockScoped;
+  var t = require("babel-types");
+
+  // Allow t.isBlockScoped to return true for import-related nodes.
+  validators.isBlockScoped = function (node) {
+    return node &&
+      t.isImportDeclaration(node) ||
+      ibs.apply(this, arguments);
+  };
 
   function removeLiveBindingUpdateViolations(scope) {
-    var bindings = scope.bindings;
-    var shouldCrawl = false;
-
-    Object.keys(bindings).forEach(function (name) {
-      var b = bindings[name];
+    Object.keys(scope.bindings).forEach(function (name) {
+      var b = scope.bindings[name];
       if (b.kind === "module") {
         // Ignore constant violations from inside module.import(id, {...})
         // callback functions, since they are necessary for updating
@@ -23,15 +29,8 @@ module.exports = function (Babel) {
             b.constantViolations.push(cv);
           }
         });
-
-        shouldCrawl = true;
       }
     });
-
-    if (shouldCrawl) {
-      // Crawl this scope again to pick up any new VariableDeclarations.
-      scope.crawl();
-    }
   }
 
   function isPartOfImportMethodCall(path) {
