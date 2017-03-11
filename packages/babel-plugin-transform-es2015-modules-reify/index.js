@@ -53,9 +53,15 @@ module.exports = function (Babel) {
       },
 
       Program: function (path) {
-        transform(path.node, Object.assign({
+        var transformOptions = {
           parse: parse
-        }, this.opts));
+        };
+
+        Object.keys(this.opts).forEach(function (key) {
+          transformOptions[key] = this.opts[key];
+        }, this);
+
+        transform(path.node, transformOptions);
       }
     }
   };
