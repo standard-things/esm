@@ -3,7 +3,10 @@ module.exports = function (Babel) {
   var transform = require("reify/lib/compiler.js").transform;
   var parse = require("reify/lib/parsers/babylon.js").parse;
 
-  function removeLiveBindingUpdateViolations(bindings) {
+  function removeLiveBindingUpdateViolations(scope) {
+    var bindings = scope.bindings;
+    var shouldCrawl = false;
+
     Object.keys(bindings).forEach(function (name) {
       var b = bindings[name];
       if (b.kind === "module") {
@@ -20,8 +23,15 @@ module.exports = function (Babel) {
             b.constantViolations.push(cv);
           }
         });
+
+        shouldCrawl = true;
       }
     });
+
+    if (shouldCrawl) {
+      // Crawl this scope again to pick up any new VariableDeclarations.
+      scope.crawl();
+    }
   }
 
   function isPartOfImportMethodCall(path) {
@@ -49,7 +59,7 @@ module.exports = function (Babel) {
   return {
     visitor: {
       Scope: function (path) {
-        removeLiveBindingUpdateViolations(path.scope.bindings);
+        removeLiveBindingUpdateViolations(path.scope);
       },
 
       Program: function (path) {
