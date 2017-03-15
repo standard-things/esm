@@ -1,4 +1,6 @@
 var assert = require("assert");
+var parserSupportsExportFromExtensions =
+  process.env.REIFY_PARSER === "babylon";
 
 describe("export declarations", function () {
   it("should allow * exports", function () {
@@ -202,6 +204,40 @@ describe("export declarations", function () {
       b: "b",
       c: "c"
     });
+  });
+
+  (parserSupportsExportFromExtensions ? it : xit
+  )("should support export-from extensions", function () {
+    import {
+      def1, def2, def3,
+      ns1, ns2, ns3,
+      a, b, c, d
+    } from "./export/from-extensions";
+
+    import def, {
+      a as _a,
+      b as _b,
+      b as _c,
+      c as _d,
+    } from "./abc";
+
+    assert.strictEqual(def, def1);
+    assert.strictEqual(def, def2);
+    assert.strictEqual(def, def3);
+
+    function checkNS(ns) {
+      assert.deepEqual(ns, def);
+      assert.notStrictEqual(ns, def);
+    }
+
+    checkNS(ns1);
+    checkNS(ns2);
+    checkNS(ns3);
+
+    assert.strictEqual(a, _a);
+    assert.strictEqual(b, _b);
+    assert.strictEqual(c, _c);
+    assert.strictEqual(d, _d);
   });
 
   it("should support export { default } from ... syntax", function () {

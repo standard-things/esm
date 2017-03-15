@@ -295,6 +295,32 @@ module.import("./module", {
 });
 ```
 
+Exporting named namespaces ([proposal](https://github.com/leebyron/ecmascript-export-ns-from)):
+```js
+export * as ns from "./module";
+```
+becomes
+```js
+module.import("./module", {
+  "*": function (value, name) {
+    this[name] = value;
+  }.bind(exports.ns = {});
+});
+```
+
+Re-exporting default exports ([proposal](https://github.com/leebyron/ecmascript-export-default-from)):
+```js
+export a, {b, c as d} from "./module";
+```
+becomes
+```js
+module.import("./module", {
+  default: value => { exports.a = value },
+  b: value => { exports.b = value },
+  c: value => { exports.d = value }
+});
+```
+
 While these examples have not covered every possible syntax for `import`
 and `export` declarations, I hope they provide the intuition necessary to
 imagine how any declaration could be compiled.
