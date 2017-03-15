@@ -37,4 +37,10 @@ describe("import declarations", function () {
     import def from "./export/common.js";
     assert.strictEqual(def, "pure CommonJS");
   });
+
+  it("should allow same symbol as different locals", function () {
+    import { a as x, a as y } from "./abc";
+    assert.strictEqual(x, "a");
+    assert.strictEqual(y, "a");
+  });
 });
