@@ -3,14 +3,15 @@
 set -e
 set -u
 
-TEST_DIR=$(dirname "$0")
+cd $(dirname "$0")
+TEST_DIR=$(pwd)
 PKG_DIR=$(dirname "$TEST_DIR")
 
 cd "$PKG_DIR"
 npm link packages/babel-plugin-transform-es2015-modules-reify
-rm -rf node_modules/babel-plugin-transform-es2015-modules-reify/node_modules/reify
-rm -rf node_modules/reify
-ln -s . node_modules/reify
+cd node_modules
+rm -rf reify babel-plugin-transform-es2015-modules-reify/node_modules/reify
+ln -s .. reify
 
 cd "$TEST_DIR"
 
