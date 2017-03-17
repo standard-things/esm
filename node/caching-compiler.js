@@ -65,9 +65,17 @@ function readWithCache(info, content) {
     }
   }
 
-  var options = { ast: false };
-  content = compile(content, options).code;
-  if (options.identical) {
+  var compileOptions = {
+    ast: false
+  };
+
+  if (reify && reify.parser) {
+    compileOptions.parse = require(reify.parser).parse;
+  };
+
+  content = compile(content, compileOptions).code;
+
+  if (compileOptions.identical) {
     // Don't bother caching result if compiler made no changes.
     return content;
   }
