@@ -12,6 +12,8 @@ var pkgInfoCache = Object.create(null);
 var reifyVersion = require("../package.json")
   .version.split(".", 2).join(".");
 
+var DEFAULT_CACHE_DIR = ".reify-cache";
+
 exports.compile = function (content, filename) {
   if (filename === "repl") {
     // Treat the REPL as if there was no filename.
@@ -176,7 +178,9 @@ function readPkgInfo(dir) {
     };
 
     if (reify) {
-      var cacheDir = getOwn(reify, "cache-directory");
+      var cacheDir = hasOwn.call(reify, "cache-directory")
+        ? reify["cache-directory"]
+        : DEFAULT_CACHE_DIR;
 
       if (typeof cacheDir === "string") {
         cacheDir = mkdirp(dir, cacheDir);
