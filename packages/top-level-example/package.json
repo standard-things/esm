@@ -1,0 +1,29 @@
+{
+  "name": "top-level-example",
+  "author": "Ben Newman <ben@benjamn.com>",
+  "version": "0.1.0",
+  "description": "Example of using Reify with a top-level parser.",
+  "private": true,
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benjamn/reify/tree/master/packages/top-level-example"
+  },
+  "keywords": [
+    "reify",
+    "example",
+    "acorn",
+    "parser",
+    "modules",
+    "import",
+    "export",
+    "compiler"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "reify": "^0.5.1"
+  },
+  "reify": {
+    "parser": "reify/lib/parsers/top-level.js"
+  }
+}
