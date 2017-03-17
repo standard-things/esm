@@ -46,7 +46,9 @@ var fallbackPkgInfo = {
 };
 
 function readWithCache(info, content) {
-  var cacheFilename = getCacheFilename(content);
+  var json = info && info.json;
+  var reify = json && json.reify;
+  var cacheFilename = getCacheFilename(content, reify);
   var absCachePath = typeof info.cacheDir === "string" &&
     path.join(info.cacheDir, cacheFilename);
 
@@ -90,12 +92,16 @@ function readFileOrNull(filename) {
   }
 }
 
-function getCacheFilename(content) {
-  return createHash("sha1")
-    .update(reifyVersion)
-    .update("\0")
-    .update(content)
-    .digest("hex") + ".json";
+function getCacheFilename(content, reify) {
+  var hash = createHash("sha1")
+    .update(reifyVersion).update("\0")
+    .update(content).update("\0");
+
+  if (reify) {
+    hash.update(JSON.stringify(reify));
+  }
+
+  return hash.digest("hex") + ".json";
 }
 
 function getPkgInfo(filename) {
