@@ -1,6 +1,4 @@
-# re&middot;i&middot;fy <sub>_verb, transitive_</sub> &nbsp; [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify)
-
-[![Greenkeeper badge](https://badges.greenkeeper.io/benjamn/reify.svg)](https://greenkeeper.io/)
+# re&middot;i&middot;fy <sub>_verb, transitive_</sub> &nbsp; [![Build Status](https://travis-ci.org/benjamn/reify.svg?branch=master)](https://travis-ci.org/benjamn/reify) [![Greenkeeper badge](https://badges.greenkeeper.io/benjamn/reify.svg)](https://greenkeeper.io/)
 
 **re&middot;i&middot;fied** <sub>past</sub> &nbsp; **re&middot;i&middot;fies** <sub>present</sub> &nbsp; **re&middot;i&middot;fy&middot;ing** <sub>participle</sub> &nbsp; **re&middot;i&middot;fi&middot;ca&middot;tion** <sub>noun</sub> &nbsp; **re&middot;i&middot;fi&middot;er** <sub>noun</sub>
 
