@@ -66,11 +66,7 @@ module.exports = function () {
           parse: parse
         };
 
-        Object.keys(this.opts).forEach(function (key) {
-          transformOptions[key] = this.opts[key];
-        }, this);
-
-        transform(path.node, transformOptions);
+        transform(path.node, Object.assign(transformOptions, this.opts));
       }
     }
   };

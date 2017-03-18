@@ -24,6 +24,9 @@
   "bugs": {
     "url": "https://github.com/benjamn/reify/issues"
   },
+  "engines": {
+    "node": ">=4"
+  },
   "scripts": {
     "test": "test/run.sh"
   },

@@ -20,6 +20,9 @@
     "compiler"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=4"
+  },
   "dependencies": {
     "reify": "^0.5.1"
   },
