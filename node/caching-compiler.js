@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var createHash = require("crypto").createHash;
 var compile = require("../lib/compiler.js").compile;
+var dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
 var hasOwn = Object.prototype.hasOwnProperty;
 
 // Map from absolute file paths to the package.json that governs them.
@@ -70,7 +71,7 @@ function readWithCache(info, content) {
   };
 
   if (reify && reify.parser) {
-    compileOptions.parse = require(reify.parser).parse;
+    compileOptions.parse = dynRequire(reify.parser).parse;
   };
 
   content = compile(content, compileOptions).code;

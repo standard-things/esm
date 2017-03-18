@@ -1,4 +1,5 @@
-var Module = require("../lib/runtime.js").enable(module.constructor);
+var dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
+var Module = require("../lib/runtime.js").enable(dynRequire('module'));
 var Mp = Module.prototype;
 
 exports.Module = Module;
