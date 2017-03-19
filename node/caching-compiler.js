@@ -110,7 +110,7 @@ function getCacheFilename(content, reify) {
     hash.update(JSON.stringify(reify));
   }
 
-  return hash.digest("hex") + ".json";
+  return hash.digest("hex") + ".js";
 }
 
 function getPkgInfo(filename) {
@@ -210,7 +210,7 @@ function readPkgInfo(dir) {
           cacheFiles.forEach(function (file) {
             // Later we'll change the value to the actual contents of the
             // file, but for now we merely register that it exists.
-            if (/\.json$/.test(file)) {
+            if (/\.js$/.test(file)) {
               info.cache[file] = true;
             }
           });

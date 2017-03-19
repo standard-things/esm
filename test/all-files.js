@@ -1,4 +1,9 @@
-import { join } from "path";
+import {
+  join,
+  relative,
+  sep,
+} from "path";
+
 import {
   readdirSync,
   readFileSync,
@@ -13,8 +18,20 @@ function walk(dir) {
     var stat = statSync(absPath);
     if (stat.isDirectory()) {
       walk(absPath);
-    } else if (/\.js$/i.test(item) &&
-               stat.isFile()) {
+    } else if (stat.isFile()) {
+      var relPath = relative(__dirname, absPath);
+      var relParts = relPath.split(sep);
+
+      // Ignore cache files.
+      if (relParts[0] === ".cache") {
+        return;
+      }
+
+      // Ignore non-.js files.
+      if (! /\.js$/.test(relPath)) {
+        return;
+      }
+
       files[absPath] = readFileSync(absPath, "utf8");
     }
   });
