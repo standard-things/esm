@@ -21,7 +21,7 @@ Object.keys(files).forEach(function (absPath) {
   }
 
   // Files without import or export tokens don't need to be tested.
-  if (! /\b(import|export)\b/.test(code)) {
+  if (! /\b(?:im|ex)port\b/.test(code)) {
     return;
   }
 
@@ -33,7 +33,7 @@ describe("babel-plugin-transform-es2015-modules-reify", function () {
     var ast = parse(code);
     delete ast.tokens;
     var result = transformFromAst(ast, code, options);
-    assert.ok(/\bmodule\.(import|export)\b/.test(result.code));
+    assert.ok(/\bmodule\.(?:import|export)\b/.test(result.code));
     return result;
   }
 
