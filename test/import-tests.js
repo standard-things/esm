@@ -54,4 +54,23 @@ describe("import declarations", function () {
     }
     assert.strictEqual(x, "c");
   });
+
+  it("should support braceless-while nested imports", function () {
+    var i = 0, x;
+    while (i++ === 0) import { a as x } from "./abc";
+    assert.strictEqual(x, "a");
+  });
+
+  it("should support braceless-do-while nested imports", function () {
+    var x;
+    do import { b as x } from "./abc";
+    while (false);
+    assert.strictEqual(x, "b");
+  });
+
+  it("should support braceless-for-in nested imports", function () {
+    for (var x in { a: 123 })
+      import { c as x } from "./abc";
+    assert.strictEqual(x, "c");
+  });
 });
