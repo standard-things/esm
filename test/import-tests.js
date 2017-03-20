@@ -43,4 +43,15 @@ describe("import declarations", function () {
     assert.strictEqual(x, "a");
     assert.strictEqual(y, "a");
   });
+
+  it("should support braceless-if nested imports", function () {
+    assert.strictEqual(typeof x, "undefined");
+    for (var i = 0; i < 3; ++i) {
+      if (i === 0) import { a as x } from "./abc";
+      else if (i === 1) import { b as x } from "./abc";
+      else import { c as x } from "./abc";
+      assert.strictEqual(x, ["a", "b", "c"][i]);
+    }
+    assert.strictEqual(x, "c");
+  });
 });
