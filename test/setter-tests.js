@@ -25,7 +25,7 @@ describe("parent setters", function () {
     var firstCallCount = 0;
     var secondCallCount = 0;
 
-    module.import("./live.js", {
+    module.importSync("./live.js", {
       value: function (v) {
         ++firstCallCount;
         value = "first:" + v;
@@ -39,7 +39,7 @@ describe("parent setters", function () {
     assert.strictEqual(value, "first:3");
     assert.strictEqual(secondCallCount, 0);
 
-    module.import("./live.js", {
+    module.importSync("./live.js", {
       value: function (v) {
         ++secondCallCount;
         value = "second:" + v;

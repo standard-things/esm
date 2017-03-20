@@ -15,12 +15,12 @@ Benefits
   * Babel's `interopRequire{Default,Wildcard}` logic is captured by `Module.prototype.getExportByName`.
 * Does not interfere with existing `require.extensions` hooks.
 * Much simpler transform implementation as compared with other ECMASCript module compilers.
-  * `import` statements become calls to `module.import(id, setters)`
+  * `import` statements become calls to `module.importSync(id, setters)`
   * `export` statements become assignments to the `exports` object.
   * The compiler doesn't have to parse the entire file to find `import` and `export` statements.
 * Line numbers are strictly preserved.
   * No hoisting of `import` statements.
   * All `import` and `export` statements are compiled in-place.
 * No need for `Object.defineProperty`-style getters to support `export * from "..."`.
-* The `module.import(id, setters)` API is human-writable, too, if you want to implement custom update logic.
+* The `module.importSync(id, setters)` API is human-writable, too, if you want to implement custom update logic.
 * Generated code is statically analyzable, since the `exports` object is not exposed.

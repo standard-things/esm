@@ -33,7 +33,7 @@ describe("babel-plugin-transform-es2015-modules-reify", function () {
     var ast = parse(code);
     delete ast.tokens;
     var result = transformFromAst(ast, code, options);
-    assert.ok(/\bmodule\.(?:import|export)\b/.test(result.code));
+    assert.ok(/\bmodule\.(?:importSync|export)\b/.test(result.code));
     return result;
   }
 

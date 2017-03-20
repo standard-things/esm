@@ -126,9 +126,9 @@ describe("compiler", function () {
     assert.strictEqual(ast.body.length, 6);
 
     isVarDecl(ast.body[0], ["foo"]);
-    isCallExprStmt(ast.body[1], "module", "import");
+    isCallExprStmt(ast.body[1], "module", "importSync");
     isVarDecl(ast.body[2], ["bar"]);
-    isCallExprStmt(ast.body[3], "module", "import");
+    isCallExprStmt(ast.body[3], "module", "importSync");
     isCallExprStmt(ast.body[4], "console", "log");
     isCallExprStmt(ast.body[5], "module", "export");
   });
