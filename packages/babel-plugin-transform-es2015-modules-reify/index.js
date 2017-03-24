@@ -12,13 +12,17 @@ module.exports = function () {
       ibs.apply(this, arguments);
   };
 
-  function removeLiveBindingUpdateViolations(scope) {
+  function removeLiveBindingUpdateViolations(scope, opts) {
     Object.keys(scope.bindings).forEach(function (name) {
       var b = scope.bindings[name];
       if (b.kind === "module") {
-        // Make the binding appear block-bound and const from the
-        // perspective of Babel, to simulate immutable live bindings.
-        b.kind = "const";
+        // Make the binding have a "let" or "var" kind from the
+        // perspective of Babel, since that's what Reify generates.
+        if (opts && opts.generateLetDeclarations === false) {
+          b.kind = "var";
+        } else {
+          b.kind = "let";
+        }
 
         // Ignore constant violations from inside module.import(id, {...})
         // callback functions, since they are necessary for updating
@@ -62,7 +66,7 @@ module.exports = function () {
   return {
     visitor: {
       Scope: function (path) {
-        removeLiveBindingUpdateViolations(path.scope);
+        removeLiveBindingUpdateViolations(path.scope, this.opts);
       },
 
       Program: function (path) {
