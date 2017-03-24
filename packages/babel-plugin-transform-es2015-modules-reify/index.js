@@ -16,6 +16,10 @@ module.exports = function () {
     Object.keys(scope.bindings).forEach(function (name) {
       var b = scope.bindings[name];
       if (b.kind === "module") {
+        // Make the binding appear block-bound and const from the
+        // perspective of Babel, to simulate immutable live bindings.
+        b.kind = "const";
+
         // Ignore constant violations from inside module.import(id, {...})
         // callback functions, since they are necessary for updating
         // imported symbols to simulate live bindings. The beauty of this
