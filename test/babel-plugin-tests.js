@@ -40,16 +40,17 @@ describe("babel-plugin-transform-es2015-modules-reify", function () {
 
   Object.keys(filesToTest).forEach(function (relPath) {
     var code = filesToTest[relPath];
+    var plugins = [[reifyPlugin, {
+      generateLetDeclarations: true
+    }]];
 
     it("compiles " + relPath, function () {
-      check(code, {
-        plugins: [reifyPlugin]
-      });
+      check(code, { plugins: plugins });
     });
 
     it("compiles " + relPath + " with es2015", function () {
       check(code, {
-        plugins: [reifyPlugin],
+        plugins: plugins,
         presets: [es2015Preset]
       });
     });
