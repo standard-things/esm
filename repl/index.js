@@ -1,24 +1,25 @@
-var vm = require("vm");
-var compile = require("../node/caching-compiler.js").compile;
+"use strict";
+
+const vm = require("vm");
+const compile = require("../node/caching-compiler.js").compile;
 
 require("../node");
 
 function wrap(name, optionsArgIndex) {
-  var method = vm[name];
+  const method = vm[name];
 
-  if (typeof method !== "function") {
-    return;
-  }
-
-  if (method.reified) {
+  if (typeof method !== "function" ||
+      method.reified) {
     return;
   }
 
   vm[name] = function (code) {
-    var options = arguments[optionsArgIndex];
-    var filename = options && options.filename;
-    var args = [compile(code, filename)];
-    for (var i = 1; i < arguments.length; ++i) {
+    const options = arguments[optionsArgIndex];
+    const filename = options && options.filename;
+    const args = [compile(code, filename)];
+    const argsCount = arguments.length;
+
+    for (let i = 1; i < argsCount; ++i) {
       args.push(arguments[i]);
     }
     return method.apply(vm, args);

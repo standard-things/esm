@@ -1,6 +1,8 @@
-var dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
-var Module = require("../lib/runtime.js").enable(dynRequire('module'));
-var Mp = Module.prototype;
+"use strict";
+
+const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
+const Module = require("../lib/runtime.js").enable(dynRequire('module'));
+const Mp = Module.prototype;
 
 exports.Module = Module;
 
@@ -11,10 +13,10 @@ Mp.resolve = function (id) {
 
 // Override Module.prototype.load to call this.runModuleSetters() whenever
 // a module has loaded.
-var load = Mp.load;
+const load = Mp.load;
 if (! load.reified && Mp.runModuleSetters) {
   (Mp.load = function () {
-    var result = load.apply(this, arguments);
+    const result = load.apply(this, arguments);
     this.runModuleSetters();
     return result;
   }).reified = load;

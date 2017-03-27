@@ -1,27 +1,29 @@
-var fs = require("fs");
-var path = require("path");
-var createHash = require("crypto").createHash;
-var compile = require("../lib/compiler.js").compile;
-var dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
-var hasOwn = Object.prototype.hasOwnProperty;
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+const createHash = require("crypto").createHash;
+const compile = require("../lib/compiler.js").compile;
+const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
+const hasOwn = Object.prototype.hasOwnProperty;
 
 // Map from absolute file paths to the package.json that governs them.
-var pkgInfoCache = Object.create(null);
+const pkgInfoCache = Object.create(null);
 
 // Take only the major and minor components of the reify version, so that
 // we don't invalidate the cache every time a patch version is released.
-var reifyVersion = require("../package.json")
+const reifyVersion = require("../package.json")
   .version.split(".", 2).join(".");
 
-var DEFAULT_CACHE_DIR = ".reify-cache";
+const DEFAULT_CACHE_DIR = ".reify-cache";
 
-exports.compile = function (content, filename) {
+exports.compile = (content, filename) => {
   if (filename === "repl") {
     // Treat the REPL as if there was no filename.
     filename = null;
   }
 
-  var info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
+  const info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
   if (! info) {
     return content;
   }
@@ -42,19 +44,19 @@ function readWithCacheAndFilename(info, content, filename) {
 
 // Used when compile filename argument is falsy. Enables in-memory
 // caching, at least.
-var fallbackPkgInfo = {
+const fallbackPkgInfo = {
   cache: Object.create(null)
 };
 
 function readWithCache(info, content) {
-  var json = info && info.json;
-  var reify = json && json.reify;
-  var cacheFilename = getCacheFilename(content, reify);
-  var absCachePath = typeof info.cacheDir === "string" &&
+  const json = info && info.json;
+  const reify = json && json.reify;
+  const cacheFilename = getCacheFilename(content, reify);
+  const absCachePath = typeof info.cacheDir === "string" &&
     path.join(info.cacheDir, cacheFilename);
 
   if (hasOwn.call(info.cache, cacheFilename)) {
-    var cacheValue = info.cache[cacheFilename];
+    let cacheValue = info.cache[cacheFilename];
 
     if (cacheValue === true && absCachePath) {
       cacheValue = info.cache[cacheFilename] =
@@ -66,7 +68,7 @@ function readWithCache(info, content) {
     }
   }
 
-  var compileOptions = {
+  const compileOptions = {
     ast: false
   };
 
@@ -102,7 +104,7 @@ function readFileOrNull(filename) {
 }
 
 function getCacheFilename(content, reify) {
-  var hash = createHash("sha1")
+  const hash = createHash("sha1")
     .update(reifyVersion).update("\0")
     .update(content).update("\0");
 
@@ -118,7 +120,7 @@ function getPkgInfo(filename) {
     return pkgInfoCache[filename];
   }
 
-  var stat = statOrNull(filename);
+  const stat = statOrNull(filename);
   if (! stat) {
     return pkgInfoCache[filename] = null;
   }
@@ -128,13 +130,13 @@ function getPkgInfo(filename) {
       return pkgInfoCache[filename] = null;
     }
 
-    var info = readPkgInfo(filename);
+    const info = readPkgInfo(filename);
     if (info) {
       return pkgInfoCache[filename] = info;
     }
   }
 
-  var parentDir = path.dirname(filename);
+  const parentDir = path.dirname(filename);
   return pkgInfoCache[filename] =
     parentDir !== filename &&
     getPkgInfo(parentDir);
@@ -149,8 +151,10 @@ function statOrNull(filename) {
 }
 
 function readPkgInfo(dir) {
+  let pkg;
+
   try {
-    var pkg = JSON.parse(fs.readFileSync(
+    pkg = JSON.parse(fs.readFileSync(
       path.join(dir, "package.json")
     ));
 
@@ -162,17 +166,16 @@ function readPkgInfo(dir) {
   }
 
   if (pkg && typeof pkg === "object") {
-    var reify = pkg.reify;
+    const reify = pkg.reify;
     if (reify === false) {
       // An explicit "reify": false property in package.json disables
       // reification even if "reify" is listed as a dependency.
       return null;
     }
 
-    function check(name) {
-      return typeof pkg[name] === "object" &&
-        hasOwn.call(pkg[name], "reify");
-    }
+    const check = (name) => (
+      typeof pkg[name] === "object" && hasOwn.call(pkg[name], "reify")
+    );
 
     if (! check("dependencies") &&
         ! check("peerDependencies") &&
@@ -186,34 +189,37 @@ function readPkgInfo(dir) {
       return null;
     }
 
-    var info = {
+    const info = {
       json: pkg,
       cacheDir: null,
       cache: Object.create(null)
     };
 
     if (reify) {
-      var cacheDir = hasOwn.call(reify, "cache-directory")
+      let cacheDir = hasOwn.call(reify, "cache-directory")
         ? reify["cache-directory"]
         : DEFAULT_CACHE_DIR;
 
       if (typeof cacheDir === "string") {
         cacheDir = mkdirp(dir, cacheDir);
 
-        var cacheFiles = cacheDir && fs.readdirSync(cacheDir);
+        const cacheFiles = cacheDir && fs.readdirSync(cacheDir);
         if (cacheFiles) {
           // If we leave info.cacheDir === null, we won't be able to save
           // cache files to disk, but we can still cache compilation
           // results in memory.
           info.cacheDir = cacheDir;
 
-          cacheFiles.forEach(function (file) {
+          const filesCount = cacheFiles.length;
+
+          for (let i = 0; i < filesCount; ++i) {
             // Later we'll change the value to the actual contents of the
             // file, but for now we merely register that it exists.
+            const file = cacheFiles[i];
             if (/\.js$/.test(file)) {
               info.cache[file] = true;
             }
-          });
+          }
         }
       }
     }
@@ -232,7 +238,7 @@ function getOwn(obj, name) {
 }
 
 function mkdirp(rootDir, relativeDir) {
-  var parentDir = path.dirname(relativeDir);
+  const parentDir = path.dirname(relativeDir);
   if (parentDir === relativeDir) {
     return rootDir;
   }
@@ -241,8 +247,8 @@ function mkdirp(rootDir, relativeDir) {
     return null;
   }
 
-  var absoluteDir = path.join(rootDir, relativeDir);
-  var stat = statOrNull(absoluteDir);
+  const absoluteDir = path.join(rootDir, relativeDir);
+  const stat = statOrNull(absoluteDir);
   if (stat && stat.isDirectory()) {
     return absoluteDir;
   }

@@ -1,10 +1,12 @@
-var compile = require("./caching-compiler.js").compile;
-var Module = require("./runtime.js").Module;
-var Mp = Module.prototype;
+"use strict";
+
+const compile = require("./caching-compiler.js").compile;
+const Module = require("./runtime.js").Module;
+const Mp = Module.prototype;
 
 // Override Module.prototype._compile to compile any code that will be
 // evaluated as a module.
-var _compile = Mp._compile;
+const _compile = Mp._compile;
 if (! _compile.reified) {
   (Mp._compile = function (content, filename) {
     return _compile.call(
