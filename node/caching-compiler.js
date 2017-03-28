@@ -23,19 +23,19 @@ exports.compile = (content, filename) => {
     filename = null;
   }
 
-  const info = filename ? getPkgInfo(filename) : fallbackPkgInfo;
-  if (! info) {
+  const pkgInfo = filename ? getPkgInfo(filename) : fallbackPkgInfo;
+  if (! pkgInfo) {
     return content;
   }
 
   return filename
-    ? readWithCacheAndFilename(info, content, filename)
-    : readWithCache(info, content);
+    ? readWithCacheAndFilename(pkgInfo, content, filename)
+    : readWithCache(pkgInfo, content);
 };
 
-function readWithCacheAndFilename(info, content, filename) {
+function readWithCacheAndFilename(pkgInfo, content, filename) {
   try {
-    return readWithCache(info, content);
+    return readWithCache(pkgInfo, content);
   } catch (e) {
     e.message += ' while processing file: ' + filename;
     throw e;
@@ -48,18 +48,18 @@ const fallbackPkgInfo = {
   cache: Object.create(null)
 };
 
-function readWithCache(info, content) {
-  const json = info && info.json;
+function readWithCache(pkgInfo, content) {
+  const json = pkgInfo && pkgInfo.json;
   const reify = json && json.reify;
   const cacheFilename = getCacheFilename(content, reify);
-  const absCachePath = typeof info.cacheDir === "string" &&
-    path.join(info.cacheDir, cacheFilename);
+  const absCachePath = typeof pkgInfo.cacheDir === "string" &&
+    path.join(pkgInfo.cacheDir, cacheFilename);
 
-  if (hasOwn.call(info.cache, cacheFilename)) {
-    let cacheValue = info.cache[cacheFilename];
+  if (hasOwn.call(pkgInfo.cache, cacheFilename)) {
+    let cacheValue = pkgInfo.cache[cacheFilename];
 
     if (cacheValue === true && absCachePath) {
-      cacheValue = info.cache[cacheFilename] =
+      cacheValue = pkgInfo.cache[cacheFilename] =
         readFileOrNull(absCachePath);
     }
 
@@ -83,9 +83,9 @@ function readWithCache(info, content) {
     return content;
   }
 
-  info.cache[cacheFilename] = content;
+  pkgInfo.cache[cacheFilename] = content;
 
-  if (typeof info.cacheDir === "string") {
+  if (typeof pkgInfo.cacheDir === "string") {
     // Writing cache files is something that should only happen at package
     // development time, so it's acceptable to use fs.writeFileSync
     // instead of some complicated asynchronous-but-atomic strategy.
@@ -130,9 +130,9 @@ function getPkgInfo(filename) {
       return pkgInfoCache[filename] = null;
     }
 
-    const info = readPkgInfo(filename);
-    if (info) {
-      return pkgInfoCache[filename] = info;
+    const pkgInfo = readPkgInfo(filename);
+    if (pkgInfo) {
+      return pkgInfoCache[filename] = pkgInfo;
     }
   }
 
@@ -189,7 +189,7 @@ function readPkgInfo(dir) {
       return null;
     }
 
-    const info = {
+    const pkgInfo = {
       json: pkg,
       cacheDir: null,
       cache: Object.create(null)
@@ -205,10 +205,10 @@ function readPkgInfo(dir) {
 
         const cacheFiles = cacheDir && fs.readdirSync(cacheDir);
         if (cacheFiles) {
-          // If we leave info.cacheDir === null, we won't be able to save
-          // cache files to disk, but we can still cache compilation
+          // If we leave pkgInfo.cacheDir === null, we won't be able to
+          // save cache files to disk, but we can still cache compilation
           // results in memory.
-          info.cacheDir = cacheDir;
+          pkgInfo.cacheDir = cacheDir;
 
           const filesCount = cacheFiles.length;
 
@@ -217,14 +217,14 @@ function readPkgInfo(dir) {
             // file, but for now we merely register that it exists.
             const file = cacheFiles[i];
             if (/\.js$/.test(file)) {
-              info.cache[file] = true;
+              pkgInfo.cache[file] = true;
             }
           }
         }
       }
     }
 
-    return info;
+    return pkgInfo;
   }
 
   return null;
