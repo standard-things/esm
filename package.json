@@ -31,7 +31,7 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "~4.0.5",
+    "acorn": "~5.0.0",
     "magic-string": "~0.19.0"
   },
   "devDependencies": {
