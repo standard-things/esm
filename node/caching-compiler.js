@@ -97,13 +97,25 @@ function compileWithCache(pkgInfo, content, options) {
   pkgInfo.cache[cacheFilename] = content;
 
   if (typeof pkgInfo.cacheDir === "string") {
-    // Writing cache files is something that should only happen at package
-    // development time, so it's acceptable to use fs.writeFileSync
-    // instead of some complicated asynchronous-but-atomic strategy.
-    fs.writeFileSync(absCachePath, content, "utf8");
+    scheduleWrite(absCachePath, content);
   }
 
   return content;
+}
+
+const pendingWrites = Object.create(null);
+let pendingWriteTimer;
+
+function scheduleWrite(path, content) {
+  pendingWrites[path] = content;
+  pendingWriteTimer = pendingWriteTimer || setTimeout(function () {
+    pendingWriteTimer = null;
+    Object.keys(pendingWrites).forEach(function (path) {
+      const content = pendingWrites[path];
+      delete pendingWrites[path];
+      fs.writeFileSync(path, content, "utf8");
+    });
+  }, 10);
 }
 
 function readFileOrNull(filename) {
