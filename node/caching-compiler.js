@@ -54,8 +54,8 @@ const fallbackPkgInfo = {
 };
 
 function compileWithCache(pkgInfo, content, options) {
-  const json = pkgInfo && pkgInfo.json;
-  const reify = json && json.reify;
+  const json = pkgInfo ? pkgInfo.json : null;
+  const reify = json ? json.reify : null;
 
   const cacheKey = typeof options.makeCacheKey === "function"
     ? options.makeCacheKey()
@@ -234,7 +234,7 @@ function readPkgInfo(dir) {
       if (typeof cacheDir === "string") {
         cacheDir = mkdirp(dir, cacheDir);
 
-        const cacheFiles = cacheDir && fs.readdirSync(cacheDir);
+        const cacheFiles = cacheDir ? fs.readdirSync(cacheDir) : null;
         if (cacheFiles) {
           // If we leave pkgInfo.cacheDir === null, we won't be able to
           // save cache files to disk, but we can still cache compilation
