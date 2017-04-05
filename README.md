@@ -85,7 +85,7 @@ import * as utils from "./utils";
 ```
 becomes
 ```js
-let utils = {};
+const utils = Object.create(null);
 module.importSync("./utils", {
   "*": (value, name) => {
     utils[name] = value;
@@ -301,10 +301,11 @@ export * as ns from "./module";
 ```
 becomes
 ```js
+exports.ns = Object.create(null);
 module.importSync("./module", {
-  "*": function (value, name) {
-    this[name] = value;
-  }.bind(exports.ns = {});
+  "*": (value, name) => {
+    exports.ns[name] = value;
+  }
 });
 ```
 
