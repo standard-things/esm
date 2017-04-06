@@ -33,3 +33,11 @@ if (! _compile.reified) {
     );
   }).reified = _compile;
 }
+
+const exts = require.extensions;
+const _extMjs = exts['.mjs'];
+if (! (_extMjs && _extMjs.reified)) {
+  (exts['.mjs'] = function (module, filename) {
+    return exts['.js'](module, filename);
+  }).reified = _extMjs;
+}

@@ -79,8 +79,12 @@ function compileWithCache(pkgInfo, content, options) {
     }
   }
 
+  const filename = options.filename;
+  const force = !!filename && path.extname(filename) === ".mjs";
+
   const compileOptions = {
-    ast: false
+    ast: false,
+    force
   };
 
   if (reify && reify.parser) {
@@ -246,10 +250,7 @@ function readPkgInfo(dir) {
           for (let i = 0; i < filesCount; ++i) {
             // Later we'll change the value to the actual contents of the
             // file, but for now we merely register that it exists.
-            const file = cacheFiles[i];
-            if (/\.js$/.test(file)) {
-              pkgInfo.cache[file] = true;
-            }
+            pkgInfo.cache[cacheFiles[i]] = true;
           }
         }
       }
