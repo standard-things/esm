@@ -1,2 +1,4 @@
+"use strict";
+
 require("./runtime.js");
-require("./compile-hook.js");
+module.exports = exports = require("./compile-hook.js");
