@@ -68,6 +68,26 @@ describe("compiler", function () {
     ).code.indexOf("var foo;"), 0);
   });
 
+  it("should respect options.generateLegacyModuleImport", function () {
+    import { compile } from "../lib/compiler.js";
+
+    function check(code) {
+      var legacy = compile(code, {
+        generateLegacyModuleImport: true
+      }).code;
+      assert.notStrictEqual(legacy.indexOf("module.import("), -1);
+    }
+
+    check('import foo from "./foo"');
+    check('import { a, b as c } from "./foo"');
+    check('import * as ns from "./foo"');
+    check('import "./foo"');
+
+    // These exports are really imports behind the scenes.
+    check('export { a, b as c } from "./foo"');
+    check('export * from "./foo"');
+  });
+
   it("should allow pre-parsed ASTs via options.parse", function () {
     import { compile } from "../lib/compiler.js";
     import { parse } from "../lib/parsers/default.js";
