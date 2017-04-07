@@ -19,13 +19,13 @@ if (! _compile.reified) {
     return _compile.call(
       this,
       compiler.compile(content, Object.assign({
-        filename: filename,
+        filename,
         makeCacheKey() {
           const stat = compiler.statOrNull(filename);
           return stat && {
-            source: "Module.prototype._compile",
-            filename: filename,
-            mtime: stat.mtime.getTime()
+            filename,
+            mtime: stat.mtime.getTime(),
+            source: "Module.prototype._compile"
           };
         }
       }, overrideCompileOptions)),
@@ -37,7 +37,7 @@ if (! _compile.reified) {
 const exts = require.extensions;
 const _extMjs = exts['.mjs'];
 if (! (_extMjs && _extMjs.reified)) {
-  (exts['.mjs'] = function (module, filename) {
-    return exts['.js'](module, filename);
-  }).reified = _extMjs;
+  (exts['.mjs'] = (module, filename) =>
+    exts['.js'](module, filename)
+  ).reified = _extMjs;
 }

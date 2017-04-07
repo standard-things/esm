@@ -1,5 +1,4 @@
 var assert = require("assert");
-var hasOwn = Object.prototype.hasOwnProperty;
 
 describe("compiler", function () {
   it("should not get confused by string literals", function () {
@@ -84,7 +83,7 @@ describe("compiler", function () {
       }
     });
 
-    assert.strictEqual(hasOwn.call(result, "ast"), false);
+    assert.strictEqual(result.ast, null);
     assert.strictEqual(result.code.indexOf("let foo"), 0);
     assert(result.code.indexOf('"./+@#"') >= 0);
   });
