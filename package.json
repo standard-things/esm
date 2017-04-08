@@ -31,8 +31,7 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "~5.0.0",
-    "magic-string": "~0.19.0"
+    "acorn": "~5.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
