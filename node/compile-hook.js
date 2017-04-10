@@ -34,7 +34,7 @@ if (! _compile.reified) {
   }).reified = _compile;
 }
 
-const exts = require.extensions;
+const exts = Module._extensions;
 const _extMjs = exts['.mjs'];
 if (! (_extMjs && _extMjs.reified)) {
   (exts['.mjs'] = (module, filename) =>
