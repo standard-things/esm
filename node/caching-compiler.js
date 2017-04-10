@@ -12,8 +12,9 @@ const pkgInfoCache = Object.create(null);
 
 // Take only the major and minor components of the reify version, so that
 // we don't invalidate the cache every time a patch version is released.
-const reifyVersion = require("../package.json")
-  .version.split(".", 2).join(".");
+const reifyVersion =
+  (process.env.REIFY_VERSION || dynRequire("../package.json").version)
+    .split(".", 2).join(".");
 
 const DEFAULT_CACHE_DIR = ".reify-cache";
 
