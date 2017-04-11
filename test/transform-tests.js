@@ -1,3 +1,5 @@
+"use strict";
+
 import assert from "assert";
 import { relative } from "path";
 import { compile, transform } from "../lib/compiler.js";
@@ -12,10 +14,14 @@ describe("compiler.transform", function () {
         return;
       }
 
-      var code = files[absPath];
+      const code = files[absPath];
+      const ast = options.parse(code);
+
+      transform(ast, options);
+
       assert.strictEqual(
         prettyPrint(compile(code, options).ast).code,
-        prettyPrint(transform(options.parse(code), options)).code,
+        prettyPrint(ast).code,
         "Transform mismatch for " + absPath
       );
     });
