@@ -186,4 +186,20 @@ describe("compiler", function () {
     var withShebang = compile(code).code;
     assert.strictEqual(withShebang.indexOf('var foo'), 0)
   });
+
+  it("should preserve crlf newlines", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const code = [
+      "import {",
+      "  strictEqual,",
+      "  // blank line",
+      "  deepEqual",
+      "}",
+      'from "assert";'
+    ].join("\r\n");
+
+    const result = compile(code).code;
+    assert.ok(result.endsWith("\r\n".repeat(5)));
+  });
 });
