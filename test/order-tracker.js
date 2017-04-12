@@ -1,4 +1,4 @@
-var data = [];
+const data = [];
 export function log(x) {
   data.push(x);
 };

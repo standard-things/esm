@@ -1,9 +1,9 @@
-var assert = require("assert");
-var parserSupportsExportFromExtensions =
+const assert = require("assert");
+const parserSupportsExportFromExtensions =
   process.env.REIFY_PARSER === "babylon";
 
-describe("export declarations", function () {
-  it("should allow * exports", function () {
+describe("export declarations", () => {
+  it("should allow * exports", () => {
     import def, {
       a, b, c as d,
     } from "./export-all.js";
@@ -14,7 +14,7 @@ describe("export declarations", function () {
     assert.strictEqual(def, "default");
   });
 
-  it("should allow re-exporting import * alongside export *", function () {
+  it("should allow re-exporting import * alongside export *", () => {
     import {
       Abc, d, e, f,
     } from "./export-all-multiple.js";
@@ -27,7 +27,7 @@ describe("export declarations", function () {
     assert.strictEqual(f, "f");
   });
 
-  it("should tolerate mutual * exports", function () {
+  it("should tolerate mutual * exports", () => {
     import { a as aa, b as ab } from "./export/all-mutual-a.js";
     import { a as ba, b as bb } from "./export/all-mutual-b.js";
     assert.strictEqual(aa, "a");
@@ -36,7 +36,7 @@ describe("export declarations", function () {
     assert.strictEqual(bb, "b");
   });
 
-  it("should allow named re-exports", function test() {
+  it("should allow named re-exports", () => {
     import { a, c, v, si } from "./export-some.js";
     assert.strictEqual(a, "a");
     assert.strictEqual(c(), "c");
@@ -44,22 +44,22 @@ describe("export declarations", function () {
     assert.strictEqual(si, "cee");
   });
 
-  it("should be able to contain import declarations", function () {
+  it("should be able to contain import declarations", () => {
     import { outer } from "./nested";
     assert.deepEqual(outer(), ["a", "b", "c"]);
   });
 
-  it("should support default declarations", function () {
+  it("should support default declarations", () => {
     import g, { check } from "./default-function";
     check(g);
   });
 
-  it("should support default expressions", function () {
+  it("should support default expressions", () => {
     import count from "./default-expression";
     assert.strictEqual(count, 1);
   });
 
-  it("should be able to invoke setters later", function (done) {
+  it("should be able to invoke setters later", (done) => {
     import def, {
       val,
       exportAgain,
@@ -78,7 +78,7 @@ describe("export declarations", function () {
     assert.strictEqual(def, "default-3");
     assert.strictEqual(val, "value-2");
 
-    setTimeout(function () {
+    setTimeout(() => {
       oneLastExport();
       assert.strictEqual(def, "default-3");
       assert.strictEqual(val, "value-3");
@@ -88,9 +88,9 @@ describe("export declarations", function () {
 
   import { Script } from "vm";
 
-  var canUseClasses = false;
-  var canUseLetConst = false;
-  var canUseDestructuring = false;
+  let canUseClasses = false;
+  let canUseLetConst = false;
+  let canUseDestructuring = false;
 
   try {
     // Test if Node supports class syntax.
@@ -106,11 +106,11 @@ describe("export declarations", function () {
 
   try {
     // Test if Node supports destructuring declarations.
-    new Script("var { x, y } = {}");
+    new Script("const { x, y } = {}");
     canUseDestructuring = true;
   } catch (e) {}
 
-  it("should support all default syntax", function () {
+  it("should support all default syntax", () => {
     import number from "./export/default/number";
     assert.strictEqual(number, 42);
 
@@ -140,7 +140,7 @@ describe("export declarations", function () {
     }
   });
 
-  it("should support basic declaration syntax", function () {
+  it("should support basic declaration syntax", () => {
     import { a, b, c, d } from "./export/declarations/basic";
 
     assert.strictEqual(a, 1);
@@ -150,7 +150,7 @@ describe("export declarations", function () {
   });
 
   (canUseLetConst ? it : xit)(
-    "should support block declaration syntax", function () {
+    "should support block declaration syntax", () => {
     import { a, b, c } from "./export/declarations/block";
 
     assert.strictEqual(a, 1);
@@ -158,8 +158,8 @@ describe("export declarations", function () {
     assert.strictEqual(c, 3);
   });
 
-  it("should support all named export syntax", function () {
-    var exp = require("./export/names");
+  it("should support all named export syntax", () => {
+    const exp = require("./export/names");
 
     assert.strictEqual(exp.foo, "foo");
     assert.strictEqual(exp.bar, "bar");
@@ -173,7 +173,7 @@ describe("export declarations", function () {
     assert.strictEqual(foo, "foo");
   });
 
-  it("should tolerate one-to-many renamed exports", function () {
+  it("should tolerate one-to-many renamed exports", () => {
     import { x, y, append } from "./export/renamed";
 
     assert.strictEqual(x, y);
@@ -190,7 +190,7 @@ describe("export declarations", function () {
     assert.strictEqual(x, "abc");
   });
 
-  it("should support all export-from syntax", function () {
+  it("should support all export-from syntax", () => {
     import def, { a, b, c, ay, bee, foo } from "./export/from";
 
     assert.strictEqual(def, "a");
@@ -207,7 +207,7 @@ describe("export declarations", function () {
   });
 
   (parserSupportsExportFromExtensions ? it : xit
-  )("should support export-from extensions", function () {
+  )("should support export-from extensions", () => {
     import {
       def1, def2, def3,
       ns1, ns2, ns3,
@@ -240,17 +240,17 @@ describe("export declarations", function () {
     assert.strictEqual(d, _d);
   });
 
-  it("should support export { default } from ... syntax", function () {
+  it("should support export { default } from ... syntax", () => {
     import object from "./export/default/from";
     assert.deepEqual(object, {
       foo: 42
     });
   });
 
-  it("should support switch-case nested imports", function () {
+  it("should support switch-case nested imports", () => {
     assert.strictEqual(typeof x, "undefined");
 
-    for (var i = 0; i < 2; ++i) {
+    for (let i = 0; i < 2; ++i) {
       switch (i) {
       case 0:
         import { a as x } from "./abc";
@@ -267,7 +267,7 @@ describe("export declarations", function () {
   });
 
   (canUseDestructuring ? it : xit)(
-    "should support destructuring declarations", function () {
+    "should support destructuring declarations", () => {
     import { a, c as b, d, x, y, rest } from "./export/destructuring.js";
 
     assert.strictEqual(a, "a");
@@ -279,7 +279,7 @@ describe("export declarations", function () {
   });
 
   (canUseDestructuring ? it : xit)(
-  "should invoke destructuring setters later", function () {
+  "should invoke destructuring setters later", () => {
     import { x, y, swap } from "./export/swap-later.js";
     assert.strictEqual(x, 1);
     assert.strictEqual(y, 2);

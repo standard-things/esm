@@ -1,7 +1,7 @@
-var assert = require("assert");
+const assert = require("assert");
 
-describe("compiler", function () {
-  it("should not get confused by string literals", function () {
+describe("compiler", () => {
+  it("should not get confused by string literals", () => {
     assert.strictEqual(
       'a; import b from "c"; d',
       'a; import b ' + 'from "c"; d'
@@ -13,8 +13,8 @@ describe("compiler", function () {
     );
   });
 
-  it("should not be enabled for nested node_modules", function () {
-    var threw = true;
+  it("should not be enabled for nested node_modules", () => {
+    let threw = true;
     try {
       import "disabled";
       threw = false;
@@ -25,82 +25,68 @@ describe("compiler", function () {
     assert.strictEqual(threw, true);
   });
 
-  it("should be enabled for packages that depend on reify", function () {
+  it("should be enabled for packages that depend on reify", () => {
     import a from "enabled";
     assert.strictEqual(a, assert);
   });
 
-  it("should preserve line numbers", function () {
+  it("should preserve line numbers", () => {
     import check from "./lines.js";
     check();
   });
 
-  it('should not hoist above "use strict"', function () {
+  it('should not hoist above "use strict"', () => {
     import { check } from "./strict";
     assert.strictEqual(check(), true);
   });
 
-  it("should respect options.generateLetDeclarations", function () {
+  it("should respect options.generateLetDeclarations", () => {
     import { compile } from "../lib/compiler.js";
 
-    var withLet = compile('import foo from "./foo"', {
+    const withLet = compile('import foo from "./foo"', {
       generateLetDeclarations: true
     }).code;
 
-    assert.strictEqual(withLet.indexOf('"use strict";let foo;'), 0);
+    assert.ok(withLet.startsWith('"use strict";let foo;'));
 
-    var without = compile('import foo from "./foo"', {
+    const without = compile('import foo from "./foo"', {
       generateLetDeclarations: false
     }).code;
 
-    assert.strictEqual(without.indexOf('"use strict";var foo;'), 0);
+    assert.ok(without.startsWith('"use strict";var foo;'));
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: false }.
-    assert.strictEqual(compile(
+    assert.ok(compile(
       'import foo from "./foo"'
-    ).code.indexOf('"use strict";var foo;'), 0);
+    ).code.startsWith('"use strict";var foo;'));
   });
 
-  it("should allow pre-parsed ASTs via options.parse", function () {
+  it("should allow pre-parsed ASTs via options.parse", () => {
     import { compile } from "../lib/compiler.js";
     import { parse } from "../lib/parsers/default.js";
 
-    var code = 'import foo from "./foo"';
-    var ast = parse(code);
-    var illegal = code.replace(/\bfoo\b/g, "+@#");
-    var result = compile(illegal, {
+    const code = 'import foo from "./foo"';
+    const ast = parse(code);
+    const illegal = code.replace(/\bfoo\b/g, "+@#");
+    const result = compile(illegal, {
       generateLetDeclarations: true,
-      parse: function (code) {
-        // If you really want to avoid parsing, you can provide an
-        // options.parse function that returns whatever AST you like.
-        return ast;
-      }
+      // If you really want to avoid parsing, you can provide an
+      // options.parse function that returns whatever AST you like.
+      parse: () => ast
     });
 
     assert.strictEqual(result.ast, null);
-    assert.strictEqual(result.code.indexOf('"use strict";let foo'), 0);
-    assert(result.code.indexOf('"./+@#"') >= 0);
+    assert.ok(result.code.startsWith('"use strict";let foo'));
+    assert.ok(result.code.includes('"./+@#"'));
   });
 
-  it("should transform AST when options.ast truthy", function () {
+  it("should transform AST when options.ast truthy", () => {
     import { compile } from "../lib/compiler.js";
-
-    var code = [
-      "console.log(foo, bar);",
-      'import foo from "./foo"',
-      'import bar from "./bar"',
-      "export default foo + bar;"
-    ].join("\n");
-
-    var result = compile(code, { ast: true });
-    var ast = result.ast;
 
     function isVarDecl(node, names) {
       assert.strictEqual(node.type, "VariableDeclaration");
-      assert.deepEqual(node.declarations.map(function (decl) {
-        return decl.id.name;
-      }), names);
+      assert.deepEqual(node.declarations.map((decl) => decl.id.name), names);
     }
 
     function isCallExprStmt(node, objectName, propertyName) {
@@ -111,6 +97,16 @@ describe("compiler", function () {
       assert.strictEqual(
         node.expression.callee.property.name, propertyName);
     }
+
+    const code = [
+      "console.log(foo, bar);",
+      'import foo from "./foo"',
+      'import bar from "./bar"',
+      "export default foo + bar;"
+    ].join("\n");
+
+    const result = compile(code, { ast: true });
+    let ast = result.ast;
 
     if (ast.type === "File") {
       ast = ast.program;
@@ -134,12 +130,12 @@ describe("compiler", function () {
       stmt.expression.value === "use strict";
   }
 
-  it("should transform default export declaration to expression", function () {
+  it("should transform default export declaration to expression", () => {
     import { compile } from "../lib/compiler.js";
 
     function parse(code) {
-      var result = compile(code, { ast: true });
-      var ast = result.ast;
+      const result = compile(code, { ast: true });
+      let ast = result.ast;
 
       if (ast.type === "File") {
         ast = ast.program;
@@ -150,11 +146,11 @@ describe("compiler", function () {
       return ast;
     }
 
-    var anonCode = [
+    const anonCode = [
       "export default class {}"
     ].join("\n");
 
-    var anonAST = parse(anonCode);
+    const anonAST = parse(anonCode);
 
     const anonFirstIndex =
       isUseStrictExprStmt(anonAST.body[0]) ? 1 : 0;
@@ -165,11 +161,11 @@ describe("compiler", function () {
       "ClassExpression"
     );
 
-    var namedCode = [
+    const namedCode = [
       "export default class C {}"
     ].join("\n");
 
-    var namedAST = parse(namedCode);
+    const namedAST = parse(namedCode);
 
     const namedFirstIndex =
       isUseStrictExprStmt(namedAST.body[0]) ? 1 : 0;
@@ -181,16 +177,16 @@ describe("compiler", function () {
     );
   });
 
-  it("should not get confused by shebang", function () {
+  it("should not get confused by shebang", () => {
     import { compile } from "../lib/compiler.js";
 
-    var code = [
+    const code = [
       "#!/usr/bin/env node -r reify",
       'import foo from "./foo"',
     ].join("\n");
 
-    var withShebang = compile(code).code;
-    assert.strictEqual(withShebang.indexOf('"use strict";var foo'), 0)
+    const withShebang = compile(code).code;
+    assert.ok(withShebang.startsWith('"use strict";var foo'));
   });
 
   it("should preserve crlf newlines", () => {

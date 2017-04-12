@@ -1,17 +1,17 @@
-var assert = require("assert");
+const assert = require("assert");
 
-describe("module.runModuleSetters", function () {
-  it("should be called after eval(...)", function () {
+describe("module.runModuleSetters", () => {
+  it("should be called after eval(...)", () => {
     import { value, run } from "./eval";
     assert.strictEqual(value, "original");
-    var result = run('localValue = "modified"');
+    const result = run('localValue = "modified"');
     assert.strictEqual(value, result);
     assert.strictEqual(value, "modified");
   });
 });
 
-describe("parent setters", function () {
-  it("should be run when children update exports", function () {
+describe("parent setters", () => {
+  it("should be run when children update exports", () => {
     import { c } from "./setters/parent";
     import { increment } from "./setters/grandchild";
     assert.strictEqual(c, 0);
@@ -19,14 +19,14 @@ describe("parent setters", function () {
     assert.strictEqual(c, 1);
   });
 
-  it("should not be called if replaced", function () {
+  it("should not be called if replaced", () => {
     import { value, reset, add } from "./live.js";
 
-    var firstCallCount = 0;
-    var secondCallCount = 0;
+    let firstCallCount = 0;
+    let secondCallCount = 0;
 
     module.importSync("./live.js", {
-      value: function (v) {
+      value: (v) => {
         ++firstCallCount;
         value = "first:" + v;
       }
@@ -40,7 +40,7 @@ describe("parent setters", function () {
     assert.strictEqual(secondCallCount, 0);
 
     module.importSync("./live.js", {
-      value: function (v) {
+      value: (v) => {
         ++secondCallCount;
         value = "second:" + v;
       }

@@ -1,6 +1,6 @@
-var foo = "foo";
-var bar = "bar";
-var baz = "baz";
+const foo = "foo";
+const bar = "bar";
+const baz = "baz";
 
 export {foo};
 export {bar, baz};

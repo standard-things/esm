@@ -1,11 +1,11 @@
-var assert = require("assert");
+const assert = require("assert");
 
-describe("Node REPL", function () {
+describe("Node REPL", () => {
   import { createContext } from "vm";
   import "../repl";
 
-  it("should work with global context", function (done) {
-    var repl = require("repl").start({
+  it("should work with global context", (done) => {
+    const repl = require("repl").start({
       useGlobal: true
     });
 
@@ -13,9 +13,9 @@ describe("Node REPL", function () {
 
     repl.eval(
       'import { strictEqual as assertStrictEqual } from "assert"',
-      null, // context
-      "repl", // filename
-      function (err, result) {
+      null, // Context
+      "repl", // Filename
+      (err, result) => {
         // Use the globally-defined assertStrictEqual to test itself!
         assertStrictEqual(typeof assertStrictEqual, "function");
         done();
@@ -23,20 +23,20 @@ describe("Node REPL", function () {
     );
   });
 
-  it("should work with non-global context", function (done) {
-    var repl = require("repl").start({
+  it("should work with non-global context", (done) => {
+    const repl = require("repl").start({
       useGlobal: false
     });
 
-    var context = createContext({
+    const context = createContext({
       module: module
     });
 
     repl.eval(
       'import { strictEqual } from "assert"',
       context,
-      "repl", // filename
-      function (err, result) {
+      "repl", // Filename
+      (err, result) => {
         // Use context.strictEqual to test itself!
         context.strictEqual(typeof context.strictEqual, "function");
         done();

@@ -1,7 +1,7 @@
 import { strictEqual } from "assert";
 
 export default "default-1";
-export var val = "value-1";
+export let val = "value-1";
 
 export function exportAgain() {
   module.export("default", exports.default = "default-2");

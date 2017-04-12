@@ -1,6 +1,6 @@
 "use strict";module.export({default:()=>f,check:()=>check});var strictEqual;module.importSync("assert",{"strictEqual":function(v){strictEqual=v}},0);
 
-var obj = {};
+const obj = {};
 
 function f() {
   return obj;

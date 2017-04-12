@@ -1,5 +1,5 @@
-export var a = 1;
-export var b = function () {};
-export var c; // lazy initialization
+export const a = 1;
+export const b = function () {};
+export let c; // lazy initialization
 export function g() {};
 c = "c";

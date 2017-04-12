@@ -1,12 +1,10 @@
-"use strict";
-
 import assert from "assert";
 import { relative } from "path";
 import { compile, transform } from "../lib/compiler.js";
 import { prettyPrint } from "recast";
 import { files } from "./all-files.js";
 
-describe("compiler.transform", function () {
+describe("compiler.transform", () => {
   function check(options) {
     Object.keys(files).forEach(function (absPath) {
       if (typeof options.filter === "function" &&
@@ -27,18 +25,18 @@ describe("compiler.transform", function () {
     });
   }
 
-  it("gives the same results as compile with babylon", function () {
+  it("gives the same results as compile with babylon", () => {
     check({
       ast: true,
       parse: require("../lib/parsers/babylon.js").parse
     });
   }).timeout(5000);
 
-  it("gives the same results as compile with acorn", function () {
+  it("gives the same results as compile with acorn", () => {
     check({
       ast: true,
       parse: require("../lib/parsers/acorn.js").parse,
-      filter: function (relPath) {
+      filter: (relPath) => {
         // Acorn can't parse this file, so we skip it.
         return relPath !== "export/from-extensions.js";
       }

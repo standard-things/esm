@@ -1,4 +1,4 @@
-var a = "a";
+let a = "a";
 
 export function append(suffix) {
   return a += suffix;

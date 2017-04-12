@@ -1,6 +1,6 @@
 import { strictEqual } from "assert";
 
-var obj = {};
+const obj = {};
 
 export default function f() {
   return obj;

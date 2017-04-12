@@ -1,8 +1,8 @@
-export var a = 1;
-export var b = function () {
+export const a = 1;
+export const b = function () {
   return d;
 };
-export var c; // lazy initialization
+export let c; // lazy initialization
 export function d() {
   return b;
 };
