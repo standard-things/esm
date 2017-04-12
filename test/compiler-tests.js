@@ -35,11 +35,6 @@ describe("compiler", function () {
     check();
   });
 
-  it("should not force strict mode", function () {
-    var foo = 1234;
-    delete foo;
-  });
-
   it('should not hoist above "use strict"', function () {
     import { check } from "./strict";
     assert.strictEqual(check(), true);
@@ -52,19 +47,19 @@ describe("compiler", function () {
       generateLetDeclarations: true
     }).code;
 
-    assert.strictEqual(withLet.indexOf("let foo;"), 0);
+    assert.strictEqual(withLet.indexOf('"use strict";let foo;'), 0);
 
     var without = compile('import foo from "./foo"', {
       generateLetDeclarations: false
     }).code;
 
-    assert.strictEqual(without.indexOf("var foo;"), 0);
+    assert.strictEqual(without.indexOf('"use strict";var foo;'), 0);
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: false }.
     assert.strictEqual(compile(
       'import foo from "./foo"'
-    ).code.indexOf("var foo;"), 0);
+    ).code.indexOf('"use strict";var foo;'), 0);
   });
 
   it("should allow pre-parsed ASTs via options.parse", function () {
@@ -84,7 +79,7 @@ describe("compiler", function () {
     });
 
     assert.strictEqual(result.ast, null);
-    assert.strictEqual(result.code.indexOf("let foo"), 0);
+    assert.strictEqual(result.code.indexOf('"use strict";let foo'), 0);
     assert(result.code.indexOf('"./+@#"') >= 0);
   });
 
@@ -122,15 +117,22 @@ describe("compiler", function () {
     }
 
     assert.strictEqual(ast.type, "Program");
-    assert.strictEqual(ast.body.length, 6);
 
-    isVarDecl(ast.body[0], ["foo"]);
-    isCallExprStmt(ast.body[1], "module", "importSync");
-    isVarDecl(ast.body[2], ["bar"]);
-    isCallExprStmt(ast.body[3], "module", "importSync");
-    isCallExprStmt(ast.body[4], "console", "log");
-    isCallExprStmt(ast.body[5], "module", "export");
+    const firstIndex = isUseStrictExprStmt(ast.body[0]) ? 1 : 0;
+    assert.strictEqual(ast.body.length - firstIndex, 6);
+
+    isVarDecl(ast.body[firstIndex + 0], ["foo"]);
+    isCallExprStmt(ast.body[firstIndex + 1], "module", "importSync");
+    isVarDecl(ast.body[firstIndex + 2], ["bar"]);
+    isCallExprStmt(ast.body[firstIndex + 3], "module", "importSync");
+    isCallExprStmt(ast.body[firstIndex + 4], "console", "log");
+    isCallExprStmt(ast.body[firstIndex + 5], "module", "export");
   });
+
+  function isUseStrictExprStmt(stmt) {
+    return stmt.type === "ExpressionStatement" &&
+      stmt.expression.value === "use strict";
+  }
 
   it("should transform default export declaration to expression", function () {
     import { compile } from "../lib/compiler.js";
@@ -154,10 +156,12 @@ describe("compiler", function () {
 
     var anonAST = parse(anonCode);
 
-    assert.strictEqual(anonAST.body.length, 1);
+    const anonFirstIndex =
+      isUseStrictExprStmt(anonAST.body[0]) ? 1 : 0;
 
+    assert.strictEqual(anonAST.body.length - anonFirstIndex, 1);
     assert.strictEqual(
-      anonAST.body[0].expression.arguments[1].right.type,
+      anonAST.body[anonFirstIndex].expression.arguments[1].right.type,
       "ClassExpression"
     );
 
@@ -167,10 +171,12 @@ describe("compiler", function () {
 
     var namedAST = parse(namedCode);
 
-    assert.strictEqual(namedAST.body.length, 2);
+    const namedFirstIndex =
+      isUseStrictExprStmt(namedAST.body[0]) ? 1 : 0;
 
+    assert.strictEqual(namedAST.body.length - namedFirstIndex, 2);
     assert.strictEqual(
-      namedAST.body[1].type,
+      namedAST.body[namedFirstIndex + 1].type,
       "ClassDeclaration"
     );
   });
@@ -184,7 +190,7 @@ describe("compiler", function () {
     ].join("\n");
 
     var withShebang = compile(code).code;
-    assert.strictEqual(withShebang.indexOf('var foo'), 0)
+    assert.strictEqual(withShebang.indexOf('"use strict";var foo'), 0)
   });
 
   it("should preserve crlf newlines", () => {

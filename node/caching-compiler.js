@@ -92,9 +92,10 @@ function compileWithCache(pkgInfo, content, options) {
     compileOptions.parse = dynRequire(reify.parser).parse;
   };
 
-  content = compile(content, compileOptions).code;
+  const result = compile(content, compileOptions);
+  content = result.code;
 
-  if (compileOptions.identical) {
+  if (result.identical) {
     // Don't bother caching result if compiler made no changes.
     return content;
   }
