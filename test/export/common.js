@@ -5,5 +5,5 @@ import { strictEqual } from "assert";
 module.exports = "pure CommonJS";
 
 // The import statement above should have been compiled to a
-// module.importSync call, which sets exports.__esModule = true.
-strictEqual(exports.__esModule, true);
+// module.importSync call, which sets exports[Symbol.for("__esModule")] = true.
+strictEqual(exports[Symbol.for("__esModule")], true);
