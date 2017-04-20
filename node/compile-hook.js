@@ -1,6 +1,5 @@
 "use strict";
 
-const fs = require("fs");
 const compiler = require("./caching-compiler.js");
 const Module = require("./runtime.js").Module;
 const Mp = Module.prototype;
