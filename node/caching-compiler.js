@@ -202,7 +202,7 @@ function readPkgInfo(dir) {
     }
   }
 
-  if (pkg && typeof pkg === "object") {
+  if (typeof pkg === "object" && pkg !== null) {
     const reify = pkg.reify;
     if (reify === false) {
       // An explicit "reify": false property in package.json disables
@@ -262,13 +262,6 @@ function readPkgInfo(dir) {
   }
 
   return null;
-}
-
-function getOwn(obj, name) {
-  return obj &&
-    typeof obj === "object" &&
-    hasOwn.call(obj, name) &&
-    obj[name];
 }
 
 function mkdirp(rootDir, relativeDir) {
