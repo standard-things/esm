@@ -1,6 +1,8 @@
 "use strict";
 
 const compiler = require("./caching-compiler.js");
+const utils = require("./utils.js");
+
 const Module = require("./runtime.js").Module;
 const Mp = Module.prototype;
 
@@ -20,7 +22,7 @@ if (! _compile.reified) {
       compiler.compile(content, Object.assign({
         filename,
         makeCacheKey() {
-          const stat = compiler.statOrNull(filename);
+          const stat = utils.statOrNull(filename);
           return stat && {
             filename,
             mtime: stat.mtime.getTime(),
