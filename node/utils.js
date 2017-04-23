@@ -110,7 +110,7 @@ function getCacheFilename(cacheKey, pkgCfg) {
 exports.getCacheFilename = getCacheFilename;
 
 function getPkgInfo(dirpath) {
-  if (typeof pkgInfoCache[dirpath] !== "undefined") {
+  if (dirpath in pkgInfoCache) {
     return pkgInfoCache[dirpath];
   }
 
