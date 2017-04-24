@@ -1,6 +1,4 @@
 const assert = require("assert");
-const parserSupportsExportFromExtensions =
-  process.env.REIFY_PARSER === "babylon";
 
 describe("export declarations", () => {
   it("should allow * exports", () => {
@@ -206,8 +204,7 @@ describe("export declarations", () => {
     });
   });
 
-  (parserSupportsExportFromExtensions ? it : xit
-  )("should support export-from extensions", () => {
+  it("should support export-from extensions", () => {
     import {
       def1, def2, def3,
       ns1, ns2, ns3,
