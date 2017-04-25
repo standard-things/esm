@@ -31,7 +31,8 @@
     "test": "test/run.sh"
   },
   "dependencies": {
-    "acorn": "~5.0.0"
+    "acorn": "~5.0.0",
+    "minizlib": "^1.0.2"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",

@@ -5,10 +5,13 @@ const dynRequire = module.require ? module.require.bind(module) : __non_webpack_
 const path = require("path");
 const utils = require("./utils.js");
 
+const hasOwn = Object.prototype.hasOwnProperty;
+
 // Used when compile filename argument is falsy.
 // Enables in-memory caching, at least.
 const fallbackPkgInfo = {
-  cache: Object.create(null)
+  cache: Object.create(null),
+  config: Object.create(null)
 };
 
 exports.compile = (content, options) => {
@@ -18,16 +21,18 @@ exports.compile = (content, options) => {
     // Treat the REPL as if there is no filename.
     options.filename = null;
   }
+  const filename = options.filename;
+  const hasFilename = typeof filename === "string";
 
-  const pkgInfo = options.filename
-    ? utils.getPkgInfo(options.filename)
+  const pkgInfo = hasFilename
+    ? utils.getPkgInfo(path.dirname(filename))
     : fallbackPkgInfo;
 
-  if (! pkgInfo) {
+  if (pkgInfo === null) {
     return content;
   }
 
-  return options.filename
+  return hasFilename
     ? compileWithCacheAndFilename(pkgInfo, content, options)
     : compileWithCache(pkgInfo, content, options);
 };
@@ -42,40 +47,33 @@ function compileWithCacheAndFilename(pkgInfo, content, options) {
 }
 
 function compileWithCache(pkgInfo, content, options) {
-  const json = pkgInfo ? pkgInfo.json : null;
-  const reify = json ? json.reify : null;
+  let cacheKey = options.cacheKey;
 
-  const cacheKey = typeof options.makeCacheKey === "function"
-    ? options.makeCacheKey()
-    : (options.cacheKey || content);
+  if (typeof cacheKey === "function") {
+    cacheKey = cacheKey();
+  }
+  if (typeof cacheKey === "undefined") {
+    cacheKey = content;
+  }
 
-  const cacheFilename = utils.getCacheFilename(cacheKey, reify);
+  const pkgCfg = pkgInfo.config;
+  const cacheFilename = utils.getCacheFilename(cacheKey, pkgCfg);
+  const cacheValue = pkgInfo.cache[cacheFilename];
 
-  const absCachePath = typeof pkgInfo.cacheDir === "string" &&
-    path.join(pkgInfo.cacheDir, cacheFilename);
-
-  let cacheValue = pkgInfo.cache[cacheFilename];
-
-  if (cacheValue) {
-    if (absCachePath && cacheValue === true) {
-      cacheValue = pkgInfo.cache[cacheFilename] =
-        utils.readFileOrNull(absCachePath);
-    }
-
-    if (typeof cacheValue === "string") {
-      return cacheValue;
-    }
+  if (typeof cacheValue === "string") {
+    return cacheValue;
   }
 
   const filename = options.filename;
-  const force = !!filename && path.extname(filename) === ".mjs";
+  const hasFilename = typeof filename === "string";
+
   const compileOptions = {
-    ast: false,
-    force
+    force: hasFilename && path.extname(filename) === ".mjs",
+    parse: undefined
   };
 
-  if (reify && reify.parser) {
-    compileOptions.parse = dynRequire(reify.parser).parse;
+  if (typeof pkgCfg.parser === "string") {
+    compileOptions.parse = dynRequire(pkgCfg.parser).parse;
   }
 
   const result = compile(content, compileOptions);
@@ -86,10 +84,12 @@ function compileWithCache(pkgInfo, content, options) {
     return content;
   }
 
-  if (typeof pkgInfo.cacheDir === "string") {
-    utils.scheduleWrite(absCachePath, code);
+  if (hasFilename && typeof pkgInfo.cachePath === "string") {
+    const rootPath = path.dirname(filename);
+    const absolutePath = path.join(pkgInfo.cachePath, cacheFilename);
+    const relativePath = path.relative(rootPath, absolutePath);
+    utils.scheduleWrite(rootPath, relativePath, code);
   }
 
   return pkgInfo.cache[cacheFilename] = code;
 }
-
