@@ -11,7 +11,7 @@ const DEFAULT_GZIP_CONFIG = {
 
 const DEFAULT_PKG_CONFIG = {
   "cache-directory": ".reify-cache",
-  parser: undefined
+  parser: void 0
 };
 
 const fsBinding = (() => {
@@ -26,7 +26,7 @@ const nodeVersion = +process.version.match(/\d+/);
 
 const internalModuleReadFile = fsBinding.internalModuleReadFile;
 const internalModuleStat = fsBinding.internalModuleStat;
-const internalStat = nodeVersion > 5 ? fsBinding.stat : undefined;
+const internalStat = nodeVersion > 5 ? fsBinding.stat : void 0;
 const internalStatValues = fsBinding.getStatValues;
 
 let useIsDirectoryFastPath = typeof internalModuleStat === "function";

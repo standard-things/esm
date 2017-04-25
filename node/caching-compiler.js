@@ -69,7 +69,7 @@ function compileWithCache(pkgInfo, content, options) {
 
   const compileOptions = {
     force: hasFilename && path.extname(filename) === ".mjs",
-    parse: undefined
+    parse: void 0
   };
 
   if (typeof pkgCfg.parser === "string") {
