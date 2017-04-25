@@ -18,7 +18,7 @@ Object.keys(files).forEach((absPath) => {
     const testName = relParts[1];
     const testType = basename(relParts[2], ".js");
 
-    if (!filesToTest[testName]) {
+    if (! filesToTest[testName]) {
       filesToTest[testName] = Object.create(null);
     }
     filesToTest[testName][testType] = code;
