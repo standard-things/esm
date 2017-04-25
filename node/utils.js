@@ -287,7 +287,7 @@ function readPkgInfo(dirpath) {
   const config = Object.assign(Object.create(null), DEFAULT_PKG_CONFIG, reify);
   const cacheDir = config["cache-directory"];
   const cachePath = typeof cacheDir === "string" ? path.join(dirpath, cacheDir) : null;
-  const cacheFiles = cachePath !== null ? readdir(cachePath) : null;
+  const cacheFiles = cachePath === null ? null : readdir(cachePath);
 
   const pkgInfo = {
     cache: Object.create(null),
@@ -295,7 +295,7 @@ function readPkgInfo(dirpath) {
     config
   };
 
-  const fileCount = cacheFiles !== null ? cacheFiles.length : 0;
+  const fileCount = cacheFiles === null ? 0 : cacheFiles.length;
 
   for (let i = 0; i < fileCount; ++i) {
     // Later, in Module._extensions[".js"], we'll change the value to the actual

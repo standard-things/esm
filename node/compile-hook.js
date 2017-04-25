@@ -18,7 +18,7 @@ module.exports = exports = (options) => {
 
 function getCacheKey(filename) {
   const mtime = utils.mtime(filename);
-  if (mtime === -1) {
+  if (mtime < 0) {
     return null;
   }
   return {
@@ -52,7 +52,7 @@ if (! (extJs && extJs.reified)) {
       ? utils.getPkgInfo(path.dirname(filename))
       : null;
 
-    const cachePath = pkgInfo !== null ? pkgInfo.cachePath : null;
+    const cachePath = pkgInfo === null ? null : pkgInfo.cachePath;
     if (typeof cachePath === "string") {
       const cache = pkgInfo.cache;
       const cacheKey = getCacheKey(filename);
