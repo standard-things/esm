@@ -284,4 +284,13 @@ describe("export declarations", () => {
     assert.strictEqual(x, 2);
     assert.strictEqual(y, 1);
   });
+
+  it("should not crash on array patterns with holes", () => {
+    import { a, b, update } from "./export/array-pattern-holes.js";
+    assert.strictEqual(a, 1);
+    assert.strictEqual(b, 2);
+    assert.strictEqual(update(3, 4, 5), 8);
+    assert.strictEqual(a, 3);
+    assert.strictEqual(b, 5);
+  });
 });
