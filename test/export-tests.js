@@ -285,7 +285,8 @@ describe("export declarations", () => {
     assert.strictEqual(y, 1);
   });
 
-  it("should not crash on array patterns with holes", () => {
+  (canUseDestructuring ? it : xit)(
+  "should not crash on array patterns with holes", () => {
     import { a, b, update } from "./export/array-pattern-holes.js";
     assert.strictEqual(a, 1);
     assert.strictEqual(b, 2);
