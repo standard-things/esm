@@ -64,16 +64,20 @@ function compileWithCache(pkgInfo, content, options) {
     return cacheValue;
   }
 
+  const compileOptions = {
+    parse: void 0,
+    sourceType: void 0
+  };
+
   const filename = options.filename;
   const hasFilename = typeof filename === "string";
 
-  const compileOptions = {
-    force: hasFilename && path.extname(filename) === ".mjs",
-    parse: void 0
-  };
-
   if (typeof pkgCfg.parser === "string") {
     compileOptions.parse = dynRequire(pkgCfg.parser).parse;
+  }
+
+  if (hasFilename && path.extname(filename) === ".mjs") {
+    compileOptions.sourceType = "module";
   }
 
   const result = compile(content, compileOptions);
