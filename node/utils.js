@@ -243,7 +243,7 @@ function readFile(filepath, options) {
       // or undefined when the file cannot be opened. The speedup comes from not
       // creating Error objects on failure.
       const content = internalModuleReadFile(filepath);
-      return typeof content === "undefined" ? null : content;
+      return content === void 0 ? null : content;
     } catch (e) {
       useReadFileFastPath = false;
     }

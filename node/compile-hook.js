@@ -11,7 +11,7 @@ const Mp = Module.prototype;
 let compileOptions;
 
 module.exports = exports = (options) => {
-  if (typeof compileOptions === "undefined") {
+  if (compileOptions === void 0) {
     compileOptions = Object.assign({}, options);
   }
 };

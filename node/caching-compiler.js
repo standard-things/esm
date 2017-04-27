@@ -52,7 +52,7 @@ function compileWithCache(pkgInfo, content, options) {
   if (typeof cacheKey === "function") {
     cacheKey = cacheKey();
   }
-  if (typeof cacheKey === "undefined") {
+  if (cacheKey === void 0) {
     cacheKey = content;
   }
 
