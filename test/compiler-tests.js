@@ -62,6 +62,19 @@ describe("compiler", () => {
     ).code.startsWith('"use strict";var foo;'));
   });
 
+  it("should respect options.avoidArrowFunctions", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const compiled = compile([
+      'import def from "mod"',
+      'export { def as x }'
+    ].join("\n"), {
+      avoidArrowFunctions: true
+    }).code;
+
+    assert.strictEqual(compiled.indexOf("=>"), -1);
+  });
+
   it("should allow pre-parsed ASTs via options.parse", () => {
     import { compile } from "../lib/compiler.js";
     import { parse } from "../lib/parsers/default.js";
