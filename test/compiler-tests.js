@@ -40,6 +40,19 @@ describe("compiler", () => {
     assert.strictEqual(check(), true);
   });
 
+  it("should respect options.generateArrowFunctions", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const compiled = compile([
+      'import def from "mod"',
+      "export { def as x }"
+    ].join("\n"), {
+      generateArrowFunctions: false
+    }).code;
+
+    assert.ok(! compiled.includes("=>"));
+  });
+
   it("should respect options.generateLetDeclarations", () => {
     import { compile } from "../lib/compiler.js";
 
@@ -60,19 +73,6 @@ describe("compiler", () => {
     assert.ok(compile(
       'import foo from "./foo"'
     ).code.startsWith('"use strict";var foo;'));
-  });
-
-  it("should respect options.avoidArrowFunctions", () => {
-    import { compile } from "../lib/compiler.js";
-
-    const compiled = compile([
-      'import def from "mod"',
-      'export { def as x }'
-    ].join("\n"), {
-      avoidArrowFunctions: true
-    }).code;
-
-    assert.strictEqual(compiled.indexOf("=>"), -1);
   });
 
   it("should allow pre-parsed ASTs via options.parse", () => {
