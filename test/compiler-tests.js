@@ -1,15 +1,20 @@
 const assert = require("assert");
 
+function isUseStrictExprStmt(stmt) {
+  return stmt.type === "ExpressionStatement" &&
+    stmt.expression.value === "use strict";
+}
+
 describe("compiler", () => {
   it("should not get confused by string literals", () => {
     assert.strictEqual(
       'a; import b from "c"; d',
-      'a; import b ' + 'from "c"; d'
+      "a; import b " + 'from "c"; d'
     );
 
     assert.strictEqual(
       'a; export {a} from "a"; b;',
-      'a; export {a' + '} from "a"; b;'
+      "a; export {a" + '} from "a"; b;'
     );
   });
 
@@ -38,60 +43,6 @@ describe("compiler", () => {
   it('should not hoist above "use strict"', () => {
     import { check } from "./strict";
     assert.strictEqual(check(), true);
-  });
-
-  it("should respect options.generateArrowFunctions", () => {
-    import { compile } from "../lib/compiler.js";
-
-    const compiled = compile([
-      'import def from "mod"',
-      "export { def as x }"
-    ].join("\n"), {
-      generateArrowFunctions: false
-    }).code;
-
-    assert.ok(! compiled.includes("=>"));
-  });
-
-  it("should respect options.generateLetDeclarations", () => {
-    import { compile } from "../lib/compiler.js";
-
-    const withLet = compile('import foo from "./foo"', {
-      generateLetDeclarations: true
-    }).code;
-
-    assert.ok(withLet.startsWith('"use strict";let foo;'));
-
-    const without = compile('import foo from "./foo"', {
-      generateLetDeclarations: false
-    }).code;
-
-    assert.ok(without.startsWith('"use strict";var foo;'));
-
-    // No options.generateLetDeclarations is the same as
-    // { generateLetDeclarations: false }.
-    assert.ok(compile(
-      'import foo from "./foo"'
-    ).code.startsWith('"use strict";var foo;'));
-  });
-
-  it("should allow pre-parsed ASTs via options.parse", () => {
-    import { compile } from "../lib/compiler.js";
-    import { parse } from "../lib/parsers/default.js";
-
-    const code = 'import foo from "./foo"';
-    const ast = parse(code);
-    const illegal = code.replace(/\bfoo\b/g, "+@#");
-    const result = compile(illegal, {
-      generateLetDeclarations: true,
-      // If you really want to avoid parsing, you can provide an
-      // options.parse function that returns whatever AST you like.
-      parse: () => ast
-    });
-
-    assert.strictEqual(result.ast, null);
-    assert.ok(result.code.startsWith('"use strict";let foo'));
-    assert.ok(result.code.includes('"./+@#"'));
   });
 
   it("should transform AST when options.ast truthy", () => {
@@ -138,10 +89,143 @@ describe("compiler", () => {
     isCallExprStmt(ast.body[firstIndex + 5], "module", "export");
   });
 
-  function isUseStrictExprStmt(stmt) {
-    return stmt.type === "ExpressionStatement" &&
-      stmt.expression.value === "use strict";
-  }
+  it("should respect options.enforceStrictMode", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const source = 'import "a"';
+
+    const withoutStrict = compile(source, {
+      enforceStrictMode: false
+    }).code;
+
+    assert.ok(! withoutStrict.startsWith('"use strict"'));
+
+    const withStrict = compile(source, {
+      enforceStrictMode: true
+    }).code;
+
+    assert.ok(withStrict.startsWith('"use strict"'));
+
+    // No options.enforceStrictMode is the same as
+    // { enforceStrictMode: true }.
+    const defaultStrict = compile(
+      source
+    ).code;
+
+    assert.ok(defaultStrict.startsWith('"use strict"'));
+  });
+
+  it("should respect options.generateArrowFunctions", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const source = [
+      'import def from "mod"',
+      "export { def as x }"
+    ].join("\n");
+
+    const withoutArrow = compile(source, {
+      generateArrowFunctions: false
+    }).code;
+
+    assert.ok(! withoutArrow.includes("=>"));
+
+    const withArrow = compile(source, {
+      generateArrowFunctions: true
+    }).code;
+
+    assert.ok(withArrow.includes("=>"));
+
+    // No options.generateArrowFunctions is the same as
+    // { generateArrowFunctions: true }.
+    const defaultArrow = compile(
+      source
+    ).code;
+
+    assert.ok(defaultArrow.includes("=>"));
+  });
+
+  it("should respect options.generateLetDeclarations", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const source = 'import foo from "./foo"';
+
+    const withLet = compile(source, {
+      generateLetDeclarations: true
+    }).code;
+
+    assert.ok(withLet.startsWith('"use strict";let foo;'));
+
+    const withoutLet = compile(source, {
+      generateLetDeclarations: false
+    }).code;
+
+    assert.ok(withoutLet.startsWith('"use strict";var foo;'));
+
+    // No options.generateLetDeclarations is the same as
+    // { generateLetDeclarations: false }.
+    const defaultLet = compile(
+      source
+    ).code;
+
+    assert.ok(defaultLet.startsWith('"use strict";var foo;'));
+  });
+
+  it("should allow pre-parsed ASTs via options.parse", () => {
+    import { compile } from "../lib/compiler.js";
+    import { parse } from "../lib/parsers/default.js";
+
+    const code = 'import foo from "./foo"';
+    const ast = parse(code);
+    const illegal = code.replace(/\bfoo\b/g, "+@#");
+    const result = compile(illegal, {
+      generateLetDeclarations: true,
+      // If you really want to avoid parsing, you can provide an
+      // options.parse function that returns whatever AST you like.
+      parse: () => ast
+    });
+
+    assert.strictEqual(result.ast, null);
+    assert.ok(result.code.startsWith('"use strict";let foo'));
+    assert.ok(result.code.includes('"./+@#"'));
+  });
+
+  it("should respect options.sourceType", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const source = "1+2;";
+
+    const moduleType = compile(source, {
+      sourceType: "module"
+    }).code;
+
+    assert.ok(moduleType.startsWith('"use strict"'));
+
+    const unambiguousAsCJS = compile(source, {
+      sourceType: "unambiguous"
+    }).code;
+
+    assert.ok(! unambiguousAsCJS.startsWith('"use strict"'));
+
+    const unambiguousAsESM = compile('import "a"\n' + source, {
+      sourceType: "unambiguous"
+    }).code;
+
+    assert.ok(unambiguousAsESM.startsWith('"use strict"'));
+
+    const scriptType = compile('import "a"\n' + source, {
+      sourceType: "script"
+    }).code;
+
+    assert.ok(scriptType.startsWith('import "a"'));
+
+    // No options.sourceType is the same as
+    // { sourceType: "unambiguous" }.
+    const defaultType = compile(
+      source
+    ).code;
+
+    assert.ok(! defaultType.startsWith('"use strict"'));
+  });
 
   it("should transform default export declaration to expression", () => {
     import { compile } from "../lib/compiler.js";
@@ -159,10 +243,7 @@ describe("compiler", () => {
       return ast;
     }
 
-    const anonCode = [
-      "export default class {}"
-    ].join("\n");
-
+    const anonCode = "export default class {}";
     const anonAST = parse(anonCode);
 
     const anonFirstIndex =
@@ -174,10 +255,7 @@ describe("compiler", () => {
       "ClassExpression"
     );
 
-    const namedCode = [
-      "export default class C {}"
-    ].join("\n");
-
+    const namedCode = "export default class C {}";
     const namedAST = parse(namedCode);
 
     const namedFirstIndex =
