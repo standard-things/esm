@@ -1,6 +1,7 @@
 "use strict";
 
 const createHash = require("crypto").createHash;
+const FastObject = require("../lib/utils.js").FastObject;
 const fs = require("fs");
 const path = require("path");
 const zlib = require("minizlib");
@@ -35,10 +36,10 @@ let useMtimeFastPath = typeof internalStat === "function";
 let useReadFileFastPath = typeof internalModuleReadFile === "function";
 
 let pendingWriteTimer;
-const pendingWrites = Object.create(null);
+const pendingWrites = new FastObject;
 
 // Map from absolute file paths to the package.json that governs them.
-const pkgInfoCache = Object.create(null);
+const pkgInfoCache = new FastObject;
 
 const reifyPkgPath = path.join(__dirname, "../package.json");
 
