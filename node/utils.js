@@ -29,6 +29,7 @@ const internalModuleStat = fsBinding.internalModuleStat;
 const internalStat = nodeVersion > 5 ? fsBinding.stat : void 0;
 const internalStatValues = fsBinding.getStatValues;
 
+const useInternalStatValues = typeof internalStatValues === "function";
 let useIsDirectoryFastPath = typeof internalModuleStat === "function";
 let useMtimeFastPath = typeof internalStat === "function";
 let useReadFileFastPath = typeof internalModuleReadFile === "function";
@@ -54,7 +55,7 @@ const reifyVersion = (() => {
   };
 })();
 
-const statValues = typeof internalStatValues === "function"
+const statValues = useInternalStatValues
   ? internalStatValues()
   : new Float64Array(14);
 
@@ -205,7 +206,7 @@ function mtime(filepath) {
       // Used to speed up file stats. Modifies the `statValues` typed array,
       // with index 11 being the mtime milliseconds stamp. The speedup comes
       // from not creating Stat objects.
-      if (internalStatValues) {
+      if (useInternalStatValues) {
         internalStat(filepath);
       } else {
         internalStat(filepath, statValues);
