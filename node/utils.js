@@ -4,6 +4,7 @@ const createHash = require("crypto").createHash;
 const FastObject = require("../lib/utils.js").FastObject;
 const fs = require("fs");
 const path = require("path");
+const SemVer = require("semver");
 const zlib = require("minizlib");
 
 const DEFAULT_GZIP_CONFIG = {
@@ -43,27 +44,14 @@ const pkgInfoCache = new FastObject;
 
 const reifyPkgPath = path.join(__dirname, "../package.json");
 
-const reifyVersion = (() => {
-  const parts = (
-    process.env.REIFY_VERSION ||
-    readJSON(reifyPkgPath).version
-  ).split(".");
-
-  return {
-    major: parts[0],
-    minor: parts[1],
-    patch: parts[2]
-  };
-})();
+const reifyVersion = SemVer.parse(
+  process.env.REIFY_VERSION ||
+  readJSON(reifyPkgPath).version
+);
 
 const statValues = useInternalStatValues
   ? internalStatValues()
   : new Float64Array(14);
-
-function checkReify(json, name) {
-  var entry = json[name];
-  return typeof entry === "object" && entry !== null && hasOwn.call(entry, "reify");
-}
 
 function fallbackIsDirectory(filepath) {
   try {
@@ -83,6 +71,15 @@ function fallbackReadFile(filepath, options) {
   try {
     return fs.readFileSync(filepath, options);
   } catch (e) {}
+  return null;
+}
+
+function getReifyRange(json, name) {
+  var entry = json[name];
+  if (typeof entry === "object" && entry !== null &&
+      hasOwn.call(entry, "reify")) {
+    return SemVer.validRange(entry.reify);
+  }
   return null;
 }
 
@@ -138,6 +135,12 @@ function getPkgInfo(dirpath) {
 }
 
 exports.getPkgInfo = getPkgInfo;
+
+function getReifyVersion() {
+  return new SemVer(reifyVersion);
+}
+
+exports.getReifyVersion = getReifyVersion;
 
 function gzip(data, options) {
   options = Object.assign(Object.create(null), DEFAULT_GZIP_CONFIG, options);
@@ -274,19 +277,24 @@ function readPkgInfo(dirpath) {
     // reification even if "reify" is listed as a dependency.
     return null;
   }
-  if (! checkReify(pkg, "dependencies") &&
-      // Use case: a package.json file may have "reify" in its
-      // "devDependencies" section because it expects another package or
-      // application to enable reification in production, but needs its
-      // own copy of the "reify" package during development. Disabling
-      // reification in production when it was enabled in development
-      // would be dangerous in this case.
-      ! checkReify(pkg, "devDependencies") &&
-      ! checkReify(pkg, "peerDependencies")) {
+
+  const range =
+    getReifyRange(pkg, "dependencies") ||
+    getReifyRange(pkg, "peerDependencies") ||
+    getReifyRange(pkg, "devDependencies");
+
+  // Use case: a package.json file may have "reify" in its "devDependencies"
+  // object because it expects another package or application to enable
+  // reification in production, but needs its own copy of the "reify" package
+  // during development. Disabling reification in production when it was enabled
+  // in development would be undesired in this case.
+  if (range === null) {
     return null;
   }
 
   const config = Object.assign(Object.create(null), DEFAULT_PKG_CONFIG, reify);
+  config.range = range;
+
   const cacheDir = config["cache-directory"];
   const cachePath = typeof cacheDir === "string" ? path.join(dirpath, cacheDir) : null;
   const cacheFiles = cachePath === null ? null : readdir(cachePath);

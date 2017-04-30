@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "acorn": "~5.0.0",
-    "minizlib": "^1.0.3"
+    "minizlib": "^1.0.3",
+    "semver": "^5.3.0"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
