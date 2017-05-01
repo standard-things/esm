@@ -2,16 +2,17 @@ const assert = require("assert");
 
 describe("Node REPL", () => {
   import { createContext } from "vm";
+  import { enable } from "../lib/runtime.js";
+  import repl from "repl";
   import "../repl";
 
   it("should work with global context", (done) => {
-    const repl = require("repl").start({
-      useGlobal: true
-    });
+    const r = repl.start({ useGlobal: true });
+    enable(r.context.module);
 
     assert.strictEqual(typeof assertStrictEqual, "undefined");
 
-    repl.eval(
+    r.eval(
       'import { strictEqual as assertStrictEqual } from "assert"',
       null, // Context
       "repl", // Filename
@@ -24,15 +25,10 @@ describe("Node REPL", () => {
   });
 
   it("should work with non-global context", (done) => {
-    const repl = require("repl").start({
-      useGlobal: false
-    });
+    const r = repl.start({ useGlobal: false });
+    const context = createContext({ module });
 
-    const context = createContext({
-      module: module
-    });
-
-    repl.eval(
+    r.eval(
       'import { strictEqual } from "assert"',
       context,
       "repl", // Filename

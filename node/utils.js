@@ -1,11 +1,12 @@
 "use strict";
 
 const createHash = require("crypto").createHash;
-const FastObject = require("../lib/utils.js").FastObject;
 const fs = require("fs");
 const path = require("path");
-const SemVer = require("semver");
 const zlib = require("minizlib");
+
+const FastObject = require("../lib/utils.js").FastObject;
+const SemVer = require("semver");
 
 const DEFAULT_GZIP_CONFIG = {
   level: 9
@@ -293,8 +294,6 @@ function readPkgInfo(dirpath) {
   }
 
   const config = Object.assign(Object.create(null), DEFAULT_PKG_CONFIG, reify);
-  config.range = range;
-
   const cacheDir = config["cache-directory"];
   const cachePath = typeof cacheDir === "string" ? path.join(dirpath, cacheDir) : null;
   const cacheFiles = cachePath === null ? null : readdir(cachePath);
@@ -302,7 +301,8 @@ function readPkgInfo(dirpath) {
   const pkgInfo = {
     cache: Object.create(null),
     cachePath,
-    config
+    config,
+    range
   };
 
   const fileCount = cacheFiles === null ? 0 : cacheFiles.length;

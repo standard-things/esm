@@ -1,30 +1,32 @@
 "use strict";
 
-const vm = require("vm");
 const compile = require("../node/caching-compiler.js").compile;
+const runtime = require("../lib/runtime.js");
+const vm = require("vm");
 
 require("../node");
+runtime.enable(module.parent);
 
 function wrap(name, optionsArgIndex) {
   const method = vm[name];
 
-  if (typeof method !== "function" ||
-      method.reified) {
+  if (typeof method !== "function" || method.reified) {
     return;
   }
 
   vm[name] = function (code) {
-    const options = arguments[optionsArgIndex];
-    const compileOptions = Object.create(null);
-    if (options && typeof options.filename === "string") {
+    const compileOptions = { filename: null };
+    const options = Object.assign({}, arguments[optionsArgIndex]);
+
+    if (typeof options.filename === "string") {
       compileOptions.filename = options.filename;
     }
 
     const args = [compile(code, compileOptions)];
     const argsCount = arguments.length;
 
-    for (let i = 1; i < argsCount; ++i) {
-      args.push(arguments[i]);
+    for (let i = 1; i < argsCount; ) {
+      args[i] = arguments[++i];
     }
 
     return method.apply(vm, args);

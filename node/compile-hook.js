@@ -1,14 +1,20 @@
 "use strict";
 
 const compiler = require("./caching-compiler.js");
+const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
 const path = require("path");
+const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
 
-const Module = require("./runtime.js").Module;
+const FastObject = require("../lib/utils.js").FastObject;
+const Module = dynRequire("module");
+const SemVer = require("semver");
+
 const exts = Module._extensions;
 const Mp = Module.prototype;
 
 let compileOptions;
+const reifyVersion = utils.getReifyVersion();
 
 module.exports = exports = (options) => {
   if (compileOptions === void 0) {
@@ -16,65 +22,107 @@ module.exports = exports = (options) => {
   }
 };
 
+function addWrapper(func, wrapper) {
+  const reified = func.reified;
+  if (typeof reified.wrappers[reifyVersion] !== "function") {
+    reified.versions.push(reifyVersion);
+    reified.wrappers[reifyVersion] = wrapper;
+  }
+}
+
+function createWrapperManager(object, property) {
+  const func = object[property];
+  if (! isManaged(func)) {
+    (object[property] = function(param, filename) {
+      // A wrapper should only be null for reify < 0.9.
+      const wrapper = findWrapper(object[property], filename);
+      return wrapper === null
+        ? func.call(this, param, filename)
+        : wrapper.call(this, func, param, filename);
+    }).reified = createWrapperMap(func);
+  }
+}
+
+function createWrapperMap(func) {
+  const map = new FastObject;
+  map.raw = func;
+  map.versions = [];
+  map.wrappers = new FastObject;
+  return map;
+}
+
+function findWrapper(func, filename) {
+  const pkgInfo = typeof filename === "string"
+    ? utils.getPkgInfo(path.dirname(filename))
+    : null;
+
+  if (pkgInfo !== null) {
+    const reified = func.reified;
+    const version = SemVer.maxSatisfying(reified.versions, pkgInfo.range);
+
+    if (version !== null) {
+      return reified.wrappers[version];
+    }
+  }
+  return null;
+}
+
 function getCacheKey(filename) {
   const mtime = utils.mtime(filename);
-  if (mtime < 0) {
-    return null;
-  }
-  return {
-    filename,
-    mtime,
-    source: "Module.prototype._compile"
-  };
+  return mtime < 0 ? null : { filename, mtime };
 }
 
-// Override Module.prototype._compile to compile any code that will be
-// evaluated as a module.
-const _compile = Mp._compile;
-if (! _compile.reified) {
-  (Mp._compile = function (content, filename) {
-    const options = {
-      filename,
-      cacheKey() {
-        return getCacheKey(filename);
-      }
-    };
-
-    content = compiler.compile(content, Object.assign(options, compileOptions));
-    return _compile.call(this, content, filename);
-  }).reified = _compile;
+function isManaged(func) {
+  return typeof func === "function" &&
+    typeof func.reified === "object" && func.reified !== null;
 }
 
-const extJs = exts[".js"];
-if (! (extJs && extJs.reified)) {
-  (exts[".js"] = (module, filename) => {
-    const pkgInfo = typeof filename === "string"
-      ? utils.getPkgInfo(path.dirname(filename))
-      : null;
+createWrapperManager(Mp, "_compile");
+createWrapperManager(exts, ".js");
+createWrapperManager(exts, ".mjs");
 
-    const cachePath = pkgInfo === null ? null : pkgInfo.cachePath;
-    if (typeof cachePath === "string") {
-      const cache = pkgInfo.cache;
-      const cacheKey = getCacheKey(filename);
-      const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo.config);
+addWrapper(Mp._compile, function(func, content, filename) {
+  const options = Object.assign({ filename }, compileOptions);
+  options.cacheKey = () => getCacheKey(filename);
+  runtime.enable(this);
+  return func.call(this, compiler.compile(content, options), filename);
+});
 
-      let cacheValue = cache[cacheFilename];
-      if (cacheValue === true) {
-        const cacheFilepath = path.join(cachePath, cacheFilename);
-        const buffer = utils.readFile(cacheFilepath);
-        cacheValue = cache[cacheFilename] = utils.gunzip(buffer, "utf8");
-      }
-      if (typeof cacheValue === "string") {
-        return module._compile(cacheValue, filename);
-      }
+addWrapper(exts[".js"], function(func, module, filename) {
+  const pkgInfo = typeof filename === "string"
+    ? utils.getPkgInfo(path.dirname(filename))
+    : null;
+
+  let cacheValue;
+  const cachePath = pkgInfo === null ? null : pkgInfo.cachePath;
+
+  if (cachePath !== null) {
+    const cache = pkgInfo.cache;
+    const cacheKey = getCacheKey(filename);
+    const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo.config);
+
+    cacheValue = cache[cacheFilename];
+    if (cacheValue === true) {
+      const cacheFilepath = path.join(cachePath, cacheFilename);
+      const buffer = utils.readFile(cacheFilepath);
+      cacheValue = cache[cacheFilename] = utils.gunzip(buffer, "utf8");
     }
-    return extJs(module, filename);
-  }).reified = extJs;
-}
+  }
 
-const extMjs = exts[".mjs"];
-if (! (extMjs && extMjs.reified)) {
-  (exts[".mjs"] = (module, filename) =>
-    exts[".js"](module, filename)
-  ).reified = extMjs;
-}
+  const reified = module._compile.reified;
+  const _compile = reified.raw;
+
+  if (typeof cacheValue === "string") {
+    runtime.enable(module);
+    _compile.call(module, cacheValue, filename);
+
+  } else {
+    const wrapper = reified.wrappers[reifyVersion];
+    wrapper.call(module, _compile, utils.readFile(filename, "utf8"), filename);
+  }
+  module.runModuleSetters();
+});
+
+addWrapper(exts[".mjs"], function(func, module, filename) {
+  exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
+});
