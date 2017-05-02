@@ -49,9 +49,6 @@ function compileWithCacheAndFilename(pkgInfo, content, options) {
 function compileWithCache(pkgInfo, content, options) {
   let cacheKey = options.cacheKey;
 
-  if (typeof cacheKey === "function") {
-    cacheKey = cacheKey();
-  }
   if (cacheKey === void 0) {
     cacheKey = content;
   }

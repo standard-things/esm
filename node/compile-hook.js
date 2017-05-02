@@ -30,12 +30,6 @@ function addWrapper(func, wrapper) {
   }
 }
 
-function compile(content, filename) {
-  const options = Object.assign({ filename }, compileOptions);
-  options.cacheKey = () => getCacheKey(filename);
-  return compiler.compile(content, options);
-}
-
 function createWrapperManager(object, property) {
   const func = object[property];
   if (! isManaged(func)) {
@@ -108,7 +102,10 @@ addWrapper(exts[".js"], function(func, module, filename) {
     cacheValue = utils.gunzip(buffer, "utf8");
 
   } else if (typeof cacheValue !== "string") {
-    cacheValue = compile(utils.readFile(filename, "utf8"), filename);
+    const options = Object.assign({}, compileOptions);
+    options.cacheKey = cacheKey;
+    options.filename = filename;
+    cacheValue = compiler.compile(utils.readFile(filename, "utf8"), options);
   }
 
   cache[cacheFilename] = cacheValue;
