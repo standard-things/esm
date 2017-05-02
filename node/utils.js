@@ -23,11 +23,11 @@ const fsBinding = (() => {
 })();
 
 const hasOwn = Object.prototype.hasOwnProperty;
-const nodeVersion = +process.version.match(/\d+/);
+const nodeVersion = +process.version.match(/\d+\.\d+/);
 
 const internalModuleReadFile = fsBinding.internalModuleReadFile;
 const internalModuleStat = fsBinding.internalModuleStat;
-const internalStat = nodeVersion > 5 ? fsBinding.stat : void 0;
+const internalStat = nodeVersion > 7.6 ? fsBinding.stat : void 0;
 const internalStatValues = fsBinding.getStatValues;
 
 const useInternalStatValues = typeof internalStatValues === "function";
