@@ -30,6 +30,12 @@ function addWrapper(func, wrapper) {
   }
 }
 
+function compile(content, filename) {
+  const options = Object.assign({ filename }, compileOptions);
+  options.cacheKey = () => getCacheKey(filename);
+  return compiler.compile(content, options);
+}
+
 function createWrapperManager(object, property) {
   const func = object[property];
   if (! isManaged(func)) {
@@ -77,49 +83,37 @@ function isManaged(func) {
     typeof func.reified === "object" && func.reified !== null;
 }
 
-createWrapperManager(Mp, "_compile");
 createWrapperManager(exts, ".js");
 createWrapperManager(exts, ".mjs");
-
-addWrapper(Mp._compile, function(func, content, filename) {
-  const options = Object.assign({ filename }, compileOptions);
-  options.cacheKey = () => getCacheKey(filename);
-  runtime.enable(this);
-  return func.call(this, compiler.compile(content, options), filename);
-});
 
 addWrapper(exts[".js"], function(func, module, filename) {
   const pkgInfo = typeof filename === "string"
     ? utils.getPkgInfo(path.dirname(filename))
     : null;
 
-  let cacheValue;
   const cachePath = pkgInfo === null ? null : pkgInfo.cachePath;
 
-  if (cachePath !== null) {
-    const cache = pkgInfo.cache;
-    const cacheKey = getCacheKey(filename);
-    const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo.config);
-
-    cacheValue = cache[cacheFilename];
-    if (cacheValue === true) {
-      const cacheFilepath = path.join(cachePath, cacheFilename);
-      const buffer = utils.readFile(cacheFilepath);
-      cacheValue = cache[cacheFilename] = utils.gunzip(buffer, "utf8");
-    }
+  if (cachePath === null) {
+    return func.call(this, module, filename);
   }
 
-  const reified = module._compile.reified;
-  const _compile = reified.raw;
+  const cache = pkgInfo.cache;
+  const cacheKey = getCacheKey(filename);
+  const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo.config);
 
-  if (typeof cacheValue === "string") {
-    runtime.enable(module);
-    _compile.call(module, cacheValue, filename);
+  let cacheValue = cache[cacheFilename];
+  if (cacheValue === true) {
+    const cacheFilepath = path.join(cachePath, cacheFilename);
+    const buffer = utils.readFile(cacheFilepath);
+    cacheValue = utils.gunzip(buffer, "utf8");
 
-  } else {
-    const wrapper = reified.wrappers[reifyVersion];
-    wrapper.call(module, _compile, utils.readFile(filename, "utf8"), filename);
+  } else if (typeof cacheValue !== "string") {
+    cacheValue = compile(utils.readFile(filename, "utf8"), filename);
   }
+
+  cache[cacheFilename] = cacheValue;
+  runtime.enable(module);
+  module._compile(cacheValue, filename);
   module.runModuleSetters();
 });
 
