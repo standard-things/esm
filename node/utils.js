@@ -44,11 +44,8 @@ const pendingWrites = new FastObject;
 const pkgInfoCache = new FastObject;
 
 const reifyPkgPath = path.join(__dirname, "../package.json");
-
-const reifyVersion = SemVer.parse(
-  process.env.REIFY_VERSION ||
-  readJSON(reifyPkgPath).version
-);
+const reifyVersion = process.env.REIFY_VERSION || readJSON(reifyPkgPath).version;
+const reifySemVer = SemVer.parse(reifyVersion);
 
 const statValues = useInternalStatValues
   ? internalStatValues()
@@ -94,7 +91,7 @@ function getCacheFilename(cacheKey, pkgCfg) {
   // Take only the major and minor components of the reify version, so that
   // we don't invalidate the cache every time a patch version is released.
   return createHash("sha1")
-    .update(reifyVersion.major + "." + reifyVersion.minor)
+    .update(reifySemVer.major + "." + reifySemVer.minor)
     .update("\0")
     .update(
       typeof cacheKey === "object" && cacheKey !== null
@@ -137,11 +134,11 @@ function getPkgInfo(dirpath) {
 
 exports.getPkgInfo = getPkgInfo;
 
-function getReifyVersion() {
+function getReifySemVer() {
   return new SemVer(reifyVersion);
 }
 
-exports.getReifyVersion = getReifyVersion;
+exports.getReifySemVer = getReifySemVer;
 
 function gzip(data, options) {
   options = Object.assign(Object.create(null), DEFAULT_GZIP_CONFIG, options);

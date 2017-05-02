@@ -13,7 +13,8 @@ const exts = Module._extensions;
 const Mp = Module.prototype;
 
 let compileOptions;
-const reifyVersion = utils.getReifyVersion();
+const reifySemVer = utils.getReifySemVer();
+const reifyVersion = reifySemVer.version;
 
 module.exports = exports = (options) => {
   if (compileOptions === void 0) {
