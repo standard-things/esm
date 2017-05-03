@@ -1,5 +1,6 @@
 "use strict";
 
+const cache = require("./cache.js");
 const createHash = require("crypto").createHash;
 const fs = require("fs");
 const path = require("path");
@@ -38,9 +39,6 @@ let useReadFileFastPath = typeof internalModuleReadFile === "function";
 
 let pendingWriteTimer;
 const pendingWrites = new FastObject;
-
-// Map from absolute file paths to the package.json that governs them.
-const pkgInfoCache = new FastObject;
 
 const reifyPkgPath = path.join(__dirname, "../package.json");
 const reifyVersion = process.env.REIFY_VERSION || readJSON(reifyPkgPath).version;
@@ -106,11 +104,11 @@ function getCacheFilename(cacheKey, pkgInfo) {
 exports.getCacheFilename = getCacheFilename;
 
 function getPkgInfo(dirpath) {
-  if (dirpath in pkgInfoCache) {
-    return pkgInfoCache[dirpath];
+  if (dirpath in cache.pkgInfo) {
+    return cache.pkgInfo[dirpath];
   }
 
-  pkgInfoCache[dirpath] = null;
+  cache.pkgInfo[dirpath] = null;
 
   if (path.basename(dirpath) === "node_modules") {
     return null;
@@ -118,14 +116,14 @@ function getPkgInfo(dirpath) {
 
   const pkgInfo = readPkgInfo(dirpath);
   if (pkgInfo !== null) {
-    return pkgInfoCache[dirpath] = pkgInfo;
+    return cache.pkgInfo[dirpath] = pkgInfo;
   }
 
   const parentPath = path.dirname(dirpath);
   if (parentPath !== dirpath) {
     const pkgInfo = getPkgInfo(parentPath);
     if (pkgInfo !== null) {
-      return pkgInfoCache[dirpath] = pkgInfo;
+      return cache.pkgInfo[dirpath] = pkgInfo;
     }
   }
   return null;
