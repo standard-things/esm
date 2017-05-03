@@ -53,8 +53,7 @@ function compileWithCache(pkgInfo, content, options) {
     cacheKey = content;
   }
 
-  const pkgCfg = pkgInfo.config;
-  const cacheFilename = utils.getCacheFilename(cacheKey, pkgCfg);
+  const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo);
   const cacheValue = pkgInfo.cache[cacheFilename];
 
   if (typeof cacheValue === "string") {
@@ -68,9 +67,10 @@ function compileWithCache(pkgInfo, content, options) {
 
   const filename = options.filename;
   const hasFilename = typeof filename === "string";
+  const parser = pkgInfo.config.parser;
 
-  if (typeof pkgCfg.parser === "string") {
-    compileOptions.parse = dynRequire(pkgCfg.parser).parse;
+  if (typeof parser === "string") {
+    compileOptions.parse = dynRequire(parser).parse;
   }
 
   if (hasFilename && path.extname(filename) === ".mjs") {

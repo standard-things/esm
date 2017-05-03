@@ -30,15 +30,17 @@ function addWrapper(func, wrapper) {
   }
 }
 
-function createWrapperManager(object, property) {
-  const func = object[property];
+function createWrapperManager(object, key) {
+  const func = object[key];
   if (! isManaged(func)) {
-    (object[property] = function(param, filename) {
+    (object[key] = function(param, filename) {
+      const pkgInfo = utils.getPkgInfo(path.dirname(filename));
+      const wrapper = pkgInfo === null ? null : findWrapper(object[key], pkgInfo.range);
+
       // A wrapper should only be null for reify < 0.9.
-      const wrapper = findWrapper(object[property], filename);
       return wrapper === null
         ? func.call(this, param, filename)
-        : wrapper.call(this, func, param, filename);
+        : wrapper.call(this, func, pkgInfo, param, filename);
     }).reified = createWrapperMap(func);
   }
 }
@@ -51,20 +53,10 @@ function createWrapperMap(func) {
   return map;
 }
 
-function findWrapper(func, filename) {
-  const pkgInfo = typeof filename === "string"
-    ? utils.getPkgInfo(path.dirname(filename))
-    : null;
-
-  if (pkgInfo !== null) {
-    const reified = func.reified;
-    const version = SemVer.maxSatisfying(reified.versions, pkgInfo.range);
-
-    if (version !== null) {
-      return reified.wrappers[version];
-    }
-  }
-  return null;
+function findWrapper(func, range) {
+  const reified = func.reified;
+  const version = SemVer.maxSatisfying(reified.versions, range);
+  return version === null ? null : reified.wrappers[version];
 }
 
 function getCacheKey(filename) {
@@ -80,20 +72,15 @@ function isManaged(func) {
 createWrapperManager(exts, ".js");
 createWrapperManager(exts, ".mjs");
 
-addWrapper(exts[".js"], function(func, module, filename) {
-  const pkgInfo = typeof filename === "string"
-    ? utils.getPkgInfo(path.dirname(filename))
-    : null;
-
-  const cachePath = pkgInfo === null ? null : pkgInfo.cachePath;
-
+addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
+  const cachePath = pkgInfo.cachePath;
   if (cachePath === null) {
     return func.call(this, module, filename);
   }
 
   const cache = pkgInfo.cache;
   const cacheKey = getCacheKey(filename);
-  const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo.config);
+  const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo);
 
   let cacheValue = cache[cacheFilename];
   if (cacheValue === true) {
@@ -109,6 +96,7 @@ addWrapper(exts[".js"], function(func, module, filename) {
   }
 
   cache[cacheFilename] = cacheValue;
+
   runtime.enable(module);
   module._compile(cacheValue, filename);
   module.runModuleSetters();

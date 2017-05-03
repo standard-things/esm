@@ -87,7 +87,7 @@ function streamToBuffer(stream, data) {
   return Buffer.concat(result);
 }
 
-function getCacheFilename(cacheKey, pkgCfg) {
+function getCacheFilename(cacheKey, pkgInfo) {
   // Take only the major and minor components of the reify version, so that
   // we don't invalidate the cache every time a patch version is released.
   return createHash("sha1")
@@ -99,7 +99,7 @@ function getCacheFilename(cacheKey, pkgCfg) {
         : cacheKey
     )
     .update("\0")
-    .update(JSON.stringify(pkgCfg))
+    .update(JSON.stringify(pkgInfo.config))
     .update("\0")
     .digest("hex") + ".js.gz";
 }
