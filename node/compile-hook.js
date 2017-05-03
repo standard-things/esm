@@ -59,11 +59,6 @@ function findWrapper(func, range) {
   return version === null ? null : reified.wrappers[version];
 }
 
-function getCacheKey(filename) {
-  const mtime = utils.mtime(filename);
-  return mtime < 0 ? null : { filename, mtime };
-}
-
 function isManaged(func) {
   return typeof func === "function" &&
     typeof func.reified === "object" && func.reified !== null;
@@ -79,19 +74,25 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   }
 
   const cache = pkgInfo.cache;
-  const cacheKey = getCacheKey(filename);
-  const cacheFilename = utils.getCacheFilename(cacheKey, pkgInfo);
+  const cacheKey = utils.mtime(filename);
+  const cacheFilename = utils.getCacheFileName(filename, cacheKey, pkgInfo);
 
   let cacheValue = cache[cacheFilename];
   if (cacheValue === true) {
     const cacheFilepath = path.join(cachePath, cacheFilename);
-    const buffer = utils.readFile(cacheFilepath);
-    cacheValue = utils.gunzip(buffer, "utf8");
+    cacheValue = path.extname(cacheFilepath) === ".gz"
+      ? utils.gunzip(utils.readFile(cacheFilepath), "utf8")
+      : utils.readFile(cacheFilepath, "utf8");
 
   } else if (typeof cacheValue !== "string") {
-    const options = Object.assign({}, compileOptions);
-    options.cacheKey = cacheKey;
-    options.filename = filename;
+    const options = {
+      cacheFilename,
+      cachePath,
+      compileOptions,
+      filename,
+      parser: pkgInfo.config.parser
+    };
+
     cacheValue = compiler.compile(utils.readFile(filename, "utf8"), options);
   }
 

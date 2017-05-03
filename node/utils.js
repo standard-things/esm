@@ -84,24 +84,30 @@ function streamToBuffer(stream, data) {
   return Buffer.concat(result);
 }
 
-function getCacheFilename(cacheKey, pkgInfo) {
+function toString(value) {
+  return typeof value === "string" ? value : String(value);
+}
+
+function getCacheFileName(filename, cacheKey, pkgInfo) {
+  const ext = typeof filename === "string"
+    ? path.extname(filename)
+    : ".js";
+
   // Take only the major and minor components of the reify version, so that
   // we don't invalidate the cache every time a patch version is released.
   return createHash("sha1")
     .update(reifySemVer.major + "." + reifySemVer.minor)
     .update("\0")
-    .update(
-      typeof cacheKey === "object" && cacheKey !== null
-        ? JSON.stringify(cacheKey)
-        : cacheKey
-    )
+    .update(toString(filename))
+    .update("\0")
+    .update(toString(cacheKey))
     .update("\0")
     .update(JSON.stringify(pkgInfo.config))
     .update("\0")
-    .digest("hex") + ".js.gz";
+    .digest("hex") + ext;
 }
 
-exports.getCacheFilename = getCacheFilename;
+exports.getCacheFileName = getCacheFileName;
 
 function getPkgInfo(dirpath) {
   if (dirpath in cache.pkgInfo) {
@@ -109,7 +115,6 @@ function getPkgInfo(dirpath) {
   }
 
   cache.pkgInfo[dirpath] = null;
-
   if (path.basename(dirpath) === "node_modules") {
     return null;
   }
@@ -261,12 +266,15 @@ function readJSON(filepath) {
 exports.readJSON = readJSON;
 
 function readPkgInfo(dirpath) {
-  const pkg = readJSON(path.join(dirpath, "package.json"));
-  if (pkg === null) {
+  const pkgPath = path.join(dirpath, "package.json");
+  const pkgJSON = readJSON(pkgPath);
+
+  if (pkgJSON === null) {
     return null;
   }
 
-  const reify = pkg.reify;
+  const reify = pkgJSON.reify;
+
   if (reify === false) {
     // An explicit "reify": false property in package.json disables
     // reification even if "reify" is listed as a dependency.
@@ -274,9 +282,9 @@ function readPkgInfo(dirpath) {
   }
 
   const range =
-    getReifyRange(pkg, "dependencies") ||
-    getReifyRange(pkg, "peerDependencies") ||
-    getReifyRange(pkg, "devDependencies");
+    getReifyRange(pkgJSON, "dependencies") ||
+    getReifyRange(pkgJSON, "peerDependencies") ||
+    getReifyRange(pkgJSON, "devDependencies");
 
   // Use case: a package.json file may have "reify" in its "devDependencies"
   // object because it expects another package or application to enable
@@ -292,12 +300,11 @@ function readPkgInfo(dirpath) {
   const cachePath = typeof cacheDir === "string" ? path.join(dirpath, cacheDir) : null;
   const cacheFiles = cachePath === null ? null : readdir(cachePath);
 
-  const pkgInfo = {
-    cache: Object.create(null),
-    cachePath,
-    config,
-    range
-  };
+  const pkgInfo = Object.create(null);
+  pkgInfo.cache = Object.create(null);
+  pkgInfo.cachePath = cachePath;
+  pkgInfo.config = config;
+  pkgInfo.range = range;
 
   const fileCount = cacheFiles === null ? 0 : cacheFiles.length;
 
@@ -319,9 +326,14 @@ function scheduleWrite(rootPath, relativePath, content) {
     Object.keys(pendingWrites).forEach((filepath) => {
       const pending = pendingWrites[filepath];
 
-      if (mkdirp(pending.rootPath, path.dirname(pending.relativePath)) &&
-          writeFile(filepath, gzip(pending.content))) {
-        delete pendingWrites[filepath];
+      if (mkdirp(pending.rootPath, path.dirname(pending.relativePath))) {
+        const ext = path.extname(filepath);
+
+        if (ext === ".gz"
+            ? writeFile(filepath, gzip(pending.content))
+            : writeFile(filepath, pending.content, "utf8")) {
+          delete pendingWrites[filepath];
+        }
       }
     });
   });
