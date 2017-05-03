@@ -1,13 +1,12 @@
 "use strict";
 
 const compiler = require("./caching-compiler.js");
-const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
 
 const FastObject = require("../lib/utils.js").FastObject;
-const Module = dynRequire("module");
+const Module = require("module");
 const SemVer = require("semver");
 
 const exts = Module._extensions;
