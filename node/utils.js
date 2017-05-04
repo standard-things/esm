@@ -3,6 +3,7 @@
 const createHash = require("crypto").createHash;
 const data = require("./data.js");
 const fs = require("fs");
+const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const zlib = require("minizlib");
 
@@ -72,11 +73,9 @@ function fallbackReadFile(filepath, options) {
 
 function getReifyRange(json, name) {
   var entry = json[name];
-  if (typeof entry === "object" && entry !== null &&
-      hasOwn.call(entry, "reify")) {
-    return SemVer.validRange(entry.reify);
-  }
-  return null;
+  return isObject(entry) && hasOwn.call(entry, "reify")
+    ? SemVer.validRange(entry.reify)
+    : null;
 }
 
 function streamToBuffer(stream, data) {
@@ -239,9 +238,7 @@ function readdir(dirpath) {
 exports.readdir = readdir;
 
 function readFile(filepath, options) {
-  const encoding = typeof options === "object" && options !== null
-    ? options.encoding
-    : options;
+  const encoding = isObject(options) ? options.encoding : options;
 
   if (useReadFileFastPath && encoding === "utf8") {
     try {

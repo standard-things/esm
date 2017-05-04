@@ -1,6 +1,7 @@
 "use strict";
 
 const compile = require("../node/caching-compiler.js").compile;
+const isObject = require("../lib/utils.js").isObject;
 const runtime = require("../lib/runtime.js");
 const setOptions = require("../node/compile-hook.js");
 const vm = require("vm");
@@ -16,9 +17,7 @@ module.exports = exports = (options) => {
 // Enable import and export statements in the default Node REPL.
 // Custom REPLs can still define their own eval functions that circumvent
 // this compilation step, but that's a feature, not a drawback.
-if (typeof module.parent === "object" && module.parent !== null &&
-    module.parent.id === "<repl>") {
-
+if (isObject(module.parent) && module.parent.id === "<repl>") {
   const createScript = vm.createScript;
 
   if (typeof createScript.reified !== "function") {

@@ -1,6 +1,7 @@
 "use strict";
 
 const compiler = require("./caching-compiler.js");
+const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
@@ -60,8 +61,7 @@ function findWrapper(func, range) {
 }
 
 function isManaged(func) {
-  return typeof func === "function" &&
-    typeof func.reified === "object" && func.reified !== null;
+  return typeof func === "function" && isObject(func.reified);
 }
 
 createWrapperManager(exts, ".js");
