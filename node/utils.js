@@ -30,7 +30,7 @@ const hasOwn = Object.prototype.hasOwnProperty;
 
 const internalModuleReadFile = fsBinding.internalModuleReadFile;
 const internalModuleStat = fsBinding.internalModuleStat;
-const internalStat = SemVer.gt(process.version, "7.6.0") ? fsBinding.stat : void 0;
+const internalStat = SemVer.gte(process.version, "7.7.0") ? fsBinding.stat : void 0;
 const internalStatValues = fsBinding.getStatValues;
 
 const useInternalStatValues = typeof internalStatValues === "function";
