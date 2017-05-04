@@ -65,7 +65,6 @@ function isManaged(func) {
 }
 
 createWrapperManager(exts, ".js");
-createWrapperManager(exts, ".mjs");
 
 addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   const cachePath = pkgInfo.cachePath;
@@ -73,6 +72,7 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
     return func.call(this, module, filename);
   }
 
+  const isGzipped = path.extname(filename) === ".gz";
   const cache = pkgInfo.cache;
   const cacheKey = utils.mtime(filename);
   const cacheFilename = utils.getCacheFileName(filename, cacheKey, pkgInfo);
@@ -80,7 +80,7 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   let cacheValue = cache[cacheFilename];
   if (cacheValue === true) {
     const cacheFilepath = path.join(cachePath, cacheFilename);
-    cacheValue = path.extname(cacheFilepath) === ".gz"
+    cacheValue = isGzipped
       ? utils.gunzip(utils.readFile(cacheFilepath), "utf8")
       : utils.readFile(cacheFilepath, "utf8");
 
@@ -93,7 +93,11 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
       parser: pkgInfo.config.parser
     };
 
-    cacheValue = compiler.compile(utils.readFile(filename, "utf8"), options);
+    const content = isGzipped
+      ? utils.gunzip(utils.readFile(filename), "utf8")
+      : utils.readFile(filename, "utf8");
+
+    cacheValue = compiler.compile(content, options);
   }
 
   cache[cacheFilename] = cacheValue;
@@ -103,6 +107,9 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   module.runModuleSetters();
 });
 
-addWrapper(exts[".mjs"], function(func, module, filename) {
-  exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
+[".gz", ".js.gz", ".mjs"].forEach((key) => {
+  createWrapperManager(exts, key);
+  addWrapper(exts[key], function(func, module, filename) {
+    exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
+  });
 });

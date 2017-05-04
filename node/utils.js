@@ -327,9 +327,7 @@ function scheduleWrite(rootPath, relativePath, content) {
       const pending = pendingWrites[filepath];
 
       if (mkdirp(pending.rootPath, path.dirname(pending.relativePath))) {
-        const ext = path.extname(filepath);
-
-        if (ext === ".gz"
+        if (path.extname(filepath) === ".gz"
             ? writeFile(filepath, gzip(pending.content))
             : writeFile(filepath, pending.content, "utf8")) {
           delete pendingWrites[filepath];
