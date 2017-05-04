@@ -37,7 +37,7 @@ function createWrapperManager(object, key) {
       const pkgInfo = utils.getPkgInfo(path.dirname(filename));
       const wrapper = pkgInfo === null ? null : findWrapper(object[key], pkgInfo.range);
 
-      // A wrapper should only be null for reify < 0.9.
+      // A wrapper should only be null for reify < 0.10.
       return wrapper === null
         ? func.call(this, param, filename)
         : wrapper.call(this, func, pkgInfo, param, filename);
