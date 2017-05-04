@@ -3,8 +3,8 @@
 const createHash = require("crypto").createHash;
 const data = require("./data.js");
 const fs = require("fs");
-const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
+const utils = require("../lib/utils.js");
 const zlib = require("minizlib");
 
 const FastObject = require("../lib/fast-object.js");
@@ -73,7 +73,7 @@ function fallbackReadFile(filepath, options) {
 
 function getReifyRange(json, name) {
   var entry = json[name];
-  return isObject(entry) && hasOwn.call(entry, "reify")
+  return utils.isObject(entry) && hasOwn.call(entry, "reify")
     ? SemVer.validRange(entry.reify)
     : null;
 }
@@ -82,10 +82,6 @@ function streamToBuffer(stream, data) {
   const result = [];
   stream.on("data", chunk => result.push(chunk)).end(data);
   return Buffer.concat(result);
-}
-
-function toString(value) {
-  return typeof value === "string" ? value : String(value);
 }
 
 function getCacheFileName(filename, cacheKey, pkgInfo) {
@@ -98,9 +94,9 @@ function getCacheFileName(filename, cacheKey, pkgInfo) {
   return createHash("sha1")
     .update(reifySemVer.major + "." + reifySemVer.minor)
     .update("\0")
-    .update(toString(filename))
+    .update(utils.toString(filename))
     .update("\0")
-    .update(toString(cacheKey))
+    .update(utils.toString(cacheKey))
     .update("\0")
     .update(JSON.stringify(pkgInfo.config))
     .update("\0")
@@ -238,7 +234,7 @@ function readdir(dirpath) {
 exports.readdir = readdir;
 
 function readFile(filepath, options) {
-  const encoding = isObject(options) ? options.encoding : options;
+  const encoding = utils.isObject(options) ? options.encoding : options;
 
   if (useReadFileFastPath && encoding === "utf8") {
     try {
