@@ -6,7 +6,8 @@ const fs = require("fs");
 const path = require("path");
 const zlib = require("minizlib");
 
-const FastObject = require("../lib/utils.js").FastObject;
+const FastObject = require("../lib/fast-object.js");
+const PkgInfo = require("./pkg-info.js");
 const SemVer = require("semver");
 
 const DEFAULT_GZIP_CONFIG = {
@@ -300,8 +301,7 @@ function readPkgInfo(dirpath) {
   const cachePath = typeof cacheDir === "string" ? path.join(dirpath, cacheDir) : null;
   const cacheFiles = cachePath === null ? null : readdir(cachePath);
 
-  const pkgInfo = Object.create(null);
-  pkgInfo.cache = Object.create(null);
+  const pkgInfo = new PkgInfo;
   pkgInfo.cachePath = cachePath;
   pkgInfo.config = config;
   pkgInfo.range = range;

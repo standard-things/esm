@@ -5,7 +5,7 @@ const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
 
-const FastObject = require("../lib/utils.js").FastObject;
+const FastObject = require("../lib/fast-object.js");
 const Module = require("module");
 const SemVer = require("semver");
 

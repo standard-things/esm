@@ -1,6 +1,6 @@
 "use strict";
 
-const FastObject = require("../lib/utils.js").FastObject;
+const FastObject = require("../lib/fast-object.js");
 
 // Map absolute file paths to the package info that governs them.
 const pkgInfo = new FastObject;
