@@ -73,4 +73,29 @@ describe("import declarations", () => {
       import { c as x } from "./abc";
     assert.strictEqual(x, "c");
   });
+
+  it("should allow CommonJS modules to set module.exports", () => {
+    import f from "./cjs/module-exports-function.js";
+    assert.strictEqual(typeof f, "function");
+    assert.strictEqual(f(), "ok");
+
+    import n from "./cjs/module-exports-null.js";
+    assert.strictEqual(n, null);
+
+    import o, { a, b, c } from "./cjs/module-exports-object.js";
+    assert.deepEqual(o, { a: 1, b: 2, c: 3 });
+    assert.strictEqual(a, o.a);
+    assert.strictEqual(b, o.b);
+    assert.strictEqual(c, o.c);
+    o.c = 4;
+    module.runModuleSetters.call({ exports: o });
+    assert.strictEqual(c, 4);
+
+    import { value, reset, add } from "./cjs/bridge.js";
+    assert.strictEqual(value, 0);
+    add(10);
+    assert.strictEqual(value, 10);
+    assert.strictEqual(reset(), 0);
+    assert.strictEqual(value, 0);
+  });
 });
