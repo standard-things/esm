@@ -1,7 +1,7 @@
 "use strict";
 
-const cache = require("./cache.js");
 const createHash = require("crypto").createHash;
+const data = require("./data.js");
 const fs = require("fs");
 const path = require("path");
 const zlib = require("minizlib");
@@ -110,25 +110,25 @@ function getCacheFileName(filename, cacheKey, pkgInfo) {
 exports.getCacheFileName = getCacheFileName;
 
 function getPkgInfo(dirpath) {
-  if (dirpath in cache.pkgInfo) {
-    return cache.pkgInfo[dirpath];
+  if (dirpath in data.pkgInfo) {
+    return data.pkgInfo[dirpath];
   }
 
-  cache.pkgInfo[dirpath] = null;
+  data.pkgInfo[dirpath] = null;
   if (path.basename(dirpath) === "node_modules") {
     return null;
   }
 
   const pkgInfo = readPkgInfo(dirpath);
   if (pkgInfo !== null) {
-    return cache.pkgInfo[dirpath] = pkgInfo;
+    return data.pkgInfo[dirpath] = pkgInfo;
   }
 
   const parentPath = path.dirname(dirpath);
   if (parentPath !== dirpath) {
     const pkgInfo = getPkgInfo(parentPath);
     if (pkgInfo !== null) {
-      return cache.pkgInfo[dirpath] = pkgInfo;
+      return data.pkgInfo[dirpath] = pkgInfo;
     }
   }
   return null;

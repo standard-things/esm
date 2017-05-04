@@ -1,7 +1,7 @@
 "use strict";
 
-const cache = require("./cache.js");
 const compile = require("../lib/compiler.js").compile;
+const data = require("./data.js");
 const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
 const path = require("path");
 const utils = require("./utils.js");
@@ -23,7 +23,7 @@ function compileWithFilename(content, options) {
 }
 
 function compileAndCache(content, options) {
-  const pkgInfo = cache.pkgInfo[""];
+  const pkgInfo = data.pkgInfo[""];
   const cacheFilename = utils.getCacheFileName(null, content, pkgInfo);
   const cacheValue = pkgInfo.cache[cacheFilename];
 
