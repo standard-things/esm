@@ -1,10 +1,12 @@
 const assert = require("assert");
 
+module.id = "<repl>";
+
 describe("Node REPL", () => {
+  import "../repl";
   import { createContext } from "vm";
   import { enable } from "../lib/runtime.js";
   import repl from "repl";
-  import "../repl";
 
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true });
