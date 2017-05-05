@@ -31,13 +31,13 @@ const hasOwn = Object.prototype.hasOwnProperty;
 
 const internalModuleReadFile = fsBinding.internalModuleReadFile;
 const internalModuleStat = fsBinding.internalModuleStat;
-const internalStat = SemVer.gte(process.version, "7.7.0") ? fsBinding.stat : void 0;
+const internalStat = fsBinding.stat;
 const internalStatValues = fsBinding.getStatValues;
 
-const useInternalStatValues = typeof internalStatValues === "function";
 let useIsDirectoryFastPath = typeof internalModuleStat === "function";
-let useMtimeFastPath = typeof internalStat === "function";
 let useReadFileFastPath = typeof internalModuleReadFile === "function";
+let useMtimeFastPath = typeof internalStat === "function" &&
+  SemVer.satisfies(process.version, ">=6.10.1<7||>=7.7");
 
 let pendingWriteTimer;
 const pendingWrites = new FastObject;
@@ -46,9 +46,12 @@ const reifyPkgPath = path.join(__dirname, "../package.json");
 const reifyVersion = process.env.REIFY_VERSION || readJSON(reifyPkgPath).version;
 const reifySemVer = SemVer.parse(reifyVersion);
 
-const statValues = useInternalStatValues
-  ? internalStatValues()
-  : new Float64Array(14);
+let statValues;
+if (useMtimeFastPath) {
+  statValues = typeof internalStatValues === "function"
+    ? internalStatValues()
+    : new Float64Array(14);
+}
 
 function fallbackIsDirectory(filepath) {
   try {
