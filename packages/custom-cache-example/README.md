@@ -15,7 +15,7 @@ npm install
 
 ```js
 > require("./index.js")
-{ __esModule: true, name: 'module.js' }
+{ __esModule: true, name: "module.js" }
 > .exit
 ```
 
