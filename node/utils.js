@@ -81,16 +81,14 @@ function getReifyRange(json, name) {
     : null;
 }
 
-function streamToBuffer(stream, data) {
+function streamToBuffer(stream, bufferOrString) {
   const result = [];
-  stream.on("data", chunk => result.push(chunk)).end(data);
+  stream.on("data", chunk => result.push(chunk)).end(bufferOrString);
   return Buffer.concat(result);
 }
 
 function getCacheFileName(filename, cacheKey, pkgInfo) {
-  const ext = typeof filename === "string"
-    ? path.extname(filename)
-    : ".js";
+  const ext = typeof filename === "string" ? path.extname(filename) : ".js";
 
   // Take only the major and minor components of the reify version, so that
   // we don't invalidate the cache every time a patch version is released.
@@ -130,6 +128,7 @@ function getPkgInfo(dirpath) {
       return data.pkgInfo[dirpath] = pkgInfo;
     }
   }
+
   return null;
 }
 
@@ -141,23 +140,23 @@ function getReifySemVer() {
 
 exports.getReifySemVer = getReifySemVer;
 
-function gzip(data, options) {
+function gzip(bufferOrString, options) {
   options = Object.assign(Object.create(null), DEFAULT_GZIP_CONFIG, options);
-  return streamToBuffer(new zlib.Gzip(options), data);
+  return streamToBuffer(new zlib.Gzip(options), bufferOrString);
 }
 
 exports.gzip = gzip;
 
-function gunzip(data, options) {
+function gunzip(bufferOrString, options) {
   options = typeof options === "string" ? { encoding: options } : options;
   options = Object.assign(Object.create(null), options);
 
   const stream = new zlib.Gunzip(options);
   if (options.encoding !== "utf8") {
-    return streamToBuffer(stream, data);
+    return streamToBuffer(stream, bufferOrString);
   }
   let result = "";
-  stream.on("data", chunk => result += chunk).end(data);
+  stream.on("data", chunk => result += chunk).end(bufferOrString);
   return result;
 }
 
@@ -335,9 +334,9 @@ function scheduleWrite(rootPath, relativePath, content) {
 
 exports.scheduleWrite = scheduleWrite;
 
-function writeFile(filepath, data, options) {
+function writeFile(filepath, bufferOrString, options) {
   try {
-    fs.writeFileSync(filepath, data, options);
+    fs.writeFileSync(filepath, bufferOrString, options);
     return true;
   } catch (e) {}
   return false;
