@@ -107,7 +107,7 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   module.runModuleSetters();
 });
 
-[".gz", ".js.gz", ".mjs"].forEach((key) => {
+[".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((key) => {
   createWrapperManager(exts, key);
   addWrapper(exts[key], function(func, module, filename) {
     exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);

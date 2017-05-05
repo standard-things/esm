@@ -45,6 +45,7 @@ function compileAndWrite(content, options) {
     const relativePath = path.relative(rootPath, absolutePath);
     utils.scheduleWrite(rootPath, relativePath, result.code);
   }
+
   return result.code;
 }
 
@@ -57,9 +58,18 @@ function toCompileOptions(options) {
   if (typeof options.parser === "string") {
     compileOptions.parse = dynRequire(options.parser).parse;
   }
-  if (typeof options.filename === "string" &&
-      path.extname(options.filename) === ".mjs") {
-    compileOptions.sourceType = "module";
+
+  if (typeof options.filename === "string") {
+    let ext = path.extname(options.filename);
+
+    if (ext === ".gz") {
+      ext = path.extname(path.basename(options.filename, ext));
+    }
+
+    if (ext === ".mjs") {
+      compileOptions.sourceType = "module";
+    }
   }
+
   return Object.assign(compileOptions, options.compileOptions);
 }
