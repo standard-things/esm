@@ -108,6 +108,11 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
 });
 
 [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((key) => {
+  if (typeof exts[key] !== "function") {
+    // Mimic the built-in Node behavior of treating files with unrecognized
+    // extensions as .js.
+    exts[key] = exts[".js"].reified.raw;
+  }
   createWrapperManager(exts, key);
   addWrapper(exts[key], function(func, module, filename) {
     exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
