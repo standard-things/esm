@@ -5,8 +5,10 @@ const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
+const wrappers = require("./wrappers.js");
+const createWrapperManager = wrappers.createWrapperManager;
+const addWrapper = wrappers.addWrapper;
 
-const FastObject = require("../lib/fast-object.js");
 const Module = require("module");
 const SemVer = require("semver");
 
@@ -14,55 +16,12 @@ const exts = Module._extensions;
 const Mp = Module.prototype;
 
 let compileOptions;
-const reifySemVer = utils.getReifySemVer();
-const reifyVersion = reifySemVer.version;
 
 module.exports = exports = (options) => {
   if (compileOptions === void 0) {
     compileOptions = Object.assign({}, options);
   }
 };
-
-function addWrapper(func, wrapper) {
-  const reified = func.reified;
-  if (typeof reified.wrappers[reifyVersion] !== "function") {
-    reified.versions.push(reifyVersion);
-    reified.wrappers[reifyVersion] = wrapper;
-  }
-}
-
-function createWrapperManager(object, key) {
-  const func = object[key];
-  if (! isManaged(func)) {
-    (object[key] = function(param, filename) {
-      const pkgInfo = utils.getPkgInfo(path.dirname(filename));
-      const wrapper = pkgInfo === null ? null : findWrapper(object[key], pkgInfo.range);
-
-      // A wrapper should only be null for reify < 0.10.
-      return wrapper === null
-        ? func.call(this, param, filename)
-        : wrapper.call(this, func, pkgInfo, param, filename);
-    }).reified = createWrapperMap(func);
-  }
-}
-
-function createWrapperMap(func) {
-  const map = new FastObject;
-  map.raw = func;
-  map.versions = [];
-  map.wrappers = new FastObject;
-  return map;
-}
-
-function findWrapper(func, range) {
-  const reified = func.reified;
-  const version = SemVer.maxSatisfying(reified.versions, range);
-  return version === null ? null : reified.wrappers[version];
-}
-
-function isManaged(func) {
-  return typeof func === "function" && isObject(func.reified);
-}
 
 createWrapperManager(exts, ".js");
 
