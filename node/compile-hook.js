@@ -9,6 +9,9 @@ const wrappers = require("./wrappers.js");
 const ensureWrapperMap = wrappers.ensureWrapperMap;
 const addWrapper = wrappers.addWrapper;
 
+const reifySemVer = utils.getReifySemVer();
+const reifyVersion = reifySemVer.version;
+
 const Module = require("module");
 const SemVer = require("semver");
 
@@ -73,7 +76,8 @@ addWrapper(exts, ".js", function(func, pkgInfo, module, filename) {
     exts[key] = jsWrapperMap.raw;
   }
 
-  addWrapper(exts, key, function(func, module, filename) {
-    jsWrapperMap.wrappers[reifyVersion].call(this, module, filename);
+  addWrapper(exts, key, function(func, pkgInfo, param, filename) {
+    jsWrapperMap.wrappers[reifyVersion]
+      .call(this, func, pkgInfo, param, filename);
   });
 });
