@@ -2,7 +2,7 @@
   "name": "babel-plugin-transform-es2015-modules-reify",
   "author": "Ben Newman <ben@benjamn.com>",
   "description": "Babel plugin for transforming ES2015 import/export to Reify's module.{import,export} API",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "main": "index.js",
   "repository": {
     "type": "git",
