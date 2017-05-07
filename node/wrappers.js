@@ -21,9 +21,10 @@ exports.addWrapper = addWrapper;
 function createWrapperManager(object, key) {
   const func = object[key];
   if (! isManaged(func)) {
-    (object[key] = function(param, filename) {
+    (object[key] = function wrapperFunc(param, filename) {
       const pkgInfo = utils.getPkgInfo(path.dirname(filename));
-      const wrapper = pkgInfo === null ? null : findWrapper(object[key], pkgInfo.range);
+      const wrapper = pkgInfo === null ? null :
+        findWrapper(wrapperFunc, pkgInfo.range);
 
       // A wrapper should only be null for reify < 0.10.
       return wrapper === null
