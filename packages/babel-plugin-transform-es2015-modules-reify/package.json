@@ -25,6 +25,6 @@
   },
   "dependencies": {
     "babel-types": "^6.24.1",
-    "reify": "^0.9.0"
+    "reify": "^0.10.0"
   }
 }
