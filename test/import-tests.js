@@ -2,16 +2,16 @@ const assert = require("assert");
 
 describe("import declarations", () => {
   it("should work in nested scopes", () => {
-    import { name, id } from "./name";
+    import { name, id } from "./import/name";
     assert.strictEqual(name, "name.js");
     assert.strictEqual(id.split("/").pop(), "name.js");
   });
 
   it("should cope with dependency cycles", () => {
-    import { check as aCheck } from "./cycle-a";
+    import { check as aCheck } from "./import/cycle-a";
     aCheck();
 
-    import { check as bCheck } from "./cycle-a";
+    import { check as bCheck } from "./import/cycle-a";
     bCheck();
   });
 
