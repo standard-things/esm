@@ -6,6 +6,8 @@ const runtime = require("../lib/runtime.js");
 const setOptions = require("../node/compile-hook.js");
 const vm = require("vm");
 
+const reifySymbol = Symbol.for("__reify");
+
 let compileOptions;
 
 module.exports = exports = (options) => {
@@ -20,11 +22,11 @@ module.exports = exports = (options) => {
 if (isObject(module.parent) && module.parent.id === "<repl>") {
   const createScript = vm.createScript;
 
-  if (typeof createScript.reified !== "function") {
+  if (typeof createScript[reifySymbol] !== "function") {
     (vm.createScript = function (code, options) {
       code = compile(code, { compileOptions });
       return createScript.call(this, code, options);
-    }).reified = createScript;
+    })[reifySymbol] = createScript;
   }
   runtime.enable(module.parent);
 }
