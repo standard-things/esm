@@ -28,6 +28,7 @@ describe("export declarations", () => {
   it("should tolerate mutual * exports", () => {
     import { a as aa, b as ab } from "./export/all-mutual-a.js";
     import { a as ba, b as bb } from "./export/all-mutual-b.js";
+
     assert.strictEqual(aa, "a");
     assert.strictEqual(ab, "b");
     assert.strictEqual(ba, "a");
@@ -50,6 +51,7 @@ describe("export declarations", () => {
 
   it("should allow named re-exports", () => {
     import { a, c, v, si } from "./export-some.js";
+
     assert.strictEqual(a, "a");
     assert.strictEqual(c(), "c");
     assert.strictEqual(v, "b");
@@ -127,9 +129,7 @@ describe("export declarations", () => {
     assert.strictEqual(number, 42);
 
     import object from "./export/default/object";
-    assert.deepEqual(object, {
-      foo: 42
-    });
+    assert.deepEqual(object, { foo: 42 });
 
     import array from "./export/default/array";
     assert.deepEqual(array, [1, 2, 3]);
@@ -211,11 +211,7 @@ describe("export declarations", () => {
     assert.strictEqual(c, "c");
     assert.strictEqual(ay, "a");
     assert.strictEqual(bee, "b");
-    assert.deepEqual(foo, {
-      a: "a",
-      b: "b",
-      c: "c"
-    });
+    assert.deepEqual(foo, { a: "a", b: "b", c: "c" });
   });
 
   it("should support export-from extensions", () => {
@@ -253,9 +249,7 @@ describe("export declarations", () => {
 
   it("should support export { default } from ... syntax", () => {
     import object from "./export/default/from";
-    assert.deepEqual(object, {
-      foo: 42
-    });
+    assert.deepEqual(object, { foo: 42 });
   });
 
   it("should support switch-case nested imports", () => {
@@ -292,6 +286,7 @@ describe("export declarations", () => {
   (canUseDestructuring ? it : xit)(
   "should invoke destructuring setters later", () => {
     import { x, y, swap } from "./export/swap-later.js";
+
     assert.strictEqual(x, 1);
     assert.strictEqual(y, 2);
     swap();
@@ -302,6 +297,7 @@ describe("export declarations", () => {
   (canUseDestructuring ? it : xit)(
   "should not crash on array patterns with holes", () => {
     import { a, b, update } from "./export/array-pattern-holes.js";
+
     assert.strictEqual(a, 1);
     assert.strictEqual(b, 2);
     assert.strictEqual(update(3, 4, 5), 8);
