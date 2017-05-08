@@ -2,7 +2,7 @@ const assert = require("assert");
 
 describe("module.runModuleSetters", () => {
   it("should be called after eval(...)", () => {
-    import { value, run } from "./eval";
+    import { value, run } from "./setter/eval";
 
     assert.strictEqual(value, "original");
     const result = run('localValue = "modified"');
