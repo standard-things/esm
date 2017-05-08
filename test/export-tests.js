@@ -34,6 +34,20 @@ describe("export declarations", () => {
     assert.strictEqual(bb, "b");
   });
 
+  it("should allow specifiers that shadow Object.prototype", () => {
+    import {
+      constructor,
+      hasOwnProperty,
+      toString,
+      valueOf
+    } from "./export/shadowed.js";
+
+    assert.strictEqual(constructor, "a");
+    assert.strictEqual(hasOwnProperty, "b");
+    assert.strictEqual(toString, "c");
+    assert.strictEqual(valueOf, "d");
+  });
+
   it("should allow named re-exports", () => {
     import { a, c, v, si } from "./export-some.js";
     assert.strictEqual(a, "a");
