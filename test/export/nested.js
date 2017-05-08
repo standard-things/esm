@@ -1,7 +1,7 @@
 export function outer() {
-  import { a as ay } from "../abc";
-  import { b as bee } from "../abc";
-  import { c as see } from "../abc";
+  import { a as ay } from "../misc/abc";
+  import { b as bee } from "../misc/abc";
+  import { c as see } from "../misc/abc";
   return [
     ay,
     bee,

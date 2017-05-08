@@ -226,7 +226,7 @@ describe("export declarations", () => {
       b as _b,
       b as _c,
       c as _d,
-    } from "./abc";
+    } from "./misc/abc";
 
     assert.strictEqual(def, def1);
     assert.strictEqual(def, def2);
@@ -258,10 +258,10 @@ describe("export declarations", () => {
     for (let i = 0; i < 2; ++i) {
       switch (i) {
       case 0:
-        import { a as x } from "./abc";
+        import { a as x } from "./misc/abc";
         break;
       case 1:
-        import { b as x } from "./abc";
+        import { b as x } from "./misc/abc";
         break;
       }
 

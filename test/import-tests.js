@@ -16,10 +16,10 @@ describe("import declarations", () => {
   });
 
   it("should support combinations of import styles", () => {
-    import * as abc1 from "./abc";
-    import abc2, * as abc3 from "./abc";
-    import { default as abc4 } from "./abc";
-    import abc5, { a as ay, b as bee, c } from "./abc";
+    import * as abc1 from "./misc/abc";
+    import abc2, * as abc3 from "./misc/abc";
+    import { default as abc4 } from "./misc/abc";
+    import abc5, { a as ay, b as bee, c } from "./misc/abc";
 
     assert.deepEqual(abc1, {
       a: "a",
@@ -39,7 +39,7 @@ describe("import declarations", () => {
   });
 
   it("should allow same symbol as different locals", () => {
-    import { a as x, a as y } from "./abc";
+    import { a as x, a as y } from "./misc/abc";
     assert.strictEqual(x, "a");
     assert.strictEqual(y, "a");
   });
@@ -47,9 +47,9 @@ describe("import declarations", () => {
   it("should support braceless-if nested imports", () => {
     assert.strictEqual(typeof x, "undefined");
     for (let i = 0; i < 3; ++i) {
-      if (i === 0) import { a as x } from "./abc";
-      else if (i === 1) import { b as x } from "./abc";
-      else import { c as x } from "./abc";
+      if (i === 0) import { a as x } from "./misc/abc";
+      else if (i === 1) import { b as x } from "./misc/abc";
+      else import { c as x } from "./misc/abc";
       assert.strictEqual(x, ["a", "b", "c"][i]);
     }
     assert.strictEqual(x, "c");
@@ -57,20 +57,20 @@ describe("import declarations", () => {
 
   it("should support braceless-while nested imports", () => {
     var i = 0, x;
-    while (i++ === 0) import { a as x } from "./abc";
+    while (i++ === 0) import { a as x } from "./misc/abc";
     assert.strictEqual(x, "a");
   });
 
   it("should support braceless-do-while nested imports", () => {
     var x;
-    do import { b as x } from "./abc";
+    do import { b as x } from "./misc/abc";
     while (false);
     assert.strictEqual(x, "b");
   });
 
   it("should support braceless-for-in nested imports", () => {
     for (var x in { a: 123 })
-      import { c as x } from "./abc";
+      import { c as x } from "./misc/abc";
     assert.strictEqual(x, "c");
   });
 

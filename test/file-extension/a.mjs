@@ -1,1 +1,1 @@
-export { a as default } from "../abc.js";
+export { a as default } from "../misc/abc.js";
