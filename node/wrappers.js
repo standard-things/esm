@@ -8,10 +8,7 @@ const utils = require("./utils.js");
 const reifySemVer = utils.getReifySemVer();
 const reifyVersion = reifySemVer.version;
 const hasOwn = Object.prototype.hasOwnProperty;
-
-function getSymbolForKey(key) {
-  return Symbol.for("reifyWrapperMap$" + key);
-}
+const reifySymbol = Symbol.for("__reify");
 
 function addWrapper(object, key, wrapper) {
   const map = ensureWrapperMap(object, key);
@@ -40,10 +37,14 @@ function ensureWrapperMap(object, key) {
         : wrapper.call(this, func, pkgInfo, param, filename);
     };
 
-    // Store the wrapper map on the object rather than on the function so
-    // that other code can modify the same property without interfering
-    // with our wrapper logic.
-    object[getSymbolForKey(key)] = map;
+    const mapsByKey = hasOwn.call(object, reifySymbol)
+      ? object[reifySymbol]
+      : object[reifySymbol] = new FastObject;
+
+    // Store the wrapper map as object[reifySymbol][key] rather than on
+    // the function, so that other code can modify the same property
+    // without interfering with our wrapper logic.
+    mapsByKey[key] = map;
   }
 
   return map;
@@ -52,13 +53,16 @@ function ensureWrapperMap(object, key) {
 exports.ensureWrapperMap = ensureWrapperMap;
 
 function getWrapperMap(object, key) {
-  const symbol = getSymbolForKey(key);
-  if (hasOwn.call(object, symbol)) {
-    const map = object[symbol];
-    if (isObject(map)) {
-      return map;
+  if (hasOwn.call(object, reifySymbol)) {
+    const mapsByKey = object[reifySymbol];
+    if (hasOwn.call(mapsByKey, key)) {
+      const map = mapsByKey[key];
+      if (isObject(map)) {
+        return map;
+      }
     }
   }
+
   return null;
 }
 
