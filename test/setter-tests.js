@@ -22,12 +22,12 @@ describe("parent setters", () => {
   });
 
   it("should not be called if replaced", () => {
-    import { value, reset, add } from "./live.js";
+    import { value, reset, add } from "./misc/live.js";
 
     let firstCallCount = 0;
     let secondCallCount = 0;
 
-    module.importSync("./live.js", {
+    module.importSync("./misc/live.js", {
       value: (v) => {
         ++firstCallCount;
         value = "first:" + v;
@@ -41,7 +41,7 @@ describe("parent setters", () => {
     assert.strictEqual(value, "first:3");
     assert.strictEqual(secondCallCount, 0);
 
-    module.importSync("./live.js", {
+    module.importSync("./misc/live.js", {
       value: (v) => {
         ++secondCallCount;
         value = "second:" + v;

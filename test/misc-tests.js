@@ -2,7 +2,7 @@ const assert = require("assert");
 
 describe("spec compliance", () => {
   it("should establish live binding of values", () => {
-    import { value, reset, add } from "./live";
+    import { value, reset, add } from "./misc/live";
     reset();
     assert.equal(value, 0);
     add(2);
@@ -10,8 +10,8 @@ describe("spec compliance", () => {
   });
 
   it("should execute modules in the correct order", () => {
-    import { getLog } from "./order-tracker";
-    import "./order-c";
+    import { getLog } from "./misc/order-tracker";
+    import "./misc/order-c";
     assert.deepEqual(getLog(), ["a", "b", "c"]);
   });
 
