@@ -3,6 +3,7 @@ const assert = require("assert");
 describe("module.runModuleSetters", () => {
   it("should be called after eval(...)", () => {
     import { value, run } from "./eval";
+
     assert.strictEqual(value, "original");
     const result = run('localValue = "modified"');
     assert.strictEqual(value, result);
@@ -12,8 +13,9 @@ describe("module.runModuleSetters", () => {
 
 describe("parent setters", () => {
   it("should be run when children update exports", () => {
-    import { c } from "./setters/parent";
-    import { increment } from "./setters/grandchild";
+    import { c } from "./setter/parent";
+    import { increment } from "./setter/grandchild";
+
     assert.strictEqual(c, 0);
     increment();
     assert.strictEqual(c, 1);
