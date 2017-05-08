@@ -6,7 +6,7 @@ const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
 const wrappers = require("./wrappers.js");
-const createWrapperManager = wrappers.createWrapperManager;
+const ensureWrapperMap = wrappers.ensureWrapperMap;
 const addWrapper = wrappers.addWrapper;
 
 const Module = require("module");
@@ -23,9 +23,9 @@ module.exports = exports = (options) => {
   }
 };
 
-createWrapperManager(exts, ".js");
+const jsWrapperMap = ensureWrapperMap(exts, ".js");
 
-addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
+addWrapper(exts, ".js", function(func, pkgInfo, module, filename) {
   const cachePath = pkgInfo.cachePath;
   if (cachePath === null) {
     return func.call(this, module, filename);
@@ -70,10 +70,10 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   if (typeof exts[key] !== "function") {
     // Mimic the built-in Node behavior of treating files with unrecognized
     // extensions as .js.
-    exts[key] = exts[".js"].reified.raw;
+    exts[key] = jsWrapperMap.raw;
   }
-  createWrapperManager(exts, key);
-  addWrapper(exts[key], function(func, module, filename) {
-    exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
+
+  addWrapper(exts, key, function(func, module, filename) {
+    jsWrapperMap.wrappers[reifyVersion].call(this, module, filename);
   });
 });
