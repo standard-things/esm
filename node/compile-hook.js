@@ -5,8 +5,10 @@ const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
+const wrappers = require("./wrappers.js");
+const ensureWrapperMap = wrappers.ensureWrapperMap;
+const addWrapper = wrappers.addWrapper;
 
-const FastObject = require("../lib/fast-object.js");
 const Module = require("module");
 const SemVer = require("semver");
 
@@ -14,8 +16,6 @@ const exts = Module._extensions;
 const Mp = Module.prototype;
 
 let compileOptions;
-const reifySemVer = utils.getReifySemVer();
-const reifyVersion = reifySemVer.version;
 
 module.exports = exports = (options) => {
   if (compileOptions === void 0) {
@@ -23,50 +23,9 @@ module.exports = exports = (options) => {
   }
 };
 
-function addWrapper(func, wrapper) {
-  const reified = func.reified;
-  if (typeof reified.wrappers[reifyVersion] !== "function") {
-    reified.versions.push(reifyVersion);
-    reified.wrappers[reifyVersion] = wrapper;
-  }
-}
+const jsWrapperMap = ensureWrapperMap(exts, ".js");
 
-function createWrapperManager(object, key) {
-  const func = object[key];
-  if (! isManaged(func)) {
-    (object[key] = function(param, filename) {
-      const pkgInfo = utils.getPkgInfo(path.dirname(filename));
-      const wrapper = pkgInfo === null ? null : findWrapper(object[key], pkgInfo.range);
-
-      // A wrapper should only be null for reify < 0.10.
-      return wrapper === null
-        ? func.call(this, param, filename)
-        : wrapper.call(this, func, pkgInfo, param, filename);
-    }).reified = createWrapperMap(func);
-  }
-}
-
-function createWrapperMap(func) {
-  const map = new FastObject;
-  map.raw = func;
-  map.versions = [];
-  map.wrappers = new FastObject;
-  return map;
-}
-
-function findWrapper(func, range) {
-  const reified = func.reified;
-  const version = SemVer.maxSatisfying(reified.versions, range);
-  return version === null ? null : reified.wrappers[version];
-}
-
-function isManaged(func) {
-  return typeof func === "function" && isObject(func.reified);
-}
-
-createWrapperManager(exts, ".js");
-
-addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
+addWrapper(exts, ".js", function(func, pkgInfo, module, filename) {
   const cachePath = pkgInfo.cachePath;
   if (cachePath === null) {
     return func.call(this, module, filename);
@@ -111,10 +70,10 @@ addWrapper(exts[".js"], function(func, pkgInfo, module, filename) {
   if (typeof exts[key] !== "function") {
     // Mimic the built-in Node behavior of treating files with unrecognized
     // extensions as .js.
-    exts[key] = exts[".js"].reified.raw;
+    exts[key] = jsWrapperMap.raw;
   }
-  createWrapperManager(exts, key);
-  addWrapper(exts[key], function(func, module, filename) {
-    exts[".js"].reified.wrappers[reifyVersion].call(this, module, filename);
+
+  addWrapper(exts, key, function(func, module, filename) {
+    jsWrapperMap.wrappers[reifyVersion].call(this, module, filename);
   });
 });
