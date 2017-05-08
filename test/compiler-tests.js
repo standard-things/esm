@@ -40,12 +40,12 @@ describe("compiler", () => {
   });
 
   it("should preserve line numbers", () => {
-    import check from "./lines.js";
+    import check from "./compiler/lines.js";
     check();
   });
 
   it('should not hoist above "use strict"', () => {
-    import { check } from "./strict";
+    import { check } from "./compiler/strict";
     assert.strictEqual(check(), true);
   });
 

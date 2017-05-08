@@ -2,7 +2,7 @@ export function check() {
   "use strict";
 
   import { strictEqual } from "assert";
-  import { a, b, c } from "./abc";
+  import { a, b, c } from "../abc";
 
   strictEqual(a, "a");
   strictEqual(b, "b");
