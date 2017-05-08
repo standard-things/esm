@@ -5,12 +5,7 @@ const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
 const utils = require("./utils.js");
-const wrappers = require("./wrappers.js");
-const ensureWrapperMap = wrappers.ensureWrapperMap;
-const addWrapper = wrappers.addWrapper;
-
-const reifySemVer = utils.getReifySemVer();
-const reifyVersion = reifySemVer.version;
+const wrapper = require("./wrapper.js");
 
 const Module = require("module");
 const SemVer = require("semver");
@@ -26,9 +21,7 @@ module.exports = exports = (options) => {
   }
 };
 
-const jsWrapperMap = ensureWrapperMap(exts, ".js");
-
-addWrapper(exts, ".js", function(func, pkgInfo, module, filename) {
+wrapper.add(exts, ".js", function(func, pkgInfo, module, filename) {
   const cachePath = pkgInfo.cachePath;
   if (cachePath === null) {
     return func.call(this, module, filename);
@@ -69,15 +62,18 @@ addWrapper(exts, ".js", function(func, pkgInfo, module, filename) {
   module.runModuleSetters();
 });
 
+const extsJsMap = wrapper.getMap(exts, ".js");
+const extsJsRaw = extsJsMap.raw;
+const extJsWrapper = extsJsMap.wrappers[utils.getReifySemVer()];
+
 [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((key) => {
   if (typeof exts[key] !== "function") {
     // Mimic the built-in Node behavior of treating files with unrecognized
     // extensions as .js.
-    exts[key] = jsWrapperMap.raw;
+    exts[key] = extsJsRaw;
   }
 
-  addWrapper(exts, key, function(func, pkgInfo, param, filename) {
-    jsWrapperMap.wrappers[reifyVersion]
-      .call(this, func, pkgInfo, param, filename);
+  wrapper.add(exts, key, function(func, pkgInfo, param, filename) {
+    return extJsWrapper.call(this, func, pkgInfo, param, filename);
   });
 });
