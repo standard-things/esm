@@ -4,7 +4,7 @@ describe("export declarations", () => {
   it("should allow * exports", () => {
     import def, {
       a, b, c as d,
-    } from "./export-all.js";
+    } from "./export/all.js";
 
     assert.strictEqual(a, "a");
     assert.strictEqual(b, "b");
@@ -15,7 +15,7 @@ describe("export declarations", () => {
   it("should allow re-exporting import * alongside export *", () => {
     import {
       Abc, d, e, f,
-    } from "./export-all-multiple.js";
+    } from "./export/all-multiple.js";
 
     assert.strictEqual(Abc.a, "a");
     assert.strictEqual(Abc.b, "b");
@@ -50,7 +50,7 @@ describe("export declarations", () => {
   });
 
   it("should allow named re-exports", () => {
-    import { a, c, v, si } from "./export-some.js";
+    import { a, c, v, si } from "./export/some.js";
 
     assert.strictEqual(a, "a");
     assert.strictEqual(c(), "c");
@@ -59,17 +59,17 @@ describe("export declarations", () => {
   });
 
   it("should be able to contain import declarations", () => {
-    import { outer } from "./nested";
+    import { outer } from "./export/nested";
     assert.deepEqual(outer(), ["a", "b", "c"]);
   });
 
   it("should support default declarations", () => {
-    import g, { check } from "./default-function";
+    import g, { check } from "./export/default-function";
     check(g);
   });
 
   it("should support default expressions", () => {
-    import count from "./default-expression";
+    import count from "./export/default-expression";
     assert.strictEqual(count, 1);
   });
 

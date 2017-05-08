@@ -2,7 +2,7 @@ function fun() {
   return true;
 }
 
-import { callFun } from "./export-cycle-b";
+import { callFun } from "./cycle-b";
 
 export default callFun();
 

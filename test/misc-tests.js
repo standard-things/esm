@@ -16,7 +16,7 @@ describe("spec compliance", () => {
   });
 
   it("should bind exports before the module executes", () => {
-    import value from "./export-cycle-a";
+    import value from "./export/cycle-a";
     assert.equal(value, true);
   });
 });

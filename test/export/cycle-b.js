@@ -1,4 +1,4 @@
-import { fun } from "./export-cycle-a";
+import { fun } from "./cycle-a";
 
 export function callFun() {
   return fun();
