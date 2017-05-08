@@ -19,15 +19,19 @@ describe("compiler", () => {
   });
 
   it("should not be enabled for nested node_modules", () => {
+    let error;
     let threw = true;
+
     try {
       import "disabled";
       threw = false;
     } catch (e) {
-      assert.ok(e instanceof SyntaxError);
-      assert.ok(/unexpected/i.test(e.message));
+      error = e;
     }
-    assert.strictEqual(threw, true);
+
+    assert.ok(threw);
+    assert.ok(error instanceof SyntaxError);
+    assert.ok(/unexpected/i.test(error.message));
   });
 
   it("should be enabled for packages that depend on reify", () => {
