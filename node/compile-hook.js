@@ -8,9 +8,7 @@ const utils = require("./utils.js");
 const wrapper = require("./wrapper.js");
 
 const Module = require("module");
-
 const exts = Module._extensions;
-const Mp = Module.prototype;
 
 let compileOptions;
 
