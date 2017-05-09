@@ -39,12 +39,12 @@ examples. While you do not have to write this API by hand, it is designed
 to be easily human readable and writable, in part because that makes it
 easier to explain.
 
-I will explain the `Module.prototype.importSync` method first, then the
+I will explain the `Module.prototype.watch` method first, then the
 `Module.prototype.export` method after that. Note that this `Module` is
 the constructor of the CommonJS `module` object, and the `import` and
 `export` methods are custom additions to `Module.prototype`.
 
-### `module.importSync(id, setters)`
+### `module.watch(require(id), setters)`
 
 Here we go:
 
@@ -57,7 +57,7 @@ becomes
 ```js
 // Local symbols are declared as ordinary variables.
 let a, b, d;
-module.importSync("./module", {
+module.watch(require("./module"), {
   // The keys of this object literal are the names of exported symbols.
   // The values are setter functions that take new values and update the
   // local variables.
@@ -67,13 +67,12 @@ module.importSync("./module", {
 });
 ```
 
-All setter functions are called synchronously before `module.importSync`
-returns (hence the `importSync` name), with whatever values are
-immediately available. However, when there are import cycles, some setter
-functions may be called again, when the exported values change. Calling
-these setter functions one or more times is the key to implementing [*live
-bindings*](http://www.2ality.com/2015/07/es6-module-exports.html), as
-required by the ECMAScript 2015 specification.
+All setter functions are called synchronously before `module.watch` returns,
+with whatever values are immediately available. However, when there are
+import cycles, some setter functions may be called again, when the exported
+values change. Calling these setter functions one or more times is the key
+to implementing [*live bindings*](http://www.2ality.com/2015/07/es6-module-exports.html),
+as required by the ECMAScript 2015 specification.
 
 While most setter functions only need to know the value of the exported
 symbol, the name of the symbol is also provided as a second parameter
@@ -86,7 +85,7 @@ import * as utils from "./utils";
 becomes
 ```js
 const utils = Object.create(null);
-module.importSync("./utils", {
+module.watch(require("./utils"), {
   "*": (value, name) => {
     utils[name] = value;
   }
@@ -95,10 +94,10 @@ module.importSync("./utils", {
 
 The setter function for `*` imports is called once for each symbol name
 exported from the `"./utils"` module. If any individual value happens to
-change after the call to `module.importSync`, the setter function will be
+change after the call to `module.watch`, the setter function will be
 called again to update that particular value. This approach ensures that
 the actual `exports` object is never exposed to the caller of
-`module.importSync`.
+`module.watch`.
 
 Notice that this compilation strategy works equally well no matter where
 the `import` declaration appears:
@@ -113,7 +112,7 @@ becomes
 ```js
 if (condition) {
   let b;
-  module.importSync("./c", {
+  module.watch(require("./c"), {
     a: value => { b = value; }
   });
   console.log(b);
@@ -129,13 +128,12 @@ What about `export` declarations? One option would be to transform them into
 CommonJS code that updates the `exports` object, since interoperability
 with Node and CommonJS is certainly a goal of this approach.
 
-However, if `Module.prototype.importSync` takes a module identifier and a
-map of *setter* functions, then it seems natural to have a
-`Module.prototype.export` method that registers *getter* functions. Given
-these getter functions, whenever `module.importSync(id, ...)` is called by
-a parent module, the getters for the `id` module will run, updating its
-`module.exports` object, so that the `module.importSync` method has access
-to the latest exported values.
+However, if `Module.prototype.watch` takes a `require(id)` object and a map
+of *setter* functions, then it seems natural for `Module.prototype.export`
+to be method that registers *getter* functions. Given these getter functions,
+whenever `module.watch(require(id), ...)` is called by a parent module, the
+getters for the `id` module will run, updating its `module.exports` object, so
+that the `module.watch` method has access to the latest exported values.
 
 The `module.export` method is called with a single object literal whose
 keys are exported symbol names and whose values are getter functions for
@@ -157,7 +155,7 @@ const a = "a", b = "b", ...;
 ```
 
 This code registers getter functions for the variables `a`, `b`, ..., so
-that `module.importSync` can easily retrieve the latest values of those
+that `module.watch` can easily retrieve the latest values of those
 variables at any time. It's important that we register getter functions
 rather than storing computed values, so that other modules always can
 import the newest values.
@@ -179,15 +177,16 @@ let c = 123;
 Note that the `module.export` call is "hoisted" to the top of the block
 where it appears. This is safe because the getter functions work equally
 well anywhere in the scope where the exported variable is declared, and
-important to ensure getters are registered as early as possible.
+a good idea because the hoisting ensures the getters are registered as
+early as possible.
 
 What about `export default` declarations? It would be a mistake to defer
 evaluation of the `default` expression until later, so wrapping it in a
 getter function is not exactly what we want.
 
-The important point to understand here is that `module.importSync` does
+The important point to understand here is that `module.watch` does
 not assume a getter function has been registered by `module.export` for
-every imported symbol. Instead, `parentModule.importSync` only really
+every imported symbol. Instead, `parentModule.watch` only really
 cares about the contents of `childModule.exports`. While the
 `childModule.export` method helps keep `childModule.exports` up to date,
 that level of sophistication isn't strictly necessary in every situation,
@@ -275,7 +274,7 @@ export { a, b as c } from "./module";
 ```
 becomes
 ```js
-module.importSync("./module", {
+module.watch(require("./module"), {
   a: value => { exports.a = value; },
   b: value => { exports.c = value; },
 });
@@ -288,7 +287,7 @@ export * from "./module";
 ```
 becomes
 ```js
-module.importSync("./module", {
+module.watch(require("./module"), {
   "*": (value, name) => {
     exports[name] = value;
   }
@@ -302,7 +301,7 @@ export * as ns from "./module";
 becomes
 ```js
 exports.ns = Object.create(null);
-module.importSync("./module", {
+module.watch(require("./module"), {
   "*": (value, name) => {
     exports.ns[name] = value;
   }
@@ -315,7 +314,7 @@ export a, {b, c as d} from "./module";
 ```
 becomes
 ```js
-module.importSync("./module", {
+module.watch(require("./module"), {
   default: value => { exports.a = value },
   b: value => { exports.b = value },
   c: value => { exports.d = value }
