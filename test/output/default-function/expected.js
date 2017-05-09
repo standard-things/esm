@@ -1,4 +1,4 @@
-"use strict";module.export({default:()=>f,check:()=>check});var strictEqual;module.importSync("assert",{strictEqual:function(v){strictEqual=v}},0);
+"use strict";module.export({default:()=>f,check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual:function(v){strictEqual=v}},0);
 
 const obj = {};
 

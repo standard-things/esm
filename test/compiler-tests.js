@@ -86,9 +86,9 @@ describe("compiler", () => {
     assert.strictEqual(ast.body.length - firstIndex, 6);
 
     isVarDecl(ast.body[firstIndex + 0], ["foo"]);
-    isCallExprStmt(ast.body[firstIndex + 1], "module", "importSync");
+    isCallExprStmt(ast.body[firstIndex + 1], "module", "watch");
     isVarDecl(ast.body[firstIndex + 2], ["bar"]);
-    isCallExprStmt(ast.body[firstIndex + 3], "module", "importSync");
+    isCallExprStmt(ast.body[firstIndex + 3], "module", "watch");
     isCallExprStmt(ast.body[firstIndex + 4], "console", "log");
     isCallExprStmt(ast.body[firstIndex + 5], "module", "export");
   });
