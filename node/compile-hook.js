@@ -8,7 +8,6 @@ const utils = require("./utils.js");
 const wrapper = require("./wrapper.js");
 
 const Module = require("module");
-const SemVer = require("semver");
 
 const exts = Module._extensions;
 const Mp = Module.prototype;

@@ -5,11 +5,10 @@ const path = require("path");
 const utils = require("./utils.js");
 
 const FastObject = require("../lib/fast-object.js");
-const SemVer = require("semver");
 
 const hasOwn = Object.prototype.hasOwnProperty;
-const reifySymbol = Symbol.for("__reify");
 const reifySemVer = utils.getReifySemVer();
+const reifySymbol = Symbol.for("__reify");
 const reifyVersion = reifySemVer.version;
 
 function add(object, key, wrapper) {
