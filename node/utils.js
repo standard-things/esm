@@ -37,7 +37,7 @@ const internalStatValues = fsBinding.getStatValues;
 let useIsDirectoryFastPath = typeof internalModuleStat === "function";
 let useReadFileFastPath = typeof internalModuleReadFile === "function";
 let useMtimeFastPath = typeof internalStat === "function" &&
-  SemVer.satisfies(process.version, ">=6.10.1<7||>=7.7");
+  SemVer.satisfies(process.version, "^6.10.1||^7.7");
 
 let pendingWriteTimer;
 const pendingWrites = new FastObject;
