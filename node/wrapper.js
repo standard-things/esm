@@ -44,7 +44,7 @@ exports.createManager = createManager;
 
 function createMap(object, key) {
   const map = new FastObject;
-  map.raw = object[key];
+  map.raw = getRaw(object[key]);
   map.versions = [];
   map.wrappers = new FastObject;
 
@@ -92,6 +92,14 @@ function getMap(object, key) {
 }
 
 exports.getMap = getMap;
+
+function getRaw(func) {
+  return typeof func === "function" && hasOwn.call(func, reifySymbol)
+    ? func[reifySymbol]
+    : func;
+}
+
+exports.getRaw = getRaw;
 
 function getStore(object) {
   return hasOwn.call(object, reifySymbol)
