@@ -39,6 +39,8 @@ let useReadFileFastPath = typeof internalModuleReadFile === "function";
 let useMtimeFastPath = typeof internalStat === "function" &&
   SemVer.satisfies(process.version, "^6.10.1||^7.7");
 
+const maxSatisfyingCache = new FastObject;
+
 let pendingWriteTimer;
 const pendingWrites = new FastObject;
 
@@ -177,6 +179,16 @@ function isDirectory(thepath) {
 }
 
 exports.isDirectory = isDirectory;
+
+function maxSatisfying(versions, range) {
+  const cacheKey = versions + "\0" + range;
+  if (cacheKey in maxSatisfyingCache) {
+    return maxSatisfyingCache[cacheKey];
+  }
+  return maxSatisfyingCache[cacheKey] = SemVer.maxSatisfying(versions, range);
+}
+
+exports.maxSatisfying = maxSatisfying;
 
 function mkdir(dirpath) {
   try {

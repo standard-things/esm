@@ -65,7 +65,7 @@ exports.createStore = createStore;
 function find(object, key, range) {
   const map = getMap(object, key);
   if (map !== null) {
-    const version = SemVer.maxSatisfying(map.versions, range);
+    const version = utils.maxSatisfying(map.versions, range);
     if (version !== null) {
       return map.wrappers[version];
     }
