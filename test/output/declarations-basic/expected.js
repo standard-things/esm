@@ -7,4 +7,4 @@ function d() {
   return b;
 };
 
-module.runModuleSetters(c = "c");
+module.runSetters(c = "c");

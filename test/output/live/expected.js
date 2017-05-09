@@ -1,9 +1,9 @@
 "use strict";module.export({value:()=>value,reset:()=>reset,add:()=>add});var value = reset();
 
 function reset() {
-  return module.runModuleSetters(value = 0);
+  return module.runSetters(value = 0);
 }
 
 function add(x) {
-  module.runModuleSetters(value += x);
+  module.runSetters(value += x);
 };

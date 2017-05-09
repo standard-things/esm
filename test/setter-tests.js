@@ -1,6 +1,6 @@
 const assert = require("assert");
 
-describe("module.runModuleSetters", () => {
+describe("module.runSetters", () => {
   it("should be called after eval(...)", () => {
     import { value, run } from "./setter/eval";
 

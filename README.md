@@ -202,24 +202,23 @@ simply becomes
 exports.default = getDefault();
 ```
 
-### `module.runModuleSetters()`
+### `module.runSetters()`
 
 Now, suppose you change the value of an exported local variable after the
 module has finished loading. Then you need to let the module system know
-about the update, and that's where `module.runModuleSetters` comes in. The
+about the update, and that's where `module.runSetters` comes in. The
 module system calls this method on your behalf whenever a module finishes
 loading, but you can also call it manually, or simply let `reify` generate
-code that calls `module.runModuleSetters` for you whenever you assign to
-an exported local variable.
+code that calls `module.runSetters` for you whenever you assign to an
+exported local variable.
 
-Calling `module.runModuleSetters()` with no arguments causes any setters
-that depend on the current module to be rerun, *but only if the value a
-setter would receive is different from the last value passed to the
-setter*.
+Calling `module.runSetters()` with no arguments causes any setters that
+depend on the current module to be rerun, *but only if the value a setter
+would receive is different from the last value passed to the setter*.
 
-If you pass an argument to `module.runModuleSetters`, the value of that
-argument will be returned as-is, so that you can easily wrap assignment
-expressions with calls to `module.runModuleSetters`:
+If you pass an argument to `module.runSetters`, the value of that argument
+will be returned as-is, so that you can easily wrap assignment expressions
+with calls to `module.runSetters`:
 
 ```js
 export let value = 0;
@@ -237,17 +236,17 @@ module.export({
 });
 let value = 0;
 function increment(by) {
-  return module.runModuleSetters(value += by);
+  return module.runSetters(value += by);
 };
 ```
 
-Note that `module.runModuleSetters(argument)` does not actually use
-`argument`. However, by having `module.runModuleSetters(argument)` return
-`argument` unmodified, we can run setters immediately after the assignment
-without interfering with evaluation of the larger expression.
+Note that `module.runSetters(argument)` does not actually use `argument`.
+However, by having `module.runSetters(argument)` return `argument`
+unmodified, we can run setters immediately after the assignment without
+interfering with evaluation of the larger expression.
 
-Because `module.runModuleSetters` runs any setters that have new values,
-it's also useful for potentially risky expressions that are difficult to
+Because `module.runSetters` runs any setters that have new values, it's
+also useful for potentially risky expressions that are difficult to
 analyze statically:
 
 ```js
@@ -256,7 +255,7 @@ export let value = 0;
 function runCommand(command) {
   // This picks up any new values of any exported local variables that may
   // have been modified by eval.
-  return module.runModuleSetters(eval(command));
+  return module.runSetters(eval(command));
 }
 
 runCommand("value = 1234");
@@ -310,7 +309,7 @@ module.watch(require("./module"), {
 
 Re-exporting default exports ([proposal](https://github.com/leebyron/ecmascript-export-default-from)):
 ```js
-export a, {b, c as d} from "./module";
+export a, { b, c as d } from "./module";
 ```
 becomes
 ```js
