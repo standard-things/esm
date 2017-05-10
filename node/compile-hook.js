@@ -1,6 +1,7 @@
 "use strict";
 
 const compiler = require("./caching-compiler.js");
+const fs = require("./fs.js");
 const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const runtime = require("../lib/runtime.js");
@@ -18,59 +19,70 @@ module.exports = exports = (options) => {
   }
 };
 
-wrapper.add(exts, ".js", function(func, pkgInfo, module, filename) {
+function extManager(func, mod, filename) {
+  const filePath = path.resolve(filename);
+  const pkgInfo = utils.getPkgInfo(path.dirname(filePath));
+  const wrap = pkgInfo === null ? null : wrapper.find(exts, ".js", pkgInfo.range);
+
+  // A wrapper should only be null for reify < 0.10.
+  return wrap === null
+    ? func.call(this, mod, filePath)
+    : wrap.call(this, func, pkgInfo, mod, filePath);
+}
+
+function extWrap(func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath;
   if (cachePath === null) {
-    return func.call(this, module, filename);
+    return func.call(this, mod, filePath);
   }
 
-  const isGzipped = path.extname(filename) === ".gz";
+  const isGzipped = path.extname(filePath) === ".gz";
   const cache = pkgInfo.cache;
-  const cacheKey = utils.mtime(filename);
-  const cacheFilename = utils.getCacheFileName(filename, cacheKey, pkgInfo);
+  const cacheKey = fs.mtime(filePath);
+  const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo);
 
   let cacheValue = cache[cacheFilename];
+
   if (cacheValue === true) {
-    const cacheFilepath = path.join(cachePath, cacheFilename);
+    const cacheFilePath = path.join(cachePath, cacheFilename);
     cacheValue = isGzipped
-      ? utils.gunzip(utils.readFile(cacheFilepath), "utf8")
-      : utils.readFile(cacheFilepath, "utf8");
+      ? fs.gunzip(fs.readFile(cacheFilePath), "utf8")
+      : fs.readFile(cacheFilePath, "utf8");
 
   } else if (typeof cacheValue !== "string") {
     const options = {
+      compileOptions,
       cacheFilename,
       cachePath,
-      compileOptions,
-      filename,
-      parser: pkgInfo.config.parser
+      filePath,
+      pkgInfo
     };
 
     const content = isGzipped
-      ? utils.gunzip(utils.readFile(filename), "utf8")
-      : utils.readFile(filename, "utf8");
+      ? fs.gunzip(fs.readFile(filePath), "utf8")
+      : fs.readFile(filePath, "utf8");
 
     cacheValue = compiler.compile(content, options);
   }
 
   cache[cacheFilename] = cacheValue;
 
-  runtime.enable(module);
-  module._compile(cacheValue, filename);
-  module.runModuleSetters();
-});
+  runtime.enable(mod);
+  mod._compile(cacheValue, filePath);
+  mod.runModuleSetters();
+}
 
-const extsJsMap = wrapper.getMap(exts, ".js");
-const extsJsRaw = extsJsMap.raw;
-const extJsWrapper = extsJsMap.wrappers[utils.getReifySemVer()];
+wrapper.manage(exts, ".js", extManager);
+wrapper.add(exts, ".js", extWrap);
+
+const extsJs = wrapper.getMap(exts, ".js").raw;
 
 [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((key) => {
   if (typeof exts[key] !== "function") {
     // Mimic the built-in Node behavior of treating files with unrecognized
     // extensions as .js.
-    exts[key] = extsJsRaw;
+    exts[key] = extsJs;
   }
-
-  wrapper.add(exts, key, function(func, pkgInfo, param, filename) {
-    return extJsWrapper.call(this, func, pkgInfo, param, filename);
-  });
+  wrapper.manage(exts, key, extManager);
+  wrapper.add(exts, key, extWrap);
 });

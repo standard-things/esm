@@ -1,6 +1,10 @@
 const assert = require("assert");
 
+// Masquerade as the REPL module.
+module.filename = null;
 module.id = "<repl>";
+module.loaded = false;
+module.parent = void 0;
 
 describe("Node REPL", () => {
   import "../repl";
@@ -19,7 +23,7 @@ describe("Node REPL", () => {
       null, // Context
       "repl", // Filename
       (err, result) => {
-        // Use the globally-defined assertStrictEqual to test itself!
+        // Use the globally defined assertStrictEqual to test itself!
         assertStrictEqual(typeof assertStrictEqual, "function");
         done();
       }

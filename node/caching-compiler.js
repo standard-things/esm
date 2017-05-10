@@ -1,14 +1,14 @@
 "use strict";
 
 const compile = require("../lib/compiler.js").compile;
-const data = require("./data.js");
 const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
+const fs = require("./fs.js");
 const path = require("path");
 const utils = require("./utils.js");
 
 exports.compile = (content, options) => {
   options = Object.assign({}, options);
-  return typeof options.filename === "string"
+  return typeof options.filePath === "string"
     ? compileWithFilename(content, options)
     : compileAndCache(content, options);
 };
@@ -17,36 +17,32 @@ function compileWithFilename(content, options) {
   try {
     return compileAndWrite(content, options);
   } catch (e) {
-    e.message += " while processing file: " + options.filename;
+    e.message += " while processing file: " + options.filePath;
     throw e;
   }
 }
 
 function compileAndCache(content, options) {
-  const pkgInfo = data.pkgInfo[""];
-  const cacheFilename = utils.getCacheFileName(null, content, pkgInfo);
-  const cacheValue = pkgInfo.cache[cacheFilename];
-
-  if (typeof cacheValue === "string") {
-    return cacheValue;
-  }
-
   const result = compile(content, toCompileOptions(options));
-  return pkgInfo.cache[cacheFilename] = result.code;
+  return options.pkgInfo.cache[options.cacheFilename] = result.code;
 }
 
 function compileAndWrite(content, options) {
   const result = compile(content, toCompileOptions(options));
+  const code = result.code;
 
   if (! result.identical) {
     // Only cache if the compiler made changes.
-    const rootPath = path.dirname(options.filename);
-    const absolutePath = path.join(options.cachePath, options.cacheFilename);
-    const relativePath = path.relative(rootPath, absolutePath);
-    utils.scheduleWrite(rootPath, relativePath, result.code);
+    const cacheFilePath = path.join(options.cachePath, options.cacheFilename);
+    const isGzipped = path.extname(cacheFilePath) === ".gz";
+    const content = () => isGzipped ? fs.gzip(code) : code;
+    const encoding = isGzipped ? null : "utf8";
+    const scopePath = options.pkgInfo.path;
+
+    fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath });
   }
 
-  return result.code;
+  return code;
 }
 
 function toCompileOptions(options) {
@@ -55,15 +51,18 @@ function toCompileOptions(options) {
     sourceType: void 0
   };
 
-  if (typeof options.parser === "string") {
-    compileOptions.parse = dynRequire(options.parser).parse;
+  const filePath = options.filePath;
+  const pkgInfo = options.pkgInfo;
+
+  if (typeof pkgInfo.parser === "string") {
+    compileOptions.parse = dynRequire(pkgInfo.parser).parse;
   }
 
-  if (typeof options.filename === "string") {
-    let ext = path.extname(options.filename);
+  if (typeof filePath === "string") {
+    let ext = path.extname(filePath);
 
     if (ext === ".gz") {
-      ext = path.extname(path.basename(options.filename, ext));
+      ext = path.extname(path.basename(filePath, ext));
     }
 
     if (ext === ".mjs") {

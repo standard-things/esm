@@ -7,12 +7,10 @@ const utils = require("./utils.js");
 const FastObject = require("../lib/fast-object.js");
 
 const hasOwn = Object.prototype.hasOwnProperty;
-const reifySemVer = utils.getReifySemVer();
 const reifySymbol = Symbol.for("__reify");
-const reifyVersion = reifySemVer.version;
+const reifyVersion = require("./version.js").version;
 
 function add(object, key, wrapper) {
-  getOrCreateManager(object, key);
   const map = getOrCreateMap(object, key);
 
   if (typeof map.wrappers[reifyVersion] !== "function") {
@@ -22,24 +20,6 @@ function add(object, key, wrapper) {
 }
 
 exports.add = add;
-
-function createManager(object, key) {
-  const func = object[key];
-  const manager =  function (param, filename) {
-    const pkgInfo = utils.getPkgInfo(path.dirname(filename));
-    const wrapper = pkgInfo === null ? null : find(object, key, pkgInfo.range);
-
-    // A wrapper should only be null for reify < 0.10.
-    return wrapper === null
-      ? func.call(this, param, filename)
-      : wrapper.call(this, func, pkgInfo, param, filename);
-  };
-
-  manager[reifySymbol] = func;
-  return object[key] = manager;
-}
-
-exports.createManager = createManager;
 
 function createMap(object, key) {
   const map = new FastObject;
@@ -74,15 +54,6 @@ function find(object, key, range) {
 
 exports.find = find;
 
-function getManager(object, key) {
-  const func = object[key];
-  return typeof func === "function" && hasOwn.call(func, reifySymbol)
-    ? func
-    : null;
-}
-
-exports.getManager = getManager;
-
 function getMap(object, key) {
   const store = getStore(object);
   return store !== null && key in store
@@ -108,15 +79,6 @@ function getStore(object) {
 
 exports.getStore = getStore;
 
-function getOrCreateManager(object, key) {
-  const manager = getManager(object, key);
-  return manager === null
-    ? createManager(object, key)
-    : manager;
-}
-
-exports.getOrCreateManager = getOrCreateManager;
-
 function getOrCreateStore(object) {
   const store = getStore(object);
   return store === null
@@ -135,3 +97,20 @@ function getOrCreateMap(object, key) {
 
 exports.getOrCreateMap = getOrCreateMap;
 
+function manage(object, key, wrapper) {
+  const func = object[key];
+  const manager = function () {
+    const args = [func];
+    const argCount = arguments.length + 1;
+
+    for (let i = 1; i < argCount; ++i) {
+      args[i] = arguments[i - 1];
+    }
+    return wrapper.apply(this, args);
+  };
+
+  manager[reifySymbol] = func;
+  object[key] = manager;
+}
+
+exports.manage = manage;
