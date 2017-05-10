@@ -70,5 +70,5 @@ function toCompileOptions(options) {
     }
   }
 
-  return Object.assign(compileOptions, options.compileOptions);
+  return compileOptions;
 }

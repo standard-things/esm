@@ -74,6 +74,21 @@ function getPkgInfo(dirPath) {
 
 exports.getPkgInfo = getPkgInfo;
 
+function isREPL(mod) {
+  while (mod != null) {
+    if (mod.filename === null &&
+        mod.id === "<repl>" &&
+        mod.loaded === false &&
+        mod.parent === void 0) {
+      return true;
+    }
+    mod = mod.parent;
+  }
+  return false;
+}
+
+exports.isREPL = isREPL;
+
 function maxSatisfying(versions, range) {
   const cacheKey = versions + "\0" + range;
   if (cacheKey in maxSatisfyingCache) {

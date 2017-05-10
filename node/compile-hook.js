@@ -11,14 +11,6 @@ const wrapper = require("./wrapper.js");
 const Module = require("module");
 const exts = Module._extensions;
 
-let compileOptions;
-
-module.exports = exports = (options) => {
-  if (compileOptions === void 0) {
-    compileOptions = Object.assign({}, options);
-  }
-};
-
 function extManager(func, mod, filename) {
   const filePath = path.resolve(filename);
   const pkgInfo = utils.getPkgInfo(path.dirname(filePath));
@@ -51,7 +43,6 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   } else if (typeof cacheValue !== "string") {
     const options = {
-      compileOptions,
       cacheFilename,
       cachePath,
       filePath,

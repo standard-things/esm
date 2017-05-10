@@ -7,7 +7,7 @@ const utils = require("./utils.js");
 const FastObject = require("../lib/fast-object.js");
 
 const hasOwn = Object.prototype.hasOwnProperty;
-const reifySymbol = Symbol.for("__reify");
+const reifySymbol = Symbol.for("__reifyWrapper");
 const reifyVersion = require("./version.js").version;
 
 function add(object, key, wrapper) {
