@@ -20,7 +20,7 @@ You can also easily `reify` the Node REPL:
 
 ```sh
 % node
-> require("reify/repl")
+> require("reify")
 {}
 > import { strictEqual } from "assert"
 > strictEqual(2 + 2, 5)
