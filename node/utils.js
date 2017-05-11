@@ -12,7 +12,8 @@ const SemVer = require("semver");
 
 const DEFAULT_PKG_CONFIG = {
   "cache-directory": ".reify-cache",
-  parser: void 0
+  parser: void 0,
+  sourceType: void 0
 };
 
 const hasOwn = Object.prototype.hasOwnProperty;

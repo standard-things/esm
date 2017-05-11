@@ -52,10 +52,10 @@ function toCompileOptions(options) {
   };
 
   const filePath = options.filePath;
-  const pkgInfo = options.pkgInfo;
+  const config = options.pkgInfo.config;
 
-  if (typeof pkgInfo.parser === "string") {
-    compileOptions.parse = dynRequire(pkgInfo.parser).parse;
+  if (typeof config.parser === "string") {
+    compileOptions.parse = dynRequire(config.parser).parse;
   }
 
   if (typeof filePath === "string") {
@@ -65,7 +65,9 @@ function toCompileOptions(options) {
       ext = path.extname(path.basename(filePath, ext));
     }
 
-    if (ext === ".mjs") {
+    if (typeof config.sourceType === "string") {
+      compileOptions.sourceType = config.sourceType;
+    } else if (ext === ".mjs") {
       compileOptions.sourceType = "module";
     }
   }
