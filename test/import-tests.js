@@ -21,11 +21,7 @@ describe("import declarations", () => {
     import { default as abc4 } from "./misc/abc";
     import abc5, { a as ay, b as bee, c } from "./misc/abc";
 
-    assert.deepEqual(abc1, {
-      a: "a",
-      b: "b",
-      c: "c"
-    });
+    assert.deepEqual(abc1, { a: "a", b: "b", c: "c" });
 
     assert.deepEqual(abc1, abc2);
     assert.deepEqual(abc1, abc3);
