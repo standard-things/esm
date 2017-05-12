@@ -88,6 +88,7 @@ describe("import declarations", () => {
     assert.strictEqual(c, 4);
 
     import { value, reset, add } from "./cjs/bridge.js";
+    reset();
     assert.strictEqual(value, 0);
     add(10);
     assert.strictEqual(value, 10);

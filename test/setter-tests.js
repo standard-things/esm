@@ -27,6 +27,7 @@ describe("parent setters", () => {
     let firstCallCount = 0;
     let secondCallCount = 0;
 
+    reset();
     module.importSync("./misc/live.js", {
       value: (v) => {
         ++firstCallCount;
