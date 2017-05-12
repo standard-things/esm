@@ -1,4 +1,5 @@
 import "./import-tests.js";
+import "./dynamic-import-tests.js";
 import "./export-tests.js";
 import "./setter-tests.js";
 import "./misc-tests.js";
