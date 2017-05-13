@@ -1,6 +1,30 @@
 const assert = require("assert");
 
 describe("export declarations", () => {
+  import { Script } from "vm";
+
+  let canUseClasses = false;
+  let canUseLetConst = false;
+  let canUseDestructuring = false;
+
+  try {
+    // Test if Node supports class syntax.
+    new Script("class A {}");
+    canUseClasses = true;
+  } catch (e) {}
+
+  try {
+    // Test if Node supports block declaration syntax.
+    new Script("let x; const y = 1234");
+    canUseLetConst = true;
+  } catch (e) {}
+
+  try {
+    // Test if Node supports destructuring declarations.
+    new Script("const { x, y } = {}");
+    canUseDestructuring = true;
+  } catch (e) {}
+
   it("should allow * exports", () => {
     import def, {
       a, b, c as d,
@@ -92,37 +116,13 @@ describe("export declarations", () => {
     assert.strictEqual(def, "default-3");
     assert.strictEqual(val, "value-2");
 
-    setTimeout(() => {
+    setImmediate(() => {
       oneLastExport();
       assert.strictEqual(def, "default-3");
       assert.strictEqual(val, "value-3");
       done();
-    }, 0);
+    });
   });
-
-  import { Script } from "vm";
-
-  let canUseClasses = false;
-  let canUseLetConst = false;
-  let canUseDestructuring = false;
-
-  try {
-    // Test if Node supports class syntax.
-    new Script("class A {}");
-    canUseClasses = true;
-  } catch (e) {}
-
-  try {
-    // Test if Node supports block declaration syntax.
-    new Script("let x; const y = 1234");
-    canUseLetConst = true;
-  } catch (e) {}
-
-  try {
-    // Test if Node supports destructuring declarations.
-    new Script("const { x, y } = {}");
-    canUseDestructuring = true;
-  } catch (e) {}
 
   it("should support all default syntax", () => {
     import number from "./export/default/number";
