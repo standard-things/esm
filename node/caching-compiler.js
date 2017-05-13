@@ -70,6 +70,10 @@ function toCompileOptions(options) {
     } else if (ext === ".mjs") {
       compileOptions.sourceType = "module";
     }
+
+    compileOptions.wrapWithRun = true;
+  } else {
+    compileOptions.wrapWithRun = false;
   }
 
   return compileOptions;
