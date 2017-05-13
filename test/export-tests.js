@@ -216,9 +216,9 @@ describe("export declarations", () => {
 
   it("should support export-from extensions", () => {
     import {
-      def1, def2, def3,
-      ns1, ns2, ns3,
-      a, b, c, d
+      def1, def2, def3, def4,
+      ns1, ns2, ns3, ns4,
+      a, b, c, d, e
     } from "./export/from-extensions";
 
     import def, {
@@ -226,11 +226,13 @@ describe("export declarations", () => {
       b as _b,
       b as _c,
       c as _d,
+      c as _e,
     } from "./misc/abc";
 
     assert.strictEqual(def, def1);
     assert.strictEqual(def, def2);
     assert.strictEqual(def, def3);
+    assert.strictEqual(def, def4);
 
     function checkNS(ns) {
       assert.deepEqual(ns, def);
@@ -240,11 +242,13 @@ describe("export declarations", () => {
     checkNS(ns1);
     checkNS(ns2);
     checkNS(ns3);
+    checkNS(ns4);
 
     assert.strictEqual(a, _a);
     assert.strictEqual(b, _b);
     assert.strictEqual(c, _c);
     assert.strictEqual(d, _d);
+    assert.strictEqual(e, _e);
   });
 
   it("should support export { default } from ... syntax", () => {
