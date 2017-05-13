@@ -1,4 +1,6 @@
-const assert = require("assert");
+import assert from "assert";
+
+const isBabylonParser = process.env.REIFY_PARSER === "babylon";
 
 describe("export declarations", () => {
   import { Script } from "vm";
@@ -214,7 +216,8 @@ describe("export declarations", () => {
     assert.deepEqual(foo, { a: "a", b: "b", c: "c" });
   });
 
-  it("should support export-from extensions", () => {
+  (isBabylonParser ? xit : it)(
+  "should support export-from extensions", () => {
     import {
       def1, def2, def3, def4,
       ns1, ns2, ns3, ns4,

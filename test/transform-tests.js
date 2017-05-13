@@ -28,18 +28,17 @@ describe("compiler.transform", () => {
   it("gives the same results as compile with babylon", () => {
     check({
       ast: true,
-      parse: require("../lib/parsers/babylon.js").parse
+      parse: require("../lib/parsers/babylon.js").parse,
+      filter: (relPath) => {
+        return relPath !== "export/from-extensions.js";
+      }
     });
   }).timeout(5000);
 
   it("gives the same results as compile with acorn", () => {
     check({
       ast: true,
-      parse: require("../lib/parsers/acorn.js").parse,
-      filter: (relPath) => {
-        // Acorn can't parse this file, so we skip it.
-        return relPath !== "export/from-extensions.js";
-      }
+      parse: require("../lib/parsers/acorn.js").parse
     });
   }).timeout(5000);
 });
