@@ -105,13 +105,13 @@ describe("compiler", () => {
       enforceStrictMode: false
     }).code;
 
-    assert.ok(! withoutStrict.startsWith('"use strict"'));
+    assert.ok(! withoutStrict.startsWith('module.run(function(){"use strict"'));
 
     const withStrict = compile(source, {
       enforceStrictMode: true
     }).code;
 
-    assert.ok(withStrict.startsWith('"use strict"'));
+    assert.ok(withStrict.startsWith('module.run(function(){"use strict"'));
 
     // No options.enforceStrictMode is the same as
     // { enforceStrictMode: true }.
@@ -119,7 +119,7 @@ describe("compiler", () => {
       source
     ).code;
 
-    assert.ok(defaultStrict.startsWith('"use strict"'));
+    assert.ok(defaultStrict.startsWith('module.run(function(){"use strict"'));
   });
 
   it("should respect options.generateArrowFunctions", () => {
@@ -160,13 +160,13 @@ describe("compiler", () => {
       generateLetDeclarations: true
     }).code;
 
-    assert.ok(withLet.startsWith('"use strict";let foo;'));
+    assert.ok(withLet.startsWith('module.run(function(){"use strict";let foo;'));
 
     const withoutLet = compile(source, {
       generateLetDeclarations: false
     }).code;
 
-    assert.ok(withoutLet.startsWith('"use strict";var foo;'));
+    assert.ok(withoutLet.startsWith('module.run(function(){"use strict";var foo;'));
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: false }.
@@ -174,7 +174,7 @@ describe("compiler", () => {
       source
     ).code;
 
-    assert.ok(defaultLet.startsWith('"use strict";var foo;'));
+    assert.ok(defaultLet.startsWith('module.run(function(){"use strict";var foo;'));
   });
 
   it("should allow pre-parsed ASTs via options.parse", () => {
@@ -192,7 +192,7 @@ describe("compiler", () => {
     });
 
     assert.strictEqual(result.ast, null);
-    assert.ok(result.code.startsWith('"use strict";let foo'));
+    assert.ok(result.code.startsWith('module.run(function(){"use strict";let foo'));
     assert.ok(result.code.includes('"./+@#"'));
   });
 
@@ -205,19 +205,19 @@ describe("compiler", () => {
       sourceType: "module"
     }).code;
 
-    assert.ok(moduleType.startsWith('"use strict"'));
+    assert.ok(moduleType.startsWith('module.run(function(){"use strict"'));
 
     const unambiguousAsCJS = compile(source, {
       sourceType: "unambiguous"
     }).code;
 
-    assert.ok(! unambiguousAsCJS.startsWith('"use strict"'));
+    assert.ok(! unambiguousAsCJS.startsWith('module.run(function(){"use strict"'));
 
     const unambiguousAsESM = compile('import "a"\n' + source, {
       sourceType: "unambiguous"
     }).code;
 
-    assert.ok(unambiguousAsESM.startsWith('"use strict"'));
+    assert.ok(unambiguousAsESM.startsWith('module.run(function(){"use strict"'));
 
     const scriptType = compile('import "a"\n' + source, {
       sourceType: "script"
@@ -231,7 +231,7 @@ describe("compiler", () => {
       source
     ).code;
 
-    assert.ok(! defaultType.startsWith('"use strict"'));
+    assert.ok(! defaultType.startsWith('module.run(function(){"use strict"'));
   });
 
   it("should transform default export declaration to expression", () => {
@@ -284,7 +284,7 @@ describe("compiler", () => {
     ].join("\n");
 
     const withShebang = compile(code).code;
-    assert.ok(withShebang.startsWith('"use strict";var foo'));
+    assert.ok(withShebang.startsWith('module.run(function(){"use strict";var foo'));
   });
 
   it("should preserve crlf newlines", () => {
@@ -299,7 +299,10 @@ describe("compiler", () => {
       'from "assert";'
     ].join("\r\n");
 
-    const result = compile(code).code;
+    const result = compile(code, {
+      wrapWithRun: false
+    }).code;
+
     assert.ok(result.endsWith("\r\n".repeat(5)));
   });
 });

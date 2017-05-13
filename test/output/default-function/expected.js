@@ -1,4 +1,4 @@
-"use strict";module.export({default:()=>f,check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual:function(v){strictEqual=v}},0);
+module.run(function(){"use strict";module.export({default:()=>f,check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual:function(v){strictEqual=v}},0);
 
 const obj = {};
 
@@ -11,3 +11,5 @@ function check(g) {
   strictEqual(f(), obj);
   strictEqual(g(), obj);
 }
+//*/
+});

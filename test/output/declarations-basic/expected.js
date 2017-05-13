@@ -1,4 +1,4 @@
-"use strict";module.export({c:()=>c,d:()=>d});module.export({a:()=>a,b:()=>b},true);const a = 1;
+module.run(function(){"use strict";module.export({c:()=>c,d:()=>d});module.export({a:()=>a,b:()=>b},true);const a = 1;
 const b = function () {
   return d;
 };
@@ -8,3 +8,5 @@ function d() {
 };
 
 module.runSetters(c = "c");
+//*/
+});
