@@ -1,5 +1,5 @@
 module.exports = function () {
-  var transform = require("reify/lib/compiler.js").transform;
+  var compiler = require("reify/lib/compiler.js");
   var parse = require("reify/lib/parsers/babylon.js").parse;
   var validators = require("babel-types/lib/validators");
   var ibs = validators.isBlockScoped;
@@ -74,7 +74,16 @@ module.exports = function () {
           parse: parse
         };
 
-        transform(path.node, Object.assign(transformOptions, this.opts));
+        var code = path.hub.file.code;
+        if (typeof code === "string") {
+          transformOptions.moduleId =
+            compiler.makeUniqueId("module", code);
+        }
+
+        compiler.transform(
+          path.node,
+          Object.assign(transformOptions, this.opts)
+        );
       }
     }
   };

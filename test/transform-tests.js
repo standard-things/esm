@@ -1,6 +1,10 @@
 import assert from "assert";
 import { relative } from "path";
-import { compile, transform } from "../lib/compiler.js";
+import {
+  compile,
+  transform,
+  makeUniqueId,
+} from "../lib/compiler.js";
 import { prettyPrint } from "recast";
 import { files } from "./all-files.js";
 
@@ -14,6 +18,8 @@ describe("compiler.transform", () => {
 
       const code = files[absPath];
       const ast = options.parse(code);
+
+      options.moduleId = makeUniqueId("module", code);
 
       transform(ast, options);
 

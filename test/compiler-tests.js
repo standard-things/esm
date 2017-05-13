@@ -31,6 +31,12 @@ describe("compiler", () => {
     assert.ok(/unexpected/i.test(error.message));
   });
 
+  it("should choose a unique module identifier", () => {
+    const module = null, module2 = null;
+    import { a } from "./misc/abc";
+    assert.strictEqual(a, "a");
+  });
+
   it("should be enabled for packages that depend on reify", () => {
     import a from "enabled";
     assert.strictEqual(a, assert);
