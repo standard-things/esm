@@ -1,5 +1,4 @@
 import assert from "assert";
-import { compile } from "../lib/compiler.js";
 import { gzip } from "../node/fs.js";
 import { join } from "path";
 import {
@@ -13,15 +12,11 @@ const content = readFileSync(join(fixturePath, "a.mjs"));
 describe("file extension", () => {
   function check(modulePath) {
     let exported;
-    let threw = false;
 
     try {
       exported = require(modulePath).default;
-    } catch (e) {
-      threw = true
-    }
+    } catch (e) {}
 
-    assert.ok(! threw);
     assert.strictEqual(exported, "a");
   }
 

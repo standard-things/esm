@@ -20,16 +20,13 @@ describe("compiler", () => {
 
   it("should not be enabled for nested node_modules", () => {
     let error;
-    let threw = true;
 
     try {
       import "disabled";
-      threw = false;
     } catch (e) {
       error = e;
     }
 
-    assert.ok(threw);
     assert.ok(error instanceof SyntaxError);
     assert.ok(/unexpected/i.test(error.message));
   });

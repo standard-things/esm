@@ -1,32 +1,30 @@
 import assert from "assert";
+import { Script } from "vm";
 
-const isBabylonParser = process.env.REIFY_PARSER === "babylon";
+let canUseClasses = false;
+let canUseDestructuring = false;
+let canUseLetConst = false;
+const canUseExportExtensions = process.env.REIFY_PARSER !== "babylon";
+
+try {
+  // Test if Node supports class syntax.
+  new Script("class A {}");
+  canUseClasses = true;
+} catch (e) {}
+
+try {
+  // Test if Node supports destructuring declarations.
+  new Script("const { x, y } = {}");
+  canUseDestructuring = true;
+} catch (e) {}
+
+try {
+  // Test if Node supports block declaration syntax.
+  new Script("let x; const y = 1");
+  canUseLetConst = true;
+} catch (e) {}
 
 describe("export declarations", () => {
-  import { Script } from "vm";
-
-  let canUseClasses = false;
-  let canUseLetConst = false;
-  let canUseDestructuring = false;
-
-  try {
-    // Test if Node supports class syntax.
-    new Script("class A {}");
-    canUseClasses = true;
-  } catch (e) {}
-
-  try {
-    // Test if Node supports block declaration syntax.
-    new Script("let x; const y = 1234");
-    canUseLetConst = true;
-  } catch (e) {}
-
-  try {
-    // Test if Node supports destructuring declarations.
-    new Script("const { x, y } = {}");
-    canUseDestructuring = true;
-  } catch (e) {}
-
   it("should allow * exports", () => {
     import def, {
       a, b, c as d,
@@ -274,7 +272,7 @@ describe("export declarations", () => {
     assert.strictEqual(b, 5);
   });
 
-  (isBabylonParser ? xit : it)(
+  (canUseExportExtensions ? it : xit)(
   "should support export extensions", () => {
     import {
       def1, def2, def3, def4,
