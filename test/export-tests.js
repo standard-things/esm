@@ -216,44 +216,6 @@ describe("export declarations", () => {
     assert.deepEqual(foo, { a: "a", b: "b", c: "c" });
   });
 
-  (isBabylonParser ? xit : it)(
-  "should support export-from extensions", () => {
-    import {
-      def1, def2, def3, def4,
-      ns1, ns2, ns3, ns4,
-      a, b, c, d, e
-    } from "./export/from-extensions";
-
-    import def, {
-      a as _a,
-      b as _b,
-      b as _c,
-      c as _d,
-      c as _e,
-    } from "./misc/abc";
-
-    assert.strictEqual(def, def1);
-    assert.strictEqual(def, def2);
-    assert.strictEqual(def, def3);
-    assert.strictEqual(def, def4);
-
-    function checkNS(ns) {
-      assert.deepEqual(ns, def);
-      assert.notStrictEqual(ns, def);
-    }
-
-    checkNS(ns1);
-    checkNS(ns2);
-    checkNS(ns3);
-    checkNS(ns4);
-
-    assert.strictEqual(a, _a);
-    assert.strictEqual(b, _b);
-    assert.strictEqual(c, _c);
-    assert.strictEqual(d, _d);
-    assert.strictEqual(e, _e);
-  });
-
   it("should support export { default } from ... syntax", () => {
     import object from "./export/default/from";
     assert.deepEqual(object, { foo: 42 });
@@ -310,5 +272,43 @@ describe("export declarations", () => {
     assert.strictEqual(update(3, 4, 5), 8);
     assert.strictEqual(a, 3);
     assert.strictEqual(b, 5);
+  });
+
+  (isBabylonParser ? xit : it)(
+  "should support export extensions", () => {
+    import {
+      def1, def2, def3, def4,
+      ns1, ns2, ns3, ns4,
+      a, b, c, d, e
+    } from "./export/extensions";
+
+    import def, {
+      a as _a,
+      b as _b,
+      b as _c,
+      c as _d,
+      c as _e,
+    } from "./misc/abc";
+
+    assert.strictEqual(def, def1);
+    assert.strictEqual(def, def2);
+    assert.strictEqual(def, def3);
+    assert.strictEqual(def, def4);
+
+    function checkNS(ns) {
+      assert.deepEqual(ns, def);
+      assert.notStrictEqual(ns, def);
+    }
+
+    checkNS(ns1);
+    checkNS(ns2);
+    checkNS(ns3);
+    checkNS(ns4);
+
+    assert.strictEqual(a, _a);
+    assert.strictEqual(b, _b);
+    assert.strictEqual(c, _c);
+    assert.strictEqual(d, _d);
+    assert.strictEqual(e, _e);
   });
 });

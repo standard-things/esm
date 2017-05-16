@@ -14,9 +14,10 @@ Object.keys(files).forEach((absPath) => {
 
   // These files fail to transform with es2015 preset due to problems
   // unrelated to the functionality of the Reify Babel plugin.
-  if (relPath === "export/from-extensions.js" ||
+  if (relPath === "export/extensions.js" ||
       relPath === "export/some.js"  ||
       relPath === "export-tests.js" ||
+      relPath === "import/extensions.js" ||
       relPath === "import-tests.js" ||
       relPath === "setter-tests.js") {
     return;

@@ -1,4 +1,6 @@
-const assert = require("assert");
+import assert from "assert";
+
+const isBabylonParser = process.env.REIFY_PARSER === "babylon";
 
 describe("import declarations", () => {
   it("should work in nested scopes", () => {
@@ -94,5 +96,43 @@ describe("import declarations", () => {
     assert.strictEqual(value, 10);
     assert.strictEqual(reset(), 0);
     assert.strictEqual(value, 0);
+  });
+
+  (isBabylonParser ? xit : it)(
+  "should support import extensions", () => {
+    import {
+      def1, def2, def3, def4,
+      ns1, ns2, ns3, ns4,
+      a, b, c, d, e
+    } from "./import/extensions";
+
+    import def, {
+      a as _a,
+      b as _b,
+      b as _c,
+      c as _d,
+      c as _e,
+    } from "./misc/abc";
+
+    assert.strictEqual(def, def1);
+    assert.strictEqual(def, def2);
+    assert.strictEqual(def, def3);
+    assert.strictEqual(def, def4);
+
+    function checkNS(ns) {
+      assert.deepEqual(ns, def);
+      assert.notStrictEqual(ns, def);
+    }
+
+    checkNS(ns1);
+    checkNS(ns2);
+    checkNS(ns3);
+    checkNS(ns4);
+
+    assert.strictEqual(a, _a);
+    assert.strictEqual(b, _b);
+    assert.strictEqual(c, _c);
+    assert.strictEqual(d, _d);
+    assert.strictEqual(e, _e);
   });
 });
