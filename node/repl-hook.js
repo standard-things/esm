@@ -1,9 +1,11 @@
 "use strict";
 
 const utils = require("./utils.js");
-const root = utils.getRootModule(module.parent ? module : __non_webpack_module__);
 
-if (utils.isREPL(root)) {
+const dynModule = module.parent ? module : __non_webpack_module__;
+const rootModule = utils.getRootModule(dynModule);
+
+if (utils.isREPL(rootModule)) {
   // Enable import and export statements in the default Node REPL.
   // Custom REPLs can still define their own eval functions that circumvent this
   // compilation step, but that's a feature, not a drawback.
@@ -28,5 +30,5 @@ if (utils.isREPL(root)) {
     return func.call(this, code, options);
   });
 
-  runtime.enable(root);
+  runtime.enable(rootModule);
 }

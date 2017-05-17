@@ -1,12 +1,10 @@
 "use strict";
 
-require("./compile-hook.js");
-require("./repl-hook.js");
-
-const setDefaults = require("../lib/options").setDefaults;
 const runtime = require("../lib/runtime.js");
+const setDefaults = require("../lib/options").setDefaults;
 
 let isDefaultsSet = false;
+const parentModule = module.parent || __non_webpack_module__.parent;
 
 module.exports = (options) => {
   if (! isDefaultsSet) {
@@ -15,4 +13,7 @@ module.exports = (options) => {
   }
 };
 
-runtime.enable(module.parent || __non_webpack_module__.parent);
+require("./compile-hook.js");
+require("./repl-hook.js");
+
+runtime.enable(parentModule);
