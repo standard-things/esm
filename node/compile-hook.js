@@ -60,7 +60,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   runtime.enable(mod);
   mod._compile(cacheValue, filePath);
-  mod.runModuleSetters();
+  mod.runSetters();
 }
 
 wrapper.manage(exts, ".js", extManager);
