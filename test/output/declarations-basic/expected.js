@@ -1,4 +1,4 @@
-"use strict";module.export({a:()=>a,b:()=>b,c:()=>c,d:()=>d});const a = 1;
+"use strict";module.export({c:()=>c,d:()=>d});module.export({a:()=>a,b:()=>b},true);const a = 1;
 const b = function () {
   return d;
 };
