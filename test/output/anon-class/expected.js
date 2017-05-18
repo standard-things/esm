@@ -1,5 +1,5 @@
-"use strict";module.export("default",exports.default=(class {
+"use strict";module.exportDefault(class {
   constructor(value) {
     this.value = value;
   }
-}));
+});

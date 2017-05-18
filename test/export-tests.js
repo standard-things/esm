@@ -109,16 +109,12 @@ describe("export declarations", () => {
     assert.strictEqual(val, "value-1");
 
     exportAgain();
-    assert.strictEqual(def, "default-2");
-    assert.strictEqual(val, "value-2");
-
-    exportYetAgain();
-    assert.strictEqual(def, "default-3");
+    assert.strictEqual(def, "default-1");
     assert.strictEqual(val, "value-2");
 
     setImmediate(() => {
       oneLastExport();
-      assert.strictEqual(def, "default-3");
+      assert.strictEqual(def, "default-1");
       assert.strictEqual(val, "value-3");
       done();
     });

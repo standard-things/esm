@@ -87,7 +87,7 @@ describe("compiler", () => {
     isVarDecl(ast.body[firstIndex + 2], ["bar"]);
     isCallExprStmt(ast.body[firstIndex + 3], "module", "watch");
     isCallExprStmt(ast.body[firstIndex + 4], "console", "log");
-    isCallExprStmt(ast.body[firstIndex + 5], "module", "export");
+    isCallExprStmt(ast.body[firstIndex + 5], "module", "exportDefault");
   });
 
   it("should respect options.enforceStrictMode", () => {
@@ -252,7 +252,7 @@ describe("compiler", () => {
 
     assert.strictEqual(anonAST.body.length - anonFirstIndex, 1);
     assert.strictEqual(
-      anonAST.body[anonFirstIndex].expression.arguments[1].right.type,
+      anonAST.body[anonFirstIndex].expression.arguments[1].type,
       "ClassExpression"
     );
 
