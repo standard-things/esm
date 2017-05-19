@@ -19,7 +19,7 @@ describe("compiler.transform", () => {
       const code = files[absPath];
       const ast = options.parse(code);
 
-      options.moduleId = makeUniqueId("module", code);
+      options.moduleAlias = makeUniqueId("module", code);
 
       transform(ast, options);
 

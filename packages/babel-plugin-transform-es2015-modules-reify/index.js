@@ -76,7 +76,7 @@ module.exports = function () {
 
         var code = path.hub.file.code;
         if (typeof code === "string") {
-          transformOptions.moduleId =
+          transformOptions.moduleAlias =
             compiler.makeUniqueId("module", code);
         }
 
