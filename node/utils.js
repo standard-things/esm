@@ -23,7 +23,7 @@ const maxSatisfyingCache = new FastObject;
 const reifySemVer = require("./version.js");
 
 function getReifyRange(json, name) {
-  var entry = json[name];
+  const entry = json[name];
   return utils.isObject(entry) && hasOwn.call(entry, "reify")
     ? SemVer.validRange(entry.reify)
     : null;
