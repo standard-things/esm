@@ -4,11 +4,13 @@ const createHash = require("crypto").createHash;
 const data = require("./data.js");
 const fs = require("./fs.js");
 const path = require("path");
+const resolveFilename = require("module")._resolveFilename;
 const utils = require("../lib/utils.js");
 
 const FastObject = require("../lib/fast-object.js");
 const PkgInfo = require("./pkg-info.js");
 const SemVer = require("semver");
+const URL = require("url");
 
 const DEFAULT_PKG_CONFIG = {
   "cache-directory": ".reify-cache",
@@ -161,3 +163,39 @@ function readPkgInfo(dirPath) {
 }
 
 exports.readPkgInfo = readPkgInfo;
+
+function resolvePath(id, mod) {
+  const parsed = URL.parse(id);
+  if (typeof parsed.protocol !== "string") {
+    return resolveFilename(id, mod);
+  }
+  // Based on file-uri-to-path.
+  // Copyright Nathan Rajlich. Released under MIT license:
+  // https://github.com/TooTallNate/file-uri-to-path
+  if (parsed.protocol !== "file:" || parsed.pathname === null) {
+    throw new TypeError;
+  }
+
+  let host = parsed.host;
+  let pathname = unescape(parsed.pathname);
+  let prefix = "";
+
+  // Section 2: Syntax
+  // https://tools.ietf.org/html/rfc8089#section-2
+  if (host === "localhost") {
+    host = "";
+  } else if (host) {
+    prefix += path.sep + path.sep;
+  } else if (pathname.startsWith("//")) {
+    // Windows shares have a pathname starting with "//".
+    prefix += path.sep;
+  }
+  // Section E.2: DOS and Windows Drive Letters
+  // https://tools.ietf.org/html/rfc8089#appendix-E.2
+  // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
+  pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, '$1:'));
+
+  return resolveFilename(prefix + host + pathname, mod);
+}
+
+exports.resolvePath = resolvePath;
