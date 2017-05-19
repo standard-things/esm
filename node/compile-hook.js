@@ -5,7 +5,7 @@ const exts = require("module")._extensions;
 const fs = require("./fs.js");
 const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
-const runtime = require("../lib/runtime.js");
+const runtime = require("./runtime.js");
 const utils = require("./utils.js");
 const wrapper = require("./wrapper.js");
 

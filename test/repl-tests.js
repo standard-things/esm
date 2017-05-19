@@ -11,7 +11,7 @@ delete require.cache[require.resolve("../node/repl-hook.js")];
 describe("Node REPL", () => {
   import "../node/repl-hook.js";
   import { createContext } from "vm";
-  import { enable } from "../lib/runtime.js";
+  import { enable } from "../node/runtime.js";
   import repl from "repl";
 
   it("should work with global context", (done) => {

@@ -1,6 +1,6 @@
 "use strict";
 
-const runtime = require("../lib/runtime.js");
+const runtime = require("./runtime.js");
 const setDefaults = require("../lib/options").setDefaults;
 
 let isDefaultsSet = false;

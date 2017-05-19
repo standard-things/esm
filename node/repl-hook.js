@@ -10,7 +10,7 @@ if (utils.isREPL(rootModule)) {
   // Custom REPLs can still define their own eval functions that circumvent this
   // compilation step, but that's a feature, not a drawback.
   const compile = require("./caching-compiler.js").compile;
-  const runtime = require("../lib/runtime.js");
+  const runtime = require("./runtime.js");
   const vm = require("vm");
   const wrapper = require("./wrapper.js");
 
