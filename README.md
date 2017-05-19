@@ -180,27 +180,40 @@ well anywhere in the scope where the exported variable is declared, and
 a good idea because the hoisting ensures the getters are registered as
 early as possible.
 
-What about `export default` declarations? It would be a mistake to defer
-evaluation of the `default` expression until later, so wrapping it in a
-getter function is not exactly what we want.
+What about `export default <expression>` declarations? It would be a
+mistake to defer evaluation of the `default` expression until later, so
+wrapping it in a hoisted getter function is not exactly what we want.
 
-The important point to understand here is that `module.watch` does
-not assume a getter function has been registered by `module.export` for
-every imported symbol. Instead, `parentModule.watch` only really
-cares about the contents of `childModule.exports`. While the
-`childModule.export` method helps keep `childModule.exports` up to date,
-that level of sophistication isn't strictly necessary in every situation,
-and `default` exports are one such situation:
+Instead,
 
 ```js
-export default getDefault();
+export default computeDefault();
 ```
 
-simply becomes
+gets replaced where it is (without any hoisting) by
 
 ```js
-exports.default = getDefault();
+module.exportDefault(computeDefault());
 ```
+
+The `module.exportDefault` method is just a convenient
+[wrapper](https://github.com/benjamn/reify/blob/d7c27163a77dac184979862f808ef4e88de91ba8/lib/runtime/index.js#L60-L67)
+around `module.export`:
+
+```js
+module.exportDefault = function (value) {
+  return this.export({
+    default: function () {
+      return value;
+    }
+  }, true);
+};
+```
+
+That `true` argument we're passing to `module.export` is a hint that the
+value returned by this getter function will never change, which enables
+[some optimizations](https://github.com/benjamn/reify/issues/134) behind
+the scenes.
 
 ### `module.runSetters()`
 
