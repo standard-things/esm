@@ -1,3 +1,5 @@
+"use strict";
+
 // Throw once for the mod.runSetters() call in reify/node/compile-hook.js,
 // and again for the first time we call module.runSetters in set below.
 let throwTimes = 2;
