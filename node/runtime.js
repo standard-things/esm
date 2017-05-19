@@ -1,6 +1,6 @@
 "use strict";
 
-const runtime = require("../lib/runtime.js");
+const runtime = require("../lib/runtime");
 const utils = require("./utils.js");
 
 exports.enable = function (mod) {
