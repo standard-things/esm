@@ -9,10 +9,10 @@ if (utils.isREPL(rootModule)) {
   // Enable import and export statements in the default Node REPL.
   // Custom REPLs can still define their own eval functions that circumvent this
   // compilation step, but that's a feature, not a drawback.
-  const compile = require("../node/caching-compiler.js").compile;
+  const compile = require("./caching-compiler.js").compile;
   const runtime = require("../lib/runtime.js");
   const vm = require("vm");
-  const wrapper = require("../node/wrapper.js");
+  const wrapper = require("./wrapper.js");
 
   wrapper.manage(vm, "createScript", function (func, code, options) {
     const pkgInfo = utils.getPkgInfo();
