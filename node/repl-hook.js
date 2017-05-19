@@ -25,7 +25,7 @@ if (utils.isREPL(rootModule)) {
     const cacheValue = pkgInfo.cache[cacheFilename];
     code = typeof cacheValue === "string"
       ? cacheValue
-      : compile(code, { cacheFilename, pkgInfo });
+      : compile(code, { cacheFilename, pkgInfo, repl: true });
 
     return func.call(this, code, options);
   });

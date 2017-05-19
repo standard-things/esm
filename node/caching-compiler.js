@@ -58,6 +58,10 @@ function toCompileOptions(options) {
     compileOptions.parse = dynRequire(config.parser).parse;
   }
 
+  if (options.repl === true) {
+    compileOptions.repl = true;
+  }
+
   if (typeof filePath === "string") {
     let ext = path.extname(filePath);
 
@@ -70,10 +74,6 @@ function toCompileOptions(options) {
     } else if (ext === ".mjs") {
       compileOptions.sourceType = "module";
     }
-
-    compileOptions.wrapWithRun = true;
-  } else {
-    compileOptions.wrapWithRun = false;
   }
 
   return compileOptions;

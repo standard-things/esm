@@ -299,10 +299,7 @@ describe("compiler", () => {
       'from "assert";'
     ].join("\r\n");
 
-    const result = compile(code, {
-      wrapWithRun: false
-    }).code;
-
+    const result = compile(code, { repl: true }).code;
     assert.ok(result.endsWith("\r\n".repeat(5)));
   });
 });
