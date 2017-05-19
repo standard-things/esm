@@ -1,5 +1,6 @@
 import assert from "assert";
 import { compile } from "../lib/compiler.js";
+import { join } from "path";
 
 const canEnforceArgCount = process.env.REIFY_PARSER !== "babylon";
 const canUseToStringTag = typeof Symbol === "function" &&
@@ -51,6 +52,11 @@ describe("dynamic import", () => {
 
   it("should support an expression id", () =>
     import((() => id)())
+      .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+  );
+
+  it("should support the file protocol", () =>
+    import("file://" + join(__dirname, id))
       .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
   );
 
