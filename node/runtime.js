@@ -1,26 +1,24 @@
 "use strict";
 
-const runtime = require("../lib/runtime");
 const utils = require("./utils.js");
 
-exports.enable = function (mod) {
-  if (runtime.enable(mod)) {
-    mod.import = wrapImport(mod.import);
-    mod.importSync = wrapImportSync(mod.importSync);
-    return true;
-  }
+const LibRuntime = require("../lib/runtime");
+const Lp = LibRuntime.prototype;
 
-  return false;
+class Runtime extends LibRuntime {
+  static enable(mod) {
+    return super.enable.call(this, mod);
+  }
+}
+
+const Rp = Runtime.prototype;
+
+Rp.import = function (id) {
+  return Lp.import.call(this, utils.resolvePath(id, this));
 };
 
-function wrapImport(func) {
-  return function (id) {
-    return func.call(this, utils.resolvePath(id, this));
-  };
-}
+Rp.importSync = function (id, setters, key) {
+  return Lp.importSync.call(this, utils.resolvePath(id, this), setters, key);
+};
 
-function wrapImportSync(func) {
-  return function (id, setters, key) {
-    return func.call(this, utils.resolvePath(id, this), setters, key);
-  };
-}
+module.exports = Runtime;

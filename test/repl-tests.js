@@ -11,12 +11,12 @@ delete require.cache[require.resolve("../node/repl-hook.js")];
 describe("Node REPL", () => {
   import "../node/repl-hook.js";
   import { createContext } from "vm";
-  import { enable } from "../node/runtime.js";
   import repl from "repl";
+  import runtime from "../node/runtime.js";
 
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true });
-    enable(r.context.module);
+    runtime.enable(r.context.module);
 
     assert.strictEqual(typeof assertStrictEqual, "undefined");
 
