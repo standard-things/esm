@@ -15,23 +15,18 @@ export const files = Object.create(null);
 function walk(dir) {
   readdirSync(dir).forEach((item) => {
     const absPath = join(dir, item);
+    const relPath = relative(__dirname, absPath);
+    const relParts = relPath.split(sep);
     const stat = statSync(absPath);
-    if (stat.isDirectory()) {
+
+    if (stat.isDirectory() &&
+        // Ignore cache folder.
+        relParts[0] !== ".cache") {
       walk(absPath);
-    } else if (stat.isFile()) {
-      const relPath = relative(__dirname, absPath);
-      const relParts = relPath.split(sep);
 
-      // Ignore cache files.
-      if (relParts[0] === ".cache") {
-        return;
-      }
-
-      // Ignore non-.js files.
-      if (! /\.js$/.test(relPath)) {
-        return;
-      }
-
+    } else if (stat.isFile() &&
+        // Ignore non-.js files.
+        relPath.endsWith(".js")) {
       files[absPath] = readFileSync(absPath, "utf8");
     }
   });
