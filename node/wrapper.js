@@ -1,6 +1,5 @@
 "use strict";
 
-const isObject = require("../lib/utils.js").isObject;
 const path = require("path");
 const utils = require("./utils.js");
 
