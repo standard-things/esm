@@ -4,16 +4,19 @@ const utils = require("./utils.js");
 
 const Runtime = require("../lib/runtime");
 const Rp = Runtime.prototype;
+const rpImport = Rp.import;
+const rpImportSync = Rp.importSync;
 
-const moduleImport = Rp.import;
-const moduleImportSync = Rp.importSync;
+function moduleImport(id) {
+  return rpImport.call(this, utils.resolvePath(id, this));
+}
 
-Rp.import = function (id) {
-  return moduleImport.call(this, utils.resolvePath(id, this));
-};
+Rp.import = moduleImport;
 
-Rp.importSync = function (id, setters, key) {
-  return moduleImportSync.call(this, utils.resolvePath(id, this), setters, key);
-};
+function moduleImportSync(id, setters, key) {
+  return rpImportSync.call(this, utils.resolvePath(id, this), setters, key);
+}
+
+Rp.importSync = moduleImportSync;
 
 module.exports = Runtime;
