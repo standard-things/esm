@@ -1,4 +1,5 @@
-const assert = require("assert");
+import assert from "assert";
+import { join as pathJoin } from "path";
 
 describe("module.runSetters", () => {
   it("should be called after eval(...)", () => {
@@ -15,6 +16,19 @@ describe("module.runSetters", () => {
     import "./setter/cycle/cjs.js";
     import { getSum } from "./setter/cycle/esm.js";
     assert.strictEqual(getSum(), 3);
+  });
+});
+
+describe("bridge modules", () => {
+  it("should not prematurely seal * exports", () => {
+    import { bridge } from "./setter/cycle/bridge-owner.js";
+
+    assert.strictEqual(
+      bridge.name,
+      pathJoin(__dirname, "setter/cycle/bridge-owner.js")
+    );
+
+    assert.strictEqual(bridge, bridge.bridge);
   });
 });
 
