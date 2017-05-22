@@ -10,17 +10,20 @@ import { files } from "./all-files.js";
 
 describe("compiler.transform", () => {
   function check(options) {
+    options = Object.assign(Object.create(null), options);
+    const reject = options.reject;
+    delete options.reject;
+
     Object.keys(files).forEach(function (absPath) {
-      if (typeof options.reject === "function" &&
-          options.reject(relative(__dirname, absPath))) {
+      if (typeof reject === "function" &&
+          reject(relative(__dirname, absPath))) {
         return;
       }
 
       const code = files[absPath];
-      const ast = options.parse(code);
-
       options.moduleAlias = makeUniqueId("module", code);
 
+      const ast = options.parse(code);
       transform(ast, options);
 
       assert.strictEqual(
@@ -33,7 +36,7 @@ describe("compiler.transform", () => {
 
   it("gives the same results as compile with babylon", () => {
     check({
-      ast: true,
+      modifyAST: true,
       parse: require("../lib/parsers/babylon.js").parse,
       reject: (relPath) => {
         return relPath === "export/extensions.js" ||
@@ -44,7 +47,7 @@ describe("compiler.transform", () => {
 
   it("gives the same results as compile with acorn", () => {
     check({
-      ast: true,
+      modifyAST: true,
       parse: require("../lib/parsers/acorn.js").parse
     });
   }).timeout(5000);

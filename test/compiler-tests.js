@@ -52,7 +52,7 @@ describe("compiler", () => {
     assert.strictEqual(check(), true);
   });
 
-  it("should transform AST when options.ast truthy", () => {
+  it("should transform AST when options.modifyAST truthy", () => {
     import { compile } from "../lib/compiler.js";
 
     function isVarDecl(node, names) {
@@ -76,7 +76,7 @@ describe("compiler", () => {
       "export default foo + bar;"
     ].join("\n");
 
-    const result = compile(code, { ast: true });
+    const result = compile(code, { modifyAST: true });
     let ast = result.ast;
 
     if (ast.type === "File") {
@@ -191,7 +191,7 @@ describe("compiler", () => {
       parse: () => ast
     });
 
-    assert.strictEqual(result.ast, null);
+    assert.strictEqual(result.ast, ast);
     assert.ok(result.code.startsWith('module.run(function(){"use strict";let foo'));
     assert.ok(result.code.includes('"./+@#"'));
   });
@@ -238,7 +238,7 @@ describe("compiler", () => {
     import { compile } from "../lib/compiler.js";
 
     function parse(code) {
-      const result = compile(code, { ast: true });
+      const result = compile(code, { modifyAST: true });
       let ast = result.ast;
 
       if (ast.type === "File") {
