@@ -52,50 +52,6 @@ describe("compiler", () => {
     assert.strictEqual(check(), true);
   });
 
-  it("should transform AST when options.modifyAST truthy", () => {
-    import { compile } from "../lib/compiler.js";
-
-    function isVarDecl(node, names) {
-      assert.strictEqual(node.type, "VariableDeclaration");
-      assert.deepEqual(node.declarations.map((decl) => decl.id.name), names);
-    }
-
-    function isCallExprStmt(node, objectName, propertyName) {
-      assert.strictEqual(node.type, "ExpressionStatement");
-      assert.strictEqual(node.expression.type, "CallExpression");
-      assert.strictEqual(
-        node.expression.callee.object.name, objectName);
-      assert.strictEqual(
-        node.expression.callee.property.name, propertyName);
-    }
-
-    const code = [
-      "console.log(foo, bar);",
-      'import foo from "./foo"',
-      'import bar from "./bar"',
-      "export default foo + bar;"
-    ].join("\n");
-
-    const result = compile(code, { modifyAST: true });
-    let ast = result.ast;
-
-    if (ast.type === "File") {
-      ast = ast.program;
-    }
-
-    assert.strictEqual(ast.type, "Program");
-
-    const firstIndex = isUseStrictExprStmt(ast.body[0]) ? 1 : 0;
-    assert.strictEqual(ast.body.length - firstIndex, 6);
-
-    isVarDecl(ast.body[firstIndex + 0], ["foo"]);
-    isCallExprStmt(ast.body[firstIndex + 1], "module", "watch");
-    isVarDecl(ast.body[firstIndex + 2], ["bar"]);
-    isCallExprStmt(ast.body[firstIndex + 3], "module", "watch");
-    isCallExprStmt(ast.body[firstIndex + 4], "console", "log");
-    isCallExprStmt(ast.body[firstIndex + 5], "module", "exportDefault");
-  });
-
   it("should respect options.enforceStrictMode", () => {
     import { compile } from "../lib/compiler.js";
 
@@ -175,6 +131,50 @@ describe("compiler", () => {
     ).code;
 
     assert.ok(defaultLet.startsWith('module.run(function(){"use strict";var foo;'));
+  });
+
+  it("should respect options.modifyAST", () => {
+    import { compile } from "../lib/compiler.js";
+
+    function isVarDecl(node, names) {
+      assert.strictEqual(node.type, "VariableDeclaration");
+      assert.deepEqual(node.declarations.map((decl) => decl.id.name), names);
+    }
+
+    function isCallExprStmt(node, objectName, propertyName) {
+      assert.strictEqual(node.type, "ExpressionStatement");
+      assert.strictEqual(node.expression.type, "CallExpression");
+      assert.strictEqual(
+        node.expression.callee.object.name, objectName);
+      assert.strictEqual(
+        node.expression.callee.property.name, propertyName);
+    }
+
+    const code = [
+      "console.log(foo, bar);",
+      'import foo from "./foo"',
+      'import bar from "./bar"',
+      "export default foo + bar;"
+    ].join("\n");
+
+    const result = compile(code, { modifyAST: true });
+    let ast = result.ast;
+
+    if (ast.type === "File") {
+      ast = ast.program;
+    }
+
+    assert.strictEqual(ast.type, "Program");
+
+    const firstIndex = isUseStrictExprStmt(ast.body[0]) ? 1 : 0;
+    assert.strictEqual(ast.body.length - firstIndex, 6);
+
+    isVarDecl(ast.body[firstIndex + 0], ["foo"]);
+    isCallExprStmt(ast.body[firstIndex + 1], "module", "watch");
+    isVarDecl(ast.body[firstIndex + 2], ["bar"]);
+    isCallExprStmt(ast.body[firstIndex + 3], "module", "watch");
+    isCallExprStmt(ast.body[firstIndex + 4], "console", "log");
+    isCallExprStmt(ast.body[firstIndex + 5], "module", "exportDefault");
   });
 
   it("should allow pre-parsed ASTs via options.parse", () => {
