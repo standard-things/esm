@@ -1,4 +1,4 @@
-module.run(function() {
+module.run(function () {
   "use strict";
 
   // Throw once for the mod.runSetters call in module.run, and again for the
