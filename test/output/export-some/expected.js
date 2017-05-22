@@ -7,5 +7,5 @@ module.runSetters(cee += "ee");
 function c() {
   return "c";
 }
-//*/
+
 });

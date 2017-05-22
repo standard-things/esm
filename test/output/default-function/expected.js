@@ -11,5 +11,5 @@ function check(g) {
   strictEqual(f(), obj);
   strictEqual(g(), obj);
 }
-//*/
+
 });

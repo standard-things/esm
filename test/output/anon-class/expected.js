@@ -3,5 +3,5 @@ module.run(function(){"use strict";module.exportDefault(class {
     this.value = value;
   }
 });
-//*/
+
 });

@@ -3,5 +3,5 @@ module.run(function(){"use strict";module.export({value:()=>localValue,run:()=>r
 function run(code) {
   return module.runSetters(eval(code));
 };
-//*/
+
 });
