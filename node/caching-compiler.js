@@ -50,6 +50,7 @@ function compileAndWrite(content, options) {
 function toCompileOptions(options) {
   const compileOptions = {
     parse: void 0,
+    repl: void 0,
     sourceType: void 0
   };
 
