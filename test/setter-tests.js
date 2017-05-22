@@ -9,6 +9,13 @@ describe("module.runSetters", () => {
     assert.strictEqual(value, result);
     assert.strictEqual(value, "modified");
   });
+
+  it("should be called for untouched CJS modules, too", () => {
+    // Import the CommonJS module first, but do not register any setters.
+    import "./setter/cycle/cjs.js";
+    import { getSum } from "./setter/cycle/esm.js";
+    assert.strictEqual(getSum(), 3);
+  });
 });
 
 describe("parent setters", () => {
