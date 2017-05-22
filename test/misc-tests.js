@@ -1,6 +1,11 @@
 const assert = require("assert");
 
 describe("spec compliance", () => {
+  it("should have a top-level `this` of `undefined`", () => {
+    import value from "./misc/this";
+    assert.strictEqual(value, void 0);
+  });
+
   it("should establish live binding of values", () => {
     import { value, reset, add } from "./misc/live";
     reset();
