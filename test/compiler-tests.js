@@ -280,11 +280,18 @@ describe("compiler", () => {
 
     const code = [
       "#!/usr/bin/env node -r reify",
-      'import foo from "./foo"',
+      'import a from "a"',
     ].join("\n");
 
-    const withShebang = compile(code).code;
-    assert.ok(withShebang.startsWith('module.run(function(){"use strict";var foo'));
+    const result = compile(code);
+    assert.ok(result.code.startsWith('module.run(function(){"use strict";var a;'));
+  });
+
+  it("should not get confused by trailing comments", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const result = compile('import "a" // trailing comment');
+    assert.ok(result.code.endsWith("// trailing comment\n});"));
   });
 
   it("should preserve crlf newlines", () => {
