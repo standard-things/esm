@@ -26,6 +26,8 @@ describe("dynamic import", () => {
   it("should resolve as a namespace import", () =>
     import("./misc/abc").then((ns) => {
       const nsTag = canUseToStringTag ? "[object Module]" : "[object Object]";
+
+      assert.ok(Object.isSealed(ns));
       assert.strictEqual(Object.prototype.toString.call(ns), nsTag);
       assert.deepEqual(ns, { a: "a", b: "b", c: "c" });
     })
