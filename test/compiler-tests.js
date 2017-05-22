@@ -289,7 +289,7 @@ describe("compiler", () => {
     import { compile } from "../lib/compiler.js";
 
     const result = compile('import "a" // trailing comment');
-    assert.ok(result.code.endsWith("// trailing comment\n});"));
+    assert.ok(result.code.endsWith("// trailing comment\n})"));
   });
 
   it("should preserve crlf newlines", () => {

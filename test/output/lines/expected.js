@@ -16,4 +16,4 @@ function check()
   strictEqual(line, 14);
 }
 
-});
+})

@@ -4,4 +4,4 @@ function run(code) {
   return module.runSetters(eval(code));
 };
 
-});
+})

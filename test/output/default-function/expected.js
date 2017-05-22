@@ -12,4 +12,4 @@ function check(g) {
   strictEqual(g(), obj);
 }
 
-});
+})

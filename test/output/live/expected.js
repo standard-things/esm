@@ -8,4 +8,4 @@ function add(x) {
   module.runSetters(value += x);
 };
 
-});
+})

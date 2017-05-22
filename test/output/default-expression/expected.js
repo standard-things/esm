@@ -4,4 +4,4 @@ module.run(function(){"use strict";let count = 0;
 // mistakenly stripped away.
 module.exportDefault((count++, count));
 
-});
+})
