@@ -1,17 +1,19 @@
 "use strict";
 
-const compile = require("../lib/compiler.js").compile;
+const compiler = require("../lib/compiler.js");
 const dynRequire = module.require ? module.require.bind(module) : __non_webpack_require__;
 const fs = require("./fs.js");
 const path = require("path");
 const utils = require("./utils.js");
 
-exports.compile = (content, options) => {
+function compile(content, options) {
   options = Object.assign({}, options);
   return typeof options.filePath === "string"
     ? compileWithFilename(content, options)
     : compileAndCache(content, options);
-};
+}
+
+exports.compile = compile;
 
 function compileWithFilename(content, options) {
   try {
@@ -23,12 +25,12 @@ function compileWithFilename(content, options) {
 }
 
 function compileAndCache(content, options) {
-  const result = compile(content, toCompileOptions(options));
+  const result = compiler.compile(content, toCompileOptions(options));
   return options.pkgInfo.cache[options.cacheFilename] = result.code;
 }
 
 function compileAndWrite(content, options) {
-  const result = compile(content, toCompileOptions(options));
+  const result = compiler.compile(content, toCompileOptions(options));
   const code = result.code;
 
   if (! result.identical) {
