@@ -84,7 +84,7 @@ import * as utils from "./utils";
 ```
 becomes
 ```js
-const utils = module.createNs();
+const utils = Object.create(null);
 module.watch(require("./utils"), {
   "*": (value, name) => {
     utils[name] = value;

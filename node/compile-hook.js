@@ -60,6 +60,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   // If the module is not loaded through module.run, then run its setters.
   if (! mod.loaded) {
+    mod.loaded = true;
     mod.runSetters();
   }
 }
