@@ -36,9 +36,9 @@ describe("dynamic import", () => {
   it("should establish live binding of values", () =>
     import("./misc/live").then((ns) => {
       ns.reset();
-      assert.equal(ns.value, 0);
+      assert.strictEqual(ns.value, 0);
       ns.add(2);
-      assert.equal(ns.value, 2);
+      assert.strictEqual(ns.value, 2);
     })
   );
 

@@ -9,9 +9,9 @@ describe("spec compliance", () => {
   it("should establish live binding of values", () => {
     import { value, reset, add } from "./misc/live";
     reset();
-    assert.equal(value, 0);
+    assert.strictEqual(value, 0);
     add(2);
-    assert.equal(value, 2);
+    assert.strictEqual(value, 2);
   });
 
   it("should execute modules in the correct order", () => {
@@ -22,7 +22,7 @@ describe("spec compliance", () => {
 
   it("should bind exports before the module executes", () => {
     import value from "./export/cycle-a";
-    assert.equal(value, true);
+    assert.strictEqual(value, true);
   });
 });
 
