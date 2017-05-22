@@ -157,8 +157,7 @@ describe("compiler", () => {
       "export default foo + bar;"
     ].join("\n");
 
-    const result = compile(code, { modifyAST: true });
-    let ast = result.ast;
+    let ast = compile(code, { modifyAST: true }).ast;
 
     if (ast.type === "File") {
       ast = ast.program;
@@ -238,8 +237,7 @@ describe("compiler", () => {
     import { compile } from "../lib/compiler.js";
 
     function parse(code) {
-      const result = compile(code, { modifyAST: true });
-      let ast = result.ast;
+      let ast = compile(code, { modifyAST: true }).ast;
 
       if (ast.type === "File") {
         ast = ast.program;
@@ -306,7 +304,7 @@ describe("compiler", () => {
       'from "assert";'
     ].join("\r\n");
 
-    const result = compile(code, { repl: true }).code;
-    assert.ok(result.endsWith("\r\n".repeat(5)));
+    const result = compile(code, { repl: true });
+    assert.ok(result.code.endsWith("\r\n".repeat(5)));
   });
 });
