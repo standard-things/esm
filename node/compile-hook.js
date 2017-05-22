@@ -57,6 +57,11 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   runtime.enable(mod);
   mod._compile(cacheValue, filePath);
+
+  // If the module is not loaded through module.run, then run its setters.
+  if (! mod.loaded) {
+    mod.runSetters();
+  }
 }
 
 wrapper.manage(exts, ".js", extManager);
