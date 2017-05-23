@@ -40,7 +40,8 @@ describe("compiler.transform", () => {
       parse: require("../lib/parsers/babylon.js").parse,
       reject: (relPath) => {
         return relPath === "export/extensions.js" ||
-               relPath === "import/extensions.js";
+               relPath === "import/extensions.js" ||
+               relPath.startsWith("output/export-multi-namespace/");
       }
     });
   }).timeout(5000);

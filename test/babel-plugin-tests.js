@@ -21,7 +21,8 @@ Object.keys(files).forEach((absPath) => {
       relPath === "export-tests.js" ||
       relPath === "import/extensions.js" ||
       relPath === "import-tests.js" ||
-      relPath === "setter-tests.js") {
+      relPath === "setter-tests.js" ||
+      relPath.startsWith("output/export-multi-namespace/")) {
     return;
   }
 
