@@ -271,8 +271,8 @@ describe("export declarations", () => {
   (canUseExportExtensions ? it : xit)(
   "should support export extensions", () => {
     import {
-      def1, def2, def3, def4,
-      ns1, ns2, ns3, ns4,
+      def1, def2, def3, def4, def5,
+      ns1, ns2, ns3, ns4, ns5,
       a, b, c, d, e
     } from "./export/extensions";
 
@@ -284,20 +284,22 @@ describe("export declarations", () => {
       c as _e,
     } from "./misc/abc";
 
-    assert.strictEqual(def, def1);
-    assert.strictEqual(def, def2);
-    assert.strictEqual(def, def3);
-    assert.strictEqual(def, def4);
+    const defs = [
+      def1, def2, def3, def4, def5
+    ];
 
-    function checkNS(ns) {
+    const namespaces = [
+      ns1, ns2, ns3, ns4, ns5
+    ];
+
+    defs.forEach((d) => {
+      assert.strictEqual(d, def);
+    });
+
+    namespaces.forEach((ns) => {
       assert.deepEqual(ns, def);
       assert.notStrictEqual(ns, def);
-    }
-
-    checkNS(ns1);
-    checkNS(ns2);
-    checkNS(ns3);
-    checkNS(ns4);
+    });
 
     assert.strictEqual(a, _a);
     assert.strictEqual(b, _b);
