@@ -37,7 +37,7 @@ describe("compiler.transform", () => {
   it("gives the same results as compile with babylon", () => {
     check({
       modifyAST: true,
-      parse: require("../lib/parsers/babylon.js").parse,
+      parse: require("../lib/parser/babylon.js").parse,
       reject: (relPath) => {
         return relPath === "export/extensions.js" ||
                relPath === "import/extensions.js" ||
@@ -49,7 +49,7 @@ describe("compiler.transform", () => {
   it("gives the same results as compile with acorn", () => {
     check({
       modifyAST: true,
-      parse: require("../lib/parsers/acorn.js").parse
+      parse: require("../lib/parser/acorn.js").parse
     });
   }).timeout(5000);
 });

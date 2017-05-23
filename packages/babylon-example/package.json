@@ -27,6 +27,6 @@
     "reify": "^0.5.1"
   },
   "reify": {
-    "parser": "reify/lib/parsers/babylon.js"
+    "parser": "reify/lib/parser/babylon.js"
   }
 }

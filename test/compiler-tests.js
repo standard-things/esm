@@ -178,7 +178,7 @@ describe("compiler", () => {
 
   it("should allow pre-parsed ASTs via options.parse", () => {
     import { compile } from "../lib/compiler.js";
-    import { parse } from "../lib/parsers";
+    import { parse } from "../lib/parser";
 
     const code = 'import foo from "./foo"';
     const ast = parse(code);

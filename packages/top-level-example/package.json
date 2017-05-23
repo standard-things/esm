@@ -27,6 +27,6 @@
     "reify": "^0.5.1"
   },
   "reify": {
-    "parser": "reify/lib/parsers/top-level.js"
+    "parser": "reify/lib/parser/top-level.js"
   }
 }

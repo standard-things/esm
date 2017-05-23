@@ -2,7 +2,7 @@ import assert from "assert";
 import { relative } from "path";
 import { transformFromAst } from "babel-core";
 import { files } from "./all-files.js";
-import { parse } from "../lib/parsers/babylon.js";
+import { parse } from "../lib/parser/babylon.js";
 import reifyPlugin from "babel-plugin-transform-es2015-modules-reify";
 import es2015Preset from "babel-preset-es2015";
 

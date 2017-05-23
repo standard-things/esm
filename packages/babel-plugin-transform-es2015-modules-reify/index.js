@@ -1,6 +1,6 @@
 module.exports = function () {
   var compiler = require("reify/lib/compiler.js");
-  var parse = require("reify/lib/parsers/babylon.js").parse;
+  var parse = require("reify/lib/parser/babylon.js").parse;
   var validators = require("babel-types/lib/validators");
   var ibs = validators.isBlockScoped;
   var t = require("babel-types");

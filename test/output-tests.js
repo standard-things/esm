@@ -28,7 +28,7 @@ Object.keys(files).forEach((absPath) => {
 describe("output", () => {
   function check(data) {
     const code = compile(data.actual, {
-      parse: require("../lib/parsers/acorn.js").parse
+      parse: require("../lib/parser/acorn.js").parse
     }).code;
 
     // Consolidate semicolons, then trim blank lines and trailing whitespace.
