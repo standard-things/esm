@@ -1,12 +1,13 @@
 "use strict";
 
+const env = require("../lib/env.js");
 const utils = require("./utils.js");
 
 const dynModule = module.parent ? module : __non_webpack_module__;
 const rootModule = utils.getRootModule(dynModule);
 const isREPL = utils.isREPL(rootModule);
-const pkgId = process.env.REIFY_ID || "reify";
-const pkgMain = isREPL ? utils.resolvePath(pkgId, rootModule) : "";
+const pkgName = env.REIFY_NAME || "reify";
+const pkgMain = isREPL ? utils.resolvePath(pkgName, rootModule) : "";
 
 if (isREPL && rootModule.children.some((mod) => mod.filename === pkgMain)) {
   // Enable import and export statements in the default Node REPL.
