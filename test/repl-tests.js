@@ -1,6 +1,7 @@
 const assert = require("assert");
 
 // Masquerade as the REPL module.
+module.children = [require.cache[require.resolve("reify")]];
 module.filename = null;
 module.id = "<repl>";
 module.loaded = false;

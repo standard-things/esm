@@ -89,11 +89,10 @@ function getRootModule(mod) {
 exports.getRootModule = getRootModule;
 
 function isREPL(mod) {
-  const root = getRootModule(mod);
-  if (root.filename === null &&
-      root.id === "<repl>" &&
-      root.loaded === false &&
-      root.parent === void 0) {
+  if (mod.filename === null &&
+      mod.id === "<repl>" &&
+      mod.loaded === false &&
+      mod.parent === void 0) {
     return true;
   }
   return false;
