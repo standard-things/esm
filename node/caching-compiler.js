@@ -26,16 +26,16 @@ function compileWithFilename(content, options) {
 
 function compileAndCache(content, options) {
   const result = compiler.compile(content, toCompileOptions(options));
-  return options.pkgInfo.cache[options.cacheFilename] = result.code;
+  return options.pkgInfo.cache[options.cacheFilename] = result;
 }
 
 function compileAndWrite(content, options) {
-  const result = compiler.compile(content, toCompileOptions(options));
-  const code = result.code;
+  const compileOptions = toCompileOptions(options);
+  const result = compiler.compile(content, compileOptions);
 
-  if (! result.identical) {
-    // Only cache if the compiler made changes.
+  if (result.sourceType === "module") {
     const cacheFilePath = path.join(options.cachePath, options.cacheFilename);
+    const code = result.code;
     const isGzipped = path.extname(cacheFilePath) === ".gz";
     const content = () => isGzipped ? fs.gzip(code) : code;
     const encoding = isGzipped ? null : "utf8";
@@ -44,7 +44,7 @@ function compileAndWrite(content, options) {
     fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath });
   }
 
-  return code;
+  return result;
 }
 
 function toCompileOptions(options) {

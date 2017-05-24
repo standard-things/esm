@@ -1,9 +1,11 @@
-module.run(function () {
-  "use strict";
+"use strict";
 
-  // Throw once for the mod.runSetters call in module.run, and again for the
-  // first time we call module.runSetters in set below.
-  let throwTimes = 2;
+require("../../node/runtime.js").enable(module);
+
+module.run(function () {
+  // Throw for the runSetters call in the compile-hook, module.run,
+  // and for the first time we call runSetters in set below.
+  let throwTimes = 3;
   let value = 1;
 
   function set(to) {
@@ -11,7 +13,7 @@ module.run(function () {
   }
 
   module.export({
-    value: () => {
+    value() {
       if (throwTimes-- > 0) {
         throw new Error("simulated");
       }

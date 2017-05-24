@@ -52,32 +52,6 @@ describe("compiler", () => {
     assert.strictEqual(check(), true);
   });
 
-  it("should respect options.enforceStrictMode", () => {
-    import { compile } from "../lib/compiler.js";
-
-    const source = 'import "a"';
-
-    const withoutStrict = compile(source, {
-      enforceStrictMode: false
-    }).code;
-
-    assert.ok(! withoutStrict.startsWith('module.run(function(){"use strict"'));
-
-    const withStrict = compile(source, {
-      enforceStrictMode: true
-    }).code;
-
-    assert.ok(withStrict.startsWith('module.run(function(){"use strict"'));
-
-    // No options.enforceStrictMode is the same as
-    // { enforceStrictMode: true }.
-    const defaultStrict = compile(
-      source
-    ).code;
-
-    assert.ok(defaultStrict.startsWith('module.run(function(){"use strict"'));
-  });
-
   it("should respect options.generateArrowFunctions", () => {
     import { compile } from "../lib/compiler.js";
 
@@ -116,13 +90,13 @@ describe("compiler", () => {
       generateLetDeclarations: true
     }).code;
 
-    assert.ok(withLet.startsWith('module.run(function(){"use strict";let foo;'));
+    assert.ok(withLet.startsWith("let foo;"));
 
     const withoutLet = compile(source, {
       generateLetDeclarations: false
     }).code;
 
-    assert.ok(withoutLet.startsWith('module.run(function(){"use strict";var foo;'));
+    assert.ok(withoutLet.startsWith("var foo;"));
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: false }.
@@ -130,7 +104,7 @@ describe("compiler", () => {
       source
     ).code;
 
-    assert.ok(defaultLet.startsWith('module.run(function(){"use strict";var foo;'));
+    assert.ok(defaultLet.startsWith("var foo;"));
   });
 
   it("should respect options.modifyAST", () => {
@@ -191,46 +165,26 @@ describe("compiler", () => {
     });
 
     assert.strictEqual(result.ast, ast);
-    assert.ok(result.code.startsWith('module.run(function(){"use strict";let foo'));
+    assert.ok(result.code.startsWith("let foo"));
     assert.ok(result.code.includes('"./+@#"'));
   });
 
   it("should respect options.sourceType", () => {
     import { compile } from "../lib/compiler.js";
 
-    const source = "1+2;";
+    const code = 'import "a"';
+    const sourceTypes = [void 0, "module", "unambiguous"];
 
-    const moduleType = compile(source, {
-      sourceType: "module"
-    }).code;
+    sourceTypes.forEach((sourceType) => {
+      const actual = compile(code, { sourceType }).code;
+      assert.ok(actual.includes("module.watch"));
+    });
 
-    assert.ok(moduleType.startsWith('module.run(function(){"use strict"'));
-
-    const unambiguousAsCJS = compile(source, {
-      sourceType: "unambiguous"
-    }).code;
-
-    assert.ok(! unambiguousAsCJS.startsWith('module.run(function(){"use strict"'));
-
-    const unambiguousAsESM = compile('import "a"\n' + source, {
-      sourceType: "unambiguous"
-    }).code;
-
-    assert.ok(unambiguousAsESM.startsWith('module.run(function(){"use strict"'));
-
-    const scriptType = compile('import "a"\n' + source, {
+    const scriptType = compile(code, {
       sourceType: "script"
     }).code;
 
-    assert.ok(scriptType.startsWith('import "a"'));
-
-    // No options.sourceType is the same as
-    // { sourceType: "unambiguous" }.
-    const defaultType = compile(
-      source
-    ).code;
-
-    assert.ok(! defaultType.startsWith('module.run(function(){"use strict"'));
+    assert.strictEqual(scriptType, code);
   });
 
   it("should transform default export declaration to expression", () => {
@@ -282,14 +236,14 @@ describe("compiler", () => {
     ].join("\n");
 
     const result = compile(code);
-    assert.ok(result.code.startsWith('module.run(function(){"use strict";var a;'));
+    assert.ok(result.code.startsWith("var a;"));
   });
 
   it("should not get confused by trailing comments", () => {
     import { compile } from "../lib/compiler.js";
 
     const result = compile('import "a" // trailing comment');
-    assert.ok(result.code.endsWith("// trailing comment\n})"));
+    assert.ok(result.code.endsWith("// trailing comment"));
   });
 
   it("should preserve crlf newlines", () => {

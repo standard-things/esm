@@ -4,16 +4,17 @@ const compiler = require("./caching-compiler.js");
 const exts = require("module")._extensions;
 const fs = require("./fs.js");
 const path = require("path");
-const runtime = require("./runtime.js");
 const utils = require("./utils.js");
 const wrapper = require("./wrapper.js");
+
+const Runtime = require("./runtime.js");
 
 function extManager(func, mod, filename) {
   const filePath = path.resolve(filename);
   const pkgInfo = utils.getPkgInfo(path.dirname(filePath));
   const wrap = pkgInfo === null ? null : wrapper.find(exts, ".js", pkgInfo.range);
 
-  // A wrapper should only be null for reify < 0.10.
+  // A wrapper should be found for packages that opt-in to reify >= 0.10.
   return wrap === null
     ? func.call(this, mod, filePath)
     : wrap.call(this, func, pkgInfo, mod, filePath);
@@ -21,47 +22,44 @@ function extManager(func, mod, filename) {
 
 function extWrap(func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath;
+
   if (cachePath === null) {
     return func.call(this, mod, filePath);
   }
 
-  const isGzipped = path.extname(filePath) === ".gz";
   const cache = pkgInfo.cache;
   const cacheKey = fs.mtime(filePath);
   const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo);
 
   let cacheValue = cache[cacheFilename];
+  let codeFilePath = cacheValue === true
+    ? path.join(cachePath, cacheFilename)
+    : filePath;
 
-  if (cacheValue === true) {
-    const cacheFilePath = path.join(cachePath, cacheFilename);
-    cacheValue = isGzipped
-      ? fs.gunzip(fs.readFile(cacheFilePath), "utf8")
-      : fs.readFile(cacheFilePath, "utf8");
+  let code = path.extname(filePath) === ".gz"
+    ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
+    : fs.readFile(codeFilePath, "utf8");
 
-  } else if (typeof cacheValue !== "string") {
-    const options = {
-      cacheFilename,
-      cachePath,
-      filePath,
-      pkgInfo
-    };
-
-    const content = isGzipped
-      ? fs.gunzip(fs.readFile(filePath), "utf8")
-      : fs.readFile(filePath, "utf8");
-
-    cacheValue = compiler.compile(content, options);
+  if (! utils.isObject(cacheValue)) {
+    cacheValue = cacheValue === true
+      ? { ast: null, code, identical: false, sourceType: "module" }
+      : compiler.compile(code, { cacheFilename, cachePath, filePath, pkgInfo });
   }
 
+  const isModule = cacheValue.sourceType === "module";
   cache[cacheFilename] = cacheValue;
+  code = cacheValue.code;
 
-  runtime.enable(mod);
-  mod._compile(cacheValue, filePath);
+  if (isModule) {
+    code = 'module.run(function(){"use strict";' + code + "\n})";
+    Runtime.enable(mod);
+  }
 
-  // If the module is not loaded through module.run, then run its setters.
-  if (! mod.loaded) {
+  mod._compile(code, filePath);
+
+  if (! isModule) {
     mod.loaded = true;
-    mod.runSetters();
+    Runtime.prototype.runSetters.call(mod);
   }
 }
 
