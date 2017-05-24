@@ -10,9 +10,9 @@ const pkgName = env.REIFY_NAME || "reify";
 const pkgMain = isREPL ? utils.resolvePath(pkgName, rootModule) : "";
 
 if (isREPL && rootModule.children.some((mod) => mod.filename === pkgMain)) {
-  // Enable import and export statements in the default Node REPL.
-  // Custom REPLs can still define their own eval functions that circumvent
-  // this compilation step, but that's a feature, not a drawback.
+  // Enable ESM in the default Node REPL by loading `reify` upon entering.
+  // Custom REPLs can still define their own eval functions to bypass this,
+  // but that's a feature, not a drawback.
   const compile = require("./caching-compiler.js").compile;
   const runtime = require("./runtime.js");
   const vm = require("vm");

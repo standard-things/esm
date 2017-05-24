@@ -5,7 +5,7 @@
   1. to make (something abstract) more concrete or real<br>
      _"these instincts are, in humans, reified as verbal constructs"_
   2. to regard or treat (an idea, concept, etc.) as if having material existence
-  3. **to enable [ECMAScript 2015 modules](http://www.2ality.com/2014/09/es6-modules-final.html) in *any* version of [Node.js](https://nodejs.org)**
+  3. **to enable [ECMAScript 2015 modules](http://www.2ality.com/2014/09/es6-modules-final.html) (ESM) in *any* version of [Node.js](https://nodejs.org)**
 
 Usage
 ---
@@ -16,7 +16,7 @@ Usage
   2. Call `require("reify")` before importing modules that contain `import`
      and `export` declarations.
 
-You can also easily `reify` the Node REPL:
+Enable ESM in the Node REPL by loading `reify` upon entering:
 
 ```sh
 % node
