@@ -61,9 +61,9 @@ module.watch(require("./module"), {
   // The keys of this object literal are the names of exported symbols.
   // The values are setter functions that take new values and update the
   // local variables.
-  default: value => { a = value; },
-  b: value => { b = value; },
-  c: value => { d = value; },
+  default(value) { a = value; },
+  b(value) { b = value; },
+  c(value) { d = value; },
 });
 ```
 
@@ -86,7 +86,7 @@ becomes
 ```js
 const utils = Object.create(null);
 module.watch(require("./utils"), {
-  "*": (value, name) => {
+  ["*"](value, name) {
     utils[name] = value;
   }
 });
@@ -113,7 +113,7 @@ becomes
 if (condition) {
   let b;
   module.watch(require("./c"), {
-    a: value => { b = value; }
+    a(value) { b = value; }
   });
   console.log(b);
 }
@@ -170,7 +170,9 @@ export { c as see }
 becomes
 
 ```js
-module.export({ see: () => c });
+module.export({
+  see: () => c
+});
 let c = 123;
 ```
 
@@ -203,9 +205,7 @@ around `module.export`:
 ```js
 module.exportDefault = function (value) {
   return this.export({
-    default: function () {
-      return value;
-    }
+    default: () => value
   }, true);
 };
 ```
@@ -287,8 +287,8 @@ export { a, b as c } from "./module";
 becomes
 ```js
 module.watch(require("./module"), {
-  a: value => { exports.a = value; },
-  b: value => { exports.c = value; },
+  a(value) { exports.a = value; },
+  b(value) { exports.c = value; },
 });
 ```
 
@@ -300,7 +300,7 @@ export * from "./module";
 becomes
 ```js
 module.watch(require("./module"), {
-  "*": (value, name) => {
+  ["*"](value, name) {
     exports[name] = value;
   }
 });
@@ -314,7 +314,7 @@ becomes
 ```js
 exports.ns = Object.create(null);
 module.watch(require("./module"), {
-  "*": (value, name) => {
+  ["*"](value, name) {
     exports.ns[name] = value;
   }
 });
@@ -327,9 +327,9 @@ export a, { b, c as d } from "./module";
 becomes
 ```js
 module.watch(require("./module"), {
-  default: value => { exports.a = value },
-  b: value => { exports.b = value },
-  c: value => { exports.d = value }
+  default(value) { exports.a = value; },
+  b(value) { exports.b = value; },
+  c(value) { exports.d = value; }
 });
 ```
 

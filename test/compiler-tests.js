@@ -55,18 +55,15 @@ describe("compiler", () => {
   it("should respect options.generateArrowFunctions", () => {
     import { compile } from "../lib/compiler.js";
 
-    const source = [
-      'import def from "mod"',
-      "export { def as x }"
-    ].join("\n");
+    const code = "export let a = 1;";
 
-    const withoutArrow = compile(source, {
+    const withoutArrow = compile(code, {
       generateArrowFunctions: false
     }).code;
 
     assert.ok(! withoutArrow.includes("=>"));
 
-    const withArrow = compile(source, {
+    const withArrow = compile(code, {
       generateArrowFunctions: true
     }).code;
 
@@ -74,9 +71,7 @@ describe("compiler", () => {
 
     // No options.generateArrowFunctions is the same as
     // { generateArrowFunctions: true }.
-    const defaultArrow = compile(
-      source
-    ).code;
+    const defaultArrow = compile(code).code;
 
     assert.ok(defaultArrow.includes("=>"));
   });
@@ -84,27 +79,49 @@ describe("compiler", () => {
   it("should respect options.generateLetDeclarations", () => {
     import { compile } from "../lib/compiler.js";
 
-    const source = 'import foo from "./foo"';
+    const code = 'import def from "mod"';
 
-    const withLet = compile(source, {
+    const withLet = compile(code, {
       generateLetDeclarations: true
     }).code;
 
-    assert.ok(withLet.startsWith("let foo;"));
+    assert.ok(withLet.startsWith("let def;"));
 
-    const withoutLet = compile(source, {
+    const withoutLet = compile(code, {
       generateLetDeclarations: false
     }).code;
 
-    assert.ok(withoutLet.startsWith("var foo;"));
+    assert.ok(withoutLet.startsWith("var def;"));
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: false }.
-    const defaultLet = compile(
-      source
-    ).code;
+    const defaultLet = compile(code).code;
 
-    assert.ok(defaultLet.startsWith("var foo;"));
+    assert.ok(defaultLet.startsWith("var def;"));
+  });
+
+  it("should respect options.generateShorthandMethodNames", () => {
+    import { compile } from "../lib/compiler.js";
+
+    const code = 'import def from "mod"';
+
+    const withoutShorthand = compile(code, {
+      generateShorthandMethodNames: false
+    }).code;
+
+    assert.ok(withoutShorthand.includes(":function"));
+
+    const withShorthand = compile(code, {
+      generateShorthandMethodNames: true
+    }).code;
+
+    assert.ok(! withShorthand.includes(":function"));
+
+    // No options.generateShorthandMethodNames is the same as
+    // { generateShorthandMethodNames: true }.
+    const defaultShorthand = compile(code).code;
+
+    assert.ok(! defaultShorthand.includes(":function"));
   });
 
   it("should respect options.modifyAST", () => {
@@ -176,8 +193,8 @@ describe("compiler", () => {
     const sourceTypes = [void 0, "module", "unambiguous"];
 
     sourceTypes.forEach((sourceType) => {
-      const actual = compile(code, { sourceType }).code;
-      assert.ok(actual.includes("module.watch"));
+      const result = compile(code, { sourceType });
+      assert.ok(result.code.includes("module.watch"));
     });
 
     const scriptType = compile(code, {
@@ -204,7 +221,6 @@ describe("compiler", () => {
 
     const anonCode = "export default class {}";
     const anonAST = parse(anonCode);
-
     const anonFirstIndex =
       isUseStrictExprStmt(anonAST.body[0]) ? 1 : 0;
 
@@ -216,7 +232,6 @@ describe("compiler", () => {
 
     const namedCode = "export default class C {}";
     const namedAST = parse(namedCode);
-
     const namedFirstIndex =
       isUseStrictExprStmt(namedAST.body[0]) ? 1 : 0;
 
