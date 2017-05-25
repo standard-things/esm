@@ -1,5 +1,5 @@
 import assert from "assert";
-import { gzip } from "../node/fs.js";
+import { gzip } from "../lib/fs.js";
 import { join } from "path";
 import {
   readFileSync,

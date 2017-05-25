@@ -1,5 +1,3 @@
-describe("Parsing with " + JSON.stringify(
-  process.env.REIFY_PARSER || "acorn"
-), () => {
+describe("Parsing with acorn", () => {
   require("./tests.js");
 });

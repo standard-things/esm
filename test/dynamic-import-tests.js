@@ -2,7 +2,6 @@ import assert from "assert";
 import { compile } from "../lib/compiler.js";
 import { join } from "path";
 
-const canEnforceArgCount = process.env.REIFY_PARSER !== "babylon";
 const canUseToStringTag = typeof Symbol === "function" &&
   typeof Symbol.toStringTag === "symbol";
 
@@ -93,8 +92,7 @@ describe("dynamic import", () => {
     assert.ok(p());
   });
 
-  (canEnforceArgCount ? it : xit)(
-  "should expect exactly one argument", () => {
+  it("should expect exactly one argument", () => {
     assert.ok([
       "import()",
       "import(a,b)",

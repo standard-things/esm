@@ -1,6 +1,6 @@
 "use strict";
 
-require("../../node/runtime.js").enable(module);
+require("../../lib/runtime.js").enable(module);
 
 module.run(function () {
   // Throw for the runSetters call in the compile-hook, module.run,

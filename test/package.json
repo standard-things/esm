@@ -1,10 +1,10 @@
 {
-  "name": "reify-test-package",
+  "name": "esm-test-package",
   "private": true,
-  "reify": {
+  "@std/esm": {
     "cache-directory": ".cache/path/for/tests"
   },
   "dependencies": {
-    "reify": "*"
+    "@std/esm": "*"
   }
 }

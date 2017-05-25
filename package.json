@@ -1,29 +1,12 @@
 {
-  "name": "reify",
-  "version": "0.11.0",
-  "main": "node/index.js",
-  "browser": "lib/empty.js",
-  "author": "Ben Newman <ben@benjamn.com>",
-  "description": "Enable ECMAScript 2015 modules in Node today. No caveats. Full stop.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/benjamn/reify.git"
-  },
-  "keywords": [
-    "ecmascript",
-    "modules",
-    "import",
-    "export",
-    "commonjs",
-    "require",
-    "exports",
-    "node"
-  ],
+  "name": "@std/esm",
+  "version": "0.0.1",
+  "description": "Enable ECMAScript modules in Node today!",
+  "keywords": "commonjs,ecmascript,export,import,modules,node,require",
+  "repository": "standard-things/esm",
   "license": "MIT",
-  "homepage": "https://github.com/benjamn/reify#readme",
-  "bugs": {
-    "url": "https://github.com/benjamn/reify/issues"
-  },
+  "author": "John-David Dalton <john.david.dalton@gmail.com>",
+  "main": "index.js",
   "engines": {
     "node": ">=4"
   },
@@ -36,11 +19,6 @@
     "semver": "^5.3.0"
   },
   "devDependencies": {
-    "babel-core": "^6.24.0",
-    "babel-plugin-transform-es2015-modules-reify": "^0.11.0",
-    "babel-preset-es2015": "^6.24.0",
-    "babylon": "^6.17.0",
-    "mocha": "~3.4.2",
-    "recast": "^0.12.3"
+    "mocha": "^3.4.2"
   }
 }

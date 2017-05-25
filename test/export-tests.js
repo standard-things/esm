@@ -4,7 +4,6 @@ import { Script } from "vm";
 let canUseClasses = false;
 let canUseDestructuring = false;
 let canUseLetConst = false;
-const canUseExportExtensions = process.env.REIFY_PARSER !== "babylon";
 
 try {
   // Test if Node supports class syntax.
@@ -268,8 +267,7 @@ describe("export declarations", () => {
     assert.strictEqual(b, 5);
   });
 
-  (canUseExportExtensions ? it : xit)(
-  "should support export extensions", () => {
+  it("should support export extensions", () => {
     import {
       def1, def2, def3, def4, def5,
       ns1, ns2, ns3, ns4, ns5,

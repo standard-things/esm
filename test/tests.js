@@ -6,6 +6,4 @@ import "./misc-tests.js";
 import "./compiler-tests.js";
 import "./output-tests.js";
 import "./file-extension-tests.js";
-import "./transform-tests.js";
-import "./babel-plugin-tests.js";
 import "./repl-tests.js";

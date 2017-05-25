@@ -1,7 +1,5 @@
 import assert from "assert";
 
-const canUseImportExtensions = process.env.REIFY_PARSER !== "babylon";
-
 describe("import declarations", () => {
   it("should work in nested scopes", () => {
     import { name, id } from "./import/name";
@@ -98,8 +96,7 @@ describe("import declarations", () => {
     assert.strictEqual(value, 0);
   });
 
-  (canUseImportExtensions ? it : xit)(
-  "should support import extensions", () => {
+  it("should support import extensions", () => {
     import {
       def1, def2, def3, def4,
       ns1, ns2, ns3, ns4,

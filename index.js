@@ -1,7 +1,7 @@
 "use strict";
 
-const setDefaults = require("../lib/options.js").setDefaults;
-const Runtime = require("./runtime.js");
+const setDefaults = require("./lib/options.js").setDefaults;
+const Runtime = require("./lib/runtime.js");
 
 let isDefaultsSet = false;
 const parentModule = module.parent || __non_webpack_module__.parent;
@@ -13,7 +13,7 @@ module.exports = (options) => {
   }
 };
 
-require("./compile-hook.js");
-require("./repl-hook.js");
+require("./lib/compile-hook.js");
+require("./lib/repl-hook.js");
 
 Runtime.enable(parentModule);
