@@ -1,7 +1,7 @@
 "use strict";
 
 const runtime = require("./runtime.js");
-const setDefaults = require("../lib/options").setDefaults;
+const setDefaults = require("../lib/options.js").setDefaults;
 
 let isDefaultsSet = false;
 const parentModule = module.parent || __non_webpack_module__.parent;
