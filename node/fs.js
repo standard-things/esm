@@ -1,9 +1,10 @@
 "use strict";
 
 const fs = require("fs");
+const minizlib = require("minizlib");
 const path = require("path");
 const utils = require("../lib/utils.js");
-const zlib = require("minizlib");
+const zlib = require("zlib");
 
 const FastObject = require("../lib/fast-object.js");
 const SemVer = require("semver");
@@ -24,6 +25,8 @@ const internalModuleStat = fsBinding.internalModuleStat;
 const internalStat = fsBinding.stat;
 const internalStatValues = fsBinding.getStatValues;
 
+let useGzipFastPath = true;
+let useGunzipFastPath = true;
 let useIsDirectoryFastPath = typeof internalModuleStat === "function";
 let useReadFileFastPath = typeof internalModuleReadFile === "function";
 let useMtimeFastPath = typeof internalStat === "function" &&
@@ -68,7 +71,15 @@ function streamToBuffer(stream, bufferOrString) {
 
 function gzip(bufferOrString, options) {
   options = Object.assign(Object.create(null), DEFAULT_GZIP_CONFIG, options);
-  return streamToBuffer(new zlib.Gzip(options), bufferOrString);
+
+  if (useGzipFastPath) {
+    try {
+      return streamToBuffer(new minizlib.Gzip(options), bufferOrString);
+    } catch (e) {
+      useGzipFastPath = false;
+    }
+  }
+  return zlib.gzipSync(bufferOrString, options);
 }
 
 exports.gzip = gzip;
@@ -77,13 +88,22 @@ function gunzip(bufferOrString, options) {
   options = typeof options === "string" ? { encoding: options } : options;
   options = Object.assign(Object.create(null), options);
 
-  const stream = new zlib.Gunzip(options);
-  if (options.encoding !== "utf8") {
-    return streamToBuffer(stream, bufferOrString);
+  if (useGunzipFastPath) {
+    try {
+      const stream = new minizlib.Gunzip(options);
+      if (options.encoding === "utf8") {
+        let result = "";
+        stream.on("data", chunk => result += chunk).end(bufferOrString);
+        return result;
+      }
+      return streamToBuffer(stream, bufferOrString);
+    } catch (e) {
+      useGunzipFastPath = false;
+    }
   }
-  let result = "";
-  stream.on("data", chunk => result += chunk).end(bufferOrString);
-  return result;
+
+  const buffer = zlib.gunzipSync(bufferOrString, options);
+  return options.encoding === "utf8" ? buffer.toString() : buffer;
 }
 
 exports.gunzip = gunzip;
