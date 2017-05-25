@@ -90,7 +90,6 @@ describe("compiler", () => {
       parse: () => ast
     });
 
-    assert.strictEqual(result.ast, ast);
     assert.ok(result.code.startsWith("let foo"));
     assert.ok(result.code.includes('"./+@#"'));
   });
