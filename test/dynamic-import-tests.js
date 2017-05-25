@@ -2,8 +2,7 @@ import assert from "assert";
 import { compile } from "../lib/compiler.js";
 import { join } from "path";
 
-const canUseToStringTag = typeof Symbol === "function" &&
-  typeof Symbol.toStringTag === "symbol";
+const canUseToStringTag = typeof Symbol.toStringTag === "symbol";
 
 describe("dynamic import", () => {
   const id = "./misc/abc";
