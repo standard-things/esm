@@ -1,4 +1,4 @@
-const assert = require("assert");
+import assert from "assert";
 
 // Masquerade as the REPL module.
 module.children = [require.cache[require.resolve("reify")]];
@@ -13,11 +13,11 @@ describe("Node REPL", () => {
   import "../node/repl-hook.js";
   import { createContext } from "vm";
   import repl from "repl";
-  import runtime from "../node/runtime.js";
+  import Runtime from "../node/runtime.js";
 
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true });
-    runtime.enable(r.context.module);
+    Runtime.enable(r.context.module);
 
     assert.strictEqual(typeof assertStrictEqual, "undefined");
 
