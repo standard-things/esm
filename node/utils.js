@@ -158,6 +158,7 @@ function readPkgInfo(dirPath) {
     // contents of the file, but for now we merely register that it exists.
     pkgInfo.cache[cacheFiles[i]] = true;
   }
+
   return pkgInfo;
 }
 
