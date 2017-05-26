@@ -1,7 +1,7 @@
-const data = [];
+const data = []
 export function log(x) {
-  data.push(x);
-};
+  data.push(x)
+}
 export function getLog() {
-  return data;
-};
+  return data
+}

@@ -1,2 +1,2 @@
-import { log } from "./order-tracker";
-log("b");
+import { log } from "./order-tracker"
+log("b")

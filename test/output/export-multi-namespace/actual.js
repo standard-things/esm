@@ -1,1 +1,1 @@
-export * as a, * as b from "module";
+export * as a, * as b from "module"

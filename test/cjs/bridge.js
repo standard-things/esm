@@ -1,1 +1,1 @@
-module.exports = require("../misc/live");
+module.exports = require("../misc/live")

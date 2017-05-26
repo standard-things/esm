@@ -1,2 +1,2 @@
-export * from "./abc";
-export default "default";
+export * from "./abc"
+export default "default"

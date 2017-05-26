@@ -1,1 +1,1 @@
-export default this;
+export default this

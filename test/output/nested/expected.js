@@ -6,5 +6,5 @@ module.export({outer:()=>outer});function outer() {var ay;module.watch(require("
     ay,
     bee,
     see
-  ];
+  ]
 }

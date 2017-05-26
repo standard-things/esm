@@ -11,7 +11,7 @@ module.export({default:()=>check});var strictEqual,deepEqual;module.watch(requir
 function check()
 
 {
-  const error = new Error; // Line 14
-  const line = +error.stack.split("\n")[1].split(":")[1];
-  strictEqual(line, 14);
+  const error = new Error // Line 14
+  const line = +error.stack.split("\n")[1].split(":")[1]
+  strictEqual(line, 14)
 }

@@ -1,5 +1,5 @@
-let localValue = "original";
-export { localValue as value };
+let localValue = "original"
+export { localValue as value }
 export function run(code) {
-  return eval(code);
-};
+  return eval(code)
+}

@@ -1,1 +1,1 @@
-export { c } from "./grandchild";
+export { c } from "./grandchild"

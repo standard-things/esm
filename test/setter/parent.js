@@ -1,2 +1,2 @@
-import { c } from "./child";
-export { c };
+import { c } from "./child"
+export { c }

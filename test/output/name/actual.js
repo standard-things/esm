@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("path")
 
 export const id = module.id,
-  name = path.basename(__filename);
+  name = path.basename(__filename)

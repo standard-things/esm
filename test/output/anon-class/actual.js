@@ -1,5 +1,5 @@
 export default class {
   constructor(value) {
-    this.value = value;
+    this.value = value
   }
-};
+}

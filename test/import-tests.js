@@ -1,107 +1,107 @@
-import assert from "assert";
+import assert from "assert"
 
 describe("import declarations", () => {
   it("should work in nested scopes", () => {
-    import { name, id } from "./import/name";
-    assert.strictEqual(name, "name.js");
-    assert.strictEqual(id.split("/").pop(), "name.js");
-  });
+    import { name, id } from "./import/name"
+    assert.strictEqual(name, "name.js")
+    assert.strictEqual(id.split("/").pop(), "name.js")
+  })
 
   it("should cope with dependency cycles", () => {
-    import { check as aCheck } from "./import/cycle-a";
-    aCheck();
+    import { check as aCheck } from "./import/cycle-a"
+    aCheck()
 
-    import { check as bCheck } from "./import/cycle-a";
-    bCheck();
-  });
+    import { check as bCheck } from "./import/cycle-a"
+    bCheck()
+  })
 
   it("should support combinations of import styles", () => {
-    import * as abc1 from "./misc/abc";
-    import abc2, * as abc3 from "./misc/abc";
-    import { default as abc4 } from "./misc/abc";
-    import abc5, { a as ay, b as bee, c } from "./misc/abc";
+    import * as abc1 from "./misc/abc"
+    import abc2, * as abc3 from "./misc/abc"
+    import { default as abc4 } from "./misc/abc"
+    import abc5, { a as ay, b as bee, c } from "./misc/abc"
 
-    assert.deepEqual(abc1, { a: "a", b: "b", c: "c" });
+    assert.deepEqual(abc1, { a: "a", b: "b", c: "c" })
 
-    assert.deepEqual(abc1, abc2);
-    assert.deepEqual(abc1, abc3);
-    assert.deepEqual(abc1, abc4);
-    assert.deepEqual(abc1, abc5);
-  });
+    assert.deepEqual(abc1, abc2)
+    assert.deepEqual(abc1, abc3)
+    assert.deepEqual(abc1, abc4)
+    assert.deepEqual(abc1, abc5)
+  })
 
   it("should import module.exports as default, by default", () => {
-    import def from "./export/common.js";
-    assert.strictEqual(def, "pure CommonJS");
-  });
+    import def from "./export/common.js"
+    assert.strictEqual(def, "pure CommonJS")
+  })
 
   it("should allow same symbol as different locals", () => {
-    import { a as x, a as y } from "./misc/abc";
-    assert.strictEqual(x, "a");
-    assert.strictEqual(y, "a");
-  });
+    import { a as x, a as y } from "./misc/abc"
+    assert.strictEqual(x, "a")
+    assert.strictEqual(y, "a")
+  })
 
   it("should support braceless-if nested imports", () => {
-    assert.strictEqual(typeof x, "undefined");
+    assert.strictEqual(typeof x, "undefined")
     for (let i = 0; i < 3; ++i) {
-      if (i === 0) import { a as x } from "./misc/abc";
-      else if (i === 1) import { b as x } from "./misc/abc";
-      else import { c as x } from "./misc/abc";
-      assert.strictEqual(x, ["a", "b", "c"][i]);
+      if (i === 0) import { a as x } from "./misc/abc"
+      else if (i === 1) import { b as x } from "./misc/abc"
+      else import { c as x } from "./misc/abc"
+      assert.strictEqual(x, ["a", "b", "c"][i])
     }
-    assert.strictEqual(x, "c");
-  });
+    assert.strictEqual(x, "c")
+  })
 
   it("should support braceless-while nested imports", () => {
-    var i = 0, x;
-    while (i++ === 0) import { a as x } from "./misc/abc";
-    assert.strictEqual(x, "a");
-  });
+    var i = 0, x
+    while (i++ === 0) import { a as x } from "./misc/abc"
+    assert.strictEqual(x, "a")
+  })
 
   it("should support braceless-do-while nested imports", () => {
-    var x;
-    do import { b as x } from "./misc/abc";
-    while (false);
-    assert.strictEqual(x, "b");
-  });
+    var x
+    do import { b as x } from "./misc/abc"
+    while (false)
+    assert.strictEqual(x, "b")
+  })
 
   it("should support braceless-for-in nested imports", () => {
     for (var x in { a: 123 })
-      import { c as x } from "./misc/abc";
-    assert.strictEqual(x, "c");
-  });
+      import { c as x } from "./misc/abc"
+    assert.strictEqual(x, "c")
+  })
 
   it("should allow CommonJS modules to set module.exports", () => {
-    import f from "./cjs/module-exports-function.js";
-    assert.strictEqual(typeof f, "function");
-    assert.strictEqual(f(), "ok");
+    import f from "./cjs/module-exports-function.js"
+    assert.strictEqual(typeof f, "function")
+    assert.strictEqual(f(), "ok")
 
-    import n from "./cjs/module-exports-null.js";
-    assert.strictEqual(n, null);
+    import n from "./cjs/module-exports-null.js"
+    assert.strictEqual(n, null)
 
-    import o, { a, b, c } from "./cjs/module-exports-object.js";
-    assert.deepEqual(o, { a: 1, b: 2, c: 3 });
-    assert.strictEqual(a, o.a);
-    assert.strictEqual(b, o.b);
-    assert.strictEqual(c, o.c);
-    o.c = 4;
-    module.runSetters.call({ exports: o });
-    assert.strictEqual(c, 4);
+    import o, { a, b, c } from "./cjs/module-exports-object.js"
+    assert.deepEqual(o, { a: 1, b: 2, c: 3 })
+    assert.strictEqual(a, o.a)
+    assert.strictEqual(b, o.b)
+    assert.strictEqual(c, o.c)
+    o.c = 4
+    module.runSetters.call({ exports: o })
+    assert.strictEqual(c, 4)
 
-    import { value, reset, add } from "./cjs/bridge.js";
-    reset();
-    assert.strictEqual(value, 0);
-    add(10);
-    assert.strictEqual(value, 10);
-    assert.strictEqual(reset(), 0);
-    assert.strictEqual(value, 0);
-  });
+    import { value, reset, add } from "./cjs/bridge.js"
+    reset()
+    assert.strictEqual(value, 0)
+    add(10)
+    assert.strictEqual(value, 10)
+    assert.strictEqual(reset(), 0)
+    assert.strictEqual(value, 0)
+  })
 
   it("should support import extensions", () => {
     import {
       def1, def2, def3, def4,
       ns1, ns2, ns3, ns4,
       a, b, c, d, e
-    } from "./import/extensions";
+    } from "./import/extensions"
 
     import def, {
       a as _a,
@@ -109,27 +109,27 @@ describe("import declarations", () => {
       b as _c,
       c as _d,
       c as _e,
-    } from "./misc/abc";
+    } from "./misc/abc"
 
-    assert.strictEqual(def, def1);
-    assert.strictEqual(def, def2);
-    assert.strictEqual(def, def3);
-    assert.strictEqual(def, def4);
+    assert.strictEqual(def, def1)
+    assert.strictEqual(def, def2)
+    assert.strictEqual(def, def3)
+    assert.strictEqual(def, def4)
 
     function checkNS(ns) {
-      assert.deepEqual(ns, def);
-      assert.notStrictEqual(ns, def);
+      assert.deepEqual(ns, def)
+      assert.notStrictEqual(ns, def)
     }
 
-    checkNS(ns1);
-    checkNS(ns2);
-    checkNS(ns3);
-    checkNS(ns4);
+    checkNS(ns1)
+    checkNS(ns2)
+    checkNS(ns3)
+    checkNS(ns4)
 
-    assert.strictEqual(a, _a);
-    assert.strictEqual(b, _b);
-    assert.strictEqual(c, _c);
-    assert.strictEqual(d, _d);
-    assert.strictEqual(e, _e);
-  });
-});
+    assert.strictEqual(a, _a)
+    assert.strictEqual(b, _b)
+    assert.strictEqual(c, _c)
+    assert.strictEqual(d, _d)
+    assert.strictEqual(e, _e)
+  })
+})

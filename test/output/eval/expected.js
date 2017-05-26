@@ -1,5 +1,5 @@
-module.export({value:()=>localValue,run:()=>run});let localValue = "original";
+module.export({value:()=>localValue,run:()=>run});let localValue = "original"
 
 function run(code) {
-  return module.runSetters(eval(code));
-};
+  return module.runSetters(eval(code))
+}

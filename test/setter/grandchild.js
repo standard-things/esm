@@ -1,5 +1,5 @@
-export let c = 0;
+export let c = 0
 export function increment() {
-  ++c;
-  module.runSetters();
-};
+  ++c
+  module.runSetters()
+}

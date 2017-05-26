@@ -1,15 +1,15 @@
-import assert from "assert";
+import assert from "assert"
 
-export const one = 1;
+export const one = 1
 
 import {
   one as bOne,
   two as bTwo,
-} from "./cycle-b";
+} from "./cycle-b"
 
-export const two = 2;
+export const two = 2
 
 export function check() {
-  assert.strictEqual(bOne, 1);
-  assert.strictEqual(bTwo, 2);
+  assert.strictEqual(bOne, 1)
+  assert.strictEqual(bTwo, 2)
 }

@@ -1,1 +1,1 @@
-module.exports = require("./bridge-owner.js");
+module.exports = require("./bridge-owner.js")

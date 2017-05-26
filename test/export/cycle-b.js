@@ -1,5 +1,5 @@
-import { fun } from "./cycle-a";
+import { fun } from "./cycle-a"
 
 export function callFun() {
-  return fun();
+  return fun()
 }

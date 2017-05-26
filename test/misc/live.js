@@ -1,9 +1,9 @@
-export var value = reset();
+export var value = reset()
 
 export function add(n) {
-  value += n;
-};
+  value += n
+}
 
 export function reset() {
-  return value = 0;
-};
+  return value = 0
+}

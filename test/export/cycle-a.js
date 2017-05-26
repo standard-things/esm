@@ -1,9 +1,9 @@
 function fun() {
-  return true;
+  return true
 }
 
-import { callFun } from "./cycle-b";
+import { callFun } from "./cycle-b"
 
-export default callFun();
+export default callFun()
 
-export { fun };
+export { fun }
