@@ -1,8 +1,6 @@
 export const a = 1;
-export const b = function () {
-  return d;
-};
-export let c; // lazy initialization
+export const b = () => d;
+export let c; // Lazy initialization.
 export function d() {
   return b;
 };

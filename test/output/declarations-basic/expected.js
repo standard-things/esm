@@ -1,8 +1,6 @@
 module.export({c:()=>c,d:()=>d});module.export({a:()=>a,b:()=>b},true);const a = 1;
-const b = function () {
-  return d;
-};
-let c; // lazy initialization
+const b = () => d;
+let c; // Lazy initialization.
 function d() {
   return b;
 };
