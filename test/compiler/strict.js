@@ -8,7 +8,7 @@ export function check() {
   strictEqual(b, "b");
   strictEqual(c, "c");
 
-  // Returns true iff the current function is strict.
+  // Returns true only if the current function is strict.
   return function () {
     return ! this;
   }();
