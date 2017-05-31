@@ -42,7 +42,9 @@ describe("import declarations", () => {
 
   it("should support braceless-if nested imports", () => {
     assert.strictEqual(typeof x, "undefined")
-    for (let i = 0; i < 3; ++i) {
+
+    let i = -1
+    while (++i < 3) {
       if (i === 0) import { a as x } from "./misc/abc"
       else if (i === 1) import { b as x } from "./misc/abc"
       else import { c as x } from "./misc/abc"
@@ -52,7 +54,8 @@ describe("import declarations", () => {
   })
 
   it("should support braceless-while nested imports", () => {
-    var i = 0, x
+    var x
+    var i = 0
     while (i++ === 0) import { a as x } from "./misc/abc"
     assert.strictEqual(x, "a")
   })

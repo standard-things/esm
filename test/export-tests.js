@@ -217,7 +217,8 @@ describe("export declarations", () => {
   it("should support switch-case nested imports", () => {
     assert.strictEqual(typeof x, "undefined")
 
-    for (let i = 0; i < 2; ++i) {
+    let i = -1
+    while (++i < 2) {
       switch (i) {
       case 0:
         import { a as x } from "./misc/abc"
