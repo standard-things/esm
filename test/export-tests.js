@@ -19,7 +19,7 @@ try {
 
 try {
   // Test if Node supports block declaration syntax.
-  new Script("let x const y = 1")
+  new Script("let x; const y = 1")
   canUseLetConst = true
 } catch (e) {}
 
