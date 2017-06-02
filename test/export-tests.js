@@ -283,6 +283,13 @@ describe("export declarations", () => {
       c as _e,
     } from "./misc/abc"
 
+    const abcNs = {
+      a: "a",
+      b: "b",
+      c: "c",
+      default: { a: "a", b: "b", c: "c" }
+    }
+
     const defs = [
       def1, def2, def3, def4, def5
     ]
@@ -296,8 +303,8 @@ describe("export declarations", () => {
     })
 
     namespaces.forEach((ns) => {
-      assert.deepEqual(ns, def)
-      assert.notStrictEqual(ns, def)
+      assert.deepEqual(ns, abcNs)
+      assert.strictEqual(ns.default, def)
     })
 
     assert.strictEqual(a, _a)
