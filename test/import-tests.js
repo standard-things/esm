@@ -1,6 +1,13 @@
 import assert from "assert"
 
 describe("import declarations", () => {
+  const abcNs = {
+    a: "a",
+    b: "b",
+    c: "c",
+    default: { a: "a", b: "b", c: "c" }
+  }
+
   it("should work in nested scopes", () => {
     import { name, id } from "./import/name"
     assert.strictEqual(name, "name.js")
@@ -19,14 +26,13 @@ describe("import declarations", () => {
     import * as abc1 from "./misc/abc"
     import abc2, * as abc3 from "./misc/abc"
     import { default as abc4 } from "./misc/abc"
-    import abc5, { a as ay, b as bee, c } from "./misc/abc"
+    import abc5, { a as aa, b as bb, c } from "./misc/abc"
 
-    assert.deepEqual(abc1, { a: "a", b: "b", c: "c" })
-
-    assert.deepEqual(abc1, abc2)
-    assert.deepEqual(abc1, abc3)
-    assert.deepEqual(abc1, abc4)
-    assert.deepEqual(abc1, abc5)
+    assert.deepEqual(abc1, abcNs)
+    assert.strictEqual(abc1, abc3)
+    assert.strictEqual(abc1.default, abc2)
+    assert.strictEqual(abc1.default, abc4)
+    assert.strictEqual(abc1.default, abc5)
   })
 
   it("should import module.exports as default, by default", () => {
@@ -74,12 +80,14 @@ describe("import declarations", () => {
   })
 
   it("should allow CommonJS modules to set module.exports", () => {
-    import f from "./cjs/module-exports-function.js"
-    assert.strictEqual(typeof f, "function")
-    assert.strictEqual(f(), "ok")
+    import fdef, * as fns from "./cjs/module-exports-function.js"
+    assert.strictEqual(typeof fdef, "function")
+    assert.strictEqual(fdef(), "ok")
+    assert.strictEqual(fns.default, fdef);
 
-    import n from "./cjs/module-exports-null.js"
-    assert.strictEqual(n, null)
+    import ndef, * as nns from "./cjs/module-exports-null.js"
+    assert.strictEqual(ndef, null)
+    assert.strictEqual(nns.default, ndef);
 
     import o, { a, b, c } from "./cjs/module-exports-object.js"
     assert.deepEqual(o, { a: 1, b: 2, c: 3 })

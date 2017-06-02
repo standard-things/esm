@@ -1,2 +1,2 @@
 export * as bridge from "./bridge.js"
-exports.name = module.id
+exports.bridge.id = module.id

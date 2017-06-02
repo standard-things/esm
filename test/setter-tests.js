@@ -1,5 +1,5 @@
 import assert from "assert"
-import { join as pathJoin } from "path"
+import path from "path"
 
 describe("module.runSetters", () => {
   it("should be called after eval(...)", () => {
@@ -24,11 +24,9 @@ describe("bridge modules", () => {
     import { bridge } from "./setter/cycle/bridge-owner.js"
 
     assert.strictEqual(
-      bridge.name,
-      pathJoin(__dirname, "setter/cycle/bridge-owner.js")
+      bridge.id,
+      path.join(__dirname, "setter/cycle/bridge-owner.js")
     )
-
-    assert.strictEqual(bridge, bridge.bridge)
   })
 })
 

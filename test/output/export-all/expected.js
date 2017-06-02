@@ -1,2 +1,2 @@
-module.watch(require("./abc"),{"*"(v,k){exports[k]=v}},0);
+module.watch(require("./abc"),{"*":module.makeNsSetter()},0);
 module.exportDefault("default");

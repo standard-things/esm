@@ -5,7 +5,13 @@ import { join } from "path"
 const canUseToStringTag = typeof Symbol.toStringTag === "symbol"
 
 describe("dynamic import", () => {
-  const id = "./misc/abc"
+  const abcId = "./misc/abc"
+  const abcNs = {
+    a: "a",
+    b: "b",
+    c: "c",
+    default: { a: "a", b: "b", c: "c" }
+  }
 
   it("should transpile to module.import", () => {
     let callCount = 0
@@ -27,7 +33,7 @@ describe("dynamic import", () => {
 
       assert.ok(Object.isSealed(ns))
       assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
-      assert.deepEqual(ns, { a: "a", b: "b", c: "c" })
+      assert.deepEqual(ns, abcNs)
     })
   )
 
@@ -41,23 +47,23 @@ describe("dynamic import", () => {
   )
 
   it("should support a variable id", () =>
-    import(id)
-      .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+    import(abcId)
+      .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support a template string id", () =>
-    import(`${id}`)
-      .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+    import(`${abcId}`)
+      .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support an expression id", () =>
-    import((() => id)())
-      .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+    import((() => abcId)())
+      .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support the file protocol", () =>
-    import("file://" + join(__dirname, id))
-      .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+    import("file://" + join(__dirname, abcId))
+      .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
@@ -67,7 +73,7 @@ describe("dynamic import", () => {
     "./misc/abc"
     )
 
-    .then((ns) => assert.deepEqual(ns, { a: "a", b: "b", c: "c" }))
+      .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support import() in an assignment", () => {
