@@ -27,11 +27,8 @@ Object.keys(files).forEach((absPath) => {
 
 describe("output", () => {
   function check(data) {
-    const code = compile(data.actual, {
-      parse: require("../lib/parser/acorn.js").parse
-    }).code
-
     // Consolidate semicolons, then trim blank lines and trailing whitespace.
+    const code = compile(data.actual).code
     const actual = code.replace(/;{2,}/g, "").replace(/^ +$/gm, "").trimRight()
     const expected = data.expected.trimRight()
 
@@ -42,7 +39,7 @@ describe("output", () => {
     const data = filesToTest[key]
     const testName = key.split("-").join(" ")
 
-    it("compiles " + testName + " example as expected", () => {
+    it(`compiles ${testName} example as expected`, () => {
       check(data)
     })
   })
