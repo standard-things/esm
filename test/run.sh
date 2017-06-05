@@ -9,15 +9,14 @@ TEST_DIR=$(pwd)
 cd "$TEST_DIR"
 
 rm -rf .cache
-export REIFY_PARSER=acorn
 
 mocha \
     --require "../index.js" \
     --full-trace \
-    run.js
+    tests.js
 
 # Run tests again using test/.cache.
 mocha \
     --require "../index.js" \
     --full-trace \
-    run.js
+    tests.js
