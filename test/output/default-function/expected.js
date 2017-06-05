@@ -1,13 +1,12 @@
-module.export({default:()=>f,check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v}},0);
+module.export({default:()=>f,check:()=>check});var assert;module.watch(require("assert"),{default(v){assert=v}},0);
 
-const obj = {}
+const object = {}
 
 function f() {
-  return obj
+  return object
 }
 
 function check(g) {
-  strictEqual(f, g)
-  strictEqual(f(), obj)
-  strictEqual(g(), obj)
+  assert.strictEqual(f, g)
+  assert.strictEqual(f(), object)
 }

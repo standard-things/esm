@@ -1,155 +1,41 @@
 import assert from "assert"
 
 describe("import declarations", () => {
-  const abcNs = {
-    a: "a",
-    b: "b",
-    c: "c",
-    default: { a: "a", b: "b", c: "c" }
-  }
+  it("should work in nested scopes", () =>
+    import("./import/name")
+      .then((ns) => ns.check())
+  )
 
-  it("should work in nested scopes", () => {
-    import { name, id } from "./import/name"
-    assert.strictEqual(name, "name.js")
-    assert.strictEqual(id.split("/").pop(), "name.js")
-  })
+  it("should cope with dependency cycles", () =>
+    Promise.all([
+      import("./import/cycle-a"),
+      import("./import/cycle-a")
+    ])
+    .then((nss) => nss.forEach((ns) => ns.check()))
+  )
 
-  it("should cope with dependency cycles", () => {
-    import { check as aCheck } from "./import/cycle-a"
-    aCheck()
+  it("should support combinations of import styles", () =>
+    import("./import/combinations")
+      .then((ns) => ns.check())
+  )
 
-    import { check as bCheck } from "./import/cycle-a"
-    bCheck()
-  })
+  it("should import module.exports as default, by default", () =>
+    import("./import/default")
+      .then((ns) => ns.check())
+  )
 
-  it("should support combinations of import styles", () => {
-    import * as abc1 from "./misc/abc"
-    import abc2, * as abc3 from "./misc/abc"
-    import { default as abc4 } from "./misc/abc"
-    import abc5, { a as aa, b as bb, c } from "./misc/abc"
+  it("should allow same symbol as different locals", () =>
+    import("./import/locals")
+      .then((ns) => ns.check())
+  )
 
-    assert.deepEqual(abc1, abcNs)
-    assert.strictEqual(abc1, abc3)
-    assert.strictEqual(abc1.default, abc2)
-    assert.strictEqual(abc1.default, abc4)
-    assert.strictEqual(abc1.default, abc5)
-  })
+  it("should allow CommonJS modules to set module.exports", () =>
+    import("./import/cjs")
+      .then((ns) => ns.check())
+  )
 
-  it("should import module.exports as default, by default", () => {
-    import def from "./export/common.js"
-    assert.strictEqual(def, "pure CommonJS")
-  })
-
-  it("should allow same symbol as different locals", () => {
-    import { a as x, a as y } from "./misc/abc"
-    assert.strictEqual(x, "a")
-    assert.strictEqual(y, "a")
-  })
-
-  it("should support braceless-if nested imports", () => {
-    assert.strictEqual(typeof x, "undefined")
-
-    let i = -1
-    while (++i < 3) {
-      if (i === 0) import { a as x } from "./misc/abc"
-      else if (i === 1) import { b as x } from "./misc/abc"
-      else import { c as x } from "./misc/abc"
-      assert.strictEqual(x, ["a", "b", "c"][i])
-    }
-    assert.strictEqual(x, "c")
-  })
-
-  it("should support braceless-while nested imports", () => {
-    var x
-    var i = 0
-    while (i++ === 0) import { a as x } from "./misc/abc"
-    assert.strictEqual(x, "a")
-  })
-
-  it("should support braceless-do-while nested imports", () => {
-    var x
-    do import { b as x } from "./misc/abc"
-    while (false)
-    assert.strictEqual(x, "b")
-  })
-
-  it("should support braceless-for-in nested imports", () => {
-    for (var x in { a: 123 })
-      import { c as x } from "./misc/abc"
-    assert.strictEqual(x, "c")
-  })
-
-  it("should allow CommonJS modules to set module.exports", () => {
-    import fdef, * as fns from "./cjs/module-exports-function.js"
-    assert.strictEqual(typeof fdef, "function")
-    assert.strictEqual(fdef(), "ok")
-    assert.strictEqual(fns.default, fdef);
-
-    import ndef, * as nns from "./cjs/module-exports-null.js"
-    assert.strictEqual(ndef, null)
-    assert.strictEqual(nns.default, ndef);
-
-    import o, { a, b, c } from "./cjs/module-exports-object.js"
-    assert.deepEqual(o, { a: 1, b: 2, c: 3 })
-    assert.strictEqual(a, o.a)
-    assert.strictEqual(b, o.b)
-    assert.strictEqual(c, o.c)
-    o.c = 4
-    module.runSetters.call({ exports: o })
-    assert.strictEqual(c, 4)
-
-    import { value, reset, add } from "./cjs/bridge.js"
-    reset()
-    assert.strictEqual(value, 0)
-    add(10)
-    assert.strictEqual(value, 10)
-    assert.strictEqual(reset(), 0)
-    assert.strictEqual(value, 0)
-  })
-
-  it("should support import extensions", () => {
-    import {
-      def1, def2, def3, def4, def5,
-      ns1, ns2, ns3, ns4, ns5,
-      a, b, c, d, e
-    } from "./import/extensions"
-
-    import def, {
-      a as _a,
-      b as _b,
-      b as _c,
-      c as _d,
-      c as _e,
-    } from "./misc/abc"
-
-    const abcNs = {
-      a: "a",
-      b: "b",
-      c: "c",
-      default: { a: "a", b: "b", c: "c" }
-    }
-
-    const defs = [
-      def1, def2, def3, def4, def5
-    ]
-
-    const namespaces = [
-      ns1, ns2, ns3, ns4, ns5
-    ]
-
-    defs.forEach((d) => {
-      assert.strictEqual(d, def)
-    })
-
-    namespaces.forEach((ns) => {
-      assert.deepEqual(ns, abcNs)
-      assert.strictEqual(ns.default, def)
-    })
-
-    assert.strictEqual(a, _a)
-    assert.strictEqual(b, _b)
-    assert.strictEqual(c, _c)
-    assert.strictEqual(d, _d)
-    assert.strictEqual(e, _e)
-  })
+  it("should support import extensions", () =>
+    import("./import/extensions")
+      .then((ns) => ns.check())
+  )
 })

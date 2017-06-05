@@ -1,4 +1,7 @@
 import assert from "assert"
+import { createContext } from "vm"
+import repl from "repl"
+import Runtime from "../lib/runtime.js"
 
 // Masquerade as the REPL module.
 module.children = [require.cache[require.resolve("../index.js")]]
@@ -8,13 +11,9 @@ module.loaded = false
 module.parent = void 0
 
 delete require.cache[require.resolve("../lib/repl-hook.js")]
+import("../lib/repl-hook.js")
 
 describe("Node REPL", () => {
-  import "../lib/repl-hook.js"
-  import { createContext } from "vm"
-  import repl from "repl"
-  import Runtime from "../lib/runtime.js"
-
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true })
     Runtime.enable(r.context.module)

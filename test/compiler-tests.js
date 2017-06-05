@@ -1,4 +1,6 @@
-const assert = require("assert")
+import assert from "assert"
+import { compile } from "../lib/compiler.js"
+import { parse } from "../lib/parser"
 
 function isUseStrictExprStmt(stmt) {
   return stmt.type === "ExpressionStatement" &&
@@ -6,55 +8,41 @@ function isUseStrictExprStmt(stmt) {
 }
 
 describe("compiler", () => {
-  it("should not get confused by string literals", () => {
-    assert.strictEqual(
-      'a; import b from "c"; d',
-      "a; import b " + 'from "c"; d'
-    )
+  it("should not get confused by string literals", () =>
+    import("./compiler/strings")
+      .then((ns) => ns.check())
+  )
 
-    assert.strictEqual(
-      'a; export {a} from "a"; b;',
-      "a; export {a" + '} from "a"; b;'
-    )
-  })
+  it("should not be enabled for nested node_modules", () =>
+    import("disabled")
+      .then(() => assert.ok(false))
+      .catch((error) => {
+        assert.ok(error instanceof SyntaxError)
+        assert.ok(/unexpected/i.test(error.message))
+      })
+  )
 
-  it("should not be enabled for nested node_modules", () => {
-    let error
+  it("should choose a unique module identifier", () =>
+    import("./compiler/module-alias")
+      .then((ns) => ns.check())
+  )
 
-    try {
-      import "disabled"
-    } catch (e) {
-      error = e
-    }
+  it("should be enabled for packages that depend on @std/esm", () =>
+    import("enabled")
+      .then((ns) => ns.check())
+  )
 
-    assert.ok(error instanceof SyntaxError)
-    assert.ok(/unexpected/i.test(error.message))
-  })
+  it("should preserve line numbers", () =>
+    import("./compiler/lines.js")
+      .then((ns) => ns.check())
+  )
 
-  it("should choose a unique module identifier", () => {
-    const module = null, module2 = null
-    import { a } from "./misc/abc"
-    assert.strictEqual(a, "a")
-  })
-
-  it("should be enabled for packages that depend on @std/esm", () => {
-    import a from "enabled"
-    assert.strictEqual(a, assert)
-  })
-
-  it("should preserve line numbers", () => {
-    import check from "./compiler/lines.js"
-    check()
-  })
-
-  it('should not hoist above "use strict"', () => {
-    import { check } from "./compiler/strict"
-    assert.strictEqual(check(), true)
-  })
+  it('should not hoist above "use strict"', () =>
+     import("./compiler/strict")
+      .then((ns) => ns.check())
+  )
 
   it("should respect options.generateLetDeclarations", () => {
-    import { compile } from "../lib/compiler.js"
-
     const code = 'import def from "mod"'
 
     const withLet = compile(code, {
@@ -76,27 +64,7 @@ describe("compiler", () => {
     assert.ok(defaultLet.startsWith("var def"))
   })
 
-  it("should allow pre-parsed ASTs via options.parse", () => {
-    import { compile } from "../lib/compiler.js"
-    import { parse } from "../lib/parser"
-
-    const code = 'import foo from "./foo"'
-    const ast = parse(code)
-    const illegal = code.replace(/\bfoo\b/g, "+@#")
-    const result = compile(illegal, {
-      generateLetDeclarations: true,
-      // If you really want to avoid parsing, you can provide an
-      // options.parse function that returns whatever AST you like.
-      parse: () => ast
-    })
-
-    assert.ok(result.code.startsWith("let foo"))
-    assert.ok(result.code.includes('"./+@#"'))
-  })
-
   it("should respect options.sourceType", () => {
-    import { compile } from "../lib/compiler.js"
-
     const code = 'import "a"'
     const sourceTypes = [void 0, "module", "unambiguous"]
 
@@ -113,8 +81,6 @@ describe("compiler", () => {
   })
 
   it("should not get confused by shebang", () => {
-    import { compile } from "../lib/compiler.js"
-
     const code = [
       "#!/usr/bin/env node -r @std/esm",
       'import a from "a"',
@@ -125,15 +91,11 @@ describe("compiler", () => {
   })
 
   it("should not get confused by trailing comments", () => {
-    import { compile } from "../lib/compiler.js"
-
     const result = compile('import "a" // trailing comment')
     assert.ok(result.code.endsWith("// trailing comment"))
   })
 
   it("should preserve crlf newlines", () => {
-    import { compile } from "../lib/compiler.js"
-
     const code = [
       "import {",
       "  strictEqual,",

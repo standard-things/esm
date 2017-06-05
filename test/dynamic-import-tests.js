@@ -1,6 +1,6 @@
 import assert from "assert"
 import { compile } from "../lib/compiler.js"
-import { join } from "path"
+import path from "path"
 
 const canUseToStringTag = typeof Symbol.toStringTag === "symbol"
 
@@ -62,7 +62,7 @@ describe("dynamic import", () => {
   )
 
   it("should support the file protocol", () =>
-    import("file://" + join(__dirname, abcId))
+    import("file://" + path.join(__dirname, abcId))
       .then((ns) => assert.deepEqual(ns, abcNs))
   )
 

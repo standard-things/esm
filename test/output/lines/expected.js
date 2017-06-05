@@ -1,4 +1,4 @@
-module.export({default:()=>check});var strictEqual,deepEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v},deepEqual(v){deepEqual=v}},0);
+module.export({check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v}},0);
 
 
 
@@ -6,12 +6,8 @@ module.export({default:()=>check});var strictEqual,deepEqual;module.watch(requir
 
 
 
-
-
-function check()
-
-{
-  const error = new Error // Line 14
-  const line = +error.stack.split("\n")[1].split(":")[1]
-  strictEqual(line, 14)
+function check() {
+  const error = new Error // Line 12.
+  const line = error.stack.match(/\.js:(\d+)/)[1]
+  strictEqual(line, '12')
 }

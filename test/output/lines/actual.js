@@ -1,17 +1,13 @@
 import {
-  strictEqual,
-  // blank line
-  deepEqual,
+  // Blank line.
+  strictEqual
 }
-from "assert"
+  from "assert"
 
 export
-default
 
-function check()
-
-{
-  const error = new Error // Line 14
-  const line = +error.stack.split("\n")[1].split(":")[1]
-  strictEqual(line, 14)
+  function check() {
+  const error = new Error // Line 12.
+  const line = error.stack.match(/\.js:(\d+)/)[1]
+  strictEqual(line, '12')
 }

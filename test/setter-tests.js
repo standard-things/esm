@@ -41,7 +41,7 @@ describe("parent setters", () => {
   })
 
   it("should not be called if replaced", () => {
-    import { value, reset, add } from "./misc/live.js"
+    import { add, reset, value } from "./misc/live.js"
 
     let firstCallCount = 0
     let secondCallCount = 0

@@ -1,13 +1,12 @@
-import { strictEqual } from "assert"
+import assert from "assert"
 
-const obj = {}
+const object = {}
 
 export default function f() {
-  return obj
+  return object
 }
 
 export function check(g) {
-  strictEqual(f, g)
-  strictEqual(f(), obj)
-  strictEqual(g(), obj)
+  assert.strictEqual(f, g)
+  assert.strictEqual(f(), object)
 }
