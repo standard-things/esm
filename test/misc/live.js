@@ -1,9 +1,9 @@
-export var value = reset()
+import assert from "assert"
+import { add, reset, value } from "../fixture/live.js"
 
-export function add(n) {
-  value += n
-}
-
-export function reset() {
-  return value = 0
+export function check() {
+  reset()
+  assert.strictEqual(value, 0)
+  add(2)
+  assert.strictEqual(value, 2)
 }

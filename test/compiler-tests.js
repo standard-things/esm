@@ -1,15 +1,9 @@
 import assert from "assert"
 import { compile } from "../lib/compiler.js"
-import { parse } from "../lib/parser"
-
-function isUseStrictExprStmt(stmt) {
-  return stmt.type === "ExpressionStatement" &&
-    stmt.expression.value === "use strict"
-}
 
 describe("compiler", () => {
   it("should not get confused by string literals", () =>
-    import("./compiler/strings")
+    import("./compiler/strings.js")
       .then((ns) => ns.check())
   )
 
@@ -22,8 +16,8 @@ describe("compiler", () => {
       })
   )
 
-  it("should choose a unique module identifier", () =>
-    import("./compiler/module-alias")
+  it("should choose unique export and module identifiers", () =>
+    import("./compiler/aliases")
       .then((ns) => ns.check())
   )
 
@@ -58,10 +52,10 @@ describe("compiler", () => {
     assert.ok(withoutLet.startsWith("var def"))
 
     // No options.generateLetDeclarations is the same as
-    // { generateLetDeclarations: false }.
+    // { generateLetDeclarations: true }.
     const defaultLet = compile(code).code
 
-    assert.ok(defaultLet.startsWith("var def"))
+    assert.ok(defaultLet.startsWith("let def"))
   })
 
   it("should respect options.sourceType", () => {
@@ -87,7 +81,7 @@ describe("compiler", () => {
     ].join("\n")
 
     const result = compile(code)
-    assert.ok(result.code.startsWith("var a"))
+    assert.ok(result.code.startsWith("let a"))
   })
 
   it("should not get confused by trailing comments", () => {

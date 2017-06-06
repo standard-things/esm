@@ -1,4 +1,4 @@
-module.export({value:()=>localValue,run:()=>run});let localValue = "original"
+module.export([["value",()=>localValue],["run",()=>run]]);let localValue = "original"
 
 
 

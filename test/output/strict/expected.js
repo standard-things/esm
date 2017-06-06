@@ -1,4 +1,4 @@
-module.export({check:()=>check});var assert;module.watch(require("assert"),{default(v){assert=v}});
+module.export([["check",()=>check]]);let assert;module.watch("assert",[["default",function(v){assert=v}]]);
 
 function check() {
   const that = (function () { return this })()

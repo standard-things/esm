@@ -1,2 +1,2 @@
-module.watch(require("./abc"),{"*":module.makeNsSetter()});
+module.watch("./abc.js",[["*",module.makeNsSetter()]]);
 module.exportDefault("default");

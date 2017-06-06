@@ -8,7 +8,7 @@ TEST_DIR=$(pwd)
 
 cd "$TEST_DIR"
 
-rm -rf .cache
+rm -rf .cache node_modules/enabled/.esm-cache
 
 mocha \
     --require "../index.js" \

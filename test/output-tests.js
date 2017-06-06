@@ -1,22 +1,18 @@
 import assert from "assert"
 import { compile } from "../lib/compiler.js"
-import { files } from "./all-files.js"
-import {
-  basename,
-  relative,
-  sep,
-} from "path"
+import files from "./all-files.js"
+import path from "path"
 
 const filesToTest = Object.create(null)
 
 Object.keys(files).forEach((absPath) => {
   const code = files[absPath]
-  const relPath = relative(__dirname, absPath)
-  const relParts = relPath.split(sep)
+  const relPath = path.relative(__dirname, absPath)
+  const relParts = relPath.split(path.sep)
 
   if (relParts[0]  === "output") {
     const testName = relParts[1]
-    const testType = basename(relParts[2], ".js")
+    const testType = path.basename(relParts[2], ".js")
 
     if (! filesToTest[testName]) {
       filesToTest[testName] = Object.create(null)
@@ -31,7 +27,6 @@ describe("output", () => {
     const code = compile(data.actual).code
     const actual = code.replace(/;{2,}/g, "").replace(/^ +$/gm, "").trimRight()
     const expected = data.expected.trimRight()
-
     assert.strictEqual(actual, expected)
   }
 

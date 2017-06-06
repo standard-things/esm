@@ -4,31 +4,17 @@ import path from "path"
 
 const canUseToStringTag = typeof Symbol.toStringTag === "symbol"
 
+const abcId = "./fixture/abc.js"
+const abcNs = {
+  a: "a",
+  b: "b",
+  c: "c",
+  default: { a: "a", b: "b", c: "c" }
+}
+
 describe("dynamic import", () => {
-  const abcId = "./misc/abc"
-  const abcNs = {
-    a: "a",
-    b: "b",
-    c: "c",
-    default: { a: "a", b: "b", c: "c" }
-  }
-
-  it("should transpile to module.import", () => {
-    let callCount = 0
-    const moduleImport = module.import
-
-    module.import = function (id) {
-      callCount++
-      return moduleImport.call(this, id)
-    }
-
-    import("./misc/abc")
-    module.import = moduleImport
-    assert.strictEqual(callCount, 1)
-  })
-
   it("should resolve as a namespace import", () =>
-    import("./misc/abc").then((ns) => {
+    import("./fixture/abc.js").then((ns) => {
       const nsTag = canUseToStringTag ? "[object Module]" : "[object Object]"
 
       assert.ok(Object.isSealed(ns))
@@ -38,7 +24,7 @@ describe("dynamic import", () => {
   )
 
   it("should establish live binding of values", () =>
-    import("./misc/live").then((ns) => {
+    import("./fixture/live.js").then((ns) => {
       ns.reset()
       assert.strictEqual(ns.value, 0)
       ns.add(2)
@@ -68,22 +54,22 @@ describe("dynamic import", () => {
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
     import
-
+    // Comment.
     (
-    "./misc/abc"
+    "./fixture/abc.js"
     )
 
       .then((ns) => assert.deepEqual(ns, abcNs))
   )
 
   it("should support import() in an assignment", () => {
-    const p = import("./misc/abc")
+    const p = import("./fixture/abc.js")
     assert.ok(p instanceof Promise)
   })
 
   it("should support import() in a function", () => {
     function p() {
-      return import("./misc/abc")
+      return import("./fixture/abc.js")
     }
 
     assert.ok(p() instanceof Promise)
@@ -91,7 +77,7 @@ describe("dynamic import", () => {
 
   it("should support import() with yield", () => {
     function* p() {
-      yield import("./misc/abc")
+      yield import("./fixture/abc.js")
     }
 
     assert.ok(p())

@@ -2,29 +2,29 @@ import assert from "assert"
 
 describe("spec compliance", () => {
   it("should bind exports before the module executes", () =>
-    import("./misc/exports")
+    import("./misc/exports.js")
       .then((ns) => ns.check())
   )
 
   it("should establish live binding of values", () =>
-    import("./misc/live-binding")
+    import("./misc/live.js")
       .then((ns) => ns.check())
   )
 
   it("should execute modules in the correct order", () =>
-    import("./misc/order-checker")
+    import("./misc/order.js")
       .then((ns) => ns.check())
   )
 
   it("should have a top-level `this` of `undefined`", () =>
-    import("./misc/this")
+    import("./misc/this.js")
       .then((ns) => ns.check())
   )
 })
 
 describe("built-in modules", () => {
   it("should fire setters if already loaded", () =>
-    import("./misc/loaded-module")
+    import("./misc/loaded.js")
       .then((ns) => ns.check())
   )
 })

@@ -1,10 +1,10 @@
 import assert from "assert"
-import * as ns1 from "../misc/abc"
-import { a, b as c }, * as ns2 from "../misc/abc"
-import def1 from "../misc/abc"
-import def2, { b, c as d } from "../misc/abc"
-import def3, * as ns3 from "../misc/abc"
-import * as ns4, * as ns5, { c as e }, def4, def5 from "../misc/abc"
+import * as ns1 from "../fixture/abc.js"
+import { a, b as c }, * as ns2 from "../fixture/abc.js"
+import def1 from "../fixture/abc.js"
+import def2, { b, c as d } from "../fixture/abc.js"
+import def3, * as ns3 from "../fixture/abc.js"
+import * as ns4, * as ns5, { c as e }, def4, def5 from "../fixture/abc.js"
 
 export function check() {
   const abcNs = {
@@ -22,9 +22,9 @@ export function check() {
     ns1, ns2, ns3, ns4, ns5
   ]
 
-  defs.forEach((d) => {
-    assert.deepEqual(d, abcNs.default)
-    assert.strictEqual(d, def1)
+  defs.forEach((def) => {
+    assert.deepEqual(def, abcNs.default)
+    assert.strictEqual(def, def1)
   })
 
   namespaces.forEach((ns) => {

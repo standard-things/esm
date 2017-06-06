@@ -1,5 +1,5 @@
 import {
-  // Blank line.
+  // Comment.
   strictEqual
 }
 from "assert"

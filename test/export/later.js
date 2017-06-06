@@ -1,24 +1,22 @@
-import { strictEqual } from "assert"
+import assert from "assert"
+import def, {
+  value,
+  exportAgain,
+  oneLastExport
+} from "../fixture/export/later.js"
 
-export default "default-1"
-export let val = "value-1"
+export function check(done) {
+  assert.strictEqual(def, "default-1")
+  assert.strictEqual(value, "value-1")
 
-export function exportAgain() {
-  // Neither of these re-export styles should work, because the original
-  // export default still takes precedence over anything else.
-  module.exportDefault(exports.default = "default-2")
+  exportAgain()
+  assert.strictEqual(def, "default-1")
+  assert.strictEqual(value, "value-2")
 
-  // This style also does not work, because the getter function for the
-  // variable val is all that matters.
-  exports.val = "ignored"
-
-  val = +(val.split("-")[1])
-  val = "value-" + ++val
-}
-
-export function oneLastExport() {
-  strictEqual(
-    val = "value-3",
-    "value-3"
-  )
+  setImmediate(() => {
+    oneLastExport()
+    assert.strictEqual(def, "default-1")
+    assert.strictEqual(value, "value-3")
+    done()
+  })
 }

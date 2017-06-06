@@ -1,30 +1,27 @@
 import assert from "assert"
+import fs from "fs"
+import path from "path"
 import { gzip } from "../lib/fs.js"
-import { join } from "path"
-import {
-  readFileSync,
-  writeFileSync
-} from "fs"
 
-const fixturePath = join(__dirname, "file-extension")
-const content = readFileSync(join(fixturePath, "a.mjs"))
+const fixturePath = path.join(__dirname, "file-extension")
+const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))
 
 describe("file extension", () => {
   function check(modulePath) {
     let exported
 
     try {
-      exported = require(modulePath).default
+      exported = require(modulePath)
     } catch (e) {}
 
-    assert.strictEqual(exported, "a")
+    assert.deepEqual(exported, { a: "a", b: "b", c: "c" })
   }
 
   [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((ext) => {
     it(`compiles ${ext} files`, () => {
-      const modulePath = join(fixturePath, "a" + ext)
+      const modulePath = path.join(fixturePath, "a" + ext)
       if (ext.includes(".gz")) {
-        writeFileSync(modulePath, gzip(content))
+        fs.writeFileSync(modulePath, gzip(content))
       }
       check(modulePath)
     })

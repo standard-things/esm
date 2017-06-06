@@ -1,5 +1,12 @@
-export {a} from "../misc/abc"
-export {b, c} from "../misc/abc"
-export {a as ay} from "../misc/abc"
-export {a as default, b as bee} from "../misc/abc"
-export {default as foo} from "../misc/abc"
+import assert from "assert"
+import def, { a, b, c, aa, bb, abc } from "../fixture/export/from.js"
+
+export function check() {
+  assert.strictEqual(def, "a")
+  assert.strictEqual(a, "a")
+  assert.strictEqual(b, "b")
+  assert.strictEqual(c, "c")
+  assert.strictEqual(aa, "a")
+  assert.strictEqual(bb, "b")
+  assert.deepEqual(abc, { a: "a", b: "b", c: "c" })
+}

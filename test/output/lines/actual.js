@@ -1,12 +1,14 @@
 import {
-  // Blank line.
+  // Comment
   strictEqual
 }
-  from "assert"
+from "assert"
 
 export
 
-  function check() {
+function check()
+
+{
   const error = new Error // Line 12.
   const line = error.stack.match(/\.js:(\d+)/)[1]
   strictEqual(line, '12')

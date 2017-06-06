@@ -1,4 +1,4 @@
-export { a, b as v } from "./abc"
+export { a, b as v } from "./abc.js"
 
 import { c as cee } from "./abc.js"
 cee += "ee"

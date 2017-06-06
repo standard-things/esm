@@ -1,4 +1,4 @@
-module.export({c:()=>c,si:()=>cee});module.watch(require("./abc"),{a(v){exports.a=v},b(v){exports.v=v}});var cee;module.watch(require("./abc.js"),{c(v){cee=v}});
+module.export([["c",()=>c],["si",()=>cee]]);module.watch("./abc.js",[["a",function(v){exports.a=v}],["b",function(v){exports.v=v}]]);let cee;module.watch("./abc.js",[["c",function(v){cee=v}]]);
 
 
 module.runSetters(cee += "ee")

@@ -1,6 +1,39 @@
-export * as ns1 from "../misc/abc"
-export { a, b as c }, * as ns2 from "../misc/abc"
-export def1 from "../misc/abc"
-export def2, { b, c as d } from "../misc/abc"
-export def3, * as ns3 from "../misc/abc"
-export * as ns4, * as ns5, { c as e }, def4, def5 from "../misc/abc"
+import assert from "assert"
+import def from "../fixture/abc.js"
+import {
+  def1, def2, def3, def4, def5,
+  ns1, ns2, ns3, ns4, ns5,
+  a, b, c, d, e
+} from "../fixture/export/extensions.js"
+
+export function check() {
+  const abcNs = {
+    a: "a",
+    b: "b",
+    c: "c",
+    default: { a: "a", b: "b", c: "c" }
+  }
+
+  const defs = [
+    def1, def2, def3, def4, def5
+  ]
+
+  const namespaces = [
+    ns1, ns2, ns3, ns4, ns5
+  ]
+
+  defs.forEach((d) => {
+    assert.strictEqual(d, def)
+  })
+
+  namespaces.forEach((ns) => {
+    assert.deepEqual(ns, abcNs)
+    assert.strictEqual(ns.default, def)
+  })
+
+  assert.strictEqual(a, "a")
+  assert.strictEqual(b, "b")
+  assert.strictEqual(c, "b")
+  assert.strictEqual(d, "c")
+  assert.strictEqual(e, "c")
+}

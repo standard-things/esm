@@ -1,1 +1,3 @@
-export { a as default } from "../misc/abc.js"
+export const a = "a"
+export const b = "b"
+export const c = "c"

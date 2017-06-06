@@ -1,9 +1,9 @@
 import assert from "assert"
-import { createContext } from "vm"
 import repl from "repl"
 import Runtime from "../lib/runtime.js"
+import vm from "vm"
 
-// Masquerade as the REPL module.
+// Masquerade as the module of the REPL.
 module.children = [require.cache[require.resolve("../index.js")]]
 module.filename = null
 module.id = "<repl>"
@@ -34,7 +34,7 @@ describe("Node REPL", () => {
 
   it("should work with non-global context", (done) => {
     const r = repl.start({ useGlobal: false })
-    const context = createContext({ module, require })
+    const context = vm.createContext({ module, require })
 
     r.eval(
       'import { strictEqual } from "assert"',

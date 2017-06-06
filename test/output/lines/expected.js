@@ -1,4 +1,4 @@
-module.export({check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v}});
+module.export([["check",()=>check]]);let strictEqual;module.watch("assert",[["strictEqual",function(v){strictEqual=v}]]);
 
 
 
@@ -6,7 +6,9 @@ module.export({check:()=>check});var strictEqual;module.watch(require("assert"),
 
 
 
-function check() {
+function check()
+
+{
   const error = new Error // Line 12.
   const line = error.stack.match(/\.js:(\d+)/)[1]
   strictEqual(line, '12')

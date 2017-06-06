@@ -2,116 +2,32 @@ import assert from "assert"
 import path from "path"
 
 describe("module.runSetters", () => {
-  it("should be called after eval(...)", () => {
-    import { value, run } from "./setter/eval"
+  it("should be called after eval(...)", () =>
+    import("./setter/eval.js")
+      .then((ns) => ns.check())
+  )
 
-    assert.strictEqual(value, "original")
-    const result = run('localValue = "modified"')
-    assert.strictEqual(value, result)
-    assert.strictEqual(value, "modified")
-  })
-
-  it("should be called for untouched CJS modules, too", () => {
-    // Import the CommonJS module first, but do not register any setters.
-    import "./setter/cycle/cjs.js"
-    import { getSum } from "./setter/cycle/esm.js"
-    assert.strictEqual(getSum(), 3)
-  })
+  it("should be called for untouched CJS modules, too", () =>
+    import("./setter/cjs.js")
+      .then((ns) => ns.check())
+  )
 })
 
 describe("bridge modules", () => {
-  it("should not prematurely seal * exports", () => {
-    import { bridge } from "./setter/cycle/bridge-owner.js"
-
-    assert.strictEqual(
-      bridge.id,
-      path.join(__dirname, "setter/cycle/bridge-owner.js")
-    )
-  })
+  it("should not prematurely seal * exports", () =>
+    import("./setter/seal.js")
+      .then((ns) => ns.check())
+  )
 })
 
 describe("parent setters", () => {
-  it("should be run when children update exports", () => {
-    import { c } from "./setter/parent"
-    import { increment } from "./setter/grandchild"
+  it("should be run when children update exports", () =>
+    import("./setter/children.js")
+      .then((ns) => ns.check())
+  )
 
-    assert.strictEqual(c, 0)
-    increment()
-    assert.strictEqual(c, 1)
-  })
-
-  it("should not be called if replaced", () => {
-    import { add, reset, value } from "./misc/live.js"
-
-    let firstCallCount = 0
-    let secondCallCount = 0
-
-    reset()
-    module.importSync("./misc/live.js", {
-      value(v) {
-        ++firstCallCount
-        value = "first:" + v
-      }
-    }, "key")
-
-    assert.strictEqual(firstCallCount, 1)
-    assert.strictEqual(value, "first:0")
-    add(3)
-    assert.strictEqual(firstCallCount, 2)
-    assert.strictEqual(value, "first:3")
-    assert.strictEqual(secondCallCount, 0)
-
-    module.importSync("./misc/live.js", {
-      value(v) {
-        ++secondCallCount
-        value = "second:" + v
-      }
-    }, "key")
-
-    assert.strictEqual(firstCallCount, 2)
-    assert.strictEqual(secondCallCount, 1)
-    assert.strictEqual(value, "second:3")
-    add(4)
-    assert.strictEqual(firstCallCount, 2)
-    assert.strictEqual(secondCallCount, 2)
-    assert.strictEqual(value, "second:7")
-  })
-
-  it("should only be discarded if getter did not throw", () => {
-    // Manually register setters for value and set, which are marked as
-    // constant in the fake-const.js module, even though they are actually
-    // mutable (see below).
-    let set
-    let value
-    let valueSetterCallCount = 0
-    module.watch(require("./setter/fake-const.js"), {
-      set(v) {
-        set = v
-      },
-      value(v) {
-        value = v
-        valueSetterCallCount += 1
-      }
-    })
-
-    // Because the getter for value in fake-const.js throws, the initial value
-    // here is undefined, and our live binding to that value is maintained,
-    // for now.
-    assert.strictEqual(value, void 0)
-    assert.strictEqual(valueSetterCallCount, 1)
-
-    // Because the exported value is marked as constant, the setter that updates
-    // our copy of value should be discarded as soon as it has been called.
-    // However, this set(2) still works because the getter threw the last time
-    // it was called. After this, though, the setter will be discarded.
-    set(2)
-    assert.strictEqual(value, 2)
-    assert.strictEqual(valueSetterCallCount, 2)
-
-    // The setter that we registered above has been discarded so this set(3)
-    // is not reflected in this scope.
-    set(3)
-    assert.strictEqual(value, 2)
-    assert.strictEqual(valueSetterCallCount, 2)
-  })
+  it("should discard setters for constant values", () =>
+    import("./setter/const.js")
+      .then((ns) => ns.check())
+  )
 })

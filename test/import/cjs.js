@@ -1,16 +1,16 @@
 import assert from "assert"
-import fdef, * as fns from "../cjs/module-exports-function.js"
-import ndef, * as nns from "../cjs/module-exports-null.js"
-import odef, { a, b, c } from "../cjs/module-exports-object.js"
-import { add, reset, value } from "../cjs/bridge.js"
+import { add, reset, value } from "../fixture/cjs/bridge.js"
+import fdef, * as fns from "../fixture/cjs/exports-function.js"
+import ndef, * as nns from "../fixture/cjs/exports-null.js"
+import odef, { a, b, c } from "../fixture/cjs/exports-object.js"
 
 export function check() {
   assert.strictEqual(typeof fdef, "function")
   assert.strictEqual(fdef(), "ok")
-  assert.strictEqual(fns.default, fdef);
+  assert.strictEqual(fns.default, fdef)
 
   assert.strictEqual(ndef, null)
-  assert.strictEqual(nns.default, ndef);
+  assert.strictEqual(nns.default, ndef)
 
   assert.deepEqual(odef, { a: 1, b: 2, c: 3 })
   assert.deepEqual({ a, b, c }, odef)

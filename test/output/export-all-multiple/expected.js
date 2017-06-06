@@ -1,1 +1,1 @@
-module.export({Abc:()=>n});module.watch(require("./def"),{"*":module.makeNsSetter()});var n;module.watch(require("./abc"),{"*"(v){n=v}});
+module.export([["Abc",()=>n]]);module.watch("./def.js",[["*",module.makeNsSetter()]]);let n;module.watch("./abc.js",[["*",function(v){n=v}]]);

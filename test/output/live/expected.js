@@ -1,4 +1,4 @@
-module.export({value:()=>value,reset:()=>reset,add:()=>add});var value = reset()
+module.export([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset()
 
 function reset() {
   return module.runSetters(value = 0)
