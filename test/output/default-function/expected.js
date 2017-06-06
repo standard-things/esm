@@ -1,4 +1,4 @@
-module.export({default:()=>f,check:()=>check});var assert;module.watch(require("assert"),{default(v){assert=v}},0);
+module.export({default:()=>f,check:()=>check});var assert;module.watch(require("assert"),{default(v){assert=v}});
 
 const object = {}
 

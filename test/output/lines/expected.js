@@ -1,4 +1,4 @@
-module.export({check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v}},0);
+module.export({check:()=>check});var strictEqual;module.watch(require("assert"),{strictEqual(v){strictEqual=v}});
 
 
 
