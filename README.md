@@ -33,22 +33,34 @@ Features
 <tr><td><a href="https://github.com/tc39/proposal-dynamic-import">Dynamic <code>import()</code></a></td><td>✅</td><td>✅</td></tr>
 <tr><td><a href="https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values">Live bindings</a></td><td>✅</td><td>✅</td></tr>
 <tr><td>Loads <code>.mjs</code> as ESM</td><td>✅</td><td>✅</td></tr>
-<tr><td>Loads <code>.js</code> as ESM</td><td>✅</td><td>❌</td></tr>
-<tr><td>Loads gzipped modules <i>(e.g. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td><td>✅</td><td>❌</td></tr>
 <tr><td>Node 4+ support</td><td>✅</td><td>❌</td></tr>
-<tr><td>Top-level <code>await</code> for main ES module</td><td>✅ *</td><td>❌</td></tr>
-<tr><td>Unordered specifiers <code>import * as ns, v, {a,b} from "mod"</code></td><td>✅ *</td><td>❌</td></tr>
-<tr><td><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports"><code>import {a,b} from "cjs"</code></a></td><td>✅ *</td><td>❌</td></tr>
-<tr><td><a href="https://github.com/leebyron/ecmascript-export-ns-from"><code>export * as ns from "mod"</code></a></td><td>✅ *</td><td>❌</td></tr>
-<tr><td><a href="https://github.com/leebyron/ecmascript-export-default-from"><code>export v from "mod"</code></a></td><td>✅ *</td><td>❌</td></tr>
-<tr><td><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">Top-level <code>return</code></a> in ESM</td><td>✅ **</td><td>❌</td></tr>
-<tr><td><code>__dirname</code> in ESM</td><td>✅ **</td><td>❌</td></tr>
-<tr><td><code>__filename</code> in ESM</td><td>✅ **</td><td>❌</td></tr>
-<tr><td><code>require</code> in ESM</td><td>✅ **</td><td>❌</td></tr>
-<tr><td>Loads ESM with <code>require</code> from CJS</td><td>✅ **</td><td>❌</td></tr>
 </table>
 
-<p>
-<i>* ESM expansions</i><br>
-<i>** Carryover from CJS</i>
-</p>
+Options
+---
+
+Specify ESM loader options using the `"@std/esm"` key in your package.json.
+All options are off by default.
+
+<table>
+<tr><td><code>"await"</code></td><td>A boolean to toggle top-level <code>await</code> in the main ES module</td></tr>
+<tr><td><code>"gz"</code></td><td>A boolean to toggle gzipped module support <i>(e.g. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td></tr>
+<tr><td><code>"js"</code></td><td>A boolean to toggle unambiguous ESM <i>(e.g. <code>.js</code> can be ESM)</i></td></tr>
+<tr><td><code>"cjs"</code></td><td>
+  <p>A boolean to toggle CJS features in ESM</p>
+  <ul>
+  <li><code>__dirname</code> and <code>__filename</code></li>
+  <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
+  <li><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">named exports</a> of CJS modules</li>
+  <li><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></li>
+  </ul>
+</td></tr>
+<tr><td><code>"ext"</code></td><td>
+  <p>A boolean to toggle import/export syntax extensions</p>
+  <ul>
+  <li><a href="https://github.com/leebyron/ecmascript-export-default-from"><code>export d from "mod"</code></a></li>
+  <li><a href="https://github.com/leebyron/ecmascript-export-ns-from"><code>export * as ns from "mod"</code></a></li>
+  <li>unordered import/export lists</li>
+  </ul>
+</td></tr>
+</table>
