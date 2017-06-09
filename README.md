@@ -1,9 +1,10 @@
 # @std/esm
 
-Under Construction
+🚧 Under Construction 🚧
 ---
 
-Please watch your step. This project is currently an unreleased work in progress. 🚧
+Pardon the mess. This project is currently an unreleased work in progress.
+Thank you for your patience.
 
 Usage
 ---
