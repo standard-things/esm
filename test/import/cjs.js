@@ -6,8 +6,10 @@ import edef, { a as ea, b as eb, c as ec } from "../fixture/cjs/exports-esmodule
 import * as fns from "../fixture/cjs/exports-function.js"
 import fdef, { a as fa, b as fb, c as fc } from "../fixture/cjs/exports-function.js"
 import ndef, * as nns from "../fixture/cjs/exports-null.js"
-import * as getSet from "../fixture/cjs/exports-get-set.js"
 import odef, { a as oa, b as ob, c as oc } from "../fixture/cjs/exports-object.js"
+import * as empty from "../fixture/cjs/exports-empty.js"
+import * as emptyESM from "../fixture/cjs/exports-esmodule-empty.js"
+import * as getSet from "../fixture/cjs/exports-get-set.js"
 
 export function check() {
   assert.strictEqual(ddef.default, "default");
@@ -35,6 +37,9 @@ export function check() {
   assert.strictEqual(value, 10)
   assert.strictEqual(reset(), 0)
   assert.strictEqual(value, 0)
+
+  assert.deepEqual(empty, { default: {} })
+  assert.deepEqual(emptyESM, {})
 
   assert.strictEqual(getSet.safe, "safe")
   getSet.safe = "so safe"
