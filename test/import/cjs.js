@@ -1,6 +1,8 @@
 import assert from "assert"
 import { add, reset, value } from "../fixture/cjs/bridge.js"
 import ddef, * as dns from "../fixture/cjs/exports-default.js"
+import * as ens from "../fixture/cjs/exports-esmodule.js"
+import edef, { a as ea, b as eb, c as ec } from "../fixture/cjs/exports-esmodule.js"
 import * as fns from "../fixture/cjs/exports-function.js"
 import fdef, { a as fa, b as fb, c as fc } from "../fixture/cjs/exports-function.js"
 import ndef, * as nns from "../fixture/cjs/exports-null.js"
@@ -8,8 +10,12 @@ import * as getSet from "../fixture/cjs/exports-get-set.js"
 import odef, { a as oa, b as ob, c as oc } from "../fixture/cjs/exports-object.js"
 
 export function check() {
-  assert.strictEqual(ddef.default, "default-value");
+  assert.strictEqual(ddef.default, "default");
   assert.strictEqual(ddef, dns.default);
+
+  assert.strictEqual(edef, "default")
+  assert.strictEqual(ens.default, edef);
+  assert.deepEqual([ea, eb, ec], ["a", "b", "c"])
 
   assert.strictEqual(fdef(), "ok")
   assert.strictEqual(fns.default, fdef)

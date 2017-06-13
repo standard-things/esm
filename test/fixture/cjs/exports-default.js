@@ -1,3 +1,3 @@
 "use strict"
 
-exports.default = "default-value"
+exports.default = "default"
