@@ -1,3 +1,5 @@
+"use strict"
+
 module.exports = {
   get safe() {
     return "safe"
