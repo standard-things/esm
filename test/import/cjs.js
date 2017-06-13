@@ -3,7 +3,7 @@ import { add, reset, value } from "../fixture/cjs/bridge.js"
 import * as fns from "../fixture/cjs/exports-function.js"
 import fdef, { a as fa, b as fb, c as fc } from "../fixture/cjs/exports-function.js"
 import ndef, * as nns from "../fixture/cjs/exports-null.js"
-import * as getter from "../fixture/cjs/exports-getter.js"
+import * as getSet from "../fixture/cjs/exports-get-set.js"
 import odef, { a as oa, b as ob, c as oc } from "../fixture/cjs/exports-object.js"
 
 export function check() {
@@ -27,5 +27,11 @@ export function check() {
   assert.strictEqual(reset(), 0)
   assert.strictEqual(value, 0)
 
-  assert.strictEqual(getter.safe, "safe")
+  assert.strictEqual(getSet.safe, "safe")
+  getSet.safe = "so safe"
+  assert.strictEqual(getSet.safe, "so safe")
+
+  const desc = Object.getOwnPropertyDescriptor(getSet, "safe")
+  assert.ok("get" in desc)
+  assert.ok("set" in desc)
 }
