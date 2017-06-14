@@ -4,7 +4,7 @@ let canUseDestructuring = false
 
 try {
   // Test if Node supports destructuring declarations.
-  canUseDestructuring = !! new vm.Script("let []=[]")
+  canUseDestructuring = !! new vm.Script("[]=[]")
 } catch (e) {}
 
 describe("export declarations", () => {
