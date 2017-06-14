@@ -2,8 +2,6 @@ import assert from "assert"
 import { compile } from "../lib/compiler.js"
 import path from "path"
 
-const canUseToStringTag = typeof Symbol.toStringTag === "symbol"
-
 const abcId = "./fixture/abc.js"
 const abcNs = {
   a: "a",
@@ -13,16 +11,6 @@ const abcNs = {
 }
 
 describe("dynamic import", () => {
-  it("should resolve as a namespace import", () =>
-    import("./fixture/abc.js").then((ns) => {
-      const nsTag = canUseToStringTag ? "[object Module]" : "[object Object]"
-
-      assert.ok(Object.isSealed(ns))
-      assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
-      assert.deepEqual(ns, abcNs)
-    })
-  )
-
   it("should establish live binding of values", () =>
     import("./fixture/live.js").then((ns) => {
       ns.reset()

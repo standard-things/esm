@@ -16,6 +16,11 @@ describe("spec compliance", () => {
       .then((ns) => ns.check())
   )
 
+  it("should produce valid namespace objects", () =>
+    import("./misc/namespace.js")
+      .then((ns) => ns.check())
+  )
+
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.js")
       .then((ns) => ns.check())
