@@ -12,11 +12,11 @@ import * as emptyESM from "../fixture/cjs/exports-esmodule-empty.js"
 import * as getSet from "../fixture/cjs/exports-get-set.js"
 
 export function check() {
-  assert.strictEqual(ddef.default, "default");
-  assert.strictEqual(ddef, dns.default);
+  assert.strictEqual(ddef.default, "default")
+  assert.strictEqual(ddef, dns.default)
 
   assert.strictEqual(edef, "default")
-  assert.strictEqual(ens.default, edef);
+  assert.strictEqual(ens.default, edef)
   assert.deepEqual([ea, eb, ec], ["a", "b", "c"])
 
   assert.strictEqual(fdef(), "ok")
