@@ -1,1 +1,1 @@
-const module1=module;module1.watch("module",[["*",function(v){exports.a=exports.b=v}]]);
+module.watch("module",[["*",function(v){module.exports.a=module.exports.b=v}]]);
