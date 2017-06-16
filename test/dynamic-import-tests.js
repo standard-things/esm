@@ -79,18 +79,16 @@ describe("dynamic import", () => {
   })
 
   it("should expect exactly one argument", () => {
-    assert.ok([
+    const invalids = [
       "import()",
       "import(a,b)",
       "import(...[a])",
       "import.then()",
       "import.call(a,b)"
-    ].every((code) => {
-      try {
-        compile(code)
-      } catch (e) {
-        return e instanceof SyntaxError
-      }
-    }))
+    ]
+
+    invalids.forEach((code) => {
+      assert.throws(() => compile(code), SyntaxError)
+    })
   })
 })
