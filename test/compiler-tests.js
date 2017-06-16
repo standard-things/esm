@@ -5,6 +5,7 @@ describe("compiler", () => {
   it("should not get confused by string literals", () =>
     import("./compiler/strings.js")
       .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
   )
 
   it("should not be enabled for nested node_modules", () =>
@@ -19,21 +20,25 @@ describe("compiler", () => {
   it("should choose unique export and module identifiers", () =>
     import("./compiler/aliases")
       .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
   )
 
   it("should be enabled for packages that depend on @std/esm", () =>
     import("enabled")
       .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
   )
 
   it("should preserve line numbers", () =>
     import("./compiler/lines.js")
       .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
   )
 
   it('should not hoist above "use strict"', () =>
      import("./compiler/strict")
       .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
   )
 
   it("should respect options.generateLetDeclarations", () => {
