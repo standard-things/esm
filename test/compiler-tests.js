@@ -69,7 +69,7 @@ describe("compiler", () => {
 
     sourceTypes.forEach((sourceType) => {
       const result = compile(code, { sourceType })
-      assert.ok(result.code.includes("module.watch"))
+      assert.ok(result.code.includes("watch"))
     })
 
     const scriptType = compile(code, {

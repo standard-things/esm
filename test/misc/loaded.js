@@ -1,9 +1,9 @@
 import assert from "assert"
-import { Module as M } from "module"
+import path from "path"
 
 export function check() {
-  // The "module" module is required in ../lib/node.js before we begin
-  // compiling anything.
-  assert.ok(module instanceof M)
+  // The "path" module is required in lib/compile-hook.js
+  // before the runtime is enabled.
+  assert.ok(path)
 }
 

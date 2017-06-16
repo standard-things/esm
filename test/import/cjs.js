@@ -29,10 +29,6 @@ export function check() {
   assert.deepEqual(odef, { a: 1, b: 2, c: 3 })
   assert.deepEqual([oa, ob, oc], [1, 2, 3])
 
-  odef.c = 4
-  module.runSetters.call({ exports: odef })
-  assert.strictEqual(oc, 4)
-
   add(10)
   assert.strictEqual(value, 10)
   assert.strictEqual(reset(), 0)

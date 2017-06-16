@@ -1,3 +1,4 @@
+import __dirname from "./__dirname.js"
 import assert from "assert"
 import { compile } from "../lib/compiler.js"
 import files from "./all-files.js"

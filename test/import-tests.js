@@ -1,12 +1,6 @@
 import assert from "assert"
 
 describe("import declarations", () => {
-  it("should work in nested scopes", () =>
-    import("./import/name.js")
-      .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
-  )
-
   it("should cope with dependency cycles", () =>
     Promise.all([
       import("./import/cycle-a.js"),
@@ -18,12 +12,6 @@ describe("import declarations", () => {
 
   it("should support combinations of import styles", () =>
     import("./import/combinations.js")
-      .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
-  )
-
-  it("should import module.exports as default, by default", () =>
-    import("./import/default.js")
       .then((ns) => ns.check())
       .catch(() => assert.ok(false))
   )

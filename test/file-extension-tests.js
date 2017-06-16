@@ -1,3 +1,4 @@
+import __dirname from "./__dirname.js"
 import assert from "assert"
 import fs from "fs"
 import path from "path"
@@ -7,23 +8,17 @@ const fixturePath = path.join(__dirname, "file-extension")
 const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))
 
 describe("file extension", () => {
-  function check(modulePath) {
-    let exported
-
-    try {
-      exported = require(modulePath)
-    } catch (e) {}
-
-    assert.deepEqual(exported, { a: "a", b: "b", c: "c" })
-  }
-
   [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((ext) => {
     it(`compiles ${ext} files`, () => {
       const modulePath = path.join(fixturePath, "a" + ext)
       if (ext.includes(".gz")) {
         fs.writeFileSync(modulePath, gzip(content))
       }
-      check(modulePath)
+      return import(modulePath)
+        .then((exported) => {
+          assert.deepEqual(exported, { a: "a", b: "b", c: "c" })
+        })
+        .catch(() => assert.ok(false))
     })
   })
 })

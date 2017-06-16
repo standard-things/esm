@@ -39,11 +39,6 @@ describe("export declarations", () => {
       .catch(() => assert.ok(false))
   )
 
-  it("should support invoking setters later", (done) => {
-    import("./export/later.js")
-      .then((ns) => ns.check(done))
-  })
-
   it("should support all default syntax", () =>
     import("./export/default.js")
       .then((ns) => ns.check())

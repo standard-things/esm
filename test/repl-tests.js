@@ -1,17 +1,8 @@
 import assert from "assert"
+import module from "./repl/module.js"
 import repl from "repl"
 import Runtime from "../lib/runtime.js"
 import vm from "vm"
-
-// Masquerade as the module of the REPL.
-module.children = [require.cache[require.resolve("../index.js")]]
-module.filename = null
-module.id = "<repl>"
-module.loaded = false
-module.parent = void 0
-
-delete require.cache[require.resolve("../lib/repl-hook.js")]
-import("../lib/repl-hook.js")
 
 describe("Node REPL", () => {
   it("should work with global context", (done) => {
@@ -23,8 +14,8 @@ describe("Node REPL", () => {
     r.eval(
       'import { strictEqual as assertStrictEqual } from "assert"',
       null, // Context
-      "repl", // Filename
-      (err, result) => {
+      "repl",
+      () => {
         // Use the globally defined assertStrictEqual to test itself!
         assertStrictEqual(typeof assertStrictEqual, "function")
         done()
@@ -34,13 +25,13 @@ describe("Node REPL", () => {
 
   it("should work with non-global context", (done) => {
     const r = repl.start({ useGlobal: false })
-    const context = vm.createContext({ module, require })
+    const context = vm.createContext({ module })
 
     r.eval(
       'import { strictEqual } from "assert"',
       context,
-      "repl", // Filename
-      (err, result) => {
+      "repl",
+      () => {
         // Use context.strictEqual to test itself!
         context.strictEqual(typeof context.strictEqual, "function")
         done()
