@@ -25,14 +25,20 @@ describe("spec compliance", () => {
       .catch(() => assert.ok(false))
   )
 
+  it("should have a top-level `this` of `undefined`", () =>
+    import("./misc/this.js")
+      .then((ns) => ns.check())
+      .catch(() => assert.ok(false))
+  )
+
   it("should not populate top-level `arguments`", () =>
     import("./misc/arguments.js")
       .then((ns) => ns.check())
       .catch(() => assert.ok(false))
   )
 
-  it("should have a top-level `this` of `undefined`", () =>
-    import("./misc/this.js")
+  it("should not have CJS free variables", () =>
+    import("./misc/free-vars.js")
       .then((ns) => ns.check())
       .catch(() => assert.ok(false))
   )
