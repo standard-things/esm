@@ -5,40 +5,40 @@ describe("compiler", () => {
   it("should not get confused by string literals", () =>
     import("./compiler/strings.js")
       .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should not be enabled for nested node_modules", () =>
     import("disabled")
       .then(() => assert.ok(false))
-      .catch((error) => {
-        assert.ok(error instanceof SyntaxError)
-        assert.ok(/unexpected/i.test(error.message))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(/unexpected/i.test(e.message))
       })
   )
 
   it("should choose unique export and module identifiers", () =>
     import("./compiler/aliases")
       .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should be enabled for packages that depend on @std/esm", () =>
     import("enabled")
       .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should preserve line numbers", () =>
     import("./compiler/lines.js")
       .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it('should not hoist above "use strict"', () =>
      import("./compiler/strict")
       .then((ns) => ns.check())
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should respect options.generateLetDeclarations", () => {

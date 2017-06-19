@@ -19,31 +19,31 @@ describe("dynamic import", () => {
       ns.add(2)
       assert.strictEqual(ns.value, 2)
     })
-    .catch(() => assert.ok(false))
+    .catch((e) => assert.ifError(e))
   )
 
   it("should support a variable id", () =>
     import(abcId)
       .then((ns) => assert.deepEqual(ns, abcNs))
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should support a template string id", () =>
     import(`${abcId}`)
       .then((ns) => assert.deepEqual(ns, abcNs))
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should support an expression id", () =>
     import((() => abcId)())
       .then((ns) => assert.deepEqual(ns, abcNs))
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should support the file protocol", () =>
     import("file://" + path.join(__dirname, abcId))
       .then((ns) => assert.deepEqual(ns, abcNs))
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
@@ -54,7 +54,7 @@ describe("dynamic import", () => {
     )
 
       .then((ns) => assert.deepEqual(ns, abcNs))
-      .catch(() => assert.ok(false))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should support import() in an assignment", () => {

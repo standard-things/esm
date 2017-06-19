@@ -18,7 +18,7 @@ describe("file extension", () => {
         .then((exported) => {
           assert.deepEqual(exported, { a: "a", b: "b", c: "c" })
         })
-        .catch(() => assert.ok(false))
+        .catch((e) => assert.ifError(e))
     })
   })
 })
