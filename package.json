@@ -11,6 +11,8 @@
     "node": ">=4"
   },
   "scripts": {
+    "build:dev": "webpack",
+    "build:prod": "NODE_ENV=production webpack",
     "test": "test/run.sh"
   },
   "dependencies": {
@@ -19,6 +21,14 @@
     "semver": "^5.3.0"
   },
   "devDependencies": {
-    "mocha": "^3.4.2"
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.0",
+    "babel-preset-env": "^1.5.2",
+    "mocha": "^3.4.2",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.0.0",
+    "webpack-bundle-analyzer": "^2.8.2",
+    "webpack-sources": "^1.0.1"
   }
 }

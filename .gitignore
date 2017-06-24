@@ -2,4 +2,5 @@
 *.log
 test/.cache
 test/**/*.gz
+dist
 node_modules
