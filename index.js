@@ -1,19 +1,14 @@
-"use strict"
-
-const setDefaults = require("./lib/options.js").setDefaults
-const Runtime = require("./lib/runtime.js")
+import Runtime from "./lib/runtime.js"
+import { setDefaults } from "./lib/options.js"
+import "./lib/compile-hook.js"
+import "./lib/repl-hook.js"
 
 let isDefaultsSet = false
-const parentModule = module.parent || __non_webpack_module__.parent
+Runtime.enable(__non_webpack_module__.parent)
 
-module.exports = (options) => {
+export default (options) => {
   if (! isDefaultsSet) {
     setDefaults(options)
     isDefaultsSet = true
   }
 }
-
-require("./lib/compile-hook.js")
-require("./lib/repl-hook.js")
-
-Runtime.enable(parentModule)
