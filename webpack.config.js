@@ -38,13 +38,15 @@ class EntryWrap {
     compiler.plugin("compilation", (compilation) => {
       const { assets } = compilation
       compilation.plugin("optimize-chunk-assets", (chunks, callback) => {
-        const chunk = chunks.find((c) => c.isInitial())
-        const file = chunk.files[0]
-        assets[file] = new ConcatSource(
-          this.before, "\n",
-          compilation.assets[file], "\n",
-          this.after
-        )
+        const entries = chunks.filter((c) => c.hasEntryModule())
+        entries.forEach((chunk) => {
+          const file = chunk.files[0]
+          assets[file] = new ConcatSource(
+            this.before, "\n",
+            compilation.assets[file], "\n",
+            this.after
+          )
+        })
         callback()
       })
     })
@@ -53,13 +55,15 @@ class EntryWrap {
 
 const config = {
   "target": "node",
-  "entry": "./index.js",
+  "entry": {
+    "esm": "./index.js"
+  },
   "node": {
     "module": false
   },
   "output": {
     "libraryTarget": "commonjs2",
-    "filename": "esm.js",
+    "filename": "[name].js",
     "path": path.join(__dirname, "dist")
   },
   "module":  {
@@ -116,6 +120,9 @@ if (process.env.NODE_ENV === "production") {
       }
     })
   )
+} else {
+  config.entry.compiler = "./lib/compiler.js"
+  config.entry.runtime = "./lib/runtime.js"
 }
 
 module.exports = config

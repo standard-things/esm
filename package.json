@@ -13,6 +13,7 @@
   "scripts": {
     "build:dev": "webpack",
     "build:prod": "NODE_ENV=production webpack",
+    "pretest": "npm run build:dev",
     "test": "test/run.sh"
   },
   "dependencies": {

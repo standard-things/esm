@@ -1,5 +1,5 @@
 import assert from "assert"
-import { compile } from "../lib/compiler.js"
+import compiler from "../dist/compiler.js"
 
 describe("compiler", () => {
   it("should not get confused by string literals", () =>
@@ -44,13 +44,13 @@ describe("compiler", () => {
   it("should respect options.generateLetDeclarations", () => {
     const code = 'import def from "mod"'
 
-    const withLet = compile(code, {
+    const withLet = compiler.compile(code, {
       generateLetDeclarations: true
     }).code
 
     assert.ok(withLet.startsWith("let def"))
 
-    const withoutLet = compile(code, {
+    const withoutLet = compiler.compile(code, {
       generateLetDeclarations: false
     }).code
 
@@ -58,7 +58,7 @@ describe("compiler", () => {
 
     // No options.generateLetDeclarations is the same as
     // { generateLetDeclarations: true }.
-    const defaultLet = compile(code).code
+    const defaultLet = compiler.compile(code).code
 
     assert.ok(defaultLet.startsWith("let def"))
   })
@@ -68,11 +68,11 @@ describe("compiler", () => {
     const sourceTypes = [void 0, "module", "unambiguous"]
 
     sourceTypes.forEach((sourceType) => {
-      const result = compile(code, { sourceType })
+      const result = compiler.compile(code, { sourceType })
       assert.ok(result.code.includes("watch"))
     })
 
-    const scriptType = compile(code, {
+    const scriptType = compiler.compile(code, {
       sourceType: "script"
     }).code
 
@@ -85,12 +85,12 @@ describe("compiler", () => {
       'import a from "a"',
     ].join("\n")
 
-    const result = compile(code)
+    const result = compiler.compile(code)
     assert.ok(result.code.startsWith("let a"))
   })
 
   it("should not get confused by trailing comments", () => {
-    const result = compile('import "a" // trailing comment')
+    const result = compiler.compile('import "a" // trailing comment')
     assert.ok(result.code.endsWith("// trailing comment"))
   })
 
@@ -104,7 +104,7 @@ describe("compiler", () => {
       'from "assert"'
     ].join("\r\n")
 
-    const result = compile(code, { repl: true })
+    const result = compiler.compile(code, { repl: true })
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 })

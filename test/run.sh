@@ -11,12 +11,12 @@ cd "$TEST_DIR"
 rm -rf .cache node_modules/enabled/.esm-cache
 
 mocha \
-    --require "../index.js" \
+    --require "../dist/esm.js" \
     --full-trace \
     tests.js
 
 # Run tests again using test/.cache.
 mocha \
-    --require "../index.js" \
+    --require "../dist/esm.js" \
     --full-trace \
     tests.js

@@ -1,6 +1,6 @@
 import __dirname from "./__dirname.js"
 import assert from "assert"
-import { compile } from "../lib/compiler.js"
+import compiler from "../dist/compiler.js"
 import files from "./all-files.js"
 import path from "path"
 
@@ -29,7 +29,7 @@ describe("output", () => {
 
     it(`compiles ${testName} example as expected`, () => {
       // Remove zero-width joiners and trim trailing whitespace.
-      const code = compile(data.actual).code
+      const code = compiler.compile(data.actual).code
       const actual = code.replace(/\u200d/g, "").trimRight()
       const expected = data.expected.trimRight()
       assert.strictEqual(actual, expected)

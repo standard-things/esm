@@ -1,6 +1,6 @@
 import __dirname from "./__dirname.js"
 import assert from "assert"
-import { compile } from "../lib/compiler.js"
+import compiler from "../dist/compiler.js"
 import path from "path"
 
 const abcId = "./fixture/abc.js"
@@ -88,7 +88,7 @@ describe("dynamic import", () => {
     ]
 
     invalids.forEach((code) => {
-      assert.throws(() => compile(code), SyntaxError)
+      assert.throws(() => compiler.compile(code), SyntaxError)
     })
   })
 })
