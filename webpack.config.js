@@ -86,7 +86,14 @@ const config = {
     }]
   },
   "plugins": [
-    new EntryWrap("const __non_webpack_module__ = module", "")
+    new EntryWrap("const __non_webpack_module__ = module", ""),
+    new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      defaultSizes: "gzip",
+      logLevel: "silent",
+      openAnalyzer: false,
+      reportFilename: "report.html"
+    })
   ]
 }
 
@@ -107,16 +114,6 @@ if (process.env.NODE_ENV === "production") {
       "output": {
         "ascii_only": true
       }
-    })
-  )
-} else {
-  config.plugins.push(
-    new BundleAnalyzerPlugin({
-      analyzerMode: "static",
-      defaultSizes: "gzip",
-      logLevel: "silent",
-      openAnalyzer: false,
-      reportFilename: "report.html"
     })
   )
 }
