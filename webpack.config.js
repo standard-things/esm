@@ -2,12 +2,13 @@
 
 const path = require("path")
 const webpack = require("webpack")
-
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const { ConcatSource } = require("webpack-sources")
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const ConcatSource = require("webpack-sources").ConcatSource
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-function BabelDefinePlugin({ types: t }) {
+function BabelDefinePlugin(babel) {
+  const t = babel.types
+
   function MemberExpression(path) {
     const node = path.node
     const object = node.object
@@ -18,9 +19,9 @@ function BabelDefinePlugin({ types: t }) {
     }
     const key = path.toComputedKey()
     if (t.isStringLiteral(key)) {
-      const { value } = key
+      const value = key.value
       if (value === "ESM_VERSION") {
-        const { version } = require("./package.json")
+        const version = require("./package.json").version
         path.replaceWith(t.valueToNode(version))
       }
     }
@@ -36,7 +37,7 @@ class EntryWrap {
 
   apply(compiler) {
     compiler.plugin("compilation", (compilation) => {
-      const { assets } = compilation
+      const assets = compilation.assets
       compilation.plugin("optimize-chunk-assets", (chunks, callback) => {
         const entries = chunks.filter((c) => c.hasEntryModule())
         entries.forEach((chunk) => {
