@@ -5,29 +5,7 @@ const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 const ConcatSource = require("webpack-sources").ConcatSource
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
-
-function BabelDefinePlugin(babel) {
-  const t = babel.types
-
-  function MemberExpression(path) {
-    const node = path.node
-    const object = node.object
-    const property = node.property
-
-    if (! path.get("object").matchesPattern("process.env")) {
-      return
-    }
-    const key = path.toComputedKey()
-    if (t.isStringLiteral(key)) {
-      const value = key.value
-      if (value === "ESM_VERSION") {
-        const version = require("./package.json").version
-        path.replaceWith(t.valueToNode(version))
-      }
-    }
-  }
-  return { visitor: { MemberExpression } }
-}
+const ESM_VERSION = require("./package.json").version
 
 class EntryWrap {
   constructor(before, after) {
@@ -72,9 +50,6 @@ const config = {
       "test": /\.js$/,
       "loader": "babel-loader",
       "options": {
-        "plugins": [
-          BabelDefinePlugin
-        ],
         "presets": [
           ["env", {
             "modules": false,
@@ -92,6 +67,7 @@ const config = {
   },
   "plugins": [
     new EntryWrap("const __non_webpack_module__ = module", ""),
+    new webpack.EnvironmentPlugin({ ESM_VERSION }),
     new BundleAnalyzerPlugin({
       analyzerMode: "static",
       defaultSizes: "gzip",
