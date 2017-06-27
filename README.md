@@ -12,6 +12,12 @@ Usage
   1. Run `npm i --save @std/esm` in your package or app directory.
   2. Call `require("@std/esm")` before importing ECMAScript modules.
 
+     ##### index.js
+     ```js
+     require("@std/esm")
+     module.exports = require("./main.mjs").default
+     ```
+
 Enable ESM in the Node REPL by loading `@std/esm` upon entering:
 
 ```shell
