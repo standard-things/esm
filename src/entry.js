@@ -153,7 +153,7 @@ class Entry {
   }
 
   runGetters() {
-    assignExportsToNamespace(this.namespace, this.exports)
+    assignExportsToNamespace(this)
 
     if (! utils.isESModule(this.exports)) {
       return
@@ -222,7 +222,9 @@ class Entry {
   }
 }
 
-function assignExportsToNamespace(namespace, exported) {
+function assignExportsToNamespace(entry) {
+  const exported = entry.exports
+  const namespace = entry.namespace
   const isESM = utils.isESModuleLike(exported)
 
   // Add a "default" namespace property unless it's a Babel exports,
@@ -262,7 +264,7 @@ function assignExportsToNamespace(namespace, exported) {
       if (hasSetter) {
         utils.setSetter(namespace, key, setter)
       }
-    } else {
+    } else if (entry._loaded < 1 || key in namespace) {
       namespace[key] = exported[key]
     }
   }
