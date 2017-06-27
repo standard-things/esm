@@ -46,7 +46,7 @@ Features
 Options
 ---
 
-Specify ESM loader options using the `"@std/esm"` key in your package.json.
+Specify ESM loader options using the `"@std/esm"` or `"@std":{"esm":{}}` fields in your package.json.
 All options are **off** by default.
 
 <table>
