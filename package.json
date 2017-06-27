@@ -14,7 +14,7 @@
     "build:dev": "webpack",
     "build:prod": "NODE_ENV=production webpack",
     "pretest": "npm run build:dev",
-    "test": "test/run.sh"
+    "test": "node script/test.js"
   },
   "dependencies": {
     "acorn": "~5.0.0",
@@ -25,7 +25,9 @@
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.0",
     "babel-preset-env": "^1.5.2",
+    "execa": "^0.7.0",
     "mocha": "^3.4.2",
+    "trash": "^4.0.1",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
