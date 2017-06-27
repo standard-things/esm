@@ -40,5 +40,9 @@
   },
   "optionalDevDependencies": {
     "node-zopfli": "^2.0.2"
-  }
+  },
+  "files":[
+    "index.js",
+    "esm.js.gz"
+  ]
 }
