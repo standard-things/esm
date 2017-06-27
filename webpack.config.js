@@ -5,32 +5,6 @@ const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 const ConcatSource = require("webpack-sources").ConcatSource
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
-const ESM_VERSION = require("./package.json").version
-
-class EntryWrap {
-  constructor(before, after) {
-    this.before = before
-    this.after = after
-  }
-
-  apply(compiler) {
-    compiler.plugin("compilation", (compilation) => {
-      const assets = compilation.assets
-      compilation.plugin("optimize-chunk-assets", (chunks, callback) => {
-        const entries = chunks.filter((c) => c.hasEntryModule())
-        entries.forEach((chunk) => {
-          const file = chunk.files[0]
-          assets[file] = new ConcatSource(
-            this.before, "\n",
-            compilation.assets[file], "\n",
-            this.after
-          )
-        })
-        callback()
-      })
-    })
-  }
-}
 
 const config = {
   "target": "node",
@@ -66,14 +40,20 @@ const config = {
     }]
   },
   "plugins": [
-    new EntryWrap("const __non_webpack_module__ = module", ""),
-    new webpack.EnvironmentPlugin({ ESM_VERSION }),
+    new webpack.BannerPlugin({
+      banner: "const __non_webpack_module__ = module",
+      entryOnly: true,
+      raw: true
+    }),
     new BundleAnalyzerPlugin({
       analyzerMode: "static",
       defaultSizes: "gzip",
       logLevel: "silent",
       openAnalyzer: false,
       reportFilename: "report.html"
+    }),
+    new webpack.EnvironmentPlugin({
+      ESM_VERSION: require("./package.json").version
     })
   ]
 }
