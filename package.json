@@ -30,7 +30,7 @@
     "pify": "^3.0.0",
     "semver": "^5.3.0",
     "trash": "^4.0.1",
-    "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
+    "uglify-js": "mishoo/UglifyJS2#harmony-v2.8.22",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
     "webpack-bundle-analyzer": "^2.8.2",
