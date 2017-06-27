@@ -25,9 +25,17 @@ const trashPaths = [
   uglifyPath
 ]
 
+const webpackArgs = []
+
+if (argv.prod) {
+  webpackArgs.push("--display-optimization-bailout")
+} else {
+  webpackArgs.push("--hide-modules")
+}
+
 Promise
   .all(trashPaths.map(trash))
-  .then(() => execa("webpack", [], {
+  .then(() => execa("webpack", webpackArgs, {
     cwd: rootPath,
     env: { NODE_ENV },
     stdio: "inherit"
