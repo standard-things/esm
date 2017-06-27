@@ -4,7 +4,8 @@ const execa = require("execa")
 const path = require("path")
 const trash = require("trash")
 
-const testPath = path.join(__dirname, "../test")
+const rootPath = path.join(__dirname, "..")
+const testPath = path.join(rootPath, "test")
 
 const cachePaths = [
   path.join(testPath, ".cache"),
