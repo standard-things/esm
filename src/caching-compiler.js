@@ -4,7 +4,7 @@ import path from "path"
 
 class Compiler {
   static compile(content, options) {
-    options = Object.assign({}, options)
+    options = Object.assign(Object.create(null), options)
     return typeof options.filePath === "string"
       ? compileWithFilename(content, options)
       : compileAndCache(content, options)

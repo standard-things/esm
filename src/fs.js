@@ -169,7 +169,7 @@ class FS {
   }
 
   static writeFileDefer(filePath, content, options) {
-    options = Object.assign({}, options)
+    options = Object.assign(Object.create(null), options)
     pendingWrites[filePath] = { content, options }
 
     if (pendingWriteTimer !== null) {
