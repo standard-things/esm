@@ -29,7 +29,7 @@ class Utils {
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
-    const ext = typeof filePath === "string" ? path.extname(filePath) : ".js"
+    const extname = typeof filePath === "string" ? path.extname(filePath) : ".js"
 
     // Take only the major and minor components of the @std/esm version, so that
     // we don't invalidate the cache every time a patch version is released.
@@ -41,7 +41,7 @@ class Utils {
       .update(toString(cacheKey))
       .update("\0")
       .update(JSON.stringify(pkgInfo.config))
-      .digest("hex") + ext
+      .digest("hex") + extname
   }
 
   static getGetter(object, key) {

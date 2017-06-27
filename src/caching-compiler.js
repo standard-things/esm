@@ -54,15 +54,15 @@ function toCompileOptions(options) {
   const config = options.pkgInfo.config
 
   if (typeof filePath === "string") {
-    let ext = path.extname(filePath)
+    let extname = path.extname(filePath)
 
-    if (ext === ".gz") {
-      ext = path.extname(path.basename(filePath, ext))
+    if (extname === ".gz") {
+      extname = path.extname(path.basename(filePath, extname))
     }
 
     if (typeof config.sourceType === "string") {
       compileOptions.sourceType = config.sourceType
-    } else if (ext === ".mjs") {
+    } else if (extname === ".mjs") {
       compileOptions.sourceType = "module"
     }
   }
