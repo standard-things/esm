@@ -4,12 +4,9 @@ const execa = require("execa")
 const fs = require("fs")
 const path = require("path")
 const pify = require("pify")
-const zopfli = require("node-zopfli")
-const gzip = pify(zopfli.gzip)
 const read = pify(fs.readFile)
 const write = pify(fs.writeFile)
 const trash = require("trash")
-
 const argv = require("yargs")
   .boolean("prod")
   .argv
@@ -28,5 +25,11 @@ trash(uglifyPath)
     stdio: "inherit"
   }))
   .then(() => read(bundlePath))
-  .then(gzip)
+  .then((buffer) => {
+    if (argv.prod) {
+      const gzip = pify(require("node-zopfli").gzip)
+      return gzip(buffer)
+    }
+    return buffer
+  })
   .then((buffer) => write(outputPath, buffer))
