@@ -11,10 +11,11 @@
     "node": ">=4"
   },
   "scripts": {
-    "build": "node script/build.js",
     "prebuild:prod": "optional-dev-dependency",
-    "build:prod": "node script/build.js --prod",
+    "prepack": "npm run build:prod",
     "pretest": "npm run build",
+    "build": "node script/build.js",
+    "build:prod": "node script/build.js --prod",
     "test": "node script/test.js"
   },
   "dependencies": {
