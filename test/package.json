@@ -1,8 +1,9 @@
 {
-  "name": "esm-test-package",
+  "name": "test",
   "private": true,
   "@std/esm": {
-    "cache-directory": ".cache/for/tests"
+    "cache-directory": ".cache/for/tests",
+    "js": true
   },
   "dependencies": {
     "@std/esm": "*"

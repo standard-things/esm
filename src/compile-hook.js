@@ -25,22 +25,24 @@ function extManager(func, mod, filename) {
 
 function extWrap(func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath
+  const config = pkgInfo.config
+  const extname = path.extname(filePath)
 
-  if (cachePath === null) {
+  if (cachePath === null ||
+      (extname !== ".mjs" && ! config.js)) {
     return func.call(this, mod, filePath)
   }
 
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
   const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
-  const config = pkgInfo.config
 
   let cacheValue = cache[cacheFilename]
   let codeFilePath = cacheValue === true
     ? path.join(cachePath, cacheFilename)
     : filePath
 
-  let code = path.extname(filePath) === ".gz"
+  let code = extname === ".gz"
     ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
     : fs.readFile(codeFilePath, "utf8")
 
