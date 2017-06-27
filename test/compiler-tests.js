@@ -1,5 +1,5 @@
 import assert from "assert"
-import compiler from "../dist/compiler.js"
+import compiler from "../build/compiler.js"
 
 describe("compiler", () => {
   it("should not get confused by string literals", () =>

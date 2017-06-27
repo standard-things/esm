@@ -1,6 +1,6 @@
 import __dirname from "./__dirname.js"
 import assert from "assert"
-import compiler from "../dist/compiler.js"
+import compiler from "../build/compiler.js"
 import files from "./all-files.js"
 import path from "path"
 
