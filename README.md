@@ -47,7 +47,7 @@ Options
 ---
 
 Specify ESM loader options using the `"@std/esm"` key in your package.json.
-All options are off by default.
+All options are **off** by default.
 
 <table>
 <tr><td><code>"await"</code></td><td>A boolean to toggle top-level <code>await</code> in the main ES module</td></tr>
