@@ -11,9 +11,9 @@
     "node": ">=4"
   },
   "scripts": {
-    "build:dev": "webpack",
-    "build:prod": "NODE_ENV=production webpack",
-    "pretest": "npm run build:dev",
+    "build": "node script/build.js",
+    "build:prod": "node script/build.js --prod",
+    "pretest": "npm run build",
     "test": "node script/test.js"
   },
   "dependencies": {
@@ -27,11 +27,14 @@
     "babel-preset-env": "^1.5.2",
     "execa": "^0.7.0",
     "mocha": "^3.4.2",
+    "node-zopfli": "^2.0.2",
+    "pify": "^3.0.0",
     "trash": "^4.0.1",
     "uglify-js": "git://github.com/mishoo/UglifyJS2.git#harmony-v2.8.22",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
     "webpack-bundle-analyzer": "^2.8.2",
-    "webpack-sources": "^1.0.1"
+    "webpack-sources": "^1.0.1",
+    "yargs": "^8.0.2"
   }
 }

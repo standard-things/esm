@@ -1,6 +1,6 @@
 .DS_Store
+*.gz
 *.log
 test/.cache
-test/**/*.gz
 build
 node_modules
