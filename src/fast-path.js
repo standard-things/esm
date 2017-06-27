@@ -1,4 +1,5 @@
-// A simplified version of the AST traversal abstraction used by Recast:
+// A simplified version of the AST traversal abstraction used by Recast.
+// Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/recast/blob/master/lib/fast-path.js
 
 import utils from "./utils.js"
