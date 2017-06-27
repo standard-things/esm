@@ -28,8 +28,4 @@ function get(options, name) {
   return defaultOptions[name]
 }
 
-function setDefaults(options) {
-  Object.assign(defaultOptions, options)
-}
-
-export { get, setDefaults }
+export { get }
