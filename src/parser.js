@@ -1,7 +1,7 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
 import { enableAll } from "./acorn-extensions"
 
-const acornOptions = {
+const defaultOptions = {
   allowHashBang: true,
   allowImportExportEverywhere: true,
   allowReturnOutsideFunction: true,
@@ -10,8 +10,9 @@ const acornOptions = {
 }
 
 class Parser {
-  static parse(code) {
-    const parser = new AcornParser(acornOptions, code)
+  static parse(code, options) {
+    options = Object.assign(Object.create(null), defaultOptions, options)
+    const parser = new AcornParser(options, code)
     enableAll(parser)
     return parser.parse()
   }
