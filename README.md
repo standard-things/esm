@@ -26,9 +26,9 @@ $ node
 {}
 > import assert from "assert"
 > assert.strictEqual(2 + 2, 5)
-AssertionError: 4 === 5
-    at repl:1:1
-    at REPLServer.defaultEval (repl.js:272:27)
+AssertionError [ERR_ASSERTION]: 4 === 5
+    at repl:1:44
+    at ContextifyScript.Script.runInThisContext (vm.js:44:33)
   ...
 ```
 
