@@ -3,4 +3,5 @@ webpack.config.js
 build
 node_modules
 script
+src
 test

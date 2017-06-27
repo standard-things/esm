@@ -35,7 +35,7 @@ class EntryWrap {
 const config = {
   "target": "node",
   "entry": {
-    "esm": "./index.js"
+    "esm": "./src/index.js"
   },
   "node": {
     "module": false
@@ -98,8 +98,8 @@ if (process.env.NODE_ENV === "production") {
     })
   )
 } else {
-  config.entry.compiler = "./lib/compiler.js"
-  config.entry.runtime = "./lib/runtime.js"
+  config.entry.compiler = "./src/compiler.js"
+  config.entry.runtime = "./src/runtime.js"
 }
 
 module.exports = config
