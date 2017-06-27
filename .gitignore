@@ -1,6 +1,7 @@
+.cache
 .DS_Store
+.esm-cache
 *.gz
 *.log
-test/.cache
 build
 node_modules
