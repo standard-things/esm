@@ -44,7 +44,7 @@ Promise
     if (argv.prod) {
       const gzip = pify(require("node-zopfli").gzip)
       return read(bundlePath)
-        .then(gzip)
+        .then((buffer) => gzip(buffer, { numiterations: 100 }))
         .then((buffer) => write(gzipPath, buffer))
     }
   })
