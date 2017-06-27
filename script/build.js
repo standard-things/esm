@@ -13,12 +13,14 @@ const argv = require("yargs")
 
 const NODE_ENV = argv.prod ? "production" : "development"
 const rootPath = path.join(__dirname, "..")
-const bundlePath = path.join(rootPath, "build/esm.js")
+const buildPath = path.join(rootPath, "build")
+const bundlePath = path.join(buildPath, "esm.js")
 const gzipPath = path.join(rootPath, "esm.js.gz")
 const uwpPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plugin")
 const uglifyPath = path.join(uwpPath, "node_modules/uglify-js")
 
 const trashPaths = [
+  buildPath,
   gzipPath,
   uglifyPath
 ]
