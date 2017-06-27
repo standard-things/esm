@@ -36,7 +36,7 @@ if (rootModule.filename === null &&
       ? cacheValue.code
       : compiler.compile(code, { cacheFilename, pkgInfo, repl: true }).code
 
-    code = '"use strict";const ' + moduleAlias + "=module;" + code
+    code = '"use strict";var ' + moduleAlias + "=module;" + code
 
     return func.call(this, code, options)
   })
