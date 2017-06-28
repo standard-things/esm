@@ -25,7 +25,11 @@ const DEFAULT_PKG_CONFIG = {
 
 class Utils {
   static encodeIdent(identifier) {
-    return identifier.split("").join("\u200d")
+    const chars = identifier.split("")
+    if (chars.length < 2) {
+      chars.push("")
+    }
+    return chars.join("\u200d")
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
