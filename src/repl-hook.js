@@ -31,14 +31,34 @@ if (rootModule.filename === null &&
   Wrapper.wrap(vm, "createScript", function (func, pkgInfo, code, options) {
     const cacheFilename = utils.getCacheFileName(null, code, pkgInfo)
     const cacheValue = pkgInfo.cache[cacheFilename]
+    const prefix =
+      '"use strict";var ' + runtimeAlias + "=" +
+      runtimeAlias + "||module.exports;\n";
 
-    code = utils.isObject(cacheValue)
-      ? cacheValue.code
-      : compiler.compile(code, { cacheFilename, pkgInfo, repl: true }).code
+    options = Object.assign(Object.create(null), options)
+    options.lineOffset = (+options.lineOffset || 0) - 1
 
-    code = '"use strict";var ' + runtimeAlias + "=module;" + code
+    if (options.produceCachedData === void 0) {
+      options.produceCachedData = true
+    }
 
-    return func.call(this, code, options)
+    if (utils.isObject(cacheValue)) {
+      code = cacheValue.code
+      if (options.produceCachedData === true &&
+          options.cachedData === void 0 &&
+          cacheValue.cachedData !== void 0) {
+        options.cachedData = cacheValue.cachedData
+      }
+    } else {
+      code = compiler.compile(code, { cacheFilename, pkgInfo, repl: true }).code
+    }
+
+    const result = func.call(this, code, options)
+
+    if (result.cachedDataProduced) {
+      pkgInfo.cache[cacheFilename].cachedData = result.cachedData
+    }
+    return result
   })
 
   Runtime.enable(rootModule)
