@@ -30,8 +30,13 @@ const config = {
             "exclude": [
               "check-es2015-constants",
               "transform-es2015-arrow-functions",
+              "transform-async-to-generator",
+              "transform-es2015-block-scoping",
               "transform-es2015-classes",
-              "transform-es2015-function-name"
+              "transform-es2015-for-of",
+              "transform-es2015-function-name",
+              "transform-es2015-object-super",
+              "transform-regenerator"
             ],
             "targets": { "node": 4 }
           }]
