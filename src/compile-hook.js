@@ -79,7 +79,8 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
     code =
       (config.cjs ? '"use strict";const ' + moduleAlias + "=module;" : "") +
-      moduleAlias + ".run(" + async + "function(){" + code + "\n})"
+      moduleAlias + ".run(" + async + "function(){" + code + "\n}" +
+      (config.cjs ? ",1" : "") + ")"
   }
 
   mod._compile(code, filePath)
