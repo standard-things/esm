@@ -85,6 +85,7 @@ if (process.env.NODE_ENV === "production") {
 } else {
   config.entry.compiler = "./src/compiler.js"
   config.entry.runtime = "./src/runtime.js"
+  config.module.rules[0].options.presets[0][1].debug = true
 }
 
 module.exports = config
