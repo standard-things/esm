@@ -45,8 +45,8 @@ function compileAndWrite(content, options) {
 
 function toCompileOptions(options) {
   const compileOptions = {
-    moduleAlias: options.moduleAlias,
     repl: options.repl,
+    runtimeAlias: options.runtimeAlias,
     sourceType: void 0
   }
 

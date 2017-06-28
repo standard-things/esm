@@ -44,7 +44,7 @@ class Compiler {
       assignmentVisitor.visit(rootPath, {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
         magicString: importExportVisitor.magicString,
-        moduleAlias: importExportVisitor.moduleAlias
+        runtimeAlias: importExportVisitor.runtimeAlias
       })
 
       importExportVisitor.finalizeHoisting()

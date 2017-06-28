@@ -8,7 +8,7 @@ import utils from "./utils.js"
 import Wrapper from "./wrapper.js"
 import vm from "vm"
 
-const moduleAlias = utils.encodeIdent("module")
+const runtimeAlias = utils.encodeIdent("module")
 
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
@@ -49,7 +49,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   if (! utils.isObject(cacheValue)) {
     cacheValue = cacheValue === true
       ? { code, sourceType: "module" }
-      : compiler.compile(code, { cacheFilename, cachePath, filePath, moduleAlias, pkgInfo })
+      : compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
   }
 
   const isESM = cacheValue.sourceType === "module"
@@ -73,13 +73,13 @@ function extWrap(func, pkgInfo, mod, filePath) {
       Module.wrap = (script) => {
         Module.wrap = wrap
         return '"use strict";(function(){const ' +
-          moduleAlias + "=arguments[2];" + script + "\n})"
+          runtimeAlias + "=arguments[2];" + script + "\n})"
       }
     }
 
     code =
-      (config.cjs ? '"use strict";const ' + moduleAlias + "=module;" : "") +
-      moduleAlias + ".run(" + async + "function(){" + code + "\n}" +
+      (config.cjs ? '"use strict";const ' + runtimeAlias + "=module;" : "") +
+      runtimeAlias + ".run(" + async + "function(){" + code + "\n}" +
       (config.cjs ? ",1" : "") + ")"
   }
 

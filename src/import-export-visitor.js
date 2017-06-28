@@ -33,7 +33,7 @@ class ImportExportVisitor extends Visitor {
     this.generateLetDeclarations = !! getOption(options, "generateLetDeclarations")
     this.madeChanges = false
     this.magicString = new MagicString(code)
-    this.moduleAlias = getOption(options, "moduleAlias")
+    this.runtimeAlias = getOption(options, "runtimeAlias")
     this.sourceType = getOption(options, "sourceType")
   }
 
@@ -42,7 +42,7 @@ class ImportExportVisitor extends Visitor {
     const callee = node.callee
 
     if (callee.type === "Import") {
-      overwrite(this, callee.start, callee.end, this.moduleAlias + ".import")
+      overwrite(this, callee.start, callee.end, this.runtimeAlias + ".import")
     }
 
     this.visitChildren(path)
@@ -79,12 +79,12 @@ class ImportExportVisitor extends Visitor {
     const decl = path.getValue()
     const hoistedCode = pad(
       this,
-      this.moduleAlias + ".watch(" + getSourceString(this, decl),
+      this.runtimeAlias + ".watch(" + getSourceString(this, decl),
       decl.start,
       decl.source.start
     ) + pad(
       this,
-      ',[["*",' + this.moduleAlias + ".makeNsSetter()]]);",
+      ',[["*",' + this.runtimeAlias + ".makeNsSetter()]]);",
       decl.source.end,
       decl.end
     )
@@ -113,7 +113,7 @@ class ImportExportVisitor extends Visitor {
       path.call(this, "visitWithoutReset", "declaration")
       assert.strictEqual(decl.declaration, dd)
 
-      let prefix = this.moduleAlias + ".exportDefault("
+      let prefix = this.runtimeAlias + ".exportDefault("
       let suffix = ");"
 
       if (dd.type === "SequenceExpression") {
@@ -191,7 +191,7 @@ class ImportExportVisitor extends Visitor {
             addToSpecifierMap(
               newMap,
               locals[0],
-              this.moduleAlias + ".exports." + exported
+              this.runtimeAlias + ".exports." + exported
             )
           }
 
@@ -450,7 +450,7 @@ function toModuleImport(visitor, code, specifierMap) {
   const importedNames = specifierMap.keys()
   const nameCount = importedNames.length
 
-  code = visitor.moduleAlias + ".watch(" + code
+  code = visitor.runtimeAlias + ".watch(" + code
 
   if (! nameCount) {
     return code + ");"
@@ -497,7 +497,7 @@ function toModuleExport(visitor, specifierMap, constant) {
 
   let i = -1
   const lastIndex = nameCount - 1
-  code += visitor.moduleAlias + ".export(["
+  code += visitor.runtimeAlias + ".export(["
 
   while (++i < nameCount) {
     const exported = exportedNames[i]

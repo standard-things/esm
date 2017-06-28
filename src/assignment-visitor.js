@@ -6,7 +6,7 @@ class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
     this.exportedLocalNames = getOption(options, "exportedLocalNames")
     this.magicString = getOption(options, "magicString")
-    this.moduleAlias = getOption(options, "moduleAlias")
+    this.runtimeAlias = getOption(options, "runtimeAlias")
 
     if (this.exportedLocalNames === void 0) {
       this.exportedLocalNames = Object.create(null)
@@ -52,7 +52,7 @@ function wrap(visitor, path) {
   const value = path.getValue()
 
   visitor.magicString
-    .prependRight(value.start, visitor.moduleAlias + ".runSetters(")
+    .prependRight(value.start, visitor.runtimeAlias + ".runSetters(")
     .prependRight(value.end, ")")
 }
 

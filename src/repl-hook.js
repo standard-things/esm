@@ -20,7 +20,7 @@ if (rootModule.filename === null &&
   // Enable ESM in the default Node REPL by loading `@std/esm` upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
-  const moduleAlias = utils.encodeIdent("module")
+  const runtimeAlias = utils.encodeIdent("module")
 
   Wrapper.manage(vm, "createScript", function (func, code, options) {
     const pkgInfo = utils.getPkgInfo()
@@ -36,7 +36,7 @@ if (rootModule.filename === null &&
       ? cacheValue.code
       : compiler.compile(code, { cacheFilename, pkgInfo, repl: true }).code
 
-    code = '"use strict";var ' + moduleAlias + "=module;" + code
+    code = '"use strict";var ' + runtimeAlias + "=module;" + code
 
     return func.call(this, code, options)
   })
