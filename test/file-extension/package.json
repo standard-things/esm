@@ -1,0 +1,11 @@
+{
+  "name": "file-extension",
+  "private": true,
+  "@std/esm": {
+    "gz": true,
+    "js": true
+  },
+  "dependencies": {
+    "@std/esm": "*"
+  }
+}

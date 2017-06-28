@@ -42,7 +42,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
     ? path.join(cachePath, cacheFilename)
     : filePath
 
-  let code = extname === ".gz"
+    let code = config.gz && extname === ".gz"
     ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
     : fs.readFile(codeFilePath, "utf8")
 
