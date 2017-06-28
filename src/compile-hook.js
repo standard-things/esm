@@ -47,13 +47,14 @@ function extWrap(func, pkgInfo, mod, filePath) {
     : fs.readFile(codeFilePath, "utf8")
 
   if (! utils.isObject(cacheValue)) {
-    cacheValue = cacheValue === true
-      ? { code, sourceType: "module" }
-      : compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
+    if (cacheValue === true) {
+      cacheValue = cache[cacheFilename] = { code, sourceType: "module" }
+    } else {
+      cacheValue = compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
+    }
   }
 
   const isESM = cacheValue.sourceType === "module"
-  cache[cacheFilename] = cacheValue
   code = cacheValue.code
 
   if (isESM) {

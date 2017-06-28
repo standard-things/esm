@@ -26,8 +26,7 @@ function compileAndCache(content, options) {
 }
 
 function compileAndWrite(content, options) {
-  const compileOptions = toCompileOptions(options)
-  const result = compiler.compile(content, compileOptions)
+  const result = compileAndCache(content, options)
 
   if (result.sourceType === "module") {
     const cacheFilePath = path.join(options.cachePath, options.cacheFilename)
