@@ -10,10 +10,10 @@ class Runtime {
   // The exports.enable method can be used to enable the @std/esm runtime for
   // specific module objects, or for Module.prototype (where implemented),
   // to make the runtime available throughout the entire module system.
-  static enable(mod) {
-    if (typeof mod.export === "function" &&
-        typeof mod.import === "function") {
-      return true
+  static enable(object) {
+    if (typeof object.export === "function" &&
+        typeof object.import === "function") {
+      return
     }
 
     let i = -1
@@ -24,10 +24,9 @@ class Runtime {
     while (++i < keyCount) {
       const key = keys[i]
       if (key !== "constructor") {
-        mod[key] = proto[key]
+        object[key] = proto[key]
       }
     }
-    return true
   }
 
   // Register getter functions for local variables in the scope of an export
