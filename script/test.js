@@ -6,24 +6,25 @@ import trash from "trash"
 const rootPath = path.join(__dirname, "..")
 const testPath = path.join(rootPath, "test")
 
-const execOptions = {
-  cwd: testPath,
-  stdio: "inherit"
-}
-
-const mochaArgs = [
-  "--require", "../build/esm.js",
-  "--full-trace",
-  "tests.js"
-]
+const cachePaths = globby.sync("**/.?(esm-)cache", {
+  cwd: rootPath,
+  realpath: true
+})
 
 function runTests() {
-  return execa("mocha", mochaArgs, execOptions)
+  return execa("mocha", [
+    "--require", "../build/esm.js",
+    "--full-trace",
+    "tests.js"
+  ], {
+    cwd: testPath,
+    stdio: "inherit"
+  })
 }
 
-globby(["**/.*/"], { cwd: testPath, realpath: true })
+Promise
   // Clear cache folders for first run.
-  .then((cachePaths) => Promise.all(cachePaths.map(trash)))
+  .all(cachePaths.map(trash))
   // Run tests again using the cache.
   .then(runTests)
   .then(runTests)
