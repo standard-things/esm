@@ -75,9 +75,9 @@ class Runtime {
     return (namespace) => Object.assign(this.exports, namespace)
   }
 
-  run(wrapper) {
-    this.module.exports = this.entry.exports
-    wrapper()
+  run(wrapper, loose) {
+    const exported = this.module.exports = this.entry.exports
+    wrapper.call(loose ? exported : void 0)
     this.module.loaded = true
     this.runSetters()
     this.entry.loaded()

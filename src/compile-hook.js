@@ -80,7 +80,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
     }
 
     code =
-      (config.cjs ? '"use strict";const ' + runtimeAlias + "=exports;" : "") +
+      (config.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
       runtimeAlias + ".run(" + async + "function(){" + code + "\n}" +
       (config.cjs ? ",1" : "") + ")"
   }
