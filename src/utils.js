@@ -33,19 +33,27 @@ class Utils {
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
-    const extname = typeof filePath === "string" ? path.extname(filePath) : ".js"
+    const basename = createHash("sha1")
+      .update(toString(filePath))
+      .digest("hex")
+      .slice(0, 7)
 
     // Take only the major and minor components of the @std/esm version, so that
     // we don't invalidate the cache every time a patch version is released.
-    return createHash("sha1")
+    const key = createHash("sha1")
       .update(esmSemVer.major + "." + esmSemVer.minor)
       .update("\0")
-      .update(toString(filePath))
+      .update(JSON.stringify(pkgInfo.config))
       .update("\0")
       .update(toString(cacheKey))
-      .update("\0")
-      .update(JSON.stringify(pkgInfo.config))
-      .digest("hex") + extname
+      .digest("hex")
+      .slice(0, 7)
+
+    const extname = typeof filePath === "string"
+      ? path.extname(filePath)
+      : ".js"
+
+    return basename + key + extname
   }
 
   static getGetter(object, key) {
