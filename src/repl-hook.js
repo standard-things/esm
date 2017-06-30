@@ -33,7 +33,7 @@ if (rootModule.filename === null &&
     const cacheValue = pkgInfo.cache[cacheFilename]
     const prefix =
       '"use strict";var ' + runtimeAlias + "=" +
-      runtimeAlias + "||module.exports;\n";
+      runtimeAlias + "||[module.exports,module.exports={}][0];\n";
 
     options = Object.assign(Object.create(null), options)
     options.lineOffset = (+options.lineOffset || 0) - 1
@@ -50,10 +50,10 @@ if (rootModule.filename === null &&
         options.cachedData = cacheValue.cachedData
       }
     } else {
-      code = compiler.compile(code, { cacheFilename, pkgInfo, repl: true }).code
+      code = compiler.compile(code, { cacheFilename, pkgInfo, repl: true, runtimeAlias }).code
     }
 
-    const result = func.call(this, code, options)
+    const result = func.call(this, prefix + code, options)
 
     if (result.cachedDataProduced) {
       pkgInfo.cache[cacheFilename].cachedData = result.cachedData

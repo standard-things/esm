@@ -1,4 +1,5 @@
 import compiler from "./caching-compiler.js"
+import Entry from "./entry.js"
 import fs from "./fs.js"
 import Module from "module"
 import path from "path"
@@ -74,12 +75,12 @@ function extWrap(func, pkgInfo, mod, filePath) {
       Module.wrap = (script) => {
         Module.wrap = wrap
         return '"use strict";(function(){const ' +
-          runtimeAlias + "=arguments[2];" + script + "\n})"
+          runtimeAlias + "=this;" + script + "\n})"
       }
     }
 
     code =
-      (config.cjs ? '"use strict";const ' + runtimeAlias + "=module;" : "") +
+      (config.cjs ? '"use strict";const ' + runtimeAlias + "=exports;" : "") +
       runtimeAlias + ".run(" + async + "function(){" + code + "\n}" +
       (config.cjs ? ",1" : "") + ")"
   }
@@ -88,7 +89,9 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   if (! isESM) {
     mod.loaded = true
-    Runtime.prototype.runSetters.call(mod)
+    const entry = Entry.getOrCreate(mod.exports, mod)
+    Runtime.prototype.runSetters.call({ entry })
+    entry.loaded()
   }
 }
 

@@ -10,9 +10,10 @@ class Runtime {
   // The exports.enable method can be used to enable the @std/esm runtime for
   // specific module objects, or for Module.prototype (where implemented),
   // to make the runtime available throughout the entire module system.
-  static enable(object) {
-    if (typeof object.export === "function" &&
-        typeof object.import === "function") {
+  static enable(mod) {
+    const object = mod.exports
+
+    if (Object.getOwnPropertyNames(object).length) {
       return
     }
 
@@ -27,22 +28,26 @@ class Runtime {
         object[key] = proto[key]
       }
     }
+
+    const exported = Object.create(null)
+    utils.setESModule(exported)
+
+    object.entry =  Entry.getOrCreate(exported, mod)
+    object.exports = exported
+    object.module = mod
   }
 
   // Register getter functions for local variables in the scope of an export
   // statement. Pass true as the second argument to indicate that the getter
   // functions always return the same values.
   export(getterPairs, constant) {
-    utils.setESModule(this.exports)
+    this.entry.addGetters(getterPairs, constant)
 
-    const entry = Entry.getOrCreate(this.exports, this)
-    entry.addGetters(getterPairs, constant)
-
-    if (this.loaded) {
+    if (this.module.loaded) {
       // If the module has already been evaluated, then we need to trigger
       // another round of entry.runSetters calls, which begins by calling
       // entry.runGetters(module).
-      entry.runSetters()
+      this.entry.runSetters()
     }
   }
 
@@ -71,13 +76,11 @@ class Runtime {
   }
 
   run(wrapper) {
-    utils.setESModule(this.exports)
-    const entry = Entry.getOrCreate(this.exports, this)
-
+    this.module.exports = this.entry.exports
     wrapper()
-    this.loaded = true
+    this.module.loaded = true
     this.runSetters()
-    entry.loaded()
+    this.entry.loaded()
   }
 
   // Platform-specific code should find a way to call this method whenever
@@ -85,22 +88,7 @@ class Runtime {
   // might happen more than once per module, in case of dependency cycles,
   // so we want Module.prototype.runSetters to run each time.
   runSetters(valueToPassThrough) {
-    let entry = Entry.get(this.exports)
-    if (entry !== null) {
-      // If there's not already an Entry object for this module, then there
-      // won't be any setters to run.
-      entry.runSetters()
-    }
-
-    if (this.loaded) {
-      // If this module has already loaded, then we have to create an Entry
-      // object, so that we can call entry.loaded().
-      if (entry === null) {
-        entry = Entry.getOrCreate(this.exports, this).runSetters()
-      }
-
-      entry.loaded()
-    }
+    this.entry.runSetters()
 
     // Assignments to exported local variables get wrapped with calls to
     // module.runSetters, so module.runSetters returns the
@@ -122,19 +110,19 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    id = resolveId(id, this)
-    utils.setESModule(this.exports)
+    const mod = this.module
+    id = resolveId(id, mod)
 
-    const parentEntry = Entry.getOrCreate(this.exports, this)
-    const exported = this.require(id)
-    const childModule = Module._cache[resolveFilename(id, this, false)]
-    const childEntry = Entry.getOrCreate(exported, childModule)
+    const parentEntry = this.entry
+    const childExports = mod.require(id)
+    const childModule = Module._cache[resolveFilename(id, mod, false)]
+    const childEntry = Entry.getOrCreate(childExports, childModule)
 
     if (parentEntry.children.indexOf(childEntry) < 0) {
       parentEntry.children.push(childEntry)
     }
     if (setterPairs !== void 0) {
-      childEntry.addSetters(setterPairs, this).runSetters()
+      childEntry.addSetters(setterPairs, mod).runSetters()
     }
   }
 }
