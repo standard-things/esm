@@ -1,9 +1,7 @@
-"use strict"
-
-const execa = require("execa")
-const globby = require("globby")
-const path = require("path")
-const trash = require("trash")
+import execa from "execa"
+import globby from "globby"
+import path from "path"
+import trash from "trash"
 
 const rootPath = path.join(__dirname, "..")
 const testPath = path.join(rootPath, "test")

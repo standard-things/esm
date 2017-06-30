@@ -1,0 +1,11 @@
+{
+  "name": "script",
+  "private": true,
+  "@std/esm": {
+    "cjs": true,
+    "js": true
+  },
+  "dependencies": {
+    "@std/esm": "*"
+  }
+}

@@ -16,7 +16,7 @@
     "pretest": "npm run build",
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
-    "test": "node script/test.js"
+    "test": "node --require ./build/esm script/test.js"
   },
   "devDependencies": {
     "acorn": "^5.0.0",

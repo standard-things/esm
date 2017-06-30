@@ -4,12 +4,13 @@ const execa = require("execa")
 const fs = require("fs")
 const path = require("path")
 const pify = require("pify")
-const read = pify(fs.readFile)
 const trash = require("trash")
-const write = pify(fs.writeFile)
 const argv = require("yargs")
   .boolean("prod")
   .argv
+
+const read = pify(fs.readFile)
+const write = pify(fs.writeFile)
 
 const NODE_ENV = argv.prod ? "production" : "development"
 const rootPath = path.join(__dirname, "..")
