@@ -1,16 +1,12 @@
 "use strict"
 
 const execa = require("execa")
+const globby = require("globby")
 const path = require("path")
 const trash = require("trash")
 
 const rootPath = path.join(__dirname, "..")
 const testPath = path.join(rootPath, "test")
-
-const cachePaths = [
-  path.join(testPath, ".cache"),
-  path.join(testPath, "node_modules/enabled/.esm-cache")
-]
 
 const execOptions = {
   cwd: testPath,
@@ -27,9 +23,9 @@ function runTests() {
   return execa("mocha", mochaArgs, execOptions)
 }
 
-Promise
+globby(["**/.*/"], { cwd: testPath, realpath: true })
   // Clear cache folders for first run.
-  .all(cachePaths.map(trash))
+  .then((cachePaths) => Promise.all(cachePaths.map(trash)))
   // Run tests again using the cache.
   .then(runTests)
   .then(runTests)

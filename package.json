@@ -21,6 +21,7 @@
   "devDependencies": {
     "acorn": "^5.0.0",
     "execa": "^0.7.0",
+    "globby": "^6.1.0",
     "minizlib": "^1.0.3",
     "mocha": "^3.4.2",
     "optional-dev-dependency": "^2.0.1",
@@ -36,7 +37,7 @@
   "optionalDevDependencies": {
     "node-zopfli": "^2.0.2"
   },
-  "files":[
+  "files": [
     "index.js",
     "esm.js.gz"
   ]
