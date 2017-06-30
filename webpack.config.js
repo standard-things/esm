@@ -3,7 +3,6 @@
 const path = require("path")
 const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-const ConcatSource = require("webpack-sources").ConcatSource
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const config = {
@@ -18,31 +17,6 @@ const config = {
     "libraryTarget": "commonjs2",
     "filename": "[name].js",
     "path": path.join(__dirname, "build")
-  },
-  "module":  {
-    "rules": [{
-      "test": /\.js$/,
-      "loader": "babel-loader",
-      "options": {
-        "presets": [
-          ["env", {
-            "modules": false,
-            "exclude": [
-              "check-es2015-constants",
-              "transform-es2015-arrow-functions",
-              "transform-async-to-generator",
-              "transform-es2015-block-scoping",
-              "transform-es2015-classes",
-              "transform-es2015-for-of",
-              "transform-es2015-function-name",
-              "transform-es2015-object-super",
-              "transform-regenerator"
-            ],
-            "targets": { "node": 4 }
-          }]
-        ]
-      }
-    }]
   },
   "plugins": [
     new webpack.BannerPlugin({
@@ -85,7 +59,6 @@ if (process.env.NODE_ENV === "production") {
 } else {
   config.entry.compiler = "./src/compiler.js"
   config.entry.runtime = "./src/runtime.js"
-  config.module.rules[0].options.presets[0][1].debug = true
 }
 
 module.exports = config

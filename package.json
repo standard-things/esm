@@ -20,9 +20,6 @@
   },
   "devDependencies": {
     "acorn": "^5.0.0",
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.0",
-    "babel-preset-env": "^1.5.2",
     "execa": "^0.7.0",
     "minizlib": "^1.0.3",
     "mocha": "^3.4.2",
@@ -34,7 +31,6 @@
     "uglifyjs-webpack-plugin": "^0.4.6",
     "webpack": "^3.0.0",
     "webpack-bundle-analyzer": "^2.8.2",
-    "webpack-sources": "^1.0.1",
     "yargs": "^8.0.2"
   },
   "optionalDevDependencies": {
