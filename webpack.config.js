@@ -10,9 +10,6 @@ const config = {
   "entry": {
     "esm": "./src/index.js"
   },
-  "node": {
-    "module": false
-  },
   "output": {
     "libraryTarget": "commonjs2",
     "filename": "[name].js",
