@@ -7,12 +7,16 @@ const pify = require("pify")
 const trash = require("trash")
 const argv = require("yargs")
   .boolean("prod")
+  .boolean("test")
   .argv
 
 const read = pify(fs.readFile)
 const write = pify(fs.writeFile)
 
-const NODE_ENV = argv.prod ? "production" : "development"
+const NODE_ENV =
+  (argv.prod ? "production" : "development") +
+  (argv.test ? "-test" : "")
+
 const rootPath = path.join(__dirname, "..")
 const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
@@ -28,7 +32,7 @@ const trashPaths = [
 
 const webpackArgs = []
 
-if (argv.prod) {
+if (argv.prod && ! argv.test) {
   webpackArgs.push("--display-optimization-bailout")
 } else {
   webpackArgs.push("--hide-modules")

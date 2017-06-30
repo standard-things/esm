@@ -13,10 +13,12 @@
   "scripts": {
     "prebuild:prod": "optional-dev-dependency",
     "prepack": "npm run build:prod",
-    "pretest": "npm run build",
+    "pretest": "npm run build -- --test",
+    "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
-    "test": "node --require ./build/esm script/test.js"
+    "test": "node --require ./build/esm.js script/test.js",
+    "test:prod": "node --require ./index.js script/test.js"
   },
   "devDependencies": {
     "acorn": "^5.0.0",
