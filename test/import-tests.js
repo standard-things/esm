@@ -6,7 +6,7 @@ describe("import declarations", () => {
       import("./import/cycle-a.js"),
       import("./import/cycle-a.js")
     ])
-    .then((nss) => nss.forEach((ns) => ns.check()))
+    .then((namespaces) => namespaces.forEach((ns) => ns.check()))
     .catch((e) => assert.ifError(e))
   )
 
