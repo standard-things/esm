@@ -20,6 +20,7 @@ function runTests() {
     cwd: testPath,
     stdio: "inherit"
   })
+  .catch((e) => process.exit(e.code))
 }
 
 Promise

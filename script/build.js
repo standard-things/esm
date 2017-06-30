@@ -41,6 +41,7 @@ Promise
     env: { NODE_ENV },
     stdio: "inherit"
   }))
+  .catch((e) => process.exit(e.code))
   .then(() => {
     if (argv.prod) {
       const gzip = pify(require("node-zopfli").gzip)
