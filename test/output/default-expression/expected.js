@@ -2,4 +2,4 @@ let value = 0
 
 // This default expression will evaluate to 0 if the parentheses are
 // mistakenly stripped away.
-module.exportDefault((value++, value));
+_.exportDefault((value++, value));

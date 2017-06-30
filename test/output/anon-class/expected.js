@@ -1,4 +1,4 @@
-module.exportDefault(class {
+_.exportDefault(class {
   constructor(value) {
     this.value = value
   }

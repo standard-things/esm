@@ -1,1 +1,1 @@
-module.watch("module",[["*",function(v){module.exports.a=module.exports.b=v}]]);
+_.watch("module",[["*",function(v){_.exports.a=_.exports.b=v}]]);

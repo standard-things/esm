@@ -9,7 +9,7 @@ import utils from "./utils.js"
 import Wrapper from "./wrapper.js"
 import vm from "vm"
 
-const runtimeAlias = utils.encodeIdent("module")
+const runtimeAlias = utils.encodeIdent("_")
 
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
