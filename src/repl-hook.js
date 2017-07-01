@@ -33,7 +33,7 @@ if (rootModule.filename === null &&
     const cacheValue = pkgInfo.cache[cacheFilename]
     const prefix =
       '"use strict";var ' + runtimeAlias + "=" +
-      runtimeAlias + "||[module.exports,module.exports={}][0];\n";
+      runtimeAlias + "||[module.exports,module.exports={}][0];\n"
 
     options = Object.assign(Object.create(null), options)
     options.lineOffset = (+options.lineOffset || 0) - 1
