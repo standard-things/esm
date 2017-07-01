@@ -160,6 +160,14 @@ class FS {
     return content === null ? content : JSON.parse(content)
   }
 
+  static removeFile(filePath) {
+    try {
+      fs.unlinkSync(filePath)
+      return true
+    } catch (e) {}
+    return false
+  }
+
   static writeFile(filePath, bufferOrString, options) {
     try {
       fs.writeFileSync(filePath, bufferOrString, options)
