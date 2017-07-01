@@ -22,7 +22,8 @@ function compileWithFilename(content, options) {
 
 function compileAndCache(content, options) {
   const result = compiler.compile(content, toCompileOptions(options))
-  return options.pkgInfo.cache[options.cacheFilename] = result
+  options.pkgInfo.cache.set(options.cacheFilename, result)
+  return result
 }
 
 function compileAndWrite(content, options) {

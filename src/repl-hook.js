@@ -46,8 +46,8 @@ if (rootModule.filename === null &&
       code = cacheValue.code
       if (options.produceCachedData === true &&
           options.cachedData === void 0 &&
-          cacheValue.cachedData !== void 0) {
-        options.cachedData = cacheValue.cachedData
+          cacheValue.data !== void 0) {
+        options.cachedData = cacheValue.data
       }
     } else {
       code = compiler.compile(code, { cacheFilename, pkgInfo, repl: true, runtimeAlias }).code
@@ -56,7 +56,7 @@ if (rootModule.filename === null &&
     const result = func.call(this, prefix + code, options)
 
     if (result.cachedDataProduced) {
-      pkgInfo.cache[cacheFilename].cachedData = result.cachedData
+      pkgInfo.cache.get(cacheFilename).data = result.cachedData
     }
     return result
   })

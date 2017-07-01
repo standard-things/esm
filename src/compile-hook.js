@@ -38,7 +38,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const md5Key = path.basename(cacheFilename, extname).slice(-8)
   const runtimeAlias = utils.encodeIdent("_" + md5Key)
 
-  let cacheValue = cache[cacheFilename]
+  let cacheValue = cache.get(cacheFilename)
   let codeFilePath = cacheValue === true
     ? path.join(cachePath, cacheFilename)
     : filePath
@@ -49,7 +49,8 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = cache[cacheFilename] = { code, runtimeAlias, sourceType: "module" }
+      cacheValue = { code, runtimeAlias, sourceType: "module" }
+      cache.set(cacheFilename, cacheValue)
     } else {
       cacheValue = compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
     }
