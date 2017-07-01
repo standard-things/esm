@@ -30,14 +30,29 @@ function compileAndWrite(content, options) {
   const result = compileAndCache(content, options)
 
   if (result.sourceType === "module") {
-    const cacheFilePath = path.join(options.cachePath, options.cacheFilename)
-    const code = result.code
+    const cachePath = options.cachePath
+    const cacheFilename = options.cacheFilename
+    const cacheFilePath = path.join(cachePath, cacheFilename)
     const isGzipped = path.extname(cacheFilePath) === ".gz"
+    const pkgInfo = options.pkgInfo
+
+    const code = result.code
     const content = () => isGzipped ? fs.gzip(code) : code
     const encoding = isGzipped ? null : "utf8"
-    const scopePath = options.pkgInfo.dirPath
+    const scopePath = pkgInfo.dirPath
 
-    fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath })
+    fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath }, (success) => {
+      if (success) {
+        // Delete expired cache files.
+        const shortname = cacheFilename.slice(0, 8)
+        pkgInfo.cache.keys().forEach((key) => {
+          if (key !== cacheFilename &&
+              key.startsWith(shortname)) {
+            fs.removeFile(path.join(cachePath, key))
+          }
+        })
+      }
+    })
   }
 
   return result
