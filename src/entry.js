@@ -108,7 +108,7 @@ class Entry {
   // finished loading.
   loaded() {
     if (this._loaded) {
-      return this._loaded > 0
+      return this._loaded
     }
 
     this._loaded = -1
@@ -128,8 +128,7 @@ class Entry {
       if (! owner.loaded) {
         // At least one owner module has not finished loading, so this Entry
         // cannot be marked as loaded yet.
-        this._loaded = 0
-        return false
+        return this._loaded = 0
       }
 
       const ownerEntry = Entry.get(owner.parent)
@@ -143,13 +142,12 @@ class Entry {
 
     while (++i < childrenCount) {
       if (! this.children[i].loaded()) {
-        this._loaded = 0
-        return false
+        return this._loaded = 0
       }
     }
+
     Object.seal(this.namespace)
-    this._loaded = 1
-    return true
+    return this._loaded = 1
   }
 
   runGetters() {
