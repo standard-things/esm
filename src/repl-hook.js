@@ -29,8 +29,8 @@ if (rootModule.filename === null &&
   })
 
   Wrapper.wrap(vm, "createScript", function (func, pkgInfo, code, options) {
-    const cacheFilename = utils.getCacheFileName(null, code, pkgInfo)
-    const cacheValue = pkgInfo.cache[cacheFilename]
+    const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
+    const cacheValue = pkgInfo.cache[cacheFileName]
     const prefix =
       '"use strict";var ' + runtimeAlias + "=" +
       runtimeAlias + "||[module.exports,module.exports={}][0];\n"
@@ -50,13 +50,13 @@ if (rootModule.filename === null &&
         options.cachedData = cacheValue.data
       }
     } else {
-      code = compiler.compile(code, { cacheFilename, pkgInfo, repl: true, runtimeAlias }).code
+      code = compiler.compile(code, { cacheFileName, pkgInfo, repl: true, runtimeAlias }).code
     }
 
     const result = func.call(this, prefix + code, options)
 
     if (result.cachedDataProduced) {
-      pkgInfo.cache.get(cacheFilename).data = result.cachedData
+      pkgInfo.cache.get(cacheFileName).data = result.cachedData
     }
     return result
   })

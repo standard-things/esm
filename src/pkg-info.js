@@ -14,13 +14,13 @@ class PkgInfo {
     const cache = new OrderedMap
     const cacheDir =  options["cache-directory"]
     const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
-    const cacheFilenames = cachePath === null ? null : fs.readdir(cachePath)
-    let nameCount = cacheFilenames === null ? 0 : cacheFilenames.length
+    const cacheFileNames = cachePath === null ? null : fs.readdir(cachePath)
+    let nameCount = cacheFileNames === null ? 0 : cacheFileNames.length
 
     while (nameCount--) {
       // Later, in Module._extensions[".js"], we'll change the value to the actual
       // contents of the file, but for now we merely register that it exists.
-      cache.set(cacheFilenames[nameCount], true)
+      cache.set(cacheFileNames[nameCount], true)
     }
 
     this.cache = cache

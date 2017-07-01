@@ -34,13 +34,13 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
-  const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
-  const md5Hash = path.basename(cacheFilename, extname).slice(-8)
+  const cacheFileName = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
+  const md5Hash = path.basename(cacheFileName, extname).slice(-8)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
-  let cacheValue = cache.get(cacheFilename)
+  let cacheValue = cache.get(cacheFileName)
   let codeFilePath = cacheValue === true
-    ? path.join(cachePath, cacheFilename)
+    ? path.join(cachePath, cacheFileName)
     : filePath
 
   let code = pkgOptions.gz && extname === ".gz"
@@ -50,9 +50,9 @@ function extWrap(func, pkgInfo, mod, filePath) {
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
       cacheValue = { code, runtimeAlias, sourceType: "module" }
-      cache.set(cacheFilename, cacheValue)
+      cache.set(cacheFileName, cacheValue)
     } else {
-      cacheValue = compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
+      cacheValue = compiler.compile(code, { cacheFileName, cachePath, filePath, runtimeAlias, pkgInfo })
     }
   }
 
