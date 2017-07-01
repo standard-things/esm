@@ -8,7 +8,10 @@ const esmPath = NODE_ENV.startsWith("production") ? "../index.js" : "../build/es
 const rootPath = path.join(__dirname, "..")
 const testPath = path.join(rootPath, "test")
 
-const cachePaths = globby.sync("**/.?(esm-)cache", {
+const trashPaths = globby.sync([
+  "**/.?(esm-)cache",
+  "test/**/*.gz"
+], {
   cwd: rootPath,
   realpath: true
 })
@@ -27,7 +30,7 @@ function runTests() {
 
 Promise
   // Clear cache folders for first run.
-  .all(cachePaths.map(trash))
+  .all(trashPaths.map(trash))
   // Run tests again using the cache.
   .then(runTests)
   .then(runTests)
