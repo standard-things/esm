@@ -30,15 +30,13 @@ class Utils {
     const basename = createHash("md5")
       .update(toString(filePath))
       .update("\0")
-      .update(esmSemVer.major + "." + esmSemVer.minor)
-      .update("\0")
       .update(JSON.stringify(pkgInfo.options))
       .digest("hex")
       .slice(0, 8)
 
-    // Take only the major and minor components of the @std/esm version, so that
-    // we don't invalidate the cache every time a patch version is released.
     const key = createHash("md5")
+      .update(esmSemVer.version)
+      .update("\0")
       .update(toString(cacheKey))
       .digest("hex")
       .slice(0, 8)
