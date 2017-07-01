@@ -12,7 +12,7 @@
   },
   "scripts": {
     "prebuild:prod": "optional-dev-dependency",
-    "prepack": "npm run build:prod",
+    "prepack": "npm run test:prod",
     "pretest": "npm run build -- --test",
     "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",
