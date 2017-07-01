@@ -176,9 +176,9 @@ class FS {
     return false
   }
 
-  static writeFileDefer(filePath, content, options) {
+  static writeFileDefer(filePath, content, options, callback) {
     options = Object.assign(Object.create(null), options)
-    pendingWrites[filePath] = { content, options }
+    pendingWrites[filePath] = { callback, content, options }
 
     if (pendingWriteTimer !== null) {
       return
@@ -187,15 +187,24 @@ class FS {
       pendingWriteTimer = null
       Object.keys(pendingWrites).forEach((filePath) => {
         const pending = pendingWrites[filePath]
+        const callback = pending.callback
+        const options = pending.options
+        let success = false
 
-        if (FS.mkdirp(path.dirname(filePath), pending.options.scopePath)) {
+        if (FS.mkdirp(path.dirname(filePath), options.scopePath)) {
           const content = typeof pending.content === "function"
             ? pending.content()
             : pending.content
 
-          if (FS.writeFile(filePath, content, pending.options)) {
-            delete pendingWrites[filePath]
-          }
+          success = FS.writeFile(filePath, content, options)
+        }
+
+        if (success) {
+          delete pendingWrites[filePath]
+        }
+
+        if (typeof callback === "function") {
+          callback(success)
         }
       })
     })
