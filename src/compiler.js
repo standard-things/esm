@@ -29,6 +29,7 @@ class Compiler {
 
     const result = {
       code,
+      data: null,
       sourceType: "script"
     }
 
