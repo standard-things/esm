@@ -24,11 +24,11 @@ function extManager(func, mod, filename) {
 
 function extWrap(func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath
-  const config = pkgInfo.config
   const extname = path.extname(filePath)
+  const pkgOptions = pkgInfo.options
 
   if (cachePath === null ||
-      (extname !== ".mjs" && ! config.js)) {
+      (extname !== ".mjs" && ! pkgOptions.js)) {
     return func.call(this, mod, filePath)
   }
 
@@ -43,7 +43,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
     ? path.join(cachePath, cacheFilename)
     : filePath
 
-  let code = config.gz && extname === ".gz"
+  let code = pkgOptions.gz && extname === ".gz"
     ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
     : fs.readFile(codeFilePath, "utf8")
 
@@ -62,7 +62,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
     Runtime.enable(mod)
 
     let async = ""
-    if (allowTopLevelAwait && config.await) {
+    if (allowTopLevelAwait && pkgOptions.await) {
       allowTopLevelAwait = false
       if (process.mainModule === mod ||
           process.mainModule.children.some((child) => child === mod)) {
@@ -70,7 +70,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
       }
     }
 
-    if (! config.cjs) {
+    if (! pkgOptions.cjs) {
       const wrap = Module.wrap
       Module.wrap = (script) => {
         Module.wrap = wrap
@@ -80,9 +80,9 @@ function extWrap(func, pkgInfo, mod, filePath) {
     }
 
     code =
-      (config.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
+      (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
       runtimeAlias + ".run(" + async + "function(){" + code + "\n}" +
-      (config.cjs ? ",1" : "") + ")"
+      (pkgOptions.cjs ? ",1" : "") + ")"
   }
 
   mod._compile(code, filePath)

@@ -34,7 +34,7 @@ function compileAndWrite(content, options) {
     const isGzipped = path.extname(cacheFilePath) === ".gz"
     const content = () => isGzipped ? fs.gzip(code) : code
     const encoding = isGzipped ? null : "utf8"
-    const scopePath = options.pkgInfo.path
+    const scopePath = options.pkgInfo.dirPath
 
     fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath })
   }
@@ -50,7 +50,7 @@ function toCompileOptions(options) {
   }
 
   const filePath = options.filePath
-  const config = options.pkgInfo.config
+  const sourceType = options.pkgInfo.options.sourceType
 
   if (typeof filePath === "string") {
     let extname = path.extname(filePath)
@@ -59,8 +59,8 @@ function toCompileOptions(options) {
       extname = path.extname(path.basename(filePath, extname))
     }
 
-    if (typeof config.sourceType === "string") {
-      compileOptions.sourceType = config.sourceType
+    if (typeof sourceType === "string") {
+      compileOptions.sourceType = sourceType
     } else if (extname === ".mjs") {
       compileOptions.sourceType = "module"
     }

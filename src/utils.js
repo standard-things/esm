@@ -17,12 +17,6 @@ const hasOwn = Object.prototype.hasOwnProperty
 const lookupGetter = Object.prototype.__lookupGetter__
 const lookupSetter = Object.prototype.__lookupSetter__
 
-const DEFAULT_PKG_CONFIG = {
-  "cache-directory": ".esm-cache",
-  parser: void 0,
-  sourceType: void 0
-}
-
 class Utils {
   static encodeIdent(identifier) {
     return identifier + "\u200d"
@@ -43,7 +37,7 @@ class Utils {
     const key = createHash("md5")
       .update(esmSemVer.major + "." + esmSemVer.minor)
       .update("\0")
-      .update(JSON.stringify(pkgInfo.config))
+      .update(JSON.stringify(pkgInfo.options))
       .update("\0")
       .update(toString(cacheKey))
       .digest("hex")
@@ -166,54 +160,33 @@ class Utils {
       return null
     }
 
-    let config
+    let options
     if (Utils.has(pkgJSON, "@std/esm")) {
-      config = pkgJSON["@std/esm"]
+      options = pkgJSON["@std/esm"]
     } else if (Utils.has(pkgJSON, "@std") && Utils.has(pkgJSON["@std"], "esm")) {
-      config = pkgJSON["@std"].esm
+      options = pkgJSON["@std"].esm
     }
 
-    if (config === false) {
-      // An explicit "@std/esm": false property in package.json disables
-      // reification even if "@std/esm" is listed as a dependency.
+    if (options === false) {
+      // An explicit "@std/esm": false property in package.json disables esm
+      // loading even if "@std/esm" is listed as a dependency.
       return null
     }
-
+    // Use case: a package.json file may have "@std/esm" in its "devDependencies"
+    // object because it expects another package or application to enable esm
+    // loading in production, but needs its own copy of the "@std/esm" package
+    // during development. Disabling esm loading in production when it was
+    // enabled in development would be undesired in this case.
     const range =
       getRange(pkgJSON, "dependencies") ||
       getRange(pkgJSON, "peerDependencies") ||
       getRange(pkgJSON, "devDependencies")
 
-    // Use case: a package.json file may have "@std/esm" in its "devDependencies"
-    // object because it expects another package or application to enable
-    // reification in production, but needs its own copy of the "@std/esm" package
-    // during development. Disabling reification in production when it was enabled
-    // in development would be undesired in this case.
     if (range === null) {
       return null
     }
 
-    config = Object.assign(Object.create(null), DEFAULT_PKG_CONFIG, config)
-
-    const cacheDir = config["cache-directory"]
-    const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
-    const cacheFiles = cachePath === null ? null : fs.readdir(cachePath)
-
-    const pkgInfo = new PkgInfo
-    pkgInfo.cachePath = cachePath
-    pkgInfo.config = config
-    pkgInfo.path = dirPath
-    pkgInfo.range = range
-
-    let fileCount = cacheFiles === null ? 0 : cacheFiles.length
-
-    while (fileCount--) {
-      // Later, in Module._extensions[".js"], we'll change the value to the actual
-      // contents of the file, but for now we merely register that it exists.
-      pkgInfo.cache[cacheFiles[fileCount]] = true
-    }
-
-    return pkgInfo
+    return new PkgInfo(dirPath, range, options)
   }
 
   static setESModule(exported) {
