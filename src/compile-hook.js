@@ -35,8 +35,8 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
   const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
-  const md5Key = path.basename(cacheFilename, extname).slice(-8)
-  const runtimeAlias = utils.encodeIdent("_" + md5Key)
+  const md5Hash = path.basename(cacheFilename, extname).slice(-8)
+  const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   let cacheValue = cache.get(cacheFilename)
   let codeFilePath = cacheValue === true
