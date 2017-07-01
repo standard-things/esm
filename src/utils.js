@@ -25,33 +25,29 @@ const DEFAULT_PKG_CONFIG = {
 
 class Utils {
   static encodeIdent(identifier) {
-    const chars = identifier.split("")
-    if (chars.length < 2) {
-      chars.push("")
-    }
-    return chars.join("\u200d")
+    return identifier + "\u200d"
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
-    const basename = createHash("sha1")
+    const extname = typeof filePath === "string"
+      ? path.extname(filePath)
+      : ".js"
+
+    const basename = createHash("md5")
       .update(toString(filePath))
       .digest("hex")
-      .slice(0, 7)
+      .slice(0, 8)
 
     // Take only the major and minor components of the @std/esm version, so that
     // we don't invalidate the cache every time a patch version is released.
-    const key = createHash("sha1")
+    const key = createHash("md5")
       .update(esmSemVer.major + "." + esmSemVer.minor)
       .update("\0")
       .update(JSON.stringify(pkgInfo.config))
       .update("\0")
       .update(toString(cacheKey))
       .digest("hex")
-      .slice(0, 7)
-
-    const extname = typeof filePath === "string"
-      ? path.extname(filePath)
-      : ".js"
+      .slice(0, 8)
 
     return basename + key + extname
   }

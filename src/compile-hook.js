@@ -9,8 +9,6 @@ import utils from "./utils.js"
 import Wrapper from "./wrapper.js"
 import vm from "vm"
 
-const runtimeAlias = utils.encodeIdent("_")
-
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
@@ -37,19 +35,21 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
   const cacheFilename = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
+  const md5Key = path.basename(cacheFilename, extname).slice(-8)
+  const runtimeAlias = utils.encodeIdent("_" + md5Key)
 
   let cacheValue = cache[cacheFilename]
   let codeFilePath = cacheValue === true
     ? path.join(cachePath, cacheFilename)
     : filePath
 
-    let code = config.gz && extname === ".gz"
+  let code = config.gz && extname === ".gz"
     ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
     : fs.readFile(codeFilePath, "utf8")
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = cache[cacheFilename] = { code, sourceType: "module" }
+      cacheValue = cache[cacheFilename] = { code, runtimeAlias, sourceType: "module" }
     } else {
       cacheValue = compiler.compile(code, { cacheFilename, cachePath, filePath, runtimeAlias, pkgInfo })
     }
