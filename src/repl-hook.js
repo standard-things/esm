@@ -54,7 +54,12 @@ if (rootModule.filename === null &&
         options.cachedData = cacheValue.data
       }
     } else {
-      code = compiler.compile(code, { cacheFileName, pkgInfo, repl: true, runtimeAlias }).code
+      code = compiler.compile(code, {
+        cacheFileName,
+        pkgInfo,
+        repl: true,
+        runtimeAlias
+      }).code
     }
 
     code =
