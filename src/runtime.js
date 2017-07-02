@@ -156,18 +156,22 @@ function resolveId(id, parent) {
     // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
     const filename = parent.filename === null ? "./" : parent.filename
     const paths = nodeModulePaths(path.dirname(filename))
+
+    // Overwrite concat() to prevent global paths from being concatenated.
     paths.concat = () => paths
+    // Ensure a parent id and filename are provided to avoid going down the
+    // --eval branch of Module._resolveLookupPaths().
     return resolveFilename(id, { id: "<mock>", filename, paths })
   }
-  // Based on file-uri-to-path.
-  // Copyright Nathan Rajlich. Released under MIT license:
-  // https://github.com/TooTallNate/file-uri-to-path
+
   if (noPathname || parsed.protocol !== "file:") {
     const error = new Error("Cannot find module " + id)
     error.code = "MODULE_NOT_FOUND"
     throw error
   }
-
+  // Based on file-uri-to-path.
+  // Copyright Nathan Rajlich. Released under MIT license:
+  // https://github.com/TooTallNate/file-uri-to-path
   let host = parsed.host
   let pathname = id
   let prefix = ""
