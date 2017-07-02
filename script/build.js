@@ -1,7 +1,7 @@
 "use strict"
 
 const execa = require("execa")
-const fs = require("fs")
+const fs = require("fs-extra")
 const path = require("path")
 const pify = require("pify")
 const trash = require("trash")
@@ -9,9 +9,6 @@ const argv = require("yargs")
   .boolean("prod")
   .boolean("test")
   .argv
-
-const read = pify(fs.readFile)
-const write = pify(fs.writeFile)
 
 const NODE_ENV =
   (argv.prod ? "production" : "development") +
@@ -49,8 +46,8 @@ Promise
   .then(() => {
     if (argv.prod) {
       const gzip = pify(require("node-zopfli").gzip)
-      return read(bundlePath)
+      return fs.readFile(bundlePath)
         .then((buffer) => gzip(buffer, { numiterations: 100 }))
-        .then((buffer) => write(gzipPath, buffer))
+        .then((buffer) => fs.writeFile(gzipPath, buffer))
     }
   })
