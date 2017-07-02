@@ -24,21 +24,23 @@ class Compiler {
       code = code.replace(shebangRegExp, "")
     }
 
-    const sourceType = getOption(options, "sourceType")
-    const ast = Parser.parse(code)
-
     const result = {
       code,
       data: null,
       sourceType: "script"
     }
 
+    const sourceType = getOption(options, "sourceType")
+
     if (sourceType === "script" ||
         (sourceType === "unambiguous" && ! importExportRegExp.test(code))) {
       return result
     }
 
+    const allowReturnOutsideFunction = getOption(options, "allowReturnOutsideFunction")
+    const ast = Parser.parse(code, { allowReturnOutsideFunction })
     const rootPath = new FastPath(ast)
+
     importExportVisitor.visit(rootPath, code, options)
 
     if (importExportVisitor.madeChanges) {

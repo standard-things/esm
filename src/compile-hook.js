@@ -49,10 +49,17 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = { code, runtimeAlias, sourceType: "module" }
+      cacheValue = { code, sourceType: "module" }
       cache.set(cacheFileName, cacheValue)
     } else {
-      cacheValue = compiler.compile(code, { cacheFileName, cachePath, filePath, runtimeAlias, pkgInfo })
+      cacheValue = compiler.compile(code, {
+        allowReturnOutsideFunction: !! pkgOptions.cjs,
+        cacheFileName,
+        cachePath,
+        filePath,
+        runtimeAlias,
+        pkgInfo
+      })
     }
   }
 

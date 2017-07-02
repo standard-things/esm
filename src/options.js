@@ -1,7 +1,7 @@
 import utils from "./utils.js"
 
 const defaultOptions = {
-  exportsAlias: "exports",
+  allowReturnOutsideFunction: false,
   generateLetDeclarations: true,
   // If true, generate code appropriate for an interactive REPL session.
   // In particular, individual commands are not  wrapped with module.run(...)
