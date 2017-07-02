@@ -102,4 +102,16 @@ describe("dynamic import", () => {
     ))
     .catch((e) => assert.ifError(e))
   )
+
+  it("should not resolve non-local dependencies", () =>
+    Promise.all([
+      "home-node-libraries",
+      "home-node-modules",
+      "node-path"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.ok(e.code !== "ERR_ASSERTION"))
+    ))
+  )
 })
