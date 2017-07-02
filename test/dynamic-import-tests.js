@@ -91,4 +91,15 @@ describe("dynamic import", () => {
       assert.throws(() => compiler.compile(code), SyntaxError)
     })
   })
+
+  it("should URL parse ids", () =>
+    Promise.all([
+      import(abcId + "?a"),
+      import(abcId + "#a")
+    ])
+    .then((namespaces) => namespaces.forEach((ns) =>
+      assert.deepEqual(ns, abcNs)
+    ))
+    .catch((e) => assert.ifError(e))
+  )
 })
