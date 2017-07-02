@@ -1,7 +1,7 @@
 import assert from "assert"
 import path from "path"
 
-describe("module.runSetters", () => {
+describe("runSetters", () => {
   it("should be called after eval(...)", () =>
     import("./setter/eval.js")
       .then((ns) => ns.check())

@@ -46,10 +46,8 @@ class Entry {
         entryWeakMap.set(exported, entry)
       }
     } else {
-      // In case the child module modified module.exports, create a temporary
-      // Entry object so that we can call the entry.addSetters method once,
-      // which will trigger entry.runSetters(names), so that module.importSync
-      // behaves as expected.
+      // Create a temporary Entry object to call entry.addSetters() and trigger
+      // entry.runSetters(), so that watch() behaves as expected.
       entry = new Entry(exported)
     }
 
@@ -104,7 +102,7 @@ class Entry {
     return this
   }
 
-  // Called by module.runSetters once the module this Entry is managing has
+  // Called by runSetters() once the module this Entry is managing has
   // finished loading.
   loaded() {
     if (this._loaded) {
@@ -165,9 +163,8 @@ class Entry {
       const name = names[i]
       const value = runGetter(this, name)
 
-      // If the getter is run without error, update module.exports and
-      // module.namespace with the current value so that CommonJS require calls
-      // remain consistent with module.watch.
+      // Update entry.exports and entry.namespace so that CommonJS require
+      // calls remain consistent with watch().
       if (value !== GETTER_ERROR) {
         this.exports[name] =
         this.namespace[name] = value
@@ -177,9 +174,9 @@ class Entry {
     return this
   }
 
-  // Called whenever module.exports might have changed to trigger any setters
-  // associated with the newly exported values. The names parameter is optional
-  // without it, all getters and setters will run.
+  // Called whenever exports might have changed to trigger any setters associated
+  // with the newly exported values. The names parameter is optional without it,
+  // all getters and setters will run.
   runSetters() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
@@ -206,7 +203,7 @@ class Entry {
     while (++i < parentIDCount) {
       // What happens if parents[parentIDs[id]] === module, or if
       // longer cycles exist in the parent chain? Thanks to our setter.last
-      // bookkeeping in changed(), the runSetters broadcast will only proceed
+      // bookkeeping in changed(), the runSetters() broadcast will only proceed
       // as far as there are any actual changes to report.
       const parent = parents.get(parentIDs[i])
       const parentEntry = Entry.get(parent.exports)
@@ -225,7 +222,7 @@ function assignExportsToNamespace(entry) {
   const namespace = entry.namespace
   const isESM = utils.isESModuleLike(exported)
 
-  // Add a "default" namespace property unless it's a Babel exports,
+  // Add a "default" namespace property unless it's a Babel-like exports,
   // in which case the exported object should be namespace-like and safe to
   // assign directly.
   if (! isESM) {
@@ -336,7 +333,7 @@ function createNamespace() {
 // Invoke the given callback for every setter that needs to be called.
 // Note forEachSetter does not call setters directly, only the given callback.
 function forEachSetter(entry, names, callback) {
-  // Make sure module.exports and entry.namespace are up to date before we
+  // Make sure entry.exports and entry.namespace are up to date before we
   // call getExportByName().
   entry.runGetters()
 

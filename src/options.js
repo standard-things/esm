@@ -4,7 +4,7 @@ const defaultOptions = {
   allowReturnOutsideFunction: false,
   generateLetDeclarations: true,
   // If true, generate code appropriate for an interactive REPL session.
-  // In particular, individual commands are not  wrapped with module.run(...)
+  // In particular, individual commands are not wrapped with run(...)
   // and options.generateLetDeclarations is false (if unspecified).
   repl: false,
   runtimeAlias: "_",

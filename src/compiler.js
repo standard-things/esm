@@ -9,11 +9,9 @@ const importExportVisitor = new IEV
 const codeOfPound = "#".charCodeAt(0)
 const shebangRegExp = /^#!.*/
 
-// Matches any import or export identifier as long as it's not preceded by
-// a `.` character (to avoid matching module.export, for example). Because
-// @std/esm replaces all import and export declarations with module.import
-// and module.export calls, this logic should prevent the compiler from
-// ever having to recompile code it has already compiled.
+// Matches any import or export identifier as long as it's not preceded by a "."
+// character (e.g. runtime.export) to prevent the compiler from compiling code
+// it has already compiled.
 const importExportRegExp = /(?:^|[^.])\b(?:im|ex)port\b/
 
 class Compiler {

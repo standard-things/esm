@@ -48,8 +48,8 @@ class Runtime {
 
     if (this.module.loaded) {
       // If the module has already been evaluated, then we need to trigger
-      // another round of entry.runSetters calls, which begins by calling
-      // entry.runGetters(module).
+      // another round of entry.runSetters() calls, which begins by calling
+      // entry.runGetters().
       this.entry.runSetters()
     }
   }
@@ -89,14 +89,12 @@ class Runtime {
   // Platform-specific code should find a way to call this method whenever
   // the module system is about to return module.exports from require. This
   // might happen more than once per module, in case of dependency cycles,
-  // so we want Module.prototype.runSetters to run each time.
+  // so we want runSetters() to run each time.
   runSetters(valueToPassThrough) {
     this.entry.runSetters()
 
-    // Assignments to exported local variables get wrapped with calls to
-    // module.runSetters, so module.runSetters returns the
-    // valueToPassThrough parameter to allow the value of the original
-    // expression to pass through. For example,
+    // Returns the valueToPassThrough parameter to allow the value of the
+    // original expression to pass through. For example,
     //
     //   export let a = 1
     //   console.log(a += 3)
@@ -105,9 +103,9 @@ class Runtime {
     //
     //   module.export("a", () => a)
     //   let a = 1
-    //   console.log(module.runSetters(a += 3))
+    //   console.log(runSetters(a += 3))
     //
-    // This ensures module.runSetters runs immediately after the assignment,
+    // This ensures runSetters() runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
   }
