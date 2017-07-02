@@ -1,4 +1,5 @@
 import compiler from "./caching-compiler.js"
+import crypto from "crypto"
 import path from "path"
 import Runtime from "./runtime.js"
 import utils from "./utils.js"
@@ -20,7 +21,12 @@ if (rootModule.filename === null &&
   // Enable ESM in the default Node REPL by loading `@std/esm` upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
-  const runtimeAlias = utils.encodeIdent("_")
+  const runtimeAlias = utils.encodeIdent("_" +
+    crypto.createHash("md5")
+      .update(Date.now() + "")
+      .digest("hex")
+      .slice(0, 8)
+  )
 
   Wrapper.manage(vm, "createScript", function (func, code, options) {
     const pkgInfo = utils.getPkgInfo()
@@ -29,11 +35,9 @@ if (rootModule.filename === null &&
   })
 
   Wrapper.wrap(vm, "createScript", function (func, pkgInfo, code, options) {
+    const cache = pkgInfo.cache
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
-    const cacheValue = pkgInfo.cache[cacheFileName]
-    const prefix =
-      '"use strict";var ' + runtimeAlias + "=" +
-      runtimeAlias + "||[module.exports,module.exports={}][0];\n"
+    const cacheValue = cache.get(cacheFileName)
 
     options = Object.assign(Object.create(null), options)
     options.lineOffset = (+options.lineOffset || 0) - 1
@@ -53,10 +57,14 @@ if (rootModule.filename === null &&
       code = compiler.compile(code, { cacheFileName, pkgInfo, repl: true, runtimeAlias }).code
     }
 
-    const result = func.call(this, prefix + code, options)
+    code =
+      '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
+      "||[module.exports,module.exports={}][0];\n" + code
+
+    const result = func.call(this, code, options)
 
     if (result.cachedDataProduced) {
-      pkgInfo.cache.get(cacheFileName).data = result.cachedData
+      cache.get(cacheFileName).data = result.cachedData
     }
     return result
   })

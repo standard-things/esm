@@ -1,7 +1,7 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
-import { createHash } from "crypto"
-import esmSemVer from "./version.js"
+import crypto from "crypto"
 import data from "./data.js"
+import esmSemVer from "./version.js"
 import FastObject from "./fast-object.js"
 import fs from "./fs.js"
 import path from "path"
@@ -27,12 +27,12 @@ class Utils {
       ? path.extname(filePath)
       : ".js"
 
-    const basename = createHash("md5")
+    const basename = crypto.createHash("md5")
       .update(toString(filePath))
       .digest("hex")
       .slice(0, 8)
 
-    const key = createHash("md5")
+    const key = crypto.createHash("md5")
       .update(esmSemVer.version)
       .update("\0")
       .update(JSON.stringify(pkgInfo.options))
