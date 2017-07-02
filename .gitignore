@@ -5,3 +5,5 @@
 *.log
 /build
 /node_modules
+/test/env/prefix/bin
+/test/env/prefix/node

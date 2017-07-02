@@ -107,7 +107,8 @@ describe("dynamic import", () => {
     Promise.all([
       "home-node-libraries",
       "home-node-modules",
-      "node-path"
+      "node-path",
+      "prefix-path"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
