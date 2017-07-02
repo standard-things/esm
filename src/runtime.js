@@ -135,18 +135,24 @@ function resolveId(id, parent) {
     return id
   }
 
-  const parsed = id.includes(":") ? URL.parse(id) : null
+  const code0 = id.charCodeAt(0)
+  const code1 = id.charCodeAt(1)
+  const isPath =
+    code0 === codeOfForwardSlash ||
+    (code0 === codeOfDot &&
+      (code1 === codeOfForwardSlash ||
+      (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash))) ||
+    id.includes(":")
 
-  if (parsed === null || typeof parsed.protocol !== "string") {
-    const code0 = id.charCodeAt(0)
-    const code1 = id.charCodeAt(1)
+  const noParse = ! isPath
+  const parsed = noParse ? null : URL.parse(id)
+  const noPathname = noParse || parsed.pathname === null
 
-    if (code0 === codeOfDot &&
-        (code1 === codeOfDot || code1 === codeOfForwardSlash)) {
-      return id
-    }
+  id = noPathname ? id : unescape(parsed.pathname)
 
-    return resolveFilename(id, {
+  if (noParse || typeof parsed.protocol !== "string") {
+    // Resolve local dependencies.
+    return isPath ? id : resolveFilename(id, {
       id: parent.id,
       filename: parent.filename,
       paths: nodeModulePaths(path.dirname(utils.toString(parent.filename)))
@@ -155,14 +161,14 @@ function resolveId(id, parent) {
   // Based on file-uri-to-path.
   // Copyright Nathan Rajlich. Released under MIT license:
   // https://github.com/TooTallNate/file-uri-to-path
-  if (parsed.protocol !== "file:" || parsed.pathname === null) {
+  if (noPathname || parsed.protocol !== "file:") {
     const error = new Error("Cannot find module " + id)
     error.code = "MODULE_NOT_FOUND"
     throw error
   }
 
   let host = parsed.host
-  let pathname = unescape(parsed.pathname)
+  let pathname = id
   let prefix = ""
 
   // Section 2: Syntax
