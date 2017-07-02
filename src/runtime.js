@@ -184,7 +184,7 @@ function resolveId(id, parent) {
   // Section E.2: DOS and Windows Drive Letters
   // https://tools.ietf.org/html/rfc8089#appendix-E.2
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
-  pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, '$1:'))
+  pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
 
   return resolveFilename(prefix + host + pathname, parent, false)
 }
