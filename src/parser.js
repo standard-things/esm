@@ -4,7 +4,7 @@ import { enableAll } from "./acorn-extensions"
 const defaultOptions = {
   allowHashBang: true,
   allowImportExportEverywhere: true,
-  allowReturnOutsideFunction: true,
+  allowReturnOutsideFunction: false,
   ecmaVersion: 8,
   sourceType: "module"
 }
