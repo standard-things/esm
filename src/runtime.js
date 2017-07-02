@@ -151,12 +151,15 @@ function resolveId(id, parent) {
   id = noPathname ? id : unescape(parsed.pathname)
 
   if (noParse || typeof parsed.protocol !== "string") {
-    // Resolve local dependencies.
-    return isPath ? id : resolveFilename(id, {
-      id: parent.id,
-      filename: parent.filename,
-      paths: nodeModulePaths(path.dirname(utils.toString(parent.filename)))
-    })
+    if (isPath) {
+      return id
+    }
+    // Prevent resolving non-local dependencies:
+    // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
+    const filename = parent.filename === null ? "./" : parent.filename
+    const paths = nodeModulePaths(path.dirname(filename))
+    paths.concat = () => paths
+    return resolveFilename(id, { id: "<mock>", filename, paths })
   }
   // Based on file-uri-to-path.
   // Copyright Nathan Rajlich. Released under MIT license:
