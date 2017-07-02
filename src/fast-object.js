@@ -1,8 +1,9 @@
 let fastProto = null
 
-// Creates an object with permanently fast properties in V8. See Toon Verwaest's
-// post https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62
-// for more details. Use %HasFastProperties(object) and the Node flag
+// Creates an object with permanently fast properties in V8.
+// See Toon Verwaest's post for more details
+// https://medium.com/@tverwaes/setting-up-prototypes-in-v8-ec9c9491dfe2#5f62.
+// Use %HasFastProperties(object) and the Node flag
 // --allow-natives-syntax to check whether an object has fast properties.
 function FastObject() {
   // A prototype object will have "fast properties" enabled once it is checked
