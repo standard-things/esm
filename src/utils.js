@@ -28,7 +28,7 @@ class Utils {
       : ".js"
 
     const basename = crypto.createHash("md5")
-      .update(toString(filePath))
+      .update(Utils.toString(filePath))
       .digest("hex")
       .slice(0, 8)
 
@@ -37,7 +37,7 @@ class Utils {
       .update("\0")
       .update(JSON.stringify(pkgInfo.options))
       .update("\0")
-      .update(toString(cacheKey))
+      .update(Utils.toString(cacheKey))
       .digest("hex")
       .slice(0, 8)
 
@@ -89,7 +89,7 @@ class Utils {
   }
 
   static getPkgInfo(dirPath) {
-    dirPath = toString(dirPath)
+    dirPath = Utils.toString(dirPath)
     if (dirPath in data.pkgInfo) {
       return data.pkgInfo[dirPath]
     }
@@ -198,6 +198,13 @@ class Utils {
   static setSetter(object, key, setter) {
     defineSetter.call(object, key, setter)
   }
+
+  static toString(value) {
+    if (typeof value === "string") {
+      return value
+    }
+    return value == null ? "" : String(value)
+  }
 }
 
 function getRange(json, name) {
@@ -205,13 +212,6 @@ function getRange(json, name) {
   return Utils.has(entry, "@std/esm")
     ? SemVer.validRange(entry["@std/esm"])
     : null
-}
-
-function toString(value) {
-  if (typeof value === "string") {
-    return value
-  }
-  return value == null ? "" : String(value)
 }
 
 Object.setPrototypeOf(Utils.prototype, null)
