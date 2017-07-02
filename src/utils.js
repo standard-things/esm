@@ -23,6 +23,9 @@ class Utils {
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
+    // While MD5 is not suitable for verification of untrusted data,
+    // it is great for revving files. See Sufian Rhazi's post for more details
+    // https://blog.risingstack.com/automatic-cache-busting-for-your-css/.
     const hash1 = Utils.md5(filePath)
     const hash2 = Utils.md5(
       esmSemVer.version + "\0" +
