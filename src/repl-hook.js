@@ -1,5 +1,4 @@
 import compiler from "./caching-compiler.js"
-import crypto from "crypto"
 import path from "path"
 import Runtime from "./runtime.js"
 import utils from "./utils.js"
@@ -21,12 +20,8 @@ if (rootModule.filename === null &&
   // Enable ESM in the default Node REPL by loading `@std/esm` upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
-  const runtimeAlias = utils.encodeIdent("_" +
-    crypto.createHash("md5")
-      .update(Date.now() + "")
-      .digest("hex")
-      .slice(0, 8)
-  )
+  const md5Hash = utils.md5(Date.now()).slice(0, 8)
+  const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   Wrapper.manage(vm, "createScript", function (func, code, options) {
     const pkgInfo = utils.getPkgInfo()

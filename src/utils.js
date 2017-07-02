@@ -23,25 +23,18 @@ class Utils {
   }
 
   static getCacheFileName(filePath, cacheKey, pkgInfo) {
+    const hash1 = Utils.md5(filePath)
+    const hash2 = Utils.md5(
+      esmSemVer.version + "\0" +
+      JSON.stringify(pkgInfo.options) + "\0" +
+      cacheKey
+    )
+
     const extname = typeof filePath === "string"
       ? path.extname(filePath)
       : ".js"
 
-    const basename = crypto.createHash("md5")
-      .update(Utils.toString(filePath))
-      .digest("hex")
-      .slice(0, 8)
-
-    const key = crypto.createHash("md5")
-      .update(esmSemVer.version)
-      .update("\0")
-      .update(JSON.stringify(pkgInfo.options))
-      .update("\0")
-      .update(Utils.toString(cacheKey))
-      .digest("hex")
-      .slice(0, 8)
-
-    return basename + key + extname
+    return hash1.slice(0, 8) + hash2.slice(0, 8) + extname
   }
 
   static getGetter(object, key) {
@@ -148,6 +141,13 @@ class Utils {
     dummyParser.pos = parser.pos
     dummyParser.nextToken()
     return dummyParser
+  }
+
+  static md5(value) {
+    return crypto
+      .createHash("md5")
+      .update(Utils.toString(value))
+      .digest("hex")
   }
 
   static readPkgInfo(dirPath) {
