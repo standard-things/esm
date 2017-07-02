@@ -4,6 +4,9 @@ import path from "path"
 import URL from "url"
 import utils from "./utils.js"
 
+const codeOfDot = ".".charCodeAt(0)
+const codeOfForwardSlash = "/".charCodeAt(0)
+const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
 
 class Runtime {
@@ -128,18 +131,34 @@ class Runtime {
 }
 
 function resolveId(id, parent) {
-  const parsed = typeof id === "string" && id.includes(":")
-    ? URL.parse(id)
-    : null
+  if (typeof id !== "string") {
+    return id
+  }
+
+  const parsed = id.includes(":") ? URL.parse(id) : null
 
   if (parsed === null || typeof parsed.protocol !== "string") {
-    return id
+    const code0 = id.charCodeAt(0)
+    const code1 = id.charCodeAt(1)
+
+    if (code0 === codeOfDot &&
+        (code1 === codeOfDot || code1 === codeOfForwardSlash)) {
+      return id
+    }
+
+    return resolveFilename(id, {
+      id: parent.id,
+      filename: parent.filename,
+      paths: nodeModulePaths(path.dirname(utils.toString(parent.filename)))
+    })
   }
   // Based on file-uri-to-path.
   // Copyright Nathan Rajlich. Released under MIT license:
   // https://github.com/TooTallNate/file-uri-to-path
   if (parsed.protocol !== "file:" || parsed.pathname === null) {
-    throw new TypeError
+    const error = new Error("Cannot find module " + id)
+    error.code = "MODULE_NOT_FOUND"
+    throw error
   }
 
   let host = parsed.host
