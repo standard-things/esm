@@ -2,8 +2,6 @@ import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
 import { enableAll } from "./acorn-extensions"
 
 const defaultOptions = {
-  allowHashBang: true,
-  allowImportExportEverywhere: true,
   allowReturnOutsideFunction: false,
   ecmaVersion: 8,
   sourceType: "module"
