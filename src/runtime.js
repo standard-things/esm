@@ -45,13 +45,6 @@ class Runtime {
   // functions always return the same values.
   export(getterPairs, constant) {
     this.entry.addGetters(getterPairs, constant)
-
-    if (this.module.loaded) {
-      // If the module has already been evaluated, then we need to trigger
-      // another round of entry.runSetters() calls, which begins by calling
-      // entry.runGetters().
-      this.entry.runSetters()
-    }
   }
 
   // Register a getter function that always returns the given value.
