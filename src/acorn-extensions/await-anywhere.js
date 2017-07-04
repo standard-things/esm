@@ -2,6 +2,7 @@ import utils from "../utils.js"
 
 function enable(parser) {
   parser.parseMaybeUnary = utils.wrap(parser.parseMaybeUnary, parseMaybeUnary)
+  return parser
 }
 
 function parseMaybeUnary(func, refDestructuringErrors, sawUnary) {

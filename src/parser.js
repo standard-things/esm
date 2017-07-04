@@ -11,8 +11,7 @@ const defaultOptions = {
 class Parser {
   static parse(code, options) {
     options = Object.assign(Object.create(null), defaultOptions, options)
-    let parser = new AcornParser(options, code)
-    enableAll(parser)
+    let parser = enableAll(new AcornParser(options, code))
 
     try {
       return parser.parse()
@@ -20,12 +19,11 @@ class Parser {
       if (e.reparse === false) {
         throw e
       }
-
-      parser = new AcornLooseParser(code, options)
-      enableAll(parser)
-      parser.next()
-      return parser.parseTopLevel()
     }
+
+    parser = enableAll(new AcornLooseParser(code, options))
+    parser.next()
+    return parser.parseTopLevel()
   }
 }
 

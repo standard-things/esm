@@ -13,6 +13,7 @@ function enable(parser) {
   parser.parseExprAtom = utils.wrap(parser.parseExprAtom, parseExprAtom)
   parser.parseImport = utils.wrap(parser.parseImport, parseImport)
   parser.parseStatement = utils.wrap(parser.parseStatement, parseStatement)
+  return parser
 }
 
 function parseExprAtom(func, refDestructuringErrors) {

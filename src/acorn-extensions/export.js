@@ -8,6 +8,7 @@ function enable(parser) {
 
   parser[key] = utils.wrap(parser[key], parseExportSpecifiers)
   parser.parseExport = parseExport
+  return parser
 }
 
 function parseExport(node, exported) {

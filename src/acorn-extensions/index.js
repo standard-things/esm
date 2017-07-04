@@ -14,6 +14,7 @@ const extensions = [
 
 function enableAll(parser) {
   extensions.forEach((ext) => ext(parser))
+  return parser
 }
 
 export {

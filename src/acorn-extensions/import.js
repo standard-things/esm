@@ -7,6 +7,7 @@ function enable(parser) {
     : "parseImportSpecifierList"
 
   parser[key] = utils.wrap(parser[key], parseImportSpecifiers)
+  return parser
 }
 
 function parseImportSpecifiers(func) {
