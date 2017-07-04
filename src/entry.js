@@ -13,7 +13,7 @@ class Entry {
     // A number indicating the loading state of the module this Entry is managing.
     this._loaded = 0
     // The child entries of this Entry.
-    this.children = []
+    this.children = new OrderedMap
     // The module.exports of the module this Entry is managing.
     this.exports = exported
     // Getters for local variables exported from the managed module.
@@ -128,10 +128,11 @@ class Entry {
     }
 
     i = -1
-    const childrenCount = this.children.length
+    const children = this.children.values()
+    const childrenCount = children.length
 
     while (++i < childrenCount) {
-      if (! this.children[i].loaded()) {
+      if (! children[i].loaded()) {
         return this._loaded = 0
       }
     }

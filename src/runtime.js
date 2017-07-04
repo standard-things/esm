@@ -108,13 +108,15 @@ class Runtime {
     id = resolveId(id, mod)
 
     const parentEntry = this.entry
+    const children = parentEntry.children
+
     const childExports = mod.require(id)
-    const childModule = Module._cache[resolveFilename(id, mod, false)]
+    const childId = resolveFilename(id, mod, false)
+    const childModule = Module._cache[childId]
     const childEntry = Entry.getOrCreate(childExports, childModule)
 
-    if (parentEntry.children.indexOf(childEntry) < 0) {
-      parentEntry.children.push(childEntry)
-    }
+    children.set(childId, childEntry)
+
     if (setterPairs !== void 0) {
       childEntry.addSetters(setterPairs, mod).runSetters()
     }
