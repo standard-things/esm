@@ -4,6 +4,8 @@ import * as bns from "../fixture/export/all-mutual/b.js"
 import * as ns1 from "../fixture/abc.js"
 import * as ns2 from "../fixture/abc.js"
 
+const useToStringTag = typeof Symbol.toStringTag === "symbol"
+
 export function check() {
   const abcNs = {
     a: "a",
@@ -17,16 +19,16 @@ export function check() {
     b: "b"
   }
 
-  const nsTag = typeof Symbol.toStringTag === "symbol"
-    ? "[object Module]"
-    : "[object Object]"
-
   const namespaces = [
     ans, bns, ns1, ns2
   ]
 
+  const nsSymbols = useToStringTag ? [Symbol.toStringTag] : []
+  const nsTag = useToStringTag ? "[object Module]" : "[object Object]"
+
   namespaces.forEach((ns) => {
     assert.ok(Object.isSealed(ns))
+    assert.deepEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
     assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
   })
 

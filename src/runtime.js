@@ -68,7 +68,11 @@ class Runtime {
   // properties of the namespace to module.exports, which is useful for
   // implementing `export * from "module"` syntax.
   makeNsSetter() {
-    return (namespace) => Object.assign(this.exports, namespace)
+    return (namespace) => {
+      for (const key in namespace) {
+        this.exports[key] = namespace[key]
+      }
+    }
   }
 
   run(wrapper, loose) {
