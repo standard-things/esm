@@ -18,7 +18,7 @@ function parseExport(node, exported) {
   }
 
   if (this.type === tt.star &&
-      utils.lookahead(this).isContextual("from")) {
+      utils.parserLookahead(this).isContextual("from")) {
     // ... * from "..."
     return parseExportNamespace(this, node)
   }

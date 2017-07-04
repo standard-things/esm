@@ -147,7 +147,7 @@ class Utils {
       .digest("hex")
   }
 
-  static lookahead(parser) {
+  static parserLookahead(parser) {
     acornParser.input = parser.input
     acornParser.pos = parser.pos
     acornParser.nextToken()

@@ -30,7 +30,7 @@ function parseExprAtom(refDestructuringErrors) {
 
 function parseStatement(declaration, topLevel, exported) {
   if (this.type === tt._import &&
-      utils.lookahead(this).type === tt.parenL) {
+      utils.parserLookahead(this).type === tt.parenL) {
     // import(...)
     const startPos = this.start
     const node = this.startNode()
