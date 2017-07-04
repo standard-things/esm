@@ -19,7 +19,10 @@ const config = {
   },
   "plugins": [
     new webpack.BannerPlugin({
-      banner: "const __non_webpack_module__ = module",
+      banner:
+        '"use strict";' +
+        "const __non_webpack_module__ = module;" +
+        "let LooseParser, parse_dammit, pluginsLoose",
       entryOnly: true,
       raw: true
     }),
@@ -32,7 +35,11 @@ const config = {
     }),
     new webpack.EnvironmentPlugin({
       ESM_VERSION: require("./package.json").version
-    })
+    }),
+    new webpack.NormalModuleReplacementPlugin(
+      /acorn\.js/,
+      (resource) => resource.request = path.join(resource.request, "../acorn.es.js")
+    )
   ]
 }
 

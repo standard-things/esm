@@ -2,33 +2,42 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
-import { Parser, tokTypes as tt } from "acorn/dist/acorn.es.js"
+import { tokTypes as tt } from "acorn/dist/acorn.es.js"
 import utils from "../utils.js"
 
-const Pp = Parser.prototype
 const codeOfLeftParen = "(".charCodeAt(0)
 
 function enable(parser) {
   // Allow `yield import()` to parse.
   tt._import.startsExpr = true
-  parser.parseExprAtom = parseExprAtom
-  parser.parseStatement = parseStatement
+  parser.parseExprAtom = utils.wrap(parser.parseExprAtom, parseExprAtom)
+  parser.parseImport = utils.wrap(parser.parseImport, parseImport)
+  parser.parseStatement = utils.wrap(parser.parseStatement, parseStatement)
 }
 
-function parseExprAtom(refDestructuringErrors) {
+function parseExprAtom(func, refDestructuringErrors) {
   const importPos = this.start
 
   if (this.eat(tt._import)) {
     if (this.type !== tt.parenL) {
-      this.unexpected()
+      utils.parserRaise(this)
     }
+
     return this.finishNode(this.startNodeAt(importPos), "Import")
   }
 
-  return Pp.parseExprAtom.call(this, refDestructuringErrors)
+  return func.call(this, refDestructuringErrors)
 }
 
-function parseStatement(declaration, topLevel, exported) {
+function parseImport(func, node) {
+  try {
+    return func.call(this, node)
+  } catch (e) {
+    utils.parserRaise(this)
+  }
+}
+
+function parseStatement(func, declaration, topLevel, exported) {
   if (this.type === tt._import &&
       utils.parserLookahead(this).type === tt.parenL) {
     // import(...)
@@ -38,16 +47,25 @@ function parseStatement(declaration, topLevel, exported) {
     const callee = this.parseExprAtom()
 
     this.next()
-    callExpr.arguments = [this.parseMaybeAssign()]
+
+    try {
+      callExpr.arguments = [this.parseMaybeAssign()]
+    } catch (e) {
+      utils.parserRaise(this)
+    }
+
     callExpr.callee = callee
     this.finishNode(callExpr, "CallExpression")
-    this.expect(tt.parenR)
+
+    if (! this.eat(tt.parenR)) {
+      utils.parserRaise(this)
+    }
 
     const expr = this.parseSubscripts(callExpr, startPos)
     return this.parseExpressionStatement(node, expr)
   }
 
-  return Pp.parseStatement.call(this, declaration, topLevel, exported)
+  return func.call(this, declaration, topLevel, exported)
 }
 
 export { enable }

@@ -1,12 +1,15 @@
-import { Parser, tokTypes as tt } from "acorn/dist/acorn.es.js"
-
-const Pp = Parser.prototype
+import { tokTypes as tt } from "acorn/dist/acorn.es.js"
+import utils from "../utils.js"
 
 function enable(parser) {
-  parser.parseImportSpecifiers = parseImportSpecifiers
+  const key = typeof parser.parseImportSpecifiers === "function"
+    ? "parseImportSpecifiers"
+    : "parseImportSpecifierList"
+
+  parser[key] = utils.wrap(parser[key], parseImportSpecifiers)
 }
 
-function parseImportSpecifiers() {
+function parseImportSpecifiers(func) {
   const specifiers = []
 
   do {
@@ -18,7 +21,7 @@ function parseImportSpecifiers() {
       specifiers.push(parseImportNamespaceSpecifier(this))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, Pp.parseImportSpecifiers.call(this))
+      specifiers.push.apply(specifiers, func.call(this))
     }
   }
   while (this.eat(tt.comma))
@@ -37,7 +40,11 @@ function parseImportNamespaceSpecifier(parser) {
   // ... * as ns
   const star = parser.startNode()
   parser.next()
-  parser.expectContextual("as")
+
+  if (! parser.eatContextual("as")) {
+    utils.parserRaise(parser)
+  }
+
   star.local = parser.parseIdent()
   return parser.finishNode(star, "ImportNamespaceSpecifier")
 }

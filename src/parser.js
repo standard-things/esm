@@ -1,4 +1,5 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
+import { LooseParser as AcornLooseParser } from "acorn/dist/acorn_loose.es.js"
 import { enableAll } from "./acorn-extensions"
 
 const defaultOptions = {
@@ -10,9 +11,21 @@ const defaultOptions = {
 class Parser {
   static parse(code, options) {
     options = Object.assign(Object.create(null), defaultOptions, options)
-    const parser = new AcornParser(options, code)
+    let parser = new AcornParser(options, code)
     enableAll(parser)
-    return parser.parse()
+
+    try {
+      return parser.parse()
+    } catch (e) {
+      if (e.reparse === false) {
+        throw e
+      }
+
+      parser = new AcornLooseParser(code, options)
+      enableAll(parser)
+      parser.next()
+      return parser.parseTopLevel()
+    }
   }
 }
 

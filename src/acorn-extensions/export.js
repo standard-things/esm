@@ -1,11 +1,13 @@
-import { Parser, tokTypes as tt } from "acorn/dist/acorn.es.js"
+import { tokTypes as tt } from "acorn/dist/acorn.es.js"
 import utils from "../utils.js"
 
-const Pp = Parser.prototype
-
 function enable(parser) {
+  const key = typeof parser.parseExportSpecifiers === "function"
+    ? "parseExportSpecifiers"
+    : "parseExportSpecifierList"
+
+  parser[key] = utils.wrap(parser[key], parseExportSpecifiers)
   parser.parseExport = parseExport
-  parser.parseExportSpecifiers = parseExportSpecifiers
 }
 
 function parseExport(node, exported) {
@@ -29,7 +31,9 @@ function parseExport(node, exported) {
   }
 
   // ... def, [, * as ns [, { x, y as z }]] from "..."
-  node.specifiers = this.parseExportSpecifiers(exported)
+  node.specifiers = typeof this.parseExportSpecifiers === "function"
+    ? this.parseExportSpecifiers(exported)
+    : this.parseExportSpecifierList()
 
   if (this.isContextual("from")) {
     parseExportFrom(this, node)
@@ -40,7 +44,7 @@ function parseExport(node, exported) {
   return this.finishNode(node, "ExportNamedDeclaration")
 }
 
-function parseExportSpecifiers(exported) {
+function parseExportSpecifiers(func, exported) {
   let expectFrom = false
   const specifiers = []
 
@@ -55,16 +59,22 @@ function parseExportSpecifiers(exported) {
       specifiers.push(parseExportNamespaceSpecifier(this, exported))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, Pp.parseExportSpecifiers.call(this, exported))
+      specifiers.push.apply(specifiers, func.call(this, exported))
     }
   }
   while (this.eat(tt.comma))
 
   if (expectFrom && ! this.isContextual("from")) {
-    this.unexpected()
+    utils.parserRaise(this)
   }
 
   return specifiers
+}
+
+function isAsyncFunction(parser) {
+  return typeof parser.isAsyncFunction === "function"
+    ? parser.isAsyncFunction()
+    : parser.toks.isAsyncFunction()
 }
 
 function parseExportDefaultDeclaration(parser, node, exported) {
@@ -73,7 +83,7 @@ function parseExportDefaultDeclaration(parser, node, exported) {
   parser.next()
 
   let isAsync
-  if (parser.type === tt._function || (isAsync = parser.isAsyncFunction())) {
+  if (parser.type === tt._function || (isAsync = isAsyncFunction(parser))) {
     // Parse a function declaration.
     const funcNode = parser.startNode()
     if (isAsync) {
@@ -102,7 +112,10 @@ function parseExportDefaultSpecifier(parser) {
 
 function parseExportFrom(parser, node) {
   // ... from "..."
-  parser.expectContextual("from")
+  if (! parser.eatContextual("from")) {
+    utils.parserRaise(parser)
+  }
+
   node.source = parser.type === tt.string ? parser.parseExprAtom() : null
   parser.semicolon()
 }
@@ -134,7 +147,11 @@ function parseExportNamespaceSpecifier(parser, exported) {
   // ... * as ns
   const star = parser.startNode()
   parser.next()
-  parser.expectContextual("as")
+
+  if (! parser.eatContextual("as")) {
+    utils.parserRaise(parser)
+  }
+
   star.exported = parser.parseIdent()
   exported[star.exported.name] = true
   return parser.finishNode(star, "ExportNamespaceSpecifier")

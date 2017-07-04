@@ -1,16 +1,13 @@
-import { Parser } from "acorn/dist/acorn.es.js"
-
-const Pp = Parser.prototype
+import utils from "../utils.js"
 
 function enable(parser) {
-  parser.parseMaybeUnary = parseMaybeUnary
+  parser.parseMaybeUnary = utils.wrap(parser.parseMaybeUnary, parseMaybeUnary)
 }
 
-function parseMaybeUnary(refDestructuringErrors, sawUnary) {
-  if (this.isContextual("await")) {
-    return this.parseAwait(refDestructuringErrors)
-  }
-  return Pp.parseMaybeUnary.call(this, refDestructuringErrors, sawUnary)
+function parseMaybeUnary(func, refDestructuringErrors, sawUnary) {
+  return this.isContextual("await")
+    ? this.parseAwait(refDestructuringErrors)
+    : func.call(this, refDestructuringErrors, sawUnary)
 }
 
 export { enable }
