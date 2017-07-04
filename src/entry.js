@@ -150,16 +150,17 @@ class Entry {
     }
 
     let i = -1
+    const getters = this.getters.values()
+    const getterCount = getters.length
     const names = this.getters.keys()
-    const nameCount = names.length
 
-    while (++i < nameCount) {
-      const name = names[i]
-      const value = runGetter(this, name)
+    while (++i < getterCount) {
+      const value = runGetter(getters[i])
 
       // Update entry.exports and entry.namespace so that CommonJS require
       // calls remain consistent with watch().
       if (value !== GETTER_ERROR) {
+        const name = names[i]
         this.exports[name] =
         this.namespace[name] = value
       }
@@ -174,10 +175,9 @@ class Entry {
   runSetters() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
-    const names = this.setters.keys()
     const parentsMap = new OrderedMap
 
-    forEachSetter(this, names, (setter, value) => {
+    forEachSetter(this, (setter, value) => {
       parentsMap.set(setter.parent.id, setter.parent)
       setter(value)
     })
@@ -321,31 +321,29 @@ function createNamespace() {
 
 // Invoke the given callback for every setter that needs to be called.
 // Note forEachSetter does not call setters directly, only the given callback.
-function forEachSetter(entry, names, callback) {
+function forEachSetter(entry, callback) {
   // Make sure entry.exports and entry.namespace are up to date before we
   // call getExportByName().
   entry.runGetters()
 
   let i = -1
-  const nameCount = names.length
+  const names = entry.setters.keys()
+  const setterMaps = entry.setters.values()
+  const setterMapCount = setterMaps.length
 
-  sortNames(names)
+  while (++i < setterMapCount) {
+    let j = -1
+    const settersMap = setterMaps[i]
+    const setters = settersMap.values()
+    const setterCount = setters.length
 
-  while (++i < nameCount) {
     const name = names[i]
-    const setters = entry.setters.get(name)
     const value = getExportByName(entry, name)
 
-    let j = -1
-    const keys = setters.keys()
-    const keyCount = keys.length
-
-    while (++j < keyCount) {
-      const setter = setters.get(keys[j])
-
+    while (++j < setterCount) {
       // Only invoke the callback if we have not called this setter before,
       // or the value is different from the last value passed to this setter.
-      callSetterOnChange(entry, setter, name, value, callback)
+      callSetterOnChange(entry, setters[j], name, value, callback)
     }
 
     // Sometimes a getter function will throw because it's called
@@ -362,7 +360,7 @@ function forEachSetter(entry, names, callback) {
       // reported that constant value. Note that we can't forget the
       // getter, because we need to remember the original value in
       // case anyone tampers with entry.exports[name].
-      setters.clear()
+      settersMap.clear()
     }
   }
 }
@@ -385,9 +383,7 @@ function getExportByName(entry, name) {
   return exported[name]
 }
 
-function runGetter(entry, name) {
-  const getter = entry.getters.get(name)
-
+function runGetter(getter) {
   try {
     const result = getter()
     ++getter.runCount
@@ -395,24 +391,6 @@ function runGetter(entry, name) {
   } catch (e) {}
 
   return GETTER_ERROR
-}
-
-function sortNames(names) {
-  const last = names[names.length - 1]
-
-  if (last === "*") {
-    return names
-  }
-
-  const index = names.indexOf("*")
-
-  if (index < 0) {
-    return names
-  }
-
-  names.splice(index, 1)
-  names.push("*")
-  return names
 }
 
 Object.setPrototypeOf(Entry.prototype, null)
