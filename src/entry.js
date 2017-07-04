@@ -144,10 +144,6 @@ class Entry {
   runGetters() {
     assignExportsToNamespace(this)
 
-    if (! utils.isESModule(this.exports)) {
-      return
-    }
-
     let i = -1
     const getters = this.getters.values()
     const names = this.getters.keys()
