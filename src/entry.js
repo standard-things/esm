@@ -111,27 +111,21 @@ class Entry {
 
     this._loaded = -1
 
+    let i = -1
+    const owners = this.ownerModules.values()
+    const ownerCount = owners.length
+
     // Multiple modules can share the same Entry object because they share
     // the same module.exports object, e.g. when a "bridge" module sets
     // module.exports = require(...) to make itself roughly synonymous
     // with some other module. Just because the bridge module has finished
     // loading (as far as it's concerned), that doesn't mean it should
     // control the loading state of the (possibly shared) Entry.
-    let i = -1
-    const ids = this.ownerModules.keys()
-    const idCount = ids.length
-
-    while (++i < idCount) {
-      const owner = this.ownerModules.get(ids[i])
-      if (! owner.loaded) {
+    while (++i < ownerCount) {
+      if (! owners[i].loaded) {
         // At least one owner module has not finished loading, so this Entry
         // cannot be marked as loaded yet.
         return this._loaded = 0
-      }
-
-      const ownerEntry = Entry.get(owner.parent)
-      if (ownerEntry !== null) {
-        ownerEntry.loaded()
       }
     }
 
@@ -181,15 +175,10 @@ class Entry {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
     const names = this.setters.keys()
-    const parents = new OrderedMap
+    const parentsMap = new OrderedMap
 
     forEachSetter(this, names, (setter, value) => {
-      const id = setter.parent.id
-
-      if (! parents.has(id)) {
-        parents.set(id, setter.parent)
-      }
-
+      parentsMap.set(setter.parent.id, setter.parent)
       setter(value)
     })
 
@@ -197,15 +186,15 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     let i = -1
-    const parentIDs = parents.keys()
-    const parentIDCount = parentIDs.length
+    const parents = parentsMap.values()
+    const parentCount = parents.length
 
-    while (++i < parentIDCount) {
+    while (++i < parentCount) {
       // What happens if parents[parentIDs[id]] === module, or if
       // longer cycles exist in the parent chain? Thanks to our setter.last
       // bookkeeping in changed(), the runSetters() broadcast will only proceed
       // as far as there are any actual changes to report.
-      const parent = parents.get(parentIDs[i])
+      const parent = parents[i]
       const parentEntry = Entry.get(parent.exports)
 
       if (parentEntry) {
