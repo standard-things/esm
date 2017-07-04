@@ -1,5 +1,6 @@
 const hashSym = Symbol.for("hash")
 const keysSym = Symbol.for("keys")
+const valuesSym = Symbol.for("values")
 
 class OrderedMap {
   constructor() {
@@ -10,14 +11,18 @@ class OrderedMap {
     this[hashSym] = Object.create(null)
 
     if (keysSym in this) {
-      this[keysSym].length = 0
+      this[keysSym].length =
+      this[valuesSym].length = 0
     } else {
       this[keysSym] = []
+      this[valuesSym] = []
     }
+
+   return this
   }
 
   get(key) {
-    return this[hashSym][key]
+    return this[valuesSym][this[hashSym][key]]
   }
 
   has(key) {
@@ -30,11 +35,24 @@ class OrderedMap {
 
   set(key, value) {
     const hash = this[hashSym]
-    if (! (key in hash)) {
-      this[keysSym].push(key)
+    const values = this[valuesSym]
+
+    if (key in hash) {
+      values[hash[key]] = value
+    } else {
+      const keys = this[keysSym]
+      const nextIndex = keys.length
+
+      hash[key] = nextIndex
+      keys[nextIndex] = key
+      values[nextIndex] = value
     }
-    hash[key] = value
+
     return this
+  }
+
+  values() {
+    return this[valuesSym]
   }
 }
 
