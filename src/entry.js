@@ -8,8 +8,6 @@ const UNDEFINED = {}
 const entryWeakMap = new WeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
-let setterCounter = 0
-
 class Entry {
   constructor(exported) {
     // A number indicating the loading state of the module this Entry is managing.
@@ -91,12 +89,12 @@ class Entry {
       let setters = this.setters.get(name)
 
       if (setters === void 0) {
-        setters = new OrderedMap
+        setters = []
         this.setters.set(name, setters)
       }
       setter.last = Object.create(null)
       setter.parent = parent
-      setters.set(setterCounter++, setter)
+      setters.push(setter)
     }
 
     return this
@@ -151,10 +149,10 @@ class Entry {
 
     let i = -1
     const getters = this.getters.values()
-    const getterCount = getters.length
     const names = this.getters.keys()
+    const nameCount = names.length
 
-    while (++i < getterCount) {
+    while (++i < nameCount) {
       const value = runGetter(getters[i])
 
       // Update entry.exports and entry.namespace so that CommonJS require
@@ -327,16 +325,19 @@ function forEachSetter(entry, callback) {
   entry.runGetters()
 
   let i = -1
+  const collections = entry.setters.values()
   const names = entry.setters.keys()
-  const setterMaps = entry.setters.values()
-  const setterMapCount = setterMaps.length
+  const nameCount = names.length
 
-  while (++i < setterMapCount) {
-    let j = -1
-    const settersMap = setterMaps[i]
-    const setters = settersMap.values()
+  while (++i < nameCount) {
+    const setters = collections[i]
     const setterCount = setters.length
 
+    if (! setterCount) {
+      continue
+    }
+
+    let j = -1
     const name = names[i]
     const value = getExportByName(entry, name)
 
@@ -360,7 +361,7 @@ function forEachSetter(entry, callback) {
       // reported that constant value. Note that we can't forget the
       // getter, because we need to remember the original value in
       // case anyone tampers with entry.exports[name].
-      settersMap.clear()
+      setters.length = 0
     }
   }
 }
