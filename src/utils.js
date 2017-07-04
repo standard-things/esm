@@ -8,9 +8,10 @@ import path from "path"
 import PkgInfo from "./pkg-info.js"
 import SemVer from "semver"
 
+const acornParser = new AcornParser
+const acornRaise = acornParser.raise
 const defineGetter = Object.prototype.__defineGetter__
 const defineSetter = Object.prototype.__defineSetter__
-const dummyParser = new AcornParser
 const esStrKey = "__esModule"
 const esSymKey = Symbol.for(esStrKey)
 const hasOwn = Object.prototype.hasOwnProperty
@@ -139,18 +140,27 @@ class Utils {
     return type === "function" || (type === "object" && value !== null)
   }
 
-  static lookahead(parser) {
-    dummyParser.input = parser.input
-    dummyParser.pos = parser.pos
-    dummyParser.nextToken()
-    return dummyParser
-  }
-
   static md5(value) {
     return crypto
       .createHash("md5")
       .update(Utils.toString(value))
       .digest("hex")
+  }
+
+  static lookahead(parser) {
+    acornParser.input = parser.input
+    acornParser.pos = parser.pos
+    acornParser.nextToken()
+    return acornParser
+  }
+
+  static parserRaise(parser) {
+    try {
+      acornRaise.call(parser, parser.start, "Unexpected token")
+    } catch (e) {
+      e.reparse = false
+      throw e
+    }
   }
 
   static readPkgInfo(dirPath) {
