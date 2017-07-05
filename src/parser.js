@@ -1,6 +1,6 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
 import { LooseParser as AcornLooseParser } from "acorn/dist/acorn_loose.es.js"
-import * as acornExts from "./acorn-extensions"
+import extensions from "./acorn-extensions"
 
 const defaultOptions = {
   allowReturnOutsideFunction: false,
@@ -13,32 +13,30 @@ const defaultOptions = {
 class Parser {
   static parse(code, options) {
     options = Object.assign(Object.create(null), defaultOptions, options)
-    let parser = enableExts(new AcornParser(options, code), options)
 
     try {
-      return parser.parse()
+      return extend(new AcornParser(options, code), options).parse()
     } catch (e) {
       if (e.reparse === false) {
         throw e
       }
     }
 
-    parser = enableExts(new AcornLooseParser(code, options), options)
-    return parser.parse()
+    return extend(new AcornLooseParser(code, options), options).parse()
   }
 }
 
-function enableExts(parser, options) {
-  acornExts.enableAwaitAnywhere(parser)
-  acornExts.enableDynamicImport(parser)
-  acornExts.enableTolerance(parser)
+function extend(parser, options) {
+  extensions.enableAwaitAnywhere(parser)
+  extensions.enableDynamicImport(parser)
+  extensions.enableTolerance(parser)
 
   if (options.enableExportExtensions) {
-    acornExts.enableExport(parser)
+    extensions.enableExport(parser)
   }
 
   if (options.enableImportExtensions) {
-    acornExts.enableImport(parser)
+    extensions.enableImport(parser)
   }
 
   return parser
