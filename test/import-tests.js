@@ -29,7 +29,7 @@ describe("import declarations", () => {
   )
 
   it("should support import extensions", () =>
-    import("./import/extensions.js")
+    import("./import/extension.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )

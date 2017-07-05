@@ -4,7 +4,7 @@ import {
   def1, def2, def3, def4, def5,
   ns1, ns2, ns3, ns4, ns5,
   a, b, c, d, e
-} from "../fixture/export/extensions.js"
+} from "../fixture/extension/import.js"
 
 export function check() {
   const abcNs = {
@@ -23,6 +23,7 @@ export function check() {
   ]
 
   defs.forEach((d) => {
+    assert.deepEqual(d, abcNs.default)
     assert.strictEqual(d, def)
   })
 
