@@ -35,9 +35,11 @@ class Compiler {
       return result
     }
 
-    const allowReturnOutsideFunction = getOption(options, "allowReturnOutsideFunction")
-    const ast = Parser.parse(code, { allowReturnOutsideFunction })
-    const rootPath = new FastPath(ast)
+    const rootPath = new FastPath(Parser.parse(code, {
+      allowReturnOutsideFunction: getOption(options, "allowReturnOutsideFunction"),
+      enableExportExtensions: getOption(options, "enableExportExtensions"),
+      enableImportExtensions: getOption(options, "enableImportExtensions")
+    }))
 
     importExportVisitor.visit(rootPath, code, options)
 

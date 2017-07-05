@@ -1,9 +1,11 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
 import { LooseParser as AcornLooseParser } from "acorn/dist/acorn_loose.es.js"
-import { enableAll } from "./acorn-extensions"
+import * as acornExts from "./acorn-extensions"
 
 const defaultOptions = {
   allowReturnOutsideFunction: false,
+  enableExportExtensions: false,
+  enableImportExtensions: false,
   ecmaVersion: 8,
   sourceType: "module"
 }
@@ -11,7 +13,7 @@ const defaultOptions = {
 class Parser {
   static parse(code, options) {
     options = Object.assign(Object.create(null), defaultOptions, options)
-    let parser = enableAll(new AcornParser(options, code))
+    let parser = enableExts(new AcornParser(options, code), options)
 
     try {
       return parser.parse()
@@ -21,10 +23,26 @@ class Parser {
       }
     }
 
-    parser = enableAll(new AcornLooseParser(code, options))
+    parser = enableExts(new AcornLooseParser(code, options), options)
     parser.next()
     return parser.parseTopLevel()
   }
+}
+
+function enableExts(parser, options) {
+  acornExts.enableAwaitAnywhere(parser)
+  acornExts.enableDynamicImport(parser)
+  acornExts.enableTolerance(parser)
+
+  if (options.enableExportExtensions) {
+    acornExts.enableExport(parser)
+  }
+
+  if (options.enableImportExtensions) {
+    acornExts.enableImport(parser)
+  }
+
+  return parser
 }
 
 Object.setPrototypeOf(Parser.prototype, null)

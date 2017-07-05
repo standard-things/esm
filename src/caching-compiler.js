@@ -60,6 +60,9 @@ function compileAndWrite(content, options) {
 
 function toCompileOptions(options) {
   const compileOptions = {
+    allowReturnOutsideFunction: options.allowReturnOutsideFunction,
+    enableExportExtensions: options.enableExportExtensions,
+    enableImportExtensions: options.enableImportExtensions,
     repl: options.repl,
     runtimeAlias: options.runtimeAlias,
     sourceType: void 0
