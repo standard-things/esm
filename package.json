@@ -21,7 +21,7 @@
     "test:prod": "node --require ./index.js script/test.js"
   },
   "devDependencies": {
-    "acorn": "^5.0.0",
+    "acorn": "^5.1.0",
     "execa": "^0.7.0",
     "fs-extra": "^3.0.1",
     "globby": "^6.1.0",
