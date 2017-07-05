@@ -24,8 +24,7 @@ class Parser {
     }
 
     parser = enableExts(new AcornLooseParser(code, options), options)
-    parser.next()
-    return parser.parseTopLevel()
+    return parser.parse()
   }
 }
 
