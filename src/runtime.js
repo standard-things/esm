@@ -10,9 +10,6 @@ const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
 
 class Runtime {
-  // The exports.enable method can be used to enable the @std/esm runtime for
-  // specific module objects, or for Module.prototype (where implemented),
-  // to make the runtime available throughout the entire module system.
   static enable(mod) {
     const object = mod.exports
 
@@ -40,16 +37,16 @@ class Runtime {
     object.module = mod
   }
 
+  // Register a getter function that always returns the given value.
+  default(value) {
+    return this.export([["default", () => value]], true)
+  }
+
   // Register getter functions for local variables in the scope of an export
   // statement. Pass true as the second argument to indicate that the getter
   // functions always return the same values.
   export(getterPairs, constant) {
     this.entry.addGetters(getterPairs, constant)
-  }
-
-  // Register a getter function that always returns the given value.
-  exportDefault(value) {
-    return this.export([["default", () => value]], true)
   }
 
   import(id) {
@@ -65,9 +62,9 @@ class Runtime {
   }
 
   // Returns a function that takes a namespace object and copies the
-  // properties of the namespace to module.exports, which is useful for
+  // properties of the namespace to entry.exports, which is useful for
   // implementing `export * from "module"` syntax.
-  makeNsSetter() {
+  nsSetter() {
     return (namespace) => {
       for (const key in namespace) {
         this.exports[key] = namespace[key]
@@ -79,15 +76,15 @@ class Runtime {
     const exported = this.module.exports = this.entry.exports
     wrapper.call(loose ? exported : void 0)
     this.module.loaded = true
-    this.runSetters()
+    this.update()
     this.entry.loaded()
   }
 
   // Platform-specific code should find a way to call this method whenever
   // the module system is about to return module.exports from require. This
   // might happen more than once per module, in case of dependency cycles,
-  // so we want runSetters() to run each time.
-  runSetters(valueToPassThrough) {
+  // so we want entry.runSetters() to run each time.
+  update(valueToPassThrough) {
     this.entry.runSetters()
 
     // Returns the valueToPassThrough parameter to allow the value of the
@@ -100,9 +97,9 @@ class Runtime {
     //
     //   module.export("a", () => a)
     //   let a = 1
-    //   console.log(runSetters(a += 3))
+    //   console.log(runtime.update(a += 3))
     //
-    // This ensures runSetters() runs immediately after the assignment,
+    // This ensures entry.runSetters() runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
   }
@@ -193,6 +190,15 @@ function resolveId(id, parent) {
   return resolveFilename(prefix + host + pathname, parent, false)
 }
 
-Object.setPrototypeOf(Runtime.prototype, null)
+const Rp = Runtime.prototype
+Object.setPrototypeOf(Rp, null)
+
+Rp.d = Rp.default
+Rp.e = Rp.export
+Rp.i = Rp.import
+Rp.n = Rp.nsSetter
+Rp.r = Rp.run
+Rp.u = Rp.update
+Rp.w = Rp.watch
 
 export default Runtime

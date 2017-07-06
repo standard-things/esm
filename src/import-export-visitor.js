@@ -40,7 +40,7 @@ class ImportExportVisitor extends Visitor {
     const callee = node.callee
 
     if (callee.type === "Import") {
-      overwrite(this, callee.start, callee.end, this.runtimeAlias + ".import")
+      overwrite(this, callee.start, callee.end, this.runtimeAlias + ".i")
     }
 
     this.visitChildren(path)
@@ -77,12 +77,12 @@ class ImportExportVisitor extends Visitor {
     const decl = path.getValue()
     const hoistedCode = pad(
       this,
-      this.runtimeAlias + ".watch(" + getSourceString(this, decl),
+      this.runtimeAlias + ".w(" + getSourceString(this, decl),
       decl.start,
       decl.source.start
     ) + pad(
       this,
-      ',[["*",' + this.runtimeAlias + ".makeNsSetter()]]);",
+      ',[["*",' + this.runtimeAlias + ".n()]]);",
       decl.source.end,
       decl.end
     )
@@ -107,11 +107,11 @@ class ImportExportVisitor extends Visitor {
 
     } else {
       // Otherwise, since the exported value is an expression, we use the
-      // special module.exportDefault(value) form.
+      // special runtime.default(value) form.
       path.call(this, "visitWithoutReset", "declaration")
       assert.strictEqual(decl.declaration, dd)
 
-      let prefix = this.runtimeAlias + ".exportDefault("
+      let prefix = this.runtimeAlias + ".d("
       let suffix = ");"
 
       if (dd.type === "SequenceExpression") {
@@ -119,7 +119,7 @@ class ImportExportVisitor extends Visitor {
         // expression, this.code.slice(dd.start, dd.end) may not include
         // the vital parentheses, so we should wrap the expression with
         // parentheses to make absolutely sure it is treated as a single
-        // argument to the module.exportDefault method, rather than as
+        // argument to runtime.default(), rather than as
         // multiple arguments.
         prefix += "("
         suffix = ")" + suffix
@@ -196,7 +196,7 @@ class ImportExportVisitor extends Visitor {
           specifierMap = newMap
         }
 
-        // Even though the compiled code uses module.watch, it should
+        // Even though the compiled code uses runtime.watch(), it should
         // still be hoisted as an export, i.e. before actual imports.
         hoistExports(this, path, toModuleImport(
           this,
@@ -448,7 +448,7 @@ function toModuleImport(visitor, code, specifierMap) {
   const importedNames = specifierMap.keys()
   const nameCount = importedNames.length
 
-  code = visitor.runtimeAlias + ".watch(" + code
+  code = visitor.runtimeAlias + ".w(" + code
 
   if (! nameCount) {
     return code + ");"
@@ -495,7 +495,7 @@ function toModuleExport(visitor, specifierMap, constant) {
 
   let i = -1
   const lastIndex = nameCount - 1
-  code += visitor.runtimeAlias + ".export(["
+  code += visitor.runtimeAlias + ".e(["
 
   while (++i < nameCount) {
     const exported = exportedNames[i]
@@ -514,7 +514,7 @@ function toModuleExport(visitor, specifierMap, constant) {
     }
   }
 
-  // The second argument to module.export indicates whether the getter
+  // The second argument to runtime.export() indicates whether the getter
   // functions provided in the first argument are constant or not.
   code += constant ? "],1);" : "]);"
 

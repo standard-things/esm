@@ -1,3 +1,3 @@
-_.export([["default",()=>f]]);function f() {
+_.e([["default",()=>f]]);function f() {
   return f
 }

@@ -1,9 +1,9 @@
-_.export([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset()
+_.e([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset()
 
 function reset() {
-  return _.runSetters(value = 0)
+  return _.u(value = 0)
 }
 
 function add(x) {
-  _.runSetters(value += x)
+  _.u(value += x)
 }

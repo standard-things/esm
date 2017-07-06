@@ -35,7 +35,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
   const cacheFileName = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
-  const md5Hash = path.basename(cacheFileName, extname).slice(-8)
+  const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   let cacheValue = cache.get(cacheFileName)
@@ -97,7 +97,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   if (! isESM) {
     mod.loaded = true
     const entry = Entry.getOrCreate(mod.exports, mod)
-    Runtime.prototype.runSetters.call({ entry })
+    Runtime.prototype.update.call({ entry })
     entry.loaded()
   }
 }

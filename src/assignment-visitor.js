@@ -38,7 +38,7 @@ function assignmentHelper(visitor, path, childName) {
   const names = utils.getNamesFromPattern(child)
   let nameCount = names.length
 
-  // Wrap assignments to exported identifiers with runSetters().
+  // Wrap assignments to exported identifiers with runtime.update().
   while (nameCount--) {
     if (visitor.exportedLocalNames[names[nameCount]] === true) {
       wrap(visitor, path)
@@ -51,7 +51,7 @@ function wrap(visitor, path) {
   const value = path.getValue()
 
   visitor.magicString
-    .prependRight(value.start, visitor.runtimeAlias + ".runSetters(")
+    .prependRight(value.start, visitor.runtimeAlias + ".u(")
     .prependRight(value.end, ")")
 }
 

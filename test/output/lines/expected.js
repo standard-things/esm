@@ -1,4 +1,4 @@
-_.export([["check",()=>check]]);let strictEqual;_.watch("assert",[["strictEqual",function(v){strictEqual=v}]]);
+_.e([["check",()=>check]]);let strictEqual;_.w("assert",[["strictEqual",function(v){strictEqual=v}]]);
 
 
 

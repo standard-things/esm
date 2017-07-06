@@ -1,1 +1,1 @@
-_.export([["Abc",()=>n]]);_.watch("./def.js",[["*",_.makeNsSetter()]]);let n;_.watch("./abc.js",[["*",function(v){n=v}]]);
+_.e([["Abc",()=>n]]);_.w("./def.js",[["*",_.n()]]);let n;_.w("./abc.js",[["*",function(v){n=v}]]);
