@@ -28,7 +28,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const pkgOptions = pkgInfo.options
 
   if (cachePath === null ||
-      (extname !== ".mjs" && pkgOptions.esm === "mjs")) {
+      (extname !== ".mjs" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
     return func.call(this, mod, filePath)
   }
 

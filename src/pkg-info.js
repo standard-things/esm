@@ -5,7 +5,7 @@ import path from "path"
 const defaultOptions = {
   cache: ".esm-cache",
   cjs: false,
-  esm: "mjs",
+  esm: false,
   ext: false,
   var: false
 }
