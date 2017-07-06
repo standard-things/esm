@@ -30,37 +30,73 @@ if (rootModule.filename === null &&
   })
 
   Wrapper.wrap(vm, "createScript", function (func, pkgInfo, code, options) {
+    options = Object.assign(Object.create(null), options)
+
     const cache = pkgInfo.cache
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache.get(cacheFileName)
+    const lineOffset = (+options.lineOffset || 0) - 1
 
-    options = Object.assign(Object.create(null), options)
-    options.lineOffset = (+options.lineOffset || 0) - 1
+    let output
 
     if (options.produceCachedData === void 0) {
       options.produceCachedData = true
     }
 
     if (utils.isObject(cacheValue)) {
-      code = cacheValue.code
+      output = cacheValue.code
       if (options.produceCachedData === true &&
           options.cachedData === void 0 &&
           cacheValue.data !== void 0) {
         options.cachedData = cacheValue.data
       }
     } else {
-      code = compiler.compile(code, {
+      output = compiler.compile(code, {
         cacheFileName,
         pkgInfo,
         runtimeAlias
       }).code
     }
 
-    code =
+    output =
       '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
-      "||[module.exports,module.exports={}][0];\n" + code
+      "||[module.exports,module.exports={}][0];\n" + output
 
-    const result = func.call(this, code, options)
+    let result
+
+    try {
+      result = func.call(this, output, options)
+    } catch (e) {
+      const runtimeIndex = e.stack.indexOf(runtimeAlias)
+
+      if (runtimeIndex < 0) {
+        throw e
+      }
+
+      // Mask runtime calls in the error.stack.
+      const stackLines = e.stack.split("\n")
+      const stackLine = stackLines[1]
+      const carrotIndex = stackLines[2].indexOf("^")
+      const lineIndex = /repl:(\d+)/.exec(stackLines[0])[1] - 1
+      const line = code.split("\n")[lineIndex + lineOffset]
+
+      stackLines[1] = line
+
+      if (carrotIndex > runtimeIndex) {
+        // Move the carrot to the left.
+        const snippet = stackLine.substr(carrotIndex, 2)
+        const matchIndex = line.indexOf(snippet, runtimeIndex)
+
+        if (matchIndex > -1) {
+          stackLines[2] = " ".repeat(matchIndex) + "^"
+        } else {
+          stackLines.splice(2, 1)
+        }
+      }
+
+      e.stack = stackLines.join("\n")
+      throw e
+    }
 
     if (result.cachedDataProduced) {
       cache.get(cacheFileName).data = result.cachedData
