@@ -54,13 +54,13 @@ class Runtime {
 
   import(id) {
     return new Promise((resolve, reject) => {
-      try {
-        let ns
-        this.watch(id, [["*", (value) => ns = value]])
-        setImmediate(() => resolve(ns))
-      } catch (e) {
-        setImmediate(() => reject(e))
-      }
+      setImmediate(() => {
+        try {
+          this.watch(id, [["*", resolve]])
+        } catch (e) {
+          reject(e)
+        }
+      })
     })
   }
 
