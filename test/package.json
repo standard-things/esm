@@ -2,7 +2,7 @@
   "name": "test",
   "private": true,
   "@std/esm": {
-    "cache-directory": ".cache/for/tests",
+    "cache": ".cache/for/tests",
     "esm": "js"
   },
   "dependencies": {

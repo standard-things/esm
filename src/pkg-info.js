@@ -3,7 +3,7 @@ import OrderedMap from "./ordered-map.js"
 import path from "path"
 
 const defaultOptions = {
-  "cache-directory": ".esm-cache",
+  cache: ".esm-cache",
   cjs: false,
   esm: "mjs",
   ext: false,
@@ -15,7 +15,7 @@ class PkgInfo {
     options = Object.assign(Object.create(null), defaultOptions, options)
 
     const cache = new OrderedMap
-    const cacheDir =  options["cache-directory"]
+    const cacheDir =  options.cache
     const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : fs.readdir(cachePath)
     let nameCount = cacheFileNames === null ? 0 : cacheFileNames.length

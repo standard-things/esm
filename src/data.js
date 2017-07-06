@@ -9,7 +9,7 @@ const pkgInfo = new FastObject
 pkgInfo[""] = new PkgInfo("", esmSemVer.version, {
   "cjs": true,
   "var": true,
-  "cache-directory": false
+  "cache": false
 })
 
 export default { pkgInfo }
