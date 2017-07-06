@@ -103,7 +103,7 @@ describe("compiler", () => {
       'from "assert"'
     ].join("\r\n")
 
-    const result = compiler.compile(code, { repl: true })
+    const result = compiler.compile(code)
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 })
