@@ -6,7 +6,7 @@ const defaultOptions = {
   allowReturnOutsideFunction: false,
   enableExportExtensions: false,
   enableImportExtensions: false,
-  ecmaVersion: 8,
+  ecmaVersion: 9,
   sourceType: "module"
 }
 
