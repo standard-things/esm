@@ -52,7 +52,7 @@ All options are **off** by default.
 <table>
 <tr><td><code>"await"</code></td><td>A boolean for top-level <code>await</code> in the main ES module</td></tr>
 <tr><td><code>"gz"</code></td><td>A boolean for gzipped module support <i>(e.g. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td></tr>
-<tr><td><code>"esm"</code></td><td>A string ESM mode of <code>"all"</code>, <code>"mjs"</code>, or <code>"js"</code> <i>(i.e. <code>.js</code> can be ESM)</i></td></tr>
+<tr><td><code>"esm"</code></td><td>A string ESM mode of <code>"all"</code> or <code>"js"</code> <i>(i.e. <code>.js</code> can be ESM)</i></td></tr>
 <tr><td><code>"cjs"</code></td><td>
   <p>A boolean for CJS features in ESM</p>
   <ul>
