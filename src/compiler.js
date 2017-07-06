@@ -1,8 +1,16 @@
 import AV from "./assignment-visitor.js"
 import FastPath from "./fast-path.js"
-import { get as getOption } from "./options.js"
 import IEV from "./import-export-visitor.js"
 import Parser from "./parser.js"
+
+const defaultOptions = {
+  cjs: false,
+  ext: false,
+  js: false,
+  repl: false,
+  runtimeAlias: "_",
+  sourceType: "unambiguous"
+}
 
 const assignmentVisitor = new AV
 const importExportVisitor = new IEV
@@ -16,7 +24,7 @@ const importExportRegExp = /(?:^|[^.])\b(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
-    options = Object.assign(Object.create(null), options)
+    options = Object.assign(Object.create(null), defaultOptions, options)
 
     if (code.charCodeAt(0) === codeOfPound) {
       code = code.replace(shebangRegExp, "")
@@ -28,7 +36,7 @@ class Compiler {
       sourceType: "script"
     }
 
-    const sourceType = getOption(options, "sourceType")
+    const sourceType = options.sourceType
 
     if (sourceType === "script" ||
         (sourceType === "unambiguous" && ! importExportRegExp.test(code))) {
@@ -36,12 +44,16 @@ class Compiler {
     }
 
     const rootPath = new FastPath(Parser.parse(code, {
-      allowReturnOutsideFunction: getOption(options, "allowReturnOutsideFunction"),
-      enableExportExtensions: getOption(options, "enableExportExtensions"),
-      enableImportExtensions: getOption(options, "enableImportExtensions")
+      allowReturnOutsideFunction: options.cjs,
+      enableExportExtensions: options.ext,
+      enableImportExtensions: options.ext
     }))
 
-    importExportVisitor.visit(rootPath, code, options)
+    importExportVisitor.visit(rootPath, code, {
+      generateLetDeclarations: ! options.repl,
+      runtimeAlias: options.runtimeAlias,
+      sourceType
+    })
 
     if (importExportVisitor.madeChanges) {
       assignmentVisitor.visit(rootPath, {

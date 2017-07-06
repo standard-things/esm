@@ -1,12 +1,11 @@
-import { get as getOption } from "./options.js"
 import utils from "./utils.js"
 import Visitor from "./visitor.js"
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
-    this.exportedLocalNames = getOption(options, "exportedLocalNames")
-    this.magicString = getOption(options, "magicString")
-    this.runtimeAlias = getOption(options, "runtimeAlias")
+    this.exportedLocalNames = options.exportedLocalNames
+    this.magicString = options.magicString
+    this.runtimeAlias = options.runtimeAlias
 
     if (this.exportedLocalNames === void 0) {
       this.exportedLocalNames = Object.create(null)

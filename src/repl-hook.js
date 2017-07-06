@@ -33,7 +33,6 @@ if (rootModule.filename === null &&
     const cache = pkgInfo.cache
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache.get(cacheFileName)
-    const pkgOptions = pkgInfo.options
 
     options = Object.assign(Object.create(null), options)
     options.lineOffset = (+options.lineOffset || 0) - 1
@@ -51,8 +50,6 @@ if (rootModule.filename === null &&
       }
     } else {
       code = compiler.compile(code, {
-        enableExportExtensions: pkgOptions.ext,
-        enableImportExtensions: pkgOptions.ext,
         repl: true,
         cacheFileName,
         pkgInfo,

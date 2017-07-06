@@ -59,30 +59,29 @@ function compileAndWrite(content, options) {
 }
 
 function toCompileOptions(options) {
+  let extname = ".js"
+  const filePath = options.filePath
+  const pkgOptions = options.pkgInfo.options
+
   const compileOptions = {
-    allowReturnOutsideFunction: options.allowReturnOutsideFunction,
-    enableExportExtensions: options.enableExportExtensions,
-    enableImportExtensions: options.enableImportExtensions,
+    cjs: pkgOptions.cjs,
+    ext: pkgOptions.ext,
     repl: options.repl,
     runtimeAlias: options.runtimeAlias,
-    sourceType: void 0
+    sourceType: options.repl ? "module" : "script"
   }
 
-  const filePath = options.filePath
-  const sourceType = options.pkgInfo.options.sourceType
-
   if (typeof filePath === "string") {
-    let extname = path.extname(filePath)
-
+    extname = path.extname(filePath)
     if (extname === ".gz") {
       extname = path.extname(path.basename(filePath, extname))
     }
+  }
 
-    if (typeof sourceType === "string") {
-      compileOptions.sourceType = sourceType
-    } else if (extname === ".mjs") {
-      compileOptions.sourceType = "module"
-    }
+  if (pkgOptions.js) {
+    compileOptions.sourceType = "unambiguous"
+  } else if (extname === ".mjs") {
+    compileOptions.sourceType = "module"
   }
 
   return compileOptions

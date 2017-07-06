@@ -53,14 +53,11 @@ function extWrap(func, pkgInfo, mod, filePath) {
       cache.set(cacheFileName, cacheValue)
     } else {
       cacheValue = compiler.compile(code, {
-        allowReturnOutsideFunction: pkgOptions.cjs,
-        enableExportExtensions: pkgOptions.ext,
-        enableImportExtensions: pkgOptions.ext,
         cacheFileName,
         cachePath,
         filePath,
-        runtimeAlias,
-        pkgInfo
+        pkgInfo,
+        runtimeAlias
       })
     }
   }

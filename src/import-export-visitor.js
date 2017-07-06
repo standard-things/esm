@@ -1,5 +1,4 @@
 import assert from "assert"
-import { get as getOption} from "./options.js"
 import MagicString from "./magic-string.js"
 import OrderedMap from "./ordered-map.js"
 import utils from "./utils.js"
@@ -30,11 +29,11 @@ class ImportExportVisitor extends Visitor {
     this.bodyInfo = null
     this.code = code
     this.exportedLocalNames = Object.create(null)
-    this.generateLetDeclarations = !! getOption(options, "generateLetDeclarations")
+    this.generateLetDeclarations = options.generateLetDeclarations
     this.madeChanges = false
     this.magicString = new MagicString(code)
-    this.runtimeAlias = getOption(options, "runtimeAlias")
-    this.sourceType = getOption(options, "sourceType")
+    this.runtimeAlias = options.runtimeAlias
+    this.sourceType = options.sourceType
   }
 
   visitCallExpression(path) {

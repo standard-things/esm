@@ -41,26 +41,25 @@ describe("compiler", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should respect options.generateLetDeclarations", () => {
+  it("should respect options.repl", () => {
     const code = 'import def from "mod"'
 
-    const withLet = compiler.compile(code, {
-      generateLetDeclarations: true
+    const withREPL = compiler.compile(code, {
+      repl: true
     }).code
 
-    assert.ok(withLet.startsWith("let def"))
+    assert.ok(withREPL.startsWith("var def"))
 
-    const withoutLet = compiler.compile(code, {
-      generateLetDeclarations: false
+    const withoutREPL = compiler.compile(code, {
+      repl: false
     }).code
 
-    assert.ok(withoutLet.startsWith("var def"))
+    assert.ok(withoutREPL.startsWith("let def"))
 
-    // No options.generateLetDeclarations is the same as
-    // { generateLetDeclarations: true }.
-    const defaultLet = compiler.compile(code).code
+    // No options.repl is the same as { repl: false }.
+    const defaultREPL = compiler.compile(code).code
 
-    assert.ok(defaultLet.startsWith("let def"))
+    assert.ok(defaultREPL.startsWith("let def"))
   })
 
   it("should respect options.sourceType", () => {
