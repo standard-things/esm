@@ -45,7 +45,7 @@ class Entry {
       }
     } else {
       // Create a temporary Entry object to call entry.addSetters() and trigger
-      // entry.runSetters(), so that watch() behaves as expected.
+      // entry.update(), so that runtime.watch() behaves as expected.
       entry = new Entry(exported)
     }
 
@@ -100,7 +100,7 @@ class Entry {
     return this
   }
 
-  // Called by runSetters() once the module this Entry is managing has
+  // Called by entry.update() once the module this Entry is managing has
   // finished loading.
   loaded() {
     if (this._loaded) {
@@ -141,33 +141,9 @@ class Entry {
     return this._loaded = 1
   }
 
-  runGetters() {
-    assignExportsToNamespace(this)
-
-    let i = -1
-    const getters = this.getters.values()
-    const names = this.getters.keys()
-    const nameCount = names.length
-
-    while (++i < nameCount) {
-      const value = runGetter(getters[i])
-
-      // Update entry.exports and entry.namespace so that CommonJS require
-      // calls remain consistent with watch().
-      if (value !== GETTER_ERROR) {
-        const name = names[i]
-        this.exports[name] =
-        this.namespace[name] = value
-      }
-    }
-
-    return this
-  }
-
-  // Called whenever exports might have changed to trigger any setters associated
-  // with the newly exported values. The names parameter is optional without it,
-  // all getters and setters will run.
-  runSetters() {
+  // Called whenever exports might have changed to trigger any setters
+  // associated with the newly exported values.
+  update() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
     const parentsMap = new OrderedMap
@@ -187,13 +163,13 @@ class Entry {
     while (++i < parentCount) {
       // What happens if parents[parentIDs[id]] === module, or if
       // longer cycles exist in the parent chain? Thanks to our setter.last
-      // bookkeeping in changed(), the runSetters() broadcast will only proceed
-      // as far as there are any actual changes to report.
+      // bookkeeping in changed(), the entry.update() broadcast will only
+      // proceed as far as there are any actual changes to report.
       const parent = parents[i]
       const parentEntry = Entry.get(parent.exports)
 
       if (parentEntry) {
-        parentEntry.runSetters()
+        parentEntry.update()
       }
     }
 
@@ -258,9 +234,8 @@ function assignExportsToNamespace(entry) {
 }
 
 function callSetterOnChange(entry, setter, name, value, callback) {
-  // Only invoke the callback if we have not called this setter
-  // (with a value of this name) before, or the current value is
-  // different from the last value we passed to this setter.
+  // Only invoke the callback the current value is different from the last
+  // value we passed to this setter.
   let shouldCall = false
 
   if (name === "*") {
@@ -323,11 +298,11 @@ function createNamespace() {
 }
 
 // Invoke the given callback for every setter that needs to be called.
-// Note forEachSetter does not call setters directly, only the given callback.
+// Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
   // Make sure entry.exports and entry.namespace are up to date before we
   // call getExportByName().
-  entry.runGetters()
+  runGetters(entry)
 
   let i = -1
   const collections = entry.setters.values()
@@ -347,8 +322,6 @@ function forEachSetter(entry, callback) {
     const value = getExportByName(entry, name)
 
     while (++j < setterCount) {
-      // Only invoke the callback if we have not called this setter before,
-      // or the value is different from the last value passed to this setter.
       callSetterOnChange(entry, setters[j], name, value, callback)
     }
 
@@ -397,6 +370,27 @@ function runGetter(getter) {
   } catch (e) {}
 
   return GETTER_ERROR
+}
+
+function runGetters(entry) {
+  assignExportsToNamespace(entry)
+
+  let i = -1
+  const getters = entry.getters.values()
+  const names = entry.getters.keys()
+  const nameCount = names.length
+
+  while (++i < nameCount) {
+    const value = runGetter(getters[i])
+
+    // Update entry.exports and entry.namespace so that CommonJS require
+    // calls remain consistent with runtime.watch().
+    if (value !== GETTER_ERROR) {
+      const name = names[i]
+      entry.exports[name] =
+      entry.namespace[name] = value
+    }
+  }
 }
 
 Object.setPrototypeOf(Entry.prototype, null)

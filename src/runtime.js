@@ -83,9 +83,9 @@ class Runtime {
   // Platform-specific code should find a way to call this method whenever
   // the module system is about to return module.exports from require. This
   // might happen more than once per module, in case of dependency cycles,
-  // so we want entry.runSetters() to run each time.
+  // so we want entry.update() to run each time.
   update(valueToPassThrough) {
-    this.entry.runSetters()
+    this.entry.update()
 
     // Returns the valueToPassThrough parameter to allow the value of the
     // original expression to pass through. For example,
@@ -95,11 +95,11 @@ class Runtime {
     //
     // becomes
     //
-    //   module.export("a", () => a)
+    //   runtime.export("a", () => a)
     //   let a = 1
     //   console.log(runtime.update(a += 3))
     //
-    // This ensures entry.runSetters() runs immediately after the assignment,
+    // This ensures entry.update() runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
   }
@@ -119,7 +119,7 @@ class Runtime {
     children.set(childId, childEntry)
 
     if (setterPairs !== void 0) {
-      childEntry.addSetters(setterPairs, mod).runSetters()
+      childEntry.addSetters(setterPairs, mod).update()
     }
   }
 }
