@@ -43,39 +43,34 @@ describe("compiler", () => {
 
   it("should respect options.type", () => {
     const code = 'import "a"'
-    const types = [void 0, "module", "unambiguous"]
+    const values = [void 0, "module", "unambiguous"]
 
-    types.forEach((type) => {
-      const result = compiler.compile(code, { type })
-      assert.ok(result.code.includes("watch"))
+    values.forEach((value) => {
+      const result = compiler.compile(code, { type: value })
+      assert.strictEqual(result.type, "module")
     })
 
-    const withScript = compiler.compile(code, {
-      type: "script"
-    }).code
+    const result = compiler.compile("1+2", {
+      type: "unambiguous"
+    })
 
-    assert.strictEqual(withScript, code)
+    assert.strictEqual(result.type, "script")
   })
 
   it("should respect options.var", () => {
     const code = 'import def from "mod"'
+    const values = [void 0, false]
+
+    values.forEach((value) => {
+      const result = compiler.compile(code, { var: value })
+      assert.ok(result.code.startsWith("let def"))
+    })
 
     const withVar = compiler.compile(code, {
       var: true
     }).code
 
     assert.ok(withVar.startsWith("var def"))
-
-    const withoutVar = compiler.compile(code, {
-      var: false
-    }).code
-
-    assert.ok(withoutVar.startsWith("let def"))
-
-    // No options.var is the same as { var: false }.
-    const defaultVar = compiler.compile(code).code
-
-    assert.ok(defaultVar.startsWith("let def"))
   })
 
   it("should not get confused by shebang", () => {

@@ -35,8 +35,7 @@ class Compiler {
       type: "script"
     }
 
-    if (options.type === "script" ||
-        (options.type === "unambiguous" && ! importExportRegExp.test(code))) {
+    if (options.type === "unambiguous" && ! importExportRegExp.test(code)) {
       return result
     }
 
