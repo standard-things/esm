@@ -40,18 +40,18 @@ if (NODE_ENV.startsWith("production")) {
   config.plugins.push(
     new webpack.optimize.ModuleConcatenationPlugin,
     new UglifyJSPlugin({
-      "compress": {
-        "collapse_vars": true,
-        "negate_iife": false,
-        "pure_getters": true,
-        "unsafe": true,
-        "warnings": false
-      },
-      "mangle": {
-        "toplevel": true
-      },
-      "output": {
-        "ascii_only": true
+      "uglifyOptions": {
+        "toplevel": true,
+        "compress": {
+          "keep_infinity": true,
+          "negate_iife": false,
+          "passes": 3,
+          "pure_getters": true,
+          "unsafe": true
+        },
+        "output": {
+          "ascii_only": true
+        }
       }
     })
   )

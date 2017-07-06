@@ -19,7 +19,7 @@ const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
 const gzipPath = path.join(rootPath, "esm.js.gz")
 const uwpPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plugin")
-const uglifyPath = path.join(uwpPath, "node_modules/uglify-js")
+const uglifyPath = path.join(uwpPath, "node_modules/uglify-es")
 
 const trashPaths = [
   buildPath,
