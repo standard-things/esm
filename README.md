@@ -50,11 +50,11 @@ Specify ESM loader options using the `"@std/esm"` or `"@std":{"esm":{}}` fields 
 All options are **off** by default.
 
 <table>
-<tr><td><code>"await"</code></td><td>A boolean to toggle top-level <code>await</code> in the main ES module</td></tr>
-<tr><td><code>"gz"</code></td><td>A boolean to toggle gzipped module support <i>(e.g. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td></tr>
-<tr><td><code>"esm"</code></td><td>A string to set the ESM mode of <code>"all"</code>, <code>"mjs"</code>, or <code>"js"</code> <i>(i.e. <code>.js</code> can be ESM)</i></td></tr>
+<tr><td><code>"await"</code></td><td>A boolean for top-level <code>await</code> in the main ES module</td></tr>
+<tr><td><code>"gz"</code></td><td>A boolean for gzipped module support <i>(e.g. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td></tr>
+<tr><td><code>"esm"</code></td><td>A string ESM mode of <code>"all"</code>, <code>"mjs"</code>, or <code>"js"</code> <i>(i.e. <code>.js</code> can be ESM)</i></td></tr>
 <tr><td><code>"cjs"</code></td><td>
-  <p>A boolean to toggle CJS features in ESM</p>
+  <p>A boolean for CJS features in ESM</p>
   <ul>
   <li><code>__dirname</code> and <code>__filename</code></li>
   <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
@@ -63,7 +63,7 @@ All options are **off** by default.
   </ul>
 </td></tr>
 <tr><td><code>"ext"</code></td><td>
-  <p>A boolean to toggle import/export syntax extensions</p>
+  <p>A boolean for <code>import</code>/<code>export</code> syntax extensions</p>
   <ul>
   <li><a href="https://github.com/leebyron/ecmascript-export-default-from"><code>export d from "mod"</code></a></li>
   <li><a href="https://github.com/leebyron/ecmascript-export-ns-from"><code>export * as ns from "mod"</code></a></li>
