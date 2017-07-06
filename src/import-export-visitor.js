@@ -33,7 +33,6 @@ class ImportExportVisitor extends Visitor {
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
-    this.sourceType = options.sourceType
   }
 
   visitCallExpression(path) {

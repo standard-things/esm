@@ -51,8 +51,7 @@ class Compiler {
 
     importExportVisitor.visit(rootPath, code, {
       generateLetDeclarations: ! options.repl,
-      runtimeAlias: options.runtimeAlias,
-      sourceType
+      runtimeAlias: options.runtimeAlias
     })
 
     if (importExportVisitor.madeChanges) {
@@ -65,7 +64,7 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (importExportVisitor.madeChanges || sourceType !== "unambiguous") {
+    if (sourceType !== "unambiguous" || importExportVisitor.madeChanges) {
       result.sourceType = "module"
     }
 
