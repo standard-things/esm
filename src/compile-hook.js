@@ -28,7 +28,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const pkgOptions = pkgInfo.options
 
   if (cachePath === null ||
-      (extname !== ".mjs" && ! pkgOptions.js)) {
+      (extname !== ".mjs" && pkgOptions.esm === "mjs")) {
     return func.call(this, mod, filePath)
   }
 
@@ -49,7 +49,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = { code, sourceType: "module" }
+      cacheValue = { code, type: "module" }
       cache.set(cacheFileName, cacheValue)
     } else {
       cacheValue = compiler.compile(code, {
@@ -62,7 +62,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
     }
   }
 
-  const isESM = cacheValue.sourceType === "module"
+  const isESM = cacheValue.type === "module"
   code = cacheValue.code
 
   if (isESM) {

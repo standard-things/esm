@@ -3,7 +3,7 @@
   "private": true,
   "@std/esm": {
     "cache-directory": ".cache/for/tests",
-    "js": true
+    "esm": "js"
   },
   "dependencies": {
     "@std/esm": "*"

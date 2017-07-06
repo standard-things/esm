@@ -41,41 +41,41 @@ describe("compiler", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should respect options.repl", () => {
-    const code = 'import def from "mod"'
-
-    const withREPL = compiler.compile(code, {
-      repl: true
-    }).code
-
-    assert.ok(withREPL.startsWith("var def"))
-
-    const withoutREPL = compiler.compile(code, {
-      repl: false
-    }).code
-
-    assert.ok(withoutREPL.startsWith("let def"))
-
-    // No options.repl is the same as { repl: false }.
-    const defaultREPL = compiler.compile(code).code
-
-    assert.ok(defaultREPL.startsWith("let def"))
-  })
-
-  it("should respect options.sourceType", () => {
+  it("should respect options.type", () => {
     const code = 'import "a"'
-    const sourceTypes = [void 0, "module", "unambiguous"]
+    const types = [void 0, "module", "unambiguous"]
 
-    sourceTypes.forEach((sourceType) => {
-      const result = compiler.compile(code, { sourceType })
+    types.forEach((type) => {
+      const result = compiler.compile(code, { type })
       assert.ok(result.code.includes("watch"))
     })
 
-    const scriptType = compiler.compile(code, {
-      sourceType: "script"
+    const withScript = compiler.compile(code, {
+      type: "script"
     }).code
 
-    assert.strictEqual(scriptType, code)
+    assert.strictEqual(withScript, code)
+  })
+
+  it("should respect options.var", () => {
+    const code = 'import def from "mod"'
+
+    const withVar = compiler.compile(code, {
+      var: true
+    }).code
+
+    assert.ok(withVar.startsWith("var def"))
+
+    const withoutVar = compiler.compile(code, {
+      var: false
+    }).code
+
+    assert.ok(withoutVar.startsWith("let def"))
+
+    // No options.var is the same as { var: false }.
+    const defaultVar = compiler.compile(code).code
+
+    assert.ok(defaultVar.startsWith("let def"))
   })
 
   it("should not get confused by shebang", () => {

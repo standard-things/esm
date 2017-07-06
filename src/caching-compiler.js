@@ -29,7 +29,7 @@ function compileAndCache(content, options) {
 function compileAndWrite(content, options) {
   const result = compileAndCache(content, options)
 
-  if (result.sourceType === "module") {
+  if (result.type === "module") {
     const cachePath = options.cachePath
     const cacheFileName = options.cacheFileName
     const cacheFilePath = path.join(cachePath, cacheFileName)
@@ -59,32 +59,15 @@ function compileAndWrite(content, options) {
 }
 
 function toCompileOptions(options) {
-  let extname = ".js"
-  const filePath = options.filePath
   const pkgOptions = options.pkgInfo.options
 
-  const compileOptions = {
+  return {
     cjs: pkgOptions.cjs,
     ext: pkgOptions.ext,
-    repl: options.repl,
     runtimeAlias: options.runtimeAlias,
-    sourceType: options.repl ? "module" : "script"
+    type: pkgOptions.esm === "js" ? "unambiguous" : "module",
+    var: pkgOptions.var
   }
-
-  if (typeof filePath === "string") {
-    extname = path.extname(filePath)
-    if (extname === ".gz") {
-      extname = path.extname(path.basename(filePath, extname))
-    }
-  }
-
-  if (pkgOptions.js) {
-    compileOptions.sourceType = "unambiguous"
-  } else if (extname === ".mjs") {
-    compileOptions.sourceType = "module"
-  }
-
-  return compileOptions
 }
 
 Object.setPrototypeOf(Compiler.prototype, null)

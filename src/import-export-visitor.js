@@ -29,7 +29,7 @@ class ImportExportVisitor extends Visitor {
     this.bodyInfo = null
     this.code = code
     this.exportedLocalNames = Object.create(null)
-    this.generateLetDeclarations = options.generateLetDeclarations
+    this.generateVarDeclarations = options.generateVarDeclarations
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
@@ -53,7 +53,7 @@ class ImportExportVisitor extends Visitor {
     const lastIndex = specifierCount - 1
 
     let hoistedCode = specifierCount
-      ? (this.generateLetDeclarations ? "let " : "var ")
+      ? (this.generateVarDeclarations ? "var " : "let ")
       : ""
 
     while (++i < specifierCount) {

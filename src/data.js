@@ -7,6 +7,8 @@ const pkgInfo = new FastObject
 
 // Enable in-memory caching when compiling without a file path.
 pkgInfo[""] = new PkgInfo("", esmSemVer.version, {
+  "cjs": true,
+  "var": true,
   "cache-directory": false
 })
 

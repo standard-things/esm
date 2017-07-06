@@ -4,7 +4,10 @@ import path from "path"
 
 const defaultOptions = {
   "cache-directory": ".esm-cache",
-  sourceType: void 0
+  cjs: false,
+  esm: "mjs",
+  ext: false,
+  var: false
 }
 
 class PkgInfo {

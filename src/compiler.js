@@ -6,10 +6,9 @@ import Parser from "./parser.js"
 const defaultOptions = {
   cjs: false,
   ext: false,
-  js: false,
-  repl: false,
+  var: false,
   runtimeAlias: "_",
-  sourceType: "unambiguous"
+  type: "module"
 }
 
 const assignmentVisitor = new AV
@@ -33,13 +32,11 @@ class Compiler {
     const result = {
       code,
       data: null,
-      sourceType: "script"
+      type: "script"
     }
 
-    const sourceType = options.sourceType
-
-    if (sourceType === "script" ||
-        (sourceType === "unambiguous" && ! importExportRegExp.test(code))) {
+    if (options.type === "script" ||
+        (options.type === "unambiguous" && ! importExportRegExp.test(code))) {
       return result
     }
 
@@ -50,7 +47,7 @@ class Compiler {
     }))
 
     importExportVisitor.visit(rootPath, code, {
-      generateLetDeclarations: ! options.repl,
+      generateVarDeclarations: options.var,
       runtimeAlias: options.runtimeAlias
     })
 
@@ -64,8 +61,8 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (sourceType !== "unambiguous" || importExportVisitor.madeChanges) {
-      result.sourceType = "module"
+    if (options.type !== "unambiguous" || importExportVisitor.madeChanges) {
+      result.type = "module"
     }
 
     result.code = importExportVisitor.magicString.toString()

@@ -50,7 +50,6 @@ if (rootModule.filename === null &&
       }
     } else {
       code = compiler.compile(code, {
-        repl: true,
         cacheFileName,
         pkgInfo,
         runtimeAlias

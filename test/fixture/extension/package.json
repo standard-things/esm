@@ -3,7 +3,7 @@
   "private": true,
   "@std/esm": {
     "ext": true,
-    "js": true
+    "esm": "js"
   },
   "dependencies": {
     "@std/esm": "*"
