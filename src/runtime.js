@@ -67,7 +67,9 @@ class Runtime {
   nsSetter() {
     return (namespace) => {
       for (const key in namespace) {
-        this.exports[key] = namespace[key]
+        if (key !== "default") {
+          this.exports[key] = namespace[key]
+        }
       }
     }
   }
