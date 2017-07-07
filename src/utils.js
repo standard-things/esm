@@ -26,6 +26,29 @@ const defaultDescriptor = {
 }
 
 class Utils {
+  static assignProperty(object, source, key) {
+    const getter = Utils.getGetter(source, key)
+    const setter = Utils.getSetter(source, key)
+    const hasGetter = typeof getter === "function"
+    const hasSetter = typeof setter === "function"
+
+    if (hasGetter || hasSetter) {
+      Utils.removeProperty(object, key)
+      if (hasGetter) {
+        Utils.setGetter(object, key, getter)
+      }
+      if (hasSetter) {
+        Utils.setSetter(object, key, setter)
+      }
+    } else {
+      const value = source[key]
+      Utils.removeProperty(object, key)
+      object[key] = value
+    }
+
+    return object
+  }
+
   static encodeIdent(identifier) {
     return identifier + "\u200d"
   }
@@ -206,6 +229,13 @@ class Utils {
     }
 
     return new PkgInfo(dirPath, range, options)
+  }
+
+  static removeProperty(object, key) {
+    try {
+      return delete object[key]
+    } catch (e) {}
+    return false
   }
 
   static setESModule(exported) {
