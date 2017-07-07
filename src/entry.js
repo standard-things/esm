@@ -141,33 +141,16 @@ class Entry {
     // Section 9.4.6.11
     // Step 7: Enforce sorted iteration order of properties
     // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-    const ns = this.namespace
-    const keys = Object.keys(ns).sort()
+    i = -1
+    const namespace = this.namespace
+    const keys = Object.keys(namespace).sort()
     const keyCount = keys.length
 
     while (++i < keyCount) {
-      const key = keys[i]
-      const getter = utils.getGetter(ns, key)
-      const setter = utils.getSetter(ns, key)
-      const hasGetter = typeof getter === "function"
-      const hasSetter = typeof setter === "function"
-
-      if (hasGetter || hasSetter) {
-        delete ns[key]
-        if (hasGetter) {
-          utils.setGetter(ns, key, getter)
-        }
-        if (hasSetter) {
-          utils.setSetter(ns, key, setter)
-        }
-      } else {
-        const value = ns[key]
-        delete ns[key]
-        ns[key] = value
-      }
+      utils.assignProperty(namespace, namespace, keys[i])
     }
 
-    Object.seal(ns)
+    Object.seal(namespace)
     return this._loaded = 1
   }
 
@@ -240,25 +223,8 @@ function assignExportsToNamespace(entry) {
 
     if (isESM) {
       namespace[key] = exported[key]
-      continue
-    } else if (key === "default") {
-      continue
-    }
-
-    const getter = utils.getGetter(exported, key)
-    const setter = utils.getSetter(exported, key)
-    const hasGetter = typeof getter === "function"
-    const hasSetter = typeof setter === "function"
-
-    if (hasGetter || hasSetter) {
-      if (hasGetter) {
-        utils.setGetter(namespace, key, getter)
-      }
-      if (hasSetter) {
-        utils.setSetter(namespace, key, setter)
-      }
-    } else if (entry._loaded < 1 || key in namespace) {
-      namespace[key] = exported[key]
+    } else if (key !== "default") {
+      utils.assignProperty(namespace, exported, key)
     }
   }
 }
