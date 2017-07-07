@@ -1,5 +1,6 @@
 import compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
+import Error from "./error.js"
 import fs from "./fs.js"
 import Module from "module"
 import path from "path"
@@ -38,37 +39,52 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
+  const maskStackTrace = (error) => {
+    Error.captureStackTrace(error, extManager)
+    Error.maskStackTrace(error, runtimeAlias, () => readFile(filePath))
+    return error
+  }
+
+  const readFile = (filePath) => (
+    pkgOptions.gz && path.extname(filePath) === ".gz"
+      ? fs.gunzip(fs.readFile(filePath), "utf8")
+      : fs.readFile(filePath, "utf8")
+  )
+
   let cacheValue = cache.get(cacheFileName)
   let codeFilePath = cacheValue === true
     ? path.join(cachePath, cacheFileName)
     : filePath
 
-  let code = pkgOptions.gz && extname === ".gz"
-    ? fs.gunzip(fs.readFile(codeFilePath), "utf8")
-    : fs.readFile(codeFilePath, "utf8")
+  let code = readFile(codeFilePath)
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
       cacheValue = { code, type: "module" }
       cache.set(cacheFileName, cacheValue)
     } else {
-      cacheValue = compiler.compile(code, {
-        cacheFileName,
-        cachePath,
-        filePath,
-        pkgInfo,
-        runtimeAlias
-      })
+      try {
+        cacheValue = compiler.compile(code, {
+          cacheFileName,
+          cachePath,
+          filePath,
+          pkgInfo,
+          runtimeAlias
+        })
+      } catch (e) {
+        throw maskStackTrace(e)
+      }
     }
   }
 
   const isESM = cacheValue.type === "module"
-  code = cacheValue.code
+  let output = cacheValue.code
 
   if (isESM) {
     Runtime.enable(mod)
 
     let async = ""
+
     if (allowTopLevelAwait && pkgOptions.await) {
       allowTopLevelAwait = false
       if (process.mainModule === mod ||
@@ -86,13 +102,17 @@ function extWrap(func, pkgInfo, mod, filePath) {
       }
     }
 
-    code =
+    output =
       (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".run(" + async + "function(){" + code + "\n}" +
+      runtimeAlias + ".run(" + async + "function(){" + output + "\n}" +
       (pkgOptions.cjs ? ",1" : "") + ")"
   }
 
-  mod._compile(code, filePath)
+  try {
+    mod._compile(output, filePath)
+  } catch (e) {
+    throw maskStackTrace(e)
+  }
 
   if (! isESM) {
     mod.loaded = true
