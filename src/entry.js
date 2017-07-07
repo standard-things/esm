@@ -287,10 +287,10 @@ function createNamespace() {
   const ns = Object.create(null)
 
   if (useToStringTag) {
-    Object.defineProperty(ns, Symbol.toStringTag, {
-      value: "Module",
+    utils.setProperty(ns, Symbol.toStringTag, {
       configurable: false,
       enumerable: false,
+      value: "Module",
       writable: false
     })
   }
