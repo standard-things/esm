@@ -190,8 +190,7 @@ function resolveId(id, parent) {
   return resolveFilename(prefix + host + pathname, parent, false)
 }
 
-const Rp = Runtime.prototype
-Object.setPrototypeOf(Rp, null)
+const Rp = Object.setPrototypeOf(Runtime.prototype, null)
 
 Rp.d = Rp.default
 Rp.e = Rp.export
