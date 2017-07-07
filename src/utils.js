@@ -168,12 +168,7 @@ class Utils {
   }
 
   static parserRaise(parser) {
-    try {
-      acornRaise.call(parser, parser.start, "Unexpected token")
-    } catch (e) {
-      e.reparse = false
-      throw e
-    }
+    acornRaise.call(parser, parser.start, "Unexpected token")
   }
 
   static readPkgInfo(dirPath) {
