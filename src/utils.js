@@ -140,6 +140,12 @@ class Utils {
     return type === "function" || (type === "object" && value !== null)
   }
 
+  static isParseError(value) {
+    return Utils.isObject(value) && value.name === "SyntaxError" &&
+      typeof value.pos === "number" && typeof value.raisedAt === "number" &&
+      Utils.isObject(value.loc)
+  }
+
   static md5(value) {
     return crypto
       .createHash("md5")
