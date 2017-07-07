@@ -18,6 +18,13 @@ const hasOwn = Object.prototype.hasOwnProperty
 const lookupGetter = Object.prototype.__lookupGetter__
 const lookupSetter = Object.prototype.__lookupSetter__
 
+const defaultDescriptor = {
+  configurable: true,
+  enumerable: true,
+  value: void 0,
+  writable: true
+}
+
 class Utils {
   static encodeIdent(identifier) {
     return identifier + "\u200d"
@@ -212,6 +219,11 @@ class Utils {
 
   static setGetter(object, key, getter) {
     defineGetter.call(object, key, getter)
+  }
+
+  static setProperty(object, key, descriptor) {
+    descriptor = Object.assign(Object.create(null), defaultDescriptor, descriptor)
+    return Object.defineProperty(object, key, descriptor)
   }
 
   static setSetter(object, key, setter) {
