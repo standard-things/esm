@@ -1,3 +1,4 @@
+import FastObject from "./fast-object.js"
 import OrderedMap from "./ordered-map.js"
 import utils from "./utils.js"
 
@@ -137,7 +138,36 @@ class Entry {
       }
     }
 
-    Object.seal(this.namespace)
+    // Section 9.4.6.11
+    // Step 7: Enforce sorted iteration order of properties
+    // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
+    const ns = this.namespace
+    const keys = Object.keys(ns).sort()
+    const keyCount = keys.length
+
+    while (++i < keyCount) {
+      const key = keys[i]
+      const getter = utils.getGetter(ns, key)
+      const setter = utils.getSetter(ns, key)
+      const hasGetter = typeof getter === "function"
+      const hasSetter = typeof setter === "function"
+
+      if (hasGetter || hasSetter) {
+        delete ns[key]
+        if (hasGetter) {
+          utils.setGetter(ns, key, getter)
+        }
+        if (hasSetter) {
+          utils.setSetter(ns, key, setter)
+        }
+      } else {
+        const value = ns[key]
+        delete ns[key]
+        ns[key] = value
+      }
+    }
+
+    Object.seal(ns)
     return this._loaded = 1
   }
 
@@ -284,7 +314,7 @@ function changed(setter, key, value) {
 }
 
 function createNamespace() {
-  const ns = Object.create(null)
+  const ns = new FastObject
 
   if (useToStringTag) {
     utils.setProperty(ns, Symbol.toStringTag, {
