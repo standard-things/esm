@@ -104,7 +104,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
 
     output =
       (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".run(" + async + "function(){" + output + "\n}" +
+      runtimeAlias + ".r(" + async + "function(){" + output + "\n}" +
       (pkgOptions.cjs ? ",1" : "") + ")"
   }
 
