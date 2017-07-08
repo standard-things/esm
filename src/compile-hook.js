@@ -39,9 +39,9 @@ function extWrap(func, pkgInfo, mod, filePath) {
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
-  const maskStackTrace = (error) => {
+  const prepareError = (error) => {
     Error.captureStackTrace(error, extManager)
-    Error.maskStackTrace(error, runtimeAlias, () => readFile(filePath))
+    Error.maskStackTrace(error, runtimeAlias, sourceCode)
     return error
   }
 
@@ -51,20 +51,24 @@ function extWrap(func, pkgInfo, mod, filePath) {
       : fs.readFile(filePath, "utf8")
   )
 
+  let cacheCode
+  let sourceCode
   let cacheValue = cache.get(cacheFileName)
-  let codeFilePath = cacheValue === true
-    ? path.join(cachePath, cacheFileName)
-    : filePath
 
-  let code = readFile(codeFilePath)
+  if (cacheValue === true) {
+    cacheCode = readFile(path.join(cachePath, cacheFileName))
+    sourceCode = () => readFile(filePath)
+  } else {
+    sourceCode = readFile(filePath)
+  }
 
   if (! utils.isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = { code, type: "module" }
+      cacheValue = { code: cacheCode, type: "module" }
       cache.set(cacheFileName, cacheValue)
     } else {
       try {
-        cacheValue = compiler.compile(code, {
+        cacheValue = compiler.compile(sourceCode, {
           cacheFileName,
           cachePath,
           filePath,
@@ -72,7 +76,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
           runtimeAlias
         })
       } catch (e) {
-        throw maskStackTrace(e)
+        throw prepareError(e)
       }
     }
   }
@@ -111,7 +115,7 @@ function extWrap(func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw maskStackTrace(e)
+    throw prepareError(e)
   }
 
   if (! isESM) {
