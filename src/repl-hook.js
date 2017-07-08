@@ -68,7 +68,8 @@ if (rootModule.filename === null &&
       result = func.call(this, output, options)
     } catch (e) {
       Error.captureStackTrace(e, extManager)
-      throw Error.maskStackTrace(e, runtimeAlias, code)
+      Error.maskStackTrace(e, runtimeAlias, code)
+      throw e
     }
 
     if (result.cachedDataProduced) {
