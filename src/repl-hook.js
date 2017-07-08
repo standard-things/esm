@@ -37,6 +37,12 @@ if (rootModule.filename === null &&
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache.get(cacheFileName)
 
+    const prepareError = (error) => {
+      Error.captureStackTrace(error, extManager)
+      Error.maskStackTrace(error, runtimeAlias, code)
+      return error
+    }
+
     if (options.produceCachedData === void 0) {
       options.produceCachedData = true
     }
@@ -51,11 +57,15 @@ if (rootModule.filename === null &&
         options.cachedData = cacheValue.data
       }
     } else {
-      output = compiler.compile(code, {
-        cacheFileName,
-        pkgInfo,
-        runtimeAlias
-      }).code
+      try {
+        output = compiler.compile(code, {
+          cacheFileName,
+          pkgInfo,
+          runtimeAlias
+        }).code
+      } catch (e) {
+        throw prepareError(e)
+      }
     }
 
     output =
@@ -67,9 +77,7 @@ if (rootModule.filename === null &&
     try {
       result = func.call(this, output, options)
     } catch (e) {
-      Error.captureStackTrace(e, extManager)
-      Error.maskStackTrace(e, runtimeAlias, code)
-      throw e
+      throw prepareError(e)
     }
 
     if (result.cachedDataProduced) {
