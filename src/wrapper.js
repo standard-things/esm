@@ -21,19 +21,9 @@ class Wrapper {
   }
 
   static manage(object, key, wrapper) {
-    const func = object[key]
-    const manager = function () {
-      let argCount = arguments.length + 1
-      const args = new Array(argCount--)
-
-      while (argCount) {
-        args[argCount] = arguments[--argCount]
-      }
-      args[0] = func
-      return wrapper.apply(this, args)
-    }
-
-    manager[wrapSym] = func
+    const raw = Wrapper.unwrap(object, key)
+    const manager = utils.wrap(raw, wrapper)
+    manager[wrapSym] = raw
     object[key] = manager
   }
 
