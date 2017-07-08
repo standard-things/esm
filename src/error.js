@@ -1,9 +1,5 @@
 import utils from "./utils.js"
 
-const srubStackRegExp = process.env.NODE_ENV === "production"
-  ? /^\s+at\s.*?esm.js.gz:.*\n?/gm
-  : /^\s+at\s.*?esm.js:.*\n?/gm
-
 const utilBinding = (() => {
   try {
     return process.binding("util")
@@ -109,7 +105,10 @@ function decorateStackTrace(error) {
 }
 
 function scrubStack(stack) {
-  return stack.replace(srubStackRegExp, "")
+  return stack
+    .split("\n")
+    .filter((line) => ! line.includes(__non_webpack_dirname__))
+    .join("\n")
 }
 
 Object.setPrototypeOf(ErrorUtils.prototype, null)

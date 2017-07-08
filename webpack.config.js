@@ -19,7 +19,11 @@ const config = {
   },
   "plugins": [
     new webpack.BannerPlugin({
-      banner: '"use strict";\n\nconst __non_webpack_module__ = module;\n',
+      banner: [
+        '"use strict";\n',
+        "const __non_webpack_module__ = module;",
+        "const __non_webpack_dirname__ = __dirname;\n"
+      ].join("\n"),
       entryOnly: true,
       raw: true
     }),
