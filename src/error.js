@@ -16,7 +16,8 @@ const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
 
 class ErrorUtils {
   static captureStackTrace(error, beforeFunc) {
-    return errorCaptureStackTrace(error, beforeFunc)
+    errorCaptureStackTrace(error, beforeFunc)
+    return error
   }
 
   static maskStackTrace(error, runtimeAlias, source) {
