@@ -39,12 +39,12 @@ class ErrorUtils {
         const filePath = stackLines[0].split(":").pop().trim()
         const loc = error.loc
 
-        const line0 = filePath + ":" + loc.line
-        const line1 = lines[loc.line - 1]
-        const line2 = " ".repeat(loc.column - 1) + "^"
+        const stackLine0 = filePath + ":" + loc.line
+        const stackLine1 = lines[loc.line - 1]
+        const stackLine2 = " ".repeat(loc.column - 1) + "^"
 
-        stackLines[0] = line0
-        stackLines.splice(1, 0, line1, line2)
+        stackLines[0] = stackLine0
+        stackLines.splice(1, 0, stackLine1, stackLine2)
         return error.stack = stackLines.join("\n")
       }
 
