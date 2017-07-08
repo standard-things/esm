@@ -13,6 +13,7 @@ const config = {
     "esm": "./src/index.js"
   },
   "output": {
+    "libraryExport": "default",
     "libraryTarget": "commonjs2",
     "filename": "[name].js",
     "path": path.join(__dirname, "build")
