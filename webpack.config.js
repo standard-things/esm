@@ -23,7 +23,7 @@ const config = {
       banner: [
         '"use strict";\n',
         "const __non_webpack_module__ = module;",
-        "const __non_webpack_dirname__ = __dirname;\n"
+        "const __non_webpack_filename__ = __filename;\n"
       ].join("\n"),
       entryOnly: true,
       raw: true

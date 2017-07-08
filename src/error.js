@@ -8,6 +8,9 @@ const utilBinding = (() => {
 })()
 
 const errorCaptureStackTrace = Error.captureStackTrace
+const errorMessageRegExp = /^(.+?: .+?) \(\d+:\d+\)(?:.*?: (.+))?$/
+const splice = Array.prototype.splice
+
 const internalDecorateErrorStack = utilBinding.decorateErrorStack
 const internalSetHiddenValue = utilBinding.setHiddenValue
 
@@ -37,19 +40,29 @@ class ErrorUtils {
       const lines = code.split("\n")
 
       if (fromParser) {
-        const filePath = stackLines[0].split(":").pop().trim()
+        const parts = errorMessageRegExp.exec(stackLines[0]) || []
+        const desc = parts[1]
+        const filePath = parts[2]
         const loc = error.loc
+        const spliceArgs = [0, 1]
 
-        const stackLine0 = filePath + ":" + loc.line
-        const stackLine1 = lines[loc.line - 1]
-        const stackLine2 = " ".repeat(loc.column - 1) + "^"
+        if (filePath !== void 0) {
+          spliceArgs.push(filePath + ":" + loc.line)
+        }
 
-        stackLines[0] = stackLine0
-        stackLines.splice(1, 0, stackLine1, stackLine2)
+        spliceArgs.push(
+          lines[loc.line - 1],
+          " ".repeat(loc.column) + "^"
+        )
+
+        if (desc !== void 0) {
+          spliceArgs.push("", desc)
+        }
+
+        splice.apply(stackLines, spliceArgs)
         return error.stack = stackLines.join("\n")
       }
 
-      // Mask runtime calls in the error.stack.
       const arrowIndex = stackLines[2].indexOf("^")
       const lineIndex = /:(\d+)/.exec(stackLines[0])[1] - 1
       const line = lines[lineIndex]
@@ -108,7 +121,7 @@ function decorateStackTrace(error) {
 function scrubStack(stack) {
   return stack
     .split("\n")
-    .filter((line) => ! line.includes(__non_webpack_dirname__))
+    .filter((line) => ! line.includes(__non_webpack_filename__))
     .join("\n")
 }
 
