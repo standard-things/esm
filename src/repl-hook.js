@@ -30,7 +30,7 @@ if (rootModule.filename === null &&
     return wrapped.call(this, func, pkgInfo, code, options)
   }
 
-  const extWrap = function (func, pkgInfo, code, options) {
+  const extWrapper = function (func, pkgInfo, code, options) {
     options = Object.assign(Object.create(null), options)
 
     const cache = pkgInfo.cache
@@ -80,14 +80,24 @@ if (rootModule.filename === null &&
       throw prepareError(e)
     }
 
+    const runWrapper = function (func, args) {
+      try {
+        return func.apply(this, args)
+      } catch (e) {
+        throw prepareError(e)
+      }
+    }
+
     if (result.cachedDataProduced) {
       cache.get(cacheFileName).data = result.cachedData
     }
 
+    result.runInContext = utils.wrapApply(result.runInContext, runWrapper)
+    result.runInThisContext = utils.wrapApply(result.runInThisContext, runWrapper)
     return result
   }
 
   Wrapper.manage(vm, "createScript", extManager)
-  Wrapper.wrap(vm, "createScript", extWrap)
+  Wrapper.wrap(vm, "createScript", extWrapper)
   Runtime.enable(rootModule)
 }
