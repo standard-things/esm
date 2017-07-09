@@ -6,7 +6,7 @@ function enable(parser) {
     ? "parseImportSpecifiers"
     : "parseImportSpecifierList"
 
-  parser[key] = utils.wrap(parser[key], parseImportSpecifiers)
+  parser[key] = utils.wrapCall(parser[key], parseImportSpecifiers)
   return parser
 }
 

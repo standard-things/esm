@@ -10,8 +10,8 @@ const codeOfLeftParen = "(".charCodeAt(0)
 function enable(parser) {
   // Allow `yield import()` to parse.
   tt._import.startsExpr = true
-  parser.parseExprAtom = utils.wrap(parser.parseExprAtom, parseExprAtom)
-  parser.parseStatement = utils.wrap(parser.parseStatement, parseStatement)
+  parser.parseExprAtom = utils.wrapCall(parser.parseExprAtom, parseExprAtom)
+  parser.parseStatement = utils.wrapCall(parser.parseStatement, parseStatement)
   return parser
 }
 

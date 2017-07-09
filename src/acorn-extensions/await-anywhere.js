@@ -1,7 +1,7 @@
 import utils from "../utils.js"
 
 function enable(parser) {
-  parser.parseMaybeUnary = utils.wrap(parser.parseMaybeUnary, parseMaybeUnary)
+  parser.parseMaybeUnary = utils.wrapCall(parser.parseMaybeUnary, parseMaybeUnary)
   return parser
 }
 

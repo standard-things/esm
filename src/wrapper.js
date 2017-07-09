@@ -22,7 +22,7 @@ class Wrapper {
 
   static manage(object, key, wrapper) {
     const raw = Wrapper.unwrap(object, key)
-    const manager = utils.wrap(raw, wrapper)
+    const manager = utils.wrapCall(raw, wrapper)
     manager[wrapSym] = raw
     object[key] = manager
   }

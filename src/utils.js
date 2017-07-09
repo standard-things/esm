@@ -262,7 +262,21 @@ class Utils {
     return value == null ? "" : String(value)
   }
 
-  static wrap(func, wrapper) {
+  static wrapApply(func, wrapper) {
+    return function() {
+      let i = -1
+      const argCount = arguments.length
+      const args = new Array(argCount)
+
+      while (++i < argCount) {
+        args[i] = arguments[i]
+      }
+
+      return wrapper.call(this, func, args)
+    }
+  }
+
+  static wrapCall(func, wrapper) {
     return function() {
       let i = 0
       const argCount = arguments.length + 1
