@@ -11,7 +11,6 @@ function enable(parser) {
   // Allow `yield import()` to parse.
   tt._import.startsExpr = true
   parser.parseExprAtom = utils.wrap(parser.parseExprAtom, parseExprAtom)
-  parser.parseImport = utils.wrap(parser.parseImport, parseImport)
   parser.parseStatement = utils.wrap(parser.parseStatement, parseStatement)
   return parser
 }
@@ -30,14 +29,6 @@ function parseExprAtom(func, refDestructuringErrors) {
   return func.call(this, refDestructuringErrors)
 }
 
-function parseImport(func, node) {
-  try {
-    return func.call(this, node)
-  } catch (e) {
-    utils.parserRaise(this)
-  }
-}
-
 function parseStatement(func, declaration, topLevel, exported) {
   if (this.type === tt._import &&
       utils.parserLookahead(this).type === tt.parenL) {
@@ -49,12 +40,7 @@ function parseStatement(func, declaration, topLevel, exported) {
 
     this.next()
 
-    try {
-      callExpr.arguments = [this.parseMaybeAssign()]
-    } catch (e) {
-      utils.parserRaise(this)
-    }
-
+    callExpr.arguments = [this.parseMaybeAssign()]
     callExpr.callee = callee
     this.finishNode(callExpr, "CallExpression")
 
