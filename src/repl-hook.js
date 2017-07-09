@@ -37,12 +37,6 @@ if (rootModule.filename === null &&
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache.get(cacheFileName)
 
-    const prepareError = (error) => {
-      Error.captureStackTrace(error, manager)
-      Error.maskStackTrace(error, runtimeAlias, code)
-      return error
-    }
-
     if (options.produceCachedData === void 0) {
       options.produceCachedData = true
     }
@@ -64,7 +58,8 @@ if (rootModule.filename === null &&
           runtimeAlias
         }).code
       } catch (e) {
-        throw prepareError(e)
+        Error.captureStackTrace(e, manager)
+        throw Error.maskStackTrace(e, runtimeAlias, code)
       }
     }
 
@@ -77,14 +72,15 @@ if (rootModule.filename === null &&
     try {
       result = func.call(this, output, options)
     } catch (e) {
-      throw prepareError(e)
+      Error.captureStackTrace(e, manager)
+      throw Error.maskStackTrace(e, runtimeAlias, code)
     }
 
     const runWrapper = function (func, args) {
       try {
         return func.apply(this, args)
       } catch (e) {
-        throw prepareError(e)
+        throw Error.maskStackTrace(e, runtimeAlias, code)
       }
     }
 

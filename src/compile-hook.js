@@ -40,12 +40,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
-  const prepareError = (error) => {
-    Error.captureStackTrace(error, manager)
-    Error.maskStackTrace(error, runtimeAlias, sourceCode)
-    return error
-  }
-
   const readFile = (filePath) => (
     pkgOptions.gz && path.extname(filePath) === ".gz"
       ? fs.gunzip(fs.readFile(filePath), "utf8")
@@ -77,7 +71,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
           runtimeAlias
         })
       } catch (e) {
-        throw prepareError(e)
+        Error.captureStackTrace(e, manager)
+        Error.maskStackTrace(e, runtimeAlias, sourceCode)
       }
     }
   }
@@ -116,7 +111,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw prepareError(e)
+    throw Error.maskStackTrace(e, runtimeAlias, sourceCode)
   }
 
   if (! isESM) {
