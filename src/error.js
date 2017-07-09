@@ -30,21 +30,33 @@ class ErrorUtils {
     const stack = scrubStack(error.stack)
     const runtimeIndex = stack.indexOf(runtimeAlias)
 
-    if (runtimeIndex < 0 && ! fromParser) {
-      return error
-    }
-
     utils.setGetter(error, "stack", () => {
-      const code = typeof source === "function" ? source() : source
+      source = typeof source === "function" ? source() : source
+
+      const lines = source.split("\n")
       const stackLines = stack.split("\n")
-      const lines = code.split("\n")
 
       if (fromParser) {
+        // Reformat the parser stack from:
+        // SyntaxError: <description> (<line>:<column>) while processing file: path/to/file.js
+        //     at <function name> (<function location>)
+        //   ...
+        // to:
+        // path/to/file.js:<line>
+        // <line of code, from the original source, where the error occurred>
+        // <column indicator arrow>
+        //
+        // SyntaxError: <description>
+        //     at <function name> (<function location>)
+        //   ...
         const parts = errorMessageRegExp.exec(stackLines[0]) || []
         const desc = parts[1]
         const filePath = parts[2]
-        const loc = error.loc
         const spliceArgs = [0, 1]
+
+        // loc.line (one-based index)
+        // loc.offset (zero-based index)
+        const loc = error.loc
 
         if (filePath !== void 0) {
           spliceArgs.push(filePath + ":" + loc.line)
@@ -63,23 +75,45 @@ class ErrorUtils {
         return error.stack = stackLines.join("\n")
       }
 
-      const arrowIndex = stackLines[2].indexOf("^")
-      const lineIndex = /:(\d+)/.exec(stackLines[0])[1] - 1
-      const line = lines[lineIndex]
+      const locMatch = /:(\d+)$/.exec(stackLines[0])
 
-      if (arrowIndex > runtimeIndex) {
-        // Move the column indicator arrow to the left.
-        const snippet = stackLines[1].substr(arrowIndex, 2)
-        const matchIndex = line.indexOf(snippet, runtimeIndex)
+      if (locMatch === null) {
+        return error.stack = stackLines.join("\n")
+      }
 
-        if (matchIndex > -1) {
-          stackLines[2] = " ".repeat(matchIndex) + "^"
-        } else {
+      const lineNum = +locMatch[1]
+      const stackLineOfCode = stackLines[1]
+      const stackArrow = stackLines[2]
+
+      const column = stackArrow.indexOf("^")
+      const sourceLineOfCode = lines[lineNum - 1]
+
+      if (column > runtimeIndex) {
+        // Move the column indicator arrow to the left by matching a clip of
+        // code from the stack to the source. To avoid false matches, we start
+        // with a larger clip size and work our way down.
+        let columnIndex
+        let clipSize = 5
+
+        while (clipSize) {
+          const clip = stackLineOfCode.substr(arrowIndex, clipSize--)
+          columnIndex = line.indexOf(clip, runtimeIndex)
+
+          if (columnIndex > -1) {
+            stackLines[2] = " ".repeat(columnIndex) + "^"
+            break
+          }
+        }
+
+        if (columnIndex === -1) {
+          // Remove the column indicator arrow.
           stackLines.splice(2, 1)
         }
       }
+      // Replace the line of code where error occurred in the stack with the
+      // corresponding line of code from the original source.
+      stackLines[1] = sourceLineOfCode
 
-      stackLines[1] = line
       return error.stack = stackLines.join("\n")
     })
 
