@@ -13,17 +13,17 @@ import vm from "vm"
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
-function extManager(func, mod, filename) {
-  const filePath = path.resolve(filename)
+function managerWrapper(manager, func, mod, filePath) {
+  filePath = path.resolve(filePath)
   const pkgInfo = utils.getPkgInfo(path.dirname(filePath))
   const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
 
   return wrapped === null
     ? func.call(this, mod, filePath)
-    : wrapped.call(this, func, pkgInfo, mod, filePath)
+    : wrapped.call(this, manager, func, pkgInfo, mod, filePath)
 }
 
-function extWrapper(func, pkgInfo, mod, filePath) {
+function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath
   const extname = path.extname(filePath)
   const pkgOptions = pkgInfo.options
@@ -36,11 +36,12 @@ function extWrapper(func, pkgInfo, mod, filePath) {
   const cache = pkgInfo.cache
   const cacheKey = fs.mtime(filePath)
   const cacheFileName = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
+
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   const prepareError = (error) => {
-    Error.captureStackTrace(error, extManager)
+    Error.captureStackTrace(error, manager)
     Error.maskStackTrace(error, runtimeAlias, sourceCode)
     return error
   }
@@ -136,6 +137,6 @@ extsToWrap.forEach((key) => {
     // extensions as .js.
     exts[key] = extsJs
   }
-  Wrapper.manage(exts, key, extManager)
-  Wrapper.wrap(exts, key, extWrapper)
+  Wrapper.manage(exts, key, managerWrapper)
+  Wrapper.wrap(exts, key, methodWrapper)
 })

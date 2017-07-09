@@ -24,13 +24,13 @@ if (rootModule.filename === null &&
   const md5Hash = utils.md5(Date.now()).substr(0, 4)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
-  const extManager = function (func, code, options) {
+  const managerWrapper = function (manager, func, code, options) {
     const pkgInfo = utils.getPkgInfo()
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
-    return wrapped.call(this, func, pkgInfo, code, options)
+    return wrapped.call(this, manager, func, pkgInfo, code, options)
   }
 
-  const extWrapper = function (func, pkgInfo, code, options) {
+  const methodWrapper = function (manager, func, pkgInfo, code, options) {
     options = Object.assign(Object.create(null), options)
 
     const cache = pkgInfo.cache
@@ -38,7 +38,7 @@ if (rootModule.filename === null &&
     const cacheValue = cache.get(cacheFileName)
 
     const prepareError = (error) => {
-      Error.captureStackTrace(error, extManager)
+      Error.captureStackTrace(error, manager)
       Error.maskStackTrace(error, runtimeAlias, code)
       return error
     }
@@ -97,7 +97,7 @@ if (rootModule.filename === null &&
     return result
   }
 
-  Wrapper.manage(vm, "createScript", extManager)
-  Wrapper.wrap(vm, "createScript", extWrapper)
+  Wrapper.manage(vm, "createScript", managerWrapper)
+  Wrapper.wrap(vm, "createScript", methodWrapper)
   Runtime.enable(rootModule)
 }
