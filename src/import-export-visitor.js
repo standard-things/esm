@@ -159,10 +159,10 @@ class ImportExportVisitor extends Visitor {
       hoistExports(this, path, specifierMap, "declaration")
 
       if (canExportedValuesChange(decl)) {
-        // We can skip adding declared names to this.exportedLocalNames if
-        // the declaration was a const-kinded VariableDeclaration, because
-        // the assignmentVisitor will not need to worry about changes to
-        // these variables.
+        // Skip adding declared names to this.exportedLocalNames if the
+        // declaration is a const-kinded VariableDeclaration, because the
+        // assignmentVisitor doesn't need to worry about changes to these
+        // variables.
         addExportedLocalNames(this, specifierMap)
       }
 
