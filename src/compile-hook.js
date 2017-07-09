@@ -23,7 +23,7 @@ function extManager(func, mod, filename) {
     : wrapped.call(this, func, pkgInfo, mod, filePath)
 }
 
-function extWrap(func, pkgInfo, mod, filePath) {
+function extWrapper(func, pkgInfo, mod, filePath) {
   const cachePath = pkgInfo.cachePath
   const extname = path.extname(filePath)
   const pkgOptions = pkgInfo.options
@@ -137,5 +137,5 @@ extsToWrap.forEach((key) => {
     exts[key] = extsJs
   }
   Wrapper.manage(exts, key, extManager)
-  Wrapper.wrap(exts, key, extWrap)
+  Wrapper.wrap(exts, key, extWrapper)
 })
