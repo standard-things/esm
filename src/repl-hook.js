@@ -73,14 +73,14 @@ if (rootModule.filename === null &&
       result = func.call(this, output, options)
     } catch (e) {
       Error.captureStackTrace(e, manager)
-      throw Error.maskStackTrace(e, runtimeAlias, code)
+      throw Error.maskStackTrace(e, runtimeAlias, code, output)
     }
 
     const runWrapper = function (func, args) {
       try {
         return func.apply(this, args)
       } catch (e) {
-        throw Error.maskStackTrace(e, runtimeAlias, code)
+        throw Error.maskStackTrace(e, runtimeAlias, code, output)
       }
     }
 

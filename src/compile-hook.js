@@ -46,6 +46,10 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       : fs.readFile(filePath, "utf8")
   )
 
+  const wrapModule = (script) => (
+    '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
+  )
+
   let cacheCode
   let sourceCode
   let cacheValue = cache.get(cacheFileName)
@@ -97,8 +101,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       const wrap = Module.wrap
       Module.wrap = (script) => {
         Module.wrap = wrap
-        return '"use strict";(function(){const ' +
-          runtimeAlias + "=this;" + script + "\n})"
+        return wrapModule(script)
       }
     }
 
@@ -111,7 +114,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw Error.maskStackTrace(e, runtimeAlias, sourceCode)
+    throw Error.maskStackTrace(e, runtimeAlias, sourceCode, wrapModule(output))
   }
 
   if (! isESM) {
