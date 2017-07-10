@@ -176,14 +176,8 @@ function maskStackLines(stackLines, sourceCode) {
   // with a larger clip length and work our way down.
   while (clipLength-- > 1) {
     const clip = stackLineOfCode.substr(column, clipLength)
-    let fromIndex = 0
-
-    if (clip.length < clipLength) {
-      clipLength = clip.length
-      fromIndex = sourceLineOfCode.length - clipLength
-    }
-
-    newColumn = sourceLineOfCode.indexOf(clip, fromIndex)
+    clipLength = Math.min(clipLength, clip.length)
+    newColumn = sourceLineOfCode.lastIndexOf(clip)
 
     if (newColumn > -1) {
       stackLines[2] = " ".repeat(newColumn) + "^"
