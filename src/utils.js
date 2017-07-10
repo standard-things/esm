@@ -26,14 +26,18 @@ const defaultDescriptor = {
 }
 
 class Utils {
-  static assignProperty(object, source, key) {
+  static assignProperty(object, source, key, removeBefore) {
     const getter = Utils.getGetter(source, key)
     const setter = Utils.getSetter(source, key)
     const hasGetter = typeof getter === "function"
     const hasSetter = typeof setter === "function"
+    const value = (hasGetter || hasSetter) ? void 0 : source[key]
+
+    if (removeBefore) {
+      Utils.removeProperty(object, key)
+    }
 
     if (hasGetter || hasSetter) {
-      Utils.removeProperty(object, key)
       if (hasGetter) {
         Utils.setGetter(object, key, getter)
       }
@@ -41,8 +45,6 @@ class Utils {
         Utils.setSetter(object, key, setter)
       }
     } else {
-      const value = source[key]
-      Utils.removeProperty(object, key)
       object[key] = value
     }
 

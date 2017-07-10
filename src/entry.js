@@ -147,7 +147,7 @@ class Entry {
     const keyCount = keys.length
 
     while (++i < keyCount) {
-      utils.assignProperty(namespace, namespace, keys[i])
+      utils.assignProperty(namespace, namespace, keys[i], true)
     }
 
     Object.seal(namespace)
