@@ -11,7 +11,7 @@ const errorCaptureStackTrace = Error.captureStackTrace
 const errorMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?:.*?: (.+))?$/
 const lineNumRegExp = /:(\d+)/
 const columnNumRegExp = /(\d+)(?=\)|$)/
-const filePathRegExp = /(?:at |\()(.*?)(?=:\d+:\d+)/
+const filePathRegExp = /(?:^ {4}at |\()(.*?)(?=:\d+:\d+\)?$)/
 const splice = Array.prototype.splice
 
 const internalDecorateErrorStack = utilBinding.decorateErrorStack
