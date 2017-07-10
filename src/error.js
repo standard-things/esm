@@ -174,24 +174,21 @@ function maskStackLines(stackLines, sourceCode) {
   // Move the column indicator arrow to the left by matching a clip of
   // code from the stack to the source. To avoid false matches, we start
   // with a larger clip length and work our way down.
-  while (clipLength-- > 1) {
+  while (clipLength-- > 1 && newColumn < 0) {
     const clip = stackLineOfCode.substr(column, clipLength)
     clipLength = Math.min(clipLength, clip.length)
 
-    let index
-    while ((index = sourceLineOfCode.lastIndexOf(clip)) > column) {
+    let index = column + 1
+    while ((index = sourceLineOfCode.lastIndexOf(clip, index - 1)) > -1) {
       newColumn = index
-    }
-
-    if (newColumn > -1) {
-      stackLines[2] = " ".repeat(newColumn) + "^"
-      stackLines[5] = stackLines[5].replace(columnNumRegExp, newColumn)
-      break
     }
   }
 
-  if (newColumn === -1) {
+  if (newColumn < 0) {
     stackLines.splice(2, 1)
+  } else if (newColumn < column) {
+    stackLines[2] = " ".repeat(newColumn) + "^"
+    stackLines[5] = stackLines[5].replace(columnNumRegExp, newColumn)
   }
 
   if (stackLines[0].startsWith("repl:")) {
