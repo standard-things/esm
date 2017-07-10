@@ -44,6 +44,9 @@ const config = {
 if (NODE_ENV.startsWith("production")) {
   config.plugins.push(
     new webpack.optimize.ModuleConcatenationPlugin,
+    new webpack.EnvironmentPlugin({
+      NODE_DEBUG: false
+    }),
     new UglifyJSPlugin({
       "uglifyOptions": {
         "toplevel": true,
