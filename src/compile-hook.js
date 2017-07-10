@@ -76,7 +76,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
         })
       } catch (e) {
         Error.captureStackTrace(e, manager)
-        Error.maskStackTrace(e, runtimeAlias, sourceCode)
+        Error.maskStackTrace(e, sourceCode)
       }
     }
   }
@@ -114,7 +114,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw Error.maskStackTrace(e, runtimeAlias, sourceCode, wrapModule(output))
+    throw Error.maskStackTrace(e, sourceCode, wrapModule(output))
   }
 
   if (! isESM) {
