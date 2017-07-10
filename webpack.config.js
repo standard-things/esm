@@ -3,6 +3,7 @@
 const path = require("path")
 const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const NODE_ENV = String(process.env.NODE_ENV)
@@ -43,6 +44,7 @@ const config = {
 
 if (NODE_ENV.startsWith("production")) {
   config.plugins.push(
+    new ShakePlugin,
     new webpack.optimize.ModuleConcatenationPlugin,
     new webpack.EnvironmentPlugin({
       NODE_DEBUG: false
