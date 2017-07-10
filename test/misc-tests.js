@@ -2,7 +2,7 @@ import assert from "assert"
 
 describe("spec compliance", () => {
   it("should bind exports before the module executes", () =>
-    import("./misc/exports.js")
+    import("./misc/export.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
