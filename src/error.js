@@ -27,22 +27,27 @@ class ErrorUtils {
   }
 
   static maskStackTrace(error, sourceCode, compiledCode) {
-    decorateStackTrace(error)
+    let trapSet = false
 
-    const stack = error.stack
+    // For efficiency V8 stack traces are not formatted when they are captured
+    // but on demand, the first time the error.stack property is accessed. To
+    // avoid accessing the stack property early, and to defer any file read
+    // operations, we follow suit and wrap the error object in a proxy object
+    // to mask error.stack on first access.
+    return new Proxy(error, {
+      get(error, key) {
+        if (key === "stack" && ! trapSet) {
+          sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
+          trapSet = true
 
-    utils.setGetter(error, "stack", () => {
-      sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
-      return error.stack = utils.isParseError(error)
-        ? maskParserStack(stack, sourceCode)
-        : maskStack(stack, sourceCode, compiledCode)
+          decorateStackTrace(error)
+          return error.stack = utils.isParseError(error)
+            ? maskParserStack(error.stack, sourceCode)
+            : maskStack(error.stack, sourceCode, compiledCode)
+        }
+        return error[key]
+      }
     })
-
-    utils.setSetter(error, "stack", (value) => {
-      utils.setProperty(error, "stack", { value })
-    })
-
-    return error
   }
 }
 
