@@ -32,8 +32,10 @@ class Runtime {
     const exported = Object.create(null)
     utils.setESModule(exported)
 
-    object.entry =  Entry.getOrCreate(exported, mod)
-    object.exports = exported
+    object.e =
+    object.entry = Entry.getOrCreate(exported, mod)
+
+    object.m =
     object.module = mod
   }
 
@@ -66,9 +68,12 @@ class Runtime {
   // implementing `export * from "module"` syntax.
   nsSetter() {
     return (namespace) => {
+      const entry = this.entry
+
       for (const key in namespace) {
         if (key !== "default") {
-          this.exports[key] = namespace[key]
+          entry.exports[key] =
+          entry.namespace[key] = namespace[key]
         }
       }
     }
@@ -195,11 +200,11 @@ function resolveId(id, parent) {
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
 
 Rp.d = Rp.default
-Rp.e = Rp.export
 Rp.i = Rp.import
 Rp.n = Rp.nsSetter
 Rp.r = Rp.run
 Rp.u = Rp.update
 Rp.w = Rp.watch
+Rp.x = Rp.export
 
 export default Runtime

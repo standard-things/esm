@@ -189,7 +189,8 @@ class ImportExportVisitor extends Visitor {
             addToSpecifierMap(
               newMap,
               locals[0],
-              this.runtimeAlias + ".exports." + exported
+              this.runtimeAlias + ".e.exports." + exported + "=" +
+              this.runtimeAlias + ".e.namespace." + exported
             )
           }
 
@@ -495,7 +496,7 @@ function toModuleExport(visitor, specifierMap, constant) {
 
   let i = -1
   const lastIndex = nameCount - 1
-  code += visitor.runtimeAlias + ".e(["
+  code += visitor.runtimeAlias + ".x(["
 
   while (++i < nameCount) {
     const exported = exportedNames[i]

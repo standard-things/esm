@@ -193,14 +193,6 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const exported = entry.exports
   const namespace = entry.namespace
-
-  if (utils.isESModule(exported)) {
-    for (const key in exported) {
-      namespace[key] = exported[key]
-    }
-    return
-  }
-
   const isESM = utils.isESModuleLike(exported)
 
   // Add a "default" namespace property unless it's a Babel-like exports,
@@ -369,7 +361,10 @@ function runGetter(getter) {
 }
 
 function runGetters(entry) {
-  assignExportsToNamespace(entry)
+  if (! utils.isESModule(entry.exports)) {
+    assignExportsToNamespace(entry)
+    return
+  }
 
   let i = -1
   const getters = entry.getters.values()
