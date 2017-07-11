@@ -138,19 +138,25 @@ class Entry {
       }
     }
 
-    // Section 9.4.6.11
-    // Step 7: Enforce sorted iteration order of properties
-    // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-    i = -1
     const namespace = this.namespace
-    const keys = Object.keys(namespace).sort()
-    const keyCount = keys.length
 
-    while (++i < keyCount) {
-      utils.assignProperty(namespace, namespace, keys[i], true)
-    }
+    utils.setGetter(this, "namespace", () => {
+      // Section 9.4.6.11
+      // Step 7: Enforce sorted iteration order of properties
+      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
+      let i = -1
+      const keys = Object.keys(namespace).sort()
+      const keyCount = keys.length
 
-    Object.seal(namespace)
+      while (++i < keyCount) {
+        utils.assignProperty(namespace, namespace, keys[i], true)
+      }
+
+      Object.seal(namespace)
+      utils.setProperty(this, "namespace", { value: namespace })
+      return namespace
+    })
+
     return this._loaded = 1
   }
 
