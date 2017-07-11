@@ -288,8 +288,7 @@ function createNamespace() {
 // Invoke the given callback for every setter that needs to be called.
 // Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
-  // Make sure entry.exports and entry.namespace are up to date before we
-  // call getExportByName().
+  // Make sure entry.namespace is up to date before we call getExportByName().
   runGetters(entry)
 
   let i = -1
@@ -333,21 +332,9 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(entry, name) {
-  if (name === "*") {
-    return entry.namespace
-  }
-
-  if (name in entry.namespace) {
-    return entry.namespace[name]
-  }
-
-  const exported = entry.exports
-
-  if (exported == null) {
-    return
-  }
-
-  return exported[name]
+  return name === "*"
+    ? entry.namespace
+    : entry.namespace[name]
 }
 
 function runGetter(getter) {
@@ -374,12 +361,10 @@ function runGetters(entry) {
   while (++i < nameCount) {
     const value = runGetter(getters[i])
 
-    // Update entry.exports and entry.namespace so that CommonJS require
-    // calls remain consistent with runtime.watch().
+    // Update entry.namespace so that CommonJS require calls remain consistent
+    // with runtime.watch().
     if (value !== GETTER_ERROR) {
-      const name = names[i]
-      entry.exports[name] =
-      entry.namespace[name] = value
+      entry.namespace[names[i]] = value
     }
   }
 }

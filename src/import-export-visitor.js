@@ -189,7 +189,6 @@ class ImportExportVisitor extends Visitor {
             addToSpecifierMap(
               newMap,
               locals[0],
-              this.runtimeAlias + ".e.exports." + exported + "=" +
               this.runtimeAlias + ".e.namespace." + exported
             )
           }

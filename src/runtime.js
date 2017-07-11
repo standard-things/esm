@@ -72,7 +72,6 @@ class Runtime {
 
       for (const key in namespace) {
         if (key !== "default") {
-          entry.exports[key] =
           entry.namespace[key] = namespace[key]
         }
       }
