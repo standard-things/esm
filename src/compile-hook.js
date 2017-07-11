@@ -76,7 +76,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
         })
       } catch (e) {
         Error.captureStackTrace(e, manager)
-        Error.maskStackTrace(e, sourceCode)
+        throw Error.maskStackTrace(e, sourceCode)
       }
     }
   }
