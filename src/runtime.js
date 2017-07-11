@@ -32,10 +32,7 @@ class Runtime {
     const exported = Object.create(null)
     utils.setESModule(exported)
 
-    object.e =
     object.entry = Entry.getOrCreate(exported, mod)
-
-    object.m =
     object.module = mod
   }
 
@@ -199,11 +196,11 @@ function resolveId(id, parent) {
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
 
 Rp.d = Rp.default
+Rp.e = Rp.export
 Rp.i = Rp.import
 Rp.n = Rp.nsSetter
 Rp.r = Rp.run
 Rp.u = Rp.update
 Rp.w = Rp.watch
-Rp.x = Rp.export
 
 export default Runtime
