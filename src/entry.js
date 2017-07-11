@@ -13,14 +13,16 @@ class Entry {
   constructor(exported) {
     // A number indicating the loading state of the module this Entry is managing.
     this._loaded = 0
+    // The object of bindings this Entry is tracking.
+    this.bindings = createNamespace()
     // The child entries of this Entry.
     this.children = new OrderedMap
     // The module.exports of the module this Entry is managing.
     this.exports = exported
     // Getters for local variables exported from the managed module.
     this.getters = new OrderedMap
-    // The object importers receive when using `import * as ns from "..."` syntax.
-    this.namespace = createNamespace()
+    // An alias of bindings that object importers receive.
+    this.namespace = this.bindings
     // A map of the modules this Entry is managing by id.
     this.ownerModules = new OrderedMap
     // Setters for assigning to local variables in parent modules.
@@ -138,23 +140,23 @@ class Entry {
       }
     }
 
-    const namespace = this.namespace
+    const bindings = this.bindings
 
     utils.setGetter(this, "namespace", () => {
       // Section 9.4.6.11
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
-      const keys = Object.keys(namespace).sort()
+      const keys = Object.keys(bindings).sort()
       const keyCount = keys.length
 
       while (++i < keyCount) {
-        utils.assignProperty(namespace, namespace, keys[i], true)
+        utils.assignProperty(bindings, bindings, keys[i], true)
       }
 
-      Object.seal(namespace)
-      utils.setProperty(this, "namespace", { value: namespace })
-      return namespace
+      Object.seal(bindings)
+      utils.setProperty(this, "namespace", { value: bindings })
+      return bindings
     })
 
     return this._loaded = 1
@@ -196,16 +198,15 @@ class Entry {
   }
 }
 
-function assignExportsToNamespace(entry) {
+function assignExportsToBindings(entry) {
+  const bindings = entry.bindings
   const exported = entry.exports
-  const namespace = entry.namespace
   const isESM = utils.isESModuleLike(exported)
 
-  // Add a "default" namespace property unless it's a Babel-like exports,
-  // in which case the exported object should be namespace-like and safe to
-  // assign directly.
+  // Add a "default" property unless it's a Babel-like exports, in which case
+  // the exported object should be namespace-like and safe to assign directly.
   if (! isESM) {
-    namespace.default = exported
+    bindings.default = exported
   }
 
   if (! utils.isObjectLike(exported)) {
@@ -220,9 +221,9 @@ function assignExportsToNamespace(entry) {
     const key = keys[i]
 
     if (isESM) {
-      namespace[key] = exported[key]
+      bindings[key] = exported[key]
     } else if (key !== "default") {
-      utils.assignProperty(namespace, exported, key)
+      utils.assignProperty(bindings, exported, key)
     }
   }
 }
@@ -294,7 +295,7 @@ function createNamespace() {
 // Invoke the given callback for every setter that needs to be called.
 // Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
-  // Make sure entry.namespace is up to date before we call getExportByName().
+  // Make sure entry.bindings is updated before we call getExportByName().
   runGetters(entry)
 
   let i = -1
@@ -340,7 +341,7 @@ function forEachSetter(entry, callback) {
 function getExportByName(entry, name) {
   return name === "*"
     ? entry.namespace
-    : entry.namespace[name]
+    : entry.bindings[name]
 }
 
 function runGetter(getter) {
@@ -355,7 +356,7 @@ function runGetter(getter) {
 
 function runGetters(entry) {
   if (! utils.isESModule(entry.exports)) {
-    assignExportsToNamespace(entry)
+    assignExportsToBindings(entry)
     return
   }
 
@@ -367,10 +368,10 @@ function runGetters(entry) {
   while (++i < nameCount) {
     const value = runGetter(getters[i])
 
-    // Update entry.namespace so that CommonJS require calls remain consistent
+    // Update entry.bindings so that CommonJS require calls remain consistent
     // with runtime.watch().
     if (value !== GETTER_ERROR) {
-      entry.namespace[names[i]] = value
+      entry.bindings[names[i]] = value
     }
   }
 }
