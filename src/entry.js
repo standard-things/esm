@@ -104,8 +104,6 @@ class Entry {
     return this
   }
 
-  // Called by entry.update() once the module this Entry is managing has
-  // finished loading.
   loaded() {
     if (this._loaded) {
       return this._loaded
@@ -163,8 +161,6 @@ class Entry {
     return this._loaded = 1
   }
 
-  // Called whenever exports might have changed to trigger any setters
-  // associated with the newly exported values.
   update() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
@@ -259,7 +255,6 @@ function createNamespace() {
 // Invoke the given callback for every setter that needs to be called.
 // Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
-  // Make sure entry.bindings is updated before we call getExportByName().
   runGetters(entry)
 
   let i = -1
@@ -341,8 +336,6 @@ function runGetters(entry) {
     const name = names[i]
     const value = runGetter(getters[i])
 
-    // Update entry.bindings so that CommonJS require calls remain consistent
-    // with runtime.watch().
     if (value !== GETTER_ERROR &&
         ! compare(bindings, name, value)) {
       entry._changed = true
