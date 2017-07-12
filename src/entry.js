@@ -292,9 +292,8 @@ function forEachSetter(entry, callback) {
       // If we happen to know that this getter function has run
       // successfully, and will never return a different value, then
       // we can forget the corresponding setter, because we've already
-      // reported that constant value. Note that we can't forget the
-      // getter, because we need to remember the original value in
-      // case anyone tampers with entry.exports[name].
+      // reported that constant value.
+      entry.getters.set(name, void 0)
       setters.length = 0
     }
   }
