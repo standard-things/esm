@@ -143,6 +143,8 @@ class Entry {
     const bindings = this.bindings
 
     utils.setGetter(this, "namespace", () => {
+      utils.setProperty(this, "namespace", { value: bindings })
+
       // Section 9.4.6.11
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
@@ -154,9 +156,7 @@ class Entry {
         utils.assignProperty(bindings, bindings, keys[i], true)
       }
 
-      Object.seal(bindings)
-      utils.setProperty(this, "namespace", { value: bindings })
-      return bindings
+      return Object.seal(bindings)
     })
 
     return this._loaded = 1
