@@ -314,11 +314,13 @@ function getExportByName(entry, name) {
 }
 
 function runGetter(getter) {
-  try {
-    const result = getter()
-    ++getter.runCount
-    return result
-  } catch (e) {}
+  if (typeof getter === "function") {
+    try {
+      const result = getter()
+      ++getter.runCount
+      return result
+    } catch (e) {}
+  }
 
   return GETTER_ERROR
 }
