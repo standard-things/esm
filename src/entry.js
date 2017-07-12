@@ -11,6 +11,7 @@ const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
   constructor(exported) {
+    this._changed = true
     // A number indicating the loading state of the module this Entry is managing.
     this._loaded = 0
     // The object of bindings this Entry is tracking.
@@ -228,68 +229,31 @@ function assignExportsToBindings(entry) {
   }
 }
 
-function callSetterOnChange(entry, setter, name, value, callback) {
-  // Only invoke the callback the current value is different from the last
-  // value we passed to this setter.
-  let shouldCall = false
-
-  if (name === "*") {
-    const isESM = utils.isESModuleLike(entry.exported)
-
-    let i = -1
-    const keys = Object.keys(value)
-    const keyCount = keys.length
-
-    while (++i < keyCount) {
-      const key = keys[i]
-      const nsValue = isESM
-        ? value[key]
-        : utils.getGetter(value, key) || value[key]
-
-      if (changed(setter, key, nsValue)) {
-        shouldCall = true
-      }
-    }
-  }
-
-  if (changed(setter, name, value)) {
-    shouldCall = true
-  }
-
-  if (shouldCall) {
-    callback(setter, value)
-  }
-}
-
 function changed(setter, key, value) {
-  let valueToCompare = value
-
-  if (valueToCompare !== valueToCompare) {
-    valueToCompare = NAN
-  } else if (valueToCompare === void 0) {
-    valueToCompare = UNDEFINED
-  }
-
-  if (setter.last[key] === valueToCompare) {
+  if (compare(setter.last, key, value)) {
     return false
   }
 
-  setter.last[key] = valueToCompare
+  setter.last[key] = value
   return true
 }
 
+function compare(object, key, value) {
+  return key in object && Object.is(object[key], value)
+}
+
 function createNamespace() {
-  const ns = new FastObject
+  const namespace = new FastObject
 
   if (useToStringTag) {
-    utils.setProperty(ns, Symbol.toStringTag, {
+    utils.setProperty(namespace, Symbol.toStringTag, {
       configurable: false,
       enumerable: false,
       value: "Module",
       writable: false
     })
   }
-  return ns
+  return namespace
 }
 
 // Invoke the given callback for every setter that needs to be called.
@@ -316,7 +280,10 @@ function forEachSetter(entry, callback) {
     const value = getExportByName(entry, name)
 
     while (++j < setterCount) {
-      callSetterOnChange(entry, setters[j], name, value, callback)
+      const setter = setters[j]
+      if (entry._changed || changed(setter, name, value)) {
+        callback(setter, value)
+      }
     }
 
     // Sometimes a getter function will throw because it's called
@@ -336,6 +303,8 @@ function forEachSetter(entry, callback) {
       setters.length = 0
     }
   }
+
+  entry._changed = false
 }
 
 function getExportByName(entry, name) {
@@ -361,17 +330,21 @@ function runGetters(entry) {
   }
 
   let i = -1
+  const bindings = entry.bindings
   const getters = entry.getters.values()
   const names = entry.getters.keys()
   const nameCount = names.length
 
   while (++i < nameCount) {
+    const name = names[i]
     const value = runGetter(getters[i])
 
     // Update entry.bindings so that CommonJS require calls remain consistent
     // with runtime.watch().
-    if (value !== GETTER_ERROR) {
-      entry.bindings[names[i]] = value
+    if (value !== GETTER_ERROR &&
+        ! compare(bindings, name, value)) {
+      entry._changed = true
+      bindings[name] = value
     }
   }
 }
