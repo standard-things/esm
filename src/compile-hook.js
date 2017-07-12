@@ -119,9 +119,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (! isESM) {
     mod.loaded = true
-    const entry = Entry.getOrCreate(mod.exports, mod)
-    Runtime.prototype.update.call({ entry })
-    entry.loaded()
+    Entry.getOrCreate(mod.exports, mod).update().loaded()
   }
 }
 
