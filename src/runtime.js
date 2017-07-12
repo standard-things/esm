@@ -76,11 +76,16 @@ class Runtime {
   }
 
   run(wrapper, loose) {
-    const exported = this.module.exports = this.entry.exports
+    const entry = this.entry
+    const exported = this.module.exports = entry.exports
     wrapper.call(loose ? exported : void 0)
     this.module.loaded = true
     this.update()
     this.entry.loaded()
+
+    for (const key in entry.bindings) {
+      exported[key] = entry.bindings
+    }
   }
 
   // Platform-specific code should find a way to call this method whenever

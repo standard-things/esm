@@ -174,7 +174,7 @@ class Entry {
       setter(value)
     })
 
-    // If any of the setters updated the module.exports of a parent module,
+    // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     let i = -1
