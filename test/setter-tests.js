@@ -1,5 +1,4 @@
 import assert from "assert"
-import path from "path"
 
 describe("setters", () => {
   it("should be called after eval(...)", () =>

@@ -1,6 +1,5 @@
 import esmSemVer from "./version.js"
 import FastObject from "./fast-object.js"
-import path from "path"
 import SemVer from "semver"
 import utils from "./utils.js"
 

@@ -180,7 +180,6 @@ class ImportExportVisitor extends Visitor {
           const nameCount = exportedNames.length
 
           while (++i < nameCount) {
-            let j = -1
             const exported = exportedNames[i]
             const locals = specifierMap.get(exported).keys()
 

@@ -3,9 +3,6 @@ import OrderedMap from "./ordered-map.js"
 import utils from "./utils.js"
 
 const GETTER_ERROR = {}
-const NAN = {}
-const UNDEFINED = {}
-
 const entryWeakMap = new WeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 

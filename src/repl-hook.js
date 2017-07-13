@@ -1,6 +1,5 @@
 import compiler from "./caching-compiler.js"
 import Error from "./error.js"
-import path from "path"
 import Runtime from "./runtime.js"
 import utils from "./utils.js"
 import vm from "vm"
