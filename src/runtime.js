@@ -123,7 +123,7 @@ class Runtime {
     const children = parentEntry.children
 
     const childExports = mod.require(id)
-    const childId = resolveFilename(id, mod, false)
+    const childId = resolveFilename(id, mod)
     const childModule = Module._cache[childId]
     const childEntry = Entry.get(childExports, childModule)
 
@@ -208,7 +208,7 @@ function resolveId(id, parent) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
 
-  return resolveCache[cacheKey] = resolveFilename(prefix + host + pathname, parent, false)
+  return resolveCache[cacheKey] = resolveFilename(prefix + host + pathname, parent)
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
