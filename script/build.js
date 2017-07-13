@@ -1,3 +1,4 @@
+/* eslint strict: off */
 "use strict"
 
 const execa = require("execa")

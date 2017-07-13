@@ -18,7 +18,7 @@ describe("Node REPL", () => {
       null, // Context.
       "repl",
       () => {
-        // Use the globally defined assertStrictEqual to test itself!
+        /* global assertStrictEqual: false */
         assertStrictEqual(typeof assertStrictEqual, "function")
         done()
       }
@@ -37,7 +37,6 @@ describe("Node REPL", () => {
       context,
       "repl",
       () => {
-        // Use context.strictEqual to test itself!
         context.strictEqual(typeof context.strictEqual, "function")
         done()
       }

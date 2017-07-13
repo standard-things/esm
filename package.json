@@ -17,7 +17,7 @@
     "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
-    "lint": "eslint **/*.js --quiet --ignore-path .gitignore",
+    "lint": "eslint **/*.js --fix --quiet --ignore-path .gitignore",
     "test": "node --require ./build/esm.js script/test.js",
     "test:prod": "node --require ./index.js script/test.js"
   },
