@@ -46,7 +46,7 @@ Promise
   .catch((e) => process.exit(e.code))
   .then(() => {
     if (argv.prod) {
-      /* eslint consistent-return: off */
+      /* eslint consistent-return: off, import/no-extraneous-dependencies: off */
       const gzip = pify(require("node-zopfli").gzip)
       return fs.readFile(bundlePath)
         .then((buffer) => gzip(buffer, { numiterations: 100 }))
