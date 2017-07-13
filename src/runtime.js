@@ -1,4 +1,5 @@
 import Entry from "./entry.js"
+import FastObject from "./fast-object.js"
 import Module from "module"
 import path from "path"
 import URL from "url"
@@ -8,6 +9,7 @@ const codeOfDot = ".".charCodeAt(0)
 const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
+const resolveCache = new FastObject
 
 class Runtime {
   static enable(mod) {
@@ -78,6 +80,7 @@ class Runtime {
   run(wrapper, loose) {
     const entry = this.entry
     const exported = this.module.exports = entry.exports
+
     wrapper.call(loose ? exported : void 0)
     this.module.loaded = true
     this.update()
@@ -137,6 +140,10 @@ function resolveId(id, parent) {
     return id
   }
 
+  if (id in resolveCache) {
+    return resolveCache[id]
+  }
+
   const code0 = id.charCodeAt(0)
   const code1 = id.charCodeAt(1)
   const isPath =
@@ -154,7 +161,7 @@ function resolveId(id, parent) {
 
   if (noParse || typeof parsed.protocol !== "string") {
     if (isPath) {
-      return id
+      return resolveCache[id] = id
     }
     // Prevent resolving non-local dependencies:
     // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
@@ -195,7 +202,7 @@ function resolveId(id, parent) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
 
-  return resolveFilename(prefix + host + pathname, parent, false)
+  return resolveCache[id] = resolveFilename(prefix + host + pathname, parent, false)
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
