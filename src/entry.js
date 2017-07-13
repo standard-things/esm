@@ -30,15 +30,7 @@ class Entry {
     this.setters = new OrderedMap
   }
 
-  static get(exported) {
-    const entry = utils.isObjectLike(exported)
-      ? entryWeakMap.get(exported)
-      : void 0
-
-    return entry === void 0 ? null : entry
-  }
-
-  static getOrCreate(exported, owner) {
+  static get(exported, owner) {
     let entry
 
     if (utils.isObjectLike(exported)) {
@@ -183,12 +175,7 @@ class Entry {
       // longer cycles exist in the parent chain? Thanks to our setter.last
       // bookkeeping in changed(), the entry.update() broadcast will only
       // proceed as far as there are any actual changes to report.
-      const parent = parents[i]
-      const parentEntry = Entry.get(parent.exports)
-
-      if (parentEntry) {
-        parentEntry.update()
-      }
+      Entry.get(parents[i].exports).update()
     }
 
     return this

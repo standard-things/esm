@@ -34,7 +34,7 @@ class Runtime {
     const exported = Object.create(null)
     utils.setESModule(exported)
 
-    object.entry = Entry.getOrCreate(exported, mod)
+    object.entry = Entry.get(exported, mod)
     object.module = mod
   }
 
@@ -125,7 +125,7 @@ class Runtime {
     const childExports = mod.require(id)
     const childId = resolveFilename(id, mod, false)
     const childModule = Module._cache[childId]
-    const childEntry = Entry.getOrCreate(childExports, childModule)
+    const childEntry = Entry.get(childExports, childModule)
 
     children.set(childId, childEntry)
 

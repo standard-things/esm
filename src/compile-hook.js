@@ -119,7 +119,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (! isESM) {
     mod.loaded = true
-    Entry.getOrCreate(mod.exports, mod).update().loaded()
+    Entry.get(mod.exports, mod).update().loaded()
   }
 }
 
