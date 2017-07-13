@@ -166,11 +166,14 @@ function resolveId(id, parent) {
     if (isPath) {
       return resolveCache[cacheKey] = id
     }
+
     // Prevent resolving non-local dependencies:
     // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
     const paths = nodeModulePaths(path.dirname(filename))
+
     // Overwrite concat() to prevent global paths from being concatenated.
     paths.concat = () => paths
+
     // Ensure a parent id and filename are provided to avoid going down the
     // --eval branch of Module._resolveLookupPaths().
     return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
@@ -181,6 +184,7 @@ function resolveId(id, parent) {
     error.code = "MODULE_NOT_FOUND"
     throw error
   }
+
   // Based on file-uri-to-path.
   // Copyright Nathan Rajlich. Released under MIT license:
   // https://github.com/TooTallNate/file-uri-to-path
@@ -198,6 +202,7 @@ function resolveId(id, parent) {
     // Windows shares have a pathname starting with "//".
     prefix += path.sep
   }
+
   // Section E.2: DOS and Windows Drive Letters
   // https://tools.ietf.org/html/rfc8089#appendix-E.2
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2

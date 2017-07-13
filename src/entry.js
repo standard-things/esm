@@ -8,6 +8,7 @@ const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
   constructor(exported) {
+    /* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
     this._changed = true
     // A number indicating the loading state of the module this Entry is managing.
     this._loaded = 0

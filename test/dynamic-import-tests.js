@@ -48,6 +48,7 @@ describe("dynamic import", () => {
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
     import
+
     // Comment.
     (
     "./fixture/abc.js"

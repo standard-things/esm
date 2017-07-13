@@ -42,6 +42,7 @@ function runTests() {
   .catch((e) => process.exit(e.code))
 }
 
+/* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
 Promise
   // Clear cache folders for first run.
   .all(trashPaths.map(trash))

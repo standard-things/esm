@@ -11,6 +11,7 @@ function walk(dir) {
     const relParts = relPath.split(path.sep)
     const stat = fs.statSync(absPath)
 
+    /* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
     if (stat.isDirectory() &&
         // Ignore cache folder.
         relParts[0] !== ".cache") {

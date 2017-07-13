@@ -23,6 +23,7 @@ module.exports = {
     "import/no-extraneous-dependencies": ["error", { packageDir: "./" }],
     "import/prefer-default-export": "error",
     "keyword-spacing": "error",
+    "lines-around-comment": ["error", { allowBlockStart: true, beforeBlockComment: true, beforeLineComment: true }],
     "no-trailing-spaces": "error",
     "no-undef": "error",
     "no-undefined": "error",
@@ -34,6 +35,7 @@ module.exports = {
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
     "sort-vars": "error",
     "space-before-function-paren": ["error", { anonymous: "always", named: "never" }],
+    "spaced-comment": "error",
     strict: "error",
     "quote-props": ["error", "consistent-as-needed"],
     quotes: ["error", "double", { avoidEscape: true, allowTemplateLiterals: true }]
