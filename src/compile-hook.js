@@ -29,7 +29,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (cachePath === null ||
       (extname !== ".mjs" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
-    return func.call(this, mod, filePath)
+    func.call(this, mod, filePath)
+    return
   }
 
   const cache = pkgInfo.cache

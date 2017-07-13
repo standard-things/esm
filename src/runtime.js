@@ -172,7 +172,7 @@ function resolveId(id, parent) {
     paths.concat = () => paths
     // Ensure a parent id and filename are provided to avoid going down the
     // --eval branch of Module._resolveLookupPaths().
-    return resolveFilename(id, { id: "<mock>", filename, paths })
+    return resolveFilename(id, { filename, id: "<mock>", paths })
   }
 
   if (noPathname || parsed.protocol !== "file:") {

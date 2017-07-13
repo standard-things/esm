@@ -264,7 +264,7 @@ class Utils {
   }
 
   static wrapApply(func, wrapper) {
-    return function() {
+    return function () {
       let i = -1
       const argCount = arguments.length
       const args = new Array(argCount)
@@ -278,7 +278,7 @@ class Utils {
   }
 
   static wrapCall(func, wrapper) {
-    return function() {
+    return function () {
       let i = 0
       const argCount = arguments.length + 1
       const args = new Array(argCount)

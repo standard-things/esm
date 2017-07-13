@@ -3,9 +3,9 @@ import extensions from "./acorn-extensions"
 
 const defaultOptions = {
   allowReturnOutsideFunction: false,
+  ecmaVersion: 9,
   enableExportExtensions: false,
   enableImportExtensions: false,
-  ecmaVersion: 9,
   sourceType: "module"
 }
 

@@ -6,9 +6,9 @@ import Parser from "./parser.js"
 const defaultOptions = {
   cjs: false,
   ext: false,
-  var: false,
   runtimeAlias: "_",
-  type: "module"
+  type: "module",
+  var: false
 }
 
 const assignmentVisitor = new AV

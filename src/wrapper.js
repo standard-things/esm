@@ -21,7 +21,7 @@ class Wrapper {
 
   static manage(object, key, wrapper) {
     const raw = Wrapper.unwrap(object, key)
-    const manager = function() {
+    const manager = function () {
       let i = 1
       const argCount = arguments.length + 2
       const args = new Array(argCount)

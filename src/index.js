@@ -1,6 +1,6 @@
-import util from "util"
 import "./compile-hook.js"
 import "./repl-hook.js"
+import util from "util"
 
 const customSym = util.inspect.custom
 const exports = {}

@@ -5,20 +5,20 @@
 import utils from "./utils.js"
 
 const childrenToVisit = Object.assign(Object.create(null), {
-  "alternate": true,
-  "argument": true,
-  "arguments": true,
-  "block": true,
-  "body": true,
-  "callee": true,
-  "cases": true,
-  "consequent": true,
-  "declaration": true,
-  "declarations": true,
-  "elements": true,
-  "expression": true,
-  "init": true,
-  "object": true
+  alternate: true,
+  argument: true,
+  arguments: true,
+  block: true,
+  body: true,
+  callee: true,
+  cases: true,
+  consequent: true,
+  declaration: true,
+  declarations: true,
+  elements: true,
+  expression: true,
+  init: true,
+  object: true
 })
 
 const keysWeakMap = new WeakMap
