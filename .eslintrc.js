@@ -38,6 +38,6 @@ module.exports = {
     "spaced-comment": "error",
     strict: "error",
     "quote-props": ["error", "consistent-as-needed"],
-    quotes: ["error", "double", { avoidEscape: true, allowTemplateLiterals: true }]
+    quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }]
   }
 }
