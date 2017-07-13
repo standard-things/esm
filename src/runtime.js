@@ -140,8 +140,11 @@ function resolveId(id, parent) {
     return id
   }
 
-  if (id in resolveCache) {
-    return resolveCache[id]
+  const filename = parent.filename === null ? "." : parent.filename
+  const cacheKey = id + "\0" + filename
+
+  if (cacheKey in resolveCache) {
+    return resolveCache[cacheKey]
   }
 
   const code0 = id.charCodeAt(0)
@@ -161,18 +164,16 @@ function resolveId(id, parent) {
 
   if (noParse || typeof parsed.protocol !== "string") {
     if (isPath) {
-      return resolveCache[id] = id
+      return resolveCache[cacheKey] = id
     }
     // Prevent resolving non-local dependencies:
     // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-    const filename = parent.filename === null ? "./" : parent.filename
     const paths = nodeModulePaths(path.dirname(filename))
-
     // Overwrite concat() to prevent global paths from being concatenated.
     paths.concat = () => paths
     // Ensure a parent id and filename are provided to avoid going down the
     // --eval branch of Module._resolveLookupPaths().
-    return resolveFilename(id, { filename, id: "<mock>", paths })
+    return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
   }
 
   if (noPathname || parsed.protocol !== "file:") {
@@ -202,7 +203,7 @@ function resolveId(id, parent) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
 
-  return resolveCache[id] = resolveFilename(prefix + host + pathname, parent, false)
+  return resolveCache[cacheKey] = resolveFilename(prefix + host + pathname, parent, false)
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
