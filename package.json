@@ -17,11 +17,15 @@
     "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
+    "lint": "eslint **/*.js --quiet --ignore-path .gitignore",
     "test": "node --require ./build/esm.js script/test.js",
     "test:prod": "node --require ./index.js script/test.js"
   },
   "devDependencies": {
     "acorn": "^5.1.1",
+    "babel-eslint": "^7.2.3",
+    "eslint": "^4.2.0",
+    "eslint-plugin-import": "^2.7.0",
     "execa": "^0.7.0",
     "fs-extra": "^3.0.1",
     "globby": "^6.1.0",
