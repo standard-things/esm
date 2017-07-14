@@ -61,8 +61,9 @@ class Entry {
       const name = pair[0]
       const getter = pair[1]
 
-      // Should this throw if this.getters[name] exists?
-      if (! this.getters.has(name)) {
+      if (this.getters.has(name)) {
+        throw new SyntaxError("Identifier '" + name + "' has already been declared")
+      } else {
         getter.constant = constant
         getter.runCount = 0
         this.getters.set(name, getter)
