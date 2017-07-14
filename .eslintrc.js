@@ -24,6 +24,7 @@ module.exports = {
     "import/prefer-default-export": "error",
     "keyword-spacing": "error",
     "lines-around-comment": ["error", { allowBlockStart: true, beforeBlockComment: true, beforeLineComment: true }],
+    "no-multiple-empty-lines": ["error", { max: 1 }],
     "no-trailing-spaces": "error",
     "no-undef": "error",
     "no-undefined": "error",
