@@ -5,6 +5,14 @@ import path from "path"
 import URL from "url"
 import utils from "./utils.js"
 
+const builtinModules = Object
+  .keys(process.binding("natives"))
+  .filter((key) => ! /^_|[\\]/.test(key))
+  .reduce((object, key) => {
+    object[key] = true
+    return object
+  }, Object.create(null))
+
 const codeOfDot = ".".charCodeAt(0)
 const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
@@ -143,7 +151,7 @@ class Runtime {
 }
 
 function resolveId(id, parent) {
-  if (typeof id !== "string") {
+  if (typeof id !== "string" || id in builtinModules) {
     return id
   }
 
