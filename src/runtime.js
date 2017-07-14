@@ -121,7 +121,7 @@ class Runtime {
     id = resolveId(id, mod)
 
     const cache = Module._cache
-    const childId = resolveFilename(id, mod)
+    const childId = path.isAbsolute(id) ? id : resolveFilename(id, mod)
 
     let childExports
     let childModule = cache[childId]
@@ -129,7 +129,7 @@ class Runtime {
     if (utils.isObject(childModule)) {
       childExports = childModule.exports
     } else {
-      childExports = mod.require(id)
+      childExports = mod.require(childId)
       childModule = cache[childId]
     }
 
