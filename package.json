@@ -27,7 +27,7 @@
     "eslint": "^4.2.0",
     "eslint-plugin-import": "^2.7.0",
     "execa": "^0.7.0",
-    "fs-extra": "^3.0.1",
+    "fs-extra": "^4.0.0",
     "globby": "^6.1.0",
     "minizlib": "^1.0.3",
     "mocha": "^3.4.2",
