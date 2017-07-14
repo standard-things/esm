@@ -37,7 +37,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const cacheKey = fs.mtime(filePath)
   const cacheFileName = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
 
-  const md5Hash = path.basename(cacheFileName, extname).substr(8, 4)
+  const md5Hash = path.basename(cacheFileName, extname).substr(8, 3)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   const readFile = (filePath) => (

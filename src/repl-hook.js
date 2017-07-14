@@ -20,7 +20,7 @@ if (rootModule.filename === null &&
   // Enable ESM in the default Node REPL by loading @std/esm upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
-  const md5Hash = utils.md5(Date.now()).substr(0, 4)
+  const md5Hash = utils.md5(Date.now()).substr(0, 3)
   const runtimeAlias = utils.encodeIdent("_" + md5Hash)
 
   const managerWrapper = function (manager, func, code, options) {
