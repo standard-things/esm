@@ -129,9 +129,8 @@ class Entry {
       }
     }
 
-    const bindings = this.bindings
-
     utils.setGetter(this, "namespace", () => {
+      const bindings = this.bindings
       utils.setProperty(this, "namespace", { value: bindings })
 
       // Section 9.4.6.11
