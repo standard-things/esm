@@ -125,33 +125,37 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    const mod = this.module
-    id = resolveId(id, mod)
-
     const cache = Module._cache
-    const childId = path.isAbsolute(id) ? id : resolveFilename(id, mod)
+    const parent = this.module
 
-    let childExports
-    let childModule = cache[childId]
-
-    if (utils.isObject(childModule)) {
-      childExports = childModule.exports
-    } else {
-      childExports = mod.require(childId)
-      childModule = cache[childId]
+    if (! (id in builtinModules)) {
+      id = resolveId(id, parent)
+      if (! path.isAbsolute(id)) {
+        id = resolveFilename(id, parent)
+      }
     }
 
-    const childEntry = Entry.get(childExports, childModule)
-    this.entry.children.set(childId, childEntry)
+    let exported
+    let mod = cache[id]
+
+    if (utils.isObject(mod)) {
+      exported = mod.exports
+    } else {
+      exported = parent.require(id)
+      mod = cache[id]
+    }
+
+    const entry = Entry.get(exported, mod)
+    this.entry.children.set(id, entry)
 
     if (setterPairs !== void 0) {
-      childEntry.addSetters(setterPairs, mod).update()
+      entry.addSetters(setterPairs, parent).update()
     }
   }
 }
 
 function resolveId(id, parent) {
-  if (typeof id !== "string" || id in builtinModules) {
+  if (typeof id !== "string") {
     return id
   }
 
