@@ -80,14 +80,15 @@ class Runtime {
   run(wrapper, loose) {
     const entry = this.entry
     const exported = this.module.exports = entry.exports
+    const bindings = entry.bindings
 
     wrapper.call(loose ? exported : void 0)
     this.module.loaded = true
     this.update()
     this.entry.loaded()
 
-    for (const key in entry.bindings) {
-      exported[key] = entry.bindings
+    for (const key in bindings) {
+      exported[key] = bindings[key]
     }
   }
 
