@@ -1,6 +1,7 @@
 module.exports = {
   extends: ["eslint:recommended", "plugin:import/errors"],
   parser: "eslint-plugin-import/memo-parser",
+  root: true,
   env: {
     es6: true,
     mocha: true,
