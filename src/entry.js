@@ -137,6 +137,33 @@ class Entry {
     return this._loaded = 1
   }
 
+  merge(otherEntry) {
+    const otherGetters = otherEntry.getters
+    const otherNamespace = otherEntry._namespace
+    const getters = this.getters
+    const namespace = this._namespace
+
+    for (const key in otherNamespace) {
+      if (key === "default") {
+        continue
+      }
+
+      let getter = getters.get(key)
+      const otherGetter = otherGetters.get(key)
+
+      if (getter === void 0) {
+        getter = otherGetter
+        getters.set(key, getter)
+      }
+
+      if (getter.owner.id === otherGetter.owner.id) {
+        namespace[key] = otherNamespace[key]
+      } else {
+        throw new SyntaxError("Identifier '" + key + "' has already been declared")
+      }
+    }
+  }
+
   update() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
@@ -169,9 +196,9 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const namespace = entry._namespace
   const exported = entry.exports
   const isESM = entry.sourceType !== "script"
+  const namespace = entry._namespace
 
   // Add a "default" property unless it's a Babel-like exports, in which case
   // the exported object should be namespace-like and safe to assign directly.

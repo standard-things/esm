@@ -69,29 +69,7 @@ class Runtime {
   }
 
   nsSetter() {
-    return (namespace, childEntry) => {
-      const entry = this.entry
-      const getters = entry.getters
-
-      for (const key in namespace) {
-        if (key !== "default") {
-          const childGetter = childEntry.getters.get(key)
-          const childOwner = childGetter.owner
-
-          if (! getters.has(key)) {
-            getters.set(key, childGetter)
-          }
-
-          const getter = getters.get(key)
-
-          if (getter.owner.id === childOwner.id) {
-            entry._namespace[key] = namespace[key]
-          } else {
-            throw new SyntaxError("Identifier '" + key + "' has already been declared")
-          }
-        }
-      }
-    }
+    return (childNamespace, childEntry) => this.entry.merge(childEntry)
   }
 
   run(wrapper, loose) {
