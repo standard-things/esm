@@ -251,6 +251,7 @@ class Utils {
 
   static setGetter(object, key, getter) {
     defineGetter.call(object, key, getter)
+    return object
   }
 
   static setProperty(object, key, descriptor) {
