@@ -246,6 +246,7 @@ class Utils {
 
   static setESModule(exported) {
     exported[esSymKey] = true
+    return exported
   }
 
   static setGetter(object, key, getter) {
@@ -259,6 +260,7 @@ class Utils {
 
   static setSetter(object, key, setter) {
     defineSetter.call(object, key, setter)
+    return object
   }
 
   static toString(value) {
