@@ -48,6 +48,15 @@ describe("spec compliance", () => {
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
+
+  it("should not export duplicate bindings", () =>
+    import("./misc/export-dups.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(/been declared/i.test(e.message))
+      })
+  )
 })
 
 describe("built-in modules", () => {
