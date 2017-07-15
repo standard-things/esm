@@ -137,10 +137,11 @@ class Entry {
   }
 
   merge(otherEntry) {
-    const otherGetters = otherEntry.getters
-    const otherNamespace = otherEntry._namespace
     const getters = this.getters
     const namespace = this._namespace
+    const isESM = otherEntry.sourceType !== "script"
+    const otherGetters = otherEntry.getters
+    const otherNamespace = otherEntry._namespace
 
     for (const key in otherNamespace) {
       if (key === "default") {
@@ -156,7 +157,11 @@ class Entry {
       }
 
       if (getter.owner.id === otherGetter.owner.id) {
-        namespace[key] = otherNamespace[key]
+        if (isESM) {
+          namespace[key] = otherNamespace[key]
+        } else {
+          utils.assignProperty(namespace, otherNamespace, key)
+        }
       } else {
         throw new SyntaxError("Identifier '" + key + "' has already been declared")
       }
@@ -196,8 +201,8 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const exported = entry.exports
-  const isESM = entry.sourceType !== "script"
   const namespace = entry._namespace
+  const isESM = entry.sourceType !== "script"
 
   // Add a "default" property unless it's a Babel-like exports, in which case
   // the exported object should be namespace-like and safe to assign directly.
