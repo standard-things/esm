@@ -47,6 +47,7 @@ describe("dynamic import", () => {
   )
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
+    /* eslint no-unexpected-multiline: off */
     import
 
     // Comment.

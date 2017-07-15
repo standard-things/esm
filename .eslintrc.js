@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["plugin:import/errors"],
+  extends: ["eslint:recommended", "plugin:import/errors"],
   parser: "eslint-plugin-import/memo-parser",
   env: {
     es6: true,
@@ -24,6 +24,8 @@ module.exports = {
     "import/prefer-default-export": "error",
     "keyword-spacing": "error",
     "lines-around-comment": ["error", { allowBlockStart: true, beforeBlockComment: true, beforeLineComment: true }],
+    "no-constant-condition": ["error", { checkLoops: false }],
+    "no-empty": ["error", { allowEmptyCatch: true }],
     "no-multiple-empty-lines": ["error", { max: 1 }],
     "no-trailing-spaces": "error",
     "no-undef": "error",
