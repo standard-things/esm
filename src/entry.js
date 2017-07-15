@@ -7,9 +7,8 @@ const entryWeakMap = new WeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
+  /* eslint lines-around-comment: off */
   constructor(mod, exported) {
-    /* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
-
     // A boolean indicating whether the module namespace has changed.
     this._changed = true
     // A number indicating the loading state of the module.

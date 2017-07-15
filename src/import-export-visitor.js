@@ -464,7 +464,7 @@ function toModuleImport(visitor, code, specifierMap) {
     const locals = specifierMap.get(imported).keys()
     const valueParam = safeParam("v", locals)
 
-    /* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
+    /* eslint lines-around-comment: off */
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
