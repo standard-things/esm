@@ -63,7 +63,7 @@ class FS {
         const stream = new minizlib.Gunzip(options)
         if (options.encoding === "utf8") {
           let result = ""
-          stream.on("data", chunk => result += chunk).end(bufferOrString)
+          stream.on("data", (chunk) => result += chunk).end(bufferOrString)
           return result
         }
         return streamToBuffer(stream, bufferOrString)
@@ -243,7 +243,7 @@ function fallbackReadFile(filePath, options) {
 
 function streamToBuffer(stream, bufferOrString) {
   const result = []
-  stream.on("data", chunk => result.push(chunk)).end(bufferOrString)
+  stream.on("data", (chunk) => result.push(chunk)).end(bufferOrString)
   return Buffer.concat(result)
 }
 

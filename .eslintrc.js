@@ -16,6 +16,8 @@ module.exports = {
     parser: "babel-eslint"
   },
   rules: {
+    "arrow-parens": "error",
+    "arrow-spacing": "error",
     "brace-style": ["error", "1tbs"],
     "consistent-return": "error",
     curly: "error",
