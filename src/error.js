@@ -27,23 +27,28 @@ class ErrorUtils {
   }
 
   static maskStackTrace(error, sourceCode, compiledCode) {
-    let trapSet = false
-
     // For efficiency V8 stack traces are not formatted when they are captured
     // but on demand, the first time the error.stack property is accessed. To
     // avoid accessing the stack property early, and to defer any file read
     // operations, we follow suit and wrap the error object in a proxy object
     // to mask error.stack on first access.
+    if (typeof Proxy === "undefined") {
+      const stack = error.stack
+      return utils.setGetter(error, "stack", () => {
+        decorateStackTrace(error)
+        return utils.setProperty(error, "stack", {
+          value: resolveStack(error, stack, sourceCode, compiledCode)
+        })
+      })
+    }
+
+    let trapSet = false
     return new Proxy(error, {
       get(error, key) {
         if (key === "stack" && ! trapSet) {
-          sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
           trapSet = true
-
           decorateStackTrace(error)
-          return error.stack = utils.isParseError(error)
-            ? maskParserStack(error.stack, sourceCode)
-            : maskStack(error.stack, sourceCode, compiledCode)
+          return error.stack = resolveStack(error, error.stack, sourceCode, compiledCode)
         }
         return error[key]
       }
@@ -199,6 +204,13 @@ function maskStackLines(stackLines, sourceCode) {
   if (stackLines[0].startsWith("repl:")) {
     stackLines.shift()
   }
+}
+
+function resolveStack(error, stack, sourceCode, compiledCode) {
+  sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
+  return utils.isParseError(error)
+    ? maskParserStack(stack, sourceCode)
+    : maskStack(stack, sourceCode, compiledCode)
 }
 
 function scrubStack(stack) {
