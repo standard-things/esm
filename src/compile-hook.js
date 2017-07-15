@@ -83,6 +83,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   const isESM = cacheValue.type === "module"
   let output = cacheValue.code
+  let compiledCode = output
 
   if (isESM) {
     Runtime.enable(mod)
@@ -101,7 +102,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       const wrap = Module.wrap
       Module.wrap = (script) => {
         Module.wrap = wrap
-        return wrapModule(script)
+        return compiledCode = wrapModule(script)
       }
     }
 
@@ -114,7 +115,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw Error.maskStackTrace(e, sourceCode, wrapModule(output))
+    throw Error.maskStackTrace(e, sourceCode, compiledCode)
   }
 
   if (! isESM) {
