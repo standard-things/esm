@@ -1,3 +1,4 @@
+/* eslint no-var: off */
 export var value = reset()
 
 export function add(n) {

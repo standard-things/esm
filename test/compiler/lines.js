@@ -1,5 +1,5 @@
 import {
-  // Comment.
+  /* eslint brace-style: off */
   strictEqual
 }
 from "assert"
@@ -11,5 +11,5 @@ function check()
 {
   const error = new Error // Line 12.
   const line = error.stack.match(/:(\d+)/)[1]
-  strictEqual(line, '12')
+  strictEqual(line, "12")
 }
