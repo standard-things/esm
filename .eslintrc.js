@@ -37,8 +37,8 @@ module.exports = {
     "sort-imports": ["error", { ignoreCase: true }],
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
     "sort-vars": "error",
-    "space-before-function-paren": ["error", { anonymous: "always", named: "never" }],
-    "spaced-comment": "error",
+    "space-before-function-paren": ["error", { named: "never" }],
+    "spaced-comment": ["error", "always", { block: { balanced: true } }],
     strict: "error",
     "quote-props": ["error", "consistent-as-needed"],
     quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }]
