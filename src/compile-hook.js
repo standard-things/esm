@@ -119,7 +119,15 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (! isESM) {
     mod.loaded = true
-    Entry.get(mod.exports, mod).update().loaded()
+
+    const getterPairs = utils
+      .keys(mod.exports)
+      .map((key) => [key, () => mod.exports[key]])
+
+    Entry.get(mod.exports, mod)
+      .addGetters(getterPairs, true)
+      .update()
+      .loaded()
   }
 }
 
