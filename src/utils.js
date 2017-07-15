@@ -177,6 +177,10 @@ class Utils {
       Utils.isObject(value.loc)
   }
 
+  static keys(object) {
+    return Utils.isObjectLike(object) ? Object.keys(object) : []
+  }
+
   static md5(value) {
     return crypto
       .createHash("md5")
