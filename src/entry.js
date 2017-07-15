@@ -7,52 +7,57 @@ const entryWeakMap = new WeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
-  constructor(exported) {
+  constructor(mod, exported) {
     /* eslint lines-around-comment: ["error", { beforeLineComment: false }] */
+
+    // A boolean indicating whether the module namespace has changed.
     this._changed = true
-    // A number indicating the loading state of the module this Entry is managing.
+    // A number indicating the loading state of the module.
     this._loaded = 0
-    // The object of bindings this Entry is tracking.
-    this.bindings = createNamespace()
-    // The child entries of this Entry.
+    // The raw namespace object.
+    this._namespace = createNamespace()
+    // The child entries of the module.
     this.children = new OrderedMap
-    // The module.exports of the module this Entry is managing.
+    // The module.exports of the module.
     this.exports = exported
-    // Getters for local variables exported from the managed module.
+    // Getters for local variables exported from the module.
     this.getters = new OrderedMap
-    // An alias of bindings that object importers receive.
-    this.namespace = this.bindings
-    // A map of the modules this Entry is managing by id.
-    this.ownerModules = new OrderedMap
+    // The namespace alias that object importers receive.
+    this.namespace = this._namespace
+    // The module this entry is managing.
+    this.module = mod
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
+    // Detect the module type.
+    this.sourceType = "script"
+
+    if (utils.isESModule(exported)) {
+      this.sourceType = "module"
+    } else if (utils.isESModuleLike(exported)) {
+      this.sourceType = "module-like"
+    }
   }
 
-  static get(exported, owner) {
-    let entry
+  static get(mod, exported) {
+    if (arguments.length === 1) {
+      exported = mod.exports
+    }
 
     if (utils.isObjectLike(exported)) {
-      entry = entryWeakMap.get(exported)
+      let entry = entryWeakMap.get(exported)
       if (entry === void 0) {
-        entry = new Entry(exported)
+        entry = new Entry(mod, exported)
         entryWeakMap.set(exported, entry)
       }
-    } else {
-      // Create a temporary Entry object to call entry.addSetters() and trigger
-      // entry.update(), so that runtime.watch() behaves as expected.
-      entry = new Entry(exported)
+      return entry
     }
 
-    if (utils.isObject(owner)) {
-      entry.ownerModules.set(owner.id, owner)
-    }
-
-    return entry
+    // Create a temporary Entry object to call entry.addSetters() and trigger
+    // entry.update(), so that runtime.watch() behaves as expected.
+    return new Entry(mod, exported)
   }
 
-  addGetters(getterPairs, constant) {
-    constant = !! constant
-
+  addGetters(getterPairs) {
     let i = -1
     const pairCount = getterPairs.length
 
@@ -61,13 +66,8 @@ class Entry {
       const name = pair[0]
       const getter = pair[1]
 
-      if (this.getters.has(name)) {
-        throw new SyntaxError("Identifier '" + name + "' has already been declared")
-      } else {
-        getter.constant = constant
-        getter.runCount = 0
-        this.getters.set(name, getter)
-      }
+      getter.owner = this.module
+      this.getters.set(name, getter)
     }
 
     return this
@@ -102,25 +102,11 @@ class Entry {
 
     this._loaded = -1
 
-    let i = -1
-    const owners = this.ownerModules.values()
-    const ownerCount = owners.length
-
-    // Multiple modules can share the same Entry object because they share
-    // the same module.exports object, e.g. when a "bridge" module sets
-    // module.exports = require(...) to make itself roughly synonymous
-    // with some other module. Just because the bridge module has finished
-    // loading (as far as it's concerned), that doesn't mean it should
-    // control the loading state of the (possibly shared) Entry.
-    while (++i < ownerCount) {
-      if (! owners[i].loaded) {
-        // At least one owner module has not finished loading, so this Entry
-        // cannot be marked as loaded yet.
-        return this._loaded = 0
-      }
+    if (! this.module.loaded) {
+      return this._loaded = 0
     }
 
-    i = -1
+    let i = -1
     const children = this.children.values()
     const childrenCount = children.length
 
@@ -131,21 +117,21 @@ class Entry {
     }
 
     utils.setGetter(this, "namespace", () => {
-      const bindings = this.bindings
-      utils.setProperty(this, "namespace", { value: bindings })
+      const namespace = this._namespace
+      utils.setProperty(this, "namespace", { value: namespace })
 
       // Section 9.4.6.11
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
-      const keys = Object.keys(bindings).sort()
+      const keys = Object.keys(namespace).sort()
       const keyCount = keys.length
 
       while (++i < keyCount) {
-        utils.assignProperty(bindings, bindings, keys[i], true)
+        utils.assignProperty(namespace, namespace, keys[i], true)
       }
 
-      return Object.seal(bindings)
+      return Object.seal(namespace)
     })
 
     return this._loaded = 1
@@ -158,7 +144,7 @@ class Entry {
 
     forEachSetter(this, (setter, value) => {
       parentsMap.set(setter.parent.id, setter.parent)
-      setter(value)
+      setter(value, this)
     })
 
     this._changed = false
@@ -175,39 +161,35 @@ class Entry {
       // longer cycles exist in the parent chain? Thanks to our setter.last
       // bookkeeping in changed(), the entry.update() broadcast will only
       // proceed as far as there are any actual changes to report.
-      Entry.get(parents[i].exports).update()
+      Entry.get(parents[i]).update()
     }
 
     return this
   }
 }
 
-function assignExportsToBindings(entry) {
-  const bindings = entry.bindings
+function assignExportsToNamespace(entry) {
+  const namespace = entry._namespace
   const exported = entry.exports
-  const isESM = utils.isESModuleLike(exported)
+  const isESM = entry.sourceType !== "script"
 
   // Add a "default" property unless it's a Babel-like exports, in which case
   // the exported object should be namespace-like and safe to assign directly.
   if (! isESM) {
-    bindings.default = exported
-  }
-
-  if (! utils.isObjectLike(exported)) {
-    return
+    namespace.default = exported
   }
 
   let i = -1
-  const keys = Object.keys(exported)
+  const keys = utils.keys(exported)
   const keyCount = keys.length
 
   while (++i < keyCount) {
     const key = keys[i]
 
     if (isESM) {
-      bindings[key] = exported[key]
+      namespace[key] = exported[key]
     } else if (key !== "default") {
-      utils.assignProperty(bindings, exported, key)
+      utils.assignProperty(namespace, exported, key)
     }
   }
 }
@@ -268,25 +250,10 @@ function forEachSetter(entry, callback) {
 
     while (++j < setterCount) {
       const setter = setters[j]
+
       if (entry._changed || changed(setter, name, value)) {
         callback(setter, value)
       }
-    }
-
-    // Sometimes a getter function will throw because it's called
-    // before the variable it's supposed to return has been
-    // initialized, so we need to know that the getter function
-    // has run to completion at least once.
-    const getter = entry.getters.get(name)
-    if (typeof getter === "function" &&
-        getter.runCount > 0 &&
-        getter.constant) {
-      // If we happen to know that this getter function has run
-      // successfully, and will never return a different value, then
-      // we can forget the corresponding setter, because we've already
-      // reported that constant value.
-      entry.getters.set(name, void 0)
-      setters.length = 0
     }
   }
 }
@@ -294,7 +261,7 @@ function forEachSetter(entry, callback) {
 function getExportByName(entry, name) {
   return name === "*"
     ? entry.namespace
-    : entry.bindings[name]
+    : entry._namespace[name]
 }
 
 function runGetter(getter) {
@@ -310,13 +277,13 @@ function runGetter(getter) {
 }
 
 function runGetters(entry) {
-  if (! utils.isESModule(entry.exports)) {
-    assignExportsToBindings(entry)
+  if (entry.sourceType !== "module") {
+    assignExportsToNamespace(entry)
     return
   }
 
   let i = -1
-  const bindings = entry.bindings
+  const namespace = entry._namespace
   const getters = entry.getters.values()
   const names = entry.getters.keys()
   const nameCount = names.length
@@ -326,9 +293,9 @@ function runGetters(entry) {
     const value = runGetter(getters[i])
 
     if (value !== GETTER_ERROR &&
-        ! compare(bindings, name, value)) {
+        ! compare(namespace, name, value)) {
       entry._changed = true
-      bindings[name] = value
+      namespace[name] = value
     }
   }
 }

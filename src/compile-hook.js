@@ -124,8 +124,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       .keys(mod.exports)
       .map((key) => [key, () => mod.exports[key]])
 
-    Entry.get(mod.exports, mod)
-      .addGetters(getterPairs, true)
+    Entry.get(mod)
+      .addGetters(getterPairs)
       .update()
       .loaded()
   }

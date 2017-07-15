@@ -39,23 +39,21 @@ class Runtime {
       }
     }
 
-    const exported = Object.create(null)
-    utils.setESModule(exported)
-
-    object.entry = Entry.get(exported, mod)
+    const exported = utils.setESModule(Object.create(null))
+    object.entry = Entry.get(mod, exported)
     object.module = mod
   }
 
   // Register a getter function that always returns the given value.
   default(value) {
-    return this.export([["default", () => value]], true)
+    return this.export([["default", () => value]])
   }
 
   // Register getter functions for local variables in the scope of an export
   // statement. Pass true as the second argument to indicate that the getter
   // functions always return the same values.
-  export(getterPairs, constant) {
-    this.entry.addGetters(getterPairs, constant)
+  export(getterPairs) {
+    this.entry.addGetters(getterPairs)
   }
 
   import(id) {
@@ -70,16 +68,27 @@ class Runtime {
     })
   }
 
-  // Returns a function that takes a namespace object and copies the
-  // properties of the namespace to entry.exports, which is useful for
-  // implementing `export * from "module"` syntax.
   nsSetter() {
-    return (namespace) => {
+    return (namespace, childEntry) => {
       const entry = this.entry
+      const getters = entry.getters
 
       for (const key in namespace) {
         if (key !== "default") {
-          entry.namespace[key] = namespace[key]
+          const childGetter = childEntry.getters.get(key)
+          const childOwner = childGetter.owner
+
+          if (! getters.has(key)) {
+            getters.set(key, childGetter)
+          }
+
+          const getter = getters.get(key)
+
+          if (getter.owner.id === childOwner.id) {
+            entry._namespace[key] = namespace[key]
+          } else {
+            throw new SyntaxError("Identifier '" + key + "' has already been declared")
+          }
         }
       }
     }
@@ -87,16 +96,17 @@ class Runtime {
 
   run(wrapper, loose) {
     const entry = this.entry
-    const exported = this.module.exports = entry.exports
-    const bindings = entry.bindings
+    const mod = this.module
+    const exported = mod.exports = entry.exports
+    const namespace = entry._namespace
 
+    mod.exports = exported
     wrapper.call(loose ? exported : void 0)
-    this.module.loaded = true
-    this.update()
-    this.entry.loaded()
+    mod.loaded = true
+    entry.update().loaded()
 
-    for (const key in bindings) {
-      exported[key] = bindings[key]
+    for (const key in namespace) {
+      exported[key] = namespace[key]
     }
   }
 
@@ -135,21 +145,27 @@ class Runtime {
       }
     }
 
-    let exported
-    let mod = cache[id]
+    let childExports
+    let childModule = cache[id]
 
-    if (utils.isObject(mod)) {
-      exported = mod.exports
+    if (utils.isObject(childModule)) {
+      childExports = childModule.exports
     } else {
-      exported = parent.require(id)
-      mod = cache[id]
+      childExports = parent.require(id)
+      childModule = cache[id]
     }
 
-    const entry = Entry.get(exported, mod)
-    this.entry.children.set(id, entry)
+    if (! utils.isObject(childModule)) {
+      childModule = new Module(id, null)
+      childModule.exports = childExports
+      childModule.loaded = true
+    }
+
+    const childEntry = Entry.get(childModule)
+    this.entry.children.set(id, childEntry)
 
     if (setterPairs !== void 0) {
-      entry.addSetters(setterPairs, parent).update()
+      childEntry.addSetters(setterPairs, parent).update()
     }
   }
 }

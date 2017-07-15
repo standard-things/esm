@@ -188,7 +188,7 @@ class ImportExportVisitor extends Visitor {
             addToSpecifierMap(
               newMap,
               locals[0],
-              this.runtimeAlias + ".entry.namespace." + exported
+              this.runtimeAlias + ".entry._namespace." + exported
             )
           }
 
@@ -483,7 +483,7 @@ function toModuleImport(visitor, code, specifierMap) {
   return code
 }
 
-function toModuleExport(visitor, specifierMap, constant) {
+function toModuleExport(visitor, specifierMap) {
   const exportedNames = specifierMap.keys()
   const nameCount = exportedNames.length
 
@@ -514,9 +514,7 @@ function toModuleExport(visitor, specifierMap, constant) {
     }
   }
 
-  // The second argument to runtime.export() indicates whether the getter
-  // functions provided in the first argument are constant or not.
-  code += constant ? "],1);" : "]);"
+  code += "]);"
 
   return code
 }
