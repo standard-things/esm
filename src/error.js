@@ -10,7 +10,7 @@ const utilBinding = (() => {
 const errorCaptureStackTrace = Error.captureStackTrace
 const errorMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?:.*?: (.+))?$/
 const lineNumRegExp = /:(\d+)/
-const columnNumRegExp = /(\d+)(?=\)|$)/
+const columnNumRegExp = /:(\d+)(?=\)|$)/
 const filePathRegExp = /(?:^ {4}at |\()(.*?)(?=:\d+:\d+\)?$)/
 const splice = Array.prototype.splice
 
@@ -196,9 +196,10 @@ function maskStackLines(stackLines, sourceCode) {
 
   if (newColumn < 0) {
     stackLines.splice(2, 1)
+    stackLines[4] = stackLines[4].replace(columnNumRegExp, "")
   } else if (newColumn < column) {
     stackLines[2] = " ".repeat(newColumn) + "^"
-    stackLines[5] = stackLines[5].replace(columnNumRegExp, newColumn)
+    stackLines[5] = stackLines[5].replace(columnNumRegExp, ":" + newColumn)
   }
 
   if (stackLines[0].startsWith("repl:")) {
