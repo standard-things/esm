@@ -124,14 +124,17 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   mod.loaded = true
 
-  const getterPairs = utils
-    .keys(mod.exports)
-    .map((key) => [key, () => mod.exports[key]])
+  const entry = Entry.get(mod)
 
-  Entry.get(mod)
-    .addGetters(getterPairs)
-    .update()
-    .loaded()
+  if (pkgOptions.cjs) {
+    const getterPairs = utils
+      .keys(mod.exports)
+      .map((key) => [key, () => mod.exports[key]])
+
+    entry.addGetters(getterPairs)
+  }
+
+  entry.update().loaded()
 }
 
 const exts = Module._extensions
