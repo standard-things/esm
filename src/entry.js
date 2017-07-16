@@ -151,9 +151,15 @@ class Entry {
       let getter = getters.get(key)
       const otherGetter = otherGetters.get(key)
 
-      if (getter === void 0) {
+      if (typeof getter !== "function" &&
+          typeof otherGetter === "function") {
         getter = otherGetter
         getters.set(key, getter)
+      }
+
+      if (typeof getter !== "function" ||
+          typeof otherGetter !== "function") {
+        continue
       }
 
       if (getter.owner.id === otherGetter.owner.id) {
