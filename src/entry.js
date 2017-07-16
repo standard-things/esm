@@ -178,8 +178,6 @@ class Entry {
       setter(value, this)
     })
 
-    this._changed = false
-
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
@@ -255,17 +253,16 @@ function createNamespace() {
 // Invoke the given callback for every setter that needs to be called.
 // Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
-  const names = entry.setters.keys()
-  const nameCount = names.length
-
-  if (! nameCount) {
-    return
-  }
-
-  runGetters(entry)
+  entry._changed = false
 
   let i = -1
   const collections = entry.setters.values()
+  const names = entry.setters.keys()
+  const nameCount = names.length
+
+  if (nameCount) {
+    runGetters(entry)
+  }
 
   while (++i < nameCount) {
     const setters = collections[i]
@@ -287,6 +284,8 @@ function forEachSetter(entry, callback) {
       }
     }
   }
+
+  entry._changed = false
 }
 
 function getExportByName(entry, name) {
