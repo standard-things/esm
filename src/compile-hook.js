@@ -118,18 +118,20 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     throw Error.maskStackTrace(e, sourceCode, compiledCode)
   }
 
-  if (! isESM) {
-    mod.loaded = true
-
-    const getterPairs = utils
-      .keys(mod.exports)
-      .map((key) => [key, () => mod.exports[key]])
-
-    Entry.get(mod)
-      .addGetters(getterPairs)
-      .update()
-      .loaded()
+  if (isESM) {
+    return
   }
+
+  mod.loaded = true
+
+  const getterPairs = utils
+    .keys(mod.exports)
+    .map((key) => [key, () => mod.exports[key]])
+
+  Entry.get(mod)
+    .addGetters(getterPairs)
+    .update()
+    .loaded()
 }
 
 const exts = Module._extensions
