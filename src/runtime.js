@@ -33,13 +33,13 @@ class Runtime {
 
     let i = -1
     const proto = this.prototype
-    const keys = Object.getOwnPropertyNames(proto)
-    const keyCount = keys.length
+    const names = Object.getOwnPropertyNames(proto)
+    const nameCount = names.length
 
-    while (++i < keyCount) {
-      const key = keys[i]
-      if (key !== "constructor") {
-        object[key] = proto[key]
+    while (++i < nameCount) {
+      const name = names[i]
+      if (name !== "constructor") {
+        object[name] = proto[name]
       }
     }
 

@@ -117,9 +117,9 @@ class Entry {
 
     let i = -1
     const children = this.children.values()
-    const childrenCount = children.length
+    const childCount = children.length
 
-    while (++i < childrenCount) {
+    while (++i < childCount) {
       if (! children[i].loaded()) {
         return this._loaded = 0
       }
@@ -133,11 +133,11 @@ class Entry {
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
-      const props = Object.keys(namespace).sort()
-      const propCount = props.length
+      const names = keys(namespace).sort()
+      const nameCount = names.length
 
-      while (++i < propCount) {
-        assignProperty(namespace, namespace, props[i], true)
+      while (++i < nameCount) {
+        assignProperty(namespace, namespace, names[i], true)
       }
 
       return Object.seal(namespace)
@@ -225,16 +225,16 @@ function assignExportsToNamespace(entry) {
   }
 
   let i = -1
-  const props = keys(exported)
-  const propCount = props.length
+  const names = keys(exported)
+  const nameCount = names.length
 
-  while (++i < propCount) {
-    const key = props[i]
+  while (++i < nameCount) {
+    const name = names[i]
 
     if (isESM) {
-      namespace[key] = exported[key]
-    } else if (key !== "default") {
-      assignProperty(namespace, exported, key)
+      namespace[name] = exported[name]
+    } else if (name !== "default") {
+      assignProperty(namespace, exported, name)
     }
   }
 }
