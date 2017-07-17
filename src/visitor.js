@@ -4,6 +4,9 @@
 
 import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
+import keys from "./util/keys.js"
+
+const childNamesMap = new WeakMap
 
 const childrenToVisit = createOptions({
   alternate: true,
@@ -22,8 +25,6 @@ const childrenToVisit = createOptions({
   object: true
 })
 
-const keysMap = new WeakMap
-
 class Visitor {
   visit(path) {
     this.reset.apply(this, arguments)
@@ -32,10 +33,15 @@ class Visitor {
 
   visitWithoutReset(path) {
     const value = path.getValue()
+
     if (Array.isArray(value)) {
       path.each(this, "visitWithoutReset")
-    } else if (path.getNode() === value) {
+      return
+    }
+
+    if (path.getNode() === value) {
       const methodName = "visit" + value.type
+
       if (typeof this[methodName] === "function") {
         // The method must call this.visitChildren(path) to continue traversing.
         this[methodName](path)
@@ -46,26 +52,39 @@ class Visitor {
   }
 
   visitChildren(path) {
-    const node = path.getValue()
-    let keys = getKeys(node)
-    let keyCount = keys.length
+    let i = -1
+    const value = path.getValue(path)
+    const names = getChildNames(value)
+    const nameCount = names.length
 
-    while (keyCount--) {
-      const key = keys[keyCount]
-      if (key in childrenToVisit && isObject(node[key])) {
-        path.call(this, "visitWithoutReset", key)
-      }
+    while (++i < nameCount) {
+      path.call(this, "visitWithoutReset", names[i])
     }
   }
 }
 
-function getKeys(object) {
-  let keys = keysMap.get(object)
-  if (keys === void 0) {
-    keys = Object.keys(object)
-    keysMap.set(object, keys)
+function getChildNames(value) {
+  let childNames = childNamesMap.get(value)
+
+  if (childNames !== void 0) {
+    return childNames
   }
-  return keys
+
+  let i = -1
+  const names = keys(value)
+  const nameCount = names.length
+  childNames = []
+
+  while (++i < nameCount) {
+    const name = names[i]
+    if (name in childrenToVisit &&
+        isObject(value[name])) {
+      childNames.push(name)
+    }
+  }
+
+  childNamesMap.set(value, childNames)
+  return childNames
 }
 
 Object.setPrototypeOf(Visitor.prototype, null)
