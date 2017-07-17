@@ -8,7 +8,7 @@ const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
   /* eslint lines-around-comment: off */
-  constructor(mod, exported) {
+  constructor(mod, exported, options) {
     // A boolean indicating whether the module namespace has changed.
     this._changed = true
     // A number indicating the loading state of the module.
@@ -21,10 +21,12 @@ class Entry {
     this.exports = exported
     // Getters for local variables exported from the module.
     this.getters = new OrderedMap
-    // The namespace alias that object importers receive.
-    this.namespace = this._namespace
     // The module this entry is managing.
     this.module = mod
+    // The namespace alias that object importers receive.
+    this.namespace = this._namespace
+    // The package options for this entry.
+    this.options = utils.createOptions(options)
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
     // Detect the module type.
@@ -37,7 +39,7 @@ class Entry {
     }
   }
 
-  static get(mod, exported) {
+  static get(mod, exported, options) {
     if (arguments.length === 1) {
       exported = mod.exports
     }

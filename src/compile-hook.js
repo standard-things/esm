@@ -86,7 +86,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   let compiledCode = output
 
   if (isESM) {
-    Runtime.enable(mod)
+    Runtime.enable(mod, pkgOptions)
 
     let async = ""
 
@@ -108,8 +108,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
     output =
       (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".r(" + async + "function(){" + output + "\n}" +
-      (pkgOptions.cjs ? ",1" : "") + ")"
+      runtimeAlias + ".r(" + async + "function(){" + output + "\n})"
   }
 
   try {
@@ -124,7 +123,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   mod.loaded = true
 
-  const entry = Entry.get(mod)
+  const entry = Entry.get(mod, mod.exports, pkgOptions)
 
   if (pkgOptions.cjs) {
     const getterPairs = utils

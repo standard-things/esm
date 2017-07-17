@@ -20,7 +20,7 @@ const resolveFilename = Module._resolveFilename
 const resolveCache = new FastObject
 
 class Runtime {
-  static enable(mod) {
+  static enable(mod, options) {
     const object = mod.exports
 
     if (Object.getOwnPropertyNames(object).length) {
@@ -40,8 +40,11 @@ class Runtime {
     }
 
     const exported = utils.setESModule(Object.create(null))
-    object.entry = Entry.get(mod, exported)
+    options = utils.createOptions(options)
+
+    object.entry = Entry.get(mod, exported, options)
     object.module = mod
+    object.options = options
   }
 
   // Register a getter function that always returns the given value.
@@ -72,14 +75,15 @@ class Runtime {
     return (childNamespace, childEntry) => this.entry.merge(childEntry)
   }
 
-  run(wrapper, loose) {
+  run(wrapper) {
     const entry = this.entry
     const mod = this.module
     const exported = mod.exports = entry.exports
     const namespace = entry._namespace
+    const options = this.options
 
     mod.exports = exported
-    wrapper.call(loose ? exported : void 0)
+    wrapper.call(options.cjs ? exported : void 0)
     mod.loaded = true
     entry.update().loaded()
 
