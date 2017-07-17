@@ -11,7 +11,7 @@ import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 
 const GETTER_ERROR = {}
-const entryWeakMap = new WeakMap
+const entryMap = new WeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
@@ -53,10 +53,10 @@ class Entry {
     }
 
     if (isObjectLike(exported)) {
-      let entry = entryWeakMap.get(exported)
+      let entry = entryMap.get(exported)
       if (entry === void 0) {
         entry = new Entry(mod, exported, options)
-        entryWeakMap.set(exported, entry)
+        entryMap.set(exported, entry)
       }
       return entry
     }

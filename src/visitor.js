@@ -22,7 +22,7 @@ const childrenToVisit = createOptions({
   object: true
 })
 
-const keysWeakMap = new WeakMap
+const keysMap = new WeakMap
 
 class Visitor {
   visit(path) {
@@ -60,10 +60,10 @@ class Visitor {
 }
 
 function getKeys(object) {
-  let keys = keysWeakMap.get(object)
+  let keys = keysMap.get(object)
   if (keys === void 0) {
     keys = Object.keys(object)
-    keysWeakMap.set(object, keys)
+    keysMap.set(object, keys)
   }
   return keys
 }
