@@ -1,10 +1,11 @@
 import compiler from "./compiler.js"
 import fs from "./fs.js"
 import path from "path"
+import utils from "./utils.js"
 
 class Compiler {
   static compile(content, options) {
-    options = Object.assign(Object.create(null), options)
+    options = utils.createOptions(options)
     return typeof options.filePath === "string"
       ? compileWithFilename(content, options)
       : compileAndCache(content, options)

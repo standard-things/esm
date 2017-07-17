@@ -3,6 +3,7 @@ import fs from "fs"
 import minizlib from "minizlib"
 import path from "path"
 import SemVer from "semver"
+import utils from "./utils.js"
 import zlib from "zlib"
 
 const DEFAULT_GZIP_CONFIG = {
@@ -42,7 +43,7 @@ if (useMtimeFastPath) {
 
 class FS {
   static gzip(bufferOrString, options) {
-    options = Object.assign(Object.create(null), DEFAULT_GZIP_CONFIG, options)
+    options = utils.createOptions(options, DEFAULT_GZIP_CONFIG)
 
     if (useGzipFastPath) {
       try {
@@ -56,7 +57,7 @@ class FS {
 
   static gunzip(bufferOrString, options) {
     options = typeof options === "string" ? { encoding: options } : options
-    options = Object.assign(Object.create(null), options)
+    options = utils.createOptions(options)
 
     if (useGunzipFastPath) {
       try {
@@ -177,7 +178,7 @@ class FS {
   }
 
   static writeFileDefer(filePath, content, options, callback) {
-    options = Object.assign(Object.create(null), options)
+    options = utils.createOptions(options)
     pendingWrites[filePath] = { callback, content, options }
 
     if (pendingWriteTimer !== null) {

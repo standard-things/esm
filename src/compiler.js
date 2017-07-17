@@ -2,6 +2,7 @@ import AV from "./assignment-visitor.js"
 import FastPath from "./fast-path.js"
 import IEV from "./import-export-visitor.js"
 import Parser from "./parser.js"
+import utils from "./utils.js"
 
 const defaultOptions = {
   cjs: false,
@@ -23,7 +24,7 @@ const importExportRegExp = /(?:^|[^.])\b(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
-    options = Object.assign(Object.create(null), defaultOptions, options)
+    options = utils.createOptions(options, defaultOptions)
 
     if (code.charCodeAt(0) === codeOfPound) {
       code = code.replace(shebangRegExp, "")

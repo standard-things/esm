@@ -25,6 +25,34 @@ const defaultDescriptor = {
 }
 
 class Utils {
+  static assign(object) {
+    if (! Utils.isObjectLike(object)) {
+      return object
+    }
+
+    let i = 0
+    const argCount = arguments.length
+
+    while (++i < argCount) {
+      const source = arguments[i]
+
+      if (! Utils.isObjectLike(source)) {
+        continue
+      }
+
+      let j = -1
+      const keys = Object.keys(source)
+      const keyCount = keys.length
+
+      while (++j < keyCount) {
+        const key = keys[j]
+        object[key] = source[key]
+      }
+    }
+
+    return object
+  }
+
   static assignProperty(object, source, key, removeBefore) {
     const getter = Utils.getGetter(source, key)
     const setter = Utils.getSetter(source, key)
@@ -48,6 +76,10 @@ class Utils {
     }
 
     return object
+  }
+
+  static createOptions(object, defaults) {
+    return assign(Object.create(null), defaults, object)
   }
 
   static encodeIdent(identifier) {
@@ -255,7 +287,7 @@ class Utils {
   }
 
   static setProperty(object, key, descriptor) {
-    descriptor = Object.assign(Object.create(null), defaultDescriptor, descriptor)
+    descriptor = Utils.createOptions(descriptor, defaultDescriptor)
     return Object.defineProperty(object, key, descriptor)
   }
 

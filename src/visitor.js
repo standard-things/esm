@@ -4,7 +4,7 @@
 
 import utils from "./utils.js"
 
-const childrenToVisit = Object.assign(Object.create(null), {
+const childrenToVisit = utils.createOptions({
   alternate: true,
   argument: true,
   arguments: true,

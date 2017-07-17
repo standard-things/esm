@@ -30,7 +30,7 @@ if (rootModule.filename === null &&
   }
 
   const methodWrapper = function (manager, func, pkgInfo, code, options) {
-    options = Object.assign(Object.create(null), options)
+    options = utils.createOptions(options)
 
     const cache = pkgInfo.cache
     const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)

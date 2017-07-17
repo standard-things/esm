@@ -1,6 +1,7 @@
 import fs from "./fs.js"
 import OrderedMap from "./ordered-map.js"
 import path from "path"
+import utils from "./utils.js"
 
 const defaultOptions = {
   cache: ".esm-cache",
@@ -12,7 +13,7 @@ const defaultOptions = {
 
 class PkgInfo {
   constructor(dirPath, range, options) {
-    options = Object.assign(Object.create(null), defaultOptions, options)
+    options = utils.createOptions(options, defaultOptions)
 
     const cache = new OrderedMap
     const cacheDir =  options.cache
