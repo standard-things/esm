@@ -1,5 +1,7 @@
 import isObjectLike from "./is-object-like.js"
 
+const hasOwn = Object.prototype.hasOwnProperty
+
 export default function assign(object) {
   if (! isObjectLike(object)) {
     return object
@@ -15,13 +17,10 @@ export default function assign(object) {
       continue
     }
 
-    let j = -1
-    const keys = Object.keys(source)
-    const keyCount = keys.length
-
-    while (++j < keyCount) {
-      const key = keys[j]
-      object[key] = source[key]
+    for (const key in source) {
+      if (hasOwn.call(source, key)) {
+        object[key] = source[key]
+      }
     }
   }
 
