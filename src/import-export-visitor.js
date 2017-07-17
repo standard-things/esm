@@ -1,8 +1,9 @@
-import assert from "assert"
 import MagicString from "./magic-string.js"
 import OrderedMap from "./ordered-map.js"
-import utils from "./utils.js"
 import Visitor from "./visitor.js"
+
+import assert from "assert"
+import getNamesFromPattern from "./util/get-names-from-pattern.js"
 
 const codeOfCR = "\r".charCodeAt(0)
 
@@ -147,7 +148,7 @@ class ImportExportVisitor extends Visitor {
 
         while (++i < ddCount) {
           let j = -1
-          const names = utils.getNamesFromPattern(dd.declarations[i].id)
+          const names = getNamesFromPattern(dd.declarations[i].id)
           const nameCount = names.length
 
           while (++j < nameCount) {

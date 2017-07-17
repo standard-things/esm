@@ -1,6 +1,14 @@
 import FastObject from "./fast-object.js"
 import OrderedMap from "./ordered-map.js"
-import utils from "./utils.js"
+
+import assignProperty from "./util/assign-property.js"
+import createOptions from "./util/create-options.js"
+import isESModule from "./util/is-esmodule.js"
+import isESModuleLike from "./util/is-esmodule-like.js"
+import isObjectLike from "./util/is-object-like.js"
+import keys from "./util/keys.js"
+import setGetter from "./util/set-getter.js"
+import setProperty from "./util/set-property.js"
 
 const GETTER_ERROR = {}
 const entryWeakMap = new WeakMap
@@ -26,15 +34,15 @@ class Entry {
     // The namespace alias that object importers receive.
     this.namespace = this._namespace
     // The package options for this entry.
-    this.options = utils.createOptions(options)
+    this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
     // Detect the module type.
     this.sourceType = "script"
 
-    if (utils.isESModule(exported)) {
+    if (isESModule(exported)) {
       this.sourceType = "module"
-    } else if (utils.isESModuleLike(exported)) {
+    } else if (isESModuleLike(exported)) {
       this.sourceType = "module-like"
     }
   }
@@ -44,10 +52,10 @@ class Entry {
       exported = mod.exports
     }
 
-    if (utils.isObjectLike(exported)) {
+    if (isObjectLike(exported)) {
       let entry = entryWeakMap.get(exported)
       if (entry === void 0) {
-        entry = new Entry(mod, exported)
+        entry = new Entry(mod, exported, options)
         entryWeakMap.set(exported, entry)
       }
       return entry
@@ -117,19 +125,19 @@ class Entry {
       }
     }
 
-    utils.setGetter(this, "namespace", () => {
+    setGetter(this, "namespace", () => {
       const namespace = this._namespace
-      utils.setProperty(this, "namespace", { value: namespace })
+      setProperty(this, "namespace", { value: namespace })
 
       // Section 9.4.6.11
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
-      const keys = Object.keys(namespace).sort()
-      const keyCount = keys.length
+      const props = Object.keys(namespace).sort()
+      const propCount = props.length
 
-      while (++i < keyCount) {
-        utils.assignProperty(namespace, namespace, keys[i], true)
+      while (++i < propCount) {
+        assignProperty(namespace, namespace, props[i], true)
       }
 
       return Object.seal(namespace)
@@ -168,7 +176,7 @@ class Entry {
         if (isESM) {
           namespace[key] = otherNamespace[key]
         } else {
-          utils.assignProperty(namespace, otherNamespace, key)
+          assignProperty(namespace, otherNamespace, key)
         }
       } else {
         throw new SyntaxError("Identifier '" + key + "' has already been declared")
@@ -217,16 +225,16 @@ function assignExportsToNamespace(entry) {
   }
 
   let i = -1
-  const keys = utils.keys(exported)
-  const keyCount = keys.length
+  const props = keys(exported)
+  const propCount = props.length
 
-  while (++i < keyCount) {
-    const key = keys[i]
+  while (++i < propCount) {
+    const key = props[i]
 
     if (isESM) {
       namespace[key] = exported[key]
     } else if (key !== "default") {
-      utils.assignProperty(namespace, exported, key)
+      assignProperty(namespace, exported, key)
     }
   }
 }
@@ -248,7 +256,7 @@ function createNamespace() {
   const namespace = new FastObject
 
   if (useToStringTag) {
-    utils.setProperty(namespace, Symbol.toStringTag, {
+    setProperty(namespace, Symbol.toStringTag, {
       configurable: false,
       enumerable: false,
       value: "Module",

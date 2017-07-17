@@ -1,7 +1,8 @@
-import esmSemVer from "./version.js"
 import FastObject from "./fast-object.js"
 import SemVer from "semver"
-import utils from "./utils.js"
+
+import esmSemVer from "./util/version.js"
+import has from "./util/has.js"
 
 const esmVersion = esmSemVer.version
 const maxSatisfyingCache = new FastObject
@@ -41,9 +42,7 @@ class Wrapper {
 
   static unwrap(object, key) {
     const func = object[key]
-    return utils.has(func, wrapSym)
-      ? func[wrapSym]
-      : func
+    return has(func, wrapSym) ? func[wrapSym]  : func
   }
 
   static wrap(object, key, wrapper) {
@@ -94,9 +93,7 @@ function getOrCreateStore(object) {
 }
 
 function getStore(object) {
-  return utils.has(object, wrapSym)
-    ? object[wrapSym]
-    : null
+  return has(object, wrapSym) ? object[wrapSym] : null
 }
 
 function maxSatisfying(versions, range) {

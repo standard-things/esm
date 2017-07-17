@@ -2,9 +2,10 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/ast-types/blob/master/lib/path-visitor.js
 
-import utils from "./utils.js"
+import createOptions from "./util/create-options.js"
+import isObject from "./util/is-object.js"
 
-const childrenToVisit = utils.createOptions({
+const childrenToVisit = createOptions({
   alternate: true,
   argument: true,
   arguments: true,
@@ -51,7 +52,7 @@ class Visitor {
 
     while (keyCount--) {
       const key = keys[keyCount]
-      if (key in childrenToVisit && utils.isObject(node[key])) {
+      if (key in childrenToVisit && isObject(node[key])) {
         path.call(this, "visitWithoutReset", key)
       }
     }

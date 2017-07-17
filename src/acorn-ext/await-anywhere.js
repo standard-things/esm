@@ -1,7 +1,7 @@
-import utils from "../utils.js"
+import wrapCall from "../util/wrap-call.js"
 
 function enable(parser) {
-  parser.parseMaybeUnary = utils.wrapCall(parser.parseMaybeUnary, parseMaybeUnary)
+  parser.parseMaybeUnary = wrapCall(parser.parseMaybeUnary, parseMaybeUnary)
   return parser
 }
 

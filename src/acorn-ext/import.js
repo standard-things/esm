@@ -1,12 +1,13 @@
 import { tokTypes as tt } from "acorn/dist/acorn.es.js"
-import utils from "../utils.js"
+import Parser from "../parser.js"
+import wrapCall from "../util/wrap-call.js"
 
 function enable(parser) {
   const key = typeof parser.parseImportSpecifiers === "function"
     ? "parseImportSpecifiers"
     : "parseImportSpecifierList"
 
-  parser[key] = utils.wrapCall(parser[key], parseImportSpecifiers)
+  parser[key] = wrapCall(parser[key], parseImportSpecifiers)
   return parser
 }
 
@@ -43,7 +44,7 @@ function parseImportNamespaceSpecifier(parser) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    utils.parserRaise(parser)
+    Parser.raise(parser)
   }
 
   star.local = parser.parseIdent()

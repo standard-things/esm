@@ -1,6 +1,14 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
-import extensions from "./acorn-extensions"
-import utils from "./utils.js"
+
+import createOptions from "./util/create-options.js"
+import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
+import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
+import { enable as enableExport } from "./acorn-ext/export.js"
+import { enable as enableImport } from "./acorn-ext/import.js"
+import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
+
+const acornParser = new AcornParser
+const acornRaise = acornParser.raise
 
 const defaultOptions = {
   allowReturnOutsideFunction: false,
@@ -11,23 +19,34 @@ const defaultOptions = {
 }
 
 class Parser {
+  static lookahead(parser) {
+    acornParser.input = parser.input
+    acornParser.pos = parser.pos
+    acornParser.nextToken()
+    return acornParser
+  }
+
   static parse(code, options) {
-    options = utils.createOptions(options, defaultOptions)
+    options = createOptions(options, defaultOptions)
     return extend(new AcornParser(options, code), options).parse()
+  }
+
+  static raise(parser) {
+    acornRaise.call(parser, parser.start, "Unexpected token")
   }
 }
 
 function extend(parser, options) {
-  extensions.enableAwaitAnywhere(parser)
-  extensions.enableDynamicImport(parser)
-  extensions.enableTolerance(parser)
+  enableAwaitAnywhere(parser)
+  enableDynamicImport(parser)
+  enableTolerance(parser)
 
   if (options.enableExportExtensions) {
-    extensions.enableExport(parser)
+    enableExport(parser)
   }
 
   if (options.enableImportExtensions) {
-    extensions.enableImport(parser)
+    enableImport(parser)
   }
 
   return parser

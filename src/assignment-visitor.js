@@ -1,5 +1,5 @@
-import utils from "./utils.js"
 import Visitor from "./visitor.js"
+import getNamesFromPattern from "./util/get-names-from-pattern.js"
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
@@ -35,7 +35,7 @@ function assignmentHelper(visitor, path, childName) {
   visitor.visitChildren(path)
 
   const child = path.getValue()[childName]
-  const names = utils.getNamesFromPattern(child)
+  const names = getNamesFromPattern(child)
   let nameCount = names.length
 
   // Wrap assignments to exported identifiers with runtime.update().

@@ -1,9 +1,17 @@
-import compiler from "./caching-compiler.js"
-import Error from "./error.js"
+import PkgInfo from "./pkg-info.js"
 import Runtime from "./runtime.js"
-import utils from "./utils.js"
-import vm from "vm"
 import Wrapper from "./wrapper.js"
+
+import captureStackTrace from "./error/capture-stack-trace.js"
+import compiler from "./caching-compiler.js"
+import createOptions from "./util/create-options.js"
+import encodeIdent from "./util/encode-ident.js"
+import getCacheFileName from "./util/get-cache-file-name.js"
+import isObject from "./util/is-object.js"
+import maskStackTrace from "./error/mask-stack-trace.js"
+import md5 from "./util/md5.js"
+import vm from "vm"
+import wrapApply from "./util/wrap-apply.js"
 
 const pkgMain = __non_webpack_module__.filename
 let rootModule = __non_webpack_module__
@@ -20,20 +28,20 @@ if (rootModule.filename === null &&
   // Enable ESM in the default Node REPL by loading @std/esm upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
-  const md5Hash = utils.md5(Date.now()).substr(0, 3)
-  const runtimeAlias = utils.encodeIdent("_" + md5Hash)
+  const md5Hash = md5(Date.now()).substr(0, 3)
+  const runtimeAlias = encodeIdent("_" + md5Hash)
 
   const managerWrapper = function (manager, func, code, options) {
-    const pkgInfo = utils.getPkgInfo()
+    const pkgInfo = PkgInfo.get("")
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
     return wrapped.call(this, manager, func, pkgInfo, code, options)
   }
 
   const methodWrapper = function (manager, func, pkgInfo, code, options) {
-    options = utils.createOptions(options)
+    options = createOptions(options)
 
     const cache = pkgInfo.cache
-    const cacheFileName = utils.getCacheFileName(null, code, pkgInfo)
+    const cacheFileName = getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache.get(cacheFileName)
 
     if (options.produceCachedData === void 0) {
@@ -42,7 +50,7 @@ if (rootModule.filename === null &&
 
     let output
 
-    if (utils.isObject(cacheValue)) {
+    if (isObject(cacheValue)) {
       output = cacheValue.code
       if (options.produceCachedData === true &&
           options.cachedData === void 0 &&
@@ -57,8 +65,8 @@ if (rootModule.filename === null &&
           runtimeAlias
         }).code
       } catch (e) {
-        Error.captureStackTrace(e, manager)
-        throw Error.maskStackTrace(e, code)
+        captureStackTrace(e, manager)
+        throw maskStackTrace(e, code)
       }
     }
 
@@ -71,15 +79,15 @@ if (rootModule.filename === null &&
     try {
       result = func.call(this, output, options)
     } catch (e) {
-      Error.captureStackTrace(e, manager)
-      throw Error.maskStackTrace(e, code, output)
+      captureStackTrace(e, manager)
+      throw maskStackTrace(e, code, output)
     }
 
     const runWrapper = function (func, args) {
       try {
         return func.apply(this, args)
       } catch (e) {
-        throw Error.maskStackTrace(e, code, output)
+        throw maskStackTrace(e, code, output)
       }
     }
 
@@ -87,8 +95,8 @@ if (rootModule.filename === null &&
       cache.get(cacheFileName).data = result.cachedData
     }
 
-    result.runInContext = utils.wrapApply(result.runInContext, runWrapper)
-    result.runInThisContext = utils.wrapApply(result.runInThisContext, runWrapper)
+    result.runInContext = wrapApply(result.runInContext, runWrapper)
+    result.runInThisContext = wrapApply(result.runInThisContext, runWrapper)
     return result
   }
 

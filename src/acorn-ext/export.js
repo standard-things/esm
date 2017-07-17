@@ -1,12 +1,13 @@
 import { tokTypes as tt } from "acorn/dist/acorn.es.js"
-import utils from "../utils.js"
+import Parser from "../parser.js"
+import wrapCall from "../util/wrap-call.js"
 
 function enable(parser) {
   const key = typeof parser.parseExportSpecifiers === "function"
     ? "parseExportSpecifiers"
     : "parseExportSpecifierList"
 
-  parser[key] = utils.wrapCall(parser[key], parseExportSpecifiers)
+  parser[key] = wrapCall(parser[key], parseExportSpecifiers)
   parser.parseExport = parseExport
   return parser
 }
@@ -21,7 +22,7 @@ function parseExport(node, exported) {
   }
 
   if (this.type === tt.star &&
-      utils.parserLookahead(this).isContextual("from")) {
+      Parser.lookahead(this).isContextual("from")) {
     // ... * from "..."
     return parseExportNamespace(this, node)
   }
@@ -66,7 +67,7 @@ function parseExportSpecifiers(func, exported) {
   while (this.eat(tt.comma))
 
   if (expectFrom && ! this.isContextual("from")) {
-    utils.parserRaise(this)
+    Parser.raise(this)
   }
 
   return specifiers
@@ -114,7 +115,7 @@ function parseExportDefaultSpecifier(parser) {
 function parseExportFrom(parser, node) {
   // ... from "..."
   if (! parser.eatContextual("from")) {
-    utils.parserRaise(parser)
+    Parser.raise(parser)
   }
 
   node.source = parser.type === tt.string ? parser.parseExprAtom() : null
@@ -150,7 +151,7 @@ function parseExportNamespaceSpecifier(parser, exported) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    utils.parserRaise(parser)
+    Parser.raise(parser)
   }
 
   star.exported = parser.parseIdent()

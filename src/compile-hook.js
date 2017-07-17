@@ -1,20 +1,28 @@
-import compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
-import Error from "./error.js"
-import fs from "./fs.js"
 import Module from "module"
-import path from "path"
+import PkgInfo from "./pkg-info.js"
 import Runtime from "./runtime.js"
 import SemVer from "semver"
-import utils from "./utils.js"
 import Wrapper from "./wrapper.js"
+
+import captureStackTrace from "./error/capture-stack-trace.js"
+import compiler from "./caching-compiler.js"
+import encodeIdent from "./util/encode-ident.js"
+import getCacheFileName from "./util/get-cache-file-name.js"
+import gunzip from "./fs/gunzip.js"
+import isObject from "./util/is-object.js"
+import keys from "./util/keys.js"
+import maskStackTrace from "./error/mask-stack-trace.js"
+import mtime from "./fs/mtime.js"
+import path from "path"
+import readFile from "./fs/read-file.js"
 
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
 function managerWrapper(manager, func, mod, filePath) {
   filePath = path.resolve(filePath)
-  const pkgInfo = utils.getPkgInfo(path.dirname(filePath))
+  const pkgInfo = PkgInfo.get(path.dirname(filePath))
   const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
 
   return wrapped === null
@@ -34,16 +42,16 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   const cache = pkgInfo.cache
-  const cacheKey = fs.mtime(filePath)
-  const cacheFileName = utils.getCacheFileName(filePath, cacheKey, pkgInfo)
+  const cacheKey = mtime(filePath)
+  const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 3)
-  const runtimeAlias = utils.encodeIdent("_" + md5Hash)
+  const runtimeAlias = encodeIdent("_" + md5Hash)
 
-  const readFile = (filePath) => (
+  const read = (filePath) => (
     pkgOptions.gz && path.extname(filePath) === ".gz"
-      ? fs.gunzip(fs.readFile(filePath), "utf8")
-      : fs.readFile(filePath, "utf8")
+      ? gunzip(readFile(filePath), "utf8")
+      : readFile(filePath, "utf8")
   )
 
   const wrapModule = (script) => (
@@ -55,13 +63,13 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   let cacheValue = cache.get(cacheFileName)
 
   if (cacheValue === true) {
-    cacheCode = readFile(path.join(cachePath, cacheFileName))
-    sourceCode = () => readFile(filePath)
+    cacheCode = read(path.join(cachePath, cacheFileName))
+    sourceCode = () => read(filePath)
   } else {
-    sourceCode = readFile(filePath)
+    sourceCode = read(filePath)
   }
 
-  if (! utils.isObject(cacheValue)) {
+  if (! isObject(cacheValue)) {
     if (cacheValue === true) {
       cacheValue = { code: cacheCode, type: "module" }
       cache.set(cacheFileName, cacheValue)
@@ -75,8 +83,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
           runtimeAlias
         })
       } catch (e) {
-        Error.captureStackTrace(e, manager)
-        throw Error.maskStackTrace(e, sourceCode)
+        captureStackTrace(e, manager)
+        throw maskStackTrace(e, sourceCode)
       }
     }
   }
@@ -114,7 +122,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   try {
     mod._compile(output, filePath)
   } catch (e) {
-    throw Error.maskStackTrace(e, sourceCode, compiledCode)
+    throw maskStackTrace(e, sourceCode, compiledCode)
   }
 
   if (isESM) {
@@ -126,8 +134,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const entry = Entry.get(mod, mod.exports, pkgOptions)
 
   if (pkgOptions.cjs) {
-    const getterPairs = utils
-      .keys(mod.exports)
+    const getterPairs = keys(mod.exports)
       .map((key) => [key, () => mod.exports[key]])
 
     entry.addGetters(getterPairs)

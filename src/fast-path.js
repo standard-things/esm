@@ -2,7 +2,7 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/recast/blob/master/lib/fast-path.js
 
-import utils from "./utils.js"
+import isObject from "./util/is-object.js"
 
 class FastPath {
   constructor(ast) {
@@ -64,7 +64,7 @@ function getNodeAt(path, pos) {
     // maintaining a complete list of type names is one of the reasons we're
     // using the FastPath/Visitor abstraction in the first place.
     const value = s[i--]
-    if (utils.isObject(value) &&
+    if (isObject(value) &&
         ! Array.isArray(value) &&
         --pos < 0) {
       return value

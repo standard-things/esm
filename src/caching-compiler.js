@@ -1,11 +1,13 @@
 import compiler from "./compiler.js"
-import fs from "./fs.js"
+import createOptions from "./util/create-options.js"
+import gzip from "./fs/gzip.js"
 import path from "path"
-import utils from "./utils.js"
+import removeFile from "./fs/remove-file.js"
+import writeFileDefer from "./fs/write-file-defer.js"
 
 class Compiler {
   static compile(content, options) {
-    options = utils.createOptions(options)
+    options = createOptions(options)
     return typeof options.filePath === "string"
       ? compileWithFilename(content, options)
       : compileAndCache(content, options)
@@ -38,18 +40,18 @@ function compileAndWrite(content, options) {
     const pkgInfo = options.pkgInfo
 
     const code = result.code
-    const content = () => isGzipped ? fs.gzip(code) : code
+    const content = () => isGzipped ? gzip(code) : code
     const encoding = isGzipped ? null : "utf8"
     const scopePath = pkgInfo.dirPath
 
-    fs.writeFileDefer(cacheFilePath, content, { encoding, scopePath }, (success) => {
+    writeFileDefer(cacheFilePath, content, { encoding, scopePath }, (success) => {
       if (success) {
         // Delete expired cache files.
         const shortname = cacheFileName.slice(0, 8)
         pkgInfo.cache.keys().forEach((key) => {
           if (key !== cacheFileName &&
               key.startsWith(shortname)) {
-            fs.removeFile(path.join(cachePath, key))
+            removeFile(path.join(cachePath, key))
           }
         })
       }

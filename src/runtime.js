@@ -1,9 +1,12 @@
 import Entry from "./entry.js"
 import FastObject from "./fast-object.js"
 import Module from "module"
-import path from "path"
 import URL from "url"
-import utils from "./utils.js"
+
+import createOptions from "./util/create-options.js"
+import isObject from "./util/is-object.js"
+import path from "path"
+import setESModule from "./util/set-esmodule.js"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
@@ -39,8 +42,8 @@ class Runtime {
       }
     }
 
-    const exported = utils.setESModule(Object.create(null))
-    options = utils.createOptions(options)
+    const exported = setESModule(Object.create(null))
+    options = createOptions(options)
 
     object.entry = Entry.get(mod, exported, options)
     object.module = mod
@@ -130,14 +133,14 @@ class Runtime {
     let childExports
     let childModule = cache[id]
 
-    if (utils.isObject(childModule)) {
+    if (isObject(childModule)) {
       childExports = childModule.exports
     } else {
       childExports = parent.require(id)
       childModule = cache[id]
     }
 
-    if (! utils.isObject(childModule)) {
+    if (! isObject(childModule)) {
       childModule = new Module(id, null)
       childModule.exports = childExports
       childModule.loaded = true

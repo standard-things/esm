@@ -1,65 +1,53 @@
-import utils from "./utils.js"
+import binding from "../util/binding.js"
+import isParseError from "../util/is-parse-error.js"
+import setGetter from "../util/set-getter.js"
+import setProperty from "../util/set-property.js"
 
-const utilBinding = (() => {
-  try {
-    return process.binding("util")
-  } catch (e) {}
-  return Object.create(null)
-})()
-
-const errorCaptureStackTrace = Error.captureStackTrace
 const errorMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?:.*?: (.+))?$/
 const lineNumRegExp = /:(\d+)/
 const columnNumRegExp = /:(\d+)(?=\)|$)/
 const filePathRegExp = /(?:^ {4}at |\()(.*?)(?=:\d+:\d+\)?$)/
 const splice = Array.prototype.splice
 
-const internalDecorateErrorStack = utilBinding.decorateErrorStack
-const internalSetHiddenValue = utilBinding.setHiddenValue
+const internalDecorateErrorStack = binding.decorateErrorStack
+const internalSetHiddenValue = binding.setHiddenValue
 
 const useInternalDecorateErrorStack = typeof internalDecorateErrorStack === "function"
 const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
 
-class ErrorUtils {
-  static captureStackTrace(error, beforeFunc) {
-    errorCaptureStackTrace(error, beforeFunc)
-    return error
-  }
-
-  static maskStackTrace(error, sourceCode, compiledCode) {
-    // For efficiency V8 stack traces are not formatted when they are captured
-    // but on demand, the first time the error.stack property is accessed. To
-    // avoid accessing the stack property early, and to defer any file read
-    // operations, we follow suit and wrap the error object in a proxy object
-    // to mask error.stack on first access.
-    if (typeof Proxy === "undefined") {
-      const stack = error.stack
-      return utils.setGetter(error, "stack", () => {
-        decorateStackTrace(error)
-        return utils.setProperty(error, "stack", {
-          value: resolveStack(error, stack, sourceCode, compiledCode)
-        })
+function maskStackTrace(error, sourceCode, compiledCode) {
+  // For efficiency V8 stack traces are not formatted when they are captured
+  // but on demand, the first time the error.stack property is accessed. To
+  // avoid accessing the stack property early, and to defer any file read
+  // operations, we follow suit and wrap the error object in a proxy object
+  // to mask error.stack on first access.
+  if (typeof Proxy === "undefined") {
+    const stack = error.stack
+    return setGetter(error, "stack", () => {
+      decorateStackTrace(error)
+      return setProperty(error, "stack", {
+        value: resolveStack(error, stack, sourceCode, compiledCode)
       })
-    }
-
-    let trapSet = false
-    return new Proxy(error, {
-      get(error, key) {
-        if (key === "stack" && ! trapSet) {
-          trapSet = true
-          decorateStackTrace(error)
-          return error.stack = resolveStack(error, error.stack, sourceCode, compiledCode)
-        }
-        return error[key]
-      }
     })
   }
+
+  let trapSet = false
+  return new Proxy(error, {
+    get(error, key) {
+      if (key === "stack" && ! trapSet) {
+        trapSet = true
+        decorateStackTrace(error)
+        return error.stack = resolveStack(error, error.stack, sourceCode, compiledCode)
+      }
+      return error[key]
+    }
+  })
 }
 
 function decorateStackTrace(error) {
   if (useInternalSetHiddenValue) {
-    if ("arrow_message_private_symbol" in utilBinding) {
-      internalSetHiddenValue(error, utilBinding.arrow_message_private_symbol, "")
+    if ("arrow_message_private_symbol" in binding) {
+      internalSetHiddenValue(error, binding.arrow_message_private_symbol, "")
     } else {
       try {
         internalSetHiddenValue(error, "arrowMessage", "")
@@ -67,8 +55,8 @@ function decorateStackTrace(error) {
       } catch (e) {}
     }
 
-    if ("decorated_private_symbol" in utilBinding) {
-      internalSetHiddenValue(error, utilBinding.decorated_private_symbol, true)
+    if ("decorated_private_symbol" in binding) {
+      internalSetHiddenValue(error, binding.decorated_private_symbol, true)
     } else {
       try {
         internalSetHiddenValue(error, "node:decorated", true)
@@ -209,7 +197,7 @@ function maskStackLines(stackLines, sourceCode) {
 
 function resolveStack(error, stack, sourceCode, compiledCode) {
   sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
-  return utils.isParseError(error)
+  return isParseError(error)
     ? maskParserStack(stack, sourceCode)
     : maskStack(stack, sourceCode, compiledCode)
 }
@@ -221,6 +209,4 @@ function scrubStack(stack) {
     .join("\n")
 }
 
-Object.setPrototypeOf(ErrorUtils.prototype, null)
-
-export default ErrorUtils
+export default maskStackTrace
