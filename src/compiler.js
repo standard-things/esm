@@ -17,6 +17,7 @@ const assignmentVisitor = new AV
 const importExportVisitor = new IEV
 const codeOfPound = "#".charCodeAt(0)
 const shebangRegExp = /^#!.*/
+const useModuleRegExp = /(["'])use module\1/
 
 // Matches any import or export identifier as long as it's not preceded by a "."
 // character (e.g. runtime.export) to prevent the compiler from compiling code
@@ -37,7 +38,9 @@ class Compiler {
       type: "script"
     }
 
-    if (options.type === "unambiguous" && ! importExportRegExp.test(code)) {
+    if (options.type === "unambiguous" &&
+        ! importExportRegExp.test(code) &&
+        ! useModuleRegExp.test(code)) {
       return result
     }
 
