@@ -34,6 +34,7 @@ module.exports = {
     "no-undef": "error",
     "no-undefined": "error",
     "no-unused-vars": "error",
+    "no-useless-rename": "error",
     "no-var": "error",
     "one-var": ["error", "never"],
     semi: ["error", "never"],
