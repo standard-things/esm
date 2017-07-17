@@ -3,6 +3,7 @@ import FastObject from "./fast-object.js"
 import Module from "module"
 import URL from "url"
 
+import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 import path from "path"
@@ -90,9 +91,7 @@ class Runtime {
     mod.loaded = true
     entry.update().loaded()
 
-    for (const key in namespace) {
-      exported[key] = namespace[key]
-    }
+    assign(exported, namespace)
   }
 
   // Platform-specific code should find a way to call this method whenever
