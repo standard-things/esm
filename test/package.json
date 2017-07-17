@@ -3,6 +3,7 @@
   "private": true,
   "@std/esm": {
     "cache": ".cache/for/tests",
+    "debug": true,
     "esm": "js"
   },
   "dependencies": {

@@ -13,6 +13,7 @@ import toString from "./util/to-string.js"
 const defaultOptions = {
   cache: ".esm-cache",
   cjs: false,
+  debug: false,
   esm: false,
   ext: false,
   var: false

@@ -74,17 +74,23 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       cacheValue = { code: cacheCode, type: "module" }
       cache.set(cacheFileName, cacheValue)
     } else {
-      try {
-        cacheValue = compiler.compile(sourceCode, {
-          cacheFileName,
-          cachePath,
-          filePath,
-          pkgInfo,
-          runtimeAlias
-        })
-      } catch (e) {
-        captureStackTrace(e, manager)
-        throw maskStackTrace(e, sourceCode)
+      const compilerOptions = {
+        cacheFileName,
+        cachePath,
+        filePath,
+        pkgInfo,
+        runtimeAlias
+      }
+
+      if (pkgOptions.debug) {
+        cacheValue = compiler.compile(sourceCode, compilerOptions)
+      } else {
+        try {
+          cacheValue = compiler.compile(sourceCode, compilerOptions)
+        } catch (e) {
+          captureStackTrace(e, manager)
+          throw maskStackTrace(e, sourceCode)
+        }
       }
     }
   }
@@ -119,10 +125,14 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       runtimeAlias + ".r(" + async + "function(){" + output + "\n})"
   }
 
-  try {
+  if (pkgOptions.debug) {
     mod._compile(output, filePath)
-  } catch (e) {
-    throw maskStackTrace(e, sourceCode, compiledCode)
+  } else {
+    try {
+      mod._compile(output, filePath)
+    } catch (e) {
+      throw maskStackTrace(e, sourceCode, compiledCode)
+    }
   }
 
   if (isESM) {

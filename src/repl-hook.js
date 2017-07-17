@@ -40,13 +40,14 @@ if (rootModule.filename === null &&
   const methodWrapper = function (manager, func, pkgInfo, code, options) {
     options = createOptions(options)
 
-    const cache = pkgInfo.cache
-    const cacheFileName = getCacheFileName(null, code, pkgInfo)
-    const cacheValue = cache.get(cacheFileName)
-
     if (options.produceCachedData === void 0) {
       options.produceCachedData = true
     }
+
+    const cache = pkgInfo.cache
+    const cacheFileName = getCacheFileName(null, code, pkgInfo)
+    const cacheValue = cache.get(cacheFileName)
+    const pkgOptions = pkgInfo.options
 
     let output
 
@@ -58,15 +59,21 @@ if (rootModule.filename === null &&
         options.cachedData = cacheValue.data
       }
     } else {
-      try {
-        output = compiler.compile(code, {
-          cacheFileName,
-          pkgInfo,
-          runtimeAlias
-        }).code
-      } catch (e) {
-        captureStackTrace(e, manager)
-        throw maskStackTrace(e, code)
+      const compilerOptions = {
+        cacheFileName,
+        pkgInfo,
+        runtimeAlias
+      }
+
+      if (pkgOptions.debug) {
+        output = compiler.compile(code, compilerOptions).code
+      } else {
+        try {
+          output = compiler.compile(code, compilerOptions).code
+        } catch (e) {
+          captureStackTrace(e, manager)
+          throw maskStackTrace(e, code)
+        }
       }
     }
 
@@ -76,14 +83,22 @@ if (rootModule.filename === null &&
 
     let result
 
-    try {
+    if (pkgOptions.debug) {
       result = func.call(this, output, options)
-    } catch (e) {
-      captureStackTrace(e, manager)
-      throw maskStackTrace(e, code, output)
+    } else {
+      try {
+        result = func.call(this, output, options)
+      } catch (e) {
+        captureStackTrace(e, manager)
+        throw maskStackTrace(e, code, output)
+      }
     }
 
     const runWrapper = function (func, args) {
+      if (pkgOptions.debug) {
+        return func.apply(this, args)
+      }
+
       try {
         return func.apply(this, args)
       } catch (e) {
