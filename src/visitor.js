@@ -39,16 +39,18 @@ class Visitor {
       return
     }
 
-    if (path.getNode() === value) {
-      const methodName = "visit" + value.type
-
-      if (typeof this[methodName] === "function") {
-        // The method must call this.visitChildren(path) to continue traversing.
-        this[methodName](path)
-      } else {
-        this.visitChildren(path)
-      }
+    if (path.getNode() !== value) {
+      return
     }
+
+    // The method must call this.visitChildren(path) to continue traversing.
+    let methodName = "visit" + value.type
+
+    if (typeof this[methodName] !== "function") {
+      methodName = "visitChildren"
+    }
+
+    this[methodName](path)
   }
 
   visitChildren(path) {
