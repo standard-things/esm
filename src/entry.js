@@ -303,9 +303,7 @@ function getExportByName(entry, name) {
 function runGetter(getter) {
   if (typeof getter === "function") {
     try {
-      const result = getter()
-      ++getter.runCount
-      return result
+      return getter()
     } catch (e) {}
   }
 
