@@ -1,3 +1,3 @@
-import * as n from "../abc.js"
+import * as ns from "../abc.js"
 export * from "./def.js"
-export { n as abc }
+export { ns as abc }

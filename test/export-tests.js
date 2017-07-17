@@ -10,7 +10,7 @@ try {
 
 describe("export declarations", () => {
   it("should support * exports", () =>
-    import("./export/ns.js")
+    import("./export/all.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
