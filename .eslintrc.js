@@ -22,6 +22,7 @@ module.exports = {
     "consistent-return": "error",
     curly: "error",
     "eol-last": "error",
+    "import/no-anonymous-default-export": "error",
     "import/no-duplicates": "error",
     "import/no-extraneous-dependencies": ["error", { packageDir: "./" }],
     "import/prefer-default-export": "error",
