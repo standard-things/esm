@@ -1,6 +1,8 @@
 const esSymKey = Symbol.for("__esModule")
 
-export default function setESModule(exported) {
+function setESModule(exported) {
   exported[esSymKey] = true
   return exported
 }
+
+export default setESModule

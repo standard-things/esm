@@ -1,4 +1,4 @@
-export default function wrapApply(func, wrapper) {
+function wrapApply(func, wrapper) {
   return function () {
     let i = -1
     const argCount = arguments.length
@@ -11,3 +11,5 @@ export default function wrapApply(func, wrapper) {
     return wrapper.call(this, func, args)
   }
 }
+
+export default wrapApply

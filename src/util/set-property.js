@@ -7,7 +7,9 @@ const defaultDescriptor = {
   writable: true
 }
 
-export default function setProperty(object, key, descriptor) {
+function setProperty(object, key, descriptor) {
   descriptor = createOptions(descriptor, defaultDescriptor)
   return Object.defineProperty(object, key, descriptor)
 }
+
+export default setProperty

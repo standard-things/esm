@@ -1,4 +1,4 @@
-export default function getNamesFromPattern(pattern) {
+function getNamesFromPattern(pattern) {
   let i = -1
   const names = []
   const queue = [pattern]
@@ -37,3 +37,5 @@ export default function getNamesFromPattern(pattern) {
 
   return names
 }
+
+export default getNamesFromPattern

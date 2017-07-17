@@ -2,7 +2,7 @@ import isObjectLike from "./is-object-like.js"
 
 const hasOwn = Object.prototype.hasOwnProperty
 
-export default function assign(object) {
+function assign(object) {
   if (! isObjectLike(object)) {
     return object
   }
@@ -26,3 +26,5 @@ export default function assign(object) {
 
   return object
 }
+
+export default assign

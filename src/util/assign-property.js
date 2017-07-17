@@ -4,7 +4,7 @@ import removeProperty from "./remove-property.js"
 import setGetter from "./set-getter.js"
 import setSetter from "./set-setter.js"
 
-export default function assignProperty(object, source, key, removeBefore) {
+function assignProperty(object, source, key, removeBefore) {
   const getter = getGetter(source, key)
   const setter = getSetter(source, key)
   const hasGetter = typeof getter === "function"
@@ -28,3 +28,5 @@ export default function assignProperty(object, source, key, removeBefore) {
 
   return object
 }
+
+export default assignProperty
