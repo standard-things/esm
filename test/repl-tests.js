@@ -1,7 +1,8 @@
+import Runtime from "../build/runtime.js"
+
 import assert from "assert"
 import module from "./repl/module.js"
 import repl from "repl"
-import Runtime from "../build/runtime.js"
 import vm from "vm"
 
 describe("Node REPL", () => {

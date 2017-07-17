@@ -37,7 +37,7 @@ module.exports = {
     "no-var": "error",
     "one-var": ["error", "never"],
     semi: ["error", "never"],
-    "sort-imports": ["error", { ignoreCase: true }],
+    "sort-imports": "error",
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
     "sort-vars": "error",
     "space-before-function-paren": ["error", { named: "never" }],

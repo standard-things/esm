@@ -1,7 +1,8 @@
-import assert from "assert"
-import array from "../fixture/export/default/array.js"
 import Anon from "../fixture/export/default/anon-class.js"
 import Named from "../fixture/export/default/class.js"
+
+import assert from "assert"
+import array from "../fixture/export/default/array.js"
 import expr from "../fixture/export/default/expression.js"
 import anonFunc from "../fixture/export/default/anon-function.js"
 import func from "../fixture/export/default/function.js"
