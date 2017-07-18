@@ -6,59 +6,64 @@ import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
 class Compiler {
-  static compile(content, options) {
+  static compile(code, options) {
     options = createOptions(options)
     return typeof options.filePath === "string"
-      ? compileWithFilename(content, options)
-      : compileAndCache(content, options)
+      ? compileWithFilename(code, options)
+      : compileAndCache(code, options)
   }
 }
 
-function compileWithFilename(content, options) {
+function compileWithFilename(code, options) {
   try {
-    return compileAndWrite(content, options)
+    return compileAndWrite(code, options)
   } catch (e) {
     e.message += " while processing file: " + options.filePath
     throw e
   }
 }
 
-function compileAndCache(content, options) {
-  const result = compiler.compile(content, toCompileOptions(options))
+function compileAndCache(code, options) {
+  const result = compiler.compile(code, toCompileOptions(options))
   options.pkgInfo.cache.set(options.cacheFileName, result)
   return result
 }
 
-function compileAndWrite(content, options) {
-  const result = compileAndCache(content, options)
+function compileAndWrite(code, options) {
+  const result = compileAndCache(code, options)
 
-  if (result.type === "module") {
-    const cachePath = options.cachePath
-    const cacheFileName = options.cacheFileName
-    const cacheFilePath = path.join(cachePath, cacheFileName)
-    const isGzipped = path.extname(cacheFilePath) === ".gz"
-    const pkgInfo = options.pkgInfo
-
-    const code = result.code
-    const content = () => isGzipped ? gzip(code) : code
-    const encoding = isGzipped ? null : "utf8"
-    const scopePath = pkgInfo.dirPath
-
-    writeFileDefer(cacheFilePath, content, { encoding, scopePath }, (success) => {
-      if (success) {
-        // Delete expired cache files.
-        const shortname = cacheFileName.slice(0, 8)
-        pkgInfo.cache.keys().forEach((key) => {
-          if (key !== cacheFileName &&
-              key.startsWith(shortname)) {
-            removeFile(path.join(cachePath, key))
-          }
-        })
-      }
-    })
+  if (result.type !== "module") {
+    return result
   }
 
+  const cachePath = options.cachePath
+  const cacheFileName = options.cacheFileName
+  const cacheFilePath = path.join(cachePath, cacheFileName)
+  const output = result.code
+  const isGzipped = path.extname(cacheFilePath) === ".gz"
+  const content = () => isGzipped ? gzip(output) : output
+  const encoding = isGzipped ? null : "utf8"
+  const pkgInfo = options.pkgInfo
+  const scopePath = pkgInfo.dirPath
+  const writeOptions = { encoding, scopePath }
+
+  writeFileDefer(cacheFilePath, content, writeOptions, (success) => {
+    if (success) {
+      removeExpired(pkgInfo.cache, cachePath, cacheFileName)
+    }
+  })
+
   return result
+}
+
+function removeExpired(cache, cachePath, cacheFileName) {
+  const shortname = cacheFileName.slice(0, 8)
+  cache.keys().forEach((key) => {
+    if (key !== cacheFileName &&
+        key.startsWith(shortname)) {
+      removeFile(path.join(cachePath, key))
+    }
+  })
 }
 
 function toCompileOptions(options) {
