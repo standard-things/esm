@@ -43,12 +43,6 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should not export the default binding of namespace exports", () =>
-    import("./misc/export-all.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should not export duplicate bindings", () =>
     import("./misc/export-dups.js")
       .then(() => assert.ok(false))
