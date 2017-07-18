@@ -13,6 +13,7 @@
   "scripts": {
     "prebuild:prod": "optional-dev-dependency",
     "precommit": "npm run lint",
+    "prelint": "npm run pretest",
     "prepack": "npm run test:prod",
     "pretest": "npm run build -- --test",
     "pretest:prod": "npm run build:prod -- --test",
