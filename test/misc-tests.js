@@ -54,7 +54,7 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(/been declared/i.test(e.message))
+        assert.ok(e.message.endsWith("has already been declared"))
       })
   )
 
@@ -67,7 +67,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
-          assert.ok(/not found/i.test(e.message))
+          assert.ok(e.message.endsWith("not found"))
         })
     ))
   )
