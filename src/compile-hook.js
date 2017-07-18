@@ -48,7 +48,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const md5Hash = path.basename(cacheFileName, extname).substr(8, 3)
   const runtimeAlias = encodeIdent("_" + md5Hash)
 
-  const read = (filePath) => (
+  const readCode = (filePath) => (
     pkgOptions.gz && path.extname(filePath) === ".gz"
       ? gunzip(readFile(filePath), "utf8")
       : readFile(filePath, "utf8")
@@ -63,10 +63,10 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   let cacheValue = cache.get(cacheFileName)
 
   if (cacheValue === true) {
-    cacheCode = read(path.join(cachePath, cacheFileName))
-    sourceCode = () => read(filePath)
+    cacheCode = readCode(path.join(cachePath, cacheFileName))
+    sourceCode = () => readCode(filePath)
   } else {
-    sourceCode = read(filePath)
+    sourceCode = readCode(filePath)
   }
 
   if (! isObject(cacheValue)) {
