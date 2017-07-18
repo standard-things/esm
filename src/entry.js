@@ -142,6 +142,9 @@ class Entry {
         assignProperty(namespace, namespace, names[i], true)
       }
 
+      // Section 9.4.6
+      // Module namespace objects are not extensible.
+      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
       return Object.seal(namespace)
     })
 
@@ -258,6 +261,9 @@ function createNamespace() {
   const namespace = new FastObject
 
   if (useToStringTag) {
+    // Section 26.3.1
+    // The value of the @@toStringTag property is "Module".
+    // https://tc39.github.io/ecma262/#sec-@@tostringtag
     setProperty(namespace, Symbol.toStringTag, {
       configurable: false,
       enumerable: false,
