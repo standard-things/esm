@@ -12,15 +12,15 @@ describe("Node REPL", () => {
     r.context.module.exports = {}
     Runtime.enable(r.context.module)
 
-    assert.strictEqual(typeof assertStrictEqual, "undefined")
+    assert.strictEqual(typeof globalAssert, "undefined")
 
     r.eval(
-      'import { strictEqual as assertStrictEqual } from "assert"',
+      'import { default as globalAssert } from "assert"',
       null, // Context.
       "repl",
       () => {
         /* global assertStrictEqual: false */
-        assertStrictEqual(typeof assertStrictEqual, "function")
+        assert.strictEqual(typeof globalAssert, "function")
         done()
       }
     )
@@ -34,11 +34,11 @@ describe("Node REPL", () => {
     Runtime.enable(module)
 
     r.eval(
-      'import { strictEqual } from "assert"',
+      'import { default as localAssert } from "assert"',
       context,
       "repl",
       () => {
-        context.strictEqual(typeof context.strictEqual, "function")
+        assert.strictEqual(typeof context.localAssert, "function")
         done()
       }
     )

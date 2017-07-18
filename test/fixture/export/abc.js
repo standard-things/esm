@@ -1,5 +1,4 @@
-"use strict"
-
-exports.a = "a"
-exports.b = "b"
-exports.c = "c"
+export const a = "a"
+export const b = "b"
+export const c = "c"
+export default "default"

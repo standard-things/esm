@@ -11,7 +11,7 @@ export function check() {
     a: "a",
     b: "b",
     c: "c",
-    default: { a: "a", b: "b", c: "c" }
+    default: "default"
   }
 
   const mutualNs = {

@@ -1,2 +1,2 @@
 export default "default"
-export * from "./def.js"
+export * from "./abc.js"

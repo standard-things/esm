@@ -1,4 +1,5 @@
-export const d = "d"
-export const e = "e"
-export const f = "f"
-export default "default"
+"use strict"
+
+exports.d = "d"
+exports.e = "e"
+exports.f = "f"

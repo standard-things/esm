@@ -1,3 +1,8 @@
 "use strict"
 
-module.exports = Object.assign(() => "ok", require("../export/abc.js"))
+const func = () => "ok"
+func.a = "a"
+func.b = "b"
+func.c = "c"
+
+module.exports = func

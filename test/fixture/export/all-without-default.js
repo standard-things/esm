@@ -1,1 +1,1 @@
-export * from "./def.js"
+export * from "./abc.js"

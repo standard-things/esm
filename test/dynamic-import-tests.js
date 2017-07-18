@@ -8,7 +8,7 @@ const abcNs = {
   a: "a",
   b: "b",
   c: "c",
-  default: { a: "a", b: "b", c: "c" }
+  default: "default"
 }
 
 describe("dynamic import", () => {

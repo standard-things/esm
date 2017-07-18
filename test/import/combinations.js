@@ -1,20 +1,35 @@
 import assert from "assert"
+
 import * as abc1 from "../fixture/export/abc.js"
-import abc2, * as abc3 from "../fixture/export/abc.js"
-import { default as abc4 } from "../fixture/export/abc.js"
-import abc5, { a as aa, b as bb, c } from "../fixture/export/abc.js"
+import abc2, { a as aa, b as bb, c } from "../fixture/export/abc.js"
+import * as def1 from "../fixture/export/def.js"
+import def2, * as def3 from "../fixture/export/def.js"
+import { default as def4 } from "../fixture/export/def.js"
 
 export function check() {
   const abcNs = {
     a: "a",
     b: "b",
     c: "c",
-    default: { a: "a", b: "b", c: "c" }
+    default: "default"
+  }
+
+  const defNs = {
+    default: {
+      d: "d",
+      e: "e",
+      f: "f"
+    }
   }
 
   assert.deepEqual(abc1, abcNs)
-  assert.strictEqual(abc1, abc3)
-  assert.strictEqual(abc1.default, abc2)
-  assert.strictEqual(abc1.default, abc4)
-  assert.strictEqual(abc1.default, abc5)
+  assert.strictEqual(abc2, "default")
+  assert.strictEqual(aa, "a")
+  assert.strictEqual(bb, "b")
+  assert.strictEqual(c, "c")
+
+  assert.deepEqual(def1, defNs)
+  assert.strictEqual(def1, def3)
+  assert.strictEqual(def1.default, def2)
+  assert.strictEqual(def1.default, def4)
 }

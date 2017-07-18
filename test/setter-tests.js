@@ -7,7 +7,7 @@ describe("setters", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should be called for untouched CJS modules, too", () =>
+  it("should be called for untouched CJS modules", () =>
     import("./setter/cjs.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

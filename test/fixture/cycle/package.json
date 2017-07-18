@@ -1,0 +1,11 @@
+{
+  "name": "cycle",
+  "private": true,
+  "@std/esm": {
+    "cjs": true,
+    "esm": "js"
+  },
+  "dependencies": {
+    "@std/esm": "*"
+  }
+}

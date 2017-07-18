@@ -1,11 +1,11 @@
 import assert from "assert"
-import def, { d, e, f as g } from "../fixture/export/all-with-default.js"
+import def, { a, b, c as d } from "../fixture/export/all-with-default.js"
 import * as ns from "../fixture/export/all-without-default.js"
 
 export function check() {
-  assert.strictEqual(d, "d")
-  assert.strictEqual(e, "e")
-  assert.strictEqual(g, "f")
+  assert.strictEqual(a, "a")
+  assert.strictEqual(b, "b")
+  assert.strictEqual(d, "c")
   assert.strictEqual(def, "default")
-  assert.deepEqual(ns, { d: "d", e: "e", f: "f" })
+  assert.deepEqual(ns, { a: "a", b: "b", c: "c" })
 }
