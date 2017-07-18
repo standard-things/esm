@@ -7,6 +7,7 @@ import * as fns from "../fixture/cjs/exports-function.js"
 import fdef, { a as fa, b as fb, c as fc } from "../fixture/cjs/exports-function.js"
 import ndef, * as nns from "../fixture/cjs/exports-null.js"
 import odef, { a as oa, b as ob, c as oc } from "../fixture/cjs/exports-object.js"
+import udef, * as uns from "../fixture/cjs/exports-undefined.js"
 import * as empty from "../fixture/cjs/exports-empty.js"
 import * as emptyESM from "../fixture/cjs/exports-esmodule-empty.js"
 import * as getSet from "../fixture/cjs/exports-get-set.js"
@@ -28,6 +29,9 @@ export function check() {
 
   assert.deepEqual(odef, { a: 1, b: 2, c: 3 })
   assert.deepEqual([oa, ob, oc], [1, 2, 3])
+
+  assert.strictEqual(udef, void 0)
+  assert.strictEqual(uns.default, udef)
 
   add(10)
   assert.strictEqual(value, 10)
