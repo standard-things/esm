@@ -1,5 +1,5 @@
 import assert from "assert"
-import { value } from "../fixture/const.js"
+import { value } from "../fixture/export/const.js"
 
 export function check() {
   value = 2
