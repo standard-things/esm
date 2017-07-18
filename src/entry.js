@@ -227,6 +227,13 @@ function assignExportsToNamespace(entry) {
   // the exported object should be namespace-like and safe to assign directly.
   if (! isESM) {
     namespace.default = exported
+
+    // Section 4.6
+    // Step 4: Create an ESM with `{default:module.exports}` as its namespace
+    // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#46-es-consuming-commonjs
+    if (! entry.options.cjs)  {
+      return
+    }
   }
 
   let i = -1

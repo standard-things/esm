@@ -31,9 +31,10 @@ function managerWrapper(manager, func, mod, filePath) {
 }
 
 function methodWrapper(manager, func, pkgInfo, mod, filePath) {
-  const cachePath = pkgInfo.cachePath
-  const extname = path.extname(filePath)
   const pkgOptions = pkgInfo.options
+  const cachePath = pkgInfo.cachePath
+  const entry = Entry.get(mod, mod.exports, pkgOptions)
+  const extname = path.extname(filePath)
 
   if (cachePath === null ||
       (extname !== ".mjs" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
@@ -140,8 +141,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   mod.loaded = true
-
-  const entry = Entry.get(mod, mod.exports, pkgOptions)
 
   if (pkgOptions.cjs) {
     const getterPairs = keys(mod.exports)
