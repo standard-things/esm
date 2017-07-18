@@ -57,6 +57,20 @@ describe("spec compliance", () => {
         assert.ok(/been declared/i.test(e.message))
       })
   )
+
+  it("should error on importing non-exported binding", () =>
+    Promise.all([
+      "./misc/import-missing-cjs.js",
+      "./misc/import-missing-esm.js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof SyntaxError)
+          assert.ok(/does not provide/i.test(e.message))
+        })
+    ))
+  )
 })
 
 describe("built-in modules", () => {

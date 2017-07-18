@@ -305,9 +305,18 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(entry, name) {
-  return name === "*"
-    ? entry.namespace
-    : entry._namespace[name]
+  if (name === "*") {
+    return entry.namespace
+  }
+
+  const namespace = entry._namespace
+
+  if (entry._loaded &&
+      ! (name in namespace)) {
+    throw new SyntaxError("The requested module does not provide an export named '" + name + "'")
+  }
+
+  return namespace[name]
 }
 
 function runGetter(getter) {
