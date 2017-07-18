@@ -15,12 +15,6 @@ describe("export declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support re-exporting import * alongside export *", () =>
-    import("./export/re-export.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should tolerate mutual * exports", () =>
     import("./export/all-mutual.js")
       .then((ns) => ns.check())
@@ -29,12 +23,6 @@ describe("export declarations", () => {
 
   it("should support specifiers that shadow Object.prototype", () =>
     import("./export/shadowed.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should support named re-exports", () =>
-    import("./export/re-export-named.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
