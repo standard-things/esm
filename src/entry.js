@@ -17,6 +17,14 @@ const useToStringTag = typeof Symbol.toStringTag === "symbol"
 class Entry {
   /* eslint lines-around-comment: off */
   constructor(mod, exported, options) {
+    let sourceType = "script"
+
+    if (isESModule(exported)) {
+      sourceType = "module"
+    } else if (isESModuleLike(exported)) {
+      sourceType = "module-like"
+    }
+
     // A boolean indicating whether the module namespace has changed.
     this._changed = true
     // A number indicating the loading state of the module.
@@ -38,13 +46,7 @@ class Entry {
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
     // Detect the module type.
-    this.sourceType = "script"
-
-    if (isESModule(exported)) {
-      this.sourceType = "module"
-    } else if (isESModuleLike(exported)) {
-      this.sourceType = "module-like"
-    }
+    this.sourceType = sourceType
   }
 
   static get(mod, exported, options) {
