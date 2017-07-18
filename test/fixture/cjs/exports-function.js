@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = Object.assign(() => "ok", require("../abc.js"))
+module.exports = Object.assign(() => "ok", require("../export/abc.js"))

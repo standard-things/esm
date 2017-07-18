@@ -3,7 +3,7 @@ import assert from "assert"
 import compiler from "../build/compiler.js"
 import path from "path"
 
-const abcId = "./fixture/abc.js"
+const abcId = "./fixture/export/abc.js"
 const abcNs = {
   a: "a",
   b: "b",
@@ -50,7 +50,7 @@ describe("dynamic import", () => {
     import
     /* eslint no-unexpected-multiline: off */
     (
-    "./fixture/abc.js"
+    "./fixture/export/abc.js"
     )
 
       .then((ns) => assert.deepEqual(ns, abcNs))
@@ -58,13 +58,13 @@ describe("dynamic import", () => {
   )
 
   it("should support import() in an assignment", () => {
-    const p = import("./fixture/abc.js")
+    const p = import("./fixture/export/abc.js")
     assert.ok(p instanceof Promise)
   })
 
   it("should support import() in a function", () => {
     function p() {
-      return import("./fixture/abc.js")
+      return import("./fixture/export/abc.js")
     }
 
     assert.ok(p() instanceof Promise)
@@ -72,7 +72,7 @@ describe("dynamic import", () => {
 
   it("should support import() with yield", () => {
     function* p() {
-      yield import("./fixture/abc.js")
+      yield import("./fixture/export/abc.js")
     }
 
     assert.ok(p())

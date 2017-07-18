@@ -1,1 +1,1 @@
-import { d } from "../fixture/abc.js"
+import { d } from "../fixture/export/abc.js"

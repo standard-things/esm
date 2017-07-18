@@ -1,8 +1,8 @@
 import assert from "assert"
-import * as abc1 from "../fixture/abc.js"
-import abc2, * as abc3 from "../fixture/abc.js"
-import { default as abc4 } from "../fixture/abc.js"
-import abc5, { a as aa, b as bb, c } from "../fixture/abc.js"
+import * as abc1 from "../fixture/export/abc.js"
+import abc2, * as abc3 from "../fixture/export/abc.js"
+import { default as abc4 } from "../fixture/export/abc.js"
+import abc5, { a as aa, b as bb, c } from "../fixture/export/abc.js"
 
 export function check() {
   const abcNs = {

@@ -1,8 +1,8 @@
 import assert from "assert"
 import * as ans from "../fixture/export/all-mutual/a.js"
 import * as bns from "../fixture/export/all-mutual/b.js"
-import * as ns1 from "../fixture/abc.js"
-import * as ns2 from "../fixture/abc.js"
+import * as ns1 from "../fixture/export/abc.js"
+import * as ns2 from "../fixture/export/abc.js"
 
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 

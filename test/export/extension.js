@@ -1,5 +1,5 @@
 import assert from "assert"
-import def from "../fixture/abc.js"
+import def from "../fixture/export/abc.js"
 import {
   def1, def2, def3, def4, def5,
   ns1, ns2, ns3, ns4, ns5,
