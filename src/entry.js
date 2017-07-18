@@ -321,7 +321,7 @@ function getExportByName(entry, name) {
 
   if (entry._loaded &&
       ! (name in namespace)) {
-    throw new SyntaxError("Import '" + name + "' not found")
+    throw new SyntaxError("The requested module does not provide an export named '" + name + "'")
   }
 
   return namespace[name]

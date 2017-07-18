@@ -61,7 +61,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
-          assert.ok(e.message.endsWith("not found"))
+          assert.ok(e.message.startsWith("The requested module does not provide an export named"))
         })
     ))
   )
