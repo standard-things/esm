@@ -10,6 +10,7 @@ import ident from "../fixture/export/default/identifier.js"
 import number from "../fixture/export/default/number.js"
 import object from "../fixture/export/default/object.js"
 import redef from "../fixture/export/default/re-export.js"
+import undef from "../fixture/export/default/undefined.js"
 
 export function check() {
   assert.deepEqual(array, [1, 2, 3])
@@ -22,4 +23,5 @@ export function check() {
   assert.strictEqual(number, 1)
   assert.deepEqual(object, { value: 1 })
   assert.strictEqual(redef, object)
+  assert.strictEqual(undef, void 0)
 }
