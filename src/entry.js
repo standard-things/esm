@@ -56,10 +56,12 @@ class Entry {
 
     if (isObjectLike(exported)) {
       let entry = entryMap.get(exported)
+
       if (entry === void 0) {
         entry = new Entry(mod, exported, options)
         entryMap.set(exported, entry)
       }
+
       return entry
     }
 
