@@ -10,6 +10,8 @@ import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
 import gunzip from "./fs/gunzip.js"
+import isESModule from "./util/is-esmodule.js"
+import isESModuleLike from "./util/is-esmodule-like.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
@@ -33,7 +35,6 @@ function managerWrapper(manager, func, mod, filePath) {
 function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const pkgOptions = pkgInfo.options
   const cachePath = pkgInfo.cachePath
-  const entry = Entry.get(mod, mod.exports, pkgOptions)
   const extname = path.extname(filePath)
 
   if (cachePath === null ||
@@ -97,11 +98,14 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   const isESM = cacheValue.type === "module"
+  const exported = isESM ? Object.create(null) : mod.exports
+
   let output = cacheValue.code
   let compiledCode = output
+  let entry = Entry.get(mod, exported, pkgOptions)
 
   if (isESM) {
-    Runtime.enable(mod, pkgOptions)
+    Runtime.enable(mod, exported, pkgOptions)
 
     let async = ""
 
@@ -138,6 +142,14 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (isESM) {
     return
+  }
+
+  entry = Entry.get(mod, mod.exports, pkgOptions)
+
+  if (isESModule(exported)) {
+    entry.sourceType = "module"
+  } else if (isESModuleLike(exported)) {
+    entry.sourceType = "module-like"
   }
 
   mod.loaded = true

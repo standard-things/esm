@@ -24,7 +24,7 @@ const resolveFilename = Module._resolveFilename
 const resolveCache = new FastObject
 
 class Runtime {
-  static enable(mod, options) {
+  static enable(mod, exported, options) {
     const object = mod.exports
 
     if (Object.getOwnPropertyNames(object).length) {
@@ -43,10 +43,13 @@ class Runtime {
       }
     }
 
-    const exported = setESModule(Object.create(null))
+    exported = setESModule(exported)
     options = createOptions(options)
 
-    object.entry = Entry.get(mod, exported, options)
+    const entry = Entry.get(mod, exported, options)
+    entry.sourceType = "module"
+
+    object.entry = entry
     object.module = mod
     object.options = options
   }
@@ -86,7 +89,6 @@ class Runtime {
     const namespace = entry._namespace
     const options = this.options
 
-    mod.exports = exported
     wrapper.call(options.cjs ? exported : void 0)
     mod.loaded = true
     entry.update().loaded()
