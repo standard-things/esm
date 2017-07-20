@@ -146,9 +146,9 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   entry = Entry.get(mod, mod.exports, pkgOptions)
 
-  if (isESModule(exported)) {
+  if (isESModule(mod.exports)) {
     entry.sourceType = "module"
-  } else if (isESModuleLike(exported)) {
+  } else if (isESModuleLike(mod.exports)) {
     entry.sourceType = "module-like"
   }
 
