@@ -54,20 +54,20 @@ class Entry {
       exported = mod.exports
     }
 
-    if (isObjectLike(exported)) {
-      let entry = entryMap.get(exported)
-
-      if (entry === void 0) {
-        entry = new Entry(mod, exported, options)
-        entryMap.set(exported, entry)
-      }
-
-      return entry
+    if (! isObjectLike(exported)) {
+      // Create a temporary Entry object to call entry.addSetters() and trigger
+      // entry.update(), so that runtime.watch() behaves as expected.
+      return new Entry(mod, exported)
     }
 
-    // Create a temporary Entry object to call entry.addSetters() and trigger
-    // entry.update(), so that runtime.watch() behaves as expected.
-    return new Entry(mod, exported)
+    let entry = entryMap.get(exported)
+
+    if (entry === void 0) {
+      entry = new Entry(mod, exported, options)
+      entryMap.set(exported, entry)
+    }
+
+    return entry
   }
 
   addGetters(getterPairs) {
