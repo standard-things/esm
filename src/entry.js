@@ -70,6 +70,12 @@ class Entry {
     return entry
   }
 
+  static set(exported, entry) {
+    if (isObjectLike(exported)) {
+      entryMap.set(exported, entry)
+    }
+  }
+
   addGetters(getterPairs) {
     let i = -1
     const pairCount = getterPairs.length
