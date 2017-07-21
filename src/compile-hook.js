@@ -5,7 +5,7 @@ import Runtime from "./runtime.js"
 import SemVer from "semver"
 import Wrapper from "./wrapper.js"
 
-import assignProperty from "./util/assign-property.js"
+import assignProperties from "./util/assign-properties.js"
 import captureStackTrace from "./error/capture-stack-trace.js"
 import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
@@ -145,11 +145,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     return
   }
 
-  const newEntry = Entry.get(mod, mod.exports, pkgOptions)
-
-  for (const key in newEntry) {
-    assignProperty(entry, newEntry, key)
-  }
+  assignProperties(entry, Entry.get(mod, mod.exports, pkgOptions))
 
   if (isESModule(mod.exports)) {
     entry.sourceType = "module"
