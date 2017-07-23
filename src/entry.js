@@ -1,7 +1,6 @@
 import FastObject from "./fast-object.js"
 import OrderedMap from "./ordered-map.js"
 
-import appendUniq from "./util/append-uniq.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
 import has from "./util/has.js"
@@ -202,11 +201,7 @@ class Entry {
   merge(otherEntry) {
     for (const key in otherEntry) {
       if (has(otherEntry, key)) {
-        if (key === "children" || key === "getters" || key === "setters") {
-          appendUniq(this[key], otherEntry[key])
-        } else {
-          assignProperty(this, otherEntry, key)
-        }
+        assignProperty(this, otherEntry, key)
       }
     }
   }
