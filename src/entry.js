@@ -1,8 +1,10 @@
 import FastObject from "./fast-object.js"
 import OrderedMap from "./ordered-map.js"
 
+import appendUniq from "./util/append-uniq.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
+import has from "./util/has.js"
 import isESModule from "./util/is-esmodule.js"
 import isESModuleLike from "./util/is-esmodule-like.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -92,6 +94,44 @@ class Entry {
     return this
   }
 
+  addGettersFrom(otherEntry) {
+    const getters = this.getters
+    const namespace = this._namespace
+    const isESM = otherEntry.sourceType !== "script"
+    const otherGetters = otherEntry.getters
+    const otherNamespace = otherEntry._namespace
+
+    for (const key in otherNamespace) {
+      if (key === "default") {
+        continue
+      }
+
+      let getter = getters.get(key)
+      const otherGetter = otherGetters.get(key)
+
+      if (typeof getter !== "function" &&
+          typeof otherGetter === "function") {
+        getter = otherGetter
+        getters.set(key, getter)
+      }
+
+      if (typeof getter !== "function" ||
+          typeof otherGetter !== "function") {
+        continue
+      }
+
+      if (getter.owner.id === otherGetter.owner.id) {
+        if (isESM) {
+          namespace[key] = otherNamespace[key]
+        } else {
+          assignProperty(namespace, otherNamespace, key)
+        }
+      } else {
+        throw new SyntaxError("Identifier '" + key + "' has already been declared")
+      }
+    }
+  }
+
   addSetters(setterPairs, parent) {
     let i = -1
     const pairCount = setterPairs.length
@@ -160,39 +200,13 @@ class Entry {
   }
 
   merge(otherEntry) {
-    const getters = this.getters
-    const namespace = this._namespace
-    const isESM = otherEntry.sourceType !== "script"
-    const otherGetters = otherEntry.getters
-    const otherNamespace = otherEntry._namespace
-
-    for (const key in otherNamespace) {
-      if (key === "default") {
-        continue
-      }
-
-      let getter = getters.get(key)
-      const otherGetter = otherGetters.get(key)
-
-      if (typeof getter !== "function" &&
-          typeof otherGetter === "function") {
-        getter = otherGetter
-        getters.set(key, getter)
-      }
-
-      if (typeof getter !== "function" ||
-          typeof otherGetter !== "function") {
-        continue
-      }
-
-      if (getter.owner.id === otherGetter.owner.id) {
-        if (isESM) {
-          namespace[key] = otherNamespace[key]
+    for (const key in otherEntry) {
+      if (has(otherEntry, key)) {
+        if (key === "children" || key === "getters" || key === "setters") {
+          appendUniq(this[key], otherEntry[key])
         } else {
-          assignProperty(namespace, otherNamespace, key)
+          assignProperty(this, otherEntry, key)
         }
-      } else {
-        throw new SyntaxError("Identifier '" + key + "' has already been declared")
       }
     }
   }

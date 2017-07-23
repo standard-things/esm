@@ -79,7 +79,7 @@ class Runtime {
   }
 
   nsSetter() {
-    return (childNamespace, childEntry) => this.entry.merge(childEntry)
+    return (childNamespace, childEntry) => this.entry.addGettersFrom(childEntry)
   }
 
   run(wrapper) {
