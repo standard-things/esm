@@ -36,8 +36,8 @@ class Entry {
     this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
-    // Detect the module type.
-    this.sourceType = getSourceType(exported)
+    // Set the default source type.
+    this.sourceType = "script"
   }
 
   static get(mod, exported, options) {
@@ -199,7 +199,6 @@ class Entry {
       }
     }
 
-    this.sourceType = getSourceType(this.exports)
     return this
   }
 
