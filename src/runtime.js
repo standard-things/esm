@@ -7,7 +7,7 @@ import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 import path from "path"
-import setESModule from "./util/set-esmodule.js"
+import setModule from "./util/set-module.js"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
@@ -43,7 +43,7 @@ class Runtime {
       }
     }
 
-    exported = setESModule(exported)
+    exported = setModule(exported)
     options = createOptions(options)
 
     const entry = Entry.get(mod, exported, options)

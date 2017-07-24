@@ -2,7 +2,7 @@ import isObjectLike from "./is-object-like.js"
 
 const esSymKey = Symbol.for("__esModule")
 
-function setESModule(exported) {
+function setModule(exported) {
   if (isObjectLike(exported)) {
     exported[esSymKey] = true
   }
@@ -10,4 +10,4 @@ function setESModule(exported) {
   return exported
 }
 
-export default setESModule
+export default setModule
