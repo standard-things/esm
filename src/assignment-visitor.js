@@ -40,11 +40,68 @@ function assignmentHelper(visitor, path, childName) {
 
   // Wrap assignments to exported identifiers with runtime.update().
   while (nameCount--) {
-    if (visitor.exportedLocalNames[names[nameCount]] === true) {
+    const name = names[nameCount]
+
+    if (visitor.exportedLocalNames[name] === true &&
+        ! isShadowed(path, name)) {
       wrap(visitor, path)
       return
     }
   }
+}
+
+function hasNamed(nodes, name) {
+  let i = -1
+  const nodeCount = nodes.length
+
+  while (++i < nodeCount) {
+    const node = nodes[i]
+    const identifier = node.type === "VariableDeclarator" ? node.id : node
+
+    if (identifier.name === name) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function hasParam(node, name) {
+  return hasNamed(node.params, name)
+}
+
+function hasVariable(node, name) {
+  let i = -1
+  const body = node.body
+  const stmtCount = body.length
+
+  while (++i < stmtCount) {
+    const stmt = body[i]
+
+    if (stmt.type === "VariableDeclaration" &&
+        hasNamed(stmt.declarations, name)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function isShadowed(path, name) {
+  let shadowed = false
+
+  path.getParentNode((parent) => {
+    const type = parent.type
+
+    if ((type === "BlockStatement" && hasVariable(parent, name)) ||
+        (type === "FunctionDeclaration" && hasParam(parent, name))) {
+      return shadowed = true
+    }
+
+    return false
+  })
+
+  return shadowed
 }
 
 function wrap(visitor, path) {
