@@ -198,6 +198,10 @@ class Entry {
   }
 
   merge(otherEntry) {
+    if (otherEntry === this) {
+      return this
+    }
+
     for (const key in otherEntry) {
       assignProperty(this, otherEntry, key)
     }
