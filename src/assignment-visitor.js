@@ -13,7 +13,8 @@ class AssignmentVisitor extends Visitor {
   }
 
   visitAssignmentExpression(path) {
-    return assignmentHelper(this, path, "left")
+    this.visitChildren(path)
+    assignmentHelper(this, path, "left")
   }
 
   visitCallExpression(path) {
@@ -27,13 +28,12 @@ class AssignmentVisitor extends Visitor {
   }
 
   visitUpdateExpression(path) {
-    return assignmentHelper(this, path, "argument")
+    this.visitChildren(path)
+    assignmentHelper(this, path, "argument")
   }
 }
 
 function assignmentHelper(visitor, path, childName) {
-  visitor.visitChildren(path)
-
   const child = path.getValue()[childName]
   const names = Parser.getNamesFromPattern(child)
   let nameCount = names.length
