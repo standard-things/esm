@@ -1,4 +1,4 @@
-_.e([["c",()=>c],["d",()=>d]]);_.e([["a",()=>a],["b",()=>b]]);const a = "a"
+_.e([["a",()=>a],["b",()=>b],["c",()=>c],["d",()=>d]]);const a = "a"
 const b = () => d
 let c // Lazy initialization.
 function d() {

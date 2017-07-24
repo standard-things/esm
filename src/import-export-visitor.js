@@ -15,8 +15,7 @@ class ImportExportVisitor extends Visitor {
 
     const codeToInsert =
       this.bodyInfo.hoistedPrefixString +
-      toModuleExport(this, this.bodyInfo.hoistedExportsMap, false) +
-      toModuleExport(this, this.bodyInfo.hoistedConstExportsMap, true) +
+      toModuleExport(this, this.bodyInfo.hoistedExportsMap) +
       this.bodyInfo.hoistedExportsString +
       this.bodyInfo.hoistedImportsString
 
@@ -307,7 +306,6 @@ function getBlockBodyInfo(visitor, path) {
   const bodyInfo = visitor.bodyInfo = Object.create(null)
   bodyInfo.insertCharIndex = insertCharIndex
   bodyInfo.insertNodeIndex = insertNodeIndex
-  bodyInfo.hoistedConstExportsMap = new OrderedMap
   bodyInfo.hoistedExportsMap = new OrderedMap
   bodyInfo.hoistedExportsString = ""
   bodyInfo.hoistedImportsString = ""
@@ -342,7 +340,6 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     return
   }
 
-  const constant = ! canExportedValuesChange(exportDeclPath.getValue())
   const exportedNames = mapOrString.keys()
   let nameCount = exportedNames.length
 
@@ -353,9 +350,7 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     assert.strictEqual(locals.length, 1)
 
     addToSpecifierMap(
-      constant
-        ? bodyInfo.hoistedConstExportsMap
-        : bodyInfo.hoistedExportsMap,
+      bodyInfo.hoistedExportsMap,
       exported,
       locals[0]
     )
