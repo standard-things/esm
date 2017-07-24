@@ -128,6 +128,8 @@ class Entry {
         throw new SyntaxError("Identifier '" + key + "' has already been declared")
       }
     }
+
+    return this
   }
 
   addSetters(setterPairs, parent) {
@@ -205,6 +207,8 @@ class Entry {
     for (const key in otherEntry) {
       assignProperty(this, otherEntry, key)
     }
+
+    return this
   }
 
   update() {
