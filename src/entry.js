@@ -205,7 +205,9 @@ class Entry {
   }
 
   update() {
-    this.sourceType = getSourceType(this.exports)
+    if (this.sourceType === "script") {
+      this.sourceType = getSourceType(this.exports)
+    }
 
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
