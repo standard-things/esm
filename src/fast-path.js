@@ -28,10 +28,10 @@ class FastPath {
   // accessing this.getValue() should be array-like. The visitor method will be
   // called with a reference to this path object for each element of the array.
   each(visitor, methodName) {
+    let i = -1
     const s = this.stack
     const array = s[s.length - 1]
 
-    let i = -1
     while (++i < array.length) {
       s.push(i, array[i])
       visitor[methodName](this)
@@ -70,6 +70,7 @@ function getNodeAt(path, pos) {
       return value
     }
   }
+
   return null
 }
 
