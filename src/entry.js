@@ -3,7 +3,6 @@ import OrderedMap from "./ordered-map.js"
 
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
-import has from "./util/has.js"
 import isESModule from "./util/is-esmodule.js"
 import isESModuleLike from "./util/is-esmodule-like.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -200,9 +199,7 @@ class Entry {
 
   merge(otherEntry) {
     for (const key in otherEntry) {
-      if (has(otherEntry, key)) {
-        assignProperty(this, otherEntry, key)
-      }
+      assignProperty(this, otherEntry, key)
     }
   }
 
