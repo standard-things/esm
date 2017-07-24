@@ -142,8 +142,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     return
   }
 
-  entry.merge(Entry.get(mod, mod.exports, pkgOptions))
-  Entry.set(mod.exports, entry)
+  Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, pkgOptions)))
 
   mod.loaded = true
 
