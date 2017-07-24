@@ -1,6 +1,5 @@
+import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
-
-const hasOwn = Object.prototype.hasOwnProperty
 
 function assign(object) {
   if (! isObjectLike(object)) {
@@ -18,7 +17,7 @@ function assign(object) {
     }
 
     for (const key in source) {
-      if (hasOwn.call(source, key)) {
+      if (has(source, key)) {
         object[key] = source[key]
       }
     }

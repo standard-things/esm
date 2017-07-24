@@ -3,6 +3,7 @@ import OrderedMap from "./ordered-map.js"
 
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
+import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import setGetter from "./util/set-getter.js"
@@ -12,7 +13,6 @@ const GETTER_ERROR = {}
 const entryMap = new WeakMap
 const esStrKey = "__esModule"
 const esSymKey = Symbol.for(esStrKey)
-const hasOwn = Object.prototype.hasOwnProperty
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
@@ -352,14 +352,12 @@ function getExportByName(entry, name) {
 }
 
 function getSourceType(exported) {
-  if (isObjectLike(exported)) {
-    if (hasOwn.call(exported, esSymKey) && exported[esSymKey] === true) {
-      return "module"
-    }
+  if (has(exported, esSymKey) && exported[esSymKey] === true) {
+    return "module"
+  }
 
-    if (hasOwn.call(exported, esStrKey) && exported[esStrKey] === true) {
-      return "module-like"
-    }
+  if (has(exported, esStrKey) && exported[esStrKey] === true) {
+    return "module-like"
   }
 
   return "script"
