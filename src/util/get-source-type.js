@@ -1,13 +1,18 @@
-import isESModule from "./is-esmodule.js"
-import isESModuleLike from "./is-esmodule-like.js"
+import isObjectLike from "./is-object-like.js"
+
+const esStrKey = "__esModule"
+const esSymKey = Symbol.for(esStrKey)
+const hasOwn = Object.prototype.hasOwnProperty
 
 function getSourceType(exported) {
-  if (isESModule(exported)) {
-    return "module"
-  }
+  if (isObjectLike(exported)) {
+    if (hasOwn.call(exported, esSymKey) && exported[esSymKey] === true) {
+      return "module"
+    }
 
-  if (isESModuleLike(exported)) {
-    return "module-like"
+    if (hasOwn.call(exported, esStrKey) && exported[esStrKey] === true) {
+      return "module-like"
+    }
   }
 
   return "script"
