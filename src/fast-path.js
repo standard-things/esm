@@ -4,6 +4,8 @@
 
 import isObject from "./util/is-object.js"
 
+const alwaysTrue = () => true
+
 class FastPath {
   constructor(ast) {
     this.stack = [ast]
@@ -39,32 +41,36 @@ class FastPath {
     }
   }
 
-  getNode() {
-    return getNodeAt(this, 0)
-  }
-
-  getParentNode() {
-    return getNodeAt(this, 1)
+  getParentNode(callback) {
+    return getNode(this, -2, callback)
   }
 
   getValue() {
     const s = this.stack
-    const len = s.length
-    return s[len - 1]
+    return s[s.length - 1]
   }
 }
 
-function getNodeAt(path, pos) {
-  const s = path.stack
-  let i = s.length
+function getNode(path, pos, callback) {
+  const stack = path.stack
+  const stackCount = stack.length
+  let i = stackCount
 
-  while (i--) {
+  if (typeof callback !== "function") {
+    callback = alwaysTrue
+  }
+
+  if (pos !== void 0) {
+    i = pos < 0 ? i + pos : pos
+  }
+
+  while (i-- > 0) {
     // Without a complete list of Node .type names, we have to settle for this
     // fuzzy matching of object shapes.
-    const value = s[i--]
+    const value = stack[i--]
     if (isObject(value) &&
         ! Array.isArray(value) &&
-        --pos < 0) {
+        callback(value)) {
       return value
     }
   }
