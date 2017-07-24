@@ -10,8 +10,6 @@ import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
 import gunzip from "./fs/gunzip.js"
-import isESModule from "./util/is-esmodule.js"
-import isESModuleLike from "./util/is-esmodule-like.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
@@ -145,13 +143,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   entry.merge(Entry.get(mod, mod.exports, pkgOptions))
-
-  if (isESModule(mod.exports)) {
-    entry.sourceType = "module"
-  } else if (isESModuleLike(mod.exports)) {
-    entry.sourceType = "module-like"
-  }
-
   Entry.set(mod.exports, entry)
 
   mod.loaded = true

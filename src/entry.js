@@ -3,8 +3,7 @@ import OrderedMap from "./ordered-map.js"
 
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
-import isESModule from "./util/is-esmodule.js"
-import isESModuleLike from "./util/is-esmodule-like.js"
+import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import setGetter from "./util/set-getter.js"
@@ -17,14 +16,6 @@ const useToStringTag = typeof Symbol.toStringTag === "symbol"
 class Entry {
   /* eslint lines-around-comment: off */
   constructor(mod, exported, options) {
-    let sourceType = "script"
-
-    if (isESModule(exported)) {
-      sourceType = "module"
-    } else if (isESModuleLike(exported)) {
-      sourceType = "module-like"
-    }
-
     // A boolean indicating whether the module namespace has changed.
     this._changed = true
     // A number indicating the loading state of the module.
@@ -46,7 +37,7 @@ class Entry {
     // Setters for assigning to local variables in parent modules.
     this.setters = new OrderedMap
     // Detect the module type.
-    this.sourceType = sourceType
+    this.sourceType = getSourceType(exported)
   }
 
   static get(mod, exported, options) {
@@ -200,18 +191,21 @@ class Entry {
   }
 
   merge(otherEntry) {
-    if (otherEntry === this) {
-      return this
+    if (otherEntry !== this) {
+      for (const key in otherEntry) {
+        if (key !== "sourceType") {
+          assignProperty(this, otherEntry, key)
+        }
+      }
     }
 
-    for (const key in otherEntry) {
-      assignProperty(this, otherEntry, key)
-    }
-
+    this.sourceType = getSourceType(this.exports)
     return this
   }
 
   update() {
+    this.sourceType = getSourceType(this.exports)
+
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
     const parentsMap = new OrderedMap
