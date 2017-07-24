@@ -36,7 +36,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitCallExpression(path) {
-    const node = path.getNode()
+    const node = path.getValue()
     const callee = node.callee
 
     if (callee.type === "Import") {

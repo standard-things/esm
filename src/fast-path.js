@@ -60,9 +60,7 @@ function getNodeAt(path, pos) {
 
   while (i--) {
     // Without a complete list of Node .type names, we have to settle for this
-    // fuzzy matching of object shapes. However, the infeasibility of
-    // maintaining a complete list of type names is one of the reasons we're
-    // using the FastPath/Visitor abstraction in the first place.
+    // fuzzy matching of object shapes.
     const value = s[i--]
     if (isObject(value) &&
         ! Array.isArray(value) &&

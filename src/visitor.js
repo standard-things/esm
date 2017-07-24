@@ -39,10 +39,6 @@ class Visitor {
       return
     }
 
-    if (path.getNode() !== value) {
-      return
-    }
-
     // The method must call this.visitChildren(path) to continue traversing.
     let methodName = "visit" + value.type
 
