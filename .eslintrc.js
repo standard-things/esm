@@ -1,3 +1,8 @@
+"use strict"
+
+const NODE_ENV = String(process.env.NODE_ENV)
+const isTest = NODE_ENV.endsWith("test")
+
 module.exports = {
   extends: ["eslint:recommended", "plugin:import/errors"],
   parser: "eslint-plugin-import/memo-parser",
@@ -28,6 +33,7 @@ module.exports = {
     "import/prefer-default-export": "error",
     "keyword-spacing": "error",
     "lines-around-comment": ["error", { allowBlockStart: true, beforeBlockComment: true, beforeLineComment: true }],
+    "no-console": isTest ? "off" : "error",
     "no-constant-condition": ["error", { checkLoops: false }],
     "no-empty": ["error", { allowEmptyCatch: true }],
     "no-multiple-empty-lines": ["error", { max: 1 }],

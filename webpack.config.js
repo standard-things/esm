@@ -7,6 +7,8 @@ const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const NODE_ENV = String(process.env.NODE_ENV)
+const isProduction = NODE_ENV.startsWith("production")
+const isTest = NODE_ENV.endsWith("test")
 
 const config = {
   "target": "node",
@@ -42,7 +44,7 @@ const config = {
   ]
 }
 
-if (NODE_ENV.startsWith("production")) {
+if (isProduction) {
   config.plugins.push(
     new ShakePlugin,
     new webpack.optimize.ModuleConcatenationPlugin,
@@ -67,7 +69,7 @@ if (NODE_ENV.startsWith("production")) {
   )
 }
 
-if (NODE_ENV.endsWith("test")) {
+if (isTest) {
   config.entry.compiler = "./src/compiler.js"
   config.entry.runtime = "./src/runtime.js"
 }
