@@ -84,7 +84,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof TypeError)
-          assert.ok(e.message.startsWith("Assignment to constant variable"))
+          assert.ok(e.message.startsWith("Assignment to constant variable."))
         })
     ))
   )

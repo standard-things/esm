@@ -31,7 +31,8 @@ class AssignmentVisitor extends Visitor {
 }
 
 function assignmentHelper(visitor, path, childName) {
-  const child = path.getValue()[childName]
+  const node = path.getValue()
+  const child = node[childName]
   const exportedNames = visitor.exportedLocalNames
   const importedNames = visitor.importedLocalNames
 
@@ -45,7 +46,13 @@ function assignmentHelper(visitor, path, childName) {
 
     if (importedNames[name] === true &&
         ! isShadowed(path, name)) {
-      throw new TypeError("Assignment to constant variable.")
+      const parser = {
+        input: visitor.magicString.original,
+        pos: node.start,
+        start: node.start
+      }
+
+      Parser.raise(parser, parser.start, "Assignment to constant variable.", TypeError)
     }
   }
 
