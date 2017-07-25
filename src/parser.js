@@ -1,5 +1,6 @@
 import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
 
+import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
 import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
@@ -71,8 +72,23 @@ class Parser {
     return extend(new AcornParser(options, code), options).parse()
   }
 
-  static raise(parser) {
-    acornRaise.call(parser, parser.start, "Unexpected token")
+  static raise(parser, pos, message, ErrorCtor) {
+    if (typeof ErrorCtor !== "function") {
+      acornRaise.call(parser, pos, message)
+    }
+
+    try {
+      acornRaise.call(parser, pos, message)
+    } catch (e) {
+      throw assign(new ErrorCtor(e.message), e)
+    }
+  }
+
+  static unexpected(parser, pos) {
+    if (typeof pos !== "number") {
+      pos = parser.start
+    }
+    Parser.raise(parser, pos, "Unexpected token")
   }
 }
 

@@ -67,7 +67,7 @@ function parseExportSpecifiers(func, exported) {
   while (this.eat(tt.comma))
 
   if (expectFrom && ! this.isContextual("from")) {
-    Parser.raise(this)
+    Parser.unexpected(this)
   }
 
   return specifiers
@@ -115,7 +115,7 @@ function parseExportDefaultSpecifier(parser) {
 function parseExportFrom(parser, node) {
   // ... from "..."
   if (! parser.eatContextual("from")) {
-    Parser.raise(parser)
+    Parser.unexpected(parser)
   }
 
   node.source = parser.type === tt.string ? parser.parseExprAtom() : null
@@ -151,7 +151,7 @@ function parseExportNamespaceSpecifier(parser, exported) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    Parser.raise(parser)
+    Parser.unexpected(parser)
   }
 
   star.exported = parser.parseIdent()

@@ -44,7 +44,7 @@ function parseImportNamespaceSpecifier(parser) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    Parser.raise(parser)
+    Parser.unexpected(parser)
   }
 
   star.local = parser.parseIdent()

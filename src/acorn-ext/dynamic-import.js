@@ -21,7 +21,7 @@ function parseExprAtom(func, refDestructuringErrors) {
 
   if (this.eat(tt._import)) {
     if (this.type !== tt.parenL) {
-      Parser.raise(this)
+      Parser.unexpected(this)
     }
 
     return this.finishNode(this.startNodeAt(importPos), "Import")
@@ -46,7 +46,7 @@ function parseStatement(func, declaration, topLevel, exported) {
     this.finishNode(callExpr, "CallExpression")
 
     if (! this.eat(tt.parenR)) {
-      Parser.raise(this)
+      Parser.unexpected(this)
     }
 
     const expr = this.parseSubscripts(callExpr, startPos)
