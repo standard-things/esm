@@ -432,19 +432,19 @@ function pad(visitor, newCode, oldStart, oldEnd) {
 }
 
 function preserveChild(visitor, path, childName) {
-  const value = path.getValue()
-  const child = value[childName]
+  const node = path.getValue()
+  const child = node[childName]
 
   overwrite(
     visitor,
-    value.start,
+    node.start,
     child.start,
     ""
   )
   overwrite(
     visitor,
     child.end,
-    value.end,
+    node.end,
     ""
   )
 
@@ -452,8 +452,8 @@ function preserveChild(visitor, path, childName) {
 }
 
 function preserveLine(visitor, path) {
-  const value = path.getValue()
-  overwrite(visitor, value.start, value.end, "")
+  const node = path.getValue()
+  overwrite(visitor, node.start, node.end, "")
 }
 
 function safeParam(param, locals) {

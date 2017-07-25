@@ -119,11 +119,11 @@ function isShadowed(path, name) {
 }
 
 function wrap(visitor, path) {
-  const value = path.getValue()
+  const node = path.getValue()
 
   visitor.magicString
-    .prependRight(value.start, visitor.runtimeAlias + ".u(")
-    .prependRight(value.end, ")")
+    .prependRight(node.start, visitor.runtimeAlias + ".u(")
+    .prependRight(node.end, ")")
 }
 
 export default AssignmentVisitor
