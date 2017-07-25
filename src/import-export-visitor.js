@@ -175,7 +175,7 @@ class ImportExportVisitor extends Visitor {
 
     let specifierMap = computeSpecifierMap(decl.specifiers)
 
-    if (! decl.source) {
+    if (decl.source == null) {
       hoistExports(this, path, specifierMap)
       addExportedLocalNames(this, specifierMap)
       return
