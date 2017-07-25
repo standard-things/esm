@@ -49,7 +49,8 @@ class ImportExportVisitor extends Visitor {
   visitImportDeclaration(path) {
     let i = -1
     const decl = path.getValue()
-    const specifierCount = decl.specifiers.length
+    const specifiers = decl.specifiers
+    const specifierCount = specifiers.length
     const lastIndex = specifierCount - 1
 
     let hoistedCode = specifierCount
@@ -57,7 +58,7 @@ class ImportExportVisitor extends Visitor {
       : ""
 
     while (++i < specifierCount) {
-      const identifier = decl.specifiers[i].local.name
+      const identifier = specifiers[i].local.name
       const isLast = i === lastIndex
       hoistedCode +=
         identifier +
@@ -67,7 +68,7 @@ class ImportExportVisitor extends Visitor {
     hoistedCode += toModuleImport(
       this,
       getSourceString(this, decl),
-      computeSpecifierMap(decl.specifiers)
+      computeSpecifierMap(specifiers)
     )
 
     hoistImports(this, path, hoistedCode)
