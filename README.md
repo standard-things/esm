@@ -4,12 +4,6 @@ No Babel, no bundles, no problem.<br>
 This small *(< 40 kB)*, zero dependency, package is all you need to enable
 ECMAScript modules in Node today!
 
-🚧 Under Construction 🚧
----
-
-Pardon the mess. This project is currently an unreleased work in progress.
-Thank you for your patience.
-
 Usage
 ---
 
