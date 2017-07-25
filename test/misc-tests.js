@@ -65,6 +65,20 @@ describe("spec compliance", () => {
         })
     ))
   )
+
+  it("should throw a type error when setting an imported identifier", () =>
+    Promise.all([
+      "./misc/import-const.js",
+      "./misc/import-let.js",
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof TypeError)
+          assert.ok(e.message.startsWith("Assignment to constant variable"))
+        })
+    ))
+  )
 })
 
 describe("built-in modules", () => {
