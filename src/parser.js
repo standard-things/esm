@@ -11,6 +11,9 @@ import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 const acornParser = new AcornParser
 const acornRaise = acornParser.raise
 
+const literalRegExp = /^(?:'((?:[^']|\.)*)'|"((?:[^"]|\.)*)"|;)/
+const skipWhiteSpaceRegExp = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
+
 const defaultOptions = {
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
@@ -65,6 +68,30 @@ class Parser {
     acornParser.pos = parser.pos
     acornParser.nextToken()
     return acornParser
+  }
+
+  // Based on Acorn's Parser.prototype.strictDirective parser utility.
+  // Copyright Marijn Haverbeke. Released under MIT license:
+  // https://github.com/ternjs/acorn/blob/5.1.1/src/parseutil.js#L9-L19
+  static moduleDirective(code) {
+    let pos = 0
+
+    while (true) {
+      skipWhiteSpaceRegExp.lastIndex = pos
+      pos += skipWhiteSpaceRegExp.exec(code)[0].length
+
+      const match = literalRegExp.exec(code.slice(pos))
+
+      if (match === null) {
+        return false
+      }
+
+      if ((match[1] || match[2]) === "use module") {
+        return true
+      }
+
+      pos += match[0].length
+    }
   }
 
   static parse(code, options) {
