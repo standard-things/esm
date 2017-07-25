@@ -58,6 +58,7 @@ class Compiler {
     if (importExportVisitor.madeChanges) {
       assignmentVisitor.visit(rootPath, {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
+        importedLocalNames: importExportVisitor.importedLocalNames,
         magicString: importExportVisitor.magicString,
         runtimeAlias: importExportVisitor.runtimeAlias
       })

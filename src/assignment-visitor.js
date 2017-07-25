@@ -4,6 +4,7 @@ import Visitor from "./visitor.js"
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
     this.exportedLocalNames = options.exportedLocalNames
+    this.importedLocalNames = options.importedLocalNames
     this.magicString = options.magicString
     this.runtimeAlias = options.runtimeAlias
 
@@ -47,6 +48,11 @@ function assignmentHelper(visitor, path, childName) {
         ! isShadowed(path, name)) {
       wrap(visitor, path)
       return
+    }
+
+    if (visitor.importedLocalNames[name] === true &&
+        ! isShadowed(path, name)) {
+      throw new TypeError("Assignment to constant variable.")
     }
   }
 }

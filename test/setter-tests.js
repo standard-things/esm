@@ -29,9 +29,17 @@ describe("parent setters", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should discard setters for constant values", () =>
-    import("./setter/const.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
+  it("should throw a type error when setting an imported identifier", () =>
+    Promise.all([
+      "./setter/import-const.js",
+      "./setter/import-let.js",
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof TypeError)
+          assert.ok(e.message.startsWith("Assignment to constant variable"))
+        })
+      ))
   )
 })

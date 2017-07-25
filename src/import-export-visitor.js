@@ -30,6 +30,7 @@ class ImportExportVisitor extends Visitor {
     this.code = code
     this.exportedLocalNames = Object.create(null)
     this.generateVarDeclarations = options.generateVarDeclarations
+    this.importedLocalNames = Object.create(null)
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
@@ -51,6 +52,7 @@ class ImportExportVisitor extends Visitor {
     const decl = path.getValue()
     const specifiers = decl.specifiers
     const specifierCount = specifiers.length
+    const specifierMap = computeSpecifierMap(specifiers)
     const lastIndex = specifierCount - 1
 
     let hoistedCode = specifierCount
@@ -68,10 +70,11 @@ class ImportExportVisitor extends Visitor {
     hoistedCode += toModuleImport(
       this,
       getSourceString(this, decl),
-      computeSpecifierMap(specifiers)
+      specifierMap
     )
 
     hoistImports(this, path, hoistedCode)
+    addImportedLocalNames(this, specifierMap)
   }
 
   visitExportAllDeclaration(path) {
@@ -228,6 +231,22 @@ function addExportedLocalNames(visitor, specifierMap) {
     // name(s) in the assignmentVisitor, so it's not worth the added
     // complexity of tracking unused information.
     visitor.exportedLocalNames[locals[0]] = true
+  }
+}
+
+function addImportedLocalNames(visitor, specifierMap) {
+  let i = -1
+  const names = specifierMap.keys()
+  const nameCount = names.length
+
+  while (++i < nameCount) {
+    let j = -1
+    const locals = specifierMap.get(names[i]).keys()
+    const localCount = locals.length
+
+    while (++j < localCount) {
+      visitor.importedLocalNames[locals[j]] = true
+    }
   }
 }
 
