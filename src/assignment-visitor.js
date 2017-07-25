@@ -40,6 +40,18 @@ function assignmentHelper(visitor, path, childName) {
   const names = Parser.getNamesFromPattern(child)
   const nameCount = names.length
 
+  // Perform checks, which may throw errors, before source transformations.
+  while (++i < nameCount) {
+    const name = names[i]
+
+    if (visitor.importedLocalNames[name] === true &&
+        ! isShadowed(path, name)) {
+      throw new TypeError("Assignment to constant variable.")
+    }
+  }
+
+  i = -1
+
   // Wrap assignments to exported identifiers with runtime.update().
   while (++i < nameCount) {
     const name = names[i]
@@ -48,11 +60,6 @@ function assignmentHelper(visitor, path, childName) {
         ! isShadowed(path, name)) {
       wrap(visitor, path)
       return
-    }
-
-    if (visitor.importedLocalNames[name] === true &&
-        ! isShadowed(path, name)) {
-      throw new TypeError("Assignment to constant variable.")
     }
   }
 }
