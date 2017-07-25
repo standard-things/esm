@@ -158,56 +158,58 @@ class ImportExportVisitor extends Visitor {
 
       hoistExports(this, path, specifierMap, "declaration")
 
+      // Skip adding declared names to this.exportedLocalNames if the
+      // declaration is a const-kinded VariableDeclaration, because the
+      // assignmentVisitor doesn't need to worry about changes to these
+      // variables.
       if (canExportedValuesChange(decl)) {
-        // Skip adding declared names to this.exportedLocalNames if the
-        // declaration is a const-kinded VariableDeclaration, because the
-        // assignmentVisitor doesn't need to worry about changes to these
-        // variables.
         addExportedLocalNames(this, specifierMap)
       }
 
       return
     }
 
-    if (decl.specifiers) {
-      let specifierMap = computeSpecifierMap(decl.specifiers)
-
-      if (decl.source) {
-        if (specifierMap) {
-          let i = -1
-          const newMap = new OrderedMap
-          const exportedNames = specifierMap.keys()
-          const nameCount = exportedNames.length
-
-          while (++i < nameCount) {
-            const exported = exportedNames[i]
-            const locals = specifierMap.get(exported).keys()
-
-            assert.strictEqual(locals.length, 1)
-
-            addToSpecifierMap(
-              newMap,
-              locals[0],
-              this.runtimeAlias + ".entry._namespace." + exported
-            )
-          }
-
-          specifierMap = newMap
-        }
-
-        // Even though the compiled code uses runtime.watch(), it should
-        // still be hoisted as an export, i.e. before actual imports.
-        hoistExports(this, path, toModuleImport(
-          this,
-          getSourceString(this, decl),
-          specifierMap
-        ))
-
-      } else {
-        hoistExports(this, path, specifierMap)
-        addExportedLocalNames(this, specifierMap)
-      }
+    if (! decl.specifiers) {
+      return
     }
+
+    let specifierMap = computeSpecifierMap(decl.specifiers)
+
+    if (! decl.source) {
+      hoistExports(this, path, specifierMap)
+      addExportedLocalNames(this, specifierMap)
+      return
+    }
+
+    if (specifierMap) {
+      let i = -1
+      const newMap = new OrderedMap
+      const exportedNames = specifierMap.keys()
+      const nameCount = exportedNames.length
+
+      while (++i < nameCount) {
+        const exported = exportedNames[i]
+        const locals = specifierMap.get(exported).keys()
+
+        assert.strictEqual(locals.length, 1)
+
+        addToSpecifierMap(
+          newMap,
+          locals[0],
+          this.runtimeAlias + ".entry._namespace." + exported
+        )
+      }
+
+      specifierMap = newMap
+    }
+
+    // Even though the compiled code uses runtime.watch(), it should
+    // still be hoisted as an export, i.e. before actual imports.
+    hoistExports(this, path, toModuleImport(
+      this,
+      getSourceString(this, decl),
+      specifierMap
+    ))
   }
 }
 
