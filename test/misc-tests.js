@@ -52,7 +52,7 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should error on importing non-exported binding", () =>
+  it("should throw a syntax error when importing non-exported binding", () =>
     Promise.all([
       "./misc/import-missing-cjs.js",
       "./misc/import-missing-esm.js"
