@@ -31,8 +31,11 @@ class AssignmentVisitor extends Visitor {
 }
 
 function assignmentHelper(visitor, path, childName) {
-  let i = -1
   const child = path.getValue()[childName]
+  const exportedNames = visitor.exportedLocalNames
+  const importedNames = visitor.importedLocalNames
+
+  let i = -1
   const names = Parser.getNamesFromPattern(child)
   const nameCount = names.length
 
@@ -40,7 +43,7 @@ function assignmentHelper(visitor, path, childName) {
   while (++i < nameCount) {
     const name = names[i]
 
-    if (visitor.importedLocalNames[name] === true &&
+    if (importedNames[name] === true &&
         ! isShadowed(path, name)) {
       throw new TypeError("Assignment to constant variable.")
     }
@@ -52,7 +55,7 @@ function assignmentHelper(visitor, path, childName) {
   while (++i < nameCount) {
     const name = names[i]
 
-    if (visitor.exportedLocalNames[name] === true &&
+    if (exportedNames[name] === true &&
         ! isShadowed(path, name)) {
       wrap(visitor, path)
       return

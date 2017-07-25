@@ -217,6 +217,7 @@ class ImportExportVisitor extends Visitor {
 
 function addExportedLocalNames(visitor, specifierMap) {
   let i = -1
+  const exportedNames = visitor.exportedLocalNames
   const names = specifierMap.keys()
   const nameCount = names.length
 
@@ -230,12 +231,13 @@ function addExportedLocalNames(visitor, specifierMap) {
     // per local variable, and we don't actually use the exported
     // name(s) in the assignmentVisitor, so it's not worth the added
     // complexity of tracking unused information.
-    visitor.exportedLocalNames[locals[0]] = true
+    exportedNames[locals[0]] = true
   }
 }
 
 function addImportedLocalNames(visitor, specifierMap) {
   let i = -1
+  const importedNames = visitor.importedLocalNames
   const names = specifierMap.keys()
   const nameCount = names.length
 
@@ -245,7 +247,7 @@ function addImportedLocalNames(visitor, specifierMap) {
     const localCount = locals.length
 
     while (++j < localCount) {
-      visitor.importedLocalNames[locals[j]] = true
+      importedNames[locals[j]] = true
     }
   }
 }
