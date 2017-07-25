@@ -11,7 +11,7 @@ import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 const acornParser = new AcornParser
 const acornRaise = acornParser.raise
 
-const literalRegExp = /^(?:'((?:[^']|\.)*)'|"((?:[^"]|\.)*)"|;)/
+const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 const skipWhiteSpaceRegExp = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
 
 const defaultOptions = {
