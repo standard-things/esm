@@ -34,13 +34,14 @@ class AssignmentVisitor extends Visitor {
 }
 
 function assignmentHelper(visitor, path, childName) {
+  let i = -1
   const child = path.getValue()[childName]
   const names = Parser.getNamesFromPattern(child)
-  let nameCount = names.length
+  const nameCount = names.length
 
   // Wrap assignments to exported identifiers with runtime.update().
-  while (nameCount--) {
-    const name = names[nameCount]
+  while (++i < nameCount) {
+    const name = names[i]
 
     if (visitor.exportedLocalNames[name] === true &&
         ! isShadowed(path, name)) {

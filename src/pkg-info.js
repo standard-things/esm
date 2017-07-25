@@ -29,12 +29,14 @@ class PkgInfo {
     const cacheDir =  options.cache
     const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
-    let nameCount = cacheFileNames === null ? 0 : cacheFileNames.length
 
-    while (nameCount--) {
+    let i = -1
+    const nameCount = cacheFileNames === null ? 0 : cacheFileNames.length
+
+    while (++i < nameCount) {
       // Later, in Module._extensions[".js"], we'll change the value to the actual
       // contents of the file, but for now we merely register that it exists.
-      cache.set(cacheFileNames[nameCount], true)
+      cache.set(cacheFileNames[i], true)
     }
 
     this.cache = cache

@@ -182,27 +182,25 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    if (specifierMap) {
-      let i = -1
-      const newMap = new OrderedMap
-      const exportedNames = specifierMap.keys()
-      const nameCount = exportedNames.length
+    let i = -1
+    const newMap = new OrderedMap
+    const names = specifierMap.keys()
+    const nameCount = names.length
 
-      while (++i < nameCount) {
-        const exported = exportedNames[i]
-        const locals = specifierMap.get(exported).keys()
+    while (++i < nameCount) {
+      const name = names[i]
+      const locals = specifierMap.get(name).keys()
 
-        assert.strictEqual(locals.length, 1)
+      assert.strictEqual(locals.length, 1)
 
-        addToSpecifierMap(
-          newMap,
-          locals[0],
-          this.runtimeAlias + ".entry._namespace." + exported
-        )
-      }
-
-      specifierMap = newMap
+      addToSpecifierMap(
+        newMap,
+        locals[0],
+        this.runtimeAlias + ".entry._namespace." + name
+      )
     }
+
+    specifierMap = newMap
 
     // Even though the compiled code uses runtime.watch(), it should
     // still be hoisted as an export, i.e. before actual imports.
@@ -215,12 +213,12 @@ class ImportExportVisitor extends Visitor {
 }
 
 function addExportedLocalNames(visitor, specifierMap) {
-  const exportedNames = specifierMap.keys()
-  let nameCount = exportedNames.length
+  let i = -1
+  const names = specifierMap.keys()
+  const nameCount = names.length
 
-  while (nameCount--) {
-    const exported = exportedNames[nameCount]
-    const locals = specifierMap.get(exported).keys()
+  while (++i < nameCount) {
+    const locals = specifierMap.get(names[i]).keys()
 
     assert.strictEqual(locals.length, 1)
 
@@ -343,18 +341,19 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     return
   }
 
-  const exportedNames = mapOrString.keys()
-  let nameCount = exportedNames.length
+  let i = -1
+  const names = mapOrString.keys()
+  const nameCount = names.length
 
-  while (nameCount--) {
-    const exported = exportedNames[nameCount]
-    const locals = mapOrString.get(exported).keys()
+  while (++i < nameCount) {
+    const name = names[i]
+    const locals = mapOrString.get(name).keys()
 
     assert.strictEqual(locals.length, 1)
 
     addToSpecifierMap(
       bodyInfo.hoistedExportsMap,
-      exported,
+      name,
       locals[0]
     )
   }
@@ -443,8 +442,8 @@ function safeParam(param, locals) {
 }
 
 function toModuleImport(visitor, code, specifierMap) {
-  const importedNames = specifierMap.keys()
-  const nameCount = importedNames.length
+  const names = specifierMap.keys()
+  const nameCount = names.length
 
   code = visitor.runtimeAlias + ".w(" + code
 
@@ -458,16 +457,16 @@ function toModuleImport(visitor, code, specifierMap) {
   code += ",["
 
   while (++i < nameCount) {
-    const imported = importedNames[i]
+    const name = names[i]
     const isLast = i === lastIndex
-    const locals = specifierMap.get(imported).keys()
+    const locals = specifierMap.get(name).keys()
     const valueParam = safeParam("v", locals)
 
     /* eslint lines-around-comment: off */
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
-      "[" + JSON.stringify(imported) + ",function(" + valueParam + "){" +
+      "[" + JSON.stringify(name) + ",function(" + valueParam + "){" +
       // Multiple local variables become a compound assignment.
       locals.join("=") + "=" + valueParam +
       "}]"
@@ -483,8 +482,8 @@ function toModuleImport(visitor, code, specifierMap) {
 }
 
 function toModuleExport(visitor, specifierMap) {
-  const exportedNames = specifierMap.keys()
-  const nameCount = exportedNames.length
+  const names = specifierMap.keys()
+  const nameCount = names.length
 
   let code = ""
 
@@ -497,14 +496,14 @@ function toModuleExport(visitor, specifierMap) {
   code += visitor.runtimeAlias + ".e(["
 
   while (++i < nameCount) {
-    const exported = exportedNames[i]
+    const name = names[i]
     const isLast = i === lastIndex
-    const locals = specifierMap.get(exported).keys()
+    const locals = specifierMap.get(name).keys()
 
     assert.strictEqual(locals.length, 1)
 
     code +=
-      "[" + JSON.stringify(exported) + ",()=>" +
+      "[" + JSON.stringify(name) + ",()=>" +
       locals[0] +
       "]"
 
