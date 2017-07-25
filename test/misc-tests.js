@@ -43,12 +43,21 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should not export duplicate bindings", () =>
-    import("./misc/export-dups.js")
+  it("should throw a syntax error when exporting duplicate local bindings", () =>
+    import("./misc/export-dup-local.js")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.endsWith("has already been declared"))
+        assert.ok(e.message.startsWith("Duplicate export of '"))
+      })
+  )
+
+  it("should throw a syntax error when exporting duplicate namespace bindings", () =>
+    import("./misc/export-dup-namespace.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.endsWith("' has already been declared"))
       })
   )
 
