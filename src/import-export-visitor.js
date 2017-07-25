@@ -3,8 +3,6 @@ import OrderedMap from "./ordered-map.js"
 import Parser from "./parser.js"
 import Visitor from "./visitor.js"
 
-import assert from "assert"
-
 const codeOfCR = "\r".charCodeAt(0)
 
 class ImportExportVisitor extends Visitor {
@@ -113,7 +111,6 @@ class ImportExportVisitor extends Visitor {
       // Otherwise, since the exported value is an expression, we use the
       // special runtime.default(value) form.
       path.call(this, "visitWithoutReset", "declaration")
-      assert.strictEqual(decl.declaration, dd)
 
       let prefix = this.runtimeAlias + ".d("
       let suffix = ");"
@@ -194,8 +191,6 @@ class ImportExportVisitor extends Visitor {
       const name = names[i]
       const locals = specifierMap.get(name).keys()
 
-      assert.strictEqual(locals.length, 1)
-
       addToSpecifierMap(
         newMap,
         locals[0],
@@ -223,8 +218,6 @@ function addExportedLocalNames(visitor, specifierMap) {
 
   while (++i < nameCount) {
     const locals = specifierMap.get(names[i]).keys()
-
-    assert.strictEqual(locals.length, 1)
 
     // It's tempting to record the exported name as the value here,
     // instead of true, but there can be more than one exported name
@@ -369,8 +362,6 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
   while (++i < nameCount) {
     const name = names[i]
     const locals = mapOrString.get(name).keys()
-
-    assert.strictEqual(locals.length, 1)
 
     addToSpecifierMap(
       bodyInfo.hoistedExportsMap,
@@ -520,8 +511,6 @@ function toModuleExport(visitor, specifierMap) {
     const name = names[i]
     const isLast = i === lastIndex
     const locals = specifierMap.get(name).keys()
-
-    assert.strictEqual(locals.length, 1)
 
     code +=
       "[" + JSON.stringify(name) + ",()=>" +

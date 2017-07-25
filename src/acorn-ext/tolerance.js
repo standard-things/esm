@@ -1,9 +1,15 @@
+import wrapCall from "../util/wrap-call.js"
+
 function enable(parser) {
-  parser.raiseRecoverable = noopRaiseRecoverable
+  parser.raiseRecoverable = wrapCall(parser.raise, raiseRecoverable)
   parser.strict = false
   return parser
 }
 
-function noopRaiseRecoverable() {}
+function raiseRecoverable(func, pos, message) {
+  if (message.startsWith("Duplicate export '")) {
+    func.call(this, pos, message)
+  }
+}
 
 export { enable }
