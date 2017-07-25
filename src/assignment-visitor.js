@@ -7,10 +7,6 @@ class AssignmentVisitor extends Visitor {
     this.importedLocalNames = options.importedLocalNames
     this.magicString = options.magicString
     this.runtimeAlias = options.runtimeAlias
-
-    if (this.exportedLocalNames === void 0) {
-      this.exportedLocalNames = Object.create(null)
-    }
   }
 
   visitAssignmentExpression(path) {
