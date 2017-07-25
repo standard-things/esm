@@ -2,7 +2,7 @@
 
 No Babel, no bundles, no problem.<br>
 This small *(< 40 kB)*, zero dependency, package is all you need to enable
-ECMAScript modules in Node today!
+ECMAScript modules in Node 4+ today!
 
 Usage
 ---
