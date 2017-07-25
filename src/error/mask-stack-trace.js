@@ -3,10 +3,10 @@ import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 
-const errorMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?:.*?: (.+))?$/
 const lineNumRegExp = /:(\d+)/
 const columnNumRegExp = /:(\d+)(?=\)|$)/
 const filePathRegExp = /(?:^ {4}at |\()(.*?)(?=:\d+:\d+\)?$)/
+const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/
 const splice = Array.prototype.splice
 
 const internalDecorateErrorStack = binding.decorateErrorStack
@@ -112,18 +112,17 @@ function fillStackLines(stackLines, sourceCode, compiledCode) {
 //
 // SyntaxError: <description>
 //   ...
-function maskParserStack(stack, sourceCode) {
+function maskParserStack(stack, sourceCode, filePath) {
   stack = scrubStack(stack)
   const stackLines = stack.split("\n")
 
-  const parts = errorMessageRegExp.exec(stackLines[0]) || []
+  const parts = parserMessageRegExp.exec(stackLines[0])
   const desc = parts[1]
   const lineNum = parts[2]
   const column = parts[3]
-  const filePath = parts[4]
   const spliceArgs = [0, 1]
 
-  if (filePath !== void 0) {
+  if (typeof filePath === "string") {
     spliceArgs.push(filePath + ":" + lineNum)
   }
 
@@ -198,7 +197,7 @@ function maskStackLines(stackLines, sourceCode) {
 function resolveStack(error, stack, sourceCode, compiledCode) {
   sourceCode = typeof sourceCode === "function" ? sourceCode() : sourceCode
   return isParseError(error)
-    ? maskParserStack(stack, sourceCode)
+    ? maskParserStack(stack, sourceCode, error.filename)
     : maskStack(stack, sourceCode, compiledCode)
 }
 

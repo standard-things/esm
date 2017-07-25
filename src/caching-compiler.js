@@ -18,7 +18,7 @@ function compileWithFilename(code, options) {
   try {
     return compileAndWrite(code, options)
   } catch (e) {
-    e.message += " while processing file: " + options.filePath
+    e.filename = options.filePath
     throw e
   }
 }
