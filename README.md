@@ -63,8 +63,8 @@ All options are **off** by default.
 <tr><td><code>"ext"</code></td><td>
   <p>A boolean for <code>import</code>/<code>export</code> syntax extensions</p>
   <ul>
-  <li><a href="https://github.com/leebyron/ecmascript-export-default-from"><code>export d from "mod"</code></a></li>
-  <li><a href="https://github.com/leebyron/ecmascript-export-ns-from"><code>export * as ns from "mod"</code></a></li>
+  <li><a href="https://github.com/tc39/proposal-export-default-from"><code>export d from "mod"</code></a></li>
+  <li><a href="https://github.com/tc39/proposal-export-ns-from"><code>export * as ns from "mod"</code></a></li>
   <li>unordered import/export lists</li>
   </ul>
 </td></tr>
