@@ -42,19 +42,23 @@ describe("compiler", () => {
   )
 
   it("should respect options.type", () => {
-    const code = 'import "a"'
     const values = [void 0, "module", "unambiguous"]
 
     values.forEach((value) => {
-      const result = compiler.compile(code, { type: value })
+      const result = compiler.compile('import "a"', { type: value })
       assert.strictEqual(result.type, "module")
     })
 
-    const result = compiler.compile("1+2", {
-      type: "unambiguous"
-    })
+    const tests = [
+      { code: "1+2", type: "script" },
+      { code: "'use module';1+2", type: "module" },
+      { code: '"use module";1+2', type: "module" }
+    ]
 
-    assert.strictEqual(result.type, "script")
+    tests.forEach((data) => {
+      const result = compiler.compile(data.code, { type: "unambiguous" })
+      assert.strictEqual(result.type, data.type)
+    })
   })
 
   it("should respect options.var", () => {

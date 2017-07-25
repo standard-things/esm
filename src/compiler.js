@@ -16,13 +16,16 @@ const defaultOptions = {
 const assignmentVisitor = new AV
 const importExportVisitor = new IEV
 const codeOfPound = "#".charCodeAt(0)
+
+const literalRegExp = /^(?:'((?:[^']|\.)*)'|"((?:[^"]|\.)*)"|;)/
 const shebangRegExp = /^#!.*/
+const skipWhiteSpaceRegExp = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
 const useModuleRegExp = /(["'])use module\1/
 
-// Matches any import or export identifier as long as it's not preceded by a "."
+// Matches any {im,ex}port identifier as long as it's not preceded by a "."
 // character (e.g. runtime.export) to prevent the compiler from compiling code
 // it has already compiled.
-const importExportRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
+const portRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
@@ -39,7 +42,7 @@ class Compiler {
     }
 
     if (options.type === "unambiguous" &&
-        ! importExportRegExp.test(code) &&
+        ! portRegExp.test(code) &&
         ! useModuleRegExp.test(code)) {
       return result
     }
@@ -66,12 +69,38 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (options.type !== "unambiguous" || importExportVisitor.madeChanges) {
+    if (options.type !== "unambiguous" ||
+        importExportVisitor.madeChanges ||
+        hasModuleDirective(code)) {
       result.type = "module"
     }
 
     result.code = importExportVisitor.magicString.toString()
     return result
+  }
+}
+
+// Based on Acorn's Parser.prototype.strictDirective parser utility.
+// Copyright Marijn Haverbeke. Released under MIT license:
+// https://github.com/ternjs/acorn/blob/5.1.1/src/parseutil.js#L9-L19
+function hasModuleDirective(code) {
+  let start = 0
+
+  while (true) {
+    skipWhiteSpaceRegExp.lastIndex = start
+    start += skipWhiteSpaceRegExp.exec(code)[0].length
+
+    const match = literalRegExp.exec(code.slice(start))
+
+    if (match === null) {
+      return false
+    }
+
+    if ((match[1] || match[2]) === "use module") {
+      return true
+    }
+
+    start += match[0].length
   }
 }
 
