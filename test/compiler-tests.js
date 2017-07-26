@@ -105,4 +105,9 @@ describe("compiler", () => {
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
+
+  it("should compile dynamic import with script source type", () => {
+    const result = compiler.compile('import("a")', { type: "script" })
+    assert.ok(result.code.includes('i("a")'))
+  })
 })

@@ -31,16 +31,17 @@ function compileAndCache(code, options) {
 
 function compileAndWrite(code, options) {
   const result = compileAndCache(code, options)
-
-  if (result.type !== "module") {
-    return result
-  }
-
   const cachePath = options.cachePath
   const cacheFileName = options.cacheFileName
   const cacheFilePath = path.join(cachePath, cacheFileName)
-  const output = result.code
   const isGzipped = path.extname(cacheFilePath) === ".gz"
+
+  let output = result.code
+
+  if (result.type === "script") {
+    output= '"' + options.runtimeAlias + ':script";' + output
+  }
+
   const content = () => isGzipped ? gzip(output) : output
   const encoding = isGzipped ? null : "utf8"
   const pkgInfo = options.pkgInfo
@@ -67,22 +68,13 @@ function removeExpired(cache, cachePath, cacheFileName) {
 }
 
 function toCompileOptions(options) {
-  const filePath = options.filePath
   const pkgOptions = options.pkgInfo.options
-  let type = "script"
-
-  if (typeof filePath === "string" &&
-      path.extname(filePath) === ".mjs") {
-    type = "module"
-  } else if (pkgOptions.esm === "js") {
-    type = "unambiguous"
-  }
 
   return {
     cjs: pkgOptions.cjs,
     ext: pkgOptions.ext,
     runtimeAlias: options.runtimeAlias,
-    type,
+    type: options.type,
     var: pkgOptions.var
   }
 }

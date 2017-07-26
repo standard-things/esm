@@ -8,6 +8,7 @@ import Wrapper from "./wrapper.js"
 import captureStackTrace from "./error/capture-stack-trace.js"
 import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
+import extname from "./util/extname.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
 import gunzip from "./fs/gunzip.js"
 import isObject from "./util/is-object.js"
@@ -33,10 +34,17 @@ function managerWrapper(manager, func, mod, filePath) {
 function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const pkgOptions = pkgInfo.options
   const cachePath = pkgInfo.cachePath
-  const extname = path.extname(filePath)
+  const ext = extname(filePath)
+  let type = "script"
+
+  if (ext === ".mjs" || ext === ".mjs.gz") {
+    type = "module"
+  } else if (pkgOptions.esm === "js") {
+    type = "unambiguous"
+  }
 
   if (cachePath === null ||
-      (extname !== ".mjs" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
+      (type !== "module" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
     func.call(this, mod, filePath)
     return
   }
@@ -45,7 +53,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const cacheKey = mtime(filePath)
   const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 
-  const md5Hash = path.basename(cacheFileName, extname).substr(8, 3)
+  const md5Hash = path.basename(cacheFileName, ext).substr(8, 3)
   const runtimeAlias = encodeIdent("_" + md5Hash)
 
   const readCode = (filePath) => (
@@ -71,7 +79,18 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   if (! isObject(cacheValue)) {
     if (cacheValue === true) {
-      cacheValue = { code: cacheCode, type: "module" }
+      if (type === "unambiguous") {
+        const prefix = '"' + runtimeAlias + ':script";'
+
+        if (cacheCode.startsWith(prefix)) {
+          type = "script"
+          cacheCode = cacheCode.slice(prefix.length)
+        } else {
+          type = "module"
+        }
+      }
+
+      cacheValue = { code: cacheCode, type }
       cache.set(cacheFileName, cacheValue)
     } else {
       const compilerOptions = {
@@ -79,7 +98,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
         cachePath,
         filePath,
         pkgInfo,
-        runtimeAlias
+        runtimeAlias,
+        type
       }
 
       if (pkgOptions.debug) {
