@@ -1,4 +1,5 @@
 import esmSemVer from "./version.js"
+import extname from "./extname.js"
 import md5 from "./md5.js"
 import path from "path"
 
@@ -13,11 +14,8 @@ function getCacheFileName(filePath, cacheKey, pkgInfo) {
     cacheKey
   )
 
-  const extname = typeof filePath === "string"
-    ? path.extname(filePath)
-    : ".js"
-
-  return hash1.slice(0, 8) + hash2.slice(0, 8) + extname
+  const ext = typeof filePath === "string" ? extname(filePath) : ".js"
+  return hash1.slice(0, 8) + hash2.slice(0, 8) + ext
 }
 
 export default getCacheFileName
