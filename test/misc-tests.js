@@ -1,12 +1,6 @@
 import assert from "assert"
 
 describe("spec compliance", () => {
-  it("should bind exports before the module executes", () =>
-    import("./misc/export.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should establish live binding of values", () =>
     import("./misc/live.js")
       .then((ns) => ns.check())
@@ -43,6 +37,27 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
+  it("should export CJS module.exports as default", () =>
+    import("./misc/export-cjs-default.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should not export CJS named binding", () =>
+    import("./misc/export-cjs-named.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("The requested module does not provide an export named '"))
+      })
+  )
+
+  it("should bind exports before the module executes", () =>
+    import("./misc/export-cycle.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should throw a syntax error when exporting duplicate local bindings", () =>
     import("./misc/export-dup-local.js")
       .then(() => assert.ok(false))
@@ -70,7 +85,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
-          assert.ok(e.message.startsWith("The requested module does not provide an export named"))
+          assert.ok(e.message.startsWith("The requested module does not provide an export named '"))
         })
     ))
   )

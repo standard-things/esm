@@ -1,9 +1,9 @@
-function fun() {
+function a() {
   return true
 }
 
-import { callFun } from "./b.js"
+import { b } from "./b.js"
 
-export default callFun()
+export default b()
 
-export { fun }
+export { a }

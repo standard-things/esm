@@ -1,5 +1,5 @@
-import { fun } from "./a.js"
+import { a } from "./a.js"
 
-export function callFun() {
-  return fun()
+export function b() {
+  return a()
 }
