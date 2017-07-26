@@ -15,4 +15,4 @@ setProperty(exports, inspectKey, {
   writable: false
 })
 
-export default exports
+export default Object.freeze(exports)
