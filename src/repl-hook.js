@@ -29,15 +29,15 @@ if (rootModule.filename === null &&
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
   const md5Hash = md5(Date.now()).substr(0, 3)
+  const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeIdent("_" + md5Hash)
 
   const managerWrapper = function (manager, func, code, options) {
-    const pkgInfo = PkgInfo.get("")
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
-    return wrapped.call(this, manager, func, pkgInfo, code, options)
+    return wrapped.call(this, manager, func, code, options)
   }
 
-  const methodWrapper = function (manager, func, pkgInfo, code, options) {
+  const methodWrapper = function (manager, func, code, options) {
     options = createOptions(options)
 
     if (options.produceCachedData === void 0) {
