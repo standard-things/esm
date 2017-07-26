@@ -1,10 +1,10 @@
 import isObjectLike from "./is-object-like.js"
 
-const esSymKey = Symbol.for("__esModule")
+const esmSym = Symbol.for("__esModule")
 
 function setModule(exported) {
   if (isObjectLike(exported)) {
-    exported[esSymKey] = true
+    exported[esmSym] = true
   }
 
   return exported
