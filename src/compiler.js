@@ -23,7 +23,7 @@ const useModuleRegExp = /(["'])use module\1/
 // Matches any {im,ex}port identifier as long as it's not preceded by a "."
 // character (e.g. runtime.export) to prevent the compiler from compiling code
 // it has already compiled.
-const portRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
+const importExportRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
@@ -40,7 +40,7 @@ class Compiler {
     }
 
     if (options.type === "unambiguous" &&
-        ! portRegExp.test(code) &&
+        ! importExportRegExp.test(code) &&
         ! useModuleRegExp.test(code)) {
       return result
     }
@@ -56,7 +56,7 @@ class Compiler {
       runtimeAlias: options.runtimeAlias
     })
 
-    if (importExportVisitor.madeChanges) {
+    if (importExportVisitor.addedImportExport) {
       assignmentVisitor.visit(rootPath, {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
         importedLocalNames: importExportVisitor.importedLocalNames,
@@ -67,10 +67,12 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (options.type !== "unambiguous" ||
-        importExportVisitor.madeChanges ||
+    if (options.type === "module" ||
+        importExportVisitor.addedImportExport ||
         Parser.moduleDirective(code)) {
       result.type = "module"
+    } else if (options.type !== "unambiguous") {
+      result.type = options.type
     }
 
     result.code = importExportVisitor.magicString.toString()

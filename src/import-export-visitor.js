@@ -24,6 +24,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   reset(rootPath, code, options) {
+    this.addedDynamicImport = false
+    this.addedImportExport = false
     this.bodyInfo = null
     this.code = code
     this.exportedLocalNames = Object.create(null)
@@ -39,6 +41,7 @@ class ImportExportVisitor extends Visitor {
     const callee = node.callee
 
     if (callee.type === "Import") {
+      this.addedDynamicImport = true
       overwrite(this, callee.start, callee.end, this.runtimeAlias + ".i")
     }
 
@@ -46,6 +49,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitImportDeclaration(path) {
+    this.addedImportExport = true
+
     let i = -1
     const decl = path.getValue()
     const specifiers = decl.specifiers
@@ -76,6 +81,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportAllDeclaration(path) {
+    this.addedImportExport = true
+
     const decl = path.getValue()
     const hoistedCode = pad(
       this,
@@ -93,6 +100,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportDefaultDeclaration(path) {
+    this.addedImportExport = true
+
     const decl = path.getValue()
     const dd = decl.declaration
 
@@ -132,6 +141,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportNamedDeclaration(path) {
+    this.addedImportExport = true
+
     const decl = path.getValue()
     const dd = decl.declaration
 
