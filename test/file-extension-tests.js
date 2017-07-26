@@ -9,15 +9,15 @@ const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))
 const gzipped = zlib.gzipSync(content)
 
 describe("file extension", () =>
-  [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((extname) => {
+  [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((ext) => {
     const abcNs = { a: "a", b: "b", c: "c" }
-    const modulePath = path.join(fixturePath, "a" + extname)
+    const modulePath = path.join(fixturePath, "a" + ext)
 
-    if (extname.endsWith(".gz") && ! fs.existsSync(modulePath)) {
+    if (ext.endsWith(".gz") && ! fs.existsSync(modulePath)) {
       fs.writeFileSync(modulePath, gzipped)
     }
 
-    it(`compiles ${extname} files`, () =>
+    it(`compiles ${ext} files`, () =>
       import(modulePath)
         .then((ns) => assert.deepEqual(ns, abcNs))
         .catch((e) => assert.ifError(e))
