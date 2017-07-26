@@ -2,8 +2,8 @@ import assert from "assert"
 import compiler from "../build/compiler.js"
 
 describe("compiler", () => {
-  it("should not get confused by string literals", () =>
-    import("./compiler/strings.js")
+  it("should be enabled for packages that depend on @std/esm", () =>
+    import("enabled")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
@@ -15,30 +15,6 @@ describe("compiler", () => {
         assert.ok(e instanceof SyntaxError)
         assert.ok(e.message.startsWith("Unexpected"))
       })
-  )
-
-  it("should choose unique export and module identifiers", () =>
-    import("./compiler/aliases")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should be enabled for packages that depend on @std/esm", () =>
-    import("enabled")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should preserve line numbers", () =>
-    import("./compiler/lines.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it('should not hoist above "use strict"', () =>
-     import("./compiler/strict")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should respect options.type", () => {
@@ -87,10 +63,28 @@ describe("compiler", () => {
     assert.ok(result.code.startsWith("let a"))
   })
 
+  it("should not get confused by string literals", () =>
+    import("./compiler/strings.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should not get confused by trailing comments", () => {
     const result = compiler.compile('import "a" // trailing comment')
     assert.ok(result.code.endsWith("// trailing comment"))
   })
+
+  it("should choose unique export and module identifiers", () =>
+    import("./compiler/aliases")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should preserve line numbers", () =>
+    import("./compiler/lines.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
 
   it("should preserve crlf newlines", () => {
     const code = [
@@ -105,4 +99,10 @@ describe("compiler", () => {
     const result = compiler.compile(code)
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
+
+  it('should not hoist above "use strict"', () =>
+    import("./compiler/strict")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
 })
