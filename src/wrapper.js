@@ -6,7 +6,7 @@ import has from "./util/has.js"
 
 const esmVersion = esmSemVer.version
 const maxSatisfyingCache = new FastObject
-const wrapSym = Symbol.for("__esmWrapper")
+const wrapSym = Symbol.for("@std/esm:wrapper")
 
 class Wrapper {
   static find(object, key, range) {
