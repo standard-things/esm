@@ -7,7 +7,7 @@ import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 import path from "path"
-import setModule from "./util/set-module.js"
+import setSourceType from "./util/set-source-type.js"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
@@ -43,7 +43,7 @@ class Runtime {
       }
     }
 
-    exported = setModule(exported)
+    exported = setSourceType(exported, "module")
     options = createOptions(options)
 
     const entry = Entry.get(mod, exported, options)

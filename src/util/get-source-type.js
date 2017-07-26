@@ -1,14 +1,15 @@
 import has from "./has.js"
 
-const esmKey = "__esModule"
-const esmSym = Symbol.for(esmKey)
+const typeSym = Symbol.for("@std/esm:sourceType")
 
 function getSourceType(exported) {
-  if (has(exported, esmSym) && exported[esmSym] === true) {
-    return "module"
+  if (has(exported, typeSym) &&
+      typeof exported[typeSym] === "string") {
+    return exported[typeSym]
   }
 
-  if (has(exported, esmKey) && exported[esmKey] === true) {
+  if (has(exported, "__esModule") &&
+      exported.__esModule === true) {
     return "module-like"
   }
 
