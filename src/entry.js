@@ -8,6 +8,7 @@ import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
+import setSetter from "./util/set-setter.js"
 
 const GETTER_ERROR = {}
 const entryMap = new WeakMap
@@ -167,13 +168,11 @@ class Entry {
     }
 
     setGetter(this, "namespace", () => {
-      const namespace = this._namespace
-      setProperty(this, "namespace", { value: namespace })
-
       // Section 9.4.6.11
       // Step 7: Enforce sorted iteration order of properties
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
+      const namespace = this._namespace
       const names = keys(namespace).sort()
       const nameCount = names.length
 
@@ -184,7 +183,11 @@ class Entry {
       // Section 9.4.6
       // Module namespace objects are not extensible.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      return Object.seal(namespace)
+      return this.namespace = Object.seal(namespace)
+    })
+
+    setSetter(this, "namespace", (value) => {
+      setProperty(this, "namespace", { value })
     })
 
     return this._loaded = 1
