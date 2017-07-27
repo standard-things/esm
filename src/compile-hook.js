@@ -17,6 +17,7 @@ import maskStackTrace from "./error/mask-stack-trace.js"
 import mtime from "./fs/mtime.js"
 import path from "path"
 import readFile from "./fs/read-file.js"
+import setSourceType from "./util/set-source-type.js"
 
 let allowTopLevelAwait = process.mainModule !== void 0 &&
   SemVer.satisfies(process.version, ">=7.6.0")
@@ -116,13 +117,14 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   const isESM = cacheValue.type === "module"
-  const exported = isESM ? Object.create(null) : mod.exports
+  const exported = Object.create(null)
 
   let output = cacheValue.code
   let compiledCode = output
   let entry = Entry.get(mod, exported, pkgOptions)
 
   if (isESM) {
+    setSourceType(exported, "module")
     Runtime.enable(mod, exported, pkgOptions)
 
     let async = ""
@@ -146,6 +148,14 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     output =
       (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
       runtimeAlias + ".r(" + async + "function(){" + output + "\n})"
+  } else {
+    setSourceType(exported, "script")
+    Runtime.enable(mod, exported, pkgOptions)
+
+    output =
+      "const " + runtimeAlias + "=this;" + runtimeAlias +
+      ".r(function(exports,require,module,__filename,__dirname){" +
+      output + "\n},require)"
   }
 
   if (pkgOptions.debug) {

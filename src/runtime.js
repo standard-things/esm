@@ -77,18 +77,25 @@ class Runtime {
     return (childNamespace, childEntry) => this.entry.addGettersFrom(childEntry)
   }
 
-  run(wrapper) {
+  run(wrapper, require) {
     const entry = this.entry
     const mod = this.module
     const exported = mod.exports = entry.exports
     const namespace = entry._namespace
     const options = this.options
 
-    wrapper.call(options.cjs ? exported : void 0)
+    if (wrapper.length) {
+      wrapper.call(exported, exported, require, mod, mod.filename, path.dirname(mod.filename))
+    } else {
+      wrapper.call(options.cjs ? exported : void 0)
+    }
+
     mod.loaded = true
     entry.update().loaded()
 
-    assign(exported, namespace)
+    if (! wrapper.length) {
+      assign(exported, namespace)
+    }
   }
 
   // Platform-specific code should find a way to call this method whenever
