@@ -66,8 +66,10 @@ class Parser {
   // Based on Acorn's Parser.prototype.strictDirective parser utility.
   // Copyright Marijn Haverbeke. Released under MIT license:
   // https://github.com/ternjs/acorn/blob/5.1.1/src/parseutil.js#L9-L19
-  static hasPragma(code, pragma) {
-    let pos = 0
+  static hasPragma(code, pragma, pos) {
+    if (pos == null) {
+      pos = 0
+    }
 
     while (true) {
       skipWhiteSpaceRegExp.lastIndex = pos
