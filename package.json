@@ -26,6 +26,7 @@
   "devDependencies": {
     "acorn": "^5.1.1",
     "babel-eslint": "^7.2.3",
+    "download-git-repo": "^1.0.1",
     "eslint": "^4.2.0",
     "eslint-plugin-import": "^2.7.0",
     "execa": "^0.7.0",

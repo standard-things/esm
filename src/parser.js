@@ -1,4 +1,12 @@
-import { Parser as AcornParser } from "acorn/dist/acorn.es.js"
+import "./acorn/src/expression.js"
+import "./acorn/src/location.js"
+import "./acorn/src/lval.js"
+import "./acorn/src/node.js"
+import "./acorn/src/scope.js"
+import "./acorn/src/statement.js"
+import "./acorn/src/tokencontext.js"
+import "./acorn/src/tokenize.js"
+import { Parser as AcornParser } from "./acorn/src/state.js"
 
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"

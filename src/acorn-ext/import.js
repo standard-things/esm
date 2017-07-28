@@ -1,4 +1,4 @@
-import { tokTypes as tt } from "acorn/dist/acorn.es.js"
+import { types as tt } from "../acorn/src/tokentype.js"
 import Parser from "../parser.js"
 import wrapCall from "../util/wrap-call.js"
 

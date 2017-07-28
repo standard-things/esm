@@ -1,11 +1,14 @@
 /* eslint strict: off */
 "use strict"
 
+const pify = require("pify")
+const acornPkg = require("acorn/package.json")
+const download = pify(require("download-git-repo"))
 const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
-const pify = require("pify")
 const trash = require("trash")
+
 const argv = require("yargs")
   .boolean("prod")
   .boolean("test")
@@ -16,6 +19,7 @@ const NODE_ENV =
   (argv.test ? "-test" : "")
 
 const rootPath = path.join(__dirname, "..")
+const acornPath = path.join(rootPath, "src/acorn")
 const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
 const gzipPath = path.join(rootPath, "esm.js.gz")
@@ -38,6 +42,12 @@ if (argv.prod && ! argv.test) {
 
 Promise
   .all(trashPaths.map(trash))
+  .then(() => fs.pathExists(acornPath))
+  .then((exists) => {
+    if (! exists) {
+      return download("ternjs/acorn#" + acornPkg.version, acornPath)
+    }
+  })
   .then(() => execa("webpack", webpackArgs, {
     cwd: rootPath,
     env: { NODE_ENV },
