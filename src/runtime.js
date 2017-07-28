@@ -5,8 +5,10 @@ import URL from "url"
 
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
+import getSourceType from "./util/get-source-type.js"
 import isObject from "./util/is-object.js"
 import path from "path"
+import wrapCall from "./util/wrap-call.js"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
@@ -77,25 +79,27 @@ class Runtime {
     return (childNamespace, childEntry) => this.entry.addGettersFrom(childEntry)
   }
 
-  run(wrapper, require) {
+  run(wrapper, req) {
     const entry = this.entry
     const mod = this.module
     const exported = mod.exports = entry.exports
     const namespace = entry._namespace
     const options = this.options
 
-    if (wrapper.length) {
-      wrapper.call(exported, exported, require, mod, mod.filename, path.dirname(mod.filename))
-    } else {
-      wrapper.call(options.cjs ? exported : void 0)
-    }
-
-    mod.loaded = true
-    entry.update().loaded()
-
     if (! wrapper.length) {
+      wrapper.call(options.cjs ? exported : void 0)
+      mod.loaded = true
+      entry.update().loaded()
       assign(exported, namespace)
+      return
     }
+
+    const filename = mod.filename
+    const dirname = path.dirname(filename)
+
+    req = options.cjs ? req : assign(wrapCall(req, requireWrapper), req)
+    wrapper.call(exported, exported, req, mod, filename, dirname)
+    mod.loaded = true
   }
 
   // Platform-specific code should find a way to call this method whenever
@@ -156,6 +160,16 @@ class Runtime {
       childEntry.addSetters(setterPairs, parent).update()
     }
   }
+}
+
+function requireWrapper(func, id) {
+  const exported = func(id)
+
+  if (getSourceType(exported) === "module") {
+    throw TypeError
+  }
+
+  return exported
 }
 
 function resolveId(id, parent) {
