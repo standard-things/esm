@@ -86,11 +86,11 @@ function hasNamed(nodes, name) {
   return false
 }
 
-function hasParam(node, name) {
-  return hasNamed(node.params, name)
-}
+const hasParameter = memoize((node, name) =>
+  hasNamed(node.params, name)
+)
 
-function hasVariable(node, name) {
+const hasVariable = memoize((node, name) => {
   let i = -1
   const body = node.body
   const stmtCount = body.length
@@ -105,7 +105,7 @@ function hasVariable(node, name) {
   }
 
   return false
-}
+})
 
 function isShadowed(path, name) {
   let shadowed = false
@@ -114,7 +114,7 @@ function isShadowed(path, name) {
     const type = parent.type
 
     if ((type === "BlockStatement" && hasVariable(parent, name)) ||
-        (type === "FunctionDeclaration" && hasParam(parent, name))) {
+        (type === "FunctionDeclaration" && hasParameter(parent, name))) {
       return shadowed = true
     }
 
@@ -122,6 +122,23 @@ function isShadowed(path, name) {
   })
 
   return shadowed
+}
+
+function memoize(func) {
+  const cacheMap = new WeakMap
+
+  return (node, name) => {
+    let names = cacheMap.get(node)
+
+    if (names === void 0) {
+      names = Object.create(null)
+      cacheMap.set(node, names)
+    }
+
+    return name in names
+      ? names[name]
+      : names[name] = func(node, name)
+  }
 }
 
 function wrap(visitor, path) {
