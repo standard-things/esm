@@ -63,17 +63,10 @@ class Parser {
     return names
   }
 
-  static lookahead(parser) {
-    acornParser.input = parser.input
-    acornParser.pos = parser.pos
-    acornParser.nextToken()
-    return acornParser
-  }
-
   // Based on Acorn's Parser.prototype.strictDirective parser utility.
   // Copyright Marijn Haverbeke. Released under MIT license:
   // https://github.com/ternjs/acorn/blob/5.1.1/src/parseutil.js#L9-L19
-  static moduleDirective(code) {
+  static hasPragma(code, pragma) {
     let pos = 0
 
     while (true) {
@@ -86,12 +79,19 @@ class Parser {
         return false
       }
 
-      if ((match[1] || match[2]) === "use module") {
+      if ((match[1] || match[2]) === pragma) {
         return true
       }
 
       pos += match[0].length
     }
+  }
+
+  static lookahead(parser) {
+    acornParser.input = parser.input
+    acornParser.pos = parser.pos
+    acornParser.nextToken()
+    return acornParser
   }
 
   static parse(code, options) {

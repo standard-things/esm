@@ -69,7 +69,7 @@ class Compiler {
 
     if (options.type === "module" ||
         importExportVisitor.addedImportExport ||
-        Parser.moduleDirective(code)) {
+        Parser.hasPragma(code, "use module")) {
       result.type = "module"
     } else if (options.type !== "unambiguous") {
       result.type = options.type
