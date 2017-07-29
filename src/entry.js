@@ -1,4 +1,3 @@
-import FastObject from "./fast-object.js"
 import OrderedMap from "./ordered-map.js"
 
 import assignProperty from "./util/assign-property.js"
@@ -22,7 +21,7 @@ class Entry {
     // A number indicating the loading state of the module.
     this._loaded = 0
     // The raw namespace object.
-    this._namespace = createNamespace()
+    this._namespace = Object.create(null)
     // The child entries of the module.
     this.children = new OrderedMap
     // The module.exports of the module.
@@ -180,6 +179,18 @@ class Entry {
         assignProperty(namespace, namespace, names[i], true)
       }
 
+      // Section 26.3.1
+      // The value of the @@toStringTag property is "Module".
+      // https://tc39.github.io/ecma262/#sec-@@tostringtag
+      if (useToStringTag) {
+        setProperty(namespace, Symbol.toStringTag, {
+          configurable: false,
+          enumerable: false,
+          value: "Module",
+          writable: false
+        })
+      }
+
       // Section 9.4.6
       // Module namespace objects are not extensible.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -282,23 +293,6 @@ function changed(setter, key, value) {
 
 function compare(object, key, value) {
   return key in object && Object.is(object[key], value)
-}
-
-function createNamespace() {
-  const namespace = new FastObject
-
-  if (useToStringTag) {
-    // Section 26.3.1
-    // The value of the @@toStringTag property is "Module".
-    // https://tc39.github.io/ecma262/#sec-@@tostringtag
-    setProperty(namespace, Symbol.toStringTag, {
-      configurable: false,
-      enumerable: false,
-      value: "Module",
-      writable: false
-    })
-  }
-  return namespace
 }
 
 // Invoke the given callback for every setter that needs to be called.
