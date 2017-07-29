@@ -80,6 +80,7 @@ if (isProduction) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
+      parallel: true,
       uglifyOptions: {
         toplevel: true,
         compress: {
