@@ -11,15 +11,15 @@ const isProduction = NODE_ENV.startsWith("production")
 const isTest = NODE_ENV.endsWith("test")
 
 const config = {
-  "target": "node",
-  "entry": {
-    "esm": "./src/index.js"
+  target: "node",
+  entry: {
+    esm: "./src/index.js"
   },
-  "output": {
-    "libraryExport": "default",
-    "libraryTarget": "commonjs2",
-    "filename": "[name].js",
-    "path": path.join(__dirname, "build")
+  output: {
+    libraryExport: "default",
+    libraryTarget: "commonjs2",
+    filename: "[name].js",
+    path: path.join(__dirname, "build")
   },
   module: {
     rules: [{
@@ -43,13 +43,13 @@ const config = {
               "transform-es2015-object-super",
               "transform-regenerator"
             ],
-            targets: { "node": 4 }
+            targets: { node: 4 }
           }]
         ]
       }
     }]
   },
-  "plugins": [
+  plugins: [
     new webpack.BannerPlugin({
       banner: [
         '"use strict";\n',
@@ -80,17 +80,17 @@ if (isProduction) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
-      "uglifyOptions": {
-        "toplevel": true,
-        "compress": {
-          "keep_infinity": true,
-          "negate_iife": false,
-          "passes": 3,
-          "pure_getters": true,
-          "unsafe": true
+      uglifyOptions: {
+        toplevel: true,
+        compress: {
+          keep_infinity: true,
+          negate_iife: false,
+          passes: 3,
+          pure_getters: true,
+          unsafe: true
         },
-        "output": {
-          "ascii_only": true
+        output: {
+          ascii_only: true
         }
       }
     })
