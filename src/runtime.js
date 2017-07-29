@@ -26,29 +26,20 @@ const resolveCache = new FastObject
 
 class Runtime {
   static enable(mod, exported, options) {
-    const object = mod.exports
-
-    if (Object.getOwnPropertyNames(object).length) {
-      return
-    }
-
-    let i = -1
-    const proto = this.prototype
-    const names = Object.getOwnPropertyNames(proto)
-    const nameCount = names.length
-
-    while (++i < nameCount) {
-      const name = names[i]
-      if (name !== "constructor") {
-        object[name] = proto[name]
-      }
-    }
-
     options = createOptions(options)
+    const object = mod.exports
 
     object.entry = Entry.get(mod, exported, options)
     object.module = mod
     object.options = options
+
+    object.d = object.default = Rp.default
+    object.e = object.export = Rp.export
+    object.i = object.import = Rp.import
+    object.n = object.nsSetter = Rp.nsSetter
+    object.r = object.run = Rp.run
+    object.u = object.update = Rp.update
+    object.w = object.watch = Rp.watch
   }
 
   // Register a getter function that always returns the given value.
