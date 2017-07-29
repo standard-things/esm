@@ -1,6 +1,7 @@
 .*
 /build
 /node_modules
+/src/acorn
 /test/fixture/extension
 /test/export/all-mutual.js
 /test/export/extension.js
