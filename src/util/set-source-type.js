@@ -10,6 +10,11 @@ function setSourceType(exported, type) {
     return exported
   }
 
+  if (type === "module") {
+    exported[typeSym] = type
+    return exported
+  }
+
   return setProperty(exported, typeSym, {
     configurable: false,
     enumerable: false,
