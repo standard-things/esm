@@ -5,10 +5,18 @@ function add(x, y) {
   return value += y
 }
 
+const divide = (value, y) => {
+  return value /= y
+}
+
+const modulo = (value, y) => {
+  return value %= y
+}
+
 function subtract(value, y) {
   return value -= y
 }
 
-function uid() {
+function inc() {
   return value += 1
 }

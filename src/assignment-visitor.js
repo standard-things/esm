@@ -113,9 +113,14 @@ function isShadowed(path, name) {
   path.getParentNode((parent) => {
     const type = parent.type
 
-    if ((type === "BlockStatement" && hasVariable(parent, name)) ||
-        (type === "FunctionDeclaration" && hasParameter(parent, name))) {
-      return shadowed = true
+    if (type === "BlockStatement") {
+      return shadowed = hasVariable(parent, name)
+    }
+
+    if (type === "FunctionDeclaration" ||
+        type === "FunctionExpression" ||
+        type === "ArrowFunctionExpression") {
+      return shadowed = hasParameter(parent, name)
     }
 
     return false
