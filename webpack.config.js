@@ -21,6 +21,34 @@ const config = {
     "filename": "[name].js",
     "path": path.join(__dirname, "build")
   },
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: "babel-loader",
+      options: {
+        plugins: [
+          "transform-for-of-as-array"
+        ],
+        presets: [
+          ["env", {
+            modules: false,
+            exclude: [
+              "check-es2015-constants",
+              "transform-async-to-generator",
+              "transform-es2015-block-scoping",
+              "transform-es2015-classes",
+              "transform-es2015-for-of",
+              "transform-es2015-function-name",
+              "transform-es2015-object-super",
+              "transform-regenerator"
+            ],
+            targets: { "node": 4 }
+          }]
+        ]
+      }
+    }]
+  },
   "plugins": [
     new webpack.BannerPlugin({
       banner: [
@@ -72,6 +100,7 @@ if (isProduction) {
 if (isTest) {
   config.entry.compiler = "./src/compiler.js"
   config.entry.runtime = "./src/runtime.js"
+  config.module.rules[0].options.presets[0][1].debug = true
 }
 
 module.exports = config
