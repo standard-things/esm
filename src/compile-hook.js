@@ -147,15 +147,15 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
     output =
       (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".r(" + async + "function(){" + output + "\n})"
+      runtimeAlias + ".r((" + async + "function(){" + output + "\n}))"
   } else {
     setSourceType(exported, "script")
     Runtime.enable(mod, exported, pkgOptions)
 
     output =
       "const " + runtimeAlias + "=this;" + runtimeAlias +
-      ".r(function(exports,require,module,__filename,__dirname){" +
-      output + "\n},require)"
+      ".r((function(exports,require,module,__filename,__dirname){" +
+      output + "\n}),require)"
   }
 
   if (pkgOptions.debug) {
