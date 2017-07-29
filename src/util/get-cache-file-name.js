@@ -1,7 +1,6 @@
 import esmSemVer from "./version.js"
 import extname from "./extname.js"
 import md5 from "./md5.js"
-import path from "path"
 
 function getCacheFileName(filePath, cacheKey, pkgInfo) {
   // While MD5 is not suitable for verification of untrusted data,

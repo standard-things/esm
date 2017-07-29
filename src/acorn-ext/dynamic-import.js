@@ -2,11 +2,9 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
-import { types as tt } from "../acorn/src/tokentype.js"
 import Parser from "../parser.js"
+import { types as tt } from "../acorn/src/tokentype.js"
 import wrapCall from "../util/wrap-call.js"
-
-const codeOfLeftParen = "(".charCodeAt(0)
 
 function enable(parser) {
   // Allow `yield import()` to parse.

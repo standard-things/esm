@@ -3,7 +3,6 @@ import SemVer from "semver"
 import binding from "./binding.js"
 import fs from "fs"
 
-const internalModuleStat = binding.internalModuleStat
 const internalStat = binding.stat
 const internalStatValues = binding.getStatValues
 
