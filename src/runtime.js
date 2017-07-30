@@ -69,17 +69,16 @@ class Runtime {
   }
 
   run(wrapper, req) {
-    const entry = this.entry
     const mod = this.module
+    const entry = this.entry
     const exported = mod.exports = entry.exports
-    const namespace = entry._namespace
     const options = this.options
 
     if (! wrapper.length) {
       wrapper.call(options.cjs ? exported : void 0)
       mod.loaded = true
       entry.update().loaded()
-      assign(exported, namespace)
+      assign(exported, entry._namespace)
       return
     }
 
