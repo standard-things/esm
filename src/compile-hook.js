@@ -93,10 +93,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       : readFile(filePath, "utf8")
   )
 
-  const wrapModule = (script) => (
-    '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
-  )
-
   let cacheCode
   let sourceCode
   let cacheValue = cache[cacheFileName]
@@ -171,7 +167,9 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       const wrap = Module.wrap
       Module.wrap = (script) => {
         Module.wrap = wrap
-        return compiledCode = wrapModule(script)
+        return compiledCode =
+          '"use strict";(function(){const ' + runtimeAlias + "=this;" +
+          script + "\n})"
       }
     }
 
