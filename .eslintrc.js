@@ -49,6 +49,7 @@ module.exports = {
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
     "sort-vars": "error",
     "space-before-function-paren": ["error", { named: "never" }],
+    "space-infix-ops": "error",
     "spaced-comment": ["error", "always", { block: { balanced: true } }],
     strict: "error",
     "quote-props": ["error", "consistent-as-needed"],
