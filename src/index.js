@@ -1,4 +1,5 @@
 import "./compile-hook.js"
+import "./main-hook.js"
 import "./repl-hook.js"
 
 import setProperty from "./util/set-property.js"
