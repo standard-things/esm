@@ -80,7 +80,6 @@ if (isProduction) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
-      parallel: true,
       uglifyOptions: {
         toplevel: true,
         compress: {
@@ -91,7 +90,8 @@ if (isProduction) {
           unsafe: true
         },
         output: {
-          ascii_only: true
+          ascii_only: true,
+          wrap_iife: true
         }
       }
     })
