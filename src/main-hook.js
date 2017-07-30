@@ -4,7 +4,7 @@ import Wrapper from "./wrapper.js"
 
 import path from "path"
 
-const pkgMain = __non_webpack_module__.filename
+const esmPkgMain = __non_webpack_module__.filename
 const preloadModules = process._preload_modules || []
 let rootModule = __non_webpack_module__
 
@@ -13,7 +13,7 @@ while (rootModule.parent != null) {
 }
 
 if (rootModule.id === "internal/preload" ||
-    preloadModules.some((child) => child.filename === pkgMain)) {
+    preloadModules.some((child) => child.filename === esmPkgMain)) {
 
   const mjsExtRegExp = /\.mjs$/
   const resolveFilename = Module._resolveFilename

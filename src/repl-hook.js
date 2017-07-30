@@ -13,7 +13,7 @@ import md5 from "./util/md5.js"
 import vm from "vm"
 import wrapApply from "./util/wrap-apply.js"
 
-const pkgMain = __non_webpack_module__.filename
+const esmPkgMain = __non_webpack_module__.filename
 let rootModule = __non_webpack_module__
 
 while (rootModule.parent != null) {
@@ -24,7 +24,7 @@ if (rootModule.filename === null &&
     rootModule.id === "<repl>" &&
     rootModule.loaded === false &&
     rootModule.parent === void 0 &&
-    rootModule.children.some((child) => child.filename === pkgMain)) {
+    rootModule.children.some((child) => child.filename === esmPkgMain)) {
   // Enable ESM in the default Node REPL by loading @std/esm upon entering.
   // Custom REPLs can still define their own eval functions to bypass this,
   // but that's a feature, not a drawback.
