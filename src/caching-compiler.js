@@ -1,5 +1,6 @@
 import compiler from "./compiler.js"
 import createOptions from "./util/create-options.js"
+import extname from "./util/extname.js"
 import gzip from "./fs/gzip.js"
 import keys from "./util/keys.js"
 import path from "path"
@@ -35,12 +36,14 @@ function compileAndWrite(code, options) {
   const cachePath = options.cachePath
   const cacheFileName = options.cacheFileName
   const cacheFilePath = path.join(cachePath, cacheFileName)
-  const isGzipped = path.extname(cacheFilePath) === ".gz"
+  const cacheExt = extname(cacheFilePath)
+  const isGzipped = cacheExt.endsWith(".gz")
 
   let output = result.code
 
   if (result.type === "script") {
-    output= '"' + options.runtimeAlias + ':script";' + output
+    const md5Hash = path.basename(cacheFileName, cacheExt).substr(8, 3)
+    output= '"' + md5Hash + ':use script";' + output
   }
 
   const content = () => isGzipped ? gzip(output) : output

@@ -111,11 +111,11 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   if (! isObject(cacheValue)) {
     if (cacheValue === true) {
       if (type === "unambiguous") {
-        const prefix = '"' + runtimeAlias + ':script";'
+        const useScriptPragma = '"' + md5Hash + ':use script";'
 
-        if (cacheCode.startsWith(prefix)) {
+        if (cacheCode.startsWith(useScriptPragma)) {
           type = "script"
-          cacheCode = cacheCode.slice(prefix.length)
+          cacheCode = cacheCode.slice(useScriptPragma.length)
         } else {
           type = "module"
         }
