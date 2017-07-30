@@ -10,6 +10,8 @@ import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
 import extname from "./util/extname.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
+import getCacheStateHash from "./util/get-cache-state-hash.js"
+import getScriptPragma from "./util/get-script-pragma.js"
 import getSourceType from "./util/get-source-type.js"
 import gunzip from "./fs/gunzip.js"
 import isObject from "./util/is-object.js"
@@ -84,8 +86,8 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const cacheKey = mtime(filePath)
   const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 
-  const md5Hash = path.basename(cacheFileName, ext).substr(8, 3)
-  const runtimeAlias = encodeIdent("_" + md5Hash)
+  const stateHash = getCacheStateHash(cacheFileName)
+  const runtimeAlias = encodeIdent("_" + stateHash.slice(0, 3))
 
   const readCode = (filePath) => (
     pkgOptions.gz && path.extname(filePath) === ".gz"
@@ -107,11 +109,11 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   if (! isObject(cacheValue)) {
     if (cacheValue === true) {
       if (type === "unambiguous") {
-        const useScriptPragma = '"' + md5Hash + ':use script";'
+        const scriptPragma = getScriptPragma(cacheFileName)
 
-        if (cacheCode.startsWith(useScriptPragma)) {
+        if (cacheCode.startsWith(scriptPragma)) {
           type = "script"
-          cacheCode = cacheCode.slice(useScriptPragma.length)
+          cacheCode = cacheCode.slice(scriptPragma.length)
         } else {
           type = "module"
         }
