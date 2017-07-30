@@ -16,7 +16,7 @@ Usage
      module.exports = require("./main.mjs").default
      ```
 
-Enable ESM in the Node CLI with [the `-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+Enable ESM in the Node CLI by loading `@std/esm` with [the `-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
 ```shell
 node -r @std/esm file.mjs

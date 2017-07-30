@@ -21,9 +21,8 @@ if (rootModule.filename === null &&
     rootModule.loaded === false &&
     rootModule.parent === void 0 &&
     rootModule.children.some((child) => child.filename === esmPkgMain)) {
-  // Enable ESM in the default Node REPL by loading @std/esm upon entering.
-  // Custom REPLs can still define their own eval functions to bypass this,
-  // but that's a feature, not a drawback.
+  // Enable ESM in the Node REPL by loading @std/esm upon entering.
+  // Custom REPLs can still define their own eval functions to bypass this.
   const md5Hash = md5(Date.now()).substr(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeIdent("_" + md5Hash)

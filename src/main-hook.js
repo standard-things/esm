@@ -10,7 +10,7 @@ const preloadModules = process._preload_modules || []
 
 if (rootModule.id === "internal/preload" ||
     preloadModules.some((child) => child.filename === esmPkgMain)) {
-
+  // Enable ESM in the Node CLI by loading @std/esm with the -r option.
   const mjsExtRegExp = /\.mjs$/
   const resolveFilename = Module._resolveFilename
 
@@ -30,7 +30,7 @@ if (rootModule.id === "internal/preload" ||
       return
     }
 
-    // Load the main module--the command line argument.
+    // Load the main module from the command line argument.
     const mod =
     Module._cache[filePath] =
     process.mainModule = new Module(filePath, null)
