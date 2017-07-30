@@ -2,8 +2,9 @@
   "name": "extension",
   "private": true,
   "@std/esm": {
-    "ext": true,
-    "esm": "js"
+    "debug": true,
+    "esm": "js",
+    "ext": true
   },
   "dependencies": {
     "@std/esm": "*"

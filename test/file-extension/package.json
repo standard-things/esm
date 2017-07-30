@@ -2,8 +2,9 @@
   "name": "file-extension",
   "private": true,
   "@std/esm": {
-    "gz": true,
-    "esm": "js"
+    "debug": true,
+    "esm": "js",
+    "gz": true
   },
   "dependencies": {
     "@std/esm": "*"
