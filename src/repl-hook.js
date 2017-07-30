@@ -10,15 +10,11 @@ import getCacheFileName from "./util/get-cache-file-name.js"
 import isObject from "./util/is-object.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
 import md5 from "./util/md5.js"
+import rootModule from "./root-module.js"
 import vm from "vm"
 import wrapApply from "./util/wrap-apply.js"
 
 const esmPkgMain = __non_webpack_module__.filename
-let rootModule = __non_webpack_module__
-
-while (rootModule.parent != null) {
-  rootModule = rootModule.parent
-}
 
 if (rootModule.filename === null &&
     rootModule.id === "<repl>" &&

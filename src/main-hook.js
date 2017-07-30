@@ -3,14 +3,10 @@ import PkgInfo from "./pkg-info.js"
 import Wrapper from "./wrapper.js"
 
 import path from "path"
+import rootModule from "./root-module.js"
 
 const esmPkgMain = __non_webpack_module__.filename
 const preloadModules = process._preload_modules || []
-let rootModule = __non_webpack_module__
-
-while (rootModule.parent != null) {
-  rootModule = rootModule.parent
-}
 
 if (rootModule.id === "internal/preload" ||
     preloadModules.some((child) => child.filename === esmPkgMain)) {
