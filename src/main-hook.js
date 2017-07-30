@@ -11,7 +11,6 @@ const preloadModules = process._preload_modules || []
 if (rootModule.id === "internal/preload" ||
     preloadModules.some((child) => child.filename === esmPkgMain)) {
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
-  const mjsExtRegExp = /\.mjs$/
   const resolveFilename = Module._resolveFilename
 
   const managerWrapper = function (manager, func) {
@@ -25,7 +24,7 @@ if (rootModule.id === "internal/preload" ||
   }
 
   const methodWrapper = function (manager, func, filePath) {
-    if (! mjsExtRegExp.test(filePath)) {
+    if (! filePath.endsWith(".mjs")) {
       func()
       return
     }
