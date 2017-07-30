@@ -1,5 +1,3 @@
-import OrderedMap from "./ordered-map.js"
-
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
@@ -23,11 +21,11 @@ class Entry {
     // The raw namespace object.
     this._namespace = Object.create(null)
     // The child entries of the module.
-    this.children = new OrderedMap
+    this.children = Object.create(null)
     // The module.exports of the module.
     this.exports = exported
     // Getters for local variables exported from the module.
-    this.getters = new OrderedMap
+    this.getters = Object.create(null)
     // The module this entry is managing.
     this.module = mod
     // The namespace alias that object importers receive.
@@ -35,7 +33,7 @@ class Entry {
     // The package options for this entry.
     this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
-    this.setters = new OrderedMap
+    this.setters = Object.create(null)
     // Set the default source type.
     this.sourceType = "script"
   }
@@ -77,7 +75,7 @@ class Entry {
       const getter = pair[1]
 
       getter.owner = this.module
-      this.getters.set(name, getter)
+      this.getters[name] = getter
     }
 
     return this
@@ -95,13 +93,13 @@ class Entry {
         continue
       }
 
-      let getter = getters.get(key)
-      const otherGetter = otherGetters.get(key)
+      let getter = getters[key]
+      const otherGetter = otherGetters[key]
 
       if (typeof getter !== "function" &&
           typeof otherGetter === "function") {
         getter = otherGetter
-        getters.set(key, getter)
+        getters[key] = getter
       }
 
       if (typeof getter !== "function" ||
@@ -131,11 +129,11 @@ class Entry {
       const pair = setterPairs[i]
       const name = pair[0]
       const setter = pair[1]
-      let setters = this.setters.get(name)
+      let setters = this.setters[name]
 
       if (setters === void 0) {
         setters = []
-        this.setters.set(name, setters)
+        this.setters[name] = setters
       }
       setter.last = Object.create(null)
       setter.parent = parent
@@ -157,11 +155,12 @@ class Entry {
     }
 
     let i = -1
-    const children = this.children.values()
-    const childCount = children.length
+    const children = this.children
+    const ids = Object.keys(children)
+    const idCount = ids.length
 
-    while (++i < childCount) {
-      if (! children[i].loaded()) {
+    while (++i < idCount) {
+      if (! children[ids[i]].loaded()) {
         return this._loaded = 0
       }
     }
@@ -223,10 +222,10 @@ class Entry {
 
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
-    const parentsMap = new OrderedMap
+    const parentsMap = Object.create(null)
 
     forEachSetter(this, (setter, value) => {
-      parentsMap.set(setter.parent.id, setter.parent)
+      parentsMap[setter.parent.id] = setter.parent
       setter(value, this)
     })
 
@@ -234,15 +233,15 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     let i = -1
-    const parents = parentsMap.values()
-    const parentCount = parents.length
+    const ids = Object.keys(parentsMap)
+    const idCount = ids.length
 
-    while (++i < parentCount) {
+    while (++i < idCount) {
       // What happens if parents[parentIDs[id]] === module, or if
       // longer cycles exist in the parent chain? Thanks to our setter.last
       // bookkeeping in changed(), the entry.update() broadcast will only
       // proceed as far as there are any actual changes to report.
-      Entry.get(parents[i]).update()
+      Entry.get(parentsMap[ids[i]]).update()
     }
 
     return this
@@ -301,8 +300,7 @@ function forEachSetter(entry, callback) {
   entry._changed = false
 
   let i = -1
-  const collections = entry.setters.values()
-  const names = entry.setters.keys()
+  const names = Object.keys(entry.setters)
   const nameCount = names.length
 
   if (nameCount) {
@@ -310,7 +308,8 @@ function forEachSetter(entry, callback) {
   }
 
   while (++i < nameCount) {
-    const setters = collections[i]
+    const name = names[i]
+    const setters = entry.setters[name]
     const setterCount = setters.length
 
     if (! setterCount) {
@@ -318,7 +317,6 @@ function forEachSetter(entry, callback) {
     }
 
     let j = -1
-    const name = names[i]
     const value = getExportByName(entry, name)
 
     while (++j < setterCount) {
@@ -366,13 +364,12 @@ function runGetters(entry) {
 
   let i = -1
   const namespace = entry._namespace
-  const getters = entry.getters.values()
-  const names = entry.getters.keys()
+  const names = Object.keys(entry.getters)
   const nameCount = names.length
 
   while (++i < nameCount) {
     const name = names[i]
-    const value = runGetter(getters[i])
+    const value = runGetter(entry.getters[name])
 
     if (value !== GETTER_ERROR &&
         ! compare(namespace, name, value)) {
