@@ -29,7 +29,6 @@ let allowTopLevelAwait = isObject(process.mainModule) &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
 function managerWrapper(manager, func, mod, filePath) {
-  filePath = path.resolve(filePath)
   const pkgInfo = PkgInfo.get(path.dirname(filePath))
   const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
 
