@@ -192,7 +192,7 @@ function resolveId(id, parent) {
   }
 
   if (noPathname || parsed.protocol !== "file:") {
-    const error = new Error("Cannot find module " + id)
+    const error = new Error("Cannot find module '" + id + "'")
     error.code = "MODULE_NOT_FOUND"
     throw error
   }
