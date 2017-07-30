@@ -166,17 +166,7 @@ class Entry {
     }
 
     setGetter(this, "namespace", () => {
-      // Section 9.4.6.11
-      // Step 7: Enforce sorted iteration order of properties
-      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-      let i = -1
       const namespace = this._namespace
-      const names = keys(namespace).sort()
-      const nameCount = names.length
-
-      while (++i < nameCount) {
-        assignProperty(namespace, namespace, names[i], true)
-      }
 
       // Section 26.3.1
       // The value of the @@toStringTag property is "Module".
@@ -188,6 +178,17 @@ class Entry {
           value: "Module",
           writable: false
         })
+      }
+
+      // Section 9.4.6.11
+      // Step 7: Enforce sorted iteration order of properties
+      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
+      let i = -1
+      const names = keys(namespace).sort()
+      const nameCount = names.length
+
+      while (++i < nameCount) {
+        assignProperty(namespace, namespace, names[i], true)
       }
 
       // Section 9.4.6
