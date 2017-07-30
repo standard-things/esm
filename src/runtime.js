@@ -5,9 +5,7 @@ import URL from "url"
 
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
-import getSourceType from "./util/get-source-type.js"
 import path from "path"
-import wrapCall from "./util/wrap-call.js"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
@@ -88,7 +86,6 @@ class Runtime {
     const filename = mod.filename
     const dirname = path.dirname(filename)
 
-    req = options.cjs ? req : assign(wrapCall(req, requireWrapper), req)
     wrapper.call(exported, exported, req, mod, filename, dirname)
     mod.loaded = true
   }
@@ -149,16 +146,6 @@ function isPath(id) {
   return code0 === codeOfForwardSlash || (code0 === codeOfDot &&
     (code1 === codeOfForwardSlash ||
     (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash)))
-}
-
-function requireWrapper(func, id) {
-  const exported = func(id)
-
-  if (getSourceType(exported) === "module") {
-    throw TypeError
-  }
-
-  return exported
 }
 
 function resolveId(id, parent) {

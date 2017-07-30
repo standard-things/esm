@@ -24,6 +24,10 @@ class PkgInfo {
   constructor(dirPath, range, options) {
     options = createOptions(options, defaultOptions)
 
+    if (options.esm === "mjs") {
+      options.esm = false
+    }
+
     const cache = Object.create(null)
     const cacheDir =  options.cache
     const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null

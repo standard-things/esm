@@ -10,6 +10,7 @@ import compiler from "./caching-compiler.js"
 import encodeIdent from "./util/encode-ident.js"
 import extname from "./util/extname.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
+import getSourceType from "./util/get-source-type.js"
 import gunzip from "./fs/gunzip.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
@@ -19,7 +20,8 @@ import path from "path"
 import readFile from "./fs/read-file.js"
 import setSourceType from "./util/set-source-type.js"
 
-let allowTopLevelAwait = process.mainModule !== void 0 &&
+let inited = false
+let allowTopLevelAwait = isObject(process.mainModule) &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
 function managerWrapper(manager, func, mod, filePath) {
@@ -35,8 +37,27 @@ function managerWrapper(manager, func, mod, filePath) {
 function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   const pkgOptions = pkgInfo.options
   const cachePath = pkgInfo.cachePath
+
+  if (cachePath === null) {
+    func.call(this, mod, filePath)
+    return
+  }
+
+  const parent = mod.parent
+  const parentPkgInfo = parent != null && typeof parent.filename === "string"
+    ? PkgInfo.get(path.dirname(parent.filename))
+    : null
+
+  if (inited &&
+      (parentPkgInfo === null || ! parentPkgInfo.options.cjs) &&
+      (parent === null || getSourceType(parent.exports) === "script")) {
+    func.call(this, mod, filePath)
+    return
+  }
+
+  inited = true
   const ext = extname(filePath)
-  let type = "script"
+  let type = getSourceType(mod.exports)
 
   if (ext === ".mjs" || ext === ".mjs.gz") {
     type = "module"
@@ -44,8 +65,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     type = "unambiguous"
   }
 
-  if (cachePath === null ||
-      (type !== "module" && (pkgOptions.esm === "mjs" || ! pkgOptions.esm))) {
+  if (! pkgOptions.esm && type !== "module") {
     func.call(this, mod, filePath)
     return
   }
