@@ -25,7 +25,7 @@ function compileWithFilename(code, options) {
 
 function compileAndCache(code, options) {
   const result = compiler.compile(code, toCompileOptions(options))
-  options.pkgInfo.cache.set(options.cacheFileName, result)
+  options.pkgInfo.cache[options.cacheFileName] = result
   return result
 }
 
@@ -59,7 +59,7 @@ function compileAndWrite(code, options) {
 
 function removeExpired(cache, cachePath, cacheFileName) {
   const shortname = cacheFileName.slice(0, 8)
-  cache.keys().forEach((key) => {
+  Object.keys(cache).forEach((key) => {
     if (key !== cacheFileName &&
         key.startsWith(shortname)) {
       removeFile(path.join(cachePath, key))

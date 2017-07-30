@@ -46,7 +46,7 @@ if (rootModule.filename === null &&
 
     const cache = pkgInfo.cache
     const cacheFileName = getCacheFileName(null, code, pkgInfo)
-    const cacheValue = cache.get(cacheFileName)
+    const cacheValue = cache[cacheFileName]
     const pkgOptions = pkgInfo.options
 
     let output
@@ -107,7 +107,7 @@ if (rootModule.filename === null &&
     }
 
     if (result.cachedDataProduced) {
-      cache.get(cacheFileName).data = result.cachedData
+      cache[cacheFileName].data = result.cachedData
     }
 
     result.runInContext = wrapApply(result.runInContext, runWrapper)

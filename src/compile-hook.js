@@ -69,7 +69,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
 
   let cacheCode
   let sourceCode
-  let cacheValue = cache.get(cacheFileName)
+  let cacheValue = cache[cacheFileName]
 
   if (cacheValue === true) {
     cacheCode = readCode(path.join(cachePath, cacheFileName))
@@ -92,7 +92,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
       }
 
       cacheValue = { code: cacheCode, type }
-      cache.set(cacheFileName, cacheValue)
+      cache[cacheFileName] = cacheValue
     } else {
       const compilerOptions = {
         cacheFileName,

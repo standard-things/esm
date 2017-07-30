@@ -1,5 +1,4 @@
 import FastObject from "./fast-object.js"
-import OrderedMap from "./ordered-map.js"
 import SemVer from "semver"
 
 import createOptions from "./util/create-options.js"
@@ -25,7 +24,7 @@ class PkgInfo {
   constructor(dirPath, range, options) {
     options = createOptions(options, defaultOptions)
 
-    const cache = new OrderedMap
+    const cache = Object.create(null)
     const cacheDir =  options.cache
     const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
@@ -36,7 +35,7 @@ class PkgInfo {
     while (++i < nameCount) {
       // Later, in Module._extensions[".js"], we'll change the value to the actual
       // contents of the file, but for now we merely register that it exists.
-      cache.set(cacheFileNames[i], true)
+      cache[cacheFileNames[i]] = true
     }
 
     this.cache = cache
