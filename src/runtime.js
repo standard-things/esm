@@ -118,9 +118,12 @@ class Runtime {
     const parent = this.module
 
     if (id in builtinModules) {
-      childModule = new Module(id, null)
-      childModule.exports = parent.require(id)
-      childModule.loaded = true
+      childModule = builtinModules[id]
+      if (childModule === true) {
+        childModule = builtinModules[id] = new Module(id, null)
+        childModule.exports = parent.require(id)
+        childModule.loaded = true
+      }
     } else {
       id = resolveId(id, parent)
       parent.require(id)
