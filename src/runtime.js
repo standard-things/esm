@@ -122,10 +122,7 @@ class Runtime {
       childModule.exports = parent.require(id)
       childModule.loaded = true
     } else {
-      if (urlsCharsRegExp.test(id) || ! isPath(id)) {
-        id = resolveId(id, parent)
-      }
-
+      id = resolveId(id, parent)
       parent.require(id)
       childModule = Module._cache[resolveFilename(id, parent)]
     }
@@ -157,6 +154,10 @@ function resolveId(id, parent) {
 
   if (cacheKey in resolveCache) {
     return resolveCache[cacheKey]
+  }
+
+  if (! (urlsCharsRegExp.test(id) || ! isPath(id))) {
+    return resolveCache[cacheKey] = id
   }
 
   const parsed = URL.parse(id)
