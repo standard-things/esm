@@ -1,6 +1,7 @@
 import compiler from "./compiler.js"
 import createOptions from "./util/create-options.js"
 import gzip from "./fs/gzip.js"
+import keys from "./util/keys.js"
 import path from "path"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
@@ -59,7 +60,7 @@ function compileAndWrite(code, options) {
 
 function removeExpired(cache, cachePath, cacheFileName) {
   const shortname = cacheFileName.slice(0, 8)
-  Object.keys(cache).forEach((key) => {
+  keys(cache).forEach((key) => {
     if (key !== cacheFileName &&
         key.startsWith(shortname)) {
       removeFile(path.join(cachePath, key))

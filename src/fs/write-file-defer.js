@@ -1,6 +1,7 @@
 import FastObject from "../fast-object.js"
 
 import createOptions from "../util/create-options.js"
+import keys from "../util/keys.js"
 import mkdirp from "./mkdirp.js"
 import path from "path"
 import writeFile from "./write-file.js"
@@ -17,7 +18,7 @@ function writeFileDefer(filePath, content, options, callback) {
   }
   pendingWriteTimer = setImmediate(() => {
     pendingWriteTimer = null
-    Object.keys(pendingWrites).forEach((filePath) => {
+    keys(pendingWrites).forEach((filePath) => {
       const pending = pendingWrites[filePath]
       const callback = pending.callback
       const options = pending.options

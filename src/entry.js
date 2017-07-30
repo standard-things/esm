@@ -156,7 +156,7 @@ class Entry {
 
     let i = -1
     const children = this.children
-    const ids = Object.keys(children)
+    const ids = keys(children)
     const idCount = ids.length
 
     while (++i < idCount) {
@@ -234,7 +234,7 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     let i = -1
-    const ids = Object.keys(parentsMap)
+    const ids = keys(parentsMap)
     const idCount = ids.length
 
     while (++i < idCount) {
@@ -301,7 +301,7 @@ function forEachSetter(entry, callback) {
   entry._changed = false
 
   let i = -1
-  const names = Object.keys(entry.setters)
+  const names = keys(entry.setters)
   const nameCount = names.length
 
   if (nameCount) {
@@ -365,7 +365,7 @@ function runGetters(entry) {
 
   let i = -1
   const namespace = entry._namespace
-  const names = Object.keys(entry.getters)
+  const names = keys(entry.getters)
   const nameCount = names.length
 
   while (++i < nameCount) {
