@@ -6,7 +6,6 @@ import URL from "url"
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
-import isObject from "./util/is-object.js"
 import path from "path"
 import wrapCall from "./util/wrap-call.js"
 
@@ -23,6 +22,7 @@ const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
 const resolveCache = new FastObject
+const urlsCharsRegExp = /[:?#]/
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -118,39 +118,37 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    const cache = Module._cache
+    let childModule
     const parent = this.module
 
-    if (! (id in builtinModules)) {
-      id = resolveId(id, parent)
-      if (! path.isAbsolute(id)) {
-        id = resolveFilename(id, parent)
-      }
-    }
-
-    let childExports
-    let childModule = cache[id]
-
-    if (isObject(childModule)) {
-      childExports = childModule.exports
-    } else {
-      childExports = parent.require(id)
-      childModule = cache[id]
-    }
-
-    if (! isObject(childModule)) {
+    if (id in builtinModules) {
       childModule = new Module(id, null)
-      childModule.exports = childExports
+      childModule.exports = parent.require(id)
       childModule.loaded = true
+    } else {
+      if (urlsCharsRegExp.test(id) || ! isPath(id)) {
+        id = resolveId(id, parent)
+      }
+
+      parent.require(id)
+      childModule = Module._cache[resolveFilename(id, parent)]
     }
 
     const childEntry = Entry.get(childModule)
-    this.entry.children.set(id, childEntry)
+    this.entry.children[id] = childEntry
 
     if (setterPairs !== void 0) {
       childEntry.addSetters(setterPairs, parent).update()
     }
   }
+}
+
+function isPath(id) {
+  const code0 = id.charCodeAt(0)
+  const code1 = id.charCodeAt(1)
+  return code0 === codeOfForwardSlash || (code0 === codeOfDot &&
+    (code1 === codeOfForwardSlash ||
+    (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash)))
 }
 
 function requireWrapper(func, id) {
@@ -175,26 +173,12 @@ function resolveId(id, parent) {
     return resolveCache[cacheKey]
   }
 
-  const code0 = id.charCodeAt(0)
-  const code1 = id.charCodeAt(1)
-  const isPath =
-    code0 === codeOfForwardSlash ||
-    (code0 === codeOfDot &&
-      (code1 === codeOfForwardSlash ||
-      (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash))) ||
-    id.includes(":")
-
-  const noParse = ! isPath
-  const parsed = noParse ? null : URL.parse(id)
-  const noPathname = noParse || parsed.pathname === null
+  const parsed = URL.parse(id)
+  const noPathname = parsed.pathname === null
 
   id = noPathname ? id : unescape(parsed.pathname)
 
-  if (noParse || typeof parsed.protocol !== "string") {
-    if (isPath) {
-      return resolveCache[cacheKey] = id
-    }
-
+  if (typeof parsed.protocol !== "string") {
     // Prevent resolving non-local dependencies:
     // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
     const paths = nodeModulePaths(path.dirname(filename))
