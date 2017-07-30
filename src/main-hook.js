@@ -15,30 +15,28 @@ if (rootModule.id === "internal/preload" ||
   const resolveFilename = Module._resolveFilename
 
   const managerWrapper = function (manager, func) {
-    const filePath = path.resolve(process.argv[1])
+    const filePath = resolveFilename(process.argv[1], null, true)
     const pkgInfo = PkgInfo.get(path.dirname(filePath))
     const wrapped = pkgInfo === null ? null : Wrapper.find(Module, "runMain", pkgInfo.range)
 
     return wrapped === null
       ? func.call(this)
-      : wrapped.call(this, manager, func)
+      : wrapped.call(this, manager, func, filePath)
   }
 
-  const methodWrapper = function (manager, func) {
-    const filename = resolveFilename(process.argv[1], null, true)
-
-    if (! mjsExtRegExp.test(filename)) {
+  const methodWrapper = function (manager, func, filePath) {
+    if (! mjsExtRegExp.test(filePath)) {
       func()
       return
     }
 
     // Load the main module--the command line argument.
     const mod =
-    Module._cache[filename] =
-    process.mainModule = new Module(filename, null)
+    Module._cache[filePath] =
+    process.mainModule = new Module(filePath, null)
 
     mod.id = "."
-    mod.load(filename)
+    mod.load(filePath)
 
     // Handle any nextTicks added in the first tick of the program.
     process._tickCallback()
