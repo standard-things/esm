@@ -34,7 +34,8 @@ export function check() {
 
   assert.deepEqual(ans, mutualNs)
   assert.deepEqual(bns, mutualNs)
-  assert.deepEqual(Object.getOwnPropertyNames(ans), ["a", "b"])
+  assert.deepEqual(Object.keys(ans), ["a", "b"])
+  assert.deepEqual(Object.getOwnPropertyNames(ans).sort(), ["a", "b"])
   assert.notStrictEqual(ans, bns)
 
   assert.deepEqual(ns1, abcNs)
