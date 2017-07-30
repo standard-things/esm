@@ -44,7 +44,7 @@
     "pify": "^3.0.0",
     "semver": "^5.4.1",
     "trash": "^4.0.1",
-    "uglify-es": "^3.0.24",
+    "uglify-es": "^3.0.27",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
     "webpack": "^3.4.0",
     "webpack-bundle-analyzer": "^2.8.3",
