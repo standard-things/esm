@@ -3,6 +3,7 @@
 const path = require("path")
 const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
+const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
@@ -74,6 +75,7 @@ const config = {
 
 if (isProduction) {
   config.plugins.push(
+    new OptimizeJsPlugin,
     new ShakePlugin,
     new webpack.optimize.ModuleConcatenationPlugin,
     new webpack.EnvironmentPlugin({

@@ -39,6 +39,7 @@
     "husky": "^0.14.3",
     "minizlib": "^1.0.3",
     "mocha": "^3.4.2",
+    "optimize-js-plugin": "0.0.4",
     "optional-dev-dependency": "^2.0.1",
     "pify": "^3.0.0",
     "semver": "^5.4.1",
