@@ -24,9 +24,9 @@ if (rootModule.id === "internal/preload" ||
   }
 
   const methodWrapper = function (manager, func, filePath, args) {
+     /* eslint consistent-return: off */
     if (! filePath.endsWith(".mjs")) {
-      func.apply(this, args)
-      return
+      return func.apply(this, args)
     }
 
     // Load the main module from the command line argument.

@@ -36,14 +36,14 @@ function managerWrapper(manager, func, args) {
 }
 
 function methodWrapper(manager, func, pkgInfo, args) {
+  /* eslint consistent-return: off */
   const mod = args[0]
   const filePath = args[1]
   const pkgOptions = pkgInfo.options
   const cachePath = pkgInfo.cachePath
 
   if (cachePath === null) {
-    func.apply(this, args)
-    return
+    return func.apply(this, args)
   }
 
   const ext = extname(filePath)
@@ -56,8 +56,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   }
 
   if (! pkgOptions.esm && type !== "module") {
-    func.apply(this, args)
-    return
+    return func.apply(this, args)
   }
 
   const cache = pkgInfo.cache
