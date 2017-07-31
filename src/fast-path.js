@@ -33,8 +33,9 @@ class FastPath {
     let i = -1
     const stack = this.stack
     const array = stack[stack.length - 1]
+    const length = array.length
 
-    while (++i < array.length) {
+    while (++i < length) {
       stack.push(i, array[i])
       visitor[methodName](this)
       stack.length -= 2
