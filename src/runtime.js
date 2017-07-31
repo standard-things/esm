@@ -21,7 +21,7 @@ const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
 const resolveCache = new FastObject
 const resolveFilename = Module._resolveFilename
-const urlsCharsRegExp = /[:?#]/
+const urlCharsRegExp = /[:?#%]/
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -196,7 +196,7 @@ function resolveId(id, parent) {
   if (! id ||
       typeof id !== "string" ||
       id in builtinModules ||
-      (! urlsCharsRegExp.test(id) && isPath(id))) {
+      (! urlCharsRegExp.test(id) && isPath(id))) {
     return id
   }
 
