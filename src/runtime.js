@@ -204,7 +204,7 @@ function resolveId(id, parent) {
     return resolveCache[cacheKey]
   }
 
-  if (! (urlsCharsRegExp.test(id) || ! isPath(id))) {
+  if (! urlsCharsRegExp.test(id) && isPath(id)) {
     return resolveCache[cacheKey] = id
   }
 
