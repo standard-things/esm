@@ -29,7 +29,7 @@ class Entry {
     this.getters = Object.create(null)
     // The module this entry is managing.
     this.module = mod
-    // The namespace alias that object importers receive.
+    // The namespace object that importers receive.
     this.namespace = this._namespace
     // The package options for this entry.
     this.options = createOptions(options)
@@ -167,7 +167,22 @@ class Entry {
     }
 
     setGetter(this, "namespace", () => {
-      const namespace = this._namespace
+      // Section 9.4.6
+      // Namespace objects have a null [[Prototype]].
+      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+      const namespace = Object.create(null)
+
+      // Section 9.4.6.11
+      // Step 7: Enforce sorted iteration order of properties
+      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
+      let i = -1
+      const raw = this._namespace
+      const names = keys(raw).sort()
+      const nameCount = names.length
+
+      while (++i < nameCount) {
+        assignProperty(namespace, raw, names[i])
+      }
 
       // Section 26.3.1
       // The value of the @@toStringTag property is "Module".
@@ -181,21 +196,10 @@ class Entry {
         })
       }
 
-      // Section 9.4.6.11
-      // Step 7: Enforce sorted iteration order of properties
-      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-      let i = -1
-      const names = keys(namespace).sort()
-      const nameCount = names.length
-
-      while (++i < nameCount) {
-        assignProperty(namespace, namespace, names[i], true)
-      }
-
       // Section 9.4.6
       // Module namespace objects are not extensible.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      return this.namespace = Object.seal(namespace)
+      return this.namespace = this._namespace = Object.seal(namespace)
     })
 
     setSetter(this, "namespace", (value) => {
