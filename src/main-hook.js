@@ -31,11 +31,21 @@ if (rootModule.id === "internal/preload" ||
 
     // Load the main module from the command line argument.
     const mod =
-    Module._cache[filePath] =
     process.mainModule = new Module(filePath, null)
 
     mod.id = "."
-    mod.load(filePath)
+
+    let threw = true
+
+    try {
+      Module._cache[filePath] = mod
+      mod.load(filePath)
+      threw = false
+    } finally {
+      if (threw) {
+        delete Module._cache[filePath]
+      }
+    }
 
     // Handle any nextTicks added in the first tick of the program.
     process._tickCallback()
