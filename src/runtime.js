@@ -193,7 +193,7 @@ function requireWrapper(func, id) {
 }
 
 function resolveId(id, parent) {
-  if (typeof id !== "string") {
+  if (typeof id !== "string" || id in builtinModules) {
     return id
   }
 
