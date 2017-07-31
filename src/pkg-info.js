@@ -37,8 +37,9 @@ class PkgInfo {
     const nameCount = cacheFileNames === null ? 0 : cacheFileNames.length
 
     while (++i < nameCount) {
-      // Later, in Module._extensions[".js"], we'll change the value to the actual
-      // contents of the file, but for now we merely register that it exists.
+      // Later, in Module._extensions[".js"], we'll change the cached value to
+      // its associated mocked compiler result, but for now we merely register
+      // that a cache file exists.
       cache[cacheFileNames[i]] = true
     }
 
