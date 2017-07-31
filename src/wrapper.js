@@ -1,3 +1,6 @@
+// This module is critical for @std/esm versioning support and should be changed
+// as little as possible. Please ensure any changes are backwards compatible.
+
 import FastObject from "./fast-object.js"
 import SemVer from "semver"
 
