@@ -19,8 +19,8 @@ const builtinModules = Object
 const codeOfDot = ".".charCodeAt(0)
 const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
-const resolveFilename = Module._resolveFilename
 const resolveCache = new FastObject
+const resolveFilename = Module._resolveFilename
 const urlsCharsRegExp = /[:?#]/
 
 class Runtime {
