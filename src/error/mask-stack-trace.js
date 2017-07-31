@@ -16,31 +16,13 @@ const useInternalDecorateErrorStack = typeof internalDecorateErrorStack === "fun
 const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
 
 function maskStackTrace(error, sourceCode, compiledCode) {
-  // For efficiency V8 stack traces are not formatted when they are captured
-  // but on demand, the first time the error.stack property is accessed. To
-  // avoid accessing the stack property early, and to defer any file read
-  // operations, we follow suit and wrap the error object in a proxy object
-  // to mask error.stack on first access.
-  if (typeof Proxy === "undefined") {
-    const stack = error.stack
-    return setGetter(error, "stack", () => {
-      decorateStackTrace(error)
-      return setProperty(error, "stack", {
-        value: resolveStack(error, stack, sourceCode, compiledCode)
-      })
+  // Defer any file read operations until the stack property is accessed.
+  const stack = error.stack
+  return setGetter(error, "stack", () => {
+    decorateStackTrace(error)
+    return setProperty(error, "stack", {
+      value: resolveStack(error, stack, sourceCode, compiledCode)
     })
-  }
-
-  let trapSet = false
-  return new Proxy(error, {
-    get(error, key) {
-      if (key === "stack" && ! trapSet) {
-        trapSet = true
-        decorateStackTrace(error)
-        return error.stack = resolveStack(error, error.stack, sourceCode, compiledCode)
-      }
-      return error[key]
-    }
   })
 }
 
