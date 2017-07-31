@@ -10,6 +10,7 @@ import setSetter from "./util/set-setter.js"
 
 const GETTER_ERROR = {}
 const entryMap = new WeakMap
+const sort = Array.prototype.sort
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
@@ -177,7 +178,7 @@ class Entry {
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
       const raw = this._namespace
-      const names = keys(raw).sort()
+      const names = sort.call(keys(raw))
       const nameCount = names.length
 
       while (++i < nameCount) {
