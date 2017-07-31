@@ -1,4 +1,4 @@
-import binding from "../binding/util.js"
+import decorateStackTrace from "./decorateStackTrace.js"
 import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
@@ -9,12 +9,6 @@ const columnNumRegExp = /:(\d+)(?=\)|$)/
 const filePathRegExp = /(?:^ {4}at |\()(.*?)(?=:\d+:\d+\)?$)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/
 const splice = Array.prototype.splice
-
-const internalDecorateErrorStack = binding.decorateErrorStack
-const internalSetHiddenValue = binding.setHiddenValue
-
-const useInternalDecorateErrorStack = typeof internalDecorateErrorStack === "function"
-const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
 
 function maskStackTrace(error, sourceCode, compiledCode) {
   decorateStackTrace(error)
@@ -35,32 +29,7 @@ function maskStackTrace(error, sourceCode, compiledCode) {
   return error
 }
 
-function decorateStackTrace(error) {
-  if (useInternalSetHiddenValue) {
-    if ("arrow_message_private_symbol" in binding) {
-      internalSetHiddenValue(error, binding.arrow_message_private_symbol, "")
-    } else {
-      try {
-        internalSetHiddenValue(error, "arrowMessage", "")
-        internalSetHiddenValue(error, "node:arrowMessage", "")
-      } catch (e) {}
-    }
 
-    if ("decorated_private_symbol" in binding) {
-      internalSetHiddenValue(error, binding.decorated_private_symbol, true)
-    } else {
-      try {
-        internalSetHiddenValue(error, "node:decorated", true)
-      } catch (e) {}
-    }
-  }
-
-  if (useInternalDecorateErrorStack) {
-    internalDecorateErrorStack(error)
-  }
-
-  return error
-}
 
 // Fill in an incomplete stack from:
 // SyntaxError: <description>
