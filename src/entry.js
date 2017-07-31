@@ -68,11 +68,7 @@ class Entry {
   }
 
   addGetters(getterPairs) {
-    let i = -1
-    const pairCount = getterPairs.length
-
-    while (++i < pairCount) {
-      const pair = getterPairs[i]
+    for (const pair of getterPairs) {
       const name = pair[0]
       const getter = pair[1]
 
@@ -124,11 +120,7 @@ class Entry {
   }
 
   addSetters(setterPairs, parent) {
-    let i = -1
-    const pairCount = setterPairs.length
-
-    while (++i < pairCount) {
-      const pair = setterPairs[i]
+    for (const pair of setterPairs) {
       const name = pair[0]
       const setter = pair[1]
       let setters = this.setters[name]
@@ -156,13 +148,11 @@ class Entry {
       return this._loaded = 0
     }
 
-    let i = -1
     const children = this.children
     const ids = keys(children)
-    const idCount = ids.length
 
-    while (++i < idCount) {
-      if (! children[ids[i]].loaded()) {
+    for (const id of ids) {
+      if (! children[id].loaded()) {
         return this._loaded = 0
       }
     }
@@ -176,13 +166,11 @@ class Entry {
       // Section 9.4.6.11
       // Step 7: Module namespace objects have sorted properties.
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-      let i = -1
       const raw = this._namespace
       const names = sort.call(keys(raw))
-      const nameCount = names.length
 
-      while (++i < nameCount) {
-        assignProperty(namespace, raw, names[i])
+      for (const name of names) {
+        assignProperty(namespace, raw, name)
       }
 
       // Section 26.3.1
@@ -239,16 +227,14 @@ class Entry {
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    let i = -1
     const ids = keys(parentsMap)
-    const idCount = ids.length
 
-    while (++i < idCount) {
+    for (const id of ids) {
       // What happens if parents[parentIDs[id]] === module, or if
       // longer cycles exist in the parent chain? Thanks to our setter.last
       // bookkeeping in changed(), the entry.update() broadcast will only
       // proceed as far as there are any actual changes to report.
-      Entry.get(parentsMap[ids[i]]).update()
+      Entry.get(parentsMap[id]).update()
     }
 
     return this
@@ -273,13 +259,9 @@ function assignExportsToNamespace(entry) {
     }
   }
 
-  let i = -1
   const names = keys(exported)
-  const nameCount = names.length
 
-  while (++i < nameCount) {
-    const name = names[i]
-
+  for (const name of names) {
     if (isESM) {
       namespace[name] = exported[name]
     } else if (name !== "default") {
@@ -306,29 +288,22 @@ function compare(object, key, value) {
 function forEachSetter(entry, callback) {
   entry._changed = false
 
-  let i = -1
   const names = keys(entry.setters)
-  const nameCount = names.length
 
-  if (nameCount) {
+  if (names.length) {
     runGetters(entry)
   }
 
-  while (++i < nameCount) {
-    const name = names[i]
+  for (const name of names) {
     const setters = entry.setters[name]
-    const setterCount = setters.length
 
-    if (! setterCount) {
+    if (! setters.length) {
       continue
     }
 
-    let j = -1
     const value = getExportByName(entry, name)
 
-    while (++j < setterCount) {
-      const setter = setters[j]
-
+    for (const setter of setters) {
       if (entry._changed || changed(setter, name, value)) {
         callback(setter, value)
       }
@@ -370,13 +345,10 @@ function runGetters(entry) {
     return
   }
 
-  let i = -1
   const namespace = entry._namespace
   const names = keys(entry.getters)
-  const nameCount = names.length
 
-  while (++i < nameCount) {
-    const name = names[i]
+  for (const name of names) {
     const value = runGetter(entry.getters[name])
 
     if (value !== GETTER_ERROR &&

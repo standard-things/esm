@@ -35,15 +35,10 @@ function assignmentHelper(visitor, path, childName) {
   const child = node[childName]
   const exportedNames = visitor.exportedLocalNames
   const importedNames = visitor.importedLocalNames
-
-  let i = -1
   const names = Parser.getNamesFromPattern(child)
-  const nameCount = names.length
 
   // Perform checks, which may throw errors, before source transformations.
-  while (++i < nameCount) {
-    const name = names[i]
-
+  for (const name of names) {
     if (importedNames[name] === true &&
         ! isShadowed(path, name)) {
       const parser = {
@@ -56,12 +51,8 @@ function assignmentHelper(visitor, path, childName) {
     }
   }
 
-  i = -1
-
   // Wrap assignments to exported identifiers with runtime.update().
-  while (++i < nameCount) {
-    const name = names[i]
-
+  for (const name of names) {
     if (exportedNames[name] === true &&
         ! isShadowed(path, name)) {
       wrap(visitor, path)
@@ -71,11 +62,7 @@ function assignmentHelper(visitor, path, childName) {
 }
 
 function hasNamed(nodes, name) {
-  let i = -1
-  const nodeCount = nodes.length
-
-  while (++i < nodeCount) {
-    const node = nodes[i]
+  for (const node of nodes) {
     const identifier = node.type === "VariableDeclarator" ? node.id : node
 
     if (identifier.name === name) {
@@ -91,13 +78,9 @@ const hasParameter = memoize((node, name) =>
 )
 
 const hasVariable = memoize((node, name) => {
-  let i = -1
   const body = node.body
-  const stmtCount = body.length
 
-  while (++i < stmtCount) {
-    const stmt = body[i]
-
+  for (const stmt of body) {
     if (stmt.type === "VariableDeclaration" &&
         hasNamed(stmt.declarations, name)) {
       return true

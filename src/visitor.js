@@ -50,13 +50,11 @@ class Visitor {
   }
 
   visitChildren(path) {
-    let i = -1
     const value = path.getValue()
     const names = getChildNames(value)
-    const nameCount = names.length
 
-    while (++i < nameCount) {
-      path.call(this, "visitWithoutReset", names[i])
+    for (const name of names) {
+      path.call(this, "visitWithoutReset", name)
     }
   }
 }
@@ -68,13 +66,10 @@ function getChildNames(value) {
     return childNames
   }
 
-  let i = -1
   const names = keys(value)
-  const nameCount = names.length
   childNames = []
 
-  while (++i < nameCount) {
-    const name = names[i]
+  for (const name of names) {
     if (name in childrenToVisit &&
         isObject(value[name])) {
       childNames.push(name)

@@ -54,20 +54,18 @@ class ImportExportVisitor extends Visitor {
     let i = -1
     const decl = path.getValue()
     const specifiers = decl.specifiers
-    const specifierCount = specifiers.length
     const specifierMap = computeSpecifierMap(specifiers)
-    const lastIndex = specifierCount - 1
+    const lastIndex = specifiers.length - 1
 
-    let hoistedCode = specifierCount
+    let hoistedCode = specifiers.length
       ? (this.generateVarDeclarations ? "var " : "let ")
       : ""
 
-    while (++i < specifierCount) {
-      const identifier = specifiers[i].local.name
-      const isLast = i === lastIndex
+    for (const specifier of specifiers) {
+      const identifier = specifier.local.name
       hoistedCode +=
         identifier +
-        (isLast ? ";" : ",")
+        (++i === lastIndex ? ";" : ",")
     }
 
     hoistedCode += toModuleImport(
@@ -154,16 +152,13 @@ class ImportExportVisitor extends Visitor {
                     type === "FunctionDeclaration")) {
         addNameToMap(specifierMap, dd.id.name)
       } else if (type === "VariableDeclaration") {
-        let i = -1
-        const ddCount = dd.declarations.length
+        const varDecls = dd.declarations
 
-        while (++i < ddCount) {
-          let j = -1
-          const names = Parser.getNamesFromPattern(dd.declarations[i].id)
-          const nameCount = names.length
+        for (const varDecl of varDecls) {
+          const names = Parser.getNamesFromPattern(varDecl.id)
 
-          while (++j < nameCount) {
-            addNameToMap(specifierMap, names[j])
+          for (const name of names) {
+            addNameToMap(specifierMap, name)
           }
         }
       }
@@ -193,13 +188,10 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    let i = -1
     const newMap = new OrderedMap
     const names = specifierMap.keys()
-    const nameCount = names.length
 
-    while (++i < nameCount) {
-      const name = names[i]
+    for (const name of names) {
       const locals = specifierMap.get(name).keys()
 
       addToSpecifierMap(
@@ -222,13 +214,11 @@ class ImportExportVisitor extends Visitor {
 }
 
 function addExportedLocalNames(visitor, specifierMap) {
-  let i = -1
   const exportedNames = visitor.exportedLocalNames
   const names = specifierMap.keys()
-  const nameCount = names.length
 
-  while (++i < nameCount) {
-    const locals = specifierMap.get(names[i]).keys()
+  for (const name of names) {
+    const locals = specifierMap.get(name).keys()
 
     // It's tempting to record the exported name as the value here,
     // instead of true, but there can be more than one exported name
@@ -240,18 +230,14 @@ function addExportedLocalNames(visitor, specifierMap) {
 }
 
 function addImportedLocalNames(visitor, specifierMap) {
-  let i = -1
   const importedNames = visitor.importedLocalNames
   const names = specifierMap.keys()
-  const nameCount = names.length
 
-  while (++i < nameCount) {
-    let j = -1
-    const locals = specifierMap.get(names[i]).keys()
-    const localCount = locals.length
+  for (const name of names) {
+    const locals = specifierMap.get(name).keys()
 
-    while (++j < localCount) {
-      importedNames[locals[j]] = true
+    for (const local of locals) {
+      importedNames[local] = true
     }
   }
 }
@@ -269,13 +255,9 @@ function addToSpecifierMap(map, __ported, local) {
 // Returns a map from {im,ex}ported identifiers to lists of local variable
 // names bound to those identifiers.
 function computeSpecifierMap(specifiers) {
-  let i = -1
-  const specifierCount = specifiers.length
   const specifierMap = new OrderedMap
 
-  while (++i < specifierCount) {
-    const s = specifiers[i]
-
+  for (const s of specifiers) {
     const local =
       s.type === "ExportDefaultSpecifier" ? "default" :
       s.type === "ExportNamespaceSpecifier" ? "*" :
@@ -366,12 +348,9 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     return
   }
 
-  let i = -1
   const names = mapOrString.keys()
-  const nameCount = names.length
 
-  while (++i < nameCount) {
-    const name = names[i]
+  for (const name of names) {
     const locals = mapOrString.get(name).keys()
 
     addToSpecifierMap(
@@ -466,22 +445,19 @@ function safeParam(param, locals) {
 
 function toModuleImport(visitor, code, specifierMap) {
   const names = specifierMap.keys()
-  const nameCount = names.length
 
   code = visitor.runtimeAlias + ".w(" + code
 
-  if (! nameCount) {
+  if (! names.length) {
     return code + ");"
   }
 
   let i = -1
-  const lastIndex = nameCount - 1
+  const lastIndex = names.length - 1
 
   code += ",["
 
-  while (++i < nameCount) {
-    const name = names[i]
-    const isLast = i === lastIndex
+  for (const name of names) {
     const locals = specifierMap.get(name).keys()
     const valueParam = safeParam("v", locals)
 
@@ -494,7 +470,7 @@ function toModuleImport(visitor, code, specifierMap) {
       locals.join("=") + "=" + valueParam +
       "}]"
 
-    if (! isLast) {
+    if (++i !== lastIndex) {
       code += ","
     }
   }
@@ -506,21 +482,19 @@ function toModuleImport(visitor, code, specifierMap) {
 
 function toModuleExport(visitor, specifierMap) {
   const names = specifierMap.keys()
-  const nameCount = names.length
 
   let code = ""
 
-  if (! nameCount) {
+  if (! names.length) {
     return code
   }
 
   let i = -1
-  const lastIndex = nameCount - 1
+  const lastIndex = names.length - 1
+
   code += visitor.runtimeAlias + ".e(["
 
-  while (++i < nameCount) {
-    const name = names[i]
-    const isLast = i === lastIndex
+  for (const name of names) {
     const locals = specifierMap.get(name).keys()
 
     code +=
@@ -528,7 +502,7 @@ function toModuleExport(visitor, specifierMap) {
       locals[0] +
       "]"
 
-    if (! isLast) {
+    if (++i !== lastIndex) {
       code += ","
     }
   }
