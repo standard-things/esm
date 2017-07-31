@@ -27,7 +27,7 @@ Enable ESM in the Node REPL by loading `@std/esm` upon entering:
 ```shell
 $ node
 > require("@std/esm")
-
+@std/esm enabled
 > import assert from "assert"
 > assert.strictEqual(2 + 2, 5)
 AssertionError [ERR_ASSERTION]: 4 === 5
