@@ -168,12 +168,12 @@ class Entry {
 
     setGetter(this, "namespace", () => {
       // Section 9.4.6
-      // Namespace objects have a null [[Prototype]].
+      // Module namespace objects have a null [[Prototype]].
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
       const namespace = Object.create(null)
 
       // Section 9.4.6.11
-      // Step 7: Enforce sorted iteration order of properties
+      // Step 7: Module namespace objects have sorted properties.
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       let i = -1
       const raw = this._namespace
@@ -185,7 +185,7 @@ class Entry {
       }
 
       // Section 26.3.1
-      // The value of the @@toStringTag property is "Module".
+      // Module namespace objects have a @@toStringTag value of "Module".
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
       if (useToStringTag) {
         setProperty(namespace, Symbol.toStringTag, {
