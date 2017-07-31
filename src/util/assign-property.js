@@ -1,19 +1,13 @@
 import getGetter from "./get-getter.js"
 import getSetter from "./get-setter.js"
-import removeProperty from "./remove-property.js"
 import setGetter from "./set-getter.js"
 import setSetter from "./set-setter.js"
 
-function assignProperty(object, source, key, removeBefore) {
+function assignProperty(object, source, key) {
   const getter = getGetter(source, key)
   const setter = getSetter(source, key)
   const hasGetter = typeof getter === "function"
   const hasSetter = typeof setter === "function"
-  const value = (hasGetter || hasSetter) ? void 0 : source[key]
-
-  if (removeBefore) {
-    removeProperty(object, key)
-  }
 
   if (hasGetter || hasSetter) {
     if (hasGetter) {
@@ -23,7 +17,7 @@ function assignProperty(object, source, key, removeBefore) {
       setSetter(object, key, setter)
     }
   } else {
-    object[key] = value
+    object[key] = source[key]
   }
 
   return object
