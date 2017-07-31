@@ -13,7 +13,7 @@ describe("compiler", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Unexpected"))
+        assert.ok(/unexpected/i.test(e.message))
       })
   )
 
