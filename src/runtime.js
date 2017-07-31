@@ -193,7 +193,10 @@ function requireWrapper(func, id) {
 }
 
 function resolveId(id, parent) {
-  if (typeof id !== "string" || id in builtinModules) {
+  if (! id ||
+      typeof id !== "string" ||
+      id in builtinModules ||
+      (! urlsCharsRegExp.test(id) && isPath(id))) {
     return id
   }
 
@@ -204,14 +207,11 @@ function resolveId(id, parent) {
     return resolveCache[cacheKey]
   }
 
-  if (! urlsCharsRegExp.test(id) && isPath(id)) {
-    return resolveCache[cacheKey] = id
-  }
-
   const parsed = URL.parse(id)
-  const noPathname = parsed.pathname === null
 
-  id = noPathname ? id : unescape(parsed.pathname)
+  if (typeof parsed.pathname === "string") {
+    id = unescape(parsed.pathname)
+  }
 
   if (typeof parsed.protocol !== "string") {
     // Prevent resolving non-local dependencies:
@@ -226,7 +226,8 @@ function resolveId(id, parent) {
     return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
   }
 
-  if (noPathname || parsed.protocol !== "file:") {
+  if (! parsed.pathname ||
+      parsed.protocol !== "file:") {
     const error = new Error("Cannot find module '" + id + "'")
     error.code = "MODULE_NOT_FOUND"
     throw error
