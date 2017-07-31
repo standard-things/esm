@@ -25,21 +25,24 @@ import setSourceType from "./util/set-source-type.js"
 let allowTopLevelAwait = isObject(process.mainModule) &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
-function managerWrapper(manager, func, mod, filePath) {
+function managerWrapper(manager, func, args) {
+  const filePath = args[1]
   const pkgInfo = PkgInfo.get(path.dirname(filePath))
   const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
 
   return wrapped === null
-    ? func.call(this, mod, filePath)
-    : wrapped.call(this, manager, func, pkgInfo, mod, filePath)
+    ? func.apply(this, args)
+    : wrapped.call(this, manager, func, pkgInfo, args)
 }
 
-function methodWrapper(manager, func, pkgInfo, mod, filePath) {
+function methodWrapper(manager, func, pkgInfo, args) {
+  const mod = args[0]
+  const filePath = args[1]
   const pkgOptions = pkgInfo.options
   const cachePath = pkgInfo.cachePath
 
   if (cachePath === null) {
-    func.call(this, mod, filePath)
+    func.apply(this, args)
     return
   }
 
@@ -53,7 +56,7 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
   }
 
   if (! pkgOptions.esm && type !== "module") {
-    func.call(this, mod, filePath)
+    func.apply(this, args)
     return
   }
 

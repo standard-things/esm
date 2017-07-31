@@ -13,19 +13,19 @@ if (rootModule.id === "internal/preload" ||
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
   const resolveFilename = Module._resolveFilename
 
-  const managerWrapper = function (manager, func) {
+  const managerWrapper = function (manager, func, args) {
     const filePath = resolveFilename(process.argv[1], null, true)
     const pkgInfo = PkgInfo.get(path.dirname(filePath))
     const wrapped = pkgInfo === null ? null : Wrapper.find(Module, "runMain", pkgInfo.range)
 
     return wrapped === null
-      ? func.call(this)
-      : wrapped.call(this, manager, func, filePath)
+      ? func.apply(this, args)
+      : wrapped.call(this, manager, func, filePath, args)
   }
 
-  const methodWrapper = function (manager, func, filePath) {
+  const methodWrapper = function (manager, func, filePath, args) {
     if (! filePath.endsWith(".mjs")) {
-      func()
+      func.apply(this, args)
       return
     }
 

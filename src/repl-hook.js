@@ -27,13 +27,14 @@ if (rootModule.filename === null &&
   const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeIdent("_" + md5Hash)
 
-  const managerWrapper = function (manager, func, code, options) {
+  const managerWrapper = function (manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
-    return wrapped.call(this, manager, func, code, options)
+    return wrapped.call(this, manager, func, args)
   }
 
-  const methodWrapper = function (manager, func, code, options) {
-    options = createOptions(options)
+  const methodWrapper = function (manager, func, args) {
+    const code = args[0]
+    const options = createOptions(args[1])
 
     if (options.produceCachedData === void 0) {
       options.produceCachedData = true
