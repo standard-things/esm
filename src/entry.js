@@ -3,6 +3,7 @@ import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
+import path from "path"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -341,7 +342,8 @@ function getExportByName(entry, name) {
 
   if (entry._loaded &&
       ! (name in namespace)) {
-    throw new SyntaxError("The requested module does not provide an export named '" + name + "'")
+    const basename = path.basename(entry.module.filename)
+    throw new SyntaxError("Module '" + basename + "' does not provide an export named '" + name + "'")
   }
 
   return namespace[name]
