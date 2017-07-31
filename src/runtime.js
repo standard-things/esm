@@ -83,11 +83,16 @@ class Runtime {
       return
     }
 
+    let wrappedRequire = req
+
+    if (! options.cjs) {
+      wrappedRequire = (id) => requireWrapper.call(this, req, id)
+      assign(wrappedRequire, req)
+    }
+
     const filename = mod.filename
     const dirname = path.dirname(filename)
-    const wrappedRequire = (id) => requireWrapper.call(this, req, id)
 
-    assign(wrappedRequire, req)
     moduleWrapper.call(exported, exported, wrappedRequire, mod, filename, dirname)
     mod.loaded = true
   }
@@ -155,7 +160,6 @@ function requireWrapper(func, id) {
     return func(id)
   }
 
-  const options = this.options
   const parent = this.module
   const filePath = resolveFilename(id, parent)
 
@@ -167,16 +171,15 @@ function requireWrapper(func, id) {
   childModule.filename = filePath
   childModule.paths = nodeModulePaths(path.dirname(filePath))
 
-  let ext = path.extname(filePath) || ".js"
-  let threw = true
+  let ext = path.extname(filePath)
 
-  if (! Module._extensions[ext]) {
+  if (! ext || typeof Module._extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  const compiler = options.cjs
-    ? Module._extensions[ext]
-    : Wrapper.unwrap(Module._extensions, ext)
+  const compiler = Wrapper.unwrap(Module._extensions, ext)
+
+  let threw = true
 
   try {
     Module._cache[filePath] = childModule
