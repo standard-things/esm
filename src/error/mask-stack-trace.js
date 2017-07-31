@@ -2,6 +2,7 @@ import binding from "../util/binding.js"
 import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
+import setSetter from "../util/set-setter.js"
 
 const lineNumRegExp = /:(\d+)/
 const columnNumRegExp = /:(\d+)(?=\)|$)/
@@ -16,14 +17,22 @@ const useInternalDecorateErrorStack = typeof internalDecorateErrorStack === "fun
 const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
 
 function maskStackTrace(error, sourceCode, compiledCode) {
-  // Defer any file read operations until the stack property is accessed.
+  decorateStackTrace(error)
   const stack = error.stack
-  return setGetter(error, "stack", () => {
-    decorateStackTrace(error)
-    return setProperty(error, "stack", {
-      value: resolveStack(error, stack, sourceCode, compiledCode)
-    })
+
+  // Defer any file read operations until the error.stack property is accessed.
+  // Ideally, we'd wrap the error in a Proxy to defer even the initial error.stack
+  // property access. However, Error.captureStackTrace() will throw when receiving
+  // a proxy wrapped error.
+  setGetter(error, "stack", () =>
+    error.stack = resolveStack(error, stack, sourceCode, compiledCode)
+  )
+
+  setSetter(error, "stack", (value) => {
+    setProperty(error, "stack", { enumerable: false, value })
   })
+
+  return error
 }
 
 function decorateStackTrace(error) {
