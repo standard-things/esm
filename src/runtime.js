@@ -6,10 +6,11 @@ import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
+import natives from "./binding/natives.js"
 import path from "path"
 
 const builtinModules = Object
-  .keys(process.binding("natives"))
+  .keys(natives)
   .filter((key) => ! key.startsWith("internal/"))
   .reduce((object, key) => {
     object[key] = true

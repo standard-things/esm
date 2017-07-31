@@ -1,4 +1,4 @@
-import binding from "../util/binding.js"
+import binding from "../binding/util.js"
 import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"

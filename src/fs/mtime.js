@@ -1,6 +1,6 @@
 import SemVer from "semver"
 
-import binding from "./binding.js"
+import binding from "../binding/fs.js"
 import fs from "fs"
 
 const internalStat = binding.stat
