@@ -22,9 +22,6 @@ import path from "path"
 import readFile from "./fs/read-file.js"
 import setSourceType from "./util/set-source-type.js"
 
-const esmPkgParent = __non_webpack_module__.parent
-
-let inited = false
 let allowTopLevelAwait = isObject(process.mainModule) &&
   SemVer.satisfies(process.version, ">=7.6.0")
 
@@ -46,25 +43,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     return
   }
 
-  let parent = mod.parent
-  let parentPkgInfo = null
-
-  if (parent == null || typeof parent.filename !== "string") {
-    parent = null
-  }
-
-  if (parent !== null) {
-    parentPkgInfo = PkgInfo.get(path.dirname(parent.filename))
-  }
-
-  if (inited &&
-      esmPkgParent.parent !== parent &&
-      (parentPkgInfo === null || ! parentPkgInfo.options.cjs) &&
-      (parent === null || getSourceType(parent.exports) === "script")) {
-    func.call(this, mod, filePath)
-    return
-  }
-
   const ext = extname(filePath)
   let type = getSourceType(mod.exports)
 
@@ -78,8 +56,6 @@ function methodWrapper(manager, func, pkgInfo, mod, filePath) {
     func.call(this, mod, filePath)
     return
   }
-
-  inited = true
 
   const cache = pkgInfo.cache
   const cacheKey = mtime(filePath)

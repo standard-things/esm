@@ -2,6 +2,7 @@ import Entry from "./entry.js"
 import FastObject from "./fast-object.js"
 import Module from "module"
 import URL from "url"
+import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
 import createOptions from "./util/create-options.js"
@@ -9,7 +10,7 @@ import path from "path"
 
 const builtinModules = Object
   .keys(process.binding("natives"))
-  .filter((key) => ! /^_|[\\]/.test(key))
+  .filter((key) => ! key.startsWith("internal/"))
   .reduce((object, key) => {
     object[key] = true
     return object
@@ -68,14 +69,14 @@ class Runtime {
     return (childNamespace, childEntry) => this.entry.addGettersFrom(childEntry)
   }
 
-  run(wrapper, req) {
+  run(moduleWrapper, req) {
     const mod = this.module
     const entry = this.entry
     const exported = mod.exports = entry.exports
     const options = this.options
 
-    if (! wrapper.length) {
-      wrapper.call(options.cjs ? exported : void 0)
+    if (! moduleWrapper.length) {
+      moduleWrapper.call(options.cjs ? exported : void 0)
       mod.loaded = true
       entry.update().loaded()
       assign(exported, entry._namespace)
@@ -84,8 +85,10 @@ class Runtime {
 
     const filename = mod.filename
     const dirname = path.dirname(filename)
+    const wrappedRequire = (id) => requireWrapper.call(this, req, id)
 
-    wrapper.call(exported, exported, req, mod, filename, dirname)
+    assign(wrappedRequire, req)
+    moduleWrapper.call(exported, exported, wrappedRequire, mod, filename, dirname)
     mod.loaded = true
   }
 
@@ -145,6 +148,48 @@ function isPath(id) {
   return code0 === codeOfForwardSlash || (code0 === codeOfDot &&
     (code1 === codeOfForwardSlash ||
     (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash)))
+}
+
+function requireWrapper(func, id) {
+  if (id in builtinModules) {
+    return func(id)
+  }
+
+  const options = this.options
+  const parent = this.module
+  const filePath = resolveFilename(id, parent)
+
+  if (filePath in Module._cache) {
+    return func(id)
+  }
+
+  const childModule = new Module(filePath, parent)
+  childModule.filename = filePath
+  childModule.paths = nodeModulePaths(path.dirname(filePath))
+
+  let ext = path.extname(filePath) || ".js"
+  let threw = true
+
+  if (! Module._extensions[ext]) {
+    ext = ".js"
+  }
+
+  const compiler = options.cjs
+    ? Module._extensions[ext]
+    : Wrapper.unwrap(Module._extensions, ext)
+
+  try {
+    Module._cache[filePath] = childModule
+    compiler.call(Module._extensions, childModule, filePath)
+    childModule.loaded = true
+    threw = false
+  } finally {
+    if (threw) {
+      delete Module._cache[filePath]
+    }
+  }
+
+  return childModule.exports
 }
 
 function resolveId(id, parent) {
