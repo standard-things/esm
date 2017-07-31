@@ -176,6 +176,11 @@ function maskStackLines(stackLines, sourceCode) {
     // Remove the column indicator arrow if a new column is not found.
     stackLines.splice(2, 1)
     stackLines[4] = stackLines[4].replace(columnNumRegExp, "")
+
+    if (stackLines[1].length < 6) {
+      // Remove the source code line reference if it's too short.
+      stackLines.splice(1, 1)
+    }
   } else if (newColumn < column) {
     // Update the column indicator arrow and column number.
     stackLines[2] = " ".repeat(newColumn) + "^"
