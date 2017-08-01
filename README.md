@@ -96,8 +96,8 @@ All options are **off** by default.
     <p>A boolean for <code>import</code>/<code>export</code> syntax extensions<br>
     <i>(syntax extensions are subject to change every <a href="http://semver.org/">minor release</a>)</i></p>
     <ul>
-    <li><a href="https://github.com/tc39/proposal-export-ns-from"><code>export * as ns from "mod"</code></a></li>
-    <li><a href="https://github.com/tc39/proposal-export-default-from"><code>export v from "mod"</code></a></li>
+    <li><a href="https://github.com/tc39/proposal-export-ns-from"><code>export * as ns from "mod"</code></a> <i>(stage 2)</i></li>
+    <li><a href="https://github.com/tc39/proposal-export-default-from"><code>export v from "mod"</code></a> <i>(stage 1)</i></li>
     <li>unordered import/export lists</li>
     </ul>
   </td>
