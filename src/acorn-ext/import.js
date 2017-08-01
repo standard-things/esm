@@ -1,17 +1,17 @@
 import Parser from "../parser.js"
 import { types as tt } from "../acorn/src/tokentype.js"
-import wrapCall from "../util/wrap-call.js"
+import wrap from "../util/wrap.js"
 
 function enable(parser) {
   const key = typeof parser.parseImportSpecifiers === "function"
     ? "parseImportSpecifiers"
     : "parseImportSpecifierList"
 
-  parser[key] = wrapCall(parser[key], parseImportSpecifiers)
+  parser[key] = wrap(parser[key], parseImportSpecifiers)
   return parser
 }
 
-function parseImportSpecifiers(func) {
+function parseImportSpecifiers(func, args) {
   const specifiers = []
 
   do {
@@ -23,7 +23,7 @@ function parseImportSpecifiers(func) {
       specifiers.push(parseImportNamespaceSpecifier(this))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, func.call(this))
+      specifiers.push.apply(specifiers, func.apply(this, args))
     }
   }
   while (this.eat(tt.comma))

@@ -1,14 +1,15 @@
-import wrapCall from "../util/wrap-call.js"
+import wrap from "../util/wrap.js"
 
 function enable(parser) {
-  parser.parseMaybeUnary = wrapCall(parser.parseMaybeUnary, parseMaybeUnary)
+  parser.parseMaybeUnary = wrap(parser.parseMaybeUnary, parseMaybeUnary)
   return parser
 }
 
-function parseMaybeUnary(func, refDestructuringErrors, sawUnary) {
+function parseMaybeUnary(func, args) {
+  const refDestructuringErrors = args[0]
   return this.isContextual("await")
     ? this.parseAwait(refDestructuringErrors)
-    : func.call(this, refDestructuringErrors, sawUnary)
+    : func.apply(this, args)
 }
 
 export { enable }

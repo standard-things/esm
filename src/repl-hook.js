@@ -12,7 +12,7 @@ import maskStackTrace from "./error/mask-stack-trace.js"
 import md5 from "./util/md5.js"
 import rootModule from "./root-module.js"
 import vm from "vm"
-import wrapApply from "./util/wrap-apply.js"
+import wrap from "./util/wrap.js"
 
 const esmPkgMain = __non_webpack_module__.filename
 
@@ -106,8 +106,8 @@ if (rootModule.filename === null &&
       cache[cacheFileName].data = result.cachedData
     }
 
-    result.runInContext = wrapApply(result.runInContext, runWrapper)
-    result.runInThisContext = wrapApply(result.runInThisContext, runWrapper)
+    result.runInContext = wrap(result.runInContext, runWrapper)
+    result.runInThisContext = wrap(result.runInThisContext, runWrapper)
     return result
   }
 

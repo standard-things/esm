@@ -4,17 +4,17 @@
 
 import Parser from "../parser.js"
 import { types as tt } from "../acorn/src/tokentype.js"
-import wrapCall from "../util/wrap-call.js"
+import wrap from "../util/wrap.js"
 
 function enable(parser) {
   // Allow `yield import()` to parse.
   tt._import.startsExpr = true
-  parser.parseExprAtom = wrapCall(parser.parseExprAtom, parseExprAtom)
-  parser.parseStatement = wrapCall(parser.parseStatement, parseStatement)
+  parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
+  parser.parseStatement = wrap(parser.parseStatement, parseStatement)
   return parser
 }
 
-function parseExprAtom(func, refDestructuringErrors) {
+function parseExprAtom(func, args) {
   const importPos = this.start
 
   if (this.eat(tt._import)) {
@@ -25,10 +25,10 @@ function parseExprAtom(func, refDestructuringErrors) {
     return this.finishNode(this.startNodeAt(importPos), "Import")
   }
 
-  return func.call(this, refDestructuringErrors)
+  return func.apply(this, args)
 }
 
-function parseStatement(func, declaration, topLevel, exported) {
+function parseStatement(func, args) {
   if (this.type === tt._import &&
       Parser.lookahead(this).type === tt.parenL) {
     // import(...)
@@ -51,7 +51,7 @@ function parseStatement(func, declaration, topLevel, exported) {
     return this.parseExpressionStatement(node, expr)
   }
 
-  return func.call(this, declaration, topLevel, exported)
+  return func.apply(this, args)
 }
 
 export { enable }

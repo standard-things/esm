@@ -1,13 +1,13 @@
 import Parser from "../parser.js"
 import { types as tt } from "../acorn/src/tokentype.js"
-import wrapCall from "../util/wrap-call.js"
+import wrap from "../util/wrap.js"
 
 function enable(parser) {
   const key = typeof parser.parseExportSpecifiers === "function"
     ? "parseExportSpecifiers"
     : "parseExportSpecifierList"
 
-  parser[key] = wrapCall(parser[key], parseExportSpecifiers)
+  parser[key] = wrap(parser[key], parseExportSpecifiers)
   parser.parseExport = parseExport
   return parser
 }
@@ -46,8 +46,9 @@ function parseExport(node, exported) {
   return this.finishNode(node, "ExportNamedDeclaration")
 }
 
-function parseExportSpecifiers(func, exported) {
+function parseExportSpecifiers(func, args) {
   let expectFrom = false
+  const exported = args[0]
   const specifiers = []
 
   do {
@@ -61,7 +62,7 @@ function parseExportSpecifiers(func, exported) {
       specifiers.push(parseExportNamespaceSpecifier(this, exported))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, func.call(this, exported))
+      specifiers.push.apply(specifiers, func.apply(this, args))
     }
   }
   while (this.eat(tt.comma))
