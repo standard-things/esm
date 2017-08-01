@@ -5,10 +5,12 @@ import URL from "url"
 import builtinModules from "../builtin-modules.js"
 import isPath from "./is-path.js"
 import path from "path"
+import punycode from "punycode/punycode.es6.js"
 
 const nodeModulePaths = Module._nodeModulePaths
-const resolveCache = new FastObject
 const resolveFilename = Module._resolveFilename
+
+const resolveCache = new FastObject
 const urlCharsRegExp = /[:?#%]/
 
 function resolveId(id, parent) {
@@ -55,7 +57,7 @@ function resolveId(id, parent) {
   // Based on file-uri-to-path.
   // Copyright Nathan Rajlich. Released under MIT license:
   // https://github.com/TooTallNate/file-uri-to-path
-  let host = parsed.host
+  let host = punycode.toUnicode(parsed.host)
   let pathname = id
   let prefix = ""
 
