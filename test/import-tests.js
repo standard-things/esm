@@ -28,6 +28,12 @@ describe("import declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
+  it("should URL parse ids", () =>
+    import("./import/decode.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should support import extensions", () =>
     import("./import/extension.js")
       .then((ns) => ns.check())

@@ -95,7 +95,8 @@ describe("dynamic import", () => {
   it("should URL parse ids", () =>
     Promise.all([
       import(abcId + "?a"),
-      import(abcId + "#a")
+      import(abcId + "#a"),
+      import(abcId.replace("abc", "%61%62%63"))
     ])
     .then((namespaces) => namespaces.forEach((ns) =>
       assert.deepEqual(ns, abcNs)
