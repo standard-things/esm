@@ -129,6 +129,7 @@ Object.setPrototypeOf(PkgInfo.prototype, null)
 infoCache[""] = new PkgInfo("", esmSemVer.version, {
   cache: false,
   cjs: true,
+  gz: true,
   var: true
 })
 
