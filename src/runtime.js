@@ -214,7 +214,7 @@ function resolveId(id, parent) {
   const parsed = URL.parse(id)
 
   if (typeof parsed.pathname === "string") {
-    id = unescape(parsed.pathname)
+    id = decodeURI(parsed.pathname)
   }
 
   if (typeof parsed.protocol !== "string") {
