@@ -17,11 +17,11 @@ function maskStackTrace(error, sourceCode) {
   // Ideally, we'd wrap the error in a Proxy to defer even the initial error.stack
   // property access. However, Error.captureStackTrace() will throw when receiving
   // a proxy wrapped error.
-  setGetter(error, "stack", () =>
-    error.stack = isParseError(error)
+  setGetter(error, "stack", () => {
+    return error.stack = isParseError(error)
       ? maskParserStack(stack, sourceCode, error.filename)
       : maskStack(stack)
-  )
+  })
 
   setSetter(error, "stack", (value) => {
     setProperty(error, "stack", { enumerable: false, value })
