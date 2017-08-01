@@ -86,7 +86,7 @@ if (rootModule.filename === null &&
         result = func.call(this, output, options)
       } catch (e) {
         captureStackTrace(e, manager)
-        throw maskStackTrace(e, code, output)
+        throw maskStackTrace(e, code)
       }
     }
 
@@ -98,7 +98,7 @@ if (rootModule.filename === null &&
       try {
         return func.apply(this, args)
       } catch (e) {
-        throw maskStackTrace(e, code, output)
+        throw maskStackTrace(e, code)
       }
     }
 

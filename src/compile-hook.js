@@ -66,21 +66,14 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const stateHash = getCacheStateHash(cacheFileName)
   const runtimeAlias = encodeIdent("_" + stateHash.slice(0, 3))
 
-  const readCode = (filePath) => (
-    pkgOptions.gz && path.extname(filePath) === ".gz"
-      ? gunzip(readFile(filePath), "utf8")
-      : readFile(filePath, "utf8")
-  )
-
   let cacheCode
   let sourceCode
   let cacheValue = cache[cacheFileName]
 
   if (cacheValue === true) {
-    cacheCode = readCode(path.join(cachePath, cacheFileName))
-    sourceCode = () => readCode(filePath)
+    cacheCode = readCode(path.join(cachePath, cacheFileName), pkgOptions)
   } else {
-    sourceCode = readCode(filePath)
+    sourceCode = readCode(filePath, pkgOptions)
   }
 
   if (! isObject(cacheValue)) {
@@ -125,7 +118,6 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const exported = Object.create(null)
 
   let output = cacheValue.code
-  let compiledCode = output
   let entry = Entry.get(mod, exported, pkgOptions)
 
   if (isESM) {
@@ -146,8 +138,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
       const wrap = Module.wrap
       Module.wrap = (script) => {
         Module.wrap = wrap
-        return compiledCode =
-          '"use strict";(function(){const ' + runtimeAlias + "=this;" +
+        return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
           script + "\n})"
       }
     }
@@ -171,7 +162,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
     try {
       mod._compile(output, filePath)
     } catch (e) {
-      throw maskStackTrace(e, sourceCode, compiledCode)
+      throw maskStackTrace(e)
     }
   }
 
@@ -191,6 +182,12 @@ function methodWrapper(manager, func, pkgInfo, args) {
   }
 
   entry.update().loaded()
+}
+
+function readCode(filePath, options) {
+  return options.gz && path.extname(filePath) === ".gz"
+    ? gunzip(readFile(filePath), "utf8")
+    : readFile(filePath, "utf8")
 }
 
 const exts = Module._extensions
