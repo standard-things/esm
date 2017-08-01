@@ -1,6 +1,6 @@
-import "./compile-hook.js"
-import "./main-hook.js"
-import "./repl-hook.js"
+import "./hook/compile.js"
+import "./hook/main.js"
+import "./hook/repl.js"
 
 import setProperty from "./util/set-property.js"
 import util from "util"

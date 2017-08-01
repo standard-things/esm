@@ -1,9 +1,9 @@
 import Module from "module"
-import PkgInfo from "./pkg-info.js"
-import Wrapper from "./wrapper.js"
+import PkgInfo from "../pkg-info.js"
+import Wrapper from "../wrapper.js"
 
 import path from "path"
-import rootModule from "./root-module.js"
+import rootModule from "../root-module.js"
 
 const esmPkgMain = __non_webpack_module__.filename
 const preloadModules = process._preload_modules || []
