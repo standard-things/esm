@@ -1,28 +1,15 @@
 import Entry from "./entry.js"
-import FastObject from "./fast-object.js"
 import Module from "module"
-import URL from "url"
 import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
+import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
-import natives from "./binding/natives.js"
 import path from "path"
+import resolveId from "./util/resolve-id.js"
 
-const builtinModules = Object
-  .keys(natives)
-  .filter((key) => ! key.startsWith("internal/"))
-  .reduce((object, key) => {
-    object[key] = true
-    return object
-  }, Object.create(null))
-
-const codeOfDot = ".".charCodeAt(0)
-const codeOfForwardSlash = "/".charCodeAt(0)
 const nodeModulePaths = Module._nodeModulePaths
-const resolveCache = new FastObject
 const resolveFilename = Module._resolveFilename
-const urlCharsRegExp = /[:?#%]/
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -128,11 +115,6 @@ class Runtime {
 
     if (id in builtinModules) {
       childModule = builtinModules[id]
-      if (childModule === true) {
-        childModule = builtinModules[id] = new Module(id, null)
-        childModule.exports = parent.require(id)
-        childModule.loaded = true
-      }
     } else {
       id = resolveId(id, parent)
       parent.require(id)
@@ -146,14 +128,6 @@ class Runtime {
       childEntry.addSetters(setterPairs, parent).update()
     }
   }
-}
-
-function isPath(id) {
-  const code0 = id.charCodeAt(0)
-  const code1 = id.charCodeAt(1)
-  return code0 === codeOfForwardSlash || (code0 === codeOfDot &&
-    (code1 === codeOfForwardSlash ||
-    (code1 === codeOfDot && id.charCodeAt(2) === codeOfForwardSlash)))
 }
 
 function requireWrapper(func, id) {
@@ -194,73 +168,6 @@ function requireWrapper(func, id) {
   }
 
   return childModule.exports
-}
-
-function resolveId(id, parent) {
-  if (! id ||
-      typeof id !== "string" ||
-      id in builtinModules ||
-      (! urlCharsRegExp.test(id) && isPath(id))) {
-    return id
-  }
-
-  const filename = parent.filename === null ? "." : parent.filename
-  const cacheKey = id + "\0" + filename
-
-  if (cacheKey in resolveCache) {
-    return resolveCache[cacheKey]
-  }
-
-  const parsed = URL.parse(id)
-
-  if (typeof parsed.pathname === "string") {
-    id = decodeURI(parsed.pathname)
-  }
-
-  if (typeof parsed.protocol !== "string") {
-    // Prevent resolving non-local dependencies:
-    // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-    const paths = nodeModulePaths(path.dirname(filename))
-
-    // Overwrite concat() to prevent global paths from being concatenated.
-    paths.concat = () => paths
-
-    // Ensure a parent id and filename are provided to avoid going down the
-    // --eval branch of Module._resolveLookupPaths().
-    return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
-  }
-
-  if (! parsed.pathname ||
-      parsed.protocol !== "file:") {
-    const error = new Error("Cannot find module '" + id + "'")
-    error.code = "MODULE_NOT_FOUND"
-    throw error
-  }
-
-  // Based on file-uri-to-path.
-  // Copyright Nathan Rajlich. Released under MIT license:
-  // https://github.com/TooTallNate/file-uri-to-path
-  let host = parsed.host
-  let pathname = id
-  let prefix = ""
-
-  // Section 2: Syntax
-  // https://tools.ietf.org/html/rfc8089#section-2
-  if (host === "localhost") {
-    host = ""
-  } else if (host) {
-    prefix += path.sep + path.sep
-  } else if (pathname.startsWith("//")) {
-    // Windows shares have a pathname starting with "//".
-    prefix += path.sep
-  }
-
-  // Section E.2: DOS and Windows Drive Letters
-  // https://tools.ietf.org/html/rfc8089#appendix-E.2
-  // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
-  pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
-
-  return resolveCache[cacheKey] = resolveFilename(prefix + host + pathname, parent)
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
