@@ -61,15 +61,22 @@ All options are **off** by default.
 </tr>
 <tr>
   <td valign="top"><code>"await":</code></td>
-  <td>A boolean for top-level <code>await</code> in the main ES module</td>
+  <td><p>A boolean for top-level <code>await</code> in the main ES module</p></td>
 </tr>
 <tr>
   <td valign="top"><code>"gz":</code></td>
-  <td>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></td>
+  <td><p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p></td>
 </tr>
 <tr>
   <td valign="top"><code>"esm":</code></td>
-  <td>A string ESM mode of <code>"all"</code> or <code>"js"</code> <i>(i.e. <code>.js</code> can be ESM)</i></td>
+  <td>
+    <p>A string ESM mode</p>
+    <ul>
+    <li><code>"mjs"</code> files as ESM</li>
+    <li><code>"all"</code> files as ESM</li>
+    <li><code>"js"</code> files with <code>import</code>/<code>export</code>/<a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+    </ul>
+  </td>
 </tr>
 <tr>
   <td valign="top"><code>"cjs":</code></td>
