@@ -55,7 +55,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
     type = "unambiguous"
   }
 
-  if (! pkgOptions.esm && type !== "module") {
+  if (pkgOptions.esm === "mjs" && type !== "module") {
     return func.apply(this, args)
   }
 

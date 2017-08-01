@@ -13,7 +13,7 @@ const defaultOptions = {
   cache: ".esm-cache",
   cjs: false,
   debug: false,
-  esm: false,
+  esm: "mjs",
   ext: false,
   var: false
 }
@@ -24,8 +24,8 @@ class PkgInfo {
   constructor(dirPath, range, options) {
     options = createOptions(options, defaultOptions)
 
-    if (options.esm === "mjs") {
-      options.esm = false
+    if (! options.esm) {
+      options.esm = "mjs"
     }
 
     const cache = Object.create(null)
