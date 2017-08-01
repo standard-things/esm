@@ -10,8 +10,7 @@ function enable(parser) {
 }
 
 function raiseRecoverable(func, args) {
-  const pos = args[0]
-  const message = args[1]
+  const [pos, message] = args
 
   if (message.startsWith(parserDupPrefix)) {
     func.call(this, pos, message.replace(parserDupPrefix, engineDupPrefix))
