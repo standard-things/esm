@@ -1,18 +1,13 @@
 import assert from "assert"
-import resolveId from "../build/resolve-id.js"
 import urlToPath from "../build/url-to-path.js"
 
-describe("id resolution", () => {
-  it("should throw an error for non-file protocols", () => {
-    assert.throws(() => resolveId("about:blank"), Error)
-    assert.throws(() => resolveId("ftp://example.com/"), Error)
-    assert.throws(() => resolveId("http://example.com/"), Error)
-    assert.throws(() => resolveId("https://example.com/"), Error)
-  })
+const modes = [
+  "posix",
+  "win32"
+]
 
-  it("should resolve paths with file protocols", () => {
-    const modes = ["posix", "win32"]
-
+describe("URL parsing", () => {
+  it("should resolve URLs with file protocols", () => {
     modes.forEach((mode) => {
       let actual
       let expected
@@ -63,6 +58,21 @@ describe("id resolution", () => {
 
       actual = urlToPath("file:///C:/a%2Fb", mode)
       assert.strictEqual(actual, "")
+    })
+  })
+
+  it("should not resolve URLs with other protocols", () => {
+    const urls = [
+      "about:blank",
+      "ftp://example.com/",
+      "http://example.com/",
+      "https://example.com/"
+    ]
+
+    modes.forEach((mode) => {
+      urls.forEach((url) => {
+        assert.strictEqual(urlToPath(url, mode), "")
+      })
     })
   })
 })

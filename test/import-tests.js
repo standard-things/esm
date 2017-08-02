@@ -28,10 +28,16 @@ describe("import declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should URL parse ids", () =>
-    import("./import/decode.js")
+  it("should parse URL ids", () =>
+    import("./import/parsable.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
+  )
+
+  it("should not parse URL ids with encoded slashes", () =>
+    import("./import/unparsable.js")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
   )
 
   it("should support import extensions", () =>

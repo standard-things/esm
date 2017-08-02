@@ -4,12 +4,15 @@ import compiler from "../build/compiler.js"
 import path from "path"
 
 const abcId = "./fixture/export/abc.js"
+
 const abcNs = {
   a: "a",
   b: "b",
   c: "c",
   default: "default"
 }
+
+const isWin = process.platform === "win32"
 
 describe("dynamic import", () => {
   it("should establish live binding of values", () =>
@@ -92,16 +95,29 @@ describe("dynamic import", () => {
     })
   })
 
-  it("should URL parse ids", () =>
+  it("should parse URL ids", () =>
     Promise.all([
       import(abcId + "?a"),
       import(abcId + "#a"),
-      import(abcId.replace("abc", "%61%62%63"))
+      import(abcId.replace("abc", "%61%62%63")),
     ])
     .then((namespaces) => namespaces.forEach((ns) =>
       assert.deepEqual(ns, abcNs)
     ))
     .catch((e) => assert.ifError(e))
+  )
+
+  it("should not parse URL ids with encoded slashes", () =>
+    Promise.all([
+      abcId.replace("/", "%2f"),
+      abcId.replace("/", "%2F"),
+      abcId.replace("/", isWin ? "%5c" : "%2f"),
+      abcId.replace("/", isWin ? "%5C" : "%2F")
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+    ))
   )
 
   it("should not resolve non-local dependencies", () =>
@@ -113,7 +129,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.ok(e.code !== "ERR_ASSERTION"))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
   )
 })
