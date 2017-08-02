@@ -153,11 +153,8 @@ function requireWrapper(func, id) {
       return func(id)
     }
 
-    try {
-      compiler.call(Module._extensions, childModule, filePath)
-    } finally {
-      Module._cache[filePath] = childModule
-    }
+    compiler.call(Module._extensions, childModule, filePath)
+    return childModule.exports
   }
 
   const childModule = new Module(filePath, parent)
