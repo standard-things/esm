@@ -5,6 +5,7 @@ import Wrapper from "./wrapper.js"
 import assign from "./util/assign.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
+import getSourceType from "./util/get-source-type.js"
 import path from "path"
 import resolveId from "./util/resolve-id.js"
 
@@ -137,15 +138,6 @@ function requireWrapper(func, id) {
 
   const parent = this.module
   const filePath = resolveFilename(id, parent)
-
-  if (filePath in Module._cache) {
-    return func(id)
-  }
-
-  const childModule = new Module(filePath, parent)
-  childModule.filename = filePath
-  childModule.paths = nodeModulePaths(path.dirname(filePath))
-
   let ext = path.extname(filePath)
 
   if (! ext || typeof Module._extensions[ext] !== "function") {
@@ -153,6 +145,24 @@ function requireWrapper(func, id) {
   }
 
   const compiler = Wrapper.unwrap(Module._extensions, ext)
+
+  if (filePath in Module._cache) {
+    const childModule = Module._cache[filePath]
+
+    if (getSourceType(childModule.exports) !== "module") {
+      return func(id)
+    }
+
+    try {
+      compiler.call(Module._extensions, childModule, filePath)
+    } finally {
+      Module._cache[filePath] = childModule
+    }
+  }
+
+  const childModule = new Module(filePath, parent)
+  childModule.filename = filePath
+  childModule.paths = nodeModulePaths(path.dirname(filePath))
 
   let threw = true
 
