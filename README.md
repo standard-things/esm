@@ -42,6 +42,7 @@ Features
 | | `@std/esm` | ESM in Node 10 |
 | --- | --- | --- |
 | [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import) | :white_check_mark: | :white_check_mark: |
+| [File URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme) | :white_check_mark: | :white_check_mark: |
 | [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values) | :white_check_mark: | :white_check_mark: |
 | [Load `.mjs` as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module) | :white_check_mark: | :white_check_mark: |
 | Node 4+ support | :white_check_mark: | :x: |
