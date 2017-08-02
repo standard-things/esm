@@ -1,5 +1,6 @@
-import __dirname from "../__dirname.js"
 import Module from "module"
+
+import __dirname from "../__dirname.js"
 import path from "path"
 
 const NODE_ENV = String(process.env.NODE_ENV)
