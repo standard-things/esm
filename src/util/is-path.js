@@ -1,5 +1,5 @@
 const codeOfDot = ".".charCodeAt(0)
-const codeOfForwardSlash = "/".charCodeAt(0)
+const codeOfSlash = "/".charCodeAt(0)
 
 function isPath(value) {
   if (typeof value !== "string") {
@@ -7,12 +7,16 @@ function isPath(value) {
   }
 
   const code0 = value.charCodeAt(0)
+
+  if (code0 === codeOfSlash) {
+    return true
+  }
+
   const code1 = value.charCodeAt(1)
 
-  return code0 === codeOfForwardSlash ||
-    (code0 === codeOfDot &&
-      (code1 === codeOfForwardSlash ||
-        (code1 === codeOfDot && value.charCodeAt(2) === codeOfForwardSlash)))
+  return code0 === codeOfDot &&
+    (code1 === codeOfSlash ||
+      (code1 === codeOfDot && value.charCodeAt(2) === codeOfSlash))
 }
 
 export default isPath
