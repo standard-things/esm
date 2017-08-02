@@ -42,14 +42,11 @@ describe("URL parsing", () => {
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "\\\\host\\path\\a\\b\\c" : ""
-
       actual = urlToPath("file://host/path/a/b/c?query#fragment", mode)
-
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "C:\\a\\b\\c" : "/C:/a/b/c"
       actual = urlToPath("file:///C:/a/b/c?query#fragment", mode)
-
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "\\\\w\u036A\u034Aei\u036C\u034Brd.com\\host\\a" : ""
