@@ -4,6 +4,7 @@ import IEV from "./import-export-visitor.js"
 import Parser from "./parser.js"
 
 import createOptions from "./util/create-options.js"
+import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = {
   cjs: false,
@@ -15,9 +16,6 @@ const defaultOptions = {
 
 const assignmentVisitor = new AV
 const importExportVisitor = new IEV
-const codeOfPound = "#".charCodeAt(0)
-
-const shebangRegExp = /^#!.*/
 const useModuleRegExp = /(["'])use module\1/
 
 // Matches any {im,ex}port identifier as long as it's not preceded by a "."
@@ -27,11 +25,8 @@ const importExportRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
+    code = stripShebang(code)
     options = createOptions(options, defaultOptions)
-
-    if (code.charCodeAt(0) === codeOfPound) {
-      code = code.replace(shebangRegExp, "")
-    }
 
     const result = {
       code,
