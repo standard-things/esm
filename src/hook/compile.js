@@ -117,8 +117,9 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const isESM = cacheValue.type === "module"
   const exported = Object.create(null)
 
-  let output = cacheValue.code
   let entry = Entry.get(mod, exported, pkgOptions)
+  let moduleWrap = Module.wrap
+  let output = cacheValue.code
 
   if (isESM) {
     setSourceType(exported, "module")
@@ -135,9 +136,9 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
 
     if (! pkgOptions.cjs) {
-      const wrap = Module.wrap
       Module.wrap = (script) => {
-        Module.wrap = wrap
+        Module.wrap = moduleWrap
+        moduleWrap = void 0
         return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
           script + "\n})"
       }
@@ -156,13 +157,20 @@ function methodWrapper(manager, func, pkgInfo, args) {
       output + "\n}),require)"
   }
 
-  if (pkgOptions.debug) {
-    mod._compile(output, filePath)
-  } else {
-    try {
+  try {
+    if (pkgOptions.debug) {
       mod._compile(output, filePath)
-    } catch (e) {
-      throw maskStackTrace(e)
+    } else {
+      try {
+        mod._compile(output, filePath)
+      } catch (e) {
+        throw maskStackTrace(e)
+      }
+    }
+  } finally {
+    if (isESM && moduleWrap && ! pkgOptions.cjs) {
+      Module.wrap = moduleWrap
+      moduleWrap = void 0
     }
   }
 
