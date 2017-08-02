@@ -1,3 +1,5 @@
+import Module from "module"
+
 import assert from "assert"
 
 describe("spec compliance", () => {
@@ -52,7 +54,21 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should not support loading ESM from require", () =>
+  it("should not support loading ESM from require", () => {
+    const abcPath = Module._resolveFilename("./fixture/export/abc.js")
+    const abcMod = Module._cache[abcPath]
+
+    delete Module._cache[abcPath]
+    return import("./misc/require-esm.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        Module._cache[abcPath] = abcMod
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(/unexpected/i.test(e.message))
+      })
+  })
+
+  it("should not support loading ESM from require if already loaded", () =>
     import("./misc/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => {
