@@ -11,10 +11,10 @@ class FastPath {
     this.stack = [ast]
   }
 
-  // Temporarily push a key and its value onto this.stack, then call
-  // the visitor method with a reference to this (modified) FastPath object.
-  // Note that the stack will be restored to its original state after the
-  // visitor method is finished, so don't retain a reference to the path.
+  // Temporarily push a `key` and its `value` onto `this.stack`, then call the
+  // `visitor` method with a reference to `this` (modified) `FastPath` object.
+  // Note that the stack is restored to its original state after the `visitor`
+  // method has finished, so don't retain a reference to the path.
   call(visitor, methodName, key) {
     const stack = this.stack
     const object = stack[stack.length - 1]
@@ -26,9 +26,9 @@ class FastPath {
     return result
   }
 
-  // Similar to FastPath.prototype.call, except that the value obtained by
-  // accessing this.getValue() should be array-like. The visitor method will be
-  // called with a reference to this path object for each element of the array.
+  // Similar to `FastPath.prototype.call`, except that the value obtained by
+  // `this.getValue()` should be array-like. The `visitor` method is called with
+  // a reference to this path object for each element of the array.
   each(visitor, methodName) {
     let i = -1
     const stack = this.stack
@@ -66,7 +66,7 @@ function getNode(path, pos, callback) {
   }
 
   while (i-- > 0) {
-    // Without a complete list of Node .type names, we have to settle for this
+    // Without a complete list of node type names, we have to settle for this
     // fuzzy matching of object shapes.
     const value = stack[i--]
     if (isObject(value) &&

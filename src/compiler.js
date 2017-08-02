@@ -19,8 +19,8 @@ const importExportVisitor = new IEV
 const useModuleRegExp = /(["'])use module\1/
 
 // Matches any {im,ex}port identifier as long as it's not preceded by a "."
-// character (e.g. runtime.export) to prevent the compiler from compiling code
-// it has already compiled.
+// character (e.g. `runtime.export`) to prevent the compiler from compiling
+// code it has already compiled.
 const importExportRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
 
 class Compiler {

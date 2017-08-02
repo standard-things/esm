@@ -205,7 +205,7 @@ const extsToWrap = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
 extsToWrap.forEach((key) => {
   if (typeof exts[key] !== "function") {
     // Mimic the built-in Node behavior of treating files with unrecognized
-    // extensions as .js.
+    // extensions as ".js".
     exts[key] = extsJs
   }
   Wrapper.manage(exts, key, managerWrapper)

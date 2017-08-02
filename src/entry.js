@@ -24,7 +24,7 @@ class Entry {
     this._namespace = Object.create(null)
     // The child entries of the module.
     this.children = Object.create(null)
-    // The module.exports of the module.
+    // The `module.exports` of the module.
     this.exports = exported
     // Getters for local variables exported from the module.
     this.getters = Object.create(null)
@@ -46,8 +46,8 @@ class Entry {
     }
 
     if (! isObjectLike(exported)) {
-      // Create a temporary Entry object to call entry.addSetters() and trigger
-      // entry.update(), so that runtime.watch() behaves as expected.
+      // Create a temporary `Entry` object to call `entry.addSetters()` and
+      // trigger `entry.update()`, so that `runtime.watch()` behaves as expected.
       return new Entry(mod, exported)
     }
 
@@ -230,9 +230,9 @@ class Entry {
     const ids = keys(parentsMap)
 
     for (const id of ids) {
-      // What happens if parents[parentIDs[id]] === module, or if
-      // longer cycles exist in the parent chain? Thanks to our setter.last
-      // bookkeeping in changed(), the entry.update() broadcast will only
+      // What happens if `parents[parentIDs[id]] === module`, or if
+      // longer cycles exist in the parent chain? Thanks to our `setter.last`
+      // bookkeeping in `changed()`, the `entry.update()` broadcast will only
       // proceed as far as there are any actual changes to report.
       Entry.get(parentsMap[id]).update()
     }

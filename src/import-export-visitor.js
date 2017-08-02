@@ -116,7 +116,7 @@ class ImportExportVisitor extends Visitor {
 
     } else {
       // Otherwise, since the exported value is an expression, we use the
-      // special runtime.default(value) form.
+      // special `runtime.default(value)` form.
       path.call(this, "visitWithoutReset", "declaration")
 
       let prefix = this.runtimeAlias + ".d("
@@ -124,10 +124,10 @@ class ImportExportVisitor extends Visitor {
 
       if (dd.type === "SequenceExpression") {
         // If the exported expression is a comma-separated sequence
-        // expression, this.code.slice(dd.start, dd.end) may not include
+        // expression, `this.code.slice(dd.start, dd.end)` may not include
         // the vital parentheses, so we should wrap the expression with
         // parentheses to make absolutely sure it is treated as a single
-        // argument to runtime.default(), rather than as
+        // argument to `runtime.default()`, rather than as
         // multiple arguments.
         prefix += "("
         suffix = ")" + suffix
@@ -203,7 +203,7 @@ class ImportExportVisitor extends Visitor {
 
     specifierMap = newMap
 
-    // Even though the compiled code uses runtime.watch(), it should
+    // Even though the compiled code uses `runtime.watch()`, it should
     // still be hoisted as an export, i.e. before actual imports.
     hoistExports(this, path, toModuleImport(
       this,

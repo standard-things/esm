@@ -51,7 +51,7 @@ function assignmentHelper(visitor, path, childName) {
     }
   }
 
-  // Wrap assignments to exported identifiers with runtime.update().
+  // Wrap assignments to exported identifiers with `runtime.update()`.
   for (const name of names) {
     if (exportedNames[name] === true &&
         ! isShadowed(path, name)) {

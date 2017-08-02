@@ -22,7 +22,7 @@ describe("import declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support CJS modules setting module.exports", () =>
+  it("should support CJS modules setting `module.exports`", () =>
     import("./import/cjs.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

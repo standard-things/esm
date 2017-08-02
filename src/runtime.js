@@ -87,13 +87,13 @@ class Runtime {
   }
 
   // Platform-specific code should find a way to call this method whenever
-  // the module system is about to return module.exports from require. This
-  // might happen more than once per module, in case of dependency cycles,
-  // so we want entry.update() to run each time.
+  // the module system is about to return `module.exports` from `require`.
+  // This might happen more than once per module, in case of dependency cycles,
+  // so we want `entry.update()` to run each time.
   update(valueToPassThrough) {
     this.entry.update()
 
-    // Returns the valueToPassThrough parameter to allow the value of the
+    // Returns the `valueToPassThrough` parameter to allow the value of the
     // original expression to pass through. For example,
     //
     //   export let a = 1
@@ -105,7 +105,7 @@ class Runtime {
     //   let a = 1
     //   console.log(runtime.update(a += 3))
     //
-    // This ensures entry.update() runs immediately after the assignment,
+    // This ensures `entry.update()` runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
   }

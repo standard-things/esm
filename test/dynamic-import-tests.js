@@ -60,12 +60,12 @@ describe("dynamic import", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support import() in an assignment", () => {
+  it("should support `import()` in an assignment", () => {
     const p = import("./fixture/export/abc.js")
     assert.ok(p instanceof Promise)
   })
 
-  it("should support import() in a function", () => {
+  it("should support `import()` in a function", () => {
     function p() {
       return import("./fixture/export/abc.js")
     }
@@ -73,7 +73,7 @@ describe("dynamic import", () => {
     assert.ok(p() instanceof Promise)
   })
 
-  it("should support import() with yield", () => {
+  it("should support `import()` with yield", () => {
     function* p() {
       yield import("./fixture/export/abc.js")
     }

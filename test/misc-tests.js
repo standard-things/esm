@@ -39,7 +39,7 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should export CJS module.exports as default", () =>
+  it("should export CJS `module.exports` as default", () =>
     import("./misc/export-cjs-default.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

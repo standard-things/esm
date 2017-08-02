@@ -13,10 +13,10 @@ function maskStackTrace(error, sourceCode) {
   decorateStackTrace(error)
   const stack = error.stack
 
-  // Defer any file read operations until the error.stack property is accessed.
-  // Ideally, we'd wrap the error in a Proxy to defer even the initial error.stack
-  // property access. However, Error.captureStackTrace() will throw when receiving
-  // a proxy wrapped error.
+  // Defer any file read operations until `error.stack` is accessed. Ideally,
+  // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
+  // However, `Error.captureStackTrace()` will throw when receiving a proxy
+  // wrapped error object.
   setGetter(error, "stack", () => {
     return error.stack = isParseError(error)
       ? maskParserStack(stack, sourceCode, error.filename)

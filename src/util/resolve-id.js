@@ -42,11 +42,12 @@ function resolveId(id, parent) {
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       const paths = nodeModulePaths(path.dirname(filename))
 
-      // Overwrite concat() to prevent global paths from being concatenated.
+      // Hack: Overwrite `path.concat()` to prevent global paths from being
+      // concatenated.
       paths.concat = () => paths
 
       // Ensure a parent id and filename are provided to avoid going down the
-      // --eval branch of Module._resolveLookupPaths().
+      // --eval branch of `Module._resolveLookupPaths()`.
       return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
     }
 
