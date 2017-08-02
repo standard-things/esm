@@ -5,7 +5,7 @@ import module from "./repl/module.js"
 import repl from "repl"
 import vm from "vm"
 
-describe("Node REPL", () => {
+describe("REPL", () => {
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true })
 
