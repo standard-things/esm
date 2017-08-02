@@ -1,4 +1,5 @@
 import Parser from "../parser.js"
+
 import { types as tt } from "../acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
 
