@@ -52,6 +52,15 @@ describe("spec compliance", () => {
       })
   )
 
+  it("should not support loading ESM from require", () =>
+    import("./misc/require-esm.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(/unexpected/i.test(e.message))
+      })
+  )
+
   it("should bind exports before the module executes", () =>
     import("./misc/export-cycle.js")
       .then((ns) => ns.check())
