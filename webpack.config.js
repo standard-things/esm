@@ -102,7 +102,9 @@ if (isProduction) {
 
 if (isTest) {
   config.entry.compiler = "./src/compiler.js"
+  config.entry["resolve-id"] = "./src/util/resolve-id.js"
   config.entry.runtime = "./src/runtime.js"
+  config.entry["url-to-path"] = "./src/util/url-to-path.js"
   config.module.rules[0].options.presets[0][1].debug = true
 }
 

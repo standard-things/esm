@@ -3,14 +3,16 @@ import Module from "module"
 import URL from "url"
 
 import builtinModules from "../builtin-modules.js"
+import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
 import path from "path"
-import punycode from "punycode/punycode.es6.js"
+import urlToPath from "./url-to-path.js"
 
 const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
 
 const resolveCache = new FastObject
+const pathMode = process.platform === "win32" ? "win32" : "posix"
 const urlCharsRegExp = /[:?#%]/
 
 function resolveId(id, parent) {
@@ -30,54 +32,34 @@ function resolveId(id, parent) {
 
   const parsed = URL.parse(id)
 
-  if (typeof parsed.pathname === "string") {
-    id = decodeURI(parsed.pathname)
+  if (! encodedSlash(parsed.pathname, pathMode)) {
+    if (typeof parsed.protocol !== "string") {
+      if (typeof parsed.pathname === "string") {
+        id = decodeURI(parsed.pathname)
+      }
+
+      // Prevent resolving non-local dependencies:
+      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
+      const paths = nodeModulePaths(path.dirname(filename))
+
+      // Overwrite concat() to prevent global paths from being concatenated.
+      paths.concat = () => paths
+
+      // Ensure a parent id and filename are provided to avoid going down the
+      // --eval branch of Module._resolveLookupPaths().
+      return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
+    }
+
+    const filePath = urlToPath(parsed, pathMode)
+
+    if (filePath) {
+      return resolveCache[cacheKey] = resolveFilename(filePath, parent)
+    }
   }
 
-  if (typeof parsed.protocol !== "string") {
-    // Prevent resolving non-local dependencies:
-    // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-    const paths = nodeModulePaths(path.dirname(filename))
-
-    // Overwrite concat() to prevent global paths from being concatenated.
-    paths.concat = () => paths
-
-    // Ensure a parent id and filename are provided to avoid going down the
-    // --eval branch of Module._resolveLookupPaths().
-    return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
-  }
-
-  if (! parsed.pathname ||
-      parsed.protocol !== "file:") {
-    const error = new Error("Cannot find module '" + id + "'")
-    error.code = "MODULE_NOT_FOUND"
-    throw error
-  }
-
-  // Based on file-uri-to-path.
-  // Copyright Nathan Rajlich. Released under MIT license:
-  // https://github.com/TooTallNate/file-uri-to-path
-  let host = punycode.toUnicode(parsed.host)
-  let pathname = id
-  let prefix = ""
-
-  // Section 2: Syntax
-  // https://tools.ietf.org/html/rfc8089#section-2
-  if (host === "localhost") {
-    host = ""
-  } else if (host) {
-    prefix += path.sep + path.sep
-  } else if (pathname.startsWith("//")) {
-    // Windows shares have a pathname starting with "//".
-    prefix += path.sep
-  }
-
-  // Section E.2: DOS and Windows Drive Letters
-  // https://tools.ietf.org/html/rfc8089#appendix-E.2
-  // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
-  pathname = path.normalize(pathname.replace(/^\/([a-zA-Z])[:|]/, "$1:"))
-
-  return resolveCache[cacheKey] = resolveFilename(prefix + host + pathname, parent)
+  const error = new Error("Cannot find module '" + id + "'")
+  error.code = "MODULE_NOT_FOUND"
+  throw error
 }
 
 export default resolveId
