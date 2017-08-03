@@ -149,12 +149,12 @@ function requireWrapper(func, id) {
   if (filePath in Module._cache) {
     const childModule = Module._cache[filePath]
 
-    if (getSourceType(childModule.exports) !== "module") {
-      return func(id)
+    if (getSourceType(childModule.exports) === "module") {
+      tryParse(compiler, childModule, filePath)
+      return childModule.exports
     }
 
-    tryParse(compiler, childModule, filePath)
-    return childModule.exports
+    return func(id)
   }
 
   const childModule = new Module(filePath, parent)
@@ -187,7 +187,6 @@ function tryParse(compiler, mod, filePath) {
     return "(function(){" + script + "\n});(function(){})"
   }
 
-  // Change the module wrapper so that the module is parsed, but not executed.
   Module.wrap = customWrap
 
   try {

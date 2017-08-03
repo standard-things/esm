@@ -105,40 +105,11 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
-  const exported = Object.create(null)
-  const entry = Entry.get(mod, exported, pkgOptions)
-
-  let output = cacheValue.code
-
   if (cacheValue.type === "module") {
-    setSourceType(exported, "module")
-    Runtime.enable(mod, exported, pkgOptions)
-    tryESModuleLoad(mod, output, filePath, runtimeAlias, pkgOptions)
-    return
+    tryESMLoad(mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
+  } else {
+    tryCJSLoad(mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
   }
-
-  setSourceType(exported, "script")
-  Runtime.enable(mod, exported, pkgOptions)
-
-  output =
-    "const " + runtimeAlias + "=this;" + runtimeAlias +
-    ".r((function(exports,require,module,__filename,__dirname){" +
-    output + "\n}),require)"
-
-  tryModuleCompile(mod, output, filePath, pkgOptions)
-
-  Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, pkgOptions)))
-
-  mod.loaded = true
-
-  if (pkgOptions.cjs) {
-    const getterPairs = keys(mod.exports)
-      .map((key) => [key, () => mod.exports[key]])
-
-    entry.addGetters(getterPairs)
-  }
-
-  entry.update().loaded()
 }
 
 function readCode(filePath, options) {
@@ -147,15 +118,41 @@ function readCode(filePath, options) {
     : readFile(filePath, "utf8")
 }
 
-function tryESModuleLoad(mod, code, filePath, runtimeAlias, options) {
-  const moduleWrap = Module.wrap
-  const customWrap = (script) => {
-    Module.wrap = moduleWrap
-    return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
-      script + "\n})"
+function tryCJSLoad(mod, code, filePath, runtimeAlias, options) {
+  const exported = Object.create(null)
+  const entry = Entry.get(mod, exported, options)
+
+  code =
+    "const " + runtimeAlias + "=this;" + runtimeAlias +
+    ".r((function(exports,require,module,__filename,__dirname){" +
+    code + "\n}),require)"
+
+  setSourceType(exported, "script")
+  Runtime.enable(mod, exported, options)
+
+  tryModuleCompile(mod, code, filePath, options)
+  Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, options)))
+
+  if (options.cjs) {
+    const getterPairs = keys(mod.exports)
+      .map((key) => [key, () => mod.exports[key]])
+
+    entry.addGetters(getterPairs)
   }
 
+  mod.loaded = true
+  entry.update().loaded()
+}
+
+function tryESMLoad(mod, code, filePath, runtimeAlias, options) {
   let async = ""
+  const exported = Object.create(null)
+  const moduleWrap = Module.wrap
+
+  const customWrap = (script) => {
+    Module.wrap = moduleWrap
+    return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
+  }
 
   if (allowTopLevelAwait && options.await) {
     allowTopLevelAwait = false
@@ -170,10 +167,11 @@ function tryESModuleLoad(mod, code, filePath, runtimeAlias, options) {
     runtimeAlias + ".r((" + async + "function(){" + code + "\n}))"
 
   if (! options.cjs) {
-    // Remove `exports`, `require`, `module`, `__filename`, and `__dirname`
-    // parameters from the module wrapper.
     Module.wrap = customWrap
   }
+
+  setSourceType(exported, "module")
+  Runtime.enable(mod, exported, options)
 
   try {
     tryModuleCompile(mod, code, filePath, options)
