@@ -66,7 +66,12 @@ All options are **off** by default.
 </tr>
 <tr>
   <td valign="top"><code>"gz":</code></td>
-  <td><p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p></td>
+  <td>
+    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p>
+    <ul>
+    <li>webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
+    </ul>
+  </td>
 </tr>
 <tr>
   <td valign="top"><code>"esm":</code></td>
