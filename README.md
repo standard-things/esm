@@ -104,7 +104,7 @@ All options are **off** by default.
     <ul>
     <li><a href="https://github.com/tc39/proposal-export-ns-from"><code>export * as ns from "mod"</code></a> <i>(stage 2)</i></li>
     <li><a href="https://github.com/tc39/proposal-export-default-from"><code>export v from "mod"</code></a> <i>(stage 1)</i></li>
-    <li>unordered import/export lists</li>
+    <li>unordered <code>import</code>/<code>export</code> lists</li>
     </ul>
   </td>
 </tr>
