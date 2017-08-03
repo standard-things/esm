@@ -9,6 +9,7 @@ import stripShebang from "./util/strip-shebang.js"
 const defaultOptions = {
   cjs: false,
   ext: false,
+  hint: "script",
   runtimeAlias: "_",
   type: "module",
   var: false
@@ -35,8 +36,10 @@ class Compiler {
     }
 
     if (options.type === "unambiguous" &&
-        ! importExportRegExp.test(code) &&
-        ! useModuleRegExp.test(code)) {
+        (Parser.hasPragma(code, "use script") ||
+          (options.hint !== "module" &&
+          ! importExportRegExp.test(code) &&
+          ! useModuleRegExp.test(code)))) {
       return result
     }
 
@@ -64,10 +67,10 @@ class Compiler {
 
     if (options.type === "module" ||
         importExportVisitor.addedImportExport ||
-        Parser.hasPragma(code, "use module")) {
+        (options.type === "unambiguous" &&
+          (options.hint === "module" ||
+          Parser.hasPragma(code, "use module")))) {
       result.type = "module"
-    } else if (options.type !== "unambiguous") {
-      result.type = options.type
     }
 
     result.code = importExportVisitor.magicString.toString()

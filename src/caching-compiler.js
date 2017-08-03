@@ -1,6 +1,5 @@
 import compiler from "./compiler.js"
 import createOptions from "./util/create-options.js"
-import getScriptPragma from "./util/get-script-pragma.js"
 import gzip from "./fs/gzip.js"
 import keys from "./util/keys.js"
 import path from "path"
@@ -41,7 +40,7 @@ function compileAndWrite(code, options) {
   let output = result.code
 
   if (result.type === "script") {
-    output = getScriptPragma(cacheFileName) + output
+    output = '"use script";' + output
   }
 
   const content = () => isGzipped ? gzip(output) : output
@@ -75,6 +74,7 @@ function toCompileOptions(options) {
   return {
     cjs: pkgOptions.cjs,
     ext: pkgOptions.ext,
+    hint: options.hint,
     runtimeAlias: options.runtimeAlias,
     type: options.type,
     var: pkgOptions.var

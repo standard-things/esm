@@ -1,5 +1,6 @@
 import Entry from "../entry.js"
 import Module from "module"
+import Parser from "../parser.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import SemVer from "semver"
@@ -11,8 +12,6 @@ import encodeIdent from "../util/encode-ident.js"
 import extname from "../util/extname.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
-import getScriptPragma from "../util/get-script-pragma.js"
-import getSourceType from "../util/get-source-type.js"
 import gunzip from "../fs/gunzip.js"
 import isObject from "../util/is-object.js"
 import keys from "../util/keys.js"
@@ -47,12 +46,18 @@ function methodWrapper(manager, func, pkgInfo, args) {
   }
 
   const ext = extname(filePath)
-  let type = getSourceType(mod.exports)
+  let hint = "script"
+  let type = "script"
+
+  if (pkgOptions.esm === "js") {
+    type = "unambiguous"
+  }
 
   if (ext === ".mjs" || ext === ".mjs.gz") {
-    type = "module"
-  } else if (pkgOptions.esm === "js") {
-    type = "unambiguous"
+    hint = "module"
+    if (type === "script") {
+      type = "module"
+    }
   }
 
   if (pkgOptions.esm === "mjs" && type !== "module") {
@@ -79,14 +84,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   if (! isObject(cacheValue)) {
     if (cacheValue === true) {
       if (type === "unambiguous") {
-        const scriptPragma = getScriptPragma(cacheFileName)
-
-        if (cacheCode.startsWith(scriptPragma)) {
-          type = "script"
-          cacheCode = cacheCode.slice(scriptPragma.length)
-        } else {
-          type = "module"
-        }
+        type = Parser.hasPragma(cacheCode, "use script") ? "script" : "module"
       }
 
       cacheValue = { code: cacheCode, type }
@@ -96,6 +94,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
         cacheFileName,
         cachePath,
         filePath,
+        hint,
         pkgInfo,
         runtimeAlias,
         type
