@@ -34,11 +34,17 @@ if (rootModule.id === "internal/preload" ||
     process.mainModule = new Module(filePath, null)
 
     mod.id = "."
+    tryModuleLoad(mod, filePath)
 
+    // Handle any nextTicks added in the first tick of the program.
+    process._tickCallback()
+  }
+
+  const tryModuleLoad = (mod, filePath) => {
     let threw = true
+    Module._cache[filePath] = mod
 
     try {
-      Module._cache[filePath] = mod
       mod.load(filePath)
       threw = false
     } finally {
@@ -46,9 +52,6 @@ if (rootModule.id === "internal/preload" ||
         delete Module._cache[filePath]
       }
     }
-
-    // Handle any nextTicks added in the first tick of the program.
-    process._tickCallback()
   }
 
   Wrapper.manage(Module, "runMain", managerWrapper)
