@@ -58,11 +58,11 @@ describe("compiler", () => {
   it("should not get confused by shebang", () => {
     const code = [
       "#!/usr/bin/env node -r @std/esm",
-      'import a from "a"'
+      'import def from "mod"'
     ].join("\n")
 
     const result = compiler.compile(code)
-    assert.ok(result.code.startsWith("let a"))
+    assert.ok(result.code.startsWith("let def"))
   })
 
   it("should not get confused by string literals", () =>
