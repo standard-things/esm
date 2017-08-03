@@ -153,23 +153,7 @@ function requireWrapper(func, id) {
       return func(id)
     }
 
-    const moduleWrap = Module.wrap
-    const customWrap = (script) => {
-      Module.wrap = moduleWrap
-      return "(function(){" + script + "\n});(function(){})"
-    }
-
-    // Change the module wrapper so that the module is parsed, but not executed.
-    Module.wrap = customWrap
-
-    try {
-      compiler.call(Module._extensions, childModule, filePath)
-    } finally {
-      if (Module.wrap === customWrap) {
-        Module.wrap = moduleWrap
-      }
-    }
-
+    tryParse(compiler, childModule, filePath)
     return childModule.exports
   }
 
@@ -177,20 +161,42 @@ function requireWrapper(func, id) {
   childModule.filename = filePath
   childModule.paths = nodeModulePaths(path.dirname(filePath))
 
+  tryModuleLoad(compiler, childModule, filePath)
+  return childModule.exports
+}
+
+function tryModuleLoad(compiler, mod, filePath) {
   let threw = true
+  Module._cache[filePath] = mod
 
   try {
-    Module._cache[filePath] = childModule
-    compiler.call(Module._extensions, childModule, filePath)
-    childModule.loaded = true
+    compiler.call(Module._extensions, mod, filePath)
+    mod.loaded = true
     threw = false
   } finally {
     if (threw) {
       delete Module._cache[filePath]
     }
   }
+}
 
-  return childModule.exports
+function tryParse(compiler, mod, filePath) {
+  const moduleWrap = Module.wrap
+  const customWrap = (script) => {
+    Module.wrap = moduleWrap
+    return "(function(){" + script + "\n});(function(){})"
+  }
+
+  // Change the module wrapper so that the module is parsed, but not executed.
+  Module.wrap = customWrap
+
+  try {
+    compiler.call(Module._extensions, mod, filePath)
+  } finally {
+    if (Module.wrap === customWrap) {
+      Module.wrap = moduleWrap
+    }
+  }
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
