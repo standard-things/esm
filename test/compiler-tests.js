@@ -27,6 +27,8 @@ describe("compiler", () => {
 
     const tests = [
       { code: "1+2", type: "script" },
+      { code: "'use script';import def from 'mod'", type: "script" },
+      { code: '"use script";import def from "mod"', type: "script" },
       { code: "'use module';1+2", type: "module" },
       { code: '"use module";1+2', type: "module" }
     ]
