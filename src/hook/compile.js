@@ -114,11 +114,17 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
-  const isESM = cacheValue.type === "module"
   const exported = Object.create(null)
+  const isESM = cacheValue.type === "module"
+
+  const moduleWrap = Module.wrap
+  const customWrap = (script) => {
+    Module.wrap = moduleWrap
+    return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
+      script + "\n})"
+  }
 
   let entry = Entry.get(mod, exported, pkgOptions)
-  let moduleWrap = Module.wrap
   let output = cacheValue.code
 
   if (isESM) {
@@ -138,12 +144,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
     if (! pkgOptions.cjs) {
       // Remove `exports`, `require`, `module`, `__filename`, and `__dirname`
       // parameters from the module wrapper.
-      Module.wrap = (script) => {
-        Module.wrap = moduleWrap
-        moduleWrap = void 0
-        return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
-          script + "\n})"
-      }
+      Module.wrap = customWrap
     }
 
     output =
@@ -170,9 +171,9 @@ function methodWrapper(manager, func, pkgInfo, args) {
       }
     }
   } finally {
-    if (isESM && moduleWrap && ! pkgOptions.cjs) {
+    if (isESM && ! pkgOptions.cjs &&
+        Module.wrap === customWrap) {
       Module.wrap = moduleWrap
-      moduleWrap = void 0
     }
   }
 
