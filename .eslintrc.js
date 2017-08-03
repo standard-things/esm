@@ -24,6 +24,7 @@ module.exports = {
     "arrow-parens": "error",
     "arrow-spacing": "error",
     "brace-style": ["error", "1tbs"],
+    "comma-dangle": "error",
     "consistent-return": "error",
     curly: "error",
     "eol-last": "error",

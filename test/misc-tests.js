@@ -118,7 +118,7 @@ describe("spec compliance", () => {
   it("should throw a type error when setting an imported identifier", () =>
     Promise.all([
       "./misc/import-const.js",
-      "./misc/import-let.js",
+      "./misc/import-let.js"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))

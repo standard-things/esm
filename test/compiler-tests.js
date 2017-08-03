@@ -56,7 +56,7 @@ describe("compiler", () => {
   it("should not get confused by shebang", () => {
     const code = [
       "#!/usr/bin/env node -r @std/esm",
-      'import a from "a"',
+      'import a from "a"'
     ].join("\n")
 
     const result = compiler.compile(code)

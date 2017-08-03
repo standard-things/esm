@@ -4,7 +4,7 @@ export const one = 1
 
 import {
   one as aOne,
-  two as aTwo,
+  two as aTwo
 } from "./cycle-a.js"
 
 export const two = 2
