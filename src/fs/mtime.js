@@ -21,15 +21,7 @@ if (useMtimeFastPath) {
 function mtime(filePath) {
   if (useMtimeFastPath) {
     try {
-      // Used to speed up file stats. Modifies the `statValues` typed array,
-      // with index 11 being the mtime milliseconds stamp. The speedup comes
-      // from not creating Stat objects.
-      if (useInternalStatValues) {
-        internalStat(filePath)
-      } else {
-        internalStat(filePath, statValues)
-      }
-      return statValues[11]
+      return fastPathMtime(filePath)
     } catch (e) {
       if (e.code === "ENOENT") {
         return -1
@@ -45,6 +37,19 @@ function fallbackMtime(filePath) {
     return fs.statSync(filePath).mtime.getTime()
   } catch (e) {}
   return -1
+}
+
+function fastPathMtime(filePath) {
+  // Used to speed up file stats. Modifies the `statValues` typed array,
+  // with index 11 being the mtime milliseconds stamp. The speedup comes
+  // from not creating Stat objects.
+  if (useInternalStatValues) {
+    internalStat(filePath)
+  } else {
+    internalStat(filePath, statValues)
+  }
+
+  return statValues[11]
 }
 
 export default mtime

@@ -11,13 +11,7 @@ function gunzip(bufferOrString, options) {
 
   if (useGunzipFastPath) {
     try {
-      const stream = new minizlib.Gunzip(options)
-      if (options.encoding === "utf8") {
-        let result = ""
-        stream.on("data", (chunk) => result += chunk).end(bufferOrString)
-        return result
-      }
-      return streamToBuffer(stream, bufferOrString)
+      return fastPathGunzip(bufferOrString, options)
     } catch (e) {
       useGunzipFastPath = false
     }
@@ -28,6 +22,18 @@ function gunzip(bufferOrString, options) {
 function fallbackGunzip(bufferOrString, options) {
   const buffer = zlib.gunzipSync(bufferOrString, options)
   return options.encoding === "utf8" ? buffer.toString() : buffer
+}
+
+function fastPathGunzip(bufferOrString, options) {
+  const stream = new minizlib.Gunzip(options)
+
+  if (options.encoding === "utf8") {
+    let result = ""
+    stream.on("data", (chunk) => result += chunk).end(bufferOrString)
+    return result
+  }
+
+  return streamToBuffer(stream, bufferOrString)
 }
 
 export default gunzip

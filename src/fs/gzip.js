@@ -14,7 +14,7 @@ function gzip(bufferOrString, options) {
 
   if (useGzipFastPath) {
     try {
-      return streamToBuffer(new minizlib.Gzip(options), bufferOrString)
+      return fastPathGzip(bufferOrString, options)
     } catch (e) {
       useGzipFastPath = false
     }
@@ -24,6 +24,10 @@ function gzip(bufferOrString, options) {
 
 function fallbackGzip(bufferOrString, options) {
   return zlib.gzipSync(bufferOrString, options)
+}
+
+function fastPathGzip(bufferOrString, options) {
+  return streamToBuffer(new minizlib.Gzip(options), bufferOrString)
 }
 
 export default gzip

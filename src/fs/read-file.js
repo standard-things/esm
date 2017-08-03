@@ -11,11 +11,7 @@ function readFile(filePath, options) {
 
   if (useReadFileFastPath && encoding === "utf8") {
     try {
-      // Used to speed up reading. Returns the contents of the file as a string
-      // or undefined when the file cannot be opened. The speedup comes from not
-      // creating Error objects on failure.
-      const content = internalModuleReadFile(filePath)
-      return content === void 0 ? null : content
+      return fastPathReadFile(filePath)
     } catch (e) {
       useReadFileFastPath = false
     }
@@ -28,6 +24,14 @@ function fallbackReadFile(filePath, options) {
     return fs.readFileSync(filePath, options)
   } catch (e) {}
   return null
+}
+
+function fastPathReadFile(filePath) {
+  // Used to speed up reading. Returns the contents of the file as a string
+  // or undefined when the file cannot be opened. The speedup comes from not
+  // creating Error objects on failure.
+  const content = internalModuleReadFile(filePath)
+  return content === void 0 ? null : content
 }
 
 export default readFile
