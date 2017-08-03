@@ -2,13 +2,12 @@ import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
-import captureStackTrace from "../error/capture-stack-trace.js"
+import attempt from "../util/attempt.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
 import encodeIdent from "../util/encode-ident.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
-import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
 import vm from "vm"
@@ -45,6 +44,12 @@ if (rootModule.filename === null &&
     const cacheValue = cache[cacheFileName]
     const pkgOptions = pkgInfo.options
 
+    const runWrapper = function (func, args) {
+      const code = args[0]
+      const callback = () => func.apply(this, args)
+      return pkgOptions.debug ? callback() : attempt(callback, manager, code)
+    }
+
     let output
 
     if (isObject(cacheValue)) {
@@ -61,46 +66,15 @@ if (rootModule.filename === null &&
         runtimeAlias
       }
 
-      if (pkgOptions.debug) {
-        output = compiler.compile(code, compilerOptions).code
-      } else {
-        try {
-          output = compiler.compile(code, compilerOptions).code
-        } catch (e) {
-          captureStackTrace(e, manager)
-          throw maskStackTrace(e, code)
-        }
-      }
+      const callback = () => compiler.compile(code, compilerOptions).code
+      output = pkgOptions.debug ? callback() : attempt(callback, manager, code)
     }
 
     output =
       '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
       "||[module.exports,module.exports={}][0];" + output
 
-    let result
-
-    if (pkgOptions.debug) {
-      result = func.call(this, output, options)
-    } else {
-      try {
-        result = func.call(this, output, options)
-      } catch (e) {
-        captureStackTrace(e, manager)
-        throw maskStackTrace(e, code)
-      }
-    }
-
-    const runWrapper = function (func, args) {
-      if (pkgOptions.debug) {
-        return func.apply(this, args)
-      }
-
-      try {
-        return func.apply(this, args)
-      } catch (e) {
-        throw maskStackTrace(e, code)
-      }
-    }
+    const result = runWrapper(func, [output, options])
 
     if (result.cachedDataProduced) {
       cache[cacheFileName].data = result.cachedData
