@@ -45,6 +45,7 @@ module.exports = {
     "no-useless-rename": "error",
     "no-var": "error",
     "one-var": ["error", "never"],
+    "rest-spread-spacing": "error",
     semi: ["error", "never"],
     "sort-imports": "error",
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
