@@ -136,6 +136,8 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
 
     if (! pkgOptions.cjs) {
+      // Remove `exports`, `require`, `module`, `__filename`, and `__dirname`
+      // parameters from the module wrapper.
       Module.wrap = (script) => {
         Module.wrap = moduleWrap
         moduleWrap = void 0
