@@ -153,7 +153,23 @@ function requireWrapper(func, id) {
       return func(id)
     }
 
-    compiler.call(Module._extensions, childModule, filePath)
+    const moduleWrap = Module.wrap
+    const customWrap = (script) => {
+      Module.wrap = moduleWrap
+      return "(function(){" + script + "\n});(function(){})"
+    }
+
+    // Change the module wrapper so that the module is parsed, but not executed.
+    Module.wrap = customWrap
+
+    try {
+      compiler.call(Module._extensions, childModule, filePath)
+    } finally {
+      if (Module.wrap === customWrap) {
+        Module.wrap = moduleWrap
+      }
+    }
+
     return childModule.exports
   }
 
