@@ -115,6 +115,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   }
 
   const exported = Object.create(null)
+  const entry = Entry.get(mod, exported, pkgOptions)
   const isESM = cacheValue.type === "module"
 
   const moduleWrap = Module.wrap
@@ -124,7 +125,6 @@ function methodWrapper(manager, func, pkgInfo, args) {
       script + "\n})"
   }
 
-  let entry = Entry.get(mod, exported, pkgOptions)
   let output = cacheValue.code
 
   if (isESM) {
