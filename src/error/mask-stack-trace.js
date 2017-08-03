@@ -6,7 +6,7 @@ import setSetter from "../util/set-setter.js"
 
 const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/
 const removeArrowRegExp = /^.+\n *^$/m
-const removeColumnsRegExp = /:1:\d+(\)?)$/gm
+const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 const splice = Array.prototype.splice
 
 function maskStackTrace(error, sourceCode) {
@@ -77,7 +77,7 @@ function scrubStack(stack) {
     .split("\n")
     .filter((line) => ! line.includes(__non_webpack_filename__))
     .join("\n")
-    .replace(removeColumnsRegExp, ":1$1")
+    .replace(removeLineInfoRegExp, "$1")
 }
 
 export default maskStackTrace
