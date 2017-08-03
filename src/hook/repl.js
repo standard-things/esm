@@ -44,7 +44,7 @@ if (rootModule.filename === null &&
     const cacheValue = cache[cacheFileName]
     const pkgOptions = pkgInfo.options
 
-    const runWrapper = function (func, args) {
+    const tryWrapper = function (func, args) {
       const code = args[0]
       const callback = () => func.apply(this, args)
       return pkgOptions.debug ? callback() : attempt(callback, manager, code)
@@ -66,22 +66,21 @@ if (rootModule.filename === null &&
         runtimeAlias
       }
 
-      const callback = () => compiler.compile(code, compilerOptions).code
-      output = pkgOptions.debug ? callback() : attempt(callback, manager, code)
+      output = tryWrapper(compiler.compile, [code, compilerOptions]).code
     }
 
     output =
       '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
       "||[module.exports,module.exports={}][0];" + output
 
-    const result = runWrapper(func, [output, options])
+    const result = tryWrapper(func, [output, options])
 
     if (result.cachedDataProduced) {
       cache[cacheFileName].data = result.cachedData
     }
 
-    result.runInContext = wrap(result.runInContext, runWrapper)
-    result.runInThisContext = wrap(result.runInThisContext, runWrapper)
+    result.runInContext = wrap(result.runInContext, tryWrapper)
+    result.runInThisContext = wrap(result.runInThisContext, tryWrapper)
     return result
   }
 
