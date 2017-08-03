@@ -77,6 +77,15 @@ describe("spec compliance", () => {
       })
   )
 
+  it("should not executed already loaded modules from require", () =>
+    import("./misc/load-count.js")
+      .then(() => import("./misc/require-load-count.js"))
+      .then(() => {
+        assert.strictEqual(global.loadCount, 1)
+        delete global.loadCount
+      })
+  )
+
   it("should bind exports before the module executes", () =>
     import("./misc/export-cycle.js")
       .then((ns) => ns.check())
