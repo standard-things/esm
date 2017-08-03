@@ -16,12 +16,6 @@ import { enable as enableExport } from "./acorn-ext/export.js"
 import { enable as enableImport } from "./acorn-ext/import.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
-const acornParser = new AcornParser
-const acornRaise = acornParser.raise
-
-const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
-const skipWhiteSpaceRegExp = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
-
 const defaultOptions = {
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
@@ -29,6 +23,12 @@ const defaultOptions = {
   enableImportExtensions: false,
   sourceType: "module"
 }
+
+const acornParser = new AcornParser
+const acornRaise = acornParser.raise
+
+const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
+const skipWhiteSpaceRegExp = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g
 
 class Parser {
   static getNamesFromPattern(pattern) {
