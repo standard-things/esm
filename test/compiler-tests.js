@@ -27,15 +27,18 @@ describe("compiler", () => {
 
     const tests = [
       { code: "1+2", type: "script" },
+      { code: "1+2", hint: "module", type: "module" },
+      { code: "'use script';import def from 'mod'", hint: "module", type: "script" },
+      { code: '"use script";import def from "mod"', hint: "module", type: "script" },
       { code: "'use script';import def from 'mod'", type: "script" },
       { code: '"use script";import def from "mod"', type: "script" },
       { code: "'use module';1+2", type: "module" },
       { code: '"use module";1+2', type: "module" }
     ]
 
-    tests.forEach((data) => {
-      const result = compiler.compile(data.code, { type: "unambiguous" })
-      assert.strictEqual(result.type, data.type)
+    tests.forEach(({ code, hint, type }) => {
+      const result = compiler.compile(code, { hint, type: "unambiguous" })
+      assert.strictEqual(result.type, type)
     })
   })
 
