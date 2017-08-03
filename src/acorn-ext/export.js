@@ -63,7 +63,7 @@ function parseExportSpecifiers(func, args) {
       specifiers.push(parseExportNamespaceSpecifier(this, exported))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, func.apply(this, args))
+      specifiers.push(...func.apply(this, args))
     }
   }
   while (this.eat(tt.comma))

@@ -57,10 +57,10 @@ class Parser {
         queue.push(pattern.left)
         break
       case "ObjectPattern":
-        queue.push.apply(queue, pattern.properties)
+        queue.push(...pattern.properties)
         break
       case "ArrayPattern":
-        queue.push.apply(queue, pattern.elements)
+        queue.push(...pattern.elements)
         break
       case "RestElement":
         queue.push(pattern.argument)

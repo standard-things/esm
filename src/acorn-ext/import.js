@@ -24,7 +24,7 @@ function parseImportSpecifiers(func, args) {
       specifiers.push(parseImportNamespaceSpecifier(this))
     } else if (this.type === tt.braceL) {
       // ... { x, y as z } [, ...]
-      specifiers.push.apply(specifiers, func.apply(this, args))
+      specifiers.push(...func.apply(this, args))
     }
   }
   while (this.eat(tt.comma))

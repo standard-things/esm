@@ -7,7 +7,6 @@ import setSetter from "../util/set-setter.js"
 const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/
 const removeArrowRegExp = /^.+\n *^$/m
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
-const splice = Array.prototype.splice
 
 function maskStackTrace(error, sourceCode) {
   decorateStackTrace(error)
@@ -60,7 +59,7 @@ function maskParserStack(stack, sourceCode, filePath) {
     "", desc
   )
 
-  splice.apply(stackLines, spliceArgs)
+  stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
 }
 
