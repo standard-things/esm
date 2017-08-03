@@ -6,6 +6,7 @@ import builtinModules from "../builtin-modules.js"
 import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
 import path from "path"
+import toStringLiteral from "./to-string-literal.js"
 import urlToPath from "./url-to-path.js"
 
 const nodeModulePaths = Module._nodeModulePaths
@@ -58,7 +59,7 @@ function resolveId(id, parent) {
     }
   }
 
-  const error = new Error("Cannot find module '" + id + "'")
+  const error = new Error("Module " + toStringLiteral(id, "'") + " not found")
   error.code = "MODULE_NOT_FOUND"
   throw error
 }

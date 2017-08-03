@@ -7,6 +7,7 @@ import path from "path"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
+import toStringLiteral from "./util/to-string-literal.js"
 
 const GETTER_ERROR = {}
 const entryMap = new WeakMap
@@ -323,7 +324,8 @@ function getExportByName(entry, name) {
   if (entry._loaded &&
       ! (name in namespace)) {
     const basename = path.basename(entry.module.filename)
-    throw new SyntaxError("Module '" + basename + "' does not provide an export named '" + name + "'")
+    throw new SyntaxError("Module " + toStringLiteral(basename, "'") +
+      " does not provide an export named '" + name + "'")
   }
 
   return namespace[name]
