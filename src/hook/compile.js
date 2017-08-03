@@ -6,7 +6,7 @@ import Runtime from "../runtime.js"
 import SemVer from "semver"
 import Wrapper from "../wrapper.js"
 
-import captureStackTrace from "../error/capture-stack-trace.js"
+import attempt from "../util/attempt.js"
 import compiler from "../caching-compiler.js"
 import encodeIdent from "../util/encode-ident.js"
 import extname from "../util/extname.js"
@@ -100,85 +100,32 @@ function methodWrapper(manager, func, pkgInfo, args) {
         type
       }
 
-      if (pkgOptions.debug) {
-        cacheValue = compiler.compile(sourceCode, compilerOptions)
-      } else {
-        try {
-          cacheValue = compiler.compile(sourceCode, compilerOptions)
-        } catch (e) {
-          captureStackTrace(e, manager)
-          throw maskStackTrace(e, sourceCode)
-        }
-      }
+      const callback = () => compiler.compile(sourceCode, compilerOptions)
+      cacheValue = pkgOptions.debug ? callback() : attempt(callback, manager, sourceCode)
     }
   }
 
   const exported = Object.create(null)
   const entry = Entry.get(mod, exported, pkgOptions)
-  const isESM = cacheValue.type === "module"
-
-  const moduleWrap = Module.wrap
-  const customWrap = (script) => {
-    Module.wrap = moduleWrap
-    return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
-      script + "\n})"
-  }
 
   let output = cacheValue.code
 
-  if (isESM) {
+  if (cacheValue.type === "module") {
     setSourceType(exported, "module")
     Runtime.enable(mod, exported, pkgOptions)
-
-    let async = ""
-
-    if (allowTopLevelAwait && pkgOptions.await) {
-      allowTopLevelAwait = false
-      if (process.mainModule === mod ||
-          process.mainModule.children.some((child) => child === mod)) {
-        async = "async "
-      }
-    }
-
-    if (! pkgOptions.cjs) {
-      // Remove `exports`, `require`, `module`, `__filename`, and `__dirname`
-      // parameters from the module wrapper.
-      Module.wrap = customWrap
-    }
-
-    output =
-      (pkgOptions.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".r((" + async + "function(){" + output + "\n}))"
-  } else {
-    setSourceType(exported, "script")
-    Runtime.enable(mod, exported, pkgOptions)
-
-    output =
-      "const " + runtimeAlias + "=this;" + runtimeAlias +
-      ".r((function(exports,require,module,__filename,__dirname){" +
-      output + "\n}),require)"
-  }
-
-  try {
-    if (pkgOptions.debug) {
-      mod._compile(output, filePath)
-    } else {
-      try {
-        mod._compile(output, filePath)
-      } catch (e) {
-        throw maskStackTrace(e)
-      }
-    }
-  } finally {
-    if (isESM && ! pkgOptions.cjs &&
-        Module.wrap === customWrap) {
-      Module.wrap = moduleWrap
-    }
-  }
-
-  if (isESM) {
+    tryESModuleLoad(mod, output, filePath, runtimeAlias, pkgOptions)
     return
   }
+
+  setSourceType(exported, "script")
+  Runtime.enable(mod, exported, pkgOptions)
+
+  output =
+    "const " + runtimeAlias + "=this;" + runtimeAlias +
+    ".r((function(exports,require,module,__filename,__dirname){" +
+    output + "\n}),require)"
+
+  tryModuleCompile(mod, output, filePath, pkgOptions)
 
   Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, pkgOptions)))
 
@@ -198,6 +145,56 @@ function readCode(filePath, options) {
   return options.gz && path.extname(filePath) === ".gz"
     ? gunzip(readFile(filePath), "utf8")
     : readFile(filePath, "utf8")
+}
+
+function tryESModuleLoad(mod, code, filePath, runtimeAlias, options) {
+  const moduleWrap = Module.wrap
+  const customWrap = (script) => {
+    Module.wrap = moduleWrap
+    return '"use strict";(function(){const ' + runtimeAlias + "=this;" +
+      script + "\n})"
+  }
+
+  let async = ""
+
+  if (allowTopLevelAwait && options.await) {
+    allowTopLevelAwait = false
+    if (process.mainModule === mod ||
+        process.mainModule.children.some((child) => child === mod)) {
+      async = "async "
+    }
+  }
+
+  code =
+    (options.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
+    runtimeAlias + ".r((" + async + "function(){" + code + "\n}))"
+
+  if (! options.cjs) {
+    // Remove `exports`, `require`, `module`, `__filename`, and `__dirname`
+    // parameters from the module wrapper.
+    Module.wrap = customWrap
+  }
+
+  try {
+    tryModuleCompile(mod, code, filePath, options)
+  } finally {
+    if (Module.wrap === customWrap) {
+      Module.wrap = moduleWrap
+    }
+  }
+}
+
+function tryModuleCompile(mod, code, filePath, options) {
+  if (options.debug) {
+    mod._compile(code, filePath)
+    return
+  }
+
+  try {
+    mod._compile(code, filePath)
+  } catch (e) {
+    throw maskStackTrace(e)
+  }
 }
 
 const exts = Module._extensions
