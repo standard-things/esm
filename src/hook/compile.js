@@ -7,9 +7,11 @@ import SemVer from "semver"
 import Wrapper from "../wrapper.js"
 
 import attempt from "../util/attempt.js"
+import binding from "../binding/fs.js"
 import compiler from "../caching-compiler.js"
 import encodeIdent from "../util/encode-ident.js"
 import extname from "../util/extname.js"
+import fs from "fs"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import gunzip from "../fs/gunzip.js"
@@ -105,11 +107,8 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
-  if (cacheValue.type === "module") {
-    tryESMLoad(mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
-  } else {
-    tryCJSLoad(mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
-  }
+  const tryModuleLoad = cacheValue.type === "module" ? tryESMLoad : tryCJSLoad
+  tryModuleLoad.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
 }
 
 function readCode(filePath, options) {
@@ -118,7 +117,7 @@ function readCode(filePath, options) {
     : readFile(filePath, "utf8")
 }
 
-function tryCJSLoad(mod, code, filePath, runtimeAlias, options) {
+function tryCJSLoad(func, mod, code, filePath, runtimeAlias, options) {
   const exported = Object.create(null)
   const entry = Entry.get(mod, exported, options)
 
@@ -130,7 +129,7 @@ function tryCJSLoad(mod, code, filePath, runtimeAlias, options) {
   setSourceType(exported, "script")
   Runtime.enable(mod, exported, options)
 
-  tryModuleCompile(mod, code, filePath, options)
+  tryModuleCompile.call(this, func, mod, code, filePath, options)
   Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, options)))
 
   if (options.cjs) {
@@ -144,7 +143,7 @@ function tryCJSLoad(mod, code, filePath, runtimeAlias, options) {
   entry.update().loaded()
 }
 
-function tryESMLoad(mod, code, filePath, runtimeAlias, options) {
+function tryESMLoad(func, mod, code, filePath, runtimeAlias, options) {
   let async = ""
   const exported = Object.create(null)
   const moduleWrap = Module.wrap
@@ -174,7 +173,7 @@ function tryESMLoad(mod, code, filePath, runtimeAlias, options) {
   Runtime.enable(mod, exported, options)
 
   try {
-    tryModuleCompile(mod, code, filePath, options)
+    tryModuleCompile.call(this, func, mod, code, filePath, options)
   } finally {
     if (Module.wrap === customWrap) {
       Module.wrap = moduleWrap
@@ -182,16 +181,61 @@ function tryESMLoad(mod, code, filePath, runtimeAlias, options) {
   }
 }
 
-function tryModuleCompile(mod, code, filePath, options) {
-  if (options.debug) {
-    mod._compile(code, filePath)
-    return
+function tryModuleCompile(func, mod, code, filePath, options) {
+  const moduleReadFile = binding.internalModuleReadFile
+  const readFileSync = fs.readFileSync
+
+  const customModuleReadFile = function (readPath) {
+    if (readPath === filePath) {
+      if (typeof moduleReadFile === "function") {
+        binding.internalModuleReadFile = moduleReadFile
+      }
+
+      fs.readFileSync = readFileSync
+      return code
+    }
+
+    return moduleReadFile.call(this, readPath)
   }
 
+  const customReadFileSync = function (readPath, readOptions) {
+    if (readPath === filePath) {
+      if (typeof moduleReadFile === "function") {
+        binding.internalModuleReadFile = moduleReadFile
+      }
+
+      fs.readFileSync = readFileSync
+      return code
+    }
+
+    return readFileSync.call(this, readPath, readOptions)
+  }
+
+  if (typeof internalModuleReadFile === "function") {
+    binding.internalModuleReadFile = customModuleReadFile
+  }
+
+  fs.readFileSync = customReadFileSync
+
   try {
-    mod._compile(code, filePath)
-  } catch (e) {
-    throw maskStackTrace(e)
+    if (options.debug) {
+      func.call(this, mod, filePath)
+      return
+    }
+
+    try {
+      func.call(this, mod, filePath)
+    } catch (e) {
+      throw maskStackTrace(e)
+    }
+  } finally {
+    if (binding.internalModuleReadFile === customModuleReadFile) {
+      binding.internalModuleReadFile = moduleReadFile
+    }
+
+    if (fs.readFileSync === customReadFileSync) {
+      fs.readFileSync = readFileSync
+    }
   }
 }
 
