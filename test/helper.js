@@ -1,7 +1,6 @@
 "use strict"
 
 const SemVer = require("semver")
-
 const globby = require("globby")
 
 let babelFiles
