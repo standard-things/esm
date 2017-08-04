@@ -1,5 +1,6 @@
 "use strict"
 
+const fs = require("fs")
 const path = require("path")
 const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
@@ -26,27 +27,7 @@ const config = {
     rules: [{
       test: /\.js$/,
       loader: "babel-loader",
-      options: {
-        plugins: [
-          "transform-for-of-as-array"
-        ],
-        presets: [
-          ["env", {
-            modules: false,
-            exclude: [
-              "check-es2015-constants",
-              "transform-async-to-generator",
-              "transform-es2015-block-scoping",
-              "transform-es2015-classes",
-              "transform-es2015-for-of",
-              "transform-es2015-function-name",
-              "transform-es2015-object-super",
-              "transform-regenerator"
-            ],
-            targets: { node: 4 }
-          }]
-        ]
-      }
+      options: JSON.parse(fs.readFileSync("./.babelrc", "utf8"))
     }]
   },
   plugins: [
