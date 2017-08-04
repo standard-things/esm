@@ -2,8 +2,9 @@ import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
+import helper from "./helper.js"
 
-const isNode4 = SemVer.satisfies(process.version, "<6")
+const register = helper.register
 
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
@@ -60,17 +61,11 @@ describe("spec compliance", () => {
   it("should not support loading ESM from require", () => {
     const abcPath = Module._resolveFilename("./fixture/export/abc.js")
     const abcMod = Module._cache[abcPath]
-    const registerImport = isNode4 ? import("babel-register") : Promise.resolve()
 
-    return registerImport
-      .then((register) => {
-        if (register) {
-          register.default({ cache: false, only: /test/ })
-        }
+    register.init()
+    delete Module._cache[abcPath]
 
-        delete Module._cache[abcPath]
-      })
-      .then(() => import("./misc/require-esm.js"))
+    return import("./misc/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => {
         Module._cache[abcPath] = abcMod

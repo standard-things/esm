@@ -1,3 +1,9 @@
+import SemVer from "semver"
+
+import helper from "./helper.js"
+
+helper.register.init()
+
 import "./import-tests.js"
 import "./dynamic-import-tests.js"
 import "./export-tests.js"
