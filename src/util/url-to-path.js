@@ -2,7 +2,7 @@ import URL from "url"
 
 import encodedSlash from "./encoded-slash.js"
 import path from "path"
-import punycode from "punycode/punycode.es6.js"
+import punycode from "../vendor/punycode/punycode.es6.js"
 
 const codeOfColon = ":".charCodeAt(0)
 

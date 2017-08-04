@@ -5,6 +5,6 @@
 *.log
 /build
 /node_modules
-/src/acorn
+/src/vendor
 /test/env/prefix/bin
 /test/env/prefix/node

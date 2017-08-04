@@ -2,7 +2,6 @@
 "use strict"
 
 const pify = require("pify")
-const acornPkg = require("acorn/package.json")
 const download = pify(require("download-git-repo"))
 const execa = require("execa")
 const fs = require("fs-extra")
@@ -19,12 +18,17 @@ const NODE_ENV =
   (argv.test ? "-test" : "")
 
 const rootPath = path.join(__dirname, "..")
-const acornPath = path.join(rootPath, "src/acorn")
+const vendorPath = path.join(rootPath, "src/vendor")
+const acornPath = path.join(vendorPath, "acorn")
 const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
 const gzipPath = path.join(rootPath, "esm.js.gz")
+const punycodePath = path.join(vendorPath, "punycode")
 const uwpPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plugin")
 const uglifyPath = path.join(uwpPath, "node_modules/uglify-es")
+
+const acornPkg = require("acorn/package.json")
+const punycodePkgPath = path.dirname(require.resolve("punycode/package.json"))
 
 const trashPaths = [
   buildPath,
@@ -46,6 +50,12 @@ Promise
   .then((exists) => {
     if (! exists) {
       return download("ternjs/acorn#" + acornPkg.version, acornPath)
+    }
+  })
+  .then(() => fs.pathExists(punycodePath))
+  .then((exists) => {
+    if (! exists) {
+      return fs.copy(punycodePkgPath, punycodePath)
     }
   })
   .then(() => execa("webpack", webpackArgs, {

@@ -4,7 +4,7 @@
 
 import Parser from "../parser.js"
 
-import { types as tt } from "../acorn/src/tokentype.js"
+import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
