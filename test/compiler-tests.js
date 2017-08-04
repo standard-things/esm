@@ -18,20 +18,20 @@ describe("compiler", () => {
   )
 
   it("should respect options.type", () => {
-    const values = [void 0, "module", "unambiguous"]
+    const types = [void 0, "module", "unambiguous"]
 
-    values.forEach((value) => {
-      const result = compiler.compile('import "a"', { type: value })
+    types.forEach((type) => {
+      const result = compiler.compile('import"a"', { type })
       assert.strictEqual(result.type, "module")
     })
 
     const tests = [
       { code: "1+2", type: "script" },
       { code: "1+2", hint: "module", type: "module" },
-      { code: "'use script';import def from 'mod'", hint: "module", type: "script" },
-      { code: '"use script";import def from "mod"', hint: "module", type: "script" },
-      { code: "'use script';import def from 'mod'", type: "script" },
-      { code: '"use script";import def from "mod"', type: "script" },
+      { code: "'use script';import'a'", hint: "module", type: "script" },
+      { code: '"use script";import"a"', hint: "module", type: "script" },
+      { code: "'use script';import'a'", type: "script" },
+      { code: '"use script";import"a"', type: "script" },
       { code: "'use module';1+2", type: "module" },
       { code: '"use module";1+2', type: "module" }
     ]
@@ -47,29 +47,22 @@ describe("compiler", () => {
   })
 
   it("should respect options.var", () => {
-    const code = 'import def from "mod"'
-    const values = [void 0, false]
+    const values = [void 0, false, true]
 
     values.forEach((value) => {
-      const result = compiler.compile(code, { var: value })
-      assert.ok(result.code.startsWith("let def"))
+      const result = compiler.compile('import a from "a"', { var: value })
+      assert.ok(result.code.startsWith(value ? "var a" : "let a"))
     })
-
-    const withVar = compiler.compile(code, {
-      var: true
-    }).code
-
-    assert.ok(withVar.startsWith("var def"))
   })
 
   it("should not get confused by shebang", () => {
     const code = [
       "#!/usr/bin/env node -r @std/esm",
-      'import def from "mod"'
+      'import a from "a"'
     ].join("\n")
 
     const result = compiler.compile(code)
-    assert.ok(result.code.startsWith("let def"))
+    assert.ok(result.code.startsWith("let a"))
   })
 
   it("should not get confused by string literals", () =>
@@ -79,7 +72,7 @@ describe("compiler", () => {
   )
 
   it("should not get confused by trailing comments", () => {
-    const result = compiler.compile('import "a" // trailing comment')
+    const result = compiler.compile('import"a" // trailing comment')
     assert.ok(result.code.endsWith("// trailing comment"))
   })
 
