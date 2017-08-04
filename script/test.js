@@ -13,6 +13,7 @@ const testPath = path.join(rootPath, "test")
 const envPath = path.join(testPath, "env")
 const esmPath = isProduction ? "../index.js" : "../build/esm.js"
 
+const BABEL_DISABLE_CACHE = true
 const HOME = path.join(envPath, "home")
 const MOCHA_BIN = path.join(rootPath, "node_modules/.bin/mocha")
 const NODE_BIN = path.join(envPath, "prefix", isWindows ? "" : "bin", "node")
@@ -32,11 +33,12 @@ function runTests() {
   return execa(NODE_BIN, [
     MOCHA_BIN,
     "--full-trace",
+    "--compilers", "js:babel-register",
     "--require", esmPath,
     "tests.js"
   ], {
     cwd: testPath,
-    env: { HOME, NODE_PATH },
+    env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH },
     stdio: "inherit"
   })
   .catch((e) => process.exit(e.code))

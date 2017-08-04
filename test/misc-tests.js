@@ -1,6 +1,7 @@
 import Module from "module"
 
 import assert from "assert"
+import babelRegister from "babel-register"
 
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
@@ -58,7 +59,9 @@ describe("spec compliance", () => {
     const abcPath = Module._resolveFilename("./fixture/export/abc.js")
     const abcMod = Module._cache[abcPath]
 
+    babelRegister({ cache: false })
     delete Module._cache[abcPath]
+
     return import("./misc/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => {
