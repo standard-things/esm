@@ -31,8 +31,8 @@ const trashPaths = globby.sync([
 function runTests() {
   return execa(NODE_BIN, [
     MOCHA_BIN,
-    "--require", esmPath,
     "--full-trace",
+    "--require", esmPath,
     "tests.js"
   ], {
     cwd: testPath,
