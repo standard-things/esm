@@ -1,10 +1,12 @@
-import __dirname from "./__dirname.js"
 import assert from "assert"
 import fs from "fs"
+import helper from "./helper.js"
 import path from "path"
 import zlib from "zlib"
 
+const __dirname = helper.__dirname
 const fixturePath = path.join(__dirname, "file-extension")
+
 const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))
 const gzipped = zlib.gzipSync(content)
 

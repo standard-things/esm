@@ -1,7 +1,10 @@
-import __dirname from "./__dirname.js"
 import assert from "assert"
 import compiler from "../build/compiler.js"
+import helper from "./helper.js"
 import path from "path"
+
+const __dirname = helper.__dirname
+const isWin = process.platform === "win32"
 
 const abcId = "./fixture/export/abc.js"
 
@@ -11,8 +14,6 @@ const abcNs = {
   c: "c",
   default: "default"
 }
-
-const isWin = process.platform === "win32"
 
 describe("dynamic import", () => {
   it("should establish live binding of values", () =>
