@@ -65,7 +65,7 @@ describe("spec compliance", () => {
     return registerImport
       .then((register) => {
         if (register) {
-          register.default({ cache: false })
+          register.default({ cache: false, only: /test/ })
         }
 
         delete Module._cache[abcPath]
