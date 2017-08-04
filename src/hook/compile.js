@@ -182,40 +182,58 @@ function tryESMLoad(func, mod, code, filePath, runtimeAlias, options) {
 }
 
 function tryModuleCompile(func, mod, code, filePath, options) {
+  const moduleCompile = mod._compile
   const moduleReadFile = binding.internalModuleReadFile
   const readFileSync = fs.readFileSync
 
-  const customModuleReadFile = function (readPath) {
-    if (readPath === filePath) {
-      if (typeof moduleReadFile === "function") {
-        binding.internalModuleReadFile = moduleReadFile
-      }
+  let restored = false
 
-      fs.readFileSync = readFileSync
-      return code
+  const readAndRestore = () => {
+    restored = true
+
+    if (typeof moduleReadFile === "function") {
+      binding.internalModuleReadFile = moduleReadFile
     }
 
-    return moduleReadFile.call(this, readPath)
+    fs.readFileSync = readFileSync
+    return code
+  }
+
+  const customModuleCompile = function (content, compilePath) {
+    if (compilePath === filePath && ! restored) {
+      // This fallback is only hit if the read file wrappers are missed,
+      // which should never happen.
+      content = readAndRestore()
+    }
+
+    mod._compile = moduleCompile
+    return moduleCompile.call(this, content, compilePath)
+  }
+
+  const customModuleReadFile = function (readPath) {
+    return readPath === filePath
+      ? readAndRestore()
+      : moduleReadFile.call(this, readPath)
   }
 
   const customReadFileSync = function (readPath, readOptions) {
-    if (readPath === filePath) {
-      if (typeof moduleReadFile === "function") {
-        binding.internalModuleReadFile = moduleReadFile
-      }
-
-      fs.readFileSync = readFileSync
-      return code
-    }
-
-    return readFileSync.call(this, readPath, readOptions)
+    return readPath === filePath
+      ? readAndRestore()
+      : readFileSync.call(this, readPath, readOptions)
   }
 
   if (typeof internalModuleReadFile === "function") {
+    // Wrap `process.binding("fs").internalModuleReadFile` in case future
+    // versions of Node use it instead of `fs.readFileSync`.
     binding.internalModuleReadFile = customModuleReadFile
   }
 
+  // Wrap `fs.readFileSync` to avoid an extraneous file read when the
+  // unwrapped `Module._extensions[ext]` is called.
   fs.readFileSync = customReadFileSync
+
+  // Wrap `mod._compile` in the off chance our read file wrappers are missed.
+  mod._compile = customModuleCompile
 
   try {
     if (options.debug) {
@@ -235,6 +253,10 @@ function tryModuleCompile(func, mod, code, filePath, options) {
 
     if (fs.readFileSync === customReadFileSync) {
       fs.readFileSync = readFileSync
+    }
+
+    if (mod._compile === customModuleCompile) {
+      mod._compile = moduleCompile
     }
   }
 }
