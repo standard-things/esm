@@ -1,13 +1,12 @@
 import binding from "../binding/fs.js"
 import fs from "fs"
+import isObjectLike from "../util/is-object-like.js"
 
 const internalModuleReadFile = binding.internalModuleReadFile
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {
-  const encoding = typeof options === "object" && options !== null
-    ? options.encoding
-    : options
+  const encoding = isObjectLike(options) ? options.encoding : options
 
   if (useReadFileFastPath && encoding === "utf8") {
     try {
