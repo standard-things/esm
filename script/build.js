@@ -36,13 +36,11 @@ const trashPaths = [
   uglifyPath
 ]
 
-const webpackArgs = []
-
-if (argv.prod && ! argv.test) {
-  webpackArgs.push("--display-optimization-bailout")
-} else {
-  webpackArgs.push("--hide-modules")
-}
+const webpackArgs = [
+  argv.prod && ! argv.test
+    ? "--display-optimization-bailout"
+    : "--hide-modules"
+]
 
 Promise
   .all(trashPaths.map(trash))
