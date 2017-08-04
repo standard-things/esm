@@ -1,25 +1,23 @@
-import __dirname from "./__dirname.js"
 import assert from "assert"
 import compiler from "../build/compiler.js"
-import files from "./all-files.js"
+import fs from "fs"
+import globby from "globby"
+import helper from "./helper.js"
 import path from "path"
 
+const __dirname = helper.__dirname
+const files = globby.sync(["output/**/*.js"])
 const tests = Object.create(null)
 
-Object.keys(files).forEach((absPath) => {
-  const relPath = path.relative(__dirname, absPath)
-  const relParts = relPath.split(path.sep)
+files.forEach((relPath) => {
+  const parts = relPath.split(path.sep)
+  const name = parts[1]
+  const type = path.basename(parts[2], ".js")
 
-  if (relParts[0]  === "output") {
-    const code = files[absPath]
-    const name = relParts[1]
-    const type = path.basename(relParts[2], ".js")
-
-    if (! tests[name]) {
-      tests[name] = Object.create(null)
-    }
-    tests[name][type] = code
+  if (! tests[name]) {
+    tests[name] = Object.create(null)
   }
+  tests[name][type] = fs.readFileSync(relPath, "utf8")
 })
 
 describe("output", () => {
