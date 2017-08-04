@@ -1,12 +1,13 @@
 "use strict"
 
-const fs = require("fs")
-const path = require("path")
-const webpack = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+
+const fs = require("fs")
+const path = require("path")
+const webpack = require("webpack")
 
 const NODE_ENV = String(process.env.NODE_ENV)
 const isProduction = NODE_ENV.startsWith("production")
