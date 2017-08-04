@@ -64,7 +64,8 @@ function maskParserStack(stack, sourceCode, filePath) {
 }
 
 function maskStack(stack) {
-  return removeArrow(scrubStack(stack))
+  stack = scrubStack(stack)
+  return stack.includes("\u200d") ? removeArrow(stack) : stack
 }
 
 function removeArrow(stack) {
