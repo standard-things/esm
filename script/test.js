@@ -41,7 +41,7 @@ const mochaArgs = [
 ]
 
 if (isNode4) {
-  mochaArgs.push("--compilers", "js:babel-register")
+  mochaArgs.splice(mochaArgs.length - 1, 0, "--compilers", "js:babel-register")
 }
 
 function runTests() {
