@@ -28,6 +28,7 @@ const config = {
     rules: [{
       test: /\.js$/,
       loader: "babel-loader",
+      exclude: /node_modules/,
       options: JSON.parse(fs.readFileSync("./.babelrc", "utf8"))
     }]
   },
