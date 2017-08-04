@@ -1,3 +1,5 @@
+import SemVer from "semver"
+
 import execa from "execa"
 import fs from "fs-extra"
 import globby from "globby"
@@ -5,6 +7,8 @@ import path from "path"
 import trash from "trash"
 
 const NODE_ENV = String(process.env.NODE_ENV)
+
+const isNode4 = SemVer.satisfies(process.version, "<6")
 const isProduction = NODE_ENV.startsWith("production")
 const isWindows = process.platform === "win32"
 
@@ -29,14 +33,19 @@ const trashPaths = globby.sync([
   realpath: true
 })
 
+const mochaArgs = [
+  MOCHA_BIN,
+  "--full-trace",
+  "--require", esmPath,
+  "tests.js"
+]
+
+if (isNode4) {
+  mochaArgs.push("--compilers", "js:babel-register")
+}
+
 function runTests() {
-  return execa(NODE_BIN, [
-    MOCHA_BIN,
-    "--full-trace",
-    "--compilers", "js:babel-register",
-    "--require", esmPath,
-    "tests.js"
-  ], {
+  return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
     env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH },
     stdio: "inherit"
