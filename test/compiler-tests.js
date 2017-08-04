@@ -36,13 +36,9 @@ describe("compiler", () => {
       { code: '"use module";1+2', type: "module" }
     ]
 
-    tests.forEach((data) => {
-      const result = compiler.compile(data.code, {
-        hint: data.hint,
-        type: "unambiguous"
-      })
-
-      assert.strictEqual(result.type, data.type)
+    tests.forEach(({ code, hint, type }) => {
+      const result = compiler.compile(code, { hint, type: "unambiguous" })
+      assert.strictEqual(result.type, type)
     })
   })
 
