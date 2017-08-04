@@ -8,7 +8,6 @@ import trash from "trash"
 
 const NODE_ENV = String(process.env.NODE_ENV)
 
-const isNode4 = SemVer.satisfies(process.version, "<6")
 const isProduction = NODE_ENV.startsWith("production")
 const isWindows = process.platform === "win32"
 
@@ -40,7 +39,7 @@ const mochaArgs = [
   "tests.js"
 ]
 
-if (isNode4) {
+if (SemVer.satisfies(process.version, "<6")) {
   mochaArgs.splice(mochaArgs.length - 1, 0, "--compilers", "js:babel-register")
 }
 
