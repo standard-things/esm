@@ -182,6 +182,7 @@ function tryModuleLoad(compiler, mod, filePath) {
 
 function tryParse(compiler, mod, filePath) {
   const moduleWrap = Module.wrap
+
   const customWrap = (script) => {
     Module.wrap = moduleWrap
     return "(function(){" + script + "\n});(function(){})"
