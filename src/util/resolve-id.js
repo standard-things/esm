@@ -1,6 +1,6 @@
 import FastObject from "../fast-object.js"
 import Module from "module"
-import URL from "url"
+import URL from "../url.js"
 
 import builtinModules from "../builtin-modules.js"
 import encodedSlash from "./encoded-slash.js"
@@ -32,7 +32,7 @@ function resolveId(id, parent) {
     return resolveCache[cacheKey]
   }
 
-  const parsed = URL.parse(id)
+  const parsed = new URL(id)
 
   if (! encodedSlash(parsed.pathname, pathMode)) {
     if (typeof parsed.protocol !== "string") {

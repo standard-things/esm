@@ -1,10 +1,8 @@
-import URL from "url"
+import URL from "../url.js"
 
 import encodedSlash from "./encoded-slash.js"
 import path from "path"
 import punycode from "../vendor/punycode/punycode.es6.js"
-
-const codeOfColon = ":".charCodeAt(0)
 
 const API = {
   posix: {
@@ -15,11 +13,13 @@ const API = {
   }
 }
 
+const codeOfColon = ":".charCodeAt(0)
+
 function urlToPath(url, mode = "posix") {
   const { path } = API[mode]
 
   const parsed = typeof url === "string"
-    ? URL.parse(url)
+    ? new URL(url)
     : url
 
   const pathname = typeof parsed.pathname === "string"
