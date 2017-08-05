@@ -1,13 +1,13 @@
 "use strict"
 
+const { BannerPlugin, EnvironmentPlugin, optimize: { ModuleConcatenationPlugin } } = require("webpack")
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-const fs = require("fs")
-const path = require("path")
-const webpack = require("webpack")
+const { join } = require("path")
+const { readFileSync } = require("fs")
 
 const NODE_ENV = String(process.env.NODE_ENV)
 const isProduction = NODE_ENV.startsWith("production")
@@ -22,18 +22,18 @@ const config = {
     libraryExport: "default",
     libraryTarget: "commonjs2",
     filename: "[name].js",
-    path: path.join(__dirname, "build")
+    path: join(__dirname, "build")
   },
   module: {
     rules: [{
       test: /\.js$/,
       loader: "babel-loader",
       exclude: /node_modules/,
-      options: JSON.parse(fs.readFileSync("./.babelrc", "utf8"))
+      options: JSON.parse(readFileSync("./.babelrc", "utf8"))
     }]
   },
   plugins: [
-    new webpack.BannerPlugin({
+    new BannerPlugin({
       banner: [
         '"use strict";\n',
         "const __non_webpack_module__ = module;",
@@ -49,7 +49,7 @@ const config = {
       openAnalyzer: false,
       reportFilename: "report.html"
     }),
-    new webpack.EnvironmentPlugin({
+    new EnvironmentPlugin({
       ESM_VERSION: require("./package.json").version
     })
   ]
@@ -59,8 +59,8 @@ if (isProduction) {
   config.plugins.push(
     new OptimizeJsPlugin,
     new ShakePlugin,
-    new webpack.optimize.ModuleConcatenationPlugin,
-    new webpack.EnvironmentPlugin({
+    new ModuleConcatenationPlugin,
+    new EnvironmentPlugin({
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
