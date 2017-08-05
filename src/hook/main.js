@@ -21,6 +21,21 @@ if (rootModule.id === "internal/preload" ||
       : wrapped.call(this, manager, func, filePath, args)
   }
 
+  // Hack: Keep `tryModuleLoad` above `methodWrapper` to avoid an UglifyJS bug.
+  const tryModuleLoad = (mod, filePath) => {
+    let threw = true
+    Module._cache[filePath] = mod
+
+    try {
+      mod.load(filePath)
+      threw = false
+    } finally {
+      if (threw) {
+        delete Module._cache[filePath]
+      }
+    }
+  }
+
   const methodWrapper = function (manager, func, filePath, args) {
      /* eslint consistent-return: off */
     if (! filePath.endsWith(".mjs")) {
@@ -36,20 +51,6 @@ if (rootModule.id === "internal/preload" ||
 
     // Handle any nextTicks added in the first tick of the program.
     process._tickCallback()
-  }
-
-  const tryModuleLoad = (mod, filePath) => {
-    let threw = true
-    Module._cache[filePath] = mod
-
-    try {
-      mod.load(filePath)
-      threw = false
-    } finally {
-      if (threw) {
-        delete Module._cache[filePath]
-      }
-    }
   }
 
   Wrapper.manage(Module, "runMain", managerWrapper)
