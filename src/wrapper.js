@@ -4,10 +4,9 @@
 import FastObject from "./fast-object.js"
 
 import { maxSatisfying as _maxSatisfying } from "semver"
-import esmSemVer from "./util/version.js"
 import has from "./util/has.js"
+import { version } from "./version.js"
 
-const esmVersion = esmSemVer.version
 const maxSatisfyingCache = new FastObject
 const wrapSym = Symbol.for("@std/esm:wrapper")
 
@@ -41,9 +40,9 @@ class Wrapper {
   static wrap(object, key, wrapper) {
     const map = getOrCreateMap(object, key)
 
-    if (typeof map.wrappers[esmVersion] !== "function") {
-      map.versions.push(esmVersion)
-      map.wrappers[esmVersion] = wrapper
+    if (typeof map.wrappers[version] !== "function") {
+      map.versions.push(version)
+      map.wrappers[version] = wrapper
     }
   }
 }

@@ -1,6 +1,6 @@
-import esmSemVer from "./version.js"
 import extname from "./extname.js"
 import md5 from "./md5.js"
+import { version } from "../version.js"
 
 function getCacheFileName(filePath, cacheKey, pkgInfo) {
   // While MD5 is not suitable for verification of untrusted data,
@@ -8,7 +8,7 @@ function getCacheFileName(filePath, cacheKey, pkgInfo) {
   // https://blog.risingstack.com/automatic-cache-busting-for-your-css/.
   const pathHash = md5(filePath)
   const stateHash = md5(
-    esmSemVer.version + "\0" +
+    version + "\0" +
     JSON.stringify(pkgInfo.options) + "\0" +
     cacheKey
   )

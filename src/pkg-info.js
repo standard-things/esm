@@ -2,12 +2,12 @@ import { basename, dirname, join } from "path"
 import FastObject from "./fast-object.js"
 
 import createOptions from "./util/create-options.js"
-import esmSemVer from "./util/version.js"
 import has from "./util/has.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
 import toString from "./util/to-string.js"
 import { validRange } from "semver"
+import { version } from "./version.js"
 
 const defaultOptions = {
   cache: ".esm-cache",
@@ -126,7 +126,7 @@ function getRange(json, name) {
 Object.setPrototypeOf(PkgInfo.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-infoCache[""] = new PkgInfo("", esmSemVer.version, {
+infoCache[""] = new PkgInfo("", version, {
   cache: false,
   cjs: true,
   gz: true,
