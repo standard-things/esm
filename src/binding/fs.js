@@ -1,8 +1,3 @@
-const fs = (() => {
-  try {
-    return process.binding("fs")
-  } catch (e) {}
-  return Object.create(null)
-})()
+import binding from "../util/binding.js"
 
-export default fs
+export default binding("fs")

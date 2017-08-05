@@ -1,8 +1,3 @@
-const natives = (() => {
-  try {
-    return process.binding("natives")
-  } catch (e) {}
-  return Object.create(null)
-})()
+import binding from "../util/binding.js"
 
-export default natives
+export default binding("natives")

@@ -1,8 +1,3 @@
-const util = (() => {
-  try {
-    return process.binding("util")
-  } catch (e) {}
-  return Object.create(null)
-})()
+import binding from "../util/binding.js"
 
-export default util
+export default binding("util")
