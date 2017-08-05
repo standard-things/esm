@@ -27,6 +27,8 @@ import setSourceType from "../util/set-source-type.js"
 let allowTopLevelAwait = isObject(process.mainModule) &&
   satisfies(process.version, ">=7.6.0")
 
+const passthruMap = new Map
+
 function managerWrapper(manager, func, args) {
   const filePath = args[1]
   const pkgInfo = PkgInfo.get(dirname(filePath))
@@ -187,6 +189,8 @@ function tryModuleCompile(func, mod, code, filePath, options) {
   const moduleReadFile = binding.internalModuleReadFile
   const readFileSync = fs.readFileSync
 
+  let error
+  let passthru = passthruMap.get(func)
   let restored = false
 
   const readAndRestore = () => {
@@ -238,14 +242,38 @@ function tryModuleCompile(func, mod, code, filePath, options) {
 
   try {
     if (options.debug) {
-      func.call(this, mod, filePath)
+      if (passthru) {
+        func.call(this, mod, filePath)
+      } else {
+        mod._compile(code, filePath)
+      }
       return
     }
 
     try {
-      func.call(this, mod, filePath)
+      if (passthru) {
+        func.call(this, mod, filePath)
+      } else {
+        mod._compile(code, filePath)
+      }
     } catch (e) {
-      throw maskStackTrace(e)
+      error = e
+    }
+
+    if (passthru &&
+        error && error.code === "ERR_REQUIRE_ESM") {
+      error = passthru = false
+      passthruMap.set(func, passthru)
+
+      try {
+        mod._compile(code, filePath)
+      } catch (e) {
+        error = e
+      }
+    }
+
+    if (error) {
+      throw maskStackTrace(error)
     }
   } finally {
     if (binding.internalModuleReadFile === customModuleReadFile) {
@@ -272,6 +300,8 @@ extsToWrap.forEach((key) => {
     // extensions as ".js".
     exts[key] = extsJs
   }
+
   Wrapper.manage(exts, key, managerWrapper)
   Wrapper.wrap(exts, key, methodWrapper)
+  passthruMap.set(Wrapper.unwrap(exts, key), true)
 })
