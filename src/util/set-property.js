@@ -1,11 +1,11 @@
 import createOptions from "./create-options.js"
 
-const defaultDescriptor = {
+const defaultDescriptor = createOptions({
   configurable: true,
   enumerable: true,
   value: void 0,
   writable: true
-}
+})
 
 function setProperty(object, key, descriptor) {
   descriptor = createOptions(descriptor, defaultDescriptor)

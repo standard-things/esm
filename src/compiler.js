@@ -6,14 +6,14 @@ import Parser from "./parser.js"
 import createOptions from "./util/create-options.js"
 import stripShebang from "./util/strip-shebang.js"
 
-const defaultOptions = {
+const defaultOptions = createOptions({
   cjs: false,
   ext: false,
   hint: "script",
   runtimeAlias: "_",
   type: "module",
   var: false
-}
+})
 
 const assignmentVisitor = new AV
 const importExportVisitor = new IEV

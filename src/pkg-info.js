@@ -9,14 +9,14 @@ import toString from "./util/to-string.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
-const defaultOptions = {
+const defaultOptions = createOptions({
   cache: ".esm-cache",
   cjs: false,
   debug: false,
   esm: "mjs",
   ext: false,
   var: false
-}
+})
 
 const infoCache = new FastObject
 

@@ -4,9 +4,9 @@ import createOptions from "../util/create-options.js"
 import { gzipSync } from "zlib"
 import streamToBuffer from "./stream-to-buffer.js"
 
-const defaultOptions = {
+const defaultOptions = createOptions({
   level: 9
-}
+})
 
 let useGzipFastPath = true
 

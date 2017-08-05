@@ -16,13 +16,13 @@ import { enable as enableExport } from "./acorn-ext/export.js"
 import { enable as enableImport } from "./acorn-ext/import.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
-const defaultOptions = {
+const defaultOptions = createOptions({
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
   enableExportExtensions: false,
   enableImportExtensions: false,
   sourceType: "module"
-}
+})
 
 const acornParser = new AcornParser
 const acornRaise = acornParser.raise
