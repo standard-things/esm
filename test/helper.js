@@ -1,12 +1,12 @@
 "use strict"
 
-const SemVer = require("semver")
 const globby = require("globby")
+const { satisfies } = require("semver")
 
 let babelFiles
 let babelRegister
 
-if (SemVer.satisfies(process.version, "<6")) {
+if (satisfies(process.version, "<6")) {
   babelRegister = require("babel-register")
   babelFiles = globby.sync([
     "**/*.{js,mjs}",

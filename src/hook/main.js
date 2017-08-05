@@ -5,14 +5,16 @@ import Wrapper from "../wrapper.js"
 import { dirname } from "path"
 import rootModule from "../root-module.js"
 
+const _preloadModules = process._preload_modules || []
+const { _tickCallback } = process
 const esmPkgMain = __non_webpack_module__.filename
-const preloadModules = process._preload_modules || []
+const mainPath = process.argv[1]
 
 if (rootModule.id === "internal/preload" ||
-    preloadModules.some((child) => child.filename === esmPkgMain)) {
+    _preloadModules.some((child) => child.filename === esmPkgMain)) {
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
   const managerWrapper = function (manager, func, args) {
-    const filePath = _resolveFilename(process.argv[1], null, true)
+    const filePath = _resolveFilename(mainPath, null, true)
     const pkgInfo = PkgInfo.get(dirname(filePath))
     const wrapped = pkgInfo === null ? null : Wrapper.find(Module, "runMain", pkgInfo.range)
 
@@ -50,7 +52,7 @@ if (rootModule.id === "internal/preload" ||
     tryModuleLoad(mod, filePath)
 
     // Handle any nextTicks added in the first tick of the program.
-    process._tickCallback()
+    _tickCallback()
   }
 
   Wrapper.manage(Module, "runMain", managerWrapper)

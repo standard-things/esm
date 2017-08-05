@@ -1,9 +1,8 @@
-import SemVer from "semver"
-
+import { ensureLink } from "fs-extra"
 import execa from "execa"
-import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
+import { satisfies } from "semver"
 import trash from "trash"
 
 const NODE_ENV = String(process.env.NODE_ENV)
@@ -39,7 +38,7 @@ const mochaArgs = [
   "tests.js"
 ]
 
-if (SemVer.satisfies(process.version, "<6")) {
+if (satisfies(process.version, "<6")) {
   mochaArgs.splice(mochaArgs.length - 1, 0, "--compilers", "js:babel-register")
 }
 
@@ -57,7 +56,7 @@ Promise
   // Clear cache folders for first run.
   .all(trashPaths.map(trash))
   // Create Node symlink.
-  .then(() => fs.ensureLink(process.execPath, NODE_BIN))
+  .then(() => ensureLink(process.execPath, NODE_BIN))
   // Run tests again using the cache.
   .then(runTests)
   .then(runTests)
