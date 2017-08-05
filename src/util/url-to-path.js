@@ -1,4 +1,4 @@
-import URL from "../url.js"
+import Url from "url"
 
 import decodeURI from "./decode-uri.js"
 import encodedSlash from "./encoded-slash.js"
@@ -14,11 +14,12 @@ const API = {
   }
 }
 
+const { parse } = Url
 const codeOfColon = ":".charCodeAt(0)
 
 function urlToPath(url, mode = "posix") {
   const { path } = API[mode]
-  const parsed = typeof url === "string" ? new URL(url) : url
+  const parsed = parse(url)
   const pathname = decodeURI(parsed.pathname)
 
   if (! pathname ||
