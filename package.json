@@ -32,7 +32,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.24.1",
     "download": "^6.2.5",
-    "eslint": "^4.2.0",
+    "eslint": "^4.4.0",
     "eslint-plugin-import": "^2.7.0",
     "execa": "^0.7.0",
     "fs-extra": "^4.0.0",
