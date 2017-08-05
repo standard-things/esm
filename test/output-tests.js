@@ -6,7 +6,7 @@ import path from "path"
 
 const files = globby.sync(["output/**/*.js"])
 const tests = files.reduce((tests, relPath) => {
-  const parts = relPath.split(path.sep)
+  const parts = relPath.split("/")
   const name = parts[1]
   const type = path.basename(parts[2], ".js")
 

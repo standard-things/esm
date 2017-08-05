@@ -45,7 +45,7 @@ describe("dynamic import", () => {
   )
 
   it("should support the file protocol", () =>
-    import("file://" + path.join(__dirname, abcId))
+    import("file:" + (isWin ? "///" : "//") + path.join(__dirname, abcId))
       .then((ns) => assert.deepEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )

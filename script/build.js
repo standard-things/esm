@@ -1,11 +1,11 @@
 /* eslint strict: off */
 "use strict"
 
-const pify = require("pify")
-const download = pify(require("download-git-repo"))
+const download = require("download")
 const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
+const pify = require("pify")
 const trash = require("trash")
 
 const argv = require("yargs")
@@ -28,6 +28,7 @@ const uglifyPath = path.join(uglifyPluginPath, "node_modules/uglify-es")
 
 const acornPkg = require("acorn/package.json")
 const acornPath = path.join(vendorPath, "acorn")
+const acornURL = "https://github.com/ternjs/acorn/archive/" + acornPkg.version + ".zip"
 
 const punycodePkgPath = path.dirname(require.resolve("punycode/package.json"))
 const punycodePath = path.join(vendorPath, "punycode")
@@ -48,7 +49,13 @@ Promise
   .all(trashPaths.map(trash))
   .then(() => {
     if (! fs.pathExistsSync(acornPath)) {
-      return download("ternjs/acorn#" + acornPkg.version, acornPath)
+      return download(acornURL, acornPath, {
+        extract: true,
+        filter: (file) => /^(?:pack|src).*?\.(?:js|json)$/.test(file.path),
+        headers: { accept: "application/zip" },
+        mode: "666",
+        strip: 1
+      })
     }
   })
   .then(() => {

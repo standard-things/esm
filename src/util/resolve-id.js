@@ -14,7 +14,7 @@ const resolveFilename = Module._resolveFilename
 
 const pathMode = process.platform === "win32" ? "win32" : "posix"
 const resolveCache = new FastObject
-const urlCharsRegExp = /[:?#%]/
+const urlCharsRegExp = /[?#%]/
 
 function resolveId(id, parent) {
   if (! id ||
