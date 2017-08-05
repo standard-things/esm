@@ -1,9 +1,9 @@
 import FastObject from "../fast-object.js"
 import Module from "module"
-import URL from "../url.js"
 
 import builtinModules from "../builtin-modules.js"
 import encodedSlash from "./encoded-slash.js"
+import decodeURI from "./decode-uri.js"
 import isPath from "./is-path.js"
 import path from "path"
 import toStringLiteral from "./to-string-literal.js"
@@ -14,6 +14,7 @@ const resolveFilename = Module._resolveFilename
 
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
+const queryHashRegExp = /[?#].+$/
 const resolveCache = new FastObject
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
@@ -26,19 +27,15 @@ function resolveId(id, parent) {
   }
 
   const filename = parent.filename === null ? "." : parent.filename
-  const cacheKey = id + "\0" + filename
+  const cacheKey = filename + "\0" + id
 
   if (cacheKey in resolveCache) {
     return resolveCache[cacheKey]
   }
 
-  const parsed = new URL(id)
-
-  if (! encodedSlash(parsed.pathname, pathMode)) {
-    if (typeof parsed.protocol !== "string") {
-      if (typeof parsed.pathname === "string") {
-        id = decodeURI(parsed.pathname)
-      }
+  if (! encodedSlash(id, pathMode)) {
+    if (! id.includes(":")) {
+      id = decodeURI(id.replace(queryHashRegExp, ""))
 
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
@@ -53,7 +50,7 @@ function resolveId(id, parent) {
       return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
     }
 
-    const filePath = urlToPath(parsed, pathMode)
+    const filePath = urlToPath(id, pathMode)
 
     if (filePath) {
       return resolveCache[cacheKey] = resolveFilename(filePath, parent)
