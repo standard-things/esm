@@ -1,8 +1,8 @@
-import path from "path"
+import { extname as _extname, basename } from "path"
 
 function extname(filePath) {
-  const ext = path.extname(filePath)
-  const prefix = ext === ".gz" ? path.extname(path.basename(filePath, ext)) : ""
+  const ext = _extname(filePath)
+  const prefix = ext === ".gz" ? _extname(basename(filePath, ext)) : ""
   return prefix + ext
 }
 

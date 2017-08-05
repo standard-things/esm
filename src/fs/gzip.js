@@ -1,7 +1,8 @@
+import { Gzip } from "minizlib"
+
 import createOptions from "../util/create-options.js"
-import minizlib from "minizlib"
+import { gzipSync } from "zlib"
 import streamToBuffer from "./stream-to-buffer.js"
-import zlib from "zlib"
 
 const defaultOptions = {
   level: 9
@@ -23,11 +24,11 @@ function gzip(bufferOrString, options) {
 }
 
 function fallbackGzip(bufferOrString, options) {
-  return zlib.gzipSync(bufferOrString, options)
+  return gzipSync(bufferOrString, options)
 }
 
 function fastPathGzip(bufferOrString, options) {
-  return streamToBuffer(new minizlib.Gzip(options), bufferOrString)
+  return streamToBuffer(new Gzip(options), bufferOrString)
 }
 
 export default gzip

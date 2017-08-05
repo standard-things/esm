@@ -1,16 +1,14 @@
+import Module, { _nodeModulePaths, _resolveFilename } from "module"
+import { dirname, extname } from "path"
+
 import Entry from "./entry.js"
-import Module from "module"
 import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
-import path from "path"
 import resolveId from "./util/resolve-id.js"
-
-const nodeModulePaths = Module._nodeModulePaths
-const resolveFilename = Module._resolveFilename
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -79,10 +77,10 @@ class Runtime {
       assign(wrappedRequire, req)
     }
 
-    const filename = mod.filename
-    const dirname = path.dirname(filename)
+    const __filename = mod.filename
+    const __dirname = dirname(__filename)
 
-    moduleWrapper.call(exported, exported, wrappedRequire, mod, filename, dirname)
+    moduleWrapper.call(exported, exported, wrappedRequire, mod, __filename, __dirname)
     mod.loaded = true
   }
 
@@ -119,7 +117,7 @@ class Runtime {
     } else {
       id = resolveId(id, parent)
       parent.require(id)
-      childModule = Module._cache[resolveFilename(id, parent)]
+      childModule = Module._cache[_resolveFilename(id, parent)]
     }
 
     const childEntry = Entry.get(childModule)
@@ -137,8 +135,8 @@ function requireWrapper(func, id) {
   }
 
   const parent = this.module
-  const filePath = resolveFilename(id, parent)
-  let ext = path.extname(filePath)
+  const filePath = _resolveFilename(id, parent)
+  let ext = extname(filePath)
 
   if (! ext || typeof Module._extensions[ext] !== "function") {
     ext = ".js"
@@ -159,7 +157,7 @@ function requireWrapper(func, id) {
 
   const childModule = new Module(filePath, parent)
   childModule.filename = filePath
-  childModule.paths = nodeModulePaths(path.dirname(filePath))
+  childModule.paths = _nodeModulePaths(dirname(filePath))
 
   tryModuleLoad(compiler, childModule, filePath)
   return childModule.exports

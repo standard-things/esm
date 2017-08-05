@@ -1,13 +1,13 @@
+import { basename, dirname, join } from "path"
 import FastObject from "./fast-object.js"
-import SemVer from "semver"
 
 import createOptions from "./util/create-options.js"
 import esmSemVer from "./util/version.js"
 import has from "./util/has.js"
-import path from "path"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
 import toString from "./util/to-string.js"
+import { validRange } from "semver"
 
 const defaultOptions = {
   cache: ".esm-cache",
@@ -30,7 +30,7 @@ class PkgInfo {
 
     const cache = Object.create(null)
     const cacheDir =  options.cache
-    const cachePath = typeof cacheDir === "string" ? path.join(dirPath, cacheDir) : null
+    const cachePath = typeof cacheDir === "string" ? join(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
 
     let i = -1
@@ -57,7 +57,7 @@ class PkgInfo {
     }
 
     infoCache[dirPath] = null
-    if (path.basename(dirPath) === "node_modules") {
+    if (basename(dirPath) === "node_modules") {
       return null
     }
 
@@ -66,7 +66,7 @@ class PkgInfo {
       return infoCache[dirPath] = pkgInfo
     }
 
-    const parentPath = path.dirname(dirPath)
+    const parentPath = dirname(dirPath)
     if (parentPath !== dirPath) {
       const pkgInfo = PkgInfo.get(parentPath)
       if (pkgInfo !== null) {
@@ -78,7 +78,7 @@ class PkgInfo {
   }
 
   static read(dirPath) {
-    const pkgPath = path.join(dirPath, "package.json")
+    const pkgPath = join(dirPath, "package.json")
     const pkgJSON = readJSON(pkgPath)
 
     if (pkgJSON === null) {
@@ -119,7 +119,7 @@ class PkgInfo {
 function getRange(json, name) {
   const entry = json[name]
   return has(entry, "@std/esm")
-    ? SemVer.validRange(entry["@std/esm"])
+    ? validRange(entry["@std/esm"])
     : null
 }
 

@@ -2,10 +2,10 @@ import "./hook/compile.js"
 import "./hook/main.js"
 import "./hook/repl.js"
 
+import { inspect } from "util"
 import setProperty from "./util/set-property.js"
-import util from "util"
 
-const customSym = util.inspect.custom
+const customSym = inspect.custom
 const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
 const exports = Object.create(null)
 

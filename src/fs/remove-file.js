@@ -1,8 +1,8 @@
-import fs from "fs"
+import { unlinkSync } from "fs"
 
 function removeFile(filePath) {
   try {
-    fs.unlinkSync(filePath)
+    unlinkSync(filePath)
     return true
   } catch (e) {}
   return false

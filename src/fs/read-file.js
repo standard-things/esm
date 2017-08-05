@@ -1,6 +1,6 @@
 import binding from "../binding/fs.js"
-import fs from "fs"
 import isObjectLike from "../util/is-object-like.js"
+import { readFileSync } from "fs"
 
 const internalModuleReadFile = binding.internalModuleReadFile
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
@@ -20,7 +20,7 @@ function readFile(filePath, options) {
 
 function fallbackReadFile(filePath, options) {
   try {
-    return fs.readFileSync(filePath, options)
+    return readFileSync(filePath, options)
   } catch (e) {}
   return null
 }

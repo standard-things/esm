@@ -1,8 +1,8 @@
-import fs from "fs"
+import { mkdirSync } from "fs"
 
 function mkdir(dirPath) {
   try {
-    fs.mkdirSync(dirPath)
+    mkdirSync(dirPath)
     return true
   } catch (e) {}
   return false

@@ -1,13 +1,12 @@
-import SemVer from "semver"
-
 import binding from "../binding/fs.js"
-import fs from "fs"
+import { satisfies } from "semver"
+import { statSync } from "fs"
 
 const internalStat = binding.stat
 const internalStatValues = binding.getStatValues
 
 let useMtimeFastPath = typeof internalStat === "function" &&
-  SemVer.satisfies(process.version, "^6.10.1||>=7.7")
+  satisfies(process.version, "^6.10.1||>=7.7")
 
 let statValues
 const useInternalStatValues = typeof internalStatValues === "function"
@@ -34,7 +33,7 @@ function mtime(filePath) {
 
 function fallbackMtime(filePath) {
   try {
-    return fs.statSync(filePath).mtime.getTime()
+    return statSync(filePath).mtime.getTime()
   } catch (e) {}
   return -1
 }

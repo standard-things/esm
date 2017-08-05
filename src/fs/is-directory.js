@@ -1,5 +1,5 @@
 import binding from "../binding/fs.js"
-import fs from "fs"
+import { statSync } from "fs"
 
 const internalModuleStat = binding.internalModuleStat
 let useIsDirectoryFastPath = typeof internalModuleStat === "function"
@@ -17,7 +17,7 @@ function isDirectory(thePath) {
 
 function fallbackIsDirectory(thePath) {
   try {
-    return fs.statSync(thePath).isDirectory()
+    return statSync(thePath).isDirectory()
   } catch (e) {}
   return false
 }

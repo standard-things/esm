@@ -1,16 +1,13 @@
+import { _nodeModulePaths, _resolveFilename } from "module"
 import FastObject from "../fast-object.js"
-import Module from "module"
 
 import builtinModules from "../builtin-modules.js"
-import encodedSlash from "./encoded-slash.js"
 import decodeURI from "./decode-uri.js"
+import { dirname } from "path"
+import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
-import path from "path"
 import toStringLiteral from "./to-string-literal.js"
 import urlToPath from "./url-to-path.js"
-
-const nodeModulePaths = Module._nodeModulePaths
-const resolveFilename = Module._resolveFilename
 
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
@@ -39,7 +36,7 @@ function resolveId(id, parent) {
 
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      const paths = nodeModulePaths(path.dirname(filename))
+      const paths = _nodeModulePaths(dirname(filename))
 
       // Hack: Overwrite `path.concat()` to prevent global paths from being
       // concatenated.
@@ -47,13 +44,13 @@ function resolveId(id, parent) {
 
       // Ensure a parent id and filename are provided to avoid going down the
       // --eval branch of `Module._resolveLookupPaths()`.
-      return resolveCache[cacheKey] = resolveFilename(id, { filename, id: "<mock>", paths })
+      return resolveCache[cacheKey] = _resolveFilename(id, { filename, id: "<mock>", paths })
     }
 
     const filePath = urlToPath(id, pathMode)
 
     if (filePath) {
-      return resolveCache[cacheKey] = resolveFilename(filePath, parent)
+      return resolveCache[cacheKey] = _resolveFilename(filePath, parent)
     }
   }
 

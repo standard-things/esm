@@ -1,9 +1,9 @@
 import FastObject from "../fast-object.js"
 
 import createOptions from "../util/create-options.js"
+import { dirname } from "path"
 import keys from "../util/keys.js"
 import mkdirp from "./mkdirp.js"
-import path from "path"
 import writeFile from "./write-file.js"
 
 let pendingWriteTimer = null
@@ -24,7 +24,7 @@ function writeFileDefer(filePath, content, options, callback) {
       const options = pending.options
       let success = false
 
-      if (mkdirp(path.dirname(filePath), options.scopePath)) {
+      if (mkdirp(dirname(filePath), options.scopePath)) {
         const content = typeof pending.content === "function"
           ? pending.content()
           : pending.content

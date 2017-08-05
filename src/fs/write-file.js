@@ -1,8 +1,8 @@
-import fs from "fs"
+import { writeFileSync } from "fs"
 
 function writeFile(filePath, bufferOrString, options) {
   try {
-    fs.writeFileSync(filePath, bufferOrString, options)
+    writeFileSync(filePath, bufferOrString, options)
     return true
   } catch (e) {}
   return false

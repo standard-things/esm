@@ -1,8 +1,8 @@
-import fs from "fs"
+import { readdirSync } from "fs"
 
 function readdir(dirPath) {
   try {
-    return fs.readdirSync(dirPath)
+    return readdirSync(dirPath)
   } catch (e) {}
   return null
 }

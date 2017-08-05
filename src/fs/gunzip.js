@@ -1,7 +1,8 @@
+import { Gunzip } from "minizlib"
+
 import createOptions from "../util/create-options.js"
-import minizlib from "minizlib"
+import { gunzipSync } from "zlib"
 import streamToBuffer from "./stream-to-buffer.js"
-import zlib from "zlib"
 
 let useGunzipFastPath = true
 
@@ -20,12 +21,12 @@ function gunzip(bufferOrString, options) {
 }
 
 function fallbackGunzip(bufferOrString, options) {
-  const buffer = zlib.gunzipSync(bufferOrString, options)
+  const buffer = gunzipSync(bufferOrString, options)
   return options.encoding === "utf8" ? buffer.toString() : buffer
 }
 
 function fastPathGunzip(bufferOrString, options) {
-  const stream = new minizlib.Gunzip(options)
+  const stream = new Gunzip(options)
 
   if (options.encoding === "utf8") {
     let result = ""

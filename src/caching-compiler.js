@@ -1,8 +1,9 @@
+import { extname, join } from "path"
+
 import compiler from "./compiler.js"
 import createOptions from "./util/create-options.js"
 import gzip from "./fs/gzip.js"
 import keys from "./util/keys.js"
-import path from "path"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
@@ -34,8 +35,8 @@ function compileAndWrite(code, options) {
   const result = compileAndCache(code, options)
   const cachePath = options.cachePath
   const cacheFileName = options.cacheFileName
-  const cacheFilePath = path.join(cachePath, cacheFileName)
-  const isGzipped = path.extname(cacheFilePath) === ".gz"
+  const cacheFilePath = join(cachePath, cacheFileName)
+  const isGzipped = extname(cacheFilePath) === ".gz"
 
   let output = result.code
 
@@ -63,7 +64,7 @@ function removeExpired(cache, cachePath, cacheFileName) {
   keys(cache).forEach((key) => {
     if (key !== cacheFileName &&
         key.startsWith(shortname)) {
-      removeFile(path.join(cachePath, key))
+      removeFile(join(cachePath, key))
     }
   })
 }

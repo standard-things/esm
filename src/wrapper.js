@@ -2,8 +2,8 @@
 // as little as possible. Please ensure any changes are backwards compatible.
 
 import FastObject from "./fast-object.js"
-import SemVer from "semver"
 
+import { maxSatisfying as _maxSatisfying } from "semver"
 import esmSemVer from "./util/version.js"
 import has from "./util/has.js"
 
@@ -94,7 +94,7 @@ function maxSatisfying(versions, range) {
   if (cacheKey in maxSatisfyingCache) {
     return maxSatisfyingCache[cacheKey]
   }
-  return maxSatisfyingCache[cacheKey] = SemVer.maxSatisfying(versions, range)
+  return maxSatisfyingCache[cacheKey] = _maxSatisfying(versions, range)
 }
 
 Object.setPrototypeOf(Wrapper.prototype, null)

@@ -1,8 +1,8 @@
-import Module from "module"
+import Module, { _resolveFilename } from "module"
 import PkgInfo from "../pkg-info.js"
 import Wrapper from "../wrapper.js"
 
-import path from "path"
+import { dirname } from "path"
 import rootModule from "../root-module.js"
 
 const esmPkgMain = __non_webpack_module__.filename
@@ -11,11 +11,9 @@ const preloadModules = process._preload_modules || []
 if (rootModule.id === "internal/preload" ||
     preloadModules.some((child) => child.filename === esmPkgMain)) {
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
-  const resolveFilename = Module._resolveFilename
-
   const managerWrapper = function (manager, func, args) {
-    const filePath = resolveFilename(process.argv[1], null, true)
-    const pkgInfo = PkgInfo.get(path.dirname(filePath))
+    const filePath = _resolveFilename(process.argv[1], null, true)
+    const pkgInfo = PkgInfo.get(dirname(filePath))
     const wrapped = pkgInfo === null ? null : Wrapper.find(Module, "runMain", pkgInfo.range)
 
     return wrapped === null

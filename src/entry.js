@@ -1,9 +1,9 @@
 import assignProperty from "./util/assign-property.js"
+import { basename } from "path"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
-import path from "path"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -11,7 +11,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 
 const GETTER_ERROR = {}
 const entryMap = new WeakMap
-const sort = Array.prototype.sort
+const { sort } = Array.prototype
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 class Entry {
@@ -323,8 +323,8 @@ function getExportByName(entry, name) {
 
   if (entry._loaded &&
       ! (name in namespace)) {
-    const basename = path.basename(entry.module.filename)
-    throw new SyntaxError("Module " + toStringLiteral(basename, "'") +
+    const moduleName = basename(entry.module.filename)
+    throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + name + "'")
   }
 

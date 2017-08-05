@@ -1,9 +1,10 @@
+import { extname as _extname, dirname, join } from "path"
+
 import Entry from "../entry.js"
 import Module from "module"
 import Parser from "../parser.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
-import SemVer from "semver"
 import Wrapper from "../wrapper.js"
 
 import attempt from "../util/attempt.js"
@@ -19,16 +20,16 @@ import isObject from "../util/is-object.js"
 import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import mtime from "../fs/mtime.js"
-import path from "path"
 import readFile from "../fs/read-file.js"
+import { satisfies } from "semver"
 import setSourceType from "../util/set-source-type.js"
 
 let allowTopLevelAwait = isObject(process.mainModule) &&
-  SemVer.satisfies(process.version, ">=7.6.0")
+  satisfies(process.version, ">=7.6.0")
 
 function managerWrapper(manager, func, args) {
   const filePath = args[1]
-  const pkgInfo = PkgInfo.get(path.dirname(filePath))
+  const pkgInfo = PkgInfo.get(dirname(filePath))
   const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
 
   return wrapped === null
@@ -78,7 +79,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   let cacheValue = cache[cacheFileName]
 
   if (cacheValue === true) {
-    cacheCode = readCode(path.join(cachePath, cacheFileName), pkgOptions)
+    cacheCode = readCode(join(cachePath, cacheFileName), pkgOptions)
   } else {
     sourceCode = readCode(filePath, pkgOptions)
   }
@@ -112,7 +113,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
 }
 
 function readCode(filePath, options) {
-  return options.gz && path.extname(filePath) === ".gz"
+  return options.gz && _extname(filePath) === ".gz"
     ? gunzip(readFile(filePath), "utf8")
     : readFile(filePath, "utf8")
 }
