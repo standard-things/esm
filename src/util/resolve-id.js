@@ -12,9 +12,10 @@ import urlToPath from "./url-to-path.js"
 const nodeModulePaths = Module._nodeModulePaths
 const resolveFilename = Module._resolveFilename
 
-const pathMode = process.platform === "win32" ? "win32" : "posix"
+const isWin = process.platform === "win32"
+const pathMode = isWin ? "win32" : "posix"
 const resolveCache = new FastObject
-const urlCharsRegExp = /[?#%]/
+const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
 function resolveId(id, parent) {
   if (! id ||
