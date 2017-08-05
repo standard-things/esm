@@ -19,6 +19,7 @@
     "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
+    "clean": "node script/clean.js",
     "lint": "eslint **/*.js src/**/*.js test/**/*.js --fix --quiet",
     "test": "node --require ./build/esm.js script/test.js",
     "test:prod": "node --require ./index.js script/test.js"
