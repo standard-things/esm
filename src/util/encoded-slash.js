@@ -9,7 +9,7 @@ const API = {
 
 function encodedSlash(string, mode = "posix") {
   const { encodedSlashRegExp  } = API[mode]
-  return string ? encodedSlashRegExp.test(string) : false
+  return typeof string === "string" && encodedSlashRegExp.test(string)
 }
 
 export default encodedSlash
