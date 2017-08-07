@@ -27,7 +27,7 @@ const childrenToVisit = createOptions({
 
 class Visitor {
   visit(path) {
-    this.reset.apply(this, arguments)
+    this.reset(...arguments)
     this.visitWithoutReset(path)
   }
 
