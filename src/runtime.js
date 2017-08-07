@@ -90,7 +90,9 @@ class Runtime {
     }
 
     const newEntry = Entry.get(mod, mod.exports, options)
+    newEntry.sourceType = getSourceType(newEntry.exports)
     newEntry.update().loaded()
+
     Entry.set(mod.exports, entry.merge(newEntry))
 
     if (options.cjs) {

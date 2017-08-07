@@ -227,9 +227,7 @@ class Entry {
   merge(otherEntry) {
     if (otherEntry !== this) {
       for (const key in otherEntry) {
-        if (key !== "sourceType") {
-          assignProperty(this, otherEntry, key)
-        }
+        assignProperty(this, otherEntry, key)
       }
     }
 
@@ -237,10 +235,6 @@ class Entry {
   }
 
   update() {
-    if (this.sourceType === "script") {
-      this.sourceType = getSourceType(this.exports)
-    }
-
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
     const parentsMap = Object.create(null)
