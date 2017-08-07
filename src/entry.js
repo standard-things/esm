@@ -1,6 +1,6 @@
 import assignProperty from "./util/assign-property.js"
-import { basename } from "path"
 import createOptions from "./util/create-options.js"
+import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
@@ -340,7 +340,8 @@ function getExportByName(parent, entry, name) {
 
   if ((entry._loaded && ! (name in _namespace)) ||
       (entry.sourceType !== "module" && ! options.cjs)) {
-    const moduleName = basename(entry.module.filename)
+    const moduleName = getModuleName(entry.module)
+
     throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + name + "'")
   }
