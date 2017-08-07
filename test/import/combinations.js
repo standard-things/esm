@@ -15,11 +15,10 @@ export function check() {
   }
 
   const defNs = {
-    default: {
-      d: "d",
-      e: "e",
-      f: "f"
-    }
+    d: "d",
+    default: { d: "d", e: "e", f: "f" },
+    e: "e",
+    f: "f"
   }
 
   assert.deepEqual(abc1, abcNs)
