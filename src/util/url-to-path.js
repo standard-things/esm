@@ -24,7 +24,7 @@ function urlToPath(url, mode = "posix") {
     return ""
   }
 
-  let host = parsed.host
+  let { host } = parsed
 
   // Section 2: Syntax
   // https://tools.ietf.org/html/rfc8089#section-2

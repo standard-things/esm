@@ -60,9 +60,9 @@ class Runtime {
 
   run(moduleWrapper, req) {
     const mod = this.module
-    const entry = this.entry
+    const { entry } = this
     const exported = mod.exports = entry.exports
-    const options = this.options
+    const { options } = this
 
     if (! moduleWrapper.length) {
       moduleWrapper.call(options.cjs ? exported : void 0)
@@ -129,7 +129,7 @@ class Runtime {
 
   watch(id, setterPairs) {
     let child
-    const entry = this.entry
+    const { entry } = this
     const parent = this.module
 
     if (id in builtinModules) {

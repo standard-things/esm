@@ -69,7 +69,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
     return func.apply(this, args)
   }
 
-  const cache = pkgInfo.cache
+  const { cache } = pkgInfo
   const cacheKey = mtime(filePath)
   const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 

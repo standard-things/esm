@@ -16,7 +16,7 @@ class FastPath {
   // Note that the stack is restored to its original state after the `visitor`
   // method has finished, so don't retain a reference to the path.
   call(visitor, methodName, key) {
-    const stack = this.stack
+    const { stack } = this
     const object = stack[stack.length - 1]
 
     stack.push(key, object[key])
@@ -31,9 +31,9 @@ class FastPath {
   // a reference to this path object for each element of the array.
   each(visitor, methodName) {
     let i = -1
-    const stack = this.stack
+    const { stack } = this
     const array = stack[stack.length - 1]
-    const length = array.length
+    const { length } = array
 
     while (++i < length) {
       stack.push(i, array[i])
@@ -47,13 +47,13 @@ class FastPath {
   }
 
   getValue() {
-    const stack = this.stack
+    const { stack } = this
     return stack[stack.length - 1]
   }
 }
 
 function getNode(path, pos, callback) {
-  const stack = path.stack
+  const { stack } = path
   const stackCount = stack.length
   let i = stackCount
 

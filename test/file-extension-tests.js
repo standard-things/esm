@@ -4,7 +4,7 @@ import helper from "./helper.js"
 import path from "path"
 import zlib from "zlib"
 
-const __dirname = helper.__dirname
+const { __dirname } = helper
 const fixturePath = path.join(__dirname, "file-extension")
 
 const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))

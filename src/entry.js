@@ -93,11 +93,9 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
-    const getters = this.getters
-    const namespace = this._namespace
+    const { _namespace, getters } = this
+    const { _namespace:otherNamespace, getters:otherGetters } = otherEntry
     const isSafe = otherEntry.sourceType !== "script"
-    const otherGetters = otherEntry.getters
-    const otherNamespace = otherEntry._namespace
 
     for (const key in otherNamespace) {
       if (key === "default") {
@@ -120,9 +118,9 @@ class Entry {
 
       if (getter.owner.id === otherGetter.owner.id) {
         if (isSafe) {
-          namespace[key] = otherNamespace[key]
+          _namespace[key] = otherNamespace[key]
         } else {
-          assignProperty(namespace, otherNamespace, key)
+          assignProperty(_namespace, otherNamespace, key)
         }
       } else {
         throw new SyntaxError("Identifier '" + key + "' has already been declared")
@@ -159,7 +157,7 @@ class Entry {
       return this._loaded = 0
     }
 
-    const children = this.children
+    const { children } = this
     const ids = keys(children)
 
     for (const id of ids) {
@@ -262,22 +260,21 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const exported = entry.exports
+  const { _namespace, exports:exported } = entry
   const isSafe = entry.sourceType !== "script"
-  const namespace = entry._namespace
 
   if (! isSafe) {
     // Hardcode "default" as `module.exports` for CommonJS scripts.
-    namespace.default = exported
+    _namespace.default = exported
   }
 
   const names = keys(exported)
 
   for (const name of names) {
     if (isSafe) {
-      namespace[name] = exported[name]
+      _namespace[name] = exported[name]
     } else if (name !== "default") {
-      assignProperty(namespace, exported, name)
+      assignProperty(_namespace, exported, name)
     }
   }
 }
@@ -325,8 +322,8 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(parent, entry, name) {
-  const options = parent.options
-  const sourceType = entry.sourceType
+  const { options } = parent
+  const { _namespace, sourceType } = entry
 
   if (name === "*") {
     if (options.cjs) {
@@ -336,21 +333,19 @@ function getExportByName(parent, entry, name) {
     return sourceType === "module" ? entry.esmNamespace : entry.cjsNamespace
   }
 
-  const namespace = entry._namespace
-
   if (sourceType !== "module" && name === "default" &&
       (sourceType === "script" || ! options.cjs)) {
     return entry.exports
   }
 
-  if ((entry._loaded && ! (name in namespace)) ||
+  if ((entry._loaded && ! (name in _namespace)) ||
       (entry.sourceType !== "module" && ! options.cjs)) {
     const moduleName = basename(entry.module.filename)
     throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + name + "'")
   }
 
-  return namespace[name]
+  return _namespace[name]
 }
 
 function runGetter(getter) {
@@ -369,16 +364,16 @@ function runGetters(entry) {
     return
   }
 
-  const namespace = entry._namespace
+  const { _namespace } = entry
   const names = keys(entry.getters)
 
   for (const name of names) {
     const value = runGetter(entry.getters[name])
 
     if (value !== GETTER_ERROR &&
-        ! compare(namespace, name, value)) {
+        ! compare(_namespace, name, value)) {
       entry._changed = true
-      namespace[name] = value
+      _namespace[name] = value
     }
   }
 }

@@ -3,7 +3,7 @@ import Module from "module"
 import helper from "../helper.js"
 import path from "path"
 
-const __dirname = helper.__dirname
+const { __dirname } = helper
 const NODE_ENV = String(process.env.NODE_ENV)
 
 const esmPath = NODE_ENV.startsWith("production")
