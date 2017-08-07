@@ -35,7 +35,7 @@
     "download": "^6.2.5",
     "eslint": "^4.4.0",
     "eslint-plugin-import": "^2.7.0",
-    "execa": "^0.7.0",
+    "execa": "^0.8.0",
     "fs-extra": "^4.0.0",
     "globby": "^6.1.0",
     "husky": "^0.14.3",
