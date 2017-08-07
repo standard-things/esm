@@ -10,7 +10,7 @@ describe("compiler", () => {
 
   it("should not be enabled for nested node_modules", () =>
     import("disabled")
-      .then(() => assert.ok(false))
+      .then((ns) => ns.check())
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
         assert.ok(/unexpected/i.test(e.message))
