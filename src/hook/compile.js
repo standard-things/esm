@@ -8,7 +8,7 @@ import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
 import attempt from "../util/attempt.js"
-import binding from "../binding/fs.js"
+import binding from "../binding.js"
 import compiler from "../caching-compiler.js"
 import encodeIdent from "../util/encode-ident.js"
 import extname from "../util/extname.js"
@@ -26,6 +26,7 @@ import setSourceType from "../util/set-source-type.js"
 let allowTopLevelAwait = isObject(process.mainModule) &&
   satisfies(process.version, ">=7.6.0")
 
+const fsBinding = binding.fs
 const passthruMap = new Map
 
 function managerWrapper(manager, func, args) {
@@ -172,7 +173,7 @@ function tryESMLoad(func, mod, code, filePath, runtimeAlias, options) {
 
 function tryModuleCompile(func, mod, code, filePath, options) {
   const moduleCompile = mod._compile
-  const moduleReadFile = binding.internalModuleReadFile
+  const moduleReadFile = fsBinding.internalModuleReadFile
   const readFileSync = fs.readFileSync
 
   let error
@@ -183,7 +184,7 @@ function tryModuleCompile(func, mod, code, filePath, options) {
     restored = true
 
     if (typeof moduleReadFile === "function") {
-      binding.internalModuleReadFile = moduleReadFile
+      fsBinding.internalModuleReadFile = moduleReadFile
     }
 
     fs.readFileSync = readFileSync
@@ -216,7 +217,7 @@ function tryModuleCompile(func, mod, code, filePath, options) {
   if (typeof internalModuleReadFile === "function") {
     // Wrap `process.binding("fs").internalModuleReadFile` in case future
     // versions of Node use it instead of `fs.readFileSync`.
-    binding.internalModuleReadFile = customModuleReadFile
+    fsBinding.internalModuleReadFile = customModuleReadFile
   }
 
   // Wrap `fs.readFileSync` to avoid an extraneous file read when the
@@ -268,8 +269,8 @@ function tryModuleCompile(func, mod, code, filePath, options) {
       throw maskStackTrace(error)
     }
   } finally {
-    if (binding.internalModuleReadFile === customModuleReadFile) {
-      binding.internalModuleReadFile = moduleReadFile
+    if (fsBinding.internalModuleReadFile === customModuleReadFile) {
+      fsBinding.internalModuleReadFile = moduleReadFile
     }
 
     if (fs.readFileSync === customReadFileSync) {

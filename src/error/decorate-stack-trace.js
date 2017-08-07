@@ -1,33 +1,39 @@
-import binding from "../binding/util.js"
+import binding from "../binding.js"
 
-const internalDecorateErrorStack = binding.decorateErrorStack
-const internalSetHiddenValue = binding.setHiddenValue
+const {
+  arrow_message_private_symbol,
+  decorated_private_symbol,
+  decorateErrorStack,
+  setHiddenValue
+} = binding.util
 
-const useInternalDecorateErrorStack = typeof internalDecorateErrorStack === "function"
-const useInternalSetHiddenValue = typeof internalSetHiddenValue === "function"
+const useArrowMessageSymbol = arrow_message_private_symbol !== void 0
+const useDecoratedSymbol = decorated_private_symbol !== void 0
+const useDecorateErrorStack = typeof decorateErrorStack === "function"
+const useSetHiddenValue = typeof setHiddenValue === "function"
 
 function decorateStackTrace(error) {
-  if (useInternalSetHiddenValue) {
-    if ("arrow_message_private_symbol" in binding) {
-      internalSetHiddenValue(error, binding.arrow_message_private_symbol, "")
+  if (useSetHiddenValue) {
+    if (useArrowMessageSymbol) {
+      setHiddenValue(error, arrow_message_private_symbol, "")
     } else {
       try {
-        internalSetHiddenValue(error, "arrowMessage", "")
-        internalSetHiddenValue(error, "node:arrowMessage", "")
+        setHiddenValue(error, "arrowMessage", "")
+        setHiddenValue(error, "node:arrowMessage", "")
       } catch (e) {}
     }
 
-    if ("decorated_private_symbol" in binding) {
-      internalSetHiddenValue(error, binding.decorated_private_symbol, true)
+    if (useDecoratedSymbol) {
+      setHiddenValue(error, decorated_private_symbol, true)
     } else {
       try {
-        internalSetHiddenValue(error, "node:decorated", true)
+        setHiddenValue(error, "node:decorated", true)
       } catch (e) {}
     }
   }
 
-  if (useInternalDecorateErrorStack) {
-    internalDecorateErrorStack(error)
+  if (useDecorateErrorStack) {
+    decorateErrorStack(error)
   }
 
   return error

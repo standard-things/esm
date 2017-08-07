@@ -1,20 +1,17 @@
-import binding from "../binding/fs.js"
+import binding from "../binding"
 import { satisfies } from "semver"
 import { statSync } from "fs"
 
-const internalStat = binding.stat
-const internalStatValues = binding.getStatValues
+const { getStatValues, stat } = binding.fs
 
-let useMtimeFastPath = typeof internalStat === "function" &&
+let useMtimeFastPath = typeof stat === "function" &&
   satisfies(process.version, "^6.10.1||>=7.7")
 
 let statValues
-const useInternalStatValues = typeof internalStatValues === "function"
+const useGetStatValues = typeof getStatValues === "function"
 
 if (useMtimeFastPath) {
-  statValues = useInternalStatValues
-    ? internalStatValues()
-    : new Float64Array(14)
+  statValues = useGetStatValues ? getStatValues() : new Float64Array(14)
 }
 
 function mtime(filePath) {
@@ -42,10 +39,10 @@ function fastPathMtime(filePath) {
   // Used to speed up file stats. Modifies the `statValues` typed array,
   // with index 11 being the mtime milliseconds stamp. The speedup comes
   // from not creating Stat objects.
-  if (useInternalStatValues) {
-    internalStat(filePath)
+  if (useGetStatValues) {
+    stat(filePath)
   } else {
-    internalStat(filePath, statValues)
+    stat(filePath, statValues)
   }
 
   return statValues[11]

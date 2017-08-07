@@ -1,8 +1,8 @@
-import binding from "../binding/fs.js"
+import binding from "../binding.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
 
-const internalModuleReadFile = binding.internalModuleReadFile
+const { internalModuleReadFile } = binding.fs
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {

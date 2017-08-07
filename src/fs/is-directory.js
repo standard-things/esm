@@ -1,7 +1,7 @@
-import binding from "../binding/fs.js"
+import binding from "../binding.js"
 import { statSync } from "fs"
 
-const internalModuleStat = binding.internalModuleStat
+const { internalModuleStat } = binding.fs
 let useIsDirectoryFastPath = typeof internalModuleStat === "function"
 
 function isDirectory(thePath) {
