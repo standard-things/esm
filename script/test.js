@@ -1,7 +1,7 @@
 import { ensureLink } from "fs-extra"
 import execa from "execa"
 import globby from "globby"
-import path from "path"
+import { join } from "path"
 import { satisfies } from "semver"
 import trash from "trash"
 
@@ -10,16 +10,16 @@ const NODE_ENV = String(process.env.NODE_ENV)
 const isProd = NODE_ENV.startsWith("production")
 const isWin = process.platform === "win32"
 
-const rootPath = path.join(__dirname, "..")
-const testPath = path.join(rootPath, "test")
-const envPath = path.join(testPath, "env")
+const rootPath = join(__dirname, "..")
+const testPath = join(rootPath, "test")
+const envPath = join(testPath, "env")
 const esmPath = isProd ? "../index.js" : "../build/esm.js"
 
 const BABEL_DISABLE_CACHE = true
-const HOME = path.join(envPath, "home")
-const MOCHA_BIN = path.join(rootPath, "node_modules/mocha/bin/mocha")
-const NODE_BIN = path.join(envPath, "prefix", isWin ? "node.exe" : "bin/node")
-const NODE_PATH = path.join(envPath, "node_path")
+const HOME = join(envPath, "home")
+const MOCHA_BIN = join(rootPath, "node_modules/mocha/bin/mocha")
+const NODE_BIN = join(envPath, "prefix", isWin ? "node.exe" : "bin/node")
+const NODE_PATH = join(envPath, "node_path")
 
 const trashPaths = globby.sync([
   "**/.?(esm-)cache",
