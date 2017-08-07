@@ -4,6 +4,7 @@
   ],
   "presets": [
     ["env", {
+      "loose": true,
       "modules": false,
       "exclude": [
         "check-es2015-constants",
