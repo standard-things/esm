@@ -73,10 +73,7 @@ class Entry {
   }
 
   addGetters(getterPairs) {
-    for (const pair of getterPairs) {
-      const name = pair[0]
-      const getter = pair[1]
-
+    for (const [name, getter] of getterPairs) {
       getter.owner = this.module
       this.getters[name] = getter
     }
@@ -125,9 +122,7 @@ class Entry {
   }
 
   addSetters(setterPairs, parent) {
-    for (const pair of setterPairs) {
-      const name = pair[0]
-      const setter = pair[1]
+    for (const [name, setter] of setterPairs) {
       let setters = this.setters[name]
 
       if (setters === void 0) {
