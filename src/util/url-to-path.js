@@ -6,15 +6,15 @@ import { parse } from "url"
 import punycode from "../vendor/punycode/punycode.es6.js"
 
 const API = {
-  posix,
-  win32
+  posix: { normalize: posix.normalize },
+  win32: { normalize: win32.normalize }
 }
 
 const codeOfColon = ":".charCodeAt(0)
 const { toUnicode } = punycode
 
 function urlToPath(url, mode = "posix") {
-  const path = API[mode]
+  const { normalize } = API[mode]
   const parsed = parse(url)
   const pathname = decodeURI(parsed.pathname)
 
@@ -32,7 +32,7 @@ function urlToPath(url, mode = "posix") {
     host = ""
   } if (host) {
     return mode === "win32"
-      ? "\\\\" + toUnicode(host) + path.normalize(pathname)
+      ? "\\\\" + toUnicode(host) + normalize(pathname)
       : ""
   }
 
@@ -52,7 +52,7 @@ function urlToPath(url, mode = "posix") {
 
   // Drive letters must be [a-zA-Z].
   return (code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)
-    ? path.normalize(pathname).slice(1)
+    ? normalize(pathname).slice(1)
     : ""
 }
 
