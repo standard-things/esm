@@ -1,6 +1,5 @@
 import { extname as _extname, dirname, join } from "path"
 
-import Entry from "../entry.js"
 import Module from "module"
 import Parser from "../parser.js"
 import PkgInfo from "../pkg-info.js"
@@ -17,7 +16,6 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import gunzip from "../fs/gunzip.js"
 import isObject from "../util/is-object.js"
-import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
@@ -122,7 +120,6 @@ function readCode(filePath, options) {
 
 function tryCJSLoad(func, mod, code, filePath, runtimeAlias, options) {
   const exported = Object.create(null)
-  const entry = Entry.get(mod, exported, options)
 
   code =
     "const " + runtimeAlias + "=this;" + runtimeAlias +
@@ -131,19 +128,7 @@ function tryCJSLoad(func, mod, code, filePath, runtimeAlias, options) {
 
   setSourceType(exported, "script")
   Runtime.enable(mod, exported, options)
-
   tryModuleCompile.call(this, func, mod, code, filePath, options)
-  Entry.set(mod.exports, entry.merge(Entry.get(mod, mod.exports, options)))
-
-  if (options.cjs) {
-    const getterPairs = keys(mod.exports)
-      .map((key) => [key, () => mod.exports[key]])
-
-    entry.addGetters(getterPairs)
-  }
-
-  mod.loaded = true
-  entry.update().loaded()
 }
 
 function tryESMLoad(func, mod, code, filePath, runtimeAlias, options) {

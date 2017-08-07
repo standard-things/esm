@@ -1,12 +1,12 @@
 import { _nodeModulePaths, _resolveFilename } from "module"
 import FastObject from "../fast-object.js"
+import NodeError from "../node-error.js"
 
 import builtinModules from "../builtin-modules.js"
 import decodeURI from "./decode-uri.js"
 import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
-import toStringLiteral from "./to-string-literal.js"
 import urlToPath from "./url-to-path.js"
 
 const isWin = process.platform === "win32"
@@ -54,9 +54,7 @@ function resolveId(id, parent) {
     }
   }
 
-  const error = new Error("Module " + toStringLiteral(id, "'") + " not found")
-  error.code = "MODULE_NOT_FOUND"
-  throw error
+  throw new NodeError("MODULE_NOT_FOUND", id)
 }
 
 export default resolveId
