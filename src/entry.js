@@ -14,6 +14,13 @@ const entryMap = new WeakMap
 const { sort } = Array.prototype
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
+const toStringTagDescriptor = {
+  configurable: false,
+  enumerable: false,
+  value: "Module",
+  writable: false
+}
+
 class Entry {
   /* eslint lines-around-comment: off */
   constructor(mod, exported, options) {
@@ -25,20 +32,24 @@ class Entry {
     this._namespace = Object.create(null)
     // The child entries of the module.
     this.children = Object.create(null)
+    // The namespace object CJS importers receive.
+    this.cjsNamespace = this._namespace
+    // The namespace object ESM importers receive.
+    this.esmNamespace = this._namespace
     // The `module.exports` of the module.
     this.exports = exported
     // Getters for local variables exported from the module.
     this.getters = Object.create(null)
+    // The id of the module.
+    this.id = mod.id
     // The module this entry is managing.
     this.module = mod
-    // The namespace object that importers receive.
-    this.namespace = this._namespace
     // The package options for this entry.
     this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
     this.setters = Object.create(null)
     // Set the default source type.
-    this.sourceType = "script"
+    this.sourceType = getSourceType(exported)
   }
 
   static get(mod, exported, options) {
@@ -157,7 +168,8 @@ class Entry {
       }
     }
 
-    setGetter(this, "namespace", () => {
+    setGetter(this, "esmNamespace", () => {
+      const isScript = this.sourceType === "script"
       // Section 9.4.6
       // Module namespace objects have a null [[Prototype]].
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -170,29 +182,47 @@ class Entry {
       const names = sort.call(keys(raw))
 
       for (const name of names) {
-        assignProperty(namespace, raw, name)
+        if (isScript && name === "default") {
+          namespace.default = this.exports
+        } else {
+          assignProperty(namespace, raw, name)
+        }
       }
 
       // Section 26.3.1
       // Module namespace objects have a @@toStringTag value of "Module".
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
       if (useToStringTag) {
-        setProperty(namespace, Symbol.toStringTag, {
-          configurable: false,
-          enumerable: false,
-          value: "Module",
-          writable: false
-        })
+        setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
       }
 
       // Section 9.4.6
       // Module namespace objects are not extensible.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      return this.namespace = this._namespace = Object.seal(namespace)
+      return this.esmNamespace = this._namespace = Object.seal(namespace)
     })
 
-    setSetter(this, "namespace", (value) => {
-      setProperty(this, "namespace", { value })
+    setSetter(this, "esmNamespace", (value) => {
+      setProperty(this, "esmNamespace", { value })
+    })
+
+    setGetter(this, "cjsNamespace", () => {
+      const namespace = Object.create(null)
+
+      // Section 4.6
+      // Step 4: Create an ESM with `{default:module.exports}` as its namespace
+      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#46-es-consuming-commonjs
+      namespace.default = this.exports
+
+      if (useToStringTag) {
+        setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
+      }
+
+      return this.cjsNamespace = Object.seal(namespace)
+    })
+
+    setSetter(this, "cjsNamespace", (value) => {
+      setProperty(this, "cjsNamespace", { value })
     })
 
     return this._loaded = 1
@@ -234,7 +264,7 @@ class Entry {
       // longer cycles exist in the parent chain? Thanks to our `setter.last`
       // bookkeeping in `changed()`, the `entry.update()` broadcast will only
       // proceed as far as there are any actual changes to report.
-      Entry.get(parentsMap[id]).update()
+      parentsMap[id].update()
     }
 
     return this
@@ -243,28 +273,19 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const exported = entry.exports
+  const names = keys(exported)
   const namespace = entry._namespace
-  const isESM = entry.sourceType !== "script"
+  const sourceType = entry.sourceType
+  const isSafe = sourceType !== "script"
 
-  // Add a "default" property unless it's a Babel-like exports, in which case
-  // the exported object should be namespace-like and safe to assign directly.
-  if (! isESM) {
+  if (sourceType === "script") {
     namespace.default = exported
-
-    // Section 4.6
-    // Step 4: Create an ESM with `{default:module.exports}` as its namespace
-    // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#46-es-consuming-commonjs
-    if (! entry.options.cjs)  {
-      return
-    }
   }
 
-  const names = keys(exported)
-
   for (const name of names) {
-    if (isESM) {
+    if (isSafe) {
       namespace[name] = exported[name]
-    } else if (name !== "default") {
+    } else {
       assignProperty(namespace, exported, name)
     }
   }
@@ -301,9 +322,8 @@ function forEachSetter(entry, callback) {
       continue
     }
 
-    const value = getExportByName(entry, name)
-
     for (const setter of setters) {
+      const value = getExportByName(setter.parent, entry, name)
       if (entry._changed || changed(setter, name, value)) {
         callback(setter, value)
       }
@@ -313,15 +333,27 @@ function forEachSetter(entry, callback) {
   entry._changed = false
 }
 
-function getExportByName(entry, name) {
+function getExportByName(parent, entry, name) {
+  const options = parent.options
+  const sourceType = entry.sourceType
+
   if (name === "*") {
-    return entry.namespace
+    if (options.cjs) {
+      return entry.esmNamespace
+    }
+
+    return sourceType === "module" ? entry.esmNamespace : entry.cjsNamespace
   }
 
   const namespace = entry._namespace
 
-  if (entry._loaded &&
-      ! (name in namespace)) {
+  if (sourceType !== "module" && name === "default" &&
+      (sourceType === "script" || ! options.cjs)) {
+    return entry.exports
+  }
+
+  if ((entry._loaded && ! (name in namespace)) ||
+      (entry.sourceType !== "module" && ! options.cjs)) {
     const moduleName = basename(entry.module.filename)
     throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + name + "'")
