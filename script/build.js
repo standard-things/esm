@@ -1,4 +1,4 @@
-/* eslint strict: off */
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const download = require("download")

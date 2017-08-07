@@ -1,3 +1,4 @@
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const join = require("path").join
@@ -16,15 +17,16 @@ const NODE_ENV = String(process.env.NODE_ENV)
 const isProduction = NODE_ENV.startsWith("production")
 const isTest = NODE_ENV.endsWith("test")
 
+/* eslint sort-keys: off */
 const config = {
   target: "node",
   entry: {
     esm: "./src/index.js"
   },
   output: {
+    filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    filename: "[name].js",
     path: join(__dirname, "build")
   },
   module: {

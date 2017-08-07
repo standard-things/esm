@@ -1,9 +1,9 @@
-/* eslint strict: off */
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const globby = require("globby")
-const { join } = require("path")
-const { readFileSync } = require("fs")
+const join = require("path").join
+const readFileSync = require("fs").readFileSync
 const trash = require("trash")
 
 const rootPath = join(__dirname, "..")

@@ -3,6 +3,7 @@
 /node_modules
 /src/vendor
 /test/fixture/extension
+/test/output
 /test/export/all-mutual.js
 /test/export/extension.js
 /test/import/extension.js

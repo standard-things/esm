@@ -5,6 +5,7 @@ const isTest = NODE_ENV.endsWith("test")
 
 module.exports = {
   extends: ["eslint:recommended", "plugin:import/errors"],
+  plugins: ["import", "node"],
   parser: "eslint-plugin-import/memo-parser",
   root: true,
   env: {
