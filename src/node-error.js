@@ -5,7 +5,7 @@ const codeSym = Symbol.for("@std/esm:errorCode")
 const messageMap = new Map
 
 messageMap.set("ERR_REQUIRE_ESM", "Must use import to load ES Module: %s")
-messageMap.set("MODULE_NOT_FOUND", (id) => "Module " + toStringLiteral(id, "'") + "not found")
+messageMap.set("MODULE_NOT_FOUND", moduleNotFound)
 
 class NodeError extends Error {
   constructor(key, ...args) {
@@ -31,6 +31,22 @@ function getMessage(key, args) {
 
   args.unshift(message)
   return String(format(...args))
+}
+
+function moduleNotFound(id, fromPath, foundPath) {
+  let message = "Module " + quote(id) + "not found"
+
+  if (typeof fromPath === "string" &&
+      typeof foundPath === "string") {
+    message += " by `import` in " + quote(fromPath) +
+      ", but would be found by `require` at " + quote(foundPath)
+  }
+
+  return message
+}
+
+function quote(value) {
+  return toStringLiteral(value, "'")
 }
 
 Object.setPrototypeOf(NodeError.prototype, null)
