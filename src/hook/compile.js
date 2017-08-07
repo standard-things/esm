@@ -1,6 +1,7 @@
 import { extname as _extname, dirname, join } from "path"
 
 import Module from "module"
+import NodeError from "../node-error.js"
 import Parser from "../parser.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
@@ -227,6 +228,12 @@ function tryModuleCompile(func, mod, code, filePath, options) {
 
   try {
     if (options.debug) {
+      const ext = extname(filePath)
+
+      if (ext === ".mjs.gz") {
+        passthru = passthruMap.get(Wrapper.unwrap(exts, ext))
+      }
+
       if (passthru) {
         func.call(this, mod, filePath)
       } else {
@@ -280,13 +287,32 @@ const extsJs = Wrapper.unwrap(exts, ".js")
 const extsToWrap = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
 
 extsToWrap.forEach((key) => {
+  let passthru = true
+
   if (typeof exts[key] !== "function") {
-    // Mimic the built-in Node behavior of treating files with unrecognized
-    // extensions as ".js".
-    exts[key] = extsJs
+    // Mimic the built-in Node behavior for ".mjs" and unrecognized extensions.
+    if (key === ".mjs" || key === ".mjs.gz") {
+      passthru = false
+      exts[key] = function (mod, filePath) {
+        throw new NodeError("ERR_REQUIRE_ESM", filePath)
+      }
+    } else if (key === ".gz") {
+      exts[key] = function (mod, filePath) {
+        let ext = extname(filePath)
+
+        if (ext === ".gz" || typeof Module._extensions[ext] !== "function") {
+          ext = ".js"
+        }
+
+        const func = Wrapper.unwrap(exts, ext)
+        return func.call(this, mod, filePath)
+      }
+    } else {
+      exts[key] = extsJs
+    }
   }
 
   Wrapper.manage(exts, key, managerWrapper)
   Wrapper.wrap(exts, key, methodWrapper)
-  passthruMap.set(Wrapper.unwrap(exts, key), true)
+  passthruMap.set(Wrapper.unwrap(exts, key), passthru)
 })
