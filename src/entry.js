@@ -84,7 +84,7 @@ class Entry {
   addGettersFrom(otherEntry) {
     const getters = this.getters
     const namespace = this._namespace
-    const isESM = otherEntry.sourceType !== "script"
+    const isSafe = otherEntry.sourceType !== "script"
     const otherGetters = otherEntry.getters
     const otherNamespace = otherEntry._namespace
 
@@ -108,7 +108,7 @@ class Entry {
       }
 
       if (getter.owner.id === otherGetter.owner.id) {
-        if (isESM) {
+        if (isSafe) {
           namespace[key] = otherNamespace[key]
         } else {
           assignProperty(namespace, otherNamespace, key)
