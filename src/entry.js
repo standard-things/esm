@@ -169,7 +169,6 @@ class Entry {
     }
 
     setGetter(this, "esmNamespace", () => {
-      const isScript = this.sourceType === "script"
       // Section 9.4.6
       // Module namespace objects have a null [[Prototype]].
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -182,11 +181,7 @@ class Entry {
       const names = sort.call(keys(raw))
 
       for (const name of names) {
-        if (isScript && name === "default") {
-          namespace.default = this.exports
-        } else {
-          assignProperty(namespace, raw, name)
-        }
+        assignProperty(namespace, raw, name)
       }
 
       // Section 26.3.1
@@ -275,17 +270,17 @@ function assignExportsToNamespace(entry) {
   const exported = entry.exports
   const names = keys(exported)
   const namespace = entry._namespace
-  const sourceType = entry.sourceType
-  const isSafe = sourceType !== "script"
+  const isSafe = entry.sourceType !== "script"
 
-  if (sourceType === "script") {
+  if (! isSafe) {
+    // Hardcode "default" as `module.exports` for CommonJS scripts.
     namespace.default = exported
   }
 
   for (const name of names) {
     if (isSafe) {
       namespace[name] = exported[name]
-    } else {
+    } else if (name !== "default") {
       assignProperty(namespace, exported, name)
     }
   }
