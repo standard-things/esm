@@ -187,9 +187,7 @@ class Entry {
       // Section 26.3.1
       // Module namespace objects have a @@toStringTag value of "Module".
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      if (useToStringTag) {
-        setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
-      }
+      setNamespaceToStringTag(namespace)
 
       // Section 9.4.6
       // Module namespace objects are not extensible.
@@ -209,10 +207,7 @@ class Entry {
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#46-es-consuming-commonjs
       namespace.default = this.exports
 
-      if (useToStringTag) {
-        setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
-      }
-
+      setNamespaceToStringTag(namespace)
       return this.cjsNamespace = Object.seal(namespace)
     })
 
@@ -384,6 +379,12 @@ function runGetters(entry) {
       entry._changed = true
       namespace[name] = value
     }
+  }
+}
+
+function setNamespaceToStringTag(namespace) {
+  if (useToStringTag) {
+    setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
   }
 }
 
