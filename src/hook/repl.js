@@ -63,7 +63,8 @@ if (rootModule.filename === null &&
       const compilerOptions = {
         cacheFileName,
         pkgInfo,
-        runtimeAlias
+        runtimeAlias,
+        var: true
       }
 
       output = tryWrapper(compiler.compile, [code, compilerOptions]).code

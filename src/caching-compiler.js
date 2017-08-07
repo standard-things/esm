@@ -78,7 +78,7 @@ function toCompileOptions(options) {
     hint: options.hint,
     runtimeAlias: options.runtimeAlias,
     type: options.type,
-    var: pkgOptions.var
+    var: options.var
   }
 }
 

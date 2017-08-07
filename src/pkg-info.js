@@ -14,8 +14,7 @@ const defaultOptions = createOptions({
   cjs: false,
   debug: false,
   esm: "mjs",
-  ext: false,
-  var: false
+  ext: false
 })
 
 const infoCache = new FastObject
@@ -129,8 +128,7 @@ Object.setPrototypeOf(PkgInfo.prototype, null)
 infoCache[""] = new PkgInfo("", version, {
   cache: false,
   cjs: true,
-  gz: true,
-  var: true
+  gz: true
 })
 
 export default PkgInfo
