@@ -214,7 +214,7 @@ function tryModuleCompile(func, mod, code, filePath, options) {
       : readFileSync.call(this, readPath, readOptions)
   }
 
-  if (typeof internalModuleReadFile === "function") {
+  if (typeof moduleReadFile === "function") {
     // Wrap `process.binding("fs").internalModuleReadFile` in case future
     // versions of Node use it instead of `fs.readFileSync`.
     fsBinding.internalModuleReadFile = customModuleReadFile
