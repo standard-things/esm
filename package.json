@@ -33,7 +33,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.24.1",
     "download": "^6.2.5",
-    "eslint": "^4.4.0",
+    "eslint": "^4.4.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.1.1",
     "execa": "^0.8.0",
@@ -50,7 +50,7 @@
     "trash": "^4.0.1",
     "uglify-es": "^3.0.27",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
-    "webpack": "^3.4.0",
+    "webpack": "^3.5.1",
     "webpack-bundle-analyzer": "^2.8.3",
     "webpack-common-shake": "^1.5.3",
     "yargs": "^8.0.2"
