@@ -28,12 +28,10 @@ Enable ESM in the Node REPL by loading `@std/esm` upon entering:
 $ node
 > require("@std/esm")
 @std/esm enabled
-> import assert from "assert"
-> assert.strictEqual(2 + 2, 5)
-AssertionError [ERR_ASSERTION]: 4 === 5
-    at repl:1:44
-    at ContextifyScript.Script.runInThisContext (vm.js:44:33)
-  ...
+> import path from "path"
+undefined
+> path.join("hello", "world")
+'hello/world'
 ```
 
 Features
