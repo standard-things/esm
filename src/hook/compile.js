@@ -240,6 +240,7 @@ function tryModuleCompile(func, mod, code, filePath, options) {
       } else {
         mod._compile(code, filePath)
       }
+
       return
     }
 
