@@ -111,18 +111,6 @@ Developers have strong opinions on just about everything. To accommodate,
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"ext":</code></td>
-  <td>
-    <p>A boolean for <code>import</code>/<code>export</code> syntax extensions<br>
-    <i>(extensions may change every <a href="http://semver.org/">minor release</a>, :pushpin: appropriately)</i></p>
-    <ul>
-    <li><a href="https://github.com/tc39/proposal-export-ns-from"><code>export * as ns from "mod"</code></a> <i>(stage 2)</i></li>
-    <li><a href="https://github.com/tc39/proposal-export-default-from"><code>export v from "mod"</code></a> <i>(stage 1)</i></li>
-    <li>unordered <code>import</code>/<code>export</code> lists</li>
-    </ul>
-  </td>
-</tr>
-<tr>
   <td colspan="2">
   <pre><code>  }
 }</code></pre>
