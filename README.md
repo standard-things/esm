@@ -1,6 +1,5 @@
 # @std/esm
 
-No Babel, no bundles, no problem.<br>
 This fast, small, zero dependency, package is all you need to enable
 ES modules in Node 4+ today!
 
