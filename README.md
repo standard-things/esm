@@ -36,9 +36,12 @@ undefined
 Standard Features
 ---
 
-Defaults are important. The `@std/esm` loader strives to be as spec-compliant as
-possible while following Node’s planned built-in behaviors. Out of the box
-`@std/esm` just works, no configuration needed, and supports
+Defaults are important. The `@std/esm` loader strives to be as spec-compliant
+as possible while following Node’s planned built-in behaviors. This means, by
+default, ESM requires the use of the `.mjs` extension. However, if you wish,
+you can [unlock](#bonus-tracks) unambiguous `.js` module use.
+
+Out of the box `@std/esm` just works, no configuration needed, and supports
 
 * [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
