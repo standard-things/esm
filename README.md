@@ -36,6 +36,10 @@ undefined
 Standard Features
 ---
 
+Defaults are important. The `@std/esm` loader strives to be as spec-compliant as
+possible while following Node’s planned built-in behaviors. Out of the box
+`@std/esm` just works, no configuration needed, and supports
+
 * [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
 * [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values)
@@ -45,8 +49,11 @@ Standard Features
 Bonus Tracks
 ---
 
-Unlock features with the `"@std/esm"` or `"@std":{"esm":{}}` field in your package.json.<br>
-All options are **off** by default.
+Developers have strong opinions on just about everything. To accommodate,
+` @std/esm` allows unlocking extra features with the `"@std/esm"` or
+`"@std":{"esm":{}}` field in your package.json.
+
+*Note: All options are **off** by default.*
 
 <table>
 <tr>
