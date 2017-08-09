@@ -2,13 +2,13 @@
 
 No Babel, no bundles, no problem.<br>
 This fast, small, zero dependency, package is all you need to enable
-ECMAScript modules in Node 4+ today!
+ES modules in Node 4+ today!
 
 Usage
 ---
 
   1. Run `npm i --save @std/esm` in your package or app directory.
-  2. Call `require("@std/esm")` before importing ECMAScript modules.
+  2. Call `require("@std/esm")` before importing ES modules.
 
      ##### index.js
      ```js
