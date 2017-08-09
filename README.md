@@ -3,7 +3,7 @@
 This fast, small, zero dependency, package is all you need to enable
 ES modules in Node 4+ today!
 
-Usage
+Getting started
 ---
 
   1. Run `npm i --save @std/esm` in your app or package directory.
@@ -14,6 +14,15 @@ Usage
      require("@std/esm")
      module.exports = require("./main.mjs").default
      ```
+
+For package authors with sub modules:
+
+```js
+// Have "foo" require only "@std/esm".
+require("foo")
+// Sub modules work!
+const bar = require("foo/bar").default
+```
 
 Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
@@ -41,7 +50,7 @@ as possible while following Node’s planned built-in behaviors. This means, by
 default, ESM requires the use of the `.mjs` extension. However, if you wish, you
 can unlock unambiguous `.js` module use with the [`"esm":"js"` option](#bonus-tracks).
 
-Out of the box `@std/esm` just works, no configuration needed, and supports
+Out of the box `@std/esm` just works, no configuration necessary, and supports
 
 * [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
