@@ -33,7 +33,7 @@ undefined
 'hello/world'
 ```
 
-Features
+Standard Features
 ---
 
 * [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import)
@@ -42,10 +42,10 @@ Features
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * Node 4+ support
 
-Options
+Bonus Tracks
 ---
 
-Specify ESM loader options using the `"@std/esm"` or `"@std":{"esm":{}}` fields in your package.json.<br>
+Unlock features with the `"@std/esm"` or `"@std":{"esm":{}}` field in your package.json.<br>
 All options are **off** by default.
 
 <table>
