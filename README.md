@@ -83,7 +83,7 @@ Developers have strong opinions on just about everything. To accommodate,
   <td>
     <p>A string ESM mode</p>
     <ul>
-    <li><code>"mjs"</code> files as ESM</li>
+    <li><code>"mjs"</code> files as ESM <i>(default)</i></li>
     <li><code>"all"</code> files as ESM</li>
     <li><code>"js"</code> files with <code>import</code>/<code>export</code>/<a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
     </ul>
