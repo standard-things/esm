@@ -15,7 +15,7 @@ Usage
      module.exports = require("./main.mjs").default
      ```
 
-Enable ESM in the Node CLI by loading `@std/esm` with [the `-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
 ```shell
 node -r @std/esm file.mjs
@@ -39,7 +39,7 @@ Standard Features
 Defaults are important. The `@std/esm` loader strives to be as spec-compliant
 as possible while following Node’s planned built-in behaviors. This means, by
 default, ESM requires the use of the `.mjs` extension. However, if you wish, you
-can unlock unambiguous `.js` module use with [the `"esm":"js"` option](#bonus-tracks).
+can unlock unambiguous `.js` module use with the [`"esm":"js"` option](#bonus-tracks).
 
 Out of the box `@std/esm` just works, no configuration needed, and supports
 
