@@ -6,7 +6,7 @@ ES modules in Node 4+ today!
 Usage
 ---
 
-  1. Run `npm i --save @std/esm` in your package or app directory.
+  1. Run `npm i --save @std/esm` in your app or package directory.
   2. Call `require("@std/esm")` before importing ES modules.
 
      ##### index.js
