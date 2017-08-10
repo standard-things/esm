@@ -50,7 +50,7 @@
     "trash": "^4.0.1",
     "uglify-es": "^3.0.27",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
-    "webpack": "^3.5.2",
+    "webpack": "^3.5.3",
     "webpack-bundle-analyzer": "^2.8.3",
     "webpack-common-shake": "^1.5.3",
     "yargs": "^8.0.2"
