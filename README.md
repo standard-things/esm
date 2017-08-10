@@ -46,8 +46,9 @@ Standard Features
 ---
 
 Defaults are important. The `@std/esm` loader strives to be as spec-compliant
-as possible while following Node’s planned built-in behaviors. This means, by
-default, ESM requires the use of the `.mjs` extension.
+as possible while following Node’s [planned](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md)
+built-in behaviors. This means, by default, ESM requires the use of the `.mjs`
+extension.
 
 Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
@@ -57,7 +58,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * Node 4+ support
 
-*Note: You can unlock unambiguous `.js` use with the [`"esm":"js"` option](#bonus-tracks).*
+*Note: You can unlock unambiguous `.js` use with the `"esm":"js"` option.*
 
 Unlockables
 ---
