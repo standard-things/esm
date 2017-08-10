@@ -59,7 +59,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
 *Note: You can unlock unambiguous `.js` use with the [`"esm":"js"` option](#bonus-tracks).*
 
-Bonus Tracks
+Unlockables
 ---
 
 Developers have strong opinions on just about everything. To accommodate,
