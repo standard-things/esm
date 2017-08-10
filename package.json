@@ -2,7 +2,7 @@
   "name": "@std/esm",
   "version": "0.0.1",
   "description": "Enable ES modules in Node today!",
-  "keywords": "commonjs,ecmascript,export,import,modules,node,require",
+  "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",
   "license": "MIT",
   "author": "John-David Dalton <john.david.dalton@gmail.com>",
