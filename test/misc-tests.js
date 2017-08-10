@@ -25,6 +25,12 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
+  it("should produce valid namespace objects for built-in modules", () =>
+    import("./misc/namespace-builtins.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.js")
       .then((ns) => ns.check())

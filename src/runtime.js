@@ -142,6 +142,7 @@ class Runtime {
     }
 
     const childEntry = entry.children[id] = Entry.get(child)
+    childEntry.loaded()
 
     if (setterPairs !== void 0) {
       childEntry.addSetters(setterPairs, Entry.get(parent)).update()
