@@ -69,20 +69,7 @@ if (isProduction) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
-      uglifyOptions: {
-        toplevel: true,
-        compress: {
-          keep_infinity: true,
-          negate_iife: false,
-          passes: 3,
-          pure_getters: true,
-          unsafe: true
-        },
-        output: {
-          ascii_only: true,
-          wrap_iife: true
-        }
-      }
+      uglifyOptions: JSON.parse(readFileSync("./.uglifyrc", "utf8"))
     })
   )
 }
