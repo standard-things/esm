@@ -40,7 +40,7 @@ describe("import declarations", () => {
       .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
   )
 
-  it("should support import extensions", () =>
+  xit("should support import extensions", () =>
     import("./import/extension.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

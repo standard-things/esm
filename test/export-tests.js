@@ -64,7 +64,7 @@ describe("export declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support export extensions", () =>
+  xit("should support export extensions", () =>
     import("./export/extension.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

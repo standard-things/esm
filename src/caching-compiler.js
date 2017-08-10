@@ -74,7 +74,7 @@ function toCompileOptions(options) {
 
   return {
     cjs: pkgOptions.cjs,
-    ext: pkgOptions.ext,
+    ext: false,
     hint: options.hint,
     runtimeAlias: options.runtimeAlias,
     type: options.type,
