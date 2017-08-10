@@ -70,7 +70,6 @@ describe("spec compliance", () => {
       .catch((e) => {
         Module._cache[abcPath] = abcMod
         assert.ok(e instanceof SyntaxError)
-        assert.ok(/unexpected/i.test(e.message))
       })
   })
 
@@ -79,7 +78,6 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(/unexpected/i.test(e.message))
       })
   )
 
