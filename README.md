@@ -48,10 +48,12 @@ undefined
 Standard Features
 ---
 
-Defaults are important. The `@std/esm` loader strives to be as spec-compliant
-as possible while following Node’s [planned](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md)
-built-in behaviors. This means, by default, ESM requires the use of the `.mjs`
-extension.
+The `@std/esm` loader is as spec-compliant
+as possible and follows [Node’s rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
+
+:point_right: This means, by default, ESM requires the use of the `.mjs`
+extension.<br>
+:unlock: You can unlock unambiguous `.js` use with the `"esm":"js"` option.
 
 Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
@@ -62,16 +64,13 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
 * Node 4+ support
 
-*Note: You can unlock unambiguous `.js` use with the `"esm":"js"` option.*
-
 Unlockables
 ---
 
-Developers have strong opinions on just about everything. To accommodate,
-` @std/esm` allows unlocking extra features with `"@std/esm":options` or
+Unlock extra features with `"@std/esm":options` or
 `"@std":{"esm":options}` in your package.json.
 
-*Note: All options are **off** by default.*
+*Note: Options are **off** by default and may be specified as either an object or ESM mode string.*
 
 <table>
 <tr>
