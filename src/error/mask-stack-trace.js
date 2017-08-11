@@ -4,7 +4,7 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 
-const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/
+const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/m
 const removeArrowRegExp = /^.+\n *^$/m
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 
@@ -41,9 +41,13 @@ function maskStackTrace(error, sourceCode) {
 //   ...
 function maskParserStack(stack, sourceCode, filePath) {
   stack = scrubStack(stack)
+  const parts = messageRegExp.exec(stack)
 
-  const stackLines = stack.split("\n")
-  const parts = messageRegExp.exec(stackLines[0])
+  if (parts === null) {
+    // Exit early if already formatted.
+    return stack
+  }
+
   const desc = parts[1]
   const lineNum = +parts[2]
   const column = +parts[3]
@@ -59,6 +63,7 @@ function maskParserStack(stack, sourceCode, filePath) {
     "", desc
   )
 
+  const stackLines = stack.split("\n")
   stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
 }
