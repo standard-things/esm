@@ -22,8 +22,13 @@ describe("compiler", () => {
     ]
 
     tests.forEach(({ code, hint, type }) => {
-      const result = compiler.compile(code, { hint, type: "unambiguous" })
-      assert.strictEqual(result.type, type)
+      const results = [
+        compiler.compile(code, { hint, type: "unambiguous" }),
+        compiler.compile(code, { type: "module" })
+      ]
+
+      const types = results.map((result) => result.type)
+      assert.deepEqual(types, [type, "module"])
     })
   })
 

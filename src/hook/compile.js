@@ -44,7 +44,8 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const mod = args[0]
   const filePath = args[1]
   const pkgOptions = pkgInfo.options
-  const cachePath = pkgInfo.cachePath
+  const { cachePath } = pkgInfo
+  const esmType = pkgOptions.esm
 
   if (cachePath === null) {
     return func.apply(this, args)
@@ -54,7 +55,9 @@ function methodWrapper(manager, func, pkgInfo, args) {
   let hint = "script"
   let type = "script"
 
-  if (pkgOptions.esm === "js") {
+  if (esmType === "all") {
+    type = "module"
+  } else if (esmType === "js") {
     type = "unambiguous"
   }
 
@@ -65,7 +68,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
-  if (pkgOptions.esm === "mjs" && type !== "module") {
+  if (esmType === "mjs" && type !== "module") {
     return func.apply(this, args)
   }
 
