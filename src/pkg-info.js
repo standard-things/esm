@@ -21,6 +21,7 @@ const infoCache = new FastObject
 
 class PkgInfo {
   constructor(dirPath, range, options) {
+    options = typeof options === "string" ? { esm: options } : options
     options = createOptions(options, defaultOptions)
 
     if (! options.esm) {

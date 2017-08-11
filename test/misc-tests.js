@@ -25,12 +25,6 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should produce valid namespace objects for built-in modules", () =>
-    import("./misc/namespace-builtins.js")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.js")
       .then((ns) => ns.check())
@@ -151,8 +145,37 @@ describe("spec compliance", () => {
 
 describe("built-in modules", () => {
   it("should fire setters if already loaded", () =>
-    import("./misc/loaded.js")
+    import("./misc/builtin-loaded.js")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
+  )
+
+  it("should produce valid namespace objects", () =>
+    import("./misc/builtin-namespace.js")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+})
+
+describe("package.json", () => {
+  it("should not be enabled for nested node_modules", () =>
+    import("disabled")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+      })
+  )
+
+  it("should read esm package options", () =>
+    Promise.all([
+      "@std-esm-object",
+      "@std-esm-string",
+      "@std-object",
+      "@std-string"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
   )
 })

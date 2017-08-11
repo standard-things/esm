@@ -2,20 +2,6 @@ import assert from "assert"
 import compiler from "../build/compiler.js"
 
 describe("compiler", () => {
-  it("should be enabled for packages that depend on @std/esm", () =>
-    import("enabled")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should not be enabled for nested node_modules", () =>
-    import("disabled")
-      .then((ns) => ns.check())
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-      })
-  )
-
   it("should respect options.type", () => {
     const types = [void 0, "module", "unambiguous"]
 

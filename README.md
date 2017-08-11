@@ -65,8 +65,8 @@ Unlockables
 ---
 
 Developers have strong opinions on just about everything. To accommodate,
-` @std/esm` allows unlocking extra features with the `"@std/esm"` or
-`"@std":{"esm":{}}` field in your package.json.
+` @std/esm` allows unlocking extra features with `"@std/esm":options` or
+`"@std":{"esm":options}` in your package.json.
 
 *Note: All options are **off** by default.*
 
