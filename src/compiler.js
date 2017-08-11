@@ -29,15 +29,17 @@ class Compiler {
     code = stripShebang(code)
     options = createOptions(options, defaultOptions)
 
+    const { hint, type } = options
+
     const result = {
       code,
       data: null,
       type: "script"
     }
 
-    if (options.type === "unambiguous" &&
+    if (type === "unambiguous" &&
         (Parser.hasPragma(code, "use script") ||
-          (options.hint !== "module" &&
+          (hint !== "module" &&
           ! importExportRegExp.test(code) &&
           ! useModuleRegExp.test(code)))) {
       return result
@@ -65,10 +67,10 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (options.type === "module" ||
+    if (type === "module" ||
         importExportVisitor.addedImportExport ||
-        (options.type === "unambiguous" &&
-          (options.hint === "module" ||
+        (type === "unambiguous" &&
+          (hint === "module" ||
           Parser.hasPragma(code, "use module")))) {
       result.type = "module"
     }
