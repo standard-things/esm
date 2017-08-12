@@ -55,8 +55,6 @@ Promise
       return download(acornURL, acornPath, {
         extract: true,
         filter: (file) => /^(?:pack|src).*?\.(?:js|json)$/.test(file.path),
-        headers: { accept: "application/zip" },
-        mode: "666",
         strip: 1
       })
     }
