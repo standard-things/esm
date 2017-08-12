@@ -21,6 +21,7 @@ const rootPath = path.join(__dirname, "..")
 const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
 const gzipPath = path.join(rootPath, "esm.js.gz")
+const jsonPath = path.join(rootPath, "package.json")
 const vendorPath = path.join(rootPath, "src/vendor")
 
 const acornPath = path.join(vendorPath, "acorn")
@@ -34,7 +35,7 @@ const uglifyPluginPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plug
 const uglifyPath = path.join(uglifyPluginPath, "node_modules/uglify-es")
 
 const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
-const removeDepsRegExp = /,\s*"dependencies":[^]*?\}/m
+const removeDepsRegExp = /,\s*"dependencies":[^]*?\}/
 
 const trashPaths = [
   buildPath,
@@ -48,45 +49,63 @@ const webpackArgs = [
     : "--hide-modules"
 ]
 
-/* eslint consistent-return: off */
-Promise
-  .all(trashPaths.map(trash))
-  .then(() => {
-    if (! fs.pathExistsSync(acornPath)) {
-      return download(acornURL, acornPath, {
-        extract: true,
-        filter: (file) => extractFilterRegExp.test(file.path),
-        strip: 1
-      })
-    }
+function cleanJSON() {
+  // Remove dependencies field, added by npm@5, from package.json.
+  return fs
+    .readFile(jsonPath, "utf8")
+    .then((jsonText) => fs.writeFile(jsonPath, jsonText.replace(removeDepsRegExp, "")))
+}
+
+function cleanRepo() {
+  return Promise.all(trashPaths.map(trash))
+}
+
+function getAcorn() {
+  if (fs.pathExistsSync(acornPath)) {
+    return Promise.resolve()
+  }
+
+  return download(acornURL, acornPath, {
+    extract: true,
+    filter: (file) => extractFilterRegExp.test(file.path),
+    strip: 1
   })
-  .then(() => {
-    if (! fs.pathExistsSync(punycodePath)) {
-      return fs.copy(punycodePkgPath, punycodePath)
-    }
-  })
-  .then(() => execa("webpack", webpackArgs, {
+}
+
+function getPunycode() {
+  if (fs.pathExistsSync(punycodePath)) {
+    return Promise.resolve()
+  }
+
+  return fs.copy(punycodePkgPath, punycodePath)
+}
+
+function gzipBundle() {
+  /* eslint import/no-extraneous-dependencies: off */
+  const gzip = pify(require("node-zopfli").gzip)
+
+  return fs
+    .readFile(bundlePath)
+    .then((buffer) => gzip(buffer, { numiterations: 100 }))
+    .then((buffer) => fs.writeFile(gzipPath, buffer))
+}
+
+function makeBundle() {
+  return execa("webpack", webpackArgs, {
     cwd: rootPath,
     env: { NODE_ENV },
     stdio: "inherit"
-  }))
-  .catch((e) => process.exit(e.code))
-  .then(() => {
-    if (argv.prod) {
-      return Promise.all([
-        () => {
-          // Remove dependencies from package.json.
-          const jsonPath = path.join(rootPath, "package.json")
-          return fs.readFile(jsonPath, "utf8")
-            .then((jsonText) => fs.writeFile(jsonPath, jsonText.replace(removeDepsRegExp, "")))
-        },
-        () => {
-          /* eslint import/no-extraneous-dependencies: off */
-          const gzip = pify(require("node-zopfli").gzip)
-          return fs.readFile(bundlePath)
-            .then((buffer) => gzip(buffer, { numiterations: 100 }))
-            .then((buffer) => fs.writeFile(gzipPath, buffer))
-        }
-      ].map((cb) => cb()))
-    }
   })
+  .catch((e) => process.exit(e.code))
+}
+
+Promise.all([
+  cleanRepo(),
+  getAcorn(),
+  getPunycode()
+])
+.then(makeBundle)
+.then(() => argv.prod && Promise.all([
+  cleanJSON(),
+  gzipBundle()
+]))
