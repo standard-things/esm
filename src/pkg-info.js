@@ -5,7 +5,6 @@ import createOptions from "./util/create-options.js"
 import has from "./util/has.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
-import toString from "./util/to-string.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
@@ -51,7 +50,6 @@ class PkgInfo {
   }
 
   static get(dirPath) {
-    dirPath = toString(dirPath)
     if (dirPath in infoCache) {
       return infoCache[dirPath]
     }
