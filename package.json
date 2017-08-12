@@ -22,7 +22,7 @@
     "build:prod": "node script/build.js --prod",
     "clean": "node script/clean.js",
     "lint": "eslint ./*.js ./**/*.js --fix --quiet",
-    "pub": "npm publish",
+    "pub": "node script/publish.js",
     "test": "node --require ./build/esm.js script/test.js",
     "test:prod": "node --require ./index.js script/test.js"
   },
