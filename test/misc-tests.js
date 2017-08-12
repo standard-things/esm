@@ -172,7 +172,7 @@ describe("package.json", () => {
       })
   )
 
-  it("should read esm package options", () =>
+  it("should respect esm package options", () =>
     Promise.all([
       "@std-esm-object",
       "@std-esm-string",
