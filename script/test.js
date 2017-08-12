@@ -23,9 +23,7 @@ const NODE_PATH = join(envPath, "node_path")
 
 const trashPaths = globby.sync([
   "**/.?(esm-)cache",
-  "test/**/*.gz",
-  "test/env/prefix/bin",
-  "test/env/prefix/node"
+  "test/**/*.gz"
 ], {
   cwd: rootPath,
   realpath: true
@@ -42,6 +40,10 @@ if (satisfies(process.version, "<6")) {
   mochaArgs.splice(mochaArgs.length - 1, 0, "--compilers", "js:babel-register")
 }
 
+function cleanRepo() {
+  return Promise.all(trashPaths.map(trash))
+}
+
 function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
@@ -51,12 +53,18 @@ function runTests() {
   .catch((e) => process.exit(e.code))
 }
 
+function setupNode() {
+  const basePath = join(NODE_BIN, isWin ? "" : "..")
+  return trash(basePath)
+    .then(() => ensureLink(process.execPath, NODE_BIN))
+}
+
 /* eslint lines-around-comment: off */
 Promise
-  // Clear cache folders for first run.
-  .all(trashPaths.map(trash))
-  // Create Node symlink.
-  .then(() => ensureLink(process.execPath, NODE_BIN))
+  .all([
+    cleanRepo(),
+    setupNode()
+  ])
   // Run tests without the cache.
   .then(runTests)
   // Run tests with the cache.
