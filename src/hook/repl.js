@@ -72,7 +72,7 @@ if (rootModule.filename === null &&
 
     output =
       '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
-      "||[module.exports,module.exports={}][0];" + output
+      "||[module.exports,module.exports=module.exports.entry.exports][0];" + output
 
     const result = tryWrapper(func, [output, options])
 
@@ -87,5 +87,7 @@ if (rootModule.filename === null &&
 
   Wrapper.manage(vm, "createScript", managerWrapper)
   Wrapper.wrap(vm, "createScript", methodWrapper)
-  Runtime.enable(rootModule)
+
+  const exported = Object.create(null)
+  Runtime.enable(rootModule, exported, pkgInfo.options)
 }
