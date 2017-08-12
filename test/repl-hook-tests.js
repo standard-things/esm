@@ -8,27 +8,7 @@ import vm from "vm"
 const context = vm.createContext({ module })
 
 describe("REPL", () => {
-  it("should work with global context", (done) => {
-    const r = repl.start({ useGlobal: true })
-
-    r.context.module.exports = {}
-    Runtime.enable(r.context.module)
-
-    assert.strictEqual(typeof globalAssert, "undefined")
-
-    r.eval(
-      'import { default as globalAssert } from "assert"',
-      null, // Context.
-      "repl",
-      () => {
-        /* global assertStrictEqual: false */
-        assert.strictEqual(typeof globalAssert, "function")
-        done()
-      }
-    )
-  })
-
-  it("should work with non-global context", (done) => {
+  it("should work with a non-global context", (done) => {
     const r = repl.start()
 
     r.eval(
@@ -64,5 +44,25 @@ describe("REPL", () => {
         done()
       })
     })
+  })
+
+  it("should work with a global context", (done) => {
+    const r = repl.start({ useGlobal: true })
+
+    r.context.module.exports = {}
+    Runtime.enable(r.context.module)
+
+    assert.strictEqual(typeof globalAssert, "undefined")
+
+    r.eval(
+      'import { default as globalAssert } from "assert"',
+      null, // Context.
+      "repl",
+      () => {
+        /* global assertStrictEqual: false */
+        assert.strictEqual(typeof globalAssert, "function")
+        done()
+      }
+    )
   })
 })
