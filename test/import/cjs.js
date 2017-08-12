@@ -33,7 +33,9 @@ export function check() {
   assert.strictEqual(udef, void 0)
   assert.strictEqual(uns.default, udef)
 
-  add(10)
+  add(5)
+  add(5)
+
   assert.strictEqual(value, 10)
   assert.strictEqual(reset(), 0)
   assert.strictEqual(value, 0)
@@ -46,6 +48,7 @@ export function check() {
   assert.strictEqual(getSet.safe, "so safe")
 
   const desc = Object.getOwnPropertyDescriptor(getSet, "safe")
+
   assert.ok("get" in desc)
   assert.ok("set" in desc)
 }
