@@ -7,6 +7,7 @@
   "license": "MIT",
   "author": "John-David Dalton <john.david.dalton@gmail.com>",
   "main": "index.js",
+  "private": true,
   "engines": {
     "node": ">=4"
   },
