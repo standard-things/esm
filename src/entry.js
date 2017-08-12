@@ -311,7 +311,7 @@ function forEachSetter(entry, callback) {
     }
 
     for (const setter of setters) {
-      const value = getExportByName(setter.parent, entry, name)
+      const value = getExportByName(entry, setter, name)
       if (entry._changed || changed(setter, name, value)) {
         callback(setter, value)
       }
@@ -321,8 +321,8 @@ function forEachSetter(entry, callback) {
   entry._changed = false
 }
 
-function getExportByName(parent, entry, name) {
-  const { options } = parent
+function getExportByName(entry, setter, name) {
+  const { options } = setter.parent
   const { _namespace, sourceType } = entry
 
   if (name === "*") {
@@ -341,6 +341,9 @@ function getExportByName(parent, entry, name) {
   if ((entry._loaded && ! (name in _namespace)) ||
       (entry.sourceType !== "module" && ! options.cjs)) {
     const moduleName = getModuleName(entry.module)
+
+    // Remove bogus setter to unblock other imports.
+    delete entry.setters[name]
 
     throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + name + "'")

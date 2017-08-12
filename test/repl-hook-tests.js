@@ -5,6 +5,8 @@ import module from "./repl/module.js"
 import repl from "repl"
 import vm from "vm"
 
+const context = vm.createContext({ module })
+
 describe("REPL", () => {
   it("should work with global context", (done) => {
     const r = repl.start({ useGlobal: true })
@@ -27,11 +29,7 @@ describe("REPL", () => {
   })
 
   it("should work with non-global context", (done) => {
-    const r = repl.start({ useGlobal: false })
-    const context = vm.createContext({ module })
-
-    module.exports = {}
-    Runtime.enable(module)
+    const r = repl.start()
 
     r.eval(
       'import { default as localAssert } from "assert"',
@@ -42,5 +40,29 @@ describe("REPL", () => {
         done()
       }
     )
+  })
+
+  it("should recover from import errors", (done) => {
+    const r = repl.start({
+      eval(code, callback) {
+        let error = null
+        try {
+          vm.createScript(code)
+            .runInContext(context)
+        } catch (e) {
+         error = e
+        }
+        callback(error)
+      }
+    })
+
+    r.eval('import { bogus } from "path"', (e) => {
+      assert.ok(e.message.includes("' does not provide an export named '"))
+
+      r.eval('import { join } from "path"', (e) => {
+        assert.ok(e === null)
+        done()
+      })
+    })
   })
 })
