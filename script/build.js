@@ -33,6 +33,7 @@ const punycodePkgPath = path.dirname(require.resolve("punycode/package.json"))
 const uglifyPluginPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plugin")
 const uglifyPath = path.join(uglifyPluginPath, "node_modules/uglify-es")
 
+const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
 const removeDepsRegExp = /,\s*"dependencies":[^]*?\}/m
 
 const trashPaths = [
@@ -54,7 +55,7 @@ Promise
     if (! fs.pathExistsSync(acornPath)) {
       return download(acornURL, acornPath, {
         extract: true,
-        filter: (file) => /^(?:pack|src).*?\.(?:js|json)$/.test(file.path),
+        filter: (file) => extractFilterRegExp.test(file.path),
         strip: 1
       })
     }
