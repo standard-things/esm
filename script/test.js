@@ -57,6 +57,7 @@ Promise
   .all(trashPaths.map(trash))
   // Create Node symlink.
   .then(() => ensureLink(process.execPath, NODE_BIN))
-  // Run tests again using the cache.
+  // Run tests without the cache.
   .then(runTests)
+  // Run tests with the cache.
   .then(runTests)
