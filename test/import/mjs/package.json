@@ -1,0 +1,10 @@
+{
+  "name": "mjs",
+  "private": true,
+  "@std/esm": {
+    "debug": true
+  },
+  "dependencies": {
+    "@std/esm": "*"
+  }
+}

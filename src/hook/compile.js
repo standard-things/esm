@@ -68,10 +68,6 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
-  if (esmType === "mjs" && type !== "module") {
-    return func.apply(this, args)
-  }
-
   const { cache } = pkgInfo
   const cacheKey = mtime(filePath)
   const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)

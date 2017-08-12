@@ -58,6 +58,12 @@ describe("spec compliance", () => {
       })
   )
 
+  it("should support loading ESM from dynamic import in CJS", (done) => {
+    import("./import/mjs/cjs-import.js")
+      .then((ns) => ns.default(done))
+      .catch((e) => assert.ifError(e))
+  })
+
   it("should not support loading ESM from require", () => {
     const abcPath = Module._resolveFilename("./fixture/export/abc.js")
     const abcMod = Module._cache[abcPath]
