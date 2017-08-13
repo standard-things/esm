@@ -117,7 +117,7 @@ Unlock extra features with `"@std/esm":options` or
 </tr>
 <tr>
   <td colspan="2">
-  <pre><code>  }
+  <pre><code>  }
 }</code></pre>
   </td>
   </tr>
