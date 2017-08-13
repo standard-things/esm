@@ -73,17 +73,17 @@ describe("spec compliance", () => {
 
     return import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => {
+      .catch(({ code }) => {
         Module._cache[abcPath] = abcMod
-        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
+        assert.strictEqual(code, "ERR_REQUIRE_ESM")
       })
   })
 
   it("should not support loading ESM from require if already loaded", () =>
     import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
+      .catch(({ code }) => {
+        assert.strictEqual(code, "ERR_REQUIRE_ESM")
       })
   )
 

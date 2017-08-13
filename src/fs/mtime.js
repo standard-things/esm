@@ -18,8 +18,8 @@ function mtime(filePath) {
   if (useMtimeFastPath) {
     try {
       return fastPathMtime(filePath)
-    } catch (e) {
-      if (e.code === "ENOENT") {
+    } catch ({ code }) {
+      if (code === "ENOENT") {
         return -1
       }
       useMtimeFastPath = false

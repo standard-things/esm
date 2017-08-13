@@ -117,7 +117,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+        .catch(({ code }) => assert.strictEqual(code, "MODULE_NOT_FOUND"))
     ))
   )
 
@@ -130,7 +130,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+        .catch(({ code }) => assert.strictEqual(code, "MODULE_NOT_FOUND"))
     ))
   )
 })

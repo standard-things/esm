@@ -36,8 +36,8 @@ describe("REPL", () => {
       }
     })
 
-    r.eval('import { bogus } from "path"', (e) => {
-      assert.ok(e.message.includes("' does not provide an export named '"))
+    r.eval('import { bogus } from "path"', ({ message }) => {
+      assert.ok(message.includes("' does not provide an export named '"))
 
       r.eval('import { join } from "path"', (e) => {
         assert.ok(e === null)
