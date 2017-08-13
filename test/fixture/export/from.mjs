@@ -1,0 +1,5 @@
+export { a } from "./abc.mjs"
+export { b, c } from "./abc.mjs"
+export { a as aa } from "./abc.mjs"
+export { a as default, b as bb } from "./abc.mjs"
+export { default as def2 } from "./abc.mjs"

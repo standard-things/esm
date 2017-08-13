@@ -1,9 +1,10 @@
 {
-  "name": "test",
+  "name": "import",
   "private": true,
   "@std/esm": {
-    "cache": ".cache/for/tests",
-    "debug": true
+    "cjs": true,
+    "debug": true,
+    "esm": "js"
   },
   "dependencies": {
     "@std/esm": "*"

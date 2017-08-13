@@ -33,7 +33,7 @@ const mochaArgs = [
   MOCHA_BIN,
   "--full-trace",
   "--require", esmPath,
-  "tests.js"
+  "tests.mjs"
 ]
 
 if (satisfies(process.version, "<6")) {

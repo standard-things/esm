@@ -1,1 +1,1 @@
-require("../fixture/export/abc.js")
+require("../fixture/export/abc.mjs")

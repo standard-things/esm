@@ -4,7 +4,7 @@ import {
   def1, def2, def3, def4, def5,
   ns1, ns2, ns3, ns4, ns5,
   a, b, c, d, e
-} from "../fixture/extension/import.js"
+} from "../fixture/extension/export.mjs"
 
 export function check() {
   const abcNs = {

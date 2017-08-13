@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = require("../live.js")
+module.exports = require("../live.mjs")
