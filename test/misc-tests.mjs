@@ -2,9 +2,6 @@ import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
-import helper from "./helper.js"
-
-const register = helper.register
 
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
@@ -68,22 +65,21 @@ describe("spec compliance", () => {
     const abcPath = Module._resolveFilename("./fixture/export/abc.mjs")
     const abcMod = Module._cache[abcPath]
 
-    register.init()
     delete Module._cache[abcPath]
 
     return import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch(({ code }) => {
+      .catch((e) => {
         Module._cache[abcPath] = abcMod
-        assert.strictEqual(code, "ERR_REQUIRE_ESM")
+        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
       })
   })
 
   it("should not support loading ESM from require if already loaded", () =>
     import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch(({ code }) => {
-        assert.strictEqual(code, "ERR_REQUIRE_ESM")
+      .catch((e) => {
+        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
       })
   )
 

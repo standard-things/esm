@@ -33,7 +33,6 @@
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-for-of-as-array": "^1.0.3",
     "babel-preset-env": "^1.6.0",
-    "babel-register": "^6.24.1",
     "download": "^6.2.5",
     "eslint": "^4.4.1",
     "eslint-plugin-import": "^2.7.0",

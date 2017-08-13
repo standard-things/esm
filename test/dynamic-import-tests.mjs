@@ -1,9 +1,7 @@
 import assert from "assert"
 import compiler from "../build/compiler.js"
-import helper from "./helper.js"
 import path from "path"
 
-const __dirname = helper.__dirname
 const isWin = process.platform === "win32"
 
 const abcId = "./fixture/export/abc.mjs"
@@ -45,7 +43,7 @@ describe("dynamic import", () => {
   )
 
   it("should support the file protocol", () =>
-    import("file:" + (isWin ? "///" : "//") + path.join(__dirname, abcId))
+    import("file:" + (isWin ? "///" : "//") + path.resolve(abcId))
       .then((ns) => assert.deepEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
@@ -117,7 +115,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch(({ code }) => assert.strictEqual(code, "MODULE_NOT_FOUND"))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
   )
 
@@ -130,7 +128,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch(({ code }) => assert.strictEqual(code, "MODULE_NOT_FOUND"))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
   )
 })

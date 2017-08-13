@@ -2,7 +2,6 @@ import { ensureLink } from "fs-extra"
 import execa from "execa"
 import globby from "globby"
 import { join } from "path"
-import { satisfies } from "semver"
 import trash from "trash"
 
 const NODE_ENV = String(process.env.NODE_ENV)
@@ -35,10 +34,6 @@ const mochaArgs = [
   "--require", esmPath,
   "tests.mjs"
 ]
-
-if (satisfies(process.version, "<6")) {
-  mochaArgs.splice(mochaArgs.length - 1, 0, "--compilers", "js:babel-register")
-}
 
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))

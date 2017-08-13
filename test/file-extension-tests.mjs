@@ -1,19 +1,15 @@
 import assert from "assert"
 import fs from "fs"
-import helper from "./helper.js"
 import path from "path"
 import zlib from "zlib"
 
-const { __dirname } = helper
-const fixturePath = path.join(__dirname, "file-extension")
-
-const content = fs.readFileSync(path.join(fixturePath, "a.mjs"))
+const content = fs.readFileSync("./file-extension/a.mjs")
 const gzipped = zlib.gzipSync(content)
 
 describe("file extension", () =>
   [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((ext) => {
     const abcNs = { a: "a", b: "b", c: "c" }
-    const modulePath = path.join(fixturePath, "a" + ext)
+    const modulePath = "./file-extension/a" + ext
 
     if (ext.endsWith(".gz") && ! fs.existsSync(modulePath)) {
       fs.writeFileSync(modulePath, gzipped)

@@ -1,7 +1,3 @@
-import helper from "./helper.js"
-
-helper.register.init()
-
 import "./import-tests.mjs"
 import "./dynamic-import-tests.mjs"
 import "./export-tests.mjs"
