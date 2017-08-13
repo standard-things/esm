@@ -81,7 +81,7 @@ function getPunycode() {
 }
 
 function gzipBundle() {
-  /* eslint import/no-extraneous-dependencies: off */
+  // eslint-disable-next-line import/no-extraneous-dependencies
   const gzip = pify(require("node-zopfli").gzip)
 
   return fs

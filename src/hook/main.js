@@ -39,8 +39,8 @@ if (rootModule.id === "internal/preload" ||
   }
 
   const methodWrapper = function (manager, func, filePath, args) {
-     /* eslint consistent-return: off */
     if (! filePath.endsWith(".mjs")) {
+      // eslint-disable-next-line consistent-return
       return func.apply(this, args)
     }
 

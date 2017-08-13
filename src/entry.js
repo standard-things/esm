@@ -22,8 +22,8 @@ const toStringTagDescriptor = {
 }
 
 class Entry {
-  /* eslint lines-around-comment: off */
   constructor(mod, exported, options) {
+    /* eslint-disable lines-around-comment */
     // A boolean indicating whether the module namespace has changed.
     this._changed = true
     // A number indicating the loading state of the module.
@@ -50,6 +50,7 @@ class Entry {
     this.setters = Object.create(null)
     // Set the default source type.
     this.sourceType = getSourceType(exported)
+    /* eslint-enable lines-around-comment */
   }
 
   static get(mod, exported, options) {

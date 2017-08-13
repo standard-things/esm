@@ -40,7 +40,6 @@ function managerWrapper(manager, func, args) {
 }
 
 function methodWrapper(manager, func, pkgInfo, args) {
-  /* eslint consistent-return: off */
   const mod = args[0]
   const filePath = args[1]
   const pkgOptions = pkgInfo.options
@@ -48,6 +47,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const esmType = pkgOptions.esm
 
   if (cachePath === null) {
+    // eslint-disable-next-line consistent-return
     return func.apply(this, args)
   }
 

@@ -17,7 +17,7 @@ const NODE_ENV = String(process.env.NODE_ENV)
 const isProduction = NODE_ENV.startsWith("production")
 const isTest = NODE_ENV.endsWith("test")
 
-/* eslint sort-keys: off */
+/* eslint-disable sort-keys */
 const config = {
   target: "node",
   entry: {
@@ -59,6 +59,7 @@ const config = {
     })
   ]
 }
+/* eslint-enable sort-keys */
 
 if (isProduction) {
   config.plugins.push(

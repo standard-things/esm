@@ -52,7 +52,7 @@ describe("dynamic import", () => {
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
     import
-    /* eslint no-unexpected-multiline: off */
+    // eslint-disable-next-line no-unexpected-multiline
     (
     "./fixture/export/abc.mjs"
     )

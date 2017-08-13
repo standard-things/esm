@@ -1,4 +1,4 @@
-/* eslint no-var: off */
+// eslint-disable-next-line no-var
 export var value = reset()
 
 export function add(n) {

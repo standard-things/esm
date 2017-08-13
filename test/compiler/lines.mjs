@@ -1,11 +1,11 @@
 import
-  /* eslint brace-style: off */
+
   assert
 
 from "assert"
 
 export
-
+// eslint-disable-next-line brace-style
 function check()
 
 {

@@ -59,7 +59,7 @@ function setupNode() {
     .then(() => ensureLink(process.execPath, NODE_BIN))
 }
 
-/* eslint lines-around-comment: off */
+/* eslint-disable lines-around-comment */
 Promise
   .all([
     cleanRepo(),
