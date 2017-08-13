@@ -9,7 +9,7 @@ const context = vm.createContext({ module })
 
 describe("REPL", () => {
   it("should work with a non-global context", (done) => {
-    const r = repl.start()
+    const r = repl.start({})
 
     r.eval(
       'import { default as localAssert } from "assert"',
@@ -28,7 +28,7 @@ describe("REPL", () => {
         let error = null
         try {
           vm.createScript(code)
-            .runInContext(context)
+            .runInContext(context, { displayErrors: false })
         } catch (e) {
          error = e
         }
@@ -36,8 +36,8 @@ describe("REPL", () => {
       }
     })
 
-    r.eval('import { bogus } from "path"', ({ message }) => {
-      assert.ok(message.includes("' does not provide an export named '"))
+    r.eval('import { bogus } from "path"', (e) => {
+      assert.ok(e.message.includes("' does not provide an export named '"))
 
       r.eval('import { join } from "path"', (e) => {
         assert.ok(e === null)
