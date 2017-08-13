@@ -12,7 +12,7 @@ Getting started
   1. Run `npm i --save @std/esm` in your app or package directory.
   2. Call `require("@std/esm")` before importing ES modules.
 
-     ##### index.js
+     **index.js**
      ```js
      require("@std/esm")
      module.exports = require("./main.mjs").default
