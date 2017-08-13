@@ -50,7 +50,7 @@ function runTests() {
     env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH },
     stdio: "inherit"
   })
-  .catch(({ code }) => process.exit(code))
+  .catch((e) => process.exit(e.code))
 }
 
 function setupNode() {
