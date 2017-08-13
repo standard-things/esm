@@ -4,11 +4,11 @@ import fs from "fs"
 import globby from "globby"
 import path from "path"
 
-const files = globby.sync(["output/**/*.js"])
+const files = globby.sync(["output/**/*.mjs"])
 const tests = files.reduce((tests, relPath) => {
   const parts = relPath.split("/")
   const name = parts[1]
-  const type = path.basename(parts[2], ".js")
+  const type = path.basename(parts[2], ".mjs")
 
   if (! tests[name]) {
     tests[name] = Object.create(null)

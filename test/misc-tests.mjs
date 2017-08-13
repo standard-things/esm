@@ -59,7 +59,7 @@ describe("spec compliance", () => {
   )
 
   it("should support loading ESM from dynamic import in CJS", (done) => {
-    import("./import/mjs/cjs-import.js")
+    import("./import/cjs-import.js")
       .then((ns) => ns.default(done))
       .catch((e) => assert.ifError(e))
   })
