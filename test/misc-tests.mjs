@@ -75,7 +75,7 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         Module._cache[abcPath] = abcMod
-        assert.ok(e instanceof SyntaxError)
+        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
       })
   })
 
@@ -83,7 +83,7 @@ describe("spec compliance", () => {
     import("./misc/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
+        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
       })
   )
 

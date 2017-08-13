@@ -53,7 +53,8 @@ class Compiler {
 
     importExportVisitor.visit(rootPath, code, {
       generateVarDeclarations: options.var,
-      runtimeAlias: options.runtimeAlias
+      runtimeAlias: options.runtimeAlias,
+      sourceType: type
     })
 
     if (importExportVisitor.addedImportExport) {

@@ -34,6 +34,7 @@ class ImportExportVisitor extends Visitor {
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
+    this.sourceType = options.sourceType
   }
 
   visitCallExpression(path) {
@@ -49,6 +50,10 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitImportDeclaration(path) {
+    if (this.sourceType === "script") {
+      return
+    }
+
     this.addedImportExport = true
 
     let i = -1
@@ -79,6 +84,10 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportAllDeclaration(path) {
+    if (this.sourceType === "script") {
+      return
+    }
+
     this.addedImportExport = true
 
     const decl = path.getValue()
@@ -98,6 +107,10 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportDefaultDeclaration(path) {
+    if (this.sourceType === "script") {
+      return
+    }
+
     this.addedImportExport = true
 
     const decl = path.getValue()
@@ -139,6 +152,10 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportNamedDeclaration(path) {
+    if (this.sourceType === "script") {
+      return
+    }
+
     this.addedImportExport = true
 
     const decl = path.getValue()
