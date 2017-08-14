@@ -34,7 +34,7 @@ function getMessage(key, args) {
 }
 
 function moduleNotFound(id, fromPath, foundPath) {
-  let message = "Module " + quote(id) + "not found"
+  let message = "Module " + quote(id) + " not found"
 
   if (typeof fromPath === "string" &&
       typeof foundPath === "string") {
