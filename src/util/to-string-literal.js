@@ -1,3 +1,5 @@
+import toString from "./to-string.js"
+
 const escapeRegExpMap = {
   "'": /\\?'/g,
   "`": /\\?`/g
@@ -17,7 +19,7 @@ const escapedDoubleQuoteRegExp = /\\"/g
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'
-  const string = JSON.stringify(value)
+  const string = JSON.stringify(toString(value))
 
   if (quote === '"' &&
       string.charCodeAt(0) === codeOfDoubleQuote) {
