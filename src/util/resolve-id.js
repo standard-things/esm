@@ -17,7 +17,7 @@ const pathMode = isWin ? "win32" : "posix"
 const queryHashRegExp = /[?#].+$/
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
-function resolveId(id, parent) {
+function resolveId(id, parent, options) {
   if (! id ||
       typeof id !== "string" ||
       id in builtinModules ||
@@ -46,19 +46,24 @@ function resolveId(id, parent) {
         return resolveCache[cacheKey] = foundPath
       }
     } else {
+      let foundPath
       const decodedId = decodeURI(id.replace(queryHashRegExp, ""))
 
-      // Prevent resolving non-local dependencies:
-      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      const paths = _nodeModulePaths(fromPath)
+      if (options && options.cjs)  {
+        foundPath = resolvePath(decodedId, parent)
+      } else {
+        // Prevent resolving non-local dependencies:
+        // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
+        const paths = _nodeModulePaths(fromPath)
 
-      // Hack: Overwrite `path.concat()` to prevent global paths from being
-      // concatenated.
-      paths.concat = () => paths
+        // Hack: Overwrite `path.concat()` to prevent global paths from being
+        // concatenated.
+        paths.concat = () => paths
 
-      // Ensure a parent id and filename are provided to avoid going down the
-      // --eval branch of `Module._resolveLookupPaths()`.
-      const foundPath = resolvePath(decodedId, { filename, id: "<mock>", paths })
+        // Ensure a parent id and filename are provided to avoid going down the
+        // --eval branch of `Module._resolveLookupPaths()`.
+        foundPath = resolvePath(decodedId, { filename, id: "<mock>", paths })
+      }
 
       if (foundPath) {
         return resolveCache[cacheKey] = foundPath

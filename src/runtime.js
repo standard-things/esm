@@ -130,18 +130,19 @@ class Runtime {
   watch(id, setterPairs) {
     let child
     const { entry } = this
+    const { children, options } = entry
     const parent = this.module
 
     if (id in builtinModules) {
       child = builtinModules[id]
     } else {
-      id = resolveId(id, parent)
+      id = resolveId(id, parent, options)
       parent.require(id)
       id = _resolveFilename(id, parent)
       child = Module._cache[id]
     }
 
-    const childEntry = entry.children[id] = Entry.get(child)
+    const childEntry = children[id] = Entry.get(child)
     childEntry.loaded()
 
     if (setterPairs !== void 0) {
