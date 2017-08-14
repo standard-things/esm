@@ -83,7 +83,7 @@ class PkgInfo {
       return null
     }
 
-    let options
+    let options = null
     if (has(pkgJSON, "@std/esm")) {
       options = pkgJSON["@std/esm"]
     } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
@@ -107,7 +107,11 @@ class PkgInfo {
       getRange(pkgJSON, "devDependencies")
 
     if (range === null) {
-      return null
+      if (options !== null) {
+        range = "*"
+      } else {
+        return null
+      }
     }
 
     return new PkgInfo(dirPath, range, options)
