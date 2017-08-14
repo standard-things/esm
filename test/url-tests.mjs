@@ -58,18 +58,18 @@ describe("URL parsing", () => {
     })
   })
 
-  it("should not resolve URLs with other protocols", () => {
-    const urls = [
+  it("should not resolve URLs with other protocols", () =>
+    Promise.all([
       "about:blank",
       "ftp://example.com/",
       "http://example.com/",
       "https://example.com/"
-    ]
-
-    modes.forEach((mode) => {
-      urls.forEach((url) => {
-        assert.strictEqual(urlToPath(url, mode), "")
-      })
-    })
-  })
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL")
+        })
+    ))
+  )
 })
