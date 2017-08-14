@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import isError from "../util/is-error.js"
 
 const {
   arrow_message_private_symbol,
@@ -13,6 +14,10 @@ const useDecorateErrorStack = typeof decorateErrorStack === "function"
 const useSetHiddenValue = typeof setHiddenValue === "function"
 
 function decorateStackTrace(error) {
+  if (! isError(error)) {
+    return error
+  }
+
   if (useSetHiddenValue) {
     if (useArrowMessageSymbol) {
       setHiddenValue(error, arrow_message_private_symbol, "")

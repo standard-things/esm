@@ -1,4 +1,5 @@
 import decorateStackTrace from "./decorate-stack-trace.js"
+import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
@@ -9,6 +10,10 @@ const removeArrowRegExp = /^.+\n *^$/m
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 
 function maskStackTrace(error, sourceCode) {
+  if (! isError(error)) {
+    return error
+  }
+
   decorateStackTrace(error)
   const stack = error.stack
 
