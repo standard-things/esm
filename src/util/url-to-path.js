@@ -11,6 +11,7 @@ const API = {
 }
 
 const codeOfColon = ":".charCodeAt(0)
+const localhostRegExp = /^\/\/localhost\b/
 const { toUnicode } = punycode
 
 function urlToPath(url, mode = "posix") {
@@ -18,9 +19,19 @@ function urlToPath(url, mode = "posix") {
   const parsed = typeof url === "string" ? parse(url) : url
   let { pathname } = parsed
 
-  if (! pathname ||
-      parsed.protocol !== "file:" ||
-      encodedSlash(pathname)) {
+  if (! pathname) {
+    return ""
+  }
+
+  if (parsed.protocol !== "file:") {
+    if (localhostRegExp.test(pathname)) {
+      pathname = pathname.slice(11)
+    } else {
+      return ""
+    }
+  }
+
+  if (encodedSlash(pathname)) {
     return ""
   }
 

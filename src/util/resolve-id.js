@@ -15,6 +15,7 @@ const resolveCache = new FastObject
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
+const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].+$/
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
@@ -41,14 +42,15 @@ function resolveId(id, parent, options) {
   const fromPath = dirname(filename)
 
   if (! encodedSlash(id, pathMode)) {
-    if (! idIsPath && id.includes(":")) {
+    if (! idIsPath && id.includes("//")) {
       const parsed = parse(id)
+      let foundPath = urlToPath(parsed, pathMode)
 
-      if (parsed.protocol !== "file:") {
+      if (! foundPath &&
+          parsed.protocol !== "file:" &&
+          ! localhostRegExp.test(id)) {
         throw new NodeError("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
       }
-
-      let foundPath = urlToPath(parsed, pathMode)
 
       if (foundPath) {
         foundPath = resolvePath(foundPath, parent)

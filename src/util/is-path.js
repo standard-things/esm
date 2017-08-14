@@ -21,7 +21,7 @@ function isPath(value) {
       ((code0 > 64 && code0 < 91) || (code0 > 96 && code0 < 123))
   }
 
-  return code0 === codeOfSlash
+  return code0 === codeOfSlash && code1 !== codeOfSlash
 }
 
 export default isPath
