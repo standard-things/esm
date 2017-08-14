@@ -297,12 +297,9 @@ function compare(object, key, value) {
 // Note: forEachSetter() does not call setters directly, only the given callback.
 function forEachSetter(entry, callback) {
   entry._changed = false
+  runGetters(entry)
 
   const names = keys(entry.setters)
-
-  if (names.length) {
-    runGetters(entry)
-  }
 
   for (const name of names) {
     const setters = entry.setters[name]
@@ -313,6 +310,7 @@ function forEachSetter(entry, callback) {
 
     for (const setter of setters) {
       const value = getExportByName(entry, setter, name)
+
       if (entry._changed || changed(setter, name, value)) {
         callback(setter, value)
       }

@@ -94,13 +94,6 @@ class Runtime {
     newEntry.update().loaded()
 
     Entry.set(mod.exports, entry.merge(newEntry))
-
-    if (options.cjs) {
-      const getterPairs = keys(mod.exports)
-        .map((key) => [key, () => mod.exports[key]])
-
-      entry.addGetters(getterPairs)
-    }
   }
 
   // Platform-specific code should find a way to call this method whenever
