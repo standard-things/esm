@@ -58,12 +58,9 @@ function resolveId(id, parent, options) {
         return resolveCache[cacheKey] = foundPath
       }
     } else {
-      let foundPath
-      const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
+      let fromParent = parent
 
-      if (options && options.cjs)  {
-        foundPath = resolvePath(decodedId, parent)
-      } else {
+      if (! options.cjs)  {
         // Prevent resolving non-local dependencies:
         // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
         const paths = _nodeModulePaths(fromPath)
@@ -74,8 +71,11 @@ function resolveId(id, parent, options) {
 
         // Ensure a parent id and filename are provided to avoid going down the
         // --eval branch of `Module._resolveLookupPaths()`.
-        foundPath = resolvePath(decodedId, { filename, id: "<mock>", paths })
+        fromParent = { filename, id: "<mock>", paths }
       }
+
+      const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
+      const foundPath = resolvePath(decodedId, fromParent)
 
       if (foundPath) {
         return resolveCache[cacheKey] = foundPath
