@@ -3,7 +3,7 @@ import FastObject from "../fast-object.js"
 import NodeError from "../node-error.js"
 
 import builtinModules from "../builtin-modules.js"
-import decodeURI from "./decode-uri.js"
+import decodeURIComponent from "./decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
@@ -47,7 +47,7 @@ function resolveId(id, parent, options) {
       }
     } else {
       let foundPath
-      const decodedId = decodeURI(id.replace(queryHashRegExp, ""))
+      const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
 
       if (options && options.cjs)  {
         foundPath = resolvePath(decodedId, parent)

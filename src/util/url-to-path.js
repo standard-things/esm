@@ -1,6 +1,6 @@
 import { posix, win32 } from "path"
 
-import decodeURI from "./decode-uri.js"
+import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
 import { parse } from "url"
 import punycode from "../vendor/punycode/punycode.es6.js"
@@ -16,7 +16,7 @@ const { toUnicode } = punycode
 function urlToPath(url, mode = "posix") {
   const { normalize } = API[mode]
   const parsed = parse(url)
-  const pathname = decodeURI(parsed.pathname)
+  let { pathname } = parsed
 
   if (! pathname ||
       parsed.protocol !== "file:" ||
@@ -25,6 +25,7 @@ function urlToPath(url, mode = "posix") {
   }
 
   let { host } = parsed
+  pathname = decodeURIComponent(pathname)
 
   // Section 2: Syntax
   // https://tools.ietf.org/html/rfc8089#section-2
