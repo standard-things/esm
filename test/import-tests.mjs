@@ -37,7 +37,7 @@ describe("import declarations", () => {
   it("should not parse URL ids with encoded slashes", () =>
     import("./import/unparsable.mjs")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+      .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
   )
 
   xit("should support import extensions", () =>

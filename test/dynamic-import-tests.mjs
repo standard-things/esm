@@ -115,7 +115,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+        .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
     ))
   )
 
@@ -128,7 +128,7 @@ describe("dynamic import", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
     ))
   )
 })

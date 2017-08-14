@@ -15,7 +15,7 @@ const { toUnicode } = punycode
 
 function urlToPath(url, mode = "posix") {
   const { normalize } = API[mode]
-  const parsed = parse(url)
+  const parsed = typeof url === "string" ? parse(url) : url
   let { pathname } = parsed
 
   if (! pathname ||

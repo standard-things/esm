@@ -4,8 +4,10 @@ import toStringLiteral from "./util/to-string-literal.js"
 const codeSym = Symbol.for("@std/esm:errorCode")
 const messageMap = new Map
 
+messageMap.set("ERR_INVALID_PROTOCOL", invalidProtocol)
+messageMap.set("ERR_MISSING_MODULE", "Cannot find module %s")
+messageMap.set("ERR_MODULE_RESOLUTION_DEPRECATED", "%s not found by import in %s. Deprecated behavior in require would have found it at %s")
 messageMap.set("ERR_REQUIRE_ESM", "Must use import to load ES Module: %s")
-messageMap.set("MODULE_NOT_FOUND", moduleNotFound)
 
 class NodeError extends Error {
   constructor(key, ...args) {
@@ -33,16 +35,9 @@ function getMessage(key, args) {
   return String(format(...args))
 }
 
-function moduleNotFound(id, fromPath, foundPath) {
-  let message = "Module " + quote(id) + " not found"
-
-  if (typeof fromPath === "string" &&
-      typeof foundPath === "string") {
-    message += " by `import` in " + quote(fromPath) +
-      ", but would be found by `require` at " + quote(foundPath)
-  }
-
-  return message
+function invalidProtocol(protocol, expectedProtocol) {
+  return "Protocol " + quote(protocol) +
+    " not supported. Expected " + quote(expectedProtocol)
 }
 
 function quote(value) {

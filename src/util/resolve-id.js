@@ -7,6 +7,7 @@ import decodeURIComponent from "./decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
 import isPath from "./is-path.js"
+import { parse } from "url"
 import urlToPath from "./url-to-path.js"
 
 const resolveCache = new FastObject
@@ -36,7 +37,13 @@ function resolveId(id, parent, options) {
 
   if (! encodedSlash(id, pathMode)) {
     if (id.includes(":")) {
-      let foundPath = urlToPath(id, pathMode)
+      const parsed = parse(id)
+
+      if (parsed.protocol !== "file:") {
+        throw new NodeError("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
+      }
+
+      let foundPath = urlToPath(parsed, pathMode)
 
       if (foundPath) {
         foundPath = resolvePath(foundPath, parent)
@@ -71,14 +78,13 @@ function resolveId(id, parent, options) {
     }
   }
 
-  const errorArgs = [id]
   const foundPath = resolvePath(id, parent)
 
   if (foundPath) {
-    errorArgs.push(fromPath, foundPath)
+    throw new NodeError("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
+  } else {
+    throw new NodeError("ERR_MISSING_MODULE", id)
   }
-
-  throw new NodeError("MODULE_NOT_FOUND", ...errorArgs)
 }
 
 function resolvePath(request, parent) {
