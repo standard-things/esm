@@ -39,9 +39,9 @@ Enable ESM in the Node REPL by loading `@std/esm` upon entering:
 $ node
 > require("@std/esm")
 @std/esm enabled
-> import path from "path"
+> import p from "path"
 undefined
-> path.join("hello", "world")
+> p.join("hello", "world")
 'hello/world'
 ```
 
