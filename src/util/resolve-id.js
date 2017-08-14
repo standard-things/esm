@@ -21,8 +21,13 @@ const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 function resolveId(id, parent, options) {
   if (! id ||
       typeof id !== "string" ||
-      id in builtinModules ||
-      (! urlCharsRegExp.test(id) && isPath(id))) {
+      id in builtinModules) {
+    return id
+  }
+
+  const idIsPath = isPath(id)
+
+  if (idIsPath && ! urlCharsRegExp.test(id)) {
     return id
   }
 
@@ -36,7 +41,7 @@ function resolveId(id, parent, options) {
   const fromPath = dirname(filename)
 
   if (! encodedSlash(id, pathMode)) {
-    if (id.includes(":")) {
+    if (! idIsPath && id.includes(":")) {
       const parsed = parse(id)
 
       if (parsed.protocol !== "file:") {
