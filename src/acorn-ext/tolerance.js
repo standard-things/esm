@@ -5,7 +5,6 @@ const parserDupPrefix = "Duplicate export '"
 
 function enable(parser) {
   parser.raiseRecoverable = wrap(parser.raise, raiseRecoverable)
-  parser.strict = false
   return parser
 }
 
@@ -14,6 +13,12 @@ function raiseRecoverable(func, args) {
 
   if (message.startsWith(parserDupPrefix)) {
     func.call(this, pos, message.replace(parserDupPrefix, engineDupPrefix))
+  }
+
+  if (message.startsWith("Binding ") ||
+      message === "new.target can only be used in functions" ||
+      message === "The keyword 'await' is reserved") {
+    func.call(this, pos, message)
   }
 }
 

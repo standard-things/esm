@@ -45,11 +45,36 @@ class Compiler {
       return result
     }
 
-    const rootPath = new FastPath(Parser.parse(code, {
+    let ast
+    let error
+
+    const parserOptions = {
       allowReturnOutsideFunction: options.cjs,
       enableExportExtensions: options.ext,
-      enableImportExtensions: options.ext
-    }))
+      enableImportExtensions: options.ext,
+      sourceType: type === "script" ? type : "module"
+    }
+
+    try {
+      ast = Parser.parse(code, parserOptions)
+    } catch (e) {
+      error = e
+    }
+
+    if (error && type === "unambiguous") {
+      parserOptions.sourceType = "script"
+
+      try {
+        ast = Parser.parse(code, parserOptions)
+        error = void 0
+      } catch (e) {}
+    }
+
+    if (error) {
+      throw error
+    }
+
+    const rootPath = new FastPath(ast)
 
     importExportVisitor.visit(rootPath, code, {
       generateVarDeclarations: options.var,
