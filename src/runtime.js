@@ -12,6 +12,8 @@ import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import resolveId from "./util/resolve-id.js"
 
+const queryHashRegExp = /[?#].*$/
+
 class Runtime {
   static enable(mod, exported, options) {
     options = createOptions(options)
@@ -129,10 +131,36 @@ class Runtime {
     if (id in builtinModules) {
       child = builtinModules[id]
     } else {
-      id = resolveId(id, parent, options)
-      parent.require(id)
-      id = _resolveFilename(id, parent)
-      child = Module._cache[id]
+      let queryHash = null
+      const resolvedId = resolveId(id, parent, options)
+
+      if (resolvedId !== id) {
+        queryHash = queryHashRegExp.exec(id)
+
+        if (queryHash !== null) {
+          id += queryHash[0]
+
+          if (id in Module._cache) {
+            child = Module._cache[id]
+          } else if (resolvedId in Module._cache) {
+            const oldChild = Module._cache[resolvedId]
+            delete Module._cache[resolvedId]
+            parent.require(resolvedId)
+            child = Module._cache[id] = Module._cache[resolvedId]
+            Module._cache[resolvedId] = oldChild
+          } else {
+            parent.require(resolvedId)
+            child = Module._cache[id] = Module._cache[resolvedId]
+            delete Module._cache[resolvedId]
+          }
+        }
+      }
+
+      if (queryHash === null) {
+        parent.require(resolvedId)
+        id = _resolveFilename(resolvedId, parent)
+        child = Module._cache[id]
+      }
     }
 
     const childEntry = children[id] = Entry.get(child)
