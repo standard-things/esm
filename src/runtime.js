@@ -11,6 +11,7 @@ import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import resolveId from "./util/resolve-id.js"
+import setGetter from "./util/set-getter.js"
 
 const queryHashRegExp = /[?#].*$/
 
@@ -179,6 +180,8 @@ class Runtime {
       }
 
       if (error) {
+        // Unlike CJS, ESM errors are preserved for subsequent loads.
+        setGetter(Module._cache, cacheId, () => { throw error })
         throw error
       } else {
         child = Module._cache[cacheId]
