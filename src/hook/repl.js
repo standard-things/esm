@@ -5,6 +5,7 @@ import Wrapper from "../wrapper.js"
 import attempt from "../util/attempt.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
+import env from "../env.js"
 import encodeIdent from "../util/encode-ident.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
@@ -13,13 +14,7 @@ import rootModule from "../root-module.js"
 import vm from "vm"
 import wrap from "../util/wrap.js"
 
-const esmPkgMain = __non_webpack_module__.filename
-
-if (rootModule.filename === null &&
-    rootModule.id === "<repl>" &&
-    rootModule.loaded === false &&
-    rootModule.parent === void 0 &&
-    rootModule.children.some((child) => child.filename === esmPkgMain)) {
+if (env.repl) {
   // Enable ESM in the Node REPL by loading @std/esm upon entering.
   // Custom REPLs can still define their own eval functions to bypass this.
   const md5Hash = md5(Date.now()).slice(0, 3)
