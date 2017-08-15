@@ -45,6 +45,17 @@ undefined
 'hello/world'
 ```
 
+Note: The REPL mode also enables CommonJS features so destructuring `import` works in the REPL for both CommonJS and ES modules:
+```shell
+$ node
+> require("@std/esm")
+@std/esm enabled
+> import { join } from "path"
+undefined
+> join("hello", "world")
+'hello/world'
+```
+
 Standard Features
 ---
 
