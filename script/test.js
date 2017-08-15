@@ -42,7 +42,7 @@ function cleanRepo() {
 function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
-    env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH },
+    env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH, USERPROFILE: HOME },
     stdio: "inherit"
   })
   .catch((e) => process.exit(e.code))
