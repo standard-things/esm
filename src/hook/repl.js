@@ -1,4 +1,5 @@
 import PkgInfo from "../pkg-info.js"
+import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
@@ -84,5 +85,17 @@ if (env.repl) {
   Wrapper.wrap(vm, "createScript", methodWrapper)
 
   const exported = Object.create(null)
-  Runtime.enable(rootModule, exported, pkgInfo.options)
+
+  if (rootModule.id === "<repl>") {
+    Runtime.enable(rootModule, exported, pkgInfo.options)
+  } else if (env.preload && process.argv.length < 2) {
+    const createContext = REPLServer.prototype.createContext
+
+    REPLServer.prototype.createContext = function () {
+      REPLServer.prototype.createContext = createContext
+      const context = createContext.call(this)
+      Runtime.enable(context.module, exported, pkgInfo.options)
+      return context
+    }
+  }
 }
