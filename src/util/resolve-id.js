@@ -12,6 +12,7 @@ import urlToPath from "./url-to-path.js"
 
 const resolveCache = new FastObject
 
+const codeOfSlash = "/".charCodeAt(0)
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
@@ -42,7 +43,8 @@ function resolveId(id, parent, options) {
   const fromPath = dirname(filename)
 
   if (! encodedSlash(id, pathMode)) {
-    if (! idIsPath && id.includes("//")) {
+    if (! idIsPath &&
+        (id.charCodeAt(0) === codeOfSlash || id.includes(":"))) {
       const parsed = parse(id)
       let foundPath = urlToPath(parsed, pathMode)
 
