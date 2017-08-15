@@ -16,7 +16,7 @@ const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
 const localhostRegExp = /^\/\/localhost\b/
-const queryHashRegExp = /[?#].+$/
+const queryHashRegExp = /[?#].*$/
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
 function resolveId(id, parent, options) {
