@@ -101,7 +101,7 @@ class PkgInfo {
     // loading in production, but needs its own copy of the "@std/esm" package
     // during development. Disabling esm loading in production when it was
     // enabled in development would be undesired in this case.
-    const range =
+    let range =
       getRange(pkgJSON, "dependencies") ||
       getRange(pkgJSON, "peerDependencies") ||
       getRange(pkgJSON, "devDependencies")
