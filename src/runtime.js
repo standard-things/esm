@@ -123,47 +123,69 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
+    let cacheId
     let child
+    let oldChild
+    let resId
+
     const { entry } = this
     const { children, options } = entry
     const parent = this.module
 
     if (id in builtinModules) {
-      child = builtinModules[id]
+      cacheId = id
+      child = builtinModules[cacheId]
     } else {
-      let queryHash = null
-      const resolvedId = resolveId(id, parent, options)
+      resId = resolveId(id, parent, options)
 
-      if (resolvedId !== id) {
-        queryHash = queryHashRegExp.exec(id)
+      if (resId !== id) {
+        // Each id with a query+hash is given a new cache entry.
+        const queryHash = queryHashRegExp.exec(id)
 
         if (queryHash !== null) {
-          id += queryHash[0]
+          cacheId = resId + queryHash[0]
 
-          if (id in Module._cache) {
-            child = Module._cache[id]
-          } else if (resolvedId in Module._cache) {
-            const oldChild = Module._cache[resolvedId]
-            delete Module._cache[resolvedId]
-            parent.require(resolvedId)
-            child = Module._cache[id] = Module._cache[resolvedId]
-            Module._cache[resolvedId] = oldChild
-          } else {
-            parent.require(resolvedId)
-            child = Module._cache[id] = Module._cache[resolvedId]
-            delete Module._cache[resolvedId]
+          if (cacheId in Module._cache) {
+            child = Module._cache[cacheId]
+          } else if (resId in Module._cache) {
+            // Backup the existing `resId` module. The child module will be stored
+            // at `resId` because Node sees the file path without query+hash.
+            oldChild = Module._cache[resId]
+            delete Module._cache[resId]
           }
         }
       }
+    }
 
-      if (queryHash === null) {
-        parent.require(resolvedId)
-        id = _resolveFilename(resolvedId, parent)
-        child = Module._cache[id]
+    if (! child) {
+      let error
+
+      try {
+        parent.require(resId)
+      } catch (e) {
+        error = e
+      }
+
+      if (cacheId) {
+        Module._cache[cacheId] = Module._cache[resId]
+
+        if (oldChild) {
+          Module._cache[resId] = oldChild
+        } else {
+          delete Module._cache[resId]
+        }
+      } else {
+        cacheId = _resolveFilename(resId, parent)
+      }
+
+      if (error) {
+        throw error
+      } else {
+        child = Module._cache[cacheId]
       }
     }
 
-    const childEntry = children[id] = Entry.get(child)
+    const childEntry = children[cacheId] = Entry.get(child)
     childEntry.loaded()
 
     if (setterPairs !== void 0) {
