@@ -51,6 +51,7 @@ function runTests() {
 function setupNode() {
   const basePath = join(NODE_BIN, isWin ? "" : "..")
   return trash(basePath)
+    .catch(() => {})
     .then(() => ensureLink(process.execPath, NODE_BIN))
 }
 
