@@ -15,6 +15,13 @@ function enable(parser) {
 function raise(func, args) {
   const [pos, message] = args
 
+  // Correct message for `let default`:
+  // https://github.com/ternjs/acorn/issues/544
+  if (message === "The keyword 'let' is reserved") {
+    func.call(this, pos, "Unexpected token")
+    return
+  }
+
   if (message.endsWith(parserTypePostfix)) {
     func.call(this, pos, message.replace(parserTypePostfix, engineTypePostfix))
     return
