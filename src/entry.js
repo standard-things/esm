@@ -219,6 +219,10 @@ class Entry {
       setProperty(this, "cjsNamespace", { value })
     })
 
+    if (this.sourceType === "module") {
+      validateSetters(this)
+    }
+
     return this._loaded = 1
   }
 
@@ -386,6 +390,17 @@ function runGetters(entry) {
 function setNamespaceToStringTag(namespace) {
   if (useToStringTag) {
     setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
+  }
+}
+
+function validateSetters(entry) {
+  const { getters, setters } = entry
+  const names = keys(setters)
+
+  for (const name of names) {
+    if (name !== "*" && ! (name in getters)) {
+      raiseMissingExport(entry, name)
+    }
   }
 }
 
