@@ -2,9 +2,9 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
-import Parser from "../parser.js"
-
+import lookahead from "../parse/lookahead.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
+import unexpected from "../parse/unexpected.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
@@ -20,7 +20,7 @@ function parseExprAtom(func, args) {
 
   if (this.eat(tt._import)) {
     if (this.type !== tt.parenL) {
-      Parser.unexpected(this)
+      unexpected(this)
     }
 
     return this.finishNode(this.startNodeAt(importPos), "Import")
@@ -31,7 +31,7 @@ function parseExprAtom(func, args) {
 
 function parseStatement(func, args) {
   if (this.type === tt._import &&
-      Parser.lookahead(this).type === tt.parenL) {
+      lookahead(this).type === tt.parenL) {
     // import(...)
     const startPos = this.start
     const node = this.startNode()
@@ -45,7 +45,7 @@ function parseStatement(func, args) {
     this.finishNode(callExpr, "CallExpression")
 
     if (! this.eat(tt.parenR)) {
-      Parser.unexpected(this)
+      unexpected(this)
     }
 
     const expr = this.parseSubscripts(callExpr, startPos)

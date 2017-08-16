@@ -1,6 +1,6 @@
-import Parser from "../parser.js"
-
+import lookahead from "../parse/lookahead.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
+import unexpected from "../parse/unexpected.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
@@ -23,7 +23,7 @@ function parseExport(node, exported) {
   }
 
   if (this.type === tt.star &&
-      Parser.lookahead(this).isContextual("from")) {
+      lookahead(this).isContextual("from")) {
     // ... * from "..."
     return parseExportNamespace(this, node)
   }
@@ -69,7 +69,7 @@ function parseExportSpecifiers(func, args) {
   while (this.eat(tt.comma))
 
   if (expectFrom && ! this.isContextual("from")) {
-    Parser.unexpected(this)
+    unexpected(this)
   }
 
   return specifiers
@@ -117,7 +117,7 @@ function parseExportDefaultSpecifier(parser) {
 function parseExportFrom(parser, node) {
   // ... from "..."
   if (! parser.eatContextual("from")) {
-    Parser.unexpected(parser)
+    unexpected(parser)
   }
 
   node.source = parser.type === tt.string ? parser.parseExprAtom() : null
@@ -153,7 +153,7 @@ function parseExportNamespaceSpecifier(parser, exported) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    Parser.unexpected(parser)
+    unexpected(parser)
   }
 
   star.exported = parser.parseIdent()

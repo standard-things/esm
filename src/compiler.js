@@ -4,6 +4,7 @@ import IEV from "./import-export-visitor.js"
 import Parser from "./parser.js"
 
 import createOptions from "./util/create-options.js"
+import hasPragma from "./parse/has-pragma.js"
 import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = createOptions({
@@ -38,7 +39,7 @@ class Compiler {
     }
 
     if (type === "unambiguous" &&
-        (Parser.hasPragma(code, "use script") ||
+        (hasPragma(code, "use script") ||
           (hint !== "module" &&
           ! importExportRegExp.test(code) &&
           ! useModuleRegExp.test(code)))) {
@@ -97,7 +98,7 @@ class Compiler {
         importExportVisitor.addedImportExport ||
         (type === "unambiguous" &&
           (hint === "module" ||
-          Parser.hasPragma(code, "use module")))) {
+          hasPragma(code, "use module")))) {
       result.type = "module"
     }
 

@@ -2,7 +2,6 @@ import { extname as _extname, dirname, join } from "path"
 
 import Module from "module"
 import NodeError from "../node-error.js"
-import Parser from "../parser.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
@@ -16,6 +15,7 @@ import fs from "fs"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import gunzip from "../fs/gunzip.js"
+import hasPragma from "../parse/has-pragma.js"
 import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import mtime from "../fs/mtime.js"
@@ -88,7 +88,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   if (! isObject(cacheValue)) {
     if (cacheValue === true) {
       if (type === "unambiguous") {
-        type = Parser.hasPragma(cacheCode, "use script") ? "script" : "module"
+        type = hasPragma(cacheCode, "use script") ? "script" : "module"
       }
 
       cacheValue = { code: cacheCode, type }

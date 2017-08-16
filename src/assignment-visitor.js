@@ -1,5 +1,7 @@
-import Parser from "./parser.js"
 import Visitor from "./visitor.js"
+
+import getNamesFromPattern from "./parse/get-names-from-pattern.js"
+import raise from "./parse/raise.js"
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
@@ -35,7 +37,7 @@ function assignmentHelper(visitor, path, childName) {
   const child = node[childName]
   const exportedNames = visitor.exportedLocalNames
   const importedNames = visitor.importedLocalNames
-  const names = Parser.getNamesFromPattern(child)
+  const names = getNamesFromPattern(child)
 
   // Perform checks, which may throw errors, before source transformations.
   for (const name of names) {
@@ -47,7 +49,7 @@ function assignmentHelper(visitor, path, childName) {
         start: node.start
       }
 
-      Parser.raise(parser, parser.start, "Assignment to constant variable.", TypeError)
+      raise(parser, parser.start, "Assignment to constant variable.", TypeError)
     }
   }
 

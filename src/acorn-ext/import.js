@@ -1,6 +1,5 @@
-import Parser from "../parser.js"
-
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
+import unexpected from "../parse/unexpected.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
@@ -45,7 +44,7 @@ function parseImportNamespaceSpecifier(parser) {
   parser.next()
 
   if (! parser.eatContextual("as")) {
-    Parser.unexpected(parser)
+    unexpected(parser)
   }
 
   star.local = parser.parseIdent()

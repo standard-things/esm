@@ -1,7 +1,8 @@
 import MagicString from "./magic-string.js"
 import OrderedMap from "./ordered-map.js"
-import Parser from "./parser.js"
 import Visitor from "./visitor.js"
+
+import getNamesFromPattern from "./parse/get-names-from-pattern.js"
 
 const codeOfCR = "\r".charCodeAt(0)
 
@@ -172,7 +173,7 @@ class ImportExportVisitor extends Visitor {
         const varDecls = dd.declarations
 
         for (const varDecl of varDecls) {
-          const names = Parser.getNamesFromPattern(varDecl.id)
+          const names = getNamesFromPattern(varDecl.id)
 
           for (const name of names) {
             addNameToMap(specifierMap, name)
