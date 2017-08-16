@@ -45,16 +45,7 @@ undefined
 'hello/world'
 ```
 
-Note: The REPL mode also enables CommonJS features so destructuring `import` works in the REPL for both CommonJS and ES modules:
-```shell
-$ node
-> require("@std/esm")
-@std/esm enabled
-> import { join } from "path"
-undefined
-> join("hello", "world")
-'hello/world'
-```
+*Note: The `"cjs"` and `"gz"` options are unlocked in the Node REPL.*
 
 Standard Features
 ---
@@ -81,7 +72,7 @@ Unlockables
 Unlock extra features with `"@std/esm":options` or
 `"@std":{"esm":options}` in your package.json.
 
-*Note: Options are **off** by default and may be specified as either an object or ESM mode string.*
+*Note: All options are **off** by default and may be specified as either an object or ESM mode string.*
 
 <table>
 <tr>
@@ -99,7 +90,7 @@ Unlock extra features with `"@std/esm":options` or
   <td>
     <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p>
     <ul>
-    <li>webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
+    <li>Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
     </ul>
   </td>
 </tr>
@@ -110,7 +101,7 @@ Unlock extra features with `"@std/esm":options` or
     <ul>
     <li><code>"mjs"</code> files as ESM <i>(default)</i></li>
     <li><code>"all"</code> files as ESM</li>
-    <li><code>"js"</code> files with <code>import</code>/<code>export</code>/<a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+    <li><code>"js"</code> files with <code>import</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
     </ul>
   </td>
 </tr>
@@ -121,8 +112,8 @@ Unlock extra features with `"@std/esm":options` or
     <ul>
     <li><code>__dirname</code> and <code>__filename</code></li>
     <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
-    <li><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">named exports</a> of CJS modules</li>
-    <li><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></li>
+    <li><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">Importing named exports</a> of CJS modules</li>
+    <li><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">Top-level <code>return</code></a></li>
     </ul>
   </td>
 </tr>
