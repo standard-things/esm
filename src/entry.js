@@ -339,16 +339,19 @@ function getExportByName(entry, setter, name) {
 
   if ((entry._loaded && ! (name in _namespace)) ||
       (entry.sourceType !== "module" && ! options.cjs)) {
-    const moduleName = getModuleName(entry.module)
-
-    // Remove bogus setter to unblock other imports.
-    delete entry.setters[name]
-
-    throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
-      " does not provide an export named '" + name + "'")
+    raiseMissingExport(entry, name)
   }
 
   return _namespace[name]
+}
+
+function raiseMissingExport(entry, name) {
+  // Remove setter to unblock other imports.
+  delete entry.setters[name]
+
+  const moduleName = getModuleName(entry.module)
+  throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
+    " does not provide an export named '" + name + "'")
 }
 
 function runGetter(getter) {
