@@ -8,7 +8,6 @@ import assign from "./util/assign.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
-import isObjectLike from "./util/is-object-like.js"
 import resolveId from "./util/resolve-id.js"
 import setGetter from "./util/set-getter.js"
 
@@ -87,15 +86,14 @@ class Runtime {
     moduleWrapper.call(exported, exported, wrappedRequire, mod, __filename, __dirname)
     mod.loaded = true
 
-    if (! isObjectLike(mod.exports)) {
-      return
-    }
-
     const newEntry = Entry.get(mod, mod.exports, options)
+    newEntry.exports = mod.exports
     newEntry.sourceType = getSourceType(newEntry.exports)
     newEntry.update().loaded()
 
-    Entry.set(mod.exports, entry.merge(newEntry))
+    entry.merge(newEntry)
+    Entry.set(mod, entry)
+    Entry.set(mod.exports, entry)
   }
 
   // Platform-specific code should find a way to call this method whenever
