@@ -55,7 +55,7 @@ as possible and follows [Node’s rules](https://github.com/nodejs/node-eps/blob
 
 :point_right: This means, by default, ESM requires the use of the `.mjs`
 extension.<br>
-:unlock: You can [unlock](#unlockables) unambiguous `.js` use with the `"esm":"js"` option.
+:unlock: You can [unlock](#unlockables) unambiguous `.js` use with the `"js"` option.
 
 Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
