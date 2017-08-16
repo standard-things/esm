@@ -2,10 +2,11 @@ import { _nodeModulePaths, _resolveFilename } from "module"
 import FastObject from "../fast-object.js"
 import NodeError from "../node-error.js"
 
+import { dirname, extname, isAbsolute, join } from "path"
 import builtinModules from "../builtin-modules.js"
 import decodeURIComponent from "./decode-uri-component.js"
-import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
+import isFile from "../fs/is-file.js"
 import isPath from "./is-path.js"
 import { parse } from "url"
 import urlToPath from "./url-to-path.js"
@@ -13,6 +14,7 @@ import urlToPath from "./url-to-path.js"
 const resolveCache = new FastObject
 
 const codeOfSlash = "/".charCodeAt(0)
+const exts = [".mjs", ".js", ".json", ".node"]
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
@@ -30,7 +32,13 @@ function resolveId(id, parent, options) {
   const idIsPath = isPath(id)
 
   if (idIsPath && ! urlCharsRegExp.test(id)) {
-    return id
+    const foundPath = completePath(id, parent)
+
+    if (foundPath) {
+      return foundPath
+    }
+
+    throw new NodeError("ERR_MISSING_MODULE", id)
   }
 
   const filename = parent.filename === null ? "." : parent.filename
@@ -55,7 +63,7 @@ function resolveId(id, parent, options) {
       }
 
       if (foundPath) {
-        foundPath = resolvePath(foundPath, parent)
+        foundPath = resolveRealPath(foundPath, parent)
       }
 
       if (foundPath) {
@@ -79,7 +87,9 @@ function resolveId(id, parent, options) {
       }
 
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = resolvePath(decodedId, fromParent)
+      const foundPath = idIsPath
+        ? completePath(decodedId, fromParent)
+        : resolveRealPath(decodedId, fromParent)
 
       if (foundPath) {
         return resolveCache[cacheKey] = foundPath
@@ -87,7 +97,7 @@ function resolveId(id, parent, options) {
     }
   }
 
-  const foundPath = resolvePath(id, parent)
+  const foundPath = resolveRealPath(id, parent)
 
   if (foundPath) {
     throw new NodeError("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
@@ -96,9 +106,40 @@ function resolveId(id, parent, options) {
   }
 }
 
-function resolvePath(request, parent) {
+function completePath(thePath, parent) {
+  const resPath = resolvePath(thePath, parent)
+
+  if (extname(resPath)) {
+    return resPath
+  }
+
+  const ext = findExt(resPath, parent)
+  return ext ? (resPath + ext) : ""
+}
+
+function findExt(thePath, parent) {
+  const resPath = resolvePath(thePath, parent)
+
+  // Enforce file extension search order:
+  // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#3313-file-search
+  for (const ext of exts) {
+    if (isFile(resPath + ext)) {
+      return ext
+    }
+  }
+
+  return ""
+}
+
+function resolvePath(thePath, parent) {
+  return isAbsolute(thePath)
+    ? thePath
+    : join(parent.filename, "..", thePath)
+}
+
+function resolveRealPath(thePath, parent) {
   try {
-    return _resolveFilename(request, parent)
+    return _resolveFilename(thePath, parent)
   } catch (e) {}
   return ""
 }

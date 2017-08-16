@@ -1,5 +1,5 @@
 import Module, { _nodeModulePaths, _resolveFilename } from "module"
-import { dirname, extname, isAbsolute, join } from "path"
+import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
 import Wrapper from "./wrapper.js"
@@ -8,8 +8,6 @@ import assign from "./util/assign.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
-import isFile from "./fs/is-file.js"
-import isPath from "./util/is-path.js"
 import resolveId from "./util/resolve-id.js"
 import setGetter from "./util/set-getter.js"
 
@@ -160,12 +158,6 @@ class Runtime {
     if (! child) {
       let error
 
-      if (isPath(resId) &&
-          ! extname(resId) &&
-          isFile(resolvePath(resId) + ".mjs")) {
-        resId += ".mjs"
-      }
-
       try {
         parent.require(resId)
       } catch (e) {
@@ -237,12 +229,6 @@ function requireWrapper(func, id) {
 
   tryModuleLoad(compiler, childModule, filePath)
   return childModule.exports
-}
-
-function resolvePath(request, parent) {
-  return isAbsolute(request)
-    ? request
-    : join(parent.filename, "..", request)
 }
 
 function tryModuleLoad(compiler, mod, filePath) {
