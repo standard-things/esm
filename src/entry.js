@@ -58,11 +58,13 @@ class Entry {
       exported = mod.exports
     }
 
-    let entry = entryMap.get(mod)
+    let entry
     const useExports = isObjectLike(exported)
 
     if (useExports) {
-      entry = entryMap.get(exported) || entry
+      entry = entryMap.get(exported) || entryMap.get(mod)
+    } else {
+      entry = entryMap.get(mod)
     }
 
     if (entry === void 0) {
