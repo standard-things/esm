@@ -8,10 +8,8 @@ import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
 import isFile from "../fs/is-file.js"
 import isPath from "./is-path.js"
-import { parse } from "url"
+import parseURL from "./parse-url.js"
 import urlToPath from "./url-to-path.js"
-
-const resolveCache = new FastObject
 
 const codeOfSlash = "/".charCodeAt(0)
 const exts = [".mjs", ".js", ".json", ".node"]
@@ -21,6 +19,8 @@ const pathMode = isWin ? "win32" : "posix"
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
+
+const resolveCache = new FastObject
 
 function resolveId(id, parent, options) {
   if (! id ||
@@ -53,7 +53,7 @@ function resolveId(id, parent, options) {
   if (! encodedSlash(id, pathMode)) {
     if (! idIsPath &&
         (id.charCodeAt(0) === codeOfSlash || id.includes(":"))) {
-      const parsed = parse(id)
+      const parsed = parseURL(id)
       let foundPath = urlToPath(parsed, pathMode)
 
       if (! foundPath &&

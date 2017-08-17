@@ -2,7 +2,7 @@ import { posix, win32 } from "path"
 
 import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
-import { parse } from "url"
+import parseURL from "./parse-url.js"
 import punycode from "../vendor/punycode/punycode.es6.js"
 
 const API = {
@@ -16,7 +16,7 @@ const { toUnicode } = punycode
 
 function urlToPath(url, mode = "posix") {
   const { normalize } = API[mode]
-  const parsed = typeof url === "string" ? parse(url) : url
+  const parsed = parseURL(url)
   let { pathname } = parsed
 
   if (! pathname) {
