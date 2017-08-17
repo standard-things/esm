@@ -3,11 +3,10 @@
 
 import FastObject from "./fast-object.js"
 
-import { maxSatisfying as _maxSatisfying } from "semver"
 import has from "./util/has.js"
+import maxSatisfying from "./util/max-satisfying.js"
 import { version } from "./version.js"
 
-const maxSatisfyingCache = new FastObject
 const wrapSym = Symbol.for("@std/esm:wrapper")
 
 class Wrapper {
@@ -86,14 +85,6 @@ function getOrCreateStore(object) {
 
 function getStore(object) {
   return has(object, wrapSym) ? object[wrapSym] : null
-}
-
-function maxSatisfying(versions, range) {
-  const cacheKey = versions + "\0" + range
-  if (cacheKey in maxSatisfyingCache) {
-    return maxSatisfyingCache[cacheKey]
-  }
-  return maxSatisfyingCache[cacheKey] = _maxSatisfying(versions, range)
 }
 
 Object.setPrototypeOf(Wrapper.prototype, null)
