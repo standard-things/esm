@@ -1,8 +1,10 @@
 import { _makeLong } from "path"
 import binding from "../binding.js"
-import { statSync } from "fs"
+import { Stats, statSync } from "fs"
 
 const { internalModuleStat } = binding.fs
+const isFile = Stats.prototype.isFile
+
 let useStatFastPath = typeof internalModuleStat === "function"
 
 function stat(filePath) {
@@ -36,7 +38,7 @@ function baseStat(filePath) {
 
 function fallbackStat(filePath) {
   try {
-    return statSync(filePath).isFile() ? 0 : 1
+    return isFile.call(statSync(filePath)) ? 0 : 1
   } catch (e) {}
   return -1
 }
