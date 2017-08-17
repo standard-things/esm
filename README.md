@@ -83,19 +83,6 @@ Unlock extra features with `"@std/esm":options` or
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"await":</code></td>
-  <td><p>A boolean for top-level <code>await</code> in the main ES module</p></td>
-</tr>
-<tr>
-  <td valign="top"><code>"gz":</code></td>
-  <td>
-    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p>
-    <ul>
-    <li>Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
-    </ul>
-  </td>
-</tr>
-<tr>
   <td valign="top"><code>"esm":</code></td>
   <td>
     <p>A string ESM mode</p>
@@ -115,6 +102,19 @@ Unlock extra features with `"@std/esm":options` or
     <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
     <li><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">Importing named exports</a> of CJS modules</li>
     <li><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">Top-level <code>return</code></a></li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"await":</code></td>
+  <td><p>A boolean for top-level <code>await</code> in the main ES module</p></td>
+</tr>
+<tr>
+  <td valign="top"><code>"gz":</code></td>
+  <td>
+    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p>
+    <ul>
+    <li>Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
     </ul>
   </td>
 </tr>
