@@ -1,3 +1,4 @@
+import { _makeLong } from "path"
 import binding from "../binding.js"
 import { statSync } from "fs"
 
@@ -44,7 +45,7 @@ function fastPathStat(filePath) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or < 0 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
-  return internalModuleStat(filePath)
+  return internalModuleStat(_makeLong(filePath))
 }
 
 stat.cache = null
