@@ -213,13 +213,6 @@ function requireWrapper(func, id) {
   const compiler = Wrapper.unwrap(Module._extensions, ext)
 
   if (filePath in Module._cache) {
-    const childModule = Module._cache[filePath]
-
-    if (getSourceType(childModule.exports) === "module") {
-      tryParse(compiler, childModule, filePath)
-      return childModule.exports
-    }
-
     return func(id)
   }
 
@@ -242,25 +235,6 @@ function tryModuleLoad(compiler, mod, filePath) {
   } finally {
     if (threw) {
       delete Module._cache[filePath]
-    }
-  }
-}
-
-function tryParse(compiler, mod, filePath) {
-  const moduleWrap = Module.wrap
-
-  const customWrap = (script) => {
-    Module.wrap = moduleWrap
-    return "(function(){" + script + "\n});(function(){})"
-  }
-
-  Module.wrap = customWrap
-
-  try {
-    compiler.call(Module._extensions, mod, filePath)
-  } finally {
-    if (Module.wrap === customWrap) {
-      Module.wrap = moduleWrap
     }
   }
 }
