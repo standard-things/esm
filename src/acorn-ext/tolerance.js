@@ -7,8 +7,10 @@ const parserTypePostfix = "may appear only with 'sourceType: module'"
 const engineTypePostfix = "may only be used in ES modules"
 
 function enable(parser) {
+  parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
   parser.raise = wrap(parser.raise, raise)
   parser.raiseRecoverable = wrap(parser.raise, raiseRecoverable)
+  parser.strict = false
   return parser
 }
 
@@ -42,6 +44,16 @@ function raiseRecoverable(func, args) {
       message === "new.target can only be used in functions" ||
       message === "The keyword 'await' is reserved") {
     func.call(this, pos, message)
+  }
+}
+
+function strictWrapper(func, args) {
+  this.strict = true
+
+  try {
+    return func.apply(this, args)
+  } finally {
+    this.strict = false
   }
 }
 
