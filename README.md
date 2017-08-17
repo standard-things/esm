@@ -9,7 +9,8 @@ for all the details.
 Getting started
 ---
 
-  1. Run `npm i --save @std/esm` in your app or package directory.
+  1. Run `npm i --save @std/esm`, with [npm 2+](https://docs.npmjs.com/misc/scope),
+     in your app or package directory.
   2. Call `require("@std/esm")` before importing ES modules.
 
      **index.js**
