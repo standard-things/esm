@@ -54,9 +54,10 @@ Standard Features
 The `@std/esm` loader is as spec-compliant
 as possible and follows [Node’s rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
 
-:point_right: This means, by default, ESM requires the use of the `.mjs`
+:point_right: This means, by default, ESM requires the use of the `.mjs` file
 extension.<br>
-:unlock: You can [unlock](#unlockables) ESM with `.js` using the `"js"` ESM mode.
+:unlock: You can [unlock](#unlockables) ESM with the `.js` file extension using
+the `"js"` ESM mode.
 
 Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
