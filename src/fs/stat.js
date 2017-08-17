@@ -5,6 +5,24 @@ const { internalModuleStat } = binding.fs
 let useStatFastPath = typeof internalModuleStat === "function"
 
 function stat(filePath) {
+  const cache = stat.cache
+
+  if (cache !== null) {
+    const result = cache.get(filePath)
+    if (result !== void 0) {
+      return result
+    }
+  }
+
+  const result = baseStat(filePath)
+  if (cache !== null) {
+    cache.set(filePath, result)
+  }
+
+  return result
+}
+
+function baseStat(filePath) {
   if (useStatFastPath) {
     try {
       return fallbackStat(filePath)
@@ -28,5 +46,7 @@ function fastPathStat(filePath) {
   // comes from not creating thousands of Stat and Error objects.
   return internalModuleStat(filePath)
 }
+
+stat.cache = null
 
 export default stat
