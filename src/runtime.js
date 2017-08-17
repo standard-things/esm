@@ -121,111 +121,126 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    let cacheId
-    let child
-    let oldChild
-    let resId
-
     const { entry } = this
-    const { children, options } = entry
     const parent = this.module
 
-    if (id in builtinModules) {
-      cacheId = id
-      child = builtinModules[cacheId]
-    } else {
-      resId = resolveId(id, parent, options)
+    Runtime.requireDepth += 1
 
-      if (resId !== id) {
-        // Each id with a query+hash is given a new cache entry.
-        const queryHash = queryHashRegExp.exec(id)
-
-        if (queryHash !== null) {
-          cacheId = resId + queryHash[0]
-
-          if (cacheId in Module._cache) {
-            child = Module._cache[cacheId]
-          } else if (resId in Module._cache) {
-            // Backup the existing `resId` module. The child module will be stored
-            // at `resId` because Node sees the file path without query+hash.
-            oldChild = Module._cache[resId]
-            delete Module._cache[resId]
-          }
-        }
+    try {
+      const childEntry = moduleImport(id, entry)
+      if (setterPairs !== void 0) {
+        childEntry.addSetters(setterPairs, Entry.get(parent)).update()
       }
-    }
-
-    if (! child) {
-      let error
-
-      try {
-        parent.require(resId)
-      } catch (e) {
-        error = e
-      }
-
-      if (cacheId) {
-        Module._cache[cacheId] = Module._cache[resId]
-
-        if (oldChild) {
-          Module._cache[resId] = oldChild
-        } else {
-          delete Module._cache[resId]
-        }
-      } else {
-        cacheId = _resolveFilename(resId, parent)
-      }
-
-      if (error) {
-        // Unlike CJS, ESM errors are preserved for subsequent loads.
-        setGetter(Module._cache, cacheId, () => {
-          throw error
-        })
-
-        throw error
-      } else {
-        child = Module._cache[cacheId]
-      }
-    }
-
-    const childEntry = children[cacheId] = Entry.get(child)
-    childEntry.loaded()
-
-    if (setterPairs !== void 0) {
-      childEntry.addSetters(setterPairs, Entry.get(parent)).update()
+    } finally {
+      Runtime.requireDepth -= 1
     }
   }
 }
 
-function requireWrapper(func, id) {
+function entryLoad(id, parentEntry, cache = Module._cache) {
+  const { children } = parentEntry
+  const childEntry = children[id] = Entry.get(cache[id])
+  childEntry.loaded()
+  return childEntry
+}
+
+function moduleImport(id, parentEntry) {
   if (id in builtinModules) {
-    return func(id)
+    return entryLoad(id, parentEntry, builtinModules)
   }
 
-  const parent = this.module
-  const filePath = _resolveFilename(id, parent)
+  let cacheId
+  let oldChild
+
+  const { module:parent, options } = parentEntry
+  const resId = resolveId(id, parent, options)
+
+  if (resId !== id) {
+    // Each id with a query+hash is given a new cache entry.
+    const queryHash = queryHashRegExp.exec(id)
+
+    if (queryHash !== null) {
+      cacheId = resId + queryHash[0]
+
+      if (cacheId in Module._cache) {
+        return entryLoad(cacheId, parentEntry)
+      }
+
+      if (resId in Module._cache) {
+        // Backup the existing `resId` module. The child module will be stored
+        // at `resId` because Node sees the file path without query+hash.
+        oldChild = Module._cache[resId]
+        delete Module._cache[resId]
+      }
+    }
+  }
+
+  let error
+
+  try {
+    parent.require(resId)
+  } catch (e) {
+    error = e
+  }
+
+  if (cacheId) {
+    Module._cache[cacheId] = Module._cache[resId]
+
+    if (oldChild) {
+      Module._cache[resId] = oldChild
+    } else {
+      delete Module._cache[resId]
+    }
+  } else {
+    cacheId = _resolveFilename(resId, parent)
+  }
+
+  if (! error) {
+    return entryLoad(cacheId, parentEntry)
+  }
+
+  // Unlike CJS, ESM errors are preserved for subsequent loads.
+  setGetter(Module._cache, cacheId, () => {
+    throw error
+  })
+
+  throw error
+}
+
+function moduleLoad(filePath, parent) {
+  const child = new Module(filePath, parent)
+  child.filename = filePath
+  child.paths = _nodeModulePaths(dirname(filePath))
+
+  tryModuleLoad(child, filePath)
+  return child.exports
+}
+
+function requireWrapper(func, id) {
+  Runtime.requireDepth += 1
+
+  try {
+    if (id in builtinModules) {
+      return func(id)
+    }
+
+    const parent = this.module
+    const filePath = _resolveFilename(id, parent)
+    return filePath in Module._cache ? func(id) : moduleLoad(filePath, parent)
+  } finally {
+    Runtime.requireDepth -= 1
+  }
+}
+
+function tryModuleLoad(mod, filePath) {
   let ext = extname(filePath)
+  let threw = true
 
   if (! ext || typeof Module._extensions[ext] !== "function") {
     ext = ".js"
   }
 
   const compiler = Wrapper.unwrap(Module._extensions, ext)
-
-  if (filePath in Module._cache) {
-    return func(id)
-  }
-
-  const childModule = new Module(filePath, parent)
-  childModule.filename = filePath
-  childModule.paths = _nodeModulePaths(dirname(filePath))
-
-  tryModuleLoad(compiler, childModule, filePath)
-  return childModule.exports
-}
-
-function tryModuleLoad(compiler, mod, filePath) {
-  let threw = true
   Module._cache[filePath] = mod
 
   try {
@@ -240,6 +255,8 @@ function tryModuleLoad(compiler, mod, filePath) {
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
+
+Runtime.requireDepth = 0
 
 Rp.d = Rp.default
 Rp.e = Rp.export

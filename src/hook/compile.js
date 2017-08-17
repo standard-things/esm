@@ -20,6 +20,7 @@ import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
+import stat from "../fs/stat.js"
 import { satisfies } from "semver"
 import setSourceType from "../util/set-source-type.js"
 
@@ -109,8 +110,18 @@ function methodWrapper(manager, func, pkgInfo, args) {
     }
   }
 
+  const noDepth = Runtime.requireDepth === 0
   const tryModuleLoad = cacheValue.type === "module" ? tryESMLoad : tryCJSLoad
+
+  if (noDepth) {
+    stat.cache = new Map
+  }
+
   tryModuleLoad.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
+
+  if (noDepth) {
+    stat.cache = null
+  }
 }
 
 function readCode(filePath, options) {
