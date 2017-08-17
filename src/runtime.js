@@ -137,16 +137,15 @@ class Runtime {
   }
 }
 
-function entryLoad(id, parentEntry, cache = Module._cache) {
-  const { children } = parentEntry
-  const childEntry = children[id] = Entry.get(cache[id])
+function entryLoad(cacheId, parentEntry) {
+  const childEntry = Entry.get(Module._cache[cacheId])
   childEntry.loaded()
-  return childEntry
+  return parentEntry.children[cacheId] = childEntry
 }
 
 function moduleImport(id, parentEntry) {
   if (id in builtinModules) {
-    return entryLoad(id, parentEntry, builtinModules)
+    return builtinModules[id]
   }
 
   let cacheId
@@ -254,9 +253,9 @@ function tryModuleLoad(mod, filePath) {
   }
 }
 
-const Rp = Object.setPrototypeOf(Runtime.prototype, null)
-
 Runtime.requireDepth = 0
+
+const Rp = Object.setPrototypeOf(Runtime.prototype, null)
 
 Rp.d = Rp.default
 Rp.e = Rp.export

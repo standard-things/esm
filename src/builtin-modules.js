@@ -1,3 +1,4 @@
+import Entry from "./entry.js"
 import FastObject from "./fast-object.js"
 import Module from "module"
 
@@ -14,7 +15,10 @@ const builtinModules = Object
       const mod = new Module(id, null)
       mod.exports = mod.require(id)
       mod.loaded = true
-      return object[id] = mod
+
+      const entry = Entry.get(mod)
+      entry.loaded()
+      return object[id] = entry
     })
 
     setSetter(object, id, (value) => {
