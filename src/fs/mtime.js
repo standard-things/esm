@@ -3,12 +3,11 @@ import { satisfies } from "semver"
 import { statSync } from "fs"
 
 const { getStatValues, stat } = binding.fs
-
-let useMtimeFastPath = typeof stat === "function" &&
-  satisfies(process.version, "^6.10.1||>=7.7")
+const useGetStatValues = typeof getStatValues === "function"
 
 let statValues
-const useGetStatValues = typeof getStatValues === "function"
+let useMtimeFastPath = typeof stat === "function" &&
+  satisfies(process.version, "^6.10.1||>=7.7")
 
 if (useMtimeFastPath) {
   statValues = useGetStatValues ? getStatValues() : new Float64Array(14)
