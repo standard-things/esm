@@ -1,6 +1,6 @@
 import FastObject from "./fast-object.js"
 
-const ids = ["fs", "natives", "util"]
+const ids = ["config", "fs", "natives", "util"]
 
 const binding = ids.reduce((binding, id) => {
   try {
