@@ -1,9 +1,10 @@
-import Module, { _resolveFilename } from "module"
+import Module from "module"
 import PkgInfo from "../pkg-info.js"
 import Wrapper from "../wrapper.js"
 
 import { dirname } from "path"
 import env from "../env.js"
+import resolveId from "../util/resolve-id.js"
 
 const { _tickCallback, argv } = process
 
@@ -12,9 +13,13 @@ if (env.preload && argv.length > 1) {
   const mainPath = argv[1]
 
   const managerWrapper = function (manager, func, args) {
-    const filePath = _resolveFilename(mainPath, null, true)
+    const filePath = resolveId(mainPath, null, { isMain: true })
     const pkgInfo = PkgInfo.get(dirname(filePath))
-    const wrapped = pkgInfo === null ? null : Wrapper.find(Module, "runMain", pkgInfo.range)
+    let wrapped = null
+
+    if (pkgInfo !== null) {
+      wrapped = Wrapper.find(Module, "runMain", pkgInfo.range)
+    }
 
     return wrapped === null
       ? func.apply(this, args)
@@ -37,16 +42,17 @@ if (env.preload && argv.length > 1) {
   }
 
   const methodWrapper = function (manager, func, filePath, args) {
+    // Bypass built-in handling of .mjs.
     if (! filePath.endsWith(".mjs")) {
       // eslint-disable-next-line consistent-return
       return func.apply(this, args)
     }
 
-    // Load the main module from the command line argument.
-    const mod =
-    process.mainModule = new Module(filePath, null)
-
+    const mod = new Module(filePath, null)
     mod.id = "."
+    process.mainModule = mod
+
+    // Load the main module from the command line argument.
     tryModuleLoad(mod, filePath)
 
     // Handle any nextTicks added in the first tick of the program.
