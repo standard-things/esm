@@ -1,18 +1,17 @@
-import { _nodeModulePaths, _resolveFilename } from "module"
 import FastObject from "../fast-object.js"
-import NodeError from "../node-error.js"
 
-import { dirname, extname, isAbsolute, join } from "path"
+import { _nodeModulePaths } from "module"
 import builtinModules from "../builtin-modules.js"
 import decodeURIComponent from "./decode-uri-component.js"
+import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
-import isFile from "../fs/is-file.js"
+import errors from "../errors.js"
 import isPath from "./is-path.js"
 import parseURL from "./parse-url.js"
+import resolveFilePath from "./resolve-file-path.js"
 import urlToPath from "./url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
-const exts = [".mjs", ".js", ".json", ".node"]
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
@@ -23,22 +22,25 @@ const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 const resolveCache = new FastObject
 
 function resolveId(id, parent, options) {
-  if (! id ||
-      typeof id !== "string" ||
-      id in builtinModules) {
+  if (typeof id !== "string") {
+    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
+  }
+
+  if (id in builtinModules) {
     return id
   }
 
+  const { isMain } = options
   const idIsPath = isPath(id)
 
   if (idIsPath && ! urlCharsRegExp.test(id)) {
-    const foundPath = completePath(id, parent)
+    const foundPath = resolveFilePath(id, parent, isMain)
 
     if (foundPath) {
       return foundPath
     }
 
-    throw new NodeError("ERR_MISSING_MODULE", id)
+    throw new errors.Error("ERR_MISSING_MODULE", id)
   }
 
   const filename = parent.filename === null ? "." : parent.filename
@@ -59,11 +61,11 @@ function resolveId(id, parent, options) {
       if (! foundPath &&
           parsed.protocol !== "file:" &&
           ! localhostRegExp.test(id)) {
-        throw new NodeError("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
+        throw new errors.Error("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
       }
 
       if (foundPath) {
-        foundPath = resolveRealPath(foundPath, parent)
+        foundPath = resolveFilePath(foundPath, parent, isMain)
       }
 
       if (foundPath) {
@@ -87,9 +89,7 @@ function resolveId(id, parent, options) {
       }
 
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = idIsPath
-        ? completePath(decodedId, fromParent)
-        : resolveRealPath(decodedId, fromParent)
+      const foundPath = resolveFilePath(decodedId, fromParent, isMain)
 
       if (foundPath) {
         return resolveCache[cacheKey] = foundPath
@@ -97,51 +97,13 @@ function resolveId(id, parent, options) {
     }
   }
 
-  const foundPath = resolveRealPath(id, parent)
+  const foundPath = resolveFilePath(id, parent, isMain)
 
   if (foundPath) {
-    throw new NodeError("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
+    throw new errors.Error("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
   } else {
-    throw new NodeError("ERR_MISSING_MODULE", id)
+    throw new errors.Error("ERR_MISSING_MODULE", id)
   }
-}
-
-function completePath(thePath, parent) {
-  const resPath = resolvePath(thePath, parent)
-
-  if (extname(resPath)) {
-    return resPath
-  }
-
-  const ext = findExt(resPath, parent)
-  return ext ? (resPath + ext) : ""
-}
-
-function findExt(thePath, parent) {
-  const resPath = resolvePath(thePath, parent)
-
-  // Enforce file extension search order:
-  // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#3313-file-search
-  for (const ext of exts) {
-    if (isFile(resPath + ext)) {
-      return ext
-    }
-  }
-
-  return ""
-}
-
-function resolvePath(thePath, parent) {
-  return isAbsolute(thePath)
-    ? thePath
-    : join(parent.filename, "..", thePath)
-}
-
-function resolveRealPath(thePath, parent) {
-  try {
-    return _resolveFilename(thePath, parent)
-  } catch (e) {}
-  return ""
 }
 
 export default resolveId
