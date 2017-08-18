@@ -33,7 +33,11 @@ const passthruMap = new Map
 function managerWrapper(manager, func, args) {
   const filePath = args[1]
   const pkgInfo = PkgInfo.get(dirname(filePath))
-  const wrapped = pkgInfo === null ? null : Wrapper.find(exts, ".js", pkgInfo.range)
+  let wrapped = null
+
+  if (pkgInfo !== null) {
+    wrapped = Wrapper.find(exts, ".js", pkgInfo.range)
+  }
 
   return wrapped === null
     ? func.apply(this, args)
