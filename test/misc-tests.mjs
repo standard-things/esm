@@ -2,6 +2,7 @@ import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
+import fs from "fs"
 
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
@@ -62,7 +63,7 @@ describe("spec compliance", () => {
   })
 
   it("should not support loading ESM from require", () => {
-    const abcPath = Module._resolveFilename("./fixture/export/abc.mjs")
+    const abcPath = fs.realpathSync("./fixture/export/abc.mjs")
     const abcMod = Module._cache[abcPath]
 
     delete Module._cache[abcPath]
