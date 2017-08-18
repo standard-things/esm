@@ -1,7 +1,6 @@
 import { extname as _extname, dirname, join } from "path"
 
 import Module from "module"
-import NodeError from "../node-error.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
@@ -10,6 +9,7 @@ import attempt from "../util/attempt.js"
 import binding from "../binding.js"
 import compiler from "../caching-compiler.js"
 import encodeIdent from "../util/encode-ident.js"
+import errors from "../errors.js"
 import extname from "../util/extname.js"
 import fs from "fs"
 import getCacheFileName from "../util/get-cache-file-name.js"
@@ -306,7 +306,7 @@ extsToWrap.forEach((key) => {
     if (key === ".mjs" || key === ".mjs.gz") {
       passthru = false
       exts[key] = function (mod, filePath) {
-        throw new NodeError("ERR_REQUIRE_ESM", filePath)
+        throw new errors.Error("ERR_REQUIRE_ESM", filePath)
       }
     } else if (key === ".gz") {
       exts[key] = function (mod, filePath) {
