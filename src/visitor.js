@@ -26,6 +26,10 @@ const childrenToVisit = createOptions({
 })
 
 class Visitor {
+  reset() {
+    // This method is replaced with a subclass implementation.
+  }
+
   visit(path) {
     this.reset(...arguments)
     this.visitWithoutReset(path)
