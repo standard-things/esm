@@ -4,17 +4,17 @@ import { format } from "util"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const codeSym = Symbol.for("@std/esm:errorCode")
-const messageMap = new Map
 const supers = [Error, TypeError]
 
 const errors = new FastObject
 supers.forEach((sup) => errors[sup.name] = createClass(sup))
 
-messageMap.set("ERR_INVALID_ARG_TYPE", invalidArgType)
-messageMap.set("ERR_INVALID_PROTOCOL", invalidProtocol)
-messageMap.set("ERR_MISSING_MODULE", "Cannot find module %s")
-messageMap.set("ERR_MODULE_RESOLUTION_DEPRECATED", "%s not found by import in %s. Deprecated behavior in require would have found it at %s")
-messageMap.set("ERR_REQUIRE_ESM", "Must use import to load ES Module: %s")
+const messages = new FastObject
+messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
+messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
+messages["ERR_MISSING_MODULE"] = "Cannot find module %s"
+messages["ERR_MODULE_RESOLUTION_DEPRECATED"] = "%s not found by import in %s. Deprecated behavior in require would have found it at %s"
+messages["ERR_REQUIRE_ESM"] = "Must use import to load ES Module: %s"
 
 function createClass(Super) {
   class NodeError extends Super {
@@ -37,7 +37,7 @@ function createClass(Super) {
 }
 
 function getMessage(key, args) {
-  const message = messageMap.get(key)
+  const message = messages[key]
 
   if (typeof message == "function") {
     return message(...args)

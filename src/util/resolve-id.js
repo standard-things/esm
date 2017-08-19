@@ -1,12 +1,10 @@
 import FastObject from "../fast-object.js"
 
 import { _nodeModulePaths } from "module"
-import builtinModules from "../builtin-modules.js"
 import decodeURIComponent from "./decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
 import errors from "../errors.js"
-import isObject from "./is-object.js"
 import isPath from "./is-path.js"
 import parseURL from "./parse-url.js"
 import resolveFilePath from "./resolve-file-path.js"
@@ -21,25 +19,9 @@ const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
-const resolveCache = new FastObject
-
 function resolveId(id, parent, options) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
-  }
-
-  if (id in builtinModules) {
-    return id
-  }
-
-  const filename = isObject(parent) && typeof parent.filename === "string"
-    ? parent.filename
-    : cwd()
-
-  const cacheKey = filename + "\0" + id
-
-  if (cacheKey in resolveCache) {
-    return resolveCache[cacheKey]
   }
 
   const { isMain } = options
@@ -49,11 +31,15 @@ function resolveId(id, parent, options) {
     const foundPath = resolveFilePath(id, parent, isMain)
 
     if (foundPath) {
-      return resolveCache[cacheKey] = foundPath
+      return foundPath
     }
 
     throw new errors.Error("ERR_MISSING_MODULE", id)
   }
+
+  const filename = parent && typeof parent.filename === "string"
+    ? parent.filename
+    : "."
 
   const fromPath = dirname(filename)
 
@@ -74,7 +60,7 @@ function resolveId(id, parent, options) {
       }
 
       if (foundPath) {
-        return resolveCache[cacheKey] = foundPath
+        return foundPath
       }
     } else {
       let fromParent = parent
@@ -97,7 +83,7 @@ function resolveId(id, parent, options) {
       const foundPath = resolveFilePath(decodedId, fromParent, isMain)
 
       if (foundPath) {
-        return resolveCache[cacheKey] = foundPath
+        return foundPath
       }
     }
   }

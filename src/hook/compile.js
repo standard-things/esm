@@ -118,7 +118,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const tryModuleLoad = cacheValue.type === "module" ? tryESMLoad : tryCJSLoad
 
   if (noDepth) {
-    stat.cache = new Map
+    stat.cache = Object.create(null)
   }
 
   tryModuleLoad.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
