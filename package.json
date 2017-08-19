@@ -49,7 +49,7 @@
     "punycode": "^2.1.0",
     "semver": "^5.4.1",
     "trash": "^4.0.1",
-    "uglify-es": "^3.0.27",
+    "uglify-es": "^3.0.28",
     "uglifyjs-webpack-plugin": "^1.0.0-beta.2",
     "webpack": "^3.5.3",
     "webpack-bundle-analyzer": "^2.8.3",
