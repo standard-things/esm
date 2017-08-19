@@ -8,6 +8,7 @@
       "modules": false,
       "exclude": [
         "check-es2015-constants",
+        "syntax-trailing-function-commas",
         "transform-async-to-generator",
         "transform-es2015-block-scoping",
         "transform-es2015-classes",
