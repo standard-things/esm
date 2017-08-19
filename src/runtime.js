@@ -192,6 +192,7 @@ function loadESM(filePath, parent) {
   } else {
     child = new Module(filePath, parent)
     child.filename = filePath
+    child.paths = _nodeModulePaths(dirname(filePath))
     tryESMLoad(child, filePath)
   }
 
