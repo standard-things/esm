@@ -29,7 +29,7 @@ class Compiler {
     code = stripShebang(code)
     options = createOptions(options, defaultOptions)
 
-    const { hint, type } = options
+    let { hint, type } = options
 
     const result = {
       code,
@@ -62,7 +62,7 @@ class Compiler {
     }
 
     if (error && type === "unambiguous") {
-      parserOptions.sourceType = "script"
+      type = parserOptions.sourceType = "script"
 
       try {
         ast = Parser.parse(code, parserOptions)
