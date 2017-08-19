@@ -159,16 +159,14 @@ function importModule(id, parentEntry) {
     }
   }
 
-  if (! error) {
-    return loadEntry(cacheId, parentEntry)
+  if (error) {
+    // Unlike CJS, ESM errors are preserved for subsequent loads.
+    setGetter(Module._cache, cacheId, () => {
+      throw error
+    })
   }
 
-  // Unlike CJS, ESM errors are preserved for subsequent loads.
-  setGetter(Module._cache, cacheId, () => {
-    throw error
-  })
-
-  throw error
+  return loadEntry(cacheId, parentEntry)
 }
 
 function loadCJS(filePath, parent) {
