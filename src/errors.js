@@ -24,7 +24,7 @@ function createClass(Super) {
     }
 
     get name() {
-      return super.name + " [" + this[codeSym] + "]"
+      return Super.name + " [" + this[codeSym] + "]"
     }
 
     get code() {
