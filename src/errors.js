@@ -44,7 +44,7 @@ function getMessage(key, args) {
   }
 
   args.unshift(message)
-  return String(format(...args))
+  return format(...args)
 }
 
 function invalidArgType(name, expected) {
