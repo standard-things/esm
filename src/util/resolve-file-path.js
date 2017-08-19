@@ -5,6 +5,7 @@ import { _resolveFilename } from "module"
 import binding from "../binding.js"
 import isFile from "../fs/is-file.js"
 import isPath from "./is-path.js"
+import { realpathSync } from "fs"
 
 const exts = [".mjs", ".js", ".json", ".node"]
 const { preserveSymlinks } = binding.config
@@ -36,7 +37,7 @@ function resolveFilePath(request, parent, isMain) {
     return realCache[resPath]
   }
 
-  return realCache[resPath] = resolveRealPath(resPath, parent, isMain)
+  return realCache[resPath] = realPath(resPath)
 }
 
 function findExt(filePath, parent) {
@@ -51,8 +52,17 @@ function findExt(filePath, parent) {
   return ""
 }
 
+function realPath(request) {
+  try {
+    return realpathSync(request)
+  } catch (e) {}
+  return ""
+}
+
 function resolvePath(request, parent) {
-  return isAbsolute(request) ? request : join(parent.filename, "..", request)
+  return isAbsolute(request)
+    ? request
+    : join(parent.filename, "..", request)
 }
 
 function resolveRealPath(request, parent, isMain) {
