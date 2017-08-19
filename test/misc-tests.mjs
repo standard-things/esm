@@ -169,12 +169,24 @@ describe("package.json", () => {
       })
   )
 
-  it("should respect esm package options", () =>
+  it("should respect @std/esm package options", () =>
     Promise.all([
       "@std-esm-object",
       "@std-esm-string",
       "@std-object",
       "@std-string"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
+  )
+
+  it("should respect @std/esm as package dependencies", () =>
+    Promise.all([
+      "dependencies",
+      "dev-dependencies",
+      "peer-dependencies"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
