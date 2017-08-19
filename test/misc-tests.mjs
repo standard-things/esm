@@ -144,6 +144,39 @@ describe("spec compliance", () => {
         })
     ))
   )
+
+  it("should throw a syntax error when using `await` as an identifier", () =>
+    import("./misc/source-await.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("The keyword 'await' is reserved"))
+      })
+  )
+
+  it("should throw a syntax error when using top-level `new.target`", () =>
+    import("./misc/source-new-target.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("new.target can only be used in functions"))
+      })
+  )
+
+  it("should throw a syntax error when using an opening HTML comment in ESM", () =>
+    import("./misc/source-html-comment.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("Unexpected token"))
+      })
+  )
+
+  it("should not throw when using an opening HTML comment in CJS", () =>
+    import("./misc/source-html-comment.js")
+      .then(() => assert.ok(true))
+      .catch((e) => assert.ifError(e))
+  )
 })
 
 describe("built-in modules", () => {
