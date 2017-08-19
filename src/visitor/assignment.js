@@ -1,7 +1,7 @@
-import Visitor from "./visitor.js"
+import Visitor from "../visitor.js"
 
-import getNamesFromPattern from "./parse/get-names-from-pattern.js"
-import raise from "./parse/raise.js"
+import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import raise from "../parse/raise.js"
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
@@ -139,4 +139,4 @@ function wrap(visitor, path) {
     .prependRight(node.end, ")")
 }
 
-export default AssignmentVisitor
+export default new AssignmentVisitor

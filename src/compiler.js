@@ -1,11 +1,11 @@
-import AV from "./assignment-visitor.js"
 import FastPath from "./fast-path.js"
-import IV from "./identifier-visitor.js"
-import IEV from "./import-export-visitor.js"
 import Parser from "./parser.js"
 
+import assignmentVisitor from "./visitor/assignment.js"
 import createOptions from "./util/create-options.js"
 import hasPragma from "./parse/has-pragma.js"
+import identifierVisitor from "./visitor/identifier.js"
+import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = createOptions({
@@ -17,9 +17,6 @@ const defaultOptions = createOptions({
   var: false
 })
 
-const assignmentVisitor = new AV
-const identifierVisitor = new IV
-const importExportVisitor = new IEV
 const useModuleRegExp = /(["'])use module\1/
 
 // Matches any {im,ex}port identifier as long as it's not preceded by a "."

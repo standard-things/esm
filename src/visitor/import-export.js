@@ -1,8 +1,8 @@
-import MagicString from "./magic-string.js"
-import OrderedMap from "./ordered-map.js"
-import Visitor from "./visitor.js"
+import MagicString from "../magic-string.js"
+import OrderedMap from "../ordered-map.js"
+import Visitor from "../visitor.js"
 
-import getNamesFromPattern from "./parse/get-names-from-pattern.js"
+import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 
 const codeOfCR = "\r".charCodeAt(0)
 
@@ -531,4 +531,4 @@ function toModuleExport(visitor, specifierMap) {
   return code
 }
 
-export default ImportExportVisitor
+export default new ImportExportVisitor

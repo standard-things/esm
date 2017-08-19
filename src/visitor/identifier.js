@@ -1,6 +1,6 @@
-import Visitor from "./visitor.js"
+import Visitor from "../visitor.js"
 
-import raise from "./parse/raise.js"
+import raise from "../parse/raise.js"
 
 class IdentifierVisitor extends Visitor {
   visitIdentifier(path) {
@@ -24,4 +24,4 @@ class IdentifierVisitor extends Visitor {
   }
 }
 
-export default IdentifierVisitor
+export default new IdentifierVisitor
