@@ -109,6 +109,13 @@ class Runtime {
   }
 }
 
+function createModule(filePath, parent) {
+  const mod = new Module(filePath, parent)
+  mod.filename = filePath
+  mod.paths = _nodeModulePaths(dirname(filePath))
+  return mod
+}
+
 function importModule(id, parentEntry) {
   if (id in builtinModules) {
     return builtinModules[id]
@@ -144,7 +151,7 @@ function importModule(id, parentEntry) {
   let error
 
   try {
-    loadESM(resId, parent)
+    loadModule(resId, parent, tryESMLoad)
   } catch (e) {
     error = e
   }
@@ -169,40 +176,23 @@ function importModule(id, parentEntry) {
   return loadEntry(cacheId, parentEntry)
 }
 
-function loadCJS(filePath, parent) {
-  let child
-
-  if (filePath in Module._cache) {
-    child = Module._cache[filePath]
-  } else {
-    child = new Module(filePath, parent)
-    child.filename = filePath
-    child.paths = _nodeModulePaths(dirname(filePath))
-    tryCJSLoad(child, filePath)
-  }
-
-  return child.exports
-}
-
-function loadESM(filePath, parent) {
-  let child
-
-  if (filePath in Module._cache) {
-    child = Module._cache[filePath]
-  } else {
-    child = new Module(filePath, parent)
-    child.filename = filePath
-    child.paths = _nodeModulePaths(dirname(filePath))
-    tryESMLoad(child, filePath)
-  }
-
-  return child.exports
-}
-
 function loadEntry(cacheId, parentEntry) {
   const childEntry = Entry.get(Module._cache[cacheId])
   childEntry.loaded()
   return parentEntry.children[cacheId] = childEntry
+}
+
+function loadModule(filePath, parent, tryModuleLoad) {
+  let child
+
+  if (filePath in Module._cache) {
+    child = Module._cache[filePath]
+  } else {
+    child = createModule(filePath, parent)
+    tryModuleLoad(child, filePath)
+  }
+
+  return child.exports
 }
 
 function requireWrapper(func, id) {
@@ -215,7 +205,7 @@ function requireWrapper(func, id) {
 
     const parent = this.module
     const filePath = _resolveFilename(id, parent)
-    return loadCJS(filePath, parent)
+    return loadModule(filePath, parent, tryCJSLoad)
   } finally {
     Runtime.requireDepth -= 1
   }
