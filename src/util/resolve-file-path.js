@@ -1,4 +1,4 @@
-import { extname, isAbsolute, join } from "path"
+import { extname, resolve } from "path"
 import FastObject from "../fast-object.js"
 
 import { _resolveFilename } from "module"
@@ -17,13 +17,18 @@ function resolveFilePath(request, parent, isMain) {
     return resolveRealPath(request, parent, isMain)
   }
 
-  let resPath = resolvePath(request, parent)
+  let resPath = resolve(parent.filename, "..", request)
 
   if (! extname(resPath)) {
-    const ext = findExt(resPath, parent)
+    let ext = findExt(resPath, parent)
 
     if (! ext) {
-      return ""
+      resPath = resolve(resPath, "index")
+      ext = findExt(resPath, parent)
+
+      if (! ext) {
+        return ""
+      }
     }
 
     resPath += ext
@@ -57,12 +62,6 @@ function realPath(request) {
     return realpathSync(request)
   } catch (e) {}
   return ""
-}
-
-function resolvePath(request, parent) {
-  return isAbsolute(request)
-    ? request
-    : join(parent.filename, "..", request)
 }
 
 function resolveRealPath(request, parent, isMain) {
