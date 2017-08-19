@@ -17,7 +17,6 @@ const pathMode = isWin ? "win32" : "posix"
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
-const urlCharsRegExp = isWin ? /[?#%]/ : /[:?#%]/
 
 function resolveId(id, parent, options) {
   if (typeof id !== "string") {
@@ -25,18 +24,6 @@ function resolveId(id, parent, options) {
   }
 
   const { isMain } = options
-  const idIsPath = isPath(id)
-
-  if (idIsPath && ! urlCharsRegExp.test(id)) {
-    const foundPath = resolveFilePath(id, parent, isMain)
-
-    if (foundPath) {
-      return foundPath
-    }
-
-    throw new errors.Error("ERR_MISSING_MODULE", id)
-  }
-
   const filename = parent && typeof parent.filename === "string"
     ? parent.filename
     : "."
@@ -44,7 +31,7 @@ function resolveId(id, parent, options) {
   const fromPath = dirname(filename)
 
   if (! encodedSlash(id, pathMode)) {
-    if (! idIsPath &&
+    if (! isPath(id) &&
         (id.charCodeAt(0) === codeOfSlash || id.includes(":"))) {
       const parsed = parseURL(id)
       let foundPath = urlToPath(parsed, pathMode)
