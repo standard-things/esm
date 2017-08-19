@@ -6,12 +6,14 @@ import decodeURIComponent from "./decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "./encoded-slash.js"
 import errors from "../errors.js"
+import isObject from "./is-object.js"
 import isPath from "./is-path.js"
 import parseURL from "./parse-url.js"
 import resolveFilePath from "./resolve-file-path.js"
 import urlToPath from "./url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
+const { cwd } = process
 const isWin = process.platform === "win32"
 const pathMode = isWin ? "win32" : "posix"
 
@@ -30,6 +32,16 @@ function resolveId(id, parent, options) {
     return id
   }
 
+  const filename = isObject(parent) && typeof parent.filename === "string"
+    ? parent.filename
+    : cwd()
+
+  const cacheKey = filename + "\0" + id
+
+  if (cacheKey in resolveCache) {
+    return resolveCache[cacheKey]
+  }
+
   const { isMain } = options
   const idIsPath = isPath(id)
 
@@ -37,17 +49,10 @@ function resolveId(id, parent, options) {
     const foundPath = resolveFilePath(id, parent, isMain)
 
     if (foundPath) {
-      return foundPath
+      return resolveCache[cacheKey] = foundPath
     }
 
     throw new errors.Error("ERR_MISSING_MODULE", id)
-  }
-
-  const filename = parent.filename === null ? "." : parent.filename
-  const cacheKey = filename + "\0" + id
-
-  if (cacheKey in resolveCache) {
-    return resolveCache[cacheKey]
   }
 
   const fromPath = dirname(filename)
