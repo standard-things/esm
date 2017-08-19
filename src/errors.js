@@ -7,7 +7,7 @@ const codeSym = Symbol.for("@std/esm:errorCode")
 const supers = [Error, TypeError]
 
 const errors = new FastObject
-supers.forEach((sup) => errors[sup.name] = createClass(sup))
+supers.forEach((Super) => errors[Super.name] = createClass(Super))
 
 const messages = new FastObject
 messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
@@ -51,9 +51,9 @@ function invalidArgType(name, expected) {
   return "The " + quote(name) + " argument must be " + expected
 }
 
-function invalidProtocol(protocol, expectedProtocol) {
+function invalidProtocol(protocol, expected) {
   return "Protocol " + quote(protocol) +
-    " not supported. Expected " + quote(expectedProtocol)
+    " not supported. Expected " + quote(expected)
 }
 
 function quote(value) {
@@ -61,4 +61,3 @@ function quote(value) {
 }
 
 export default errors
-
