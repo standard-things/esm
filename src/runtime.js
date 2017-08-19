@@ -125,26 +125,22 @@ function importModule(id, parentEntry) {
   const resId = resolveId(id, parent, options)
 
   let oldChild
-  let queryHash
   let cacheId = resId
+  let queryHash = queryHashRegExp.exec(id)
 
-  if (resId !== id) {
-    // Each id with a query+hash is given a new cache entry.
-    queryHash = queryHashRegExp.exec(id)
+  // Each id with a query+hash is given a new cache entry.
+  if (queryHash !== null) {
+    cacheId = resId + queryHash[0]
 
-    if (queryHash !== null) {
-      cacheId = resId + queryHash[0]
+    if (cacheId in Module._cache) {
+      return loadEntry(cacheId, parentEntry)
+    }
 
-      if (cacheId in Module._cache) {
-        return loadEntry(cacheId, parentEntry)
-      }
-
-      if (resId in Module._cache) {
-        // Backup the existing `resId` module. The child module will be stored
-        // at `resId` because Node sees the file path without query+hash.
-        oldChild = Module._cache[resId]
-        delete Module._cache[resId]
-      }
+    if (resId in Module._cache) {
+      // Backup the existing `resId` module. The child module will be stored
+      // at `resId` because Node sees the file path without query+hash.
+      oldChild = Module._cache[resId]
+      delete Module._cache[resId]
     }
   }
 
