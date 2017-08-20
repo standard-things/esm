@@ -53,7 +53,7 @@ describe("package.json", () => {
   )
 })
 
-describe("resolving file paths", () => {
+describe("Node rules", () => {
   it("should find modules with names containing colons", () =>
     Promise.all([
       "./misc/with:colon.mjs",
@@ -64,6 +64,17 @@ describe("resolving file paths", () => {
         .then(() => assert.ok(true))
         .catch((e) => assert.ifError(e))
     ))
+  )
+
+  it("should not reevaluate a module that errors", () =>
+    import("./misc/reevaluate.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) =>
+        import("./misc/reevaluate.mjs")
+          .then(() => assert.ok(false))
+          .catch((re) => assert.strictEqual(e, re))
+      )
+      .then(() => delete global.reevaluate)
   )
 })
 
