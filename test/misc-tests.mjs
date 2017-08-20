@@ -4,6 +4,55 @@ import SemVer from "semver"
 import assert from "assert"
 import fs from "fs"
 
+describe("built-in modules", () => {
+  it("should fire setters if already loaded", () =>
+    import("./misc/builtin-loaded.mjs")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should produce valid namespace objects", () =>
+    import("./misc/builtin-namespace.mjs")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+})
+
+describe("package.json", () => {
+  it("should not be enabled for nested node_modules", () =>
+    import("disabled")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+      })
+  )
+
+  it("should respect @std/esm package options", () =>
+    Promise.all([
+      "@std-esm-object",
+      "@std-esm-string",
+      "@std-object",
+      "@std-string"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
+  )
+
+  it("should respect @std/esm as package dependencies", () =>
+    Promise.all([
+      "dependencies",
+      "dev-dependencies",
+      "peer-dependencies"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
+  )
+})
+
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
     import("./misc/live.mjs")
@@ -205,54 +254,5 @@ describe("spec compliance", () => {
     import("./misc/source-html-comment.js")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
-  )
-})
-
-describe("built-in modules", () => {
-  it("should fire setters if already loaded", () =>
-    import("./misc/builtin-loaded.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should produce valid namespace objects", () =>
-    import("./misc/builtin-namespace.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-})
-
-describe("package.json", () => {
-  it("should not be enabled for nested node_modules", () =>
-    import("disabled")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-      })
-  )
-
-  it("should respect @std/esm package options", () =>
-    Promise.all([
-      "@std-esm-object",
-      "@std-esm-string",
-      "@std-object",
-      "@std-string"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-        .catch((e) => assert.ifError(e))
-    ))
-  )
-
-  it("should respect @std/esm as package dependencies", () =>
-    Promise.all([
-      "dependencies",
-      "dev-dependencies",
-      "peer-dependencies"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-        .catch((e) => assert.ifError(e))
-    ))
   )
 })
