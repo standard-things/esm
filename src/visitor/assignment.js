@@ -21,7 +21,7 @@ class AssignmentVisitor extends Visitor {
   visitCallExpression(path) {
     this.visitChildren(path)
 
-    const callee = path.getValue().callee
+    const { callee } = path.getValue()
     if (callee.type === "Identifier" &&
         callee.name === "eval") {
       wrap(this, path)
@@ -67,9 +67,9 @@ function assignmentHelper(visitor, path, childName) {
 
 function hasNamed(nodes, name) {
   for (const node of nodes) {
-    const identifier = node.type === "VariableDeclarator" ? node.id : node
+    const id = node.type === "VariableDeclarator" ? node.id : node
 
-    if (identifier.name === name) {
+    if (id.name === name) {
       return true
     }
   }
