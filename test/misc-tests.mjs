@@ -76,6 +76,13 @@ describe("Node rules", () => {
       )
       .then(() => delete global.reevaluate)
   )
+
+  it("should not wrap custom errors", () =>
+    import("./misc/custom-error.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e, global.customError))
+      .then(() => delete global.customError)
+  )
 })
 
 describe("spec compliance", () => {
