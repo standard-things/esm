@@ -3,6 +3,8 @@ import Visitor from "../visitor.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import raise from "../parse/raise.js"
 
+const shadowedMap = new WeakMap
+
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
     this.exportedLocalNames = options.exportedLocalNames
@@ -75,11 +77,11 @@ function hasNamed(nodes, name) {
   return false
 }
 
-const hasParameter = memoize((node, name) =>
-  hasNamed(node.params, name)
-)
+function hasParameter(node, name) {
+  return hasNamed(node.params, name)
+}
 
-const hasVariable = memoize((node, name) => {
+function hasVariable(node, name) {
   const body = node.body
 
   for (const stmt of body) {
@@ -90,45 +92,35 @@ const hasVariable = memoize((node, name) => {
   }
 
   return false
-})
+}
 
 function isShadowed(path, name) {
   let shadowed = false
 
   path.getParentNode((parent) => {
-    const type = parent.type
+    let cache = shadowedMap.get(parent)
+
+    if (cache === void 0) {
+      cache = Object.create(null)
+      shadowedMap.set(parent, cache)
+    } else if (name in cache) {
+      return shadowed = cache[name]
+    }
+
+    const { type } = parent
 
     if (type === "BlockStatement") {
-      return shadowed = hasVariable(parent, name)
-    }
-
-    if (type === "FunctionDeclaration" ||
+      shadowed = hasVariable(parent, name)
+    } else if (type === "FunctionDeclaration" ||
         type === "FunctionExpression" ||
         type === "ArrowFunctionExpression") {
-      return shadowed = hasParameter(parent, name)
+      shadowed = hasParameter(parent, name)
     }
 
-    return false
+    return cache[name] = shadowed
   })
 
   return shadowed
-}
-
-function memoize(func) {
-  const cacheMap = new WeakMap
-
-  return (node, name) => {
-    let names = cacheMap.get(node)
-
-    if (names === void 0) {
-      names = Object.create(null)
-      cacheMap.set(node, names)
-    }
-
-    return name in names
-      ? names[name]
-      : names[name] = func(node, name)
-  }
 }
 
 function wrap(visitor, path) {
