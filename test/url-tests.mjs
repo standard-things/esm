@@ -30,6 +30,9 @@ describe("URL parsing", () => {
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "" : "/home/us\\er"
+      actual = urlToPath("file:///home/us%5cer", mode)
+      assert.strictEqual(actual, expected)
+
       actual = urlToPath("file:///home/us%5Cer", mode)
       assert.strictEqual(actual, expected)
 
@@ -52,6 +55,9 @@ describe("URL parsing", () => {
       expected = isWin ? "\\\\w\u036A\u034Aei\u036C\u034Brd.com\\host\\a" : ""
       actual = urlToPath("file://xn--weird-prdj8vva.com/host/a", mode)
       assert.strictEqual(actual, expected)
+
+      actual = urlToPath("file:///C:/a%2fb", mode)
+      assert.strictEqual(actual, "")
 
       actual = urlToPath("file:///C:/a%2Fb", mode)
       assert.strictEqual(actual, "")

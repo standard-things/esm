@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = require("./bridge-owner.mjs")
+module.exports = require("./bridge.mjs")

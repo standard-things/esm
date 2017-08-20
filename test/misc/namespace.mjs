@@ -1,6 +1,6 @@
 import assert from "assert"
-import * as ans from "../fixture/export/all-mutual/a.mjs"
-import * as bns from "../fixture/export/all-mutual/b.mjs"
+import * as ans from "../fixture/export/cycle-all/a.mjs"
+import * as bns from "../fixture/export/cycle-all/b.mjs"
 import * as ns1 from "../fixture/export/abc.mjs"
 import * as ns2 from "../fixture/export/abc.mjs"
 

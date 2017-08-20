@@ -16,7 +16,7 @@ describe("export declarations", () => {
   )
 
   it("should tolerate mutual * exports", () =>
-    import("./export/all-mutual.mjs")
+    import("./export/cycle-all.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )

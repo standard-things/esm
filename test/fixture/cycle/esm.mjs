@@ -1,5 +1,5 @@
 import { one, two } from "./cjs.js"
 
-export function getSum() {
+export function sum() {
   return one + two
 }

@@ -5,7 +5,7 @@ export const one = 1
 import {
   one as aOne,
   two as aTwo
-} from "./cycle-a.mjs"
+} from "./a.mjs"
 
 export const two = 2
 

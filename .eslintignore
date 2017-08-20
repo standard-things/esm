@@ -4,8 +4,8 @@
 /src/vendor
 /test/fixture/extension
 /test/output
-/test/export/all-mutual.js
+/test/export/cycle-all.js
 /test/export/extension.js
 /test/import/extension.js
-/test/misc/export-dup-local.js
+/test/misc/export/dup-local.js
 /test/misc/namespace.js

@@ -6,13 +6,13 @@ import fs from "fs"
 
 describe("built-in modules", () => {
   it("should fire setters if already loaded", () =>
-    import("./misc/builtin-loaded.mjs")
+    import("./misc/builtin/loaded.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
   it("should produce valid namespace objects", () =>
-    import("./misc/builtin-namespace.mjs")
+    import("./misc/builtin/namespace.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
@@ -99,13 +99,13 @@ describe("spec compliance", () => {
   )
 
   it("should export CJS `module.exports` as default", () =>
-    import("./misc/export-cjs-default.mjs")
+    import("./misc/export/cjs-default.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
   it("should not export CJS named binding", () =>
-    import("./misc/export-cjs-named.mjs")
+    import("./misc/export/cjs-named.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -114,7 +114,7 @@ describe("spec compliance", () => {
   )
 
   it("should support loading ESM from dynamic import in CJS", (done) => {
-    import("./import/cjs-import.js")
+    import("./import/import.js")
       .then((ns) => ns.default(done))
       .catch((e) => assert.ifError(e))
   })
@@ -151,13 +151,13 @@ describe("spec compliance", () => {
   )
 
   it("should bind exports before the module executes", () =>
-    import("./misc/export-cycle.mjs")
+    import("./misc/export/cycle-named.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
   it("should throw a syntax error when exporting duplicate local bindings", () =>
-    import("./misc/export-dup-local.mjs")
+    import("./misc/export/dup-local.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -166,7 +166,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when exporting duplicate namespace bindings", () =>
-    import("./misc/export-dup-namespace.mjs")
+    import("./misc/export/dup-namespace.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -176,8 +176,8 @@ describe("spec compliance", () => {
 
   it("should throw a syntax error when importing non-exported binding", () =>
     Promise.all([
-      "./misc/import-missing-cjs.mjs",
-      "./misc/import-missing-esm.mjs"
+      "./misc/import/missing-cjs.mjs",
+      "./misc/import/missing-esm.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -190,8 +190,8 @@ describe("spec compliance", () => {
 
   it("should throw a type error when setting an imported identifier", () =>
     Promise.all([
-      "./misc/import-const.mjs",
-      "./misc/import-let.mjs"
+      "./misc/import/const.mjs",
+      "./misc/import/let.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -203,7 +203,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when accessing top-level `arguments`", () =>
-    import("./misc/source-arguments-binding.mjs")
+    import("./misc/source/arguments-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -213,8 +213,8 @@ describe("spec compliance", () => {
 
   it("should throw a syntax error when creating an `arguments` binding", () =>
     Promise.all([
-      "./misc/source-arguments-undefined.mjs",
-      "./misc/source-arguments-undefined-nested.mjs"
+      "./misc/source/arguments-undefined.mjs",
+      "./misc/source/arguments-undefined-nested.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -226,7 +226,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when creating an `await` binding", () =>
-    import("./misc/source-await-binding.mjs")
+    import("./misc/source/await-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -235,7 +235,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when using top-level `new.target`", () =>
-    import("./misc/source-new-target.mjs")
+    import("./misc/source/new-target.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -244,7 +244,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when using an opening HTML comment in ESM", () =>
-    import("./misc/source-html-comment.mjs")
+    import("./misc/source/html-comment.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -253,19 +253,19 @@ describe("spec compliance", () => {
   )
 
   it("should not throw when accessing `arguments` in a function", () =>
-    import("./misc/source-arguments-function.mjs")
+    import("./misc/source/arguments-function.mjs")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when typeof checking `arguments`", () =>
-    import("./misc/source-arguments-typeof.mjs")
+    import("./misc/source/arguments-typeof.mjs")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when using an opening HTML comment in CJS", () =>
-    import("./misc/source-html-comment.js")
+    import("./misc/source/html-comment.js")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )

@@ -3,8 +3,8 @@ import assert from "assert"
 describe("import declarations", () => {
   it("should cope with dependency cycles", () =>
     Promise.all([
-      import("./import/cycle-a.mjs"),
-      import("./import/cycle-a.mjs")
+      import("./import/cycle/a.mjs"),
+      import("./import/cycle/a.mjs")
     ])
     .then((namespaces) => namespaces.forEach((ns) => ns.check()))
     .catch((e) => assert.ifError(e))
