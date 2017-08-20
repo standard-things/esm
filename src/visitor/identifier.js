@@ -2,6 +2,8 @@ import Visitor from "../visitor.js"
 
 import raise from "../parse/raise.js"
 
+const definedMap = new WeakMap
+
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {
     this.magicString = options.magicString
@@ -33,14 +35,20 @@ function isArgumentsDefined(path, name) {
   let defined = false
 
   path.getParentNode((parent) => {
-    const type = parent.type
+    defined = definedMap.get(parent)
 
-    if (type === "FunctionDeclaration" ||
-        type === "FunctionExpression") {
-      return defined = true
+    if (defined !== void 0) {
+      return defined
     }
 
-    return false
+    const { type } = parent
+
+    defined =
+      type === "FunctionDeclaration" ||
+      type === "FunctionExpression"
+
+    definedMap.set(parent, defined)
+    return defined
   })
 
   return defined
