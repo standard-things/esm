@@ -17,12 +17,8 @@ const defaultOptions = createOptions({
   var: false
 })
 
-const useModuleRegExp = /(["'])use module\1/
-
-// Matches any {im,ex}port identifier as long as it's not preceded by a "."
-// character (e.g. `runtime.export`) to prevent the compiler from compiling
-// code it has already compiled.
-const importExportRegExp = /(?:^|[^.]\b)(?:im|ex)port\b/
+const argumentsRegExp = /\barguments\b/
+const importExportRegExp = /\b(?:im|ex)port\b/
 
 class Compiler {
   static compile(code, options) {
@@ -37,11 +33,15 @@ class Compiler {
       type: "script"
     }
 
+    let useModule
+
     if (type === "unambiguous" &&
         (hasPragma(code, "use script") ||
           (hint !== "module" &&
-          ! importExportRegExp.test(code) &&
-          ! useModuleRegExp.test(code)))) {
+            ! importExportRegExp.test(code) &&
+            ! (useModule = hasPragma(code, "use module"))
+          )
+        )) {
       return result
     }
 
@@ -97,11 +97,17 @@ class Compiler {
         importExportVisitor.addedImportExport ||
         (type === "unambiguous" &&
           (hint === "module" ||
-          hasPragma(code, "use module")))) {
+            (typeof useModule === "boolean"
+              ? useModule
+              : (useModule = hasPragma(code, "use module"))
+            )
+          )
+        )) {
       result.type = "module"
     }
 
-    if (result.type === "module") {
+    if (result.type === "module" &&
+        argumentsRegExp.test(code)) {
       identifierVisitor.visit(rootPath)
     }
 
