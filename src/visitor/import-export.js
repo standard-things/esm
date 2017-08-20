@@ -58,8 +58,8 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = true
 
     let i = -1
-    const decl = path.getValue()
-    const specifiers = decl.specifiers
+    const node = path.getValue()
+    const { specifiers } = node
     const specifierMap = computeSpecifierMap(specifiers)
     const lastIndex = specifiers.length - 1
 
@@ -68,15 +68,15 @@ class ImportExportVisitor extends Visitor {
       : ""
 
     for (const specifier of specifiers) {
-      const identifier = specifier.local.name
+      const { name } = specifier.local
       hoistedCode +=
-        identifier +
+        name +
         (++i === lastIndex ? ";" : ",")
     }
 
     hoistedCode += toModuleImport(
       this,
-      getSourceString(this, decl),
+      getSourceString(this, node),
       specifierMap
     )
 
@@ -91,17 +91,18 @@ class ImportExportVisitor extends Visitor {
 
     this.addedImportExport = true
 
-    const decl = path.getValue()
+    const node = path.getValue()
+    const { source } = node
     const hoistedCode = pad(
       this,
-      this.runtimeAlias + ".w(" + getSourceString(this, decl),
-      decl.start,
-      decl.source.start
+      this.runtimeAlias + ".w(" + getSourceString(this, node),
+      node.start,
+      source.start
     ) + pad(
       this,
       ',[["*",' + this.runtimeAlias + ".n()]]);",
-      decl.source.end,
-      decl.end
+      source.end,
+      node.end
     )
 
     hoistExports(this, path, hoistedCode)
@@ -114,17 +115,18 @@ class ImportExportVisitor extends Visitor {
 
     this.addedImportExport = true
 
-    const decl = path.getValue()
-    const dd = decl.declaration
+    const node = path.getValue()
+    const { declaration } = node
+    const { id, type } = declaration
 
-    if (dd.id && (dd.type === "FunctionDeclaration" ||
-                  dd.type === "ClassDeclaration")) {
+    if (id && (type === "FunctionDeclaration" ||
+               type === "ClassDeclaration")) {
       // If the exported default value is a function or class declaration,
       // it's important that the declaration be visible to the rest of the
       // code in the exporting module, so we must avoid compiling it to a
       // named function or class expression.
       hoistExports(this, path,
-        addToSpecifierMap(new OrderedMap, "default", dd.id.name),
+        addToSpecifierMap(new OrderedMap, "default", id.name),
         "declaration"
       )
 
@@ -136,19 +138,18 @@ class ImportExportVisitor extends Visitor {
       let prefix = this.runtimeAlias + ".d("
       let suffix = ");"
 
-      if (dd.type === "SequenceExpression") {
-        // If the exported expression is a comma-separated sequence
-        // expression, `this.code.slice(dd.start, dd.end)` may not include
-        // the vital parentheses, so we should wrap the expression with
-        // parentheses to make absolutely sure it is treated as a single
-        // argument to `runtime.default()`, rather than as
-        // multiple arguments.
+      if (type === "SequenceExpression") {
+        // If the exported expression is a comma-separated sequence expression,
+        // `this.code.slice(declaration.start, declaration.end)` may not include
+        // the vital parentheses, so we should wrap the expression with parentheses
+        // to make absolutely sure it is treated as a single argument to
+        // `runtime.default()`, rather than as multiple arguments.
         prefix += "("
         suffix = ")" + suffix
       }
 
-      overwrite(this, decl.start, dd.start, prefix)
-      overwrite(this, dd.end, decl.end, suffix)
+      overwrite(this, node.start, declaration.start, prefix)
+      overwrite(this, declaration.end, node.end, suffix)
     }
   }
 
@@ -159,20 +160,20 @@ class ImportExportVisitor extends Visitor {
 
     this.addedImportExport = true
 
-    const decl = path.getValue()
-    const dd = decl.declaration
+    const node = path.getValue()
+    const { declaration } = node
 
-    if (dd) {
+    if (declaration) {
       const specifierMap = new OrderedMap
-      const type = dd.type
+      const { id, type } = declaration
 
-      if (dd.id && (type === "ClassDeclaration" ||
-                    type === "FunctionDeclaration")) {
-        addNameToMap(specifierMap, dd.id.name)
+      if (id && (type === "ClassDeclaration" ||
+                 type === "FunctionDeclaration")) {
+        addNameToMap(specifierMap, id.name)
       } else if (type === "VariableDeclaration") {
-        const varDecls = dd.declarations
+        const { declarations } = declaration
 
-        for (const varDecl of varDecls) {
+        for (const varDecl of declarations) {
           const names = getNamesFromPattern(varDecl.id)
 
           for (const name of names) {
@@ -187,20 +188,22 @@ class ImportExportVisitor extends Visitor {
       // declaration is a const-kinded VariableDeclaration, because the
       // assignmentVisitor doesn't need to worry about changes to these
       // variables.
-      if (canExportedValuesChange(decl)) {
+      if (canExportedValuesChange(node)) {
         addExportedLocalNames(this, specifierMap)
       }
 
       return
     }
 
-    if (! decl.specifiers) {
+    const { specifiers } = node
+
+    if (! specifiers) {
       return
     }
 
-    let specifierMap = computeSpecifierMap(decl.specifiers)
+    let specifierMap = computeSpecifierMap(specifiers)
 
-    if (decl.source == null) {
+    if (node.source == null) {
       hoistExports(this, path, specifierMap)
       addExportedLocalNames(this, specifierMap)
       return
@@ -225,7 +228,7 @@ class ImportExportVisitor extends Visitor {
     // still be hoisted as an export, i.e. before actual imports.
     hoistExports(this, path, toModuleImport(
       this,
-      getSourceString(this, decl),
+      getSourceString(this, node),
       specifierMap
     ))
   }
@@ -342,8 +345,8 @@ function getBlockBodyInfo(visitor, path) {
 
 // Gets a string representation (including quotes) from an import or
 // export declaration node.
-function getSourceString(visitor, decl) {
-  return visitor.code.slice(decl.source.start, decl.source.end)
+function getSourceString(visitor, { source }) {
+  return visitor.code.slice(source.start, source.end)
 }
 
 function hoistImports(visitor, importDeclPath, hoistedCode) {
