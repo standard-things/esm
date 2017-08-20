@@ -7,7 +7,7 @@ import attempt from "../util/attempt.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
 import env from "../env.js"
-import encodeIdent from "../util/encode-ident.js"
+import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
 import md5 from "../util/md5.js"
@@ -20,7 +20,7 @@ if (env.repl) {
   // Custom REPLs can still define their own eval functions to bypass this.
   const md5Hash = md5(Date.now()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
-  const runtimeAlias = encodeIdent("_" + md5Hash)
+  const runtimeAlias = encodeId("_" + md5Hash)
 
   const managerWrapper = function (manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)

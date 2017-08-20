@@ -8,7 +8,7 @@ import Wrapper from "../wrapper.js"
 import attempt from "../util/attempt.js"
 import binding from "../binding.js"
 import compiler from "../caching-compiler.js"
-import encodeIdent from "../util/encode-ident.js"
+import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import extname from "../util/extname.js"
 import fs from "fs"
@@ -78,7 +78,7 @@ function methodWrapper(manager, func, pkgInfo, args) {
   const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 
   const stateHash = getCacheStateHash(cacheFileName)
-  const runtimeAlias = encodeIdent("_" + stateHash.slice(0, 3))
+  const runtimeAlias = encodeId("_" + stateHash.slice(0, 3))
 
   let cacheCode
   let sourceCode
