@@ -66,22 +66,22 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should not reevaluate a module that errors", () =>
-    import("./misc/reevaluate.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) =>
-        import("./misc/reevaluate.mjs")
-          .then(() => assert.ok(false))
-          .catch((re) => assert.strictEqual(e, re))
-      )
-      .then(() => delete global.reevaluate)
-  )
-
   it("should not wrap custom errors", () =>
     import("./misc/custom-error.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e, global.customError))
       .then(() => delete global.customError)
+  )
+
+  it("should not reevaluate errors", () =>
+    import("./misc/reevaluate-error.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) =>
+        import("./misc/reevaluate-error.mjs")
+          .then(() => assert.ok(false))
+          .catch((re) => assert.strictEqual(e, re))
+      )
+      .then(() => delete global.reevaluate)
   )
 })
 
