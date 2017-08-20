@@ -15,7 +15,7 @@ class IdentifierVisitor extends Visitor {
     if (node.name === "arguments") {
       const { operator, type } = path.getParentNode()
 
-      if ((type !== "UnaryExpression" || operator !== "typeof") &&
+      if (! (type === "UnaryExpression" && operator === "typeof") &&
           ! isArgumentsDefined(path)) {
         const parser = {
           input: this.magicString.original,
