@@ -58,6 +58,16 @@ describe("URL parsing", () => {
     })
   })
 
+  it("should resolve URLs with protocol relative localhost", () => {
+    modes.forEach((mode) => {
+      const isWin = mode === "win32"
+
+      const expected = isWin ? "" : "/dev"
+      const actual = urlToPath("//localhost/dev", mode)
+      assert.strictEqual(actual, expected)
+    })
+  })
+
   it("should not resolve URLs with other protocols", () =>
     Promise.all([
       "about:blank",
