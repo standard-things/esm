@@ -104,11 +104,12 @@ class Compiler {
           )
         )) {
       result.type = "module"
-    }
 
-    if (result.type === "module" &&
-        argumentsRegExp.test(code)) {
-      identifierVisitor.visit(rootPath)
+      if (argumentsRegExp.test(code)) {
+        identifierVisitor.visit(rootPath, {
+          magicString: importExportVisitor.magicString
+        })
+      }
     }
 
     result.code = importExportVisitor.magicString.toString()

@@ -29,12 +29,6 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should not populate top-level `arguments`", () =>
-    import("./misc/arguments.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should not have CJS free variables", () =>
     import("./misc/free-vars.mjs")
       .then((ns) => ns.check())
@@ -145,8 +139,31 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should throw a syntax error when using `await` as an identifier", () =>
-    import("./misc/source-await.mjs")
+  it("should throw a syntax error when accessing top-level `arguments`", () =>
+    import("./misc/source-arguments-binding.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("Binding arguments in strict mode"))
+      })
+  )
+
+  it("should throw a syntax error when creating an `arguments` binding", () =>
+    Promise.all([
+      "./misc/source-arguments-undefined.mjs",
+      "./misc/source-arguments-undefined-nested.mjs"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof ReferenceError)
+          assert.ok(e.message.startsWith("arguments is not defined"))
+        })
+    ))
+  )
+
+  it("should throw a syntax error when creating an `await` binding", () =>
+    import("./misc/source-await-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -170,6 +187,18 @@ describe("spec compliance", () => {
         assert.ok(e instanceof SyntaxError)
         assert.ok(e.message.startsWith("Unexpected token"))
       })
+  )
+
+  it("should not throw when accessing `arguments` in a function", () =>
+    import("./misc/source-arguments-function.mjs")
+      .then(() => assert.ok(true))
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should not throw when typeof checking `arguments`", () =>
+    import("./misc/source-arguments-typeof.mjs")
+      .then(() => assert.ok(true))
+      .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when using an opening HTML comment in CJS", () =>
