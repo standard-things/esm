@@ -53,6 +53,20 @@ describe("package.json", () => {
   )
 })
 
+describe("resolving file paths", () => {
+  it("should find modules with names containing colons", () =>
+    Promise.all([
+      "./misc/with:colon.mjs",
+      "./misc/with%3acolon.mjs",
+      "./misc/with%3Acolon.mjs"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
+  )
+})
+
 describe("spec compliance", () => {
   it("should establish live binding of values", () =>
     import("./misc/live.mjs")
