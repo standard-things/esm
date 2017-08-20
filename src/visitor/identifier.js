@@ -16,7 +16,7 @@ class IdentifierVisitor extends Visitor {
       const { operator, type } = path.getParentNode()
 
       if ((type !== "UnaryExpression" || operator !== "typeof") &&
-          ! isArgumentsDefined(path, node.name)) {
+          ! isArgumentsDefined(path)) {
         const parser = {
           input: this.magicString.original,
           pos: node.start,
@@ -31,7 +31,7 @@ class IdentifierVisitor extends Visitor {
   }
 }
 
-function isArgumentsDefined(path, name) {
+function isArgumentsDefined(path) {
   let defined = false
 
   path.getParentNode((parent) => {
