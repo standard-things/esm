@@ -4,6 +4,12 @@ import SemVer from "semver"
 import assert from "assert"
 import fs from "fs"
 
+beforeEach(() => {
+  delete global.customError
+  delete global.loadCount
+  delete global.reevaluate
+})
+
 describe("built-in modules", () => {
   it("should fire setters if already loaded", () =>
     import("./misc/builtin/loaded.mjs")
@@ -66,11 +72,34 @@ describe("Node rules", () => {
     ))
   )
 
+  it("should reevaluate same ES module with different query+hash", () =>
+    import("./misc/load-count.mjs")
+      .then((oldNs) =>
+        [
+          { id: "./misc/load-count.mjs?",  count: 2 },
+          { id: "./misc/load-count.mjs#",  count: 3 },
+          { id: "./misc/load-count.mjs?",  count: 2 },
+          { id: "./misc/load-count.mjs#",  count: 3 },
+          { id: "./misc/load-count.mjs?4", count: 4 },
+          { id: "./misc/load-count.mjs#5", count: 5 },
+          { id: "./misc/load-count.mjs?4", count: 4 },
+          { id: "./misc/load-count.mjs#5", count: 5 }
+        ].reduce((promise, data) =>
+          promise
+            .then(() => import(data.id))
+            .then((ns) => {
+              assert.notStrictEqual(ns, oldNs)
+              assert.strictEqual(ns.default, data.count)
+              oldNs = ns
+            })
+        , Promise.resolve())
+      )
+  )
+
   it("should not wrap custom errors", () =>
     import("./misc/custom-error.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e, global.customError))
-      .then(() => delete global.customError)
   )
 
   it("should not reevaluate errors", () =>
@@ -81,7 +110,6 @@ describe("Node rules", () => {
           .then(() => assert.ok(false))
           .catch((re) => assert.strictEqual(e, re))
       )
-      .then(() => delete global.reevaluate)
   )
 })
 
@@ -162,10 +190,7 @@ describe("spec compliance", () => {
   it("should not executed already loaded modules from require", () =>
     import("./misc/load-count.js")
       .then(() => import("./misc/require-load-count.js"))
-      .then(() => {
-        assert.strictEqual(global.loadCount, 1)
-        delete global.loadCount
-      })
+      .then((ns) => assert.strictEqual(ns.default, 1))
   )
 
   it("should bind exports before the module executes", () =>

@@ -8,6 +8,7 @@ module.exports = {
     "import/prefer-default-export": "off",
     "no-unused-vars": "off",
     "sort-imports": "off",
+    "sort-keys": "off",
     strict: "off"
   }
 }
