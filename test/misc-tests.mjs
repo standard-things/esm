@@ -61,6 +61,12 @@ describe("package.json", () => {
 })
 
 describe("Node rules", () => {
+  it("should find `.mjs` before `.js`", () =>
+    import("./misc/priority/a")
+      .then((ns) => assert.strictEqual(ns.default, "esm"))
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should find modules with names containing colons", () =>
     Promise.all([
       "./misc/with:colon.mjs",
