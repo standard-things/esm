@@ -1,6 +1,6 @@
-import { _makeLong } from "path"
-import binding from "../binding.js"
 import { Stats, statSync } from "fs"
+import binding from "../binding.js"
+import toNamespacedPath from "../util/to-namespaced-path.js"
 
 const { internalModuleStat } = binding.fs
 const isFile = Stats.prototype.isFile
@@ -44,7 +44,7 @@ function fastPathStat(filePath) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or < 0 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
-  return internalModuleStat(_makeLong(filePath))
+  return internalModuleStat(toNamespacedPath(filePath))
 }
 
 stat.cache = null

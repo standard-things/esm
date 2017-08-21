@@ -1,7 +1,7 @@
-import { _makeLong } from "path"
 import binding from "../binding.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
+import toNamespacedPath from "../util/to-namespaced-path.js"
 
 const { internalModuleReadFile } = binding.fs
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
@@ -30,7 +30,7 @@ function fastPathReadFile(filePath) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
-  const content = internalModuleReadFile(_makeLong(filePath))
+  const content = internalModuleReadFile(toNamespacedPath(filePath))
   return content === void 0 ? null : content
 }
 

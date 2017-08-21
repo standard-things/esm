@@ -1,7 +1,7 @@
 import FastObject from "./fast-object.js"
 
-import { _makeLong } from "path"
 import readFile from "./fs/read-file.js"
+import toNamespacedPath from "./util/to-namespaced-path.js"
 
 const { dlopen } = process
 const { parse:jsonParse } = JSON
@@ -20,7 +20,7 @@ builtinCompilers[".json"] = function (mod, filePath) {
 }
 
 builtinCompilers[".node"] = function (mod, filePath) {
-  return dlopen(mod, _makeLong(filePath))
+  return dlopen(mod, toNamespacedPath(filePath))
 }
 
 export default builtinCompilers
