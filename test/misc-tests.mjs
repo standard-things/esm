@@ -8,6 +8,7 @@ beforeEach(() => {
   delete global.customError
   delete global.loadCount
   delete global.reevaluate
+  delete Module._extensions[".coffee"]
 })
 
 describe("built-in modules", () => {
@@ -111,6 +112,13 @@ describe("Node rules", () => {
           .catch((re) => assert.strictEqual(e, re))
       )
   )
+
+  it("should not use `Module._extensions` in ESM", () => {
+    Module._extensions[".coffee"] = Module._extensions[".js"]
+    return import("./misc/cof")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+  })
 })
 
 describe("spec compliance", () => {
