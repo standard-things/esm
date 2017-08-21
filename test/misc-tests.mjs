@@ -4,11 +4,15 @@ import SemVer from "semver"
 import assert from "assert"
 import fs from "fs"
 
+const jsonExt = Module._extensions[".json"]
+const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
+
 beforeEach(() => {
   delete global.customError
   delete global.loadCount
   delete global.reevaluate
   delete Module._extensions[".coffee"]
+  Module._extensions[".json"] = jsonExt
 })
 
 describe("built-in modules", () => {
@@ -119,11 +123,18 @@ describe("Node rules", () => {
       )
   )
 
-  it("should not use `Module._extensions` in ESM", () => {
+  it("should not support custom file extensions in ESM", () => {
     Module._extensions[".coffee"] = Module._extensions[".js"]
     return import("./misc/cof")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+  })
+
+  it("should not support overwriting `.json` handling", () => {
+    Module._extensions[".json"] = () => ({})
+    return import("./package.json")
+      .then((ns) => assert.deepEqual(ns.default, json))
+      .catch((e) => assert.ifError(e))
   })
 })
 
