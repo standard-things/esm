@@ -22,7 +22,8 @@ const childrenToVisit = createOptions({
   elements: true,
   expression: true,
   init: true,
-  object: true
+  object: true,
+  value: true
 })
 
 class Visitor {
