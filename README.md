@@ -9,16 +9,15 @@ for all the details.
 Getting started
 ---
 
-  1. Run `npm i --save @std/esm`, with [npm 2+](https://docs.npmjs.com/misc/scope),
-     in your app or package directory.
-  2. Call `require("@std/esm")` before importing ES modules.
+  1. Run `npm i --save @std/esm` in your app or package directory.
+  2. Add `.esm-cache` to your `.gitignore`.
+  3. Call `require("@std/esm")` before importing ES modules.
 
      **index.js**
      ```js
      require("@std/esm")
      module.exports = require("./main.mjs").default
      ```
-  3. Add `.esm-cache` to your `.gitignore`.
 
 For package authors with sub modules:
 
