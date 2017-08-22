@@ -1,6 +1,6 @@
 import { Stats, statSync } from "fs"
 import binding from "../binding.js"
-import toNamespacedPath from "../util/to-namespaced-path.js"
+import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const { internalModuleStat } = binding.fs
 const isFile = Stats.prototype.isFile

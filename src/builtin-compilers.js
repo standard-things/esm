@@ -1,7 +1,7 @@
 import FastObject from "./fast-object.js"
 
 import readFile from "./fs/read-file.js"
-import toNamespacedPath from "./util/to-namespaced-path.js"
+import toNamespacedPath from "./path/to-namespaced-path.js"
 
 const { dlopen } = process
 const { parse:jsonParse } = JSON
