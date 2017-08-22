@@ -18,6 +18,7 @@ Getting started
      require("@std/esm")
      module.exports = require("./main.mjs").default
      ```
+  3. Add `.esm-cache` to your `.gitignore`.
 
 For package authors with sub modules:
 
