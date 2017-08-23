@@ -1,13 +1,23 @@
 import FastObject from "./fast-object.js"
 
-const ids = ["config", "fs", "natives", "util"]
+import setGetter from "./util/set-getter.js"
+import setProperty from "./util/set-property.js"
+import setSetter from "./util/set-setter.js"
+
+const ids = ["config", "fs", "inspector", "natives", "util"]
 
 const binding = ids.reduce((binding, id) => {
-  try {
-    binding[id] = process.binding(id)
-  } catch (e) {
-    binding[id] = Object.create(null)
-  }
+  setGetter(binding, id, () => {
+    try {
+      return binding[id] = process.binding(id)
+    } catch (e) {
+      return binding[id] = Object.create(null)
+    }
+  })
+
+  setSetter(binding, id, (value) => {
+    setProperty(binding, id, { value })
+  })
 
   return binding
 }, new FastObject)
