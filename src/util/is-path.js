@@ -1,6 +1,8 @@
+const codeOfBackslash = "\\".charCodeAt(0)
 const codeOfColon = ":".charCodeAt(0)
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
+
 const isWin = process.platform === "win32"
 
 function isPath(value) {
@@ -17,8 +19,10 @@ function isPath(value) {
   }
 
   if (isWin) {
+    // Detect drive letter, i.e. `[a-zA-Z]:\\`
     return code1 === codeOfColon &&
-      ((code0 > 64 && code0 < 91) || (code0 > 96 && code0 < 123))
+      ((code0 > 64 && code0 < 91) || (code0 > 96 && code0 < 123)) &&
+      value.charCodeAt(2) === codeOfBackslash
   }
 
   return code0 === codeOfSlash && code1 !== codeOfSlash
