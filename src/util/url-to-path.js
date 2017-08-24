@@ -10,8 +10,8 @@ const API = {
   win32: { normalize: win32.normalize }
 }
 
-const codeOfBackslash = "\\".charCodeAt(0)
 const codeOfColon = ":".charCodeAt(0)
+const codeOfSlash = "/".charCodeAt(0)
 
 const localhostRegExp = /^\/\/localhost\b/
 const { toUnicode } = punycode
@@ -64,9 +64,10 @@ function urlToPath(url, mode = "posix") {
 
   const code1 = pathname.charCodeAt(1)
 
-  // Drive letters must be `[a-zA-Z]:\\`.
+  // Drive letters must be `[A-Za-z]:/`
+  // All slashes of pathnames are forward slashes.
   if (((code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)) &&
-      pathname.charCodeAt(3) === codeOfBackslash){
+      pathname.charCodeAt(3) === codeOfSlash){
     return normalize(pathname).slice(1)
   }
 

@@ -41,7 +41,7 @@ function toNamespacedPath(thePath) {
     return thePath
   }
 
-  // Detect drive letter, i.e. `[a-zA-Z]:\\`
+  // Detect drive letter, i.e. `[A-Za-z]:\\`
   if (code1 === codeOfColon &&
       ((code0 > 64 && code0 < 91) || (code0 > 96 && code0 < 123)) &&
       resolvedPath.charCodeAt(2) === codeOfBackslash) {
