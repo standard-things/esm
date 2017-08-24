@@ -1,6 +1,6 @@
 import { extname as _extname, dirname, join } from "path"
 
-import Module from "module"
+import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"

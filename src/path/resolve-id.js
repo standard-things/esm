@@ -1,19 +1,19 @@
 import FastObject from "../fast-object.js"
 
-import { _nodeModulePaths } from "module"
-import decodeURIComponent from "./decode-uri-component.js"
+import decodeURIComponent from "../util/decode-uri-component.js"
 import { dirname } from "path"
-import encodedSlash from "./encoded-slash.js"
+import encodedSlash from "../util/encoded-slash.js"
 import errors from "../errors.js"
 import isPath from "./is-path.js"
-import parseURL from "./parse-url.js"
+import nodeModulePaths from "../module/node-module-paths.js"
+import parseURL from "../util/parse-url.js"
 import resolveFilePath from "./resolve-file-path.js"
-import urlToPath from "./url-to-path.js"
+import urlToPath from "../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
+
 const { cwd } = process
-const isWin = process.platform === "win32"
-const pathMode = isWin ? "win32" : "posix"
+const pathMode = process.platform === "win32" ? "win32" : "posix"
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
@@ -50,24 +50,11 @@ function resolveId(id, parent, options) {
         return foundPath
       }
     } else {
-      let fromParent = parent
-
-      if (! options.cjs)  {
-        // Prevent resolving non-local dependencies:
-        // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-        const paths = _nodeModulePaths(fromPath)
-
-        // Hack: Overwrite `path.concat()` to prevent global paths from being
-        // concatenated.
-        paths.concat = () => paths
-
-        // Ensure a parent id and filename are provided to avoid going down the
-        // --eval branch of `Module._resolveLookupPaths()`.
-        fromParent = { filename, id: "<mock>", paths }
-      }
-
+      // Prevent resolving non-local dependencies:
+      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
+      const skipGlobalPaths = ! options.cjs
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = resolveFilePath(decodedId, fromParent, isMain)
+      const foundPath = resolveFilePath(decodedId, parent, isMain, skipGlobalPaths)
 
       if (foundPath) {
         return foundPath

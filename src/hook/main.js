@@ -1,15 +1,19 @@
-import Module from "module"
+import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 import Wrapper from "../wrapper.js"
 
 import { dirname } from "path"
 import env from "../env.js"
-import resolveId from "../util/resolve-id.js"
+import moduleHook from "../hook/module.js"
+import resolveId from "../path/resolve-id.js"
 
 const { _tickCallback, argv } = process
 
 if (env.preload && argv.length > 1) {
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
+  moduleHook(Module)
+
+  const BuiltinModule = __non_webpack_module__.constructor
   const mainPath = argv[1]
 
   const managerWrapper = function (manager, func, args) {
@@ -18,7 +22,7 @@ if (env.preload && argv.length > 1) {
     let wrapped = null
 
     if (pkgInfo !== null) {
-      wrapped = Wrapper.find(Module, "runMain", pkgInfo.range)
+      wrapped = Wrapper.find(BuiltinModule, "runMain", pkgInfo.range)
     }
 
     return wrapped === null
@@ -41,13 +45,13 @@ if (env.preload && argv.length > 1) {
     }
   }
 
-  const methodWrapper = function (manager, func, filePath, args) {
-    // Bypass built-in handling of .mjs.
-    if (! filePath.endsWith(".mjs")) {
-      // eslint-disable-next-line consistent-return
-      return func.apply(this, args)
-    }
+  const tryTickCallback = () => {
+    try {
+      _tickCallback()
+    } catch (e) {}
+  }
 
+  const methodWrapper = function (manager, func, filePath, args) {
     const mod = new Module(filePath, null)
     mod.id = "."
     process.mainModule = mod
@@ -56,9 +60,9 @@ if (env.preload && argv.length > 1) {
     tryModuleLoad(mod, filePath)
 
     // Handle any nextTicks added in the first tick of the program.
-    _tickCallback()
+    tryTickCallback()
   }
 
-  Wrapper.manage(Module, "runMain", managerWrapper)
-  Wrapper.wrap(Module, "runMain", methodWrapper)
+  Wrapper.manage(BuiltinModule, "runMain", managerWrapper)
+  Wrapper.wrap(BuiltinModule, "runMain", methodWrapper)
 }

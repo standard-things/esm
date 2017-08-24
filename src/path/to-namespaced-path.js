@@ -1,4 +1,4 @@
-// Based on Node's lib/path.js _makeLong method.
+// Based on Node's `path._makeLong` method.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/path.js
 
@@ -9,11 +9,12 @@ const codeOfColon = ":".charCodeAt(0)
 const codeOfDot = ".".charCodeAt(0)
 const codeOfQMark = "?".charCodeAt(0)
 
-const isWin = process.platform === "win32"
+function posixToNamespacedPath(thePath) {
+  return thePath
+}
 
-function toNamespacedPath(thePath) {
-  if (! isWin ||
-      typeof thePath !== "string" ||
+function win32ToNamespacedPath(thePath) {
+  if (typeof thePath !== "string" ||
       ! thePath.length) {
     return thePath
   }
@@ -51,4 +52,6 @@ function toNamespacedPath(thePath) {
   return thePath
 }
 
-export default toNamespacedPath
+export default process.platform === "win32"
+  ? win32ToNamespacedPath
+  : posixToNamespacedPath

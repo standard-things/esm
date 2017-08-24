@@ -1,23 +1,27 @@
 import { extname, resolve } from "path"
 import FastObject from "../fast-object.js"
 
-import { _resolveFilename } from "module"
 import binding from "../binding.js"
 import isFile from "../fs/is-file.js"
 import isPath from "./is-path.js"
 import { realpathSync } from "fs"
+import resolveFilename from "../module/resolve-filename.js"
 
 const exts = [".mjs", ".js", ".json", ".node"]
 const { preserveSymlinks } = binding.config
 
 const realCache = new FastObject
 
-function resolveFilePath(request, parent, isMain) {
+function resolveFilePath(request, parent, isMain, skipGlobalPaths) {
   if (! isPath(request)) {
-    return resolveRealPath(request, parent, isMain)
+    return resolveRealPath(request, parent, isMain, skipGlobalPaths)
   }
 
-  let resPath = resolve(parent.filename, "..", request)
+  const parentFilename = parent && parent.filename
+
+  let resPath = parentFilename
+    ? resolve(parentFilename, "..", request)
+    : resolve(request)
 
   if (! extname(resPath)) {
     let ext = findExt(resPath, parent)
@@ -64,9 +68,9 @@ function realPath(request) {
   return ""
 }
 
-function resolveRealPath(request, parent, isMain) {
+function resolveRealPath(request, parent, isMain, skipGlobalPaths) {
   try {
-    return _resolveFilename(request, parent, isMain)
+    return resolveFilename(request, parent, isMain, skipGlobalPaths)
   } catch (e) {}
   return ""
 }
