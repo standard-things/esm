@@ -1,4 +1,4 @@
-import extname from "./extname.js"
+import extname from "../path/extname.js"
 import md5 from "./md5.js"
 import { version } from "../version.js"
 

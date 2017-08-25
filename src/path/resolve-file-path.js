@@ -2,8 +2,8 @@ import { extname, resolve } from "path"
 import FastObject from "../fast-object.js"
 
 import binding from "../binding.js"
-import isFile from "../fs/is-file.js"
-import isPath from "./is-path.js"
+import isFile from "../util/is-file.js"
+import isPath from "../util/is-path.js"
 import { realpathSync } from "fs"
 import resolveFilename from "../module/resolve-filename.js"
 

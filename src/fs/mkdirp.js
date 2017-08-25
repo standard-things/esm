@@ -1,5 +1,5 @@
 import { dirname } from "path"
-import isDirectory from "./is-directory.js"
+import isDirectory from "../util/is-directory.js"
 import mkdir from "./mkdir.js"
 
 function mkdirp(dirPath, scopePath) {
