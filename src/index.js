@@ -5,14 +5,17 @@ import { inspect } from "util"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import replHook from "./hook/repl.js"
+import requireHook from "./hook/require.js"
 import setProperty from "./util/set-property.js"
 import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
-
 const customSym = inspect.custom
 const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
-const exports = Object.create(null)
+
+function hook(mod) {
+  return requireHook(mod)
+}
 
 if (env.repl) {
   // Enable ESM in the Node REPL by loading @std/esm upon entering.
@@ -28,11 +31,11 @@ if (env.repl) {
   moduleHook(BuiltinModule)
 }
 
-setProperty(exports, inspectKey, {
+setProperty(hook, inspectKey, {
   configurable: false,
   enumerable: false,
   value: () => "@std/esm enabled",
   writable: false
 })
 
-export default Object.freeze(exports)
+export default Object.freeze(hook)
