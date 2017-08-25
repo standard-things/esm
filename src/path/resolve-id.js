@@ -4,6 +4,7 @@ import decodeURIComponent from "../util/decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "../util/encoded-slash.js"
 import errors from "../errors.js"
+import isBuiltinModule from "../util/is-builtin-module.js"
 import isPath from "../util/is-path.js"
 import nodeModulePaths from "../module/node-module-paths.js"
 import parseURL from "../util/parse-url.js"
@@ -67,6 +68,10 @@ function resolveId(id, parent, options) {
   if (foundPath) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
   } else {
+    if (isBuiltinModule(id)) {
+      return id
+    }
+
     throw new errors.Error("ERR_MISSING_MODULE", id)
   }
 }
