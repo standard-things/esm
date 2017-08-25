@@ -6,8 +6,8 @@ import moduleLoad from "../module/load.js"
 import resolveId from "../path/resolve-id.js"
 
 function hook(mod) {
-  return makeRequireFunction(mod, (request) => {
-    const filePath = resolveId(request, mod)
+  return makeRequireFunction(mod, (id) => {
+    const filePath = resolveId(id, mod)
     const pkgInfo = PkgInfo.get(dirname(filePath))
 
     return pkgInfo === null

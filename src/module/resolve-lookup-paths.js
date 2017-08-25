@@ -12,24 +12,24 @@ const { slice } = Array.prototype
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-function resolveLookupPaths(request, parent, skipGlobalPaths) {
-  if (request in builtinModules) {
+function resolveLookupPaths(id, parent, skipGlobalPaths) {
+  if (id in builtinModules) {
     return null
   }
 
   // Check for relative path.
-  if (request.length < 2 ||
-      request.charCodeAt(0) !== codeOfDot ||
-      (request.charCodeAt(1) !== codeOfDot &&
-       request.charCodeAt(1) !== codeOfSlash)) {
+  if (id.length < 2 ||
+      id.charCodeAt(0) !== codeOfDot ||
+      (id.charCodeAt(1) !== codeOfDot &&
+       id.charCodeAt(1) !== codeOfSlash)) {
     const parentPaths = parent && parent.paths
     const parentFilename = parent && parent.filename
     const paths = parentPaths ? slice.call(parentPaths) : []
 
-    // Maintain backwards compat with certain broken uses of require(".")
+    // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module"s directory in front of the lookup paths.
-    if (request === ".") {
-      paths.unshift(parentFilename ? dirname(parentFilename) : resolve(request))
+    if (id === ".") {
+      paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
     }
 
     if (parentPaths && ! skipGlobalPaths) {
@@ -39,12 +39,12 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     return paths.length ? paths : null
   }
 
-  // With --eval, parent.id is not set and parent.filename is null.
+  // With --eval, `parent.id` is not set and `parent.filename` is `null`.
   if (! parent ||
       ! parent.id ||
       ! parent.filename) {
-    // Normally the path is taken from `ealpath(__filename)` but with --eval
-    // there is no filename.
+    // Normally the path is taken from `realpath(__filename)`
+    // but with --eval there is no `__filename`.
     const paths = nodeModulePaths(".")
     paths.unshift(".")
     return paths

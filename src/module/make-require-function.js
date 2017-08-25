@@ -7,18 +7,18 @@ import { resolve } from "path"
 import resolveFilename from "./resolve-filename.js"
 
 function makeRequireFunction(mod, loader = mod.require) {
-  function require(request) {
+  function require(id) {
     moduleState.requireDepth += 1
 
     try {
-      return loader.call(mod, request)
+      return loader.call(mod, id)
     } finally {
       moduleState.requireDepth -= 1
     }
   }
 
-  function resolve(request) {
-    return resolveFilename(request, mod)
+  function resolve(id) {
+    return resolveFilename(id, mod)
   }
 
   require.cache = moduleState._cache

@@ -8,9 +8,9 @@ import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import resolveFilename from "./resolve-filename.js"
 
-function load(request, parent, isMain) {
+function load(id, parent, isMain) {
   const Parent = parent ? parent.constructor : Module
-  const filePath = resolveFilename(request, parent, isMain)
+  const filePath = resolveFilename(id, parent, isMain)
   const state = parent ? Parent : moduleState
 
   if (filePath in state._cache) {

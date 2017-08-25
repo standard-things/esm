@@ -7,9 +7,9 @@ const gunzipSync = require("zlib").gunzipSync
 const join = require("path").join
 const readFileSync = require("fs").readFileSync
 
-const filename = join(__dirname, "esm.js.gz")
-const content = gunzipSync(readFileSync(filename)).toString()
-const mod = new Module(filename, module.parent)
+const filePath = join(__dirname, "esm.js.gz")
+const content = gunzipSync(readFileSync(filePath)).toString()
+const mod = new Module(filePath, module.parent)
 
-mod._compile(content, filename)
+mod._compile(content, filePath)
 module.exports = mod.exports

@@ -18,18 +18,18 @@ const { preserveSymlinks } = binding.config
 const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
-function findPath(request, parent, paths, isMain) {
+function findPath(id, parent, paths, isMain) {
   const extensions = parent
     ? parent.constructor._extensions
     : moduleState._extensions
 
-  if (isAbsolute(request)) {
+  if (isAbsolute(id)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
     return false
   }
 
-  const cacheKey = request + "\0" +
+  const cacheKey = id + "\0" +
     (paths.length === 1 ? paths[0] : paths.join("\0"))
 
   if (cacheKey in pathCache) {
@@ -37,16 +37,16 @@ function findPath(request, parent, paths, isMain) {
   }
 
   let exts
-  const trailingSlash = request.length > 0 &&
-    request.charCodeAt(request.length - 1) === codeOfSlash
+  const trailingSlash = id.length > 0 &&
+    id.charCodeAt(id.length - 1) === codeOfSlash
 
   for (const curPath of paths) {
     if (curPath && stat(curPath) < 1) {
       continue
     }
 
-    let filename
-    const basePath = resolve(curPath, request)
+    let filePath
+    const basePath = resolve(curPath, id)
     const rc = stat(basePath)
     const isFile = rc === 0
     const isDir = rc === 1
@@ -54,58 +54,58 @@ function findPath(request, parent, paths, isMain) {
     if (! trailingSlash) {
       if (isFile) {
         if (preserveSymlinks && ! isMain) {
-          filename = resolve(basePath)
+          filePath = resolve(basePath)
         } else {
-          filename = realpathSync(basePath)
+          filePath = realpathSync(basePath)
         }
       } else if (isDir) {
         if (exts === void 0) {
           exts = keys(extensions)
         }
 
-        filename = tryPackage(basePath, exts, isMain)
+        filePath = tryPackage(basePath, exts, isMain)
       }
 
-      if (! filename) {
+      if (! filePath) {
         if (exts === void 0) {
           exts = keys(extensions)
         }
 
-        filename = tryExtensions(basePath, exts, isMain)
+        filePath = tryExtensions(basePath, exts, isMain)
       }
     }
 
-    if (isDir && ! filename) {
+    if (isDir && ! filePath) {
       if (exts === void 0) {
         exts = keys(extensions)
       }
 
-      filename = tryPackage(basePath, exts, isMain)
+      filePath = tryPackage(basePath, exts, isMain)
     }
 
-    if (isDir && ! filename) {
+    if (isDir && ! filePath) {
       if (exts === void 0) {
         exts = keys(extensions)
       }
 
-      filename = tryExtensions(resolve(basePath, "index"), exts, isMain)
+      filePath = tryExtensions(resolve(basePath, "index"), exts, isMain)
     }
 
-    if (filename) {
-      pathCache[cacheKey] = filename
-      return filename
+    if (filePath) {
+      pathCache[cacheKey] = filePath
+      return filePath
     }
   }
 
   return false
 }
 
-function readPackage(requestPath) {
-  if (requestPath in packageMainCache) {
-    return packageMainCache[requestPath]
+function readPackage(thePath) {
+  if (thePath in packageMainCache) {
+    return packageMainCache[thePath]
   }
 
-  const jsonPath = resolve(requestPath, "package.json")
+  const jsonPath = resolve(thePath, "package.json")
   const json = readFile(jsonPath, "utf8")
 
   if (json === null) {
@@ -115,7 +115,7 @@ function readPackage(requestPath) {
   let pkg
 
   try {
-    pkg = packageMainCache[requestPath] = JSON.parse(json).main
+    pkg = packageMainCache[thePath] = JSON.parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message
@@ -127,36 +127,36 @@ function readPackage(requestPath) {
 
 function tryExtensions(thePath, exts, isMain) {
   for (const ext of exts) {
-    const filename = tryFile(thePath + ext, isMain)
+    const filePath = tryFile(thePath + ext, isMain)
 
-    if (filename) {
-      return filename
+    if (filePath) {
+      return filePath
     }
   }
 
   return false
 }
 
-function tryFile(requestPath, isMain) {
-  const rc = stat(requestPath)
+function tryFile(thePath, isMain) {
+  const rc = stat(thePath)
 
   return preserveSymlinks && ! isMain
-    ? (rc === 0 && resolve(requestPath))
-    : (rc === 0 && realpathSync(requestPath))
+    ? (rc === 0 && resolve(thePath))
+    : (rc === 0 && realpathSync(thePath))
 }
 
-function tryPackage(requestPath, exts, isMain) {
-  const pkg = readPackage(requestPath)
+function tryPackage(thePath, exts, isMain) {
+  const pkg = readPackage(thePath)
 
   if (! pkg) {
     return false
   }
 
-  const filename = resolve(requestPath, pkg)
+  const filePath = resolve(thePath, pkg)
 
-  return tryFile(filename, isMain) ||
-         tryExtensions(filename, exts, isMain) ||
-         tryExtensions(resolve(filename, "index"), exts, isMain)
+  return tryFile(filePath, isMain) ||
+         tryExtensions(filePath, exts, isMain) ||
+         tryExtensions(resolve(filePath, "index"), exts, isMain)
 }
 
 export default findPath

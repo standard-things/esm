@@ -12,16 +12,16 @@ const { preserveSymlinks } = binding.config
 
 const realCache = new FastObject
 
-function resolveFilePath(request, parent, isMain, skipGlobalPaths) {
-  if (! isPath(request)) {
-    return resolveRealPath(request, parent, isMain, skipGlobalPaths)
+function resolveFilePath(id, parent, isMain, skipGlobalPaths) {
+  if (! isPath(id)) {
+    return resolveRealPath(id, parent, isMain, skipGlobalPaths)
   }
 
   const parentFilename = parent && parent.filename
 
   let resPath = parentFilename
-    ? resolve(parentFilename, "..", request)
-    : resolve(request)
+    ? resolve(parentFilename, "..", id)
+    : resolve(id)
 
   if (! extname(resPath)) {
     let ext = findExt(resPath, parent)
@@ -61,16 +61,16 @@ function findExt(filePath, parent) {
   return ""
 }
 
-function realPath(request) {
+function realPath(id) {
   try {
-    return realpathSync(request)
+    return realpathSync(id)
   } catch (e) {}
   return ""
 }
 
-function resolveRealPath(request, parent, isMain, skipGlobalPaths) {
+function resolveRealPath(id, parent, isMain, skipGlobalPaths) {
   try {
-    return resolveFilename(request, parent, isMain, skipGlobalPaths)
+    return resolveFilename(id, parent, isMain, skipGlobalPaths)
   } catch (e) {}
   return ""
 }

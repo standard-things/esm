@@ -6,21 +6,21 @@ import builtinModules from "../builtin-modules.js"
 import findPath from "./find-path.js"
 import resolveLookupPaths from "./resolve-lookup-paths.js"
 
-function resolveFilename(request, parent, isMain, skipGlobalPaths) {
-  if (request in builtinModules) {
-    return request
+function resolveFilename(id, parent, isMain, skipGlobalPaths) {
+  if (id in builtinModules) {
+    return id
   }
 
-  const paths = resolveLookupPaths(request, parent, skipGlobalPaths)
-  const filename = findPath(request, parent, paths, isMain)
+  const paths = resolveLookupPaths(id, parent, skipGlobalPaths)
+  const filePath = findPath(id, parent, paths, isMain)
 
-  if (! filename) {
-    const error = new Error("Cannot find module '" + request + "'")
+  if (! filePath) {
+    const error = new Error("Cannot find module '" + id + "'")
     error.code = "MODULE_NOT_FOUND"
     throw error
   }
 
-  return filename
+  return filePath
 }
 
 export default resolveFilename

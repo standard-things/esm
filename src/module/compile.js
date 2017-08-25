@@ -32,7 +32,7 @@ function compile(mod, content, filePath) {
   if (process._breakFirstLine &&
       process._eval == null) {
     if (resolvedArgv === void 0) {
-      // We enter the REPL if we're not given a filename argument.
+      // We enter the REPL if we're not given a file path argument.
       resolvedArgv = process.argv[1]
         ? resolveFilename(process.argv[1], null, false)
         : "repl"
@@ -51,7 +51,7 @@ function compile(mod, content, filePath) {
   }
 
   const noDepth = moduleState.requireDepth === 0
-  const require = makeRequireFunction(mod)
+  const req = makeRequireFunction(mod)
 
   if (noDepth) {
     stat.cache = new Map
@@ -61,10 +61,10 @@ function compile(mod, content, filePath) {
 
   if (inspectorWrapper) {
     result = inspectorWrapper(compiledWrapper, mod.exports, mod.exports,
-      require, mod, filePath, dirname(filePath))
+      req, mod, filePath, dirname(filePath))
   } else {
     result = compiledWrapper.call(mod.exports, mod.exports,
-      require, mod, filePath, dirname(filePath))
+      req, mod, filePath, dirname(filePath))
   }
 
   if (noDepth) {
