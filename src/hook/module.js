@@ -17,6 +17,7 @@ import gunzip from "../fs/gunzip.js"
 import hasPragma from "../parse/has-pragma.js"
 import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
+import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import stat from "../fs/stat.js"
@@ -115,7 +116,7 @@ function hook(Module) {
       }
     }
 
-    const noDepth = Runtime.requireDepth === 0
+    const noDepth = moduleState.requireDepth === 0
     const tryModuleLoad = cacheValue.type === "module" ? tryESMLoad : tryCJSLoad
 
     if (noDepth) {

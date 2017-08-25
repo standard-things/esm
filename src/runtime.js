@@ -99,7 +99,7 @@ class Runtime {
     const { entry } = this
     const parent = this.module
 
-    Runtime.requireDepth += 1
+    moduleState.requireDepth += 1
 
     try {
       const childEntry = importModule(id, entry)
@@ -107,7 +107,7 @@ class Runtime {
         childEntry.addSetters(setterPairs, Entry.get(parent)).update()
       }
     } finally {
-      Runtime.requireDepth -= 1
+      moduleState.requireDepth -= 1
     }
   }
 }
@@ -194,7 +194,7 @@ function loadModule(filePath, parent, tryModuleLoad) {
 }
 
 function requireWrapper(func, id) {
-  Runtime.requireDepth += 1
+  moduleState.requireDepth += 1
 
   try {
     if (id in builtinModules) {
@@ -205,7 +205,7 @@ function requireWrapper(func, id) {
     const filePath = resolveFilename(id, parent)
     return loadModule(filePath, parent, tryCJSLoad)
   } finally {
-    Runtime.requireDepth -= 1
+    moduleState.requireDepth -= 1
   }
 }
 
@@ -303,8 +303,6 @@ function wrapRequire(runtime, req, wrapper) {
   const wrapped = (id) => wrapper.call(runtime, req, id)
   return assign(wrapped, req)
 }
-
-Runtime.requireDepth = 0
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
 
