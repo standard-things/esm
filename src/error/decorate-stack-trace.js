@@ -1,47 +1,45 @@
 import binding from "../binding.js"
 import isError from "../util/is-error.js"
 
-const {
-  arrow_message_private_symbol,
-  decorated_private_symbol,
-  decorateErrorStack,
-  setHiddenValue
-} = binding.util
+const { util } = binding
 
-const useArrowMessageSymbol = arrow_message_private_symbol !== void 0
-const useDecoratedSymbol = decorated_private_symbol !== void 0
-const useDecorateErrorStack = typeof decorateErrorStack === "function"
-const useSetHiddenValue = typeof setHiddenValue === "function"
+const _setHiddenValue = util.setHiddenValue
+const arrowMessageSymbol = util.arrow_message_private_symbol
+const decoratedSymbol = util.decorated_private_symbol
+
+const useArrowMessageSymbol = arrowMessageSymbol !== void 0
+const useDecoratedSymbol = decoratedSymbol !== void 0
+const useSetHiddenValue = typeof _setHiddenValue === "function"
 
 function decorateStackTrace(error) {
   if (! isError(error)) {
     return error
   }
 
-  if (useSetHiddenValue) {
-    if (useArrowMessageSymbol) {
-      setHiddenValue(error, arrow_message_private_symbol, "")
-    } else {
-      try {
-        setHiddenValue(error, "arrowMessage", "")
-        setHiddenValue(error, "node:arrowMessage", "")
-      } catch (e) {}
-    }
-
-    if (useDecoratedSymbol) {
-      setHiddenValue(error, decorated_private_symbol, true)
-    } else {
-      try {
-        setHiddenValue(error, "node:decorated", true)
-      } catch (e) {}
-    }
+  if (useArrowMessageSymbol) {
+    setHiddenValue(error, arrowMessageSymbol, "")
+  } else {
+    setHiddenValue(error, "arrowMessage", "")
+    setHiddenValue(error, "node:arrowMessage", "")
   }
 
-  if (useDecorateErrorStack) {
-    decorateErrorStack(error)
+  if (useDecoratedSymbol) {
+    setHiddenValue(error, decoratedSymbol, true)
+  } else {
+    setHiddenValue(error, "node:decorated", true)
   }
 
   return error
+}
+
+function setHiddenValue(object, key, value) {
+  if (useSetHiddenValue) {
+    try {
+      return _setHiddenValue(object, key, value)
+    } catch (e) {}
+  }
+
+  return false
 }
 
 export default decorateStackTrace
