@@ -1,7 +1,12 @@
 import binding from "../binding.js"
 import builtinModules from "../builtin-modules.js"
 
-let natives
+const natives = Object
+  .keys(binding.natives)
+  .reduce((object, id) => {
+    object[id] = true
+    return object
+  }, Object.create(null))
 
 function isBuiltinModule(id) {
   if (typeof id !== "string" ||
@@ -9,15 +14,7 @@ function isBuiltinModule(id) {
     return false
   }
 
-  if (id in builtinModules) {
-    return true
-  }
-
-  if (natives === void 0) {
-    natives = binding.natives
-  }
-
-  return id in natives
+  return id in builtinModules || id in natives
 }
 
 export default isBuiltinModule
