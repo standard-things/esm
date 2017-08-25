@@ -1,4 +1,3 @@
-import Entry from "./entry.js"
 import FastObject from "./fast-object.js"
 import Module from "./module.js"
 
@@ -12,11 +11,9 @@ const ids = [
   "child_process",
   "cluster",
   "console",
-  "constants",
   "crypto",
   "dgram",
   "dns",
-  "domain",
   "events",
   "fs",
   "http",
@@ -25,40 +22,34 @@ const ids = [
   "net",
   "os",
   "path",
-  "process",
-  "punycode",
   "querystring",
   "readline",
   "repl",
   "stream",
   "string_decoder",
-  "sys",
   "timers",
   "tls",
   "tty",
   "url",
   "util",
-  "v8",
   "vm",
   "zlib"
 ]
 
-const builtinModules = ids.reduce((object, id) => {
-  setGetter(object, id, () => {
-    const mod = new Module(id, null)
-    mod.exports = mod.require(id)
-    mod.loaded = true
+const builtinModules = ids
+  .reduce((object, id) => {
+    setGetter(object, id, () => {
+      const mod = new Module(id, null)
+      mod.exports = mod.require(id)
+      mod.loaded = true
+      return object[id] = mod
+    })
 
-    const entry = Entry.get(mod)
-    entry.loaded()
-    return object[id] = entry
-  })
+    setSetter(object, id, (value) => {
+      setProperty(object, id, { value })
+    })
 
-  setSetter(object, id, (value) => {
-    setProperty(object, id, { value })
-  })
-
-  return object
-}, new FastObject)
+    return object
+  }, new FastObject)
 
 export default builtinModules

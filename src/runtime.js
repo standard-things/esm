@@ -5,6 +5,7 @@ import Module from "./module.js"
 import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
+import builtinEntries from "./builtin-entries.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
@@ -112,8 +113,8 @@ class Runtime {
 }
 
 function importModule(id, parentEntry) {
-  if (id in builtinModules) {
-    return builtinModules[id]
+  if (id in builtinEntries) {
+    return builtinEntries[id]
   }
 
   const { module:parent, options } = parentEntry
