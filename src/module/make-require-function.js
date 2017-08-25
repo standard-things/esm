@@ -6,11 +6,12 @@ import moduleState from "./state.js"
 import { resolve } from "path"
 import resolveFilename from "./resolve-filename.js"
 
-function makeRequireFunction(mod) {
-  function require(path) {
+function makeRequireFunction(mod, loader = mod.require) {
+  function require(request) {
+    moduleState.requireDepth += 1
+
     try {
-      moduleState.requireDepth += 1
-      return mod.require(path)
+      return loader.call(mod, request)
     } finally {
       moduleState.requireDepth -= 1
     }
