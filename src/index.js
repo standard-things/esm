@@ -1,19 +1,32 @@
-import "./hook/main.js"
-import "./hook/repl.js"
+import Module from "./module.js"
 
 import env from "./env.js"
 import { inspect } from "util"
+import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
+import replHook from "./hook/repl.js"
 import setProperty from "./util/set-property.js"
+import vm from "vm"
 
-if (! env.preload) {
-  const BuiltinModule = __non_webpack_module__.constructor
-  moduleHook(BuiltinModule)
-}
+const BuiltinModule = __non_webpack_module__.constructor
 
 const customSym = inspect.custom
 const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
 const exports = Object.create(null)
+
+if (env.repl) {
+  // Enable ESM in the Node REPL by loading @std/esm upon entering.
+  // Custom REPLs can still define their own eval functions to bypass this.
+  replHook(vm)
+} else if (env.preload &&
+    process.argv.length > 1) {
+  // Enable ESM in the Node CLI by loading @std/esm with the -r option.
+  mainHook(BuiltinModule)
+  moduleHook(Module)
+} else if (env.mocha) {
+  // Enable ESM in Mocha by loading @std/esm with the -r option.
+  moduleHook(BuiltinModule)
+}
 
 setProperty(exports, inspectKey, {
   configurable: false,

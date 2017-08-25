@@ -12,22 +12,25 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
-import vm from "vm"
 import wrap from "../util/wrap.js"
 
-if (env.repl) {
-  // Enable ESM in the Node REPL by loading @std/esm upon entering.
-  // Custom REPLs can still define their own eval functions to bypass this.
+function hook(vm) {
   const md5Hash = md5(Date.now()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeId("_" + md5Hash)
 
-  const managerWrapper = function (manager, func, args) {
+  function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
     return wrapped.call(this, manager, func, args)
   }
 
-  const methodWrapper = function (manager, func, args) {
+  function methodWrapper(manager, func, args) {
+    function tryWrapper(func, args) {
+      return pkgOptions.debug
+        ? func.apply(this, args)
+        : attempt(() => func.apply(this, args), manager, args[0])
+    }
+
     const code = args[0]
     const options = createOptions(args[1])
 
@@ -39,12 +42,6 @@ if (env.repl) {
     const cacheFileName = getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache[cacheFileName]
     const pkgOptions = pkgInfo.options
-
-    const tryWrapper = function (func, args) {
-      const code = args[0]
-      const callback = () => func.apply(this, args)
-      return pkgOptions.debug ? callback() : attempt(callback, manager, code)
-    }
 
     let output
 
@@ -88,9 +85,14 @@ if (env.repl) {
 
   if (rootModule.id === "<repl>") {
     Runtime.enable(rootModule, exported, pkgInfo.options)
-  } else if (env.preload && process.argv.length < 2) {
-    const createContext = REPLServer.prototype.createContext
+    return
+  }
 
+  const { createContext } = REPLServer.prototype
+
+  if (env.preload &&
+      process.argv.length < 2 &&
+      typeof createContext === "function") {
     REPLServer.prototype.createContext = function () {
       REPLServer.prototype.createContext = createContext
       const context = createContext.call(this)
@@ -99,3 +101,5 @@ if (env.repl) {
     }
   }
 }
+
+export default hook

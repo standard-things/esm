@@ -1,47 +1,41 @@
-import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 import Wrapper from "../wrapper.js"
 
 import { dirname } from "path"
-import env from "../env.js"
-import moduleHook from "../hook/module.js"
+import moduleLoad from "../module/load.js"
 import resolveId from "../path/resolve-id.js"
 
 const { _tickCallback, argv } = process
+const mainPath = argv[1]
 
-if (env.preload && argv.length > 1) {
-  // Enable ESM in the Node CLI by loading @std/esm with the -r option.
-  const BuiltinModule = __non_webpack_module__.constructor
-  const mainPath = argv[1]
-
-  const managerWrapper = function (manager, func, args) {
+function hook(Module) {
+  function managerWrapper(manager, func, args) {
     const filePath = resolveId(mainPath, null, { isMain: true })
     const pkgInfo = PkgInfo.get(dirname(filePath))
     let wrapped = null
 
     if (pkgInfo !== null) {
-      wrapped = Wrapper.find(BuiltinModule, "runMain", pkgInfo.range)
+      wrapped = Wrapper.find(Module, "runMain", pkgInfo.range)
     }
 
     return wrapped === null
       ? func.apply(this, args)
-      : wrapped.call(this, manager, func, filePath)
+      : wrapped(filePath)
   }
 
-  const tryTickCallback = () => {
+  function methodWrapper(filePath) {
+    moduleLoad(filePath, null, true)
+    tryTickCallback()
+  }
+
+  function tryTickCallback() {
     try {
       _tickCallback()
     } catch (e) {}
   }
 
-  const methodWrapper = function (manager, func, filePath) {
-    Module._load(filePath, null, true)
-
-    // Handle any nextTicks added in the first tick of the program.
-    tryTickCallback()
-  }
-
-  Wrapper.manage(BuiltinModule, "runMain", managerWrapper)
-  Wrapper.wrap(BuiltinModule, "runMain", methodWrapper)
-  moduleHook(Module)
+  Wrapper.manage(Module, "runMain", managerWrapper)
+  Wrapper.wrap(Module, "runMain", methodWrapper)
 }
+
+export default hook
