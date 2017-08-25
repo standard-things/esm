@@ -7,8 +7,6 @@ import { resolve } from "path"
 import resolveFilename from "./resolve-filename.js"
 
 function makeRequireFunction(mod) {
-  const Module = mod.constructor
-
   function require(path) {
     try {
       moduleState.requireDepth += 1
