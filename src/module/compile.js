@@ -11,14 +11,12 @@ import resolveFilename from "./resolve-filename.js"
 import stat from "../fs/stat.js"
 import stripShebang from "../util/strip-shebang.js"
 
-// Resolved path to process.argv[1] will be lazily placed here
-// (needed for setting breakpoint when called with --inspect-brk)
+// Lazily resolve `process.argv[1]`.
+// Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
-// Run the file contents in the correct scope or sandbox. Expose
-// the correct helper variables (require, module, exports) to
-// the file.
-// Returns exception, if any.
+let { callAndPauseOnStart } = binding.inspector
+
 function compile(mod, content, filePath) {
   const Module = mod.constructor
   const wrapper = Module.wrap(stripShebang(content))
@@ -33,7 +31,7 @@ function compile(mod, content, filePath) {
 
   if (process._breakFirstLine &&
       process._eval == null) {
-    if (! resolvedArgv) {
+    if (resolvedArgv === void 0) {
       // We enter the REPL if we're not given a filename argument.
       resolvedArgv = process.argv[1]
         ? resolveFilename(process.argv[1], null, false)
@@ -43,7 +41,7 @@ function compile(mod, content, filePath) {
     // Set breakpoint on module start.
     if (filePath === resolvedArgv) {
       delete process._breakFirstLine
-      inspectorWrapper = binding.inspector.callAndPauseOnStart
+      inspectorWrapper = callAndPauseOnStart
 
       if (! inspectorWrapper) {
         const Debug = runInDebugContext("Debug")
