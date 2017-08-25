@@ -11,8 +11,6 @@ const { _tickCallback, argv } = process
 
 if (env.preload && argv.length > 1) {
   // Enable ESM in the Node CLI by loading @std/esm with the -r option.
-  moduleHook(Module)
-
   const BuiltinModule = __non_webpack_module__.constructor
   const mainPath = argv[1]
 
@@ -27,22 +25,7 @@ if (env.preload && argv.length > 1) {
 
     return wrapped === null
       ? func.apply(this, args)
-      : wrapped.call(this, manager, func, filePath, args)
-  }
-
-  // Hack: Keep `tryModuleLoad` above `methodWrapper` to avoid an UglifyJS bug.
-  const tryModuleLoad = (mod, filePath) => {
-    let threw = true
-    Module._cache[filePath] = mod
-
-    try {
-      mod.load(filePath)
-      threw = false
-    } finally {
-      if (threw) {
-        delete Module._cache[filePath]
-      }
-    }
+      : wrapped.call(this, manager, func, filePath)
   }
 
   const tryTickCallback = () => {
@@ -51,13 +34,8 @@ if (env.preload && argv.length > 1) {
     } catch (e) {}
   }
 
-  const methodWrapper = function (manager, func, filePath, args) {
-    const mod = new Module(filePath, null)
-    mod.id = "."
-    process.mainModule = mod
-
-    // Load the main module from the command line argument.
-    tryModuleLoad(mod, filePath)
+  const methodWrapper = function (manager, func, filePath) {
+    Module._load(filePath, null, true)
 
     // Handle any nextTicks added in the first tick of the program.
     tryTickCallback()
@@ -65,4 +43,5 @@ if (env.preload && argv.length > 1) {
 
   Wrapper.manage(BuiltinModule, "runMain", managerWrapper)
   Wrapper.wrap(BuiltinModule, "runMain", methodWrapper)
+  moduleHook(Module)
 }
