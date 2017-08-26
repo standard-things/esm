@@ -1,5 +1,6 @@
 import FastObject from "../fast-object.js"
 
+import assign from "../util/assign.js"
 import fs from "fs"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
@@ -7,7 +8,8 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 const { dlopen } = process
 const { parse:jsonParse } = JSON
 
-const extensions = new FastObject
+const BuiltinModule = __non_webpack_module__.constructor
+const extensions = assign(new FastObject, BuiltinModule._extensions)
 
 extensions[".js"] = function (mod, filePath) {
   const content = fs.readFileSync(filePath, "utf8")
