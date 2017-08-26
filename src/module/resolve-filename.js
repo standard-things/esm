@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import builtinModules from "../builtin-modules.js"
+import errors from "../errors.js"
 import findPath from "./find-path.js"
 import resolveLookupPaths from "./resolve-lookup-paths.js"
 
@@ -15,9 +16,7 @@ function resolveFilename(id, parent, isMain, skipGlobalPaths) {
   const filePath = findPath(id, parent, paths, isMain)
 
   if (! filePath) {
-    const error = new Error("Cannot find module '" + id + "'")
-    error.code = "MODULE_NOT_FOUND"
-    throw error
+    throw new errors.Error("ERR_MISSING_MODULE", id)
   }
 
   return filePath
