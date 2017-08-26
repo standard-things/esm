@@ -2,6 +2,7 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/module.js
 
+import errors from "../errors.js"
 import moduleState from "./state.js"
 import { resolve } from "path"
 import resolveFilename from "./resolve-filename.js"
@@ -11,6 +12,10 @@ function makeRequireFunction(mod, loader = mod.require) {
     moduleState.requireDepth += 1
 
     try {
+      if (typeof id !== "string") {
+        throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
+      }
+
       return loader.call(mod, id)
     } finally {
       moduleState.requireDepth -= 1
