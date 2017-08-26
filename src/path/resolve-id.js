@@ -1,5 +1,6 @@
 import FastObject from "../fast-object.js"
 
+import createOptions from "../util/create-options.js"
 import decodeURIComponent from "../util/decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "../util/encoded-slash.js"
@@ -24,12 +25,14 @@ function resolveId(id, parent, options) {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
 
-  const { isMain } = options
+  options = createOptions(options)
+
   const filename = parent && typeof parent.filename === "string"
     ? parent.filename
     : "."
 
   const fromPath = dirname(filename)
+  const { isMain } = options
 
   if (! encodedSlash(id, pathMode)) {
     if (! isPath(id) &&
