@@ -1,7 +1,6 @@
 import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
-import Module from "./module.js"
 import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
@@ -9,9 +8,9 @@ import builtinEntries from "./builtin-entries.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
+import moduleLoad from "./module/load.js"
 import moduleState from "./module/state.js"
 import nodeModulePaths from "./module/node-module-paths.js"
-import resolveFilename from "./module/resolve-filename.js"
 import resolveId from "./path/resolve-id.js"
 import setGetter from "./util/set-getter.js"
 
@@ -125,8 +124,8 @@ function importModule(id, parentEntry) {
   let cacheId = resId
   let queryHash = queryHashRegExp.exec(id)
 
-  // Each id with a query+hash is given a new cache entry.
   if (queryHash !== null) {
+    // Each id with a query+hash is given a new cache entry.
     cacheId = resId + queryHash[0]
 
     if (cacheId in state._cache) {
@@ -144,7 +143,7 @@ function importModule(id, parentEntry) {
   let error
 
   try {
-    loadModule(resId, parent, tryESMLoad)
+    moduleLoad(resId, parent, false, tryESMLoad, () => resId)
   } catch (e) {
     error = e
   }
@@ -176,34 +175,13 @@ function loadEntry(cacheId, parentEntry) {
   return parentEntry.children[cacheId] = childEntry
 }
 
-function loadModule(filePath, parent, tryModuleLoad) {
-  let child
-  const Parent = parent ? parent.constructor : Module
-  const state = parent ? Parent : moduleState
-
-  if (filePath in state._cache) {
-    child = state._cache[filePath]
-  } else {
-    child = new Parent(filePath, parent)
-    child.filename = filePath
-    child.paths = nodeModulePaths(dirname(filePath))
-    tryModuleLoad(child, filePath)
-  }
-
-  return child.exports
-}
-
-function requireWrapper(func, id) {
+function requireWrapper(func, id, parent) {
   moduleState.requireDepth += 1
 
   try {
-    if (id in builtinModules) {
-      return func(id)
-    }
-
-    const parent = this.module
-    const filePath = resolveFilename(id, parent)
-    return loadModule(filePath, parent, tryCJSLoad)
+    return id in builtinModules
+      ? func(id)
+      : moduleLoad(id, parent, false, tryCJSLoad)
   } finally {
     moduleState.requireDepth -= 1
   }
@@ -213,14 +191,14 @@ function runCJS(runtime, moduleWrapper, req) {
   const mod = runtime.module
   const { entry } = runtime
   const exported = mod.exports = entry.exports
-  const filePath = mod.filename
+  const { filename } = mod
   const { options } = runtime
 
   if (! options.cjs) {
-    req = wrapRequire(runtime, req, requireWrapper)
+    req = wrapRequire(req, mod, requireWrapper)
   }
 
-  moduleWrapper.call(exported, exported, req, mod, filePath, dirname(filePath))
+  moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
   mod.loaded = true
 
   entry.merge(Entry.get(mod, mod.exports, options))
@@ -244,9 +222,10 @@ function runESM(runtime, moduleWrapper) {
   assign(exported, entry._namespace)
 }
 
-function tryCJSLoad(mod, filePath) {
-  let ext = extname(filePath)
+function tryCJSLoad(filePath) {
+  const mod = this
   const state = mod.constructor
+  let ext = extname(filePath)
 
   if (! ext || typeof state._extensions[ext] !== "function") {
     ext = ".js"
@@ -254,53 +233,37 @@ function tryCJSLoad(mod, filePath) {
 
   const compiler = Wrapper.unwrap(state._extensions, ext)
 
-  let threw = true
-  state._cache[filePath] = mod
-
-  try {
-    compiler.call(state._extensions, mod, filePath)
-    mod.loaded = true
-    threw = false
-  } finally {
-    if (threw) {
-      delete state._cache[filePath]
-    }
-  }
+  mod.filename = filePath
+  mod.paths = nodeModulePaths(dirname(filePath))
+  compiler.call(state._extensions, mod, filePath)
+  mod.loaded = true
 }
 
-function tryESMLoad(mod, filePath) {
+function tryESMLoad(filePath) {
+  const mod = this
+  const state = mod.constructor
   let ext = extname(filePath)
 
   if (! ext || typeof moduleState._extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  let threw = true
-  const state = mod.constructor
   const compiler = ext === ".js"
     ? state._extensions[ext]
     : moduleState._extensions[ext]
 
-  state._cache[filePath] = mod
-
-  try {
-    if (typeof compiler === "function") {
-      compiler(mod, filePath)
-    } else {
-      mod.load(filePath)
-    }
-
+  if (typeof compiler === "function") {
+    mod.filename = filePath
+    mod.paths = nodeModulePaths(dirname(filePath))
+    compiler(mod, filePath)
     mod.loaded = true
-    threw = false
-  } finally {
-    if (threw) {
-      delete state._cache[filePath]
-    }
+  } else {
+    mod.load(filePath)
   }
 }
 
-function wrapRequire(runtime, req, wrapper) {
-  const wrapped = (id) => wrapper.call(runtime, req, id)
+function wrapRequire(req, parent, wrapper) {
+  const wrapped = (id) => wrapper(req, id, parent)
   return assign(wrapped, req)
 }
 
