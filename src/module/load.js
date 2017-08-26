@@ -8,7 +8,7 @@ import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import resolveFilename from "./resolve-filename.js"
 
-function load(id, parent, isMain) {
+function load(id, parent, isMain, loader) {
   const Parent = parent ? parent.constructor : Module
   const filePath = resolveFilename(id, parent, isMain)
   const state = parent ? Parent : moduleState
@@ -35,16 +35,16 @@ function load(id, parent, isMain) {
     child.id = "."
   }
 
-  tryModuleLoad(child, filePath, state)
+  tryModuleLoad(child, filePath, state, loader)
   return child.exports
 }
 
-function tryModuleLoad(mod, filePath, state) {
+function tryModuleLoad(mod, filePath, state, loader = mod.load) {
   let threw = true
   state._cache[filePath] = mod
 
   try {
-    mod.load(filePath)
+    loader.call(mod, filePath)
     threw = false
   } finally {
     if (threw) {
