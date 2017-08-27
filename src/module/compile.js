@@ -7,7 +7,7 @@ import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
 import moduleState from "./state.js"
-import resolveFilename from "./resolve-filename.js"
+import resolveFilename from "./cjs/resolve-filename.js"
 import stat from "../fs/stat.js"
 import stripShebang from "../util/strip-shebang.js"
 

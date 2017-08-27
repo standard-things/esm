@@ -4,8 +4,7 @@
 
 import errors from "../errors.js"
 import moduleState from "./state.js"
-import { resolve } from "path"
-import resolveFilename from "./resolve-filename.js"
+import resolveFilename from "./cjs/resolve-filename.js"
 
 function makeRequireFunction(mod, loader = mod.require) {
   function require(id) {

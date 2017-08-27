@@ -12,13 +12,12 @@ import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const exts = [".mjs", ".js", ".json", ".node"]
 const { preserveSymlinks } = binding.config
 
 const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
-function findPath(id, parent, paths, isMain) {
+function findPath(id, parent, paths, isMain, searchExts) {
   const extensions = parent
     ? parent.constructor._extensions
     : moduleState._extensions
@@ -36,7 +35,6 @@ function findPath(id, parent, paths, isMain) {
     return pathCache[cacheKey]
   }
 
-  let exts
   const trailingSlash = id.length > 0 &&
     id.charCodeAt(id.length - 1) === codeOfSlash
 
@@ -59,36 +57,36 @@ function findPath(id, parent, paths, isMain) {
           filePath = realpathSync(basePath)
         }
       } else if (isDir) {
-        if (exts === void 0) {
-          exts = keys(extensions)
+        if (searchExts === void 0) {
+          searchExts = keys(extensions)
         }
 
-        filePath = tryPackage(basePath, exts, isMain)
+        filePath = tryPackage(basePath, searchExts, isMain)
       }
 
       if (! filePath) {
-        if (exts === void 0) {
-          exts = keys(extensions)
+        if (searchExts === void 0) {
+          searchExts = keys(extensions)
         }
 
-        filePath = tryExtensions(basePath, exts, isMain)
+        filePath = tryExtensions(basePath, searchExts, isMain)
       }
     }
 
     if (isDir && ! filePath) {
-      if (exts === void 0) {
-        exts = keys(extensions)
+      if (searchExts === void 0) {
+        searchExts = keys(extensions)
       }
 
-      filePath = tryPackage(basePath, exts, isMain)
+      filePath = tryPackage(basePath, searchExts, isMain)
     }
 
     if (isDir && ! filePath) {
-      if (exts === void 0) {
-        exts = keys(extensions)
+      if (searchExts === void 0) {
+        searchExts = keys(extensions)
       }
 
-      filePath = tryExtensions(resolve(basePath, "index"), exts, isMain)
+      filePath = tryExtensions(resolve(basePath, "index"), searchExts, isMain)
     }
 
     if (filePath) {

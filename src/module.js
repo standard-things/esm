@@ -3,10 +3,10 @@ import assign from "./util/assign.js"
 import compile from "./module/compile.js"
 import findPath from "./module/find-path.js"
 import initPaths from "./module/init-paths.js"
-import load from "./module/load.js"
+import load from "./module/cjs/load.js"
 import moduleState from "./module/state.js"
 import nodeModulePaths from "./module/node-module-paths.js"
-import resolveFilename from "./module/resolve-filename.js"
+import resolveFilename from "./module/cjs/resolve-filename.js"
 import resolveLookupPaths from "./module/resolve-lookup-paths.js"
 
 const BuiltinModule = __non_webpack_module__.constructor

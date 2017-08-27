@@ -127,7 +127,7 @@ describe("Node rules", () => {
     Module._extensions[".coffee"] = Module._extensions[".js"]
     return import("./misc/cof")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
   })
 
   it("should not support overwriting `.json` handling", () => {

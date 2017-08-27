@@ -1,20 +1,15 @@
-import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
-import Wrapper from "./wrapper.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
+import { dirname } from "path"
 import getSourceType from "./util/get-source-type.js"
-import moduleLoad from "./module/load.js"
+import loadCJS from "./module/cjs/load.js"
+import loadESM from "./module/esm/load.js"
 import moduleState from "./module/state.js"
-import nodeModulePaths from "./module/node-module-paths.js"
-import resolveId from "./path/resolve-id.js"
-import setGetter from "./util/set-getter.js"
-
-const queryHashRegExp = /[?#].*$/
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -117,71 +112,18 @@ function importModule(id, parentEntry) {
   }
 
   const { module:parent, options } = parentEntry
-  const state = parent ? parent.constructor : moduleState
-  const resId = resolveId(id, parent, options)
+  const exported = loadESM(id, parent, options)
+  const childEntry = Entry.get(exported)
 
-  let oldChild
-  let cacheId = resId
-  let queryHash = queryHashRegExp.exec(id)
-
-  if (queryHash !== null) {
-    // Each id with a query+hash is given a new cache entry.
-    cacheId = resId + queryHash[0]
-
-    if (cacheId in state._cache) {
-      return loadEntry(cacheId, parentEntry)
-    }
-
-    if (resId in state._cache) {
-      // Backup the existing `resId` module. The child module will be stored
-      // at `resId` because Node sees the file path without query+hash.
-      oldChild = state._cache[resId]
-      delete state._cache[resId]
-    }
-  }
-
-  let error
-
-  try {
-    moduleLoad(resId, parent, false, tryESMLoad, () => resId)
-  } catch (e) {
-    error = e
-  }
-
-  if (queryHash !== null) {
-    state._cache[cacheId] = state._cache[resId]
-
-    if (oldChild) {
-      state._cache[resId] = oldChild
-    } else {
-      delete state._cache[resId]
-    }
-  }
-
-  if (error) {
-    // Unlike CJS, ESM errors are preserved for subsequent loads.
-    setGetter(state._cache, cacheId, () => {
-      throw error
-    })
-  }
-
-  return loadEntry(cacheId, parentEntry)
-}
-
-function loadEntry(cacheId, parentEntry) {
-  const state = parentEntry.module.constructor
-  const childEntry = Entry.get(state._cache[cacheId])
   childEntry.loaded()
-  return parentEntry.children[cacheId] = childEntry
+  return parentEntry.children[childEntry.id] = childEntry
 }
 
 function requireWrapper(func, id, parent) {
   moduleState.requireDepth += 1
 
   try {
-    return id in builtinModules
-      ? func(id)
-      : moduleLoad(id, parent, false, tryCJSLoad)
+    return id in builtinModules ? func(id) : loadCJS(id, parent)
   } finally {
     moduleState.requireDepth -= 1
   }
@@ -220,46 +162,6 @@ function runESM(runtime, moduleWrapper) {
 
   entry.update().loaded()
   assign(exported, entry._namespace)
-}
-
-function tryCJSLoad(filePath) {
-  const mod = this
-  const state = mod.constructor
-  let ext = extname(filePath)
-
-  if (! ext || typeof state._extensions[ext] !== "function") {
-    ext = ".js"
-  }
-
-  const compiler = Wrapper.unwrap(state._extensions, ext)
-
-  mod.filename = filePath
-  mod.paths = nodeModulePaths(dirname(filePath))
-  compiler.call(state._extensions, mod, filePath)
-  mod.loaded = true
-}
-
-function tryESMLoad(filePath) {
-  const mod = this
-  const state = mod.constructor
-  let ext = extname(filePath)
-
-  if (! ext || typeof moduleState._extensions[ext] !== "function") {
-    ext = ".js"
-  }
-
-  const compiler = ext === ".js"
-    ? state._extensions[ext]
-    : moduleState._extensions[ext]
-
-  if (typeof compiler === "function") {
-    mod.filename = filePath
-    mod.paths = nodeModulePaths(dirname(filePath))
-    compiler(mod, filePath)
-    mod.loaded = true
-  } else {
-    mod.load(filePath)
-  }
 }
 
 function wrapRequire(req, parent, wrapper) {

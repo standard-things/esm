@@ -7,7 +7,7 @@ import errors from "../errors.js"
 import findPath from "./find-path.js"
 import resolveLookupPaths from "./resolve-lookup-paths.js"
 
-function resolveFilename(id, parent, isMain, skipGlobalPaths) {
+function resolveFilename(id, parent, isMain, skipGlobalPaths, searchExts) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
@@ -17,13 +17,9 @@ function resolveFilename(id, parent, isMain, skipGlobalPaths) {
   }
 
   const paths = resolveLookupPaths(id, parent, skipGlobalPaths)
-  const filePath = findPath(id, parent, paths, isMain)
+  const filePath = findPath(id, parent, paths, isMain, searchExts)
 
-  if (! filePath) {
-    throw new errors.Error("ERR_MISSING_MODULE", id)
-  }
-
-  return filePath
+  return filePath || ""
 }
 
 export default resolveFilename

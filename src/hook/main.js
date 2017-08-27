@@ -1,8 +1,8 @@
 import PkgInfo from "../pkg-info.js"
 
 import { dirname } from "path"
-import moduleLoad from "../module/load.js"
-import resolveId from "../path/resolve-id.js"
+import moduleLoad from "../module/esm/load.js"
+import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Module) {
   const { _tickCallback, argv } = process
@@ -12,7 +12,7 @@ function hook(Module) {
   Module.runMain = function () {
     Module.runMain = runMain
 
-    const filePath = resolveId(mainPath, null, { isMain: true })
+    const filePath = resolveFilename(mainPath, null, { isMain: true })
     const pkgInfo = PkgInfo.get(dirname(filePath))
 
     if (pkgInfo === null) {

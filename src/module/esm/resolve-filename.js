@@ -1,25 +1,21 @@
-import FastObject from "../fast-object.js"
-
-import createOptions from "../util/create-options.js"
-import decodeURIComponent from "../util/decode-uri-component.js"
+import _resolveFilename from "../resolve-filename.js"
+import createOptions from "../../util/create-options.js"
+import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
-import encodedSlash from "../util/encoded-slash.js"
-import errors from "../errors.js"
-import isPath from "../util/is-path.js"
-import nodeModulePaths from "../module/node-module-paths.js"
-import parseURL from "../util/parse-url.js"
-import resolveFilePath from "./resolve-file-path.js"
-import urlToPath from "../util/url-to-path.js"
+import encodedSlash from "../../util/encoded-slash.js"
+import errors from "../../errors.js"
+import isPath from "../../util/is-path.js"
+import parseURL from "../../util/parse-url.js"
+import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
-
-const { cwd } = process
 const pathMode = process.platform === "win32" ? "win32" : "posix"
+const searchExts = [".mjs", ".js", ".json", ".node"]
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
-function resolveId(id, parent, options) {
+function resolveFilename(id, parent, options) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
@@ -46,7 +42,7 @@ function resolveId(id, parent, options) {
       }
 
       if (foundPath) {
-        foundPath = resolveFilePath(foundPath, parent, isMain)
+        foundPath = _resolveFilename(foundPath, parent, isMain)
       }
 
       if (foundPath) {
@@ -57,7 +53,7 @@ function resolveId(id, parent, options) {
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       const skipGlobalPaths = ! options.cjs
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = resolveFilePath(decodedId, parent, isMain, skipGlobalPaths)
+      const foundPath = _resolveFilename(decodedId, parent, isMain, skipGlobalPaths, searchExts)
 
       if (foundPath) {
         return foundPath
@@ -65,7 +61,7 @@ function resolveId(id, parent, options) {
     }
   }
 
-  const foundPath = resolveFilePath(id, parent, isMain)
+  const foundPath = _resolveFilename(id, parent, isMain)
 
   if (foundPath) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
@@ -74,4 +70,4 @@ function resolveId(id, parent, options) {
   throw new errors.Error("ERR_MISSING_MODULE", id)
 }
 
-export default resolveId
+export default resolveFilename
