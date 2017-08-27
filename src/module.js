@@ -26,6 +26,10 @@ class Module extends BuiltinModule {
   }
 
   load(filePath) {
+    if (this.loaded) {
+      throw new Error("Module already loaded: " + this.id)
+    }
+
     let ext = extname(filePath) || ".js"
 
     if (! (ext in Module._extensions)) {
