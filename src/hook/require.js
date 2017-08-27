@@ -1,5 +1,7 @@
+import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
+import assign from "../util/assign.js"
 import { dirname } from "path"
 import makeRequireFunction from "../module/make-require-function.js"
 import moduleLoad from "../module/esm/load.js"
@@ -10,9 +12,12 @@ function hook(mod) {
     const filePath = resolveFilename(id, mod)
     const pkgInfo = PkgInfo.get(dirname(filePath))
 
-    return pkgInfo === null
-      ? mod.require(filePath)
-      : moduleLoad(filePath, mod)
+    if (pkgInfo === null) {
+      return mod.require(filePath)
+    }
+
+    const copy = assign(new Module(mod.id, mod.parent), mod)
+    return moduleLoad(filePath, copy, pkgInfo.options)
   })
 }
 

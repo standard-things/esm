@@ -17,18 +17,21 @@ function hook(mod) {
   return requireHook(mod)
 }
 
-if (env.repl) {
-  // Enable ESM in the Node REPL by loading @std/esm upon entering.
-  // Custom REPLs can still define their own eval functions to bypass this.
-  replHook(vm)
-} else if (env.preload &&
-    process.argv.length > 1) {
-  // Enable ESM in the Node CLI by loading @std/esm with the -r option.
-  mainHook(BuiltinModule)
-  moduleHook(Module)
-} else if (env.mocha) {
+if (env.mocha) {
   // Enable ESM in Mocha by loading @std/esm with the -r option.
   moduleHook(BuiltinModule)
+} else {
+  if (env.repl) {
+    // Enable ESM in the Node REPL by loading @std/esm upon entering.
+    // Custom REPLs can still define their own eval functions to bypass this.
+    replHook(vm)
+  } else if (env.preload &&
+      process.argv.length > 1) {
+    // Enable ESM in the Node CLI by loading @std/esm with the -r option.
+    mainHook(BuiltinModule)
+  }
+
+  moduleHook(Module)
 }
 
 setProperty(hook, inspectKey, {
