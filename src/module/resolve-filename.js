@@ -17,9 +17,7 @@ function resolveFilename(id, parent, isMain, skipGlobalPaths, searchExts) {
   }
 
   const paths = resolveLookupPaths(id, parent, skipGlobalPaths)
-  const filePath = findPath(id, parent, paths, isMain, searchExts)
-
-  return filePath || ""
+  return findPath(id, parent, paths, isMain, searchExts)
 }
 
 export default resolveFilename

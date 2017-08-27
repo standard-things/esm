@@ -25,7 +25,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
   if (isAbsolute(id)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
-    return false
+    return ""
   }
 
   const cacheKey = id + "\0" +
@@ -95,7 +95,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
     }
   }
 
-  return false
+  return ""
 }
 
 function readPackage(thePath) {
@@ -107,7 +107,7 @@ function readPackage(thePath) {
   const json = readFile(jsonPath, "utf8")
 
   if (json === null) {
-    return false
+    return ""
   }
 
   let pkg
@@ -132,7 +132,7 @@ function tryExtensions(thePath, exts, isMain) {
     }
   }
 
-  return false
+  return ""
 }
 
 function tryFile(thePath, isMain) {
@@ -147,7 +147,7 @@ function tryPackage(thePath, exts, isMain) {
   const pkg = readPackage(thePath)
 
   if (! pkg) {
-    return false
+    return ""
   }
 
   const filePath = resolve(thePath, pkg)
