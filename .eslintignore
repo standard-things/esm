@@ -3,9 +3,10 @@
 /node_modules
 /src/vendor
 /test/fixture/extension
+/test/misc/source
 /test/output
-/test/export/cycle-all.js
-/test/export/extension.js
-/test/import/extension.js
-/test/misc/export/dup-local.js
-/test/misc/namespace.js
+/test/export/cycle-all.mjs
+/test/export/extension.mjs
+/test/import/extension.mjs
+/test/misc/export/dup-local.mjs
+/test/misc/builtin/namespace.mjs

@@ -4,4 +4,4 @@ function decodeURIComponent(string) {
   return typeof string === "string" ? globalDecodeURIComponent(string) : ""
 }
 
-export default globalDecodeURIComponent
+export default decodeURIComponent

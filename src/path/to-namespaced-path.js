@@ -19,7 +19,7 @@ function win32ToNamespacedPath(thePath) {
     return thePath
   }
 
-  const resolvedPath = resolve(path)
+  const resolvedPath = resolve(thePath)
 
   if (resolvedPath.length < 3) {
     return thePath

@@ -25,12 +25,12 @@ function stat(filePath) {
 function baseStat(filePath) {
   if (useStatFastPath) {
     try {
-      return fallbackStat(filePath)
+      return fastPathStat(filePath)
     } catch (e) {
       useStatFastPath = false
     }
   }
-  return fallbackStat(filePath, options)
+  return fallbackStat(filePath)
 }
 
 function fallbackStat(filePath) {

@@ -6,8 +6,6 @@ import { resolve } from "path"
 
 const codeOfBackslash = "\\".charCodeAt(0)
 const codeOfColon = ":".charCodeAt(0)
-const codeOfDot = ".".charCodeAt(0)
-const codeOfQMark = "?".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
 const { map } = Array.prototype
@@ -41,8 +39,10 @@ function win32NodeModulePaths(from) {
     if (code === codeOfBackslash ||
         code === codeOfSlash ||
         code === codeOfColon) {
-      if (p !== nmLen)
+      if (p !== nmLen) {
         paths.push(from.slice(0, last) + "\\node_modules")
+      }
+
       last = length
       p = 0
     } else if (p !== -1) {
@@ -82,6 +82,7 @@ function posixNodeModulePaths(from) {
       if (p !== nmLen) {
         paths.push(from.slice(0, last) + "/node_modules")
       }
+
       last = length
       p = 0
     } else if (p !== -1) {

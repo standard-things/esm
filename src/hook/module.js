@@ -20,9 +20,9 @@ import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
-import stat from "../fs/stat.js"
 import { satisfies } from "semver"
 import setSourceType from "../util/set-source-type.js"
+import stat from "../fs/stat.js"
 
 let allowTopLevelAwait = isObject(process.mainModule) &&
   satisfies(process.version, ">=7.6.0")
@@ -46,6 +46,7 @@ function hook(Module) {
       : wrapped.call(this, manager, func, pkgInfo, args)
   }
 
+  // eslint-disable-next-line consistent-return
   function methodWrapper(manager, func, pkgInfo, args) {
     const mod = args[0]
     const filePath = args[1]
@@ -54,7 +55,6 @@ function hook(Module) {
     const esmType = pkgOptions.esm
 
     if (cachePath === null) {
-      // eslint-disable-next-line consistent-return
       return func.apply(this, args)
     }
 
