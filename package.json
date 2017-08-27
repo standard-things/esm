@@ -21,7 +21,7 @@
     "build": "node script/build.js",
     "build:prod": "node script/build.js --prod",
     "clean": "node script/clean.js",
-    "lint": "eslint ./*.{js,mjs} ./*/*.{js,mjs} ./*/*/*.{js,mjs} ./*/*/*/*.{js,mjs} --fix --quiet",
+    "lint": "eslint *.{js,mjs} **/*.{js,mjs} --fix --quiet",
     "pub": "node script/publish.js",
     "test": "node --require ./build/esm.js script/test.js",
     "test:prod": "node --require ./index.js script/test.js"
