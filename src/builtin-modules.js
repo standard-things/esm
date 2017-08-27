@@ -1,6 +1,7 @@
 import FastObject from "./fast-object.js"
 import Module from "./module.js"
 
+import binding from "./binding.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -36,8 +37,17 @@ const ids = [
   "zlib"
 ]
 
+const nativeIds = Object
+  .keys(binding.natives)
+  .filter((id) => ! id.startsWith("internal/"))
+
 const builtinModules = ids
+  .concat(nativeIds)
   .reduce((object, id) => {
+    if (id in object) {
+      return object
+    }
+
     setGetter(object, id, () => {
       const mod = new Module(id, null)
       mod.exports = mod.require(id)
