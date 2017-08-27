@@ -8,6 +8,10 @@ import findPath from "./find-path.js"
 import resolveLookupPaths from "./resolve-lookup-paths.js"
 
 function resolveFilename(id, parent, isMain, skipGlobalPaths) {
+  if (typeof id !== "string") {
+    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
+  }
+
   if (id in builtinModules) {
     return id
   }

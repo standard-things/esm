@@ -5,15 +5,10 @@
 import Module from "../module.js"
 
 import builtinModules from "../builtin-modules.js"
-import errors from "../errors.js"
 import moduleState from "./state.js"
 import resolveFilename from "./resolve-filename.js"
 
 function load(id, parent, isMain, loader, resolver = resolveFilename) {
-  if (typeof id !== "string") {
-    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
-  }
-
   const Parent = parent ? parent.constructor : Module
   const filePath = resolver(id, parent, isMain)
   const state = parent ? Parent : moduleState
