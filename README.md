@@ -11,22 +11,13 @@ Getting started
 
   1. Run `npm i --save @std/esm` in your app or package directory.
   2. Add `.esm-cache` to your `.gitignore`.
-  3. Call `require("@std/esm")` before importing ES modules.
+  3. Create the ESM loader to import your main ES module:
 
      **index.js**
      ```js
-     require("@std/esm")
+     require = require("@std/esm")(module)
      module.exports = require("./main.mjs").default
      ```
-
-For package authors with sub modules:
-
-```js
-// Have "foo" require only "@std/esm".
-require("foo")
-// Sub modules work!
-const bar = require("foo/bar").default
-```
 
 Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
