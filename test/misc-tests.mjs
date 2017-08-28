@@ -33,9 +33,7 @@ describe("package.json", () => {
   it("should not be enabled for nested node_modules", () =>
     import("disabled")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-      })
+      .catch((e) => assert.ok(e instanceof SyntaxError))
   )
 
   it("should respect @std/esm package options", () =>
@@ -207,9 +205,7 @@ describe("spec compliance", () => {
   it("should not support loading ESM from require if already loaded", () =>
     import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
-      })
+      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
   )
 
   it("should not executed already loaded modules from require", () =>

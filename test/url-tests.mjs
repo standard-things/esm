@@ -81,9 +81,7 @@ describe("URL parsing", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL")
-        })
+        .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
     ))
   )
 })
