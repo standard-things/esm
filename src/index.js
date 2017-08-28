@@ -14,6 +14,7 @@ const customSym = inspect.custom
 const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
 
 function hook(mod) {
+  moduleHook(Module)
   return requireHook(mod)
 }
 
