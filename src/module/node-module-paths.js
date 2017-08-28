@@ -10,7 +10,7 @@ const codeOfSlash = "/".charCodeAt(0)
 
 const { map } = Array.prototype
 const nmChars = map.call("node_modules", (char) => char.charCodeAt(0)).reverse()
-const nmLen = nmChars.length
+const nmLength = nmChars.length
 
 // "from" is the __dirname of the module.
 function win32NodeModulePaths(from) {
@@ -22,9 +22,9 @@ function win32NodeModulePaths(from) {
     return [from + "node_modules"]
   }
 
-  let p = 0
   let length = from.length
   let last = length
+  let nmCount = 0
 
   const paths = []
 
@@ -39,17 +39,17 @@ function win32NodeModulePaths(from) {
     if (code === codeOfBackslash ||
         code === codeOfSlash ||
         code === codeOfColon) {
-      if (p !== nmLen) {
+      if (nmCount !== nmLength) {
         paths.push(from.slice(0, last) + "\\node_modules")
       }
 
       last = length
-      p = 0
-    } else if (p !== -1) {
-      if (nmChars[p] === code) {
-        ++p
+      nmCount = 0
+    } else if (nmCount !== -1) {
+      if (nmChars[nmCount] === code) {
+        ++nmCount
       } else {
-        p = -1
+        nmCount = -1
       }
     }
   }
@@ -69,9 +69,9 @@ function posixNodeModulePaths(from) {
   // note: this approach *only* works when the path is guaranteed
   // to be absolute.  Doing a fully-edge-case-correct path.split
   // that works on both Windows and Posix is non-trivial.
-  let p = 0
   let length = from.length
   let last = length
+  let nmCount = 0
 
   const paths = []
 
@@ -79,17 +79,17 @@ function posixNodeModulePaths(from) {
     const code = from.charCodeAt(length)
 
     if (code === codeOfSlash) {
-      if (p !== nmLen) {
+      if (nmCount !== nmLength) {
         paths.push(from.slice(0, last) + "/node_modules")
       }
 
       last = length
-      p = 0
-    } else if (p !== -1) {
-      if (nmChars[p] === code) {
-        ++p
+      nmCount = 0
+    } else if (nmCount !== -1) {
+      if (nmChars[nmCount] === code) {
+        ++nmCount
       } else {
-        p = -1
+        nmCount = -1
       }
     }
   }
