@@ -1,4 +1,5 @@
 import { Url, parse } from "url"
+
 import FastObject from "../fast-object.js"
 
 const parseCache = new FastObject

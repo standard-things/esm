@@ -1,4 +1,5 @@
 import { basename, dirname, join } from "path"
+
 import FastObject from "./fast-object.js"
 
 import createOptions from "./util/create-options.js"
