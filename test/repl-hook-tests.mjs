@@ -7,7 +7,7 @@ import vm from "vm"
 
 const context = vm.createContext({ module })
 
-describe("REPL", () => {
+describe("REPL hook", () => {
   it("should work with a non-global context", (done) => {
     const r = repl.start({})
 
