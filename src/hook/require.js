@@ -1,8 +1,8 @@
 import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
-import assign from "../util/assign.js"
 import { dirname } from "path"
+import keys from "../util/keys.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
@@ -16,8 +16,16 @@ function hook(mod) {
       return mod.require(filePath)
     }
 
-    const copy = assign(new Module(mod.id, mod.parent), mod)
-    return moduleLoad(filePath, copy, pkgInfo.options)
+    const copy = new Module(mod.id, mod.parent)
+    const names = keys(mod)
+
+    for (const name of names) {
+      if (name !== "constructor") {
+        copy[name] = mod[name]
+      }
+    }
+
+    return moduleLoad(filePath, copy, pkgInfo.options).exports
   })
 }
 
