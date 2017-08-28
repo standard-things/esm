@@ -29,13 +29,13 @@ describe("import declarations", () => {
   )
 
   it("should parse URL ids", () =>
-    import("./import/parsable.mjs")
+    import("./import/url-ids.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
   it("should not parse URL ids with encoded slashes", () =>
-    import("./import/unparsable.mjs")
+    import("./import/url-slashes.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
   )
