@@ -30,15 +30,16 @@ class Module extends BuiltinModule {
       throw new Error("Module already loaded: " + this.id)
     }
 
-    let ext = extname(filePath) || ".js"
+    const { _extensions } = this.constructor
+    let ext = extname(filePath)
 
-    if (! (ext in Module._extensions)) {
+    if (! ext || typeof _extensions[ext] !== "function") {
       ext = ".js"
     }
 
     this.filename = filePath
     this.paths = nodeModulePaths(dirname(filePath))
-    Module._extensions[ext](this, filePath)
+    _extensions[ext](this, filePath)
     this.loaded = true
   }
 
