@@ -2,8 +2,8 @@
 "use strict"
 
 const join = require("path").join
-const webpack = require("webpack")
 const readFileSync = require("fs").readFileSync
+const webpack = require("webpack")
 
 const BannerPlugin = webpack.BannerPlugin
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
