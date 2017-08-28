@@ -21,12 +21,14 @@ import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import { satisfies } from "semver"
+import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
 let allowTopLevelAwait = isObject(process.mainModule) &&
   satisfies(process.version, ">=7.6.0")
 
+const extMjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 const fsBinding = binding.fs
 
 function hook(Module) {
@@ -305,15 +307,10 @@ function hook(Module) {
   const extsToWrap = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
 
   extsToWrap.forEach((key) => {
-    let passthru = true
-
     if (typeof exts[key] !== "function") {
       // Mimic the built-in Node behavior for ".mjs" and unrecognized extensions.
       if (key === ".mjs" || key === ".mjs.gz") {
-        passthru = false
-        exts[key] = function (mod, filePath) {
-          throw new errors.Error("ERR_REQUIRE_ESM", filePath)
-        }
+        exts[key] = mjsCompiler
       } else if (key === ".gz") {
         exts[key] = function (mod, filePath) {
           let ext = extname(filePath)
@@ -330,10 +327,23 @@ function hook(Module) {
       }
     }
 
+    const unwrapped = Wrapper.unwrap(exts, key)
+
+    passthruMap.set(unwrapped, ! unwrapped[extMjsSym])
     Wrapper.manage(exts, key, managerWrapper)
     Wrapper.wrap(exts, key, methodWrapper)
-    passthruMap.set(Wrapper.unwrap(exts, key), passthru)
   })
 }
+
+function mjsCompiler(mod, filePath) {
+  throw new errors.Error("ERR_REQUIRE_ESM", filePath)
+}
+
+setProperty(mjsCompiler, extMjsSym, {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+})
 
 export default hook
