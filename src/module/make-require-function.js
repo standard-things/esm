@@ -7,7 +7,7 @@ import moduleState from "./state.js"
 import resolveFilename from "./cjs/resolve-filename.js"
 
 function makeRequireFunction(mod, loader = mod.require) {
-  function require(id) {
+  function req(id) {
     moduleState.requireDepth += 1
 
     try {
@@ -25,12 +25,12 @@ function makeRequireFunction(mod, loader = mod.require) {
     return resolveFilename(id, mod)
   }
 
-  require.cache = moduleState._cache
-  require.extensions = moduleState._extensions
-  require.main = process.mainModule
-  require.resolve = resolve
+  req.cache = moduleState._cache
+  req.extensions = moduleState._extensions
+  req.main = process.mainModule
+  req.resolve = resolve
 
-  return require
+  return req
 }
 
 export default makeRequireFunction
