@@ -1,6 +1,7 @@
 import binding from "../binding.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
+import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const { internalModuleReadFile } = binding.fs
@@ -8,15 +9,18 @@ let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {
   const encoding = isObjectLike(options) ? options.encoding : options
+  const isUTF8 = encoding === "utf8"
 
-  if (useReadFileFastPath && encoding === "utf8") {
+  if (useReadFileFastPath && isUTF8) {
     try {
       return fastPathReadFile(filePath)
     } catch (e) {
       useReadFileFastPath = false
     }
   }
-  return fallbackReadFile(filePath, options)
+
+  const content = fallbackReadFile(filePath, options)
+  return isUTF8 && content !== null ? stripBOM(content) : content
 }
 
 function fallbackReadFile(filePath, options) {
