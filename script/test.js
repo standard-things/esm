@@ -14,7 +14,6 @@ const testPath = join(rootPath, "test")
 const envPath = join(testPath, "env")
 const esmPath = isProd ? "../index.js" : "../build/esm.js"
 
-const BABEL_DISABLE_CACHE = true
 const HOME = join(envPath, "home")
 const MOCHA_BIN = join(rootPath, "node_modules/mocha/bin/mocha")
 const NODE_BIN = join(envPath, "prefix", isWin ? "node.exe" : "bin/node")
@@ -42,7 +41,7 @@ function cleanRepo() {
 function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
-    env: { BABEL_DISABLE_CACHE, HOME, NODE_PATH, USERPROFILE: HOME },
+    env: { HOME, NODE_PATH, USERPROFILE: HOME },
     stdio: "inherit"
   })
   .catch((e) => process.exit(e.code))
