@@ -1,6 +1,7 @@
 .cache
 .DS_Store
 .esm-cache
+.node_repl_history
 *.gz
 *.log
 /build
