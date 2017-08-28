@@ -22,7 +22,9 @@ const childrenToVisit = createOptions({
   elements: true,
   expression: true,
   init: true,
+  left: true,
   object: true,
+  right: true,
   value: true
 })
 
@@ -34,6 +36,10 @@ class Visitor {
 
   visitWithoutReset(path) {
     const value = path.getValue()
+
+    if (! isObject(value)) {
+      return
+    }
 
     if (Array.isArray(value)) {
       path.each(this, "visitWithoutReset")

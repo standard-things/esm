@@ -59,9 +59,29 @@ describe("dynamic import", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support `import()` in an assignment", () => {
+  it("should support `import()` in an initial assignment", () => {
     const p = import("./fixture/export/abc.mjs")
     assert.ok(p instanceof Promise)
+  })
+
+  it("should support `import()` in a reassignment", () => {
+    let p
+    p = import("./fixture/export/abc.mjs")
+    assert.ok(p instanceof Promise)
+  })
+
+  it("should support `import()` in call expression", () => {
+    assert.ok(import("./fixture/export/abc.mjs") instanceof Promise)
+  })
+
+  it("should support `import()` in a class", () => {
+    class P {
+      constructor() {
+        return import("./fixture/export/abc.mjs")
+      }
+    }
+
+    assert.ok(new P instanceof Promise)
   })
 
   it("should support `import()` in a function", () => {
