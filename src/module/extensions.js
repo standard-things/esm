@@ -7,7 +7,7 @@ import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const { dlopen } = process
-const { parse:jsonParse } = JSON
+const jsonParse = JSON.parse
 
 const BuiltinModule = __non_webpack_module__.constructor
 const extensions = assign(new FastObject, BuiltinModule._extensions)

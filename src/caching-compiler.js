@@ -46,13 +46,12 @@ function compileAndWrite(code, options) {
 
   const content = () => isGzipped ? gzip(output) : output
   const encoding = isGzipped ? null : "utf8"
-  const pkgInfo = options.pkgInfo
-  const scopePath = pkgInfo.dirPath
+  const { cache, dirPath:scopePath } = options.pkgInfo
   const writeOptions = { encoding, scopePath }
 
   writeFileDefer(cacheFilePath, content, writeOptions, (success) => {
     if (success) {
-      removeExpired(pkgInfo.cache, cachePath, cacheFileName)
+      removeExpired(cache, cachePath, cacheFileName)
     }
   })
 
@@ -70,10 +69,8 @@ function removeExpired(cache, cachePath, cacheFileName) {
 }
 
 function toCompileOptions(options) {
-  const pkgOptions = options.pkgInfo.options
-
   return {
-    cjs: pkgOptions.cjs,
+    cjs: options.pkgInfo.options.cjs,
     ext: false,
     hint: options.hint,
     runtimeAlias: options.runtimeAlias,

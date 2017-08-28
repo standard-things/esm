@@ -26,31 +26,28 @@ function hook(vm) {
 
   function methodWrapper(manager, func, args) {
     function tryWrapper(func, args) {
-      return pkgOptions.debug
-        ? func.apply(this, args)
-        : attempt(() => func.apply(this, args), manager, args[0])
+      return attempt(() => func.apply(this, args), manager, args[0])
     }
 
     const code = args[0]
-    const options = createOptions(args[1])
+    const scriptOptions = createOptions(args[1])
 
-    if (options.produceCachedData === void 0) {
-      options.produceCachedData = true
+    if (scriptOptions.produceCachedData === void 0) {
+      scriptOptions.produceCachedData = true
     }
 
     const cache = pkgInfo.cache
     const cacheFileName = getCacheFileName(null, code, pkgInfo)
     const cacheValue = cache[cacheFileName]
-    const pkgOptions = pkgInfo.options
 
     let output
 
     if (isObject(cacheValue)) {
       output = cacheValue.code
-      if (options.produceCachedData === true &&
-          options.cachedData === void 0 &&
+      if (scriptOptions.produceCachedData === true &&
+          scriptOptions.cachedData === void 0 &&
           cacheValue.data !== void 0) {
-        options.cachedData = cacheValue.data
+        scriptOptions.cachedData = cacheValue.data
       }
     } else {
       const compilerOptions = {
@@ -67,7 +64,7 @@ function hook(vm) {
       '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" + output
 
-    const result = tryWrapper(func, [output, options])
+    const result = tryWrapper(func, [output, scriptOptions])
 
     if (result.cachedDataProduced) {
       cache[cacheFileName].data = result.cachedData
