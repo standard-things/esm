@@ -21,7 +21,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
       children.push(child)
     }
 
-    return child.exports
+    return child
   }
 
   if (filePath in builtinModules) {
@@ -36,7 +36,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
   }
 
   tryLoad(child, filePath, state, loader)
-  return child.exports
+  return child
 }
 
 function tryLoad(mod, filePath, state, loader = mod.load) {

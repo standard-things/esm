@@ -112,18 +112,19 @@ function importModule(id, parentEntry) {
   }
 
   const { module:parent, options } = parentEntry
-  const exported = loadESM(id, parent, options)
-  const childEntry = Entry.get(exported)
+  const child = loadESM(id, parent, options)
+  const childEntry = Entry.get(child)
 
   childEntry.loaded()
-  return parentEntry.children[childEntry.id] = childEntry
+  return parentEntry.children[child.id] = childEntry
 }
 
 function requireWrapper(func, id, parent) {
   moduleState.requireDepth += 1
 
   try {
-    return id in builtinModules ? func(id) : loadCJS(id, parent)
+    const child = builtinModules[id] || loadCJS(id, parent)
+    return child.exports
   } finally {
     moduleState.requireDepth -= 1
   }
