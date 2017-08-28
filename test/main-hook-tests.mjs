@@ -25,7 +25,7 @@ describe("module.runMain hook", () => {
     ))
     .then((results) => {
       results.forEach((result) => {
-        const ns = JSON.parse(result.stdout)
+        const ns = JSON.parse(result.stdout.split("\n").pop())
         assert.deepEqual(ns, abcNs)
       })
     })
