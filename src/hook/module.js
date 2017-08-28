@@ -25,48 +25,42 @@ import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
-let allowTopLevelAwait = isObject(process.mainModule) &&
-  satisfies(process.version, ">=7.6.0")
-
-const extMjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 const fsBinding = binding.fs
+const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
 function hook(Module) {
+  const { _extensions } = Module
+  const jsCompiler = Wrapper.unwrap(_extensions, ".js")
   const passthruMap = new Map
+
+  let allowTopLevelAwait = isObject(process.mainModule) &&
+    satisfies(process.version, ">=7.6.0")
 
   function managerWrapper(manager, func, args) {
     const filePath = args[1]
     const pkgInfo = PkgInfo.get(dirname(filePath))
-    let wrapped = null
 
-    if (pkgInfo !== null) {
-      wrapped = Wrapper.find(exts, ".js", pkgInfo.range)
+    if (pkgInfo === null) {
+      return func.apply(this, args)
     }
 
-    return wrapped === null
-      ? func.apply(this, args)
-      : wrapped.call(this, manager, func, pkgInfo, args)
+    const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
+    return wrapped.call(this, manager, func, pkgInfo, args)
   }
 
   // eslint-disable-next-line consistent-return
   function methodWrapper(manager, func, pkgInfo, args) {
     const mod = args[0]
     const filePath = args[1]
-    const pkgOptions = pkgInfo.options
-    const { cachePath } = pkgInfo
-    const esmType = pkgOptions.esm
-
-    if (cachePath === null) {
-      return func.apply(this, args)
-    }
-
     const ext = extname(filePath)
+    const { options } = pkgInfo
+
     let hint = "script"
     let type = "script"
 
-    if (esmType === "all") {
+    if (options.esm === "all") {
       type = "module"
-    } else if (esmType === "js") {
+    } else if (options.esm === "js") {
       type = "unambiguous"
     }
 
@@ -77,7 +71,7 @@ function hook(Module) {
       }
     }
 
-    const { cache } = pkgInfo
+    const { cache, cachePath } = pkgInfo
     const cacheKey = mtime(filePath)
     const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
 
@@ -89,9 +83,9 @@ function hook(Module) {
     let cacheValue = cache[cacheFileName]
 
     if (cacheValue === true) {
-      cacheCode = readCode(join(cachePath, cacheFileName), pkgOptions)
+      cacheCode = readCode(join(cachePath, cacheFileName), options)
     } else {
-      sourceCode = readCode(filePath, pkgOptions)
+      sourceCode = readCode(filePath, options)
     }
 
     if (! isObject(cacheValue)) {
@@ -114,18 +108,18 @@ function hook(Module) {
         }
 
         const callback = () => compiler.compile(sourceCode, compilerOptions)
-        cacheValue = pkgOptions.debug ? callback() : attempt(callback, manager, sourceCode)
+        cacheValue = options.debug ? callback() : attempt(callback, manager, sourceCode)
       }
     }
 
     const noDepth = moduleState.requireDepth === 0
-    const tryModuleLoad = cacheValue.type === "module" ? tryESMLoad : tryCJSLoad
 
     if (noDepth) {
       stat.cache = Object.create(null)
     }
 
-    tryModuleLoad.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, pkgOptions)
+    const tryModuleCompile = cacheValue.type === "module" ? tryESMCompile : tryCJSCompile
+    tryModuleCompile.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, options)
 
     if (noDepth) {
       stat.cache = null
@@ -138,28 +132,25 @@ function hook(Module) {
       : readFile(filePath, "utf8")
   }
 
-  function tryCJSLoad(func, mod, code, filePath, runtimeAlias, options) {
+  function tryCJSCompile(func, mod, content, filePath, runtimeAlias, options) {
     const exported = Object.create(null)
-
-    code =
-      "const " + runtimeAlias + "=this;" + runtimeAlias +
-      ".r((function(exports,require,module,__filename,__dirname){" +
-      code + "\n}),require)"
-
     setSourceType(exported, "script")
     Runtime.enable(mod, exported, options)
-    tryModuleCompile.call(this, func, mod, code, filePath, options)
+
+    content =
+      "const " + runtimeAlias + "=this;" + runtimeAlias +
+      ".r((function(exports,require,module,__filename,__dirname){" +
+      content + "\n}),require)"
+
+    tryModuleCompile.call(this, func, mod, content, filePath, options)
   }
 
-  function tryESMLoad(func, mod, code, filePath, runtimeAlias, options) {
-    let async = ""
+  function tryESMCompile(func, mod, content, filePath, runtimeAlias, options) {
     const exported = Object.create(null)
-    const moduleWrap = Module.wrap
+    setSourceType(exported, "module")
+    Runtime.enable(mod, exported, options)
 
-    const customWrap = (script) => {
-      Module.wrap = moduleWrap
-      return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
-    }
+    let async = ""
 
     if (allowTopLevelAwait && options.await) {
       allowTopLevelAwait = false
@@ -169,19 +160,23 @@ function hook(Module) {
       }
     }
 
-    code =
+    content =
       (options.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".r((" + async + "function(){" + code + "\n}))"
+      runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
+
+    const moduleWrap = Module.wrap
+
+    const customWrap = (script) => {
+      Module.wrap = moduleWrap
+      return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
+    }
 
     if (! options.cjs) {
       Module.wrap = customWrap
     }
 
-    setSourceType(exported, "module")
-    Runtime.enable(mod, exported, options)
-
     try {
-      tryModuleCompile.call(this, func, mod, code, filePath, options)
+      tryModuleCompile.call(this, func, mod, content, filePath, options)
     } finally {
       if (Module.wrap === customWrap) {
         Module.wrap = moduleWrap
@@ -189,7 +184,7 @@ function hook(Module) {
     }
   }
 
-  function tryModuleCompile(func, mod, code, filePath, options) {
+  function tryModuleCompile(func, mod, content, filePath, options) {
     const moduleCompile = mod._compile
     const moduleReadFile = fsBinding.internalModuleReadFile
     const readFileSync = fs.readFileSync
@@ -206,7 +201,7 @@ function hook(Module) {
       }
 
       fs.readFileSync = readFileSync
-      return code
+      return content
     }
 
     const customModuleCompile = function (content, compilePath) {
@@ -238,11 +233,11 @@ function hook(Module) {
       fsBinding.internalModuleReadFile = customModuleReadFile
     }
 
-    // Wrap `fs.readFileSync` to avoid an extraneous file read when the
-    // unwrapped `Module._extensions[ext]` is called.
+    // Wrap `fs.readFileSync` to avoid an extra file read when the passthru
+    // `Module._extensions[ext]` is called.
     fs.readFileSync = customReadFileSync
 
-    // Wrap `mod._compile` in the off chance our read file wrappers are missed.
+    // Wrap `mod._compile` in the off chance the read file wrappers are missed.
     mod._compile = customModuleCompile
 
     try {
@@ -250,13 +245,13 @@ function hook(Module) {
         const ext = extname(filePath)
 
         if (ext === ".mjs.gz") {
-          passthru = passthruMap.get(Wrapper.unwrap(exts, ext))
+          passthru = passthruMap.get(Wrapper.unwrap(_extensions, ext))
         }
 
         if (passthru) {
           func.call(this, mod, filePath)
         } else {
-          mod._compile(code, filePath)
+          mod._compile(content, filePath)
         }
 
         return
@@ -266,7 +261,7 @@ function hook(Module) {
         if (passthru) {
           func.call(this, mod, filePath)
         } else {
-          mod._compile(code, filePath)
+          mod._compile(content, filePath)
         }
       } catch (e) {
         error = e
@@ -278,7 +273,7 @@ function hook(Module) {
         passthruMap.set(func, passthru)
 
         try {
-          mod._compile(code, filePath)
+          mod._compile(content, filePath)
         } catch (e) {
           error = e
         }
@@ -302,44 +297,44 @@ function hook(Module) {
     }
   }
 
-  const exts = Module._extensions
-  const extsJs = Wrapper.unwrap(exts, ".js")
-  const extsToWrap = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
+  const exts = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
 
-  extsToWrap.forEach((key) => {
-    if (typeof exts[key] !== "function") {
-      // Mimic the built-in Node behavior for ".mjs" and unrecognized extensions.
-      if (key === ".mjs" || key === ".mjs.gz") {
-        exts[key] = mjsCompiler
-      } else if (key === ".gz") {
-        exts[key] = function (mod, filePath) {
-          let ext = extname(filePath)
-
-          if (ext === ".gz" || typeof Module._extensions[ext] !== "function") {
-            ext = ".js"
-          }
-
-          const func = Wrapper.unwrap(exts, ext)
-          return func.call(this, mod, filePath)
-        }
-      } else {
-        exts[key] = extsJs
+  exts.forEach((key) => {
+    if (typeof _extensions[key] !== "function") {
+      // Mimic the built-in behavior for ".mjs" and unrecognized extensions.
+      if (key === ".gz") {
+        _extensions[key] = gzCompiler
+      } else if (key === ".mjs" || key === ".mjs.gz") {
+        _extensions[key] = mjsCompiler
+      } else if (key !== ".js") {
+        _extensions[key] = jsCompiler
       }
     }
 
-    const unwrapped = Wrapper.unwrap(exts, key)
+    const raw = Wrapper.unwrap(_extensions, key)
+    passthruMap.set(raw, ! raw[mjsSym])
 
-    passthruMap.set(unwrapped, ! unwrapped[extMjsSym])
-    Wrapper.manage(exts, key, managerWrapper)
-    Wrapper.wrap(exts, key, methodWrapper)
+    Wrapper.manage(_extensions, key, managerWrapper)
+    Wrapper.wrap(_extensions, key, methodWrapper)
   })
+}
+
+function gzCompiler(mod, filePath) {
+  let ext = extname(filePath)
+
+  if (ext === ".gz" || typeof this[ext] !== "function") {
+    ext = ".js"
+  }
+
+  const func = Wrapper.unwrap(this, ext)
+  return func.call(this, mod, filePath)
 }
 
 function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, extMjsSym, {
+setProperty(mjsCompiler, mjsSym, {
   configurable: false,
   enumerable: false,
   value: true,
