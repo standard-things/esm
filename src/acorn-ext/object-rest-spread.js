@@ -1,4 +1,4 @@
-// An adapted and less strict version of the object rest spread acorn plugin.
+// A less strict version of the object rest spread acorn plugin.
 // Copyright Victor Homyakov. Released under MIT license:
 // https://github.com/victor-homyakov/acorn-object-rest-spread
 
@@ -14,11 +14,10 @@ function enable(parser) {
 }
 
 function parseObj(func, args) {
+  let first = true
   const [isPattern, refDestructuringErrors] = args
   const node = this.startNode()
   const propHash = Object.create(null)
-
-  let first = true
 
   node.properties = []
 
@@ -51,12 +50,11 @@ function parseObj(func, args) {
     // https://github.com/babel/babylon/blob/master/src/parser/expression.js
     if (this.type === tt.ellipsis) {
       propNode = this.parseSpread(refDestructuringErrors)
+      propNode.type = "SpreadElement"
 
       if (isPattern) {
         propNode.type = "RestElement"
         propNode.value = this.toAssignable(propNode.argument, true)
-      } else {
-        propNode.type = "SpreadElement"
       }
 
       node.properties.push(propNode)
