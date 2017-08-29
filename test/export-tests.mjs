@@ -2,9 +2,14 @@ import assert from "assert"
 import vm from "vm"
 
 let canUseDestructuring = false
+let canUseObjectRestSpread = false
 
 try {
   canUseDestructuring = !! new vm.Script("[]=[]")
+} catch (e) {}
+
+try {
+  canUseObjectRestSpread = !! new vm.Script("let{...x}={...x}")
 } catch (e) {}
 
 describe("export declarations", () => {
@@ -57,8 +62,15 @@ describe("export declarations", () => {
   )
 
   ;(canUseDestructuring ? it : xit)(
-  "should support all destructuring syntax", () =>
+  "should support destructuring syntax", () =>
     import("./export/destructuring.mjs")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
+  ;(canUseObjectRestSpread ? it : xit)(
+  "should support object rest spread syntax", () =>
+    import("./export/object-rest-spread.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )

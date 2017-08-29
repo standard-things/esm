@@ -3,13 +3,6 @@ import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs"
-import vm from "vm"
-
-let canUseObjectRestSpread = false
-
-try {
-  canUseObjectRestSpread = !! new vm.Script("let{...x}={...x}")
-} catch (e) {}
 
 const jsonExt = Module._extensions[".json"]
 const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
@@ -337,13 +330,6 @@ describe("spec compliance", () => {
 
   it("should not throw when using an opening HTML comment in CJS", () =>
     import("./misc/source/html-comment.js")
-      .then(() => assert.ok(true))
-      .catch((e) => assert.ifError(e))
-  )
-
-  ;(canUseObjectRestSpread ? it : xit)(
-  "should not throw when using object rest spread syntax", () =>
-    import("./misc/source/object-rest-spread.mjs")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
