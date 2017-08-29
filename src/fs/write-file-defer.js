@@ -16,6 +16,7 @@ function writeFileDefer(filePath, content, options, callback) {
   if (pendingWriteTimer !== null) {
     return
   }
+
   pendingWriteTimer = setImmediate(() => {
     pendingWriteTimer = null
     keys(pendingWrites).forEach((filePath) => {

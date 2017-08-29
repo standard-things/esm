@@ -21,9 +21,11 @@ function mtime(filePath) {
       if (code === "ENOENT") {
         return -1
       }
+
       useMtimeFastPath = false
     }
   }
+
   return fallbackMtime(filePath)
 }
 

@@ -15,6 +15,7 @@ function stat(filePath) {
   }
 
   const result = baseStat(filePath)
+
   if (cache !== null) {
     cache[filePath] = result
   }
@@ -30,6 +31,7 @@ function baseStat(filePath) {
       useStatFastPath = false
     }
   }
+
   return fallbackStat(filePath)
 }
 
