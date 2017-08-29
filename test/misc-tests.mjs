@@ -333,4 +333,10 @@ describe("spec compliance", () => {
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
+
+  it("should not throw when using object rest spread syntax", () =>
+    import("./misc/source/object-rest-spread.mjs")
+      .then(() => assert.ok(true))
+      .catch((e) => assert.ifError(e))
+  )
 })

@@ -5,6 +5,7 @@ import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
 import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
 import { enable as enableExport } from "./acorn-ext/export.js"
 import { enable as enableImport } from "./acorn-ext/import.js"
+import { enable as enableObjectRestSpread } from "./acorn-ext/object-rest-spread.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
 const defaultOptions = createOptions({
@@ -25,6 +26,7 @@ class Parser {
 function extend(parser, options) {
   enableAwaitAnywhere(parser)
   enableDynamicImport(parser)
+  enableObjectRestSpread(parser)
   enableTolerance(parser)
 
   if (options.enableExportExtensions) {
