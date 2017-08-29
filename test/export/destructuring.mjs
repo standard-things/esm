@@ -1,5 +1,5 @@
 import assert from "assert"
-import { a, c as b, d, e, f, rest } from "../fixture/export/destructuring.mjs"
+import { a, b, c, rest } from "../fixture/export/destructuring.mjs"
 import { a0, a2, update } from "../fixture/export/holes.mjs"
 import { x, y, swap } from "../fixture/export/swap.mjs"
 
@@ -7,10 +7,8 @@ export function check() {
   // Should support destructuring declarations.
   assert.strictEqual(a, "a")
   assert.strictEqual(b, "b")
-  assert.strictEqual(d, "d")
-  assert.strictEqual(e, "e")
-  assert.strictEqual(f, "f")
-  assert.deepEqual(rest, [a, b, d])
+  assert.strictEqual(c, "c")
+  assert.deepEqual(rest, [b, c])
 
   // Should not crash on array patterns with holes.
   assert.strictEqual(a0, 0)

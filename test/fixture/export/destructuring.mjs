@@ -1,6 +1,2 @@
-export const { a, b: c, c: d = "d" } = {
-  a: "a",
-  b: "b"
-}
-
-export const [e, f, ...rest] = ["e", "f", a, c, d]
+export const { a:b, b:c = "c" } = { a: "b" }
+export const [a, ...rest] = ["a", b, c]
