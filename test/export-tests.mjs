@@ -69,7 +69,7 @@ describe("export declarations", () => {
   )
 
   ;(canUseObjectRestSpread ? it : xit)(
-  "should support object rest spread syntax", () =>
+  "should support object rest/spread syntax", () =>
     import("./export/object-rest-spread.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))

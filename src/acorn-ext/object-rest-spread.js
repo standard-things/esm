@@ -1,4 +1,4 @@
-// A less strict version of the object rest spread acorn plugin.
+// A less strict version of the object rest/spread acorn plugin.
 // Copyright Victor Homyakov. Released under MIT license:
 // https://github.com/victor-homyakov/acorn-object-rest-spread
 
