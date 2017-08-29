@@ -4,7 +4,6 @@ import vm from "vm"
 let canUseDestructuring = false
 
 try {
-  // Test if Node supports destructuring declarations.
   canUseDestructuring = !! new vm.Script("[]=[]")
 } catch (e) {}
 
