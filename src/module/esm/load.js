@@ -73,7 +73,7 @@ function loader(filePath) {
   }
 
   if (ext === ".js") {
-    _extensions = mod.constructor
+    _extensions = mod.constructor._extensions
   }
 
   const compiler = _extensions[ext]
