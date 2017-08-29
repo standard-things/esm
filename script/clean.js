@@ -4,7 +4,7 @@
 const globby = require("globby")
 const join = require("path").join
 const readFileSync = require("fs").readFileSync
-const trash = require("trash")
+const trash = require("./trash.js")
 
 const rootPath = join(__dirname, "..")
 const gitignorePath = join(rootPath, ".gitignore")

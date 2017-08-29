@@ -6,7 +6,7 @@ const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
 const pify = require("pify")
-const trash = require("trash")
+const trash = require("./trash.js")
 
 const argv = require("yargs")
   .boolean("prod")
@@ -81,6 +81,10 @@ function getPunycode() {
 }
 
 function gzipBundle() {
+  if (! fs.pathExistsSync(bundlePath)) {
+    return Promise.resolve()
+  }
+
   // eslint-disable-next-line import/no-extraneous-dependencies
   const gzip = pify(require("node-zopfli").gzip)
 
@@ -94,9 +98,9 @@ function makeBundle() {
   return execa("webpack", webpackArgs, {
     cwd: rootPath,
     env: { NODE_ENV },
+    reject: false,
     stdio: "inherit"
   })
-  .catch((e) => process.exit(e.code))
 }
 
 Promise.all([

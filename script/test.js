@@ -2,7 +2,7 @@ import { ensureLink } from "fs-extra"
 import execa from "execa"
 import globby from "globby"
 import { join } from "path"
-import trash from "trash"
+import trash from "./trash.js"
 
 const NODE_ENV = String(process.env.NODE_ENV)
 
@@ -42,15 +42,14 @@ function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
     env: { HOME, NODE_PATH, USERPROFILE: HOME },
+    reject: false,
     stdio: "inherit"
   })
-  .catch((e) => process.exit(e.code))
 }
 
 function setupNode() {
   const basePath = join(NODE_BIN, isWin ? "" : "..")
   return trash(basePath)
-    .catch(() => {})
     .then(() => ensureLink(process.execPath, NODE_BIN))
 }
 

@@ -33,9 +33,9 @@ function makeFieldRegExp(field) {
 function publishPackage() {
   return execa("npm", ["publish"], {
     cwd: rootPath,
+    reject: false,
     stdio: "inherit"
   })
-  .catch((e) => process.exit(e.code))
 }
 
 function removeField(jsonText, field) {

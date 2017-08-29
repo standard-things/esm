@@ -17,12 +17,17 @@ describe("module.runMain hook", () => {
 
     const options = ["-r", "--require"]
 
-    return Promise.all(options.map((option) =>
-      execa(NODE_BIN, [
-        option, "../build/esm.js",
+    return Promise.all(options.map((option) => {
+      const args = [
+        option,
+        "../build/esm.js",
         "./main/main.mjs"
-      ])
-    ))
+      ]
+
+      return execa(NODE_BIN, args, {
+        reject: false
+      })
+    }))
     .then((results) => {
       results.forEach((result) => {
         const ns = JSON.parse(result.stdout.split("\n").pop())
