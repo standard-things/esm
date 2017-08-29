@@ -7,7 +7,7 @@ import binding from "../binding.js"
 import keys from "../util/keys.js"
 import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
-import { realpathSync } from "fs"
+import realpath from "../fs/realpath.js"
 import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
@@ -54,7 +54,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
         if (preserveSymlinks && ! isMain) {
           filePath = resolve(basePath)
         } else {
-          filePath = realpathSync(basePath)
+          filePath = realpath(basePath)
         }
       } else if (isDir) {
         if (searchExts === void 0) {
@@ -140,7 +140,7 @@ function tryFile(thePath, isMain) {
 
   return preserveSymlinks && ! isMain
     ? (rc === 0 && resolve(thePath))
-    : (rc === 0 && realpathSync(thePath))
+    : (rc === 0 && realpath(thePath))
 }
 
 function tryPackage(thePath, exts, isMain) {
