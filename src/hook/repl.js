@@ -29,7 +29,7 @@ function hook(vm) {
       return attempt(() => func.apply(this, args), manager, args[0])
     }
 
-    const code = args[0]
+    const [code] = args
     const scriptOptions = createOptions(args[1])
 
     if (scriptOptions.produceCachedData === void 0) {

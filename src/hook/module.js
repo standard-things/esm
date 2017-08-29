@@ -37,7 +37,7 @@ function hook(Module) {
     satisfies(process.version, ">=7.6.0")
 
   function managerWrapper(manager, func, args) {
-    const filePath = args[1]
+    const [, filePath] = args
     const pkgInfo = PkgInfo.get(dirname(filePath))
 
     if (pkgInfo === null) {
@@ -50,8 +50,7 @@ function hook(Module) {
 
   // eslint-disable-next-line consistent-return
   function methodWrapper(manager, func, pkgInfo, args) {
-    const mod = args[0]
-    const filePath = args[1]
+    const [mod, filePath] = args
     const ext = extname(filePath)
     const { options } = pkgInfo
 

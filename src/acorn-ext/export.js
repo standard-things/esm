@@ -49,7 +49,7 @@ function parseExport(node, exported) {
 
 function parseExportSpecifiers(func, args) {
   let expectFrom = false
-  const exported = args[0]
+  const [exported] = args
   const specifiers = []
 
   do {
