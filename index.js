@@ -15,8 +15,7 @@ const content =
 
 const compiledWrapper = runInThisContext(content, {
   displayErrors: true,
-  filename: filePath,
-  lineOffset: 0
+  filename: filePath
 })
 
 compiledWrapper(require, module, module.filename)

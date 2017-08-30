@@ -22,8 +22,7 @@ function compile(mod, content, filePath) {
 
   const compiledWrapper = runInThisContext(wrapper, {
     displayErrors: true,
-    filename: filePath,
-    lineOffset: 0
+    filename: filePath
   })
 
   let inspectorWrapper = null
