@@ -11,6 +11,8 @@ import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import moduleState from "./module/state.js"
 
+const BuiltinModule = __non_webpack_module__.constructor
+
 class Runtime {
   static enable(mod, exported, options) {
     options = createOptions(options)
@@ -116,6 +118,12 @@ function importModule(id, parentEntry) {
   const childEntry = Entry.get(child)
 
   childEntry.loaded()
+
+  if (childEntry.sourceType === "module" &&
+      child.constructor !== BuiltinModule) {
+    delete BuiltinModule._cache[child.id]
+  }
+
   return parentEntry.children[child.id] = childEntry
 }
 
