@@ -36,7 +36,7 @@ function load(id, parent, options) {
     }
 
     if (filePath in __non_webpack_require__.cache) {
-      oldChildB = state._cache[filePath]
+      oldChildB = __non_webpack_require__.cache[filePath]
       delete __non_webpack_require__.cache[filePath]
     }
   }
