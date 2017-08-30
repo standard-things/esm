@@ -21,6 +21,8 @@ const argumentsRegExp = /\barguments\b/
 const importExportRegExp = /\b(?:im|ex)port\b/
 
 class Compiler {
+  static defaultOptions = defaultOptions
+
   static compile(code, options) {
     code = stripShebang(code)
     options = createOptions(options, defaultOptions)

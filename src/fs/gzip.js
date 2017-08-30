@@ -31,4 +31,6 @@ function fastPathGzip(bufferOrString, options) {
   return streamToBuffer(new Gzip(options), bufferOrString)
 }
 
+gzip.defaultOptions = defaultOptions
+
 export default gzip

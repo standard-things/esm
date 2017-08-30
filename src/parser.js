@@ -17,6 +17,8 @@ const defaultOptions = createOptions({
 })
 
 class Parser {
+  static defaultOptions = defaultOptions
+
   static parse(code, options) {
     options = createOptions(options, defaultOptions)
     return extend(new AcornParser(options, code), options).parse()

@@ -50,6 +50,8 @@ class PkgInfo {
     this.range = range
   }
 
+  static defaultOptions = defaultOptions
+
   static get(dirPath) {
     if (dirPath in infoCache) {
       return infoCache[dirPath]
