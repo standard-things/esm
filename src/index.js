@@ -10,6 +10,7 @@ import setProperty from "./util/set-property.js"
 import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
+
 const customSym = inspect.custom
 const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
 
