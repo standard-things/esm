@@ -6,9 +6,7 @@ import { runInDebugContext, runInThisContext } from "vm"
 import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
-import moduleState from "./state.js"
 import resolveFilename from "./cjs/resolve-filename.js"
-import stat from "../fs/stat.js"
 import stripShebang from "../util/strip-shebang.js"
 
 // Lazily resolve `process.argv[1]`.
@@ -19,6 +17,7 @@ let { callAndPauseOnStart } = binding.inspector
 
 function compile(mod, content, filePath) {
   const Module = mod.constructor
+  const req = makeRequireFunction(mod)
   const wrapper = Module.wrap(stripShebang(content))
 
   const compiledWrapper = runInThisContext(wrapper, {
@@ -50,13 +49,6 @@ function compile(mod, content, filePath) {
     }
   }
 
-  const noDepth = moduleState.requireDepth === 0
-  const req = makeRequireFunction(mod)
-
-  if (noDepth) {
-    stat.cache = new Map
-  }
-
   let result
 
   if (inspectorWrapper) {
@@ -65,10 +57,6 @@ function compile(mod, content, filePath) {
   } else {
     result = compiledWrapper.call(mod.exports, mod.exports,
       req, mod, filePath, dirname(filePath))
-  }
-
-  if (noDepth) {
-    stat.cache = null
   }
 
   return result
