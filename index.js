@@ -11,5 +11,6 @@ const filePath = join(__dirname, "esm.js.gz")
 const content = gunzipSync(readFileSync(filePath)).toString()
 const mod = new Module(filePath, module.parent)
 
+mod.filename = filePath
 mod._compile(content, filePath)
 module.exports = mod.exports
