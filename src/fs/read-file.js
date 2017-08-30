@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import isFile from "../util/is-file.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
 import stripBOM from "../util/strip-bom.js"
@@ -24,9 +25,12 @@ function readFile(filePath, options) {
 }
 
 function fallbackReadFile(filePath, options) {
-  try {
-    return readFileSync(filePath, options)
-  } catch (e) {}
+  if (isFile(filePath)) {
+    try {
+      return readFileSync(filePath, options)
+    } catch (e) {}
+  }
+
   return null
 }
 
