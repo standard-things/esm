@@ -46,8 +46,9 @@ function hasLoaderParam(params) {
 const env = new FastObject
 
 env.preload =
-  rootModule.id === "internal/preload" ||
-  hasLoaderModule(_preloadModules)
+  hasLoaderModule(_preloadModules) ||
+  (rootModule.id === "internal/preload" &&
+  hasLoaderModule(rootModule.children))
 
 env.repl =
   (env.preload && argv.length < 2) ||
