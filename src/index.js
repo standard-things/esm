@@ -19,9 +19,8 @@ function hook(mod) {
   return requireHook(mod)
 }
 
-if (env.mocha || env.cli) {
-  // Enable ESM in Mocha by loading @std/esm with the -r option or other
-  // command-line utilities if @std/esm is one of their arguments.
+if (env.cli) {
+  // Enable ESM in command-line utilities by including @std/esm as an argument.
   moduleHook(BuiltinModule)
 } else {
   if (env.repl) {

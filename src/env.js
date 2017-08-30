@@ -1,38 +1,46 @@
-import { dirname, join } from "path"
+import { join, resolve } from "path"
 
 import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
+import isPath from "./util/is-path.js"
 import realpath from "./fs/realpath.js"
 import resolveFilename from "./module/resolve-filename.js"
 import rootModule from "./root-module.js"
 
 const { _preloadModules, argv } = process
-const { filename:esmPath, parent } = __non_webpack_module__
 
+const codeOfDash = "-".charCodeAt(0)
+const esmPath = __non_webpack_module__.filename
 const indexPath = join(esmPath, "../index.js")
-const parentFilename = parent && parent.filename
+const params = argv.slice(2)
 
-let mainPath = ""
-let pkgPath = ""
+const nmIndex = params.length
+  ? argv[1].replace(/\\/g, "/").lastIndexOf("/node_modules/")
+  : -1
 
-if (argv.length > 1) {
-  mainPath = resolveFilename(argv[1], rootModule)
+function hasLoaderModule(modules) {
+  return Array.isArray(modules) &&
+    modules.some(({ filename }) => filename === esmPath)
+}
 
-  if (dirname(argv[1])
-        .replace(/\\/g, "/")
-        .endsWith("/node_modules/.bin")) {
-    pkgPath = realpath(join(argv[1], "../../../"))
+function hasLoaderParam(params) {
+  for (const param of params) {
+    let resolved = ""
+
+    if (isPath(param)) {
+      resolved = realpath(resolve(param))
+    } else if (param.charCodeAt(0) !== codeOfDash) {
+      resolved = resolveFilename(param, rootModule)
+    }
+
+    if (resolved &&
+        (resolved === esmPath || resolved === indexPath)) {
+      return true
+    }
   }
-}
 
-function hasLoaderModule(children) {
-  return Array.isArray(children) &&
-    children.some(({ filename }) => filename === esmPath)
-}
-
-function hasLoaderPath(strings) {
-  return strings.some((string) => resolveFilename(string, rootModule) === indexPath)
+  return false
 }
 
 const env = new FastObject
@@ -52,17 +60,8 @@ env.repl =
 env.cli =
   ! env.preload &&
   ! env.repl &&
-  argv.length > 2 &&
-  hasLoaderPath(argv.slice(2)) &&
-  !! pkgPath && PkgInfo.get(pkgPath) !== null
-
-env.mocha =
-  ! env.preload &&
-  ! env.repl &&
-  argv.length > 4 &&
-  mainPath === rootModule.filename &&
-  mainPath === parentFilename &&
-  mainPath.includes("mocha") &&
-  (argv.indexOf("-r") > 1 || argv.indexOf("--require") > 1)
+  nmIndex > -1 &&
+  hasLoaderParam(params) &&
+  PkgInfo.get(realpath(argv[1].slice(0, nmIndex))) !== null
 
 export default env
