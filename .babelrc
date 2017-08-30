@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "transform-class-properties",
     "transform-for-of-as-array"
   ],
   "presets": [
