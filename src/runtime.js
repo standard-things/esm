@@ -121,7 +121,7 @@ function importModule(id, parentEntry) {
 
   if (childEntry.sourceType === "module" &&
       child.constructor !== BuiltinModule) {
-    delete BuiltinModule._cache[child.id]
+    delete __non_webpack_require__.cache[child.id]
   }
 
   return parentEntry.children[child.id] = childEntry

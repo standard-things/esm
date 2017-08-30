@@ -15,7 +15,8 @@ module.exports = {
   },
   globals: {
     __non_webpack_filename__: false,
-    __non_webpack_module__: false
+    __non_webpack_module__: false,
+    __non_webpack_require__: false
   },
   parserOptions: {
     ecmaVersion: 8,

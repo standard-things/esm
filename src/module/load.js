@@ -8,8 +8,6 @@ import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import resolveFilename from "./cjs/resolve-filename.js"
 
-const BuiltinModule = __non_webpack_module__.constructor
-
 function load(id, parent, isMain, loader, resolver = resolveFilename) {
   const filePath = resolver(id, parent, isMain)
 
@@ -22,7 +20,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
 
   let child =
     state._cache[filePath] ||
-    (state._cache[filePath] = BuiltinModule._cache[filePath])
+    (state._cache[filePath] = __non_webpack_require__.cache[filePath])
 
   if (child) {
     const children = parent && parent.children
@@ -49,7 +47,7 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
   let threw = true
 
   state._cache[filePath] =
-  BuiltinModule._cache[filePath] = mod
+  __non_webpack_require__.cache[filePath] = mod
 
   try {
     loader.call(mod, filePath)
@@ -57,7 +55,7 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
   } finally {
     if (threw) {
       delete state._cache[filePath]
-      delete BuiltinModule._cache[filePath]
+      delete __non_webpack_require__.cache[filePath]
     }
   }
 }

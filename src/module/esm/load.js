@@ -7,8 +7,6 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
-const BuiltinModule = __non_webpack_module__.constructor
-
 const queryHashRegExp = /[?#].*$/
 
 function load(id, parent, options) {
@@ -37,9 +35,9 @@ function load(id, parent, options) {
       delete state._cache[filePath]
     }
 
-    if (filePath in BuiltinModule._cache) {
+    if (filePath in __non_webpack_require__.cache) {
       oldChildB = state._cache[filePath]
-      delete BuiltinModule._cache[filePath]
+      delete __non_webpack_require__.cache[filePath]
     }
   }
 
@@ -54,7 +52,7 @@ function load(id, parent, options) {
 
   if (queryHash !== null) {
     state._cache[cacheId] =
-    BuiltinModule._cache[cacheId] = child
+    __non_webpack_require__.cache[cacheId] = child
 
     if (oldChildA) {
       state._cache[filePath] = oldChildA
@@ -63,9 +61,9 @@ function load(id, parent, options) {
     }
 
     if (oldChildB) {
-      BuiltinModule._cache[filePath] = oldChildB
+      __non_webpack_require__.cache[filePath] = oldChildB
     } else {
-      delete BuiltinModule._cache[filePath]
+      delete __non_webpack_require__.cache[filePath]
     }
   }
 
