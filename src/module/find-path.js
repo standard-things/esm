@@ -135,11 +135,11 @@ function tryExtensions(thePath, exts, isMain) {
 }
 
 function tryFile(thePath, isMain) {
-  const rc = stat(thePath)
+  const isFile = stat(thePath) === 0
 
   return preserveSymlinks && ! isMain
-    ? (rc === 0 && resolve(thePath))
-    : (rc === 0 && realpath(thePath))
+    ? (isFile && resolve(thePath))
+    : (isFile && realpath(thePath))
 }
 
 function tryPackage(thePath, exts, isMain) {
