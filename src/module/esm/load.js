@@ -28,8 +28,8 @@ function load(id, parent, options) {
       return state._cache[cacheId]
     }
 
-    // Backup the existing cache entries. The child module will be stored
-    // there because Node sees the file path without the query+hash.
+    // Backup existing cache entries because Node uses the child module's file
+    // path, without query+hash, as its cache id.
     if (filePath in state._cache) {
       oldChildA = state._cache[filePath]
       delete state._cache[filePath]
