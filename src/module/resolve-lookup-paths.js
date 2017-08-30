@@ -7,10 +7,10 @@ import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
 
-const { slice } = Array.prototype
-
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
+
+const { slice } = Array.prototype
 
 function resolveLookupPaths(id, parent, skipGlobalPaths) {
   if (id in builtinModules) {

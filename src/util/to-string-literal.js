@@ -1,5 +1,8 @@
 import toString from "./to-string.js"
 
+const codeOfDoubleQuote = '"'.charCodeAt(0)
+const escapedDoubleQuoteRegExp = /\\"/g
+
 const escapeRegExpMap = {
   "'": /\\?'/g,
   "`": /\\?`/g
@@ -13,9 +16,6 @@ const quoteMap = {
   "double": '"',
   "single": "'"
 }
-
-const codeOfDoubleQuote = '"'.charCodeAt(0)
-const escapedDoubleQuoteRegExp = /\\"/g
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'

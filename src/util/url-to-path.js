@@ -5,16 +5,16 @@ import encodedSlash from "./encoded-slash.js"
 import parseURL from "./parse-url.js"
 import punycode from "../vendor/punycode/punycode.es6.js"
 
-const API = {
-  posix: { normalize: posix.normalize },
-  win32: { normalize: win32.normalize }
-}
-
 const codeOfColon = ":".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
 const localhostRegExp = /^\/\/localhost\b/
 const { toUnicode } = punycode
+
+const API = {
+  posix: { normalize: posix.normalize },
+  win32: { normalize: win32.normalize }
+}
 
 function urlToPath(url, mode = "posix") {
   const { normalize } = API[mode]

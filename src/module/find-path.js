@@ -11,7 +11,6 @@ import realpath from "../fs/realpath.js"
 import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
-
 const { preserveSymlinks } = binding.config
 
 const packageMainCache = Object.create(null)
