@@ -11,8 +11,8 @@ import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
-const customSym = inspect.custom
-const inspectKey = typeof customSym === "symbol" ? customSym : "inspect"
+const { custom } = inspect
+const inspectKey = typeof custom === "symbol" ? custom : "inspect"
 
 function hook(mod) {
   moduleHook(Module)
