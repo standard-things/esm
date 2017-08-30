@@ -1,10 +1,9 @@
-import { join, resolve } from "path"
-
 import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
 import isPath from "./util/is-path.js"
 import realpath from "./fs/realpath.js"
+import { resolve } from "path"
 import resolveFilename from "./module/resolve-filename.js"
 import rootModule from "./root-module.js"
 
@@ -12,7 +11,6 @@ const { _preloadModules, argv } = process
 
 const codeOfDash = "-".charCodeAt(0)
 const esmPath = __non_webpack_module__.filename
-const indexPath = join(esmPath, "../index.js")
 const params = argv.slice(2)
 
 const nmIndex = params.length
@@ -26,16 +24,12 @@ function hasLoaderModule(modules) {
 
 function hasLoaderParam(params) {
   for (const param of params) {
-    let resolved = ""
-
     if (isPath(param)) {
-      resolved = realpath(resolve(param))
-    } else if (param.charCodeAt(0) !== codeOfDash) {
-      resolved = resolveFilename(param, rootModule)
-    }
-
-    if (resolved &&
-        (resolved === esmPath || resolved === indexPath)) {
+      if (realpath(resolve(param)) === esmPath) {
+        return true
+      }
+    } else if (param.charCodeAt(0) !== codeOfDash &&
+        resolveFilename(param, rootModule) === esmPath) {
       return true
     }
   }
