@@ -35,10 +35,11 @@ function load(id, parent, options) {
     }
   }
 
+  let child
   let error
 
   try {
-    _load(filePath, parent, options.isMain, loader, () => filePath)
+    child = _load(filePath, parent, options.isMain, loader, () => filePath)
   } catch (e) {
     error = e
   }
@@ -58,9 +59,11 @@ function load(id, parent, options) {
     setGetter(state._cache, cacheId, () => {
       throw error
     })
+
+    throw error
   }
 
-  return state._cache[cacheId]
+  return child
 }
 
 function loader(filePath) {
