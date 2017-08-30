@@ -7,6 +7,8 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
+const BuiltinModule = __non_webpack_module__.constructor
+
 const queryHashRegExp = /[?#].*$/
 
 function load(id, parent, options) {
@@ -15,7 +17,8 @@ function load(id, parent, options) {
   const state = parent ? parent.constructor : moduleState
   const filePath = resolveFilename(id, parent, options)
 
-  let oldChild
+  let oldChildA
+  let oldChildB
   let cacheId = filePath
   let queryHash = queryHashRegExp.exec(id)
 
@@ -27,11 +30,16 @@ function load(id, parent, options) {
       return state._cache[cacheId]
     }
 
+    // Backup the existing cache entries. The child module will be stored
+    // there because Node sees the file path without the query+hash.
     if (filePath in state._cache) {
-      // Backup the existing module entry. The child module will be stored
-      // there because Node sees the file path without the query+hash.
-      oldChild = state._cache[filePath]
+      oldChildA = state._cache[filePath]
       delete state._cache[filePath]
+    }
+
+    if (filePath in BuiltinModule._cache) {
+      oldChildB = state._cache[filePath]
+      delete BuiltinModule._cache[filePath]
     }
   }
 
@@ -45,12 +53,19 @@ function load(id, parent, options) {
   }
 
   if (queryHash !== null) {
-    state._cache[cacheId] = state._cache[filePath]
+    state._cache[cacheId] =
+    BuiltinModule._cache[cacheId] = child
 
-    if (oldChild) {
-      state._cache[filePath] = oldChild
+    if (oldChildA) {
+      state._cache[filePath] = oldChildA
     } else {
       delete state._cache[filePath]
+    }
+
+    if (oldChildB) {
+      BuiltinModule._cache[filePath] = oldChildB
+    } else {
+      delete BuiltinModule._cache[filePath]
     }
   }
 
