@@ -56,24 +56,19 @@ class PkgInfo {
     }
 
     infoCache[dirPath] = null
+
     if (basename(dirPath) === "node_modules") {
       return null
     }
 
-    const pkgInfo = PkgInfo.read(dirPath)
-    if (pkgInfo !== null) {
-      return infoCache[dirPath] = pkgInfo
+    let pkgInfo = PkgInfo.read(dirPath)
+
+    if (pkgInfo === null) {
+      const parentPath = dirname(dirPath)
+      pkgInfo = parentPath === dirPath ? null : PkgInfo.get(parentPath)
     }
 
-    const parentPath = dirname(dirPath)
-    if (parentPath !== dirPath) {
-      const pkgInfo = PkgInfo.get(parentPath)
-      if (pkgInfo !== null) {
-        return infoCache[dirPath] = pkgInfo
-      }
-    }
-
-    return null
+    return infoCache[dirPath] = pkgInfo
   }
 
   static read(dirPath) {
