@@ -14,10 +14,11 @@ const defaultScripts = `,
   }`
 
 const fieldsToRemove = [
-  "private",
+  "@std/esm",
   "dependencies",
   "devDependencies",
-  "optionalDevDependencies"
+  "optionalDevDependencies",
+  "private"
 ]
 
 const scriptsRegExp = makeFieldRegExp("scripts")
