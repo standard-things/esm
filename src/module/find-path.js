@@ -17,9 +17,7 @@ const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
 function findPath(id, parent, paths, isMain, searchExts) {
-  const extensions = parent
-    ? parent.constructor._extensions
-    : moduleState._extensions
+  const { _extensions } = parent ? parent.constructor : moduleState
 
   if (isAbsolute(id)) {
     paths = [""]
@@ -57,7 +55,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
         }
       } else if (isDir) {
         if (searchExts === void 0) {
-          searchExts = keys(extensions)
+          searchExts = keys(_extensions)
         }
 
         filePath = tryPackage(basePath, searchExts, isMain)
@@ -65,7 +63,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
 
       if (! filePath) {
         if (searchExts === void 0) {
-          searchExts = keys(extensions)
+          searchExts = keys(_extensions)
         }
 
         filePath = tryExtensions(basePath, searchExts, isMain)
@@ -74,7 +72,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
 
     if (isDir && ! filePath) {
       if (searchExts === void 0) {
-        searchExts = keys(extensions)
+        searchExts = keys(_extensions)
       }
 
       filePath = tryPackage(basePath, searchExts, isMain)
@@ -82,7 +80,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
 
     if (isDir && ! filePath) {
       if (searchExts === void 0) {
-        searchExts = keys(extensions)
+        searchExts = keys(_extensions)
       }
 
       filePath = tryExtensions(resolve(basePath, "index"), searchExts, isMain)
