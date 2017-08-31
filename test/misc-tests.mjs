@@ -4,6 +4,17 @@ import SemVer from "semver"
 import assert from "assert"
 import fs from "fs"
 
+const isWin = process.platform === "win32"
+
+const abcId = "./fixture/export/abc.mjs"
+
+const abcNs = {
+  a: "a",
+  b: "b",
+  c: "c",
+  default: "default"
+}
+
 const jsonExt = Module._extensions[".json"]
 const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
 
@@ -69,7 +80,19 @@ describe("Node rules", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should find modules with names containing colons", () =>
+  it("should support URL ids", () =>
+    Promise.all([
+      import(abcId + "?a"),
+      import(abcId + "#a"),
+      import(abcId.replace("abc", "%61%62%63"))
+    ])
+    .then((namespaces) => namespaces.forEach((ns) =>
+      assert.deepEqual(ns, abcNs)
+    ))
+    .catch((e) => assert.ifError(e))
+  )
+
+  it("should support ids containing colons", () =>
     Promise.all([
       "./misc/with:colon.mjs",
       "./misc/with%3acolon.mjs",
@@ -81,7 +104,7 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should reevaluate same ES module with different query+hash", () =>
+  it("should reevaluate for ids with different query+hash", () =>
     import("./misc/load-count.mjs")
       .then((oldNs) =>
         [
@@ -103,6 +126,32 @@ describe("Node rules", () => {
             })
         , Promise.resolve())
       )
+  )
+
+  it("should not support URL ids with encoded slashes", () =>
+    Promise.all([
+      abcId.replace("/", "%2f"),
+      abcId.replace("/", "%2F"),
+      abcId.replace("/", isWin ? "%5c" : "%2f"),
+      abcId.replace("/", isWin ? "%5C" : "%2F")
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+    ))
+  )
+
+  it("should not resolve non-local dependencies", () =>
+    Promise.all([
+      "home-node-libraries",
+      "home-node-modules",
+      "node-path",
+      "prefix-path"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
+    ))
   )
 
   it("should not wrap custom errors", () =>

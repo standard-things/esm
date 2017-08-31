@@ -113,42 +113,4 @@ describe("dynamic import", () => {
       assert.throws(() => compiler.compile(code), SyntaxError)
     })
   })
-
-  it("should parse URL ids", () =>
-    Promise.all([
-      import(abcId + "?a"),
-      import(abcId + "#a"),
-      import(abcId.replace("abc", "%61%62%63"))
-    ])
-    .then((namespaces) => namespaces.forEach((ns) =>
-      assert.deepEqual(ns, abcNs)
-    ))
-    .catch((e) => assert.ifError(e))
-  )
-
-  it("should not parse URL ids with encoded slashes", () =>
-    Promise.all([
-      abcId.replace("/", "%2f"),
-      abcId.replace("/", "%2F"),
-      abcId.replace("/", isWin ? "%5c" : "%2f"),
-      abcId.replace("/", isWin ? "%5C" : "%2F")
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
-    ))
-  )
-
-  it("should not resolve non-local dependencies", () =>
-    Promise.all([
-      "home-node-libraries",
-      "home-node-modules",
-      "node-path",
-      "prefix-path"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
-    ))
-  )
 })
