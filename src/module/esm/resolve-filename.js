@@ -52,8 +52,9 @@ function resolveFilename(id, parent, options) {
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       const skipGlobalPaths = ! options.cjs
+      const skipOutsideDot = options.cjs ? void 0 : false
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = _resolveFilename(decodedId, parent, isMain, skipGlobalPaths, searchExts)
+      const foundPath = _resolveFilename(decodedId, parent, isMain, skipGlobalPaths, skipOutsideDot, searchExts)
 
       if (foundPath) {
         return foundPath

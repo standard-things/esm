@@ -4,19 +4,23 @@
 
 import { isAbsolute, resolve } from "path"
 import binding from "../binding.js"
+import captureStackTrace from "../error/capture-stack-trace.js"
 import keys from "../util/keys.js"
 import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
+import { satisfies } from "semver"
 import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
+const defaultOutsideDot = satisfies(process.version, ">=9")
 const { preserveSymlinks } = binding.config
+let warned = false
 
 const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
-function findPath(id, parent, paths, isMain, searchExts) {
+function findPath(id, paths, isMain, parent, skipOutsideDot = defaultOutsideDot, searchExts) {
   const { _extensions } = parent ? parent.constructor : moduleState
 
   if (isAbsolute(id)) {
@@ -35,7 +39,12 @@ function findPath(id, parent, paths, isMain, searchExts) {
   const trailingSlash = id.length > 0 &&
     id.charCodeAt(id.length - 1) === codeOfSlash
 
-  for (const curPath of paths) {
+  let i = -1
+  const pathsCount = paths.length
+
+  while (++i < pathsCount) {
+    const curPath = paths[i]
+
     if (curPath && stat(curPath) !== 1) {
       continue
     }
@@ -87,11 +96,41 @@ function findPath(id, parent, paths, isMain, searchExts) {
     }
 
     if (filePath) {
+      // Warn once if "." resolved outside the module directory.
+      if (! skipOutsideDot &&
+          ! warned &&
+          id === "." && i > 0) {
+        warned = true
+
+        emitDeprecationWarning(
+          "warning: require('.') resolved outside the package directory. " +
+          "This functionality is deprecated and will be removed soon.",
+          "DEP0019"
+        )
+      }
+
       return pathCache[cacheKey] = filePath
     }
   }
 
   return ""
+}
+
+function emitDeprecationWarning(message, code) {
+  if (process.noDeprecation) {
+    return
+  }
+
+  const warning = new Error(warning)
+  warning.name = "DeprecationWarning"
+  warning.code = code
+  captureStackTrace(warning, emitDeprecationWarning)
+
+  if (process.throwDeprecation) {
+    throw warning
+  }
+
+  process.nextTick(() => process.emit("warning", warning))
 }
 
 function readPackage(thePath) {

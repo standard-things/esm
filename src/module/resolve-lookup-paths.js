@@ -6,29 +6,31 @@ import { dirname, resolve } from "path"
 import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
+import { satisfies } from "semver"
 
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
+const defaultOutsideDot = satisfies(process.version, ">=9")
 const { slice } = Array.prototype
 
-function resolveLookupPaths(id, parent, skipGlobalPaths) {
+function resolveLookupPaths(id, parent, skipGlobalPaths, skipOutsideDot = defaultOutsideDot) {
   if (id in builtinModules) {
     return null
   }
 
   // Check for relative path.
-  if (id.length < 2 ||
+  if ((! skipOutsideDot && id.length < 2) ||
       id.charCodeAt(0) !== codeOfDot ||
       (id.charCodeAt(1) !== codeOfDot &&
        id.charCodeAt(1) !== codeOfSlash)) {
     const parentPaths = parent && parent.paths
-    const parentFilename = parent && parent.filename
     const paths = parentPaths ? slice.call(parentPaths) : []
 
     // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module"s directory in front of the lookup paths.
-    if (id === ".") {
+    if (! skipOutsideDot && id === ".") {
+      const parentFilename = parent && parent.filename
       paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
     }
 
