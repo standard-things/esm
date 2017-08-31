@@ -6,7 +6,7 @@ import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Module) {
   const { _tickCallback, argv } = process
-  const mainPath = argv[1]
+  const [, mainPath] = argv
   const { runMain } = Module
 
   Module.runMain = function () {

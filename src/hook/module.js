@@ -202,7 +202,7 @@ function hook(Module, options) {
   function tryModuleCompile(func, mod, content, filePath, options) {
     const moduleCompile = mod._compile
     const moduleReadFile = fsBinding.internalModuleReadFile
-    const readFileSync = fs.readFileSync
+    const { readFileSync } = fs
 
     let error
     let passthru = passthruMap.get(func)

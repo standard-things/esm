@@ -3,12 +3,12 @@ import binding from "../binding.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const { internalModuleStat } = binding.fs
-const isFile = Stats.prototype.isFile
+const { isFile } = Stats.prototype
 
 let useStatFastPath = typeof internalModuleStat === "function"
 
 function stat(filePath) {
-  const cache = stat.cache
+  const { cache } = stat
 
   if (cache !== null && filePath in cache) {
     return cache[filePath]
