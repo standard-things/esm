@@ -129,17 +129,13 @@ function readPackage(thePath) {
     return ""
   }
 
-  let pkg
-
   try {
-    pkg = packageMainCache[thePath] = JSON.parse(json).main
+    return packageMainCache[thePath] = JSON.parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message
     throw e
   }
-
-  return pkg
 }
 
 function tryExtensions(thePath, exts, isMain) {
