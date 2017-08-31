@@ -13,9 +13,8 @@ function hook(Module) {
     Module.runMain = runMain
 
     const filePath = resolveFilename(mainPath, null, { isMain: true })
-    const pkgInfo = PkgInfo.get(dirname(filePath))
 
-    if (pkgInfo === null) {
+    if (PkgInfo.get(dirname(filePath)) === null) {
       Module.runMain()
       return
     }
