@@ -1,5 +1,4 @@
 import Module from "module"
-import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs"
@@ -152,6 +151,12 @@ describe("Node rules", () => {
         .then(() => assert.ok(false))
         .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
     ))
+  )
+
+  it('should not resolve non-local "." id', () =>
+    import(".")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
   )
 
   it("should not wrap custom errors", () =>
