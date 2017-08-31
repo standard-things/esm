@@ -11,10 +11,10 @@ import { satisfies } from "semver"
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-const defaultOutsideDot = satisfies(process.version, ">=9")
+const skipOutsideDot = satisfies(process.version, ">=9")
 const { slice } = Array.prototype
 
-function resolveLookupPaths(id, parent, skipGlobalPaths, skipOutsideDot = defaultOutsideDot) {
+function resolveLookupPaths(id, parent, skipGlobalPaths) {
   if (id in builtinModules) {
     return null
   }
@@ -28,8 +28,10 @@ function resolveLookupPaths(id, parent, skipGlobalPaths, skipOutsideDot = defaul
     const paths = parentPaths ? slice.call(parentPaths) : []
 
     // Maintain backwards compat with certain broken uses of `require(".")`
-    // by putting the module"s directory in front of the lookup paths.
-    if (! skipOutsideDot && id === ".") {
+    // by putting the module's directory in front of the lookup paths.
+    if (id === "." &&
+        ! skipGlobalPaths &&
+        ! skipOutsideDot) {
       const parentFilename = parent && parent.filename
       paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
     }

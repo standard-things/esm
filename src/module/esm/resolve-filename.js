@@ -29,6 +29,7 @@ function resolveFilename(id, parent, options) {
 
   const fromPath = dirname(filename)
   const { isMain } = options
+  let skipWarnings = false
 
   if (! encodedSlash(id, pathMode)) {
     if (! isPath(id) &&
@@ -53,9 +54,8 @@ function resolveFilename(id, parent, options) {
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       const skipGlobalPaths = ! options.cjs
-      const skipOutsideDot = options.cjs ? void 0 : false
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = _resolveFilename(decodedId, parent, isMain, skipGlobalPaths, skipOutsideDot, searchExts)
+      const foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
 
       if (foundPath) {
         return foundPath
@@ -63,7 +63,8 @@ function resolveFilename(id, parent, options) {
     }
   }
 
-  const foundPath = _resolveFilename(id, parent, isMain)
+  skipWarnings = true
+  const foundPath = _resolveFilename(id, parent, isMain, skipWarnings)
 
   if (foundPath) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)

@@ -14,14 +14,14 @@ import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const defaultOutsideDot = satisfies(process.version, ">=9")
 const { preserveSymlinks } = binding.config
+const skipOutsideDot = satisfies(process.version, ">=9")
 let warned = false
 
 const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
-function findPath(id, paths, isMain, parent, skipOutsideDot = defaultOutsideDot, searchExts) {
+function findPath(id, paths, isMain, parent, skipWarnings, skipGlobalPaths, searchExts) {
   const { _extensions } = parent ? parent.constructor : moduleState
 
   if (isAbsolute(id)) {
@@ -98,13 +98,15 @@ function findPath(id, paths, isMain, parent, skipOutsideDot = defaultOutsideDot,
 
     if (filePath) {
       // Warn once if "." resolved outside the module directory.
-      if (! skipOutsideDot &&
-          ! warned &&
-          id === "." && i > 0) {
+      if (id === "." && i > 0 &&
+          ! skipGlobalPaths &&
+          ! skipOutsideDot &&
+          ! skipWarnings &&
+          ! warned) {
         warned = true
 
         emitDeprecationWarning(
-          "warning: require('.') resolved outside the package directory. " +
+          "require('.') resolved outside the package directory. " +
           "This functionality is deprecated and will be removed soon.",
           "DEP0019"
         )
