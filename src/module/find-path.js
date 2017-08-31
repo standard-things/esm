@@ -4,7 +4,7 @@
 
 import { isAbsolute, resolve } from "path"
 import binding from "../binding.js"
-import captureStackTrace from "../error/capture-stack-trace.js"
+import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
 import keys from "../util/keys.js"
 import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
@@ -115,23 +115,6 @@ function findPath(id, paths, isMain, parent, skipOutsideDot = defaultOutsideDot,
   }
 
   return ""
-}
-
-function emitDeprecationWarning(message, code) {
-  if (process.noDeprecation) {
-    return
-  }
-
-  const warning = new Error(warning)
-  warning.name = "DeprecationWarning"
-  warning.code = code
-  captureStackTrace(warning, emitDeprecationWarning)
-
-  if (process.throwDeprecation) {
-    throw warning
-  }
-
-  process.nextTick(() => process.emit("warning", warning))
 }
 
 function readPackage(thePath) {
