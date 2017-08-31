@@ -5,7 +5,7 @@ function emitDeprecationWarning(message, code) {
     return
   }
 
-  const warning = new Error(warning)
+  const warning = new Error(message)
 
   if (typeof code === "string") {
     warning.code = code
