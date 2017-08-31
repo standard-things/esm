@@ -57,6 +57,6 @@ env.cli =
   ! env.repl &&
   nmIndex > -1 &&
   hasLoaderParam(params) &&
-  PkgInfo.get(realpath(argv[1].slice(0, nmIndex))) !== null
+  PkgInfo.get(realpath(argv[1].slice(0, nmIndex + 1))) !== null
 
 export default env
