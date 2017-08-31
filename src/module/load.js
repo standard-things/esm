@@ -25,7 +25,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
   if (child) {
     const children = parent && parent.children
 
-    if (children && children.indexOf(child) < 0) {
+    if (children && children.indexOf(child) === -1) {
       children.push(child)
     }
 

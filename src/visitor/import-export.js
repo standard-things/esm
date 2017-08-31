@@ -461,7 +461,7 @@ function preserveLine(visitor, path) {
 }
 
 function safeParam(param, locals) {
-  return locals.indexOf(param) < 0 ? param : safeParam("_" + param, locals)
+  return locals.indexOf(param) === -1 ? param : safeParam("_" + param, locals)
 }
 
 function toModuleImport(visitor, code, specifierMap) {

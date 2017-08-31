@@ -38,7 +38,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
     id.charCodeAt(id.length - 1) === codeOfSlash
 
   for (const curPath of paths) {
-    if (curPath && stat(curPath) < 1) {
+    if (curPath && stat(curPath) !== 1) {
       continue
     }
 

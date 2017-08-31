@@ -55,7 +55,7 @@ env.repl =
 env.cli =
   ! env.preload &&
   ! env.repl &&
-  nmIndex > -1 &&
+  nmIndex !== -1 &&
   hasLoaderParam(params) &&
   PkgInfo.get(realpath(argv[1].slice(0, nmIndex + 1))) !== null
 

@@ -44,7 +44,7 @@ function fallbackStat(filePath) {
 
 function fastPathStat(filePath) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
-  // 1 when it's a directory or < 0 on error (usually ENOENT). The speedup
+  // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
   return internalModuleStat(toNamespacedPath(filePath))
 }
