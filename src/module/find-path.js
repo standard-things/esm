@@ -89,8 +89,7 @@ function findPath(id, parent, paths, isMain, searchExts) {
     }
 
     if (filePath) {
-      pathCache[cacheKey] = filePath
-      return filePath
+      return pathCache[cacheKey] = filePath
     }
   }
 
