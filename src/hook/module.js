@@ -4,9 +4,11 @@ import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
+import assign from "../util/assign.js"
 import attempt from "../util/attempt.js"
 import binding from "../binding.js"
 import compiler from "../caching-compiler.js"
+import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import extname from "../path/extname.js"
@@ -16,6 +18,7 @@ import getCacheStateHash from "../util/get-cache-state-hash.js"
 import gunzip from "../fs/gunzip.js"
 import hasPragma from "../parse/has-pragma.js"
 import isObject from "../util/is-object.js"
+import isObjectLike from "../util/is-object-like.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -28,7 +31,11 @@ import stat from "../fs/stat.js"
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
-function hook(Module) {
+function hook(Module, options) {
+  options = isObjectLike(options)
+    ? createOptions(options, PkgInfo.defaultOptions)
+    : null
+
   const { _extensions } = Module
   const jsCompiler = Wrapper.unwrap(_extensions, ".js")
   const passthruMap = new Map
@@ -38,9 +45,18 @@ function hook(Module) {
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const pkgInfo = PkgInfo.get(dirname(filePath))
+    const dirPath = dirname(filePath)
+    let pkgInfo = PkgInfo.get(dirPath)
 
-    if (pkgInfo === null) {
+    if (pkgInfo === null &&
+        options !== null) {
+      pkgInfo = PkgInfo.read(dirPath, true)
+      PkgInfo.set(dirPath, pkgInfo)
+      assign(pkgInfo.options, options)
+    }
+
+    if (pkgInfo === null ||
+        pkgInfo.options === null) {
       return func.apply(this, args)
     }
 

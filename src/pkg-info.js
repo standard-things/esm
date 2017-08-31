@@ -73,12 +73,16 @@ class PkgInfo {
     return infoCache[dirPath] = pkgInfo
   }
 
-  static read(dirPath) {
+  static read(dirPath, force) {
     const pkgPath = join(dirPath, "package.json")
-    const pkgJSON = readJSON(pkgPath)
+    let pkgJSON = readJSON(pkgPath)
 
     if (pkgJSON === null) {
-      return null
+      if (force) {
+        pkgJSON = Object.create(null)
+      } else {
+        return null
+      }
     }
 
     let options = null
@@ -88,7 +92,8 @@ class PkgInfo {
       options = pkgJSON["@std"].esm
     }
 
-    if (options === false) {
+    if (! force &&
+        options === false) {
       // An explicit "@std/esm": false property in package.json disables esm
       // loading even if "@std/esm" is listed as a dependency.
       return null
@@ -105,14 +110,25 @@ class PkgInfo {
       getRange(pkgJSON, "devDependencies")
 
     if (range === null) {
-      if (options !== null) {
+      if (options || force) {
         range = "*"
       } else {
         return null
       }
     }
 
-    return new PkgInfo(dirPath, range, options)
+    const pkgInfo = new PkgInfo(dirPath, range, options)
+
+    if (force &&
+        options === false) {
+      pkgInfo.options = null
+    }
+
+    return pkgInfo
+  }
+
+  static set(dirPath, pkgInfo) {
+    infoCache[dirPath] = pkgInfo
   }
 }
 

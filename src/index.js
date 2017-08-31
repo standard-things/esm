@@ -14,9 +14,9 @@ const BuiltinModule = __non_webpack_module__.constructor
 const { custom } = inspect
 const inspectKey = typeof custom === "symbol" ? custom : "inspect"
 
-function hook(mod) {
-  moduleHook(Module)
-  return requireHook(mod)
+function hook(mod, options) {
+  moduleHook(Module, options)
+  return requireHook(mod, options)
 }
 
 if (env.cli) {
