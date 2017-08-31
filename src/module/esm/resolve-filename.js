@@ -9,6 +9,7 @@ import parseURL from "../../util/parse-url.js"
 import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
+
 const pathMode = process.platform === "win32" ? "win32" : "posix"
 const searchExts = [".mjs", ".js", ".json", ".node"]
 

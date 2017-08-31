@@ -7,9 +7,9 @@ import { resolve } from "path"
 import resolveFilename from "./module/resolve-filename.js"
 import rootModule from "./root-module.js"
 
-const { _preloadModules, argv } = process
-
 const codeOfDash = "-".charCodeAt(0)
+
+const { _preloadModules, argv } = process
 const esmPath = __non_webpack_module__.filename
 const params = argv.slice(2)
 

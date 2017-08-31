@@ -13,6 +13,7 @@ import { satisfies } from "semver"
 import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
+
 const defaultOutsideDot = satisfies(process.version, ">=9")
 const { preserveSymlinks } = binding.config
 let warned = false
