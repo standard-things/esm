@@ -25,7 +25,7 @@ function hook(Module) {
 
   function tryTickCallback() {
     try {
-      _tickCallback()
+      _tickCallback.call(process)
     } catch (e) {}
   }
 }

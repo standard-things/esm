@@ -2,7 +2,8 @@ import binding from "../binding"
 import { satisfies } from "semver"
 import { statSync } from "fs"
 
-const { getStatValues, stat } = binding.fs
+const fsBinding = binding.fs
+const { getStatValues, stat } = fsBinding
 const useGetStatValues = typeof getStatValues === "function"
 
 let statValues
@@ -10,7 +11,9 @@ let useMtimeFastPath = typeof stat === "function" &&
   satisfies(process.version, "^6.10.1||>=7.7")
 
 if (useMtimeFastPath) {
-  statValues = useGetStatValues ? getStatValues() : new Float64Array(14)
+  statValues = useGetStatValues
+    ? getStatValues.call(fsBinding)
+    : new Float64Array(14)
 }
 
 function mtime(filePath) {
@@ -41,9 +44,9 @@ function fastPathMtime(filePath) {
   // with index 11 being the mtime milliseconds stamp. The speedup comes
   // from not creating Stat objects.
   if (useGetStatValues) {
-    stat(filePath)
+    stat.call(fsBinding, filePath)
   } else {
-    stat(filePath, statValues)
+    stat.call(fsBinding, filePath, statValues)
   }
 
   return statValues[11]

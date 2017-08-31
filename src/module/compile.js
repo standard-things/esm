@@ -13,7 +13,8 @@ import stripShebang from "../util/strip-shebang.js"
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
-let { callAndPauseOnStart } = binding.inspector
+const inspectorBinding = binding.inspector
+const { callAndPauseOnStart } = inspectorBinding
 
 function compile(mod, content, filePath) {
   const Module = mod.constructor
@@ -51,11 +52,11 @@ function compile(mod, content, filePath) {
   let result
 
   if (inspectorWrapper) {
-    result = inspectorWrapper(compiledWrapper, mod.exports, mod.exports,
-      req, mod, filePath, dirname(filePath))
+    result = inspectorWrapper.call(inspectorBinding, compiledWrapper,
+      mod.exports, mod.exports, req, mod, filePath, dirname(filePath))
   } else {
-    result = compiledWrapper.call(mod.exports, mod.exports,
-      req, mod, filePath, dirname(filePath))
+    result = compiledWrapper.call(
+      mod.exports, mod.exports, req, mod, filePath, dirname(filePath))
   }
 
   return result

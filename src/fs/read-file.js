@@ -5,7 +5,8 @@ import { readFileSync } from "fs"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
-const { internalModuleReadFile } = binding.fs
+const fsBinding = binding.fs
+const { internalModuleReadFile } = fsBinding
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {
@@ -38,7 +39,7 @@ function fastPathReadFile(filePath) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
-  const content = internalModuleReadFile(toNamespacedPath(filePath))
+  const content = internalModuleReadFile.call(fsBinding, toNamespacedPath(filePath))
   return content === void 0 ? null : content
 }
 

@@ -1,11 +1,10 @@
 import binding from "../binding.js"
 import isError from "../util/is-error.js"
 
-const { util } = binding
-
-const _setHiddenValue = util.setHiddenValue
-const arrowMessageSymbol = util.arrow_message_private_symbol
-const decoratedSymbol = util.decorated_private_symbol
+const utilBinding = binding.util
+const _setHiddenValue = utilBinding.setHiddenValue
+const arrowMessageSymbol = utilBinding.arrow_message_private_symbol
+const decoratedSymbol = utilBinding.decorated_private_symbol
 
 const useArrowMessageSymbol = arrowMessageSymbol !== void 0
 const useDecoratedSymbol = decoratedSymbol !== void 0
@@ -35,7 +34,7 @@ function decorateStackTrace(error) {
 function setHiddenValue(object, key, value) {
   if (useSetHiddenValue) {
     try {
-      return _setHiddenValue(object, key, value)
+      return _setHiddenValue.call(utilBinding, object, key, value)
     } catch (e) {}
   }
 

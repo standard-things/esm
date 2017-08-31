@@ -2,7 +2,8 @@ import { Stats, statSync } from "fs"
 import binding from "../binding.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
-const { internalModuleStat } = binding.fs
+const fsBinding = binding.fs
+const { internalModuleStat } = fsBinding
 const { isFile } = Stats.prototype
 
 let useStatFastPath = typeof internalModuleStat === "function"
@@ -46,7 +47,7 @@ function fastPathStat(filePath) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
-  return internalModuleStat(toNamespacedPath(filePath))
+  return internalModuleStat.call(fsBinding, toNamespacedPath(filePath))
 }
 
 stat.cache = null
