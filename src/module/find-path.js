@@ -99,11 +99,12 @@ function findPath(id, paths, isMain, parent, skipWarnings, skipGlobalPaths, sear
 
     if (filePath) {
       // Warn once if "." resolved outside the module directory.
-      if (id === "." && i > 0 &&
+      if (id === "." &&
+          i > 0 &&
+          ! warned &&
           ! skipGlobalPaths &&
           ! skipOutsideDot &&
-          ! skipWarnings &&
-          ! warned) {
+          ! skipWarnings) {
         warned = true
 
         emitDeprecationWarning(
