@@ -12,7 +12,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
   const filePath = resolver(id, parent, isMain)
 
   if (filePath in builtinModules) {
-    return builtinModules[filePath].exports
+    return builtinModules[filePath]
   }
 
   const Parent = parent ? parent.constructor : Module
