@@ -6,7 +6,6 @@ import { isAbsolute, resolve } from "path"
 import binding from "../binding.js"
 import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
 import keys from "../util/keys.js"
-import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
@@ -25,7 +24,7 @@ const pathCache = Object.create(null)
 function findPath(id, paths, isMain, parent, skipWarnings, skipGlobalPaths, searchExts) {
   const extensions = parent
     ? parent.constructor._extensions
-    : moduleState.extensions
+    : __non_webpack_require__.extensions
 
   if (isAbsolute(id)) {
     paths = [""]
