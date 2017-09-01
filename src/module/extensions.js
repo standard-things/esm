@@ -9,7 +9,7 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 const BuiltinModule = __non_webpack_module__.constructor
 
 const { dlopen } = process
-const jsonParse = JSON.parse
+const { parse } = JSON
 const extensions = assign(new FastObject, BuiltinModule._extensions)
 
 extensions[".js"] = function (mod, filePath) {
@@ -21,7 +21,7 @@ extensions[".json"] = function (mod, filePath) {
   const content = readFile(filePath, "utf8")
 
   try {
-    mod.exports = jsonParse(content)
+    mod.exports = parse(content)
   } catch (error) {
     error.message = filePath + ": " + error.message
     throw error

@@ -2,6 +2,8 @@ import extname from "../path/extname.js"
 import md5 from "./md5.js"
 import { version } from "../version.js"
 
+const { stringify } = JSON
+
 function getCacheFileName(filePath, cacheKey, pkgInfo) {
   // While MD5 is not suitable for verification of untrusted data,
   // it is great for revving files. See Sufian Rhazi's post for more details
@@ -9,7 +11,7 @@ function getCacheFileName(filePath, cacheKey, pkgInfo) {
   const pathHash = md5(filePath)
   const stateHash = md5(
     version + "\0" +
-    JSON.stringify(pkgInfo.options) + "\0" +
+    stringify(pkgInfo.options) + "\0" +
     cacheKey
   )
 

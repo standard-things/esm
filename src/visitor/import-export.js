@@ -6,6 +6,8 @@ import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 
 const codeOfCR = "\r".charCodeAt(0)
 
+const { stringify } = JSON
+
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
     if (this.bodyInfo === null) {
@@ -486,7 +488,7 @@ function toModuleImport(visitor, code, specifierMap) {
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
-      "[" + JSON.stringify(name) + ",function(" + valueParam + "){" +
+      "[" + stringify(name) + ",function(" + valueParam + "){" +
       // Multiple local variables become a compound assignment.
       locals.join("=") + "=" + valueParam +
       "}]"
@@ -520,7 +522,7 @@ function toModuleExport(visitor, specifierMap) {
     const locals = specifierMap.get(name).keys()
 
     code +=
-      "[" + JSON.stringify(name) + ",()=>" +
+      "[" + stringify(name) + ",()=>" +
       locals[0] +
       "]"
 
