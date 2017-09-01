@@ -124,7 +124,7 @@ function importModule(id, parentEntry) {
       delete __non_webpack_require__.cache[child.id]
     }
   } else {
-    delete moduleState._cache[child.id]
+    delete moduleState.cache[child.id]
   }
 
   return parentEntry.children[child.id] = childEntry
@@ -132,7 +132,7 @@ function importModule(id, parentEntry) {
 
 function requirer(id) {
   const child = loadCJS(id, this)
-  delete moduleState._cache[child.id]
+  delete moduleState.cache[child.id]
   return child.exports
 }
 

@@ -24,7 +24,7 @@ function load(id, parent, options) {
     cacheId = filePath + queryHash[0]
 
     child =
-      moduleState._cache[cacheId] ||
+      moduleState.cache[cacheId] ||
       __non_webpack_require__.cache[cacheId]
 
     if (child) {
@@ -33,9 +33,9 @@ function load(id, parent, options) {
 
     // Backup existing cache entries because Node uses the child module's file
     // path, without query+hash, as its cache id.
-    if (filePath in moduleState._cache) {
-      oldChildA = moduleState._cache[filePath]
-      delete moduleState._cache[filePath]
+    if (filePath in moduleState.cache) {
+      oldChildA = moduleState.cache[filePath]
+      delete moduleState.cache[filePath]
     }
 
     if (filePath in __non_webpack_require__.cache) {
@@ -55,13 +55,13 @@ function load(id, parent, options) {
   }
 
   if (queryHash !== null) {
-    moduleState._cache[cacheId] =
+    moduleState.cache[cacheId] =
     __non_webpack_require__.cache[cacheId] = child
 
     if (oldChildA) {
-      moduleState._cache[filePath] = oldChildA
+      moduleState.cache[filePath] = oldChildA
     } else {
-      delete moduleState._cache[filePath]
+      delete moduleState.cache[filePath]
     }
 
     if (oldChildB) {
@@ -79,7 +79,7 @@ function load(id, parent, options) {
     throw error
   } finally {
     // Unlike CJS, ESM errors are preserved for subsequent loads.
-    setGetter(moduleState._cache, cacheId, () => {
+    setGetter(moduleState.cache, cacheId, () => {
       throw error
     })
 
@@ -88,24 +88,24 @@ function load(id, parent, options) {
 }
 
 function loader(filePath) {
-  let { _extensions } = moduleState
+  let { extensions } = moduleState
   let ext = extname(filePath)
   const mod = this
 
-  if (! ext || typeof _extensions[ext] !== "function") {
+  if (! ext || typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 
   if (ext === ".js") {
-    ({ _extensions } = mod.constructor)
+    extensions = mod.constructor._extensions
   }
 
-  const compiler = _extensions[ext]
+  const compiler = extensions[ext]
 
   if (typeof compiler === "function") {
     mod.filename = filePath
     mod.paths = nodeModulePaths(dirname(filePath))
-    compiler.call(_extensions, mod, filePath)
+    compiler.call(extensions, mod, filePath)
     mod.loaded = true
   } else {
     mod.load(filePath)

@@ -50,8 +50,8 @@ class Module extends BuiltinModule {
 
 assign(Module, BuiltinModule)
 
-Module._cache = moduleState._cache
-Module._extensions = moduleState._extensions
+Module._cache = moduleState.cache
+Module._extensions = moduleState.extensions
 Module._findPath = findPath
 Module._initPaths = initPaths
 Module._load = load

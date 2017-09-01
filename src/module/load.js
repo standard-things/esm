@@ -19,7 +19,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
   const state = parent ? Parent : moduleState
 
   let child =
-    moduleState._cache[filePath] ||
+    moduleState.cache[filePath] ||
     __non_webpack_require__.cache[filePath]
 
   if (child) {
@@ -44,9 +44,11 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
 }
 
 function tryLoad(mod, filePath, state, loader = mod.load) {
+  const cache = state._cache || state.cache
   let threw = true
 
-  state._cache[filePath] =
+
+  cache[filePath] =
   __non_webpack_require__.cache[filePath] = mod
 
   try {
@@ -54,7 +56,7 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
     threw = false
   } finally {
     if (threw) {
-      delete state._cache[filePath]
+      delete cache[filePath]
       delete __non_webpack_require__.cache[filePath]
     }
   }
