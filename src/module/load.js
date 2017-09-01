@@ -19,8 +19,8 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
   const state = parent ? Parent : moduleState
 
   let child =
-    state._cache[filePath] ||
-    (state._cache[filePath] = __non_webpack_require__.cache[filePath])
+    moduleState._cache[filePath] ||
+    __non_webpack_require__.cache[filePath]
 
   if (child) {
     const children = parent && parent.children

@@ -11,10 +11,9 @@ const queryHashRegExp = /[?#].*$/
 
 function load(id, parent, options) {
   options = createOptions(options)
-
-  const state = parent ? parent.constructor : moduleState
   const filePath = resolveFilename(id, parent, options)
 
+  let child
   let oldChildA
   let oldChildB
   let cacheId = filePath
@@ -24,15 +23,19 @@ function load(id, parent, options) {
     // Each id with a query+hash is given a new cache entry.
     cacheId = filePath + queryHash[0]
 
-    if (cacheId in state._cache) {
-      return state._cache[cacheId]
+    child =
+      moduleState._cache[cacheId] ||
+      __non_webpack_require__.cache[cacheId]
+
+    if (child) {
+      return child
     }
 
     // Backup existing cache entries because Node uses the child module's file
     // path, without query+hash, as its cache id.
-    if (filePath in state._cache) {
-      oldChildA = state._cache[filePath]
-      delete state._cache[filePath]
+    if (filePath in moduleState._cache) {
+      oldChildA = moduleState._cache[filePath]
+      delete moduleState._cache[filePath]
     }
 
     if (filePath in __non_webpack_require__.cache) {
@@ -41,23 +44,24 @@ function load(id, parent, options) {
     }
   }
 
-  let child
   let error
+  let threw = true
 
   try {
     child = _load(filePath, parent, options.isMain, loader, () => filePath)
+    threw = false
   } catch (e) {
     error = e
   }
 
   if (queryHash !== null) {
-    state._cache[cacheId] =
+    moduleState._cache[cacheId] =
     __non_webpack_require__.cache[cacheId] = child
 
     if (oldChildA) {
-      state._cache[filePath] = oldChildA
+      moduleState._cache[filePath] = oldChildA
     } else {
-      delete state._cache[filePath]
+      delete moduleState._cache[filePath]
     }
 
     if (oldChildB) {
@@ -67,16 +71,20 @@ function load(id, parent, options) {
     }
   }
 
-  if (error) {
+  if (! threw) {
+    return child
+  }
+
+  try {
+    throw error
+  } finally {
     // Unlike CJS, ESM errors are preserved for subsequent loads.
-    setGetter(state._cache, cacheId, () => {
+    setGetter(moduleState._cache, cacheId, () => {
       throw error
     })
 
-    throw error
+    delete __non_webpack_require__.cache[cacheId]
   }
-
-  return child
 }
 
 function loader(filePath) {
