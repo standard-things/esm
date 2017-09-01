@@ -19,24 +19,34 @@ function resolveLookupPaths(id, parent, skipGlobalPaths) {
     return null
   }
 
-  // Check for relative path.
-  if ((! skipOutsideDot && id.length < 2) ||
+  let lookOutside
+
+  if (skipOutsideDot) {
+    lookOutside =
+      id.charCodeAt(0) !== codeOfDot &&
+      (id.charCodeAt(1) !== codeOfDot &&
+       id.charCodeAt(1) !== codeOfSlash)
+  } else {
+    lookOutside =
+      id.length < 2 ||
       id.charCodeAt(0) !== codeOfDot ||
       (id.charCodeAt(1) !== codeOfDot &&
-       id.charCodeAt(1) !== codeOfSlash)) {
+       id.charCodeAt(1) !== codeOfSlash)
+  }
+
+  if (lookOutside) {
     const parentPaths = parent && parent.paths
     const paths = parentPaths ? slice.call(parentPaths) : []
 
     // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module's directory in front of the lookup paths.
-    if (id === "." &&
-        ! skipGlobalPaths &&
-        ! skipOutsideDot) {
+    if (id === ".") {
       const parentFilename = parent && parent.filename
       paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
     }
 
-    if (parentPaths && ! skipGlobalPaths) {
+    if (parentPaths &&
+        ! skipGlobalPaths) {
       paths.push(...moduleState.globalPaths)
     }
 
