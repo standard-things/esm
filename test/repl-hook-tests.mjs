@@ -26,12 +26,14 @@ describe("REPL hook", () => {
     const r = repl.start({
       eval(code, callback) {
         let error = null
+
         try {
           vm.createScript(code)
             .runInContext(context, { displayErrors: false })
         } catch (e) {
-         error = e
+          error = e
         }
+
         callback(error)
       }
     })
