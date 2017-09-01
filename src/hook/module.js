@@ -286,7 +286,8 @@ function hook(Module, options) {
       }
 
       if (passthru &&
-          error && error.code === "ERR_REQUIRE_ESM") {
+          error instanceof errors.Error &&
+          error.code === "ERR_REQUIRE_ESM") {
         error = passthru = false
         passthruMap.set(func, passthru)
 
