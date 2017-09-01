@@ -207,6 +207,7 @@ function hook(Module, options) {
     let error
     let passthru = passthruMap.get(func)
     let restored = false
+    let threw = true
 
     const readAndRestore = () => {
       restored = true
@@ -278,6 +279,8 @@ function hook(Module, options) {
         } else {
           mod._compile(content, filePath)
         }
+
+        threw = false
       } catch (e) {
         error = e
       }
@@ -289,12 +292,13 @@ function hook(Module, options) {
 
         try {
           mod._compile(content, filePath)
+          threw = false
         } catch (e) {
           error = e
         }
       }
 
-      if (error) {
+      if (threw) {
         throw maskStackTrace(error)
       }
     } finally {

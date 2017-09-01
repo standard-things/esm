@@ -49,6 +49,7 @@ class Compiler {
 
     let ast
     let error
+    let threw = true
 
     const parserOptions = {
       allowReturnOutsideFunction: options.cjs,
@@ -59,20 +60,21 @@ class Compiler {
 
     try {
       ast = Parser.parse(code, parserOptions)
+      threw = false
     } catch (e) {
       error = e
     }
 
-    if (error && type === "unambiguous") {
+    if (threw && type === "unambiguous") {
       type = parserOptions.sourceType = "script"
 
       try {
         ast = Parser.parse(code, parserOptions)
-        error = void 0
+        threw = false
       } catch (e) {}
     }
 
-    if (error) {
+    if (threw) {
       throw error
     }
 
