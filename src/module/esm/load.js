@@ -88,19 +88,15 @@ function load(id, parent, options) {
 }
 
 function loader(filePath) {
-  let { extensions } = moduleState
   let ext = extname(filePath)
-  const mod = this
+  const { extensions } = moduleState
 
   if (! ext || typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  if (ext === ".js") {
-    extensions = mod.constructor._extensions
-  }
-
   const compiler = extensions[ext]
+  const mod = this
 
   if (typeof compiler === "function") {
     mod.filename = filePath

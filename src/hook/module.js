@@ -337,6 +337,8 @@ function hook(Module, options) {
     Wrapper.manage(_extensions, key, managerWrapper)
     Wrapper.wrap(_extensions, key, methodWrapper)
   })
+
+  moduleState.extensions[".js"] = _extensions[".js"]
 }
 
 function gzCompiler(mod, filePath) {
