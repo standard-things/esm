@@ -42,15 +42,15 @@ const env = new FastObject
 env.preload =
   hasLoaderModule(_preloadModules) ||
   (rootModule.id === "internal/preload" &&
-  hasLoaderModule(rootModule.children))
+   hasLoaderModule(rootModule.children))
 
 env.repl =
   (env.preload && argv.length < 2) ||
   (rootModule.filename === null &&
-  rootModule.id === "<repl>" &&
-  rootModule.loaded === false &&
-  rootModule.parent === void 0 &&
-  hasLoaderModule(rootModule.children))
+   rootModule.id === "<repl>" &&
+   rootModule.loaded === false &&
+   rootModule.parent === void 0 &&
+   hasLoaderModule(rootModule.children))
 
 env.cli =
   ! env.preload &&
