@@ -25,8 +25,8 @@ function makeRequireFunction(mod, requirer = mod.require) {
     return resolveFilename(id, mod)
   }
 
-  req.cache = moduleState._cache
-  req.extensions = moduleState._extensions
+  req.cache = __non_webpack_require__.cache
+  req.extensions = __non_webpack_require__.extensions
   req.main = process.mainModule
   req.resolve = resolve
 
