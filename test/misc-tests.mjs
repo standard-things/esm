@@ -1,9 +1,14 @@
 import Module from "module"
+import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs"
 
 const isWin = process.platform === "win32"
+const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
+
+const jsonExt = Module._extensions[".json"]
+const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
 
 const abcId = "./fixture/export/abc.mjs"
 
@@ -13,9 +18,6 @@ const abcNs = {
   c: "c",
   default: "default"
 }
-
-const jsonExt = Module._extensions[".json"]
-const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
 
 beforeEach(() => {
   delete global.customError
@@ -81,14 +83,14 @@ describe("Node rules", () => {
 
   it("should support URL ids", () =>
     Promise.all([
-      import(abcId + "?a"),
-      import(abcId + "#a"),
-      import(abcId.replace("abc", "%61%62%63"))
-    ])
-    .then((namespaces) => namespaces.forEach((ns) =>
-      assert.deepEqual(ns, abcNs)
+      abcId + "?a",
+      abcId + "#a",
+      abcId.replace("abc", "%61%62%63")
+    ].map((id) =>
+      import(id)
+        .then((ns) => assert.deepEqual(ns, abcNs))
+        .catch((e) => assert.ifError(e))
     ))
-    .catch((e) => assert.ifError(e))
   )
 
   it("should support ids containing colons", () =>
@@ -99,6 +101,17 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
+        .catch((e) => assert.ifError(e))
+    ))
+  )
+
+  it('should support local "." ids', () =>
+    Promise.all([
+      "./misc/relative/dot.js",
+      "./misc/relative/dot-slash.js"
+    ].map((id) =>
+      import(id)
+        .then((ns) => assert.deepEqual(ns.default, "inside dot"))
         .catch((e) => assert.ifError(e))
     ))
   )
@@ -153,10 +166,16 @@ describe("Node rules", () => {
     ))
   )
 
-  it('should not resolve non-local "." id', () =>
+  it('should not resolve non-local "." ids', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
+      .catch((e) => {
+        const expected = skipOutsideDot
+          ? "ERR_MISSING_MODULE"
+          : "ERR_MODULE_RESOLUTION_DEPRECATED"
+
+        assert.strictEqual(e.code, expected)
+      })
   )
 
   it("should not wrap custom errors", () =>

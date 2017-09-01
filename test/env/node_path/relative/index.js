@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = "dot"
+module.exports = "outside dot"

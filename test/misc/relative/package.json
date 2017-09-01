@@ -1,0 +1,5 @@
+{
+  "name": "relative",
+  "private": true,
+  "@std/esm": true
+}
