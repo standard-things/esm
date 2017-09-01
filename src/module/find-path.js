@@ -21,10 +21,8 @@ let warned = false
 const packageMainCache = Object.create(null)
 const pathCache = Object.create(null)
 
-function findPath(id, paths, isMain, parent, skipWarnings, skipGlobalPaths, searchExts) {
-  const extensions = parent
-    ? parent.constructor._extensions
-    : __non_webpack_require__.extensions
+function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
+  const { extensions } = __non_webpack_require__
 
   if (isAbsolute(id)) {
     paths = [""]
