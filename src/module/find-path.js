@@ -14,6 +14,7 @@ import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
+const { parse } = JSON
 const { preserveSymlinks } = binding.config
 const skipOutsideDot = satisfies(process.version, ">=9")
 let warned = false
@@ -131,13 +132,19 @@ function readPackage(thePath) {
     return ""
   }
 
+  let main
+
   try {
-    return packageMainCache[thePath] = JSON.parse(json).main
+    ({ main } = parse(json))
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message
     throw e
   }
+
+  return typeof main === "string"
+    ? packageMainCache[thePath] = main
+    : ""
 }
 
 function tryExtensions(thePath, exts, isMain) {
@@ -161,13 +168,13 @@ function tryFile(thePath, isMain) {
 }
 
 function tryPackage(thePath, exts, isMain) {
-  const pkg = readPackage(thePath)
+  const mainPath = readPackage(thePath)
 
-  if (! pkg) {
+  if (! mainPath) {
     return ""
   }
 
-  const filePath = resolve(thePath, pkg)
+  const filePath = resolve(thePath, mainPath)
 
   return tryFile(filePath, isMain) ||
          tryExtensions(filePath, exts, isMain) ||
