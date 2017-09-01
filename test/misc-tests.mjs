@@ -207,6 +207,44 @@ describe("Node rules", () => {
       .then((ns) => assert.deepEqual(ns.default, json))
       .catch((e) => assert.ifError(e))
   })
+
+  it("should resolve non-local dependencies with require", () =>
+    import("./require.js")
+      .then((ns) => {
+        const require = ns.default
+
+        const ids = [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+
+        ids.map((id) => assert.ok(require(id)))
+      })
+      .catch((e) => assert.ifError(e))
+  )
+
+  it('should resolve non-local "." ids with require', () =>
+    import("./require.js")
+      .then((ns) => {
+        const require = ns.default
+        const exported = require(".")
+
+        if (skipOutsideDot) {
+          assert.ok(false)
+        } else {
+          assert.strictEqual(exported, "outside dot")
+        }
+      })
+      .catch((e) => {
+        if (skipOutsideDot) {
+          assert.strictEqual(e.code, "ERR_MISSING_MODULE")
+        } else {
+          assert.ifError(e)
+        }
+      })
+  )
 })
 
 describe("spec compliance", () => {
