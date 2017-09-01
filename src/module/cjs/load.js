@@ -16,12 +16,12 @@ function loader(filePath) {
     ext = ".js"
   }
 
-  const compiler = Wrapper.unwrap(extensions, ext)
   const mod = this
-
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
-  compiler.call(extensions, mod, filePath)
+
+  const extCompiler = Wrapper.unwrap(extensions, ext)
+  extCompiler.call(extensions, mod, filePath)
   mod.loaded = true
 }
 

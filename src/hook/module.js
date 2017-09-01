@@ -331,8 +331,8 @@ function hook(Module, options) {
       }
     }
 
-    const raw = Wrapper.unwrap(_extensions, key)
-    passthruMap.set(raw, ! raw[mjsSym])
+    const extCompiler = Wrapper.unwrap(_extensions, key)
+    passthruMap.set(extCompiler, ! extCompiler[mjsSym])
 
     Wrapper.manage(_extensions, key, managerWrapper)
     Wrapper.wrap(_extensions, key, methodWrapper)
@@ -348,8 +348,8 @@ function gzCompiler(mod, filePath) {
     ext = ".js"
   }
 
-  const func = Wrapper.unwrap(this, ext)
-  return func.call(this, mod, filePath)
+  const extCompiler = Wrapper.unwrap(this, ext)
+  return extCompiler.call(this, mod, filePath)
 }
 
 function mjsCompiler(mod, filePath) {

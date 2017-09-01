@@ -95,17 +95,19 @@ function loader(filePath) {
     ext = ".js"
   }
 
-  const compiler = extensions[ext]
+  const extCompiler = extensions[ext]
   const mod = this
 
-  if (typeof compiler === "function") {
-    mod.filename = filePath
-    mod.paths = nodeModulePaths(dirname(filePath))
-    compiler.call(extensions, mod, filePath)
-    mod.loaded = true
-  } else {
+  if (typeof extCompiler !== "function") {
     mod.load(filePath)
+    return
   }
+
+  mod.filename = filePath
+  mod.paths = nodeModulePaths(dirname(filePath))
+
+  extCompiler.call(extensions, mod, filePath)
+  mod.loaded = true
 }
 
 export default load
