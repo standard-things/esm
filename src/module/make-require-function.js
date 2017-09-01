@@ -6,7 +6,7 @@ import errors from "../errors.js"
 import moduleState from "./state.js"
 import resolveFilename from "./cjs/resolve-filename.js"
 
-function makeRequireFunction(mod, loader = mod.require) {
+function makeRequireFunction(mod, requirer = mod.require) {
   function req(id) {
     moduleState.requireDepth += 1
 
@@ -15,7 +15,7 @@ function makeRequireFunction(mod, loader = mod.require) {
         throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
       }
 
-      return loader.call(mod, id)
+      return requirer.call(mod, id)
     } finally {
       moduleState.requireDepth -= 1
     }
