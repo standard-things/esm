@@ -8,19 +8,16 @@ import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import resolveFilename from "./cjs/resolve-filename.js"
 
-function load(id, parent, isMain, loader, resolver = resolveFilename) {
+function load(id, parent, isMain, state, loader, resolver = resolveFilename) {
   const filePath = resolver(id, parent, isMain)
 
   if (filePath in builtinModules) {
     return builtinModules[filePath]
   }
 
-  const Parent = parent ? parent.constructor : Module
-  const state = parent ? Parent : moduleState
-
-  let child =
-    moduleState.cache[filePath] ||
-    __non_webpack_require__.cache[filePath]
+  let child = state
+    ? state.cache[filePath]
+    : moduleState.cache[filePath] || __non_webpack_require__.cache[filePath]
 
   if (child) {
     const children = parent && parent.children
@@ -32,6 +29,7 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
     return child
   }
 
+  const Parent = parent ? parent.constructor : Module
   child = new Parent(filePath, parent)
 
   if (isMain) {
@@ -44,20 +42,26 @@ function load(id, parent, isMain, loader, resolver = resolveFilename) {
 }
 
 function tryLoad(mod, filePath, state, loader = mod.load) {
-  const cache = state._cache || state.cache
+  if (state) {
+    state.cache[filePath] = mod
+  } else {
+    moduleState.cache[filePath] =
+    __non_webpack_require__.cache[filePath] = mod
+  }
+
   let threw = true
-
-
-  cache[filePath] =
-  __non_webpack_require__.cache[filePath] = mod
 
   try {
     loader.call(mod, filePath)
     threw = false
   } finally {
     if (threw) {
-      delete cache[filePath]
-      delete __non_webpack_require__.cache[filePath]
+      if (state) {
+        delete state.cache[filePath]
+      } else {
+        delete moduleState.cache[filePath]
+        delete __non_webpack_require__.cache[filePath]
+      }
     }
   }
 }

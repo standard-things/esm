@@ -11,8 +11,6 @@ import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 
-const BuiltinModule = __non_webpack_module__.constructor
-
 class Runtime {
   static enable(mod, exported, options) {
     options = createOptions(options)
@@ -120,9 +118,7 @@ function importModule(id, parentEntry) {
   childEntry.loaded()
 
   if (childEntry.sourceType === "module") {
-    if (child.constructor !== BuiltinModule) {
-      delete __non_webpack_require__.cache[child.id]
-    }
+    delete __non_webpack_require__.cache[child.id]
   } else {
     delete moduleState.cache[child.id]
   }
@@ -131,9 +127,7 @@ function importModule(id, parentEntry) {
 }
 
 function requirer(id) {
-  const child = loadCJS(id, this)
-  delete moduleState.cache[child.id]
-  return child.exports
+  return loadCJS(id, this).exports
 }
 
 function runCJS(runtime, moduleWrapper, req) {

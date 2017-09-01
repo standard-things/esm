@@ -48,7 +48,7 @@ function load(id, parent, options) {
   let threw = true
 
   try {
-    child = _load(filePath, parent, options.isMain, loader, () => filePath)
+    child = _load(filePath, parent, options.isMain, null, loader, () => filePath)
     threw = false
   } catch (e) {
     error = e

@@ -5,23 +5,23 @@ import _load from "../load.js"
 import nodeModulePaths from "../node-module-paths.js"
 
 function load(id, parent, isMain) {
-  return _load(id, parent, isMain, loader)
+  return _load(id, parent, isMain, __non_webpack_require__, loader)
 }
 
 function loader(filePath) {
-  const mod = this
-  const { _extensions } = mod.constructor
   let ext = extname(filePath)
+  const { extensions } = __non_webpack_require__
 
-  if (! ext || typeof _extensions[ext] !== "function") {
+  if (! ext || typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  const compiler = Wrapper.unwrap(_extensions, ext)
+  const compiler = Wrapper.unwrap(extensions, ext)
+  const mod = this
 
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
-  compiler.call(_extensions, mod, filePath)
+  compiler.call(extensions, mod, filePath)
   mod.loaded = true
 }
 
