@@ -149,15 +149,17 @@ function readPackage(thePath) {
 }
 
 function tryExtensions(thePath, exts, isMain) {
+  let filePath = ""
+
   for (const ext of exts) {
-    const filePath = tryFile(thePath + ext, isMain)
+    filePath = tryFile(thePath + ext, isMain)
 
     if (filePath) {
       return filePath
     }
   }
 
-  return ""
+  return filePath
 }
 
 function tryFile(thePath, isMain) {
@@ -172,7 +174,7 @@ function tryPackage(thePath, exts, isMain) {
   const mainPath = readPackage(thePath)
 
   if (! mainPath) {
-    return ""
+    return mainPath
   }
 
   const filePath = resolve(thePath, mainPath)
