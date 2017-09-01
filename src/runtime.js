@@ -3,12 +3,12 @@ import Entry from "./entry.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
-import builtinModules from "./builtin-modules.js"
 import createOptions from "./util/create-options.js"
 import { dirname } from "path"
 import getSourceType from "./util/get-source-type.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
+import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
@@ -119,34 +119,32 @@ function importModule(id, parentEntry) {
 
   childEntry.loaded()
 
-  if (childEntry.sourceType === "module" &&
-      child.constructor !== BuiltinModule) {
-    delete __non_webpack_require__.cache[child.id]
+  if (childEntry.sourceType === "module") {
+    if (child.constructor !== BuiltinModule) {
+      delete __non_webpack_require__.cache[child.id]
+    }
+  } else {
+    delete moduleState._cache[child.id]
   }
 
   return parentEntry.children[child.id] = childEntry
 }
 
-function requireWrapper(func, id, parent) {
-  moduleState.requireDepth += 1
-
-  try {
-    const child = builtinModules[id] || loadCJS(id, parent)
-    return child.exports
-  } finally {
-    moduleState.requireDepth -= 1
-  }
+function requirer(id) {
+  const child = loadCJS(id, this)
+  delete moduleState._cache[child.id]
+  return child.exports
 }
 
 function runCJS(runtime, moduleWrapper, req) {
   const mod = runtime.module
   const { entry } = runtime
-  const exported = mod.exports = entry.exports
   const { filename } = mod
   const { options } = runtime
+  const exported = mod.exports = entry.exports
 
   if (! options.cjs) {
-    req = wrapRequire(req, mod, requireWrapper)
+    req = assign(makeRequireFunction(mod, requirer, req))
   }
 
   moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
@@ -171,11 +169,6 @@ function runESM(runtime, moduleWrapper) {
 
   entry.update().loaded()
   assign(exported, entry._namespace)
-}
-
-function wrapRequire(req, parent, wrapper) {
-  const wrapped = (id) => wrapper(req, id, parent)
-  return assign(wrapped, req)
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)
