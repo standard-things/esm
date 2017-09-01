@@ -190,7 +190,13 @@ describe("Node rules", () => {
       .catch((e) =>
         import("./misc/reevaluate-error.mjs")
           .then(() => assert.ok(false))
-          .catch((re) => assert.strictEqual(e, re))
+          .catch((re) => {
+            if (re.code === "ERR_ASSERTION") {
+              assert.ok(false)
+            } else {
+              assert.strictEqual(e, re)
+            }
+          })
       )
   )
 
