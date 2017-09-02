@@ -2,6 +2,7 @@
 .DS_Store
 .esm-cache
 .node_repl_history
+.vscode
 *.gz
 *.log
 /build
