@@ -1,4 +1,7 @@
 import { extname as _extname, dirname } from "path"
+
+import PkgInfo from "../../pkg-info.js"
+
 import _load from "../load.js"
 import createOptions from "../../util/create-options.js"
 import extname from "../../path/extname.js"
@@ -12,7 +15,7 @@ import setGetter from "../../util/set-getter.js"
 const queryHashRegExp = /[?#].*$/
 
 function load(id, parent, options) {
-  options = createOptions(options)
+  options = createOptions(options, PkgInfo.defaultOptions)
   const filePath = resolveFilename(id, parent, options)
 
   let child
