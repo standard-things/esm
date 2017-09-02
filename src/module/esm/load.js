@@ -2,6 +2,8 @@ import { extname as _extname, dirname } from "path"
 import _load from "../load.js"
 import createOptions from "../../util/create-options.js"
 import extname from "../../path/extname.js"
+import getGetter from "../../util/get-getter.js"
+import isObject from "../../util/is-object.js"
 import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
@@ -115,7 +117,16 @@ function pluck(object, key) {
   let value
 
   if (key in object) {
-    value = object[key]
+    value = getGetter(object, key)
+
+    if (typeof value !== "function") {
+      value = object[key]
+
+      if (! isObject(value)) {
+        value = void 0
+      }
+    }
+
     delete object[key]
   }
 
@@ -125,6 +136,11 @@ function pluck(object, key) {
 function restore(object, key, value) {
   if (value === void 0) {
     delete object[key]
+    return
+  }
+
+  if (typeof value === "function") {
+    setGetter(object, key, value)
   } else {
     object[key] = value
   }
