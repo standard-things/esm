@@ -1,4 +1,5 @@
 import { dirname, extname } from "path"
+
 import assign from "./util/assign.js"
 import compile from "./module/compile.js"
 import findPath from "./module/cjs/find-path.js"

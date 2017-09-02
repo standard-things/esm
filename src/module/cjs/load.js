@@ -1,4 +1,5 @@
 import { dirname, extname } from "path"
+
 import Wrapper from "../../wrapper.js"
 
 import _load from "../load.js"

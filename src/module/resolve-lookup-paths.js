@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import { dirname, resolve } from "path"
+
 import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"

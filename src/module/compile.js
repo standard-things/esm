@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import { runInDebugContext, runInThisContext } from "vm"
+
 import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"

@@ -1,4 +1,5 @@
 import { Stats, statSync } from "fs"
+
 import binding from "../binding.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 

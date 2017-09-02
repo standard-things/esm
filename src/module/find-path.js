@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import { isAbsolute, resolve } from "path"
+
 import binding from "../binding.js"
 import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
 import keys from "../util/keys.js"
