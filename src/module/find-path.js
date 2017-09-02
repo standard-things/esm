@@ -15,11 +15,12 @@ const codeOfSlash = "/".charCodeAt(0)
 
 const { parse } = JSON
 const { preserveSymlinks } = binding.config
+
+const packageCache = Object.create(null)
+const pathCache = Object.create(null)
+
 const skipOutsideDot = satisfies(process.version, ">=9")
 let warned = false
-
-const packageMainCache = Object.create(null)
-const pathCache = Object.create(null)
 
 function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
   const { extensions } = __non_webpack_require__
@@ -121,8 +122,8 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
 }
 
 function readPackage(thePath) {
-  if (thePath in packageMainCache) {
-    return packageMainCache[thePath]
+  if (thePath in packageCache) {
+    return packageCache[thePath]
   }
 
   const jsonPath = resolve(thePath, "package.json")
@@ -143,7 +144,7 @@ function readPackage(thePath) {
   }
 
   return typeof main === "string"
-    ? packageMainCache[thePath] = main
+    ? packageCache[thePath] = main
     : ""
 }
 
