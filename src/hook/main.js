@@ -1,5 +1,6 @@
 import PkgInfo from "../pkg-info.js"
 
+import assign from "../util/assign.js"
 import { dirname } from "path"
 import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
@@ -12,14 +13,17 @@ function hook(Module) {
   Module.runMain = function () {
     Module.runMain = runMain
 
-    const filePath = resolveFilename(mainPath, null, { isMain: true })
+    let options = { isMain: true }
+    const filePath = resolveFilename(mainPath, null, options)
+    const pkgInfo = PkgInfo.get(dirname(filePath))
 
-    if (PkgInfo.get(dirname(filePath)) === null) {
+    if (pkgInfo === null) {
       Module.runMain()
       return
     }
 
-    moduleLoad(filePath, null, true)
+    assign(options, pkgInfo.options)
+    moduleLoad(filePath, null, options)
     tryTickCallback()
   }
 
