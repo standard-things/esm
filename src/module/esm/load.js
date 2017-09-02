@@ -25,8 +25,9 @@ function load(id, parent, options) {
   let cacheId = filePath
   let queryHash = queryHashRegExp.exec(id)
 
-  if (options.esm === "mjs" &&
-      _extname(filePath) === ".mjs") {
+  if (options.esm === "all" ||
+      (options.esm === "mjs" &&
+       _extname(filePath) === ".mjs")) {
     state = moduleState
   }
 
