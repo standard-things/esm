@@ -254,6 +254,12 @@ describe("Node rules", () => {
 })
 
 describe("spec compliance", () => {
+  it("should bind exports before the module executes", () =>
+    import("./misc/export/cycle-named.mjs")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should establish live binding of values", () =>
     import("./misc/live.mjs")
       .then((ns) => ns.check())
@@ -278,14 +284,20 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should not have CJS free variables", () =>
-    import("./misc/free-vars.mjs")
+  it("should export CJS `module.exports` as default", () =>
+    import("./misc/export/cjs-default.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
-  it("should export CJS `module.exports` as default", () =>
-    import("./misc/export/cjs-default.mjs")
+  it("should support loading ESM from dynamic import in CJS", (done) => {
+    import("./import/import.js")
+      .then((ns) => ns.default(done))
+      .catch((e) => assert.ifError(e))
+  })
+
+  it("should not have CJS free variables", () =>
+    import("./misc/free-vars.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
@@ -298,12 +310,6 @@ describe("spec compliance", () => {
         assert.ok(e.message.includes("' does not provide an export named '"))
       })
   )
-
-  it("should support loading ESM from dynamic import in CJS", (done) => {
-    import("./import/import.js")
-      .then((ns) => ns.default(done))
-      .catch((e) => assert.ifError(e))
-  })
 
   it("should not support loading ESM from require", () => {
     const abcPath = fs.realpathSync("./fixture/export/abc.mjs")
@@ -325,16 +331,10 @@ describe("spec compliance", () => {
       .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
   )
 
-  it("should not executed already loaded modules from require", () =>
+  it("should not execute already loaded modules from require", () =>
     import("./misc/load-count.js")
       .then(() => import("./misc/require-load-count.js"))
       .then((ns) => assert.strictEqual(ns.default, 1))
-  )
-
-  it("should bind exports before the module executes", () =>
-    import("./misc/export/cycle-named.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should throw a syntax error when exporting duplicate local bindings", () =>
