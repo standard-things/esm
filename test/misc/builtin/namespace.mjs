@@ -1,5 +1,5 @@
 import assert from "assert"
-import * as ns from "_tls_legacy"
+import * as ns from "_http_common"
 
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 

@@ -28,6 +28,18 @@ beforeEach(() => {
 })
 
 describe("built-in modules", () => {
+  it("should load built-ins from CJS", () =>
+    import("./misc/builtin/load.js")
+      .then((ns) => assert.ok(Object.keys(ns).length))
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should load built-ins from ESM", () =>
+    import("./misc/builtin/load.mjs")
+      .then((ns) => assert.ok(Object.keys(ns).length))
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should fire setters if already loaded", () =>
     import("./misc/builtin/loaded.mjs")
       .then((ns) => ns.check())
