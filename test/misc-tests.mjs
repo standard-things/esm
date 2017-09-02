@@ -302,6 +302,12 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
+  it("should load CJS modules that delete their cache entry", () => {
+    return import("./misc/delete-cache.js")
+      .then((ns) => assert.deepEqual(ns.default, "delete cache"))
+      .catch((e) => assert.ifError(e))
+  })
+
   it("should support loading ESM from dynamic import in CJS", (done) => {
     import("./import/import.js")
       .then((ns) => ns.default(done))
