@@ -1,10 +1,10 @@
+import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import createOptions from "./util/create-options.js"
-import { dirname } from "path"
 import getSourceType from "./util/get-source-type.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
@@ -90,15 +90,19 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    const { entry } = this
-    const parent = this.module
+    const { entry, module:mod, options } = this
 
     moduleState.requireDepth += 1
 
     try {
-      const childEntry = importModule(id, entry)
+      const child = importModule(id, mod, loadESM, options)
+      const childEntry = Entry.get(child)
+
+      childEntry.loaded()
+      entry.children[child.id] = childEntry
+
       if (setterPairs !== void 0) {
-        childEntry.addSetters(setterPairs, Entry.get(parent)).update()
+        childEntry.addSetters(setterPairs, entry).update()
       }
     } finally {
       moduleState.requireDepth -= 1
@@ -106,41 +110,32 @@ class Runtime {
   }
 }
 
-function importModule(id, parentEntry) {
+function importModule(id, parent, loader, options) {
   if (id in builtinEntries) {
     return builtinEntries[id]
   }
 
-  const { module:parent, options } = parentEntry
-  const child = loadESM(id, parent, options)
-  const childEntry = Entry.get(child)
+  const child = loader(id, parent, options)
 
-  childEntry.loaded()
-
-  if (childEntry.sourceType === "module") {
-    delete __non_webpack_require__.cache[child.id]
+  if (getSourceType(child.exports) === "module") {
+    if (extname(child.filename) !== ".mjs") {
+      delete __non_webpack_require__.cache[child.id]
+    }
   } else {
     delete moduleState.cache[child.id]
   }
 
-  return parentEntry.children[child.id] = childEntry
-}
-
-function requirer(id) {
-  return loadCJS(id, this).exports
+  return child
 }
 
 function runCJS(runtime, moduleWrapper, req) {
-  const mod = runtime.module
-  const { entry } = runtime
+  const { entry, module:mod, options } = runtime
   const { filename } = mod
-  const { options } = runtime
   const exported = mod.exports = entry.exports
+  const loader = options.cjs ? loadESM : loadCJS
+  const requirer = (id) => importModule(id, mod, loader, options).exports
 
-  if (! options.cjs) {
-    req = assign(makeRequireFunction(mod, requirer), req)
-  }
-
+  req = assign(makeRequireFunction(mod, requirer), req)
   moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
   mod.loaded = true
 
@@ -153,10 +148,8 @@ function runCJS(runtime, moduleWrapper, req) {
 }
 
 function runESM(runtime, moduleWrapper) {
-  const mod = runtime.module
-  const { entry } = runtime
+  const { entry, module:mod, options } = runtime
   const exported = mod.exports = entry.exports
-  const { options } = runtime
 
   moduleWrapper.call(options.cjs ? exported : void 0)
   mod.loaded = true
