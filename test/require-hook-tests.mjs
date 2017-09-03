@@ -1,23 +1,23 @@
-import Module from "module"
-
 import assert from "assert"
 import path from "path"
 import requireHook from "../build/esm.js"
 
-const module = Module._cache[path.resolve("./require-hook-tests.mjs")]
-
 describe("require hook", () => {
-  it("should create a require function that can load ESM", () => {
-    const esmRequire = requireHook(module)
-    const ns = esmRequire("./fixture/export/abc.mjs")
+  it("should create a require function that can load ESM", () =>
+    import("./module.js")
+      .then((ns) => {
+        const mod = ns.default
+        const esmRequire = requireHook(mod)
 
-    const abcNs = {
-      a: "a",
-      b: "b",
-      c: "c",
-      default: "default"
-    }
+        const abcNs = {
+          a: "a",
+          b: "b",
+          c: "c",
+          default: "default"
+        }
 
-    assert.deepEqual(ns, abcNs)
-  })
+        const exported = esmRequire("./fixture/export/abc.mjs")
+        assert.deepEqual(exported, abcNs)
+      })
+  )
 })
