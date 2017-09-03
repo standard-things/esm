@@ -229,7 +229,7 @@ describe("Node rules", () => {
   it("should resolve non-local dependencies with require", () =>
     import("./require.js")
       .then((ns) => {
-        const require = ns.default
+        const req = ns.default
 
         const ids = [
           "home-node-libraries",
@@ -238,7 +238,7 @@ describe("Node rules", () => {
           "prefix-path"
         ]
 
-        ids.map((id) => assert.ok(require(id)))
+        ids.map((id) => assert.ok(req(id)))
       })
       .catch((e) => assert.ifError(e))
   )
@@ -246,8 +246,8 @@ describe("Node rules", () => {
   it('should resolve non-local "." ids with require', () =>
     import("./require.js")
       .then((ns) => {
-        const require = ns.default
-        const exported = require(".")
+        const req = ns.default
+        const exported = req(".")
 
         if (skipOutsideDot) {
           assert.ok(false)
