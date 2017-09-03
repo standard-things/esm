@@ -138,7 +138,7 @@ function runCJS(runtime, moduleWrapper, req) {
   const exported = mod.exports = entry.exports
 
   if (! options.cjs) {
-    req = assign(makeRequireFunction(mod, requirer, req))
+    req = assign(makeRequireFunction(mod, requirer), req)
   }
 
   moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
