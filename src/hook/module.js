@@ -28,12 +28,14 @@ import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
+const defaultOptions = createOptions(PkgInfo.defaultOptions)
+
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
 function hook(Module, options) {
   options = isObjectLike(options)
-    ? createOptions(options, PkgInfo.defaultOptions)
+    ? createOptions(options, defaultOptions)
     : null
 
   const { _extensions } = Module
@@ -362,5 +364,7 @@ setProperty(mjsCompiler, mjsSym, {
   value: true,
   writable: false
 })
+
+hook.defaultOptions = defaultOptions
 
 export default hook

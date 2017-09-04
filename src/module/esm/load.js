@@ -12,10 +12,12 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
+const defaultOptions = createOptions(PkgInfo.defaultOptions)
+
 const queryHashRegExp = /[?#].*$/
 
 function load(id, parent, options) {
-  options = createOptions(options, PkgInfo.defaultOptions)
+  options = createOptions(options, defaultOptions)
   const filePath = resolveFilename(id, parent, options)
 
   let child
@@ -147,5 +149,7 @@ function restore(object, key, value) {
     object[key] = value
   }
 }
+
+load.defaultOptions = defaultOptions
 
 export default load

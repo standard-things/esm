@@ -9,9 +9,11 @@ import makeRequireFunction from "../module/make-require-function.js"
 import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
+const defaultOptions = createOptions(PkgInfo.defaultOptions)
+
 function hook(mod, options) {
   options = isObjectLike(options)
-    ? createOptions(options, PkgInfo.defaultOptions)
+    ? createOptions(options, defaultOptions)
     : null
 
   return makeRequireFunction(mod, (id) => {
@@ -31,5 +33,7 @@ function hook(mod, options) {
     return moduleLoad(filePath, copy, loadOptions).exports
   })
 }
+
+hook.defaultOptions = defaultOptions
 
 export default hook

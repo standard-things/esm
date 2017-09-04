@@ -12,13 +12,13 @@ import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 
+const defaultOptions = createOptions(PkgInfo.defaultOptions)
+
 class Runtime {
-  static get defaultOptions() {
-    return PkgInfo.defaultOptions
-  }
+  static defaultOptions = defaultOptions
 
   static enable(mod, exported, options) {
-    options = createOptions(options, PkgInfo.defaultOptions)
+    options = createOptions(options, defaultOptions)
     const object = mod.exports
 
     object.entry = Entry.get(mod, exported, options)
