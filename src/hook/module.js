@@ -259,18 +259,16 @@ function hook(Module, options) {
         } else {
           mod._compile(content, filePath)
         }
-
-        return
-      }
-
-      try {
-        if (passthru) {
-          func.call(this, mod, filePath)
-        } else {
-          mod._compile(content, filePath)
+      } else {
+        try {
+          if (passthru) {
+            func.call(this, mod, filePath)
+          } else {
+            mod._compile(content, filePath)
+          }
+        } catch (e) {
+          throw maskStackTrace(e)
         }
-      } catch (e) {
-        throw maskStackTrace(e)
       }
     } finally {
       if (fsBinding.internalModuleReadFile === customModuleReadFile) {
