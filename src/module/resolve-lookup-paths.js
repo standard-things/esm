@@ -4,7 +4,6 @@
 
 import { dirname, resolve } from "path"
 
-import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
 import { satisfies } from "semver"
@@ -16,10 +15,6 @@ const skipOutsideDot = satisfies(process.version, ">=9")
 const { slice } = Array.prototype
 
 function resolveLookupPaths(id, parent, skipGlobalPaths) {
-  if (id in builtinModules) {
-    return null
-  }
-
   let lookOutside
 
   if (skipOutsideDot) {
