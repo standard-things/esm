@@ -59,7 +59,7 @@ function resolveLookupPaths(id, parent, skipGlobalPaths) {
   if (! parent ||
       ! parent.id ||
       ! parentFilename) {
-    // Normally the path is taken from `realpath(__filename)`
+    // Normally, the path is taken from `realpath(__filename)`,
     // but with --eval there is no `__filename`.
     const paths = nodeModulePaths(".")
     paths.unshift(".")
