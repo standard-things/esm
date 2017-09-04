@@ -155,7 +155,7 @@ function hook(Module, options) {
     content =
       "const " + runtimeAlias + "=this;" + runtimeAlias +
       ".r((function(exports,require,module,__filename,__dirname){" +
-      content + "\n}),require)"
+      content + "\n}))"
 
     tryModuleCompile.call(this, func, mod, content, filePath, options)
   }

@@ -57,12 +57,9 @@ class Runtime {
     return (childNamespace, childEntry) => this.entry.addGettersFrom(childEntry)
   }
 
-  run(moduleWrapper, req) {
-    if (moduleWrapper.length) {
-      runCJS(this, moduleWrapper, req)
-    } else {
-      runESM(this, moduleWrapper)
-    }
+  run(moduleWrapper) {
+    const runner = moduleWrapper.length ? runCJS : runESM
+    runner(this, moduleWrapper)
   }
 
   // Platform-specific code should find a way to call this method whenever
@@ -128,14 +125,14 @@ function importModule(id, parent, loader, options) {
   return child
 }
 
-function runCJS(runtime, moduleWrapper, req) {
+function runCJS(runtime, moduleWrapper) {
   const { entry, module:mod, options } = runtime
   const { filename } = mod
   const exported = mod.exports = entry.exports
   const loader = options.cjs ? loadESM : loadCJS
   const requirer = (id) => importModule(id, mod, loader, options).exports
+  const req = makeRequireFunction(mod, requirer)
 
-  req = assign(makeRequireFunction(mod, requirer), req)
   moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
   mod.loaded = true
 
