@@ -7,7 +7,6 @@ import { runInDebugContext, runInThisContext } from "vm"
 import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
-import resolveFilename from "./cjs/resolve-filename.js"
 import stripShebang from "../util/strip-shebang.js"
 
 // Lazily resolve `process.argv[1]`.
@@ -34,7 +33,7 @@ function compile(mod, content, filePath) {
     if (resolvedArgv === void 0) {
       // Enter the REPL if not given a file path argument.
       resolvedArgv = process.argv[1]
-        ? resolveFilename(process.argv[1], null, false)
+        ? Module._resolveFilename(process.argv[1])
         : "repl"
     }
 

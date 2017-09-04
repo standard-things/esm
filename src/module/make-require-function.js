@@ -4,9 +4,10 @@
 
 import errors from "../errors.js"
 import moduleState from "./state.js"
-import resolveFilename from "./cjs/resolve-filename.js"
 
 function makeRequireFunction(mod, requirer = mod.require) {
+  const { _resolveFilename } = mod.constructor
+
   function req(id) {
     moduleState.requireDepth += 1
 
@@ -22,7 +23,7 @@ function makeRequireFunction(mod, requirer = mod.require) {
   }
 
   function resolve(id) {
-    return resolveFilename(id, mod)
+    return _resolveFilename(id, mod)
   }
 
   req.cache = __non_webpack_require__.cache
