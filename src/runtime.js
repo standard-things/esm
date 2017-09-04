@@ -1,6 +1,7 @@
 import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
+import PkgInfo from "./pkg-info.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
@@ -12,8 +13,12 @@ import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 
 class Runtime {
+  static get defaultOptions() {
+    return PkgInfo.defaultOptions
+  }
+
   static enable(mod, exported, options) {
-    options = createOptions(options)
+    options = createOptions(options, PkgInfo.defaultOptions)
     const object = mod.exports
 
     object.entry = Entry.get(mod, exported, options)
