@@ -1,5 +1,7 @@
 import Module from "./module.js"
+import PkgInfo from "./pkg-info.js"
 
+import { dirname } from "path"
 import env from "./env.js"
 import { inspect } from "util"
 import mainHook from "./hook/main.js"
@@ -15,6 +17,10 @@ const { custom } = inspect
 const inspectKey = typeof custom === "symbol" ? custom : "inspect"
 
 function hook(mod, options) {
+  if (options === true) {
+    options = PkgInfo.get(dirname(mod.filename))
+  }
+
   moduleHook(Module, options)
   return requireHook(mod, options)
 }
