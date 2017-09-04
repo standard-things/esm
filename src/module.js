@@ -57,7 +57,7 @@ class Module extends BuiltinModule {
   static globalPaths = moduleState.globalPaths
 
   static _findPath(id, paths, isMain) {
-    return findPath(id, paths, isMain)
+    return findPath(id, paths, isMain) || false
   }
 
   static _load(id, parent, isMain) {
