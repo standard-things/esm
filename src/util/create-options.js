@@ -1,7 +1,7 @@
-import assign from "./assign.js"
+import defaults from "./defaults.js"
 
-function createOptions(object, defaults) {
-  return assign(Object.create(null), defaults, object)
+function createOptions(options, defaultOptions) {
+  return defaults(Object.create(null), options, defaultOptions)
 }
 
 export default createOptions
