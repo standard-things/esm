@@ -32,7 +32,7 @@ function compile(mod, content, filePath) {
   if (process._breakFirstLine &&
       process._eval == null) {
     if (resolvedArgv === void 0) {
-      // We enter the REPL if we're not given a file path argument.
+      // Enter the REPL if not given a file path argument.
       resolvedArgv = process.argv[1]
         ? resolveFilename(process.argv[1], null, false)
         : "repl"
