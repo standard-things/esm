@@ -103,7 +103,7 @@ class Runtime {
       childEntry.loaded()
       entry.children[child.id] = childEntry
 
-      if (setterPairs !== void 0) {
+      if (setterPairs) {
         childEntry.addSetters(setterPairs, entry).update()
       }
     } finally {

@@ -69,7 +69,7 @@ class Visitor {
 function getChildNames(value) {
   let childNames = childNamesMap.get(value)
 
-  if (childNames !== void 0) {
+  if (childNames) {
     return childNames
   }
 
