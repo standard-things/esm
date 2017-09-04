@@ -59,7 +59,10 @@ function hook(Module, options) {
     }
 
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
-    return wrapped.call(this, manager, func, pkgInfo, args)
+
+    return wrapped === null
+      ? func.apply(this, args)
+      : wrapped.call(this, manager, func, pkgInfo, args)
   }
 
   // eslint-disable-next-line consistent-return
