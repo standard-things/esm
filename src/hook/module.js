@@ -200,12 +200,10 @@ function hook(Module, options) {
   function tryModuleCompile(func, mod, content, filePath, options) {
     const moduleCompile = mod._compile
     const moduleReadFile = fsBinding.internalModuleReadFile
+    const passthru = passthruMap.get(func)
     const { readFileSync } = fs
 
-    let error
-    let passthru = passthruMap.get(func)
     let restored = false
-    let threw = true
 
     const readAndRestore = () => {
       restored = true
@@ -256,12 +254,6 @@ function hook(Module, options) {
 
     try {
       if (options.debug) {
-        const ext = extname(filePath)
-
-        if (ext === ".mjs.gz") {
-          passthru = passthruMap.get(Wrapper.unwrap(_extensions, ext))
-        }
-
         if (passthru) {
           func.call(this, mod, filePath)
         } else {
@@ -277,28 +269,8 @@ function hook(Module, options) {
         } else {
           mod._compile(content, filePath)
         }
-
-        threw = false
       } catch (e) {
-        error = e
-      }
-
-      if (passthru &&
-          isError(error) &&
-          error.code === "ERR_REQUIRE_ESM") {
-        error = passthru = false
-        passthruMap.set(func, passthru)
-
-        try {
-          mod._compile(content, filePath)
-          threw = false
-        } catch (e) {
-          error = e
-        }
-      }
-
-      if (threw) {
-        throw maskStackTrace(error)
+        throw maskStackTrace(e)
       }
     } finally {
       if (fsBinding.internalModuleReadFile === customModuleReadFile) {
