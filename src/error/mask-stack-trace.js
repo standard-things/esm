@@ -62,11 +62,15 @@ function maskParserStack(stack, sourceCode, filePath) {
     spliceArgs.push(filePath + ":" + lineNum)
   }
 
-  spliceArgs.push(
-    sourceCode.split("\n")[lineNum - 1] || "",
-    " ".repeat(column) + "^",
-    "", desc
-  )
+  if (typeof sourceCode === "string") {
+    spliceArgs.push(
+      sourceCode.split("\n")[lineNum - 1] || "",
+      " ".repeat(column) + "^",
+      ""
+    )
+  }
+
+  spliceArgs.push(desc)
 
   const stackLines = stack.split("\n")
   stackLines.splice(...spliceArgs)
