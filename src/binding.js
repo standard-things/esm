@@ -1,5 +1,6 @@
 import FastObject from "./fast-object.js"
 
+import isObjectLike from "./util/is-object-like.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -9,11 +10,13 @@ const ids = ["config", "fs", "inspector", "natives", "util"]
 
 const binding = ids.reduce((binding, id) => {
   setGetter(binding, id, () => {
+    let value
+
     try {
-      return binding[id] = _binding.call(process, id)
-    } catch (e) {
-      return binding[id] = Object.create(null)
-    }
+      value = _binding.call(process, id)
+    } catch (e) {}
+
+    return binding[id] = isObjectLike(value) ? value : Object.create(null)
   })
 
   setSetter(binding, id, (value) => {
