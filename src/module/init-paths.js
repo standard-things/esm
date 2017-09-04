@@ -12,10 +12,7 @@ function initPaths() {
 
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.
-  const prefixDir = isWin
-    ? resolve(process.execPath, "..")
-    : resolve(process.execPath, "..", "..")
-
+  const prefixDir = resolve(process.execPath, "..", isWin ? "" : "..")
   const paths = [resolve(prefixDir, "lib", "node")]
 
   if (homeDir) {
