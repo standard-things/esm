@@ -16,6 +16,7 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import gunzip from "../fs/gunzip.js"
 import hasPragma from "../parse/has-pragma.js"
+import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -283,7 +284,7 @@ function hook(Module, options) {
       }
 
       if (passthru &&
-          error instanceof errors.Error &&
+          isError(error) &&
           error.code === "ERR_REQUIRE_ESM") {
         error = passthru = false
         passthruMap.set(func, passthru)
@@ -329,7 +330,21 @@ function hook(Module, options) {
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, key)
-    passthruMap.set(extCompiler, ! extCompiler[mjsSym])
+    let passthru = ! extCompiler[mjsSym]
+
+    if (passthru &&
+        key === ".mjs") {
+      try {
+        extCompiler()
+      } catch (e) {
+        if (isError(e) &&
+            e.code === "ERR_REQUIRE_ESM") {
+          passthru = false
+        }
+      }
+    }
+
+    passthruMap.set(extCompiler, passthru)
 
     Wrapper.manage(_extensions, key, managerWrapper)
     Wrapper.wrap(_extensions, key, methodWrapper)
