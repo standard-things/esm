@@ -8,7 +8,6 @@ import assign from "../util/assign.js"
 import attempt from "../util/attempt.js"
 import binding from "../binding.js"
 import compiler from "../caching-compiler.js"
-import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import extname from "../path/extname.js"
@@ -28,15 +27,11 @@ import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
-const defaultOptions = createOptions(PkgInfo.defaultOptions)
-
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
 function hook(Module, options) {
-  options = isObjectLike(options)
-    ? createOptions(options, defaultOptions)
-    : null
+  options = isObjectLike(options) ? options : null
 
   const { _extensions } = Module
   const jsCompiler = Wrapper.unwrap(_extensions, ".js")
@@ -364,7 +359,5 @@ setProperty(mjsCompiler, mjsSym, {
   value: true,
   writable: false
 })
-
-hook.defaultOptions = defaultOptions
 
 export default hook

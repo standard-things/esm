@@ -1,29 +1,23 @@
 import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
-import PkgInfo from "./pkg-info.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
-import createOptions from "./util/create-options.js"
 import getSourceType from "./util/get-source-type.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 
-const defaultOptions = createOptions(PkgInfo.defaultOptions)
-
 class Runtime {
-  static defaultOptions = defaultOptions
-
   static enable(mod, exported, options) {
-    options = createOptions(options, defaultOptions)
     const object = mod.exports
+    const entry = Entry.get(mod, exported, options)
 
-    object.entry = Entry.get(mod, exported, options)
+    object.entry = entry
     object.module = mod
-    object.options = options
+    object.options = entry.options
 
     object.d = object.default = Rp.default
     object.e = object.export = Rp.export
