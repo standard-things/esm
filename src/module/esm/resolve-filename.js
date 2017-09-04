@@ -1,5 +1,4 @@
 import _resolveFilename from "../resolve-filename.js"
-import createOptions from "../../util/create-options.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "../../util/encoded-slash.js"
@@ -16,19 +15,16 @@ const searchExts = [".mjs", ".js", ".json", ".node"]
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
-function resolveFilename(id, parent, options) {
+function resolveFilename(id, parent, isMain, options) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
-
-  options = createOptions(options)
 
   const filename = parent && typeof parent.filename === "string"
     ? parent.filename
     : "."
 
   const fromPath = dirname(filename)
-  const { isMain } = options
   let skipWarnings = false
 
   if (! encodedSlash(id, pathMode)) {
@@ -53,7 +49,7 @@ function resolveFilename(id, parent, options) {
     } else {
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      const skipGlobalPaths = ! options.cjs
+      const skipGlobalPaths = ! (options && options.cjs)
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
       const foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
 

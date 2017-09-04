@@ -111,7 +111,7 @@ function importModule(id, parent, loader, options) {
     return builtinEntries[id]
   }
 
-  const child = loader(id, parent, options)
+  const child = loader(id, parent, false, options)
 
   if (getSourceType(child.exports) === "module") {
     if (extname(child.filename) !== ".mjs") {

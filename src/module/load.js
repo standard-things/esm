@@ -4,17 +4,9 @@
 
 import Module from "../module.js"
 
-import builtinModules from "../builtin-modules.js"
 import moduleState from "./state.js"
-import resolveFilename from "./cjs/resolve-filename.js"
 
-function load(id, parent, isMain, state, loader, resolver = resolveFilename) {
-  const filePath = resolver(id, parent, isMain)
-
-  if (filePath in builtinModules) {
-    return builtinModules[filePath]
-  }
-
+function load(filePath, parent, isMain, state, loader) {
   let child = state
     ? state.cache[filePath]
     : moduleState.cache[filePath] || __non_webpack_require__.cache[filePath]

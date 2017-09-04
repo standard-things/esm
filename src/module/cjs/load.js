@@ -4,9 +4,11 @@ import Wrapper from "../../wrapper.js"
 
 import _load from "../load.js"
 import nodeModulePaths from "../node-module-paths.js"
+import resolveFilename from "./resolve-filename.js"
 
-function load(id, parent, isMain) {
-  return _load(id, parent, isMain, __non_webpack_require__, loader)
+function load(id, parent, isMain, options) {
+  const filePath = resolveFilename(id, parent, isMain, options)
+  return _load(filePath, parent, isMain, __non_webpack_require__, loader)
 }
 
 function loader(filePath) {

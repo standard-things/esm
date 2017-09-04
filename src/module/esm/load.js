@@ -1,9 +1,6 @@
 import { extname as _extname, dirname } from "path"
 
-import PkgInfo from "../../pkg-info.js"
-
 import _load from "../load.js"
-import createOptions from "../../util/create-options.js"
 import extname from "../../path/extname.js"
 import getGetter from "../../util/get-getter.js"
 import isObject from "../../util/is-object.js"
@@ -12,13 +9,10 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
-const defaultOptions = createOptions(PkgInfo.defaultOptions)
-
 const queryHashRegExp = /[?#].*$/
 
-function load(id, parent, options) {
-  options = createOptions(options, defaultOptions)
-  const filePath = resolveFilename(id, parent, options)
+function load(id, parent, isMain, options) {
+  const filePath = resolveFilename(id, parent, isMain, options)
 
   let child
   let oldChildA
@@ -57,7 +51,7 @@ function load(id, parent, options) {
   let threw = true
 
   try {
-    child = _load(filePath, parent, options.isMain, state, loader, () => filePath)
+    child = _load(filePath, parent, isMain, state, loader)
     threw = false
   } catch (e) {
     error = e
@@ -149,7 +143,5 @@ function restore(object, key, value) {
     object[key] = value
   }
 }
-
-load.defaultOptions = defaultOptions
 
 export default load

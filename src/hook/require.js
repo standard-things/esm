@@ -1,7 +1,7 @@
 import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
-import createOptions from "../util/create-options.js"
+import builtinModules from "../builtin-modules.js"
 import { dirname } from "path"
 import isObjectLike from "../util/is-object-like.js"
 import keys from "../util/keys.js"
@@ -9,15 +9,15 @@ import makeRequireFunction from "../module/make-require-function.js"
 import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
-const defaultOptions = createOptions(PkgInfo.defaultOptions)
-
 function hook(mod, options) {
-  options = isObjectLike(options)
-    ? createOptions(options, defaultOptions)
-    : null
+  options = isObjectLike(options) ? options : null
 
   return makeRequireFunction(mod, (id) => {
-    const filePath = resolveFilename(id, mod)
+    if (id in builtinModules) {
+      return builtinModules[id].exports
+    }
+
+    const filePath = resolveFilename(id, mod, false, options)
     const pkgInfo = options === null ? PkgInfo.get(dirname(filePath)) : null
     const loadOptions = pkgInfo === null ? options : pkgInfo.options
 
@@ -33,7 +33,5 @@ function hook(mod, options) {
     return moduleLoad(filePath, copy, loadOptions).exports
   })
 }
-
-hook.defaultOptions = defaultOptions
 
 export default hook
