@@ -329,19 +329,11 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should not support loading ESM from require", () => {
-    const abcPath = fs.realpathSync("./fixture/export/abc.mjs")
-    const abcMod = require.cache[abcPath]
-
-    delete require.cache[abcPath]
-
-    return import("./misc/require-esm.js")
+  it("should not support loading ESM from require", () =>
+    import("./misc/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        require.cache[abcPath] = abcMod
-        assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
-      })
-  })
+      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
+  )
 
   it("should not support loading ESM from require if already loaded", () =>
     import("./misc/require-esm.js")
