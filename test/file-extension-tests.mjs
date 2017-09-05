@@ -1,5 +1,5 @@
 import assert from "assert"
-import fs from "fs"
+import fs from "fs-extra"
 import path from "path"
 import zlib from "zlib"
 
@@ -8,10 +8,17 @@ const gzipped = zlib.gzipSync(content)
 
 describe("file extension", () =>
   [".gz", ".js.gz", ".mjs.gz", ".mjs"].forEach((ext) => {
-    const abcNs = { a: "a", b: "b", c: "c" }
     const modulePath = "./file-extension/a" + ext
 
-    if (ext.endsWith(".gz") && ! fs.existsSync(modulePath)) {
+    const abcNs = {
+      a: "a",
+      b: "b",
+      c: "c",
+      default: "default"
+    }
+
+    if (ext.endsWith(".gz") &&
+        ! fs.pathExistsSync(modulePath)) {
       fs.writeFileSync(modulePath, gzipped)
     }
 

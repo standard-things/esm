@@ -3,10 +3,18 @@
 const assert = require("assert")
 
 function check(done) {
-  import("../file-extension/a.mjs").then((ns) => {
-    assert.deepEqual(ns, { a: "a", b: "b", c: "c" })
-    done()
-  })
+  const abcNs = {
+    a: "a",
+    b: "b",
+    c: "c",
+    default: "default"
+  }
+
+  import("../file-extension/a.mjs")
+    .then((ns) => {
+      assert.deepEqual(ns, abcNs)
+      done()
+    })
 }
 
 module.exports = check
