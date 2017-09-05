@@ -1,6 +1,6 @@
 import { extname as _extname, dirname } from "path"
 
-import _load from "../load.js"
+import _load from "../_load.js"
 import extname from "../../path/extname.js"
 import getGetter from "../../util/get-getter.js"
 import isObject from "../../util/is-object.js"

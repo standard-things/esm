@@ -1,22 +1,18 @@
 import { dirname, extname } from "path"
 
-import builtinModules from "./builtin-modules.js"
 import compile from "./module/compile.js"
 import defaults from "./util/defaults.js"
 import findPath from "./module/find-path.js"
 import initPaths from "./module/init-paths.js"
-import load from "./module/cjs/load.js"
+import load from "./module/load.js"
 import moduleState from "./module/state.js"
 import nodeModulePaths from "./module/node-module-paths.js"
-import resolveFilename from "./module/cjs/resolve-filename.js"
+import resolveFilename from "./module/resolve-filename.js"
 import resolveLookupPaths from "./module/resolve-lookup-paths.js"
+import wrap from "./module/wrap.js"
+import wrapper from "./module/wrapper.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
-
-const wrapper = [
-  "(function(exports,require,module,__filename,__dirname){",
-  "\n})"
-]
 
 class Module extends BuiltinModule {
   constructor(id, parent) {
@@ -45,38 +41,17 @@ class Module extends BuiltinModule {
     this.loaded = true
   }
 
-  wrap(script) {
-    return wrapper[0] + script + wrapper[1]
-  }
-
   static _cache = moduleState.cache
   static _extensions = moduleState.extensions
+  static _findPath = findPath
   static _initPaths = initPaths
+  static _load = load
   static _nodeModulePaths = nodeModulePaths
+  static _resolveFilename = resolveFilename
+  static _resolveLookupPaths = resolveLookupPaths
   static _wrapper = wrapper
   static globalPaths = moduleState.globalPaths
-
-  static _findPath(id, paths, isMain) {
-    return findPath(id, paths, isMain) || false
-  }
-
-  static _load(id, parent, isMain) {
-    return id in builtinModules
-      ? builtinModules[id].exports
-      : load(id, parent, isMain)
-  }
-
-  static _resolveFilename(id, parent, isMain) {
-    return id in builtinModules
-      ? id
-      : resolveFilename(id, parent, isMain)
-  }
-
-  static _resolveLookupPaths(id, parent) {
-    return id in builtinModules
-      ? null
-      : resolveLookupPaths(id, parent)
-  }
+  static wrap = wrap
 }
 
 defaults(Module, BuiltinModule)

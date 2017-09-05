@@ -4,9 +4,12 @@
 
 import { runInDebugContext, runInThisContext } from "vm"
 
+import Module from "../module.js"
+
 import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
+import resolveFilename from "./resolve-filename.js"
 import stripShebang from "../util/strip-shebang.js"
 
 // Lazily resolve `process.argv[1]`.
@@ -17,7 +20,6 @@ const inspectorBinding = binding.inspector
 const { callAndPauseOnStart } = inspectorBinding
 
 function compile(mod, content, filePath) {
-  const Module = mod.constructor
   const req = makeRequireFunction(mod)
   const wrapper = Module.wrap(stripShebang(content))
 
@@ -33,7 +35,7 @@ function compile(mod, content, filePath) {
     if (resolvedArgv === void 0) {
       // Enter the REPL if not given a file path argument.
       resolvedArgv = process.argv[1]
-        ? Module._resolveFilename(process.argv[1])
+        ? resolveFilename(process.argv[1])
         : "repl"
     }
 

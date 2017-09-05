@@ -1,4 +1,4 @@
-import _resolveFilename from "../resolve-filename.js"
+import _resolveFilename from "../_resolve-filename.js"
 import errors from "../../errors.js"
 
 function resolveFilename(id, parent, isMain, options) {

@@ -1,4 +1,4 @@
-import _resolveFilename from "../resolve-filename.js"
+import _resolveFilename from "../_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "../../util/encoded-slash.js"

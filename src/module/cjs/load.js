@@ -2,7 +2,7 @@ import { dirname, extname } from "path"
 
 import Wrapper from "../../wrapper.js"
 
-import _load from "../load.js"
+import _load from "../_load.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 
