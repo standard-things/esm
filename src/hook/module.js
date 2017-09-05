@@ -44,10 +44,9 @@ function hook(Module, options) {
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
     const dirPath = dirname(filePath)
-    let pkgInfo = PkgInfo.get(dirPath)
+    let pkgInfo = options === null ? PkgInfo.get(dirPath) : null
 
-    if (pkgInfo === null &&
-        options !== null) {
+    if (options !== null) {
       pkgInfo = PkgInfo.read(dirPath, true)
       PkgInfo.set(dirPath, pkgInfo)
       assign(pkgInfo.options, options)
