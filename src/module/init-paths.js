@@ -20,10 +20,10 @@ function initPaths() {
     paths.unshift(resolve(homeDir, ".node_modules"))
   }
 
-  const nodePath = process.env.NODE_PATH
+  const { NODE_PATH } = process.env
 
-  return nodePath
-    ? nodePath.split(delimiter).filter(Boolean).concat(paths)
+  return typeof NODE_PATH === "string"
+    ? NODE_PATH.split(delimiter).filter(Boolean).concat(paths)
     : paths
 }
 
