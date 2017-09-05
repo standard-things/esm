@@ -94,7 +94,6 @@ class Runtime {
       const child = importModule(id, mod, loadESM, options)
       const childEntry = Entry.get(child)
 
-      childEntry.loaded()
       entry.children[child.id] = childEntry
 
       if (setterPairs) {
