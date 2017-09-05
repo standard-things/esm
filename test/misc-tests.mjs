@@ -1,13 +1,13 @@
-import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs"
+import require from "./require.js"
 
 const isWin = process.platform === "win32"
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
-const jsonExt = Module._extensions[".json"]
+const jsonExt = require.extensions[".json"]
 const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
 
 const abcId = "./fixture/export/abc.mjs"
@@ -23,8 +23,8 @@ beforeEach(() => {
   delete global.customError
   delete global.loadCount
   delete global.reevaluate
-  delete Module._extensions[".coffee"]
-  Module._extensions[".json"] = jsonExt
+  delete require.extensions[".coffee"]
+  require.extensions[".json"] = jsonExt
 })
 
 describe("built-in modules", () => {
@@ -213,14 +213,14 @@ describe("Node rules", () => {
   )
 
   it("should not support custom file extensions in ESM", () => {
-    Module._extensions[".coffee"] = Module._extensions[".js"]
+    require.extensions[".coffee"] = require.extensions[".js"]
     return import("./misc/cof")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
   })
 
   it("should not support overwriting `.json` handling", () => {
-    Module._extensions[".json"] = () => ({})
+    require.extensions[".json"] = () => ({})
     return import("./package.json")
       .then((ns) => assert.deepEqual(ns.default, json))
       .catch((e) => assert.ifError(e))
@@ -331,14 +331,14 @@ describe("spec compliance", () => {
 
   it("should not support loading ESM from require", () => {
     const abcPath = fs.realpathSync("./fixture/export/abc.mjs")
-    const abcMod = Module._cache[abcPath]
+    const abcMod = require.cache[abcPath]
 
-    delete Module._cache[abcPath]
+    delete require.cache[abcPath]
 
     return import("./misc/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => {
-        Module._cache[abcPath] = abcMod
+        require.cache[abcPath] = abcMod
         assert.strictEqual(e.code, "ERR_REQUIRE_ESM")
       })
   })

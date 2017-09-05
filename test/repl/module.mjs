@@ -1,7 +1,8 @@
-import Module from "module"
-
+import module from "../module.js"
 import path from "path"
+import require from "../require.js"
 
+const Module = module.constructor
 const NODE_ENV = String(process.env.NODE_ENV)
 
 const esmPath = NODE_ENV.startsWith("production")
@@ -9,10 +10,10 @@ const esmPath = NODE_ENV.startsWith("production")
   : path.resolve("../build/esm.js")
 
 // Masquerade as the module of the REPL.
-const module = new Module("<repl>")
-module.children.push(Module._cache[esmPath])
+const mod = new Module("<repl>")
+mod.children.push(require.cache[esmPath])
 
-delete Module._cache[esmPath]
-module.require(esmPath)
+delete require.cache[esmPath]
+mod.require(esmPath)
 
-export default module
+export default mod
