@@ -24,8 +24,8 @@
     "clean": "node script/clean.js",
     "lint": "eslint '**/*.{js,mjs}' --fix --quiet",
     "pub": "node script/publish.js",
-    "test": "node --require ./build/esm.js script/test.js",
-    "test:prod": "node --require ./index.js script/test.js"
+    "test": "node --require ./index.js script/test.js",
+    "test:prod": "node --require ./index.js script/test.js --prod"
   },
   "devDependencies": {
     "acorn": "^5.1.1",

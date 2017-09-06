@@ -20,7 +20,7 @@ describe("module.runMain hook", () => {
     return Promise.all(options.map((option) => {
       const args = [
         option,
-        "../build/esm.js",
+        "../index.js",
         "./main/main.mjs"
       ]
 

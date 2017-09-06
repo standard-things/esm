@@ -1,9 +1,12 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
-const join = require("path").join
-const readFileSync = require("fs").readFileSync
+const fs = require("fs")
+const path = require("path")
 const webpack = require("webpack")
+
+const isProd = /production/.test(process.env.NODE_ENV)
+const isTest = /test/.test(process.env.NODE_ENV)
 
 const BannerPlugin = webpack.BannerPlugin
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
@@ -12,10 +15,6 @@ const ModuleConcatenationPlugin = webpack.optimize.ModuleConcatenationPlugin
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
-
-const NODE_ENV = String(process.env.NODE_ENV)
-const isProduction = NODE_ENV.startsWith("production")
-const isTest = NODE_ENV.endsWith("test")
 
 /* eslint-disable sort-keys */
 const config = {
@@ -27,14 +26,14 @@ const config = {
     filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    path: join(__dirname, "build")
+    path: path.join(__dirname, "build")
   },
   module: {
     rules: [{
       test: /\.js$/,
       loader: "babel-loader",
       exclude: /node_modules/,
-      options: JSON.parse(readFileSync("./.babelrc", "utf8"))
+      options: JSON.parse(fs.readFileSync("./.babelrc", "utf8"))
     }]
   },
   plugins: [
@@ -60,7 +59,7 @@ const config = {
 }
 /* eslint-enable sort-keys */
 
-if (isProduction) {
+if (isProd) {
   config.plugins.push(
     new OptimizeJsPlugin,
     new ShakePlugin,
@@ -69,7 +68,7 @@ if (isProduction) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
-      uglifyOptions: JSON.parse(readFileSync("./.uglifyrc", "utf8"))
+      uglifyOptions: JSON.parse(fs.readFileSync("./.uglifyrc", "utf8"))
     })
   )
 }

@@ -1,7 +1,7 @@
 import assert from "assert"
 import fs from "fs-extra"
 import path from "path"
-import requireHook from "../build/esm.js"
+import requireHook from "../index.js"
 import zlib from "zlib"
 
 const abcNs = {

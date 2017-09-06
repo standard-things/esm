@@ -1,7 +1,6 @@
 "use strict"
 
-const NODE_ENV = String(process.env.NODE_ENV)
-const isTest = NODE_ENV.endsWith("test")
+const isTest = /test/.test(process.env.NODE_ENV)
 
 module.exports = {
   extends: ["eslint:recommended", "plugin:import/errors"],

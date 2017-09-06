@@ -4,20 +4,26 @@ import { ensureLink } from "fs-extra"
 import execa from "execa"
 import globby from "globby"
 import trash from "./trash.js"
+import yargs from "yargs"
 
-const NODE_ENV = String(process.env.NODE_ENV)
+const argv = yargs
+  .boolean("prod")
+  .argv
 
-const isProd = NODE_ENV.startsWith("production")
 const isWin = process.platform === "win32"
 
 const rootPath = join(__dirname, "..")
 const testPath = join(rootPath, "test")
 const envPath = join(testPath, "env")
-const esmPath = isProd ? "../index.js" : "../build/esm.js"
 
 const HOME = join(envPath, "home")
 const MOCHA_BIN = join(rootPath, "node_modules/mocha/bin/mocha")
 const NODE_BIN = join(envPath, "prefix", isWin ? "node.exe" : "bin/node")
+
+const NODE_ENV =
+  (argv.prod ? "production" : "development") +
+  "-test"
+
 const NODE_PATH = [
   join(envPath, "node_path"),
   join(envPath, "node_path/relative")
@@ -34,7 +40,7 @@ const trashPaths = globby.sync([
 const mochaArgs = [
   MOCHA_BIN,
   "--full-trace",
-  "--require", esmPath,
+  "--require", "../index.js",
   "tests.mjs"
 ]
 
@@ -45,7 +51,7 @@ function cleanRepo() {
 function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
-    env: { HOME, NODE_PATH, USERPROFILE: HOME },
+    env: { HOME, NODE_ENV, NODE_PATH, USERPROFILE: HOME },
     reject: false,
     stdio: "inherit"
   })

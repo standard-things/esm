@@ -17,6 +17,13 @@ const NODE_ENV =
   (argv.prod ? "production" : "development") +
   (argv.test ? "-test" : "")
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const zlib = argv.prod ? require("node-zopfli") : require("zlib")
+const gzip = pify(zlib.gzip)
+const gzipOptions = argv.prod
+  ? { numiterations: 100 }
+  : { level: 0 }
+
 const rootPath = path.join(__dirname, "..")
 const buildPath = path.join(rootPath, "build")
 const bundlePath = path.join(buildPath, "esm.js")
@@ -85,12 +92,9 @@ function gzipBundle() {
     return Promise.resolve()
   }
 
-  // eslint-disable-next-line import/no-extraneous-dependencies
-  const gzip = pify(require("node-zopfli").gzip)
-
   return fs
     .readFile(bundlePath)
-    .then((buffer) => gzip(buffer, { numiterations: 100 }))
+    .then((buffer) => gzip(buffer, gzipOptions))
     .then((buffer) => fs.writeFile(gzipPath, buffer))
 }
 
@@ -109,7 +113,7 @@ Promise.all([
   getPunycode()
 ])
 .then(makeBundle)
-.then(() => argv.prod && Promise.all([
-  cleanJSON(),
+.then(() => Promise.all([
+  argv.prod && cleanJSON(),
   gzipBundle()
 ]))
