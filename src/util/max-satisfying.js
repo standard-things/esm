@@ -7,11 +7,9 @@ const satisfyCache = new FastObject
 function maxSatisfying(versions, range) {
   const cacheKey = versions + "\0" + range
 
-  if (cacheKey in satisfyCache) {
-    return satisfyCache[cacheKey]
-  }
-
-  return satisfyCache[cacheKey] = _maxSatisfying(versions, range)
+  return cacheKey in satisfyCache
+    ? satisfyCache[cacheKey]
+    : satisfyCache[cacheKey] = _maxSatisfying(versions, range)
 }
 
 export default maxSatisfying
