@@ -18,14 +18,15 @@
     "prelint": "npm run pretest",
     "prepub": "npm run test:prod",
     "pretest": "npm run build -- --test",
-    "pretest:prod": "npm run build:prod -- --test",
+    "pretest:prod": "npm run pretest -- --prod",
+    "_test": "node --require ./index.js script/test.js",
     "build": "node script/build.js",
-    "build:prod": "node script/build.js --prod",
+    "build:prod": "npm run build -- --prod",
     "clean": "node script/clean.js",
     "lint": "eslint '**/*.{js,mjs}' --fix --quiet",
     "pub": "node script/publish.js",
-    "test": "node --require ./index.js script/test.js",
-    "test:prod": "node --require ./index.js script/test.js --prod"
+    "test": "npm run _test",
+    "test:prod": "npm run _test -- --prod"
   },
   "devDependencies": {
     "acorn": "^5.1.1",
