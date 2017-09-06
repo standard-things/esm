@@ -2,6 +2,7 @@ import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs-extra"
+import path from "path"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"
@@ -226,7 +227,20 @@ describe("Node rules", () => {
       .catch((e) => assert.ifError(e))
   })
 
-  it("should resolve non-local dependencies with require", () =>
+  it("should not cache ES modules in `require.cache`", () =>
+    import("./require.js")
+      .then((ns) => {
+        const req = ns.default
+        const filePath = path.resolve("./misc/cache/out.mjs")
+
+        delete req.cache[filePath]
+        return import("./misc/cache/out/")
+          .then(() => assert.strictEqual(filePath in req.cache, false))
+      })
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should resolve non-local dependencies with `require`", () =>
     import("./require.js")
       .then((ns) => {
         const req = ns.default
@@ -243,7 +257,7 @@ describe("Node rules", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it('should resolve non-local "." ids with require', () =>
+  it('should resolve non-local "." ids with `require`', () =>
     import("./require.js")
       .then((ns) => {
         const req = ns.default
@@ -262,6 +276,19 @@ describe("Node rules", () => {
           assert.ifError(e)
         }
       })
+  )
+
+  it("should cache ES modules in `require.cache` with `options.cjs`", () =>
+    import("./require.js")
+      .then((ns) => {
+        const req = ns.default
+        const filePath = path.resolve("./misc/cache/in.mjs")
+
+        delete req.cache[filePath]
+        return import("./misc/cache/in/")
+          .then(() => assert.ok(filePath in req.cache))
+      })
+      .catch((e) => assert.ifError(e))
   )
 })
 
