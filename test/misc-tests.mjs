@@ -1,7 +1,7 @@
 import SemVer from "semver"
 
 import assert from "assert"
-import fs from "fs"
+import fs from "fs-extra"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"

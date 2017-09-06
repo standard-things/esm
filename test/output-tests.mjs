@@ -1,6 +1,6 @@
 import assert from "assert"
 import compiler from "../build/compiler.js"
-import fs from "fs"
+import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 

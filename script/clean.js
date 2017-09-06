@@ -1,15 +1,15 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
+const fs = require("fs-extra")
 const globby = require("globby")
-const join = require("path").join
-const readFileSync = require("fs").readFileSync
+const path = require("path")
 const trash = require("./trash.js")
 
-const rootPath = join(__dirname, "..")
-const gitignorePath = join(rootPath, ".gitignore")
+const rootPath = path.join(__dirname, "..")
+const gitignorePath = path.join(rootPath, ".gitignore")
 
-const ignores = readFileSync(gitignorePath, "utf8")
+const ignores = fs.readFileSync(gitignorePath, "utf8")
   .replace(/^\s+/gm, "")
   .replace(/\s+$/gm, "")
   .split("\n")
