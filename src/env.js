@@ -9,7 +9,7 @@ import rootModule from "./root-module.js"
 
 const codeOfDash = "-".charCodeAt(0)
 
-const { _preloadModules, argv } = process
+const { _preloadModules, argv, cwd } = process
 const esmPath = __non_webpack_module__.filename
 const params = argv.slice(2)
 
@@ -61,6 +61,7 @@ env.cli =
   ! env.repl &&
   nmIndex !== -1 &&
   hasLoaderParam(params) &&
-  PkgInfo.get(realpath(argv[1].slice(0, nmIndex + 1))) !== null
+  (PkgInfo.get(cwd()) !== null ||
+   PkgInfo.get(realpath(argv[1].slice(0, nmIndex + 1))) !== null)
 
 export default env
