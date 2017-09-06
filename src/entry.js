@@ -80,6 +80,10 @@ class Entry {
     return entry
   }
 
+  static has(key) {
+    return entryMap.has(key)
+  }
+
   static set(key, entry) {
     if (isObjectLike(key)) {
       entryMap.set(key, entry)
