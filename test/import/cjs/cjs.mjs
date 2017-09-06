@@ -1,6 +1,7 @@
 import assert from "assert"
 import { add, reset, value } from "../../fixture/cjs/bridge.js"
 import adef, * as ans from "../../fixture/cjs/exports-array.js"
+import cdef, { a as ca } from "../../fixture/cjs/exports-class.js"
 import ddef, * as dns from "../../fixture/cjs/exports-default.js"
 import edef, { a as ea } from "../../fixture/cjs/exports-esmodule.js"
 import fdef, { a as fa } from "../../fixture/cjs/exports-function.js"
@@ -8,6 +9,7 @@ import nuldef, * as nulns from "../../fixture/cjs/exports-null.js"
 import numdef, * as numns from "../../fixture/cjs/exports-number.js"
 import odef, { a as oa } from "../../fixture/cjs/exports-object.js"
 import udef, * as uns from "../../fixture/cjs/exports-undefined.js"
+import * as cns from "../../fixture/cjs/exports-class.js"
 import * as ens from "../../fixture/cjs/exports-esmodule.js"
 import * as fns from "../../fixture/cjs/exports-function.js"
 import * as empty from "../../fixture/cjs/exports-empty.js"
@@ -17,6 +19,10 @@ import * as getSet from "../../fixture/cjs/exports-get-set.js"
 export function check() {
   assert.deepEqual(adef, [1])
   assert.strictEqual(ans.default, adef)
+
+  assert.strictEqual(typeof cdef, "function")
+  assert.strictEqual(cns.default, cdef)
+  assert.strictEqual(ca, "a")
 
   assert.strictEqual(ddef.default, "default")
   assert.strictEqual(ddef, dns.default)

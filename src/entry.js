@@ -4,6 +4,7 @@ import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
+import keysAll from "./util/keys-all.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -266,15 +267,15 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const { _namespace, exports:exported } = entry
-  const isSafe = entry.sourceType !== "script"
+  const { _namespace, exports:exported, sourceType } = entry
+  const isSafe = sourceType !== "script"
 
   if (! isSafe) {
     // Hardcode "default" as `module.exports` for CommonJS scripts.
     _namespace.default = exported
   }
 
-  const names = keys(exported)
+  const names = isSafe ? keys(exported) : keysAll(exported)
 
   for (const name of names) {
     if (isSafe) {
