@@ -94,7 +94,7 @@ class Runtime {
       const child = importModule(id, mod, loadESM, options)
       const childEntry = Entry.get(child)
 
-      entry.children[child.id] = childEntry
+      entry.children[child.filename] = childEntry
 
       if (setterPairs) {
         childEntry.addSetters(setterPairs, entry).update()
@@ -111,13 +111,14 @@ function importModule(id, parent, loader, options) {
   }
 
   const child = loader(id, parent, false, options)
+  const { filename } = child
 
   if (getSourceType(child.exports) === "module") {
-    if (extname(child.filename) !== ".mjs") {
-      delete __non_webpack_require__.cache[child.id]
+    if (extname(filename) !== ".mjs") {
+      delete __non_webpack_require__.cache[filename]
     }
   } else {
-    delete moduleState.cache[child.id]
+    delete moduleState.cache[filename]
   }
 
   return child
