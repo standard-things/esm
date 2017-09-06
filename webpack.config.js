@@ -41,8 +41,7 @@ const config = {
     new BannerPlugin({
       banner: [
         '"use strict";\n',
-        "const __non_webpack_module__ = module;",
-        "const __non_webpack_filename__ = __filename;\n"
+        "const __non_webpack_module__ = module;\n"
       ].join("\n"),
       entryOnly: true,
       raw: true

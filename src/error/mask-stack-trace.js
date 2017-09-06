@@ -5,6 +5,8 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 
+const esmPath = __non_webpack_module__.filename
+
 const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/m
 const removeArrowRegExp = /^.+\n *^$/m
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
@@ -89,7 +91,7 @@ function removeArrow(stack) {
 function scrubStack(stack) {
   return stack
     .split("\n")
-    .filter((line) => ! line.includes(__non_webpack_filename__))
+    .filter((line) => ! line.includes(esmPath))
     .join("\n")
     .replace(removeLineInfoRegExp, "$1")
 }
