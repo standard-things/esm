@@ -8,6 +8,4 @@ Object.defineProperty(exports, "__esModule", {
 })
 
 exports.a = "a"
-exports.b = "b"
-exports.c = "c"
 exports.default = "default"

@@ -1,34 +1,42 @@
 import assert from "assert"
 import { add, reset, value } from "../../fixture/cjs/bridge.js"
+import adef, * as ans from "../../fixture/cjs/exports-array.js"
 import ddef, * as dns from "../../fixture/cjs/exports-default.js"
-import * as ens from "../../fixture/cjs/exports-esmodule.js"
-import edef, { a as ea, b as eb, c as ec } from "../../fixture/cjs/exports-esmodule.js"
-import * as fns from "../../fixture/cjs/exports-function.js"
-import fdef, { a as fa, b as fb, c as fc } from "../../fixture/cjs/exports-function.js"
-import ndef, * as nns from "../../fixture/cjs/exports-null.js"
-import odef, { a as oa, b as ob, c as oc } from "../../fixture/cjs/exports-object.js"
+import edef, { a as ea } from "../../fixture/cjs/exports-esmodule.js"
+import fdef, { a as fa } from "../../fixture/cjs/exports-function.js"
+import nuldef, * as nulns from "../../fixture/cjs/exports-null.js"
+import numdef, * as numns from "../../fixture/cjs/exports-number.js"
+import odef, { a as oa } from "../../fixture/cjs/exports-object.js"
 import udef, * as uns from "../../fixture/cjs/exports-undefined.js"
+import * as ens from "../../fixture/cjs/exports-esmodule.js"
+import * as fns from "../../fixture/cjs/exports-function.js"
 import * as empty from "../../fixture/cjs/exports-empty.js"
 import * as emptyESM from "../../fixture/cjs/exports-esmodule-empty.js"
 import * as getSet from "../../fixture/cjs/exports-get-set.js"
 
 export function check() {
+  assert.deepEqual(adef, [1])
+  assert.strictEqual(ans.default, adef)
+
   assert.strictEqual(ddef.default, "default")
   assert.strictEqual(ddef, dns.default)
 
   assert.strictEqual(edef, "default")
   assert.strictEqual(ens.default, edef)
-  assert.deepEqual([ea, eb, ec], ["a", "b", "c"])
+  assert.strictEqual(ea, "a")
 
   assert.strictEqual(fdef(), "ok")
   assert.strictEqual(fns.default, fdef)
-  assert.deepEqual([fa, fb, fc], ["a", "b", "c"])
+  assert.strictEqual(fa, "a")
 
-  assert.strictEqual(ndef, null)
-  assert.strictEqual(nns.default, ndef)
+  assert.strictEqual(nuldef, null)
+  assert.strictEqual(nulns.default, nuldef)
 
-  assert.deepEqual(odef, { a: 1, b: 2, c: 3 })
-  assert.deepEqual([oa, ob, oc], [1, 2, 3])
+  assert.strictEqual(numdef, 1)
+  assert.strictEqual(numns.default, numdef)
+
+  assert.deepEqual(odef, { a: "a" })
+  assert.strictEqual(oa, "a")
 
   assert.strictEqual(udef, void 0)
   assert.strictEqual(uns.default, udef)
