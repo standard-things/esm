@@ -1,7 +1,7 @@
 import assert from "assert"
 import fs from "fs-extra"
+import makeRequire from "../index.js"
 import path from "path"
-import requireHook from "../index.js"
 import zlib from "zlib"
 
 const abcId = "./fixture/export/abc.mjs"
@@ -28,7 +28,7 @@ describe("require hook", () => {
     import("./module.js")
       .then((ns) => {
         const mod = ns.default
-        const esmRequire = requireHook(mod)
+        const esmRequire = makeRequire(mod)
         const exported = esmRequire(abcId)
         assert.deepEqual(exported, abcNs)
       })
@@ -38,10 +38,10 @@ describe("require hook", () => {
     import("./module.js")
       .then((ns) => {
         const mod = ns.default
-        const allRequire = requireHook(mod, { esm: "all" })
-        const gzRequire = requireHook(mod, { gz: true })
-        const jsRequire = requireHook(mod, { esm: "js" })
-        const mjsRequire = requireHook(mod, { esm: "mjs" })
+        const allRequire = makeRequire(mod, { esm: "all" })
+        const gzRequire = makeRequire(mod, { gz: true })
+        const jsRequire = makeRequire(mod, { esm: "js" })
+        const mjsRequire = makeRequire(mod, { esm: "mjs" })
 
         allRequire("./require/this.js")
         assert.strictEqual(global.this, "undefined")
