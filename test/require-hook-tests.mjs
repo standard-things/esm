@@ -4,6 +4,8 @@ import path from "path"
 import requireHook from "../index.js"
 import zlib from "zlib"
 
+const abcId = "./fixture/export/abc.mjs"
+
 const abcNs = {
   a: "a",
   b: "b",
@@ -11,11 +13,15 @@ const abcNs = {
   default: "default"
 }
 
-if (! fs.pathExistsSync("./require/a.js.gz")) {
+if (! fs.pathExistsSync("./require/a.mjs.gz")) {
   const content = fs.readFileSync("./require/a.js")
   const gzipped = zlib.gzipSync(content)
-  fs.writeFileSync("./require/a.js.gz", gzipped)
+  fs.writeFileSync("./require/a.mjs.gz", gzipped)
 }
+
+beforeEach(() => {
+  delete global.this
+})
 
 describe("require hook", () => {
   it("should create a require function that can load ESM", () =>
@@ -23,7 +29,7 @@ describe("require hook", () => {
       .then((ns) => {
         const mod = ns.default
         const esmRequire = requireHook(mod)
-        const exported = esmRequire("./fixture/export/abc.mjs")
+        const exported = esmRequire(abcId)
         assert.deepEqual(exported, abcNs)
       })
   )
@@ -32,13 +38,21 @@ describe("require hook", () => {
     import("./module.js")
       .then((ns) => {
         const mod = ns.default
-        const gzRequire = requireHook(mod, { esm: "all", gz: true })
-        const esmRequire = requireHook(mod, { esm: "js" })
+        const allRequire = requireHook(mod, { esm: "all" })
+        const gzRequire = requireHook(mod, { gz: true })
+        const jsRequire = requireHook(mod, { esm: "js" })
+        const mjsRequire = requireHook(mod, { esm: "mjs" })
 
-        let exported = esmRequire("./require/a.js")
+        allRequire("./require/this.js")
+        assert.strictEqual(global.this, "undefined")
+
+        let exported = gzRequire("./require/a.mjs.gz")
         assert.deepEqual(exported, abcNs)
 
-        exported = gzRequire("./require/a.js.gz")
+        exported = jsRequire("./require/a.js")
+        assert.deepEqual(exported, abcNs)
+
+        exported = mjsRequire(abcId)
         assert.deepEqual(exported, abcNs)
       })
   )
