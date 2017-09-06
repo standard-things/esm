@@ -17,6 +17,11 @@ const nmIndex = params.length
   ? argv[1].replace(/\\/g, "/").lastIndexOf("/node_modules/")
   : -1
 
+const preloading =
+  hasLoaderModule(_preloadModules) ||
+  (rootModule.id === "internal/preload" &&
+   hasLoaderModule(rootModule.children))
+
 function hasLoaderModule(modules) {
   return Array.isArray(modules) &&
     modules.some(({ filename }) => filename === esmPath)
@@ -40,12 +45,11 @@ function hasLoaderParam(params) {
 const env = new FastObject
 
 env.preload =
-  hasLoaderModule(_preloadModules) ||
-  (rootModule.id === "internal/preload" &&
-   hasLoaderModule(rootModule.children))
+  preloading &&
+  argv.length > 1
 
 env.repl =
-  (env.preload && argv.length < 2) ||
+  (preloading && argv.length < 2) ||
   (rootModule.filename === null &&
    rootModule.id === "<repl>" &&
    rootModule.loaded === false &&
