@@ -32,8 +32,8 @@ describe("require hook", () => {
     import("./module.js")
       .then((ns) => {
         const mod = ns.default
+        const gzRequire = requireHook(mod, { esm: "all", gz: true })
         const esmRequire = requireHook(mod, { esm: "js" })
-        const gzRequire = requireHook(mod, { gz: true })
 
         let exported = esmRequire("./require/a.js")
         assert.deepEqual(exported, abcNs)
