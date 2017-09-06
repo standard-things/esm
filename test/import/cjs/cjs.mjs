@@ -45,7 +45,9 @@ export function check() {
 
   assert.strictEqual(getSet.safe, "safe")
   getSet.safe = "so safe"
+
   assert.strictEqual(getSet.safe, "so safe")
+  getSet.safe = "safe"
 
   const desc = Object.getOwnPropertyDescriptor(getSet, "safe")
 

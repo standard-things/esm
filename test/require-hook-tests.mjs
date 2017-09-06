@@ -38,7 +38,12 @@ describe("require hook", () => {
     import("./module.js")
       .then((ns) => {
         const mod = ns.default
+        const cjsId = path.resolve("./import/cjs/id")
+        const cjsMod = new mod.constructor(cjsId)
+        cjsMod.filename = cjsMod.id
+
         const allRequire = makeRequire(mod, { esm: "all" })
+        const cjsRequire = makeRequire(cjsMod, true)
         const gzRequire = makeRequire(mod, { gz: true })
         const jsRequire = makeRequire(mod, { esm: "js" })
         const mjsRequire = makeRequire(mod, { esm: "mjs" })
@@ -46,7 +51,10 @@ describe("require hook", () => {
         allRequire("./require/this.js")
         assert.strictEqual(global.this, "undefined")
 
-        let exported = gzRequire("./require/a.mjs.gz")
+        let exported = cjsRequire("./cjs")
+        exported.check()
+
+        exported = gzRequire("./require/a.mjs.gz")
         assert.deepEqual(exported, abcNs)
 
         exported = jsRequire("./require/a.js")
