@@ -1,4 +1,5 @@
 const codeOfPound = "#".charCodeAt(0)
+
 const shebangRegExp = /^#!.*/
 
 function stripShebang(string) {
