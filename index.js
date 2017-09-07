@@ -18,7 +18,7 @@ mod.filename = __filename
 mod.parent = module.parent
 
 const scriptOptions = Object.create(null)
-scriptOptions.filename = esmPath
+scriptOptions.filename = __filename
 
 const content =
   "(function(require,module,__filename){" +

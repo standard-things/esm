@@ -87,6 +87,22 @@ describe("package.json", () => {
   )
 })
 
+describe("errors", () => {
+  it("should mask stack traces", () =>
+    import("MISSING_MODULE")
+      .catch((e) => {
+        const stack = e.stack
+        assert.strictEqual(stack.includes("esm.js"), false)
+      })
+  )
+
+  it("should not wrap custom errors", () =>
+    import("./misc/custom-error.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e, global.customError))
+  )
+})
+
 describe("Node rules", () => {
   it("should find `.mjs` before `.js`", () =>
     Promise.all([
@@ -194,12 +210,6 @@ describe("Node rules", () => {
 
         assert.strictEqual(e.code, expected)
       })
-  )
-
-  it("should not wrap custom errors", () =>
-    import("./misc/custom-error.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e, global.customError))
   )
 
   it("should not reevaluate errors", () =>
