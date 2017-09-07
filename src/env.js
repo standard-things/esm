@@ -1,10 +1,10 @@
 import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
+import _resolveFilename from "./module/_resolve-filename.js"
 import isPath from "./util/is-path.js"
 import realpath from "./fs/realpath.js"
 import { resolve } from "path"
-import resolveFilename from "./module/resolve-filename.js"
 import rootModule from "./root-module.js"
 
 const codeOfDash = "-".charCodeAt(0)
@@ -34,7 +34,7 @@ function hasLoaderParam(params) {
         return true
       }
     } else if (param.charCodeAt(0) !== codeOfDash &&
-        resolveFilename(param, rootModule) === esmPath) {
+        _resolveFilename(param, rootModule) === esmPath) {
       return true
     }
   }
