@@ -1,8 +1,9 @@
+import SafeWeakMap from "../safe-weak-map.js"
 import Visitor from "../visitor.js"
 
 import raise from "../parse/raise.js"
 
-const definedMap = new WeakMap
+const definedMap = new SafeWeakMap
 
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {

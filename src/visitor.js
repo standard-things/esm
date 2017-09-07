@@ -2,11 +2,13 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/ast-types/blob/master/lib/path-visitor.js
 
+import SafeWeakMap from "./safe-weak-map.js"
+
 import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 
-const childNamesMap = new WeakMap
+const childNamesMap = new SafeWeakMap
 
 const childrenToVisit = createOptions({
   alternate: true,

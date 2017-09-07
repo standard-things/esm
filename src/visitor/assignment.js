@@ -1,10 +1,11 @@
 import NullObject from "../null-object.js"
+import SafeWeakMap from "../safe-weak-map.js"
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import raise from "../parse/raise.js"
 
-const shadowedMap = new WeakMap
+const shadowedMap = new SafeWeakMap
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {

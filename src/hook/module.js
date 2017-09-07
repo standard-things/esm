@@ -3,6 +3,7 @@ import { extname as _extname, dirname, join } from "path"
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
+import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
@@ -37,7 +38,7 @@ function hook(Module, options) {
 
   const { _extensions } = Module
   const jsCompiler = Wrapper.unwrap(_extensions, ".js")
-  const passthruMap = new Map
+  const passthruMap = new SafeMap
 
   let allowTopLevelAwait = isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")

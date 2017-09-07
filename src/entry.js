@@ -1,4 +1,5 @@
 import NullObject from "./null-object.js"
+import SafeWeakMap from "./safe-weak-map.js"
 
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
@@ -16,7 +17,7 @@ const { is, seal } = Object
 const { sort } = Array.prototype
 
 const GETTER_ERROR = {}
-const entryMap = new WeakMap
+const entryMap = new SafeWeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 const toStringTagDescriptor = createOptions({
