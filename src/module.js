@@ -15,10 +15,6 @@ import wrapper from "./module/wrapper.js"
 const BuiltinModule = __non_webpack_module__.constructor
 
 class Module extends BuiltinModule {
-  constructor(id, parent) {
-    super(id, parent)
-  }
-
   _compile(content, filePath) {
     return compile(this, content, filePath)
   }
