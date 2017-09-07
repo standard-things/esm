@@ -196,7 +196,7 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
+        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_LEGACY"))
     ))
   )
 
@@ -206,7 +206,7 @@ describe("Node rules", () => {
       .catch((e) => {
         const expected = skipOutsideDot
           ? "ERR_MISSING_MODULE"
-          : "ERR_MODULE_RESOLUTION_DEPRECATED"
+          : "ERR_MODULE_RESOLUTION_LEGACY"
 
         assert.strictEqual(e.code, expected)
       })
@@ -243,7 +243,7 @@ describe("Node rules", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./misc/cof")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_DEPRECATED"))
+      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
 
   it("should not support overwriting `.json` handling", () => {

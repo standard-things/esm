@@ -63,7 +63,7 @@ function resolveFilename(id, parent, isMain, options) {
   const foundPath = _resolveFilename(id, parent, isMain, skipWarnings)
 
   if (foundPath) {
-    throw new errors.Error("ERR_MODULE_RESOLUTION_DEPRECATED", id, fromPath, foundPath)
+    throw new errors.Error("ERR_MODULE_RESOLUTION_LEGACY", id, fromPath, foundPath)
   }
 
   throw new errors.Error("ERR_MISSING_MODULE", id)
