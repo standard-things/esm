@@ -1,8 +1,8 @@
 import assert from "assert"
 
 // Import the CommonJS module first, but do not register any setters.
-import "../fixture/cycle/cjs.js"
-import { sum } from "../fixture/cycle/esm.mjs"
+import "./untouched/cjs.js"
+import { sum } from "./untouched/esm.mjs"
 
 export function check() {
   assert.strictEqual(sum(), 3)
