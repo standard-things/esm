@@ -8,31 +8,31 @@ const vm = require("vm")
 const zlib = require("zlib")
 
 const esmPath = path.join(__dirname, "esm.js.gz")
+const inspectKey = util.inspect.custom || "inspect"
+
+const descriptor = Object.create(null)
+descriptor.value = () => "@std/esm enabled"
+
+const mod = new module.constructor(module.id)
+mod.filename = __filename
+mod.parent = module.parent
+
+const scriptOptions = Object.create(null)
+scriptOptions.filename = esmPath
 
 const content =
   "(function(require,module,__filename){" +
   zlib.gunzipSync(fs.readFileSync(esmPath)).toString() +
   "\n})"
 
-const compiled = vm.runInThisContext(content, {
-  displayErrors: true,
-  filename: esmPath
-})
-
-const mod = new module.constructor(module.id)
-mod.filename = __filename
-mod.parent = module.parent
-
-const inspectKey = typeof util.inspect.custom === "symbol"
-  ? util.inspect.custom
-  : "inspect"
-
-const loader = makeLoaderFunction()
+const compiled = vm.runInThisContext(content, scriptOptions)
 
 function makeLoaderFunction() {
   compiled(require, mod, __filename)
   return mod.exports
 }
+
+const loader = makeLoaderFunction()
 
 module.exports = (mod, options) => {
   const type = typeof options
@@ -46,11 +46,4 @@ module.exports = (mod, options) => {
   return loader(mod, options)
 }
 
-Object.defineProperty(module.exports, inspectKey, {
-  configurable: false,
-  enumerable: false,
-  value: () => "@std/esm enabled",
-  writable: false
-})
-
-Object.freeze(module.exports)
+Object.freeze(Object.defineProperty(module.exports, inspectKey, descriptor))
