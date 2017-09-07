@@ -1,5 +1,6 @@
 import { extname as _extname, dirname, join } from "path"
 
+import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
@@ -130,7 +131,7 @@ function hook(Module, options) {
     const noDepth = moduleState.requireDepth === 0
 
     if (noDepth) {
-      stat.cache = Object.create(null)
+      stat.cache = new NullObject
     }
 
     const tryModuleCompile = cacheValue.type === "module" ? tryESMCompile : tryCJSCompile
@@ -148,7 +149,7 @@ function hook(Module, options) {
   }
 
   function tryCJSCompile(func, mod, content, filePath, runtimeAlias, options) {
-    const exported = Object.create(null)
+    const exported = new NullObject
     setSourceType(exported, "script")
     Runtime.enable(mod, exported, options)
 
@@ -161,7 +162,7 @@ function hook(Module, options) {
   }
 
   function tryESMCompile(func, mod, content, filePath, runtimeAlias, options) {
-    const exported = Object.create(null)
+    const exported = new NullObject
     setSourceType(exported, "module")
     Runtime.enable(mod, exported, options)
 

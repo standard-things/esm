@@ -1,10 +1,12 @@
+import NullObject from "./null-object.js"
+
 class OrderedMap {
   constructor() {
     this.clear()
   }
 
   clear() {
-    this._hash = Object.create(null)
+    this._hash = new NullObject
 
     if (this._keys === void 0) {
       this._keys = []

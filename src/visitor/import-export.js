@@ -1,4 +1,5 @@
 import MagicString from "../magic-string.js"
+import NullObject from "../null-object.js"
 import OrderedMap from "../ordered-map.js"
 import Visitor from "../visitor.js"
 
@@ -31,9 +32,9 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = false
     this.bodyInfo = null
     this.code = code
-    this.exportedLocalNames = Object.create(null)
+    this.exportedLocalNames = new NullObject
     this.generateVarDeclarations = options.generateVarDeclarations
-    this.importedLocalNames = Object.create(null)
+    this.importedLocalNames = new NullObject
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
@@ -334,7 +335,7 @@ function getBlockBodyInfo(visitor, path) {
     }
   }
 
-  const bodyInfo = visitor.bodyInfo = Object.create(null)
+  const bodyInfo = visitor.bodyInfo = new NullObject
   bodyInfo.insertCharIndex = insertCharIndex
   bodyInfo.insertNodeIndex = insertNodeIndex
   bodyInfo.hoistedExportsMap = new OrderedMap

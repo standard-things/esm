@@ -2,6 +2,8 @@
 // Copyright Rich Harris. Released under MIT license:
 // https://github.com/Rich-Harris/magic-string
 
+import NullObject from "./null-object.js"
+
 class Chunk {
   constructor(start, end, content) {
     this.start = start
@@ -52,8 +54,8 @@ class MagicString {
     this.intro = ""
     this.firstChunk = chunk
     this.lastSearchedChunk = chunk
-    this.byStart = Object.create(null)
-    this.byEnd = Object.create(null)
+    this.byStart = new NullObject
+    this.byEnd = new NullObject
 
     this.byStart[0] = chunk
     this.byEnd[string.length] = chunk

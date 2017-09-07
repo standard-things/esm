@@ -1,3 +1,5 @@
+import NullObject from "./null-object.js"
+
 let fastProto = null
 
 // Creates an object with permanently fast properties in V8.
@@ -14,7 +16,7 @@ function FastObject() {
     fastProto = FastObject.prototype = null
     return result
   }
-  fastProto = FastObject.prototype = Object.create(null)
+  fastProto = FastObject.prototype = new NullObject
   return new FastObject
 }
 

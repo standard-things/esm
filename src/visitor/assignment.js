@@ -1,3 +1,4 @@
+import NullObject from "../null-object.js"
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
@@ -101,7 +102,7 @@ function isShadowed(path, name) {
     let cache = shadowedMap.get(parent)
 
     if (cache === void 0) {
-      cache = Object.create(null)
+      cache = new NullObject
       shadowedMap.set(parent, cache)
     } else if (name in cache) {
       return shadowed = cache[name]

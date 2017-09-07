@@ -1,3 +1,5 @@
+import NullObject from "./null-object.js"
+
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
 import getModuleName from "./util/get-module-name.js"
@@ -30,9 +32,9 @@ class Entry {
     // A number indicating the loading state of the module.
     this._loaded = 0
     // The raw namespace object.
-    this._namespace = Object.create(null)
+    this._namespace = new NullObject
     // The child entries of the module.
-    this.children = Object.create(null)
+    this.children = new NullObject
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
     // The namespace object ESM importers receive.
@@ -40,7 +42,7 @@ class Entry {
     // The `module.exports` of the module.
     this.exports = exported
     // Getters for local variables exported from the module.
-    this.getters = Object.create(null)
+    this.getters = new NullObject
     // The id of the module.
     this.id = mod.id
     // The module this entry is managing.
@@ -48,7 +50,7 @@ class Entry {
     // The package options for this entry.
     this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
-    this.setters = Object.create(null)
+    this.setters = new NullObject
     // Set the default source type.
     this.sourceType = getSourceType(exported)
     /* eslint-enable lines-around-comment */
@@ -145,7 +147,7 @@ class Entry {
         setters = []
         this.setters[name] = setters
       }
-      setter.last = Object.create(null)
+      setter.last = new NullObject
       setter.parent = parent
       setters.push(setter)
     }
@@ -179,7 +181,7 @@ class Entry {
       // Section 9.4.6
       // Module namespace objects have a null [[Prototype]].
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      const namespace = Object.create(null)
+      const namespace = new NullObject
 
       // Section 9.4.6.11
       // Step 7: Module namespace objects have sorted properties.
@@ -211,7 +213,7 @@ class Entry {
     })
 
     setGetter(this, "cjsNamespace", () => {
-      const namespace = Object.create(null)
+      const namespace = new NullObject
 
       // Section 4.6
       // Step 4: Create an ESM with `{default:module.exports}` as its namespace
@@ -246,7 +248,7 @@ class Entry {
   update() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
-    const parentsMap = Object.create(null)
+    const parentsMap = new NullObject
 
     forEachSetter(this, (setter, value) => {
       parentsMap[setter.parent.id] = setter.parent

@@ -1,6 +1,7 @@
 import { basename, dirname, join } from "path"
 
 import FastObject from "./fast-object.js"
+import NullObject from "./null-object.js"
 
 import createOptions from "./util/create-options.js"
 import has from "./util/has.js"
@@ -28,7 +29,7 @@ class PkgInfo {
       options.esm = "mjs"
     }
 
-    const cache = Object.create(null)
+    const cache = new NullObject
     const cacheDir =  options.cache
     const cachePath = typeof cacheDir === "string" ? join(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
@@ -79,7 +80,7 @@ class PkgInfo {
 
     if (pkgJSON === null) {
       if (force) {
-        pkgJSON = Object.create(null)
+        pkgJSON = new NullObject
       } else {
         return null
       }

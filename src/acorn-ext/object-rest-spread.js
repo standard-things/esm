@@ -2,6 +2,8 @@
 // Copyright Victor Homyakov. Released under MIT license:
 // https://github.com/victor-homyakov/acorn-object-rest-spread
 
+import NullObject from "../null-object.js"
+
 import raise from "../parse/raise.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import unexpected from "../parse/unexpected.js"
@@ -17,7 +19,7 @@ function parseObj(func, args) {
   let first = true
   const [isPattern, refDestructuringErrors] = args
   const node = this.startNode()
-  const propHash = Object.create(null)
+  const propHash = new NullObject
 
   node.properties = []
 

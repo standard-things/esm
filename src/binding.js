@@ -1,4 +1,5 @@
 import FastObject from "./fast-object.js"
+import NullObject from "./null-object.js"
 
 import isObjectLike from "./util/is-object-like.js"
 import setGetter from "./util/set-getter.js"
@@ -16,7 +17,7 @@ const binding = ids.reduce((binding, id) => {
       value = _binding.call(process, id)
     } catch (e) {}
 
-    return binding[id] = isObjectLike(value) ? value : Object.create(null)
+    return binding[id] = isObjectLike(value) ? value : new NullObject
   })
 
   setSetter(binding, id, (value) => {
