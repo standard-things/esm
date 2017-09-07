@@ -1,8 +1,11 @@
 import { extname as _extname, dirname } from "path"
 
+import Entry from "../../entry.js"
+
 import _load from "../_load.js"
 import extname from "../../path/extname.js"
 import getGetter from "../../util/get-getter.js"
+import getSourceType from "../../util/get-source-type.js"
 import isObject from "../../util/is-object.js"
 import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
@@ -21,14 +24,24 @@ function load(id, parent, isMain, options) {
   let cacheId = filePath
   let queryHash = queryHashRegExp.exec(id)
 
-  if (_extname(filePath) === ".mjs") {
-    state = moduleState
+  if (queryHash) {
+    cacheId = filePath + queryHash[0]
   }
 
-  if (queryHash !== null) {
-    // Each id with a query+hash is given a new cache entry.
-    cacheId = filePath + queryHash[0]
+  if (! (options && options.cjs) &&
+      _extname(filePath) === ".mjs") {
+    state = moduleState
+  } else {
+    child = __non_webpack_require__.cache[cacheId]
 
+    if (child &&
+        getSourceType(child.exports) === "module" &&
+        ! Entry.has(child)) {
+      delete __non_webpack_require__.cache[cacheId]
+    }
+  }
+
+  if (queryHash) {
     child = state
       ? state.cache[cacheId]
       : moduleState.cache[cacheId] || __non_webpack_require__.cache[cacheId]
@@ -57,7 +70,7 @@ function load(id, parent, isMain, options) {
     error = e
   }
 
-  if (queryHash !== null) {
+  if (queryHash) {
     if (state) {
       state.cache[cacheId] = child
     } else {
