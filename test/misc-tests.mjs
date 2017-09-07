@@ -89,9 +89,14 @@ describe("package.json", () => {
 
 describe("Node rules", () => {
   it("should find `.mjs` before `.js`", () =>
-    import("./misc/priority")
-      .then((ns) => assert.strictEqual(ns.default, "esm"))
-      .catch((e) => assert.ifError(e))
+    Promise.all([
+      "./misc/priority",
+      "priority"
+    ].map((id) =>
+      import(id)
+        .then((ns) => assert.strictEqual(ns.default, "mjs"))
+        .catch((e) => assert.ifError(e))
+    ))
   )
 
   it("should support URL ids", () =>

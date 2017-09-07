@@ -1,1 +1,1 @@
-export default "esm"
+export default "mjs"
