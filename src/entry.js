@@ -12,17 +12,19 @@ import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
+const { is, seal } = Object
+const { sort } = Array.prototype
+
 const GETTER_ERROR = {}
 const entryMap = new WeakMap
-const { sort } = Array.prototype
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
-const toStringTagDescriptor = {
+const toStringTagDescriptor = createOptions({
   configurable: false,
   enumerable: false,
   value: "Module",
   writable: false
-}
+})
 
 class Entry {
   constructor(mod, exported, options) {
@@ -205,7 +207,7 @@ class Entry {
       // Section 9.4.6
       // Module namespace objects are not extensible.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      return this.esmNamespace = this._namespace = Object.seal(namespace)
+      return this.esmNamespace = this._namespace = seal(namespace)
     })
 
     setSetter(this, "esmNamespace", (value) => {
@@ -221,7 +223,7 @@ class Entry {
       namespace.default = this.exports
 
       setNamespaceToStringTag(namespace)
-      return this.cjsNamespace = Object.seal(namespace)
+      return this.cjsNamespace = seal(namespace)
     })
 
     setSetter(this, "cjsNamespace", (value) => {
@@ -302,7 +304,7 @@ function changed(setter, key, value) {
 }
 
 function compare(object, key, value) {
-  return key in object && Object.is(object[key], value)
+  return key in object && is(object[key], value)
 }
 
 // Invoke the given callback for every setter that needs to be called.
