@@ -22,8 +22,8 @@ const abcNs = {
 
 beforeEach(() => {
   delete global.customError
+  delete global.evaluated
   delete global.loadCount
-  delete global.reevaluate
   delete require.extensions[".coffee"]
   require.extensions[".json"] = jsonExt
 })
@@ -203,19 +203,30 @@ describe("Node rules", () => {
   )
 
   it("should not reevaluate errors", () =>
-    import("./misc/reevaluate-error.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) =>
-        import("./misc/reevaluate-error.mjs")
-          .then(() => assert.ok(false))
-          .catch((re) => {
-            if (re.code === "ERR_ASSERTION") {
-              assert.ok(false)
-            } else {
-              assert.strictEqual(e, re)
-            }
+    [
+      "./misc/reevaluate-error.mjs",
+      "./misc/reevaluate-error.mjs?a",
+      "./misc/reevaluate-error.mjs#a"
+    ].reduce((promise, id, index) =>
+      promise
+        .then(() => {
+          delete global.evaluated
+          return import(id)
+            .then(() => assert.ok(false))
+            .catch((e) =>
+              import(id)
+                .then(() => assert.ok(false))
+                .catch((re) => {
+                  if (re.code === "ERR_ASSERTION") {
+                    assert.ok(false)
+                  } else {
+                    assert.strictEqual(e, re)
+                    assert.strictEqual(global.loadCount, index + 1)
+                  }
+                })
+            )
           })
-      )
+    , Promise.resolve())
   )
 
   it("should not support custom file extensions in ESM", () => {
