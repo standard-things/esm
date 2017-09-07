@@ -94,7 +94,7 @@ class Runtime {
       const child = importModule(id, mod, loadESM, options)
       const childEntry = Entry.get(child)
 
-      entry.children[child.filename] = childEntry
+      entry.children[child.id] = childEntry
 
       if (setterPairs) {
         childEntry.addSetters(setterPairs, entry).update()

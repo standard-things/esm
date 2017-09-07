@@ -249,7 +249,7 @@ class Entry {
     const parentsMap = Object.create(null)
 
     forEachSetter(this, (setter, value) => {
-      parentsMap[setter.parent.filename] = setter.parent
+      parentsMap[setter.parent.id] = setter.parent
       setter(value, this)
     })
 
