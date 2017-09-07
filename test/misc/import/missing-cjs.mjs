@@ -1,1 +1,1 @@
-import { d } from "../../fixture/export/abc.mjs"
+import { NOT_EXPORTED } from "../../fixture/export/abc.mjs"

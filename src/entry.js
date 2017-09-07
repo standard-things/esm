@@ -405,7 +405,8 @@ function validateSetters(entry) {
   const names = keys(setters)
 
   for (const name of names) {
-    if (name !== "*" && ! (name in getters)) {
+    if (name !== "*" &&
+        ! (name in getters)) {
       raiseMissingExport(entry, name)
     }
   }

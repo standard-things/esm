@@ -1,1 +1,1 @@
-import { a } from "../../fixture/export/def.js"
+import { NOT_EXPORTED } from "../../fixture/export/def.js"

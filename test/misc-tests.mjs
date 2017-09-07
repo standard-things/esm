@@ -395,7 +395,8 @@ describe("spec compliance", () => {
   it("should throw a syntax error when importing non-exported binding", () =>
     Promise.all([
       "./misc/import/missing-cjs.mjs",
-      "./misc/import/missing-esm.mjs"
+      "./misc/import/missing-esm.mjs",
+      "./misc/import/missing-cycle-a.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
