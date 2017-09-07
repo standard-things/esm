@@ -9,22 +9,23 @@ import setSetter from "./util/set-setter.js"
 const _binding = process.binding
 const ids = ["config", "fs", "inspector", "natives", "util"]
 
-const binding = ids.reduce((binding, id) => {
-  setGetter(binding, id, () => {
-    let value
+const binding = ids
+  .reduce((binding, id) => {
+    setGetter(binding, id, () => {
+      let value
 
-    try {
-      value = _binding.call(process, id)
-    } catch (e) {}
+      try {
+        value = _binding.call(process, id)
+      } catch (e) {}
 
-    return binding[id] = isObjectLike(value) ? value : new NullObject
-  })
+      return binding[id] = isObjectLike(value) ? value : new NullObject
+    })
 
-  setSetter(binding, id, (value) => {
-    setProperty(binding, id, { value })
-  })
+    setSetter(binding, id, (value) => {
+      setProperty(binding, id, { value })
+    })
 
-  return binding
-}, new FastObject)
+    return binding
+  }, new FastObject)
 
 export default binding
