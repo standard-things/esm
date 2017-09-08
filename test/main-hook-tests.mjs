@@ -1,10 +1,10 @@
+import __dirname from "./__dirname.js"
 import assert from "assert"
 import execa from "execa"
 import path from "path"
 
 const isWin = process.platform === "win32"
-
-const NODE_BIN = path.resolve("./env/prefix", isWin ? "node.exe" : "bin/node")
+const NODE_BIN = path.resolve(__dirname, "./env/prefix", isWin ? "node.exe" : "bin/node")
 
 describe("module.runMain hook", () => {
   it("should work with Node -r and --require options", () => {
@@ -19,18 +19,23 @@ describe("module.runMain hook", () => {
 
     return Promise.all(options.map((option) => {
       const args = [
-        option,
-        "../index.js",
+        option, "../index.js",
         "./main/main.mjs"
       ]
 
       return execa(NODE_BIN, args, {
+        cwd: __dirname,
         reject: false
       })
     }))
     .then((results) => {
       results.forEach((result) => {
-        const ns = JSON.parse(result.stdout.split("\n").pop())
+        if (result.stderr) {
+          throw new Error(result.stderr)
+        }
+
+        const last = result.stdout.split("\n").pop()
+        const ns = last ? JSON.parse(last) : {}
         assert.deepEqual(ns, abcNs)
       })
     })

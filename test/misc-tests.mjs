@@ -1,5 +1,6 @@
 import SemVer from "semver"
 
+import __dirname from "./__dirname.js"
 import assert from "assert"
 import fs from "fs-extra"
 import path from "path"
@@ -253,69 +254,52 @@ describe("Node rules", () => {
       .catch((e) => assert.ifError(e))
   })
 
-  it("should not cache ES modules in `require.cache`", () =>
-    import("./require.js")
-      .then((ns) => {
-        const req = ns.default
-        const filePath = path.resolve("./misc/cache/out.mjs")
+  it("should not cache ES modules in `require.cache`", () => {
+    const filePath = path.resolve(__dirname, "./misc/cache/out.mjs")
 
-        delete req.cache[filePath]
-        return import("./misc/cache/out/")
-          .then(() => assert.strictEqual(filePath in req.cache, false))
-      })
+    delete require.cache[filePath]
+    return import("./misc/cache/out/")
+      .then(() => assert.strictEqual(filePath in require.cache, false))
       .catch((e) => assert.ifError(e))
-  )
+  })
 
-  it("should resolve non-local dependencies with `require`", () =>
-    import("./require.js")
-      .then((ns) => {
-        const req = ns.default
+  it("should resolve non-local dependencies with `require`", () => {
+    const ids = [
+      "home-node-libraries",
+      "home-node-modules",
+      "node-path",
+      "prefix-path"
+    ]
 
-        const ids = [
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
+    ids.map((id) => assert.ok(require(id)))
+  })
 
-        ids.map((id) => assert.ok(req(id)))
-      })
+  it('should resolve non-local "." ids with `require`', () => {
+    try {
+      const exported = require(".")
+
+      if (skipOutsideDot) {
+        assert.ok(false)
+      } else {
+        assert.strictEqual(exported, "outside dot")
+      }
+    } catch (e) {
+      if (skipOutsideDot) {
+        assert.strictEqual(e.code, "ERR_MISSING_MODULE")
+      } else {
+        assert.ifError(e)
+      }
+    }
+  })
+
+  it("should cache ES modules in `require.cache` with `options.cjs`", () => {
+    const filePath = path.resolve(__dirname, "./misc/cache/in.mjs")
+
+    delete require.cache[filePath]
+    return import("./misc/cache/in/")
+      .then(() => assert.ok(filePath in require.cache))
       .catch((e) => assert.ifError(e))
-  )
-
-  it('should resolve non-local "." ids with `require`', () =>
-    import("./require.js")
-      .then((ns) => {
-        const req = ns.default
-        const exported = req(".")
-
-        if (skipOutsideDot) {
-          assert.ok(false)
-        } else {
-          assert.strictEqual(exported, "outside dot")
-        }
-      })
-      .catch((e) => {
-        if (skipOutsideDot) {
-          assert.strictEqual(e.code, "ERR_MISSING_MODULE")
-        } else {
-          assert.ifError(e)
-        }
-      })
-  )
-
-  it("should cache ES modules in `require.cache` with `options.cjs`", () =>
-    import("./require.js")
-      .then((ns) => {
-        const req = ns.default
-        const filePath = path.resolve("./misc/cache/in.mjs")
-
-        delete req.cache[filePath]
-        return import("./misc/cache/in/")
-          .then(() => assert.ok(filePath in req.cache))
-      })
-      .catch((e) => assert.ifError(e))
-  )
+  })
 })
 
 describe("spec compliance", () => {

@@ -1,13 +1,14 @@
+import __dirname from "../__dirname.js"
 import module from "../module.js"
 import path from "path"
 import require from "../require.js"
 
 // Masquerade as the REPL module.
-const pkgPath = path.resolve("../index.js")
-const mod = new module.constructor("<repl>")
+const pkgPath = path.resolve(__dirname, "../index.js")
+const repl = new module.constructor("<repl>")
 
-mod.children.push(require.cache[pkgPath])
+repl.children.push(require.cache[pkgPath])
 delete require.cache[pkgPath]
-mod.require(pkgPath)
+repl.require(pkgPath)
 
-export default mod
+export default repl
