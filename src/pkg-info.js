@@ -1,4 +1,4 @@
-import { basename, dirname, join } from "path"
+import { basename, dirname, resolve } from "path"
 
 import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
@@ -31,7 +31,7 @@ class PkgInfo {
 
     const cache = new NullObject
     const cacheDir =  options.cache
-    const cachePath = typeof cacheDir === "string" ? join(dirPath, cacheDir) : null
+    const cachePath = typeof cacheDir === "string" ? resolve(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
 
     let i = -1
@@ -75,7 +75,7 @@ class PkgInfo {
   }
 
   static read(dirPath, force) {
-    const pkgPath = join(dirPath, "package.json")
+    const pkgPath = resolve(dirPath, "package.json")
     let pkgJSON = readJSON(pkgPath)
 
     if (pkgJSON === null) {

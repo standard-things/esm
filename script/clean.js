@@ -6,8 +6,8 @@ const globby = require("globby")
 const path = require("path")
 const trash = require("./trash.js")
 
-const rootPath = path.join(__dirname, "..")
-const gitignorePath = path.join(rootPath, ".gitignore")
+const rootPath = path.resolve(__dirname, "..")
+const gitignorePath = path.resolve(rootPath, ".gitignore")
 
 const ignores = fs.readFileSync(gitignorePath, "utf8")
   .replace(/^\s+/gm, "")

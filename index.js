@@ -7,7 +7,7 @@ const util = require("util")
 const vm = require("vm")
 const zlib = require("zlib")
 
-const esmPath = path.join(__dirname, "esm.js.gz")
+const esmPath = path.resolve(__dirname, "esm.js.gz")
 const inspectKey = util.inspect.custom || "inspect"
 
 const descriptor = Object.create(null)

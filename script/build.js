@@ -24,22 +24,22 @@ const gzipOptions = argv.prod
   ? { numiterations: 100 }
   : { level: 0 }
 
-const rootPath = path.join(__dirname, "..")
-const buildPath = path.join(rootPath, "build")
-const bundlePath = path.join(buildPath, "esm.js")
-const gzipPath = path.join(rootPath, "esm.js.gz")
-const jsonPath = path.join(rootPath, "package.json")
-const vendorPath = path.join(rootPath, "src/vendor")
+const rootPath = path.resolve(__dirname, "..")
+const buildPath = path.resolve(rootPath, "build")
+const bundlePath = path.resolve(buildPath, "esm.js")
+const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const jsonPath = path.resolve(rootPath, "package.json")
+const vendorPath = path.resolve(rootPath, "src/vendor")
 
-const acornPath = path.join(vendorPath, "acorn")
+const acornPath = path.resolve(vendorPath, "acorn")
 const acornPkg = require("acorn/package.json")
 const acornURL = "https://github.com/ternjs/acorn/archive/" + acornPkg.version + ".zip"
 
-const punycodePath = path.join(vendorPath, "punycode")
+const punycodePath = path.resolve(vendorPath, "punycode")
 const punycodePkgPath = path.dirname(require.resolve("punycode/package.json"))
 
-const uglifyPluginPath = path.join(rootPath, "node_modules/uglifyjs-webpack-plugin")
-const uglifyPath = path.join(uglifyPluginPath, "node_modules/uglify-es")
+const uglifyPluginPath = path.resolve(rootPath, "node_modules/uglifyjs-webpack-plugin")
+const uglifyPath = path.resolve(uglifyPluginPath, "node_modules/uglify-es")
 
 const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
 const removeDepsRegExp = /,\s*"dependencies":[^]*?\}/

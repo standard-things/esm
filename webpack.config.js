@@ -26,7 +26,7 @@ const config = {
     filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    path: path.join(__dirname, "build")
+    path: path.resolve(__dirname, "build")
   },
   module: {
     rules: [{

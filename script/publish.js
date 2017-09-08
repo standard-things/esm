@@ -5,8 +5,8 @@ const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
 
-const rootPath = path.join(__dirname, "..")
-const jsonPath = path.join(rootPath, "package.json")
+const rootPath = path.resolve(__dirname, "..")
+const jsonPath = path.resolve(rootPath, "package.json")
 
 const defaultScripts = `,
   "scripts": {

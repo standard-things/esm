@@ -1,4 +1,4 @@
-import { delimiter, join } from "path"
+import { delimiter, resolve } from "path"
 
 import { ensureLink } from "fs-extra"
 import execa from "execa"
@@ -12,21 +12,21 @@ const argv = yargs
 
 const isWin = process.platform === "win32"
 
-const rootPath = join(__dirname, "..")
-const testPath = join(rootPath, "test")
-const envPath = join(testPath, "env")
+const rootPath = resolve(__dirname, "..")
+const testPath = resolve(rootPath, "test")
+const envPath = resolve(testPath, "env")
 
-const HOME = join(envPath, "home")
-const MOCHA_BIN = join(rootPath, "node_modules/mocha/bin/mocha")
-const NODE_BIN = join(envPath, "prefix", isWin ? "node.exe" : "bin/node")
+const HOME = resolve(envPath, "home")
+const MOCHA_BIN = resolve(rootPath, "node_modules/mocha/bin/mocha")
+const NODE_BIN = resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 
 const NODE_ENV =
   (argv.prod ? "production" : "development") +
   "-test"
 
 const NODE_PATH = [
-  join(envPath, "node_path"),
-  join(envPath, "node_path/relative")
+  resolve(envPath, "node_path"),
+  resolve(envPath, "node_path/relative")
 ].join(delimiter)
 
 const trashPaths = globby.sync([
@@ -58,7 +58,7 @@ function runTests() {
 }
 
 function setupNode() {
-  const basePath = join(NODE_BIN, isWin ? "" : "..")
+  const basePath = resolve(NODE_BIN, isWin ? "" : "..")
   return trash(basePath)
     .then(() => ensureLink(process.execPath, NODE_BIN))
 }

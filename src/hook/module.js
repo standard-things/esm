@@ -1,4 +1,4 @@
-import { extname as _extname, dirname, join } from "path"
+import { extname as _extname, dirname, resolve } from "path"
 
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
@@ -100,7 +100,7 @@ function hook(Module, options) {
     let cacheValue = cache[cacheFileName]
 
     if (cacheValue === true) {
-      cacheCode = readCode(join(cachePath, cacheFileName), options)
+      cacheCode = readCode(resolve(cachePath, cacheFileName), options)
     } else {
       sourceCode = readCode(filePath, options)
     }
