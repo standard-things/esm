@@ -72,6 +72,18 @@ describe("compiler", () => {
     assert.ok(result.code.includes('i("a")'))
   })
 
+  it("should not error on transforms at the end the source", () => {
+    const codes = [
+      'import{a}from"a"',
+      'import"a"',
+      "export{a}",
+      "export default a"
+    ]
+
+    codes.forEach(compiler.compile)
+    assert.ok(true)
+  })
+
   it('should not hoist above "use strict"', () =>
     import("./compiler/strict.mjs")
       .then((ns) => ns.check())
@@ -95,7 +107,7 @@ describe("compiler", () => {
   )
 
   it("should not get confused by trailing comments", () => {
-    const result = compiler.compile('import"a" // trailing comment')
-    assert.ok(result.code.endsWith("// trailing comment"))
+    const result = compiler.compile('import"a"//trailing comment')
+    assert.ok(result.code.endsWith("//trailing comment"))
   })
 })
