@@ -41,27 +41,6 @@ describe("compiler", () => {
     })
   })
 
-  it("should not get confused by shebang", () => {
-    const code = [
-      "#!/usr/bin/env node -r @std/esm",
-      'import a from "a"'
-    ].join("\n")
-
-    const result = compiler.compile(code)
-    assert.ok(result.code.startsWith("let a"))
-  })
-
-  it("should not get confused by string literals", () =>
-    import("./compiler/strings.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should not get confused by trailing comments", () => {
-    const result = compiler.compile('import"a" // trailing comment')
-    assert.ok(result.code.endsWith("// trailing comment"))
-  })
-
   it("should choose unique export and module identifiers", () =>
     import("./compiler/aliases.mjs")
       .then((ns) => ns.check())
@@ -88,14 +67,35 @@ describe("compiler", () => {
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 
+  it("should compile dynamic import with script source type", () => {
+    const result = compiler.compile('import("a")', { type: "script" })
+    assert.ok(result.code.includes('i("a")'))
+  })
+
   it('should not hoist above "use strict"', () =>
     import("./compiler/strict.mjs")
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
 
-  it("should compile dynamic import with script source type", () => {
-    const result = compiler.compile('import("a")', { type: "script" })
-    assert.ok(result.code.includes('i("a")'))
+  it("should not get confused by shebang", () => {
+    const code = [
+      "#!/usr/bin/env node -r @std/esm",
+      'import a from "a"'
+    ].join("\n")
+
+    const result = compiler.compile(code)
+    assert.ok(result.code.startsWith("let a"))
+  })
+
+  it("should not get confused by string literals", () =>
+    import("./compiler/strings.mjs")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should not get confused by trailing comments", () => {
+    const result = compiler.compile('import"a" // trailing comment')
+    assert.ok(result.code.endsWith("// trailing comment"))
   })
 })
