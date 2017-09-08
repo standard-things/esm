@@ -71,7 +71,6 @@ function removeExpired(cache, cachePath, cacheFileName) {
 function toCompileOptions(options) {
   return {
     cjs: options.pkgInfo.options.cjs,
-    ext: false,
     hint: options.hint,
     runtimeAlias: options.runtimeAlias,
     type: options.type,

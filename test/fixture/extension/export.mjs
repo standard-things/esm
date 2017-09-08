@@ -1,6 +1,0 @@
-export * as ns1 from "../export/abc.mjs"
-export { a, b as c }, * as ns2 from "../export/abc.mjs"
-export def1 from "../export/abc.mjs"
-export def2, { b, c as d } from "../export/abc.mjs"
-export def3, * as ns3 from "../export/abc.mjs"
-export * as ns4, * as ns5, { c as e }, def4, def5 from "../export/abc.mjs"

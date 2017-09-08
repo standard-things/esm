@@ -39,10 +39,4 @@ describe("import declarations", () => {
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
   )
-
-  xit("should support import extensions", () =>
-    import("./import/extension.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
 })

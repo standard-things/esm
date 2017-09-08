@@ -74,10 +74,4 @@ describe("export declarations", () => {
       .then((ns) => ns.check())
       .catch((e) => assert.ifError(e))
   )
-
-  xit("should support export extensions", () =>
-    import("./export/extension.mjs")
-      .then((ns) => ns.check())
-      .catch((e) => assert.ifError(e))
-  )
 })

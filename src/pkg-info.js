@@ -14,8 +14,7 @@ const defaultOptions = createOptions({
   cache: ".esm-cache",
   cjs: false,
   debug: false,
-  esm: "mjs",
-  ext: false
+  esm: "mjs"
 })
 
 const infoCache = new FastObject

@@ -10,7 +10,6 @@ import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = createOptions({
   cjs: false,
-  ext: false,
   hint: "script",
   runtimeAlias: "_",
   type: "module",
@@ -53,8 +52,6 @@ class Compiler {
 
     const parserOptions = {
       allowReturnOutsideFunction: options.cjs,
-      enableExportExtensions: options.ext,
-      enableImportExtensions: options.ext,
       sourceType: type === "script" ? type : "module"
     }
 
