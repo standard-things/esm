@@ -1,0 +1,27 @@
+build: off
+shallow_clone: true
+version: '{build}'
+
+environment:
+  matrix:
+    - nodejs_version: 8
+    - nodejs_version: 7
+    - nodejs_version: 6
+    - nodejs_version: 4
+
+matrix:
+  fast_finish: true
+
+cache:
+  - '%APPDATA%\npm-cache'
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm -gs i npm@^5.3
+  - set PATH=%APPDATA%\npm;%PATH%
+  - npm -s i
+
+test_script:
+  - node --version
+  - npm --version
+  - npm test
