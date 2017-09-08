@@ -52,6 +52,7 @@ class MagicString {
 
     this.original = string
     this.intro = ""
+    this.outro = ""
     this.firstChunk = chunk
     this.lastSearchedChunk = chunk
     this.byStart = new NullObject
@@ -80,7 +81,13 @@ class MagicString {
   prependRight(index, content) {
     this._split(index)
     const chunk = this.byStart[index]
-    chunk.prependRight(content)
+
+    if (chunk) {
+      chunk.prependRight(content)
+    } else {
+      this.outro = content + this.outro
+    }
+
     return this
   }
 
@@ -117,7 +124,7 @@ class MagicString {
       str += chunk.toString()
       chunk = chunk.next
     }
-    return str
+    return str + this.outro
   }
 }
 
