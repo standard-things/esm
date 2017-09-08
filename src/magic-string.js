@@ -18,6 +18,11 @@ class Chunk {
     return this.start < index && index < this.end
   }
 
+  edit(content) {
+    this.content = content
+    this.intro = ""
+  }
+
   prependRight(content) {
     this.intro = content + this.intro
   }
@@ -26,7 +31,6 @@ class Chunk {
     const sliceIndex = index - this.start
     const originalBefore = this.original.slice(0, sliceIndex)
     const originalAfter = this.original.slice(sliceIndex)
-
     const newChunk = new Chunk(index, this.end, originalAfter)
 
     this.original = originalBefore
@@ -55,10 +59,11 @@ class MagicString {
     this.outro = ""
     this.firstChunk = chunk
     this.lastSearchedChunk = chunk
-    this.byStart = new NullObject
-    this.byEnd = new NullObject
 
+    this.byStart = new NullObject
     this.byStart[0] = chunk
+
+    this.byEnd = new NullObject
     this.byEnd[string.length] = chunk
   }
 
@@ -69,12 +74,20 @@ class MagicString {
     const first = this.byStart[start]
     const last = this.byEnd[end]
 
-    first.content = content
-    first.end = end
-    first.intro = ""
-    first.next = last.next
-    first.original = this.original.slice(start, end)
+    first.edit(content)
 
+    if (first === last) {
+      return this
+    }
+
+    let chunk = first.next
+
+    while (chunk !== last) {
+      chunk.edit("")
+      chunk = chunk.next
+    }
+
+    chunk.edit("")
     return this
   }
 
@@ -92,9 +105,11 @@ class MagicString {
   }
 
   _split(index) {
-    if (this.byStart[index] || this.byEnd[index]) {
+    if (this.byStart[index] ||
+        this.byEnd[index]) {
       return
     }
+
     let chunk = this.lastSearchedChunk
     const searchForward = index > chunk.end
 
@@ -103,6 +118,7 @@ class MagicString {
         this._splitChunk(chunk, index)
         return
       }
+
       chunk = searchForward
         ? this.byStart[chunk.end]
         : this.byEnd[chunk.start]
@@ -120,10 +136,12 @@ class MagicString {
   toString() {
     let str = this.intro
     let chunk = this.firstChunk
+
     while (chunk) {
       str += chunk.toString()
       chunk = chunk.next
     }
+
     return str + this.outro
   }
 }
