@@ -72,7 +72,7 @@ describe("compiler", () => {
     assert.ok(result.code.includes('i("a")'))
   })
 
-  it("should not error on transforms at the end the source", () => {
+  it("should not error on transforms at the end of the source", () => {
     const codes = [
       'import{a}from"a"',
       'import"a"',
