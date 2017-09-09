@@ -271,7 +271,7 @@ function hook(Module, options) {
             mod._compile(content, filePath)
           }
         } catch (e) {
-          throw maskStackTrace(e)
+          throw maskStackTrace(e, () => readCode(filePath, options))
         }
       }
     } finally {

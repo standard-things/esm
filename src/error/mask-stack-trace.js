@@ -5,26 +5,34 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 
-const messageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)$/m
-const removeArrowRegExp = /^.+\n *^$/m
-const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
+const nodeMessageRegExp = /^.+?:(\d+)(?=\n)/
+const parseMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
-function maskStackTrace(error, sourceCode) {
+const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
+const replaceArrowRegExp = /^.+\n *\^+\n/m
+
+function maskStackTrace(error, sourceCode, filePath = error.filename) {
   if (! isError(error)) {
     return error
   }
 
   decorateStackTrace(error)
-  const stack = error.stack
+  let stack = error.stack
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
   // However, `Error.captureStackTrace()` will throw when receiving a proxy
   // wrapped error object.
   setGetter(error, "stack", () => {
-    return error.stack = isParseError(error)
-      ? maskParserStack(stack, sourceCode, error.filename)
-      : maskStack(stack)
+    stack = scrubStack(stack)
+
+    if (isParseError(error)) {
+      return error.stack = maskParserStack(stack, sourceCode, filePath)
+    }
+
+    return error.stack = stack.includes("\u200d")
+      ? maskNodeStack(stack, sourceCode, filePath)
+      : stack
   })
 
   setSetter(error, "stack", (value) => {
@@ -45,11 +53,9 @@ function maskStackTrace(error, sourceCode) {
 // SyntaxError: <description>
 //   ...
 function maskParserStack(stack, sourceCode, filePath) {
-  stack = scrubStack(stack)
-  const parts = messageRegExp.exec(stack)
+  const parts = parseMessageRegExp.exec(stack)
 
   if (parts === null) {
-    // Exit early if already formatted.
     return stack
   }
 
@@ -57,33 +63,51 @@ function maskParserStack(stack, sourceCode, filePath) {
   const lineNum = +parts[2]
   const column = +parts[3]
   const spliceArgs = [0, 1]
+  const stackLines = stack.split("\n")
 
   if (typeof filePath === "string") {
     spliceArgs.push(filePath + ":" + lineNum)
   }
 
+  if (typeof sourceCode === "function") {
+    sourceCode = sourceCode(filePath)
+  }
+
   if (typeof sourceCode === "string") {
-    spliceArgs.push(
-      sourceCode.split("\n")[lineNum - 1] || "",
-      " ".repeat(column) + "^",
-      ""
-    )
+    const lines = sourceCode.split("\n")
+    const line = lines[lineNum - 1]
+
+    if (line) {
+      spliceArgs.push(line, " ".repeat(column) + "^", "")
+    }
   }
 
   spliceArgs.push(desc)
-
-  const stackLines = stack.split("\n")
   stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
 }
 
-function maskStack(stack) {
-  stack = scrubStack(stack)
-  return stack.includes("\u200d") ? removeArrow(stack) : stack
-}
+function maskNodeStack(stack, sourceCode, filePath) {
+  const parts = nodeMessageRegExp.exec(stack)
 
-function removeArrow(stack) {
-  return stack.replace(removeArrowRegExp, "")
+  if (parts === null) {
+    return stack
+  }
+
+  return stack.replace(replaceArrowRegExp, () => {
+    if (typeof sourceCode === "function") {
+      sourceCode = sourceCode(filePath)
+    }
+
+    if (typeof sourceCode !== "string") {
+      return ""
+    }
+
+    const lineNum = +parts[1]
+    const lines = sourceCode.split("\n")
+    const line = lines[lineNum - 1]
+    return line ? (line + "\n") : ""
+  })
 }
 
 function scrubStack(stack) {
@@ -91,7 +115,7 @@ function scrubStack(stack) {
     .split("\n")
     .filter((line) => ! line.includes(__non_webpack_module__.filename))
     .join("\n")
-    .replace(removeLineInfoRegExp, "$1")
+    .replace(removeLineInfoRegExp, ":1$1")
 }
 
 export default maskStackTrace
