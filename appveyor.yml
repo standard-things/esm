@@ -3,11 +3,13 @@ shallow_clone: true
 version: '{build}'
 
 environment:
+  nvs_version: 1.4.2
   matrix:
-    - nodejs_version: 8
-    - nodejs_version: 7
-    - nodejs_version: 6
-    - nodejs_version: 4
+    - nodejs_version: node/8
+    - nodejs_version: node/7
+    - nodejs_version: node/6
+    - nodejs_version: node/4
+    - nodejs_version: chakracore/latest
 
 matrix:
   fast_finish: true
@@ -16,12 +18,14 @@ cache:
   - '%APPDATA%\npm-cache'
 
 install:
-  - ps: Install-Product node $env:nodejs_version
-  - npm -gs i npm@^5.3
-  - set PATH=%APPDATA%\npm;%PATH%
-  - npm -s i
+  - git clone -b v%nvs_version% --depth 1 https://github.com/jasongin/nvs %APPDATA%\nvs > nul 2>&1
+  - set PATH=%APPDATA%\nvs;%PATH%
+  - nvs add %nodejs_version% > nul 2>&1
+  - nvs use %nodejs_version% > nul 2>&1
+  - npm i > nul 2>&1
 
 test_script:
-  - node --version
-  - npm --version
+  - nvs -v
+  - node -v
+  - npm -v
   - npm test
