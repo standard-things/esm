@@ -2,11 +2,15 @@ import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
 import _resolveFilename from "./module/_resolve-filename.js"
+import isObjectLike from "./util/is-object-like.js"
 import isPath from "./util/is-path.js"
+import keys from "./util/keys.js"
+import parseJSON from "./util/parse-json.js"
 import realpath from "./fs/realpath.js"
 import { resolve } from "path"
 import rootModule from "./root-module.js"
 
+const codeOfBracket = "{".charCodeAt(0)
 const codeOfDash = "-".charCodeAt(0)
 
 const { _preloadModules, argv, cwd } = process
@@ -28,14 +32,40 @@ function hasLoaderModule(modules) {
 }
 
 function hasLoaderParam(params) {
-  for (const param of params) {
-    if (isPath(param)) {
-      if (realpath(resolve(param)) === esmPath) {
+  for (let param of params) {
+    if (param.charCodeAt(0) === codeOfBracket) {
+      const parsed = parseJSON(param)
+
+      if (parsed !== null) {
+        param = parsed
+      }
+    }
+
+    if (hasLoaderValue(param)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function hasLoaderValue(value) {
+  if (typeof value === "string") {
+    if (isPath(value)) {
+      if (realpath(resolve(value)) === esmPath) {
         return true
       }
-    } else if (param.charCodeAt(0) !== codeOfDash &&
-        _resolveFilename(param, rootModule) === esmPath) {
+    } else if (value.charCodeAt(0) !== codeOfDash &&
+        _resolveFilename(value, rootModule) === esmPath) {
       return true
+    }
+  } else if (isObjectLike(value)) {
+    const names = keys(value)
+
+    for (const name of names) {
+      if (hasLoaderValue(value[name])) {
+        return true
+      }
     }
   }
 
