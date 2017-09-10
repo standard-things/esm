@@ -133,7 +133,7 @@ function hook(Module, options) {
     }
 
     const tryModuleCompile = cacheValue.type === "module" ? tryESMCompile : tryCJSCompile
-    tryModuleCompile.call(this, func, mod, cacheValue.code, filePath, runtimeAlias, options)
+    tryModuleCompile.call(this, manager, func, mod, cacheValue.code, filePath, runtimeAlias, options)
 
     if (noDepth) {
       stat.cache = null
@@ -161,7 +161,7 @@ function hook(Module, options) {
     }
   }
 
-  function tryCJSCompile(func, mod, content, filePath, runtimeAlias, options) {
+  function tryCJSCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
     const exported = new NullObject
     setSourceType(exported, "script")
     Runtime.enable(mod, exported, options)
@@ -171,10 +171,10 @@ function hook(Module, options) {
       ".r((function(exports,require,module,__filename,__dirname){" +
       content + "\n}))"
 
-    tryModuleCompile.call(this, func, mod, content, filePath, options)
+    tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
   }
 
-  function tryESMCompile(func, mod, content, filePath, runtimeAlias, options) {
+  function tryESMCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
     const exported = new NullObject
     setSourceType(exported, "module")
     Runtime.enable(mod, exported, options)
@@ -205,7 +205,7 @@ function hook(Module, options) {
     }
 
     try {
-      tryModuleCompile.call(this, func, mod, content, filePath, options)
+      tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
     } finally {
       if (Module.wrap === customWrap) {
         Module.wrap = moduleWrap
@@ -213,7 +213,7 @@ function hook(Module, options) {
     }
   }
 
-  function tryModuleCompile(func, mod, content, filePath, options) {
+  function tryModuleCompile(manager, func, mod, content, filePath, options) {
     const moduleCompile = mod._compile
     const moduleReadFile = fsBinding.internalModuleReadFile
     const passthru = passthruMap.get(func)
@@ -283,6 +283,7 @@ function hook(Module, options) {
             mod._compile(content, filePath)
           }
         } catch (e) {
+          captureStackTrace(e, manager)
           throw maskStackTrace(e, () => readCode(filePath, options))
         }
       }
