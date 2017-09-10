@@ -5,8 +5,8 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 
-const nodeMessageRegExp = /^.+?:(\d+)(?=\n)/
-const parseMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
+const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
+const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 const replaceArrowRegExp = /^.+\n *\^+\n/m
@@ -53,7 +53,7 @@ function maskStackTrace(error, sourceCode, filePath) {
 // SyntaxError: <description>
 //   ...
 function maskParserStack(stack, sourceCode, filePath) {
-  const parts = parseMessageRegExp.exec(stack)
+  const parts = parserMessageRegExp.exec(stack)
 
   if (parts === null) {
     return stack
@@ -88,7 +88,7 @@ function maskParserStack(stack, sourceCode, filePath) {
 }
 
 function maskNodeStack(stack, sourceCode, filePath) {
-  const parts = nodeMessageRegExp.exec(stack)
+  const parts = engineMessageRegExp.exec(stack)
 
   if (parts === null) {
     return stack
