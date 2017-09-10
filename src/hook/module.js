@@ -7,8 +7,8 @@ import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
-import attempt from "../util/attempt.js"
 import binding from "../binding.js"
+import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
@@ -114,7 +114,7 @@ function hook(Module, options) {
         cacheValue = { code: cacheCode, type }
         cache[cacheFileName] = cacheValue
       } else {
-        const compilerOptions = {
+        cacheValue = tryCompile(manager, sourceCode, {
           cacheFileName,
           cachePath,
           filePath,
@@ -122,10 +122,7 @@ function hook(Module, options) {
           pkgInfo,
           runtimeAlias,
           type
-        }
-
-        const callback = () => compiler.compile(sourceCode, compilerOptions)
-        cacheValue = options.debug ? callback() : attempt(callback, manager, sourceCode)
+        })
       }
     }
 
@@ -147,6 +144,21 @@ function hook(Module, options) {
     return options.gz && _extname(filePath) === ".gz"
       ? gunzip(readFile(filePath), "utf8")
       : readFile(filePath, "utf8")
+  }
+
+  function tryCompile(manager, code, options) {
+    const { filePath, pkgInfo } = options
+
+    if (pkgInfo.options.debug) {
+      return compiler.compile(code, options)
+    }
+
+    try {
+      return compiler.compile(code, options)
+    } catch (e) {
+      captureStackTrace(e, manager)
+      throw maskStackTrace(e, code, filePath)
+    }
   }
 
   function tryCJSCompile(func, mod, content, filePath, runtimeAlias, options) {

@@ -4,13 +4,14 @@ import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
-import attempt from "../util/attempt.js"
+import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import env from "../env.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
+import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
@@ -27,11 +28,17 @@ function hook(vm) {
 
   function methodWrapper(manager, func, args) {
     function tryWrapper(func, args) {
-      return attempt(() => func.apply(this, args), manager, args[0])
+      try {
+        return func.apply(this, args)
+      } catch (e) {
+        const [code] = args
+        captureStackTrace(e, manager)
+        throw maskStackTrace(e, code)
+      }
     }
 
-    const [code] = args
-    const scriptOptions = createOptions(args[1])
+    let [code, scriptOptions] = args
+    scriptOptions = createOptions(scriptOptions)
 
     if (scriptOptions.produceCachedData === void 0) {
       scriptOptions.produceCachedData = true
