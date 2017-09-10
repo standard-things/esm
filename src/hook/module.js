@@ -285,7 +285,6 @@ function hook(Module, options) {
           }
         } catch (e) {
           if (! isParseError(e)) {
-            captureStackTrace(e, manager)
             maskStackTrace(e, () => readCode(filePath, options))
           }
 
