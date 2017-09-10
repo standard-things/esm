@@ -48,12 +48,12 @@ function getMessage(key, args) {
 }
 
 function invalidArgType(name, expected) {
-  return "The " + toStringLiteral(name) + " argument must be " + expected
+  return "The " + toStringLiteral(name, "'") + " argument must be " + expected
 }
 
 function invalidProtocol(protocol, expected) {
-  return "Protocol " + toStringLiteral(protocol) +
-    " not supported. Expected " + toStringLiteral(expected)
+  return "Protocol " + toStringLiteral(protocol, "'") +
+    " not supported. Expected " + toStringLiteral(expected, "'")
 }
 
 export default errors

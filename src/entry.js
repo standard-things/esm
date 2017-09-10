@@ -365,7 +365,7 @@ function raiseMissingExport(entry, name) {
   delete entry.setters[name]
 
   const moduleName = getModuleName(entry.module)
-  throw new SyntaxError("Module " + toStringLiteral(moduleName) +
+  throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
     " does not provide an export named '" + name + "'")
 }
 

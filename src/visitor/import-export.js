@@ -4,10 +4,9 @@ import OrderedMap from "../ordered-map.js"
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import toStringLiteral from "../util/to-string-literal.js"
 
 const codeOfCR = "\r".charCodeAt(0)
-
-const { stringify } = JSON
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
@@ -489,7 +488,7 @@ function toModuleImport(visitor, code, specifierMap) {
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
-      "[" + stringify(name) + ",function(" + valueParam + "){" +
+      "[" + toStringLiteral(name) + ",function(" + valueParam + "){" +
       // Multiple local variables become a compound assignment.
       locals.join("=") + "=" + valueParam +
       "}]"
@@ -523,7 +522,7 @@ function toModuleExport(visitor, specifierMap) {
     const locals = specifierMap.get(name).keys()
 
     code +=
-      "[" + stringify(name) + ",()=>" +
+      "[" + toStringLiteral(name) + ",()=>" +
       locals[0] +
       "]"
 

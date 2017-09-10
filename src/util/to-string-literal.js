@@ -20,8 +20,8 @@ const quoteMap = {
   "single": "'"
 }
 
-function toStringLiteral(value, style = "'") {
-  const quote = quoteMap[style] || "'"
+function toStringLiteral(value, style = '"') {
+  const quote = quoteMap[style] || '"'
   const string = stringify(toString(value))
 
   if (quote === '"' &&
