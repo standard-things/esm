@@ -22,7 +22,7 @@ install:
   - set PATH=%APPDATA%\nvs;%PATH%
   - nvs add %nodejs_version% > nul 2>&1
   - nvs use %nodejs_version% > nul 2>&1
-  - npm i > nul 2>&1
+  - appveyor-retry npm i > nul 2>&1
 
 test_script:
   - nvs -v
