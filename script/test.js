@@ -52,9 +52,9 @@ function runTests() {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
     env: { HOME, NODE_ENV, NODE_PATH, USERPROFILE: HOME },
-    reject: false,
     stdio: "inherit"
   })
+  .catch((e) => process.exit(e.code))
 }
 
 function setupNode() {
