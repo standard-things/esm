@@ -21,6 +21,7 @@ import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
+import isParseError from "../util/is-parse-error.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -283,8 +284,12 @@ function hook(Module, options) {
             mod._compile(content, filePath)
           }
         } catch (e) {
-          captureStackTrace(e, manager)
-          throw maskStackTrace(e, () => readCode(filePath, options))
+          if (! isParseError(e)) {
+            captureStackTrace(e, manager)
+            maskStackTrace(e, () => readCode(filePath, options))
+          }
+
+          throw e
         }
       }
     } finally {
