@@ -11,17 +11,8 @@ class Compiler {
   static compile(code, options) {
     options = createOptions(options)
     return typeof options.filePath === "string"
-      ? compileWithFilename(code, options)
+      ? compileAndWrite(code, options)
       : compileAndCache(code, options)
-  }
-}
-
-function compileWithFilename(code, options) {
-  try {
-    return compileAndWrite(code, options)
-  } catch (e) {
-    e.filename = options.filePath
-    throw e
   }
 }
 

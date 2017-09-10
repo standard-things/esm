@@ -11,7 +11,7 @@ const parseMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 const replaceArrowRegExp = /^.+\n *\^+\n/m
 
-function maskStackTrace(error, sourceCode, filePath = error.filename) {
+function maskStackTrace(error, sourceCode, filePath) {
   if (! isError(error)) {
     return error
   }
