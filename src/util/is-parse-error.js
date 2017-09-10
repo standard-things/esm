@@ -1,9 +1,7 @@
-import isError from "./is-error.js"
-import isObject from "./is-object.js"
+import AcornError from "../acorn-error.js"
 
 function isParseError(value) {
-  return isError(value) && typeof value.pos === "number" &&
-    typeof value.raisedAt === "number" && isObject(value.loc)
+  return value instanceof AcornError
 }
 
 export default isParseError

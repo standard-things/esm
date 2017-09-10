@@ -1,10 +1,12 @@
+import AcornError from "../acorn-error.js"
+
 import wrap from "../util/wrap.js"
 
-const parserDupPrefix = "Duplicate export '"
 const engineDupPrefix = "Duplicate export of '"
+const parserDupPrefix = "Duplicate export '"
 
-const parserTypePostfix = "may appear only with 'sourceType: module'"
 const engineTypePostfix = "may only be used in ES modules"
+const parserTypePostfix = "may appear only with 'sourceType: module'"
 
 function enable(parser) {
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
@@ -15,35 +17,31 @@ function enable(parser) {
 }
 
 function raise(func, args) {
-  const [pos, message] = args
+  let [pos, message] = args
 
   // Correct message for `let default`:
   // https://github.com/ternjs/acorn/issues/544
   if (message === "The keyword 'let' is reserved") {
-    func.call(this, pos, "Unexpected token")
-    return
+    message = "Unexpected token"
+  } else if (message.endsWith(parserTypePostfix)) {
+    message = message.replace(parserTypePostfix, engineTypePostfix)
   }
 
-  if (message.endsWith(parserTypePostfix)) {
-    func.call(this, pos, message.replace(parserTypePostfix, engineTypePostfix))
-    return
-  }
-
-  func.apply(this, args)
+  throw new AcornError(this, pos, message)
 }
 
 function raiseRecoverable(func, args) {
-  const [pos, message] = args
+  let [pos, message] = args
 
   if (message.startsWith(parserDupPrefix)) {
-    func.call(this, pos, message.replace(parserDupPrefix, engineDupPrefix))
-    return
+    message = message.replace(parserDupPrefix, engineDupPrefix)
+    throw new AcornError(this, pos, message)
   }
 
   if (message.startsWith("Binding ") ||
       message === "new.target can only be used in functions" ||
       message === "The keyword 'await' is reserved") {
-    func.call(this, pos, message)
+    throw new AcornError(this, pos, message)
   }
 }
 
