@@ -4,12 +4,13 @@ import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
+import wrapper from "../module/wrapper.js"
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
-const replaceArrowRegExp = /^.+\n *\^+\n/m
+const replaceArrowRegExp = /^(.+\n)( *\^+\n)/m
 
 function maskStackTrace(error, sourceCode, filePath) {
   if (! isError(error)) {
@@ -25,14 +26,9 @@ function maskStackTrace(error, sourceCode, filePath) {
   // wrapped error object.
   setGetter(error, "stack", () => {
     stack = scrubStack(stack)
-
-    if (isParseError(error)) {
-      return error.stack = maskParserStack(stack, sourceCode, filePath)
-    }
-
-    return error.stack = stack.includes("\u200d")
-      ? maskNodeStack(stack, sourceCode, filePath)
-      : stack
+    return error.stack = isParseError(error)
+      ? maskParserStack(stack, sourceCode, filePath)
+      : maskEngineStack(stack, sourceCode, filePath)
   })
 
   setSetter(error, "stack", (value) => {
@@ -87,14 +83,29 @@ function maskParserStack(stack, sourceCode, filePath) {
   return stackLines.join("\n")
 }
 
-function maskNodeStack(stack, sourceCode, filePath) {
+function maskEngineStack(stack, sourceCode, filePath) {
   const parts = engineMessageRegExp.exec(stack)
 
   if (parts === null) {
     return stack
   }
 
-  return stack.replace(replaceArrowRegExp, () => {
+  return stack.replace(replaceArrowRegExp, (match, snippet, arrow) => {
+    const lineNum = +parts[1]
+
+    if (! snippet.includes("\u200d")) {
+      const [prefix] = wrapper
+
+      if (lineNum === 1 &&
+          snippet.startsWith(prefix)) {
+        const { length } = prefix
+        snippet = snippet.slice(length)
+        arrow = arrow.slice(length)
+      }
+
+      return snippet + arrow
+    }
+
     if (typeof sourceCode === "function") {
       sourceCode = sourceCode(filePath)
     }
@@ -103,7 +114,6 @@ function maskNodeStack(stack, sourceCode, filePath) {
       return ""
     }
 
-    const lineNum = +parts[1]
     const lines = sourceCode.split("\n")
     const line = lines[lineNum - 1]
     return line ? (line + "\n") : ""
