@@ -18,12 +18,30 @@ describe("command-line hook", () => {
       cwd: __dirname,
       reject: false
     })
+    .then((result) => assert.strictEqual(result.stderr, ""))
+  })
+
+  it("should inspect JSON encoded command-line arguments", () => {
+    const args = [
+      "./node_modules/cli",
+      '{"r":"../index.js"}'
+    ]
+
+    return execa(NODE_BIN, args, {
+      cwd: __dirname,
+      reject: false
+    })
     .then((result) => {
-      if (result.stderr) {
-        throw new Error(result.stderr)
+      const abcNs = {
+        a: "a",
+        b: "b",
+        c: "c",
+        default: "default"
       }
 
-      assert.ok(true)
+      const last = result.stdout.split("\n").pop()
+      const ns = last ? JSON.parse(last) : {}
+      assert.deepEqual(ns, abcNs)
     })
   })
 })
