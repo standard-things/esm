@@ -3,12 +3,12 @@ import isObjectLike from "./is-object-like.js"
 
 const { defineProperty } = Object
 
-const defaultDescriptor = createOptions({
+const defaultDescriptor = {
   configurable: true,
   enumerable: true,
   value: void 0,
   writable: true
-})
+}
 
 function setProperty(object, key, descriptor) {
   if (isObjectLike(object)) {

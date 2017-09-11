@@ -20,12 +20,12 @@ const GETTER_ERROR = {}
 const entryMap = new SafeWeakMap
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
-const toStringTagDescriptor = createOptions({
+const toStringTagDescriptor = {
   configurable: false,
   enumerable: false,
   value: "Module",
   writable: false
-})
+}
 
 class Entry {
   constructor(mod, exported, options) {

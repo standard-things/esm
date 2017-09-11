@@ -9,7 +9,7 @@ function getSourceType(exported) {
         exported.__esModule === true) {
       if (has(exported, typeSym) &&
           exported[typeSym] === "module") {
-        return "module"
+        return exported[typeSym]
       }
 
       return "module-like"
