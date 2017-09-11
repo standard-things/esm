@@ -6,5 +6,3 @@ Object.defineProperty(exports, "__esModule", {
   value: true,
   writable: false
 })
-
-// Export nothing.
