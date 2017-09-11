@@ -5,10 +5,19 @@ import Entry from "./entry.js"
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import getSourceType from "./util/get-source-type.js"
+import has from "./util/has.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
+import setProperty from "./util/set-property.js"
+
+const esmDescriptor = {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+}
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -153,6 +162,11 @@ function runESM(runtime, moduleWrapper) {
 
   entry.update().loaded()
   assign(exported, entry._namespace)
+
+  if (options.cjs &&
+      ! has(exported, "__esModule")) {
+    setProperty(exported, "__esModule", esmDescriptor)
+  }
 }
 
 const Rp = Object.setPrototypeOf(Runtime.prototype, null)

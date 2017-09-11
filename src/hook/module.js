@@ -34,13 +34,6 @@ import stat from "../fs/stat.js"
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
-const trueDescriptor = {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
-}
-
 function hook(Module, options) {
   options = isObjectLike(options) ? options : null
 
@@ -204,9 +197,7 @@ function hook(Module, options) {
       return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
     }
 
-    if (options.cjs) {
-      setProperty(exported, "__esModule", trueDescriptor)
-    } else {
+    if (! options.cjs) {
       Module.wrap = customWrap
     }
 
@@ -367,6 +358,11 @@ function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, mjsSym, trueDescriptor)
+setProperty(mjsCompiler, mjsSym, {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+})
 
 export default hook
