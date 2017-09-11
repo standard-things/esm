@@ -8,13 +8,6 @@ const NODE_BIN = path.resolve(__dirname, "./env/prefix", isWin ? "node.exe" : "b
 
 describe("module.runMain hook", () => {
   it("should work with Node -r and --require options", () => {
-    const abcNs = {
-      a: "a",
-      b: "b",
-      c: "c",
-      default: "default"
-    }
-
     const options = ["-r", "--require"]
 
     return Promise.all(options.map((option) => {
@@ -32,6 +25,13 @@ describe("module.runMain hook", () => {
       results.forEach((result) => {
         if (result.stderr) {
           throw new Error(result.stderr)
+        }
+
+        const abcNs = {
+          a: "a",
+          b: "b",
+          c: "c",
+          default: "default"
         }
 
         const last = result.stdout.split("\n").pop()
