@@ -300,6 +300,12 @@ describe("Node rules", () => {
       .then(() => assert.ok(filePath in require.cache))
       .catch((e) => assert.ifError(e))
   })
+
+  it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
+    import("./misc/esmodule/")
+      .then((ns) => ns.check())
+      .catch((e) => assert.ifError(e))
+  )
 })
 
 describe("spec compliance", () => {

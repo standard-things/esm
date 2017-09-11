@@ -1,0 +1,11 @@
+{
+  "name": "esmodule",
+  "private": true,
+  "@std/esm": {
+    "cjs": true,
+    "debug": true
+  },
+  "dependencies": {
+    "@std/esm": "*"
+  }
+}
