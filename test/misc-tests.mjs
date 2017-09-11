@@ -7,6 +7,7 @@ import path from "path"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"
+const pkgPath = path.resolve(__dirname, "../index.js")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
 const jsonExt = require.extensions[".json"]
@@ -89,18 +90,64 @@ describe("package.json", () => {
 })
 
 describe("errors", () => {
-  it("should mask stack traces", () =>
-    import("MISSING_MODULE")
-      .catch((e) => {
-        const stack = e.stack
-        assert.strictEqual(stack.includes("esm.js"), false)
-      })
-  )
-
   it("should not wrap custom errors", () =>
     import("./misc/custom-error.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e, global.customError))
+  )
+
+  it("should mask stack arrows", () => {
+    const id1 = path.resolve(__dirname, "./misc/error/import-error.mjs")
+    const id2 = path.resolve(__dirname, "./misc/error/import-error.js")
+    const id3 = path.resolve(__dirname, "./misc/error/syntax-error.js")
+
+    return Promise.all([
+      import(id1)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          const arrow = [
+            id1 + ":2",
+            '  import "error"',
+            "  ^",
+            "",
+            "SyntaxError:"
+          ].join("\n")
+
+          assert.ok(e.stack.startsWith(arrow))
+        }),
+      import(id2)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          const arrow = [
+            id2 + ":1",
+            'import"error"',
+            "^",
+            "",
+            "SyntaxError:"
+          ].join("\n")
+
+          assert.ok(e.stack.startsWith(arrow))
+        }),
+      import(id3)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          const arrow = [
+            id3 + ":1",
+            "syntax@error",
+            "      ^",
+            "",
+            "SyntaxError:"
+          ].join("\n")
+
+          assert.ok(e.stack.startsWith(arrow))
+        })
+    ])
+  })
+
+  it("should mask stack traces", () =>
+    import("./misc/error/import-error.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
   )
 })
 

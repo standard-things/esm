@@ -1,0 +1,5 @@
+{
+  "name": "error",
+  "private": true,
+  "@std/esm": true
+}
