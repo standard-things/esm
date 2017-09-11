@@ -34,6 +34,13 @@ import stat from "../fs/stat.js"
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
+const trueDescriptor = {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+}
+
 function hook(Module, options) {
   options = isObjectLike(options) ? options : null
 
@@ -178,6 +185,11 @@ function hook(Module, options) {
   function tryESMCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
     const exported = new NullObject
     setSourceType(exported, "module")
+
+    if (options.cjs) {
+      setProperty(exported, "__esModule", trueDescriptor)
+    }
+
     Runtime.enable(mod, exported, options)
 
     let async = ""
@@ -359,11 +371,6 @@ function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, mjsSym, {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
-})
+setProperty(mjsCompiler, mjsSym, trueDescriptor)
 
 export default hook
