@@ -4,24 +4,22 @@ import isObjectLike from "./is-object-like.js"
 const typeSym = Symbol.for("@std/esm:sourceType")
 
 function getSourceType(exported) {
+  let type = "script"
+
   if (isObjectLike(exported)) {
-    if (has(exported, "__esModule") &&
-        exported.__esModule === true) {
-      if (has(exported, typeSym) &&
-          exported[typeSym] === "module") {
-        return exported[typeSym]
-      }
-
-      return "module-like"
-    }
-
     if (has(exported, typeSym) &&
         typeof exported[typeSym] === "string") {
-      return exported[typeSym]
+      type = exported[typeSym]
+    }
+
+    if (type === "script" &&
+        has(exported, "__esModule") &&
+        exported.__esModule === true) {
+      type = "module-like"
     }
   }
 
-  return "script"
+  return type
 }
 
 export default getSourceType
