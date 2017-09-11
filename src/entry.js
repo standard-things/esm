@@ -336,24 +336,21 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(entry, setter, name) {
-  const { options } = setter.parent
   const { _namespace, sourceType } = entry
+  const { options } = setter.parent
+  const isScript = ! options.cjs && sourceType !== "module"
 
   if (name === "*") {
-    if (options.cjs) {
-      return entry.esmNamespace
-    }
-
-    return sourceType === "module" ? entry.esmNamespace : entry.cjsNamespace
+    return isScript ? entry.cjsNamespace : entry.esmNamespace
   }
 
-  if (sourceType !== "module" && name === "default" &&
-      (sourceType === "script" || ! options.cjs)) {
+  if (isScript &&
+      name === "default") {
     return entry.exports
   }
 
-  if ((entry._loaded && ! (name in _namespace)) ||
-      (entry.sourceType !== "module" && ! options.cjs)) {
+  if (isScript ||
+      (entry._loaded && ! (name in _namespace))) {
     raiseMissingExport(entry, name)
   }
 
