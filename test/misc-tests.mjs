@@ -44,13 +44,13 @@ describe("built-in modules", () => {
 
   it("should fire setters if already loaded", () =>
     import("./misc/builtin/loaded.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should produce valid namespace objects", () =>
     import("./misc/builtin/namespace.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 })
@@ -303,7 +303,7 @@ describe("Node rules", () => {
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/esmodule/")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 })
@@ -311,37 +311,37 @@ describe("Node rules", () => {
 describe("spec compliance", () => {
   it("should bind exports before the module executes", () =>
     import("./misc/export/cycle-named.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should establish live binding of values", () =>
     import("./misc/live.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should execute modules in the correct order", () =>
     import("./misc/order.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should produce valid namespace objects", () =>
     import("./misc/namespace.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should export CJS `module.exports` as default", () =>
     import("./misc/export/cjs-default.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
@@ -359,7 +359,7 @@ describe("spec compliance", () => {
 
   it("should not have CJS free variables", () =>
     import("./misc/free-vars.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 

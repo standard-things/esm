@@ -3,7 +3,7 @@ import { a, b, c, rest } from "../fixture/export/destructuring.mjs"
 import { a0, a2, update } from "../fixture/export/holes.mjs"
 import { x, y, swap } from "../fixture/export/swap.mjs"
 
-export function check() {
+export default function () {
   // Should support destructuring declarations.
   assert.strictEqual(a, "a")
   assert.strictEqual(b, "b")

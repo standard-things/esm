@@ -2,7 +2,7 @@
 
 const assert = require("assert")
 
-function check(done) {
+module.exports = function (done) {
   const abcNs = {
     a: "a",
     b: "b",
@@ -16,5 +16,3 @@ function check(done) {
       done()
     })
 }
-
-module.exports = check

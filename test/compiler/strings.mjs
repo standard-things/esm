@@ -1,6 +1,6 @@
 import assert from "assert"
 
-export function check() {
+export default function () {
   assert.strictEqual(
     'a; import b from "c"; d',
     "a; import b " + 'from "c"; d'

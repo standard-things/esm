@@ -1,6 +1,6 @@
 import assert from "assert"
 import bridge from "./seal/bridge.mjs"
 
-export function check() {
+export default function () {
   assert.strictEqual(bridge.a, "a")
 }

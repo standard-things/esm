@@ -6,31 +6,31 @@ describe("import declarations", () => {
       import("./import/cycle/a.mjs"),
       import("./import/cycle/a.mjs")
     ])
-    .then((namespaces) => namespaces.forEach((ns) => ns.check()))
+    .then((namespaces) => namespaces.forEach((ns) => ns.default()))
     .catch((e) => assert.ifError(e))
   )
 
   it("should support combinations of import styles", () =>
     import("./import/cjs/combinations.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should support same symbol as different locals", () =>
     import("./import/locals.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should support CJS modules setting `module.exports`", () =>
     import("./import/cjs/cjs.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should parse URL ids", () =>
     import("./import/url-ids.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 

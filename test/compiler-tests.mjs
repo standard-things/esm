@@ -43,13 +43,13 @@ describe("compiler", () => {
 
   it("should choose unique export and module identifiers", () =>
     import("./compiler/aliases.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
   it("should preserve line numbers", () =>
     import("./compiler/lines.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
@@ -86,7 +86,7 @@ describe("compiler", () => {
 
   it('should not hoist above "use strict"', () =>
     import("./compiler/strict.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
@@ -102,7 +102,7 @@ describe("compiler", () => {
 
   it("should not get confused by string literals", () =>
     import("./compiler/strings.mjs")
-      .then((ns) => ns.check())
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 

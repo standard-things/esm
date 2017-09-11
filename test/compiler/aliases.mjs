@@ -2,7 +2,7 @@ import assert from "assert"
 
 export let value = 0
 
-export function check() {
+export default function () {
   const exports = null
   const exports2 = null
   const module = null

@@ -9,7 +9,7 @@ import {
 
 export const two = 2
 
-export function check() {
+export default function () {
   assert.strictEqual(aOne, 1)
   assert.strictEqual(aTwo, 2)
 }

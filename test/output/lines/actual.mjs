@@ -5,11 +5,13 @@ import
 from "assert"
 
 export
-// eslint-disable-next-line brace-style
-function check()
 
+default
+
+function ()
+// eslint-disable-next-line brace-style
 {
-  const error = new Error // Line 12.
+  const error = new Error // Line 14.
   const line = error.stack.match(/:(\d+)/)[1]
-  assert.strictEqual(line, "12")
+  assert.strictEqual(line, "14")
 }

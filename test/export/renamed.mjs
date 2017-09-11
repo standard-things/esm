@@ -1,7 +1,7 @@
 import assert from "assert"
 import { append, x as a, x, y } from "../fixture/export/renamed.mjs"
 
-export function check() {
+export default function () {
   assert.strictEqual(x, a)
   assert.strictEqual(x, y)
   assert.strictEqual(x, "a")

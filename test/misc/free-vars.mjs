@@ -1,6 +1,6 @@
 import assert from "assert"
 
-export function check() {
+export default function () {
   assert.throws(() => __dirname, ReferenceError)
   assert.throws(() => __filename, ReferenceError)
   assert.throws(() => exports, ReferenceError)

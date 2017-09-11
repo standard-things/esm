@@ -47,7 +47,7 @@ describe("require hook", () => {
     assert.strictEqual(global.this, "undefined")
 
     let exported = cjsRequire("./cjs")
-    exported.check()
+    exported.default()
 
     exported = gzRequire("./require/a.mjs.gz")
     assert.deepEqual(exported, abcNs)

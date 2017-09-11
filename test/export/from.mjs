@@ -1,7 +1,7 @@
 import assert from "assert"
 import def1, { a, b, c, aa, bb, def2 } from "../fixture/export/from.mjs"
 
-export function check() {
+export default function () {
   assert.strictEqual(a, "a")
   assert.strictEqual(b, "b")
   assert.strictEqual(c, "c")

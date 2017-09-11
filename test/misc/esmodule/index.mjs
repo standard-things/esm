@@ -4,7 +4,7 @@ const customValue = require("./custom.mjs")
 const defaultValue = require("./default.mjs")
 const noValue = require("../../fixture/export/abc.mjs")
 
-export function check() {
+export default function () {
   assert.deepEqual(Object.getOwnPropertyDescriptor(customValue, "__esModule"), {
     configurable: true,
     enumerable: true,

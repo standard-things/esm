@@ -1,6 +1,6 @@
 import assert from "assert"
 
-export function check() {
+export default function () {
   const that = (function () {
     return this
   })()
