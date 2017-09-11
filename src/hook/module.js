@@ -170,28 +170,18 @@ function hook(Module, options) {
   }
 
   function tryCJSCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
-    const exported = new NullObject
-    setSourceType(exported, "script")
-    Runtime.enable(mod, exported, options)
-
     content =
       "const " + runtimeAlias + "=this;" + runtimeAlias +
       ".r((function(exports,require,module,__filename,__dirname){" +
       content + "\n}))"
 
+    const exported = new NullObject
+    setSourceType(exported, "script")
+    Runtime.enable(mod, exported, options)
     tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
   }
 
   function tryESMCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
-    const exported = new NullObject
-    setSourceType(exported, "module")
-
-    if (options.cjs) {
-      setProperty(exported, "__esModule", trueDescriptor)
-    }
-
-    Runtime.enable(mod, exported, options)
-
     let async = ""
 
     if (allowTopLevelAwait && options.await) {
@@ -206,6 +196,7 @@ function hook(Module, options) {
       (options.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
       runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
 
+    const exported = new NullObject
     const moduleWrap = Module.wrap
 
     const customWrap = (script) => {
@@ -213,9 +204,14 @@ function hook(Module, options) {
       return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
     }
 
-    if (! options.cjs) {
+    if (options.cjs) {
+      setProperty(exported, "__esModule", trueDescriptor)
+    } else {
       Module.wrap = customWrap
     }
+
+    setSourceType(exported, "module")
+    Runtime.enable(mod, exported, options)
 
     try {
       tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
