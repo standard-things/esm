@@ -4,8 +4,5 @@
   "@std/esm": {
     "cache": ".cache/for/tests",
     "debug": true
-  },
-  "dependencies": {
-    "@std/esm": "*"
   }
 }

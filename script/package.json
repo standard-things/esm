@@ -5,8 +5,5 @@
     "cjs": true,
     "debug": true,
     "esm": "js"
-  },
-  "dependencies": {
-    "@std/esm": "*"
   }
 }

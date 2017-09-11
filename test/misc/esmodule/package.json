@@ -4,8 +4,5 @@
   "@std/esm": {
     "cjs": true,
     "debug": true
-  },
-  "dependencies": {
-    "@std/esm": "*"
   }
 }
