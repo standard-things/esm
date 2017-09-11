@@ -1,9 +1,9 @@
-import { dirname, extname } from "path"
 
 import Entry from "./entry.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
+import { extname } from "path"
 import getSourceType from "./util/get-source-type.js"
 import has from "./util/has.js"
 import loadCJS from "./module/cjs/load.js"
@@ -136,13 +136,12 @@ function importModule(id, parent, loader, options) {
 
 function runCJS(runtime, moduleWrapper) {
   const { entry, module:mod, options } = runtime
-  const { filename } = mod
   const exported = mod.exports = entry.exports
   const loader = options.cjs ? loadESM : loadCJS
   const requirer = (id) => importModule(id, mod, loader, options).exports
   const req = makeRequireFunction(mod, requirer)
 
-  moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
+  moduleWrapper.call(exported, exported, req)
   mod.loaded = true
 
   entry.merge(Entry.get(mod, mod.exports, options))

@@ -164,9 +164,8 @@ function hook(Module, options) {
 
   function tryCJSCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
     content =
-      "const " + runtimeAlias + "=this;" + runtimeAlias +
-      ".r((function(exports,require,module,__filename,__dirname){" +
-      content + "\n}))"
+      "const " + runtimeAlias + "=this;" +
+      runtimeAlias + ".r((function(exports,require){" + content + "\n}))"
 
     const exported = new NullObject
     setSourceType(exported, "script")
