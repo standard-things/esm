@@ -4,13 +4,22 @@ import isParseError from "../util/is-parse-error.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
-import wrapper from "../module/wrapper.js"
+
+const BuiltinModule = __non_webpack_module__.constructor
+
+const ZWJ = "\u200d"
+const { isArray } = Array
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)/m
+
+const wrapperFallback = [
+  "(function (exports, require, module, __filename, __dirname) { ",
+  "\n});"
+]
 
 function maskStackTrace(error, sourceCode, filePath) {
   if (! isError(error)) {
@@ -57,6 +66,7 @@ function maskParserStack(stack, sourceCode, filePath) {
 
   const desc = parts[1]
   const lineNum = +parts[2]
+  const lineIndex = lineNum - 1
   const column = +parts[3]
   const spliceArgs = [0, 1]
   const stackLines = stack.split("\n")
@@ -71,10 +81,9 @@ function maskParserStack(stack, sourceCode, filePath) {
 
   if (typeof sourceCode === "string") {
     const lines = sourceCode.split("\n")
-    const line = lines[lineNum - 1]
 
-    if (line) {
-      spliceArgs.push(line, " ".repeat(column) + "^", "")
+    if (lineIndex < lines.length) {
+      spliceArgs.push(lines[lineIndex], " ".repeat(column) + "^", "")
     }
   }
 
@@ -93,30 +102,40 @@ function maskEngineStack(stack, sourceCode, filePath) {
   return stack.replace(replaceArrowRegExp, (match, snippet, arrow) => {
     const lineNum = +parts[1]
 
-    if (! snippet.includes("\u200d")) {
-      const [prefix] = wrapper
-
-      if (lineNum === 1 &&
-          snippet.startsWith(prefix)) {
-        const { length } = prefix
-        snippet = snippet.slice(length)
-        arrow = arrow.slice(length)
+    if (snippet.includes(ZWJ)) {
+      if (typeof sourceCode === "function") {
+        sourceCode = sourceCode(filePath)
       }
 
+      if (typeof sourceCode !== "string") {
+        return ""
+      }
+
+      const lines = sourceCode.split("\n")
+      const line = lines[lineNum - 1]
+      return line ? (line + "\n") : ""
+    }
+
+    if (lineNum !== 1) {
       return snippet + arrow
     }
 
-    if (typeof sourceCode === "function") {
-      sourceCode = sourceCode(filePath)
+    let { wrapper } = BuiltinModule
+
+    if (! isArray(wrapper) ||
+        typeof wrapper[0] !== "string") {
+      wrapper = wrapperFallback
     }
 
-    if (typeof sourceCode !== "string") {
-      return ""
+    const [prefix] = wrapper
+
+    if (snippet.startsWith(prefix)) {
+      const { length } = prefix
+      snippet = snippet.slice(length)
+      arrow = arrow.slice(length)
     }
 
-    const lines = sourceCode.split("\n")
-    const line = lines[lineNum - 1]
-    return line ? (line + "\n") : ""
+    return snippet + arrow
   })
 }
 

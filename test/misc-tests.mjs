@@ -100,6 +100,7 @@ describe("errors", () => {
     const id1 = path.resolve(__dirname, "./misc/error/import-error.mjs")
     const id2 = path.resolve(__dirname, "./misc/error/import-error.js")
     const id3 = path.resolve(__dirname, "./misc/error/syntax-error.js")
+    const id4 = path.resolve(__dirname, "./node_modules/error/index.js")
 
     return Promise.all([
       import(id1)
@@ -133,6 +134,19 @@ describe("errors", () => {
         .catch((e) => {
           const arrow = [
             id3 + ":1",
+            "syntax@error",
+            "      ^",
+            "",
+            "SyntaxError:"
+          ].join("\n")
+
+          assert.ok(e.stack.startsWith(arrow))
+        }),
+      import(id4)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          const arrow = [
+            id4 + ":1",
             "syntax@error",
             "      ^",
             "",

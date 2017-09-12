@@ -21,7 +21,6 @@ import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
-import isParseError from "../util/is-parse-error.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -55,16 +54,13 @@ function hook(Module, options) {
       assign(pkgInfo.options, options)
     }
 
-    if (pkgInfo === null ||
-        pkgInfo.options === null) {
-      return func.apply(this, args)
-    }
+    const wrapped = (pkgInfo && pkgInfo.options)
+      ? Wrapper.find(_extensions, ".js", pkgInfo.range)
+      : null
 
-    const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
-
-    return wrapped === null
-      ? func.apply(this, args)
-      : wrapped.call(this, manager, func, pkgInfo, args)
+    return wrapped
+      ? wrapped.call(this, manager, func, pkgInfo, args)
+      : tryPassthruCompile.call(this, func, args)
   }
 
   // eslint-disable-next-line consistent-return
@@ -115,7 +111,7 @@ function hook(Module, options) {
         cacheValue = { code: cacheCode, type }
         cache[cacheFileName] = cacheValue
       } else {
-        cacheValue = tryCompile(manager, sourceCode, {
+        cacheValue = tryCodeCompile(manager, sourceCode, {
           cacheFileName,
           cachePath,
           filePath,
@@ -142,12 +138,15 @@ function hook(Module, options) {
   }
 
   function readCode(filePath, options) {
-    return options.gz && _extname(filePath) === ".gz"
-      ? gunzip(readFile(filePath), "utf8")
-      : readFile(filePath, "utf8")
+    if (options && options.gz &&
+        _extname(filePath) === ".gz") {
+      return gunzip(readFile(filePath), "utf8")
+    }
+
+    return readFile(filePath, "utf8")
   }
 
-  function tryCompile(manager, code, options) {
+  function tryCodeCompile(manager, code, options) {
     const { filePath, pkgInfo } = options
 
     if (pkgInfo.options.debug) {
@@ -282,11 +281,7 @@ function hook(Module, options) {
             mod._compile(content, filePath)
           }
         } catch (e) {
-          if (! isParseError(e)) {
-            maskStackTrace(e, () => readCode(filePath, options))
-          }
-
-          throw e
+          throw maskStackTrace(e, () => readCode(filePath, options))
         }
       }
     } finally {
@@ -301,6 +296,15 @@ function hook(Module, options) {
       if (mod._compile === customModuleCompile) {
         mod._compile = moduleCompile
       }
+    }
+  }
+
+  function tryPassthruCompile(func, args) {
+    try {
+      func.apply(this, args)
+    } catch (e) {
+      const [, filePath] = args
+      throw maskStackTrace(e, () => readCode(filePath))
     }
   }
 

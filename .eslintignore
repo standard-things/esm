@@ -4,6 +4,7 @@
 /src/vendor
 /test/misc/error
 /test/misc/source
+/test/node_modules/error
 /test/output
 /test/export/cycle-all.mjs
 /test/misc/export/dup-local.mjs
