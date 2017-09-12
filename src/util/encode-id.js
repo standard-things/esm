@@ -1,5 +1,7 @@
+const ZWJ = "\u200d"
+
 function encodeId(id) {
-  return id + "\u200d"
+  return id + ZWJ
 }
 
 export default encodeId
