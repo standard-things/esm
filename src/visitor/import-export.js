@@ -41,8 +41,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitCallExpression(path) {
-    const node = path.getValue()
-    const callee = node.callee
+    const { callee } = path.getValue()
 
     if (callee.type === "Import") {
       this.addedDynamicImport = true
@@ -237,7 +236,7 @@ class ImportExportVisitor extends Visitor {
 }
 
 function addExportedLocalNames(visitor, specifierMap) {
-  const exportedNames = visitor.exportedLocalNames
+  const { exportedLocalNames } = visitor
   const names = specifierMap.keys()
 
   for (const name of names) {
@@ -248,19 +247,19 @@ function addExportedLocalNames(visitor, specifierMap) {
     // per local variable, and we don't actually use the exported
     // name(s) in the assignmentVisitor, so it's not worth the added
     // complexity of tracking unused information.
-    exportedNames[locals[0]] = true
+    exportedLocalNames[locals[0]] = true
   }
 }
 
 function addImportedLocalNames(visitor, specifierMap) {
-  const importedNames = visitor.importedLocalNames
+  const { importedLocalNames } = visitor
   const names = specifierMap.keys()
 
   for (const name of names) {
     const locals = specifierMap.get(name).keys()
 
     for (const local of locals) {
-      importedNames[local] = true
+      importedLocalNames[local] = true
     }
   }
 }
@@ -295,7 +294,8 @@ function computeSpecifierMap(specifiers) {
        s.type === "ExportNamespaceSpecifier") ? s.exported.name :
       null
 
-    if (typeof local === "string" && typeof __ported === "string") {
+    if (typeof local === "string" &&
+        typeof __ported === "string") {
       addToSpecifierMap(specifierMap, __ported, local)
     }
   }
@@ -304,15 +304,15 @@ function computeSpecifierMap(specifiers) {
 }
 
 function getBlockBodyInfo(visitor, path) {
-  if (visitor.bodyInfo !== null) {
+  if (visitor.bodyInfo) {
     return visitor.bodyInfo
   }
 
   const parent = path.getParentNode()
-  const body = parent.body
+  const { body, start } = parent
 
   let hoistedPrefixString = ""
-  let insertCharIndex = parent.start
+  let insertCharIndex = start
   let insertNodeIndex = 0
 
   // Avoid hoisting above string literal expression statements such as
@@ -323,6 +323,7 @@ function getBlockBodyInfo(visitor, path) {
 
   while (++i < stmtCount) {
     const stmt = body[i]
+
     if (stmt.type === "ExpressionStatement" &&
         stmt.expression.type === "Literal" &&
         typeof stmt.expression.value === "string") {
@@ -384,18 +385,16 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
   }
 }
 
-function canExportedValuesChange(exportDecl) {
-  if (exportDecl.type === "ExportDefaultDeclaration") {
-    const dd = exportDecl.declaration
-    return (dd.type === "FunctionDeclaration" ||
-            dd.type === "ClassDeclaration")
+function canExportedValuesChange({ declaration, type }) {
+  if (type === "ExportDefaultDeclaration") {
+    return (declaration.type === "FunctionDeclaration" ||
+            declaration.type === "ClassDeclaration")
   }
 
-  if (exportDecl.type === "ExportNamedDeclaration") {
-    const dd = exportDecl.declaration
-    if (dd &&
-        dd.type === "VariableDeclaration" &&
-        dd.kind === "const") {
+  if (type === "ExportNamedDeclaration") {
+    if (declaration &&
+        declaration.type === "VariableDeclaration" &&
+        declaration.kind === "const") {
       return false
     }
   }
@@ -458,8 +457,8 @@ function preserveChild(visitor, path, childName) {
 }
 
 function preserveLine(visitor, path) {
-  const node = path.getValue()
-  overwrite(visitor, node.start, node.end, "")
+  const { end, start } = path.getValue()
+  overwrite(visitor, start, end, "")
 }
 
 function safeParam(param, locals) {
