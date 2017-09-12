@@ -18,7 +18,7 @@
     "prelint": "npm run pretest",
     "prepub": "npm run test:prod",
     "pretest": "npm run build -- --test",
-    "pretest:prod": "npm run pretest -- --prod",
+    "pretest:prod": "npm run build:prod -- --test",
     "_test": "node --require ./index.js script/test.js",
     "build": "node script/build.js",
     "build:prod": "npm run build -- --prod",
