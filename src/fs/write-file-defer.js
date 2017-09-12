@@ -13,7 +13,7 @@ function writeFileDefer(filePath, content, options, callback) {
   options = createOptions(options)
   pendingWrites[filePath] = { callback, content, options }
 
-  if (pendingWriteTimer !== null) {
+  if (pendingWriteTimer) {
     return
   }
 

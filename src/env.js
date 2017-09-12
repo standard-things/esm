@@ -38,7 +38,7 @@ function hasLoaderParam(params) {
     if (param.charCodeAt(0) === codeOfBracket) {
       const parsed = parseJSON(param)
 
-      if (parsed !== null) {
+      if (parsed) {
         param = parsed
       }
     }

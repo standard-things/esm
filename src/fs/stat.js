@@ -12,13 +12,14 @@ let useStatFastPath = typeof internalModuleStat === "function"
 function stat(filePath) {
   const { cache } = stat
 
-  if (cache !== null && filePath in cache) {
+  if (cache &&
+      filePath in cache) {
     return cache[filePath]
   }
 
   const result = baseStat(filePath)
 
-  if (cache !== null) {
+  if (cache) {
     cache[filePath] = result
   }
 

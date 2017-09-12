@@ -38,7 +38,7 @@ function isArgumentsDefined(path) {
   path.getParentNode((parent) => {
     defined = definedMap.get(parent)
 
-    if (defined !== void 0) {
+    if (defined) {
       return defined
     }
 

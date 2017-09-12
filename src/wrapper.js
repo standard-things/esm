@@ -12,12 +12,15 @@ const wrapSym = Symbol.for("@std/esm:wrapper")
 class Wrapper {
   static find(object, key, range) {
     const map = getMap(object, key)
-    if (map !== null) {
+
+    if (map) {
       const version = maxSatisfying(map.versions, range)
-      if (version !== null) {
+
+      if (version) {
         return map.wrappers[version]
       }
     }
+
     return null
   }
 
@@ -64,23 +67,15 @@ function createStore(object) {
 
 function getMap(object, key) {
   const store = getStore(object)
-  return store !== null && key in store
-    ? store[key]
-    : null
+  return (store && key in store) ? store[key] : null
 }
 
 function getOrCreateMap(object, key) {
-  const map = getMap(object, key)
-  return map === null
-    ? createMap(object, key)
-    : map
+  return getMap(object, key) || createMap(object, key)
 }
 
 function getOrCreateStore(object) {
-  const store = getStore(object)
-  return store === null
-    ? createStore(object)
-    : store
+  return getStore(object) || createStore(object)
 }
 
 function getStore(object) {

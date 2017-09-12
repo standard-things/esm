@@ -21,9 +21,6 @@ class ImportExportVisitor extends Visitor {
       this.bodyInfo.hoistedImportsString
 
     this.magicString.prependRight(this.bodyInfo.insertCharIndex, codeToInsert)
-
-    // Just in case we call finalizeHoisting again, don't hoist anything.
-    this.bodyInfo = null
   }
 
   reset(rootPath, code, options) {

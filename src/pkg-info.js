@@ -34,7 +34,7 @@ class PkgInfo {
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
 
     let i = -1
-    const nameCount = cacheFileNames === null ? 0 : cacheFileNames.length
+    const nameCount = cacheFileNames ? cacheFileNames.length : 0
 
     while (++i < nameCount) {
       // Later, in the ".js" or ".mjs" compiler, we'll change the cached value

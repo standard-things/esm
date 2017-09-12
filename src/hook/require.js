@@ -18,8 +18,8 @@ function hook(mod, options) {
     }
 
     const filePath = resolveFilename(id, mod, false, options)
-    const pkgInfo = options === null ? PkgInfo.get(dirname(filePath)) : null
-    const loadOptions = pkgInfo === null ? options : pkgInfo.options
+    const pkgInfo = options ? null : PkgInfo.get(dirname(filePath))
+    const loadOptions = pkgInfo ? pkgInfo.options : options
 
     const copy = new Module(mod.id)
     copy.filename = mod.filename

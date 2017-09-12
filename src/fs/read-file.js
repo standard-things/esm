@@ -22,7 +22,7 @@ function readFile(filePath, options) {
   }
 
   const content = fallbackReadFile(filePath, options)
-  return isUTF8 && content !== null ? stripBOM(content) : content
+  return (isUTF8 && content !== null) ? stripBOM(content) : content
 }
 
 function fallbackReadFile(filePath, options) {
