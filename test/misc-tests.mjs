@@ -105,7 +105,7 @@ describe("errors", () => {
     const id6 = path.resolve(__dirname, "./node_modules/error/index.js")
 
     function check(error, startsWith) {
-      const stack = error.stack
+      const stack = error.stack.replace(/\r\n/g, "\n")
       assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
     }
 
