@@ -102,11 +102,12 @@ function isShadowed(path, name) {
   path.getParentNode((parent) => {
     let cache = shadowedMap.get(parent)
 
-    if (cache === void 0) {
+    if (cache &&
+        name in cache) {
+      return shadowed = cache[name]
+    } else {
       cache = new NullObject
       shadowedMap.set(parent, cache)
-    } else if (name in cache) {
-      return shadowed = cache[name]
     }
 
     const { type } = parent

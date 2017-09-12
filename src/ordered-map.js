@@ -8,12 +8,12 @@ class OrderedMap {
   clear() {
     this._hash = new NullObject
 
-    if (this._keys === void 0) {
-      this._keys = []
-      this._values = []
-    } else {
+    if (this._keys) {
       this._keys.length =
       this._values.length = 0
+    } else {
+      this._keys = []
+      this._values = []
     }
 
     return this

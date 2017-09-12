@@ -73,13 +73,15 @@ class Entry {
       entry = entryMap.get(mod)
     }
 
-    if (entry === void 0) {
-      entry = new Entry(mod, exported, options)
-      entryMap.set(mod, entry)
+    if (entry) {
+      return entry
+    }
 
-      if (useExports) {
-        entryMap.set(exported, entry)
-      }
+    entry = new Entry(mod, exported, options)
+    entryMap.set(mod, entry)
+
+    if (useExports) {
+      entryMap.set(exported, entry)
     }
 
     return entry
@@ -146,10 +148,11 @@ class Entry {
     for (const [name, setter] of setterPairs) {
       let setters = this.setters[name]
 
-      if (setters === void 0) {
-        setters = []
-        this.setters[name] = setters
+      if (! setters) {
+        setters =
+        this.setters[name] = []
       }
+
       setter.last = new NullObject
       setter.parent = parent
       setters.push(setter)
