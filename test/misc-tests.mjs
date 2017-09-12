@@ -98,56 +98,65 @@ describe("errors", () => {
 
   it("should mask stack arrows", () => {
     const id1 = path.resolve(__dirname, "./misc/error/import-error.mjs")
-    const id2 = path.resolve(__dirname, "./misc/error/import-error.js")
-    const id3 = path.resolve(__dirname, "./misc/error/syntax-error.js")
-    const id4 = path.resolve(__dirname, "./node_modules/error/index.js")
+    const id2 = path.resolve(__dirname, "./misc/error/export-error.js")
+    const id3 = path.resolve(__dirname, "./misc/error/import-error.js")
+    const id4 = path.resolve(__dirname, "./misc/error/nested-error.mjs")
+    const id5 = path.resolve(__dirname, "./misc/error/syntax-error.js")
+    const id6 = path.resolve(__dirname, "./node_modules/error/index.js")
+
+    function check(error, startsWith) {
+      const stack = error.stack
+      assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+    }
 
     return Promise.all([
       import(id1)
         .then(() => assert.ok(false))
         .catch((e) => {
-          const arrow = [
-            id1 + ":2",
-            '  import "error"',
-            "  ^"
-          ].join("\n")
-
-          assert.ok(e.stack.startsWith(arrow))
-        }),
-      import(id2)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          const arrow = [
+          check(e, [
             id2 + ":1",
-            'import"error"',
+            'export const a = "a"',
             "^"
-          ].join("\n")
+          ].join("\n"))
 
-          assert.ok(e.stack.startsWith(arrow))
+          assert.strictEqual(e.stack.includes(id1 + ":"), false)
         }),
-      import(id3)
+        import(id3)
         .then(() => assert.ok(false))
-        .catch((e) => {
-          const arrow = [
+        .catch((e) =>
+          check(e, [
             id3 + ":1",
-            "syntax@error",
-            "      ^"
-          ].join("\n")
-
-          assert.ok(e.stack.startsWith(arrow))
-        }),
+            'import { a } from "./export-error.js"',
+            "^"
+          ].join("\n"))
+        ),
       import(id4)
         .then(() => assert.ok(false))
-        .catch((e) => {
-          const arrow = [
-            id4 + ":1",
+        .catch((e) =>
+          check(e, [
+            id4 + ":2",
+            '  import"nested"',
+            "  ^"
+          ].join("\n"))
+        ),
+      import(id5)
+        .then(() => assert.ok(false))
+        .catch((e) =>
+          check(e, [
+            id5 + ":1",
             "syntax@error",
             "      ^"
-          ].join("\n")
-
-          const stack = e.stack
-          assert.ok(stack.startsWith(arrow) || stack.startsWith("SyntaxError:"))
-        })
+          ].join("\n"))
+        ),
+      import(id6)
+        .then(() => assert.ok(false))
+        .catch((e) =>
+          check(e, [
+            id6 + ":1",
+            "syntax@error",
+            "      ^"
+          ].join("\n"))
+        )
     ])
   })
 

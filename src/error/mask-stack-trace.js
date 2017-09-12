@@ -144,7 +144,7 @@ function scrubStack(stack) {
     .split("\n")
     .filter((line) => ! line.includes(__non_webpack_module__.filename))
     .join("\n")
-    .replace(removeLineInfoRegExp, ":1$1")
+    .replace(removeLineInfoRegExp, "$1")
 }
 
 export default maskStackTrace
