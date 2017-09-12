@@ -109,9 +109,7 @@ describe("errors", () => {
           const arrow = [
             id1 + ":2",
             '  import "error"',
-            "  ^",
-            "",
-            "SyntaxError:"
+            "  ^"
           ].join("\n")
 
           assert.ok(e.stack.startsWith(arrow))
@@ -122,9 +120,7 @@ describe("errors", () => {
           const arrow = [
             id2 + ":1",
             'import"error"',
-            "^",
-            "",
-            "SyntaxError:"
+            "^"
           ].join("\n")
 
           assert.ok(e.stack.startsWith(arrow))
@@ -135,9 +131,7 @@ describe("errors", () => {
           const arrow = [
             id3 + ":1",
             "syntax@error",
-            "      ^",
-            "",
-            "SyntaxError:"
+            "      ^"
           ].join("\n")
 
           assert.ok(e.stack.startsWith(arrow))
@@ -148,12 +142,11 @@ describe("errors", () => {
           const arrow = [
             id4 + ":1",
             "syntax@error",
-            "      ^",
-            "",
-            "SyntaxError:"
+            "      ^"
           ].join("\n")
 
-          assert.ok(e.stack.startsWith(arrow))
+          const stack = e.stack
+          assert.ok(stack.startsWith(arrow) || stack.startsWith("SyntaxError:"))
         })
     ])
   })
