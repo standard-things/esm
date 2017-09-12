@@ -8,8 +8,9 @@ const trash = require("./trash.js")
 
 const rootPath = path.resolve(__dirname, "..")
 const gitignorePath = path.resolve(rootPath, ".gitignore")
+const packageLockPath = path.resolve(rootPath, "package-lock.json")
 
-const ignores = fs.readFileSync(gitignorePath, "utf8")
+const ignorePatterns = fs.readFileSync(gitignorePath, "utf8")
   .replace(/^\s+/gm, "")
   .replace(/\s+$/gm, "")
   .split("\n")
@@ -18,9 +19,13 @@ const ignores = fs.readFileSync(gitignorePath, "utf8")
     : "**/" + ignore
   )
 
-const trashPaths = globby.sync(ignores, {
+const ignorePaths = globby.sync(ignorePatterns, {
   cwd: rootPath,
   realpath: true
 })
+
+const trashPaths = [
+  packageLockPath
+].concat(ignorePaths)
 
 Promise.all(trashPaths.map(trash))

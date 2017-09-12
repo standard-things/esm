@@ -110,4 +110,9 @@ describe("compiler", () => {
     codes.forEach(compiler.compile)
     assert.ok(true)
   })
+
+  it("should not error on shorthand async function properties with reserved names", () => {
+    compiler.compile("({ async delete() {} })")
+    assert.ok(true)
+  })
 })
