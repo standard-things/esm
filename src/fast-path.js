@@ -5,6 +5,7 @@
 import isObject from "./util/is-object.js"
 
 const alwaysTrue = () => true
+const { isArray } = Array
 
 class FastPath {
   constructor(ast) {
@@ -70,7 +71,7 @@ function getNode(path, pos, callback) {
     // fuzzy matching of object shapes.
     const value = stack[i--]
     if (isObject(value) &&
-        ! Array.isArray(value) &&
+        ! isArray(value) &&
         callback(value)) {
       return value
     }

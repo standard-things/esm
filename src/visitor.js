@@ -8,6 +8,8 @@ import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 
+const { isArray } = Array
+
 const childNamesMap = new SafeWeakMap
 
 const childrenToVisit = createOptions({
@@ -43,7 +45,7 @@ class Visitor {
       return
     }
 
-    if (Array.isArray(value)) {
+    if (isArray(value)) {
       path.each(this, "visitWithoutReset")
       return
     }

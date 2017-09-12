@@ -14,6 +14,8 @@ const codeOfBracket = "{".charCodeAt(0)
 const codeOfDash = "-".charCodeAt(0)
 
 const { _preloadModules, argv, cwd } = process
+const { isArray } = Array
+
 const esmPath = __non_webpack_module__.filename
 const params = argv.slice(2)
 
@@ -27,7 +29,7 @@ const preloading =
    hasLoaderModule(rootModule.children))
 
 function hasLoaderModule(modules) {
-  return Array.isArray(modules) &&
+  return isArray(modules) &&
     modules.some(({ filename }) => filename === esmPath)
 }
 
