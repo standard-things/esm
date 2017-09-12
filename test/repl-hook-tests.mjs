@@ -42,7 +42,7 @@ describe("REPL hook", () => {
       assert.ok(e.message.includes("' does not provide an export named '"))
 
       r.eval('import { join } from "path"', (e) => {
-        assert.ok(e === null)
+        assert.strictEqual(e, null)
         done()
       })
     })
