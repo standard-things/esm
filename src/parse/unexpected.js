@@ -4,6 +4,7 @@ function unexpected(parser, pos) {
   if (typeof pos !== "number") {
     pos = parser.start
   }
+
   raise(parser, pos, "Unexpected token")
 }
 
