@@ -134,15 +134,15 @@ class MagicString {
   }
 
   toString() {
-    let str = this.intro
+    let string = this.intro
     let chunk = this.firstChunk
 
     while (chunk) {
-      str += chunk.toString()
+      string += chunk.toString()
       chunk = chunk.next
     }
 
-    return str + this.outro
+    return string + this.outro
   }
 }
 
