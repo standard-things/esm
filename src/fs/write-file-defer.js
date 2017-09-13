@@ -20,15 +20,13 @@ function writeFileDefer(filePath, content, options, callback) {
   pendingWriteTimer = setImmediate(() => {
     pendingWriteTimer = null
     keys(pendingWrites).forEach((filePath) => {
-      const pending = pendingWrites[filePath]
-      const callback = pending.callback
-      const options = pending.options
+      let { callback, content, options } = pendingWrites[filePath]
       let success = false
 
       if (mkdirp(dirname(filePath), options.scopePath)) {
-        const content = typeof pending.content === "function"
-          ? pending.content()
-          : pending.content
+        if (typeof content === "function") {
+          content = content(filePath)
+        }
 
         success = writeFile(filePath, content, options)
       }

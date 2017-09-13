@@ -27,7 +27,7 @@ function maskStackTrace(error, sourceCode, filePath) {
   }
 
   decorateStackTrace(error)
-  let stack = error.stack
+  let { stack } = error
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.

@@ -32,18 +32,16 @@ class OrderedMap {
   }
 
   set(key, value) {
-    const hash = this._hash
-    const values = this._values
+    const { _hash, _keys, _values } = this
 
-    if (key in hash) {
-      values[hash[key]] = value
+    if (key in _hash) {
+      _values[_hash[key]] = value
     } else {
-      const keys = this._keys
-      const nextIndex = keys.length
+      const { length } = _keys
 
-      hash[key] = nextIndex
-      keys[nextIndex] = key
-      values[nextIndex] = value
+      _hash[key] = length
+      _keys[length] = key
+      _values[length] = value
     }
 
     return this

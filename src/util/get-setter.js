@@ -1,9 +1,9 @@
 import has from "./has.js"
 
-const lookupSetter = Object.prototype.__lookupSetter__
+const { __lookupSetter__ } = Object.prototype
 
 function getSetter(object, key) {
-  return has(object, key) ? lookupSetter.call(object, key) : void 0
+  return has(object, key) ? __lookupSetter__.call(object, key) : void 0
 }
 
 export default getSetter
