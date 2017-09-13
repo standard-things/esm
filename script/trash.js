@@ -7,7 +7,14 @@ function trash(iterable) {
   return new Promise((resolve) =>
     _trash(iterable)
       .then(() => resolve())
-      .catch(() => resolve())
+      .catch((e) => {
+        if (e.code === "EACCES") {
+          console.error(e)
+          process.exit(e.code)
+        }
+
+        resolve()
+      })
   )
 }
 
