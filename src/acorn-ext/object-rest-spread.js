@@ -4,9 +4,9 @@
 
 import NullObject from "../null-object.js"
 
+import expect from "../parse/expect.js"
 import raise from "../parse/raise.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
-import unexpected from "../parse/unexpected.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
@@ -29,9 +29,7 @@ function parseObj(func, args) {
     if (first) {
       first = false
     } else {
-      if (! this.eat(tt.comma)) {
-        unexpected(this)
-      }
+      expect(this, tt.comma)
 
       if (this.afterTrailingComma(tt.braceR)) {
         break
