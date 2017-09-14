@@ -13,8 +13,8 @@ describe("URL parsing", () => {
       let expected
       const isWin = mode === "win32"
 
-      actual = urlToPath("file:///", mode)
       expected = isWin ? "" : "/"
+      actual = urlToPath("file:///", mode)
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "" : "/home/user"

@@ -29,8 +29,8 @@ describe("output", () =>
       it(`compiles ${name} example as expected`, () => {
         // Remove zero-width joiners and trim trailing whitespace.
         const code = compiler.compile(test.actual).code
-        const actual = code.replace(/\u200d/g, "").trimRight()
         const expected = test.expected.trimRight()
+        const actual = code.replace(/\u200d/g, "").trimRight()
 
         assert.strictEqual(actual, expected)
       })
