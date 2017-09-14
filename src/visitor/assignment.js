@@ -24,6 +24,7 @@ class AssignmentVisitor extends Visitor {
     this.visitChildren(path)
 
     const { callee } = path.getValue()
+
     if (callee.type === "Identifier" &&
         callee.name === "eval") {
       wrap(this, path)
