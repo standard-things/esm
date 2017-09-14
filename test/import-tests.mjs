@@ -1,15 +1,6 @@
 import assert from "assert"
 
 describe("import declarations", () => {
-  it("should cope with dependency cycles", () =>
-    Promise.all([
-      import("./import/cycle/a.mjs"),
-      import("./import/cycle/a.mjs")
-    ])
-    .then((namespaces) => namespaces.forEach((ns) => ns.default()))
-    .catch((e) => assert.ifError(e))
-  )
-
   it("should support combinations of import styles", () =>
     import("./import/cjs/combinations.mjs")
       .then((ns) => ns.default())

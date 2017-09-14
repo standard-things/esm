@@ -475,7 +475,7 @@ describe("spec compliance", () => {
     Promise.all([
       "./misc/import/missing-cjs.mjs",
       "./misc/import/missing-esm.mjs",
-      "./misc/import/missing-cycle-a.mjs"
+      "./fixture/cycle/missing/a.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
