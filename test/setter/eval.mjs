@@ -1,9 +1,17 @@
 import assert from "assert"
-import { run, value } from "../fixture/eval.mjs"
+import { direct, indirect, value } from "../fixture/eval.mjs"
 
 export default function () {
   assert.strictEqual(value, "original")
-  const result = run('localValue = "modified"')
+
+  const expected = "direct"
+  let result = direct('localValue = "direct"')
+
   assert.strictEqual(value, result)
-  assert.strictEqual(value, "modified")
+  assert.strictEqual(value, expected)
+
+  result = indirect('localValue = "indirect"')
+
+  assert.strictEqual(value, expected)
+  assert.strictEqual(result, "indirect")
 }
