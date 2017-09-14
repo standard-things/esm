@@ -66,6 +66,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 
 * [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import) / [`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
 * [Dynamic `import()`](https://github.com/tc39/proposal-dynamic-import)
+* [Improved errors](https://mobile.twitter.com/jdalton/status/907741390813016064)
 * [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values)
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
