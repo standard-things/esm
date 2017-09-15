@@ -228,6 +228,14 @@ class ImportExportVisitor extends Visitor {
       specifierMap
     ))
   }
+
+  visitMetaProperty(path) {
+    const { meta } = path.getValue()
+
+    if (meta.name === "import") {
+      overwrite(this, meta.start, meta.end, this.runtimeAlias + "._")
+    }
+  }
 }
 
 function addExportedLocalNames(visitor, specifierMap) {

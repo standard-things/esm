@@ -1,5 +1,5 @@
-
 import Entry from "./entry.js"
+import NullObject from "./null-object.js"
 
 import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
@@ -25,9 +25,11 @@ class Runtime {
     const entry = Entry.get(mod, exported, options)
 
     object.entry = entry
+    object.meta = new NullObject
     object.module = mod
     object.options = entry.options
 
+    object._ = object
     object.d = object.default = Rp.default
     object.e = object.export = Rp.export
     object.i = object.import = Rp.import
