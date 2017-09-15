@@ -24,7 +24,6 @@ class ImportExportVisitor extends Visitor {
   }
 
   reset(rootPath, code, options) {
-    this.addedDynamicImport = false
     this.addedImportExport = false
     this.bodyInfo = null
     this.code = code
@@ -41,7 +40,6 @@ class ImportExportVisitor extends Visitor {
     const { callee } = path.getValue()
 
     if (callee.type === "Import") {
-      this.addedDynamicImport = true
       overwrite(this, callee.start, callee.end, this.runtimeAlias + ".i")
     }
 
