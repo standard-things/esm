@@ -12,6 +12,10 @@ import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 import setProperty from "./util/set-property.js"
 
+const isWin = process.platform === "win32"
+const fileProtocol = "file:" + (isWin ? "///" : "//")
+const reBackSlash = /\\/g
+
 const esmDescriptor = {
   configurable: false,
   enumerable: false,
@@ -116,6 +120,10 @@ class Runtime {
   }
 }
 
+function getURLFromFilePath(filePath) {
+  return fileProtocol + filePath.replace(reBackSlash, "/")
+}
+
 function importModule(id, parent, loader, options) {
   if (id in builtinEntries) {
     return builtinEntries[id]
@@ -155,9 +163,10 @@ function runCJS(runtime, moduleWrapper) {
 }
 
 function runESM(runtime, moduleWrapper) {
-  const { entry, module:mod, options } = runtime
+  const { entry, meta, module:mod, options } = runtime
   const exported = mod.exports = entry.exports
 
+  meta.url = getURLFromFilePath(mod.filename)
   moduleWrapper.call(options.cjs ? exported : void 0)
   mod.loaded = true
 
