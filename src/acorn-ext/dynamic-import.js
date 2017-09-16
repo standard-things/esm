@@ -97,6 +97,8 @@ function parseImportMetaPropertyAtom(parser) {
 
   if (node.property.name !== "meta") {
     raise(parser, node.property.start, "The only valid meta property for 'import' is 'import.meta'")
+  } else if (! parser.inModule) {
+    raise(parser, meta.start, "'import.meta' may only be used in ES modules")
   }
 
   return parser.finishNode(node, "MetaProperty")

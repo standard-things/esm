@@ -414,7 +414,7 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   })
 
-  it("should support `import.meta`", () =>
+  it("should support `import.meta` in ESM", () =>
     import("./misc/meta.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
@@ -438,6 +438,15 @@ describe("spec compliance", () => {
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
         assert.ok(e.message.includes("' does not provide an export named '"))
+      })
+  )
+
+  it("should not support `import.meta` in CJS", () =>
+    import("./misc/meta/a.js")
+      .then((ns) => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("'import.meta' may only be used in ES modules"))
       })
   )
 
