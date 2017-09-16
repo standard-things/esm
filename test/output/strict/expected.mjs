@@ -1,6 +1,6 @@
 let assert;_.w("assert",[["default",function(v){assert=v}]]);
 
-_.d(function () {
+_.d(() => {
   const that = (function () {
     return this
   })()

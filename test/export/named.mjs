@@ -2,7 +2,7 @@ import assert from "assert"
 import def from "../fixture/export/named.mjs"
 import * as ns from "../fixture/export/named.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(ns.bar, "bar")
   assert.strictEqual(ns.baz, "baz")
   assert.strictEqual(ns.baz2, "baz")

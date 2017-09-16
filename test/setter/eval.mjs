@@ -1,7 +1,7 @@
 import assert from "assert"
 import { direct, indirect, value } from "../fixture/eval.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(value, "original")
 
   const expected = "direct"

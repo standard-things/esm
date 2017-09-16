@@ -2,7 +2,7 @@ import assert from "assert"
 import { c } from "../fixture/tree/parent.mjs"
 import { increment } from "../fixture/tree/grandchild.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(c, 0)
   increment()
   assert.strictEqual(c, 1)

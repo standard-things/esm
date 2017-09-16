@@ -8,7 +8,7 @@ export
 
 default
 
-function ()
+() =>
 // eslint-disable-next-line brace-style
 {
   const error = new Error // Line 14.

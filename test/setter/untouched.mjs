@@ -4,6 +4,6 @@ import assert from "assert"
 import "./untouched/cjs.js"
 import { sum } from "./untouched/esm.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(sum(), 3)
 }

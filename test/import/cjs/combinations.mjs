@@ -6,7 +6,7 @@ import * as def1 from "../../fixture/export/def.js"
 import def2, * as def3 from "../../fixture/export/def.js"
 import { default as def4 } from "../../fixture/export/def.js"
 
-export default function () {
+export default () => {
   const abcNs = {
     a: "a",
     b: "b",

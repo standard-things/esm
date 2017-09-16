@@ -1,6 +1,6 @@
 import assert from "assert"
 import def from "../../fixture/cycle/named/a.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(def, true)
 }

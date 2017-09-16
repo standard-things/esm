@@ -6,7 +6,7 @@ import {
   valueOf
 } from "../fixture/export/shadowed.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(constructor, "a")
   assert.strictEqual(hasOwnProperty, "b")
   assert.strictEqual(toString, "c")

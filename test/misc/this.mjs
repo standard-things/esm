@@ -2,6 +2,6 @@ import assert from "assert"
 
 const that = this
 
-export default function () {
+export default () => {
   assert.strictEqual(that, void 0)
 }

@@ -13,7 +13,7 @@ import object from "../fixture/export/default/object.mjs"
 import redef from "../fixture/export/default/re-export.mjs"
 import undef from "../fixture/export/default/undefined.mjs"
 
-export default function () {
+export default () => {
   assert.deepEqual(array, [1])
   assert.strictEqual(new Anon(1).value, 1)
   assert.strictEqual(new Named(2).value, 2)

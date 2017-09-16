@@ -6,7 +6,7 @@ import * as ns2 from "../fixture/export/abc.mjs"
 
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
-export default function () {
+export default () => {
   const abcNs = {
     a: "a",
     b: "b",

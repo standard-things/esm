@@ -4,7 +4,7 @@ import { a as ba, b as bb } from "../fixture/cycle/all/b.mjs"
 import * as ans from "../fixture/cycle/all/a.mjs"
 import * as bns from "../fixture/cycle/all/b.mjs"
 
-export default function () {
+export default () => {
   assert.strictEqual(aa, "a")
   assert.strictEqual(ab, "b")
   assert.strictEqual(ba, "a")

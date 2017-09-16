@@ -2,7 +2,7 @@ import assert from "assert"
 import meta1 from "./meta/a.mjs"
 import meta2 from "./meta/a.js"
 
-export default function () {
+export default () => {
   const metas = [meta1, meta2]
 
   metas.forEach((meta) => {

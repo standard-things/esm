@@ -414,11 +414,11 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   })
 
-  it("should support `import.meta`", () => {
+  it("should support `import.meta`", () =>
     import("./misc/meta.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
-  })
+  )
 
   it("should support loading ESM from dynamic import in CJS", (done) => {
     import("./import/import.js")

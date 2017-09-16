@@ -16,7 +16,7 @@ import * as empty from "../../fixture/cjs/exports-empty.js"
 import * as emptyESM from "../../fixture/cjs/exports-esmodule-empty.js"
 import * as getSet from "../../fixture/cjs/exports-get-set.js"
 
-export default function () {
+export default () => {
   assert.deepEqual(adef, [1])
   assert.strictEqual(ans.default, adef)
 
