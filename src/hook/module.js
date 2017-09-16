@@ -231,7 +231,7 @@ function hook(Module, options) {
     }
 
     const customModuleCompile = function (content, compilePath) {
-      if (compilePath === filePath && ! restored) {
+      if (! restored && compilePath === filePath) {
         // This fallback is only hit if the read file wrappers are missed,
         // which should never happen.
         content = readAndRestore()
