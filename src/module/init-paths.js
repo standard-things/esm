@@ -5,14 +5,13 @@
 import { delimiter, resolve } from "path"
 
 function initPaths() {
-  const isWin = process.platform === "win32"
-  const homeDir = isWin
-    ? process.env.USERPROFILE
-    : process.env.HOME
+  const { env, execPath, platform } = process
+  const isWin = platform === "win32"
+  const homeDir = isWin ? env.USERPROFILE : env.HOME
 
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.
-  const prefixDir = resolve(process.execPath, "..", isWin ? "" : "..")
+  const prefixDir = resolve(execPath, "..", isWin ? "" : "..")
   const paths = [resolve(prefixDir, "lib", "node")]
 
   if (homeDir) {
@@ -20,7 +19,7 @@ function initPaths() {
     paths.unshift(resolve(homeDir, ".node_modules"))
   }
 
-  const { NODE_PATH } = process.env
+  const { NODE_PATH } = env
 
   return typeof NODE_PATH === "string"
     ? NODE_PATH.split(delimiter).filter(Boolean).concat(paths)
