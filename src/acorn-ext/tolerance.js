@@ -2,6 +2,9 @@ import AcornError from "../acorn-error.js"
 
 import wrap from "../util/wrap.js"
 
+const alwaysTrue = () => true
+const noop = () => {}
+
 const engineDupPrefix = "Duplicate export of '"
 const parserDupPrefix = "Duplicate export '"
 
@@ -9,10 +12,25 @@ const engineTypePostfix = "may only be used in ES modules"
 const parserTypePostfix = "may appear only with 'sourceType: module'"
 
 function enable(parser) {
+  parser.canDeclareLexicalName =
+  parser.canDeclareVarName = alwaysTrue
+
+  parser.checkExpressionErrors =
+  parser.checkPatternErrors =
+  parser.checkPropClash =
+  parser.checkYieldAwaitInDefaultParams =
+  parser.declareLexicalName =
+  parser.declareVarName =
+  parser.enterFunctionScope =
+  parser.enterLexicalScope =
+  parser.exitFunctionScope =
+  parser.exitLexicalScope = noop
+
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
   parser.raise = wrap(parser.raise, raise)
   parser.raiseRecoverable = wrap(parser.raise, raiseRecoverable)
   parser.strict = false
+
   return parser
 }
 
