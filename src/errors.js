@@ -33,6 +33,7 @@ function createClass(Super) {
   }
 
   Object.setPrototypeOf(NodeError.prototype, null)
+
   return NodeError
 }
 
