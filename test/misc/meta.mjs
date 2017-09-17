@@ -1,16 +1,19 @@
-import __dirname from "../__dirname.js"
 import assert from "assert"
 import path from "path"
+import url from "url"
 import ma1 from "../fixture/meta/a.mjs"
 import ma2 from "../fixture/meta/a.mjs?a#a"
 import mb1 from "../fixture/meta/b.mjs"
 import mb2 from "../fixture/meta/b.mjs?b#b"
 
+const __filename = new url.URL(import.meta.url).pathname
+const __dirname = path.dirname(__filename)
+
 const isWin = process.platform === "win32"
 const fileProtocol = "file:" + (isWin ? "///" : "//")
 const reBackSlash = /\\/g
 
-const metaPath = path.resolve(__dirname, "fixture/meta")
+const metaPath = path.resolve(__dirname, "../fixture/meta")
 const maPath = path.resolve(metaPath, "a.mjs")
 const mbPath = path.resolve(metaPath, "b.mjs")
 const maURL = getURLFromFilePath(maPath)

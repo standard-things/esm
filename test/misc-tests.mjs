@@ -1,10 +1,13 @@
 import SemVer from "semver"
 
-import __dirname from "./__dirname.js"
 import assert from "assert"
 import fs from "fs-extra"
 import path from "path"
 import require from "./require.js"
+import url from "url"
+
+const __filename = new url.URL(import.meta.url).pathname
+const __dirname = path.dirname(__filename)
 
 const isWin = process.platform === "win32"
 const pkgPath = path.resolve(__dirname, "../index.js")
