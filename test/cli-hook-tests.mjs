@@ -4,6 +4,7 @@ import execa from "execa"
 import path from "path"
 
 const isWin = process.platform === "win32"
+
 const NODE_BIN = path.resolve(__dirname, "./env/prefix", isWin ? "node.exe" : "bin/node")
 
 describe("command-line hook", () => {
