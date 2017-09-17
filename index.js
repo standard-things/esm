@@ -7,13 +7,18 @@ const util = require("util")
 const vm = require("vm")
 const zlib = require("zlib")
 
+// Guard against poorly mocked module constructors.
+const Module = module.constructor.length > 1
+  ? module.constructor
+  : require("module")
+
 const esmPath = path.resolve(__dirname, "esm.js.gz")
 const inspectKey = util.inspect.custom || "inspect"
 
 const descriptor = Object.create(null)
 descriptor.value = () => "@std/esm enabled"
 
-const mod = new module.constructor(module.id)
+const mod = new Module(module.id)
 mod.filename = __filename
 mod.parent = module.parent
 
