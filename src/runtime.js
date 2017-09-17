@@ -5,16 +5,13 @@ import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import { extname } from "path"
 import getSourceType from "./util/get-source-type.js"
+import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import has from "./util/has.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 import setProperty from "./util/set-property.js"
-
-const isWin = process.platform === "win32"
-const fileProtocol = "file:" + (isWin ? "///" : "//")
-const reBackSlash = /\\/g
 
 const esmDescriptor = {
   configurable: false,
@@ -118,10 +115,6 @@ class Runtime {
       moduleState.requireDepth -= 1
     }
   }
-}
-
-function getURLFromFilePath(filePath) {
-  return fileProtocol + filePath.replace(reBackSlash, "/")
 }
 
 function importModule(id, parent, loader, options) {
