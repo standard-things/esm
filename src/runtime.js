@@ -22,8 +22,9 @@ const esmDescriptor = {
 
 class Runtime {
   static enable(mod, exported, options) {
-    const object = mod.exports
     const entry = Entry.get(mod, exported, options)
+    const object = mod.exports
+    const { prototype } = Runtime
 
     object.entry = entry
     object.meta = new NullObject
@@ -31,13 +32,13 @@ class Runtime {
     object.options = entry.options
 
     object._ = object
-    object.d = object.default = Rp.default
-    object.e = object.export = Rp.export
-    object.i = object.import = Rp.import
-    object.n = object.nsSetter = Rp.nsSetter
-    object.r = object.run = Rp.run
-    object.u = object.update = Rp.update
-    object.w = object.watch = Rp.watch
+    object.d = object.default = prototype.default
+    object.e = object.export = prototype.export
+    object.i = object.import = prototype.import
+    object.n = object.nsSetter = prototype.nsSetter
+    object.r = object.run = prototype.run
+    object.u = object.update = prototype.update
+    object.w = object.watch = prototype.watch
   }
 
   // Register a getter function that always returns the given value.
@@ -172,14 +173,6 @@ function runESM(runtime, moduleWrapper) {
   }
 }
 
-const Rp = Object.setPrototypeOf(Runtime.prototype, null)
-
-Rp.d = Rp.default
-Rp.e = Rp.export
-Rp.i = Rp.import
-Rp.n = Rp.nsSetter
-Rp.r = Rp.run
-Rp.u = Rp.update
-Rp.w = Rp.watch
+Object.setPrototypeOf(Runtime.prototype, null)
 
 export default Runtime
