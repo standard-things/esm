@@ -85,7 +85,7 @@ env.repl =
   (rootModule.filename === null &&
    rootModule.id === "<repl>" &&
    rootModule.loaded === false &&
-   rootModule.parent === void 0 &&
+   rootModule.parent == null &&
    hasLoaderModule(rootModule.children))
 
 env.cli =
