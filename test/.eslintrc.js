@@ -1,3 +1,5 @@
+"use strict"
+
 module.exports = {
   rules: {
     "import/export": "off",
