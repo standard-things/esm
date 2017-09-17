@@ -36,7 +36,7 @@ function load(id, parent, isMain, options) {
 
   try {
     child = _load(cacheId, parent, isMain, state, function (cacheId) {
-      return loader.call(this, cacheId, filePath)
+      return loader.call(this, filePath, cacheId)
     })
 
     threw = false
@@ -60,7 +60,7 @@ function load(id, parent, isMain, options) {
   }
 }
 
-function loader(cacheId, filePath) {
+function loader(filePath, cacheId) {
   let ext = extname(filePath)
   const { extensions } = moduleState
 
