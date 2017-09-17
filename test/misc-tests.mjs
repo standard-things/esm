@@ -212,14 +212,17 @@ describe("Node rules", () => {
     import("./fixture/load-count.mjs")
       .then((oldNs) =>
         [
-          { id: "./fixture/load-count.mjs?",  count: 2 },
-          { id: "./fixture/load-count.mjs#",  count: 3 },
-          { id: "./fixture/load-count.mjs?",  count: 2 },
-          { id: "./fixture/load-count.mjs#",  count: 3 },
-          { id: "./fixture/load-count.mjs?4", count: 4 },
-          { id: "./fixture/load-count.mjs#5", count: 5 },
-          { id: "./fixture/load-count.mjs?4", count: 4 },
-          { id: "./fixture/load-count.mjs#5", count: 5 }
+          { id: "./fixture/load-count.mjs?",    count: 2 },
+          { id: "./fixture/load-count.mjs#",    count: 3 },
+          { id: "./fixture/load-count.mjs?",    count: 2 },
+          { id: "./fixture/load-count.mjs#",    count: 3 },
+          { id: "./fixture/load-count.mjs?4",   count: 4 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?4",   count: 4 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?6#6", count: 6 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?6#6", count: 6 }
         ].reduce((promise, data) =>
           promise
             .then(() => import(data.id))
