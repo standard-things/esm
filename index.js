@@ -18,7 +18,7 @@ const inspectKey = util.inspect.custom || "inspect"
 const descriptor = Object.create(null)
 descriptor.value = () => "@std/esm enabled"
 
-const mod = new Module(module.id)
+const mod = new Module(module.id, null)
 mod.filename = __filename
 mod.parent = module.parent
 

@@ -21,7 +21,7 @@ function hook(mod, options) {
     const pkgInfo = options ? null : PkgInfo.get(dirname(filePath))
     const loadOptions = pkgInfo ? pkgInfo.options : options
 
-    const copy = new Module(mod.id)
+    const copy = new Module(mod.id, null)
     copy.filename = mod.filename
     copy.parent = mod.parent
 
