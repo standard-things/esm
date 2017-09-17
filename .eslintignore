@@ -2,10 +2,10 @@
 /build
 /node_modules
 /src/vendor
-/test/misc/error
-/test/misc/source
+/test/fixture/error
+/test/fixture/source
 /test/node_modules/error
 /test/output
 /test/export/cycle-all.mjs
-/test/misc/export/dup-local.mjs
+/test/fixture/export/dup-local.mjs
 /test/misc/builtin/namespace.mjs

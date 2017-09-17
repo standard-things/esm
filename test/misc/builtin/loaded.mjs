@@ -2,8 +2,7 @@ import assert from "assert"
 import path from "path"
 
 export default () => {
-  // The "path" module is required in src/hook/compile.js
+  // The "path" module is required in src/hook/module.js
   // before the runtime is enabled.
-  assert.ok(path)
+  assert.ok(Object.keys(path).length)
 }
-

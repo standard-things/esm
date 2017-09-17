@@ -1,7 +1,7 @@
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
-import module from "./repl/module.mjs"
+import module from "./fixture/repl/module.mjs"
 import repl from "repl"
 import vm from "vm"
 

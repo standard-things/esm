@@ -15,10 +15,10 @@ const abcNs = {
   default: "default"
 }
 
-if (! fs.pathExistsSync("./require/a.mjs.gz")) {
-  const content = fs.readFileSync("./require/a.js")
+if (! fs.pathExistsSync("./fixture/require/a.mjs.gz")) {
+  const content = fs.readFileSync("./fixture/require/a.js")
   const gzipped = zlib.gzipSync(content)
-  fs.writeFileSync("./require/a.mjs.gz", gzipped)
+  fs.writeFileSync("./fixture/require/a.mjs.gz", gzipped)
 }
 
 beforeEach(() => {
@@ -33,7 +33,7 @@ describe("require hook", () => {
   })
 
   it("should support options", () => {
-    const cjsId = path.resolve(__dirname, "./import/cjs/id")
+    const cjsId = path.resolve(__dirname, "./import/cjs/dummy-id")
     const cjsMod = new module.constructor(cjsId)
     cjsMod.filename = cjsMod.id
 
@@ -43,16 +43,16 @@ describe("require hook", () => {
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
 
-    allRequire("./require/this.js")
+    allRequire("./fixture/require/this.js")
     assert.strictEqual(global.this, "undefined")
 
     let exported = cjsRequire("./cjs")
     exported.default()
 
-    exported = gzRequire("./require/a.mjs.gz")
+    exported = gzRequire("./fixture/require/a.mjs.gz")
     assert.deepEqual(exported, abcNs)
 
-    exported = jsRequire("./require/a.js")
+    exported = jsRequire("./fixture/require/a.js")
     assert.deepEqual(exported, abcNs)
 
     exported = mjsRequire(abcId)

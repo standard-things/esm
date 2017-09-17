@@ -13,7 +13,7 @@ describe("module.runMain hook", () => {
     return Promise.all(options.map((option) => {
       const args = [
         option, "../index.js",
-        "./main/main.mjs"
+        "./fixture/main.mjs"
       ]
 
       return execa(NODE_BIN, args, {

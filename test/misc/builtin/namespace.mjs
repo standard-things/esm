@@ -8,7 +8,7 @@ export default () => {
   const nsTag = useToStringTag ? "[object Module]" : "[object Object]"
 
   assert.ok(Object.isSealed(ns))
-  assert.deepEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
   assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
+  assert.deepEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
   assert.deepEqual(Object.getOwnPropertyNames(ns), ["default"])
 }

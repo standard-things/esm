@@ -31,15 +31,9 @@ beforeEach(() => {
 })
 
 describe("built-in modules", () => {
-  it("should load built-ins from CJS", () =>
-    import("./misc/builtin/load.js")
-      .then((ns) => assert.ok(Object.keys(ns).length))
-      .catch((e) => assert.ifError(e))
-  )
-
-  it("should load built-ins from ESM", () =>
+  it("should load built-in modules", () =>
     import("./misc/builtin/load.mjs")
-      .then((ns) => assert.ok(Object.keys(ns).length))
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
@@ -91,17 +85,17 @@ describe("package.json", () => {
 
 describe("errors", () => {
   it("should not wrap custom errors", () =>
-    import("./misc/custom-error.mjs")
+    import("./fixture/error/custom.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e, global.customError))
   )
 
   it("should mask stack arrows", () => {
-    const id1 = path.resolve(__dirname, "./misc/error/import-error.mjs")
-    const id2 = path.resolve(__dirname, "./misc/error/export-error.js")
-    const id3 = path.resolve(__dirname, "./misc/error/import-error.js")
-    const id4 = path.resolve(__dirname, "./misc/error/nested-error.mjs")
-    const id5 = path.resolve(__dirname, "./misc/error/syntax-error.js")
+    const id1 = path.resolve(__dirname, "./fixture/error/import.mjs")
+    const id2 = path.resolve(__dirname, "./fixture/error/export.js")
+    const id3 = path.resolve(__dirname, "./fixture/error/import.js")
+    const id4 = path.resolve(__dirname, "./fixture/error/nested.mjs")
+    const id5 = path.resolve(__dirname, "./fixture/error/syntax.js")
     const id6 = path.resolve(__dirname, "./node_modules/error/index.js")
 
     function check(error, startsWith) {
@@ -126,7 +120,7 @@ describe("errors", () => {
         .catch((e) =>
           check(e, [
             id3 + ":1",
-            'import { a } from "./export-error.js"',
+            'import { a } from "./export.js"',
             "^"
           ].join("\n"))
         ),
@@ -161,7 +155,7 @@ describe("errors", () => {
   })
 
   it("should mask stack traces", () =>
-    import("./misc/error/import-error.mjs")
+    import("./fixture/error/import.mjs")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
   )
@@ -170,7 +164,7 @@ describe("errors", () => {
 describe("Node rules", () => {
   it("should find `.mjs` before `.js`", () =>
     Promise.all([
-      "./misc/priority",
+      "./fixture/priority",
       "priority"
     ].map((id) =>
       import(id)
@@ -193,9 +187,9 @@ describe("Node rules", () => {
 
   it("should support ids containing colons", () =>
     Promise.all([
-      "./misc/with:colon.mjs",
-      "./misc/with%3acolon.mjs",
-      "./misc/with%3Acolon.mjs"
+      "./fixture/with:colon.mjs",
+      "./fixture/with%3acolon.mjs",
+      "./fixture/with%3Acolon.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
@@ -205,8 +199,8 @@ describe("Node rules", () => {
 
   it('should support local "." ids', () =>
     Promise.all([
-      "./misc/relative/dot.js",
-      "./misc/relative/dot-slash.js"
+      "./fixture/relative/dot.js",
+      "./fixture/relative/dot-slash.js"
     ].map((id) =>
       import(id)
         .then((ns) => assert.deepEqual(ns.default, "inside dot"))
@@ -215,17 +209,17 @@ describe("Node rules", () => {
   )
 
   it("should reevaluate for ids with different query+hash", () =>
-    import("./misc/load-count.mjs")
+    import("./fixture/load-count.mjs")
       .then((oldNs) =>
         [
-          { id: "./misc/load-count.mjs?",  count: 2 },
-          { id: "./misc/load-count.mjs#",  count: 3 },
-          { id: "./misc/load-count.mjs?",  count: 2 },
-          { id: "./misc/load-count.mjs#",  count: 3 },
-          { id: "./misc/load-count.mjs?4", count: 4 },
-          { id: "./misc/load-count.mjs#5", count: 5 },
-          { id: "./misc/load-count.mjs?4", count: 4 },
-          { id: "./misc/load-count.mjs#5", count: 5 }
+          { id: "./fixture/load-count.mjs?",  count: 2 },
+          { id: "./fixture/load-count.mjs#",  count: 3 },
+          { id: "./fixture/load-count.mjs?",  count: 2 },
+          { id: "./fixture/load-count.mjs#",  count: 3 },
+          { id: "./fixture/load-count.mjs?4", count: 4 },
+          { id: "./fixture/load-count.mjs#5", count: 5 },
+          { id: "./fixture/load-count.mjs?4", count: 4 },
+          { id: "./fixture/load-count.mjs#5", count: 5 }
         ].reduce((promise, data) =>
           promise
             .then(() => import(data.id))
@@ -278,9 +272,9 @@ describe("Node rules", () => {
 
   it("should not reevaluate errors", () =>
     [
-      "./misc/reevaluate-error.mjs",
-      "./misc/reevaluate-error.mjs?a",
-      "./misc/reevaluate-error.mjs#a"
+      "./fixture/reevaluate-error.mjs",
+      "./fixture/reevaluate-error.mjs?a",
+      "./fixture/reevaluate-error.mjs#a"
     ].reduce((promise, id, index) =>
       promise
         .then(() => {
@@ -305,7 +299,7 @@ describe("Node rules", () => {
 
   it("should not support custom file extensions in ESM", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
-    return import("./misc/cof")
+    return import("./fixture/cof")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
@@ -318,10 +312,10 @@ describe("Node rules", () => {
   })
 
   it("should not cache ES modules in `require.cache`", () => {
-    const filePath = path.resolve(__dirname, "./misc/cache/out.mjs")
+    const filePath = path.resolve(__dirname, "./fixture/cache/out.mjs")
 
     delete require.cache[filePath]
-    return import("./misc/cache/out/")
+    return import("./fixture/cache/out/")
       .then(() => assert.strictEqual(filePath in require.cache, false))
       .catch((e) => assert.ifError(e))
   })
@@ -356,10 +350,10 @@ describe("Node rules", () => {
   })
 
   it("should cache ES modules in `require.cache` with `options.cjs`", () => {
-    const filePath = path.resolve(__dirname, "./misc/cache/in.mjs")
+    const filePath = path.resolve(__dirname, "./fixture/cache/in.mjs")
 
     delete require.cache[filePath]
-    return import("./misc/cache/in/")
+    return import("./fixture/cache/in/")
       .then(() => assert.ok(filePath in require.cache))
       .catch((e) => assert.ifError(e))
   })
@@ -409,7 +403,7 @@ describe("spec compliance", () => {
   )
 
   it("should load CJS modules that delete their cache entry", () => {
-    return import("./misc/delete-cache.js")
+    return import("./fixture/delete-cache.js")
       .then((ns) => assert.deepEqual(ns.default, "delete cache"))
       .catch((e) => assert.ifError(e))
   })
@@ -421,7 +415,7 @@ describe("spec compliance", () => {
   )
 
   it("should support loading ESM from dynamic import in CJS", (done) => {
-    import("./import/import.js")
+    import("./misc/import.js")
       .then((ns) => ns.default(done))
       .catch((e) => assert.ifError(e))
   })
@@ -433,7 +427,7 @@ describe("spec compliance", () => {
   )
 
   it("should not export CJS named binding", () =>
-    import("./misc/export/cjs-named.mjs")
+    import("./fixture/export/cjs-named.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -442,7 +436,7 @@ describe("spec compliance", () => {
   )
 
   it("should not support `import.meta` in CJS", () =>
-    import("./misc/meta/a.js")
+    import("./fixture/meta/a.js")
       .then((ns) => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -451,25 +445,25 @@ describe("spec compliance", () => {
   )
 
   it("should not support loading ESM from require", () =>
-    import("./misc/require-esm.js")
+    import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
   )
 
   it("should not support loading ESM from require if already loaded", () =>
-    import("./misc/require-esm.js")
+    import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
   )
 
   it("should not execute already loaded modules from require", () =>
-    import("./misc/load-count.js")
-      .then(() => import("./misc/require-load-count.js"))
+    import("./fixture/load-count.js")
+      .then(() => import("./fixture/require-load-count.js"))
       .then((ns) => assert.strictEqual(ns.default, 1))
   )
 
   it("should throw a syntax error when exporting duplicate local bindings", () =>
-    import("./misc/export/dup-local.mjs")
+    import("./fixture/export/dup-local.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -478,7 +472,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when exporting duplicate namespace bindings", () =>
-    import("./misc/export/dup-namespace.mjs")
+    import("./fixture/export/dup-namespace.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -488,8 +482,8 @@ describe("spec compliance", () => {
 
   it("should throw a syntax error when importing non-exported binding", () =>
     Promise.all([
-      "./misc/import/missing-cjs.mjs",
-      "./misc/import/missing-esm.mjs",
+      "./fixture/import/missing-cjs.mjs",
+      "./fixture/import/missing-esm.mjs",
       "./fixture/cycle/missing/a.mjs"
     ].map((id) =>
       import(id)
@@ -503,8 +497,8 @@ describe("spec compliance", () => {
 
   it("should throw a type error when setting an imported identifier", () =>
     Promise.all([
-      "./misc/import/const.mjs",
-      "./misc/import/let.mjs"
+      "./fixture/import/const.mjs",
+      "./fixture/import/let.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -516,7 +510,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when accessing top-level `arguments`", () =>
-    import("./misc/source/arguments-binding.mjs")
+    import("./fixture/source/arguments-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -526,8 +520,8 @@ describe("spec compliance", () => {
 
   it("should throw a syntax error when creating an `arguments` binding", () =>
     Promise.all([
-      "./misc/source/arguments-undefined.mjs",
-      "./misc/source/arguments-undefined-nested.mjs"
+      "./fixture/source/arguments-undefined.mjs",
+      "./fixture/source/arguments-undefined-nested.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -539,7 +533,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when creating an `await` binding", () =>
-    import("./misc/source/await-binding.mjs")
+    import("./fixture/source/await-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -548,7 +542,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when using top-level `new.target`", () =>
-    import("./misc/source/new-target.mjs")
+    import("./fixture/source/new-target.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -557,7 +551,7 @@ describe("spec compliance", () => {
   )
 
   it("should throw a syntax error when using an opening HTML comment in ESM", () =>
-    import("./misc/source/html-comment.mjs")
+    import("./fixture/source/html-comment.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
@@ -566,19 +560,19 @@ describe("spec compliance", () => {
   )
 
   it("should not throw when accessing `arguments` in a function", () =>
-    import("./misc/source/arguments-function.mjs")
+    import("./fixture/source/arguments-function.mjs")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when typeof checking `arguments`", () =>
-    import("./misc/source/arguments-typeof.mjs")
+    import("./fixture/source/arguments-typeof.mjs")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when using an opening HTML comment in CJS", () =>
-    import("./misc/source/html-comment.js")
+    import("./fixture/source/html-comment.js")
       .then(() => assert.ok(true))
       .catch((e) => assert.ifError(e))
   )

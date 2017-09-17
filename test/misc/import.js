@@ -10,7 +10,7 @@ module.exports = function (done) {
     default: "default"
   }
 
-  import("../file-extension/a.mjs")
+  import("../fixture/file-extension/a.mjs")
     .then((ns) => {
       assert.deepEqual(ns, abcNs)
       done()

@@ -1,7 +1,7 @@
 import assert from "assert"
 
-const customValue = require("./custom.mjs")
-const defaultValue = require("./default.mjs")
+const customValue = require("../../fixture/esmodule/custom.mjs")
+const defaultValue = require("../../fixture/esmodule/default.mjs")
 const noValue = require("../../fixture/export/abc.mjs")
 
 export default () => {
