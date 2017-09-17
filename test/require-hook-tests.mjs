@@ -34,7 +34,7 @@ describe("require hook", () => {
 
   it("should support options", () => {
     const cjsId = path.resolve(__dirname, "./import/cjs/dummy-id")
-    const cjsMod = new module.constructor(cjsId)
+    const cjsMod = new module.constructor(cjsId, null)
     cjsMod.filename = cjsMod.id
 
     const allRequire = makeRequire(module, { esm: "all" })
