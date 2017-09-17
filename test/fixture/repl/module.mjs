@@ -1,9 +1,10 @@
 import module from "../../module.js"
 import path from "path"
 import require from "../../require.js"
-import url from "url"
 
-const __filename = new url.URL(import.meta.url).pathname
+const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
 // Masquerade as the REPL module.

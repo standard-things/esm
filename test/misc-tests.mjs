@@ -4,12 +4,12 @@ import assert from "assert"
 import fs from "fs-extra"
 import path from "path"
 import require from "./require.js"
-import url from "url"
-
-const __filename = new url.URL(import.meta.url).pathname
-const __dirname = path.dirname(__filename)
 
 const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
+const __dirname = path.dirname(__filename)
+
 const pkgPath = path.resolve(__dirname, "../index.js")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 

@@ -3,10 +3,11 @@ import fs from "fs-extra"
 import makeRequire from "../index.js"
 import module from "./module.js"
 import path from "path"
-import url from "url"
 import zlib from "zlib"
 
-const __filename = new url.URL(import.meta.url).pathname
+const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
 const abcId = "./fixture/export/abc.mjs"

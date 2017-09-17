@@ -1,15 +1,15 @@
 import assert from "assert"
 import path from "path"
-import url from "url"
 import ma1 from "../fixture/meta/a.mjs"
 import ma2 from "../fixture/meta/a.mjs?a#a"
 import mb1 from "../fixture/meta/b.mjs"
 import mb2 from "../fixture/meta/b.mjs?b#b"
 
-const __filename = new url.URL(import.meta.url).pathname
+const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
-const isWin = process.platform === "win32"
 const fileProtocol = "file:" + (isWin ? "///" : "//")
 const reBackSlash = /\\/g
 

@@ -1,12 +1,11 @@
 import assert from "assert"
 import execa from "execa"
 import path from "path"
-import url from "url"
-
-const __filename = new url.URL(import.meta.url).pathname
-const __dirname = path.dirname(__filename)
 
 const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
+const __dirname = path.dirname(__filename)
 
 const NODE_BIN = path.resolve(__dirname, "./env/prefix", isWin ? "node.exe" : "bin/node")
 
