@@ -10,7 +10,9 @@ import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
+import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
+import setSetter from "./util/set-setter.js"
 
 const esmDescriptor = {
   configurable: false,
@@ -26,9 +28,18 @@ class Runtime {
     const { prototype } = Runtime
 
     object.entry = entry
-    object.meta = new NullObject
     object.module = mod
     object.options = entry.options
+
+    setGetter(object, "meta", () => {
+      const meta = new NullObject
+      meta.url = mod.url
+      return object.meta = meta
+    })
+
+    setSetter(object, "meta", (value) => {
+      setProperty(object, "meta", { value })
+    })
 
     object._ = object
     object.d = object.default = prototype.default
@@ -156,10 +167,9 @@ function runCJS(runtime, moduleWrapper) {
 }
 
 function runESM(runtime, moduleWrapper) {
-  const { entry, meta, module:mod, options } = runtime
+  const { entry, module:mod, options } = runtime
   const exported = mod.exports = entry.exports
 
-  meta.url = mod.url
   moduleWrapper.call(options.cjs ? exported : void 0)
   mod.loaded = true
 
