@@ -2,7 +2,6 @@
 // Copyright Sindre Sorhus. Released under MIT license:
 // https://github.com/sindresorhus/file-url
 
-import createOptions from "./create-options.js"
 import encodeURI from "./encode-uri.js"
 import { resolve } from "path"
 
@@ -11,10 +10,10 @@ const codeOfSlash = "/".charCodeAt(0)
 const reBackSlash = /\\/g
 const reEncodeChars = /[?#]/g
 
-const encodeCharMap = createOptions({
+const encodeCharMap = {
   "#": "%23",
   "?": "%3F"
-})
+}
 
 function encodeChar(char) {
   return encodeCharMap[char]

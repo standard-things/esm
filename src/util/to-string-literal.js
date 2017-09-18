@@ -1,4 +1,3 @@
-import createOptions from "./create-options.js"
 import toString from "./to-string.js"
 
 const codeOfDoubleQuote = '"'.charCodeAt(0)
@@ -7,19 +6,19 @@ const { stringify } = JSON
 
 const escapedDoubleQuoteRegExp = /\\"/g
 
-const escapeRegExpMap = createOptions({
+const escapeRegExpMap = {
   "'": /\\?'/g,
   "`": /\\?`/g
-})
+}
 
-const quoteMap = createOptions({
+const quoteMap = {
   '"': '"',
   "'": "'",
   "`": "`",
   "back": "`",
   "double": '"',
   "single": "'"
-})
+}
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'

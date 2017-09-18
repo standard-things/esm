@@ -10,12 +10,12 @@ import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
-const defaultOptions = createOptions({
+const defaultOptions = {
   cache: ".esm-cache",
   cjs: false,
   debug: false,
   esm: "mjs"
-})
+}
 
 const infoCache = new FastObject
 

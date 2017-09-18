@@ -6,11 +6,11 @@ import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
 import { enable as enableObjectRestSpread } from "./acorn-ext/object-rest-spread.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
-const defaultOptions = createOptions({
+const defaultOptions = {
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
   sourceType: "module"
-})
+}
 
 class Parser {
   static defaultOptions = defaultOptions

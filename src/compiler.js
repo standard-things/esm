@@ -8,13 +8,13 @@ import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
 
-const defaultOptions = createOptions({
+const defaultOptions = {
   cjs: false,
   hint: "script",
   runtimeAlias: "_",
   type: "module",
   var: false
-})
+}
 
 const argumentsRegExp = /\barguments\b/
 const importExportRegExp = /\b(?:im|ex)port\b/
