@@ -8,7 +8,7 @@ import { resolve } from "path"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const fileProtocol = "file://"
+const protocol = "file://"
 
 const reBackSlash = /\\/g
 const reQMarkHash = /[?#]/g
@@ -22,7 +22,7 @@ function getURLFromFilePath(filePath) {
 
   // Section 3.3: Escape path components
   // https://tools.ietf.org/html/rfc3986#section-3.3
-  return fileProtocol + encodeURI(filePath).replace(reQMarkHash, encodeURIComponent)
+  return protocol + encodeURI(filePath).replace(reQMarkHash, encodeURIComponent)
 }
 
 export default getURLFromFilePath
