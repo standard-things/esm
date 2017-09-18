@@ -1,35 +1,31 @@
 import assert from "assert"
 import path from "path"
-import ma1 from "../fixture/meta/a.mjs"
-import ma2 from "../fixture/meta/a.mjs?a#a"
-import mb1 from "../fixture/meta/b.mjs"
-import mb2 from "../fixture/meta/b.mjs?b#b"
+import mc1 from "../fixture/with%3Acolon.mjs"
+import mc2 from "../fixture/with%3Acolon.mjs?a#a"
+import mp1 from "../fixture/with%23pound.mjs"
+import mp2 from "../fixture/with%23pound.mjs?b#b"
 
 const isWin = process.platform === "win32"
 
 const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
-const fileProtocol = "file:" + (isWin ? "///" : "//")
-const reBackSlash = /\\/g
+const testPath = path.resolve(__dirname, "..")
+const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
 
-const metaPath = path.resolve(__dirname, "../fixture/meta")
-const maPath = path.resolve(metaPath, "a.mjs")
-const mbPath = path.resolve(metaPath, "b.mjs")
-const maURL = getURLFromFilePath(maPath)
-const mbURL = getURLFromFilePath(mbPath)
+const mcPath = path.resolve(testPath, "./fixture/with%3Acolon.mjs")
+const mcURL = testURL + "/fixture/with:colon.mjs"
 
-function getURLFromFilePath(filePath) {
-  return fileProtocol + filePath.replace(reBackSlash, "/")
-}
+const mpPath = path.resolve(testPath, "./fixture/with%23pound.mjs")
+const mpURL = testURL + "/fixture/with%23pound.mjs"
 
 export default () => {
-  const defs = [ma1, ma2, mb1, mb2]
+  const defs = [mc1, mc2, mp1, mp2]
   defs.forEach((def) => assert.strictEqual(Object.getPrototypeOf(def), null))
 
-  assert.deepEqual(ma1, { url: maURL })
-  assert.deepEqual(ma2, { url: maURL + "?a#a" })
+  assert.deepEqual(mc1, { url: mcURL })
+  assert.deepEqual(mc2, { url: mcURL + "?a#a" })
 
-  assert.deepEqual(mb1, { url: mbURL })
-  assert.deepEqual(mb2, { url: mbURL + "?b#b" })
+  assert.deepEqual(mp1, { url: mpURL })
+  assert.deepEqual(mp2, { url: mpURL + "?b#b" })
 }

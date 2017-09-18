@@ -200,6 +200,12 @@ describe("Node rules", () => {
     ))
   )
 
+  it("should support ids containing pounds", () =>
+    import("./fixture/with%23pound.mjs")
+      .then(() => assert.ok(true))
+      .catch((e) => assert.ifError(e))
+  )
+
   it('should support local "." ids', () =>
     Promise.all([
       "./fixture/relative/dot.js",
@@ -442,7 +448,7 @@ describe("spec compliance", () => {
   )
 
   it("should not support `import.meta` in CJS", () =>
-    import("./fixture/meta/a.js")
+    import("./fixture/meta.js")
       .then((ns) => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)

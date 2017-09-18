@@ -1,1 +1,1 @@
-import "assert"
+export default import.meta
