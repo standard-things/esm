@@ -5,7 +5,6 @@ import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import { extname } from "path"
 import getSourceType from "./util/get-source-type.js"
-import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import has from "./util/has.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
@@ -160,7 +159,7 @@ function runESM(runtime, moduleWrapper) {
   const { entry, meta, module:mod, options } = runtime
   const exported = mod.exports = entry.exports
 
-  meta.url = getURLFromFilePath(mod.filename)
+  meta.url = mod.url
   moduleWrapper.call(options.cjs ? exported : void 0)
   mod.loaded = true
 

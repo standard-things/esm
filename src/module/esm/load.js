@@ -6,6 +6,7 @@ import _load from "../_load.js"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getSourceType from "../../util/get-source-type.js"
+import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
@@ -13,7 +14,9 @@ import setGetter from "../../util/set-getter.js"
 
 function load(id, parent, isMain, options) {
   const filePath = resolveFilename(id, parent, isMain, options)
-  const cacheId = filePath + getQueryHash(id)
+  const queryHash = getQueryHash(id)
+  const cacheId = filePath + queryHash
+  const url = getURLFromFilePath(filePath) + queryHash
 
   let child
   let state
@@ -35,8 +38,8 @@ function load(id, parent, isMain, options) {
   let threw = true
 
   try {
-    child = _load(cacheId, parent, isMain, state, function (cacheId) {
-      return loader.call(this, filePath, cacheId)
+    child = _load(cacheId, parent, isMain, state, function () {
+      return loader.call(this, filePath, url)
     })
 
     threw = false
@@ -60,7 +63,7 @@ function load(id, parent, isMain, options) {
   }
 }
 
-function loader(filePath, cacheId) {
+function loader(filePath, url) {
   let ext = extname(filePath)
   const { extensions } = moduleState
 
@@ -76,8 +79,9 @@ function loader(filePath, cacheId) {
     return
   }
 
-  mod.filename = cacheId
+  mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
+  mod.url = url
 
   extCompiler.call(extensions, mod, filePath)
   mod.loaded = true
