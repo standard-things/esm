@@ -71,8 +71,11 @@ function loader(filePath, url) {
     ext = ".js"
   }
 
-  const extCompiler = extensions[ext]
   const mod = this
+  const entry = Entry.get(mod)
+  const extCompiler = extensions[ext]
+
+  entry.url = url
 
   if (typeof extCompiler !== "function") {
     mod.load(filePath)
@@ -81,7 +84,6 @@ function loader(filePath, url) {
 
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
-  mod.url = url
 
   extCompiler.call(extensions, mod, filePath)
   mod.loaded = true

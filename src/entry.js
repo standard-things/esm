@@ -54,8 +54,10 @@ class Entry {
     this.options = createOptions(options)
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
-    // Set the default source type.
+    // The source type of the module.
     this.sourceType = getSourceType(exported)
+    // The file url of the module.
+    this.url = null
     /* eslint-enable lines-around-comment */
   }
 
@@ -353,7 +355,8 @@ function getExportByName(entry, setter, name) {
   }
 
   if (isScript ||
-      (entry._loaded && ! (name in _namespace))) {
+      (entry._loaded === 1 &&
+       ! (name in _namespace))) {
     raiseMissingExport(entry, name)
   }
 

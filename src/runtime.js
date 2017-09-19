@@ -23,7 +23,10 @@ const esmDescriptor = {
 
 class Runtime {
   static enable(mod, exported, options) {
-    const entry = Entry.get(mod, exported, options)
+    const entry = Entry.get(mod)
+    entry.merge(new Entry(mod, exported, options))
+    Entry.set(exported, entry)
+
     const object = mod.exports
     const { prototype } = Runtime
 
@@ -33,7 +36,7 @@ class Runtime {
 
     setGetter(object, "meta", () => {
       const meta = new NullObject
-      meta.url = mod.url
+      meta.url = entry.url
       return object.meta = meta
     })
 
@@ -116,7 +119,14 @@ class Runtime {
     try {
       const child = importModule(id, mod, loadESM, options)
       const childEntry = Entry.get(child)
+      const exported = child.exports
 
+      childEntry.merge(Entry.get(child, exported, options))
+      childEntry.exports = exported
+      childEntry.sourceType = getSourceType(exported)
+      Entry.set(exported, childEntry)
+
+      childEntry.loaded()
       entry.children[child.id] = childEntry
 
       if (setterPairs) {
@@ -150,19 +160,20 @@ function importModule(id, parent, loader, options) {
 
 function runCJS(runtime, moduleWrapper) {
   const { entry, module:mod, options } = runtime
-  const exported = mod.exports = entry.exports
   const loader = options.cjs ? loadESM : loadCJS
   const requirer = (id) => importModule(id, mod, loader, options).exports
   const req = makeRequireFunction(mod, requirer)
 
+  let exported = mod.exports = entry.exports
   moduleWrapper.call(exported, exported, req)
+  exported = mod.exports
+
+  entry.merge(Entry.get(mod, exported, options))
+  entry.exports = exported
+  entry.sourceType = getSourceType(exported)
+  Entry.set(exported, entry)
+
   mod.loaded = true
-
-  entry.merge(Entry.get(mod, mod.exports, options))
-  entry.exports = mod.exports
-  entry.sourceType = getSourceType(entry.exports)
-
-  Entry.set(mod.exports, entry)
   entry.update().loaded()
 }
 
