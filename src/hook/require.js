@@ -33,7 +33,7 @@ function hook(mod, options) {
       }
     }
 
-    return moduleLoad(filePath, copy, loadOptions).exports
+    return moduleLoad(filePath, copy, false, loadOptions).exports
   })
 }
 
