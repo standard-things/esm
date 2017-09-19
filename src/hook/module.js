@@ -34,14 +34,16 @@ const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
 function hook(Module, parent, options) {
-  const parentFilename = parent && parent.filename
-  const parentPkgInfo = parentFilename ? PkgInfo.get(dirname(parentFilename)) : null
-
   options = isObjectLike(options) ? options : null
 
   const { _extensions } = Module
   const jsCompiler = Wrapper.unwrap(_extensions, ".js")
   const passthruMap = new SafeMap
+
+  const parentFilename = parent && parent.filename
+  const parentPkgInfo = options && parentFilename
+    ? PkgInfo.get(dirname(parentFilename))
+    : null
 
   let allowTopLevelAwait = isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")
