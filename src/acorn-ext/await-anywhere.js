@@ -6,9 +6,8 @@ function enable(parser) {
 }
 
 function parseMaybeUnary(func, args) {
-  const [refDestructuringErrors] = args
   return this.isContextual("await")
-    ? this.parseAwait(refDestructuringErrors)
+    ? this.parseAwait()
     : func.apply(this, args)
 }
 

@@ -15,7 +15,7 @@ function enable(parser) {
 
 function parseObj(func, args) {
   let first = true
-  const [isPattern, refDestructuringErrors] = args
+  const [isPattern] = args
   const node = this.startNode()
 
   node.properties = []
@@ -37,7 +37,7 @@ function parseObj(func, args) {
     let startPos
     let propNode = this.startNode()
 
-    if (isPattern || refDestructuringErrors) {
+    if (isPattern) {
       startPos = this.start
       startLoc = this.startLoc
     }
@@ -46,7 +46,7 @@ function parseObj(func, args) {
     // Copyright Babylon contributors. Released under MIT license:
     // https://github.com/babel/babylon/blob/master/src/parser/expression.js
     if (this.type === tt.ellipsis) {
-      propNode = this.parseSpread(refDestructuringErrors)
+      propNode = this.parseSpread()
       propNode.type = "SpreadElement"
 
       if (isPattern) {
@@ -71,10 +71,10 @@ function parseObj(func, args) {
         ! isGenerator &&
         isAsyncProp(this, propNode)) {
       isAsync = true
-      this.parsePropertyName(propNode, refDestructuringErrors)
+      this.parsePropertyName(propNode)
     }
 
-    this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+    this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc)
     node.properties.push(this.finishNode(propNode, "Property"))
   }
 
@@ -82,7 +82,7 @@ function parseObj(func, args) {
 }
 
 function toAssignable(func, args) {
-  const [node, isBinding] = args
+  const [node] = args
 
   if (node && node.type === "ObjectExpression") {
     node.type = "ObjectPattern"
@@ -90,9 +90,9 @@ function toAssignable(func, args) {
 
     for (const propNode of properties) {
       if (propNode.kind === "init") {
-        this.toAssignable(propNode.value, isBinding)
+        this.toAssignable(propNode.value)
       } else if (propNode.type === "SpreadElement") {
-        propNode.value = this.toAssignable(propNode.argument, isBinding)
+        propNode.value = this.toAssignable(propNode.argument)
       } else {
         raise(this, propNode.key.start, "Object pattern can't contain getter or setter")
       }
