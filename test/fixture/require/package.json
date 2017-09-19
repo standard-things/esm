@@ -1,0 +1,7 @@
+{
+  "name": "require",
+  "private": true,
+  "devDependencies": {
+    "@std/esm": "0.0.0"
+  }
+}

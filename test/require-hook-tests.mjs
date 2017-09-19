@@ -47,19 +47,19 @@ describe("require hook", () => {
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
 
+    const exports = [
+      gzRequire("./fixture/require/a.mjs.gz"),
+      jsRequire("./fixture/require/a.js"),
+      mjsRequire(abcId)
+    ]
+
+    exports.forEach((exported) => assert.deepEqual(exported, abcNs))
+
+    cjsRequire("./cjs").default()
     allRequire("./fixture/require/this.js")
+
+    assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
-
-    let exported = cjsRequire("./cjs")
-    exported.default()
-
-    exported = gzRequire("./fixture/require/a.mjs.gz")
-    assert.deepEqual(exported, abcNs)
-
-    exported = jsRequire("./fixture/require/a.js")
-    assert.deepEqual(exported, abcNs)
-
-    exported = mjsRequire(abcId)
-    assert.deepEqual(exported, abcNs)
+    assert.strictEqual(fs.pathExistsSync("./fixture/require/.esm-cache"), false)
   })
 })
