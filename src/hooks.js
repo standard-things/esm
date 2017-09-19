@@ -36,7 +36,7 @@ hooks.require = (mod, options) => {
     }
   }
 
-  moduleHook(Module, options)
+  moduleHook(Module, mod, options)
   return requireHook(mod, options)
 }
 

@@ -33,7 +33,10 @@ import stat from "../fs/stat.js"
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
-function hook(Module, options) {
+function hook(Module, parent, options) {
+  const parentFilename = parent && parent.filename
+  const parentPkgInfo = parentFilename ? PkgInfo.get(dirname(parentFilename)) : null
+
   options = isObjectLike(options) ? options : null
 
   const { _extensions } = Module
@@ -52,6 +55,11 @@ function hook(Module, options) {
       pkgInfo = PkgInfo.read(dirPath, true)
       PkgInfo.set(dirPath, pkgInfo)
       assign(pkgInfo.options, options)
+
+      if (parentPkgInfo) {
+        pkgInfo.cache = parentPkgInfo.cache
+        pkgInfo.cachePath = parentPkgInfo.cachePath
+      }
     }
 
     const wrapped = (pkgInfo && pkgInfo.options)
