@@ -244,9 +244,22 @@ class Entry {
   }
 
   merge(otherEntry) {
-    if (otherEntry !== this) {
-      for (const key in otherEntry) {
+    if (otherEntry === this) {
+      return this
+    }
+
+    for (const key in otherEntry) {
+      if (this._loaded !== 1 &&
+          key === "namespace") {
         assignProperty(this, otherEntry, key)
+      } else {
+        const value = otherEntry[key]
+
+        if (key === "_loaded"
+            ? value > this._loaded
+            : value != null) {
+          this[key] = value
+        }
       }
     }
 
