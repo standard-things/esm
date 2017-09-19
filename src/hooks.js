@@ -29,7 +29,11 @@ hooks.repl = () => {
 
 hooks.require = (mod, options) => {
   if (options === true) {
-    options = PkgInfo.get(dirname(mod.filename))
+    const pkgInfo = PkgInfo.get(dirname(mod.filename))
+
+    if (pkgInfo) {
+      options = pkgInfo.options
+    }
   }
 
   moduleHook(Module, options)
