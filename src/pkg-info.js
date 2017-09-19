@@ -106,11 +106,13 @@ class PkgInfo {
     // enabled in development would be undesired in this case.
     let range =
       getRange(pkgJSON, "dependencies") ||
-      getRange(pkgJSON, "peerDependencies") ||
-      getRange(pkgJSON, "devDependencies")
+      getRange(pkgJSON, "peerDependencies")
 
-    if (range === null) {
-      if (options || force) {
+    if (force) {
+      range = "*"
+    } else if (range === null) {
+      if (options ||
+          getRange(pkgJSON, "devDependencies")) {
         range = "*"
       } else {
         return null
