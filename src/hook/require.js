@@ -9,27 +9,27 @@ import makeRequireFunction from "../module/make-require-function.js"
 import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
-function hook(mod, options) {
+function hook(parent, options) {
   options = isObjectLike(options) ? options : null
 
-  return makeRequireFunction(mod, (id) => {
+  return makeRequireFunction(parent, (id) => {
     if (id in builtinModules) {
       return builtinModules[id].exports
     }
 
-    const filePath = resolveFilename(id, mod, false, options)
+    const filePath = resolveFilename(id, parent, false, options)
     const pkgInfo = options ? null : PkgInfo.get(dirname(filePath))
     const loadOptions = pkgInfo ? pkgInfo.options : options
 
-    const copy = new Module(mod.id, null)
-    copy.filename = mod.filename
-    copy.parent = mod.parent
+    const copy = new Module(parent.id, null)
+    copy.filename = parent.filename
+    copy.parent = parent.parent
 
-    const names = keys(mod)
+    const names = keys(parent)
 
     for (const name of names) {
       if (name !== "constructor") {
-        copy[name] = mod[name]
+        copy[name] = parent[name]
       }
     }
 
