@@ -87,6 +87,9 @@ function parseImportCallAtom(parser) {
 }
 
 function parseImportMetaPropertyAtom(parser) {
+  // The meta property code is adapted from Babylon.
+  // Copyright Babylon contributors. Released under MIT license:
+  // https://github.com/babel/babylon/blob/master/src/parser/expression.js
   const node = parser.startNode()
   const meta = parser.parseIdent(true)
 
