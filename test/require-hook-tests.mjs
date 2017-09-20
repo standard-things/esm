@@ -49,19 +49,19 @@ describe("require hook", () => {
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
 
-    allRequire("./fixture/options/all/")
+    allRequire("./fixture/options/all")
     assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
 
     const dirPath = path.resolve(__dirname, "./fixture/options/cjs")
-    const exported = cjsRequire(dirPath + "/")
+    const exported = cjsRequire(dirPath)
     assert.deepEqual(exported, { __dirname: dirPath })
 
     const exports = [
       gzRequire("./fixture/options/gz/index.mjs.gz"),
-      jsRequire("./fixture/options/js/"),
-      mjsRequire("./fixture/options/mjs/"),
-      trueRequire("../js/")
+      jsRequire("./fixture/options/js"),
+      mjsRequire("./fixture/options/mjs"),
+      trueRequire("../js")
     ]
 
     exports.forEach((exported) => assert.ok(exported))

@@ -1,8 +1,8 @@
 import assert from "assert"
 
-const customValue = require("../../fixture/esmodule/custom.mjs")
-const defaultValue = require("../../fixture/esmodule/default.mjs")
-const noValue = require("../../fixture/export/abc.mjs")
+const customValue = require("../../../fixture/export/pseudo/custom.mjs")
+const defaultValue = require("../../../fixture/export/pseudo/default.mjs")
+const noValue = require("../../../fixture/export/abc.mjs")
 
 export default () => {
   assert.deepEqual(Object.getOwnPropertyDescriptor(customValue, "__esModule"), {

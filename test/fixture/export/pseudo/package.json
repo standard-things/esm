@@ -1,5 +1,5 @@
 {
-  "name": "esmodule",
+  "name": "pseudo",
   "private": true,
   "@std/esm": {
     "cjs": true,

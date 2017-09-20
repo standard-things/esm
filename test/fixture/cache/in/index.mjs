@@ -1,1 +1,1 @@
-import "../in.mjs"
+import "./file.mjs"
