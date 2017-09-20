@@ -1,5 +1,6 @@
 import assert from "assert"
 import fs from "fs-extra"
+import globby from "globby"
 import makeRequire from "../index.js"
 import module from "./module.js"
 import path from "path"
@@ -19,10 +20,10 @@ const abcNs = {
   default: "default"
 }
 
-if (! fs.pathExistsSync("./fixture/require/a.mjs.gz")) {
-  const content = fs.readFileSync("./fixture/require/a.js")
+if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
+  const content = fs.readFileSync("./fixture/options/js/index.js")
   const gzipped = zlib.gzipSync(content)
-  fs.writeFileSync("./fixture/require/a.mjs.gz", gzipped)
+  fs.writeFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
 }
 
 beforeEach(() => {
@@ -36,30 +37,39 @@ describe("require hook", () => {
     assert.deepEqual(exported, abcNs)
   })
 
-  it("should support options", () => {
-    const cjsId = path.resolve(__dirname, "./import/cjs/dummy-id")
-    const cjsMod = new module.constructor(cjsId, null)
-    cjsMod.filename = cjsMod.id
+  it("should support options", (done) => {
+    const trueId = path.resolve(__dirname, "./fixture/options/true/id")
+    const trueMod = new module.constructor(trueId, null)
+    trueMod.filename = trueMod.id
 
+    const trueRequire = makeRequire(trueMod, true)
     const allRequire = makeRequire(module, { esm: "all" })
-    const cjsRequire = makeRequire(cjsMod, true)
+    const cjsRequire = makeRequire(module, { cjs: true })
     const gzRequire = makeRequire(module, { gz: true })
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
 
-    const exports = [
-      gzRequire("./fixture/require/a.mjs.gz"),
-      jsRequire("./fixture/require/a.js"),
-      mjsRequire(abcId)
-    ]
-
-    exports.forEach((exported) => assert.deepEqual(exported, abcNs))
-
-    cjsRequire("./cjs").default()
-    allRequire("./fixture/require/this.js")
-
+    allRequire("./fixture/options/all/")
     assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
-    assert.strictEqual(fs.pathExistsSync("./fixture/require/.esm-cache"), false)
+
+    const dirPath = path.resolve(__dirname, "./fixture/options/cjs")
+    const exported = cjsRequire(dirPath + "/")
+    assert.deepEqual(exported, { __dirname: dirPath })
+
+    const exports = [
+      gzRequire("./fixture/options/gz/index.mjs.gz"),
+      jsRequire("./fixture/options/js/"),
+      mjsRequire("./fixture/options/mjs/"),
+      trueRequire("../js/")
+    ]
+
+    exports.forEach((exported) => assert.ok(exported))
+
+    setImmediate(() => {
+      const cachePaths = globby.sync(["./fixture/options/**/.esm-cache"])
+      assert.deepEqual(cachePaths, ["./fixture/options/true/.esm-cache"])
+      done()
+    })
   })
 })
