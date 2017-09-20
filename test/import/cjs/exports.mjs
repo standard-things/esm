@@ -1,51 +1,52 @@
 import assert from "assert"
 import { add, reset, value } from "../../fixture/cjs/bridge.js"
-import adef, * as ans from "../../fixture/cjs/exports-array.js"
-import cdef, { a as ca } from "../../fixture/cjs/exports-class.js"
-import ddef, * as dns from "../../fixture/cjs/exports-default.js"
-import edef, { a as ea } from "../../fixture/cjs/exports-esmodule.js"
-import fdef, { a as fa } from "../../fixture/cjs/exports-function.js"
-import nuldef, * as nulns from "../../fixture/cjs/exports-null.js"
-import numdef, * as numns from "../../fixture/cjs/exports-number.js"
-import odef, { a as oa } from "../../fixture/cjs/exports-object.js"
-import udef, * as uns from "../../fixture/cjs/exports-undefined.js"
-import * as cns from "../../fixture/cjs/exports-class.js"
-import * as ens from "../../fixture/cjs/exports-esmodule.js"
-import * as fns from "../../fixture/cjs/exports-function.js"
-import * as empty from "../../fixture/cjs/exports-empty.js"
-import * as emptyESM from "../../fixture/cjs/exports-esmodule-empty.js"
-import * as getSet from "../../fixture/cjs/exports-get-set.js"
+import defaultArray, * as nsArray from "../../fixture/cjs/exports-array.js"
+import defaultClass, { a as namedClass } from "../../fixture/cjs/exports-class.js"
+import defaultDefault, * as nsDefault from "../../fixture/cjs/exports-default.js"
+import defaultEmpty, * as nsEmpty from "../../fixture/cjs/exports-empty.js"
+import defaultExports from "../../fixture/cjs/exports-exports.mjs"
+import defaultFunction, { a as namedFunction } from "../../fixture/cjs/exports-function.js"
+import defaultNull, * as nsNull from "../../fixture/cjs/exports-null.js"
+import defaultNumber, * as nsNumber from "../../fixture/cjs/exports-number.js"
+import defaultObject, { a as namedObject } from "../../fixture/cjs/exports-object.js"
+import defaultPseudo, { a as namedPseudo } from "../../fixture/cjs/exports-pseudo.js"
+import defaultUndefined, * as nsUndefined from "../../fixture/cjs/exports-undefined.js"
+import * as nsClass from "../../fixture/cjs/exports-class.js"
+import * as nsEmptyPseudo from "../../fixture/cjs/exports-pseudo-empty.js"
+import * as nsPseudo from "../../fixture/cjs/exports-pseudo.js"
+import * as nsFunction from "../../fixture/cjs/exports-function.js"
+import * as nsSafe from "../../fixture/cjs/exports-get-set.js"
 
 export default () => {
-  assert.deepEqual(adef, [1])
-  assert.strictEqual(ans.default, adef)
+  assert.deepEqual(defaultArray, [1])
+  assert.strictEqual(nsArray.default, defaultArray)
 
-  assert.strictEqual(typeof cdef, "function")
-  assert.strictEqual(cns.default, cdef)
-  assert.strictEqual(ca, "a")
+  assert.strictEqual(typeof defaultClass, "function")
+  assert.strictEqual(nsClass.default, defaultClass)
+  assert.strictEqual(namedClass, "a")
 
-  assert.strictEqual(ddef.default, "default")
-  assert.strictEqual(ddef, dns.default)
+  assert.strictEqual(defaultDefault.default, "default")
+  assert.strictEqual(defaultDefault, nsDefault.default)
 
-  assert.strictEqual(edef, "default")
-  assert.strictEqual(ens.default, edef)
-  assert.strictEqual(ea, "a")
+  assert.strictEqual(defaultPseudo, "default")
+  assert.strictEqual(nsPseudo.default, defaultPseudo)
+  assert.strictEqual(namedPseudo, "a")
 
-  assert.strictEqual(fdef(), "ok")
-  assert.strictEqual(fns.default, fdef)
-  assert.strictEqual(fa, "a")
+  assert.strictEqual(defaultFunction(), "ok")
+  assert.strictEqual(nsFunction.default, defaultFunction)
+  assert.strictEqual(namedFunction, "a")
 
-  assert.strictEqual(nuldef, null)
-  assert.strictEqual(nulns.default, nuldef)
+  assert.strictEqual(defaultNull, null)
+  assert.strictEqual(nsNull.default, defaultNull)
 
-  assert.strictEqual(numdef, 1)
-  assert.strictEqual(numns.default, numdef)
+  assert.strictEqual(defaultNumber, 1)
+  assert.strictEqual(nsNumber.default, defaultNumber)
 
-  assert.deepEqual(odef, { a: "a" })
-  assert.strictEqual(oa, "a")
+  assert.deepEqual(defaultObject, { a: "a" })
+  assert.strictEqual(namedObject, "a")
 
-  assert.strictEqual(udef, void 0)
-  assert.strictEqual(uns.default, udef)
+  assert.strictEqual(defaultUndefined, void 0)
+  assert.strictEqual(nsUndefined.default, defaultUndefined)
 
   add(5)
   add(5)
@@ -54,17 +55,20 @@ export default () => {
   assert.strictEqual(reset(), 0)
   assert.strictEqual(value, 0)
 
-  assert.deepEqual(empty, { default: {} })
-  assert.deepEqual(emptyESM, {})
+  assert.deepEqual(nsEmpty, { default: {} })
+  assert.deepEqual(nsEmptyPseudo, {})
 
-  assert.strictEqual(getSet.safe, "safe")
-  getSet.safe = "so safe"
+  const objectProto = Object.prototype
+  assert.strictEqual(Object.getPrototypeOf(defaultEmpty), objectProto)
+  assert.strictEqual(Object.getPrototypeOf(defaultExports), objectProto)
 
-  assert.strictEqual(getSet.safe, "so safe")
-  getSet.safe = "safe"
+  assert.strictEqual(nsSafe.safe, "safe get")
+  nsSafe.safe = "safe set"
 
-  const desc = Object.getOwnPropertyDescriptor(getSet, "safe")
+  assert.strictEqual(nsSafe.safe, "safe set")
+  nsSafe.safe = "safe get"
 
+  const desc = Object.getOwnPropertyDescriptor(nsSafe, "safe")
   assert.ok("get" in desc)
   assert.ok("set" in desc)
 }

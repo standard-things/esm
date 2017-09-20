@@ -1,6 +1,6 @@
 "use strict"
 
-let safe = "safe"
+let safe = "safe get"
 
 module.exports = {
   get safe() {
