@@ -1,20 +1,20 @@
 import assert from "assert"
 
 describe("import declarations", () => {
-  it("should support combinations of import styles", () =>
-    import("./import/cjs/combinations.mjs")
-      .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
-  )
-
   it("should support same symbol as different locals", () =>
     import("./import/locals.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
+  it("should support mixed import styles", () =>
+    import("./import/cjs/mixed.mjs")
+      .then((ns) => ns.default())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should support CJS modules setting `module.exports`", () =>
-    import("./import/cjs/cjs.mjs")
+    import("./import/cjs/exports.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )

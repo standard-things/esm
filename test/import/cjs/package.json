@@ -1,5 +1,5 @@
 {
-  "name": "import",
+  "name": "cjs",
   "private": true,
   "@std/esm": {
     "cjs": true,
