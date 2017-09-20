@@ -11,15 +11,6 @@ const isWin = process.platform === "win32"
 const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
-const abcId = "./fixture/export/abc.mjs"
-
-const abcNs = {
-  a: "a",
-  b: "b",
-  c: "c",
-  default: "default"
-}
-
 if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
   const content = fs.readFileSync("./fixture/options/js/index.js")
   const gzipped = zlib.gzipSync(content)
@@ -33,8 +24,32 @@ beforeEach(() => {
 describe("require hook", () => {
   it("should create a require function that can load ESM", () => {
     const esmRequire = makeRequire(module)
-    const exported = esmRequire(abcId)
-    assert.deepEqual(exported, abcNs)
+
+    const abcNs = {
+      a: "a",
+      b: "b",
+      c: "c",
+      default: "default"
+    }
+
+    const defNs = {
+      d: "d",
+      e: "e",
+      f: "f"
+    }
+
+    const abcExported = esmRequire("./fixture/export/abc.mjs")
+    assert.deepEqual(abcExported, abcNs)
+
+    const defFilePath = path.resolve(__dirname, "./fixture/export/def.js")
+    delete esmRequire.cache[defFilePath]
+
+    const defExported = esmRequire(defFilePath)
+    assert.deepEqual(defExported, defNs)
+
+    const defModule = esmRequire.cache[defFilePath]
+    assert.ok(defModule)
+    assert.strictEqual(defModule.id, defFilePath)
   })
 
   it("should support options", (done) => {
@@ -53,9 +68,16 @@ describe("require hook", () => {
     assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
 
-    const dirPath = path.resolve(__dirname, "./fixture/options/cjs")
-    const exported = cjsRequire(dirPath)
-    assert.deepEqual(exported, { __dirname: dirPath })
+    const cjsDirPath = path.resolve(__dirname, "./fixture/options/cjs")
+    const cjsFilePath = path.resolve(cjsDirPath, "index.mjs")
+    delete cjsRequire.cache[cjsFilePath]
+
+    const cjsExports = cjsRequire(cjsDirPath)
+    assert.deepEqual(cjsExports, { __dirname: cjsDirPath })
+
+    const cjsModule = cjsRequire.cache[cjsFilePath]
+    assert.ok(cjsModule)
+    assert.strictEqual(cjsModule.id, cjsFilePath)
 
     const exports = [
       gzRequire("./fixture/options/gz/index.mjs.gz"),
