@@ -176,7 +176,7 @@ function hook(Module, parent, options) {
       "const " + runtimeAlias + "=this;" +
       runtimeAlias + ".r((function(exports,require){" + content + "\n}))"
 
-    const exported = new NullObject
+    const exported = {}
     setSourceType(exported, "script")
     Runtime.enable(mod, exported, options)
     tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
@@ -197,7 +197,7 @@ function hook(Module, parent, options) {
       (options.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
       runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
 
-    const exported = new NullObject
+    const exported = {}
     const moduleWrap = Module.wrap
 
     const customWrap = (script) => {
