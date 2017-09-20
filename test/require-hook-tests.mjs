@@ -41,7 +41,7 @@ describe("require hook", () => {
     const abcExported = esmRequire("./fixture/export/abc.mjs")
     assert.deepEqual(abcExported, abcNs)
 
-    const defFilePath = path.resolve(__dirname, "./fixture/export/def.js")
+    const defFilePath = path.resolve(__dirname, "fixture/export/def.js")
     delete esmRequire.cache[defFilePath]
 
     const defExported = esmRequire(defFilePath)
@@ -53,7 +53,7 @@ describe("require hook", () => {
   })
 
   it("should support options", (done) => {
-    const trueId = path.resolve(__dirname, "./fixture/options/true/id")
+    const trueId = path.resolve(__dirname, "fixture/options/true/id")
     const trueMod = new module.constructor(trueId, null)
     trueMod.filename = trueMod.id
 
@@ -68,7 +68,7 @@ describe("require hook", () => {
     assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
 
-    const cjsDirPath = path.resolve(__dirname, "./fixture/options/cjs")
+    const cjsDirPath = path.resolve(__dirname, "fixture/options/cjs")
     const cjsFilePath = path.resolve(cjsDirPath, "index.mjs")
     delete cjsRequire.cache[cjsFilePath]
 
@@ -89,8 +89,8 @@ describe("require hook", () => {
     exports.forEach((exported) => assert.ok(exported))
 
     setImmediate(() => {
-      const cachePaths = globby.sync(["./fixture/options/**/.esm-cache"])
-      assert.deepEqual(cachePaths, ["./fixture/options/true/.esm-cache"])
+      const cachePaths = globby.sync(["fixture/options/**/.esm-cache"])
+      assert.deepEqual(cachePaths, ["fixture/options/true/.esm-cache"])
       done()
     })
   })

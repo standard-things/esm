@@ -13,10 +13,10 @@ const __dirname = path.dirname(__filename)
 const testPath = path.resolve(__dirname, "..")
 const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
 
-const mcPath = path.resolve(testPath, "./fixture/with%3Acolon.mjs")
+const mcPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")
 const mcURL = testURL + "/fixture/with:colon.mjs"
 
-const mpPath = path.resolve(testPath, "./fixture/with%23pound.mjs")
+const mpPath = path.resolve(testPath, "fixture/with%23pound.mjs")
 const mpURL = testURL + "/fixture/with%23pound.mjs"
 
 export default () => {

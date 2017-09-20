@@ -94,12 +94,12 @@ describe("errors", () => {
   )
 
   it("should mask stack arrows", () => {
-    const id1 = path.resolve(__dirname, "./fixture/error/import.mjs")
-    const id2 = path.resolve(__dirname, "./fixture/error/export.js")
-    const id3 = path.resolve(__dirname, "./fixture/error/import.js")
-    const id4 = path.resolve(__dirname, "./fixture/error/nested.mjs")
-    const id5 = path.resolve(__dirname, "./fixture/error/syntax.js")
-    const id6 = path.resolve(__dirname, "./node_modules/error/index.js")
+    const id1 = path.resolve(__dirname, "fixture/error/import.mjs")
+    const id2 = path.resolve(__dirname, "fixture/error/export.js")
+    const id3 = path.resolve(__dirname, "fixture/error/import.js")
+    const id4 = path.resolve(__dirname, "fixture/error/nested.mjs")
+    const id5 = path.resolve(__dirname, "fixture/error/syntax.js")
+    const id6 = path.resolve(__dirname, "node_modules/error/index.js")
 
     function check(error, startsWith) {
       const stack = error.stack.replace(/\r\n/g, "\n")
@@ -324,7 +324,7 @@ describe("Node rules", () => {
   })
 
   it("should not cache ES modules in `require.cache`", () => {
-    const filePath = path.resolve(__dirname, "./fixture/cache/out/file.mjs")
+    const filePath = path.resolve(__dirname, "fixture/cache/out/file.mjs")
 
     delete require.cache[filePath]
     return import("./fixture/cache/out")
@@ -362,7 +362,7 @@ describe("Node rules", () => {
   })
 
   it("should cache ES modules in `require.cache` with `options.cjs`", () => {
-    const filePath = path.resolve(__dirname, "./fixture/cache/in/file.mjs")
+    const filePath = path.resolve(__dirname, "fixture/cache/in/file.mjs")
 
     delete require.cache[filePath]
     return import("./fixture/cache/in")
