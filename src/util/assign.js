@@ -1,5 +1,5 @@
-import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
+import keys from "./keys.js"
 
 function assign(object) {
   if (! isObjectLike(object)) {
@@ -11,15 +11,10 @@ function assign(object) {
 
   while (++i < argCount) {
     const source = arguments[i]
+    const names = keys(source)
 
-    if (! isObjectLike(source)) {
-      continue
-    }
-
-    for (const key in source) {
-      if (has(source, key)) {
-        object[key] = source[key]
-      }
+    for (const name of names) {
+      object[name] = source[name]
     }
   }
 
