@@ -4,7 +4,7 @@
 
 import { isAbsolute, resolve } from "path"
 
-import NullObject from "../null-object.js"
+import FastObject from "../fast-object.js"
 
 import binding from "../binding.js"
 import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
@@ -19,8 +19,8 @@ const codeOfSlash = "/".charCodeAt(0)
 const { parse } = JSON
 const { preserveSymlinks } = binding.config
 
-const packageCache = new NullObject
-const pathCache = new NullObject
+const packageCache = new FastObject
+const pathCache = new FastObject
 
 const skipOutsideDot = satisfies(process.version, ">=9")
 let warned = false
