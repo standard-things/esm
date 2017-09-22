@@ -1,8 +1,9 @@
+const codeOfAt = "@".charCodeAt(0)
 const codeOfDoubleQuote = '"'.charCodeAt(0)
 const codeOfEqual = "=".charCodeAt(0)
 const codeOfPound = "#".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
 const codeOfSingleQuote = "'".charCodeAt(0)
+const codeOfSlash = "/".charCodeAt(0)
 const codeOfSpace = " ".charCodeAt(0)
 const codeOfTab = "\t".charCodeAt(0)
 
@@ -14,14 +15,14 @@ const { trim } = String.prototype
 function getSourceMappingURL(content) {
   const { length } = content
 
-  let match
-  let pos = length
-
   if (length < minLength) {
     return ""
   }
 
-  while (true) {
+  let match
+  let pos = length
+
+  while (! match) {
     pos = content.lastIndexOf(name, pos)
 
     if (pos === -1 ||
@@ -29,14 +30,20 @@ function getSourceMappingURL(content) {
       return ""
     }
 
-    // Check for "//# " before the name.
+    // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
     if (content.charCodeAt(pos - 4) !== codeOfSlash ||
-        content.charCodeAt(pos - 3) !== codeOfSlash ||
-        content.charCodeAt(pos - 2) !== codeOfPound) {
+        content.charCodeAt(pos - 3) !== codeOfSlash) {
       continue
     }
 
-    const code = content.charCodeAt(pos - 1)
+    let code = content.charCodeAt(pos - 2)
+
+    if (code !== codeOfPound &&
+        code !== codeOfAt) {
+      continue
+    }
+
+    code = content.charCodeAt(pos - 1)
 
     if (code !== codeOfSpace &&
         code !== codeOfTab) {
@@ -56,7 +63,6 @@ function getSourceMappingURL(content) {
     }
 
     match = content.slice(urlPos)
-    break
   }
 
   const newLinePos = match.indexOf("\n")
