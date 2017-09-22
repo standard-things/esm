@@ -183,7 +183,12 @@ class Entry {
       }
     }
 
-    assignExportsToNamespace(this)
+    // While CJS bridge modules don't have getters to assign to the raw
+    // namespace object, they do have populated exports objects.
+    if (! this.getters.length &&
+        ! this.setters.length) {
+      assignExportsToNamespace(this)
+    }
 
     setGetter(this, "esmNamespace", () => {
       const isSafe = this.sourceType !== "script"
