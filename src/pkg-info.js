@@ -15,7 +15,7 @@ const defaultOptions = {
   cjs: false,
   debug: false,
   esm: "mjs",
-  sourceMap: null
+  sourceMap: void 0
 }
 
 const infoCache = new FastObject
@@ -37,7 +37,7 @@ class PkgInfo {
       options.esm = "mjs"
     }
 
-    if (typeof sourceMap === "boolean") {
+    if (sourceMap !== void 0) {
       options.sourceMap = sourceMap
       delete options.sourcemap
     }
