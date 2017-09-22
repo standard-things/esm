@@ -300,7 +300,7 @@ function assignExportsToNamespace(entry) {
   const isSafe = sourceType !== "script"
 
   if (! isSafe) {
-    // Hardcode "default" as `module.exports` for CommonJS scripts.
+    // Hardcode "default" as `module.exports` for CJS scripts.
     _namespace.default = exported
   }
 
