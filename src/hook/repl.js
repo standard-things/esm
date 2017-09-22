@@ -1,4 +1,3 @@
-import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
 import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
@@ -86,7 +85,7 @@ function hook(vm) {
   Wrapper.manage(vm, "createScript", managerWrapper)
   Wrapper.wrap(vm, "createScript", methodWrapper)
 
-  const exported = new NullObject
+  const exported = {}
 
   if (rootModule.id === "<repl>") {
     Runtime.enable(rootModule, exported, pkgInfo.options)
