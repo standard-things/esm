@@ -431,6 +431,7 @@ function pad(visitor, newCode, oldStart, oldEnd) {
     if (i > lastIndex) {
       newLines[i] = ""
     }
+
     if (lastCharCode === codeOfCR) {
       newLines[i] += "\r"
     }
