@@ -12,7 +12,7 @@ function createSourceMap(filePath, content) {
 
   return '{"version":3,"sources":[' +
     toStringLiteral(filePath) +
-    '],"mappings":"' + mapping + '"}'
+    '],"names":[],"mappings":"' + mapping + '"}'
 }
 
 export default createSourceMap
