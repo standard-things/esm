@@ -11,11 +11,14 @@ import binding from "../binding.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import encodeId from "../util/encode-id.js"
+import encodeURI from "../util/encode-uri.js"
+import env from "../env.js"
 import errors from "../errors.js"
 import extname from "../path/extname.js"
 import fs from "fs"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
+import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import gunzip from "../fs/gunzip.js"
 import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
@@ -29,6 +32,7 @@ import { satisfies } from "semver"
 import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
+import toStringLiteral from "../util/to-string-literal.js"
 
 const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
@@ -275,6 +279,18 @@ function hook(Module, parent, options) {
 
     // Wrap `mod._compile` in the off chance the read file wrappers are missed.
     mod._compile = customModuleCompile
+
+    // Add an inline source map to mask the source in the inspector.
+    if (env.inspector &&
+        ! getSourceMappingURL(content)) {
+      content +=
+        "//# sourceMappingURL=data:application/json;charset=utf-8," +
+        encodeURI(
+          '{"version":3,"sources":[' +
+          toStringLiteral(filePath) +
+          '],"names":[],"mappings":"AAAA"}'
+        )
+    }
 
     try {
       if (options.debug) {
