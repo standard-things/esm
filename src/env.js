@@ -2,6 +2,7 @@ import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
 import _resolveFilename from "./module/_resolve-filename.js"
+import binding from "./binding.js"
 import isObjectLike from "./util/is-object-like.js"
 import isPath from "./util/is-path.js"
 import keys from "./util/keys.js"
@@ -13,14 +14,18 @@ import rootModule from "./root-module.js"
 const codeOfBracket = "{".charCodeAt(0)
 const codeOfDash = "-".charCodeAt(0)
 
-const { _preloadModules, argv, cwd } = process
+const { _preloadModules, argv, cwd, execArgv } = process
+const inspectorBinding = binding.inspector
 const { isArray } = Array
 
-const esmPath = __non_webpack_module__.filename
-const params = argv.slice(2)
+const args = argv.slice(2)
+const debugArgRegExp = /^--(?:debug|inspect)(?:-brk)?$/
 
-const nmIndex = params.length
-  ? argv[1].replace(/\\/g, "/").lastIndexOf("/node_modules/")
+const esmPath = __non_webpack_module__.filename
+const [, filePath] = argv
+
+const nmIndex = args.length
+  ? filePath.replace(/\\/g, "/").lastIndexOf("/node_modules/")
   : -1
 
 const preloading =
@@ -28,27 +33,21 @@ const preloading =
   (rootModule.id === "internal/preload" &&
    hasLoaderModule(rootModule.children))
 
+function hasDebugArg(args) {
+  return args.some((arg) => debugArgRegExp.test(arg))
+}
+
+function hasLoaderArg(args) {
+  return args.some((arg) =>
+    arg.charCodeAt(0) === codeOfBracket
+      ? hasLoaderValue(parseJSON(arg) || arg)
+      : hasLoaderValue(arg)
+  )
+}
+
 function hasLoaderModule(modules) {
   return isArray(modules) &&
     modules.some(({ filename }) => filename === esmPath)
-}
-
-function hasLoaderParam(params) {
-  for (let param of params) {
-    if (param.charCodeAt(0) === codeOfBracket) {
-      const parsed = parseJSON(param)
-
-      if (parsed) {
-        param = parsed
-      }
-    }
-
-    if (hasLoaderValue(param)) {
-      return true
-    }
-  }
-
-  return false
 }
 
 function hasLoaderValue(value) {
@@ -76,6 +75,11 @@ function hasLoaderValue(value) {
 
 const env = new FastObject
 
+env.inspector =
+  hasDebugArg(execArgv) ||
+  (typeof inspectorBinding.isEnabled === "function" &&
+   inspectorBinding.isEnabled())
+
 env.preload =
   preloading &&
   argv.length > 1
@@ -92,8 +96,8 @@ env.cli =
   ! env.preload &&
   ! env.repl &&
   nmIndex !== -1 &&
-  hasLoaderParam(params) &&
+  hasLoaderArg(args) &&
   (PkgInfo.get(cwd()) !== null ||
-   PkgInfo.get(realpath(argv[1].slice(0, nmIndex + 1))) !== null)
+   PkgInfo.get(realpath(filePath.slice(0, nmIndex + 1))) !== null)
 
 export default env
