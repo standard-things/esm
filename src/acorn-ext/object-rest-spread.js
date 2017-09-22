@@ -15,7 +15,7 @@ function enable(parser) {
 
 function parseObj(func, args) {
   let first = true
-  const [isPattern] = args
+  const [isPattern, refDestructuringErrors] = args
   const node = this.startNode()
 
   node.properties = []
@@ -37,7 +37,8 @@ function parseObj(func, args) {
     let startPos
     let propNode = this.startNode()
 
-    if (isPattern) {
+    if (isPattern ||
+        refDestructuringErrors) {
       startPos = this.start
       startLoc = this.startLoc
     }
@@ -74,7 +75,7 @@ function parseObj(func, args) {
       this.parsePropertyName(propNode)
     }
 
-    this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc)
+    this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
     node.properties.push(this.finishNode(propNode, "Property"))
   }
 

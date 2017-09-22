@@ -104,6 +104,11 @@ describe("compiler", () => {
     assert.ok(true)
   })
 
+  it("should not error on arrow functions with destructured arguments", () => {
+    compiler.compile("({a=1})=>{}")
+    assert.ok(true)
+  })
+
   it("should not error on transforms at the end of the source", () => {
     const codes = [
       'import{a}from"a"',
