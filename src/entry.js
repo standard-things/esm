@@ -183,6 +183,8 @@ class Entry {
       }
     }
 
+    assignExportsToNamespace(this)
+
     setGetter(this, "esmNamespace", () => {
       const isSafe = this.sourceType !== "script"
 
