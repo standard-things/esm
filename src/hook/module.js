@@ -281,7 +281,8 @@ function hook(Module, parent, options) {
     mod._compile = customModuleCompile
 
     // Add an inline source map to mask the source in the inspector.
-    if (env.inspector &&
+    if (options.sourceMap !== false &&
+        (env.inspector || options.sourceMap) &&
         ! getSourceMappingURL(content)) {
       content +=
         "//# sourceMappingURL=data:application/json;charset=utf-8," +

@@ -14,7 +14,8 @@ const defaultOptions = {
   cache: ".esm-cache",
   cjs: false,
   debug: false,
-  esm: "mjs"
+  esm: "mjs",
+  sourceMap: null
 }
 
 const infoCache = new FastObject
@@ -22,10 +23,23 @@ const infoCache = new FastObject
 class PkgInfo {
   constructor(dirPath, range, options) {
     options = typeof options === "string" ? { esm: options } : options
+
+    let sourceMap
+
+    if (has(options, "sourcemap") &&
+        ! has(options, "sourceMap")) {
+      sourceMap = options.sourcemap
+    }
+
     options = createOptions(options, defaultOptions)
 
     if (! options.esm) {
       options.esm = "mjs"
+    }
+
+    if (typeof sourceMap === "boolean") {
+      options.sourceMap = sourceMap
+      delete options.sourcemap
     }
 
     const cache = new NullObject
