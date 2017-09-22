@@ -80,7 +80,7 @@ describe("require hook", () => {
     assert.strictEqual(cjsModule.id, cjsFilePath)
 
     const exports = [
-      gzRequire("./fixture/options/gz/index.mjs.gz"),
+      gzRequire("./fixture/options/gz"),
       jsRequire("./fixture/options/js"),
       mjsRequire("./fixture/options/mjs"),
       trueRequire("../js")

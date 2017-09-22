@@ -331,7 +331,7 @@ function hook(Module, parent, options) {
     }
   }
 
-  const exts = [".js", ".gz", ".js.gz", ".mjs.gz", ".mjs"]
+  const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 
   exts.forEach((key) => {
     if (typeof _extensions[key] !== "function") {
