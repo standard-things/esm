@@ -1,6 +1,6 @@
 import AcornParser from "./acorn-parser.js"
 
-import createOptions from "./util/create-options.js"
+import _createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
 import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
 import { enable as enableObjectRestSpread } from "./acorn-ext/object-rest-spread.js"
@@ -12,11 +12,14 @@ const defaultOptions = {
   sourceType: "module"
 }
 
+const createOptions = (options) => _createOptions(options, Parser.defaultOptions)
+
 class Parser {
+  static createOptions = createOptions
   static defaultOptions = defaultOptions
 
   static parse(code, options) {
-    options = createOptions(options, defaultOptions)
+    options = Parser.createOptions(options)
     return extend(new AcornParser(options, code)).parse()
   }
 }

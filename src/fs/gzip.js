@@ -1,17 +1,13 @@
 import { Gzip } from "minizlib"
 
-import createOptions from "../util/create-options.js"
+import _createOptions from "../util/create-options.js"
 import { gzipSync } from "zlib"
 import streamToBuffer from "./stream-to-buffer.js"
-
-const defaultOptions = {
-  level: 9
-}
 
 let useGzipFastPath = true
 
 function gzip(bufferOrString, options) {
-  options = createOptions(options, defaultOptions)
+  options = gzip.createOptions(options)
 
   if (useGzipFastPath) {
     try {
@@ -31,6 +27,7 @@ function fastPathGzip(bufferOrString, options) {
   return streamToBuffer(new Gzip(options), bufferOrString)
 }
 
-gzip.defaultOptions = defaultOptions
+gzip.defaultOptions = { level: 9 }
+gzip.createOptions = (options) => _createOptions(options, gzip.defaultOptions)
 
 export default gzip

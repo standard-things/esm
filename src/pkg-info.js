@@ -3,7 +3,7 @@ import { basename, dirname, resolve } from "path"
 import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
-import createOptions from "./util/create-options.js"
+import _createOptions from "./util/create-options.js"
 import has from "./util/has.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
@@ -21,29 +21,14 @@ const defaultOptions = {
 const infoCache = new FastObject
 
 class PkgInfo {
+  static createOptions = createOptions
+  static defaultOptions = defaultOptions
+
   constructor(dirPath, range, options) {
-    options = typeof options === "string" ? { esm: options } : options
-
-    let sourceMap
-
-    if (has(options, "sourcemap") &&
-        ! has(options, "sourceMap")) {
-      sourceMap = options.sourcemap
-    }
-
-    options = createOptions(options, defaultOptions)
-
-    if (! options.esm) {
-      options.esm = "mjs"
-    }
-
-    if (sourceMap !== void 0) {
-      options.sourceMap = sourceMap
-      delete options.sourcemap
-    }
+    options = PkgInfo.createOptions(options)
 
     const cache = new NullObject
-    const cacheDir =  options.cache
+    const cacheDir = options.cache
     const cachePath = typeof cacheDir === "string" ? resolve(dirPath, cacheDir) : null
     const cacheFileNames = cachePath === null ? null : readdir(cachePath)
 
@@ -63,8 +48,6 @@ class PkgInfo {
     this.options = options
     this.range = range
   }
-
-  static defaultOptions = defaultOptions
 
   static get(dirPath) {
     if (dirPath in infoCache) {
@@ -144,6 +127,30 @@ class PkgInfo {
   static set(dirPath, pkgInfo) {
     infoCache[dirPath] = pkgInfo
   }
+}
+
+function createOptions(options) {
+  let sourceMap
+
+  if (typeof options === "string") {
+    options = { esm: options }
+  } else if (has(options, "sourcemap") &&
+      ! has(options, "sourceMap")) {
+    sourceMap = options.sourcemap
+  }
+
+  options = _createOptions(options, defaultOptions)
+
+  if (! options.esm) {
+    options.esm = "mjs"
+  }
+
+  if (sourceMap !== void 0) {
+    options.sourceMap = sourceMap
+    delete options.sourcemap
+  }
+
+  return options
 }
 
 function getRange(json, name) {

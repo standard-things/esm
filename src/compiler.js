@@ -1,8 +1,8 @@
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
 
+import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
-import createOptions from "./util/create-options.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
@@ -16,15 +16,18 @@ const defaultOptions = {
   var: false
 }
 
+const createOptions = (options) => _createOptions(options, Compiler.defaultOptions)
+
 const argumentsRegExp = /\barguments\b/
 const importExportRegExp = /\b(?:im|ex)port\b/
 
 class Compiler {
+  static createOptions = createOptions
   static defaultOptions = defaultOptions
 
   static compile(code, options) {
     code = stripShebang(code)
-    options = createOptions(options, defaultOptions)
+    options = Compiler.createOptions(options)
 
     let { hint, type } = options
 
