@@ -51,7 +51,10 @@ hooks.require = (mod, options) => {
   copy.parent = mod.parent
 
   moduleHook(Module, copy, options)
-  return requireHook(copy, options)
+
+  const req = requireHook(copy, options)
+  req.extensions = Module._extensions
+  return req
 }
 
 export default hooks
