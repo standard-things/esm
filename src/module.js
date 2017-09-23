@@ -33,6 +33,7 @@ class Module extends BuiltinModule {
 
     this.filename = filePath
     this.paths = nodeModulePaths(dirname(filePath))
+
     _extensions[ext](this, filePath)
     this.loaded = true
   }
