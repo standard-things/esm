@@ -91,7 +91,7 @@ in your package.json.
 <tr>
   <td valign="top"><code>"esm":</code></td>
   <td>
-    <p>A string ESM mode</p>
+    <p>A string ESM mode:</p>
     <ul>
     <li><code>"mjs"</code> files as ESM <i>(default)</i></li>
     <li><code>"all"</code> files as ESM</li>
@@ -102,7 +102,7 @@ in your package.json.
 <tr>
   <td valign="top"><code>"cjs":</code></td>
   <td>
-    <p>A boolean for CJS features in ESM</p>
+    <p>A boolean for CJS features in ESM:</p>
     <ul>
     <li><code>__dirname</code> and <code>__filename</code></li>
     <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
@@ -113,15 +113,43 @@ in your package.json.
 </tr>
 <tr>
   <td valign="top"><code>"await":</code></td>
-  <td><p>A boolean for top-level <code>await</code> in the main ES module</p></td>
+  <td><p>A boolean for top-level <code>await</code> in the main ES module.</p></td>
 </tr>
 <tr>
   <td valign="top"><code>"gz":</code></td>
   <td>
-    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>)</i></p>
-    <ul>
-    <li>Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a></li>
-    </ul>
+    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
+    <p><i>Note: Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a>.</i></p>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <pre><code>  }
+}</code></pre>
+  </td>
+</tr>
+</table>
+
+DevOpts
+---
+
+<table>
+<tr>
+  <td colspan="2">
+    <pre><code>{
+  "@std/esm": {</code></pre>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"debug":</code></td>
+  <td><p>A boolean for unmasking stack traces.</p></td>
+</tr>
+<tr>
+  <td valign="top"><code>"sourceMap":</code></td>
+  <td>
+    <p>A boolean for enabling inline source maps</p>
+    <p><i>Note: Automatically enabled using the Node CLI
+    <a href="https://nodejs.org/en/docs/inspector/"><code>--inspect</code> option</a>.</i></p>
   </td>
 </tr>
 <tr>
