@@ -8,7 +8,7 @@ import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(parent, options) {
-  options = isObjectLike(options) ? options : null
+  options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
   return makeRequireFunction(parent, (id) => {
     if (id in builtinModules) {

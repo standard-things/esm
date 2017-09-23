@@ -38,7 +38,7 @@ const fsBinding = binding.fs
 const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
 
 function hook(Module, parent, options) {
-  options = isObjectLike(options) ? options : null
+  options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
   const { _extensions } = Module
   const jsCompiler = Wrapper.unwrap(_extensions, ".js")
