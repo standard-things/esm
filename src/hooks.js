@@ -3,6 +3,7 @@ import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
 import { dirname } from "path"
+import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import replHook from "./hook/repl.js"
@@ -36,8 +37,21 @@ hooks.require = (mod, options) => {
     }
   }
 
-  moduleHook(Module, mod, options)
-  return requireHook(mod, options)
+  const copy = new Module(mod.id, null)
+  const names = keys(mod)
+
+  for (const name of names) {
+    if (name !== "constructor") {
+      copy[name] = mod[name]
+    }
+  }
+
+  copy.id = mod.id
+  copy.filename = mod.filename
+  copy.parent = mod.parent
+
+  moduleHook(Module, copy, options)
+  return requireHook(copy, options)
 }
 
 export default hooks
