@@ -2,7 +2,7 @@ import assert from "assert"
 import compiler from "../build/compiler.js"
 
 describe("compiler", () => {
-  it("should respect options.type", () => {
+  it("should support `options.type`", () => {
     const types = [void 0, "module", "unambiguous"]
 
     types.forEach((type) => {
@@ -32,7 +32,7 @@ describe("compiler", () => {
     })
   })
 
-  it("should respect options.var", () => {
+  it("should support `options.var`", () => {
     const values = [void 0, false, true]
 
     values.forEach((value) => {

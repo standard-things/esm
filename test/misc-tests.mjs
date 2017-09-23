@@ -60,7 +60,7 @@ describe("package.json", () => {
       .catch((e) => assert.ok(e instanceof SyntaxError))
   )
 
-  it("should respect @std/esm package options", () =>
+  it("should support `@std/esm` package options", () =>
     Promise.all([
       "@std-esm-object",
       "@std-esm-string",
@@ -73,7 +73,7 @@ describe("package.json", () => {
     ))
   )
 
-  it("should respect @std/esm as package dependencies", () =>
+  it("should support `@std/esm` as package dependencies", () =>
     Promise.all([
       "dependencies",
       "dev-dependencies",

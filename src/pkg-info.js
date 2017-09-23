@@ -108,16 +108,14 @@ class PkgInfo {
 
     if (! force &&
         options === false) {
-      // An explicit "@std/esm": false property in package.json disables esm
-      // loading even if "@std/esm" is listed as a dependency.
+      // An explicit `@std/esm` property value of `false` disables ESM loading
+      // even if `@std/esm` is listed as a dependency.
       return null
     }
 
-    // Use case: a package.json file may have "@std/esm" in its "devDependencies"
-    // object because it expects another package or application to enable esm
-    // loading in production, but needs its own copy of the "@std/esm" package
-    // during development. Disabling esm loading in production when it was
-    // enabled in development would be undesired in this case.
+    // A package.json may have `@std/esm` in its "devDependencies" object
+    // because it expects another package or application to enable ESM loading
+    // in production, but needs `@std/esm` during development.
     let range =
       getRange(pkgJSON, "dependencies") ||
       getRange(pkgJSON, "peerDependencies")
