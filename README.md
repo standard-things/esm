@@ -76,15 +76,15 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with `"@std/esm":options` or
-`"@std":{"esm":options}` in your package.json.
+Unlock extra features with `"@std/esm":options` or `"@std":{"esm":options}`
+in your package.json.
 
 *Note: All options are **off** by default and may be specified as either an object or ESM mode string.*
 
 <table>
 <tr>
   <td colspan="2">
-  <pre><code>{
+    <pre><code>{
   "@std/esm": {</code></pre>
   </td>
 </tr>
@@ -126,8 +126,8 @@ Unlock extra features with `"@std/esm":options` or
 </tr>
 <tr>
   <td colspan="2">
-  <pre><code>  }
+    <pre><code>  }
 }</code></pre>
   </td>
-  </tr>
+</tr>
 </table>
