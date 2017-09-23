@@ -11,6 +11,9 @@ const isWin = process.platform === "win32"
 const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
+const abcFilePath = path.resolve(__dirname, "fixture/export/abc.mjs")
+const defFilePath = path.resolve(__dirname, "fixture/export/def.js")
+
 if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
   const content = fs.readFileSync("./fixture/options/js/index.js")
   const gzipped = zlib.gzipSync(content)
@@ -38,16 +41,16 @@ describe("require hook", () => {
       f: "f"
     }
 
-    const abcExported = esmRequire("./fixture/export/abc.mjs")
-    assert.deepEqual(abcExported, abcNs)
-
-    const defFilePath = path.resolve(__dirname, "fixture/export/def.js")
+    delete esmRequire.cache[abcFilePath]
     delete esmRequire.cache[defFilePath]
 
-    const defExported = esmRequire(defFilePath)
+    const abcExported = esmRequire("./fixture/export/abc.mjs")
+    const defExported = esmRequire("./fixture/export/def.js")
+    const defModule = esmRequire.cache[defFilePath]
+
+    assert.deepEqual(abcExported, abcNs)
     assert.deepEqual(defExported, defNs)
 
-    const defModule = esmRequire.cache[defFilePath]
     assert.ok(defModule)
     assert.strictEqual(defModule.id, defFilePath)
   })
@@ -65,6 +68,7 @@ describe("require hook", () => {
     const mjsRequire = makeRequire(module, { esm: "mjs" })
 
     allRequire("./fixture/options/all")
+
     assert.ok("this" in global)
     assert.strictEqual(global.this, "undefined")
 
@@ -73,11 +77,11 @@ describe("require hook", () => {
     delete cjsRequire.cache[cjsFilePath]
 
     const cjsExports = cjsRequire(cjsDirPath)
-    assert.deepEqual(cjsExports, { __dirname: cjsDirPath })
-
     const cjsModule = cjsRequire.cache[cjsFilePath]
+
     assert.ok(cjsModule)
     assert.strictEqual(cjsModule.id, cjsFilePath)
+    assert.deepEqual(cjsExports, { __dirname: cjsDirPath })
 
     const exports = [
       gzRequire("./fixture/options/gz"),
@@ -92,6 +96,23 @@ describe("require hook", () => {
       const cachePaths = globby.sync(["fixture/options/**/.esm-cache"])
       assert.deepEqual(cachePaths, ["fixture/options/true/.esm-cache"])
       done()
+    })
+  })
+
+  it("should support `options.sourceMap`", () => {
+    const keys = ["sourceMap", "sourcemap"]
+
+    keys.forEach((key) => {
+      const esmRequire = makeRequire(module, { cjs: true, [key]: true })
+
+      const mod = new module.constructor("<mock>", null)
+      mod._compile = (content) => assert.ok(content.includes("sourceMappingURL"))
+
+      delete esmRequire.cache[abcFilePath]
+      delete esmRequire.cache[defFilePath]
+
+      esmRequire.extensions[".mjs"](mod, abcFilePath)
+      esmRequire.extensions[".js"](mod, defFilePath)
     })
   })
 })
