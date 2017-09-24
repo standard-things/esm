@@ -17,24 +17,20 @@ messages["ERR_MODULE_RESOLUTION_LEGACY"] = "%s not found by import in %s. Legacy
 messages["ERR_REQUIRE_ESM"] = "Must use import to load ES Module: %s"
 
 function createClass(Super) {
-  class NodeError extends Super {
+  return class NodeError extends Super {
     constructor(key, ...args) {
       super(getMessage(key, args))
       this[codeSym] = key
     }
 
     get name() {
-      return Super.name + " [" + this[codeSym] + "]"
+      return super.name + " [" + this[codeSym] + "]"
     }
 
     get code() {
       return this[codeSym]
     }
   }
-
-  Object.setPrototypeOf(NodeError.prototype, null)
-
-  return NodeError
 }
 
 function getMessage(key, args) {
