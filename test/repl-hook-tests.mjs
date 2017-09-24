@@ -35,6 +35,16 @@ describe("REPL hook", () => {
     })
   })
 
+  it("should use a plain object for `module.exports`", (done) => {
+    const r = repl.start({})
+    const code = "this.exports = module.exports"
+
+    r.eval(code, context, "repl", () => {
+      assert.strictEqual(Object.getPrototypeOf(context.exports), Object.prototype)
+      done()
+    })
+  })
+
   it("should recover from import errors", (done) => {
     const r = repl.start({
       eval(code, callback) {
