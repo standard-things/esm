@@ -87,10 +87,6 @@ class Runtime {
     runner(this, moduleWrapper)
   }
 
-  // Platform-specific code should find a way to call this method whenever
-  // the module system is about to return `module.exports` from `require`.
-  // This might happen more than once per module, in case of dependency cycles,
-  // so we want `entry.update()` to run each time.
   update(valueToPassThrough) {
     this.entry.update()
 
