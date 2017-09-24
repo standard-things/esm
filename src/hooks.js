@@ -29,16 +29,13 @@ hooks.repl = () => {
 }
 
 hooks.require = (mod, options) => {
-  if (options === true) {
-    const pkgInfo = PkgInfo.get(dirname(mod.filename))
-
-    if (pkgInfo) {
-      options = pkgInfo.options
-    }
-  }
-
   const copy = new Module(mod.id, null)
   const names = keys(mod)
+  const pkgInfo = options === true ? PkgInfo.get(dirname(mod.filename)) : null
+
+  if (pkgInfo) {
+    ({ options } = pkgInfo)
+  }
 
   for (const name of names) {
     if (name !== "constructor") {
