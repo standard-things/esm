@@ -35,13 +35,19 @@ import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
 const fsBinding = binding.fs
-const mjsSym = Symbol.for('@std/esm:extensions[".mjs"]')
+const extSym = Symbol.for("@std/esm:extensions")
+
+const extDescriptor = {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+}
 
 function hook(Module, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
   const { _extensions } = Module
-  const jsCompiler = Wrapper.unwrap(_extensions, ".js")
   const passthruMap = new SafeMap
 
   const parentFilename = parent && parent.filename
@@ -336,17 +342,15 @@ function hook(Module, parent, options) {
   exts.forEach((key) => {
     if (typeof _extensions[key] !== "function") {
       // Mimic the built-in behavior for ".mjs" and unrecognized extensions.
-      if (key === ".gz") {
-        _extensions[key] = gzCompiler
-      } else if (key === ".mjs" || key === ".mjs.gz") {
+      if (key === ".mjs" || key === ".mjs.gz") {
         _extensions[key] = mjsCompiler
-      } else if (key !== ".js") {
-        _extensions[key] = jsCompiler
+      } else if (key.endsWith(".gz")) {
+        _extensions[key] = gzCompiler
       }
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, key)
-    let passthru = ! extCompiler[mjsSym]
+    let passthru = ! extCompiler[extSym]
 
     if (passthru &&
         key === ".mjs") {
@@ -376,7 +380,7 @@ function gzCompiler(mod, filePath) {
     ext = ".js"
   }
 
-  const extCompiler = Wrapper.unwrap(this, ext)
+  const extCompiler = this[ext]
   return extCompiler.call(this, mod, filePath)
 }
 
@@ -384,11 +388,7 @@ function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, mjsSym, {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
-})
+setProperty(gzCompiler, extSym, extDescriptor)
+setProperty(mjsCompiler, extSym, extDescriptor)
 
 export default hook
