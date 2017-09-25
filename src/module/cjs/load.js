@@ -6,12 +6,17 @@ import _load from "../_load.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 
+const extSym = Symbol.for("@std/esm:extensions")
+
 function load(id, parent, isMain, options) {
   const filePath = resolveFilename(id, parent, isMain, options)
-  return _load(filePath, parent, isMain, __non_webpack_require__, loader)
+
+  return _load(filePath, parent, isMain, __non_webpack_require__, function () {
+    return loader.call(this, filePath, options)
+  })
 }
 
-function loader(filePath) {
+function loader(filePath, options) {
   let ext = extname(filePath)
   const { extensions } = __non_webpack_require__
 
@@ -20,11 +25,17 @@ function loader(filePath) {
     ext = ".js"
   }
 
+  let extCompiler = Wrapper.unwrap(extensions, ext)
+
+  if (extCompiler[extSym] &&
+      options && (options.cjs || options.esm !== "mjs")) {
+    extCompiler = extensions[ext]
+  }
+
   const mod = this
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
 
-  const extCompiler = Wrapper.unwrap(extensions, ext)
   extCompiler.call(extensions, mod, filePath)
   mod.loaded = true
 }
