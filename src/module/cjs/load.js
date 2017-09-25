@@ -1,8 +1,8 @@
-import { dirname, extname } from "path"
-
 import Wrapper from "../../wrapper.js"
 
 import _load from "../_load.js"
+import { dirname } from "path"
+import extname from "../../path/extname.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 
@@ -25,7 +25,7 @@ function loader(filePath, options) {
     ext = ".js"
   }
 
-  let extCompiler = Wrapper.unwrap(extensions, ext)
+  let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
 
   if (extCompiler[extSym] &&
       options && (options.cjs || options.esm !== "mjs")) {

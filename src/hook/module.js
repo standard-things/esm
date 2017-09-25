@@ -339,55 +339,43 @@ function hook(Module, parent, options) {
 
   const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 
-  exts.forEach((key) => {
-    if (typeof _extensions[key] !== "function") {
-      // Mimic the built-in behavior for ".mjs" and unrecognized extensions.
-      if (key === ".mjs" || key === ".mjs.gz") {
-        _extensions[key] = mjsCompiler
-      } else if (key.endsWith(".gz")) {
-        _extensions[key] = gzCompiler
-      }
+  exts.forEach((ext) => {
+    if (typeof _extensions[ext] !== "function" &&
+        (ext === ".mjs" || ext === ".mjs.gz")) {
+      _extensions[ext] = mjsCompiler
     }
 
-    const extCompiler = Wrapper.unwrap(_extensions, key)
-    let passthru = ! extCompiler[extSym]
+    const extCompiler = Wrapper.unwrap(_extensions, ext)
 
-    if (passthru &&
-        key === ".mjs") {
-      try {
-        extCompiler()
-      } catch (e) {
-        if (isError(e) &&
-            e.code === "ERR_REQUIRE_ESM") {
-          passthru = false
+    if (extCompiler) {
+      let passthru = ! extCompiler[extSym]
+
+      if (passthru &&
+          ext === ".mjs") {
+        try {
+          extCompiler()
+        } catch (e) {
+          if (isError(e) &&
+              e.code === "ERR_REQUIRE_ESM") {
+            passthru = false
+          }
         }
       }
+
+      passthruMap.set(extCompiler, passthru)
     }
 
-    passthruMap.set(extCompiler, passthru)
-
-    Wrapper.manage(_extensions, key, managerWrapper)
-    Wrapper.wrap(_extensions, key, methodWrapper)
+    Wrapper.manage(_extensions, ext, managerWrapper)
+    Wrapper.wrap(_extensions, ext, methodWrapper)
   })
 
   moduleState.extensions[".js"] = _extensions[".js"]
-}
-
-function gzCompiler(mod, filePath) {
-  let ext = extname(filePath)
-
-  if (ext === ".gz" || typeof this[ext] !== "function") {
-    ext = ".js"
-  }
-
-  return this[ext](mod, filePath)
 }
 
 function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(gzCompiler, extSym, extDescriptor)
 setProperty(mjsCompiler, extSym, extDescriptor)
 
 export default hook
