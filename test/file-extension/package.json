@@ -1,0 +1,10 @@
+{
+  "name": "file-extension",
+  "private": true,
+  "@std/esm": {
+    "cjs": true,
+    "debug": true,
+    "esm": "js",
+    "gz": true
+  }
+}
