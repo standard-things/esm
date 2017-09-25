@@ -19,10 +19,10 @@ function getSourceMappingURL(content) {
     return ""
   }
 
-  let match
+  let match = null
   let pos = length
 
-  while (! match) {
+  while (match === null) {
     pos = content.lastIndexOf(name, pos)
 
     if (pos === -1 ||

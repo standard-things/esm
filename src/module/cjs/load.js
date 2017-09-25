@@ -15,7 +15,8 @@ function loader(filePath) {
   let ext = extname(filePath)
   const { extensions } = __non_webpack_require__
 
-  if (! ext || typeof extensions[ext] !== "function") {
+  if (ext === "" ||
+      typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 

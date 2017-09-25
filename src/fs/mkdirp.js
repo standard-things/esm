@@ -5,7 +5,8 @@ import mkdir from "./mkdir.js"
 function mkdirp(dirPath, scopePath) {
   const parentPath = dirname(dirPath)
 
-  if (dirPath === parentPath || dirPath === scopePath) {
+  if (dirPath === parentPath ||
+      dirPath === scopePath) {
     return true
   }
 

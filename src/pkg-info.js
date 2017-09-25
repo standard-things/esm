@@ -30,7 +30,7 @@ class PkgInfo {
     const cache = new NullObject
     const cacheDir = options.cache
     const cachePath = typeof cacheDir === "string" ? resolve(dirPath, cacheDir) : null
-    const cacheFileNames = cachePath === null ? null : readdir(cachePath)
+    const cacheFileNames = cachePath === null ? cachePath : readdir(cachePath)
 
     let i = -1
     const nameCount = cacheFileNames ? cacheFileNames.length : 0

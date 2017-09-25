@@ -27,7 +27,8 @@ class Module extends BuiltinModule {
     const { _extensions } = this.constructor
     let ext = extname(filePath)
 
-    if (! ext || typeof _extensions[ext] !== "function") {
+    if (ext === "" ||
+        typeof _extensions[ext] !== "function") {
       ext = ".js"
     }
 

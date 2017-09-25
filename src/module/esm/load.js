@@ -67,7 +67,8 @@ function loader(filePath, url) {
   let ext = extname(filePath)
   const { extensions } = moduleState
 
-  if (! ext || typeof extensions[ext] !== "function") {
+  if (ext === "" ||
+      typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 
