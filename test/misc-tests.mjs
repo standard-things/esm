@@ -426,11 +426,11 @@ describe("spec compliance", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should support loading ESM from dynamic import in CJS", (done) => {
+  it("should support loading ESM from dynamic import in CJS", () =>
     import("./misc/import.js")
-      .then((ns) => ns.default(done))
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
-  })
+  )
 
   it("should not have CJS free variables", () =>
     import("./misc/free-vars.mjs")
