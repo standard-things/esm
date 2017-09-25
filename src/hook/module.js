@@ -380,8 +380,7 @@ function gzCompiler(mod, filePath) {
     ext = ".js"
   }
 
-  const extCompiler = this[ext]
-  return extCompiler.call(this, mod, filePath)
+  return this[ext](mod, filePath)
 }
 
 function mjsCompiler(mod, filePath) {

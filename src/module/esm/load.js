@@ -74,13 +74,12 @@ function loader(filePath, url) {
 
   const mod = this
   const entry = Entry.get(mod)
-  const extCompiler = extensions[ext]
 
   entry.url = url
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
 
-  extCompiler.call(extensions, mod, filePath)
+  extensions[ext](mod, filePath)
   mod.loaded = true
 }
 
