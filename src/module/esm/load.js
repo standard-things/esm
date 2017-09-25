@@ -76,12 +76,6 @@ function loader(filePath, url) {
   const extCompiler = extensions[ext]
 
   entry.url = url
-
-  if (typeof extCompiler !== "function") {
-    mod.load(filePath)
-    return
-  }
-
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
 
