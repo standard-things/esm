@@ -1,7 +1,7 @@
 // This module is critical for @std/esm versioning support and should be changed
 // as little as possible. Please ensure any changes are backwards compatible.
 
-import FastObject from "./fast-object.js"
+import NullObject from "./null-object.js"
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
@@ -35,8 +35,8 @@ class Wrapper {
   }
 
   static unwrap(object, key) {
-    const func = object[key]
-    return has(func, wrapSym) ? func[wrapSym]  : func
+    const manager = object[key]
+    return has(manager, wrapSym) ? manager[wrapSym]  : manager
   }
 
   static wrap(object, key, wrapper) {
@@ -50,10 +50,10 @@ class Wrapper {
 }
 
 function createMap(object, key) {
-  const map = new FastObject
+  const map = new NullObject
   map.raw = Wrapper.unwrap(object, key)
   map.versions = []
-  map.wrappers = new FastObject
+  map.wrappers = new NullObject
 
   // Store the wrapper map as object[wrapSym][key] rather than on the
   // function, so that other code can modify the same property  without
@@ -62,7 +62,7 @@ function createMap(object, key) {
 }
 
 function createStore(object) {
-  return object[wrapSym] = new FastObject
+  return object[wrapSym] = new NullObject
 }
 
 function getMap(object, key) {
