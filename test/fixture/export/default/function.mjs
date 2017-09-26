@@ -1,3 +1,3 @@
-export default function f() {
-  return f
+export default function named(value) {
+  return value
 }

@@ -18,7 +18,7 @@ import * as nsFunction from "../../fixture/cjs/exports-function.js"
 import * as nsSafe from "../../fixture/cjs/exports-get-set.js"
 
 export default () => {
-  assert.deepEqual(defaultArray, [1])
+  assert.deepEqual(defaultArray, ["a"])
   assert.strictEqual(nsArray.default, defaultArray)
 
   assert.strictEqual(typeof defaultClass, "function")
