@@ -25,6 +25,16 @@ const abcNs = {
   default: "default"
 }
 
+function checkErrorCode(error, code) {
+  assert.strictEqual(error.name, "Error [" + code + "]")
+  assert.strictEqual(error.code, code)
+}
+
+function checkErrorStack(error, startsWith) {
+  const stack = error.stack.replace(/\r\n/g, "\n")
+  assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+}
+
 beforeEach(() => {
   delete global.customError
   delete global.evaluated
@@ -101,16 +111,11 @@ describe("errors", () => {
     const id5 = path.resolve(__dirname, "fixture/error/syntax.js")
     const id6 = path.resolve(__dirname, "node_modules/error/index.js")
 
-    function check(error, startsWith) {
-      const stack = error.stack.replace(/\r\n/g, "\n")
-      assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
-    }
-
     return Promise.all([
       import(id1)
         .then(() => assert.ok(false))
         .catch((e) => {
-          check(e, [
+          checkErrorStack(e, [
             id2 + ":1",
             'export const a = "a"',
             "^"
@@ -121,7 +126,7 @@ describe("errors", () => {
         import(id3)
         .then(() => assert.ok(false))
         .catch((e) =>
-          check(e, [
+          checkErrorStack(e, [
             id3 + ":1",
             'import { a } from "./export.js"',
             "^"
@@ -130,7 +135,7 @@ describe("errors", () => {
       import(id4)
         .then(() => assert.ok(false))
         .catch((e) =>
-          check(e, [
+          checkErrorStack(e, [
             id4 + ":2",
             '  import"nested"',
             "  ^"
@@ -139,7 +144,7 @@ describe("errors", () => {
       import(id5)
         .then(() => assert.ok(false))
         .catch((e) =>
-          check(e, [
+          checkErrorStack(e, [
             id5 + ":1",
             "syntax@error",
             "      ^"
@@ -148,7 +153,7 @@ describe("errors", () => {
       import(id6)
         .then(() => assert.ok(false))
         .catch((e) =>
-          check(e, [
+          checkErrorStack(e, [
             id6 + ":1",
             "syntax@error",
             "      ^"
@@ -253,7 +258,7 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+        .catch((e) => checkErrorCode(e, "ERR_MISSING_MODULE"))
     ))
   )
 
@@ -266,20 +271,18 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_LEGACY"))
+        .catch((e) => checkErrorCode(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     ))
   )
 
   it('should not resolve non-local "." ids', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        const expected = skipOutsideDot
+      .catch((e) => checkErrorCode(e,
+        skipOutsideDot
           ? "ERR_MISSING_MODULE"
           : "ERR_MODULE_RESOLUTION_LEGACY"
-
-        assert.strictEqual(e.code, expected)
-      })
+      ))
   )
 
   it("should not reevaluate errors", () =>
@@ -313,7 +316,7 @@ describe("Node rules", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./fixture/cof")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_MODULE_RESOLUTION_LEGACY"))
+      .catch((e) => checkErrorCode(e, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
 
   it("should not support overwriting `.json` handling", () => {
@@ -354,7 +357,7 @@ describe("Node rules", () => {
       }
     } catch (e) {
       if (skipOutsideDot) {
-        assert.strictEqual(e.code, "ERR_MISSING_MODULE")
+        checkErrorCode(e, "ERR_MISSING_MODULE")
       } else {
         assert.ifError(e)
       }
@@ -459,13 +462,13 @@ describe("spec compliance", () => {
   it("should not support loading ESM from require", () =>
     import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
+      .catch((e) => checkErrorCode(e, "ERR_REQUIRE_ESM"))
   )
 
   it("should not support loading ESM from require if already loaded", () =>
     import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
+      .catch((e) => checkErrorCode(e, "ERR_REQUIRE_ESM"))
   )
 
   it("should not execute already loaded modules from require", () =>
