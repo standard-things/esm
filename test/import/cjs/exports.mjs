@@ -1,5 +1,4 @@
 import assert from "assert"
-import { add, reset, value } from "../../fixture/cjs/bridge.js"
 import defaultArray, * as nsArray from "../../fixture/cjs/exports-array.js"
 import defaultClass, { a as namedClass } from "../../fixture/cjs/exports-class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/exports-default.js"
@@ -47,13 +46,6 @@ export default () => {
 
   assert.strictEqual(defaultUndefined, void 0)
   assert.strictEqual(nsUndefined.default, defaultUndefined)
-
-  add(5)
-  add(5)
-
-  assert.strictEqual(value, 10)
-  assert.strictEqual(reset(), 0)
-  assert.strictEqual(value, 0)
 
   assert.deepEqual(nsEmpty, { default: {} })
   assert.deepEqual(nsEmptyPseudo, {})

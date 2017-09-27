@@ -1,6 +1,6 @@
 import assert from "assert"
-import bridge from "../fixture/seal/bridge.mjs"
+import cycle from "../fixture/seal/cycle.mjs"
 
 export default () => {
-  assert.strictEqual(bridge.a, "a")
+  assert.strictEqual(cycle.a, "a")
 }

@@ -18,8 +18,13 @@ describe("dynamic import", () => {
     import("./fixture/live.mjs").then((ns) => {
       ns.reset()
       assert.strictEqual(ns.value, 0)
+
       ns.add(2)
-      assert.strictEqual(ns.value, 2)
+      ns.add(2)
+      assert.strictEqual(ns.value, 4)
+
+      assert.strictEqual(ns.reset(), 0)
+      assert.strictEqual(ns.value, 0)
     })
     .catch((e) => assert.ifError(e))
   )
