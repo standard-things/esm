@@ -208,16 +208,16 @@ function hook(Module, parent, options) {
       runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
 
     const exported = {}
-    const Module = mod.constructor
-    const moduleWrap = Module.wrap
+    const Ctor = mod.constructor
+    const moduleWrap = Ctor.wrap
 
     const customWrap = (script) => {
-      Module.wrap = moduleWrap
+      Ctor.wrap = moduleWrap
       return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
     }
 
     if (! options.cjs) {
-      Module.wrap = customWrap
+      Ctor.wrap = customWrap
     }
 
     setSourceType(exported, "module")
@@ -226,8 +226,8 @@ function hook(Module, parent, options) {
     try {
       tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
     } finally {
-      if (Module.wrap === customWrap) {
-        Module.wrap = moduleWrap
+      if (Ctor.wrap === customWrap) {
+        Ctor.wrap = moduleWrap
       }
     }
   }
