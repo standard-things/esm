@@ -208,6 +208,7 @@ function hook(Module, parent, options) {
       runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
 
     const exported = {}
+    const Module = mod.constructor
     const moduleWrap = Module.wrap
 
     const customWrap = (script) => {
