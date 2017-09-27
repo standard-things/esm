@@ -3,7 +3,6 @@ import { extname, resolve } from "path"
 import compiler from "./compiler.js"
 import createOptions from "./util/create-options.js"
 import gzip from "./fs/gzip.js"
-import keys from "./util/keys.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
@@ -51,12 +50,13 @@ function compileAndWrite(code, options) {
 
 function removeExpired(cache, cachePath, cacheFileName) {
   const shortname = cacheFileName.slice(0, 8)
-  keys(cache).forEach((key) => {
+
+  for (const key in cache) {
     if (key !== cacheFileName &&
         key.startsWith(shortname)) {
       removeFile(resolve(cachePath, key))
     }
-  })
+  }
 }
 
 function toCompileOptions(options) {

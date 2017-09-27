@@ -175,9 +175,8 @@ class Entry {
     }
 
     const { children } = this
-    const ids = keys(children)
 
-    for (const id of ids) {
+    for (const id in children) {
       if (! children[id].loaded()) {
         return this._loaded = 0
       }
@@ -286,9 +285,7 @@ class Entry {
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    const ids = keys(parentsMap)
-
-    for (const id of ids) {
+    for (const id in parentsMap) {
       // What happens if `parents[parentIDs[id]] === module`, or if
       // longer cycles exist in the parent chain? Thanks to our `setter.last`
       // bookkeeping in `changed()`, the `entry.update()` broadcast will only
@@ -339,10 +336,10 @@ function forEachSetter(entry, callback) {
   entry._changed = false
   runGetters(entry)
 
-  const names = keys(entry.setters)
+  const settersMap = entry.setters
 
-  for (const name of names) {
-    const setters = entry.setters[name]
+  for (const name in settersMap) {
+    const setters = settersMap[name]
 
     if (! setters.length) {
       continue
@@ -408,11 +405,10 @@ function runGetters(entry) {
     return
   }
 
-  const { _namespace } = entry
-  const names = keys(entry.getters)
+  const { _namespace, getters } = entry
 
-  for (const name of names) {
-    const value = runGetter(entry.getters[name])
+  for (const name in getters) {
+    const value = runGetter(getters[name])
 
     if (value !== GETTER_ERROR &&
         ! compare(_namespace, name, value)) {
@@ -430,9 +426,8 @@ function setNamespaceToStringTag(namespace) {
 
 function validateSetters(entry) {
   const { getters, setters } = entry
-  const names = keys(setters)
 
-  for (const name of names) {
+  for (const name in setters) {
     if (name !== "*" &&
         ! (name in getters)) {
       raiseMissingExport(entry, name)
