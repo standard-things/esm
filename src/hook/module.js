@@ -366,11 +366,15 @@ function hook(Module, parent, options) {
       passthruMap.set(extCompiler, passthru)
     }
 
+    if (ext === ".js" &&
+        moduleState.extensions !== _extensions) {
+      Wrapper.manage(moduleState.extensions, ext, managerWrapper)
+      Wrapper.wrap(moduleState.extensions, ext, methodWrapper)
+    }
+
     Wrapper.manage(_extensions, ext, managerWrapper)
     Wrapper.wrap(_extensions, ext, methodWrapper)
   })
-
-  moduleState.extensions[".js"] = _extensions[".js"]
 }
 
 function mjsCompiler(mod, filePath) {
