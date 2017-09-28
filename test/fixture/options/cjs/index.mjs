@@ -1,1 +1,1 @@
-export { __dirname }
+export default module.exports
