@@ -25,6 +25,12 @@ describe("require hook", () => {
       .catch((e) => assert.ifError(e))
   )
 
+  it("should support live binding", () =>
+    import("./require/live.mjs")
+      .then((ns) => ns.default())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should support creating multiple loaders with different options", (done) => {
     import("./require/mixed.mjs")
       .then((ns) => ns.default(done))
