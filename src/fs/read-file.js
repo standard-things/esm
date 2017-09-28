@@ -7,6 +7,7 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
 const { internalModuleReadFile } = fsBinding
+
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {

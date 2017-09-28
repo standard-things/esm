@@ -18,6 +18,7 @@ const { sort } = Array.prototype
 
 const GETTER_ERROR = {}
 const entryMap = new SafeWeakMap
+
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
 const toStringTagDescriptor = {

@@ -4,11 +4,12 @@ import { statSync } from "fs"
 
 const fsBinding = binding.fs
 const { getStatValues, stat } = fsBinding
-const useGetStatValues = typeof getStatValues === "function"
 
-let statValues
+const useGetStatValues = typeof getStatValues === "function"
 let useMtimeFastPath = typeof stat === "function" &&
   satisfies(process.version, "^6.10.1||>=7.7")
+
+let statValues
 
 if (useMtimeFastPath) {
   statValues = useGetStatValues
