@@ -1,16 +1,4 @@
 import assert from "assert"
-import fs from "fs-extra"
-import zlib from "zlib"
-
-if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
-  const content = fs.readFileSync("./fixture/options/js/index.js")
-  const gzipped = zlib.gzipSync(content)
-  fs.writeFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
-}
-
-beforeEach(() => {
-  delete global.this
-})
 
 describe("require hook", () => {
   it("should create an ESM loader", () =>

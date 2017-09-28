@@ -10,11 +10,9 @@ const isWin = process.platform === "win32"
 const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
+const pkgJSON = JSON.parse(fs.readFileSync("../package.json", "utf8"))
 const pkgPath = path.resolve(__dirname, "../index.js")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
-
-const jsonExt = require.extensions[".json"]
-const json = JSON.parse(fs.readFileSync("./package.json", "utf8"))
 
 const abcId = "./fixture/export/abc.mjs"
 
@@ -34,14 +32,6 @@ function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
 }
-
-beforeEach(() => {
-  delete global.customError
-  delete global.evaluated
-  delete global.loadCount
-  delete require.extensions[".coffee"]
-  require.extensions[".json"] = jsonExt
-})
 
 describe("built-in modules", () => {
   it("should load built-in modules", () =>
@@ -321,8 +311,8 @@ describe("Node rules", () => {
 
   it("should not support overwriting `.json` handling", () => {
     require.extensions[".json"] = () => ({})
-    return import("./package.json")
-      .then((ns) => assert.deepEqual(ns.default, json))
+    return import("../package.json")
+      .then((ns) => assert.deepEqual(ns.default, pkgJSON))
       .catch((e) => assert.ifError(e))
   })
 
