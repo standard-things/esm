@@ -204,8 +204,10 @@ function hook(Module, parent, options) {
     }
 
     content =
-      (options.cjs ? '"use strict";const ' + runtimeAlias + "=this;" : "") +
-      runtimeAlias + ".r((" + async + "function(){" + content + "\n}))"
+      '"use strict";const ' + runtimeAlias + "=this;" +
+      runtimeAlias + ".r((" + async + "function(" +
+      (options.cjs ? "exports,require" : "") +
+      "){" + content + "\n}))"
 
     const exported = {}
     const Ctor = mod.constructor
@@ -213,7 +215,7 @@ function hook(Module, parent, options) {
 
     const customWrap = (script) => {
       Ctor.wrap = moduleWrap
-      return '"use strict";(function(){const ' + runtimeAlias + "=this;" + script + "\n})"
+      return "(function(){" + script + "\n})"
     }
 
     if (! options.cjs) {

@@ -83,7 +83,7 @@ class Runtime {
   }
 
   run(moduleWrapper) {
-    const runner = moduleWrapper.length ? runCJS : runESM
+    const runner = this.entry.sourceType === "module" ? runESM : runCJS
     runner(this, moduleWrapper)
   }
 
@@ -177,7 +177,14 @@ function runESM(runtime, moduleWrapper) {
   const { entry, module:mod, options } = runtime
   const exported = mod.exports = entry.exports
 
-  moduleWrapper.call(options.cjs ? exported : void 0)
+  if (options.cjs) {
+    const requirer = (id) => importModule(id, mod, loadESM, options).exports
+    const req = makeRequireFunction(mod, requirer)
+    moduleWrapper.call(exported, exported, req)
+  } else {
+    moduleWrapper.call(void 0)
+  }
+
   mod.loaded = true
 
   entry.update().loaded()
