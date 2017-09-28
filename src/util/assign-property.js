@@ -1,28 +1,22 @@
-import getGetter from "./get-getter.js"
-import getSetter from "./get-setter.js"
+import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
-import setGetter from "./set-getter.js"
-import setSetter from "./set-setter.js"
+
+const { defineProperty, getOwnPropertyDescriptor } = Object
 
 function assignProperty(object, source, key) {
   if (! isObjectLike(object)) {
     return object
   }
 
-  const getter = getGetter(source, key)
-  const setter = getSetter(source, key)
-  const hasGetter = typeof getter === "function"
-  const hasSetter = typeof setter === "function"
+  const sourceDescriptor = getOwnPropertyDescriptor(source, key)
 
-  if (hasGetter || hasSetter) {
-    if (hasGetter) {
-      setGetter(object, key, getter)
-    }
-    if (hasSetter) {
-      setSetter(object, key, setter)
-    }
-  } else {
+  if (sourceDescriptor.configurable === true &&
+      sourceDescriptor.enumerable === true &&
+      sourceDescriptor.writable === true &&
+      has(sourceDescriptor, "value")) {
     object[key] = source[key]
+  } else {
+    defineProperty(object, key, sourceDescriptor)
   }
 
   return object
