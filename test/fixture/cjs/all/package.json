@@ -1,9 +1,0 @@
-{
-  "name": "cjs",
-  "private": true,
-  "@std/esm": {
-    "esm": "all",
-    "cjs": true,
-    "debug": true
-  }
-}
