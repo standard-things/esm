@@ -23,9 +23,21 @@ const abcNs = {
   default: "default"
 }
 
-function checkErrorCode(error, code) {
-  assert.strictEqual(error.name, "Error [" + code + "]")
+function checkError(error, code) {
+  const proto = Object.getPrototypeOf(error)
+  const codeDescriptor = Object.getOwnPropertyDescriptor(proto, "code")
+  const nameDescriptor = Object.getOwnPropertyDescriptor(proto, "name")
+
   assert.strictEqual(error.code, code)
+  assert.strictEqual(error.name, "Error [" + code + "]")
+
+  error.code = "ERR_CUSTOM"
+  assert.strictEqual(error.code, "ERR_CUSTOM")
+  Object.defineProperty(error, "code", codeDescriptor)
+
+  error.name = "Custom"
+  assert.strictEqual(error.name, "Custom")
+  Object.defineProperty(error, "name", nameDescriptor)
 }
 
 function checkErrorStack(error, startsWith) {
@@ -248,7 +260,7 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => checkErrorCode(e, "ERR_MISSING_MODULE"))
+        .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
     ))
   )
 
@@ -261,14 +273,14 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
-        .catch((e) => checkErrorCode(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+        .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     ))
   )
 
   it('should not resolve non-local "." ids', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => checkErrorCode(e,
+      .catch((e) => checkError(e,
         skipOutsideDot
           ? "ERR_MISSING_MODULE"
           : "ERR_MODULE_RESOLUTION_LEGACY"
@@ -306,7 +318,7 @@ describe("Node rules", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./fixture/cof")
       .then(() => assert.ok(false))
-      .catch((e) => checkErrorCode(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+      .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
 
   it("should not support overwriting `.json` handling", () => {
@@ -347,7 +359,7 @@ describe("Node rules", () => {
       }
     } catch (e) {
       if (skipOutsideDot) {
-        checkErrorCode(e, "ERR_MISSING_MODULE")
+        checkError(e, "ERR_MISSING_MODULE")
       } else {
         assert.ifError(e)
       }
@@ -452,13 +464,13 @@ describe("spec compliance", () => {
   it("should not support loading ESM from require", () =>
     import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => checkErrorCode(e, "ERR_REQUIRE_ESM"))
+      .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
   it("should not support loading ESM from require if already loaded", () =>
     import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
-      .catch((e) => checkErrorCode(e, "ERR_REQUIRE_ESM"))
+      .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
   it("should not execute already loaded modules from require", () =>

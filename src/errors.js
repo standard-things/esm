@@ -1,6 +1,7 @@
 import FastObject from "./fast-object.js"
 
 import { format } from "util"
+import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const codeSym = Symbol.for("@std/esm:errorCode")
@@ -27,8 +28,16 @@ function createClass(Super) {
       return super.name + " [" + this[codeSym] + "]"
     }
 
+    set name(value) {
+      setProperty(this, "name", { value })
+    }
+
     get code() {
       return this[codeSym]
+    }
+
+    set code(value) {
+      setProperty(this, "code", { value })
     }
   }
 }
