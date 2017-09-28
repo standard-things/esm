@@ -5,6 +5,7 @@ import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
 import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
+import isEmpty from "./util/is-empty.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import keysAll from "./util/keys-all.js"
@@ -100,10 +101,15 @@ class Entry {
     }
   }
 
+  addGetter(name, getter) {
+    getter.owner = this.module
+    this.getters[name] = getter
+    return this
+  }
+
   addGetters(getterPairs) {
     for (const [name, getter] of getterPairs) {
-      getter.owner = this.module
-      this.getters[name] = getter
+      this.addGetter(name, getter)
     }
 
     return this
@@ -185,9 +191,14 @@ class Entry {
 
     // While CJS bridge modules don't have getters to assign to the raw
     // namespace object, they do have populated exports objects.
-    if (! this.getters.length &&
-        ! this.setters.length) {
+    if (isEmpty(this.getters) &&
+        isEmpty(this.setter)) {
       assignExportsToNamespace(this)
+      const { _namespace } = this
+
+      for (const name in _namespace) {
+        this.addGetter(name, () => this._namespace[name])
+      }
     }
 
     setGetter(this, "esmNamespace", () => {
@@ -201,14 +212,14 @@ class Entry {
       // Section 9.4.6.11
       // Step 7: Module namespace objects have sorted properties.
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-      const raw = this._namespace
-      const names = sort.call(keys(raw))
+      const { _namespace } = this
+      const names = sort.call(keys(_namespace))
 
       for (const name of names) {
         if (isSafe) {
-          namespace[name] = raw[name]
+          namespace[name] = _namespace[name]
         } else {
-          assignProperty(namespace, raw, name)
+          assignProperty(namespace, _namespace, name)
         }
       }
 
