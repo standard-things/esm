@@ -1,8 +1,8 @@
-import has from "./has.js"
+const { hasOwnProperty } = Object.prototype
 
 function isEmpty(object) {
   for (const key in object) {
-    if (has(object, key)) {
+    if (hasOwnProperty.call(object, key)) {
       return false
     }
   }

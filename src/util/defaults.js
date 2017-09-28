@@ -1,5 +1,6 @@
-import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
+
+const { hasOwnProperty } = Object.prototype
 
 function defaults(object) {
   if (! isObjectLike(object)) {
@@ -12,14 +13,10 @@ function defaults(object) {
   while (++i < argCount) {
     const source = arguments[i]
 
-    if (! isObjectLike(source)) {
-      continue
-    }
-
     for (const key in source) {
-      if (has(source, key) &&
+      if (hasOwnProperty.call(source, key) &&
           (object[key] === void 0 ||
-           ! has(object, key))) {
+           ! hasOwnProperty.call(object, key))) {
         object[key] = source[key]
       }
     }
