@@ -10,6 +10,8 @@ function hook(Module) {
   const [, mainPath] = argv
   const { runMain } = Module
 
+  const useTickCallback = typeof _tickCallback === "function"
+
   Module.runMain = function () {
     Module.runMain = runMain
 
@@ -31,9 +33,9 @@ function hook(Module) {
   }
 
   function tryTickCallback() {
-    try {
-      _tickCallback.call(process)
-    } catch (e) {}
+    if (useTickCallback) {
+      _tickCallback()
+    }
   }
 }
 
