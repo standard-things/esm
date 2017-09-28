@@ -48,7 +48,7 @@ module.exports = (mod, options) => {
     return makeLoaderFunction(options)(mod, options)
   }
 
-  return loader(mod, options)
+  return loader(mod)
 }
 
 Object.freeze(Object.defineProperty(module.exports, inspectKey, descriptor))
