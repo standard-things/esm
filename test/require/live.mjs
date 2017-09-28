@@ -1,5 +1,5 @@
 import assert from "assert"
-import { add, reset, value } from "../fixture/require/relive.mjs"
+import { add, reset, value } from "../fixture/require/live.mjs"
 
 export default () => {
   reset()
