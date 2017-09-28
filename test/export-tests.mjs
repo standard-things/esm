@@ -49,7 +49,7 @@ describe("export declarations", () => {
       .catch((e) => assert.ifError(e))
   )
 
-  it("should tolerate one-to-many renamed exports", () =>
+  it("should support one-to-many renamed exports", () =>
     import("./export/renamed.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
