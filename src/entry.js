@@ -153,18 +153,23 @@ class Entry {
     return this
   }
 
+  addSetter(name, setter, parent) {
+    let setters = this.setters[name]
+
+    if (! setters) {
+      setters =
+      this.setters[name] = []
+    }
+
+    setter.last = new NullObject
+    setter.parent = parent
+    setters.push(setter)
+    return this
+  }
+
   addSetters(setterPairs, parent) {
     for (const [name, setter] of setterPairs) {
-      let setters = this.setters[name]
-
-      if (! setters) {
-        setters =
-        this.setters[name] = []
-      }
-
-      setter.last = new NullObject
-      setter.parent = parent
-      setters.push(setter)
+      this.addSetter(name, setter, parent)
     }
 
     return this
