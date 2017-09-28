@@ -24,20 +24,20 @@ function createClass(Super) {
       this[codeSym] = key
     }
 
-    get name() {
-      return super.name + " [" + this[codeSym] + "]"
-    }
-
-    set name(value) {
-      setProperty(this, "name", { value })
-    }
-
     get code() {
       return this[codeSym]
     }
 
     set code(value) {
       setProperty(this, "code", { value })
+    }
+
+    get name() {
+      return super.name + " [" + this[codeSym] + "]"
+    }
+
+    set name(value) {
+      setProperty(this, "name", { value })
     }
   }
 }
