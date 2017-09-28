@@ -417,12 +417,17 @@ function runGetter(getter) {
 }
 
 function runGetters(entry) {
-  if (entry.sourceType !== "module") {
-    assignExportsToNamespace(entry)
-    return
-  }
+  const { _namespace, getters, options, sourceType } = entry
+  const isScript = sourceType !== "module"
 
-  const { _namespace, getters } = entry
+  if (isScript ||
+      options.cjs) {
+    assignExportsToNamespace(entry)
+
+    if (isScript) {
+      return
+    }
+  }
 
   for (const name in getters) {
     const value = runGetter(getters[name])
