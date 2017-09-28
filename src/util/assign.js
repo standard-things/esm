@@ -1,5 +1,6 @@
 import isObjectLike from "./is-object-like.js"
-import keys from "./keys.js"
+
+const { hasOwnProperty } = Object.prototype
 
 function assign(object) {
   if (! isObjectLike(object)) {
@@ -11,10 +12,11 @@ function assign(object) {
 
   while (++i < argCount) {
     const source = arguments[i]
-    const names = keys(source)
 
-    for (const name of names) {
-      object[name] = source[name]
+    for (const name in source) {
+      if (hasOwnProperty.call(source, name)) {
+        object[name] = source[name]
+      }
     }
   }
 
