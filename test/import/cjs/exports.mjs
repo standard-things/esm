@@ -13,6 +13,7 @@ import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/exports-pseudo.
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/exports-undefined.js"
 import * as nsClass from "../../fixture/cjs/exports-class.js"
 import * as nsEmptyPseudo from "../../fixture/cjs/exports-pseudo-empty.js"
+import * as nsOfExports from "../../fixture/cjs/exports-of-exports.mjs"
 import * as nsPseudo from "../../fixture/cjs/exports-pseudo.js"
 import * as nsFunction from "../../fixture/cjs/exports-function.js"
 import * as nsSafe from "../../fixture/cjs/exports-get-set.js"
@@ -23,37 +24,38 @@ function isPlainObject(object) {
 
 export default () => {
   assert.deepEqual(defaultArray, ["a"])
-  assert.strictEqual(nsArray.default, defaultArray)
+  assert.deepEqual(nsArray, { 0: "a", default: defaultArray })
 
-  assert.strictEqual(typeof defaultClass, "function")
-  assert.strictEqual(nsClass.default, defaultClass)
   assert.strictEqual(aOfClass, "a")
+  assert.strictEqual(typeof defaultClass, "function")
+  assert.deepEqual(nsClass, { default: defaultClass })
 
-  assert.strictEqual(defaultDefault.default, "default")
-  assert.strictEqual(defaultDefault, nsDefault.default)
+  assert.deepEqual(defaultDefault, { default: "default" })
+  assert.deepEqual(nsDefault, { default: defaultDefault })
 
-  assert.strictEqual(defaultFunction(), "ok")
-  assert.strictEqual(nsFunction.default, defaultFunction)
   assert.strictEqual(aOfFunction, "a")
+  assert.strictEqual(defaultFunction(), "ok")
+  assert.deepEqual(nsFunction, { a: "a", default: defaultFunction })
 
   assert.strictEqual(defaultNull, null)
-  assert.strictEqual(nsNull.default, defaultNull)
+  assert.deepEqual(nsNull, { default: defaultNull })
 
   assert.strictEqual(defaultNumber, 1)
-  assert.strictEqual(nsNumber.default, defaultNumber)
+  assert.deepEqual(nsNumber, { default: defaultNumber })
 
   assert.deepEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
 
-  assert.strictEqual(defaultOfExports, "default")
   assert.strictEqual(aOfExports, "a")
+  assert.strictEqual(defaultOfExports, "default")
+  assert.deepEqual(nsOfExports, { a: "a", b: "b", default: "default" })
 
-  assert.strictEqual(defaultPseudo, "default")
-  assert.strictEqual(nsPseudo.default, defaultPseudo)
   assert.strictEqual(aOfPseudo, "a")
+  assert.strictEqual(defaultPseudo, "default")
+  assert.deepEqual(nsPseudo, { a: "a", default: "default" })
 
   assert.strictEqual(defaultUndefined, void 0)
-  assert.strictEqual(nsUndefined.default, defaultUndefined)
+  assert.deepEqual(nsUndefined, { default: defaultUndefined })
 
   assert.deepEqual(nsEmpty, { default: {} })
   assert.deepEqual(nsEmptyPseudo, {})
