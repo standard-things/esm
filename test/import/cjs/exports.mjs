@@ -8,9 +8,9 @@ import defaultFunction, { a as aOfFunction } from "../../fixture/cjs/exports-fun
 import defaultNull, * as nsNull from "../../fixture/cjs/exports-null.js"
 import defaultNumber, * as nsNumber from "../../fixture/cjs/exports-number.js"
 import defaultObject, { a as aOfObject } from "../../fixture/cjs/exports-object.js"
+import defaultOfExports, { a as aOfExports } from "../../fixture/cjs/exports-of-exports.mjs"
 import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/exports-pseudo.js"
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/exports-undefined.js"
-import { a as aOfExports } from "../../fixture/cjs/exports-named.mjs"
 import * as nsClass from "../../fixture/cjs/exports-class.js"
 import * as nsEmptyPseudo from "../../fixture/cjs/exports-pseudo-empty.js"
 import * as nsPseudo from "../../fixture/cjs/exports-pseudo.js"
@@ -24,7 +24,6 @@ function isPlainObject(object) {
 export default () => {
   assert.deepEqual(defaultArray, ["a"])
   assert.strictEqual(nsArray.default, defaultArray)
-  assert.strictEqual(aOfExports, "a")
 
   assert.strictEqual(typeof defaultClass, "function")
   assert.strictEqual(nsClass.default, defaultClass)
@@ -32,10 +31,6 @@ export default () => {
 
   assert.strictEqual(defaultDefault.default, "default")
   assert.strictEqual(defaultDefault, nsDefault.default)
-
-  assert.strictEqual(defaultPseudo, "default")
-  assert.strictEqual(nsPseudo.default, defaultPseudo)
-  assert.strictEqual(aOfPseudo, "a")
 
   assert.strictEqual(defaultFunction(), "ok")
   assert.strictEqual(nsFunction.default, defaultFunction)
@@ -49,6 +44,13 @@ export default () => {
 
   assert.deepEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
+
+  assert.strictEqual(defaultOfExports, "default")
+  assert.strictEqual(aOfExports, "a")
+
+  assert.strictEqual(defaultPseudo, "default")
+  assert.strictEqual(nsPseudo.default, defaultPseudo)
+  assert.strictEqual(aOfPseudo, "a")
 
   assert.strictEqual(defaultUndefined, void 0)
   assert.strictEqual(nsUndefined.default, defaultUndefined)
