@@ -1,13 +1,35 @@
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
-import module from "./fixture/repl/module.mjs"
+import module from "./module.js"
+import path from "path"
 import repl from "repl"
+import require from "./require.js"
 import vm from "vm"
 
-const context = vm.createContext({ module })
+const isWin = process.platform === "win32"
+
+const __filename = import.meta.url.slice(isWin ? 8 : 7)
+const __dirname = path.dirname(__filename)
+
+const pkgPath = path.resolve(__dirname, "../index.js")
+const parent = require.cache[pkgPath].parent
+const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
 
 describe("REPL hook", () => {
+  let context
+
+  before(() => {
+    context = vm.createContext({ module: new module.constructor("<repl>") })
+
+    delete require.cache[pkgPath]
+    context.module.require(pkgPath)
+
+    delete require.cache[pkgPath]
+    parent.children.splice(pkgIndex, 1)
+    parent.require(pkgPath)
+  })
+
   it("should work with a global context", (done) => {
     const r = repl.start({ useGlobal: true })
     const code = 'import { default as globalAssert } from "assert"'
