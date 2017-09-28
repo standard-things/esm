@@ -1,2 +1,1 @@
-import { add, reset, value } from "./live.js"
-export { add, reset, value }
+export * from "./live.js"
