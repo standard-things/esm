@@ -444,15 +444,9 @@ function runGetter(getter) {
 }
 
 function runGetters(entry) {
-  const isScript = entry.sourceType !== "module"
-
-  if (isScript ||
-      entry.options.cjs) {
+  if (entry.sourceType !== "module") {
     assignExportsToNamespace(entry)
-
-    if (isScript) {
-      return
-    }
+    return
   }
 
   const { _namespace, getters } = entry
