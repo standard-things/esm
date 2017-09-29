@@ -126,7 +126,7 @@ class Entry {
   addGettersFrom(otherEntry) {
     const { _namespace, getters } = this
     const { _namespace:otherNamespace, getters:otherGetters } = otherEntry
-    const isSafe = otherEntry.sourceType !== "script"
+    const safe = isSafe(otherEntry)
 
     for (const key in otherNamespace) {
       if (key === "default") {
@@ -148,7 +148,7 @@ class Entry {
       }
 
       if (getter.owner.id === otherGetter.owner.id) {
-        if (isSafe) {
+        if (safe) {
           _namespace[key] = otherNamespace[key]
         } else {
           assignProperty(_namespace, otherNamespace, key)
@@ -188,13 +188,13 @@ class Entry {
       return this._loaded
     }
 
-    this._loaded = -1
-
     if (! this.module.loaded) {
       return this._loaded = 0
     }
 
-    const { _namespace, children, getters } = this
+    this._loaded = -1
+
+    const { children } = this
 
     for (const id in children) {
       if (! children[id].loaded()) {
@@ -204,6 +204,8 @@ class Entry {
 
     assignExportsToNamespace(this)
 
+    const { _namespace, getters } = this
+
     for (const name in _namespace) {
       if (! (name in getters)) {
         this.addGetter(name, () => this._namespace[name])
@@ -211,12 +213,12 @@ class Entry {
     }
 
     if (this.sourceType === "module") {
-      const { exports:exported, options } = this
+      const { exports:exported } = this
 
       validateSetters(this)
       assign(exported, _namespace)
 
-      if (options.cjs &&
+      if (this.options.cjs &&
           ! has(exported, "__esModule")) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
@@ -234,11 +236,11 @@ class Entry {
       // Step 7: Module namespace objects have sorted properties.
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       const { _namespace } = this
-      const isSafe = this.sourceType !== "script"
       const names = sort.call(keys(_namespace))
+      const safe = isSafe(this)
 
       for (const name of names) {
-        if (isSafe) {
+        if (safe) {
           namespace[name] = _namespace[name]
         } else {
           assignProperty(namespace, _namespace, name)
@@ -328,8 +330,8 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const { _namespace, exports:exported, sourceType } = entry
-  const isScript = sourceType === "script"
+  const { _namespace, exports:exported } = entry
+  const isScript = entry.sourceType === "script"
 
   if (isScript) {
     _namespace.default = exported
@@ -339,13 +341,12 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const { options } = entry
-  const isSafe = ! isScript && ! options.cjs
+  const safe = isSafe(entry)
   const object = entry._loaded === 1 ? _namespace : exported
-  const names = isSafe ? keys(object) : keysAll(object)
+  const names = safe ? keys(object) : keysAll(object)
 
   for (const name of names) {
-    if (isSafe) {
+    if (safe) {
       _namespace[name] = exported[name]
     } else if (! isScript || name !== "default") {
       assignProperty(_namespace, exported, name)
@@ -394,9 +395,8 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(entry, setter, name) {
-  const { _namespace, sourceType } = entry
   const { options } = setter.parent
-  const isScript = ! options.cjs && sourceType !== "module"
+  const isScript = ! options.cjs && entry.sourceType !== "module"
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
@@ -407,6 +407,8 @@ function getExportByName(entry, setter, name) {
     return entry.exports
   }
 
+  const { _namespace } = entry
+
   if (isScript ||
       (entry._loaded === 1 &&
        ! (name in _namespace))) {
@@ -414,6 +416,10 @@ function getExportByName(entry, setter, name) {
   }
 
   return _namespace[name]
+}
+
+function isSafe(entry) {
+  return entry.sourceType !== "script" &&  ! entry.options.cjs
 }
 
 function raiseMissingExport(entry, name) {
@@ -436,17 +442,18 @@ function runGetter(getter) {
 }
 
 function runGetters(entry) {
-  const { _namespace, getters, options, sourceType } = entry
-  const isScript = sourceType !== "module"
+  const isScript = entry.sourceType !== "module"
 
   if (isScript ||
-      options.cjs) {
+      entry.options.cjs) {
     assignExportsToNamespace(entry)
 
     if (isScript) {
       return
     }
   }
+
+  const { _namespace, getters } = entry
 
   for (const name in getters) {
     const value = runGetter(getters[name])
