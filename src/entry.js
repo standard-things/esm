@@ -385,7 +385,8 @@ function forEachSetter(entry, callback) {
     for (const setter of setters) {
       const value = getExportByName(entry, setter, name)
 
-      if (entry._changed || changed(setter, name, value)) {
+      if (entry._changed ||
+          changed(setter, name, value)) {
         callback(setter, value)
       }
     }
@@ -395,8 +396,9 @@ function forEachSetter(entry, callback) {
 }
 
 function getExportByName(entry, setter, name) {
-  const { options } = setter.parent
-  const isScript = ! options.cjs && entry.sourceType !== "module"
+  const isScript =
+    entry.sourceType !== "module" &&
+    ! setter.parent.options.cjs
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
