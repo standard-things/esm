@@ -37,7 +37,7 @@
     "babel-plugin-transform-for-of-as-array": "^1.0.3",
     "babel-preset-env": "^1.6.0",
     "download": "^6.2.5",
-    "eslint": "^4.7.1",
+    "eslint": "^4.8.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.2.0",
     "execa": "^0.8.0",
