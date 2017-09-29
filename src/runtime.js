@@ -1,11 +1,9 @@
 import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
-import assign from "./util/assign.js"
 import builtinEntries from "./builtin-entries.js"
 import { extname } from "path"
 import getSourceType from "./util/get-source-type.js"
-import has from "./util/has.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
@@ -13,13 +11,6 @@ import moduleState from "./module/state.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
-
-const esmDescriptor = {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
-}
 
 class Runtime {
   static enable(mod, exported, options) {
@@ -186,14 +177,7 @@ function runESM(runtime, moduleWrapper) {
   }
 
   mod.loaded = true
-
   entry.update().loaded()
-  assign(exported, entry._namespace)
-
-  if (options.cjs &&
-      ! has(exported, "__esModule")) {
-    setProperty(exported, "__esModule", esmDescriptor)
-  }
 }
 
 Object.setPrototypeOf(Runtime.prototype, null)

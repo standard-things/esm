@@ -6,7 +6,7 @@ const noValue = require("../../../fixture/export/abc.mjs")
 
 export default () => {
   assert.deepEqual(Object.getOwnPropertyDescriptor(customValue, "__esModule"), {
-    configurable: true,
+    configurable: false,
     enumerable: true,
     value: "a",
     writable: true

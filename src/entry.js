@@ -1,11 +1,12 @@
 import NullObject from "./null-object.js"
 import SafeWeakMap from "./safe-weak-map.js"
 
+import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
 import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
-import isEmpty from "./util/is-empty.js"
+import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import keysAll from "./util/keys-all.js"
@@ -22,6 +23,13 @@ const entryMap = new SafeWeakMap
 
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
 
+const esmDescriptor = {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+}
+
 const toStringTagDescriptor = {
   configurable: false,
   enumerable: false,
@@ -32,9 +40,9 @@ const toStringTagDescriptor = {
 class Entry {
   constructor(mod, exported, options) {
     /* eslint-disable lines-around-comment */
-    // A boolean indicating whether the module namespace has changed.
+    // The namespace object change indicator.
     this._changed = true
-    // A number indicating the loading state of the module.
+    // The loading state of the module.
     this._loaded = 0
     // The raw namespace object.
     this._namespace = new NullObject
@@ -186,7 +194,7 @@ class Entry {
       return this._loaded = 0
     }
 
-    const { children } = this
+    const { _namespace, children, getters } = this
 
     for (const id in children) {
       if (! children[id].loaded()) {
@@ -194,21 +202,29 @@ class Entry {
       }
     }
 
-    // While CJS bridge modules don't have getters to assign to the raw
-    // namespace object, they do have populated exports objects.
-    if (isEmpty(this.getters) &&
-        isEmpty(this.setter)) {
-      assignExportsToNamespace(this)
-      const { _namespace } = this
+    assignExportsToNamespace(this)
 
-      for (const name in _namespace) {
+    for (const name in _namespace) {
+      if (! (name in getters)) {
         this.addGetter(name, () => this._namespace[name])
       }
     }
 
-    setGetter(this, "esmNamespace", () => {
-      const isSafe = this.sourceType !== "script"
+    if (this.sourceType === "module") {
+      const { exports:exported, options } = this
 
+      validateSetters(this)
+      assign(exported, _namespace)
+
+      if (options.cjs &&
+          ! has(exported, "__esModule")) {
+        setProperty(exported, "__esModule", esmDescriptor)
+      }
+
+      seal(exported)
+    }
+
+    setGetter(this, "esmNamespace", () => {
       // Section 9.4.6
       // Module namespace objects have a null [[Prototype]].
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -218,6 +234,7 @@ class Entry {
       // Step 7: Module namespace objects have sorted properties.
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       const { _namespace } = this
+      const isSafe = this.sourceType !== "script"
       const names = sort.call(keys(_namespace))
 
       for (const name of names) {
@@ -258,10 +275,6 @@ class Entry {
     setSetter(this, "cjsNamespace", (value) => {
       setProperty(this, "cjsNamespace", { value })
     })
-
-    if (this.sourceType === "module") {
-      validateSetters(this)
-    }
 
     return this._loaded = 1
   }
@@ -316,19 +329,25 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, exports:exported, sourceType } = entry
-  const isSafe = sourceType !== "script"
+  const isScript = sourceType === "script"
 
-  if (! isSafe) {
-    // Hardcode "default" as `module.exports` for CJS scripts.
+  if (isScript) {
     _namespace.default = exported
   }
 
-  const names = isSafe ? keys(exported) : keysAll(exported)
+  if (! isObjectLike(exported)) {
+    return
+  }
+
+  const { options } = entry
+  const isSafe = ! isScript && ! options.cjs
+  const object = entry._loaded === 1 ? _namespace : exported
+  const names = isSafe ? keys(object) : keysAll(object)
 
   for (const name of names) {
     if (isSafe) {
       _namespace[name] = exported[name]
-    } else if (name !== "default") {
+    } else if (! isScript || name !== "default") {
       assignProperty(_namespace, exported, name)
     }
   }
