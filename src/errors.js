@@ -4,7 +4,6 @@ import { format } from "util"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
-const codeSym = Symbol.for("@std/esm:errorCode")
 const supers = [Error, TypeError]
 
 const errors = new FastObject
@@ -21,23 +20,11 @@ function createClass(Super) {
   return class NodeError extends Super {
     constructor(key, ...args) {
       super(getMessage(key, args))
-      this[codeSym] = key
-    }
-
-    get code() {
-      return this[codeSym]
-    }
-
-    set code(value) {
-      setProperty(this, "code", { value })
-    }
-
-    get name() {
-      return super.name + " [" + this[codeSym] + "]"
-    }
-
-    set name(value) {
-      setProperty(this, "name", { value })
+      this.code = key
+      setProperty(this, "name", {
+        enumerable: false,
+        value: super.name + " [" + key + "]"
+      })
     }
   }
 }

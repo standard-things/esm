@@ -25,10 +25,8 @@ const abcNs = {
 
 function checkError(error, code) {
   const message = error.message
-  const proto = Object.getPrototypeOf(error)
-
-  const codeDescriptor = Object.getOwnPropertyDescriptor(proto, "code")
-  const nameDescriptor = Object.getOwnPropertyDescriptor(proto, "name")
+  const origCode = error.code
+  const origName = error.name
 
   assert.strictEqual(error.code, code)
   assert.strictEqual(error.name, "Error [" + code + "]")
@@ -37,12 +35,13 @@ function checkError(error, code) {
   error.code = "ERR_CUSTOM"
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-  Object.defineProperty(error, "code", codeDescriptor)
 
   error.name = "Custom"
   assert.strictEqual(error.name, "Custom")
   assert.strictEqual(error.toString(), "Custom: " + message)
-  Object.defineProperty(error, "name", nameDescriptor)
+
+  error.code = origCode
+  error.name = origName
 }
 
 function checkErrorStack(error, startsWith) {
