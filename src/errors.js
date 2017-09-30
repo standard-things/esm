@@ -1,13 +1,21 @@
+import { format, promisify } from "util"
+
 import FastObject from "./fast-object.js"
 
-import { format } from "util"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
-const codeSym = Symbol.for("@std/esm:errorCode")
-const supers = [Error, TypeError]
+let codeSym
+
+try {
+  promisify()
+} catch (e) {
+  const symbols = Object.getOwnPropertySymbols(e)
+  codeSym = symbols.length ? symbols[0] : Symbol.for("@std/esm:errorCode")
+}
 
 const errors = new FastObject
+const supers = [Error, TypeError]
 supers.forEach((Super) => errors[Super.name] = createClass(Super))
 
 const messages = new FastObject
