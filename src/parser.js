@@ -3,6 +3,7 @@ import AcornParser from "./acorn-parser.js"
 import _createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
 import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
+import { enable as enableHTMLComment } from "./acorn-ext/html-comment.js"
 import { enable as enableObjectRestSpread } from "./acorn-ext/object-rest-spread.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
@@ -27,6 +28,7 @@ class Parser {
 function extend(parser) {
   enableAwaitAnywhere(parser)
   enableDynamicImport(parser)
+  enableHTMLComment(parser)
   enableObjectRestSpread(parser)
   enableTolerance(parser)
 

@@ -572,7 +572,7 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Unexpected token"))
+        assert.ok(e.message.startsWith("HTML comments are not allowed in modules"))
       })
   )
 
