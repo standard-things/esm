@@ -38,10 +38,12 @@ function checkError(error, code) {
   error.code = "ERR_CUSTOM"
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
+  assert.deepEqual(Object.keys(error), ["code"])
 
   error.name = "Custom"
   assert.strictEqual(error.name, "Custom")
   assert.strictEqual(error.toString(), "Custom: " + message)
+  assert.deepEqual(Object.keys(error), ["code", "name"])
 
   Object.defineProperty(error, "code", codeDescriptor)
   Object.defineProperty(error, "name", nameDescriptor)

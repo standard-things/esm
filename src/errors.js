@@ -29,7 +29,7 @@ function createClass(Super) {
     }
 
     set code(value) {
-      setProperty(this, "code", { enumerable: false, value })
+      setProperty(this, "code", { value })
     }
 
     get name() {
@@ -37,7 +37,7 @@ function createClass(Super) {
     }
 
     set name(value) {
-      setProperty(this, "name", { enumerable: false, value })
+      setProperty(this, "name", { value })
     }
   }
 }
