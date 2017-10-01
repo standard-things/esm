@@ -10,5 +10,5 @@ const abcNs = {
 }
 
 module.exports = () =>
-  import("../fixture/export/abc.mjs")
+  import("../../fixture/export/abc.mjs")
     .then((ns) => assert.deepEqual(ns, abcNs))

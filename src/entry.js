@@ -4,6 +4,7 @@ import SafeWeakMap from "./safe-weak-map.js"
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
+import { format } from "util"
 import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
 import has from "./util/has.js"
@@ -19,6 +20,8 @@ const { is, seal } = Object
 const { sort } = Array.prototype
 
 const GETTER_ERROR = {}
+const STAR_ERROR = {}
+
 const entryMap = new SafeWeakMap
 
 const useToStringTag = typeof Symbol.toStringTag === "symbol"
@@ -124,9 +127,8 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
-    const { _namespace, getters } = this
+    const { getters } = this
     const { _namespace:otherNamespace, getters:otherGetters } = otherEntry
-    const safe = isSafe(otherEntry)
 
     for (const key in otherNamespace) {
       if (key === "default") {
@@ -147,14 +149,11 @@ class Entry {
         continue
       }
 
-      if (getter.owner.id === otherGetter.owner.id) {
-        if (safe) {
-          _namespace[key] = otherNamespace[key]
-        } else {
-          assignProperty(_namespace, otherNamespace, key)
-        }
-      } else {
-        throw new SyntaxError("Identifier '" + key + "' has already been declared")
+      const { id } = getter.owner
+
+      if (id !== otherGetter.owner.id &&
+          id !== this.id) {
+        this.addGetter(key, () => STAR_ERROR)
       }
     }
 
@@ -414,23 +413,37 @@ function getExportByName(entry, setter, name) {
   if (isScript ||
       (entry._loaded === 1 &&
        ! (name in _namespace))) {
-    raiseMissingExport(entry, name)
+    raiseExportMissing(entry, name)
   }
 
-  return _namespace[name]
+  const value = _namespace[name]
+
+  if (value === STAR_ERROR) {
+    raiseExportStarConflict(entry, name)
+  }
+
+  return value
 }
 
 function isSafe(entry) {
   return entry.sourceType !== "script" &&  ! entry.options.cjs
 }
 
-function raiseMissingExport(entry, name) {
-  // Remove setter to unblock other imports.
+function raiseExport(entry, name, message) {
+  // Remove getter and setter to unblock other imports.
+  delete entry.getters[name]
   delete entry.setters[name]
 
   const moduleName = getModuleName(entry.module)
-  throw new SyntaxError("Module " + toStringLiteral(moduleName, "'") +
-    " does not provide an export named '" + name + "'")
+  throw new SyntaxError(format(message, toStringLiteral(moduleName, "'"), name))
+}
+
+function raiseExportMissing(entry, name) {
+  raiseExport(entry, name, "Module %s does not provide an export named '%s'")
+}
+
+function raiseExportStarConflict(entry, name) {
+  raiseExport(entry, name, "Module %s contains conflicting star exports for name '%s'")
 }
 
 function runGetter(getter) {
@@ -474,7 +487,7 @@ function validateSetters(entry) {
   for (const name in setters) {
     if (name !== "*" &&
         ! (name in getters)) {
-      raiseMissingExport(entry, name)
+      raiseExportMissing(entry, name)
     }
   }
 }
