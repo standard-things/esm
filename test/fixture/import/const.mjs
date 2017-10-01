@@ -1,3 +1,3 @@
-import { value } from "../../fixture/export/const.js"
+import { value } from "../export/const.mjs"
 
 value = "changed"

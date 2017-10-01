@@ -6,6 +6,6 @@
 /test/fixture/source
 /test/node_modules/error
 /test/output
-/test/export/cycle-all.mjs
+/test/export/star-cycle.mjs
 /test/fixture/export/dup-local.mjs
 /test/misc/builtin/namespace.mjs

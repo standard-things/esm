@@ -1,3 +1,3 @@
-import { value } from "../../fixture/export/let.js"
+import { value } from "../export/let.mjs"
 
 value = "changed"
