@@ -4,6 +4,7 @@ import SafeWeakMap from "./safe-weak-map.js"
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
+import env from "./env.js"
 import { format } from "util"
 import getModuleName from "./util/get-module-name.js"
 import getSourceType from "./util/get-source-type.js"
@@ -430,9 +431,11 @@ function isSafe(entry) {
 }
 
 function raiseExport(entry, name, message) {
-  // Remove getter and setter to unblock other imports.
-  delete entry.getters[name]
-  delete entry.setters[name]
+  if (env.repl) {
+    // Remove problematic getter and setter to unblock subsequent imports.
+    delete entry.getters[name]
+    delete entry.setters[name]
+  }
 
   const moduleName = getModuleName(entry.module)
   throw new SyntaxError(format(message, toStringLiteral(moduleName, "'"), name))
