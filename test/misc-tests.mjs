@@ -439,7 +439,7 @@ describe("spec compliance", () => {
   )
 
   it("should support loading ESM from dynamic import in CJS", () =>
-    import("./misc/import.js")
+    import("./misc/import/dynamic.js")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
@@ -486,6 +486,12 @@ describe("spec compliance", () => {
       .then((ns) => assert.strictEqual(ns.default, 1))
   )
 
+  it("should not error when importing a non-ambiguous export", () =>
+    import("./misc/import/non-ambiguous.mjs")
+      .then((ns) => ns.default())
+      .catch((e) => assert.ifError(e))
+  )
+
   it("should throw a syntax error when exporting duplicate local bindings", () =>
     import("./fixture/export/dup-local.mjs")
       .then(() => assert.ok(false))
@@ -495,13 +501,18 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when exporting duplicate namespace bindings", () =>
-    import("./fixture/export/dup-namespace.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.endsWith("' has already been declared"))
-      })
+  it("should throw a syntax error when importing or re-exporting a conflicted star exports", () =>
+    Promise.all([
+      "./fixture/import/star-conflict.mjs",
+      "./fixture/export/star-conflict.mjs"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof SyntaxError)
+          assert.ok(e.message.includes("contains conflicting star exports for name '"))
+        })
+    ))
   )
 
   it("should throw a syntax error when importing non-exported binding", () =>
