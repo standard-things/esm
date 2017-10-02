@@ -25,14 +25,12 @@ const abcNs = {
 
 function checkError(error, code) {
   const message = error.message
+  checkErrorProps(error, code, message)
+  checkErrorCustomProps(error, code, message)
+  checkErrorProps(error, code, message)
+}
 
-  assert.strictEqual(error.code, code)
-  assert.strictEqual(error.name, "Error [" + code + "]")
-  assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-  assert.strictEqual(error.hasOwnProperty("code"), false)
-  assert.strictEqual(error.hasOwnProperty("name"), false)
-  assert.deepStrictEqual(Object.keys(error), [])
-
+function checkErrorCustomProps(error, code, message) {
   error.code = "ERR_CUSTOM"
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
@@ -45,6 +43,18 @@ function checkError(error, code) {
 
   delete error.code
   delete error.name
+}
+
+function checkErrorProps(error, code, message) {
+  assert.strictEqual(error.code, code)
+  assert.strictEqual(error.name, "Error [" + code + "]")
+  assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
+
+  const actual = Object.getOwnPropertyNames(error).sort()
+  const expected = Object.getOwnPropertyNames(new Error("x")).sort()
+
+  assert.deepStrictEqual(actual, expected)
+  assert.deepStrictEqual(Object.keys(error), [])
 }
 
 function checkErrorStack(error, startsWith) {
