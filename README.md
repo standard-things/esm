@@ -1,6 +1,6 @@
 # @std/esm
 
-This fast, small, zero dependency, package is all you need to enable
+This fast, small, zero-dependency package is all you need to enable
 ES modules in Node 4+ today!
 
 :book: See the [release post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
