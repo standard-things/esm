@@ -8,7 +8,7 @@ export default () => {
   assert.strictEqual(a, "a")
   assert.strictEqual(b, "b")
   assert.strictEqual(c, "c")
-  assert.deepEqual(rest, [b, c])
+  assert.deepStrictEqual(rest, [b, c])
 
   // Should not crash on array patterns with holes.
   assert.strictEqual(a0, 0)

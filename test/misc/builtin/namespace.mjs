@@ -9,6 +9,6 @@ export default () => {
 
   assert.ok(Object.isSealed(ns))
   assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
-  assert.deepEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
-  assert.deepEqual(Object.getOwnPropertyNames(ns), ["default"])
+  assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
+  assert.deepStrictEqual(Object.getOwnPropertyNames(ns), ["default"])
 }

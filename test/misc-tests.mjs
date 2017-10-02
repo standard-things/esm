@@ -31,17 +31,17 @@ function checkError(error, code) {
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
   assert.strictEqual(error.hasOwnProperty("code"), false)
   assert.strictEqual(error.hasOwnProperty("name"), false)
-  assert.deepEqual(Object.keys(error), [])
+  assert.deepStrictEqual(Object.keys(error), [])
 
   error.code = "ERR_CUSTOM"
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-  assert.deepEqual(Object.keys(error), ["code"])
+  assert.deepStrictEqual(Object.keys(error), ["code"])
 
   error.name = "Custom"
   assert.strictEqual(error.name, "Custom")
   assert.strictEqual(error.toString(), "Custom: " + message)
-  assert.deepEqual(Object.keys(error), ["code", "name"])
+  assert.deepStrictEqual(Object.keys(error), ["code", "name"])
 
   delete error.code
   delete error.name
@@ -226,7 +226,7 @@ describe("Node rules", () => {
       "./fixture/relative/dot-slash.js"
     ].map((id) =>
       import(id)
-        .then((ns) => assert.deepEqual(ns.default, "inside dot"))
+        .then((ns) => assert.strictEqual(ns.default, "inside dot"))
         .catch((e) => assert.ifError(e))
     ))
   )
@@ -331,7 +331,7 @@ describe("Node rules", () => {
   it("should not support overwriting `.json` handling", () => {
     require.extensions[".json"] = () => ({})
     return import("../package.json")
-      .then((ns) => assert.deepEqual(ns.default, pkgJSON))
+      .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
       .catch((e) => assert.ifError(e))
   })
 
@@ -428,7 +428,7 @@ describe("spec compliance", () => {
 
   it("should load CJS modules that delete their cache entry", () => {
     return import("./fixture/delete-cache.js")
-      .then((ns) => assert.deepEqual(ns.default, "delete cache"))
+      .then((ns) => assert.strictEqual(ns.default, "delete cache"))
       .catch((e) => assert.ifError(e))
   })
 

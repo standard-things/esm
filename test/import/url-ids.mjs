@@ -5,5 +5,5 @@ import def3 from "../fixture/export/%61%62%63.mjs"
 
 export default () => {
   const defs = [def1, def2, def3]
-  defs.forEach((def) => assert.deepEqual(def, "default"))
+  defs.forEach((def) => assert.strictEqual(def, "default"))
 }

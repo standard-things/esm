@@ -14,14 +14,14 @@ const defFilePath = path.resolve(__dirname, "../fixture/export/def.js")
 export default () => {
   const esmRequire = makeRequire(module)
 
-  const abcNs = {
+  const abcExpected = {
     a: "a",
     b: "b",
     c: "c",
     default: "default"
   }
 
-  const defNs = {
+  const defExpected = {
     d: "d",
     e: "e",
     f: "f"
@@ -34,8 +34,8 @@ export default () => {
   const defExported = esmRequire("./fixture/export/def.js")
   const defModule = esmRequire.cache[defFilePath]
 
-  assert.deepEqual(abcExported, abcNs)
-  assert.deepEqual(defExported, defNs)
+  assert.deepStrictEqual(abcExported, abcExpected)
+  assert.deepStrictEqual(defExported, defExpected)
 
   assert.ok(defModule)
   assert.strictEqual(defModule.id, defFilePath)

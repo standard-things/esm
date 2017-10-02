@@ -35,7 +35,7 @@ export default () =>
       assert.strictEqual(global.this, "undefined")
 
       const cachePaths = globby.sync(["fixture/options/**/.esm-cache"])
-      assert.deepEqual(cachePaths, ["fixture/options/true/.esm-cache"])
+      assert.deepStrictEqual(cachePaths, ["fixture/options/true/.esm-cache"])
       resolve()
     })
   })

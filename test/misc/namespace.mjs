@@ -20,14 +20,14 @@ export default () => {
 
   namespaces.forEach((ns) => {
     assert.ok(Object.isSealed(ns))
-    assert.deepEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
+    assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
     assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
   })
 
   assert.deepEqual(ans, { a: "a", b: "b" })
-  assert.deepEqual(bns, ans)
-  assert.deepEqual(Object.keys(ans), ["a", "b"])
-  assert.deepEqual(Object.getOwnPropertyNames(ans).sort(), ["a", "b"])
+  assert.deepStrictEqual(bns, ans)
+  assert.deepStrictEqual(Object.keys(ans), ["a", "b"])
+  assert.deepStrictEqual(Object.getOwnPropertyNames(ans).sort(), ["a", "b"])
   assert.notStrictEqual(ans, bns)
 
   assert.deepEqual(ns1, abcNs)

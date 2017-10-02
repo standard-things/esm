@@ -35,7 +35,7 @@ describe("command-line hook", () => {
       reject: false
     })
     .then((result) => {
-      const abcNs = {
+      const expected = {
         a: "a",
         b: "b",
         c: "c",
@@ -43,8 +43,8 @@ describe("command-line hook", () => {
       }
 
       const last = result.stdout.split("\n").pop()
-      const ns = last ? JSON.parse(last) : {}
-      assert.deepEqual(ns, abcNs)
+      const exported = last ? JSON.parse(last) : {}
+      assert.deepStrictEqual(exported, expected)
     })
   })
 })

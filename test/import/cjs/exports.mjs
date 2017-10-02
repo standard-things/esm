@@ -23,14 +23,14 @@ function isPlainObject(object) {
 }
 
 export default () => {
-  assert.deepEqual(defaultArray, ["a"])
+  assert.deepStrictEqual(defaultArray, ["a"])
   assert.deepEqual(nsArray, { 0: "a", default: defaultArray })
 
   assert.strictEqual(aOfClass, "a")
   assert.strictEqual(typeof defaultClass, "function")
   assert.deepEqual(nsClass, { default: defaultClass })
 
-  assert.deepEqual(defaultDefault, { default: "default" })
+  assert.deepStrictEqual(defaultDefault, { default: "default" })
   assert.deepEqual(nsDefault, { default: defaultDefault })
 
   assert.strictEqual(aOfFunction, "a")
@@ -43,7 +43,7 @@ export default () => {
   assert.strictEqual(defaultNumber, 1)
   assert.deepEqual(nsNumber, { default: defaultNumber })
 
-  assert.deepEqual(defaultObject, { a: "a" })
+  assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
 
   assert.strictEqual(aOfExports, "a")

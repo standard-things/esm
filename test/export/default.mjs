@@ -14,7 +14,7 @@ import redef from "../fixture/export/default/re-export.mjs"
 import undef from "../fixture/export/default/undefined.mjs"
 
 export default () => {
-  assert.deepEqual(array, ["a"])
+  assert.deepStrictEqual(array, ["a"])
   assert.strictEqual(new Anon(1).value, 1)
   assert.strictEqual(new Named(2).value, 2)
   assert.strictEqual(expr, 1)
@@ -23,7 +23,7 @@ export default () => {
   assert.strictEqual(ident, 1)
   assert.strictEqual(nul, null)
   assert.strictEqual(number, 1)
-  assert.deepEqual(object, { value: 1 })
+  assert.deepStrictEqual(object, { value: 1 })
   assert.strictEqual(redef, object)
   assert.strictEqual(undef, void 0)
 }

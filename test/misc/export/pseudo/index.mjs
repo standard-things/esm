@@ -5,14 +5,14 @@ const defaultValue = require("../../../fixture/export/pseudo/default.mjs")
 const noValue = require("../../../fixture/export/abc.mjs")
 
 export default () => {
-  assert.deepEqual(Object.getOwnPropertyDescriptor(customValue, "__esModule"), {
+  assert.deepStrictEqual(Object.getOwnPropertyDescriptor(customValue, "__esModule"), {
     configurable: false,
     enumerable: true,
     value: "a",
     writable: true
   })
 
-  assert.deepEqual(Object.getOwnPropertyDescriptor(defaultValue, "__esModule"), {
+  assert.deepStrictEqual(Object.getOwnPropertyDescriptor(defaultValue, "__esModule"), {
     configurable: false,
     enumerable: false,
     value: true,

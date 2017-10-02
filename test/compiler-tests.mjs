@@ -28,7 +28,7 @@ describe("compiler", () => {
       ]
 
       const types = results.map((result) => result.type)
-      assert.deepEqual(types, [data.type, "module"])
+      assert.deepStrictEqual(types, [data.type, "module"])
     })
   })
 

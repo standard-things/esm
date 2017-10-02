@@ -30,7 +30,7 @@ describe("module.runMain hook", () => {
           throw new Error(result.stderr)
         }
 
-        const abcNs = {
+        const expected = {
           a: "a",
           b: "b",
           c: "c",
@@ -38,8 +38,8 @@ describe("module.runMain hook", () => {
         }
 
         const last = result.stdout.split("\n").pop()
-        const ns = last ? JSON.parse(last) : {}
-        assert.deepEqual(ns, abcNs)
+        const exported = last ? JSON.parse(last) : {}
+        assert.deepStrictEqual(exported, expected)
       })
     })
   })
