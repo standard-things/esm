@@ -40,6 +40,7 @@ describe("REPL hook", () => {
     assert.strictEqual(typeof globalAssert, "undefined")
 
     r.eval(code, null, "repl", () => {
+      r.close()
       assert.strictEqual(typeof globalAssert, "function")
       done()
     })
@@ -52,6 +53,7 @@ describe("REPL hook", () => {
     assert.strictEqual(typeof context.localAssert, "undefined")
 
     r.eval(code, context, "repl", () => {
+      r.close()
       assert.strictEqual(typeof context.localAssert, "function")
       done()
     })
@@ -62,6 +64,7 @@ describe("REPL hook", () => {
     const code = "this.exports = module.exports"
 
     r.eval(code, context, "repl", () => {
+      r.close()
       assert.strictEqual(Object.getPrototypeOf(context.exports), Object.prototype)
       done()
     })
@@ -79,15 +82,15 @@ describe("REPL hook", () => {
           error = e
         }
 
-        callback.call(this, error)
+        callback(error)
       }
     })
 
-    r.eval('import { bogus } from "path"', function (e) {
-      assert.ok(e.message.includes("' does not provide an export named '"))
-
-      this.eval('import { join } from "path"', (e) => {
-        assert.strictEqual(e, null)
+    r.eval('import { bogus } from "path"', (error1) => {
+      r.eval('import { join } from "path"', (error2) => {
+        r.close()
+        assert.ok(error1.message.includes("' does not provide an export named '"))
+        assert.strictEqual(error2, null)
         done()
       })
     })

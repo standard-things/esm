@@ -39,7 +39,6 @@ const trashPaths = globby.sync([
 
 const mochaArgs = [
   MOCHA_BIN,
-  "--exit",
   "--full-trace",
   "--require", "../index.js",
   "tests.mjs"
