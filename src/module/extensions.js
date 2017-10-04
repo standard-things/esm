@@ -9,12 +9,12 @@ const { dlopen } = process
 const { parse } = JSON
 const extensions = new FastObject
 
-extensions[".js"] = function (mod, filePath) {
+extensions[".js"] = (mod, filePath) => {
   const content = fs.readFileSync(filePath, "utf8")
   mod._compile(stripBOM(content), filePath)
 }
 
-extensions[".json"] = function (mod, filePath) {
+extensions[".json"] = (mod, filePath) => {
   const content = readFile(filePath, "utf8")
 
   try {
@@ -25,7 +25,7 @@ extensions[".json"] = function (mod, filePath) {
   }
 }
 
-extensions[".node"] = function (mod, filePath) {
+extensions[".node"] = (mod, filePath) => {
   return dlopen(mod, toNamespacedPath(filePath))
 }
 

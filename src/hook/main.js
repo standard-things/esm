@@ -12,7 +12,7 @@ function hook(Module) {
 
   const useTickCallback = typeof _tickCallback === "function"
 
-  Module.runMain = function () {
+  Module.runMain = () => {
     Module.runMain = runMain
 
     if (mainPath in builtinModules) {
