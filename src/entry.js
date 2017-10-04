@@ -293,7 +293,11 @@ class Entry {
       } else {
         const value = otherEntry[key]
 
-        if (key === "_loaded"
+        if (key === "children" ||
+            key === "getters" ||
+            key === "setters") {
+          assign(this[key], value)
+        } else if (key === "_loaded"
             ? value > this._loaded
             : value != null) {
           this[key] = value
