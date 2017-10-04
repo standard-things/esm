@@ -12,7 +12,7 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
-function load(id, parent, isMain, options) {
+function load(id, parent, isMain, options, preload) {
   const filePath = resolveFilename(id, parent, isMain, options)
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
@@ -35,12 +35,20 @@ function load(id, parent, isMain, options) {
   }
 
   let error
+  let called = false
   let threw = true
 
   try {
     child = _load(cacheId, parent, isMain, state, function () {
-      return loader.call(this, filePath, url)
+      called = true
+      return loader.call(this, filePath, url, preload)
     })
+
+    if (! called &&
+        preload) {
+      called = true
+      preload(child)
+    }
 
     threw = false
   } catch (e) {
@@ -63,7 +71,7 @@ function load(id, parent, isMain, options) {
   }
 }
 
-function loader(filePath, url) {
+function loader(filePath, url, preload) {
   let ext = extname(filePath)
   const { extensions } = moduleState
 
@@ -78,6 +86,10 @@ function loader(filePath, url) {
   entry.url = url
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
+
+  if (preload) {
+    preload(mod)
+  }
 
   extensions[ext](mod, filePath)
   mod.loaded = true
