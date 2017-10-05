@@ -1,15 +1,19 @@
 import { posix, win32 } from "path"
 
+import binding from "../binding.js"
 import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
 import parseURL from "./parse-url.js"
-import punycode from "../vendor/punycode/punycode.es6.js"
+import url from "url"
 
 const codeOfColon = ":".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
 const localhostRegExp = /^\/\/localhost\b/
-const { toUnicode } = punycode
+
+const { domainToUnicode } = typeof url.domainToUnicode === "function"
+  ? url
+  : binding.url
 
 const API = {
   posix: { normalize: posix.normalize },
@@ -46,7 +50,7 @@ function urlToPath(url, mode = "posix") {
     host = ""
   } if (host) {
     return mode === "win32"
-      ? "\\\\" + toUnicode(host) + normalize(pathname)
+      ? "\\\\" + domainToUnicode(host) + normalize(pathname)
       : ""
   }
 

@@ -35,9 +35,6 @@ const acornPath = path.resolve(vendorPath, "acorn")
 const acornPkg = require("acorn/package.json")
 const acornURL = "https://github.com/ternjs/acorn/archive/" + acornPkg.version + ".zip"
 
-const punycodePath = path.resolve(vendorPath, "punycode")
-const punycodePkgPath = path.dirname(require.resolve("punycode/package.json"))
-
 const uglifyPluginPath = path.resolve(rootPath, "node_modules/uglifyjs-webpack-plugin")
 const uglifyPath = path.resolve(uglifyPluginPath, "node_modules/uglify-es")
 
@@ -79,14 +76,6 @@ function getAcorn() {
   })
 }
 
-function getPunycode() {
-  if (fs.pathExistsSync(punycodePath)) {
-    return Promise.resolve()
-  }
-
-  return fs.copy(punycodePkgPath, punycodePath)
-}
-
 function gzipBundle() {
   if (! fs.pathExistsSync(bundlePath)) {
     return Promise.resolve()
@@ -109,8 +98,7 @@ function makeBundle() {
 
 Promise.all([
   cleanRepo(),
-  getAcorn(),
-  getPunycode()
+  getAcorn()
 ])
 .then(makeBundle)
 .then(() => Promise.all([
