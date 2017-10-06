@@ -364,10 +364,6 @@ function forEachSetter(entry, callback) {
   for (const name in settersMap) {
     const setters = settersMap[name]
 
-    if (! setters.length) {
-      continue
-    }
-
     for (const setter of setters) {
       const value = getExportByName(entry, setter, name)
 
