@@ -61,7 +61,11 @@ class Runtime {
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {
-          this.watch(id, [["*", resolve]])
+          this.watch(id, [["*", (value, childEntry) => {
+            if (childEntry._loaded === 1) {
+              resolve(value)
+            }
+          }]])
         } catch (e) {
           reject(e)
         }
@@ -99,38 +103,47 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    const { entry, module:mod, options } = this
+    const { entry, module:parent, options } = this
 
     moduleState.requireDepth += 1
 
     try {
-      const child = importModule(id, mod, loadESM, options)
-      const childEntry = Entry.get(child)
+      let child
+      let childEntry
+
+      importModule(id, parent, loadESM, options, (mod) => {
+        child = mod
+        childEntry = Entry.get(child)
+        entry.children[child.id] = childEntry
+        childEntry.addSetters(setterPairs, entry)
+      })
+
       const exported = child.exports
+      Entry.set(exported, childEntry)
 
       childEntry.merge(Entry.get(child, exported, options))
       childEntry.exports = exported
       childEntry.sourceType = getSourceType(exported)
-      Entry.set(exported, childEntry)
-
       childEntry.loaded()
-      entry.children[child.id] = childEntry
-
-      if (setterPairs) {
-        childEntry.addSetters(setterPairs, entry).update()
-      }
+      childEntry.update()
     } finally {
       moduleState.requireDepth -= 1
     }
   }
 }
 
-function importModule(id, parent, loader, options) {
+function importModule(id, parent, loader, options, preload) {
   if (id in builtinEntries) {
-    return builtinEntries[id]
+    const child = builtinEntries[id]
+
+    if (preload) {
+      preload(child)
+    }
+
+    return child
   }
 
-  const child = loader(id, parent, false, options)
+  const child = loader(id, parent, false, options, preload)
   const { filename } = child
 
   if (getSourceType(child.exports) === "module") {
