@@ -282,26 +282,9 @@ class Entry {
   }
 
   merge(otherEntry) {
-    if (otherEntry === this) {
-      return this
-    }
-
-    for (const key in otherEntry) {
-      if (this._loaded !== 1 &&
-          key === "namespace") {
-        assignProperty(this, otherEntry, key)
-      } else {
-        const value = otherEntry[key]
-
-        if (key === "children" ||
-            key === "getters" ||
-            key === "setters") {
-          assign(this[key], value)
-        } else if (key === "_loaded"
-            ? value > this._loaded
-            : value != null) {
-          this[key] = value
-        }
+    if (otherEntry !== this) {
+      for (const key in otherEntry) {
+        mergeProperty(this, otherEntry, key)
       }
     }
 
@@ -432,6 +415,50 @@ function getExportByName(entry, setter, name) {
 
 function isSafe(entry) {
   return entry.sourceType !== "script" &&  ! entry.options.cjs
+}
+
+function mergeProperty(entry, otherEntry, key) {
+  const { _loaded } = entry
+
+  if (_loaded !== 1 &&
+      key === "namespace") {
+    return assignProperty(entry, otherEntry, key)
+  }
+
+  const value = otherEntry[key]
+
+  if (key !== "setters") {
+    if (key === "children") {
+      assign(entry.children, value)
+    } else if (key === "getters") {
+      for (const name in value) {
+        entry.addGetter(name, value[name])
+      }
+    } else if (key ===  "_loaded"
+        ? value > _loaded
+        : value != null) {
+      entry[key] = value
+    }
+
+    return entry
+  }
+
+  const settersMap = entry.setters
+
+  for (const name in value) {
+    const setters = settersMap[name]
+    const otherSetters = settersMap[name] = value[name]
+
+    if (setters) {
+      for (const setter of setters) {
+        if (otherSetters.indexOf(setter) === -1) {
+          otherSetters.push(setter)
+        }
+      }
+    }
+  }
+
+  return entry
 }
 
 function raiseExport(entry, name, message) {
