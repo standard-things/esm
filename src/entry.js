@@ -292,9 +292,10 @@ class Entry {
   update() {
     // Lazily-initialized mapping of parent module identifiers to parent
     // module objects whose setters we might need to run.
-    const parentsMap = new NullObject
+    let parentsMap
 
     forEachSetter(this, (setter, value) => {
+      parentsMap || (parentsMap = new NullObject)
       parentsMap[setter.parent.id] = setter.parent
       setter(value, this)
     })
