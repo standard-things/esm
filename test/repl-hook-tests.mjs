@@ -30,7 +30,7 @@ describe("REPL hook", () => {
     parent.require(pkgPath)
   })
 
-  it("should work with a global context", (done) => {
+  it("should work with a global context", () => {
     const r = repl.start({ useGlobal: true })
     const code = 'import { default as globalAssert } from "assert"'
 
@@ -39,35 +39,35 @@ describe("REPL hook", () => {
 
     assert.strictEqual(typeof globalAssert, "undefined")
 
-    r.eval(code, null, "repl", () => {
-      r.close()
+    r.eval(code, null, "repl", () =>
       assert.strictEqual(typeof globalAssert, "function")
-      done()
-    })
+    )
+
+    r.close()
   })
 
-  it("should work with a non-global context", (done) => {
+  it("should work with a non-global context", () => {
     const r = repl.start({})
     const code = 'import { default as localAssert } from "assert"'
 
     assert.strictEqual(typeof context.localAssert, "undefined")
 
-    r.eval(code, context, "repl", () => {
-      r.close()
+    r.eval(code, context, "repl", () =>
       assert.strictEqual(typeof context.localAssert, "function")
-      done()
-    })
+    )
+
+    r.close()
   })
 
-  it("should use a plain object for `module.exports`", (done) => {
+  it("should use a plain object for `module.exports`", () => {
     const r = repl.start({})
     const code = "this.exports = module.exports"
 
-    r.eval(code, context, "repl", () => {
-      r.close()
+    r.eval(code, context, "repl", () =>
       assert.strictEqual(Object.getPrototypeOf(context.exports), Object.prototype)
-      done()
-    })
+    )
+
+    r.close()
   })
 
   it("should recover from import errors", (done) => {
@@ -88,9 +88,12 @@ describe("REPL hook", () => {
 
     r.eval('import { bogus } from "path"', (error1) => {
       r.eval('import { join } from "path"', (error2) => {
-        r.close()
         assert.ok(error1.message.includes("' does not provide an export named '"))
         assert.strictEqual(error2, null)
+      })
+
+      setImmediate(() => {
+        r.close()
         done()
       })
     })
