@@ -9,15 +9,18 @@ import url from "url"
 const codeOfColon = ":".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
+let { domainToUnicode } = url
 const localhostRegExp = /^\/\/localhost\b/
-
-const { domainToUnicode } = typeof url.domainToUnicode === "function"
-  ? url
-  : binding.url
 
 const API = {
   posix: { normalize: posix.normalize },
   win32: { normalize: win32.normalize }
+}
+
+if (typeof domainToUnicode !== "function") {
+  const urlBinding = binding.url
+  const internalDomainToUnicode = urlBinding.domainToUnicode
+  domainToUnicode = (domain) => internalDomainToUnicode.call(urlBinding, domain)
 }
 
 function urlToPath(url, mode = "posix") {
