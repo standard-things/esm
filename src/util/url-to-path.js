@@ -18,9 +18,12 @@ const API = {
 }
 
 if (typeof domainToUnicode !== "function") {
-  const urlBinding = binding.url
-  const internalDomainToUnicode = urlBinding.domainToUnicode
-  domainToUnicode = (domain) => internalDomainToUnicode.call(urlBinding, domain)
+  const icuBinding = binding.icu
+  const { toUnicode } = icuBinding
+
+  domainToUnicode = typeof toUnicode === "function"
+    ? (domain) => toUnicode.call(icuBinding, domain)
+    : __non_webpack_require__("punycode").toUnicode
 }
 
 function urlToPath(url, mode = "posix") {
