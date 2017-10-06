@@ -120,8 +120,10 @@ class Entry {
   }
 
   addGetters(getterPairs) {
-    for (const [name, getter] of getterPairs) {
-      this.addGetter(name, getter)
+    if (getterPairs) {
+      for (const [name, getter] of getterPairs) {
+        this.addGetter(name, getter)
+      }
     }
 
     return this
@@ -162,13 +164,7 @@ class Entry {
   }
 
   addSetter(name, setter, parent) {
-    let setters = this.setters[name]
-
-    if (! setters) {
-      setters =
-      this.setters[name] = []
-    }
-
+    const setters = this.setters[name] || (this.setters[name] = [])
     setter.last = new NullObject
     setter.parent = parent
     setters.push(setter)
@@ -176,8 +172,10 @@ class Entry {
   }
 
   addSetters(setterPairs, parent) {
-    for (const [name, setter] of setterPairs) {
-      this.addSetter(name, setter, parent)
+    if (setterPairs) {
+      for (const [name, setter] of setterPairs) {
+        this.addSetter(name, setter, parent)
+      }
     }
 
     return this
