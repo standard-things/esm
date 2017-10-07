@@ -43,6 +43,16 @@ const nycJSON = nycIndex === -1
   ? null
   : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
 
+const loading =
+  nmIndex !== -1 &&
+  hasLoaderArg(args) &&
+  (PkgInfo.get(process.cwd()) !== null ||
+  PkgInfo.get(realpath(filePath.slice(0, nmIndex + 1))) !== null)
+
+const nyc =
+  has(nycJSON, "name") &&
+  nycJSON.name === "nyc"
+
 const preloading =
   hasLoaderModule(process._preloadModules) ||
   (id === "internal/preload" &&
@@ -110,15 +120,6 @@ env.repl =
 env.cli =
   ! env.preload &&
   ! env.repl &&
-  nmIndex !== -1 &&
-  hasLoaderArg(args) &&
-  (PkgInfo.get(process.cwd()) !== null ||
-   PkgInfo.get(realpath(filePath.slice(0, nmIndex + 1))) !== null)
-
-env.nyc =
-  ! env.preload &&
-  ! env.repl &&
-  has(nycJSON, "name") &&
-  nycJSON.name === "nyc"
+  (loading || nyc)
 
 export default env
