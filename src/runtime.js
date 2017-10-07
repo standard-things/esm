@@ -146,9 +146,9 @@ function importModule(id, parent, loader, options, preload) {
   const child = loader(id, parent, false, options, preload)
   const { filename } = child
 
-  if (getSourceType(child.exports) === "module") {
-    if (! (options && options.cjs) &&
-        extname(filename) === ".mjs") {
+  if (! (options && options.cjs) &&
+      getSourceType(child.exports) === "module") {
+    if (extname(filename) === ".mjs") {
       delete __non_webpack_require__.cache[filename]
     }
   } else {

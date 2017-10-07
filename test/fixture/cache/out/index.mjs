@@ -1,1 +1,1 @@
-import "./file.mjs"
+// Empty module.

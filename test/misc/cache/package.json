@@ -1,0 +1,8 @@
+{
+  "name": "cache",
+  "private": true,
+  "@std/esm": {
+    "cjs": true,
+    "debug": true
+  }
+}

@@ -342,11 +342,11 @@ describe("Node rules", () => {
   })
 
   it("should not cache ES modules in `require.cache`", () => {
-    const filePath = path.resolve(__dirname, "fixture/cache/out/file.mjs")
+    const id = require.resolve("./fixture/cache/out")
 
-    delete require.cache[filePath]
-    return import("./fixture/cache/out")
-      .then(() => assert.strictEqual(filePath in require.cache, false))
+    delete require.cache[id]
+    return import(id)
+      .then(() => assert.strictEqual(id in require.cache, false))
       .catch((e) => assert.ifError(e))
   })
 
@@ -379,14 +379,11 @@ describe("Node rules", () => {
     }
   })
 
-  it("should cache ES modules in `require.cache` with `options.cjs`", () => {
-    const filePath = path.resolve(__dirname, "fixture/cache/in/file.mjs")
-
-    delete require.cache[filePath]
-    return import("./fixture/cache/in")
-      .then(() => assert.ok(filePath in require.cache))
+  it("should not cache ES modules in ESM cache with `options.cjs`", () =>
+    import("./misc/cache")
+      .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
-  })
+  )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/export/pseudo")
