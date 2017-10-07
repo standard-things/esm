@@ -498,8 +498,7 @@ describe("spec compliance", () => {
 
   it("should not execute already loaded modules from require", () =>
     import("./fixture/load-count.js")
-      .then(() => import("./fixture/require-load-count.js"))
-      .then((ns) => assert.strictEqual(ns.default, 1))
+      .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
   )
 
   it("should not error when importing a non-ambiguous export", () =>
