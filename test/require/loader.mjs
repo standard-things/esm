@@ -1,15 +1,10 @@
 import assert from "assert"
 import makeRequire from "../../index.js"
 import module from "../module.js"
-import path from "path"
+import require from "../require.js"
 
-const isWin = process.platform === "win32"
-
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
-const abcFilePath = path.resolve(__dirname, "../fixture/export/abc.mjs")
-const defFilePath = path.resolve(__dirname, "../fixture/export/def.js")
+const abcFilePath = require.resolve("./fixture/export/abc.mjs")
+const defFilePath = require.resolve("./fixture/export/def.js")
 
 export default () => {
   const esmRequire = makeRequire(module)

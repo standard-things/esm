@@ -2,16 +2,12 @@ import SemVer from "semver"
 
 import assert from "assert"
 import fs from "fs-extra"
-import path from "path"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"
 
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
 const pkgJSON = JSON.parse(fs.readFileSync("../package.json", "utf8"))
-const pkgPath = path.resolve(__dirname, "../index.js")
+const pkgPath = require.resolve("../")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
 const abcId = "./fixture/export/abc.mjs"
@@ -123,12 +119,12 @@ describe("errors", () => {
   )
 
   it("should mask stack arrows", () => {
-    const id1 = path.resolve(__dirname, "fixture/error/import.mjs")
-    const id2 = path.resolve(__dirname, "fixture/error/export.js")
-    const id3 = path.resolve(__dirname, "fixture/error/import.js")
-    const id4 = path.resolve(__dirname, "fixture/error/nested.mjs")
-    const id5 = path.resolve(__dirname, "fixture/error/syntax.js")
-    const id6 = path.resolve(__dirname, "node_modules/error/index.js")
+    const id1 = require.resolve("./fixture/error/import.mjs")
+    const id2 = require.resolve("./fixture/error/export.js")
+    const id3 = require.resolve("./fixture/error/import.js")
+    const id4 = require.resolve("./fixture/error/nested.mjs")
+    const id5 = require.resolve("./fixture/error/syntax.js")
+    const id6 = require.resolve("./node_modules/error/index.js")
 
     return Promise.all([
       import(id1)

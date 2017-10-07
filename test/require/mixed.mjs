@@ -3,15 +3,11 @@ import fs from "fs-extra"
 import globby from "globby"
 import makeRequire from "../../index.js"
 import module from "../module.js"
-import path from "path"
+import require from "../require.js"
 
-const isWin = process.platform === "win32"
-
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
-const trueId = path.resolve(__dirname, "../fixture/options/true/id")
+const trueId = require.resolve("./fixture/options/true")
 const trueMod = new module.constructor(trueId, null)
+
 trueMod.filename = trueMod.id
 
 export default () =>

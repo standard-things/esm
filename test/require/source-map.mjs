@@ -1,15 +1,10 @@
 import assert from "assert"
 import makeRequire from "../../index.js"
 import module from "../module.js"
-import path from "path"
+import require from "../require.js"
 
-const isWin = process.platform === "win32"
-
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
-const abcFilePath = path.resolve(__dirname, "fixture/export/abc.mjs")
-const defFilePath = path.resolve(__dirname, "fixture/export/def.js")
+const abcId = require.resolve("./fixture/export/abc.mjs")
+const defId = require.resolve("./fixture/export/def.js")
 
 export default () => {
   const keys = ["sourceMap", "sourcemap"]
@@ -20,10 +15,10 @@ export default () => {
     const mod = new module.constructor("<mock>", null)
     mod._compile = (content) => assert.ok(content.includes("sourceMappingURL"))
 
-    delete esmRequire.cache[abcFilePath]
-    delete esmRequire.cache[defFilePath]
+    delete esmRequire.cache[abcId]
+    delete esmRequire.cache[defId]
 
-    esmRequire.extensions[".mjs"](mod, abcFilePath)
-    esmRequire.extensions[".js"](mod, defFilePath)
+    esmRequire.extensions[".mjs"](mod, abcId)
+    esmRequire.extensions[".js"](mod, defId)
   })
 }

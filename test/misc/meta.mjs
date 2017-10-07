@@ -1,5 +1,6 @@
 import assert from "assert"
 import path from "path"
+import require from "../require.js"
 import mc1 from "../fixture/with%3Acolon.mjs"
 import mc2 from "../fixture/with%3Acolon.mjs?a#a"
 import mp1 from "../fixture/with%23pound.mjs"
@@ -7,10 +8,7 @@ import mp2 from "../fixture/with%23pound.mjs?b#b"
 
 const isWin = process.platform === "win32"
 
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
-const testPath = path.resolve(__dirname, "..")
+const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
 
 const mcPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")

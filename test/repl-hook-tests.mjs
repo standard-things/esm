@@ -2,17 +2,11 @@ import Runtime from "../build/runtime.js"
 
 import assert from "assert"
 import module from "./module.js"
-import path from "path"
 import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
-const isWin = process.platform === "win32"
-
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
-
-const pkgPath = path.resolve(__dirname, "../index.js")
+const pkgPath = require.resolve("../")
 const parent = require.cache[pkgPath].parent
 const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
 
