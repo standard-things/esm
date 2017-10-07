@@ -3,11 +3,10 @@
 // https://github.com/sindresorhus/file-url
 
 import encodeURI from "./encode-uri.js"
-import { resolve } from "path"
+import normalize from "../path/normalize.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const backSlashRegExp = /\\/g
 const encodeCharsRegExp = /[?#]/g
 
 const encodeCharMap = {
@@ -20,7 +19,7 @@ function encodeChar(char) {
 }
 
 function getURLFromFilePath(filePath) {
-  filePath = resolve(filePath).replace(backSlashRegExp, "/")
+  filePath = normalize(filePath)
 
   if (filePath.charCodeAt(0) !== codeOfSlash) {
     filePath = "/" + filePath
