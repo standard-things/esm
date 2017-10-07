@@ -400,8 +400,14 @@ describe("Node rules", () => {
 })
 
 describe("spec compliance", () => {
-  it("should bind exports before the module executes", () =>
-    import("./misc/export/cycle-named.mjs")
+  it("should establish bindings before the module executes", () =>
+    import("./misc/bindings.mjs")
+      .then((ns) => ns.default())
+      .catch((e) => assert.ifError(e))
+  )
+
+  it("should hoist declarations before the module executes", () =>
+    import("./misc/declarations.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
