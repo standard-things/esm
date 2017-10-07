@@ -7,8 +7,8 @@ import { resolve } from "path"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const reBackSlash = /\\/g
-const reEncodeChars = /[?#]/g
+const backSlashRegExp = /\\/g
+const encodeCharsRegExp = /[?#]/g
 
 const encodeCharMap = {
   "#": "%23",
@@ -20,7 +20,7 @@ function encodeChar(char) {
 }
 
 function getURLFromFilePath(filePath) {
-  filePath = resolve(filePath).replace(reBackSlash, "/")
+  filePath = resolve(filePath).replace(backSlashRegExp, "/")
 
   if (filePath.charCodeAt(0) !== codeOfSlash) {
     filePath = "/" + filePath
@@ -28,7 +28,7 @@ function getURLFromFilePath(filePath) {
 
   // Section 3.3: Escape path components
   // https://tools.ietf.org/html/rfc3986#section-3.3
-  return "file://" + encodeURI(filePath).replace(reEncodeChars, encodeChar)
+  return "file://" + encodeURI(filePath).replace(encodeCharsRegExp, encodeChar)
 }
 
 export default getURLFromFilePath
