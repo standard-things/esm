@@ -15,7 +15,7 @@ describe("setters", () => {
 })
 
 describe("bridge modules", () => {
-  it("should not prematurely seal * exports", () =>
+  it("should not prematurely seal star exports", () =>
     import("./setter/seal.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))

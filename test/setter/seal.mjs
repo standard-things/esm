@@ -1,6 +1,6 @@
 import assert from "assert"
-import cycle from "../fixture/seal/cycle.mjs"
+import seal from "../fixture/cycle/seal/a.mjs"
 
 export default () => {
-  assert.strictEqual(cycle.a, "a")
+  assert.strictEqual(seal.a, "a")
 }
