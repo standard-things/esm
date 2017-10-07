@@ -13,13 +13,13 @@ try {
 } catch (e) {}
 
 describe("export declarations", () => {
-  it("should support * exports", () =>
+  it("should support star exports", () =>
     import("./export/star.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
   )
 
-  it("should tolerate mutual * exports", () =>
+  it("should tolerate mutual star exports", () =>
     import("./export/star-cycle.mjs")
       .then((ns) => ns.default())
       .catch((e) => assert.ifError(e))
