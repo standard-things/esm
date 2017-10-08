@@ -110,20 +110,25 @@ class Runtime {
     try {
       let child
       let childEntry
+      let sourceType
 
       importModule(id, parent, loadESM, options, (mod) => {
         child = mod
         childEntry = Entry.get(child)
+        sourceType = childEntry.sourceType
         entry.children[child.id] = childEntry
         childEntry.addSetters(setterPairs, entry)
       })
 
-      const exported = child.exports
-      Entry.set(exported, childEntry)
+      if (sourceType === "script") {
+        const exported = child.exports
+        Entry.set(exported, childEntry)
 
-      childEntry.merge(Entry.get(child, exported, options))
-      childEntry.exports = exported
-      childEntry.sourceType = getSourceType(exported)
+        childEntry.merge(Entry.get(child, exported, options))
+        childEntry.exports = exported
+        childEntry.sourceType = getSourceType(exported)
+      }
+
       childEntry.loaded()
       childEntry.update()
     } finally {
