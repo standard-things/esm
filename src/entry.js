@@ -45,7 +45,7 @@ class Entry {
   constructor(mod, exported, options) {
     /* eslint-disable lines-around-comment */
     // The namespace object change indicator.
-    this._changed = true
+    this._changed = false
     // The loading state of the module.
     this._loaded = 0
     // The raw namespace object.
