@@ -37,8 +37,15 @@ describe("module.runMain hook", () => {
           default: "default"
         }
 
-        const last = result.stdout.split("\n").pop()
-        const exported = last ? JSON.parse(last) : {}
+        const jsonText = result
+          .stdout
+          .split("\n")
+          .find((line) => line.startsWith("{"))
+
+        const exported = jsonText
+          ? JSON.parse(jsonText)
+          : {}
+
         assert.deepStrictEqual(exported, expected)
       })
     })
