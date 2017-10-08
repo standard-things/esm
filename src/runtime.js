@@ -122,14 +122,14 @@ class Runtime {
 
       if (sourceType === "script") {
         const exported = child.exports
+        childEntry.merge(Entry.get(child, exported, options))
         Entry.set(exported, childEntry)
 
-        childEntry.merge(Entry.get(child, exported, options))
         childEntry.exports = exported
         childEntry.sourceType = getSourceType(exported)
+        childEntry.loaded()
       }
 
-      childEntry.loaded()
       childEntry.update()
     } finally {
       moduleState.requireDepth -= 1
@@ -171,15 +171,7 @@ function runCJS(runtime, moduleWrapper) {
 
   let exported = mod.exports = entry.exports
   moduleWrapper.call(exported, exported, req)
-  exported = mod.exports
-
-  entry.merge(Entry.get(mod, exported, options))
-  entry.exports = exported
-  entry.sourceType = getSourceType(exported)
-  Entry.set(exported, entry)
-
   mod.loaded = true
-  entry.update().loaded()
 }
 
 function runESM(runtime, moduleWrapper) {
