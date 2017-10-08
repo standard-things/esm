@@ -9,11 +9,9 @@ import setSetter from "./util/set-setter.js"
 
 const builtinEntries = keys(builtinModules)
   .reduce((object, id) => {
-    setGetter(object, id, () => {
-      const entry = Entry.get(builtinModules[id])
-      entry.loaded()
-      return object[id] = entry
-    })
+    setGetter(object, id, () =>
+      object[id] = Entry.get(builtinModules[id])
+    )
 
     setSetter(object, id, (value) => {
       setProperty(object, id, { value })
