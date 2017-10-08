@@ -3,35 +3,22 @@ import makeRequire from "../../index.js"
 import module from "../module.js"
 import require from "../require.js"
 
-const abcFilePath = require.resolve("./fixture/export/abc.mjs")
-const defFilePath = require.resolve("./fixture/export/def.js")
+const abcId = require.resolve("./fixture/export/abc.mjs")
+const defId = require.resolve("./fixture/export/def.js")
 
 export default () => {
   const esmRequire = makeRequire(module)
 
-  const abcExpected = {
-    a: "a",
-    b: "b",
-    c: "c",
-    default: "default"
-  }
+  delete esmRequire.cache[abcId]
+  delete esmRequire.cache[defId]
 
-  const defExpected = {
-    d: "d",
-    e: "e",
-    f: "f"
-  }
+  const abc = esmRequire("./fixture/export/abc.mjs")
+  const def = esmRequire("./fixture/export/def.js")
+  const defMod = esmRequire.cache[defId]
 
-  delete esmRequire.cache[abcFilePath]
-  delete esmRequire.cache[defFilePath]
+  assert.deepStrictEqual(abc, { a: "a", b: "b", c: "c", default: "default" })
+  assert.deepStrictEqual(def, { d: "d", e: "e", f: "f" })
 
-  const abcExported = esmRequire("./fixture/export/abc.mjs")
-  const defExported = esmRequire("./fixture/export/def.js")
-  const defModule = esmRequire.cache[defFilePath]
-
-  assert.deepStrictEqual(abcExported, abcExpected)
-  assert.deepStrictEqual(defExported, defExpected)
-
-  assert.ok(defModule)
-  assert.strictEqual(defModule.id, defFilePath)
+  assert.ok(defMod)
+  assert.strictEqual(defMod.id, defId)
 }
