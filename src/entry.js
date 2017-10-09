@@ -19,13 +19,14 @@ import toStringLiteral from "./util/to-string-literal.js"
 
 const { is, seal } = Object
 const { sort } = Array.prototype
+const { toStringTag } = Symbol
 
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
 const entryMap = new SafeWeakMap
 
-const useToStringTag = typeof Symbol.toStringTag === "symbol"
+const useToStringTag = typeof toStringTag === "symbol"
 
 const esmDescriptor = {
   configurable: false,
@@ -504,10 +505,10 @@ function runGetters(entry) {
   }
 }
 
-function setNamespaceToStringTag(namespace) {
-  if (useToStringTag) {
-    setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
-  }
+function setNamespaceToStringTag(object) {
+  return useToStringTag
+    ? setProperty(object, toStringTag, toStringTagDescriptor)
+    : object
 }
 
 function validateSetters(entry) {
