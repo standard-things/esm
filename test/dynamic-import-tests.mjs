@@ -1,17 +1,18 @@
 import assert from "assert"
 import compiler from "../build/compiler.js"
+import createNamespace from "./create-namespace.js"
 import path from "path"
 
 const isWin = process.platform === "win32"
 
 const abcId = "./fixture/export/abc.mjs"
 
-const abcNs = {
+const abcNs = createNamespace({
   a: "a",
   b: "b",
   c: "c",
   default: "default"
-}
+})
 
 describe("dynamic import", () => {
   it("should establish live binding of values", () =>
@@ -31,25 +32,25 @@ describe("dynamic import", () => {
 
   it("should support a variable id", () =>
     import(abcId)
-      .then((ns) => assert.deepEqual(ns, abcNs))
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
 
   it("should support a template string id", () =>
     import(`${abcId}`)
-      .then((ns) => assert.deepEqual(ns, abcNs))
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
 
   it("should support an expression id", () =>
     import((() => abcId)())
-      .then((ns) => assert.deepEqual(ns, abcNs))
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
 
   it("should support the file protocol", () =>
     import("file:" + (isWin ? "///" : "//") + path.resolve(abcId))
-      .then((ns) => assert.deepEqual(ns, abcNs))
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
 
@@ -60,7 +61,7 @@ describe("dynamic import", () => {
     "./fixture/export/abc.mjs"
     )
 
-      .then((ns) => assert.deepEqual(ns, abcNs))
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
       .catch((e) => assert.ifError(e))
   )
 

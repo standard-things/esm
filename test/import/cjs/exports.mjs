@@ -1,4 +1,5 @@
 import assert from "assert"
+import createNamespace from "../../create-namespace.js"
 import defaultArray, * as nsArray from "../../fixture/cjs/exports-array.js"
 import defaultClass, { a as aOfClass } from "../../fixture/cjs/exports-class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/exports-default.js"
@@ -23,42 +24,54 @@ function isPlainObject(object) {
 }
 
 export default () => {
+  let ns = createNamespace({ 0: "a", default: defaultArray })
   assert.deepStrictEqual(defaultArray, ["a"])
-  assert.deepEqual(nsArray, { 0: "a", default: defaultArray })
+  assert.deepStrictEqual(nsArray, ns)
 
+  ns = createNamespace({ default: defaultClass })
   assert.strictEqual(aOfClass, "a")
   assert.strictEqual(typeof defaultClass, "function")
-  assert.deepEqual(nsClass, { default: defaultClass })
+  assert.deepStrictEqual(nsClass, ns)
 
+  ns = createNamespace({ default: defaultDefault })
   assert.deepStrictEqual(defaultDefault, { default: "default" })
-  assert.deepEqual(nsDefault, { default: defaultDefault })
+  assert.deepStrictEqual(nsDefault, ns)
 
+  ns = createNamespace({ a: "a", default: defaultFunction })
   assert.strictEqual(aOfFunction, "a")
   assert.strictEqual(defaultFunction(), "ok")
-  assert.deepEqual(nsFunction, { a: "a", default: defaultFunction })
+  assert.deepStrictEqual(nsFunction, ns)
 
+  ns = createNamespace({ default: defaultNull })
   assert.strictEqual(defaultNull, null)
-  assert.deepEqual(nsNull, { default: defaultNull })
+  assert.deepStrictEqual(nsNull, ns)
 
+  ns = createNamespace({ default: defaultNumber })
   assert.strictEqual(defaultNumber, 1)
-  assert.deepEqual(nsNumber, { default: defaultNumber })
+  assert.deepStrictEqual(nsNumber, ns)
 
   assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
 
+  ns = createNamespace({ a: "a", b: "b", default: "default" })
   assert.strictEqual(aOfExports, "a")
   assert.strictEqual(defaultOfExports, "default")
-  assert.deepEqual(nsOfExports, { a: "a", b: "b", default: "default" })
+  assert.deepStrictEqual(nsOfExports, ns)
 
+  ns = createNamespace({ a: "a", default: "default" })
   assert.strictEqual(aOfPseudo, "a")
   assert.strictEqual(defaultPseudo, "default")
-  assert.deepEqual(nsPseudo, { a: "a", default: "default" })
+  assert.deepStrictEqual(nsPseudo, ns)
 
+  ns = createNamespace({ default: defaultUndefined })
   assert.strictEqual(defaultUndefined, void 0)
-  assert.deepEqual(nsUndefined, { default: defaultUndefined })
+  assert.deepStrictEqual(nsUndefined, ns)
 
-  assert.deepEqual(nsEmpty, { default: {} })
-  assert.deepEqual(nsEmptyPseudo, {})
+  ns = createNamespace({ default: {} })
+  assert.deepStrictEqual(nsEmpty, ns)
+
+  ns = createNamespace()
+  assert.deepStrictEqual(nsEmptyPseudo, ns)
 
   const objects = [defaultEmpty, defaultExports]
   objects.forEach((object) => assert.ok(isPlainObject(object)))

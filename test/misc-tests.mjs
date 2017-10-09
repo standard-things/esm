@@ -1,6 +1,7 @@
 import SemVer from "semver"
 
 import assert from "assert"
+import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import require from "./require.js"
 
@@ -12,12 +13,12 @@ const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
 const abcId = "./fixture/export/abc.mjs"
 
-const abcNs = {
+const abcNs = createNamespace({
   a: "a",
   b: "b",
   c: "c",
   default: "default"
-}
+})
 
 function checkError(error, code) {
   const message = error.message
@@ -203,7 +204,7 @@ describe("Node rules", () => {
       abcId.replace("abc", "%61%62%63")
     ].map((id) =>
       import(id)
-        .then((ns) => assert.deepEqual(ns, abcNs))
+        .then((ns) => assert.deepStrictEqual(ns, abcNs))
         .catch((e) => assert.ifError(e))
     ))
   )

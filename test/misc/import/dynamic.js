@@ -1,14 +1,15 @@
 "use strict"
 
 const assert = require("assert")
+const createNamespace = require("../../create-namespace.js")
 
-const abcNs = {
+const abcNs = createNamespace({
   a: "a",
   b: "b",
   c: "c",
   default: "default"
-}
+})
 
 module.exports = () =>
   import("../../fixture/export/abc.mjs")
-    .then((ns) => assert.deepEqual(ns, abcNs))
+    .then((ns) => assert.deepStrictEqual(ns, abcNs))

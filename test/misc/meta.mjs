@@ -1,4 +1,5 @@
 import assert from "assert"
+import createMeta from "../create-meta.js"
 import path from "path"
 import require from "../require.js"
 import mc1 from "../fixture/with%3Acolon.mjs"
@@ -21,9 +22,15 @@ export default () => {
   const defs = [mc1, mc2, mp1, mp2]
   defs.forEach((def) => assert.strictEqual(Object.getPrototypeOf(def), null))
 
-  assert.deepEqual(mc1, { url: mcURL })
-  assert.deepEqual(mc2, { url: mcURL + "?a#a" })
+  let meta = createMeta({ url: mcURL })
+  assert.deepStrictEqual(mc1, meta)
 
-  assert.deepEqual(mp1, { url: mpURL })
-  assert.deepEqual(mp2, { url: mpURL + "?b#b" })
+  meta = createMeta({ url: mcURL + "?a#a" })
+  assert.deepStrictEqual(mc2, meta)
+
+  meta = createMeta({ url: mpURL })
+  assert.deepStrictEqual(mp1, meta)
+
+  meta = createMeta({ url: mpURL + "?b#b" })
+  assert.deepStrictEqual(mp2, meta)
 }
