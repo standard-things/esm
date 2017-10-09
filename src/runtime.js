@@ -120,7 +120,7 @@ class Runtime {
         childEntry.addSetters(setterPairs, entry)
       })
 
-      if (sourceType === "script") {
+      if (sourceType !== "module") {
         const exported = child.exports
         childEntry.merge(Entry.get(child, exported, options))
         Entry.set(exported, childEntry)
