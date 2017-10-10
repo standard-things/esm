@@ -34,8 +34,8 @@ import setProperty from "../util/set-property.js"
 import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
-const fsBinding = binding.fs
 const extSym = Symbol.for("@std/esm:extensions")
+const fsBinding = binding.fs
 
 const extDescriptor = {
   configurable: false,
