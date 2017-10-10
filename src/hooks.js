@@ -20,7 +20,7 @@ hooks.cli = () => {
 
 hooks.preload = () => {
   mainHook(BuiltinModule)
-  moduleHook(Module)
+  moduleHook(BuiltinModule)
 }
 
 hooks.repl = () => {
