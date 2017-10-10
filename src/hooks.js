@@ -25,7 +25,7 @@ hooks.preload = () => {
 
 hooks.repl = () => {
   replHook(vm)
-  moduleHook(Module)
+  moduleHook(BuiltinModule)
 }
 
 hooks.require = (mod, options) => {
