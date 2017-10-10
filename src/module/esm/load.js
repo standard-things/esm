@@ -41,7 +41,7 @@ function load(id, parent, isMain, options, preload) {
   try {
     child = _load(cacheId, parent, isMain, state, function () {
       called = true
-      return loader.call(this, filePath, url, preload)
+      return loader.call(this, filePath, url, options, preload)
     })
 
     if (! called &&
@@ -71,9 +71,11 @@ function load(id, parent, isMain, options, preload) {
   }
 }
 
-function loader(filePath, url, preload) {
+function loader(filePath, url, options, preload) {
   let ext = extname(filePath)
-  const { extensions } = moduleState
+  const { extensions } = options && options.cjs
+    ? __non_webpack_require__
+    : moduleState
 
   if (ext === "" ||
       typeof extensions[ext] !== "function") {
