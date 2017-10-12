@@ -97,7 +97,7 @@ function loader(filePath, url, options, preload) {
 
   let extCompiler = extensions[ext]
 
-  if ((options && options.cjs) &&
+  if (options && options.cjs &&
       (ext === ".js" || ext === ".mjs") &&
       typeof _extensions[ext] === "function" &&
       ! _extensions[ext][extSym]) {
