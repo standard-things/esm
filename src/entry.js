@@ -512,12 +512,26 @@ function setNamespaceToStringTag(object) {
 }
 
 function validateSetters(entry) {
-  const { getters, setters } = entry
+  const settersMap = entry.setters
+  const { children, getters } = entry
 
-  for (const name in setters) {
-    if (name !== "*" &&
-        ! (name in getters)) {
+  for (const name in settersMap) {
+    if (name === "*") {
+      continue
+    }
+
+    if (! (name in getters)) {
       raiseExportMissing(entry, name)
+    }
+
+    const setters = settersMap[name]
+
+    for (const setter of setters) {
+      const { parent } = setter
+
+      if (parent.id in children) {
+        throw new ReferenceError(name + " is not defined")
+      }
     }
   }
 }
