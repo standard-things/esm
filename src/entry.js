@@ -512,9 +512,10 @@ function setNamespaceToStringTag(object) {
 }
 
 function validateSetters(entry) {
-  const { getters, setters } = entry
+  const { getters } = entry
+  const settersMap = entry.setters
 
-  for (const name in setters) {
+  for (const name in settersMap) {
     if (name !== "*" &&
         ! (name in getters)) {
       raiseExportMissing(entry, name)
