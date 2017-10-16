@@ -34,7 +34,7 @@
     "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-for-of-as-array": "^1.0.3",
+    "babel-plugin-transform-for-of-as-array": "^1.0.4",
     "babel-preset-env": "^1.6.0",
     "download": "^6.2.5",
     "eslint": "^4.8.0",
