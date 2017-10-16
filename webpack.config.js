@@ -5,9 +5,6 @@ const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
 
-const isProd = /production/.test(process.env.NODE_ENV)
-const isTest = /test/.test(process.env.NODE_ENV)
-
 const BannerPlugin = webpack.BannerPlugin
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
 const EnvironmentPlugin = webpack.EnvironmentPlugin
@@ -15,6 +12,11 @@ const ModuleConcatenationPlugin = webpack.optimize.ModuleConcatenationPlugin
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+
+const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"))
+
+const isProd = /production/.test(process.env.NODE_ENV)
+const isTest = /test/.test(process.env.NODE_ENV)
 
 /* eslint-disable sort-keys */
 const config = {
@@ -33,7 +35,7 @@ const config = {
       test: /\.js$/,
       loader: "babel-loader",
       exclude: /node_modules/,
-      options: JSON.parse(fs.readFileSync("./.babelrc", "utf8"))
+      options: readJSON("./.babelrc")
     }]
   },
   plugins: [
@@ -53,13 +55,15 @@ const config = {
       reportFilename: "report.html"
     }),
     new EnvironmentPlugin({
-      ESM_VERSION: require("./package.json").version
+      ESM_VERSION: readJSON("./package.json").version
     })
   ]
 }
 /* eslint-enable sort-keys */
 
 if (isProd) {
+  const ClosureCompilerPlugin = require("webpack-closure-compiler")
+
   config.plugins.push(
     new OptimizeJsPlugin,
     new ShakePlugin,
@@ -68,7 +72,10 @@ if (isProd) {
       NODE_DEBUG: false
     }),
     new UglifyJSPlugin({
-      uglifyOptions: JSON.parse(fs.readFileSync("./.uglifyrc", "utf8"))
+      uglifyOptions: readJSON("./.uglifyrc")
+    }),
+    new ClosureCompilerPlugin({
+      compiler: readJSON("./.ccrc")
     })
   )
 }

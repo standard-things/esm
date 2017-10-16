@@ -59,7 +59,8 @@
     "yargs": "^9.0.1"
   },
   "optionalDevDependencies": {
-    "node-zopfli": "^2.0.2"
+    "node-zopfli": "^2.0.2",
+    "webpack-closure-compiler": "^2.1.5"
   },
   "files": [
     "index.js",
