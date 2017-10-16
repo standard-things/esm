@@ -16,7 +16,7 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 const isProd = /production/.test(process.env.NODE_ENV)
 const isTest = /test/.test(process.env.NODE_ENV)
 
-const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"))
+const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath))
 
 /* eslint-disable sort-keys */
 const config = {

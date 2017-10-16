@@ -33,8 +33,7 @@ exts.forEach((ext) => {
 })
 
 if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
-  const content = fs.readFileSync("./fixture/options/js/index.js")
-  const gzipped = zlib.gzipSync(content)
+  const gzipped = zlib.gzipSync(fs.readFileSync("./fixture/options/js/index.js"))
   fs.writeFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
 }
 

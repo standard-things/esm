@@ -27,7 +27,7 @@ scriptOptions.filename = __filename
 
 const content =
   "(function(require,module,__filename,__options){" +
-  zlib.gunzipSync(fs.readFileSync(esmPath)).toString() +
+  zlib.gunzipSync(fs.readFileSync(esmPath)) +
   "\n})"
 
 const compiled = vm.runInThisContext(content, scriptOptions)

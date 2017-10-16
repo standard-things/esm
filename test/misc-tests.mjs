@@ -7,7 +7,7 @@ import require from "./require.js"
 
 const isWin = process.platform === "win32"
 
-const pkgJSON = JSON.parse(fs.readFileSync("../package.json", "utf8"))
+const pkgJSON = JSON.parse(fs.readFileSync("../package.json"))
 const pkgPath = require.resolve("../")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
