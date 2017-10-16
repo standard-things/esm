@@ -1,9 +1,13 @@
 
+import { Buffer } from "buffer"
+
 import binding from "../binding.js"
 
+const bufferToString = Buffer.prototype.toString
 const utilBinding = binding.util
+
+const _String = String
 const _safeToString = utilBinding.safeToString
-const _toString = String
 
 const useSafeToString = typeof safeToString === "function"
 
@@ -14,7 +18,7 @@ function safeToString(value) {
     } catch (e) {}
   }
 
-  return _toString(value)
+  return _String(value)
 }
 
 function toString(value) {
@@ -22,7 +26,13 @@ function toString(value) {
     return value
   }
 
-  return value == null ? "" : safeToString(value)
+  if (value == null) {
+    return ""
+  }
+
+  return value instanceof Buffer
+    ? bufferToString.call(value)
+    : safeToString(value)
 }
 
 export default toString
