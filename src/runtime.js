@@ -110,26 +110,15 @@ class Runtime {
     try {
       let child
       let childEntry
-      let sourceType
 
       importModule(id, parent, loadESM, options, (mod) => {
         child = mod
         childEntry = Entry.get(child)
-        sourceType = childEntry.sourceType
         entry.children[child.id] = childEntry
         childEntry.addSetters(setterPairs, entry)
       })
 
-      if (sourceType !== "module") {
-        const exported = child.exports
-        childEntry.merge(Entry.get(child, exported, options))
-        Entry.set(exported, childEntry)
-
-        childEntry.exports = exported
-        childEntry.sourceType = getSourceType(exported)
-        childEntry.loaded()
-      }
-
+      childEntry.loaded()
       childEntry.update()
     } finally {
       moduleState.requireDepth -= 1

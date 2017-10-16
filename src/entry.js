@@ -201,6 +201,29 @@ class Entry {
       }
     }
 
+    if (this.sourceType === "module") {
+      const exported = this.exports
+      assign(exported, this._namespace)
+
+      if (this.options.cjs &&
+          ! has(exported, "__esModule")) {
+        setProperty(exported, "__esModule", esmDescriptor)
+      }
+
+      seal(exported)
+    } else {
+      const exported = this.module.exports
+      this.merge(Entry.get(this.module, exported, this.options))
+      Entry.set(exported, this)
+
+      this.exports = exported
+      this.sourceType = getSourceType(exported)
+
+      if (! this.module.loaded) {
+        return this._loaded = 0
+      }
+    }
+
     assignExportsToNamespace(this)
 
     const { _namespace, getters } = this
@@ -209,20 +232,6 @@ class Entry {
       if (! (name in getters)) {
         this.addGetter(name, () => this._namespace[name])
       }
-    }
-
-    if (this.sourceType === "module") {
-      const { exports:exported } = this
-
-      validateSetters(this)
-      assign(exported, _namespace)
-
-      if (this.options.cjs &&
-          ! has(exported, "__esModule")) {
-        setProperty(exported, "__esModule", esmDescriptor)
-      }
-
-      seal(exported)
     }
 
     setGetter(this, "esmNamespace", () => {
@@ -509,18 +518,6 @@ function setNamespaceToStringTag(object) {
   return useToStringTag
     ? setProperty(object, toStringTag, toStringTagDescriptor)
     : object
-}
-
-function validateSetters(entry) {
-  const { getters } = entry
-  const settersMap = entry.setters
-
-  for (const name in settersMap) {
-    if (name !== "*" &&
-        ! (name in getters)) {
-      raiseExportMissing(entry, name)
-    }
-  }
 }
 
 Object.setPrototypeOf(Entry.prototype, null)
