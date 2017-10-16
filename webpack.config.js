@@ -13,10 +13,10 @@ const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"))
-
 const isProd = /production/.test(process.env.NODE_ENV)
 const isTest = /test/.test(process.env.NODE_ENV)
+
+const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath, "utf8"))
 
 /* eslint-disable sort-keys */
 const config = {
@@ -62,8 +62,6 @@ const config = {
 /* eslint-enable sort-keys */
 
 if (isProd) {
-  const ClosureCompilerPlugin = require("webpack-closure-compiler")
-
   config.plugins.push(
     new OptimizeJsPlugin,
     new ShakePlugin,
@@ -73,9 +71,6 @@ if (isProd) {
     }),
     new UglifyJSPlugin({
       uglifyOptions: readJSON("./.uglifyrc")
-    }),
-    new ClosureCompilerPlugin({
-      compiler: readJSON("./.ccrc")
     })
   )
 }
