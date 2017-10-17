@@ -109,7 +109,8 @@ class Compiler {
         )) {
       result.type = "module"
 
-      if (argumentsRegExp.test(code)) {
+      if (process.env.NODE_ENV !== "production" &&
+          argumentsRegExp.test(code)) {
         identifierVisitor.visit(rootPath, {
           magicString: importExportVisitor.magicString
         })
