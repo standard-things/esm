@@ -85,9 +85,7 @@ function hasParameter(node, name) {
 }
 
 function hasVariable(node, name) {
-  const body = node.body
-
-  for (const stmt of body) {
+  for (const stmt of node.body) {
     if (stmt.type === "VariableDeclaration" &&
         hasNamed(stmt.declarations, name)) {
       return true

@@ -87,9 +87,8 @@ function toAssignable(func, args) {
 
   if (node && node.type === "ObjectExpression") {
     node.type = "ObjectPattern"
-    const { properties } = node
 
-    for (const propNode of properties) {
+    for (const propNode of node.properties) {
       if (propNode.kind === "init") {
         this.toAssignable(propNode.value)
       } else if (propNode.type === "SpreadElement") {

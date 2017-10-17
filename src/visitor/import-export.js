@@ -167,9 +167,7 @@ class ImportExportVisitor extends Visitor {
                  type === "FunctionDeclaration")) {
         addNameToMap(specifierMap, id.name)
       } else if (type === "VariableDeclaration") {
-        const { declarations } = declaration
-
-        for (const varDecl of declarations) {
+        for (const varDecl of declaration.declarations) {
           const names = getNamesFromPattern(varDecl.id)
 
           for (const name of names) {
