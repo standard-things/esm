@@ -350,6 +350,20 @@ function assignExportsToNamespace(entry) {
   }
 }
 
+function callGetter(getter, throws) {
+  if (typeof getter === "function") {
+    if (throws) {
+      return getter()
+    }
+
+    try {
+      return getter()
+    } catch (e) {}
+  }
+
+  return GETTER_ERROR
+}
+
 function changed(setter, key, value) {
   if (compare(setter.last, key, value)) {
     return false
@@ -368,22 +382,7 @@ function compare(object, key, value) {
 function forEachSetter(entry, callback) {
   entry._changed = false
   runGetters(entry)
-
-  const settersMap = entry.setters
-
-  for (const name in settersMap) {
-    const setters = settersMap[name]
-
-    for (const setter of setters) {
-      const value = getExportByName(entry, setter, name)
-
-      if (entry._changed ||
-          changed(setter, name, value)) {
-        callback(setter, value)
-      }
-    }
-  }
-
+  runSetters(entry, callback)
   entry._changed = false
 }
 
@@ -419,7 +418,7 @@ function getExportByName(entry, setter, name) {
 }
 
 function isSafe(entry) {
-  return entry.sourceType !== "script" &&  ! entry.options.cjs
+  return entry.sourceType !== "script" && ! entry.options.cjs
 }
 
 function mergeProperty(entry, otherEntry, key) {
@@ -485,32 +484,41 @@ function raiseExportStarConflict(entry, name) {
   raiseExport(entry, name, "Module %s contains conflicting star exports for name '%s'")
 }
 
-function runGetter(getter) {
-  if (typeof getter === "function") {
-    try {
-      return getter()
-    } catch (e) {}
-  }
+function runGetter(entry, name, throws) {
+  const { _namespace, getters } = entry
+  const value = callGetter(getters[name], throws)
 
-  return GETTER_ERROR
+  if (value !== GETTER_ERROR &&
+      ! compare(_namespace, name, value)) {
+    entry._changed = true
+    _namespace[name] = value
+  }
 }
 
 function runGetters(entry) {
-  if (entry.sourceType !== "module") {
-    assignExportsToNamespace(entry)
-    return
-  }
-
-  const { _namespace, getters } = entry
-
-  for (const name in getters) {
-    const value = runGetter(getters[name])
-
-    if (value !== GETTER_ERROR &&
-        ! compare(_namespace, name, value)) {
-      entry._changed = true
-      _namespace[name] = value
+  if (entry.sourceType === "module") {
+    for (const name in entry.getters) {
+      runGetter(entry, name)
     }
+  } else {
+    assignExportsToNamespace(entry)
+  }
+}
+
+function runSetter(entry, name, callback) {
+  for (const setter of entry.setters[name]) {
+    const value = getExportByName(entry, setter, name)
+
+    if (entry._changed ||
+        changed(setter, name, value)) {
+      callback(setter, value)
+    }
+  }
+}
+
+function runSetters(entry, callback) {
+  for (const name in entry.setters) {
+    runSetter(entry, name, callback)
   }
 }
 
