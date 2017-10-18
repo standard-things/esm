@@ -64,19 +64,16 @@ describe("built-in modules", () => {
   it("should load built-in modules", () =>
     import("./misc/builtin/load.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should fire setters if already loaded", () =>
     import("./misc/builtin/loaded.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should produce valid namespace objects", () =>
     import("./misc/builtin/namespace.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 })
 
@@ -96,7 +93,6 @@ describe("package.json", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
-        .catch((e) => assert.ifError(e))
     ))
   )
 
@@ -108,7 +104,6 @@ describe("package.json", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
-        .catch((e) => assert.ifError(e))
     ))
   )
 })
@@ -194,7 +189,6 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then((ns) => assert.strictEqual(ns.default, "mjs"))
-        .catch((e) => assert.ifError(e))
     ))
   )
 
@@ -206,7 +200,6 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then((ns) => assert.deepStrictEqual(ns, abcNs))
-        .catch((e) => assert.ifError(e))
     ))
   )
 
@@ -218,14 +211,12 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
-        .catch((e) => assert.ifError(e))
     ))
   )
 
   it("should support ids containing pounds", () =>
     import("./fixture/with%23pound.mjs")
       .then(() => assert.ok(true))
-      .catch((e) => assert.ifError(e))
   )
 
   it('should support local "." ids', () =>
@@ -235,7 +226,6 @@ describe("Node rules", () => {
     ].map((id) =>
       import(id)
         .then((ns) => assert.strictEqual(ns.default, "inside dot"))
-        .catch((e) => assert.ifError(e))
     ))
   )
 
@@ -340,7 +330,6 @@ describe("Node rules", () => {
     require.extensions[".json"] = () => ({})
     return import("../package.json")
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
-      .catch((e) => assert.ifError(e))
   })
 
   it("should not cache ES modules in `require.cache`", () => {
@@ -349,7 +338,6 @@ describe("Node rules", () => {
     delete require.cache[id]
     return import(id)
       .then(() => assert.strictEqual(id in require.cache, false))
-      .catch((e) => assert.ifError(e))
   })
 
   it("should resolve non-local dependencies with `require`", () => {
@@ -384,13 +372,11 @@ describe("Node rules", () => {
   it("should not cache ES modules in ESM cache with `options.cjs`", () =>
     import("./misc/cache")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/export/pseudo")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 })
 
@@ -398,67 +384,56 @@ describe("spec compliance", () => {
   it("should establish bindings before the module executes", () =>
     import("./misc/bindings.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should hoist declarations before the module executes", () =>
     import("./misc/declarations.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should establish live binding of values", () =>
     import("./misc/live.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should execute modules in the correct order", () =>
     import("./misc/order.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should produce valid namespace objects", () =>
     import("./misc/namespace.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should export CJS `module.exports` as default", () =>
     import("./misc/export/cjs-default.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should load CJS modules that delete their cache entry", () => {
     return import("./fixture/delete-cache.js")
       .then((ns) => assert.strictEqual(ns.default, "delete cache"))
-      .catch((e) => assert.ifError(e))
   })
 
   it("should support `import.meta` in ESM", () =>
     import("./misc/meta.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support loading ESM from dynamic import in CJS", () =>
     import("./misc/import/dynamic.js")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not have CJS free variables", () =>
     import("./misc/free-vars.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not export CJS named binding", () =>
@@ -499,7 +474,6 @@ describe("spec compliance", () => {
   it("should not error when importing a non-ambiguous export", () =>
     import("./misc/import/non-ambiguous.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should throw a syntax error when exporting duplicate local bindings", () =>
@@ -620,18 +594,15 @@ describe("spec compliance", () => {
   it("should not throw when accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
       .then(() => assert.ok(true))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when typeof checking `arguments`", () =>
     import("./fixture/source/arguments-typeof.mjs")
       .then(() => assert.ok(true))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not throw when using an opening HTML comment in CJS", () =>
     import("./fixture/source/html-comment.js")
       .then(() => assert.ok(true))
-      .catch((e) => assert.ifError(e))
   )
 })
