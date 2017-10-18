@@ -48,10 +48,15 @@ function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
 }
 
-function runTests() {
+function runTests(cached) {
   return execa(NODE_BIN, mochaArgs, {
     cwd: testPath,
-    env: { HOME, NODE_ENV, NODE_PATH, USERPROFILE: HOME },
+    env: {
+      HOME,
+      NODE_ENV: NODE_ENV + (cached ? "cached" : ""),
+      NODE_PATH,
+      USERPROFILE: HOME
+    },
     stdio: "inherit"
   })
   .catch((e) => process.exit(e.code))
@@ -69,7 +74,5 @@ Promise
     cleanRepo(),
     setupNode()
   ])
-  // Run tests without the cache.
-  .then(runTests)
-  // Run tests with the cache.
-  .then(runTests)
+  .then(() => runTests())
+  .then(() => runTests(true))
