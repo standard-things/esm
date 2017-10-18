@@ -555,10 +555,11 @@ describe("spec compliance", () => {
             assert.strictEqual(result.stderr, "")
           } else {
             const expected =
+              "(" + process.release.name + ":" + process.pid + ") " +
               "Warning: arguments is not defined (" + data.loc + "): " +
               require.resolve(data.id)
 
-            assert.strictEqual(result.stderr.slice(13, -1), expected)
+            assert.strictEqual(result.stderr.trim(), expected)
           }
         })
     , Promise.resolve())
