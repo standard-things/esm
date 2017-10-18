@@ -226,14 +226,6 @@ class Entry {
 
     assignExportsToNamespace(this)
 
-    const { _namespace, getters } = this
-
-    for (const name in _namespace) {
-      if (! (name in getters)) {
-        this.addGetter(name, () => this._namespace[name])
-      }
-    }
-
     setGetter(this, "esmNamespace", () => {
       // Section 9.4.6
       // Module namespace objects have a null [[Prototype]].
@@ -326,11 +318,15 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const { _namespace, exports:exported } = entry
+  const { _namespace, exports:exported, getters } = entry
   const isScript = entry.sourceType === "script"
 
   if (isScript) {
     _namespace.default = exported
+
+    if (! ("default" in getters)) {
+      entry.addGetter("default", () => entry._namespace.default)
+    }
   }
 
   if (! isObjectLike(exported)) {
@@ -342,6 +338,10 @@ function assignExportsToNamespace(entry) {
   const names = safe ? keys(object) : keysAll(object)
 
   for (const name of names) {
+    if (! (name in getters)) {
+      entry.addGetter(name, () => entry._namespace[name])
+    }
+
     if (safe) {
       _namespace[name] = exported[name]
     } else if (! isScript || name !== "default") {
@@ -350,16 +350,10 @@ function assignExportsToNamespace(entry) {
   }
 }
 
-function callGetter(getter, throws) {
-  if (typeof getter === "function") {
-    if (throws) {
-      return getter()
-    }
-
-    try {
-      return getter()
-    } catch (e) {}
-  }
+function callGetter(getter) {
+  try {
+    return getter()
+  } catch (e) {}
 
   return GETTER_ERROR
 }
@@ -400,15 +394,13 @@ function getExportByName(entry, setter, name) {
     return entry.exports
   }
 
-  const { _namespace } = entry
-
   if (isScript ||
       (entry._loaded === 1 &&
-       ! (name in _namespace))) {
+       ! (name in entry.getters))) {
     raiseExportMissing(entry, name)
   }
 
-  const value = _namespace[name]
+  const value = entry._namespace[name]
 
   if (value === STAR_ERROR) {
     raiseExportStarConflict(entry, name)
@@ -484,9 +476,9 @@ function raiseExportStarConflict(entry, name) {
   raiseExport(entry, name, "Module %s contains conflicting star exports for name '%s'")
 }
 
-function runGetter(entry, name, throws) {
+function runGetter(entry, name) {
   const { _namespace, getters } = entry
-  const value = callGetter(getters[name], throws)
+  const value = callGetter(getters[name])
 
   if (value !== GETTER_ERROR &&
       ! compare(_namespace, name, value)) {
