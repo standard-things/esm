@@ -3,6 +3,7 @@ import SemVer from "semver"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
+import mockIo from "mock-stdio"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"
@@ -562,18 +563,31 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when creating an `arguments` binding", () =>
-    Promise.all([
-      "./fixture/source/arguments-undefined.mjs",
-      "./fixture/source/arguments-undefined-nested.mjs"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.ok(e instanceof ReferenceError)
-          assert.ok(e.message.startsWith("arguments is not defined"))
+  it("should warn when creating an `arguments` binding", () =>
+    [
+      { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
+      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
+    ].reduce((promise, data) =>
+      promise
+        .then(() => {
+          mockIo.start()
+          return import(data.id)
         })
-    ))
+        .then(() => {
+          const result = mockIo.end()
+          assert.strictEqual(result.stdout, "")
+
+          if (/cached/.test(process.env.NODE_ENV)) {
+            assert.strictEqual(result.stderr, "")
+          } else {
+            const expected =
+              "Warning: arguments is not defined (" + data.loc + "): " +
+              require.resolve(data.id)
+
+            assert.strictEqual(result.stderr.slice(13, -1), expected)
+          }
+        })
+    , Promise.resolve())
   )
 
   it("should throw a syntax error when creating an `await` binding", () =>
