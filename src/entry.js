@@ -4,6 +4,7 @@ import SafeWeakMap from "./safe-weak-map.js"
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import createOptions from "./util/create-options.js"
+import emitWarning from "./error/emit-warning.js"
 import env from "./env.js"
 import { format } from "util"
 import getModuleName from "./util/get-module-name.js"
@@ -498,12 +499,24 @@ function runGetters(entry) {
 }
 
 function runSetter(entry, name, callback) {
+  const { options } = entry
+
   for (const setter of entry.setters[name]) {
     const value = getExportByName(entry, setter, name)
 
-    if (entry._changed ||
-        changed(setter, name, value)) {
-      callback(setter, value)
+    if (! entry._changed &&
+        ! changed(setter, name, value)) {
+      continue
+    }
+
+    callback(setter, value)
+
+    if (options.warnings &&
+        name in entry.getters &&
+        value === void 0 &&
+        setter.parent.id in entry.children) {
+      const moduleName = getModuleName(entry.module)
+      emitWarning("Possible temporal dead zone access of '" + name + "' in " + moduleName)
     }
   }
 }
