@@ -6,6 +6,7 @@ import Wrapper from "../wrapper.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
+import emitWarning from "../error/emit-warning.js"
 import encodeId from "../util/encode-id.js"
 import env from "../env.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
@@ -64,7 +65,14 @@ function hook(vm) {
         var: true
       }
 
-      output = tryWrapper(compiler.compile, [code, compilerOptions]).code
+      const result = tryWrapper(compiler.compile, [code, compilerOptions])
+      output = result.code
+
+      if (result.warnings) {
+        for (const warning of result.warnings) {
+          emitWarning(warning.message)
+        }
+      }
     }
 
     output =

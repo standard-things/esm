@@ -11,6 +11,7 @@ import binding from "../binding.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import createSourceMap from "../util/create-source-map.js"
+import emitWarning from "../error/emit-warning.js"
 import encodeId from "../util/encode-id.js"
 import encodeURI from "../util/encode-uri.js"
 import env from "../env.js"
@@ -140,6 +141,12 @@ function hook(Module, parent, options) {
           runtimeAlias,
           type
         })
+
+        if (cacheValue.warnings) {
+          for (const warning of cacheValue.warnings) {
+            emitWarning(warning.message + ": " + filePath)
+          }
+        }
       }
     }
 

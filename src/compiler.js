@@ -35,7 +35,8 @@ class Compiler {
     const result = {
       code,
       data: null,
-      type: "script"
+      type: "script",
+      warnings: null
     }
 
     let useModule
@@ -112,8 +113,10 @@ class Compiler {
 
       if (options.warnings &&
           argumentsRegExp.test(code)) {
+        result.warnings = []
         identifierVisitor.visit(rootPath, {
-          magicString: importExportVisitor.magicString
+          magicString: importExportVisitor.magicString,
+          warnings: result.warnings
         })
       }
     }

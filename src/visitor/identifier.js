@@ -8,24 +8,37 @@ const definedMap = new SafeWeakMap
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {
     this.magicString = options.magicString
+    this.warnings = options.warnings
   }
 
   visitIdentifier(path) {
     const node = path.getValue()
 
-    if (node.name === "arguments") {
-      const { operator, type } = path.getParentNode()
+    if (node.name !== "arguments") {
+      this.visitChildren(path)
+      return
+    }
 
-      if (! (type === "UnaryExpression" && operator === "typeof") &&
-          ! isArgumentsDefined(path)) {
-        const parser = {
-          input: this.magicString.original,
-          pos: node.start,
-          start: node.start
-        }
+    const { operator, type } = path.getParentNode()
 
-        raise(parser, parser.start, "arguments is not defined", ReferenceError)
-      }
+    if ((type === "UnaryExpression" &&
+         operator === "typeof") ||
+        isArgumentsDefined(path)) {
+      this.visitChildren(path)
+      return
+    }
+
+    const parser = {
+      input: this.magicString.original,
+      pos: node.start,
+      start: node.start
+    }
+
+    try {
+      raise(parser, parser.start, "arguments is not defined", Error)
+    } catch (e) {
+      e.name = "Warning"
+      this.warnings.push(e)
     }
 
     this.visitChildren(path)
