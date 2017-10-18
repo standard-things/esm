@@ -13,7 +13,8 @@ const defaultOptions = {
   hint: "script",
   runtimeAlias: "_",
   type: "module",
-  var: false
+  var: false,
+  warnings: process.env.NODE_ENV !== "production"
 }
 
 const createOptions = (options) => _createOptions(options, Compiler.defaultOptions)
@@ -109,7 +110,7 @@ class Compiler {
         )) {
       result.type = "module"
 
-      if (process.env.NODE_ENV !== "production" &&
+      if (options.warnings &&
           argumentsRegExp.test(code)) {
         identifierVisitor.visit(rootPath, {
           magicString: importExportVisitor.magicString

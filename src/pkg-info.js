@@ -15,7 +15,8 @@ const defaultOptions = {
   cjs: false,
   debug: false,
   esm: "mjs",
-  sourceMap: void 0
+  sourceMap: void 0,
+  warnings: process.env.NODE_ENV !== "production"
 }
 
 const infoCache = new FastObject
