@@ -4,13 +4,11 @@ describe("file extension", () => {
   it("should support loading `.gz` files in CJS", () =>
     import("./file-extension/gz.js")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support loading `.gz` files in ESM", () =>
     import("./file-extension/gz.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not support loading `.mjz.gz` with `require`", () =>

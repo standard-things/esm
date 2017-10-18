@@ -27,31 +27,26 @@ describe("dynamic import", () => {
       assert.strictEqual(ns.reset(), 0)
       assert.strictEqual(ns.value, 0)
     })
-    .catch((e) => assert.ifError(e))
   )
 
   it("should support a variable id", () =>
     import(abcId)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support a template string id", () =>
     import(`${abcId}`)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support an expression id", () =>
     import((() => abcId)())
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support the file protocol", () =>
     import("file:" + (isWin ? "///" : "//") + path.resolve(abcId))
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
@@ -62,7 +57,6 @@ describe("dynamic import", () => {
     )
 
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
-      .catch((e) => assert.ifError(e))
   )
 
   it("should support `import()` in an initial assignment", () => {

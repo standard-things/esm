@@ -44,13 +44,11 @@ describe("compiler", () => {
   it("should choose unique export and module identifiers", () =>
     import("./compiler/aliases.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should preserve line numbers", () =>
     import("./compiler/lines.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should preserve crlf newlines", () => {
@@ -75,7 +73,6 @@ describe("compiler", () => {
   it('should not hoist above "use strict"', () =>
     import("./compiler/strict.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not get confused by shebang", () => {
@@ -91,7 +88,6 @@ describe("compiler", () => {
   it("should not get confused by string literals", () =>
     import("./compiler/strings.mjs")
       .then((ns) => ns.default())
-      .catch((e) => assert.ifError(e))
   )
 
   it("should not get confused by trailing comments", () => {
