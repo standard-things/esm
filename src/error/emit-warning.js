@@ -1,5 +1,11 @@
 import captureStackTrace from "./capture-stack-trace.js"
 
+const PREFIX = "(" + process.release.name + ":" + process.pid + ") "
+
+const _emitWarning = process.emitWarning
+
+const useEmitWarning = typeof _emitWarning === "function"
+
 function emitWarning(message, type, code, Ctor) {
   const isDeprecation = type === "DeprecationWarning"
 
@@ -8,25 +14,38 @@ function emitWarning(message, type, code, Ctor) {
     return
   }
 
+  if (useEmitWarning) {
+    _emitWarning(message, type, code, Ctor)
+    return
+  }
+
+  const useCode = typeof code === "string"
+
   if (typeof type !== "string") {
     type = "Warning"
   }
 
-  const warning = new Error(message)
-  warning.name = type
-
-  if (typeof code === "string") {
-    warning.code = code
-  }
-
-  captureStackTrace(warning, Ctor || emitWarning)
-
   if (isDeprecation &&
       process.throwDeprecation) {
+    const warning = new Error(message)
+    warning.name = type
+
+    if (useCode) {
+      warning.code = code
+    }
+
+    captureStackTrace(warning, Ctor || emitWarning)
     throw warning
   }
 
-  process.nextTick(() => process.emit("warning", warning))
+  process.nextTick(() => {
+    // eslint-disable-next-line no-console
+    console.error(
+      PREFIX +
+      (useCode ? "[" + code + "] " : "") +
+      type + ": " + message
+    )
+  })
 }
 
 export default emitWarning
