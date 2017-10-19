@@ -5,6 +5,10 @@ import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import mockIo from "mock-stdio"
 import require from "./require.js"
+import util from "util"
+
+const NODE_ENV = process.env.NODE_ENV
+const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isWin = process.platform === "win32"
 
@@ -58,6 +62,10 @@ function checkErrorProps(error, code, message) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+}
+
+function getWarning(...args) {
+  return WARNING_PREFIX + "Warning: " + util.format(...args) + "\n"
 }
 
 describe("built-in modules", () => {
@@ -528,41 +536,13 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should throw a syntax error when accessing top-level `arguments`", () =>
+  it("should throw a syntax error when creating an `arguments` binding", () =>
     import("./fixture/source/arguments-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
         assert.ok(e.message.startsWith("Binding arguments in strict mode"))
       })
-  )
-
-  it("should warn when creating an `arguments` binding", () =>
-    [
-      { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
-      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
-    ].reduce((promise, data) =>
-      promise
-        .then(() => {
-          mockIo.start()
-          return import(data.id)
-        })
-        .then(() => {
-          const result = mockIo.end()
-          assert.strictEqual(result.stdout, "")
-
-          if (/cached/.test(process.env.NODE_ENV)) {
-            assert.strictEqual(result.stderr, "")
-          } else {
-            const expected =
-              "(" + process.release.name + ":" + process.pid + ") " +
-              "Warning: arguments is not defined (" + data.loc + "): " +
-              require.resolve(data.id)
-
-            assert.strictEqual(result.stderr.trim(), expected)
-          }
-        })
-    , Promise.resolve())
   )
 
   it("should throw a syntax error when creating an `await` binding", () =>
@@ -591,6 +571,34 @@ describe("spec compliance", () => {
         assert.ok(e.message.startsWith("HTML comments are not allowed in modules"))
       })
   )
+
+  it("should warn when creating an `arguments` binding", () =>
+    [
+      { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
+      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
+    ].reduce((promise, data) => {
+      const id = require.resolve(data.id)
+      const stderr = /cached/.test(NODE_ENV)
+        ? ""
+        : getWarning("arguments is not defined (%s): %s", data.loc, id)
+
+      return promise
+        .then(() => {
+          mockIo.start()
+          return import(id)
+        })
+        .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
+    }, Promise.resolve())
+  )
+
+  it("should warn for potential TDZ access", () => {
+    const id = require.resolve("./fixture/cycle/tdz/a.mjs")
+    const stderr = getWarning("Possible temporal dead zone access of 'a' in %s", id)
+
+    mockIo.start()
+    return import(id)
+      .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
+  })
 
   it("should not throw when accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
