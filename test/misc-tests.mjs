@@ -64,8 +64,9 @@ function checkErrorStack(error, startsWith) {
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
 }
 
-function getWarning(...args) {
-  return WARNING_PREFIX + "Warning: " + util.format(...args) + "\n"
+function getWarning() {
+  return WARNING_PREFIX + "Warning: " +
+    util.format.apply(util, arguments) + "\n"
 }
 
 describe("built-in modules", () => {
