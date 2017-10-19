@@ -339,14 +339,14 @@ function assignExportsToNamespace(entry) {
   const names = safe ? keys(object) : keysAll(object)
 
   for (const name of names) {
-    if (! (name in getters)) {
-      entry.addGetter(name, () => entry._namespace[name])
-    }
-
     if (safe) {
       _namespace[name] = exported[name]
     } else if (! isScript || name !== "default") {
       assignProperty(_namespace, exported, name)
+    }
+
+    if (! (name in getters)) {
+      entry.addGetter(name, () => entry._namespace[name])
     }
   }
 }
