@@ -147,7 +147,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"sourceMap":</code></td>
   <td>
-    <p>A boolean for enabling inline source maps</p>
+    <p>A boolean for enabling inline source maps.</p>
     <p><i>Note: Automatically enabled using the Node CLI
     <a href="https://nodejs.org/en/docs/inspector/"><code>--inspect</code> option</a>.</i></p>
   </td>
