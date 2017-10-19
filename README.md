@@ -153,6 +153,13 @@ DevOpts
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"warnings":</code></td>
+  <td>
+    <p>A boolean for enabling parse and runtime warnings.</p>
+    <p><i>Note: The default value is <code>process.env.NODE_ENV !== "production"</code>.</i></p>
+  </td>
+</tr>
+<tr>
   <td colspan="2">
     <pre><code>  }
 }</code></pre>
