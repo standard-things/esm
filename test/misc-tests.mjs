@@ -7,9 +7,9 @@ import mockIo from "mock-stdio"
 import require from "./require.js"
 import util from "util"
 
-const NODE_ENV = process.env.NODE_ENV
 const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
+const isCached = /cached/.test(process.env.NODE_ENV)
 const isWin = process.platform === "win32"
 
 const pkgJSON = JSON.parse(fs.readFileSync("../package.json"))
@@ -578,9 +578,7 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
       const id = require.resolve(data.id)
-      const stderr = /cached/.test(NODE_ENV)
-        ? ""
-        : getWarning("arguments is not defined (%s): %s", data.loc, id)
+      const stderr = isCached ? "" : getWarning("arguments is not defined (%s): %s", data.loc, id)
 
       return promise
         .then(() => {
