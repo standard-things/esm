@@ -23,7 +23,7 @@ describe("export declarations", () => {
       .then((ns) => ns.default())
   )
 
-  it("should support specifiers that shadow Object.prototype", () =>
+  it("should support specifiers that shadow `Object.prototype`", () =>
     import("./export/shadowed.mjs")
       .then((ns) => ns.default())
   )
