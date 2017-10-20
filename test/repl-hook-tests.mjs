@@ -1,6 +1,7 @@
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
+import isPlainObject from "./is-plain-object.js"
 import module from "./module.js"
 import repl from "repl"
 import require from "./require.js"
@@ -58,7 +59,7 @@ describe("REPL hook", () => {
     const code = "this.exports = module.exports"
 
     r.eval(code, context, "repl", () =>
-      assert.strictEqual(Object.getPrototypeOf(context.exports), Object.prototype)
+      assert.ok(isPlainObject(context.exports))
     )
 
     r.close()

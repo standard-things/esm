@@ -1,5 +1,6 @@
 import assert from "assert"
 import createNamespace from "../../create-namespace.js"
+import isPlainObject from "../../is-plain-object.js"
 import defaultArray, * as nsArray from "../../fixture/cjs/exports-array.js"
 import defaultClass, * as nsClass from "../../fixture/cjs/exports-class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/exports-default.js"
@@ -17,10 +18,6 @@ import * as nsOfExports from "../../fixture/cjs/exports-of-exports.mjs"
 import * as nsPseudo from "../../fixture/cjs/exports-pseudo.js"
 import * as nsFunction from "../../fixture/cjs/exports-function.js"
 import * as nsSafe from "../../fixture/cjs/exports-get-set.js"
-
-function isPlainObject(object) {
-  return Object.getPrototypeOf(object) === Object.prototype
-}
 
 export default () => {
   let ns = createNamespace({ 0: "a", default: defaultArray })
