@@ -1,7 +1,7 @@
 import assert from "assert"
 import createNamespace from "../../create-namespace.js"
 import defaultArray, * as nsArray from "../../fixture/cjs/exports-array.js"
-import defaultClass, { a as aOfClass } from "../../fixture/cjs/exports-class.js"
+import defaultClass, * as nsClass from "../../fixture/cjs/exports-class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/exports-default.js"
 import defaultEmpty, * as nsEmpty from "../../fixture/cjs/exports-empty.js"
 import defaultExports from "../../fixture/cjs/exports-exports.mjs"
@@ -12,7 +12,6 @@ import defaultObject, { a as aOfObject } from "../../fixture/cjs/exports-object.
 import defaultOfExports, { a as aOfExports } from "../../fixture/cjs/exports-of-exports.mjs"
 import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/exports-pseudo.js"
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/exports-undefined.js"
-import * as nsClass from "../../fixture/cjs/exports-class.js"
 import * as nsEmptyPseudo from "../../fixture/cjs/exports-pseudo-empty.js"
 import * as nsOfExports from "../../fixture/cjs/exports-of-exports.mjs"
 import * as nsPseudo from "../../fixture/cjs/exports-pseudo.js"
@@ -29,7 +28,6 @@ export default () => {
   assert.deepStrictEqual(nsArray, ns)
 
   ns = createNamespace({ default: defaultClass })
-  assert.strictEqual(aOfClass, "a")
   assert.strictEqual(typeof defaultClass, "function")
   assert.deepStrictEqual(nsClass, ns)
 

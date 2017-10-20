@@ -12,7 +12,6 @@ import getSourceType from "./util/get-source-type.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
-import keysAll from "./util/keys-all.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -337,7 +336,7 @@ function assignExportsToNamespace(entry) {
 
   const safe = isSafe(entry)
   const object = entry._loaded === 1 ? _namespace : exported
-  const names = safe ? keys(object) : keysAll(object)
+  const names = keys(object)
 
   for (const name of names) {
     if (safe) {
