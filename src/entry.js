@@ -204,7 +204,6 @@ class Entry {
     if (this.sourceType === "module") {
       const exported = this.exports
       assign(exported, this._namespace)
-      assignExportsToNamespace(this)
 
       if (this.options.cjs &&
           ! has(exported, "__esModule")) {
@@ -223,9 +222,9 @@ class Entry {
       if (! this.module.loaded) {
         return this._loaded = 0
       }
-
-      assignExportsToNamespace(this)
     }
+
+    assignExportsToNamespace(this)
 
     setGetter(this, "esmNamespace", () => {
       // Section 9.4.6
