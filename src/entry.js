@@ -199,10 +199,10 @@ class Entry {
       const mod = this.module
       const exported = mod.exports
 
-      Entry.set(mod, exported, this)
-
       this.exports = exported
       this.sourceType = getSourceType(exported)
+
+      Entry.set(mod, exported, this)
 
       if (! mod.loaded) {
         return this._loaded = 0

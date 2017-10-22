@@ -20,11 +20,11 @@ class Runtime {
     const entry =
     object.entry = Entry.get(mod)
 
-    Entry.set(mod, exported, entry)
-
     entry.exports = exported
     entry.options = options
     entry.sourceType = getSourceType(exported)
+
+    Entry.set(mod, exported, entry)
 
     setGetter(object, "meta", () => {
       const meta = new NullObject
