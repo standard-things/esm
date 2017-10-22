@@ -14,19 +14,17 @@ import setSetter from "./util/set-setter.js"
 
 class Runtime {
   static enable(mod, exported, options) {
-    const entry = Entry.get(mod)
     const object = mod.exports
     const { prototype } = Runtime
+
+    const entry =
+    object.entry = Entry.get(mod)
 
     Entry.set(mod, exported, entry)
 
     entry.exports = exported
     entry.options = options
     entry.sourceType = getSourceType(exported)
-
-    object.entry = entry
-    object.module = mod
-    object.options = options
 
     setGetter(object, "meta", () => {
       const meta = new NullObject
@@ -106,7 +104,8 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    const { entry, module:parent, options } = this
+    const { entry } = this
+    const { module:parent, options } = entry
 
     moduleState.requireDepth += 1
 
@@ -156,18 +155,20 @@ function importModule(id, parent, loader, options, preload) {
 }
 
 function runCJS(runtime, moduleWrapper) {
-  const { entry, module:mod, options } = runtime
+  const { entry } = runtime
+  const { module:mod, options } = entry
   const loader = options.cjs ? loadESM : loadCJS
   const requirer = (id) => importModule(id, mod, loader, options).exports
   const req = makeRequireFunction(mod, requirer)
+  const exported = mod.exports = entry.exports
 
-  let exported = mod.exports = entry.exports
   moduleWrapper.call(exported, exported, req)
   mod.loaded = true
 }
 
 function runESM(runtime, moduleWrapper) {
-  const { entry, module:mod, options } = runtime
+  const { entry } = runtime
+  const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
 
   if (options.cjs) {
