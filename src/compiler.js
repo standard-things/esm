@@ -67,7 +67,8 @@ class Compiler {
       error = e
     }
 
-    if (threw && type === "unambiguous") {
+    if (threw &&
+        type === "unambiguous") {
       type = parserOptions.sourceType = "script"
 
       try {
