@@ -16,7 +16,7 @@ class Runtime {
   static enable(mod, exported, options) {
     const entry = Entry.get(mod)
     entry.merge(new Entry(mod, exported, options))
-    Entry.set(exported, entry)
+    Entry.set(mod, exported, entry)
 
     const object = mod.exports
     const { prototype } = Runtime

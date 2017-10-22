@@ -96,10 +96,8 @@ class Entry {
     return entryMap.has(key)
   }
 
-  static set(key, entry) {
-    if (isObjectLike(key)) {
-      entryMap.set(key, entry)
-    }
+  static set(mod, exported, entry) {
+    entryMap.set(isObjectLike(exported) ? exported : mod, entry)
   }
 
   addGetter(name, getter) {
@@ -200,14 +198,16 @@ class Entry {
 
       seal(exported)
     } else {
-      const exported = this.module.exports
-      this.merge(Entry.get(this.module, exported, this.options))
-      Entry.set(exported, this)
+      this.merge(Entry.get(this.module, this.module.exports, this.options))
+
+      const mod = this.module
+      const exported = mod.exports
+      Entry.set(mod, exported, this)
 
       this.exports = exported
       this.sourceType = getSourceType(exported)
 
-      if (! this.module.loaded) {
+      if (! mod.loaded) {
         return this._loaded = 0
       }
     }
