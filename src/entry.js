@@ -319,9 +319,14 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, exports:exported, getters } = entry
-  const isScript = entry.sourceType === "script"
 
-  if (isScript) {
+  const isModule =
+    entry.sourceType === "module" ||
+    !! (entry.options.cjs &&
+    has(exported, "__esModule") &&
+    exported.__esModule)
+
+  if (! isModule) {
     _namespace.default = exported
 
     if (! ("default" in getters)) {
@@ -340,7 +345,7 @@ function assignExportsToNamespace(entry) {
   for (const name of names) {
     if (safe) {
       _namespace[name] = exported[name]
-    } else if (! isScript || name !== "default") {
+    } else if (isModule || name !== "default") {
       assignProperty(_namespace, exported, name)
     }
 
@@ -382,19 +387,15 @@ function forEachSetter(entry, callback) {
 
 function getExportByName(entry, setter, name) {
   const isScript =
-    entry.sourceType !== "module" &&
+    entry.sourceType === "script" &&
     ! setter.parent.options.cjs
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
   }
 
-  if (isScript &&
-      name === "default") {
-    return entry.exports
-  }
-
-  if (isScript ||
+  if ((isScript &&
+       name !== "default") ||
       (entry._loaded === 1 &&
        ! (name in entry.getters))) {
     raiseExportMissing(entry, name)
@@ -410,7 +411,7 @@ function getExportByName(entry, setter, name) {
 }
 
 function isSafe(entry) {
-  return entry.sourceType !== "script" && ! entry.options.cjs
+  return entry.sourceType === "module" && ! entry.options.cjs
 }
 
 function mergeProperty(entry, otherEntry, key) {
