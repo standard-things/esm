@@ -1,14 +1,12 @@
 import { extname, resolve } from "path"
 
 import compiler from "./compiler.js"
-import createOptions from "./util/create-options.js"
 import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
 class Compiler {
   static compile(code, options) {
-    options = createOptions(options)
     return typeof options.filePath === "string"
       ? compileAndWrite(code, options)
       : compileAndCache(code, options)
