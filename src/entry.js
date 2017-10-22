@@ -3,7 +3,6 @@ import SafeWeakMap from "./safe-weak-map.js"
 
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
-import createOptions from "./util/create-options.js"
 import emitWarning from "./error/emit-warning.js"
 import env from "./env.js"
 import { format } from "util"
@@ -43,7 +42,7 @@ const toStringTagDescriptor = {
 }
 
 class Entry {
-  constructor(mod, exported, options) {
+  constructor(mod, exported) {
     /* eslint-disable lines-around-comment */
     // The namespace object change indicator.
     this._changed = false
@@ -66,7 +65,7 @@ class Entry {
     // The module this entry is managing.
     this.module = mod
     // The package options for this entry.
-    this.options = createOptions(options)
+    this.options = new NullObject
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
     // The source type of the module.
@@ -76,16 +75,13 @@ class Entry {
     /* eslint-enable lines-around-comment */
   }
 
-  static get(mod, exported, options) {
-    if (arguments.length === 1) {
-      exported = mod.exports
-    }
-
+  static get(mod) {
+    const exported = mod.exports
     const useExports = isObjectLike(exported)
     let entry = entryMap.get(useExports ? exported : mod)
 
     if (! entry) {
-      entry = new Entry(mod, exported, options)
+      entry = new Entry(mod, exported)
       entryMap.set(useExports ? exported : mod, entry)
     }
 
@@ -198,7 +194,7 @@ class Entry {
 
       seal(exported)
     } else {
-      this.merge(Entry.get(this.module, this.module.exports, this.options))
+      this.merge(Entry.get(this.module))
 
       const mod = this.module
       const exported = mod.exports
