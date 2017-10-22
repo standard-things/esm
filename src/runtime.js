@@ -15,15 +15,18 @@ import setSetter from "./util/set-setter.js"
 class Runtime {
   static enable(mod, exported, options) {
     const entry = Entry.get(mod)
-    entry.merge(new Entry(mod, exported, options))
-    Entry.set(mod, exported, entry)
-
     const object = mod.exports
     const { prototype } = Runtime
 
+    Entry.set(mod, exported, entry)
+
+    entry.exports = exported
+    entry.options = options
+    entry.sourceType = getSourceType(exported)
+
     object.entry = entry
     object.module = mod
-    object.options = entry.options
+    object.options = options
 
     setGetter(object, "meta", () => {
       const meta = new NullObject

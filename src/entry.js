@@ -202,6 +202,7 @@ class Entry {
 
       const mod = this.module
       const exported = mod.exports
+
       Entry.set(mod, exported, this)
 
       this.exports = exported
