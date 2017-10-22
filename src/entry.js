@@ -81,24 +81,12 @@ class Entry {
       exported = mod.exports
     }
 
-    let entry
     const useExports = isObjectLike(exported)
+    let entry = entryMap.get(useExports ? exported : mod)
 
-    if (useExports) {
-      entry = entryMap.get(exported) || entryMap.get(mod)
-    } else {
-      entry = entryMap.get(mod)
-    }
-
-    if (entry) {
-      return entry
-    }
-
-    entry = new Entry(mod, exported, options)
-    entryMap.set(mod, entry)
-
-    if (useExports) {
-      entryMap.set(exported, entry)
+    if (! entry) {
+      entry = new Entry(mod, exported, options)
+      entryMap.set(useExports ? exported : mod, entry)
     }
 
     return entry
