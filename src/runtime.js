@@ -105,7 +105,6 @@ class Runtime {
 
   watch(id, setterPairs) {
     const { entry } = this
-    const { module:parent, options } = entry
 
     moduleState.requireDepth += 1
 
@@ -113,7 +112,7 @@ class Runtime {
       let child
       let childEntry
 
-      importModule(id, parent, loadESM, options, (mod) => {
+      importModule(id, entry.module, loadESM, entry.options, (mod) => {
         child = mod
         childEntry = Entry.get(child)
         entry.children[child.id] = childEntry

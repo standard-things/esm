@@ -27,7 +27,6 @@ if (typeof domainToUnicode !== "function") {
 }
 
 function urlToPath(url, mode = "posix") {
-  const { normalize } = API[mode]
   const parsed = parseURL(url)
   let { pathname } = parsed
 
@@ -48,6 +47,7 @@ function urlToPath(url, mode = "posix") {
   }
 
   let { host } = parsed
+  const { normalize } = API[mode]
   pathname = decodeURIComponent(pathname)
 
   // Section 2: Syntax

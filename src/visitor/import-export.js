@@ -64,9 +64,8 @@ class ImportExportVisitor extends Visitor {
       : ""
 
     for (const specifier of specifiers) {
-      const { name } = specifier.local
       hoistedCode +=
-        name +
+        specifier.local.name +
         (++i === lastIndex ? ";" : ",")
     }
 

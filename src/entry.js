@@ -461,8 +461,8 @@ function raiseExportStarConflict(entry, name) {
 }
 
 function runGetter(entry, name) {
-  const { _namespace, getters } = entry
-  const value = callGetter(getters[name])
+  const { _namespace } = entry
+  const value = callGetter(entry.getters[name])
 
   if (value !== GETTER_ERROR &&
       ! (name in _namespace &&

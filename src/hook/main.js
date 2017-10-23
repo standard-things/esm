@@ -6,8 +6,8 @@ import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Module) {
-  const { _tickCallback, argv } = process
-  const [, mainPath] = argv
+  const { _tickCallback } = process
+  const [, mainPath] = process.argv
   const { runMain } = Module
 
   const useTickCallback = typeof _tickCallback === "function"
