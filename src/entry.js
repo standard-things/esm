@@ -349,16 +349,14 @@ function callGetter(getter) {
 }
 
 function changed(setter, key, value) {
-  if (compare(setter.last, key, value)) {
+  const { last } = setter
+
+  if (is(last[key], value)) {
     return false
   }
 
-  setter.last[key] = value
+  last[key] = value
   return true
-}
-
-function compare(object, key, value) {
-  return key in object && is(object[key], value)
 }
 
 // Invoke the given callback for every setter that needs to be called.
@@ -467,7 +465,8 @@ function runGetter(entry, name) {
   const value = callGetter(getters[name])
 
   if (value !== GETTER_ERROR &&
-      ! compare(_namespace, name, value)) {
+      ! (name in _namespace &&
+      is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value
   }
