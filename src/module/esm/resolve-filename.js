@@ -9,7 +9,6 @@ import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const pathMode = process.platform === "win32" ? "win32" : "posix"
 const esmExts = [".mjs", ".js", ".json", ".node"]
 const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
 
@@ -28,11 +27,11 @@ function resolveFilename(id, parent, isMain, options) {
   const fromPath = dirname(filename)
   let skipWarnings = false
 
-  if (! encodedSlash(id, pathMode)) {
+  if (! encodedSlash(id)) {
     if (! isPath(id) &&
         (id.charCodeAt(0) === codeOfSlash || id.includes(":"))) {
       const parsed = parseURL(id)
-      let foundPath = urlToPath(parsed, pathMode)
+      let foundPath = urlToPath(parsed)
 
       if (! foundPath &&
           parsed.protocol !== "file:" &&

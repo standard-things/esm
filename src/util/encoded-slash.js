@@ -1,15 +1,9 @@
-const API = {
-  posix: {
-    encodedSlashRegExp: /%2f/i
-  },
-  win32: {
-    encodedSlashRegExp: /%5c|%2f/i
-  }
-}
+const encodedSlashRegExp = process.platform === "win32"
+  ? /%5c|%2f/i
+  : /%2f/i
 
-function encodedSlash(string, mode = "posix") {
-  return typeof string === "string" &&
-    API[mode].encodedSlashRegExp.test(string)
+function encodedSlash(string) {
+  return typeof string === "string" && encodedSlashRegExp.test(string)
 }
 
 export default encodedSlash

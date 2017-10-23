@@ -7,7 +7,7 @@ import { delimiter, resolve } from "path"
 function initPaths() {
   const { env } = process
   const isWin = process.platform === "win32"
-  const homeDir = isWin ? env.USERPROFILE : env.HOME
+  const homeDir = env[isWin ? "USERPROFILE" : "HOME"]
 
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.

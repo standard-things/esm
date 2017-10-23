@@ -1,21 +1,18 @@
-import { posix, win32 } from "path"
-
 import binding from "../binding.js"
 import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
 import parseURL from "./parse-url.js"
+import path from "path"
 import url from "url"
 
 const codeOfColon = ":".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-let { domainToUnicode } = url
+const isWin = process.platform === "win32"
 const localhostRegExp = /^\/\/localhost\b/
 
-const API = {
-  posix: { normalize: posix.normalize },
-  win32: { normalize: win32.normalize }
-}
+let { domainToUnicode } = url
+const { normalize } = path[isWin ? "win32" : "posix"]
 
 if (typeof domainToUnicode !== "function") {
   const icuBinding = binding.icu
@@ -26,7 +23,7 @@ if (typeof domainToUnicode !== "function") {
     : __non_webpack_require__("punycode").toUnicode
 }
 
-function urlToPath(url, mode = "posix") {
+function urlToPath(url) {
   const parsed = parseURL(url)
   let { pathname } = parsed
 
@@ -47,7 +44,6 @@ function urlToPath(url, mode = "posix") {
   }
 
   let { host } = parsed
-  const { normalize } = API[mode]
   pathname = decodeURIComponent(pathname)
 
   // Section 2: Syntax
@@ -55,12 +51,12 @@ function urlToPath(url, mode = "posix") {
   if (host === "localhost") {
     host = ""
   } if (host) {
-    return mode === "win32"
+    return isWin
       ? "\\\\" + domainToUnicode(host) + normalize(pathname)
       : ""
   }
 
-  if (mode !== "win32") {
+  if (! isWin) {
     return pathname
   }
 
