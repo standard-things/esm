@@ -281,11 +281,16 @@ class Entry {
     // module objects whose setters we might need to run.
     let parentsMap
 
-    forEachSetter(this, (setter, value) => {
+    this._changed = false
+
+    runGetters(this)
+    runSetters(this, (setter, value) => {
       parentsMap || (parentsMap = new NullObject)
       parentsMap[setter.parent.id] = setter.parent
       setter(value, this)
     })
+
+    this._changed = false
 
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
@@ -357,15 +362,6 @@ function changed(setter, key, value) {
 
   last[key] = value
   return true
-}
-
-// Invoke the given callback for every setter that needs to be called.
-// Note: forEachSetter() does not call setters directly, only the given callback.
-function forEachSetter(entry, callback) {
-  entry._changed = false
-  runGetters(entry)
-  runSetters(entry, callback)
-  entry._changed = false
 }
 
 function getExportByName(entry, setter, name) {
