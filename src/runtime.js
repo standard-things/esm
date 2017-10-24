@@ -77,7 +77,7 @@ class Runtime {
   nsSetter() {
     const { entry } = this
     return function nsSetter(childNs, childEntry) {
-      return entry.addGettersFrom(childEntry)
+      entry.addGettersFrom(childEntry)
     }
   }
 
