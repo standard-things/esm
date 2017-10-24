@@ -48,7 +48,7 @@ class Runtime {
 
   // Register a getter function that always returns the given value.
   default(value) {
-    return this.export([["default", () => value]])
+    this.export([["default", () => value]])
   }
 
   // Register getter functions for local variables in the scope of an export
