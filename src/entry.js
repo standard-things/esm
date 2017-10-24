@@ -483,23 +483,22 @@ function runGetters(entry) {
 }
 
 function runSetter(entry, name, callback) {
-  const { options } = entry
+  const { children, getters } = entry
+  const { warnings } = entry.options
+
+  const moduleName = getModuleName(entry.module)
+  const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
     const value = getExportByName(entry, setter, name)
 
-    if (! entry._changed &&
-        ! changed(setter, name, value)) {
-      continue
-    }
-
-    callback(setter, value)
-
-    if (options.warnings &&
-        name in entry.getters &&
+    if (nsChanged ||
+        changed(setter, name, value)) {
+      callback(setter, value)
+    } else if (warnings &&
         value === void 0 &&
-        setter.parent.id in entry.children) {
-      const moduleName = getModuleName(entry.module)
+        name in getters &&
+        setter.parent.id in children) {
       emitWarning("Possible temporal dead zone access of '" + name + "' in " + moduleName)
     }
   }
