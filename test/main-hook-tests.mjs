@@ -1,7 +1,10 @@
+import SemVer from "semver"
+
 import assert from "assert"
 import execa from "execa"
 import path from "path"
 
+const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
 const isWin = process.platform === "win32"
 const requireFlags = ["-r", "--require"]
 
@@ -54,7 +57,7 @@ describe("module.runMain hook", () => {
 
   it("should throw correct error for missing modules", () => {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
-    const otherFlags = ["", "--preserve-symlinks"]
+    const otherFlags = canUsePreserveSymlinks ? ["", "--preserve-symlinks"] : [""]
     const runs = []
 
     fileNames.forEach((fileName) =>
