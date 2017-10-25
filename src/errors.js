@@ -22,7 +22,7 @@ const messages = new FastObject
 messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
 messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
 messages["ERR_MISSING_MODULE"] = "Cannot find module %s"
-messages["ERR_MODULE_RESOLUTION_LEGACY"] = "%s not found by import in %s. Legacy behavior in require would have found it at %s"
+messages["ERR_MODULE_RESOLUTION_LEGACY"] = "%s not found by import in %s. Legacy behavior in require() would have found it at %s"
 messages["ERR_REQUIRE_ESM"] = "Must use import to load ES Module: %s"
 
 function createClass(Super) {
