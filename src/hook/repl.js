@@ -7,7 +7,6 @@ import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
-import env from "../env.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -95,9 +94,7 @@ function hook(vm) {
 
   const { createContext } = REPLServer.prototype
 
-  if (env.preload &&
-      process.argv.length < 2 &&
-      typeof createContext === "function") {
+  if (typeof createContext === "function") {
     REPLServer.prototype.createContext = function () {
       REPLServer.prototype.createContext = createContext
       const context = createContext.call(this)
