@@ -31,7 +31,7 @@ function load(id, parent, isMain, options, preload) {
 
     if (child &&
         getSourceType(child.exports) === "module" &&
-        ! Entry.has(child)) {
+        ! Entry.has(child.exports)) {
       delete __non_webpack_require__.cache[cacheId]
     }
   }
