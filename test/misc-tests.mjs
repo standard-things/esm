@@ -223,6 +223,11 @@ describe("Node rules", () => {
     ))
   )
 
+  it("should support ids containing percents", () =>
+    import("./fixture/with%2520percent.mjs")
+      .then(() => assert.ok(true))
+  )
+
   it("should support ids containing pounds", () =>
     import("./fixture/with%23pound.mjs")
       .then(() => assert.ok(true))
