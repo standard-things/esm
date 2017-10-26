@@ -27,8 +27,7 @@ Getting started
      your package.json.
 
      ```js
-     const loader1 = require("@std/esm")(module, { cjs: true, esm: "js" })
-     const loader2 = require("@std/esm")(module, true)
+     require = require("@std/esm")(module, optionsOrTrue)
      ```
 
 Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
