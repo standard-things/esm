@@ -95,10 +95,6 @@ function loader(filePath, url, options, preload) {
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
 
-  if (preload) {
-    preload(mod)
-  }
-
   let extCompiler = extensions[ext]
 
   if (options && options.cjs &&
@@ -107,6 +103,10 @@ function loader(filePath, url, options, preload) {
       ! _extensions[ext][extSym]) {
     extensions = _extensions
     extCompiler = extensions[ext]
+  }
+
+  if (preload) {
+    preload(mod)
   }
 
   extCompiler.call(extensions, mod, filePath)
