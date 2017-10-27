@@ -20,20 +20,24 @@ function load(id, parent, isMain, options, preload) {
   const cacheId = filePath + queryHash
   const url = getURLFromFilePath(filePath) + queryHash
 
-  let child
   let state
 
-  if (! (options && options.cjs) &&
-      _extname(filePath) === ".mjs") {
-    state = moduleState
-  } else {
-    child = __non_webpack_require__.cache[cacheId]
+  if (! (options && options.cjs)) {
+    isMain = false
 
-    if (child &&
-        getSourceType(child.exports) === "module" &&
-        ! Entry.has(child.exports)) {
-      delete __non_webpack_require__.cache[cacheId]
+    if (_extname(filePath) === ".mjs") {
+      state = moduleState
     }
+  }
+
+  let child = state
+    ? void 0
+    : __non_webpack_require__.cache[cacheId]
+
+  if (child &&
+      getSourceType(child.exports) === "module" &&
+      ! Entry.has(child.exports)) {
+    delete __non_webpack_require__.cache[cacheId]
   }
 
   let error
