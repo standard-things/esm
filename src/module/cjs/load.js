@@ -1,3 +1,4 @@
+import Entry from "../../entry.js"
 import Wrapper from "../../wrapper.js"
 
 import _load from "../_load.js"
@@ -44,6 +45,8 @@ function loader(filePath, options, preload) {
   const mod = this
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
+
+  Entry.get(mod)
 
   if (preload) {
     preload(mod)
