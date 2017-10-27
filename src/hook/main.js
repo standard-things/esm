@@ -2,7 +2,7 @@ import PkgInfo from "../pkg-info.js"
 
 import builtinModules from "../builtin-modules.js"
 import { dirname } from "path"
-import moduleLoad from "../module/esm/load.js"
+import loadESM from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Module) {
@@ -28,7 +28,7 @@ function hook(Module) {
       return
     }
 
-    moduleLoad(filePath, null, true, pkgInfo.options)
+    loadESM(filePath, null, true, pkgInfo.options)
     tryTickCallback()
   }
 

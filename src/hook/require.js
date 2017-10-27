@@ -3,8 +3,8 @@ import PkgInfo from "../pkg-info.js"
 import builtinModules from "../builtin-modules.js"
 import { dirname } from "path"
 import isObjectLike from "../util/is-object-like.js"
+import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
-import moduleLoad from "../module/esm/load.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(parent, options) {
@@ -19,7 +19,7 @@ function hook(parent, options) {
     const pkgInfo = options ? null : PkgInfo.get(dirname(filePath))
     const loadOptions = pkgInfo ? pkgInfo.options : options
 
-    return moduleLoad(filePath, parent, false, loadOptions).exports
+    return loadESM(filePath, parent, false, loadOptions).exports
   })
 }
 
