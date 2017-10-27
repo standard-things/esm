@@ -8,15 +8,24 @@ import resolveFilename from "./resolve-filename.js"
 
 const extSym = Symbol.for("@std/esm:extensions")
 
-function load(id, parent, isMain, options) {
+function load(id, parent, isMain, options, preload) {
+  let called = false
   const filePath = resolveFilename(id, parent, isMain, options)
-
-  return _load(filePath, parent, isMain, __non_webpack_require__, function () {
-    return loader.call(this, filePath, options)
+  const child = _load(filePath, parent, isMain, __non_webpack_require__, function () {
+    called = true
+    return loader.call(this, filePath, options, preload)
   })
+
+  if (! called &&
+      preload) {
+    called = true
+    preload(child)
+  }
+
+  return child
 }
 
-function loader(filePath, options) {
+function loader(filePath, options, preload) {
   let ext = extname(filePath)
   const { extensions } = __non_webpack_require__
 
@@ -35,6 +44,10 @@ function loader(filePath, options) {
   const mod = this
   mod.filename = filePath
   mod.paths = nodeModulePaths(dirname(filePath))
+
+  if (preload) {
+    preload(mod)
+  }
 
   extCompiler.call(extensions, mod, filePath)
   mod.loaded = true
