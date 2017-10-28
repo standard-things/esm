@@ -38,7 +38,13 @@ describe("command-line hook", () => {
     })
     .then((result) => {
       const url = dirnameURL + "/fixture/main.mjs"
-      const expected = { default: { url } }
+
+      const expected = {
+        default: {
+          mainModule: true,
+          meta: { url }
+        }
+      }
 
       const jsonText = result
         .stdout

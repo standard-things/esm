@@ -32,7 +32,11 @@ describe("module.runMain hook", () => {
     return Promise.all(runs.map(runMain))
       .then((results) => {
         const url = dirnameURL + "/fixture/main.mjs"
-        const expected = { url }
+
+        const expected = {
+          mainModule: false,
+          meta: { url }
+        }
 
         results.forEach((result) => {
           const jsonText = result
