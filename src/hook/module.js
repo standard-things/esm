@@ -1,5 +1,6 @@
 import { extname as _extname, dirname, resolve } from "path"
 
+import Entry from "../entry.js"
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
@@ -22,10 +23,13 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import gunzip from "../fs/gunzip.js"
+import has from "../util/has.js"
 import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
+import loadCJS from "../module/cjs/load.js"
+import loadESM from "../module/esm/load.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -75,7 +79,7 @@ function hook(Module, parent, options) {
       }
     }
 
-    const wrapped = (pkgInfo && pkgInfo.options)
+    const wrapped = pkgInfo && pkgInfo.options
       ? Wrapper.find(_extensions, ".js", pkgInfo.range)
       : null
 
@@ -104,6 +108,37 @@ function hook(Module, parent, options) {
       if (type === "script") {
         type = "module"
       }
+    }
+
+    if (! Entry.has(mod.exports)) {
+      const loader = type === "script" ? loadCJS : loadESM
+      const { parent } = mod
+      const childCount = parent ? parent.children.length : 0
+
+      delete moduleState.cache[filePath]
+      delete __non_webpack_require__.cache[filePath]
+
+      mod.exports = loader(filePath, parent, false, options, (newMod) => {
+        newMod.children = mod.children
+
+        if (parent) {
+          parent.children.length = childCount
+        }
+
+        if (has(mod, "_compile")) {
+          newMod._compile = mod._compile
+        }
+      }).exports
+
+      if (filePath in moduleState.cache) {
+        moduleState.cache[filePath] = mod
+      }
+
+      if (filePath in __non_webpack_require__.cache) {
+        __non_webpack_require__.cache[filePath] = mod
+      }
+
+      return
     }
 
     const { cache, cachePath } = pkgInfo
