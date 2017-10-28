@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename)
 
 const NODE_BIN = path.resolve(__dirname, "env/prefix", isWin ? "node.exe" : "bin/node")
 
+const dirnameURL = "file://" + (isWin ? "/" : "") + __dirname.replace(/\\/g, "/")
+
 describe("command-line hook", () => {
   it("should not fail on unresolvable command-line arguments", () => {
     const args = [
@@ -35,16 +37,13 @@ describe("command-line hook", () => {
       reject: false
     })
     .then((result) => {
-      const expected = {
-        a: "a",
-        b: "b",
-        c: "c",
-        default: "default"
-      }
+      const url = dirnameURL + "/fixture/main.mjs"
+      const expected = { default: { url } }
 
       const jsonText = result
         .stdout
         .split("\n")
+        .reverse()
         .find((line) => line.startsWith("{"))
 
       const exported = jsonText

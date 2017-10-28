@@ -4,14 +4,16 @@ import assert from "assert"
 import execa from "execa"
 import path from "path"
 
-const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
 const isWin = process.platform === "win32"
-const requireFlags = ["-r", "--require"]
 
 const __filename = import.meta.url.slice(isWin ? 8 : 7)
 const __dirname = path.dirname(__filename)
 
 const NODE_BIN = path.resolve(__dirname, "env/prefix", isWin ? "node.exe" : "bin/node")
+
+const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
+const dirnameURL = "file://" + (isWin ? "/" : "") + __dirname.replace(/\\/g, "/")
+const requireFlags = ["-r", "--require"]
 
 function runMain(args) {
   return execa(NODE_BIN, args, {
@@ -29,17 +31,14 @@ describe("module.runMain hook", () => {
 
     return Promise.all(runs.map(runMain))
       .then((results) => {
-        results.forEach((result) => {
-          const expected = {
-            a: "a",
-            b: "b",
-            c: "c",
-            default: "default"
-          }
+        const url = dirnameURL + "/fixture/main.mjs"
+        const expected = { url }
 
+        results.forEach((result) => {
           const jsonText = result
             .stdout
             .split("\n")
+            .reverse()
             .find((line) => line.startsWith("{"))
 
           const exported = jsonText

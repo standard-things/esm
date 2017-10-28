@@ -1,3 +1,2 @@
-import * as ns from "./export/abc.mjs"
-
-console.log(JSON.stringify(ns))
+console.log(JSON.stringify(import.meta))
+export default import.meta
