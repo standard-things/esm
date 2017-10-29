@@ -33,15 +33,7 @@ function parseObj(func, args) {
       }
     }
 
-    let startLoc
-    let startPos
-    let propNode = this.startNode()
-
-    if (isPattern ||
-        refDestructuringErrors) {
-      startPos = this.start
-      startLoc = this.startLoc
-    }
+    let propNode
 
     // The rest/spread code is adapted from Babylon.
     // Copyright Babylon contributors. Released under MIT license:
@@ -54,29 +46,11 @@ function parseObj(func, args) {
         propNode.type = "RestElement"
         propNode.value = this.toAssignable(propNode.argument, true)
       }
-
-      node.properties.push(propNode)
-      continue
+    } else {
+      propNode = this.parseProperty(isPattern, refDestructuringErrors)
     }
 
-    propNode.method =
-    propNode.shorthand = false
-
-    const isGenerator = ! isPattern && this.eat(tt.star)
-
-    this.parsePropertyName(propNode)
-
-    let isAsync = false
-
-    if (! isPattern &&
-        ! isGenerator &&
-        isAsyncProp(this, propNode)) {
-      isAsync = true
-      this.parsePropertyName(propNode)
-    }
-
-    this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
-    node.properties.push(this.finishNode(propNode, "Property"))
+    node.properties.push(propNode)
   }
 
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression")
@@ -102,12 +76,6 @@ function toAssignable(func, args) {
   }
 
   return func.apply(this, args)
-}
-
-function isAsyncProp(parser, propNode) {
-  return typeof parser.isAsyncProp === "function"
-    ? parser.isAsyncProp(propNode)
-    : parser.toks.isAsyncProp(propNode)
 }
 
 export { enable }
