@@ -6,10 +6,26 @@ import { skipWhiteSpace } from "../vendor/acorn/src/whitespace.js"
 
 const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 
-function hasPragma(code, pragma, pos) {
-  if (pos == null) {
-    pos = 0
+function hasPragma(code, pragma) {
+  const index = indexOf(code, pragma)
+
+  if (index < 13) {
+    return index === 0
   }
+
+  if (pragma === "use module") {
+    return indexOf(code.slice(0, index), "use script") === -1
+  }
+
+  if (pragma === "use script") {
+    return indexOf(code.slice(0, index), "use module") === -1
+  }
+
+  return true
+}
+
+function indexOf(code, pragma) {
+  let pos = 0
 
   while (true) {
     skipWhiteSpace.lastIndex = pos
@@ -18,11 +34,11 @@ function hasPragma(code, pragma, pos) {
     const match = literalRegExp.exec(code.slice(pos))
 
     if (match === null) {
-      return false
+      return -1
     }
 
     if ((match[1] || match[2]) === pragma) {
-      return true
+      return pos
     }
 
     pos += match[0].length
