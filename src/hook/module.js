@@ -35,8 +35,8 @@ import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import { satisfies } from "semver"
+import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
-import setSourceType from "../util/set-source-type.js"
 import stat from "../fs/stat.js"
 
 const extSym = Symbol.for("@std/esm:extensions")
@@ -229,7 +229,8 @@ function hook(Module, parent, options) {
       runtimeAlias + ".r((function(exports,require){" + content + "\n}))"
 
     const exported = {}
-    setSourceType(exported, "script")
+
+    setESM(exported, false)
     Runtime.enable(mod, exported, options)
     tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
   }
@@ -264,7 +265,7 @@ function hook(Module, parent, options) {
       Ctor.wrap = customWrap
     }
 
-    setSourceType(exported, "module")
+    setESM(exported, true)
     Runtime.enable(mod, exported, options)
 
     try {

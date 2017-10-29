@@ -3,7 +3,7 @@ import NullObject from "./null-object.js"
 
 import builtinEntries from "./builtin-entries.js"
 import { extname } from "path"
-import getSourceType from "./util/get-source-type.js"
+import isESM from "./util/is-es-module.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
@@ -20,9 +20,9 @@ class Runtime {
     const entry =
     object.entry = Entry.get(mod)
 
+    entry.esm = isESM(exported)
     entry.exports = exported
     entry.options = options
-    entry.sourceType = getSourceType(exported)
 
     Entry.set(mod, exported, entry)
 
@@ -82,7 +82,7 @@ class Runtime {
   }
 
   run(moduleWrapper) {
-    const runner = this.entry.sourceType === "module" ? runESM : runCJS
+    const runner = this.entry.esm ? runESM : runCJS
     runner(this, moduleWrapper)
   }
 
@@ -145,7 +145,7 @@ function importModule(id, parent, loader, options, preload) {
   const { filename } = child
 
   if (! (options && options.cjs) &&
-      getSourceType(child.exports) === "module") {
+      isESM(child.exports)) {
     if (extname(filename) === ".mjs") {
       delete __non_webpack_require__.cache[filename]
     }

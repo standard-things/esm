@@ -7,8 +7,8 @@ import emitWarning from "./error/emit-warning.js"
 import env from "./env.js"
 import { format } from "util"
 import getModuleName from "./util/get-module-name.js"
-import getSourceType from "./util/get-source-type.js"
 import has from "./util/has.js"
+import isESM from "./util/is-es-module.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import setGetter from "./util/set-getter.js"
@@ -56,6 +56,8 @@ class Entry {
     this.cjsNamespace = this._namespace
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
+    // The ES module type indicator.
+    this.esm = isESM(exported)
     // The `module.exports` of the module.
     this.exports = exported
     // Getters for local variables exported from the module.
@@ -68,8 +70,6 @@ class Entry {
     this.options = new NullObject
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
-    // The source type of the module.
-    this.sourceType = getSourceType(exported)
     // The file url of the module.
     this.url = null
     /* eslint-enable lines-around-comment */
@@ -183,7 +183,7 @@ class Entry {
       }
     }
 
-    if (this.sourceType === "module") {
+    if (this.esm) {
       const exported = this.exports
       assign(exported, this._namespace)
 
@@ -199,8 +199,8 @@ class Entry {
       const mod = this.module
       const exported = mod.exports
 
+      this.esm = isESM(exported)
       this.exports = exported
-      this.sourceType = getSourceType(exported)
 
       Entry.set(mod, exported, this)
 
@@ -310,13 +310,13 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const { _namespace, exports:exported, getters } = entry
 
-  const isModule =
-    entry.sourceType === "module" ||
+  const inModule =
+    entry.esm ||
     !! (entry.options.cjs &&
     has(exported, "__esModule") &&
     exported.__esModule)
 
-  if (! isModule) {
+  if (! inModule) {
     _namespace.default = exported
 
     if (! ("default" in getters)) {
@@ -335,7 +335,7 @@ function assignExportsToNamespace(entry) {
   for (const name of names) {
     if (safe) {
       _namespace[name] = exported[name]
-    } else if (isModule || name !== "default") {
+    } else if (inModule || name !== "default") {
       assignProperty(_namespace, exported, name)
     }
 
@@ -366,7 +366,7 @@ function changed(setter, key, value) {
 
 function getExportByName(entry, setter, name) {
   const isScript =
-    entry.sourceType === "script" &&
+    ! entry.esm &&
     ! setter.parent.options.cjs
 
   if (name === "*") {
@@ -390,7 +390,7 @@ function getExportByName(entry, setter, name) {
 }
 
 function isSafe(entry) {
-  return entry.sourceType === "module" && ! entry.options.cjs
+  return entry.esm && ! entry.options.cjs
 }
 
 function mergeProperty(entry, otherEntry, key) {
@@ -469,7 +469,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  if (entry.sourceType === "module") {
+  if (entry.esm) {
     for (const name in entry.getters) {
       runGetter(entry, name)
     }

@@ -5,8 +5,8 @@ import Entry from "../../entry.js"
 import _load from "../_load.js"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
-import getSourceType from "../../util/get-source-type.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
+import isESM from "../../util/is-es-module.js"
 import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
@@ -35,7 +35,7 @@ function load(id, parent, isMain, options, preload) {
     : __non_webpack_require__.cache[cacheId]
 
   if (child &&
-      getSourceType(child.exports) === "module" &&
+      isESM(child.exports) &&
       ! Entry.has(child.exports)) {
     delete __non_webpack_require__.cache[cacheId]
   }
