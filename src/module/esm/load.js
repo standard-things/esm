@@ -22,7 +22,7 @@ function load(id, parent, isMain, options, preload) {
 
   let state
 
-  if (! (options && options.cjs)) {
+  if (! options.cjs) {
     isMain = false
 
     if (_extname(filePath) === ".mjs") {
@@ -97,7 +97,7 @@ function loader(filePath, url, options, preload) {
 
   let extCompiler = extensions[ext]
 
-  if (options && options.cjs &&
+  if (options.cjs &&
       (ext === ".js" || ext === ".mjs") &&
       typeof _extensions[ext] === "function" &&
       ! _extensions[ext][extSym]) {

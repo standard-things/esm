@@ -38,7 +38,7 @@ function loader(filePath, options, preload) {
   let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
 
   if (extCompiler[extSym] &&
-      options && (options.cjs || options.esm !== "mjs")) {
+      (options.cjs || options.esm !== "mjs")) {
     extCompiler = extensions[ext]
   }
 
