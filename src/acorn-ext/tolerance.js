@@ -2,6 +2,7 @@ import AcornError from "../acorn-error.js"
 
 import wrap from "../util/wrap.js"
 
+const alwaysFalse = () => false
 const alwaysTrue = () => true
 const noop = () => {}
 
@@ -12,12 +13,19 @@ const engineTypePostfix = "may only be used in ES modules"
 const parserTypePostfix = "may appear only with 'sourceType: module'"
 
 function enable(parser) {
-  parser.canDeclareLexicalName =
-  parser.canDeclareVarName = alwaysTrue
+  parser.isDirectiveCandidate =
+  parser.strictDirective = alwaysFalse
 
-  parser.checkExpressionErrors =
+  parser.canDeclareLexicalName =
+  parser.canDeclareVarName =
+  parser.isSimpleParamList = alwaysTrue
+
+  parser.adaptDirectivePrologue =
+  parser.checkParams =
   parser.checkPatternErrors =
+  parser.checkPatternExport =
   parser.checkPropClash =
+  parser.checkVariableExport =
   parser.checkYieldAwaitInDefaultParams =
   parser.declareLexicalName =
   parser.declareVarName =
@@ -26,12 +34,21 @@ function enable(parser) {
   parser.exitFunctionScope =
   parser.exitLexicalScope = noop
 
+  parser.checkExpressionErrors = checkExpressionErrors
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
   parser.raise = wrap(parser.raise, raise)
   parser.raiseRecoverable = wrap(parser.raise, raiseRecoverable)
-  parser.strict = false
 
+  parser.strict = false
   return parser
+}
+
+function checkExpressionErrors(refDestructuringErrors) {
+  if (refDestructuringErrors) {
+    return refDestructuringErrors.shorthandAssign > -1
+  }
+
+  return false
 }
 
 function raise(func, args) {
