@@ -29,7 +29,7 @@
     "test:prod": "npm run _test -- --prod"
   },
   "devDependencies": {
-    "acorn": "^5.1.2",
+    "acorn": "^5.2.1",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
@@ -37,7 +37,7 @@
     "babel-plugin-transform-for-of-as-array": "^1.0.4",
     "babel-preset-env": "^1.6.0",
     "download": "^6.2.5",
-    "eslint": "^4.8.0",
+    "eslint": "^4.10.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.2.0",
     "execa": "^0.8.0",
