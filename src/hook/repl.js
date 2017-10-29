@@ -94,13 +94,15 @@ function hook(vm) {
 
   const { createContext } = REPLServer.prototype
 
-  if (typeof createContext === "function") {
-    REPLServer.prototype.createContext = function () {
-      REPLServer.prototype.createContext = createContext
-      const context = createContext.call(this)
-      Runtime.enable(context.module, exported, pkgInfo.options)
-      return context
-    }
+  if (typeof createContext !== "function") {
+    return
+  }
+
+  REPLServer.prototype.createContext = function () {
+    REPLServer.prototype.createContext = createContext
+    const context = createContext.call(this)
+    Runtime.enable(context.module, exported, pkgInfo.options)
+    return context
   }
 }
 
