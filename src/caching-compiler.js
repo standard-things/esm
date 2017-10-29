@@ -28,7 +28,7 @@ function compileAndWrite(code, options) {
 
   let output = result.code
 
-  if (result.type === "script") {
+  if (! result.esm) {
     output = '"use script";' + output
   }
 

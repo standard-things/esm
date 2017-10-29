@@ -7,28 +7,26 @@ describe("compiler", () => {
 
     types.forEach((type) => {
       const result = compiler.compile('import"a"', { type })
-      assert.strictEqual(result.type, "module")
+      assert.strictEqual(result.esm, true)
     })
 
     const tests = [
-      { code: "1+2", type: "script" },
-      { code: "1+2", hint: "module", type: "module" },
-      { code: "'use script';import'a'", hint: "module", type: "script" },
-      { code: '"use script";import"a"', hint: "module", type: "script" },
-      { code: "'use script';import'a'", type: "script" },
-      { code: '"use script";import"a"', type: "script" },
-      { code: "'use module';1+2", type: "module" },
-      { code: '"use module";1+2', type: "module" }
+      { code: "1+2", esm: false },
+      { code: "1+2", esm: true, hint: "module" },
+      { code: "'use script';import'a'", esm: false, hint: "module" },
+      { code: '"use script";import"a"', esm: false, hint: "module" },
+      { code: "'use script';import'a'", esm: false },
+      { code: '"use script";import"a"', esm: false },
+      { code: "'use module';1+2", esm: true },
+      { code: '"use module";1+2', esm: true }
     ]
 
     tests.forEach((data) => {
-      const results = [
-        compiler.compile(data.code, { hint: data.hint, type: "unambiguous" }),
-        compiler.compile(data.code, { type: "module" })
-      ]
+      let result = compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
+      assert.strictEqual(result.esm, data.esm)
 
-      const types = results.map((result) => result.type)
-      assert.deepStrictEqual(types, [data.type, "module"])
+      result = compiler.compile(data.code, { type: "module" })
+      assert.strictEqual(result.esm, true)
     })
   })
 
@@ -66,7 +64,7 @@ describe("compiler", () => {
   })
 
   it("should compile dynamic import with script source type", () => {
-    const result = compiler.compile('import("a")', { type: "script" })
+    const result = compiler.compile('import("a")', { esm: false })
     assert.ok(result.code.includes('i("a")'))
   })
 

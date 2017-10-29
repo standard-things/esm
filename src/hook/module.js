@@ -164,7 +164,7 @@ function hook(Module, parent, options) {
           type = hasPragma(cacheCode, "use script") ? "script" : "module"
         }
 
-        cacheValue = { code: cacheCode, type }
+        cacheValue = { code: cacheCode, esm: type === "module" }
         cache[cacheFileName] = cacheValue
       } else {
         cacheValue = tryCodeCompile(manager, sourceCode, {
@@ -191,7 +191,7 @@ function hook(Module, parent, options) {
       stat.cache = new NullObject
     }
 
-    const tryModuleCompile = cacheValue.type === "module" ? tryESMCompile : tryCJSCompile
+    const tryModuleCompile = cacheValue.esm ? tryESMCompile : tryCJSCompile
     tryModuleCompile.call(this, manager, func, mod, cacheValue.code, filePath, runtimeAlias, options)
 
     if (noDepth) {

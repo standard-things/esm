@@ -35,7 +35,7 @@ class Compiler {
     const result = {
       code,
       data: null,
-      type: "script",
+      esm: false,
       warnings: null
     }
 
@@ -110,7 +110,7 @@ class Compiler {
             )
           )
         )) {
-      result.type = "module"
+      result.esm = true
 
       if (options.warnings &&
           argumentsRegExp.test(code)) {
