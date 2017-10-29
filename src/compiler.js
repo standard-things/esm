@@ -39,15 +39,11 @@ class Compiler {
       warnings: null
     }
 
-    let useModule
-
     if (type === "unambiguous" &&
         (hasPragma(code, "use script") ||
           (hint !== "module" &&
-            ! importExportRegExp.test(code) &&
-            ! (useModule = hasPragma(code, "use module"))
-          )
-        )) {
+          ! importExportRegExp.test(code) &&
+          ! hasPragma(code, "use module")))) {
       return result
     }
 
@@ -63,6 +59,10 @@ class Compiler {
     try {
       ast = Parser.parse(code, parserOptions)
       threw = false
+
+      if (type === "unambiguous") {
+        type = "module"
+      }
     } catch (e) {
       error = e
     }
@@ -81,12 +81,14 @@ class Compiler {
       throw error
     }
 
+    const esm = type === "module"
     const rootPath = new FastPath(ast)
+    const { runtimeAlias } = options
 
     importExportVisitor.visit(rootPath, code, {
-      esm: type !== "script",
+      esm,
       generateVarDeclarations: options.var,
-      runtimeAlias: options.runtimeAlias
+      runtimeAlias
     })
 
     if (importExportVisitor.addedImportExport) {
@@ -94,22 +96,13 @@ class Compiler {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
         importedLocalNames: importExportVisitor.importedLocalNames,
         magicString: importExportVisitor.magicString,
-        runtimeAlias: importExportVisitor.runtimeAlias
+        runtimeAlias
       })
 
       importExportVisitor.finalizeHoisting()
     }
 
-    if (type === "module" ||
-        importExportVisitor.addedImportExport ||
-        (type === "unambiguous" &&
-          (hint === "module" ||
-            (typeof useModule === "boolean"
-              ? useModule
-              : (useModule = hasPragma(code, "use module"))
-            )
-          )
-        )) {
+    if (esm) {
       result.esm = true
 
       if (options.warnings &&
