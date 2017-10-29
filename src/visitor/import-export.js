@@ -27,13 +27,13 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = false
     this.bodyInfo = null
     this.code = code
+    this.esm = options.esm,
     this.exportedLocalNames = new NullObject
     this.generateVarDeclarations = options.generateVarDeclarations
     this.importedLocalNames = new NullObject
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeAlias = options.runtimeAlias
-    this.sourceType = options.sourceType
   }
 
   visitCallExpression(path) {
@@ -47,7 +47,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitImportDeclaration(path) {
-    if (this.sourceType === "script") {
+    if (! this.esm) {
       return
     }
 
@@ -80,7 +80,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportAllDeclaration(path) {
-    if (this.sourceType === "script") {
+    if (! this.esm) {
       return
     }
 
@@ -104,7 +104,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportDefaultDeclaration(path) {
-    if (this.sourceType === "script") {
+    if (! this.esm) {
       return
     }
 
@@ -149,7 +149,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportNamedDeclaration(path) {
-    if (this.sourceType === "script") {
+    if (! this.esm) {
       return
     }
 

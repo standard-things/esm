@@ -84,9 +84,9 @@ class Compiler {
     const rootPath = new FastPath(ast)
 
     importExportVisitor.visit(rootPath, code, {
+      esm: type !== "script",
       generateVarDeclarations: options.var,
-      runtimeAlias: options.runtimeAlias,
-      sourceType: type
+      runtimeAlias: options.runtimeAlias
     })
 
     if (importExportVisitor.addedImportExport) {
