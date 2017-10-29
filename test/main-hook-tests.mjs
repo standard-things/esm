@@ -58,7 +58,9 @@ describe("module.runMain hook", () => {
       })
   })
 
-  it("should throw correct error for missing modules", () => {
+  it("should throw correct error for missing modules", function () {
+    this.retries(3)
+
     const fileNames = ["missing", "missing.js", "missing.mjs"]
     const otherFlags = canUsePreserveSymlinks ? ["", "--preserve-symlinks"] : [""]
     const runs = []
