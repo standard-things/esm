@@ -62,11 +62,11 @@ class Runtime {
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {
-          this.watch(id, [["*", function importer(value, childEntry) {
+          this.watch(id, [["*", createSetter("import", (value, childEntry) => {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
-          }]])
+          })]])
         } catch (e) {
           reject(e)
         }
@@ -75,10 +75,9 @@ class Runtime {
   }
 
   nsSetter() {
-    const { entry } = this
-    return function nsSetter(childNs, childEntry) {
-      entry.addGettersFrom(childEntry)
-    }
+    return createSetter("nsSetter", (value, childEntry) => {
+      this.entry.addGettersFrom(childEntry)
+    })
   }
 
   run(moduleWrapper) {
@@ -128,6 +127,11 @@ class Runtime {
       moduleState.requireDepth -= 1
     }
   }
+}
+
+function createSetter(from, setter) {
+  setter.from = from
+  return setter
 }
 
 function importModule(id, parent, loader, options, preload) {
