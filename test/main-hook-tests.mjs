@@ -7,6 +7,10 @@ import require from "./require.js"
 
 const isWin = process.platform === "win32"
 
+const canTestMissingModuleErrors =
+  ! ("TRAVIS" in process.env &&
+    SemVer.satisfies(process.version, "^7"))
+
 const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
 
@@ -59,9 +63,8 @@ describe("module.runMain hook", () => {
       })
   })
 
-  it("should error for missing modules", function () {
-    this.retries(3)
-
+  ;(canTestMissingModuleErrors ? it : xit)(
+  "should error for missing modules", function () {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
     const otherFlags = canUsePreserveSymlinks ? ["", "--preserve-symlinks"] : [""]
     const runs = []
