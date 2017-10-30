@@ -1,4 +1,4 @@
-"use module"
+"use strict"
 
 if (typeof global.loadCount === "number") {
   global.loadCount++
