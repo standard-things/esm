@@ -39,6 +39,35 @@ describe("compiler", () => {
     })
   })
 
+  it('should support the "use module" directive', () => {
+    const tests = [
+      { code: "'use module';\"use script\";import'a'", hint: "module" },
+      { code: '"use module";\'use script\';import"a"', hint: "module" },
+      { code: "'use module';\"use script\";import'a'" },
+      { code: '"use module";\'use script\';import"a"' }
+    ]
+
+    tests.forEach((data) => {
+      const result = compile(data.code, { hint: data.hint, type: "unambiguous" })
+      assert.strictEqual(result.esm, true)
+    })
+  })
+
+  it('should support the "use script" directive', () => {
+    const tests = [
+      { code: "'use script';\"use module\";import'a'", hint: "module" },
+      { code: '"use script";\'use module\';import"a"', hint: "module" },
+      { code: "'use script';\"use module\";import'a'" },
+      { code: '"use script";\'use module\';import"a"' }
+    ]
+
+    tests.forEach((data) =>
+      assert.throws(() =>
+        compile(data.code, { hint: data.hint, type: "unambiguous" })
+      , SyntaxError)
+    )
+  })
+
   it("should support shebangs", () => {
     const code = [
       "#!/usr/bin/env node -r @std/esm",
