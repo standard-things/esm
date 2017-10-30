@@ -5,9 +5,10 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 
+const ZWJ = "\u200d"
+
 const BuiltinModule = __non_webpack_module__.constructor
 
-const ZWJ = "\u200d"
 const { isArray } = Array
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/

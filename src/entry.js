@@ -16,12 +16,12 @@ import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
+const GETTER_ERROR = {}
+const STAR_ERROR = {}
+
 const { is, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
-
-const GETTER_ERROR = {}
-const STAR_ERROR = {}
 
 const entryMap = new SafeWeakMap
 
