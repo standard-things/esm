@@ -11,8 +11,8 @@ export default () => {
 
   keys.forEach((key) => {
     const esmRequire = makeRequire(module, { cjs: true, [key]: true })
-
     const mod = new module.constructor("<mock>", null)
+
     mod._compile = (content) => assert.ok(content.includes("sourceMappingURL"))
 
     delete esmRequire.cache[abcId]

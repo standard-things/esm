@@ -109,8 +109,8 @@ describe("dynamic import", () => {
       "import.call(a,b)"
     ]
 
-    invalids.forEach((code) => {
+    invalids.forEach((code) =>
       assert.throws(() => compile(code), SyntaxError)
-    })
+    )
   })
 })
