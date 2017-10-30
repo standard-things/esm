@@ -4,6 +4,7 @@ import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 
+const compile = compiler.compile
 const files = globby.sync(["output/**/*.mjs"])
 const tests = files
   .reduce((tests, relPath) => {
@@ -28,7 +29,7 @@ describe("output", () =>
 
       it(`compiles ${name} example as expected`, () => {
         // Remove zero-width joiners and trim trailing whitespace.
-        const code = compiler.compile(test.actual).code
+        const code = compile(test.actual).code
         const expected = test.expected.trimRight()
         const actual = code.replace(/\u200d/g, "").trimRight()
 

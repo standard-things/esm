@@ -5,6 +5,8 @@ import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
+const { compile } = compiler
+
 class Compiler {
   static compile(code, options) {
     return typeof options.filePath === "string"
@@ -14,7 +16,7 @@ class Compiler {
 }
 
 function compileAndCache(code, options) {
-  const result = compiler.compile(code, toCompileOptions(options))
+  const result = compile(code, toCompileOptions(options))
   options.pkgInfo.cache[options.cacheFileName] = result
   return result
 }

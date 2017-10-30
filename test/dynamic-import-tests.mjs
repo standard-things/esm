@@ -4,9 +4,9 @@ import createNamespace from "./create-namespace.js"
 import path from "path"
 
 const isWin = process.platform === "win32"
+const compile = compiler.compile
 
 const abcId = "./fixture/export/abc.mjs"
-
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -110,7 +110,7 @@ describe("dynamic import", () => {
     ]
 
     invalids.forEach((code) => {
-      assert.throws(() => compiler.compile(code), SyntaxError)
+      assert.throws(() => compile(code), SyntaxError)
     })
   })
 })

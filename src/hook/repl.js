@@ -14,6 +14,8 @@ import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
+const { compile } = compiler
+
 function hook(vm) {
   const md5Hash = md5(Date.now()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
@@ -64,7 +66,7 @@ function hook(vm) {
         warnings: false
       }
 
-      output = tryWrapper(compiler.compile, [code, compilerOptions]).code
+      output = tryWrapper(compile, [code, compilerOptions]).code
     }
 
     output =

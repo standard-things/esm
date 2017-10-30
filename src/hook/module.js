@@ -39,6 +39,7 @@ import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 
+const { compile } = compiler
 const extSym = Symbol.for("@std/esm:extensions")
 const fsBinding = binding.fs
 
@@ -212,11 +213,11 @@ function hook(Module, parent, options) {
     const { filePath, pkgInfo } = options
 
     if (pkgInfo.options.debug) {
-      return compiler.compile(code, options)
+      return compile(code, options)
     }
 
     try {
-      return compiler.compile(code, options)
+      return compile(code, options)
     } catch (e) {
       captureStackTrace(e, manager)
       throw maskStackTrace(e, code, filePath)
