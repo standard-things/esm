@@ -138,18 +138,18 @@ describe("errors", () => {
           checkErrorStack(e, [
             id2 + ":1",
             'export const a = "a"',
-            "^"
+            "^\n"
           ].join("\n"))
 
           assert.strictEqual(e.stack.includes(id1 + ":"), false)
         }),
-        import(id3)
+      import(id3)
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
             id3 + ":1",
             'import { a } from "./export.js"',
-            "^"
+            "^\n"
           ].join("\n"))
         ),
       import(id4)
@@ -158,7 +158,7 @@ describe("errors", () => {
           checkErrorStack(e, [
             id4 + ":2",
             '  import"nested"',
-            "  ^"
+            "  ^\n"
           ].join("\n"))
         ),
       import(id5)
@@ -167,7 +167,7 @@ describe("errors", () => {
           checkErrorStack(e, [
             id5 + ":1",
             "syntax@error",
-            "      ^"
+            "\n"
           ].join("\n"))
         ),
       import(id6)
@@ -176,7 +176,7 @@ describe("errors", () => {
           checkErrorStack(e, [
             id6 + ":1",
             "syntax@error",
-            "      ^"
+            "      ^\n"
           ].join("\n"))
         )
     ])
