@@ -14,7 +14,7 @@ const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
 const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
-const replaceArrowRegExp = /^(.+\n)( *\^+\n)/m
+const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
 const wrapperFallback = [
   "(function (exports, require, module, __filename, __dirname) { ",
@@ -99,7 +99,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
     return stack
   }
 
-  return stack.replace(replaceArrowRegExp, (match, snippet, arrow) => {
+  return stack.replace(replaceArrowRegExp, (match, snippet, arrow, newline = "") => {
     const lineNum = +parts[1]
 
     if (snippet.includes(ZWJ)) {
@@ -112,12 +112,12 @@ function maskEngineStack(stack, sourceCode, filePath) {
       }
 
       const lines = sourceCode.split("\n")
-      const line = lines[lineNum - 1]
-      return line ? (line + "\n") : ""
+      const line = lines[lineNum - 1] || ""
+      return line + (line ? "\n" : "") + (newline || "\n")
     }
 
     if (lineNum !== 1) {
-      return snippet + arrow
+      return snippet + arrow + newline
     }
 
     let { wrapper } = BuiltinModule
@@ -135,7 +135,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
       arrow = arrow.slice(length)
     }
 
-    return snippet + arrow
+    return snippet + arrow + newline
   })
 }
 
