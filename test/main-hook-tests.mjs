@@ -58,7 +58,7 @@ describe("module.runMain hook", () => {
       })
   })
 
-  it("should throw correct error for missing modules", function () {
+  it("should error for missing modules", function () {
     this.retries(3)
 
     const fileNames = ["missing", "missing.js", "missing.mjs"]

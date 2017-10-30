@@ -17,7 +17,6 @@ const pkgPath = require.resolve("../")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
 
 const abcId = "./fixture/export/abc.mjs"
-
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -490,7 +489,7 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
-  it("should throw a syntax error when exporting duplicate local bindings", () =>
+  it("should error when exporting duplicate local bindings", () =>
     import("./fixture/export/dup-local.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -499,7 +498,7 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when importing or re-exporting a conflicted star exports", () =>
+  it("should error when importing or re-exporting a conflicted star exports", () =>
     Promise.all([
       "./fixture/import/star-conflict.mjs",
       "./fixture/export/star-conflict.mjs"
@@ -513,7 +512,7 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should throw a syntax error when importing non-exported binding", () =>
+  it("should error when importing non-exported binding", () =>
     Promise.all([
       "./fixture/import/missing-cjs.mjs",
       "./fixture/import/missing-esm.mjs",
@@ -528,7 +527,7 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should throw a type error when setting an imported identifier", () =>
+  it("should error when setting an imported identifier", () =>
     Promise.all([
       "./fixture/import/const.mjs",
       "./fixture/import/let.mjs"
@@ -542,7 +541,7 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should throw a syntax error when creating an `arguments` binding", () =>
+  it("should error when creating an `arguments` binding", () =>
     import("./fixture/source/arguments-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -551,7 +550,7 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when creating an `await` binding", () =>
+  it("should error when creating an `await` binding", () =>
     import("./fixture/source/await-binding.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -560,7 +559,7 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when using top-level `new.target`", () =>
+  it("should error when using top-level `new.target`", () =>
     import("./fixture/source/new-target.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -569,7 +568,7 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should throw a syntax error when using an opening HTML comment in ESM", () =>
+  it("should error when using an opening HTML comment in ESM", () =>
     import("./fixture/source/html-comment.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -604,17 +603,17 @@ describe("spec compliance", () => {
       .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
   })
 
-  it("should not throw when accessing `arguments` in a function", () =>
+  it("should not error when accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
       .then(() => assert.ok(true))
   )
 
-  it("should not throw when typeof checking `arguments`", () =>
+  it("should not error when typeof checking `arguments`", () =>
     import("./fixture/source/arguments-typeof.mjs")
       .then(() => assert.ok(true))
   )
 
-  it("should not throw when using an opening HTML comment in CJS", () =>
+  it("should not error when using an opening HTML comment in CJS", () =>
     import("./fixture/source/html-comment.js")
       .then(() => assert.ok(true))
   )
