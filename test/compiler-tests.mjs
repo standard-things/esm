@@ -39,11 +39,6 @@ describe("compiler", () => {
     })
   })
 
-  it("should choose unique export and module identifiers", () =>
-    import("./compiler/aliases.mjs")
-      .then((ns) => ns.default())
-  )
-
   it("should preserve line numbers", () =>
     import("./compiler/lines.mjs")
       .then((ns) => ns.default())
