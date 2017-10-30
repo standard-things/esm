@@ -40,10 +40,19 @@ class Compiler {
     }
 
     if (type === "unambiguous" &&
-        (hasPragma(code, "use script") ||
-          (hint !== "module" &&
-          ! importExportRegExp.test(code) &&
-          ! hasPragma(code, "use module")))) {
+        hasPragma(code, "use script")) {
+      type = "script"
+    }
+
+    if (type === "script" &&
+        ! importExportRegExp.test(code)) {
+      return result
+    }
+
+    if (type === "unambiguous" &&
+        hint !== "module" &&
+        ! hasPragma(code, "use module") &&
+        ! importExportRegExp.test(code)) {
       return result
     }
 
