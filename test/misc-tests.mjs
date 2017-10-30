@@ -377,7 +377,7 @@ describe("Node rules", () => {
       if (skipOutsideDot) {
         checkError(e, "ERR_MISSING_MODULE")
       } else {
-        assert.ifError(e)
+        throw e
       }
     }
   })
