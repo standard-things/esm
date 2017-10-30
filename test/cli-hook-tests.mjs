@@ -1,15 +1,14 @@
 import assert from "assert"
 import execa from "execa"
 import path from "path"
+import require from "./require.js"
 
 const isWin = process.platform === "win32"
 
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
+const testPath = path.dirname(require.resolve("./tests.mjs"))
+const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
 
-const NODE_BIN = path.resolve(__dirname, "env/prefix", isWin ? "node.exe" : "bin/node")
-
-const dirnameURL = "file://" + (isWin ? "/" : "") + __dirname.replace(/\\/g, "/")
+const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 describe("command-line hook", () => {
   it("should not fail on unresolvable command-line arguments", () => {
@@ -20,7 +19,7 @@ describe("command-line hook", () => {
     ]
 
     return execa(NODE_BIN, args, {
-      cwd: __dirname,
+      cwd: testPath,
       reject: false
     })
     .then((result) => assert.strictEqual(result.stderr, ""))
@@ -33,11 +32,11 @@ describe("command-line hook", () => {
     ]
 
     return execa(NODE_BIN, args, {
-      cwd: __dirname,
+      cwd: testPath,
       reject: false
     })
     .then((result) => {
-      const url = dirnameURL + "/fixture/main.mjs"
+      const url = testURL + "/fixture/main.mjs"
 
       const expected = {
         default: {

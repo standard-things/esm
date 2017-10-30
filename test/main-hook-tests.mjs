@@ -3,21 +3,22 @@ import SemVer from "semver"
 import assert from "assert"
 import execa from "execa"
 import path from "path"
+import require from "./require.js"
 
 const isWin = process.platform === "win32"
 
-const __filename = import.meta.url.slice(isWin ? 8 : 7)
-const __dirname = path.dirname(__filename)
+const canUsePreserveSymlinks =
+  SemVer.satisfies(process.version, ">=6.3.0")
 
-const NODE_BIN = path.resolve(__dirname, "env/prefix", isWin ? "node.exe" : "bin/node")
-
-const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
-const dirnameURL = "file://" + (isWin ? "/" : "") + __dirname.replace(/\\/g, "/")
 const requireFlags = ["-r", "--require"]
+const testPath = path.dirname(require.resolve("./tests.mjs"))
+const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
+
+const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 function runMain(args) {
   return execa(NODE_BIN, args, {
-    cwd: __dirname,
+    cwd: testPath,
     reject: false
   })
 }
@@ -31,7 +32,7 @@ describe("module.runMain hook", () => {
 
     return Promise.all(runs.map(runMain))
       .then((results) => {
-        const url = dirnameURL + "/fixture/main.mjs"
+        const url = testURL + "/fixture/main.mjs"
 
         const expected = {
           mainModule: false,
