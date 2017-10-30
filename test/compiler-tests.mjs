@@ -39,6 +39,26 @@ describe("compiler", () => {
     })
   })
 
+  it("should support shebangs", () => {
+    const code = [
+      "#!/usr/bin/env node -r @std/esm",
+      'import a from "a"'
+    ].join("\n")
+
+    const result = compile(code)
+    assert.ok(result.code.startsWith("let a"))
+  })
+
+  it("should support trailing comments", () => {
+    const result = compile('import"a"//trailing comment')
+    assert.ok(result.code.endsWith("//trailing comment"))
+  })
+
+  it("should compile dynamic import with script source type", () => {
+    const result = compile('import("a")', { esm: false })
+    assert.ok(result.code.includes('i("a")'))
+  })
+
   it("should preserve line numbers", () =>
     import("./compiler/lines.mjs")
       .then((ns) => ns.default())
@@ -58,35 +78,15 @@ describe("compiler", () => {
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 
-  it("should compile dynamic import with script source type", () => {
-    const result = compile('import("a")', { esm: false })
-    assert.ok(result.code.includes('i("a")'))
-  })
-
   it('should not hoist above "use strict"', () =>
     import("./compiler/strict.mjs")
       .then((ns) => ns.default())
   )
 
-  it("should not get confused by shebang", () => {
-    const code = [
-      "#!/usr/bin/env node -r @std/esm",
-      'import a from "a"'
-    ].join("\n")
-
-    const result = compile(code)
-    assert.ok(result.code.startsWith("let a"))
-  })
-
   it("should not get confused by string literals", () =>
     import("./compiler/strings.mjs")
       .then((ns) => ns.default())
   )
-
-  it("should not get confused by trailing comments", () => {
-    const result = compile('import"a"//trailing comment')
-    assert.ok(result.code.endsWith("//trailing comment"))
-  })
 
   it("should not error on shorthand async function properties with reserved names", () => {
     compile("({async delete(){}})")
