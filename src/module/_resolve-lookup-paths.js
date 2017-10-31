@@ -16,18 +16,22 @@ const { slice } = Array.prototype
 
 function _resolveLookupPaths(id, parent, skipGlobalPaths) {
   let lookOutside
+  const code0 = id.charCodeAt(0)
+  const code1 = id.charCodeAt(1)
+  const isDot = id === "."
 
   if (skipOutsideDot) {
     lookOutside =
-      id.charCodeAt(0) !== codeOfDot &&
-      (id.charCodeAt(1) !== codeOfDot &&
-       id.charCodeAt(1) !== codeOfSlash)
+      ! isDot &&
+      ! (code0 === codeOfDot &&
+          (code1 === codeOfDot ||
+           code1 === codeOfSlash))
   } else {
     lookOutside =
       id.length < 2 ||
-      id.charCodeAt(0) !== codeOfDot ||
-      (id.charCodeAt(1) !== codeOfDot &&
-       id.charCodeAt(1) !== codeOfSlash)
+      code0 !== codeOfDot ||
+      (code1 !== codeOfDot &&
+       code1 !== codeOfSlash)
   }
 
   const parentFilename = parent && parent.filename
@@ -38,7 +42,7 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
 
     // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module's directory in front of the lookup paths.
-    if (id === ".") {
+    if (isDot) {
       paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
     }
 
