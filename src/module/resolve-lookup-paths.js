@@ -5,10 +5,13 @@
 import _resolveLookupPaths from "./_resolve-lookup-paths.js"
 import builtinModules from "../builtin-modules.js"
 
-function resolveLookupPaths(id, parent) {
-  return id in builtinModules
-    ? null
-    : _resolveLookupPaths(id, parent)
+function resolveLookupPaths(id, parent, newReturn) {
+  if (id in builtinModules) {
+    return newReturn ? null : [id, []]
+  }
+
+  const paths = _resolveLookupPaths(id, parent)
+  return newReturn ? paths : [id, paths]
 }
 
 export default resolveLookupPaths
