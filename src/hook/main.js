@@ -34,10 +34,10 @@ function hook(Module) {
       setPrototypeOf(mod, Module.prototype)
     })
 
-    tryTickCallback()
+    tickCallback()
   }
 
-  function tryTickCallback() {
+  function tickCallback() {
     if (useTickCallback) {
       _tickCallback()
     }
