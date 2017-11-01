@@ -7,6 +7,7 @@ import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isESM from "../../util/is-es-module.js"
+import isError from "../../util/is-error.js"
 import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
@@ -63,6 +64,9 @@ function load(id, parent, isMain, options, preload) {
 
   if (! threw) {
     return child
+  } else if (isError(error) &&
+      error.code === "ERR_REQUIRE_ESM") {
+    error.message = error.message.replace("import", "@std/esm")
   }
 
   try {
