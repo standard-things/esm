@@ -13,7 +13,7 @@ import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 
-const extSym = Symbol.for("@std/esm:extensions")
+const BuiltinModule = __non_webpack_module__.constructor
 
 function load(id, parent, isMain, options, preload) {
   const filePath = resolveFilename(id, parent, isMain, options)
@@ -93,26 +93,21 @@ function loader(filePath, url, options, preload) {
     preload(mod)
   }
 
-  let ext = extname(filePath)
+  const Ctor = mod.constructor
   let { extensions } = moduleState
+  let ext = extname(filePath)
+
+  if (Ctor === BuiltinModule &&
+      (options.cjs || ext === ".js")) {
+    extensions = Ctor._extensions
+  }
 
   if (ext === "" ||
       typeof extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  const { _extensions } = mod.constructor
-  let extCompiler = extensions[ext]
-
-  if (options.cjs &&
-      (ext === ".js" || ext === ".mjs") &&
-      typeof _extensions[ext] === "function" &&
-      ! _extensions[ext][extSym]) {
-    extensions = _extensions
-    extCompiler = extensions[ext]
-  }
-
-  extCompiler.call(extensions, mod, filePath)
+  extensions[ext](mod, filePath)
   mod.loaded = true
 }
 
