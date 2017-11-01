@@ -2,8 +2,6 @@
 // Copyright Victor Homyakov. Released under MIT license:
 // https://github.com/victor-homyakov/acorn-object-rest-spread
 
-import expect from "../parse/expect.js"
-import raise from "../parse/raise.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
 
@@ -26,7 +24,7 @@ function parseObj(func, args) {
     if (first) {
       first = false
     } else {
-      expect(this, tt.comma)
+      this.expect(tt.comma)
 
       if (this.afterTrailingComma(tt.braceR)) {
         break
@@ -68,7 +66,7 @@ function toAssignable(func, args) {
       } else if (propNode.type === "SpreadElement") {
         propNode.value = this.toAssignable(propNode.argument)
       } else {
-        raise(this, propNode.key.start, "Object pattern can't contain getter or setter")
+        this.raise(propNode.key.start, "Object pattern can't contain getter or setter")
       }
     }
 
