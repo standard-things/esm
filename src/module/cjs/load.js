@@ -27,6 +27,16 @@ function load(id, parent, isMain, options, preload) {
 }
 
 function loader(filePath, options, preload) {
+  const mod = this
+  Entry.get(mod)
+
+  mod.filename = filePath
+  mod.paths = nodeModulePaths(dirname(filePath))
+
+  if (preload) {
+    preload(mod)
+  }
+
   let ext = extname(filePath)
   const { extensions } = __non_webpack_require__
 
@@ -40,16 +50,6 @@ function loader(filePath, options, preload) {
   if (extCompiler[extSym] &&
       (options.cjs || options.esm !== "mjs")) {
     extCompiler = extensions[ext]
-  }
-
-  const mod = this
-  mod.filename = filePath
-  mod.paths = nodeModulePaths(dirname(filePath))
-
-  Entry.get(mod)
-
-  if (preload) {
-    preload(mod)
   }
 
   extCompiler.call(extensions, mod, filePath)

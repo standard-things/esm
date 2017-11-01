@@ -79,7 +79,15 @@ function load(id, parent, isMain, options, preload) {
 
 function loader(filePath, url, options, preload) {
   const mod = this
-  const { _extensions } = mod.constructor
+  const entry = Entry.get(mod)
+
+  entry.url = url
+  mod.filename = filePath
+  mod.paths = nodeModulePaths(dirname(filePath))
+
+  if (preload) {
+    preload(mod)
+  }
 
   let ext = extname(filePath)
   let { extensions } = moduleState
@@ -89,12 +97,7 @@ function loader(filePath, url, options, preload) {
     ext = ".js"
   }
 
-  const entry = Entry.get(mod)
-  entry.url = url
-
-  mod.filename = filePath
-  mod.paths = nodeModulePaths(dirname(filePath))
-
+  const { _extensions } = mod.constructor
   let extCompiler = extensions[ext]
 
   if (options.cjs &&
@@ -103,10 +106,6 @@ function loader(filePath, url, options, preload) {
       ! _extensions[ext][extSym]) {
     extensions = _extensions
     extCompiler = extensions[ext]
-  }
-
-  if (preload) {
-    preload(mod)
   }
 
   extCompiler.call(extensions, mod, filePath)
