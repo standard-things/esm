@@ -8,7 +8,6 @@ import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
-import binding from "../binding.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import compiler from "../caching-compiler.js"
 import createSourceMap from "../util/create-source-map.js"
@@ -18,7 +17,6 @@ import encodeURI from "../util/encode-uri.js"
 import env from "../env.js"
 import errors from "../errors.js"
 import extname from "../path/extname.js"
-import fs from "fs"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
@@ -41,7 +39,6 @@ import stat from "../fs/stat.js"
 
 const { compile } = compiler
 const extSym = Symbol.for("@std/esm:extensions")
-const fsBinding = binding.fs
 
 const extDescriptor = {
   configurable: false,
@@ -86,10 +83,9 @@ function hook(Module, parent, options) {
 
     return wrapped
       ? wrapped.call(this, manager, func, pkgInfo, args)
-      : tryPassthruCompile.call(this, func, args)
+      : tryPassthru.call(this, func, args, options)
   }
 
-  // eslint-disable-next-line consistent-return
   function methodWrapper(manager, func, pkgInfo, args) {
     const [mod, filePath] = args
     const ext = extname(filePath)
@@ -112,33 +108,7 @@ function hook(Module, parent, options) {
     }
 
     if (! Entry.has(mod.exports)) {
-      const loader = type === "script" ? loadCJS : loadESM
-      const { parent } = mod
-      const childCount = parent ? parent.children.length : 0
-
-      delete moduleState.cache[filePath]
-      delete __non_webpack_require__.cache[filePath]
-
-      mod.exports = loader(filePath, parent, false, options, (newMod) => {
-        newMod.children = mod.children
-
-        if (parent) {
-          parent.children.length = childCount
-        }
-
-        if (has(mod, "_compile")) {
-          newMod._compile = mod._compile
-        }
-      }).exports
-
-      if (filePath in moduleState.cache) {
-        moduleState.cache[filePath] = mod
-      }
-
-      if (filePath in __non_webpack_require__.cache) {
-        __non_webpack_require__.cache[filePath] = mod
-      }
-
+      load(mod, filePath, type, options)
       return
     }
 
@@ -149,55 +119,97 @@ function hook(Module, parent, options) {
     const stateHash = getCacheStateHash(cacheFileName)
     const runtimeAlias = encodeId("_" + stateHash.slice(0, 3))
 
-    let cacheCode
-    let sourceCode
-    let cacheValue = cache[cacheFileName]
+    let code
+    let cached = cache[cacheFileName]
 
-    if (cacheValue === true) {
-      cacheCode = readCode(resolve(cachePath, cacheFileName), options)
-    } else {
-      sourceCode = readCode(filePath, options)
-    }
+    if (cached === true) {
+      code = readCode(resolve(cachePath, cacheFileName), options)
 
-    if (! isObject(cacheValue)) {
-      if (cacheValue === true) {
-        if (type === "unambiguous") {
-          type = hasPragma(cacheCode, "use script") ? "script" : "module"
-        }
+      if (type === "unambiguous") {
+        type = hasPragma(code, "use script") ? "script" : "module"
+      }
 
-        cacheValue = { code: cacheCode, esm: type === "module" }
-        cache[cacheFileName] = cacheValue
-      } else {
-        cacheValue = tryCodeCompile(manager, sourceCode, {
-          cacheFileName,
-          cachePath,
-          filePath,
-          hint,
-          pkgInfo,
-          runtimeAlias,
-          type
-        })
-
-        if (cacheValue.warnings) {
-          for (const warning of cacheValue.warnings) {
-            emitWarning(warning.message + ": " + filePath)
-          }
-        }
+      cached =
+      cache[cacheFileName] = {
+        code,
+        esm: type === "module"
       }
     }
 
-    const noDepth = moduleState.requireDepth === 0
-
-    if (noDepth) {
-      stat.cache = new NullObject
+    if (isObject(cached)) {
+      tryCompileCached(mod, cached, filePath, runtimeAlias, options)
+      return
     }
 
-    const tryModuleCompile = cacheValue.esm ? tryESMCompile : tryCJSCompile
-    tryModuleCompile.call(this, manager, func, mod, cacheValue.code, filePath, runtimeAlias, options)
+    const { _compile } = mod
 
-    if (noDepth) {
-      stat.cache = null
+    mod._compile = (content, filePath) => {
+      mod._compile = _compile
+
+      cached = tryCompileCode(manager, content, {
+        cacheFileName,
+        cachePath,
+        filePath,
+        hint,
+        pkgInfo,
+        runtimeAlias,
+        type
+      })
+
+      if (cached.warnings) {
+        for (const warning of cached.warnings) {
+          emitWarning(warning.message + ": " + filePath)
+        }
+      }
+
+      tryCompileCached(mod, cached, filePath, runtimeAlias, options)
     }
+
+    if (passthruMap.get(func)) {
+      tryPassthru.call(this, func, args, options)
+    } else {
+      mod._compile(readCode(filePath, options), filePath)
+    }
+  }
+
+  function load(mod, filePath, type, options) {
+    const loader = type === "script" ? loadCJS : loadESM
+    const { parent } = mod
+    const childCount = parent ? parent.children.length : 0
+
+    delete moduleState.cache[filePath]
+    delete __non_webpack_require__.cache[filePath]
+
+    mod.exports = loader(filePath, parent, false, options, (newMod) => {
+      newMod.children = mod.children
+
+      if (parent) {
+        parent.children.length = childCount
+      }
+
+      if (has(mod, "_compile")) {
+        newMod._compile = mod._compile
+      }
+    }).exports
+
+    if (filePath in moduleState.cache) {
+      moduleState.cache[filePath] = mod
+    }
+
+    if (filePath in __non_webpack_require__.cache) {
+      __non_webpack_require__.cache[filePath] = mod
+    }
+  }
+
+  function maybeSourceMap(content, filePath, options) {
+    if (options.sourceMap !== false &&
+        (env.inspector || options.sourceMap) &&
+        ! getSourceMappingURL(content)) {
+      return "//# sourceMappingURL=data:application/json;charset=utf-8," +
+        encodeURI(createSourceMap(filePath, content))
+    }
+
+    return ""
   }
 
   function readCode(filePath, options) {
@@ -209,7 +221,31 @@ function hook(Module, parent, options) {
     return readFile(filePath, "utf8")
   }
 
-  function tryCodeCompile(manager, code, options) {
+  function tryCompileCached(mod, cached, filePath, runtimeAlias, options) {
+    const { code } = cached
+    const noDepth = moduleState.requireDepth === 0
+    const tryCompile = cached.esm ? tryCompileESM : tryCompileCJS
+
+    if (noDepth) {
+      stat.cache = new NullObject
+    }
+
+    if (options.debug) {
+      tryCompile(mod, code, filePath, runtimeAlias, options)
+    } else {
+      try {
+        tryCompile(mod, code, filePath, runtimeAlias, options)
+      } catch (e) {
+        throw maskStackTrace(e, () => readCode(filePath, options))
+      }
+    }
+
+    if (noDepth) {
+      stat.cache = null
+    }
+  }
+
+  function tryCompileCode(manager, code, options) {
     const { filePath, pkgInfo } = options
 
     if (pkgInfo.options.debug) {
@@ -224,19 +260,22 @@ function hook(Module, parent, options) {
     }
   }
 
-  function tryCJSCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
+  function tryCompileCJS(mod, content, filePath, runtimeAlias, options) {
     content =
       "const " + runtimeAlias + "=this;" +
       runtimeAlias + ".r((function(exports,require){" + content + "\n}))"
+
+    content +=
+      maybeSourceMap(content, filePath, options)
 
     const exported = {}
 
     setESM(exported, false)
     Runtime.enable(mod, exported, options)
-    tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
+    mod._compile(content, filePath)
   }
 
-  function tryESMCompile(manager, func, mod, content, filePath, runtimeAlias, options) {
+  function tryCompileESM(mod, content, filePath, runtimeAlias, options) {
     let async = ""
 
     if (allowTopLevelAwait && options.await) {
@@ -253,8 +292,11 @@ function hook(Module, parent, options) {
       (options.cjs ? "exports,require" : "") +
       "){" + content + "\n}))"
 
-    const exported = {}
+    content +=
+      maybeSourceMap(content, filePath, options)
+
     const Ctor = mod.constructor
+    const exported = {}
     const moduleWrap = Ctor.wrap
 
     const customWrap = (script) => {
@@ -270,7 +312,7 @@ function hook(Module, parent, options) {
     Runtime.enable(mod, exported, options)
 
     try {
-      tryModuleCompile.call(this, manager, func, mod, content, filePath, options)
+      mod._compile(content, filePath)
     } finally {
       if (Ctor.wrap === customWrap) {
         Ctor.wrap = moduleWrap
@@ -278,108 +320,16 @@ function hook(Module, parent, options) {
     }
   }
 
-  function tryModuleCompile(manager, func, mod, content, filePath, options) {
-    const moduleCompile = mod._compile
-    const moduleReadFile = fsBinding.internalModuleReadFile
-    const passthru = passthruMap.get(func)
-    const { readFileSync } = fs
-
-    let restored = false
-
-    const readAndRestore = () => {
-      restored = true
-
-      if (typeof moduleReadFile === "function") {
-        fsBinding.internalModuleReadFile = moduleReadFile
-      }
-
-      fs.readFileSync = readFileSync
-      return content
-    }
-
-    const customModuleCompile = function (content, compilePath) {
-      if (! restored && compilePath === filePath) {
-        // This fallback is only hit if the read file wrappers are missed.
-        content = readAndRestore()
-      }
-
-      mod._compile = moduleCompile
-      return moduleCompile.call(this, content, compilePath)
-    }
-
-    const customModuleReadFile = function (readPath) {
-      return readPath === filePath
-        ? readAndRestore()
-        : moduleReadFile.call(this, readPath)
-    }
-
-    const customReadFileSync = function (readPath, readOptions) {
-      return readPath === filePath
-        ? readAndRestore()
-        : readFileSync.call(this, readPath, readOptions)
-    }
-
-    if (typeof moduleReadFile === "function") {
-      // Wrap `process.binding("fs").internalModuleReadFile` in case future
-      // versions of Node use it instead of `fs.readFileSync`.
-      fsBinding.internalModuleReadFile = customModuleReadFile
-    }
-
-    // Wrap `fs.readFileSync` to avoid an extra file read when the passthru
-    // `Module._extensions[ext]` is called.
-    fs.readFileSync = customReadFileSync
-
-    // Wrap `mod._compile` in the off chance the read file wrappers are missed.
-    mod._compile = customModuleCompile
-
-    // Add an inline source map to mask the source in the inspector.
-    if (options.sourceMap !== false &&
-        (env.inspector || options.sourceMap) &&
-        ! getSourceMappingURL(content)) {
-      content +=
-        "//# sourceMappingURL=data:application/json;charset=utf-8," +
-        encodeURI(createSourceMap(filePath, content))
-    }
-
-    try {
-      if (options.debug) {
-        if (passthru) {
-          func.call(this, mod, filePath)
-        } else {
-          mod._compile(content, filePath)
-        }
-      } else {
-        try {
-          if (passthru) {
-            func.call(this, mod, filePath)
-          } else {
-            mod._compile(content, filePath)
-          }
-        } catch (e) {
-          throw maskStackTrace(e, () => readCode(filePath, options))
-        }
-      }
-    } finally {
-      if (fsBinding.internalModuleReadFile === customModuleReadFile) {
-        fsBinding.internalModuleReadFile = moduleReadFile
-      }
-
-      if (fs.readFileSync === customReadFileSync) {
-        fs.readFileSync = readFileSync
-      }
-
-      if (mod._compile === customModuleCompile) {
-        mod._compile = moduleCompile
-      }
-    }
-  }
-
-  function tryPassthruCompile(func, args) {
-    try {
+  function tryPassthru(func, args, options) {
+    if (options && options.debug) {
       func.apply(this, args)
-    } catch (e) {
-      const [, filePath] = args
-      throw maskStackTrace(e, () => readCode(filePath))
+    } else {
+      try {
+        func.apply(this, args)
+      } catch (e) {
+        const [, filePath] = args
+        throw maskStackTrace(e, () => readCode(filePath, options))
+      }
     }
   }
 
