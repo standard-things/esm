@@ -35,7 +35,7 @@ function parseObj(func, args) {
 
     // The rest/spread code is adapted from Babylon.
     // Copyright Babylon contributors. Released under MIT license:
-    // https://github.com/babel/babylon/blob/master/src/parser/expression.js
+    // https://github.com/babel/babel/blob/master/packages/babylon/src/parser/expression.js
     if (this.type === tt.ellipsis) {
       propNode = this.parseSpread()
       propNode.type = "SpreadElement"

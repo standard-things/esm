@@ -86,7 +86,7 @@ function parseImportCallAtom(parser) {
 function parseImportMetaPropertyAtom(parser) {
   // Support for meta properties adapted from Babylon.
   // Copyright Babylon contributors. Released under MIT license:
-  // https://github.com/babel/babylon/blob/master/src/parser/expression.js
+  // https://github.com/babel/babel/blob/master/packages/babylon/src/parser/expression.js
   const node = parser.startNode()
   node.meta = parser.parseIdent(true)
 
