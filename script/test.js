@@ -44,6 +44,10 @@ const mochaArgs = [
   "tests.mjs"
 ]
 
+if (process.env.HARMONY) {
+  mochaArgs.push("--harmony")
+}
+
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
 }

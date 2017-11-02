@@ -15,3 +15,8 @@ node_js:
 cache:
   directories:
     - ~/.npm
+
+matrix:
+  include:
+    - node_js: 9
+      env: HARMONY=true
