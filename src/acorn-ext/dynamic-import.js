@@ -84,21 +84,19 @@ function parseImportCallAtom(parser) {
 }
 
 function parseImportMetaPropertyAtom(parser) {
-  // The meta property code is adapted from Babylon.
+  // Support for meta properties adapted from Babylon.
   // Copyright Babylon contributors. Released under MIT license:
   // https://github.com/babel/babylon/blob/master/src/parser/expression.js
   const node = parser.startNode()
-  const meta = parser.parseIdent(true)
+  node.meta = parser.parseIdent(true)
 
   parser.expect(tt.dot)
-
-  node.meta = meta
   node.property = parser.parseIdent(true)
 
   if (node.property.name !== "meta") {
     parser.raise(node.property.start, "The only valid meta property for 'import' is 'import.meta'")
   } else if (! parser.inModule) {
-    parser.raise(meta.start, "'import.meta' may only be used in ES modules")
+    parser.raise(node.meta.start, "'import.meta' may only be used in ES modules")
   }
 
   return parser.finishNode(node, "MetaProperty")
