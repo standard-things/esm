@@ -142,9 +142,14 @@ function hook(Module, parent, options) {
     }
 
     const { _compile } = mod
+    const shouldRestore = has(mod, "_compile")
 
     mod._compile = (content, filePath) => {
-      mod._compile = _compile
+      if (shouldRestore) {
+        mod._compile = _compile
+      } else {
+        delete mod._compile
+      }
 
       cached = tryCompileCode(manager, content, {
         cacheFileName,
