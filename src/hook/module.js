@@ -302,7 +302,7 @@ function hook(Module, parent, options) {
     content =
       '"use strict";const ' + runtimeAlias + "=this;" +
       runtimeAlias + ".r((" + async + "function(" +
-      (options.cjs ? "exports,require" : "") +
+      (options.cjs.vars ? "exports,require" : "") +
       "){" + content + "\n}))"
 
     content +=
@@ -317,7 +317,7 @@ function hook(Module, parent, options) {
       return "(function(){" + script + "\n})"
     }
 
-    if (! options.cjs) {
+    if (! options.cjs.vars) {
       Ctor.wrap = customWrap
     }
 

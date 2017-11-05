@@ -135,7 +135,7 @@ function createSetter(from, setter) {
 function runCJS(runtime, moduleWrapper) {
   const { entry } = runtime
   const { module:mod, options } = entry
-  const loader = options.cjs ? loadESM : loadCJS
+  const loader = options.cjs.vars ? loadESM : loadCJS
   const requirer = (id) => moduleImport(id, mod, loader, options).exports
   const req = makeRequireFunction(mod, requirer)
   const exported = mod.exports = entry.exports
@@ -149,7 +149,7 @@ function runESM(runtime, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
 
-  if (options.cjs) {
+  if (options.cjs.vars) {
     const requirer = (id) => moduleImport(id, mod, loadESM, options).exports
     const req = makeRequireFunction(mod, requirer)
     moduleWrapper.call(exported, exported, req)

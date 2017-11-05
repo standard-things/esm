@@ -12,7 +12,7 @@ import { version } from "./version.js"
 
 const defaultOptions = {
   cache: ".esm-cache",
-  cjs: false,
+  cjs: createCJSObject(false),
   debug: false,
   esm: "mjs",
   sourceMap: void 0,
@@ -130,14 +130,35 @@ class PkgInfo {
   }
 }
 
+function createCJSObject(value) {
+  const object = new NullObject
+  object.babel =
+  object.cache =
+  object.extensions =
+  object.globalPaths =
+  object.namedExports =
+  object.topLevelReturn =
+  object.vars = value
+  return object
+}
+
 function createOptions(options) {
+  let cjsObject
   let sourceMap
 
   if (typeof options === "string") {
     options = { esm: options }
-  } else if (has(options, "sourcemap") &&
-      ! has(options, "sourceMap")) {
-    sourceMap = options.sourcemap
+  } else {
+    if (has(options, "cjs")) {
+      cjsObject = typeof options.cjs === "boolean"
+        ? createCJSObject(options.cjs)
+        : createOptions(options.cjs, defaultOptions.cjs)
+    }
+
+    if (has(options, "sourcemap") &&
+        ! has(options, "sourceMap")) {
+      sourceMap = options.sourcemap
+    }
   }
 
   options = _createOptions(options, defaultOptions)
@@ -146,8 +167,12 @@ function createOptions(options) {
     options.esm = "mjs"
   }
 
+  if (cjsObject) {
+    options.cjs = cjsObject
+  }
+
   if (sourceMap !== void 0) {
-    options.sourceMap = sourceMap
+    options.sourceMap = !! sourceMap
     delete options.sourcemap
   }
 

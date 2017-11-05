@@ -1,4 +1,5 @@
 import NullObject from "./null-object.js"
+import PkgInfo from "./pkg-info.js"
 import SafeWeakMap from "./safe-weak-map.js"
 
 import assign from "./util/assign.js"
@@ -67,7 +68,7 @@ class Entry {
     // The module this entry is managing.
     this.module = mod
     // The package options for this entry.
-    this.options = new NullObject
+    this.options = PkgInfo.createOptions()
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
     // The file url of the module.
@@ -187,7 +188,7 @@ class Entry {
       const exported = this.exports
       assign(exported, this._namespace)
 
-      if (this.options.cjs &&
+      if (this.options.cjs.babel &&
           ! has(exported, "__esModule")) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
@@ -312,7 +313,7 @@ function assignExportsToNamespace(entry) {
 
   const inModule =
     entry.esm ||
-    !! (entry.options.cjs &&
+    !! (entry.options.cjs.babel &&
     has(exported, "__esModule") &&
     exported.__esModule)
 
@@ -367,7 +368,7 @@ function changed(setter, key, value) {
 function getExportByName(entry, setter, name) {
   const isScript =
     ! entry.esm &&
-    ! setter.parent.options.cjs
+    ! setter.parent.options.cjs.namedExports
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace

@@ -61,7 +61,7 @@ class Compiler {
     let threw = true
 
     const parserOptions = {
-      allowReturnOutsideFunction: options.cjs,
+      allowReturnOutsideFunction: options.cjs.topLevelReturn,
       sourceType: type === "script" ? type : "module"
     }
 

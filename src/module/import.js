@@ -17,7 +17,7 @@ function moduleImport(id, parent, loader, options, preload) {
   const child = loader(id, parent, false, options, preload)
   const { filename } = child
 
-  if (! options.cjs &&
+  if (! options.cjs.cache &&
       isESM(child.exports)) {
     if (extname(filename) === ".mjs") {
       delete __non_webpack_require__.cache[filename]

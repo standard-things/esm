@@ -23,7 +23,7 @@ function load(id, parent, isMain, options, preload) {
 
   let state
 
-  if (! options.cjs) {
+  if (! options.cjs.cache) {
     isMain = false
 
     if (_extname(filePath) === ".mjs") {
@@ -98,7 +98,7 @@ function loader(filePath, url, options, preload) {
   let ext = extname(filePath)
 
   if (Ctor === BuiltinModule &&
-      (options.cjs || ext === ".js")) {
+      (options.cjs.extensions || ext === ".js")) {
     extensions = Ctor._extensions
   }
 
