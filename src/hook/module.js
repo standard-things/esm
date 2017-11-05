@@ -29,6 +29,7 @@ import isObjectLike from "../util/is-object-like.js"
 import loadCJS from "../module/cjs/load.js"
 import loadESM from "../module/esm/load.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
+import moduleImport from "../module/import.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
@@ -192,7 +193,7 @@ function hook(Module, parent, options) {
       delete __non_webpack_require__.cache[filePath]
     }
 
-    mod.exports = loader(filePath, parent, false, options, (newMod) => {
+    mod.exports = moduleImport(filePath, parent, loader, options, (newMod) => {
       newMod.children = mod.children
 
       if (parent) {

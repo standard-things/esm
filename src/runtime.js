@@ -1,12 +1,11 @@
 import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
-import builtinEntries from "./builtin-entries.js"
-import { extname } from "path"
 import isESM from "./util/is-es-module.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
+import moduleImport from "./module/import.js"
 import moduleState from "./module/state.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
@@ -106,15 +105,14 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
+    let child
+    let childEntry
     const { entry } = this
 
     moduleState.requireDepth += 1
 
     try {
-      let child
-      let childEntry
-
-      importModule(id, entry.module, loadESM, entry.options, (mod) => {
+      moduleImport(id, entry.module, loadESM, entry.options, (mod) => {
         child = mod
         childEntry = Entry.get(child)
         entry.children[child.id] = childEntry
@@ -134,37 +132,11 @@ function createSetter(from, setter) {
   return setter
 }
 
-function importModule(id, parent, loader, options, preload) {
-  if (id in builtinEntries) {
-    const child = builtinEntries[id]
-
-    if (preload) {
-      preload(child)
-    }
-
-    return child
-  }
-
-  const child = loader(id, parent, false, options, preload)
-  const { filename } = child
-
-  if (! options.cjs &&
-      isESM(child.exports)) {
-    if (extname(filename) === ".mjs") {
-      delete __non_webpack_require__.cache[filename]
-    }
-  } else {
-    delete moduleState.cache[filename]
-  }
-
-  return child
-}
-
 function runCJS(runtime, moduleWrapper) {
   const { entry } = runtime
   const { module:mod, options } = entry
   const loader = options.cjs ? loadESM : loadCJS
-  const requirer = (id) => importModule(id, mod, loader, options).exports
+  const requirer = (id) => moduleImport(id, mod, loader, options).exports
   const req = makeRequireFunction(mod, requirer)
   const exported = mod.exports = entry.exports
 
@@ -178,7 +150,7 @@ function runESM(runtime, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   if (options.cjs) {
-    const requirer = (id) => importModule(id, mod, loadESM, options).exports
+    const requirer = (id) => moduleImport(id, mod, loadESM, options).exports
     const req = makeRequireFunction(mod, requirer)
     moduleWrapper.call(exported, exported, req)
   } else {
