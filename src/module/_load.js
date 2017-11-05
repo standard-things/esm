@@ -6,7 +6,7 @@ import Module from "../module.js"
 
 import moduleState from "./state.js"
 
-function load(filePath, parent, isMain, state, loader) {
+function _load(filePath, parent, isMain, state, loader) {
   let child = state
     ? state.cache[filePath]
     : moduleState.cache[filePath] || __non_webpack_require__.cache[filePath]
@@ -58,4 +58,4 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
   }
 }
 
-export default load
+export default _load
