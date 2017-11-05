@@ -182,8 +182,15 @@ function hook(Module, parent, options) {
     const { parent } = mod
     const childCount = parent ? parent.children.length : 0
 
-    delete moduleState.cache[filePath]
-    delete __non_webpack_require__.cache[filePath]
+    if (moduleState.cache[filePath] &&
+        ! moduleState.cache[filePath].loaded) {
+      delete moduleState.cache[filePath]
+    }
+
+    if (__non_webpack_require__.cache[filePath] &&
+        ! __non_webpack_require__.cache[filePath].loaded) {
+      delete __non_webpack_require__.cache[filePath]
+    }
 
     mod.exports = loader(filePath, parent, false, options, (newMod) => {
       newMod.children = mod.children
