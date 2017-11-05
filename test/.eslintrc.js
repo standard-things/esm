@@ -9,6 +9,7 @@ module.exports = {
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
     "no-console": "off",
+    "no-empty": "off",
     "no-unused-vars": "off",
     "sort-imports": "off",
     "sort-keys": "off",
