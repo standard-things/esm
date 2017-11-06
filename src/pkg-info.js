@@ -12,7 +12,7 @@ import { version } from "./version.js"
 
 const defaultOptions = {
   cache: ".esm-cache",
-  cjs: createCJSOptions(false),
+  cjs: createCJS(false),
   debug: false,
   esm: "mjs",
   sourceMap: void 0,
@@ -130,7 +130,7 @@ class PkgInfo {
   }
 }
 
-function createCJSOptions(value, object = {}) {
+function createCJS(value, object = {}) {
   object.babel =
   object.cache =
   object.extensions =
@@ -142,15 +142,15 @@ function createCJSOptions(value, object = {}) {
 }
 
 function createOptions(options) {
-  let cjsObject
+  let cjsOptions
   let sourceMap
 
   if (typeof options === "string") {
     options = { esm: options }
   } else {
     if (has(options, "cjs")) {
-      cjsObject = typeof options.cjs === "boolean"
-        ? createCJSOptions(options.cjs, new NullObject)
+      cjsOptions = typeof options.cjs === "boolean"
+        ? createCJS(options.cjs, new NullObject)
         : createOptions(options.cjs, defaultOptions.cjs)
     }
 
@@ -166,8 +166,8 @@ function createOptions(options) {
     options.esm = "mjs"
   }
 
-  if (cjsObject) {
-    options.cjs = cjsObject
+  if (cjsOptions) {
+    options.cjs = cjsOptions
   }
 
   if (sourceMap !== void 0) {
