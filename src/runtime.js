@@ -1,6 +1,7 @@
 import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
+import errors from "./errors.js"
 import isESM from "./util/is-es-module.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
@@ -135,10 +136,18 @@ function createSetter(from, setter) {
 function runCJS(runtime, moduleWrapper) {
   const { entry } = runtime
   const { module:mod, options } = entry
-  const loader = options.cjs.vars ? loadESM : loadCJS
-  const requirer = (id) => moduleImport(id, mod, loader, options).exports
-  const req = makeRequireFunction(mod, requirer)
   const exported = mod.exports = entry.exports
+  const loader = options.cjs.vars ? loadESM : loadCJS
+  const req = makeRequireFunction(mod, (id) => {
+    const child = moduleImport(id, mod, loader, options)
+
+    if (! options.cjs.vars &&
+        isESM(child.exports)) {
+      throw new errors.Error("ERR_REQUIRE_ESM", child.filename)
+    }
+
+    return child.exports
+  })
 
   moduleWrapper.call(exported, exported, req)
   mod.loaded = true
