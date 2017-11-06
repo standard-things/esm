@@ -29,7 +29,7 @@ describe("REPL hook", () => {
     const r = repl.start({ useGlobal: true })
     const code = 'import { default as globalAssert } from "assert"'
 
-    Runtime.enable(r.context.module, {}, {})
+    Runtime.enable(r.context.module, {}, { cjs: {} })
 
     assert.strictEqual(typeof globalAssert, "undefined")
 
