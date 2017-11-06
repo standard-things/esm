@@ -29,7 +29,7 @@ function runMain(args) {
 }
 
 describe("module.runMain hook", () => {
-  it("should work with Node -r and --require requireFlags", () => {
+  it("should work with Node -r and --require", () => {
     const runs = requireFlags.map((requireFlag) => [
       requireFlag, "../index.js",
       "./fixture/main.mjs"
