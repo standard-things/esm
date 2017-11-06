@@ -12,7 +12,7 @@ import { version } from "./version.js"
 
 const defaultOptions = {
   cache: ".esm-cache",
-  cjs: createCJSObject(false),
+  cjs: createCJSOptions(false),
   debug: false,
   esm: "mjs",
   sourceMap: void 0,
@@ -130,8 +130,7 @@ class PkgInfo {
   }
 }
 
-function createCJSObject(value) {
-  const object = new NullObject
+function createCJSOptions(value, object = {}) {
   object.babel =
   object.cache =
   object.extensions =
@@ -151,7 +150,7 @@ function createOptions(options) {
   } else {
     if (has(options, "cjs")) {
       cjsObject = typeof options.cjs === "boolean"
-        ? createCJSObject(options.cjs)
+        ? createCJSOptions(options.cjs, new NullObject)
         : createOptions(options.cjs, defaultOptions.cjs)
     }
 
