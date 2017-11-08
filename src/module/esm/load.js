@@ -3,9 +3,11 @@ import { extname as _extname, dirname } from "path"
 import Entry from "../../entry.js"
 
 import _load from "../_load.js"
+import env from "../../env.js"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
+import has from "../../util/has.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import moduleState from "../state.js"
@@ -109,10 +111,21 @@ function loader(filePath, url, options, preload) {
     ext = ".js"
   }
 
+  if (env.cli) {
+    extensions[ext](mod, filePath)
+    mod.loaded = true
+    return
+  }
+
   const { _compile } = mod
+  const shouldRestore = has(mod, "_compile")
 
   mod._compile = (content, filePath) => {
-    mod._compile = _compile
+    if (shouldRestore) {
+      mod._compile = _compile
+    } else {
+      delete mod._compile
+    }
 
     const func = typeof mod[compileSym] === "function"
       ? mod[compileSym]
