@@ -89,8 +89,9 @@ class Entry {
     return entry
   }
 
-  static has(key) {
-    return entryMap.has(key)
+  static has(mod) {
+    const exported = mod.exports
+    return entryMap.has(isObjectLike(exported) ? exported : mod)
   }
 
   static set(mod, exported, entry) {

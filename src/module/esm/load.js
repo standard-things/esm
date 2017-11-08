@@ -41,7 +41,7 @@ function load(id, parent, isMain, options, preload) {
 
   if (child &&
       isESM(child.exports) &&
-      ! Entry.has(child.exports)) {
+      ! Entry.has(child)) {
     delete __non_webpack_require__.cache[cacheId]
   }
 

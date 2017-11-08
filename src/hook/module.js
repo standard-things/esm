@@ -107,7 +107,7 @@ function hook(Module, parent, options) {
       }
     }
 
-    if (! Entry.has(mod.exports)) {
+    if (! Entry.has(mod)) {
       const entry = Entry.get(mod)
       entry.url = getURLFromFilePath(filePath)
     }
