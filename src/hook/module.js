@@ -26,7 +26,6 @@ import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
-import loadCJS from "../module/cjs/load.js"
 import loadESM from "../module/esm/load.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleImport from "../module/import.js"
@@ -39,7 +38,8 @@ import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 
 const { compile } = compiler
-const extSym = Symbol.for("@std/esm:extensions")
+const compileSym = Symbol.for('@std/esm:module._compile')
+const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
 
 const extDescriptor = {
   configurable: false,
@@ -109,7 +109,7 @@ function hook(Module, parent, options) {
     }
 
     if (! Entry.has(mod.exports)) {
-      load(mod, filePath, type, options)
+      load(mod, filePath, options)
       return
     }
 
@@ -142,16 +142,7 @@ function hook(Module, parent, options) {
       return
     }
 
-    const { _compile } = mod
-    const shouldRestore = has(mod, "_compile")
-
-    mod._compile = (content, filePath) => {
-      if (shouldRestore) {
-        mod._compile = _compile
-      } else {
-        delete mod._compile
-      }
-
+    mod[compileSym] = (content, filePath) => {
       cached = tryCompileCode(manager, content, {
         cacheFileName,
         cachePath,
@@ -178,8 +169,7 @@ function hook(Module, parent, options) {
     }
   }
 
-  function load(mod, filePath, type, options) {
-    const loader = type === "script" ? loadCJS : loadESM
+  function load(mod, filePath, options) {
     const { parent } = mod
     const childCount = parent ? parent.children.length : 0
 
@@ -193,7 +183,7 @@ function hook(Module, parent, options) {
       delete __non_webpack_require__.cache[filePath]
     }
 
-    mod.exports = moduleImport(filePath, parent, loader, options, (newMod) => {
+    mod.exports = moduleImport(filePath, parent, loadESM, options, (newMod) => {
       newMod.children = mod.children
 
       if (parent) {
@@ -357,7 +347,7 @@ function hook(Module, parent, options) {
     const extCompiler = Wrapper.unwrap(_extensions, ext)
 
     if (extCompiler) {
-      let passthru = ! extCompiler[extSym]
+      let passthru = ! extCompiler[mjsSym]
 
       if (passthru &&
           ext === ".mjs") {
@@ -389,6 +379,6 @@ function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, extSym, extDescriptor)
+setProperty(mjsCompiler, mjsSym, extDescriptor)
 
 export default hook

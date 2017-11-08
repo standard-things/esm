@@ -7,7 +7,7 @@ import extname from "../../path/extname.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 
-const extSym = Symbol.for("@std/esm:extensions")
+const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
 
 function load(id, parent, isMain, options, preload) {
   let called = false
@@ -47,7 +47,7 @@ function loader(filePath, options, preload) {
 
   let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
 
-  if (extCompiler[extSym] &&
+  if (extCompiler[mjsSym] &&
       (options.cjs.extensions || options.esm !== "mjs")) {
     extCompiler = extensions[ext]
   }

@@ -15,6 +15,8 @@ import setGetter from "../../util/set-getter.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
+const compileSym = Symbol.for("@std/esm:module._compile")
+
 function load(id, parent, isMain, options, preload) {
   const filePath = resolveFilename(id, parent, isMain, options)
   const queryHash = getQueryHash(id)
@@ -105,6 +107,18 @@ function loader(filePath, url, options, preload) {
   if (ext === "" ||
       typeof extensions[ext] !== "function") {
     ext = ".js"
+  }
+
+  const { _compile } = mod
+
+  mod._compile = (content, filePath) => {
+    mod._compile = _compile
+
+    const func = typeof mod[compileSym] === "function"
+      ? mod[compileSym]
+      : _compile
+
+    return func.call(mod, content, filePath)
   }
 
   extensions[ext](mod, filePath)
