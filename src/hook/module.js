@@ -20,15 +20,14 @@ import extname from "../path/extname.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
+import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
-import loadESM from "../module/esm/load.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import moduleImport from "../module/import.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
@@ -109,8 +108,8 @@ function hook(Module, parent, options) {
     }
 
     if (! Entry.has(mod.exports)) {
-      load(mod, filePath, options)
-      return
+      const entry = Entry.get(mod)
+      entry.url = getURLFromFilePath(filePath)
     }
 
     const { cache, cachePath } = pkgInfo
@@ -180,41 +179,6 @@ function hook(Module, parent, options) {
       tryPassthru.call(this, func, args, options)
     } else {
       mod._compile(readCode(filePath, options), filePath)
-    }
-  }
-
-  function load(mod, filePath, options) {
-    const { parent } = mod
-    const childCount = parent ? parent.children.length : 0
-
-    if (moduleState.cache[filePath] &&
-        ! moduleState.cache[filePath].loaded) {
-      delete moduleState.cache[filePath]
-    }
-
-    if (__non_webpack_require__.cache[filePath] &&
-        ! __non_webpack_require__.cache[filePath].loaded) {
-      delete __non_webpack_require__.cache[filePath]
-    }
-
-    mod.exports = moduleImport(filePath, parent, loadESM, options, (newMod) => {
-      newMod.children = mod.children
-
-      if (parent) {
-        parent.children.length = childCount
-      }
-
-      if (has(mod, "_compile")) {
-        newMod._compile = mod._compile
-      }
-    }).exports
-
-    if (filePath in moduleState.cache) {
-      moduleState.cache[filePath] = mod
-    }
-
-    if (filePath in __non_webpack_require__.cache) {
-      __non_webpack_require__.cache[filePath] = mod
     }
   }
 
