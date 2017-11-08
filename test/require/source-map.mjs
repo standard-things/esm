@@ -19,6 +19,7 @@ export default () => {
     delete esmRequire.cache[defId]
 
     esmRequire.extensions[".mjs"](mod, abcId)
+    mod.exports = {}
     esmRequire.extensions[".js"](mod, defId)
   })
 }
