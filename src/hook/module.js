@@ -38,7 +38,7 @@ import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 
 const { compile } = compiler
-const compileSym = Symbol.for('@std/esm:module._compile')
+const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
 
 const extDescriptor = {
@@ -142,7 +142,21 @@ function hook(Module, parent, options) {
       return
     }
 
-    mod[compileSym] = (content, filePath) => {
+    const shouldOverwrite = env.cli
+    const shouldRestore = shouldOverwrite && has(mod, "_compile")
+
+    const { _compile } = mod
+    const key = shouldOverwrite ? "_compile" : compileSym
+
+    mod[key] = (content, filePath) => {
+      if (shouldOverwrite) {
+        if (shouldRestore) {
+          mod._compile = _compile
+        } else {
+          delete mod._compile
+        }
+      }
+
       cached = tryCompileCode(manager, content, {
         cacheFileName,
         cachePath,
