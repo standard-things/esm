@@ -40,13 +40,6 @@ const { compile } = compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
 
-const extDescriptor = {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
-}
-
 function hook(Module, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
@@ -141,13 +134,11 @@ function hook(Module, parent, options) {
       return
     }
 
+    const { _compile } = mod
     const shouldOverwrite = env.cli
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
-    const { _compile } = mod
-    const key = shouldOverwrite ? "_compile" : compileSym
-
-    mod[key] = (content, filePath) => {
+    const compileWrapper = (content, filePath) => {
       if (shouldOverwrite) {
         if (shouldRestore) {
           mod._compile = _compile
@@ -173,6 +164,12 @@ function hook(Module, parent, options) {
       }
 
       tryCompileCached(mod, cached, filePath, runtimeAlias, options)
+    }
+
+    if (shouldOverwrite) {
+      mod._compile = compileWrapper
+    } else {
+      setProperty(mod, compileSym, { enumerable: false, value: compileWrapper })
     }
 
     if (passthruMap.get(func)) {
@@ -357,6 +354,11 @@ function mjsCompiler(mod, filePath) {
   throw new errors.Error("ERR_REQUIRE_ESM", filePath)
 }
 
-setProperty(mjsCompiler, mjsSym, extDescriptor)
+setProperty(mjsCompiler, mjsSym, {
+  configurable: false,
+  enumerable: false,
+  value: true,
+  writable: false
+})
 
 export default hook

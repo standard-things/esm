@@ -5,6 +5,7 @@ import NullObject from "./null-object.js"
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
+import setProperty from "./util/set-property.js"
 import { version } from "./version.js"
 
 const wrapSym = Symbol.for("@std/esm:wrapper")
@@ -25,12 +26,12 @@ class Wrapper {
   }
 
   static manage(object, key, wrapper) {
-    const raw = Wrapper.unwrap(object, key)
+    const value = Wrapper.unwrap(object, key)
     const manager = function (...args) {
-      return wrapper.call(this, manager, raw, args)
+      return wrapper.call(this, manager, value, args)
     }
 
-    manager[wrapSym] = raw
+    setProperty(manager, wrapSym, { enumerable: false, value })
     object[key] = manager
   }
 
@@ -62,7 +63,9 @@ function createMap(object, key) {
 }
 
 function createStore(object) {
-  return object[wrapSym] = new NullObject
+  const value = new NullObject
+  setProperty(object, wrapSym, { enumerable: false, value })
+  return value
 }
 
 function getMap(object, key) {
