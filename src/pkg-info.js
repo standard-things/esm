@@ -131,11 +131,11 @@ class PkgInfo {
 }
 
 function createCJS(value, object = {}) {
-  object.babel =
   object.cache =
   object.extensions =
-  object.globalPaths =
+  object.interop =
   object.namedExports =
+  object.paths =
   object.topLevelReturn =
   object.vars = value
   return object

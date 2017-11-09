@@ -189,7 +189,7 @@ class Entry {
       const exported = this.exports
       assign(exported, this._namespace)
 
-      if (this.options.cjs.babel &&
+      if (this.options.cjs.interop &&
           ! has(exported, "__esModule")) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
@@ -314,7 +314,7 @@ function assignExportsToNamespace(entry) {
 
   const inModule =
     entry.esm ||
-    !! (entry.options.cjs.babel &&
+    !! (entry.options.cjs.interop &&
     has(exported, "__esModule") &&
     exported.__esModule)
 
