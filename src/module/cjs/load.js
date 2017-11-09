@@ -7,7 +7,7 @@ import extname from "../../path/extname.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 
-const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
+const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
 
 function load(id, parent, isMain, options, preload) {
   let called = false

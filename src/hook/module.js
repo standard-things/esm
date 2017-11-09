@@ -38,7 +38,7 @@ import stat from "../fs/stat.js"
 
 const { compile } = compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
-const mjsSym = Symbol.for('@std/esm:module._extensions[".js"]')
+const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
 
 function hook(Module, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
