@@ -336,8 +336,15 @@ function assignExportsToNamespace(entry) {
   for (const name of names) {
     if (safe) {
       _namespace[name] = exported[name]
-    } else if (inModule || name !== "default") {
-      assignProperty(_namespace, exported, name)
+    } else if ((inModule || name !== "default") &&
+        ! has(_namespace, name)) {
+      setGetter(_namespace, name, () => {
+        return exported[name]
+      })
+
+      setSetter(_namespace, name, (value) => {
+        exported[name] = value
+      })
     }
 
     if (! (name in getters)) {
