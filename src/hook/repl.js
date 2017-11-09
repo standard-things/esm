@@ -15,9 +15,10 @@ import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
 const { compile } = compiler
+const { now } = Date
 
 function hook(vm) {
-  const md5Hash = md5(Date.now().toString()).slice(0, 3)
+  const md5Hash = md5(now().toString()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeId("_" + md5Hash)
 
