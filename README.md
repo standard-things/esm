@@ -3,7 +3,8 @@
 This fast, small, zero-dependency package is all you need to enable
 ES modules in Node 4+ today!
 
-:book: See the [release post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
+See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
+:book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
 for all the details.
 
 Getting started
