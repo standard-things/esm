@@ -1,21 +1,22 @@
 {
   "plugins": [
-    "transform-class-properties",
+    "@babel/proposal-class-properties",
+    ["@babel/transform-block-scoping", {
+      "throwIfClosureRequired": false
+    }],
     "transform-for-of-as-array"
   ],
   "presets": [
-    ["env", {
+    ["@babel/env", {
       "loose": true,
       "modules": false,
       "exclude": [
-        "check-es2015-constants",
-        "syntax-trailing-function-commas",
+        "check-constants",
         "transform-async-to-generator",
-        "transform-es2015-block-scoping",
-        "transform-es2015-classes",
-        "transform-es2015-for-of",
-        "transform-es2015-function-name",
-        "transform-es2015-object-super",
+        "transform-classes",
+        "transform-for-of",
+        "transform-function-name",
+        "transform-object-super",
         "transform-regenerator"
       ],
       "targets": { "node": 4 }
