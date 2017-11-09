@@ -223,7 +223,7 @@ class Entry {
       // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
       const { _namespace } = this
       const names = sort.call(keys(_namespace))
-      const safe = isSafe(this)
+      const safe = this.esm
 
       for (const name of names) {
         if (safe) {
@@ -329,7 +329,7 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const safe = isSafe(entry)
+  const safe = entry.esm
   const object = entry._loaded === 1 ? _namespace : exported
   const names = keys(object)
 
@@ -388,10 +388,6 @@ function getExportByName(entry, setter, name) {
   }
 
   return value
-}
-
-function isSafe(entry) {
-  return entry.esm && ! entry.options.cjs
 }
 
 function mergeProperty(entry, otherEntry, key) {
