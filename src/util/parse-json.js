@@ -1,10 +1,8 @@
-import toString from "./to-string.js"
-
 const { parse } = JSON
 
 function parseJSON(string) {
   try {
-    return parse(toString(string))
+    return parse(string)
   } catch (e) {}
 
   return null

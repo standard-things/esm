@@ -17,7 +17,7 @@ import wrap from "../util/wrap.js"
 const { compile } = compiler
 
 function hook(vm) {
-  const md5Hash = md5(Date.now()).slice(0, 3)
+  const md5Hash = md5(Date.now().toString()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeAlias = encodeId("_" + md5Hash)
 
@@ -45,7 +45,7 @@ function hook(vm) {
     }
 
     const cache = pkgInfo.cache
-    const cacheFileName = getCacheFileName(null, code, pkgInfo)
+    const cacheFileName = getCacheFileName("", code, pkgInfo)
     const cacheValue = cache[cacheFileName]
 
     let output

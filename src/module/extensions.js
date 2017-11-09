@@ -10,7 +10,7 @@ const { parse } = JSON
 const extensions = new FastObject
 
 extensions[".js"] = (mod, filePath) => {
-  mod._compile(stripBOM(fs.readFileSync(filePath)), filePath)
+  mod._compile(stripBOM(fs.readFileSync(filePath, "utf8")), filePath)
 }
 
 extensions[".json"] = (mod, filePath) => {

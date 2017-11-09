@@ -14,7 +14,7 @@ function getCacheFileName(filePath, cacheKey, pkgInfo) {
     cacheKey
   )
 
-  const ext = typeof filePath === "string" ? extname(filePath) : ".js"
+  const ext = extname(filePath) || ".js"
   return pathHash.slice(0, 8) + stateHash.slice(0, 8) + ext
 }
 

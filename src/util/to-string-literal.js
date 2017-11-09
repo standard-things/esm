@@ -1,5 +1,3 @@
-import toString from "./to-string.js"
-
 const codeOfDoubleQuote = '"'.charCodeAt(0)
 
 const { stringify } = JSON
@@ -22,7 +20,7 @@ const quoteMap = {
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'
-  const string = stringify(toString(value))
+  const string = stringify(value)
 
   if (quote === '"' &&
       string.charCodeAt(0) === codeOfDoubleQuote) {

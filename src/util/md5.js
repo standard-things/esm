@@ -1,9 +1,8 @@
 import { createHash } from "crypto"
-import toString from "./to-string.js"
 
-function md5(value) {
+function md5(string) {
   return createHash("md5")
-    .update(toString(value))
+    .update(string)
     .digest("hex")
 }
 
