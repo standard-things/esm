@@ -16,8 +16,14 @@ function hook(parent, options) {
     }
 
     const filePath = resolveFilename(id, parent, false, options)
-    const pkgInfo = options ? null : PkgInfo.get(dirname(filePath))
-    const loadOptions = pkgInfo ? pkgInfo.options : options
+
+    const pkgInfo = options
+      ? null
+      : PkgInfo.get(dirname(filePath))
+
+    const loadOptions = pkgInfo
+      ? pkgInfo.options
+      : (options || PkgInfo.defaultOptions)
 
     return loadESM(filePath, parent, false, loadOptions).exports
   })
