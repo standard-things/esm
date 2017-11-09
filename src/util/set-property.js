@@ -1,5 +1,4 @@
 import createOptions from "./create-options.js"
-import isObjectLike from "./is-object-like.js"
 
 const { defineProperty } = Object
 
@@ -11,12 +10,8 @@ const defaultDescriptor = {
 }
 
 function setProperty(object, key, descriptor) {
-  if (isObjectLike(object)) {
-    descriptor = createOptions(descriptor, defaultDescriptor)
-    defineProperty(object, key, descriptor)
-  }
-
-  return object
+  descriptor = createOptions(descriptor, defaultDescriptor)
+  return defineProperty(object, key, descriptor)
 }
 
 export default setProperty

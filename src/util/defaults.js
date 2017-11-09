@@ -1,12 +1,6 @@
-import isObjectLike from "./is-object-like.js"
-
 const { hasOwnProperty } = Object.prototype
 
 function defaults(object) {
-  if (! isObjectLike(object)) {
-    return object
-  }
-
   let i = 0
   const argCount = arguments.length
 

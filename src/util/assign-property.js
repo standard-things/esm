@@ -1,14 +1,8 @@
 import has from "./has.js"
-import isObjectLike from "./is-object-like.js"
 
 const { defineProperty, getOwnPropertyDescriptor } = Object
 
 function assignProperty(object, source, key) {
-  if (! isObjectLike(object) ||
-      ! isObjectLike(source)) {
-    return object
-  }
-
   const sourceDescriptor = getOwnPropertyDescriptor(source, key)
 
   if (sourceDescriptor) {
