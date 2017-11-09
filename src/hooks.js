@@ -3,7 +3,6 @@ import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
 import { dirname } from "path"
-import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import replHook from "./hook/repl.js"
@@ -11,6 +10,8 @@ import requireHook from "./hook/require.js"
 import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
+
+const { keys } = Object
 
 const hooks = new FastObject
 

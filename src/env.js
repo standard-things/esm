@@ -6,7 +6,6 @@ import binding from "./binding.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import isPath from "./util/is-path.js"
-import keys from "./util/keys.js"
 import normalize from "./path/normalize.js"
 import parseJSON from "./util/parse-json.js"
 import readJSON from "./fs/read-json.js"
@@ -21,11 +20,12 @@ const debugArgRegExp = /^--(?:debug|inspect)(?:-brk)?$/
 
 const { children, id } = rootModule
 const { argv } = process
+const { isArray } = Array
+const { keys } = Object
 const { parent } = __non_webpack_module__
 
 const args = argv.slice(2)
 const inspectorBinding = binding.inspector
-const { isArray } = Array
 
 const esmPath = __non_webpack_module__.filename
 const [, filePath] = argv

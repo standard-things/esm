@@ -11,7 +11,6 @@ import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isESM from "./util/is-es-module.js"
 import isObjectLike from "./util/is-object-like.js"
-import keys from "./util/keys.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -20,7 +19,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
-const { is, seal } = Object
+const { is, keys, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
 

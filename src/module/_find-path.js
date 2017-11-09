@@ -8,7 +8,6 @@ import FastObject from "../fast-object.js"
 
 import binding from "../binding.js"
 import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
-import keys from "../util/keys.js"
 import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
@@ -16,6 +15,7 @@ import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
+const { keys } = Object
 const { parse } = JSON
 const { preserveSymlinks } = binding.config
 
