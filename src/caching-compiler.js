@@ -9,9 +9,12 @@ const { compile } = compiler
 
 class Compiler {
   static compile(code, options) {
-    return typeof options.filePath === "string"
-      ? compileAndWrite(code, options)
-      : compileAndCache(code, options)
+    if (typeof options.cachePath === "string" &&
+        typeof options.filePath === "string") {
+      return compileAndWrite(code, options)
+    }
+
+    return compileAndCache(code, options)
   }
 }
 
