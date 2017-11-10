@@ -95,9 +95,11 @@ describe("package.json", () => {
   it("should support `@std/esm` package options", () =>
     Promise.all([
       "@std-esm-object",
-      "@std-esm-string",
+      "@std-esm-string-cjs",
+      "@std-esm-string-js",
       "@std-object",
-      "@std-string"
+      "@std-string-cjs",
+      "@std-string-js"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
