@@ -7,6 +7,8 @@ import moduleState from "./state.js"
 import resolveFilename from "./resolve-filename.js"
 
 function makeRequireFunction(mod, requirer = mod.require) {
+  const Ctor = mod.constructor
+
   function req(id) {
     moduleState.requireDepth += 1
 
@@ -26,7 +28,7 @@ function makeRequireFunction(mod, requirer = mod.require) {
   }
 
   req.cache = __non_webpack_require__.cache
-  req.extensions = __non_webpack_require__.extensions
+  req.extensions = Ctor._extensions
   req.main = process.mainModule
   req.resolve = resolve
 
