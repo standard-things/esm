@@ -20,16 +20,16 @@ Getting started
      module.exports = require("./main.mjs").default
      ```
 
-     By default, `@std/esm` **only** processes files of packages that opt-in
-     with a `@std/esm` options object or `@std/esm` as a dependency, dev
-     dependency, or peer dependency in their package.json. However, you can
-     enable processing **all** files with specific options by passing an options
-     object as the second argument or passing `true` to use the options from
-     your package.json.
+By default, `@std/esm` **only** processes files of packages that opt-in
+with a `@std/esm` options object or `@std/esm` as a dependency, dev
+dependency, or peer dependency in their package.json. However, you can
+enable processing **all** files with specific options by passing an options
+object as the second argument or passing `true` to use the options from
+your package.json.
 
-     ```js
-     require = require("@std/esm")(module, optionsOrTrue)
-     ```
+```js
+require = require("@std/esm")(module, optionsOrTrue)
+```
 
 Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
