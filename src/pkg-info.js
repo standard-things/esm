@@ -146,7 +146,11 @@ function createOptions(options) {
   let sourceMap
 
   if (typeof options === "string") {
-    options = { esm: options }
+    if (options === "cjs") {
+      options = { cjs: true, esm: "js" }
+    } else {
+      options = { esm: options }
+    }
   } else {
     if (has(options, "cjs")) {
       cjsOptions = typeof options.cjs === "boolean"
