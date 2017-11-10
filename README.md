@@ -141,6 +141,10 @@ DevOpts
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"cache":</code></td>
+  <td><p>A boolean for toggling the <code>.esm-cache</code> <i>(default: <code>true</code>).</i></p></td>
+</tr>
+<tr>
   <td valign="top"><code>"debug":</code></td>
   <td><p>A boolean for unmasking stack traces.</p></td>
 </tr>
