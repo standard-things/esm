@@ -141,6 +141,10 @@ DevOpts
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"cache":</code></td>
+  <td><p>A boolean for enabling the cache. <i>default: true</i></p></td>
+</tr>
+<tr>
   <td valign="top"><code>"debug":</code></td>
   <td><p>A boolean for unmasking stack traces.</p></td>
 </tr>
