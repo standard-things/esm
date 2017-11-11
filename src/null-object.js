@@ -1,7 +1,11 @@
 const { create } = Object
 
-function NullObject() {
-  return create(null)
+class NullObject {
+  constructor() {
+    return create(null)
+  }
 }
+
+Object.setPrototypeOf(NullObject.prototype, null)
 
 export default NullObject
