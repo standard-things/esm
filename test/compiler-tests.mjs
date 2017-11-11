@@ -11,9 +11,28 @@ describe("compiler", () => {
       const result = compile('import"a"', { type })
       assert.strictEqual(result.esm, true)
     })
+  })
 
+  it('should support `options.type` of "module"', () => {
+    const tests = [
+      "1+2",
+      "1+2//import",
+      '"use module";1+2',
+      "'use module';1+2",
+      '"use script";1+2',
+      "'use script';1+2"
+    ]
+
+    tests.forEach((code) => {
+      const result = compile(code, { type: "module" })
+      assert.strictEqual(result.esm, true)
+    })
+  })
+
+  it('should support `options.type` of "unambiguous"', () => {
     const tests = [
       { code: "1+2", esm: false },
+      { code: "1+2//import", esm: false },
       { code: "1+2", esm: true, hint: "module" },
       { code: '"use module";1+2', esm: true },
       { code: "'use module';1+2", esm: true, hint: "module" },
@@ -22,11 +41,8 @@ describe("compiler", () => {
     ]
 
     tests.forEach((data) => {
-      let result = compile(data.code, { hint: data.hint, type: "unambiguous" })
+      const result = compile(data.code, { hint: data.hint, type: "unambiguous" })
       assert.strictEqual(result.esm, data.esm)
-
-      result = compile(data.code, { type: "module" })
-      assert.strictEqual(result.esm, true)
     })
   })
 

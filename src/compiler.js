@@ -50,8 +50,11 @@ class Compiler {
     }
 
     if (type === "unambiguous" &&
-        hint !== "module" &&
-        ! hasPragma(code, "use module") &&
+        (hint === "module" || hasPragma(code, "use module"))) {
+      type = "module"
+    }
+
+    if (type === "unambiguous" &&
         ! importExportRegExp.test(code)) {
       return result
     }
@@ -68,10 +71,6 @@ class Compiler {
     try {
       ast = Parser.parse(code, parserOptions)
       threw = false
-
-      if (type === "unambiguous") {
-        type = "module"
-      }
     } catch (e) {
       error = e
     }
@@ -90,17 +89,20 @@ class Compiler {
       throw error
     }
 
-    const esm = type === "module"
     const rootPath = new FastPath(ast)
     const { runtimeAlias } = options
 
     importExportVisitor.visit(rootPath, code, {
-      esm,
+      esm: type !== "script",
       generateVarDeclarations: options.var,
       runtimeAlias
     })
 
     if (importExportVisitor.addedImportExport) {
+      if (type === "unambiguous") {
+        type = "module"
+      }
+
       assignmentVisitor.visit(rootPath, {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
         importedLocalNames: importExportVisitor.importedLocalNames,
@@ -111,7 +113,7 @@ class Compiler {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (esm) {
+    if (type === "module") {
       result.esm = true
 
       if (options.warnings &&
