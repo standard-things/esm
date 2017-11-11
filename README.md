@@ -130,6 +130,68 @@ in your package.json.
 </tr>
 </table>
 
+Advanced
+---
+
+<table>
+<tr>
+  <td colspan="2">
+    <pre><code>{
+  "@std/esm": {
+    "cjs": {</code></pre>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"cache":</code></td>
+  <td>
+    <p>A boolean for storing ES modules on <code>require.cache</code>.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"extensions":</code></td>
+  <td>
+    <p>A boolean for respecting <code>require.extensions</code> in ES modules.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"interop":</code></td>
+  <td>
+    <p>A boolean for respecting <code>__esModule</code>.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"namedExports":</code></td>
+  <td>
+    <p>A boolean for supporting named exports of CJS modules.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"paths":</code></td>
+  <td>
+    <p>A boolean for following CJS path rules in ES modules.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"topLevelReturn":</code></td>
+  <td>
+    <p>A boolean for top level <code>return</code> support.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"vars":</code></td>
+  <td>
+    <p>A boolean for exposing variables like <code>__dirname</code> and <code>__filename</code> in ES modules.</p>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <pre><code>    }
+  }
+}</code></pre>
+  </td>
+</tr>
+</table>
+
 DevOpts
 ---
 
@@ -142,11 +204,15 @@ DevOpts
 </tr>
 <tr>
   <td valign="top"><code>"cache":</code></td>
-  <td><p>A boolean for toggling the <code>.esm-cache</code> <i>(default: <code>true</code>).</i></p></td>
+  <td>
+    <p>A boolean for toggling the <code>.esm-cache</code> <i>(default: <code>true</code>).</i></p>
+  </td>
 </tr>
 <tr>
   <td valign="top"><code>"debug":</code></td>
-  <td><p>A boolean for unmasking stack traces.</p></td>
+  <td>
+    <p>A boolean for unmasking stack traces.</p>
+  </td>
 </tr>
 <tr>
   <td valign="top"><code>"sourceMap":</code></td>
