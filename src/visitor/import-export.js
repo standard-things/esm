@@ -1,12 +1,13 @@
 import MagicString from "../magic-string.js"
 import NullObject from "../null-object.js"
-import OrderedMap from "../ordered-map.js"
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import toStringLiteral from "../util/to-string-literal.js"
 
 const codeOfCR = "\r".charCodeAt(0)
+
+const { keys } = Object
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
@@ -121,7 +122,7 @@ class ImportExportVisitor extends Visitor {
       // code in the exporting module, so we must avoid compiling it to a
       // named function or class expression.
       hoistExports(this, path,
-        addToSpecifierMap(new OrderedMap, "default", id.name),
+        addToSpecifierMap(new NullObject, "default", id.name),
         "declaration"
       )
 
@@ -159,7 +160,7 @@ class ImportExportVisitor extends Visitor {
     const { declaration } = node
 
     if (declaration) {
-      const specifierMap = new OrderedMap
+      const specifierMap = new NullObject
       const { id, type } = declaration
 
       if (id && (type === "ClassDeclaration" ||
@@ -202,11 +203,11 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    const newMap = new OrderedMap
-    const names = specifierMap.keys()
+    const newMap = new NullObject
+    const names = keys(specifierMap)
 
     for (const name of names) {
-      const locals = specifierMap.get(name).keys()
+      const locals = keys(specifierMap[name])
 
       addToSpecifierMap(
         newMap,
@@ -237,10 +238,10 @@ class ImportExportVisitor extends Visitor {
 
 function addExportedLocalNames(visitor, specifierMap) {
   const { exportedLocalNames } = visitor
-  const names = specifierMap.keys()
+  const names = keys(specifierMap)
 
   for (const name of names) {
-    const locals = specifierMap.get(name).keys()
+    const locals = keys(specifierMap[name])
 
     // It's tempting to record the exported name as the value here,
     // instead of true, but there can be more than one exported name
@@ -253,10 +254,10 @@ function addExportedLocalNames(visitor, specifierMap) {
 
 function addImportedLocalNames(visitor, specifierMap) {
   const { importedLocalNames } = visitor
-  const names = specifierMap.keys()
+  const names = keys(specifierMap)
 
   for (const name of names) {
-    const locals = specifierMap.get(name).keys()
+    const locals = keys(specifierMap[name])
 
     for (const local of locals) {
       importedLocalNames[local] = true
@@ -269,15 +270,15 @@ function addNameToMap(map, name) {
 }
 
 function addToSpecifierMap(map, __ported, local) {
-  const locals = map.get(__ported) || new OrderedMap
-  locals.set(local, true)
-  return map.set(__ported, locals)
+  const locals = map[__ported] || (map[__ported] = new NullObject)
+  locals[local] = true
+  return map
 }
 
 // Returns a map from {im,ex}ported identifiers to lists of local variable
 // names bound to those identifiers.
 function computeSpecifierMap(specifiers) {
-  const specifierMap = new OrderedMap
+  const specifierMap = new NullObject
 
   for (const s of specifiers) {
     const local =
@@ -338,7 +339,7 @@ function getBlockBodyInfo(visitor, path) {
   const bodyInfo = visitor.bodyInfo = new NullObject
   bodyInfo.insertCharIndex = insertCharIndex
   bodyInfo.insertNodeIndex = insertNodeIndex
-  bodyInfo.hoistedExportsMap = new OrderedMap
+  bodyInfo.hoistedExportsMap = new NullObject
   bodyInfo.hoistedExportsString = ""
   bodyInfo.hoistedImportsString = ""
   bodyInfo.hoistedPrefixString = hoistedPrefixString
@@ -372,10 +373,10 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     return
   }
 
-  const names = mapOrString.keys()
+  const names = keys(mapOrString)
 
   for (const name of names) {
-    const locals = mapOrString.get(name).keys()
+    const locals = keys(mapOrString[name])
 
     addToSpecifierMap(
       bodyInfo.hoistedExportsMap,
@@ -467,7 +468,7 @@ function safeParam(param, locals) {
 }
 
 function toModuleImport(visitor, code, specifierMap) {
-  const names = specifierMap.keys()
+  const names = keys(specifierMap)
 
   code = visitor.runtimeAlias + ".w(" + code
 
@@ -481,7 +482,7 @@ function toModuleImport(visitor, code, specifierMap) {
   code += ",["
 
   for (const name of names) {
-    const locals = specifierMap.get(name).keys()
+    const locals = keys(specifierMap[name])
     const valueParam = safeParam("v", locals)
 
     /* eslint-disable lines-around-comment */
@@ -505,7 +506,7 @@ function toModuleImport(visitor, code, specifierMap) {
 }
 
 function toModuleExport(visitor, specifierMap) {
-  const names = specifierMap.keys()
+  const names = keys(specifierMap)
 
   let code = ""
 
@@ -519,7 +520,7 @@ function toModuleExport(visitor, specifierMap) {
   code += visitor.runtimeAlias + ".e(["
 
   for (const name of names) {
-    const locals = specifierMap.get(name).keys()
+    const locals = keys(specifierMap[name])
 
     code +=
       "[" + toStringLiteral(name) + ",()=>" +
