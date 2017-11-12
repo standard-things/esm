@@ -107,7 +107,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"cjs":</code></td>
   <td>
-    <p>A boolean to support <a href="#cjs-options">CJS features</a> in ESM.</p>
+    <p>A boolean to <a href="#cjs-unlockables">unlock CJS features</a> in ESM.</p>
   </td>
 </tr>
 <tr>
@@ -131,7 +131,7 @@ Commonly used options may be specified in shorthand form:
 </tr>
 </table>
 
-CJS Options
+CJS Unlockables
 ---
 
 The `"cjs"` option may also be specified as an object.
