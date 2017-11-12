@@ -31,7 +31,11 @@ const NODE_PATH = [
 
 const trashPaths = globby.sync([
   "**/.?(esm-)cache",
-  "test/**/*.gz"
+  "**/.nyc_output",
+  "test/**/*.gz",
+  "test/node_modules/**/node_modules",
+  "test/node_modules/**/package-lock.json",
+  "test/node_modules/nyc-typescript-esm/**/*.js"
 ], {
   cwd: rootPath,
   realpath: true
