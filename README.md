@@ -250,5 +250,5 @@ Tips
 * Load `@std/esm` with the *“require”* option of [AVA](https://github.com/avajs/ava#options),
   [Mocha](https://mochajs.org/#-r---require-module-name), and [nyc](https://github.com/istanbuljs/nyc#require-additional-modules)
 * Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [tap](http://www.node-tap.org/cli/)
-* Use options `"@std/esm":{"cjs":{"cache":true}}` with [Mocha `--watch`](https://mochajs.org/#-w---watch)
+* Use options `"@std/esm":"cjs"` or `"@std/esm":{"cjs":{"cache":true}}` with the Mocha [`--watch` option](https://mochajs.org/#-w---watch)
 * When in doubt, use options `"@std/esm":"cjs"`
