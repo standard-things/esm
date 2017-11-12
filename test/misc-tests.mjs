@@ -14,7 +14,7 @@ const isWin = process.platform === "win32"
 
 const pkgJSON = JSON.parse(fs.readFileSync("../package.json"))
 const pkgPath = require.resolve("../")
-const skipOutsideDot = SemVer.satisfies(process.version, ">=9")
+const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
 
 const abcId = "./fixture/export/abc.mjs"
 const abcNs = createNamespace({

@@ -22,7 +22,7 @@ const { preserveSymlinks } = binding.config
 const packageCache = new FastObject
 const pathCache = new FastObject
 
-const skipOutsideDot = satisfies(process.version, ">=9")
+const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
 function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {

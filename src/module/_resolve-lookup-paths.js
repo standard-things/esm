@@ -11,7 +11,7 @@ import { satisfies } from "semver"
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-const skipOutsideDot = satisfies(process.version, ">=9")
+const skipOutsideDot = satisfies(process.version, ">=10")
 const { slice } = Array.prototype
 
 function _resolveLookupPaths(id, parent, skipGlobalPaths) {
