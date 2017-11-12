@@ -28,7 +28,7 @@ object as the second argument or passing `true` to use the options from
 your package.json.
 
 ```js
-require = require("@std/esm")(module, optionsOrTrue)
+require = require("@std/esm")(module, options)
 ```
 
 Enable ESM in the Node CLI by loading `@std/esm` with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
@@ -76,8 +76,8 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with `"@std/esm":optionsOrString` or
-`"@std":{"esm":optionsOrString}` in your package.json.
+Unlock extra features with `"@std/esm":options` or `"@std":{"esm":options}`
+in your package.json.
 
 Commonly used options may be specified in shorthand form:
 
