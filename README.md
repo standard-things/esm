@@ -102,23 +102,19 @@ in your package.json.
 <tr>
   <td valign="top"><code>"cjs":</code></td>
   <td>
-    <p>A boolean for CJS features in ESM:</p>
-    <ul>
-    <li><code>__dirname</code> and <code>__filename</code></li>
-    <li><code>require</code> in ESM and loading ESM with <code>require</code></li>
-    <li><a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">Importing named exports</a> of CJS modules</li>
-    <li><a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">Top-level <code>return</code></a></li>
-    </ul>
+    <p>A boolean to support <a href="#cjs-options">CJS features</a> in ESM.</p>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"await":</code></td>
-  <td><p>A boolean for top-level <code>await</code> in the main ES module.</p></td>
+  <td>
+    <p>A boolean to support top-level <code>await</code> in the main ES module.</p>
+  </td>
 </tr>
 <tr>
   <td valign="top"><code>"gz":</code></td>
   <td>
-    <p>A boolean for gzipped module support <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
+    <p>A boolean to support gzipped module <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
     <p><i>Note: Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a>.</i></p>
   </td>
 </tr>
@@ -130,8 +126,10 @@ in your package.json.
 </tr>
 </table>
 
-Advanced
+CJS Options
 ---
+
+The `"cjs"` option may also be specified as an object.
 
 <table>
 <tr>
@@ -144,7 +142,7 @@ Advanced
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for storing ES modules on <code>require.cache</code>.</p>
+    <p>A boolean for storing ES modules in <code>require.cache</code>.</p>
   </td>
 </tr>
 <tr>
@@ -156,31 +154,31 @@ Advanced
 <tr>
   <td valign="top"><code>"interop":</code></td>
   <td>
-    <p>A boolean for respecting <code>__esModule</code>.</p>
+    <p>A boolean for <code>__esModule</code> interoperability.</p>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"namedExports":</code></td>
   <td>
-    <p>A boolean for supporting named exports of CJS modules.</p>
+    <p>A boolean to support <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"paths":</code></td>
   <td>
-    <p>A boolean for following CJS path rules in ES modules.</p>
+    <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ES modules.</p>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"topLevelReturn":</code></td>
   <td>
-    <p>A boolean for top level <code>return</code> support.</p>
+    <p>A boolean to support <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"vars":</code></td>
   <td>
-    <p>A boolean for exposing variables like <code>__dirname</code> and <code>__filename</code> in ES modules.</p>
+    <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ES modules.</p>
   </td>
 </tr>
 <tr>
@@ -217,7 +215,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"sourceMap":</code></td>
   <td>
-    <p>A boolean for enabling inline source maps.</p>
+    <p>A boolean for including inline source maps.</p>
     <p><i>Note: Automatically enabled using the Node CLI
     <a href="https://nodejs.org/en/docs/inspector/"><code>--inspect</code> option</a>.</i></p>
   </td>
@@ -225,8 +223,8 @@ DevOpts
 <tr>
   <td valign="top"><code>"warnings":</code></td>
   <td>
-    <p>A boolean for enabling parse and runtime warnings.</p>
-    <p><i>Note: The default value is <code>process.env.NODE_ENV !== "production"</code>.</i></p>
+    <p>A boolean for logging parse and runtime warnings.</p>
+    <p><i>(default: <code>process.env.NODE_ENV !== "production"</code>)</i></p>
   </td>
 </tr>
 <tr>
