@@ -76,10 +76,15 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with `"@std/esm":options` or `"@std":{"esm":options}`
-in your package.json.
+Unlock extra features with `"@std/esm":optionsOrString` or
+`"@std":{"esm":optionsOrString}` in your package.json.
 
-*Note: All options are **off** by default and may be specified as either an object or ESM mode string.*
+Commonly used options may be specified in shorthand form:
+
+* `"@std/esm":"js"` is shorthand for `"@std/esm":{"esm":"js"}`
+* `"@std/esm":"cjs"` is shorthand for `"@std/esm":{"cjs":true,"esm":"js"}`
+
+*Note: All options are **off** by default.*
 
 <table>
 <tr>
