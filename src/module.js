@@ -9,6 +9,7 @@ import moduleState from "./module/state.js"
 import nodeModulePaths from "./module/node-module-paths.js"
 import resolveFilename from "./module/resolve-filename.js"
 import resolveLookupPaths from "./module/resolve-lookup-paths.js"
+import setProperty from "./util/set-property.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
 
@@ -53,5 +54,11 @@ class Module extends BuiltinModule {
 }
 
 defaults(Module, BuiltinModule)
+
+setProperty(Module, "length", {
+  enumerable: false,
+  value: 2,
+  writable: false
+})
 
 export default Module
