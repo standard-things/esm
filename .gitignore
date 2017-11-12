@@ -1,11 +1,11 @@
+*.gz
+*.log
 .cache
 .DS_Store
 .esm-cache
 .node_repl_history
 .vscode
 package-lock.json
-*.gz
-*.log
 /build
 /node_modules
 /src/vendor
