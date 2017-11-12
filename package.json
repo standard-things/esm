@@ -29,10 +29,10 @@
     "test:prod": "npm run _test -- --prod"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.31",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.31",
-    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.31",
-    "@babel/preset-env": "^7.0.0-beta.31",
+    "@babel/core": "^7.0.0-beta.32",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.32",
+    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.32",
+    "@babel/preset-env": "^7.0.0-beta.32",
     "acorn": "^5.2.1",
     "babel-eslint": "^8.0.2",
     "babel-loader": "^8.0.0-beta.0",
