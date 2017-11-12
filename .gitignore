@@ -3,6 +3,7 @@
 .esm-cache
 .node_repl_history
 .vscode
+package-lock.json
 *.gz
 *.log
 /build
