@@ -90,8 +90,6 @@ Commonly used options may be specified in shorthand form:
 * `"@std/esm":"js"` is shorthand for `"@std/esm":{"esm":"js"}`
 * `"@std/esm":"cjs"` is shorthand for `"@std/esm":{"cjs":true,"esm":"js"}`
 
-*Note: All options are **off** by default.*
-
 <table>
 <tr>
   <td colspan="2">
