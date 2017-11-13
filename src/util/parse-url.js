@@ -5,15 +5,12 @@ import FastObject from "../fast-object.js"
 const parseCache = new FastObject
 
 function parseURL(url) {
-  if (url instanceof Url) {
-    return url
-  }
+  const isURL = url instanceof Url
+  const key = isURL ? url.href : url
 
-  if (url in parseCache) {
-    return parseCache[url]
-  }
-
-  return parseCache[url] = parse(url)
+  return key in parseCache
+    ? parseCache[key]
+    : parseCache[key] = (isURL ? url : parse(url))
 }
 
 export default parseURL
