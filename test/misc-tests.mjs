@@ -585,7 +585,9 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
       const id = require.resolve(data.id)
-      const stderr = isCached ? "" : getWarning("arguments is not defined (%s): %s", data.loc, id)
+      const stderr = isCached
+        ? ""
+        : getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, id)
 
       return promise
         .then(() => {
@@ -598,7 +600,7 @@ describe("spec compliance", () => {
 
   it("should warn for potential TDZ access", () => {
     const id = require.resolve("./fixture/cycle/tdz/a.mjs")
-    const stderr = getWarning("Possible temporal dead zone access of 'a' in %s", id)
+    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", id)
 
     mockIo.start()
     return import(id)

@@ -501,7 +501,7 @@ function runSetter(entry, name, callback) {
         value === void 0 &&
         name in getters &&
         setter.parent.id in children) {
-      emitWarning("Possible temporal dead zone access of '" + name + "' in " + moduleName)
+      emitWarning("@std/esm detected possible temporal dead zone access of '" + name + "' in " + moduleName)
     }
   }
 }

@@ -35,7 +35,7 @@ class IdentifierVisitor extends Visitor {
     }
 
     try {
-      raise(parser, parser.start, "arguments is not defined", Error)
+      raise(parser, parser.start, "@std/esm detected undefined arguments access", Error)
     } catch (e) {
       e.name = "Warning"
       this.warnings.push(e)
