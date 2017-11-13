@@ -61,7 +61,7 @@ Standard Features
 ---
 
 The `@std/esm` loader is as spec-compliant
-as possible and follows [Node’s rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
+as possible and follows Node’s [ESM rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
 
 :point_right: This means, by default, ESM requires the use of the `.mjs` file
 extension.<br>
@@ -157,7 +157,7 @@ The `"cjs"` option may also be specified as an object.
 <tr>
   <td valign="top"><code>"extensions":</code></td>
   <td>
-    <p>A boolean for respecting <code>require.extensions</code> in ES modules.</p>
+    <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
   </td>
 </tr>
 <tr>
@@ -175,7 +175,7 @@ The `"cjs"` option may also be specified as an object.
 <tr>
   <td valign="top"><code>"paths":</code></td>
   <td>
-    <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ES modules.</p>
+    <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ESM.</p>
   </td>
 </tr>
 <tr>
@@ -187,7 +187,7 @@ The `"cjs"` option may also be specified as an object.
 <tr>
   <td valign="top"><code>"vars":</code></td>
   <td>
-    <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ES modules.</p>
+    <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
   </td>
 </tr>
 <tr>
@@ -249,7 +249,7 @@ Tips
 * Load `@std/esm` before [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
 * Load `@std/esm` with the *“require”* option of [AVA](https://github.com/avajs/ava#options),
   [Mocha](https://mochajs.org/#-r---require-module-name), and [nyc](https://github.com/istanbuljs/nyc#require-additional-modules)
-* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [tap](http://www.node-tap.org/cli/)
+* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [TAP](http://www.node-tap.org/cli/)
 * Use options `"@std/esm":"cjs"` or `"@std/esm":{"cjs":{"cache":true}}` with the Mocha [`--watch` option](https://mochajs.org/#-w---watch)
 * Use options `"@std/esm":"cjs"` with [webpack](https://webpack.js.org/)
 * When in doubt, use options `"@std/esm":"cjs"`
