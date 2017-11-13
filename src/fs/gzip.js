@@ -19,6 +19,10 @@ function gzip(bufferOrString, options) {
   return fallbackGzip(bufferOrString, options)
 }
 
+function createOptions(options) {
+  return _createOptions(options, gzip.defaultOptions)
+}
+
 function fallbackGzip(bufferOrString, options) {
   return gzipSync(bufferOrString, options)
 }
@@ -28,6 +32,6 @@ function fastPathGzip(bufferOrString, options) {
 }
 
 gzip.defaultOptions = { level: 9 }
-gzip.createOptions = (options) => _createOptions(options, gzip.defaultOptions)
+gzip.createOptions = createOptions
 
 export default gzip

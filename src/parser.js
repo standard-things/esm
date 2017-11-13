@@ -14,8 +14,6 @@ const defaultOptions = {
   sourceType: "module"
 }
 
-const createOptions = (options) => _createOptions(options, Parser.defaultOptions)
-
 class Parser {
   static createOptions = createOptions
   static defaultOptions = defaultOptions
@@ -24,6 +22,10 @@ class Parser {
     options = Parser.createOptions(options)
     return extend(new AcornParser(options, code)).parse()
   }
+}
+
+function createOptions(options) {
+  return _createOptions(options, Parser.defaultOptions)
 }
 
 function extend(parser) {
