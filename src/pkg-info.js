@@ -144,6 +144,7 @@ function createCJS(value, object = {}) {
 function createOptions(options) {
   let cjsOptions
   let sourceMap
+  const { defaultOptions } = PkgInfo
 
   if (typeof options === "string") {
     if (options === "cjs") {
