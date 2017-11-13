@@ -1,5 +1,6 @@
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
+import PkgInfo from "./pkg-info.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
@@ -9,15 +10,13 @@ import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = {
-  cjs: false,
+  cjs: PkgInfo.createOptions(),
   hint: "script",
   runtimeAlias: "_",
   type: "module",
   var: false,
   warnings: process.env.NODE_ENV !== "production"
 }
-
-const createOptions = (options) => _createOptions(options, Compiler.defaultOptions)
 
 const argumentsRegExp = /\barguments\b/
 const importExportRegExp = /\b(?:im|ex)port\b/
@@ -58,10 +57,12 @@ class Compiler {
     let error
     let threw = true
 
-    const parserOptions = {
-      allowReturnOutsideFunction: options.cjs.topLevelReturn,
-      sourceType: type === "script" ? type : "module"
-    }
+    const allowReturnOutsideFunction =
+      options.cjs.topLevelReturn ||
+      type === "script"
+
+    const sourceType = type === "script" ? type : "module"
+    const parserOptions = { allowReturnOutsideFunction, sourceType }
 
     try {
       ast = Parser.parse(code, parserOptions)
@@ -112,6 +113,7 @@ class Compiler {
       result.esm = true
 
       if (options.warnings &&
+          ! options.cjs.vars &&
           argumentsRegExp.test(code)) {
         result.warnings = []
         identifierVisitor.visit(rootPath, {
@@ -124,6 +126,13 @@ class Compiler {
     result.code = importExportVisitor.magicString.toString()
     return result
   }
+}
+
+function createOptions(options) {
+  const { defaultOptions } = Compiler
+  options = _createOptions(options, defaultOptions)
+  options.cjs = _createOptions(options.cjs, defaultOptions.cjs)
+  return options
 }
 
 Object.setPrototypeOf(Compiler.prototype, null)

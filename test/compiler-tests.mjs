@@ -4,6 +4,21 @@ import compiler from "../build/compiler.js"
 const compile = compiler.compile
 
 describe("compiler", () => {
+  it("should support `options.cjs.topLevelReturn`", () => {
+    assert.doesNotThrow(() => compile("return", { type: "script" }))
+    assert.throws(() => compile("return", { type: "module" }), SyntaxError)
+    assert.doesNotThrow(() => compile("return", { cjs: { topLevelReturn: true }, type: "module" }))
+  })
+
+  it("should support `options.cjs.vars`", () => {
+    let result = compile("arguments")
+    const warnings = result.warnings || []
+    assert.strictEqual(warnings.length, 1)
+
+    result = compile("arguments", { cjs: { vars: true } })
+    assert.strictEqual(result.warnings, null)
+  })
+
   it("should support `options.type`", () => {
     const types = [void 0, "module", "unambiguous"]
 
