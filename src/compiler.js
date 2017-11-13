@@ -10,7 +10,7 @@ import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = {
-  cjs: PkgInfo.createOptions(),
+  cjs: PkgInfo.defaultOptions.cjs,
   hint: "script",
   runtimeAlias: "_",
   type: "script",
@@ -129,10 +129,7 @@ class Compiler {
 }
 
 function createOptions(options) {
-  const { defaultOptions } = Compiler
-  options = _createOptions(options, defaultOptions)
-  options.cjs = _createOptions(options.cjs, defaultOptions.cjs)
-  return options
+  return _createOptions(options, Compiler.defaultOptions)
 }
 
 Object.setPrototypeOf(Compiler.prototype, null)
