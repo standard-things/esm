@@ -160,17 +160,17 @@ function createOptions(options) {
     } else {
       options = { esm: options }
     }
-  } else {
-    if (has(options, "cjs")) {
-      cjsOptions = typeof options.cjs === "boolean"
-        ? createCJS(options.cjs, new NullObject)
-        : createOptions(options.cjs, defaultOptions.cjs)
-    }
+  }
 
-    if (has(options, "sourcemap") &&
-        ! has(options, "sourceMap")) {
-      sourceMap = options.sourcemap
-    }
+  if (has(options, "cjs")) {
+    cjsOptions = typeof options.cjs === "boolean"
+      ? createCJS(options.cjs, new NullObject)
+      : createOptions(options.cjs, defaultOptions.cjs)
+  }
+
+  if (has(options, "sourcemap") &&
+      ! has(options, "sourceMap")) {
+    sourceMap = options.sourcemap
   }
 
   options = _createOptions(options, defaultOptions)
