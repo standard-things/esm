@@ -134,13 +134,11 @@ describe("compiler", () => {
   )
 
   it("should not error on shorthand async function properties with reserved names", () => {
-    compile("({async delete(){}})")
-    assert.ok(true)
+    assert.doesNotThrow(() => compile("({async delete(){}})"))
   })
 
   it("should not error on arrow functions with destructured arguments", () => {
-    compile("({a=1})=>{}")
-    assert.ok(true)
+    assert.doesNotThrow(() => compile("({a=1})=>{}"))
   })
 
   it("should not error on transforms at the end of the source", () => {
@@ -151,7 +149,6 @@ describe("compiler", () => {
       "export default a"
     ]
 
-    codes.forEach(compile)
-    assert.ok(true)
+    codes.forEach((code) => assert.doesNotThrow(() => compile(code)))
   })
 })
