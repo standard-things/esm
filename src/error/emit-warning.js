@@ -14,16 +14,16 @@ function emitWarning(message, type, code, Ctor) {
     return
   }
 
+  if (typeof type !== "string") {
+    type = "Warning"
+  }
+
   if (useEmitWarning) {
     _emitWarning(message, type, code, Ctor)
     return
   }
 
   const useCode = typeof code === "string"
-
-  if (typeof type !== "string") {
-    type = "Warning"
-  }
 
   if (isDeprecation &&
       process.throwDeprecation) {
