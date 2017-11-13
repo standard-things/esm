@@ -63,6 +63,7 @@ function hook(vm) {
         cacheFileName,
         pkgInfo,
         runtimeAlias,
+        type: "unambiguous",
         var: true,
         warnings: false
       }

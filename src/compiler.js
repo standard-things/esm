@@ -13,7 +13,7 @@ const defaultOptions = {
   cjs: PkgInfo.createOptions(),
   hint: "script",
   runtimeAlias: "_",
-  type: "module",
+  type: "script",
   var: false,
   warnings: process.env.NODE_ENV !== "production"
 }

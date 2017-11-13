@@ -5,22 +5,25 @@ const compile = compiler.compile
 
 describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
-    assert.doesNotThrow(() => compile("return", { type: "script" }))
+    assert.doesNotThrow(() => compile("return"))
     assert.throws(() => compile("return", { type: "module" }), SyntaxError)
     assert.doesNotThrow(() => compile("return", { cjs: { topLevelReturn: true }, type: "module" }))
   })
 
   it("should support `options.cjs.vars`", () => {
     let result = compile("arguments")
+    assert.strictEqual(result.warnings, null)
+
+    result = compile("arguments", { cjs: { vars: true }, type: "module" })
+    assert.strictEqual(result.warnings, null)
+
+    result = compile("arguments", { type: "module" })
     const warnings = result.warnings || []
     assert.strictEqual(warnings.length, 1)
-
-    result = compile("arguments", { cjs: { vars: true } })
-    assert.strictEqual(result.warnings, null)
   })
 
   it("should support `options.type`", () => {
-    const types = [void 0, "module", "unambiguous"]
+    const types = ["module", "unambiguous"]
 
     types.forEach((type) => {
       const result = compile('import"a"', { type })
@@ -65,7 +68,7 @@ describe("compiler", () => {
     const values = [void 0, false, true]
 
     values.forEach((value) => {
-      const result = compile('import a from "a"', { var: value })
+      const result = compile('import a from "a"', { var: value, type: "module" })
       assert.ok(result.code.startsWith(value ? "var a" : "let a"))
     })
   })
@@ -105,12 +108,12 @@ describe("compiler", () => {
       'import a from "a"'
     ].join("\n")
 
-    const result = compile(code)
+    const result = compile(code, { type: "module" })
     assert.ok(result.code.startsWith("let a"))
   })
 
   it("should support trailing comments", () => {
-    const result = compile('import"a"//trailing comment')
+    const result = compile('import"a"//trailing comment', { type: "module" })
     assert.ok(result.code.endsWith("//trailing comment"))
   })
 
@@ -134,7 +137,7 @@ describe("compiler", () => {
       'from "assert"'
     ].join("\r\n")
 
-    const result = compile(code)
+    const result = compile(code, { type: "module" })
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 
@@ -164,6 +167,8 @@ describe("compiler", () => {
       "export default a"
     ]
 
-    codes.forEach((code) => assert.doesNotThrow(() => compile(code)))
+    codes.forEach((code) =>
+      assert.doesNotThrow(() => compile(code, { type: "module" }))
+    )
   })
 })
