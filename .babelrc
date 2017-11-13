@@ -1,6 +1,8 @@
 {
   "plugins": [
-    "@babel/proposal-class-properties",
+    ["@babel/proposal-class-properties", {
+      "loose": true
+    }],
     ["@babel/transform-block-scoping", {
       "throwIfClosureRequired": false
     }],
