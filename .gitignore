@@ -2,7 +2,6 @@
 *.log
 .cache
 .DS_Store
-.esm-cache
 .node_repl_history
 .vscode
 package-lock.json

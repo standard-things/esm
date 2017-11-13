@@ -11,8 +11,7 @@ Getting started
 ---
 
   1. Run `npm i --save @std/esm` in your app or package directory.
-  2. Add `.esm-cache` to your `.gitignore`.
-  3. Create the ESM loader to import your main ES module:
+  2. Create the ESM loader to import your main ES module:
 
      **index.js**
      ```js
@@ -212,7 +211,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for toggling the <code>.esm-cache</code> <i>(default: <code>true</code>).</i></p>
+    <p>A boolean for toggling <code>.cache</code> creation <i>(default: <code>true</code>).</i></p>
   </td>
 </tr>
 <tr>

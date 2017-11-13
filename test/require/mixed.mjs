@@ -38,8 +38,8 @@ export default () =>
       assert.ok("this" in global)
       assert.strictEqual(global.this, "undefined")
 
-      const cachePaths = globby.sync(["fixture/options/**/.esm-cache"])
-      assert.deepStrictEqual(cachePaths, ["fixture/options/true/.esm-cache"])
+      const cachePaths = globby.sync(["fixture/options/**/.cache"])
+      assert.deepStrictEqual(cachePaths, ["fixture/options/true/node_modules/.cache"])
       resolve()
     })
   })

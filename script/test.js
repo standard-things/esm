@@ -30,7 +30,7 @@ const NODE_PATH = [
 ].join(delimiter)
 
 const trashPaths = globby.sync([
-  "**/.?(esm-)cache",
+  "**/.cache",
   "**/.nyc_output",
   "test/**/*.gz",
   "test/node_modules/**/node_modules",

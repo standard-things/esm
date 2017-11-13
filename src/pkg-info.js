@@ -4,6 +4,7 @@ import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
+import findCacheDir from "find-cache-dir"
 import has from "./util/has.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
@@ -11,7 +12,7 @@ import { validRange } from "semver"
 import { version } from "./version.js"
 
 const defaultOptions = {
-  cache: ".esm-cache",
+  cache: true,
   cjs: createCJS(false),
   debug: false,
   esm: "mjs",
@@ -28,12 +29,20 @@ class PkgInfo {
   constructor(dirPath, range, options) {
     options = PkgInfo.createOptions(options)
 
-    const cache = new NullObject
-    const cacheDir = options.cache
-    const cachePath = typeof cacheDir === "string" ? resolve(dirPath, cacheDir) : null
-    const cacheFileNames = cachePath === null ? cachePath : readdir(cachePath)
+    let cachePath = null
+
+    if (typeof options.cache === "string") {
+      cachePath = resolve(dirPath, options.cache)
+    } else if (options.cache !== false) {
+      cachePath = findCacheDir({ cwd: dirPath, name: "@std/esm" })
+    }
+
+    const cacheFileNames = cachePath === null
+      ? cachePath
+      : readdir(cachePath)
 
     let i = -1
+    const cache = new NullObject
     const nameCount = cacheFileNames ? cacheFileNames.length : 0
 
     while (++i < nameCount) {
