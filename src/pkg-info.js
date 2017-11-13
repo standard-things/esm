@@ -4,7 +4,6 @@ import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
-import findCacheDir from "find-cache-dir"
 import has from "./util/has.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
@@ -34,7 +33,7 @@ class PkgInfo {
     if (typeof options.cache === "string") {
       cachePath = resolve(dirPath, options.cache)
     } else if (options.cache !== false) {
-      cachePath = findCacheDir({ cwd: dirPath, name: "@std/esm" })
+      cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
     }
 
     const cacheFileNames = cachePath === null
