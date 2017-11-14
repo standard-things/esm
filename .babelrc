@@ -13,7 +13,6 @@
       "loose": true,
       "modules": false,
       "exclude": [
-        "check-constants",
         "transform-async-to-generator",
         "transform-classes",
         "transform-for-of",
