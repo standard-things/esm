@@ -4,12 +4,8 @@
 
 import Module from "../module.js"
 
-import moduleState from "./state.js"
-
 function _load(filePath, parent, isMain, state, loader) {
-  let child = state
-    ? state.cache[filePath]
-    : moduleState.cache[filePath] || __non_webpack_require__.cache[filePath]
+  let child = state.cache[filePath]
 
   if (child) {
     const children = parent && parent.children
@@ -34,12 +30,7 @@ function _load(filePath, parent, isMain, state, loader) {
 }
 
 function tryLoad(mod, filePath, state, loader = mod.load) {
-  if (state) {
-    state.cache[filePath] = mod
-  } else {
-    moduleState.cache[filePath] =
-    __non_webpack_require__.cache[filePath] = mod
-  }
+  state.cache[filePath] = mod
 
   let threw = true
 
@@ -48,12 +39,7 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
     threw = false
   } finally {
     if (threw) {
-      if (state) {
-        delete state.cache[filePath]
-      } else {
-        delete moduleState.cache[filePath]
-        delete __non_webpack_require__.cache[filePath]
-      }
+      delete state.cache[filePath]
     }
   }
 }

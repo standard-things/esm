@@ -30,7 +30,7 @@ function hook(Module) {
       return
     }
 
-    loadESM(filePath, null, true, pkgInfo.options, (mod) => {
+    loadESM(filePath, null, true, (mod) => {
       setPrototypeOf(mod, Module.prototype)
     })
 

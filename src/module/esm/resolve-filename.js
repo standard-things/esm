@@ -1,3 +1,5 @@
+import PkgInfo from "../../pkg-info.js"
+
 import _resolveFilename from "../_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
@@ -15,7 +17,7 @@ const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
-function resolveFilename(id, parent, isMain, options) {
+function resolveFilename(id, parent, isMain) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
@@ -49,9 +51,23 @@ function resolveFilename(id, parent, isMain, options) {
     } else {
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      const skipGlobalPaths = ! (options && options.cjs.paths)
+      let searchExts = esmExts
+      let skipGlobalPaths = true
+      const pkgInfo = PkgInfo.get(fromPath)
+
+      if (pkgInfo) {
+        const { options } = pkgInfo
+
+        if (options.gz) {
+          searchExts = gzExts
+        }
+
+        if (options.cjs.paths) {
+          skipGlobalPaths = false
+        }
+      }
+
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const searchExts = options && options.gz ? gzExts : esmExts
       const foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
 
       if (foundPath) {

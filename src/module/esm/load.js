@@ -1,6 +1,7 @@
 import { extname as _extname, dirname } from "path"
 
 import Entry from "../../entry.js"
+import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
 import env from "../../env.js"
@@ -19,15 +20,17 @@ const BuiltinModule = __non_webpack_module__.constructor
 
 const compileSym = Symbol.for("@std/esm:module._compile")
 
-function load(id, parent, isMain, options, preload) {
-  const filePath = resolveFilename(id, parent, isMain, options)
+function load(id, parent, isMain, preload) {
+  const filePath = resolveFilename(id, parent, isMain)
+  const pkgInfo = PkgInfo.get(dirname(filePath))
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
+  const options = pkgInfo ? pkgInfo.options : null
   const url = getURLFromFilePath(filePath) + queryHash
 
-  let state
+  let state = __non_webpack_require__
 
-  if (! options.cjs.cache) {
+  if (! (options && options.cjs.cache)) {
     isMain = false
 
     if (_extname(filePath) === ".mjs") {
@@ -35,14 +38,16 @@ function load(id, parent, isMain, options, preload) {
     }
   }
 
-  let child = state
-    ? void 0
-    : __non_webpack_require__.cache[cacheId]
+  let isRequireState = state === __non_webpack_require__
+
+  let child = isRequireState
+    ? state.cache[cacheId]
+    : null
 
   if (child &&
       isESM(child.exports) &&
       ! Entry.has(child)) {
-    delete __non_webpack_require__.cache[cacheId]
+    delete state.cache[cacheId]
   }
 
   let error
@@ -52,7 +57,7 @@ function load(id, parent, isMain, options, preload) {
   try {
     child = _load(cacheId, parent, isMain, state, function () {
       called = true
-      return loader.call(this, filePath, url, options, preload)
+      return loader.call(this, filePath, url, parent, preload)
     })
 
     if (! called &&
@@ -76,16 +81,18 @@ function load(id, parent, isMain, options, preload) {
   try {
     throw error
   } finally {
-    // Unlike CJS, ESM errors are preserved for subsequent loads.
-    setGetter(moduleState.cache, cacheId, () => {
-      throw error
-    })
-
-    delete __non_webpack_require__.cache[cacheId]
+    if (isRequireState) {
+      delete state.cache[cacheId]
+    } else {
+      // Unlike CJS, ESM errors are preserved for subsequent loads.
+      setGetter(state.cache, cacheId, () => {
+        throw error
+      })
+    }
   }
 }
 
-function loader(filePath, url, options, preload) {
+function loader(filePath, url, parent, preload) {
   const mod = this
   const entry = Entry.get(mod)
 
@@ -98,11 +105,18 @@ function loader(filePath, url, options, preload) {
   }
 
   const Ctor = mod.constructor
+  const filename = parent && typeof parent.filename === "string"
+    ? parent.filename
+    : "."
+
+  const pkgInfo = PkgInfo.get(dirname(filename))
+  const options = pkgInfo ? pkgInfo.options : null
+
   let { extensions } = moduleState
   let ext = extname(filePath)
 
   if (Ctor === BuiltinModule &&
-      (options.cjs.extensions || ext === ".js")) {
+      ((options && options.cjs.extensions) || ext === ".js")) {
     extensions = Ctor._extensions
   }
 
