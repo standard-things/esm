@@ -15,6 +15,7 @@ const defaultOptions = {
   cjs: createCJS(false),
   debug: false,
   esm: "mjs",
+  gz: false,
   sourceMap: void 0,
   warnings: process.env.NODE_ENV !== "production"
 }
