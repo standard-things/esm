@@ -105,19 +105,24 @@ function loader(filePath, url, parent, preload) {
   }
 
   const Ctor = mod.constructor
-  const filename = parent && typeof parent.filename === "string"
-    ? parent.filename
-    : "."
-
-  const pkgInfo = PkgInfo.get(dirname(filename))
-  const options = pkgInfo ? pkgInfo.options : null
 
   let { extensions } = moduleState
   let ext = extname(filePath)
 
-  if (Ctor === BuiltinModule &&
-      ((options && options.cjs.extensions) || ext === ".js")) {
-    extensions = Ctor._extensions
+  if (Ctor === BuiltinModule) {
+    if (ext === ".js") {
+      extensions = Ctor._extensions
+    } else {
+      const filename = parent && typeof parent.filename === "string"
+        ? parent.filename
+        : "."
+
+      const pkgInfo = PkgInfo.get(dirname(filename))
+
+      if (pkgInfo && pkgInfo.options.cjs.extensions) {
+        extensions = Ctor._extensions
+      }
+    }
   }
 
   if (ext === "" ||
