@@ -19,14 +19,13 @@
     "prepub": "npm run test:prod",
     "pretest": "npm run build -- --test",
     "pretest:prod": "npm run build:prod -- --test",
-    "_test": "node --require ./index.js script/test.js",
     "build": "node script/build.js",
     "build:prod": "npm run build -- --prod",
     "clean": "node script/clean.js",
     "lint": "eslint '**/*.{js,mjs}' --fix --quiet",
     "pub": "node script/publish.js",
-    "test": "npm run _test",
-    "test:prod": "npm run _test -- --prod"
+    "test": "node script/test.js",
+    "test:prod": "node script/test.js --prod"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.32",

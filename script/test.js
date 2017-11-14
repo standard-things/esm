@@ -1,33 +1,34 @@
-import { delimiter, resolve } from "path"
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
+"use strict"
 
-import { ensureLink } from "fs-extra"
-import execa from "execa"
-import globby from "globby"
-import trash from "trash"
-import yargs from "yargs"
+const execa = require("execa")
+const fs = require("fs-extra")
+const globby = require("globby")
+const path = require("path")
+const trash = require("trash")
 
-const argv = yargs
+const argv = require("yargs")
   .boolean("prod")
   .argv
 
 const isWin = process.platform === "win32"
 
-const rootPath = resolve(__dirname, "..")
-const testPath = resolve(rootPath, "test")
-const envPath = resolve(testPath, "env")
+const rootPath = path.resolve(__dirname, "..")
+const testPath = path.resolve(rootPath, "test")
+const envPath = path.resolve(testPath, "env")
 
-const HOME = resolve(envPath, "home")
-const MOCHA_BIN = resolve(rootPath, "node_modules/mocha/bin/mocha")
-const NODE_BIN = resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
+const HOME = path.resolve(envPath, "home")
+const MOCHA_BIN = path.resolve(rootPath, "node_modules/mocha/bin/mocha")
+const NODE_BIN = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 
 const NODE_ENV =
   (argv.prod ? "production" : "development") +
   "-test"
 
 const NODE_PATH = [
-  resolve(envPath, "node_path"),
-  resolve(envPath, "node_path/relative")
-].join(delimiter)
+  path.resolve(envPath, "node_path"),
+  path.resolve(envPath, "node_path/relative")
+].join(path.delimiter)
 
 const trashPaths = globby.sync([
   "**/.cache",
@@ -71,9 +72,9 @@ function runTests(cached) {
 }
 
 function setupNode() {
-  const basePath = resolve(NODE_BIN, isWin ? "" : "..")
+  const basePath = path.resolve(NODE_BIN, isWin ? "" : "..")
   return trash(basePath)
-    .then(() => ensureLink(process.execPath, NODE_BIN))
+    .then(() => fs.ensureLink(process.execPath, NODE_BIN))
 }
 
 /* eslint-disable lines-around-comment */
