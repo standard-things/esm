@@ -3,7 +3,7 @@ import { delimiter, resolve } from "path"
 import { ensureLink } from "fs-extra"
 import execa from "execa"
 import globby from "globby"
-import trash from "./trash.js"
+import trash from "trash"
 import yargs from "yargs"
 
 const argv = yargs

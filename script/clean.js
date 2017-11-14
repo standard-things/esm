@@ -4,11 +4,11 @@
 const fs = require("fs-extra")
 const globby = require("globby")
 const path = require("path")
-const trash = require("./trash.js")
+const trash = require("trash")
 
 const rootPath = path.resolve(__dirname, "..")
 const gitignorePath = path.resolve(rootPath, ".gitignore")
-const packageLockPath = path.resolve(rootPath, "package-lock.json")
+const nodeModulesPath = path.resolve(rootPath, "node_modules")
 
 const ignorePatterns = fs.readFileSync(gitignorePath, "utf8")
   .replace(/^\s+/gm, "")
@@ -24,8 +24,27 @@ const ignorePaths = globby.sync(ignorePatterns, {
   realpath: true
 })
 
-const trashPaths = [
-  packageLockPath
-].concat(ignorePaths)
+const trashPaths = ignorePaths
+  .filter((thePath) => thePath !== nodeModulesPath)
 
-Promise.all(trashPaths.map(trash))
+function isEmpty(dirPath) {
+  return ! fs.readdirSync(dirPath).length
+}
+
+function trashEmptyDirs() {
+  return globby.sync(["*/**/"], {
+    cwd: rootPath,
+    realpath: true
+  })
+  .filter(isEmpty)
+  .map(trash)
+}
+
+function trashNodeModules() {
+  return trash(nodeModulesPath)
+}
+
+Promise
+  .all(trashPaths.map(trash))
+  .then(trashEmptyDirs())
+  .then(trashNodeModules())
