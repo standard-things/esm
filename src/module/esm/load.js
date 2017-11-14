@@ -25,12 +25,10 @@ function load(id, parent, isMain, preload) {
   const pkgInfo = PkgInfo.get(dirname(filePath))
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
-  const options = pkgInfo ? pkgInfo.options : null
-  const url = getURLFromFilePath(filePath) + queryHash
 
   let state = __non_webpack_require__
 
-  if (! (options && options.cjs.cache)) {
+  if (! (pkgInfo && pkgInfo.options.cjs.cache)) {
     isMain = false
 
     if (_extname(filePath) === ".mjs") {
@@ -57,6 +55,7 @@ function load(id, parent, isMain, preload) {
   try {
     child = _load(cacheId, parent, isMain, state, function () {
       called = true
+      const url = getURLFromFilePath(filePath) + queryHash
       return loader.call(this, filePath, url, parent, preload)
     })
 
