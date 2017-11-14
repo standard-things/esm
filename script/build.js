@@ -20,9 +20,7 @@ const NODE_ENV =
 // eslint-disable-next-line import/no-extraneous-dependencies
 const zlib = argv.prod ? require("node-zopfli") : require("zlib")
 const gzip = pify(zlib.gzip)
-const gzipOptions = argv.prod
-  ? { numiterations: 100 }
-  : { level: 0 }
+const gzipOptions = argv.prod ? { numiterations: 100 } : { level: 0 }
 
 const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
