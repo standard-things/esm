@@ -36,8 +36,8 @@ function enable(parser) {
 
   parser.checkExpressionErrors = checkExpressionErrors
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
-  parser.raise = wrap(parser.raise, raise)
-  parser.raiseRecoverable = wrap(parser.raise, raiseRecoverable)
+  parser.raise = raise
+  parser.raiseRecoverable = raiseRecoverable
 
   parser.strict = false
   return parser
@@ -51,9 +51,7 @@ function checkExpressionErrors(refDestructuringErrors) {
   return false
 }
 
-function raise(func, args) {
-  let [pos, message] = args
-
+function raise(pos, message) {
   // Correct message for `let default`:
   // https://github.com/ternjs/acorn/issues/544
   if (message === "The keyword 'let' is reserved") {
@@ -65,9 +63,7 @@ function raise(func, args) {
   throw new AcornError(this, pos, message)
 }
 
-function raiseRecoverable(func, args) {
-  let [pos, message] = args
-
+function raiseRecoverable(pos, message) {
   if (message.startsWith(parserDupPrefix)) {
     message = message.replace(parserDupPrefix, engineDupPrefix)
     throw new AcornError(this, pos, message)

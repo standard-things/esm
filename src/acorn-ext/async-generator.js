@@ -20,13 +20,12 @@ function enable(parser) {
 
 function parseClass(node, isStatement) {
   this.next()
-
   this.parseClassId(node, isStatement)
   this.parseClassSuper(node)
 
-  let classBody = this.startNode()
-
+  const classBody = this.startNode()
   classBody.body = []
+
   this.expect(tt.braceL)
 
   while (! this.eat(tt.braceR)) {
@@ -44,18 +43,16 @@ function parseClass(node, isStatement) {
     method.static = isMaybeStatic && this.type !== tt.parenL
 
     if (method.static) {
-      if (isGenerator) {
-        this.unexpected()
-      }
-
       isGenerator = this.eat(tt.star)
       this.parsePropertyName(method)
     }
 
+    let { key } = method
+
     if (! isGenerator &&
         ! method.computed &&
-        method.key.type === "Identifier" &&
-        method.key.name === "async" &&
+        key.type === "Identifier" &&
+        key.name === "async" &&
         this.type !== tt.parenL &&
         ! this.canInsertSemicolon()) {
       isAsync = true
@@ -66,8 +63,6 @@ function parseClass(node, isStatement) {
     method.kind = "method"
 
     if (! method.computed) {
-      let { key } = method
-
       if (! isGenerator &&
           ! isAsync &&
           key.type === "Identifier" &&
@@ -119,10 +114,6 @@ function parseForStatement(node) {
   this.expect(tt.parenL)
 
   if (this.type === tt.semi) {
-    if (forAwait) {
-      this.unexpected()
-    }
-
     return this.parseFor(node, null)
   }
 
@@ -147,10 +138,6 @@ function parseForStatement(node) {
       return this.parseForIn(node, init, forAwait)
     }
 
-    if (forAwait) {
-      this.unexpected()
-    }
-
     return this.parseFor(node, init)
   }
 
@@ -162,10 +149,6 @@ function parseForStatement(node) {
     this.toAssignable(init)
     this.checkLVal(init)
     return this.parseForIn(node, init, forAwait)
-  }
-
-  if (forAwait) {
-    this.unexpected()
   }
 
   return this.parseFor(node, init)

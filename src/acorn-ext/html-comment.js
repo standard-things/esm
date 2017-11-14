@@ -20,7 +20,7 @@ function readToken_lt_gt(func, args) {
   if (this.inModule) {
     const [code] = args
     const { input, pos } = this
-    let next = input.charCodeAt(pos + 1)
+    const next = input.charCodeAt(pos + 1)
 
     // Detect opening HTML comment, i.e. `<!--`.
     if (code === codeOfLT &&
@@ -38,7 +38,7 @@ function readToken_plus_min(func, args) {
   if (this.inModule) {
     const [code] = args
     const { input, lastTokEnd, pos } = this
-    let next = input.charCodeAt(pos + 1)
+    const next = input.charCodeAt(pos + 1)
 
     // Detect closing HTML comment, i.e. `-->`.
     if (next === code &&

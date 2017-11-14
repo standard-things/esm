@@ -6,19 +6,18 @@ import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
-  parser.parseObj = wrap(parser.parseObj, parseObj)
+  parser.parseObj = parseObj
   parser.toAssignable = wrap(parser.toAssignable, toAssignable)
   return parser
 }
 
-function parseObj(func, args) {
-  let first = true
-  const [isPattern, refDestructuringErrors] = args
+function parseObj(isPattern, refDestructuringErrors) {
   const node = this.startNode()
-
   node.properties = []
 
   this.next()
+
+  let first = true
 
   while (! this.eat(tt.braceR)) {
     if (first) {
@@ -57,23 +56,23 @@ function parseObj(func, args) {
 function toAssignable(func, args) {
   const [node] = args
 
-  if (node && node.type === "ObjectExpression") {
-    node.type = "ObjectPattern"
-
-    for (const propNode of node.properties) {
-      if (propNode.kind === "init") {
-        this.toAssignable(propNode.value)
-      } else if (propNode.type === "SpreadElement") {
-        propNode.value = this.toAssignable(propNode.argument)
-      } else {
-        this.raise(propNode.key.start, "Object pattern can't contain getter or setter")
-      }
-    }
-
-    return node
+  if (node.type !== "ObjectExpression") {
+    return func.apply(this, args)
   }
 
-  return func.apply(this, args)
+  node.type = "ObjectPattern"
+
+  for (const propNode of node.properties) {
+    if (propNode.kind === "init") {
+      this.toAssignable(propNode.value)
+    } else if (propNode.type === "SpreadElement") {
+      propNode.value = this.toAssignable(propNode.argument)
+    } else {
+      this.raise(propNode.key.start, "Object pattern can't contain getter or setter")
+    }
+  }
+
+  return node
 }
 
 export { enable }
