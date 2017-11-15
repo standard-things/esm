@@ -4,7 +4,7 @@
 const fs = require("fs-extra")
 const globby = require("globby")
 const path = require("path")
-const trash = require("trash")
+const trash = require("./trash.js")
 
 const rootPath = path.resolve(__dirname, "..")
 const gitignorePath = path.resolve(rootPath, ".gitignore")

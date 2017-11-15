@@ -6,7 +6,7 @@ const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
 const pify = require("pify")
-const trash = require("trash")
+const trash = require("./trash.js")
 
 const argv = require("yargs")
   .boolean("prod")
