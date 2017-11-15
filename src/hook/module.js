@@ -320,24 +320,21 @@ function hook(Module, parent, options) {
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, ext)
+    let passthru = typeof extCompiler === "function" && ! extCompiler[mjsSym]
 
-    if (extCompiler) {
-      let passthru = ! extCompiler[mjsSym]
-
-      if (passthru &&
-          ext === ".mjs") {
-        try {
-          extCompiler()
-        } catch (e) {
-          if (isError(e) &&
-              e.code === "ERR_REQUIRE_ESM") {
-            passthru = false
-          }
+    if (passthru &&
+        ext === ".mjs") {
+      try {
+        extCompiler()
+      } catch (e) {
+        if (isError(e) &&
+            e.code === "ERR_REQUIRE_ESM") {
+          passthru = false
         }
       }
-
-      passthruMap.set(extCompiler, passthru)
     }
+
+    passthruMap.set(extCompiler, passthru)
 
     if (ext === ".js" &&
         moduleState.extensions !== _extensions) {
