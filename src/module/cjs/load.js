@@ -6,15 +6,30 @@ import Wrapper from "../../wrapper.js"
 import _load from "../_load.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
+import moduleResolveFilename from "../resolve-filename.js"
+import resolveFilename from "./resolve-filename.js"
 
 const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
+  const parentFilename = (parent && parent.filename) || "."
+  const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+  const parentOptions = parentPkgInfo && parentPkgInfo.options
+
+  let filePath
+
+  if (parentOptions && parentOptions.cjs.paths &&
+      Module._resolveFilename !== moduleResolveFilename) {
+    filePath = Module._resolveFilename(id, parent, isMain)
+  } else {
+    filePath = resolveFilename(id, parent, isMain)
+  }
+
   let called = false
-  const filePath = Module._resolveFilename(id, parent, isMain)
+
   const child = _load(filePath, parent, isMain, __non_webpack_require__, function () {
     called = true
-    return loader.call(this, filePath, parent, preload)
+    return loader.call(this, filePath, parentOptions, preload)
   })
 
   if (! called &&
@@ -26,7 +41,7 @@ function load(id, parent, isMain, preload) {
   return child
 }
 
-function loader(filePath, parent, preload) {
+function loader(filePath, parentOptions, preload) {
   const mod = this
   Entry.get(mod)
 
@@ -47,15 +62,10 @@ function loader(filePath, parent, preload) {
 
   let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
 
-  if (extCompiler[mjsSym]) {
-    const parentFilename = (parent && parent.filename) || "."
-    const pkgInfo = PkgInfo.get(dirname(parentFilename))
-    const options = pkgInfo && pkgInfo.options
-
-    if (options &&
-        (options.cjs.extensions || options.esm !== "mjs")) {
-      extCompiler = extensions[ext]
-    }
+  if (parentOptions &&
+      extCompiler[mjsSym] &&
+      (parentOptions.cjs.extensions || parentOptions.esm !== "mjs")) {
+    extCompiler = extensions[ext]
   }
 
   extCompiler.call(extensions, mod, filePath)
