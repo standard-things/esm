@@ -123,7 +123,7 @@ Commonly used options may be specified in shorthand form:
   <td valign="top"><code>"gz":</code></td>
   <td>
     <p>A boolean to support gzipped module <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
-    <p><i>Note: Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/">gzip-loader</a>.</i></p>
+    <p><i>Note: Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/"><code>gzip-loader</code></a>.</i></p>
   </td>
 </tr>
 <tr>
@@ -246,11 +246,11 @@ DevOpts
 Tips
 ---
 * Load `@std/esm` before [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
-* Load `@std/esm` with the *“require”* option of [AVA](https://github.com/avajs/ava#options),
-  [Mocha](https://mochajs.org/#-r---require-module-name),
-  [nyc](https://github.com/istanbuljs/nyc#require-additional-modules), and
-  [tape](https://github.com/substack/tape#preloading-modules)
-* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [TAP](http://www.node-tap.org/cli/)
+* Load `@std/esm` with the *“require”* option of [`ava`](https://github.com/avajs/ava#options),
+  [`mocha`](https://mochajs.org/#-r---require-module-name),
+  [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules), and
+  [`tape`](https://github.com/substack/tape#preloading-modules)
+* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [`node-tap`](http://www.node-tap.org/cli/)
 * Use options `"@std/esm":"cjs"` or `"@std/esm":{"cjs":{"cache":true}}` with the Mocha [`--watch` option](https://mochajs.org/#-w---watch)
-* Use options `"@std/esm":"cjs"` with [webpack](https://webpack.js.org/)
+* Use options `"@std/esm":"cjs"` with [`webpack`](https://webpack.js.org/)
 * When in doubt, use options `"@std/esm":"cjs"`
