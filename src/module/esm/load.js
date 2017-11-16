@@ -36,7 +36,7 @@ function load(id, parent, isMain, preload) {
     }
   }
 
-  let isRequireState = state === __non_webpack_require__
+  const isRequireState = state === __non_webpack_require__
 
   let child = isRequireState
     ? state.cache[cacheId]
