@@ -15,6 +15,7 @@ import moduleState from "../state.js"
 import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
+import toOptInError from "../../util/to-opt-in-error.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
@@ -74,7 +75,7 @@ function load(id, parent, isMain, preload) {
     return child
   } else if (isError(error) &&
       error.code === "ERR_REQUIRE_ESM") {
-    error.message = error.message.replace("import", "@std/esm")
+    toOptInError(error)
   }
 
   try {

@@ -35,6 +35,7 @@ import { satisfies } from "semver"
 import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
+import toOptInError from "../util/to-opt-in-error.js"
 
 const { compile } = compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
@@ -348,7 +349,14 @@ function hook(Module, parent, options) {
 }
 
 function mjsCompiler(mod, filePath) {
-  throw new errors.Error("ERR_REQUIRE_ESM", filePath)
+  const error = new errors.Error("ERR_REQUIRE_ESM", filePath)
+  const { mainModule } = process
+
+  if (mainModule && mainModule.filename === filePath) {
+    toOptInError(error)
+  }
+
+  throw error
 }
 
 setProperty(mjsCompiler, mjsSym, {
