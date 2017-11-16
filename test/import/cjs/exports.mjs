@@ -74,12 +74,4 @@ export default () => {
   objects.forEach((object) => assert.ok(isPlainObject(object)))
 
   assert.strictEqual(nsSafe.safe, "safe get")
-  nsSafe.safe = "safe set"
-
-  assert.strictEqual(nsSafe.safe, "safe set")
-  nsSafe.safe = "safe get"
-
-  const desc = getDescriptor(nsSafe, "safe")
-  assert.ok("get" in desc)
-  assert.ok("set" in desc)
 }

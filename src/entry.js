@@ -1,5 +1,6 @@
 import NullObject from "./null-object.js"
 import PkgInfo from "./pkg-info.js"
+import SafeProxy from "./safe-proxy.js"
 import SafeWeakMap from "./safe-weak-map.js"
 
 import assign from "./util/assign.js"
@@ -26,6 +27,7 @@ const { toStringTag } = Symbol
 const entryMap = new SafeWeakMap
 
 const useToStringTag = typeof toStringTag === "symbol"
+const useProxy = typeof SafeProxy === "function"
 
 const esmDescriptor = {
   configurable: false,
@@ -213,35 +215,7 @@ class Entry {
     assignExportsToNamespace(this)
 
     setGetter(this, "esmNamespace", () => {
-      // Section 9.4.6
-      // Module namespace objects have a null [[Prototype]].
-      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      const namespace = new NullObject
-
-      // Section 9.4.6.11
-      // Step 7: Module namespace objects have sorted properties.
-      // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-      const { _namespace } = this
-      const names = sort.call(keys(_namespace))
-      const safe = this.esm
-
-      for (const name of names) {
-        if (safe) {
-          namespace[name] = _namespace[name]
-        } else {
-          assignProperty(namespace, _namespace, name)
-        }
-      }
-
-      // Section 26.3.1
-      // Module namespace objects have a @@toStringTag value of "Module".
-      // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      setNamespaceToStringTag(namespace)
-
-      // Section 9.4.6
-      // Module namespace objects are not extensible.
-      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      return this.esmNamespace = this._namespace = seal(namespace)
+      return this.esmNamespace = toNamespace(this)
     })
 
     setSetter(this, "esmNamespace", (value) => {
@@ -249,15 +223,7 @@ class Entry {
     })
 
     setGetter(this, "cjsNamespace", () => {
-      const namespace = new NullObject
-
-      // Section 4.6
-      // Step 4: Create an ESM with `{default:module.exports}` as its namespace
-      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#46-es-consuming-commonjs
-      namespace.default = this.exports
-
-      setNamespaceToStringTag(namespace)
-      return this.cjsNamespace = seal(namespace)
+      return this.cjsNamespace = toNamespace(this, { default: this.exports })
     })
 
     setSetter(this, "cjsNamespace", (value) => {
@@ -370,6 +336,20 @@ function changed(setter, key, value) {
 
   last[key] = value
   return true
+}
+
+function createNamespace() {
+  // Section 9.4.6
+  // Module namespace objects have a null [[Prototype]].
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+  const namespace = new NullObject
+
+  // Section 26.3.1
+  // Module namespace objects have a @@toStringTag value of "Module".
+  // https://tc39.github.io/ecma262/#sec-@@tostringtag
+  return useToStringTag
+    ? setProperty(namespace, toStringTag, toStringTagDescriptor)
+    : namespace
 }
 
 function getExportByName(entry, setter, name) {
@@ -501,7 +481,10 @@ function runSetter(entry, name, callback) {
         value === void 0 &&
         name in getters &&
         setter.parent.id in children) {
-      emitWarning("@std/esm detected possible temporal dead zone access of '" + name + "' in " + moduleName)
+      emitWarning(
+        "@std/esm detected possible temporal dead zone access of '" + name +
+        "' in " + moduleName
+      )
     }
   }
 }
@@ -512,10 +495,120 @@ function runSetters(entry, callback) {
   }
 }
 
-function setNamespaceToStringTag(object) {
-  return useToStringTag
-    ? setProperty(object, toStringTag, toStringTagDescriptor)
-    : object
+function toNamespace(entry, source = entry._namespace) {
+  return useProxy
+    ? toNamespaceProxy(entry, source)
+    : toNamespaceGetter(entry, source)
+}
+
+function toNamespaceGetter(entry, source = entry._namespace) {
+  // Section 9.4.6.11
+  // Step 7: Module namespace sources have sorted properties.
+  // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
+  const names = sort.call(keys(source))
+  const namespace = createNamespace()
+
+  for (const name of names) {
+    setGetter(namespace, name, () => {
+      if (useToStringTag &&
+          name === toStringTag) {
+        return namespace[name]
+      }
+
+      return source[name]
+    })
+
+    setSetter(namespace, name, () => {
+      if (name in source) {
+        warnNamespaceAssignment(entry, name)
+      } else {
+        warnNamespaceExtension(entry, name)
+      }
+    })
+  }
+
+  // Section 9.4.6
+  // Module namespace sources are not extensible.
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+  return seal(namespace)
+}
+
+function toNamespaceProxy(entry, source = entry._namespace) {
+  const names = sort.call(keys(source))
+  const namespace = createNamespace()
+
+  for (const name of names) {
+    namespace[name] = void 0
+  }
+
+  return new SafeProxy(seal(namespace), {
+    get: (namespace, name) => {
+      if (useToStringTag &&
+          name === toStringTag) {
+        return namespace[name]
+      }
+
+      return source[name]
+    },
+    getOwnPropertyDescriptor: (namespace, name) => {
+      if (! (name in namespace)) {
+        return
+      }
+
+      const descriptor = {
+        configurable: false,
+        enumerable: false,
+        value: "Module",
+        writable: false
+      }
+
+      // Section 26.3.1
+      // Return descriptor of the module namespace @@toStringTag.
+      // https://tc39.github.io/ecma262/#sec-@@tostringtag
+      if (useToStringTag &&
+          name === toStringTag) {
+        // eslint-disable-next-line consistent-return
+        return descriptor
+      }
+
+      // Section 9.4.6
+      // Return descriptor of the non-extensible module namespace property.
+      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+      descriptor.enumerable =
+      descriptor.writable = true
+      descriptor.value = source[name]
+
+      // eslint-disable-next-line consistent-return
+      return descriptor
+    },
+    set: (namespace, name) => {
+      if (name in source) {
+        warnNamespaceAssignment(entry, name)
+      } else {
+        warnNamespaceExtension(entry, name)
+      }
+
+      return true
+    }
+  })
+}
+
+function warnNamespaceAssignment(entry, name) {
+  if (entry.options.warnings) {
+    emitWarning(
+      "@std/esm cannot assign to the read only module namespace property " +
+      toStringLiteral(name, "'") + " of " + getModuleName(entry.module)
+    )
+  }
+}
+
+function warnNamespaceExtension(entry, name) {
+  if (entry.options.warnings) {
+    emitWarning(
+      "@std/esm cannot add property " + toStringLiteral(name, "'") +
+      " to module namespace of " + getModuleName(entry.module)
+    )
+  }
 }
 
 Object.setPrototypeOf(Entry.prototype, null)

@@ -10,11 +10,9 @@ const noValue = require("../../../fixture/export/abc.mjs")
 const getDescriptor = Object.getOwnPropertyDescriptor
 
 export default () => {
-  const customDescriptor = {
+  const partialDescriptor = {
     configurable: false,
-    enumerable: true,
-    value: "a",
-    writable: true
+    enumerable: true
   }
 
   const defaultDescriptor = {
@@ -24,11 +22,19 @@ export default () => {
     writable: false
   }
 
-  assert.strictEqual(getDescriptor(defaultNs, "__esModule"), void 0)
-  assert.deepStrictEqual(getDescriptor(customValue, "__esModule"), customDescriptor)
+  function getPartialDescriptor(object, name) {
+    const descriptor = getDescriptor(object, name)
+    return {
+      configurable: descriptor.configurable,
+      enumerable: descriptor.enumerable
+    }
+  }
 
-  assert.deepStrictEqual(getDescriptor(customNs, "__esModule"), customDescriptor)
+  assert.strictEqual(getDescriptor(defaultNs, "__esModule"), void 0)
   assert.deepStrictEqual(getDescriptor(defaultValue, "__esModule"), defaultDescriptor)
+
+  assert.deepStrictEqual(getPartialDescriptor(customNs, "__esModule"), partialDescriptor)
+  assert.deepStrictEqual(getPartialDescriptor(customValue, "__esModule"), partialDescriptor)
 
   assert.strictEqual(getDescriptor(noNs, "__esModule"), void 0)
   assert.strictEqual(getDescriptor(noValue, "__esModule"), void 0)
