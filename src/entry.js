@@ -1,3 +1,4 @@
+import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 import PkgInfo from "./pkg-info.js"
 import SafeProxy from "./safe-proxy.js"
@@ -7,7 +8,6 @@ import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import emitWarning from "./error/emit-warning.js"
 import env from "./env.js"
-import { format } from "util"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isESM from "./util/is-es-module.js"
@@ -26,8 +26,15 @@ const { toStringTag } = Symbol
 
 const entryMap = new SafeWeakMap
 
-const useToStringTag = typeof toStringTag === "symbol"
+const messages = new FastObject
+messages["ERR_EXPORT_MISSING"] = exportMissing
+messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
+messages["WRN_NS_ASSIGNMENT"] = namespaceAssignment
+messages["WRN_NS_EXTENSION"] = namespaceExtension
+messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
+
 const useProxy = typeof SafeProxy === "function"
+const useToStringTag = typeof toStringTag === "symbol"
 
 const esmDescriptor = {
   configurable: false,
@@ -352,6 +359,18 @@ function createNamespace() {
     : namespace
 }
 
+function exportMissing(entry, name) {
+  const moduleName = getModuleName(entry.module)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " does not provide an export named '" + name + "'"
+}
+
+function exportStarConflict(entry, name) {
+  const moduleName = getModuleName(entry.module)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " contains conflicting star exports for name '" + name + "'"
+}
+
 function getExportByName(entry, setter, name) {
   const isScript =
     ! entry.esm &&
@@ -365,13 +384,13 @@ function getExportByName(entry, setter, name) {
        name !== "default") ||
       (entry._loaded === 1 &&
        ! (name in entry.getters))) {
-    raiseExportMissing(entry, name)
+    raise("ERR_EXPORT_MISSING", entry, name)
   }
 
   const value = entry._namespace[name]
 
   if (value === STAR_ERROR) {
-    raiseExportStarConflict(entry, name)
+    raise("ERR_EXPORT_STAR_CONFLICT", entry, name)
   }
 
   return value
@@ -421,23 +440,24 @@ function mergeProperty(entry, otherEntry, key) {
   return entry
 }
 
-function raiseExport(entry, name, message) {
+function namespaceAssignment(entry, name) {
+  return "@std/esm cannot assign to the read only module namespace property " +
+    toStringLiteral(name, "'") + " of " + getModuleName(entry.module)
+}
+
+function namespaceExtension(entry, name) {
+  return "@std/esm cannot add property " + toStringLiteral(name, "'") +
+    " to module namespace of " + getModuleName(entry.module)
+}
+
+function raise(key, entry, name) {
   if (env.repl) {
     // Remove problematic getter and setter to unblock subsequent imports.
     delete entry.getters[name]
     delete entry.setters[name]
   }
 
-  const moduleName = getModuleName(entry.module)
-  throw new SyntaxError(format(message, toStringLiteral(moduleName, "'"), name))
-}
-
-function raiseExportMissing(entry, name) {
-  raiseExport(entry, name, "Module %s does not provide an export named '%s'")
-}
-
-function raiseExportStarConflict(entry, name) {
-  raiseExport(entry, name, "Module %s contains conflicting star exports for name '%s'")
+  throw new SyntaxError(messages[key](entry, name))
 }
 
 function runGetter(entry, name) {
@@ -464,9 +484,6 @@ function runGetters(entry) {
 
 function runSetter(entry, name, callback) {
   const { children, getters } = entry
-  const { warnings } = entry.options
-
-  const moduleName = getModuleName(entry.module)
   const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
@@ -477,14 +494,10 @@ function runSetter(entry, name, callback) {
     if (force ||
         changed(setter, name, value)) {
       callback(setter, value)
-    } else if (warnings &&
-        value === void 0 &&
+    } else if (value === void 0 &&
         name in getters &&
         setter.parent.id in children) {
-      emitWarning(
-        "@std/esm detected possible temporal dead zone access of '" + name +
-        "' in " + moduleName
-      )
+      warn("WRN_TDZ_ACCESS", entry, name)
     }
   }
 }
@@ -493,6 +506,11 @@ function runSetters(entry, callback) {
   for (const name in entry.setters) {
     runSetter(entry, name, callback)
   }
+}
+
+function temporalDeadZoneAccess(entry, name) {
+  return "@std/esm detected possible temporal dead zone access of " +
+    toStringLiteral(name, "'") + " in " + getModuleName(entry.module)
 }
 
 function toNamespace(entry, source = entry._namespace) {
@@ -520,9 +538,9 @@ function toNamespaceGetter(entry, source = entry._namespace) {
 
     setSetter(namespace, name, () => {
       if (name in source) {
-        warnNamespaceAssignment(entry, name)
+        warn("WRN_NS_ASSIGNMENT", entry, name)
       } else {
-        warnNamespaceExtension(entry, name)
+        warn("WRN_NS_EXTENSION", entry, name)
       }
     })
   }
@@ -583,9 +601,9 @@ function toNamespaceProxy(entry, source = entry._namespace) {
     },
     set: (namespace, name) => {
       if (name in source) {
-        warnNamespaceAssignment(entry, name)
+        warn("WRN_NS_ASSIGNMENT", entry, name)
       } else {
-        warnNamespaceExtension(entry, name)
+        warn("WRN_NS_EXTENSION", entry, name)
       }
 
       return true
@@ -593,21 +611,9 @@ function toNamespaceProxy(entry, source = entry._namespace) {
   })
 }
 
-function warnNamespaceAssignment(entry, name) {
+function warn(key, entry, name) {
   if (entry.options.warnings) {
-    emitWarning(
-      "@std/esm cannot assign to the read only module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleName(entry.module)
-    )
-  }
-}
-
-function warnNamespaceExtension(entry, name) {
-  if (entry.options.warnings) {
-    emitWarning(
-      "@std/esm cannot add property " + toStringLiteral(name, "'") +
-      " to module namespace of " + getModuleName(entry.module)
-    )
+    emitWarning(messages[key](entry, name))
   }
 }
 
