@@ -4,8 +4,9 @@
 
 import { dirname, resolve } from "path"
 
+import Module from "../module.js"
+
 import moduleState from "./state.js"
-import nodeModulePaths from "./node-module-paths.js"
 import { satisfies } from "semver"
 
 const codeOfDot = ".".charCodeAt(0)
@@ -60,7 +61,7 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
       ! parentFilename) {
     // Normally, the path is taken from `realpath(__filename)`,
     // but with --eval there is no `__filename`.
-    const paths = nodeModulePaths(".")
+    const paths = Module._nodeModulePaths(".")
     paths.unshift(".")
     return paths
   }

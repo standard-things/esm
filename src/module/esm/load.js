@@ -1,6 +1,7 @@
 import { extname as _extname, dirname } from "path"
 
 import Entry from "../../entry.js"
+import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
@@ -12,7 +13,6 @@ import has from "../../util/has.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import moduleState from "../state.js"
-import nodeModulePaths from "../node-module-paths.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
@@ -22,8 +22,15 @@ const BuiltinModule = __non_webpack_module__.constructor
 const compileSym = Symbol.for("@std/esm:module._compile")
 
 function load(id, parent, isMain, preload) {
-  const filePath = resolveFilename(id, parent, isMain)
-  const pkgInfo = PkgInfo.get(dirname(filePath))
+  const parentFilename = (parent && parent.filename) || "."
+  const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+  const parentOptions = parentPkgInfo && parentPkgInfo.options
+  const filePath = parentOptions && parentOptions.cjs.paths
+    ? Module._resolveFilename(id, parent, isMain)
+    : resolveFilename(id, parent, isMain)
+
+  const fromPath = dirname(filePath)
+  const pkgInfo = PkgInfo.get(fromPath)
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
 
@@ -57,7 +64,7 @@ function load(id, parent, isMain, preload) {
     child = _load(cacheId, parent, isMain, state, function () {
       called = true
       const url = getURLFromFilePath(filePath) + queryHash
-      return loader.call(this, filePath, url, parent, preload)
+      return loader.call(this, filePath, fromPath, url, parentOptions, preload)
     })
 
     if (! called &&
@@ -92,13 +99,13 @@ function load(id, parent, isMain, preload) {
   }
 }
 
-function loader(filePath, url, parent, preload) {
+function loader(filePath, fromPath, url, parentOptions, preload) {
   const mod = this
   const entry = Entry.get(mod)
 
   entry.url = url
   mod.filename = filePath
-  mod.paths = nodeModulePaths(dirname(filePath))
+  mod.paths = Module._nodeModulePaths(fromPath)
 
   if (preload) {
     preload(mod)
@@ -112,16 +119,8 @@ function loader(filePath, url, parent, preload) {
   if (Ctor === BuiltinModule) {
     if (ext === ".js") {
       extensions = Ctor._extensions
-    } else {
-      const filename = parent && typeof parent.filename === "string"
-        ? parent.filename
-        : "."
-
-      const pkgInfo = PkgInfo.get(dirname(filename))
-
-      if (pkgInfo && pkgInfo.options.cjs.extensions) {
-        extensions = Ctor._extensions
-      }
+    } else if (parentOptions && parentOptions.cjs.extensions) {
+      extensions = Ctor._extensions
     }
   }
 

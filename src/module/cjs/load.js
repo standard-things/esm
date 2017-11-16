@@ -1,18 +1,17 @@
 import Entry from "../../entry.js"
+import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 import Wrapper from "../../wrapper.js"
 
 import _load from "../_load.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
-import nodeModulePaths from "../node-module-paths.js"
-import resolveFilename from "./resolve-filename.js"
 
 const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
   let called = false
-  const filePath = resolveFilename(id, parent, isMain)
+  const filePath = Module._resolveFilename(id, parent, isMain)
   const child = _load(filePath, parent, isMain, __non_webpack_require__, function () {
     called = true
     return loader.call(this, filePath, parent, preload)
@@ -32,7 +31,7 @@ function loader(filePath, parent, preload) {
   Entry.get(mod)
 
   mod.filename = filePath
-  mod.paths = nodeModulePaths(dirname(filePath))
+  mod.paths = Module._nodeModulePaths(dirname(filePath))
 
   if (preload) {
     preload(mod)
@@ -49,14 +48,12 @@ function loader(filePath, parent, preload) {
   let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
 
   if (extCompiler[mjsSym]) {
-    const filename = parent && typeof parent.filename === "string"
-      ? parent.filename
-      : "."
+    const parentFilename = (parent && parent.filename) || "."
+    const pkgInfo = PkgInfo.get(dirname(parentFilename))
+    const options = pkgInfo && pkgInfo.options
 
-    const pkgInfo = PkgInfo.get(dirname(filename))
-
-    if (pkgInfo &&
-        (pkgInfo.options.cjs.extensions || pkgInfo.options.esm !== "mjs")) {
+    if (options &&
+        (options.cjs.extensions || options.esm !== "mjs")) {
       extCompiler = extensions[ext]
     }
   }
