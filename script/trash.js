@@ -11,7 +11,7 @@ function trash(iterable) {
         if (e.code === "EACCES") {
           // eslint-disable-next-line no-console
           console.error(e)
-          process.exit(e.code)
+          process.exitCode = e.code
         }
 
         resolve()
