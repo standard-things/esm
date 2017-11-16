@@ -13,6 +13,7 @@ import has from "../../util/has.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import moduleState from "../state.js"
+import moduleResolveFilename from "../resolve-filename.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
@@ -25,9 +26,15 @@ function load(id, parent, isMain, preload) {
   const parentFilename = (parent && parent.filename) || "."
   const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
   const parentOptions = parentPkgInfo && parentPkgInfo.options
-  const filePath = parentOptions && parentOptions.cjs.paths
-    ? Module._resolveFilename(id, parent, isMain)
-    : resolveFilename(id, parent, isMain)
+
+  let filePath
+
+  if (parentOptions && parentOptions.cjs.paths &&
+      Module._resolveFilename !== moduleResolveFilename) {
+    filePath = Module._resolveFilename(id, parent, isMain)
+  } else {
+    filePath = resolveFilename(id, parent, isMain)
+  }
 
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
