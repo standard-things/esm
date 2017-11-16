@@ -21,6 +21,7 @@ const ignorePatterns = fs.readFileSync(gitignorePath, "utf8")
 
 const ignorePaths = globby.sync(ignorePatterns, {
   cwd: rootPath,
+  nodir: false,
   realpath: true
 })
 
@@ -34,6 +35,7 @@ function isEmpty(dirPath) {
 function trashEmptyDirs() {
   return globby.sync(["*/**/"], {
     cwd: rootPath,
+    nodir: false,
     realpath: true
   })
   .filter(isEmpty)

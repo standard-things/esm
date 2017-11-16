@@ -38,7 +38,10 @@ export default () =>
       assert.ok("this" in global)
       assert.strictEqual(global.this, "undefined")
 
-      const cachePaths = globby.sync(["fixture/options/**/.cache"])
+      const cachePaths = globby.sync(["fixture/options/**/.cache"], {
+        nodir: false
+      })
+
       assert.deepStrictEqual(cachePaths, ["fixture/options/true/node_modules/.cache"])
       resolve()
     })
