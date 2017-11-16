@@ -20,7 +20,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
-const { is, keys, seal } = Object
+const { is, isSealed, keys, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
 
@@ -195,7 +195,16 @@ class Entry {
 
     if (this.esm) {
       const exported = this.exports
-      assign(exported, this._namespace)
+
+      if (! isSealed(exported)) {
+        const { _namespace } = this
+
+        for (const name in _namespace) {
+          setGetter(exported, name, () => {
+            return this._namespace[name]
+          })
+        }
+      }
 
       if (this.options.cjs.interop &&
           ! has(exported, "__esModule")) {
