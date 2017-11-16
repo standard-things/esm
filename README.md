@@ -247,9 +247,10 @@ Tips
 ---
 * Load `@std/esm` before [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
 * Load `@std/esm` with the *“require”* option of [AVA](https://github.com/avajs/ava#options),
-  [Mocha](https://mochajs.org/#-r---require-module-name), and [nyc](https://github.com/istanbuljs/nyc#require-additional-modules)
+  [Mocha](https://mochajs.org/#-r---require-module-name),
+  [nyc](https://github.com/istanbuljs/nyc#require-additional-modules), and
+  [tape](https://github.com/substack/tape#preloading-modules)
 * Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [TAP](http://www.node-tap.org/cli/)
-* Load `@std/esm` with the `-r @std/esm` option of [tape](https://www.npmjs.com/package/tape)
 * Use options `"@std/esm":"cjs"` or `"@std/esm":{"cjs":{"cache":true}}` with the Mocha [`--watch` option](https://mochajs.org/#-w---watch)
 * Use options `"@std/esm":"cjs"` with [webpack](https://webpack.js.org/)
 * When in doubt, use options `"@std/esm":"cjs"`
