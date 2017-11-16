@@ -26,20 +26,19 @@ function compileAndCache(code, options) {
 
 function compileAndWrite(code, options) {
   const result = compileAndCache(code, options)
+
+  // Add "main" to enable `readFile` fast path.
+  const output =
+    (result.esm ? '"main";' : '"use script";"main";') +
+    result.code
+
+  const { cache, dirPath:scopePath } = options.pkgInfo
   const cachePath = options.cachePath
   const cacheFileName = options.cacheFileName
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const isGzipped = extname(cacheFilePath) === ".gz"
-
-  let output = result.code
-
-  if (! result.esm) {
-    output = '"use script";' + output
-  }
-
   const content = () => isGzipped ? gzip(output) : output
   const encoding = isGzipped ? null : "utf8"
-  const { cache, dirPath:scopePath } = options.pkgInfo
   const writeOptions = { encoding, scopePath }
 
   writeFileDefer(cacheFilePath, content, writeOptions, (success) => {
