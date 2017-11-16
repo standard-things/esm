@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import { extname } from "path"
 import isFile from "../util/is-file.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
@@ -16,7 +17,7 @@ function readFile(filePath, options) {
 
   if (useReadFileFastPath && isUTF8) {
     try {
-      return fastPathReadFile(filePath)
+      return fastPathReadFile(filePath, options)
     } catch (e) {
       useReadFileFastPath = false
     }
@@ -36,12 +37,19 @@ function fallbackReadFile(filePath, options) {
   return null
 }
 
-function fastPathReadFile(filePath) {
+function fastPathReadFile(filePath, options) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
   const content = internalModuleReadFile.call(fsBinding, toNamespacedPath(filePath))
-  return content === void 0 ? null : content
+
+  if (content === void 0) {
+    return extname(filePath) === ".json"
+      ? null
+      : fallbackReadFile(filePath, options)
+  }
+
+  return content
 }
 
 export default readFile
