@@ -40,15 +40,9 @@ function fastPathReadFile(filePath, options) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
-  const content = internalModuleReadFile.call(fsBinding, toNamespacedPath(filePath))
-
-  if (content === void 0) {
-    return null
-  }
-
-  return content === ""
-    ? fallbackReadFile(filePath, options)
-    : content
+  filePath = toNamespacedPath(filePath)
+  return internalModuleReadFile.call(fsBinding, filePath) ||
+    fallbackReadFile(filePath, options)
 }
 
 export default readFile
