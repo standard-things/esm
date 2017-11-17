@@ -1,5 +1,4 @@
 import binding from "../binding.js"
-import { extname } from "path"
 import isFile from "../util/is-file.js"
 import isObjectLike from "../util/is-object-like.js"
 import { readFileSync } from "fs"
@@ -44,12 +43,12 @@ function fastPathReadFile(filePath, options) {
   const content = internalModuleReadFile.call(fsBinding, toNamespacedPath(filePath))
 
   if (content === void 0) {
-    return extname(filePath) === ".json"
-      ? null
-      : fallbackReadFile(filePath, options)
+    return null
   }
 
-  return content
+  return content === ""
+    ? fallbackReadFile(filePath, options)
+    : content
 }
 
 export default readFile
