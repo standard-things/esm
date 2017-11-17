@@ -6,6 +6,7 @@
 import { DestructuringErrors } from "../vendor/acorn/src/parseutil.js"
 
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
+import wrap from "../util/wrap.js"
 
 const loopLabel = { kind: "loop" }
 
@@ -14,7 +15,7 @@ function enable(parser) {
   parser.parseForIn = parseForIn
   parser.parseForStatement = parseForStatement
   parser.parseFunction = parseFunction
-  parser.parseProperty = parseProperty
+  parser.parseProperty = wrap(parser.parseProperty, parseProperty)
   return parser
 }
 
@@ -197,7 +198,13 @@ function parseFunction(node, isStatement, allowExpressionBody, isAsync) {
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression")
 }
 
-function parseProperty(isPattern, refDestructuringErrors) {
+function parseProperty(func, args) {
+  const [isPattern, refDestructuringErrors] = args
+
+  if (this.type === tt.ellipsis) {
+    return func.apply(this, args)
+  }
+
   const propNode = this.startNode()
 
   propNode.method =
