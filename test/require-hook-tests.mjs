@@ -11,8 +11,13 @@ describe("require hook", () => {
       .then((ns) => ns.default())
   )
 
-  it("should support live binding", () =>
+  it("should support live binding through bridged modules", () =>
     import("./require/live.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should support live binding through `module.exports`", () =>
+    import("./require/live.js")
       .then((ns) => ns.default())
   )
 
