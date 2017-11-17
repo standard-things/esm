@@ -1,4 +1,4 @@
-// A more accurate version of the dynamic import acorn plugin.
+// A more accurate version of acorn-dynamic-import.
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
