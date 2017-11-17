@@ -130,11 +130,6 @@ function hook(Module, parent, options) {
       }
     }
 
-    if (isObject(cached)) {
-      tryCompileCached(mod, cached, filePath, runtimeAlias, options)
-      return
-    }
-
     const { _compile } = mod
     const shouldOverwrite = env.cli
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
@@ -148,15 +143,17 @@ function hook(Module, parent, options) {
         }
       }
 
-      cached = tryCompileCode(manager, content, {
-        cacheFileName,
-        cachePath,
-        filePath,
-        hint,
-        pkgInfo,
-        runtimeAlias,
-        type
-      })
+      if (! isObject(cached)) {
+        cached = tryCompileCode(manager, content, {
+          cacheFileName,
+          cachePath,
+          filePath,
+          hint,
+          pkgInfo,
+          runtimeAlias,
+          type
+        })
+      }
 
       if (cached.warnings) {
         for (const warning of cached.warnings) {
