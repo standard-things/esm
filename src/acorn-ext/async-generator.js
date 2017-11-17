@@ -3,8 +3,6 @@
 // https://github.com/babel/babel/blob/master/packages/babylon/src/parser/expression.js
 // https://github.com/babel/babel/blob/master/packages/babylon/src/parser/statement.js
 
-import { DestructuringErrors } from "../vendor/acorn/src/parseutil.js"
-
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
 
@@ -142,8 +140,7 @@ function parseForStatement(node) {
     return this.parseFor(node, init)
   }
 
-  const refDestructuringErrors = new DestructuringErrors
-  const init = this.parseExpression(true, refDestructuringErrors)
+  const init = this.parseExpression(true)
 
   if (this.type === tt._in ||
       this.isContextual("of")) {
@@ -199,7 +196,7 @@ function parseFunction(node, isStatement, allowExpressionBody, isAsync) {
 }
 
 function parseProperty(func, args) {
-  const [isPattern, refDestructuringErrors] = args
+  const [isPattern] = args
 
   if (this.type === tt.ellipsis) {
     return func.apply(this, args)
@@ -213,8 +210,7 @@ function parseProperty(func, args) {
   let startPos
   let startLoc
 
-  if (isPattern ||
-      refDestructuringErrors) {
+  if (isPattern) {
     startPos = this.start
     startLoc = this.startLoc
   }
@@ -243,7 +239,7 @@ function parseProperty(func, args) {
     this.parsePropertyName(propNode)
   }
 
-  this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc, refDestructuringErrors)
+  this.parsePropertyValue(propNode, isPattern, isGenerator, isAsync, startPos, startLoc)
   return this.finishNode(propNode, "Property")
 }
 

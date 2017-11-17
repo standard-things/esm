@@ -13,6 +13,7 @@ const engineTypePostfix = "may only be used in ES modules"
 const parserTypePostfix = "may appear only with 'sourceType: module'"
 
 function enable(parser) {
+  parser.checkExpressionErrors =
   parser.isDirectiveCandidate =
   parser.strictDirective = alwaysFalse
 
@@ -34,21 +35,12 @@ function enable(parser) {
   parser.exitFunctionScope =
   parser.exitLexicalScope = noop
 
-  parser.checkExpressionErrors = checkExpressionErrors
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
   parser.raise = raise
   parser.raiseRecoverable = raiseRecoverable
 
   parser.strict = false
   return parser
-}
-
-function checkExpressionErrors(refDestructuringErrors) {
-  if (refDestructuringErrors) {
-    return refDestructuringErrors.shorthandAssign !== -1
-  }
-
-  return false
 }
 
 function raise(pos, message) {
