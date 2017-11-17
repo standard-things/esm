@@ -10,6 +10,7 @@ const abcNs = createNamespace({
   default: "default"
 })
 
-module.exports = () =>
-  import("../../fixture/export/abc.mjs")
+module.exports = () => {
+  return import("../../fixture/export/abc.mjs")
     .then((ns) => assert.deepStrictEqual(ns, abcNs))
+}
