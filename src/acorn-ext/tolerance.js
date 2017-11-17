@@ -45,7 +45,7 @@ function enable(parser) {
 
 function checkExpressionErrors(refDestructuringErrors) {
   if (refDestructuringErrors) {
-    return refDestructuringErrors.shorthandAssign > -1
+    return refDestructuringErrors.shorthandAssign !== -1
   }
 
   return false
