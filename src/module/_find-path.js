@@ -22,6 +22,7 @@ const { preserveSymlinks } = binding.config
 const packageCache = new FastObject
 const pathCache = new FastObject
 
+const mainFieldRegExp = /"main"/
 const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
@@ -126,7 +127,8 @@ function readPackage(thePath) {
   const jsonPath = resolve(thePath, "package.json")
   const json = readFile(jsonPath, "utf8")
 
-  if (json === null) {
+  if (! json ||
+      ! mainFieldRegExp.test(json)) {
     return ""
   }
 
