@@ -89,15 +89,9 @@ function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
         searchExts = keys(extensions)
       }
 
-      filePath = tryPackage(basePath, searchExts, isMain)
-    }
-
-    if (isDir && ! filePath) {
-      if (searchExts === void 0) {
-        searchExts = keys(extensions)
-      }
-
-      filePath = tryExtensions(resolve(basePath, "index"), searchExts, isMain)
+      filePath =
+        tryPackage(basePath, searchExts, isMain) ||
+        tryExtensions(resolve(basePath, "index"), searchExts, isMain)
     }
 
     if (filePath) {
