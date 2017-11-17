@@ -159,9 +159,8 @@ function parseFunction(node, isStatement, allowExpressionBody, isAsync) {
   node.generator = this.eat(tt.star)
   node.id = null
 
-  if (isStatement &&
-      isStatement !== "nullableID" &&
-      this.type === tt.name) {
+  if (this.type === tt.name &&
+      isStatement && isStatement !== "nullableID") {
     node.id = this.parseIdent()
     this.checkLVal(node.id, "var")
   }
