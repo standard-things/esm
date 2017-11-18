@@ -51,7 +51,7 @@ const builtinModules = ids
 
     setGetter(object, id, () => {
       const mod = new Module(id, null)
-      mod.exports = mod.require(id)
+      mod.exports = id === "module" ? Module : mod.require(id)
       mod.loaded = true
       return object[id] = mod
     })
