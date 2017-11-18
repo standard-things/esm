@@ -49,11 +49,11 @@ class Module extends BuiltinModule {
   static _resolveFilename = resolveFilename
   static _resolveLookupPaths = resolveLookupPaths
   static _wrapper = wrapper
+  static Module = Module
   static globalPaths = moduleState.globalPaths
   static wrap = wrap
 }
 
-Module.Module = Module
 defaults(Module, BuiltinModule)
 
 setProperty(Module, "length", {
