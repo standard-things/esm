@@ -3,23 +3,23 @@ import loadESM from "../module/esm/load.js"
 
 const { setPrototypeOf } = Object
 
-function hook(Module) {
+function hook(Mod) {
   const { _tickCallback } = process
   const [, mainPath] = process.argv
-  const { runMain } = Module
+  const { runMain } = Mod
 
   const useTickCallback = typeof _tickCallback === "function"
 
-  Module.runMain = () => {
-    Module.runMain = runMain
+  Mod.runMain = () => {
+    Mod.runMain = runMain
 
     if (mainPath in builtinModules) {
-      Module.runMain()
+      Mod.runMain()
       return
     }
 
-    loadESM(mainPath, null, true, (mod) => {
-      setPrototypeOf(mod, Module.prototype)
+    loadESM(filePath, null, true, (mod) => {
+      setPrototypeOf(mod, Mod.prototype)
     })
 
     tickCallback()

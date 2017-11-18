@@ -41,10 +41,10 @@ const { compile } = compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
 
-function hook(Module, parent, options) {
+function hook(Mod, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
-  const { _extensions } = Module
+  const { _extensions } = Mod
   const passthruMap = new SafeMap
 
   const parentFilename = parent && parent.filename
