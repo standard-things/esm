@@ -53,6 +53,7 @@ class Module extends BuiltinModule {
   static wrap = wrap
 }
 
+Module.Module = Module
 defaults(Module, BuiltinModule)
 
 setProperty(Module, "length", {
