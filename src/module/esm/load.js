@@ -9,7 +9,6 @@ import env from "../../env.js"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
-import has from "../../util/has.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import moduleResolveFilename from "../resolve-filename.js"
@@ -19,8 +18,6 @@ import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
-
-const compileSym = Symbol.for("@std/esm:module._compile")
 
 function load(id, parent, isMain, preload) {
   const parentFilename = (parent && parent.filename) || "."
@@ -123,12 +120,10 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
   let { extensions } = moduleState
   let ext = extname(filePath)
 
-  if (Ctor === BuiltinModule) {
-    if (ext === ".js") {
-      extensions = Ctor._extensions
-    } else if (parentOptions && parentOptions.cjs.extensions) {
-      extensions = Ctor._extensions
-    }
+  if (Ctor === BuiltinModule &&
+      (ext === ".js" ||
+        (parentOptions && parentOptions.cjs.extensions))) {
+    extensions = Ctor._extensions
   }
 
   if (ext === "" ||
@@ -140,23 +135,6 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
     extensions[ext](mod, filePath)
     mod.loaded = true
     return
-  }
-
-  const { _compile } = mod
-  const shouldRestore = has(mod, "_compile")
-
-  mod._compile = (content, filePath) => {
-    if (shouldRestore) {
-      mod._compile = _compile
-    } else {
-      delete mod._compile
-    }
-
-    const func = typeof mod[compileSym] === "function"
-      ? mod[compileSym]
-      : _compile
-
-    return func.call(mod, content, filePath)
   }
 
   extensions[ext](mod, filePath)

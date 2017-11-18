@@ -4,6 +4,8 @@
 
 import Module from "../module.js"
 
+const compileSym = Symbol.for("@std/esm:module._compile")
+
 function _load(filePath, parent, isMain, state, loader) {
   let child = state.cache[filePath]
 
@@ -23,6 +25,18 @@ function _load(filePath, parent, isMain, state, loader) {
   if (isMain) {
     process.mainModule = child
     child.id = "."
+  }
+
+  const { _compile } = child
+
+  child._compile = (content, filePath) => {
+    delete child._compile
+
+    const func = typeof child[compileSym] === "function"
+      ? child[compileSym]
+      : _compile
+
+    return func.call(child, content, filePath)
   }
 
   tryLoad(child, filePath, state, loader)
