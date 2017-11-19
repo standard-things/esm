@@ -105,11 +105,11 @@ function load(id, parent, isMain, preload) {
 
 function loader(filePath, fromPath, url, parentOptions, preload) {
   const mod = this
-  const entry = Entry.get(mod)
-
-  entry.url = url
   mod.filename = filePath
   mod.paths = Module._nodeModulePaths(fromPath)
+
+  const entry = Entry.get(mod)
+  entry.url = url
 
   if (preload) {
     preload(mod)
