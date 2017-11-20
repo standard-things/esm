@@ -406,10 +406,8 @@ function getExportByName(entry, setter, name) {
 }
 
 function mergeProperty(entry, otherEntry, key) {
-  const { _loaded } = entry
-
-  if (_loaded !== 1 &&
-      key === "namespace") {
+  if ((entry._loaded || otherEntry._loaded) &&
+      (key === "cjsNamespace" || key === "esmNamespace")) {
     return assignProperty(entry, otherEntry, key)
   }
 
@@ -423,7 +421,7 @@ function mergeProperty(entry, otherEntry, key) {
         entry.addGetter(name, value[name])
       }
     } else if (key ===  "_loaded"
-        ? value > _loaded
+        ? value > entry._loaded
         : value != null) {
       entry[key] = value
     }
