@@ -193,6 +193,8 @@ class Entry {
       }
     }
 
+    let setGetters = true
+
     if (this.esm) {
       const exported = this.exports
 
@@ -213,7 +215,9 @@ class Entry {
 
       seal(exported)
     } else {
-      this.merge(Entry.get(this.module))
+      const otherEntry = Entry.get(this.module)
+      setGetters = otherEntry._loaded !== 1
+      this.merge(otherEntry)
 
       const mod = this.module
       const exported = mod.exports
@@ -230,21 +234,23 @@ class Entry {
 
     assignExportsToNamespace(this)
 
-    setGetter(this, "esmNamespace", () => {
-      return this.esmNamespace = toNamespace(this)
-    })
+    if (setGetters) {
+      setGetter(this, "esmNamespace", () => {
+        return this.esmNamespace = toNamespace(this)
+      })
 
-    setSetter(this, "esmNamespace", (value) => {
-      setProperty(this, "esmNamespace", { value })
-    })
+      setSetter(this, "esmNamespace", (value) => {
+        setProperty(this, "esmNamespace", { value })
+      })
 
-    setGetter(this, "cjsNamespace", () => {
-      return this.cjsNamespace = toNamespace(this, { default: this.exports })
-    })
+      setGetter(this, "cjsNamespace", () => {
+        return this.cjsNamespace = toNamespace(this, { default: this.exports })
+      })
 
-    setSetter(this, "cjsNamespace", (value) => {
-      setProperty(this, "cjsNamespace", { value })
-    })
+      setSetter(this, "cjsNamespace", (value) => {
+        setProperty(this, "cjsNamespace", { value })
+      })
+    }
 
     return this._loaded = 1
   }
