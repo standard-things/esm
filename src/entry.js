@@ -79,6 +79,8 @@ class Entry {
     this.options = PkgInfo.createOptions()
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
+    // Initialize empty namespace setter so they are merged properly.
+    this.setters["*"] = []
     // The file url of the module.
     this.url = null
     /* eslint-enable lines-around-comment */
