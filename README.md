@@ -242,6 +242,7 @@ Tips
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules), and
   [`tape`](https://github.com/substack/tape#preloading-modules)
 * Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [`node-tap`](http://www.node-tap.org/cli/)
+* Load `@std/esm` with the `--node-args="-r @std/esm"` option of [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
 * Use options `"@std/esm":"cjs"` or `"@std/esm":{"cjs":{"cache":true}}` with the Mocha [`--watch` option](https://mochajs.org/#-w---watch)
 * Use options `"@std/esm":"cjs"` with [`webpack`](https://webpack.js.org/)
 * When in doubt, use options `"@std/esm":"cjs"`
