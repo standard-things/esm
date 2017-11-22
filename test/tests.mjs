@@ -28,13 +28,13 @@ exts.forEach((ext) => {
   if (ext.endsWith(".gz") &&
       ! fs.pathExistsSync(filePath)) {
     const gzipped = ext === ".mjs.gz" ? mjsGzipped : jsGzipped
-    fs.writeFileSync(filePath, gzipped)
+    fs.outputFileSync(filePath, gzipped)
   }
 })
 
 if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
   const gzipped = zlib.gzipSync(fs.readFileSync("./fixture/options/js/index.js"))
-  fs.writeFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
+  fs.outputFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
 }
 
 beforeEach(() => {

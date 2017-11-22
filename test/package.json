@@ -1,8 +1,0 @@
-{
-  "name": "test",
-  "private": true,
-  "@std/esm": {
-    "cache": ".cache/for/tests",
-    "debug": true
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "name": "in",
-  "private": true,
-  "@std/esm": {
-    "cjs": true,
-    "debug": true
-  }
-}
