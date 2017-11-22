@@ -4,7 +4,9 @@ import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
+import defaults from "./util/defaults.js"
 import has from "./util/has.js"
+import isObjectLike from "./util/is-object-like.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
@@ -82,21 +84,32 @@ class PkgInfo {
 
   static read(dirPath, force) {
     let pkgJSON = readJSON(resolve(dirPath, "package.json"))
+    let options = readJSON(resolve(dirPath, ".esmrc"))
+    let range = null
+
+    if (options) {
+      options = toOptions(options)
+    }
 
     if (pkgJSON === null) {
-      if (force) {
-        pkgJSON = new NullObject
-      } else {
+      if (options) {
+        const parentPkgInfo = PkgInfo.get(dirname(dirPath))
+
+        if (parentPkgInfo) {
+          range = parentPkgInfo.range
+          options = defaults(PkgInfo.createOptions(options), parentPkgInfo.options)
+        }
+      } else if (! force) {
         return null
       }
     }
 
-    let options = readJSON(resolve(dirPath, ".esmrc"))
-
-    if (has(pkgJSON, "@std/esm")) {
-      options = pkgJSON["@std/esm"]
-    } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
-      options = pkgJSON["@std"].esm
+    if (options === null) {
+      if (has(pkgJSON, "@std/esm")) {
+        options = pkgJSON["@std/esm"]
+      } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
+        options = pkgJSON["@std"].esm
+      }
     }
 
     if (! force &&
@@ -106,12 +119,14 @@ class PkgInfo {
       return null
     }
 
-    // A package.json may have `@std/esm` in its "devDependencies" object
-    // because it expects another package or application to enable ESM loading
-    // in production, but needs `@std/esm` during development.
-    let range =
-      getRange(pkgJSON, "dependencies") ||
-      getRange(pkgJSON, "peerDependencies")
+    if (range === null) {
+      // A package.json may have `@std/esm` in its "devDependencies" object
+      // because it expects another package or application to enable ESM loading
+      // in production, but needs `@std/esm` during development.
+      range =
+        getRange(pkgJSON, "dependencies") ||
+        getRange(pkgJSON, "peerDependencies")
+    }
 
     if (force) {
       range = "*"
@@ -155,13 +170,7 @@ function createOptions(options) {
   let sourceMap
   const { defaultOptions } = PkgInfo
 
-  if (typeof options === "string") {
-    if (options === "cjs") {
-      options = { cjs: true, esm: "js" }
-    } else {
-      options = { esm: options }
-    }
-  }
+  options = toOptions(options)
 
   if (has(options, "cjs")) {
     cjsOptions = typeof options.cjs === "boolean"
@@ -193,10 +202,25 @@ function createOptions(options) {
 }
 
 function getRange(json, name) {
-  const entry = json[name]
-  return has(entry, "@std/esm")
-    ? validRange(entry["@std/esm"])
-    : null
+  if (has(json, name)) {
+    const object = json[name]
+
+    if (has(object, "@std/esm")) {
+      return validRange(object["@std/esm"])
+    }
+  }
+
+  return null
+}
+
+function toOptions(value) {
+  if (typeof value === "string") {
+    return value === "cjs"
+      ? { cjs: true, esm: "js" }
+      : { esm: value }
+  }
+
+  return isObjectLike(value) ? value : {}
 }
 
 Object.setPrototypeOf(PkgInfo.prototype, null)
