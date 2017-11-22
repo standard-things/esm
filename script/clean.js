@@ -29,17 +29,26 @@ const ignorePaths = globby.sync(ignorePatterns, {
 const trashPaths = ignorePaths
   .filter((thePath) => thePath !== nodeModulesPath)
 
+function exists(thePath) {
+  return fs.existsSync(thePath)
+}
+
 function isEmpty(dirPath) {
   return ! fs.readdirSync(dirPath).length
+}
+
+function realPath(thePath) {
+  return path.resolve(rootPath, thePath)
 }
 
 function trashEmptyDirs() {
   return globby.sync(["*/**/"], {
     cwd: rootPath,
     expandDirectories: false,
-    nodir: false,
-    realpath: true
+    nodir: false
   })
+  .map(realPath)
+  .filter(exists)
   .filter(isEmpty)
   .map(trash)
 }
