@@ -55,7 +55,7 @@ function cleanJSON() {
   // Remove dependencies field, added by npm@5, from package.json.
   return fs
     .readFile(jsonPath, "utf8")
-    .then((jsonText) => fs.writeFile(jsonPath, jsonText.replace(removeDepsRegExp, "")))
+    .then((jsonText) => fs.outputFile(jsonPath, jsonText.replace(removeDepsRegExp, "")))
 }
 
 function cleanRepo() {
@@ -82,7 +82,7 @@ function gzipBundle() {
   return fs
     .readFile(bundlePath)
     .then((buffer) => gzip(buffer, gzipOptions))
-    .then((buffer) => fs.writeFile(gzipPath, buffer))
+    .then((buffer) => fs.outputFile(gzipPath, buffer))
 }
 
 function makeBundle() {
