@@ -18,9 +18,8 @@ function hook(parent, options) {
     if (options) {
       const parentFilename = (parent && parent.filename) || "."
       const dirPath = dirname(parentFilename)
-      const pkgInfo = PkgInfo.read(dirPath, true)
+      const pkgInfo = PkgInfo.get(dirPath, true)
 
-      PkgInfo.set(dirPath, pkgInfo)
       assign(pkgInfo.options, options)
     }
 

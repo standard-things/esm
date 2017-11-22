@@ -70,8 +70,7 @@ function hook(Mod, parent, options) {
       : (PkgInfo.get(dirPath) || defaultPkgInfo)
 
     if (options) {
-      pkgInfo = PkgInfo.read(dirPath, true)
-      PkgInfo.set(dirPath, pkgInfo)
+      pkgInfo = PkgInfo.get(dirPath, true)
       assign(pkgInfo.options, options)
 
       if (parentPkgInfo) {

@@ -61,18 +61,25 @@ class PkgInfo {
     this.range = range
   }
 
-  static get(dirPath) {
+  static get(dirPath, force) {
+    let pkgInfo
+
     if (dirPath in infoCache) {
-      return infoCache[dirPath]
+      pkgInfo = infoCache[dirPath]
+
+      if (! force || pkgInfo) {
+        return pkgInfo
+      }
     }
 
     infoCache[dirPath] = null
 
-    if (basename(dirPath) === "node_modules") {
+    if (! force &&
+        basename(dirPath) === "node_modules") {
       return null
     }
 
-    let pkgInfo = PkgInfo.read(dirPath)
+    pkgInfo = PkgInfo.read(dirPath, force)
 
     if (pkgInfo === null) {
       const parentPath = dirname(dirPath)
