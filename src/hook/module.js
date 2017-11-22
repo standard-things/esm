@@ -47,10 +47,17 @@ function hook(Mod, parent, options) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
-  const parentFilename = parent && parent.filename
-  const parentPkgInfo = options && parentFilename
-    ? PkgInfo.get(dirname(parentFilename))
-    : null
+  const parentFilename = (parent && parent.filename) || "."
+  const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+
+  if (parentPkgInfo) {
+    defaultPkgInfo.cache = parentPkgInfo.cache
+    defaultPkgInfo.cachePath = parentPkgInfo.cachePath
+    defaultPkgInfo.dirPath = parentPkgInfo.dirPath
+    defaultPkgInfo.options.cache = parentPkgInfo.options.cache
+    defaultPkgInfo.options.esm = parentPkgInfo.options.esm
+  }
 
   let allowTopLevelAwait = isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")
@@ -58,7 +65,9 @@ function hook(Mod, parent, options) {
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
     const dirPath = dirname(filePath)
-    let pkgInfo = options ? null : PkgInfo.get(dirPath)
+    let pkgInfo = options
+      ? null
+      : (PkgInfo.get(dirPath) || defaultPkgInfo)
 
     if (options) {
       pkgInfo = PkgInfo.read(dirPath, true)

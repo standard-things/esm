@@ -178,7 +178,7 @@ describe("errors", () => {
           checkErrorStack(e, [
             id6 + ":1",
             "syntax@error",
-            "      ^\n"
+            "\n"
           ].join("\n"))
         )
     ])
