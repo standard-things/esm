@@ -39,6 +39,7 @@ const trashPaths = globby.sync([
   "test/node_modules/nyc-typescript-esm/**/*.js"
 ], {
   cwd: rootPath,
+  expandDirectories: false,
   nodir: false,
   realpath: true
 })
