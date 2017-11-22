@@ -1,8 +1,4 @@
 {
   "name": "file-extension",
-  "private": true,
-  "@std/esm": {
-    "debug": true,
-    "gz": true
-  }
+  "private": true
 }
