@@ -19,10 +19,7 @@ Getting started
      module.exports = require("./main.mjs").default
      ```
 
-By default, `@std/esm` **only** processes files of packages that opt-in
-with a `@std/esm` options object or `@std/esm` as a dependency, dev
-dependency, or peer dependency in their package.json. However, you can
-enable processing **all** files with specific options by passing an options
+Enable processing **all** files with specific options by passing an options
 object as the second argument or passing `true` to use the options from
 your package.json.
 
