@@ -21,7 +21,7 @@ Getting started
 
 Enable processing **all** files with specific options by passing an options
 object as the second argument or passing `true` to use the options from
-your package.json.
+your .esmrc or package.json.
 
 ```js
 require = require("@std/esm")(module, options)
@@ -78,8 +78,8 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with `"@std/esm":options` or `"@std":{"esm":options}`
-in your package.json.
+Unlock extra features by specifying options in your .esmrc or `"@std/esm"` field
+of your package.json.
 
 Commonly used options may be specified in shorthand form:
 
@@ -89,8 +89,7 @@ Commonly used options may be specified in shorthand form:
 <table>
 <tr>
   <td colspan="2">
-    <pre><code>{
-  "@std/esm": {</code></pre>
+    <pre><code>{</code></pre>
   </td>
 </tr>
 <tr>
@@ -125,8 +124,7 @@ Commonly used options may be specified in shorthand form:
 </tr>
 <tr>
   <td colspan="2">
-    <pre><code>  }
-}</code></pre>
+    <pre><code>}</code></pre>
   </td>
 </tr>
 </table>
@@ -140,8 +138,7 @@ The `"cjs"` option may also be specified as an object.
 <tr>
   <td colspan="2">
     <pre><code>{
-  "@std/esm": {
-    "cjs": {</code></pre>
+  "cjs": {</code></pre>
   </td>
 </tr>
 <tr>
@@ -188,8 +185,7 @@ The `"cjs"` option may also be specified as an object.
 </tr>
 <tr>
   <td colspan="2">
-    <pre><code>    }
-  }
+    <pre><code>  }
 }</code></pre>
   </td>
 </tr>
@@ -201,8 +197,7 @@ DevOpts
 <table>
 <tr>
   <td colspan="2">
-    <pre><code>{
-  "@std/esm": {</code></pre>
+    <pre><code>{</code></pre>
   </td>
 </tr>
 <tr>
@@ -234,8 +229,7 @@ DevOpts
 </tr>
 <tr>
   <td colspan="2">
-    <pre><code>  }
-}</code></pre>
+    <pre><code>}</code></pre>
   </td>
 </tr>
 </table>
