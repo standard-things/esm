@@ -81,8 +81,7 @@ class PkgInfo {
   }
 
   static read(dirPath, force) {
-    const pkgPath = resolve(dirPath, "package.json")
-    let pkgJSON = readJSON(pkgPath)
+    let pkgJSON = readJSON(resolve(dirPath, "package.json"))
 
     if (pkgJSON === null) {
       if (force) {
@@ -92,7 +91,8 @@ class PkgInfo {
       }
     }
 
-    let options = null
+    let options = readJSON(resolve(dirPath, ".esmrc"))
+
     if (has(pkgJSON, "@std/esm")) {
       options = pkgJSON["@std/esm"]
     } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {

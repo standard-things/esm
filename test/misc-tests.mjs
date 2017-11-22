@@ -92,6 +92,17 @@ describe("package.json", () => {
       .catch((e) => assert.ok(e instanceof SyntaxError))
   )
 
+  it("should support .esmrc` options", () =>
+    Promise.all([
+      "esmrc-object",
+      "esmrc-string-cjs",
+      "esmrc-string-js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+    ))
+  )
+
   it("should support `@std/esm` package options", () =>
     Promise.all([
       "@std-esm-object",
