@@ -1,6 +1,7 @@
 {
   "toplevel": true,
   "compress": {
+    "collapse_vars": false,
     "keep_infinity": true,
     "negate_iife": false,
     "passes": 3,
