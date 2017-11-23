@@ -45,17 +45,21 @@ function loader(filePath, parent, preload) {
     ext = ".js"
   }
 
-  let extCompiler = Wrapper.unwrap(extensions, ext) || extensions[ext]
+  let extCompiler = Wrapper.unwrap(extensions, ext)
 
-  if (extCompiler[mjsSym]) {
-    const parentFilename = (parent && parent.filename) || "."
-    const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
-    const parentOptions = parentPkgInfo && parentPkgInfo.options
+  if (typeof extCompiler === "function") {
+    if (extCompiler[mjsSym]) {
+      const parentFilename = (parent && parent.filename) || "."
+      const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+      const parentOptions = parentPkgInfo && parentPkgInfo.options
 
-    if (parentOptions &&
-        (parentOptions.cjs.extensions || parentOptions.esm !== "mjs")) {
-      extCompiler = extensions[ext]
+      if (parentOptions &&
+          (parentOptions.cjs.extensions || parentOptions.esm !== "mjs")) {
+        extCompiler = extensions[ext]
+      }
     }
+  } else {
+    extCompiler = extensions[ext]
   }
 
   extCompiler.call(extensions, mod, filePath)
