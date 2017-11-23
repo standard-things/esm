@@ -2,22 +2,18 @@ import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import isObjectLike from "./util/is-object-like.js"
+import noDeprecation from "./util/no-deprecation.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 
-const _binding = process.binding
+const _binding = noDeprecation(() => process.binding)
 const ids = ["config", "fs", "icu", "inspector", "natives", "util"]
 
 const binding = ids
   .reduce((binding, id) => {
     setGetter(binding, id, () => {
-      let value
-
-      try {
-        value = _binding.call(process, id)
-      } catch (e) {}
-
+      const value = noDeprecation(() => _binding.call(process, id))
       return binding[id] = isObjectLike(value) ? value : new NullObject
     })
 
