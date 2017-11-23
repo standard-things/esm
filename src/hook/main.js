@@ -3,12 +3,13 @@ import PkgInfo from "../pkg-info.js"
 import builtinModules from "../builtin-modules.js"
 import { dirname } from "path"
 import loadESM from "../module/esm/load.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 const { setPrototypeOf } = Object
 
 function hook(Mod) {
-  const { _tickCallback } = process
+  const _tickCallback = noDeprecationWarning(() => process._tickCallback)
   const [, mainPath] = process.argv
   const { runMain } = Mod
 
