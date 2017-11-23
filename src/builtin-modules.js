@@ -6,8 +6,6 @@ import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 
-const { keys } = Object
-
 const ids = [
   "assert",
   "buffer",
@@ -39,7 +37,8 @@ const ids = [
   "zlib"
 ]
 
-const nativeIds = keys(binding.natives)
+const nativeIds = Object
+  .keys(binding.natives)
   .filter((id) => ! id.startsWith("internal/"))
 
 const builtinModules = ids
