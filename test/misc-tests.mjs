@@ -117,6 +117,11 @@ describe("package.json", () => {
     ))
   )
 
+  it("should apply .esmrc over package.json options", () =>
+    import("./fixture/options-priority")
+      .then(() => assert.ok(true))
+  )
+
   it("should support `@std/esm` as package dependencies", () =>
     Promise.all([
       "dependencies",
