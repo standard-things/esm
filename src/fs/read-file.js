@@ -6,9 +6,11 @@ import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
-const { internalModuleReadFile } = fsBinding
+const { internalModuleReadFile, internalModuleReadJSON } = fsBinding
 
-let useReadFileFastPath = typeof internalModuleReadFile === "function"
+const useInternalModuleReadFile = typeof internalModuleReadFile === "function"
+const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"
+let useReadFileFastPath = useInternalModuleReadFile || useInternalModuleReadJSON
 
 function readFile(filePath, options) {
   const encoding = isObjectLike(options) ? options.encoding : options
@@ -41,8 +43,13 @@ function fastPathReadFile(filePath, options) {
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
   filePath = toNamespacedPath(filePath)
-  return internalModuleReadFile.call(fsBinding, filePath) ||
-    fallbackReadFile(filePath, options)
+
+  if (useInternalModuleReadFile) {
+    return internalModuleReadFile.call(fsBinding, filePath)
+  }
+
+  const content = useInternalModuleReadJSON.call(fsBinding, filePath)
+  return content === "" ? fallbackReadFile(filePath, options) : content
 }
 
 export default readFile
