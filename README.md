@@ -19,9 +19,8 @@ Getting started
      module.exports = require("./main.mjs").default
      ```
 
-Enable processing **all** files with specific options by passing an options
-object as the second argument or passing `true` to use the options from
-your .esmrc or package.json.
+Enable processing **all** modules, including dependencies, by providing an
+`options` object or `true` to use the options from your .esmrc or package.json.
 
 ```js
 require = require("@std/esm")(module, options)
