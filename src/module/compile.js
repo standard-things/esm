@@ -9,6 +9,7 @@ import Module from "../module.js"
 import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import resolveFilename from "./resolve-filename.js"
 import stripShebang from "../util/strip-shebang.js"
 
@@ -17,7 +18,7 @@ import stripShebang from "../util/strip-shebang.js"
 let resolvedArgv
 
 const inspectorBinding = binding.inspector
-const { callAndPauseOnStart } = inspectorBinding
+const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
 
 function compile(mod, content, filePath) {
   const req = makeRequireFunction(mod)
@@ -44,7 +45,7 @@ function compile(mod, content, filePath) {
       delete process._breakFirstLine
       inspectorWrapper = callAndPauseOnStart
 
-      if (! inspectorWrapper) {
+      if (typeof inspectorWrapper !== "function") {
         const Debug = runInDebugContext("Debug")
         Debug.setBreakPoint(compiledWrapper, 0, 0)
       }

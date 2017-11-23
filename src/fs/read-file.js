@@ -1,12 +1,14 @@
 import binding from "../binding.js"
 import isFile from "../util/is-file.js"
 import isObjectLike from "../util/is-object-like.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import { readFileSync } from "fs"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
-const { internalModuleReadFile, internalModuleReadJSON } = fsBinding
+const internalModuleReadFile = noDeprecationWarning(() => fsBinding.internalModuleReadFile)
+const internalModuleReadJSON = noDeprecationWarning(() => fsBinding.internalModuleReadJSON)
 
 const useInternalModuleReadFile = typeof internalModuleReadFile === "function"
 const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"

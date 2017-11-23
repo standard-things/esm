@@ -1,6 +1,7 @@
 import binding from "../binding.js"
 import decodeURIComponent from "./decode-uri-component.js"
 import encodedSlash from "./encoded-slash.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseURL from "./parse-url.js"
 import path from "path"
 import url from "url"
@@ -16,7 +17,7 @@ const { normalize } = path[isWin ? "win32" : "posix"]
 
 if (typeof domainToUnicode !== "function") {
   const icuBinding = binding.icu
-  const { toUnicode } = icuBinding
+  const toUnicode = noDeprecationWarning(() => icuBinding.toUnicode)
 
   domainToUnicode = typeof toUnicode === "function"
     ? (domain) => toUnicode.call(icuBinding, domain)

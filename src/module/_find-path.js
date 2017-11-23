@@ -8,6 +8,7 @@ import FastObject from "../fast-object.js"
 
 import binding from "../binding.js"
 import emitDeprecationWarning from "../warning/emit-deprecation-warning.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
@@ -17,7 +18,7 @@ const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
 const { parse } = JSON
-const { preserveSymlinks } = binding.config
+const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
 const packageCache = new FastObject
 const pathCache = new FastObject

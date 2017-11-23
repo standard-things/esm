@@ -1,10 +1,11 @@
 import { Stats, statSync } from "fs"
 
 import binding from "../binding.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
-const { internalModuleStat } = fsBinding
+const internalModuleStat = noDeprecationWarning(() => fsBinding.internalModuleStat)
 const { isFile } = Stats.prototype
 
 let useStatFastPath = typeof internalModuleStat === "function"

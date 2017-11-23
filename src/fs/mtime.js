@@ -1,9 +1,11 @@
 import binding from "../binding"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import { satisfies } from "semver"
 import { statSync } from "fs"
 
 const fsBinding = binding.fs
-const { getStatValues, stat } = fsBinding
+const getStatValues = noDeprecationWarning(() => fsBinding.getStatValues)
+const stat = noDeprecationWarning(() => fsBinding.stat)
 
 const useGetStatValues = typeof getStatValues === "function"
 let useMtimeFastPath = typeof stat === "function" &&

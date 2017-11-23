@@ -1,10 +1,11 @@
 import binding from "../binding.js"
 import isError from "../util/is-error.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 
 const utilBinding = binding.util
-const _setHiddenValue = utilBinding.setHiddenValue
-const arrowMessageSymbol = utilBinding.arrow_message_private_symbol
-const decoratedSymbol = utilBinding.decorated_private_symbol
+const _setHiddenValue = noDeprecationWarning(() => utilBinding.setHiddenValue)
+const arrowMessageSymbol = noDeprecationWarning(() => utilBinding.arrow_message_private_symbol)
+const decoratedSymbol = noDeprecationWarning(() => utilBinding.decorated_private_symbol)
 
 const useArrowMessageSymbol = arrowMessageSymbol !== void 0
 const useDecoratedSymbol = decoratedSymbol !== void 0
