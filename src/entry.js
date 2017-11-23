@@ -6,7 +6,7 @@ import SafeWeakMap from "./safe-weak-map.js"
 
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
-import emitWarning from "./error/emit-warning.js"
+import emitWarning from "./warning/emit-warning.js"
 import env from "./env.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"

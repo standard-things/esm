@@ -1,19 +1,18 @@
-import has from "./has.js"
+import has from "../util/has.js"
 
-function noDeprecation(callback) {
-  const original = process.noDeprecation
+function noDeprecationWarning(callback) {
+  let result
+  const { noDeprecation } = process
   const shouldRestore = has(process, "noDeprecation")
 
   process.noDeprecation = true
-
-  let result
 
   try {
     result = callback()
   } catch (e) {}
 
   if (shouldRestore) {
-    process.noDeprecation = original
+    process.noDeprecation = noDeprecation
   } else {
     delete process.noDeprecation
   }
@@ -21,4 +20,4 @@ function noDeprecation(callback) {
   return result
 }
 
-export default noDeprecation
+export default noDeprecationWarning

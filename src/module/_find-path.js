@@ -7,7 +7,7 @@ import { isAbsolute, resolve } from "path"
 import FastObject from "../fast-object.js"
 
 import binding from "../binding.js"
-import emitDeprecationWarning from "../error/emit-deprecation-warning.js"
+import emitDeprecationWarning from "../warning/emit-deprecation-warning.js"
 import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"

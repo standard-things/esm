@@ -1,4 +1,4 @@
-import captureStackTrace from "./capture-stack-trace.js"
+import captureStackTrace from "../error/capture-stack-trace.js"
 
 const PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
