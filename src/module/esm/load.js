@@ -11,6 +11,7 @@ import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
+import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleResolveFilename from "../resolve-filename.js"
 import moduleState from "../state.js"
 import resolveFilename from "./resolve-filename.js"
@@ -106,7 +107,13 @@ function load(id, parent, isMain, preload) {
 function loader(filePath, fromPath, url, parentOptions, preload) {
   const mod = this
   mod.filename = filePath
-  mod.paths = Module._nodeModulePaths(fromPath)
+
+  if (parentOptions && parentOptions.cjs.paths &&
+      Module._nodeModulePaths !== moduleNodeModulePaths) {
+    mod.paths = Module._nodeModulePaths(fromPath)
+  } else {
+    mod.paths = moduleNodeModulePaths(fromPath)
+  }
 
   const entry = Entry.get(mod)
   entry.url = url
