@@ -1,6 +1,6 @@
 import has from "../util/has.js"
 
-function noDeprecationWarning(callback) {
+function noDeprecationWarning(getter) {
   let result
   const { noDeprecation } = process
   const shouldRestore = has(process, "noDeprecation")
@@ -8,7 +8,7 @@ function noDeprecationWarning(callback) {
   process.noDeprecation = true
 
   try {
-    result = callback()
+    result = getter()
   } catch (e) {}
 
   if (shouldRestore) {
@@ -17,7 +17,13 @@ function noDeprecationWarning(callback) {
     delete process.noDeprecation
   }
 
-  return result
+  if (typeof result !== "function") {
+    return result
+  }
+
+  return function (...args) {
+    return noDeprecationWarning(() => result.apply(this, args))
+  }
 }
 
 export default noDeprecationWarning
