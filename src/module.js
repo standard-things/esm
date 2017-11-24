@@ -47,10 +47,10 @@ class Module extends BuiltinModule {
   static _nodeModulePaths = nodeModulePaths
   static _resolveFilename = resolveFilename
   static _resolveLookupPaths = resolveLookupPaths
-  static _wrapper = wrapper
   static Module = Module
   static globalPaths = BuiltinModule.globalPaths
   static wrap = wrap
+  static wrapper = wrapper.slice()
 }
 
 defaults(Module, BuiltinModule)
