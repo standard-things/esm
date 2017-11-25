@@ -32,13 +32,16 @@ function hook(vm) {
       try {
         return func.apply(this, args)
       } catch (e) {
-        const [code] = args
+        const [sourceCode] = args
+        const useURLs = e.sourceType === "module"
+
+        delete e.sourceType
         captureStackTrace(e, manager)
-        throw maskStackTrace(e, code)
+        throw maskStackTrace(e, sourceCode, null, useURLs)
       }
     }
 
-    let [code, scriptOptions] = args
+    let [sourceCode, scriptOptions] = args
     scriptOptions = createOptions(scriptOptions)
 
     if (scriptOptions.produceCachedData === void 0) {
@@ -46,7 +49,7 @@ function hook(vm) {
     }
 
     const cache = pkgInfo.cache
-    const cacheFileName = getCacheFileName("", code, pkgInfo)
+    const cacheFileName = getCacheFileName("", sourceCode, pkgInfo)
     const cacheValue = cache[cacheFileName]
 
     let output
@@ -68,7 +71,7 @@ function hook(vm) {
         warnings: false
       }
 
-      output = tryWrapper(compile, [code, compilerOptions]).code
+      output = tryWrapper(compile, [sourceCode, compilerOptions]).code
     }
 
     output =

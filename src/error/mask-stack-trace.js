@@ -1,4 +1,6 @@
+import _wrapper from "../module/wrapper.js"
 import decorateStackTrace from "./decorate-stack-trace.js"
+import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import setProperty from "../util/set-property.js"
@@ -13,15 +15,12 @@ const { defineProperty } = Object
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
-const removeLineInfoRegExp = /:1:\d+(\)?)$/gm
+const atPathRegExp = /\((.+?)(?=:\d+)/g
+const filePathRegExp = /^(.+?)(?=:\d+\n)/
+const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
-const wrapperFallback = [
-  "(function (exports, require, module, __filename, __dirname) { ",
-  "\n});"
-]
-
-function maskStackTrace(error, sourceCode, filePath) {
+function maskStackTrace(error, sourceCode, filePath, useURLs) {
   if (! isError(error)) {
     return error
   }
@@ -37,11 +36,15 @@ function maskStackTrace(error, sourceCode, filePath) {
     configurable: true,
     enumerable: false,
     get() {
-      stack = stack.replace(message, error.message)
-      stack = scrubStack(stack)
-      return error.stack = isParseError(error)
+      stack = stack.replace(message, message = error.message)
+      stack = isParseError(error)
         ? maskParserStack(stack, sourceCode, filePath)
         : maskEngineStack(stack, sourceCode, filePath)
+
+      return error.stack = withoutMessage(stack, message, (stack) => {
+        stack = scrub(stack)
+        return useURLs ? filePathsToURLs(stack) : stack
+      })
     },
     set(value) {
       setProperty(error, "stack", { enumerable: false, value })
@@ -126,7 +129,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
 
     if (! isArray(wrapper) ||
         typeof wrapper[0] !== "string") {
-      wrapper = wrapperFallback
+      wrapper = _wrapper
     }
 
     const [prefix] = wrapper
@@ -141,12 +144,27 @@ function maskEngineStack(stack, sourceCode, filePath) {
   })
 }
 
-function scrubStack(stack) {
+function filePathsToURLs(stack) {
+  return stack
+    .replace(filePathRegExp, getURLFromFilePath)
+    .replace(atPathRegExp, replaceAtPath)
+}
+
+function replaceAtPath(match, filePath) {
+  return "(" + getURLFromFilePath(filePath)
+}
+
+function scrub(stack) {
   return stack
     .split("\n")
     .filter((line) => ! line.includes(__non_webpack_module__.filename))
     .join("\n")
-    .replace(removeLineInfoRegExp, "$1")
+    .replace(removeColumnInfoRegExp, ":1")
+}
+
+function withoutMessage(stack, message, callback) {
+  stack = stack.replace(message, "$message$")
+  return callback(stack).replace("$message$", message)
 }
 
 export default maskStackTrace

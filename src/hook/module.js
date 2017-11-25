@@ -204,7 +204,6 @@ function hook(Mod, parent, options) {
   }
 
   function tryCompileCached(mod, cached, filePath, runtimeAlias, options) {
-    const { code } = cached
     const noDepth = moduleState.requireDepth === 0
     const tryCompile = cached.esm ? tryCompileESM : tryCompileCJS
 
@@ -213,12 +212,13 @@ function hook(Mod, parent, options) {
     }
 
     if (options.debug) {
-      tryCompile(mod, code, filePath, runtimeAlias, options)
+      tryCompile(mod, cached.code, filePath, runtimeAlias, options)
     } else {
       try {
-        tryCompile(mod, code, filePath, runtimeAlias, options)
+        tryCompile(mod, cached.code, filePath, runtimeAlias, options)
       } catch (e) {
-        throw maskStackTrace(e, () => readCode(filePath, options))
+        const sourceCode = () => readCode(filePath, options)
+        throw maskStackTrace(e, sourceCode, filePath, cached.esm)
       }
     }
 
@@ -227,18 +227,21 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryCompileCode(manager, code, options) {
+  function tryCompileCode(manager, sourceCode, options) {
     const { filePath, pkgInfo } = options
 
     if (pkgInfo.options.debug) {
-      return compile(code, options)
+      return compile(sourceCode, options)
     }
 
     try {
-      return compile(code, options)
+      return compile(sourceCode, options)
     } catch (e) {
+      const useURLs = e.sourceType === "module"
+
+      delete e.sourceType
       captureStackTrace(e, manager)
-      throw maskStackTrace(e, code, filePath)
+      throw maskStackTrace(e, sourceCode, filePath, useURLs)
     }
   }
 
@@ -310,7 +313,8 @@ function hook(Mod, parent, options) {
         func.apply(this, args)
       } catch (e) {
         const [, filePath] = args
-        throw maskStackTrace(e, () => readCode(filePath, options))
+        const sourceCode = () => readCode(filePath, options)
+        throw maskStackTrace(e, sourceCode, filePath)
       }
     }
   }

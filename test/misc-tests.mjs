@@ -12,9 +12,11 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 const isCached = /cached/.test(process.env.NODE_ENV)
 const isWin = process.platform === "win32"
 
+const fileProtocol = "file://" + (isWin ? "/" : "")
+const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
+
 const pkgJSON = JSON.parse(fs.readFileSync("../package.json"))
 const pkgPath = require.resolve("../")
-const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
 
 const abcId = "./fixture/export/abc.mjs"
 const abcNs = createNamespace({
@@ -61,6 +63,10 @@ function checkErrorProps(error, code, message) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+}
+
+function getURLFromFilePath(filePath) {
+  return fileProtocol + filePath.replace(/\\/g, "/")
 }
 
 function getWarning() {
@@ -152,15 +158,13 @@ describe("errors", () => {
     return Promise.all([
       import(id1)
         .then(() => assert.ok(false))
-        .catch((e) => {
+        .catch((e) =>
           checkErrorStack(e, [
-            id2 + ":1",
+            getURLFromFilePath(id2) + ":1",
             'export const a = "a"',
             "^\n"
           ].join("\n"))
-
-          assert.strictEqual(e.stack.includes(id1 + ":"), false)
-        }),
+        ),
       import(id3)
         .then(() => assert.ok(false))
         .catch((e) =>
@@ -174,7 +178,7 @@ describe("errors", () => {
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
-            id4 + ":2",
+            getURLFromFilePath(id4) + ":2",
             '  import"nested"',
             "  ^\n"
           ].join("\n"))
