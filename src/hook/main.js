@@ -16,19 +16,17 @@ function hook(Mod) {
 
   const useTickCallback = typeof _tickCallback === "function"
 
-  const cwdPkgInfo = PkgInfo.get(".")
-  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+  const cwdPkgInfo = PkgInfo.get(".", true)
+  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
 
-  if (cwdPkgInfo) {
-    const cwdOptions = cwdPkgInfo.options
-    const defaultOptions = defaultPkgInfo.options
-    const mode = cwdOptions.esm
+  const cwdOptions = cwdPkgInfo.options
+  const defaultOptions = defaultPkgInfo.options
+  const mode = cwdOptions.esm
 
-    assign(defaultPkgInfo, cwdPkgInfo)
-    defaultPkgInfo.options = assign(defaultOptions, cwdOptions)
-    defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
-    defaultPkgInfo.range = "*"
-  }
+  assign(defaultPkgInfo, cwdPkgInfo)
+  defaultPkgInfo.options = assign(defaultOptions, cwdOptions)
+  defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
+  defaultPkgInfo.range = "*"
 
   Mod.runMain = () => {
     Mod.runMain = runMain

@@ -51,19 +51,17 @@ function hook(Mod, parent, options) {
   const passthruMap = new SafeMap
 
   const parentFilePath = (parent && parent.filename) || "."
-  const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
-  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+  const parentPkgInfo = PkgInfo.get(dirname(parentFilePath), true)
+  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
 
-  if (parentPkgInfo) {
-    const parentOptions = parentPkgInfo.options
-    const defaultOptions = defaultPkgInfo.options
-    const mode = parentOptions.esm
+  const parentOptions = parentPkgInfo.options
+  const defaultOptions = defaultPkgInfo.options
+  const mode = parentOptions.esm
 
-    assign(defaultPkgInfo, parentPkgInfo)
-    defaultPkgInfo.options = assign(defaultOptions, parentOptions)
-    defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
-    defaultPkgInfo.range = "*"
-  }
+  assign(defaultPkgInfo, parentPkgInfo)
+  defaultPkgInfo.options = assign(defaultOptions, parentOptions)
+  defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
+  defaultPkgInfo.range = "*"
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
@@ -74,12 +72,12 @@ function hook(Mod, parent, options) {
 
     if (options) {
       pkgInfo = PkgInfo.get(dirPath, true)
-      assign(pkgInfo.options, options)
+      const pkgOptions = pkgInfo.options
+      const { range } = pkgInfo
 
-      if (parentPkgInfo) {
-        pkgInfo.cache = parentPkgInfo.cache
-        pkgInfo.cachePath = parentPkgInfo.cachePath
-      }
+      assign(pkgInfo, parentPkgInfo)
+      pkgInfo.options = assign(pkgOptions, options)
+      pkgInfo.range = range
     }
 
     const wrapped = pkgInfo && pkgInfo.options
