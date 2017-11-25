@@ -39,8 +39,6 @@ class Module extends BuiltinModule {
     this.loaded = true
   }
 
-  static _cache = BuiltinModule.cache
-  static _extensions = BuiltinModule.extensions
   static _findPath = findPath
   static _initPaths = initPaths
   static _load = load
@@ -48,7 +46,6 @@ class Module extends BuiltinModule {
   static _resolveFilename = resolveFilename
   static _resolveLookupPaths = resolveLookupPaths
   static Module = Module
-  static globalPaths = BuiltinModule.globalPaths
   static wrap = wrap
   static wrapper = wrapper.slice()
 }
