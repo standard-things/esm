@@ -4,9 +4,10 @@ import path from "path"
 import require from "./require.js"
 
 const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.dirname(require.resolve("./tests.mjs"))
-const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 

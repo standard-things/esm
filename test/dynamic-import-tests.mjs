@@ -3,8 +3,8 @@ import compiler from "../build/compiler.js"
 import createNamespace from "./create-namespace.js"
 import path from "path"
 
-const isWin = process.platform === "win32"
 const compile = compiler.compile
+const isWin = process.platform === "win32"
 
 const abcId = "./fixture/export/abc.mjs"
 const abcNs = createNamespace({

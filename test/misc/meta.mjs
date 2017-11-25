@@ -10,9 +10,10 @@ import percent1 from "../fixture/with%2520percent.mjs"
 import percent2 from "../fixture/with%2520percent.mjs?c#c"
 
 const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.dirname(require.resolve("./tests.mjs"))
-const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const colonPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")
 const colonURL = testURL + "/fixture/with:colon.mjs"

@@ -13,13 +13,13 @@ const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
 
 const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
+const requireFlags = ["-r", "--require"]
 
 const testPath = path.dirname(require.resolve("./tests.mjs"))
-const testURL = "file://" + (isWin ? "/" : "") + testPath.replace(/\\/g, "/")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
-
-const requireFlags = ["-r", "--require"]
 
 function runMain(args) {
   return execa(NODE_BIN, args, {
