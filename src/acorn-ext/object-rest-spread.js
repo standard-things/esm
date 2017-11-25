@@ -22,9 +22,7 @@ function parseProperty(func, args) {
   if (isPattern) {
     propNode.type = "RestElement"
     propNode.value = this.toAssignable(propNode.argument)
-  }
-
-  if (this.type === tt.comma &&
+  } else if (this.type === tt.comma &&
       refDestructuringErrors && refDestructuringErrors.trailingComma === -1) {
     refDestructuringErrors.trailingComma = this.start
   }
