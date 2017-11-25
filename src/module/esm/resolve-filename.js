@@ -22,8 +22,8 @@ function resolveFilename(id, parent, isMain) {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
 
-  const parentFilename = (parent && parent.filename) || "."
-  const fromPath = dirname(parentFilename)
+  const parentFilePath = (parent && parent.filename) || "."
+  const fromPath = dirname(parentFilePath)
   let skipWarnings = false
 
   if (! encodedSlash(id)) {

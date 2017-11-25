@@ -30,19 +30,19 @@ const esmPath = __non_webpack_module__.filename
 const [, filePath] = argv
 const inspectorBinding = binding.inspector
 const isInspectorEnabled = noDeprecationWarning(() => inspectorBinding.isEnabled)
-const parentFilename = parent && normalize(parent.filename)
+const parentFilePath = parent && normalize(parent.filename)
 
 const nmIndex = args.length
   ? normalize(filePath).lastIndexOf("/node_modules/")
   : -1
 
-const nycIndex = parentFilename
-  ? parentFilename.lastIndexOf("/node_modules/nyc/")
+const nycIndex = parentFilePath
+  ? parentFilePath.lastIndexOf("/node_modules/nyc/")
   : -1
 
 const nycJSON = nycIndex === -1
   ? null
-  : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
+  : readJSON(parentFilePath.slice(0, nycIndex + 18) + "package.json")
 
 const loading =
   nmIndex !== -1 &&

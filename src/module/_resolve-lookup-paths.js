@@ -35,7 +35,7 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
        code1 !== codeOfSlash)
   }
 
-  const parentFilename = parent && parent.filename
+  const parentFilePath = parent && parent.filename
 
   if (lookOutside) {
     const parentPaths = parent && parent.paths
@@ -44,7 +44,7 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
     // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module's directory in front of the lookup paths.
     if (isDot) {
-      paths.unshift(parentFilename ? dirname(parentFilename) : resolve(id))
+      paths.unshift(parentFilePath ? dirname(parentFilePath) : resolve(id))
     }
 
     if (parentPaths &&
@@ -58,7 +58,7 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
   // With --eval, `parent.id` is not set and `parent.filename` is `null`.
   if (! parent ||
       ! parent.id ||
-      ! parentFilename) {
+      ! parentFilePath) {
     // Normally, the path is taken from `realpath(__filename)`,
     // but with --eval there is no `__filename`.
     const paths = Module._nodeModulePaths(".")

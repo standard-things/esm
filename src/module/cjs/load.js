@@ -49,8 +49,8 @@ function loader(filePath, parent, preload) {
 
   if (typeof extCompiler === "function") {
     if (extCompiler[mjsSym]) {
-      const parentFilename = (parent && parent.filename) || "."
-      const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+      const parentFilePath = (parent && parent.filename) || "."
+      const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
       const parentOptions = parentPkgInfo && parentPkgInfo.options
 
       if (parentOptions &&

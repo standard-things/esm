@@ -47,8 +47,8 @@ function hook(Mod, parent, options) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
-  const parentFilename = (parent && parent.filename) || "."
-  const parentPkgInfo = PkgInfo.get(dirname(parentFilename))
+  const parentFilePath = (parent && parent.filename) || "."
+  const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
   const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
 
   if (parentPkgInfo) {
