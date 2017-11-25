@@ -18,8 +18,6 @@ import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
-const BuiltinModule = __non_webpack_module__.constructor
-
 function load(id, parent, isMain, preload) {
   const parentFilePath = (parent && parent.filename) || "."
   const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
@@ -122,15 +120,12 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
     preload(mod)
   }
 
-  const Ctor = mod.constructor
-
   let { extensions } = moduleState
   let ext = extname(filePath)
 
-  if (Ctor === BuiltinModule &&
-      (ext === ".js" ||
-        (parentOptions && parentOptions.cjs.extensions))) {
-    extensions = Ctor._extensions
+  if (ext === ".js" ||
+      (parentOptions && parentOptions.cjs.extensions)) {
+    extensions = mod.constructor._extensions
   }
 
   if (ext === "" ||
