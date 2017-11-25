@@ -1,5 +1,6 @@
 import PkgInfo from "../pkg-info.js"
 
+import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import { dirname } from "path"
 import loadESM from "../module/esm/load.js"
@@ -15,6 +16,20 @@ function hook(Mod) {
 
   const useTickCallback = typeof _tickCallback === "function"
 
+  const cwdPkgInfo = PkgInfo.get(".")
+  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+
+  if (cwdPkgInfo) {
+    const cwdOptions = cwdPkgInfo.options
+    const defaultOptions = defaultPkgInfo.options
+    const mode = cwdOptions.esm
+
+    assign(defaultPkgInfo, cwdPkgInfo)
+    defaultPkgInfo.options = assign(defaultOptions, cwdOptions)
+    defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
+    defaultPkgInfo.range = "*"
+  }
+
   Mod.runMain = () => {
     Mod.runMain = runMain
 
@@ -25,7 +40,7 @@ function hook(Mod) {
 
     const filePath = resolveFilename(mainPath, null, true)
     const dirPath = dirname(filePath)
-    const pkgInfo = PkgInfo.get(dirPath) || PkgInfo.get(".")
+    const pkgInfo = PkgInfo.get(dirPath) || defaultPkgInfo
 
     PkgInfo.set(dirPath, pkgInfo)
 

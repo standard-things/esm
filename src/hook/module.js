@@ -44,6 +44,9 @@ const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 function hook(Mod, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
+  let allowTopLevelAwait = isObject(process.mainModule) &&
+    satisfies(process.version, ">=7.6.0")
+
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
@@ -52,15 +55,15 @@ function hook(Mod, parent, options) {
   const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
 
   if (parentPkgInfo) {
-    defaultPkgInfo.cache = parentPkgInfo.cache
-    defaultPkgInfo.cachePath = parentPkgInfo.cachePath
-    defaultPkgInfo.dirPath = parentPkgInfo.dirPath
-    defaultPkgInfo.options.cache = parentPkgInfo.options.cache
-    defaultPkgInfo.options.esm = parentPkgInfo.options.esm
-  }
+    const parentOptions = parentPkgInfo.options
+    const defaultOptions = defaultPkgInfo.options
+    const mode = parentOptions.esm
 
-  let allowTopLevelAwait = isObject(process.mainModule) &&
-    satisfies(process.version, ">=7.6.0")
+    assign(defaultPkgInfo, parentPkgInfo)
+    defaultPkgInfo.options = assign(defaultOptions, parentOptions)
+    defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
+    defaultPkgInfo.range = "*"
+  }
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
