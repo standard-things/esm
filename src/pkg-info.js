@@ -74,16 +74,22 @@ class PkgInfo {
 
     infoCache[dirPath] = null
 
-    if (! force &&
-        basename(dirPath) === "node_modules") {
-      return null
+    if (basename(dirPath) === "node_modules") {
+      return force
+        ? infoCache[dirPath] = PkgInfo.read(dirPath, true)
+        : null
     }
 
-    pkgInfo = PkgInfo.read(dirPath, force)
+    pkgInfo = PkgInfo.read(dirPath)
 
     if (pkgInfo === null) {
       const parentPath = dirname(dirPath)
       pkgInfo = parentPath === dirPath ? null : PkgInfo.get(parentPath)
+    }
+
+    if (force &&
+        pkgInfo === null) {
+      pkgInfo = PkgInfo.read(dirPath, force)
     }
 
     return infoCache[dirPath] = pkgInfo
