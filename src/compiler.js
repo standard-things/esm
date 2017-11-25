@@ -69,6 +69,7 @@ class Compiler {
       threw = false
     } catch (e) {
       error = e
+      error.sourceType = parserOptions.sourceType
     }
 
     if (threw &&
