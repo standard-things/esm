@@ -14,36 +14,42 @@ import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
 import stat from "../fs/stat.js"
 
+const BuiltinModule = __non_webpack_module__.constructor
+
 const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
 const { parse } = JSON
-const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
 const packageCache = new FastObject
 const pathCache = new FastObject
 
 const mainFieldRegExp = /"main"/
+const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
 function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
-  const { extensions } = __non_webpack_require__
-
   if (isAbsolute(id)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
     return ""
   }
 
-  const cacheKey = id + "\0" +
+  const cacheKey =
+    id + "\0" +
     (paths.length === 1 ? paths[0] : paths.join("\0"))
 
   if (cacheKey in pathCache) {
     return pathCache[cacheKey]
   }
 
-  const trailingSlash = id.length > 0 &&
+  const extensions =
+    BuiltinModule._extensions ||
+    __non_webpack_require__.extensions
+
+  const trailingSlash =
+    id.length > 0 &&
     id.charCodeAt(id.length - 1) === codeOfSlash
 
   let i = -1

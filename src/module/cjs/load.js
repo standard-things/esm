@@ -7,6 +7,8 @@ import _load from "../_load.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
 
+const BuiltinModule = __non_webpack_module__.constructor
+
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
@@ -38,7 +40,9 @@ function loader(filePath, parent, preload) {
   }
 
   let ext = extname(filePath)
-  const { extensions } = __non_webpack_require__
+  const extensions =
+    BuiltinModule._extensions ||
+    __non_webpack_require__.extensions
 
   if (ext === "" ||
       typeof extensions[ext] !== "function") {
