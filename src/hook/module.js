@@ -39,7 +39,7 @@ import toOptInError from "../util/to-opt-in-error.js"
 
 const { compile } = compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
-const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
+const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null

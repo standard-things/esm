@@ -7,7 +7,7 @@ import _load from "../_load.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
 
-const mjsSym = Symbol.for('@std/esm:module._extensions[".mjs"]')
+const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
   let called = false
