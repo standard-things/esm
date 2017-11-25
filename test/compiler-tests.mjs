@@ -156,7 +156,14 @@ describe("compiler", () => {
   })
 
   it("should not error on arrow functions with destructured arguments", () => {
-    assert.doesNotThrow(() => compile("({a=1})=>{}"))
+    const codes = [
+      "({a=1})=>{}",
+      "({a=1},{b=2})=>{}"
+    ]
+
+    codes.forEach((code) =>
+      assert.doesNotThrow(() => compile(code))
+    )
   })
 
   it("should not error on transforms at the end of the source", () => {
