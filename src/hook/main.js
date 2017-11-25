@@ -11,7 +11,6 @@ const { setPrototypeOf } = Object
 
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
-  const [, mainPath] = process.argv
   const { runMain } = Mod
 
   const useTickCallback = typeof _tickCallback === "function"
@@ -30,6 +29,8 @@ function hook(Mod) {
 
   Mod.runMain = () => {
     Mod.runMain = runMain
+
+    const [, mainPath] = process.argv
 
     if (mainPath in builtinModules) {
       Mod.runMain()
