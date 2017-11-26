@@ -8,13 +8,9 @@
       "scripthost"
     ],
     "moduleResolution": "node",
-    "outDir": "./",
     "target": "es6"
   },
-  "exclude": [
+  "exlcude": [
     "node_modules"
-  ],
-  "include": [
-    "src/**/*"
   ]
 }

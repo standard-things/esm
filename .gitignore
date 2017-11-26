@@ -1,8 +1,10 @@
 *.gz
 *.log
 .cache
+.config
 .DS_Store
 .node_repl_history
+.nyc_output
 .vscode
 package-lock.json
 /build
@@ -10,3 +12,4 @@ package-lock.json
 /src/vendor
 /test/env/prefix/bin
 /test/env/prefix/node
+/test/fixture/scenario/ava-nyc-tsc/*.js

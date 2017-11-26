@@ -11,6 +11,7 @@ import "./cli-hook-tests.mjs"
 import "./main-hook-tests.mjs"
 import "./require-hook-tests.mjs"
 import "./repl-hook-tests.mjs"
+import "./scenario-tests.mjs"
 
 import fs from "fs-extra"
 import require from "./require.js"
