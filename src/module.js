@@ -27,7 +27,7 @@ class Module extends BuiltinModule {
       throw new Error("Module already loaded: " + this.id)
     }
 
-    const { _extensions } = this.constructor
+    const { _extensions } = Module
     let ext = extname(filePath)
 
     if (ext === "" ||
