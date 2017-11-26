@@ -235,13 +235,18 @@ DevOpts
 
 Tips
 ---
-* Load `@std/esm` before [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
-* Load `@std/esm` with the *“require”* option of [`ava`](https://github.com/avajs/ava#options),
+* Load `@std/esm` before
+  [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
+* Load `@std/esm` with the *“require”* option of
+  [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules), and
   [`tape`](https://github.com/substack/tape#preloading-modules)
-* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of [`node-tap`](http://www.node-tap.org/cli/)
-* Load `@std/esm` with the `--node-args="-r @std/esm"` option of [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
-* Use `"@std/esm":"cjs"` with the `--watch` and `--watch-extensions` options of [`mocha`](https://mochajs.org/#-w---watch)
+* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of
+  [`node-tap`](http://www.node-tap.org/cli/)
+* Load `@std/esm` with the `--node-args="-r @std/esm"` option of
+  [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
+* Use `"@std/esm":"cjs"` with the `--watch` and `--watch-extensions` options of
+  [`mocha`](https://mochajs.org/#-w---watch)
 * Use `"@std/esm":"cjs"` with [`webpack`](https://webpack.js.org/)
 * When in doubt, use `"@std/esm":"cjs"`
