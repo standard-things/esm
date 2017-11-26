@@ -188,7 +188,7 @@ function createOptions(options) {
   if (has(options, "cjs")) {
     cjsOptions = typeof options.cjs === "boolean"
       ? createCJS(options.cjs, new NullObject)
-      : createOptions(options.cjs, defaultOptions.cjs)
+      : _createOptions(options.cjs, defaultOptions.cjs)
   }
 
   if (has(options, "sourcemap") &&
