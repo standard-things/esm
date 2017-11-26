@@ -28,7 +28,9 @@ function runMain(args) {
   })
 }
 
-describe("module.runMain hook", () => {
+describe("module.runMain hook", function () {
+  this.timeout(0)
+
   it("should work with Node -r and --require", () => {
     const runs = requireFlags.map((requireFlag) => [
       requireFlag, "../index.js",

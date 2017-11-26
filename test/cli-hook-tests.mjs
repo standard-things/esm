@@ -11,7 +11,9 @@ const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
-describe("command-line hook", () => {
+describe("command-line hook", function () {
+  this.timeout(0)
+
   it("should not fail on unresolvable command-line arguments", () => {
     const args = [
       "./node_modules/cli",

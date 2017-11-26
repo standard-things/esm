@@ -10,16 +10,14 @@ const testPath = path.dirname(require.resolve("./tests.mjs"))
 
 const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
-describe("scenarios", () => {
-  it("should work with @babel/register", function () {
-    this.timeout(0)
+describe("scenarios", function () {
+  this.timeout(0)
 
-    return execa(NODE_BIN, ["./scenario/babel-register.js"], { cwd: testPath })
-  })
+  it("should work with @babel/register", () =>
+    execa(NODE_BIN, ["./scenario/babel-register.js"], { cwd: testPath })
+  )
 
-  it("should work with ava, nyc, and tsc", function () {
-    this.timeout(0)
-
+  it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPath = path.resolve(dirPath, "test.js")
     const tscArgs = ["--project", dirPath]
