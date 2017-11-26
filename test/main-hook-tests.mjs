@@ -19,10 +19,8 @@ const requireFlags = ["-r", "--require"]
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
-const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
-
-function runMain(args) {
-  return execa(NODE_BIN, args, {
+function node(args) {
+  return execa(process.execPath, args, {
     cwd: testPath,
     reject: false
   })
@@ -37,7 +35,7 @@ describe("module.runMain hook", function () {
       "./fixture/main.mjs"
     ])
 
-    return Promise.all(runs.map(runMain))
+    return Promise.all(runs.map(node))
       .then((results) => {
         const url = testURL + "/fixture/main.mjs"
 
@@ -82,7 +80,7 @@ describe("module.runMain hook", function () {
       )
     )
 
-    return Promise.all(runs.map(runMain))
+    return Promise.all(runs.map(node))
       .then((results) => {
         results.forEach((result) =>
           assert.ok(result.stderr.includes("Error [ERR_MISSING_MODULE]: Cannot find module"))

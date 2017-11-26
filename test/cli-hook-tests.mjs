@@ -9,35 +9,30 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
-const NODE_BIN = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
+function node(args) {
+  return execa(process.execPath, args, {
+    cwd: testPath,
+    reject: false
+  })
+}
 
 describe("command-line hook", function () {
   this.timeout(0)
 
-  it("should not fail on unresolvable command-line arguments", () => {
-    const args = [
+  it("should not fail on unresolvable command-line arguments", () =>
+    node([
       "./node_modules/cli",
       "UNRESOLVABLE_VALUE",
       "../index.js"
-    ]
-
-    return execa(NODE_BIN, args, {
-      cwd: testPath,
-      reject: false
-    })
+    ])
     .then((result) => assert.strictEqual(result.stderr, ""))
-  })
+  )
 
-  it("should inspect JSON encoded command-line arguments", () => {
-    const args = [
+  it("should inspect JSON encoded command-line arguments", () =>
+    node([
       "./node_modules/cli",
       '{"r":"../index.js"}'
-    ]
-
-    return execa(NODE_BIN, args, {
-      cwd: testPath,
-      reject: false
-    })
+    ])
     .then((result) => {
       const url = testURL + "/fixture/main.mjs"
 
@@ -60,5 +55,5 @@ describe("command-line hook", function () {
 
       assert.deepStrictEqual(exported, expected)
     })
-  })
+  )
 })
