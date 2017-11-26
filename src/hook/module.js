@@ -44,7 +44,8 @@ const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 function hook(Mod, parent, options) {
   options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
 
-  let allowTopLevelAwait = isObject(process.mainModule) &&
+  let allowTopLevelAwait =
+    isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")
 
   const { _extensions } = Mod
