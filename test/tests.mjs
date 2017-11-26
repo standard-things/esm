@@ -14,6 +14,7 @@ import "./repl-hook-tests.mjs"
 import "./scenario-tests.mjs"
 
 import fs from "fs-extra"
+import path from "path"
 import require from "./require.js"
 import zlib from "zlib"
 
@@ -33,9 +34,11 @@ exts.forEach((ext) => {
   }
 })
 
-if (! fs.pathExistsSync("./fixture/options/gz/index.mjs.gz")) {
+const filePath = path.resolve("./fixture/options/gz/index.mjs.gz")
+
+if (! fs.pathExistsSync(filePath)) {
   const gzipped = zlib.gzipSync(fs.readFileSync("./fixture/options/js/index.js"))
-  fs.outputFileSync("./fixture/options/gz/index.mjs.gz", gzipped)
+  fs.outputFileSync(filePath, gzipped)
 }
 
 beforeEach(() => {
