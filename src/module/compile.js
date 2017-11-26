@@ -17,13 +17,14 @@ import stripShebang from "../util/strip-shebang.js"
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
+const useRunInDebugContext = typeof runInDebugContext === "function"
+
 const inspectorBinding = binding.inspector
 const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
 
 function compile(mod, content, filePath) {
   const req = makeRequireFunction(mod)
   const wrapper = Module.wrap(stripShebang(content))
-
   const compiledWrapper = runInThisContext(wrapper, {
     displayErrors: true,
     filename: filePath
@@ -45,7 +46,8 @@ function compile(mod, content, filePath) {
       delete process._breakFirstLine
       inspectorWrapper = callAndPauseOnStart
 
-      if (typeof inspectorWrapper !== "function") {
+      if (useRunInDebugContext &&
+          typeof inspectorWrapper !== "function") {
         const Debug = runInDebugContext("Debug")
         Debug.setBreakPoint(compiledWrapper, 0, 0)
       }
