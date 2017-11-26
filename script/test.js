@@ -18,7 +18,7 @@ const testPath = path.resolve(rootPath, "test")
 const envPath = path.resolve(testPath, "env")
 
 const HOME = path.resolve(envPath, "home")
-const MOCHA_BIN = path.resolve(rootPath, "node_modules/mocha/bin/mocha")
+const MOCHA_BIN = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const NODE_BIN = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 
 const NODE_ENV =
@@ -44,23 +44,25 @@ const trashPaths = globby.sync([
   realpath: true
 })
 
-const mochaArgs = [
+const nodeArgs = []
+
+if (process.env.HARMONY) {
+  nodeArgs.push("--harmony")
+}
+
+nodeArgs.push(
   MOCHA_BIN,
   "--full-trace",
   "--require", "../index.js",
   "tests.mjs"
-]
-
-if (process.env.HARMONY) {
-  mochaArgs.push("--harmony")
-}
+)
 
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
 }
 
 function runTests(cached) {
-  return execa(NODE_BIN, mochaArgs, {
+  return execa(NODE_BIN, nodeArgs, {
     cwd: testPath,
     env: {
       HOME,

@@ -9,6 +9,9 @@ const canTestMissingModuleErrors =
   ! ("TRAVIS" in process.env &&
     SemVer.satisfies(process.version, "^7"))
 
+const canUseExperimentalModules =
+  SemVer.satisfies(process.version, ">=8.5.0")
+
 const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
 
@@ -30,10 +33,16 @@ describe("module.runMain hook", function () {
   this.timeout(0)
 
   it("should work with Node -r and --require", () => {
-    const runs = requireFlags.map((requireFlag) => [
-      requireFlag, "../index.js",
-      "./fixture/main.mjs"
-    ])
+    const otherFlags = canUseExperimentalModules ? ["", "--experimental-modules"] : [""]
+    const runs = []
+
+    requireFlags.forEach((requireFlag) =>
+      otherFlags.forEach((flag) => {
+        const args = flag ? [flag] : []
+        args.push(requireFlag, "../index.js", "./fixture/main.mjs")
+        runs.push(args)
+      })
+    )
 
     return Promise.all(runs.map(node))
       .then((results) => {
@@ -55,7 +64,8 @@ describe("module.runMain hook", function () {
             ? JSON.parse(jsonText)
             : {}
 
-          if (result.stderr) {
+          if (result.stderr &&
+              ! result.stderr.includes("ExperimentalWarning")) {
             throw new Error(result.stderr)
           }
 
