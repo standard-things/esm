@@ -1,5 +1,8 @@
 import { dirname, extname } from "path"
 
+import NullObject from "./null-object.js"
+
+import assign from "./util/assign.js"
 import compile from "./module/compile.js"
 import defaults from "./util/defaults.js"
 import findPath from "./module/find-path.js"
@@ -39,6 +42,7 @@ class Module extends BuiltinModule {
     this.loaded = true
   }
 
+  static _extensions = new NullObject
   static _findPath = findPath
   static _initPaths = initPaths
   static _load = load
@@ -51,6 +55,7 @@ class Module extends BuiltinModule {
 }
 
 defaults(Module, BuiltinModule)
+assign(Module._extensions, BuiltinModule._extensions)
 
 setProperty(Module, "length", {
   enumerable: false,
