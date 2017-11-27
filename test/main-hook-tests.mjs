@@ -10,6 +10,7 @@ const canTestMissingModuleErrors =
     SemVer.satisfies(process.version, "^7"))
 
 const canUseExperimentalModules =
+  process.jsEngine !== "chakracore" &&
   SemVer.satisfies(process.version, ">=8.5.0")
 
 const canUsePreserveSymlinks =
