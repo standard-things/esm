@@ -2,8 +2,6 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
-import { runInDebugContext, runInThisContext } from "vm"
-
 import Module from "../module.js"
 
 import binding from "../binding.js"
@@ -12,15 +10,19 @@ import makeRequireFunction from "./make-require-function.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import resolveFilename from "./resolve-filename.js"
 import stripShebang from "../util/strip-shebang.js"
+import vm from "vm"
 
 // Lazily resolve `process.argv[1]`.
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
-const useRunInDebugContext = typeof runInDebugContext === "function"
-
 const inspectorBinding = binding.inspector
 const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
+
+const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
+const { runInThisContext } = vm
+
+const useRunInDebugContext = typeof runInDebugContext === "function"
 
 function compile(mod, content, filePath) {
   const req = makeRequireFunction(mod)
