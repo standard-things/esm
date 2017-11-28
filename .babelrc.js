@@ -14,8 +14,7 @@ module.exports = {
   ],
   presets: [
     ["@babel/env", {
-      loose: true,
-      modules: false,
+      debug: isTest,
       exclude: [
         "transform-async-to-generator",
         "transform-classes",
@@ -24,8 +23,9 @@ module.exports = {
         "transform-object-super",
         "transform-regenerator"
       ],
-      targets: { node: 4 },
-      debug: isTest
+      loose: true,
+      modules: false,
+      targets: { node: 4 }
     }]
   ]
 }
