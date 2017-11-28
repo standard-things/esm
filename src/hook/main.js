@@ -1,10 +1,14 @@
+import { dirname, resolve } from "path"
+
 import PkgInfo from "../pkg-info.js"
 
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
-import { dirname } from "path"
+import isPath from "../util/is-path.js"
 import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
+import parseJSON from "../util/parse-json.js"
+import readFile from "../fs/read-file.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 const { setPrototypeOf } = Object
@@ -16,10 +20,21 @@ function hook(Mod) {
   const useTickCallback = typeof _tickCallback === "function"
 
   const cwdPkgInfo = PkgInfo.get(".", true)
-  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
+  let cwdOptions = cwdPkgInfo.options
 
-  const cwdOptions = cwdPkgInfo.options
+  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
   const defaultOptions = defaultPkgInfo.options
+
+  let { ESM_OPTIONS } = process.env
+
+  if (ESM_OPTIONS) {
+    if (isPath(ESM_OPTIONS)) {
+      ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
+    }
+
+    cwdOptions = PkgInfo.createOptions(parseJSON(ESM_OPTIONS))
+  }
+
   const mode = cwdOptions.esm
 
   assign(defaultPkgInfo, cwdPkgInfo)
