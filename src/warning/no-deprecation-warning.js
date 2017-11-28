@@ -1,6 +1,6 @@
+import getDescriptor from "../util/get-descriptor.js"
+import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
-
-const { defineProperty, getOwnPropertyDescriptor } = Object
 
 function noDeprecationWarning(getter) {
   let descriptor
@@ -9,7 +9,7 @@ function noDeprecationWarning(getter) {
   const shouldRestore = ! process.noDeprecation
 
   if (shouldRestore) {
-    descriptor = getOwnPropertyDescriptor(process, "noDeprecation")
+    descriptor = getDescriptor(process, "noDeprecation")
 
     if (descriptor) {
       setProperty(process, "noDeprecation", { value: true, writable: false })
@@ -24,7 +24,7 @@ function noDeprecationWarning(getter) {
 
   if (shouldRestore) {
     if (descriptor) {
-      defineProperty(process, "noDeprecation", descriptor)
+      setDescriptor(process, "noDeprecation", descriptor)
     } else {
       delete process.noDeprecation
     }

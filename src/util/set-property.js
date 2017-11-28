@@ -1,6 +1,5 @@
 import createOptions from "./create-options.js"
-
-const { defineProperty } = Object
+import setDescriptor from "./set-descriptor.js"
 
 const defaultDescriptor = {
   configurable: true,
@@ -11,7 +10,7 @@ const defaultDescriptor = {
 
 function setProperty(object, key, descriptor) {
   descriptor = createOptions(descriptor, defaultDescriptor)
-  return defineProperty(object, key, descriptor)
+  return setDescriptor(object, key, descriptor)
 }
 
 export default setProperty

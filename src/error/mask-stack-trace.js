@@ -3,6 +3,7 @@ import decorateStackTrace from "./decorate-stack-trace.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
+import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
@@ -10,7 +11,6 @@ const ZWJ = "\u200d"
 const BuiltinModule = __non_webpack_module__.constructor
 
 const { isArray } = Array
-const { defineProperty } = Object
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
@@ -32,7 +32,7 @@ function maskStackTrace(error, sourceCode, filePath, useURLs) {
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
   // However, `Error.captureStackTrace()` will throw when receiving a proxy
   // wrapped error object.
-  return defineProperty(error, "stack", {
+  return setDescriptor(error, "stack", {
     configurable: true,
     enumerable: false,
     get() {

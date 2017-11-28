@@ -1,9 +1,9 @@
+import getDescriptor from "./get-descriptor.js"
 import has from "./has.js"
-
-const { defineProperty, getOwnPropertyDescriptor } = Object
+import setDescriptor from "./set-descriptor.js"
 
 function assignProperty(object, source, key) {
-  const sourceDescriptor = getOwnPropertyDescriptor(source, key)
+  const sourceDescriptor = getDescriptor(source, key)
 
   if (sourceDescriptor) {
     if (sourceDescriptor.configurable === true &&
@@ -12,7 +12,7 @@ function assignProperty(object, source, key) {
         has(sourceDescriptor, "value")) {
       object[key] = source[key]
     } else {
-      defineProperty(object, key, sourceDescriptor)
+      setDescriptor(object, key, sourceDescriptor)
     }
   }
 

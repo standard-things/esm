@@ -1,9 +1,7 @@
-const {
-  defineProperty,
-  getOwnPropertyDescriptor,
-  getOwnPropertyNames,
-  setPrototypeOf
-} = Object
+import getDescriptor from "./util/get-descriptor.js"
+import setDescriptor from "./util/set-descriptor.js"
+
+const { getOwnPropertyNames, setPrototypeOf } = Object
 
 class Safe {
   static create(Super) {
@@ -12,8 +10,8 @@ class Safe {
     const names = getOwnPropertyNames(Super.prototype)
 
     for (const name of names) {
-      const descriptor = getOwnPropertyDescriptor(Super.prototype, name)
-      defineProperty(Safe.prototype, name, descriptor)
+      const descriptor = getDescriptor(Super.prototype, name)
+      setDescriptor(Safe.prototype, name, descriptor)
     }
 
     setPrototypeOf(Safe.prototype, null)
