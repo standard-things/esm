@@ -1,16 +1,25 @@
 import { basename, dirname, resolve } from "path"
 
 import FastObject from "./fast-object.js"
+import Module from "./module.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
 import defaults from "./util/defaults.js"
 import has from "./util/has.js"
+import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
+import loadESM from "./module/esm/load.js"
 import readJSON from "./fs/read-json.js"
 import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
+
+const ESMRC_FILENAME = ".esmrc"
+const ESMRC_JS_FILENAME = ".esmrc.js"
+const PACKAGE_FILENAME = "package.json"
+
+const { setPrototypeOf } = Object
 
 const defaultOptions = {
   cache: true,
@@ -96,12 +105,22 @@ class PkgInfo {
   }
 
   static read(dirPath, force) {
-    let pkgJSON = readJSON(resolve(dirPath, "package.json"))
-    let options = readJSON(resolve(dirPath, ".esmrc"))
+    let pkgJSON = readJSON(resolve(dirPath, PACKAGE_FILENAME))
+    let options = readJSON(resolve(dirPath, ESMRC_FILENAME))
     let range = null
 
     if (options) {
       options = toOptions(options)
+    } else {
+      const optionsPath = resolve(dirPath, ESMRC_JS_FILENAME)
+
+      if (isFile(optionsPath)) {
+        const optionsMod = loadESM(optionsPath, null, false, (mod) => {
+          setPrototypeOf(mod, Module.prototype)
+        })
+
+        options = toOptions(optionsMod.exports)
+      }
     }
 
     if (pkgJSON === null) {
