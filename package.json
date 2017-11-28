@@ -55,6 +55,7 @@
     "optimize-js-plugin": "0.0.4",
     "optional-dev-dependency": "^2.0.1",
     "pify": "^3.0.0",
+    "pm2": "^2.8.0",
     "semver": "^5.4.1",
     "trash": "^4.1.0",
     "typescript": "^2.6.1",

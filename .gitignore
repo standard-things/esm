@@ -5,6 +5,7 @@
 .DS_Store
 .node_repl_history
 .nyc_output
+.pm2
 .vscode
 package-lock.json
 /build
