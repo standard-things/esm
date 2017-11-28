@@ -11,6 +11,8 @@ module.exports = {
     "import/prefer-default-export": "off",
     "no-console": "off",
     "no-empty": "off",
+    "no-global-assign": "off",
+    "no-undef": "off",
     "no-unused-vars": "off",
     "sort-imports": "off",
     "sort-keys": "off",
