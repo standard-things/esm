@@ -66,7 +66,7 @@ function hasDebugArg(args) {
 function hasLoaderArg(args) {
   return args.some((arg) =>
     arg.charCodeAt(0) === codeOfBracket
-      ? hasLoaderValue(parseJSON(arg) || arg)
+      ? hasLoaderValue(parseJSON(arg))
       : hasLoaderValue(arg)
   )
 }
