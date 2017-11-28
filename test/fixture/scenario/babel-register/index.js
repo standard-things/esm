@@ -2,4 +2,4 @@
 
 require = require("../../../../")(module, true)
 require("@babel/register")
-console.log(require("./index.mjs").default)
+module.exports = require("./index.mjs").default
