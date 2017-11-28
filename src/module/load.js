@@ -8,7 +8,7 @@ import builtinModules from "../builtin-modules.js"
 function load(id, parent, isMain) {
   return id in builtinModules
     ? builtinModules[id].exports
-    : _load(id, parent, isMain, __non_webpack_require__)
+    : _load(id, parent, isMain, __non_webpack_require__).exports
 }
 
 export default load
