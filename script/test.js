@@ -3,7 +3,7 @@
 
 const execa = require("execa")
 const fs = require("fs-extra")
-const globby = require("globby")
+const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const trash = require("./trash.js")
 
@@ -14,8 +14,18 @@ const argv = require("yargs")
 const isWin = process.platform === "win32"
 
 const rootPath = path.resolve(__dirname, "..")
+const buildPath = path.resolve(rootPath, "build")
+const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const testPath = path.resolve(rootPath, "test")
 const envPath = path.resolve(testPath, "env")
+
+const trashPaths = ignorePaths
+  .filter((thePath) =>
+    thePath !== nodeModulesPath &&
+    thePath !== gzipPath &&
+    ! thePath.startsWith(buildPath)
+  )
 
 const HOME = path.resolve(envPath, "home")
 const MOCHA_BIN = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
@@ -29,20 +39,6 @@ const NODE_PATH = [
   path.resolve(envPath, "node_path"),
   path.resolve(envPath, "node_path/relative")
 ].join(path.delimiter)
-
-const trashPaths = globby.sync([
-  "**/.cache",
-  "**/.nyc_output",
-  "test/**/*.gz",
-  "test/node_modules/**/node_modules",
-  "test/node_modules/**/package-lock.json",
-  "test/node_modules/nyc-typescript-esm/**/*.js"
-], {
-  cwd: rootPath,
-  expandDirectories: false,
-  nodir: false,
-  realpath: true
-})
 
 const nodeArgs = []
 

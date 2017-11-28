@@ -3,28 +3,12 @@
 
 const fs = require("fs-extra")
 const globby = require("globby")
+const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const trash = require("./trash.js")
 
 const rootPath = path.resolve(__dirname, "..")
-const gitignorePath = path.resolve(rootPath, ".gitignore")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
-
-const ignorePatterns = fs.readFileSync(gitignorePath, "utf8")
-  .replace(/^\s+/gm, "")
-  .replace(/\s+$/gm, "")
-  .split("\n")
-  .map((ignore) => ignore.startsWith("/")
-    ? ignore.slice(1)
-    : "**/" + ignore
-  )
-
-const ignorePaths = globby.sync(ignorePatterns, {
-  cwd: rootPath,
-  expandDirectories: false,
-  nodir: false,
-  realpath: true
-})
 
 const trashPaths = ignorePaths
   .filter((thePath) => thePath !== nodeModulesPath)
