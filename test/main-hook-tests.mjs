@@ -34,8 +34,12 @@ describe("module.runMain hook", function () {
   this.timeout(0)
 
   it("should work with Node -r and --require", () => {
-    const otherFlags = canUseExperimentalModules ? ["", "--experimental-modules"] : [""]
+    const otherFlags = ["", "--no-deprecation"]
     const runs = []
+
+    if (canUseExperimentalModules) {
+      otherFlags.push("--experimental-modules")
+    }
 
     requireFlags.forEach((requireFlag) =>
       otherFlags.forEach((flag) => {
@@ -78,8 +82,12 @@ describe("module.runMain hook", function () {
   ;(canTestMissingModuleErrors ? it : xit)(
   "should error for missing modules", function () {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
-    const otherFlags = canUsePreserveSymlinks ? ["", "--preserve-symlinks"] : [""]
+    const otherFlags = [""]
     const runs = []
+
+    if (canUsePreserveSymlinks) {
+      otherFlags.push("--preserve-symlinks")
+    }
 
     fileNames.forEach((fileName) =>
       requireFlags.forEach((requireFlag) =>
