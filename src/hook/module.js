@@ -1,6 +1,7 @@
 import { extname as _extname, dirname, resolve } from "path"
 
 import Entry from "../entry.js"
+import Module from "../module.js"
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
 import Runtime from "../runtime.js"
@@ -33,7 +34,9 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import { satisfies } from "semver"
 import setESM from "../util/set-es-module.js"
+import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
+import setSetter from "../util/set-setter.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
@@ -322,6 +325,7 @@ function hook(Mod, parent, options) {
   }
 
   const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+  const extsObjects = [moduleState.extensions, Module._extensions]
 
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
@@ -346,14 +350,20 @@ function hook(Mod, parent, options) {
 
     passthruMap.set(extCompiler, passthru)
 
-    if (ext === ".js" &&
-        moduleState.extensions !== _extensions) {
-      Wrapper.manage(moduleState.extensions, ext, managerWrapper)
-      Wrapper.wrap(moduleState.extensions, ext, methodWrapper)
-    }
-
     Wrapper.manage(_extensions, ext, managerWrapper)
     Wrapper.wrap(_extensions, ext, methodWrapper)
+
+    for (const extsObject of extsObjects) {
+      if (extsObject !== _extensions) {
+        setGetter(extsObject, ext, () => {
+          return _extensions[ext]
+        })
+
+        setSetter(extsObject, ext, (value) => {
+          _extensions[ext] = value
+        })
+      }
+    }
   })
 }
 
