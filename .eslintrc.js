@@ -1,26 +1,27 @@
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const isTest = /test/.test(process.env.NODE_ENV)
 
 module.exports = {
-  extends: ["eslint:recommended", "plugin:import/errors"],
-  plugins: ["import", "node"],
-  parser: "eslint-plugin-import/memo-parser",
-  root: true,
   env: {
     es6: true,
     mocha: true,
     node: true
   },
+  extends: ["eslint:recommended", "plugin:import/errors"],
   globals: {
     __non_webpack_module__: false,
     __non_webpack_require__: false,
     __options: false
   },
+  parser: "eslint-plugin-import/memo-parser",
   parserOptions: {
     ecmaVersion: 8,
     parser: "babel-eslint"
   },
+  plugins: ["import", "node"],
+  root: true,
   rules: {
     "arrow-parens": "error",
     "arrow-spacing": "error",
@@ -46,6 +47,8 @@ module.exports = {
     "no-useless-rename": "error",
     "no-var": "error",
     "one-var": ["error", "never"],
+    "quote-props": ["error", "consistent-as-needed"],
+    quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "rest-spread-spacing": "error",
     semi: ["error", "never"],
     "sort-imports": "error",
@@ -54,8 +57,6 @@ module.exports = {
     "space-before-function-paren": ["error", { named: "never" }],
     "space-infix-ops": "error",
     "spaced-comment": ["error", "always", { block: { balanced: true } }],
-    strict: "error",
-    "quote-props": ["error", "consistent-as-needed"],
-    quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }]
+    strict: "error"
   }
 }
