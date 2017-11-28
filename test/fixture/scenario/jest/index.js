@@ -1,4 +1,4 @@
 "use strict"
 
 require = require("../../../../")(module)
-module.exports = require("./index.mjs").default
+module.exports = require("./").default
