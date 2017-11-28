@@ -1,18 +1,22 @@
-{
-  "plugins": [
+"use strict"
+
+const isTest = /test/.test(process.env.NODE_ENV)
+
+module.exports = {
+  plugins: [
     ["@babel/proposal-class-properties", {
-      "loose": true
+      loose: true
     }],
     ["@babel/transform-block-scoping", {
-      "throwIfClosureRequired": false
+      throwIfClosureRequired: false
     }],
     "transform-for-of-as-array"
   ],
-  "presets": [
+  presets: [
     ["@babel/env", {
-      "loose": true,
-      "modules": false,
-      "exclude": [
+      loose: true,
+      modules: false,
+      exclude: [
         "transform-async-to-generator",
         "transform-classes",
         "transform-for-of",
@@ -20,7 +24,8 @@
         "transform-object-super",
         "transform-regenerator"
       ],
-      "targets": { "node": 4 }
+      targets: { node: 4 },
+      debug: isTest
     }]
   ]
 }

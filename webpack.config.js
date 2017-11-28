@@ -34,8 +34,7 @@ const config = {
     rules: [{
       test: /\.js$/,
       loader: "babel-loader",
-      exclude: /node_modules/,
-      options: readJSON("./.babelrc")
+      exclude: /node_modules/
     }]
   },
   plugins: [
@@ -79,7 +78,6 @@ if (isTest) {
   config.entry.compiler = "./src/compiler.js"
   config.entry.runtime = "./src/runtime.js"
   config.entry["url-to-path"] = "./src/util/url-to-path.js"
-  config.module.rules[0].options.presets[0][1].debug = true
 }
 
 module.exports = config
