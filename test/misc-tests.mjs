@@ -100,9 +100,9 @@ describe("package.json", () => {
 
   it("should support .esmrc` options", () =>
     Promise.all([
-      "esmrc-object",
-      "esmrc-string-cjs",
-      "esmrc-string-js"
+      "./fixture/options-file/esmrc-object",
+      "./fixture/options-file/esmrc-string-cjs",
+      "./fixture/options-file/esmrc-string-js"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
@@ -111,12 +111,12 @@ describe("package.json", () => {
 
   it("should support `@std/esm` package options", () =>
     Promise.all([
-      "@std-esm-object",
-      "@std-esm-string-cjs",
-      "@std-esm-string-js",
-      "@std-object",
-      "@std-string-cjs",
-      "@std-string-js"
+      "./fixture/options-file/@std-esm-object",
+      "./fixture/options-file/@std-esm-string-cjs",
+      "./fixture/options-file/@std-esm-string-js",
+      "./fixture/options-file/@std-object",
+      "./fixture/options-file/@std-string-cjs",
+      "./fixture/options-file/@std-string-js"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))
