@@ -1,4 +1,4 @@
-import { basename, dirname, resolve } from "path"
+import { basename, dirname, extname, resolve } from "path"
 
 import FastObject from "./fast-object.js"
 import Module from "./module.js"
@@ -10,6 +10,7 @@ import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import readJSON from "./fs/read-json.js"
+import readJSON5 from "./fs/read-json5.js"
 import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
@@ -108,26 +109,30 @@ class PkgInfo {
     let parentPkgInfo = null
     let range = null
 
-    let options = readJSON(resolve(dirPath, ESMRC_FILENAME))
+    let options = readJSON5(resolve(dirPath, ESMRC_FILENAME))
     let pkgJSON = readJSON(resolve(dirPath, PACKAGE_FILENAME))
 
     if (options === null) {
       const optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
 
       if (optionsPath) {
-        pkgInfo =
-        infoCache[dirPath] = new PkgInfo(dirPath, "*", {
-          cjs: true,
-          esm: "js",
-          gz: true
-        })
+        if (extname(optionsPath) === ".json") {
+          options = readJSON5(optionsPath)
+        } else {
+          pkgInfo =
+          infoCache[dirPath] = new PkgInfo(dirPath, "*", {
+            cjs: true,
+            esm: "js",
+            gz: true
+          })
 
-        options = loadESM(optionsPath, null, false, (mod) => {
-          setPrototypeOf(mod, Module.prototype)
-        }).exports
+          options = loadESM(optionsPath, null, false, (mod) => {
+            setPrototypeOf(mod, Module.prototype)
+          }).exports
 
-        if (options === void 0) {
-          options = null
+          if (options === void 0) {
+            options = null
+          }
         }
       }
     }
