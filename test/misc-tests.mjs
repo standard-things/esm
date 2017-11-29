@@ -120,6 +120,17 @@ describe("package.json", () => {
     ))
   )
 
+  it("should support .esmrc.gz options", () =>
+    Promise.all([
+      "./fixture/options-file/esmrc-gz-object",
+      "./fixture/options-file/esmrc-gz-string-cjs",
+      "./fixture/options-file/esmrc-gz-string-js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+    ))
+  )
+
   it("should support .esmrc.js options", () =>
     Promise.all([
       "./fixture/options-file/esmrc-js-object",
@@ -131,11 +142,33 @@ describe("package.json", () => {
     ))
   )
 
+  it("should support .esmrc.js.gz options", () =>
+    Promise.all([
+      "./fixture/options-file/esmrc-js-gz-object",
+      "./fixture/options-file/esmrc-js-gz-string-cjs",
+      "./fixture/options-file/esmrc-js-gz-string-js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+    ))
+  )
+
   it("should support .esmrc.mjs options", () =>
     Promise.all([
       "./fixture/options-file/esmrc-mjs-object",
       "./fixture/options-file/esmrc-mjs-string-cjs",
       "./fixture/options-file/esmrc-mjs-string-js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+    ))
+  )
+
+  it("should support .esmrc.mjs.gz options", () =>
+    Promise.all([
+      "./fixture/options-file/esmrc-mjs-gz-object",
+      "./fixture/options-file/esmrc-mjs-gz-string-cjs",
+      "./fixture/options-file/esmrc-mjs-gz-string-js"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(true))

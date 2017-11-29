@@ -18,28 +18,25 @@ import path from "path"
 import require from "./require.js"
 import zlib from "zlib"
 
-const exts = [".gz", ".js.gz", ".mjs.gz", ".mjs"]
 const jsonExt = require.extensions[".json"]
 
-const jsGzipped = zlib.gzipSync(fs.readFileSync("./fixture/file-extension/a.js"))
-const mjsGzipped = zlib.gzipSync(fs.readFileSync("./fixture/file-extension/a.mjs"))
-
-exts.forEach((ext) => {
-  const filePath = "./fixture/file-extension/a" + ext
-
-  if (ext.endsWith(".gz") &&
-      ! fs.pathExistsSync(filePath)) {
-    const gzipped = ext === ".mjs.gz" ? mjsGzipped : jsGzipped
-    fs.outputFileSync(filePath, gzipped)
-  }
-})
-
-const filePath = path.resolve("./fixture/options/gz/index.mjs.gz")
-
-if (! fs.pathExistsSync(filePath)) {
-  const gzipped = zlib.gzipSync(fs.readFileSync("./fixture/options/js/index.js"))
-  fs.outputFileSync(filePath, gzipped)
+function gzip(fromPath, toPath) {
+  return fs.outputFileSync(toPath, zlib.gzipSync(fs.readFileSync(fromPath)))
 }
+
+gzip("./fixture/file-extension/a.js", "./fixture/file-extension/a.gz")
+gzip("./fixture/file-extension/a.js", "./fixture/file-extension/a.js.gz")
+gzip("./fixture/file-extension/a.mjs", "./fixture/file-extension/a.mjs.gz")
+gzip("./fixture/options/mjs/index.mjs", "./fixture/options/gz/index.mjs.gz")
+gzip("./fixture/options-file/esmrc-js-object/.esmrc.js", "./fixture/options-file/esmrc-gz-object/.esmrc.gz")
+gzip("./fixture/options-file/esmrc-js-string-cjs/.esmrc.js", "./fixture/options-file/esmrc-gz-string-cjs/.esmrc.gz")
+gzip("./fixture/options-file/esmrc-js-string-js/.esmrc.js", "./fixture/options-file/esmrc-gz-string-js/.esmrc.gz")
+gzip("./fixture/options-file/esmrc-js-object/.esmrc.js", "./fixture/options-file/esmrc-js-gz-object/.esmrc.js.gz")
+gzip("./fixture/options-file/esmrc-js-string-cjs/.esmrc.js", "./fixture/options-file/esmrc-js-gz-string-cjs/.esmrc.js.gz")
+gzip("./fixture/options-file/esmrc-js-string-js/.esmrc.js", "./fixture/options-file/esmrc-js-gz-string-js/.esmrc.js.gz")
+gzip("./fixture/options-file/esmrc-mjs-object/.esmrc.mjs", "./fixture/options-file/esmrc-mjs-gz-object/.esmrc.mjs.gz")
+gzip("./fixture/options-file/esmrc-mjs-string-cjs/.esmrc.mjs", "./fixture/options-file/esmrc-mjs-gz-string-cjs/.esmrc.mjs.gz")
+gzip("./fixture/options-file/esmrc-mjs-string-js/.esmrc.mjs", "./fixture/options-file/esmrc-mjs-gz-string-js/.esmrc.mjs.gz")
 
 beforeEach(() => {
   delete global.customError
