@@ -5,9 +5,9 @@ import Module from "./module.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
+import _findPath from "./module/_find-path.js"
 import defaults from "./util/defaults.js"
 import has from "./util/has.js"
-import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import readJSON from "./fs/read-json.js"
@@ -16,7 +16,6 @@ import { validRange } from "semver"
 import { version } from "./version.js"
 
 const ESMRC_FILENAME = ".esmrc"
-const ESMRC_JS_FILENAME = ".esmrc.js"
 const PACKAGE_FILENAME = "package.json"
 
 const { setPrototypeOf } = Object
@@ -32,6 +31,7 @@ const defaultOptions = {
 }
 
 const infoCache = new FastObject
+const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class PkgInfo {
   static createOptions = createOptions
@@ -112,9 +112,15 @@ class PkgInfo {
     if (options) {
       options = toOptions(options)
     } else {
-      const optionsPath = resolve(dirPath, ESMRC_JS_FILENAME)
+      const optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
 
-      if (isFile(optionsPath)) {
+      if (optionsPath) {
+        infoCache[dirPath] = new PkgInfo(dirPath, "*", {
+          cjs: true,
+          esm: "js",
+          gz: true
+        })
+
         const optionsMod = loadESM(optionsPath, null, false, (mod) => {
           setPrototypeOf(mod, Module.prototype)
         })
