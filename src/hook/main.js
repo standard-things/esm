@@ -7,7 +7,7 @@ import builtinModules from "../builtin-modules.js"
 import isPath from "../util/is-path.js"
 import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
-import parseJSON from "../util/parse-json.js"
+import parseJSON5 from "../util/parse-json5.js"
 import readFile from "../fs/read-file.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
@@ -32,7 +32,7 @@ function hook(Mod) {
       ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
     }
 
-    cwdOptions = PkgInfo.createOptions(parseJSON(ESM_OPTIONS))
+    cwdOptions = PkgInfo.createOptions(parseJSON5(ESM_OPTIONS))
   }
 
   const mode = cwdOptions.esm
