@@ -6,7 +6,6 @@ import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
-import defaults from "./util/defaults.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
@@ -105,38 +104,37 @@ class PkgInfo {
   }
 
   static read(dirPath, force) {
-    let pkgJSON = readJSON(resolve(dirPath, PACKAGE_FILENAME))
-    let options = readJSON(resolve(dirPath, ESMRC_FILENAME))
+    let pkgInfo
+    let parentPkgInfo = null
     let range = null
 
-    if (options) {
-      options = toOptions(options)
-    } else {
+    let options = readJSON(resolve(dirPath, ESMRC_FILENAME))
+    let pkgJSON = readJSON(resolve(dirPath, PACKAGE_FILENAME))
+
+    if (options === null) {
       const optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
 
       if (optionsPath) {
+        pkgInfo =
         infoCache[dirPath] = new PkgInfo(dirPath, "*", {
           cjs: true,
           esm: "js",
           gz: true
         })
 
-        const optionsMod = loadESM(optionsPath, null, false, (mod) => {
+        options = loadESM(optionsPath, null, false, (mod) => {
           setPrototypeOf(mod, Module.prototype)
-        })
+        }).exports
 
-        options = toOptions(optionsMod.exports)
+        if (options === void 0) {
+          options = null
+        }
       }
     }
 
     if (pkgJSON === null) {
       if (options) {
-        const parentPkgInfo = PkgInfo.get(dirname(dirPath))
-
-        if (parentPkgInfo) {
-          range = parentPkgInfo.range
-          options = defaults(PkgInfo.createOptions(options), parentPkgInfo.options)
-        }
+        parentPkgInfo = PkgInfo.get(dirname(dirPath))
       } else if (! force) {
         return null
       }
@@ -157,27 +155,34 @@ class PkgInfo {
       return null
     }
 
-    if (range === null) {
+    if (force) {
+      range = "*"
+    } else if (parentPkgInfo) {
+      ({ range } = parentPkgInfo)
+    } else {
       // A package.json may have `@std/esm` in its "devDependencies" object
       // because it expects another package or application to enable ESM loading
       // in production, but needs `@std/esm` during development.
       range =
         getRange(pkgJSON, "dependencies") ||
         getRange(pkgJSON, "peerDependencies")
-    }
 
-    if (force) {
-      range = "*"
-    } else if (range === null) {
-      if (options ||
-          getRange(pkgJSON, "devDependencies")) {
-        range = "*"
-      } else {
-        return null
+      if (range === null) {
+        if (options ||
+            getRange(pkgJSON, "devDependencies")) {
+          range = "*"
+        } else {
+          return null
+        }
       }
     }
 
-    const pkgInfo = new PkgInfo(dirPath, range, options)
+    if (pkgInfo) {
+      pkgInfo.options = PkgInfo.createOptions(options)
+      pkgInfo.range = range
+    } else {
+      pkgInfo = new PkgInfo(dirPath, range, options)
+    }
 
     if (force &&
         options === false) {
