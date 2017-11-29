@@ -161,7 +161,7 @@ describe("package.json", () => {
       .then(() => assert.ok(true))
   )
 
-  it("should support `@std/esm` as package dependencies", () =>
+  it("should support @std/esm as package dependencies", () =>
     Promise.all([
       "dependencies",
       "dev-dependencies",
@@ -245,7 +245,7 @@ describe("errors", () => {
 })
 
 describe("Node rules", () => {
-  it("should find `.mjs` before `.js`", () =>
+  it("should find .mjs before .js", () =>
     Promise.all([
       "./fixture/file-extension-priority",
       "file-extension-priority"
@@ -394,7 +394,7 @@ describe("Node rules", () => {
       .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
 
-  it("should not support overwriting `.json` handling", () => {
+  it("should not support overwriting .json handling", () => {
     require.extensions[".json"] = () => ({})
     return import("../package.json")
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
