@@ -106,15 +106,13 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    let child
     let childEntry
     const { entry } = this
 
     moduleState.requireDepth += 1
 
     try {
-      load(id, entry.module, loadESM, (mod) => {
-        child = mod
+      load(id, entry.module, loadESM, (child) => {
         childEntry = Entry.get(child)
         entry.children[child.id] = childEntry
         childEntry.addSetters(setterPairs, entry)
