@@ -2,6 +2,6 @@
 
 module.exports = {
   rules: {
-    "import/prefer-default-export": "off"
+    "node/no-unsupported-features": "off"
   }
 }

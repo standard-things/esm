@@ -1,7 +1,7 @@
 import assert from "assert"
 import { a, b, c, rest } from "../fixture/export/destructuring.mjs"
 import { a0, a2, update } from "../fixture/export/holes.mjs"
-import { x, y, swap } from "../fixture/export/swap.mjs"
+import { swap, x, y } from "../fixture/export/swap.mjs"
 
 export default () => {
   // Should support destructuring declarations.

@@ -14,6 +14,7 @@ module.exports = {
     "no-global-assign": "off",
     "no-undef": "off",
     "no-unused-vars": "off",
+    "node/no-unsupported-features": "off",
     "sort-imports": "off",
     "sort-keys": "off",
     strict: "off"

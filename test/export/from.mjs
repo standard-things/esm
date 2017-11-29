@@ -1,5 +1,5 @@
 import assert from "assert"
-import def1, { a, b, c, aa, bb, def2 } from "../fixture/export/from.mjs"
+import def1, { a, aa, b, bb, c, def2 } from "../fixture/export/from.mjs"
 
 export default () => {
   assert.strictEqual(a, "a")

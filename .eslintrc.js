@@ -1,4 +1,3 @@
-/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const isTest = /test/.test(process.env.NODE_ENV)
@@ -46,6 +45,7 @@ module.exports = {
     "no-unused-vars": "error",
     "no-useless-rename": "error",
     "no-var": "error",
+    "node/no-unsupported-features": ["error", { version: 4 }],
     "one-var": ["error", "never"],
     "quote-props": ["error", "consistent-as-needed"],
     quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],

@@ -1,4 +1,3 @@
-/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
 const isTest = /test/.test(process.env.NODE_ENV)
