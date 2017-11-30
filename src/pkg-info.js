@@ -151,6 +151,7 @@ class PkgInfo {
     }
 
     let parentPkgInfo
+    let pkgParsed = false
     let pkgJSON = readFile(resolve(dirPath, PACKAGE_FILENAME), "utf8")
 
     if (! force &&
@@ -162,12 +163,10 @@ class PkgInfo {
       }
     }
 
-    if (! optionsFound ||
-        ! parentPkgInfo) {
-      pkgJSON = parseJSON(pkgJSON)
-    }
-
     if (! optionsFound) {
+      pkgParsed = true
+      pkgJSON = parseJSON(pkgJSON)
+
       if (has(pkgJSON, "@std/esm")) {
         optionsFound = true
         options = pkgJSON["@std/esm"]
@@ -191,6 +190,11 @@ class PkgInfo {
     } else if (parentPkgInfo) {
       range = parentPkgInfo.range
     } else {
+      if (! pkgParsed) {
+        pkgParsed = true
+        pkgJSON = parseJSON(pkgJSON)
+      }
+
       // A package.json may have `@std/esm` in its "devDependencies" object
       // because it expects another package or application to enable ESM loading
       // in production, but needs `@std/esm` during development.
