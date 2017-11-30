@@ -63,6 +63,7 @@ describe("module.runMain hook", function () {
   it("should support `ESM_OPTIONS` environment variable", () =>
     Promise.all([
       "'cjs'",
+      "{cjs:1}",
       "{cjs:true}"
     ].map((ESM_OPTIONS) =>
       runMain("./node_modules/esm-options", { ESM_OPTIONS })
