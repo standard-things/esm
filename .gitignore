@@ -4,6 +4,7 @@
 .config
 .DS_Store
 .node_repl_history
+.node-spawn-wrap-*
 .nyc_output
 .pm2
 .vscode
