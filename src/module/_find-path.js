@@ -142,7 +142,7 @@ function readPackage(thePath) {
   let main
 
   try {
-    ({ main } = parse(json))
+    main = parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message
