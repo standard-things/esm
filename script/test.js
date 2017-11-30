@@ -17,13 +17,15 @@ const buildPath = path.resolve(rootPath, "build")
 const gzipPath = path.resolve(rootPath, "esm.js.gz")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const testPath = path.resolve(rootPath, "test")
+const vendorPath = path.resolve(rootPath, "src/vendor")
 const envPath = path.resolve(testPath, "env")
 
 const trashPaths = ignorePaths
   .filter((thePath) =>
-    thePath !== nodeModulesPath &&
     thePath !== gzipPath &&
-    ! thePath.startsWith(buildPath)
+    thePath !== nodeModulesPath &&
+    ! thePath.startsWith(buildPath) &&
+    ! thePath.startsWith(vendorPath)
   )
 
 const HOME = path.resolve(envPath, "home")
