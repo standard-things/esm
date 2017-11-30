@@ -22,19 +22,16 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
-function node(args) {
+function node(args, env) {
   return execa(process.execPath, args, {
     cwd: testPath,
+    env,
     reject: false
   })
 }
 
 function runMain(filePath, env) {
-  return execa(process.execPath, ["-r", "../index.js", filePath], {
-    cwd: testPath,
-    env,
-    reject: false
-  })
+  return node(["-r", "../index.js", filePath], env)
 }
 
 describe("module.runMain hook", function () {
@@ -53,26 +50,24 @@ describe("module.runMain hook", function () {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push(requireFlag, "../index.js", "./fixture/main/main-module.mjs")
-        runs.push(args)
+        runs.push(
+          node(args)
+            .then((result) => assert.ok(result.stdout.includes("main-module:false")))
+        )
       })
     )
 
-    return Promise.all(runs.map(node))
-      .then((results) => {
-        results.forEach((result) => {
-          if (result.stderr &&
-              ! result.stderr.includes("ExperimentalWarning")) {
-            throw new Error(result.stderr)
-          }
-
-          assert.ok(result.stdout.includes("main-module:false"))
-        })
-      })
+    return Promise.all(runs)
   })
 
   it("should support `ESM_OPTIONS` environment variable", () =>
-    runMain("./node_modules/esm-options", { ESM_OPTIONS: "{cjs:true}" })
-    .then((result) => assert.ok(result.stdout.includes("esm-options:true")))
+    Promise.all([
+      "'cjs'",
+      "{cjs:true}"
+    ].map((ESM_OPTIONS) =>
+      runMain("./node_modules/esm-options", { ESM_OPTIONS })
+        .then((result) => assert.ok(result.stdout.includes("esm-options:true")))
+    ))
   )
 
   it("should support `import.meta.url`", () =>
@@ -104,15 +99,13 @@ describe("module.runMain hook", function () {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push("-r", "../index.js", fileName)
-        runs.push(args)
+        runs.push(
+          node(args)
+            .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
+        )
       })
     )
 
-    return Promise.all(runs.map(node))
-      .then((results) => {
-        results.forEach((result) =>
-          assert.ok(result.stderr.includes("Error [ERR_MISSING_MODULE]: Cannot find module"))
-        )
-      })
+    return Promise.all(runs)
   })
 })
