@@ -22,7 +22,15 @@ const { setPrototypeOf } = Object
 
 const defaultOptions = {
   cache: true,
-  cjs: createCJS(false),
+  cjs: {
+    cache: false,
+    extensions: false,
+    interop: false,
+    namedExports: false,
+    paths: false,
+    topLevelReturn: false,
+    vars: false
+  },
   debug: false,
   esm: "mjs",
   gz: false,
@@ -31,6 +39,8 @@ const defaultOptions = {
 }
 
 const infoCache = new FastObject
+
+const cjsKeys = Object.keys(defaultOptions.cjs)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class PkgInfo {
@@ -202,14 +212,21 @@ class PkgInfo {
   }
 }
 
-function createCJS(value, object = {}) {
-  object.cache =
-  object.extensions =
-  object.interop =
-  object.namedExports =
-  object.paths =
-  object.topLevelReturn =
-  object.vars = value
+function createCJS(source, object = {}) {
+  if (isObjectLike(source)) {
+    for (const key of cjsKeys) {
+      if (has(source, key)) {
+        object[key] = source[key]
+      }
+    }
+  } else {
+    const value = !! source
+
+    for (const key of cjsKeys) {
+      object[key] = value
+    }
+  }
+
   return object
 }
 
@@ -221,30 +238,38 @@ function createOptions(options) {
   options = toOptions(options)
 
   if (has(options, "cjs")) {
-    cjsOptions = typeof options.cjs === "boolean"
-      ? createCJS(options.cjs, new NullObject)
-      : _createOptions(options.cjs, defaultOptions.cjs)
+    cjsOptions = createCJS(options.cjs, new NullObject)
   }
 
-  if (has(options, "sourcemap") &&
-      ! has(options, "sourceMap")) {
+  if (has(options, "sourceMap")) {
+    sourceMap = options.sourceMap
+  } else if (has(options, "sourcemap")) {
     sourceMap = options.sourcemap
   }
 
   options = _createOptions(options, defaultOptions)
 
-  if (! options.esm) {
-    options.esm = "mjs"
+  if (typeof options.cache !== "string") {
+    options.cache = !! options.cache
   }
 
   if (cjsOptions) {
     options.cjs = cjsOptions
   }
 
+  if (options.esm !== "all" &&
+      options.esm !== "js") {
+    options.esm = "mjs"
+  }
+
   if (sourceMap !== void 0) {
     options.sourceMap = !! sourceMap
     delete options.sourcemap
   }
+
+  options.debug = !! options.debug
+  options.gz = !! options.gz
+  options.warnings = !! options.warnings
 
   return options
 }
@@ -271,7 +296,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-Object.setPrototypeOf(PkgInfo.prototype, null)
+setPrototypeOf(PkgInfo.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 infoCache[""] = new PkgInfo("", version, {
