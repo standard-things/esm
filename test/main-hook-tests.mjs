@@ -18,7 +18,6 @@ const canUsePreserveSymlinks =
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
-const requireFlags = ["-r", "--require"]
 
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
@@ -30,11 +29,20 @@ function node(args) {
   })
 }
 
+function runMain(filePath, env) {
+  return execa(process.execPath, ["-r", "../index.js", filePath], {
+    cwd: testPath,
+    env,
+    reject: false
+  })
+}
+
 describe("module.runMain hook", function () {
   this.timeout(0)
 
-  it("should work with Node -r and --require", () => {
+  it("should support Node -r and --require", () => {
     const otherFlags = ["", "--no-deprecation"]
+    const requireFlags = ["-r", "--require"]
     const runs = []
 
     if (canUseExperimentalModules) {
@@ -44,40 +52,43 @@ describe("module.runMain hook", function () {
     requireFlags.forEach((requireFlag) =>
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
-        args.push(requireFlag, "../index.js", "./fixture/main.mjs")
+        args.push(requireFlag, "../index.js", "./fixture/main/main-module.mjs")
         runs.push(args)
       })
     )
 
     return Promise.all(runs.map(node))
       .then((results) => {
-        const url = testURL + "/fixture/main.mjs"
-
-        const expected = {
-          mainModule: false,
-          meta: { url }
-        }
-
         results.forEach((result) => {
-          const jsonText = result
-            .stdout
-            .split("\n")
-            .reverse()
-            .find((line) => line.startsWith("{"))
-
-          const exported = jsonText
-            ? JSON.parse(jsonText)
-            : {}
-
           if (result.stderr &&
               ! result.stderr.includes("ExperimentalWarning")) {
             throw new Error(result.stderr)
           }
 
-          assert.deepStrictEqual(exported, expected)
+          assert.ok(result.stdout.includes("main-module:false"))
         })
       })
   })
+
+  it("should support `ESM_OPTIONS` environment variable", () =>
+    runMain("./node_modules/esm-options", { ESM_OPTIONS: "{cjs:true}" })
+    .then((result) => assert.ok(result.stdout.includes("esm-options:true")))
+  )
+
+  it("should support `import.meta.url`", () =>
+    runMain("./fixture/main/import-meta.mjs")
+      .then((result) => {
+        const url = testURL + "/fixture/main/import-meta.mjs"
+        const expected = JSON.stringify({ url })
+
+        assert.ok(result.stdout.includes("import-meta:" + expected))
+      })
+  )
+
+  it("should not set `process.mainModule`", () =>
+    runMain("./fixture/main/main-module.mjs")
+      .then((result) => assert.ok(result.stdout.includes("main-module:false")))
+  )
 
   ;(canTestMissingModuleErrors ? it : xit)(
   "should error for missing modules", function () {
@@ -90,13 +101,11 @@ describe("module.runMain hook", function () {
     }
 
     fileNames.forEach((fileName) =>
-      requireFlags.forEach((requireFlag) =>
-        otherFlags.forEach((flag) => {
-          const args = flag ? [flag] : []
-          args.push(requireFlag, "../index.js", fileName)
-          runs.push(args)
-        })
-      )
+      otherFlags.forEach((flag) => {
+        const args = flag ? [flag] : []
+        args.push("-r", "../index.js", fileName)
+        runs.push(args)
+      })
     )
 
     return Promise.all(runs.map(node))

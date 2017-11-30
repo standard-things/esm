@@ -33,27 +33,6 @@ describe("command-line hook", function () {
       "./node_modules/cli",
       '{"r":"../index.js"}'
     ])
-    .then((result) => {
-      const url = testURL + "/fixture/main.mjs"
-
-      const expected = {
-        default: {
-          mainModule: true,
-          meta: { url }
-        }
-      }
-
-      const jsonText = result
-        .stdout
-        .split("\n")
-        .reverse()
-        .find((line) => line.startsWith("{"))
-
-      const exported = jsonText
-        ? JSON.parse(jsonText)
-        : {}
-
-      assert.deepStrictEqual(exported, expected)
-    })
+    .then((result) => assert.ok(result.stdout.includes("main-module:true")))
   )
 })
