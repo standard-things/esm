@@ -46,12 +46,16 @@ function fastPathReadFile(filePath, options) {
   // creating Error objects on failure.
   filePath = toNamespacedPath(filePath)
 
-  if (useInternalModuleReadFile) {
-    return internalModuleReadFile.call(fsBinding, filePath)
+  const content = useInternalModuleReadJSON
+    ? internalModuleReadJSON.call(fsBinding, filePath)
+    : internalModuleReadFile.call(fsBinding, filePath)
+
+  if (useInternalModuleReadJSON &&
+      content === "") {
+    return fallbackReadFile(filePath, options)
   }
 
-  const content = useInternalModuleReadJSON.call(fsBinding, filePath)
-  return content === "" ? fallbackReadFile(filePath, options) : content
+  return content === void 0 ? null : content
 }
 
 export default readFile
