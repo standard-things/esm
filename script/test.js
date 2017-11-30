@@ -67,9 +67,7 @@ function runTests(cached) {
     },
     stdio: "inherit"
   })
-  .catch((e) => {
-    process.exitCode = e.code
-  })
+  .catch((e) => process.exit(e.code))
 }
 
 function setupNode() {
