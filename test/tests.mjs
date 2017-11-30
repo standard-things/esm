@@ -1,3 +1,7 @@
+import fs from "fs-extra"
+import require from "./require.js"
+import zlib from "zlib"
+
 import "./import-tests.mjs"
 import "./dynamic-import-tests.mjs"
 import "./export-tests.mjs"
@@ -12,11 +16,6 @@ import "./main-hook-tests.mjs"
 import "./require-hook-tests.mjs"
 import "./repl-hook-tests.mjs"
 import "./scenario-tests.mjs"
-
-import fs from "fs-extra"
-import path from "path"
-import require from "./require.js"
-import zlib from "zlib"
 
 const jsonExt = require.extensions[".json"]
 
