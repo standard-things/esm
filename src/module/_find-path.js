@@ -172,8 +172,8 @@ function tryFile(thePath, isMain) {
   const isFile = stat(thePath) === 0
 
   return preserveSymlinks && ! isMain
-    ? (isFile && resolve(thePath))
-    : (isFile && realpath(thePath))
+    ? isFile && resolve(thePath)
+    : isFile && realpath(thePath)
 }
 
 function tryPackage(thePath, exts, isMain) {

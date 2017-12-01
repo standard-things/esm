@@ -72,7 +72,7 @@ function hook(Mod, parent, options) {
     const dirPath = dirname(filePath)
     let pkgInfo = options
       ? null
-      : (PkgInfo.get(dirPath) || defaultPkgInfo)
+      : PkgInfo.get(dirPath) || defaultPkgInfo
 
     if (options) {
       pkgInfo = PkgInfo.get(dirPath, true)
