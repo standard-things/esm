@@ -13,15 +13,15 @@ function enable(parser) {
 }
 
 function checkLVal(func, args) {
-  const [expr, bindingType] = args
+  const [expr] = args
   const { type } = expr
 
   if (type === "ObjectPattern") {
     for (const propNode of expr.properties) {
-      this.checkLVal(propNode, bindingType)
+      this.checkLVal(propNode)
     }
   } else if (type === "Property") {
-    this.checkLVal(expr.value, bindingType)
+    this.checkLVal(expr.value)
   } else {
     func.apply(this, args)
   }
@@ -47,7 +47,7 @@ function parseProperty(func, args) {
 }
 
 function toAssignable(func, args) {
-  const [node, isBinding] = args
+  const [node] = args
 
   if (node === null) {
     return node
@@ -59,7 +59,7 @@ function toAssignable(func, args) {
     node.type = "ObjectPattern"
 
     for (const propNode of node.properties) {
-      this.toAssignable(propNode, isBinding)
+      this.toAssignable(propNode)
     }
 
     return node
@@ -70,12 +70,12 @@ function toAssignable(func, args) {
       this.raise(node.key.start, "Object pattern can't contain getter or setter")
     }
 
-    return this.toAssignable(node.value, isBinding)
+    return this.toAssignable(node.value)
   }
 
   if (type === "SpreadElement") {
     node.type = "RestElement"
-    return this.toAssignable(node.argument, isBinding)
+    return this.toAssignable(node.argument)
   }
 
   return func.apply(this, args)
