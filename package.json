@@ -1,6 +1,6 @@
 {
   "name": "@std/esm",
-  "version": "0.17.3",
+  "version": "0.18.0",
   "description": "Enable ES modules in Node today!",
   "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",
