@@ -19,8 +19,8 @@ Getting started
      module.exports = require("./main.mjs").default
      ```
 
-Enable processing **all** modules, including dependencies, by providing an
-`options` object or `true` to use the options from your .esmrc or package.json.
+Enable for **all** modules, including dependencies, by providing
+`options` or `true` to use your options file.
 
 ```js
 require = require("@std/esm")(module, options)
@@ -77,8 +77,14 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features by specifying options in your .esmrc or `"@std/esm"` field
-of your package.json.
+Unlock extra features with an options file or the `"@std/esm"` field of your
+package.json.
+
+Options may be specified as:
+
+* JSON in an .esmrc, .esmrc.json, or package.json file
+* JSON or options file path in the `ESM_OPTIONS` environment variable
+* CJS/ESM in an .esmrc.js or .esmrc.mjs file
 
 Commonly used options may be specified in shorthand form:
 
