@@ -10,9 +10,9 @@ import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import parseJSON from "./util/parse-json.js"
-import parseJSON5 from "./util/parse-json5.js"
+import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
-import readJSON5 from "./fs/read-json5.js"
+import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
@@ -126,7 +126,7 @@ class PkgInfo {
     let optionsFound = options !== null
 
     if (optionsFound) {
-      options = parseJSON5(options)
+      options = parseJSON6(options)
     } else {
       optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
     }
@@ -135,7 +135,7 @@ class PkgInfo {
       optionsFound = true
 
       if (extname(optionsPath) === ".json") {
-        options = readJSON5(optionsPath)
+        options = readJSON6(optionsPath)
       } else {
         pkgInfo =
         infoCache[dirPath] = new PkgInfo(dirPath, "*", {

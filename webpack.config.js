@@ -41,7 +41,10 @@ const config = {
     new BannerPlugin({
       banner: [
         '"use strict";\n',
-        "const __non_webpack_module__ = module;\n"
+        "const __non_webpack_module__ = module;",
+
+        // Work around undeclared variable assignments in json-6.
+        "let exponent_digit, string_status;\n"
       ].join("\n"),
       entryOnly: true,
       raw: true
