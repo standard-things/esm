@@ -671,7 +671,6 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
       const id = require.resolve(data.id)
-
       const hash = isCached
         ? ""
         : "#" + Date.now()

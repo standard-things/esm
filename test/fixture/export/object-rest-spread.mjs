@@ -5,5 +5,6 @@ function identity(value) {
 const ab = { a: "a", b: "b" }
 const abc = { ...identity(ab), c: "c" }
 
-export const { a, ...rest } = abc
-export default { ...abc, d: "d" }
+export const { a, ...bc } = abc
+export const d = ({ a, ...bcd } = {}) => bcd
+export default { ...abc, d }
