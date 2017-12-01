@@ -2,7 +2,7 @@ import assert from "assert"
 import execa from "execa"
 import path from "path"
 import require from "./require.js"
-import trash from "trash"
+import trash from "../script/trash.js"
 
 const canTestPM2 = ! ("TRAVIS" in process.env)
 

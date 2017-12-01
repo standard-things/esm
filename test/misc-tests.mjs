@@ -671,6 +671,11 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
       const id = require.resolve(data.id)
+
+      const hash = isCached
+        ? ""
+        : "#" + Date.now()
+
       const stderr = isCached
         ? ""
         : getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, id)
@@ -679,6 +684,11 @@ describe("spec compliance", () => {
         .then(() => {
           mockIo.start()
           return import(id)
+        })
+        .then(() => {
+          mockIo.end()
+          mockIo.start()
+          return import(id + hash)
         })
         .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
     }, Promise.resolve())
