@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.32",
     "@babel/plugin-proposal-class-properties": "^7.0.0-beta.32",
-    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.32",
+    "@babel/plugin-transform-block-scoping": "^7.0.0-beta.33",
     "@babel/preset-env": "^7.0.0-beta.32",
     "@babel/register": "^7.0.0-beta.32",
     "acorn": "^5.2.1",
