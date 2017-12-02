@@ -77,13 +77,11 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with an options file or the `"@std/esm"` field of your
-package.json.
+Unlock extra features with options specified as one of the following:
 
-Options may be specified as:
-
-* JSON in an .esmrc, .esmrc.json, or package.json file
-* JSON or options file path in the `ESM_OPTIONS` environment variable
+* The `"@std/esm"` field in your package.json
+* [JSON6](https://github.com/d3x0r/json6) in an .esmrc or .esmrc.json file
+* JSON6 or file path in the `ESM_OPTIONS` environment variable
 * CJS/ESM in an .esmrc.js or .esmrc.mjs file
 
 Commonly used options may be specified in shorthand form:
@@ -124,7 +122,7 @@ Commonly used options may be specified in shorthand form:
   <td valign="top"><code>"gz":</code></td>
   <td>
     <p>A boolean to support gzipped module <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
-    <p><i>Note: Don’t forget the webpack <a href="https://webpack.js.org/loaders/gzip-loader/"><code>gzip-loader</code></a>.</i></p>
+    <p><i>Note: Don’t forget the webpack <a href="https://github.com/webpack-contrib/gzip-loader"><code>gzip-loader</code></a>.</i></p>
   </td>
 </tr>
 <tr>
@@ -242,7 +240,7 @@ DevOpts
 Tips
 ---
 * Load `@std/esm` before
-  [`@babel/register`](https://www.npmjs.com/package/@babel/register) v7+
+  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register) v7+
 * Load `@std/esm` with the *“require”* option of
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
@@ -254,5 +252,5 @@ Tips
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
 * Use `"@std/esm":"cjs"` with the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
-* Use `"@std/esm":"cjs"` with [`webpack`](https://webpack.js.org/)
+* Use `"@std/esm":"cjs"` with [`webpack`](https://github.com/webpack/webpack)
 * When in doubt, use `"@std/esm":"cjs"`
