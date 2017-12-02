@@ -96,10 +96,42 @@ function hook(Mod, parent, options) {
   function methodWrapper(manager, func, pkgInfo, args) {
     const [mod, filePath] = args
     const { _compile } = mod
-    const { options } = pkgInfo
+    const { cache, cachePath, options } = pkgInfo
+    const cacheKey = mtime(filePath)
+    const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
+    const ext = extname(filePath)
 
     const shouldOverwrite = env.cli
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
+
+    let hint = "script"
+    let type = "script"
+
+    if (options.esm === "all") {
+      type = "module"
+    } else if (options.esm === "js") {
+      type = "unambiguous"
+    }
+
+    if (ext === ".mjs" || ext === ".mjs.gz") {
+      hint = "module"
+      if (type === "script") {
+        type = "module"
+      }
+    }
+
+    let cached = cache[cacheFileName]
+
+    if (cached === true) {
+      const code = readCode(resolve(cachePath, cacheFileName), options)
+
+      if (type === "unambiguous") {
+        type = hasPragma(code, "use script") ? "script" : "module"
+      }
+
+      cached =
+      cache[cacheFileName] = { code, esm: type === "module" }
+    }
 
     const compileWrapper = (content, filePath) => {
       if (shouldOverwrite) {
@@ -110,49 +142,13 @@ function hook(Mod, parent, options) {
         }
       }
 
-      let hint = "script"
-      let type = "script"
-
-      if (options.esm === "all") {
-        type = "module"
-      } else if (options.esm === "js") {
-        type = "unambiguous"
-      }
-
-      const ext = extname(filePath)
-
-      if (ext === ".mjs" || ext === ".mjs.gz") {
-        hint = "module"
-        if (type === "script") {
-          type = "module"
-        }
-      }
-
       if (! Entry.has(mod)) {
         const entry = Entry.get(mod)
         entry.url = getURLFromFilePath(filePath)
       }
 
-      const { cache, cachePath } = pkgInfo
-      const cacheKey = mtime(filePath)
-      const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
-
       const stateHash = getCacheStateHash(cacheFileName)
       const runtimeAlias = encodeId("_" + stateHash.slice(0, 3))
-
-      let code
-      let cached = cache[cacheFileName]
-
-      if (cached === true) {
-        code = readCode(resolve(cachePath, cacheFileName), options)
-
-        if (type === "unambiguous") {
-          type = hasPragma(code, "use script") ? "script" : "module"
-        }
-
-        cached =
-        cache[cacheFileName] = { code, esm: type === "module" }
-      }
 
       if (! isObject(cached)) {
         cached = tryCompileCode(manager, content, {
@@ -181,10 +177,12 @@ function hook(Mod, parent, options) {
       setProperty(mod, compileSym, { enumerable: false, value: compileWrapper })
     }
 
-    if (passthruMap.get(func)) {
+    if (! cached &&
+        passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
-      mod._compile(readCode(filePath, options), filePath)
+      const content = cached ? cached.code : readCode(filePath, options)
+      mod._compile(content, filePath)
     }
   }
 
