@@ -1,5 +1,6 @@
 import assert from "assert"
 import execa from "execa"
+import fs from "fs-extra"
 import path from "path"
 import require from "./require.js"
 import trash from "../script/trash.js"
