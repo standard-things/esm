@@ -9,7 +9,6 @@ import util from "util"
 
 const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
-const isCached = /cached/.test(process.env.NODE_ENV)
 const isWin = process.platform === "win32"
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
@@ -671,23 +670,12 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
       const id = require.resolve(data.id)
-      const hash = isCached
-        ? ""
-        : "#" + Date.now()
-
-      const stderr = isCached
-        ? ""
-        : getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, id)
+      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, id)
 
       return promise
         .then(() => {
           mockIo.start()
           return import(id)
-        })
-        .then(() => {
-          mockIo.end()
-          mockIo.start()
-          return import(id + hash)
         })
         .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
     }, Promise.resolve())
