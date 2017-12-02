@@ -1,5 +1,4 @@
 {
-  cache: false,
   cjs: true,
   debug: true
 }
