@@ -1,4 +1,4 @@
 {
-  "cjs": true,
-  "debug": true
+  cjs: true,
+  debug: true
 }

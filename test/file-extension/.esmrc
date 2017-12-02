@@ -1,4 +1,4 @@
 {
-  "debug": true,
-  "gz": true
+  debug: true,
+  gz: true
 }

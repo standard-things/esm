@@ -1,5 +1,5 @@
 {
-  "cache": false,
-  "cjs": true,
-  "debug": true
+  cache: false,
+  cjs: true,
+  debug: true
 }
