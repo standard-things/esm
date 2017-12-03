@@ -12,8 +12,24 @@ const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const trashPaths = ignorePaths
   .filter((thePath) => thePath !== nodeModulesPath)
 
-function exists(thePath) {
-  return fs.existsSync(thePath)
+function cleanEmptyDirs() {
+  return globby.sync(["*/**/"], {
+    cwd: rootPath,
+    expandDirectories: false,
+    nodir: false
+  })
+  .map(realPath)
+  .filter(fs.existsSync)
+  .filter(isEmpty)
+  .map(trash)
+}
+
+function cleanNodeModules() {
+  return trash(nodeModulesPath)
+}
+
+function cleanRepo() {
+  return Promise.all(trashPaths.map(trash))
 }
 
 function isEmpty(dirPath) {
@@ -24,23 +40,8 @@ function realPath(thePath) {
   return path.resolve(rootPath, thePath)
 }
 
-function trashEmptyDirs() {
-  return globby.sync(["*/**/"], {
-    cwd: rootPath,
-    expandDirectories: false,
-    nodir: false
-  })
-  .map(realPath)
-  .filter(exists)
-  .filter(isEmpty)
-  .map(trash)
-}
-
-function trashNodeModules() {
-  return trash(nodeModulesPath)
-}
-
 Promise
-  .all(trashPaths.map(trash))
-  .then(trashEmptyDirs())
-  .then(trashNodeModules())
+  .resolve()
+  .then(cleanRepo)
+  .then(cleanEmptyDirs)
+  .then(cleanNodeModules)

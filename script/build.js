@@ -94,11 +94,9 @@ function makeBundle() {
 }
 
 Promise.all([
+  argv.prod && cleanJSON(),
   cleanRepo(),
   getAcorn()
 ])
 .then(makeBundle)
-.then(() => Promise.all([
-  argv.prod && cleanJSON(),
-  gzipBundle()
-]))
+.then(gzipBundle)
