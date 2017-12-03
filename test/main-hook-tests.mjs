@@ -50,25 +50,28 @@ describe("module.runMain hook", function () {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push(requireFlag, "../index.js", "./fixture/main/main-module.mjs")
-        runs.push(
-          node(args)
-            .then((result) => assert.ok(result.stdout.includes("main-module:false")))
-        )
+        runs.push(args)
       })
     )
 
-    return Promise.all(runs)
+    return runs
+      .reduce((promise, args) =>
+        promise
+          .then(() => node(args))
+          .then((result) => assert.ok(result.stdout.includes("main-module:false")))
+      , Promise.resolve())
   })
 
   it("should support `ESM_OPTIONS` environment variable", () =>
-    Promise.all([
+    [
       "'cjs'",
       "{cjs:1}",
       "{cjs:true}"
-    ].map((ESM_OPTIONS) =>
-      runMain("./node_modules/esm-options", { ESM_OPTIONS })
+    ].reduce((promise, ESM_OPTIONS) =>
+      promise
+        .then(() => runMain("./node_modules/esm-options", { ESM_OPTIONS }))
         .then((result) => assert.ok(result.stdout.includes("esm-options:true")))
-    ))
+    , Promise.resolve())
   )
 
   it("should support `import.meta.url`", () =>
@@ -100,13 +103,15 @@ describe("module.runMain hook", function () {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push("-r", "../index.js", fileName)
-        runs.push(
-          node(args)
-            .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
-        )
+        runs.push(args)
       })
     )
 
-    return Promise.all(runs)
+    return runs
+      .reduce((promise, args) =>
+        promise
+          .then(() => node(args))
+          .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
+      , Promise.resolve())
   })
 })
