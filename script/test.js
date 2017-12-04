@@ -63,7 +63,7 @@ function runTests(cached) {
     cwd: testPath,
     env: {
       HOME,
-      NODE_ENV: NODE_ENV + (cached ? "cached" : ""),
+      NODE_ENV: NODE_ENV + (cached ? "-cached" : ""),
       NODE_PATH,
       USERPROFILE: HOME
     },
