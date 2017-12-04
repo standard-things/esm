@@ -51,8 +51,8 @@ function resetScripts(jsonText) {
 }
 
 fs.readFile(jsonPath, "utf8")
-  .then((jsonText) => fs
-    .outputFile(jsonPath, cleanJSON(jsonText))
-    .then(publishPackage)
-    .then(() => fs.outputFile(jsonPath, jsonText))
+  .then((jsonText) =>
+    fs.outputFile(jsonPath, cleanJSON(jsonText))
+      .then(publishPackage)
+      .then(() => fs.outputFile(jsonPath, jsonText))
   )
