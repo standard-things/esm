@@ -11,8 +11,6 @@ import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
-const { setPrototypeOf } = Object
-
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
   const { runMain } = Mod
@@ -58,10 +56,7 @@ function hook(Mod) {
 
     PkgInfo.set(dirPath, pkgInfo)
 
-    loadESM(filePath, null, true, (mod) => {
-      setPrototypeOf(mod, Mod.prototype)
-    })
-
+    loadESM(filePath, null, true)
     tickCallback()
   }
 

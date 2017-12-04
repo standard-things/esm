@@ -125,7 +125,7 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
 
   if (ext === ".js" ||
       (parentOptions && parentOptions.cjs.extensions)) {
-    extensions = mod.constructor._extensions
+    extensions = Module._extensions
   }
 
   if (ext === "" ||

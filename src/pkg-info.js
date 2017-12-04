@@ -1,7 +1,6 @@
 import { basename, dirname, extname, resolve } from "path"
 
 import FastObject from "./fast-object.js"
-import Module from "./module.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
@@ -19,8 +18,6 @@ import { version } from "./version.js"
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
-
-const { setPrototypeOf } = Object
 
 const defaultOptions = {
   cache: true,
@@ -144,9 +141,7 @@ class PkgInfo {
           gz: true
         })
 
-        options = loadESM(optionsPath, null, false, (mod) => {
-          setPrototypeOf(mod, Module.prototype)
-        }).exports
+        options = loadESM(optionsPath, null, false).exports
       }
     }
 
@@ -174,13 +169,6 @@ class PkgInfo {
         optionsFound = true
         options = pkgJSON["@std"].esm
       }
-    }
-
-    if (! force &&
-        options === false) {
-      // An explicit `@std/esm` property value of `false` disables ESM loading
-      // even if `@std/esm` is listed as a dependency.
-      return null
     }
 
     let range
@@ -217,11 +205,6 @@ class PkgInfo {
       pkgInfo.range = range
     } else {
       pkgInfo = new PkgInfo(dirPath, range, options)
-    }
-
-    if (force &&
-        options === false) {
-      pkgInfo.options = null
     }
 
     return pkgInfo
@@ -318,7 +301,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-setPrototypeOf(PkgInfo.prototype, null)
+Object.setPrototypeOf(PkgInfo.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 infoCache[""] = new PkgInfo("", version, {

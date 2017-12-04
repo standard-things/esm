@@ -54,12 +54,12 @@ function hook(Mod, parent, options) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
+  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
+  const defaultOptions = defaultPkgInfo.options
+
   const parentFilePath = (parent && parent.filename) || "."
   const parentPkgInfo = PkgInfo.get(dirname(parentFilePath), true)
-  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
-
   const parentOptions = parentPkgInfo.options
-  const defaultOptions = defaultPkgInfo.options
   const mode = parentOptions.esm
 
   assign(defaultPkgInfo, parentPkgInfo)
@@ -84,7 +84,7 @@ function hook(Mod, parent, options) {
       pkgInfo.range = range
     }
 
-    const wrapped = pkgInfo && pkgInfo.options
+    const wrapped = pkgInfo
       ? Wrapper.find(_extensions, ".js", pkgInfo.range)
       : null
 
@@ -251,7 +251,7 @@ function hook(Mod, parent, options) {
   function tryCompileCJS(mod, content, filePath, runtimeAlias, options) {
     content =
       "const " + runtimeAlias + "=this;" +
-      runtimeAlias + ".r((function(exports,require){" + content + "\n}))"
+      runtimeAlias + ".r((function(exports,require,module,__filename,__dirname){" + content + "\n}))"
 
     content +=
       maybeSourceMap(content, filePath, options)
@@ -277,23 +277,22 @@ function hook(Mod, parent, options) {
     content =
       '"use strict";const ' + runtimeAlias + "=this;" +
       runtimeAlias + ".r((" + async + "function(" +
-      (options.cjs.vars ? "exports,require" : "") +
+      (options.cjs.vars ? "exports,require,module,__filename,__dirname" : "") +
       "){" + content + "\n}))"
 
     content +=
       maybeSourceMap(content, filePath, options)
 
-    const Ctor = mod.constructor
     const exported = {}
-    const moduleWrap = Ctor.wrap
+    const moduleWrap = Module.wrap
 
     const customWrap = (script) => {
-      Ctor.wrap = moduleWrap
+      Module.wrap = moduleWrap
       return "(function(){" + script + "\n})"
     }
 
     if (! options.cjs.vars) {
-      Ctor.wrap = customWrap
+      Module.wrap = customWrap
     }
 
     setESM(exported, true)
@@ -302,8 +301,8 @@ function hook(Mod, parent, options) {
     try {
       mod._compile(content, filePath)
     } finally {
-      if (Ctor.wrap === customWrap) {
-        Ctor.wrap = moduleWrap
+      if (Module.wrap === customWrap) {
+        Module.wrap = moduleWrap
       }
     }
   }

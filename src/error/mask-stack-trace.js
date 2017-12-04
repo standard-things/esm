@@ -1,4 +1,5 @@
-import _wrapper from "../module/wrapper.js"
+import Module from "../module.js"
+
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
@@ -7,10 +8,6 @@ import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
-
-const BuiltinModule = __non_webpack_module__.constructor
-
-const { isArray } = Array
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
@@ -125,13 +122,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
       return snippet + arrow + newline
     }
 
-    let { wrapper } = BuiltinModule
-
-    if (! isArray(wrapper) ||
-        typeof wrapper[0] !== "string") {
-      wrapper = _wrapper
-    }
-
+    const { wrapper } = Module
     const [prefix] = wrapper
 
     if (snippet.startsWith(prefix)) {

@@ -5,6 +5,7 @@
 import { isAbsolute, resolve } from "path"
 
 import FastObject from "../fast-object.js"
+import Module from "../module.js"
 
 import binding from "../binding.js"
 import emitDeprecationWarning from "../warning/emit-deprecation-warning.js"
@@ -13,8 +14,6 @@ import readFile from "../fs/read-file.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
 import stat from "../fs/stat.js"
-
-const BuiltinModule = __non_webpack_module__.constructor
 
 const codeOfSlash = "/".charCodeAt(0)
 
@@ -44,9 +43,7 @@ function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
     return pathCache[cacheKey]
   }
 
-  const extensions =
-    BuiltinModule._extensions ||
-    __non_webpack_require__.extensions
+  const { _extensions } = Module
 
   const trailingSlash =
     id.length > 0 &&
@@ -77,7 +74,7 @@ function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
         }
       } else if (isDir) {
         if (searchExts === void 0) {
-          searchExts = keys(extensions)
+          searchExts = keys(_extensions)
         }
 
         filePath = tryPackage(basePath, searchExts, isMain)
@@ -85,7 +82,7 @@ function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
 
       if (! filePath) {
         if (searchExts === void 0) {
-          searchExts = keys(extensions)
+          searchExts = keys(_extensions)
         }
 
         filePath = tryExtensions(basePath, searchExts, isMain)
@@ -94,7 +91,7 @@ function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
 
     if (isDir && ! filePath) {
       if (searchExts === void 0) {
-        searchExts = keys(extensions)
+        searchExts = keys(_extensions)
       }
 
       filePath =

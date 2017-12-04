@@ -2,6 +2,7 @@ import FastObject from "./fast-object.js"
 import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
+import clone from "./module/clone.js"
 import { dirname } from "path"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
@@ -11,48 +12,41 @@ import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
-const { keys } = Object
-
 const hooks = new FastObject
 
+let hooked = false
+
 hooks.cli = () => {
+  hooked = true
   moduleHook(BuiltinModule)
 }
 
 hooks.preload = () => {
+  hooked = true
   mainHook(BuiltinModule)
-  moduleHook(BuiltinModule)
+  moduleHook(Module)
 }
 
 hooks.repl = () => {
+  hooked = true
   replHook(vm)
-  moduleHook(BuiltinModule)
+  moduleHook(Module)
 }
 
 hooks.require = (mod, options) => {
-  const copy = new Module(mod.id, null)
-  const names = keys(mod)
-  const pkgInfo = options === true ? PkgInfo.get(dirname(mod.filename)) : null
+  const cloned = clone(mod)
 
-  if (pkgInfo) {
-    options = pkgInfo.options
+  if (options === true) {
+    const pkgInfo = PkgInfo.get(dirname(mod.filename))
+    options = pkgInfo ? pkgInfo.options : options
   }
 
-  for (const name of names) {
-    if (name !== "constructor") {
-      copy[name] = mod[name]
-    }
+  if (options ||
+      ! hooked) {
+    moduleHook(Module, cloned, options)
   }
 
-  copy.id = mod.id
-  copy.filename = mod.filename
-  copy.parent = mod.parent
-
-  moduleHook(Module, copy, options)
-
-  const req = requireHook(copy, options)
-  req.extensions = Module._extensions
-  return req
+  return requireHook(cloned, options)
 }
 
 export default hooks

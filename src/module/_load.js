@@ -19,8 +19,7 @@ function _load(filePath, parent, isMain, state, loader) {
     return child
   }
 
-  const Parent = parent ? parent.constructor : Module
-  child = new Parent(filePath, parent)
+  child = new Module(filePath, parent)
 
   if (isMain) {
     process.mainModule = child
