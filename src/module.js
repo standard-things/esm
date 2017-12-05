@@ -8,6 +8,7 @@ import defaults from "./util/defaults.js"
 import findPath from "./module/find-path.js"
 import initPaths from "./module/init-paths.js"
 import load from "./module/load.js"
+import moduleState from "./module/state.js"
 import nodeModulePaths from "./module/node-module-paths.js"
 import resolveFilename from "./module/resolve-filename.js"
 import resolveLookupPaths from "./module/resolve-lookup-paths.js"
@@ -50,6 +51,7 @@ class Module extends BuiltinModule {
   static _resolveFilename = resolveFilename
   static _resolveLookupPaths = resolveLookupPaths
   static Module = Module
+  static globalPaths = moduleState.globalPaths.slice()
   static wrap = wrap
   static wrapper = wrapper.slice()
 }

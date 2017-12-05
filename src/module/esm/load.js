@@ -37,7 +37,7 @@ function load(id, parent, isMain, preload) {
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
 
-  let state = __non_webpack_require__
+  let state = Module
 
   if (! (pkgInfo && pkgInfo.options.cjs.cache)) {
     isMain = false
@@ -47,16 +47,16 @@ function load(id, parent, isMain, preload) {
     }
   }
 
-  const isRequireState = state === __non_webpack_require__
+  const isModState = state === Module
 
-  let child = isRequireState
-    ? state.cache[cacheId]
+  let child = isModState
+    ? state._cache[cacheId]
     : null
 
   if (child &&
       isESM(child.exports) &&
       ! Entry.has(child)) {
-    delete state.cache[cacheId]
+    delete state._cache[cacheId]
   }
 
   let error
@@ -91,11 +91,11 @@ function load(id, parent, isMain, preload) {
   try {
     throw error
   } finally {
-    if (isRequireState) {
-      delete state.cache[cacheId]
+    if (isModState) {
+      delete state._cache[cacheId]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state.cache, cacheId, () => {
+      setGetter(state._cache, cacheId, () => {
         throw error
       })
     }
@@ -120,26 +120,26 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
     preload(mod)
   }
 
-  let { extensions } = moduleState
+  let { _extensions } = moduleState
   let ext = extname(filePath)
 
   if (ext === ".js" ||
       (parentOptions && parentOptions.cjs.extensions)) {
-    extensions = Module._extensions
+    _extensions = Module._extensions
   }
 
   if (ext === "" ||
-      typeof extensions[ext] !== "function") {
+      typeof _extensions[ext] !== "function") {
     ext = ".js"
   }
 
   if (env.cli) {
-    extensions[ext](mod, filePath)
+    _extensions[ext](mod, filePath)
     mod.loaded = true
     return
   }
 
-  extensions[ext](mod, filePath)
+  _extensions[ext](mod, filePath)
   mod.loaded = true
 }
 

@@ -7,7 +7,7 @@ import Module from "../module.js"
 const compileSym = Symbol.for("@std/esm:module._compile")
 
 function _load(filePath, parent, isMain, state, loader) {
-  let child = state.cache[filePath]
+  let child = state._cache[filePath]
 
   if (child) {
     const children = parent && parent.children
@@ -43,7 +43,7 @@ function _load(filePath, parent, isMain, state, loader) {
 }
 
 function tryLoad(mod, filePath, state, loader = mod.load) {
-  state.cache[filePath] = mod
+  state._cache[filePath] = mod
 
   let threw = true
 
@@ -52,7 +52,7 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
     threw = false
   } finally {
     if (threw) {
-      delete state.cache[filePath]
+      delete state._cache[filePath]
     }
   }
 }

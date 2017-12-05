@@ -12,7 +12,7 @@ const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 function load(id, parent, isMain, preload) {
   let called = false
   const filePath = Module._resolveFilename(id, parent, isMain)
-  const child = _load(filePath, parent, isMain, __non_webpack_require__, function () {
+  const child = _load(filePath, parent, isMain, Module, function () {
     called = true
     return loader.call(this, filePath, parent, preload)
   })

@@ -1,12 +1,12 @@
 import FastObject from "../fast-object.js"
 
+import _initPaths from "./_init-paths.js"
 import extensions from "./extensions.js"
-import initPaths from "./init-paths.js"
 
 const state = new FastObject
-state.cache = new FastObject
-state.extensions = extensions
-state.globalPaths = initPaths()
+state._cache = new FastObject
+state._extensions = extensions
+state.globalPaths = _initPaths()
 state.requireDepth = 0
 
 export default state

@@ -322,7 +322,7 @@ function hook(Mod, parent, options) {
   }
 
   const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
-  const extsObjects = [moduleState.extensions, Module._extensions]
+  const extsObjects = [moduleState._extensions, Module._extensions]
 
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
