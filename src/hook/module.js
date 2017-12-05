@@ -199,21 +199,20 @@ function hook(Mod, parent, options) {
   }
 
   function readCachedCode(filePath, options) {
-    if (options && options.gz &&
-        _extname(filePath) === ".gz") {
-      return gunzip(readFileFast(filePath), "utf8")
-    }
-
-    return readFileFast(filePath, "utf8")
+    return readWith(readFileFast, filePath, options)
   }
 
   function readSourceCode(filePath, options) {
+    return readWith(readFile, filePath, options)
+  }
+
+  function readWith(reader, filePath, options) {
     if (options && options.gz &&
         _extname(filePath) === ".gz") {
-      return gunzip(readFile(filePath), "utf8")
+      return gunzip(reader(filePath), "utf8")
     }
 
-    return readFile(filePath, "utf8")
+    return reader(filePath, "utf8")
   }
 
   function tryCompileCached(mod, cached, filePath, runtimeAlias, options) {
