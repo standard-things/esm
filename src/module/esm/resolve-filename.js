@@ -45,6 +45,7 @@ function resolveFilename(id, parent, isMain) {
   const isAbs = isAbsolutePath(id)
   const parentFilePath = (parent && parent.filename) || "."
   const fromPath = dirname(isAbs ? id : parentFilePath)
+  const pkgInfo = PkgInfo.get(fromPath)
 
   if (! encodedSlash(id)) {
     if (! isAbs &&
@@ -63,8 +64,6 @@ function resolveFilename(id, parent, isMain) {
         foundPath = _resolveFilename(foundPath, parent, isMain, true, true, noExts)
       }
     } else {
-      const pkgInfo = PkgInfo.get(fromPath)
-
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       let skipGlobalPaths = true
@@ -90,7 +89,8 @@ function resolveFilename(id, parent, isMain) {
   if (foundPath) {
     const ext = extname(foundPath)
 
-    if (ext in extLookup) {
+    if (ext in extLookup ||
+        (pkgInfo && pkgInfo.options.cjs.paths)) {
       return foundPath
     }
 
