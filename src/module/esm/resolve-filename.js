@@ -1,3 +1,4 @@
+import FastObject from "../../fast-object.js"
 import PkgInfo from "../../pkg-info.js"
 
 import _resolveFilename from "../_resolve-filename.js"
@@ -5,32 +6,52 @@ import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
 import encodedSlash from "../../util/encoded-slash.js"
 import errors from "../../errors.js"
-import isPath from "../../util/is-path.js"
+import extname from "../../path/extname.js"
+import isAbsolutePath from "../../util/is-absolute-path.js"
+import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
 import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
-const esmExts = [".mjs", ".js", ".json", ".node"]
-const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
-
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
+
+const esmExts = [".mjs", ".js", ".json", ".node"]
+const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
+const noExts = []
+
+const esmExtsLookup = new FastObject
+const gzExtsLookup = new FastObject
+
+for (const ext of esmExts) {
+  esmExtsLookup[ext] = true
+}
+
+for (const ext of gzExts) {
+  gzExtsLookup[ext] = true
+}
 
 function resolveFilename(id, parent, isMain) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
   }
 
-  const parentFilePath = (parent && parent.filename) || "."
-  const fromPath = dirname(parentFilePath)
+  let foundPath
+  let extLookup = esmExtsLookup
+  let searchExts = esmExts
   let skipWarnings = false
 
+  const isAbs = isAbsolutePath(id)
+  const parentFilePath = (parent && parent.filename) || "."
+  const fromPath = dirname(isAbs ? id : parentFilePath)
+
   if (! encodedSlash(id)) {
-    if (! isPath(id) &&
+    if (! isAbs &&
+        ! isRelativePath(id) &&
         (id.charCodeAt(0) === codeOfSlash || id.includes(":"))) {
       const parsed = parseURL(id)
-      let foundPath = urlToPath(parsed)
+      foundPath = urlToPath(parsed)
 
       if (! foundPath &&
           parsed.protocol !== "file:" &&
@@ -39,23 +60,20 @@ function resolveFilename(id, parent, isMain) {
       }
 
       if (foundPath) {
-        foundPath = _resolveFilename(foundPath, parent, isMain)
-      }
-
-      if (foundPath) {
-        return foundPath
+        foundPath = _resolveFilename(foundPath, parent, isMain, true, true, noExts)
       }
     } else {
+      const pkgInfo = PkgInfo.get(fromPath)
+
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      let searchExts = esmExts
       let skipGlobalPaths = true
-      const pkgInfo = PkgInfo.get(fromPath)
 
       if (pkgInfo) {
         const { options } = pkgInfo
 
         if (options.gz) {
+          extLookup = gzExtsLookup
           searchExts = gzExts
         }
 
@@ -65,16 +83,22 @@ function resolveFilename(id, parent, isMain) {
       }
 
       const decodedId = decodeURIComponent(id.replace(queryHashRegExp, ""))
-      const foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
-
-      if (foundPath) {
-        return foundPath
-      }
+      foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
     }
   }
 
+  if (foundPath) {
+    const ext = extname(foundPath)
+
+    if (ext in extLookup) {
+      return foundPath
+    }
+
+    throw new errors.Error("ERR_UNKNOWN_FILE_EXTENSION", foundPath)
+  }
+
   skipWarnings = true
-  const foundPath = _resolveFilename(id, parent, isMain, skipWarnings)
+  foundPath = _resolveFilename(id, parent, isMain, skipWarnings)
 
   if (foundPath) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_LEGACY", id, fromPath, foundPath)
