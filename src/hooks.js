@@ -17,20 +17,26 @@ const hooks = new FastObject
 let hooked = false
 
 hooks.cli = () => {
-  hooked = true
-  moduleHook(BuiltinModule)
+  if (! hooked) {
+    hooked = true
+    moduleHook(BuiltinModule)
+  }
 }
 
 hooks.preload = () => {
-  hooked = true
-  mainHook(BuiltinModule)
-  moduleHook(Module)
+  if (! hooked) {
+    hooked = true
+    mainHook(BuiltinModule)
+    moduleHook(Module)
+  }
 }
 
 hooks.repl = () => {
-  hooked = true
-  replHook(vm)
-  moduleHook(Module)
+  if (! hooked) {
+    hooked = true
+    replHook(vm)
+    moduleHook(Module)
+  }
 }
 
 hooks.require = (mod, options) => {
