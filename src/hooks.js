@@ -12,9 +12,9 @@ import vm from "vm"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
-const hooks = new FastObject
-
 let hooked = false
+
+const hooks = new FastObject
 
 hooks.cli = () => {
   if (! hooked) {
