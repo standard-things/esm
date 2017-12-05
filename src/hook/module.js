@@ -331,7 +331,6 @@ function hook(Mod, parent, options) {
   }
 
   const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
-  const extsObjects = [moduleState._extensions, Module._extensions]
 
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
@@ -354,21 +353,20 @@ function hook(Mod, parent, options) {
       }
     }
 
-    passthruMap.set(extCompiler, passthru)
-
     Wrapper.manage(_extensions, ext, managerWrapper)
     Wrapper.wrap(_extensions, ext, methodWrapper)
 
-    for (const extsObject of extsObjects) {
-      if (extsObject !== _extensions) {
-        setGetter(extsObject, ext, () => {
-          return _extensions[ext]
-        })
+    passthruMap.set(extCompiler, passthru)
+    moduleState._extensions[ext] = _extensions[ext]
 
-        setSetter(extsObject, ext, (value) => {
-          _extensions[ext] = value
-        })
-      }
+    if (Module._extensions !== _extensions) {
+      setGetter(Module._extensions, ext, () => {
+        return _extensions[ext]
+      })
+
+      setSetter(Module._extensions, ext, (value) => {
+        _extensions[ext] = value
+      })
     }
   })
 }
