@@ -1,18 +1,23 @@
 import Module from "../module.js"
 
-const { keys } = Object
+import getDescriptor from "../util/get-descriptor.js"
+import setDescriptor from "../util/set-descriptor.js"
+
+const { getOwnPropertyNames, getOwnPropertySymbols } = Object
 
 function clone(mod) {
   const copy = new Module(mod.id, null)
-  const names = keys(mod)
 
   copy.id = mod.id
   copy.filename = mod.filename
   copy.parent = mod.parent
 
+  const names = getOwnPropertyNames(mod)
+  names.push(...getOwnPropertySymbols(mod))
+
   for (const name of names) {
     if (name !== "constructor") {
-      copy[name] = mod[name]
+      setDescriptor(copy, name, getDescriptor(mod, name))
     }
   }
 
