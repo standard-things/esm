@@ -1,31 +1,8 @@
-const codeOfBackslash = "\\".charCodeAt(0)
-const codeOfColon = ":".charCodeAt(0)
-const codeOfDot = ".".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-
-const isWin = process.platform === "win32"
+import isAbsolutePath from "./is-absolute-path.js"
+import isRelativePath from "./is-relative-path.js"
 
 function isPath(value) {
-  if (typeof value !== "string") {
-    return false
-  }
-
-  const code0 = value.charCodeAt(0)
-  const code1 = value.charCodeAt(1)
-
-  if (code0 === codeOfDot) {
-    return code1 === codeOfSlash ||
-      (code1 === codeOfDot && value.charCodeAt(2) === codeOfSlash)
-  }
-
-  if (isWin) {
-    // Detect drive letter, i.e. `[A-Za-z]:\\`
-    return code1 === codeOfColon &&
-      ((code0 > 64 && code0 < 91) || (code0 > 96 && code0 < 123)) &&
-      value.charCodeAt(2) === codeOfBackslash
-  }
-
-  return code0 === codeOfSlash && code1 !== codeOfSlash
+  return isRelativePath(value) || isAbsolutePath(value)
 }
 
 export default isPath
