@@ -4,9 +4,11 @@
 
 import Module from "../module.js"
 
+import _initPaths from "./_init-paths.js"
 import moduleState from "./state.js"
 
 function initPaths() {
+  moduleState.globalPaths = _initPaths()
   Module.globalPaths = moduleState.globalPaths.slice()
 }
 
