@@ -11,6 +11,7 @@ import loadESM from "./module/esm/load.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
+import readFileFast from "./fs/read-file-fast.js"
 import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import { validRange } from "semver"
@@ -147,7 +148,7 @@ class PkgInfo {
 
     let parentPkgInfo
     let pkgParsed = false
-    let pkgJSON = readFile(resolve(dirPath, PACKAGE_FILENAME), "utf8")
+    let pkgJSON = readFileFast(resolve(dirPath, PACKAGE_FILENAME), "utf8")
 
     if (! force &&
         pkgJSON === null) {

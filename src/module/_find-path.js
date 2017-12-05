@@ -10,7 +10,7 @@ import Module from "../module.js"
 import binding from "../binding.js"
 import emitDeprecationWarning from "../warning/emit-deprecation-warning.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
-import readFile from "../fs/read-file.js"
+import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
 import stat from "../fs/stat.js"
@@ -129,7 +129,7 @@ function readPackage(thePath) {
   }
 
   const jsonPath = resolve(thePath, "package.json")
-  const json = readFile(jsonPath, "utf8")
+  const json = readFileFast(jsonPath, "utf8")
 
   if (! json ||
       ! mainFieldRegExp.test(json)) {

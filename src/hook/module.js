@@ -32,6 +32,7 @@ import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
+import readFileFast from "../fs/read-file-fast.js"
 import { satisfies } from "semver"
 import setESM from "../util/set-es-module.js"
 import setGetter from "../util/set-getter.js"
@@ -123,7 +124,7 @@ function hook(Mod, parent, options) {
     let cached = cache[cacheFileName]
 
     if (cached === true) {
-      const code = readCode(resolve(cachePath, cacheFileName), options)
+      const code = readCachedCode(resolve(cachePath, cacheFileName), options)
 
       if (type === "unambiguous") {
         type = hasPragma(code, "use script") ? "script" : "module"
@@ -181,7 +182,7 @@ function hook(Mod, parent, options) {
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
-      const content = cached ? cached.code : readCode(filePath, options)
+      const content = cached ? cached.code : readSourceCode(filePath, options)
       mod._compile(content, filePath)
     }
   }
@@ -197,7 +198,16 @@ function hook(Mod, parent, options) {
     return ""
   }
 
-  function readCode(filePath, options) {
+  function readCachedCode(filePath, options) {
+    if (options && options.gz &&
+        _extname(filePath) === ".gz") {
+      return gunzip(readFileFast(filePath), "utf8")
+    }
+
+    return readFileFast(filePath, "utf8")
+  }
+
+  function readSourceCode(filePath, options) {
     if (options && options.gz &&
         _extname(filePath) === ".gz") {
       return gunzip(readFile(filePath), "utf8")
@@ -220,7 +230,7 @@ function hook(Mod, parent, options) {
       try {
         tryCompile(mod, cached.code, filePath, runtimeAlias, options)
       } catch (e) {
-        const sourceCode = () => readCode(filePath, options)
+        const sourceCode = () => readSourceCode(filePath, options)
         throw maskStackTrace(e, sourceCode, filePath, cached.esm)
       }
     }
@@ -315,7 +325,7 @@ function hook(Mod, parent, options) {
         func.apply(this, args)
       } catch (e) {
         const [, filePath] = args
-        const sourceCode = () => readCode(filePath, options)
+        const sourceCode = () => readSourceCode(filePath, options)
         throw maskStackTrace(e, sourceCode, filePath)
       }
     }

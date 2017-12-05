@@ -5,14 +5,17 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
 const internalModuleReadFile = noDeprecationWarning(() => fsBinding.internalModuleReadFile)
+const internalModuleReadJSON = noDeprecationWarning(() => fsBinding.internalModuleReadJSON)
 
-let useReadFileFastPath = typeof internalModuleReadFile === "function"
+const useInternalModuleReadFile = typeof internalModuleReadFile === "function"
+const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"
+let useReadFileFastPath = useInternalModuleReadFile || useInternalModuleReadJSON
 
-function readFile(filePath, options) {
+function readFileFast(filePath, options) {
   if (useReadFileFastPath &&
       options === "utf8") {
     try {
-      return fastPathReadFile(filePath)
+      return fastPathReadFile(filePath, options)
     } catch (e) {
       useReadFileFastPath = false
     }
@@ -21,14 +24,22 @@ function readFile(filePath, options) {
   return readFileSync(filePath, options)
 }
 
-function fastPathReadFile(filePath) {
+function fastPathReadFile(filePath, options) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
   filePath = toNamespacedPath(filePath)
 
-  const content = internalModuleReadFile.call(fsBinding, filePath)
+  const content = useInternalModuleReadJSON
+    ? internalModuleReadJSON.call(fsBinding, filePath)
+    : internalModuleReadFile.call(fsBinding, filePath)
+
+  if (useInternalModuleReadJSON &&
+      content === "") {
+    return readFileSync(filePath, options)
+  }
+
   return content === void 0 ? null : content
 }
 
-export default readFile
+export default readFileFast
