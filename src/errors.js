@@ -23,6 +23,7 @@ messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
 messages["ERR_MISSING_MODULE"] = missingModule
 messages["ERR_MODULE_RESOLUTION_LEGACY"] = moduleResolutionLegacy
 messages["ERR_REQUIRE_ESM"] = requireESM
+messages["ERR_UNKNOWN_FILE_EXTENSION"] = unknownFileExtension
 
 function createClass(Super) {
   return class NodeError extends Super {
@@ -69,6 +70,10 @@ function moduleResolutionLegacy(id, fromPath, foundPath) {
 
 function requireESM(moduleName) {
   return "Must use import to load ES Module: " + moduleName
+}
+
+function unknownFileExtension(filePath) {
+  return "Unknown file extension: " + filePath
 }
 
 export default errors
