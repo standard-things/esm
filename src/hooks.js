@@ -44,7 +44,7 @@ hooks.require = (mod, options) => {
 
   if (options === true) {
     const pkgInfo = PkgInfo.get(dirname(mod.filename))
-    options = pkgInfo ? pkgInfo.options : options
+    options = pkgInfo && pkgInfo.options
   }
 
   if (options ||
