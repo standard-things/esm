@@ -1,4 +1,5 @@
 import Compiler from "../caching-compiler.js"
+import Entry from "../entry.js"
 import PkgInfo from "../pkg-info.js"
 import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
@@ -11,6 +12,7 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
+import resolveSpecifiers from "../module/resolve-specifiers.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
@@ -18,6 +20,7 @@ const { compile } = Compiler
 const { now } = Date
 
 function hook(vm) {
+  let mod
   const md5Hash = md5(now().toString()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeName = encodeId("_" + md5Hash)
@@ -74,6 +77,8 @@ function hook(vm) {
       content = tryWrapper(compile, [sourceCode, compilerOptions]).code
     }
 
+    resolveSpecifiers(mod, content)
+
     content =
       '"use strict";var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" + content
@@ -95,6 +100,8 @@ function hook(vm) {
   const exported = {}
 
   if (rootModule.id === "<repl>") {
+    mod = rootModule
+    Entry.get(mod).runtimeName = runtimeName
     Runtime.enable(rootModule, exported, pkgInfo.options)
     return
   }
@@ -108,7 +115,10 @@ function hook(vm) {
   REPLServer.prototype.createContext = function () {
     REPLServer.prototype.createContext = createContext
     const context = createContext.call(this)
-    Runtime.enable(context.module, exported, pkgInfo.options)
+
+    mod = context.module
+    Entry.get(mod).runtimeName = runtimeName
+    Runtime.enable(mod, exported, pkgInfo.options)
     return context
   }
 }

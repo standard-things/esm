@@ -76,6 +76,8 @@ class Entry {
     this.module = mod
     // The package options for this entry.
     this.options = PkgInfo.createOptions()
+    // The name of the runtime identifier.
+    this.runtimeName = null
     // Setters for assigning to local variables in parent modules.
     this.setters = new NullObject
     // Initialize empty namespace setter so they are merged properly.
