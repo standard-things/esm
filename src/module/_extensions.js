@@ -7,13 +7,13 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const { dlopen } = process
 const { parse } = JSON
-const _extensions = new FastObject
+const extensions = new FastObject
 
-_extensions[".js"] = (mod, filePath) => {
+extensions[".js"] = (mod, filePath) => {
   mod._compile(stripBOM(readFileSync(filePath, "utf8")), filePath)
 }
 
-_extensions[".json"] = (mod, filePath) => {
+extensions[".json"] = (mod, filePath) => {
   const content = readFileFast(filePath, "utf8")
 
   try {
@@ -24,8 +24,8 @@ _extensions[".json"] = (mod, filePath) => {
   }
 }
 
-_extensions[".node"] = (mod, filePath) => {
+extensions[".node"] = (mod, filePath) => {
   return dlopen(mod, toNamespacedPath(filePath))
 }
 
-export default _extensions
+export default extensions

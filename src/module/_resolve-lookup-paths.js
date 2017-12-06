@@ -15,7 +15,7 @@ const codeOfSlash = "/".charCodeAt(0)
 const skipOutsideDot = satisfies(process.version, ">=10")
 const { slice } = Array.prototype
 
-function _resolveLookupPaths(id, parent, skipGlobalPaths) {
+function resolveLookupPaths(id, parent, skipGlobalPaths) {
   let lookOutside
   const code0 = id.charCodeAt(0)
   const code1 = id.charCodeAt(1)
@@ -69,4 +69,4 @@ function _resolveLookupPaths(id, parent, skipGlobalPaths) {
   return [dirname(parent.filename)]
 }
 
-export default _resolveLookupPaths
+export default resolveLookupPaths

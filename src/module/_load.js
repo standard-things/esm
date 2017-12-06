@@ -6,7 +6,7 @@ import Module from "../module.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
 
-function _load(filePath, parent, isMain, state, loader) {
+function load(filePath, parent, isMain, state, loader) {
   let child = state._cache[filePath]
 
   if (child) {
@@ -57,4 +57,4 @@ function tryLoad(mod, filePath, state, loader = mod.load) {
   }
 }
 
-export default _load
+export default load

@@ -4,7 +4,7 @@
 
 import { delimiter, resolve } from "path"
 
-function _initPaths() {
+function initPaths() {
   const { env } = process
   const isWin = process.platform === "win32"
   const homeDir = env[isWin ? "USERPROFILE" : "HOME"]
@@ -26,4 +26,4 @@ function _initPaths() {
     : paths
 }
 
-export default _initPaths
+export default initPaths

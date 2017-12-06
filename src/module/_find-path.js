@@ -28,7 +28,7 @@ const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymli
 const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
-function _findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
+function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
   if (isAbsolute(id)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
@@ -187,4 +187,4 @@ function tryPackage(thePath, exts, isMain) {
          tryExtensions(resolve(filePath, "index"), exts, isMain)
 }
 
-export default _findPath
+export default findPath
