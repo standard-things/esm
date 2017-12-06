@@ -128,7 +128,8 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
   let { _extensions } = moduleState
   let ext = extname(filePath)
 
-  if (ext === ".js" ||
+  if (env.cli ||
+      ext === ".js" ||
       (parentOptions && parentOptions.cjs.extensions)) {
     _extensions = Module._extensions
   }
