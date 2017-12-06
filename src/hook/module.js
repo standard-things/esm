@@ -103,7 +103,7 @@ function hook(Mod, parent, options) {
     const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
     const ext = extname(filePath)
 
-    const shouldOverwrite = env.cli
+    const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
     let hint = "script"
