@@ -18,15 +18,8 @@ const hooks = new FastObject
 hooks.cli = () => {
   if (! hooked) {
     hooked = true
-    moduleHook(BuiltinModule)
-  }
-}
-
-hooks.preload = () => {
-  if (! hooked) {
-    hooked = true
     mainHook(BuiltinModule)
-    moduleHook(Module)
+    moduleHook(BuiltinModule)
   }
 }
 

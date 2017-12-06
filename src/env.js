@@ -44,12 +44,6 @@ const nycJSON = nycIndex === -1
   ? null
   : readJSON(parentFilePath.slice(0, nycIndex + 18) + "package.json")
 
-const loading =
-  nmIndex !== -1 &&
-  hasLoaderArg(args) &&
-  (PkgInfo.get(process.cwd()) !== null ||
-  PkgInfo.get(realpath(filePath.slice(0, nmIndex + 1))) !== null)
-
 const nyc =
   has(nycJSON, "name") &&
   nycJSON.name === "nyc"
@@ -58,6 +52,12 @@ const preloading =
   hasLoaderModule(_preloadModules) ||
   (id === "internal/preload" &&
    hasLoaderModule(children))
+
+const loading =
+   nmIndex !== -1 &&
+   hasLoaderArg(args) &&
+   (PkgInfo.get(process.cwd()) !== null ||
+   PkgInfo.get(realpath(filePath.slice(0, nmIndex + 1))) !== null)
 
 function hasDebugArg(args) {
   return args.some((arg) => debugArgRegExp.test(arg))
@@ -106,10 +106,6 @@ env.inspector =
   (typeof isInspectorEnabled === "function" &&
    isInspectorEnabled.call(inspectorBinding))
 
-env.preload =
-  preloading &&
-  argv.length > 1
-
 env.repl =
   (preloading && argv.length < 2) ||
   (id === "<repl>" &&
@@ -119,8 +115,7 @@ env.repl =
    hasLoaderModule(children))
 
 env.cli =
-  ! env.preload &&
-  ! env.repl &&
-  (loading || nyc)
+   (preloading && argv.length > 1) ||
+   (loading || nyc)
 
 export default env
