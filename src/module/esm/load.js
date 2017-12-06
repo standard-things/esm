@@ -19,12 +19,18 @@ import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 function load(id, parent, isMain, preload) {
+  const parentEntry = Entry.get(parent)
+  const parentSpecifiers = parentEntry && parentEntry.specifiers
+
   const parentPkgInfo = PkgInfo.from(parent)
   const parentOptions = parentPkgInfo && parentPkgInfo.options
 
   let filePath
 
-  if (Module._resolveFilename !== moduleResolveFilename &&
+  if (parentSpecifiers &&
+      id in parentSpecifiers) {
+    filePath = parentSpecifiers[id]
+  } else if (Module._resolveFilename !== moduleResolveFilename &&
       parentOptions && parentOptions.cjs.paths) {
     filePath = Module._resolveFilename(id, parent, isMain)
   } else {

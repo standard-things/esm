@@ -10,8 +10,19 @@ import extname from "../../path/extname.js"
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
+  const parentEntry = Entry.get(parent)
+  const parentSpecifiers = parentEntry && parentEntry.specifiers
+
+  let filePath
   let called = false
-  const filePath = Module._resolveFilename(id, parent, isMain)
+
+  if (parentSpecifiers &&
+      id in parentSpecifiers) {
+    filePath = parentSpecifiers[id]
+  } else {
+    filePath = Module._resolveFilename(id, parent, isMain)
+  }
+
   const child = _load(filePath, parent, isMain, Module, function () {
     called = true
     return loader.call(this, filePath, parent, preload)

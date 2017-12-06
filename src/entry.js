@@ -81,12 +81,18 @@ class Entry {
     this.setters = new NullObject
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
+    // The child entry specifiers of the module.
+    this.specifiers = new NullObject
     // The file url of the module.
     this.url = null
     /* eslint-enable lines-around-comment */
   }
 
   static get(mod) {
+    if (! mod) {
+      return null
+    }
+
     const exported = mod.exports
     const useExports = isObjectLike(exported)
     let entry = entryMap.get(useExports ? exported : mod)
@@ -100,12 +106,20 @@ class Entry {
   }
 
   static has(mod) {
+    if (! mod) {
+      return false
+    }
+
     const exported = mod.exports
     return entryMap.has(isObjectLike(exported) ? exported : mod)
   }
 
   static set(mod, exported, entry) {
-    entryMap.set(isObjectLike(exported) ? exported : mod, entry)
+    if (isObjectLike(exported)) {
+      entryMap.set(exported, entry)
+    } else if (mod) {
+      entryMap.set(mod, entry)
+    }
   }
 
   addGetter(name, getter) {
