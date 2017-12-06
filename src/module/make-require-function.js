@@ -6,7 +6,6 @@ import Module from "../module.js"
 
 import errors from "../errors.js"
 import moduleState from "./state.js"
-import resolveFilename from "./resolve-filename.js"
 
 function makeRequireFunction(mod, requirer = mod.require) {
   function req(id) {
@@ -24,7 +23,7 @@ function makeRequireFunction(mod, requirer = mod.require) {
   }
 
   function resolve(id) {
-    return resolveFilename(id, mod)
+    return Module._resolveFilename(id, mod)
   }
 
   req.cache = Module._cache

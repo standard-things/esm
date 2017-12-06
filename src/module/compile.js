@@ -8,7 +8,6 @@ import binding from "../binding.js"
 import { dirname } from "path"
 import makeRequireFunction from "./make-require-function.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
-import resolveFilename from "./resolve-filename.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
 
@@ -39,7 +38,7 @@ function compile(mod, content, filePath) {
     if (resolvedArgv === void 0) {
       // Enter the REPL if not given a file path argument.
       resolvedArgv = process.argv[1]
-        ? resolveFilename(process.argv[1])
+        ? Module._resolveFilename(process.argv[1])
         : "repl"
     }
 
