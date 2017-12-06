@@ -36,13 +36,13 @@ import readFileFast from "../fs/read-file-fast.js"
 import resolveSpecifiers from "../module/resolve-specifiers.js"
 import { satisfies } from "semver"
 import setESM from "../util/set-es-module.js"
-import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
-import setSetter from "../util/set-setter.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const { compile } = Compiler
+const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
@@ -66,6 +66,8 @@ function hook(Mod, parent, options) {
   defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
   defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
   defaultPkgInfo.range = "*"
+
+  Module._extensions = _extensions
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
@@ -333,8 +335,6 @@ function hook(Mod, parent, options) {
     }
   }
 
-  const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
-
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
         (ext === ".mjs" || ext === ".mjs.gz")) {
@@ -361,16 +361,6 @@ function hook(Mod, parent, options) {
 
     passthruMap.set(extCompiler, passthru)
     moduleState._extensions[ext] = _extensions[ext]
-
-    if (Module._extensions !== _extensions) {
-      setGetter(Module._extensions, ext, () => {
-        return _extensions[ext]
-      })
-
-      setSetter(Module._extensions, ext, (value) => {
-        _extensions[ext] = value
-      })
-    }
   })
 }
 
