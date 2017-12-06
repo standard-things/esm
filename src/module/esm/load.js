@@ -138,12 +138,6 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
     ext = ".js"
   }
 
-  if (env.cli) {
-    _extensions[ext](mod, filePath)
-    mod.loaded = true
-    return
-  }
-
   _extensions[ext](mod, filePath)
   mod.loaded = true
 }
