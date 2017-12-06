@@ -485,7 +485,6 @@ function toModuleImport(visitor, code, specifierMap) {
     const locals = keys(specifierMap[name])
     const valueParam = safeParam("v", locals)
 
-    /* eslint-disable lines-around-comment */
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
@@ -493,7 +492,6 @@ function toModuleImport(visitor, code, specifierMap) {
       // Multiple local variables become a compound assignment.
       locals.join("=") + "=" + valueParam +
       "}]"
-    /* eslint-enable lines-around-comment */
 
     if (++i !== lastIndex) {
       code += ","

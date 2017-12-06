@@ -52,7 +52,6 @@ const toStringTagDescriptor = {
 
 class Entry {
   constructor(mod, exported) {
-    /* eslint-disable lines-around-comment */
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
@@ -85,7 +84,6 @@ class Entry {
     this.specifiers = new NullObject
     // The file url of the module.
     this.url = null
-    /* eslint-enable lines-around-comment */
   }
 
   static get(mod) {
