@@ -2,6 +2,7 @@ import { dirname, resolve } from "path"
 
 import PkgInfo from "../pkg-info.js"
 
+import _resolveFilename from "../module/esm/_resolve-filename.js"
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import isPath from "../util/is-path.js"
@@ -9,7 +10,6 @@ import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
-import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
@@ -50,7 +50,7 @@ function hook(Mod) {
       return
     }
 
-    const filePath = resolveFilename(mainPath, null, true)
+    const filePath = _resolveFilename(mainPath, null, true)
     const dirPath = dirname(filePath)
     const pkgInfo = PkgInfo.get(dirPath) || defaultPkgInfo
 
