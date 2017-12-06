@@ -1,7 +1,8 @@
-import assert from "assert"
-import compiler from "../build/compiler.js"
+import Compiler from "../build/compiler.js"
 
-const compile = compiler.compile
+import assert from "assert"
+
+const compile = Compiler.compile
 
 describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {

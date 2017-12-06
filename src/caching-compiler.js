@@ -1,13 +1,14 @@
 import { extname, resolve } from "path"
 
-import compiler from "./compiler.js"
+import Compiler from "./compiler.js"
+
 import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
-const { compile } = compiler
+const { compile } = Compiler
 
-class Compiler {
+class CachingCompiler {
   static compile(code, options) {
     if (typeof options.cachePath === "string" &&
         typeof options.filePath === "string") {
@@ -71,6 +72,6 @@ function toCompileOptions(options) {
   }
 }
 
-Object.setPrototypeOf(Compiler.prototype, null)
+Object.setPrototypeOf(CachingCompiler.prototype, null)
 
-export default Compiler
+export default CachingCompiler

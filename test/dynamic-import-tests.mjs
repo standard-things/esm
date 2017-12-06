@@ -1,9 +1,10 @@
+import Compiler from "../build/compiler.js"
+
 import assert from "assert"
-import compiler from "../build/compiler.js"
 import createNamespace from "./create-namespace.js"
 import path from "path"
 
-const compile = compiler.compile
+const compile = Compiler.compile
 const isWin = process.platform === "win32"
 
 const abcId = "./fixture/export/abc.mjs"

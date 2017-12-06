@@ -1,5 +1,6 @@
 import { extname as _extname, dirname, resolve } from "path"
 
+import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import NullObject from "../null-object.js"
@@ -10,7 +11,6 @@ import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
-import compiler from "../caching-compiler.js"
 import createSourceMap from "../util/create-source-map.js"
 import emitWarning from "../warning/emit-warning.js"
 import encodeId from "../util/encode-id.js"
@@ -41,7 +41,7 @@ import setSetter from "../util/set-setter.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
-const { compile } = compiler
+const { compile } = Compiler
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 

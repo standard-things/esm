@@ -1,10 +1,11 @@
+import Compiler from "../build/compiler.js"
+
 import assert from "assert"
-import compiler from "../build/compiler.js"
 import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 
-const compile = compiler.compile
+const compile = Compiler.compile
 const files = globby.sync(["output/**/*.mjs"])
 const tests = files
   .reduce((tests, relPath) => {

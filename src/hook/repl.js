@@ -1,10 +1,10 @@
+import Compiler from "../caching-compiler.js"
 import PkgInfo from "../pkg-info.js"
 import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
-import compiler from "../caching-compiler.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
@@ -14,7 +14,7 @@ import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
-const { compile } = compiler
+const { compile } = Compiler
 const { now } = Date
 
 function hook(vm) {
