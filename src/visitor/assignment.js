@@ -12,7 +12,7 @@ class AssignmentVisitor extends Visitor {
     this.exportedLocalNames = options.exportedLocalNames
     this.importedLocalNames = options.importedLocalNames
     this.magicString = options.magicString
-    this.runtimeAlias = options.runtimeAlias
+    this.runtimeName = options.runtimeName
   }
 
   visitAssignmentExpression(path) {
@@ -129,7 +129,7 @@ function wrap(visitor, path) {
   const node = path.getValue()
 
   visitor.magicString
-    .prependRight(node.start, visitor.runtimeAlias + ".u(")
+    .prependRight(node.start, visitor.runtimeName + ".u(")
     .prependRight(node.end, ")")
 }
 

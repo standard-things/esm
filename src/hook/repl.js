@@ -20,7 +20,7 @@ const { now } = Date
 function hook(vm) {
   const md5Hash = md5(now().toString()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
-  const runtimeAlias = encodeId("_" + md5Hash)
+  const runtimeName = encodeId("_" + md5Hash)
 
   function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
@@ -52,10 +52,10 @@ function hook(vm) {
     const cacheFileName = getCacheFileName("", sourceCode, pkgInfo)
     const cacheValue = cache[cacheFileName]
 
-    let output
+    let content
 
     if (isObject(cacheValue)) {
-      output = cacheValue.code
+      content = cacheValue.code
       if (scriptOptions.produceCachedData === true &&
           scriptOptions.cachedData === void 0 &&
           cacheValue.data !== void 0) {
@@ -65,20 +65,20 @@ function hook(vm) {
       const compilerOptions = {
         cacheFileName,
         pkgInfo,
-        runtimeAlias,
+        runtimeName,
         type: "unambiguous",
         var: true,
         warnings: false
       }
 
-      output = tryWrapper(compile, [sourceCode, compilerOptions]).code
+      content = tryWrapper(compile, [sourceCode, compilerOptions]).code
     }
 
-    output =
-      '"use strict";var ' + runtimeAlias + "=" + runtimeAlias +
-      "||[module.exports,module.exports=module.exports.entry.exports][0];" + output
+    content =
+      '"use strict";var ' + runtimeName + "=" + runtimeName +
+      "||[module.exports,module.exports=module.exports.entry.exports][0];" + content
 
-    const result = tryWrapper(func, [output, scriptOptions])
+    const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
       cache[cacheFileName].data = result.cachedData

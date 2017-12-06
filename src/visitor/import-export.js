@@ -34,14 +34,14 @@ class ImportExportVisitor extends Visitor {
     this.importedLocalNames = new NullObject
     this.madeChanges = false
     this.magicString = new MagicString(code)
-    this.runtimeAlias = options.runtimeAlias
+    this.runtimeName = options.runtimeName
   }
 
   visitCallExpression(path) {
     const { callee } = path.getValue()
 
     if (callee.type === "Import") {
-      overwrite(this, callee.start, callee.end, this.runtimeAlias + ".i")
+      overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
     }
 
     this.visitChildren(path)
@@ -91,12 +91,12 @@ class ImportExportVisitor extends Visitor {
     const { source } = node
     const hoistedCode = pad(
       this,
-      this.runtimeAlias + ".w(" + getSourceString(this, node),
+      this.runtimeName + ".w(" + getSourceString(this, node),
       node.start,
       source.start
     ) + pad(
       this,
-      ',[["*",' + this.runtimeAlias + ".n()]]);",
+      ',[["*",' + this.runtimeName + ".n()]]);",
       source.end,
       node.end
     )
@@ -131,7 +131,7 @@ class ImportExportVisitor extends Visitor {
       // special `runtime.default(value)` form.
       path.call(this, "visitWithoutReset", "declaration")
 
-      let prefix = this.runtimeAlias + ".d("
+      let prefix = this.runtimeName + ".d("
       let suffix = ");"
 
       if (type === "SequenceExpression") {
@@ -212,7 +212,7 @@ class ImportExportVisitor extends Visitor {
       addToSpecifierMap(
         newMap,
         locals[0],
-        this.runtimeAlias + ".entry._namespace." + name
+        this.runtimeName + ".entry._namespace." + name
       )
     }
 
@@ -231,7 +231,7 @@ class ImportExportVisitor extends Visitor {
     const { meta } = path.getValue()
 
     if (meta.name === "import") {
-      overwrite(this, meta.start, meta.end, this.runtimeAlias + "._")
+      overwrite(this, meta.start, meta.end, this.runtimeName + "._")
     }
   }
 }
@@ -470,7 +470,7 @@ function safeParam(param, locals) {
 function toModuleImport(visitor, code, specifierMap) {
   const names = keys(specifierMap)
 
-  code = visitor.runtimeAlias + ".w(" + code
+  code = visitor.runtimeName + ".w(" + code
 
   if (! names.length) {
     return code + ");"
@@ -517,7 +517,7 @@ function toModuleExport(visitor, specifierMap) {
   let i = -1
   const lastIndex = names.length - 1
 
-  code += visitor.runtimeAlias + ".e(["
+  code += visitor.runtimeName + ".e(["
 
   for (const name of names) {
     const locals = keys(specifierMap[name])

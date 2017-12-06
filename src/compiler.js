@@ -12,7 +12,7 @@ import stripShebang from "./util/strip-shebang.js"
 const defaultOptions = {
   cjs: PkgInfo.defaultOptions.cjs,
   hint: "script",
-  runtimeAlias: "_",
+  runtimeName: "_",
   type: "script",
   var: false,
   warnings: process.env.NODE_ENV !== "production"
@@ -87,12 +87,12 @@ class Compiler {
     }
 
     const rootPath = new FastPath(ast)
-    const { runtimeAlias } = options
+    const { runtimeName } = options
 
     importExportVisitor.visit(rootPath, code, {
       esm: type !== "script",
       generateVarDeclarations: options.var,
-      runtimeAlias
+      runtimeName
     })
 
     if (importExportVisitor.addedImportExport) {
@@ -104,7 +104,7 @@ class Compiler {
         exportedLocalNames: importExportVisitor.exportedLocalNames,
         importedLocalNames: importExportVisitor.importedLocalNames,
         magicString: importExportVisitor.magicString,
-        runtimeAlias
+        runtimeName
       })
 
       importExportVisitor.finalizeHoisting()

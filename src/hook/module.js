@@ -141,13 +141,14 @@ function hook(Mod, parent, options) {
         }
       }
 
-      if (! Entry.has(mod)) {
-        const entry = Entry.get(mod)
+      const stateHash = getCacheStateHash(cacheFileName)
+      const runtimeName = encodeId("_" + stateHash.slice(0, 3))
+
+      const entry = Entry.get(mod)
+
+      if (! entry.url) {
         entry.url = getURLFromFilePath(filePath)
       }
-
-      const stateHash = getCacheStateHash(cacheFileName)
-      const runtimeAlias = encodeId("_" + stateHash.slice(0, 3))
 
       if (! isObject(cached)) {
         cached = tryCompileCode(manager, content, {
@@ -156,7 +157,7 @@ function hook(Mod, parent, options) {
           filePath,
           hint,
           pkgInfo,
-          runtimeAlias,
+          runtimeName,
           type
         })
       }
@@ -167,7 +168,7 @@ function hook(Mod, parent, options) {
         }
       }
 
-      tryCompileCached(mod, cached, filePath, runtimeAlias, options)
+      tryCompileCached(mod, cached, filePath, runtimeName, options)
     }
 
     if (shouldOverwrite) {
@@ -213,7 +214,7 @@ function hook(Mod, parent, options) {
     return reader(filePath, "utf8")
   }
 
-  function tryCompileCached(mod, cached, filePath, runtimeAlias, options) {
+  function tryCompileCached(mod, cached, filePath, runtimeName, options) {
     const noDepth = moduleState.requireDepth === 0
     const tryCompile = cached.esm ? tryCompileESM : tryCompileCJS
 
@@ -222,10 +223,10 @@ function hook(Mod, parent, options) {
     }
 
     if (options.debug) {
-      tryCompile(mod, cached.code, filePath, runtimeAlias, options)
+      tryCompile(mod, cached.code, filePath, runtimeName, options)
     } else {
       try {
-        tryCompile(mod, cached.code, filePath, runtimeAlias, options)
+        tryCompile(mod, cached.code, filePath, runtimeName, options)
       } catch (e) {
         const sourceCode = () => readSourceCode(filePath, options)
         throw maskStackTrace(e, sourceCode, filePath, cached.esm)
@@ -255,10 +256,10 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryCompileCJS(mod, content, filePath, runtimeAlias, options) {
+  function tryCompileCJS(mod, content, filePath, runtimeName, options) {
     content =
-      "const " + runtimeAlias + "=this;" +
-      runtimeAlias + ".r((function(exports,require,module,__filename,__dirname){" + content + "\n}))"
+      "const " + runtimeName + "=this;" +
+      runtimeName + ".r((function(exports,require,module,__filename,__dirname){" + content + "\n}))"
 
     content +=
       maybeSourceMap(content, filePath, options)
@@ -270,7 +271,7 @@ function hook(Mod, parent, options) {
     mod._compile(content, filePath)
   }
 
-  function tryCompileESM(mod, content, filePath, runtimeAlias, options) {
+  function tryCompileESM(mod, content, filePath, runtimeName, options) {
     let async = ""
 
     if (allowTopLevelAwait && options.await) {
@@ -282,8 +283,8 @@ function hook(Mod, parent, options) {
     }
 
     content =
-      '"use strict";const ' + runtimeAlias + "=this;" +
-      runtimeAlias + ".r((" + async + "function(" +
+      '"use strict";const ' + runtimeName + "=this;" +
+      runtimeName + ".r((" + async + "function(" +
       (options.cjs.vars ? "exports,require,module,__filename,__dirname" : "") +
       "){" + content + "\n}))"
 

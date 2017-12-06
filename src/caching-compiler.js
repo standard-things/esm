@@ -65,7 +65,7 @@ function toCompileOptions(options) {
   return {
     cjs: options.pkgInfo.options.cjs,
     hint: options.hint,
-    runtimeAlias: options.runtimeAlias,
+    runtimeName: options.runtimeName,
     type: options.type,
     var: options.var
   }
