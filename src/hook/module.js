@@ -58,13 +58,11 @@ function hook(Mod, parent, options) {
   const defaultPkgInfo = new PkgInfo("", "", { cache: false })
   const defaultOptions = defaultPkgInfo.options
 
-  const parentFilePath = (parent && parent.filename) || "."
-  const parentPkgInfo = PkgInfo.get(dirname(parentFilePath), true)
-  const parentOptions = parentPkgInfo.options
-  const mode = parentOptions.esm
+  const parentPkgInfo = PkgInfo.from(parent, true)
+  const mode = parentPkgInfo.options.esm
 
   assign(defaultPkgInfo, parentPkgInfo)
-  defaultPkgInfo.options = assign(defaultOptions, parentOptions)
+  defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
   defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
   defaultPkgInfo.range = "*"
 

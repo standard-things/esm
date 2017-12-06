@@ -2,7 +2,6 @@ import PkgInfo from "../pkg-info.js"
 
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
-import { dirname } from "path"
 import isObjectLike from "../util/is-object-like.js"
 import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
@@ -16,11 +15,7 @@ function hook(parent, options) {
     }
 
     if (options) {
-      const parentFilePath = (parent && parent.filename) || "."
-      const dirPath = dirname(parentFilePath)
-      const pkgInfo = PkgInfo.get(dirPath, true)
-
-      assign(pkgInfo.options, options)
+      assign(PkgInfo.from(parent, true).options, options)
     }
 
     return loadESM(id, parent, false).exports

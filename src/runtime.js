@@ -2,12 +2,12 @@ import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
 import builtinEntries from "./builtin-entries.js"
-import { dirname } from "path"
 import errors from "./errors.js"
 import isESM from "./util/is-es-module.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
+import moduleDirname from "./module/dirname.js"
 import moduleState from "./module/state.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
@@ -150,7 +150,6 @@ function runCJS(runtime, moduleWrapper) {
   const { entry } = runtime
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
-  const { filename } = mod
   const loader = options.cjs.vars ? loadESM : loadCJS
   const req = makeRequireFunction(mod, (id) => {
     const child = load(id, mod, loader)
@@ -163,7 +162,7 @@ function runCJS(runtime, moduleWrapper) {
     return child.exports
   })
 
-  moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
+  moduleWrapper.call(exported, exported, req, mod, mod.filename, moduleDirname(mod))
   mod.loaded = true
 }
 
@@ -173,11 +172,10 @@ function runESM(runtime, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   if (options.cjs.vars) {
-    const { filename } = mod
     const requirer = (id) => load(id, mod, loadESM).exports
     const req = makeRequireFunction(mod, requirer)
 
-    moduleWrapper.call(exported, exported, req, mod, filename, dirname(filename))
+    moduleWrapper.call(exported, exported, req, mod, mod.filename, moduleDirname(mod))
   } else {
     moduleWrapper.call(void 0)
   }

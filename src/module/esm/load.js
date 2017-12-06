@@ -13,12 +13,24 @@ import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
+import moduleResolveFilename from "../cjs/resolve-filename.js"
 import moduleState from "../state.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 function load(id, parent, isMain, preload) {
-  const filePath = _resolveFilename(id, parent, isMain)
+  const parentPkgInfo = PkgInfo.from(parent)
+  const parentOptions = parentPkgInfo && parentPkgInfo.options
+
+  let filePath
+
+  if (Module._resolveFilename !== moduleResolveFilename &&
+      parentOptions && parentOptions.cjs.paths) {
+    filePath = Module._resolveFilename(id, parent, isMain)
+  } else {
+    filePath = _resolveFilename(id, parent, isMain)
+  }
+
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
   const queryHash = getQueryHash(id)
@@ -54,7 +66,7 @@ function load(id, parent, isMain, preload) {
     child = _load(cacheId, parent, isMain, state, function () {
       called = true
       const url = getURLFromFilePath(filePath) + queryHash
-      return loader.call(this, filePath, fromPath, url, parent, preload)
+      return loader.call(this, filePath, fromPath, url, parentOptions, preload)
     })
 
     if (! called &&
@@ -89,16 +101,12 @@ function load(id, parent, isMain, preload) {
   }
 }
 
-function loader(filePath, fromPath, url, parent, preload) {
+function loader(filePath, fromPath, url, parentOptions, preload) {
   const mod = this
   mod.filename = filePath
 
-  const parentFilePath = (parent && parent.filename) || "."
-  const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
-  const parentOptions = parentPkgInfo && parentPkgInfo.options
-
-  if (parentOptions && parentOptions.cjs.paths &&
-      Module._nodeModulePaths !== moduleNodeModulePaths) {
+  if (Module._nodeModulePaths !== moduleNodeModulePaths &&
+      parentOptions && parentOptions.cjs.paths) {
     mod.paths = Module._nodeModulePaths(fromPath)
   } else {
     mod.paths = moduleNodeModulePaths(fromPath)

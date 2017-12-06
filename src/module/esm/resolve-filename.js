@@ -2,21 +2,21 @@ import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
 import _resolveFilename from "./_resolve-filename.js"
-import { dirname } from "path"
+import builtinModules from "../../builtin-modules.js"
 import moduleResolveFilename from "../cjs/resolve-filename.js"
 
 function resolveFilename(id, parent, isMain) {
   if (Module._resolveFilename !== moduleResolveFilename) {
-    const parentFilePath = (parent && parent.filename) || "."
-    const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
-    const parentOptions = parentPkgInfo && parentPkgInfo.options
+    const parentPkgInfo = PkgInfo.from(parent)
 
-    if (parentOptions && parentOptions.cjs.paths) {
+    if (parentPkgInfo && parentPkgInfo.options.cjs.paths) {
       return Module._resolveFilename(id, parent, isMain)
     }
   }
 
-  return _resolveFilename(id, parent, isMain)
+  return id in builtinModules
+    ? id
+    : _resolveFilename(id, parent, isMain)
 }
 
 export default resolveFilename

@@ -9,6 +9,7 @@ import errors from "../../errors.js"
 import extname from "../../path/extname.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
 import isRelativePath from "../../util/is-relative-path.js"
+import moduleDirname from "../../module/dirname.js"
 import parseURL from "../../util/parse-url.js"
 import urlToPath from "../../util/url-to-path.js"
 
@@ -43,8 +44,7 @@ function resolveFilename(id, parent, isMain) {
   let skipWarnings = false
 
   const isAbs = isAbsolutePath(id)
-  const parentFilePath = (parent && parent.filename) || "."
-  const fromPath = dirname(isAbs ? id : parentFilePath)
+  const fromPath = isAbs ? dirname(id) : moduleDirname(parent)
   const pkgInfo = PkgInfo.get(fromPath)
 
   if (! encodedSlash(id)) {

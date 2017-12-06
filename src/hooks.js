@@ -3,7 +3,6 @@ import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
 import clone from "./module/clone.js"
-import { dirname } from "path"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import replHook from "./hook/repl.js"
@@ -43,7 +42,7 @@ hooks.require = (mod, options) => {
   const cloned = clone(mod)
 
   if (options === true) {
-    const pkgInfo = PkgInfo.get(dirname(mod.filename))
+    const pkgInfo = PkgInfo.from(mod)
     options = pkgInfo && pkgInfo.options
   }
 

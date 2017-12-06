@@ -1,4 +1,4 @@
-import { basename, dirname, extname, resolve } from "path"
+import { basename, dirname , extname, resolve } from "path"
 
 import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
@@ -8,6 +8,7 @@ import _findPath from "./module/_find-path.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
+import moduleDirname from "./module/dirname.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
@@ -114,6 +115,10 @@ class PkgInfo {
     }
 
     return infoCache[dirPath] = pkgInfo
+  }
+
+  static from(mod, force) {
+    return PkgInfo.get(moduleDirname(mod), force)
   }
 
   static read(dirPath, force) {

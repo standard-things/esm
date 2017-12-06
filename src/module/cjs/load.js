@@ -49,12 +49,12 @@ function loader(filePath, parent, preload) {
 
   if (typeof extCompiler === "function") {
     if (extCompiler[mjsSym]) {
-      const parentFilePath = (parent && parent.filename) || "."
-      const parentPkgInfo = PkgInfo.get(dirname(parentFilePath))
+      const parentPkgInfo = PkgInfo.from(parent)
       const parentOptions = parentPkgInfo && parentPkgInfo.options
 
       if (parentOptions &&
-          (parentOptions.cjs.extensions || parentOptions.esm !== "mjs")) {
+          (parentOptions.cjs.extensions ||
+           parentOptions.esm !== "mjs")) {
         extCompiler = _extensions[ext]
       }
     }
