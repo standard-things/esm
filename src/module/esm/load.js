@@ -6,7 +6,6 @@ import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
 import _resolveFilename from "./_resolve-filename.js"
-import env from "../../env.js"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
@@ -128,8 +127,7 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
   let { _extensions } = moduleState
   let ext = extname(filePath)
 
-  if (env.cli ||
-      ext === ".js" ||
+  if (ext === ".js" ||
       (parentOptions && parentOptions.cjs.extensions)) {
     _extensions = Module._extensions
   }
