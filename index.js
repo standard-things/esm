@@ -26,14 +26,14 @@ const scriptOptions = Object.create(null)
 scriptOptions.filename = __filename
 
 const content =
-  "(function(require,module,__filename,__options){" +
+  "(function(require,module,__options){" +
   zlib.gunzipSync(fs.readFileSync(esmPath)) +
   "\n})"
 
 const compiled = vm.runInThisContext(content, scriptOptions)
 
 function makeLoaderFunction(options) {
-  compiled(require, mod, __filename, options)
+  compiled(require, mod, options)
   return mod.exports
 }
 
