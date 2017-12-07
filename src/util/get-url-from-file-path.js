@@ -3,6 +3,7 @@
 // https://github.com/sindresorhus/file-url
 
 import encodeURI from "./encode-uri.js"
+import isPath from "./is-path.js"
 import normalize from "../path/normalize.js"
 
 const codeOfSlash = "/".charCodeAt(0)
@@ -19,6 +20,10 @@ function encodeChar(char) {
 }
 
 function getURLFromFilePath(filePath) {
+  if (! isPath(filePath)) {
+    return filePath
+  }
+
   filePath = normalize(filePath)
 
   if (filePath.charCodeAt(0) !== codeOfSlash) {
