@@ -4,6 +4,7 @@ import decorateStackTrace from "./decorate-stack-trace.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
+import isPath from "../util/is-path.js"
 import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
 
@@ -12,8 +13,8 @@ const ZWJ = "\u200d"
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
 
-const atPathRegExp = /\((.+?)(?=:\d+)/g
-const filePathRegExp = /^(.+?)(?=:\d+\n)/
+const atNameRegExp = /\((.+?)(?=:\d+)/g
+const headerRegExp = /^(.+?)(?=:\d+\n)/
 const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
@@ -40,7 +41,7 @@ function maskStackTrace(error, sourceCode, filePath, useURLs) {
 
       return error.stack = withoutMessage(stack, message, (stack) => {
         stack = scrub(stack)
-        return useURLs ? filePathsToURLs(stack) : stack
+        return useURLs ? fileNamesToURLs(stack) : stack
       })
     },
     set(value) {
@@ -135,14 +136,18 @@ function maskEngineStack(stack, sourceCode, filePath) {
   })
 }
 
-function filePathsToURLs(stack) {
+function fileNamesToURLs(stack) {
   return stack
-    .replace(filePathRegExp, getURLFromFilePath)
-    .replace(atPathRegExp, replaceAtPath)
+    .replace(headerRegExp, resolveURL)
+    .replace(atNameRegExp, replaceAtName)
 }
 
-function replaceAtPath(match, filePath) {
-  return "(" + getURLFromFilePath(filePath)
+function replaceAtName(match, name) {
+  return "(" + resolveURL(name)
+}
+
+function resolveURL(name) {
+  return isPath(name) ? getURLFromFilePath(name) : name
 }
 
 function scrub(stack) {
