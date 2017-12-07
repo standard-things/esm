@@ -25,8 +25,11 @@ class ImportExportVisitor extends Visitor {
   }
 
   reset(rootPath, code, options) {
+    this.addedDynamicImport = false
     this.addedImportExport = false
+    this.addedImportMeta = false
     this.bodyInfo = null
+    this.changed = false
     this.code = code
     this.esm = options.esm,
     this.exportedLocalNames = new NullObject
@@ -41,6 +44,8 @@ class ImportExportVisitor extends Visitor {
     const { callee } = path.getValue()
 
     if (callee.type === "Import") {
+      this.changed =
+      this.addedDynamicImport = true
       overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
     }
 
@@ -52,6 +57,7 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
+    this.changed =
     this.addedImportExport = true
 
     let i = -1
@@ -85,6 +91,7 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
+    this.changed =
     this.addedImportExport = true
 
     const node = path.getValue()
@@ -109,6 +116,7 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
+    this.changed =
     this.addedImportExport = true
 
     const node = path.getValue()
@@ -154,6 +162,7 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
+    this.changed =
     this.addedImportExport = true
 
     const node = path.getValue()
@@ -231,6 +240,8 @@ class ImportExportVisitor extends Visitor {
     const { meta } = path.getValue()
 
     if (meta.name === "import") {
+      this.changed =
+      this.addedImportMeta = true
       overwrite(this, meta.start, meta.end, this.runtimeName + "._")
     }
   }

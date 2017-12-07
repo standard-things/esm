@@ -87,9 +87,7 @@ function hook(Mod, parent, options) {
       pkgInfo.range = range
     }
 
-    const wrapped = pkgInfo
-      ? Wrapper.find(_extensions, ".js", pkgInfo.range)
-      : null
+    const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
 
     return wrapped
       ? wrapped.call(this, manager, func, pkgInfo, args)
@@ -134,7 +132,11 @@ function hook(Mod, parent, options) {
       }
 
       cached =
-      cache[cacheFileName] = { code, esm: type === "module" }
+      cache[cacheFileName] = {
+        changed: true,
+        code,
+        esm: type === "module"
+      }
     }
 
     const compileWrapper = (content, filePath) => {
@@ -174,7 +176,12 @@ function hook(Mod, parent, options) {
         }
       }
 
-      tryCompileCached(mod, cached, filePath, runtimeName, options)
+      if (! cached.changed &&
+          pkgInfo === defaultPkgInfo) {
+        tryPassthru.call(this, func, args, options)
+      } else {
+        tryCompileCached(mod, cached, filePath, runtimeName, options)
+      }
     }
 
     if (shouldOverwrite) {

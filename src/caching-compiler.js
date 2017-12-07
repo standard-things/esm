@@ -28,6 +28,10 @@ function compileAndCache(code, options) {
 function compileAndWrite(code, options) {
   const result = compileAndCache(code, options)
 
+  if (! result.changed) {
+    return result
+  }
+
   // Add "main" to enable `readFile` fast path.
   const output =
     (result.esm ? '"main";' : '"use script";"main";') +

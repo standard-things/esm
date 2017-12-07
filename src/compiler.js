@@ -32,6 +32,7 @@ class Compiler {
     let { hint, type } = options
 
     const result = {
+      changed: false,
       code,
       data: null,
       esm: false,
@@ -95,6 +96,8 @@ class Compiler {
       runtimeName
     })
 
+    result.changed = importExportVisitor.changed
+
     if (importExportVisitor.addedImportExport) {
       if (type === "unambiguous") {
         type = "module"
@@ -124,7 +127,10 @@ class Compiler {
       }
     }
 
-    result.code = importExportVisitor.magicString.toString()
+    if (result.changed) {
+      result.code = importExportVisitor.magicString.toString()
+    }
+
     return result
   }
 }
