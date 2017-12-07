@@ -114,7 +114,8 @@ function hook(Mod, parent, options) {
       type = "unambiguous"
     }
 
-    if (ext === ".mjs" || ext === ".mjs.gz") {
+    if (ext === ".mjs" ||
+        ext === ".mjs.gz") {
       hint = "module"
 
       if (type === "script") {
@@ -151,13 +152,6 @@ function hook(Mod, parent, options) {
       const stateHash = getCacheStateHash(cacheFileName)
       const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
-      const entry = Entry.get(mod)
-      entry.runtimeName = runtimeName
-
-      if (! entry.url) {
-        entry.url = getURLFromFilePath(filePath)
-      }
-
       if (! isObject(cached)) {
         cached = tryCompileCode(manager, content, {
           cacheFileName,
@@ -179,9 +173,17 @@ function hook(Mod, parent, options) {
       if (! cached.changed &&
           pkgInfo === defaultPkgInfo) {
         tryPassthru.call(this, func, args, options)
-      } else {
-        tryCompileCached(mod, cached, filePath, runtimeName, options)
+        return
       }
+
+      const entry = Entry.get(mod)
+      entry.runtimeName = runtimeName
+
+      if (! entry.url) {
+        entry.url = getURLFromFilePath(filePath)
+      }
+
+      tryCompileCached(mod, cached, filePath, runtimeName, options)
     }
 
     if (shouldOverwrite) {
