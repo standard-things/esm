@@ -1,6 +1,8 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
 "use strict"
 
+const JSON6 = require("json-6")
+
 const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
@@ -12,6 +14,8 @@ const ModuleConcatenationPlugin = webpack.optimize.ModuleConcatenationPlugin
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+
+const readJSON = (filePath) => JSON6.parse(fs.readFileSync(filePath))
 
 const builtins = [
   "Array", "ArrayBuffer", "Atomics", "Boolean", "Buffer", "DataView", "Date",
@@ -27,8 +31,6 @@ const builtins = [
 
 const isProd = /production/.test(process.env.NODE_ENV)
 const isTest = /test/.test(process.env.NODE_ENV)
-
-const readJSON = (filePath) => JSON.parse(fs.readFileSync(filePath))
 
 /* eslint-disable sort-keys */
 const config = {
