@@ -16,8 +16,7 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
     mod.paths = moduleNodeModulePaths(fromPath)
   }
 
-  const entry = Entry.get(mod)
-  entry.url = url
+  Entry.get(mod).url = url
 
   if (preload) {
     preload(mod)
