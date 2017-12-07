@@ -87,10 +87,11 @@ function resolveFilename(id, parent, isMain) {
   }
 
   if (foundPath) {
-    const ext = extname(foundPath)
+    if (pkgInfo && pkgInfo.options.cjs.paths) {
+      return foundPath
+    }
 
-    if (ext in extLookup ||
-        (pkgInfo && pkgInfo.options.cjs.paths)) {
+    if (extname(foundPath) in extLookup) {
       return foundPath
     }
 
