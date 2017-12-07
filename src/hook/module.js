@@ -79,11 +79,10 @@ function hook(Mod, parent, options) {
 
     if (options) {
       pkgInfo = PkgInfo.get(dirPath, true)
-      const pkgOptions = pkgInfo.options
       const { range } = pkgInfo
 
       assign(pkgInfo, parentPkgInfo)
-      pkgInfo.options = assign(pkgOptions, options)
+      pkgInfo.options = assign(pkgInfo.options, options)
       pkgInfo.range = range
     }
 

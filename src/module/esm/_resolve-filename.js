@@ -46,6 +46,7 @@ function resolveFilename(id, parent, isMain) {
   const isAbs = isAbsolutePath(id)
   const fromPath = isAbs ? dirname(id) : moduleDirname(parent)
   const pkgInfo = PkgInfo.get(fromPath)
+  const pkgOptions = pkgInfo && pkgInfo.options
 
   if (! encodedSlash(id)) {
     if (! isAbs &&
@@ -68,15 +69,13 @@ function resolveFilename(id, parent, isMain) {
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       let skipGlobalPaths = true
 
-      if (pkgInfo) {
-        const { options } = pkgInfo
-
-        if (options.gz) {
+      if (pkgOptions) {
+        if (pkgOptions.gz) {
           extLookup = gzExtsLookup
           searchExts = gzExts
         }
 
-        if (options.cjs.paths) {
+        if (pkgOptions.cjs.paths) {
           skipGlobalPaths = false
         }
       }
@@ -87,7 +86,7 @@ function resolveFilename(id, parent, isMain) {
   }
 
   if (foundPath) {
-    if (pkgInfo && pkgInfo.options.cjs.paths) {
+    if (pkgOptions && pkgOptions.cjs.paths) {
       return foundPath
     }
 
