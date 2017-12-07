@@ -1,11 +1,11 @@
-import { dirname, extname } from "path"
-
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
 import _resolveFilename from "./_resolve-filename.js"
+import { dirname } from "path"
+import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isESM from "../../util/is-es-module.js"
@@ -37,6 +37,7 @@ function load(id, parent, isMain, preload) {
 
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
+  const pkgOptions = pkgInfo && pkgInfo.options
 
   let called = false
   let state = Module
@@ -44,10 +45,13 @@ function load(id, parent, isMain, preload) {
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
 
-  if (! (pkgInfo && pkgInfo.options.cjs.cache)) {
+  if (! (pkgOptions && pkgOptions.cjs.cache)) {
+    const ext = extname(filePath)
     isMain = false
 
-    if (extname(filePath) === ".mjs") {
+    if (ext === ".mjs" ||
+        (pkgOptions && pkgOptions.gz &&
+         ext === ".mjs.gz")) {
       state = moduleState
     }
   }
