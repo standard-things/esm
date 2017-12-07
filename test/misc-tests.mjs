@@ -15,8 +15,8 @@ const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
 
-const pkgJSON = JSON6.parse(fs.readFileSync("../package.json", "utf8"))
-const pkgOptions = JSON6.parse(fs.readFileSync("./.esmrc", "utf8"))
+const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
+const pkgOptions = JSON6.parse(fs.readFileSync("./.esmrc"))
 const pkgPath = require.resolve("../")
 
 const abcId = "./fixture/export/abc.mjs"
