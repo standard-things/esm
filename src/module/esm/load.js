@@ -1,4 +1,4 @@
-import { extname as _extname, dirname } from "path"
+import { dirname, extname } from "path"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
@@ -6,12 +6,11 @@ import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
 import _resolveFilename from "./_resolve-filename.js"
-import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
-import moduleNodeModulePaths from "../node-module-paths.js"
+import loader from "./loader.js"
 import moduleResolveFilename from "../cjs/resolve-filename.js"
 import moduleState from "../state.js"
 import setGetter from "../../util/set-getter.js"
@@ -38,22 +37,24 @@ function load(id, parent, isMain, preload) {
 
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
+
+  let called = false
+  let state = Module
+
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
-
-  let state = Module
 
   if (! (pkgInfo && pkgInfo.options.cjs.cache)) {
     isMain = false
 
-    if (_extname(filePath) === ".mjs") {
+    if (extname(filePath) === ".mjs") {
       state = moduleState
     }
   }
 
-  const isModState = state === Module
+  const isStateExposed = state === Module
 
-  let child = isModState
+  let child = isStateExposed
     ? state._cache[cacheId]
     : null
 
@@ -64,7 +65,6 @@ function load(id, parent, isMain, preload) {
   }
 
   let error
-  let called = false
   let threw = true
 
   try {
@@ -95,7 +95,7 @@ function load(id, parent, isMain, preload) {
   try {
     throw error
   } finally {
-    if (isModState) {
+    if (isStateExposed) {
       delete state._cache[cacheId]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
@@ -104,41 +104,6 @@ function load(id, parent, isMain, preload) {
       })
     }
   }
-}
-
-function loader(filePath, fromPath, url, parentOptions, preload) {
-  const mod = this
-  mod.filename = filePath
-
-  if (Module._nodeModulePaths !== moduleNodeModulePaths &&
-      parentOptions && parentOptions.cjs.paths) {
-    mod.paths = Module._nodeModulePaths(fromPath)
-  } else {
-    mod.paths = moduleNodeModulePaths(fromPath)
-  }
-
-  const entry = Entry.get(mod)
-  entry.url = url
-
-  if (preload) {
-    preload(mod)
-  }
-
-  let { _extensions } = moduleState
-  let ext = extname(filePath)
-
-  if (ext === ".js" ||
-      (parentOptions && parentOptions.cjs.extensions)) {
-    _extensions = Module._extensions
-  }
-
-  if (ext === "" ||
-      typeof _extensions[ext] !== "function") {
-    ext = ".js"
-  }
-
-  _extensions[ext](mod, filePath)
-  mod.loaded = true
 }
 
 export default load
