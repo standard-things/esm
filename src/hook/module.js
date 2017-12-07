@@ -349,7 +349,8 @@ function hook(Mod, parent, options) {
 
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
-        (ext === ".mjs" || ext === ".mjs.gz")) {
+        (ext === ".mjs" ||
+         ext === ".mjs.gz")) {
       _extensions[ext] = mjsCompiler
     }
 
