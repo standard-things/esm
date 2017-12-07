@@ -1,13 +1,10 @@
 import Entry from "../../entry.js"
 import Module from "../../module.js"
-import PkgInfo from "../../pkg-info.js"
 import Wrapper from "../../wrapper.js"
 
 import _load from "../_load.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
-
-const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function load(id, parent, isMain, preload) {
   const parentEntry = Entry.get(parent)
@@ -58,18 +55,7 @@ function loader(filePath, parent, preload) {
 
   let extCompiler = Wrapper.unwrap(_extensions, ext)
 
-  if (typeof extCompiler === "function") {
-    if (extCompiler[mjsSym]) {
-      const parentPkgInfo = PkgInfo.from(parent)
-      const parentOptions = parentPkgInfo && parentPkgInfo.options
-
-      if (parentOptions &&
-          (parentOptions.cjs.extensions ||
-           parentOptions.esm !== "mjs")) {
-        extCompiler = _extensions[ext]
-      }
-    }
-  } else {
+  if (typeof extCompiler !== "function") {
     extCompiler = _extensions[ext]
   }
 
