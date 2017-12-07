@@ -1,3 +1,4 @@
+import JSON6 from "json-6"
 import SemVer from "semver"
 
 import assert from "assert"
@@ -14,7 +15,8 @@ const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
 
-const pkgJSON = JSON.parse(fs.readFileSync("../package.json"))
+const pkgJSON = JSON6.parse(fs.readFileSync("../package.json", "utf8"))
+const pkgOptions = JSON6.parse(fs.readFileSync("./.esmrc", "utf8"))
 const pkgPath = require.resolve("../")
 
 const abcId = "./fixture/export/abc.mjs"
@@ -259,13 +261,17 @@ describe("errors", () => {
         ),
       import(id6)
         .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            id6 + ":1",
-            "syntax@error",
-            "\n"
-          ].join("\n"))
-        )
+        .catch((e) => {
+          if (pkgOptions.debug) {
+            assert.ok(true)
+          } else {
+            checkErrorStack(e, [
+              id6 + ":1",
+              "syntax@error",
+              "\n"
+            ].join("\n"))
+          }
+        })
     ])
   })
 
