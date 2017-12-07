@@ -13,6 +13,18 @@ const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
+const builtins = [
+  "Array", "ArrayBuffer", "Atomics", "Boolean", "Buffer", "DataView", "Date",
+  "Error", "EvalError", "Float32Array", "Float64Array", "Function", "Infinity",
+  "Int8Array", "Int16Array", "Int32Array", "Intl", "JSON", "Map", "Math", "NaN",
+  "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
+  "Reflect", "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol",
+  "SyntaxError", "TypeError", "URIError", "Uint8Array", "Uint16Array",
+  "Uint32Array", "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly",
+  "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
+  "process"
+]
+
 const isProd = /production/.test(process.env.NODE_ENV)
 const isTest = /test/.test(process.env.NODE_ENV)
 
@@ -41,7 +53,12 @@ const config = {
     new BannerPlugin({
       banner: [
         '"use strict";\n',
-        "const __non_webpack_module__ = module;\n"
+        "const __non_webpack_module__ = module;\n",
+        "const " +
+          builtins
+            .map((name) => name + " = global." + name)
+            .join(", ") +
+        ";\n"
       ].join("\n"),
       entryOnly: true,
       raw: true
