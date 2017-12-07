@@ -3,8 +3,8 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/bootstrap_node.js
 
 const wrapper = [
-  "(function(exports,require,module,__filename,__dirname){",
-  "\n})"
+  "(function (exports, require, module, __filename, __dirname) { ",
+  "\n});"
 ]
 
 export default wrapper
