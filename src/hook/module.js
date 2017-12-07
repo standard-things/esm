@@ -41,8 +41,9 @@ import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const { compile } = Compiler
-const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+const { setPrototypeOf } = Object
 
+const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
@@ -117,6 +118,7 @@ function hook(Mod, parent, options) {
 
     if (ext === ".mjs" || ext === ".mjs.gz") {
       hint = "module"
+
       if (type === "script") {
         type = "module"
       }
@@ -177,6 +179,7 @@ function hook(Mod, parent, options) {
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper
+      setPrototypeOf(mod, Module.prototype)
     } else {
       setProperty(mod, compileSym, { enumerable: false, value: compileWrapper })
     }
@@ -263,7 +266,7 @@ function hook(Mod, parent, options) {
   function tryCompileCJS(mod, content, filePath, runtimeName, options) {
     content =
       "const " + runtimeName + "=this;" +
-      runtimeName + ".r((function(exports,require,module,__filename,__dirname){" + content + "\n}))"
+      runtimeName + ".r((function(exports,require){" + content + "\n}))"
 
     content +=
       maybeSourceMap(content, filePath, options)
@@ -291,7 +294,7 @@ function hook(Mod, parent, options) {
     content =
       '"use strict";const ' + runtimeName + "=this;" +
       runtimeName + ".r((" + async + "function(" +
-      (options.cjs.vars ? "exports,require,module,__filename,__dirname" : "") +
+      (options.cjs.vars ? "exports,require" : "") +
       "){" + content + "\n}))"
 
     content +=

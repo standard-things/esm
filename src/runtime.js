@@ -7,7 +7,6 @@ import isESM from "./util/is-es-module.js"
 import loadCJS from "./module/cjs/load.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
-import moduleDirname from "./module/dirname.js"
 import moduleState from "./module/state.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
@@ -162,7 +161,7 @@ function runCJS(runtime, moduleWrapper) {
     return child.exports
   })
 
-  moduleWrapper.call(exported, exported, req, mod, mod.filename, moduleDirname(mod))
+  moduleWrapper.call(exported, exported, req)
   mod.loaded = true
 }
 
@@ -175,7 +174,7 @@ function runESM(runtime, moduleWrapper) {
     const requirer = (id) => load(id, mod, loadESM).exports
     const req = makeRequireFunction(mod, requirer)
 
-    moduleWrapper.call(exported, exported, req, mod, mod.filename, moduleDirname(mod))
+    moduleWrapper.call(exported, exported, req)
   } else {
     moduleWrapper.call(void 0)
   }
