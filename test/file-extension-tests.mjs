@@ -11,6 +11,21 @@ describe("file extension", () => {
       .then((ns) => ns.default())
   )
 
+  it("should support loading unknown extensions with `require`", () =>
+    import("./file-extension/unknown.require.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should not support loading unknown extensions with dynamic import in CJS", () =>
+    import("./file-extension/unknown.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should not support loading unknown extensions with dynamic import in ESM", () =>
+    import("./file-extension/unknown.mjs")
+      .then((ns) => ns.default())
+  )
+
   it("should not support loading `.mjz.gz` with `require`", () =>
     import("./file-extension/mjs.gz.js")
       .then(() => assert.ok(false))
