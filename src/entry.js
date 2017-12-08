@@ -7,7 +7,6 @@ import SafeWeakMap from "./safe-weak-map.js"
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import emitWarning from "./warning/emit-warning.js"
-import env from "./env.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isESM from "./util/is-es-module.js"
@@ -415,6 +414,8 @@ function getExportByName(entry, setter, name) {
        name !== "default") ||
       (entry._loaded === 1 &&
        ! (name in entry.getters))) {
+    // Remove problematic setter to unblock subsequent imports.
+    delete entry.setters[name]
     raise("ERR_EXPORT_MISSING", entry, name)
   }
 
@@ -480,12 +481,6 @@ function namespaceExtension(entry, name) {
 }
 
 function raise(key, entry, name) {
-  if (env.repl) {
-    // Remove problematic getter and setter to unblock subsequent imports.
-    delete entry.getters[name]
-    delete entry.setters[name]
-  }
-
   throw new SyntaxError(messages[key](entry, name))
 }
 
