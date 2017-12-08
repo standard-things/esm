@@ -41,8 +41,6 @@ const defaultOptions = {
 
 const defaultCJS = defaultOptions.cjs
 
-const infoCache = new FastObject
-
 const cjsKeys = Object.keys(defaultOptions.cjs)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
@@ -83,22 +81,24 @@ class PkgInfo {
     this.range = range
   }
 
+  static cache = new FastObject
+
   static get(dirPath, force) {
     let pkgInfo
 
-    if (dirPath in infoCache) {
-      pkgInfo = infoCache[dirPath]
+    if (dirPath in PkgInfo.cache) {
+      pkgInfo = PkgInfo.cache[dirPath]
 
       if (! force || pkgInfo) {
         return pkgInfo
       }
     }
 
-    infoCache[dirPath] = null
+    PkgInfo.cache[dirPath] = null
 
     if (basename(dirPath) === "node_modules") {
       return force
-        ? infoCache[dirPath] = PkgInfo.read(dirPath, true)
+        ? PkgInfo.cache[dirPath] = PkgInfo.read(dirPath, true)
         : null
     }
 
@@ -114,7 +114,7 @@ class PkgInfo {
       pkgInfo = PkgInfo.read(dirPath, force)
     }
 
-    return infoCache[dirPath] = pkgInfo
+    return PkgInfo.cache[dirPath] = pkgInfo
   }
 
   static from(mod, force) {
@@ -141,7 +141,7 @@ class PkgInfo {
         options = readJSON6(optionsPath)
       } else {
         pkgInfo =
-        infoCache[dirPath] = new PkgInfo(dirPath, "*", {
+        PkgInfo.cache[dirPath] = new PkgInfo(dirPath, "*", {
           cjs: true,
           esm: "js",
           gz: true
@@ -217,7 +217,7 @@ class PkgInfo {
   }
 
   static set(dirPath, pkgInfo) {
-    infoCache[dirPath] = pkgInfo
+    PkgInfo.cache[dirPath] = pkgInfo
   }
 }
 
@@ -323,7 +323,7 @@ function toOptions(value) {
 Object.setPrototypeOf(PkgInfo.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-infoCache[""] = new PkgInfo("", version, {
+PkgInfo.cache[""] = new PkgInfo("", version, {
   cache: false,
   cjs: true,
   gz: true

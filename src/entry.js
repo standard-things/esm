@@ -23,8 +23,6 @@ const { is, isSealed, keys, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
 
-const entryMap = new SafeWeakMap
-
 const messages = new FastObject
 messages["ERR_EXPORT_MISSING"] = exportMissing
 messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
@@ -87,6 +85,8 @@ class Entry {
     this.url = null
   }
 
+  static cache = new SafeWeakMap
+
   static get(mod) {
     if (! mod) {
       return null
@@ -94,11 +94,11 @@ class Entry {
 
     const exported = mod.exports
     const useExports = isObjectLike(exported)
-    let entry = entryMap.get(useExports ? exported : mod)
+    let entry = Entry.cache.get(useExports ? exported : mod)
 
     if (! entry) {
       entry = new Entry(mod, exported)
-      entryMap.set(useExports ? exported : mod, entry)
+      Entry.cache.set(useExports ? exported : mod, entry)
     }
 
     return entry
@@ -110,14 +110,14 @@ class Entry {
     }
 
     const exported = mod.exports
-    return entryMap.has(isObjectLike(exported) ? exported : mod)
+    return Entry.cache.has(isObjectLike(exported) ? exported : mod)
   }
 
   static set(mod, exported, entry) {
     if (isObjectLike(exported)) {
-      entryMap.set(exported, entry)
+      Entry.cache.set(exported, entry)
     } else if (mod) {
-      entryMap.set(mod, entry)
+      Entry.cache.set(mod, entry)
     }
   }
 
