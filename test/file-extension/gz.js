@@ -8,6 +8,6 @@ module.exports = () => {
   return import("../fixture/file-extension/a.mjs.gz")
     .then((nsMjsGz) => {
       const namespaces = [nsGz, nsJsGz, nsMjsGz]
-      namespaces.forEach((ns) => assert.ok(ns))
+      namespaces.forEach(assert.ok)
     })
 }
