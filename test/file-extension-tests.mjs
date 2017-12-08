@@ -11,8 +11,23 @@ describe("file extension", () => {
       .then((ns) => ns.default())
   )
 
+  it("should support loading extensionless files with `require`", () =>
+    import("./file-extension/no-ext-require.js")
+      .then((ns) => ns.default())
+  )
+
   it("should support loading unknown extensions with `require`", () =>
     import("./file-extension/unknown.require.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should not support loading extensionless files with dynamic import in CJS", () =>
+    import("./file-extension/no-ext.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should not support loading extensionless files with dynamic import in ESM", () =>
+    import("./file-extension/no-ext.mjs")
       .then((ns) => ns.default())
   )
 
