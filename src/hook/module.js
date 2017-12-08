@@ -61,12 +61,15 @@ function hook(Mod, parent, options) {
   const defaultOptions = defaultPkgInfo.options
 
   const parentPkgInfo = PkgInfo.from(parent, true)
-  const mode = parentPkgInfo.options.esm
+  const parentPkgOptions = parentPkgInfo.options
 
   assign(defaultPkgInfo, parentPkgInfo)
-  defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
-  defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
+  defaultPkgInfo.options = assign(defaultOptions, parentPkgOptions)
   defaultPkgInfo.range = "*"
+
+  if (parentPkgOptions.esm === "all") {
+    defaultPkgInfo.options.esm = "js"
+  }
 
   Module._extensions = _extensions
 

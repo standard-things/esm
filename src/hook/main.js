@@ -33,12 +33,13 @@ function hook(Mod) {
     cwdOptions = PkgInfo.createOptions(parseJSON6(ESM_OPTIONS))
   }
 
-  const mode = cwdOptions.esm
-
   assign(defaultPkgInfo, cwdPkgInfo)
   defaultPkgInfo.options = assign(defaultOptions, cwdOptions)
-  defaultPkgInfo.options.esm = mode === "all" ? "js" : mode
   defaultPkgInfo.range = "*"
+
+  if (cwdOptions.esm === "all") {
+    defaultPkgInfo.options.esm = "js"
+  }
 
   Mod.runMain = () => {
     Mod.runMain = runMain
