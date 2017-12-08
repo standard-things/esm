@@ -243,12 +243,23 @@ function createCJS(source) {
 
 function createOptions(options) {
   let cjsOptions
+  let esmMode
   let sourceMap
-  const { defaultOptions } = PkgInfo
 
   options = toOptions(options)
 
-  if (has(options, "cjs")) {
+  const hasCJS = has(options, "cjs")
+
+  if (has(options, "esm") &&
+      options.esm === "cjs") {
+    esmMode = "js"
+
+    if (! hasCJS) {
+      cjsOptions = createCJS(true)
+    }
+  }
+
+  if (hasCJS) {
     cjsOptions = createCJS(options.cjs)
   }
 
@@ -258,7 +269,7 @@ function createOptions(options) {
     sourceMap = options.sourcemap
   }
 
-  options = _createOptions(options, defaultOptions)
+  options = _createOptions(options, PkgInfo.defaultOptions)
 
   if (typeof options.cache !== "string") {
     options.cache = !! options.cache
@@ -268,7 +279,9 @@ function createOptions(options) {
     options.cjs = cjsOptions
   }
 
-  if (options.esm !== "all" &&
+  if (esmMode) {
+    options.esm = esmMode
+  } else if (options.esm !== "all" &&
       options.esm !== "js") {
     options.esm = "mjs"
   }
