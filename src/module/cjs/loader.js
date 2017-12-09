@@ -1,6 +1,5 @@
 import Entry from "../../entry.js"
 import Module from "../../module.js"
-import Wrapper from "../../wrapper.js"
 
 import { dirname } from "path"
 import extname from "../../path/extname.js"
@@ -24,13 +23,7 @@ function loader(filePath, parent, preload) {
     ext = ".js"
   }
 
-  let extCompiler = Wrapper.unwrap(_extensions, ext)
-
-  if (typeof extCompiler !== "function") {
-    extCompiler = _extensions[ext]
-  }
-
-  extCompiler.call(_extensions, mod, filePath)
+  _extensions[ext](mod, filePath)
   mod.loaded = true
 }
 
