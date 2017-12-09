@@ -13,42 +13,38 @@ const Module = module.constructor.length > 1
   : require("module")
 
 const esmPath = path.resolve(__dirname, "esm.js.gz")
-const inspectKey = util.inspect.custom || "inspect"
 
-const descriptor = Object.create(null)
-descriptor.value = () => "@std/esm enabled"
+const content =
+  "(function(require,module,__shared__){" +
+  zlib.gunzipSync(fs.readFileSync(esmPath)) +
+  "\n})"
+
+const scriptOptions = Object.create(null)
+scriptOptions.filename = __filename
+
+const compiled = vm.runInThisContext(content, scriptOptions)
+
+function load() {
+  compiled(require, mod, shared)
+  return mod.exports
+}
+
+function makeRequireFunction(mod, options) {
+  return load()(mod, options)
+}
 
 const mod = new Module(module.id, null)
 mod.filename = __filename
 mod.parent = module.parent
 
-const scriptOptions = Object.create(null)
-scriptOptions.filename = __filename
+let shared
+shared = load()
 
-const content =
-  "(function(require,module,__options){" +
-  zlib.gunzipSync(fs.readFileSync(esmPath)) +
-  "\n})"
+const descriptor = Object.create(null)
+descriptor.value = () => "@std/esm enabled"
 
-const compiled = vm.runInThisContext(content, scriptOptions)
+const inspectKey = util.inspect.custom || "inspect"
+Object.defineProperty(makeRequireFunction, inspectKey, descriptor)
 
-function makeLoaderFunction(options) {
-  compiled(require, mod, options)
-  return mod.exports
-}
-
-const loader = makeLoaderFunction()
-
-module.exports = (mod, options) => {
-  const type = typeof options
-
-  if (options === true ||
-      type === "function" ||
-      (type === "object" && options !== null)) {
-    return makeLoaderFunction(options)(mod, options)
-  }
-
-  return loader(mod)
-}
-
-Object.freeze(Object.defineProperty(module.exports, inspectKey, descriptor))
+Object.freeze(makeRequireFunction)
+module.exports = makeRequireFunction

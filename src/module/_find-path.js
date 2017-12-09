@@ -4,7 +4,6 @@
 
 import { isAbsolute, resolve } from "path"
 
-import FastObject from "../fast-object.js"
 import Module from "../module.js"
 
 import binding from "../binding.js"
@@ -13,18 +12,16 @@ import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import { satisfies } from "semver"
+import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
 const { parse } = JSON
-
-const packageCache = new FastObject
-const pathCache = new FastObject
+const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
 const mainFieldRegExp = /"main"/
-const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
@@ -39,8 +36,8 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
     id + "\0" +
     (paths.length === 1 ? paths[0] : paths.join("\0"))
 
-  if (cacheKey in pathCache) {
-    return pathCache[cacheKey]
+  if (cacheKey in shared.findPath) {
+    return shared.findPath[cacheKey]
   }
 
   const { _extensions } = Module
@@ -116,7 +113,7 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
         )
       }
 
-      return pathCache[cacheKey] = filePath
+      return shared.findPath[cacheKey] = filePath
     }
   }
 
@@ -124,8 +121,8 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
 }
 
 function readPackage(thePath) {
-  if (thePath in packageCache) {
-    return packageCache[thePath]
+  if (thePath in shared.package) {
+    return shared.package[thePath]
   }
 
   const jsonPath = resolve(thePath, "package.json")
@@ -147,7 +144,7 @@ function readPackage(thePath) {
   }
 
   return typeof main === "string"
-    ? packageCache[thePath] = main
+    ? shared.package[thePath] = main
     : ""
 }
 

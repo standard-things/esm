@@ -2,7 +2,6 @@ import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 import PkgInfo from "./pkg-info.js"
 import SafeProxy from "./safe-proxy.js"
-import SafeWeakMap from "./safe-weak-map.js"
 
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
@@ -14,6 +13,7 @@ import isObjectLike from "./util/is-object-like.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
+import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const GETTER_ERROR = {}
@@ -85,8 +85,6 @@ class Entry {
     this.url = null
   }
 
-  static cache = new SafeWeakMap
-
   static get(mod) {
     if (! mod) {
       return null
@@ -94,11 +92,11 @@ class Entry {
 
     const exported = mod.exports
     const useExports = isObjectLike(exported)
-    let entry = Entry.cache.get(useExports ? exported : mod)
+    let entry = shared.entry.get(useExports ? exported : mod)
 
     if (! entry) {
       entry = new Entry(mod, exported)
-      Entry.cache.set(useExports ? exported : mod, entry)
+      shared.entry.set(useExports ? exported : mod, entry)
     }
 
     return entry
@@ -110,14 +108,14 @@ class Entry {
     }
 
     const exported = mod.exports
-    return Entry.cache.has(isObjectLike(exported) ? exported : mod)
+    return shared.entry.has(isObjectLike(exported) ? exported : mod)
   }
 
   static set(mod, exported, entry) {
     if (isObjectLike(exported)) {
-      Entry.cache.set(exported, entry)
+      shared.entry.set(exported, entry)
     } else if (mod) {
-      Entry.cache.set(mod, entry)
+      shared.entry.set(mod, entry)
     }
   }
 

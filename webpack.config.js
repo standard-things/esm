@@ -55,7 +55,8 @@ const config = {
     new BannerPlugin({
       banner: [
         '"use strict";\n',
-        "const __non_webpack_module__ = module;\n",
+        "var __shared__;",
+        "const __non_webpack_module__ = module;",
         "const " +
           builtins
             .map((name) => name + " = global." + name)

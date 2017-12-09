@@ -130,15 +130,20 @@ function hook(Mod, parent, options) {
     if (cached === true) {
       const code = readCachedCode(resolve(cachePath, cacheFileName), options)
 
-      if (type === "unambiguous") {
-        type = hasPragma(code, "use script") ? "script" : "module"
-      }
+      if (code === null) {
+        cached = null
+        delete cache[cacheFileName]
+      } else {
+        if (type === "unambiguous") {
+          type = hasPragma(code, "use script") ? "script" : "module"
+        }
 
-      cached =
-      cache[cacheFileName] = {
-        changed: true,
-        code,
-        esm: type === "module"
+        cached =
+        cache[cacheFileName] = {
+          changed: true,
+          code,
+          esm: type === "module"
+        }
       }
     }
 
