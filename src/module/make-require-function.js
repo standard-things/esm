@@ -5,9 +5,10 @@
 import Module from "../module.js"
 
 import errors from "../errors.js"
+import loadCJS from "./cjs/load.js"
 import moduleState from "./state.js"
 
-function makeRequireFunction(mod, requirer = mod.require) {
+function makeRequireFunction(mod, requirer) {
   function req(id) {
     moduleState.requireDepth += 1
 
@@ -24,6 +25,10 @@ function makeRequireFunction(mod, requirer = mod.require) {
 
   function resolve(id) {
     return Module._resolveFilename(id, mod)
+  }
+
+  if (typeof requirer !== "function") {
+    requirer = (id) => loadCJS(id, mod, false)
   }
 
   req.cache = Module._cache
