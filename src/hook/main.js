@@ -1,5 +1,6 @@
 import { dirname, resolve } from "path"
 
+import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
 import _loadESM from "../module/esm/_load.js"
@@ -51,7 +52,14 @@ function hook(Mod) {
       return
     }
 
-    const filePath = _resolveFilename(mainPath, null, true)
+    let filePath
+
+    try {
+      filePath = _resolveFilename(mainPath, null, true)
+    } catch (e) {
+      filePath = Module._resolveFilename(mainPath, null, true)
+    }
+
     const dirPath = dirname(filePath)
     const pkgInfo = PkgInfo.get(dirPath) || defaultPkgInfo
 
