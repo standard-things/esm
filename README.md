@@ -15,16 +15,10 @@ Getting started
 
      **index.js**
      ```js
-     require = require("@std/esm")(module)
+     // Provide options as a parameter or options file.
+     require = require("@std/esm")(module, options)
      module.exports = require("./main.mjs").default
      ```
-
-Enable for **all** modules, including dependencies, by providing
-`options` or `true` to use your options file.
-
-```js
-require = require("@std/esm")(module, options)
-```
 
 Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 

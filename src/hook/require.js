@@ -7,18 +7,16 @@ import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
 
 function hook(parent, options) {
-  options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
+  const parentPkgInfo = PkgInfo.from(parent, true)
+
+  if (isObjectLike(options)) {
+    assign(parentPkgInfo.options, PkgInfo.createOptions(options))
+  }
 
   return makeRequireFunction(parent, (id) => {
-    if (id in builtinModules) {
-      return builtinModules[id].exports
-    }
-
-    if (options) {
-      assign(PkgInfo.from(parent, true).options, options)
-    }
-
-    return loadESM(id, parent, false).exports
+    return id in builtinModules
+      ? builtinModules[id].exports
+      : loadESM(id, parent, false).exports
   })
 }
 

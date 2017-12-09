@@ -48,8 +48,6 @@ const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent, options) {
-  options = isObjectLike(options) ? PkgInfo.createOptions(options) : null
-
   let allowTopLevelAwait =
     isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")
@@ -60,8 +58,12 @@ function hook(Mod, parent, options) {
   const defaultPkgInfo = new PkgInfo("", "", { cache: false })
   const defaultOptions = defaultPkgInfo.options
 
+  const overwriteOptions = isObjectLike(options)
+    ? PkgInfo.createOptions(options)
+    : null
+
   const parentPkgInfo = PkgInfo.from(parent, true)
-  const parentPkgOptions = parentPkgInfo.options
+  const parentPkgOptions = assign(parentPkgInfo.options, overwriteOptions)
 
   assign(defaultPkgInfo, parentPkgInfo)
   defaultPkgInfo.options = assign(defaultOptions, parentPkgOptions)
@@ -75,25 +77,14 @@ function hook(Mod, parent, options) {
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const dirPath = dirname(filePath)
-    let pkgInfo = options
-      ? null
-      : PkgInfo.get(dirPath) || defaultPkgInfo
-
-    if (options) {
-      pkgInfo = PkgInfo.get(dirPath, true)
-      const { range } = pkgInfo
-
-      assign(pkgInfo, parentPkgInfo)
-      pkgInfo.options = assign(pkgInfo.options, options)
-      pkgInfo.range = range
-    }
-
+    const pkgInfo = PkgInfo.get(dirname(filePath)) || defaultPkgInfo
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
+
+    assign(pkgInfo.options, overwriteOptions)
 
     return wrapped
       ? wrapped.call(this, manager, func, pkgInfo, args)
-      : tryPassthru.call(this, func, args, options)
+      : tryPassthru.call(this, func, args, pkgInfo.options)
   }
 
   function methodWrapper(manager, func, pkgInfo, args) {
@@ -178,6 +169,7 @@ function hook(Mod, parent, options) {
       }
 
       if (! cached.changed &&
+          ! overwriteOptions &&
           pkgInfo === defaultPkgInfo) {
         tryPassthru.call(this, func, args, options)
         return
