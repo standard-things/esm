@@ -33,6 +33,8 @@ messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
 const useProxy = typeof SafeProxy === "function"
 const useToStringTag = typeof toStringTag === "symbol"
 
+const warned = new FastObject
+
 const esmDescriptor = {
   configurable: false,
   enumerable: false,
@@ -635,7 +637,12 @@ function toNamespaceProxy(entry, source = entry._namespace) {
 
 function warn(key, entry, name) {
   if (entry.options.warnings) {
-    emitWarning(messages[key](entry, name))
+    const cacheKey = key + "\0" + entry.id + "\0" + name
+
+    if (! (cacheKey in warned)) {
+      warned[cacheKey] = true
+      emitWarning(messages[key](entry, name))
+    }
   }
 }
 
