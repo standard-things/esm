@@ -320,8 +320,7 @@ function getBlockBodyInfo(visitor, path) {
     return visitor.bodyInfo
   }
 
-  const parent = path.getParentNode()
-  const { body, start } = parent
+  const { body, start } = path.getParentNode()
 
   let hoistedPrefixString = ""
   let insertCharIndex = start
