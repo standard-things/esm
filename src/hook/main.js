@@ -12,6 +12,10 @@ import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
 
+const codeOfBracket = "{".charCodeAt(0)
+const codeOfDoubleQuote = '"'.charCodeAt(0)
+const codeOfSingleQuote = "'".charCodeAt(0)
+
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
   const { runMain } = Mod
@@ -19,27 +23,30 @@ function hook(Mod) {
   const useTickCallback = typeof _tickCallback === "function"
 
   const cwdPkgInfo = PkgInfo.get(".", true)
-  let cwdOptions = cwdPkgInfo.options
-
   const defaultPkgInfo = new PkgInfo("", "", { cache: false })
-  const defaultOptions = defaultPkgInfo.options
+
+  assign(defaultPkgInfo, cwdPkgInfo)
 
   let { ESM_OPTIONS } = process.env
 
   if (ESM_OPTIONS) {
+    ESM_OPTIONS = ESM_OPTIONS.trim()
+
     if (isPath(ESM_OPTIONS)) {
       ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
     }
 
-    cwdOptions = PkgInfo.createOptions(parseJSON6(ESM_OPTIONS))
-  }
+    const code0 = ESM_OPTIONS.charCodeAt(0)
 
-  assign(defaultPkgInfo, cwdPkgInfo)
-  defaultPkgInfo.options = assign(defaultOptions, cwdOptions)
-  defaultPkgInfo.range = "*"
+    if (code0 === codeOfBracket ||
+        code0 === codeOfDoubleQuote ||
+        code0 === codeOfSingleQuote) {
+      ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
+    }
 
-  if (cwdOptions.esm === "all") {
-    defaultPkgInfo.options.esm = "js"
+    assign(defaultPkgInfo.options, PkgInfo.createOptions(ESM_OPTIONS))
+  } else {
+    assign(defaultPkgInfo.options, cwdPkgInfo.options)
   }
 
   Mod.runMain = () => {
