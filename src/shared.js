@@ -13,6 +13,7 @@ if (! __shared__) {
   shared.maxSatisfying = new FastObject
   shared.package = new FastObject
   shared.parseURL = new FastObject
+  shared.pkgInfo = new FastObject
 }
 
 export default shared

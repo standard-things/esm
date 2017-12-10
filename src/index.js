@@ -1,3 +1,4 @@
+import FastObject from "./fast-object.js"
 import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
@@ -11,6 +12,8 @@ import requireHook from "./hook/require.js"
 import shared from "./shared.js"
 import vm from "vm"
 
+const { stringify } = JSON
+
 let exported
 
 if (shared.inited) {
@@ -23,6 +26,12 @@ if (shared.inited) {
     }
 
     if (options) {
+      const optionsKey = stringify(options)
+
+      PkgInfo.cache =
+        shared.pkgInfo[optionsKey] ||
+        (shared.pkgInfo[optionsKey] = new FastObject)
+
       moduleHook(Module, cloned, options)
     }
 

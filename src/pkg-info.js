@@ -15,6 +15,7 @@ import readFile from "./fs/read-file.js"
 import readFileFast from "./fs/read-file-fast.js"
 import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
+import shared from "./shared.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
@@ -40,6 +41,7 @@ const defaultOptions = {
 }
 
 const defaultCJS = defaultOptions.cjs
+const optionsKey = JSON.stringify(defaultOptions)
 
 const cjsKeys = Object.keys(defaultOptions.cjs)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
@@ -81,7 +83,9 @@ class PkgInfo {
     this.range = range
   }
 
-  static cache = new FastObject
+  static cache =
+    shared.pkgInfo[optionsKey] ||
+    (shared.pkgInfo[optionsKey] = new FastObject)
 
   static get(dirPath, force) {
     let pkgInfo
