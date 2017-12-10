@@ -8,10 +8,16 @@ const definedMap = new SafeWeakMap
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {
     this.magicString = options.magicString
+    this.warnedForArguments = false
     this.warnings = options.warnings
   }
 
   visitIdentifier(path) {
+    if (this.warnedForArguments) {
+      this.visitChildren(path)
+      return
+    }
+
     const node = path.getValue()
 
     if (node.name !== "arguments") {
@@ -19,6 +25,7 @@ class IdentifierVisitor extends Visitor {
       return
     }
 
+    const { start } = node
     const { operator, type } = path.getParentNode()
 
     if ((type === "UnaryExpression" &&
@@ -30,14 +37,15 @@ class IdentifierVisitor extends Visitor {
 
     const parser = {
       input: this.magicString.original,
-      pos: node.start,
-      start: node.start
+      pos: start,
+      start
     }
 
     try {
-      raise(parser, parser.start, "@std/esm detected undefined arguments access", Error)
+      raise(parser, start, "@std/esm detected undefined arguments access", Error)
     } catch (e) {
       e.name = "Warning"
+      this.warnedForArguments = true
       this.warnings.push(e)
     }
 
