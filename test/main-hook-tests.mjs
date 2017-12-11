@@ -74,6 +74,11 @@ describe("module.runMain hook", function () {
     , Promise.resolve())
   )
 
+  it("should support dynamic import in CJS", () =>
+    runMain("./fixture/main/dynamic-import.js")
+      .then((result) => assert.ok(result.stdout.includes("dynamic-import-js:true")))
+  )
+
   it("should support `import.meta.url`", () =>
     runMain("./fixture/main/import-meta.mjs")
       .then((result) => {

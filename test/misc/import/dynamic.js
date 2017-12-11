@@ -10,7 +10,17 @@ const abcNs = createNamespace({
   default: "default"
 })
 
+const defNs = createNamespace({
+  default: { d: "d", e: "e", f: "f" }
+})
+
 module.exports = () => {
-  return import("../../fixture/export/abc.mjs")
-    .then((ns) => assert.deepStrictEqual(ns, abcNs))
+  return [
+    { id: "../../fixture/import/dynamic-cjs.js", ns: defNs },
+    { id: "../../fixture/import/dynamic-esm.js", ns: abcNs }
+  ].reduce((promise, data) =>
+    promise
+      .then(() => require(data.id))
+      .then((ns) => assert.deepStrictEqual(ns, data.ns))
+  , Promise.resolve())
 }
