@@ -10,7 +10,7 @@ const codeOfCR = "\r".charCodeAt(0)
 
 const { keys } = Object
 
-const functionPrefixRe = /^\s*(?:async\s*)?function\s*\*?/
+const functionPrefixRe = /^\s*(?:async\s*)?function(?:\s*\*)?/
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
