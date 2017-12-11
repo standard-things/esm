@@ -22,10 +22,24 @@ function hook(Mod) {
 
   const useTickCallback = typeof _tickCallback === "function"
 
-  const cwdPkgInfo = PkgInfo.get(".", true)
-  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
+  const cwd = process.cwd()
+  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+  const defaultOptions = defaultPkgInfo.options
+
+  let cwdPkgInfo = PkgInfo.get(cwd)
+
+  if (! cwdPkgInfo) {
+    cwdPkgInfo = PkgInfo.get(cwd, true)
+    PkgInfo.set(cwd, defaultPkgInfo)
+  }
 
   assign(defaultPkgInfo, cwdPkgInfo)
+  defaultPkgInfo.options = assign(defaultOptions, cwdPkgInfo.options)
+  defaultPkgInfo.range = "*"
+
+  if (defaultPkgInfo.options.esm === "all") {
+    defaultPkgInfo.options.esm = "js"
+  }
 
   let { ESM_OPTIONS } = process.env
 
@@ -45,8 +59,6 @@ function hook(Mod) {
     }
 
     assign(defaultPkgInfo.options, PkgInfo.createOptions(ESM_OPTIONS))
-  } else {
-    assign(defaultPkgInfo.options, cwdPkgInfo.options)
   }
 
   Mod.runMain = () => {
