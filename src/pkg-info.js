@@ -101,11 +101,9 @@ class PkgInfo {
       }
     }
 
-    PkgInfo.cache[dirPath] = null
-
     if (basename(dirPath) === "node_modules") {
-      return force
-        ? PkgInfo.cache[dirPath] = PkgInfo.read(dirPath, true)
+      return PkgInfo.cache[dirPath] = force
+        ? PkgInfo.read(dirPath, true)
         : null
     }
 
@@ -131,9 +129,17 @@ class PkgInfo {
   static read(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
 
-    let optionsPath
     let pkgInfo
 
+    if (dirPath in PkgInfo.cache) {
+      pkgInfo = PkgInfo.cache[dirPath]
+
+      if (! force || pkgInfo) {
+        return pkgInfo
+      }
+    }
+
+    let optionsPath
     let options = readFile(resolve(dirPath, ESMRC_FILENAME), "utf8")
     let optionsFound = options !== null
 
