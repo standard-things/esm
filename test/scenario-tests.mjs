@@ -10,10 +10,9 @@ const canTestPM2 = ! ("TRAVIS" in process.env)
 const pkgPath = require.resolve("../")
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 
-function exec(filePath, args, env) {
+function exec(filePath, args) {
   return execa(filePath, args, {
-    cwd: testPath,
-    env
+    cwd: testPath
   })
 }
 
@@ -31,7 +30,9 @@ describe("scenarios", function () {
     ]
 
     return Promise.resolve()
-      .then(() => exec("nyc", nycArgs, { ESM_OPTIONS: "cjs" }))
+      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
+      .then(() => exec("nyc", nycArgs))
+      .then(() => fs.removeSync(".esmrc"))
   })
 
   it("should work with ava, nyc, and tsc", () => {
