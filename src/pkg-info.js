@@ -103,11 +103,11 @@ class PkgInfo {
 
     if (basename(dirPath) === "node_modules") {
       return PkgInfo.cache[dirPath] = force
-        ? PkgInfo.read(dirPath, true)
+        ? readInfo(dirPath, true)
         : null
     }
 
-    pkgInfo = PkgInfo.read(dirPath)
+    pkgInfo = readInfo(dirPath)
 
     if (pkgInfo === null) {
       const parentPath = dirname(dirPath)
@@ -116,7 +116,7 @@ class PkgInfo {
 
     if (force &&
         pkgInfo === null) {
-      pkgInfo = PkgInfo.read(dirPath, force)
+      pkgInfo = readInfo(dirPath, force)
     }
 
     return PkgInfo.cache[dirPath] = pkgInfo
@@ -124,111 +124,6 @@ class PkgInfo {
 
   static from(mod, force) {
     return PkgInfo.get(moduleDirname(mod), force)
-  }
-
-  static read(dirPath, force) {
-    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-
-    let pkgInfo
-
-    if (dirPath in PkgInfo.cache) {
-      pkgInfo = PkgInfo.cache[dirPath]
-
-      if (! force || pkgInfo) {
-        return pkgInfo
-      }
-    }
-
-    let optionsPath
-    let options = readFile(resolve(dirPath, ESMRC_FILENAME), "utf8")
-    let optionsFound = options !== null
-
-    if (optionsFound) {
-      options = parseJSON6(options)
-    } else {
-      optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
-    }
-
-    if (optionsPath) {
-      optionsFound = true
-
-      if (extname(optionsPath) === ".json") {
-        options = readJSON6(optionsPath)
-      } else {
-        pkgInfo =
-        PkgInfo.cache[dirPath] = new PkgInfo(dirPath, "*", {
-          cjs: true,
-          esm: "js",
-          gz: true
-        })
-
-        options = _loadESM(optionsPath, null, false).exports
-      }
-    }
-
-    let parentPkgInfo
-    let pkgParsed = false
-    let pkgJSON = readFileFast(resolve(dirPath, PACKAGE_FILENAME), "utf8")
-
-    if (! force &&
-        pkgJSON === null) {
-      if (optionsFound) {
-        parentPkgInfo = PkgInfo.get(dirname(dirPath))
-      } else {
-        return null
-      }
-    }
-
-    if (! optionsFound) {
-      pkgParsed = true
-      pkgJSON = parseJSON(pkgJSON)
-
-      if (has(pkgJSON, "@std/esm")) {
-        optionsFound = true
-        options = pkgJSON["@std/esm"]
-      } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
-        optionsFound = true
-        options = pkgJSON["@std"].esm
-      }
-    }
-
-    let range
-
-    if (force) {
-      range = "*"
-    } else if (parentPkgInfo) {
-      range = parentPkgInfo.range
-    } else {
-      if (! pkgParsed) {
-        pkgParsed = true
-        pkgJSON = parseJSON(pkgJSON)
-      }
-
-      // A package.json may have `@std/esm` in its "devDependencies" object
-      // because it expects another package or application to enable ESM loading
-      // in production, but needs `@std/esm` during development.
-      range =
-        getRange(pkgJSON, "dependencies") ||
-        getRange(pkgJSON, "peerDependencies")
-
-      if (range === null) {
-        if (optionsFound ||
-            getRange(pkgJSON, "devDependencies")) {
-          range = "*"
-        } else {
-          return null
-        }
-      }
-    }
-
-    if (pkgInfo) {
-      pkgInfo.options = PkgInfo.createOptions(options)
-      pkgInfo.range = range
-    } else {
-      pkgInfo = new PkgInfo(dirPath, range, options)
-    }
-
-    return pkgInfo
   }
 
   static set(dirPath, pkgInfo) {
@@ -324,6 +219,100 @@ function getRange(json, name) {
   }
 
   return null
+}
+
+function readInfo(dirPath, force) {
+  let optionsPath
+  let pkgInfo
+
+  let options = readFile(resolve(dirPath, ESMRC_FILENAME), "utf8")
+  let optionsFound = options !== null
+
+  if (optionsFound) {
+    options = parseJSON6(options)
+  } else {
+    optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
+  }
+
+  if (optionsPath) {
+    optionsFound = true
+
+    if (extname(optionsPath) === ".json") {
+      options = readJSON6(optionsPath)
+    } else {
+      pkgInfo =
+      PkgInfo.cache[dirPath] = new PkgInfo(dirPath, "*", {
+        cjs: true,
+        esm: "js",
+        gz: true
+      })
+
+      options = _loadESM(optionsPath, null, false).exports
+    }
+  }
+
+  let parentPkgInfo
+  let pkgParsed = false
+  let pkgJSON = readFileFast(resolve(dirPath, PACKAGE_FILENAME), "utf8")
+
+  if (! force &&
+      pkgJSON === null) {
+    if (optionsFound) {
+      parentPkgInfo = PkgInfo.get(dirname(dirPath))
+    } else {
+      return null
+    }
+  }
+
+  if (! optionsFound) {
+    pkgParsed = true
+    pkgJSON = parseJSON(pkgJSON)
+
+    if (has(pkgJSON, "@std/esm")) {
+      optionsFound = true
+      options = pkgJSON["@std/esm"]
+    } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
+      optionsFound = true
+      options = pkgJSON["@std"].esm
+    }
+  }
+
+  let range
+
+  if (force) {
+    range = "*"
+  } else if (parentPkgInfo) {
+    range = parentPkgInfo.range
+  } else {
+    if (! pkgParsed) {
+      pkgParsed = true
+      pkgJSON = parseJSON(pkgJSON)
+    }
+
+    // A package.json may have `@std/esm` in its "devDependencies" object
+    // because it expects another package or application to enable ESM loading
+    // in production, but needs `@std/esm` during development.
+    range =
+      getRange(pkgJSON, "dependencies") ||
+      getRange(pkgJSON, "peerDependencies")
+
+    if (range === null) {
+      if (optionsFound ||
+          getRange(pkgJSON, "devDependencies")) {
+        range = "*"
+      } else {
+        return null
+      }
+    }
+  }
+
+  if (pkgInfo) {
+    pkgInfo.options = PkgInfo.createOptions(options)
+    pkgInfo.range = range
+    return pkgInfo
+  }
+
+  return new PkgInfo(dirPath, range, options)
 }
 
 function toOptions(value) {
