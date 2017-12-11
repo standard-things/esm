@@ -51,6 +51,7 @@ class PkgInfo {
   static defaultOptions = defaultOptions
 
   constructor(dirPath, range, options) {
+    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     options = PkgInfo.createOptions(options)
 
     let cachePath = null
@@ -88,6 +89,8 @@ class PkgInfo {
     (shared.pkgInfo[optionsKey] = new FastObject)
 
   static get(dirPath, force) {
+    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
+
     let pkgInfo
 
     if (dirPath in PkgInfo.cache) {
@@ -126,6 +129,8 @@ class PkgInfo {
   }
 
   static read(dirPath, force) {
+    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
+
     let optionsPath
     let pkgInfo
 
@@ -221,6 +226,7 @@ class PkgInfo {
   }
 
   static set(dirPath, pkgInfo) {
+    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     PkgInfo.cache[dirPath] = pkgInfo
   }
 }
