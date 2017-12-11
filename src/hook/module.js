@@ -48,6 +48,8 @@ const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent, options) {
+  let defaultPkgInfo
+
   let allowTopLevelAwait =
     isObject(process.mainModule) &&
     satisfies(process.version, ">=7.6.0")
@@ -55,29 +57,35 @@ function hook(Mod, parent, options) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
-  const defaultPkgInfo = new PkgInfo("", "", { cache: false })
-  const defaultOptions = defaultPkgInfo.options
-
   const overwriteOptions = isObjectLike(options)
     ? PkgInfo.createOptions(options)
     : null
 
-  const parentPkgInfo = PkgInfo.from(parent, true)
-  const parentPkgOptions = assign(parentPkgInfo.options, overwriteOptions)
-
-  assign(defaultPkgInfo, parentPkgInfo)
-  defaultPkgInfo.options = assign(defaultOptions, parentPkgOptions)
-  defaultPkgInfo.range = "*"
-
-  if (parentPkgOptions.esm === "all") {
-    defaultPkgInfo.options.esm = "js"
-  }
-
   Module._extensions = _extensions
+
+  function getDefaultPkgInfo() {
+    if (defaultPkgInfo) {
+      return defaultPkgInfo
+    }
+
+    defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+    const defaultOptions = defaultPkgInfo.options
+    const parentPkgInfo = PkgInfo.from(parent, true)
+
+    assign(defaultPkgInfo, parentPkgInfo)
+    defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
+    defaultPkgInfo.range = "*"
+
+    if (defaultPkgInfo.options.esm === "all") {
+      defaultPkgInfo.options.esm = "js"
+    }
+
+    return defaultPkgInfo
+  }
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const pkgInfo = PkgInfo.get(dirname(filePath)) || defaultPkgInfo
+    const pkgInfo = PkgInfo.get(dirname(filePath)) || getDefaultPkgInfo()
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
 
     assign(pkgInfo.options, overwriteOptions)
@@ -170,7 +178,7 @@ function hook(Mod, parent, options) {
 
       if (! cached.changed &&
           ! overwriteOptions &&
-          pkgInfo === defaultPkgInfo) {
+          pkgInfo === getDefaultPkgInfo()) {
         tryPassthru.call(this, func, args, options)
         return
       }
