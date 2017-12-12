@@ -2,12 +2,15 @@ import MagicString from "../magic-string.js"
 import NullObject from "../null-object.js"
 import Visitor from "../visitor.js"
 
+import encodeId from "../util/encode-id.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import toStringLiteral from "../util/to-string-literal.js"
 
 const codeOfCR = "\r".charCodeAt(0)
 
 const { keys } = Object
+
+const functionPrefixRe = /^\s*(?:async\s*)?function(?:\s*\*)?/
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
@@ -123,14 +126,25 @@ class ImportExportVisitor extends Visitor {
     const { declaration } = node
     const { id, type } = declaration
 
-    if (id && (type === "FunctionDeclaration" ||
-               type === "ClassDeclaration")) {
+    if (type === "FunctionDeclaration" || (id && type === "ClassDeclaration")) {
+      const name = id ? id.name : encodeId("default")
+      if (! id) {
+        const source = this.code.slice(declaration.start, declaration.end)
+        const prefixLength = source.match(functionPrefixRe)[0].length
+
+        this.madeChanges = true
+        this.magicString.prependRight(
+          declaration.start + prefixLength,
+          " " + name
+        )
+      }
+
       // If the exported default value is a function or class declaration,
       // it's important that the declaration be visible to the rest of the
       // code in the exporting module, so we must avoid compiling it to a
       // named function or class expression.
       hoistExports(this, path,
-        addToSpecifierMap(new NullObject, "default", id.name),
+        addToSpecifierMap(new NullObject, "default", name),
         "declaration"
       )
 
