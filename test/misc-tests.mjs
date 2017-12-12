@@ -613,11 +613,25 @@ describe("spec compliance", () => {
     ))
   )
 
+  it("should error for missing modules before code execution", () =>
+    Promise.all([
+      "./fixture/import/missing-module-cjs.mjs",
+      "./fixture/import/missing-module-esm.mjs"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.strictEqual("loadCount" in global, false)
+          assert.strictEqual(e.code, "ERR_MISSING_MODULE")
+        })
+    ))
+  )
+
   it("should error when importing non-exported binding", () =>
     Promise.all([
-      "./fixture/import/missing-cjs.mjs",
-      "./fixture/import/missing-esm.mjs",
-      "./fixture/cycle/missing/a.mjs"
+      "./fixture/import/missing-export-cjs.mjs",
+      "./fixture/import/missing-export-esm.mjs",
+      "./fixture/cycle/missing-export/a.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
