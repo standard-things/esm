@@ -133,8 +133,10 @@ class ImportExportVisitor extends Visitor {
     const { declaration } = node
     const { id, type } = declaration
 
-    if (type === "FunctionDeclaration" || (id && type === "ClassDeclaration")) {
+    if (type === "FunctionDeclaration" ||
+        (id && type === "ClassDeclaration")) {
       const name = id ? id.name : encodeId("default")
+
       if (! id) {
         const source = this.code.slice(declaration.start, declaration.end)
         const prefixLength = source.match(functionPrefixRe)[0].length
@@ -154,7 +156,6 @@ class ImportExportVisitor extends Visitor {
         addToSpecifierMap(new NullObject, "default", name),
         "declaration"
       )
-
     } else {
       // Otherwise, since the exported value is an expression, we use the
       // special `runtime.default(value)` form.
@@ -419,16 +420,15 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
 
 function canExportedValuesChange({ declaration, type }) {
   if (type === "ExportDefaultDeclaration") {
-    return (declaration.type === "FunctionDeclaration" ||
-            declaration.type === "ClassDeclaration")
+    return declaration.type === "FunctionDeclaration" ||
+           declaration.type === "ClassDeclaration"
   }
 
-  if (type === "ExportNamedDeclaration") {
-    if (declaration &&
-        declaration.type === "VariableDeclaration" &&
-        declaration.kind === "const") {
-      return false
-    }
+  if (type === "ExportNamedDeclaration" &&
+      declaration &&
+      declaration.type === "VariableDeclaration" &&
+      declaration.kind === "const") {
+    return false
   }
 
   return true
