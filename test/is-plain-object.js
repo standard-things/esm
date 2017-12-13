@@ -1,7 +1,8 @@
 "use strict"
 
 function isPlainObject(object) {
-  return Object.getPrototypeOf(object) === Object.prototype
+  return object != null &&
+    Object.getPrototypeOf(object) === Object.prototype
 }
 
 module.exports = isPlainObject
