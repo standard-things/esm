@@ -9,8 +9,8 @@ const shadowedMap = new SafeWeakMap
 
 class AssignmentVisitor extends Visitor {
   reset(rootPath, options) {
-    this.exportedLocalNames = options.exportedLocalNames
-    this.importedLocalNames = options.importedLocalNames
+    this.assignableExports = options.assignableExports
+    this.assignableImports = options.assignableImports
     this.magicString = options.magicString
     this.runtimeName = options.runtimeName
   }
@@ -38,15 +38,14 @@ class AssignmentVisitor extends Visitor {
 }
 
 function assignmentHelper(visitor, path, childName) {
+  const { assignableExports, assignableImports } = visitor
   const node = path.getValue()
   const child = node[childName]
-  const exportedNames = visitor.exportedLocalNames
-  const importedNames = visitor.importedLocalNames
   const names = getNamesFromPattern(child)
 
   // Perform checks, which may throw errors, before source transformations.
   for (const name of names) {
-    if (importedNames[name] === true &&
+    if (assignableImports[name] === true &&
         ! isShadowed(path, name)) {
       const parser = {
         input: visitor.magicString.original,
@@ -60,7 +59,7 @@ function assignmentHelper(visitor, path, childName) {
 
   // Wrap assignments to exported identifiers with `runtime.update()`.
   for (const name of names) {
-    if (exportedNames[name] === true &&
+    if (assignableExports[name] === true &&
         ! isShadowed(path, name)) {
       wrap(visitor, path)
       return

@@ -65,9 +65,11 @@ class Entry {
     this.esmNamespace = this._namespace
     // The ES module type indicator.
     this.esm = isESM(exported)
+    // The names of bindings exported by the module.
+    this.exportNames = null
     // The `module.exports` of the module.
     this.exports = exported
-    // Getters for local variables exported from the module.
+    // Getters for local variables exported by the module.
     this.getters = new NullObject
     // The id of the module.
     this.id = mod.id
@@ -82,7 +84,7 @@ class Entry {
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
     // The child entry specifiers of the module.
-    this.specifiers = new NullObject
+    this.specifiers = null
     // The file url of the module.
     this.url = null
   }

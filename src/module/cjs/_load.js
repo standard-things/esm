@@ -13,7 +13,7 @@ function load(id, parent, isMain, preload) {
 
   if (parentSpecifiers &&
       id in parentSpecifiers) {
-    filePath = parentSpecifiers[id]
+    filePath = parentSpecifiers[id].filePath
   } else {
     filePath = Module._resolveFilename(id, parent, isMain)
   }

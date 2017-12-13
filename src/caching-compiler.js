@@ -7,6 +7,8 @@ import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
 const { compile } = Compiler
+const { keys } = Object
+const { stringify } = JSON
 
 class CachingCompiler {
   static compile(code, options) {
@@ -20,8 +22,29 @@ class CachingCompiler {
 }
 
 function compileAndCache(code, options) {
-  const result = compile(code, toCompileOptions(options))
-  options.pkgInfo.cache[options.cacheFileName] = result
+  const result =
+  options.pkgInfo.cache[options.cacheFileName] =
+  compile(code, toCompileOptions(options))
+
+  // Add "main" to enable the `readFileFast` fast path of
+  // `process.binding("fs").internalModuleReadJSON`.
+  let output = '"main";'
+
+  if (result.esm) {
+    const { specifiers } = result
+    const meta = { e: result.exportNames, s: {} }
+
+    for (const specifier in specifiers) {
+      meta.s[specifier] = keys(specifiers[specifier])
+    }
+
+    output = "'" + stringify(meta) + "';" + output
+  } else {
+    output = '"use script";' + output
+  }
+
+  result.code = output + result.code
+
   return result
 }
 
@@ -32,17 +55,12 @@ function compileAndWrite(code, options) {
     return result
   }
 
-  // Add "main" to enable `readFile` fast path.
-  const output =
-    (result.esm ? '"main";' : '"use script";"main";') +
-    result.code
-
   const { cache, dirPath:scopePath } = options.pkgInfo
   const cachePath = options.cachePath
   const cacheFileName = options.cacheFileName
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const isGzipped = extname(cacheFilePath) === ".gz"
-  const content = () => isGzipped ? gzip(output) : output
+  const content = () => isGzipped ? gzip(result.code) : result.code
   const encoding = isGzipped ? null : "utf8"
   const writeOptions = { encoding, scopePath }
 

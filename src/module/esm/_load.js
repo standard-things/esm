@@ -27,7 +27,7 @@ function load(id, parent, isMain, preload) {
 
   if (parentSpecifiers &&
       id in parentSpecifiers) {
-    filePath = parentSpecifiers[id]
+    filePath = parentSpecifiers[id].filePath
   } else if (Module._resolveFilename !== moduleResolveFilename &&
       parentOptions && parentOptions.cjs.paths) {
     filePath = Module._resolveFilename(id, parent, isMain)

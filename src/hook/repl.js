@@ -53,35 +53,33 @@ function hook(vm) {
 
     const cache = pkgInfo.cache
     const cacheFileName = getCacheFileName("", sourceCode, pkgInfo)
-    const cacheValue = cache[cacheFileName]
 
-    let content
+    let cached = cache[cacheFileName]
 
-    if (isObject(cacheValue)) {
-      content = cacheValue.code
+    if (isObject(cached)) {
       if (scriptOptions.produceCachedData === true &&
           scriptOptions.cachedData === void 0 &&
-          cacheValue.data !== void 0) {
-        scriptOptions.cachedData = cacheValue.data
+          cached.data !== void 0) {
+        scriptOptions.cachedData = cached.data
       }
     } else {
-      const compilerOptions = {
+      cached = tryWrapper(compile, [sourceCode, {
         cacheFileName,
         pkgInfo,
         runtimeName,
         type: "unambiguous",
         var: true,
         warnings: false
-      }
-
-      content = tryWrapper(compile, [sourceCode, compilerOptions]).code
+      }])
     }
 
-    resolveSpecifiers(mod, content)
+    if (cached.esm) {
+      resolveSpecifiers(mod, cached.code)
+    }
 
-    content =
+    const content =
       '"use strict";var ' + runtimeName + "=" + runtimeName +
-      "||[module.exports,module.exports=module.exports.entry.exports][0];" + content
+      "||[module.exports,module.exports=module.exports.entry.exports][0];" + cached.code
 
     const result = tryWrapper(func, [content, scriptOptions])
 

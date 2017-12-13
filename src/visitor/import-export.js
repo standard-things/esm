@@ -31,16 +31,18 @@ class ImportExportVisitor extends Visitor {
     this.addedDynamicImport = false
     this.addedImportExport = false
     this.addedImportMeta = false
+    this.assignableExports = new NullObject
+    this.assignableImports = new NullObject
     this.bodyInfo = null
     this.changed = false
     this.code = code
     this.esm = options.esm,
-    this.exportedLocalNames = new NullObject
+    this.exportNames = []
     this.generateVarDeclarations = options.generateVarDeclarations
-    this.importedLocalNames = new NullObject
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeName = options.runtimeName
+    this.specifiers = new NullObject
   }
 
   visitCallExpression(path) {
@@ -86,7 +88,7 @@ class ImportExportVisitor extends Visitor {
     )
 
     hoistImports(this, path, hoistedCode)
-    addImportedLocalNames(this, specifierMap)
+    addAssignableImports(this, specifierMap)
   }
 
   visitExportAllDeclaration(path) {
@@ -98,10 +100,15 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = true
 
     const node = path.getValue()
+    const specifierString = getSourceString(this, node)
+    const specifierName = specifierString.slice(1, -1)
+
+    this.specifiers[specifierName] = addNameToMap(new NullObject, "*")
+
     const { source } = node
     const hoistedCode = pad(
       this,
-      this.runtimeName + ".w(" + getSourceString(this, node),
+      this.runtimeName + ".w(" + specifierString,
       node.start,
       source.start
     ) + pad(
@@ -201,12 +208,12 @@ class ImportExportVisitor extends Visitor {
 
       hoistExports(this, path, specifierMap, "declaration")
 
-      // Skip adding declared names to this.exportedLocalNames if the
+      // Skip adding declared names to this.assignableExports if the
       // declaration is a const-kinded VariableDeclaration, because the
       // assignmentVisitor doesn't need to worry about changes to these
       // variables.
       if (canExportedValuesChange(node)) {
-        addExportedLocalNames(this, specifierMap)
+        addAssignableExports(this, specifierMap)
       }
 
       return
@@ -222,7 +229,7 @@ class ImportExportVisitor extends Visitor {
 
     if (node.source == null) {
       hoistExports(this, path, specifierMap)
-      addExportedLocalNames(this, specifierMap)
+      addAssignableExports(this, specifierMap)
       return
     }
 
@@ -261,8 +268,8 @@ class ImportExportVisitor extends Visitor {
   }
 }
 
-function addExportedLocalNames(visitor, specifierMap) {
-  const { exportedLocalNames } = visitor
+function addAssignableExports(visitor, specifierMap) {
+  const { assignableExports } = visitor
   const names = keys(specifierMap)
 
   for (const name of names) {
@@ -273,25 +280,25 @@ function addExportedLocalNames(visitor, specifierMap) {
     // per local variable, and we don't actually use the exported
     // name(s) in the assignmentVisitor, so it's not worth the added
     // complexity of tracking unused information.
-    exportedLocalNames[locals[0]] = true
+    assignableExports[locals[0]] = true
   }
 }
 
-function addImportedLocalNames(visitor, specifierMap) {
-  const { importedLocalNames } = visitor
+function addAssignableImports(visitor, specifierMap) {
+  const { assignableImports } = visitor
   const names = keys(specifierMap)
 
   for (const name of names) {
     const locals = keys(specifierMap[name])
 
     for (const local of locals) {
-      importedLocalNames[local] = true
+      assignableImports[local] = true
     }
   }
 }
 
 function addNameToMap(map, name) {
-  addToSpecifierMap(map, name, name)
+  return addToSpecifierMap(map, name, name)
 }
 
 function addToSpecifierMap(map, __ported, local) {
@@ -491,10 +498,13 @@ function safeParam(param, locals) {
   return locals.indexOf(param) === -1 ? param : safeParam("_" + param, locals)
 }
 
-function toModuleImport(visitor, code, specifierMap) {
+function toModuleImport(visitor, specifierString, specifierMap) {
   const names = keys(specifierMap)
+  const specifierName = specifierString.slice(1, -1)
 
-  code = visitor.runtimeName + ".w(" + code
+  visitor.specifiers[specifierName] = specifierMap
+
+  let code = visitor.runtimeName + ".w(" + specifierString
 
   if (! names.length) {
     return code + ");"
@@ -537,12 +547,15 @@ function toModuleExport(visitor, specifierMap) {
   }
 
   let i = -1
+  const { exportNames } = visitor
   const lastIndex = names.length - 1
 
   code += visitor.runtimeName + ".e(["
 
   for (const name of names) {
     const locals = keys(specifierMap[name])
+
+    exportNames.push(name)
 
     code +=
       "[" + toStringLiteral(name) + ",()=>" +

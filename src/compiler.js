@@ -36,6 +36,8 @@ class Compiler {
       code,
       data: null,
       esm: false,
+      exportNames: null,
+      specifiers: null,
       warnings: null
     }
 
@@ -99,13 +101,16 @@ class Compiler {
     result.changed = importExportVisitor.changed
 
     if (importExportVisitor.addedImportExport) {
+      result.exportNames = importExportVisitor.exportNames
+      result.specifiers = importExportVisitor.specifiers
+
       if (type === "unambiguous") {
         type = "module"
       }
 
       assignmentVisitor.visit(rootPath, {
-        exportedLocalNames: importExportVisitor.exportedLocalNames,
-        importedLocalNames: importExportVisitor.importedLocalNames,
+        assignableExports: importExportVisitor.assignableExports,
+        assignableImports: importExportVisitor.assignableImports,
         magicString: importExportVisitor.magicString,
         runtimeName
       })

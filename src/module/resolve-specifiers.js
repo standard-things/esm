@@ -1,19 +1,26 @@
 import Entry from "../entry.js"
+import NullObject from "../null-object.js"
 
 import resolveFilename from "./esm/resolve-filename.js"
 
+const { keys } = Object
+const { parse } = JSON
+
 function resolveSpecifiers(mod, content) {
-  const { runtimeName, specifiers } = Entry.get(mod)
+  const entry = Entry.get(mod)
+  const line = content.slice(1, content.indexOf("'", 1))
+  const meta = parse(line)
+  const names = keys(meta.s)
 
-  content
-    // Slice the first line of content.
-    .slice(0, content.indexOf("\n"))
-    // Scan for static import specifiers to resolve.
-    .replace(RegExp(runtimeName + '.w\\("([^"]+)', "g"), (match, specifier) => {
-      specifiers[specifier] = resolveFilename(specifier, mod)
-    })
+  entry.exportNames = meta.e
+  entry.specifiers = new NullObject
 
-  return specifiers
+  for (const name of names) {
+    const specifier =
+    entry.specifiers[name] = new NullObject
+    specifier.exportNames = meta.s[names]
+    specifier.filePath = resolveFilename(name, mod)
+  }
 }
 
 export default resolveSpecifiers
