@@ -313,20 +313,22 @@ function addToSpecifierMap(map, __ported, local) {
 function computeSpecifierMap(specifiers) {
   const specifierMap = new NullObject
 
-  for (const s of specifiers) {
-    const local =
-      s.type === "ExportDefaultSpecifier" ? "default" :
-      s.type === "ExportNamespaceSpecifier" ? "*" :
-      s.local.name
+  for (const specifier of specifiers) {
+    const local = specifier.local.name
+    const { type } = specifier
 
-    const __ported = // The IMported or EXported name.
-      s.type === "ImportSpecifier" ? s.imported.name :
-      s.type === "ImportDefaultSpecifier" ? "default" :
-      s.type === "ImportNamespaceSpecifier" ? "*" :
-      (s.type === "ExportSpecifier" ||
-       s.type === "ExportDefaultSpecifier" ||
-       s.type === "ExportNamespaceSpecifier") ? s.exported.name :
-      null
+    // The IMported or EXported name.
+    let __ported = null
+
+    if (type === "ImportSpecifier") {
+      __ported = specifier.imported.name
+    } else if (type === "ImportDefaultSpecifier") {
+      __ported = "default"
+    } else if (type === "ImportNamespaceSpecifier") {
+      __ported = "*"
+    } else if (type === "ExportSpecifier") {
+      __ported = specifier.exported.name
+    }
 
     if (typeof local === "string" &&
         typeof __ported === "string") {
