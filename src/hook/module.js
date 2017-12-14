@@ -24,7 +24,6 @@ import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
-import hasPragma from "../parse/has-pragma.js"
 import isError from "../util/is-error.js"
 import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
@@ -128,20 +127,19 @@ function hook(Mod, parent, options) {
 
     if (cached === true) {
       const code = readCachedCode(resolve(cachePath, cacheFileName), options)
+      const entry = Entry.get(mod)
 
       if (code === null) {
         cached = null
         delete cache[cacheFileName]
       } else {
-        if (type === "unambiguous") {
-          type = hasPragma(code, "use script") ? "script" : "module"
-        }
+        resolveSpecifiers(mod, code)
 
         cached =
         cache[cacheFileName] = {
           changed: true,
           code,
-          esm: type === "module"
+          esm: entry.esm
         }
       }
     }
@@ -304,8 +302,6 @@ function hook(Mod, parent, options) {
         async = "async "
       }
     }
-
-    resolveSpecifiers(mod, content)
 
     content =
       '"use strict";const ' + runtimeName + "=this;" +
