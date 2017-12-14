@@ -38,9 +38,7 @@ function compileAndCache(code, options) {
       meta.s[specifier] = keys(specifiers[specifier])
     }
 
-    output = "'" + stringify(meta) + "';" + output
-  } else {
-    output = '"use script";' + output
+    output += "/*" + stringify(meta) + "*/"
   }
 
   result.code = output + result.code
