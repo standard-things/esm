@@ -247,7 +247,8 @@ function readInfo(dirPath, force) {
         gz: true
       })
 
-      options = _loadESM(optionsPath, null, false).exports
+      pkgInfo.options =
+      PkgInfo.createOptions(_loadESM(optionsPath, null, false).exports)
     }
   }
 
@@ -307,9 +308,12 @@ function readInfo(dirPath, force) {
   }
 
   if (pkgInfo) {
-    pkgInfo.options = PkgInfo.createOptions(options)
     pkgInfo.range = range
     return pkgInfo
+  }
+
+  if (! optionsFound) {
+    options = process.env.ESM_OPTIONS
   }
 
   return new PkgInfo(dirPath, range, options)
