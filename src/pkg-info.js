@@ -37,7 +37,7 @@ const defaultOptions = {
   esm: "mjs",
   gz: false,
   sourceMap: void 0,
-  warnings: process.env.NODE_ENV !== "production"
+  warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
 
 const defaultCJS = defaultOptions.cjs
@@ -313,7 +313,7 @@ function readInfo(dirPath, force) {
   }
 
   if (! optionsFound) {
-    options = process.env.ESM_OPTIONS
+    options = process.env && process.env.ESM_OPTIONS
   }
 
   return new PkgInfo(dirPath, range, options)

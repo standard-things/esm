@@ -15,7 +15,7 @@ const defaultOptions = {
   runtimeName: "_",
   type: "script",
   var: false,
-  warnings: process.env.NODE_ENV !== "production"
+  warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
 
 const argumentsRegExp = /\barguments\b/

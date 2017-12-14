@@ -41,7 +41,7 @@ function hook(Mod) {
     defaultPkgInfo.options.esm = "js"
   }
 
-  let { ESM_OPTIONS } = process.env
+  let ESM_OPTIONS = process.env && process.env.ESM_OPTIONS
 
   if (ESM_OPTIONS) {
     ESM_OPTIONS = ESM_OPTIONS.trim()
