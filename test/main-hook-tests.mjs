@@ -70,13 +70,19 @@ describe("module.runMain hook", function () {
     ].reduce((promise, ESM_OPTIONS) =>
       promise
         .then(() => runMain("./node_modules/esm-options", { ESM_OPTIONS }))
-        .then((result) => assert.ok(result.stdout.includes("esm-options:true")))
+        .then((result) => {
+          assert.strictEqual(result.stderr, "")
+          assert.ok(result.stdout.includes("esm-options:true"))
+        })
     , Promise.resolve())
   )
 
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main/dynamic-import.js")
-      .then((result) => assert.ok(result.stdout.includes("dynamic-import-js:true")))
+      .then((result) => {
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("dynamic-import-js:true"))
+      })
   )
 
   it("should support `import.meta.url`", () =>
@@ -91,7 +97,10 @@ describe("module.runMain hook", function () {
 
   it("should not set `process.mainModule`", () =>
     runMain("./fixture/main/main-module.mjs")
-      .then((result) => assert.ok(result.stdout.includes("main-module:false")))
+      .then((result) => {
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("main-module:false"))
+      })
   )
 
   ;(canTestMissingModuleErrors ? it : xit)(
