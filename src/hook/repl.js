@@ -16,7 +16,6 @@ import resolveSpecifiers from "../module/resolve-specifiers.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
-const { compile } = Compiler
 const { now } = Date
 
 function hook(vm) {
@@ -63,7 +62,7 @@ function hook(vm) {
         scriptOptions.cachedData = cached.data
       }
     } else {
-      cached = tryWrapper(compile, [sourceCode, {
+      cached = tryWrapper(Compiler.compile, [sourceCode, {
         cacheFileName,
         pkgInfo,
         runtimeName,

@@ -39,7 +39,6 @@ import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
-const { compile } = Compiler
 const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
@@ -263,11 +262,11 @@ function hook(Mod, parent, options) {
     const { filePath, pkgInfo } = options
 
     if (pkgInfo.options.debug) {
-      return compile(sourceCode, options)
+      return Compiler.compile(sourceCode, options)
     }
 
     try {
-      return compile(sourceCode, options)
+      return Compiler.compile(sourceCode, options)
     } catch (e) {
       const useURLs = e.sourceType === "module"
 

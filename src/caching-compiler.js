@@ -6,7 +6,6 @@ import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
-const { compile } = Compiler
 const { keys } = Object
 const { stringify } = JSON
 
@@ -24,7 +23,7 @@ class CachingCompiler {
 function compileAndCache(code, options) {
   const result =
   options.pkgInfo.cache[options.cacheFileName] =
-  compile(code, toCompileOptions(options))
+  Compiler.compile(code, toCompileOptions(options))
 
   // Add "main" to enable the `readFileFast` fast path of
   // `process.binding("fs").internalModuleReadJSON`.
