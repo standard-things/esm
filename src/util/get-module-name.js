@@ -1,6 +1,10 @@
 function getModuleName(mod) {
-  const { filename } = mod
-  return typeof filename === "string" ? filename : mod.id
+  if (mod) {
+    const { filename } = mod
+    return typeof filename === "string" ? filename : mod.id
+  }
+
+  return ""
 }
 
 export default getModuleName
