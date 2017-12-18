@@ -1,4 +1,5 @@
 import FastPath from "./fast-path.js"
+import NullObject from "./null-object.js"
 import Parser from "./parser.js"
 import PkgInfo from "./pkg-info.js"
 
@@ -8,6 +9,8 @@ import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
+
+const { keys } = Object
 
 const defaultOptions = {
   cjs: PkgInfo.defaultOptions.cjs,
@@ -37,7 +40,8 @@ class Compiler {
       data: null,
       esm: false,
       exportNames: null,
-      specifiers: null,
+      exportStarSpecifiers: null,
+      moduleSpecifiers: null,
       warnings: null
     }
 
@@ -101,9 +105,6 @@ class Compiler {
     result.changed = importExportVisitor.changed
 
     if (importExportVisitor.addedImportExport) {
-      result.exportNames = importExportVisitor.exportNames
-      result.specifiers = importExportVisitor.specifiers
-
       if (type === "unambiguous") {
         type = "module"
       }
@@ -119,7 +120,17 @@ class Compiler {
     }
 
     if (type === "module") {
+      const { moduleSpecifiers } = importExportVisitor
+      const specifierMap = new NullObject
+
+      for (const specifier in moduleSpecifiers) {
+        specifierMap[specifier] = keys(moduleSpecifiers[specifier])
+      }
+
       result.esm = true
+      result.exportNames = importExportVisitor.exportNames
+      result.exportStarSpecifiers = importExportVisitor.exportStarSpecifiers
+      result.moduleSpecifiers = specifierMap
 
       if (options.warnings &&
           ! options.cjs.vars &&

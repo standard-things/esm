@@ -34,12 +34,13 @@ class ImportExportVisitor extends Visitor {
     this.code = code
     this.esm = options.esm,
     this.exportNames = []
+    this.exportStarSpecifiers = []
     this.generateVarDeclarations = options.generateVarDeclarations
     this.info = rootPath.stack[0].info
     this.madeChanges = false
     this.magicString = new MagicString(code)
+    this.moduleSpecifiers = new NullObject
     this.runtimeName = options.runtimeName
-    this.specifiers = new NullObject
   }
 
   visitCallExpression(path) {
@@ -93,16 +94,12 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    this.changed =
-    this.addedImportExport = true
-
+    const { moduleSpecifiers } = this
     const node = path.getValue()
+    const { source } = node
     const specifierString = getSourceString(this, node)
     const specifierName = specifierString.slice(1, -1)
 
-    this.specifiers[specifierName] = addNameToMap(new NullObject, "*")
-
-    const { source } = node
     const hoistedCode = pad(
       this,
       this.runtimeName + ".w(" + specifierString,
@@ -114,6 +111,15 @@ class ImportExportVisitor extends Visitor {
       source.end,
       node.end
     )
+
+    this.changed =
+    this.addedImportExport = true
+
+    this.exportStarSpecifiers.push(specifierName)
+
+    if (! (specifierName in moduleSpecifiers)) {
+      moduleSpecifiers[specifierName] = new NullObject
+    }
 
     hoistExports(this, path, hoistedCode)
   }
@@ -228,11 +234,14 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    const newMap = new NullObject
+    const { exportNames } = this
     const names = keys(specifierMap)
+    const newMap = new NullObject
 
     for (const name of names) {
       const locals = keys(specifierMap[name])
+
+      exportNames.push(name)
 
       addToSpecifierMap(
         newMap,
@@ -457,7 +466,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
   const names = keys(specifierMap)
   const specifierName = specifierString.slice(1, -1)
 
-  visitor.specifiers[specifierName] = specifierMap
+  visitor.moduleSpecifiers[specifierName] = specifierMap
 
   let code = visitor.runtimeName + ".w(" + specifierString
 
@@ -493,17 +502,16 @@ function toModuleImport(visitor, specifierString, specifierMap) {
 }
 
 function toModuleExport(visitor, specifierMap) {
-  const names = keys(specifierMap)
-
   let code = ""
+  const names = keys(specifierMap)
 
   if (! names.length) {
     return code
   }
 
   let i = -1
-  const { exportNames } = visitor
   const lastIndex = names.length - 1
+  const { exportNames } = visitor
 
   code += visitor.runtimeName + ".e(["
 
