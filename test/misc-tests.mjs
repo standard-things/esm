@@ -19,7 +19,7 @@ const pkgPath = require.resolve("../")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : {}
+  : pkgJSON["@std/esm"]
 
 const abcId = "./fixture/export/abc.mjs"
 const abcNs = createNamespace({
