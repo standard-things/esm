@@ -30,8 +30,8 @@ class CachingCompiler {
     const meta = parse(line)
     const result = new NullObject
 
-    result.exportNames = meta.e
-    result.exportStarSpecifiers = meta.a
+    result.exportSpecifiers = meta.e
+    result.exportStarNames = meta.a
     result.moduleSpecifiers = meta.s
     return result
   }
@@ -50,8 +50,8 @@ function compileAndCache(code, options) {
     output +=
       "/*" +
       stringify({
-        a: result.exportStarSpecifiers,
-        e: result.exportNames,
+        a: result.exportStarNames,
+        e: result.exportSpecifiers,
         s: result.moduleSpecifiers
       }) +
       "*/"

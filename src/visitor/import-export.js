@@ -33,8 +33,8 @@ class ImportExportVisitor extends Visitor {
     this.changed = false
     this.code = code
     this.esm = options.esm,
-    this.exportNames = []
-    this.exportStarSpecifiers = []
+    this.exportSpecifiers = new NullObject
+    this.exportStarNames = []
     this.generateVarDeclarations = options.generateVarDeclarations
     this.info = rootPath.stack[0].info
     this.madeChanges = false
@@ -115,7 +115,7 @@ class ImportExportVisitor extends Visitor {
     this.changed =
     this.addedImportExport = true
 
-    this.exportStarSpecifiers.push(specifierName)
+    this.exportStarNames.push(specifierName)
 
     if (! (specifierName in moduleSpecifiers)) {
       moduleSpecifiers[specifierName] = new NullObject
@@ -234,14 +234,14 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    const { exportNames } = this
+    const { exportSpecifiers } = this
     const names = keys(specifierMap)
     const newMap = new NullObject
 
     for (const name of names) {
       const locals = keys(specifierMap[name])
 
-      exportNames.push(name)
+      exportSpecifiers[name] = true
 
       addToSpecifierMap(
         newMap,
@@ -511,14 +511,14 @@ function toModuleExport(visitor, specifierMap) {
 
   let i = -1
   const lastIndex = names.length - 1
-  const { exportNames } = visitor
+  const { exportSpecifiers } = visitor
 
   code += visitor.runtimeName + ".e(["
 
   for (const name of names) {
     const locals = keys(specifierMap[name])
 
-    exportNames.push(name)
+    exportSpecifiers[name] = true
 
     code +=
       "[" + toStringLiteral(name) + ",()=>" +

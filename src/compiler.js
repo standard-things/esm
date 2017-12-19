@@ -39,8 +39,8 @@ class Compiler {
       code,
       data: null,
       esm: false,
-      exportNames: null,
-      exportStarSpecifiers: null,
+      exportSpecifiers: null,
+      exportStarNames: null,
       moduleSpecifiers: null,
       warnings: null
     }
@@ -128,8 +128,8 @@ class Compiler {
       }
 
       result.esm = true
-      result.exportNames = importExportVisitor.exportNames
-      result.exportStarSpecifiers = importExportVisitor.exportStarSpecifiers
+      result.exportSpecifiers = importExportVisitor.exportSpecifiers
+      result.exportStarNames = importExportVisitor.exportStarNames
       result.moduleSpecifiers = specifierMap
 
       if (options.warnings &&
