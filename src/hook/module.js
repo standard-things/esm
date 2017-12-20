@@ -32,7 +32,6 @@ import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
-import resolveSpecifiers from "../module/resolve-specifiers.js"
 import { satisfies } from "semver"
 import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
@@ -126,19 +125,16 @@ function hook(Mod, parent, options) {
 
     if (cached === true) {
       const code = readCachedCode(resolve(cachePath, cacheFileName), options)
-      const entry = Entry.get(mod)
 
       if (code === null) {
         cached = null
         delete cache[cacheFileName]
       } else {
-        resolveSpecifiers(mod, code)
-
         cached =
         cache[cacheFileName] = {
           changed: true,
           code,
-          esm: entry.esm
+          esm: !! Compiler.getMeta(code)
         }
       }
     }

@@ -12,7 +12,6 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
-import resolveSpecifiers from "../module/resolve-specifiers.js"
 import rootModule from "../root-module.js"
 import wrap from "../util/wrap.js"
 
@@ -70,10 +69,6 @@ function hook(vm) {
         var: true,
         warnings: false
       }])
-    }
-
-    if (cached.esm) {
-      resolveSpecifiers(mod, cached.code)
     }
 
     const content =
