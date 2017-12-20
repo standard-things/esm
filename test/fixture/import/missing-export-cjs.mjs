@@ -1,1 +1,1 @@
-import { NOT_EXPORTED } from "../export/abc.mjs"
+import { NOT_EXPORTED } from "../export/def.js"
