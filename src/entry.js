@@ -24,6 +24,8 @@ const { sort } = Array.prototype
 const { toStringTag } = Symbol
 
 const messages = new FastObject
+messages["ERR_EXPORT_MISSING"] = exportMissing
+messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
 messages["WRN_NS_ASSIGNMENT"] = namespaceAssignment
 messages["WRN_NS_EXTENSION"] = namespaceExtension
 messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
@@ -389,6 +391,18 @@ function createNamespace() {
     : namespace
 }
 
+function exportMissing(entry, name) {
+  const moduleName = getModuleName(entry.module)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " does not provide an export named '" + name + "'"
+}
+
+function exportStarConflict(entry, name) {
+  const moduleName = getModuleName(entry.module)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " contains conflicting star exports for name '" + name + "'"
+}
+
 function getExportByName(entry, setter, name) {
   const isScript =
     ! entry.esm &&
@@ -398,7 +412,22 @@ function getExportByName(entry, setter, name) {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
   }
 
-  return entry._namespace[name]
+  if ((isScript &&
+       name !== "default") ||
+      (entry._loaded === 1 &&
+       ! (name in entry.getters))) {
+    // Remove problematic setter to unblock subsequent imports.
+    delete entry.setters[name]
+    raise("ERR_EXPORT_MISSING", entry, name)
+  }
+
+  const value = entry._namespace[name]
+
+  if (value === STAR_ERROR) {
+    raise("ERR_EXPORT_STAR_CONFLICT", entry, name)
+  }
+
+  return value
 }
 
 function mergeProperty(entry, otherEntry, key) {
@@ -451,6 +480,10 @@ function namespaceAssignment(entry, name) {
 function namespaceExtension(entry, name) {
   return "@std/esm cannot add property " + toStringLiteral(name, "'") +
     " to module namespace of " + getModuleName(entry.module)
+}
+
+function raise(key, entry, name) {
+  throw new SyntaxError(messages[key](entry, name))
 }
 
 function runGetter(entry, name) {
