@@ -10,8 +10,6 @@ const codeOfCR = "\r".charCodeAt(0)
 
 const { keys } = Object
 
-const functionPrefixRe = /^\s*(?:async\s*)?function(?:\s*\*)?/
-
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
     if (this.bodyInfo === null) {
@@ -131,19 +129,16 @@ class ImportExportVisitor extends Visitor {
 
     const node = path.getValue()
     const { declaration } = node
-    const { id, type } = declaration
+    const { id, type, functionParamsStart } = declaration
 
     if (type === "FunctionDeclaration" ||
         (id && type === "ClassDeclaration")) {
       const name = id ? id.name : encodeId("default")
 
       if (! id) {
-        const source = this.code.slice(declaration.start, declaration.end)
-        const prefixLength = source.match(functionPrefixRe)[0].length
-
         this.madeChanges = true
         this.magicString.prependRight(
-          declaration.start + prefixLength,
+          functionParamsStart,
           " " + name
         )
       }
