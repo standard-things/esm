@@ -2,7 +2,9 @@ _.e([["default",()=>default]]);
 
 
 
-async /* Comment 3 */  function 
-/* Comment 4
-*/ // Comment 5
+
+async /* Comment three. */ function
+/*
+Comment four.
+*/ // Comment five.
  default() {}
