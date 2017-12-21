@@ -8,25 +8,24 @@ import path from "path"
 const compile = Compiler.compile
 const files = globby.sync(["output/**/*.mjs"])
 const tests = files
-  .reduce((tests, relPath) => {
-    const parts = relPath.split("/")
-    const name = parts[1]
-    const type = path.basename(parts[2], ".mjs")
+  .reduce((tests, thePath) => {
+    const dirPath = path.dirname(thePath)
+    const type = path.basename(thePath, ".mjs")
 
-    if (! tests[name]) {
-      tests[name] = Object.create(null)
+    if (! tests[dirPath]) {
+      tests[dirPath] = Object.create(null)
     }
 
-    tests[name][type] = fs.readFileSync(relPath, "utf8")
+    tests[dirPath][type] = fs.readFileSync(thePath, "utf8")
     return tests
   }, Object.create(null))
 
 describe("output", () =>
   Object
     .keys(tests)
-    .forEach((name) => {
-      const test = tests[name]
-      name = name.split("-").join(" ")
+    .forEach((dirPath) => {
+      const name = path.basename(dirPath).split("-").join(" ")
+      const test = tests[dirPath]
 
       it(`compiles ${name} example as expected`, () => {
         // Remove zero-width joiners and trim trailing whitespace.
