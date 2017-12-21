@@ -5,9 +5,10 @@ function enable(parser) {
   return parser
 }
 
-function parseFunctionParams(func, [ node ]) {
+function parseFunctionParams(func, args) {
+  const [node] = args
   node.functionParamsStart = this.start
-  return func.call(this, node)
+  return func.apply(this, args)
 }
 
 export { enable }
