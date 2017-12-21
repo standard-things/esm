@@ -130,7 +130,8 @@ class ImportExportVisitor extends Visitor {
     }
 
     this.changed =
-    this.addedImportExport = true
+    this.addedImportExport =
+    this.exportSpecifiers.default = true
 
     const node = path.getValue()
     const { declaration } = node
