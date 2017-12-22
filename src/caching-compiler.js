@@ -1,13 +1,15 @@
 import { extname, resolve } from "path"
 
 import Compiler from "./compiler.js"
+import NullObject from "./null-object.js"
 
 import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
-const { keys } = Object
-const { stringify } = JSON
+const codeOfSlash = "/".charCodeAt(0)
+
+const { stringify, parse } = JSON
 
 class CachingCompiler {
   static compile(code, options) {
@@ -17,6 +19,21 @@ class CachingCompiler {
     }
 
     return compileAndCache(code, options)
+  }
+
+  static getMeta(code) {
+    if (code.charCodeAt(7) !== codeOfSlash) {
+      return null
+    }
+
+    const line = code.slice(9, code.indexOf("*/", 10))
+    const meta = parse(line)
+    const result = new NullObject
+
+    result.exportNames = meta.e
+    result.exportStarSpecifiers = meta.a
+    result.moduleSpecifiers = meta.s
+    return result
   }
 }
 
@@ -30,14 +47,14 @@ function compileAndCache(code, options) {
   let output = '"main";'
 
   if (result.esm) {
-    const { specifiers } = result
-    const meta = { e: result.exportNames, s: {} }
-
-    for (const specifier in specifiers) {
-      meta.s[specifier] = keys(specifiers[specifier])
-    }
-
-    output += "/*" + stringify(meta) + "*/"
+    output +=
+      "/*" +
+      stringify({
+        a: result.exportStarSpecifiers,
+        e: result.exportNames,
+        s: result.moduleSpecifiers
+      }) +
+      "*/"
   }
 
   result.code = output + result.code
