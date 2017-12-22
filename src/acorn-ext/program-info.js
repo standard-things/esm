@@ -25,7 +25,7 @@ function parseTopLevel(node) {
 
   while (this.type !== tt.eof) {
     const stmt = this.parseStatement(true, true, exported)
-    const { expression, type } = stmt
+    let { expression, type } = stmt
 
     if (! inited) {
       // Avoid hoisting above string literal expression statements such as
@@ -42,8 +42,15 @@ function parseTopLevel(node) {
       }
     }
 
+    let object = stmt
+
+    if (type === "ExportNameDeclaration") {
+      object = stmt.declaration
+      type = object.type
+    }
+
     if (type === "VariableDeclaration") {
-      for (const decl of stmt.declarations) {
+      for (const decl of object.declarations) {
         const names = getNamesFromPattern(decl.id)
 
         for (const name of names) {
@@ -53,6 +60,10 @@ function parseTopLevel(node) {
     } else if (type === "ClassDeclaration" ||
         type === "FunctionDeclaration") {
       idents.push(stmt.id.name)
+    } else if (type === "ImportDeclaration") {
+      for (const specifier of stmt.specifiers) {
+        idents.push(specifier.local.name)
+      }
     }
 
     body.push(stmt)
