@@ -7,6 +7,7 @@ import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
 import { enable as enableFunctionParamsStart } from "./acorn-ext/function-params-start.js"
 import { enable as enableHTMLComment } from "./acorn-ext/html-comment.js"
 import { enable as enableObjectRestSpread } from "./acorn-ext/object-rest-spread.js"
+import { enable as enableProgramInfo } from "./acorn-ext/program-info.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 
 const defaultOptions = {
@@ -36,6 +37,7 @@ function extend(parser) {
   enableFunctionParamsStart(parser)
   enableHTMLComment(parser)
   enableObjectRestSpread(parser)
+  enableProgramInfo(parser)
   enableTolerance(parser)
 
   return parser

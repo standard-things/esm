@@ -6,23 +6,22 @@ import encodeId from "../util/encode-id.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import toStringLiteral from "../util/to-string-literal.js"
 
+const ANON_NAME = encodeId("default")
+
 const codeOfCR = "\r".charCodeAt(0)
 
 const { keys } = Object
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
-    if (this.bodyInfo === null) {
-      return
-    }
-
+    const { info } = this
     const codeToInsert =
-      this.bodyInfo.hoistedPrefixString +
-      toModuleExport(this, this.bodyInfo.hoistedExportsMap) +
-      this.bodyInfo.hoistedExportsString +
-      this.bodyInfo.hoistedImportsString
+      info.hoistedPrefixString +
+      toModuleExport(this, info.hoistedExportsMap) +
+      info.hoistedExportsString +
+      info.hoistedImportsString
 
-    this.magicString.prependRight(this.bodyInfo.insertCharIndex, codeToInsert)
+    this.magicString.prependRight(info.insertCharIndex, codeToInsert)
   }
 
   reset(rootPath, code, options) {
@@ -31,12 +30,12 @@ class ImportExportVisitor extends Visitor {
     this.addedImportMeta = false
     this.assignableExports = new NullObject
     this.assignableImports = new NullObject
-    this.bodyInfo = null
     this.changed = false
     this.code = code
     this.esm = options.esm,
     this.exportNames = []
     this.generateVarDeclarations = options.generateVarDeclarations
+    this.info = rootPath.stack[0].info
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.runtimeName = options.runtimeName
@@ -133,7 +132,7 @@ class ImportExportVisitor extends Visitor {
 
     if (type === "FunctionDeclaration" ||
         (id && type === "ClassDeclaration")) {
-      const name = id ? id.name : encodeId("default")
+      const name = id ? id.name : safeName(ANON_NAME, this.info.idents)
 
       if (! id) {
         this.madeChanges = true
@@ -193,8 +192,8 @@ class ImportExportVisitor extends Visitor {
                  type === "FunctionDeclaration")) {
         addNameToMap(specifierMap, id.name)
       } else if (type === "VariableDeclaration") {
-        for (const varDecl of declaration.declarations) {
-          const names = getNamesFromPattern(varDecl.id)
+        for (const decl of declaration.declarations) {
+          const names = getNamesFromPattern(decl.id)
 
           for (const name of names) {
             addNameToMap(specifierMap, name)
@@ -334,71 +333,28 @@ function computeSpecifierMap(specifiers) {
   return specifierMap
 }
 
-function getBlockBodyInfo(visitor, path) {
-  if (visitor.bodyInfo) {
-    return visitor.bodyInfo
-  }
-
-  const { body, start } = path.getParentNode()
-
-  let hoistedPrefixString = ""
-  let insertCharIndex = start
-  let insertNodeIndex = 0
-
-  // Avoid hoisting above string literal expression statements such as
-  // "use strict", which may depend on occurring at the beginning of
-  // their enclosing scopes.
-  let i = -1
-  const stmtCount = body.length
-
-  while (++i < stmtCount) {
-    const stmt = body[i]
-
-    if (stmt.type === "ExpressionStatement" &&
-        stmt.expression.type === "Literal" &&
-        typeof stmt.expression.value === "string") {
-      insertCharIndex = stmt.end
-      insertNodeIndex = i + 1
-      hoistedPrefixString = ";"
-    } else {
-      break
-    }
-  }
-
-  const bodyInfo = visitor.bodyInfo = new NullObject
-  bodyInfo.insertCharIndex = insertCharIndex
-  bodyInfo.insertNodeIndex = insertNodeIndex
-  bodyInfo.hoistedExportsMap = new NullObject
-  bodyInfo.hoistedExportsString = ""
-  bodyInfo.hoistedImportsString = ""
-  bodyInfo.hoistedPrefixString = hoistedPrefixString
-
-  return bodyInfo
-}
-
 // Gets a string representation (including quotes) from an import or
 // export declaration node.
 function getSourceString(visitor, { source }) {
   return visitor.code.slice(source.start, source.end)
 }
 
-function hoistImports(visitor, importDeclPath, hoistedCode) {
-  preserveLine(visitor, importDeclPath)
-  const bodyInfo = getBlockBodyInfo(visitor, importDeclPath)
-  bodyInfo.hoistedImportsString += hoistedCode
+function hoistImports(visitor, path, hoistedCode) {
+  preserveLine(visitor, path)
+  visitor.info.hoistedImportsString += hoistedCode
 }
 
-function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
+function hoistExports(visitor, path, mapOrString, childName) {
   if (childName) {
-    preserveChild(visitor, exportDeclPath, childName)
+    preserveChild(visitor, path, childName)
   } else {
-    preserveLine(visitor, exportDeclPath)
+    preserveLine(visitor, path)
   }
 
-  const bodyInfo = getBlockBodyInfo(visitor, exportDeclPath)
+  const { info } = visitor
 
   if (typeof mapOrString === "string") {
-    bodyInfo.hoistedExportsString += mapOrString
+    info.hoistedExportsString += mapOrString
     return
   }
 
@@ -408,7 +364,7 @@ function hoistExports(visitor, exportDeclPath, mapOrString, childName) {
     const locals = keys(mapOrString[name])
 
     addToSpecifierMap(
-      bodyInfo.hoistedExportsMap,
+      info.hoistedExportsMap,
       name,
       locals[0]
     )
@@ -491,8 +447,10 @@ function preserveLine(visitor, path) {
   overwrite(visitor, start, end, "")
 }
 
-function safeParam(param, locals) {
-  return locals.indexOf(param) === -1 ? param : safeParam("_" + param, locals)
+function safeName(name, locals) {
+  return locals.indexOf(name) === -1
+    ? name
+    : safeName(encodeId(name), locals)
 }
 
 function toModuleImport(visitor, specifierString, specifierMap) {
@@ -514,7 +472,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
 
   for (const name of names) {
     const locals = keys(specifierMap[name])
-    const valueParam = safeParam("v", locals)
+    const valueParam = safeName("v", locals)
 
     code +=
       // Generate plain functions, instead of arrow functions,
