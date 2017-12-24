@@ -3,6 +3,7 @@ import Module from "../../module.js"
 
 import { dirname } from "path"
 import extname from "../../path/extname.js"
+import moduleState from "../state.js"
 
 function loader(filePath, parent, preload) {
   const mod = this
@@ -24,7 +25,7 @@ function loader(filePath, parent, preload) {
   }
 
   _extensions[ext](mod, filePath)
-  mod.loaded = true
+  mod.loaded = ! moduleState.preload
 }
 
 export default loader

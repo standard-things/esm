@@ -8,6 +8,7 @@ import _resolveFilename from "../module/esm/_resolve-filename.js"
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import isPath from "../util/is-path.js"
+import moduleState from "../module/state.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
@@ -83,6 +84,21 @@ function hook(Mod) {
     const pkgInfo = PkgInfo.get(dirPath) || defaultPkgInfo
 
     PkgInfo.set(dirPath, pkgInfo)
+
+    moduleState.preload = true
+
+    let child
+
+    try {
+      child = _loadESM(filePath, null, true)
+    } finally {
+      moduleState.preload = false
+
+      if (child) {
+        child.loaded = false
+        child.preloaded = true
+      }
+    }
 
     _loadESM(filePath, null, true)
     tickCallback()

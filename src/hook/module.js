@@ -87,9 +87,13 @@ function hook(Mod, parent, options) {
 
     assign(pkgInfo.options, overwriteOptions)
 
-    return wrapped
-      ? wrapped.call(this, manager, func, pkgInfo, args)
-      : tryPassthru.call(this, func, args, pkgInfo.options)
+    if (wrapped) {
+      return wrapped.call(this, manager, func, pkgInfo, args)
+    }
+
+    if (! moduleState.preload) {
+      return tryPassthru.call(this, func, args, pkgInfo.options)
+    }
   }
 
   function methodWrapper(manager, func, pkgInfo, args) {
@@ -183,7 +187,9 @@ function hook(Mod, parent, options) {
         entry.url = getURLFromFilePath(filePath)
       }
 
-      tryCompileCached(mod, cached, filePath, runtimeName, options)
+      if (! moduleState.preload) {
+        tryCompileCached(mod, cached, filePath, runtimeName, options)
+      }
     }
 
     if (shouldOverwrite) {

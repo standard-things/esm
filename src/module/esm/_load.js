@@ -57,6 +57,7 @@ function load(id, parent, isMain, preload) {
     : null
 
   if (child &&
+      child.loaded &&
       isESM(child.exports) &&
       ! Entry.has(child)) {
     delete state._cache[cacheId]

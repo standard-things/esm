@@ -4,6 +4,8 @@
 
 import Module from "../module.js"
 
+import moduleState from "./state.js"
+
 const compileSym = Symbol.for("@std/esm:module._compile")
 
 function load(filePath, parent, isMain, state, loader) {
@@ -16,14 +18,18 @@ function load(filePath, parent, isMain, state, loader) {
       children.push(child)
     }
 
-    return child
-  }
+    if (! child.preloaded) {
+      return child
+    }
 
-  child = new Module(filePath, parent)
+    delete child.preloaded
+  } else {
+    child = new Module(filePath, parent)
 
-  if (isMain) {
-    process.mainModule = child
-    child.id = "."
+    if (isMain) {
+      process.mainModule = child
+      child.id = "."
+    }
   }
 
   const { _compile } = child

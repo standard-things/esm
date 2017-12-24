@@ -36,7 +36,7 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
   }
 
   _extensions[ext](mod, filePath)
-  mod.loaded = true
+  mod.loaded = ! moduleState.preload
 }
 
 export default loader
