@@ -27,6 +27,7 @@ function load(filePath, parent, isMain, state, loader) {
     child = new Module(filePath, parent)
 
     if (isMain) {
+      moduleState.mainModule =
       process.mainModule = child
       child.id = "."
     }

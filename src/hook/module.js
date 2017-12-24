@@ -25,7 +25,6 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isObject from "../util/is-object.js"
 import isObjectLike from "../util/is-object-like.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
@@ -46,10 +45,7 @@ const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent, options) {
   let defaultPkgInfo
-
-  let allowTopLevelAwait =
-    isObject(process.mainModule) &&
-    satisfies(process.version, ">=7.6.0")
+  let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
   const { _extensions } = Mod
   const passthruMap = new SafeMap
@@ -155,7 +151,7 @@ function hook(Mod, parent, options) {
       const stateHash = getCacheStateHash(cacheFileName)
       const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
-      if (! isObject(cached)) {
+      if (! cached) {
         cached = tryCompileCode(manager, content, {
           cacheFileName,
           cachePath,
@@ -295,11 +291,15 @@ function hook(Mod, parent, options) {
 
   function tryCompileESM(mod, content, filePath, runtimeName, options) {
     let async = ""
+    const { mainModule } = moduleState
 
-    if (allowTopLevelAwait && options.await) {
+    if (allowTopLevelAwait &&
+        mainModule &&
+        options.await) {
       allowTopLevelAwait = false
-      if (process.mainModule === mod ||
-          process.mainModule.children.some((child) => child === mod)) {
+
+      if (mainModule === mod ||
+          mainModule.children.some((child) => child === mod)) {
         async = "async "
       }
     }

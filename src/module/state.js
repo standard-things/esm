@@ -7,6 +7,7 @@ const state = new FastObject
 state._cache = new FastObject
 state._extensions = _extensions
 state.globalPaths = _initPaths()
+state.mainModule = null
 state.requireDepth = 0
 
 export default state

@@ -21,6 +21,9 @@ function load(id, parent, isMain, preload) {
   const parentOptions = parentPkgInfo && parentPkgInfo.options
 
   let filePath
+  let called = false
+  let childIsMain = isMain
+  let state = Module
 
   if (Module._resolveFilename !== moduleResolveFilename &&
       parentOptions && parentOptions.cjs.paths) {
@@ -32,16 +35,12 @@ function load(id, parent, isMain, preload) {
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
-
-  let called = false
-  let state = Module
-
   const queryHash = getQueryHash(id)
   const cacheId = filePath + queryHash
 
   if (! (pkgOptions && pkgOptions.cjs.cache)) {
     const ext = extname(filePath)
-    isMain = false
+    childIsMain = false
 
     if (ext === ".mjs" ||
         (pkgOptions && pkgOptions.gz &&
@@ -67,9 +66,15 @@ function load(id, parent, isMain, preload) {
   let threw = true
 
   try {
-    child = _load(cacheId, parent, isMain, state, function () {
+    child = _load(cacheId, parent, childIsMain, state, function () {
       called = true
       const url = getURLFromFilePath(filePath) + queryHash
+
+      if (isMain) {
+        moduleState.mainModule = this
+        this.id = "."
+      }
+
       return loader.call(this, filePath, fromPath, url, parentOptions, preload)
     })
 
