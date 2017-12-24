@@ -204,34 +204,6 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function maybeSourceMap(content, filePath, options) {
-    if (options.sourceMap !== false &&
-        (env.inspector || options.sourceMap) &&
-        ! getSourceMappingURL(content)) {
-      return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-        encodeURI(createSourceMap(filePath, content))
-    }
-
-    return ""
-  }
-
-  function readCachedCode(filePath, options) {
-    return readWith(readFileFast, filePath, options)
-  }
-
-  function readSourceCode(filePath, options) {
-    return readWith(readFile, filePath, options)
-  }
-
-  function readWith(reader, filePath, options) {
-    if (options && options.gz &&
-        _extname(filePath) === ".gz") {
-      return gunzip(reader(filePath), "utf8")
-    }
-
-    return reader(filePath, "utf8")
-  }
-
   function tryCompileCached(mod, cached, filePath, runtimeName, options) {
     const noDepth = moduleState.requireDepth === 0
     const tryCompile = cached.esm ? tryCompileESM : tryCompileCJS
@@ -337,20 +309,6 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryPassthru(func, args, options) {
-    if (options && options.debug) {
-      func.apply(this, args)
-    } else {
-      try {
-        func.apply(this, args)
-      } catch (e) {
-        const [, filePath] = args
-        const sourceCode = () => readSourceCode(filePath, options)
-        throw maskStackTrace(e, sourceCode, filePath)
-      }
-    }
-  }
-
   exts.forEach((ext) => {
     if (typeof _extensions[ext] !== "function" &&
         (ext === ".mjs" ||
@@ -381,6 +339,17 @@ function hook(Mod, parent, options) {
   })
 }
 
+function maybeSourceMap(content, filePath, options) {
+  if (options.sourceMap !== false &&
+      (env.inspector || options.sourceMap) &&
+      ! getSourceMappingURL(content)) {
+    return "//# sourceMappingURL=data:application/json;charset=utf-8," +
+      encodeURI(createSourceMap(filePath, content))
+  }
+
+  return ""
+}
+
 function mjsCompiler(mod, filePath) {
   const error = new errors.Error("ERR_REQUIRE_ESM", filePath)
   const { mainModule } = process
@@ -390,6 +359,37 @@ function mjsCompiler(mod, filePath) {
   }
 
   throw error
+}
+
+function readCachedCode(filePath, options) {
+  return readWith(readFileFast, filePath, options)
+}
+
+function readSourceCode(filePath, options) {
+  return readWith(readFile, filePath, options)
+}
+
+function readWith(reader, filePath, options) {
+  if (options && options.gz &&
+      _extname(filePath) === ".gz") {
+    return gunzip(reader(filePath), "utf8")
+  }
+
+  return reader(filePath, "utf8")
+}
+
+function tryPassthru(func, args, options) {
+  if (options && options.debug) {
+    func.apply(this, args)
+  } else {
+    try {
+      func.apply(this, args)
+    } catch (e) {
+      const [, filePath] = args
+      const sourceCode = () => readSourceCode(filePath, options)
+      throw maskStackTrace(e, sourceCode, filePath)
+    }
+  }
 }
 
 setProperty(mjsCompiler, mjsSym, {
