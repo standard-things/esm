@@ -247,9 +247,11 @@ function hook(Mod, parent, options) {
   }
 
   function tryCompileCJS(mod, content, filePath, runtimeName, options) {
+    const async = useAsyncWrapper(mod, options) ? "async " :  ""
+
     content =
       "const " + runtimeName + "=this;" +
-      runtimeName + ".r((function(exports,require){" + content + "\n}))"
+      runtimeName + ".r((" + async + "function(exports,require){" + content + "\n}))"
 
     content +=
       maybeSourceMap(content, filePath, options)
@@ -262,19 +264,7 @@ function hook(Mod, parent, options) {
   }
 
   function tryCompileESM(mod, content, filePath, runtimeName, options) {
-    let async = ""
-    const { mainModule } = moduleState
-
-    if (allowTopLevelAwait &&
-        mainModule &&
-        options.await) {
-      allowTopLevelAwait = false
-
-      if (mainModule === mod ||
-          mainModule.children.some((child) => child === mod)) {
-        async = "async "
-      }
-    }
+    const async = useAsyncWrapper(mod, options) ? "async " :  ""
 
     content =
       '"use strict";const ' + runtimeName + "=this;" +
@@ -307,6 +297,23 @@ function hook(Mod, parent, options) {
         Module.wrap = moduleWrap
       }
     }
+  }
+
+  function useAsyncWrapper(mod, options) {
+    const { mainModule } = moduleState
+
+    if (allowTopLevelAwait &&
+        mainModule &&
+        options.await) {
+      allowTopLevelAwait = false
+
+      if (mainModule === mod ||
+          mainModule.children.some((child) => child === mod)) {
+        return true
+      }
+    }
+
+    return false
   }
 
   exts.forEach((ext) => {
