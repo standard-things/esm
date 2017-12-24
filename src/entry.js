@@ -607,7 +607,6 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
       if (useToStringTag &&
           name === toStringTag) {
-        // eslint-disable-next-line consistent-return
         return descriptor
       }
 
@@ -618,7 +617,6 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       descriptor.writable = true
       descriptor.value = source[name]
 
-      // eslint-disable-next-line consistent-return
       return descriptor
     },
     set: (namespace, name) => {
