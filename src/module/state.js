@@ -8,6 +8,7 @@ state._cache = new FastObject
 state._extensions = _extensions
 state.globalPaths = _initPaths()
 state.mainModule = null
+state.preload = null
 state.requireDepth = 0
 
 export default state

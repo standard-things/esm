@@ -18,11 +18,11 @@ function load(filePath, parent, isMain, state, loader) {
       children.push(child)
     }
 
-    if (! child.preloaded) {
+    if (moduleState.preload === null) {
       return child
     }
 
-    delete child.preloaded
+    moduleState.preload = null
   } else {
     child = new Module(filePath, parent)
 
