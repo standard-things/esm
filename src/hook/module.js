@@ -228,24 +228,6 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryCompileCode(manager, sourceCode, options) {
-    const { filePath, pkgInfo } = options
-
-    if (pkgInfo.options.debug) {
-      return Compiler.compile(sourceCode, options)
-    }
-
-    try {
-      return Compiler.compile(sourceCode, options)
-    } catch (e) {
-      const useURLs = e.sourceType === "module"
-
-      delete e.sourceType
-      captureStackTrace(e, manager)
-      throw maskStackTrace(e, sourceCode, filePath, useURLs)
-    }
-  }
-
   function tryCompileCJS(mod, content, filePath, runtimeName, options) {
     const async = useAsyncWrapper(mod, options) ? "async " :  ""
 
@@ -383,6 +365,24 @@ function readWith(reader, filePath, options) {
   }
 
   return reader(filePath, "utf8")
+}
+
+function tryCompileCode(manager, sourceCode, options) {
+  const { filePath, pkgInfo } = options
+
+  if (pkgInfo.options.debug) {
+    return Compiler.compile(sourceCode, options)
+  }
+
+  try {
+    return Compiler.compile(sourceCode, options)
+  } catch (e) {
+    const useURLs = e.sourceType === "module"
+
+    delete e.sourceType
+    captureStackTrace(e, manager)
+    throw maskStackTrace(e, sourceCode, filePath, useURLs)
+  }
 }
 
 function tryPassthru(func, args, options) {
