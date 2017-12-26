@@ -22,13 +22,15 @@ class CachingCompiler {
   }
 
   static getMeta(code) {
-    if (code.charCodeAt(7) !== codeOfSlash) {
+    const result = new NullObject
+    result.esm = code.charCodeAt(7) === codeOfSlash
+
+    if (! result.esm) {
       return null
     }
 
     const line = code.slice(9, code.indexOf("*/", 10))
     const meta = parse(line)
-    const result = new NullObject
 
     result.exportSpecifiers = meta.e
     result.exportStarNames = meta.a
