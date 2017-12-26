@@ -96,7 +96,7 @@ function hook(Mod) {
 
       if (child) {
         child.loaded = false
-        child.preloaded = true
+        child.preload = false
       }
     }
 
