@@ -35,6 +35,7 @@ class CachingCompiler {
     result.exportSpecifiers = meta.e
     result.exportStarNames = meta.a
     result.moduleSpecifiers = meta.s
+    result.warnings = meta.w
     return result
   }
 }
@@ -54,7 +55,8 @@ function compileAndCache(code, options) {
       stringify({
         a: result.exportStarNames,
         e: result.exportSpecifiers,
-        s: result.moduleSpecifiers
+        s: result.moduleSpecifiers,
+        w: result.warnings
       }) +
       "*/"
   }
