@@ -5,10 +5,10 @@ import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
-import _loadESM from "./module/esm/_load.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import moduleDirname from "./module/dirname.js"
+import parseAndLoad from "./module/esm/parse-and-load.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
@@ -248,7 +248,7 @@ function readInfo(dirPath, force) {
       })
 
       pkgInfo.options =
-      PkgInfo.createOptions(_loadESM(optionsPath, null, false).exports)
+      PkgInfo.createOptions(parseAndLoad(optionsPath, null, false).exports)
     }
   }
 
