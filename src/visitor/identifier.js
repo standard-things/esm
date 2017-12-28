@@ -1,7 +1,7 @@
 import SafeWeakMap from "../safe-weak-map.js"
 import Visitor from "../visitor.js"
 
-import raise from "../parse/raise.js"
+import { getLineInfo } from "../vendor/acorn/src/locutil.js"
 
 const definedMap = new SafeWeakMap
 
@@ -25,7 +25,6 @@ class IdentifierVisitor extends Visitor {
       return
     }
 
-    const { start } = node
     const { operator, type } = path.getParentNode()
 
     if ((type === "UnaryExpression" &&
@@ -35,20 +34,10 @@ class IdentifierVisitor extends Visitor {
       return
     }
 
-    const parser = {
-      input: this.magicString.original,
-      pos: start,
-      start
-    }
+    const { column, line } = getLineInfo(this.magicString.original, node.start)
 
-    try {
-      raise(parser, start, "@std/esm detected undefined arguments access", Error)
-    } catch (e) {
-      e.name = "Warning"
-      this.warnedForArguments = true
-      this.warnings.push(e)
-    }
-
+    this.warnedForArguments = true
+    this.warnings.push("@std/esm detected undefined arguments access (" + line + ":" + column + ")")
     this.visitChildren(path)
   }
 }
