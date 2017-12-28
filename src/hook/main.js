@@ -3,13 +3,12 @@ import { dirname, resolve } from "path"
 import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
-import _loadESM from "../module/esm/_load.js"
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import isPath from "../util/is-path.js"
-import moduleState from "../module/state.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
+import parseAndLoad from "../module/esm/parse-and-load.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
 
@@ -85,22 +84,7 @@ function hook(Mod) {
 
     PkgInfo.set(dirPath, pkgInfo)
 
-    moduleState.preload = true
-
-    let child
-
-    try {
-      child = _loadESM(filePath, null, true)
-    } finally {
-      moduleState.preload = false
-
-      if (child) {
-        child.loaded = false
-        child.preload = false
-      }
-    }
-
-    _loadESM(filePath, null, true)
+    parseAndLoad(filePath, null, true)
     tickCallback()
   }
 
