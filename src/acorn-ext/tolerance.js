@@ -32,7 +32,8 @@ function enable(parser) {
   parser.enterFunctionScope =
   parser.enterLexicalScope =
   parser.exitFunctionScope =
-  parser.exitLexicalScope = noop
+  parser.exitLexicalScope =
+  parser.invalidStringToken = noop
 
   parser.checkExpressionErrors = checkExpressionErrors
   parser.checkLVal = wrap(parser.checkLVal, strictWrapper)
