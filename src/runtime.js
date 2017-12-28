@@ -8,6 +8,7 @@ import errors from "./errors.js"
 import isESM from "./util/is-es-module.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
+import parseAndLoad from "./module/esm/parse-and-load.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -62,11 +63,11 @@ class Runtime {
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {
-          this.watch(id, [["*", createSetter("import", (value, childEntry) => {
+          watch.call(this, id, [["*", createSetter("import", (value, childEntry) => {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
-          })]])
+          })]], parseAndLoad)
         } catch (e) {
           reject(e)
         }
@@ -106,23 +107,7 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    let childEntry
-    const { entry } = this
-
-    moduleState.requireDepth += 1
-
-    try {
-      load(id, entry.module, _loadESM, (child) => {
-        childEntry = Entry.get(child)
-        entry.children[child.id] = childEntry
-        childEntry.addSetters(setterPairs, entry)
-      })
-
-      childEntry.loaded()
-      childEntry.update()
-    } finally {
-      moduleState.requireDepth -= 1
-    }
+    return watch.call(this, id, setterPairs, _loadESM)
   }
 }
 
@@ -181,6 +166,26 @@ function runESM(runtime, moduleWrapper) {
 
   mod.loaded = true
   entry.update().loaded()
+}
+
+function watch(id, setterPairs, loader) {
+  let childEntry
+  const { entry } = this
+
+  moduleState.requireDepth += 1
+
+  try {
+    load(id, entry.module, loader, (child) => {
+      childEntry = Entry.get(child)
+      entry.children[child.id] = childEntry
+      childEntry.addSetters(setterPairs, entry)
+    })
+
+    childEntry.loaded()
+    childEntry.update()
+  } finally {
+    moduleState.requireDepth -= 1
+  }
 }
 
 Object.setPrototypeOf(Runtime.prototype, null)
