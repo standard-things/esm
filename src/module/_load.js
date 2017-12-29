@@ -7,6 +7,7 @@ import Module from "../module.js"
 import moduleState from "./state.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
+const preloadSym = Symbol.for("@std/esm:Module#preload")
 
 function load(filePath, parent, isMain, state, loader) {
   let child = state._cache[filePath]
@@ -18,11 +19,12 @@ function load(filePath, parent, isMain, state, loader) {
       children.push(child)
     }
 
-    if (! ("preload" in child))  {
+    if (child.loaded ||
+      ! (preloadSym in child)) {
       return child
     }
 
-    delete child.preload
+    delete child[preloadSym]
   } else {
     child = new Module(filePath, parent)
 
