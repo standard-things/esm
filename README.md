@@ -109,7 +109,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean to support top-level <code>await</code> in the main ES module.</p>
+    <p>A boolean to support top-level <code>await</code> in the main module <i>(requires <code>Node v7.6+</code>)</i>.</p>
   </td>
 </tr>
 <tr>
