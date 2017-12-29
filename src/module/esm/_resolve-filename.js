@@ -7,10 +7,10 @@ import { dirname } from "path"
 import encodedSlash from "../../util/encoded-slash.js"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
+import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
 import isRelativePath from "../../util/is-relative-path.js"
-import moduleDirname from "../../module/dirname.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
 import urlToPath from "../../util/url-to-path.js"
@@ -52,7 +52,7 @@ function resolveFilename(id, parent, isMain) {
   let skipWarnings = false
 
   const isAbs = isAbsolutePath(id)
-  const fromPath = isAbs ? dirname(id) : moduleDirname(parent)
+  const fromPath = isAbs ? dirname(id) : getModuleDirname(parent)
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
 

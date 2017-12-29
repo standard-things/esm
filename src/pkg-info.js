@@ -5,9 +5,9 @@ import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
+import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
-import moduleDirname from "./module/dirname.js"
 import parseAndLoad from "./module/esm/parse-and-load.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
@@ -123,7 +123,7 @@ class PkgInfo {
   }
 
   static from(mod, force) {
-    return PkgInfo.get(moduleDirname(mod), force)
+    return PkgInfo.get(getModuleDirname(mod), force)
   }
 
   static set(dirPath, pkgInfo) {
