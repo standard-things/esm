@@ -7,7 +7,7 @@ import Module from "../module.js"
 import moduleState from "./state.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
-const preloadSym = Symbol.for("@std/esm:Module#preload")
+const parsingSym = Symbol.for("@std/esm:Module#parsing")
 
 function load(filePath, parent, isMain, state, loader) {
   let child = state._cache[filePath]
@@ -20,11 +20,11 @@ function load(filePath, parent, isMain, state, loader) {
     }
 
     if (child.loaded ||
-      ! (preloadSym in child)) {
+      ! (parsingSym in child)) {
       return child
     }
 
-    delete child[preloadSym]
+    delete child[parsingSym]
   } else {
     child = new Module(filePath, parent)
 

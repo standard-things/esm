@@ -93,7 +93,7 @@ function hook(Mod, parent, options) {
       return wrapped.call(this, manager, func, pkgInfo, args)
     }
 
-    if (! moduleState.preload) {
+    if (! moduleState.parsing) {
       return tryPassthru.call(this, func, args, pkgInfo.options)
     }
   }
@@ -172,7 +172,7 @@ function hook(Mod, parent, options) {
       }
 
       if (entry.options.warnings &&
-          moduleState.preload &&
+          moduleState.parsing &&
           cached.warnings) {
         for (const warning of cached.warnings) {
           warn(warning.code, filePath, ...warning.args)
@@ -190,7 +190,7 @@ function hook(Mod, parent, options) {
         entry.url = getURLFromFilePath(filePath)
       }
 
-      if (! moduleState.preload) {
+      if (! moduleState.parsing) {
         tryCompileCached(mod, cached, filePath, runtimeName, options)
         return
       }

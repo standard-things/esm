@@ -26,7 +26,7 @@ function loader(filePath, parent, preload) {
 
   _extensions[ext](mod, filePath)
 
-  if (! moduleState.preload) {
+  if (! moduleState.parsing) {
     mod.loaded = true
   }
 }

@@ -37,7 +37,7 @@ function loader(filePath, fromPath, url, parentOptions, preload) {
 
   _extensions[ext](mod, filePath)
 
-  if (! moduleState.preload) {
+  if (! moduleState.parsing) {
     mod.loaded = true
   }
 }

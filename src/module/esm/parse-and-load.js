@@ -1,21 +1,21 @@
 import _load from "./_load.js"
 import moduleState from "../state.js"
 
-const preloadSym = Symbol.for("@std/esm:Module#preload")
+const parsingSym = Symbol.for("@std/esm:Module#parsing")
 
 function parseAndLoad(id, parent, isMain, preload) {
   let child
 
-  moduleState.preload = true
+  moduleState.parsing = true
 
   try {
     child = _load(id, parent, isMain)
   } finally {
-    moduleState.preload = false
+    moduleState.parsing = false
 
     if (child &&
         ! child.loaded) {
-      child[preloadSym] = false
+      child[parsingSym] = false
     }
   }
 
