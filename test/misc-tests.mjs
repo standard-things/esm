@@ -229,7 +229,7 @@ describe("errors", () => {
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
-            getURLFromFilePath(id2) + ":1",
+            id2 + ":1",
             'export const a = "a"',
             "^\n"
           ].join("\n"))
