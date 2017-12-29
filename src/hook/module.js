@@ -2,6 +2,7 @@ import { extname as _extname, dirname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
+import FastObject from "../fast-object.js"
 import Module from "../module.js"
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
@@ -9,7 +10,9 @@ import Runtime from "../runtime.js"
 import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
+import _loadESM from "../module/esm/_load.js"
 import assign from "../util/assign.js"
+import builtinModules from "../builtin-modules.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
 import emitWarning from "../warning/emit-warning.js"
@@ -20,6 +23,7 @@ import errors from "../errors.js"
 import extname from "../path/extname.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
+import getModuleName from "../util/get-module-name.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
@@ -36,12 +40,15 @@ import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
+import toStringLiteral from "../util/to-string-literal.js"
 
-const { setPrototypeOf } = Object
+const { keys, setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
+const metaSym = Symbol.for("@std/esm:Module#meta")
+const preloadSym = Symbol.for("@std/esm:Module#preload")
 
 function hook(Mod, parent, options) {
   let defaultPkgInfo
@@ -131,11 +138,10 @@ function hook(Mod, parent, options) {
         delete cache[cacheFileName]
       } else {
         cached =
-        cache[cacheFileName] = {
+        cache[cacheFileName] = assign({
           changed: true,
-          code,
-          esm: !! Compiler.getMeta(code)
-        }
+          code
+        }, Compiler.getMeta(code))
       }
     }
 
@@ -163,9 +169,10 @@ function hook(Mod, parent, options) {
         })
       }
 
-      if (cached.warnings) {
+      if (moduleState.preload &&
+          cached.warnings) {
         for (const warning of cached.warnings) {
-          emitWarning(warning.message + ": " + filePath)
+          emitWarning(warning + ": " + filePath)
         }
       }
 
@@ -185,6 +192,81 @@ function hook(Mod, parent, options) {
 
       if (! moduleState.preload) {
         tryCompileCached(mod, cached, filePath, runtimeName, options)
+        return
+      }
+
+      mod[metaSym] = cached
+
+      if (! cached.esm) {
+        return
+      }
+
+      const { moduleSpecifiers } = cached
+      const names = keys(moduleSpecifiers)
+      const resolved = {}
+
+      for (const name of names) {
+        resolved[name] = name in builtinModules
+          ? builtinModules[name]
+          : _loadESM(name, mod)
+
+        resolved[name][preloadSym] = true
+      }
+
+      for (const name of names) {
+        const moduleSpecifier = resolved[name][metaSym]
+
+        if (! moduleSpecifier || ! moduleSpecifier.esm) {
+          continue
+        }
+
+        const requestedExportNames = moduleSpecifiers[name]
+
+        for (const exportName of requestedExportNames) {
+          const { exportSpecifiers } = moduleSpecifier
+
+          if (exportSpecifiers[exportName] === "exportName") {
+            raise("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
+          } else if (! (exportName in exportSpecifiers)) {
+            let skipExportMissing = false
+
+            for (const name of moduleSpecifier.exportStarNames) {
+              const childCached = resolved[name] && resolved[name][metaSym]
+
+              if (! childCached || ! childCached.esm) {
+                skipExportMissing = true
+                break
+              }
+            }
+
+            if (! skipExportMissing &&
+                exportName !== "*") {
+              raise("ERR_EXPORT_MISSING", resolved[name], exportName)
+            }
+          }
+        }
+      }
+
+      // Resolve export names.
+      for (const name of cached.exportStarNames) {
+        const childCached = resolved[name] && resolved[name][metaSym]
+
+        if (! childCached || ! childCached.exportSpecifiers) {
+          continue
+        }
+        const childExportNames = keys(childCached.exportSpecifiers)
+
+        for (const exportName of childExportNames) {
+          const { exportSpecifiers } = cached
+
+          if (has(exportSpecifiers, exportName)) {
+            if (exportSpecifiers[exportName] === "imported") {
+              exportSpecifiers[exportName] = "conflicted"
+            }
+          } else {
+            exportSpecifiers[exportName] = "imported"
+          }
+        }
       }
     }
 
@@ -407,3 +489,24 @@ setProperty(mjsCompiler, mjsSym, {
 })
 
 export default hook
+
+function exportMissing(mod, name) {
+  const moduleName = getModuleName(mod)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " does not provide an export named '" + name + "'"
+}
+
+function exportStarConflict(mod, name) {
+  const moduleName = getModuleName(mod)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " contains conflicting star exports for name '" + name + "'"
+}
+
+function raise(key, mod, name) {
+  throw new SyntaxError(messages[key](mod, name))
+}
+
+const messages = new FastObject
+messages["ERR_EXPORT_MISSING"] = exportMissing
+messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
+
