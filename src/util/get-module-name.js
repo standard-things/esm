@@ -1,6 +1,12 @@
-function getModuleName(mod) {
-  return mod
-    ? mod.filename || mod.id || ""
+import isObject from "./is-object.js"
+
+function getModuleName(request) {
+  if (typeof request === "string") {
+    return request
+  }
+
+  return isObject(request)
+    ? request.filename || request.id || ""
     : ""
 }
 

@@ -1,12 +1,10 @@
-import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 import PkgInfo from "./pkg-info.js"
 import SafeProxy from "./safe-proxy.js"
 
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
-import emitWarning from "./warning/emit-warning.js"
-import getModuleName from "./util/get-module-name.js"
+import errors from "./errors.js"
 import has from "./util/has.js"
 import isESM from "./util/is-es-module.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -14,7 +12,7 @@ import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
-import toStringLiteral from "./util/to-string-literal.js"
+import warn from "./warn.js"
 
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
@@ -23,17 +21,8 @@ const { is, isSealed, keys, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
 
-const messages = new FastObject
-messages["ERR_EXPORT_MISSING"] = exportMissing
-messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
-messages["WRN_NS_ASSIGNMENT"] = namespaceAssignment
-messages["WRN_NS_EXTENSION"] = namespaceExtension
-messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
-
 const useProxy = typeof SafeProxy === "function"
 const useToStringTag = typeof toStringTag === "symbol"
-
-const warned = new FastObject
 
 const esmDescriptor = {
   configurable: false,
@@ -387,18 +376,6 @@ function createNamespace() {
     : namespace
 }
 
-function exportMissing(entry, name) {
-  const moduleName = getModuleName(entry.module)
-  return "Module " + toStringLiteral(moduleName, "'") +
-    " does not provide an export named '" + name + "'"
-}
-
-function exportStarConflict(entry, name) {
-  const moduleName = getModuleName(entry.module)
-  return "Module " + toStringLiteral(moduleName, "'") +
-    " contains conflicting star exports for name '" + name + "'"
-}
-
 function getExportByName(entry, setter, name) {
   const isScript =
     ! entry.esm &&
@@ -414,13 +391,13 @@ function getExportByName(entry, setter, name) {
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     delete entry.setters[name]
-    raise("ERR_EXPORT_MISSING", entry, name)
+    throw new errors.SyntaxError("ERR_EXPORT_MISSING", entry.module, name)
   }
 
   const value = entry._namespace[name]
 
   if (value === STAR_ERROR) {
-    raise("ERR_EXPORT_STAR_CONFLICT", entry, name)
+    throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", entry.module, name)
   }
 
   return value
@@ -468,20 +445,6 @@ function mergeProperty(entry, otherEntry, key) {
   return entry
 }
 
-function namespaceAssignment(entry, name) {
-  return "@std/esm cannot assign to the read only module namespace property " +
-    toStringLiteral(name, "'") + " of " + getModuleName(entry.module)
-}
-
-function namespaceExtension(entry, name) {
-  return "@std/esm cannot add property " + toStringLiteral(name, "'") +
-    " to module namespace of " + getModuleName(entry.module)
-}
-
-function raise(key, entry, name) {
-  throw new SyntaxError(messages[key](entry, name))
-}
-
 function runGetter(entry, name) {
   const { _namespace } = entry
   const value = callGetter(entry.getters[name])
@@ -519,7 +482,7 @@ function runSetter(entry, name, callback) {
     } else if (value === void 0 &&
         name in getters &&
         setter.parent.id in children) {
-      warn("WRN_TDZ_ACCESS", entry, name)
+      warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }
 }
@@ -528,11 +491,6 @@ function runSetters(entry, callback) {
   for (const name in entry.setters) {
     runSetter(entry, name, callback)
   }
-}
-
-function temporalDeadZoneAccess(entry, name) {
-  return "@std/esm detected possible temporal dead zone access of " +
-    toStringLiteral(name, "'") + " in " + getModuleName(entry.module)
 }
 
 function toNamespace(entry, source = entry._namespace) {
@@ -559,10 +517,12 @@ function toNamespaceGetter(entry, source = entry._namespace) {
     })
 
     setSetter(namespace, name, () => {
-      if (name in source) {
-        warn("WRN_NS_ASSIGNMENT", entry, name)
-      } else {
-        warn("WRN_NS_EXTENSION", entry, name)
+      if (entry.options.warnings) {
+        if (name in source) {
+          warn("WRN_NS_ASSIGNMENT", entry.module, name)
+        } else {
+          warn("WRN_NS_EXTENSION", entry.module, name)
+        }
       }
     })
   }
@@ -620,26 +580,17 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       return descriptor
     },
     set: (namespace, name) => {
-      if (name in source) {
-        warn("WRN_NS_ASSIGNMENT", entry, name)
-      } else {
-        warn("WRN_NS_EXTENSION", entry, name)
+      if (entry.options.warnings) {
+        if (name in source) {
+          warn("WRN_NS_ASSIGNMENT", entry.module, name)
+        } else {
+          warn("WRN_NS_EXTENSION", entry.module, name)
+        }
       }
 
       return true
     }
   })
-}
-
-function warn(key, entry, name) {
-  if (entry.options.warnings) {
-    const cacheKey = key + "\0" + entry.id + "\0" + name
-
-    if (! (cacheKey in warned)) {
-      warned[cacheKey] = true
-      emitWarning(messages[key](entry, name))
-    }
-  }
 }
 
 Object.setPrototypeOf(Entry.prototype, null)

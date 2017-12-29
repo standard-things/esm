@@ -37,7 +37,7 @@ class IdentifierVisitor extends Visitor {
     const { column, line } = getLineInfo(this.magicString.original, node.start)
 
     this.warnedForArguments = true
-    this.warnings.push("@std/esm detected undefined arguments access (" + line + ":" + column + ")")
+    this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
     this.visitChildren(path)
   }
 }

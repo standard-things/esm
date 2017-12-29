@@ -140,7 +140,7 @@ function runCJS(runtime, moduleWrapper) {
 
     if (! options.cjs.vars &&
         isESM(child.exports)) {
-      throw new errors.Error("ERR_REQUIRE_ESM", child.filename)
+      throw new errors.Error("ERR_REQUIRE_ESM", child)
     }
 
     return child.exports

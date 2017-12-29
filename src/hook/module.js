@@ -2,7 +2,6 @@ import { extname as _extname, dirname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
-import FastObject from "../fast-object.js"
 import Module from "../module.js"
 import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
@@ -15,7 +14,6 @@ import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
-import emitWarning from "../warning/emit-warning.js"
 import encodeId from "../util/encode-id.js"
 import encodeURI from "../util/encode-uri.js"
 import env from "../env.js"
@@ -23,7 +21,6 @@ import errors from "../errors.js"
 import extname from "../path/extname.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
-import getModuleName from "../util/get-module-name.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
@@ -40,15 +37,17 @@ import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
-import toStringLiteral from "../util/to-string-literal.js"
+import warn from "../warn.js"
 
 const { keys, setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
+
 const metaSym = Symbol.for("@std/esm:Module#meta")
-const preloadSym = Symbol.for("@std/esm:Module#preload")
+const parsingSym = Symbol.for("@std/esm:Module#parsing")
 
 function hook(Mod, parent, options) {
   let defaultPkgInfo
@@ -154,6 +153,9 @@ function hook(Mod, parent, options) {
         }
       }
 
+      const entry = Entry.get(mod)
+      entry.runtimeName = runtimeName
+
       const stateHash = getCacheStateHash(cacheFileName)
       const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
@@ -169,10 +171,11 @@ function hook(Mod, parent, options) {
         })
       }
 
-      if (moduleState.preload &&
+      if (entry.options.warnings &&
+          moduleState.preload &&
           cached.warnings) {
         for (const warning of cached.warnings) {
-          emitWarning(warning + ": " + filePath)
+          warn(warning.code, filePath, ...warning.args)
         }
       }
 
@@ -182,9 +185,6 @@ function hook(Mod, parent, options) {
         tryPassthru.call(this, func, args, options)
         return
       }
-
-      const entry = Entry.get(mod)
-      entry.runtimeName = runtimeName
 
       if (! entry.url) {
         entry.url = getURLFromFilePath(filePath)
@@ -210,7 +210,7 @@ function hook(Mod, parent, options) {
           ? builtinModules[name]
           : _loadESM(name, mod)
 
-        resolved[name][preloadSym] = true
+        resolved[name][parsingSym] = true
       }
 
       for (const name of names) {
@@ -226,7 +226,7 @@ function hook(Mod, parent, options) {
           const { exportSpecifiers } = moduleSpecifier
 
           if (exportSpecifiers[exportName] === "exportName") {
-            raise("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
+            throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
           } else if (! (exportName in exportSpecifiers)) {
             let skipExportMissing = false
 
@@ -241,7 +241,7 @@ function hook(Mod, parent, options) {
 
             if (! skipExportMissing &&
                 exportName !== "*") {
-              raise("ERR_EXPORT_MISSING", resolved[name], exportName)
+              throw new errors.SyntaxError("ERR_EXPORT_MISSING", resolved[name], exportName)
             }
           }
         }
@@ -422,7 +422,7 @@ function maybeSourceMap(content, filePath, options) {
 }
 
 function mjsCompiler(mod, filePath) {
-  const error = new errors.Error("ERR_REQUIRE_ESM", filePath)
+  const error = new errors.Error("ERR_REQUIRE_ESM", mod)
   const { mainModule } = process
 
   if (mainModule && mainModule.filename === filePath) {
@@ -489,24 +489,3 @@ setProperty(mjsCompiler, mjsSym, {
 })
 
 export default hook
-
-function exportMissing(mod, name) {
-  const moduleName = getModuleName(mod)
-  return "Module " + toStringLiteral(moduleName, "'") +
-    " does not provide an export named '" + name + "'"
-}
-
-function exportStarConflict(mod, name) {
-  const moduleName = getModuleName(mod)
-  return "Module " + toStringLiteral(moduleName, "'") +
-    " contains conflicting star exports for name '" + name + "'"
-}
-
-function raise(key, mod, name) {
-  throw new SyntaxError(messages[key](mod, name))
-}
-
-const messages = new FastObject
-messages["ERR_EXPORT_MISSING"] = exportMissing
-messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
-

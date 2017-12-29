@@ -1,5 +1,6 @@
 import FastObject from "./fast-object.js"
 
+import getModuleName from "./util/get-module-name.js"
 import { promisify } from "util"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
@@ -14,10 +15,15 @@ try {
 }
 
 const errors = new FastObject
-const supers = [Error, TypeError]
-supers.forEach((Super) => errors[Super.name] = createClass(Super))
+const builtinSupers = [SyntaxError]
+const nodeSupers = [Error, TypeError]
+
+builtinSupers.forEach((Super) => errors[Super.name] = createBuiltinClass(Super))
+nodeSupers.forEach((Super) => errors[Super.name] = createNodeClass(Super))
 
 const messages = new FastObject
+messages["ERR_EXPORT_MISSING"] = exportMissing
+messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
 messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
 messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
 messages["ERR_MISSING_MODULE"] = missingModule
@@ -25,11 +31,19 @@ messages["ERR_MODULE_RESOLUTION_LEGACY"] = moduleResolutionLegacy
 messages["ERR_REQUIRE_ESM"] = requireESM
 messages["ERR_UNKNOWN_FILE_EXTENSION"] = unknownFileExtension
 
-function createClass(Super) {
+function createBuiltinClass(Super) {
+  return class BuiltinError extends Super {
+    constructor(code, ...args) {
+      super(messages[code](...args))
+    }
+  }
+}
+
+function createNodeClass(Super) {
   return class NodeError extends Super {
-    constructor(key, ...args) {
-      super(messages[key](...args))
-      setProperty(this, codeSym, { enumerable: false, value: key })
+    constructor(code, ...args) {
+      super(messages[code](...args))
+      setProperty(this, codeSym, { enumerable: false, value: code })
     }
 
     get code() {
@@ -50,8 +64,20 @@ function createClass(Super) {
   }
 }
 
-function invalidArgType(name, expected) {
-  return "The " + toStringLiteral(name, "'") + " argument must be " + expected
+function exportMissing(request, exportName) {
+  const moduleName = getModuleName(request)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " does not provide an export named '" + exportName + "'"
+}
+
+function exportStarConflict(request, exportName) {
+  const moduleName = getModuleName(request)
+  return "Module " + toStringLiteral(moduleName, "'") +
+    " contains conflicting star exports for name '" + exportName + "'"
+}
+
+function invalidArgType(argName, expected) {
+  return "The " + toStringLiteral(argName, "'") + " argument must be " + expected
 }
 
 function invalidProtocol(protocol, expected) {
@@ -59,8 +85,8 @@ function invalidProtocol(protocol, expected) {
     " not supported. Expected " + toStringLiteral(expected, "'")
 }
 
-function missingModule(moduleName) {
-  return "Cannot find module " + moduleName
+function missingModule(request) {
+  return "Cannot find module " + getModuleName(request)
 }
 
 function moduleResolutionLegacy(id, fromPath, foundPath) {
@@ -68,8 +94,8 @@ function moduleResolutionLegacy(id, fromPath, foundPath) {
     ". Legacy behavior in require() would have found it at " + foundPath
 }
 
-function requireESM(moduleName) {
-  return "Must use import to load ES Module: " + moduleName
+function requireESM(request) {
+  return "Must use import to load ES Module: " + getModuleName(request)
 }
 
 function unknownFileExtension(filePath) {
