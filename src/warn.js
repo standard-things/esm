@@ -17,17 +17,16 @@ messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
 
 const warned = new FastObject
 
-function defaultCacheKey(code, args) {
-  return code + "\0" + args.join("\0")
-}
-
-function moduleCacheKey(code, [request, name]) {
-  return code + "\0" + getModuleName(request) + "\0" + name
+function moduleCacheKey(request, name) {
+  return getModuleName(request) + "\0" + name
 }
 
 function getCacheKey(code, args) {
-  const getter = cacheKeys[code] || defaultCacheKey
-  return getter(code, args)
+  const key = code in cacheKeys
+    ? cacheKeys[code](...args)
+    : args.join("\0")
+
+  return code + "\0" + key
 }
 
 function argumentsAccess(request, line, column) {

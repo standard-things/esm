@@ -14,13 +14,6 @@ try {
   codeSym = symbols.length ? symbols[0] : Symbol.for("@std/esm:errorCode")
 }
 
-const errors = new FastObject
-const builtinSupers = [SyntaxError]
-const nodeSupers = [Error, TypeError]
-
-builtinSupers.forEach((Super) => errors[Super.name] = createBuiltinClass(Super))
-nodeSupers.forEach((Super) => errors[Super.name] = createNodeClass(Super))
-
 const messages = new FastObject
 messages["ERR_EXPORT_MISSING"] = exportMissing
 messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
@@ -30,6 +23,12 @@ messages["ERR_MISSING_MODULE"] = missingModule
 messages["ERR_MODULE_RESOLUTION_LEGACY"] = moduleResolutionLegacy
 messages["ERR_REQUIRE_ESM"] = requireESM
 messages["ERR_UNKNOWN_FILE_EXTENSION"] = unknownFileExtension
+
+const errors = new FastObject
+const supers = [Error, TypeError]
+
+errors.SyntaxError = createBuiltinClass(SyntaxError)
+supers.forEach((Super) => errors[Super.name] = createNodeClass(Super))
 
 function createBuiltinClass(Super) {
   return class BuiltinError extends Super {
@@ -77,7 +76,8 @@ function exportStarConflict(request, exportName) {
 }
 
 function invalidArgType(argName, expected) {
-  return "The " + toStringLiteral(argName, "'") + " argument must be " + expected
+  return "The " + toStringLiteral(argName, "'") +
+    " argument must be " + expected
 }
 
 function invalidProtocol(protocol, expected) {
