@@ -14,6 +14,7 @@ if (! __shared__) {
   shared.package = new FastObject
   shared.parseURL = new FastObject
   shared.pkgInfo = new FastObject
+  shared.resolveFilename = new FastObject
 }
 
 export default shared

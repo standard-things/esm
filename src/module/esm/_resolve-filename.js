@@ -7,10 +7,12 @@ import { dirname } from "path"
 import encodedSlash from "../../util/encoded-slash.js"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
+import getModuleName from "../../util/get-module-name.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
 import isRelativePath from "../../util/is-relative-path.js"
 import moduleDirname from "../../module/dirname.js"
 import parseURL from "../../util/parse-url.js"
+import shared from "../../shared.js"
 import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
@@ -36,6 +38,12 @@ for (const ext of gzExts) {
 function resolveFilename(id, parent, isMain) {
   if (typeof id !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
+  }
+
+  const cacheKey = id + "\0" + getModuleName(parent) + "\0" + isMain
+
+  if (cacheKey in shared.resolveFilename) {
+    return shared.resolveFilename[cacheKey]
   }
 
   let foundPath
@@ -86,12 +94,9 @@ function resolveFilename(id, parent, isMain) {
   }
 
   if (foundPath) {
-    if (pkgOptions && pkgOptions.cjs.paths) {
-      return foundPath
-    }
-
-    if (extname(foundPath) in extLookup) {
-      return foundPath
+    if ((pkgOptions && pkgOptions.cjs.paths) ||
+        extname(foundPath) in extLookup) {
+      return shared.resolveFilename[cacheKey] = foundPath
     }
 
     throw new errors.Error("ERR_UNKNOWN_FILE_EXTENSION", foundPath)
