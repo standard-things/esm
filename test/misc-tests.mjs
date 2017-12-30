@@ -627,7 +627,7 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should error when importing non-exported binding", () =>
+  it("should error when importing non-exported binding before code execution", () =>
     Promise.all([
       "./fixture/import/missing-export-cjs.mjs",
       "./fixture/import/missing-export-esm.mjs",
@@ -636,7 +636,7 @@ describe("spec compliance", () => {
       import(id)
         .then(() => assert.ok(false))
         .catch((e) => {
-          assert.ok(e instanceof SyntaxError)
+          assert.strictEqual("loadCount" in global, false)
           assert.ok(e.message.includes("' does not provide an export named '"))
         })
     ))

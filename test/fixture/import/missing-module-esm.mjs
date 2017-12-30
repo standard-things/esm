@@ -1,2 +1,2 @@
-import "../load-count.js"
-import "./MISSING_MODULE.js"
+import "../load-count.mjs"
+import "./MISSING_MODULE.mjs"
