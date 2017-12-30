@@ -171,10 +171,12 @@ function hook(Mod, parent, options) {
         })
       }
 
+      const { warnings } = cached
+
       if (entry.options.warnings &&
           moduleState.parsing &&
-          cached.warnings) {
-        for (const warning of cached.warnings) {
+          warnings) {
+        for (const warning of warnings) {
           warn(warning.code, filePath, ...warning.args)
         }
       }
@@ -190,83 +192,13 @@ function hook(Mod, parent, options) {
         entry.url = getURLFromFilePath(filePath)
       }
 
-      if (! moduleState.parsing) {
+      if (moduleState.parsing) {
+        if (cached.esm) {
+          mod[metaSym] = cached
+          tryParse(mod, cached)
+        }
+      } else {
         tryCompileCached(mod, cached, filePath, runtimeName, options)
-        return
-      }
-
-      mod[metaSym] = cached
-
-      if (! cached.esm) {
-        return
-      }
-
-      const { moduleSpecifiers } = cached
-      const names = keys(moduleSpecifiers)
-      const resolved = {}
-
-      for (const name of names) {
-        resolved[name] = name in builtinModules
-          ? builtinModules[name]
-          : _loadESM(name, mod)
-
-        resolved[name][parsingSym] = true
-      }
-
-      for (const name of names) {
-        const moduleSpecifier = resolved[name][metaSym]
-
-        if (! moduleSpecifier || ! moduleSpecifier.esm) {
-          continue
-        }
-
-        const requestedExportNames = moduleSpecifiers[name]
-
-        for (const exportName of requestedExportNames) {
-          const { exportSpecifiers } = moduleSpecifier
-
-          if (exportSpecifiers[exportName] === "exportName") {
-            throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
-          } else if (! (exportName in exportSpecifiers)) {
-            let skipExportMissing = false
-
-            for (const name of moduleSpecifier.exportStarNames) {
-              const childCached = resolved[name] && resolved[name][metaSym]
-
-              if (! childCached || ! childCached.esm) {
-                skipExportMissing = true
-                break
-              }
-            }
-
-            if (! skipExportMissing &&
-                exportName !== "*") {
-              throw new errors.SyntaxError("ERR_EXPORT_MISSING", resolved[name], exportName)
-            }
-          }
-        }
-      }
-
-      // Resolve export names.
-      for (const name of cached.exportStarNames) {
-        const childCached = resolved[name] && resolved[name][metaSym]
-
-        if (! childCached || ! childCached.exportSpecifiers) {
-          continue
-        }
-        const childExportNames = keys(childCached.exportSpecifiers)
-
-        for (const exportName of childExportNames) {
-          const { exportSpecifiers } = cached
-
-          if (has(exportSpecifiers, exportName)) {
-            if (exportSpecifiers[exportName] === "imported") {
-              exportSpecifiers[exportName] = "conflicted"
-            }
-          } else {
-            exportSpecifiers[exportName] = "imported"
-          }
-        }
       }
     }
 
@@ -464,6 +396,74 @@ function tryCompileCode(manager, sourceCode, options) {
     delete e.sourceType
     captureStackTrace(e, manager)
     throw maskStackTrace(e, sourceCode, filePath, useURLs)
+  }
+}
+
+function tryParse(mod, cached) {
+  const { moduleSpecifiers } = cached
+  const names = keys(moduleSpecifiers)
+  const resolved = new NullObject
+
+  for (const name of names) {
+    if (! (name in builtinModules)) {
+      const child = _loadESM(name, mod)
+      child[parsingSym] = true
+
+      if (metaSym in child) {
+        resolved[name] = child
+      }
+    }
+  }
+
+  for (const name in resolved) {
+    const childCached = resolved[name][metaSym]
+    const requestedExportNames = moduleSpecifiers[name]
+
+    for (const exportName of requestedExportNames) {
+      const { exportSpecifiers } = childCached
+
+      if (exportSpecifiers[exportName] === "exportName") {
+        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
+      } else if (! (exportName in exportSpecifiers)) {
+        let skipExportMissing = false
+
+        for (const name of childCached.exportStarNames) {
+          if (! (name in resolved) ||
+              ! (metaSym in resolved[name])) {
+            skipExportMissing = true
+            break
+          }
+        }
+
+        if (! skipExportMissing &&
+            exportName !== "*") {
+          throw new errors.SyntaxError("ERR_EXPORT_MISSING", resolved[name], exportName)
+        }
+      }
+    }
+  }
+
+  // Resolve export names.
+  for (const name of cached.exportStarNames) {
+    if (! (name in resolved) ||
+        ! (metaSym in resolved[name])) {
+      continue
+    }
+
+    const childCached = resolved[name][metaSym]
+    const childExportNames = keys(childCached.exportSpecifiers)
+
+    for (const exportName of childExportNames) {
+      const { exportSpecifiers } = cached
+
+      if (has(exportSpecifiers, exportName)) {
+        if (exportSpecifiers[exportName] === "imported") {
+          exportSpecifiers[exportName] = "conflicted"
+        }
+      } else {
+        exportSpecifiers[exportName] = "imported"
+      }
+    }
   }
 }
 
