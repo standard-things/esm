@@ -32,18 +32,19 @@ class Compiler {
     code = stripShebang(code)
     options = Compiler.createOptions(options)
 
-    let { hint, type } = options
+    const result = new NullObject
+    result.code = code
 
-    const result = {
-      changed: false,
-      code,
-      data: null,
-      esm: false,
-      exportSpecifiers: null,
-      exportStarNames: null,
-      moduleSpecifiers: null,
-      warnings: null
-    }
+    result.changed =
+    result.esm = false
+
+    result.data =
+    result.exportSpecifiers =
+    result.exportStarNames =
+    result.moduleSpecifiers =
+    result.warnings = null
+
+    let { hint, type } = options
 
     if (type === "unambiguous" &&
         hasPragma(code, "use script")) {
