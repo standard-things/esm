@@ -46,8 +46,8 @@ const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
-const metaSym = Symbol.for("@std/esm:Module#meta")
-const parsingSym = Symbol.for("@std/esm:Module#parsing")
+const cacheSym = Symbol.for("@std/esm:Module#cache")
+const stateSym = Symbol.for("@std/esm:Module#state")
 
 function hook(Mod, parent, options) {
   let defaultPkgInfo
@@ -137,10 +137,11 @@ function hook(Mod, parent, options) {
         delete cache[cacheFileName]
       } else {
         cached =
-        cache[cacheFileName] = assign({
-          changed: true,
-          code
-        }, Compiler.getMeta(code))
+        cache[cacheFileName] = new NullObject
+
+        cached.changed = true
+        cached.code = code
+        Compiler.assignMeta(cached, code)
       }
     }
 
@@ -194,8 +195,7 @@ function hook(Mod, parent, options) {
 
       if (moduleState.parsing) {
         if (cached.esm &&
-            mod[parsingSym] === 1) {
-          mod[metaSym] = cached
+            mod[stateSym] === 1) {
           tryParse(mod, cached)
         }
       } else {
@@ -401,65 +401,78 @@ function tryCompileCode(manager, sourceCode, options) {
 }
 
 function tryParse(mod, cached) {
-  const { moduleSpecifiers } = cached
+  const children = new NullObject
+  const { exportSpecifiers, moduleSpecifiers } = cached
   const names = keys(moduleSpecifiers)
-  const resolved = new NullObject
 
+  mod[cacheSym] = cached
+
+  // Parse children.
   for (const name of names) {
     if (! (name in builtinModules)) {
       const child = _loadESM(name, mod)
-      child[parsingSym] = 2
+      child[stateSym] = 2
 
-      if (metaSym in child) {
-        resolved[name] = child
+      if (cacheSym in child) {
+        children[name] = child
       }
     }
   }
 
-  for (const name in resolved) {
-    const { exportSpecifiers, exportStarNames } = resolved[name][metaSym]
+  // Validate requested child export names.
+  for (const name in children) {
+    const child = children[name]
+    const childCached = child[cacheSym]
     const requestedExportNames = moduleSpecifiers[name]
 
-    for (const exportName of requestedExportNames) {
-      if (exportSpecifiers[exportName] === 3) {
-        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
-      } else if (! (exportName in exportSpecifiers)) {
-        let skipExportMissing = false
+    for (const requestedName of requestedExportNames) {
+      if (requestedName === "*") {
+        continue
+      }
 
-        for (const name of exportStarNames) {
-          if (! (name in resolved) ||
-              ! (metaSym in resolved[name])) {
-            skipExportMissing = true
-            break
-          }
+      const { exportSpecifiers:childExportSpecifiers } = childCached
+
+      if (requestedName in childExportSpecifiers) {
+        if (childExportSpecifiers[requestedName] < 3) {
+          continue
         }
 
-        if (! skipExportMissing &&
-            exportName !== "*") {
-          throw new errors.SyntaxError("ERR_EXPORT_MISSING", resolved[name], exportName)
+        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
+      }
+
+      const { exportStarNames:childExportStarNames } = childCached
+      let throwExportMissing = true
+
+      for (const childStarName of childExportStarNames) {
+        if (! (childStarName in children)) {
+          throwExportMissing = false
+          break
         }
+      }
+
+      if (throwExportMissing) {
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedName)
       }
     }
   }
 
-  // Resolve export names.
-  for (const name of cached.exportStarNames) {
-    if (! (name in resolved) ||
-        ! (metaSym in resolved[name])) {
+  // Resolve export names from star exports.
+  for (const starName of cached.exportStarNames) {
+    if (! (starName in children)) {
       continue
     }
 
-    const childCached = resolved[name][metaSym]
-    const childExportNames = keys(childCached.exportSpecifiers)
+    const child = children[starName]
+    const childCached = child[cacheSym]
 
-    for (const exportName of childExportNames) {
-      const { exportSpecifiers } = cached
-
-      if (has(exportSpecifiers, exportName)) {
+    for (const exportName in childCached.exportSpecifiers) {
+      if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
+          // Export specifier is conflicted.
           exportSpecifiers[exportName] = 3
         }
       } else {
+        // Export specifier is imported.
         exportSpecifiers[exportName] = 2
       }
     }
