@@ -3,6 +3,7 @@ import { extname, resolve } from "path"
 import Compiler from "./compiler.js"
 import NullObject from "./null-object.js"
 
+import assign from "./util/assign.js"
 import gzip from "./fs/gzip.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
@@ -12,6 +13,22 @@ const codeOfSlash = "/".charCodeAt(0)
 const { stringify, parse } = JSON
 
 class CachingCompiler {
+  static assignMeta(object, code) {
+    object.esm = code.charCodeAt(7) === codeOfSlash
+
+    if (object.esm) {
+      const line = code.slice(9, code.indexOf("*/", 10))
+      const meta = parse(line)
+
+      object.exportSpecifiers = assign(new NullObject, meta.e)
+      object.exportStarNames = meta.s
+      object.moduleSpecifiers = assign(new NullObject, meta.m)
+      object.warnings = meta.w
+    }
+
+    return object
+  }
+
   static compile(code, options) {
     if (typeof options.cachePath === "string" &&
         typeof options.filePath === "string") {
@@ -19,24 +36,6 @@ class CachingCompiler {
     }
 
     return compileAndCache(code, options)
-  }
-
-  static getMeta(code) {
-    const result = new NullObject
-    result.esm = code.charCodeAt(7) === codeOfSlash
-
-    if (! result.esm) {
-      return null
-    }
-
-    const line = code.slice(9, code.indexOf("*/", 10))
-    const meta = parse(line)
-
-    result.exportSpecifiers = meta.e
-    result.exportStarNames = meta.a
-    result.moduleSpecifiers = meta.s
-    result.warnings = meta.w
-    return result
   }
 }
 
@@ -53,16 +52,15 @@ function compileAndCache(code, options) {
     output +=
       "/*" +
       stringify({
-        a: result.exportStarNames,
         e: result.exportSpecifiers,
-        s: result.moduleSpecifiers,
+        m: result.moduleSpecifiers,
+        s: result.exportStarNames,
         w: result.warnings
       }) +
       "*/"
   }
 
   result.code = output + result.code
-
   return result
 }
 
