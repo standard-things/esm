@@ -129,13 +129,18 @@ class ImportExportVisitor extends Visitor {
       return
     }
 
-    this.changed =
-    this.addedImportExport =
-    this.exportSpecifiers.default = true
-
     const node = path.getValue()
     const { declaration } = node
     const { id, type, functionParamsStart } = declaration
+
+    // Export specifier states:
+    //   1 - Own
+    //   2 - Imported
+    //   3 - Conflicted
+    this.exportSpecifiers.default = 1
+
+    this.changed =
+    this.addedImportExport = true
 
     if (type === "FunctionDeclaration" ||
         (id && type === "ClassDeclaration")) {
@@ -242,7 +247,7 @@ class ImportExportVisitor extends Visitor {
     for (const name of names) {
       const locals = keys(specifierMap[name])
 
-      exportSpecifiers[name] = true
+      exportSpecifiers[name] = 1
 
       addToSpecifierMap(
         newMap,
@@ -519,7 +524,7 @@ function toModuleExport(visitor, specifierMap) {
   for (const name of names) {
     const locals = keys(specifierMap[name])
 
-    exportSpecifiers[name] = true
+    exportSpecifiers[name] = 1
 
     code +=
       "[" + toStringLiteral(name) + ",()=>" +

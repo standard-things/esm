@@ -421,7 +421,7 @@ function tryParse(mod, cached) {
     const requestedExportNames = moduleSpecifiers[name]
 
     for (const exportName of requestedExportNames) {
-      if (exportSpecifiers[exportName] === "conflicted") {
+      if (exportSpecifiers[exportName] === 3) {
         throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
       } else if (! (exportName in exportSpecifiers)) {
         let skipExportMissing = false
@@ -456,11 +456,11 @@ function tryParse(mod, cached) {
       const { exportSpecifiers } = cached
 
       if (has(exportSpecifiers, exportName)) {
-        if (exportSpecifiers[exportName] === "imported") {
-          exportSpecifiers[exportName] = "conflicted"
+        if (exportSpecifiers[exportName] === 2) {
+          exportSpecifiers[exportName] = 3
         }
       } else {
-        exportSpecifiers[exportName] = "imported"
+        exportSpecifiers[exportName] = 2
       }
     }
   }
