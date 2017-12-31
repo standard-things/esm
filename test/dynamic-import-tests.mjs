@@ -101,9 +101,12 @@ describe("dynamic import", () => {
     assert.ok(p())
   })
 
-  it("should be syntactic form and not a function", () => {
+  it("should be syntactic", () => {
     const invalids = [
-      "const func = import",
+      "const f = import",
+      "import.length",
+      "import.name",
+      "import.apply()",
       "import.call()",
       "import.toString()"
     ]
@@ -112,11 +115,12 @@ describe("dynamic import", () => {
       assert.throws(() => compile(code), SyntaxError)
     )
   })
+
   it("should expect exactly one argument", () => {
     const invalids = [
       "import()",
       "import(a,b)",
-      "import(...[a])",
+      "import(...[a])"
     ]
 
     invalids.forEach((code) =>
