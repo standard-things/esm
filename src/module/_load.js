@@ -7,7 +7,7 @@ import Module from "../module.js"
 import moduleState from "./state.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
-const parsingSym = Symbol.for("@std/esm:Module#parsing")
+const stateSym = Symbol.for("@std/esm:Module#state")
 
 function load(filePath, parent, isMain, state, loader) {
   let child = state._cache[filePath]
@@ -20,13 +20,31 @@ function load(filePath, parent, isMain, state, loader) {
     }
 
     if (child.loaded ||
-      ! (parsingSym in child)) {
+        ! (stateSym in child)) {
       return child
     }
 
-    delete child[parsingSym]
+    // Module states:
+    //   1 - Initial state
+    //   2 - Parsing phase is complete
+    //   3 - Execution phase is complete
+    if (moduleState.parsing &&
+        child[stateSym] !== 1) {
+      return child
+    }
+
+    if (! moduleState.parsing &&
+        child[stateSym] === 3) {
+      return child
+    }
+
+    child[stateSym] = 3
   } else {
     child = new Module(filePath, parent)
+
+    if (moduleState.parsing) {
+      child[stateSym] = 1
+    }
 
     if (isMain) {
       moduleState.mainModule =

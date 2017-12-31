@@ -193,7 +193,8 @@ function hook(Mod, parent, options) {
       }
 
       if (moduleState.parsing) {
-        if (cached.esm) {
+        if (cached.esm &&
+            mod[parsingSym] === 1) {
           mod[metaSym] = cached
           tryParse(mod, cached)
         }
@@ -407,7 +408,7 @@ function tryParse(mod, cached) {
   for (const name of names) {
     if (! (name in builtinModules)) {
       const child = _loadESM(name, mod)
-      child[parsingSym] = true
+      child[parsingSym] = 2
 
       if (metaSym in child) {
         resolved[name] = child
@@ -416,18 +417,16 @@ function tryParse(mod, cached) {
   }
 
   for (const name in resolved) {
-    const childCached = resolved[name][metaSym]
+    const { exportSpecifiers, exportStarNames } = resolved[name][metaSym]
     const requestedExportNames = moduleSpecifiers[name]
 
     for (const exportName of requestedExportNames) {
-      const { exportSpecifiers } = childCached
-
-      if (exportSpecifiers[exportName] === "exportName") {
+      if (exportSpecifiers[exportName] === "conflicted") {
         throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, exportName)
       } else if (! (exportName in exportSpecifiers)) {
         let skipExportMissing = false
 
-        for (const name of childCached.exportStarNames) {
+        for (const name of exportStarNames) {
           if (! (name in resolved) ||
               ! (metaSym in resolved[name])) {
             skipExportMissing = true
