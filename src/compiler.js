@@ -5,12 +5,11 @@ import PkgInfo from "./pkg-info.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
+import has from "./util/has.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
-
-const { keys } = Object
 
 const defaultOptions = {
   cjs: PkgInfo.defaultOptions.cjs,
@@ -125,7 +124,17 @@ class Compiler {
       const specifierMap = new NullObject
 
       for (const specifier in moduleSpecifiers) {
-        specifierMap[specifier] = keys(moduleSpecifiers[specifier])
+        const exportNames =
+        specifierMap[specifier] = []
+
+        const moduleSpecifier = moduleSpecifiers[specifier]
+
+        for (const exportName in moduleSpecifier) {
+          if (exportName !== "*" &&
+              has(moduleSpecifier, exportName)) {
+            exportNames.push(exportName)
+          }
+        }
       }
 
       result.esm = true
