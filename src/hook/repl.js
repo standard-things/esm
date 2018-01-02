@@ -9,13 +9,15 @@ import captureStackTrace from "../error/capture-stack-trace.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
-import isObject from "../util/is-object.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
+import tryParse from "../try-parse.js"
 import wrap from "../util/wrap.js"
 
 const { now } = Date
+
+const stateSym = Symbol.for("@std/esm:Module#state")
 
 function hook(vm) {
   let mod
@@ -54,7 +56,7 @@ function hook(vm) {
 
     let cached = cache[cacheFileName]
 
-    if (isObject(cached)) {
+    if (cached) {
       if (scriptOptions.produceCachedData === true &&
           scriptOptions.cachedData === void 0 &&
           cached.data !== void 0) {
@@ -74,6 +76,12 @@ function hook(vm) {
     const content =
       '"use strict";var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" + cached.code
+
+    mod[stateSym] = 1
+
+    if (cached.esm) {
+      tryParse(mod, cached)
+    }
 
     const result = tryWrapper(func, [content, scriptOptions])
 
