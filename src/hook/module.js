@@ -9,9 +9,7 @@ import Runtime from "../runtime.js"
 import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
-import _loadESM from "../module/esm/_load.js"
 import assign from "../util/assign.js"
-import builtinModules from "../builtin-modules.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
 import encodeId from "../util/encode-id.js"
@@ -37,16 +35,16 @@ import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
+import tryParse from "../try-parse.js"
 import warn from "../warn.js"
 
-const { keys, setPrototypeOf } = Object
+const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
-const cacheSym = Symbol.for("@std/esm:Module#cache")
 const stateSym = Symbol.for("@std/esm:Module#state")
 
 function hook(Mod, parent, options) {
@@ -397,85 +395,6 @@ function tryCompileCode(manager, sourceCode, options) {
     delete e.sourceType
     captureStackTrace(e, manager)
     throw maskStackTrace(e, sourceCode, filePath, useURLs)
-  }
-}
-
-function tryParse(mod, cached) {
-  const children = new NullObject
-  const { exportSpecifiers, moduleSpecifiers } = cached
-  const names = keys(moduleSpecifiers)
-
-  mod[cacheSym] = cached
-
-  // Parse children.
-  for (const name of names) {
-    if (! (name in builtinModules)) {
-      const child = _loadESM(name, mod)
-      child[stateSym] = 2
-
-      if (cacheSym in child) {
-        children[name] = child
-      }
-    }
-  }
-
-  // Validate requested child export names.
-  for (const name in children) {
-    const child = children[name]
-    const childCached = child[cacheSym]
-    const requestedExportNames = moduleSpecifiers[name]
-
-    for (const requestedName of requestedExportNames) {
-      if (requestedName === "*") {
-        continue
-      }
-
-      const { exportSpecifiers:childExportSpecifiers } = childCached
-
-      if (requestedName in childExportSpecifiers) {
-        if (childExportSpecifiers[requestedName] < 3) {
-          continue
-        }
-
-        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
-      }
-
-      const { exportStarNames:childExportStarNames } = childCached
-      let throwExportMissing = true
-
-      for (const childStarName of childExportStarNames) {
-        if (! (childStarName in children)) {
-          throwExportMissing = false
-          break
-        }
-      }
-
-      if (throwExportMissing) {
-        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedName)
-      }
-    }
-  }
-
-  // Resolve export names from star exports.
-  for (const starName of cached.exportStarNames) {
-    if (! (starName in children)) {
-      continue
-    }
-
-    const child = children[starName]
-    const childCached = child[cacheSym]
-
-    for (const exportName in childCached.exportSpecifiers) {
-      if (exportName in exportSpecifiers) {
-        if (exportSpecifiers[exportName] === 2) {
-          // Export specifier is conflicted.
-          exportSpecifiers[exportName] = 3
-        }
-      } else {
-        // Export specifier is imported.
-        exportSpecifiers[exportName] = 2
-      }
-    }
   }
 }
 
