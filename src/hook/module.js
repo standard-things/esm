@@ -194,7 +194,7 @@ function hook(Mod, parent, options) {
       if (moduleState.parsing) {
         if (cached.esm &&
             mod[stateSym] === 1) {
-          tryParse(mod, cached)
+          tryParse(mod, cached, options)
         }
       } else {
         tryCompileCached(mod, cached, filePath, runtimeName, options)

@@ -9,10 +9,10 @@ const { keys } = Object
 const cacheSym = Symbol.for("@std/esm:Module#cache")
 const stateSym = Symbol.for("@std/esm:Module#state")
 
-function tryParse(mod, cached) {
+function tryParse(mod, cached, options) {
   const children = new NullObject
   const { exportSpecifiers, moduleSpecifiers } = cached
-  const names = keys(moduleSpecifiers)
+  const names = moduleSpecifiers ? keys(moduleSpecifiers) : []
 
   mod[cacheSym] = cached
 
@@ -21,10 +21,7 @@ function tryParse(mod, cached) {
     if (! (name in builtinModules)) {
       const child = _loadESM(name, mod)
       child[stateSym] = 2
-
-      if (cacheSym in child) {
-        children[name] = child
-      }
+      children[name] = child
     }
   }
 
@@ -34,11 +31,18 @@ function tryParse(mod, cached) {
     const childCached = child[cacheSym]
     const requestedExportNames = moduleSpecifiers[name]
 
-    for (const requestedName of requestedExportNames) {
-      if (requestedName === "*") {
-        continue
+    if (! childCached) {
+      if (! options.cjs.namedExports &&
+          requestedExportNames.length &&
+          (requestedExportNames.length > 1 ||
+           requestedExportNames[0] !== "default")) {
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedExportNames[0])
       }
 
+      continue
+    }
+
+    for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCached
 
       if (requestedName in childExportSpecifiers) {
@@ -73,6 +77,10 @@ function tryParse(mod, cached) {
 
     const child = children[starName]
     const childCached = child[cacheSym]
+
+    if (! childCached) {
+      continue
+    }
 
     for (const exportName in childCached.exportSpecifiers) {
       if (exportName in exportSpecifiers) {
