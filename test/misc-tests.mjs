@@ -637,7 +637,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.strictEqual("loadCount" in global, false)
-          assert.ok(e.message.includes("' does not provide an export named '"))
+          assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
         })
     ))
   )
