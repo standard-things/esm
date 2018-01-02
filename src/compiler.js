@@ -51,11 +51,13 @@ class Compiler {
     }
 
     if (type === "unambiguous" &&
-        (hint === "module" || hasPragma(code, "use module"))) {
+        (hint === "module" ||
+         hasPragma(code, "use module"))) {
       type = "module"
     }
 
-    if ((type === "script" || type === "unambiguous") &&
+    if ((type === "script" ||
+         type === "unambiguous") &&
         ! importExportRegExp.test(code)) {
       return result
     }
