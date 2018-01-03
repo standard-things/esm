@@ -127,4 +127,15 @@ describe("dynamic import", () => {
       assert.throws(() => compile(code), SyntaxError)
     )
   })
+
+  // bug: https://github.com/standard-things/esm/issues/203
+  it("should not error when using comment before import()", () =>
+    Promise.all([
+      "./fixture/comment/single-line.js",
+      "./fixture/comment/multi-line.js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(true))
+    ))
+  )
 })
