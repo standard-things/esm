@@ -6,7 +6,7 @@ function createSourceMap(filePath, content) {
   let lineCount = -1
   let mapping = ""
 
-  while (newlineRegExp.test(content)) {
+  while (newlineRegExp.test(content) || lineCount < 0) {
     mapping += (++lineCount ? ";" : "") + "AA" + (lineCount ? "C" : "A") + "A"
   }
 

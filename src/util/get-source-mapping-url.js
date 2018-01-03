@@ -13,6 +13,10 @@ const minLength = nameLength + 6
 const { trim } = String.prototype
 
 function getSourceMappingURL(content) {
+  if (typeof content !== "string") {
+    return ""
+  }
+
   const { length } = content
 
   if (length < minLength) {
