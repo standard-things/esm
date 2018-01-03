@@ -17,10 +17,9 @@ import wrap from "../util/wrap.js"
 
 const { now } = Date
 
-const stateSym = Symbol.for("@std/esm:Module#state")
-
 function hook(vm) {
-  let mod
+  let entry
+
   const md5Hash = md5(now().toString()).slice(0, 3)
   const pkgInfo = PkgInfo.get("")
   const runtimeName = encodeId("_" + md5Hash)
@@ -77,10 +76,15 @@ function hook(vm) {
       '"use strict";var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" + cached.code
 
-    mod[stateSym] = 1
+    entry.esm = cached.esm
+    entry.exportSpecifiers = cached.exportSpecifiers
+    entry.exportStarNames = cached.exportStarNames
+    entry.moduleSpecifiers = cached.moduleSpecifiers
+    entry.state = 1
+    entry.warnings = cached.warnings
 
-    if (cached.esm) {
-      tryParse(mod, cached)
+    if (entry.esm) {
+      tryParse(entry)
     }
 
     const result = tryWrapper(func, [content, scriptOptions])
@@ -100,9 +104,10 @@ function hook(vm) {
   const exported = {}
 
   if (rootModule.id === "<repl>") {
-    mod = rootModule
-    Entry.get(mod).runtimeName = runtimeName
-    Runtime.enable(rootModule, exported, pkgInfo.options)
+    entry = Entry.get(rootModule)
+    entry.options = pkgInfo.options
+    entry.runtimeName = runtimeName
+    Runtime.enable(entry, exported)
     return
   }
 
@@ -114,11 +119,13 @@ function hook(vm) {
 
   REPLServer.prototype.createContext = function () {
     REPLServer.prototype.createContext = createContext
+
     const context = createContext.call(this)
 
-    mod = context.module
-    Entry.get(mod).runtimeName = runtimeName
-    Runtime.enable(mod, exported, pkgInfo.options)
+    entry = Entry.get(context.module)
+    entry.options = pkgInfo.options
+    entry.runtimeName = runtimeName
+    Runtime.enable(entry, exported)
     return context
   }
 }

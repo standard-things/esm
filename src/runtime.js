@@ -5,7 +5,6 @@ import _loadCJS from "./module/cjs/_load.js"
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
 import errors from "./errors.js"
-import isESM from "./util/is-es-module.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 import parseAndLoad from "./module/esm/parse-and-load.js"
@@ -14,16 +13,13 @@ import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 
 class Runtime {
-  static enable(mod, exported, options) {
+  static enable(entry, exported) {
+    const mod = entry.module
     const object = mod.exports
     const { prototype } = Runtime
 
-    const entry =
-    object.entry = Entry.get(mod)
-
-    entry.esm = isESM(exported)
+    object.entry = entry
     entry.exports = exported
-    entry.options = options
 
     Entry.set(mod, exported, entry)
 
@@ -139,7 +135,7 @@ function runCJS(runtime, moduleWrapper) {
     const child = load(id, mod, loader)
 
     if (! options.cjs.vars &&
-        isESM(child.exports)) {
+        Entry.get(child).esm) {
       throw new errors.Error("ERR_REQUIRE_ESM", child)
     }
 

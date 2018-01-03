@@ -45,8 +45,6 @@ const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
-const stateSym = Symbol.for("@std/esm:Module#state")
-
 function hook(Mod, parent, options) {
   let defaultPkgInfo
   let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
@@ -135,13 +133,16 @@ function hook(Mod, parent, options) {
         delete cache[cacheFileName]
       } else {
         cached =
-        cache[cacheFileName] = new NullObject
-
-        cached.changed = true
-        cached.code = code
-        Compiler.assignMeta(cached, code)
+        cache[cacheFileName] = Compiler.from(code)
       }
     }
+
+    const entry = Entry.get(mod)
+    const stateHash = getCacheStateHash(cacheFileName)
+    const runtimeName = encodeId("_" + stateHash.slice(0, 3))
+
+    entry.options = options
+    entry.runtimeName = runtimeName
 
     const compileWrapper = (content, filePath) => {
       if (shouldOverwrite) {
@@ -151,12 +152,6 @@ function hook(Mod, parent, options) {
           delete mod._compile
         }
       }
-
-      const entry = Entry.get(mod)
-      entry.runtimeName = runtimeName
-
-      const stateHash = getCacheStateHash(cacheFileName)
-      const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
       if (! cached) {
         cached = tryCompileCode(manager, content, {
@@ -172,7 +167,14 @@ function hook(Mod, parent, options) {
 
       const { warnings } = cached
 
-      if (entry.options.warnings &&
+      entry.code = cached.code
+      entry.esm = cached.esm
+      entry.exportSpecifiers = cached.exportSpecifiers
+      entry.exportStarNames = cached.exportStarNames
+      entry.moduleSpecifiers = cached.moduleSpecifiers
+      entry.warnings = cached.warnings
+
+      if (options.warnings &&
           moduleState.parsing &&
           warnings) {
         for (const warning of warnings) {
@@ -192,12 +194,12 @@ function hook(Mod, parent, options) {
       }
 
       if (moduleState.parsing) {
-        if (cached.esm &&
-            mod[stateSym] === 1) {
-          tryParse(mod, cached, options)
+        if (entry.esm &&
+            entry.state === 1) {
+          tryParse(entry)
         }
       } else {
-        tryCompileCached(mod, cached, filePath, runtimeName, options)
+        tryCompileCached(entry)
       }
     }
 
@@ -217,22 +219,24 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryCompileCached(mod, cached, filePath, runtimeName, options) {
+  function tryCompileCached(entry) {
     const noDepth = moduleState.requireDepth === 0
-    const tryCompile = cached.esm ? tryCompileESM : tryCompileCJS
+    const { options } = entry
+    const tryCompile = entry.esm ? tryCompileESM : tryCompileCJS
 
     if (noDepth) {
       stat.cache = new NullObject
     }
 
     if (options.debug) {
-      tryCompile(mod, cached.code, filePath, runtimeName, options)
+      tryCompile(entry)
     } else {
       try {
-        tryCompile(mod, cached.code, filePath, runtimeName, options)
+        tryCompile(entry)
       } catch (e) {
-        const sourceCode = () => readSourceCode(filePath, options)
-        throw maskStackTrace(e, sourceCode, filePath, cached.esm)
+        const { filename } = entry.module
+        const sourceCode = () => readSourceCode(filename, options)
+        throw maskStackTrace(e, sourceCode, filename, entry.esm)
       }
     }
 
@@ -241,34 +245,35 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function tryCompileCJS(mod, content, filePath, runtimeName, options) {
-    const async = useAsyncWrapper(mod, options) ? "async " :  ""
+  function tryCompileCJS(entry) {
+    const async = useAsyncWrapper(entry) ? "async " :  ""
+    const { module:mod, runtimeName } = entry
 
-    content =
+    let content =
       "const " + runtimeName + "=this;" +
-      runtimeName + ".r((" + async + "function(exports,require){" + content + "\n}))"
+      runtimeName + ".r((" + async + "function(exports,require){" +
+      entry.code + "\n}))"
 
-    content +=
-      maybeSourceMap(content, filePath, options)
+    content += maybeSourceMap(content, entry)
 
     const exported = {}
 
     setESM(exported, false)
-    Runtime.enable(mod, exported, options)
-    mod._compile(content, filePath)
+    Runtime.enable(entry, exported)
+    mod._compile(content, mod.filename)
   }
 
-  function tryCompileESM(mod, content, filePath, runtimeName, options) {
-    const async = useAsyncWrapper(mod, options) ? "async " :  ""
+  function tryCompileESM(entry) {
+    const async = useAsyncWrapper(entry) ? "async " :  ""
+    const { module:mod, options, runtimeName } = entry
 
-    content =
+    let content =
       '"use strict";const ' + runtimeName + "=this;" +
       runtimeName + ".r((" + async + "function(" +
       (options.cjs.vars ? "exports,require" : "") +
-      "){" + content + "\n}))"
+      "){" + entry.code + "\n}))"
 
-    content +=
-      maybeSourceMap(content, filePath, options)
+    content += maybeSourceMap(content, entry)
 
     const exported = {}
     const moduleWrap = Module.wrap
@@ -283,10 +288,10 @@ function hook(Mod, parent, options) {
     }
 
     setESM(exported, true)
-    Runtime.enable(mod, exported, options)
+    Runtime.enable(entry, exported)
 
     try {
-      mod._compile(content, filePath)
+      mod._compile(content, mod.filename)
     } finally {
       if (Module.wrap === customWrap) {
         Module.wrap = moduleWrap
@@ -294,12 +299,13 @@ function hook(Mod, parent, options) {
     }
   }
 
-  function useAsyncWrapper(mod, options) {
+  function useAsyncWrapper(entry) {
     const { mainModule } = moduleState
 
     if (allowTopLevelAwait &&
         mainModule &&
-        options.await) {
+        entry.options.await) {
+      const mod = entry.module
       allowTopLevelAwait = false
 
       if (mainModule === mod ||
@@ -341,12 +347,14 @@ function hook(Mod, parent, options) {
   })
 }
 
-function maybeSourceMap(content, filePath, options) {
-  if (options.sourceMap !== false &&
-      (env.inspector || options.sourceMap) &&
+function maybeSourceMap(content, entry) {
+  const { sourceMap } = entry.options
+
+  if (sourceMap !== false &&
+      (env.inspector || sourceMap) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(filePath, content))
+      encodeURI(createSourceMap(entry.module.filename, content))
   }
 
   return ""

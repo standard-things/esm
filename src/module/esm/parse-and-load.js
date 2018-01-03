@@ -1,7 +1,7 @@
+import Entry from "../../entry.js"
+
 import _load from "./_load.js"
 import moduleState from "../state.js"
-
-const stateSym = Symbol.for("@std/esm:Module#state")
 
 function parseAndLoad(id, parent, isMain, preload) {
   let child
@@ -18,10 +18,12 @@ function parseAndLoad(id, parent, isMain, preload) {
     return _load(id, parent, isMain, preload)
   }
 
-  child[stateSym] = 2
+  const entry = Entry.get(child)
+  entry.state = 2
+
   _load(id, parent, isMain, preload)
 
-  child[stateSym] = 3
+  entry.state = 3
   return child
 }
 

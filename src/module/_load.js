@@ -2,12 +2,12 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import Entry from "../entry.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
-const stateSym = Symbol.for("@std/esm:Module#state")
 
 function load(filePath, parent, isMain, state, loader) {
   let child = state._cache[filePath]
@@ -19,8 +19,10 @@ function load(filePath, parent, isMain, state, loader) {
       children.push(child)
     }
 
+    const entry = Entry.get(child)
+
     if (child.loaded ||
-        ! (stateSym in child)) {
+        typeof entry.state !== "number") {
       return child
     }
 
@@ -29,21 +31,21 @@ function load(filePath, parent, isMain, state, loader) {
     //   2 - Parsing phase is complete
     //   3 - Execution phase is complete
     if (moduleState.parsing &&
-        child[stateSym] !== 1) {
+        entry.state !== 1) {
       return child
     }
 
     if (! moduleState.parsing &&
-        child[stateSym] === 3) {
+        entry.state === 3) {
       return child
     }
 
-    child[stateSym] = 3
+    entry.state = 3
   } else {
     child = new Module(filePath, parent)
 
     if (moduleState.parsing) {
-      child[stateSym] = 1
+      Entry.get(child).state = 1
     }
 
     if (isMain) {

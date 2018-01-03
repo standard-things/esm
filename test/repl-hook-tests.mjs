@@ -1,3 +1,4 @@
+import Entry from "../build/entry.js"
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
@@ -28,8 +29,9 @@ describe("REPL hook", () => {
   it("should work with a global context", () => {
     const r = repl.start({ useGlobal: true })
     const code = 'import { default as globalAssert } from "assert"'
+    const entry = Entry.get(r.context.module)
 
-    Runtime.enable(r.context.module, {}, { cjs: {} })
+    Runtime.enable(entry, {})
 
     assert.strictEqual(typeof globalAssert, "undefined")
 
