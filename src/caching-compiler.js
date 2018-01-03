@@ -13,22 +13,6 @@ const codeOfSlash = "/".charCodeAt(0)
 const { stringify, parse } = JSON
 
 class CachingCompiler {
-  static assignMeta(object, code) {
-    object.esm = code.charCodeAt(7) === codeOfSlash
-
-    if (object.esm) {
-      const line = code.slice(9, code.indexOf("*/", 10))
-      const meta = parse(line)
-
-      object.exportSpecifiers = assign(new NullObject, meta.e)
-      object.exportStarNames = meta.s
-      object.moduleSpecifiers = assign(new NullObject, meta.m)
-      object.warnings = meta.w
-    }
-
-    return object
-  }
-
   static compile(code, options) {
     if (typeof options.cachePath === "string" &&
         typeof options.filePath === "string") {
@@ -36,6 +20,26 @@ class CachingCompiler {
     }
 
     return compileAndCache(code, options)
+  }
+
+  static from(code) {
+    const result = new NullObject
+    result.changed = true
+    result.code = code
+    result.esm = code.charCodeAt(7) === codeOfSlash
+
+    if (result.esm) {
+      // Extract metadata.
+      const line = code.slice(9, code.indexOf("*/", 10))
+      const meta = parse(line)
+
+      result.exportSpecifiers = assign(new NullObject, meta.e)
+      result.exportStarNames = meta.s
+      result.moduleSpecifiers = assign(new NullObject, meta.m)
+      result.warnings = meta.w
+    }
+
+    return result
   }
 }
 
@@ -49,6 +53,7 @@ function compileAndCache(code, options) {
   let output = '"main";'
 
   if (result.esm) {
+    // Add metadata.
     output +=
       "/*" +
       stringify({
