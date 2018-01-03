@@ -1,4 +1,3 @@
-import Entry from "../../entry.js"
 import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
@@ -8,7 +7,6 @@ import { dirname } from "path"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
-import isESM from "../../util/is-es-module.js"
 import isError from "../../util/is-error.js"
 import loader from "./loader.js"
 import moduleResolveFilename from "../cjs/resolve-filename.js"
@@ -21,9 +19,6 @@ function load(id, parent, isMain, preload) {
   const parentOptions = parentPkgInfo && parentPkgInfo.options
 
   let filePath
-  let called = false
-  let childIsMain = isMain
-  let state = Module
 
   if (Module._resolveFilename !== moduleResolveFilename &&
       parentOptions && parentOptions.cjs.paths) {
@@ -35,8 +30,9 @@ function load(id, parent, isMain, preload) {
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
-  const queryHash = getQueryHash(id)
-  const cacheId = filePath + queryHash
+
+  let childIsMain = isMain
+  let state = Module
 
   if (! (pkgOptions && pkgOptions.cjs.cache)) {
     const ext = extname(filePath)
@@ -49,33 +45,27 @@ function load(id, parent, isMain, preload) {
     }
   }
 
-  const isStateExposed = state === Module
+  const queryHash = getQueryHash(id)
+  const cacheId = filePath + queryHash
 
-  let child = isStateExposed
-    ? state._cache[cacheId]
-    : null
-
-  if (child &&
-      child.loaded &&
-      isESM(child.exports) &&
-      ! Entry.has(child)) {
-    delete state._cache[cacheId]
-  }
-
+  let child
   let error
+
+  let called = false
   let threw = true
 
   try {
     child = _load(cacheId, parent, childIsMain, state, function () {
       called = true
+      const child = this
       const url = getURLFromFilePath(filePath) + queryHash
 
       if (isMain) {
-        moduleState.mainModule = this
-        this.id = "."
+        moduleState.mainModule = child
+        child.id = "."
       }
 
-      return loader.call(this, filePath, fromPath, url, parentOptions, preload)
+      return loader.call(child, filePath, fromPath, url, parentOptions, preload)
     })
 
     if (! called &&
@@ -99,7 +89,7 @@ function load(id, parent, isMain, preload) {
   try {
     throw error
   } finally {
-    if (isStateExposed) {
+    if (state === Module) {
       delete state._cache[cacheId]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.

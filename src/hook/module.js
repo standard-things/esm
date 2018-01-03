@@ -31,7 +31,6 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { satisfies } from "semver"
-import setESM from "../util/set-es-module.js"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
@@ -256,7 +255,6 @@ function hook(Mod, parent, options) {
 
     const exported = {}
 
-    setESM(exported, false)
     Runtime.enable(entry, exported)
     mod._compile(content, entry.filePath)
   }
@@ -286,7 +284,6 @@ function hook(Mod, parent, options) {
       Module.wrap = customWrap
     }
 
-    setESM(exported, true)
     Runtime.enable(entry, exported)
 
     try {
