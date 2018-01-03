@@ -65,6 +65,7 @@ function load(id, parent, isMain, preload) {
         child.id = "."
       }
 
+      child.parent = void 0
       return loader.call(child, filePath, fromPath, url, parentOptions, preload)
     })
 

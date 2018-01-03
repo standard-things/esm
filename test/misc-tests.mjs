@@ -5,6 +5,7 @@ import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import mockIo from "mock-stdio"
+import module from "./module.js"
 import require from "./require.js"
 import util from "util"
 
@@ -446,7 +447,12 @@ describe("Node rules", () => {
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
   })
 
-  it("should not cache ES modules in `require.cache`", () => {
+  it("should not expose ESM in `module.parent`", () => {
+    assert.ok("parent" in module)
+    assert.strictEqual(module.parent, void 0)
+  })
+
+  it("should not expose ESM in `require.cache`", () => {
     const id = require.resolve("./fixture/cache/out")
 
     delete require.cache[id]
