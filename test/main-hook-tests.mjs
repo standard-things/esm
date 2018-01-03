@@ -125,7 +125,9 @@ describe("module.runMain hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
+          .then((result) =>
+            assert.ok(result.stderr.includes("ERR_MISSING_MODULE"))
+          )
       , Promise.resolve())
   })
 })

@@ -619,6 +619,12 @@ describe("spec compliance", () => {
     ))
   )
 
+  it("should error with legacy code missing modules in CJS", () =>
+    import("./fixture/import/missing-module.js")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+  )
+
   it("should error for missing modules before code execution", () =>
     Promise.all([
       "./fixture/import/missing-module-cjs.mjs",

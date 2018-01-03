@@ -1,7 +1,7 @@
 import _resolveFilename from "../_resolve-filename.js"
-import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 import shared from "../../shared.js"
+import toStringLiteral from "../../util/to-string-literal.js"
 
 function resolveFilename(id, parent, isMain) {
   const cacheKey = id + "\0" + getModuleName(parent) + "\0" + isMain
@@ -16,7 +16,9 @@ function resolveFilename(id, parent, isMain) {
     return shared.resolveFilename[cacheKey] = filePath
   }
 
-  throw new errors.Error("ERR_MISSING_MODULE", id)
+  const error = new Error("Cannot find module " + toStringLiteral(id, "'"))
+  error.code = "MODULE_NOT_FOUND"
+  throw error
 }
 
 export default resolveFilename

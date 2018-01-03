@@ -71,12 +71,26 @@ function hook(Mod) {
       return
     }
 
+    let error
     let filePath
+    let threw = true
 
     try {
       filePath = _resolveFilename(mainPath, null, true)
+      threw = false
     } catch (e) {
-      filePath = Module._resolveFilename(mainPath, null, true)
+      error = e
+    }
+
+    if (threw) {
+      try {
+        filePath = Module._resolveFilename(mainPath, null, true)
+      } catch (e) {}
+    }
+
+    if (threw &&
+        ! filePath) {
+      throw error
     }
 
     const dirPath = dirname(filePath)
