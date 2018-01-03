@@ -13,13 +13,13 @@ const codeOfSlash = "/".charCodeAt(0)
 const { stringify, parse } = JSON
 
 class CachingCompiler {
-  static compile(code, options) {
-    if (typeof options.cachePath === "string" &&
-        typeof options.filePath === "string") {
-      return compileAndWrite(code, options)
+  static compile(code, entry, cacheFileName, options) {
+    if (entry.filePath &&
+        options.cachePath) {
+      return compileAndWrite(code, entry, cacheFileName, options)
     }
 
-    return compileAndCache(code, options)
+    return compileAndCache(code, entry, cacheFileName, options)
   }
 
   static from(code) {
@@ -43,10 +43,10 @@ class CachingCompiler {
   }
 }
 
-function compileAndCache(code, options) {
+function compileAndCache(code, entry, cacheFileName, options) {
   const result =
-  options.pkgInfo.cache[options.cacheFileName] =
-  Compiler.compile(code, toCompileOptions(options))
+  entry.data.package.cache[cacheFileName] =
+  Compiler.compile(code, toCompileOptions(entry, options))
 
   // Add "main" to enable the `readFileFast` fast path of
   // `process.binding("fs").internalModuleReadJSON`.
@@ -69,16 +69,15 @@ function compileAndCache(code, options) {
   return result
 }
 
-function compileAndWrite(code, options) {
-  const result = compileAndCache(code, options)
+function compileAndWrite(code, entry, cacheFileName, options) {
+  const result = compileAndCache(code, entry, cacheFileName, options)
 
   if (! result.changed) {
     return result
   }
 
-  const { cache, dirPath:scopePath } = options.pkgInfo
+  const { cache, dirPath:scopePath } = entry.data.package
   const cachePath = options.cachePath
-  const cacheFileName = options.cacheFileName
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const isGzipped = extname(cacheFilePath) === ".gz"
   const content = () => isGzipped ? gzip(result.code) : result.code
@@ -105,11 +104,11 @@ function removeExpired(cache, cachePath, cacheFileName) {
   }
 }
 
-function toCompileOptions(options) {
+function toCompileOptions(entry, options) {
   return {
-    cjs: options.pkgInfo.options.cjs,
+    cjs: entry.options.cjs,
     hint: options.hint,
-    runtimeName: options.runtimeName,
+    runtimeName: entry.runtimeName,
     type: options.type,
     var: options.var
   }

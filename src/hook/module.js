@@ -96,14 +96,25 @@ function hook(Mod, parent, options) {
 
   function methodWrapper(manager, func, pkgInfo, args) {
     const [mod, filePath] = args
-    const { _compile } = mod
-    const { cache, cachePath, options } = pkgInfo
-    const cacheKey = mtime(filePath)
-    const cacheFileName = getCacheFileName(filePath, cacheKey, pkgInfo)
-    const ext = extname(filePath)
-
     const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
+
+    const { _compile } = mod
+    const { cache, cachePath, options } = pkgInfo
+
+    const cacheKey = mtime(filePath)
+    const ext = extname(filePath)
+    const entry = Entry.get(mod)
+
+    entry.data.package = pkgInfo
+    entry.filePath = filePath
+    entry.options = options
+
+    const cacheFileName = getCacheFileName(entry, cacheKey)
+    const stateHash = getCacheStateHash(cacheFileName)
+    const runtimeName = encodeId("_" + stateHash.slice(0, 3))
+
+    entry.runtimeName = runtimeName
 
     let hint = "script"
     let type = "script"
@@ -133,16 +144,10 @@ function hook(Mod, parent, options) {
         delete cache[cacheFileName]
       } else {
         cached =
+        entry.data.compile =
         cache[cacheFileName] = Compiler.from(code)
       }
     }
-
-    const entry = Entry.get(mod)
-    const stateHash = getCacheStateHash(cacheFileName)
-    const runtimeName = encodeId("_" + stateHash.slice(0, 3))
-
-    entry.options = options
-    entry.runtimeName = runtimeName
 
     const compileWrapper = (content, filePath) => {
       if (shouldOverwrite) {
@@ -154,25 +159,17 @@ function hook(Mod, parent, options) {
       }
 
       if (! cached) {
-        cached = tryCompileCode(manager, content, {
-          cacheFileName,
+        cached = tryCompileCode(manager, content, entry, cacheFileName, {
           cachePath,
-          filePath,
           hint,
-          pkgInfo,
-          runtimeName,
           type
         })
       }
 
-      const { warnings } = cached
-
-      entry.code = cached.code
+      entry.data.compile = cached
       entry.esm = cached.esm
-      entry.exportSpecifiers = cached.exportSpecifiers
-      entry.exportStarNames = cached.exportStarNames
-      entry.moduleSpecifiers = cached.moduleSpecifiers
-      entry.warnings = cached.warnings
+
+      const { warnings } = cached
 
       if (options.warnings &&
           moduleState.parsing &&
@@ -248,11 +245,12 @@ function hook(Mod, parent, options) {
   function tryCompileCJS(entry) {
     const async = useAsyncWrapper(entry) ? "async " :  ""
     const { module:mod, runtimeName } = entry
+    const { code } = entry.data.compile
 
     let content =
       "const " + runtimeName + "=this;" +
       runtimeName + ".r((" + async + "function(exports,require){" +
-      entry.code + "\n}))"
+      code + "\n}))"
 
     content += maybeSourceMap(content, entry)
 
@@ -260,18 +258,19 @@ function hook(Mod, parent, options) {
 
     setESM(exported, false)
     Runtime.enable(entry, exported)
-    mod._compile(content, mod.filename)
+    mod._compile(content, entry.filePath)
   }
 
   function tryCompileESM(entry) {
     const async = useAsyncWrapper(entry) ? "async " :  ""
     const { module:mod, options, runtimeName } = entry
+    const { code } = entry.data.compile
 
     let content =
       '"use strict";const ' + runtimeName + "=this;" +
       runtimeName + ".r((" + async + "function(" +
       (options.cjs.vars ? "exports,require" : "") +
-      "){" + entry.code + "\n}))"
+      "){" + code + "\n}))"
 
     content += maybeSourceMap(content, entry)
 
@@ -291,7 +290,7 @@ function hook(Mod, parent, options) {
     Runtime.enable(entry, exported)
 
     try {
-      mod._compile(content, mod.filename)
+      mod._compile(content, entry.filePath)
     } finally {
       if (Module.wrap === customWrap) {
         Module.wrap = moduleWrap
@@ -354,7 +353,7 @@ function maybeSourceMap(content, entry) {
       (env.inspector || sourceMap) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(entry.module.filename, content))
+      encodeURI(createSourceMap(entry.filePath, content))
   }
 
   return ""
@@ -388,21 +387,19 @@ function readWith(reader, filePath, options) {
   return reader(filePath, "utf8")
 }
 
-function tryCompileCode(manager, sourceCode, options) {
-  const { filePath, pkgInfo } = options
-
-  if (pkgInfo.options.debug) {
-    return Compiler.compile(sourceCode, options)
+function tryCompileCode(manager, sourceCode, entry, cacheFilename, options) {
+  if (entry.options.debug) {
+    return Compiler.compile(sourceCode, entry, cacheFilename, options)
   }
 
   try {
-    return Compiler.compile(sourceCode, options)
+    return Compiler.compile(sourceCode, entry, cacheFilename, options)
   } catch (e) {
     const useURLs = e.sourceType === "module"
 
     delete e.sourceType
     captureStackTrace(e, manager)
-    throw maskStackTrace(e, sourceCode, filePath, useURLs)
+    throw maskStackTrace(e, sourceCode, entry.filePath, useURLs)
   }
 }
 

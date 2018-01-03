@@ -6,7 +6,6 @@ import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import errors from "./errors.js"
 import has from "./util/has.js"
-import isESM from "./util/is-es-module.js"
 import isObjectLike from "./util/is-object-like.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
@@ -50,19 +49,27 @@ class Entry {
     this.children = new NullObject
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
+    // The data object for the module.
+    this.data = new NullObject
+    // The compiler data for the module.
+    this.data.compile = null
+    // The package data for the module.
+    this.data.package = null
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
     // The ES module type indicator.
-    this.esm = isESM(exported)
+    this.esm = false
     // The `module.exports` of the module.
     this.exports = exported
+    // The file path of the module.
+    this.filePath = mod.filename
     // Getters for local variables exported by the module.
     this.getters = new NullObject
     // The id of the module.
     this.id = mod.id
-    // The module this entry is managing.
+    // The module the entry is managing.
     this.module = mod
-    // The package options for this entry.
+    // The options for the entry.
     this.options = PkgInfo.createOptions()
     // The name of the runtime identifier.
     this.runtimeName = null
@@ -224,7 +231,7 @@ class Entry {
       const mod = this.module
       const exported = mod.exports
 
-      this.esm = isESM(exported)
+      this.esm = false
       this.exports = exported
 
       Entry.set(mod, exported, this)

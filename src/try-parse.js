@@ -9,7 +9,10 @@ const { keys } = Object
 
 function tryParse(entry) {
   const children = new NullObject
-  const { exportSpecifiers, module: mod, moduleSpecifiers } = entry
+  const data = entry.data.compile
+  const mod = entry.module
+
+  const { exportSpecifiers, moduleSpecifiers } = data
   const { namedExports } = entry.options.cjs
   const names = moduleSpecifiers ? keys(moduleSpecifiers) : []
 
@@ -40,8 +43,10 @@ function tryParse(entry) {
       continue
     }
 
+    const childData = childEntry.data.compile
+
     for (const requestedName of requestedExportNames) {
-      const { exportSpecifiers:childExportSpecifiers } = childEntry
+      const { exportSpecifiers:childExportSpecifiers } = childData
 
       if (requestedName in childExportSpecifiers) {
         if (childExportSpecifiers[requestedName] < 3) {
@@ -51,7 +56,7 @@ function tryParse(entry) {
         throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
       }
 
-      const { exportStarNames:childExportStarNames } = childEntry
+      const { exportStarNames:childExportStarNames } = childData
       let throwExportMissing = true
 
       for (const childStarName of childExportStarNames) {
@@ -68,7 +73,7 @@ function tryParse(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const starName of entry.exportStarNames) {
+  for (const starName of data.exportStarNames) {
     if (! (starName in children)) {
       continue
     }
@@ -79,7 +84,9 @@ function tryParse(entry) {
       continue
     }
 
-    for (const exportName in childEntry.exportSpecifiers) {
+    const childData = childEntry.data.compile
+
+    for (const exportName in childData.exportSpecifiers) {
       if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.

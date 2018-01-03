@@ -50,47 +50,45 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    const cache = pkgInfo.cache
-    const cacheFileName = getCacheFileName("", sourceCode, pkgInfo)
-
-    let cached = cache[cacheFileName]
+    const cacheFileName = getCacheFileName(entry, sourceCode)
+    let cached = pkgInfo.cache[cacheFileName]
 
     if (cached) {
       if (scriptOptions.produceCachedData === true &&
           scriptOptions.cachedData === void 0 &&
-          cached.data !== void 0) {
-        scriptOptions.cachedData = cached.data
+          cached.scriptData !== void 0) {
+        scriptOptions.cachedData = cached.scriptData
       }
     } else {
-      cached = tryWrapper(Compiler.compile, [sourceCode, {
+      cached = tryWrapper(Compiler.compile, [
+        sourceCode,
+        entry,
         cacheFileName,
-        pkgInfo,
-        runtimeName,
-        type: "unambiguous",
-        var: true,
-        warnings: false
-      }])
+        {
+          type: "unambiguous",
+          var: true,
+          warnings: false
+        }
+      ])
     }
 
-    const content =
-      '"use strict";var ' + runtimeName + "=" + runtimeName +
-      "||[module.exports,module.exports=module.exports.entry.exports][0];" + cached.code
-
+    entry.data.compile = cached
     entry.esm = cached.esm
-    entry.exportSpecifiers = cached.exportSpecifiers
-    entry.exportStarNames = cached.exportStarNames
-    entry.moduleSpecifiers = cached.moduleSpecifiers
     entry.state = 1
-    entry.warnings = cached.warnings
 
     if (entry.esm) {
       tryParse(entry)
     }
 
+    const content =
+      '"use strict";var ' + runtimeName + "=" + runtimeName +
+      "||[module.exports,module.exports=module.exports.entry.exports][0];" +
+      cached.code
+
     const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
-      cache[cacheFileName].data = result.cachedData
+      pkgInfo.cache[cacheFileName].scriptData = result.cachedData
     }
 
     result.runInContext = wrap(result.runInContext, tryWrapper)
@@ -98,35 +96,28 @@ function hook(vm) {
     return result
   }
 
+  function initEntry(mod) {
+    entry = Entry.get(mod)
+    entry.data.package = pkgInfo
+    entry.options = pkgInfo.options
+    entry.runtimeName = runtimeName
+    Runtime.enable(entry, {})
+  }
+
   Wrapper.manage(vm, "createScript", managerWrapper)
   Wrapper.wrap(vm, "createScript", methodWrapper)
 
-  const exported = {}
-
-  if (rootModule.id === "<repl>") {
-    entry = Entry.get(rootModule)
-    entry.options = pkgInfo.options
-    entry.runtimeName = runtimeName
-    Runtime.enable(entry, exported)
-    return
-  }
-
   const { createContext } = REPLServer.prototype
 
-  if (typeof createContext !== "function") {
-    return
-  }
-
-  REPLServer.prototype.createContext = function () {
-    REPLServer.prototype.createContext = createContext
-
-    const context = createContext.call(this)
-
-    entry = Entry.get(context.module)
-    entry.options = pkgInfo.options
-    entry.runtimeName = runtimeName
-    Runtime.enable(entry, exported)
-    return context
+  if (rootModule.id === "<repl>") {
+    initEntry(rootModule)
+  } else if (typeof createContext === "function") {
+    REPLServer.prototype.createContext = function () {
+      REPLServer.prototype.createContext = createContext
+      const context = createContext.call(this)
+      initEntry(context.module)
+      return context
+    }
   }
 }
 

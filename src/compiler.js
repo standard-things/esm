@@ -31,13 +31,15 @@ class Compiler {
     code = stripShebang(code)
     options = Compiler.createOptions(options)
 
+    const { runtimeName } = options
     const result = new NullObject
+
     result.code = code
+    result.runtimeName = runtimeName
 
     result.changed =
     result.esm = false
 
-    result.data =
     result.exportSpecifiers =
     result.exportStarNames =
     result.moduleSpecifiers =
@@ -96,7 +98,6 @@ class Compiler {
     }
 
     const rootPath = new FastPath(ast)
-    const { runtimeName } = options
 
     importExportVisitor.visit(rootPath, code, {
       esm: type !== "script",
