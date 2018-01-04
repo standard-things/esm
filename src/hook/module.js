@@ -145,6 +145,7 @@ function hook(Mod, parent, options) {
         cached =
         entry.data.compile =
         cache[cacheFileName] = Compiler.from(code)
+        entry.esm = cached.esm
       }
     }
 
