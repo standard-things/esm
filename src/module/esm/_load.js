@@ -30,11 +30,12 @@ function load(id, parent, isMain, preload) {
   const fromPath = dirname(filePath)
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
+  const isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
 
   let childIsMain = isMain
   let state = Module
 
-  if (! (pkgOptions && pkgOptions.cjs.cache)) {
+  if (isUnexposed) {
     const ext = extname(filePath)
     childIsMain = false
 
@@ -65,7 +66,10 @@ function load(id, parent, isMain, preload) {
         child.id = "."
       }
 
-      child.parent = void 0
+      if (isUnexposed) {
+        child.parent = void 0
+      }
+
       return loader.call(child, filePath, fromPath, url, parentOptions, preload)
     })
 

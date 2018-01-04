@@ -5,7 +5,6 @@ import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import mockIo from "mock-stdio"
-import module from "./module.js"
 import require from "./require.js"
 import util from "util"
 
@@ -447,10 +446,22 @@ describe("Node rules", () => {
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
   })
 
-  it("should not expose ESM in `module.parent`", () => {
-    assert.ok("parent" in module)
-    assert.strictEqual(module.parent, void 0)
-  })
+  it("should not expose ESM in `module.parent`", () =>
+    import("./fixture/parent/off")
+      .then((ns) => {
+        const mod = ns.default
+        assert.ok("parent" in mod)
+        assert.strictEqual(mod.parent, void 0)
+      })
+  )
+
+  it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
+    import("./fixture/parent/on")
+      .then((ns) => {
+        const mod = ns.default
+        assert.ok(mod.parent)
+      })
+  )
 
   it("should not expose ESM in `require.cache`", () => {
     const id = require.resolve("./fixture/cache/out")
@@ -459,6 +470,11 @@ describe("Node rules", () => {
     return import(id)
       .then(() => assert.strictEqual(id in require.cache, false))
   })
+
+  it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
+    import("./misc/cache")
+      .then((ns) => ns.default())
+  )
 
   it("should resolve non-local dependencies with `require`", () => {
     const ids = [
@@ -488,11 +504,6 @@ describe("Node rules", () => {
       }
     }
   })
-
-  it("should not cache ES modules in ESM cache with `options.cjs`", () =>
-    import("./misc/cache")
-      .then((ns) => ns.default())
-  )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/export/pseudo")
