@@ -5,12 +5,17 @@ import NullObject from "./null-object.js"
 
 import assign from "./util/assign.js"
 import gzip from "./fs/gzip.js"
+import parseJSON from "./util/parse-json.js"
 import removeFile from "./fs/remove-file.js"
 import writeFileDefer from "./fs/write-file-defer.js"
 
+const codeOfAsterisk = "*".charCodeAt(0)
+const codeOfLeftBracket = "{".charCodeAt(0)
+const codeOfRightBracket = "}".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-const { stringify, parse } = JSON
+const { keys } = Object
+const { stringify } = JSON
 
 class CachingCompiler {
   static compile(code, entry, cacheFileName, options) {
@@ -26,19 +31,42 @@ class CachingCompiler {
     const result = new NullObject
     result.changed = true
     result.code = code
-    result.esm = code.charCodeAt(7) === codeOfSlash
+    result.esm = false
 
-    if (result.esm) {
-      // Extract metadata.
-      const line = code.slice(9, code.indexOf("*/", 10))
-      const meta = parse(line)
-
-      result.exportSpecifiers = assign(new NullObject, meta.e)
-      result.exportStarNames = meta.s
-      result.moduleSpecifiers = assign(new NullObject, meta.m)
-      result.warnings = meta.w
+    // Extract metadata.
+    if (code.charCodeAt(7) !== codeOfSlash ||
+        code.charCodeAt(8) !== codeOfAsterisk ||
+        code.charCodeAt(9) !== codeOfLeftBracket) {
+      return result
     }
 
+    const line = code.slice(9, code.indexOf("*/", 10))
+
+    if (line.charCodeAt(line.length - 1) !== codeOfRightBracket) {
+      return result
+    }
+
+    const meta = parseJSON(line)
+
+    if (! meta) {
+      return result
+    }
+
+    const metaKeys = keys(meta)
+
+    if (metaKeys.length !== 4 ||
+        metaKeys[0] !== "e" ||
+        metaKeys[1] !== "m" ||
+        metaKeys[2] !== "s" ||
+        metaKeys[3] !== "w") {
+      return result
+    }
+
+    result.esm = true
+    result.exportSpecifiers = assign(new NullObject, meta.e)
+    result.exportStarNames = meta.s
+    result.moduleSpecifiers = assign(new NullObject, meta.m)
+    result.warnings = meta.w
     return result
   }
 }

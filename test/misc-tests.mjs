@@ -744,4 +744,9 @@ describe("spec compliance", () => {
     import("./fixture/source/html-comment.js")
       .then(() => assert.ok(true))
   )
+
+  it("should not error parsing metadata of CJS modules with leading multiline comments", () =>
+    import("./fixture/source/multiline-comment.js")
+      .then(() => assert.ok(true))
+  )
 })
