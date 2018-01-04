@@ -59,7 +59,7 @@ class Runtime {
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {
-          watch.call(this, id, [["*", createSetter("import", (value, childEntry) => {
+          watch(this.entry, id, [["*", createSetter("import", (value, childEntry) => {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
@@ -78,8 +78,9 @@ class Runtime {
   }
 
   run(moduleWrapper) {
-    const runner = this.entry.esm ? runESM : runCJS
-    runner(this, moduleWrapper)
+    const { entry } = this
+    const runner = entry.esm ? runESM : runCJS
+    runner(entry, moduleWrapper)
   }
 
   update(valueToPassThrough) {
@@ -103,7 +104,7 @@ class Runtime {
   }
 
   watch(id, setterPairs) {
-    return watch.call(this, id, setterPairs, _loadESM)
+    return watch(this.entry, id, setterPairs, _loadESM)
   }
 }
 
@@ -126,8 +127,7 @@ function load(id, parent, loader, preload) {
   return loader(id, parent, false, preload)
 }
 
-function runCJS(runtime, moduleWrapper) {
-  const { entry } = runtime
+function runCJS(entry, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
   const loader = options.cjs.vars ? _loadESM : _loadCJS
@@ -146,8 +146,7 @@ function runCJS(runtime, moduleWrapper) {
   mod.loaded = true
 }
 
-function runESM(runtime, moduleWrapper) {
-  const { entry } = runtime
+function runESM(entry, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
 
@@ -164,9 +163,8 @@ function runESM(runtime, moduleWrapper) {
   entry.update().loaded()
 }
 
-function watch(id, setterPairs, loader) {
+function watch(entry, id, setterPairs, loader) {
   let childEntry
-  const { entry } = this
 
   moduleState.requireDepth += 1
 
