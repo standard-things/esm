@@ -4,6 +4,12 @@ import shared from "../shared.js"
 
 function parseURL(url) {
   const isURL = url instanceof Url
+
+  if (! isURL &&
+      typeof url !== "string") {
+    url = ""
+  }
+
   const cacheKey = isURL ? url.href : url
 
   return cacheKey in shared.parseURL

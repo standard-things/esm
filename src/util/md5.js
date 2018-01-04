@@ -2,7 +2,7 @@ import { createHash } from "crypto"
 
 function md5(string) {
   return createHash("md5")
-    .update(string)
+    .update(typeof string === "string" ? string : "")
     .digest("hex")
 }
 

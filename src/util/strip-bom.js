@@ -5,6 +5,10 @@
 const codeOfBOM = "\ufeff".charCodeAt(0)
 
 function stripBOM(string) {
+  if (typeof string !== "string") {
+    return ""
+  }
+
   return string.charCodeAt(0) === codeOfBOM
     ? string.slice(1)
     : string

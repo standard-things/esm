@@ -5,7 +5,7 @@ import { version } from "../version.js"
 const { stringify } = JSON
 
 function getCacheFileName(entry, cacheKey) {
-  const filePath = entry.filePath || ""
+  const { filePath } = entry
 
   // While MD5 is not suitable for verification of untrusted data,
   // it is great for revving files. See Sufian Rhazi's post for more details
