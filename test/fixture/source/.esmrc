@@ -1,3 +1,4 @@
 {
+  debug: true,
   sourceMap: true
 }
