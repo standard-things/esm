@@ -25,7 +25,7 @@ scriptOptions.filename = __filename
 const compiled = vm.runInThisContext(content, scriptOptions)
 
 function load() {
-  compiled(require, mod, shared)
+  compiled(mod.require, mod, shared)
   return mod.exports
 }
 
