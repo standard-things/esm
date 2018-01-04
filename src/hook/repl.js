@@ -12,7 +12,7 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
-import tryParse from "../try-parse.js"
+import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
 const { now } = Date
@@ -77,7 +77,7 @@ function hook(vm) {
     entry.state = 1
 
     if (entry.esm) {
-      tryParse(entry)
+      validateESM(entry)
     }
 
     entry.state = 2

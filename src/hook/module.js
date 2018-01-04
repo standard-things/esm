@@ -34,7 +34,7 @@ import { satisfies } from "semver"
 import setProperty from "../util/set-property.js"
 import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
-import tryParse from "../try-parse.js"
+import validateESM from "../module/esm/validate.js"
 import warn from "../warn.js"
 
 const { setPrototypeOf } = Object
@@ -193,7 +193,7 @@ function hook(Mod, parent, options) {
       if (moduleState.parsing) {
         if (entry.esm &&
             entry.state === 1) {
-          tryParse(entry)
+          validateESM(entry)
         }
       } else {
         tryCompileCached(entry)

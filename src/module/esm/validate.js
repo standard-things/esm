@@ -1,23 +1,20 @@
-import Entry from "./entry.js"
-import NullObject from "./null-object.js"
+import Entry from "../../entry.js"
+import NullObject from "../../null-object.js"
 
-import _loadESM from "./module/esm/_load.js"
-import builtinModules from "./builtin-modules.js"
-import errors from "./errors.js"
+import _loadESM from "./_load.js"
+import builtinModules from "../../builtin-modules.js"
+import errors from "../../errors.js"
 
-const { keys } = Object
-
-function tryParse(entry) {
+function validate(entry) {
   const children = new NullObject
   const data = entry.data.compile
   const mod = entry.module
 
   const { exportSpecifiers, moduleSpecifiers } = data
   const { namedExports } = entry.options.cjs
-  const names = moduleSpecifiers ? keys(moduleSpecifiers) : []
 
   // Parse children.
-  for (const name of names) {
+  for (const name in moduleSpecifiers) {
     if (! (name in builtinModules)) {
       const child = _loadESM(name, mod)
       const childEntry = Entry.get(child)
@@ -100,4 +97,4 @@ function tryParse(entry) {
   }
 }
 
-export default tryParse
+export default validate
