@@ -1,3 +1,5 @@
+import SemVer from "semver"
+
 import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
@@ -5,6 +7,7 @@ import path from "path"
 import require from "./require.js"
 import trash from "../script/trash.js"
 
+const canTestJest = SemVer.satisfies(process.version, ">4")
 const canTestPM2 = ! ("TRAVIS" in process.env)
 
 const pkgPath = require.resolve("../")
@@ -50,7 +53,8 @@ describe("scenarios", function () {
       .then(() => exec("nyc", nycArgs))
   })
 
-  it("should work with jest", () => {
+  ;(canTestJest ? it : xit)(
+  "should work with jest", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest")
     const configPath = path.resolve(dirPath, "jest.config.json")
     const jestArgs = ["--config", configPath, "--rootDir", dirPath]
