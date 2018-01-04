@@ -1,3 +1,6 @@
+// Inspired by `findMagicComment` in
+// https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
+
 const codeOfAt = "@".charCodeAt(0)
 const codeOfDoubleQuote = '"'.charCodeAt(0)
 const codeOfEqual = "=".charCodeAt(0)
@@ -34,35 +37,38 @@ function getSourceMappingURL(content) {
       return ""
     }
 
+    const equalPos = pos + nameLength
+    const urlPos = equalPos + 1
+
+    pos -= 4
+
     // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
-    if (content.charCodeAt(pos - 4) !== codeOfSlash ||
-        content.charCodeAt(pos - 3) !== codeOfSlash) {
+    if (content.charCodeAt(pos) !== codeOfSlash ||
+        content.charCodeAt(pos + 1) !== codeOfSlash) {
       continue
     }
 
-    let code = content.charCodeAt(pos - 2)
+    let code = content.charCodeAt(pos + 2)
 
     if (code !== codeOfPound &&
         code !== codeOfAt) {
       continue
     }
 
-    code = content.charCodeAt(pos - 1)
+    code = content.charCodeAt(pos + 3)
 
     if (code !== codeOfSpace &&
         code !== codeOfTab) {
       continue
     }
 
-    const equalPos = pos + nameLength
-    const urlPos = equalPos + 1
+    // Check for "=" after the name.
+    if (equalPos < length &&
+        content.charCodeAt(equalPos) !== codeOfEqual) {
+      continue
+    }
 
-    // Check for "=..." after the name.
-    if (urlPos < length) {
-      if (content.charCodeAt(equalPos) !== codeOfEqual) {
-        continue
-      }
-    } else {
+    if (urlPos === length) {
       return ""
     }
 

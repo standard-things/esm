@@ -749,4 +749,9 @@ describe("spec compliance", () => {
     import("./fixture/source/multiline-comment.js")
       .then(() => assert.ok(true))
   )
+
+  it("should not hang on strings containing '# sourceMappingURL'", () =>
+    import("./fixture/source/source-mapping-url-string.mjs")
+      .then(() => assert.ok(true))
+  )
 })
