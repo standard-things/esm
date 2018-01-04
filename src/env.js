@@ -14,8 +14,8 @@ import realpath from "./fs/realpath.js"
 import { resolve } from "path"
 import rootModule from "./root-module.js"
 
-const codeOfBracket = "{".charCodeAt(0)
 const codeOfDash = "-".charCodeAt(0)
+const codeOfLeftBracket = "{".charCodeAt(0)
 
 const { children, id } = rootModule
 const { argv } = process
@@ -65,7 +65,7 @@ function hasDebugArg(args) {
 
 function hasLoaderArg(args) {
   return args.some((arg) =>
-    arg.charCodeAt(0) === codeOfBracket
+    arg.charCodeAt(0) === codeOfLeftBracket
       ? hasLoaderValue(parseJSON(arg))
       : hasLoaderValue(arg)
   )

@@ -12,8 +12,8 @@ import parseAndLoad from "../module/esm/parse-and-load.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
 
-const codeOfBracket = "{".charCodeAt(0)
 const codeOfDoubleQuote = '"'.charCodeAt(0)
+const codeOfLeftBracket = "{".charCodeAt(0)
 const codeOfSingleQuote = "'".charCodeAt(0)
 
 function hook(Mod) {
@@ -52,7 +52,7 @@ function hook(Mod) {
 
     const code0 = ESM_OPTIONS.charCodeAt(0)
 
-    if (code0 === codeOfBracket ||
+    if (code0 === codeOfLeftBracket ||
         code0 === codeOfDoubleQuote ||
         code0 === codeOfSingleQuote) {
       ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
