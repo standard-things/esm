@@ -96,10 +96,18 @@ describe("module.runMain hook", function () {
   )
 
   it("should not set `process.mainModule`", () =>
-    runMain("./fixture/main/main-module.mjs")
+    runMain("./fixture/main/main-module/off")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
         assert.ok(result.stdout.includes("main-module:false"))
+      })
+  )
+
+  it("should set `process.mainModule` with `options.cjs.cache`", () =>
+    runMain("./fixture/main/main-module/on")
+      .then((result) => {
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("main-module:true"))
       })
   )
 
