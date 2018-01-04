@@ -80,12 +80,16 @@ function hook(vm) {
       tryParse(entry)
     }
 
+    entry.state = 2
+
     const content =
       '"use strict";var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" +
       cached.code
 
     const result = tryWrapper(func, [content, scriptOptions])
+
+    entry.state = 3
 
     if (result.cachedDataProduced) {
       pkgInfo.cache[cacheFileName].scriptData = result.cachedData

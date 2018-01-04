@@ -23,7 +23,7 @@ function parseAndLoad(id, parent, isMain, preload) {
 
   _load(id, parent, isMain, preload)
 
-  entry.state = 3
+  entry.state = 4
   return child
 }
 

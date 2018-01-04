@@ -77,6 +77,12 @@ class Entry {
     this.setters = new NullObject
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
+    // The state of the module:
+    //   1 - Parsing phase started.
+    //   2 - Parsing phase completed.
+    //   3 - Execution phase started.
+    //   4 - Execution phase completed.
+    this.state = null
     // The file url of the module.
     this.url = null
   }

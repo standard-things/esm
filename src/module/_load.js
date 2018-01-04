@@ -22,21 +22,17 @@ function load(filePath, parent, isMain, state, loader) {
     const entry = Entry.get(child)
 
     if (child.loaded ||
-        typeof entry.state !== "number") {
+        ! entry.state) {
       return child
     }
 
-    // Module states:
-    //   1 - Initial state
-    //   2 - Parsing phase is complete
-    //   3 - Execution phase is complete
     if (moduleState.parsing &&
         entry.state !== 1) {
       return child
     }
 
     if (! moduleState.parsing &&
-        entry.state === 3) {
+        entry.state !== 2) {
       return child
     }
 
