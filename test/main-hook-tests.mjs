@@ -95,7 +95,7 @@ describe("module.runMain hook", function () {
       })
   )
 
-  it("should not set `process.mainModule`", () =>
+  it("should not expose ESM in `process.mainModule`", () =>
     runMain("./fixture/main/main-module/off")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
@@ -103,7 +103,7 @@ describe("module.runMain hook", function () {
       })
   )
 
-  it("should set `process.mainModule` with `options.cjs.cache`", () =>
+  it("should expose ESM in `process.mainModule` with `options.cjs.cache`", () =>
     runMain("./fixture/main/main-module/on")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
