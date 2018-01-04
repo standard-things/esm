@@ -1,10 +1,30 @@
-import builtinModules from "../../builtin-modules.js"
-import parseAndLoad from "./parse-and-load.js"
+import Entry from "../../entry.js"
 
-function load(id, parent, isMain) {
-  return id in builtinModules
-    ? builtinModules[id].exports
-    : parseAndLoad(id, parent, isMain).exports
+import _load from "./_load.js"
+import moduleState from "../state.js"
+
+function load(id, parent, isMain, preload) {
+  let child
+
+  moduleState.parsing = true
+
+  try {
+    child = _load(id, parent, isMain)
+  } finally {
+    moduleState.parsing = false
+  }
+
+  if (child.loaded) {
+    return _load(id, parent, isMain, preload)
+  }
+
+  const entry = Entry.get(child)
+  entry.state = 2
+
+  _load(id, parent, isMain, preload)
+
+  entry.state = 4
+  return child
 }
 
 export default load

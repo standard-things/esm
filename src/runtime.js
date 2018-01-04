@@ -5,9 +5,9 @@ import _loadCJS from "./module/cjs/_load.js"
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
 import errors from "./errors.js"
+import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
-import parseAndLoad from "./module/esm/parse-and-load.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -63,7 +63,7 @@ class Runtime {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
-          })]], parseAndLoad)
+          })]], loadESM)
         } catch (e) {
           reject(e)
         }
