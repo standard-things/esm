@@ -2,7 +2,6 @@ import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
 import _load from "../_load.js"
-import _resolveFilename from "./_resolve-filename.js"
 import { dirname } from "path"
 import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
@@ -11,6 +10,7 @@ import isError from "../../util/is-error.js"
 import loader from "./loader.js"
 import moduleResolveFilename from "../cjs/resolve-filename.js"
 import moduleState from "../state.js"
+import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
@@ -24,7 +24,7 @@ function load(id, parent, isMain, preload) {
       parentOptions && parentOptions.cjs.paths) {
     filePath = Module._resolveFilename(id, parent, isMain)
   } else {
-    filePath = _resolveFilename(id, parent, isMain)
+    filePath = resolveFilename(id, parent, isMain)
   }
 
   const fromPath = dirname(filePath)

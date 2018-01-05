@@ -3,7 +3,6 @@ import { dirname, resolve } from "path"
 import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
-import _resolveFilename from "../module/esm/_resolve-filename.js"
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
 import isPath from "../util/is-path.js"
@@ -11,6 +10,7 @@ import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
+import resolveFilename from "../module/esm/resolve-filename.js"
 
 const codeOfDoubleQuote = '"'.charCodeAt(0)
 const codeOfLeftBracket = "{".charCodeAt(0)
@@ -76,7 +76,7 @@ function hook(Mod) {
     let threw = true
 
     try {
-      filePath = _resolveFilename(mainPath, null, true)
+      filePath = resolveFilename(mainPath, null, true)
       threw = false
     } catch (e) {
       error = e

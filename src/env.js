@@ -1,7 +1,7 @@
 import FastObject from "./fast-object.js"
 import PkgInfo from "./pkg-info.js"
 
-import _resolveFilename from "./module/_resolve-filename.js"
+import _resolveFilename from "./module/esm/_resolve-filename.js"
 import binding from "./binding.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
