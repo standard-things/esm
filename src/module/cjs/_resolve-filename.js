@@ -35,12 +35,12 @@ function resolveFilename(request, parent, isMain, options) {
 
     paths = []
 
-    for (const thePath of fromPaths) {
-      fakeParent.paths = Module._nodeModulePaths(thePath)
+    for (const fromPath of fromPaths) {
+      fakeParent.paths = Module._nodeModulePaths(fromPath)
       const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
 
-      if (paths.indexOf(thePath) === -1) {
-        paths.push(thePath)
+      if (paths.indexOf(fromPath) === -1) {
+        paths.push(fromPath)
       }
 
       for (const lookupPath of lookupPaths) {
