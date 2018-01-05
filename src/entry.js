@@ -139,9 +139,9 @@ class Entry {
 
   addGettersFrom(otherEntry) {
     const { getters } = this
-    const { _namespace:otherNamespace, getters:otherGetters } = otherEntry
+    const { getters:otherGetters } = otherEntry
 
-    for (const key in otherNamespace) {
+    for (const key in otherEntry._namespace) {
       if (key === "default") {
         continue
       }
@@ -214,9 +214,7 @@ class Entry {
       const exported = this.exports
 
       if (! isSealed(exported)) {
-        const { _namespace } = this
-
-        for (const name in _namespace) {
+        for (const name in this._namespace) {
           setGetter(exported, name, () => {
             return this._namespace[name]
           })

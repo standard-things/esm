@@ -292,9 +292,7 @@ function addAssignableImports(visitor, specifierMap) {
   const { assignableImports } = visitor
 
   for (const name in specifierMap) {
-    const localsMap = specifierMap[name]
-
-    for (const local in localsMap) {
+    for (const local in specifierMap[name]) {
       assignableImports[local] = true
     }
   }
