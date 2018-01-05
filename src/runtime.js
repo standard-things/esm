@@ -130,7 +130,7 @@ function load(request, parent, loader, preload) {
 function runCJS(entry, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
-  const loader = options.cjs.vars ? _loadESM : _loadCJS
+  const loader = options.cjs.vars ? loadESM : _loadCJS
   const req = makeRequireFunction(mod, (request) => {
     const child = load(request, mod, loader)
 
@@ -151,7 +151,7 @@ function runESM(entry, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   if (options.cjs.vars) {
-    const requirer = (request) => load(request, mod, _loadESM).exports
+    const requirer = (request) => load(request, mod, loadESM).exports
     const req = makeRequireFunction(mod, requirer)
 
     moduleWrapper.call(exported, exported, req)
