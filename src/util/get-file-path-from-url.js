@@ -1,6 +1,6 @@
 import binding from "../binding.js"
 import decodeURIComponent from "./decode-uri-component.js"
-import encodedSlash from "./encoded-slash.js"
+import hasEncodedSlash from "./has-encoded-slash.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseURL from "./parse-url.js"
 import path from "path"
@@ -24,7 +24,7 @@ if (typeof domainToUnicode !== "function") {
     : __non_webpack_require__("punycode").toUnicode
 }
 
-function urlToPath(url) {
+function getFilePathFromURL(url) {
   const parsed = parseURL(url)
   let { pathname } = parsed
 
@@ -40,7 +40,7 @@ function urlToPath(url) {
     }
   }
 
-  if (encodedSlash(pathname)) {
+  if (hasEncodedSlash(pathname)) {
     return ""
   }
 
@@ -81,4 +81,4 @@ function urlToPath(url) {
   return ""
 }
 
-export default urlToPath
+export default getFilePathFromURL

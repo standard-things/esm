@@ -4,16 +4,16 @@ import PkgInfo from "../../pkg-info.js"
 import _resolveFilename from "./_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import { dirname } from "path"
-import encodedSlash from "../../util/encoded-slash.js"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
+import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
+import hasEncodedSlash from "../../util/has-encoded-slash.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
 import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
-import urlToPath from "../../util/url-to-path.js"
 
 const codeOfSlash = "/".charCodeAt(0)
 
@@ -56,12 +56,12 @@ function resolveFilename(request, parent, isMain) {
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
 
-  if (! encodedSlash(request)) {
+  if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
         (request.charCodeAt(0) === codeOfSlash || request.includes(":"))) {
       const parsed = parseURL(request)
-      foundPath = urlToPath(parsed)
+      foundPath = getFilePathFromURL(parsed)
 
       if (! foundPath &&
           parsed.protocol !== "file:" &&

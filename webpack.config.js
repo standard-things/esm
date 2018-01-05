@@ -98,7 +98,7 @@ if (isTest) {
   config.entry.compiler = "./src/compiler.js"
   config.entry.entry = "./src/entry.js"
   config.entry.runtime = "./src/runtime.js"
-  config.entry["url-to-path"] = "./src/util/url-to-path.js"
+  config.entry["get-file-path-from-url"] = "./src/util/get-file-path-from-url.js"
 }
 
 module.exports = config
