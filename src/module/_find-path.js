@@ -25,15 +25,15 @@ const mainFieldRegExp = /"main"/
 const skipOutsideDot = satisfies(process.version, ">=10")
 let warned = false
 
-function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
-  if (isAbsolute(id)) {
+function findPath(request, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
+  if (isAbsolute(request)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
     return ""
   }
 
   const cacheKey =
-    id + "\0" +
+    request + "\0" +
     (paths.length === 1 ? paths[0] : paths.join("\0"))
 
   if (cacheKey in shared.findPath) {
@@ -43,8 +43,8 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
   const { _extensions } = Module
 
   const trailingSlash =
-    id.length > 0 &&
-    id.charCodeAt(id.length - 1) === codeOfSlash
+    request.length > 0 &&
+    request.charCodeAt(request.length - 1) === codeOfSlash
 
   let i = -1
   const pathsCount = paths.length
@@ -57,7 +57,7 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
     }
 
     let filePath
-    const basePath = resolve(curPath, id)
+    const basePath = resolve(curPath, request)
     const rc = stat(basePath)
     const isFile = rc === 0
     const isDir = rc === 1
@@ -98,7 +98,7 @@ function findPath(id, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) 
 
     if (filePath) {
       // Warn once if "." resolved outside the module directory.
-      if (id === "." &&
+      if (request === "." &&
           i > 0 &&
           ! warned &&
           ! skipGlobalPaths &&

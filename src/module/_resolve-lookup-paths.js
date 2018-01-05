@@ -15,11 +15,11 @@ const codeOfSlash = "/".charCodeAt(0)
 const skipOutsideDot = satisfies(process.version, ">=10")
 const { slice } = Array.prototype
 
-function resolveLookupPaths(id, parent, skipGlobalPaths) {
+function resolveLookupPaths(request, parent, skipGlobalPaths) {
   let lookOutside
-  const code0 = id.charCodeAt(0)
-  const code1 = id.charCodeAt(1)
-  const isDot = id === "."
+  const code0 = request.charCodeAt(0)
+  const code1 = request.charCodeAt(1)
+  const isDot = request === "."
 
   if (skipOutsideDot) {
     lookOutside =
@@ -29,7 +29,7 @@ function resolveLookupPaths(id, parent, skipGlobalPaths) {
            code1 === codeOfSlash))
   } else {
     lookOutside =
-      id.length < 2 ||
+      request.length < 2 ||
       code0 !== codeOfDot ||
       (code1 !== codeOfDot &&
        code1 !== codeOfSlash)
@@ -44,7 +44,7 @@ function resolveLookupPaths(id, parent, skipGlobalPaths) {
     // Maintain backwards compat with certain broken uses of `require(".")`
     // by putting the module's directory in front of the lookup paths.
     if (isDot) {
-      paths.unshift(parentFilePath ? dirname(parentFilePath) : resolve(id))
+      paths.unshift(parentFilePath ? dirname(parentFilePath) : resolve(request))
     }
 
     if (parentPaths &&

@@ -4,8 +4,8 @@
 
 import _findPath from "./_find-path.js"
 
-function findPath(id, paths, isMain) {
-  return _findPath(id, paths, isMain) || false
+function findPath(request, paths, isMain) {
+  return _findPath(request, paths, isMain) || false
 }
 
 export default findPath
