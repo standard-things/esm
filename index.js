@@ -7,16 +7,21 @@ const util = require("util")
 const vm = require("vm")
 const zlib = require("zlib")
 
-// Guard against poorly mocked module constructors.
-const Module = module.constructor.length > 1
-  ? module.constructor
-  : require("module")
+// Guard against mocked environments (e.g. Jest).
+const useBuiltins = module.constructor.length > 1
 
-const esmPath = path.resolve(__dirname, "esm.js.gz")
+const Module = useBuiltins ? module.constructor : require("module")
+
+const stdMod = new Module(module.id, null)
+const stdPath = path.resolve(__dirname, "esm.js.gz")
+const stdReq = useBuiltins ? require : stdMod.require
+
+stdMod.filename = __filename
+stdMod.parent = module.parent
 
 const content =
   "(function(require,module,__shared__){" +
-  zlib.gunzipSync(fs.readFileSync(esmPath)) +
+  zlib.gunzipSync(fs.readFileSync(stdPath)) +
   "\n})"
 
 const scriptOptions = Object.create(null)
@@ -25,17 +30,13 @@ scriptOptions.filename = __filename
 const compiled = vm.runInThisContext(content, scriptOptions)
 
 function load() {
-  compiled(mod.require, mod, shared)
-  return mod.exports
+  compiled(stdReq, stdMod, shared)
+  return stdMod.exports
 }
 
 function makeRequireFunction(mod, options) {
   return load()(mod, options)
 }
-
-const mod = new Module(module.id, null)
-mod.filename = __filename
-mod.parent = module.parent
 
 let shared
 shared = load()
