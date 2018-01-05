@@ -3,11 +3,12 @@ import Compiler from "../build/compiler.js"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import path from "path"
+import require from "./require.js"
 
 const compile = Compiler.compile
 const isWin = process.platform === "win32"
 
-const abcId = "./fixture/export/abc.mjs"
+const abcPath = require.resolve("./fixture/export/abc.mjs")
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -31,22 +32,22 @@ describe("dynamic import", () => {
   )
 
   it("should support a variable id", () =>
-    import(abcId)
+    import(abcPath)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
   it("should support a template string id", () =>
-    import(`${abcId}`)
+    import(`${abcPath}`)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
   it("should support an expression id", () =>
-    import((() => abcId)())
+    import((() => abcPath)())
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
   it("should support the file protocol", () =>
-    import("file:" + (isWin ? "///" : "//") + path.resolve(abcId))
+    import("file:" + (isWin ? "///" : "//") + path.resolve(abcPath))
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 

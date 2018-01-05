@@ -3,16 +3,16 @@ import makeRequire from "../../index.js"
 import module from "../module.js"
 import require from "../require.js"
 
-const abcId = require.resolve("./fixture/export/abc.mjs")
-const defId = require.resolve("./fixture/export/def.js")
-const nopId = require.resolve("nop")
+const abcPath = require.resolve("./fixture/export/abc.mjs")
+const defPath = require.resolve("./fixture/export/def.js")
+const nopPath = require.resolve("nop")
 
 export default () => {
   const esmRequire = makeRequire(module)
 
-  delete esmRequire.cache[abcId]
-  delete esmRequire.cache[defId]
-  delete esmRequire.cache[nopId]
+  delete esmRequire.cache[abcPath]
+  delete esmRequire.cache[defPath]
+  delete esmRequire.cache[nopPath]
 
   const abc = esmRequire("./fixture/export/abc.mjs")
   const def = esmRequire("./fixture/export/def.js")
@@ -22,8 +22,8 @@ export default () => {
   assert.deepStrictEqual(def, { d: "d", e: "e", f: "f" })
   assert.strictEqual(nop(), void 0)
 
-  const defMod = esmRequire.cache[defId]
+  const defMod = esmRequire.cache[defPath]
 
   assert.ok(defMod)
-  assert.strictEqual(defMod.id, defId)
+  assert.strictEqual(defMod.id, defPath)
 }

@@ -3,8 +3,8 @@ import makeRequire from "../../index.js"
 import module from "../module.js"
 import require from "../require.js"
 
-const abcId = require.resolve("./fixture/export/abc.mjs")
-const defId = require.resolve("./fixture/export/def.js")
+const abcPath = require.resolve("./fixture/export/abc.mjs")
+const defPath = require.resolve("./fixture/export/def.js")
 
 export default () => {
   const keys = ["sourceMap", "sourcemap"]
@@ -15,11 +15,11 @@ export default () => {
 
     mod._compile = (content) => assert.ok(content.includes("sourceMappingURL"))
 
-    delete esmRequire.cache[abcId]
-    delete esmRequire.cache[defId]
+    delete esmRequire.cache[abcPath]
+    delete esmRequire.cache[defPath]
 
-    esmRequire.extensions[".mjs"](mod, abcId)
+    esmRequire.extensions[".mjs"](mod, abcPath)
     mod.exports = {}
-    esmRequire.extensions[".js"](mod, defId)
+    esmRequire.extensions[".js"](mod, defPath)
   })
 }

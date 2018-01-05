@@ -2,14 +2,14 @@
 
 const assert = require("assert")
 
-const liveId = require.resolve("../fixture/live.mjs")
+const livePath = require.resolve("../fixture/live.mjs")
 
 module.exports = () => {
   const makeRequire = require("../../index.js")
   const esmRequire = makeRequire(module)
 
-  delete esmRequire.cache[liveId]
-  const live = esmRequire(liveId)
+  delete esmRequire.cache[livePath]
+  const live = esmRequire(livePath)
 
   live.reset()
   assert.strictEqual(live.value, 0)

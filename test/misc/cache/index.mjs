@@ -1,12 +1,12 @@
 import assert from "assert"
 
 export default () => {
-  const id = require.resolve("../../fixture/cache/in")
+  const filePath = require.resolve("../../fixture/cache/in")
 
-  assert.strictEqual(require(id).default, 1)
-  assert.ok(id in require.cache)
-  assert.strictEqual(require(id).default, 1)
+  assert.strictEqual(require(filePath).default, 1)
+  assert.ok(filePath in require.cache)
+  assert.strictEqual(require(filePath).default, 1)
 
-  delete require.cache[id]
-  assert.strictEqual(require(id).default, 2)
+  delete require.cache[filePath]
+  assert.strictEqual(require(filePath).default, 2)
 }

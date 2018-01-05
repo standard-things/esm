@@ -88,8 +88,8 @@ function resolveFilename(request, parent, isMain) {
         }
       }
 
-      const decodedId = decodeURIComponent(request.replace(queryHashRegExp, ""))
-      foundPath = _resolveFilename(decodedId, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
+      const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
+      foundPath = _resolveFilename(decoded, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
     }
   }
 

@@ -1,5 +1,5 @@
 "use strict"
 
-const id = "../fixture/file-extension/a.mjs.gz"
-delete require.cache[require.resolve(id)]
-module.exports = require(id)
+const filePath = "../fixture/file-extension/a.mjs.gz"
+delete require.cache[filePath]
+module.exports = require(filePath)

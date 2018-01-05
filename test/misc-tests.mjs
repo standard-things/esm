@@ -21,7 +21,7 @@ const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
   : pkgJSON["@std/esm"]
 
-const abcId = "./fixture/export/abc.mjs"
+const abcPath = require.resolve("./fixture/export/abc.mjs")
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -303,9 +303,9 @@ describe("Node rules", () => {
 
   it("should support URL ids", () =>
     Promise.all([
-      abcId + "?a",
-      abcId + "#a",
-      abcId.replace("abc", "%61%62%63")
+      abcPath + "?a",
+      abcPath + "#a",
+      abcPath.replace("abc", "%61%62%63")
     ].map((id) =>
       import(id)
         .then((ns) => assert.deepStrictEqual(ns, abcNs))
@@ -372,10 +372,10 @@ describe("Node rules", () => {
 
   it("should not support URL ids with encoded slashes", () =>
     Promise.all([
-      abcId.replace("/", "%2f"),
-      abcId.replace("/", "%2F"),
-      abcId.replace("/", isWin ? "%5c" : "%2f"),
-      abcId.replace("/", isWin ? "%5C" : "%2F")
+      abcPath.replace("/", "%2f"),
+      abcPath.replace("/", "%2F"),
+      abcPath.replace("/", isWin ? "%5c" : "%2f"),
+      abcPath.replace("/", isWin ? "%5C" : "%2F")
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
@@ -464,11 +464,11 @@ describe("Node rules", () => {
   )
 
   it("should not expose ESM in `require.cache`", () => {
-    const id = require.resolve("./fixture/cache/out")
+    const filePath = require.resolve("./fixture/cache/out")
 
-    delete require.cache[id]
-    return import(id)
-      .then(() => assert.strictEqual(id in require.cache, false))
+    delete require.cache[filePath]
+    return import(filePath)
+      .then(() => assert.strictEqual(filePath in require.cache, false))
   })
 
   it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
@@ -720,24 +720,24 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
     ].reduce((promise, data) => {
-      const id = require.resolve(data.id)
-      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, id)
+      const filePath = require.resolve(data.id)
+      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, filePath)
 
       return promise
         .then(() => {
           mockIo.start()
-          return import(id)
+          return import(filePath)
         })
         .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
     }, Promise.resolve())
   )
 
   it("should warn for potential TDZ access", () => {
-    const id = require.resolve("./fixture/cycle/tdz/a.mjs")
-    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", id)
+    const filePath = require.resolve("./fixture/cycle/tdz/a.mjs")
+    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", filePath)
 
     mockIo.start()
-    return import(id)
+    return import(filePath)
       .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
   })
 
