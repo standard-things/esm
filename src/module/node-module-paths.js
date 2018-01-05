@@ -12,30 +12,30 @@ const { map } = Array.prototype
 const nmChars = map.call("node_modules", (char) => char.charCodeAt(0)).reverse()
 const nmLength = nmChars.length
 
-function posixNodeModulePaths(dirPath) {
-  dirPath = resolve(dirPath)
+function posixNodeModulePaths(from) {
+  from = resolve(from)
 
   // Return early not only to avoid unnecessary work, but to avoid returning
   // an array of two items for a root path: ["//node_modules", "/node_modules"]
-  if (dirPath === "/") {
+  if (from === "/") {
     return ["/node_modules"]
   }
 
   // This approach only works when the path is guaranteed to be absolute.
   // Doing a fully-edge-case-correct `path.split()` that works on both Windows
   // and Posix is non-trivial.
-  let length = dirPath.length
+  let { length } = from
   let last = length
   let nmCount = 0
 
   const paths = []
 
   while (length--) {
-    const code = dirPath.charCodeAt(length)
+    const code = from.charCodeAt(length)
 
     if (code === codeOfSlash) {
       if (nmCount !== nmLength) {
-        paths.push(dirPath.slice(0, last) + "/node_modules")
+        paths.push(from.slice(0, last) + "/node_modules")
       }
 
       last = length
@@ -55,23 +55,23 @@ function posixNodeModulePaths(dirPath) {
   return paths
 }
 
-function win32NodeModulePaths(dirPath) {
-  dirPath = resolve(dirPath)
+function win32NodeModulePaths(from) {
+  from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
-  if (dirPath.charCodeAt(dirPath.length - 1) === codeOfBackslash &&
-      dirPath.charCodeAt(dirPath.length - 2) === codeOfColon) {
-    return [dirPath + "node_modules"]
+  if (from.charCodeAt(from.length - 1) === codeOfBackslash &&
+      from.charCodeAt(from.length - 2) === codeOfColon) {
+    return [from + "node_modules"]
   }
 
-  let length = dirPath.length
+  let { length } = from
   let last = length
   let nmCount = 0
 
   const paths = []
 
   while (length--) {
-    const code = dirPath.charCodeAt(length)
+    const code = from.charCodeAt(length)
 
     // The path segment separator check ("\" and "/") was used to get
     // node_modules path for every path segment. Use colon as an extra
@@ -81,7 +81,7 @@ function win32NodeModulePaths(dirPath) {
         code === codeOfSlash ||
         code === codeOfColon) {
       if (nmCount !== nmLength) {
-        paths.push(dirPath.slice(0, last) + "\\node_modules")
+        paths.push(from.slice(0, last) + "\\node_modules")
       }
 
       last = length
