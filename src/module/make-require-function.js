@@ -9,27 +9,33 @@ import loadCJS from "./cjs/load.js"
 import moduleState from "./state.js"
 
 function makeRequireFunction(mod, requirer) {
-  function req(id) {
+  const req = function require(request) {
     moduleState.requireDepth += 1
 
     try {
-      if (typeof id !== "string") {
-        throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "id", "string")
+      if (typeof request !== "string") {
+        throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
       }
 
-      return requirer.call(mod, id)
+      return requirer.call(mod, request)
     } finally {
       moduleState.requireDepth -= 1
     }
   }
 
-  function resolve(id) {
-    return Module._resolveFilename(id, mod)
+  function resolve(request, options) {
+    return Module._resolveFilename(request, mod, false, options)
+  }
+
+  function paths(request) {
+    return Module._resolveLookupPaths(request, mod, true)
   }
 
   if (typeof requirer !== "function") {
-    requirer = (id) => loadCJS(id, mod, false)
+    requirer = (request) => loadCJS(request, mod, false)
   }
+
+  resolve.paths = paths
 
   req.cache = Module._cache
   req.extensions = Module._extensions
