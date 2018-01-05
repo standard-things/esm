@@ -155,7 +155,8 @@ class Entry {
         getters[key] = getter
       }
 
-      if (typeof getter !== "function" ||
+      if (this.esm ||
+          typeof getter !== "function" ||
           typeof otherGetter !== "function") {
         continue
       }
@@ -394,6 +395,10 @@ function getExportByName(entry, setter, name) {
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
+  }
+
+  if (entry.esm) {
+    return entry._namespace[name]
   }
 
   if ((isScript &&
