@@ -2,9 +2,9 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/recast/blob/master/lib/fast-path.js
 
+import alwaysTrue from "./util/always-true.js"
 import isObject from "./util/is-object.js"
 
-const alwaysTrue = () => true
 const { isArray } = Array
 
 class FastPath {

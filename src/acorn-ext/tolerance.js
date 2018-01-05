@@ -1,10 +1,9 @@
 import AcornError from "../acorn-error.js"
 
+import alwaysFalse from "../util/always-false.js"
+import alwaysTrue from "../util/always-true.js"
+import noop from "../util/noop.js"
 import wrap from "../util/wrap.js"
-
-const alwaysFalse = () => false
-const alwaysTrue = () => true
-const noop = () => {}
 
 const engineDupPrefix = "Duplicate export of '"
 const parserDupPrefix = "Duplicate export '"
