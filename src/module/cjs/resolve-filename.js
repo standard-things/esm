@@ -5,10 +5,10 @@
 import _resolveFilename from "./_resolve-filename.js"
 import builtinModules from "../../builtin-modules.js"
 
-function resolveFilename(id, parent, isMain) {
-  return id in builtinModules
-    ? id
-    : _resolveFilename(id, parent, isMain)
+function resolveFilename(request, parent, isMain, options) {
+  return request in builtinModules
+    ? request
+    : _resolveFilename(request, parent, isMain, options)
 }
 
 export default resolveFilename
