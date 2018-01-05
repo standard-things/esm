@@ -10,6 +10,8 @@ function loader(filePath, parent, preload) {
   mod.filename = filePath
   mod.paths = Module._nodeModulePaths(dirname(filePath))
 
+  // Initialize the entry here to enable using `Entry.has(mod)` as a way to
+  // detect side loaded modules.
   Entry.get(mod)
 
   if (preload) {
