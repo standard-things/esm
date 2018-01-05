@@ -14,6 +14,7 @@ const isWin = process.platform === "win32"
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
+const slashRegExp = /[\\/]/g
 
 const pkgPath = require.resolve("../")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
@@ -372,10 +373,10 @@ describe("Node rules", () => {
 
   it("should not support URL ids with encoded slashes", () =>
     Promise.all([
-      abcPath.replace("/", "%2f"),
-      abcPath.replace("/", "%2F"),
-      abcPath.replace("/", isWin ? "%5c" : "%2f"),
-      abcPath.replace("/", isWin ? "%5C" : "%2F")
+      abcPath.replace(slashRegExp, "%2f"),
+      abcPath.replace(slashRegExp, "%2F"),
+      abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
+      abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
