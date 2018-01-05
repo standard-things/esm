@@ -12,10 +12,10 @@ function hook(parent, options) {
     assign(parentPkgInfo.options, PkgInfo.createOptions(options))
   }
 
-  return makeRequireFunction(parent, (id) =>
-    id in builtinModules
+  return makeRequireFunction(parent, (request) =>
+  request in builtinModules
       ? builtinModules.exports
-      : loadESM(id, parent, false).exports
+      : loadESM(request, parent, false).exports
   )
 }
 

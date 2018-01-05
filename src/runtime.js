@@ -55,11 +55,11 @@ class Runtime {
     this.entry.addGetters(getterPairs)
   }
 
-  import(id) {
+  import(request) {
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {
-          watch(this.entry, id, [["*", createSetter("import", (value, childEntry) => {
+          watch(this.entry, request, [["*", createSetter("import", (value, childEntry) => {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
@@ -103,8 +103,8 @@ class Runtime {
     return valueToPassThrough
   }
 
-  watch(id, setterPairs) {
-    return watch(this.entry, id, setterPairs, _loadESM)
+  watch(request, setterPairs) {
+    return watch(this.entry, request, setterPairs, _loadESM)
   }
 }
 
@@ -113,9 +113,9 @@ function createSetter(from, setter) {
   return setter
 }
 
-function load(id, parent, loader, preload) {
-  if (id in builtinEntries) {
-    const child = builtinEntries[id]
+function load(request, parent, loader, preload) {
+  if (request in builtinEntries) {
+    const child = builtinEntries[request]
 
     if (preload) {
       preload(child)
@@ -124,15 +124,15 @@ function load(id, parent, loader, preload) {
     return child
   }
 
-  return loader(id, parent, false, preload)
+  return loader(request, parent, false, preload)
 }
 
 function runCJS(entry, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
   const loader = options.cjs.vars ? _loadESM : _loadCJS
-  const req = makeRequireFunction(mod, (id) => {
-    const child = load(id, mod, loader)
+  const req = makeRequireFunction(mod, (request) => {
+    const child = load(request, mod, loader)
 
     if (! options.cjs.vars &&
         Entry.get(child).esm) {
@@ -151,7 +151,7 @@ function runESM(entry, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   if (options.cjs.vars) {
-    const requirer = (id) => load(id, mod, _loadESM).exports
+    const requirer = (request) => load(request, mod, _loadESM).exports
     const req = makeRequireFunction(mod, requirer)
 
     moduleWrapper.call(exported, exported, req)
@@ -163,13 +163,13 @@ function runESM(entry, moduleWrapper) {
   entry.update().loaded()
 }
 
-function watch(entry, id, setterPairs, loader) {
+function watch(entry, request, setterPairs, loader) {
   let childEntry
 
   moduleState.requireDepth += 1
 
   try {
-    load(id, entry.module, loader, (child) => {
+    load(request, entry.module, loader, (child) => {
       childEntry = Entry.get(child)
       entry.children[child.id] = childEntry
       childEntry.addSetters(setterPairs, entry)
