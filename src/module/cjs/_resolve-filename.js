@@ -39,12 +39,12 @@ function resolveFilename(request, parent, isMain, options) {
       fakeParent.paths = Module._nodeModulePaths(thePath)
       const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
 
-      if (! paths.includes(thePath)) {
+      if (paths.indexOf(thePath) === -1) {
         paths.push(thePath)
       }
 
       for (const lookupPath of lookupPaths) {
-        if (! paths.includes(lookupPath)) {
+        if (paths.indexOf(lookupPath) === -1) {
           paths.push(lookupPath)
         }
       }
