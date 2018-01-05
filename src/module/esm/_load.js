@@ -47,7 +47,7 @@ function load(id, parent, isMain, preload) {
   }
 
   const queryHash = getQueryHash(id)
-  const cacheId = filePath + queryHash
+  const cacheKey = filePath + queryHash
 
   let child
   let error
@@ -56,7 +56,7 @@ function load(id, parent, isMain, preload) {
   let threw = true
 
   try {
-    child = _load(cacheId, parent, childIsMain, state, function () {
+    child = _load(cacheKey, parent, childIsMain, state, function () {
       called = true
       const child = this
       const url = getURLFromFilePath(filePath) + queryHash
@@ -95,10 +95,10 @@ function load(id, parent, isMain, preload) {
     throw error
   } finally {
     if (state === Module) {
-      delete state._cache[cacheId]
+      delete state._cache[cacheKey]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state._cache, cacheId, () => {
+      setGetter(state._cache, cacheKey, () => {
         throw error
       })
     }
