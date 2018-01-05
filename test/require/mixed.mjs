@@ -13,6 +13,7 @@ export default () =>
     const gzRequire = makeRequire(module, { gz: true })
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
+    const shorthandRequire = makeRequire(module, { esm: "cjs" })
     const warningsRequire = makeRequire(module, { cache: false, warnings: false })
 
     allRequire("./fixture/options/all")
@@ -20,6 +21,7 @@ export default () =>
     gzRequire("./fixture/options/gz")
     jsRequire("./fixture/options/js")
     mjsRequire("./fixture/options/mjs")
+    shorthandRequire("./fixture/options/shorthand")
 
     mockIo.start()
     warningsRequire("./fixture/options/warnings")
