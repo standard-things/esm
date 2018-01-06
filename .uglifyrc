@@ -1,5 +1,4 @@
 {
-  "toplevel": true,
   "compress": {
     "collapse_vars": false,
     "keep_infinity": true,
@@ -7,6 +6,10 @@
     "passes": 3,
     "pure_getters": true,
     "unsafe": true
+  },
+  "mangle": {
+    "reserved": ["__shared__"],
+    "toplevel": true
   },
   "output": {
     "ascii_only": true,
