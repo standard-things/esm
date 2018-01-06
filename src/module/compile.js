@@ -19,14 +19,13 @@ const inspectorBinding = binding.inspector
 const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
 
 const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
-const { runInThisContext } = vm
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 
 function compile(mod, content, filePath) {
   const req = makeRequireFunction(mod)
   const wrapper = Module.wrap(stripShebang(content))
-  const compiledWrapper = runInThisContext(wrapper, {
+  const compiledWrapper = vm.runInThisContext(wrapper, {
     displayErrors: true,
     filename: filePath
   })
