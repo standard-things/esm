@@ -9,6 +9,7 @@ const shared = assign(new FastObject, __shared__)
 if (! __shared__) {
   shared.entry = new SafeWeakMap
   shared.findPath = new FastObject
+  shared.global = global
   shared.inited = false
   shared.maxSatisfying = new FastObject
   shared.package = new FastObject

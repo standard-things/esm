@@ -251,7 +251,7 @@ function hook(Mod, parent, options) {
 
     let content =
       "const " + runtimeName + "=this;" +
-      runtimeName + ".r((" + async + "function(exports,require){" +
+      runtimeName + ".r((" + async + "function(global,exports,require){" +
       code + "\n}))"
 
     content += maybeSourceMap(content, entry)
@@ -269,8 +269,8 @@ function hook(Mod, parent, options) {
 
     let content =
       '"use strict";const ' + runtimeName + "=this;" +
-      runtimeName + ".r((" + async + "function(" +
-      (options.cjs.vars ? "exports,require" : "") +
+      runtimeName + ".r((" + async + "function(global" +
+      (options.cjs.vars ? ",exports,require" : "") +
       "){" + code + "\n}))"
 
     content += maybeSourceMap(content, entry)

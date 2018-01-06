@@ -40,6 +40,7 @@ function makeRequireFunction(mod, options) {
 
 let shared
 shared = load()
+shared.global = global
 
 const descriptor = Object.create(null)
 descriptor.value = () => "@std/esm enabled"

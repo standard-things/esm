@@ -11,6 +11,7 @@ import moduleState from "./module/state.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
+import shared from "./shared.js"
 
 class Runtime {
   static enable(entry, exported) {
@@ -142,7 +143,7 @@ function runCJS(entry, moduleWrapper) {
     return child.exports
   })
 
-  moduleWrapper.call(exported, exported, req)
+  moduleWrapper.call(exported, shared.global, exported, req)
   mod.loaded = true
 }
 
@@ -154,9 +155,9 @@ function runESM(entry, moduleWrapper) {
     const requirer = (request) => load(request, mod, loadESM).exports
     const req = makeRequireFunction(mod, requirer)
 
-    moduleWrapper.call(exported, exported, req)
+    moduleWrapper.call(exported, shared.global, exported, req)
   } else {
-    moduleWrapper.call(void 0)
+    moduleWrapper.call(void 0, shared.global)
   }
 
   mod.loaded = true

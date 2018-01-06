@@ -1,3 +1,6 @@
 {
+  "globals": {
+    "JEST_GLOBAL": "JEST_GLOBAL_VALUE"
+  },
   "transform": {}
 }

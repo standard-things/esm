@@ -1,1 +1,1 @@
-export default "default"
+export default global.JEST_GLOBAL
