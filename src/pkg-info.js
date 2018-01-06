@@ -41,9 +41,8 @@ const defaultOptions = {
 }
 
 const defaultCJS = defaultOptions.cjs
-const optionsKey = JSON.stringify(defaultOptions)
-
-const cjsKeys = Object.keys(defaultOptions.cjs)
+const cacheKey = JSON.stringify(defaultOptions)
+const cjsKeys = Object.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class PkgInfo {
@@ -85,8 +84,8 @@ class PkgInfo {
   }
 
   static cache =
-    shared.pkgInfo[optionsKey] ||
-    (shared.pkgInfo[optionsKey] = new FastObject)
+    shared.pkgInfo[cacheKey] ||
+    (shared.pkgInfo[cacheKey] = new FastObject)
 
   static get(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
