@@ -22,12 +22,7 @@ function load(filePath, parent, isMain, state, loader) {
     const entry = Entry.get(child)
 
     if (child.loaded ||
-        ! entry.state) {
-      return child
-    }
-
-    if (moduleState.parsing &&
-        entry.state !== 1) {
+        moduleState.parsing) {
       return child
     }
 
