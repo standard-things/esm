@@ -18,23 +18,28 @@ let exported
 
 if (shared.inited) {
   exported = (mod, options) => {
+    let cacheKey
+
+    if (isObjectLike(options)) {
+      cacheKey = stringify(options)
+    } else {
+      const pkgInfo = PkgInfo.from(mod)
+      const pkgOptions = pkgInfo && pkgInfo.options
+
+      if (pkgOptions) {
+        cacheKey = stringify(pkgOptions)
+      }
+    }
+
     const cloned = clone(mod)
 
-    if (! isObjectLike(options)) {
-      const pkgInfo = PkgInfo.from(mod)
-      options = pkgInfo && pkgInfo.options
-    }
-
-    if (options) {
-      const optionsKey = stringify(options)
-
+    if (cacheKey) {
       PkgInfo.cache =
-        shared.pkgInfo[optionsKey] ||
-        (shared.pkgInfo[optionsKey] = new FastObject)
-
-      moduleHook(Module, cloned, options)
+        shared.pkgInfo[cacheKey] ||
+        (shared.pkgInfo[cacheKey] = new FastObject)
     }
 
+    moduleHook(Module, cloned, options)
     return requireHook(cloned, options)
   }
 } else {
