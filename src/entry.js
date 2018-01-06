@@ -82,7 +82,7 @@ class Entry {
     //   2 - Parsing phase completed.
     //   3 - Execution phase started.
     //   4 - Execution phase completed.
-    this.state = null
+    this.state = 0
     // The file url of the module.
     this.url = null
   }
