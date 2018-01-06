@@ -90,13 +90,13 @@ class Runtime {
     // original expression to pass through. For example,
     //
     //   export let a = 1
-    //   console.log(a += 3)
+    //   a += 3
     //
     // becomes
     //
     //   runtime.export("a", () => a)
     //   let a = 1
-    //   console.log(runtime.update(a += 3))
+    //   runtime.update(a += 3)
     //
     // This ensures `entry.update()` runs immediately after the assignment,
     // and does not interfere with the larger computation.
