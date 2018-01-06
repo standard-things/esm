@@ -180,6 +180,7 @@ function hook(Mod, parent, options) {
       }
 
       if (! cached.changed &&
+          ! moduleState.parsing &&
           ! overwriteOptions &&
           pkgInfo === getDefaultPkgInfo()) {
         tryPassthru.call(this, func, args, options)
@@ -208,6 +209,7 @@ function hook(Mod, parent, options) {
     }
 
     if (! cached &&
+        ! moduleState.parsing &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
