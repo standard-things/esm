@@ -19,9 +19,11 @@ function load(id, parent, isMain, preload) {
   }
 
   const entry = Entry.get(child)
-  entry.state = 2
 
-  _load(id, parent, isMain, preload)
+  if (entry.state < 3) {
+    entry.state = 2
+    _load(id, parent, isMain, preload)
+  }
 
   entry.state = 4
   return child
