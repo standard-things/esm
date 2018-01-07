@@ -84,13 +84,9 @@ function hook(Mod, parent, options) {
 
     assign(pkgInfo.options, overwriteOptions)
 
-    if (wrapped) {
-      return wrapped.call(this, manager, func, pkgInfo, args)
-    }
-
-    if (! moduleState.parsing) {
-      return tryPassthru.call(this, func, args, pkgInfo.options)
-    }
+    return wrapped
+      ? wrapped.call(this, manager, func, pkgInfo, args)
+      : tryPassthru.call(this, func, args, pkgInfo.options)
   }
 
   function methodWrapper(manager, func, pkgInfo, args) {
@@ -180,7 +176,6 @@ function hook(Mod, parent, options) {
       }
 
       if (! cached.changed &&
-          ! moduleState.parsing &&
           ! overwriteOptions &&
           pkgInfo === getDefaultPkgInfo()) {
         tryPassthru.call(this, func, args, options)
@@ -209,7 +204,6 @@ function hook(Mod, parent, options) {
     }
 
     if (! cached &&
-        ! moduleState.parsing &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
