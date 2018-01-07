@@ -10,8 +10,11 @@ import trash from "../script/trash.js"
 const canTestJest = SemVer.satisfies(process.version, ">4")
 const canTestPM2 = ! ("TRAVIS" in process.env)
 
+const isWin = process.platform === "win32"
+
 const pkgPath = require.resolve("../")
 const testPath = path.dirname(require.resolve("./tests.mjs"))
+const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 function exec(filePath, args) {
   return execa(filePath, args, {
@@ -21,22 +24,6 @@ function exec(filePath, args) {
 
 describe("scenarios", function () {
   this.timeout(0)
-
-  it("should work with babel, mocha, and nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
-    const mochaPattern = path.resolve(dirPath, "test.mjs")
-    const nycArgs = [
-      "--cwd", dirPath, "-e", ".mjs",
-      "-x", ".babelrc.js", "-x", "test.mjs",
-      "-i", pkgPath, "-i", "@babel/register", "-i", "@babel/polyfill",
-      "mocha", mochaPattern
-    ]
-
-    return Promise.resolve()
-      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
-      .then(() => exec("nyc", nycArgs))
-      .then(() => fs.removeSync(".esmrc"))
-  })
 
   it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
@@ -51,6 +38,34 @@ describe("scenarios", function () {
     return Promise.resolve()
       .then(() => exec("tsc", tscArgs))
       .then(() => exec("nyc", nycArgs))
+  })
+
+  it("should work with babel, mocha, and nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
+    const mochaPattern = path.resolve(dirPath, "test.mjs")
+    const nycArgs = [
+      "--cwd", dirPath,
+      "-e", ".mjs",
+      "-x", ".babelrc.js", "-x", "test.mjs",
+      "-i", pkgPath, "-i", "@babel/register", "-i", "@babel/polyfill",
+      "mocha", mochaPattern
+    ]
+
+    return Promise.resolve()
+      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
+      .then(() => exec("nyc", nycArgs))
+      .then(() => fs.removeSync(".esmrc"))
+  })
+
+  it("should work with nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
+    const nycArgs = [
+      "--cwd", dirPath,
+      "-i", pkgPath,
+      nodePath, dirPath
+    ]
+
+    return exec("nyc", nycArgs)
   })
 
   ;(canTestJest ? it : xit)(
