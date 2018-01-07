@@ -13,12 +13,15 @@ const argv = require("yargs")
 const isWin = process.platform === "win32"
 
 const rootPath = path.resolve(__dirname, "..")
-const buildPath = path.resolve(rootPath, "build")
-const gzipPath = path.resolve(rootPath, "esm.js.gz")
-const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const testPath = path.resolve(rootPath, "test")
-const vendorPath = path.resolve(rootPath, "src/vendor")
+
+const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
+const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
+const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
+const nodeModulesPath = path.resolve(rootPath, "node_modules")
+const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const trashPaths = ignorePaths
   .filter((thePath) =>
@@ -29,8 +32,6 @@ const trashPaths = ignorePaths
   )
 
 const HOME = path.resolve(envPath, "home")
-const MOCHA_BIN = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
-const NODE_BIN = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 
 const NODE_ENV =
   (argv.prod ? "production" : "development") +
@@ -48,7 +49,7 @@ if (process.env.HARMONY) {
 }
 
 nodeArgs.push(
-  MOCHA_BIN,
+  mochaPath,
   "--full-trace",
   "--require", "../index.js",
   "tests.mjs"
@@ -59,7 +60,7 @@ function cleanRepo() {
 }
 
 function runTests(cached) {
-  return execa(NODE_BIN, nodeArgs, {
+  return execa(nodePath, nodeArgs, {
     cwd: testPath,
     env: {
       HOME,
@@ -73,9 +74,9 @@ function runTests(cached) {
 }
 
 function setupNode() {
-  const basePath = path.resolve(NODE_BIN, isWin ? "" : "..")
+  const basePath = path.resolve(nodePath, isWin ? "" : "..")
   return trash(basePath)
-    .then(() => fs.ensureLink(process.execPath, NODE_BIN))
+    .then(() => fs.ensureLink(process.execPath, nodePath))
 }
 
 Promise
