@@ -19,12 +19,12 @@ function load(filePath, parent, isMain, state, loader) {
       children.push(child)
     }
 
-    const entry = Entry.get(child)
-
     if (child.loaded ||
         moduleState.parsing) {
       return child
     }
+
+    const entry = Entry.get(child)
 
     if (! moduleState.parsing &&
         entry.state !== 2) {
@@ -35,14 +35,14 @@ function load(filePath, parent, isMain, state, loader) {
   } else {
     child = new Module(filePath, parent)
 
-    if (moduleState.parsing) {
-      Entry.get(child).state = 1
-    }
-
     if (isMain) {
       moduleState.mainModule =
       process.mainModule = child
       child.id = "."
+    }
+
+    if (moduleState.parsing) {
+      Entry.get(child).state = 1
     }
   }
 
