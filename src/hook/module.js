@@ -45,41 +45,31 @@ const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent, options) {
-  let defaultPkgInfo
   let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
-
-  const { _extensions } = Mod
-  const passthruMap = new SafeMap
 
   const overwriteOptions = isObjectLike(options)
     ? PkgInfo.createOptions(options)
     : null
 
-  Module._extensions = _extensions
+  const { _extensions } = Mod
+  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+  const defaultOptions = defaultPkgInfo.options
+  const parentPkgInfo = PkgInfo.from(parent, true)
+  const passthruMap = new SafeMap
 
-  function getDefaultPkgInfo() {
-    if (defaultPkgInfo) {
-      return defaultPkgInfo
-    }
+  assign(defaultPkgInfo, parentPkgInfo)
+  defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
+  defaultPkgInfo.range = "*"
 
-    defaultPkgInfo = new PkgInfo("", "*", { cache: false })
-    const defaultOptions = defaultPkgInfo.options
-    const parentPkgInfo = PkgInfo.from(parent, true)
-
-    assign(defaultPkgInfo, parentPkgInfo)
-    defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
-    defaultPkgInfo.range = "*"
-
-    if (defaultPkgInfo.options.esm === "all") {
-      defaultPkgInfo.options.esm = "js"
-    }
-
-    return defaultPkgInfo
+  if (defaultPkgInfo.options.esm === "all") {
+    defaultPkgInfo.options.esm = "js"
   }
+
+  Module._extensions = _extensions
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const pkgInfo = PkgInfo.get(dirname(filePath)) || getDefaultPkgInfo()
+    const pkgInfo = PkgInfo.get(dirname(filePath)) || defaultPkgInfo
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
 
     assign(pkgInfo.options, overwriteOptions)
@@ -177,7 +167,7 @@ function hook(Mod, parent, options) {
 
       if (! cached.changed &&
           ! overwriteOptions &&
-          pkgInfo === getDefaultPkgInfo()) {
+          pkgInfo === defaultPkgInfo) {
         tryPassthru.call(this, func, args, options)
         return
       }
