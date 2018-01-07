@@ -598,6 +598,22 @@ describe("spec compliance", () => {
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
+  it("should not execute already loaded modules", () =>
+    [
+      "./fixture/load-count.js",
+      "./fixture/cycle/load-count/a.js",
+      "./fixture/cycle/load-count/a.mjs"
+    ].reduce((promise, id) => {
+      return promise
+        .then(() => {
+          delete global.loadCount
+          delete require.cache[require.resolve("./fixture/load-count.js")]
+          return import(id)
+        })
+        .then(() => assert.strictEqual(global.loadCount, 1))
+    }, Promise.resolve())
+  )
+
   it("should not execute already loaded modules from require", () =>
     import("./fixture/load-count.js")
       .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))

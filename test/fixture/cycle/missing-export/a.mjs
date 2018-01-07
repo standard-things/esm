@@ -1,2 +1,2 @@
-import "../../load-count.mjs"
+import "../../load-count.mjs#cycle/missing-export"
 import "./b.mjs"

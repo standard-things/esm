@@ -1,4 +1,5 @@
 import fs from "fs-extra"
+import path from "path"
 import require from "./require.js"
 import zlib from "zlib"
 
@@ -42,6 +43,9 @@ beforeEach(() => {
   delete global.evaluated
   delete global.loadCount
   delete global.this
+
+  delete require.cache[path.resolve("fixture/load-count.js")]
   delete require.extensions[".coffee"]
+
   require.extensions[".json"] = jsonExt
 })
