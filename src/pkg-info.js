@@ -271,7 +271,8 @@ function readInfo(dirPath, force) {
     if (has(pkgJSON, "@std/esm")) {
       optionsFound = true
       options = pkgJSON["@std/esm"]
-    } else if (has(pkgJSON, "@std") && has(pkgJSON["@std"], "esm")) {
+    } else if (has(pkgJSON, "@std") &&
+        has(pkgJSON["@std"], "esm")) {
       optionsFound = true
       options = pkgJSON["@std"].esm
     }
@@ -311,8 +312,9 @@ function readInfo(dirPath, force) {
     return pkgInfo
   }
 
-  if (! optionsFound) {
-    options = process.env && process.env.ESM_OPTIONS
+  if (options === true ||
+      ! optionsFound) {
+    options = shared.env.vars.ESM_OPTIONS
   }
 
   return new PkgInfo(dirPath, range, options)

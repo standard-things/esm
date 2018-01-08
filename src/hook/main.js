@@ -1,32 +1,24 @@
-import { dirname, resolve } from "path"
-
 import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
 import assign from "../util/assign.js"
 import builtinModules from "../builtin-modules.js"
-import isPath from "../util/is-path.js"
+import { dirname } from "path"
+import env from "../env.js"
 import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
-import parseJSON6 from "../util/parse-json6.js"
-import readFile from "../fs/read-file.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
-
-const codeOfDoubleQuote = '"'.charCodeAt(0)
-const codeOfLeftBracket = "{".charCodeAt(0)
-const codeOfSingleQuote = "'".charCodeAt(0)
 
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
   const { runMain } = Mod
 
+  const cwd = process.cwd()
   const useTickCallback = typeof _tickCallback === "function"
 
-  const cwd = process.cwd()
+  let cwdPkgInfo = PkgInfo.get(cwd)
   const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
   const defaultOptions = defaultPkgInfo.options
-
-  let cwdPkgInfo = PkgInfo.get(cwd)
 
   if (! cwdPkgInfo) {
     cwdPkgInfo = PkgInfo.get(cwd, true)
@@ -37,28 +29,12 @@ function hook(Mod) {
   defaultPkgInfo.options = assign(defaultOptions, cwdPkgInfo.options)
   defaultPkgInfo.range = "*"
 
-  if (defaultPkgInfo.options.esm === "all") {
-    defaultPkgInfo.options.esm = "js"
+  if (env.vars.ESM_OPTIONS) {
+    assign(defaultPkgInfo.options, PkgInfo.createOptions(env.vars.ESM_OPTIONS))
   }
 
-  let ESM_OPTIONS = process.env && process.env.ESM_OPTIONS
-
-  if (ESM_OPTIONS) {
-    ESM_OPTIONS = ESM_OPTIONS.trim()
-
-    if (isPath(ESM_OPTIONS)) {
-      ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
-    }
-
-    const code0 = ESM_OPTIONS.charCodeAt(0)
-
-    if (code0 === codeOfLeftBracket ||
-        code0 === codeOfDoubleQuote ||
-        code0 === codeOfSingleQuote) {
-      ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
-    }
-
-    assign(defaultPkgInfo.options, PkgInfo.createOptions(ESM_OPTIONS))
+  if (defaultPkgInfo.options.esm === "all") {
+    defaultPkgInfo.options.esm = "js"
   }
 
   Mod.runMain = () => {
