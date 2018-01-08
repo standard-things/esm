@@ -65,11 +65,11 @@ describe("module.runMain hook", function () {
   it("should support `ESM_OPTIONS` environment variable", () =>
     [
       "'cjs'",
-      "{cjs:1}",
-      "{cjs:true}"
+      "{cjs:1,esm:'js'}",
+      "{cjs:true,esm:'js'}"
     ].reduce((promise, ESM_OPTIONS) =>
       promise
-        .then(() => runMain("./node_modules/esm-options", { ESM_OPTIONS }))
+        .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
         .then((result) => {
           assert.strictEqual(result.stderr, "")
           assert.ok(result.stdout.includes("esm-options:true"))
