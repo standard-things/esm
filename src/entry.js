@@ -467,7 +467,7 @@ function runGetter(entry, name) {
 
   if (value !== GETTER_ERROR &&
       ! (name in _namespace &&
-      is(_namespace[name], value))) {
+         is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value
   }
