@@ -244,6 +244,7 @@ Tips
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `@std/esm` with the `--node-args="-r @std/esm"` option of
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
+* Load `@std/esm` in a custom runner [as in the documentation](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library) for [`jasmine`](https://jasmine.github.io/)
 * Use `"@std/esm":"cjs"` with the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
 * Use `"@std/esm":"cjs"` with [`webpack`](https://github.com/webpack/webpack)
