@@ -1,5 +1,5 @@
 {
   "name": "options-priority",
   "private": true,
-  "@std/esm": "js"
+  "@std/esm": "mjs"
 }
