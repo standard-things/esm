@@ -230,7 +230,7 @@ function hook(Mod, parent, options) {
 
   function tryCompileCJS(entry) {
     const async = useAsyncWrapper(entry) ? "async " :  ""
-    const { module:mod, runtimeName } = entry
+    const { runtimeName } = entry
     const { code } = entry.data.compile
 
     let content =
@@ -243,12 +243,12 @@ function hook(Mod, parent, options) {
     const exported = {}
 
     Runtime.enable(entry, exported)
-    mod._compile(content, entry.filePath)
+    entry.module._compile(content, entry.filePath)
   }
 
   function tryCompileESM(entry) {
     const async = useAsyncWrapper(entry) ? "async " :  ""
-    const { module:mod, options, runtimeName } = entry
+    const { options, runtimeName } = entry
     const { code } = entry.data.compile
 
     let content =
@@ -274,7 +274,7 @@ function hook(Mod, parent, options) {
     Runtime.enable(entry, exported)
 
     try {
-      mod._compile(content, entry.filePath)
+      entry.module._compile(content, entry.filePath)
     } finally {
       if (Module.wrap === customWrap) {
         Module.wrap = moduleWrap
