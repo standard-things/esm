@@ -8,7 +8,7 @@ import builtinModules from "../../builtin-modules.js"
 function load(request, parent, isMain) {
   return request in builtinModules
     ? builtinModules[request].exports
-    : _load(request, parent, isMain).exports
+    : _load(request, parent, isMain).module.exports
 }
 
 export default load

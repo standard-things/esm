@@ -14,17 +14,29 @@ import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
-function load(id, parent, isMain, preload) {
+function load(request, parent, isMain, preload) {
+  let cacheKey
+  let filePath
+  let queryHash
+  let entry = request
+
   const parentPkgInfo = PkgInfo.from(parent)
   const parentOptions = parentPkgInfo && parentPkgInfo.options
 
-  let filePath
+  if (typeof request === "string") {
+    if (Module._resolveFilename !== moduleResolveFilename &&
+        parentOptions && parentOptions.cjs.paths) {
+      filePath = Module._resolveFilename(request, parent, isMain)
+    } else {
+      filePath = resolveFilename(request, parent, isMain)
+    }
 
-  if (Module._resolveFilename !== moduleResolveFilename &&
-      parentOptions && parentOptions.cjs.paths) {
-    filePath = Module._resolveFilename(id, parent, isMain)
+    queryHash = getQueryHash(request)
+
+    cacheKey =
+    request = filePath + queryHash
   } else {
-    filePath = resolveFilename(id, parent, isMain)
+    filePath = entry.filePath
   }
 
   const fromPath = dirname(filePath)
@@ -41,42 +53,43 @@ function load(id, parent, isMain, preload) {
 
     if (ext === ".mjs" ||
         (pkgOptions && pkgOptions.gz &&
-         ext === ".mjs.gz")) {
+        ext === ".mjs.gz")) {
       state = moduleState
     }
   }
 
-  const queryHash = getQueryHash(id)
-  const cacheKey = filePath + queryHash
-
-  let child
   let error
-
   let called = false
   let threw = true
 
   try {
-    child = _load(cacheKey, parent, childIsMain, state, function () {
+    entry = _load(request, parent, childIsMain, state, (childEntry) => {
       called = true
-      const child = this
-      const url = getURLFromFilePath(filePath) + queryHash
+      entry = childEntry
+      const child = entry.module
+
+      if (! entry.url) {
+        child.filename =
+        entry.filePath = filePath
+        entry.cacheKey = cacheKey
+        entry.url = getURLFromFilePath(filePath) + queryHash
+
+        if (isUnexposed) {
+          child.parent = void 0
+        }
+      }
 
       if (isMain) {
         moduleState.mainModule = child
         child.id = "."
       }
 
-      if (isUnexposed) {
-        child.parent = void 0
-      }
-
-      return loader.call(child, filePath, fromPath, url, parentOptions, preload)
+      return loader(entry, fromPath, parentOptions, preload)
     })
 
     if (! called &&
         preload) {
-      called = true
-      preload(child)
+      preload(entry)
     }
 
     threw = false
@@ -85,7 +98,7 @@ function load(id, parent, isMain, preload) {
   }
 
   if (! threw) {
-    return child
+    return entry
   } else if (isError(error) &&
       error.code === "ERR_REQUIRE_ESM") {
     toOptInError(error)
@@ -95,10 +108,10 @@ function load(id, parent, isMain, preload) {
     throw error
   } finally {
     if (state === Module) {
-      delete state._cache[cacheKey]
+      delete state._cache[entry.cacheKey]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state._cache, cacheKey, () => {
+      setGetter(state._cache, entry.cacheKey, () => {
         throw error
       })
     }

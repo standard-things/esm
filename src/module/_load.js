@@ -9,31 +9,45 @@ import moduleState from "./state.js"
 
 const compileSym = Symbol.for("@std/esm:module._compile")
 
-function load(filePath, parent, isMain, state, loader) {
-  let child = state._cache[filePath]
+function load(request, parent, isMain, state, loader) {
+  let child
+  let filePath
+  let entry = request
+
+  if (typeof request === "string") {
+    filePath = request
+    child = state._cache[filePath]
+
+    if (child) {
+      entry = Entry.get(child)
+    }
+  } else {
+    filePath = entry.filePath
+    child = entry.module
+  }
 
   if (child) {
     const children = parent && parent.children
 
-    if (children && children.indexOf(child) === -1) {
+    if (children &&
+        children.indexOf(child) === -1) {
       children.push(child)
     }
 
     if (child.loaded ||
         moduleState.parsing) {
-      return child
+      return entry
     }
-
-    const entry = Entry.get(child)
 
     if (! moduleState.parsing &&
         entry.state !== 2) {
-      return child
+      return entry
     }
 
     entry.state = 3
   } else {
     child = new Module(filePath, parent)
+    child.filename = filePath
 
     if (isMain) {
       moduleState.mainModule =
@@ -41,8 +55,11 @@ function load(filePath, parent, isMain, state, loader) {
       child.id = "."
     }
 
+    entry = Entry.get(child)
+    entry.cacheKey = filePath
+
     if (moduleState.parsing) {
-      Entry.get(child).state = 1
+      entry.state = 1
     }
   }
 
@@ -58,21 +75,22 @@ function load(filePath, parent, isMain, state, loader) {
     return func.call(child, content, filePath)
   }
 
-  tryLoad(child, filePath, state, loader)
-  return child
+  tryLoad(entry, state, loader)
+  return entry
 }
 
-function tryLoad(mod, filePath, state, loader = mod.load) {
-  state._cache[filePath] = mod
+function tryLoad(entry, state, loader) {
+  const { cacheKey } = entry
+  state._cache[cacheKey] = entry.module
 
   let threw = true
 
   try {
-    loader.call(mod, filePath)
+    loader(entry)
     threw = false
   } finally {
     if (threw) {
-      delete state._cache[filePath]
+      delete state._cache[cacheKey]
     }
   }
 }

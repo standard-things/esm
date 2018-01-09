@@ -1,32 +1,29 @@
-import Entry from "../../entry.js"
-
 import _load from "./_load.js"
 import moduleState from "../state.js"
 
-function load(id, parent, isMain, preload) {
-  let child
+function load(request, parent, isMain, preload) {
+  let entry
 
   moduleState.parsing = true
 
   try {
-    child = _load(id, parent, isMain)
+    entry = _load(request, parent, isMain)
   } finally {
     moduleState.parsing = false
   }
 
-  if (child.loaded) {
-    return _load(id, parent, isMain, preload)
+  if (entry.module.loaded) {
+    entry.state = 4
+    return _load(entry, parent, isMain, preload)
   }
-
-  const entry = Entry.get(child)
 
   if (entry.state < 3) {
     entry.state = 2
-    _load(id, parent, isMain, preload)
+    _load(entry, parent, isMain, preload)
   }
 
   entry.state = 4
-  return child
+  return entry
 }
 
 export default load

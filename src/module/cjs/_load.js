@@ -7,23 +7,25 @@ import Module from "../../module.js"
 import _load from "../_load.js"
 import loader from "./loader.js"
 
-function load(id, parent, isMain, preload) {
+function load(request, parent, isMain, preload) {
   let called = false
+  let entry = request
 
-  const filePath = Module._resolveFilename(id, parent, isMain)
+  if (typeof request === "string") {
+    request = Module._resolveFilename(request, parent, isMain)
+  }
 
-  const child = _load(filePath, parent, isMain, Module, function () {
+  entry = _load(request, parent, isMain, Module, (entry) => {
     called = true
-    return loader.call(this, filePath, parent, preload)
+    return loader(entry, parent, preload)
   })
 
   if (! called &&
       preload) {
-    called = true
-    preload(child)
+    preload(entry)
   }
 
-  return child
+  return entry
 }
 
 export default load

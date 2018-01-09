@@ -1,21 +1,18 @@
-import Entry from "../../entry.js"
 import Module from "../../module.js"
 
 import { dirname } from "path"
 import extname from "../../path/extname.js"
 import moduleState from "../state.js"
 
-function loader(filePath, parent, preload) {
-  const mod = this
-  mod.filename = filePath
-  mod.paths = Module._nodeModulePaths(dirname(filePath))
+function loader(entry, parent, preload) {
+  const { filePath, module:mod } = entry
 
-  // Initialize the entry here to enable using `Entry.has(mod)` as a way to
-  // detect side loaded modules.
-  Entry.get(mod)
+  if (! mod.paths) {
+    mod.paths = Module._nodeModulePaths(dirname(filePath))
+  }
 
   if (preload) {
-    preload(mod)
+    preload(entry)
   }
 
   const { _extensions } = Module

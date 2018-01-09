@@ -116,13 +116,13 @@ function createSetter(from, setter) {
 
 function load(request, parent, loader, preload) {
   if (request in builtinEntries) {
-    const child = builtinEntries[request]
+    const entry = builtinEntries[request]
 
     if (preload) {
-      preload(child)
+      preload(entry)
     }
 
-    return child
+    return entry
   }
 
   return loader(request, parent, false, preload)
@@ -133,10 +133,11 @@ function runCJS(entry, moduleWrapper) {
   const exported = mod.exports = entry.exports
   const loader = options.cjs.vars ? loadESM : _loadCJS
   const req = makeRequireFunction(mod, (request) => {
-    const child = load(request, mod, loader)
+    const childEntry = load(request, mod, loader)
+    const child = childEntry.module
 
     if (! options.cjs.vars &&
-        Entry.get(child).esm) {
+        childEntry.esm) {
       throw new errors.Error("ERR_REQUIRE_ESM", child)
     }
 
@@ -152,7 +153,7 @@ function runESM(entry, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   if (options.cjs.vars) {
-    const requirer = (request) => load(request, mod, loadESM).exports
+    const requirer = (request) => load(request, mod, loadESM).module.exports
     const req = makeRequireFunction(mod, requirer)
 
     moduleWrapper.call(exported, shared.global, exported, req)
@@ -165,14 +166,11 @@ function runESM(entry, moduleWrapper) {
 }
 
 function watch(entry, request, setterPairs, loader) {
-  let childEntry
-
   moduleState.requireDepth += 1
 
   try {
-    load(request, entry.module, loader, (child) => {
-      childEntry = Entry.get(child)
-      entry.children[child.id] = childEntry
+    const childEntry = load(request, entry.module, loader, (childEntry) => {
+      entry.children[childEntry.id] = childEntry
       childEntry.addSetters(setterPairs, entry)
     })
 

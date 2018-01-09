@@ -15,7 +15,7 @@ function hook(parent, options) {
   return makeRequireFunction(parent, (request) =>
   request in builtinModules
       ? builtinModules.exports
-      : loadESM(request, parent, false).exports
+      : loadESM(request, parent, false).module.exports
   )
 }
 

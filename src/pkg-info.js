@@ -247,7 +247,7 @@ function readInfo(dirPath, force) {
       })
 
       pkgInfo.options =
-      PkgInfo.createOptions(loadESM(optionsPath, null, false).exports)
+      PkgInfo.createOptions(loadESM(optionsPath, null, false).module.exports)
     }
   }
 

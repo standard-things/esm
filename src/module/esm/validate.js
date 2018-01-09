@@ -1,4 +1,3 @@
-import Entry from "../../entry.js"
 import NullObject from "../../null-object.js"
 
 import _loadESM from "./_load.js"
@@ -16,9 +15,7 @@ function validate(entry) {
   // Parse children.
   for (const name in moduleSpecifiers) {
     if (! (name in builtinModules)) {
-      const child = _loadESM(name, mod)
-      const childEntry = Entry.get(child)
-
+      const childEntry = _loadESM(name, mod)
       childEntry.state = 2
       children[name] = childEntry
     }
