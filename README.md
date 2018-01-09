@@ -90,7 +90,6 @@ Commonly used options may be specified in shorthand form:
   <td>
     <p>A string mode:</p>
     <ul>
-    <li><code>"mjs"</code> files as ESM <i>(default)</i></li>
     <li><code>"all"</code> files as ESM</li>
     <li><code>"js"</code> and other files with <code>import</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
     <li><code>"cjs"</code> shorthand for <code>"@std/esm":{"cjs":true,"esm":"js"}</code></li>
@@ -185,7 +184,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for toggling <code>.cache</code> creation. <i>(default: <code>true</code>)</i></p>
+    <p>A boolean for toggling <code>.cache</code> creation.</p>
   </td>
 </tr>
 <tr>
@@ -205,8 +204,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"warnings":</code></td>
   <td>
-    <p>A boolean for logging parse and runtime warnings.</p>
-    <p><i>(default: <code>process.env.NODE_ENV !== "production"</code>)</i></p>
+    <p>A boolean for logging development parse and runtime warnings.</p>
   </td>
 </tr>
 <tr>
