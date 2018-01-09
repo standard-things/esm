@@ -40,7 +40,7 @@ $ node
 @std/esm enabled
 ```
 
-*Note: The `"cjs"` and `"gz"` options are [unlocked](#unlockables) in the Node REPL.*
+*Note: All `"cjs"` options are [unlocked](#unlockables) in the Node REPL.*
 
 Standard Features
 ---
@@ -164,13 +164,6 @@ Commonly used options may be specified in shorthand form:
   <td valign="top"><code>"await":</code></td>
   <td>
     <p>A boolean to support top-level <code>await</code> in the main module <i>(requires Node 7.6+)</i>.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"gz":</code></td>
-  <td>
-    <p>A boolean to support gzipped module <i>(i.e. <code>.js.gz</code>, <code>.mjs.gz</code>).</i></p>
-    <p><i>Note: Don’t forget the webpack <a href="https://github.com/webpack-contrib/gzip-loader"><code>gzip-loader</code></a>.</i></p>
   </td>
 </tr>
 <tr>
