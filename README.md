@@ -38,10 +38,6 @@ Or upon entering:
 $ node
 > require("@std/esm")
 @std/esm enabled
-> import p from "path"
-undefined
-> p.join("hello", "world")
-'hello/world'
 ```
 
 *Note: The `"cjs"` and `"gz"` options are [unlocked](#unlockables) in the Node REPL.*
