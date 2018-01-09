@@ -81,7 +81,7 @@ describe("module.runMain hook", function () {
     runMain("./fixture/main/dynamic-import.js")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("dynamic-import-js:true"))
+        assert.ok(result.stdout.includes("dynamic-import-cjs:true"))
       })
   )
 
