@@ -656,7 +656,8 @@ describe("spec compliance", () => {
   it("should error for missing modules before code execution", () =>
     Promise.all([
       "./fixture/import/missing/module/cjs.mjs",
-      "./fixture/import/missing/module/esm.mjs"
+      "./fixture/import/missing/module/esm.mjs",
+      "./fixture/cycle/missing/module/a.mjs"
     ].map((id) =>
       import(id)
         .then(() => assert.ok(false))
