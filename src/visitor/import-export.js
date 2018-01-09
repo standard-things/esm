@@ -134,7 +134,7 @@ class ImportExportVisitor extends Visitor {
       moduleSpecifiers[specifierName] = new NullObject
     }
 
-    hoistExports(this, path, hoistedCode)
+    hoistImports(this, path, hoistedCode)
   }
 
   visitExportDefaultDeclaration(path) {
@@ -280,7 +280,7 @@ class ImportExportVisitor extends Visitor {
 
     specifierMap = newMap
 
-    hoistExports(this, path, toModuleImport(
+    hoistImports(this, path, toModuleImport(
       this,
       getSourceString(this, node),
       specifierMap

@@ -1,7 +1,11 @@
 import assert from "assert"
-import tracker from "../fixture/import/order/tracker.js"
+import exportTracker from "../fixture/export/order/tracker.js"
+import importTracker from "../fixture/import/order/tracker.js"
+import "../fixture/export/order"
 import "../fixture/import/order"
 
 export default () => {
-  assert.deepStrictEqual(tracker, ["a", "b", "c", "d"])
+  const expected = ["a", "b", "c", "d"]
+  assert.deepStrictEqual(exportTracker, expected)
+  assert.deepStrictEqual(importTracker, expected)
 }
