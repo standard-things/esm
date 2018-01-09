@@ -92,7 +92,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"esm":</code></td>
   <td>
-    <p>A string ESM mode:</p>
+    <p>A string mode:</p>
     <ul>
     <li><code>"mjs"</code> files as ESM <i>(default)</i></li>
     <li><code>"all"</code> files as ESM</li>
