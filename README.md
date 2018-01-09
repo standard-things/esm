@@ -161,7 +161,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for top-level <code>await</code> in the main module <i>(requires Node 7.6+)</i>.</p>
+    <p>A boolean for top-level <code>await</code> in the main module. <i>(requires Node 7.6+)</i></p>
   </td>
 </tr>
 <tr>
@@ -196,8 +196,6 @@ DevOpts
   <td valign="top"><code>"sourceMap":</code></td>
   <td>
     <p>A boolean for including inline source maps.</p>
-    <p><i>Note: Automatically enabled using the Node CLI
-    <a href="https://nodejs.org/en/docs/inspector/"><code>--inspect</code> option</a>.</i></p>
   </td>
 </tr>
 <tr>
