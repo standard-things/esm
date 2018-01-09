@@ -98,9 +98,14 @@ class Entry {
     const useExports = isObjectLike(exported)
     let entry = shared.entry.get(useExports ? exported : mod)
 
+    if (! entry &&
+        useExports) {
+      entry = shared.entry.get(mod)
+    }
+
     if (! entry) {
       entry = new Entry(mod, exported)
-      shared.entry.set(useExports ? exported : mod, entry)
+      Entry.set(mod, exported, entry)
     }
 
     return entry
@@ -116,10 +121,12 @@ class Entry {
   }
 
   static set(mod, exported, entry) {
+    if (mod) {
+      shared.entry.set(mod, entry)
+    }
+
     if (isObjectLike(exported)) {
       shared.entry.set(exported, entry)
-    } else if (mod) {
-      shared.entry.set(mod, entry)
     }
   }
 
