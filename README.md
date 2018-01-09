@@ -130,7 +130,7 @@ Commonly used options may be specified in shorthand form:
       <tr>
         <td valign="top"><code>"namedExports":</code></td>
         <td>
-          <p>A boolean to support <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
+          <p>A boolean for <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
         </td>
       </tr>
       <tr>
@@ -142,13 +142,13 @@ Commonly used options may be specified in shorthand form:
       <tr>
         <td valign="top"><code>"topLevelReturn":</code></td>
         <td>
-          <p>A boolean to support <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
+          <p>A boolean for <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
         </td>
       </tr>
       <tr>
         <td valign="top"><code>"vars":</code></td>
         <td>
-          <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
+          <p>A boolean for <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
         </td>
       </tr>
       <tr>
@@ -163,7 +163,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean to support top-level <code>await</code> in the main module <i>(requires Node 7.6+)</i>.</p>
+    <p>A boolean for top-level <code>await</code> in the main module <i>(requires Node 7.6+)</i>.</p>
   </td>
 </tr>
 <tr>
@@ -185,7 +185,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for toggling <code>.cache</code> creation <i>(default: <code>true</code>).</i></p>
+    <p>A boolean for toggling <code>.cache</code> creation. <i>(default: <code>true</code>)</i></p>
   </td>
 </tr>
 <tr>
