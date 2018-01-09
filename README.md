@@ -104,7 +104,64 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"cjs":</code></td>
   <td>
-    <p>A boolean to <a href="#contd">unlock</a> CJS features in ESM.</p>
+    <p>A boolean or object to unlock CJS features in ESM.</p>
+    <details>
+      <summary>Unlockable Features</summary>
+      <table>
+      <tr>
+        <td colspan="2">
+          <pre><code>{</code></pre>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"cache":</code></td>
+        <td>
+          <p>A boolean for storing ES modules in <code>require.cache</code>.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"extensions":</code></td>
+        <td>
+          <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"interop":</code></td>
+        <td>
+          <p>A boolean for <code>__esModule</code> interoperability.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"namedExports":</code></td>
+        <td>
+          <p>A boolean to support <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"paths":</code></td>
+        <td>
+          <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ESM.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"topLevelReturn":</code></td>
+        <td>
+          <p>A boolean to support <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"vars":</code></td>
+        <td>
+          <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <pre><code>}</code></pre>
+        </td>
+      </tr>
+      </table>
+    </details>
   </td>
 </tr>
 <tr>
@@ -123,68 +180,6 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td colspan="2">
     <pre><code>}</code></pre>
-  </td>
-</tr>
-</table>
-
-Cont’d
----
-
-The `"cjs"` option may also be specified as an object.
-
-<table>
-<tr>
-  <td colspan="2">
-    <pre><code>{
-  "cjs": {</code></pre>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"cache":</code></td>
-  <td>
-    <p>A boolean for storing ES modules in <code>require.cache</code>.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"extensions":</code></td>
-  <td>
-    <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"interop":</code></td>
-  <td>
-    <p>A boolean for <code>__esModule</code> interoperability.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"namedExports":</code></td>
-  <td>
-    <p>A boolean to support <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"paths":</code></td>
-  <td>
-    <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ESM.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"topLevelReturn":</code></td>
-  <td>
-    <p>A boolean to support <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"vars":</code></td>
-  <td>
-    <p>A boolean to expose <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
-  </td>
-</tr>
-<tr>
-  <td colspan="2">
-    <pre><code>  }
-}</code></pre>
   </td>
 </tr>
 </table>
