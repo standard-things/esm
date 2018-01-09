@@ -17,21 +17,21 @@ import toOptInError from "../../util/to-opt-in-error.js"
 function load(request, parent, isMain, preload) {
   let cacheKey
   let filePath
+  let parentOptions
   let queryHash
   let entry = request
 
-  const parentPkgInfo = PkgInfo.from(parent)
-  const parentOptions = parentPkgInfo && parentPkgInfo.options
-
   if (typeof request === "string") {
+    const parentPkgInfo = PkgInfo.from(parent)
+    parentOptions = parentPkgInfo && parentPkgInfo.options
+    queryHash = getQueryHash(request)
+
     if (Module._resolveFilename !== moduleResolveFilename &&
         parentOptions && parentOptions.cjs.paths) {
       filePath = Module._resolveFilename(request, parent, isMain)
     } else {
       filePath = resolveFilename(request, parent, isMain)
     }
-
-    queryHash = getQueryHash(request)
 
     cacheKey =
     request = filePath + queryHash
