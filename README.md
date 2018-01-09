@@ -237,6 +237,7 @@ Tips
 * Load `@std/esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register) v7+
 * Load `@std/esm` with the *“require”* option of
+  [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules), and
   [`tape`](https://github.com/substack/tape#preloading-modules)
