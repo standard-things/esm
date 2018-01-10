@@ -81,9 +81,7 @@ Commonly used options may be specified in shorthand form:
 
 <table>
 <tr>
-  <td colspan="2">
-    <code>{</code>
-  </td>
+  <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
   <td valign="top"><code>"esm":</code></td>
@@ -103,9 +101,7 @@ Commonly used options may be specified in shorthand form:
       <summary>Unlockable Features</summary>
       <table>
       <tr>
-        <td colspan="2">
-          <code>{</code>
-        </td>
+        <td colspan="2"><code>{</code></td>
       </tr>
       <tr>
         <td valign="top"><code>"cache":</code></td>
@@ -150,9 +146,7 @@ Commonly used options may be specified in shorthand form:
         </td>
       </tr>
       <tr>
-        <td colspan="2">
-          <code>}</code>
-        </td>
+        <td colspan="2"><code>}</code></td>
       </tr>
       </table>
     </details>
@@ -165,9 +159,7 @@ Commonly used options may be specified in shorthand form:
   </td>
 </tr>
 <tr>
-  <td colspan="2">
-    <code>}</code>
-  </td>
+  <td colspan="2"><code>}</code></td>
 </tr>
 </table>
 
@@ -176,9 +168,7 @@ DevOpts
 
 <table>
 <tr>
-  <td colspan="2">
-    <code>{</code>
-  </td>
+  <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
   <td valign="top"><code>"cache":</code></td>
@@ -205,9 +195,7 @@ DevOpts
   </td>
 </tr>
 <tr>
-  <td colspan="2">
-    <code>}</code>
-  </td>
+  <td colspan="2"><code>}</code></td>
 </tr>
 </table>
 
