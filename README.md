@@ -67,7 +67,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 Unlockables
 ---
 
-Unlock extra features with options specified as one of the following:
+Unlock features with options specified as one of the following:
 
 * The `"@std/esm"` field in your package.json
 * [JSON6](https://github.com/d3x0r/json6) in an .esmrc or .esmrc.json file
