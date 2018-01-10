@@ -2,34 +2,32 @@ import Compiler from "../build/compiler.js"
 
 import assert from "assert"
 
-const compile = Compiler.compile
-
 describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
-    assert.doesNotThrow(() => compile("return"))
-    assert.throws(() => compile("return", { type: "module" }), SyntaxError)
-    assert.doesNotThrow(() => compile("return", { cjs: { topLevelReturn: true }, type: "module" }))
-  })
-
-  it("should support `options.cjs.vars`", () => {
-    let result = compile("arguments")
-    assert.strictEqual(result.warnings, null)
-
-    result = compile("arguments", { cjs: { vars: true }, type: "module" })
-    assert.strictEqual(result.warnings, null)
-
-    result = compile("arguments", { type: "module" })
-    const warnings = result.warnings || []
-    assert.strictEqual(warnings.length, 1)
+    assert.doesNotThrow(() => Compiler.compile("return"))
+    assert.throws(() => Compiler.compile("return", { type: "module" }), SyntaxError)
+    assert.doesNotThrow(() => Compiler.compile("return", { cjs: { topLevelReturn: true }, type: "module" }))
   })
 
   it("should support `options.type`", () => {
     const types = ["module", "unambiguous"]
 
     types.forEach((type) => {
-      const result = compile('import"a"', { type })
+      const result = Compiler.compile('import"a"', { type })
       assert.strictEqual(result.esm, true)
     })
+  })
+
+  it("should support `options.cjs.vars`", () => {
+    let result = Compiler.compile("arguments")
+    assert.strictEqual(result.warnings, null)
+
+    result = Compiler.compile("arguments", { cjs: { vars: true }, type: "module" })
+    assert.strictEqual(result.warnings, null)
+
+    result = Compiler.compile("arguments", { type: "module" })
+    const warnings = result.warnings || []
+    assert.strictEqual(warnings.length, 1)
   })
 
   it('should support `options.type` of "module"', () => {
@@ -43,7 +41,7 @@ describe("compiler", () => {
     ]
 
     tests.forEach((code) => {
-      const result = compile(code, { type: "module" })
+      const result = Compiler.compile(code, { type: "module" })
       assert.strictEqual(result.esm, true)
     })
   })
@@ -60,7 +58,7 @@ describe("compiler", () => {
     ]
 
     tests.forEach((data) => {
-      const result = compile(data.code, { hint: data.hint, type: "unambiguous" })
+      const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       assert.strictEqual(result.esm, data.esm)
     })
   })
@@ -69,7 +67,7 @@ describe("compiler", () => {
     const values = [void 0, false, true]
 
     values.forEach((value) => {
-      const result = compile('import a from "a"', { var: value, type: "module" })
+      const result = Compiler.compile('import a from "a"', { var: value, type: "module" })
       assert.ok(result.code.startsWith(value ? "var a" : "let a"))
     })
   })
@@ -83,7 +81,7 @@ describe("compiler", () => {
     ]
 
     tests.forEach((data) => {
-      const result = compile(data.code, { hint: data.hint, type: "unambiguous" })
+      const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       assert.strictEqual(result.esm, true)
     })
   })
@@ -98,7 +96,7 @@ describe("compiler", () => {
 
     tests.forEach((data) =>
       assert.throws(() =>
-        compile(data.code, { hint: data.hint, type: "unambiguous" })
+        Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       , SyntaxError)
     )
   })
@@ -109,17 +107,17 @@ describe("compiler", () => {
       'import a from "a"'
     ].join("\n")
 
-    const result = compile(code, { type: "module" })
+    const result = Compiler.compile(code, { type: "module" })
     assert.ok(result.code.startsWith("let a"))
   })
 
   it("should support trailing comments", () => {
-    const result = compile('import"a"//trailing comment', { type: "module" })
+    const result = Compiler.compile('import"a"//trailing comment', { type: "module" })
     assert.ok(result.code.endsWith("//trailing comment"))
   })
 
   it("should compile dynamic import with script source type", () => {
-    const result = compile('import("a")', { esm: false })
+    const result = Compiler.compile('import("a")', { esm: false })
     assert.ok(result.code.includes('i("a")'))
   })
 
@@ -138,7 +136,7 @@ describe("compiler", () => {
       'from "assert"'
     ].join("\r\n")
 
-    const result = compile(code, { type: "module" })
+    const result = Compiler.compile(code, { type: "module" })
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
   })
 
@@ -153,7 +151,7 @@ describe("compiler", () => {
   )
 
   it("should not error on shorthand async function properties with reserved names", () => {
-    assert.doesNotThrow(() => compile("({async delete(){}})"))
+    assert.doesNotThrow(() => Compiler.compile("({async delete(){}})"))
   })
 
   it("should not error on arrow functions with destructured arguments", () => {
@@ -163,7 +161,7 @@ describe("compiler", () => {
     ]
 
     codes.forEach((code) =>
-      assert.doesNotThrow(() => compile(code))
+      assert.doesNotThrow(() => Compiler.compile(code))
     )
   })
 
@@ -176,7 +174,7 @@ describe("compiler", () => {
     ]
 
     codes.forEach((code) =>
-      assert.doesNotThrow(() => compile(code, { type: "module" }))
+      assert.doesNotThrow(() => Compiler.compile(code, { type: "module" }))
     )
   })
 })

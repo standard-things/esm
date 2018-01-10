@@ -9,7 +9,7 @@ import trash from "../script/trash.js"
 
 const canTestMissingModuleErrors =
   ! ("TRAVIS" in process.env &&
-    SemVer.satisfies(process.version, "^7"))
+     SemVer.satisfies(process.version, "^7"))
 
 const canUseExperimentalModules =
   process.jsEngine !== "chakracore" &&
@@ -86,7 +86,6 @@ describe("module.runMain hook", function () {
     return runMain("./fixture/options/env", { ESM_OPTIONS })
       .then(() => {
         const pathExists = fs.pathExistsSync(cachePath)
-
         return trash([cachePath])
           .then(() => assert.ok(pathExists))
       })
@@ -105,7 +104,6 @@ describe("module.runMain hook", function () {
       .then((result) => {
         const url = testURL + "/fixture/main/import-meta.mjs"
         const expected = JSON.stringify({ url })
-
         assert.ok(result.stdout.includes("import-meta:" + expected))
       })
   )
@@ -148,9 +146,7 @@ describe("module.runMain hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) =>
-            assert.ok(result.stderr.includes("ERR_MISSING_MODULE"))
-          )
+          .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
       , Promise.resolve())
   })
 })

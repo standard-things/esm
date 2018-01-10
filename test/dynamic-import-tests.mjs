@@ -5,7 +5,6 @@ import createNamespace from "./create-namespace.js"
 import path from "path"
 import require from "./require.js"
 
-const compile = Compiler.compile
 const isWin = process.platform === "win32"
 
 const abcPath = require.resolve("./fixture/export/abc.mjs")
@@ -113,7 +112,7 @@ describe("dynamic import", () => {
     ]
 
     invalids.forEach((code) =>
-      assert.throws(() => compile(code), SyntaxError)
+      assert.throws(() => Compiler.compile(code), SyntaxError)
     )
   })
 
@@ -125,7 +124,7 @@ describe("dynamic import", () => {
     ]
 
     invalids.forEach((code) =>
-      assert.throws(() => compile(code), SyntaxError)
+      assert.throws(() => Compiler.compile(code), SyntaxError)
     )
   })
 })

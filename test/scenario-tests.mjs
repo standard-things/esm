@@ -94,9 +94,6 @@ describe("scenarios", function () {
       .then(() => exec("pm2", ["kill"]))
       .then(() => exec("pm2", pm2Args))
       .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
-      .then(() => {
-        const errorLog = fs.readFileSync(errorPath, "utf8")
-        assert.strictEqual(errorLog, "")
-      })
+      .then(() => assert.strictEqual(fs.readFileSync(errorPath, "utf8"), ""))
   })
 })
