@@ -2,8 +2,10 @@ import SemVer from "semver"
 
 import assert from "assert"
 import execa from "execa"
+import fs from "fs-extra"
 import path from "path"
 import require from "./require.js"
+import trash from "../script/trash.js"
 
 const canTestMissingModuleErrors =
   ! ("TRAVIS" in process.env &&
@@ -76,6 +78,19 @@ describe("module.runMain hook", function () {
         })
     , Promise.resolve())
   )
+
+  it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", () => {
+    const cachePath = path.resolve("./fixture/options/env/.cache")
+    const ESM_OPTIONS = "{cache:'" + cachePath + "',esm:'cjs'}"
+
+    return runMain("./fixture/options/env", { ESM_OPTIONS })
+      .then(() => {
+        const pathExists = fs.pathExistsSync(cachePath)
+
+        return trash([cachePath])
+          .then(() => assert.ok(pathExists))
+      })
+  })
 
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main/dynamic-import.js")
