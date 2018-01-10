@@ -82,7 +82,7 @@ Commonly used options may be specified in shorthand form:
 <table>
 <tr>
   <td colspan="2">
-    <pre><code>{</code></pre>
+    <code>{</code>
   </td>
 </tr>
 <tr>
@@ -104,7 +104,7 @@ Commonly used options may be specified in shorthand form:
       <table>
       <tr>
         <td colspan="2">
-          <pre><code>{</code></pre>
+          <code>{</code>
         </td>
       </tr>
       <tr>
@@ -151,7 +151,7 @@ Commonly used options may be specified in shorthand form:
       </tr>
       <tr>
         <td colspan="2">
-          <pre><code>}</code></pre>
+          <code>}</code>
         </td>
       </tr>
       </table>
@@ -166,7 +166,7 @@ Commonly used options may be specified in shorthand form:
 </tr>
 <tr>
   <td colspan="2">
-    <pre><code>}</code></pre>
+    <code>}</code>
   </td>
 </tr>
 </table>
@@ -177,7 +177,7 @@ DevOpts
 <table>
 <tr>
   <td colspan="2">
-    <pre><code>{</code></pre>
+    <code>{</code>
   </td>
 </tr>
 <tr>
@@ -206,7 +206,7 @@ DevOpts
 </tr>
 <tr>
   <td colspan="2">
-    <pre><code>}</code></pre>
+    <code>}</code>
   </td>
 </tr>
 </table>
