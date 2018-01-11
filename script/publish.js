@@ -20,9 +20,7 @@ const defaultScripts = `,
 
 const fieldsToRemove = [
   "@std/esm",
-  "dependencies",
   "devDependencies",
-  "optionalDevDependencies",
   "private"
 ]
 

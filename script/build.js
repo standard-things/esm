@@ -17,7 +17,7 @@ const NODE_ENV =
   (argv.test ? "-test" : "")
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const zlib = argv.prod ? require("node-zopfli") : require("zlib")
+const zlib = argv.prod ? require("@gfx/zopfli") : require("zlib")
 const gzip = pify(zlib.gzip)
 const gzipOptions = argv.prod ? { numiterations: 100 } : { level: 0 }
 
@@ -25,7 +25,6 @@ const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
 const bundlePath = path.resolve(buildPath, "esm.js")
 const gzipPath = path.resolve(rootPath, "esm.js.gz")
-const pkgPath = path.resolve(rootPath, "package.json")
 const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const acornPath = path.resolve(vendorPath, "acorn")
@@ -36,7 +35,6 @@ const uglifyPluginPath = path.resolve(rootPath, "node_modules/uglifyjs-webpack-p
 const uglifyPath = path.resolve(uglifyPluginPath, "node_modules/uglify-es")
 
 const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
-const removeDepsRegExp = /,\s*"dependencies":[^]*?\}/
 
 const trashPaths = [
   buildPath,
@@ -49,12 +47,6 @@ const webpackArgs = [
     ? "--display-optimization-bailout"
     : "--hide-modules"
 ]
-
-function cleanPackageJSON() {
-  return fs
-    .readFile(pkgPath, "utf8")
-    .then((content) => fs.outputFile(pkgPath, content.replace(removeDepsRegExp, "")))
-}
 
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
@@ -94,7 +86,6 @@ function makeBundle() {
 
 Promise
   .all([
-    argv.prod && cleanPackageJSON(),
     cleanRepo(),
     getAcorn()
   ])
