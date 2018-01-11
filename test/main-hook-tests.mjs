@@ -7,10 +7,6 @@ import path from "path"
 import require from "./require.js"
 import trash from "../script/trash.js"
 
-const canTestCacheOption =
-  ! ("APPVEYOR" in process.env) &&
-  ! ("TRAVIS" in process.env)
-
 const canTestMissingModuleErrors =
   ! ("TRAVIS" in process.env &&
      SemVer.satisfies(process.version, "^7"))
@@ -83,6 +79,19 @@ describe("module.runMain hook", function () {
     , Promise.resolve())
   )
 
+  it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", () => {
+    const execPath = path.resolve("./fixture/options/env")
+    const cachePath = path.resolve(execPath, ".cache")
+    const ESM_OPTIONS = "{cache:'" + cachePath + "',esm:'cjs'}"
+
+    return runMain(execPath, { ESM_OPTIONS })
+      .then(() => {
+        const pathExists = fs.pathExistsSync(cachePath)
+        return trash(cachePath)
+          .then(() => assert.ok(pathExists))
+      })
+  })
+
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main/dynamic-import.js")
       .then((result) => {
@@ -115,20 +124,6 @@ describe("module.runMain hook", function () {
         assert.ok(result.stdout.includes("main-module:true"))
       })
   )
-
-  ;(canTestCacheOption ? it : xit)(
-  "should support setting `options.cache` with the `ESM_OPTIONS` environment variable", () => {
-    const execPath = path.resolve("./fixture/options/env")
-    const cachePath = path.resolve(execPath, ".cache")
-    const ESM_OPTIONS = "{cache:'" + cachePath + "',esm:'cjs'}"
-
-    return runMain(execPath, { ESM_OPTIONS })
-      .then(() => {
-        const pathExists = fs.pathExistsSync(cachePath)
-        return trash(cachePath)
-          .then(() => assert.ok(pathExists))
-      })
-  })
 
   ;(canTestMissingModuleErrors ? it : xit)(
   "should error for missing modules", function () {
