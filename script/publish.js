@@ -2,10 +2,12 @@
 
 const execa = require("execa")
 const fs = require("fs-extra")
+const minifyHTML = require("html-minifier").minify
 const path = require("path")
 
 const rootPath = path.resolve(__dirname, "..")
-const jsonPath = path.resolve(rootPath, "package.json")
+const pkgPath = path.resolve(rootPath, "package.json")
+const readmePath = path.resolve(rootPath, "README.md")
 
 const defaultScripts = `,
   "scripts": {
@@ -21,9 +23,32 @@ const fieldsToRemove = [
 ]
 
 const scriptsRegExp = makeFieldRegExp("scripts")
+const tableRegExp = /^<table>[^]*?\n<\/table>/gm
 
-function cleanJSON(jsonText) {
-  return removeFields(resetScripts(jsonText), fieldsToRemove)
+function cleanPackageJSON(content) {
+  return removeFields(resetScripts(content), fieldsToRemove)
+}
+
+function cleanReadme(content) {
+  return content
+    .trim()
+    .replace(tableRegExp, (table) =>
+      minifyHTML(table, {
+        collapseBooleanAttributes: true,
+        collapseInlineTagWhitespace: true,
+        collapseWhitespace: true,
+        decodeEntities: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+        removeEmptyAttributes: true,
+        removeEmptyElements: true,
+        removeOptionalTags: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        removeTagWhitespace: true
+      })
+    )
 }
 
 function makeFieldRegExp(field) {
@@ -38,21 +63,37 @@ function publishPackage() {
   })
 }
 
-function removeField(jsonText, field) {
-  return jsonText.replace(makeFieldRegExp(field), "")
+function removeField(content, field) {
+  return content.replace(makeFieldRegExp(field), "")
 }
 
-function removeFields(jsonText, fields) {
-  return fields.reduce(removeField, jsonText)
+function removeFields(content, fields) {
+  return fields.reduce(removeField, content)
 }
 
-function resetScripts(jsonText) {
-  return jsonText.replace(scriptsRegExp, defaultScripts)
+function resetScripts(content) {
+  return content.replace(scriptsRegExp, defaultScripts)
 }
 
-fs.readFile(jsonPath, "utf8")
-  .then((jsonText) =>
-    fs.outputFile(jsonPath, cleanJSON(jsonText))
+Promise
+  .all([
+    fs.readFile(pkgPath, "utf8"),
+    fs.readFile(readmePath, "utf8")
+  ])
+  .then((contents) => {
+    const pkgContent = contents[0]
+    const readmeContent = contents[1]
+
+    return Promise
+      .all([
+        fs.outputFile(pkgPath, cleanPackageJSON(pkgContent)),
+        fs.outputFile(readmePath, cleanReadme(readmeContent))
+      ])
       .then(publishPackage)
-      .then(() => fs.outputFile(jsonPath, jsonText))
-  )
+      .then(() => Promise
+        .all([
+          fs.outputFile(pkgPath, pkgContent),
+          fs.outputFile(readmePath, readmeContent)
+        ])
+      )
+  })
