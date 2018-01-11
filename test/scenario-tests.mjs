@@ -90,7 +90,7 @@ describe("scenarios", function () {
     ]
 
     return Promise.resolve()
-      .then(() => trash([logsPath]))
+      .then(() => trash(logsPath))
       .then(() => exec("pm2", ["kill"]))
       .then(() => exec("pm2", pm2Args))
       .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))

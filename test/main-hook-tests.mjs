@@ -125,7 +125,7 @@ describe("module.runMain hook", function () {
     return runMain(execPath, { ESM_OPTIONS })
       .then(() => {
         const pathExists = fs.pathExistsSync(cachePath)
-        return trash([cachePath])
+        return trash(cachePath)
           .then(() => assert.ok(pathExists))
       })
   })
