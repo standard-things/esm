@@ -1,15 +1,20 @@
 import Entry from "./entry.js"
 import FastObject from "./fast-object.js"
+import Module from "./module.js"
 
-import builtinModules from "./builtin-modules.js"
+import builtinModules from "./module/builtin-modules.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 
-const builtinEntries = Object.keys(builtinModules)
+const builtinEntries = builtinModules
   .reduce((object, id) => {
     setGetter(object, id, () => {
-      const entry = Entry.get(builtinModules[id])
+      const mod = new Module(id, null)
+      mod.exports = id === "module" ? Module : mod.require(id)
+      mod.loaded = true
+
+      const entry = Entry.get(mod)
       entry.loaded()
       return object[id] = entry
     })

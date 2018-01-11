@@ -3,10 +3,10 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import _resolveLookupPaths from "./_resolve-lookup-paths.js"
-import builtinModules from "../builtin-modules.js"
+import builtinEntries from "../builtin-entries.js"
 
 function resolveLookupPaths(request, parent, newReturn) {
-  if (request in builtinModules) {
+  if (request in builtinEntries) {
     return newReturn ? null : [request, []]
   }
 

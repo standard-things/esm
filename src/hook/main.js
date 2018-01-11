@@ -2,7 +2,7 @@ import Module from "../module.js"
 import PkgInfo from "../pkg-info.js"
 
 import assign from "../util/assign.js"
-import builtinModules from "../builtin-modules.js"
+import builtinEntries from "../builtin-entries.js"
 import { dirname } from "path"
 import env from "../env.js"
 import loadESM from "../module/esm/load.js"
@@ -42,7 +42,7 @@ function hook(Mod) {
 
     const [, mainPath] = process.argv
 
-    if (mainPath in builtinModules) {
+    if (mainPath in builtinEntries) {
       Mod.runMain()
       return
     }

@@ -3,11 +3,11 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import _load from "./_load.js"
-import builtinModules from "../../builtin-modules.js"
+import builtinEntries from "../../builtin-entries.js"
 
 function load(request, parent, isMain) {
-  return request in builtinModules
-    ? builtinModules[request].exports
+  return request in builtinEntries
+    ? builtinEntries[request].module.exports
     : _load(request, parent, isMain).module.exports
 }
 

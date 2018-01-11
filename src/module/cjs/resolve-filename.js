@@ -3,10 +3,10 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import _resolveFilename from "./_resolve-filename.js"
-import builtinModules from "../../builtin-modules.js"
+import builtinEntries from "../../builtin-entries.js"
 
 function resolveFilename(request, parent, isMain, options) {
-  return request in builtinModules
+  return request in builtinEntries
     ? request
     : _resolveFilename(request, parent, isMain, options)
 }
