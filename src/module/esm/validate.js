@@ -17,7 +17,9 @@ function validate(entry) {
     if (! (name in builtinEntries)) {
       const childEntry = _loadESM(name, mod)
       childEntry.state = 2
-      children[name] = childEntry
+
+      children[name] =
+      entry.children[childEntry.id] = childEntry
     }
   }
 

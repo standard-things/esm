@@ -170,7 +170,6 @@ function watch(entry, request, setterPairs, loader) {
 
   try {
     const childEntry = load(request, entry.module, loader, (childEntry) => {
-      entry.children[childEntry.id] = childEntry
       childEntry.addSetters(setterPairs, entry)
     })
 
