@@ -2,12 +2,16 @@
 
 const execa = require("execa")
 const fs = require("fs-extra")
-const minifyHTML = require("html-minifier").minify
+const htmlmin = require("html-minifier").minify
 const path = require("path")
+const uglify = require("uglify-es").minify
 
 const rootPath = path.resolve(__dirname, "..")
+const indexPath = path.resolve(rootPath, "index.js")
 const pkgPath = path.resolve(rootPath, "package.json")
 const readmePath = path.resolve(rootPath, "README.md")
+
+const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
 
 const defaultScripts = `,
   "scripts": {
@@ -25,34 +29,57 @@ const fieldsToRemove = [
 const scriptsRegExp = makeFieldRegExp("scripts")
 const tableRegExp = /^<table>[^]*?\n<\/table>/gm
 
-function cleanPackageJSON(content) {
-  return removeFields(resetScripts(content), fieldsToRemove)
+function cleanIndex() {
+  return fs
+    .readFile(indexPath, "utf8")
+    .then((content) => {
+      process.once("exit", () => fs.outputFileSync(indexPath, content))
+      return fs.outputFile(indexPath, minifyJS(content))
+    })
 }
 
-function cleanReadme(content) {
-  return content
-    .trim()
-    .replace(tableRegExp, (table) =>
-      minifyHTML(table, {
-        collapseBooleanAttributes: true,
-        collapseInlineTagWhitespace: true,
-        collapseWhitespace: true,
-        decodeEntities: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-        removeEmptyAttributes: true,
-        removeEmptyElements: true,
-        removeOptionalTags: true,
-        removeRedundantAttributes: true,
-        removeScriptTypeAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        removeTagWhitespace: true
-      })
-    )
+function cleanPackageJSON() {
+  return fs
+    .readFile(pkgPath, "utf8")
+    .then((content) => {
+      process.once("exit", () => fs.outputFileSync(pkgPath, content))
+      return fs.outputFile(pkgPath, removeFields(resetScripts(content), fieldsToRemove))
+    })
+}
+
+function cleanReadme() {
+  return fs
+    .readFile(readmePath, "utf8")
+    .then((content) => {
+      process.once("exit", () => fs.outputFileSync(readmePath, content))
+      return fs.outputFile(readmePath, content.replace(tableRegExp, minifyHTML))
+    })
 }
 
 function makeFieldRegExp(field) {
   return RegExp(',\\s*"' + field + '":\\s*(\\{[^]*?\\}|[^]*?)(?=,?\\n)')
+}
+
+function minifyHTML(content) {
+  return htmlmin(content, {
+    collapseBooleanAttributes: true,
+    collapseInlineTagWhitespace: true,
+    collapseWhitespace: true,
+    decodeEntities: true,
+    removeAttributeQuotes: true,
+    removeComments: true,
+    removeEmptyAttributes: true,
+    removeEmptyElements: true,
+    removeOptionalTags: true,
+    removeRedundantAttributes: true,
+    removeScriptTypeAttributes: true,
+    removeStyleLinkTypeAttributes: true,
+    removeTagWhitespace: true
+  })
+}
+
+function minifyJS(content) {
+  return uglify(content, uglifyOptions).code
 }
 
 function publishPackage() {
@@ -64,7 +91,7 @@ function publishPackage() {
 }
 
 function removeField(content, field) {
-  return content.replace(makeFieldRegExp(field), "")
+  return String(content).replace(makeFieldRegExp(field), "")
 }
 
 function removeFields(content, fields) {
@@ -72,28 +99,13 @@ function removeFields(content, fields) {
 }
 
 function resetScripts(content) {
-  return content.replace(scriptsRegExp, defaultScripts)
+  return String(content).replace(scriptsRegExp, defaultScripts)
 }
 
 Promise
   .all([
-    fs.readFile(pkgPath, "utf8"),
-    fs.readFile(readmePath, "utf8")
+    cleanIndex(),
+    cleanPackageJSON(),
+    cleanReadme()
   ])
-  .then((contents) => {
-    const pkgContent = contents[0]
-    const readmeContent = contents[1]
-
-    return Promise
-      .all([
-        fs.outputFile(pkgPath, cleanPackageJSON(pkgContent)),
-        fs.outputFile(readmePath, cleanReadme(readmeContent))
-      ])
-      .then(publishPackage)
-      .then(() => Promise
-        .all([
-          fs.outputFile(pkgPath, pkgContent),
-          fs.outputFile(readmePath, readmeContent)
-        ])
-      )
-  })
+  .then(publishPackage)
