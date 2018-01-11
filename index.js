@@ -14,7 +14,7 @@ const Module = useBuiltins ? module.constructor : require("module")
 
 const stdMod = new Module(module.id, null)
 const stdPath = path.resolve(__dirname, "esm.js.gz")
-const stdReq = useBuiltins ? require : stdMod.require
+const stdReq = useBuiltins ? require : (request) => stdMod.require(request)
 
 stdMod.filename = __filename
 stdMod.parent = module.parent

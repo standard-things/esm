@@ -54,8 +54,8 @@ describe("scenarios", function () {
       .then(() => fs.removeSync(".esmrc"))
   })
 
-  it("should work with jest", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest")
+  it("should work with jest and mock-require", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
     const configPath = path.resolve(dirPath, "jest.config.json")
     const jestArgs = ["--config", configPath, "--rootDir", dirPath]
 
