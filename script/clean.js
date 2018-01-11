@@ -13,15 +13,18 @@ const trashPaths = ignorePaths
   .filter((thePath) => thePath !== nodeModulesPath)
 
 function cleanEmptyDirs() {
-  return globby.sync(["*/**/"], {
-    cwd: rootPath,
-    expandDirectories: false,
-    nodir: false
-  })
-  .map(realPath)
-  .filter(fs.existsSync)
-  .filter(isEmpty)
-  .map(trash)
+  return Promise
+    .all(
+      globby.sync(["*/**/"], {
+        cwd: rootPath,
+        expandDirectories: false,
+        nodir: false
+      })
+      .map(realPath)
+      .filter(fs.existsSync)
+      .filter(isEmpty)
+      .map(trash)
+    )
 }
 
 function cleanNodeModules() {
