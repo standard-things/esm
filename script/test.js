@@ -60,10 +60,10 @@ nodeArgs.push(
 
 function cleanIndex() {
   return fs
-    .readFile(indexPath)
+    .readFile(indexPath, "utf8")
     .then((content) => {
       process.once("exit", () => fs.outputFileSync(indexPath, content))
-      return fs.outputFile(indexPath, minify(content))
+      return fs.outputFile(indexPath, minifyJS(content))
     })
 }
 
@@ -71,7 +71,7 @@ function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
 }
 
-function minify(content) {
+function minifyJS(content) {
   return uglify(content, uglifyOptions).code
 }
 
