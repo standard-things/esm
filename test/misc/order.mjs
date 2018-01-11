@@ -9,7 +9,7 @@ import "../fixture/import/order"
 export default () => {
   const trackers = [cycleTracker, exportTracker, importTracker]
 
-  trackers.forEach((tracker) =>
+  trackers.forEach((tracker) => {
     assert.deepStrictEqual(tracker, ["a", "b", "c", "d"])
-  )
+  })
 }

@@ -111,9 +111,9 @@ describe("dynamic import", () => {
       "import.toString()"
     ]
 
-    invalids.forEach((code) =>
+    invalids.forEach((code) => {
       assert.throws(() => Compiler.compile(code), SyntaxError)
-    )
+    })
   })
 
   it("should expect exactly one argument", () => {
@@ -123,8 +123,8 @@ describe("dynamic import", () => {
       "import(...[a])"
     ]
 
-    invalids.forEach((code) =>
+    invalids.forEach((code) => {
       assert.throws(() => Compiler.compile(code), SyntaxError)
-    )
+    })
   })
 })

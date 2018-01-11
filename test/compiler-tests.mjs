@@ -94,11 +94,11 @@ describe("compiler", () => {
       { code: '"use script";\'use module\';import"a"' }
     ]
 
-    tests.forEach((data) =>
+    tests.forEach((data) => {
       assert.throws(() =>
         Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       , SyntaxError)
-    )
+    })
   })
 
   it("should support shebangs", () => {
@@ -160,9 +160,9 @@ describe("compiler", () => {
       "({a=1},{b=2})=>{}"
     ]
 
-    codes.forEach((code) =>
+    codes.forEach((code) => {
       assert.doesNotThrow(() => Compiler.compile(code))
-    )
+    })
   })
 
   it("should not error on transforms at the end of the source", () => {
@@ -173,8 +173,8 @@ describe("compiler", () => {
       "export default a"
     ]
 
-    codes.forEach((code) =>
+    codes.forEach((code) => {
       assert.doesNotThrow(() => Compiler.compile(code, { type: "module" }))
-    )
+    })
   })
 })

@@ -71,7 +71,7 @@ export default () => {
   assert.deepStrictEqual(nsEmptyPseudo, ns)
 
   const objects = [defaultEmpty, defaultExports]
-  objects.forEach((object) => assert.ok(isPlainObject(object)))
+  assert.ok(objects.every(isPlainObject))
 
   assert.strictEqual(nsSafe.safe, "safe get")
 }

@@ -38,14 +38,14 @@ function emitWarning(message, type, code, Ctor) {
     throw warning
   }
 
-  process.nextTick(() =>
+  process.nextTick(() => {
     // eslint-disable-next-line no-console
     console.error(
       PREFIX +
       (useCode ? "[" + code + "] " : "") +
       type + ": " + message
     )
-  )
+  })
 }
 
 export default emitWarning

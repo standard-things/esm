@@ -52,13 +52,13 @@ describe("module.runMain hook", function () {
       otherFlags.push("--experimental-modules")
     }
 
-    requireFlags.forEach((requireFlag) =>
+    requireFlags.forEach((requireFlag) => {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push(requireFlag, "../index.js", "./fixture/main/main-module.mjs")
         runs.push(args)
       })
-    )
+    })
 
     return runs
       .reduce((promise, args) =>
@@ -140,13 +140,13 @@ describe("module.runMain hook", function () {
       otherFlags.push("--preserve-symlinks")
     }
 
-    fileNames.forEach((fileName) =>
+    fileNames.forEach((fileName) => {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push("-r", "../index.js", fileName)
         runs.push(args)
       })
-    )
+    })
 
     return runs
       .reduce((promise, args) =>

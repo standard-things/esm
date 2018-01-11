@@ -1,5 +1,5 @@
 "use strict"
 
-test("jest", () =>
+test("jest", () => {
   expect(require("../index.js")).toBe("JEST_GLOBAL_VALUE")
-)
+})

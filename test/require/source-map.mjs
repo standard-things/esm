@@ -13,7 +13,9 @@ export default () => {
     const esmRequire = makeRequire(module, { cjs: true, [key]: true })
     const mod = new module.constructor("<mock>", null)
 
-    mod._compile = (content) => assert.ok(content.includes("sourceMappingURL"))
+    mod._compile = (content) => {
+      assert.ok(content.includes("sourceMappingURL"))
+    }
 
     delete esmRequire.cache[abcPath]
     delete esmRequire.cache[defPath]
