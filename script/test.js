@@ -5,6 +5,7 @@ const fs = require("fs-extra")
 const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const trash = require("./trash.js")
+const uglify = require("uglify-es").minify
 
 const argv = require("yargs")
   .boolean("prod")
@@ -14,14 +15,16 @@ const isWin = process.platform === "win32"
 
 const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
-
 const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
 const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const indexPath = path.resolve(rootPath, "index.js")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const vendorPath = path.resolve(rootPath, "src/vendor")
+
+const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
 
 const trashPaths = ignorePaths
   .filter((thePath) =>
@@ -55,8 +58,21 @@ nodeArgs.push(
   "tests.mjs"
 )
 
+function cleanIndex() {
+  return fs
+    .readFile(indexPath)
+    .then((content) => {
+      process.once("exit", () => fs.outputFileSync(indexPath, content))
+      return fs.outputFile(indexPath, minify(content))
+    })
+}
+
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
+}
+
+function minify(content) {
+  return uglify(content, uglifyOptions).code
 }
 
 function runTests(cached) {
@@ -81,6 +97,7 @@ function setupNode() {
 
 Promise
   .all([
+    argv.prod && cleanIndex(),
     cleanRepo(),
     setupNode()
   ])
