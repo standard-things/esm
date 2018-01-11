@@ -25,7 +25,7 @@ const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
 const bundlePath = path.resolve(buildPath, "esm.js")
 const gzipPath = path.resolve(rootPath, "esm.js.gz")
-const jsonPath = path.resolve(rootPath, "package.json")
+const pkgPath = path.resolve(rootPath, "package.json")
 const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const acornPath = path.resolve(vendorPath, "acorn")
@@ -50,11 +50,10 @@ const webpackArgs = [
     : "--hide-modules"
 ]
 
-function cleanJSON() {
-  // Remove dependencies field, added by npm@5, from package.json.
+function cleanPackageJSON() {
   return fs
-    .readFile(jsonPath, "utf8")
-    .then((jsonText) => fs.outputFile(jsonPath, jsonText.replace(removeDepsRegExp, "")))
+    .readFile(pkgPath, "utf8")
+    .then((content) => fs.outputFile(pkgPath, content.replace(removeDepsRegExp, "")))
 }
 
 function cleanRepo() {
@@ -93,10 +92,11 @@ function makeBundle() {
   })
 }
 
-Promise.all([
-  argv.prod && cleanJSON(),
-  cleanRepo(),
-  getAcorn()
-])
-.then(makeBundle)
-.then(gzipBundle)
+Promise
+  .all([
+    argv.prod && cleanPackageJSON(),
+    cleanRepo(),
+    getAcorn()
+  ])
+  .then(makeBundle)
+  .then(gzipBundle)
