@@ -448,21 +448,7 @@ function pad(visitor, newCode, oldStart, oldEnd) {
 function preserveChild(visitor, path, childName) {
   const node = path.getValue()
   const child = node[childName]
-
-  overwrite(
-    visitor,
-    node.start,
-    child.start,
-    ""
-  )
-  overwrite(
-    visitor,
-    child.end,
-    node.end,
-    ""
-  )
-
-  path.call(visitor, "visitWithoutReset", childName)
+  overwrite(visitor, node.start, child.start, "")
 }
 
 function preserveLine(visitor, path) {
