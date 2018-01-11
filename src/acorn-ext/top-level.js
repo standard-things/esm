@@ -16,7 +16,7 @@ function parseTopLevel(node) {
   const { body } = node
   const exported = new NullObject
   const idents = []
-  const info = new NullObject
+  const top = new NullObject
 
   let hoistedPrefixString = ""
   let inited = false
@@ -69,17 +69,17 @@ function parseTopLevel(node) {
     body.push(stmt)
   }
 
-  info.idents = idents
-  info.insertCharIndex = insertCharIndex
-  info.insertNodeIndex = insertNodeIndex
-  info.hoistedExportsMap = new NullObject
-  info.hoistedExportsString = ""
-  info.hoistedImportsString = ""
-  info.hoistedPrefixString = hoistedPrefixString
+  top.idents = idents
+  top.insertCharIndex = insertCharIndex
+  top.insertNodeIndex = insertNodeIndex
+  top.hoistedExportsMap = new NullObject
+  top.hoistedExportsString = ""
+  top.hoistedImportsString = ""
+  top.hoistedPrefixString = hoistedPrefixString
 
   this.next()
-  node.info = info
   node.sourceType = this.options.sourceType
+  node.top = top
   return this.finishNode(node, "Program")
 }
 

@@ -14,14 +14,14 @@ const { keys } = Object
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
-    const { info } = this
+    const { top } = this
     const codeToInsert =
-      info.hoistedPrefixString +
-      toModuleExport(this, info.hoistedExportsMap) +
-      info.hoistedExportsString +
-      info.hoistedImportsString
+      top.hoistedPrefixString +
+      toModuleExport(this, top.hoistedExportsMap) +
+      top.hoistedExportsString +
+      top.hoistedImportsString
 
-    this.magicString.prependRight(info.insertCharIndex, codeToInsert)
+    this.magicString.prependRight(top.insertCharIndex, codeToInsert)
   }
 
   reset(rootPath, code, options) {
@@ -36,11 +36,11 @@ class ImportExportVisitor extends Visitor {
     this.exportSpecifiers = new NullObject
     this.exportStarNames = []
     this.generateVarDeclarations = options.generateVarDeclarations
-    this.info = rootPath.stack[0].info
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.moduleSpecifiers = new NullObject
     this.runtimeName = options.runtimeName
+    this.top = rootPath.stack[0].top
   }
 
   visitCallExpression(path) {
@@ -159,7 +159,7 @@ class ImportExportVisitor extends Visitor {
         (id && type === "ClassDeclaration")) {
       // Support exporting default class and function declarations:
       // export default function named() {}
-      const name = id ? id.name : safeName(ANON_NAME, this.info.idents)
+      const name = id ? id.name : safeName(ANON_NAME, this.top.idents)
 
       if (! id) {
         // Convert anonymous functions to named functions so they are hoisted.
@@ -398,16 +398,17 @@ function hoistExports(visitor, path, mapOrString, childName) {
     preserveLine(visitor, path)
   }
 
-  const { info } = visitor
+  const { top } = visitor
 
   if (typeof mapOrString === "string") {
-    info.hoistedExportsString += mapOrString
+    top.hoistedExportsString += mapOrString
     return
   }
 
   for (const name in mapOrString) {
     addToSpecifierMap(
-      info.hoistedExportsMap,
+      visitor,
+      top.hoistedExportsMap,
       name,
       getLocal(mapOrString, name)
     )
@@ -416,7 +417,7 @@ function hoistExports(visitor, path, mapOrString, childName) {
 
 function hoistImports(visitor, path, hoistedCode) {
   preserveLine(visitor, path)
-  visitor.info.hoistedImportsString += hoistedCode
+  visitor.top.hoistedImportsString += hoistedCode
 }
 
 function overwrite(visitor, oldStart, oldEnd, newCode) {
