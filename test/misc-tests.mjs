@@ -736,7 +736,7 @@ describe("spec compliance", () => {
   it("should warn when creating an `arguments` binding", () =>
     [
       { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
-      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "1:16" }
+      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
     ].reduce((promise, data) => {
       const filePath = require.resolve(data.id)
       const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, filePath)

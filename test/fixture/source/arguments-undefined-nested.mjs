@@ -1,1 +1,7 @@
-const a = () => arguments
+const a = () => {
+  arguments
+}
+
+const b = function () {
+  arguments
+}
