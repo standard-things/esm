@@ -98,6 +98,7 @@ class Compiler {
     }
 
     const rootPath = new FastPath(ast)
+    const top = rootPath.stack[0].top
 
     try {
       importExportVisitor.visit(rootPath, code, {
@@ -157,6 +158,7 @@ class Compiler {
 
       if (options.warnings &&
           ! options.cjs.vars &&
+          top.idents.indexOf("arguments") === -1 &&
           argumentsRegExp.test(code)) {
         result.warnings = []
         identifierVisitor.visit(rootPath, {
