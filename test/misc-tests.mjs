@@ -697,50 +697,80 @@ describe("spec compliance", () => {
     ))
   )
 
-  it("should error when creating an `arguments` binding", () =>
-    import("./fixture/source/arguments-binding.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Binding arguments in strict mode"))
-      })
-  )
+  it("should error when creating an `arguments` binding", () => {
+    const id = require.resolve("./fixture/source/arguments-binding.mjs")
 
-  it("should error when creating an `await` binding", () =>
-    import("./fixture/source/await-binding.mjs")
+    import(id)
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("The keyword 'await' is reserved"))
-      })
-  )
+      .catch((e) =>
+        checkErrorStack(e, [
+          getURLFromFilePath(id) + ":1",
+          "const arguments = 1",
+          "      ^\n",
+          "SyntaxError: Binding arguments in strict mode"
+        ].join("\n"))
+      )
+  })
 
-  it("should error when exporting non-local bindings", () =>
-    import("./fixture/source/non-local-export.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Export 'global' is not defined in module"))
-      })
-  )
+  it("should error when creating an `await` binding", () => {
+    const id = require.resolve("./fixture/source/await-binding.mjs")
 
-  it("should error when using top-level `new.target`", () =>
-    import("./fixture/source/new-target.mjs")
+    return import(id)
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("new.target can only be used in functions"))
-      })
-  )
+      .catch((e) =>
+        checkErrorStack(e, [
+          getURLFromFilePath(id) + ":1",
+          "const await = 1",
+          "      ^\n",
+          "SyntaxError: The keyword 'await' is reserved"
+        ].join("\n"))
+      )
+  })
 
-  it("should error when using an opening HTML comment in ESM", () =>
-    import("./fixture/source/html-comment.mjs")
+  it("should error when exporting non-local bindings", () => {
+    const id = require.resolve("./fixture/source/non-local-export.mjs")
+
+    return import(id)
       .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("HTML comments are not allowed in modules"))
-      })
-  )
+      .catch((e) =>
+        checkErrorStack(e, [
+          getURLFromFilePath(id) + ":1",
+          "export { global }",
+          "         ^^^^^^\n",
+          "SyntaxError: Export 'global' is not defined in module"
+        ].join("\n"))
+      )
+  })
+
+  it("should error when using top-level `new.target`", () => {
+    const id = require.resolve("./fixture/source/new-target.mjs")
+
+    return import(id)
+      .then(() => assert.ok(false))
+      .catch((e) =>
+        checkErrorStack(e, [
+          getURLFromFilePath(id) + ":1",
+          "new.target",
+          "^\n",
+          "SyntaxError: new.target can only be used in functions"
+        ].join("\n"))
+      )
+  })
+
+  it("should error when using an opening HTML comment in ESM", () => {
+    const id = require.resolve("./fixture/source/html-comment.mjs")
+
+    return import(id)
+      .then(() => assert.ok(false))
+      .catch((e) =>
+        checkErrorStack(e, [
+          getURLFromFilePath(id) + ":1",
+          "<!--",
+          "^\n",
+          "SyntaxError: HTML comments are not allowed in modules"
+        ].join("\n"))
+      )
+   })
 
   it("should warn when creating an `arguments` binding", () =>
     [

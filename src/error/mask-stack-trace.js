@@ -11,7 +11,7 @@ import setProperty from "../util/set-property.js"
 const ZWJ = "\u200d"
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
-const parserMessageRegExp = /^(.+?: .+?) \((\d+):(\d+)\)(?=\n)/
+const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 
 const atNameRegExp = /\((.+?)(?=:\d+)/g
 const headerRegExp = /^(.+?)(?=:\d+\n)/
@@ -34,7 +34,9 @@ function maskStackTrace(error, sourceCode, filePath, useURLs) {
     configurable: true,
     enumerable: false,
     get() {
-      stack = stack.replace(message, message = error.message)
+      stack = stack.replace(message, error.message)
+      message = error.message
+
       stack = isParseError(error)
         ? maskParserStack(stack, sourceCode, filePath)
         : maskEngineStack(stack, sourceCode, filePath)
@@ -51,14 +53,14 @@ function maskStackTrace(error, sourceCode, filePath, useURLs) {
 }
 
 // Transform parser stack lines from:
-// SyntaxError: <description> (<line>:<column>)
+// <type>: <message> (<line>:<column>)
 //   ...
 // to:
 // path/to/file.js:<line>
 // <line of code, from the original source, where the error occurred>
 // <column indicator arrow>
 //
-// SyntaxError: <description>
+// <type>: <message>
 //   ...
 function maskParserStack(stack, sourceCode, filePath) {
   const parts = parserMessageRegExp.exec(stack)
@@ -67,10 +69,11 @@ function maskParserStack(stack, sourceCode, filePath) {
     return stack
   }
 
-  const desc = parts[1]
-  const lineNum = +parts[2]
+  const type = parts[1]
+  const message = parts[2]
+  const lineNum = +parts[3]
   const lineIndex = lineNum - 1
-  const column = +parts[3]
+  const column = +parts[4]
   const spliceArgs = [0, 1]
   const stackLines = stack.split("\n")
 
@@ -86,11 +89,18 @@ function maskParserStack(stack, sourceCode, filePath) {
     const lines = sourceCode.split("\n")
 
     if (lineIndex < lines.length) {
-      spliceArgs.push(lines[lineIndex], " ".repeat(column) + "^", "")
+      let arrow = "^"
+
+      if (message.startsWith("Export '")) {
+        // Increase arrow count to the length of the identifier.
+        arrow = arrow.repeat(message.indexOf("'", 8) - 8)
+      }
+
+      spliceArgs.push(lines[lineIndex], " ".repeat(column) + arrow, "")
     }
   }
 
-  spliceArgs.push(desc)
+  spliceArgs.push(type + ": " + message)
   stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
 }
