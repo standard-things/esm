@@ -2,8 +2,8 @@ import NullObject from "../null-object.js"
 import SafeWeakMap from "../safe-weak-map.js"
 import Visitor from "../visitor.js"
 
+import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import raise from "../parse/raise.js"
 
 const shadowedMap = new SafeWeakMap
 
@@ -54,7 +54,11 @@ function assignmentHelper(visitor, path, childName) {
         start
       }
 
-      raise(parser, start, "Assignment to constant variable.", TypeError)
+      throw new errors.TypeError(
+        parser,
+        start,
+        "Assignment to constant variable."
+      )
     }
   }
 

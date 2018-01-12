@@ -1,7 +1,13 @@
-import AcornError from "../acorn-error.js"
+import errors from "../parse/errors.js"
 
 function isParseError(value) {
-  return value instanceof AcornError
+  for (const name in errors) {
+    if (value instanceof errors[name]) {
+      return true
+    }
+  }
+
+  return false
 }
 
 export default isParseError

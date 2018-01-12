@@ -3,8 +3,8 @@ import NullObject from "../null-object.js"
 import Visitor from "../visitor.js"
 
 import encodeId from "../util/encode-id.js"
+import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import raise from "../parse/raise.js"
 import toStringLiteral from "../util/to-string-literal.js"
 
 const ANON_NAME = encodeId("default")
@@ -269,7 +269,8 @@ class ImportExportVisitor extends Visitor {
             start
           }
 
-          raise(parser,
+          throw new errors.SyntaxError(
+            parser,
             start,
             "Export " + toStringLiteral(localName, "'") + " is not defined in module"
           )

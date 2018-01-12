@@ -1,6 +1,6 @@
-import _raise from "../parse/raise.js"
 import alwaysFalse from "../util/always-false.js"
 import alwaysTrue from "../util/always-true.js"
+import errors from "../parse/errors.js"
 import noop from "../util/noop.js"
 import wrap from "../util/wrap.js"
 
@@ -59,7 +59,7 @@ function raise(pos, message) {
     message = message.replace(parserTypePostfix, engineTypePostfix)
   }
 
-  _raise(this, pos, message)
+  throw new errors.SyntaxError(this, pos, message)
 }
 
 function raiseRecoverable(pos, message) {
