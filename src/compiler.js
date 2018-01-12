@@ -99,11 +99,16 @@ class Compiler {
 
     const rootPath = new FastPath(ast)
 
-    importExportVisitor.visit(rootPath, code, {
-      esm: type !== "script",
-      generateVarDeclarations: options.var,
-      runtimeName
-    })
+    try {
+      importExportVisitor.visit(rootPath, code, {
+        esm: type !== "script",
+        generateVarDeclarations: options.var,
+        runtimeName
+      })
+    } catch (e) {
+      e.sourceType = parserOptions.sourceType
+      throw e
+    }
 
     result.changed = importExportVisitor.changed
 
@@ -112,12 +117,17 @@ class Compiler {
         type = "module"
       }
 
-      assignmentVisitor.visit(rootPath, {
-        assignableExports: importExportVisitor.assignableExports,
-        assignableImports: importExportVisitor.assignableImports,
-        magicString: importExportVisitor.magicString,
-        runtimeName
-      })
+      try {
+        assignmentVisitor.visit(rootPath, {
+          assignableExports: importExportVisitor.assignableExports,
+          assignableImports: importExportVisitor.assignableImports,
+          magicString: importExportVisitor.magicString,
+          runtimeName
+        })
+      } catch (e) {
+        e.sourceType = parserOptions.sourceType
+        throw e
+      }
 
       importExportVisitor.finalizeHoisting()
     }
