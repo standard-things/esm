@@ -4,6 +4,7 @@ import Visitor from "../visitor.js"
 
 import encodeId from "../util/encode-id.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import raise from "../parse/raise.js"
 import toStringLiteral from "../util/to-string-literal.js"
 
 const ANON_NAME = encodeId("default")
@@ -254,10 +255,27 @@ class ImportExportVisitor extends Visitor {
     // Support exporting specifiers:
     // export { name1, name2, ..., nameN }
     if (node.source === null) {
+      const { idents } = this.top
       const pairs = []
 
       for (const specifier of specifiers) {
-        pairs.push([specifier.exported.name, specifier.local.name])
+        const localName = specifier.local.name
+
+        if (idents.indexOf(localName) === -1) {
+          const { start } = specifier
+          const parser = {
+            input: this.magicString.original,
+            pos: start,
+            start
+          }
+
+          raise(parser,
+            start,
+            "Export " + toStringLiteral(localName, "'") + " is not defined in module"
+          )
+        }
+
+        pairs.push([specifier.exported.name, localName])
       }
 
       hoistExports(this, node, pairs)

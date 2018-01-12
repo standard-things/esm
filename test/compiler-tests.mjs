@@ -169,7 +169,7 @@ describe("compiler", () => {
     const codes = [
       'import{a}from"a"',
       'import"a"',
-      "export{a}",
+      "let a;export{a}",
       "export default a"
     ]
 

@@ -1,1 +1,1 @@
-export { module }
+export default module
