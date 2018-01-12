@@ -1,19 +1,13 @@
-import AcornParser from "../acorn-parser.js"
-
-import assign from "../util/assign.js"
-
-const acornRaise = AcornParser.prototype.raise
+import AcornError from "../acorn-error.js"
 
 function raise(parser, pos, message, ErrorCtor) {
-  if (typeof ErrorCtor !== "function") {
-    acornRaise.call(parser, pos, message)
+  const error = new AcornError(parser, pos, message)
+
+  if (typeof ErrorCtor === "function") {
+    throw new ErrorCtor(error.message)
   }
 
-  try {
-    acornRaise.call(parser, pos, message)
-  } catch (e) {
-    throw assign(new ErrorCtor(e.message), e)
-  }
+  throw error
 }
 
 export default raise
