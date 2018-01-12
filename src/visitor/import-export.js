@@ -96,7 +96,7 @@ class ImportExportVisitor extends Visitor {
       specifierMap
     )
 
-    hoistImports(this, path, hoistedCode)
+    hoistImports(this, node, hoistedCode)
     addAssignableImports(this, specifierMap)
   }
 
@@ -134,7 +134,7 @@ class ImportExportVisitor extends Visitor {
       moduleSpecifiers[specifierName] = new NullObject
     }
 
-    hoistImports(this, path, hoistedCode)
+    hoistImports(this, node, hoistedCode)
   }
 
   visitExportDefaultDeclaration(path) {
@@ -174,7 +174,7 @@ class ImportExportVisitor extends Visitor {
       // it's important that the declaration be visible to the rest of the
       // code in the exporting module, so we must avoid compiling it to a
       // named function or class expression.
-      hoistExports(this, path,
+      hoistExports(this, node,
         addToSpecifierMap(this, new NullObject, "default", name),
         "declaration"
       )
@@ -235,7 +235,7 @@ class ImportExportVisitor extends Visitor {
         }
       }
 
-      hoistExports(this, path, specifierMap, "declaration")
+      hoistExports(this, node, specifierMap, "declaration")
 
       // Skip adding declared names to `this.assignableExports` if the
       // declaration is a const-kinded VariableDeclaration, because the
@@ -257,7 +257,7 @@ class ImportExportVisitor extends Visitor {
     let specifierMap = createSpecifierMap(this, node)
 
     if (node.source == null) {
-      hoistExports(this, path, specifierMap)
+      hoistExports(this, node, specifierMap)
       addAssignableExports(this, specifierMap)
       return
     }
@@ -280,7 +280,7 @@ class ImportExportVisitor extends Visitor {
 
     specifierMap = newMap
 
-    hoistImports(this, path, toModuleImport(
+    hoistImports(this, node, toModuleImport(
       this,
       getSourceString(this, node),
       specifierMap
@@ -386,11 +386,11 @@ function getSourceString(visitor, { source }) {
   return visitor.code.slice(source.start, source.end)
 }
 
-function hoistExports(visitor, path, map, childName) {
+function hoistExports(visitor, node, map, childName) {
   if (childName) {
-    preserveChild(visitor, path, childName)
+    preserveChild(visitor, node, childName)
   } else {
-    preserveLine(visitor, path)
+    preserveLine(visitor, node)
   }
 
   const { top } = visitor
@@ -405,8 +405,8 @@ function hoistExports(visitor, path, map, childName) {
   }
 }
 
-function hoistImports(visitor, path, hoistedCode) {
-  preserveLine(visitor, path)
+function hoistImports(visitor, node, hoistedCode) {
+  preserveLine(visitor, node)
   visitor.top.hoistedImportsString += hoistedCode
 }
 
@@ -445,14 +445,12 @@ function pad(visitor, newCode, oldStart, oldEnd) {
   return newLines.join("\n")
 }
 
-function preserveChild(visitor, path, childName) {
-  const node = path.getValue()
+function preserveChild(visitor, node, childName) {
   const child = node[childName]
   overwrite(visitor, node.start, child.start, "")
 }
 
-function preserveLine(visitor, path) {
-  const { end, start } = path.getValue()
+function preserveLine(visitor, { end, start }) {
   overwrite(visitor, start, end, "")
 }
 
