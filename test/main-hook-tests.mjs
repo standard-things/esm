@@ -82,7 +82,10 @@ describe("module.runMain hook", function () {
   it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", () => {
     const execPath = path.resolve("./fixture/options/env")
     const cachePath = path.resolve(execPath, ".cache")
-    const ESM_OPTIONS = "{cache:'" + cachePath + "',esm:'cjs'}"
+    const ESM_OPTIONS =
+      "{cache:'" +
+      cachePath.replace(/\\/g, "\\\\") +
+      "',esm:'cjs'}"
 
     return runMain(execPath, { ESM_OPTIONS })
       .then(() => {
