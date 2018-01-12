@@ -25,7 +25,7 @@ function parseTopLevel(node) {
 
   while (this.type !== tt.eof) {
     const stmt = this.parseStatement(true, true, exported)
-    let { expression, type } = stmt
+    let { expression, id, type } = stmt
 
     if (! inited) {
       // Avoid hoisting above string literal expression statements such as
@@ -57,9 +57,10 @@ function parseTopLevel(node) {
           idents.push(name)
         }
       }
-    } else if (type === "ClassDeclaration" ||
-        type === "FunctionDeclaration") {
-      idents.push(stmt.id.name)
+    } else if (id &&
+        (type === "ClassDeclaration" ||
+         type === "FunctionDeclaration")) {
+      idents.push(id.name)
     } else if (type === "ImportDeclaration") {
       for (const specifier of stmt.specifiers) {
         idents.push(specifier.local.name)
