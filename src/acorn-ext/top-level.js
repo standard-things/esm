@@ -72,7 +72,7 @@ function parseTopLevel(node) {
   top.idents = idents
   top.insertCharIndex = insertCharIndex
   top.insertNodeIndex = insertNodeIndex
-  top.hoistedExportsMap = new NullObject
+  top.hoistedExports = []
   top.hoistedExportsString = ""
   top.hoistedImportsString = ""
   top.hoistedPrefixString = hoistedPrefixString
