@@ -6,6 +6,5 @@ import "./vendor/acorn/src/scope.js"
 import "./vendor/acorn/src/statement.js"
 import "./vendor/acorn/src/tokencontext.js"
 import "./vendor/acorn/src/tokenize.js"
-import { Parser as AcornParser } from "./vendor/acorn/src/state.js"
 
-export default AcornParser
+export { Parser as default } from "./vendor/acorn/src/state.js"
