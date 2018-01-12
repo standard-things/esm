@@ -54,7 +54,7 @@
     "json-6": "^0.1.126",
     "minizlib": "^1.0.4",
     "mocha": "^4.0.1",
-    "mock-require": "^2.0.2",
+    "mock-require": "^3.0.1",
     "mock-stdio": "^1.0.0",
     "nop": "^1.0.0",
     "nyc": "^11.4.1",
