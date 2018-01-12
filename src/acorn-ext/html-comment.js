@@ -25,7 +25,7 @@ function readToken_lt_gt(func, args) {
         next === codeOfBang &&
         input.charCodeAt(pos + 2) === codeOfDash &&
         input.charCodeAt(pos + 3) === codeOfDash) {
-      throw this.raise(pos, htmlErrorMessage)
+      this.raise(pos, htmlErrorMessage)
     }
   }
 
@@ -43,7 +43,7 @@ function readToken_plus_min(func, args) {
         next === codeOfDash &&
         input.charCodeAt(pos + 2) === codeOfGT &&
         (lastTokEnd === 0 || lineBreak.test(input.slice(lastTokEnd, pos)))) {
-      throw this.raise(pos, htmlErrorMessage)
+      this.raise(pos, htmlErrorMessage)
     }
   }
 
