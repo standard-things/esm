@@ -47,13 +47,14 @@ function assignmentHelper(visitor, path, childName) {
   for (const name of names) {
     if (assignableImports[name] === true &&
         ! isShadowed(path, name)) {
+      const { start } = node
       const parser = {
         input: visitor.magicString.original,
-        pos: node.start,
-        start: node.start
+        pos: start,
+        start
       }
 
-      raise(parser, parser.start, "Assignment to constant variable.", TypeError)
+      raise(parser, start, "Assignment to constant variable.", TypeError)
     }
   }
 
