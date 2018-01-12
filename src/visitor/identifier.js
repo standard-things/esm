@@ -14,7 +14,6 @@ class IdentifierVisitor extends Visitor {
 
   visitIdentifier(path) {
     if (this.warnedForArguments) {
-      this.visitChildren(path)
       return
     }
 
@@ -38,7 +37,12 @@ class IdentifierVisitor extends Visitor {
 
     this.warnedForArguments = true
     this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
-    this.visitChildren(path)
+  }
+
+  visitWithoutReset(path) {
+    if (! this.warnedForArguments) {
+      super.visitWithoutReset(path)
+    }
   }
 }
 
