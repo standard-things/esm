@@ -5,7 +5,6 @@ import Visitor from "../visitor.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import toStringLiteral from "../util/to-string-literal.js"
 
 const ANON_NAME = encodeId("default")
 
@@ -265,7 +264,7 @@ class ImportExportVisitor extends Visitor {
           throw new errors.SyntaxError(
             this.magicString.original,
             specifier.start,
-            "Export " + toStringLiteral(localName, "'") + " is not defined in module"
+            "Export '" + localName + "' is not defined in module"
           )
         }
 
@@ -464,7 +463,7 @@ function toModuleExport(visitor, pairs) {
     exportSpecifiers[exportName] = 1
 
     code +=
-      "[" + toStringLiteral(exportName) + ",()=>" +
+      '["' + exportName + '",()=>' +
       localName +
       "]"
 
@@ -502,7 +501,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
     code +=
       // Generate plain functions, instead of arrow functions,
       // to avoid a perf hit in Node 4.
-      "[" + toStringLiteral(importName) + ",function(" + valueParam + "){" +
+      '["' + importName + '",function(' + valueParam + "){" +
       // Multiple local variables become a compound assignment.
       localNames.join("=") + "=" + valueParam +
       "}]"

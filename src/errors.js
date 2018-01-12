@@ -70,13 +70,12 @@ function exportStarConflict(request, exportName) {
 }
 
 function invalidArgType(argName, expected) {
-  return "The " + toStringLiteral(argName, "'") +
-    " argument must be " + expected
+  return "The '" + argName + "' argument must be " + expected
 }
 
 function invalidProtocol(protocol, expected) {
-  return "Protocol " + toStringLiteral(protocol, "'") +
-    " not supported. Expected " + toStringLiteral(expected, "'")
+  return "Protocol '" + protocol +
+    "' not supported. Expected '" + expected + "'"
 }
 
 function missingModule(request) {

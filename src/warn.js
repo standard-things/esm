@@ -45,8 +45,8 @@ function namespaceExtension(request, key) {
 }
 
 function temporalDeadZoneAccess(request, varName) {
-  return "@std/esm detected possible temporal dead zone access of " +
-    toStringLiteral(varName, "'") + " in " + getModuleName(request)
+  return "@std/esm detected possible temporal dead zone access of '" +
+    varName + "' in " + getModuleName(request)
 }
 
 function warn(code, ...args) {
