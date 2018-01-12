@@ -7,7 +7,7 @@ function createClass(Super) {
     constructor(parser, pos, message) {
       super(message)
       const { column, line } = getLineInfo(parser.input, pos)
-      this.message = message + " (" + line + ":" + column + ")"
+      this.message += " (" + line + ":" + column + ")"
     }
   }
 }
