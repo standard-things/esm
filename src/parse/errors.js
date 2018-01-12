@@ -4,9 +4,9 @@ import { getLineInfo } from "../vendor/acorn/src/locutil.js"
 
 function createClass(Super) {
   return class AcornError extends Super {
-    constructor(parser, pos, message) {
+    constructor(input, pos, message) {
       super(message)
-      const { column, line } = getLineInfo(parser.input, pos)
+      const { column, line } = getLineInfo(input, pos)
       this.message += " (" + line + ":" + column + ")"
     }
   }

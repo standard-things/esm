@@ -262,16 +262,9 @@ class ImportExportVisitor extends Visitor {
         const localName = specifier.local.name
 
         if (idents.indexOf(localName) === -1) {
-          const { start } = specifier
-          const parser = {
-            input: this.magicString.original,
-            pos: start,
-            start
-          }
-
           throw new errors.SyntaxError(
-            parser,
-            start,
+            this.magicString.original,
+            specifier.start,
             "Export " + toStringLiteral(localName, "'") + " is not defined in module"
           )
         }

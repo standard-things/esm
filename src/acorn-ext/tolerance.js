@@ -59,7 +59,7 @@ function raise(pos, message) {
     message = message.replace(parserTypePostfix, engineTypePostfix)
   }
 
-  throw new errors.SyntaxError(this, pos, message)
+  throw new errors.SyntaxError(this.input, pos, message)
 }
 
 function raiseRecoverable(pos, message) {
