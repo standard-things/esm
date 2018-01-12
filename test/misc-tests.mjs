@@ -715,6 +715,15 @@ describe("spec compliance", () => {
       })
   )
 
+  it("should error when exporting non-local bindings", () =>
+    import("./fixture/source/non-local-export.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.startsWith("Export 'global' is not defined in module"))
+      })
+  )
+
   it("should error when using top-level `new.target`", () =>
     import("./fixture/source/new-target.mjs")
       .then(() => assert.ok(false))
