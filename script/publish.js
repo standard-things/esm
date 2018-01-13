@@ -61,7 +61,6 @@ function makeFieldRegExp(field) {
 function minifyHTML(content) {
   return htmlmin(content, {
     collapseBooleanAttributes: true,
-    collapseInlineTagWhitespace: true,
     collapseWhitespace: true,
     decodeEntities: true,
     removeAttributeQuotes: true,
