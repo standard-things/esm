@@ -35,9 +35,9 @@ describe("REPL hook", () => {
 
     assert.strictEqual(typeof globalAssert, "undefined")
 
-    r.eval(code, null, "repl", () =>
+    r.eval(code, null, "repl", () => {
       assert.strictEqual(typeof globalAssert, "function")
-    )
+    })
 
     r.close()
   })
@@ -48,9 +48,9 @@ describe("REPL hook", () => {
 
     assert.strictEqual(typeof context.localAssert, "undefined")
 
-    r.eval(code, context, "repl", () =>
+    r.eval(code, context, "repl", () => {
       assert.strictEqual(typeof context.localAssert, "function")
-    )
+    })
 
     r.close()
   })
@@ -59,9 +59,9 @@ describe("REPL hook", () => {
     const r = repl.start({})
     const code = "this.exports = module.exports"
 
-    r.eval(code, context, "repl", () =>
+    r.eval(code, context, "repl", () => {
       assert.ok(isPlainObject(context.exports))
-    )
+    })
 
     r.close()
   })
