@@ -173,7 +173,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for toggling <code>.cache</code> creation.</p>
+    <p>A boolean for toggling <code>.cache</code> creation or path as string to cache directory.</p>
   </td>
 </tr>
 <tr>
