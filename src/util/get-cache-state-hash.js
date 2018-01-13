@@ -1,8 +1,9 @@
-import { basename } from "path"
-import extname from "../path/extname.js"
+import { basename, extname } from "path"
 
 function getCacheStateHash(filePath) {
-  return basename(filePath, extname(filePath)).slice(-8)
+  return typeof filePath === "string"
+    ? basename(filePath, extname(filePath)).slice(-8)
+    : ""
 }
 
 export default getCacheStateHash
