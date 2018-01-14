@@ -362,7 +362,7 @@ function readSourceCode(filePath, options) {
 function readWith(reader, filePath, options) {
   if (options && options.gz &&
       _extname(filePath) === ".gz") {
-    return gunzip(reader(filePath), "utf8")
+    return gunzip(readFile(filePath), "utf8")
   }
 
   return reader(filePath, "utf8")
