@@ -264,23 +264,13 @@ describe("errors", () => {
         ),
       import(id6)
         .then(() => assert.ok(false))
-        .catch((e) => {
-          const startsWith = [id6 + ":1"]
-
-          if (pkgOptions.debug) {
-            startsWith.push(
-              "(function (exports, require, module, __filename, __dirname) { syntax@error",
-              "                                                                    ^\n"
-            )
-          } else {
-            startsWith.push(
-              "syntax@error",
-              "      ^\n"
-            )
-          }
-
-          checkErrorStack(e, startsWith.join("\n"))
-        })
+        .catch((e) =>
+          checkErrorStack(e, [
+            id6 + ":1",
+            (pkgOptions.debug ? "(function (exports, require, module, __filename, __dirname) { " : "") +
+            "syntax@error"
+          ].join("\n"))
+        )
     ])
   })
 

@@ -2,6 +2,7 @@ import FastObject from "./fast-object.js"
 import Module from "./module.js"
 import PkgInfo from "./pkg-info.js"
 
+import assign from "./util/assign.js"
 import clone from "./module/clone.js"
 import env from "./env.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -39,8 +40,13 @@ if (shared.inited) {
         (shared.pkgInfo[cacheKey] = new FastObject)
     }
 
-    moduleHook(Module, cloned, options)
-    return requireHook(cloned, options)
+    if (isObjectLike(options)) {
+      const parentPkgInfo = PkgInfo.from(cloned, true)
+      assign(parentPkgInfo.options, PkgInfo.createOptions(options))
+    }
+
+    moduleHook(Module, cloned)
+    return requireHook(cloned)
   }
 } else {
   exported = shared

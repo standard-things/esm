@@ -24,7 +24,6 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isObjectLike from "../util/is-object-like.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -44,12 +43,8 @@ const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
-function hook(Mod, parent, options) {
+function hook(Mod, parent) {
   let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
-
-  const overwriteOptions = isObjectLike(options)
-    ? PkgInfo.createOptions(options)
-    : null
 
   const { _extensions } = Mod
   const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
@@ -71,8 +66,6 @@ function hook(Mod, parent, options) {
     const [, filePath] = args
     const pkgInfo = PkgInfo.get(dirname(filePath)) || defaultPkgInfo
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
-
-    assign(pkgInfo.options, overwriteOptions)
 
     return wrapped
       ? wrapped.call(this, manager, func, pkgInfo, args)
@@ -145,11 +138,22 @@ function hook(Mod, parent, options) {
       }
 
       if (! cached) {
-        cached = tryCompileCode(manager, content, entry, cacheFileName, {
-          cachePath,
-          hint,
-          type
-        })
+        const parentEntry = Entry.get(mod.parent)
+
+        if (! parentEntry ||
+            ! parentEntry.data.compiled ||
+              parentEntry.data.compiled.changed) {
+          cached = tryCompileCode(manager, content, entry, cacheFileName, {
+            cachePath,
+            hint,
+            type
+          })
+        } else {
+          cached = new NullObject
+          cached.code = content
+          cached.changed =
+          cached.esm = false
+        }
       }
 
       entry.data.compile = cached
@@ -163,13 +167,6 @@ function hook(Mod, parent, options) {
         for (const warning of warnings) {
           warn(warning.code, filePath, ...warning.args)
         }
-      }
-
-      if (! cached.changed &&
-          ! overwriteOptions &&
-          pkgInfo === defaultPkgInfo) {
-        tryPassthru.call(this, func, args, options)
-        return
       }
 
       if (! entry.url) {
