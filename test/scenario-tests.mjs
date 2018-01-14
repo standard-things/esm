@@ -54,6 +54,21 @@ describe("scenarios", function () {
       .then(() => fs.removeSync(".esmrc"))
   })
 
+  it("should work with chai, mocha, and nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/chai-mocha-nyc")
+    const mochaPattern = path.resolve(dirPath, "test.js")
+    const nycArgs = [
+      "--cwd", dirPath,
+      "-i", pkgPath,
+      "mocha", mochaPattern
+    ]
+
+    return Promise.resolve()
+      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
+      .then(() => exec("nyc", nycArgs))
+      .then(() => fs.removeSync(".esmrc"))
+  })
+
   it("should work with jest and mock-require", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
     const configPath = path.resolve(dirPath, "jest.config.json")

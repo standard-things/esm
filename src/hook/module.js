@@ -36,6 +36,7 @@ import toOptInError from "../util/to-opt-in-error.js"
 import validateESM from "../module/esm/validate.js"
 import warn from "../warn.js"
 
+const moduleWrapCJS = Module.wrap
 const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
@@ -239,6 +240,10 @@ function hook(Mod, parent) {
 
     const exported = {}
 
+    if (Module.wrap === moduleWrapESM) {
+      Module.wrap = moduleWrapCJS
+    }
+
     Runtime.enable(entry, exported)
     entry.module._compile(content, entry.filePath)
   }
@@ -257,15 +262,9 @@ function hook(Mod, parent) {
     content += maybeSourceMap(content, entry)
 
     const exported = {}
-    const moduleWrap = Module.wrap
-
-    const customWrap = (script) => {
-      Module.wrap = moduleWrap
-      return "(function(){" + script + "\n})"
-    }
 
     if (! options.cjs.vars) {
-      Module.wrap = customWrap
+      Module.wrap = moduleWrapESM
     }
 
     Runtime.enable(entry, exported)
@@ -273,8 +272,8 @@ function hook(Mod, parent) {
     try {
       entry.module._compile(content, entry.filePath)
     } finally {
-      if (Module.wrap === customWrap) {
-        Module.wrap = moduleWrap
+      if (Module.wrap === moduleWrapESM) {
+        Module.wrap = moduleWrapCJS
       }
     }
   }
@@ -325,6 +324,11 @@ function hook(Mod, parent) {
     passthruMap.set(extCompiler, passthru)
     moduleState._extensions[ext] = _extensions[ext]
   })
+}
+
+function moduleWrapESM(script) {
+  Module.wrap = moduleWrapCJS
+  return "(function(){" + script + "\n})"
 }
 
 function maybeSourceMap(content, entry) {
