@@ -153,7 +153,7 @@ class ImportExportVisitor extends Visitor {
 
     const node = path.getValue()
     const { declaration } = node
-    const { id, type, functionParamsStart } = declaration
+    const { id, type } = declaration
 
     if (type === "FunctionDeclaration" ||
         (id && type === "ClassDeclaration")) {
@@ -165,7 +165,7 @@ class ImportExportVisitor extends Visitor {
         // Convert anonymous functions to named functions so they are hoisted.
         this.madeChanges = true
         this.magicString.prependRight(
-          functionParamsStart,
+          declaration.functionParamsStart,
           " " + name
         )
       }
