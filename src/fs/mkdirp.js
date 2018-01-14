@@ -2,19 +2,38 @@ import { dirname } from "path"
 import isDirectory from "../util/is-directory.js"
 import mkdir from "./mkdir.js"
 
-function mkdirp(dirPath, scopePath) {
-  const parentPath = dirname(dirPath)
-
-  if (dirPath === parentPath ||
-      dirPath === scopePath) {
-    return true
+function mkdirp(dirPath) {
+  if (typeof dirPath !== "string") {
+    return false
   }
 
-  if (mkdirp(parentPath, scopePath)) {
-    return isDirectory(dirPath) || mkdir(dirPath)
+  const paths = []
+
+  while (true) {
+    if (isDirectory(dirPath)) {
+      break
+    }
+
+    paths.push(dirPath)
+
+    const parentPath = dirname(dirPath)
+
+    if (dirPath === parentPath) {
+      break
+    }
+
+    dirPath = parentPath
   }
 
-  return false
+  let { length } = paths
+
+  while (length--) {
+    if (! mkdir(paths[length])) {
+      return false
+    }
+  }
+
+  return true
 }
 
 export default mkdirp
