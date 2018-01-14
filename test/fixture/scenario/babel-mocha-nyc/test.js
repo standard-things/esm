@@ -1,5 +1,5 @@
 import assert from "assert"
-import getItems from "./index.mjs"
+import getItems from "./index.js"
 
 describe("suite", () => {
   it("test", async () =>

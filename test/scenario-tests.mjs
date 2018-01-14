@@ -39,11 +39,10 @@ describe("scenarios", function () {
 
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
-    const mochaPattern = path.resolve(dirPath, "test.mjs")
+    const mochaPattern = path.resolve(dirPath, "test.js")
     const nycArgs = [
       "--cwd", dirPath,
-      "-e", ".mjs",
-      "-x", ".babelrc.js", "-x", "test.mjs",
+      "-x", ".babelrc.js", "-x", "test.js",
       "-i", pkgPath, "-i", "@babel/register", "-i", "@babel/polyfill",
       "mocha", mochaPattern
     ]
