@@ -62,6 +62,10 @@ describe("scenarios", function () {
     return exec("jest", jestArgs)
   })
 
+  it("should work with native modules", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
+  )
+
   it("should work with nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
     const nycArgs = [
