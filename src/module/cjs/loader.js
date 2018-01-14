@@ -2,14 +2,11 @@ import Module from "../../module.js"
 
 import { dirname } from "path"
 import extname from "../../path/extname.js"
-import moduleState from "../state.js"
 
 function loader(entry, parent, preload) {
   const { filePath, module:mod } = entry
 
-  if (! mod.paths) {
-    mod.paths = Module._nodeModulePaths(dirname(filePath))
-  }
+  mod.paths = Module._nodeModulePaths(dirname(filePath))
 
   if (preload) {
     preload(entry)
@@ -24,10 +21,7 @@ function loader(entry, parent, preload) {
   }
 
   _extensions[ext](mod, filePath)
-
-  if (! moduleState.parsing) {
-    mod.loaded = true
-  }
+  mod.loaded = true
 }
 
 export default loader
