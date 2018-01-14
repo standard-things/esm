@@ -178,8 +178,6 @@ class ImportExportVisitor extends Visitor {
     } else {
       // Otherwise, since the exported value is an expression, we use the
       // special `runtime.default(value)` form.
-      path.call(this, "visitWithoutReset", "declaration")
-
       let prefix = this.runtimeName + ".d("
       let suffix = ");"
 
@@ -196,6 +194,8 @@ class ImportExportVisitor extends Visitor {
       overwrite(this, node.start, declaration.start, prefix)
       overwrite(this, declaration.end, node.end, suffix)
     }
+
+    path.call(this, "visitWithoutReset", "declaration")
   }
 
   visitExportNamedDeclaration(path) {
@@ -242,6 +242,7 @@ class ImportExportVisitor extends Visitor {
         addAssignableExports(this, pairs)
       }
 
+      path.call(this, "visitWithoutReset", "declaration")
       return
     }
 
@@ -382,13 +383,13 @@ function getSourceString(visitor, { source }) {
 }
 
 function hoistExports(visitor, node, pairs) {
+  visitor.top.hoistedExports.push(...pairs)
+
   if (node.declaration) {
     preserveChild(visitor, node, "declaration")
   } else {
     preserveLine(visitor, node)
   }
-
-  visitor.top.hoistedExports.push(...pairs)
 }
 
 function hoistImports(visitor, node, hoistedCode) {
