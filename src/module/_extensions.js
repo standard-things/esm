@@ -25,7 +25,7 @@ extensions[".json"] = (mod, filePath) => {
 }
 
 extensions[".node"] = (mod, filePath) => {
-  return dlopen(mod, toNamespacedPath(filePath))
+  return dlopen.call(process, mod, toNamespacedPath(filePath))
 }
 
 export default extensions

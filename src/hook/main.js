@@ -80,7 +80,7 @@ function hook(Mod) {
 
   function tickCallback() {
     if (useTickCallback) {
-      _tickCallback()
+      _tickCallback.call(process)
     }
   }
 }

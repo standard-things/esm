@@ -19,7 +19,7 @@ function emitWarning(message, type, code, Ctor) {
   }
 
   if (useEmitWarning) {
-    _emitWarning(message, type, code, Ctor)
+    _emitWarning.call(process, message, type, code, Ctor)
     return
   }
 
