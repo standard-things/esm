@@ -18,7 +18,7 @@ const headerRegExp = /^(.+?)(?=:\d+\n)/
 const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
-function maskStackTrace(error, sourceCode, filePath, useURLs) {
+function maskStackTrace(error, sourceCode, filePath, isESM) {
   if (! isError(error)) {
     return error
   }
@@ -43,7 +43,7 @@ function maskStackTrace(error, sourceCode, filePath, useURLs) {
 
       return error.stack = withoutMessage(stack, message, (stack) => {
         stack = scrub(stack)
-        return useURLs ? fileNamesToURLs(stack) : stack
+        return isESM ? fileNamesToURLs(stack) : stack
       })
     },
     set(value) {
