@@ -25,9 +25,21 @@ const useRunInDebugContext = typeof runInDebugContext === "function"
 function compile(mod, content, filePath) {
   const req = makeRequireFunction(mod)
   const wrapper = Module.wrap(stripShebang(content))
-  const compiledWrapper = vm.runInThisContext(wrapper, {
+
+  const script = new vm.Script(wrapper, {
+    cachedData: void 0,
+    columnOffset: 0,
     displayErrors: true,
-    filename: filePath
+    filename: filePath,
+    lineOffset: 0,
+    produceCachedData: true
+  })
+
+  const compiledWrapper = script.runInThisContext({
+    columnOffset: 0,
+    displayErrors: true,
+    filename: filePath,
+    lineOffset: 0
   })
 
   let inspectorWrapper = null
