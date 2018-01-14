@@ -1,8 +1,10 @@
 import { extname } from "path"
 import md5 from "./md5.js"
-import { version } from "../version.js"
+import { version as stdVersion } from "../version.js"
 
 const { stringify } = JSON
+
+const nodeVersion = process.version
 
 function getCacheFileName(entry, cacheKey) {
   let { filePath } = entry
@@ -23,7 +25,8 @@ function getCacheFileName(entry, cacheKey) {
   const pathHash = md5(filePath)
 
   const stateHash = md5(
-    version + "\0" +
+    nodeVersion + "\0" +
+    stdVersion + "\0" +
     stringify(entry.options) + "\0" +
     cacheKey
   )
