@@ -26,8 +26,8 @@ function load(request, parent, isMain, preload) {
     parentOptions = parentPkgInfo && parentPkgInfo.options
     queryHash = getQueryHash(request)
 
-    if (Module._resolveFilename !== moduleResolveFilename &&
-        parentOptions && parentOptions.cjs.paths) {
+    if (parentOptions && parentOptions.cjs.paths &&
+        Module._resolveFilename !== moduleResolveFilename) {
       filePath = Module._resolveFilename(request, parent, isMain)
     } else {
       filePath = resolveFilename(request, parent, isMain)

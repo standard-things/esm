@@ -8,15 +8,16 @@ function loader(entry, fromPath, parentOptions, preload) {
   const { filePath, module:mod } = entry
 
   if (! mod.paths) {
-    if (Module._nodeModulePaths !== moduleNodeModulePaths &&
-        parentOptions && parentOptions.cjs.paths) {
+    if (parentOptions && parentOptions.cjs.paths &&
+        Module._nodeModulePaths !== moduleNodeModulePaths) {
       mod.paths = Module._nodeModulePaths(fromPath)
     } else {
       mod.paths = moduleNodeModulePaths(fromPath)
     }
   }
 
-  if (preload) {
+  if (! moduleState.parsing &&
+      preload) {
     preload(entry)
   }
 
@@ -31,6 +32,12 @@ function loader(entry, fromPath, parentOptions, preload) {
   if (ext === "" ||
       typeof _extensions[ext] !== "function") {
     ext = ".js"
+  }
+
+  if (moduleState.parsing &&
+      (ext === ".json" ||
+       ext === ".node")) {
+    return
   }
 
   _extensions[ext](mod, filePath)
