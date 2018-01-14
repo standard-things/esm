@@ -3,15 +3,21 @@
 const isTest = /test/.test(process.env.NODE_ENV)
 
 module.exports = {
+  env: {
+    production: {
+      plugins: [
+        ["transform-remove-console", {
+          exclude: ["error"]
+        }]
+      ]
+    }
+  },
   plugins: [
     ["@babel/proposal-class-properties", {
       loose: true
     }],
     ["@babel/transform-block-scoping", {
       throwIfClosureRequired: false
-    }],
-    ["transform-remove-console", {
-      exclude: ["error"]
     }],
     "transform-for-of-as-array"
   ],
