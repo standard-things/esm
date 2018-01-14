@@ -18,20 +18,13 @@ import { resolve } from "path"
 import rootModule from "./root-module.js"
 import shared from "./shared.js"
 
-const codeOfDash = "-".charCodeAt(0)
-const codeOfDoubleQuote = '"'.charCodeAt(0)
-const codeOfLeftBracket = "{".charCodeAt(0)
-const codeOfSingleQuote = "'".charCodeAt(0)
-
 const { isArray } = Array
 const { keys } = Object
 
-const _preloadModules = noDeprecationWarning(() => process._preloadModules)
-const debugArgRegExp = /^--(?:debug|inspect)(?:-brk)?$/
-const stdPath = __non_webpack_module__.filename
+const codeOfDash = "-".charCodeAt(0)
+const codeOfLeftBracket = "{".charCodeAt(0)
 
-const inspectorBinding = binding.inspector
-const isInspectorEnabled = noDeprecationWarning(() => inspectorBinding.isEnabled)
+const stdPath = __non_webpack_module__.filename
 
 function getVars() {
   const vars = new NullObject
@@ -51,6 +44,8 @@ function getVars() {
     return vars
   }
 
+  const codeOfDoubleQuote = '"'.charCodeAt(0)
+  const codeOfSingleQuote = "'".charCodeAt(0)
   const code0 = ESM_OPTIONS.charCodeAt(0)
 
   if (code0 === codeOfLeftBracket ||
@@ -64,6 +59,7 @@ function getVars() {
 }
 
 function hasDebugArg(args) {
+  const debugArgRegExp = /^--(?:debug|inspect)(?:-brk)?$/
   return args.some((arg) => debugArgRegExp.test(arg))
 }
 
@@ -140,12 +136,17 @@ function isFromPackage() {
 }
 
 function isFromRequireFlag() {
+  const _preloadModules = noDeprecationWarning(() => process._preloadModules)
+
   return hasLoaderModule(_preloadModules) ||
     (rootModule.id === "internal/preload" &&
      hasLoaderModule(rootModule.children))
 }
 
 function isInspector() {
+  const inspectorBinding = binding.inspector
+  const isInspectorEnabled = noDeprecationWarning(() => inspectorBinding.isEnabled)
+
   return shared.env.inspector =
     hasDebugArg(process.execArgv) ||
     (typeof isInspectorEnabled === "function" &&
