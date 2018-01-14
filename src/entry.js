@@ -384,12 +384,12 @@ function changed(setter, key, value) {
 }
 
 function createNamespace() {
-  // Section 9.4.6
+  // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace objects have a null [[Prototype]].
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   const namespace = new NullObject
 
-  // Section 26.3.1
+  // Section 26.3.1: @@toStringTag
   // Module namespace objects have a @@toStringTag value of "Module".
   // https://tc39.github.io/ecma262/#sec-@@tostringtag
   return useToStringTag
@@ -525,7 +525,7 @@ function toNamespace(entry, source = entry._namespace) {
 }
 
 function toNamespaceGetter(entry, source = entry._namespace) {
-  // Section 9.4.6.11
+  // Section 9.4.6.11: ModuleNamespaceCreate ( module, exports )
   // Step 7: Module namespace sources have sorted properties.
   // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
   const names = sort.call(keys(source))
@@ -552,7 +552,7 @@ function toNamespaceGetter(entry, source = entry._namespace) {
     })
   }
 
-  // Section 9.4.6
+  // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace sources are not extensible.
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   return seal(namespace)
@@ -587,7 +587,7 @@ function toNamespaceProxy(entry, source = entry._namespace) {
         writable: false
       }
 
-      // Section 26.3.1
+      // Section 26.3.1: @@toStringTag
       // Return descriptor of the module namespace @@toStringTag.
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
       if (useToStringTag &&
@@ -595,7 +595,7 @@ function toNamespaceProxy(entry, source = entry._namespace) {
         return descriptor
       }
 
-      // Section 9.4.6
+      // Section 9.4.6: Module Namespace Exotic Objects
       // Return descriptor of the non-extensible module namespace property.
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
       descriptor.enumerable =

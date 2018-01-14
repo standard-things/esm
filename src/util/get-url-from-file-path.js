@@ -25,7 +25,7 @@ function getURLFromFilePath(filePath) {
     filePath = "/" + filePath
   }
 
-  // Section 3.3: Escape path components
+  // Section 3.3: Escape Path Components
   // https://tools.ietf.org/html/rfc3986#section-3.3
   return "file://" + encodeURI(filePath).replace(encodeCharsRegExp, encodeChar)
 }
