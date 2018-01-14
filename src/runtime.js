@@ -57,6 +57,13 @@ class Runtime {
   }
 
   import(request) {
+    // Section 2.2.1: Runtime Semantics: Evaluation
+    // Step 6: Coerce request to a string.
+    // https://tc39.github.io/proposal-dynamic-import/#sec-import-call-runtime-semantics-evaluation
+    if (typeof request !== "string") {
+      request = String(request)
+    }
+
     return new Promise((resolve, reject) => {
       setImmediate(() => {
         try {

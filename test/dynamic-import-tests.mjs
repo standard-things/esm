@@ -4,10 +4,13 @@ import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import path from "path"
 import require from "./require.js"
+import url from "url"
 
 const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const abcPath = require.resolve("./fixture/export/abc.mjs")
+const abcURL = fileProtocol + abcPath.replace(/\\/g, "/")
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -30,25 +33,33 @@ describe("dynamic import", () => {
     })
   )
 
-  it("should support a variable id", () =>
+  it("should accept a variable", () =>
     import(abcPath)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
-  it("should support a template string id", () =>
+  it("should accept a template string", () =>
     import(`${abcPath}`)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
-  it("should support an expression id", () =>
+  it("should accept an expression", () =>
     import((() => abcPath)())
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
 
   it("should support the file protocol", () =>
-    import("file:" + (isWin ? "///" : "//") + path.resolve(abcPath))
+    import(abcURL)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   )
+
+  it("should coerce specifier to a string", () => {
+    const parsed = url.parse(abcURL)
+    parsed.toString = () => parsed.href
+
+    return import(parsed)
+      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+  })
 
   it("should support whitespace between `import`, `(`, and `)`", () =>
     import
@@ -116,7 +127,7 @@ describe("dynamic import", () => {
     })
   })
 
-  it("should expect exactly one argument", () => {
+  it("should accept exactly one argument", () => {
     const invalids = [
       "import()",
       "import(a,b)",
