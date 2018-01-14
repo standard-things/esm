@@ -126,7 +126,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
 
       const lines = sourceCode.split("\n")
       const line = lines[lineNum - 1] || ""
-      return line + (line ? "\n" : "") + (newline || "\n")
+      return line + (line ? "\n\n" : "\n")
     }
 
     if (lineNum !== 1) {
