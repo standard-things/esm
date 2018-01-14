@@ -1,0 +1,4 @@
+{
+  cjs: true,
+  debug: true
+}

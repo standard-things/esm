@@ -14,7 +14,12 @@ function load(request, parent, isMain, preload) {
 
   if (entry.module.loaded) {
     entry.state = 4
-    return _load(entry, parent, isMain, preload)
+
+    if (entry.filePath) {
+      _load(entry, parent, isMain, preload)
+    }
+
+    return entry
   }
 
   if (entry.state < 3) {
