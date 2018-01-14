@@ -10,6 +10,9 @@ module.exports = {
     ["@babel/transform-block-scoping", {
       throwIfClosureRequired: false
     }],
+    ["transform-remove-console", {
+      exclude: ["error"]
+    }],
     "transform-for-of-as-array"
   ],
   presets: [

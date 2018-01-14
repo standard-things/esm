@@ -41,6 +41,7 @@
     "babel-eslint": "^8.2.1",
     "babel-loader": "^8.0.0-beta.0",
     "babel-plugin-transform-for-of-as-array": "^1.0.4",
+    "babel-plugin-transform-remove-console": "canary",
     "chai": "^4.1.2",
     "download": "^6.2.5",
     "eslint": "^4.15.0",
