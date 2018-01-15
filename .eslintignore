@@ -2,6 +2,7 @@
 /node_modules
 /src/vendor
 /test/fixture/error
+/test/fixture/main/top-level-await
 /test/fixture/source
 /test/node_modules/error
 /test/output

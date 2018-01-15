@@ -95,6 +95,14 @@ describe("module.runMain hook", function () {
       })
   })
 
+  it("should support `options.await`", () =>
+    runMain("./fixture/main/top-level-await")
+      .then((result) => {
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("top-level-await:true"))
+      })
+  )
+
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main/dynamic-import.js")
       .then((result) => {

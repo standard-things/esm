@@ -1,0 +1,4 @@
+{
+  await: true,
+  debug: true
+}
