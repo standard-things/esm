@@ -22,6 +22,24 @@ function exec(filePath, args) {
 describe("scenarios", function () {
   this.timeout(0)
 
+  it("should work with babel-register (flag)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const indexPath = path.resolve(dirPath, "index.js")
+
+    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", indexPath]
+
+    return Promise.resolve()
+      .then(() => exec("node", nodeArgs))
+  })
+
+  it("should work with babel-register (code)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register")
+    const mainPath = path.resolve(dirPath, "main.js")
+
+    return Promise.resolve()
+      .then(() => exec("node", mainPath))
+  })
+
   it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPattern = path.resolve(dirPath, "test.js")
