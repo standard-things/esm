@@ -91,7 +91,7 @@ describe("module.runMain hook", function () {
     , Promise.resolve())
   })
 
-  it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", function () {
+  it("should support `ESM_OPTIONS` environment variable with `options.cache`", function () {
     if (pkgOptions.debug) {
       this.skip()
       return
