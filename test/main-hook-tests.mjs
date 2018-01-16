@@ -1,3 +1,4 @@
+import JSON6 from "json-6"
 import SemVer from "semver"
 
 import assert from "assert"
@@ -20,6 +21,12 @@ const canUsePreserveSymlinks =
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
+
+const pkgPath = require.resolve("../")
+const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
+const pkgOptions = fs.pathExistsSync(".esmrc")
+  ? JSON6.parse(fs.readFileSync(".esmrc"))
+  : pkgJSON["@std/esm"]
 
 const testPath = path.dirname(require.resolve("./tests.mjs"))
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
@@ -64,8 +71,13 @@ describe("module.runMain hook", function () {
       , Promise.resolve())
   })
 
-  it("should support `ESM_OPTIONS` environment variable", () =>
-    [
+  it("should support `ESM_OPTIONS` environment variable", function () {
+    if (pkgOptions.debug) {
+      this.skip()
+      return
+    }
+
+    return [
       "'cjs'",
       "{cjs:1,esm:'js'}",
       "{cjs:true,esm:'js'}"
@@ -77,9 +89,14 @@ describe("module.runMain hook", function () {
           assert.ok(result.stdout.includes("esm-options:true"))
         })
     , Promise.resolve())
-  )
+  })
 
-  it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", () => {
+  it("should support setting `options.cache` with the `ESM_OPTIONS` environment variable", function () {
+    if (pkgOptions.debug) {
+      this.skip()
+      return
+    }
+
     const execPath = path.resolve("./fixture/options/env")
     const cachePath = path.resolve(execPath, ".cache")
     const ESM_OPTIONS =

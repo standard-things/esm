@@ -264,13 +264,14 @@ describe("errors", () => {
         ),
       import(id6)
         .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            id6 + ":1",
-            (pkgOptions.debug ? "(function (exports, require, module, __filename, __dirname) { " : "") +
-            "syntax@error"
-          ].join("\n"))
-        )
+        .catch((e) => {
+          if (! pkgOptions.debug) {
+            return checkErrorStack(e, [
+              id6 + ":1",
+              "syntax@error"
+            ].join("\n"))
+          }
+        })
     ])
   })
 
