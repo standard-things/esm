@@ -27,7 +27,10 @@ function load(request, parent, isMain, preload) {
     _load(entry, parent, isMain, preload)
   }
 
-  entry.state = 4
+  if (entry.module.loaded) {
+    entry.state = 4
+  }
+
   return entry
 }
 
