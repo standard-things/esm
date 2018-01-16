@@ -24,20 +24,19 @@ describe("scenarios", function () {
 
   it("should work with babel-register (flag)", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
-    const indexPath = path.resolve(dirPath, "index.js")
-
-    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", indexPath]
+    const mainPath = path.resolve(dirPath, "main.js")
+    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", mainPath]
 
     return Promise.resolve()
-      .then(() => exec("node", nodeArgs))
+      .then(() => exec(nodePath, nodeArgs))
   })
 
   it("should work with babel-register (code)", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register")
-    const mainPath = path.resolve(dirPath, "main.js")
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const indexPath = path.resolve(dirPath, "index.js")
 
     return Promise.resolve()
-      .then(() => exec("node", mainPath))
+      .then(() => exec(nodePath, [indexPath]))
   })
 
   it("should work with ava, nyc, and tsc", () => {

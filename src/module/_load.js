@@ -56,6 +56,7 @@ function load(request, parent, isMain, state, loader) {
     }
 
     entry = Entry.get(child)
+    entry.parent = Entry.get(parent)
     entry.cacheKey = filePath
 
     if (moduleState.parsing) {

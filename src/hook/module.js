@@ -138,12 +138,12 @@ function hook(Mod, parent) {
         }
       }
 
-      if (! cached) {
-        const parentEntry = Entry.get(mod.parent)
+      const { parent } = entry
 
-        if (! parentEntry ||
-            ! parentEntry.data.compiled ||
-              parentEntry.data.compiled.changed) {
+      if (! cached) {
+        if (! parent ||
+            ! parent.data.compiled ||
+              parent.data.compiled.changed) {
           cached = tryCompileCode(manager, content, entry, cacheFileName, {
             cachePath,
             hint,
@@ -175,7 +175,11 @@ function hook(Mod, parent) {
       }
 
       if (moduleState.parsing) {
-        if (entry.esm &&
+        if (! entry.esm &&
+            (entry.data.package === defaultPkgInfo ||
+              (entry.parent && entry.parent.data.package === defaultPkgInfo))) {
+          tryCompileCached(entry)
+        } else if (entry.esm &&
             entry.state === 1) {
           validateESM(entry)
         }

@@ -38,7 +38,7 @@ const toStringTagDescriptor = {
 }
 
 class Entry {
-  constructor(mod, exported) {
+  constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
@@ -61,8 +61,8 @@ class Entry {
     this.esmNamespace = this._namespace
     // The ES module type indicator.
     this.esm = false
-    // The `module.exports` of the module.
-    this.exports = exported
+    // The initial `module.exports` value.
+    this.exports = null
     // The file path of the module.
     this.filePath = mod.filename
     // Getters for local variables exported by the module.
@@ -73,6 +73,8 @@ class Entry {
     this.module = mod
     // The options for the entry.
     this.options = PkgInfo.createOptions()
+    // The `module.parent` entry.
+    this.parent = null
     // The name of the runtime identifier.
     this.runtimeName = null
     // Setters for assigning to local variables in parent modules.
@@ -104,7 +106,7 @@ class Entry {
     }
 
     if (! entry) {
-      entry = new Entry(mod, exported)
+      entry = new Entry(mod)
       Entry.set(mod, exported, entry)
     }
 
@@ -221,7 +223,7 @@ class Entry {
     let setGetters = true
 
     if (this.esm) {
-      const exported = this.exports
+      const exported = this.module.exports
 
       if (! isSealed(exported)) {
         for (const name in this._namespace) {
@@ -242,13 +244,10 @@ class Entry {
       setGetters = otherEntry._loaded !== 1
       this.merge(otherEntry)
 
-      const mod = this.module
-      const exported = mod.exports
-
       this.esm = false
-      this.exports = exported
 
-      Entry.set(mod, exported, this)
+      const mod = this.module
+      Entry.set(mod, mod.exports, this)
 
       if (! mod.loaded) {
         return this._loaded = 0
@@ -267,7 +266,9 @@ class Entry {
       })
 
       setGetter(this, "cjsNamespace", () => {
-        return this.cjsNamespace = toNamespace(this, { default: this.exports })
+        return this.cjsNamespace = toNamespace(this, {
+          default: this.module.exports
+        })
       })
 
       setSetter(this, "cjsNamespace", (value) => {
@@ -320,7 +321,8 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry) {
-  const { _namespace, exports:exported, getters } = entry
+  const { _namespace, getters } = entry
+  const exported = entry.module.exports
 
   const inModule =
     entry.esm ||

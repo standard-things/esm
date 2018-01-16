@@ -1,5 +1,5 @@
 "use strict"
 
-require = require("../../../../")(module, true)
+require = require("../../../../")(module)
 require("@babel/register")
 require("./index.mjs")

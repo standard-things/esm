@@ -1,4 +1,5 @@
-// @flow
-import test from "./test"
+"use strict"
 
-const x: number = test()
+require = require("../../../../")(module)
+require("@babel/register")
+require("./main.js")

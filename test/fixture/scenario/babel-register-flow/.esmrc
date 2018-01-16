@@ -1,3 +1,4 @@
 {
+  debug: true,
   esm: "js"
 }

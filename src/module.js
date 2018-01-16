@@ -20,9 +20,7 @@ const BuiltinModule = __non_webpack_module__.constructor
 
 class Module extends BuiltinModule {
   _compile(content, filePath) {
-    if (! moduleState.parsing) {
-      return compile(this, content, filePath)
-    }
+    return compile(this, content, filePath)
   }
 
   load(filePath) {

@@ -151,6 +151,7 @@ function runCJS(entry, moduleWrapper) {
     return child.exports
   })
 
+  entry.exports = null
   moduleWrapper.call(exported, shared.global, exported, req)
   mod.loaded = true
 }
@@ -158,6 +159,8 @@ function runCJS(entry, moduleWrapper) {
 function runESM(entry, moduleWrapper) {
   const { module:mod, options } = entry
   const exported = mod.exports = entry.exports
+
+  entry.exports = null
 
   if (options.cjs.vars) {
     const requirer = (request) => load(request, mod, loadESM).module.exports
