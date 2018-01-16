@@ -16,10 +16,13 @@ function validate(entry) {
   for (const name in moduleSpecifiers) {
     if (! (name in builtinEntries)) {
       const childEntry = _loadESM(name, mod)
-      childEntry.state = 2
 
       children[name] =
       entry.children[childEntry.id] = childEntry
+
+      if (childEntry.state < 2) {
+        childEntry.state = 2
+      }
     }
   }
 

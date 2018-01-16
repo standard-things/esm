@@ -178,7 +178,8 @@ function hook(Mod, parent) {
         if (! entry.esm &&
             (entry.data.package === defaultPkgInfo ||
               (entry.parent && entry.parent.data.package === defaultPkgInfo))) {
-          tryCompileCached(entry)
+          entry.state = 3
+          tryPassthru.call(this, func, args, options)
         } else if (entry.esm &&
             entry.state === 1) {
           validateESM(entry)

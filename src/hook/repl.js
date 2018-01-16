@@ -80,8 +80,6 @@ function hook(vm) {
       validateESM(entry)
     }
 
-    entry.state = 2
-
     const content =
       '"use strict";var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" +
@@ -89,12 +87,11 @@ function hook(vm) {
 
     const result = tryWrapper(func, [content, scriptOptions])
 
-    entry.state = 3
-
     if (result.cachedDataProduced) {
       pkgInfo.cache[cacheFileName].scriptData = result.cachedData
     }
 
+    entry.state = 3
     result.runInContext = wrap(result.runInContext, tryWrapper)
     result.runInThisContext = wrap(result.runInThisContext, tryWrapper)
     return result

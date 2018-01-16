@@ -37,6 +37,7 @@ function loader(entry, fromPath, parentOptions, preload) {
   if (moduleState.parsing &&
       (ext === ".json" ||
        ext === ".node")) {
+    entry.state = 2
     return
   }
 

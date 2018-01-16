@@ -2,6 +2,7 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import Entry from "../entry.js"
 import Module from "../module.js"
 
 import binding from "../binding.js"
@@ -66,16 +67,22 @@ function compile(mod, content, filePath) {
     }
   }
 
+  const entry = Entry.get(mod)
+  const exported = mod.exports
+
+  entry.state = 3
+
   let result
 
   if (inspectorWrapper) {
     result = inspectorWrapper.call(inspectorBinding, compiledWrapper,
-      mod.exports, mod.exports, req, mod, filePath, dirname(filePath))
+      exported, exported, req, mod, filePath, dirname(filePath))
   } else {
     result = compiledWrapper.call(
-      mod.exports, mod.exports, req, mod, filePath, dirname(filePath))
+      exported, exported, req, mod, filePath, dirname(filePath))
   }
 
+  entry.state = 4
   return result
 }
 

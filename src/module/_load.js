@@ -58,10 +58,7 @@ function load(request, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.parent = Entry.get(parent)
     entry.cacheKey = filePath
-
-    if (moduleState.parsing) {
-      entry.state = 1
-    }
+    entry.state = moduleState.parsing ? 1 : 3
   }
 
   const { _compile } = child
