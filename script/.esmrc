@@ -1,5 +1,4 @@
 {
-  cjs: true,
   debug: true,
-  esm: "js"
+  esm: "cjs"
 }

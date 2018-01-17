@@ -1,6 +1,6 @@
-import add from "./index"
+import add from "./add.js"
 import test from "ava"
 
-test('maxRequest - some may fail', (t) => {
+test("test", (t) => {
   t.is(add(1, 2), 3)
 })

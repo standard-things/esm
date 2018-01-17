@@ -1,8 +1,6 @@
 import assert from "assert"
-import getItems from "./index.js"
+import get from "./get.js"
 
-describe("suite", () => {
-  it("test", async () =>
-    assert.deepStrictEqual(await getItems(), ["a", "b"])
-  )
+it("test", async () => {
+  assert.deepStrictEqual(await get(), ["a", "b"])
 })

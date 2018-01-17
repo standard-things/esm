@@ -1,6 +1,6 @@
-import add from "./"
+import add from "./add.js"
 import test from "ava"
 
-test("should add numbers", (t) => {
+test("test", (t) => {
   t.is(add(1, 2), 3)
 })
