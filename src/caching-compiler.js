@@ -144,6 +144,7 @@ function toCompileOptions(entry, options) {
 Object.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
+  process.setMaxListeners(process.getMaxListeners() + 1)
   process.once("exit", () => {
     for (const cacheFilePath in shared.pendingWrites) {
       let {
@@ -165,6 +166,8 @@ if (! shared.inited) {
         removeExpired(entry.data.package.cache, cachePath, cacheFileName)
       }
     }
+
+    process.setMaxListeners(Math.max(process.getMaxListeners() - 1, 0))
   })
 }
 
