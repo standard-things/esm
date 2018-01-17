@@ -16,32 +16,32 @@ There are three ways to enable ESM with `@std/esm`.
 
 1. Enable ESM with a CJS bridge:
 
-**index.js**
-```js
-// Provide options as a parameter or options file.
-require = require("@std/esm")(module, options)
-module.exports = require("./main.mjs").default
-```
+    **index.js**
+    ```js
+    // Provide options as a parameter or options file.
+    require = require("@std/esm")(module, options)
+    module.exports = require("./main.mjs").default
+    ```
 
 2. Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
-```shell
-node -r @std/esm main.mjs
-```
+    ```shell
+    node -r @std/esm main.mjs
+    ```
 
 3. Enable ESM in the Node REPL:
 
-```shell
-node -r @std/esm
-```
+    ```shell
+    node -r @std/esm
+    ```
 
-Or upon entering:
+    or upon entering:
 
-```shell
-$ node
-> require("@std/esm")
-@std/esm enabled
-```
+    ```shell
+    $ node
+    > require("@std/esm")
+    @std/esm enabled
+    ```
 
 *Note: All `"cjs"` options are [unlocked](#unlockables) in the Node REPL.*
 
