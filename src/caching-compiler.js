@@ -17,6 +17,7 @@ const codeOfRightBracket = "}".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
+const { max } = Math
 const { stringify } = JSON
 
 class CachingCompiler {
@@ -167,7 +168,7 @@ if (! shared.inited) {
       }
     }
 
-    process.setMaxListeners(Math.max(process.getMaxListeners() - 1, 0))
+    process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
   })
 }
 
