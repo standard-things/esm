@@ -183,7 +183,7 @@ function hook(Mod, parent) {
           tryPassthru.call(this, func, args, options)
         } else if (entry.esm &&
             entry.state === 1) {
-          validateESM(entry)
+          tryValidateESM(manager, entry)
         }
       } else {
         tryCompileCached(entry)
@@ -221,9 +221,9 @@ function hook(Mod, parent) {
       try {
         tryCompile(entry)
       } catch (e) {
-        const { filename } = entry.module
-        const sourceCode = () => readSourceCode(filename, options)
-        throw maskStackTrace(e, sourceCode, filename, entry.esm)
+        const { filePath } = entry
+        const sourceCode = () => readSourceCode(filePath, options)
+        throw maskStackTrace(e, sourceCode, filePath, entry.esm)
       }
     }
 
@@ -280,6 +280,24 @@ function hook(Mod, parent) {
     } finally {
       if (Module.wrap === moduleWrapESM) {
         Module.wrap = moduleWrapCJS
+      }
+    }
+  }
+
+  function tryValidateESM(manager, entry) {
+    const { options } = entry
+
+    if (options.debug) {
+      validateESM(entry)
+    } else {
+      try {
+        validateESM(entry)
+      } catch (e) {
+        const { filePath } = entry
+        const sourceCode = () => readSourceCode(filePath, options)
+
+        captureStackTrace(e, manager)
+        throw maskStackTrace(e, sourceCode, filePath, true)
       }
     }
   }
