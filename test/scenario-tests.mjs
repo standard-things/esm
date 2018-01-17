@@ -39,6 +39,20 @@ describe("scenarios", function () {
       .then(() => exec(nodePath, nodeArgs))
   })
 
+  it("should work with ava and nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
+    const avaPattern = path.resolve(dirPath, "test.js")
+    const nycArgs = [
+      "--cwd", dirPath,
+      "-i", cwdPath,
+      "ava", avaPattern
+    ]
+
+    return Promise.resolve()
+      .then(() => exec("nyc", nycArgs))
+  })
+
   it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPattern = path.resolve(dirPath, "test.js")
