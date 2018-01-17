@@ -176,6 +176,7 @@ function hook(Mod, parent) {
 
       if (moduleState.parsing) {
         if (! entry.esm &&
+            ! (entry.parent && entry.parent.esm) &&
             (entry.data.package === defaultPkgInfo ||
               (entry.parent && entry.parent.data.package === defaultPkgInfo))) {
           entry.state = 3

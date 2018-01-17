@@ -126,6 +126,14 @@ describe("scenarios", function () {
     return exec("nyc", nycArgs)
   })
 
+  it("should work with postcss", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/postcss")
+    const indexPath = path.resolve(dirPath, "index.js")
+
+    return Promise.resolve()
+      .then(() => exec(nodePath, [indexPath]))
+  })
+
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-register")

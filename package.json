@@ -65,6 +65,7 @@
     "optimize-js-plugin": "0.0.4",
     "pify": "^3.0.0",
     "pm2": "^2.8.0",
+    "postcss": "^6.0.16",
     "semver": "^5.5.0",
     "sleep": "^5.1.1",
     "trash": "^4.2.1",
