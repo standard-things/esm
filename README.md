@@ -216,7 +216,7 @@ Tips
 * Load `@std/esm` with the `--node-args="-r @std/esm"` option of
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
 * Use `@std/esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
-* Use `"@std/esm":"cjs"` with the `--watch` and `--watch-extensions` options of
+* Use `"@std/esm":"cjs"` for the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
-* Use `"@std/esm":"cjs"` with [`webpack`](https://github.com/webpack/webpack)
+* Use `"@std/esm":"cjs"` for [`ava`](https://github.com/avajs/ava) and [`webpack`](https://github.com/webpack/webpack)
 * When in doubt, use `"@std/esm":"cjs"`
