@@ -10,23 +10,26 @@ for all the details.
 Getting started
 ---
 
-  1. Run `npm i --save @std/esm` in your app or package directory.
-  2. Create the ESM loader to import your main ES module:
+Run `npm i --save @std/esm` in your app or package directory.
 
-     **index.js**
-     ```js
-     // Provide options as a parameter or options file.
-     require = require("@std/esm")(module, options)
-     module.exports = require("./main.mjs").default
-     ```
+There are three ways to enable ESM with `@std/esm`.
 
-Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+1. Enable ESM with a CJS bridge:
 
-```shell
-node -r @std/esm file.mjs
+**index.js**
+```js
+// Provide options as a parameter or options file.
+require = require("@std/esm")(module, options)
+module.exports = require("./main.mjs").default
 ```
 
-Enable ESM in the Node REPL:
+2. Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+
+```shell
+node -r @std/esm main.mjs
+```
+
+3. Enable ESM in the Node REPL:
 
 ```shell
 node -r @std/esm
