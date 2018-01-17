@@ -1,7 +1,6 @@
 import { extname, resolve } from "path"
 
 import Compiler from "./compiler.js"
-import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import assign from "./util/assign.js"
@@ -9,6 +8,7 @@ import gzip from "./fs/gzip.js"
 import mkdirp from "./fs/mkdirp.js"
 import parseJSON from "./util/parse-json.js"
 import removeFile from "./fs/remove-file.js"
+import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
 const codeOfAsterisk = "*".charCodeAt(0)
@@ -18,8 +18,6 @@ const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
 const { stringify } = JSON
-
-const pendingWrites = new FastObject
 
 class CachingCompiler {
   static compile(code, entry, cacheFileName, options) {
@@ -112,7 +110,13 @@ function compileAndWrite(code, entry, cacheFileName, options) {
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const content = result.code
 
-  pendingWrites[cacheFilePath] = { cacheFileName, cachePath, content, entry }
+  shared.pendingWrites[cacheFilePath] = {
+    cacheFileName,
+    cachePath,
+    content,
+    entry
+  }
+
   return result
 }
 
@@ -139,22 +143,29 @@ function toCompileOptions(entry, options) {
 
 Object.setPrototypeOf(CachingCompiler.prototype, null)
 
-process.once("exit", () => {
-  for (const cacheFilePath in pendingWrites) {
-    let { cacheFileName, cachePath, content, entry } = pendingWrites[cacheFilePath]
+if (! shared.inited) {
+  process.once("exit", () => {
+    for (const cacheFilePath in shared.pendingWrites) {
+      let {
+        cacheFileName,
+        cachePath,
+        content,
+        entry
+      } = shared.pendingWrites[cacheFilePath]
 
-    if (! mkdirp(cachePath)) {
-      continue
-    }
+      if (! mkdirp(cachePath)) {
+        continue
+      }
 
-    if (extname(cacheFilePath) === ".gz") {
-      content = gzip(content)
-    }
+      if (extname(cacheFilePath) === ".gz") {
+        content = gzip(content)
+      }
 
-    if (writeFile(cacheFilePath, content)) {
-      removeExpired(entry.data.package.cache, cachePath, cacheFileName)
+      if (writeFile(cacheFilePath, content)) {
+        removeExpired(entry.data.package.cache, cachePath, cacheFileName)
+      }
     }
-  }
-})
+  })
+}
 
 export default CachingCompiler
