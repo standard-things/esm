@@ -1,10 +1,8 @@
-import binding from "../binding.js"
 import decodeURIComponent from "./decode-uri-component.js"
+import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import parseURL from "./parse-url.js"
 import path from "path"
-import url from "url"
 
 const codeOfColon = ":".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
@@ -12,17 +10,7 @@ const codeOfSlash = "/".charCodeAt(0)
 const isWin = process.platform === "win32"
 const localhostRegExp = /^\/\/localhost\b/
 
-let { domainToUnicode } = url
 const { normalize } = path[isWin ? "win32" : "posix"]
-
-if (typeof domainToUnicode !== "function") {
-  const icuBinding = binding.icu
-  const toUnicode = noDeprecationWarning(() => icuBinding.toUnicode)
-
-  domainToUnicode = typeof toUnicode === "function"
-    ? (domain) => toUnicode.call(icuBinding, domain)
-    : __non_webpack_require__("punycode").toUnicode
-}
 
 function getFilePathFromURL(url) {
   const parsed = parseURL(url)
