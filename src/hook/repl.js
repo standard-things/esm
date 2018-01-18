@@ -9,6 +9,7 @@ import captureStackTrace from "../error/capture-stack-trace.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
+import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
@@ -34,12 +35,16 @@ function hook(vm) {
       try {
         return func.apply(this, args)
       } catch (e) {
+        if (isStackTraceMasked(e)) {
+          throw e
+        }
+
+        const isESM = e.sourceType === "module"
         const [sourceCode] = args
-        const useURLs = e.sourceType === "module"
 
         delete e.sourceType
         captureStackTrace(e, manager)
-        throw maskStackTrace(e, sourceCode, null, useURLs)
+        throw maskStackTrace(e, sourceCode, null, isESM)
       }
     }
 

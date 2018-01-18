@@ -24,6 +24,7 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
+import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -221,6 +222,10 @@ function hook(Mod, parent) {
       try {
         tryCompile(entry)
       } catch (e) {
+        if (isStackTraceMasked(e)) {
+          throw e
+        }
+
         const { filePath } = entry
         const sourceCode = () => readSourceCode(filePath, options)
         throw maskStackTrace(e, sourceCode, filePath, entry.esm)
@@ -280,24 +285,6 @@ function hook(Mod, parent) {
     } finally {
       if (Module.wrap === moduleWrapESM) {
         Module.wrap = moduleWrapCJS
-      }
-    }
-  }
-
-  function tryValidateESM(manager, entry) {
-    const { options } = entry
-
-    if (options.debug) {
-      validateESM(entry)
-    } else {
-      try {
-        validateESM(entry)
-      } catch (e) {
-        const { filePath } = entry
-        const sourceCode = () => readSourceCode(filePath, options)
-
-        captureStackTrace(e, manager)
-        throw maskStackTrace(e, sourceCode, filePath, true)
       }
     }
   }
@@ -404,11 +391,15 @@ function tryCompileCode(manager, sourceCode, entry, cacheFilename, options) {
   try {
     return Compiler.compile(sourceCode, entry, cacheFilename, options)
   } catch (e) {
-    const useURLs = e.sourceType === "module"
+    if (isStackTraceMasked(e)) {
+      throw e
+    }
+
+    const isESM = e.sourceType === "module"
 
     delete e.sourceType
     captureStackTrace(e, manager)
-    throw maskStackTrace(e, sourceCode, entry.filePath, useURLs)
+    throw maskStackTrace(e, sourceCode, entry.filePath, isESM)
   }
 }
 
@@ -419,9 +410,35 @@ function tryPassthru(func, args, options) {
     try {
       func.apply(this, args)
     } catch (e) {
+      if (isStackTraceMasked(e)) {
+        throw e
+      }
+
       const [, filePath] = args
       const sourceCode = () => readSourceCode(filePath, options)
       throw maskStackTrace(e, sourceCode, filePath)
+    }
+  }
+}
+
+function tryValidateESM(manager, entry) {
+  const { options } = entry
+
+  if (options.debug) {
+    validateESM(entry)
+  } else {
+    try {
+      validateESM(entry)
+    } catch (e) {
+      if (isStackTraceMasked(e)) {
+        throw e
+      }
+
+      const { filePath } = entry
+      const sourceCode = () => readSourceCode(filePath, options)
+
+      captureStackTrace(e, manager)
+      throw maskStackTrace(e, sourceCode, filePath, true)
     }
   }
 }
