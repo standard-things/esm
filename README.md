@@ -19,7 +19,7 @@ There are three ways to enable ESM with `@std/esm`.
     **index.js**
     ```js
     // Provide options as a parameter or options file.
-    require = require("@std/esm")(module, options)
+    require = require("@std/esm")(module/*, options*/)
     module.exports = require("./main.mjs").default
     ```
 
