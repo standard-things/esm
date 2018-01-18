@@ -422,7 +422,7 @@ function tryPassthru(func, args, options) {
 }
 
 function tryValidateESM(manager, entry) {
-  const { options } = entry
+  const { filePath, options } = entry
 
   if (options.debug) {
     validateESM(entry)
@@ -434,7 +434,6 @@ function tryValidateESM(manager, entry) {
         throw e
       }
 
-      const { filePath } = entry
       const sourceCode = () => readSourceCode(filePath, options)
 
       captureStackTrace(e, manager)
