@@ -1,6 +1,6 @@
 import FastObject from "./fast-object.js"
 
-import getModuleName from "./util/get-module-name.js"
+import getModuleURL from "./util/get-module-url.js"
 import { promisify } from "util"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
@@ -58,13 +58,13 @@ function createNodeClass(Super) {
 }
 
 function exportMissing(request, exportName) {
-  const moduleName = getModuleName(request)
+  const moduleName = getModuleURL(request)
   return "Module " + toStringLiteral(moduleName, "'") +
     " does not provide an export named '" + exportName + "'"
 }
 
 function exportStarConflict(request, exportName) {
-  const moduleName = getModuleName(request)
+  const moduleName = getModuleURL(request)
   return "Module " + toStringLiteral(moduleName, "'") +
     " contains conflicting star exports for name '" + exportName + "'"
 }
@@ -79,7 +79,7 @@ function invalidProtocol(protocol, expected) {
 }
 
 function missingModule(request) {
-  return "Cannot find module " + getModuleName(request)
+  return "Cannot find module " + getModuleURL(request)
 }
 
 function moduleResolutionLegacy(id, fromPath, foundPath) {
@@ -88,7 +88,7 @@ function moduleResolutionLegacy(id, fromPath, foundPath) {
 }
 
 function requireESM(request) {
-  return "Must use import to load ES Module: " + getModuleName(request)
+  return "Must use import to load ES Module: " + getModuleURL(request)
 }
 
 function unknownFileExtension(filePath) {

@@ -5,9 +5,19 @@ function getModuleName(request) {
     return request
   }
 
-  return isObject(request)
-    ? request.filename || request.id || ""
-    : ""
+  if (isObject(request)) {
+    const { filename, id } = request
+
+    if (typeof filename === "string") {
+      return filename
+    }
+
+    if (typeof id === "string") {
+      return id
+    }
+  }
+
+  return ""
 }
 
 export default getModuleName
