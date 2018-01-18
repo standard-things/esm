@@ -15,7 +15,7 @@ function validate(entry) {
   // Parse children.
   for (const name in moduleSpecifiers) {
     if (! (name in builtinEntries)) {
-      const childEntry = tryLoadESM(name, mod)
+      const childEntry = _loadESM(name, mod)
 
       children[name] =
       entry.children[childEntry.id] = childEntry
@@ -36,7 +36,7 @@ function validate(entry) {
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
            requestedExportNames[0] !== "default")) {
-        raise(mod, "ERR_EXPORT_MISSING", childEntry.module, requestedExportNames[0])
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", childEntry.module, requestedExportNames[0])
       }
 
       continue
@@ -52,7 +52,7 @@ function validate(entry) {
           continue
         }
 
-        raise(mod, "ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
+        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
       }
 
       const { exportStarNames:childExportStarNames } = childData
@@ -66,7 +66,7 @@ function validate(entry) {
       }
 
       if (throwExportMissing) {
-        raise(mod, "ERR_EXPORT_MISSING", childEntry.module, requestedName)
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", childEntry.module, requestedName)
       }
     }
   }
@@ -96,21 +96,6 @@ function validate(entry) {
         exportSpecifiers[exportName] = 2
       }
     }
-  }
-}
-
-function raise(mod, code, request, exportName) {
-  const error = new errors.SyntaxError(code, request, exportName)
-  error.filename = mod.filename
-  throw error
-}
-
-function tryLoadESM(request, parent) {
-  try {
-    return _loadESM(request, parent)
-  } catch (e) {
-    e.filename = parent.filename
-    throw e
   }
 }
 

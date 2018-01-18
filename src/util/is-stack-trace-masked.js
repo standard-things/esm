@@ -1,21 +1,19 @@
-import isStackTraceDecorated from "./is-stack-trace-decorated.js"
+import isError from "./is-error.js"
 
 const { getOwnPropertyDescriptor } = Object
 
 function isStackTraceMasked(error) {
-  if (! isStackTraceDecorated(error)) {
+  if (! isError(error)) {
     return false
   }
 
   const descriptor = getOwnPropertyDescriptor(error, "stack")
 
-  if (! descriptor ||
-      ! ("get" in descriptor) ||
-      ! ("set" in descriptor)) {
-    return false
-  }
-
-  return true
+  return !! descriptor &&
+    descriptor.configurable === true &&
+    descriptor.enumerable === false &&
+    typeof descriptor.get === "function" &&
+    typeof descriptor.set === "function"
 }
 
 export default isStackTraceMasked

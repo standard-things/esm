@@ -35,17 +35,12 @@ function maskStackTrace(error, sourceCode, filePath, isESM) {
     configurable: true,
     enumerable: false,
     get() {
+      const masker = isParseError(error) ? maskParserStack : maskEngineStack
+      const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
+
       stack = stack.replace(message, error.message)
-      message = error.message
-
-      stack = isParseError(error)
-        ? maskParserStack(stack, sourceCode, filePath)
-        : maskEngineStack(stack, sourceCode, filePath)
-
-      return error.stack = withoutMessage(stack, message, (stack) => {
-        stack = scrub(stack)
-        return isESM ? fileNamesToURLs(stack) : stack
-      })
+      stack = masker(stack, sourceCode, filePath)
+      return error.stack = withoutMessage(stack, error.message, scrubber)
     },
     set(value) {
       setProperty(error, "stack", { enumerable: false, value })
@@ -170,8 +165,9 @@ function scrub(stack) {
 }
 
 function withoutMessage(stack, message, callback) {
-  stack = stack.replace(message, "$message$")
-  return callback(stack).replace("$message$", message)
+  const token = ZWJ + "message" + ZWJ
+  stack = stack.replace(message, token)
+  return callback(stack).replace(token, message)
 }
 
 export default maskStackTrace
