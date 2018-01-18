@@ -104,6 +104,11 @@ function maskParserStack(stack, sourceCode, filePath) {
 function maskEngineStack(stack, sourceCode, filePath) {
   const parts = engineMessageRegExp.exec(stack)
 
+  if (typeof filePath === "string" &&
+      ! headerRegExp.test(stack)) {
+    stack = filePath + ":1\n" + stack
+  }
+
   if (parts === null) {
     return stack
   }

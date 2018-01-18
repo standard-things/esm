@@ -12,8 +12,10 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isWin = process.platform === "win32"
 
-const fileProtocol = "file://" + (isWin ? "/" : "")
+const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
 const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
+
+const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
 const pkgPath = require.resolve("../")
@@ -23,6 +25,7 @@ const pkgOptions = fs.pathExistsSync(".esmrc")
   : pkgJSON["@std/esm"]
 
 const abcPath = require.resolve("./fixture/export/abc.mjs")
+const abcURL = getURLFromFilePath(abcPath)
 const abcNs = createNamespace({
   a: "a",
   b: "b",
@@ -221,9 +224,10 @@ describe("errors", () => {
     const id1 = require.resolve("./fixture/error/import.mjs")
     const id2 = require.resolve("./fixture/error/export.js")
     const id3 = require.resolve("./fixture/error/import.js")
-    const id4 = require.resolve("./fixture/error/nested.mjs")
-    const id5 = require.resolve("./fixture/error/syntax.js")
-    const id6 = require.resolve("./node_modules/error/index.js")
+    const id4 = require.resolve("./fixture/error/missing.mjs")
+    const id5 = require.resolve("./fixture/error/nested.mjs")
+    const id6 = require.resolve("./fixture/error/syntax.js")
+    const id7 = require.resolve("./node_modules/error/index.js")
 
     return Promise.all([
       import(id1)
@@ -248,27 +252,38 @@ describe("errors", () => {
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
-            getURLFromFilePath(id4) + ":2",
-            '  import"nested"',
-            "  ^\n"
+            getURLFromFilePath(id4) + ":1",
+            "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
           ].join("\n"))
         ),
       import(id5)
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
-            id5 + ":1",
-            "syntax@error",
-            "\n"
+            getURLFromFilePath(id5) + ":2",
+            '  import"nested"',
+            "  ^\n"
           ].join("\n"))
         ),
       import(id6)
         .then(() => assert.ok(false))
+        .catch((e) =>
+          checkErrorStack(e, [
+            id6 + ":1",
+            skipDecorateCheck
+              ? "SyntaxError: Unexpected token ILLEGAL"
+              : "syntax@error\n\n"
+          ].join("\n"))
+        ),
+      import(id7)
+        .then(() => assert.ok(false))
         .catch((e) => {
           if (! pkgOptions.debug) {
             return checkErrorStack(e, [
-              id6 + ":1",
-              "syntax@error"
+              id7 + ":1",
+              skipDecorateCheck
+                ? "SyntaxError: Unexpected token ILLEGAL"
+                : "syntax@error"
             ].join("\n"))
           }
         })
@@ -769,7 +784,8 @@ describe("spec compliance", () => {
       { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
     ].reduce((promise, data) => {
       const filePath = require.resolve(data.id)
-      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, filePath)
+      const url = getURLFromFilePath(filePath)
+      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, url)
 
       return promise
         .then(() => {
@@ -782,7 +798,8 @@ describe("spec compliance", () => {
 
   it("should warn for potential TDZ access", () => {
     const filePath = require.resolve("./fixture/cycle/tdz/a.mjs")
-    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", filePath)
+    const url = getURLFromFilePath(filePath)
+    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", url)
 
     mockIo.start()
     return import(filePath)
