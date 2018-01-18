@@ -11,6 +11,10 @@ const { isFile } = Stats.prototype
 let useStatFastPath = typeof internalModuleStat === "function"
 
 function stat(filePath) {
+  if (typeof filePath !== "string") {
+    return -1
+  }
+
   const { cache } = stat
 
   if (cache &&
@@ -43,6 +47,7 @@ function fallbackStat(filePath) {
   try {
     return isFile.call(statSync(filePath)) ? 0 : 1
   } catch (e) {}
+
   return -1
 }
 

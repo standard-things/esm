@@ -12,6 +12,10 @@ const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"
 let useReadFileFastPath = useInternalModuleReadFile || useInternalModuleReadJSON
 
 function readFileFast(filePath, options) {
+  if (typeof filePath !== "string") {
+    return null
+  }
+
   if (useReadFileFastPath &&
       options === "utf8") {
     try {

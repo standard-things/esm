@@ -9,6 +9,10 @@ const internalModuleReadFile = noDeprecationWarning(() => fsBinding.internalModu
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filePath, options) {
+  if (typeof filePath !== "string") {
+    return null
+  }
+
   if (useReadFileFastPath &&
       options === "utf8") {
     try {

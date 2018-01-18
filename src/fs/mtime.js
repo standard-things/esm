@@ -20,6 +20,10 @@ if (useMtimeFastPath) {
 }
 
 function mtime(filePath) {
+  if (typeof filePath !== "string") {
+    return -1
+  }
+
   if (useMtimeFastPath) {
     try {
       return fastPathMtime(filePath)
