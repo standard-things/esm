@@ -430,15 +430,17 @@ function tryValidateESM(manager, entry) {
     try {
       validateESM(entry)
     } catch (e) {
+      const { filename } = e
+
+      delete e.filename
+
       if (isStackTraceMasked(e)) {
         throw e
       }
 
-      const { filePath } = entry
-      const sourceCode = () => readSourceCode(filePath, options)
-
+      const sourceCode = () => readSourceCode(filename, options)
       captureStackTrace(e, manager)
-      throw maskStackTrace(e, sourceCode, filePath, true)
+      throw maskStackTrace(e, sourceCode, filename, true)
     }
   }
 }
