@@ -24,6 +24,7 @@ function maskStackTrace(error, sourceCode, filePath, isESM) {
   }
 
   decorateStackTrace(error)
+
   let { message, stack } = error
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
