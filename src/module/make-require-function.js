@@ -8,7 +8,7 @@ import errors from "../errors.js"
 import loadCJS from "./cjs/load.js"
 import moduleState from "./state.js"
 
-function makeRequireFunction(mod, requirer) {
+function makeRequireFunction(mod, requirer, resolver) {
   const req = function require(request) {
     moduleState.requireDepth += 1
 
@@ -24,7 +24,7 @@ function makeRequireFunction(mod, requirer) {
   }
 
   function resolve(request, options) {
-    return Module._resolveFilename(request, mod, false, options)
+    return resolver.call(mod, request, options)
   }
 
   function paths(request) {
@@ -33,6 +33,10 @@ function makeRequireFunction(mod, requirer) {
 
   if (typeof requirer !== "function") {
     requirer = (request) => loadCJS(request, mod, false)
+  }
+
+  if (typeof resolver !== "function") {
+    resolver = (request, options) => Module._resolveFilename(request, mod, false, options)
   }
 
   resolve.paths = paths
