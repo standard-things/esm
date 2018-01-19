@@ -34,6 +34,8 @@ function fastPathReadFile(filePath, options) {
   // creating Error objects on failure.
   filePath = toNamespacedPath(filePath)
 
+  // Warning: These internal methods will crash if `filePath` is a directory.
+  // https://github.com/nodejs/node/issues/8307
   const content = useInternalModuleReadJSON
     ? internalModuleReadJSON.call(fsBinding, filePath)
     : internalModuleReadFile.call(fsBinding, filePath)
