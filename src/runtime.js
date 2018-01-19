@@ -8,6 +8,7 @@ import errors from "./errors.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
+import resolveFilename from "./module/esm/resolve-filename.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -164,7 +165,8 @@ function runESM(entry, moduleWrapper) {
 
   if (options.cjs.vars) {
     const requirer = (request) => load(request, mod, loadESM).module.exports
-    const req = makeRequireFunction(mod, requirer)
+    const resolver = (request, options) => resolveFilename(request, mod, false, options)
+    const req = makeRequireFunction(mod, requirer, resolver)
 
     moduleWrapper.call(exported, shared.global, exported, req)
   } else {
