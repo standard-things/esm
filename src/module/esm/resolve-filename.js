@@ -59,7 +59,8 @@ function resolveFilename(request, parent, isMain) {
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (request.charCodeAt(0) === codeOfSlash || request.includes(":"))) {
+        (request.charCodeAt(0) === codeOfSlash ||
+         request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
       foundPath = getFilePathFromURL(parsed)
 

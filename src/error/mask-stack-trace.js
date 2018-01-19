@@ -10,6 +10,8 @@ import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
 
+const stdPath = __non_webpack_module__.filename
+
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 
@@ -116,7 +118,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
   return stack.replace(replaceArrowRegExp, (match, snippet, arrow, newline = "") => {
     const lineNum = +parts[1]
 
-    if (snippet.includes(ZWJ)) {
+    if (snippet.indexOf(ZWJ) !== -1) {
       if (typeof sourceCode === "function") {
         sourceCode = sourceCode(filePath)
       }
@@ -164,7 +166,7 @@ function resolveURL(name) {
 function scrub(stack) {
   return stack
     .split("\n")
-    .filter((line) => ! line.includes(__non_webpack_module__.filename))
+    .filter((line) => line.indexOf(stdPath) === -1)
     .join("\n")
     .replace(removeColumnInfoRegExp, ":1")
 }
