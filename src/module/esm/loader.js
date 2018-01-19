@@ -8,12 +8,9 @@ function loader(entry, fromPath, parentOptions, preload) {
   const { filePath, module:mod } = entry
 
   if (! mod.paths) {
-    if (parentOptions && parentOptions.cjs.paths &&
-        Module._nodeModulePaths !== moduleNodeModulePaths) {
-      mod.paths = Module._nodeModulePaths(fromPath)
-    } else {
-      mod.paths = moduleNodeModulePaths(fromPath)
-    }
+    mod.paths = parentOptions && parentOptions.cjs.paths
+      ? Module._nodeModulePaths(fromPath)
+      : moduleNodeModulePaths(fromPath)
   }
 
   if (! moduleState.parsing &&

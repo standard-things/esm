@@ -8,7 +8,6 @@ import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isError from "../../util/is-error.js"
 import loader from "./loader.js"
-import moduleResolveFilename from "../cjs/resolve-filename.js"
 import moduleState from "../state.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
@@ -26,12 +25,9 @@ function load(request, parent, isMain, preload) {
     parentOptions = parentPkgInfo && parentPkgInfo.options
     queryHash = getQueryHash(request)
 
-    if (parentOptions && parentOptions.cjs.paths &&
-        Module._resolveFilename !== moduleResolveFilename) {
-      filePath = Module._resolveFilename(request, parent, isMain)
-    } else {
-      filePath = resolveFilename(request, parent, isMain)
-    }
+    filePath = parentOptions && parentOptions.cjs.paths
+      ? Module._resolveFilename(request, parent, isMain)
+      : resolveFilename(request, parent, isMain)
 
     cacheKey =
     request = filePath + queryHash
