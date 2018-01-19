@@ -11,6 +11,7 @@ import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
 import hasEncodedSlash from "../../util/has-encoded-slash.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
+import isObject from "../../util/is-object.js"
 import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
@@ -35,14 +36,17 @@ for (const ext of gzExts) {
   gzExtsLookup[ext] = true
 }
 
-function resolveFilename(request, parent, isMain) {
+function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
   }
 
-  const cacheKey = request + "\0" + getModuleName(parent) + "\0" + isMain
+  const cacheKey = isObject(options)
+    ? null
+    : request + "\0" + getModuleName(parent) + "\0" + isMain
 
-  if (cacheKey in shared.resolveFilename) {
+  if (cacheKey &&
+      cacheKey in shared.resolveFilename) {
     return shared.resolveFilename[cacheKey]
   }
 
@@ -71,7 +75,7 @@ function resolveFilename(request, parent, isMain) {
       }
 
       if (foundPath) {
-        foundPath = _resolveFilename(foundPath, parent, isMain, true, true, noExts)
+        foundPath = _resolveFilename(foundPath, parent, isMain, options, true, true, noExts)
       }
     } else {
       // Prevent resolving non-local dependencies:
@@ -90,7 +94,7 @@ function resolveFilename(request, parent, isMain) {
       }
 
       const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
-      foundPath = _resolveFilename(decoded, parent, isMain, skipWarnings, skipGlobalPaths, searchExts)
+      foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts)
     }
   }
 
@@ -104,7 +108,7 @@ function resolveFilename(request, parent, isMain) {
   }
 
   skipWarnings = true
-  foundPath = _resolveFilename(request, parent, isMain, skipWarnings)
+  foundPath = _resolveFilename(request, parent, isMain, options, skipWarnings)
 
   if (foundPath) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_LEGACY", request, fromPath, foundPath)
