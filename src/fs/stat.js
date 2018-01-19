@@ -1,8 +1,8 @@
 import { Stats, statSync } from "fs"
 
 import binding from "../binding.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import moduleState from "../module/state.js"
+import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs

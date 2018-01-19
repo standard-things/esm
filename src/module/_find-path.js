@@ -52,7 +52,8 @@ function findPath(request, paths, isMain, skipWarnings, skipGlobalPaths, searchE
   while (++i < pathsCount) {
     const curPath = paths[i]
 
-    if (curPath && stat(curPath) !== 1) {
+    if (curPath &&
+        stat(curPath) !== 1) {
       continue
     }
 
