@@ -32,7 +32,6 @@ import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { satisfies } from "semver"
 import setProperty from "../util/set-property.js"
-import stat from "../fs/stat.js"
 import toOptInError from "../util/to-opt-in-error.js"
 import validateESM from "../module/esm/validate.js"
 import warn from "../warn.js"
@@ -213,7 +212,7 @@ function hook(Mod, parent) {
     const tryCompile = entry.esm ? tryCompileESM : tryCompileCJS
 
     if (noDepth) {
-      stat.cache = new NullObject
+      moduleState.stat = new NullObject
     }
 
     if (options.debug) {
@@ -233,7 +232,7 @@ function hook(Mod, parent) {
     }
 
     if (noDepth) {
-      stat.cache = null
+      moduleState.stat = null
     }
   }
 

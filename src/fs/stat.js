@@ -2,6 +2,7 @@ import { Stats, statSync } from "fs"
 
 import binding from "../binding.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
+import moduleState from "../module/state.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 const fsBinding = binding.fs
@@ -15,7 +16,7 @@ function stat(filePath) {
     return -1
   }
 
-  const { cache } = stat
+  const cache = moduleState.stat
 
   if (cache &&
       filePath in cache) {
@@ -57,7 +58,5 @@ function fastPathStat(filePath) {
   // comes from not creating thousands of Stat and Error objects.
   return internalModuleStat.call(fsBinding, toNamespacedPath(filePath))
 }
-
-stat.cache = null
 
 export default stat

@@ -10,5 +10,6 @@ state.globalPaths = _initPaths()
 state.mainModule = null
 state.parsing = null
 state.requireDepth = 0
+state.stat = null
 
 export default state
