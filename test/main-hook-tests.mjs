@@ -104,8 +104,9 @@ describe("module.runMain hook", function () {
       return
     }
 
-    const execPath = path.resolve("./fixture/options/env")
+    const execPath = path.resolve(testPath, "fixture/options/env")
     const cachePath = path.resolve(execPath, ".cache")
+
     const ESM_OPTIONS =
       "{cache:'" +
       cachePath.replace(/\\/g, "\\\\") +
