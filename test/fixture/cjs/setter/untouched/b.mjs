@@ -1,4 +1,4 @@
-import { one, two } from "./cjs.js"
+import { one, two } from "./a.js"
 
 export function sum() {
   return one + two

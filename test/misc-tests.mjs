@@ -482,7 +482,7 @@ describe("Node rules", () => {
   })
 
   it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
-    import("./misc/cache")
+    import("./cjs/cache")
       .then((ns) => ns.default())
   )
 
@@ -647,7 +647,7 @@ describe("Node rules", () => {
   )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
-    import("./misc/export/pseudo")
+    import("./cjs/export/pseudo.mjs")
       .then((ns) => ns.default())
   )
 })

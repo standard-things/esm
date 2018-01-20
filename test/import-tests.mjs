@@ -7,12 +7,12 @@ describe("import declarations", () => {
   )
 
   it("should support mixed import styles", () =>
-    import("./import/cjs/mixed.mjs")
+    import("./cjs/import/mixed.mjs")
       .then((ns) => ns.default())
   )
 
   it("should support CJS modules setting `module.exports`", () =>
-    import("./import/cjs/exports.mjs")
+    import("./cjs/import/exports.mjs")
       .then((ns) => ns.default())
   )
 

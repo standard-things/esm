@@ -1,5 +1,5 @@
 "use strict"
 
 exports.one = 1
-require("./esm.mjs")
+require("./b.mjs")
 exports.two = 2

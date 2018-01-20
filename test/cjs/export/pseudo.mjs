@@ -1,11 +1,11 @@
 import assert from "assert"
-import * as customNs from "../../../fixture/export/pseudo/custom.mjs"
-import * as defaultNs from "../../../fixture/export/pseudo/default.mjs"
-import * as noNs from "../../../fixture/export/abc.mjs"
+import * as customNs from "../../fixture/cjs/export/pseudo-custom.mjs"
+import * as defaultNs from "../../fixture/cjs/export/nothing.mjs"
+import * as noNs from "../../fixture/export/abc.mjs"
 
-const customValue = require("../../../fixture/export/pseudo/custom.mjs")
-const defaultValue = require("../../../fixture/export/pseudo/default.mjs")
-const noValue = require("../../../fixture/export/abc.mjs")
+const customValue = require("../../fixture/cjs/export/pseudo-custom.mjs")
+const defaultValue = require("../../fixture/cjs/export/nothing.mjs")
+const noValue = require("../../fixture/export/abc.mjs")
 
 const getDescriptor = Object.getOwnPropertyDescriptor
 
