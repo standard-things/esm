@@ -339,6 +339,13 @@ describe("Node rules", () => {
       .then(() => assert.ok(true))
   )
 
+  it("should support single character ids", () =>
+    // Test for single character package name bug:
+    // https://github.com/nodejs/node/pull/16634
+    import("./fixture/import/single-char.mjs")
+      .then(() => assert.ok(true))
+  )
+
   it('should support local "." ids', () =>
     Promise.all([
       "./fixture/relative/dot.js",
