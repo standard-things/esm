@@ -13,8 +13,8 @@ function createClass(Super) {
 }
 
 const errors = new FastObject
-const supers = [SyntaxError, TypeError]
 
-supers.forEach((Super) => errors[Super.name] = createClass(Super))
+errors.SyntaxError = createClass(SyntaxError)
+errors.TypeError = createClass(TypeError)
 
 export default errors

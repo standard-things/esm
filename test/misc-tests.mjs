@@ -490,7 +490,9 @@ describe("Node rules", () => {
       "node-path",
       "prefix-path"
     ]
-    .forEach((id) => assert.ok(require(id)))
+    .forEach((id) => {
+      assert.ok(require(id))
+    })
   )
 
   it("should resolve non-local dependencies with `require.resolve`", () =>
@@ -512,7 +514,9 @@ describe("Node rules", () => {
         filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
       }
     ]
-    .forEach((data) => assert.strictEqual(require.resolve(data.id), data.filePath))
+    .forEach((data) => {
+      assert.strictEqual(require.resolve(data.id), data.filePath)
+    })
   )
 
   it("should not resolve non-local dependencies with `require` in ESM", () =>
@@ -524,7 +528,9 @@ describe("Node rules", () => {
           "node-path",
           "prefix-path"
         ]
-        .forEach((id) => assert.throws(() => ns.default(id)))
+        .forEach((id) => {
+          assert.throws(() => ns.default(id))
+        })
     )
   )
 
@@ -537,7 +543,9 @@ describe("Node rules", () => {
           "node-path",
           "prefix-path"
         ]
-        .forEach((id) => assert.throws(() => ns.default.resolve(id)))
+        .forEach((id) => {
+          assert.throws(() => ns.default.resolve(id))
+        })
       )
   )
 
@@ -550,7 +558,9 @@ describe("Node rules", () => {
           "node-path",
           "prefix-path"
         ]
-        .forEach((id) => assert.ok(ns.default(id)))
+        .forEach((id) => {
+          assert.ok(ns.default(id))
+        })
       )
   )
 
@@ -575,7 +585,9 @@ describe("Node rules", () => {
             filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
           }
         ]
-        .forEach((data) => assert.strictEqual(ns.default.resolve(data.id), data.filePath))
+        .forEach((data) => {
+          assert.strictEqual(ns.default.resolve(data.id), data.filePath)
+        })
       )
   )
 

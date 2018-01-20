@@ -15,6 +15,7 @@ try {
 }
 
 const messages = new FastObject
+
 messages["ERR_EXPORT_MISSING"] = exportMissing
 messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
 messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
@@ -96,9 +97,9 @@ function unknownFileExtension(filePath) {
 }
 
 const errors = new FastObject
-const supers = [Error, TypeError]
 
+errors.Error = createNodeClass(Error)
 errors.SyntaxError = createBuiltinClass(SyntaxError)
-supers.forEach((Super) => errors[Super.name] = createNodeClass(Super))
+errors.TypeError = createNodeClass(TypeError)
 
 export default errors

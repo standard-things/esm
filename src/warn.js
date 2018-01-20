@@ -5,17 +5,17 @@ import getModuleURL from "./util/get-module-url.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const cacheKeys = new FastObject
+const messages = new FastObject
+const warned = new FastObject
+
 cacheKeys["WRN_NS_ASSIGNMENT"] =
 cacheKeys["WRN_NS_EXTENSION"] =
 cacheKeys["WRN_TDZ_ACCESS"] = moduleCacheKey
 
-const messages = new FastObject
 messages["WRN_ARGUMENTS_ACCESS"] = argumentsAccess
 messages["WRN_NS_ASSIGNMENT"] = namespaceAssignment
 messages["WRN_NS_EXTENSION"] = namespaceExtension
 messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
-
-const warned = new FastObject
 
 function moduleCacheKey(request, name) {
   return getModuleURL(request) + "\0" + name

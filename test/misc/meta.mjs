@@ -25,8 +25,10 @@ const percentPath = path.resolve(testPath, "fixture/with%2520percent.mjs")
 const percentURL = testURL + "/fixture/with%2520percent.mjs"
 
 export default () => {
-  const defs = [colon1, colon2, pound1, pound2, percent1, percent2]
-  defs.forEach((def) => assert.strictEqual(Object.getPrototypeOf(def), null))
+  [colon1, colon2, pound1, pound2, percent1, percent2]
+    .forEach((def) => {
+      assert.strictEqual(Object.getPrototypeOf(def), null)
+    })
 
   let meta = createMeta({ url: colonURL })
   assert.deepStrictEqual(colon1, meta)

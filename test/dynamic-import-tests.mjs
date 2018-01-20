@@ -112,8 +112,8 @@ describe("dynamic import", () => {
     assert.ok(p())
   })
 
-  it("should be syntactic", () => {
-    const invalids = [
+  it("should be syntactic", () =>
+    [
       "const f = import",
       "import.length",
       "import.name",
@@ -121,21 +121,19 @@ describe("dynamic import", () => {
       "import.call()",
       "import.toString()"
     ]
-
-    invalids.forEach((code) => {
+    .forEach((code) => {
       assert.throws(() => Compiler.compile(code), SyntaxError)
     })
-  })
+  )
 
-  it("should accept exactly one argument", () => {
-    const invalids = [
+  it("should accept exactly one argument", () =>
+    [
       "import()",
       "import(a,b)",
       "import(...[a])"
     ]
-
-    invalids.forEach((code) => {
+    .forEach((code) => {
       assert.throws(() => Compiler.compile(code), SyntaxError)
     })
-  })
+  )
 })
