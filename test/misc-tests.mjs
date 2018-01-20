@@ -5,6 +5,7 @@ import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import mockIo from "mock-stdio"
+import path from "path"
 import require from "./require.js"
 import util from "util"
 
@@ -485,6 +486,15 @@ describe("Node rules", () => {
       .then((ns) => ns.default())
   )
 
+  it('should not resolve non-local "." ids with `require`', () => {
+    try {
+      require(".")
+      assert.ok(false)
+    } catch (e) {
+      assert.strictEqual(e.code, "MODULE_NOT_FOUND")
+    }
+  })
+
   it("should resolve non-local dependencies with `require`", () =>
     [
       "home-node-libraries",
@@ -495,6 +505,36 @@ describe("Node rules", () => {
     .forEach((id) => {
       assert.ok(require(id))
     })
+  )
+
+  it("should not resolve non-local dependencies with `require` in ESM", () =>
+    import("./fixture/require-paths/off")
+      .then((ns) =>
+        [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .forEach((id) => {
+          assert.throws(() => ns.default(id))
+        })
+    )
+  )
+
+  it("should resolve non-local dependencies with `require` in ESM with `options.cjs.paths`", () =>
+    import("./fixture/require-paths/on")
+      .then((ns) =>
+        [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .forEach((id) => {
+          assert.ok(ns.default(id))
+        })
+      )
   )
 
   it("should resolve non-local dependencies with `require.resolve`", () =>
@@ -521,21 +561,6 @@ describe("Node rules", () => {
     })
   )
 
-  it("should not resolve non-local dependencies with `require` in ESM", () =>
-    import("./fixture/require-paths/off")
-      .then((ns) =>
-        [
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
-        .forEach((id) => {
-          assert.throws(() => ns.default(id))
-        })
-    )
-  )
-
   it("should not resolve non-local dependencies with `require.resolve` in ESM", () =>
     import("./fixture/require-paths/off")
       .then((ns) =>
@@ -547,21 +572,6 @@ describe("Node rules", () => {
         ]
         .forEach((id) => {
           assert.throws(() => ns.default.resolve(id))
-        })
-      )
-  )
-
-  it("should resolve non-local dependencies with `require` in ESM with `options.cjs.paths`", () =>
-    import("./fixture/require-paths/on")
-      .then((ns) =>
-        [
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
-        .forEach((id) => {
-          assert.ok(ns.default(id))
         })
       )
   )
@@ -593,14 +603,22 @@ describe("Node rules", () => {
       )
   )
 
-  it('should not resolve non-local "." ids with `require`', () => {
-    try {
-      require(".")
-      assert.ok(false)
-    } catch (e) {
-      assert.strictEqual(e.code, "MODULE_NOT_FOUND")
-    }
+  it("should support `options` in `require.resolve`", () => {
+    const paths = [path.resolve("./fixture/paths")]
+    const actual = require.resolve("a", { paths })
+
+    assert.strictEqual(actual, path.resolve("./fixture/paths/node_modules/a/index.js"))
   })
+
+  it("should support `options` in `require.resolve` in ESM with `options.cjs.paths`", () =>
+    import("./fixture/require-paths/on")
+      .then((ns) => {
+        const paths = [path.resolve("./fixture/paths")]
+        const actual = ns.default.resolve("a", { paths })
+
+        assert.strictEqual(actual, path.resolve("./fixture/paths/node_modules/a/index.js"))
+      })
+  )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/export/pseudo")
