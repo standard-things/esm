@@ -13,7 +13,6 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 const isWin = process.platform === "win32"
 
 const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
-const skipOutsideDot = SemVer.satisfies(process.version, ">=10")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
@@ -406,11 +405,7 @@ describe("Node rules", () => {
   it('should not resolve non-local "." ids', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => checkError(e,
-        skipOutsideDot
-          ? "ERR_MISSING_MODULE"
-          : "ERR_MODULE_RESOLUTION_LEGACY"
-      ))
+      .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
   )
 
   it("should not reevaluate errors", () =>
@@ -591,21 +586,12 @@ describe("Node rules", () => {
       )
   )
 
-  it('should resolve non-local "." ids with `require`', () => {
+  it('should not resolve non-local "." ids with `require`', () => {
     try {
-      const exported = require(".")
-
-      if (skipOutsideDot) {
-        assert.ok(false)
-      } else {
-        assert.strictEqual(exported, "outside dot")
-      }
+      require(".")
+      assert.ok(false)
     } catch (e) {
-      if (skipOutsideDot) {
-        checkError(e, "ERR_MISSING_MODULE")
-      } else {
-        throw e
-      }
+      assert.strictEqual(e.code, "MODULE_NOT_FOUND")
     }
   })
 

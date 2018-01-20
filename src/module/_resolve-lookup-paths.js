@@ -2,51 +2,29 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
-import { dirname, resolve } from "path"
-
 import Module from "../module.js"
 
+import { dirname } from "path"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
-import { satisfies } from "semver"
 
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
-const skipOutsideDot = satisfies(process.version, ">=10")
 const { slice } = Array.prototype
 
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
-  let lookOutside
   const code0 = request.charCodeAt(0)
   const code1 = request.charCodeAt(1)
-  const isDot = request === "."
-
-  if (skipOutsideDot) {
-    lookOutside =
-      ! isDot &&
-      ! (code0 === codeOfDot &&
-          (code1 === codeOfDot ||
-           code1 === codeOfSlash))
-  } else {
-    lookOutside =
-      request.length < 2 ||
-      code0 !== codeOfDot ||
-      (code1 !== codeOfDot &&
-       code1 !== codeOfSlash)
-  }
-
   const parentFilePath = parent && parent.filename
 
-  if (lookOutside) {
+  // Look outside if not a relative path.
+  if (request !== "." &&
+      ! (code0 === codeOfDot &&
+         (code1 === codeOfDot ||
+          code1 === codeOfSlash))) {
     const parentPaths = parent && parent.paths
     const paths = parentPaths ? slice.call(parentPaths) : []
-
-    // Maintain backwards compat with certain broken uses of `require(".")`
-    // by putting the module's directory in front of the lookup paths.
-    if (isDot) {
-      paths.unshift(parentFilePath ? dirname(parentFilePath) : resolve(request))
-    }
 
     if (parentPaths &&
         ! skipGlobalPaths) {

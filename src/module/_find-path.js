@@ -7,11 +7,9 @@ import { isAbsolute, resolve } from "path"
 import Module from "../module.js"
 
 import binding from "../binding.js"
-import emitDeprecationWarning from "../warning/emit-deprecation-warning.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
-import { satisfies } from "semver"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
@@ -22,10 +20,8 @@ const { parse } = JSON
 const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
 const mainFieldRegExp = /"main"/
-const skipOutsideDot = satisfies(process.version, ">=10")
-let warned = false
 
-function findPath(request, paths, isMain, skipWarnings, skipGlobalPaths, searchExts) {
+function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
@@ -98,22 +94,6 @@ function findPath(request, paths, isMain, skipWarnings, skipGlobalPaths, searchE
     }
 
     if (filePath) {
-      // Warn once if "." resolved outside the module directory.
-      if (request === "." &&
-          i > 0 &&
-          ! warned &&
-          ! skipGlobalPaths &&
-          ! skipOutsideDot &&
-          ! skipWarnings) {
-        warned = true
-
-        emitDeprecationWarning(
-          "require('.') resolved outside the package directory. " +
-          "This functionality is deprecated and will be removed soon.",
-          "DEP0019"
-        )
-      }
-
       return shared.findPath[cacheKey] = filePath
     }
   }

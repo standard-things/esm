@@ -39,7 +39,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
     paths = _resolveLookupPaths(request, parent, skipGlobalPaths)
   }
 
-  return _findPath(request, paths, isMain, skipWarnings, skipGlobalPaths, searchExts)
+  return _findPath(request, paths, isMain, searchExts)
 }
 
 export default resolveFilename

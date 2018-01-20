@@ -230,7 +230,7 @@ function readInfo(dirPath, force) {
   if (optionsFound) {
     options = parseJSON6(options)
   } else {
-    optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, true, true, searchExts)
+    optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, searchExts)
   }
 
   if (optionsPath) {
