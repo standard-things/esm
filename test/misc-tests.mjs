@@ -483,16 +483,101 @@ describe("Node rules", () => {
       .then((ns) => ns.default())
   )
 
-  it("should resolve non-local dependencies with `require`", () => {
-    const ids = [
+  it("should resolve non-local dependencies with `require`", () =>
+    [
       "home-node-libraries",
       "home-node-modules",
       "node-path",
       "prefix-path"
     ]
+    .forEach((id) => assert.ok(require(id)))
+  )
 
-    ids.map((id) => assert.ok(require(id)))
-  })
+  it("should resolve non-local dependencies with `require.resolve`", () =>
+    [
+      {
+        id: "home-node-libraries",
+        filePath: require.resolve("./env/home/.node_libraries/home-node-libraries/index.js")
+      },
+      {
+        id: "home-node-modules",
+        filePath:require.resolve("./env/home/.node_modules/home-node-modules/index.js")
+      },
+      {
+        id: "node-path",
+        filePath: require.resolve("./env/node_path/node-path/index.js")
+      },
+      {
+        id: "prefix-path",
+        filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
+      }
+    ]
+    .forEach((data) => assert.strictEqual(require.resolve(data.id), data.filePath))
+  )
+
+  it("should not resolve non-local dependencies with `require` in ESM", () =>
+    import("./fixture/require-paths/off")
+      .then((ns) =>
+        [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .forEach((id) => assert.throws(() => ns.default(id)))
+    )
+  )
+
+  it("should not resolve non-local dependencies with `require.resolve` in ESM", () =>
+    import("./fixture/require-paths/off")
+      .then((ns) =>
+        [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .forEach((id) => assert.throws(() => ns.default.resolve(id)))
+      )
+  )
+
+  it("should resolve non-local dependencies with `require` in ESM with `options.cjs.paths`", () =>
+    import("./fixture/require-paths/on")
+      .then((ns) =>
+        [
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .forEach((id) => assert.ok(ns.default(id)))
+      )
+  )
+
+  it("should resolve non-local dependencies with `require.resolve` in ESM with `options.cjs.paths`", () =>
+    import("./fixture/require-paths/on")
+      .then((ns) =>
+        [
+          {
+            id: "home-node-libraries",
+            filePath: require.resolve("./env/home/.node_libraries/home-node-libraries/index.js")
+          },
+          {
+            id: "home-node-modules",
+            filePath:require.resolve("./env/home/.node_modules/home-node-modules/index.js")
+          },
+          {
+            id: "node-path",
+            filePath: require.resolve("./env/node_path/node-path/index.js")
+          },
+          {
+            id: "prefix-path",
+            filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
+          }
+        ]
+        .forEach((data) => assert.strictEqual(ns.default.resolve(data.id), data.filePath))
+      )
+  )
 
   it('should resolve non-local "." ids with `require`', () => {
     try {

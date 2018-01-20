@@ -1,0 +1,7 @@
+{
+  cjs: {
+    paths: true,
+    vars: true
+  },
+  debug: true
+}
