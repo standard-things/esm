@@ -620,6 +620,32 @@ describe("Node rules", () => {
       })
   )
 
+  it("should support `require.resolve.paths`", () => {
+    const expected = [
+      path.resolve("./node_modules"),
+      path.resolve("../node_modules")
+    ]
+
+    const actual = require.resolve.paths("a").slice(0, 2)
+    assert.deepStrictEqual(actual, expected)
+  })
+
+  it("should support `require.resolve.paths` in ESM with `options.cjs.paths`", () =>
+    import("./fixture/require-paths/on")
+      .then((ns) => {
+        const expected = [
+          path.resolve("./fixture/require-paths/on/node_modules"),
+          path.resolve("./fixture/require-paths/node_modules"),
+          path.resolve("./fixture/node_modules"),
+          path.resolve("./node_modules"),
+          path.resolve("../node_modules")
+        ]
+
+        const actual = ns.default.resolve.paths("a").slice(0, 5)
+        assert.deepStrictEqual(actual, expected)
+      })
+  )
+
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
     import("./misc/export/pseudo")
       .then((ns) => ns.default())
