@@ -215,6 +215,7 @@ Tips
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `@std/esm` with the `--node-args="-r @std/esm"` option of
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
+* Load `@std/esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
 * Use `@std/esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
 * Use `"@std/esm":"cjs"` for the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
