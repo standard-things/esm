@@ -641,6 +641,11 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
+  it("should namespace objects should be thenable", () =>
+    import("./fixture/export/thenable.mjs")
+      .then((value) => assert.strictEqual(value, "thenable"))
+  )
+
   it("should have a top-level `this` of `undefined`", () =>
     import("./misc/this.mjs")
       .then((ns) => ns.default())
