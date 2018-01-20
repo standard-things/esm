@@ -793,15 +793,33 @@ describe("spec compliance", () => {
   )
 
   it("should error with legacy code missing modules in CJS", () =>
-    import("./fixture/import/missing/module/cjs.js")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+    Promise.all([
+      "./fixture/import/missing/module/cjs.js",
+      "./fixture/import/missing/module/no-ext.js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+    ))
+  )
+
+  it("should error with legacy code missing modules in CJS with `options.cjs.vars`", () =>
+    Promise.all([
+      "./fixture/cjs/missing/module/cjs.js",
+      "./fixture/cjs/missing/module/esm.js",
+      "./fixture/cjs/missing/module/no-ext.js"
+    ].map((id) =>
+      import(id)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+    ))
   )
 
   it("should error for missing modules before code execution", () =>
     Promise.all([
       "./fixture/import/missing/module/cjs.mjs",
       "./fixture/import/missing/module/esm.mjs",
+      "./fixture/import/missing/module/no-ext.mjs",
       "./fixture/cycle/missing/module/a.mjs"
     ].map((id) =>
       import(id)
