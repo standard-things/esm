@@ -1,4 +1,4 @@
-import { extname as _extname, dirname, resolve } from "path"
+import { extname as _extname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -48,24 +48,41 @@ function hook(Mod, parent) {
   let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
   const { _extensions } = Mod
-  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
-  const defaultOptions = defaultPkgInfo.options
-  const parentPkgInfo = PkgInfo.from(parent, true)
   const passthruMap = new SafeMap
 
-  assign(defaultPkgInfo, parentPkgInfo)
-  defaultPkgInfo.options = assign(defaultOptions, parentPkgInfo.options)
-  defaultPkgInfo.range = "*"
+  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
+  const defaultOptions = defaultPkgInfo.options
+  let parentPkgInfo = PkgInfo.from(parent)
 
-  if (defaultPkgInfo.options.esm === "all") {
-    defaultPkgInfo.options.esm = "js"
+  if (parentPkgInfo) {
+    assign(defaultPkgInfo, parentPkgInfo)
+    assign(defaultOptions, parentPkgInfo.options)
   }
 
+  if (! parent &&
+      env.vars.ESM_OPTIONS) {
+    assign(defaultOptions, PkgInfo.createOptions(env.vars.ESM_OPTIONS))
+  }
+
+  if (! parentPkgInfo) {
+    parentPkgInfo = PkgInfo.from(parent, true)
+    assign(parentPkgInfo.options, defaultOptions)
+    assign(defaultPkgInfo, parentPkgInfo)
+  }
+
+  if (defaultOptions.esm === "all") {
+    defaultOptions.esm = "js"
+  }
+
+  defaultPkgInfo.options = defaultOptions
+  defaultPkgInfo.range = "*"
+
   Module._extensions = _extensions
+  PkgInfo.defaultPkgInfo = defaultPkgInfo
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const pkgInfo = PkgInfo.get(dirname(filePath)) || defaultPkgInfo
+    const pkgInfo = PkgInfo.from(filePath)
     const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
 
     return wrapped
