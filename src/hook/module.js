@@ -203,6 +203,7 @@ function hook(Mod, parent) {
           tryValidateESM(manager, entry)
         }
       } else {
+        entry.state = 3
         tryCompileCached(entry)
       }
     }
