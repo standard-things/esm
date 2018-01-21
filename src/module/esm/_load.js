@@ -1,3 +1,4 @@
+import Entry from "../../entry.js"
 import Module from "../../module.js"
 import PkgInfo from "../../pkg-info.js"
 
@@ -21,8 +22,8 @@ function load(request, parent, isMain, preload) {
   let entry = request
 
   if (typeof request === "string") {
-    const parentPkgInfo = PkgInfo.from(parent)
-    parentOptions = parentPkgInfo && parentPkgInfo.options
+    const parentEntry = Entry.get(parent)
+    parentOptions = parentEntry && parentEntry.options
     queryHash = getQueryHash(request)
 
     filePath = parentOptions && parentOptions.cjs.paths
