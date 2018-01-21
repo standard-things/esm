@@ -5,6 +5,8 @@ import _loadCJS from "./module/cjs/_load.js"
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
 import errors from "./errors.js"
+import getFilePathFromURL from "./util/get-file-path-from-url.js"
+import isError from "./util/is-error.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
@@ -138,13 +140,28 @@ function load(request, parent, loader, preload) {
 
 function runCJS(entry, moduleWrapper) {
   const { module:mod, options } = entry
+  const cjsVars = options.cjs.vars
   const exported = mod.exports = entry.exports
-  const loader = options.cjs.vars ? loadESM : _loadCJS
+  const loader = cjsVars ? loadESM : _loadCJS
   const req = makeRequireFunction(mod, (request) => {
-    const childEntry = load(request, mod, loader)
+    let childEntry
+
+    try {
+      childEntry = load(request, mod, loader)
+    } catch (e) {
+      if (isError(e) &&
+          e.code === "ERR_MISSING_MODULE") {
+        const { message } = e
+        const url = message.slice(message.lastIndexOf(" ") + 1)
+        throw new errors.Error("MODULE_NOT_FOUND", getFilePathFromURL(url))
+      }
+
+      throw e
+    }
+
     const child = childEntry.module
 
-    if (! options.cjs.vars &&
+    if (! cjsVars &&
         childEntry.esm) {
       throw new errors.Error("ERR_REQUIRE_ESM", child)
     }
