@@ -8,7 +8,6 @@ import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
-import toStringLiteral from "../../util/to-string-literal.js"
 
 const { isArray } = Array
 
@@ -61,9 +60,7 @@ function resolveFilename(request, parent, isMain, options) {
       : foundPath
   }
 
-  const error = new Error("Cannot find module " + toStringLiteral(request, "'"))
-  error.code = "MODULE_NOT_FOUND"
-  throw error
+  throw new errors.Error("MODULE_NOT_FOUND", request)
 }
 
 export default resolveFilename

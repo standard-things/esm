@@ -20,10 +20,11 @@ messages["ERR_EXPORT_MISSING"] = exportMissing
 messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
 messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
 messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
-messages["ERR_MISSING_MODULE"] = missingModule
+messages["ERR_MISSING_MODULE"] = missingESM
 messages["ERR_MODULE_RESOLUTION_LEGACY"] = moduleResolutionLegacy
 messages["ERR_REQUIRE_ESM"] = requireESM
 messages["ERR_UNKNOWN_FILE_EXTENSION"] = unknownFileExtension
+messages["MODULE_NOT_FOUND"] = missingCJS
 
 function createBuiltinClass(Super) {
   return class BuiltinError extends Super {
@@ -37,7 +38,13 @@ function createNodeClass(Super) {
   return class NodeError extends Super {
     constructor(code, ...args) {
       super(messages[code](...args))
-      setProperty(this, codeSym, { enumerable: false, value: code })
+
+      if (code === "MODULE_NOT_FOUND") {
+        this.code = code
+        this.name = super.name
+      } else {
+        setProperty(this, codeSym, { enumerable: false, value: code })
+      }
     }
 
     get code() {
@@ -79,7 +86,11 @@ function invalidProtocol(protocol, expected) {
     "' not supported. Expected '" + expected + "'"
 }
 
-function missingModule(request) {
+function missingCJS(request) {
+  return "Cannot find module " + toStringLiteral(request, "'")
+}
+
+function missingESM(request) {
   return "Cannot find module " + getModuleURL(request)
 }
 
