@@ -3,7 +3,6 @@ import PkgInfo from "../../pkg-info.js"
 
 import _resolveFilename from "./_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
-import { dirname } from "path"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
@@ -56,7 +55,7 @@ function resolveFilename(request, parent, isMain, options) {
   let skipWarnings = false
 
   const isAbs = isAbsolutePath(request)
-  const fromPath = isAbs ? dirname(request) : getModuleDirname(parent)
+  const fromPath = getModuleDirname(isAbs ? request : parent)
   const pkgInfo = PkgInfo.get(fromPath)
   const pkgOptions = pkgInfo && pkgInfo.options
 
