@@ -46,8 +46,13 @@ const cjsKeys = Object.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class PkgInfo {
+  static cache =
+    shared.pkgInfo[cacheKey] ||
+    (shared.pkgInfo[cacheKey] = new FastObject)
+
   static createOptions = createOptions
   static defaultOptions = defaultOptions
+  static defaultPkgInfo = null
 
   constructor(dirPath, range, options) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
@@ -82,12 +87,6 @@ class PkgInfo {
     this.options = options
     this.range = range
   }
-
-  static cache =
-    shared.pkgInfo[cacheKey] ||
-    (shared.pkgInfo[cacheKey] = new FastObject)
-
-  static defaultPkgInfo = null
 
   static get(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
