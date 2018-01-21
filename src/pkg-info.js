@@ -87,6 +87,8 @@ class PkgInfo {
     shared.pkgInfo[cacheKey] ||
     (shared.pkgInfo[cacheKey] = new FastObject)
 
+  static defaultPkgInfo = null
+
   static get(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
 
@@ -95,7 +97,8 @@ class PkgInfo {
     if (dirPath in PkgInfo.cache) {
       pkgInfo = PkgInfo.cache[dirPath]
 
-      if (! force || pkgInfo) {
+      if (! force ||
+          pkgInfo) {
         return pkgInfo
       }
     }
@@ -111,6 +114,11 @@ class PkgInfo {
     if (pkgInfo === null) {
       const parentPath = dirname(dirPath)
       pkgInfo = parentPath === dirPath ? null : PkgInfo.get(parentPath)
+    }
+
+    if (pkgInfo === null &&
+          PkgInfo.defaultPkgInfo) {
+      pkgInfo = PkgInfo.defaultPkgInfo
     }
 
     if (force &&

@@ -53,12 +53,12 @@ if (shared.inited) {
   shared.inited = true
 
   if (env.repl) {
-    replHook(vm)
     moduleHook(Module)
+    replHook(vm)
   } else if (env.cli) {
     const BuiltinModule = __non_webpack_module__.constructor
-    mainHook(BuiltinModule)
     moduleHook(BuiltinModule)
+    mainHook(BuiltinModule)
   }
 }
 
