@@ -616,25 +616,25 @@ describe("Node rules", () => {
   )
 
   it("should support `options` in `require.resolve`", () => {
-    const paths = [path.resolve("./fixture/paths")]
+    const paths = [path.resolve("fixture/paths")]
     const actual = require.resolve("a", { paths })
 
-    assert.strictEqual(actual, path.resolve("./fixture/paths/node_modules/a/index.js"))
+    assert.strictEqual(actual, path.resolve("fixture/paths/node_modules/a/index.js"))
   })
 
   it("should support `options` in `require.resolve` in ESM with `options.cjs.paths`", () =>
     import("./fixture/require-paths/on")
       .then((ns) => {
-        const paths = [path.resolve("./fixture/paths")]
+        const paths = [path.resolve("fixture/paths")]
         const actual = ns.default.resolve("a", { paths })
 
-        assert.strictEqual(actual, path.resolve("./fixture/paths/node_modules/a/index.js"))
+        assert.strictEqual(actual, path.resolve("fixture/paths/node_modules/a/index.js"))
       })
   )
 
   it("should support `require.resolve.paths`", () => {
     const expected = [
-      path.resolve("./node_modules"),
+      path.resolve("node_modules"),
       path.resolve("../node_modules")
     ]
 
@@ -646,10 +646,10 @@ describe("Node rules", () => {
     import("./fixture/require-paths/on")
       .then((ns) => {
         const expected = [
-          path.resolve("./fixture/require-paths/on/node_modules"),
-          path.resolve("./fixture/require-paths/node_modules"),
-          path.resolve("./fixture/node_modules"),
-          path.resolve("./node_modules"),
+          path.resolve("fixture/require-paths/on/node_modules"),
+          path.resolve("fixture/require-paths/node_modules"),
+          path.resolve("fixture/node_modules"),
+          path.resolve("node_modules"),
           path.resolve("../node_modules")
         ]
 
