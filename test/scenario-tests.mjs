@@ -2,15 +2,14 @@ import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
-import require from "./require.js"
 import trash from "../script/trash.js"
 
 const canTestPM2 = ! ("TRAVIS" in process.env)
 
 const isWin = process.platform === "win32"
 
-const pkgPath = require.resolve("../")
-const testPath = path.dirname(require.resolve("./tests.mjs"))
+const pkgPath = path.resolve("../index.js")
+const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 function exec(filePath, args) {

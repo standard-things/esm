@@ -1,10 +1,11 @@
 import assert from "assert"
 import makeRequire from "../../index.js"
 import module from "../module.js"
+import path from "path"
 import require from "../require.js"
 
-const abcPath = require.resolve("./fixture/export/abc.mjs")
-const defPath = require.resolve("./fixture/export/def.js")
+const abcPath = path.resolve("fixture/export/abc.mjs")
+const defPath = path.resolve("fixture/export/def.js")
 
 export default () => {
   const keys = ["sourceMap", "sourcemap"]

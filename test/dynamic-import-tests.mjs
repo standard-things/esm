@@ -3,13 +3,12 @@ import Compiler from "../build/compiler.js"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import path from "path"
-import require from "./require.js"
 import url from "url"
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
-const abcPath = require.resolve("./fixture/export/abc.mjs")
+const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = fileProtocol + abcPath.replace(/\\/g, "/")
 const abcNs = createNamespace({
   a: "a",

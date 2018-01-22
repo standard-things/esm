@@ -1,12 +1,11 @@
 import assert from "assert"
 import execa from "execa"
 import path from "path"
-import require from "./require.js"
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
-const testPath = path.dirname(require.resolve("./tests.mjs"))
+const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 function node(args) {

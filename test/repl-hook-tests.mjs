@@ -4,11 +4,12 @@ import Runtime from "../build/runtime.js"
 import assert from "assert"
 import isPlainObject from "./is-plain-object.js"
 import module from "./module.js"
+import path from "path"
 import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
-const pkgPath = require.resolve("../")
+const pkgPath = path.resolve("../index.js")
 const parent = require.cache[pkgPath].parent
 const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
 

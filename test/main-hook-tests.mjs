@@ -5,7 +5,6 @@ import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
-import require from "./require.js"
 import trash from "../script/trash.js"
 import vm from "vm"
 
@@ -29,13 +28,13 @@ try {
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
-const pkgPath = require.resolve("../")
+const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
   : pkgJSON["@std/esm"]
 
-const testPath = path.dirname(require.resolve("./tests.mjs"))
+const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 function node(args, env) {

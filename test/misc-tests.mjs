@@ -18,13 +18,13 @@ const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
-const pkgPath = require.resolve("../")
+const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
   : pkgJSON["@std/esm"]
 
-const abcPath = require.resolve("./fixture/export/abc.mjs")
+const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
 const abcNs = createNamespace({
   a: "a",
@@ -221,13 +221,13 @@ describe("errors", () => {
   )
 
   it("should mask stack arrows", () => {
-    const id1 = require.resolve("./fixture/error/import.mjs")
-    const id2 = require.resolve("./fixture/error/export.js")
-    const id3 = require.resolve("./fixture/error/import.js")
-    const id4 = require.resolve("./fixture/error/missing.mjs")
-    const id5 = require.resolve("./fixture/error/nested.mjs")
-    const id6 = require.resolve("./fixture/error/syntax.js")
-    const id7 = require.resolve("./node_modules/error/index.js")
+    const id1 = path.resolve("fixture/error/import.mjs")
+    const id2 = path.resolve("fixture/error/export.js")
+    const id3 = path.resolve("fixture/error/import.js")
+    const id4 = path.resolve("fixture/error/missing.mjs")
+    const id5 = path.resolve("fixture/error/nested.mjs")
+    const id6 = path.resolve("fixture/error/syntax.js")
+    const id7 = path.resolve("node_modules/error/index.js")
 
     return Promise.all([
       import(id1)
@@ -486,7 +486,7 @@ describe("Node rules", () => {
   )
 
   it("should not expose ESM in `require.cache`", () => {
-    const filePath = require.resolve("./fixture/cache/out")
+    const filePath = path.resolve("fixture/cache/out/index.mjs")
 
     delete require.cache[filePath]
     return import(filePath)
@@ -553,23 +553,23 @@ describe("Node rules", () => {
     [
       {
         id: "home-node-libraries",
-        filePath: require.resolve("./env/home/.node_libraries/home-node-libraries/index.js")
+        resolved: path.resolve("env/home/.node_libraries/home-node-libraries/index.js")
       },
       {
         id: "home-node-modules",
-        filePath:require.resolve("./env/home/.node_modules/home-node-modules/index.js")
+        resolved: path.resolve("env/home/.node_modules/home-node-modules/index.js")
       },
       {
         id: "node-path",
-        filePath: require.resolve("./env/node_path/node-path/index.js")
+        resolved: path.resolve("env/node_path/node-path/index.js")
       },
       {
         id: "prefix-path",
-        filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
+        resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
       }
     ]
     .forEach((data) => {
-      assert.strictEqual(require.resolve(data.id), data.filePath)
+      assert.strictEqual(require.resolve(data.id), data.resolved)
     })
   )
 
@@ -594,23 +594,23 @@ describe("Node rules", () => {
         [
           {
             id: "home-node-libraries",
-            filePath: require.resolve("./env/home/.node_libraries/home-node-libraries/index.js")
+            resolved: path.resolve("env/home/.node_libraries/home-node-libraries/index.js")
           },
           {
             id: "home-node-modules",
-            filePath:require.resolve("./env/home/.node_modules/home-node-modules/index.js")
+            resolved: path.resolve("env/home/.node_modules/home-node-modules/index.js")
           },
           {
             id: "node-path",
-            filePath: require.resolve("./env/node_path/node-path/index.js")
+            resolved: path.resolve("env/node_path/node-path/index.js")
           },
           {
             id: "prefix-path",
-            filePath: require.resolve("./env/prefix/lib/node/prefix-path/index.js")
+            resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
           }
         ]
         .forEach((data) => {
-          assert.strictEqual(ns.default.resolve(data.id), data.filePath)
+          assert.strictEqual(ns.default.resolve(data.id), data.resolved)
         })
       )
   )
@@ -764,7 +764,7 @@ describe("spec compliance", () => {
       return promise
         .then(() => {
           delete global.loadCount
-          delete require.cache[require.resolve("./fixture/load-count.js")]
+          delete require.cache[path.resolve("fixture/load-count.js")]
           return import(id)
         })
         .then(() => assert.strictEqual(global.loadCount, 1))
@@ -873,7 +873,7 @@ describe("spec compliance", () => {
   )
 
   it("should error when creating an `arguments` binding", () => {
-    const id = require.resolve("./fixture/source/arguments-binding.mjs")
+    const id = path.resolve("fixture/source/arguments-binding.mjs")
 
     import(id)
       .then(() => assert.ok(false))
@@ -888,7 +888,7 @@ describe("spec compliance", () => {
   })
 
   it("should error when creating an `await` binding", () => {
-    const id = require.resolve("./fixture/source/await-binding.mjs")
+    const id = path.resolve("fixture/source/await-binding.mjs")
 
     return import(id)
       .then(() => assert.ok(false))
@@ -903,7 +903,7 @@ describe("spec compliance", () => {
   })
 
   it("should error when exporting non-local bindings", () => {
-    const id = require.resolve("./fixture/source/non-local-export.mjs")
+    const id = path.resolve("fixture/source/non-local-export.mjs")
 
     return import(id)
       .then(() => assert.ok(false))
@@ -918,7 +918,7 @@ describe("spec compliance", () => {
   })
 
   it("should error when using top-level `new.target`", () => {
-    const id = require.resolve("./fixture/source/new-target.mjs")
+    const id = path.resolve("fixture/source/new-target.mjs")
 
     return import(id)
       .then(() => assert.ok(false))
@@ -933,7 +933,7 @@ describe("spec compliance", () => {
   })
 
   it("should error when using an opening HTML comment in ESM", () => {
-    const id = require.resolve("./fixture/source/html-comment.mjs")
+    const id = path.resolve("fixture/source/html-comment.mjs")
 
     return import(id)
       .then(() => assert.ok(false))
@@ -949,10 +949,10 @@ describe("spec compliance", () => {
 
   it("should warn when creating an `arguments` binding", () =>
     [
-      { id: "./fixture/source/arguments-undefined.mjs", loc: "1:0" },
-      { id: "./fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
+      { id: "fixture/source/arguments-undefined.mjs", loc: "1:0" },
+      { id: "fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
     ].reduce((promise, data) => {
-      const filePath = require.resolve(data.id)
+      const filePath = path.resolve(data.id)
       const url = getURLFromFilePath(filePath)
       const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, url)
 
@@ -966,7 +966,7 @@ describe("spec compliance", () => {
   )
 
   it("should warn for potential TDZ access", () => {
-    const filePath = require.resolve("./fixture/cycle/tdz/a.mjs")
+    const filePath = path.resolve("fixture/cycle/tdz/a.mjs")
     const url = getURLFromFilePath(filePath)
     const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", url)
 

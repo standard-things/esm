@@ -1,8 +1,8 @@
 "use strict"
 
 const assert = require("assert")
-
-const livePath = require.resolve("../fixture/live.mjs")
+const path = require("path")
+const livePath = path.resolve("fixture/live.mjs")
 
 module.exports = () => {
   const makeRequire = require("../../index.js")

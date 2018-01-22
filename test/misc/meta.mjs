@@ -1,7 +1,6 @@
 import assert from "assert"
 import createMeta from "../create-meta.js"
 import path from "path"
-import require from "../require.js"
 import colon1 from "../fixture/with%3Acolon.mjs"
 import colon2 from "../fixture/with%3Acolon.mjs?a#a"
 import pound1 from "../fixture/with%23pound.mjs"
@@ -12,7 +11,7 @@ import percent2 from "../fixture/with%2520percent.mjs?c#c"
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
-const testPath = path.dirname(require.resolve("./tests.mjs"))
+const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const colonPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")
