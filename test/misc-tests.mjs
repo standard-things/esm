@@ -267,19 +267,25 @@ describe("errors", () => {
         ),
       import(id6)
         .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            id6 + ":1",
-            skipDecorateCheck
-              ? "SyntaxError: Unexpected token ILLEGAL"
-              : "syntax@error\n\n"
-          ].join("\n"))
-        ),
+        .catch((e) => {
+          if (pkgOptions.debug) {
+            assert.ok(true)
+          } else {
+            checkErrorStack(e, [
+              id6 + ":1",
+              skipDecorateCheck
+                ? "SyntaxError: Unexpected token ILLEGAL"
+                : "syntax@error\n\n"
+            ].join("\n"))
+          }
+        }),
       import(id7)
         .then(() => assert.ok(false))
         .catch((e) => {
-          if (! pkgOptions.debug) {
-            return checkErrorStack(e, [
+          if (pkgOptions.debug) {
+            assert.ok(true)
+          } else {
+            checkErrorStack(e, [
               id7 + ":1",
               skipDecorateCheck
                 ? "SyntaxError: Unexpected token ILLEGAL"
@@ -293,7 +299,13 @@ describe("errors", () => {
   it("should mask stack traces", () =>
     import("./fixture/error/import.mjs")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
+      .catch((e) => {
+        if (pkgOptions.debug) {
+          assert.ok(true)
+        } else {
+          assert.strictEqual(e.stack.includes(pkgPath), false)
+        }
+      })
   )
 })
 
