@@ -11,7 +11,7 @@ const builtinEntries = builtinModules
   .reduce((object, id) => {
     setGetter(object, id, () => {
       const mod = new Module(id, null)
-      mod.exports = id === "module" ? Module : mod.require(id)
+      mod.exports = id === "module" ? Module : __non_webpack_require__(id)
       mod.loaded = true
 
       const entry = Entry.get(mod)
