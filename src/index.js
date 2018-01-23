@@ -4,8 +4,9 @@ import PkgInfo from "./pkg-info.js"
 
 import assign from "./util/assign.js"
 import clone from "./module/clone.js"
-import env from "./env.js"
+import isCLI from "./env/is-cli.js"
 import isObjectLike from "./util/is-object-like.js"
+import isREPL from "./env/is-repl.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import replHook from "./hook/repl.js"
@@ -52,10 +53,10 @@ if (shared.inited) {
   exported = shared
   shared.inited = true
 
-  if (env.repl) {
+  if (isREPL()) {
     moduleHook(Module)
     replHook(vm)
-  } else if (env.cli) {
+  } else if (isCLI()) {
     const BuiltinModule = __non_webpack_module__.constructor
     moduleHook(BuiltinModule)
     mainHook(BuiltinModule)

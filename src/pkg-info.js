@@ -5,6 +5,7 @@ import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
+import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -321,7 +322,7 @@ function readInfo(dirPath, force) {
 
   if (options === true ||
       ! optionsFound) {
-    options = shared.env.vars.ESM_OPTIONS
+    options = getEnvVars().ESM_OPTIONS
   }
 
   return new PkgInfo(dirPath, range, options)
