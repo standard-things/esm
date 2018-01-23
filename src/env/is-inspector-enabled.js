@@ -8,13 +8,16 @@ function isInspectorEnabled() {
     return shared.env.isInspectorEnabled
   }
 
+  if (hasDebugArg(process.execArgv)) {
+    return shared.env.isInspectorEnabled = true
+  }
+
   const inspectorBinding = binding.inspector
   const isEnabled = noDeprecationWarning(() => inspectorBinding.isEnabled)
 
   return shared.env.isInspectorEnabled =
-    hasDebugArg(process.execArgv) ||
-    (typeof isEnabled === "function" &&
-     isEnabled.call(inspectorBinding))
+    typeof isEnabled === "function" &&
+    isEnabled.call(inspectorBinding)
 }
 
 export default isInspectorEnabled

@@ -8,12 +8,10 @@ function isFromRequireFlag() {
     return shared.env.isFromRequireFlag
   }
 
-  const _preloadModules = noDeprecationWarning(() => process._preloadModules)
-
   return shared.env.isFromRequireFlag =
-    hasLoaderModule(_preloadModules) ||
     (rootModule.id === "internal/preload" &&
-     hasLoaderModule(rootModule.children))
+     hasLoaderModule(rootModule.children)) ||
+    noDeprecationWarning(() => hasLoaderModule(process._preloadModules))
 }
 
 export default isFromRequireFlag
