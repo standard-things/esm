@@ -45,6 +45,8 @@ class Entry {
     this._loaded = 0
     // The raw namespace object.
     this._namespace = new NullObject
+    // The cache file name of the module.
+    this.cacheFileName = null
     // The cache key of the module.
     this.cacheKey = null
     // The child entries of the module.

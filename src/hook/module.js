@@ -1,42 +1,30 @@
-import { extname as _extname, resolve } from "path"
+import { extname, resolve } from "path"
 
-import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
-import NullObject from "../null-object.js"
 import PkgInfo from "../pkg-info.js"
-import Runtime from "../runtime.js"
 import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
-import captureStackTrace from "../error/capture-stack-trace.js"
-import createSourceMap from "../util/create-source-map.js"
+import compile from "../module/_compile.js"
 import encodeId from "../util/encode-id.js"
-import encodeURI from "../util/encode-uri.js"
-import env from "../env.js"
 import errors from "../errors.js"
-import extname from "../path/extname.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
-import getSourceMappingURL from "../util/get-source-mapping-url.js"
-import getURLFromFilePath from "../util/get-url-from-file-path.js"
+import getEnvVars from "../env/get-vars.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
+import isFile from "../util/is-file.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
-import readFileFast from "../fs/read-file-fast.js"
-import { satisfies } from "semver"
 import setProperty from "../util/set-property.js"
 import toOptInError from "../util/to-opt-in-error.js"
-import validateESM from "../module/esm/validate.js"
-import warn from "../warn.js"
 
-const moduleWrapCJS = Module.wrap
 const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
@@ -45,8 +33,6 @@ const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
 
 function hook(Mod, parent) {
-  let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
-
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
@@ -59,9 +45,12 @@ function hook(Mod, parent) {
     assign(defaultOptions, parentPkgInfo.options)
   }
 
-  if (! parent &&
-      env.vars.ESM_OPTIONS) {
-    assign(defaultOptions, PkgInfo.createOptions(env.vars.ESM_OPTIONS))
+  if (! parent) {
+    const { ESM_OPTIONS } = getEnvVars()
+
+    if (ESM_OPTIONS) {
+      assign(defaultOptions, PkgInfo.createOptions(ESM_OPTIONS))
+    }
   }
 
   if (! parentPkgInfo) {
@@ -99,7 +88,6 @@ function hook(Mod, parent) {
     const { cache, cachePath, options } = pkgInfo
 
     const cacheKey = mtime(filePath)
-    const ext = extname(filePath)
     const entry = Entry.get(mod)
 
     entry.data.package = pkgInfo
@@ -110,40 +98,15 @@ function hook(Mod, parent) {
     const stateHash = getCacheStateHash(cacheFileName)
     const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
+    entry.cacheFileName = cacheFileName
     entry.runtimeName = runtimeName
-
-    let hint = "script"
-    let type = "script"
-
-    if (options.esm === "all") {
-      type = "module"
-    } else if (options.esm === "js") {
-      type = "unambiguous"
-    }
-
-    if (ext === ".mjs" ||
-        ext === ".mjs.gz") {
-      hint = "module"
-
-      if (type === "script") {
-        type = "module"
-      }
-    }
 
     let cached = cache[cacheFileName]
 
-    if (cached === true) {
-      const code = readCachedCode(resolve(cachePath, cacheFileName), options)
-
-      if (code === null) {
-        cached = null
-        delete cache[cacheFileName]
-      } else {
-        cached =
-        entry.data.compile =
-        cache[cacheFileName] = Compiler.from(code)
-        entry.esm = cached.esm
-      }
+    if (cached === true &&
+        ! isFile(resolve(cachePath, cacheFileName))) {
+      cached = null
+      delete cache[cacheFileName]
     }
 
     const compileWrapper = (content, filePath) => {
@@ -155,56 +118,9 @@ function hook(Mod, parent) {
         }
       }
 
-      const { parent } = entry
-
-      if (! cached) {
-        if (! parent ||
-            ! parent.data.compiled ||
-              parent.data.compiled.changed) {
-          cached = tryCompileCode(manager, content, entry, cacheFileName, {
-            cachePath,
-            hint,
-            type
-          })
-        } else {
-          cached = new NullObject
-          cached.code = content
-          cached.changed =
-          cached.esm = false
-        }
-      }
-
-      entry.data.compile = cached
-      entry.esm = cached.esm
-
-      const { warnings } = cached
-
-      if (options.warnings &&
-          moduleState.parsing &&
-          warnings) {
-        for (const warning of warnings) {
-          warn(warning.code, filePath, ...warning.args)
-        }
-      }
-
-      if (! entry.url) {
-        entry.url = getURLFromFilePath(filePath)
-      }
-
-      if (moduleState.parsing) {
-        if (! entry.esm &&
-            ! (entry.parent && entry.parent.esm) &&
-            (entry.data.package === defaultPkgInfo ||
-              (entry.parent && entry.parent.data.package === defaultPkgInfo))) {
-          entry.state = 3
-          tryPassthru.call(this, func, args, options)
-        } else if (entry.esm &&
-            entry.state === 1) {
-          tryValidateESM(manager, entry)
-        }
-      } else {
+      if (! compile(entry, content, filePath)) {
         entry.state = 3
-        tryCompileCached(entry)
+        return tryPassthru.call(this, func, args, options)
       }
     }
 
@@ -219,109 +135,9 @@ function hook(Mod, parent) {
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
-      const content = cached ? cached.code : readSourceCode(filePath, options)
+      const content = cached ? "" : readSourceCode(filePath, options)
       mod._compile(content, filePath)
     }
-  }
-
-  function tryCompileCached(entry) {
-    const noDepth = moduleState.requireDepth === 0
-    const { options } = entry
-    const tryCompile = entry.esm ? tryCompileESM : tryCompileCJS
-
-    if (noDepth) {
-      moduleState.stat = new NullObject
-    }
-
-    if (options.debug) {
-      tryCompile(entry)
-    } else {
-      try {
-        tryCompile(entry)
-      } catch (e) {
-        if (isStackTraceMasked(e)) {
-          throw e
-        }
-
-        const { filePath } = entry
-        const sourceCode = () => readSourceCode(filePath, options)
-        throw maskStackTrace(e, sourceCode, filePath, entry.esm)
-      }
-    }
-
-    if (noDepth) {
-      moduleState.stat = null
-    }
-  }
-
-  function tryCompileCJS(entry) {
-    const async = useAsyncWrapper(entry) ? "async " :  ""
-    const { runtimeName } = entry
-    const { code } = entry.data.compile
-
-    let content =
-      "const " + runtimeName + "=this;" +
-      runtimeName + ".r((" + async + "function(global,exports,require){" +
-      code + "\n}))"
-
-    content += maybeSourceMap(content, entry)
-
-    const exported = {}
-
-    if (Module.wrap === moduleWrapESM) {
-      Module.wrap = moduleWrapCJS
-    }
-
-    Runtime.enable(entry, exported)
-    entry.module._compile(content, entry.filePath)
-  }
-
-  function tryCompileESM(entry) {
-    const async = useAsyncWrapper(entry) ? "async " :  ""
-    const { options, runtimeName } = entry
-    const { code } = entry.data.compile
-
-    let content =
-      '"use strict";const ' + runtimeName + "=this;" +
-      runtimeName + ".r((" + async + "function(global" +
-      (options.cjs.vars ? ",exports,require" : "") +
-      "){" + code + "\n}))"
-
-    content += maybeSourceMap(content, entry)
-
-    const exported = {}
-
-    if (! options.cjs.vars) {
-      Module.wrap = moduleWrapESM
-    }
-
-    Runtime.enable(entry, exported)
-
-    try {
-      entry.module._compile(content, entry.filePath)
-    } finally {
-      if (Module.wrap === moduleWrapESM) {
-        Module.wrap = moduleWrapCJS
-      }
-    }
-  }
-
-  function useAsyncWrapper(entry) {
-    const { mainModule } = moduleState
-
-    if (allowTopLevelAwait &&
-        mainModule &&
-        entry.options.await) {
-      const mod = entry.module
-      allowTopLevelAwait = false
-
-      if (mainModule === mod ||
-          mainModule.children.some((child) => child === mod)) {
-        return true
-      }
-    }
-
-    return false
   }
 
   exts.forEach((ext) => {
@@ -332,7 +148,10 @@ function hook(Mod, parent) {
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, ext)
-    let passthru = typeof extCompiler === "function" && ! extCompiler[mjsSym]
+
+    let passthru =
+      typeof extCompiler === "function" &&
+      ! extCompiler[mjsSym]
 
     if (passthru &&
         ext === ".mjs") {
@@ -354,24 +173,6 @@ function hook(Mod, parent) {
   })
 }
 
-function moduleWrapESM(script) {
-  Module.wrap = moduleWrapCJS
-  return "(function(){" + script + "\n})"
-}
-
-function maybeSourceMap(content, entry) {
-  const { sourceMap } = entry.options
-
-  if (sourceMap !== false &&
-      (env.inspector || sourceMap) &&
-      ! getSourceMappingURL(content)) {
-    return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(entry.filePath, content))
-  }
-
-  return ""
-}
-
 function mjsCompiler(mod, filePath) {
   const error = new errors.Error("ERR_REQUIRE_ESM", mod)
   const { mainModule } = process
@@ -383,41 +184,13 @@ function mjsCompiler(mod, filePath) {
   throw error
 }
 
-function readCachedCode(filePath, options) {
-  return readWith(readFileFast, filePath, options)
-}
-
 function readSourceCode(filePath, options) {
-  return readWith(readFile, filePath, options)
-}
-
-function readWith(reader, filePath, options) {
   if (options && options.gz &&
-      _extname(filePath) === ".gz") {
+      extname(filePath) === ".gz") {
     return gunzip(readFile(filePath), "utf8")
   }
 
-  return reader(filePath, "utf8")
-}
-
-function tryCompileCode(manager, sourceCode, entry, cacheFilename, options) {
-  if (entry.options.debug) {
-    return Compiler.compile(sourceCode, entry, cacheFilename, options)
-  }
-
-  try {
-    return Compiler.compile(sourceCode, entry, cacheFilename, options)
-  } catch (e) {
-    if (isStackTraceMasked(e)) {
-      throw e
-    }
-
-    const isESM = e.sourceType === "module"
-
-    delete e.sourceType
-    captureStackTrace(e, manager)
-    throw maskStackTrace(e, sourceCode, entry.filePath, isESM)
-  }
+  return readFile(filePath, "utf8")
 }
 
 function tryPassthru(func, args, options) {
@@ -432,29 +205,8 @@ function tryPassthru(func, args, options) {
       }
 
       const [, filePath] = args
-      const sourceCode = () => readSourceCode(filePath, options)
-      throw maskStackTrace(e, sourceCode, filePath)
-    }
-  }
-}
-
-function tryValidateESM(manager, entry) {
-  const { filePath, options } = entry
-
-  if (options.debug) {
-    validateESM(entry)
-  } else {
-    try {
-      validateESM(entry)
-    } catch (e) {
-      if (isStackTraceMasked(e)) {
-        throw e
-      }
-
-      const sourceCode = () => readSourceCode(filePath, options)
-
-      captureStackTrace(e, manager)
-      throw maskStackTrace(e, sourceCode, filePath, true)
+      const content = () => readSourceCode(filePath, options)
+      throw maskStackTrace(e, content, filePath)
     }
   }
 }

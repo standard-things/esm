@@ -21,13 +21,13 @@ const { max } = Math
 const { stringify } = JSON
 
 class CachingCompiler {
-  static compile(code, entry, cacheFileName, options) {
+  static compile(entry, code, options) {
     if (entry.filePath &&
-        options.cachePath) {
-      return compileAndWrite(code, entry, cacheFileName, options)
+        entry.data.package.cachePath) {
+      return compileAndWrite(entry, code, options)
     }
 
-    return compileAndCache(code, entry, cacheFileName, options)
+    return compileAndCache(entry, code, options)
   }
 
   static from(code) {
@@ -74,9 +74,9 @@ class CachingCompiler {
   }
 }
 
-function compileAndCache(code, entry, cacheFileName, options) {
+function compileAndCache(entry, code, options) {
   const result =
-  entry.data.package.cache[cacheFileName] =
+  entry.data.package.cache[entry.cacheFileName] =
   Compiler.compile(code, toCompileOptions(entry, options))
 
   // Add "main" to enable the `readFileFast` fast path of
@@ -100,14 +100,15 @@ function compileAndCache(code, entry, cacheFileName, options) {
   return result
 }
 
-function compileAndWrite(code, entry, cacheFileName, options) {
-  const result = compileAndCache(code, entry, cacheFileName, options)
+function compileAndWrite(entry, code, options) {
+  const result = compileAndCache(entry, code, options)
 
   if (! result.changed) {
     return result
   }
 
-  const { cachePath } = options
+  const { cacheFileName } = entry
+  const { cachePath } = entry.data.package
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const content = result.code
 

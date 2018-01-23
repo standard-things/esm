@@ -55,7 +55,9 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    const cacheFileName = getCacheFileName(entry, sourceCode)
+    const cacheFileName =
+    entry.cacheFileName = getCacheFileName(entry, sourceCode)
+
     let cached = pkgInfo.cache[cacheFileName]
 
     if (cached) {
@@ -66,9 +68,8 @@ function hook(vm) {
       }
     } else {
       cached = tryWrapper(Compiler.compile, [
-        sourceCode,
         entry,
-        cacheFileName,
+        sourceCode,
         {
           type: "unambiguous",
           var: true,
