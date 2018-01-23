@@ -1,7 +1,6 @@
 import FastPath from "./fast-path.js"
 import NullObject from "./null-object.js"
 import Parser from "./parser.js"
-import PkgInfo from "./pkg-info.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
@@ -12,7 +11,15 @@ import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
 
 const defaultOptions = {
-  cjs: PkgInfo.defaultOptions.cjs,
+  cjs: {
+    cache: false,
+    extensions: false,
+    interop: false,
+    namedExports: false,
+    paths: false,
+    topLevelReturn: false,
+    vars: false
+  },
   hint: "script",
   runtimeName: "_",
   type: "script",
