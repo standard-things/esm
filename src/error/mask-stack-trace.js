@@ -136,8 +136,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
       return snippet + arrow + newline
     }
 
-    const { wrapper } = Module
-    const [prefix] = wrapper
+    const [prefix] = Module.wrapper
 
     if (snippet.startsWith(prefix)) {
       const { length } = prefix
