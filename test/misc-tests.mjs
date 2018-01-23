@@ -12,10 +12,8 @@ import util from "util"
 const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isWin = process.platform === "win32"
-
-const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
-
 const fileProtocol = "file://" + (isWin ? "/" : "")
+const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
 const slashRegExp = /[\\/]/g
 
 const pkgPath = path.resolve("../index.js")
