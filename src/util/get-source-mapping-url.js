@@ -1,15 +1,6 @@
 // Inspired by `findMagicComment` in
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
 
-const codeOfAt = "@".charCodeAt(0)
-const codeOfDoubleQuote = '"'.charCodeAt(0)
-const codeOfEqual = "=".charCodeAt(0)
-const codeOfPound = "#".charCodeAt(0)
-const codeOfSingleQuote = "'".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-const codeOfSpace = " ".charCodeAt(0)
-const codeOfTab = "\t".charCodeAt(0)
-
 const name = "sourceMappingURL"
 const nameLength = name.length
 const minLength = nameLength + 6
@@ -43,28 +34,28 @@ function getSourceMappingURL(content) {
     pos -= 4
 
     // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
-    if (content.charCodeAt(pos) !== codeOfSlash ||
-        content.charCodeAt(pos + 1) !== codeOfSlash) {
+    if (content.charCodeAt(pos) !== 47 /* / */ ||
+        content.charCodeAt(pos + 1) !== 47 /* / */) {
       continue
     }
 
     let code = content.charCodeAt(pos + 2)
 
-    if (code !== codeOfPound &&
-        code !== codeOfAt) {
+    if (code !== 35 /* # */ &&
+        code !== 64 /* @ */) {
       continue
     }
 
     code = content.charCodeAt(pos + 3)
 
-    if (code !== codeOfSpace &&
-        code !== codeOfTab) {
+    if (code !== 32 /* <space> */ &&
+        code !== 9 /* \t */) {
       continue
     }
 
     // Check for "=" after the name.
     if (equalPos < length &&
-        content.charCodeAt(equalPos) !== codeOfEqual) {
+        content.charCodeAt(equalPos) !== 61 /* = */) {
       continue
     }
 
@@ -89,10 +80,10 @@ function getSourceMappingURL(content) {
   while (++i < matchLength) {
     const code = match.charCodeAt(i)
 
-    if (code === codeOfDoubleQuote ||
-        code === codeOfSingleQuote ||
-        code === codeOfSpace ||
-        code === codeOfTab) {
+    if (code === 34 /* " */ ||
+        code === 39 /* ' */ ||
+        code === 32 /* <space> */ ||
+        code === 9 /* \t */) {
       return ""
     }
   }

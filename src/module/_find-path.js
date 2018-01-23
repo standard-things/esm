@@ -13,9 +13,6 @@ import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
-const codeOfBackslash = "\\".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-
 const { keys } = Object
 const { parse } = JSON
 
@@ -42,11 +39,11 @@ function findPath(request, paths, isMain, searchExts) {
 
   if (trailingSlash) {
     const code = request.charCodeAt(request.length - 1)
-    trailingSlash = code === codeOfSlash
+    trailingSlash = code === 47 /* / */
 
     if (isWin &&
         ! trailingSlash) {
-      trailingSlash = code === codeOfBackslash
+      trailingSlash = code === 92 /* \ */
     }
   }
 

@@ -1,5 +1,3 @@
-const codeOfDoubleQuote = '"'.charCodeAt(0)
-
 const { stringify } = JSON
 
 const escapedDoubleQuoteRegExp = /\\"/g
@@ -23,7 +21,7 @@ function toStringLiteral(value, style = '"') {
   const string = stringify(value)
 
   if (quote === '"' &&
-      string.charCodeAt(0) === codeOfDoubleQuote) {
+      string.charCodeAt(0) === 34 /* " */) {
     return string
   }
 

@@ -15,8 +15,6 @@ import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
 
-const codeOfSlash = "/".charCodeAt(0)
-
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
@@ -62,7 +60,7 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (request.charCodeAt(0) === codeOfSlash ||
+        (request.charCodeAt(0) === 47 /* / */ ||
          request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
       foundPath = getFilePathFromURL(parsed)

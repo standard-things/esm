@@ -4,10 +4,6 @@
 
 import { resolve } from "path"
 
-const codeOfBackslash = "\\".charCodeAt(0)
-const codeOfColon = ":".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-
 const { map } = Array.prototype
 const nmChars = map.call("node_modules", (char) => char.charCodeAt(0)).reverse()
 const nmLength = nmChars.length
@@ -33,7 +29,7 @@ function posixNodeModulePaths(from) {
   while (length--) {
     const code = from.charCodeAt(length)
 
-    if (code === codeOfSlash) {
+    if (code === 47 /* / */) {
       if (nmCount !== nmLength) {
         paths.push(from.slice(0, last) + "/node_modules")
       }
@@ -59,8 +55,8 @@ function win32NodeModulePaths(from) {
   from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
-  if (from.charCodeAt(from.length - 1) === codeOfBackslash &&
-      from.charCodeAt(from.length - 2) === codeOfColon) {
+  if (from.charCodeAt(from.length - 1) === 92 /* \ */ &&
+      from.charCodeAt(from.length - 2) === 58 /* : */) {
     return [from + "node_modules"]
   }
 
@@ -77,9 +73,9 @@ function win32NodeModulePaths(from) {
     // node_modules path for every path segment. Use colon as an extra
     // condition since we can get node_modules path for drive root like
     // "C:\node_modules" and don"t need to parse drive name.
-    if (code === codeOfBackslash ||
-        code === codeOfSlash ||
-        code === codeOfColon) {
+    if (code === 92 /* \ */ ||
+        code === 47 /* / */ ||
+        code === 58 /* : */) {
       if (nmCount !== nmLength) {
         paths.push(from.slice(0, last) + "\\node_modules")
       }

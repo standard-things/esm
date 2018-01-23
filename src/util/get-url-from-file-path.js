@@ -5,8 +5,6 @@
 import encodeURI from "./encode-uri.js"
 import normalize from "../path/normalize.js"
 
-const codeOfSlash = "/".charCodeAt(0)
-
 const encodeCharsRegExp = /[?#]/g
 
 const encodeCharMap = {
@@ -21,7 +19,7 @@ function encodeChar(char) {
 function getURLFromFilePath(filePath) {
   filePath = normalize(filePath)
 
-  if (filePath.charCodeAt(0) !== codeOfSlash) {
+  if (filePath.charCodeAt(0) !== 47 /* / */) {
     filePath = "/" + filePath
   }
 

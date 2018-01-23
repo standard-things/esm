@@ -11,11 +11,6 @@ import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
-const codeOfAsterisk = "*".charCodeAt(0)
-const codeOfLeftBracket = "{".charCodeAt(0)
-const codeOfRightBracket = "}".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-
 const { keys } = Object
 const { max } = Math
 const { stringify } = JSON
@@ -37,15 +32,15 @@ class CachingCompiler {
     result.esm = false
 
     // Extract metadata.
-    if (code.charCodeAt(7) !== codeOfSlash ||
-        code.charCodeAt(8) !== codeOfAsterisk ||
-        code.charCodeAt(9) !== codeOfLeftBracket) {
+    if (code.charCodeAt(7) !== 47 /* / */ ||
+        code.charCodeAt(8) !== 42 /* * */ ||
+        code.charCodeAt(9) !== 123 /* { */) {
       return result
     }
 
     const line = code.slice(9, code.indexOf("*/", 10))
 
-    if (line.charCodeAt(line.length - 1) !== codeOfRightBracket) {
+    if (line.charCodeAt(line.length - 1) !== 125 /* } */) {
       return result
     }
 

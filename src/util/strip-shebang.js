@@ -1,5 +1,3 @@
-const codeOfPound = "#".charCodeAt(0)
-
 const shebangRegExp = /^#!.*/
 
 function stripShebang(string) {
@@ -7,7 +5,7 @@ function stripShebang(string) {
     return ""
   }
 
-  return string.charCodeAt(0) === codeOfPound
+  return string.charCodeAt(0) === 35 /* # */
     ? string.replace(shebangRegExp, "")
     : string
 }

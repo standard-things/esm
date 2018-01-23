@@ -7,8 +7,6 @@ import rootModule from "../root-module.js"
 
 const { keys } = Object
 
-const codeOfDash = "-".charCodeAt(0)
-
 const stdPath = __non_webpack_module__.filename
 
 function hasLoaderValue(value) {
@@ -17,7 +15,7 @@ function hasLoaderValue(value) {
       if (realpath(resolve(value)) === stdPath) {
         return true
       }
-    } else if (value.charCodeAt(0) !== codeOfDash &&
+    } else if (value.charCodeAt(0) !== 45 /* - */ &&
         _resolveFilename(value, rootModule) === stdPath) {
       return true
     }

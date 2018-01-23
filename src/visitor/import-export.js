@@ -8,8 +8,6 @@ import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 
 const ANON_NAME = encodeId("default")
 
-const codeOfCR = "\r".charCodeAt(0)
-
 const { keys } = Object
 
 class ImportExportVisitor extends Visitor {
@@ -424,7 +422,7 @@ function pad(visitor, newCode, oldStart, oldEnd) {
       newLines[i] = ""
     }
 
-    if (lastCharCode === codeOfCR) {
+    if (lastCharCode === 13 /* \r */) {
       newLines[i] += "\r"
     }
   }

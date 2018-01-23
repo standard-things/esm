@@ -28,14 +28,11 @@ function getVars() {
     return shared.env.getVars = vars
   }
 
-  const codeOfDoubleQuote = '"'.charCodeAt(0)
-  const codeOfLeftBracket = "{".charCodeAt(0)
-  const codeOfSingleQuote = "'".charCodeAt(0)
   const code0 = ESM_OPTIONS.charCodeAt(0)
 
-  if (code0 === codeOfLeftBracket ||
-      code0 === codeOfDoubleQuote ||
-      code0 === codeOfSingleQuote) {
+  if (code0 === 123 /* { */ ||
+      code0 === 34 /* " */ ||
+      code0 === 39 /* ' */) {
     ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
   }
 

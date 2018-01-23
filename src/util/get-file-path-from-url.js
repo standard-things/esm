@@ -4,9 +4,6 @@ import hasEncodedSlash from "./has-encoded-slash.js"
 import parseURL from "./parse-url.js"
 import path from "path"
 
-const codeOfColon = ":".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
-
 const isWin = process.platform === "win32"
 const localhostRegExp = /^\/\/localhost\b/
 
@@ -53,7 +50,7 @@ function getFilePathFromURL(url) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   if (pathname.length < 3 ||
-      pathname.charCodeAt(2) !== codeOfColon) {
+      pathname.charCodeAt(2) !== 58 /* : */) {
     return ""
   }
 
@@ -62,7 +59,7 @@ function getFilePathFromURL(url) {
   // Drive letters must be `[A-Za-z]:/`
   // All slashes of pathnames are forward slashes.
   if (((code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)) &&
-      pathname.charCodeAt(3) === codeOfSlash){
+      pathname.charCodeAt(3) === 47 /* / */){
     return normalize(pathname).slice(1)
   }
 
