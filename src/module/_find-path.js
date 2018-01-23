@@ -13,13 +13,15 @@ import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
+const codeOfBackslash = "\\".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
 
 const { keys } = Object
 const { parse } = JSON
-const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
+const isWin = process.platform === "win32"
 const mainFieldRegExp = /"main"/
+const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
@@ -37,10 +39,17 @@ function findPath(request, paths, isMain, searchExts) {
   }
 
   const { _extensions } = Module
+  let trailingSlash = request.length > 0
 
-  const trailingSlash =
-    request.length > 0 &&
-    request.charCodeAt(request.length - 1) === codeOfSlash
+  if (trailingSlash) {
+    const code = request.charCodeAt(request.length - 1)
+    trailingSlash = code === codeOfSlash
+
+    if (isWin &&
+        ! trailingSlash) {
+      trailingSlash = code === codeOfBackslash
+    }
+  }
 
   let i = -1
   const pathsCount = paths.length
