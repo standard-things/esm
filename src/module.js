@@ -2,6 +2,7 @@ import { dirname, extname } from "path"
 
 import NullObject from "./null-object.js"
 
+import assert from "assert"
 import assign from "./util/assign.js"
 import compile from "./module/compile.js"
 import defaults from "./util/defaults.js"
@@ -41,6 +42,12 @@ class Module extends BuiltinModule {
 
     _extensions[ext](this, filePath)
     this.loaded = true
+  }
+
+  require(request) {
+    assert(request, "missing path")
+    assert(typeof request === "string", "path must be a string")
+    return Module._load(request, this, false)
   }
 
   static _extensions = new NullObject
