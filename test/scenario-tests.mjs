@@ -31,12 +31,57 @@ describe("scenarios", function () {
       .then(() => exec(nodePath, [indexPath]))
   })
 
+  it("should work with babel-register and plugins (code, reversed require)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const cachePath = path.resolve(dirPath, "node_modules/.cache")
+    const indexPath = path.resolve(dirPath, "index-reverse.js")
+
+    return Promise.resolve()
+      .then(() => trash(cachePath))
+      .then(() => exec(nodePath, [indexPath]))
+  })
+
   it("should work with babel-register and plugins (flag)", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const cachePath = path.resolve(dirPath, "node_modules/.cache")
     const mainPath = path.resolve(dirPath, "main.js")
     const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", mainPath]
 
     return Promise.resolve()
+      .then(() => trash(cachePath))
+      .then(() => exec(nodePath, nodeArgs))
+  })
+
+  it("should work with babel-register and plugins (flag, reverse require)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const cachePath = path.resolve(dirPath, "node_modules/.cache")
+    const mainPath = path.resolve(dirPath, "main.js")
+    const nodeArgs = ["-r", "@babel/register", "-r", pkgPath, mainPath]
+
+    return Promise.resolve()
+      .then(() => trash(cachePath))
+      .then(() => exec(nodePath, nodeArgs))
+  })
+
+  it("should work with babel-register and plugins (code and flag double hook)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const cachePath = path.resolve(dirPath, "node_modules/.cache")
+    const mainPath = path.resolve(dirPath, "index.js")
+    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", mainPath]
+
+    return Promise.resolve()
+      .then(() => trash(cachePath))
+      .then(() => exec(nodePath, nodeArgs))
+  })
+
+  it("should work with babel-register and plugins (code and flag double hook, reverse require)", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
+    const cachePath = path.resolve(dirPath, "node_modules/.cache")
+    const mainPath = path.resolve(dirPath, "index.js")
+    const nodeArgs = ["-r", "@babel/register", "-r", pkgPath, mainPath]
+
+    return Promise.resolve()
+      .then(() => trash(cachePath))
       .then(() => exec(nodePath, nodeArgs))
   })
 
