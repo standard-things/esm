@@ -38,7 +38,6 @@ function findPath(request, paths, isMain, searchExts) {
     return shared.findPath[cacheKey]
   }
 
-  const { _extensions } = Module
   let trailingSlash = request.length > 0
 
   if (trailingSlash) {
@@ -77,7 +76,7 @@ function findPath(request, paths, isMain, searchExts) {
         }
       } else if (isDir) {
         if (searchExts === void 0) {
-          searchExts = keys(_extensions)
+          searchExts = keys(Module._extensions)
         }
 
         filePath = tryPackage(basePath, searchExts, isMain)
@@ -85,7 +84,7 @@ function findPath(request, paths, isMain, searchExts) {
 
       if (! filePath) {
         if (searchExts === void 0) {
-          searchExts = keys(_extensions)
+          searchExts = keys(Module._extensions)
         }
 
         filePath = tryExtensions(basePath, searchExts, isMain)
@@ -94,7 +93,7 @@ function findPath(request, paths, isMain, searchExts) {
 
     if (isDir && ! filePath) {
       if (searchExts === void 0) {
-        searchExts = keys(_extensions)
+        searchExts = keys(Module._extensions)
       }
 
       filePath =
