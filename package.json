@@ -36,7 +36,7 @@
     "@babel/preset-env": "^7.0.0-beta.38",
     "@babel/register": "^7.0.0-beta.38",
     "@babel/runtime": "^7.0.0-beta.38",
-    "@gfx/zopfli": "^1.0.5",
+    "@gfx/zopfli": "^1.0.7",
     "acorn": "^5.3.0",
     "ava": "^0.24.0",
     "babel-eslint": "^8.2.1",
