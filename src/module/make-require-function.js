@@ -5,7 +5,6 @@
 import Module from "../module.js"
 
 import errors from "../errors.js"
-import loadCJS from "./cjs/load.js"
 import moduleState from "./state.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
@@ -32,7 +31,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   if (typeof requirer !== "function") {
-    requirer = (request) => loadCJS(request, mod, false)
+    requirer = (request) => mod.require(request)
   }
 
   if (typeof resolver !== "function") {
