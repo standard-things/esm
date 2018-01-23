@@ -5,24 +5,17 @@
 import Module from "../module.js"
 
 import { dirname } from "path"
+import isRelativePath from "../util/is-relative-path.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
-
-const codeOfDot = ".".charCodeAt(0)
-const codeOfSlash = "/".charCodeAt(0)
 
 const { slice } = Array.prototype
 
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
-  const code0 = request.charCodeAt(0)
-  const code1 = request.charCodeAt(1)
   const parentFilePath = parent && parent.filename
 
   // Look outside if not a relative path.
-  if (request !== "." &&
-      ! (code0 === codeOfDot &&
-         (code1 === codeOfDot ||
-          code1 === codeOfSlash))) {
+  if (! isRelativePath(request)) {
     const parentPaths = parent && parent.paths
     const paths = parentPaths ? slice.call(parentPaths) : []
 
