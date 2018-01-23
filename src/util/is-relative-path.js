@@ -1,21 +1,46 @@
+const codeOfBackslash = "\\".charCodeAt(0)
 const codeOfDot = ".".charCodeAt(0)
 const codeOfSlash = "/".charCodeAt(0)
+
+const isWin = process.platform === "win32"
 
 function isRelativePath(value) {
   if (typeof value !== "string") {
     return false
   }
 
-  const code0 = value.charCodeAt(0)
+  const { length } = value
 
-  if (code0 !== codeOfDot) {
+  if (! length) {
     return false
   }
 
-  const code1 = value.charCodeAt(1)
+  let code = value.charCodeAt(0)
 
-  return code1 === codeOfSlash ||
-    (code1 === codeOfDot && value.charCodeAt(2) === codeOfSlash)
+  if (code !== codeOfDot) {
+    return false
+  }
+
+  if (length === 1) {
+    return true
+  }
+
+  code = value.charCodeAt(1)
+
+  if (code === codeOfDot) {
+    if (length === 2) {
+      return true
+    }
+
+    code = value.charCodeAt(2)
+  }
+
+  if (isWin &&
+      code === codeOfBackslash) {
+    return true
+  }
+
+  return code === codeOfSlash
 }
 
 export default isRelativePath
