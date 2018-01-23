@@ -4,7 +4,10 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
-const canTestPM2 = ! ("TRAVIS" in process.env)
+const canTestPM2 =
+  "v8" in process.versions &&
+  ! ("TRAVIS" in process.env)
+
 const isWin = process.platform === "win32"
 
 const pkgPath = path.resolve("../index.js")
