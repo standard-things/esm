@@ -176,9 +176,10 @@ function hook(Mod, parent) {
 
 function mjsCompiler(mod, filePath) {
   const error = new errors.Error("ERR_REQUIRE_ESM", mod)
-  const { mainModule } = process
+  const { mainModule } = moduleState
 
-  if (mainModule && mainModule.filename === filePath) {
+  if (mainModule &&
+      mainModule.filename === filePath) {
     toOptInError(error)
   }
 
