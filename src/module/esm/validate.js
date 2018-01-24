@@ -29,9 +29,11 @@ function validate(entry) {
   // Validate requested child export names.
   for (const name in children) {
     const childEntry = children[name]
+    const childCached = childEntry.package.cache[childEntry.cacheFileName]
+    const childIsESM = childCached && childCached.esm
     const requestedExportNames = moduleSpecifiers[name]
 
-    if (! childEntry.esm) {
+    if (! childIsESM) {
       if (! namedExports &&
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
@@ -78,8 +80,10 @@ function validate(entry) {
     }
 
     const childEntry = children[starName]
+    const childCached = childEntry.package.cache[childEntry.cacheFileName]
+    const childIsESM = childCached && childCached.esm
 
-    if (! childEntry.esm) {
+    if (! childIsESM) {
       continue
     }
 

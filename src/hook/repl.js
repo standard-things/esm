@@ -78,10 +78,9 @@ function hook(vm) {
       ])
     }
 
-    entry.esm = cached.esm
     entry.state = 1
 
-    if (entry.esm) {
+    if (cached.esm) {
       validateESM(entry)
     }
 

@@ -85,7 +85,9 @@ class Runtime {
 
   run(moduleWrapper) {
     const { entry } = this
-    const runner = entry.esm ? runESM : runCJS
+    const cached = entry.package.cache[entry.cacheFileName]
+    const isESM = cached && cached.esm
+    const runner =  isESM ? runESM : runCJS
     runner(entry, moduleWrapper)
   }
 

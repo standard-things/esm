@@ -15,8 +15,10 @@ function load(request, parent, isMain) {
 
   const childEntry = _load(request, parent, isMain)
   const child = childEntry.module
+  const childCached = childEntry.package.cache[childEntry.cacheFileName]
+  const childIsESM = childCached && childCached.esm
 
-  if (childEntry.esm &&
+  if (childIsESM &&
       parent &&
       ! Entry.get(parent).package.options.cjs.vars) {
     throw new errors.Error("ERR_REQUIRE_ESM", child)

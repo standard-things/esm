@@ -57,8 +57,6 @@ class Entry {
     this.package = Package.from(mod)
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
-    // The ES module type indicator.
-    this.esm = false
     // The initial `module.exports` value.
     this.exports = null
     // The file path of the module.
@@ -160,7 +158,10 @@ class Entry {
         getters[key] = getter
       }
 
-      if (this.esm ||
+      const cached = this.package.cache[this.cacheFileName]
+      const isESM = cached && cached.esm
+
+      if (isESM ||
           typeof getter !== "function" ||
           typeof otherGetter !== "function") {
         continue
@@ -214,9 +215,12 @@ class Entry {
       }
     }
 
+    const cached = this.package.cache[this.cacheFileName]
+    const isESM = cached && cached.esm
+
     let setGetters = true
 
-    if (this.esm) {
+    if (isESM) {
       const exported = this.module.exports
 
       if (! isSealed(exported)) {
@@ -237,8 +241,6 @@ class Entry {
       const otherEntry = Entry.get(this.module)
       setGetters = otherEntry._loaded !== 1
       this.merge(otherEntry)
-
-      this.esm = false
 
       const mod = this.module
       Entry.set(mod, mod.exports, this)
@@ -316,10 +318,12 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
+  const cached = entry.package.cache[entry.cacheFileName]
   const exported = entry.module.exports
+  const isESM = cached && cached.esm
 
   const inModule =
-    entry.esm ||
+    isESM ||
     !! (entry.package.options.cjs.interop &&
     has(exported, "__esModule") &&
     exported.__esModule)
@@ -336,12 +340,11 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const safe = entry.esm
   const object = entry._loaded === 1 ? _namespace : exported
   const names = keys(object)
 
   for (const name of names) {
-    if (safe) {
+    if (isESM) {
       _namespace[name] = exported[name]
     } else if ((inModule || name !== "default") &&
         ! has(_namespace, name)) {
@@ -394,15 +397,18 @@ function createNamespace() {
 }
 
 function getExportByName(entry, setter, name) {
+  const cached = entry.package.cache[entry.cacheFileName]
+  const isESM = cached && cached.esm
+
   const isScript =
-    ! entry.esm &&
+    ! isESM &&
     ! setter.parent.package.options.cjs.namedExports
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
   }
 
-  if (entry.esm) {
+  if (isESM) {
     return entry._namespace[name]
   }
 
@@ -479,7 +485,10 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  if (entry.esm) {
+  const cached = entry.package.cache[entry.cacheFileName]
+  const isESM = cached && cached.esm
+
+  if (isESM) {
     for (const name in entry.getters) {
       runGetter(entry, name)
     }

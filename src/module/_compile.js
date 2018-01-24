@@ -59,15 +59,12 @@ function compile(entry, content, filePath) {
 
     cached =
     cache[cacheFileName] = Compiler.from(code)
-    entry.esm = cached.esm
   } else if (! cached) {
     cached = tryCompileCode(entry, content, {
       hint,
       type
     })
   }
-
-  entry.esm = cached.esm
 
   const { warnings } = cached
 
@@ -84,16 +81,20 @@ function compile(entry, content, filePath) {
   }
 
   if (moduleState.parsing) {
+    const cached = entry.package.cache[entry.cacheFileName]
     const defaultPkg = Package.default
+    const isESM = cached && cached.esm
+    const { parent } = entry
+    const parentCached = parent && parent.package.cache[parent.cacheFileName]
+    const parentIsESM = parentCached && parentCached.esm
 
-    if (! entry.esm &&
-        ! (entry.parent &&
-           entry.parent.esm) &&
+    if (! isESM &&
+        ! parentIsESM &&
         (pkg === defaultPkg ||
          (entry.parent &&
           entry.parent.package === defaultPkg))) {
       return false
-    } else if (entry.esm &&
+    } else if (isESM &&
         entry.state === 1) {
       tryValidateESM(entry)
     }
@@ -108,7 +109,9 @@ function compile(entry, content, filePath) {
 function tryCompileCached(entry) {
   const noDepth = moduleState.requireDepth === 0
   const { options } = entry.package
-  const tryCompile = entry.esm ? tryCompileESM : tryCompileCJS
+  const cached = entry.package.cache[entry.cacheFileName]
+  const isESM = cached && cached.esm
+  const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
     moduleState.stat = new NullObject
@@ -126,7 +129,7 @@ function tryCompileCached(entry) {
 
       const { filePath } = entry
       const sourceCode = () => readSourceCode(filePath, options)
-      throw maskStackTrace(e, sourceCode, filePath, entry.esm)
+      throw maskStackTrace(e, sourceCode, filePath, isESM)
     }
   }
 
