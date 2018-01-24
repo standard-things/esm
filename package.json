@@ -75,7 +75,7 @@
     "webpack": "^3.10.0",
     "webpack-bundle-analyzer": "^2.8.3",
     "webpack-common-shake": "^1.5.3",
-    "yargs": "^10.1.1"
+    "yargs": "^11.0.0"
   },
   "files": [
     "index.js",
