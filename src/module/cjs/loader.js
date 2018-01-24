@@ -12,15 +12,14 @@ function loader(entry, parent, preload) {
     preload(entry)
   }
 
-  const { _extensions } = Module
   let ext = extname(filePath)
 
   if (ext === "" ||
-      typeof _extensions[ext] !== "function") {
+      typeof Module._extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  _extensions[ext](mod, filePath)
+  Module._extensions[ext](mod, filePath)
   mod.loaded = true
 }
 
