@@ -27,7 +27,6 @@ import wrap from "./wrap.js"
 let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
 function compile(entry, content, filePath) {
-  const { parent } = entry
   const { options } = entry.package
   const ext = extname(filePath)
 
