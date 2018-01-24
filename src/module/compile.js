@@ -4,10 +4,15 @@
 
 import Entry from "../entry.js"
 import Module from "../module.js"
+import Package from "../package.js"
 
+import _compile from "./_compile.js"
 import binding from "../binding.js"
 import { dirname } from "path"
+import encodeId from "../util/encode-id.js"
+import getCacheFileName from "../util/get-cache-file-name.js"
 import makeRequireFunction from "./make-require-function.js"
+import md5 from "../util/md5.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
@@ -16,15 +21,30 @@ import vm from "vm"
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
+const { now } = Date
+
 const inspectorBinding = binding.inspector
 const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
-
 const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 
-function compile(mod, content, filePath) {
-  const req = makeRequireFunction(mod)
+const md5Hash = md5(now().toString()).slice(0, 3)
+const runtimeName = encodeId("_" + md5Hash)
+
+function compile(content, filePath) {
+  const entry = Entry.get(this)
+
+  if (! entry.state) {
+    entry.cacheFileName = getCacheFileName(entry, content)
+    entry.package = Package.get("")
+    entry.runtimeName = runtimeName
+
+    _compile(entry, content, filePath)
+    return
+  }
+
+  const req = makeRequireFunction(this)
   const wrapper = Module.wrap(stripShebang(content))
 
   const script = new vm.Script(wrapper, {
@@ -67,8 +87,7 @@ function compile(mod, content, filePath) {
     }
   }
 
-  const entry = Entry.get(mod)
-  const exported = mod.exports
+  const exported = this.exports
 
   entry.state = 3
 
@@ -76,10 +95,10 @@ function compile(mod, content, filePath) {
 
   if (inspectorWrapper) {
     result = inspectorWrapper.call(inspectorBinding, compiledWrapper,
-      exported, exported, req, mod, filePath, dirname(filePath))
+      exported, exported, req, this, filePath, dirname(filePath))
   } else {
     result = compiledWrapper.call(
-      exported, exported, req, mod, filePath, dirname(filePath))
+      exported, exported, req, this, filePath, dirname(filePath))
   }
 
   entry.state = 4
