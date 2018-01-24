@@ -78,7 +78,6 @@ function hook(vm) {
       ])
     }
 
-    entry.compileData = cached
     entry.esm = cached.esm
     entry.state = 1
 

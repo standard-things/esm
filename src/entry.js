@@ -53,9 +53,7 @@ class Entry {
     this.children = new NullObject
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
-    // The compiler data for the module.
-    this.compileData = null
-    // The package data for the module.
+    // The package data of the module.
     this.package = PkgInfo.from(mod)
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
@@ -67,8 +65,6 @@ class Entry {
     this.filePath = mod.filename
     // Getters for local variables exported by the module.
     this.getters = new NullObject
-    // The id of the module.
-    this.id = mod.id
     // The module the entry is managing.
     this.module = mod
     // The `module.parent` entry.
@@ -131,7 +127,7 @@ class Entry {
   }
 
   addGetter(name, getter) {
-    getter.owner = this.module
+    getter.owner = this
     this.getters[name] = getter
     return this
   }
@@ -170,10 +166,10 @@ class Entry {
         continue
       }
 
-      const { id } = getter.owner
+      const { id } = getter.owner.module
 
-      if (id !== otherGetter.owner.id &&
-          id !== this.id) {
+      if (id !== otherGetter.owner.module.id &&
+          id !== this.module.id) {
         this.addGetter(key, () => STAR_ERROR)
       }
     }
@@ -297,7 +293,7 @@ class Entry {
     runGetters(this)
     runSetters(this, (setter, value) => {
       parentsMap || (parentsMap = new NullObject)
-      parentsMap[setter.parent.id] = setter.parent
+      parentsMap[setter.parent.module.id] = setter.parent
       setter(value, this)
     })
 
@@ -506,7 +502,7 @@ function runSetter(entry, name, callback) {
       callback(setter, value)
     } else if (value === void 0 &&
         name in getters &&
-        setter.parent.id in children) {
+        setter.parent.module.id in children) {
       warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }

@@ -6,7 +6,7 @@ import errors from "../../errors.js"
 
 function validate(entry) {
   const children = new NullObject
-  const { compileData } = entry
+  const compileData = entry.package.cache[entry.cacheFileName]
   const mod = entry.module
 
   const { exportSpecifiers, moduleSpecifiers } = compileData
@@ -18,7 +18,7 @@ function validate(entry) {
       const childEntry = _loadESM(name, mod)
 
       children[name] =
-      entry.children[childEntry.id] = childEntry
+      entry.children[childEntry.module.id] = childEntry
 
       if (childEntry.state < 2) {
         childEntry.state = 2
@@ -42,7 +42,7 @@ function validate(entry) {
       continue
     }
 
-    const childData = childEntry.compileData
+    const childData = childEntry.package.cache[childEntry.cacheFileName]
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childData
@@ -83,9 +83,7 @@ function validate(entry) {
       continue
     }
 
-    const childData = childEntry.compileData
-
-    for (const exportName in childData.exportSpecifiers) {
+    for (const exportName in childEntry.package.cache[childEntry.cacheFileName].exportSpecifiers) {
       if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.

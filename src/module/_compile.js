@@ -59,17 +59,15 @@ function compile(entry, content, filePath) {
     const code = readCachedCode(resolve(cachePath, cacheFileName), options)
 
     cached =
-    entry.compileData =
     cache[cacheFileName] = Compiler.from(code)
     entry.esm = cached.esm
-  } else {
+  } else if (! cached) {
     cached = tryCompileCode(entry, content, {
       hint,
       type
     })
   }
 
-  entry.compileData = cached
   entry.esm = cached.esm
 
   const { warnings } = cached
@@ -139,7 +137,7 @@ function tryCompileCached(entry) {
 function tryCompileCJS(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
   const { runtimeName } = entry
-  const { code } = entry.compileData
+  const { code } = entry.package.cache[entry.cacheFileName]
 
   let content =
     "const " + runtimeName + "=this;" +
@@ -161,7 +159,7 @@ function tryCompileCJS(entry) {
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
   const { runtimeName } = entry
-  const { code } = entry.compileData
+  const { code } = entry.package.cache[entry.cacheFileName]
   const { options } = entry.package
 
   let content =
