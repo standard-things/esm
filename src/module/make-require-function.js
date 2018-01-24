@@ -4,18 +4,13 @@
 
 import Module from "../module.js"
 
-import errors from "../errors.js"
 import moduleState from "./state.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
-  const req = function require(request) {
+  function require(request) {
     moduleState.requireDepth += 1
 
     try {
-      if (typeof request !== "string") {
-        throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
-      }
-
       return requirer.call(mod, request)
     } finally {
       moduleState.requireDepth -= 1
@@ -38,14 +33,13 @@ function makeRequireFunction(mod, requirer, resolver) {
     resolver = (request, options) => Module._resolveFilename(request, mod, false, options)
   }
 
+  require.cache = Module._cache
+  require.extensions = Module._extensions
+  require.main = process.mainModule
+  require.resolve = resolve
   resolve.paths = paths
 
-  req.cache = Module._cache
-  req.extensions = Module._extensions
-  req.main = process.mainModule
-  req.resolve = resolve
-
-  return req
+  return require
 }
 
 export default makeRequireFunction
