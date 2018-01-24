@@ -87,7 +87,7 @@ function hook(vm) {
     }
 
     const content =
-      '"use strict";var ' + runtimeName + "=" + runtimeName +
+      'var ' + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" +
       cached.code
 
