@@ -124,9 +124,10 @@ function hook(Mod, parent) {
       }
     }
 
+    setPrototypeOf(mod, Module.prototype)
+
     if (shouldOverwrite) {
       mod._compile = compileWrapper
-      setPrototypeOf(mod, Module.prototype)
     } else {
       setProperty(mod, compileSym, { enumerable: false, value: compileWrapper })
     }
