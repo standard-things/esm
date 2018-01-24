@@ -1,16 +1,11 @@
 import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
-import _loadCJS from "./module/cjs/_load.js"
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
-import errors from "./errors.js"
-import getFilePathFromURL from "./util/get-file-path-from-url.js"
-import isError from "./util/is-error.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
-import resolveFilename from "./module/esm/resolve-filename.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -124,50 +119,10 @@ function createSetter(from, setter) {
   return setter
 }
 
-function load(request, parent, loader, preload) {
-  if (request in builtinEntries) {
-    const entry = builtinEntries[request]
-
-    if (preload) {
-      preload(entry)
-    }
-
-    return entry
-  }
-
-  return loader(request, parent, false, preload)
-}
-
 function runCJS(entry, moduleWrapper) {
-  const { module:mod, options } = entry
-  const cjsVars = options.cjs.vars
+  const { module:mod } = entry
   const exported = mod.exports = entry.exports
-  const loader = cjsVars ? loadESM : _loadCJS
-  const req = makeRequireFunction(mod, (request) => {
-    let childEntry
-
-    try {
-      childEntry = load(request, mod, loader)
-    } catch (e) {
-      if (isError(e) &&
-          e.code === "ERR_MISSING_MODULE") {
-        const { message } = e
-        const url = message.slice(message.lastIndexOf(" ") + 1)
-        throw new errors.Error("MODULE_NOT_FOUND", getFilePathFromURL(url))
-      }
-
-      throw e
-    }
-
-    const child = childEntry.module
-
-    if (! cjsVars &&
-        childEntry.esm) {
-      throw new errors.Error("ERR_REQUIRE_ESM", child)
-    }
-
-    return child.exports
-  })
+  const req = makeRequireFunction(mod)
 
   entry.exports = null
   moduleWrapper.call(exported, shared.global, exported, req)
@@ -175,16 +130,13 @@ function runCJS(entry, moduleWrapper) {
 }
 
 function runESM(entry, moduleWrapper) {
-  const { module:mod, options } = entry
+  const { module:mod } = entry
   const exported = mod.exports = entry.exports
 
   entry.exports = null
 
-  if (options.cjs.vars) {
-    const requirer = (request) => load(request, mod, loadESM).module.exports
-    const resolver = (request, options) => resolveFilename(request, mod, false, options)
-    const req = makeRequireFunction(mod, requirer, resolver)
-
+  if (entry.options.cjs.vars) {
+    const req = makeRequireFunction(mod)
     moduleWrapper.call(exported, shared.global, exported, req)
   } else {
     moduleWrapper.call(void 0, shared.global)
@@ -198,12 +150,20 @@ function watch(entry, request, setterPairs, loader) {
   moduleState.requireDepth += 1
 
   try {
-    const childEntry = load(request, entry.module, loader, (childEntry) => {
-      childEntry.addSetters(setterPairs, entry)
-    })
+    let childEntry
 
-    childEntry.loaded()
-    childEntry.update()
+    if (request in builtinEntries) {
+      childEntry = builtinEntries[request]
+        .addSetters(setterPairs, entry)
+        .update()
+    } else {
+      childEntry = loader(request, entry.module, false, (childEntry) => {
+        childEntry.addSetters(setterPairs, entry)
+      })
+
+      childEntry.loaded()
+      childEntry.update()
+    }
   } finally {
     moduleState.requireDepth -= 1
   }

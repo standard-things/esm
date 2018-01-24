@@ -517,23 +517,8 @@ describe("Node rules", () => {
     })
   )
 
-  it("should not resolve non-local dependencies with `require` in ESM", () =>
-    import("./fixture/require-paths/off")
-      .then((ns) =>
-        [
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
-        .forEach((id) => {
-          assert.throws(() => ns.default(id))
-        })
-    )
-  )
-
-  it("should resolve non-local dependencies with `require` in ESM with `options.cjs.paths`", () =>
-    import("./fixture/require-paths/on")
+  it("should resolve non-local dependencies with `require` in ESM", () =>
+    import("./fixture/require-paths")
       .then((ns) =>
         [
           "home-node-libraries",
@@ -571,23 +556,8 @@ describe("Node rules", () => {
     })
   )
 
-  it("should not resolve non-local dependencies with `require.resolve` in ESM", () =>
-    import("./fixture/require-paths/off")
-      .then((ns) =>
-        [
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
-        .forEach((id) => {
-          assert.throws(() => ns.default.resolve(id))
-        })
-      )
-  )
-
-  it("should resolve non-local dependencies with `require.resolve` in ESM with `options.cjs.paths`", () =>
-    import("./fixture/require-paths/on")
+  it("should resolve non-local dependencies with `require.resolve` in ESM", () =>
+    import("./fixture/require-paths")
       .then((ns) =>
         [
           {
@@ -620,8 +590,8 @@ describe("Node rules", () => {
     assert.strictEqual(actual, path.resolve("fixture/paths/node_modules/a/index.js"))
   })
 
-  it("should support `options` in `require.resolve` in ESM with `options.cjs.paths`", () =>
-    import("./fixture/require-paths/on")
+  it("should support `options` in `require.resolve` in ESM", () =>
+    import("./fixture/require-paths")
       .then((ns) => {
         const paths = [path.resolve("fixture/paths")]
         const actual = ns.default.resolve("a", { paths })
@@ -640,18 +610,17 @@ describe("Node rules", () => {
     assert.deepStrictEqual(actual, expected)
   })
 
-  it("should support `require.resolve.paths` in ESM with `options.cjs.paths`", () =>
-    import("./fixture/require-paths/on")
+  it("should support `require.resolve.paths` in ESM", () =>
+    import("./fixture/require-paths")
       .then((ns) => {
         const expected = [
-          path.resolve("fixture/require-paths/on/node_modules"),
           path.resolve("fixture/require-paths/node_modules"),
           path.resolve("fixture/node_modules"),
           path.resolve("node_modules"),
           path.resolve("../node_modules")
         ]
 
-        const actual = ns.default.resolve.paths("a").slice(0, 5)
+        const actual = ns.default.resolve.paths("a").slice(0, 4)
         assert.deepStrictEqual(actual, expected)
       })
   )

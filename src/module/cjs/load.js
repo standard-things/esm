@@ -2,13 +2,27 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import Entry from "../../entry.js"
+
 import _load from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
+import errors from "../../errors.js"
 
 function load(request, parent, isMain) {
-  return request in builtinEntries
-    ? builtinEntries[request].module.exports
-    : _load(request, parent, isMain).module.exports
+  if (request in builtinEntries) {
+    return builtinEntries[request].module.exports
+  }
+
+  const childEntry = _load(request, parent, isMain)
+  const child = childEntry.module
+
+  if (childEntry.esm &&
+      parent &&
+      ! Entry.get(parent).options.cjs.vars) {
+    throw new errors.Error("ERR_REQUIRE_ESM", child)
+  }
+
+  return child.exports
 }
 
 export default load

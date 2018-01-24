@@ -1,18 +1,17 @@
-import { dirname, extname } from "path"
-
 import NullObject from "./null-object.js"
 
-import assert from "assert"
+import _compile from "./module/compile.js"
+import _findPath from "./module/find-path.js"
+import _initPaths from "./module/init-paths.js"
+import _load from "./module/cjs/load.js"
+import _nodeModulePaths from "./module/node-module-paths.js"
+import _resolveFilename from "./module/cjs/resolve-filename.js"
+import _resolveLookupPaths from "./module/resolve-lookup-paths.js"
 import assign from "./util/assign.js"
-import compile from "./module/compile.js"
 import defaults from "./util/defaults.js"
-import findPath from "./module/find-path.js"
-import initPaths from "./module/init-paths.js"
-import load from "./module/cjs/load.js"
+import load from "./module/load.js"
 import moduleState from "./module/state.js"
-import nodeModulePaths from "./module/node-module-paths.js"
-import resolveFilename from "./module/cjs/resolve-filename.js"
-import resolveLookupPaths from "./module/resolve-lookup-paths.js"
+import require from "./module/require.js"
 import setProperty from "./util/set-property.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
@@ -20,48 +19,22 @@ import wrapper from "./module/wrapper.js"
 const BuiltinModule = __non_webpack_module__.constructor
 
 class Module extends BuiltinModule {
-  _compile(content, filePath) {
-    return compile(this, content, filePath)
-  }
-
-  load(filePath) {
-    if (this.loaded) {
-      throw new Error("Module already loaded: " + this.id)
-    }
-
-    const { _extensions } = Module
-    let ext = extname(filePath)
-
-    if (ext === "" ||
-        typeof _extensions[ext] !== "function") {
-      ext = ".js"
-    }
-
-    this.filename = filePath
-    this.paths = nodeModulePaths(dirname(filePath))
-
-    _extensions[ext](this, filePath)
-    this.loaded = true
-  }
-
-  require(request) {
-    assert(request, "missing path")
-    assert(typeof request === "string", "path must be a string")
-    return Module._load(request, this, false)
-  }
-
   static _extensions = new NullObject
-  static _findPath = findPath
-  static _initPaths = initPaths
-  static _load = load
-  static _nodeModulePaths = nodeModulePaths
-  static _resolveFilename = resolveFilename
-  static _resolveLookupPaths = resolveLookupPaths
+  static _findPath = _findPath
+  static _initPaths = _initPaths
+  static _load = _load
+  static _nodeModulePaths = _nodeModulePaths
+  static _resolveFilename = _resolveFilename
+  static _resolveLookupPaths = _resolveLookupPaths
   static Module = Module
   static globalPaths = moduleState.globalPaths.slice()
   static wrap = wrap
   static wrapper = wrapper.slice()
 }
+
+Module.prototype._compile = _compile
+Module.prototype.load = load
+Module.prototype.require = require
 
 defaults(Module, BuiltinModule)
 assign(Module._extensions, BuiltinModule._extensions)
