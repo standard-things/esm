@@ -345,7 +345,7 @@ Object.setPrototypeOf(Package.prototype, null)
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {
   cache: false,
-  cjs: true,
+  esm: "cjs",
   gz: true
 })
 
