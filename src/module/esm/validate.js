@@ -6,10 +6,10 @@ import errors from "../../errors.js"
 
 function validate(entry) {
   const children = new NullObject
-  const compileData = entry.package.cache[entry.cacheFileName]
+  const data = entry.package.cache[entry.cacheFileName]
   const mod = entry.module
 
-  const { exportSpecifiers, moduleSpecifiers } = compileData
+  const { exportSpecifiers, moduleSpecifiers } = data
   const { namedExports } = entry.package.options.cjs
 
   // Parse children.
@@ -72,7 +72,7 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const starName of compileData.exportStarNames) {
+  for (const starName of data.exportStarNames) {
     if (! (starName in children)) {
       continue
     }
@@ -83,7 +83,9 @@ function validate(entry) {
       continue
     }
 
-    for (const exportName in childEntry.package.cache[childEntry.cacheFileName].exportSpecifiers) {
+    const childData = childEntry.package.cache[childEntry.cacheFileName]
+
+    for (const exportName in childData.exportSpecifiers) {
       if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.
