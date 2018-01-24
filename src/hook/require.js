@@ -2,6 +2,7 @@ import assert from "assert"
 import builtinEntries from "../builtin-entries.js"
 import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
+import moduleState from "../module/state.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(parent) {
@@ -18,7 +19,10 @@ function hook(parent) {
     return resolveFilename(request, parent, false, options)
   }
 
-  return makeRequireFunction(parent, requirer, resolver)
+  const req = makeRequireFunction(parent, requirer, resolver)
+
+  req.main = moduleState.mainModule
+  return req
 }
 
 export default hook

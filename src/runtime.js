@@ -137,6 +137,7 @@ function runESM(entry, moduleWrapper) {
 
   if (entry.options.cjs.vars) {
     const req = makeRequireFunction(mod)
+    req.main = moduleState.mainModule
     moduleWrapper.call(exported, shared.global, exported, req)
   } else {
     moduleWrapper.call(void 0, shared.global)
