@@ -22,7 +22,7 @@ function require(request) {
 
   const entry = Entry.get(this)
 
-  if (! entry.options.cjs.vars) {
+  if (! entry.package.options.cjs.vars) {
     return Module._load(request, this, false)
   }
 

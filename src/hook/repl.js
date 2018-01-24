@@ -78,7 +78,7 @@ function hook(vm) {
       ])
     }
 
-    entry.data.compile = cached
+    entry.compileData = cached
     entry.esm = cached.esm
     entry.state = 1
 
@@ -105,8 +105,7 @@ function hook(vm) {
 
   function initEntry(mod) {
     entry = Entry.get(mod)
-    entry.data.package = pkgInfo
-    entry.options = pkgInfo.options
+    entry.package = pkgInfo
     entry.runtimeName = runtimeName
     Runtime.enable(entry, {})
   }

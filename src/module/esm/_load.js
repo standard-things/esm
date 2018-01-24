@@ -23,7 +23,7 @@ function load(request, parent, isMain, preload) {
 
   if (typeof request === "string") {
     const parentEntry = Entry.get(parent)
-    parentOptions = parentEntry && parentEntry.options
+    parentOptions = parentEntry && parentEntry.package.options
     queryHash = getQueryHash(request)
 
     filePath = parentOptions && parentOptions.cjs.paths

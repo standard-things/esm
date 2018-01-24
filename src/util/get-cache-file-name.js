@@ -27,7 +27,7 @@ function getCacheFileName(entry, cacheKey) {
   const stateHash = md5(
     nodeVersion + "\0" +
     stdVersion + "\0" +
-    stringify(entry.options) + "\0" +
+    stringify(entry.package.options) + "\0" +
     cacheKey
   )
 

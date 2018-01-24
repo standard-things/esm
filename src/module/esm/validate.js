@@ -6,11 +6,11 @@ import errors from "../../errors.js"
 
 function validate(entry) {
   const children = new NullObject
-  const data = entry.data.compile
+  const { compileData } = entry
   const mod = entry.module
 
-  const { exportSpecifiers, moduleSpecifiers } = data
-  const { namedExports } = entry.options.cjs
+  const { exportSpecifiers, moduleSpecifiers } = compileData
+  const { namedExports } = entry.package.options.cjs
 
   // Parse children.
   for (const name in moduleSpecifiers) {
@@ -42,7 +42,7 @@ function validate(entry) {
       continue
     }
 
-    const childData = childEntry.data.compile
+    const childData = childEntry.compileData
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childData
@@ -72,7 +72,7 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const starName of data.exportStarNames) {
+  for (const starName of compileData.exportStarNames) {
     if (! (starName in children)) {
       continue
     }
@@ -83,7 +83,7 @@ function validate(entry) {
       continue
     }
 
-    const childData = childEntry.data.compile
+    const childData = childEntry.compileData
 
     for (const exportName in childData.exportSpecifiers) {
       if (exportName in exportSpecifiers) {

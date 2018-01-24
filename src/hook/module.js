@@ -90,9 +90,8 @@ function hook(Mod, parent) {
     const cacheKey = mtime(filePath)
     const entry = Entry.get(mod)
 
-    entry.data.package = pkgInfo
+    entry.package = pkgInfo
     entry.filePath = filePath
-    entry.options = options
 
     const cacheFileName = getCacheFileName(entry, cacheKey)
     const stateHash = getCacheStateHash(cacheFileName)

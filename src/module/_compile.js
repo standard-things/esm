@@ -27,7 +27,8 @@ import wrap from "./wrap.js"
 let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
 function compile(entry, content, filePath) {
-  const { options, parent } = entry
+  const { parent } = entry
+  const { options } = entry.package
   const ext = extname(filePath)
 
   let hint = "script"
@@ -48,7 +49,7 @@ function compile(entry, content, filePath) {
     }
   }
 
-  const pkgInfo = entry.data.package
+  const pkgInfo = entry.package
   const { cacheFileName } = entry
   const { cache, cachePath } = pkgInfo
 
@@ -58,28 +59,17 @@ function compile(entry, content, filePath) {
     const code = readCachedCode(resolve(cachePath, cacheFileName), options)
 
     cached =
-    entry.data.compile =
+    entry.compileData =
     cache[cacheFileName] = Compiler.from(code)
     entry.esm = cached.esm
+  } else {
+    cached = tryCompileCode(entry, content, {
+      hint,
+      type
+    })
   }
 
-  if (! cached) {
-    if (! parent ||
-        ! parent.data.compiled ||
-          parent.data.compiled.changed) {
-      cached = tryCompileCode(entry, content, {
-        hint,
-        type
-      })
-    } else {
-      cached = new NullObject
-      cached.code = content
-      cached.changed =
-      cached.esm = false
-    }
-  }
-
-  entry.data.compile = cached
+  entry.compileData = cached
   entry.esm = cached.esm
 
   const { warnings } = cached
@@ -102,7 +92,7 @@ function compile(entry, content, filePath) {
            entry.parent.esm) &&
         (pkgInfo === PkgInfo.defaultPkgInfo ||
          (entry.parent &&
-          entry.parent.data.package === PkgInfo.defaultPkgInfo))) {
+          entry.parent.package === PkgInfo.defaultPkgInfo))) {
       return false
     } else if (entry.esm &&
         entry.state === 1) {
@@ -118,7 +108,7 @@ function compile(entry, content, filePath) {
 
 function tryCompileCached(entry) {
   const noDepth = moduleState.requireDepth === 0
-  const { options } = entry
+  const { options } = entry.package
   const tryCompile = entry.esm ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
@@ -149,7 +139,7 @@ function tryCompileCached(entry) {
 function tryCompileCJS(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
   const { runtimeName } = entry
-  const { code } = entry.data.compile
+  const { code } = entry.compileData
 
   let content =
     "const " + runtimeName + "=this;" +
@@ -170,8 +160,9 @@ function tryCompileCJS(entry) {
 
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
-  const { options, runtimeName } = entry
-  const { code } = entry.data.compile
+  const { runtimeName } = entry
+  const { code } = entry.compileData
+  const { options } = entry.package
 
   let content =
     '"use strict";const ' + runtimeName + "=this;" +
@@ -204,7 +195,7 @@ function moduleWrapESM(script) {
 }
 
 function maybeSourceMap(entry, content) {
-  const { sourceMap } = entry.options
+  const { sourceMap } = entry.package.options
 
   if (sourceMap !== false &&
      (sourceMap || isInspectorEnabled()) &&
@@ -235,7 +226,7 @@ function readSourceCode(filePath, options) {
 }
 
 function tryCompileCode(entry, content, options) {
-  if (entry.options.debug) {
+  if (entry.package.options.debug) {
     return Compiler.compile(entry, content, options)
   }
 
@@ -255,7 +246,8 @@ function tryCompileCode(entry, content, options) {
 }
 
 function tryValidateESM(entry) {
-  const { filePath, options } = entry
+  const { filePath } = entry
+  const { options } = entry.package
 
   if (options.debug) {
     validateESM(entry)
@@ -279,7 +271,7 @@ function useAsyncWrapper(entry) {
 
   if (allowTopLevelAwait &&
       mainModule &&
-      entry.options.await) {
+      entry.package.options.await) {
     const mod = entry.module
     allowTopLevelAwait = false
 

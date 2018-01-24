@@ -18,7 +18,7 @@ const { stringify } = JSON
 class CachingCompiler {
   static compile(entry, code, options) {
     if (entry.filePath &&
-        entry.data.package.cachePath) {
+        entry.package.cachePath) {
       return compileAndWrite(entry, code, options)
     }
 
@@ -71,7 +71,7 @@ class CachingCompiler {
 
 function compileAndCache(entry, code, options) {
   const result =
-  entry.data.package.cache[entry.cacheFileName] =
+  entry.package.cache[entry.cacheFileName] =
   Compiler.compile(code, toCompileOptions(entry, options))
 
   // Add "main" to enable the `readFileFast` fast path of
@@ -103,7 +103,7 @@ function compileAndWrite(entry, code, options) {
   }
 
   const { cacheFileName } = entry
-  const { cachePath } = entry.data.package
+  const { cachePath } = entry.package
   const cacheFilePath = resolve(cachePath, cacheFileName)
   const content = result.code
 
@@ -130,7 +130,7 @@ function removeExpired(cache, cachePath, cacheFileName) {
 
 function toCompileOptions(entry, options) {
   return {
-    cjs: entry.options.cjs,
+    cjs: entry.package.options.cjs,
     hint: options.hint,
     runtimeName: entry.runtimeName,
     type: options.type,
@@ -160,7 +160,7 @@ if (! shared.inited) {
       }
 
       if (writeFile(cacheFilePath, content)) {
-        removeExpired(entry.data.package.cache, cachePath, cacheFileName)
+        removeExpired(entry.package.cache, cachePath, cacheFileName)
       }
     }
 

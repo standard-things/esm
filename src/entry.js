@@ -53,12 +53,10 @@ class Entry {
     this.children = new NullObject
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
-    // The data object for the module.
-    this.data = new NullObject
     // The compiler data for the module.
-    this.data.compile = null
+    this.compileData = null
     // The package data for the module.
-    this.data.package = null
+    this.package = PkgInfo.from(mod)
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
     // The ES module type indicator.
@@ -73,8 +71,6 @@ class Entry {
     this.id = mod.id
     // The module the entry is managing.
     this.module = mod
-    // The options for the entry.
-    this.options = PkgInfo.createOptions()
     // The `module.parent` entry.
     this.parent = null
     // The name of the runtime identifier.
@@ -235,7 +231,7 @@ class Entry {
         }
       }
 
-      if (this.options.cjs.interop &&
+      if (this.package.options.cjs.interop &&
           ! has(exported, "__esModule")) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
@@ -328,7 +324,7 @@ function assignExportsToNamespace(entry) {
 
   const inModule =
     entry.esm ||
-    !! (entry.options.cjs.interop &&
+    !! (entry.package.options.cjs.interop &&
     has(exported, "__esModule") &&
     exported.__esModule)
 
@@ -404,7 +400,7 @@ function createNamespace() {
 function getExportByName(entry, setter, name) {
   const isScript =
     ! entry.esm &&
-    ! setter.parent.options.cjs.namedExports
+    ! setter.parent.package.options.cjs.namedExports
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
@@ -546,7 +542,7 @@ function toNamespaceGetter(entry, source = entry._namespace) {
     })
 
     setSetter(namespace, name, () => {
-      if (entry.options.warnings) {
+      if (entry.package.options.warnings) {
         if (name in source) {
           warn("WRN_NS_ASSIGNMENT", entry.module, name)
         } else {
@@ -609,7 +605,7 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       return descriptor
     },
     set: (namespace, name) => {
-      if (entry.options.warnings) {
+      if (entry.package.options.warnings) {
         if (name in source) {
           warn("WRN_NS_ASSIGNMENT", entry.module, name)
         } else {

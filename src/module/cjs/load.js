@@ -18,7 +18,7 @@ function load(request, parent, isMain) {
 
   if (childEntry.esm &&
       parent &&
-      ! Entry.get(parent).options.cjs.vars) {
+      ! Entry.get(parent).package.options.cjs.vars) {
     throw new errors.Error("ERR_REQUIRE_ESM", child)
   }
 
