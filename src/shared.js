@@ -16,7 +16,6 @@ if (! __shared__) {
   shared.package = new FastObject
   shared.parseURL = new FastObject
   shared.pendingWrites = new FastObject
-  shared.package = new FastObject
   shared.resolveFilename = new FastObject
 }
 
