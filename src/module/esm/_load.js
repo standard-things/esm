@@ -1,6 +1,6 @@
 import Entry from "../../entry.js"
 import Module from "../../module.js"
-import PkgInfo from "../../pkg-info.js"
+import Package from "../../package.js"
 
 import _load from "../_load.js"
 import { dirname } from "path"
@@ -37,8 +37,8 @@ function load(request, parent, isMain, preload) {
   }
 
   const fromPath = dirname(filePath)
-  const pkgInfo = PkgInfo.get(fromPath)
-  const pkgOptions = pkgInfo && pkgInfo.options
+  const pkg = Package.get(fromPath)
+  const pkgOptions = pkg && pkg.options
   const isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
 
   let childIsMain = isMain

@@ -3,7 +3,7 @@ import { extname as _extname, resolve } from "path"
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
 import NullObject from "../null-object.js"
-import PkgInfo from "../pkg-info.js"
+import Package from "../package.js"
 import Runtime from "../runtime.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
@@ -48,9 +48,9 @@ function compile(entry, content, filePath) {
     }
   }
 
-  const pkgInfo = entry.package
+  const pkg = entry.package
+  const { cache, cachePath } = pkg
   const { cacheFileName } = entry
-  const { cache, cachePath } = pkgInfo
 
   let cached = cache[cacheFileName]
 
@@ -84,12 +84,14 @@ function compile(entry, content, filePath) {
   }
 
   if (moduleState.parsing) {
+    const defaultPkg = Package.default
+
     if (! entry.esm &&
         ! (entry.parent &&
            entry.parent.esm) &&
-        (pkgInfo === PkgInfo.defaultPkgInfo ||
+        (pkg === defaultPkg ||
          (entry.parent &&
-          entry.parent.package === PkgInfo.defaultPkgInfo))) {
+          entry.parent.package === defaultPkg))) {
       return false
     } else if (entry.esm &&
         entry.state === 1) {

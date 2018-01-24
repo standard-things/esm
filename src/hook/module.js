@@ -2,7 +2,7 @@ import { extname, resolve } from "path"
 
 import Entry from "../entry.js"
 import Module from "../module.js"
-import PkgInfo from "../pkg-info.js"
+import Package from "../package.js"
 import SafeMap from "../safe-map.js"
 import Wrapper from "../wrapper.js"
 
@@ -36,70 +36,67 @@ function hook(Mod, parent) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
 
-  const defaultPkgInfo = new PkgInfo("", "*", { cache: false })
-  const defaultOptions = defaultPkgInfo.options
-  let parentPkgInfo = PkgInfo.from(parent)
+  const defaultPkg = new Package("", "*", { cache: false })
+  const defaultOptions = defaultPkg.options
+  let parentPkg = Package.from(parent)
 
-  if (parentPkgInfo) {
-    assign(defaultPkgInfo, parentPkgInfo)
-    assign(defaultOptions, parentPkgInfo.options)
+  if (parentPkg) {
+    assign(defaultPkg, parentPkg)
+    assign(defaultOptions, parentPkg.options)
   }
 
   if (! parent) {
     const { ESM_OPTIONS } = getEnvVars()
 
     if (ESM_OPTIONS) {
-      assign(defaultOptions, PkgInfo.createOptions(ESM_OPTIONS))
+      assign(defaultOptions, Package.createOptions(ESM_OPTIONS))
     }
   }
 
-  if (! parentPkgInfo) {
-    parentPkgInfo = PkgInfo.from(parent, true)
-    assign(parentPkgInfo.options, defaultOptions)
-    assign(defaultPkgInfo, parentPkgInfo)
+  if (! parentPkg) {
+    parentPkg = Package.from(parent, true)
+    assign(parentPkg.options, defaultOptions)
+    assign(defaultPkg, parentPkg)
   }
 
   if (defaultOptions.esm === "all") {
     defaultOptions.esm = "js"
   }
 
-  defaultPkgInfo.options = defaultOptions
-  defaultPkgInfo.range = "*"
+  defaultPkg.options = defaultOptions
+  defaultPkg.range = "*"
 
   Module._extensions = _extensions
-  PkgInfo.defaultPkgInfo = defaultPkgInfo
+  Package.default = defaultPkg
 
   function managerWrapper(manager, func, args) {
     const [, filePath] = args
-    const pkgInfo = PkgInfo.from(filePath)
-    const wrapped = Wrapper.find(_extensions, ".js", pkgInfo.range)
+    const pkg = Package.from(filePath)
+    const wrapped = Wrapper.find(_extensions, ".js", pkg.range)
 
     return wrapped
-      ? wrapped.call(this, manager, func, pkgInfo, args)
-      : tryPassthru.call(this, func, args, pkgInfo.options)
+      ? wrapped.call(this, manager, func, args)
+      : tryPassthru.call(this, func, args, pkg.options)
   }
 
-  function methodWrapper(manager, func, pkgInfo, args) {
+  function methodWrapper(manager, func, args) {
     const [mod, filePath] = args
     const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
     const { _compile } = mod
-    const { cache, cachePath, options } = pkgInfo
-
-    const cacheKey = mtime(filePath)
     const entry = Entry.get(mod)
 
-    entry.package = pkgInfo
     entry.filePath = filePath
 
-    const cacheFileName = getCacheFileName(entry, cacheKey)
+    const cacheFileName = getCacheFileName(entry, mtime(filePath))
     const stateHash = getCacheStateHash(cacheFileName)
     const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
     entry.cacheFileName = cacheFileName
     entry.runtimeName = runtimeName
 
+    const { cache, cachePath, options } = entry.package
     let cached = cache[cacheFileName]
 
     if (cached === true &&

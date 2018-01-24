@@ -1,5 +1,5 @@
 import NullObject from "./null-object.js"
-import PkgInfo from "./pkg-info.js"
+import Package from "./package.js"
 import SafeProxy from "./safe-proxy.js"
 
 import assign from "./util/assign.js"
@@ -54,7 +54,7 @@ class Entry {
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
     // The package data of the module.
-    this.package = PkgInfo.from(mod)
+    this.package = Package.from(mod)
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
     // The ES module type indicator.

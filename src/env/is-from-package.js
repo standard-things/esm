@@ -1,4 +1,4 @@
-import PkgInfo from "../pkg-info.js"
+import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
 import isFromNyc from "./is-from-nyc.js"
@@ -20,8 +20,8 @@ function isFromPackage() {
 
   if (nodeModulesIndex !== -1 &&
       hasLoaderArg(args) &&
-      (PkgInfo.get(process.cwd()) !== null ||
-       PkgInfo.get(realpath(filePath.slice(0, nodeModulesIndex + 1))) !== null)) {
+      (Package.get(process.cwd()) !== null ||
+       Package.get(realpath(filePath.slice(0, nodeModulesIndex + 1))) !== null)) {
     // From a package like Mocha.
     return shared.env.isFromPackage = true
   }

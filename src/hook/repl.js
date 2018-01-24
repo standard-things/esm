@@ -1,6 +1,6 @@
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
-import PkgInfo from "../pkg-info.js"
+import Package from "../package.js"
 import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
@@ -22,11 +22,11 @@ function hook(vm) {
   let entry
 
   const md5Hash = md5(now().toString()).slice(0, 3)
-  const pkgInfo = PkgInfo.get("")
+  const pkg = Package.get("")
   const runtimeName = encodeId("_" + md5Hash)
 
   function managerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(vm, "createScript", pkgInfo.range)
+    const wrapped = Wrapper.find(vm, "createScript", pkg.range)
     return wrapped.call(this, manager, func, args)
   }
 
@@ -58,7 +58,7 @@ function hook(vm) {
     const cacheFileName =
     entry.cacheFileName = getCacheFileName(entry, sourceCode)
 
-    let cached = pkgInfo.cache[cacheFileName]
+    let cached = pkg.cache[cacheFileName]
 
     if (cached) {
       if (scriptOptions.produceCachedData === true &&
@@ -93,7 +93,7 @@ function hook(vm) {
     const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
-      pkgInfo.cache[cacheFileName].scriptData = result.cachedData
+      pkg.cache[cacheFileName].scriptData = result.cachedData
     }
 
     entry.state = 3
@@ -104,7 +104,7 @@ function hook(vm) {
 
   function initEntry(mod) {
     entry = Entry.get(mod)
-    entry.package = pkgInfo
+    entry.package = pkg
     entry.runtimeName = runtimeName
     Runtime.enable(entry, {})
   }

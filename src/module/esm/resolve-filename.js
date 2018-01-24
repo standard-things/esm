@@ -1,5 +1,5 @@
 import FastObject from "../../fast-object.js"
-import PkgInfo from "../../pkg-info.js"
+import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
@@ -54,8 +54,8 @@ function resolveFilename(request, parent, isMain, options) {
 
   const isAbs = isAbsolutePath(request)
   const fromPath = getModuleDirname(isAbs ? request : parent)
-  const pkgInfo = PkgInfo.get(fromPath)
-  const pkgOptions = pkgInfo && pkgInfo.options
+  const pkg = Package.get(fromPath)
+  const pkgOptions = pkg && pkg.options
 
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&

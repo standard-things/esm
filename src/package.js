@@ -46,18 +46,18 @@ const cacheKey = JSON.stringify(defaultOptions)
 const cjsKeys = Object.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
-class PkgInfo {
+class Package {
   static cache =
-    shared.pkgInfo[cacheKey] ||
-    (shared.pkgInfo[cacheKey] = new FastObject)
+    shared.package[cacheKey] ||
+    (shared.package[cacheKey] = new FastObject)
 
   static createOptions = createOptions
   static defaultOptions = defaultOptions
-  static defaultPkgInfo = null
+  static default = null
 
   constructor(dirPath, range, options) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-    options = PkgInfo.createOptions(options)
+    options = Package.createOptions(options)
 
     let cachePath = null
 
@@ -92,50 +92,52 @@ class PkgInfo {
   static get(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
 
-    let pkgInfo
+    let pkg
 
-    if (dirPath in PkgInfo.cache) {
-      pkgInfo = PkgInfo.cache[dirPath]
+    if (dirPath in Package.cache) {
+      pkg = Package.cache[dirPath]
 
       if (! force ||
-          pkgInfo) {
-        return pkgInfo
+          pkg) {
+        return pkg
       }
     }
 
     if (basename(dirPath) === "node_modules") {
-      return PkgInfo.cache[dirPath] = force
+      return Package.cache[dirPath] = force
         ? readInfo(dirPath, true)
         : null
     }
 
-    pkgInfo = readInfo(dirPath)
+    pkg = readInfo(dirPath)
 
-    if (pkgInfo === null) {
+    if (pkg === null) {
       const parentPath = dirname(dirPath)
-      pkgInfo = parentPath === dirPath ? null : PkgInfo.get(parentPath)
+      pkg = parentPath === dirPath ? null : Package.get(parentPath)
     }
 
-    if (pkgInfo === null &&
-          PkgInfo.defaultPkgInfo) {
-      pkgInfo = PkgInfo.defaultPkgInfo
+    const defaultPkg = Package.default
+
+    if (pkg === null &&
+        defaultPkg) {
+      pkg = defaultPkg
     }
 
     if (force &&
-        pkgInfo === null) {
-      pkgInfo = readInfo(dirPath, force)
+        pkg === null) {
+      pkg = readInfo(dirPath, force)
     }
 
-    return PkgInfo.cache[dirPath] = pkgInfo
+    return Package.cache[dirPath] = pkg
   }
 
   static from(mod, force) {
-    return PkgInfo.get(getModuleDirname(mod), force)
+    return Package.get(getModuleDirname(mod), force)
   }
 
-  static set(dirPath, pkgInfo) {
+  static set(dirPath, pkg) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-    PkgInfo.cache[dirPath] = pkgInfo
+    Package.cache[dirPath] = pkg
   }
 }
 
@@ -187,7 +189,7 @@ function createOptions(options) {
     sourceMap = options.sourcemap
   }
 
-  options = _createOptions(options, PkgInfo.defaultOptions)
+  options = _createOptions(options, Package.defaultOptions)
 
   if (typeof options.cache !== "string") {
     options.cache = !! options.cache
@@ -230,7 +232,7 @@ function getRange(json, name) {
 
 function readInfo(dirPath, force) {
   let optionsPath
-  let pkgInfo
+  let pkg
 
   let options = readFile(resolve(dirPath, ESMRC_FILENAME), "utf8")
   let optionsFound = options !== null
@@ -247,26 +249,26 @@ function readInfo(dirPath, force) {
     if (extname(optionsPath) === ".json") {
       options = readJSON6(optionsPath)
     } else {
-      pkgInfo =
-      PkgInfo.cache[dirPath] = new PkgInfo(dirPath, "*", {
+      pkg =
+      Package.cache[dirPath] = new Package(dirPath, "*", {
         cjs: true,
         esm: "js",
         gz: true
       })
 
-      pkgInfo.options =
-      PkgInfo.createOptions(loadESM(optionsPath, null, false).module.exports)
+      pkg.options =
+      Package.createOptions(loadESM(optionsPath, null, false).module.exports)
     }
   }
 
-  let parentPkgInfo
+  let parentPkg
   let pkgParsed = false
   let pkgJSON = readFileFast(resolve(dirPath, PACKAGE_FILENAME), "utf8")
 
   if (! force &&
       pkgJSON === null) {
     if (optionsFound) {
-      parentPkgInfo = PkgInfo.get(dirname(dirPath))
+      parentPkg = Package.get(dirname(dirPath))
     } else {
       return null
     }
@@ -290,8 +292,8 @@ function readInfo(dirPath, force) {
 
   if (force) {
     range = "*"
-  } else if (parentPkgInfo) {
-    range = parentPkgInfo.range
+  } else if (parentPkg) {
+    range = parentPkg.range
   } else {
     if (! pkgParsed) {
       pkgParsed = true
@@ -315,9 +317,9 @@ function readInfo(dirPath, force) {
     }
   }
 
-  if (pkgInfo) {
-    pkgInfo.range = range
-    return pkgInfo
+  if (pkg) {
+    pkg.range = range
+    return pkg
   }
 
   if (options === true ||
@@ -325,7 +327,7 @@ function readInfo(dirPath, force) {
     options = getEnvVars().ESM_OPTIONS
   }
 
-  return new PkgInfo(dirPath, range, options)
+  return new Package(dirPath, range, options)
 }
 
 function toOptions(value) {
@@ -338,13 +340,13 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-Object.setPrototypeOf(PkgInfo.prototype, null)
+Object.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-PkgInfo.cache[""] = new PkgInfo("", version, {
+Package.cache[""] = new Package("", version, {
   cache: false,
   cjs: true,
   gz: true
 })
 
-export default PkgInfo
+export default Package

@@ -1,5 +1,5 @@
 import Module from "../module.js"
-import PkgInfo from "../pkg-info.js"
+import Package from "../package.js"
 
 import assign from "../util/assign.js"
 import builtinEntries from "../builtin-entries.js"
@@ -46,16 +46,16 @@ function hook(Mod) {
       throw error
     }
 
-    const { defaultPkgInfo } = PkgInfo
+    const defaultPkg = Package.default
     const dirPath = dirname(filePath)
 
-    if (PkgInfo.get(dirPath) === defaultPkgInfo) {
-      const pkgInfo = new PkgInfo("", "*", { cache: false })
-      const pkgOptions = pkgInfo.options
+    if (Package.get(dirPath) === defaultPkg) {
+      const pkg = new Package("", "*", { cache: false })
+      const pkgOptions = pkg.options
 
-      assign(pkgInfo, defaultPkgInfo)
-      pkgInfo.options = assign(pkgOptions, defaultPkgInfo.options)
-      PkgInfo.set(dirPath, pkgInfo)
+      assign(pkg, defaultPkg)
+      pkg.options = assign(pkgOptions, defaultPkg.options)
+      Package.set(dirPath, pkg)
     }
 
     loadESM(filePath, null, true)
