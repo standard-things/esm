@@ -27,6 +27,7 @@ function hook(vm) {
 
   function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkg.range)
+
     return wrapped.call(this, manager, func, args)
   }
 
