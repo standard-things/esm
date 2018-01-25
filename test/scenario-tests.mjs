@@ -5,7 +5,6 @@ import path from "path"
 import trash from "../script/trash.js"
 
 const canTestPM2 =
-  "v8" in process.versions &&
   ! ("TRAVIS" in process.env)
 
 const isWin = process.platform === "win32"
