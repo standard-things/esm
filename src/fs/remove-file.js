@@ -1,10 +1,13 @@
 import { unlinkSync } from "fs"
 
 function removeFile(filename) {
-  try {
-    unlinkSync(filename)
-    return true
-  } catch (e) {}
+  if (typeof filename === "string") {
+    try {
+      unlinkSync(filename)
+      return true
+    } catch (e) {}
+  }
+
   return false
 }
 

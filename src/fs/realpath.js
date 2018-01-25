@@ -1,9 +1,12 @@
 import { realpathSync } from "fs"
 
 function realpath(thePath) {
-  try {
-    return realpathSync(thePath)
-  } catch (e) {}
+  if (typeof thePath === "string") {
+    try {
+      return realpathSync(thePath)
+    } catch (e) {}
+  }
+
   return ""
 }
 

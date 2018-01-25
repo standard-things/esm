@@ -1,10 +1,13 @@
 import { writeFileSync } from "fs"
 
 function writeFile(filename, bufferOrString, options) {
-  try {
-    writeFileSync(filename, bufferOrString, options)
-    return true
-  } catch (e) {}
+  if (typeof filename === "string") {
+    try {
+      writeFileSync(filename, bufferOrString, options)
+      return true
+    } catch (e) {}
+  }
+
   return false
 }
 
