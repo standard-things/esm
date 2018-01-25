@@ -1,7 +1,8 @@
+import { inspect, promisify } from "util"
+
 import FastObject from "./fast-object.js"
 
 import getModuleURL from "./util/get-module-url.js"
-import { promisify } from "util"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
@@ -16,15 +17,16 @@ try {
 
 const messages = new FastObject
 
-messages["ERR_EXPORT_MISSING"] = exportMissing
-messages["ERR_EXPORT_STAR_CONFLICT"] = exportStarConflict
-messages["ERR_INVALID_ARG_TYPE"] = invalidArgType
-messages["ERR_INVALID_PROTOCOL"] = invalidProtocol
-messages["ERR_MISSING_MODULE"] = missingESM
-messages["ERR_MODULE_RESOLUTION_LEGACY"] = moduleResolutionLegacy
-messages["ERR_REQUIRE_ESM"] = requireESM
-messages["ERR_UNKNOWN_FILE_EXTENSION"] = unknownFileExtension
-messages["MODULE_NOT_FOUND"] = missingCJS
+messages.ERR_EXPORT_MISSING = exportMissing
+messages.ERR_EXPORT_STAR_CONFLICT = exportStarConflict
+messages.ERR_INVALID_ARG_TYPE = invalidArgType
+messages.ERR_INVALID_ARG_VALUE = invalidArgValue
+messages.ERR_INVALID_PROTOCOL = invalidProtocol
+messages.ERR_MISSING_MODULE = missingESM
+messages.ERR_MODULE_RESOLUTION_LEGACY = moduleResolutionLegacy
+messages.ERR_REQUIRE_ESM = requireESM
+messages.ERR_UNKNOWN_FILE_EXTENSION = unknownFileExtension
+messages.MODULE_NOT_FOUND = missingCJS
 
 function createBuiltinClass(Super) {
   return class BuiltinError extends Super {
@@ -67,18 +69,34 @@ function createNodeClass(Super) {
 
 function exportMissing(request, exportName) {
   const moduleName = getModuleURL(request)
+
   return "Module " + toStringLiteral(moduleName, "'") +
     " does not provide an export named '" + exportName + "'"
 }
 
 function exportStarConflict(request, exportName) {
   const moduleName = getModuleURL(request)
+
   return "Module " + toStringLiteral(moduleName, "'") +
     " contains conflicting star exports for name '" + exportName + "'"
 }
 
-function invalidArgType(argName, expected) {
-  return "The '" + argName + "' argument must be " + expected
+function invalidArgType(argName, expected, actual) {
+  const message = "The '" + argName + "' argument must be " + expected
+
+  return arguments.length > 2
+    ? message + ". Received type " + (actual === null ? "null" : typeof actual)
+    : message
+}
+
+function invalidArgValue(argName, value, reason = "is invalid") {
+  let inspected = inspect(value)
+
+  if (inspected.length > 128) {
+    inspected = inspected.slice(0, 128) + "..."
+  }
+
+  return "The argument '" + argName + "' " + reason + ". Received " + inspected
 }
 
 function invalidProtocol(protocol, expected) {
