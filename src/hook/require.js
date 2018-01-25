@@ -1,5 +1,5 @@
-import assert from "assert"
 import builtinEntries from "../builtin-entries.js"
+import errors from "../errors.js"
 import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import moduleState from "../module/state.js"
@@ -7,8 +7,13 @@ import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(parent) {
   function requirer(request) {
-    assert(request, "missing path")
-    assert(typeof request === "string", "path must be a string")
+    if (typeof request !== "string") {
+      throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+    }
+
+    if (request === "") {
+      throw new errors.Error("ERR_INVALID_ARG_VALUE", "request",  request, "must be a non-empty string")
+    }
 
     return request in builtinEntries
       ? builtinEntries.module.exports

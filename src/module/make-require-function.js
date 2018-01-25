@@ -4,6 +4,7 @@
 
 import Module from "../module.js"
 
+import errors from "../errors.js"
 import moduleState from "./state.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
@@ -18,10 +19,18 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   function resolve(request, options) {
+    if (typeof request !== "string") {
+      throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+    }
+
     return resolver.call(mod, request, options)
   }
 
   function paths(request) {
+    if (typeof request !== "string") {
+      throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+    }
+
     return Module._resolveLookupPaths(request, mod, true)
   }
 

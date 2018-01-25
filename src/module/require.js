@@ -5,7 +5,6 @@
 import Entry from "../entry.js"
 import Module from "../module.js"
 
-import assert from "assert"
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 import getFilePathFromURL from "../util/get-file-path-from-url.js"
@@ -13,8 +12,13 @@ import isError from "../util/is-error.js"
 import loadESM from "./esm/_load.js"
 
 function require(request) {
-  assert(request, "missing path")
-  assert(typeof request === "string", "path must be a string")
+  if (typeof request !== "string") {
+    throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+  }
+
+  if (request === "") {
+    throw new errors.Error("ERR_INVALID_ARG_VALUE", "request",  request, "must be a non-empty string")
+  }
 
   if (request in builtinEntries) {
     return builtinEntries[request].module.exports
