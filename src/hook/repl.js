@@ -55,10 +55,10 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    const cacheFileName =
-    entry.cacheFileName = getCacheFileName(entry, sourceCode)
+    const cacheName =
+    entry.cacheName = getCacheFileName(entry, sourceCode)
 
-    let cached = pkg.cache[cacheFileName]
+    let cached = pkg.cache[cacheName]
 
     if (cached) {
       if (scriptOptions.produceCachedData === true &&
@@ -92,7 +92,7 @@ function hook(vm) {
     const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
-      pkg.cache[cacheFileName].scriptData = result.cachedData
+      pkg.cache[cacheName].scriptData = result.cachedData
     }
 
     entry.state = 3

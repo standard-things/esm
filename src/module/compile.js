@@ -36,7 +36,7 @@ function compile(content, filename) {
   const entry = Entry.get(this)
 
   if (! entry.state) {
-    entry.cacheFileName = getCacheFileName(entry, content)
+    entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
     entry.runtimeName = runtimeName
 

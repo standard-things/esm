@@ -50,15 +50,15 @@ function compile(entry, content, filename) {
 
   const pkg = entry.package
   const { cache, cachePath } = pkg
-  const { cacheFileName } = entry
+  const { cacheName } = entry
 
-  let cached = cache[cacheFileName]
+  let cached = cache[cacheName]
 
   if (cached === true) {
-    const code = readCachedCode(resolve(cachePath, cacheFileName), options)
+    const code = readCachedCode(resolve(cachePath, cacheName), options)
 
     cached =
-    cache[cacheFileName] = Compiler.from(code)
+    cache[cacheName] = Compiler.from(code)
   } else if (! cached) {
     cached = tryCompileCode(entry, content, {
       hint,
@@ -81,11 +81,11 @@ function compile(entry, content, filename) {
   }
 
   if (moduleState.parsing) {
-    const cached = entry.package.cache[entry.cacheFileName]
+    const cached = entry.package.cache[entry.cacheName]
     const defaultPkg = Package.default
     const isESM = cached && cached.esm
     const { parent } = entry
-    const parentCached = parent && parent.package.cache[parent.cacheFileName]
+    const parentCached = parent && parent.package.cache[parent.cacheName]
     const parentIsESM = parentCached && parentCached.esm
 
     if (! isESM &&
@@ -109,7 +109,7 @@ function compile(entry, content, filename) {
 function tryCompileCached(entry) {
   const noDepth = moduleState.requireDepth === 0
   const { options } = entry.package
-  const cached = entry.package.cache[entry.cacheFileName]
+  const cached = entry.package.cache[entry.cacheName]
   const isESM = cached && cached.esm
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -145,7 +145,7 @@ function tryCompileCJS(entry) {
   let content =
     "const " + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global,exports,require){" +
-    entry.package.cache[entry.cacheFileName].code +
+    entry.package.cache[entry.cacheName].code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)
@@ -169,7 +169,7 @@ function tryCompileESM(entry) {
     '"use strict";const ' + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global" +
     (options.cjs.vars ? ",exports,require" : "") +
-    "){" + entry.package.cache[entry.cacheFileName].code + "\n}))"
+    "){" + entry.package.cache[entry.cacheName].code + "\n}))"
 
   content += maybeSourceMap(entry, content)
 

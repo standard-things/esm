@@ -46,7 +46,7 @@ class Entry {
     // The raw namespace object.
     this._namespace = new NullObject
     // The cache file name of the module.
-    this.cacheFileName = null
+    this.cacheName = null
     // The cache key of the module.
     this.cacheKey = null
     // The child entries of the module.
@@ -156,7 +156,7 @@ class Entry {
         getters[key] = getter
       }
 
-      const cached = this.package.cache[this.cacheFileName]
+      const cached = this.package.cache[this.cacheName]
       const isESM = cached && cached.esm
 
       if (isESM ||
@@ -213,7 +213,7 @@ class Entry {
       }
     }
 
-    const cached = this.package.cache[this.cacheFileName]
+    const cached = this.package.cache[this.cacheName]
     const isESM = cached && cached.esm
 
     let setGetters = true
@@ -316,7 +316,7 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
-  const cached = entry.package.cache[entry.cacheFileName]
+  const cached = entry.package.cache[entry.cacheName]
   const exported = entry.module.exports
   const isESM = cached && cached.esm
 
@@ -395,7 +395,7 @@ function createNamespace() {
 }
 
 function getExportByName(entry, setter, name) {
-  const cached = entry.package.cache[entry.cacheFileName]
+  const cached = entry.package.cache[entry.cacheName]
   const isESM = cached && cached.esm
 
   const isScript =
@@ -483,7 +483,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  const cached = entry.package.cache[entry.cacheFileName]
+  const cached = entry.package.cache[entry.cacheName]
   const isESM = cached && cached.esm
 
   if (isESM) {

@@ -5,7 +5,7 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 function validate(entry) {
-  const cached = entry.package.cache[entry.cacheFileName]
+  const cached = entry.package.cache[entry.cacheName]
   const { exportSpecifiers, moduleSpecifiers } = cached
 
   const children = new NullObject
@@ -31,7 +31,7 @@ function validate(entry) {
   for (const name in children) {
     const childEntry = children[name]
     const child = childEntry.module
-    const childCached = childEntry.package.cache[childEntry.cacheFileName]
+    const childCached = childEntry.package.cache[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
     const requestedExportNames = moduleSpecifiers[name]
 
@@ -79,7 +79,7 @@ function validate(entry) {
     }
 
     const childEntry = children[starName]
-    const childCached = childEntry.package.cache[childEntry.cacheFileName]
+    const childCached = childEntry.package.cache[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
 
     if (! childIsESM) {

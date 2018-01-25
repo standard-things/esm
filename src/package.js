@@ -67,19 +67,16 @@ class Package {
       cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
     }
 
-    const cacheFileNames = cachePath === null
-      ? cachePath
-      : readdir(cachePath)
-
-    let i = -1
     const cache = new NullObject
-    const nameCount = cacheFileNames ? cacheFileNames.length : 0
+    const cacheNames = readdir(cachePath)
 
-    while (++i < nameCount) {
-      // Later, in the ".js" or ".mjs" compiler, we'll change the cached value
-      // to its associated mocked compiler result, but for now we merely register
-      // that a cache file exists.
-      cache[cacheFileNames[i]] = true
+    if (cacheNames) {
+      for (const cacheName of cacheNames) {
+        // Later, in the ".js" or ".mjs" compiler, we'll change the cached value
+        // to its associated mocked compiler result, but for now we merely register
+        // that a cache file exists.
+        cache[cacheName] = true
+      }
     }
 
     this.cache = cache

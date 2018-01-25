@@ -12,7 +12,7 @@ import nodeModulePaths from "./node-module-paths.js"
 const { slice } = Array.prototype
 
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
-  const parentFilePath = parent && parent.filename
+  const parentFilename = parent && parent.filename
 
   // Look outside if not a relative path.
   if (! isRelativePath(request)) {
@@ -30,7 +30,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   // With --eval, `parent.id` is not set and `parent.filename` is `null`.
   if (! parent ||
       ! parent.id ||
-      ! parentFilePath) {
+      ! parentFilename) {
     // Normally, the path is taken from `realpath(__filename)`,
     // but with --eval there is no `__filename`.
     const paths = skipGlobalPaths

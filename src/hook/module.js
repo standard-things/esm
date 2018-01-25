@@ -86,20 +86,20 @@ function hook(Mod, parent) {
 
     const { _compile } = mod
     const entry = Entry.get(mod)
-    const cacheFileName = getCacheFileName(entry, mtime(filename))
-    const stateHash = getCacheStateHash(cacheFileName)
+    const cacheName = getCacheFileName(entry, mtime(filename))
+    const stateHash = getCacheStateHash(cacheName)
     const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
-    entry.cacheFileName = cacheFileName
+    entry.cacheName = cacheName
     entry.runtimeName = runtimeName
 
     const { cache, cachePath, options } = entry.package
-    let cached = cache[cacheFileName]
+    let cached = cache[cacheName]
 
     if (cached === true &&
-        ! isFile(resolve(cachePath, cacheFileName))) {
+        ! isFile(resolve(cachePath, cacheName))) {
       cached = null
-      delete cache[cacheFileName]
+      delete cache[cacheName]
     }
 
     const compileWrapper = (content, filename) => {

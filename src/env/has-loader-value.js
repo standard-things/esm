@@ -7,16 +7,16 @@ import rootModule from "../root-module.js"
 
 const { keys } = Object
 
-const stdPath = __non_webpack_module__.filename
+const stdFilename = __non_webpack_module__.filename
 
 function hasLoaderValue(value) {
   if (typeof value === "string") {
     if (isPath(value)) {
-      if (realpath(resolve(value)) === stdPath) {
+      if (realpath(resolve(value)) === stdFilename) {
         return true
       }
     } else if (value.charCodeAt(0) !== 45 /* - */ &&
-        _resolveFilename(value, rootModule) === stdPath) {
+        _resolveFilename(value, rootModule) === stdFilename) {
       return true
     }
   } else if (isObjectLike(value)) {

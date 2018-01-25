@@ -12,8 +12,8 @@ const useBuiltins = module.constructor.length > 1
 
 const Module = useBuiltins ? module.constructor : require("module")
 
+const stdFilename = path.resolve(__dirname, "esm.js.gz")
 const stdMod = new Module(module.id, null)
-const stdPath = path.resolve(__dirname, "esm.js.gz")
 const stdReq = useBuiltins ? require : (request) => stdMod.require(request)
 
 stdMod.filename = __filename
@@ -21,7 +21,7 @@ stdMod.parent = module.parent
 
 const content =
   "(function(require,module,__shared__){" +
-  zlib.gunzipSync(fs.readFileSync(stdPath)) +
+  zlib.gunzipSync(fs.readFileSync(stdFilename)) +
   "\n})"
 
 const scriptOptions = Object.create(null)

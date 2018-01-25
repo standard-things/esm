@@ -9,15 +9,15 @@ function isFromNyc() {
   }
 
   const { parent } = __non_webpack_module__
-  const parentFilePath = parent && normalize(parent.filename)
+  const parentFilename = parent && normalize(parent.filename)
 
-  const nycIndex = parentFilePath
-    ? parentFilePath.lastIndexOf("/node_modules/nyc/")
+  const nycIndex = parentFilename
+    ? parentFilename.lastIndexOf("/node_modules/nyc/")
     : -1
 
   const nycJSON = nycIndex === -1
     ? null
-    : readJSON(parentFilePath.slice(0, nycIndex + 18) + "package.json")
+    : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
 
   return shared.env.isFromNyc =
     has(nycJSON, "name") &&

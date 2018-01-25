@@ -10,7 +10,7 @@ import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
 
-const stdPath = __non_webpack_module__.filename
+const stdFilename = __non_webpack_module__.filename
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
@@ -165,7 +165,7 @@ function resolveURL(name) {
 function scrub(stack) {
   return stack
     .split("\n")
-    .filter((line) => line.indexOf(stdPath) === -1)
+    .filter((line) => line.indexOf(stdFilename) === -1)
     .join("\n")
     .replace(removeColumnInfoRegExp, ":1")
 }

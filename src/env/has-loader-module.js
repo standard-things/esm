@@ -1,10 +1,10 @@
 const { isArray } = Array
 
-const stdPath = __non_webpack_module__.filename
+const stdFilename = __non_webpack_module__.filename
 
 function hasLoaderModule(modules) {
   return isArray(modules) &&
-    modules.some(({ filename }) => filename === stdPath)
+    modules.some(({ filename }) => filename === stdFilename)
 }
 
 export default hasLoaderModule

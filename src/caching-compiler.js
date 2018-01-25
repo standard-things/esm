@@ -71,7 +71,7 @@ class CachingCompiler {
 
 function compileAndCache(entry, code, options) {
   const result =
-  entry.package.cache[entry.cacheFileName] =
+  entry.package.cache[entry.cacheName] =
   Compiler.compile(code, toCompileOptions(entry, options))
 
   // Add "main" to enable the `readFileFast` fast path of
@@ -102,13 +102,13 @@ function compileAndWrite(entry, code, options) {
     return result
   }
 
-  const { cacheFileName } = entry
+  const { cacheName } = entry
   const { cachePath } = entry.package
-  const cacheFilePath = resolve(cachePath, cacheFileName)
+  const cacheFilename = resolve(cachePath, cacheName)
   const content = result.code
 
-  shared.pendingWrites[cacheFilePath] = {
-    cacheFileName,
+  shared.pendingWrites[cacheFilename] = {
+    cacheName,
     cachePath,
     content,
     entry
@@ -117,11 +117,11 @@ function compileAndWrite(entry, code, options) {
   return result
 }
 
-function removeExpired(cache, cachePath, cacheFileName) {
-  const shortname = cacheFileName.slice(0, 8)
+function removeExpired(cache, cachePath, cacheName) {
+  const shortname = cacheName.slice(0, 8)
 
   for (const key in cache) {
-    if (key !== cacheFileName &&
+    if (key !== cacheName &&
         key.startsWith(shortname)) {
       removeFile(resolve(cachePath, key))
     }
@@ -143,24 +143,24 @@ Object.setPrototypeOf(CachingCompiler.prototype, null)
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
   process.once("exit", () => {
-    for (const cacheFilePath in shared.pendingWrites) {
+    for (const cacheFilename in shared.pendingWrites) {
       let {
-        cacheFileName,
+        cacheName,
         cachePath,
         content,
         entry
-      } = shared.pendingWrites[cacheFilePath]
+      } = shared.pendingWrites[cacheFilename]
 
       if (! mkdirp(cachePath)) {
         continue
       }
 
-      if (extname(cacheFilePath) === ".gz") {
+      if (extname(cacheFilename) === ".gz") {
         content = gzip(content)
       }
 
-      if (writeFile(cacheFilePath, content)) {
-        removeExpired(entry.package.cache, cachePath, cacheFileName)
+      if (writeFile(cacheFilename, content)) {
+        removeExpired(entry.package.cache, cachePath, cacheName)
       }
     }
 
