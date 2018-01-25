@@ -8,14 +8,14 @@ const cacheKeys = new FastObject
 const messages = new FastObject
 const warned = new FastObject
 
-cacheKeys["WRN_NS_ASSIGNMENT"] =
-cacheKeys["WRN_NS_EXTENSION"] =
-cacheKeys["WRN_TDZ_ACCESS"] = moduleCacheKey
+cacheKeys.WRN_NS_ASSIGNMENT =
+cacheKeys.WRN_NS_EXTENSION =
+cacheKeys.WRN_TDZ_ACCESS = moduleCacheKey
 
-messages["WRN_ARGUMENTS_ACCESS"] = argumentsAccess
-messages["WRN_NS_ASSIGNMENT"] = namespaceAssignment
-messages["WRN_NS_EXTENSION"] = namespaceExtension
-messages["WRN_TDZ_ACCESS"] = temporalDeadZoneAccess
+messages.WRN_ARGUMENTS_ACCESS = argumentsAccess
+messages.WRN_NS_ASSIGNMENT = namespaceAssignment
+messages.WRN_NS_EXTENSION = namespaceExtension
+messages.WRN_TDZ_ACCESS = temporalDeadZoneAccess
 
 function moduleCacheKey(request, name) {
   return getModuleURL(request) + "\0" + name
