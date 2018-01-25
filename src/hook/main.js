@@ -25,11 +25,11 @@ function hook(Mod) {
     }
 
     let error
-    let filePath
+    let filename
     let threw = true
 
     try {
-      filePath = resolveFilename(mainPath, null, true)
+      filename = resolveFilename(mainPath, null, true)
       threw = false
     } catch (e) {
       error = e
@@ -37,17 +37,17 @@ function hook(Mod) {
 
     if (threw) {
       try {
-        filePath = Module._resolveFilename(mainPath, null, true)
+        filename = Module._resolveFilename(mainPath, null, true)
       } catch (e) {}
     }
 
     if (threw &&
-        ! filePath) {
+        ! filename) {
       throw error
     }
 
     const defaultPkg = Package.default
-    const dirPath = dirname(filePath)
+    const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {
       const pkg = new Package("", "*", { cache: false })
@@ -58,7 +58,7 @@ function hook(Mod) {
       Package.set(dirPath, pkg)
     }
 
-    loadESM(filePath, null, true)
+    loadESM(filename, null, true)
     tickCallback()
   }
 

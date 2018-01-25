@@ -32,7 +32,7 @@ const useRunInDebugContext = typeof runInDebugContext === "function"
 const md5Hash = md5(now().toString()).slice(0, 3)
 const runtimeName = encodeId("_" + md5Hash)
 
-function compile(content, filePath) {
+function compile(content, filename) {
   const entry = Entry.get(this)
 
   if (! entry.state) {
@@ -40,7 +40,7 @@ function compile(content, filePath) {
     entry.package = Package.get("")
     entry.runtimeName = runtimeName
 
-    _compile(entry, content, filePath)
+    _compile(entry, content, filename)
     return
   }
 
@@ -51,7 +51,7 @@ function compile(content, filePath) {
     cachedData: void 0,
     columnOffset: 0,
     displayErrors: true,
-    filename: filePath,
+    filename,
     lineOffset: 0,
     produceCachedData: true
   })
@@ -59,7 +59,7 @@ function compile(content, filePath) {
   const compiledWrapper = script.runInThisContext({
     columnOffset: 0,
     displayErrors: true,
-    filename: filePath,
+    filename,
     lineOffset: 0
   })
 
@@ -75,7 +75,7 @@ function compile(content, filePath) {
     }
 
     // Set breakpoint on module start.
-    if (filePath === resolvedArgv) {
+    if (filename === resolvedArgv) {
       delete process._breakFirstLine
       inspectorWrapper = callAndPauseOnStart
 
@@ -95,10 +95,10 @@ function compile(content, filePath) {
 
   if (inspectorWrapper) {
     result = inspectorWrapper.call(inspectorBinding, compiledWrapper,
-      exported, exported, req, this, filePath, dirname(filePath))
+      exported, exported, req, this, filename, dirname(filename))
   } else {
     result = compiledWrapper.call(
-      exported, exported, req, this, filePath, dirname(filePath))
+      exported, exported, req, this, filename, dirname(filename))
   }
 
   entry.state = 4

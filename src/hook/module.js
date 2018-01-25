@@ -70,8 +70,8 @@ function hook(Mod, parent) {
   Package.default = defaultPkg
 
   function managerWrapper(manager, func, args) {
-    const [, filePath] = args
-    const pkg = Package.from(filePath)
+    const [, filename] = args
+    const pkg = Package.from(filename)
     const wrapped = Wrapper.find(_extensions, ".js", pkg.range)
 
     return wrapped
@@ -80,13 +80,13 @@ function hook(Mod, parent) {
   }
 
   function methodWrapper(manager, func, args) {
-    const [mod, filePath] = args
+    const [mod, filename] = args
     const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
     const { _compile } = mod
     const entry = Entry.get(mod)
-    const cacheFileName = getCacheFileName(entry, mtime(filePath))
+    const cacheFileName = getCacheFileName(entry, mtime(filename))
     const stateHash = getCacheStateHash(cacheFileName)
     const runtimeName = encodeId("_" + stateHash.slice(0, 3))
 
@@ -102,7 +102,7 @@ function hook(Mod, parent) {
       delete cache[cacheFileName]
     }
 
-    const compileWrapper = (content, filePath) => {
+    const compileWrapper = (content, filename) => {
       if (shouldOverwrite) {
         if (shouldRestore) {
           mod._compile = _compile
@@ -111,7 +111,7 @@ function hook(Mod, parent) {
         }
       }
 
-      if (! compile(entry, content, filePath)) {
+      if (! compile(entry, content, filename)) {
         entry.state = 3
         return tryPassthru.call(this, func, args, options)
       }
@@ -129,8 +129,8 @@ function hook(Mod, parent) {
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
-      const content = cached ? "" : readSourceCode(filePath, options)
-      mod._compile(content, filePath)
+      const content = cached ? "" : readSourceCode(filename, options)
+      mod._compile(content, filename)
     }
   }
 
@@ -167,25 +167,25 @@ function hook(Mod, parent) {
   })
 }
 
-function mjsCompiler(mod, filePath) {
+function mjsCompiler(mod, filename) {
   const error = new errors.Error("ERR_REQUIRE_ESM", mod)
   const { mainModule } = moduleState
 
   if (mainModule &&
-      mainModule.filename === filePath) {
+      mainModule.filename === filename) {
     toOptInError(error)
   }
 
   throw error
 }
 
-function readSourceCode(filePath, options) {
+function readSourceCode(filename, options) {
   if (options && options.gz &&
-      extname(filePath) === ".gz") {
-    return gunzip(readFile(filePath), "utf8")
+      extname(filename) === ".gz") {
+    return gunzip(readFile(filename), "utf8")
   }
 
-  return readFile(filePath, "utf8")
+  return readFile(filename, "utf8")
 }
 
 function tryPassthru(func, args, options) {
@@ -199,9 +199,9 @@ function tryPassthru(func, args, options) {
         throw e
       }
 
-      const [, filePath] = args
-      const content = () => readSourceCode(filePath, options)
-      throw maskStackTrace(e, content, filePath)
+      const [, filename] = args
+      const content = () => readSourceCode(filename, options)
+      throw maskStackTrace(e, content, filename)
     }
   }
 }

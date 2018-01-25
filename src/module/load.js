@@ -6,22 +6,22 @@ import { dirname, extname } from "path"
 
 import Module from "../module.js"
 
-function load(filePath) {
+function load(filename) {
   if (this.loaded) {
     throw new Error("Module already loaded: " + this.id)
   }
 
-  let ext = extname(filePath)
+  let ext = extname(filename)
 
   if (ext === "" ||
       typeof Module._extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  this.filename = filePath
-  this.paths = Module._nodeModulePaths(dirname(filePath))
+  this.filename = filename
+  this.paths = Module._nodeModulePaths(dirname(filename))
 
-  Module._extensions[ext](this, filePath)
+  Module._extensions[ext](this, filename)
   this.loaded = true
 }
 

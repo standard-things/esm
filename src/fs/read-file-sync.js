@@ -2,12 +2,12 @@ import { readFileSync as _readFileSync } from "fs"
 import isFile from "../util/is-file.js"
 import stripBOM from "../util/strip-bom.js"
 
-function readFileSync(filePath, options) {
+function readFileSync(filename, options) {
   let content = null
 
-  if (isFile(filePath)) {
+  if (isFile(filename)) {
     try {
-      content = _readFileSync(filePath, options)
+      content = _readFileSync(filename, options)
     } catch (e) {}
   }
 

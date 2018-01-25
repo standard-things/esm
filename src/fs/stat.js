@@ -11,52 +11,52 @@ const { isFile } = Stats.prototype
 
 let useStatFastPath = typeof internalModuleStat === "function"
 
-function stat(filePath) {
-  if (typeof filePath !== "string") {
+function stat(filename) {
+  if (typeof filename !== "string") {
     return -1
   }
 
   const cache = moduleState.stat
 
   if (cache &&
-      filePath in cache) {
-    return cache[filePath]
+      filename in cache) {
+    return cache[filename]
   }
 
-  const result = baseStat(filePath)
+  const result = baseStat(filename)
 
   if (cache) {
-    cache[filePath] = result
+    cache[filename] = result
   }
 
   return result
 }
 
-function baseStat(filePath) {
+function baseStat(filename) {
   if (useStatFastPath) {
     try {
-      return fastPathStat(filePath)
+      return fastPathStat(filename)
     } catch (e) {
       useStatFastPath = false
     }
   }
 
-  return fallbackStat(filePath)
+  return fallbackStat(filename)
 }
 
-function fallbackStat(filePath) {
+function fallbackStat(filename) {
   try {
-    return isFile.call(statSync(filePath)) ? 0 : 1
+    return isFile.call(statSync(filename)) ? 0 : 1
   } catch (e) {}
 
   return -1
 }
 
-function fastPathStat(filePath) {
+function fastPathStat(filename) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
-  return internalModuleStat.call(fsBinding, toNamespacedPath(filePath))
+  return internalModuleStat.call(fsBinding, toNamespacedPath(filename))
 }
 
 export default stat

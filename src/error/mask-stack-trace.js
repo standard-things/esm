@@ -20,7 +20,7 @@ const headerRegExp = /^(.+?)(?=:\d+\n)/
 const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
-function maskStackTrace(error, sourceCode, filePath, isESM) {
+function maskStackTrace(error, sourceCode, filename, isESM) {
   if (! isError(error)) {
     return error
   }
@@ -41,7 +41,7 @@ function maskStackTrace(error, sourceCode, filePath, isESM) {
       const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
 
       stack = stack.replace(message, error.message)
-      stack = masker(stack, sourceCode, filePath)
+      stack = masker(stack, sourceCode, filename)
       return error.stack = withoutMessage(stack, error.message, scrubber)
     },
     set(value) {
@@ -60,7 +60,7 @@ function maskStackTrace(error, sourceCode, filePath, isESM) {
 //
 // <type>: <message>
 //   ...
-function maskParserStack(stack, sourceCode, filePath) {
+function maskParserStack(stack, sourceCode, filename) {
   const parts = parserMessageRegExp.exec(stack)
 
   if (parts === null) {
@@ -75,12 +75,12 @@ function maskParserStack(stack, sourceCode, filePath) {
   const spliceArgs = [0, 1]
   const stackLines = stack.split("\n")
 
-  if (typeof filePath === "string") {
-    spliceArgs.push(filePath + ":" + lineNum)
+  if (typeof filename === "string") {
+    spliceArgs.push(filename + ":" + lineNum)
   }
 
   if (typeof sourceCode === "function") {
-    sourceCode = sourceCode(filePath)
+    sourceCode = sourceCode(filename)
   }
 
   if (typeof sourceCode === "string") {
@@ -103,12 +103,12 @@ function maskParserStack(stack, sourceCode, filePath) {
   return stackLines.join("\n")
 }
 
-function maskEngineStack(stack, sourceCode, filePath) {
+function maskEngineStack(stack, sourceCode, filename) {
   const parts = engineMessageRegExp.exec(stack)
 
-  if (typeof filePath === "string" &&
+  if (typeof filename === "string" &&
       ! headerRegExp.test(stack)) {
-    stack = filePath + ":1\n" + stack
+    stack = filename + ":1\n" + stack
   }
 
   if (parts === null) {
@@ -120,7 +120,7 @@ function maskEngineStack(stack, sourceCode, filePath) {
 
     if (snippet.indexOf(ZWJ) !== -1) {
       if (typeof sourceCode === "function") {
-        sourceCode = sourceCode(filePath)
+        sourceCode = sourceCode(filename)
       }
 
       if (typeof sourceCode !== "string") {

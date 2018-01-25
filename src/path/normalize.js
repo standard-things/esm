@@ -2,9 +2,9 @@ import { resolve } from "path"
 
 const backSlashRegExp = /\\/g
 
-function normalize(filePath) {
-  return typeof filePath === "string"
-    ? resolve(filePath).replace(backSlashRegExp, "/")
+function normalize(filename) {
+  return typeof filename === "string"
+    ? resolve(filename).replace(backSlashRegExp, "/")
     : ""
 }
 

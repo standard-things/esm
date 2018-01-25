@@ -26,9 +26,9 @@ import wrap from "./wrap.js"
 
 let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
-function compile(entry, content, filePath) {
+function compile(entry, content, filename) {
   const { options } = entry.package
-  const ext = extname(filePath)
+  const ext = extname(filename)
 
   let hint = "script"
   let type = "script"
@@ -72,12 +72,12 @@ function compile(entry, content, filePath) {
       moduleState.parsing &&
       warnings) {
     for (const warning of warnings) {
-      warn(warning.code, filePath, ...warning.args)
+      warn(warning.code, filename, ...warning.args)
     }
   }
 
   if (! entry.url) {
-    entry.url = getURLFromFilePath(filePath)
+    entry.url = getURLFromFilePath(filename)
   }
 
   if (moduleState.parsing) {
@@ -208,22 +208,22 @@ function maybeSourceMap(entry, content) {
   return ""
 }
 
-function readCachedCode(filePath, options) {
+function readCachedCode(filename, options) {
   if (options && options.gz &&
-      _extname(filePath) === ".gz") {
-    return gunzip(readFile(filePath), "utf8")
+      _extname(filename) === ".gz") {
+    return gunzip(readFile(filename), "utf8")
   }
 
-  return readFileFast(filePath, "utf8")
+  return readFileFast(filename, "utf8")
 }
 
-function readSourceCode(filePath, options) {
+function readSourceCode(filename, options) {
   if (options && options.gz &&
-      _extname(filePath) === ".gz") {
-    return gunzip(readFile(filePath), "utf8")
+      _extname(filename) === ".gz") {
+    return gunzip(readFile(filename), "utf8")
   }
 
-  return readFile(filePath, "utf8")
+  return readFile(filename, "utf8")
 }
 
 function tryCompileCode(entry, content, options) {

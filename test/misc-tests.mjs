@@ -70,8 +70,8 @@ function checkErrorStack(error, startsWith) {
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
 }
 
-function getURLFromFilePath(filePath) {
-  return fileProtocol + filePath.replace(/\\/g, "/")
+function getURLFromFilePath(filename) {
+  return fileProtocol + filename.replace(/\\/g, "/")
 }
 
 function getWarning() {
@@ -484,11 +484,11 @@ describe("Node rules", () => {
   )
 
   it("should not expose ESM in `require.cache`", () => {
-    const filePath = path.resolve("fixture/cache/out/index.mjs")
+    const filename = path.resolve("fixture/cache/out/index.mjs")
 
-    delete require.cache[filePath]
-    return import(filePath)
-      .then(() => assert.strictEqual(filePath in require.cache, false))
+    delete require.cache[filename]
+    return import(filename)
+      .then(() => assert.strictEqual(filename in require.cache, false))
   })
 
   it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
@@ -919,26 +919,26 @@ describe("spec compliance", () => {
       { id: "fixture/source/arguments-undefined.mjs", loc: "1:0" },
       { id: "fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
     ].reduce((promise, data) => {
-      const filePath = path.resolve(data.id)
-      const url = getURLFromFilePath(filePath)
+      const filename = path.resolve(data.id)
+      const url = getURLFromFilePath(filename)
       const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, url)
 
       return promise
         .then(() => {
           mockIo.start()
-          return import(filePath)
+          return import(filename)
         })
         .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
     }, Promise.resolve())
   )
 
   it("should warn for potential TDZ access", () => {
-    const filePath = path.resolve("fixture/cycle/tdz/a.mjs")
-    const url = getURLFromFilePath(filePath)
+    const filename = path.resolve("fixture/cycle/tdz/a.mjs")
+    const url = getURLFromFilePath(filename)
     const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", url)
 
     mockIo.start()
-    return import(filePath)
+    return import(filename)
       .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
   })
 

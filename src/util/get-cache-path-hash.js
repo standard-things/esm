@@ -1,8 +1,8 @@
 import { basename, extname } from "path"
 
-function getCachePathHash(filePath) {
-  return typeof filePath === "string"
-    ? basename(filePath, extname(filePath)).slice(0, 8)
+function getCachePathHash(filename) {
+  return typeof filename === "string"
+    ? basename(filename, extname(filename)).slice(0, 8)
     : ""
 }
 

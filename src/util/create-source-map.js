@@ -2,7 +2,7 @@ import toStringLiteral from "./to-string-literal.js"
 
 const newlineRegExp = /\n/g
 
-function createSourceMap(filePath, content) {
+function createSourceMap(filename, content) {
   let lineCount = -1
   let mapping = ""
 
@@ -11,7 +11,7 @@ function createSourceMap(filePath, content) {
   }
 
   return '{"version":3,"sources":[' +
-    toStringLiteral(filePath) +
+    toStringLiteral(filename) +
     '],"names":[],"mappings":"' + mapping + '"}'
 }
 

@@ -103,8 +103,8 @@ function requireESM(request) {
   return "Must use import to load ES Module: " + getModuleURL(request)
 }
 
-function unknownFileExtension(filePath) {
-  return "Unknown file extension: " + filePath
+function unknownFileExtension(filename) {
+  return "Unknown file extension: " + filename
 }
 
 const errors = new FastObject

@@ -58,7 +58,7 @@ function findPath(request, paths, isMain, searchExts) {
       continue
     }
 
-    let filePath
+    let filename
     const basePath = resolve(curPath, request)
     const rc = stat(basePath)
     const isFile = rc === 0
@@ -67,39 +67,39 @@ function findPath(request, paths, isMain, searchExts) {
     if (! trailingSlash) {
       if (isFile) {
         if (preserveSymlinks && ! isMain) {
-          filePath = resolve(basePath)
+          filename = resolve(basePath)
         } else {
-          filePath = realpath(basePath)
+          filename = realpath(basePath)
         }
       } else if (isDir) {
         if (searchExts === void 0) {
           searchExts = keys(Module._extensions)
         }
 
-        filePath = tryPackage(basePath, searchExts, isMain)
+        filename = tryPackage(basePath, searchExts, isMain)
       }
 
-      if (! filePath) {
+      if (! filename) {
         if (searchExts === void 0) {
           searchExts = keys(Module._extensions)
         }
 
-        filePath = tryExtensions(basePath, searchExts, isMain)
+        filename = tryExtensions(basePath, searchExts, isMain)
       }
     }
 
-    if (isDir && ! filePath) {
+    if (isDir && ! filename) {
       if (searchExts === void 0) {
         searchExts = keys(Module._extensions)
       }
 
-      filePath =
+      filename =
         tryPackage(basePath, searchExts, isMain) ||
         tryExtensions(resolve(basePath, "index"), searchExts, isMain)
     }
 
-    if (filePath) {
-      return shared.findPath[cacheKey] = filePath
+    if (filename) {
+      return shared.findPath[cacheKey] = filename
     }
   }
 
@@ -135,17 +135,17 @@ function readPackage(thePath) {
 }
 
 function tryExtensions(thePath, exts, isMain) {
-  let filePath = ""
+  let filename = ""
 
   for (const ext of exts) {
-    filePath = tryFile(thePath + ext, isMain)
+    filename = tryFile(thePath + ext, isMain)
 
-    if (filePath) {
-      return filePath
+    if (filename) {
+      return filename
     }
   }
 
-  return filePath
+  return filename
 }
 
 function tryFile(thePath, isMain) {
@@ -163,11 +163,11 @@ function tryPackage(thePath, exts, isMain) {
     return mainPath
   }
 
-  const filePath = resolve(thePath, mainPath)
+  const filename = resolve(thePath, mainPath)
 
-  return tryFile(filePath, isMain) ||
-         tryExtensions(filePath, exts, isMain) ||
-         tryExtensions(resolve(filePath, "index"), exts, isMain)
+  return tryFile(filename, isMain) ||
+         tryExtensions(filename, exts, isMain) ||
+         tryExtensions(resolve(filename, "index"), exts, isMain)
 }
 
 export default findPath

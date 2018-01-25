@@ -9,23 +9,23 @@ const { dlopen } = process
 const { parse } = JSON
 const extensions = new FastObject
 
-extensions[".js"] = (mod, filePath) => {
-  mod._compile(stripBOM(readFileSync(filePath, "utf8")), filePath)
+extensions[".js"] = (mod, filename) => {
+  mod._compile(stripBOM(readFileSync(filename, "utf8")), filename)
 }
 
-extensions[".json"] = (mod, filePath) => {
-  const content = readFileFast(filePath, "utf8")
+extensions[".json"] = (mod, filename) => {
+  const content = readFileFast(filename, "utf8")
 
   try {
     mod.exports = parse(content)
   } catch (error) {
-    error.message = filePath + ": " + error.message
+    error.message = filename + ": " + error.message
     throw error
   }
 }
 
-extensions[".node"] = (mod, filePath) => {
-  return dlopen.call(process, mod, toNamespacedPath(filePath))
+extensions[".node"] = (mod, filename) => {
+  return dlopen.call(process, mod, toNamespacedPath(filename))
 }
 
 export default extensions

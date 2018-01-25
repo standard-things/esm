@@ -19,14 +19,14 @@ if (useMtimeFastPath) {
     : new Float64Array(14)
 }
 
-function mtime(filePath) {
-  if (typeof filePath !== "string") {
+function mtime(filename) {
+  if (typeof filename !== "string") {
     return -1
   }
 
   if (useMtimeFastPath) {
     try {
-      return fastPathMtime(filePath)
+      return fastPathMtime(filename)
     } catch ({ code }) {
       if (code === "ENOENT") {
         return -1
@@ -36,24 +36,24 @@ function mtime(filePath) {
     }
   }
 
-  return fallbackMtime(filePath)
+  return fallbackMtime(filename)
 }
 
-function fallbackMtime(filePath) {
+function fallbackMtime(filename) {
   try {
-    return statSync(filePath).mtime.getTime()
+    return statSync(filename).mtime.getTime()
   } catch (e) {}
   return -1
 }
 
-function fastPathMtime(filePath) {
+function fastPathMtime(filename) {
   // Used to speed up file stats. Modifies the `statValues` typed array,
   // with index 11 being the mtime milliseconds stamp. The speedup comes
   // from not creating Stat objects.
   if (useGetStatValues) {
-    stat.call(fsBinding, filePath)
+    stat.call(fsBinding, filename)
   } else {
-    stat.call(fsBinding, filePath, statValues)
+    stat.call(fsBinding, filename, statValues)
   }
 
   return statValues[11]

@@ -14,8 +14,8 @@ const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
-function exec(filePath, args) {
-  return execa(filePath, args, {
+function exec(filename, args) {
+  return execa(filename, args, {
     cwd: testPath
   })
 }

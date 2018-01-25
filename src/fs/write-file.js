@@ -1,8 +1,8 @@
 import { writeFileSync } from "fs"
 
-function writeFile(filePath, bufferOrString, options) {
+function writeFile(filename, bufferOrString, options) {
   try {
-    writeFileSync(filePath, bufferOrString, options)
+    writeFileSync(filename, bufferOrString, options)
     return true
   } catch (e) {}
   return false

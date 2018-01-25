@@ -11,38 +11,38 @@ const useInternalModuleReadFile = typeof internalModuleReadFile === "function"
 const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"
 let useReadFileFastPath = useInternalModuleReadFile || useInternalModuleReadJSON
 
-function readFileFast(filePath, options) {
-  if (typeof filePath !== "string") {
+function readFileFast(filename, options) {
+  if (typeof filename !== "string") {
     return null
   }
 
   if (useReadFileFastPath &&
       options === "utf8") {
     try {
-      return fastPathReadFile(filePath, options)
+      return fastPathReadFile(filename, options)
     } catch (e) {
       useReadFileFastPath = false
     }
   }
 
-  return readFileSync(filePath, options)
+  return readFileSync(filename, options)
 }
 
-function fastPathReadFile(filePath, options) {
+function fastPathReadFile(filename, options) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.
-  filePath = toNamespacedPath(filePath)
+  filename = toNamespacedPath(filename)
 
-  // Warning: These internal methods will crash if `filePath` is a directory.
+  // Warning: These internal methods will crash if `filename` is a directory.
   // https://github.com/nodejs/node/issues/8307
   const content = useInternalModuleReadJSON
-    ? internalModuleReadJSON.call(fsBinding, filePath)
-    : internalModuleReadFile.call(fsBinding, filePath)
+    ? internalModuleReadJSON.call(fsBinding, filename)
+    : internalModuleReadFile.call(fsBinding, filename)
 
   if (useInternalModuleReadJSON &&
       content === "") {
-    return readFileSync(filePath, options)
+    return readFileSync(filename, options)
   }
 
   return content === void 0 ? null : content

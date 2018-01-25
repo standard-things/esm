@@ -45,8 +45,8 @@ function node(args, env) {
   })
 }
 
-function runMain(filePath, env) {
-  return node(["-r", "../index.js", filePath], env)
+function runMain(filename, env) {
+  return node(["-r", "../index.js", filename], env)
 }
 
 describe("module.runMain hook", function () {

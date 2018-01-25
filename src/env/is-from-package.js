@@ -12,16 +12,16 @@ function isFromPackage() {
   }
 
   const { argv } = process
-  const [, filePath] = argv
+  const [, filename] = argv
   const args = argv.slice(2)
   const nodeModulesIndex = args.length
-    ? normalize(filePath).lastIndexOf("/node_modules/")
+    ? normalize(filename).lastIndexOf("/node_modules/")
     : -1
 
   if (nodeModulesIndex !== -1 &&
       hasLoaderArg(args) &&
       (Package.get(process.cwd()) !== null ||
-       Package.get(realpath(filePath.slice(0, nodeModulesIndex + 1))) !== null)) {
+       Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) {
     // From a package like Mocha.
     return shared.env.isFromPackage = true
   }

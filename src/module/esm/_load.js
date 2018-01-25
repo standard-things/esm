@@ -16,7 +16,7 @@ import toOptInError from "../../util/to-opt-in-error.js"
 
 function load(request, parent, isMain, preload) {
   let cacheKey
-  let filePath
+  let filename
   let parentOptions
   let queryHash
   let entry = request
@@ -26,17 +26,17 @@ function load(request, parent, isMain, preload) {
     parentOptions = parentEntry && parentEntry.package.options
     queryHash = getQueryHash(request)
 
-    filePath = parentOptions && parentOptions.cjs.paths
+    filename = parentOptions && parentOptions.cjs.paths
       ? Module._resolveFilename(request, parent, isMain)
       : resolveFilename(request, parent, isMain)
 
     cacheKey =
-    request = filePath + queryHash
+    request = filename + queryHash
   } else {
-    filePath = entry.module.filename
+    filename = entry.module.filename
   }
 
-  const fromPath = dirname(filePath)
+  const fromPath = dirname(filename)
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
   const isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
@@ -45,7 +45,7 @@ function load(request, parent, isMain, preload) {
   let state = Module
 
   if (isUnexposed) {
-    const ext = extname(filePath)
+    const ext = extname(filename)
     childIsMain = false
 
     if (ext === ".mjs" ||
@@ -66,9 +66,9 @@ function load(request, parent, isMain, preload) {
       const child = entry.module
 
       if (! entry.url) {
-        child.filename = filePath
+        child.filename = filename
         entry.cacheKey = cacheKey
-        entry.url = getURLFromFilePath(filePath) + queryHash
+        entry.url = getURLFromFilePath(filename) + queryHash
 
         if (isUnexposed) {
           child.parent = void 0

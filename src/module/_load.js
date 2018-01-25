@@ -11,19 +11,19 @@ const compileSym = Symbol.for("@std/esm:module._compile")
 
 function load(request, parent, isMain, state, loader) {
   let child
-  let filePath
+  let filename
   let entry = request
 
   if (typeof request === "string") {
-    filePath = request
-    child = state._cache[filePath]
+    filename = request
+    child = state._cache[filename]
 
     if (child) {
       entry = Entry.get(child)
     }
   } else {
-    filePath = entry.module.filename
     child = entry.module
+    filename = child.filename
   }
 
   if (child) {
@@ -46,8 +46,8 @@ function load(request, parent, isMain, state, loader) {
 
     entry.state = 3
   } else {
-    child = new Module(filePath, parent)
-    child.filename = filePath
+    child = new Module(filename, parent)
+    child.filename = filename
 
     if (isMain) {
       moduleState.mainModule =
@@ -57,20 +57,20 @@ function load(request, parent, isMain, state, loader) {
 
     entry = Entry.get(child)
     entry.parent = Entry.get(parent)
-    entry.cacheKey = filePath
+    entry.cacheKey = filename
     entry.state = moduleState.parsing ? 1 : 3
   }
 
   const { _compile } = child
 
-  child._compile = (content, filePath) => {
+  child._compile = (content, filename) => {
     delete child._compile
 
     const func = typeof child[compileSym] === "function"
       ? child[compileSym]
       : _compile
 
-    return func.call(child, content, filePath)
+    return func.call(child, content, filename)
   }
 
   tryLoad(entry, state, loader)

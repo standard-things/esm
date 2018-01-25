@@ -15,7 +15,7 @@ const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-const readJSON = (filePath) => JSON6.parse(fs.readFileSync(filePath))
+const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 
 const builtins = [
   "Array", "ArrayBuffer", "Atomics", "Boolean", "Buffer", "DataView", "Date",
