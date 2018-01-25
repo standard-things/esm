@@ -127,9 +127,9 @@ function tryCompileCached(entry) {
         throw e
       }
 
-      const { filePath } = entry
-      const sourceCode = () => readSourceCode(filePath, options)
-      throw maskStackTrace(e, sourceCode, filePath, isESM)
+      const { filename } = entry.module
+      const sourceCode = () => readSourceCode(filename, options)
+      throw maskStackTrace(e, sourceCode, filename, isESM)
     }
   }
 
@@ -140,13 +140,13 @@ function tryCompileCached(entry) {
 
 function tryCompileCJS(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
-  const { runtimeName } = entry
-  const { code } = entry.package.cache[entry.cacheFileName]
+  const { module:mod, runtimeName } = entry
 
   let content =
     "const " + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global,exports,require){" +
-    code + "\n}))"
+    entry.package.cache[entry.cacheFileName].code +
+    "\n}))"
 
   content += maybeSourceMap(entry, content)
 
@@ -157,20 +157,19 @@ function tryCompileCJS(entry) {
   }
 
   Runtime.enable(entry, exported)
-  entry.module._compile(content, entry.filePath)
+  mod._compile(content, mod.filename)
 }
 
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
-  const { runtimeName } = entry
-  const { code } = entry.package.cache[entry.cacheFileName]
+  const { module:mod, runtimeName } = entry
   const { options } = entry.package
 
   let content =
     '"use strict";const ' + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global" +
     (options.cjs.vars ? ",exports,require" : "") +
-    "){" + code + "\n}))"
+    "){" + entry.package.cache[entry.cacheFileName].code + "\n}))"
 
   content += maybeSourceMap(entry, content)
 
@@ -183,7 +182,7 @@ function tryCompileESM(entry) {
   Runtime.enable(entry, exported)
 
   try {
-    entry.module._compile(content, entry.filePath)
+    mod._compile(content, mod.filename)
   } finally {
     if (Module.wrap === moduleWrapESM) {
       Module.wrap = wrap
@@ -203,7 +202,7 @@ function maybeSourceMap(entry, content) {
      (sourceMap || isInspectorEnabled()) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(entry.filePath, content))
+      encodeURI(createSourceMap(entry.module.filename, content))
   }
 
   return ""
@@ -243,12 +242,11 @@ function tryCompileCode(entry, content, options) {
 
     delete e.sourceType
     // captureStackTrace(e, manager)
-    throw maskStackTrace(e, content, entry.filePath, isESM)
+    throw maskStackTrace(e, content, entry.module.filename, isESM)
   }
 }
 
 function tryValidateESM(entry) {
-  const { filePath } = entry
   const { options } = entry.package
 
   if (options.debug) {
@@ -261,9 +259,10 @@ function tryValidateESM(entry) {
         throw e
       }
 
-      const content = () => readSourceCode(filePath, options)
+      const { filename } = entry.module
+      const content = () => readSourceCode(filename, options)
       // captureStackTrace(e, manager)
-      throw maskStackTrace(e, content, filePath, true)
+      throw maskStackTrace(e, content, filename, true)
     }
   }
 }

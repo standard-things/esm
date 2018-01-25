@@ -33,7 +33,7 @@ function load(request, parent, isMain, preload) {
     cacheKey =
     request = filePath + queryHash
   } else {
-    filePath = entry.filePath
+    filePath = entry.module.filename
   }
 
   const fromPath = dirname(filePath)
@@ -66,8 +66,7 @@ function load(request, parent, isMain, preload) {
       const child = entry.module
 
       if (! entry.url) {
-        child.filename =
-        entry.filePath = filePath
+        child.filename = filePath
         entry.cacheKey = cacheKey
         entry.url = getURLFromFilePath(filePath) + queryHash
 

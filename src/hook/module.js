@@ -86,9 +86,6 @@ function hook(Mod, parent) {
 
     const { _compile } = mod
     const entry = Entry.get(mod)
-
-    entry.filePath = filePath
-
     const cacheFileName = getCacheFileName(entry, mtime(filePath))
     const stateHash = getCacheStateHash(cacheFileName)
     const runtimeName = encodeId("_" + stateHash.slice(0, 3))

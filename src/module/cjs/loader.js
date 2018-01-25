@@ -4,22 +4,23 @@ import { dirname } from "path"
 import extname from "../../path/extname.js"
 
 function loader(entry, parent, preload) {
-  const { filePath, module:mod } = entry
+  const mod = entry.module
+  const { filename } = mod
 
-  mod.paths = Module._nodeModulePaths(dirname(filePath))
+  mod.paths = Module._nodeModulePaths(dirname(filename))
 
   if (preload) {
     preload(entry)
   }
 
-  let ext = extname(filePath)
+  let ext = extname(filename)
 
   if (ext === "" ||
       typeof Module._extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  Module._extensions[ext](mod, filePath)
+  Module._extensions[ext](mod, filename)
   mod.loaded = true
 }
 

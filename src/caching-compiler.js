@@ -17,7 +17,7 @@ const { stringify } = JSON
 
 class CachingCompiler {
   static compile(entry, code, options) {
-    if (entry.filePath &&
+    if (entry.module.filename &&
         entry.package.cachePath) {
       return compileAndWrite(entry, code, options)
     }

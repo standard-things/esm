@@ -5,7 +5,8 @@ import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
 
 function loader(entry, fromPath, parentOptions, preload) {
-  const { filePath, module:mod } = entry
+  const mod = entry.module
+  const { filename } = mod
 
   if (! mod.paths) {
     mod.paths = parentOptions && parentOptions.cjs.paths
@@ -19,7 +20,7 @@ function loader(entry, fromPath, parentOptions, preload) {
   }
 
   let { _extensions } = moduleState
-  let ext = extname(filePath)
+  let ext = extname(filename)
 
   if (ext === ".js" ||
       (parentOptions && parentOptions.cjs.extensions)) {
@@ -38,7 +39,7 @@ function loader(entry, fromPath, parentOptions, preload) {
     return
   }
 
-  _extensions[ext](mod, filePath)
+  _extensions[ext](mod, filename)
 
   if (! moduleState.parsing) {
     mod.loaded = true

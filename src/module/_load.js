@@ -22,7 +22,7 @@ function load(request, parent, isMain, state, loader) {
       entry = Entry.get(child)
     }
   } else {
-    filePath = entry.filePath
+    filePath = entry.module.filename
     child = entry.module
   }
 

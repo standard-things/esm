@@ -122,7 +122,7 @@ function createSetter(from, setter) {
 }
 
 function runCJS(entry, moduleWrapper) {
-  const { module:mod } = entry
+  const mod = entry.module
   const exported = mod.exports = entry.exports
   const req = makeRequireFunction(mod)
 
@@ -132,7 +132,7 @@ function runCJS(entry, moduleWrapper) {
 }
 
 function runESM(entry, moduleWrapper) {
-  const { module:mod } = entry
+  const mod = entry.module
   const exported = mod.exports = entry.exports
 
   entry.exports = null

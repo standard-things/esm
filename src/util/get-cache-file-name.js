@@ -7,13 +7,13 @@ const { stringify } = JSON
 const nodeVersion = process.version
 
 function getCacheFileName(entry, cacheKey) {
-  let { filePath } = entry
+  let { filename } = entry.module
 
-  if (typeof filePath !== "string") {
-    filePath = ""
+  if (typeof filename !== "string") {
+    filename = ""
   }
 
-  let ext = extname(filePath)
+  let ext = extname(filename)
 
   if (ext !== ".gz") {
     ext = ".js"
@@ -22,7 +22,7 @@ function getCacheFileName(entry, cacheKey) {
   // While MD5 is not suitable for verification of untrusted data,
   // it is great for revving files. See Sufian Rhazi's post for more details
   // https://blog.risingstack.com/automatic-cache-busting-for-your-css/.
-  const pathHash = md5(filePath)
+  const pathHash = md5(filename)
 
   const stateHash = md5(
     nodeVersion + "\0" +

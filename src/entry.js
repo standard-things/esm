@@ -59,8 +59,6 @@ class Entry {
     this.esmNamespace = this._namespace
     // The initial `module.exports` value.
     this.exports = null
-    // The file path of the module.
-    this.filePath = mod.filename
     // Getters for local variables exported by the module.
     this.getters = new NullObject
     // The module the entry is managing.
