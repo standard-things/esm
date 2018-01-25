@@ -5,12 +5,11 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 function validate(entry) {
-  const children = new NullObject
-  const data = entry.package.cache[entry.cacheFileName]
-  const mod = entry.module
+  const cached = entry.package.cache[entry.cacheFileName]
+  const { exportSpecifiers, moduleSpecifiers } = cached
 
-  const { exportSpecifiers, moduleSpecifiers } = data
-  const { namedExports } = entry.package.options.cjs
+  const children = new NullObject
+  const mod = entry.module
 
   // Parse children.
   for (const name in moduleSpecifiers) {
@@ -26,9 +25,12 @@ function validate(entry) {
     }
   }
 
+  const { namedExports } = entry.package.options.cjs
+
   // Validate requested child export names.
   for (const name in children) {
     const childEntry = children[name]
+    const child = childEntry.module
     const childCached = childEntry.package.cache[childEntry.cacheFileName]
     const childIsESM = childCached && childCached.esm
     const requestedExportNames = moduleSpecifiers[name]
@@ -38,16 +40,14 @@ function validate(entry) {
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
            requestedExportNames[0] !== "default")) {
-        throw new errors.SyntaxError("ERR_EXPORT_MISSING", childEntry.module, requestedExportNames[0])
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedExportNames[0])
       }
 
       continue
     }
 
-    const childData = childEntry.package.cache[childEntry.cacheFileName]
-
     for (const requestedName of requestedExportNames) {
-      const { exportSpecifiers:childExportSpecifiers } = childData
+      const { exportSpecifiers:childExportSpecifiers } = childCached
 
       if (requestedName in childExportSpecifiers) {
         if (childExportSpecifiers[requestedName] < 3) {
@@ -57,10 +57,9 @@ function validate(entry) {
         throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
       }
 
-      const { exportStarNames:childExportStarNames } = childData
       let throwExportMissing = true
 
-      for (const childStarName of childExportStarNames) {
+      for (const childStarName of childCached.exportStarNames) {
         if (! (childStarName in children)) {
           throwExportMissing = false
           break
@@ -68,13 +67,13 @@ function validate(entry) {
       }
 
       if (throwExportMissing) {
-        throw new errors.SyntaxError("ERR_EXPORT_MISSING", childEntry.module, requestedName)
+        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedName)
       }
     }
   }
 
   // Resolve export names from star exports.
-  for (const starName of data.exportStarNames) {
+  for (const starName of cached.exportStarNames) {
     if (! (starName in children)) {
       continue
     }
@@ -87,9 +86,7 @@ function validate(entry) {
       continue
     }
 
-    const childData = childEntry.package.cache[childEntry.cacheFileName]
-
-    for (const exportName in childData.exportSpecifiers) {
+    for (const exportName in childCached.exportSpecifiers) {
       if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.
