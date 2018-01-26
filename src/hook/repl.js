@@ -32,24 +32,7 @@ function hook(vm) {
   }
 
   function methodWrapper(manager, func, args) {
-    function tryWrapper(func, args) {
-      try {
-        return func.apply(this, args)
-      } catch (e) {
-        if (isStackTraceMasked(e)) {
-          throw e
-        }
-
-        const isESM = e.sourceType === "module"
-        const [sourceCode] = args
-
-        delete e.sourceType
-        captureStackTrace(e, manager)
-        throw maskStackTrace(e, sourceCode, null, isESM)
-      }
-    }
-
-    let [sourceCode, scriptOptions] = args
+    let [content, scriptOptions] = args
     scriptOptions = createOptions(scriptOptions)
 
     if (scriptOptions.produceCachedData === void 0) {
@@ -57,7 +40,7 @@ function hook(vm) {
     }
 
     const cacheName =
-    entry.cacheName = getCacheFileName(entry, sourceCode)
+    entry.cacheName = getCacheFileName(entry, content)
 
     let cached = pkg.cache[cacheName]
 
@@ -68,9 +51,9 @@ function hook(vm) {
         scriptOptions.cachedData = cached.scriptData
       }
     } else {
-      cached = tryWrapper(Compiler.compile, [
+      cached = tryWrapper(manager, Compiler.compile, [
         entry,
-        sourceCode,
+        content,
         {
           type: "unambiguous",
           var: true,
@@ -82,23 +65,28 @@ function hook(vm) {
     entry.state = 1
 
     if (cached.esm) {
-      validateESM(entry)
+      tryValidateESM(manager, entry, content)
     }
 
-    const content =
+    entry.state = 3
+
+    content =
       "var " + runtimeName + "=" + runtimeName +
       "||[module.exports,module.exports=module.exports.entry.exports][0];" +
       cached.code
 
-    const result = tryWrapper(func, [content, scriptOptions])
+    const result = tryWrapper(manager, func, [content, scriptOptions])
+
+    const wrapper = function (func, args) {
+      return tryWrapper.call(this, manager, func, args)
+    }
 
     if (result.cachedDataProduced) {
       pkg.cache[cacheName].scriptData = result.cachedData
     }
 
-    entry.state = 3
-    result.runInContext = wrap(result.runInContext, tryWrapper)
-    result.runInThisContext = wrap(result.runInThisContext, tryWrapper)
+    result.runInContext = wrap(result.runInContext, wrapper)
+    result.runInThisContext = wrap(result.runInThisContext, wrapper)
     return result
   }
 
@@ -123,6 +111,38 @@ function hook(vm) {
       initEntry(context.module)
       return context
     }
+  }
+}
+
+function tryValidateESM(caller, entry, content) {
+  try {
+    validateESM(entry)
+  } catch (e) {
+    if (isStackTraceMasked(e)) {
+      throw e
+    }
+
+    const { filename } = entry.module
+
+    captureStackTrace(e, caller)
+    throw maskStackTrace(e, content, filename, true)
+  }
+}
+
+function tryWrapper(caller, func, args) {
+  try {
+    return func.apply(this, args)
+  } catch (e) {
+    if (isStackTraceMasked(e)) {
+      throw e
+    }
+
+    const [content] = args
+    const isESM = e.sourceType === "module"
+
+    delete e.sourceType
+    captureStackTrace(e, caller)
+    throw maskStackTrace(e, content, null, isESM)
   }
 }
 
