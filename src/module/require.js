@@ -7,8 +7,6 @@ import Module from "../module.js"
 
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
-import getFilePathFromURL from "../util/get-file-path-from-url.js"
-import isError from "../util/is-error.js"
 import loadESM from "./esm/_load.js"
 
 function require(request) {
@@ -25,34 +23,12 @@ function require(request) {
   }
 
   const entry = Entry.get(this)
+  const cached = entry.package.cache[entry.cacheName]
+  const isESM = cached && cached.esm
 
-  if (! entry.package.options.cjs.vars) {
-    return Module._load(request, this, false)
-  }
-
-  let childEntry
-
-  try {
-    childEntry = loadESM(request, this, false)
-  } catch (e) {
-    if (isError(e)) {
-      const { code } = e
-
-      if (code === "ERR_MODULE_RESOLUTION_LEGACY") {
-        return Module._load(request, this, false)
-      }
-
-      if (code === "ERR_MISSING_MODULE") {
-        const { message } = e
-        const url = message.slice(message.lastIndexOf(" ") + 1)
-        throw new errors.Error("MODULE_NOT_FOUND", getFilePathFromURL(url))
-      }
-    }
-
-    throw e
-  }
-
-  return childEntry.module.exports
+  return isESM
+    ? loadESM(request, this, false).module.exports
+    : Module._load(request, this, false)
 }
 
 export default require
