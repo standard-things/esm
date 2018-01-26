@@ -56,8 +56,8 @@ function load(request, parent, isMain, state, loader) {
     }
 
     entry = Entry.get(child)
+    entry.id = filename
     entry.parent = Entry.get(parent)
-    entry.cacheKey = filename
     entry.state = moduleState.parsing ? 1 : 3
   }
 
@@ -78,8 +78,8 @@ function load(request, parent, isMain, state, loader) {
 }
 
 function tryLoad(entry, state, loader) {
-  const { cacheKey } = entry
-  state._cache[cacheKey] = entry.module
+  const { id } = entry
+  state._cache[id] = entry.module
 
   let threw = true
 
@@ -88,7 +88,7 @@ function tryLoad(entry, state, loader) {
     threw = false
   } finally {
     if (threw) {
-      delete state._cache[cacheKey]
+      delete state._cache[id]
     }
   }
 }

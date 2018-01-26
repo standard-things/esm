@@ -47,8 +47,6 @@ class Entry {
     this._namespace = new NullObject
     // The cache file name of the module.
     this.cacheName = null
-    // The cache key of the module.
-    this.cacheKey = null
     // The child entries of the module.
     this.children = new NullObject
     // The namespace object CJS importers receive.
@@ -61,6 +59,8 @@ class Entry {
     this.exports = null
     // Getters for local variables exported by the module.
     this.getters = new NullObject
+    // The unique id for the module cache.
+    this.id = null
     // The module the entry is managing.
     this.module = mod
     // The `module.parent` entry.

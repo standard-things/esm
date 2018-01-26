@@ -72,7 +72,7 @@ function load(request, parent, isMain, preload) {
 
       if (! entry.url) {
         child.filename = filename
-        entry.cacheKey = cacheKey
+        entry.id = cacheKey
         entry.url = getURLFromFilePath(filename) + queryHash
 
         if (isUnexposed) {
@@ -109,10 +109,10 @@ function load(request, parent, isMain, preload) {
     throw error
   } finally {
     if (state === Module) {
-      delete state._cache[entry.cacheKey]
+      delete state._cache[entry.id]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state._cache, entry.cacheKey, () => {
+      setGetter(state._cache, entry.id, () => {
         throw error
       })
     }
