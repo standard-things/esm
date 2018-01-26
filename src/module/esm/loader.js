@@ -1,29 +1,24 @@
 import Module from "../../module.js"
 
 import extname from "../../path/extname.js"
-import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
 
-function loader(entry, fromPath, parentOptions, preload) {
-  const mod = entry.module
-  const { filename } = mod
-
-  if (! mod.paths) {
-    mod.paths = parentOptions && parentOptions.cjs.paths
-      ? Module._nodeModulePaths(fromPath)
-      : moduleNodeModulePaths(fromPath)
-  }
-
+function loader(entry, preload) {
   if (! moduleState.parsing &&
       preload) {
     preload(entry)
   }
 
+  const mod = entry.module
+  const { filename } = mod
+  const { parent } = entry
+
   let { _extensions } = moduleState
   let ext = extname(filename)
 
   if (ext === ".js" ||
-      (parentOptions && parentOptions.cjs.extensions)) {
+      (parent &&
+       parent.package.options.cjs.extensions)) {
     _extensions = Module._extensions
   }
 

@@ -5,6 +5,7 @@
 import Module from "../../module.js"
 
 import _load from "../_load.js"
+import { dirname } from "path"
 import loader from "./loader.js"
 
 function load(request, parent, isMain, preload) {
@@ -17,7 +18,12 @@ function load(request, parent, isMain, preload) {
 
   entry = _load(request, parent, isMain, Module, (entry) => {
     called = true
-    return loader(entry, parent, preload)
+
+    const child = entry.module
+
+    child.paths = Module._nodeModulePaths(dirname(child.filename))
+
+    return loader(entry, preload)
   })
 
   if (! called &&

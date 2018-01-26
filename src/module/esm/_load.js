@@ -9,6 +9,7 @@ import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isError from "../../util/is-error.js"
 import loader from "./loader.js"
+import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
@@ -17,18 +18,15 @@ import toOptInError from "../../util/to-opt-in-error.js"
 function load(request, parent, isMain, preload) {
   let cacheKey
   let filename
-  let parentOptions
   let queryHash
   let entry = request
 
   if (typeof request === "string") {
-    const parentEntry = Entry.get(parent)
-    parentOptions = parentEntry && parentEntry.package.options
-    queryHash = getQueryHash(request)
-
-    filename = parentOptions && parentOptions.cjs.paths
+    filename = parent && Entry.get(parent).package.options.cjs.paths
       ? Module._resolveFilename(request, parent, isMain)
       : resolveFilename(request, parent, isMain)
+
+    queryHash = getQueryHash(request)
 
     cacheKey =
     request = filename + queryHash
@@ -63,7 +61,14 @@ function load(request, parent, isMain, preload) {
     entry = _load(request, parent, childIsMain, state, (childEntry) => {
       called = true
       entry = childEntry
+
       const child = entry.module
+
+      if (! child.paths) {
+        child.paths = entry.package.options.cjs.paths
+          ? Module._nodeModulePaths(fromPath)
+          : moduleNodeModulePaths(fromPath)
+      }
 
       if (! entry.url) {
         child.filename = filename
@@ -80,7 +85,7 @@ function load(request, parent, isMain, preload) {
         child.id = "."
       }
 
-      return loader(entry, fromPath, parentOptions, preload)
+      return loader(entry, preload)
     })
 
     if (! called &&

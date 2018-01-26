@@ -1,17 +1,14 @@
 import Module from "../../module.js"
 
-import { dirname } from "path"
 import extname from "../../path/extname.js"
 
-function loader(entry, parent, preload) {
-  const mod = entry.module
-  const { filename } = mod
-
-  mod.paths = Module._nodeModulePaths(dirname(filename))
-
+function loader(entry, preload) {
   if (preload) {
     preload(entry)
   }
+
+  const mod = entry.module
+  const { filename } = mod
 
   let ext = extname(filename)
 

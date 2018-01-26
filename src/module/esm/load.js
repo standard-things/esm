@@ -24,7 +24,12 @@ function load(request, parent, isMain, preload) {
 
   if (entry.state < 3) {
     entry.state = 2
-    _load(entry, parent, isMain, preload)
+
+    if (preload) {
+      preload(entry)
+    }
+
+    _load(entry, parent, isMain)
   }
 
   if (entry.module.loaded) {
