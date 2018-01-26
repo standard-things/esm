@@ -1,0 +1,7 @@
+{
+  cjs: {
+    paths: true
+  },
+  debug: true,
+  esm: "js"
+}

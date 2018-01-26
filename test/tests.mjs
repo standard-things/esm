@@ -24,9 +24,9 @@ function gzip(fromPath, toPath) {
   return fs.outputFileSync(toPath, zlib.gzipSync(fs.readFileSync(fromPath)))
 }
 
-gzip("fixture/file-extension/a.js", "fixture/file-extension/a.gz")
-gzip("fixture/file-extension/a.js", "fixture/file-extension/a.js.gz")
-gzip("fixture/file-extension/a.mjs", "fixture/file-extension/a.mjs.gz")
+gzip("fixture/ext/a.js", "fixture/gz/a.gz")
+gzip("fixture/ext/a.js", "fixture/gz/a.js.gz")
+gzip("fixture/ext/a.mjs", "fixture/gz/a.mjs.gz")
 gzip("fixture/options/mjs/index.mjs", "fixture/options/gz/index.mjs.gz")
 gzip("fixture/options-file/esmrc-js-object/.esmrc.js", "fixture/options-file/esmrc-gz-object/.esmrc.gz")
 gzip("fixture/options-file/esmrc-js-string-cjs/.esmrc.js", "fixture/options-file/esmrc-gz-string-cjs/.esmrc.gz")

@@ -96,7 +96,9 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   if (foundPath) {
-    if ((pkgOptions && pkgOptions.cjs.paths) ||
+    if ((pkgOptions &&
+        (pkgOptions.cjs.paths ||
+         pkgOptions.esm === "js")) ||
         extname(foundPath) in extLookup) {
       return shared.resolveFilename[cacheKey] = foundPath
     }

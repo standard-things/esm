@@ -310,8 +310,8 @@ describe("errors", () => {
 describe("Node rules", () => {
   it("should find .mjs before .js", () =>
     Promise.all([
-      "./fixture/file-extension-priority",
-      "file-extension-priority"
+      "./fixture/ext-priority",
+      "ext-priority"
     ].map((id) =>
       import(id)
         .then((ns) => assert.strictEqual(ns.default, "mjs"))

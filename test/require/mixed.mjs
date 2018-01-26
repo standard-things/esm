@@ -6,8 +6,8 @@ import module from "../module.js"
 import mockIo from "mock-stdio"
 import require from "../require.js"
 
-export default () =>
-  new Promise((resolve) => {
+export default () => {
+  return new Promise((resolve) => {
     const allRequire = makeRequire(module, { esm: "all" })
     const cjsRequire = makeRequire(module, { cjs: true })
     const gzRequire = makeRequire(module, { gz: true })
@@ -35,3 +35,4 @@ export default () =>
       resolve()
     })
   })
+}

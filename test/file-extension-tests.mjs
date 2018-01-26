@@ -2,48 +2,68 @@ import assert from "assert"
 
 describe("file extension", () => {
   it("should support loading `.gz` files in CJS", () =>
-    import("./file-extension/gz.js")
+    import("./gz/gz.js")
       .then((ns) => ns.default())
   )
 
   it("should support loading `.gz` files in ESM", () =>
-    import("./file-extension/gz.mjs")
+    import("./gz/gz.mjs")
       .then((ns) => ns.default())
   )
 
+  it("should not support loading `.mjs.gz` with `require`", () =>
+    import("./gz/mjs.gz.js")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
+  )
+
   it("should support loading extensionless files with `require`", () =>
-    import("./file-extension/no-ext-require.js")
+    import("./ext/no-ext-require.js")
       .then((ns) => ns.default())
   )
 
   it("should support loading unknown extensions with `require`", () =>
-    import("./file-extension/unknown.require.js")
+    import("./ext/unknown.require.js")
       .then((ns) => ns.default())
   )
 
   it("should not support loading extensionless files with dynamic import in CJS", () =>
-    import("./file-extension/no-ext.js")
+    import("./ext/no-ext.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should support loading extensionless files with dynamic import in CJS with `options.cjs.paths`", () =>
+    import("./cjs/ext/no-ext.js")
       .then((ns) => ns.default())
   )
 
   it("should not support loading extensionless files with dynamic import in ESM", () =>
-    import("./file-extension/no-ext.mjs")
+    import("./ext/no-ext.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should support loading extensionless files with dynamic import in ESM with `options.cjs.paths`", () =>
+    import("./cjs/ext/no-ext.mjs")
       .then((ns) => ns.default())
   )
 
   it("should not support loading unknown extensions with dynamic import in CJS", () =>
-    import("./file-extension/unknown.js")
+    import("./ext/unknown.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should support loading unknown extensions with dynamic import in CJS with `options.cjs.paths`", () =>
+    import("./cjs/ext/unknown.js")
       .then((ns) => ns.default())
   )
 
   it("should not support loading unknown extensions with dynamic import in ESM", () =>
-    import("./file-extension/unknown.mjs")
+    import("./ext/unknown.mjs")
       .then((ns) => ns.default())
   )
 
-  it("should not support loading `.mjz.gz` with `require`", () =>
-    import("./file-extension/mjs.gz.js")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
+  it("should support loading unknown extensions with dynamic import in ESM with `options.cjs.paths`", () =>
+    import("./cjs/ext/unknown.mjs")
+      .then((ns) => ns.default())
   )
 })
