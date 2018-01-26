@@ -40,7 +40,7 @@ function compile(content, filename) {
     entry.package = Package.get("")
     entry.runtimeName = runtimeName
 
-    _compile(entry, content, filename)
+    _compile(compile, entry, content, filename)
     return
   }
 

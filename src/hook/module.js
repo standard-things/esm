@@ -111,7 +111,7 @@ function hook(Mod, parent) {
         }
       }
 
-      if (! compile(entry, content, filename)) {
+      if (! compile(manager, entry, content, filename)) {
         entry.state = 3
         return tryPassthru.call(this, func, args, options)
       }

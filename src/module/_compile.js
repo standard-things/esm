@@ -26,7 +26,7 @@ import wrap from "./wrap.js"
 
 let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
-function compile(entry, content, filename) {
+function compile(caller, entry, content, filename) {
   const { options } = entry.package
   const ext = extname(filename)
 
@@ -60,10 +60,7 @@ function compile(entry, content, filename) {
     cached =
     cache[cacheName] = Compiler.from(code)
   } else if (! cached) {
-    cached = tryCompileCode(entry, content, {
-      hint,
-      type
-    })
+    cached = tryCompileCode(caller, entry, content, { hint, type })
   }
 
   const { warnings } = cached
@@ -96,17 +93,17 @@ function compile(entry, content, filename) {
       return false
     } else if (isESM &&
         entry.state === 1) {
-      tryValidateESM(entry)
+      tryValidateESM(caller, entry)
     }
   } else {
     entry.state = 3
-    tryCompileCached(entry)
+    tryCompileCached(caller, entry)
   }
 
   return true
 }
 
-function tryCompileCached(entry) {
+function tryCompileCached(caller, entry) {
   const noDepth = moduleState.requireDepth === 0
   const { options } = entry.package
   const cached = entry.package.cache[entry.cacheName]
@@ -128,8 +125,10 @@ function tryCompileCached(entry) {
       }
 
       const { filename } = entry.module
-      const sourceCode = () => readSourceCode(filename, options)
-      throw maskStackTrace(e, sourceCode, filename, isESM)
+      const content = () => readSourceCode(filename, options)
+
+      captureStackTrace(e, caller)
+      throw maskStackTrace(e, content, filename, isESM)
     }
   }
 
@@ -226,7 +225,7 @@ function readSourceCode(filename, options) {
   return readFile(filename, "utf8")
 }
 
-function tryCompileCode(entry, content, options) {
+function tryCompileCode(caller, entry, content, options) {
   if (entry.package.options.debug) {
     return Compiler.compile(entry, content, options)
   }
@@ -241,12 +240,12 @@ function tryCompileCode(entry, content, options) {
     const isESM = e.sourceType === "module"
 
     delete e.sourceType
-    // captureStackTrace(e, manager)
+    captureStackTrace(e, caller)
     throw maskStackTrace(e, content, entry.module.filename, isESM)
   }
 }
 
-function tryValidateESM(entry) {
+function tryValidateESM(caller, entry) {
   const { options } = entry.package
 
   if (options.debug) {
@@ -261,7 +260,8 @@ function tryValidateESM(entry) {
 
       const { filename } = entry.module
       const content = () => readSourceCode(filename, options)
-      // captureStackTrace(e, manager)
+
+      captureStackTrace(e, caller)
       throw maskStackTrace(e, content, filename, true)
     }
   }
