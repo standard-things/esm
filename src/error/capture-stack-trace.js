@@ -1,11 +1,15 @@
 import isError from "../util/is-error.js"
 
-const errorCaptureStackTrace = Error.captureStackTrace
+const _captureStackTrace = Error.captureStackTrace
 
 function captureStackTrace(error, beforeFunc) {
-  return isError(error)
-    ? errorCaptureStackTrace(error, beforeFunc)
-    : error
+  if (! isError(error)) {
+    return error
+  }
+
+  return typeof beforeFunc === "function"
+    ? _captureStackTrace(error, beforeFunc)
+    : _captureStackTrace(error)
 }
 
 export default captureStackTrace
