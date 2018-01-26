@@ -201,6 +201,7 @@ function tryPassthru(func, args, options) {
 
       const [, filename] = args
       const content = () => readSourceCode(filename, options)
+
       throw maskStackTrace(e, content, filename)
     }
   }

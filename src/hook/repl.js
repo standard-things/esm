@@ -51,7 +51,7 @@ function hook(vm) {
         scriptOptions.cachedData = cached.scriptData
       }
     } else {
-      cached = tryWrapper(manager, Compiler.compile, [
+      cached = tryWrapper(Compiler.compile, [
         entry,
         content,
         {
@@ -75,18 +75,14 @@ function hook(vm) {
       "||[module.exports,module.exports=module.exports.entry.exports][0];" +
       cached.code
 
-    const result = tryWrapper(manager, func, [content, scriptOptions])
-
-    const wrapper = function (func, args) {
-      return tryWrapper.call(this, manager, func, args)
-    }
+    const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
       pkg.cache[cacheName].scriptData = result.cachedData
     }
 
-    result.runInContext = wrap(result.runInContext, wrapper)
-    result.runInThisContext = wrap(result.runInThisContext, wrapper)
+    result.runInContext = wrap(result.runInContext, tryWrapper)
+    result.runInThisContext = wrap(result.runInThisContext, tryWrapper)
     return result
   }
 
@@ -129,7 +125,7 @@ function tryValidateESM(caller, entry, content) {
   }
 }
 
-function tryWrapper(caller, func, args) {
+function tryWrapper(func, args) {
   try {
     return func.apply(this, args)
   } catch (e) {
@@ -141,7 +137,6 @@ function tryWrapper(caller, func, args) {
     const isESM = e.sourceType === "module"
 
     delete e.sourceType
-    captureStackTrace(e, caller)
     throw maskStackTrace(e, content, null, isESM)
   }
 }

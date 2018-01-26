@@ -97,13 +97,13 @@ function compile(caller, entry, content, filename) {
     }
   } else {
     entry.state = 3
-    tryCompileCached(caller, entry)
+    tryCompileCached(entry)
   }
 
   return true
 }
 
-function tryCompileCached(caller, entry) {
+function tryCompileCached(entry) {
   const noDepth = moduleState.requireDepth === 0
   const { options } = entry.package
   const cached = entry.package.cache[entry.cacheName]
@@ -127,7 +127,6 @@ function tryCompileCached(caller, entry) {
       const { filename } = entry.module
       const content = () => readSourceCode(filename, options)
 
-      captureStackTrace(e, caller)
       throw maskStackTrace(e, content, filename, isESM)
     }
   }
