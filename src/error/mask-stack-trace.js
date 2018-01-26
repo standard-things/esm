@@ -20,7 +20,7 @@ const headerRegExp = /^(.+?)(?=:\d+\n)/
 const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
-function maskStackTrace(error, sourceCode, filename, isESM) {
+function maskStackTrace(error, content, filename, isESM) {
   if (! isError(error)) {
     return error
   }
@@ -41,7 +41,7 @@ function maskStackTrace(error, sourceCode, filename, isESM) {
       const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
 
       stack = stack.replace(message, error.message)
-      stack = masker(stack, sourceCode, filename)
+      stack = masker(stack, content, filename)
       return error.stack = withoutMessage(stack, error.message, scrubber)
     },
     set(value) {
@@ -60,7 +60,7 @@ function maskStackTrace(error, sourceCode, filename, isESM) {
 //
 // <type>: <message>
 //   ...
-function maskParserStack(stack, sourceCode, filename) {
+function maskParserStack(stack, content, filename) {
   const parts = parserMessageRegExp.exec(stack)
 
   if (parts === null) {
@@ -79,12 +79,12 @@ function maskParserStack(stack, sourceCode, filename) {
     spliceArgs.push(filename + ":" + lineNum)
   }
 
-  if (typeof sourceCode === "function") {
-    sourceCode = sourceCode(filename)
+  if (typeof content === "function") {
+    content = content(filename)
   }
 
-  if (typeof sourceCode === "string") {
-    const lines = sourceCode.split("\n")
+  if (typeof content === "string") {
+    const lines = content.split("\n")
 
     if (lineIndex < lines.length) {
       let arrow = "^"
@@ -103,7 +103,7 @@ function maskParserStack(stack, sourceCode, filename) {
   return stackLines.join("\n")
 }
 
-function maskEngineStack(stack, sourceCode, filename) {
+function maskEngineStack(stack, content, filename) {
   const parts = engineMessageRegExp.exec(stack)
 
   if (typeof filename === "string" &&
@@ -119,15 +119,15 @@ function maskEngineStack(stack, sourceCode, filename) {
     const lineNum = +parts[1]
 
     if (snippet.indexOf(ZWJ) !== -1) {
-      if (typeof sourceCode === "function") {
-        sourceCode = sourceCode(filename)
+      if (typeof content === "function") {
+        content = content(filename)
       }
 
-      if (typeof sourceCode !== "string") {
+      if (typeof content !== "string") {
         return ""
       }
 
-      const lines = sourceCode.split("\n")
+      const lines = content.split("\n")
       const line = lines[lineNum - 1] || ""
       return line + (line ? "\n\n" : "\n")
     }
