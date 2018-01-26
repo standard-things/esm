@@ -15,10 +15,10 @@ const stdFilename = __non_webpack_module__.filename
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 
+const arrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 const atNameRegExp = /\((.+?)(?=:\d+)/g
+const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const headerRegExp = /^(.+?)(?=:\d+\n)/
-const removeColumnInfoRegExp = /:1:\d+(?=\)?$)/gm
-const replaceArrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 
 function maskStackTrace(error, content, filename, isESM) {
   if (! isError(error)) {
@@ -115,7 +115,7 @@ function maskEngineStack(stack, content, filename) {
     return stack
   }
 
-  return stack.replace(replaceArrowRegExp, (match, snippet, arrow, newline = "") => {
+  return stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
     const lineNum = +parts[1]
 
     if (snippet.indexOf(ZWJ) !== -1) {
@@ -167,7 +167,7 @@ function scrub(stack) {
     .split("\n")
     .filter((line) => line.indexOf(stdFilename) === -1)
     .join("\n")
-    .replace(removeColumnInfoRegExp, ":1")
+    .replace(columnInfoRegExp, ":1")
 }
 
 function withoutMessage(stack, message, callback) {
