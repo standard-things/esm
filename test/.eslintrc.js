@@ -4,7 +4,6 @@ module.exports = {
   rules: {
     "import/export": "off",
     "import/named": "off",
-    "import/no-anonymous-default-export": "off",
     "import/no-duplicates": "off",
     "import/no-extraneous-dependencies": "off",
     "import/no-unresolved": "off",
