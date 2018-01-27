@@ -23,7 +23,7 @@ function load(request, parent, isMain, preload) {
 
     child.paths = Module._nodeModulePaths(dirname(child.filename))
 
-    return loader(entry, preload)
+    loader(entry, preload)
   })
 
   if (! called &&

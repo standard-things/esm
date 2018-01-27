@@ -85,7 +85,7 @@ function load(request, parent, isMain, preload) {
         child.id = "."
       }
 
-      return loader(entry, preload)
+      loader(entry, preload)
     })
 
     if (! called &&
