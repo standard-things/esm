@@ -1,3 +1,5 @@
+import Entry from "../../entry.js"
+
 import _load from "./_load.js"
 import moduleState from "../state.js"
 
@@ -29,7 +31,15 @@ function load(request, parent, isMain, preload) {
       preload(entry)
     }
 
-    _load(entry, parent, isMain)
+    const parentEntry = Entry.get(parent)
+    const parentCached = parentEntry && parentEntry.package.cache[parentEntry.cacheName]
+    const parentIsESM = parentCached && parentCached.esm
+
+    if (parentIsESM) {
+      parent.require(request)
+    } else {
+      _load(request, parent, isMain)
+    }
   }
 
   if (entry.module.loaded) {

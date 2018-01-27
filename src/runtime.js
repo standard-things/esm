@@ -64,14 +64,34 @@ class Runtime {
 
     return new Promise((resolve, reject) => {
       setImmediate(() => {
+        moduleState.requireDepth += 1
+
         try {
-          watch(this.entry, request, [["*", createSetter("import", (value, childEntry) => {
+          const { entry } = this
+          const mod = entry.module
+          const setterPairs = [["*", createSetter("import", (value, childEntry) => {
             if (childEntry._loaded === 1) {
               resolve(value)
             }
-          })]], loadESM)
+          })]]
+
+          if (request in builtinEntries) {
+            mod.require(request)
+            builtinEntries[request]
+              .addSetters(setterPairs, entry)
+              .update()
+          } else {
+            const childEntry = loadESM(request, mod, false, (childEntry) => {
+              childEntry.addSetters(setterPairs, entry)
+            })
+
+            childEntry.loaded()
+            childEntry.update()
+          }
         } catch (e) {
           reject(e)
+        } finally {
+          moduleState.requireDepth -= 1
         }
       })
     })
@@ -112,7 +132,37 @@ class Runtime {
   }
 
   watch(request, setterPairs) {
-    return watch(this.entry, request, setterPairs, _loadESM)
+    moduleState.requireDepth += 1
+
+    try {
+      const { entry } = this
+      const mod = entry.module
+
+      let childEntry
+
+      if (request in builtinEntries) {
+        mod.require(request)
+
+        childEntry = builtinEntries[request]
+          .addSetters(setterPairs, entry)
+          .update()
+      } else {
+        moduleState.passthru = true
+
+        childEntry = _loadESM(request, mod, false, (childEntry) => {
+          childEntry.addSetters(setterPairs, entry)
+        })
+
+        moduleState.passthru = false
+
+        mod.require(request)
+
+        childEntry.loaded()
+        childEntry.update()
+      }
+    } finally {
+      moduleState.requireDepth -= 1
+    }
   }
 }
 
@@ -147,29 +197,6 @@ function runESM(entry, moduleWrapper) {
 
   mod.loaded = true
   entry.update().loaded()
-}
-
-function watch(entry, request, setterPairs, loader) {
-  moduleState.requireDepth += 1
-
-  try {
-    let childEntry
-
-    if (request in builtinEntries) {
-      childEntry = builtinEntries[request]
-        .addSetters(setterPairs, entry)
-        .update()
-    } else {
-      childEntry = loader(request, entry.module, false, (childEntry) => {
-        childEntry.addSetters(setterPairs, entry)
-      })
-
-      childEntry.loaded()
-      childEntry.update()
-    }
-  } finally {
-    moduleState.requireDepth -= 1
-  }
 }
 
 Object.setPrototypeOf(Runtime.prototype, null)

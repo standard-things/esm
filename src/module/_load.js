@@ -61,36 +61,24 @@ function load(request, parent, isMain, state, loader) {
     entry.state = moduleState.parsing ? 1 : 3
   }
 
-  const { _compile } = child
+  if (moduleState.passthru) {
+    entry.state = 2
+  } else {
+    const { _compile } = child
 
-  child._compile = (content, filename) => {
-    delete child._compile
+    child._compile = (content, filename) => {
+      delete child._compile
 
-    const func = typeof child[compileSym] === "function"
-      ? child[compileSym]
-      : _compile
+      const func = typeof child[compileSym] === "function"
+        ? child[compileSym]
+        : _compile
 
-    return func.call(child, content, filename)
-  }
-
-  tryLoad(entry, state, loader)
-  return entry
-}
-
-function tryLoad(entry, state, loader) {
-  const { id } = entry
-  state._cache[id] = entry.module
-
-  let threw = true
-
-  try {
-    loader(entry)
-    threw = false
-  } finally {
-    if (threw) {
-      delete state._cache[id]
+      return func.call(child, content, filename)
     }
   }
+
+  loader(entry)
+  return entry
 }
 
 export default load

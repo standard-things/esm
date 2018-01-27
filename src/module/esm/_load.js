@@ -16,23 +16,13 @@ import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 function load(request, parent, isMain, preload) {
-  let cacheKey
-  let filename
-  let queryHash
-  let entry = request
+  const filename = parent && Entry.get(parent).package.options.cjs.paths
+    ? Module._resolveFilename(request, parent, isMain)
+    : resolveFilename(request, parent, isMain)
 
-  if (typeof request === "string") {
-    filename = parent && Entry.get(parent).package.options.cjs.paths
-      ? Module._resolveFilename(request, parent, isMain)
-      : resolveFilename(request, parent, isMain)
+  const queryHash = getQueryHash(request)
 
-    queryHash = getQueryHash(request)
-
-    cacheKey =
-    request = filename + queryHash
-  } else {
-    filename = entry.module.filename
-  }
+  request = filename + queryHash
 
   const fromPath = dirname(filename)
   const pkg = Package.get(fromPath)
@@ -55,47 +45,52 @@ function load(request, parent, isMain, preload) {
 
   let error
   let called = false
-  let threw = true
+  let threw = false
 
-  try {
-    entry = _load(request, parent, childIsMain, state, (childEntry) => {
-      called = true
-      entry = childEntry
+  const entry = _load(request, parent, childIsMain, state, (entry) => {
+    const child = entry.module
 
-      const child = entry.module
+    state._cache[request] = child
 
-      if (! child.paths) {
-        child.paths = entry.package.options.cjs.paths
-          ? Module._nodeModulePaths(fromPath)
-          : moduleNodeModulePaths(fromPath)
-      }
-
-      if (! entry.url) {
-        child.filename = filename
-        entry.id = cacheKey
-        entry.url = getURLFromFilePath(filename) + queryHash
-
-        if (isUnexposed) {
-          child.parent = void 0
-        }
-      }
-
-      if (isMain) {
-        moduleState.mainModule = child
-        child.id = "."
-      }
-
-      loader(entry, preload)
-    })
-
-    if (! called &&
-        preload) {
-      preload(entry)
+    if (moduleState.passthru) {
+      return
     }
 
-    threw = false
-  } catch (e) {
-    error = e
+    called = true
+
+    if (! child.paths) {
+      child.paths = entry.package.options.cjs.paths
+        ? Module._nodeModulePaths(fromPath)
+        : moduleNodeModulePaths(fromPath)
+    }
+
+    if (! entry.url) {
+      child.filename = filename
+      entry.id = request
+      entry.url = getURLFromFilePath(filename) + queryHash
+
+      if (isUnexposed) {
+        child.parent = void 0
+      }
+    }
+
+    if (isMain) {
+      moduleState.mainModule = child
+      child.id = "."
+    }
+
+    try {
+      loader(entry, preload)
+    } catch (e) {
+      error = e
+      threw = true
+      delete state._cache[request]
+    }
+  })
+
+  if (! called &&
+      preload) {
+    preload(entry)
   }
 
   if (! threw) {
@@ -109,10 +104,10 @@ function load(request, parent, isMain, preload) {
     throw error
   } finally {
     if (state === Module) {
-      delete state._cache[entry.id]
+      delete state._cache[request]
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state._cache, entry.id, () => {
+      setGetter(state._cache, request, () => {
         throw error
       })
     }
