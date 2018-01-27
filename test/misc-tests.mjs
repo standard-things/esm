@@ -96,6 +96,23 @@ describe("built-in modules", () => {
   )
 })
 
+describe("integration", () => {
+  it("should support intercepting `require`", () =>
+    import("./cjs/intercept/require.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should support intercepting static `import`", () =>
+    import("./cjs/intercept/static-import.js")
+      .then((ns) => ns.default())
+  )
+
+  it("should support intercepting dynamic `import`", () =>
+    import("./cjs/intercept/dynamic-import.js")
+      .then((ns) => ns.default())
+  )
+})
+
 describe("package.json", () => {
   it("should not be enabled for nested node_modules", () =>
     import("disabled")
