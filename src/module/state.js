@@ -9,6 +9,7 @@ state._extensions = _extensions
 state.globalPaths = _initPaths()
 state.mainModule = null
 state.parsing = null
+state.passthru = null
 state.requireDepth = 0
 state.stat = null
 

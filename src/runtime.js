@@ -64,34 +64,22 @@ class Runtime {
 
     return new Promise((resolve, reject) => {
       setImmediate(() => {
-        moduleState.requireDepth += 1
+        const { entry } = this
+
+        const setterPairs = [["*", createSetter("import", (value, childEntry) => {
+          if (childEntry._loaded === 1) {
+            resolve(value)
+          }
+        })]]
+
+        if (request in builtinEntries) {
+          return watchBuiltin(entry, request, setterPairs)
+        }
 
         try {
-          const { entry } = this
-          const mod = entry.module
-          const setterPairs = [["*", createSetter("import", (value, childEntry) => {
-            if (childEntry._loaded === 1) {
-              resolve(value)
-            }
-          })]]
-
-          if (request in builtinEntries) {
-            mod.require(request)
-            builtinEntries[request]
-              .addSetters(setterPairs, entry)
-              .update()
-          } else {
-            const childEntry = loadESM(request, mod, false, (childEntry) => {
-              childEntry.addSetters(setterPairs, entry)
-            })
-
-            childEntry.loaded()
-            childEntry.update()
-          }
+          watchDynamicImport(entry, request, setterPairs)
         } catch (e) {
           reject(e)
-        } finally {
-          moduleState.requireDepth -= 1
         }
       })
     })
@@ -132,37 +120,11 @@ class Runtime {
   }
 
   watch(request, setterPairs) {
-    moduleState.requireDepth += 1
+    const { entry } = this
 
-    try {
-      const { entry } = this
-      const mod = entry.module
-
-      let childEntry
-
-      if (request in builtinEntries) {
-        mod.require(request)
-
-        childEntry = builtinEntries[request]
-          .addSetters(setterPairs, entry)
-          .update()
-      } else {
-        moduleState.passthru = true
-
-        childEntry = _loadESM(request, mod, false, (childEntry) => {
-          childEntry.addSetters(setterPairs, entry)
-        })
-
-        moduleState.passthru = false
-
-        mod.require(request)
-
-        childEntry.loaded()
-        childEntry.update()
-      }
-    } finally {
-      moduleState.requireDepth -= 1
-    }
+    return request in builtinEntries
+      ? watchBuiltin(entry, request, setterPairs)
+      : watchStaticImport(entry, request, setterPairs)
   }
 }
 
@@ -197,6 +159,51 @@ function runESM(entry, moduleWrapper) {
 
   mod.loaded = true
   entry.update().loaded()
+}
+
+function watchBuiltin(entry, request, setterPairs) {
+  entry.module.require(request)
+
+  builtinEntries[request]
+    .addSetters(setterPairs, entry)
+    .update()
+}
+
+function watchDynamicImport(entry, request, setterPairs) {
+  moduleState.requireDepth += 1
+
+  try {
+    const childEntry = loadESM(request, entry.module, false, (childEntry) => {
+      childEntry.addSetters(setterPairs, entry)
+    })
+
+    childEntry.loaded()
+    childEntry.update()
+  } finally {
+    moduleState.requireDepth -= 1
+  }
+}
+
+function watchStaticImport(entry, request, setterPairs) {
+  moduleState.requireDepth += 1
+  moduleState.passthru = true
+
+  const mod = entry.module
+
+  let childEntry
+
+  try {
+    childEntry = _loadESM(request, mod, false, (childEntry) => {
+      childEntry.addSetters(setterPairs, entry)
+    })
+  } finally {
+    moduleState.passthru = false
+    moduleState.requireDepth -= 1
+  }
+
+  mod.require(request)
+  childEntry.loaded()
+  childEntry.update()
 }
 
 Object.setPrototypeOf(Runtime.prototype, null)
