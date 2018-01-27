@@ -5,9 +5,9 @@
 import Entry from "../entry.js"
 import Module from "../module.js"
 
+import _loadESM from "./esm/_load.js"
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
-import loadESM from "./esm/_load.js"
 
 function require(request) {
   if (typeof request !== "string") {
@@ -27,7 +27,7 @@ function require(request) {
   const isESM = cached && cached.esm
 
   return isESM
-    ? loadESM(request, this, false).module.exports
+    ? _loadESM(request, this, false).module.exports
     : Module._load(request, this, false)
 }
 
