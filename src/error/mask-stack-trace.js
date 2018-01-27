@@ -27,11 +27,13 @@ function maskStackTrace(error, content, filename, isESM) {
 
   decorateStackTrace(error)
 
-  let { message, stack } = error
+  let { stack } = error
 
   if (typeof stack !== "string") {
     return error
   }
+
+  const message = String(error)
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
@@ -41,12 +43,16 @@ function maskStackTrace(error, content, filename, isESM) {
     configurable: true,
     enumerable: false,
     get() {
-      const masker = isParseError(error) ? maskParserStack : maskEngineStack
-      const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
+      const newMessage = String(error)
+      stack = stack.replace(message, newMessage)
 
-      stack = stack.replace(message, error.message)
+      const masker = isParseError(error) ? maskParserStack : maskEngineStack
       stack = masker(stack, content, filename)
-      return error.stack = withoutMessage(stack, error.message, scrubber)
+
+      const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
+      stack = withoutMessage(stack, newMessage, scrubber)
+
+      return error.stack = stack
     },
     set(value) {
       setProperty(error, "stack", { enumerable: false, value })
