@@ -29,6 +29,10 @@ function maskStackTrace(error, content, filename, isESM) {
 
   let { message, stack } = error
 
+  if (typeof stack !== "string") {
+    return error
+  }
+
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
   // However, `Error.captureStackTrace()` will throw when receiving a proxy

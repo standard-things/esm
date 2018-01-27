@@ -218,6 +218,15 @@ describe("errors", () => {
       .catch((e) => assert.strictEqual(e, global.customError))
   )
 
+  it("should not error when accessing `error.stack`", () =>
+    import("./fixture/error/no-stack.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.doesNotThrow(() => e.stack)
+        assert.strictEqual(e, global.customError)
+      })
+  )
+
   it("should mask stack arrows", () => {
     const id1 = path.resolve("fixture/error/import.mjs")
     const id2 = path.resolve("fixture/error/export.js")
