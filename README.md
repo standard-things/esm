@@ -158,7 +158,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for top-level <code>await</code> in the main module. <i>(requires Node 7.6+)</i></p>
+    <p>A boolean for top-level <code>await</code> in modules without ESM exports. <i>(requires Node 7.6+)</i></p>
   </td>
 </tr>
 <tr>
