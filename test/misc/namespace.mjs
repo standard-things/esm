@@ -26,18 +26,18 @@ export default () => {
   const nsSymbols = useToStringTag ? [toStringTag] : []
   const nsTag = useToStringTag ? "[object Module]" : "[object Object]"
 
-  namespaces.forEach((ns) => {
-    assert.ok(Object.isSealed(ns))
-    assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
-    assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
-  })
-
   assert.deepStrictEqual(ans, starNs)
   assert.deepStrictEqual(bns, ans)
   assert.deepStrictEqual(Object.keys(ans), ["a", "b"])
-  assert.deepStrictEqual(Object.getOwnPropertyNames(ans).sort(), ["a", "b"])
+  assert.deepStrictEqual(Object.getOwnPropertyNames(ans), ["a", "b"])
   assert.notStrictEqual(ans, bns)
 
-  assert.deepStrictEqual(ns1, abcNs)
   assert.strictEqual(ns1, ns2)
+  assert.deepStrictEqual(ns1, abcNs)
+
+  namespaces.forEach((ns) => {
+    assert.ok(Object.isSealed(ns))
+    assert.strictEqual(Object.prototype.toString.call(ns), nsTag)
+    assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), nsSymbols)
+  })
 }

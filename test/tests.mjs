@@ -16,8 +16,8 @@ import "./require-hook-tests.mjs"
 import "./setter-tests.mjs"
 import "./top-level-await.mjs"
 import "./url-tests.mjs"
-import "./scenario-tests.mjs"
 import "./repl-hook-tests.mjs"
+import "./scenario-tests.mjs"
 
 const jsonExt = require.extensions[".json"]
 

@@ -7,7 +7,7 @@ const nsJsGz = require("../fixture/gz/a.js.gz")
 module.exports = () => {
   return import("../fixture/gz/a.mjs.gz")
     .then((nsMjsGz) => {
-      const namespaces = [nsGz, nsJsGz, nsMjsGz]
-      namespaces.forEach(assert.ok)
+      [nsGz, nsJsGz, nsMjsGz]
+        .forEach(assert.ok)
     })
 }

@@ -4,7 +4,7 @@ import esm from "../../fixture/builtin/load.mjs"
 
 export default () => {
   [cjs, esm]
-    .forEach((ns) => {
-      assert.ok(Object.keys(ns).length)
+    .forEach((exported) => {
+      assert.ok(Object.keys(exported).length)
     })
 }

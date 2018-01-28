@@ -4,6 +4,6 @@ import * as nsJsGz from "../fixture/gz/a.js.gz"
 import * as nsMjsGz from "../fixture/gz/a.mjs.gz"
 
 export default () => {
-  const namespaces = [nsGz, nsJsGz, nsMjsGz]
-  namespaces.forEach(assert.ok)
+  [nsGz, nsJsGz, nsMjsGz]
+    .forEach(assert.ok)
 }

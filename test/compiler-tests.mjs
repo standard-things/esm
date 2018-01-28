@@ -10,12 +10,11 @@ describe("compiler", () => {
   })
 
   it("should support `options.type`", () => {
-    const types = ["module", "unambiguous"]
-
-    types.forEach((type) => {
-      const result = Compiler.compile('import"a"', { type })
-      assert.strictEqual(result.esm, true)
-    })
+    ["module", "unambiguous"]
+      .forEach((type) => {
+        const result = Compiler.compile('import"a"', { type })
+        assert.strictEqual(result.esm, true)
+      })
   })
 
   it("should support `options.cjs.vars`", () => {
@@ -31,7 +30,7 @@ describe("compiler", () => {
   })
 
   it('should support `options.type` of "module"', () => {
-    const tests = [
+    [
       "1+2",
       "1+2//import",
       '"use module";1+2',
@@ -39,15 +38,14 @@ describe("compiler", () => {
       '"use script";1+2',
       "'use script';1+2"
     ]
-
-    tests.forEach((code) => {
+    .forEach((code) => {
       const result = Compiler.compile(code, { type: "module" })
       assert.strictEqual(result.esm, true)
     })
   })
 
   it('should support `options.type` of "unambiguous"', () => {
-    const tests = [
+    [
       { code: "1+2", esm: false },
       { code: "1+2//import", esm: false },
       { code: "1+2", esm: true, hint: "module" },
@@ -56,45 +54,41 @@ describe("compiler", () => {
       { code: '"use script";1+2', esm: false },
       { code: "'use script';1+2", esm: false, hint: "module" }
     ]
-
-    tests.forEach((data) => {
+    .forEach((data) => {
       const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       assert.strictEqual(result.esm, data.esm)
     })
   })
 
   it("should support `options.var`", () => {
-    const values = [void 0, false, true]
-
-    values.forEach((value) => {
-      const result = Compiler.compile('import a from "a"', { var: value, type: "module" })
-      assert.ok(result.code.startsWith(value ? "var a" : "let a"))
-    })
+    [void 0, false, true]
+      .forEach((value) => {
+        const result = Compiler.compile('import a from "a"', { var: value, type: "module" })
+        assert.ok(result.code.startsWith(value ? "var a" : "let a"))
+      })
   })
 
   it('should support the "use module" directive', () => {
-    const tests = [
+    [
       { code: "'use module';\"use script\";import'a'", hint: "module" },
       { code: '"use module";\'use script\';import"a"', hint: "module" },
       { code: "'use module';\"use script\";import'a'" },
       { code: '"use module";\'use script\';import"a"' }
     ]
-
-    tests.forEach((data) => {
+    .forEach((data) => {
       const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       assert.strictEqual(result.esm, true)
     })
   })
 
   it('should support the "use script" directive', () => {
-    const tests = [
+    [
       { code: "'use script';\"use module\";import'a'", hint: "module" },
       { code: '"use script";\'use module\';import"a"', hint: "module" },
       { code: "'use script';\"use module\";import'a'" },
       { code: '"use script";\'use module\';import"a"' }
     ]
-
-    tests.forEach((data) => {
+    .forEach((data) => {
       assert.throws(() =>
         Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
       , SyntaxError)
@@ -155,25 +149,23 @@ describe("compiler", () => {
   })
 
   it("should not error on arrow functions with destructured arguments", () => {
-    const codes = [
+    [
       "({a=1})=>{}",
       "({a=1},{b=2})=>{}"
     ]
-
-    codes.forEach((code) => {
+    .forEach((code) => {
       assert.doesNotThrow(() => Compiler.compile(code))
     })
   })
 
   it("should not error on transforms at the end of the source", () => {
-    const codes = [
+    [
       'import{a}from"a"',
       'import"a"',
       "let a;export{a}",
       "export default a"
     ]
-
-    codes.forEach((code) => {
+    .forEach((code) => {
       assert.doesNotThrow(() => Compiler.compile(code, { type: "module" }))
     })
   })
