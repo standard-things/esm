@@ -272,9 +272,11 @@ function useAsyncWrapper(entry) {
   if (useTopLevelAwait &&
       entry.package.options.await) {
     const cached = entry.package.cache[entry.cacheName]
+    const exportSpecifiers = cached && cached.exportSpecifiers
 
-    if (cached) {
-      return ! keys(cached.exportSpecifiers).length
+    if (! exportSpecifiers ||
+        ! keys(exportSpecifiers).length) {
+      return true
     }
   }
 

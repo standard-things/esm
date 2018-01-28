@@ -11,7 +11,9 @@ describe("top-level await", () => {
   (canUseAsyncAwait ? it : xit)(
   "should support `options.await`", () =>
     Promise.all([
+      "./fixture/top-level-await/empty.js",
       "./fixture/top-level-await/empty.mjs",
+      "./fixture/top-level-await/export.js",
       "./fixture/top-level-await/nested.mjs"
     ].map((id) =>
       import(id)
