@@ -52,7 +52,8 @@ function load(request, parent, isMain, preload) {
 
     state._cache[request] = child
 
-    if (moduleState.passthru) {
+    if (moduleState.passthru &&
+        ! moduleState.parsing) {
       return
     }
 

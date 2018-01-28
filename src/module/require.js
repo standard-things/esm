@@ -23,8 +23,14 @@ function require(request) {
   }
 
   const entry = Entry.get(this)
+  const { _requireESM } = entry
   const cached = entry.package.cache[entry.cacheName]
-  const isESM = cached && cached.esm
+
+  entry._requireESM = false
+
+  const isESM =
+    _requireESM ||
+    (cached && cached.esm)
 
   return isESM
     ? _loadESM(request, this, false).module.exports

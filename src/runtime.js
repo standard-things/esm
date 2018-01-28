@@ -77,7 +77,7 @@ class Runtime {
         }
 
         try {
-          watchDynamicImport(entry, request, setterPairs)
+          watchImport(entry, request, setterPairs, loadESM)
         } catch (e) {
           reject(e)
         }
@@ -124,7 +124,7 @@ class Runtime {
 
     return request in builtinEntries
       ? watchBuiltin(entry, request, setterPairs)
-      : watchStaticImport(entry, request, setterPairs)
+      : watchImport(entry, request, setterPairs, _loadESM)
   }
 }
 
@@ -169,22 +169,7 @@ function watchBuiltin(entry, request, setterPairs) {
     .update()
 }
 
-function watchDynamicImport(entry, request, setterPairs) {
-  moduleState.requireDepth += 1
-
-  try {
-    const childEntry = loadESM(request, entry.module, false, (childEntry) => {
-      childEntry.addSetters(setterPairs, entry)
-    })
-
-    childEntry.loaded()
-    childEntry.update()
-  } finally {
-    moduleState.requireDepth -= 1
-  }
-}
-
-function watchStaticImport(entry, request, setterPairs) {
+function watchImport(entry, request, setterPairs, loader) {
   moduleState.requireDepth += 1
   moduleState.passthru = true
 
@@ -193,7 +178,7 @@ function watchStaticImport(entry, request, setterPairs) {
   let childEntry
 
   try {
-    childEntry = _loadESM(request, mod, false, (childEntry) => {
+    childEntry = loader(request, mod, false, (childEntry) => {
       childEntry.addSetters(setterPairs, entry)
     })
   } finally {
@@ -201,7 +186,9 @@ function watchStaticImport(entry, request, setterPairs) {
     moduleState.requireDepth -= 1
   }
 
+  entry._requireESM = true
   mod.require(request)
+
   childEntry.loaded()
   childEntry.update()
 }

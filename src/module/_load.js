@@ -61,7 +61,8 @@ function load(request, parent, isMain, state, loader) {
     entry.state = moduleState.parsing ? 1 : 3
   }
 
-  if (moduleState.passthru) {
+  if (moduleState.passthru &&
+      ! moduleState.parsing) {
     entry.state = 2
   } else {
     const { _compile } = child

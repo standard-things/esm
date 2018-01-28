@@ -45,6 +45,8 @@ class Entry {
     this._loaded = 0
     // The raw namespace object.
     this._namespace = new NullObject
+    // The load mode for `module.require`.
+    this._requireESM = false
     // The cache file name of the module.
     this.cacheName = null
     // The child entries of the module.
