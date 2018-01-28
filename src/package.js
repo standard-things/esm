@@ -10,6 +10,7 @@ import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
+import moduleState from "./module/state.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
@@ -253,8 +254,18 @@ function readInfo(dirPath, force) {
         gz: true
       })
 
-      pkg.options =
-      Package.createOptions(loadESM(optionsPath, null, false).module.exports)
+      const { parsing, passthru } = moduleState
+
+      moduleState.parsing =
+      moduleState.passthru = false
+
+      try {
+        pkg.options =
+        Package.createOptions(loadESM(optionsPath, null, false).module.exports)
+      } finally {
+        moduleState.parsing = parsing
+        moduleState.passthru = passthru
+      }
     }
   }
 
