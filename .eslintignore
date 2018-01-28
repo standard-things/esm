@@ -2,8 +2,8 @@
 /node_modules
 /src/vendor
 /test/fixture/error
-/test/fixture/main/top-level-await
 /test/fixture/source
+/test/fixture/top-level-await
 /test/node_modules/error
 /test/output
 /test/export/star-cycle.mjs

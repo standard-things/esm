@@ -19,12 +19,6 @@ const canUseExperimentalModules =
 const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
 
-let canUseAsyncAwait = false
-
-try {
-  canUseAsyncAwait = !! new vm.Script("async()=>await 1")
-} catch (e) {}
-
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
@@ -178,13 +172,4 @@ describe("module.runMain hook", function () {
           .then((result) => assert.ok(result.stderr.includes("ERR_MISSING_MODULE")))
       , Promise.resolve())
   })
-
-  ;(canUseAsyncAwait ? it : xit)(
-  "should support `options.await`", () =>
-    runMain("./fixture/main/top-level-await")
-      .then((result) => {
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("top-level-await:true"))
-      })
-  )
 })

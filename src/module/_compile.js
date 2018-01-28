@@ -24,7 +24,9 @@ import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
 
-let allowTopLevelAwait = satisfies(process.version, ">=7.6.0")
+const useTopLevelAwait = satisfies(process.version, ">=7.6.0")
+
+const { keys } = Object
 
 function compile(caller, entry, content, filename) {
   const { options } = entry.package
@@ -267,17 +269,12 @@ function tryValidateESM(caller, entry) {
 }
 
 function useAsyncWrapper(entry) {
-  const { mainModule } = moduleState
-
-  if (allowTopLevelAwait &&
-      mainModule &&
+  if (useTopLevelAwait &&
       entry.package.options.await) {
-    const mod = entry.module
-    allowTopLevelAwait = false
+    const cached = entry.package.cache[entry.cacheName]
 
-    if (mainModule === mod ||
-        mainModule.children.some((child) => child === mod)) {
-      return true
+    if (cached) {
+      return ! keys(cached.exportSpecifiers).length
     }
   }
 
