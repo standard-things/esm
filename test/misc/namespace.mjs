@@ -29,8 +29,10 @@ export default () => {
   assert.deepStrictEqual(ans, starNs)
   assert.deepStrictEqual(bns, ans)
   assert.deepStrictEqual(Object.keys(ans), ["a", "b"])
-  assert.deepStrictEqual(Object.getOwnPropertyNames(ans), ["a", "b"])
   assert.notStrictEqual(ans, bns)
+
+  // Use `Array#sort` to avoid a V8 JIT bug in Node 4.
+  assert.deepStrictEqual(Object.getOwnPropertyNames(ans).sort(), ["a", "b"])
 
   assert.strictEqual(ns1, ns2)
   assert.deepStrictEqual(ns1, abcNs)
