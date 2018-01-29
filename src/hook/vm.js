@@ -108,7 +108,8 @@ function hook(vm) {
 
     vm.Script = function (code, options) {
       vm.Script = Script
-      code = code.slice(Module.wrapper[0].length, -Module.wrapper[1].length)
+      const { wrapper } = Module
+      code = code.slice(wrapper[0].length, -wrapper[1].length)
       return vm.createScript(code, options)
     }
   } else if (isEval())  {
