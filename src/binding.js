@@ -8,7 +8,7 @@ import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 
 const _binding = noDeprecationWarning(() => process.binding)
-const ids = ["config", "fs", "icu", "inspector", "natives", "util"]
+const ids = ["config", "fs", "icu", "natives", "util"]
 
 const binding = ids
   .reduce((binding, id) => {

@@ -13,7 +13,7 @@ import extname from "../path/extname.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
-import isInspectorEnabled from "../env/is-inspector-enabled.js"
+import isInspect from "../env/is-inspect.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "./state.js"
@@ -199,7 +199,7 @@ function maybeSourceMap(entry, content) {
   const { sourceMap } = entry.package.options
 
   if (sourceMap !== false &&
-     (sourceMap || isInspectorEnabled()) &&
+     (sourceMap || isInspect()) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
       encodeURI(createSourceMap(entry.module.filename, content))
