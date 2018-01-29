@@ -229,6 +229,34 @@ describe("package.json", () => {
 })
 
 describe("errors", () => {
+  it("should error when `require` receives an empty `request`", () => {
+    try {
+      require("")
+      assert.ok(false)
+    } catch (e) {
+      assert.strictEqual(e.code, "ERR_INVALID_ARG_VALUE")
+    }
+  })
+
+  it("should error when `require` methods receive a non-string `request`", () => {
+    [
+      require,
+      require.resolve,
+      require.resolve.paths
+    ]
+    .forEach((func) => {
+      [1, false, null, void 0, {}]
+        .forEach((request) => {
+          try {
+            func(request)
+            assert.ok(false)
+          } catch (e) {
+            assert.strictEqual(e.code, "ERR_INVALID_ARG_TYPE")
+          }
+        })
+    })
+  })
+
   it("should not wrap custom errors", () =>
     import("./fixture/error/custom.mjs")
       .then(() => assert.ok(false))
