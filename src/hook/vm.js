@@ -40,10 +40,9 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    const cacheName =
     entry.cacheName = getCacheFileName(entry, content)
 
-    let cached = entry.package.cache[cacheName]
+    let cached = entry.package.cache[entry.cacheName]
 
     if (cached) {
       if (scriptOptions.produceCachedData === true &&

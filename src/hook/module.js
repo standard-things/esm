@@ -81,26 +81,12 @@ function hook(Mod, parent) {
 
   function methodWrapper(manager, func, args) {
     const [mod, filename] = args
+    const { _compile } = mod
     const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
-
-    const { _compile } = mod
     const entry = Entry.get(mod)
-    const cacheName = getCacheFileName(entry, mtime(filename))
-    const stateHash = getCacheStateHash(cacheName)
-    const runtimeName = encodeId("_" + stateHash.slice(0, 3))
-
-    entry.cacheName = cacheName
-    entry.runtimeName = runtimeName
-
     const { cache, cachePath, options } = entry.package
-    let cached = cache[cacheName]
-
-    if (cached === true &&
-        ! isFile(resolve(cachePath, cacheName))) {
-      cached = null
-      delete cache[cacheName]
-    }
+    const cacheName = getCacheFileName(entry, mtime(filename))
 
     const compileWrapper = (content, filename) => {
       if (shouldOverwrite) {
@@ -117,7 +103,18 @@ function hook(Mod, parent) {
       }
     }
 
+    entry.cacheName = cacheName
+    entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
+
     setPrototypeOf(mod, Module.prototype)
+
+    let cached = cache[cacheName]
+
+    if (cached === true &&
+        ! isFile(resolve(cachePath, cacheName))) {
+      cached = null
+      delete cache[cacheName]
+    }
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper
