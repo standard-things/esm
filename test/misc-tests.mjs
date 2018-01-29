@@ -372,7 +372,7 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should support URL ids", () =>
+  it("should support URL requests", () =>
     Promise.all([
       abcPath + "?a",
       abcPath + "#a",
@@ -383,7 +383,7 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should support ids containing colons", () =>
+  it("should support requests containing colons", () =>
     Promise.all([
       "./fixture/with:colon.mjs",
       "./fixture/with%3acolon.mjs",
@@ -394,24 +394,24 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should support ids containing percents", () =>
+  it("should support requests containing percents", () =>
     import("./fixture/with%2520percent.mjs")
       .then(() => assert.ok(true))
   )
 
-  it("should support ids containing pounds", () =>
+  it("should support requests containing pounds", () =>
     import("./fixture/with%23pound.mjs")
       .then(() => assert.ok(true))
   )
 
-  it("should support single character ids", () =>
+  it("should support single character requests", () =>
     // Test for single character package name bug:
     // https://github.com/nodejs/node/pull/16634
     import("./fixture/import/single-char.mjs")
       .then(() => assert.ok(true))
   )
 
-  it('should support local "." ids', () =>
+  it('should support local "." requests', () =>
     Promise.all([
       "./fixture/relative/dot.js",
       "./fixture/relative/dot-slash.js"
@@ -421,7 +421,7 @@ describe("Node rules", () => {
     ))
   )
 
-  it("should reevaluate for ids with different query+hash", () =>
+  it("should reevaluate for requests with different query+hash", () =>
     import("./fixture/load-count.mjs")
       .then((oldNs) =>
         [
@@ -448,7 +448,7 @@ describe("Node rules", () => {
       )
   )
 
-  it("should not support URL ids with encoded slashes", () =>
+  it("should not support URL requests with encoded slashes", () =>
     Promise.all([
       abcPath.replace(slashRegExp, "%2f"),
       abcPath.replace(slashRegExp, "%2F"),
@@ -474,7 +474,7 @@ describe("Node rules", () => {
     ))
   )
 
-  it('should not resolve non-local "." ids', () =>
+  it('should not resolve non-local "." requests', () =>
     import(".")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
@@ -550,7 +550,7 @@ describe("Node rules", () => {
       .then((ns) => ns.default())
   )
 
-  it('should not resolve non-local "." ids with `require`', () => {
+  it('should not resolve non-local "." requests with `require`', () => {
     try {
       require(".")
       assert.ok(false)
@@ -894,13 +894,13 @@ describe("spec compliance", () => {
   )
 
   it("should error when creating an `arguments` binding", () => {
-    const id = path.resolve("fixture/source/arguments-binding.mjs")
+    const filename = path.resolve("fixture/source/arguments-binding.mjs")
 
-    import(id)
+    import(filename)
       .then(() => assert.ok(false))
       .catch((e) =>
         checkErrorStack(e, [
-          getURLFromFilePath(id) + ":1",
+          getURLFromFilePath(filename) + ":1",
           "const arguments = 1",
           "      ^\n",
           "SyntaxError: Binding arguments in strict mode"
@@ -909,13 +909,13 @@ describe("spec compliance", () => {
   })
 
   it("should error when creating an `await` binding", () => {
-    const id = path.resolve("fixture/source/await-binding.mjs")
+    const filename = path.resolve("fixture/source/await-binding.mjs")
 
-    return import(id)
+    return import(filename)
       .then(() => assert.ok(false))
       .catch((e) =>
         checkErrorStack(e, [
-          getURLFromFilePath(id) + ":1",
+          getURLFromFilePath(filename) + ":1",
           "const await = 1",
           "      ^\n",
           "SyntaxError: The keyword 'await' is reserved"
@@ -924,13 +924,13 @@ describe("spec compliance", () => {
   })
 
   it("should error when exporting non-local bindings", () => {
-    const id = path.resolve("fixture/source/non-local-export.mjs")
+    const filename = path.resolve("fixture/source/non-local-export.mjs")
 
-    return import(id)
+    return import(filename)
       .then(() => assert.ok(false))
       .catch((e) =>
         checkErrorStack(e, [
-          getURLFromFilePath(id) + ":1",
+          getURLFromFilePath(filename) + ":1",
           "export { global }",
           "         ^^^^^^\n",
           "SyntaxError: Export 'global' is not defined in module"
@@ -939,13 +939,13 @@ describe("spec compliance", () => {
   })
 
   it("should error when using top-level `new.target`", () => {
-    const id = path.resolve("fixture/source/new-target.mjs")
+    const filename = path.resolve("fixture/source/new-target.mjs")
 
-    return import(id)
+    return import(filename)
       .then(() => assert.ok(false))
       .catch((e) =>
         checkErrorStack(e, [
-          getURLFromFilePath(id) + ":1",
+          getURLFromFilePath(filename) + ":1",
           "new.target",
           "^\n",
           "SyntaxError: new.target can only be used in functions"
@@ -954,13 +954,13 @@ describe("spec compliance", () => {
   })
 
   it("should error when using an opening HTML comment in ESM", () => {
-    const id = path.resolve("fixture/source/html-comment.mjs")
+    const filename = path.resolve("fixture/source/html-comment.mjs")
 
-    return import(id)
+    return import(filename)
       .then(() => assert.ok(false))
       .catch((e) =>
         checkErrorStack(e, [
-          getURLFromFilePath(id) + ":1",
+          getURLFromFilePath(filename) + ":1",
           "<!--",
           "^\n",
           "SyntaxError: HTML comments are not allowed in modules"
