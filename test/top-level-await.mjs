@@ -15,10 +15,8 @@ describe("top-level await", () => {
       "./fixture/top-level-await/empty.mjs",
       "./fixture/top-level-await/export.js",
       "./fixture/top-level-await/nested.mjs"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ].
+    map((id) => import(id)))
   )
 
   ;(canUseAsyncAwait ? it : xit)(

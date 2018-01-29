@@ -125,10 +125,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-object",
       "./fixture/options-file/esmrc-string-cjs",
       "./fixture/options-file/esmrc-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.json options", () =>
@@ -136,10 +134,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-json-object",
       "./fixture/options-file/esmrc-json-string-cjs",
       "./fixture/options-file/esmrc-json-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.gz options", () =>
@@ -147,10 +143,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-gz-object",
       "./fixture/options-file/esmrc-gz-string-cjs",
       "./fixture/options-file/esmrc-gz-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.js options", () =>
@@ -158,10 +152,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-js-object",
       "./fixture/options-file/esmrc-js-string-cjs",
       "./fixture/options-file/esmrc-js-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.js.gz options", () =>
@@ -169,10 +161,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-js-gz-object",
       "./fixture/options-file/esmrc-js-gz-string-cjs",
       "./fixture/options-file/esmrc-js-gz-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.mjs options", () =>
@@ -180,10 +170,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-mjs-object",
       "./fixture/options-file/esmrc-mjs-string-cjs",
       "./fixture/options-file/esmrc-mjs-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support .esmrc.mjs.gz options", () =>
@@ -191,10 +179,8 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-mjs-gz-object",
       "./fixture/options-file/esmrc-mjs-gz-string-cjs",
       "./fixture/options-file/esmrc-mjs-gz-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support @std/esm package options", () =>
@@ -205,15 +191,12 @@ describe("package.json", () => {
       "./fixture/options-file/@std-object",
       "./fixture/options-file/@std-string-cjs",
       "./fixture/options-file/@std-string-js"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should apply .esmrc over package.json options", () =>
     import("./fixture/options-priority")
-      .then(() => assert.ok(true))
   )
 
   it("should support @std/esm as package dependencies", () =>
@@ -221,10 +204,8 @@ describe("package.json", () => {
       "dependencies",
       "dev-dependencies",
       "peer-dependencies"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 })
 
@@ -388,27 +369,22 @@ describe("Node rules", () => {
       "./fixture/with:colon.mjs",
       "./fixture/with%3acolon.mjs",
       "./fixture/with%3Acolon.mjs"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(true))
-    ))
+    ]
+    .map((id) => import(id)))
   )
 
   it("should support requests containing percents", () =>
     import("./fixture/with%2520percent.mjs")
-      .then(() => assert.ok(true))
   )
 
   it("should support requests containing pounds", () =>
     import("./fixture/with%23pound.mjs")
-      .then(() => assert.ok(true))
   )
 
   it("should support single character requests", () =>
     // Test for single character package name bug:
     // https://github.com/nodejs/node/pull/16634
     import("./fixture/import/single-char.mjs")
-      .then(() => assert.ok(true))
   )
 
   it('should support local "." requests', () =>
@@ -1012,26 +988,21 @@ describe("spec compliance", () => {
 
   it("should not error when accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
-      .then(() => assert.ok(true))
   )
 
   it("should not error when typeof checking `arguments`", () =>
     import("./fixture/source/arguments-typeof.mjs")
-      .then(() => assert.ok(true))
   )
 
   it("should not error when using an opening HTML comment in CJS", () =>
     import("./fixture/source/html-comment.js")
-      .then(() => assert.ok(true))
   )
 
   it("should not error parsing metadata of CJS modules with leading multiline comments", () =>
     import("./fixture/source/multiline-comment.js")
-      .then(() => assert.ok(true))
   )
 
   it("should not hang on strings containing '# sourceMappingURL'", () =>
     import("./fixture/source/source-mapping-url-string.mjs")
-      .then(() => assert.ok(true))
   )
 })
