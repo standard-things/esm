@@ -40,10 +40,6 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    if (! entry) {
-      initEntry(global.module || rootModule)
-    }
-
     const cacheName =
     entry.cacheName = getCacheFileName(entry, content)
 
@@ -110,6 +106,7 @@ function hook(vm) {
       vm.Script = Script
       const { wrapper } = Module
       code = code.slice(wrapper[0].length, -wrapper[1].length)
+      initEntry(rootModule)
       return vm.createScript(code, options)
     }
   } else if (isEval())  {
@@ -117,6 +114,7 @@ function hook(vm) {
 
     vm.runInThisContext = function (code, options) {
       vm.runInThisContext = runInThisContext
+      initEntry(global.module)
       return vm.createScript(code, options).runInThisContext(options)
     }
   } else if (isREPL()) {
