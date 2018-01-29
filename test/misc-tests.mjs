@@ -507,6 +507,20 @@ describe("Node rules", () => {
     , Promise.resolve())
   )
 
+  it("should support requests with trailing backslashs in Windows", function () {
+    if (! isWin) {
+      this.skip()
+      return
+    }
+
+    const request = ".\\fixture\\ext-priority\\"
+
+    return Promise
+      .resolve()
+      .then(() => require(request))
+      .then(() => import(request))
+  })
+
   it("should not support custom file extensions in ESM", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./fixture/cof")
