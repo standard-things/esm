@@ -9,7 +9,7 @@ function isREPL() {
   }
 
   return shared.env.isREPL =
-    (process.argv.length < 2 &&
+    (process.argv.length === 1 &&
      isFromRequireFlag()) ||
     (rootModule.id === "<repl>" &&
      rootModule.filename === null &&

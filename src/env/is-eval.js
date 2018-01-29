@@ -8,9 +8,9 @@ function isEval() {
   }
 
   return shared.env.isEval =
-    process.argv.length < 2 &&
-    isFromRequireFlag() &&
-    matches(process.execArgv, /^(?:--eval|--print|-pe|-[ep])$/)
+    process.argv.length === 1 &&
+    matches(process.execArgv, /^(?:--eval|--print|-pe|-[ep])$/) &&
+    isFromRequireFlag()
 }
 
 export default isEval

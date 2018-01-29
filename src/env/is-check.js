@@ -8,9 +8,9 @@ function isCheck() {
   }
 
   return shared.env.isCheck =
-    process.argv.length < 2 &&
-    isFromRequireFlag() &&
-    matches(process.execArgv, /^(?:--check|-c)$/)
+    process.argv.length === 1 &&
+    matches(process.execArgv, /^(?:--check|-c)$/) &&
+    isFromRequireFlag()
 }
 
 export default isCheck
