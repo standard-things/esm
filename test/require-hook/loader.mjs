@@ -1,5 +1,5 @@
 import assert from "assert"
-import makeRequire from "../../index.js"
+import makeRequire from "../../"
 import module from "../module.js"
 import path from "path"
 import require from "../require.js"

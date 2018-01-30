@@ -5,7 +5,7 @@ const path = require("path")
 const livePath = path.resolve("fixture/live.mjs")
 
 module.exports = () => {
-  const makeRequire = require("../../index.js")
+  const makeRequire = require("../../")
   const esmRequire = makeRequire(module)
 
   delete esmRequire.cache[livePath]

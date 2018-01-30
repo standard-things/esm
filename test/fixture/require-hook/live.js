@@ -1,4 +1,4 @@
 "use strict"
 
-require = require("../../../index.js")(module)
+require = require("../../../")(module)
 module.exports = require("../live.mjs")
