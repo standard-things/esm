@@ -5,6 +5,7 @@ import SafeProxy from "./safe-proxy.js"
 import assign from "./util/assign.js"
 import assignProperty from "./util/assign-property.js"
 import errors from "./errors.js"
+import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import setGetter from "./util/set-getter.js"
@@ -143,6 +144,7 @@ class Entry {
   addGettersFrom(otherEntry) {
     const { getters } = this
     const { getters:otherGetters } = otherEntry
+    const name = getModuleName(this.module)
 
     for (const key in otherEntry._namespace) {
       if (key === "default") {
@@ -167,10 +169,10 @@ class Entry {
         continue
       }
 
-      const { id } = getter.owner.module
+      const ownerName = getModuleName(getter.owner.module)
 
-      if (id !== otherGetter.owner.module.id &&
-          id !== this.module.id) {
+      if (ownerName !== name &&
+          ownerName !== getModuleName(otherGetter.owner.module)) {
         this.addGetter(key, () => STAR_ERROR)
       }
     }
