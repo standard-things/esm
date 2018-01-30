@@ -15,19 +15,37 @@ describe("command-line hook", function () {
   this.timeout(0)
 
   it("should not fail on unresolvable command-line arguments", () =>
-    node([
-      "./node_modules/cli-hook",
-      "UNRESOLVABLE_VALUE",
+    [
+      "../",
       "../index.js"
-    ])
-    .then((result) => assert.strictEqual(result.stderr, ""))
+    ]
+    .reduce((promise, request) =>
+      promise
+        .then(() =>
+          node([
+            "./node_modules/cli-hook",
+            "UNRESOLVABLE_VALUE",
+            request
+          ])
+          .then((result) => assert.strictEqual(result.stderr, ""))
+        )
+    , Promise.resolve())
   )
 
   it("should inspect JSON encoded command-line arguments", () =>
-    node([
-      "./node_modules/cli-hook",
-      '{"r":"../index.js"}'
-    ])
-    .then((result) => assert.ok(result.stdout.includes("cli-hook:true")))
+    [
+      "../",
+      "../index.js"
+    ]
+    .reduce((promise, request) =>
+      promise
+        .then(() =>
+          node([
+            "./node_modules/cli-hook",
+            '{"r":"' + request + '"}'
+          ])
+          .then((result) => assert.ok(result.stdout.includes("cli-hook:true")))
+        )
+    , Promise.resolve())
   )
 })

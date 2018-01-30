@@ -1,8 +1,9 @@
+import { extname, resolve } from "path"
+
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
 import isPath from "../util/is-path.js"
 import realpath from "../fs/realpath.js"
-import { resolve } from "path"
 import rootModule from "../root-module.js"
 
 const { keys } = Object
@@ -12,7 +13,13 @@ const stdFilename = __non_webpack_module__.filename
 function hasLoaderValue(value) {
   if (typeof value === "string") {
     if (isPath(value)) {
-      if (realpath(resolve(value)) === stdFilename) {
+      let resolved = resolve(value)
+
+      if (! extname(resolved)) {
+        resolved += "/index.js"
+      }
+
+      if (realpath(resolved) === stdFilename) {
         return true
       }
     } else if (value.charCodeAt(0) !== 45 /* - */ &&
