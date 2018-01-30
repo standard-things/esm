@@ -1,6 +1,11 @@
+import SemVer from "semver"
+
 import assert from "assert"
 import execa from "execa"
 import path from "path"
+
+const canTestCheckFlag =
+  SemVer.satisfies(process.version, ">=8.0.0")
 
 const testPath = path.resolve(".")
 
@@ -14,7 +19,8 @@ function shell(command) {
 describe("--check hook", function () {
   this.timeout(0)
 
-  it("should support Node -c and --check", () => {
+  ;(canTestCheckFlag ? it : xit)(
+  "should support Node -c and --check", () => {
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
     const runs = []
