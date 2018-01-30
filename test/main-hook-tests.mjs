@@ -40,10 +40,10 @@ function node(args, env) {
 }
 
 function runMain(filename, env) {
-  return node(["-r", "../index.js", filename], env)
+  return node(["-r", "../", filename], env)
 }
 
-describe("module.runMain hook", function () {
+describe("main hook", function () {
   this.timeout(0)
 
   it("should support Node -r and --require", () => {
@@ -58,7 +58,7 @@ describe("module.runMain hook", function () {
     requireFlags.forEach((requireFlag) => {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
-        args.push(requireFlag, "../index.js", "./fixture/main/main-module.mjs")
+        args.push(requireFlag, "../", "./fixture/main-hook")
         runs.push(args)
       })
     })
@@ -67,7 +67,7 @@ describe("module.runMain hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stdout.includes("main-module:false")))
+          .then((result) => assert.ok(result.stdout.includes("main-hook:true")))
       , Promise.resolve())
   })
 
@@ -115,7 +115,7 @@ describe("module.runMain hook", function () {
   })
 
   it("should support dynamic import in CJS", () =>
-    runMain("./fixture/main/dynamic-import.js")
+    runMain("./fixture/main-hook/dynamic-import.js")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
         assert.ok(result.stdout.includes("dynamic-import-cjs:true"))
@@ -123,16 +123,16 @@ describe("module.runMain hook", function () {
   )
 
   it("should support `import.meta.url`", () =>
-    runMain("./fixture/main/import-meta.mjs")
+    runMain("./fixture/main-hook/import-meta.mjs")
       .then((result) => {
-        const url = testURL + "/fixture/main/import-meta.mjs"
+        const url = testURL + "/fixture/main-hook/import-meta.mjs"
         const expected = JSON.stringify({ url })
         assert.ok(result.stdout.includes("import-meta:" + expected))
       })
   )
 
   it("should not expose ESM in `process.mainModule`", () =>
-    runMain("./fixture/main/main-module/off")
+    runMain("./fixture/main-hook/main-module/off")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
         assert.ok(result.stdout.includes("main-module:false"))
@@ -140,7 +140,7 @@ describe("module.runMain hook", function () {
   )
 
   it("should expose ESM in `process.mainModule` with `options.cjs.cache`", () =>
-    runMain("./fixture/main/main-module/on")
+    runMain("./fixture/main-hook/main-module/on")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
         assert.ok(result.stdout.includes("main-module:true"))
@@ -160,7 +160,7 @@ describe("module.runMain hook", function () {
     fileNames.forEach((fileName) => {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
-        args.push("-r", "../index.js", fileName)
+        args.push("-r", "../", fileName)
         runs.push(args)
       })
     })
