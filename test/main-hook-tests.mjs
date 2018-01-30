@@ -8,10 +8,6 @@ import path from "path"
 import trash from "../script/trash.js"
 import vm from "vm"
 
-const canTestMissingModuleErrors =
-  ! ("TRAVIS" in process.env &&
-     SemVer.satisfies(process.version, "^7"))
-
 const canUseExperimentalModules =
   process.jsEngine !== "chakracore" &&
   SemVer.satisfies(process.version, ">=8.5.0")
@@ -147,8 +143,7 @@ describe("main hook", function () {
       })
   )
 
-  ;(canTestMissingModuleErrors ? it : xit)(
-  "should error for missing modules", function () {
+  it("should error for missing modules", () => {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
     const otherFlags = [""]
     const runs = []
