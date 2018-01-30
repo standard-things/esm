@@ -3,6 +3,7 @@ import path from "path"
 import require from "./require.js"
 import zlib from "zlib"
 
+import "./check-hook-tests.mjs"
 import "./cli-hook-tests.mjs"
 import "./compiler-tests.mjs"
 import "./dynamic-import-tests.mjs"
