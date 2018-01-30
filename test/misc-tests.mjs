@@ -461,14 +461,14 @@ describe("Node rules", () => {
       "./fixture/reevaluate-error.mjs",
       "./fixture/reevaluate-error.mjs?a",
       "./fixture/reevaluate-error.mjs#a"
-    ].reduce((promise, id, index) =>
+    ].reduce((promise, request, index) =>
       promise
         .then(() => {
           delete global.evaluated
-          return import(id)
+          return import(request)
             .then(() => assert.ok(false))
             .catch((e) =>
-              import(id)
+              import(request)
                 .then(() => assert.ok(false))
                 .catch((re) => {
                   if (re.code === "ERR_ASSERTION") {
@@ -771,12 +771,12 @@ describe("spec compliance", () => {
       "./fixture/load-count.js",
       "./fixture/cycle/load-count/a.js",
       "./fixture/cycle/load-count/a.mjs"
-    ].reduce((promise, id) => {
+    ].reduce((promise, request) => {
       return promise
         .then(() => {
           delete global.loadCount
           delete require.cache[path.resolve("fixture/load-count.js")]
-          return import(id)
+          return import(request)
         })
         .then(() => assert.strictEqual(global.loadCount, 1))
     }, Promise.resolve())

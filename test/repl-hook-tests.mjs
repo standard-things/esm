@@ -13,7 +13,7 @@ const pkgPath = path.resolve("../index.js")
 const parent = require.cache[pkgPath].parent
 const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
 
-describe("REPL hook", () => {
+describe("repl hook", () => {
   let context
 
   before(() => {

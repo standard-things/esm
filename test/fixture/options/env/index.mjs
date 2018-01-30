@@ -1,3 +1,3 @@
-const actual = typeof module !== "undefined"
-console.log("esm-options:" + actual)
-export {}
+import console from "console"
+
+console.log("esm-options:" + (typeof module !== "undefined"))

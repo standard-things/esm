@@ -2,11 +2,7 @@ import assert from "assert"
 import execa from "execa"
 import path from "path"
 
-const isWin = process.platform === "win32"
-const fileProtocol = "file://" + (isWin ? "/" : "")
-
 const testPath = path.resolve(".")
-const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 function node(args) {
   return execa(process.execPath, args, {
