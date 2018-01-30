@@ -20,7 +20,7 @@ describe("command-line hook", function () {
 
   it("should not fail on unresolvable command-line arguments", () =>
     node([
-      "./node_modules/cli",
+      "./node_modules/cli-hook",
       "UNRESOLVABLE_VALUE",
       "../index.js"
     ])
@@ -29,9 +29,9 @@ describe("command-line hook", function () {
 
   it("should inspect JSON encoded command-line arguments", () =>
     node([
-      "./node_modules/cli",
+      "./node_modules/cli-hook",
       '{"r":"../index.js"}'
     ])
-    .then((result) => assert.ok(result.stdout.includes("main-module:true")))
+    .then((result) => assert.ok(result.stdout.includes("cli-hook:true")))
   )
 })
