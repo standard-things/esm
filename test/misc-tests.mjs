@@ -126,7 +126,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-string-cjs",
       "./fixture/options-file/esmrc-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.json options", () =>
@@ -135,7 +135,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-json-string-cjs",
       "./fixture/options-file/esmrc-json-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.gz options", () =>
@@ -144,7 +144,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-gz-string-cjs",
       "./fixture/options-file/esmrc-gz-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.js options", () =>
@@ -153,7 +153,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-js-string-cjs",
       "./fixture/options-file/esmrc-js-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.js.gz options", () =>
@@ -162,7 +162,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-js-gz-string-cjs",
       "./fixture/options-file/esmrc-js-gz-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.mjs options", () =>
@@ -171,7 +171,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-mjs-string-cjs",
       "./fixture/options-file/esmrc-mjs-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support .esmrc.mjs.gz options", () =>
@@ -180,7 +180,7 @@ describe("package.json", () => {
       "./fixture/options-file/esmrc-mjs-gz-string-cjs",
       "./fixture/options-file/esmrc-mjs-gz-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support @std/esm package options", () =>
@@ -192,7 +192,7 @@ describe("package.json", () => {
       "./fixture/options-file/@std-string-cjs",
       "./fixture/options-file/@std-string-js"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should apply .esmrc over package.json options", () =>
@@ -205,7 +205,7 @@ describe("package.json", () => {
       "dev-dependencies",
       "peer-dependencies"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 })
 
@@ -347,8 +347,8 @@ describe("Node rules", () => {
     Promise.all([
       "./fixture/ext-priority",
       "ext-priority"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then((ns) => assert.strictEqual(ns.default, "mjs"))
     ))
   )
@@ -358,8 +358,8 @@ describe("Node rules", () => {
       abcPath + "?a",
       abcPath + "#a",
       abcPath.replace("abc", "%61%62%63")
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then((ns) => assert.deepStrictEqual(ns, abcNs))
     ))
   )
@@ -370,7 +370,7 @@ describe("Node rules", () => {
       "./fixture/with%3acolon.mjs",
       "./fixture/with%3Acolon.mjs"
     ]
-    .map((id) => import(id)))
+    .map((request) => import(request)))
   )
 
   it("should support requests containing percents", () =>
@@ -391,8 +391,8 @@ describe("Node rules", () => {
     Promise.all([
       "./fixture/relative/dot.js",
       "./fixture/relative/dot-slash.js"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then((ns) => assert.strictEqual(ns.default, "inside dot"))
     ))
   )
@@ -430,8 +430,8 @@ describe("Node rules", () => {
       abcPath.replace(slashRegExp, "%2F"),
       abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
       abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
     ))
@@ -443,8 +443,8 @@ describe("Node rules", () => {
       "home-node-modules",
       "node-path",
       "prefix-path"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     ))
@@ -556,8 +556,8 @@ describe("Node rules", () => {
       "node-path",
       "prefix-path"
     ]
-    .forEach((id) => {
-      assert.ok(require(id))
+    .forEach((request) => {
+      assert.ok(require(request))
     })
   )
 
@@ -570,8 +570,8 @@ describe("Node rules", () => {
           "node-path",
           "prefix-path"
         ]
-        .forEach((id) => {
-          assert.ok(ns.default(id))
+        .forEach((request) => {
+          assert.ok(ns.default(request))
         })
       )
   )
@@ -805,8 +805,8 @@ describe("spec compliance", () => {
     Promise.all([
       "./fixture/import/star-conflict.mjs",
       "./fixture/export/star-conflict.mjs"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
@@ -819,8 +819,8 @@ describe("spec compliance", () => {
     Promise.all([
       "./fixture/import/missing/module/cjs.js",
       "./fixture/import/missing/module/no-ext.js"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
@@ -831,8 +831,8 @@ describe("spec compliance", () => {
       "./fixture/cjs/missing/module/cjs.js",
       "./fixture/cjs/missing/module/esm.js",
       "./fixture/cjs/missing/module/no-ext.js"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
@@ -844,8 +844,8 @@ describe("spec compliance", () => {
       "./fixture/import/missing/module/esm.mjs",
       "./fixture/import/missing/module/no-ext.mjs",
       "./fixture/cycle/missing/module/a.mjs"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.strictEqual("loadCount" in global, false)
@@ -859,8 +859,8 @@ describe("spec compliance", () => {
       "./fixture/import/missing/export/cjs.mjs",
       "./fixture/import/missing/export/esm.mjs",
       "./fixture/cycle/missing/export/a.mjs"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.strictEqual("loadCount" in global, false)
@@ -873,8 +873,8 @@ describe("spec compliance", () => {
     Promise.all([
       "./fixture/import/const.mjs",
       "./fixture/import/let.mjs"
-    ].map((id) =>
-      import(id)
+    ].map((request) =>
+      import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.ok(e instanceof TypeError)
