@@ -3,6 +3,7 @@ import NullObject from "../../null-object.js"
 import _loadESM from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
+import getModuleName from "../../util/get-module-name.js"
 
 function validate(entry) {
   const cached = entry.package.cache[entry.cacheName]
@@ -17,7 +18,7 @@ function validate(entry) {
       const childEntry = _loadESM(name, mod)
 
       children[name] =
-      entry.children[childEntry.module.id] = childEntry
+      entry.children[getModuleName(childEntry.module)] = childEntry
 
       if (childEntry.state < 2) {
         childEntry.state = 2

@@ -297,7 +297,7 @@ class Entry {
     runGetters(this)
     runSetters(this, (setter, value) => {
       parentsMap || (parentsMap = new NullObject)
-      parentsMap[setter.parent.module.id] = setter.parent
+      parentsMap[getModuleName(setter.parent.module)] = setter.parent
       setter(value, this)
     })
 
@@ -513,7 +513,7 @@ function runSetter(entry, name, callback) {
       callback(setter, value)
     } else if (value === void 0 &&
         name in getters &&
-        setter.parent.module.id in children) {
+        getModuleName(setter.parent.module) in children) {
       warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }
