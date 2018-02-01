@@ -43,10 +43,8 @@ class CachingCompiler {
     const exportNames = metaMap[3]
     const exportSpecifiers = new NullObject
 
-    if (exportNames) {
-      for (const exportName of exportNames) {
-        exportSpecifiers[exportName] = 1
-      }
+    for (const exportName of exportNames) {
+      exportSpecifiers[exportName] = 1
     }
 
     const result = new NullObject
@@ -73,10 +71,8 @@ function compileAndCache(entry, code, options) {
   const exportSpecifiers =
   result.exportSpecifiers = new NullObject
 
-  if (exportNames) {
-    for (const exportName of exportNames) {
-      exportSpecifiers[exportName] = 1
-    }
+  for (const exportName of exportNames) {
+    exportSpecifiers[exportName] = 1
   }
 
   // Add "main" to enable the `readFileFast` fast path of

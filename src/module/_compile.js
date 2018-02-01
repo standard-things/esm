@@ -74,12 +74,9 @@ function compile(caller, entry, content, filename) {
     cache[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
   }
 
-  const { warnings } = cached
-
   if (options.warnings &&
-      moduleState.parsing &&
-      warnings) {
-    for (const warning of warnings) {
+      moduleState.parsing) {
+    for (const warning of cached.warnings) {
       warn(warning.code, filename, ...warning.args)
     }
   }

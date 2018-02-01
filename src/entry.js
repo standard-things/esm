@@ -132,10 +132,8 @@ class Entry {
   }
 
   addGetters(getterPairs) {
-    if (getterPairs) {
-      for (const [name, getter] of getterPairs) {
-        this.addGetter(name, getter)
-      }
+    for (const [name, getter] of getterPairs) {
+      this.addGetter(name, getter)
     }
 
     return this
@@ -189,10 +187,8 @@ class Entry {
   }
 
   addSetters(setterPairs, parent) {
-    if (setterPairs) {
-      for (const [name, setter] of setterPairs) {
-        this.addSetter(name, setter, parent)
-      }
+    for (const [name, setter] of setterPairs) {
+      this.addSetter(name, setter, parent)
     }
 
     return this
@@ -462,11 +458,9 @@ function mergeProperty(entry, otherEntry, key) {
     const setters = settersMap[name]
     const otherSetters = settersMap[name] = value[name]
 
-    if (setters) {
-      for (const setter of setters) {
-        if (otherSetters.indexOf(setter) === -1) {
-          otherSetters.push(setter)
-        }
+    for (const setter of setters) {
+      if (otherSetters.indexOf(setter) === -1) {
+        otherSetters.push(setter)
       }
     }
   }

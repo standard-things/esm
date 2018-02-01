@@ -19,7 +19,9 @@ module.exports = {
     ["@babel/transform-block-scoping", {
       throwIfClosureRequired: false
     }],
-    "transform-for-of-as-array"
+    ["transform-for-of-as-array", {
+      loose: true
+    }]
   ],
   presets: [
     ["@babel/env", {

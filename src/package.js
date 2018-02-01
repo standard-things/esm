@@ -72,13 +72,13 @@ class Package {
     const cache = new NullObject
     const cacheNames = readdir(cachePath)
 
-    if (cacheNames) {
-      for (const cacheName of cacheNames) {
-        // Later, we'll change the cached value to its associated compiler result,
-        // but for now we merely register that a cache file exists.
-        cache[cacheName] = true
-      }
+    for (const cacheName of cacheNames) {
+      // Later, we'll change the cached value to its associated compiler result,
+      // but for now we merely register that a cache file exists.
+      cache[cacheName] = true
+    }
 
+    if (cacheNames) {
       cache["data.blob"] = readFile(resolve(cachePath, "data.blob"))
       cache["data.json"] = readJSON(resolve(cachePath, "data.json"))
     }
