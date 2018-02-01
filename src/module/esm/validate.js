@@ -34,7 +34,8 @@ function validate(entry) {
   for (const name in children) {
     const childEntry = children[name]
     const child = childEntry.module
-    const childCached = childEntry.package.cache[childEntry.cacheName]
+    const childPkg = childEntry.package
+    const childCached = childPkg.cache[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
     const requestedExportNames = moduleSpecifiers[name]
 
@@ -50,7 +51,7 @@ function validate(entry) {
     }
 
     const childExportStars = childCached.exportStars
-    const skipExportMissing = childEntry.package.options.cjs.vars
+    const skipExportMissing = childPkg.options.cjs.vars
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCached
