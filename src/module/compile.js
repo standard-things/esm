@@ -29,32 +29,42 @@ const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 
-const md5Hash = md5(now().toString()).slice(0, 3)
-const runtimeName = encodeId("_" + md5Hash)
-
 function compile(content, filename) {
   const entry = Entry.get(this)
 
   if (! entry.state) {
     entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
-    entry.runtimeName = runtimeName
+    entry.runtimeName = encodeId("_" + md5(now().toString()).slice(0, 3))
 
     _compile(compile, entry, content, filename)
     return
   }
 
-  const req = makeRequireFunction(this)
+  const cached = entry.package.cache[entry.cacheName]
+
+  const buffer = cached
+    ? cached.scriptData
+    : void 0
+
   const wrapper = Module.wrap(stripShebang(content))
 
   const script = new vm.Script(wrapper, {
-    cachedData: void 0,
+    cachedData: buffer,
     columnOffset: 0,
     displayErrors: true,
     filename,
     lineOffset: 0,
     produceCachedData: true
   })
+
+  if (cached) {
+    if (script.cachedDataProduced) {
+      cached.scriptData = script.cachedData
+    } else if (script.cachedDataRejected) {
+      delete cached.scriptData
+    }
+  }
 
   const compiledWrapper = script.runInThisContext({
     columnOffset: 0,
@@ -88,6 +98,7 @@ function compile(content, filename) {
   }
 
   const exported = this.exports
+  const req = makeRequireFunction(this)
 
   entry.state = 3
 

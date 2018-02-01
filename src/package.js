@@ -15,6 +15,7 @@ import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
 import readFileFast from "./fs/read-file-fast.js"
+import readJSON from "./fs/read-json.js"
 import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import shared from "./shared.js"
@@ -73,11 +74,13 @@ class Package {
 
     if (cacheNames) {
       for (const cacheName of cacheNames) {
-        // Later, in the ".js" or ".mjs" compiler, we'll change the cached value
-        // to its associated mocked compiler result, but for now we merely register
-        // that a cache file exists.
+        // Later, we'll change the cached value to its associated compiler result,
+        // but for now we merely register that a cache file exists.
         cache[cacheName] = true
       }
+
+      cache["data.blob"] = readFile(resolve(cachePath, "data.blob"))
+      cache["data.json"] = readJSON(resolve(cachePath, "data.json"))
     }
 
     this.cache = cache

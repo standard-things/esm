@@ -3,15 +3,13 @@ import { extname, resolve } from "path"
 import Compiler from "./compiler.js"
 import NullObject from "./null-object.js"
 
-import assign from "./util/assign.js"
 import gzip from "./fs/gzip.js"
 import mkdirp from "./fs/mkdirp.js"
-import parseJSON from "./util/parse-json.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
-const { keys } = Object
+const { concat } = Buffer
 const { max } = Math
 const { stringify } = JSON
 
@@ -25,46 +23,39 @@ class CachingCompiler {
     return compileAndCache(entry, code, options)
   }
 
-  static from(code) {
+  static from(entry) {
+    const { cache } = entry.package
+
+    if (! cache ||
+        ! cache["data.json"] ||
+        ! cache["data.json"][entry.cacheName] ||
+        ! cache["data.blob"]) {
+      return null
+    }
+
     const result = new NullObject
+    const metaData = cache["data.json"][entry.cacheName]
+    const scriptData = cache["data.blob"].slice(metaData[1], metaData[2])
+
+    const exportNames = metaData[3]
+
+    const exportSpecifiers = new NullObject
+    result.exportSpecifiers = new NullObject
+
+    if (exportNames) {
+      for (const exportName of exportNames) {
+        exportSpecifiers[exportName] = 1
+      }
+    }
+
     result.changed = true
-    result.code = code
-    result.esm = false
-
-    // Extract metadata.
-    if (code.charCodeAt(7) !== 47 /* / */ ||
-        code.charCodeAt(8) !== 42 /* * */ ||
-        code.charCodeAt(9) !== 123 /* { */) {
-      return result
-    }
-
-    const line = code.slice(9, code.indexOf("*/", 10))
-
-    if (line.charCodeAt(line.length - 1) !== 125 /* } */) {
-      return result
-    }
-
-    const meta = parseJSON(line)
-
-    if (! meta) {
-      return result
-    }
-
-    const metaKeys = keys(meta)
-
-    if (metaKeys.length !== 4 ||
-        metaKeys[0] !== "e" ||
-        metaKeys[1] !== "m" ||
-        metaKeys[2] !== "s" ||
-        metaKeys[3] !== "w") {
-      return result
-    }
-
-    result.esm = true
-    result.exportSpecifiers = assign(new NullObject, meta.e)
-    result.exportStarNames = meta.s
-    result.moduleSpecifiers = assign(new NullObject, meta.m)
-    result.warnings = meta.w
+    result.esm = !! metaData[0]
+    result.exportNames = exportNames
+    result.exportSpecifiers = exportSpecifiers
+    result.exportStars = metaData[4]
+    result.moduleSpecifiers = metaData[5]
+    result.warnings = metaData[6]
+    result.scriptData = scriptData
     return result
   }
 }
@@ -74,24 +65,20 @@ function compileAndCache(entry, code, options) {
   entry.package.cache[entry.cacheName] =
   Compiler.compile(code, toCompileOptions(entry, options))
 
-  // Add "main" to enable the `readFileFast` fast path of
-  // `process.binding("fs").internalModuleReadJSON`.
-  let output = '"main";'
+  const { exportNames } = result
 
-  if (result.esm) {
-    // Add metadata.
-    output +=
-      "/*" +
-      stringify({
-        e: result.exportSpecifiers,
-        m: result.moduleSpecifiers,
-        s: result.exportStarNames,
-        w: result.warnings
-      }) +
-      "*/"
+  const exportSpecifiers =
+  result.exportSpecifiers = new NullObject
+
+  if (exportNames) {
+    for (const exportName of exportNames) {
+      exportSpecifiers[exportName] = 1
+    }
   }
 
-  result.code = output + result.code
+  // Add "main" to enable the `readFileFast` fast path of
+  // `process.binding("fs").internalModuleReadJSON`.
+  result.code = '"main";' + result.code
   return result
 }
 
@@ -143,6 +130,8 @@ Object.setPrototypeOf(CachingCompiler.prototype, null)
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
   process.once("exit", () => {
+    const pendingMeta = new NullObject
+
     for (const cacheFilename in shared.pendingWrites) {
       let {
         cacheName,
@@ -159,9 +148,51 @@ if (! shared.inited) {
         content = gzip(content)
       }
 
-      if (writeFile(cacheFilename, content)) {
-        removeExpired(entry.package.cache, cachePath, cacheName)
+      if (! writeFile(cacheFilename, content)) {
+        continue
       }
+
+      removeExpired(entry.package.cache, cachePath, cacheName)
+
+      let meta = pendingMeta[cachePath]
+
+      if (! meta) {
+        meta =
+        pendingMeta[cachePath] = new NullObject
+
+        meta.buffers = []
+        meta.map = new NullObject
+        meta.offset = 0
+      }
+
+      const cached = entry.package.cache[cacheName]
+      const { scriptData } = cached
+
+      let offsetStart = -1
+      let offsetEnd = -1
+
+      if (scriptData) {
+        offsetStart = meta.offset
+        offsetEnd = meta.offset += scriptData.length
+        meta.buffers.push(scriptData)
+      }
+
+      meta.map[cacheName] = [
+        cached.esm ? 1 : 0,
+        offsetStart,
+        offsetEnd,
+        cached.exportNames,
+        cached.exportStars,
+        cached.moduleSpecifiers,
+        cached.warnings
+      ]
+    }
+
+    for (const cachePath in pendingMeta) {
+      const meta = pendingMeta[cachePath]
+
+      writeFile(resolve(cachePath, "data.blob"), concat(meta.buffers))
+      writeFile(resolve(cachePath, "data.json"), stringify(meta.map))
     }
 
     process.setMaxListeners(max(process.getMaxListeners() - 1, 0))

@@ -31,8 +31,8 @@ class ImportExportVisitor extends Visitor {
     this.changed = false
     this.code = code
     this.esm = options.esm,
-    this.exportSpecifiers = new NullObject
-    this.exportStarNames = []
+    this.exportNames = []
+    this.exportStars = []
     this.generateVarDeclarations = options.generateVarDeclarations
     this.madeChanges = false
     this.magicString = new MagicString(code)
@@ -76,11 +76,13 @@ class ImportExportVisitor extends Visitor {
     const node = path.getValue()
     const { specifiers } = node
     const specifierMap = createSpecifierMap(this, node)
-    const lastIndex = specifiers.length - 1
+    const specifierString = getSourceString(this, node)
 
     let hoistedCode = specifiers.length
       ? (this.generateVarDeclarations ? "var " : "let ")
       : ""
+
+    const lastIndex = specifiers.length - 1
 
     for (const specifier of specifiers) {
       hoistedCode +=
@@ -90,7 +92,7 @@ class ImportExportVisitor extends Visitor {
 
     hoistedCode += toModuleImport(
       this,
-      getSourceString(this, node),
+      specifierString,
       specifierMap
     )
 
@@ -108,7 +110,6 @@ class ImportExportVisitor extends Visitor {
     this.changed =
     this.addedImportExport = true
 
-    const { moduleSpecifiers } = this
     const node = path.getValue()
     const { source } = node
     const specifierString = getSourceString(this, node)
@@ -126,10 +127,12 @@ class ImportExportVisitor extends Visitor {
       node.end
     )
 
-    this.exportStarNames.push(specifierName)
+    this.exportStars.push(specifierName)
+
+    const { moduleSpecifiers } = this
 
     if (! (specifierName in moduleSpecifiers)) {
-      moduleSpecifiers[specifierName] = new NullObject
+      moduleSpecifiers[specifierName] = []
     }
 
     hoistImports(this, node, hoistedCode)
@@ -147,7 +150,7 @@ class ImportExportVisitor extends Visitor {
     //   1 - Own
     //   2 - Imported
     //   3 - Conflicted
-    this.exportSpecifiers.default = 1
+    this.exportNames.push("default")
 
     const node = path.getValue()
     const { declaration } = node
@@ -277,24 +280,39 @@ class ImportExportVisitor extends Visitor {
 
     // Support re-exporting specifiers of an imported module:
     // export { name1, name2, ..., nameN } from "mod"
-    const { exportSpecifiers } = this
+    const { exportNames, moduleSpecifiers } = this
     const specifierMap = new NullObject
+
+    const specifierString = getSourceString(this, node)
+    const specifierName = specifierString.slice(1, -1)
+
+    if (! (specifierName in moduleSpecifiers)) {
+      moduleSpecifiers[specifierName] = []
+    }
+
+    const moduleSpecifier = moduleSpecifiers[specifierName]
 
     for (const specifier of specifiers) {
       const exportName = specifier.exported.name
-      exportSpecifiers[exportName] = 1
+      const localName = specifier.local.name
+
+      exportNames.push(exportName)
+
+      if (moduleSpecifier.indexOf(localName) === -1) {
+        moduleSpecifier.push(localName)
+      }
 
       addToSpecifierMap(
         this,
         specifierMap,
-        specifier.local.name,
+        localName,
         this.runtimeName + ".entry._namespace." + exportName
       )
     }
 
     hoistImports(this, node, toModuleImport(
       this,
-      getSourceString(this, node),
+      specifierString,
       specifierMap
     ))
   }
@@ -454,12 +472,12 @@ function toModuleExport(visitor, pairs) {
 
   let i = -1
   const lastIndex = pairs.length - 1
-  const { exportSpecifiers } = visitor
+  const { exportNames } = visitor
 
   code += visitor.runtimeName + ".e(["
 
   for (const [exportName, localName] of pairs) {
-    exportSpecifiers[exportName] = 1
+    exportNames.push(exportName)
 
     code +=
       '["' + exportName + '",()=>' +
@@ -478,11 +496,14 @@ function toModuleExport(visitor, pairs) {
 
 function toModuleImport(visitor, specifierString, specifierMap) {
   const importNames = keys(specifierMap)
+  const { moduleSpecifiers } = visitor
   const specifierName = specifierString.slice(1, -1)
 
-  visitor.moduleSpecifiers[specifierName] = specifierMap
-
   let code = visitor.runtimeName + ".w(" + specifierString
+
+  if (! (specifierName in moduleSpecifiers)) {
+    moduleSpecifiers[specifierName] = []
+  }
 
   if (! importNames.length) {
     return code + ");"
@@ -490,12 +511,18 @@ function toModuleImport(visitor, specifierString, specifierMap) {
 
   let i = -1
   const lastIndex = importNames.length - 1
+  const moduleSpecifier = moduleSpecifiers[specifierName]
 
   code += ",["
 
   for (const importName of importNames) {
     const localNames = specifierMap[importName]
     const valueParam = safeName("v", localNames)
+
+    if (importName !== "*" &&
+        moduleSpecifier.indexOf(importName) === -1) {
+      moduleSpecifier.push(importName)
+    }
 
     code +=
       // Generate plain functions, instead of arrow functions,

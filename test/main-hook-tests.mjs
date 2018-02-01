@@ -9,7 +9,7 @@ import trash from "../script/trash.js"
 import vm from "vm"
 
 const canUseExperimentalModules =
-  process.jsEngine !== "chakracore" &&
+  "v8" in process.versions &&
   SemVer.satisfies(process.version, ">=8.5.0")
 
 const canUsePreserveSymlinks =

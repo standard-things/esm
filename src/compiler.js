@@ -4,7 +4,6 @@ import Parser from "./parser.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
-import has from "./util/has.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
@@ -42,13 +41,12 @@ class Compiler {
     const result = new NullObject
 
     result.code = code
-    result.runtimeName = runtimeName
 
     result.changed =
     result.esm = false
 
-    result.exportSpecifiers =
-    result.exportStarNames =
+    result.exportNames =
+    result.exportStars =
     result.moduleSpecifiers =
     result.warnings = null
 
@@ -141,27 +139,10 @@ class Compiler {
     }
 
     if (type === "module") {
-      const { moduleSpecifiers } = importExportVisitor
-      const specifierMap = new NullObject
-
-      for (const specifier in moduleSpecifiers) {
-        const exportNames =
-        specifierMap[specifier] = []
-
-        const moduleSpecifier = moduleSpecifiers[specifier]
-
-        for (const exportName in moduleSpecifier) {
-          if (exportName !== "*" &&
-              has(moduleSpecifier, exportName)) {
-            exportNames.push(exportName)
-          }
-        }
-      }
-
       result.esm = true
-      result.exportSpecifiers = importExportVisitor.exportSpecifiers
-      result.exportStarNames = importExportVisitor.exportStarNames
-      result.moduleSpecifiers = specifierMap
+      result.exportNames = importExportVisitor.exportNames
+      result.exportStars = importExportVisitor.exportStars
+      result.moduleSpecifiers = importExportVisitor.moduleSpecifiers
 
       if (options.warnings &&
           ! options.cjs.vars &&

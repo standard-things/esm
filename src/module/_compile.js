@@ -57,12 +57,21 @@ function compile(caller, entry, content, filename) {
   let cached = cache[cacheName]
 
   if (cached === true) {
-    const code = readCachedCode(resolve(cachePath, cacheName), options)
+    cached = Compiler.from(entry)
+
+    if (cached) {
+      cached.code = readCachedCode(resolve(cachePath, cacheName), options)
+      cache[cacheName] = cached
+    }
+  }
+
+  if (! cached) {
+    if (content === "") {
+      content = readSourceCode(filename, options)
+    }
 
     cached =
-    cache[cacheName] = Compiler.from(code)
-  } else if (! cached) {
-    cached = tryCompileCode(caller, entry, content, { hint, type })
+    cache[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
   }
 
   const { warnings } = cached

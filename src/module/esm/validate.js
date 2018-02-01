@@ -14,15 +14,17 @@ function validate(entry) {
 
   // Parse children.
   for (const name in moduleSpecifiers) {
-    if (! (name in builtinEntries)) {
-      const childEntry = _loadESM(name, mod)
+    if (name in builtinEntries) {
+      continue
+    }
 
-      children[name] =
-      entry.children[getModuleName(childEntry.module)] = childEntry
+    const childEntry =
+    children[name] = _loadESM(name, mod)
 
-      if (childEntry.state < 2) {
-        childEntry.state = 2
-      }
+    entry.children[getModuleName(childEntry.module)] = childEntry
+
+    if (childEntry.state < 2) {
+      childEntry.state = 2
     }
   }
 
@@ -47,6 +49,9 @@ function validate(entry) {
       continue
     }
 
+    const childExportStars = childCached.exportStars
+    const skipExportMissing = childEntry.package.options.cjs.vars
+
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCached
 
@@ -58,12 +63,14 @@ function validate(entry) {
         throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
       }
 
-      let throwExportMissing = true
+      let throwExportMissing = ! skipExportMissing
 
-      for (const childStarName of childCached.exportStarNames) {
-        if (! (childStarName in children)) {
-          throwExportMissing = false
-          break
+      if (throwExportMissing) {
+        for (const childName of childExportStars) {
+          if (! (childName in children)) {
+            throwExportMissing = false
+            break
+          }
         }
       }
 
@@ -74,12 +81,12 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const starName of cached.exportStarNames) {
-    if (! (starName in children)) {
+  for (const childName of cached.exportStars) {
+    if (childName in builtinEntries) {
       continue
     }
 
-    const childEntry = children[starName]
+    const childEntry = children[childName]
     const childCached = childEntry.package.cache[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
 

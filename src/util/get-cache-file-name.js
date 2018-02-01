@@ -4,6 +4,10 @@ import { version as stdVersion } from "../version.js"
 
 const { stringify } = JSON
 
+const engineVersion =
+  process.versions.v8 ||
+  process.versions.chakracore
+
 const nodeVersion = process.version
 
 function getCacheFileName(entry, cacheKey) {
@@ -26,6 +30,7 @@ function getCacheFileName(entry, cacheKey) {
 
   const stateHash = md5(
     nodeVersion + "\0" +
+    engineVersion + "\0" +
     stdVersion + "\0" +
     stringify(entry.package.options) + "\0" +
     cacheKey
