@@ -1,6 +1,6 @@
+import getDescriptor from "../util/get-descriptor.js"
 import isError from "./is-error.js"
 
-const { getOwnPropertyDescriptor } = Object
 const { toString } = Function.prototype
 
 const nativePattern = "[native code]"
@@ -10,7 +10,7 @@ function isStackTraceMasked(error) {
     return false
   }
 
-  const descriptor = getOwnPropertyDescriptor(error, "stack")
+  const descriptor = getDescriptor(error, "stack")
 
   return !! descriptor &&
     descriptor.configurable === true &&

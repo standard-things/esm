@@ -1,10 +1,9 @@
-import has from "./has.js"
-
 const { getOwnPropertyDescriptor } = Object
 
 function getDescriptor(object, key) {
-  const descriptor = has(object, key) && getOwnPropertyDescriptor(object, key)
-  return descriptor || null
+  return object == null
+    ? null
+    : (getOwnPropertyDescriptor(object, key) || null)
 }
 
 export default getDescriptor

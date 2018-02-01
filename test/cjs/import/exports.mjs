@@ -19,8 +19,6 @@ import * as nsPseudo from "../../fixture/cjs/export/pseudo.js"
 import * as nsFunction from "../../fixture/cjs/export/function.js"
 import * as nsSafe from "../../fixture/cjs/export/get-set.js"
 
-const getDescriptor = Object.getOwnPropertyDescriptor
-
 export default () => {
   let ns = createNamespace({ 0: "a", default: defaultArray })
   assert.deepStrictEqual(defaultArray, ["a"])
