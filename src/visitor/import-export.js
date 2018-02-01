@@ -129,12 +129,7 @@ class ImportExportVisitor extends Visitor {
 
     this.exportStars.push(specifierName)
 
-    const { moduleSpecifiers } = this
-
-    if (! (specifierName in moduleSpecifiers)) {
-      moduleSpecifiers[specifierName] = []
-    }
-
+    addToModuleSpecifiers(this, specifierName)
     hoistImports(this, node, hoistedCode)
   }
 
@@ -280,27 +275,20 @@ class ImportExportVisitor extends Visitor {
 
     // Support re-exporting specifiers of an imported module:
     // export { name1, name2, ..., nameN } from "mod"
-    const { exportNames, moduleSpecifiers } = this
+    const { exportNames } = this
     const specifierMap = new NullObject
 
     const specifierString = getSourceString(this, node)
     const specifierName = specifierString.slice(1, -1)
 
-    if (! (specifierName in moduleSpecifiers)) {
-      moduleSpecifiers[specifierName] = []
-    }
-
-    const moduleSpecifier = moduleSpecifiers[specifierName]
+    addToModuleSpecifiers(this, specifierName)
 
     for (const specifier of specifiers) {
       const exportName = specifier.exported.name
       const localName = specifier.local.name
 
       exportNames.push(exportName)
-
-      if (moduleSpecifier.indexOf(localName) === -1) {
-        moduleSpecifier.push(localName)
-      }
+      addToModuleSpecifiers(this, specifierName, localName)
 
       addToSpecifierMap(
         this,
@@ -347,13 +335,26 @@ function addAssignableImports(visitor, specifierMap) {
   }
 }
 
+function addToModuleSpecifiers(visitor, specifierName, exportName) {
+  const { moduleSpecifiers } = visitor
+
+  const exportNames =
+    moduleSpecifiers[specifierName] ||
+    (moduleSpecifiers[specifierName] = [])
+
+  if (exportName &&
+      exportName !== "*" &&
+      exportNames.indexOf(exportName) === -1) {
+    exportNames.push(exportName)
+  }
+}
+
 function addToSpecifierMap(visitor, specifierMap, importName, localName) {
   const localNames =
     specifierMap[importName] ||
     (specifierMap[importName] = [])
 
   localNames.push(localName)
-  return specifierMap
 }
 
 function canExportedValuesChange({ declaration, type }) {
@@ -496,14 +497,11 @@ function toModuleExport(visitor, pairs) {
 
 function toModuleImport(visitor, specifierString, specifierMap) {
   const importNames = keys(specifierMap)
-  const { moduleSpecifiers } = visitor
   const specifierName = specifierString.slice(1, -1)
 
   let code = visitor.runtimeName + ".w(" + specifierString
 
-  if (! (specifierName in moduleSpecifiers)) {
-    moduleSpecifiers[specifierName] = []
-  }
+  addToModuleSpecifiers(visitor, specifierName)
 
   if (! importNames.length) {
     return code + ");"
@@ -511,7 +509,6 @@ function toModuleImport(visitor, specifierString, specifierMap) {
 
   let i = -1
   const lastIndex = importNames.length - 1
-  const moduleSpecifier = moduleSpecifiers[specifierName]
 
   code += ",["
 
@@ -519,10 +516,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
     const localNames = specifierMap[importName]
     const valueParam = safeName("v", localNames)
 
-    if (importName !== "*" &&
-        moduleSpecifier.indexOf(importName) === -1) {
-      moduleSpecifier.push(importName)
-    }
+    addToModuleSpecifiers(visitor, specifierName, importName)
 
     code +=
       // Generate plain functions, instead of arrow functions,
