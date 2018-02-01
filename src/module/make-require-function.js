@@ -11,7 +11,7 @@ import isError from "../util/is-error.js"
 import moduleState from "./state.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
-  function require(request) {
+  const req = function require(request) {
     moduleState.requireDepth += 1
 
     const entry = Entry.get(mod)
@@ -71,13 +71,13 @@ function makeRequireFunction(mod, requirer, resolver) {
     resolver = (request, options) => Module._resolveFilename(request, mod, false, options)
   }
 
-  require.cache = Module._cache
-  require.extensions = Module._extensions
-  require.main = process.mainModule
-  require.resolve = resolve
+  req.cache = Module._cache
+  req.extensions = Module._extensions
+  req.main = process.mainModule
+  req.resolve = resolve
   resolve.paths = paths
 
-  return require
+  return req
 }
 
 export default makeRequireFunction

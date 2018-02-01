@@ -9,7 +9,7 @@ import _loadESM from "./esm/_load.js"
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 
-function require(request) {
+const req = function require(request) {
   if (typeof request !== "string") {
     throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
   }
@@ -37,4 +37,4 @@ function require(request) {
     : Module._load(request, this, false)
 }
 
-export default require
+export default req

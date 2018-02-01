@@ -11,7 +11,7 @@ import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import load from "./module/load.js"
 import moduleState from "./module/state.js"
-import require from "./module/require.js"
+import req from "./module/require.js"
 import setProperty from "./util/set-property.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
@@ -34,7 +34,7 @@ class Module extends BuiltinModule {
 
 Module.prototype._compile = _compile
 Module.prototype.load = load
-Module.prototype.require = require
+Module.prototype.require = req
 
 defaults(Module, BuiltinModule)
 assign(Module._extensions, BuiltinModule._extensions)
