@@ -15,6 +15,7 @@ const builtinEntries = builtinModules
       mod.loaded = true
 
       const entry = Entry.get(mod)
+      entry.builtin = true
       entry.loaded()
       return object[id] = entry
     })

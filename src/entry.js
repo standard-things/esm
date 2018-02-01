@@ -48,6 +48,8 @@ class Entry {
     this._namespace = new NullObject
     // The load mode for `module.require`.
     this._requireESM = false
+    // The builtin module indicator.
+    this.builtin = false
     // The cache file name of the module.
     this.cacheName = null
     // The child entries of the module.
