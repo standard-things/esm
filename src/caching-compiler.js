@@ -26,21 +26,22 @@ class CachingCompiler {
   static from(entry) {
     const { cache } = entry.package
 
-    if (! cache ||
-        ! cache["data.json"] ||
-        ! cache["data.json"][entry.cacheName] ||
-        ! cache["data.blob"]) {
+    const metaMap =
+      cache &&
+      cache["data.json"] &&
+      cache["data.json"][entry.cacheName]
+
+    if (! metaMap) {
       return null
     }
 
-    const result = new NullObject
-    const metaData = cache["data.json"][entry.cacheName]
-    const scriptData = cache["data.blob"].slice(metaData[1], metaData[2])
+    const metaBuffer = cache["data.blob"]
+    const scriptData = metaBuffer
+      ? metaBuffer.slice(metaMap[1], metaMap[2])
+      : void 0
 
-    const exportNames = metaData[3]
-
+    const exportNames = metaMap[3]
     const exportSpecifiers = new NullObject
-    result.exportSpecifiers = new NullObject
 
     if (exportNames) {
       for (const exportName of exportNames) {
@@ -48,14 +49,16 @@ class CachingCompiler {
       }
     }
 
+    const result = new NullObject
+
     result.changed = true
-    result.esm = !! metaData[0]
+    result.esm = !! metaMap[0]
     result.exportNames = exportNames
     result.exportSpecifiers = exportSpecifiers
-    result.exportStars = metaData[4]
-    result.moduleSpecifiers = metaData[5]
-    result.warnings = metaData[6]
+    result.exportStars = metaMap[4]
+    result.moduleSpecifiers = metaMap[5]
     result.scriptData = scriptData
+    result.warnings = metaMap[6]
     return result
   }
 }
