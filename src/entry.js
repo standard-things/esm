@@ -318,15 +318,16 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
-  const cached = entry.package.cache[entry.cacheName]
   const exported = entry.module.exports
+  const pkg = entry.package
+  const cached = pkg.cache[entry.cacheName]
   const isESM = cached && cached.esm
 
   const inModule =
     isESM ||
-    !! (entry.package.options.cjs.interop &&
-    has(exported, "__esModule") &&
-    exported.__esModule)
+    (pkg.options.cjs.interop &&
+     has(exported, "__esModule") &&
+     !! exported.__esModule)
 
   if (! inModule) {
     _namespace.default = exported
