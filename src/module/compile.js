@@ -4,6 +4,7 @@
 
 import Entry from "../entry.js"
 import Module from "../module.js"
+import NullObject from "../null-object.js"
 import Package from "../package.js"
 
 import _compile from "./_compile.js"
@@ -14,6 +15,7 @@ import getCacheFileName from "../util/get-cache-file-name.js"
 import makeRequireFunction from "./make-require-function.js"
 import md5 from "../util/md5.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
+import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
 
@@ -41,7 +43,8 @@ function compile(content, filename) {
     return
   }
 
-  const cached = entry.package.cache[entry.cacheName]
+  const pkg = entry.package
+  const cached = pkg.cache[entry.cacheName]
 
   const buffer = cached
     ? cached.scriptData
@@ -60,7 +63,20 @@ function compile(content, filename) {
 
   if (cached) {
     if (script.cachedDataProduced) {
-      cached.scriptData = script.cachedData
+      const { cacheName } = entry
+      const { cachePath } = pkg
+      const scriptData = script.cachedData
+
+      cached.scriptData = scriptData
+
+      if (cachePath &&
+          cacheName) {
+        const pendingMetas =
+          shared.pendingMetas[cachePath] ||
+          (shared.pendingMetas[cachePath] = new NullObject)
+
+        pendingMetas[cacheName] = { entry, scriptData }
+      }
     } else if (script.cachedDataRejected) {
       delete cached.scriptData
     }

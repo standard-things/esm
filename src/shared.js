@@ -15,6 +15,7 @@ if (! __shared__) {
   shared.maxSatisfying = new FastObject
   shared.package = new FastObject
   shared.parseURL = new FastObject
+  shared.pendingMetas = new FastObject
   shared.pendingWrites = new FastObject
   shared.resolveFilename = new FastObject
 }

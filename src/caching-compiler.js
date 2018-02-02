@@ -25,51 +25,61 @@ class CachingCompiler {
 
   static from(entry) {
     const { cache } = entry.package
+    const { cacheName } = entry
 
     const metaMap =
       cache &&
       cache["data.json"] &&
-      cache["data.json"][entry.cacheName]
+      cache["data.json"][cacheName]
 
     if (! metaMap) {
       return null
     }
 
     const metaBuffer = cache["data.blob"]
+    const exportNames = metaMap[3]
     const scriptData = metaBuffer
-      ? metaBuffer.slice(metaMap[1], metaMap[2])
+      ? metaBuffer.slice(metaMap[0], metaMap[1])
       : void 0
 
-    const exportNames = metaMap[3]
-    const exportSpecifiers = new NullObject
+    const result = {
+      changed: false,
+      esm: metaMap[2],
+      exportNames,
+      exportSpecifiers: null,
+      exportStars: metaMap[4],
+      moduleSpecifiers: metaMap[5],
+      scriptData,
+      warnings: metaMap[6]
+    }
+
+    if (! result.esm) {
+      return result
+    }
+
+    const exportSpecifiers = {}
 
     for (const exportName of exportNames) {
       exportSpecifiers[exportName] = 1
     }
 
-    const result = new NullObject
-
-    result.changed = true
-    result.esm = !! metaMap[0]
-    result.exportNames = exportNames
     result.exportSpecifiers = exportSpecifiers
-    result.exportStars = metaMap[4]
-    result.moduleSpecifiers = metaMap[5]
-    result.scriptData = scriptData
-    result.warnings = metaMap[6]
     return result
   }
 }
 
 function compileAndCache(entry, code, options) {
-  const result =
-  entry.package.cache[entry.cacheName] =
-  Compiler.compile(code, toCompileOptions(entry, options))
+  const { cache } = entry.package
+  const { cacheName } = entry
 
-  const { exportNames } = result
+  const result =
+  cache[cacheName] =
+  Compiler.compile(code, toCompileOptions(entry, options))
 
   const exportSpecifiers =
   result.exportSpecifiers = new NullObject
+
+  const { exportNames } = result
 
   for (const exportName of exportNames) {
     exportSpecifiers[exportName] = 1
@@ -78,6 +88,7 @@ function compileAndCache(entry, code, options) {
   // Add "main" to enable the `readFileFast` fast path of
   // `process.binding("fs").internalModuleReadJSON`.
   result.code = '"main";' + result.code
+
   return result
 }
 
@@ -88,25 +99,25 @@ function compileAndWrite(entry, code, options) {
     return result
   }
 
-  const { cacheName } = entry
   const { cachePath } = entry.package
-  const cacheFilename = resolve(cachePath, cacheName)
   const content = result.code
 
-  shared.pendingWrites[cacheFilename] = {
-    cacheName,
-    cachePath,
-    content,
-    entry
-  }
+  const pendingWrites =
+    shared.pendingWrites[cachePath] ||
+    (shared.pendingWrites[cachePath] = new NullObject)
+
+  pendingWrites[entry.cacheName] = { content, entry }
 
   return result
 }
 
-function removeExpired(cache, cachePath, cacheName) {
+function removeExpired(entry) {
+  const pkg = entry.package
+  const { cacheName } = entry
+  const { cachePath } = pkg
   const shortname = cacheName.slice(0, 8)
 
-  for (const key in cache) {
+  for (const key in pkg.cache) {
     if (key !== cacheName &&
         key.startsWith(shortname)) {
       removeFile(resolve(cachePath, key))
@@ -128,70 +139,75 @@ Object.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
+
   process.once("exit", () => {
-    const pendingMeta = new NullObject
+    const { pendingWrites } = shared
 
-    for (const cacheFilename in shared.pendingWrites) {
-      let {
-        cacheName,
-        cachePath,
-        content,
-        entry
-      } = shared.pendingWrites[cacheFilename]
-
+    for (const cachePath in pendingWrites) {
       if (! mkdirp(cachePath)) {
         continue
       }
 
-      if (extname(cacheFilename) === ".gz") {
-        content = gzip(content)
-      }
+      const cacheData = pendingWrites[cachePath]
 
-      if (! writeFile(cacheFilename, content)) {
+      for (const cacheName in cacheData) {
+        let { content, entry } = cacheData[cacheName]
+
+        if (extname(cacheName) === ".gz") {
+          content = gzip(content)
+        }
+
+        if (writeFile(resolve(cachePath, cacheName), content)) {
+          removeExpired(entry)
+        }
+      }
+    }
+
+    const { pendingMetas } = shared
+
+    for (const cachePath in pendingMetas) {
+      if (! mkdirp(cachePath)) {
         continue
       }
 
-      removeExpired(entry.package.cache, cachePath, cacheName)
+      const buffers = []
+      const cacheData = pendingMetas[cachePath]
+      const map = new NullObject
 
-      let meta = pendingMeta[cachePath]
+      let offset = 0
 
-      if (! meta) {
-        meta =
-        pendingMeta[cachePath] = new NullObject
+      for (const cacheName in cacheData) {
+        const { entry, scriptData } = cacheData[cacheName]
 
-        meta.buffers = []
-        meta.map = new NullObject
-        meta.offset = 0
+        let offsetStart = -1
+        let offsetEnd = -1
+
+        if (scriptData) {
+          offsetStart = offset
+          offsetEnd = offset += scriptData.length
+          buffers.push(scriptData)
+        }
+
+        const { cache } = entry.package
+        const cached = cache[cacheName]
+
+        if (cached) {
+          map[cacheName] = [
+            offsetStart,
+            offsetEnd,
+            cached.esm,
+            cached.exportNames,
+            cached.exportStars,
+            cached.moduleSpecifiers,
+            cached.warnings
+          ]
+        } else {
+          map[cacheName] = [offsetStart, offsetEnd]
+        }
       }
 
-      const cached = entry.package.cache[cacheName]
-      const { scriptData } = cached
-
-      let offsetStart = -1
-      let offsetEnd = -1
-
-      if (scriptData) {
-        offsetStart = meta.offset
-        offsetEnd = meta.offset += scriptData.length
-        meta.buffers.push(scriptData)
-      }
-
-      meta.map[cacheName] = [
-        cached.esm ? 1 : 0,
-        offsetStart,
-        offsetEnd,
-        cached.exportNames,
-        cached.exportStars,
-        cached.moduleSpecifiers,
-        cached.warnings
-      ]
-    }
-
-    for (const cachePath in pendingMeta) {
-      const meta = pendingMeta[cachePath]
-
-      writeFile(resolve(cachePath, "data.blob"), concat(meta.buffers))
-      writeFile(resolve(cachePath, "data.json"), stringify(meta.map))
+      writeFile(resolve(cachePath, "data.blob"), concat(buffers))
+      writeFile(resolve(cachePath, "data.json"), stringify(map))
     }
 
     process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
