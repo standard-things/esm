@@ -44,7 +44,9 @@ function compile(content, filename) {
   }
 
   const pkg = entry.package
-  const cached = pkg.cache[entry.cacheName]
+  const { cacheName } = entry
+  const { cachePath } = pkg
+  const cached = pkg.cache[cacheName]
 
   const buffer = cached
     ? cached.scriptData
@@ -61,25 +63,28 @@ function compile(content, filename) {
     produceCachedData: true
   })
 
+  let scriptData
+
+  if (script.cachedDataProduced &&
+      ! script.cachedDataRejected) {
+    scriptData = script.cachedData
+  }
+
   if (cached) {
-    if (script.cachedDataProduced) {
-      const { cacheName } = entry
-      const { cachePath } = pkg
-      const scriptData = script.cachedData
-
+    if (scriptData) {
       cached.scriptData = scriptData
-
-      if (cachePath &&
-          cacheName) {
-        const pendingMetas =
-          shared.pendingMetas[cachePath] ||
-          (shared.pendingMetas[cachePath] = new NullObject)
-
-        pendingMetas[cacheName] = { entry, scriptData }
-      }
-    } else if (script.cachedDataRejected) {
+    } else {
       delete cached.scriptData
     }
+  }
+
+  if (cachePath &&
+      cacheName) {
+    const pendingMetas =
+      shared.pendingMetas[cachePath] ||
+      (shared.pendingMetas[cachePath] = new NullObject)
+
+    pendingMetas[cacheName] = { entry, scriptData }
   }
 
   const compiledWrapper = script.runInThisContext({
