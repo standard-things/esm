@@ -62,6 +62,9 @@ function compile(caller, entry, content, filename) {
     if (cached) {
       cached.code = readCachedCode(resolve(cachePath, cacheName), options)
       cache[cacheName] = cached
+    } else {
+      delete cache[cacheName]
+      delete cache["data.json"][cacheName]
     }
   }
 

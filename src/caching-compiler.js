@@ -112,14 +112,15 @@ function compileAndWrite(entry, code, options) {
 }
 
 function removeExpired(entry) {
-  const pkg = entry.package
+  const { cache, cachePath } = entry.package
   const { cacheName } = entry
-  const { cachePath } = pkg
   const shortname = cacheName.slice(0, 8)
 
-  for (const key in pkg.cache) {
+  for (const key in cache) {
     if (key !== cacheName &&
         key.startsWith(shortname)) {
+      delete cache[cacheName]
+      delete cache["data.json"][cacheName]
       removeFile(resolve(cachePath, key))
     }
   }

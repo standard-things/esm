@@ -1,5 +1,6 @@
 import { extname, resolve } from "path"
 
+import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
@@ -16,12 +17,12 @@ import getEnvVars from "../env/get-vars.js"
 import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isFile from "../util/is-file.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
+import readFileFast from "../fs/read-file-fast.js"
 import setProperty from "../util/set-property.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
@@ -110,10 +111,16 @@ function hook(Mod, parent) {
 
     let cached = cache[cacheName]
 
-    if (cached === true &&
-        ! isFile(resolve(cachePath, cacheName))) {
-      cached = null
-      delete cache[cacheName]
+    if (cached === true) {
+      cached = Compiler.from(entry)
+
+      if (cached) {
+        cached.code = readCachedCode(resolve(cachePath, cacheName), options)
+        cache[cacheName] = cached
+      } else {
+        delete cache[cacheName]
+        delete cache["data.json"][cacheName]
+      }
     }
 
     if (shouldOverwrite) {
@@ -174,6 +181,15 @@ function mjsCompiler(mod, filename) {
   }
 
   throw error
+}
+
+function readCachedCode(filename, options) {
+  if (options && options.gz &&
+      extname(filename) === ".gz") {
+    return gunzip(readFile(filename), "utf8")
+  }
+
+  return readFileFast(filename, "utf8")
 }
 
 function readSourceCode(filename, options) {
