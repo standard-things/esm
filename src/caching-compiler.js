@@ -36,11 +36,18 @@ class CachingCompiler {
       return null
     }
 
-    const metaBuffer = cache["data.blob"]
     const exportNames = metaMap[3]
-    const scriptData = metaBuffer
-      ? metaBuffer.slice(metaMap[0], metaMap[1])
-      : void 0
+    const metaBuffer = cache["data.blob"]
+    const offsetStart = metaMap[0]
+    const offsetEnd = metaMap[1]
+
+    let scriptData
+
+    if (metaBuffer &&
+        offsetStart !== -1 &&
+        offsetEnd !== -1) {
+      scriptData = metaBuffer.slice(offsetStart, offsetEnd)
+    }
 
     const result = {
       changed: false,
