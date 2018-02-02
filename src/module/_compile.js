@@ -69,10 +69,6 @@ function compile(caller, entry, content, filename) {
   }
 
   if (! cached) {
-    if (content === "") {
-      content = readSourceCode(filename, options)
-    }
-
     cached =
     cache[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
   }

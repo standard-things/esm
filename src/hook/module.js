@@ -133,7 +133,7 @@ function hook(Mod, parent) {
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, options)
     } else {
-      const content = cached ? "" : readSourceCode(filename, options)
+      const content = cached ? cached.code : readSourceCode(filename, options)
       mod._compile(content, filename)
     }
   }
