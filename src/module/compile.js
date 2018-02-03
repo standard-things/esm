@@ -64,27 +64,40 @@ function compile(content, filename) {
   })
 
   let scriptData
+  let changed = false
+
+  const { cachedDataRejected } = script
 
   if (script.cachedDataProduced &&
-      ! script.cachedDataRejected) {
+      ! cachedDataRejected) {
+    changed = ! buffer
     scriptData = script.cachedData
   }
 
   if (cached) {
     if (scriptData) {
       cached.scriptData = scriptData
-    } else {
+    } else if (cachedDataRejected) {
+      changed = true
+
+      const metaData = cached["data.json"][cacheName]
+
+      if (metaData) {
+        metaData[0] =
+        metaData[1] = -1
+      }
+
       delete cached.scriptData
     }
   }
 
-  if (cachePath &&
+  if (changed &&
+      cachePath &&
       cacheName) {
     const pendingMetas =
       shared.pendingMetas[cachePath] ||
       (shared.pendingMetas[cachePath] = new NullObject)
-
-    pendingMetas[cacheName] = { entry, scriptData }
+    pendingMetas[cacheName] = scriptData
   }
 
   const compiledWrapper = script.runInThisContext({

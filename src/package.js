@@ -69,22 +69,26 @@ class Package {
       cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
     }
 
-    const cache = new NullObject
-    const cacheNames = readdir(cachePath)
+    let cache = shared.cacheDirs[cachePath]
 
-    for (const cacheName of cacheNames) {
-      // Later, we'll change the cached value to its associated compiler result,
-      // but for now we merely register that a cache file exists.
-      cache[cacheName] = true
+    if (! cache) {
+      cache =
+      shared.cacheDirs[cachePath] = new NullObject
+
+      for (const cacheName of readdir(cachePath)) {
+        // Later, we'll change the cached value to its associated compiler result,
+        // but for now we merely register that a cache file exists.
+        cache[cacheName] = true
+      }
+
+      cache["data.blob"] = cache["data.blob"]
+        ? readFile(resolve(cachePath, "data.blob"))
+        : new Buffer(0)
+
+      cache["data.json"] = cache["data.json"]
+        ? readJSON(resolve(cachePath, "data.json"))
+        : {}
     }
-
-    cache["data.blob"] = cache["data.blob"]
-      ? readFile(resolve(cachePath, "data.blob"))
-      : new Buffer(0)
-
-    cache["data.json"] = cache["data.json"]
-      ? readJSON(resolve(cachePath, "data.json"))
-      : {}
 
     this.cache = cache
     this.cachePath = cachePath

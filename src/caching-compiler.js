@@ -4,6 +4,7 @@ import Compiler from "./compiler.js"
 import NullObject from "./null-object.js"
 
 import gzip from "./fs/gzip.js"
+import has from "./util/has.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
@@ -113,14 +114,13 @@ function compileAndWrite(entry, code, options) {
     shared.pendingWrites[cachePath] ||
     (shared.pendingWrites[cachePath] = new NullObject)
 
-  pendingWrites[entry.cacheName] = { content, entry }
+  pendingWrites[entry.cacheName] = content
 
   return result
 }
 
-function removeExpired(entry) {
-  const { cache, cachePath } = entry.package
-  const { cacheName } = entry
+function removeExpired(cachePath, cacheName) {
+  const cache = shared.cacheDirs[cachePath]
   const shortname = cacheName.slice(0, 8)
 
   for (const key in cache) {
@@ -156,17 +156,15 @@ if (! shared.inited) {
         continue
       }
 
-      const cacheData = pendingWrites[cachePath]
+      const contents = pendingWrites[cachePath]
 
-      for (const cacheName in cacheData) {
-        let { content, entry } = cacheData[cacheName]
-
-        if (extname(cacheName) === ".gz") {
-          content = gzip(content)
-        }
+      for (const cacheName in contents) {
+        const content = extname(cacheName) === ".gz"
+          ? gzip(contents[cacheName])
+          : contents[cacheName]
 
         if (writeFile(resolve(cachePath, cacheName), content)) {
-          removeExpired(entry)
+          removeExpired(cachePath, cacheName)
         }
       }
     }
@@ -178,14 +176,27 @@ if (! shared.inited) {
         continue
       }
 
+      const cache = shared.cacheDirs[cachePath]
+      const scriptDatas = pendingMetas[cachePath]
+
+      for (const cacheName in cache) {
+        const cached = cache[cacheName]
+
+        if (cached !== true &&
+            cacheName !== "data.blob" &&
+            cacheName !== "data.json" &&
+            ! has(scriptDatas, cacheName)) {
+          scriptDatas[cacheName] = cache[cacheName].scriptData
+        }
+      }
+
       const buffers = []
-      const cacheData = pendingMetas[cachePath]
       const map = new NullObject
 
       let offset = 0
 
-      for (const cacheName in cacheData) {
-        const { entry, scriptData } = cacheData[cacheName]
+      for (const cacheName in scriptDatas) {
+        const scriptData = scriptDatas[cacheName]
 
         let offsetStart = -1
         let offsetEnd = -1
@@ -196,7 +207,6 @@ if (! shared.inited) {
           buffers.push(scriptData)
         }
 
-        const { cache } = entry.package
         const cached = cache[cacheName]
 
         if (cached) {

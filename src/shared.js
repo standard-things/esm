@@ -7,6 +7,7 @@ import assign from "./util/assign.js"
 const shared = assign(new FastObject, __shared__)
 
 if (! __shared__) {
+  shared.cacheDirs = new FastObject
   shared.entry = new SafeWeakMap
   shared.env = new FastObject
   shared.findPath = new FastObject
