@@ -51,7 +51,7 @@ function compile(caller, entry, content, filename) {
   }
 
   const pkg = entry.package
-  const { cache, cachePath } = pkg
+  const { cache } = pkg
   const { cacheName } = entry
 
   let cached = cache[cacheName]
@@ -60,7 +60,7 @@ function compile(caller, entry, content, filename) {
     cached = Compiler.from(entry)
 
     if (cached) {
-      cached.code = readCachedCode(resolve(cachePath, cacheName), options)
+      cached.code = readCachedCode(resolve(pkg.cachePath, cacheName), options)
       cache[cacheName] = cached
     } else {
       delete cache[cacheName]
