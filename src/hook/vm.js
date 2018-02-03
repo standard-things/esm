@@ -10,6 +10,7 @@ import captureStackTrace from "../error/capture-stack-trace.js"
 import createOptions from "../util/create-options.js"
 import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
+import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
 import isEval from "../env/is-eval.js"
 import isREPL from "../env/is-repl.js"
@@ -36,7 +37,7 @@ function hook(vm) {
     let [content, scriptOptions] = args
     scriptOptions = createOptions(scriptOptions)
 
-    if (scriptOptions.produceCachedData === void 0) {
+    if (! scriptOptions.produceCachedData) {
       scriptOptions.produceCachedData = true
     }
 
@@ -45,9 +46,9 @@ function hook(vm) {
     let cached = entry.package.cache[entry.cacheName]
 
     if (cached) {
-      if (scriptOptions.produceCachedData === true &&
-          scriptOptions.cachedData === void 0 &&
-          cached.scriptData !== void 0) {
+      if (cached.scriptData &&
+          scriptOptions.produceCachedData &&
+          ! has(scriptOptions, "cachedData")) {
         scriptOptions.cachedData = cached.scriptData
       }
     } else {
