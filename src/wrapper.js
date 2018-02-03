@@ -51,15 +51,14 @@ class Wrapper {
 }
 
 function createMap(object, key) {
-  const map = new NullObject
-  map.raw = Wrapper.unwrap(object, key)
-  map.versions = []
-  map.wrappers = new NullObject
-
   // Store the wrapper map as object[wrapSym][key] rather than on the
   // function, so that other code can modify the same property  without
   // interfering with our wrapper logic.
-  return getOrCreateStore(object)[key] = map
+  return getOrCreateStore(object)[key] = {
+    raw: Wrapper.unwrap(object, key),
+    versions: [],
+    wrappers: new NullObject
+  }
 }
 
 function createStore(object) {

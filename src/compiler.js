@@ -1,5 +1,4 @@
 import FastPath from "./fast-path.js"
-import NullObject from "./null-object.js"
 import Parser from "./parser.js"
 
 import _createOptions from "./util/create-options.js"
@@ -37,18 +36,17 @@ class Compiler {
     code = stripShebang(code)
     options = Compiler.createOptions(options)
 
-    const { runtimeName } = options
-    const result = new NullObject
-
-    result.code = code
-
-    result.changed =
-    result.esm = false
-
-    result.exportNames =
-    result.exportStars =
-    result.moduleSpecifiers =
-    result.warnings = null
+    const result = {
+      changed: false,
+      code,
+      esm: false,
+      exportNames: null,
+      exportSpecifiers: null,
+      exportStars: null,
+      moduleSpecifiers: null,
+      scriptData: null,
+      warnings: null
+    }
 
     let { hint, type } = options
 
@@ -103,6 +101,7 @@ class Compiler {
     }
 
     const rootPath = new FastPath(ast)
+    const { runtimeName } = options
     const top = rootPath.stack[0].top
 
     try {

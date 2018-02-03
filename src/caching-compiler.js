@@ -3,8 +3,8 @@ import { extname, resolve } from "path"
 import Compiler from "./compiler.js"
 import NullObject from "./null-object.js"
 
+import assign from "./util/assign.js"
 import gzip from "./fs/gzip.js"
-import has from "./util/has.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
@@ -28,50 +28,50 @@ class CachingCompiler {
     const { cache } = entry.package
     const { cacheName } = entry
 
-    const metaMap =
+    const meta =
       cache &&
       cache["data.json"] &&
       cache["data.json"][cacheName]
 
-    if (! metaMap) {
+    if (! meta) {
       return null
     }
 
-    const exportNames = metaMap[3]
-    const metaBuffer = cache["data.blob"]
-    const offsetStart = metaMap[0]
-    const offsetEnd = metaMap[1]
-
-    let scriptData
-
-    if (metaBuffer &&
-        offsetStart !== -1 &&
-        offsetEnd !== -1) {
-      scriptData = metaBuffer.slice(offsetStart, offsetEnd)
-    }
+    const moduleSpecifiers = meta[5]
+      ? assign(new NullObject, meta[5])
+      : null
 
     const result = {
       changed: false,
-      esm: metaMap[2],
-      exportNames,
+      code: null,
+      esm: !! meta[2],
+      exportNames: meta[3] || null,
       exportSpecifiers: null,
-      exportStars: metaMap[4],
-      moduleSpecifiers: metaMap[5],
-      scriptData,
-      warnings: metaMap[6]
+      exportStars: meta[4] || null,
+      moduleSpecifiers,
+      scriptData: null,
+      warnings: meta[6] || null
     }
 
-    if (! result.esm) {
-      return result
+    if (result.esm) {
+      const exportSpecifiers =
+      result.exportSpecifiers = new NullObject
+
+      for (const exportName of result.exportNames) {
+        exportSpecifiers[exportName] = 1
+      }
     }
 
-    const exportSpecifiers = {}
+    const buffer = cache["data.blob"]
+    const offsetStart = meta[0]
+    const offsetEnd = meta[1]
 
-    for (const exportName of exportNames) {
-      exportSpecifiers[exportName] = 1
+    if (buffer &&
+        offsetStart !== -1 &&
+        offsetEnd !== -1) {
+      result.scriptData = buffer.slice(offsetStart, offsetEnd)
     }
 
-    result.exportSpecifiers = exportSpecifiers
     return result
   }
 }
@@ -84,18 +84,18 @@ function compileAndCache(entry, code, options) {
   cache[cacheName] =
   Compiler.compile(code, toCompileOptions(entry, options))
 
-  const exportSpecifiers =
-  result.exportSpecifiers = new NullObject
-
-  const { exportNames } = result
-
-  for (const exportName of exportNames) {
-    exportSpecifiers[exportName] = 1
-  }
-
   // Add "main" to enable the `readFileFast` fast path of
   // `process.binding("fs").internalModuleReadJSON`.
   result.code = '"main";' + result.code
+
+  if (result.esm) {
+    const exportSpecifiers =
+    result.exportSpecifiers = new NullObject
+
+    for (const exportName of result.exportNames) {
+      exportSpecifiers[exportName] = 1
+    }
+  }
 
   return result
 }
@@ -108,19 +108,18 @@ function compileAndWrite(entry, code, options) {
   }
 
   const { cachePath } = entry.package
-  const content = result.code
 
   const pendingWrites =
     shared.pendingWrites[cachePath] ||
     (shared.pendingWrites[cachePath] = new NullObject)
 
-  pendingWrites[entry.cacheName] = content
+  pendingWrites[entry.cacheName] = result.code
 
   return result
 }
 
 function removeExpired(cachePath, cacheName) {
-  const cache = shared.cacheDirs[cachePath]
+  const cache = shared.packageCache[cachePath]
   const shortname = cacheName.slice(0, 8)
 
   for (const key in cache) {
@@ -176,16 +175,14 @@ if (! shared.inited) {
         continue
       }
 
-      const cache = shared.cacheDirs[cachePath]
+      const cache = shared.packageCache[cachePath]
       const scriptDatas = pendingMetas[cachePath]
 
       for (const cacheName in cache) {
         const cached = cache[cacheName]
 
         if (cached !== true &&
-            cacheName !== "data.blob" &&
-            cacheName !== "data.json" &&
-            ! has(scriptDatas, cacheName)) {
+            ! scriptDatas[cacheName]) {
           scriptDatas[cacheName] = cache[cacheName].scriptData
         }
       }
@@ -196,10 +193,15 @@ if (! shared.inited) {
       let offset = 0
 
       for (const cacheName in scriptDatas) {
-        const scriptData = scriptDatas[cacheName]
+        if (cacheName === "data.blob" ||
+            cacheName === "data.json") {
+          continue
+        }
 
         let offsetStart = -1
         let offsetEnd = -1
+
+        const scriptData = scriptDatas[cacheName]
 
         if (scriptData) {
           offsetStart = offset
