@@ -3,7 +3,11 @@ import has from "./has.js"
 const { __lookupGetter__ } = Object.prototype
 
 function getGetter(object, key) {
-  return has(object, key) ? __lookupGetter__.call(object, key) : void 0
+  if (has(object, key)) {
+    return __lookupGetter__.call(object, key) || null
+  }
+
+  return null
 }
 
 export default getGetter
