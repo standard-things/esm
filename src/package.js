@@ -69,11 +69,11 @@ class Package {
       cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
     }
 
-    let cache = shared.cacheDirs[cachePath]
+    let cache = shared.packageCache[cachePath]
 
     if (! cache) {
       cache =
-      shared.cacheDirs[cachePath] = new NullObject
+      shared.packageCache[cachePath] = new NullObject
 
       for (const cacheName of readdir(cachePath)) {
         // Later, we'll change the cached value to its associated compiler result,
