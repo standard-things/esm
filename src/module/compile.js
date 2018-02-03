@@ -47,12 +47,11 @@ function compile(content, filename) {
   const { cacheName } = entry
   const { cachePath } = pkg
   const cached = pkg.cache[cacheName]
-
-  const buffer = cached
-    ? cached.scriptData
-    : void 0
-
   const wrapper = Module.wrap(stripShebang(content))
+
+  const buffer =
+    (cached && cached.scriptData) ||
+    void 0
 
   const script = new vm.Script(wrapper, {
     cachedData: buffer,
@@ -63,8 +62,8 @@ function compile(content, filename) {
     produceCachedData: true
   })
 
-  let scriptData
   let changed = false
+  let scriptData = null
 
   const { cachedDataRejected } = script
 
@@ -80,11 +79,11 @@ function compile(content, filename) {
     } else if (cachedDataRejected) {
       changed = true
 
-      const metaData = cached["data.json"][cacheName]
+      const meta = cached["data.json"][cacheName]
 
-      if (metaData) {
-        metaData[0] =
-        metaData[1] = -1
+      if (meta) {
+        meta[0] =
+        meta[1] = -1
       }
 
       delete cached.scriptData
