@@ -764,6 +764,14 @@ describe("spec compliance", () => {
     ))
   )
 
+  it("should not support evaled `import.meta` in ESM", () => {
+    assert.throws(
+      () => eval("import.meta"),
+      SyntaxError,
+      "Cannot use 'import.meta' outside a module"
+    )
+  })
+
   it("should not support loading ESM from require", () =>
     import("./fixture/require-esm.js")
       .then(() => assert.ok(false))
