@@ -64,8 +64,6 @@ export default () => {
 
   ns = createNamespace({ default: {} })
   assert.deepStrictEqual(nsEmpty, ns)
-
-  ns = createNamespace()
   assert.deepStrictEqual(nsEmptyPseudo, ns)
 
   const objects = [defaultEmpty, defaultExports]

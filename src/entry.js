@@ -318,18 +318,22 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
-  const exported = entry.module.exports
   const pkg = entry.package
   const cached = pkg.cache[entry.cacheName]
+  const exported = entry.module.exports
   const isESM = cached && cached.esm
+  const object = entry._loaded === 1 ? _namespace : exported
 
-  const inModule =
-    isESM ||
-    (pkg.options.cjs.interop &&
-     has(exported, "__esModule") &&
-     !! exported.__esModule)
+  const isPseudo =
+    pkg.options.cjs.interop &&
+    has(exported, "__esModule") &&
+    !! exported.__esModule
 
-  if (! inModule) {
+  const skipDefault =
+    ! isESM &&
+    ! (isPseudo && has(object, "default"))
+
+  if (skipDefault) {
     _namespace.default = exported
 
     if (! ("default" in getters)) {
@@ -341,13 +345,12 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const object = entry._loaded === 1 ? _namespace : exported
   const names = keys(object)
 
   for (const name of names) {
     if (isESM) {
       _namespace[name] = exported[name]
-    } else if ((inModule || name !== "default") &&
+    } else if (! (skipDefault && name === "default") &&
         ! has(_namespace, name)) {
       setGetter(_namespace, name, () => {
         return exported[name]
