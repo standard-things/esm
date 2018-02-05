@@ -7,8 +7,8 @@ export default () => {
   const expected = "direct"
   let result = direct('localValue = "direct"')
 
-  assert.strictEqual(value, result)
   assert.strictEqual(value, expected)
+  assert.strictEqual(result, expected)
 
   result = indirect('localValue = "indirect"')
 
