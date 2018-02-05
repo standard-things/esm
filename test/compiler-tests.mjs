@@ -89,9 +89,10 @@ describe("compiler", () => {
       { code: '"use script";\'use module\';import"a"' }
     ]
     .forEach((data) => {
-      assert.throws(() =>
-        Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
-      , SyntaxError)
+      assert.throws(
+        () => Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" }),
+        SyntaxError
+      )
     })
   })
 
