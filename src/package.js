@@ -61,12 +61,14 @@ class Package {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     options = Package.createOptions(options)
 
-    let cachePath = null
+    let cachePath
 
     if (typeof options.cache === "string") {
       cachePath = resolve(dirPath, options.cache)
     } else if (options.cache !== false) {
       cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
+    } else {
+      cachePath = ""
     }
 
     let cache = shared.packageCache[cachePath]
