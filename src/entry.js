@@ -530,7 +530,7 @@ function toNamespace(entry, source = entry._namespace) {
 
 function toNamespaceGetter(entry, source = entry._namespace) {
   // Section 9.4.6.11: ModuleNamespaceCreate ( module, exports )
-  // Step 7: Module namespace sources have sorted properties.
+  // Step 7: Module namespace objects have sorted properties.
   // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
   const names = sort.call(keys(source))
   const namespace = createNamespace()
