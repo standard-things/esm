@@ -3,10 +3,13 @@ import Parser from "./parser.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
+import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import stripShebang from "./util/strip-shebang.js"
+
+const { keys } = Object
 
 const defaultOptions = {
   cjs: {
@@ -24,9 +27,6 @@ const defaultOptions = {
   var: false,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
-
-const argumentsRegExp = /\barguments\b/
-const importExportRegExp = /\b(?:im|ex)port\b/
 
 class Compiler {
   static createOptions = createOptions
@@ -61,9 +61,11 @@ class Compiler {
       type = "module"
     }
 
+    const possibleIndexes = findIndexes(code, ["import", "export", "eval"])
+
     if ((type === "script" ||
          type === "unambiguous") &&
-        ! importExportRegExp.test(code)) {
+        ! possibleIndexes.length) {
       return result
     }
 
@@ -108,6 +110,7 @@ class Compiler {
       importExportVisitor.visit(rootPath, code, {
         esm: type !== "script",
         generateVarDeclarations: options.var,
+        possibleIndexes,
         runtimeName
       })
     } catch (e) {
@@ -118,20 +121,29 @@ class Compiler {
     result.changed = importExportVisitor.changed
 
     if (importExportVisitor.addedImportExport) {
-      if (type === "unambiguous") {
-        type = "module"
-      }
+      type = "module"
 
-      try {
-        assignmentVisitor.visit(rootPath, {
-          assignableExports: importExportVisitor.assignableExports,
-          assignableImports: importExportVisitor.assignableImports,
-          magicString: importExportVisitor.magicString,
-          runtimeName
-        })
-      } catch (e) {
-        e.sourceType = parserOptions.sourceType
-        throw e
+      const { assignableExports, assignableImports } = importExportVisitor
+
+      const possibleIndexes = findIndexes(code, [
+        "eval",
+        ...keys(assignableExports),
+        ...keys(assignableImports)
+      ])
+
+      if (possibleIndexes.length) {
+        try {
+          assignmentVisitor.visit(rootPath, {
+            assignableExports,
+            assignableImports,
+            magicString: importExportVisitor.magicString,
+            possibleIndexes,
+            runtimeName
+          })
+        } catch (e) {
+          e.sourceType = parserOptions.sourceType
+          throw e
+        }
       }
 
       importExportVisitor.finalizeHoisting()
@@ -145,13 +157,17 @@ class Compiler {
 
       if (options.warnings &&
           ! options.cjs.vars &&
-          top.idents.indexOf("arguments") === -1 &&
-          argumentsRegExp.test(code)) {
-        result.warnings = []
-        identifierVisitor.visit(rootPath, {
-          magicString: importExportVisitor.magicString,
-          warnings: result.warnings
-        })
+          top.idents.indexOf("arguments") === -1) {
+        const possibleIndexes = findIndexes(code, ["arguments"])
+
+        if (possibleIndexes.length) {
+          result.warnings = []
+          identifierVisitor.visit(rootPath, {
+            magicString: importExportVisitor.magicString,
+            possibleIndexes,
+            warnings: result.warnings
+          })
+        }
       }
     }
 

@@ -12,6 +12,7 @@ class AssignmentVisitor extends Visitor {
     this.assignableExports = options.assignableExports
     this.assignableImports = options.assignableImports
     this.magicString = options.magicString
+    this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
   }
 

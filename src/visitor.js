@@ -36,6 +36,13 @@ const childrenToVisit = createOptions({
 class Visitor {
   visit(path) {
     this.reset(...arguments)
+
+    const possibleIndexes = this.possibleIndexes || []
+
+    this.possibleEnd = possibleIndexes.length
+    this.possibleIndexes = possibleIndexes
+    this.possibleStart = 0
+
     this.visitWithoutReset(path)
   }
 
@@ -51,7 +58,7 @@ class Visitor {
       return
     }
 
-    // The method must call this.visitChildren(path) to continue traversing.
+    // The method must call `this.visitChildren(path)` to continue traversing.
     let methodName = "visit" + value.type
 
     if (typeof this[methodName] !== "function") {
@@ -62,11 +69,43 @@ class Visitor {
   }
 
   visitChildren(path) {
-    const value = path.getValue()
-    const names = getChildNames(value)
+    const node = path.getValue()
+    const names = getChildNames(node)
 
-    for (const name of names) {
-      path.call(this, "visitWithoutReset", name)
+    const { end, start } = node
+    const { possibleIndexes } = this
+
+    const oldLeft = this.possibleStart
+    const oldRight = this.possibleEnd
+
+    let left = oldLeft
+    let right = oldRight
+
+    if (typeof start === "number" &&
+        typeof end === "number") {
+      // Find first index not less than `node.start`.
+      while (left < right &&
+          possibleIndexes[left] < start) {
+        ++left
+      }
+
+      // Find first index not greater than `node.end`.
+      while (left < right &&
+          possibleIndexes[right - 1] > end) {
+        --right
+      }
+    }
+
+    if (left < right) {
+      this.possibleStart = left
+      this.possibleEnd = right
+
+      for (const name of names) {
+        path.call(this, "visitWithoutReset", name)
+      }
+
+      this.possibleStart = oldLeft
+      this.possibleEnd = oldRight
     }
   }
 }

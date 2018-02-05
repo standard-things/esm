@@ -38,6 +38,7 @@ class ImportExportVisitor extends Visitor {
     this.madeChanges = false
     this.magicString = new MagicString(code)
     this.moduleSpecifiers = new NullObject
+    this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
     this.top = rootPath.stack[0].top
   }

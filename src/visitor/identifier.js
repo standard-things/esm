@@ -8,6 +8,7 @@ const definedMap = new SafeWeakMap
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {
     this.magicString = options.magicString
+    this.possibleIndexes = options.possibleIndexes
     this.warnedForArguments = false
     this.warnings = options.warnings
   }
