@@ -751,12 +751,17 @@ describe("spec compliance", () => {
   )
 
   it("should not support `import.meta` in CJS", () =>
-    import("./fixture/meta.js")
-      .then((ns) => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("'import.meta' may only be used in ES modules"))
-      })
+    Promise.all([
+      "./fixture/meta.js",
+      "./fixture/eval/meta.js"
+    ].map((request) =>
+      import(request)
+        .then((ns) => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof SyntaxError)
+          assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
+        })
+    ))
   )
 
   it("should not support loading ESM from require", () =>
