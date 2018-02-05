@@ -1,7 +1,11 @@
-_.e([["value",()=>localValue],["run",()=>run]]);let localValue = "original"
+_.e([["value",()=>localValue],["indirect",()=>indirect],["direct",()=>direct]]);let localValue = "original"
 
 
 
-function run(code) {
-  return _.u(eval(code))
+function indirect(code) {
+  return (0, eval)(code)
+}
+
+function direct(code) {
+  return _.u(eval(_.l(code)))
 }

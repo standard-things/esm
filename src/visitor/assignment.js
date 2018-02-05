@@ -27,7 +27,7 @@ class AssignmentVisitor extends Visitor {
 
     if (callee.type === "Identifier" &&
         callee.name === "eval") {
-      wrap(this, path)
+      wrapUpdate(this, path)
     }
   }
 
@@ -59,7 +59,7 @@ function assignmentHelper(visitor, path, childName) {
   for (const name of names) {
     if (assignableExports[name] === true &&
         ! isShadowed(path, name)) {
-      wrap(visitor, path)
+      wrapUpdate(visitor, path)
       return
     }
   }
@@ -122,12 +122,12 @@ function isShadowed(path, name) {
   return shadowed
 }
 
-function wrap(visitor, path) {
-  const node = path.getValue()
+function wrapUpdate(visitor, path) {
+  const { end, start } = path.getValue()
 
   visitor.magicString
-    .prependRight(node.start, visitor.runtimeName + ".u(")
-    .prependRight(node.end, ")")
+    .prependRight(start, visitor.runtimeName + ".u(")
+    .prependRight(end, ")")
 }
 
 export default new AssignmentVisitor

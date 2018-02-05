@@ -23,6 +23,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   reset(rootPath, code, options) {
+    this.addedDirectEval = false
     this.addedDynamicImport = false
     this.addedImportExport = false
     this.addedImportMeta = false
@@ -53,6 +54,13 @@ class ImportExportVisitor extends Visitor {
     }
 
     this.visitChildren(path)
+
+    if (callee.type === "Identifier" &&
+        callee.name === "eval") {
+      this.changed =
+      this.addedDirectEval = true
+      wrapEval(this, path)
+    }
   }
 
   visitImportDeclaration(path) {
@@ -534,6 +542,14 @@ function toModuleImport(visitor, specifierString, specifierMap) {
   code += "]);"
 
   return code
+}
+
+function wrapEval(visitor, path) {
+  const { callee, end } = path.getValue()
+
+  visitor.magicString
+    .prependRight(callee.end, "(" + visitor.runtimeName + ".l")
+    .prependRight(end, ")")
 }
 
 export default new ImportExportVisitor

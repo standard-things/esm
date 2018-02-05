@@ -4,6 +4,7 @@ import Compiler from "./compiler.js"
 import NullObject from "./null-object.js"
 
 import assign from "./util/assign.js"
+import getCacheFileName from "./util/get-cache-file-name.js"
 import gzip from "./fs/gzip.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
@@ -16,7 +17,8 @@ const { stringify } = JSON
 
 class CachingCompiler {
   static compile(entry, code, options) {
-    if (entry.module.filename &&
+    if (! options.eval &&
+        entry.module.filename &&
         entry.package.cachePath) {
       return compileAndWrite(entry, code, options)
     }
@@ -77,16 +79,22 @@ class CachingCompiler {
 }
 
 function compileAndCache(entry, code, options) {
-  const { cache } = entry.package
+  const result = Compiler.compile(code, toCompileOptions(entry, options))
+
+  if (options.eval) {
+    const cache = shared.packageCache[""]
+    const cacheName = getCacheFileName(entry, code)
+    return cache[cacheName] = result
+  }
+
+  const { cache, cachePath } = entry.package
   const { cacheName } = entry
 
-  const result =
-  cache[cacheName] =
-  Compiler.compile(code, toCompileOptions(entry, options))
-
-  // Add "main" to enable the `readFileFast` fast path of
-  // `process.binding("fs").internalModuleReadJSON`.
-  result.code = '"main";' + result.code
+  if (cachePath) {
+    // Add "main" to enable the `readFileFast` fast path of
+    // `process.binding("fs").internalModuleReadJSON`.
+    result.code = '"main";' + result.code
+  }
 
   if (result.esm) {
     const exportSpecifiers =
@@ -97,7 +105,7 @@ function compileAndCache(entry, code, options) {
     }
   }
 
-  return result
+  return cache[cacheName] = result
 }
 
 function compileAndWrite(entry, code, options) {
@@ -133,6 +141,14 @@ function removeExpired(cachePath, cacheName) {
 }
 
 function toCompileOptions(entry, options) {
+  if (options.eval) {
+    return {
+      cjs: entry.package.options.cjs,
+      runtimeName: entry.runtimeName,
+      var: true
+    }
+  }
+
   return {
     cjs: entry.package.options.cjs,
     hint: options.hint,

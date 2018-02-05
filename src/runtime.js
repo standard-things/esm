@@ -1,3 +1,4 @@
+import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 import NullObject from "./null-object.js"
 
@@ -36,6 +37,7 @@ class Runtime {
     object.d = object.default = prototype.default
     object.e = object.export = prototype.export
     object.i = object.import = prototype.import
+    object.l = object.eval = prototype.eval
     object.n = object.nsSetter = prototype.nsSetter
     object.r = object.run = prototype.run
     object.u = object.update = prototype.update
@@ -52,6 +54,15 @@ class Runtime {
   // functions always return the same values.
   export(getterPairs) {
     this.entry.addGetters(getterPairs)
+  }
+
+  eval(content) {
+    // Section 18.2.1.1: Runtime Semantics: PerformEval ( x, evalRealm, strictCaller, direct )
+    // Setp 2: Only evaluate strings.
+    // https://tc39.github.io/ecma262/#sec-performeval
+    return typeof content === "string"
+      ? Compiler.compile(this.entry, content, { eval: true }).code
+      : content
   }
 
   import(request) {

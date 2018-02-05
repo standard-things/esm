@@ -731,6 +731,11 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
+  it("should support evaled dynamic import in CJS", () =>
+    import("./misc/eval/dynamic.js")
+      .then((ns) => ns.default())
+  )
+
   it("should not have CJS free variables", () =>
     import("./misc/free-vars.mjs")
       .then((ns) => ns.default())
