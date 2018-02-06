@@ -61,7 +61,7 @@ class Compiler {
       type = "module"
     }
 
-    const possibleIndexes = findIndexes(code, ["import", "export", "eval"])
+    const possibleIndexes = findIndexes(code, ["export", "eval", "import"])
 
     if ((type === "script" ||
          type === "unambiguous") &&
