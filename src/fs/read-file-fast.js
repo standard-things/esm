@@ -40,7 +40,7 @@ function fastPathReadFile(filename, options) {
     : internalModuleReadFile(filename)
 
   if (useInternalModuleReadJSON &&
-      content === "") {
+      ! content) {
     return readFileSync(filename, options)
   }
 
