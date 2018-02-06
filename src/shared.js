@@ -19,6 +19,7 @@ if (! __shared__) {
   shared.findPath = new FastObject
   shared.global = global
   shared.globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
+  shared.hiddenKeyType = null
   shared.inited = false
   shared.maxSatisfying = new FastObject
   shared.package = new FastObject

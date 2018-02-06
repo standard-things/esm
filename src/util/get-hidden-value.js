@@ -1,17 +1,19 @@
 import binding from "../binding.js"
+import hiddenKeyType from "../hidden-key-type.js"
 import isObjectLike from "./is-object-like.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 
-const utilBinding = binding.util
-const _getHiddenValue = noDeprecationWarning(() => utilBinding.getHiddenValue)
+const _getHiddenValue = binding.util.getHiddenValue
 
-const useGetHiddenValue = typeof _getHiddenValue === "function"
+const useGetHiddenValue =
+  hiddenKeyType !== "undefined" &&
+  typeof _getHiddenValue === "function"
 
 function getHiddenValue(object, key) {
   if (useGetHiddenValue &&
+      typeof key === hiddenKeyType &&
       isObjectLike(object)) {
     try {
-      return _getHiddenValue.call(utilBinding, object, key)
+      return _getHiddenValue(object, key)
     } catch (e) {}
   }
 }
