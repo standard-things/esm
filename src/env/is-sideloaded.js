@@ -1,16 +1,16 @@
 import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
-import isFromNyc from "./is-from-nyc.js"
+import isNyc from "./is-nyc.js"
 import normalize from "../path/normalize.js"
 import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 
-function isFromPackage() {
+function isSideloaded() {
   const { env } = shared
 
-  if ("isFromPackage" in env) {
-    return env.isFromPackage
+  if ("sideloaded" in env) {
+    return env.sideloaded
   }
 
   const { argv } = process
@@ -20,14 +20,14 @@ function isFromPackage() {
     ? normalize(filename).lastIndexOf("/node_modules/")
     : -1
 
-  return env.isFromPackage =
+  return env.sideloaded =
     // From a package like Mocha.
     (nodeModulesIndex !== -1 &&
      hasLoaderArg(args) &&
      (Package.get(process.cwd()) !== null ||
       Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) ||
     // From istanbuljs/nyc.
-    isFromNyc()
+    isNyc()
 }
 
-export default isFromPackage
+export default isSideloaded

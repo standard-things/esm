@@ -3,11 +3,11 @@ import normalize from "../path/normalize.js"
 import readJSON from "../fs/read-json.js"
 import shared from "../shared.js"
 
-function isFromNyc() {
+function isNyc() {
   const { env } = shared
 
-  if ("isFromNyc" in env) {
-    return env.isFromNyc
+  if ("nyc" in env) {
+    return env.nyc
   }
 
   const { parent } = __non_webpack_module__
@@ -21,9 +21,9 @@ function isFromNyc() {
     ? null
     : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
 
-  return env.isFromNyc =
+  return env.nyc =
     has(nycJSON, "name") &&
     nycJSON.name === "nyc"
 }
 
-export default isFromNyc
+export default isNyc

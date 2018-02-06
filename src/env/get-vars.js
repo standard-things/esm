@@ -7,15 +7,17 @@ import { resolve } from "path"
 import shared from "../shared.js"
 
 function getVars() {
-  if ("getVars" in shared.env) {
-    return shared.env.getVars
+  const { env } = shared
+
+  if ("vars" in env) {
+    return env.vars
   }
 
   const vars = new NullObject
 
   if (! process.env ||
       typeof process.env.ESM_OPTIONS !== "string") {
-    return shared.env.getVars = vars
+    return env.vars = vars
   }
 
   let ESM_OPTIONS = process.env.ESM_OPTIONS.trim()
@@ -25,7 +27,7 @@ function getVars() {
   }
 
   if (! ESM_OPTIONS) {
-    return shared.env.getVars = vars
+    return env.vars = vars
   }
 
   const code0 = ESM_OPTIONS.charCodeAt(0)
@@ -37,7 +39,7 @@ function getVars() {
   }
 
   vars.ESM_OPTIONS = ESM_OPTIONS
-  return shared.env.getVars = vars
+  return env.vars = vars
 }
 
 export default getVars

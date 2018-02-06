@@ -1,18 +1,18 @@
-import isFromRequireFlag from "./is-from-require-flag.js"
+import isPreloaded from "./is-preloaded.js"
 import matches from "../util/matches.js"
 import shared from "../shared.js"
 
 function isCheck() {
   const { env } = shared
 
-  if ("isCheck" in env) {
-    return env.isCheck
+  if ("check" in env) {
+    return env.check
   }
 
-  return env.isCheck =
+  return env.check =
     process.argv.length === 1 &&
     matches(process.execArgv, /^(?:--check|-c)$/) &&
-    isFromRequireFlag()
+    isPreloaded()
 }
 
 export default isCheck

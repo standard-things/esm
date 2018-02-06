@@ -1,18 +1,18 @@
 import hasLoaderModule from "./has-loader-module.js"
-import isFromRequireFlag from "./is-from-require-flag.js"
+import isPreloaded from "./is-preloaded.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
 
 function isREPL() {
   const { env } = shared
 
-  if ("isRepl" in env) {
-    return env.isREPL
+  if ("repl" in env) {
+    return env.repl
   }
 
-  return env.isREPL =
+  return env.repl =
     (process.argv.length === 1 &&
-     isFromRequireFlag()) ||
+      isPreloaded()) ||
     (rootModule.id === "<repl>" &&
      rootModule.filename === null &&
      rootModule.loaded === false &&

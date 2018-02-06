@@ -1,18 +1,18 @@
-import isFromPackage from "./is-from-package.js"
-import isFromRequireFlag from "./is-from-require-flag.js"
+import isPreloaded from "./is-preloaded.js"
+import isSideloaded from "./is-sideloaded.js"
 import shared from "../shared.js"
 
 function isCLI() {
   const { env } = shared
 
-  if ("isCLI" in env) {
-    return env.isCLI
+  if ("cli" in env) {
+    return env.cli
   }
 
-  return env.isCLI =
+  return env.cli =
     (process.argv.length > 1 &&
-     isFromRequireFlag()) ||
-    isFromPackage()
+      isPreloaded()) ||
+    isSideloaded()
 }
 
 export default isCLI

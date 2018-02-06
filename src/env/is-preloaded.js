@@ -2,16 +2,16 @@ import hasLoaderModule from "./has-loader-module.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
 
-function isFromRequireFlag() {
+function isPreloaded() {
   const { env } = shared
 
-  if ("isFromRequireFlag" in env) {
-    return env.isFromRequireFlag
+  if ("preloaded" in env) {
+    return env.preloaded
   }
 
-  return env.isFromRequireFlag =
+  return env.preloaded =
     rootModule.id === "internal/preload" &&
     hasLoaderModule(rootModule.children)
 }
 
-export default isFromRequireFlag
+export default isPreloaded
