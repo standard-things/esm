@@ -6,7 +6,8 @@ const { getStatValues, stat } = binding.fs
 
 const useGetStatValues = typeof getStatValues === "function"
 
-let useMtimeFastPath = typeof stat === "function" &&
+let useMtimeFastPath =
+  typeof stat === "function" &&
   satisfies(process.version, "^6.10.1||>=7.7")
 
 let statValues

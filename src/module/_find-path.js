@@ -14,10 +14,10 @@ import stat from "../fs/stat.js"
 
 const { keys } = Object
 const { parse } = JSON
+const { preserveSymlinks } = binding.config
 
 const isWin = process.platform === "win32"
 const mainFieldRegExp = /"main"/
-const { preserveSymlinks } = binding.config
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
