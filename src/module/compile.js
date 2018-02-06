@@ -10,10 +10,8 @@ import Package from "../package.js"
 import _compile from "./_compile.js"
 import binding from "../binding.js"
 import { dirname } from "path"
-import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import makeRequireFunction from "./make-require-function.js"
-import md5 from "../util/md5.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
@@ -22,9 +20,6 @@ import vm from "vm"
 // Lazily resolve `process.argv[1]`.
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
-
-const { callAndPauseOnStart } = binding.inspector
-const { now } = Date
 
 const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
 
@@ -36,7 +31,7 @@ function compile(content, filename) {
   if (! entry.state) {
     entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
-    entry.runtimeName = encodeId("_" + md5(now().toString()).slice(0, 3))
+    entry.runtimeName = shared.globalName
 
     _compile(compile, entry, content, filename)
     return
@@ -119,7 +114,7 @@ function compile(content, filename) {
     // Set breakpoint on module start.
     if (filename === resolvedArgv) {
       delete process._breakFirstLine
-      inspectorWrapper = callAndPauseOnStart
+      inspectorWrapper = binding.inspector.callAndPauseOnStart
 
       if (useRunInDebugContext &&
           typeof inspectorWrapper !== "function") {
