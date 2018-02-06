@@ -1,30 +1,35 @@
 import Entry from "./entry.js"
-import FastObject from "./fast-object.js"
 import Module from "./module.js"
 
 import builtinModules from "./module/builtin-modules.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
+import shared from "./shared.js"
 
-const builtinEntries = builtinModules
-  .reduce((object, id) => {
-    setGetter(object, id, () => {
-      const mod = new Module(id, null)
-      mod.exports = id === "module" ? Module : __non_webpack_require__(id)
-      mod.loaded = true
+function init(builtinEntries) {
+  return builtinModules
+    .reduce((builtinEntries, id) => {
+      setGetter(builtinEntries, id, () => {
+        const mod = new Module(id, null)
+        mod.exports = id === "module" ? Module : __non_webpack_require__(id)
+        mod.loaded = true
 
-      const entry = Entry.get(mod)
-      entry.builtin = true
-      entry.loaded()
-      return object[id] = entry
-    })
+        const entry = Entry.get(mod)
+        entry.builtin = true
+        entry.loaded()
+        return builtinEntries[id] = entry
+      })
 
-    setSetter(object, id, (value) => {
-      setProperty(object, id, { value })
-    })
+      setSetter(builtinEntries, id, (value) => {
+        setProperty(builtinEntries, id, { value })
+      })
 
-    return object
-  }, new FastObject)
+      return builtinEntries
+    }, builtinEntries)
+}
 
-export default builtinEntries
+export default shared.inited
+  ? shared.builtinEntries
+  : init(shared.builtinEntries)
+

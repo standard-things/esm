@@ -1,14 +1,23 @@
 import binding from "../binding.js"
+import shared from "../shared.js"
 
-let { builtinModules } = __non_webpack_module__.constructor
+const { isArray } = Array
+const { freeze, isFrozen, keys } = Object
 
-if (! Array.isArray(builtinModules) ||
-    ! Object.isFrozen(builtinModules)) {
-  builtinModules = Object
-    .keys(binding.natives)
-    .filter((id) => ! id.startsWith("internal/"))
+function init() {
+  let { builtinModules } = __non_webpack_module__.constructor
 
-  Object.freeze(builtinModules)
+  if (! isArray(builtinModules) ||
+      ! isFrozen(builtinModules)) {
+    builtinModules = keys(binding.natives)
+      .filter((id) => ! id.startsWith("internal/"))
+
+    freeze(builtinModules)
+  }
+
+  return builtinModules
 }
 
-export default builtinModules
+export default shared.inited
+  ? shared.builtinModules
+  : init()

@@ -12,6 +12,8 @@ const shared = assign(new FastObject, __shared__)
 
 if (! __shared__) {
   shared.binding = new FastObject
+  shared.builtinEntries = new FastObject
+  shared.builtinModules = null
   shared.entry = new SafeWeakMap
   shared.env = new FastObject
   shared.findPath = new FastObject
