@@ -3,11 +3,13 @@ import matches from "../util/matches.js"
 import shared from "../shared.js"
 
 function isCheck() {
-  if ("isCheck" in shared.env) {
-    return shared.env.isCheck
+  const { env } = shared
+
+  if ("isCheck" in env) {
+    return env.isCheck
   }
 
-  return shared.env.isCheck =
+  return env.isCheck =
     process.argv.length === 1 &&
     matches(process.execArgv, /^(?:--check|-c)$/) &&
     isFromRequireFlag()

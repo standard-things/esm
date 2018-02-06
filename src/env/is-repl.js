@@ -4,11 +4,13 @@ import rootModule from "../root-module.js"
 import shared from "../shared.js"
 
 function isREPL() {
-  if ("isRepl" in shared.env) {
-    return shared.env.isREPL
+  const { env } = shared
+
+  if ("isRepl" in env) {
+    return env.isREPL
   }
 
-  return shared.env.isREPL =
+  return env.isREPL =
     (process.argv.length === 1 &&
      isFromRequireFlag()) ||
     (rootModule.id === "<repl>" &&

@@ -4,8 +4,10 @@ import readJSON from "../fs/read-json.js"
 import shared from "../shared.js"
 
 function isFromNyc() {
-  if ("isFromNyc" in shared.env) {
-    return shared.env.isFromNyc
+  const { env } = shared
+
+  if ("isFromNyc" in env) {
+    return env.isFromNyc
   }
 
   const { parent } = __non_webpack_module__
@@ -19,7 +21,7 @@ function isFromNyc() {
     ? null
     : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
 
-  return shared.env.isFromNyc =
+  return env.isFromNyc =
     has(nycJSON, "name") &&
     nycJSON.name === "nyc"
 }
