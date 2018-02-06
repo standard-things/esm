@@ -11,6 +11,7 @@ const { now } = Date
 const shared = assign(new FastObject, __shared__)
 
 if (! __shared__) {
+  shared.binding = new FastObject
   shared.entry = new SafeWeakMap
   shared.env = new FastObject
   shared.findPath = new FastObject
