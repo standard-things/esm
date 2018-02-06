@@ -27,6 +27,7 @@ class ImportExportVisitor extends Visitor {
     this.addedDynamicImport = false
     this.addedImportExport = false
     this.addedImportMeta = false
+    this.addedIndirectEval = false
     this.assignableExports = new NullObject
     this.assignableImports = new NullObject
     this.changed = false
@@ -62,6 +63,27 @@ class ImportExportVisitor extends Visitor {
       this.addedDirectEval = true
       wrapEval(this, path)
     }
+  }
+
+  visitIdentifier(path) {
+    const node = path.getValue()
+
+    if (node.name !== "eval") {
+      return
+    }
+
+    const parent = path.getParentNode()
+    const { callee } = parent
+
+    if (parent.type === "CallExpression" &&
+        callee.type === "Identifier" &&
+        callee.name === "eval") {
+      return
+    }
+
+    this.changed =
+    this.addedIndirectEval = true
+    overwrite(this, node.start, node.end, this.runtimeName + ".g")
   }
 
   visitImportDeclaration(path) {
@@ -549,7 +571,7 @@ function wrapEval(visitor, path) {
   const { callee, end } = path.getValue()
 
   visitor.magicString
-    .prependRight(callee.end, "(" + visitor.runtimeName + ".l")
+    .prependRight(callee.end, "(" + visitor.runtimeName + ".c")
     .prependRight(end, ")")
 }
 

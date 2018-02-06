@@ -8,7 +8,6 @@ import Wrapper from "../wrapper.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createOptions from "../util/create-options.js"
-import encodeId from "../util/encode-id.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
@@ -16,12 +15,10 @@ import isEval from "../env/is-eval.js"
 import isREPL from "../env/is-repl.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import md5 from "../util/md5.js"
 import rootModule from "../root-module.js"
+import shared from "../shared.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
-
-const { now } = Date
 
 function hook(vm) {
   let entry
@@ -92,7 +89,7 @@ function hook(vm) {
   function initEntry(mod) {
     entry = Entry.get(mod)
     entry.package = pkg
-    entry.runtimeName = encodeId("_" + md5(now().toString()).slice(0, 3))
+    entry.runtimeName = shared.globalName
     Runtime.enable(entry, {})
   }
 

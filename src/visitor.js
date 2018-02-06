@@ -25,6 +25,7 @@ const childrenToVisit = createOptions({
   declarations: true,
   elements: true,
   expression: true,
+  expressions: true,
   init: true,
   left: true,
   object: true,

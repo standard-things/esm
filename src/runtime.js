@@ -12,11 +12,14 @@ import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 
+const indirectEval = eval
+
+let hasSetGlobalName = false
+
 class Runtime {
   static enable(entry, exported) {
     const mod = entry.module
     const object = mod.exports
-    const { prototype } = Runtime
 
     object.entry = entry
     entry.exports = exported
@@ -33,11 +36,15 @@ class Runtime {
       setProperty(object, "meta", { value })
     })
 
+    const { prototype } = Runtime
+    const { globalEval } =  prototype
+
     object._ = object
+    object.c = object.compileEval = prototype.compileEval
     object.d = object.default = prototype.default
     object.e = object.export = prototype.export
+    object.g = object.globalEval = (content) => globalEval.call(object, content)
     object.i = object.import = prototype.import
-    object.l = object.eval = prototype.eval
     object.n = object.nsSetter = prototype.nsSetter
     object.r = object.run = prototype.run
     object.u = object.update = prototype.update
@@ -56,13 +63,35 @@ class Runtime {
     this.entry.addGetters(getterPairs)
   }
 
-  eval(content) {
+  compileEval(content) {
     // Section 18.2.1.1: Runtime Semantics: PerformEval ( x, evalRealm, strictCaller, direct )
     // Setp 2: Only evaluate strings.
     // https://tc39.github.io/ecma262/#sec-performeval
     return typeof content === "string"
       ? Compiler.compile(this.entry, content, { eval: true }).code
       : content
+  }
+
+  globalEval(content) {
+    const { globalName } = shared
+
+    if (! hasSetGlobalName) {
+      hasSetGlobalName = true
+
+      setProperty(global, globalName, {
+        enumerable: false,
+        value: { i: this.import }
+      })
+    }
+
+    if (typeof content === "string") {
+      content = Compiler.compile(this.entry, content, {
+        eval: true,
+        runtimeName: globalName
+      }).code
+    }
+
+    return indirectEval(content)
   }
 
   import(request) {

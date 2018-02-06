@@ -21,7 +21,6 @@ class IdentifierVisitor extends Visitor {
     const node = path.getValue()
 
     if (node.name !== "arguments") {
-      this.visitChildren(path)
       return
     }
 
@@ -30,7 +29,6 @@ class IdentifierVisitor extends Visitor {
     if ((type === "UnaryExpression" &&
          operator === "typeof") ||
         isArgumentsDefined(path)) {
-      this.visitChildren(path)
       return
     }
 
