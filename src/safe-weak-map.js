@@ -1,3 +1,3 @@
-import Safe from "./safe.js"
+import SafeBuiltin from "./safe-builtin.js"
 
-export default Safe.create(WeakMap)
+export default SafeBuiltin.create(WeakMap)

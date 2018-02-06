@@ -1,3 +1,3 @@
-import Safe from "./safe.js"
+import SafeBuiltin from "./safe-builtin.js"
 
-export default Safe.create(Set)
+export default SafeBuiltin.create(Set)
