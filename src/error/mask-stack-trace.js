@@ -5,7 +5,6 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
-import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
@@ -39,8 +38,7 @@ function maskStackTrace(error, content, filename, isESM) {
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
   // However, `Error.captureStackTrace()` will throw when receiving a proxy
   // wrapped error object.
-  return setDescriptor(error, "stack", {
-    configurable: true,
+  return setProperty(error, "stack", {
     enumerable: false,
     get() {
       const newMessage = String(error)
