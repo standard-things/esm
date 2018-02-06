@@ -141,14 +141,10 @@ function removeExpired(cachePath, cacheName) {
 }
 
 function toCompileOptions(entry, options) {
-  const runtimeName =
-    options.runtimeName ||
-    entry.runtimeName
-
   if (options.eval) {
     return {
       cjs: entry.package.options.cjs,
-      runtimeName,
+      runtimeName: entry.runtimeName,
       var: true
     }
   }
@@ -156,7 +152,7 @@ function toCompileOptions(entry, options) {
   return {
     cjs: entry.package.options.cjs,
     hint: options.hint,
-    runtimeName,
+    runtimeName: entry.runtimeName,
     type: options.type,
     var: options.var
   }

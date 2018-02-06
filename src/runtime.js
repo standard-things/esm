@@ -14,8 +14,6 @@ import shared from "./shared.js"
 
 const indirectEval = eval
 
-let hasSetGlobalName = false
-
 class Runtime {
   static enable(entry, exported) {
     const mod = entry.module
@@ -73,22 +71,24 @@ class Runtime {
   }
 
   globalEval(content) {
-    const { globalName } = shared
+    const { entry } = this
+    const { runtimeName } = entry
 
-    if (! hasSetGlobalName) {
-      hasSetGlobalName = true
-
-      setProperty(global, globalName, {
+    if (! (runtimeName in global)) {
+      setProperty(global, runtimeName, {
         enumerable: false,
-        value: { i: this.import }
+        value: {
+          __proto__: null,
+          i: this.i.bind({
+            __proto__: null,
+            entry
+          })
+        }
       })
     }
 
     if (typeof content === "string") {
-      content = Compiler.compile(this.entry, content, {
-        eval: true,
-        runtimeName: globalName
-      }).code
+      content = Compiler.compile(this.entry, content, { eval: true }).code
     }
 
     return indirectEval(content)
