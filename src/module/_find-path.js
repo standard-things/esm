@@ -7,7 +7,6 @@ import { isAbsolute, resolve } from "path"
 import Module from "../module.js"
 
 import binding from "../binding.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
@@ -18,7 +17,7 @@ const { parse } = JSON
 
 const isWin = process.platform === "win32"
 const mainFieldRegExp = /"main"/
-const preserveSymlinks = noDeprecationWarning(() => binding.config.preserveSymlinks)
+const { preserveSymlinks } = binding.config
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
@@ -66,7 +65,8 @@ function findPath(request, paths, isMain, searchExts) {
 
     if (! trailingSlash) {
       if (isFile) {
-        if (preserveSymlinks && ! isMain) {
+        if (preserveSymlinks &&
+            ! isMain) {
           filename = resolve(basePath)
         } else {
           filename = realpath(basePath)
@@ -149,11 +149,16 @@ function tryExtensions(thePath, exts, isMain) {
 }
 
 function tryFile(thePath, isMain) {
-  const isFile = stat(thePath) === 0
+  if (stat(thePath)) {
+    return false
+  }
 
-  return preserveSymlinks && ! isMain
-    ? isFile && resolve(thePath)
-    : isFile && realpath(thePath)
+  if (preserveSymlinks &&
+      ! isMain) {
+    return resolve(thePath)
+  }
+
+  return realpath(thePath)
 }
 
 function tryPackage(thePath, exts, isMain) {

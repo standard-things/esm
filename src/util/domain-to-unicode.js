@@ -1,15 +1,13 @@
 import binding from "../binding.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import url from "url"
 
 let { domainToUnicode:_domainToUnicode } = url
 
 if (typeof _domainToUnicode !== "function") {
-  const icuBinding = binding.icu
-  const toUnicode = noDeprecationWarning(() => icuBinding.toUnicode)
+  const { toUnicode } = binding.icu
 
   _domainToUnicode = typeof toUnicode === "function"
-    ? (domain) => toUnicode.call(icuBinding, domain)
+    ? (domain) => toUnicode(domain)
     : __non_webpack_require__("punycode").toUnicode
 }
 

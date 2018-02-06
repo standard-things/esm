@@ -23,10 +23,9 @@ import vm from "vm"
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
+const { callAndPauseOnStart } = binding.inspector
 const { now } = Date
 
-const inspectorBinding = binding.inspector
-const callAndPauseOnStart = noDeprecationWarning(() => inspectorBinding.callAndPauseOnStart)
 const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
@@ -138,7 +137,7 @@ function compile(content, filename) {
   let result
 
   if (inspectorWrapper) {
-    result = inspectorWrapper.call(inspectorBinding, compiledWrapper,
+    result = inspectorWrapper(compiledWrapper,
       exported, exported, req, this, filename, dirname(filename))
   } else {
     result = compiledWrapper.call(

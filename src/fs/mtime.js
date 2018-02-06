@@ -1,13 +1,11 @@
 import binding from "../binding"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import { satisfies } from "semver"
 import { statSync } from "fs"
 
-const fsBinding = binding.fs
-const getStatValues = noDeprecationWarning(() => fsBinding.getStatValues)
-const stat = noDeprecationWarning(() => fsBinding.stat)
+const { getStatValues, stat } = binding.fs
 
 const useGetStatValues = typeof getStatValues === "function"
+
 let useMtimeFastPath = typeof stat === "function" &&
   satisfies(process.version, "^6.10.1||>=7.7")
 
@@ -15,7 +13,7 @@ let statValues
 
 if (useMtimeFastPath) {
   statValues = useGetStatValues
-    ? getStatValues.call(fsBinding)
+    ? getStatValues()
     : new Float64Array(14)
 }
 
@@ -51,9 +49,9 @@ function fastPathMtime(filename) {
   // with index 11 being the mtime milliseconds stamp. The speedup comes
   // from not creating Stat objects.
   if (useGetStatValues) {
-    stat.call(fsBinding, filename)
+    stat(filename)
   } else {
-    stat.call(fsBinding, filename, statValues)
+    stat(filename, statValues)
   }
 
   return statValues[11]

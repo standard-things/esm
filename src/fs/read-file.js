@@ -1,10 +1,8 @@
 import binding from "../binding.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import readFileSync from "./read-file-sync.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
-const fsBinding = binding.fs
-const internalModuleReadFile = noDeprecationWarning(() => fsBinding.internalModuleReadFile)
+const { internalModuleReadFile } = binding.fs
 
 let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
@@ -33,7 +31,7 @@ function fastPathReadFile(filename) {
 
   // Warning: This internal method will crash if `filename` is a directory.
   // https://github.com/nodejs/node/issues/8307
-  const content = internalModuleReadFile.call(fsBinding, filename)
+  const content = internalModuleReadFile(filename)
   return content === void 0 ? null : content
 }
 
