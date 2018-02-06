@@ -2,19 +2,20 @@ import { Gunzip } from "minizlib"
 
 import createOptions from "../util/create-options.js"
 import { gunzipSync } from "zlib"
+import shared from "../shared.js"
 import streamToBuffer from "./stream-to-buffer.js"
-
-let useGunzipFastPath = true
 
 function gunzip(bufferOrString, options) {
   options = typeof options === "string" ? { encoding: options } : options
   options = createOptions(options)
 
-  if (useGunzipFastPath) {
+  const { fastPath } = shared
+
+  if (fastPath.gunzip) {
     try {
       return fastPathGunzip(bufferOrString, options)
     } catch (e) {
-      useGunzipFastPath = false
+      fastPath.gunzip = false
     }
   }
   return fallbackGunzip(bufferOrString, options)

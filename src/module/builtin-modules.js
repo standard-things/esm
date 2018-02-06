@@ -20,4 +20,4 @@ function init() {
 
 export default shared.inited
   ? shared.builtinModules
-  : init()
+  : shared.builtinModules = init()

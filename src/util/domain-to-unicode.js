@@ -1,14 +1,18 @@
 import binding from "../binding.js"
 import url from "url"
 
-let { domainToUnicode:_domainToUnicode } = url
+let _domainToUnicode = url.domainToUnicode
 
 if (typeof _domainToUnicode !== "function") {
-  const { toUnicode } = binding.icu
+  _domainToUnicode = (domain) => {
+    const { toUnicode } = binding.icu
 
-  _domainToUnicode = typeof toUnicode === "function"
-    ? (domain) => toUnicode(domain)
-    : __non_webpack_require__("punycode").toUnicode
+    _domainToUnicode = typeof toUnicode === "function"
+      ? (domain) => toUnicode(domain)
+      : __non_webpack_require__("punycode").toUnicode
+
+    return _domainToUnicode(domain)
+  }
 }
 
 function domainToUnicode(domain) {

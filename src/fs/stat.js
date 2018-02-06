@@ -2,12 +2,10 @@ import { Stats, statSync } from "fs"
 
 import binding from "../binding.js"
 import moduleState from "../module/state.js"
+import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
-const { internalModuleStat } = binding.fs
 const { isFile } = Stats.prototype
-
-let useStatFastPath = typeof internalModuleStat === "function"
 
 function stat(filename) {
   if (typeof filename !== "string") {
@@ -31,11 +29,13 @@ function stat(filename) {
 }
 
 function baseStat(filename) {
-  if (useStatFastPath) {
+  const { fastPath } = shared
+
+  if (fastPath.stat) {
     try {
       return fastPathStat(filename)
     } catch (e) {
-      useStatFastPath = false
+      fastPath.stat = false
     }
   }
 
@@ -54,7 +54,7 @@ function fastPathStat(filename) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
-  return internalModuleStat(toNamespacedPath(filename))
+  return binding.fs.internalModuleStat(toNamespacedPath(filename))
 }
 
 export default stat

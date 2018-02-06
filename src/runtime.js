@@ -7,9 +7,8 @@ import builtinEntries from "./builtin-entries.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
-import setGetter from "./util/set-getter.js"
+import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
-import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 
 const indirectEval = eval
@@ -24,14 +23,10 @@ class Runtime {
 
     Entry.set(mod, exported, entry)
 
-    setGetter(object, "meta", () => {
+    setDeferred(object, "meta", () => {
       const meta = new NullObject
       meta.url = entry.url
-      return object.meta = meta
-    })
-
-    setSetter(object, "meta", (value) => {
-      setProperty(object, "meta", { value })
+      return meta
     })
 
     const { prototype } = Runtime

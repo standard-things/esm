@@ -1,26 +1,21 @@
 import binding from "../binding.js"
 import readFileSync from "./read-file-sync.js"
+import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
-
-const { internalModuleReadFile, internalModuleReadJSON } = binding.fs
-
-const useInternalModuleReadJSON = typeof internalModuleReadJSON === "function"
-
-let useReadFileFastPath =
-  useInternalModuleReadJSON ||
-  typeof internalModuleReadFile === "function"
 
 function readFileFast(filename, options) {
   if (typeof filename !== "string") {
     return null
   }
 
-  if (useReadFileFastPath &&
+  const { fastPath } = shared
+
+  if (fastPath.readFileFast &&
       options === "utf8") {
     try {
       return fastPathReadFile(filename, options)
     } catch (e) {
-      useReadFileFastPath = false
+      fastPath.readFileFast = false
     }
   }
 
@@ -33,11 +28,13 @@ function fastPathReadFile(filename, options) {
   // creating Error objects on failure.
   filename = toNamespacedPath(filename)
 
+  const useInternalModuleReadJSON = shared.support.internalModuleReadJSON
+
   // Warning: These internal methods will crash if `filename` is a directory.
   // https://github.com/nodejs/node/issues/8307
   const content = useInternalModuleReadJSON
-    ? internalModuleReadJSON(filename)
-    : internalModuleReadFile(filename)
+    ? binding.fs.internalModuleReadJSON(filename)
+    : binding.fs.internalModuleReadFile(filename)
 
   if (useInternalModuleReadJSON &&
       ! content) {

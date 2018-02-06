@@ -8,6 +8,7 @@ import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
+import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
@@ -253,22 +254,14 @@ class Entry {
     assignExportsToNamespace(this)
 
     if (setGetters) {
-      setGetter(this, "esmNamespace", () => {
-        return this.esmNamespace = toNamespace(this)
-      })
-
-      setSetter(this, "esmNamespace", (value) => {
-        setProperty(this, "esmNamespace", { value })
-      })
-
-      setGetter(this, "cjsNamespace", () => {
-        return this.cjsNamespace = toNamespace(this, {
+      setDeferred(this, "cjsNamespace", () => {
+        return toNamespace(this, {
           default: this.module.exports
         })
       })
 
-      setSetter(this, "cjsNamespace", (value) => {
-        setProperty(this, "cjsNamespace", { value })
+      setDeferred(this, "esmNamespace", () => {
+        return toNamespace(this)
       })
     }
 

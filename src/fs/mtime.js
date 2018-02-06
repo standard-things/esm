@@ -1,29 +1,15 @@
 import binding from "../binding"
-import { satisfies } from "semver"
+import shared from "../shared.js"
 import { statSync } from "fs"
-
-const { getStatValues, stat } = binding.fs
-
-const useGetStatValues = typeof getStatValues === "function"
-
-let useMtimeFastPath =
-  typeof stat === "function" &&
-  satisfies(process.version, "^6.10.1||>=7.7")
-
-let statValues
-
-if (useMtimeFastPath) {
-  statValues = useGetStatValues
-    ? getStatValues()
-    : new Float64Array(14)
-}
 
 function mtime(filename) {
   if (typeof filename !== "string") {
     return -1
   }
 
-  if (useMtimeFastPath) {
+  const { fastPath } = shared
+
+  if (fastPath.mtime) {
     try {
       return fastPathMtime(filename)
     } catch ({ code }) {
@@ -31,7 +17,7 @@ function mtime(filename) {
         return -1
       }
 
-      useMtimeFastPath = false
+      fastPath.mtime = false
     }
   }
 
@@ -49,13 +35,13 @@ function fastPathMtime(filename) {
   // Used to speed up file stats. Modifies the `statValues` typed array,
   // with index 11 being the mtime milliseconds stamp. The speedup comes
   // from not creating Stat objects.
-  if (useGetStatValues) {
-    stat(filename)
+  if (shared.support.getStatValues) {
+    binding.fs.stat(filename)
   } else {
-    stat(filename, statValues)
+    binding.fs.stat(filename, shared.statValues)
   }
 
-  return statValues[11]
+  return shared.statValues[11]
 }
 
 export default mtime

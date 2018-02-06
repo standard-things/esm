@@ -1,19 +1,16 @@
 import binding from "../binding.js"
-import hiddenKeyType from "../hidden-key-type.js"
 import isObjectLike from "./is-object-like.js"
-
-const _setHiddenValue = binding.util.setHiddenValue
-
-const useSetHiddenValue =
-  hiddenKeyType !== "undefined" &&
-  typeof _setHiddenValue === "function"
+import shared from "../shared.js"
 
 function setHiddenValue(object, key, value) {
-  if (useSetHiddenValue &&
-      typeof key === hiddenKeyType &&
-      isObjectLike(object)) {
+  if (! isObjectLike(object)) {
+    return
+  }
+
+  if (shared.support.setHiddenValue &&
+      typeof key === shared.hiddenKeyType) {
     try {
-      return _setHiddenValue(object, key, value)
+      return binding.util.setHiddenValue(object, key, value)
     } catch (e) {}
   }
 

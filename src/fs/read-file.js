@@ -1,22 +1,21 @@
 import binding from "../binding.js"
 import readFileSync from "./read-file-sync.js"
+import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
-
-const { internalModuleReadFile } = binding.fs
-
-let useReadFileFastPath = typeof internalModuleReadFile === "function"
 
 function readFile(filename, options) {
   if (typeof filename !== "string") {
     return null
   }
 
-  if (useReadFileFastPath &&
+  const { fastPath } = shared
+
+  if (fastPath.readFile &&
       options === "utf8") {
     try {
       return fastPathReadFile(filename)
     } catch (e) {
-      useReadFileFastPath = false
+      fastPath.readFile = false
     }
   }
 
@@ -31,7 +30,7 @@ function fastPathReadFile(filename) {
 
   // Warning: This internal method will crash if `filename` is a directory.
   // https://github.com/nodejs/node/issues/8307
-  const content = internalModuleReadFile(filename)
+  const content = binding.fs.internalModuleReadFile(filename)
   return content === void 0 ? null : content
 }
 

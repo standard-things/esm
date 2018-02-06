@@ -2,18 +2,19 @@ import { Gzip } from "minizlib"
 
 import _createOptions from "../util/create-options.js"
 import { gzipSync } from "zlib"
+import shared from "../shared.js"
 import streamToBuffer from "./stream-to-buffer.js"
-
-let useGzipFastPath = true
 
 function gzip(bufferOrString, options) {
   options = gzip.createOptions(options)
 
-  if (useGzipFastPath) {
+  const { fastPath } = shared
+
+  if (fastPath.gzip) {
     try {
       return fastPathGzip(bufferOrString, options)
     } catch (e) {
-      useGzipFastPath = false
+      fastPath.gzip = false
     }
   }
   return fallbackGzip(bufferOrString, options)
