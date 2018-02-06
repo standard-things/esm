@@ -11,6 +11,8 @@ import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
+const { freeze } = Object
+
 const indirectEval = eval
 
 class Runtime {
@@ -66,27 +68,38 @@ class Runtime {
   }
 
   globalEval(content) {
+    if (typeof content !== "string") {
+      return indirectEval(content)
+    }
+
     const { entry } = this
     const { runtimeName } = entry
 
     if (! (runtimeName in global)) {
-      setProperty(global, runtimeName, {
-        enumerable: false,
-        value: {
-          __proto__: null,
-          i: this.i.bind({
-            __proto__: null,
-            entry
-          })
-        }
+      const globalImport = this.import.bind({
+        __proto__: null,
+        entry
       })
+
+      const globalRuntime = new NullObject
+
+      setProperty(globalRuntime, "i", {
+        enumerable: false,
+        value: globalImport
+      })
+
+      setProperty(global, runtimeName, {
+        configurable: false,
+        enumerable: false,
+        value: globalRuntime,
+        writable: false
+      })
+
+      freeze(globalImport)
+      freeze(globalRuntime)
     }
 
-    if (typeof content === "string") {
-      content = Compiler.compile(this.entry, content, { eval: true }).code
-    }
-
-    return indirectEval(content)
+    return indirectEval(Compiler.compile(entry, content, { eval: true }).code)
   }
 
   import(request) {
