@@ -17,8 +17,10 @@ const defNs = createNamespace({
 module.exports = () => {
   return Promise
     .all([
-      { id: "../../fixture/eval/dynamic/cjs.js", ns: defNs },
-      { id: "../../fixture/eval/dynamic/esm.js", ns: abcNs }
+      { id: "../../fixture/eval/direct/dynamic/cjs.js", ns: defNs },
+      { id: "../../fixture/eval/direct/dynamic/esm.js", ns: abcNs },
+      { id: "../../fixture/eval/indirect/dynamic/cjs.js", ns: defNs },
+      { id: "../../fixture/eval/indirect/dynamic/esm.js", ns: abcNs }
     ].map((data) =>
       require(data.id)
         .then((ns) => assert.deepStrictEqual(ns, data.ns))

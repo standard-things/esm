@@ -753,7 +753,8 @@ describe("spec compliance", () => {
   it("should not support `import.meta` in CJS", () =>
     Promise.all([
       "./fixture/meta.js",
-      "./fixture/eval/meta.js"
+      "./fixture/eval/direct/meta.js",
+      "./fixture/eval/indirect/meta.js"
     ].map((request) =>
       import(request)
         .then((ns) => assert.ok(false))
