@@ -1,7 +1,5 @@
 import { inspect, promisify } from "util"
 
-import FastObject from "./fast-object.js"
-
 import getModuleURL from "./util/get-module-url.js"
 import setProperty from "./util/set-property.js"
 import toStringLiteral from "./util/to-string-literal.js"
@@ -15,18 +13,19 @@ try {
   codeSym = symbols.length ? symbols[0] : Symbol.for("@std/esm:errorCode")
 }
 
-const messages = new FastObject
-
-messages.ERR_EXPORT_MISSING = exportMissing
-messages.ERR_EXPORT_STAR_CONFLICT = exportStarConflict
-messages.ERR_INVALID_ARG_TYPE = invalidArgType
-messages.ERR_INVALID_ARG_VALUE = invalidArgValue
-messages.ERR_INVALID_PROTOCOL = invalidProtocol
-messages.ERR_MISSING_MODULE = missingESM
-messages.ERR_MODULE_RESOLUTION_LEGACY = moduleResolutionLegacy
-messages.ERR_REQUIRE_ESM = requireESM
-messages.ERR_UNKNOWN_FILE_EXTENSION = unknownFileExtension
-messages.MODULE_NOT_FOUND = missingCJS
+const messages = {
+  __proto__: null,
+  ERR_EXPORT_MISSING: exportMissing,
+  ERR_EXPORT_STAR_CONFLICT: exportStarConflict,
+  ERR_INVALID_ARG_TYPE: invalidArgType,
+  ERR_INVALID_ARG_VALUE: invalidArgValue,
+  ERR_INVALID_PROTOCOL: invalidProtocol,
+  ERR_MISSING_MODULE: missingESM,
+  ERR_MODULE_RESOLUTION_LEGACY: moduleResolutionLegacy,
+  ERR_REQUIRE_ESM: requireESM,
+  ERR_UNKNOWN_FILE_EXTENSION: unknownFileExtension,
+  MODULE_NOT_FOUND: missingCJS
+}
 
 function createBuiltinClass(Super) {
   return class BuiltinError extends Super {
@@ -125,10 +124,11 @@ function unknownFileExtension(filename) {
   return "Unknown file extension: " + filename
 }
 
-const errors = new FastObject
-
-errors.Error = createNodeClass(Error)
-errors.SyntaxError = createBuiltinClass(SyntaxError)
-errors.TypeError = createNodeClass(TypeError)
+const errors = {
+  __proto__: null,
+  Error: createNodeClass(Error),
+  SyntaxError: createBuiltinClass(SyntaxError),
+  TypeError: createNodeClass(TypeError)
+}
 
 export default errors
