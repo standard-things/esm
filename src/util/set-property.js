@@ -11,6 +11,13 @@ const defaultDescriptor = {
 
 function setProperty(object, key, descriptor) {
   descriptor = createOptions(descriptor, defaultDescriptor)
+
+  if ("get" in descriptor ||
+      "set" in descriptor) {
+    delete descriptor.value
+    delete descriptor.writable
+  }
+
   return setDescriptor(object, key, descriptor)
 }
 
