@@ -20,11 +20,11 @@ const content = [
 const filename = path.resolve(__dirname, "virtual.js")
 const intercepted = []
 const mod = new Module(".", null)
-const origRequire = Module.prototype.require
+const oldRequire = Module.prototype.require
 
 Module.prototype.require = function (request) {
   intercepted.push(request)
-  return origRequire.apply(this, arguments)
+  return oldRequire.apply(this, arguments)
 }
 
 try {
@@ -32,7 +32,7 @@ try {
   mod.paths = Module._nodeModulePaths(__dirname)
   mod._compile(content, filename)
 } finally {
-  Module.prototype.require = origRequire
+  Module.prototype.require = oldRequire
 }
 
 module.exports = () => {

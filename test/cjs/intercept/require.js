@@ -9,11 +9,11 @@ const expected = [
 ]
 
 const intercepted = []
-const origRequire = Module.prototype.require
+const oldRequire = Module.prototype.require
 
 Module.prototype.require = function (request) {
   intercepted.push(request)
-  return origRequire.apply(this, arguments)
+  return oldRequire.apply(this, arguments)
 }
 
 let assert
@@ -23,7 +23,7 @@ try {
   require(expected[1])
   require(expected[2])
 } finally {
-  Module.prototype.require = origRequire
+  Module.prototype.require = oldRequire
 }
 
 module.exports = () => {

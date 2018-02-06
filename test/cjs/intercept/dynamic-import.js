@@ -20,11 +20,11 @@ const content = [
 const filename = path.resolve(__dirname, "virtual.js")
 const intercepted = []
 const mod = new Module(".", null)
-const origRequire = Module.prototype.require
+const oldRequire = Module.prototype.require
 
 Module.prototype.require = function (request) {
   intercepted.push(request)
-  return origRequire.apply(this, arguments)
+  return oldRequire.apply(this, arguments)
 }
 
 try {
@@ -35,7 +35,7 @@ try {
 
 module.exports = () => {
   return new Promise((resolve) => setImmediate(() => {
-    Module.prototype.require = origRequire
+    Module.prototype.require = oldRequire
 
     assert.deepStrictEqual(intercepted.sort(), expected)
     resolve()
