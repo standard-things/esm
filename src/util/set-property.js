@@ -2,6 +2,7 @@ import createOptions from "./create-options.js"
 import setDescriptor from "./set-descriptor.js"
 
 const defaultDescriptor = {
+  __proto__: null,
   configurable: true,
   enumerable: true,
   value: void 0,

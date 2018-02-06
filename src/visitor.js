@@ -4,7 +4,6 @@
 
 import SafeWeakMap from "./safe-weak-map.js"
 
-import createOptions from "./util/create-options.js"
 import isObject from "./util/is-object.js"
 
 const { isArray } = Array
@@ -12,7 +11,8 @@ const { keys } = Object
 
 const childNamesMap = new SafeWeakMap
 
-const childrenToVisit = createOptions({
+const childrenToVisit = {
+  __proto__: null,
   alternate: true,
   argument: true,
   arguments: true,
@@ -32,7 +32,7 @@ const childrenToVisit = createOptions({
   properties: true,
   right: true,
   value: true
-})
+}
 
 class Visitor {
   visit(path) {

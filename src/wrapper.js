@@ -55,6 +55,7 @@ function createMap(object, key) {
   // function, so that other code can modify the same property  without
   // interfering with our wrapper logic.
   return getOrCreateStore(object)[key] = {
+    __proto__: null,
     raw: Wrapper.unwrap(object, key),
     versions: [],
     wrappers: new NullObject

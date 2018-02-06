@@ -26,6 +26,7 @@ const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
 
 const defaultOptions = {
+  __proto__: null,
   cache: true,
   cjs: {
     cache: false,

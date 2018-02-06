@@ -31,7 +31,11 @@ function fastPathGzip(bufferOrString, options) {
   return streamToBuffer(new Gzip(options), bufferOrString)
 }
 
-gzip.defaultOptions = { level: 9 }
+gzip.defaultOptions = {
+  __proto__: null,
+  level: 9
+}
+
 gzip.createOptions = createOptions
 
 export default gzip

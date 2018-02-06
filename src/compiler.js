@@ -12,6 +12,7 @@ import stripShebang from "./util/strip-shebang.js"
 const { keys } = Object
 
 const defaultOptions = {
+  __proto__: null,
   cjs: {
     cache: false,
     extensions: false,

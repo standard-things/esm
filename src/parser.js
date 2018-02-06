@@ -9,6 +9,7 @@ import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 import { enable as enableTopLevel } from "./acorn-ext/top-level.js"
 
 const defaultOptions = {
+  __proto__: null,
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
   sourceType: "module"
