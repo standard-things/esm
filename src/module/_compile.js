@@ -19,12 +19,10 @@ import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
-import { satisfies } from "semver"
+import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
-
-const useTopLevelAwait = satisfies(process.version, ">=7.6.0")
 
 const { keys } = Object
 
@@ -274,8 +272,8 @@ function tryValidateESM(caller, entry) {
 }
 
 function useAsyncWrapper(entry) {
-  if (useTopLevelAwait &&
-      entry.package.options.await) {
+  if (entry.package.options.await &&
+      shared.support.await) {
     const cached = entry.package.cache[entry.cacheName]
     const exportSpecifiers = cached && cached.exportSpecifiers
 

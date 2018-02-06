@@ -72,6 +72,10 @@ if (! __shared__) {
     return binding.util.arrow_message_private_symbol !== void 0
   })
 
+  setDeferred(support, "await", () => {
+    return satisfies(nodeVersion, ">=7.6.0")
+  })
+
   setDeferred(support, "decoratedSymbol", () => {
     return binding.util.decorated_private_symbol !== void 0
   })
