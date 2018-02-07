@@ -25,6 +25,10 @@ const abcNs = createNamespace({
   default: "default"
 })
 
+const defNs = createNamespace({
+  default: { d: "d", e: "e", f: "f" }
+})
+
 const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
@@ -701,7 +705,7 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
-  it("should namespace objects should be thenable", () =>
+  it("should have thenable namespace objects", () =>
     import("./fixture/export/thenable.mjs")
       .then((value) => assert.strictEqual(value, "thenable"))
   )
@@ -721,33 +725,63 @@ describe("spec compliance", () => {
       .then((ns) => assert.strictEqual(ns.default, "delete cache"))
   })
 
+  it("should support dynamic import in CJS", () =>
+    require("./fixture/import/dynamic.js")
+      .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
+  )
+
+  it("should support evaled dynamic import in ESM", () => {
+    const code = `
+      Promise.all([
+        import("./fixture/export/abc.mjs"),
+        import("./fixture/export/def.js")
+      ])
+    `
+
+    return Promise
+      .all([
+        eval(code),
+        (0, eval)(code)
+      ].map((promise) =>
+        promise
+          .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
+      ))
+  })
+
+  it("should support evaled dynamic import in CJS", () =>
+    Promise.all([
+      "./fixture/eval/direct/dynamic.js",
+      "./fixture/eval/indirect/dynamic.js"
+    ].map((request) =>
+      require(request)
+        .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
+    ))
+  )
+
+  it("should support evaled strict mode code in ESM", () => {
+    const code = `
+      "use strict"
+      import("path")
+      ;(function() { return this })()
+    `
+
+    assert.strictEqual(eval(code), void 0)
+    assert.strictEqual((0, eval)(code), void 0)
+  })
+
+  it("should support evaled strict mode code in CJS", () => {
+    [
+      "./fixture/eval/direct/strict.js",
+      "./fixture/eval/indirect/strict.js"
+    ]
+    .forEach((request) => {
+      assert.strictEqual(require(request), void 0)
+    })
+  })
+
   it("should support `import.meta` in ESM", () =>
     import("./misc/meta.mjs")
       .then((ns) => ns.default())
-  )
-
-  it("should support dynamic import in CJS", () =>
-    import("./misc/import/dynamic.js")
-      .then((ns) => ns.default())
-  )
-
-  it("should support evaled dynamic import in CJS", () =>
-    import("./misc/eval/dynamic.js")
-      .then((ns) => ns.default())
-  )
-
-  it("should not have CJS free variables", () =>
-    import("./misc/free-vars.mjs")
-      .then((ns) => ns.default())
-  )
-
-  it("should not export CJS named binding", () =>
-    import("./fixture/export/cjs-named.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.includes("' does not provide an export named '"))
-      })
   )
 
   it("should not support `import.meta` in CJS", () =>
@@ -768,7 +802,7 @@ describe("spec compliance", () => {
   it("should not support evaled `import.meta` in ESM", () => {
     [
       () => eval("import.meta"),
-      () => (0, eval)("import.meta"),
+      () => (0, eval)("import.meta")
     ]
     .forEach((evaler) => {
       assert.throws(
@@ -778,6 +812,20 @@ describe("spec compliance", () => {
       )
     })
   })
+
+  it("should not have CJS free variables", () =>
+    import("./misc/free-vars.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should not export CJS named binding", () =>
+    import("./fixture/export/cjs-named.mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.ok(e instanceof SyntaxError)
+        assert.ok(e.message.includes("' does not provide an export named '"))
+      })
+  )
 
   it("should not support loading ESM from require", () =>
     import("./fixture/require-esm.js")
