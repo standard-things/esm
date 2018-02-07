@@ -1,11 +1,11 @@
-_.e([["value",()=>localValue],["indirect",()=>indirect],["direct",()=>direct]]);let localValue = "original"
+_.e([["a",()=>a]]);let a = "a"
 
+const o = { d, eval:_.g, f }
 
+o.eval = _.g
 
-function indirect(code) {
-  return (0, _.g)(code)
-}
+;(0, _.g)(code)
 
-function direct(code) {
-  return _.u(eval(_.c(code)))
-}
+eval()
+
+_.u(eval(_.c(code)))

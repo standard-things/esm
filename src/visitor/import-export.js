@@ -45,24 +45,27 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitCallExpression(path) {
-    const { callee } = path.getValue()
+    const node = path.getValue()
+    const { callee } = node
 
-    if (callee.type === "Import") {
+    if (node.arguments.length &&
+        callee.name === "eval") {
+      // Support direct eval:
+      // eval(code)
+      this.changed =
+      this.addedDirectEval = true
+
+      wrapInCompile(this, path)
+    } else if (callee.type === "Import") {
       // Support dynamic import:
       // import("mod")
       this.changed =
       this.addedDynamicImport = true
+
       overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
     }
 
     this.visitChildren(path)
-
-    if (callee.type === "Identifier" &&
-        callee.name === "eval") {
-      this.changed =
-      this.addedDirectEval = true
-      wrapEval(this, path)
-    }
   }
 
   visitIdentifier(path) {
@@ -73,17 +76,25 @@ class ImportExportVisitor extends Visitor {
     }
 
     const parent = path.getParentNode()
-    const { callee } = parent
+    const { type } = parent
 
-    if (parent.type === "CallExpression" &&
-        callee.type === "Identifier" &&
-        callee.name === "eval") {
+    if (type === "CallExpression") {
       return
     }
 
+    // Support indirect eval:
+    // o = { eval }
+    // o.e = eval
+    // (0, eval)(code)
     this.changed =
     this.addedIndirectEval = true
-    overwrite(this, node.start, node.end, this.runtimeName + ".g")
+
+    if (type === "Property" &&
+        parent.shorthand) {
+      this.magicString.prependRight(node.end, ":" + this.runtimeName + ".g")
+    } else {
+      overwrite(this, node.start, node.end, this.runtimeName + ".g")
+    }
   }
 
   visitImportDeclaration(path) {
@@ -343,6 +354,7 @@ class ImportExportVisitor extends Visitor {
       // Support import.meta.
       this.changed =
       this.addedImportMeta = true
+
       overwrite(this, meta.start, meta.end, this.runtimeName + "._")
     }
   }
@@ -567,7 +579,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
   return code
 }
 
-function wrapEval(visitor, path) {
+function wrapInCompile(visitor, path) {
   const { callee, end } = path.getValue()
 
   visitor.magicString

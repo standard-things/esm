@@ -1,11 +1,11 @@
-let localValue = "original"
+export let a = "a"
 
-export { localValue as value }
+const o = { d, eval, f }
 
-export function indirect(code) {
-  return (0, eval)(code)
-}
+o.eval = eval
 
-export function direct(code) {
-  return eval(code)
-}
+;(0, eval)(code)
+
+eval()
+
+eval(code)

@@ -17,24 +17,25 @@ class AssignmentVisitor extends Visitor {
   }
 
   visitAssignmentExpression(path) {
-    this.visitChildren(path)
     assignmentHelper(this, path, "left")
+    this.visitChildren(path)
   }
 
   visitCallExpression(path) {
-    this.visitChildren(path)
+    const node = path.getValue()
 
-    const { callee } = path.getValue()
-
-    if (callee.type === "Identifier" &&
-        callee.name === "eval") {
-      wrapUpdate(this, path)
+    if (node.arguments.length &&
+        node.callee.name === "eval") {
+      // Wrap direct eval calls.
+      wrapInUpdate(this, path)
     }
+
+    this.visitChildren(path)
   }
 
   visitUpdateExpression(path) {
-    this.visitChildren(path)
     assignmentHelper(this, path, "argument")
+    this.visitChildren(path)
   }
 }
 
@@ -56,11 +57,11 @@ function assignmentHelper(visitor, path, childName) {
     }
   }
 
-  // Wrap assignments to exported identifiers with `runtime.update()`.
   for (const name of names) {
     if (assignableExports[name] === true &&
         ! isShadowed(path, name)) {
-      wrapUpdate(visitor, path)
+      // Wrap assignments to exported identifiers.
+      wrapInUpdate(visitor, path)
       return
     }
   }
@@ -123,7 +124,7 @@ function isShadowed(path, name) {
   return shadowed
 }
 
-function wrapUpdate(visitor, path) {
+function wrapInUpdate(visitor, path) {
   const { end, start } = path.getValue()
 
   visitor.magicString
