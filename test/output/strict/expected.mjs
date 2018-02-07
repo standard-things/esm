@@ -5,5 +5,5 @@ _.d(() => {
     return this
   })()
 
-  assert.strictEqual(that, void 0)
+  assert.strictEqual(typeof that, "undefined")
 });

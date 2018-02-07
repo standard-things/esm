@@ -519,7 +519,7 @@ describe("Node rules", () => {
       .then((ns) => {
         const mod = ns.default
         assert.ok("parent" in mod)
-        assert.strictEqual(mod.parent, void 0)
+        assert.strictEqual(typeof mod.parent, "undefined")
       })
   )
 
@@ -765,8 +765,8 @@ describe("spec compliance", () => {
       ;(function() { return this })()
     `
 
-    assert.strictEqual(eval(code), void 0)
-    assert.strictEqual((0, eval)(code), void 0)
+    assert.strictEqual(typeof eval(code), "undefined")
+    assert.strictEqual(typeof (0, eval)(code), "undefined")
   })
 
   it("should support evaled strict mode code in CJS", () => {
@@ -775,7 +775,7 @@ describe("spec compliance", () => {
       "./fixture/eval/indirect/strict.js"
     ]
     .forEach((request) => {
-      assert.strictEqual(require(request), void 0)
+      assert.strictEqual(typeof require(request), "undefined")
     })
   })
 
