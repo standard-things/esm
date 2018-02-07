@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = (1, eval)("import.meta")
+module.exports = (0, eval)("import.meta")

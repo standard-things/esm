@@ -1,9 +1,5 @@
 "use strict"
 
-Promise
-  .all([
-    require("../import/dynamic/cjs.js"),
-    require("../import/dynamic/esm.js")
-  ])
+require("../import/dynamic.js")
   .then(() => console.log("dynamic-import-cjs:true"))
   .catch((e) => console.log(e))

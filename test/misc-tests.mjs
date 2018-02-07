@@ -16,12 +16,6 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
 const slashRegExp = /[\\/]/g
 
-const pkgPath = path.resolve("../index.js")
-const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
-const pkgOptions = fs.pathExistsSync(".esmrc")
-  ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : pkgJSON["@std/esm"]
-
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
 const abcNs = createNamespace({
@@ -30,6 +24,12 @@ const abcNs = createNamespace({
   c: "c",
   default: "default"
 })
+
+const pkgPath = path.resolve("../index.js")
+const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
+const pkgOptions = fs.pathExistsSync(".esmrc")
+  ? JSON6.parse(fs.readFileSync(".esmrc"))
+  : pkgJSON["@std/esm"]
 
 function checkError(error, code) {
   const message = error.message
@@ -766,11 +766,17 @@ describe("spec compliance", () => {
   )
 
   it("should not support evaled `import.meta` in ESM", () => {
-    assert.throws(
+    [
       () => eval("import.meta"),
-      SyntaxError,
-      "Cannot use 'import.meta' outside a module"
-    )
+      () => (0, eval)("import.meta"),
+    ]
+    .forEach((evaler) => {
+      assert.throws(
+        evaler,
+        SyntaxError,
+        "Cannot use 'import.meta' outside a module"
+      )
+    })
   })
 
   it("should not support loading ESM from require", () =>
