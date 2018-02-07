@@ -144,8 +144,7 @@ function toCompileOptions(entry, options) {
   if (options.eval) {
     return {
       cjs: entry.package.options.cjs,
-      runtimeName: entry.runtimeName,
-      var: true
+      runtimeName: entry.runtimeName
     }
   }
 
