@@ -76,6 +76,15 @@ if (! __shared__) {
     return satisfies(nodeVersion, ">=7.6.0")
   })
 
+  setDeferred(support, "blockScopedDeclarations", () => {
+    try {
+      eval("let a")
+      return true
+    } catch (e) {}
+
+    return false
+  })
+
   setDeferred(support, "decoratedSymbol", () => {
     return binding.util.decorated_private_symbol !== void 0
   })
