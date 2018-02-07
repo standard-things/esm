@@ -4,6 +4,7 @@ import NullObject from "./null-object.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
+import hasPragma from "./parse/has-pragma.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
@@ -73,9 +74,31 @@ class Runtime {
     }
 
     const { entry } = this
-    const { runtimeName } = entry
+    const result = Compiler.compile(entry, content, { eval: true })
 
-    if (! (runtimeName in global)) {
+    if (! result.changed) {
+      return indirectEval(content)
+    }
+
+    const { runtimeName } = entry
+    const { blockScopedDeclarations } = shared.support
+
+    content = result.code
+
+    if (blockScopedDeclarations) {
+      content =
+        (hasPragma(content, "use strict") ? '"use strict";' : "") +
+        "let " + runtimeName + "=global." + runtimeName + ";" +
+        content
+
+      setProperty(global, runtimeName, {
+        enumerable: false,
+        get: () => {
+          delete global[runtimeName]
+          return this
+        }
+      })
+    } else if (! (runtimeName in global)) {
       const globalImport = this.import.bind({
         __proto__: null,
         entry
@@ -99,7 +122,7 @@ class Runtime {
       freeze(globalRuntime)
     }
 
-    return indirectEval(Compiler.compile(entry, content, { eval: true }).code)
+    return indirectEval(content)
   }
 
   import(request) {
