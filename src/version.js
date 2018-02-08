@@ -4,6 +4,7 @@ import SemVer from "semver"
 // `@std/esm` version string. See https://webpack.js.org/plugins/environment-plugin/.
 const semver = new SemVer(process.env.ESM_VERSION)
 const { major, minor, patch, version } = semver
+const name = "@std/esm@" + version
 
-export { major, minor, patch, version }
+export { name, major, minor, patch, version }
 export default semver

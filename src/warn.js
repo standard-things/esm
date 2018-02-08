@@ -2,6 +2,7 @@ import FastObject from "./fast-object.js"
 
 import emitWarning from "./warning/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
+import { name as stdName } from "./version.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const cacheKeys = {
@@ -34,22 +35,22 @@ function getCacheKey(code, args) {
 }
 
 function argumentsAccess(request, line, column) {
-  return "@std/esm detected undefined arguments access (" +
+  return stdName + " detected undefined arguments access (" +
     line + ":" + column + "): " + getModuleURL(request)
 }
 
 function namespaceAssignment(request, key) {
-  return "@std/esm cannot assign to the read only module namespace property " +
+  return stdName + " cannot assign to the read only module namespace property " +
     toStringLiteral(key, "'") + " of " + getModuleURL(request)
 }
 
 function namespaceExtension(request, key) {
-  return "@std/esm cannot add property " + toStringLiteral(key, "'") +
+  return stdName + " cannot add property " + toStringLiteral(key, "'") +
     " to module namespace of " + getModuleURL(request)
 }
 
 function temporalDeadZoneAccess(request, varName) {
-  return "@std/esm detected possible temporal dead zone access of '" +
+  return stdName + " detected possible temporal dead zone access of '" +
     varName + "' in " + getModuleURL(request)
 }
 

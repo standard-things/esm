@@ -15,10 +15,10 @@ class Wrapper {
     const map = getMap(object, key)
 
     if (map) {
-      const version = maxSatisfying(map.versions, range)
+      const maxVersion = maxSatisfying(map.versions, range)
 
-      if (version) {
-        return map.wrappers[version]
+      if (maxVersion) {
+        return map.wrappers[maxVersion]
       }
     }
 

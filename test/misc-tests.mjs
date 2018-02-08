@@ -35,6 +35,8 @@ const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
   : pkgJSON["@std/esm"]
 
+const stdName = "@std/esm@" + pkgJSON.version
+
 function checkError(error, code) {
   const message = error.message
   checkErrorProps(error, code, message)
@@ -1038,7 +1040,7 @@ describe("spec compliance", () => {
     ].reduce((promise, data) => {
       const filename = path.resolve(data.id)
       const url = getURLFromFilePath(filename)
-      const stderr = getWarning("@std/esm detected undefined arguments access (%s): %s", data.loc, url)
+      const stderr = getWarning(stdName + " detected undefined arguments access (%s): %s", data.loc, url)
 
       return promise
         .then(() => {
@@ -1052,7 +1054,7 @@ describe("spec compliance", () => {
   it("should warn for potential TDZ access", () => {
     const filename = path.resolve("fixture/cycle/tdz/a.mjs")
     const url = getURLFromFilePath(filename)
-    const stderr = getWarning("@std/esm detected possible temporal dead zone access of 'a' in %s", url)
+    const stderr = getWarning(stdName + " detected possible temporal dead zone access of 'a' in %s", url)
 
     mockIo.start()
     return import(filename)
