@@ -78,7 +78,7 @@ if (! __shared__) {
 
   setDeferred(support, "blockScopedDeclarations", () => {
     try {
-      eval("let a")
+      (0, eval)("let a")
       return true
     } catch (e) {}
 
