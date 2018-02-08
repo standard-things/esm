@@ -24,11 +24,14 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import setProperty from "../util/set-property.js"
+import shared from "../shared.js"
+import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+const importExportRegExp = /\b(?:im|ex)port\b/
 
 const compileSym = Symbol.for("@std/esm:module._compile")
 const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
@@ -214,6 +217,14 @@ function tryPassthru(func, args, options) {
 
       const [, filename] = args
       const content = () => readSourceCode(filename, options)
+      const { message } = e
+
+      if (e.name === "SyntaxError" &&
+          importExportRegExp.test(message)) {
+        e.message = stdName + " is not enabled for " + filename
+        e.stack = e.stack.replace(message, e.message)
+        shared.dirtyCache = true
+      }
 
       throw maskStackTrace(e, content, filename)
     }

@@ -96,6 +96,8 @@ class Package {
             hasBuffer = true
           } else if (cacheName === ".data.json") {
             hasMap = true
+          } else if (cacheName === ".dirty") {
+            cache.dirty = true
           }
         }
 

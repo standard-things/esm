@@ -246,6 +246,10 @@ if (! shared.inited) {
       writeFile(resolve(cachePath, ".data.blob"), concat(buffers))
       writeFile(resolve(cachePath, ".data.json"), stringify(map))
     }
+
+    if (shared.dirtyCache) {
+      writeFile(resolve(cachePath, ".dirty"), "")
+    }
   })
 }
 
