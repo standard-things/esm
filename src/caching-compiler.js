@@ -204,24 +204,6 @@ if (! shared.inited) {
       }
     }
 
-    for (const cachePath in pendingWrites) {
-      if (! mkdirp(cachePath)) {
-        continue
-      }
-
-      const contents = pendingWrites[cachePath]
-
-      for (const cacheName in contents) {
-        const content = extname(cacheName) === ".gz"
-          ? gzip(contents[cacheName])
-          : contents[cacheName]
-
-        if (writeFile(resolve(cachePath, cacheName), content)) {
-          removeExpired(cachePath, cacheName)
-        }
-      }
-    }
-
     for (const cachePath in pendingMetas) {
       if (! mkdirp(cachePath)) {
         continue
@@ -280,6 +262,24 @@ if (! shared.inited) {
 
       writeFile(resolve(cachePath, ".data.blob"), concat(buffers))
       writeFile(resolve(cachePath, ".data.json"), stringify(map))
+    }
+
+    for (const cachePath in pendingWrites) {
+      if (! mkdirp(cachePath)) {
+        continue
+      }
+
+      const contents = pendingWrites[cachePath]
+
+      for (const cacheName in contents) {
+        const content = extname(cacheName) === ".gz"
+          ? gzip(contents[cacheName])
+          : contents[cacheName]
+
+        if (writeFile(resolve(cachePath, cacheName), content)) {
+          removeExpired(cachePath, cacheName)
+        }
+      }
     }
   })
 }
