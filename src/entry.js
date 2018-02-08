@@ -161,7 +161,7 @@ class Entry {
         getters[key] = getter
       }
 
-      const cached = this.package.cache[this.cacheName]
+      const cached = this.package.cache.compile[this.cacheName]
       const isESM = cached && cached.esm
 
       if (isESM ||
@@ -216,7 +216,7 @@ class Entry {
       }
     }
 
-    const cached = this.package.cache[this.cacheName]
+    const cached = this.package.cache.compile[this.cacheName]
     const isESM = cached && cached.esm
 
     let setGetters = true
@@ -312,7 +312,7 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
   const pkg = entry.package
-  const cached = pkg.cache[entry.cacheName]
+  const cached = pkg.cache.compile[entry.cacheName]
   const exported = entry.module.exports
   const isESM = cached && cached.esm
   const object = entry._loaded === 1 ? _namespace : exported
@@ -394,7 +394,7 @@ function createNamespace() {
 }
 
 function getExportByName(entry, setter, name) {
-  const cached = entry.package.cache[entry.cacheName]
+  const cached = entry.package.cache.compile[entry.cacheName]
   const isESM = cached && cached.esm
 
   const isScript =
@@ -480,7 +480,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  const cached = entry.package.cache[entry.cacheName]
+  const cached = entry.package.cache.compile[entry.cacheName]
   const isESM = cached && cached.esm
 
   if (isESM) {

@@ -15,7 +15,7 @@ function load(request, parent, isMain) {
 
   const childEntry = _load(request, parent, isMain)
   const child = childEntry.module
-  const childCached = childEntry.package.cache[childEntry.cacheName]
+  const childCached = childEntry.package.cache.compile[childEntry.cacheName]
   const childIsESM = childCached && childCached.esm
 
   if (childIsESM &&

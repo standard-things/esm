@@ -24,7 +24,7 @@ const req = function require(request) {
 
   const entry = Entry.get(this)
   const { _requireESM } = entry
-  const cached = entry.package.cache[entry.cacheName]
+  const cached = entry.package.cache.compile[entry.cacheName]
 
   entry._requireESM = false
 

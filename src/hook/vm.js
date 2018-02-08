@@ -40,7 +40,7 @@ function hook(vm) {
 
     entry.cacheName = getCacheFileName(entry, content)
 
-    let cached = entry.package.cache[entry.cacheName]
+    let cached = entry.package.cache.compile[entry.cacheName]
 
     if (cached) {
       if (cached.scriptData &&

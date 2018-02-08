@@ -52,23 +52,23 @@ function compile(caller, entry, content, filename) {
   const { cache } = pkg
   const { cacheName } = entry
 
-  let cached = cache[cacheName]
+  let cached = cache.compile[cacheName]
 
   if (cached === true) {
     cached = Compiler.from(entry)
 
     if (cached) {
       cached.code = readCachedCode(resolve(pkg.cachePath, cacheName), options)
-      cache[cacheName] = cached
+      cache.compile[cacheName] = cached
     } else {
-      delete cache[cacheName]
-      delete cache["data.json"][cacheName]
+      delete cache.compile[cacheName]
+      delete cache.map[cacheName]
     }
   }
 
   if (! cached) {
     cached =
-    cache[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
+    cache.compile[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
   }
 
   if (options.warnings &&
@@ -83,11 +83,11 @@ function compile(caller, entry, content, filename) {
   }
 
   if (moduleState.parsing) {
-    const cached = entry.package.cache[entry.cacheName]
+    const cached = entry.package.cache.compile[entry.cacheName]
     const defaultPkg = Package.default
     const isESM = cached && cached.esm
     const { parent } = entry
-    const parentCached = parent && parent.package.cache[parent.cacheName]
+    const parentCached = parent && parent.package.cache.compile[parent.cacheName]
     const parentIsESM = parentCached && parentCached.esm
 
     if (! isESM &&
@@ -111,7 +111,7 @@ function compile(caller, entry, content, filename) {
 function tryCompileCached(entry) {
   const noDepth = moduleState.requireDepth === 0
   const { options } = entry.package
-  const cached = entry.package.cache[entry.cacheName]
+  const cached = entry.package.cache.compile[entry.cacheName]
   const isESM = cached && cached.esm
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -148,7 +148,7 @@ function tryCompileCJS(entry) {
   let content =
     "const " + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global,exports,require){" +
-    entry.package.cache[entry.cacheName].code +
+    entry.package.cache.compile[entry.cacheName].code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)
@@ -172,7 +172,7 @@ function tryCompileESM(entry) {
     '"use strict";const ' + runtimeName + "=this;" +
     runtimeName + ".r((" + async + "function(global" +
     (options.cjs.vars ? ",exports,require" : "") +
-    "){" + entry.package.cache[entry.cacheName].code + "\n}))"
+    "){" + entry.package.cache.compile[entry.cacheName].code + "\n}))"
 
   content += maybeSourceMap(entry, content)
 
@@ -274,7 +274,7 @@ function tryValidateESM(caller, entry) {
 function useAsyncWrapper(entry) {
   if (entry.package.options.await &&
       shared.support.await) {
-    const cached = entry.package.cache[entry.cacheName]
+    const cached = entry.package.cache.compile[entry.cacheName]
     const exportSpecifiers = cached && cached.exportSpecifiers
 
     if (! exportSpecifiers ||

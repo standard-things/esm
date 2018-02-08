@@ -109,17 +109,17 @@ function hook(Mod, parent) {
 
     setPrototypeOf(mod, Module.prototype)
 
-    let cached = cache[cacheName]
+    let cached = cache.compile[cacheName]
 
     if (cached === true) {
       cached = Compiler.from(entry)
 
       if (cached) {
         cached.code = readCachedCode(resolve(cachePath, cacheName), options)
-        cache[cacheName] = cached
+        cache.compile[cacheName] = cached
       } else {
-        delete cache[cacheName]
-        delete cache["data.json"][cacheName]
+        delete cache.compile[cacheName]
+        delete cache.map[cacheName]
       }
     }
 

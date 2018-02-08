@@ -6,7 +6,7 @@ import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 
 function validate(entry) {
-  const cached = entry.package.cache[entry.cacheName]
+  const cached = entry.package.cache.compile[entry.cacheName]
   const { exportSpecifiers, moduleSpecifiers } = cached
 
   const children = new NullObject
@@ -35,7 +35,7 @@ function validate(entry) {
     const childEntry = children[name]
     const child = childEntry.module
     const childPkg = childEntry.package
-    const childCached = childPkg.cache[childEntry.cacheName]
+    const childCached = childPkg.cache.compile[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
     const requestedExportNames = moduleSpecifiers[name]
 
@@ -88,7 +88,7 @@ function validate(entry) {
     }
 
     const childEntry = children[childName]
-    const childCached = childEntry.package.cache[childEntry.cacheName]
+    const childCached = childEntry.package.cache.compile[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
 
     if (! childIsESM) {

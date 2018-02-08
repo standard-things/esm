@@ -39,8 +39,8 @@ function compile(content, filename) {
 
   const pkg = entry.package
   const { cacheName } = entry
-  const { cachePath } = pkg
-  const cached = pkg.cache[cacheName]
+  const { cache, cachePath } = pkg
+  const cached = cache.compile[cacheName]
   const wrapper = Module.wrap(stripShebang(content))
 
   const buffer =
@@ -73,7 +73,7 @@ function compile(content, filename) {
     } else if (cachedDataRejected) {
       changed = true
 
-      const meta = cached["data.json"][cacheName]
+      const meta = cache.map[cacheName]
 
       if (meta) {
         meta[0] =

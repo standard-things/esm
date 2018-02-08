@@ -32,8 +32,8 @@ class CachingCompiler {
 
     const meta =
       cache &&
-      cache["data.json"] &&
-      cache["data.json"][cacheName]
+      cache.map &&
+      cache.map[cacheName]
 
     if (! meta) {
       return null
@@ -64,7 +64,7 @@ class CachingCompiler {
       }
     }
 
-    const buffer = cache["data.blob"]
+    const { buffer } = cache
     const offsetStart = meta[0]
     const offsetEnd = meta[1]
 
@@ -84,7 +84,7 @@ function compileAndCache(entry, code, options) {
   if (options.eval) {
     const cache = shared.packageCache[""]
     const cacheName = getCacheFileName(entry, code)
-    return cache[cacheName] = result
+    return cache.compile[cacheName] = result
   }
 
   const { cache, cachePath } = entry.package
@@ -105,7 +105,7 @@ function compileAndCache(entry, code, options) {
     }
   }
 
-  return cache[cacheName] = result
+  return cache.compile[cacheName] = result
 }
 
 function compileAndWrite(entry, code, options) {
@@ -130,12 +130,12 @@ function removeExpired(cachePath, cacheName) {
   const cache = shared.packageCache[cachePath]
   const shortname = cacheName.slice(0, 8)
 
-  for (const key in cache) {
-    if (key !== cacheName &&
-        key.startsWith(shortname)) {
-      delete cache[cacheName]
-      delete cache["data.json"][cacheName]
-      removeFile(resolve(cachePath, key))
+  for (const otherCacheName in cache) {
+    if (otherCacheName !== cacheName &&
+        otherCacheName.startsWith(shortname)) {
+      delete cache.compile[cacheName]
+      delete cache.map[cacheName]
+      removeFile(resolve(cachePath, otherCacheName))
     }
   }
 }
@@ -163,6 +163,8 @@ if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
 
   process.once("exit", () => {
+    process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
+
     const { pendingWrites } = shared
 
     for (const cachePath in pendingWrites) {
@@ -194,11 +196,12 @@ if (! shared.inited) {
       const scriptDatas = pendingMetas[cachePath]
 
       for (const cacheName in cache) {
-        const cached = cache[cacheName]
+        const cached = cache.compile[cacheName]
 
-        if (cached !== true &&
+        if (cached &&
+            cached !== true &&
             ! scriptDatas[cacheName]) {
-          scriptDatas[cacheName] = cache[cacheName].scriptData
+          scriptDatas[cacheName] = cached.scriptData
         }
       }
 
@@ -208,8 +211,7 @@ if (! shared.inited) {
       let offset = 0
 
       for (const cacheName in scriptDatas) {
-        if (cacheName === "data.blob" ||
-            cacheName === "data.json") {
+        if (cacheName.charCodeAt(0) === 46 /* . */) {
           continue
         }
 
@@ -224,7 +226,7 @@ if (! shared.inited) {
           buffers.push(scriptData)
         }
 
-        const cached = cache[cacheName]
+        const cached = cache.compile[cacheName]
 
         if (cached) {
           map[cacheName] = [
@@ -241,11 +243,9 @@ if (! shared.inited) {
         }
       }
 
-      writeFile(resolve(cachePath, "data.blob"), concat(buffers))
-      writeFile(resolve(cachePath, "data.json"), stringify(map))
+      writeFile(resolve(cachePath, ".data.blob"), concat(buffers))
+      writeFile(resolve(cachePath, ".data.json"), stringify(map))
     }
-
-    process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
   })
 }
 

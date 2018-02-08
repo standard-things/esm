@@ -78,19 +78,35 @@ class Package {
       cache =
       shared.packageCache[cachePath] = new NullObject
 
-      for (const cacheName of readdir(cachePath)) {
-        // Later, we'll change the cached value to its associated compiler result,
-        // but for now we merely register that a cache file exists.
-        cache[cacheName] = true
+      const compileCache =
+      cache.compile = new NullObject
+
+      if (cachePath) {
+        let hasBuffer
+        let hasMap
+
+        const cacheNames = readdir(cachePath)
+
+        for (const cacheName of cacheNames) {
+          if (cacheName.charCodeAt(0) !== 46 /* . */) {
+            // Later, we'll change the cached value to its associated compiler result,
+            // but for now we merely register that a cache file exists.
+            compileCache[cacheName] = true
+          } else if (cacheName === ".data.blob") {
+            hasBuffer = true
+          } else if (cacheName === ".data.json") {
+            hasMap = true
+          }
+        }
+
+        cache.buffer = hasBuffer
+          ? readFile(resolve(cachePath, ".data.blob"))
+          : new Buffer(0)
+
+        cache.map = hasMap
+          ? readJSON(resolve(cachePath, ".data.json"))
+          : {}
       }
-
-      cache["data.blob"] = cache["data.blob"]
-        ? readFile(resolve(cachePath, "data.blob"))
-        : new Buffer(0)
-
-      cache["data.json"] = cache["data.json"]
-        ? readJSON(resolve(cachePath, "data.json"))
-        : {}
     }
 
     this.cache = cache
