@@ -20,7 +20,6 @@ if (! __shared__) {
   const support = new FastObject
 
   shared.binding = binding
-  shared.dirtyCache = false
   shared.entry = new SafeWeakMap
   shared.env = new FastObject
   shared.fastPath = fastPath

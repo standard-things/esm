@@ -6,6 +6,7 @@ import NullObject from "./null-object.js"
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
 import gzip from "./fs/gzip.js"
+import isCacheFileName from "./util/is-cache-file-name.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
@@ -126,16 +127,23 @@ function compileAndWrite(entry, code, options) {
   return result
 }
 
+function removeCacheFile(cachePath, cacheName) {
+  const cache = shared.packageCache[cachePath]
+
+  delete cache.compile[cacheName]
+  delete cache.map[cacheName]
+  return removeFile(resolve(cachePath, cacheName))
+}
+
 function removeExpired(cachePath, cacheName) {
   const cache = shared.packageCache[cachePath]
   const shortname = cacheName.slice(0, 8)
 
   for (const otherCacheName in cache) {
     if (otherCacheName !== cacheName &&
-        otherCacheName.startsWith(shortname)) {
-      delete cache.compile[cacheName]
-      delete cache.map[cacheName]
-      removeFile(resolve(cachePath, otherCacheName))
+        otherCacheName.startsWith(shortname) &&
+        isCacheFileName(otherCacheName)) {
+      removeCacheFile(cachePath, cacheName)
     }
   }
 }
@@ -165,7 +173,36 @@ if (! shared.inited) {
   process.once("exit", () => {
     process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
 
-    const { pendingWrites } = shared
+    const { packageCache, pendingMetas, pendingWrites } = shared
+
+    for (const cachePath in packageCache) {
+      if (cachePath === "") {
+        continue
+      }
+
+      const cache = packageCache[cachePath]
+
+      if (! cache.dirty) {
+        continue
+      }
+
+      delete pendingWrites[cachePath]
+      delete pendingMetas[cachePath]
+
+      if (! mkdirp(cachePath)) {
+        continue
+      }
+
+      writeFile(resolve(cachePath, ".dirty"), "")
+
+      for (const cacheName in cache.compile) {
+        if (cacheName === ".data.blob" ||
+            cacheName === ".data.json" ||
+            isCacheFileName(cacheName)) {
+          removeCacheFile(cachePath, cacheName)
+        }
+      }
+    }
 
     for (const cachePath in pendingWrites) {
       if (! mkdirp(cachePath)) {
@@ -185,14 +222,12 @@ if (! shared.inited) {
       }
     }
 
-    const { pendingMetas } = shared
-
     for (const cachePath in pendingMetas) {
       if (! mkdirp(cachePath)) {
         continue
       }
 
-      const cache = shared.packageCache[cachePath]
+      const cache = packageCache[cachePath]
       const scriptDatas = pendingMetas[cachePath]
 
       for (const cacheName in cache) {
@@ -245,10 +280,6 @@ if (! shared.inited) {
 
       writeFile(resolve(cachePath, ".data.blob"), concat(buffers))
       writeFile(resolve(cachePath, ".data.json"), stringify(map))
-    }
-
-    if (shared.dirtyCache) {
-      writeFile(resolve(cachePath, ".dirty"), "")
     }
   })
 }

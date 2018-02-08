@@ -24,7 +24,6 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import setProperty from "../util/set-property.js"
-import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
@@ -80,7 +79,7 @@ function hook(Mod, parent) {
 
     return wrapped
       ? wrapped.call(this, manager, func, args)
-      : tryPassthru.call(this, func, args, pkg.options)
+      : tryPassthru.call(this, func, args, pkg)
   }
 
   function methodWrapper(manager, func, args) {
@@ -89,7 +88,8 @@ function hook(Mod, parent) {
     const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
     const entry = Entry.get(mod)
-    const { cache, cachePath, options } = entry.package
+    const pkg = entry.package
+    const { cache, cachePath, options } = pkg
     const cacheName = getCacheFileName(entry, mtime(filename))
 
     const compileWrapper = (content, filename) => {
@@ -103,7 +103,7 @@ function hook(Mod, parent) {
 
       if (! compile(manager, entry, content, filename)) {
         entry.state = 3
-        return tryPassthru.call(this, func, args, options)
+        return tryPassthru.call(this, func, args, pkg)
       }
     }
 
@@ -134,7 +134,7 @@ function hook(Mod, parent) {
 
     if (! cached &&
         passthruMap.get(func)) {
-      tryPassthru.call(this, func, args, options)
+      tryPassthru.call(this, func, args, pkg)
     } else {
       const content = cached ? cached.code : readSourceCode(filename, options)
       mod._compile(content, filename)
@@ -204,7 +204,9 @@ function readSourceCode(filename, options) {
   return readFile(filename, "utf8")
 }
 
-function tryPassthru(func, args, options) {
+function tryPassthru(func, args, pkg) {
+  const options = pkg && pkg.options
+
   if (options && options.debug) {
     func.apply(this, args)
   } else {
@@ -223,7 +225,10 @@ function tryPassthru(func, args, options) {
           importExportRegExp.test(message)) {
         e.message = stdName + " is not enabled for " + filename
         e.stack = e.stack.replace(message, e.message)
-        shared.dirtyCache = true
+
+        if (pkg) {
+          pkg.cache.dirty = true
+        }
       }
 
       throw maskStackTrace(e, content, filename)

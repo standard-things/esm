@@ -18,6 +18,7 @@ import readFileFast from "./fs/read-file-fast.js"
 import readJSON from "./fs/read-json.js"
 import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
+import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
@@ -78,7 +79,7 @@ class Package {
       cache =
       shared.packageCache[cachePath] = new NullObject
 
-      const compileCache =
+      let compileCache =
       cache.compile = new NullObject
 
       if (cachePath) {
@@ -97,7 +98,11 @@ class Package {
           } else if (cacheName === ".data.json") {
             hasMap = true
           } else if (cacheName === ".dirty") {
-            cache.dirty = true
+            compileCache = new NullObject
+            hasBuffer =
+            hasMap = false
+            cleanCache(cachePath)
+            break
           }
         }
 
@@ -167,6 +172,20 @@ class Package {
   static set(dirPath, pkg) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     Package.cache[dirPath] = pkg
+  }
+}
+
+function cleanCache(cachePath) {
+  removeFile(resolve(cachePath, ".dirty"))
+
+  const babelCachePath = resolve(cachePath, "../../@babel/register")
+  const cacheNames = readdir(babelCachePath)
+
+  for (const cacheName of cacheNames) {
+    if (cacheName.startsWith(".babel.") &&
+        extname(cacheName) === ".json") {
+      removeFile(resolve(babelCachePath, cacheName))
+    }
   }
 }
 
