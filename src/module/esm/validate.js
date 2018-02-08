@@ -7,13 +7,13 @@ import getModuleName from "../../util/get-module-name.js"
 
 function validate(entry) {
   const cached = entry.package.cache.compile[entry.cacheName]
-  const { exportSpecifiers, moduleSpecifiers } = cached
+  const { dependencySpecifiers, exportSpecifiers } = cached
 
   const children = new NullObject
   const mod = entry.module
 
   // Parse children.
-  for (const name in moduleSpecifiers) {
+  for (const name in dependencySpecifiers) {
     if (name in builtinEntries) {
       continue
     }
@@ -37,7 +37,7 @@ function validate(entry) {
     const childPkg = childEntry.package
     const childCached = childPkg.cache.compile[childEntry.cacheName]
     const childIsESM = childCached && childCached.esm
-    const requestedExportNames = moduleSpecifiers[name]
+    const requestedExportNames = dependencySpecifiers[name]
 
     if (! childIsESM) {
       if (! namedExports &&

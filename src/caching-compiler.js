@@ -40,18 +40,18 @@ class CachingCompiler {
       return null
     }
 
-    const moduleSpecifiers = meta[5]
-      ? assign(new NullObject, meta[5])
+    const dependencySpecifiers = meta[3]
+      ? assign(new NullObject, meta[3])
       : null
 
     const result = {
       changed: false,
       code: null,
+      dependencySpecifiers,
       esm: !! meta[2],
-      exportNames: meta[3] || null,
+      exportNames: meta[4] || null,
       exportSpecifiers: null,
-      exportStars: meta[4] || null,
-      moduleSpecifiers,
+      exportStars: meta[5] || null,
       scriptData: null,
       warnings: meta[6] || null
     }
@@ -268,9 +268,9 @@ if (! shared.inited) {
             offsetStart,
             offsetEnd,
             cached.esm,
+            cached.dependencySpecifiers,
             cached.exportNames,
             cached.exportStars,
-            cached.moduleSpecifiers,
             cached.warnings
           ]
         } else {

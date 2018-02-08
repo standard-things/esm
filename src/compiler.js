@@ -40,11 +40,11 @@ class Compiler {
     const result = {
       changed: false,
       code,
+      dependencySpecifiers: null,
       esm: false,
       exportNames: null,
       exportSpecifiers: null,
       exportStars: null,
-      moduleSpecifiers: null,
       scriptData: null,
       warnings: null
     }
@@ -152,9 +152,9 @@ class Compiler {
 
     if (type === "module") {
       result.esm = true
+      result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
       result.exportNames = importExportVisitor.exportNames
       result.exportStars = importExportVisitor.exportStars
-      result.moduleSpecifiers = importExportVisitor.moduleSpecifiers
 
       if (options.warnings &&
           ! options.cjs.vars &&

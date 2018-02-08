@@ -32,13 +32,13 @@ class ImportExportVisitor extends Visitor {
     this.assignableImports = new NullObject
     this.changed = false
     this.code = code
-    this.esm = options.esm,
+    this.dependencySpecifiers = new NullObject
+    this.esm = options.esm
     this.exportNames = []
     this.exportStars = []
     this.generateVarDeclarations = options.generateVarDeclarations
     this.madeChanges = false
     this.magicString = new MagicString(code)
-    this.moduleSpecifiers = new NullObject
     this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
     this.top = rootPath.stack[0].top
@@ -171,7 +171,7 @@ class ImportExportVisitor extends Visitor {
 
     this.exportStars.push(specifierName)
 
-    addToModuleSpecifiers(this, specifierName)
+    addToDependencySpecifiers(this, specifierName)
     hoistImports(this, node, hoistedCode)
   }
 
@@ -323,14 +323,14 @@ class ImportExportVisitor extends Visitor {
     const specifierString = getSourceString(this, node)
     const specifierName = specifierString.slice(1, -1)
 
-    addToModuleSpecifiers(this, specifierName)
+    addToDependencySpecifiers(this, specifierName)
 
     for (const specifier of specifiers) {
       const exportName = specifier.exported.name
       const localName = specifier.local.name
 
       exportNames.push(exportName)
-      addToModuleSpecifiers(this, specifierName, localName)
+      addToDependencySpecifiers(this, specifierName, localName)
 
       addToSpecifierMap(
         this,
@@ -378,12 +378,12 @@ function addAssignableImports(visitor, specifierMap) {
   }
 }
 
-function addToModuleSpecifiers(visitor, specifierName, exportName) {
-  const { moduleSpecifiers } = visitor
+function addToDependencySpecifiers(visitor, specifierName, exportName) {
+  const { dependencySpecifiers } = visitor
 
   const exportNames =
-    moduleSpecifiers[specifierName] ||
-    (moduleSpecifiers[specifierName] = [])
+    dependencySpecifiers[specifierName] ||
+    (dependencySpecifiers[specifierName] = [])
 
   if (exportName &&
       exportName !== "*" &&
@@ -544,7 +544,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
 
   let code = visitor.runtimeName + ".w(" + specifierString
 
-  addToModuleSpecifiers(visitor, specifierName)
+  addToDependencySpecifiers(visitor, specifierName)
 
   if (! importNames.length) {
     return code + ");"
@@ -559,7 +559,7 @@ function toModuleImport(visitor, specifierString, specifierMap) {
     const localNames = specifierMap[importName]
     const valueParam = safeName("v", localNames)
 
-    addToModuleSpecifiers(visitor, specifierName, importName)
+    addToDependencySpecifiers(visitor, specifierName, importName)
 
     code +=
       // Generate plain functions, instead of arrow functions,
