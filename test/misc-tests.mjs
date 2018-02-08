@@ -13,7 +13,7 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
-const skipDecorateCheck = SemVer.satisfies(process.version, "<=4")
+const skipDecorateCheck = SemVer.satisfies(process.version, "<5")
 const slashRegExp = /[\\/]/g
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
