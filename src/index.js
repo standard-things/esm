@@ -40,9 +40,11 @@ if (shared.inited) {
     const cloned = clone(mod)
 
     if (cacheKey) {
+      const { cache } = shared.package
+
       Package.cache =
-        shared.package.cache[cacheKey] ||
-        (shared.package.cache[cacheKey] = new FastObject)
+        cache[cacheKey] ||
+        (cache[cacheKey] = new FastObject)
     }
 
     if (isObjectLike(options)) {

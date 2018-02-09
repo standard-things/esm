@@ -73,11 +73,12 @@ class Package {
       cachePath = ""
     }
 
-    let cache = shared.package.dir[cachePath]
+    const { dir } = shared.package
+    let cache = dir[cachePath]
 
     if (! cache) {
       cache =
-      shared.package.dir[cachePath] = new NullObject
+      dir[cachePath] = new NullObject
 
       let compileCache =
       cache.compile = new NullObject
