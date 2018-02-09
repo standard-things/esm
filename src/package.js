@@ -288,7 +288,8 @@ function getRoot(dirPath) {
     return dirPath
   }
 
-  return getRoot(parentPath)
+  const root = getRoot(parentPath)
+  return root === dirname(root) ? dirPath : root
 }
 
 function readInfo(dirPath, force) {
