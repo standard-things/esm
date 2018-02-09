@@ -276,20 +276,30 @@ function getRange(json, name) {
 }
 
 function getRoot(dirPath) {
+  const { root } = shared.package
+  const cached = root[dirPath]
+
+  if (cached) {
+    return cached
+  }
+
   if (basename(dirPath) === "node_modules" ||
       isFile(resolve(dirPath, PACKAGE_FILENAME))) {
-    return dirPath
+    return root[dirPath] = dirPath
   }
 
   const parentPath = dirname(dirPath)
 
   if (parentPath === dirPath ||
       basename(parentPath) === "node_modules") {
-    return dirPath
+    return root[dirPath] = dirPath
   }
 
-  const root = getRoot(parentPath)
-  return root === dirname(root) ? dirPath : root
+  const ancestorPath = getRoot(parentPath)
+
+  return root[dirPath] = ancestorPath === dirname(ancestorPath)
+    ? dirPath
+    : ancestorPath
 }
 
 function readInfo(dirPath, force) {

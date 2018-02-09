@@ -40,6 +40,9 @@ if (__shared__) {
       default: null,
       dir: {
         __proto__: null
+      },
+      root: {
+        __proto__: null
       }
     },
     parseURL: new FastObject,
