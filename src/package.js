@@ -123,43 +123,7 @@ class Package {
   }
 
   static get(dirPath, force) {
-    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-
-    let pkg
-
-    if (dirPath in Package.cache) {
-      pkg = Package.cache[dirPath]
-
-      if (! force ||
-          pkg) {
-        return pkg
-      }
-    }
-
-    if (basename(dirPath) === "node_modules") {
-      return Package.cache[dirPath] = null
-    }
-
-    pkg = readInfo(dirPath)
-
-    if (pkg === null) {
-      const parentPath = dirname(dirPath)
-      pkg = parentPath === dirPath ? null : Package.get(parentPath)
-    }
-
-    const defaultPkg = shared.package.default
-
-    if (pkg === null &&
-        defaultPkg) {
-      pkg = defaultPkg
-    }
-
-    if (force &&
-        pkg === null) {
-      pkg = readInfo(dirPath, force)
-    }
-
-    return Package.cache[dirPath] = pkg
+    return getInfo(dirPath, force) || shared.package.default
   }
 
   static from(mod, force) {
@@ -168,7 +132,7 @@ class Package {
 
   static set(dirPath, pkg) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-    Package.cache[dirPath] = pkg
+    Package.cache[dirPath] = pkg || null
   }
 }
 
@@ -261,6 +225,42 @@ function createOptions(options) {
   options.warnings = !! options.warnings
 
   return options
+}
+
+function getInfo(dirPath, force) {
+  dirPath = dirPath === "" ? dirPath : resolve(dirPath)
+
+  let pkg
+
+  if (dirPath in Package.cache) {
+    pkg = Package.cache[dirPath]
+
+    if (! force ||
+        pkg) {
+      return pkg
+    }
+  }
+
+  if (basename(dirPath) === "node_modules") {
+    return Package.cache[dirPath] = null
+  }
+
+  pkg = readInfo(dirPath)
+
+  if (pkg === null) {
+    const parentPath = dirname(dirPath)
+
+    if (parentPath !== dirPath) {
+      pkg = getInfo(parentPath)
+    }
+  }
+
+  if (force &&
+      pkg === null) {
+    pkg = readInfo(dirPath, force)
+  }
+
+  return Package.cache[dirPath] = pkg
 }
 
 function getRange(json, name) {

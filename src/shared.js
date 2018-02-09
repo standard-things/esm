@@ -37,6 +37,7 @@ if (__shared__) {
       cache: {
         __proto__: null
       },
+      default: null,
       dir: {
         __proto__: null
       }
