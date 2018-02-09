@@ -24,6 +24,7 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import setProperty from "../util/set-property.js"
+import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
@@ -70,7 +71,7 @@ function hook(Mod, parent) {
   defaultPkg.range = "*"
 
   Module._extensions = _extensions
-  Package.default = defaultPkg
+  shared.package.default = defaultPkg
 
   function managerWrapper(manager, func, args) {
     const [, filename] = args

@@ -3,7 +3,6 @@ import { extname as _extname, resolve } from "path"
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
 import NullObject from "../null-object.js"
-import Package from "../package.js"
 import Runtime from "../runtime.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
@@ -84,7 +83,7 @@ function compile(caller, entry, content, filename) {
 
   if (moduleState.parsing) {
     const cached = entry.package.cache.compile[entry.cacheName]
-    const defaultPkg = Package.default
+    const defaultPkg = shared.package.default
     const isESM = cached && cached.esm
     const { parent } = entry
     const parentCached = parent && parent.package.cache.compile[parent.cacheName]

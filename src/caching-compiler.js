@@ -83,7 +83,7 @@ function compileAndCache(entry, code, options) {
   const result = Compiler.compile(code, toCompileOptions(entry, options))
 
   if (options.eval) {
-    const cache = shared.packageCache[""]
+    const cache = shared.package.dir[""]
     const cacheName = getCacheFileName(entry, code)
     return cache.compile[cacheName] = result
   }
@@ -128,7 +128,7 @@ function compileAndWrite(entry, code, options) {
 }
 
 function removeCacheFile(cachePath, cacheName) {
-  const cache = shared.packageCache[cachePath]
+  const cache = shared.package.dir[cachePath]
 
   delete cache.compile[cacheName]
   delete cache.map[cacheName]
@@ -136,7 +136,7 @@ function removeCacheFile(cachePath, cacheName) {
 }
 
 function removeExpired(cachePath, cacheName) {
-  const cache = shared.packageCache[cachePath]
+  const cache = shared.package.dir[cachePath]
   const shortname = cacheName.slice(0, 8)
 
   for (const otherCacheName in cache) {
@@ -173,14 +173,15 @@ if (! shared.inited) {
   process.once("exit", () => {
     process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
 
-    const { packageCache, pendingMetas, pendingWrites } = shared
+    const { pendingMetas, pendingWrites } = shared
+    const { dir } = shared.package
 
-    for (const cachePath in packageCache) {
+    for (const cachePath in dir) {
       if (cachePath === "") {
         continue
       }
 
-      const cache = packageCache[cachePath]
+      const cache = dir[cachePath]
 
       if (! cache.dirty) {
         continue
@@ -209,7 +210,7 @@ if (! shared.inited) {
         continue
       }
 
-      const cache = packageCache[cachePath]
+      const cache = dir[cachePath]
       const scriptDatas = pendingMetas[cachePath]
 
       for (const cacheName in cache) {

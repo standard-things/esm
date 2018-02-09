@@ -41,8 +41,8 @@ if (shared.inited) {
 
     if (cacheKey) {
       Package.cache =
-        shared.package[cacheKey] ||
-        (shared.package[cacheKey] = new FastObject)
+        shared.package.cache[cacheKey] ||
+        (shared.package.cache[cacheKey] = new FastObject)
     }
 
     if (isObjectLike(options)) {

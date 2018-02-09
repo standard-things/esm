@@ -7,6 +7,7 @@ import { dirname } from "path"
 import loadESM from "../module/esm/load.js"
 import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
+import shared from "../shared.js"
 
 function hook(Mod) {
   const _tickCallback = noDeprecationWarning(() => process._tickCallback)
@@ -46,7 +47,7 @@ function hook(Mod) {
       throw error
     }
 
-    const defaultPkg = Package.default
+    const defaultPkg = shared.package.default
     const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {

@@ -52,12 +52,11 @@ const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class Package {
   static cache =
-    shared.package[cacheKey] ||
-    (shared.package[cacheKey] = new FastObject)
+    shared.package.cache[cacheKey] ||
+    (shared.package.cache[cacheKey] = new FastObject)
 
   static createOptions = createOptions
   static defaultOptions = defaultOptions
-  static default = null
 
   constructor(dirPath, range, options) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
@@ -73,11 +72,11 @@ class Package {
       cachePath = ""
     }
 
-    let cache = shared.packageCache[cachePath]
+    let cache = shared.package.dir[cachePath]
 
     if (! cache) {
       cache =
-      shared.packageCache[cachePath] = new NullObject
+      shared.package.dir[cachePath] = new NullObject
 
       let compileCache =
       cache.compile = new NullObject
@@ -138,9 +137,7 @@ class Package {
     }
 
     if (basename(dirPath) === "node_modules") {
-      return Package.cache[dirPath] = force
-        ? readInfo(dirPath, true)
-        : null
+      return Package.cache[dirPath] = null
     }
 
     pkg = readInfo(dirPath)
@@ -150,7 +147,7 @@ class Package {
       pkg = parentPath === dirPath ? null : Package.get(parentPath)
     }
 
-    const defaultPkg = Package.default
+    const defaultPkg = shared.package.default
 
     if (pkg === null &&
         defaultPkg) {
