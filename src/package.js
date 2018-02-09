@@ -8,6 +8,7 @@ import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
+import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import moduleState from "./module/state.js"
@@ -123,6 +124,7 @@ class Package {
   }
 
   static get(dirPath, force) {
+    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     return getInfo(dirPath, force) || shared.package.default
   }
 
@@ -228,8 +230,6 @@ function createOptions(options) {
 }
 
 function getInfo(dirPath, force) {
-  dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-
   let pkg
 
   if (dirPath in Package.cache) {
@@ -273,6 +273,22 @@ function getRange(json, name) {
   }
 
   return null
+}
+
+function getRoot(dirPath) {
+  if (basename(dirPath) === "node_modules" ||
+      isFile(resolve(dirPath, PACKAGE_FILENAME))) {
+    return dirPath
+  }
+
+  const parentPath = dirname(dirPath)
+
+  if (parentPath === dirPath ||
+      basename(parentPath) === "node_modules") {
+    return dirPath
+  }
+
+  return getRoot(parentPath)
 }
 
 function readInfo(dirPath, force) {
@@ -323,13 +339,14 @@ function readInfo(dirPath, force) {
   if (! force &&
       pkgJSON === null) {
     if (optionsFound) {
-      parentPkg = Package.get(dirname(dirPath))
+      parentPkg = getInfo(dirname(dirPath))
     } else {
       return null
     }
   }
 
-  if (! optionsFound) {
+  if (! optionsFound &&
+      pkgJSON !== null) {
     pkgParsed = true
     pkgJSON = parseJSON(pkgJSON)
 
@@ -350,7 +367,8 @@ function readInfo(dirPath, force) {
   } else if (parentPkg) {
     range = parentPkg.range
   } else {
-    if (! pkgParsed) {
+    if (! pkgParsed &&
+        pkgJSON !== null) {
       pkgParsed = true
       pkgJSON = parseJSON(pkgJSON)
     }
@@ -380,6 +398,11 @@ function readInfo(dirPath, force) {
   if (options === true ||
       ! optionsFound) {
     options = getEnvVars().ESM_OPTIONS
+  }
+
+  if (! pkgParsed &&
+      pkgJSON === null) {
+    dirPath = getRoot(dirPath)
   }
 
   return new Package(dirPath, range, options)
