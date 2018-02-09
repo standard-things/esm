@@ -2,7 +2,7 @@ import getDescriptor from "./get-descriptor.js"
 import has from "./has.js"
 import setDescriptor from "./set-descriptor.js"
 
-function assignProperty(object, source, key) {
+function copyProperty(object, source, key) {
   const sourceDescriptor = getDescriptor(source, key)
 
   if (sourceDescriptor) {
@@ -19,4 +19,4 @@ function assignProperty(object, source, key) {
   return object
 }
 
-export default assignProperty
+export default copyProperty

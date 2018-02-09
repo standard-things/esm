@@ -3,7 +3,7 @@ import Package from "./package.js"
 import SafeProxy from "./safe-proxy.js"
 
 import assign from "./util/assign.js"
-import assignProperty from "./util/assign-property.js"
+import copyProperty from "./util/copy-property.js"
 import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
@@ -430,7 +430,7 @@ function getExportByName(entry, setter, name) {
 function mergeProperty(entry, otherEntry, key) {
   if ((entry._loaded || otherEntry._loaded) &&
       (key === "cjsNamespace" || key === "esmNamespace")) {
-    return assignProperty(entry, otherEntry, key)
+    return copyProperty(entry, otherEntry, key)
   }
 
   const value = otherEntry[key]
