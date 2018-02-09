@@ -107,8 +107,8 @@ function findPath(request, paths, isMain, searchExts) {
 }
 
 function readPackage(thePath) {
-  if (thePath in shared.package.cache) {
-    return shared.package.cache[thePath]
+  if (thePath in shared.readPackage) {
+    return shared.readPackage[thePath]
   }
 
   const jsonPath = resolve(thePath, "package.json")
@@ -130,7 +130,7 @@ function readPackage(thePath) {
   }
 
   return typeof main === "string"
-    ? shared.package.cache[thePath] = main
+    ? shared.readPackage[thePath] = main
     : ""
 }
 

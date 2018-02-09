@@ -48,6 +48,7 @@ if (__shared__) {
     parseURL: new FastObject,
     pendingMetas: new FastObject,
     pendingWrites: new FastObject,
+    readPackage: new FastObject,
     resolveFilename: new FastObject,
     support
   }
