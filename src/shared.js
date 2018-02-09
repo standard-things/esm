@@ -2,7 +2,6 @@
 import FastObject from "./fast-object.js"
 import SafeWeakMap from "./safe-weak-map.js"
 
-import assign from "./util/assign.js"
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import md5 from "./util/md5.js"
@@ -12,29 +11,42 @@ import setDeferred from "./util/set-deferred.js"
 const { now } = Date
 
 const nodeVersion = process.version
-const shared = assign(new FastObject, __shared__)
 
-if (! __shared__) {
+let shared
+
+if (__shared__) {
+  shared = __shared__
+} else {
   const fastPath = new FastObject
   const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
   const support = new FastObject
 
-  shared.binding = binding
-  shared.entry = new SafeWeakMap
-  shared.env = new FastObject
-  shared.fastPath = fastPath
-  shared.findPath = new FastObject
-  shared.global = global
-  shared.globalName = globalName
-  shared.inited = false
-  shared.maxSatisfying = new FastObject
-  shared.package = new FastObject
-  shared.packageCache = new FastObject
-  shared.parseURL = new FastObject
-  shared.pendingMetas = new FastObject
-  shared.pendingWrites = new FastObject
-  shared.resolveFilename = new FastObject
-  shared.support = support
+  shared = {
+    __proto__: null,
+    binding,
+    entry: new SafeWeakMap,
+    env: new FastObject,
+    fastPath,
+    findPath: new FastObject,
+    global,
+    globalName,
+    inited: false,
+    maxSatisfying: new FastObject,
+    package: {
+      __proto__: null,
+      cache: {
+        __proto__: null
+      },
+      dir: {
+        __proto__: null
+      }
+    },
+    parseURL: new FastObject,
+    pendingMetas: new FastObject,
+    pendingWrites: new FastObject,
+    resolveFilename: new FastObject,
+    support
+  }
 
   fastPath.gunzip = true
   fastPath.gzip = true
