@@ -41,7 +41,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     return paths
   }
 
-  return [dirname(parent.filename)]
+  return [dirname(parentFilename)]
 }
 
 export default resolveLookupPaths
