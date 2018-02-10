@@ -1,13 +1,8 @@
-import SemVer from "semver"
-
 import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
-
-const canTestJest =
-  SemVer.satisfies(process.version, ">=6")
 
 const canTestPM2 =
   ! ("TRAVIS" in process.env)
@@ -107,6 +102,18 @@ describe("scenarios", function () {
       .then(() => fs.removeSync(".esmrc"))
   })
 
+  it("should work with jest and mock-require", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
+    const configPath = path.resolve(dirPath, "jest.config.json")
+
+    const jestArgs = [
+      "--config", configPath,
+      "--rootDir", dirPath
+    ]
+
+    return exec("jest", jestArgs)
+  })
+
   it("should work with esmod-pmb", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
   )
@@ -134,19 +141,6 @@ describe("scenarios", function () {
   it("should work with postcss", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
   )
-
-  ;(canTestJest ? it : xit)(
-  "should work with jest and mock-require", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
-    const configPath = path.resolve(dirPath, "jest.config.json")
-
-    const jestArgs = [
-      "--config", configPath,
-      "--rootDir", dirPath
-    ]
-
-    return exec("jest", jestArgs)
-  })
 
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
