@@ -6,8 +6,7 @@ import Entry from "../entry.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
-
-const compileSym = Symbol.for("@std/esm:module._compile")
+import shared from "../shared.js"
 
 function load(request, parent, isMain, state, loader) {
   let child
@@ -70,8 +69,9 @@ function load(request, parent, isMain, state, loader) {
     child._compile = (content, filename) => {
       delete child._compile
 
-      const func = typeof child[compileSym] === "function"
-        ? child[compileSym]
+      const symbol = shared.symbol._compile
+      const func = typeof child[symbol] === "function"
+        ? child[symbol]
         : _compile
 
       return func.call(child, content, filename)

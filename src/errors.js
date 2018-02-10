@@ -1,17 +1,8 @@
-import { inspect, promisify } from "util"
-
 import getModuleURL from "./util/get-module-url.js"
+import { inspect } from "util"
 import setProperty from "./util/set-property.js"
+import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
-
-let codeSym
-
-try {
-  promisify()
-} catch (e) {
-  const symbols = Object.getOwnPropertySymbols(e)
-  codeSym = symbols.length ? symbols[0] : Symbol.for("@std/esm:errorCode")
-}
 
 const messages = {
   __proto__: null,
@@ -43,12 +34,12 @@ function createNodeClass(Super) {
         this.code = code
         this.name = super.name
       } else {
-        setProperty(this, codeSym, { enumerable: false, value: code })
+        setProperty(this, shared.symbol.errorCode, { enumerable: false, value: code })
       }
     }
 
     get code() {
-      return this[codeSym]
+      return this[shared.symbol.errorCode]
     }
 
     set code(value) {
@@ -56,7 +47,7 @@ function createNodeClass(Super) {
     }
 
     get name() {
-      return super.name + " [" + this[codeSym] + "]"
+      return super.name + " [" + this[shared.symbol.errorCode] + "]"
     }
 
     set name(value) {

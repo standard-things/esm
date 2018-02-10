@@ -33,9 +33,6 @@ const { setPrototypeOf } = Object
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const importExportRegExp = /\b(?:im|ex)port\b/
 
-const compileSym = Symbol.for("@std/esm:module._compile")
-const mjsSym = Symbol.for('@std/esm:Module._extensions[".mjs"]')
-
 function hook(Mod, parent) {
   const { _extensions } = Mod
   const passthruMap = new SafeMap
@@ -130,7 +127,7 @@ function hook(Mod, parent) {
     if (shouldOverwrite) {
       mod._compile = compileWrapper
     } else {
-      setProperty(mod, compileSym, { enumerable: false, value: compileWrapper })
+      setProperty(mod, shared.symbol._compile, { enumerable: false, value: compileWrapper })
     }
 
     if (! cached &&
@@ -153,7 +150,7 @@ function hook(Mod, parent) {
 
     let passthru =
       typeof extCompiler === "function" &&
-      ! extCompiler[mjsSym]
+      ! extCompiler[shared.symbol.mjs]
 
     if (passthru &&
         ext === ".mjs") {
@@ -237,7 +234,7 @@ function tryPassthru(func, args, pkg) {
   }
 }
 
-setProperty(mjsCompiler, mjsSym, {
+setProperty(mjsCompiler, shared.symbol.mjs, {
   configurable: false,
   enumerable: false,
   value: true,

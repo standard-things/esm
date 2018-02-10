@@ -6,9 +6,8 @@ import NullObject from "./null-object.js"
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
 import setProperty from "./util/set-property.js"
+import shared from "./shared.js"
 import { version } from "./version.js"
-
-const wrapSym = Symbol.for("@std/esm:wrapper")
 
 class Wrapper {
   static find(object, key, range) {
@@ -31,13 +30,14 @@ class Wrapper {
       return wrapper.call(this, manager, value, args)
     }
 
-    setProperty(manager, wrapSym, { enumerable: false, value })
+    setProperty(manager, shared.symbol.wrapper, { enumerable: false, value })
     object[key] = manager
   }
 
   static unwrap(object, key) {
     const manager = object[key]
-    return has(manager, wrapSym) ? manager[wrapSym]  : manager
+    const symbol = shared.symbol.wrapper
+    return has(manager, symbol) ? manager[symbol]  : manager
   }
 
   static wrap(object, key, wrapper) {
@@ -51,8 +51,8 @@ class Wrapper {
 }
 
 function createMap(object, key) {
-  // Store the wrapper map as object[wrapSym][key] rather than on the
-  // function, so that other code can modify the same property  without
+  // Store the wrapper map as `object[shared.symbol.wrapper][key]` rather than
+  // on the function, so that other code can modify the same property without
   // interfering with our wrapper logic.
   return getOrCreateStore(object)[key] = {
     __proto__: null,
@@ -64,7 +64,7 @@ function createMap(object, key) {
 
 function createStore(object) {
   const value = new NullObject
-  setProperty(object, wrapSym, { enumerable: false, value })
+  setProperty(object, shared.symbol.wrapper, { enumerable: false, value })
   return value
 }
 
@@ -82,7 +82,8 @@ function getOrCreateStore(object) {
 }
 
 function getStore(object) {
-  return has(object, wrapSym) ? object[wrapSym] : null
+  const symbol = shared.symbol.wrapper
+  return has(object, symbol) ? object[symbol] : null
 }
 
 Object.setPrototypeOf(Wrapper.prototype, null)

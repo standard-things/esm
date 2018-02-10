@@ -4,10 +4,13 @@ import SafeWeakMap from "./safe-weak-map.js"
 
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
+import getSymbols from "./util/get-symbols.js"
 import md5 from "./util/md5.js"
+import { promisify } from "util"
 import { satisfies } from "semver"
 import setDeferred from "./util/set-deferred.js"
 
+const getSymbolFor = Symbol.for
 const { now } = Date
 
 const nodeVersion = process.version
@@ -20,6 +23,12 @@ if (__shared__) {
   const fastPath = new FastObject
   const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
   const support = new FastObject
+  const symbol = {
+    __proto__: null,
+    _compile: getSymbolFor("@std/esm:module._compile"),
+    mjs: getSymbolFor('@std/esm:Module._extensions[".mjs"]'),
+    wrapper: getSymbolFor("@std/esm:wrapper")
+  }
 
   shared = {
     __proto__: null,
@@ -50,7 +59,8 @@ if (__shared__) {
     pendingWrites: new FastObject,
     readPackage: new FastObject,
     resolveFilename: new FastObject,
-    support
+    support,
+    symbol
   }
 
   fastPath.gunzip = true
@@ -124,6 +134,19 @@ if (__shared__) {
 
   setDeferred(support, "setHiddenValue", () => {
     return typeof binding.util.setHiddenValue === "function"
+  })
+
+  setDeferred(symbol, "errorCode", () => {
+    let error
+
+    try {
+      promisify()
+    } catch (e) {
+      error = e
+    }
+
+    const symbols = getSymbols(error)
+    return symbols.length ? symbols[0] : getSymbolFor("@std/esm:errorCode")
   })
 }
 
