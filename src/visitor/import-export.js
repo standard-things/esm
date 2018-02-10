@@ -37,7 +37,6 @@ class ImportExportVisitor extends Visitor {
     this.exportNames = []
     this.exportStars = []
     this.generateVarDeclarations = options.generateVarDeclarations
-    this.madeChanges = false
     this.magicString = new MagicString(code)
     this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
@@ -201,7 +200,6 @@ class ImportExportVisitor extends Visitor {
 
       if (! id) {
         // Convert anonymous functions to named functions so they are hoisted.
-        this.madeChanges = true
         this.magicString.prependRight(
           declaration.functionParamsStart,
           " " + name
@@ -461,10 +459,8 @@ function overwrite(visitor, oldStart, oldEnd, newCode) {
   const padded = pad(visitor, newCode, oldStart, oldEnd)
 
   if (oldStart !== oldEnd) {
-    visitor.madeChanges = true
     visitor.magicString.overwrite(oldStart, oldEnd, padded)
   } else if (padded !== "") {
-    visitor.madeChanges = true
     visitor.magicString.prependRight(oldStart, padded)
   }
 }
