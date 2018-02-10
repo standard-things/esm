@@ -7,9 +7,8 @@ import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
+import keys from "./util/keys.js"
 import stripShebang from "./util/strip-shebang.js"
-
-const { keys } = Object
 
 const defaultOptions = {
   __proto__: null,

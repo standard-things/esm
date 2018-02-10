@@ -5,10 +5,9 @@ import Visitor from "../visitor.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import keys from "../util/keys.js"
 
 const ANON_NAME = encodeId("default")
-
-const { keys } = Object
 
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {

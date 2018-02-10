@@ -3,10 +3,9 @@ import { extname, resolve } from "path"
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
 import isPath from "../util/is-path.js"
+import keys from "../util/keys.js"
 import realpath from "../fs/realpath.js"
 import rootModule from "../root-module.js"
-
-const { keys } = Object
 
 const stdFilename = __non_webpack_module__.filename
 

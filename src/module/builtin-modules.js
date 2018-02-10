@@ -1,8 +1,9 @@
 import binding from "../binding.js"
+import keys from "../util/keys.js"
 import shared from "../shared.js"
 
 const { isArray } = Array
-const { freeze, isFrozen, keys } = Object
+const { freeze, isFrozen } = Object
 
 function init() {
   let { builtinModules } = __non_webpack_module__.constructor

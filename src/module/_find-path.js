@@ -7,12 +7,12 @@ import { isAbsolute, resolve } from "path"
 import Module from "../module.js"
 
 import binding from "../binding.js"
+import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
-const { keys } = Object
 const { parse } = JSON
 const { preserveSymlinks } = binding.config
 

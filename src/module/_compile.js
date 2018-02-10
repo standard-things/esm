@@ -14,6 +14,7 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
 import isInspect from "../env/is-inspect.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
@@ -22,8 +23,6 @@ import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
-
-const { keys } = Object
 
 function compile(caller, entry, content, filename) {
   const { options } = entry.package

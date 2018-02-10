@@ -5,9 +5,9 @@
 import SafeWeakMap from "./safe-weak-map.js"
 
 import isObject from "./util/is-object.js"
+import keys from "./util/keys.js"
 
 const { isArray } = Array
-const { keys } = Object
 
 const childNamesMap = new SafeWeakMap
 
