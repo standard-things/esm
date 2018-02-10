@@ -1,8 +1,7 @@
 import Module from "../module.js"
 
 import copyProperty from "../util/copy-property.js"
-
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object
+import keysAll from "../util/keys-all.js"
 
 function clone(mod) {
   const cloned = new Module(mod.id, null)
@@ -11,8 +10,7 @@ function clone(mod) {
   cloned.filename = mod.filename
   cloned.parent = mod.parent
 
-  const names = getOwnPropertyNames(mod)
-  names.push(...getOwnPropertySymbols(mod))
+  const names = keysAll(mod)
 
   for (const name of names) {
     if (name !== "constructor") {

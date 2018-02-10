@@ -5,10 +5,9 @@ import Module from "./module.js"
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
+import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
-
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object.prototype
 
 function init() {
   return builtinModules
@@ -25,10 +24,9 @@ function init() {
           if (id === "vm" &&
               has(exported, "Module")) {
             const source = exported
-            exported = {}
+            const names = keysAll(source)
 
-            const names = getOwnPropertyNames(source)
-            names.push(...getOwnPropertySymbols(source))
+            exported = {}
 
             for (const name of names) {
               if (name !== "Module") {

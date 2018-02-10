@@ -1,6 +1,5 @@
 import copyProperty from "./copy-property.js"
-
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object
+import keysAll from "./keys-all.js"
 
 function copy(object) {
   let i = 0
@@ -13,8 +12,7 @@ function copy(object) {
       continue
     }
 
-    const names = getOwnPropertyNames(source)
-    names.push(...getOwnPropertySymbols(source))
+    const names = keysAll(source)
 
     for (const name of names) {
       copyProperty(object, source, name)
