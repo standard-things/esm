@@ -34,7 +34,10 @@ function createNodeClass(Super) {
         this.code = code
         this.name = super.name
       } else {
-        setProperty(this, shared.symbol.errorCode, { enumerable: false, value: code })
+        setProperty(this, shared.symbol.errorCode, {
+          enumerable: false,
+          value: code
+        })
       }
     }
 

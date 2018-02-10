@@ -30,8 +30,10 @@ class Wrapper {
       return wrapper.call(this, manager, value, args)
     }
 
-    setProperty(manager, shared.symbol.wrapper, { enumerable: false, value })
-    object[key] = manager
+    object[key] = setProperty(manager, shared.symbol.wrapper, {
+      enumerable: false,
+      value
+    })
   }
 
   static unwrap(object, key) {
@@ -64,7 +66,12 @@ function createMap(object, key) {
 
 function createStore(object) {
   const value = new NullObject
-  setProperty(object, shared.symbol.wrapper, { enumerable: false, value })
+
+  setProperty(object, shared.symbol.wrapper, {
+    enumerable: false,
+    value
+  })
+
   return value
 }
 

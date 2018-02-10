@@ -127,7 +127,10 @@ function hook(Mod, parent) {
     if (shouldOverwrite) {
       mod._compile = compileWrapper
     } else {
-      setProperty(mod, shared.symbol._compile, { enumerable: false, value: compileWrapper })
+      setProperty(mod, shared.symbol._compile, {
+        enumerable: false,
+        value: compileWrapper
+      })
     }
 
     if (! cached &&

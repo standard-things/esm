@@ -54,7 +54,10 @@ function maskStackTrace(error, content, filename, isESM) {
       return error.stack = stack
     },
     set(value) {
-      setProperty(error, "stack", { enumerable: false, value })
+      setProperty(error, "stack", {
+        enumerable: false,
+        value
+      })
     }
   })
 }
