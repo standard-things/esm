@@ -260,16 +260,25 @@ describe("errors", () => {
   )
 
   it("should mask stack arrows", () => {
-    const id1 = path.resolve("fixture/error/import.mjs")
+    const id1 = path.resolve("fixture/error/end-of-input.mjs")
     const id2 = path.resolve("fixture/error/export.js")
     const id3 = path.resolve("fixture/error/import.js")
-    const id4 = path.resolve("fixture/error/missing.mjs")
-    const id5 = path.resolve("fixture/error/nested.mjs")
-    const id6 = path.resolve("fixture/error/syntax.js")
-    const id7 = path.resolve("node_modules/error/index.js")
+    const id4 = path.resolve("fixture/error/import.mjs")
+    const id5 = path.resolve("fixture/error/missing.mjs")
+    const id6 = path.resolve("fixture/error/nested.mjs")
+    const id7 = path.resolve("fixture/error/syntax.js")
+    const id8 = path.resolve("node_modules/error/index.js")
 
     return Promise.all([
       import(id1)
+        .then(() => assert.ok(false))
+        .catch((e) =>
+          checkErrorStack(e, [
+            getURLFromFilePath(id1) + ":4",
+            "SyntaxError: Unexpected token"
+          ].join("\n"))
+        ),
+      import(id4)
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
@@ -287,37 +296,23 @@ describe("errors", () => {
             "^\n"
           ].join("\n"))
         ),
-      import(id4)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(id4) + ":1",
-            "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
-          ].join("\n"))
-        ),
       import(id5)
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
-            getURLFromFilePath(id5) + ":2",
-            '  import"nested"',
-            "  ^\n"
+            getURLFromFilePath(id5) + ":1",
+            "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
           ].join("\n"))
         ),
       import(id6)
         .then(() => assert.ok(false))
-        .catch((e) => {
-          if (pkgOptions.debug) {
-            assert.ok(true)
-          } else {
-            checkErrorStack(e, [
-              id6 + ":1",
-              skipDecorateCheck
-                ? "SyntaxError: Unexpected token ILLEGAL"
-                : "syntax@error\n\n"
-            ].join("\n"))
-          }
-        }),
+        .catch((e) =>
+          checkErrorStack(e, [
+            getURLFromFilePath(id6) + ":2",
+            '  import"nested"',
+            "  ^\n"
+          ].join("\n"))
+        ),
       import(id7)
         .then(() => assert.ok(false))
         .catch((e) => {
@@ -326,6 +321,20 @@ describe("errors", () => {
           } else {
             checkErrorStack(e, [
               id7 + ":1",
+              skipDecorateCheck
+                ? "SyntaxError: Unexpected token ILLEGAL"
+                : "syntax@error\n\n"
+            ].join("\n"))
+          }
+        }),
+      import(id8)
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          if (pkgOptions.debug) {
+            assert.ok(true)
+          } else {
+            checkErrorStack(e, [
+              id8 + ":1",
               skipDecorateCheck
                 ? "SyntaxError: Unexpected token ILLEGAL"
                 : "syntax@error"

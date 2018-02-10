@@ -16,6 +16,7 @@ const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 
 const arrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 const atNameRegExp = /\((.+?)(?=:\d+)/g
+const blankRegExp = /^\s*$/
 const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const headerRegExp = /^(.+?)(?=:\d+\n)/
 
@@ -102,7 +103,11 @@ function maskParserStack(stack, content, filename) {
         arrow = arrow.repeat(message.indexOf("'", 8) - 8)
       }
 
-      spliceArgs.push(lines[lineIndex], " ".repeat(column) + arrow, "")
+      const line = lines[lineIndex]
+
+      if (! blankRegExp.test(line)) {
+        spliceArgs.push(line, " ".repeat(column) + arrow, "")
+      }
     }
   }
 
