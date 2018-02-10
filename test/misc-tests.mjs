@@ -439,7 +439,7 @@ describe("Node rules", () => {
     ].map((request) =>
       import(request)
         .then(() => assert.ok(false))
-        .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
     ))
   )
 
@@ -459,7 +459,7 @@ describe("Node rules", () => {
   it('should not resolve non-local "." requests', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => checkError(e, "ERR_MISSING_MODULE"))
+      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
   )
 
   it("should not reevaluate errors", () =>
@@ -924,7 +924,7 @@ describe("spec compliance", () => {
         .then(() => assert.ok(false))
         .catch((e) => {
           assert.strictEqual("loadCount" in global, false)
-          assert.strictEqual(e.code, "ERR_MISSING_MODULE")
+          assert.strictEqual(e.code, "MODULE_NOT_FOUND")
         })
     ))
   )

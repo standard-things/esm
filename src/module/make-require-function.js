@@ -6,7 +6,6 @@ import Entry from "../entry.js"
 import Module from "../module.js"
 
 import errors from "../errors.js"
-import getFilePathFromURL from "../util/get-file-path-from-url.js"
 import isError from "../util/is-error.js"
 import moduleState from "./state.js"
 
@@ -32,12 +31,6 @@ function makeRequireFunction(mod, requirer, resolver) {
 
         if (code === "ERR_MODULE_RESOLUTION_LEGACY") {
           return Module._load(request, mod, false)
-        }
-
-        if (code === "ERR_MISSING_MODULE") {
-          const { message } = e
-          const url = message.slice(message.lastIndexOf(" ") + 1)
-          throw new errors.Error("MODULE_NOT_FOUND", getFilePathFromURL(url))
         }
       }
 

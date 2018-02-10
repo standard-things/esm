@@ -20,7 +20,6 @@ const messages = {
   ERR_INVALID_ARG_TYPE: invalidArgType,
   ERR_INVALID_ARG_VALUE: invalidArgValue,
   ERR_INVALID_PROTOCOL: invalidProtocol,
-  ERR_MISSING_MODULE: missingESM,
   ERR_MODULE_RESOLUTION_LEGACY: moduleResolutionLegacy,
   ERR_REQUIRE_ESM: requireESM,
   ERR_UNKNOWN_FILE_EXTENSION: unknownFileExtension,
@@ -105,10 +104,6 @@ function invalidProtocol(protocol, expected) {
 
 function missingCJS(request) {
   return "Cannot find module " + toStringLiteral(request, "'")
-}
-
-function missingESM(request) {
-  return "Cannot find module " + getModuleURL(request)
 }
 
 function moduleResolutionLegacy(id, fromPath, foundPath) {

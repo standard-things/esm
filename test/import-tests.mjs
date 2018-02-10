@@ -24,6 +24,6 @@ describe("import declarations", () => {
   it("should not parse URL ids with encoded slashes", () =>
     import("./import/url-slashes.mjs")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_MISSING_MODULE"))
+      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
   )
 })

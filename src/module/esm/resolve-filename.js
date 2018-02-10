@@ -47,15 +47,16 @@ function resolveFilename(request, parent, isMain, options) {
     return shared.resolveFilename[cacheKey]
   }
 
+  const isAbs = isAbsolutePath(request)
+  const fromPath = getModuleDirname(isAbs ? request : parent)
+
+  const pkg = Package.get(fromPath)
+  const pkgOptions = pkg && pkg.options
+
   let foundPath
   let extLookup = esmExtsLookup
   let searchExts = esmExts
   let skipWarnings = false
-
-  const isAbs = isAbsolutePath(request)
-  const fromPath = getModuleDirname(isAbs ? request : parent)
-  const pkg = Package.get(fromPath)
-  const pkgOptions = pkg && pkg.options
 
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
@@ -113,7 +114,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new errors.Error("ERR_MODULE_RESOLUTION_LEGACY", request, fromPath, foundPath)
   }
 
-  throw new errors.Error("ERR_MISSING_MODULE", request)
+  throw new errors.Error("MODULE_NOT_FOUND", request)
 }
 
 export default resolveFilename
