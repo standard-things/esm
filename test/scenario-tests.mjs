@@ -27,41 +27,28 @@ function exec(filename, args) {
 describe("scenarios", function () {
   this.timeout(0)
 
-  it("should work with babel-register and plugins (code)", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
-    const indexPath = path.resolve(dirPath, "index.js")
-
-    return Promise.resolve()
-      .then(() => exec(nodePath, [indexPath]))
-  })
-
-  it("should work with babel-register and plugins (flag)", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register-flow")
-    const mainPath = path.resolve(dirPath, "main.js")
-    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register", mainPath]
-
-    return Promise.resolve()
-      .then(() => exec(nodePath, nodeArgs))
-  })
-
   it("should work with ava and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
+
     const nycArgs = [
       "--cwd", dirPath,
       "-i", cwdPath,
       "ava", avaPattern
     ]
 
-    return Promise.resolve()
-      .then(() => exec("nyc", nycArgs))
+    return exec("nyc", nycArgs)
   })
 
   it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPattern = path.resolve(dirPath, "test.js")
-    const tscArgs = ["--project", dirPath]
+
+    const tscArgs = [
+      "--project", dirPath
+    ]
+
     const nycArgs = [
       "--cwd", dirPath,
       "-i", pkgPath,
@@ -73,9 +60,24 @@ describe("scenarios", function () {
       .then(() => exec("nyc", nycArgs))
   })
 
+  it("should work with babel and plugins (code)", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/babel-flow")])
+  )
+
+  it("should work with babel and plugins (flag)", () => {
+    const nodeArgs = [
+      "-r", pkgPath,
+      "-r", "@babel/register",
+      path.resolve(testPath, "fixture/scenario/babel-flow")
+    ]
+
+    return exec(nodePath, nodeArgs)
+  })
+
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
     const mochaPattern = path.resolve(dirPath, "test.js")
+
     const nycArgs = [
       "--cwd", dirPath,
       "-x", ".babelrc.js", "-x", "test.js",
@@ -92,6 +94,7 @@ describe("scenarios", function () {
   it("should work with chai, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/chai-mocha-nyc")
     const mochaPattern = path.resolve(dirPath, "test.js")
+
     const nycArgs = [
       "--cwd", dirPath,
       "-i", pkgPath,
@@ -118,6 +121,7 @@ describe("scenarios", function () {
 
   it("should work with nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
+
     const nycArgs = [
       "--cwd", dirPath,
       "-i", pkgPath,
@@ -127,37 +131,39 @@ describe("scenarios", function () {
     return exec("nyc", nycArgs)
   })
 
-  it("should work with postcss", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/postcss")
-    const indexPath = path.resolve(dirPath, "index.js")
-
-    return Promise.resolve()
-      .then(() => exec(nodePath, [indexPath]))
-  })
+  it("should work with postcss", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
+  )
 
   ;(canTestJest ? it : xit)(
   "should work with jest and mock-require", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
     const configPath = path.resolve(dirPath, "jest.config.json")
-    const jestArgs = ["--config", configPath, "--rootDir", dirPath]
+
+    const jestArgs = [
+      "--config", configPath,
+      "--rootDir", dirPath
+    ]
 
     return exec("jest", jestArgs)
   })
 
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-register")
-    const indexPath = path.resolve(dirPath, "index.js")
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
     const errorPath = path.resolve(logsPath, "pm2-error-0.log")
 
-    const nodeArgs = ["-r", pkgPath, "-r", "@babel/register"]
+    const nodeArgs = [
+      "-r", pkgPath,
+      "-r", "@babel/register"
+    ]
+
     const pm2Args = [
       "start",
       "--no-autorestart",
       "--name", "pm2",
       "--node-args", nodeArgs.join(" "),
-      indexPath
+      path.resolve(testPath, "fixture/scenario/babel")
     ]
 
     return Promise.resolve()

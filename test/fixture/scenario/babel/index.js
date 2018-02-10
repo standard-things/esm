@@ -2,4 +2,4 @@
 
 require = require("../../../../")(module)
 require("@babel/register")
-require("./index.mjs")
+require("./main.mjs")
