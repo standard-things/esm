@@ -104,6 +104,10 @@ describe("scenarios", function () {
       .then(() => fs.removeSync(".esmrc"))
   })
 
+  it("should work with esmod-pmb", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
+  )
+
   it("should work with express", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
   )
