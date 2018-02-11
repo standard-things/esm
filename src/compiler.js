@@ -120,7 +120,8 @@ class Compiler {
 
     result.changed = importExportVisitor.changed
 
-    if (importExportVisitor.addedImportExport) {
+    if (importExportVisitor.addedImportExport ||
+        importExportVisitor.addedImportMeta) {
       type = "module"
 
       const { assignableExports, assignableImports } = importExportVisitor

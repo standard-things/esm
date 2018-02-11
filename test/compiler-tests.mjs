@@ -36,7 +36,8 @@ describe("compiler", () => {
       '"use module";1+2',
       "'use module';1+2",
       '"use script";1+2',
-      "'use script';1+2"
+      "'use script';1+2",
+      "import.meta"
     ]
     .forEach((code) => {
       const result = Compiler.compile(code, { type: "module" })
@@ -52,7 +53,9 @@ describe("compiler", () => {
       { code: '"use module";1+2', esm: true },
       { code: "'use module';1+2", esm: true, hint: "module" },
       { code: '"use script";1+2', esm: false },
-      { code: "'use script';1+2", esm: false, hint: "module" }
+      { code: "'use script';1+2", esm: false, hint: "module" },
+      { code: "import.meta", esm: true },
+      { code: "import.meta", esm: true, hint: "module" }
     ]
     .forEach((data) => {
       const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
@@ -73,7 +76,11 @@ describe("compiler", () => {
       { code: "'use module';\"use script\";import'a'", hint: "module" },
       { code: '"use module";\'use script\';import"a"', hint: "module" },
       { code: "'use module';\"use script\";import'a'" },
-      { code: '"use module";\'use script\';import"a"' }
+      { code: '"use module";\'use script\';import"a"' },
+      { code: "'use module';\"use script\";import.meta", hint: "module" },
+      { code: '"use module";\'use script\';import.meta', hint: "module" },
+      { code: "'use module';\"use script\";import.meta" },
+      { code: '"use module";\'use script\';import.meta' }
     ]
     .forEach((data) => {
       const result = Compiler.compile(data.code, { hint: data.hint, type: "unambiguous" })
@@ -86,7 +93,11 @@ describe("compiler", () => {
       { code: "'use script';\"use module\";import'a'", hint: "module" },
       { code: '"use script";\'use module\';import"a"', hint: "module" },
       { code: "'use script';\"use module\";import'a'" },
-      { code: '"use script";\'use module\';import"a"' }
+      { code: '"use script";\'use module\';import"a"' },
+      { code: "'use script';\"use module\";import.meta", hint: "module" },
+      { code: '"use script";\'use module\';import.meta', hint: "module" },
+      { code: "'use script';\"use module\";import.meta" },
+      { code: '"use script";\'use module\';import.meta' }
     ]
     .forEach((data) => {
       assert.throws(
