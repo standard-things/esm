@@ -497,8 +497,7 @@ function runSetter(entry, name, callback) {
   const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
-    const nsSetter = setter.from === "nsSetter"
-    const force = nsChanged && nsSetter
+    const force = nsChanged && setter.from === "nsSetter"
     const value = force ? void 0 : getExportByName(entry, setter, name)
 
     if (force ||
