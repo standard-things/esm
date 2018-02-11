@@ -44,10 +44,15 @@ class ImportExportVisitor extends Visitor {
 
   visitCallExpression(path) {
     const node = path.getValue()
+
+    if (! node.arguments.length) {
+      this.visitChildren(path)
+      return
+    }
+
     const { callee } = node
 
-    if (node.arguments.length &&
-        callee.name === "eval") {
+    if (callee.name === "eval") {
       // Support direct eval:
       // eval(code)
       this.changed =
