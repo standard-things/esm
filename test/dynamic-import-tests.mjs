@@ -60,16 +60,6 @@ describe("dynamic import", () => {
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
   })
 
-  it("should support whitespace between `import`, `(`, and `)`", () =>
-    import
-    // eslint-disable-next-line no-unexpected-multiline
-    (
-    "./fixture/export/abc.mjs"
-    )
-
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
-  )
-
   it("should support `import()` in an initial assignment", () => {
     const p = import("./fixture/export/abc.mjs")
     assert.ok(p instanceof Promise)
