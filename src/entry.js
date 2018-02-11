@@ -1,6 +1,7 @@
 import NullObject from "./null-object.js"
 import Package from "./package.js"
 import SafeProxy from "./safe-proxy.js"
+import SafeReflect from "./safe-reflect.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
@@ -22,7 +23,6 @@ const { is, isSealed, keys, seal } = Object
 const { sort } = Array.prototype
 const { toStringTag } = Symbol
 
-const useProxy = typeof SafeProxy === "function"
 const useToStringTag = typeof toStringTag === "symbol"
 
 const esmDescriptor = {
@@ -519,7 +519,7 @@ function runSetters(entry, callback) {
 }
 
 function toNamespace(entry, source = entry._namespace) {
-  return useProxy
+  return SafeProxy
     ? toNamespaceProxy(entry, source)
     : toNamespaceGetter(entry, source)
 }
@@ -568,15 +568,12 @@ function toNamespaceProxy(entry, source = entry._namespace) {
 
   return new SafeProxy(seal(namespace), {
     get: (namespace, name) => {
-      if (useToStringTag &&
-          name === toStringTag) {
-        return namespace[name]
-      }
-
-      return source[name]
+      return name === toStringTag
+        ? SafeReflect.get(namespace, name)
+        : SafeReflect.get(source, name)
     },
     getOwnPropertyDescriptor: (namespace, name) => {
-      if (! (name in namespace)) {
+      if (! SafeReflect.has(namespace, name)) {
         return
       }
 
@@ -590,8 +587,7 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       // Section 26.3.1: @@toStringTag
       // Return descriptor of the module namespace @@toStringTag.
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      if (useToStringTag &&
-          name === toStringTag) {
+      if (name === toStringTag) {
         return descriptor
       }
 
@@ -600,13 +596,13 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
       descriptor.enumerable =
       descriptor.writable = true
-      descriptor.value = source[name]
+      descriptor.value = SafeReflect.get(source, name)
 
       return descriptor
     },
     set: (namespace, name) => {
       if (entry.package.options.warnings) {
-        if (name in source) {
+        if (SafeReflect.has(source, name)) {
           warn("WRN_NS_ASSIGNMENT", entry.module, name)
         } else {
           warn("WRN_NS_EXTENSION", entry.module, name)
