@@ -1,9 +1,5 @@
-class SafeProxy {
-  constructor(target, handler) {
-    return new Proxy(target, handler)
-  }
-}
+import SafeBuiltin from "./safe-builtin.js"
 
-Object.setPrototypeOf(SafeProxy.prototype, null)
-
-export default typeof Proxy === "function" ? SafeProxy : null
+export default typeof Proxy === "function"
+  ? SafeBuiltin.create(Proxy)
+  : null
