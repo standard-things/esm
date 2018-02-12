@@ -275,11 +275,4 @@ function watchImport(entry, request, setterPairs, loader) {
   childEntry.update()
 }
 
-Object.defineProperty(Runtime.globalEval, "name", {
-  configurable: true,
-  enumerable: true,
-  value: "eval",
-  writable: false
-})
-
 export default Runtime
