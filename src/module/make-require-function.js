@@ -6,14 +6,23 @@ import Entry from "../entry.js"
 import Module from "../module.js"
 
 import errors from "../errors.js"
+import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
 import moduleState from "./state.js"
+import shared from "../shared.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
+  const entry = Entry.get(mod)
+  const cached = entry.package.cache.compile[entry.cacheName]
+  const isESM = cached && cached.esm
+  const { name } = entry
+
   const req = function require(request) {
     moduleState.requireDepth += 1
 
-    const entry = Entry.get(mod)
+    shared.entry.skipExports[name] =
+      ! isESM &&
+      ! isDataProperty(mod, "exports")
 
     if (! entry.package.options.cjs.vars) {
       try {

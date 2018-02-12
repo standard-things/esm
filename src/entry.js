@@ -94,13 +94,22 @@ class Entry {
       return null
     }
 
-    const exported = mod.exports
-    const useExports = isObjectLike(exported)
-    let entry = shared.entry.get(useExports ? exported : mod)
+    const { cache, skipExports } = shared.entry
+    const name = getModuleName(mod)
+
+    let exported
+    let useExports = false
+
+    if (! skipExports[name]) {
+      exported = mod.exports
+      useExports = isObjectLike(exported)
+    }
+
+    let entry = cache.get(useExports ? exported : mod)
 
     if (! entry &&
         useExports) {
-      entry = shared.entry.get(mod)
+      entry = cache.get(mod)
     }
 
     if (! entry) {
@@ -117,16 +126,18 @@ class Entry {
     }
 
     const exported = mod.exports
-    return shared.entry.has(isObjectLike(exported) ? exported : mod)
+    return shared.entry.cache.has(isObjectLike(exported) ? exported : mod)
   }
 
   static set(mod, exported, entry) {
+    const { cache } = shared.entry
+
     if (mod) {
-      shared.entry.set(mod, entry)
+      cache.set(mod, entry)
     }
 
     if (isObjectLike(exported)) {
-      shared.entry.set(exported, entry)
+      cache.set(exported, entry)
     }
   }
 
@@ -265,6 +276,8 @@ class Entry {
         return toNamespace(this)
       })
     }
+
+    delete shared.entry.skipExports[this.name]
 
     return this._loaded = 1
   }

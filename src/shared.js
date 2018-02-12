@@ -33,7 +33,11 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
-    entry: new SafeWeakMap,
+    entry: {
+      __proto__: null,
+      cache: new SafeWeakMap,
+      skipExports: new FastObject
+    },
     env: new FastObject,
     fastPath,
     findPath: new FastObject,

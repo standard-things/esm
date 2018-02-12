@@ -1,18 +1,15 @@
 import getDescriptor from "./get-descriptor.js"
-import has from "./has.js"
+import isDataDescriptor from "./is-data-descriptor.js"
 import setDescriptor from "./set-descriptor.js"
 
 function copyProperty(object, source, key) {
-  const sourceDescriptor = getDescriptor(source, key)
+  const descriptor = getDescriptor(source, key)
 
-  if (sourceDescriptor) {
-    if (sourceDescriptor.configurable === true &&
-        sourceDescriptor.enumerable === true &&
-        sourceDescriptor.writable === true &&
-        has(sourceDescriptor, "value")) {
+  if (descriptor) {
+    if (isDataDescriptor(descriptor)) {
       object[key] = source[key]
     } else {
-      setDescriptor(object, key, sourceDescriptor)
+      setDescriptor(object, key, descriptor)
     }
   }
 
