@@ -122,6 +122,10 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
   )
 
+  it("should work with global-prefix", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
+  )
+
   it("should work with native modules", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
   )
