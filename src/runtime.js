@@ -85,6 +85,10 @@ class Runtime {
 
     content = result.code
 
+    if (global[runtimeName]) {
+      return content
+    }
+
     if (blockScopedDeclarations) {
       content =
         (hasPragma(content, "use strict") ? '"use strict";' : "") +

@@ -72,8 +72,19 @@ function hook(vm) {
     const { runtimeName } = entry
 
     content =
-      "var " + runtimeName + "=" + runtimeName +
-      "||[module.exports,module.exports=module.exports.entry.exports][0];" +
+      "(()=>{" +
+        'var g=Function("return this")(),' +
+        "m=g.module," +
+        "e=m&&m.exports," +
+        'k="' + runtimeName + '";' +
+        "if(e&&!g[k]){" +
+          "m.exports=e.entry.exports;" +
+          "Object.defineProperty(g,k,{" +
+            "__proto__:null," +
+            "value:e" +
+          "})" +
+        "}" +
+      "})();" +
       cached.code
 
     const result = tryWrapper(func, [content, scriptOptions])

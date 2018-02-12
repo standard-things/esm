@@ -17,7 +17,9 @@ describe("repl hook", () => {
   let context
 
   before(() => {
-    context = vm.createContext({ module: new module.constructor("<repl>") })
+    context = vm.createContext({
+      module: new module.constructor("<repl>")
+    })
 
     delete require.cache[pkgPath]
     context.module.require(pkgPath)
