@@ -69,6 +69,8 @@ class Entry {
     this.id = null
     // The module the entry is managing.
     this.module = mod
+    // The name of the module.
+    this.name = getModuleName(mod)
     // The `module.parent` entry.
     this.parent = null
     // The name of the runtime identifier.
@@ -143,9 +145,8 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
-    const { getters } = this
+    const { getters, name } = this
     const { getters:otherGetters } = otherEntry
-    const name = getModuleName(this.module)
 
     for (const key in otherEntry._namespace) {
       if (key === "default") {
@@ -170,10 +171,10 @@ class Entry {
         continue
       }
 
-      const ownerName = getModuleName(getter.owner.module)
+      const ownerName = getter.owner.name
 
       if (ownerName !== name &&
-          ownerName !== getModuleName(otherGetter.owner.module)) {
+          ownerName !== otherGetter.owner.name) {
         this.addGetter(key, () => STAR_ERROR)
       }
     }
@@ -288,7 +289,7 @@ class Entry {
     runGetters(this)
     runSetters(this, (setter, value) => {
       parentsMap || (parentsMap = new NullObject)
-      parentsMap[getModuleName(setter.parent.module)] = setter.parent
+      parentsMap[setter.parent.name] = setter.parent
       setter(value, this)
     })
 
@@ -505,7 +506,7 @@ function runSetter(entry, name, callback) {
       callback(setter, value)
     } else if (value === void 0 &&
         name in getters &&
-        getModuleName(setter.parent.module) in children) {
+        setter.parent.name in children) {
       warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }
