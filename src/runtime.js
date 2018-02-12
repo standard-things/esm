@@ -5,6 +5,7 @@ import NullObject from "./null-object.js"
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
 import hasPragma from "./parse/has-pragma.js"
+import identity from "./util/identity.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
@@ -16,48 +17,8 @@ const { freeze } = Object
 
 const indirectEval = eval
 
-class Runtime {
-  static enable(entry, exported) {
-    const mod = entry.module
-    const object = mod.exports
-
-    object.entry = entry
-    entry.exports = exported
-
-    Entry.set(mod, exported, entry)
-
-    setDeferred(object, "meta", () => {
-      const meta = new NullObject
-      meta.url = entry.url
-      return meta
-    })
-
-    const { prototype } = Runtime
-    const { globalEval } =  prototype
-
-    object._ = object
-    object.c = object.compileEval = prototype.compileEval
-    object.d = object.default = prototype.default
-    object.e = object.export = prototype.export
-    object.g = object.globalEval = (content) => globalEval.call(object, content)
-    object.i = object.import = prototype.import
-    object.n = object.nsSetter = prototype.nsSetter
-    object.r = object.run = prototype.run
-    object.u = object.update = prototype.update
-    object.w = object.watch = prototype.watch
-  }
-
-  // Register a getter function that always returns the given value.
-  default(value) {
-    this.export([["default", () => value]])
-  }
-
-  // Register getter functions for local variables in the scope of an export
-  // statement. Pass true as the second argument to indicate that the getter
-  // functions always return the same values.
-  export(getterPairs) {
-    this.entry.addGetters(getterPairs)
-  }
+const Runtime = {
+  __proto__: null,
 
   compileEval(content) {
     // Section 18.2.1.1: Runtime Semantics: PerformEval ( x, evalRealm, strictCaller, direct )
@@ -66,18 +27,18 @@ class Runtime {
     return typeof content === "string"
       ? Compiler.compile(this.entry, content, { eval: true }).code
       : content
-  }
+  },
 
-  globalEval(content) {
+  compileGlobalEval(content) {
     if (typeof content !== "string") {
-      return indirectEval(content)
+      return content
     }
 
     const { entry } = this
     const result = Compiler.compile(entry, content, { eval: true })
 
     if (! result.changed) {
-      return indirectEval(content)
+      return content
     }
 
     const { runtimeName } = entry
@@ -126,8 +87,54 @@ class Runtime {
       freeze(globalRuntime)
     }
 
-    return indirectEval(content)
-  }
+    return content
+  },
+
+  // Register a getter function that always returns the given value.
+  default(value) {
+    this.export([["default", () => value]])
+  },
+
+  enable(entry, exported) {
+    const mod = entry.module
+    const object = mod.exports
+
+    entry.exports = exported
+    Entry.set(mod, exported, entry)
+
+    object.compileGlobalEval = Runtime.compileGlobalEval
+    object.entry = entry
+
+    setDeferred(object, "meta", () => {
+      const meta = new NullObject
+      meta.url = entry.url
+      return meta
+    })
+
+    object._ = object
+    object.c = object.compileEval = Runtime.compileEval.bind(object)
+    object.d = object.default = Runtime.default
+    object.e = object.export = Runtime.export
+    object.g = object.globalEval = Runtime.globalEval.bind(object)
+    object.i = object.import = Runtime.import
+    object.k = identity
+    object.n = object.nsSetter = Runtime.nsSetter
+    object.r = object.run = Runtime.run
+    object.u = object.update = Runtime.update
+    object.v = indirectEval
+    object.w = object.watch = Runtime.watch
+  },
+
+  // Register getter functions for local variables in the scope of an export
+  // statement. Pass true as the second argument to indicate that the getter
+  // functions always return the same values.
+  export(getterPairs) {
+    this.entry.addGetters(getterPairs)
+  },
+
+  globalEval(content) {
+    return indirectEval(this.compileGlobalEval(content))
+  },
 
   import(request) {
     // Section 2.2.1: Runtime Semantics: Evaluation
@@ -158,13 +165,13 @@ class Runtime {
         }
       })
     })
-  }
+  },
 
   nsSetter() {
     return createSetter("nsSetter", (value, childEntry) => {
       this.entry.addGettersFrom(childEntry)
     })
-  }
+  },
 
   run(moduleWrapper) {
     const { entry } = this
@@ -172,7 +179,7 @@ class Runtime {
     const isESM = cached && cached.esm
     const runner =  isESM ? runESM : runCJS
     runner(entry, moduleWrapper)
-  }
+  },
 
   update(valueToPassThrough) {
     this.entry.update()
@@ -192,7 +199,7 @@ class Runtime {
     // This ensures `entry.update()` runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
-  }
+  },
 
   watch(request, setterPairs) {
     const { entry } = this
@@ -268,6 +275,11 @@ function watchImport(entry, request, setterPairs, loader) {
   childEntry.update()
 }
 
-Object.setPrototypeOf(Runtime.prototype, null)
+Object.defineProperty(Runtime.globalEval, "name", {
+  configurable: true,
+  enumerable: true,
+  value: "eval",
+  writable: false
+})
 
 export default Runtime
