@@ -12,13 +12,13 @@ const ANON_NAME = encodeId("default")
 class ImportExportVisitor extends Visitor {
   finalizeHoisting() {
     const { top } = this
-    const codeToInsert =
+    const code =
       top.hoistedPrefixString +
       toModuleExport(this, top.hoistedExports) +
       top.hoistedExportsString +
       top.hoistedImportsString
 
-    this.magicString.prependRight(top.insertCharIndex, codeToInsert)
+    this.magicString.prependRight(top.insertCharIndex, code)
   }
 
   reset(rootPath, code, options) {
@@ -61,7 +61,17 @@ class ImportExportVisitor extends Visitor {
       this.changed =
       this.addedDirectEval = true
 
-      wrapInCompile(this, path)
+      const { runtimeName } = this
+
+      let code = runtimeName + ".c"
+
+      if (! this.strict) {
+        code = "(" + runtimeName + ".v===eval?" + code + ":" + runtimeName + ".k)"
+      }
+
+      this.magicString
+        .prependRight(callee.end, "(" + code)
+        .prependRight(node.end, ")")
     } else if (callee.type === "Import") {
       // Support dynamic import:
       // import("mod")
@@ -95,11 +105,19 @@ class ImportExportVisitor extends Visitor {
     this.changed =
     this.addedIndirectEval = true
 
+    const { runtimeName } = this
+
+    let code = runtimeName + ".g"
+
+    if (! this.strict) {
+      code = "(" + runtimeName + ".v===eval?" + code + ":eval)"
+    }
+
     if (type === "Property" &&
         parent.shorthand) {
-      this.magicString.prependRight(node.end, ":" + this.runtimeName + ".g")
+      this.magicString.prependRight(node.end, ":" + code)
     } else {
-      overwrite(this, node.start, node.end, this.runtimeName + ".g")
+      overwrite(this, node.start, node.end, code)
     }
   }
 
@@ -159,18 +177,19 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = true
 
     const node = path.getValue()
+    const { runtimeName } = this
     const { source } = node
     const specifierString = getSourceString(this, node)
     const specifierName = specifierString.slice(1, -1)
 
     const hoistedCode = pad(
       this,
-      this.runtimeName + ".w(" + specifierString,
+      runtimeName + ".w(" + specifierString,
       node.start,
       source.start
     ) + pad(
       this,
-      ',[["*",' + this.runtimeName + ".n()]]);",
+      ',[["*",' + runtimeName + ".n()]]);",
       source.end,
       node.end
     )
@@ -207,10 +226,7 @@ class ImportExportVisitor extends Visitor {
 
       if (! id) {
         // Convert anonymous functions to named functions so they are hoisted.
-        this.magicString.prependRight(
-          declaration.functionParamsStart,
-          " " + name
-        )
+        this.magicString.prependRight(declaration.functionParamsStart, " " + name)
       }
 
       // If the exported default value is a function or class declaration,
@@ -477,6 +493,7 @@ function pad(visitor, newCode, oldStart, oldEnd) {
   const oldLineCount = oldLines.length
   const newLines = newCode.split("\n")
   const lastIndex = newLines.length - 1
+
   let i = lastIndex - 1
 
   while (++i < oldLineCount) {
@@ -580,14 +597,6 @@ function toModuleImport(visitor, specifierString, specifierMap) {
   code += "]);"
 
   return code
-}
-
-function wrapInCompile(visitor, path) {
-  const { callee, end } = path.getValue()
-
-  visitor.magicString
-    .prependRight(callee.end, "(" + visitor.runtimeName + ".c")
-    .prependRight(end, ")")
 }
 
 export default new ImportExportVisitor
