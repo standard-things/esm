@@ -992,7 +992,7 @@ describe("spec compliance", () => {
           getURLFromFilePath(filename) + ":1",
           "const await = 1",
           "      ^\n",
-          "SyntaxError: The keyword 'await' is reserved"
+          "SyntaxError: Can not use keyword 'await' outside an async function"
         ].join("\n"))
       )
   })

@@ -53,6 +53,7 @@ function hook(vm) {
         entry,
         content,
         {
+          strict: false,
           type: "unambiguous",
           var: true,
           warnings: false

@@ -22,6 +22,8 @@ class ImportExportVisitor extends Visitor {
   }
 
   reset(rootPath, code, options) {
+    const { strict, top } = rootPath.stack[0]
+
     this.addedDirectEval = false
     this.addedDynamicImport = false
     this.addedImportExport = false
@@ -39,7 +41,8 @@ class ImportExportVisitor extends Visitor {
     this.magicString = new MagicString(code)
     this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
-    this.top = rootPath.stack[0].top
+    this.strict = strict
+    this.top = top
   }
 
   visitCallExpression(path) {

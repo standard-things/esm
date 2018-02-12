@@ -23,6 +23,7 @@ const defaultOptions = {
   },
   hint: "script",
   runtimeName: "_",
+  strict: void 0,
   type: "script",
   var: false,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
@@ -78,7 +79,12 @@ class Compiler {
       type === "script"
 
     const sourceType = type === "script" ? type : "module"
-    const parserOptions = { allowReturnOutsideFunction, sourceType }
+
+    const parserOptions = {
+      allowReturnOutsideFunction,
+      sourceType,
+      strict: options.strict
+    }
 
     try {
       ast = Parser.parse(code, parserOptions)
@@ -104,7 +110,7 @@ class Compiler {
 
     const rootPath = new FastPath(ast)
     const { runtimeName } = options
-    const top = rootPath.stack[0].top
+    const { top } = ast
 
     try {
       importExportVisitor.visit(rootPath, code, {

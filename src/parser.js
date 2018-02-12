@@ -12,7 +12,8 @@ const defaultOptions = {
   __proto__: null,
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
-  sourceType: "module"
+  sourceType: "module",
+  strict: void 0
 }
 
 class Parser {
@@ -21,7 +22,18 @@ class Parser {
 
   static parse(code, options) {
     options = Parser.createOptions(options)
-    return extend(new AcornParser(options, code)).parse()
+    const parser = extend(new AcornParser(options, code))
+    const { strict } = options
+
+    if (strict !== void 0) {
+      parser.strict = strict
+    }
+
+    const result = parser.parse()
+
+    result.inModule = parser.inModule
+    result.strict = parser.strict
+    return result
   }
 }
 

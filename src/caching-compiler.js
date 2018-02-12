@@ -160,6 +160,7 @@ function toCompileOptions(entry, options) {
     cjs: entry.package.options.cjs,
     hint: options.hint,
     runtimeName: entry.runtimeName,
+    strict: options.strict,
     type: options.type,
     var: options.var
   }
