@@ -5,17 +5,21 @@ import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 
-const files = globby.sync(["output/**/*.mjs"])
+const files = globby.sync(["output/**/*.{js,mjs}"])
 const tests = files
   .reduce((tests, thePath) => {
     const dirPath = path.dirname(thePath)
-    const type = path.basename(thePath, ".mjs")
+    const type = path.basename(thePath).replace(/\.m?js$/, "")
 
     if (! tests[dirPath]) {
       tests[dirPath] = Object.create(null)
     }
 
-    tests[dirPath][type] = fs.readFileSync(thePath, "utf8")
+    tests[dirPath][type] = {
+      content: fs.readFileSync(thePath, "utf8"),
+      type: path.extname(thePath) === ".mjs" ? "module" : "script"
+    }
+
     return tests
   }, Object.create(null))
 
@@ -27,9 +31,12 @@ describe("output", () =>
       const test = tests[dirPath]
 
       it(`compiles ${name} example as expected`, () => {
+        const result = Compiler.compile(test.actual.content, {
+          type: test.actual.type
+        })
+
         // Remove zero-width joiners and trim trailing whitespace.
-        const result = Compiler.compile(test.actual, { type: "module" })
-        const expected = test.expected.trimRight()
+        const expected = test.expected.content.trimRight()
         const actual = result.code.replace(/\u200d/g, "").trimRight()
 
         assert.strictEqual(actual, expected)

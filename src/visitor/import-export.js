@@ -94,7 +94,9 @@ class ImportExportVisitor extends Visitor {
     const parent = path.getParentNode()
     const { type } = parent
 
-    if (type === "CallExpression") {
+    if (type === "CallExpression" ||
+        (type == "AssignmentExpression" &&
+         parent.left.name === "eval")) {
       return
     }
 
