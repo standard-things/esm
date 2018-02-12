@@ -66,7 +66,7 @@ class ImportExportVisitor extends Visitor {
       let code = runtimeName + ".c"
 
       if (! this.strict) {
-        code = "(" + runtimeName + ".v===eval?" + code + ":" + runtimeName + ".k)"
+        code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
       }
 
       this.magicString
@@ -110,7 +110,7 @@ class ImportExportVisitor extends Visitor {
     let code = runtimeName + ".g"
 
     if (! this.strict) {
-      code = "(" + runtimeName + ".v===eval?" + code + ":eval)"
+      code = "(eval===" + runtimeName + ".v?" + code + ":eval)"
     }
 
     if (type === "Property" &&
