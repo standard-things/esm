@@ -92,7 +92,7 @@ Commonly used options may be specified in shorthand form:
     <p>A string mode:</p>
     <ul>
       <li><code>"all"</code> files as ESM</li>
-      <li><code>"js"</code> and other files with <code>import</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+      <li><code>"js"</code> and other files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
     </ul>
   </td>
 </tr>
