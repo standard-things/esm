@@ -18,7 +18,7 @@ function cleanEmptyDirs() {
       globby.sync(["*/**/"], {
         cwd: rootPath,
         expandDirectories: false,
-        nodir: false
+        onlyFiles: false
       })
       .map(realPath)
       .filter(fs.existsSync)

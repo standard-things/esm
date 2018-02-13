@@ -52,7 +52,7 @@
     "express": "^4.16.2",
     "fs-extra": "^5.0.0",
     "global-prefix": "^1.0.2",
-    "globby": "^7.1.1",
+    "globby": "^8.0.0",
     "html-minifier": "^3.5.8",
     "husky": "^0.14.3",
     "jest": "^22.1.3",

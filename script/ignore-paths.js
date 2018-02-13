@@ -17,8 +17,8 @@ const patterns = fs.readFileSync(gitignorePath, "utf8")
   )
 
 module.exports = globby.sync(patterns, {
+  absolute: true,
   cwd: rootPath,
   expandDirectories: false,
-  nodir: false,
-  realpath: true
+  onlyFiles: false
 })

@@ -1,10 +1,7 @@
 import assert from "assert"
-import fs from "fs-extra"
-import globby from "globby"
 import makeRequire from "../../"
 import module from "../module.js"
 import mockIo from "mock-stdio"
-import require from "../require.js"
 
 export default () => {
   return new Promise((resolve) => {
