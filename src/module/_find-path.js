@@ -26,12 +26,14 @@ function findPath(request, paths, isMain, searchExts) {
     return ""
   }
 
+  const cache = shared.findPath
+
   const cacheKey =
     request + "\0" +
     (paths.length === 1 ? paths[0] : paths.join("\0"))
 
-  if (cacheKey in shared.findPath) {
-    return shared.findPath[cacheKey]
+  if (cacheKey in cache) {
+    return cache[cacheKey]
   }
 
   let trailingSlash = request.length > 0
@@ -99,7 +101,7 @@ function findPath(request, paths, isMain, searchExts) {
     }
 
     if (filename) {
-      return shared.findPath[cacheKey] = filename
+      return cache[cacheKey] = filename
     }
   }
 
@@ -107,8 +109,10 @@ function findPath(request, paths, isMain, searchExts) {
 }
 
 function readPackage(thePath) {
-  if (thePath in shared.readPackage) {
-    return shared.readPackage[thePath]
+  const cache = shared.readPackage
+
+  if (thePath in cache) {
+    return cache[thePath]
   }
 
   const jsonPath = resolve(thePath, "package.json")
@@ -130,7 +134,7 @@ function readPackage(thePath) {
   }
 
   return typeof main === "string"
-    ? shared.readPackage[thePath] = main
+    ? cache[thePath] = main
     : ""
 }
 

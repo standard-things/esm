@@ -10,11 +10,12 @@ function parseURL(url) {
     url = ""
   }
 
+  const cache = shared.parseURL
   const cacheKey = isURL ? url.href : url
 
-  return cacheKey in shared.parseURL
-    ? shared.parseURL[cacheKey]
-    : shared.parseURL[cacheKey] = (isURL ? url : parse(url))
+  return cacheKey in cache
+    ? cache[cacheKey]
+    : cache[cacheKey] = (isURL ? url : parse(url))
 }
 
 export default parseURL

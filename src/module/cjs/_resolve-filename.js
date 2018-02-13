@@ -16,13 +16,14 @@ function resolveFilename(request, parent, isMain, options) {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
   }
 
+  const cache = shared.resolveFilename
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain
 
   if (cacheKey &&
-      cacheKey in shared.resolveFilename) {
-    return shared.resolveFilename[cacheKey]
+      cacheKey in cache) {
+    return cache[cacheKey]
   }
 
   let paths
@@ -56,7 +57,7 @@ function resolveFilename(request, parent, isMain, options) {
 
   if (foundPath) {
     return cacheKey
-      ? shared.resolveFilename[cacheKey] = foundPath
+      ? cache[cacheKey] = foundPath
       : foundPath
   }
 

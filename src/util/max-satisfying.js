@@ -2,11 +2,12 @@ import { maxSatisfying as _maxSatisfying } from "semver"
 import shared from "../shared.js"
 
 function maxSatisfying(versions, range) {
+  const cache = shared.maxSatisfying
   const cacheKey = versions + "\0" + range
 
-  return cacheKey in shared.maxSatisfying
-    ? shared.maxSatisfying[cacheKey]
-    : shared.maxSatisfying[cacheKey] = _maxSatisfying(versions, range)
+  return cacheKey in cache
+    ? cache[cacheKey]
+    : cache[cacheKey] = _maxSatisfying(versions, range)
 }
 
 export default maxSatisfying

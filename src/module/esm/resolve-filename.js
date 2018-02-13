@@ -38,13 +38,14 @@ function resolveFilename(request, parent, isMain, options) {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
   }
 
+  const cache = shared.resolveFilename
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain
 
   if (cacheKey &&
-      cacheKey in shared.resolveFilename) {
-    return shared.resolveFilename[cacheKey]
+      cacheKey in cache) {
+    return cache[cacheKey]
   }
 
   const isAbs = isAbsolutePath(request)
@@ -101,7 +102,7 @@ function resolveFilename(request, parent, isMain, options) {
         (pkgOptions.cjs.paths ||
          pkgOptions.esm === "js")) ||
         extname(foundPath) in extLookup) {
-      return shared.resolveFilename[cacheKey] = foundPath
+      return cache[cacheKey] = foundPath
     }
 
     throw new errors.Error("ERR_UNKNOWN_FILE_EXTENSION", foundPath)
