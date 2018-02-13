@@ -7,7 +7,7 @@ import encodeId from "./util/encode-id.js"
 import getSymbols from "./util/get-symbols.js"
 import md5 from "./util/md5.js"
 import { promisify } from "util"
-import { satisfies } from "semver"
+import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
 const getSymbolFor = Symbol.for
@@ -63,6 +63,7 @@ if (__shared__) {
     pendingWrites: new FastObject,
     readPackage: new FastObject,
     resolveFilename: new FastObject,
+    satisfies: new FastObject,
     support,
     symbol
   }
