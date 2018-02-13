@@ -12,7 +12,7 @@ const tests = files
     const type = path.basename(thePath).replace(/\.m?js$/, "")
 
     if (! tests[dirPath]) {
-      tests[dirPath] = Object.create(null)
+      tests[dirPath] = { __proto__: null }
     }
 
     tests[dirPath][type] = {
@@ -21,7 +21,7 @@ const tests = files
     }
 
     return tests
-  }, Object.create(null))
+  }, { __proto__: null })
 
 describe("output", () =>
   Object

@@ -12,7 +12,7 @@ const toStringTagDescriptor = {
 }
 
 function createNamespace(object) {
-  const ns = Object.assign(Object.create(null), object)
+  const ns = Object.assign({ __proto__: null }, object)
   return Object.seal(setToStringTag(ns))
 }
 

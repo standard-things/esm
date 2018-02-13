@@ -1,7 +1,7 @@
 "use strict"
 
 function createMeta(object) {
-  return Object.assign(Object.create(null), object)
+  return Object.assign({ __proto__: null }, object)
 }
 
 module.exports = createMeta

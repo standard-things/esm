@@ -24,10 +24,10 @@ const content =
   zlib.gunzipSync(fs.readFileSync(stdFilename)) +
   "\n})"
 
-const scriptOptions = Object.create(null)
-scriptOptions.filename = __filename
-
-const compiled = vm.runInThisContext(content, scriptOptions)
+const compiled = vm.runInThisContext(content, {
+  __proto__: null,
+  filename: __filename
+})
 
 function load() {
   compiled(stdReq, stdMod, shared)
@@ -42,11 +42,12 @@ let shared
 shared = load()
 shared.global = global
 
-const descriptor = Object.create(null)
-descriptor.value = () => "@std/esm enabled"
-
 const inspectKey = util.inspect.custom || "inspect"
-Object.defineProperty(makeRequireFunction, inspectKey, descriptor)
+
+Object.defineProperty(makeRequireFunction, inspectKey, {
+  __proto__: null,
+  value: () => "@std/esm enabled"
+})
 
 Object.freeze(makeRequireFunction)
 module.exports = makeRequireFunction
