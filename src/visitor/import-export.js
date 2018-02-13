@@ -1,5 +1,4 @@
 import MagicString from "../magic-string.js"
-import NullObject from "../null-object.js"
 import Visitor from "../visitor.js"
 
 import encodeId from "../util/encode-id.js"
@@ -29,11 +28,11 @@ class ImportExportVisitor extends Visitor {
     this.addedImportExport = false
     this.addedImportMeta = false
     this.addedIndirectEval = false
-    this.assignableExports = new NullObject
-    this.assignableImports = new NullObject
+    this.assignableExports = { __proto__: null }
+    this.assignableImports = { __proto__: null }
     this.changed = false
     this.code = code
-    this.dependencySpecifiers = new NullObject
+    this.dependencySpecifiers = { __proto__: null }
     this.esm = options.esm
     this.exportNames = []
     this.exportStars = []
@@ -341,7 +340,7 @@ class ImportExportVisitor extends Visitor {
     // Support re-exporting specifiers of an imported module:
     // export { name1, name2, ..., nameN } from "mod"
     const { exportNames } = this
-    const specifierMap = new NullObject
+    const specifierMap = { __proto__: null }
 
     const specifierString = getSourceString(this, node)
     const specifierName = specifierString.slice(1, -1)
@@ -441,7 +440,7 @@ function canExportedValuesChange({ declaration, type }) {
 
 function createSpecifierMap(visitor, node) {
   const { specifiers } = node
-  const specifierMap = new NullObject
+  const specifierMap = { __proto__: null }
 
   for (const specifier of specifiers) {
     let importName = "*"

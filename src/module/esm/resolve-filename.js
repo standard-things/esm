@@ -1,4 +1,3 @@
-import NullObject from "../../null-object.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
@@ -22,8 +21,8 @@ const esmExts = [".mjs", ".js", ".json", ".node"]
 const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
 const noExts = []
 
-const esmExtsLookup = new NullObject
-const gzExtsLookup = new NullObject
+const esmExtsLookup = { __proto__: null }
+const gzExtsLookup = { __proto__: null }
 
 for (const ext of esmExts) {
   esmExtsLookup[ext] = true

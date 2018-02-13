@@ -1,5 +1,3 @@
-import NullObject from "./null-object.js"
-
 import isObjectLike from "./util/is-object-like.js"
 import noDeprecationWarning from "./warning/no-deprecation-warning.js"
 import setDeferred from "./util/set-deferred.js"
@@ -44,7 +42,7 @@ const binding = ids
       const source = noDeprecationWarning(() => _binding.call(process, id))
 
       if (! isObjectLike(source)) {
-        return new NullObject
+        return { __proto__: null }
       }
 
       const names = map[id]
@@ -53,7 +51,7 @@ const binding = ids
         return source
       }
 
-      const object = new NullObject
+      const object = { __proto__: null }
 
       for (const name of names) {
         setGetter(object, name, () => {
@@ -67,6 +65,6 @@ const binding = ids
 
       return object
     })
-  , new NullObject)
+  , { __proto__: null })
 
 export default binding

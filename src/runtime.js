@@ -1,6 +1,5 @@
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
-import NullObject from "./null-object.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
@@ -69,7 +68,7 @@ const Runtime = {
         entry
       })
 
-      const globalRuntime = new NullObject
+      const globalRuntime = { __proto__: null }
 
       setProperty(globalRuntime, "i", {
         enumerable: false,
@@ -106,9 +105,10 @@ const Runtime = {
     object.entry = entry
 
     setDeferred(object, "meta", () => {
-      const meta = new NullObject
-      meta.url = entry.url
-      return meta
+      return {
+        __proto__: null,
+        url: entry.url
+      }
     })
 
     object._ = object

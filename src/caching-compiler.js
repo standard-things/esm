@@ -1,7 +1,6 @@
 import { extname, resolve } from "path"
 
 import Compiler from "./compiler.js"
-import NullObject from "./null-object.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
@@ -41,7 +40,7 @@ class CachingCompiler {
     }
 
     const dependencySpecifiers = meta[3]
-      ? assign(new NullObject, meta[3])
+      ? assign({ __proto__: null }, meta[3])
       : null
 
     const result = {
@@ -58,7 +57,7 @@ class CachingCompiler {
 
     if (result.esm) {
       const exportSpecifiers =
-      result.exportSpecifiers = new NullObject
+      result.exportSpecifiers = { __proto__: null }
 
       for (const exportName of result.exportNames) {
         exportSpecifiers[exportName] = 1
@@ -99,7 +98,7 @@ function compileAndCache(entry, code, options) {
 
   if (result.esm) {
     const exportSpecifiers =
-    result.exportSpecifiers = new NullObject
+    result.exportSpecifiers = { __proto__: null }
 
     for (const exportName of result.exportNames) {
       exportSpecifiers[exportName] = 1
@@ -120,7 +119,7 @@ function compileAndWrite(entry, code, options) {
 
   const pendingWrites =
     shared.pendingWrites[cachePath] ||
-    (shared.pendingWrites[cachePath] = new NullObject)
+    (shared.pendingWrites[cachePath] = { __proto__: null })
 
   pendingWrites[entry.cacheName] = result.code
 
@@ -225,7 +224,7 @@ if (! shared.inited) {
       }
 
       const buffers = []
-      const map = new NullObject
+      const map = { __proto__: null }
 
       let offset = 0
 

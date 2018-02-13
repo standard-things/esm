@@ -1,4 +1,3 @@
-import NullObject from "./null-object.js"
 import Package from "./package.js"
 import SafeProxy from "./safe-proxy.js"
 import SafeReflect from "./safe-reflect.js"
@@ -46,7 +45,7 @@ class Entry {
     // The loading state of the module.
     this._loaded = 0
     // The raw namespace object.
-    this._namespace = new NullObject
+    this._namespace = { __proto__: null }
     // The load mode for `module.require`.
     this._requireESM = false
     // The builtin module indicator.
@@ -54,7 +53,7 @@ class Entry {
     // The cache file name of the module.
     this.cacheName = null
     // The child entries of the module.
-    this.children = new NullObject
+    this.children = { __proto__: null }
     // The namespace object CJS importers receive.
     this.cjsNamespace = this._namespace
     // The package data of the module.
@@ -64,7 +63,7 @@ class Entry {
     // The initial `module.exports` value.
     this.exports = null
     // Getters for local variables exported by the module.
-    this.getters = new NullObject
+    this.getters = { __proto__: null }
     // The unique id for the module cache.
     this.id = null
     // The module the entry is managing.
@@ -76,7 +75,7 @@ class Entry {
     // The name of the runtime identifier.
     this.runtimeName = null
     // Setters for assigning to local variables in parent modules.
-    this.setters = new NullObject
+    this.setters = { __proto__: null }
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
     // The state of the module:
@@ -195,7 +194,7 @@ class Entry {
 
   addSetter(name, setter, parent) {
     const setters = this.setters[name] || (this.setters[name] = [])
-    setter.last = new NullObject
+    setter.last = { __proto__: null }
     setter.parent = parent
     setters.push(setter)
     return this
@@ -301,7 +300,7 @@ class Entry {
 
     runGetters(this)
     runSetters(this, (setter, value) => {
-      parentsMap || (parentsMap = new NullObject)
+      parentsMap || (parentsMap = { __proto__: null })
       parentsMap[setter.parent.name] = setter.parent
       setter(value, this)
     })
@@ -397,7 +396,7 @@ function createNamespace() {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace objects have a null [[Prototype]].
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  const namespace = new NullObject
+  const namespace = { __proto__: null }
 
   // Section 26.3.1: @@toStringTag
   // Module namespace objects have a @@toStringTag value of "Module".

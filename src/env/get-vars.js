@@ -1,5 +1,3 @@
-import NullObject from "../null-object.js"
-
 import isPath from "../util/is-path.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
@@ -13,7 +11,7 @@ function getVars() {
     return env.vars
   }
 
-  const vars = new NullObject
+  const vars = { __proto__: null }
 
   if (! process.env ||
       typeof process.env.ESM_OPTIONS !== "string") {

@@ -1,5 +1,3 @@
-import NullObject from "../../null-object.js"
-
 import _loadESM from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
@@ -8,7 +6,7 @@ function validate(entry) {
   const cached = entry.package.cache.compile[entry.cacheName]
   const { dependencySpecifiers, exportSpecifiers } = cached
 
-  const children = new NullObject
+  const children = { __proto__: null }
   const mod = entry.module
 
   // Parse children.

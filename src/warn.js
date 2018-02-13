@@ -1,5 +1,3 @@
-import NullObject from "./null-object.js"
-
 import emitWarning from "./warning/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
 import { name as stdName } from "./version.js"
@@ -20,7 +18,7 @@ const messages = {
   WRN_TDZ_ACCESS: temporalDeadZoneAccess
 }
 
-const warned = new NullObject
+const warned = { __proto__: null }
 
 function moduleCacheKey(request, name) {
   return getModuleURL(request) + "\0" + name

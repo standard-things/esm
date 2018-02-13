@@ -1,4 +1,3 @@
-import NullObject from "../null-object.js"
 import SafeWeakMap from "../safe-weak-map.js"
 import Visitor from "../visitor.js"
 
@@ -104,7 +103,7 @@ function isShadowed(path, name) {
         name in cache) {
       return shadowed = cache[name]
     } else {
-      cache = new NullObject
+      cache = { __proto__: null }
       shadowedMap.set(parent, cache)
     }
 

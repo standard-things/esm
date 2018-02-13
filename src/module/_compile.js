@@ -2,7 +2,6 @@ import { extname as _extname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
-import NullObject from "../null-object.js"
 import Runtime from "../runtime.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
@@ -114,7 +113,7 @@ function tryCompileCached(entry) {
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
-    moduleState.stat = new NullObject
+    moduleState.stat = { __proto__: null }
   }
 
   if (options.debug) {

@@ -1,5 +1,3 @@
-import NullObject from "./null-object.js"
-
 import copy from "./util/copy.js"
 import copyProperty from "./util/copy-property.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -14,7 +12,7 @@ const construct = typeof Reflect === "object" && Reflect !== null
 class SafeBuiltin {
   static create(Super) {
     if (typeof Super !== "function") {
-      return copy(new NullObject, Super)
+      return copy({ __proto__: null }, Super)
     }
 
     const Safe = isObjectLike(Super.prototype)

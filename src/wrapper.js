@@ -1,8 +1,6 @@
 // This module is critical for @std/esm versioning support and should be changed
 // as little as possible. Please ensure any changes are backwards compatible.
 
-import NullObject from "./null-object.js"
-
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
 import setProperty from "./util/set-property.js"
@@ -60,12 +58,12 @@ function createMap(object, key) {
     __proto__: null,
     raw: Wrapper.unwrap(object, key),
     versions: [],
-    wrappers: new NullObject
+    wrappers: { __proto__: null }
   }
 }
 
 function createStore(object) {
-  const value = new NullObject
+  const value = { __proto__: null }
 
   setProperty(object, shared.symbol.wrapper, {
     enumerable: false,

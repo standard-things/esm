@@ -1,5 +1,3 @@
-import NullObject from "../null-object.js"
-
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 
@@ -14,9 +12,9 @@ function parseTopLevel(node) {
   }
 
   const { body } = node
-  const exported = new NullObject
+  const exported = { __proto__: null }
   const idents = []
-  const top = new NullObject
+  const top = { __proto__: null }
 
   let hoistedPrefixString = ""
   let inited = false

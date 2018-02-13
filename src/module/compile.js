@@ -4,7 +4,6 @@
 
 import Entry from "../entry.js"
 import Module from "../module.js"
-import NullObject from "../null-object.js"
 import Package from "../package.js"
 
 import _compile from "./_compile.js"
@@ -89,7 +88,7 @@ function compile(content, filename) {
       cacheName) {
     const pendingMetas =
       shared.pendingMetas[cachePath] ||
-      (shared.pendingMetas[cachePath] = new NullObject)
+      (shared.pendingMetas[cachePath] = { __proto__: null })
     pendingMetas[cacheName] = scriptData
   }
 

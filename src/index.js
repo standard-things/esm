@@ -1,5 +1,4 @@
 import Module from "./module.js"
-import NullObject from "./null-object.js"
 import Package from "./package.js"
 
 import assign from "./util/assign.js"
@@ -44,7 +43,7 @@ if (shared.inited) {
 
       Package.cache =
         cache[cacheKey] ||
-        (cache[cacheKey] = new NullObject)
+        (cache[cacheKey] = { __proto__: null })
     }
 
     if (isObjectLike(options)) {

@@ -1,5 +1,3 @@
-import NullObject from "./null-object.js"
-
 import _compile from "./module/compile.js"
 import _findPath from "./module/find-path.js"
 import _initPaths from "./module/init-paths.js"
@@ -19,7 +17,7 @@ import wrapper from "./module/wrapper.js"
 const BuiltinModule = __non_webpack_module__.constructor
 
 class Module extends BuiltinModule {
-  static _extensions = new NullObject
+  static _extensions = { __proto__: null }
   static _findPath = _findPath
   static _initPaths = _initPaths
   static _load = _load

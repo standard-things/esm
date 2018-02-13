@@ -1,7 +1,5 @@
 import { basename, dirname , extname, resolve } from "path"
 
-import NullObject from "./null-object.js"
-
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
@@ -53,7 +51,7 @@ const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 class Package {
   static cache =
     shared.package.cache[cacheKey] ||
-    (shared.package.cache[cacheKey] = new NullObject)
+    (shared.package.cache[cacheKey] = { __proto__: null })
 
   static createOptions = createOptions
   static defaultOptions = defaultOptions
@@ -77,10 +75,10 @@ class Package {
 
     if (! cache) {
       cache =
-      dir[cachePath] = new NullObject
+      dir[cachePath] = { __proto__: null }
 
       let compileCache =
-      cache.compile = new NullObject
+      cache.compile = { __proto__: null }
 
       if (cachePath) {
         let hasBuffer
@@ -98,7 +96,7 @@ class Package {
           } else if (cacheName === ".data.json") {
             hasMap = true
           } else if (cacheName === ".dirty") {
-            compileCache = new NullObject
+            compileCache = { __proto__: null }
             hasBuffer =
             hasMap = false
             cleanCache(cachePath)
@@ -153,7 +151,7 @@ function cleanCache(cachePath) {
 }
 
 function createCJS(source) {
-  const object = new NullObject
+  const object = { __proto__: null }
 
   if (isObjectLike(source)) {
     for (const key of cjsKeys) {

@@ -1,6 +1,5 @@
 import Entry from "./entry.js"
 import Module from "./module.js"
-import NullObject from "./null-object.js"
 
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
@@ -44,7 +43,7 @@ function init() {
         entry.loaded()
         return entry
       })
-    , new NullObject)
+    , { __proto__: null })
 }
 
 export default shared.inited
