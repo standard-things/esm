@@ -88,20 +88,36 @@ if (__shared__) {
     return typeof binding.fs.internalModuleStat === "function"
   })
 
+  setDeferred(shared, "arrowSymbol", () => {
+    if (satisfies(nodeVersion, "<6.0.0")) {
+      return "arrowMessage"
+    }
+
+    return satisfies(nodeVersion, "<7.0.0")
+      ? "node:arrowMessage"
+      : binding.util.arrow_message_private_symbol
+  })
+
+  setDeferred(shared, "decoratedSymbol", () => {
+    if (satisfies(nodeVersion, "<6.0.0")) {
+      return
+    }
+
+    return satisfies(nodeVersion, "<7.0.0")
+      ? "node:decorated"
+      : binding.util.decorated_private_symbol
+  })
+
   setDeferred(shared, "hiddenKeyType", () => {
     return satisfies(nodeVersion, "<7.0.0")
       ? "string"
-      : typeof binding.util.arrow_message_private_symbol
+      : typeof shared.arrowSymbol
   })
 
   setDeferred(shared, "statValues", () => {
     return shared.support.getStatValues
       ? binding.fs.getStatValues()
       : new Float64Array(14)
-  })
-
-  setDeferred(support, "arrowSymbol", () => {
-    return binding.util.arrow_message_private_symbol !== void 0
   })
 
   setDeferred(support, "await", () => {
@@ -115,10 +131,6 @@ if (__shared__) {
     } catch (e) {}
 
     return false
-  })
-
-  setDeferred(support, "decoratedSymbol", () => {
-    return binding.util.decorated_private_symbol !== void 0
   })
 
   setDeferred(support, "getStatValues", () => {

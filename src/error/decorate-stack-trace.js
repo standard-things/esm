@@ -1,26 +1,18 @@
-import binding from "../binding.js"
 import isError from "../util/is-error.js"
 import setHiddenValue from "../util/set-hidden-value.js"
 import shared from "../shared.js"
 
 function decorateStackTrace(error) {
-  if (! isError(error)) {
-    return error
-  }
+  if (isError(error)) {
+    const { arrowSymbol, decoratedSymbol } = shared
 
-  const { support } = shared
+    if (arrowSymbol !== void 0) {
+      setHiddenValue(error, arrowSymbol, "")
+    }
 
-  if (support.arrowSymbol) {
-    setHiddenValue(error, binding.util.arrow_message_private_symbol, "")
-  } else {
-    setHiddenValue(error, "arrowMessage", "")
-    setHiddenValue(error, "node:arrowMessage", "")
-  }
-
-  if (support.decoratedSymbol) {
-    setHiddenValue(error, binding.util.decorated_private_symbol, true)
-  } else {
-    setHiddenValue(error, "node:decorated", true)
+    if (decoratedSymbol !== void 0) {
+      setHiddenValue(error, decoratedSymbol, true)
+    }
   }
 
   return error
