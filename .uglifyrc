@@ -3,6 +3,7 @@
     "collapse_vars": false,
     "negate_iife": false,
     "passes": 3,
+    "pure_getters": true,
     "unsafe": true
   },
   "mangle": {
