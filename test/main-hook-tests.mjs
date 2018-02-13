@@ -42,7 +42,7 @@ function runMain(filename, env) {
 describe("main hook", function () {
   this.timeout(0)
 
-  it("should support Node -r and --require", () => {
+  it("should support `-r` and `--require` flags", () => {
     const otherFlags = ["", "--no-deprecation"]
     const requireFlags = ["-r", "--require"]
     const runs = []

@@ -20,7 +20,7 @@ describe("--check hook", function () {
   this.timeout(0)
 
   ;(canTestCheckFlag ? it : xit)(
-  "should support Node -c and --check", () => {
+  "should support `-c` and `--check` flags", () => {
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
     const runs = []
