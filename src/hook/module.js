@@ -90,6 +90,11 @@ function hook(Mod, parent) {
     const { cache, cachePath, options } = pkg
     const cacheName = getCacheFileName(entry, mtime(filename))
 
+    const compileFallback = () => {
+      entry.state = 3
+      return tryPassthru.call(this, func, args, pkg)
+    }
+
     const compileWrapper = (content, filename) => {
       if (shouldOverwrite) {
         if (shouldRestore) {
@@ -99,10 +104,7 @@ function hook(Mod, parent) {
         }
       }
 
-      if (! compile(manager, entry, content, filename)) {
-        entry.state = 3
-        return tryPassthru.call(this, func, args, pkg)
-      }
+      return compile(manager, entry, content, filename, compileFallback)
     }
 
     entry.cacheName = cacheName

@@ -178,7 +178,7 @@ const Runtime = {
     const cached = entry.package.cache.compile[entry.cacheName]
     const isESM = cached && cached.esm
     const runner =  isESM ? runESM : runCJS
-    runner(entry, moduleWrapper)
+    return runner(entry, moduleWrapper)
   },
 
   update(valueToPassThrough) {
@@ -221,8 +221,11 @@ function runCJS(entry, moduleWrapper) {
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-  moduleWrapper.call(exported, shared.global, exported, req)
+
+  const result = moduleWrapper.call(exported, shared.global, exported, req)
+
   mod.loaded = true
+  return result
 }
 
 function runESM(entry, moduleWrapper) {
@@ -231,16 +234,19 @@ function runESM(entry, moduleWrapper) {
 
   entry.exports = null
 
+  let result
+
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
     req.main = moduleState.mainModule
-    moduleWrapper.call(exported, shared.global, exported, req)
+    result = moduleWrapper.call(exported, shared.global, exported, req)
   } else {
-    moduleWrapper.call(void 0, shared.global)
+    result = moduleWrapper.call(void 0, shared.global)
   }
 
   mod.loaded = true
   entry.update().loaded()
+  return result
 }
 
 function watchBuiltin(entry, request, setterPairs) {

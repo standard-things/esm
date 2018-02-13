@@ -23,7 +23,7 @@ import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
 
-function compile(caller, entry, content, filename) {
+function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
   const ext = extname(filename)
 
@@ -92,17 +92,17 @@ function compile(caller, entry, content, filename) {
         (pkg === defaultPkg ||
          (entry.parent &&
           entry.parent.package === defaultPkg))) {
-      return false
-    } else if (isESM &&
+      return fallback ? fallback() : void 0
+    }
+
+    if (isESM &&
         entry.state === 1) {
       tryValidateESM(caller, entry)
     }
   } else {
     entry.state = 3
-    tryCompileCached(entry)
+    return tryCompileCached(entry)
   }
-
-  return true
 }
 
 function tryCompileCached(entry) {
@@ -116,11 +116,17 @@ function tryCompileCached(entry) {
     moduleState.stat = { __proto__: null }
   }
 
+  let result
+
   if (options.debug) {
-    tryCompile(entry)
+    result = tryCompile(entry)
+
+    if (noDepth) {
+      moduleState.stat = null
+    }
   } else {
     try {
-      tryCompile(entry)
+      result = tryCompile(entry)
     } catch (e) {
       if (isStackTraceMasked(e)) {
         throw e
@@ -130,12 +136,14 @@ function tryCompileCached(entry) {
       const content = () => readSourceCode(filename, options)
 
       throw maskStackTrace(e, content, filename, isESM)
+    } finally {
+      if (noDepth) {
+        moduleState.stat = null
+      }
     }
   }
 
-  if (noDepth) {
-    moduleState.stat = null
-  }
+  return result
 }
 
 function tryCompileCJS(entry) {
@@ -144,7 +152,7 @@ function tryCompileCJS(entry) {
 
   let content =
     "const " + runtimeName + "=this;" +
-    runtimeName + ".r((" + async + "function(global,exports,require){" +
+    "return " + runtimeName + ".r((" + async + "function(global,exports,require){" +
     entry.package.cache.compile[entry.cacheName].code +
     "\n}))"
 
@@ -157,7 +165,7 @@ function tryCompileCJS(entry) {
   }
 
   Runtime.enable(entry, exported)
-  mod._compile(content, mod.filename)
+  return mod._compile(content, mod.filename)
 }
 
 function tryCompileESM(entry) {
@@ -167,7 +175,7 @@ function tryCompileESM(entry) {
 
   let content =
     '"use strict";const ' + runtimeName + "=this;" +
-    runtimeName + ".r((" + async + "function(global" +
+    "return " + runtimeName + ".r((" + async + "function(global" +
     (options.cjs.vars ? ",exports,require" : "") +
     "){" + entry.package.cache.compile[entry.cacheName].code + "\n}))"
 
@@ -182,7 +190,7 @@ function tryCompileESM(entry) {
   Runtime.enable(entry, exported)
 
   try {
-    mod._compile(content, mod.filename)
+    return mod._compile(content, mod.filename)
   } finally {
     if (Module.wrap === moduleWrapESM) {
       Module.wrap = wrap

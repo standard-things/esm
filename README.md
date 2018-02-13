@@ -65,6 +65,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 * [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values)
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
+* Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
 * Node 4+ support
 
 Unlockables

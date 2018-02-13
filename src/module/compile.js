@@ -32,8 +32,7 @@ function compile(content, filename) {
     entry.package = Package.get("")
     entry.runtimeName = shared.globalName
 
-    _compile(compile, entry, content, filename)
-    return
+    return _compile(compile, entry, content, filename)
   }
 
   const pkg = entry.package
