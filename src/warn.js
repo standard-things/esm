@@ -1,4 +1,4 @@
-import FastObject from "./fast-object.js"
+import NullObject from "./null-object.js"
 
 import emitWarning from "./warning/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
@@ -20,7 +20,7 @@ const messages = {
   WRN_TDZ_ACCESS: temporalDeadZoneAccess
 }
 
-const warned = new FastObject
+const warned = new NullObject
 
 function moduleCacheKey(request, name) {
   return getModuleURL(request) + "\0" + name

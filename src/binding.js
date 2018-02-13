@@ -1,4 +1,3 @@
-import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import isObjectLike from "./util/is-object-like.js"
@@ -68,6 +67,6 @@ const binding = ids
 
       return object
     })
-  , new FastObject)
+  , new NullObject)
 
 export default binding

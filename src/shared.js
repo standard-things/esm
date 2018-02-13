@@ -1,5 +1,5 @@
 
-import FastObject from "./fast-object.js"
+import NullObject from "./null-object.js"
 import SafeWeakMap from "./safe-weak-map.js"
 
 import binding from "./binding.js"
@@ -20,9 +20,9 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
-  const fastPath = new FastObject
+  const fastPath = new NullObject
   const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
-  const support = new FastObject
+  const support = new NullObject
   const symbol = {
     __proto__: null,
     _compile: getSymbolFor("@std/esm:module._compile"),
@@ -36,15 +36,15 @@ if (__shared__) {
     entry: {
       __proto__: null,
       cache: new SafeWeakMap,
-      skipExports: new FastObject
+      skipExports: new NullObject
     },
-    env: new FastObject,
+    env: new NullObject,
     fastPath,
-    findPath: new FastObject,
+    findPath: new NullObject,
     global,
     globalName,
     inited: false,
-    maxSatisfying: new FastObject,
+    maxSatisfying: new NullObject,
     package: {
       __proto__: null,
       cache: {
@@ -58,12 +58,12 @@ if (__shared__) {
         __proto__: null
       }
     },
-    parseURL: new FastObject,
-    pendingMetas: new FastObject,
-    pendingWrites: new FastObject,
-    readPackage: new FastObject,
-    resolveFilename: new FastObject,
-    satisfies: new FastObject,
+    parseURL: new NullObject,
+    pendingMetas: new NullObject,
+    pendingWrites: new NullObject,
+    readPackage: new NullObject,
+    resolveFilename: new NullObject,
+    satisfies: new NullObject,
     support,
     symbol
   }

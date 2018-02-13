@@ -1,5 +1,5 @@
-import FastObject from "./fast-object.js"
 import Module from "./module.js"
+import NullObject from "./null-object.js"
 import Package from "./package.js"
 
 import assign from "./util/assign.js"
@@ -44,7 +44,7 @@ if (shared.inited) {
 
       Package.cache =
         cache[cacheKey] ||
-        (cache[cacheKey] = new FastObject)
+        (cache[cacheKey] = new NullObject)
     }
 
     if (isObjectLike(options)) {

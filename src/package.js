@@ -1,6 +1,5 @@
 import { basename, dirname , extname, resolve } from "path"
 
-import FastObject from "./fast-object.js"
 import NullObject from "./null-object.js"
 
 import _createOptions from "./util/create-options.js"
@@ -54,7 +53,7 @@ const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 class Package {
   static cache =
     shared.package.cache[cacheKey] ||
-    (shared.package.cache[cacheKey] = new FastObject)
+    (shared.package.cache[cacheKey] = new NullObject)
 
   static createOptions = createOptions
   static defaultOptions = defaultOptions

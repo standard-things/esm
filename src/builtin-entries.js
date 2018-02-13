@@ -1,6 +1,6 @@
 import Entry from "./entry.js"
-import FastObject from "./fast-object.js"
 import Module from "./module.js"
+import NullObject from "./null-object.js"
 
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
@@ -44,7 +44,7 @@ function init() {
         entry.loaded()
         return entry
       })
-    , new FastObject)
+    , new NullObject)
 }
 
 export default shared.inited
