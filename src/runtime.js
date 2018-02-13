@@ -221,11 +221,7 @@ function runCJS(entry, moduleWrapper) {
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-
-  const result = moduleWrapper.call(exported, shared.global, exported, req)
-
-  mod.loaded = true
-  return result
+  return moduleWrapper.call(exported, shared.global, exported, req)
 }
 
 function runESM(entry, moduleWrapper) {
@@ -244,6 +240,7 @@ function runESM(entry, moduleWrapper) {
     result = moduleWrapper.call(void 0, shared.global)
   }
 
+  // Set the loaded state here in case the module was side loaded.
   mod.loaded = true
   entry.update().loaded()
   return result
