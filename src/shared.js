@@ -121,10 +121,6 @@ if (__shared__) {
     return binding.util.decorated_private_symbol !== void 0
   })
 
-  setDeferred(support, "getHiddenValue", () => {
-    return typeof binding.util.getHiddenValue === "function"
-  })
-
   setDeferred(support, "getStatValues", () => {
     return typeof binding.fs.getStatValues === "function"
   })
