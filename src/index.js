@@ -23,7 +23,9 @@ let exported
 if (shared.inited) {
   const { stringify } = JSON
 
-  const nodeModulesRegExp = /[\\/]node_modules[\\/]/
+  const nodeModulesRegExp = process.platform === "win32"
+    ? /[\\/]node_modules[\\/]/
+    : /\/node_modules\//
 
   exported = (mod, options) => {
     if (! isObject(mod)) {
