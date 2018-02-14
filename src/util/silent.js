@@ -2,7 +2,7 @@ import getDescriptor from "../util/get-descriptor.js"
 import setDescriptor from "../util/set-descriptor.js"
 import setProperty from "../util/set-property.js"
 
-function noDeprecationWarning(callback) {
+function silent(callback) {
   let oldDescriptor
 
   const shouldRestore = ! process.noDeprecation
@@ -31,13 +31,7 @@ function noDeprecationWarning(callback) {
     }
   }
 
-  if (typeof result !== "function") {
-    return result
-  }
-
-  return function (...args) {
-    return noDeprecationWarning(() => result.apply(this, args))
-  }
+  return result
 }
 
-export default noDeprecationWarning
+export default silent

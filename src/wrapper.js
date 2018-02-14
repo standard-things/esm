@@ -1,11 +1,13 @@
-// This module is critical for @std/esm versioning support and should be changed
-// as little as possible. Please ensure any changes are backwards compatible.
+// This module is important for `@std/esm` versioning support and should be
+// changed as little as possible. Please ensure any changes are backwards
+// compatible.
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
-import noDeprecationWarning from "./warning/no-deprecation-warning.js"
 import setProperty from "./util/set-property.js"
+import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
+import silent from "./util/silent.js"
 import { version } from "./version.js"
 
 class Wrapper {
@@ -29,16 +31,16 @@ class Wrapper {
       return wrapper.call(this, manager, value, args)
     }
 
-    noDeprecationWarning(() => {
-      object[key] = setProperty(manager, shared.symbol.wrapper, {
-        enumerable: false,
-        value
-      })
+    setProperty(manager, shared.symbol.wrapper, {
+      enumerable: false,
+      value
     })
+
+    setSilent(object, key, manager)
   }
 
   static unwrap(object, key) {
-    const manager = noDeprecationWarning(() => object[key])
+    const manager = silent(() => object[key])
     const symbol = shared.symbol.wrapper
     return has(manager, symbol) ? manager[symbol]  : manager
   }

@@ -4,13 +4,13 @@ import Package from "../package.js"
 import assign from "../util/assign.js"
 import builtinEntries from "../builtin-entries.js"
 import { dirname } from "path"
+import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 import shared from "../shared.js"
 
 function hook(Mod) {
-  const _tickCallback = noDeprecationWarning(() => process._tickCallback)
+  const _tickCallback = getSilent(process, "_tickCallback")
   const { runMain } = Mod
 
   const useTickCallback = typeof _tickCallback === "function"

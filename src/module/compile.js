@@ -10,8 +10,8 @@ import _compile from "./_compile.js"
 import binding from "../binding.js"
 import { dirname } from "path"
 import getCacheFileName from "../util/get-cache-file-name.js"
+import getSilent from "../util/get-silent.js"
 import makeRequireFunction from "./make-require-function.js"
-import noDeprecationWarning from "../warning/no-deprecation-warning.js"
 import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
@@ -20,7 +20,7 @@ import vm from "vm"
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
-const runInDebugContext = noDeprecationWarning(() => vm.runInDebugContext)
+const runInDebugContext = getSilent(vm, "runInDebugContext")
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 

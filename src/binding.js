@@ -1,7 +1,8 @@
+import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
-import noDeprecationWarning from "./warning/no-deprecation-warning.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
+import silent from "./util/silent.js"
 
 let _binding
 
@@ -36,10 +37,10 @@ const binding = ids
   .reduce((binding, id) =>
     setDeferred(binding, id, () => {
       if (! _binding) {
-        _binding = noDeprecationWarning(() => process.binding)
+        _binding = getSilent(process, "binding")
       }
 
-      const source = noDeprecationWarning(() => _binding.call(process, id))
+      const source = silent(() => _binding.call(process, id))
 
       if (! isObjectLike(source)) {
         return { __proto__: null }
@@ -55,7 +56,7 @@ const binding = ids
 
       for (const name of names) {
         setGetter(object, name, () => {
-          const value = noDeprecationWarning(() => source[name])
+          const value = getSilent(source, name)
 
           return typeof value === "function"
             ? (...args) => value.apply(source, args)
