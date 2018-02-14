@@ -143,6 +143,19 @@ describe("main hook", function () {
       })
   )
 
+  it("should treat extensionless files as CJS", () =>
+    Promise
+      .resolve()
+      .then(() =>
+        runMain("./fixture/ext/no-ext-js")
+          .then((result) => assert.strictEqual(result.stderr, ""))
+      )
+      .then(() =>
+        runMain("./fixture/ext/no-ext-mjs")
+          .then((result) => assert.ok(result.stderr))
+      )
+  )
+
   it("should error for missing modules", () => {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
     const otherFlags = [""]
