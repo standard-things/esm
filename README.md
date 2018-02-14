@@ -159,7 +159,7 @@ Commonly used options may be specified in shorthand form:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for top-level <code>await</code> in modules without ESM exports. <i>(requires Node 7.6+)</i></p>
+    <p>A boolean for <a href="https://github.com/MylesBorins/proposal-top-level-await#variant-c-top-level-await-can-only-be-used-in-modules-without-exports">top-level <code>await</code></a> in modules without ESM exports. <i>(requires Node 7.6+)</i></p>
   </td>
 </tr>
 <tr>
