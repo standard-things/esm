@@ -1,5 +1,6 @@
 import Wrapper from "../wrapper.js"
 
+import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
@@ -18,7 +19,8 @@ function hook(process) {
   function exceptionMethodWrapper(manager, func, args) {
     const [error] = args
 
-    if (! isStackTraceMasked(error)) {
+    if (isError(error) &&
+        ! isStackTraceMasked(error)) {
       maskStackTrace(error)
     }
 

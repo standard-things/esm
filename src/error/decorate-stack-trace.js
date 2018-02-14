@@ -1,18 +1,15 @@
-import isError from "../util/is-error.js"
 import setHiddenValue from "../util/set-hidden-value.js"
 import shared from "../shared.js"
 
 function decorateStackTrace(error) {
-  if (isError(error)) {
-    const { arrowSymbol, decoratedSymbol } = shared
+  const { arrowSymbol, decoratedSymbol } = shared
 
-    if (arrowSymbol !== void 0) {
-      setHiddenValue(error, arrowSymbol, "")
-    }
+  if (arrowSymbol !== void 0) {
+    setHiddenValue(error, arrowSymbol, "")
+  }
 
-    if (decoratedSymbol !== void 0) {
-      setHiddenValue(error, decoratedSymbol, true)
-    }
+  if (decoratedSymbol !== void 0) {
+    setHiddenValue(error, decoratedSymbol, true)
   }
 
   return error

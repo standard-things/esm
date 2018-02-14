@@ -11,6 +11,7 @@ import extname from "../path/extname.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import gunzip from "../fs/gunzip.js"
+import isError from "../util/is-error.js"
 import isInspect from "../env/is-inspect.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import keys from "../util/keys.js"
@@ -128,7 +129,8 @@ function tryCompileCached(entry) {
     try {
       result = tryCompile(entry)
     } catch (e) {
-      if (isStackTraceMasked(e)) {
+      if (! isError(e) ||
+          isStackTraceMasked(e)) {
         throw e
       }
 
@@ -242,7 +244,8 @@ function tryCompileCode(caller, entry, content, options) {
   try {
     return Compiler.compile(entry, content, options)
   } catch (e) {
-    if (isStackTraceMasked(e)) {
+    if (! isError(e) ||
+        isStackTraceMasked(e)) {
       throw e
     }
 
@@ -263,7 +266,8 @@ function tryValidateESM(caller, entry) {
     try {
       validateESM(entry)
     } catch (e) {
-      if (isStackTraceMasked(e)) {
+      if (! isError(e) ||
+          isStackTraceMasked(e)) {
         throw e
       }
 

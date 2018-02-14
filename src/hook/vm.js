@@ -11,6 +11,7 @@ import createOptions from "../util/create-options.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
+import isError from "../util/is-error.js"
 import isEval from "../env/is-eval.js"
 import isREPL from "../env/is-repl.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
@@ -146,7 +147,8 @@ function tryValidateESM(caller, entry, content) {
   try {
     validateESM(entry)
   } catch (e) {
-    if (isStackTraceMasked(e)) {
+    if (! isError(e) ||
+        isStackTraceMasked(e)) {
       throw e
     }
 
@@ -161,7 +163,8 @@ function tryWrapper(func, args) {
   try {
     return func.apply(this, args)
   } catch (e) {
-    if (isStackTraceMasked(e)) {
+    if (! isError(e) ||
+        isStackTraceMasked(e)) {
       throw e
     }
 

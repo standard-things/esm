@@ -2,7 +2,6 @@ import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
-import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
@@ -19,10 +18,6 @@ const blankRegExp = /^\s*$/
 const headerRegExp = /^(.+?)(?=:\d+\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
-  if (! isError(error)) {
-    return error
-  }
-
   decorateStackTrace(error)
 
   let { stack } = error

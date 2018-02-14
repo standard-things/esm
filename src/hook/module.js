@@ -216,7 +216,8 @@ function tryPassthru(func, args, pkg) {
     try {
       func.apply(this, args)
     } catch (e) {
-      if (isStackTraceMasked(e)) {
+      if (! isError(e) ||
+          isStackTraceMasked(e)) {
         throw e
       }
 
