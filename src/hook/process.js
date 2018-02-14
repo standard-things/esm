@@ -4,12 +4,11 @@ import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
-import shared from "../shared.js"
+import { version } from "../version.js"
 
 function hook(process) {
   function exceptionManagerWrapper(manager, func, args) {
-    const pkg = shared.package.default
-    const wrapped = Wrapper.find(process, "_fatalException", pkg.range)
+    const wrapped = Wrapper.find(process, "_fatalException", version)
 
     return wrapped
       ? wrapped.call(this, manager, func, args)
@@ -28,8 +27,7 @@ function hook(process) {
   }
 
   function warningManagerWrapper(manager, func, args) {
-    const pkg = shared.package.default
-    const wrapped = Wrapper.find(process, "emitWarning", pkg.range)
+    const wrapped = Wrapper.find(process, "emitWarning", version)
 
     return wrapped
       ? wrapped.call(this, manager, func, args)
