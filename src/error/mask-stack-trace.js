@@ -5,11 +5,10 @@ import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
+import scrubStackTrace from "./scrub-stack-trace.js"
 import setProperty from "../util/set-property.js"
 
 const ZWJ = "\u200d"
-
-const stdFilename = __non_webpack_module__.filename
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
@@ -17,7 +16,6 @@ const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 const arrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
 const atNameRegExp = /\((.+?)(?=:\d+)/g
 const blankRegExp = /^\s*$/
-const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const headerRegExp = /^(.+?)(?=:\d+\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
@@ -43,12 +41,17 @@ function maskStackTrace(error, content, filename, isESM) {
     enumerable: false,
     get() {
       const newMessage = String(error)
+
+      const masker = isParseError(error)
+        ? maskParserStack
+        : maskEngineStack
+
+      const scrubber = isESM
+        ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
+        : (stack) => scrubStackTrace(stack)
+
       stack = stack.replace(message, newMessage)
-
-      const masker = isParseError(error) ? maskParserStack : maskEngineStack
       stack = masker(stack, content, filename)
-
-      const scrubber = (stack) => isESM ? fileNamesToURLs(scrub(stack)) : scrub(stack)
       stack = withoutMessage(stack, newMessage, scrubber)
 
       return error.stack = stack
@@ -176,14 +179,6 @@ function replaceAtName(match, name) {
 
 function resolveURL(name) {
   return isPath(name) ? getURLFromFilePath(name) : name
-}
-
-function scrub(stack) {
-  return stack
-    .split("\n")
-    .filter((line) => line.indexOf(stdFilename) === -1)
-    .join("\n")
-    .replace(columnInfoRegExp, ":1")
 }
 
 function withoutMessage(stack, message, callback) {
