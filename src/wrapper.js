@@ -3,6 +3,7 @@
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
+import noDeprecationWarning from "./warning/no-deprecation-warning.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import { version } from "./version.js"
@@ -28,14 +29,16 @@ class Wrapper {
       return wrapper.call(this, manager, value, args)
     }
 
-    object[key] = setProperty(manager, shared.symbol.wrapper, {
-      enumerable: false,
-      value
+    noDeprecationWarning(() => {
+      object[key] = setProperty(manager, shared.symbol.wrapper, {
+        enumerable: false,
+        value
+      })
     })
   }
 
   static unwrap(object, key) {
-    const manager = object[key]
+    const manager = noDeprecationWarning(() => object[key])
     const symbol = shared.symbol.wrapper
     return has(manager, symbol) ? manager[symbol]  : manager
   }
