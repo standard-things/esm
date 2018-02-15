@@ -2,7 +2,10 @@ import SafeJSON from "../builtin/json.js"
 
 import { extname } from "path"
 import md5 from "./md5.js"
+import shared from "../shared.js"
 import { version as stdVersion } from "../version.js"
+
+const { process } = shared
 
 const engineVersion =
   process.versions.v8 ||

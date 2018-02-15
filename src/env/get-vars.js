@@ -11,14 +11,15 @@ function getVars() {
     return env.vars
   }
 
+  const processEnv = process.env
   const vars = { __proto__: null }
 
-  if (! process.env ||
-      typeof process.env.ESM_OPTIONS !== "string") {
+  if (! processEnv ||
+      typeof processEnv.ESM_OPTIONS !== "string") {
     return env.vars = vars
   }
 
-  let ESM_OPTIONS = process.env.ESM_OPTIONS.trim()
+  let ESM_OPTIONS = processEnv.ESM_OPTIONS.trim()
 
   if (isPath(ESM_OPTIONS)) {
     ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")

@@ -15,7 +15,7 @@ if (__shared__) {
   const getSymbolFor = Symbol.for
   const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const globalPaths = _initPaths()
-  const nodeVersion = process.version
+  const { versions } = process
 
   const fastPath = {
     __proto__: null,
@@ -64,6 +64,16 @@ if (__shared__) {
     parseURL: { __proto__: null },
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
+    process: {
+      __proto__: null,
+      dlopen: process.dlopen,
+      version: process.version,
+      versions: {
+        __proto__: null,
+        chakracore: versions.chakracore,
+        v8: versions.v8
+      }
+    },
     readPackage: { __proto__: null },
     resolveFilename: { __proto__: null },
     satisfies: { __proto__: null },
@@ -72,27 +82,27 @@ if (__shared__) {
   }
 
   setDeferred(shared, "arrowSymbol", () => {
-    if (satisfies(nodeVersion, "<6.0.0")) {
+    if (satisfies(shared.process.version, "<6.0.0")) {
       return "arrowMessage"
     }
 
-    return satisfies(nodeVersion, "<7.0.0")
+    return satisfies(shared.process.version, "<7.0.0")
       ? "node:arrowMessage"
       : binding.util.arrow_message_private_symbol
   })
 
   setDeferred(shared, "decoratedSymbol", () => {
-    if (satisfies(nodeVersion, "<6.0.0")) {
+    if (satisfies(shared.process.version, "<6.0.0")) {
       return
     }
 
-    return satisfies(nodeVersion, "<7.0.0")
+    return satisfies(shared.process.version, "<7.0.0")
       ? "node:decorated"
       : binding.util.decorated_private_symbol
   })
 
   setDeferred(shared, "hiddenKeyType", () => {
-    return satisfies(nodeVersion, "<7.0.0")
+    return satisfies(shared.process.version, "<7.0.0")
       ? "string"
       : typeof shared.arrowSymbol
   })
@@ -105,7 +115,7 @@ if (__shared__) {
 
   setDeferred(fastPath, "mtime", () => {
     return typeof binding.fs.stat === "function" &&
-      satisfies(nodeVersion, "^6.10.1||>=7.7")
+      satisfies(shared.process.version, "^6.10.1||>=7.7")
   })
 
   setDeferred(fastPath, "readFile", () => {
@@ -121,7 +131,7 @@ if (__shared__) {
   })
 
   setDeferred(support, "await", () => {
-    return satisfies(nodeVersion, ">=7.6.0")
+    return satisfies(shared.process.version, ">=7.6.0")
   })
 
   setDeferred(support, "blockScopedDeclarations", () => {

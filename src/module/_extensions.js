@@ -2,10 +2,9 @@ import SafeJSON from "../builtin/json.js"
 
 import readFileFast from "../fs/read-file-fast.js"
 import { readFileSync } from "fs"
+import shared from "../shared.js"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
-
-const { dlopen } = process
 
 /* eslint-disable sort-keys */
 const extensions = {
@@ -24,7 +23,7 @@ const extensions = {
     }
   },
   [".node"](mod, filename) {
-    return dlopen.call(process, mod, toNamespacedPath(filename))
+    return shared.process.dlopen(mod, toNamespacedPath(filename))
   }
 }
 
