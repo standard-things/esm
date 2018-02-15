@@ -1,4 +1,6 @@
-const _encodeURI = global.encodeURI
+import shared from "../shared.js"
+
+const _encodeURI = shared.encodeURI
 
 function encodeURI(string) {
   return typeof string === "string"

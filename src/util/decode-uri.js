@@ -1,4 +1,6 @@
-const _decodeURI = global.decodeURI
+import shared from "../shared.js"
+
+const _decodeURI = shared.decodeURI
 
 function decodeURI(string) {
   return typeof string === "string"

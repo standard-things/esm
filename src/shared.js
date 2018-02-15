@@ -20,6 +20,7 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
+  const { decodeURI, decodeURIComponent, encodeURI } = global
   const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
   const globalPaths = _initPaths()
 
@@ -36,6 +37,9 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
+    decodeURI,
+    decodeURIComponent,
+    encodeURI,
     entry: {
       __proto__: null,
       cache: new SafeWeakMap,

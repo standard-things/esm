@@ -1,4 +1,6 @@
-const _decodeURIComponent = global.decodeURIComponent
+import shared from "../shared.js"
+
+const _decodeURIComponent = shared.decodeURIComponent
 
 function decodeURIComponent(string) {
   return typeof string === "string"
