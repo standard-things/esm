@@ -2,10 +2,11 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/recast/blob/master/lib/fast-path.js
 
+import SafeArray from "./builtin/array.js"
+import SafeObject from "./builtin/object.js"
+
 import alwaysTrue from "./util/always-true.js"
 import isObject from "./util/is-object.js"
-
-const { isArray } = Array
 
 class FastPath {
   constructor(ast) {
@@ -71,7 +72,7 @@ function getNode(path, pos, callback) {
     // fuzzy matching of object shapes.
     const value = stack[i--]
     if (isObject(value) &&
-        ! isArray(value) &&
+        ! SafeArray.isArray(value) &&
         callback(value)) {
       return value
     }
@@ -80,6 +81,6 @@ function getNode(path, pos, callback) {
   return null
 }
 
-Object.setPrototypeOf(FastPath.prototype, null)
+SafeObject.setPrototypeOf(FastPath.prototype, null)
 
 export default FastPath

@@ -1,5 +1,6 @@
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
+import SafeObject from "./builtin/object.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
@@ -190,6 +191,6 @@ function createOptions(options) {
   return _createOptions(options, Compiler.defaultOptions)
 }
 
-Object.setPrototypeOf(Compiler.prototype, null)
+SafeObject.setPrototypeOf(Compiler.prototype, null)
 
 export default Compiler

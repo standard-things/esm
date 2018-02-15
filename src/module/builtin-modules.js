@@ -1,19 +1,19 @@
+import SafeArray from "../builtin/array.js"
+import SafeObject from "../builtin/object.js"
+
 import binding from "../binding.js"
 import keys from "../util/keys.js"
 import shared from "../shared.js"
 
-const { isArray } = Array
-const { freeze, isFrozen } = Object
-
 function init() {
   let { builtinModules } = __non_webpack_module__.constructor
 
-  if (! isArray(builtinModules) ||
-      ! isFrozen(builtinModules)) {
+  if (! SafeArray.isArray(builtinModules) ||
+      ! SafeObject.isFrozen(builtinModules)) {
     builtinModules = keys(binding.natives)
       .filter((id) => ! id.startsWith("internal/"))
 
-    freeze(builtinModules)
+    SafeObject.freeze(builtinModules)
   }
 
   return builtinModules

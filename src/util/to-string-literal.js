@@ -1,4 +1,4 @@
-const { stringify } = JSON
+import SafeJSON from "../builtin/json.js"
 
 const escapedDoubleQuoteRegExp = /\\"/g
 
@@ -18,7 +18,7 @@ const quoteMap = {
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'
-  const string = stringify(value)
+  const string = SafeJSON.stringify(value)
 
   if (quote === '"' &&
       string.charCodeAt(0) === 34 /* " */) {

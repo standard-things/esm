@@ -1,12 +1,12 @@
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object
+import SafeObject from "../builtin/object.js"
 
 function keysAll(object) {
   if (object == null) {
     return []
   }
 
-  const names = getOwnPropertyNames(object)
-  names.push(...getOwnPropertySymbols(object))
+  const names = SafeObject.getOwnPropertyNames(object)
+  names.push(...SafeObject.getOwnPropertySymbols(object))
   return names
 }
 

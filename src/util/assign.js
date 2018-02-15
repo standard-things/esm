@@ -1,8 +1,9 @@
-const { hasOwnProperty } = Object.prototype
+import SafeObject from "../builtin/object.js"
 
 function assign(object) {
   let i = 0
   const argCount = arguments.length
+  const { hasOwnProperty } = SafeObject.prototype
 
   while (++i < argCount) {
     const source = arguments[i]

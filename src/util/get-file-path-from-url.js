@@ -1,4 +1,4 @@
-import decodeURIComponent from "./decode-uri-component.js"
+import decodeURIComponent from "../builtin/decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
 import { normalize } from "path"

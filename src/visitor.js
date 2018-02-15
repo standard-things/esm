@@ -2,12 +2,12 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/ast-types/blob/master/lib/path-visitor.js
 
-import SafeWeakMap from "./safe-weak-map.js"
+import SafeArray from "./builtin/array.js"
+import SafeObject from "./builtin/object.js"
+import SafeWeakMap from "./builtin/weak-map.js"
 
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
-
-const { isArray } = Array
 
 const childNamesMap = new SafeWeakMap
 
@@ -54,7 +54,7 @@ class Visitor {
       return
     }
 
-    if (isArray(value)) {
+    if (SafeArray.isArray(value)) {
       path.each(this, "visitWithoutReset")
       return
     }
@@ -132,6 +132,6 @@ function getChildNames(value) {
   return childNames
 }
 
-Object.setPrototypeOf(Visitor.prototype, null)
+SafeObject.setPrototypeOf(Visitor.prototype, null)
 
 export default Visitor

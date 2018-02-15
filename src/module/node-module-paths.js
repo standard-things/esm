@@ -2,10 +2,12 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import SafeArray from "../builtin/array.js"
+
 import { resolve } from "path"
 import shared from "../shared.js"
 
-const nmChars = Array.prototype
+const nmChars = SafeArray.prototype
   .map.call("node_modules", (char) => char.charCodeAt(0))
   .reverse()
 

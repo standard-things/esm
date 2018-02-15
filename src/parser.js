@@ -1,4 +1,5 @@
 import AcornParser from "./acorn-parser.js"
+import SafeObject from "./builtin/object.js"
 
 import _createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
@@ -52,6 +53,6 @@ function extend(parser) {
   return parser
 }
 
-Object.setPrototypeOf(Parser.prototype, null)
+SafeObject.setPrototypeOf(Parser.prototype, null)
 
 export default Parser

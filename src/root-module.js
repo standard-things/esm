@@ -1,4 +1,4 @@
-import SafeSet from "./safe-set.js"
+import SafeSet from "./builtin/set.js"
 
 let rootModule = __non_webpack_module__
 let seen = new SafeSet

@@ -1,7 +1,7 @@
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
-import decodeURIComponent from "../../util/decode-uri-component.js"
+import decodeURIComponent from "../../builtin/decode-uri-component.js"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"

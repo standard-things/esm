@@ -1,8 +1,8 @@
+import SafeJSON from "../builtin/json.js"
+
 import { extname } from "path"
 import md5 from "./md5.js"
 import { version as stdVersion } from "../version.js"
-
-const { stringify } = JSON
 
 const engineVersion =
   process.versions.v8 ||
@@ -32,7 +32,7 @@ function getCacheFileName(entry, cacheKey) {
     nodeVersion + "\0" +
     engineVersion + "\0" +
     stdVersion + "\0" +
-    stringify(entry.package.options) + "\0" +
+    SafeJSON.stringify(entry.package.options) + "\0" +
     cacheKey
   )
 

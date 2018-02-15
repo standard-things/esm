@@ -1,7 +1,7 @@
-const { isArray } = Array
+import SafeArray from "../builtin/array.js"
 
 function matches(array, pattern) {
-  return isArray(array) &&
+  return SafeArray.isArray(array) &&
     array.some((value) => pattern.test(value))
 }
 

@@ -1,7 +1,7 @@
-const { __defineSetter__ } = Object.prototype
+import SafeObject from "../builtin/object.js"
 
 function setSetter(object, key, setter) {
-  __defineSetter__.call(object, key, setter)
+  SafeObject.prototype.__defineSetter__.call(object, key, setter)
   return object
 }
 

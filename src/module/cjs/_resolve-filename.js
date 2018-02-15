@@ -3,13 +3,12 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import Module from "../../module.js"
+import SafeArray from "../../builtin/array.js"
 
 import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
-
-const { isArray } = Array
 
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
@@ -29,7 +28,7 @@ function resolveFilename(request, parent, isMain, options) {
   let paths
 
   if (! cacheKey &&
-      isArray(options.paths)) {
+      SafeArray.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 

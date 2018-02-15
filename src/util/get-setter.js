@@ -1,10 +1,10 @@
-import has from "./has.js"
+import SafeObject from "../builtin/object.js"
 
-const { __lookupSetter__ } = Object.prototype
+import has from "./has.js"
 
 function getSetter(object, key) {
   if (has(object, key)) {
-    return __lookupSetter__.call(object, key) || null
+    return SafeObject.prototype.__lookupSetter__.call(object, key) || null
   }
 
   return null

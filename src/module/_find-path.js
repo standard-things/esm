@@ -5,6 +5,7 @@
 import { isAbsolute, resolve } from "path"
 
 import Module from "../module.js"
+import SafeJSON from "../builtin/json.js"
 
 import binding from "../binding.js"
 import keys from "../util/keys.js"
@@ -13,7 +14,6 @@ import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
-const { parse } = JSON
 const { preserveSymlinks } = binding.config
 
 const mainFieldRegExp = /"main"/
@@ -125,7 +125,7 @@ function readPackage(thePath) {
   let main
 
   try {
-    main = parse(json).main
+    main = SafeJSON.parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message

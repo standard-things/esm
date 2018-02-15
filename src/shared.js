@@ -1,30 +1,28 @@
-import SafeWeakMap from "./safe-weak-map.js"
-
 import _initPaths from "./module/_init-paths.js"
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
-import getSymbols from "./util/get-symbols.js"
 import md5 from "./util/md5.js"
 import { promisify } from "util"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
-
-const { now } = Date
-const { platform } = process
-
-const getSymbolFor = Symbol.for
-const nodeVersion = process.version
 
 let shared
 
 if (__shared__) {
   shared = __shared__
 } else {
-  const { decodeURI, decodeURIComponent, encodeURI } = global
-  const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
+  const { getOwnPropertySymbols } = Object
+  const getSymbolFor = Symbol.for
+  const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const globalPaths = _initPaths()
+  const nodeVersion = process.version
 
-  const fastPath = { __proto__: null }
+  const fastPath = {
+    __proto__: null,
+    gunzip: true,
+    gzip: true
+  }
+
   const support = { __proto__: null }
 
   const symbol = {
@@ -42,12 +40,12 @@ if (__shared__) {
     encodeURI,
     entry: {
       __proto__: null,
-      cache: new SafeWeakMap,
+      cache: new WeakMap,
       skipExports: { __proto__: null }
     },
     env: {
       __proto__: null,
-      win32: platform === "win32"
+      win32: process.platform === "win32"
     },
     fastPath,
     findPath: { __proto__: null },
@@ -72,26 +70,6 @@ if (__shared__) {
     support,
     symbol
   }
-
-  fastPath.gunzip = true
-  fastPath.gzip = true
-
-  setDeferred(fastPath, "mtime", () => {
-    return typeof binding.fs.stat === "function" &&
-      satisfies(nodeVersion, "^6.10.1||>=7.7")
-  })
-
-  setDeferred(fastPath, "readFile", () => {
-    return support.internalModuleReadFile
-  })
-
-  setDeferred(fastPath, "readFileFast", () => {
-    return support.internalModuleReadJSON || support.internalModuleReadFile
-  })
-
-  setDeferred(fastPath, "stat", () => {
-    return typeof binding.fs.internalModuleStat === "function"
-  })
 
   setDeferred(shared, "arrowSymbol", () => {
     if (satisfies(nodeVersion, "<6.0.0")) {
@@ -123,6 +101,23 @@ if (__shared__) {
     return shared.support.getStatValues
       ? binding.fs.getStatValues()
       : new Float64Array(14)
+  })
+
+  setDeferred(fastPath, "mtime", () => {
+    return typeof binding.fs.stat === "function" &&
+      satisfies(nodeVersion, "^6.10.1||>=7.7")
+  })
+
+  setDeferred(fastPath, "readFile", () => {
+    return support.internalModuleReadFile
+  })
+
+  setDeferred(fastPath, "readFileFast", () => {
+    return support.internalModuleReadJSON || support.internalModuleReadFile
+  })
+
+  setDeferred(fastPath, "stat", () => {
+    return typeof binding.fs.internalModuleStat === "function"
   })
 
   setDeferred(support, "await", () => {
@@ -163,7 +158,9 @@ if (__shared__) {
       error = e
     }
 
-    const symbols = getSymbols(error)
+    const symbols = error
+      ? getOwnPropertySymbols(error)
+      : []
 
     return symbols.length
       ? symbols[0]

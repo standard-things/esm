@@ -1,7 +1,8 @@
-const { toString } = Object.prototype
+import SafeObject from "../builtin/object.js"
 
 function isError(value) {
-  return value instanceof Error || toString.call(value) === "[object Error]"
+  return value instanceof Error ||
+    SafeObject.prototype.toString.call(value) === "[object Error]"
 }
 
 export default isError

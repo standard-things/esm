@@ -2,6 +2,8 @@
 // changed as little as possible. Please ensure any changes are backwards
 // compatible.
 
+import SafeObject from "./builtin/object.js"
+
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
 import setProperty from "./util/set-property.js"
@@ -96,6 +98,6 @@ function getStore(object) {
   return has(object, symbol) ? object[symbol] : null
 }
 
-Object.setPrototypeOf(Wrapper.prototype, null)
+SafeObject.setPrototypeOf(Wrapper.prototype, null)
 
 export default Wrapper

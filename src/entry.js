@@ -1,6 +1,9 @@
 import Package from "./package.js"
-import SafeProxy from "./safe-proxy.js"
-import SafeReflect from "./safe-reflect.js"
+import SafeArray from "./builtin/array.js"
+import SafeObject from "./builtin/object.js"
+import SafeProxy from "./builtin/proxy.js"
+import SafeReflect from "./builtin/reflect.js"
+import SafeSymbol from "./builtin/symbol.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
@@ -8,6 +11,7 @@ import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
+import keys from "./util/keys.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
@@ -18,11 +22,7 @@ import warn from "./warn.js"
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
-const { is, isSealed, keys, seal } = Object
-const { sort } = Array.prototype
-const { toStringTag } = Symbol
-
-const useToStringTag = typeof toStringTag === "symbol"
+const useToStringTag = typeof SafeSymbol.toStringTag === "symbol"
 
 const esmDescriptor = {
   configurable: false,
@@ -235,7 +235,7 @@ class Entry {
     if (isESM) {
       const exported = this.module.exports
 
-      if (! isSealed(exported)) {
+      if (! SafeObject.isSealed(exported)) {
         for (const name in this._namespace) {
           setGetter(exported, name, () => {
             return this._namespace[name]
@@ -248,7 +248,7 @@ class Entry {
         setProperty(exported, "__esModule", esmDescriptor)
       }
 
-      seal(exported)
+      SafeObject.seal(exported)
     } else {
       const otherEntry = Entry.get(this.module)
       setGetters = otherEntry._loaded !== 1
@@ -384,7 +384,7 @@ function callGetter(getter) {
 function changed(setter, key, value) {
   const { last } = setter
 
-  if (is(last[key], value)) {
+  if (SafeObject.is(last[key], value)) {
     return false
   }
 
@@ -402,7 +402,7 @@ function createNamespace() {
   // Module namespace objects have a @@toStringTag value of "Module".
   // https://tc39.github.io/ecma262/#sec-@@tostringtag
   return useToStringTag
-    ? setProperty(namespace, toStringTag, toStringTagDescriptor)
+    ? setProperty(namespace, SafeSymbol.toStringTag, toStringTagDescriptor)
     : namespace
 }
 
@@ -486,7 +486,7 @@ function runGetter(entry, name) {
 
   if (value !== GETTER_ERROR &&
       ! (name in _namespace &&
-         is(_namespace[name], value))) {
+         SafeObject.is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value
   }
@@ -540,13 +540,13 @@ function toNamespaceGetter(entry, source = entry._namespace) {
   // Section 9.4.6.11: ModuleNamespaceCreate ( module, exports )
   // Step 7: Module namespace objects have sorted properties.
   // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-  const names = sort.call(keys(source))
+  const names = SafeArray.prototype.sort.call(keys(source))
   const namespace = createNamespace()
 
   for (const name of names) {
     setGetter(namespace, name, () => {
       if (useToStringTag &&
-          name === toStringTag) {
+          name === SafeSymbol.toStringTag) {
         return namespace[name]
       }
 
@@ -567,20 +567,20 @@ function toNamespaceGetter(entry, source = entry._namespace) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace sources are not extensible.
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  return seal(namespace)
+  return SafeObject.seal(namespace)
 }
 
 function toNamespaceProxy(entry, source = entry._namespace) {
-  const names = sort.call(keys(source))
+  const names = SafeArray.prototype.sort.call(keys(source))
   const namespace = createNamespace()
 
   for (const name of names) {
     namespace[name] = void 0
   }
 
-  return new SafeProxy(seal(namespace), {
+  return new SafeProxy(SafeObject.seal(namespace), {
     get: (namespace, name) => {
-      return name === toStringTag
+      return name === SafeSymbol.toStringTag
         ? SafeReflect.get(namespace, name)
         : SafeReflect.get(source, name)
     },
@@ -599,7 +599,7 @@ function toNamespaceProxy(entry, source = entry._namespace) {
       // Section 26.3.1: @@toStringTag
       // Return descriptor of the module namespace @@toStringTag.
       // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      if (name === toStringTag) {
+      if (name === SafeSymbol.toStringTag) {
         return descriptor
       }
 
@@ -626,6 +626,6 @@ function toNamespaceProxy(entry, source = entry._namespace) {
   })
 }
 
-Object.setPrototypeOf(Entry.prototype, null)
+SafeObject.setPrototypeOf(Entry.prototype, null)
 
 export default Entry

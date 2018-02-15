@@ -1,11 +1,10 @@
 import Module from "../../module.js"
+import SafeArray from "../../builtin/array.js"
 
 import _findPath from "../_find-path.js"
 import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import errors from "../../errors.js"
 import nodeModulePaths from "../node-module-paths.js"
-
-const { isArray } = Array
 
 function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
   if (typeof request !== "string") {
@@ -15,7 +14,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
   let paths
 
   if (options &&
-      isArray(options.paths)) {
+      SafeArray.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 

@@ -1,5 +1,6 @@
 import Module from "./module.js"
 import Package from "./package.js"
+import SafeJSON from "./builtin/json.js"
 
 import assign from "./util/assign.js"
 import clone from "./module/clone.js"
@@ -21,8 +22,6 @@ import vmHook from "./hook/vm.js"
 let exported
 
 if (shared.inited) {
-  const { stringify } = JSON
-
   const nodeModulesRegExp = shared.env.win32
     ? /[\\/]node_modules[\\/]/
     : /\/node_modules\//
@@ -35,13 +34,13 @@ if (shared.inited) {
     let cacheKey
 
     if (isObjectLike(options)) {
-      cacheKey = stringify(options)
+      cacheKey = SafeJSON.stringify(options)
     } else {
       const pkg = Package.from(mod)
       const pkgOptions = pkg && pkg.options
 
       if (pkgOptions) {
-        cacheKey = stringify(pkgOptions)
+        cacheKey = SafeJSON.stringify(pkgOptions)
       }
     }
 

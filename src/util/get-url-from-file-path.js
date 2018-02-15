@@ -2,7 +2,7 @@
 // Copyright Sindre Sorhus. Released under MIT license:
 // https://github.com/sindresorhus/file-url
 
-import encodeURI from "./encode-uri.js"
+import encodeURI from "../builtin/encode-uri.js"
 import normalize from "../path/normalize.js"
 
 const encodeCharsRegExp = /[?#]/g

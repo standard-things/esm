@@ -1,5 +1,6 @@
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
+import SafeObject from "./builtin/object.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
@@ -11,8 +12,6 @@ import moduleState from "./module/state.js"
 import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
-
-const { freeze } = Object
 
 const indirectEval = eval
 
@@ -82,8 +81,8 @@ const Runtime = {
         writable: false
       })
 
-      freeze(globalImport)
-      freeze(globalRuntime)
+      SafeObject.freeze(globalImport)
+      SafeObject.freeze(globalRuntime)
     }
 
     return content

@@ -4,7 +4,8 @@ import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
-import SafeMap from "../safe-map.js"
+import SafeMap from "../builtin/map.js"
+import SafeObject from "../builtin/object.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
@@ -27,8 +28,6 @@ import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
-
-const { setPrototypeOf } = Object
 
 const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
 const importExportRegExp = /\b(?:im|ex)port\b/
@@ -110,7 +109,7 @@ function hook(Mod, parent) {
     entry.cacheName = cacheName
     entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
 
-    setPrototypeOf(mod, Module.prototype)
+    SafeObject.setPrototypeOf(mod, Module.prototype)
 
     let cached = cache.compile[cacheName]
 

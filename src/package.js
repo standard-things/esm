@@ -1,5 +1,8 @@
 import { basename, dirname , extname, resolve } from "path"
 
+import SafeJSON from "./builtin/json.js"
+import SafeObject from "./builtin/object.js"
+
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
@@ -44,8 +47,8 @@ const defaultOptions = {
 }
 
 const defaultCJS = defaultOptions.cjs
-const cacheKey = JSON.stringify(defaultOptions)
-const cjsKeys = Object.keys(defaultCJS)
+const cacheKey = SafeJSON.stringify(defaultOptions)
+const cjsKeys = SafeObject.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class Package {
@@ -427,7 +430,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-Object.setPrototypeOf(Package.prototype, null)
+SafeObject.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {

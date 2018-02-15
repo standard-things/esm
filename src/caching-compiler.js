@@ -1,6 +1,10 @@
 import { extname, resolve } from "path"
 
 import Compiler from "./compiler.js"
+import SafeBuffer from "./builtin/buffer.js"
+import SafeJSON from "./builtin/json.js"
+import SafeMath from "./builtin/math.js"
+import SafeObject from "./builtin/object.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
@@ -10,10 +14,6 @@ import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
-
-const { concat } = Buffer
-const { max } = Math
-const { stringify } = JSON
 
 class CachingCompiler {
   static compile(entry, code, options) {
@@ -165,13 +165,13 @@ function toCompileOptions(entry, options) {
   }
 }
 
-Object.setPrototypeOf(CachingCompiler.prototype, null)
+SafeObject.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
 
   process.once("exit", () => {
-    process.setMaxListeners(max(process.getMaxListeners() - 1, 0))
+    process.setMaxListeners(SafeMath.max(process.getMaxListeners() - 1, 0))
 
     const { pendingMetas, pendingWrites } = shared
     const { dir } = shared.package
@@ -261,8 +261,8 @@ if (! shared.inited) {
         }
       }
 
-      writeFile(resolve(cachePath, ".data.blob"), concat(buffers))
-      writeFile(resolve(cachePath, ".data.json"), stringify(map))
+      writeFile(resolve(cachePath, ".data.blob"), SafeBuffer.concat(buffers))
+      writeFile(resolve(cachePath, ".data.json"), SafeJSON.stringify(map))
     }
 
     for (const cachePath in pendingWrites) {

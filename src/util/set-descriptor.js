@@ -1,10 +1,10 @@
-import isObjectLike from "./is-object-like.js"
+import SafeObject from "../builtin/object.js"
 
-const { defineProperty } = Object
+import isObjectLike from "./is-object-like.js"
 
 function setDescriptor(object, key, descriptor) {
   return isObjectLike(object) && isObjectLike(descriptor)
-    ? defineProperty(object, key, descriptor)
+    ? SafeObject.defineProperty(object, key, descriptor)
     : object
 }
 

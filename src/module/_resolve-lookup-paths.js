@@ -3,13 +3,12 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import Module from "../module.js"
+import SafeArray from "../builtin/array.js"
 
 import { dirname } from "path"
 import isRelativePath from "../util/is-relative-path.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
-
-const { slice } = Array.prototype
 
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
   const parentFilename = parent && parent.filename
@@ -17,7 +16,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   // Look outside if not a relative path.
   if (! isRelativePath(request)) {
     const parentPaths = parent && parent.paths
-    const paths = parentPaths ? slice.call(parentPaths) : []
+    const paths = parentPaths ? SafeArray.prototype.slice.call(parentPaths) : []
 
     if (parentPaths &&
         ! skipGlobalPaths) {

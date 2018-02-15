@@ -2,6 +2,8 @@
 // Copyright Rich Harris. Released under MIT license:
 // https://github.com/Rich-Harris/magic-string
 
+import SafeObject from "./builtin/object.js"
+
 class Chunk {
   constructor(start, end, content) {
     this.start = start
@@ -46,7 +48,7 @@ class Chunk {
   }
 }
 
-Object.setPrototypeOf(Chunk.prototype, null)
+SafeObject.setPrototypeOf(Chunk.prototype, null)
 
 class MagicString {
   constructor(string) {
@@ -144,6 +146,6 @@ class MagicString {
   }
 }
 
-Object.setPrototypeOf(MagicString.prototype, null)
+SafeObject.setPrototypeOf(MagicString.prototype, null)
 
 export default MagicString

@@ -1,4 +1,4 @@
-import SafeWeakMap from "../safe-weak-map.js"
+import SafeWeakMap from "../builtin/weak-map.js"
 import Visitor from "../visitor.js"
 
 import errors from "../parse/errors.js"

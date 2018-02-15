@@ -1,8 +1,8 @@
-const { parse } = JSON
+import SafeJSON from "../builtin/json.js"
 
 function parseJSON(string) {
   try {
-    return parse(string)
+    return SafeJSON.parse(string)
   } catch (e) {}
 
   return null
