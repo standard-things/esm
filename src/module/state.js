@@ -1,11 +1,13 @@
 import _extensions from "./_extensions.js"
-import _initPaths from "./_init-paths.js"
+import shared from "../shared.js"
+
+const { globalPaths } = shared
 
 const state = {
   __proto__: null,
   _cache: { __proto__: null },
   _extensions,
-  globalPaths: _initPaths(),
+  globalPaths,
   mainModule: null,
   parsing: null,
   passthru: null,

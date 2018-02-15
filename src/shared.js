@@ -1,5 +1,6 @@
 import SafeWeakMap from "./safe-weak-map.js"
 
+import _initPaths from "./module/_init-paths.js"
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import getSymbols from "./util/get-symbols.js"
@@ -19,9 +20,12 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
-  const fastPath = { __proto__: null }
   const globalName = encodeId("_" + md5(now().toString()).slice(0, 3))
+  const globalPaths = _initPaths()
+
+  const fastPath = { __proto__: null }
   const support = { __proto__: null }
+
   const symbol = {
     __proto__: null,
     _compile: getSymbolFor("@std/esm:module._compile"),
@@ -45,20 +49,15 @@ if (__shared__) {
     findPath: { __proto__: null },
     global,
     globalName,
+    globalPaths,
     inited: false,
     maxSatisfying: { __proto__: null },
     package: {
       __proto__: null,
-      cache: {
-        __proto__: null
-      },
+      cache: { __proto__: null },
       default: null,
-      dir: {
-        __proto__: null
-      },
-      root: {
-        __proto__: null
-      }
+      dir: { __proto__: null },
+      root: { __proto__: null }
     },
     parseURL: { __proto__: null },
     pendingMetas: { __proto__: null },
@@ -161,7 +160,10 @@ if (__shared__) {
     }
 
     const symbols = getSymbols(error)
-    return symbols.length ? symbols[0] : getSymbolFor("@std/esm:errorCode")
+
+    return symbols.length
+      ? symbols[0]
+      : getSymbolFor("@std/esm:errorCode")
   })
 }
 
