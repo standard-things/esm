@@ -1,5 +1,5 @@
 const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
-const runtimeRegExp = /\w+\u200d\.(\w+)(\.)/g
+const runtimeRegExp = /\w+\u200d\.(\w+)(\.)?/g
 const traceRegExp = /(\n +at .+)+$/
 
 const stdFilename = __non_webpack_module__.filename
