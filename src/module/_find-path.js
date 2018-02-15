@@ -16,7 +16,6 @@ import stat from "../fs/stat.js"
 const { parse } = JSON
 const { preserveSymlinks } = binding.config
 
-const isWin = process.platform === "win32"
 const mainFieldRegExp = /"main"/
 
 function findPath(request, paths, isMain, searchExts) {
@@ -42,7 +41,7 @@ function findPath(request, paths, isMain, searchExts) {
     const code = request.charCodeAt(request.length - 1)
     trailingSlash = code === 47 /* / */
 
-    if (isWin &&
+    if (shared.env.win32 &&
         ! trailingSlash) {
       trailingSlash = code === 92 /* \ */
     }

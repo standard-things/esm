@@ -1,6 +1,5 @@
 import { isAbsolute as _isAbsolutePath } from "path"
-
-const isPosix = process.platform !== "win32"
+import shared from "../shared.js"
 
 function isAbsolutePath(value) {
   if (typeof value !== "string") {
@@ -11,7 +10,7 @@ function isAbsolutePath(value) {
     // Protocol relative URLs are not paths.
     const code1 = value.charCodeAt(1)
 
-    if (isPosix) {
+    if (! shared.env.win32) {
       return code1 !== 47 /* / */
     }
 

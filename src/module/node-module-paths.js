@@ -3,12 +3,21 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import { resolve } from "path"
+import shared from "../shared.js"
 
-const { map } = Array.prototype
-const nmChars = map.call("node_modules", (char) => char.charCodeAt(0)).reverse()
+const nmChars = Array.prototype
+  .map.call("node_modules", (char) => char.charCodeAt(0))
+  .reverse()
+
 const nmLength = nmChars.length
 
-function posixNodeModulePaths(from) {
+function nodeModulePaths(from) {
+  return shared.env.win32
+    ? win32Paths(from)
+    : posixPaths(from)
+}
+
+function posixPaths(from) {
   from = resolve(from)
 
   // Return early not only to avoid unnecessary work, but to avoid returning
@@ -51,7 +60,7 @@ function posixNodeModulePaths(from) {
   return paths
 }
 
-function win32NodeModulePaths(from) {
+function win32Paths(from) {
   from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
@@ -94,6 +103,4 @@ function win32NodeModulePaths(from) {
   return paths
 }
 
-export default process.platform === "win32"
-  ? win32NodeModulePaths
-  : posixNodeModulePaths
+export default nodeModulePaths

@@ -23,7 +23,7 @@ let exported
 if (shared.inited) {
   const { stringify } = JSON
 
-  const nodeModulesRegExp = process.platform === "win32"
+  const nodeModulesRegExp = shared.env.win32
     ? /[\\/]node_modules[\\/]/
     : /\/node_modules\//
 

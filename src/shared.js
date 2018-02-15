@@ -8,9 +8,10 @@ import { promisify } from "util"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
-const getSymbolFor = Symbol.for
 const { now } = Date
+const { platform } = process
 
+const getSymbolFor = Symbol.for
 const nodeVersion = process.version
 
 let shared
@@ -36,7 +37,10 @@ if (__shared__) {
       cache: new SafeWeakMap,
       skipExports: { __proto__: null }
     },
-    env: { __proto__: null },
+    env: {
+      __proto__: null,
+      win32: platform === "win32"
+    },
     fastPath,
     findPath: { __proto__: null },
     global,

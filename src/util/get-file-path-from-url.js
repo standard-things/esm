@@ -1,13 +1,11 @@
 import decodeURIComponent from "./decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
+import { normalize } from "path"
 import parseURL from "./parse-url.js"
-import path from "path"
+import shared from "../shared.js"
 
-const isWin = process.platform === "win32"
 const localhostRegExp = /^\/\/localhost\b/
-
-const { normalize } = path[isWin ? "win32" : "posix"]
 
 function getFilePathFromURL(url) {
   const parsed = parseURL(url)
@@ -30,6 +28,8 @@ function getFilePathFromURL(url) {
   }
 
   let { host } = parsed
+  const { win32 } = shared.env
+
   pathname = decodeURIComponent(pathname)
 
   // Section 2: Syntax
@@ -37,12 +37,12 @@ function getFilePathFromURL(url) {
   if (host === "localhost") {
     host = ""
   } if (host) {
-    return isWin
+    return win32
       ? "\\\\" + domainToUnicode(host) + normalize(pathname)
       : ""
   }
 
-  if (! isWin) {
+  if (! win32) {
     return pathname
   }
 
