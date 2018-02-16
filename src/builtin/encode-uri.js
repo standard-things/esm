@@ -11,5 +11,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.encodeURI
-  : shared.encodeURI = init()
+  ? shared.builtin.encodeURI
+  : shared.builtin.encodeURI = init()

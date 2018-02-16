@@ -8,5 +8,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Proxy
-  : shared.Proxy = init()
+  ? shared.builtin.Proxy
+  : shared.builtin.Proxy = init()

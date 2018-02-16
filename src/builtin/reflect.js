@@ -8,5 +8,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Reflect
-  : shared.Reflect = init()
+  ? shared.builtin.Reflect
+  : shared.builtin.Reflect = init()

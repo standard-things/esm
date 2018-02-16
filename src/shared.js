@@ -35,6 +35,7 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
+    builtin: { __proto__: null },
     decodeURI,
     decodeURIComponent,
     encodeURI,
@@ -49,6 +50,7 @@ if (__shared__) {
     },
     fastPath,
     findPath: { __proto__: null },
+    generic: { __proto__: null },
     global,
     globalName,
     globalPaths,

@@ -11,5 +11,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.decodeURIComponent
-  : shared.decodeURIComponent = init()
+  ? shared.builtin.decodeURIComponent
+  : shared.builtin.decodeURIComponent = init()
