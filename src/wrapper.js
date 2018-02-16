@@ -2,7 +2,9 @@
 // changed as little as possible. Please ensure any changes are backwards
 // compatible.
 
-import SafeObject from "./builtin/object.js"
+import GenericArray from "./generic/array.js"
+import GenericFunction from "./generic/function.js"
+import GenericObject from "./generic/object.js"
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
@@ -30,7 +32,7 @@ class Wrapper {
   static manage(object, key, wrapper) {
     const value = Wrapper.unwrap(object, key)
     const manager = function (...args) {
-      return wrapper.call(this, manager, value, args)
+      return GenericFunction.call(wrapper, this, manager, value, args)
     }
 
     setProperty(manager, shared.symbol.wrapper, {
@@ -51,7 +53,7 @@ class Wrapper {
     const map = getOrCreateMap(object, key)
 
     if (typeof map.wrappers[version] !== "function") {
-      map.versions.push(version)
+      GenericArray.push(map.versions, version)
       map.wrappers[version] = wrapper
     }
   }
@@ -98,6 +100,6 @@ function getStore(object) {
   return has(object, symbol) ? object[symbol] : null
 }
 
-SafeObject.setPrototypeOf(Wrapper.prototype, null)
+GenericObject.setPrototypeOf(Wrapper.prototype, null)
 
 export default Wrapper

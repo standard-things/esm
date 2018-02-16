@@ -1,5 +1,7 @@
 import { extname, resolve } from "path"
 
+import GenericString from "../generic/string.js"
+
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
 import isPath from "../util/is-path.js"
@@ -21,7 +23,7 @@ function hasLoaderValue(value) {
       if (realpath(resolved) === stdFilename) {
         return true
       }
-    } else if (value.charCodeAt(0) !== 45 /* - */ &&
+    } else if (GenericString.charCodeAt(value, 0) !== 45 /* - */ &&
         _resolveFilename(value, rootModule) === stdFilename) {
       return true
     }

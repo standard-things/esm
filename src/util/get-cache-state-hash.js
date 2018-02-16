@@ -1,8 +1,10 @@
 import { basename, extname } from "path"
 
+import GenericString from "../generic/string.js"
+
 function getCacheStateHash(filename) {
   return typeof filename === "string"
-    ? basename(filename, extname(filename)).slice(-8)
+    ? GenericString.slice(basename(filename, extname(filename)), -8)
     : ""
 }
 

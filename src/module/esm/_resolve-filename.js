@@ -1,5 +1,5 @@
+import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
-import SafeArray from "../../builtin/array.js"
 
 import _findPath from "../_find-path.js"
 import _resolveLookupPaths from "../_resolve-lookup-paths.js"
@@ -14,7 +14,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
   let paths
 
   if (options &&
-      SafeArray.isArray(options.paths)) {
+      GenericArray.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 
@@ -24,13 +24,13 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
       fakeParent.paths = nodeModulePaths(fromPath)
       const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
 
-      if (paths.indexOf(fromPath) === -1) {
-        paths.push(fromPath)
+      if (GenericArray.indexOf(paths, fromPath) === -1) {
+        GenericArray.push(paths, fromPath)
       }
 
       for (const lookupPath of lookupPaths) {
-        if (paths.indexOf(lookupPath) === -1) {
-          paths.push(lookupPath)
+        if (GenericArray.indexOf(paths, lookupPath) === -1) {
+          GenericArray.push(paths, lookupPath)
         }
       }
     }

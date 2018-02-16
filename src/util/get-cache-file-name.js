@@ -1,3 +1,4 @@
+import GenericString from "../generic/string.js"
 import SafeJSON from "../builtin/json.js"
 
 import { extname } from "path"
@@ -39,7 +40,8 @@ function getCacheFileName(entry, cacheKey) {
     cacheKey
   )
 
-  return pathHash.slice(0, 8) + stateHash.slice(0, 8) + ext
+  return GenericString.slice(pathHash, 0, 8) +
+    GenericString.slice(stateHash, 0, 8) + ext
 }
 
 export default getCacheFileName

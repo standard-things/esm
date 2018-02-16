@@ -1,3 +1,5 @@
+import GenericString from "../generic/string.js"
+
 import has from "../util/has.js"
 import normalize from "../path/normalize.js"
 import readJSON from "../fs/read-json.js"
@@ -14,12 +16,15 @@ function isNyc() {
   const parentFilename = parent && normalize(parent.filename)
 
   const nycIndex = parentFilename
-    ? parentFilename.lastIndexOf("/node_modules/nyc/")
+    ? GenericString.lastIndexOf(parentFilename, "/node_modules/nyc/")
     : -1
 
-  const nycJSON = nycIndex === -1
-    ? null
-    : readJSON(parentFilename.slice(0, nycIndex + 18) + "package.json")
+  if (nycIndex === -1) {
+    return env.nyc = false
+  }
+
+  const nycPath = GenericString.slice(parentFilename, 0, nycIndex + 18) + "package.json"
+  const nycJSON = readJSON(nycPath)
 
   return env.nyc =
     has(nycJSON, "name") &&

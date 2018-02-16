@@ -1,10 +1,11 @@
 // Inspired by `findMagicComment` in
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
 
+import GenericString from "../generic/string.js"
+
 const name = "sourceMappingURL"
 const nameLength = name.length
 const minLength = nameLength + 6
-const { trim } = String.prototype
 
 function getSourceMappingURL(content) {
   if (typeof content !== "string") {
@@ -21,7 +22,7 @@ function getSourceMappingURL(content) {
   let pos = length
 
   while (match === null) {
-    pos = content.lastIndexOf(name, pos)
+    pos = GenericString.lastIndexOf(content, name, pos)
 
     if (pos === -1 ||
         pos < 4) {
@@ -34,19 +35,19 @@ function getSourceMappingURL(content) {
     pos -= 4
 
     // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
-    if (content.charCodeAt(pos) !== 47 /* / */ ||
-        content.charCodeAt(pos + 1) !== 47 /* / */) {
+    if (GenericString.charCodeAt(content, pos) !== 47 /* / */ ||
+        GenericString.charCodeAt(content, pos + 1) !== 47 /* / */) {
       continue
     }
 
-    let code = content.charCodeAt(pos + 2)
+    let code = GenericString.charCodeAt(content, pos + 2)
 
     if (code !== 35 /* # */ &&
         code !== 64 /* @ */) {
       continue
     }
 
-    code = content.charCodeAt(pos + 3)
+    code = GenericString.charCodeAt(content, pos + 3)
 
     if (code !== 32 /* <space> */ &&
         code !== 9 /* \t */) {
@@ -55,7 +56,7 @@ function getSourceMappingURL(content) {
 
     // Check for "=" after the name.
     if (equalPos < length &&
-        content.charCodeAt(equalPos) !== 61 /* = */) {
+      GenericString.charCodeAt(content, equalPos) !== 61 /* = */) {
       continue
     }
 
@@ -63,22 +64,22 @@ function getSourceMappingURL(content) {
       return ""
     }
 
-    match = content.slice(urlPos)
+    match = GenericString.slice(content, urlPos)
   }
 
-  const newLinePos = match.indexOf("\n")
+  const newLinePos = GenericString.indexOf(match, "\n")
 
   if (newLinePos !== -1) {
-    match = match.slice(0, newLinePos)
+    match = GenericString.slice(match, 0, newLinePos)
   }
 
-  match = trim.call(match)
+  match = GenericString.trim(match)
 
   let i = -1
   const matchLength = match.length
 
   while (++i < matchLength) {
-    const code = match.charCodeAt(i)
+    const code = GenericString.charCodeAt(match, i)
 
     if (code === 34 /* " */ ||
         code === 39 /* ' */ ||

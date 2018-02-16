@@ -1,15 +1,15 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function assign(object) {
   let i = 0
   const argCount = arguments.length
-  const { hasOwnProperty } = SafeObject.prototype
+  const { hasOwnProperty } = GenericObject
 
   while (++i < argCount) {
     const source = arguments[i]
 
     for (const name in source) {
-      if (hasOwnProperty.call(source, name)) {
+      if (hasOwnProperty(source, name)) {
         object[name] = source[name]
       }
     }

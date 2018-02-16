@@ -1,3 +1,4 @@
+import apply from "./apply.js"
 import isDataDescriptor from "./is-data-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 
@@ -8,6 +9,8 @@ const {
   getOwnPropertySymbols,
   setPrototypeOf
 } = Object
+
+const { push } = Array.prototype
 
 const construct = typeof Reflect === "object" && Reflect !== null
   ? Reflect.construct
@@ -66,7 +69,7 @@ function keysAll(object) {
   }
 
   const names = getOwnPropertyNames(object)
-  names.push(...getOwnPropertySymbols(object))
+  apply(push, names, getOwnPropertySymbols(object))
   return names
 }
 

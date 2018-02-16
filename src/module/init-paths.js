@@ -2,14 +2,16 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
-import _initPaths from "./_init-paths.js"
+import initGlobalPaths from "./init-global-paths.js"
 import moduleState from "./state.js"
 
 function initPaths() {
-  moduleState.globalPaths = _initPaths()
-  Module.globalPaths = moduleState.globalPaths.slice()
+  const globalPaths = initGlobalPaths()
+  moduleState.globalPaths = globalPaths
+  Module.globalPaths = GenericArray.slice(globalPaths)
 }
 
 export default initPaths

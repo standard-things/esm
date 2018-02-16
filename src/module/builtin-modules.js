@@ -1,19 +1,24 @@
-import SafeArray from "../builtin/array.js"
-import SafeObject from "../builtin/object.js"
+import GenericArray from "../generic/array.js"
+import GenericObject from "../generic/object.js"
+import GenericString from "../generic/string.js"
 
 import binding from "../binding.js"
-import keys from "../util/keys.js"
 import shared from "../shared.js"
 
 function init() {
   let { builtinModules } = __non_webpack_module__.constructor
 
-  if (! SafeArray.isArray(builtinModules) ||
-      ! SafeObject.isFrozen(builtinModules)) {
-    builtinModules = keys(binding.natives)
-      .filter((id) => ! id.startsWith("internal/"))
+  if (! GenericArray.isArray(builtinModules) ||
+      ! GenericObject.isFrozen(builtinModules)) {
+    builtinModules = []
 
-    SafeObject.freeze(builtinModules)
+    for (const name in binding.natives) {
+      if (! GenericString.startsWith(name, "internal/")) {
+        GenericArray.push(builtinModules, name)
+      }
+    }
+
+    GenericObject.freeze(builtinModules)
   }
 
   return builtinModules

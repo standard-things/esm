@@ -2,8 +2,8 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import GenericArray from "../generic/array.js"
 import Module from "../module.js"
-import SafeArray from "../builtin/array.js"
 
 import { dirname } from "path"
 import isRelativePath from "../util/is-relative-path.js"
@@ -16,11 +16,11 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   // Look outside if not a relative path.
   if (! isRelativePath(request)) {
     const parentPaths = parent && parent.paths
-    const paths = parentPaths ? SafeArray.prototype.slice.call(parentPaths) : []
+    const paths = parentPaths ? GenericArray.slice(parentPaths) : []
 
     if (parentPaths &&
         ! skipGlobalPaths) {
-      paths.push(...moduleState.globalPaths)
+      GenericArray.push(paths, ...moduleState.globalPaths)
     }
 
     return paths.length ? paths : null
@@ -36,7 +36,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
       ? nodeModulePaths(".")
       : Module._nodeModulePaths(".")
 
-    paths.unshift(".")
+    GenericArray.unshift(paths, ".")
     return paths
   }
 

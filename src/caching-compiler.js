@@ -1,10 +1,12 @@
 import { extname, resolve } from "path"
 
 import Compiler from "./compiler.js"
-import SafeBuffer from "./builtin/buffer.js"
+import GenericArray from "./generic/array.js"
+import GenericBuffer from "./generic/buffer.js"
+import GenericObject from "./generic/object.js"
+import GenericString from "./generic/string.js"
 import SafeJSON from "./builtin/json.js"
 import SafeMath from "./builtin/math.js"
-import SafeObject from "./builtin/object.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
@@ -71,7 +73,7 @@ class CachingCompiler {
     if (buffer &&
         offsetStart !== -1 &&
         offsetEnd !== -1) {
-      result.scriptData = buffer.slice(offsetStart, offsetEnd)
+      result.scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
     }
 
     return result
@@ -136,11 +138,11 @@ function removeCacheFile(cachePath, cacheName) {
 
 function removeExpired(cachePath, cacheName) {
   const cache = shared.package.dir[cachePath]
-  const shortname = cacheName.slice(0, 8)
+  const shortname = GenericString.slice(cacheName, 0, 8)
 
   for (const otherCacheName in cache) {
     if (otherCacheName !== cacheName &&
-        otherCacheName.startsWith(shortname) &&
+        GenericString.startsWith(otherCacheName, shortname) &&
         isCacheFileName(otherCacheName)) {
       removeCacheFile(cachePath, cacheName)
     }
@@ -165,7 +167,7 @@ function toCompileOptions(entry, options) {
   }
 }
 
-SafeObject.setPrototypeOf(CachingCompiler.prototype, null)
+GenericObject.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
@@ -229,7 +231,7 @@ if (! shared.inited) {
       let offset = 0
 
       for (const cacheName in scriptDatas) {
-        if (cacheName.charCodeAt(0) === 46 /* . */) {
+        if (GenericString.charCodeAt(cacheName, 0) === 46 /* . */) {
           continue
         }
 
@@ -241,7 +243,7 @@ if (! shared.inited) {
         if (scriptData) {
           offsetStart = offset
           offsetEnd = offset += scriptData.length
-          buffers.push(scriptData)
+          GenericArray.push(buffers, scriptData)
         }
 
         const cached = cache.compile[cacheName]
@@ -261,7 +263,7 @@ if (! shared.inited) {
         }
       }
 
-      writeFile(resolve(cachePath, ".data.blob"), SafeBuffer.concat(buffers))
+      writeFile(resolve(cachePath, ".data.blob"), GenericBuffer.concat(buffers))
       writeFile(resolve(cachePath, ".data.json"), SafeJSON.stringify(map))
     }
 

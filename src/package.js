@@ -1,7 +1,8 @@
 import { basename, dirname , extname, resolve } from "path"
 
+import GenericObject from "./generic/object.js"
+import GenericString from "./generic/string.js"
 import SafeJSON from "./builtin/json.js"
-import SafeObject from "./builtin/object.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
@@ -48,7 +49,7 @@ const defaultOptions = {
 
 const defaultCJS = defaultOptions.cjs
 const cacheKey = SafeJSON.stringify(defaultOptions)
-const cjsKeys = SafeObject.keys(defaultCJS)
+const cjsKeys = GenericObject.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
 
 class Package {
@@ -90,7 +91,7 @@ class Package {
         const cacheNames = readdir(cachePath)
 
         for (const cacheName of cacheNames) {
-          if (cacheName.charCodeAt(0) !== 46 /* . */) {
+          if (GenericString.charCodeAt(cacheName, 0) !== 46 /* . */) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
             compileCache[cacheName] = true
@@ -146,7 +147,7 @@ function cleanCache(cachePath) {
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
-    if (cacheName.startsWith(".babel.") &&
+    if (GenericString.startsWith(cacheName, ".babel.") &&
         extname(cacheName) === ".json") {
       removeFile(resolve(babelCachePath, cacheName))
     }
@@ -430,7 +431,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-SafeObject.setPrototypeOf(Package.prototype, null)
+GenericObject.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {

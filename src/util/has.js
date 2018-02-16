@@ -1,8 +1,8 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function has(object, key) {
   return object != null &&
-    SafeObject.prototype.hasOwnProperty.call(object, key)
+    GenericObject.hasOwnProperty(object, key)
 }
 
 export default has

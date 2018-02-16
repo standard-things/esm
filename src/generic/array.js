@@ -8,6 +8,8 @@ function init() {
 
   return {
     __proto__: null,
+    concat: unapply(arrayProto.concat),
+    filter: unapply(arrayProto.filter),
     indexOf: unapply(arrayProto.indexOf),
     isArray: SafeArray.isArray,
     join: unapply(arrayProto.join),
@@ -16,7 +18,9 @@ function init() {
     reverse: unapply(arrayProto.reverse),
     slice: unapply(arrayProto.slice),
     some: unapply(arrayProto.some),
-    sort: unapply(arrayProto.sort)
+    sort: unapply(arrayProto.sort),
+    splice: unapply(arrayProto.splice),
+    unshift: unapply(arrayProto.unshift)
   }
 }
 

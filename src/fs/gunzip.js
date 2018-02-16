@@ -1,3 +1,4 @@
+import GenericBuffer from "../generic/buffer.js"
 import { Gunzip } from "minizlib"
 
 import createOptions from "../util/create-options.js"
@@ -23,7 +24,10 @@ function gunzip(bufferOrString, options) {
 
 function fallbackGunzip(bufferOrString, options) {
   const buffer = gunzipSync(bufferOrString, options)
-  return options.encoding === "utf8" ? buffer.toString() : buffer
+
+  return options.encoding === "utf8"
+    ? GenericBuffer.toString(buffer)
+    : buffer
 }
 
 function fastPathGunzip(bufferOrString, options) {

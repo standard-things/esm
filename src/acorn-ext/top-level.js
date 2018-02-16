@@ -1,3 +1,5 @@
+import GenericArray from "../generic/array.js"
+
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 
@@ -47,25 +49,27 @@ function parseTopLevel(node) {
       type = object.type
     }
 
+    const { push } = GenericArray
+
     if (type === "VariableDeclaration") {
       for (const decl of object.declarations) {
         const names = getNamesFromPattern(decl.id)
 
         for (const name of names) {
-          idents.push(name)
+          push(idents, name)
         }
       }
     } else if (id &&
         (type === "ClassDeclaration" ||
          type === "FunctionDeclaration")) {
-      idents.push(id.name)
+      push(idents, id.name)
     } else if (type === "ImportDeclaration") {
       for (const specifier of stmt.specifiers) {
-        idents.push(specifier.local.name)
+        push(idents, specifier.local.name)
       }
     }
 
-    body.push(stmt)
+    push(body, stmt)
   }
 
   top.idents = idents

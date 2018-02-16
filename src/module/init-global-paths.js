@@ -4,7 +4,10 @@
 
 import { delimiter, resolve } from "path"
 
-function initPaths() {
+import GenericArray from "../generic/array.js"
+import GenericString from "../generic/string.js"
+
+function initGlobalPaths() {
   const { env } = process
   const isWin = process.platform === "win32"
   const homeDir = env[isWin ? "USERPROFILE" : "HOME"]
@@ -15,15 +18,20 @@ function initPaths() {
   const paths = [resolve(prefixDir, "lib", "node")]
 
   if (homeDir) {
-    paths.unshift(resolve(homeDir, ".node_libraries"))
-    paths.unshift(resolve(homeDir, ".node_modules"))
+    GenericArray.unshift(paths, resolve(homeDir, ".node_libraries"))
+    GenericArray.unshift(paths, resolve(homeDir, ".node_modules"))
   }
 
   const { NODE_PATH } = env
 
-  return typeof NODE_PATH === "string"
-    ? NODE_PATH.split(delimiter).filter(Boolean).concat(paths)
-    : paths
+  if (typeof NODE_PATH !== "string") {
+    return paths
+  }
+
+  const otherPaths = GenericString.split(NODE_PATH, delimiter)
+  const filtered = GenericArray.filter(otherPaths, Boolean)
+
+  return GenericArray.concat(filtered, paths)
 }
 
-export default initPaths
+export default initGlobalPaths

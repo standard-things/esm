@@ -12,8 +12,10 @@ function init() {
     endsWith: unapply(stringProto.endsWith),
     indexOf: unapply(stringProto.indexOf),
     lastIndexOf: unapply(stringProto.lastIndexOf),
+    repeat: unapply(stringProto.repeat),
     replace: unapply(stringProto.replace),
     slice: unapply(stringProto.slice),
+    split: unapply(stringProto.split),
     startsWith: unapply(stringProto.startsWith),
     trim: unapply(stringProto.trim)
   }

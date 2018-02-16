@@ -1,3 +1,7 @@
+import GenericArray from "../generic/array.js"
+import GenericRegExp from "../generic/regexp.js"
+import GenericString from "../generic/string.js"
+
 const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const runtimeRegExp = /\w+\u200d\.(\w+)(\.)?/g
 const traceRegExp = /(\n +at .+)+$/
@@ -9,22 +13,27 @@ function scrubStackTrace(stack) {
     return ""
   }
 
-  const match = traceRegExp.exec(stack)
+  const match = GenericRegExp.exec(traceRegExp, stack)
 
   if (match === null) {
     return stack
   }
 
   const { index } = match
-  const message = stack.slice(0, index)
-  const trace = stack.slice(index)
+  const message = GenericString.slice(stack, 0, index)
+
+  let trace = GenericString.slice(stack, index)
+  const lines = GenericString.split(trace, "\n")
+
+  const filtered = GenericArray.filter(lines, (line) => {
+    return GenericString.indexOf(line, stdFilename) === -1
+  })
+
+  trace = GenericArray.join(filtered, "\n")
+  trace = GenericString.replace(trace, columnInfoRegExp, ":1")
+  trace = GenericString.replace(trace, runtimeRegExp, replaceRuntime)
 
   return message + trace
-    .split("\n")
-    .filter((line) => line.indexOf(stdFilename) === -1)
-    .join("\n")
-    .replace(columnInfoRegExp, ":1")
-    .replace(runtimeRegExp, replaceRuntime)
 }
 
 function replaceRuntime(match, name, dot = "") {

@@ -1,5 +1,7 @@
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
+import GenericFunction from "../generic/function.js"
+import GenericString from "../generic/string.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import { REPLServer } from "repl"
@@ -28,7 +30,7 @@ function hook(vm) {
   function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkg.range)
 
-    return wrapped.call(this, manager, func, args)
+    return GenericFunction.call(wrapped, this, manager, func, args)
   }
 
   function methodWrapper(manager, func, args) {
@@ -115,7 +117,7 @@ function hook(vm) {
     vm.Script = function (code, options) {
       vm.Script = Script
       const { wrapper } = Module
-      code = code.slice(wrapper[0].length, -wrapper[1].length)
+      code = GenericString.slice(code, wrapper[0].length, -wrapper[1].length)
       initEntry(rootModule)
       return vm.createScript(code, options)
     }
@@ -135,7 +137,7 @@ function hook(vm) {
     } else if (typeof createContext === "function") {
       REPLServer.prototype.createContext = function () {
         REPLServer.prototype.createContext = createContext
-        const context = createContext.call(this)
+        const context = GenericFunction.call(createContext, this)
         initEntry(context.module)
         return context
       }
@@ -161,7 +163,7 @@ function tryValidateESM(caller, entry, content) {
 
 function tryWrapper(func, args) {
   try {
-    return func.apply(this, args)
+    return GenericFunction.apply(func, this, args)
   } catch (e) {
     if (! isError(e) ||
         isStackTraceMasked(e)) {

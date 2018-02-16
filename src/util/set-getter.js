@@ -1,7 +1,7 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function setGetter(object, key, getter) {
-  SafeObject.prototype.__defineGetter__.call(object, key, getter)
+  GenericObject.__defineGetter__(object, key, getter)
   return object
 }
 

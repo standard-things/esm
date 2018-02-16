@@ -1,3 +1,5 @@
+import GenericString from "../generic/string.js"
+
 const shebangRegExp = /^#!.*/
 
 function stripShebang(string) {
@@ -5,8 +7,8 @@ function stripShebang(string) {
     return ""
   }
 
-  return string.charCodeAt(0) === 35 /* # */
-    ? string.replace(shebangRegExp, "")
+  return GenericString.charCodeAt(string, 0) === 35 /* # */
+    ? GenericString.replace(string, shebangRegExp, "")
     : string
 }
 

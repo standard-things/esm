@@ -2,10 +2,13 @@ import { extname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
+import GenericFunction from "../generic/function.js"
+import GenericObject from "../generic/object.js"
+import GenericRegExp from "../generic/regexp.js"
+import GenericString from "../generic/string.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import SafeMap from "../builtin/map.js"
-import SafeObject from "../builtin/object.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
@@ -75,8 +78,8 @@ function hook(Mod, parent) {
     const wrapped = Wrapper.find(_extensions, ".js", pkg.range)
 
     return wrapped
-      ? wrapped.call(this, manager, func, args)
-      : tryPassthru.call(this, func, args, pkg)
+      ? GenericFunction.call(wrapped, this, manager, func, args)
+      : GenericFunction.call(tryPassthru, this, func, args, pkg)
   }
 
   function methodWrapper(manager, func, args) {
@@ -91,7 +94,7 @@ function hook(Mod, parent) {
 
     const compileFallback = () => {
       entry.state = 3
-      return tryPassthru.call(this, func, args, pkg)
+      return GenericFunction.call(tryPassthru, this, func, args, pkg)
     }
 
     const compileWrapper = (content, filename) => {
@@ -107,9 +110,9 @@ function hook(Mod, parent) {
     }
 
     entry.cacheName = cacheName
-    entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
+    entry.runtimeName = encodeId("_" + GenericString.slice(getCacheStateHash(cacheName), 0, 3))
 
-    SafeObject.setPrototypeOf(mod, Module.prototype)
+    GenericObject.setPrototypeOf(mod, Module.prototype)
 
     let cached = cache.compile[cacheName]
 
@@ -136,14 +139,14 @@ function hook(Mod, parent) {
 
     if (! cached &&
         passthruMap.get(func)) {
-      tryPassthru.call(this, func, args, pkg)
+      GenericFunction.call(tryPassthru, this, func, args, pkg)
     } else {
       const content = cached ? cached.code : readSourceCode(filename, options)
       mod._compile(content, filename)
     }
   }
 
-  exts.forEach((ext) => {
+  for (const ext of exts) {
     if (typeof _extensions[ext] !== "function" &&
         (ext === ".mjs" ||
          ext === ".mjs.gz")) {
@@ -173,7 +176,7 @@ function hook(Mod, parent) {
 
     passthruMap.set(extCompiler, passthru)
     moduleState._extensions[ext] = _extensions[ext]
-  })
+  }
 }
 
 function mjsCompiler(mod, filename) {
@@ -210,10 +213,10 @@ function tryPassthru(func, args, pkg) {
   const options = pkg && pkg.options
 
   if (options && options.debug) {
-    func.apply(this, args)
+    GenericFunction.apply(func, this, args)
   } else {
     try {
-      func.apply(this, args)
+      GenericFunction.apply(func, this, args)
     } catch (e) {
       if (! isError(e) ||
           isStackTraceMasked(e)) {
@@ -225,9 +228,9 @@ function tryPassthru(func, args, pkg) {
       const { message } = e
 
       if (e.name === "SyntaxError" &&
-          importExportRegExp.test(message)) {
+          GenericRegExp.test(importExportRegExp, message)) {
         e.message = stdName + " is not enabled for " + filename
-        e.stack = e.stack.replace(message, e.message)
+        e.stack = GenericString.replace(e.stack, message, e.message)
 
         if (pkg) {
           pkg.cache.dirty = true

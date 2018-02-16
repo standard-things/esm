@@ -1,3 +1,5 @@
+import GenericRegExp from "../generic/regexp.js"
+
 import shared from "../shared.js"
 
 const posixRegExp = /%2f/i
@@ -9,8 +11,8 @@ function hasEncodedSlash(string) {
   }
 
   return shared.env.win32
-    ? win32RegExp.test(string)
-    : posixRegExp.test(string)
+    ? GenericRegExp.test(win32RegExp, string)
+    : GenericRegExp.test(posixRegExp, string)
 }
 
 export default hasEncodedSlash

@@ -1,6 +1,6 @@
+import GenericArray from "./generic/array.js"
+import GenericObject from "./generic/object.js"
 import Package from "./package.js"
-import SafeArray from "./builtin/array.js"
-import SafeObject from "./builtin/object.js"
 import SafeProxy from "./builtin/proxy.js"
 import SafeReflect from "./builtin/reflect.js"
 import SafeSymbol from "./builtin/symbol.js"
@@ -196,7 +196,7 @@ class Entry {
     const setters = this.setters[name] || (this.setters[name] = [])
     setter.last = { __proto__: null }
     setter.parent = parent
-    setters.push(setter)
+    GenericArray.push(setters, setter)
     return this
   }
 
@@ -235,7 +235,7 @@ class Entry {
     if (isESM) {
       const exported = this.module.exports
 
-      if (! SafeObject.isSealed(exported)) {
+      if (! GenericObject.isSealed(exported)) {
         for (const name in this._namespace) {
           setGetter(exported, name, () => {
             return this._namespace[name]
@@ -248,7 +248,7 @@ class Entry {
         setProperty(exported, "__esModule", esmDescriptor)
       }
 
-      SafeObject.seal(exported)
+      GenericObject.seal(exported)
     } else {
       const otherEntry = Entry.get(this.module)
       setGetters = otherEntry._loaded !== 1
@@ -384,7 +384,7 @@ function callGetter(getter) {
 function changed(setter, key, value) {
   const { last } = setter
 
-  if (SafeObject.is(last[key], value)) {
+  if (GenericObject.is(last[key], value)) {
     return false
   }
 
@@ -471,8 +471,8 @@ function mergeProperty(entry, otherEntry, key) {
     const otherSetters = settersMap[name] = value[name]
 
     for (const setter of setters) {
-      if (otherSetters.indexOf(setter) === -1) {
-        otherSetters.push(setter)
+      if (GenericArray.indexOf(otherSetters, setter) === -1) {
+        GenericArray.push(otherSetters, setter)
       }
     }
   }
@@ -486,7 +486,7 @@ function runGetter(entry, name) {
 
   if (value !== GETTER_ERROR &&
       ! (name in _namespace &&
-         SafeObject.is(_namespace[name], value))) {
+         GenericObject.is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value
   }
@@ -540,7 +540,7 @@ function toNamespaceGetter(entry, source = entry._namespace) {
   // Section 9.4.6.11: ModuleNamespaceCreate ( module, exports )
   // Step 7: Module namespace objects have sorted properties.
   // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-  const names = SafeArray.prototype.sort.call(keys(source))
+  const names = GenericArray.sort(keys(source))
   const namespace = createNamespace()
 
   for (const name of names) {
@@ -567,18 +567,18 @@ function toNamespaceGetter(entry, source = entry._namespace) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace sources are not extensible.
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  return SafeObject.seal(namespace)
+  return GenericObject.seal(namespace)
 }
 
 function toNamespaceProxy(entry, source = entry._namespace) {
-  const names = SafeArray.prototype.sort.call(keys(source))
+  const names = GenericArray.sort(keys(source))
   const namespace = createNamespace()
 
   for (const name of names) {
     namespace[name] = void 0
   }
 
-  return new SafeProxy(SafeObject.seal(namespace), {
+  return new SafeProxy(GenericObject.seal(namespace), {
     get: (namespace, name) => {
       return name === SafeSymbol.toStringTag
         ? SafeReflect.get(namespace, name)
@@ -626,6 +626,6 @@ function toNamespaceProxy(entry, source = entry._namespace) {
   })
 }
 
-SafeObject.setPrototypeOf(Entry.prototype, null)
+GenericObject.setPrototypeOf(Entry.prototype, null)
 
 export default Entry

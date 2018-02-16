@@ -2,14 +2,17 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
-import SafeArray from "../builtin/array.js"
+import GenericArray from "../generic/array.js"
+import GenericString from "../generic/string.js"
 
 import { resolve } from "path"
 import shared from "../shared.js"
 
-const nmChars = SafeArray.prototype
-  .map.call("node_modules", (char) => char.charCodeAt(0))
-  .reverse()
+const nmChars = GenericArray.map("node_modules", (char) => {
+  return GenericString.charCodeAt(char, 0)
+})
+
+GenericArray.reverse(nmChars)
 
 const nmLength = nmChars.length
 
@@ -38,11 +41,11 @@ function posixPaths(from) {
   const paths = []
 
   while (length--) {
-    const code = from.charCodeAt(length)
+    const code = GenericString.charCodeAt(from, length)
 
     if (code === 47 /* / */) {
       if (nmCount !== nmLength) {
-        paths.push(from.slice(0, last) + "/node_modules")
+        GenericArray.push(paths, GenericString.slice(from, 0, last) + "/node_modules")
       }
 
       last = length
@@ -57,7 +60,7 @@ function posixPaths(from) {
   }
 
   // Append "/node_modules" to handle root paths.
-  paths.push("/node_modules")
+  GenericArray.push(paths, "/node_modules")
 
   return paths
 }
@@ -66,8 +69,8 @@ function win32Paths(from) {
   from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
-  if (from.charCodeAt(from.length - 1) === 92 /* \ */ &&
-      from.charCodeAt(from.length - 2) === 58 /* : */) {
+  if (GenericString.charCodeAt(from, from.length - 1) === 92 /* \ */ &&
+      GenericString.charCodeAt(from, from.length - 2) === 58 /* : */) {
     return [from + "node_modules"]
   }
 
@@ -78,7 +81,7 @@ function win32Paths(from) {
   const paths = []
 
   while (length--) {
-    const code = from.charCodeAt(length)
+    const code = GenericString.charCodeAt(from, length)
 
     // The path segment separator check ("\" and "/") was used to get
     // node_modules path for every path segment. Use colon as an extra
@@ -88,7 +91,7 @@ function win32Paths(from) {
         code === 47 /* / */ ||
         code === 58 /* : */) {
       if (nmCount !== nmLength) {
-        paths.push(from.slice(0, last) + "\\node_modules")
+        GenericArray.push(paths, GenericString.slice(from, 0, last) + "\\node_modules")
       }
 
       last = length

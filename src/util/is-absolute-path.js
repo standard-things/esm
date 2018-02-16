@@ -1,3 +1,5 @@
+import GenericString from "../generic/string.js"
+
 import { isAbsolute as _isAbsolutePath } from "path"
 import shared from "../shared.js"
 
@@ -6,9 +8,9 @@ function isAbsolutePath(value) {
     return false
   }
 
-  if (value.charCodeAt(0) === 47 /* / */) {
+  if (GenericString.charCodeAt(value, 0) === 47 /* / */) {
     // Protocol relative URLs are not paths.
-    const code1 = value.charCodeAt(1)
+    const code1 = GenericString.charCodeAt(value, 1)
 
     if (! shared.env.win32) {
       return code1 !== 47 /* / */
@@ -19,8 +21,8 @@ function isAbsolutePath(value) {
       // Allow long UNC paths or named pipes.
       // https://en.wikipedia.org/wiki/Path_(computing)#Uniform_Naming_Convention
       // https://en.wikipedia.org/wiki/Named_pipe#In_Windows
-      const code2 = value.charCodeAt(2)
-      return code2 === 46 /* . */ || code2 === 63/* ? */
+      const code2 = GenericString.charCodeAt(value, 2)
+      return code2 === 46 /* . */ || code2 === 63 /* ? */
     }
 
     return true

@@ -1,3 +1,6 @@
+import GenericArray from "../../generic/array.js"
+import GenericRegExp from "../../generic/regexp.js"
+import GenericString from "../../generic/string.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
@@ -18,7 +21,7 @@ const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
 const esmExts = [".mjs", ".js", ".json", ".node"]
-const gzExts = esmExts.concat(".gz", ".mjs.gz", ".js.gz")
+const gzExts = GenericArray.concat(esmExts, ".gz", ".mjs.gz", ".js.gz")
 const noExts = []
 
 const esmExtsLookup = { __proto__: null }
@@ -61,14 +64,14 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (request.charCodeAt(0) === 47 /* / */ ||
-         request.indexOf(":") !== -1)) {
+        (GenericString.charCodeAt(request, 0) === 47 /* / */ ||
+         GenericString.indexOf(request, ":") !== -1)) {
       const parsed = parseURL(request)
       foundPath = getFilePathFromURL(parsed)
 
       if (! foundPath &&
           parsed.protocol !== "file:" &&
-          ! localhostRegExp.test(request)) {
+          ! GenericRegExp.test(localhostRegExp, request)) {
         throw new errors.Error("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
       }
 
@@ -91,7 +94,7 @@ function resolveFilename(request, parent, isMain, options) {
         }
       }
 
-      const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
+      const decoded = decodeURIComponent(GenericString.replace(request, queryHashRegExp, ""))
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts)
     }
   }

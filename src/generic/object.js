@@ -16,7 +16,7 @@ const GenericObject = {
   getOwnPropertyNames: SafeObject.getOwnPropertyNames,
   getOwnPropertySymbols: SafeObject.getOwnPropertySymbols,
   hasOwnProperty: unapply(objectProto.hasOwnProperty),
-  is: SafeObject.js,
+  is: SafeObject.is,
   isFrozen: SafeObject.isFrozen,
   isSealed: SafeObject.isSealed,
   keys: SafeObject.keys,

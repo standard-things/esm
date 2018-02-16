@@ -1,3 +1,4 @@
+import GenericRegExp from "./generic/regexp.js"
 import Module from "./module.js"
 import Package from "./package.js"
 import SafeJSON from "./builtin/json.js"
@@ -19,13 +20,15 @@ import shared from "./shared.js"
 import vm from "vm"
 import vmHook from "./hook/vm.js"
 
+const BuiltinModule = __non_webpack_module__.constructor
+
+const nodeModulesRegExp = shared.env.win32
+  ? /[\\/]node_modules[\\/]/
+  : /\/node_modules\//
+
 let exported
 
 if (shared.inited) {
-  const nodeModulesRegExp = shared.env.win32
-    ? /[\\/]node_modules[\\/]/
-    : /\/node_modules\//
-
   exported = (mod, options) => {
     if (! isObject(mod)) {
       throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "module", "object")
@@ -61,15 +64,13 @@ if (shared.inited) {
 
     moduleHook(Module, cloned)
 
-    if (! nodeModulesRegExp.test(mod.filename)) {
+    if (! GenericRegExp.test(nodeModulesRegExp, mod.filename)) {
       processHook(process)
     }
 
     return requireHook(cloned)
   }
 } else {
-  const BuiltinModule = __non_webpack_module__.constructor
-
   exported = shared
   exported.inited = true
 

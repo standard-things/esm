@@ -1,3 +1,5 @@
+import GenericString from "./generic/string.js"
+
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "util"
 import setProperty from "./util/set-property.js"
@@ -85,7 +87,7 @@ function invalidArgValue(argName, value, reason = "is invalid") {
   let inspected = inspect(value)
 
   if (inspected.length > 128) {
-    inspected = inspected.slice(0, 128) + "..."
+    inspected = GenericString.slice(inspected, 0, 128) + "..."
   }
 
   return "The argument '" + argName + "' " + reason + ". Received " + inspected

@@ -1,3 +1,4 @@
+import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 
 const PREFIX = "(" + process.release.name + ":" + process.pid + ") "
@@ -19,7 +20,7 @@ function emitWarning(message, type, code, Ctor) {
   }
 
   if (useEmitWarning) {
-    _emitWarning.call(process, message, type, code, Ctor)
+    call(_emitWarning, process, message, type, code, Ctor)
     return
   }
 

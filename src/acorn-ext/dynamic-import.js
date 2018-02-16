@@ -2,6 +2,8 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
+import GenericFunction from "../generic/function.js"
+
 import lookahead from "../parse/lookahead.js"
 import { types as tt } from "../vendor/acorn/src/tokentype.js"
 import wrap from "../util/wrap.js"
@@ -29,7 +31,7 @@ function parseExprAtom(func, args) {
     this.unexpected()
   }
 
-  return func.apply(this, args)
+  return GenericFunction.apply(func, this, args)
 }
 
 function parseStatement(func, args) {
@@ -49,7 +51,7 @@ function parseStatement(func, args) {
     }
   }
 
-  return func.apply(this, args)
+  return GenericFunction.apply(func, this, args)
 }
 
 function parseImportCall(parser) {

@@ -3,6 +3,8 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import Entry from "../entry.js"
+import GenericArray from "../generic/array.js"
+import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
@@ -29,8 +31,8 @@ function load(request, parent, isMain, state, loader) {
     const children = parent && parent.children
 
     if (children &&
-        children.indexOf(child) === -1) {
-      children.push(child)
+        GenericArray.indexOf(children, child) === -1) {
+      GenericArray.push(children, child)
     }
 
     if (child.loaded ||
@@ -74,7 +76,7 @@ function load(request, parent, isMain, state, loader) {
         ? child[symbol]
         : _compile
 
-      return func.call(child, content, filename)
+      return GenericFunction.call(func, child, content, filename)
     }
   }
 

@@ -1,12 +1,13 @@
-import SafeObject from "../builtin/object.js"
+import GenericArray from "../generic/array.js"
+import GenericObject from "../generic/object.js"
 
 function keysAll(object) {
   if (object == null) {
     return []
   }
 
-  const names = SafeObject.getOwnPropertyNames(object)
-  names.push(...SafeObject.getOwnPropertySymbols(object))
+  const names = GenericObject.getOwnPropertyNames(object)
+  GenericArray.push(names, ...GenericObject.getOwnPropertySymbols(object))
   return names
 }
 

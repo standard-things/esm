@@ -1,6 +1,7 @@
-import getDescriptor from "../util/get-descriptor.js"
+import GenericFunction from "../generic/function.js"
+import GenericString from "../generic/string.js"
 
-const { toString } = Function.prototype
+import getDescriptor from "../util/get-descriptor.js"
 
 const nativePattern = "[native code]"
 
@@ -12,8 +13,8 @@ function isStackTraceMasked(error) {
     descriptor.enumerable === false &&
     typeof descriptor.get === "function" &&
     typeof descriptor.set === "function" &&
-    toString.call(descriptor.get).indexOf(nativePattern) === -1 &&
-    toString.call(descriptor.set).indexOf(nativePattern) === -1
+    GenericString.indexOf(GenericFunction.toString(descriptor.get), nativePattern) === -1 &&
+    GenericString.indexOf(GenericFunction.toString(descriptor.set), nativePattern) === -1
 }
 
 export default isStackTraceMasked

@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import Entry from "../entry.js"
+import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 import Package from "../package.js"
 
@@ -133,7 +134,7 @@ function compile(content, filename) {
     result = inspectorWrapper(compiledWrapper,
       exported, exported, req, this, filename, dirname(filename))
   } else {
-    result = compiledWrapper.call(
+    result = GenericFunction.call(compiledWrapper,
       exported, exported, req, this, filename, dirname(filename))
   }
 

@@ -1,3 +1,4 @@
+import GenericString from "../generic/string.js"
 import SafeJSON from "../builtin/json.js"
 
 const escapedDoubleQuoteRegExp = /\\"/g
@@ -21,12 +22,14 @@ function toStringLiteral(value, style = '"') {
   const string = SafeJSON.stringify(value)
 
   if (quote === '"' &&
-      string.charCodeAt(0) === 34 /* " */) {
+      GenericString.charCodeAt(string, 0) === 34 /* " */) {
     return string
   }
 
-  const unquoted = string.slice(1, -1).replace(escapedDoubleQuoteRegExp, '"')
-  return quote + unquoted.replace(escapeRegExpMap[quote], "\\" + quote) + quote
+  const unquoted = GenericString.slice(string, 1, -1)
+  const escaped = GenericString.replace(unquoted, escapedDoubleQuoteRegExp, '"')
+
+  return quote + GenericString.replace(escaped, escapeRegExpMap[quote], "\\" + quote) + quote
 }
 
 export default toStringLiteral

@@ -4,10 +4,13 @@ import shared from "../shared.js"
 import unapply from "../util/unapply.js"
 
 function init() {
+  const bufferProto = SafeBuffer.prototype
+
   return {
     __proto__: null,
     concat: SafeBuffer.concat,
-    slice: unapply(SafeBuffer.prototype.slice)
+    slice: unapply(bufferProto.slice),
+    toString: unapply(bufferProto.toString)
   }
 }
 

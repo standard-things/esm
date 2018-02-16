@@ -2,6 +2,8 @@
 // Copyright Sindre Sorhus. Released under MIT license:
 // https://github.com/sindresorhus/file-url
 
+import GenericString from "../generic/string.js"
+
 import encodeURI from "../builtin/encode-uri.js"
 import normalize from "../path/normalize.js"
 
@@ -19,13 +21,14 @@ function encodeChar(char) {
 function getURLFromFilePath(filename) {
   filename = normalize(filename)
 
-  if (filename.charCodeAt(0) !== 47 /* / */) {
+  if (GenericString.charCodeAt(filename, 0) !== 47 /* / */) {
     filename = "/" + filename
   }
 
   // Section 3.3: Escape Path Components
   // https://tools.ietf.org/html/rfc3986#section-3.3
-  return "file://" + encodeURI(filename).replace(encodeCharsRegExp, encodeChar)
+  const encoded = encodeURI(filename)
+  return "file://" + GenericString.replace(encoded, encodeCharsRegExp, encodeChar)
 }
 
 export default getURLFromFilePath

@@ -1,3 +1,5 @@
+import GenericArray from "./generic/array.js"
+
 import _compile from "./module/compile.js"
 import _findPath from "./module/find-path.js"
 import _initPaths from "./module/init-paths.js"
@@ -7,6 +9,7 @@ import _resolveFilename from "./module/cjs/resolve-filename.js"
 import _resolveLookupPaths from "./module/resolve-lookup-paths.js"
 import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
+import initGlobalPaths from "./module/init-global-paths.js"
 import load from "./module/load.js"
 import moduleState from "./module/state.js"
 import req from "./module/require.js"
@@ -25,9 +28,8 @@ class Module extends BuiltinModule {
   static _resolveFilename = _resolveFilename
   static _resolveLookupPaths = _resolveLookupPaths
   static Module = Module
-  static globalPaths = moduleState.globalPaths.slice()
   static wrap = wrap
-  static wrapper = wrapper.slice()
+  static wrapper = GenericArray.slice(wrapper)
 }
 
 Module.prototype._compile = _compile
@@ -42,5 +44,11 @@ setProperty(Module, "length", {
   value: 2,
   writable: false
 })
+
+if (! Module.globalPaths) {
+  Module.globalPaths = initGlobalPaths()
+}
+
+moduleState.globalPaths = GenericArray.slice(Module.globalPaths)
 
 export default Module

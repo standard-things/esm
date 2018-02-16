@@ -1,9 +1,9 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function getSymbols(object) {
   return object == null
     ? []
-    : SafeObject.getOwnPropertySymbols(object)
+    : GenericObject.getOwnPropertySymbols(object)
 }
 
 export default getSymbols

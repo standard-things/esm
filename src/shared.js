@@ -1,4 +1,3 @@
-import _initPaths from "./module/_init-paths.js"
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import md5 from "./util/md5.js"
@@ -14,7 +13,6 @@ if (__shared__) {
   const { getOwnPropertySymbols } = Object
   const getSymbolFor = Symbol.for
   const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
-  const globalPaths = _initPaths()
   const { versions } = process
 
   const fastPath = {
@@ -53,7 +51,6 @@ if (__shared__) {
     generic: { __proto__: null },
     global,
     globalName,
-    globalPaths,
     inited: false,
     maxSatisfying: { __proto__: null },
     package: {

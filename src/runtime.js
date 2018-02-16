@@ -1,6 +1,7 @@
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
-import SafeObject from "./builtin/object.js"
+import GenericFunction from "./generic/function.js"
+import GenericObject from "./generic/object.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
@@ -62,7 +63,7 @@ const Runtime = {
         }
       })
     } else if (! (runtimeName in global)) {
-      const globalImport = this.import.bind({
+      const globalImport = GenericFunction.bind(this.import, {
         __proto__: null,
         entry
       })
@@ -81,8 +82,8 @@ const Runtime = {
         writable: false
       })
 
-      SafeObject.freeze(globalImport)
-      SafeObject.freeze(globalRuntime)
+      GenericObject.freeze(globalImport)
+      GenericObject.freeze(globalRuntime)
     }
 
     return content
@@ -220,7 +221,7 @@ function runCJS(entry, moduleWrapper) {
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-  return moduleWrapper.call(exported, shared.global, exported, req)
+  return GenericFunction.call(moduleWrapper, exported, shared.global, exported, req)
 }
 
 function runESM(entry, moduleWrapper) {
@@ -234,9 +235,9 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
     req.main = moduleState.mainModule
-    result = moduleWrapper.call(exported, shared.global, exported, req)
+    result = GenericFunction.call(moduleWrapper, exported, shared.global, exported, req)
   } else {
-    result = moduleWrapper.call(void 0, shared.global)
+    result = GenericFunction.call(moduleWrapper, void 0, shared.global)
   }
 
   // Set the loaded state here in case the module was sideloaded.

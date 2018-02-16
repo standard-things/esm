@@ -1,3 +1,6 @@
+import GenericRegExp from "../generic/regexp.js"
+import GenericString from "../generic/string.js"
+
 import decodeURIComponent from "../builtin/decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
@@ -16,8 +19,8 @@ function getFilePathFromURL(url) {
   }
 
   if (parsed.protocol !== "file:") {
-    if (localhostRegExp.test(pathname)) {
-      pathname = pathname.slice(11)
+    if (GenericRegExp.test(localhostRegExp, pathname)) {
+      pathname = GenericString.slice(pathname, 11)
     } else {
       return ""
     }
@@ -50,17 +53,17 @@ function getFilePathFromURL(url) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   if (pathname.length < 3 ||
-      pathname.charCodeAt(2) !== 58 /* : */) {
+      GenericString.charCodeAt(pathname, 2) !== 58 /* : */) {
     return ""
   }
 
-  const code1 = pathname.charCodeAt(1)
+  const code1 = GenericString.charCodeAt(pathname, 1)
 
   // Drive letters must be `[A-Za-z]:/`
   // All slashes of pathnames are forward slashes.
   if (((code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)) &&
-      pathname.charCodeAt(3) === 47 /* / */){
-    return normalize(pathname).slice(1)
+      GenericString.charCodeAt(pathname, 3) === 47 /* / */){
+    return GenericString.slice(normalize(pathname), 1)
   }
 
   return ""

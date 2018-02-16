@@ -1,7 +1,7 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function setSetter(object, key, setter) {
-  SafeObject.prototype.__defineSetter__.call(object, key, setter)
+  GenericObject.__defineSetter__(object, key, setter)
   return object
 }
 

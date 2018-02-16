@@ -4,6 +4,9 @@
 
 import { isAbsolute, resolve } from "path"
 
+import GenericArray from "../generic/array.js"
+import GenericRegExp from "../generic/regexp.js"
+import GenericString from "../generic/string.js"
 import Module from "../module.js"
 import SafeJSON from "../builtin/json.js"
 
@@ -29,7 +32,9 @@ function findPath(request, paths, isMain, searchExts) {
 
   const cacheKey =
     request + "\0" +
-    (paths.length === 1 ? paths[0] : paths.join("\0"))
+    (paths.length === 1
+      ? paths[0]
+      : GenericArray.join(paths, "\0"))
 
   if (cacheKey in cache) {
     return cache[cacheKey]
@@ -38,7 +43,7 @@ function findPath(request, paths, isMain, searchExts) {
   let trailingSlash = request.length > 0
 
   if (trailingSlash) {
-    const code = request.charCodeAt(request.length - 1)
+    const code = GenericString.charCodeAt(request, request.length - 1)
     trailingSlash = code === 47 /* / */
 
     if (shared.env.win32 &&
@@ -118,7 +123,7 @@ function readPackage(thePath) {
   const json = readFileFast(jsonPath, "utf8")
 
   if (! json ||
-      ! mainFieldRegExp.test(json)) {
+      ! GenericRegExp.test(mainFieldRegExp, json)) {
     return ""
   }
 

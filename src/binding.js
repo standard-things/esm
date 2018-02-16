@@ -1,3 +1,5 @@
+import apply from "./util/apply.js"
+import call from "./util/call.js"
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import setDeferred from "./util/set-deferred.js"
@@ -33,39 +35,40 @@ const map = {
   ]
 }
 
-const binding = ids
-  .reduce((binding, id) =>
-    setDeferred(binding, id, () => {
-      if (! _binding) {
-        _binding = getSilent(process, "binding")
-      }
+const binding = { __proto__: null }
 
-      const source = silent(() => _binding.call(process, id))
+for (const id of ids) {
+  setDeferred(binding, id, () => {
+    if (! _binding) {
+      _binding = getSilent(process, "binding")
+    }
 
-      if (! isObjectLike(source)) {
-        return { __proto__: null }
-      }
+    const source = silent(() => call(_binding, process, id))
 
-      const names = map[id]
+    if (! isObjectLike(source)) {
+      return { __proto__: null }
+    }
 
-      if (! names) {
-        return source
-      }
+    const names = map[id]
 
-      const object = { __proto__: null }
+    if (! names) {
+      return source
+    }
 
-      for (const name of names) {
-        setGetter(object, name, () => {
-          const value = getSilent(source, name)
+    const object = { __proto__: null }
 
-          return typeof value === "function"
-            ? (...args) => value.apply(source, args)
-            : value
-        })
-      }
+    for (const name of names) {
+      setGetter(object, name, () => {
+        const value = getSilent(source, name)
 
-      return object
-    })
-  , { __proto__: null })
+        return typeof value === "function"
+          ? (...args) => apply(value, source, args)
+          : value
+      })
+    }
+
+    return object
+  })
+}
 
 export default binding

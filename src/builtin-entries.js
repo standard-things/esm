@@ -9,41 +9,44 @@ import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
 function init() {
-  return builtinModules
-    .reduce((builtinEntries, id) =>
-      setDeferred(builtinEntries, id, () => {
-        let exported
-        const mod = new Module(id, null)
+  const builtinEntries = { __proto__: null }
 
-        if (id === "module") {
-          exported = Module
-        } else {
-          exported = __non_webpack_require__(id)
+  for (const id of builtinModules) {
+    setDeferred(builtinEntries, id, () => {
+      let exported
+      const mod = new Module(id, null)
 
-          if (id === "vm" &&
-              has(exported, "Module")) {
-            const source = exported
-            const names = keysAll(source)
+      if (id === "module") {
+        exported = Module
+      } else {
+        exported = __non_webpack_require__(id)
 
-            exported = {}
+        if (id === "vm" &&
+            has(exported, "Module")) {
+          const source = exported
+          const names = keysAll(source)
 
-            for (const name of names) {
-              if (name !== "Module") {
-                copyProperty(exported, source, name)
-              }
+          exported = {}
+
+          for (const name of names) {
+            if (name !== "Module") {
+              copyProperty(exported, source, name)
             }
           }
         }
+      }
 
-        mod.exports = exported
-        mod.loaded = true
+      mod.exports = exported
+      mod.loaded = true
 
-        const entry = Entry.get(mod)
-        entry.builtin = true
-        entry.loaded()
-        return entry
-      })
-    , { __proto__: null })
+      const entry = Entry.get(mod)
+      entry.builtin = true
+      entry.loaded()
+      return entry
+    })
+  }
+
+  return builtinEntries
 }
 
 export default shared.inited

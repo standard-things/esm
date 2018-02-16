@@ -2,7 +2,8 @@
 // Copyright Rich Harris. Released under MIT license:
 // https://github.com/Rich-Harris/magic-string
 
-import SafeObject from "./builtin/object.js"
+import GenericObject from "./generic/object.js"
+import GenericString from "./generic/string.js"
 
 class Chunk {
   constructor(start, end, content) {
@@ -29,8 +30,8 @@ class Chunk {
 
   split(index) {
     const sliceIndex = index - this.start
-    const originalBefore = this.original.slice(0, sliceIndex)
-    const originalAfter = this.original.slice(sliceIndex)
+    const originalBefore = GenericString.slice(this.original, 0, sliceIndex)
+    const originalAfter = GenericString.slice(this.original, sliceIndex)
     const newChunk = new Chunk(index, this.end, originalAfter)
 
     this.original = originalBefore
@@ -48,7 +49,7 @@ class Chunk {
   }
 }
 
-SafeObject.setPrototypeOf(Chunk.prototype, null)
+GenericObject.setPrototypeOf(Chunk.prototype, null)
 
 class MagicString {
   constructor(string) {
@@ -146,6 +147,6 @@ class MagicString {
   }
 }
 
-SafeObject.setPrototypeOf(MagicString.prototype, null)
+GenericObject.setPrototypeOf(MagicString.prototype, null)
 
 export default MagicString

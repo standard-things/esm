@@ -2,8 +2,8 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
-import SafeArray from "../../builtin/array.js"
 
 import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
@@ -28,7 +28,7 @@ function resolveFilename(request, parent, isMain, options) {
   let paths
 
   if (! cacheKey &&
-      SafeArray.isArray(options.paths)) {
+      GenericArray.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 
@@ -38,13 +38,13 @@ function resolveFilename(request, parent, isMain, options) {
       fakeParent.paths = Module._nodeModulePaths(fromPath)
       const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
 
-      if (paths.indexOf(fromPath) === -1) {
-        paths.push(fromPath)
+      if (GenericArray.indexOf(paths, fromPath) === -1) {
+        GenericArray.push(paths, fromPath)
       }
 
       for (const lookupPath of lookupPaths) {
-        if (paths.indexOf(lookupPath) === -1) {
-          paths.push(lookupPath)
+        if (GenericArray.indexOf(paths, lookupPath) === -1) {
+          GenericArray.push(paths, lookupPath)
         }
       }
     }

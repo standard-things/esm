@@ -1,8 +1,11 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function isError(value) {
-  return value instanceof Error ||
-    SafeObject.prototype.toString.call(value) === "[object Error]"
+  if (value instanceof Error) {
+    return true
+  }
+
+  return GenericObject.toString(value) === "[object Error]"
 }
 
 export default isError

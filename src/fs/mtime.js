@@ -1,3 +1,5 @@
+import GenericDate from "../generic/date.js"
+
 import binding from "../binding"
 import shared from "../shared.js"
 import { statSync } from "fs"
@@ -26,7 +28,7 @@ function mtime(filename) {
 
 function fallbackMtime(filename) {
   try {
-    return statSync(filename).mtime.getTime()
+    return GenericDate.getTime(statSync(filename).mtime)
   } catch (e) {}
   return -1
 }

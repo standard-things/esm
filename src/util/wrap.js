@@ -1,6 +1,8 @@
+import call from "./call.js"
+
 function wrap(func, wrapper) {
   return function (...args) {
-    return wrapper.call(this, func, args)
+    return call(wrapper, this, func, args)
   }
 }
 

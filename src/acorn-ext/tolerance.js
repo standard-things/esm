@@ -1,3 +1,5 @@
+import GenericString from "../generic/string.js"
+
 import alwaysFalse from "../util/always-false.js"
 import alwaysTrue from "../util/always-true.js"
 import errors from "../parse/errors.js"
@@ -49,10 +51,10 @@ function checkExpressionErrors(refDestructuringErrors) {
 }
 
 function raise(pos, message) {
-  if (message.startsWith(parserDupPrefix)) {
-    message = message.replace(parserDupPrefix, engineDupPrefix)
-  } else if (message.endsWith(parserTypePostfix)) {
-    message = message.replace(parserTypePostfix, engineTypePostfix)
+  if (GenericString.startsWith(message, parserDupPrefix)) {
+    message = GenericString.replace(message, parserDupPrefix, engineDupPrefix)
+  } else if (GenericString.endsWith(message, parserTypePostfix)) {
+    message = GenericString.replace(message, parserTypePostfix, engineTypePostfix)
   }
 
   throw new errors.SyntaxError(this.input, pos, message)

@@ -1,3 +1,4 @@
+import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 import Package from "../package.js"
 
@@ -65,7 +66,7 @@ function hook(Mod) {
 
   function tickCallback() {
     if (useTickCallback) {
-      _tickCallback.call(process)
+      GenericFunction.call(_tickCallback, process)
     }
   }
 }

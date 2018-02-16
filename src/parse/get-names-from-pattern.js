@@ -1,3 +1,5 @@
+import GenericArray from "../generic/array.js"
+
 function getNamesFromPattern(pattern) {
   let i = -1
   const names = []
@@ -15,28 +17,28 @@ function getNamesFromPattern(pattern) {
     // Cases are ordered from most to least likely to encounter.
     switch (pattern.type) {
       case "Identifier":
-        names.push(pattern.name)
+        GenericArray.push(names, pattern.name)
         break
 
       case "Property":
       case "ObjectProperty":
-        queue.push(pattern.value)
+        GenericArray.push(queue, pattern.value)
         break
 
       case "AssignmentPattern":
-        queue.push(pattern.left)
+        GenericArray.push(queue, pattern.left)
         break
 
       case "ObjectPattern":
-        queue.push(...pattern.properties)
+        GenericArray.push(queue, ...pattern.properties)
         break
 
       case "ArrayPattern":
-        queue.push(...pattern.elements)
+        GenericArray.push(queue, ...pattern.elements)
         break
 
       case "RestElement":
-        queue.push(pattern.argument)
+        GenericArray.push(queue, pattern.argument)
         break
     }
   }

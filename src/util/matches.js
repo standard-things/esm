@@ -1,8 +1,14 @@
-import SafeArray from "../builtin/array.js"
+import GenericArray from "../generic/array.js"
+import GenericRegExp from "../generic/regexp.js"
 
 function matches(array, pattern) {
-  return SafeArray.isArray(array) &&
-    array.some((value) => pattern.test(value))
+  if (! GenericArray.isArray(array)) {
+    return false
+  }
+
+  return GenericArray.some(array, (value) => {
+    return GenericRegExp.test(pattern, value)
+  })
 }
 
 export default matches

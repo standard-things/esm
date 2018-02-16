@@ -1,3 +1,4 @@
+import apply from "./apply.js"
 import silent from "./silent.js"
 
 function getSilent(object, key) {
@@ -8,7 +9,7 @@ function getSilent(object, key) {
   }
 
   return function (...args) {
-    return silent(() => value.apply(this, args))
+    return silent(() => apply(value, this, args))
   }
 }
 

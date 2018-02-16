@@ -1,11 +1,16 @@
+import GenericString from "../generic/string.js"
+
 import { resolve } from "path"
 
 const backSlashRegExp = /\\/g
 
 function normalize(filename) {
-  return typeof filename === "string"
-    ? resolve(filename).replace(backSlashRegExp, "/")
-    : ""
+  if (typeof filename !== "string") {
+    return ""
+  }
+
+  const resolved = resolve(filename)
+  return GenericString.replace(resolved, backSlashRegExp, "/")
 }
 
 export default normalize

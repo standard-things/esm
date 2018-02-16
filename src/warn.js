@@ -1,3 +1,5 @@
+import GenericArray from "./generic/array.js"
+
 import emitWarning from "./warning/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
 import { name as stdName } from "./version.js"
@@ -27,7 +29,7 @@ function moduleCacheKey(request, name) {
 function getCacheKey(code, args) {
   const key = code in cacheKeys
     ? cacheKeys[code](...args)
-    : args.join("\0")
+    : GenericArray.join(args, "\0")
 
   return code + "\0" + key
 }

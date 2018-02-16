@@ -1,4 +1,6 @@
-const isWin = process.platform === "win32"
+import GenericString from "../generic/string.js"
+
+import shared from "../shared.js"
 
 function isRelativePath(value) {
   if (typeof value !== "string") {
@@ -11,7 +13,7 @@ function isRelativePath(value) {
     return false
   }
 
-  let code = value.charCodeAt(0)
+  let code = GenericString.charCodeAt(value, 0)
 
   if (code !== 46 /* . */) {
     return false
@@ -21,17 +23,17 @@ function isRelativePath(value) {
     return true
   }
 
-  code = value.charCodeAt(1)
+  code = GenericString.charCodeAt(value, 1)
 
   if (code === 46 /* . */) {
     if (length === 2) {
       return true
     }
 
-    code = value.charCodeAt(2)
+    code = GenericString.charCodeAt(value, 2)
   }
 
-  if (isWin &&
+  if (shared.env.win32 &&
       code === 92 /* \ */) {
     return true
   }

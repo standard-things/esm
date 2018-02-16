@@ -1,6 +1,7 @@
 import FastPath from "./fast-path.js"
+import GenericArray from "./generic/array.js"
+import GenericObject from "./generic/object.js"
 import Parser from "./parser.js"
-import SafeObject from "./builtin/object.js"
 
 import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
@@ -165,7 +166,7 @@ class Compiler {
 
       if (options.warnings &&
           ! options.cjs.vars &&
-          top.idents.indexOf("arguments") === -1) {
+          GenericArray.indexOf(top.idents, "arguments") === -1) {
         const possibleIndexes = findIndexes(code, ["arguments"])
 
         if (possibleIndexes.length) {
@@ -191,6 +192,6 @@ function createOptions(options) {
   return _createOptions(options, Compiler.defaultOptions)
 }
 
-SafeObject.setPrototypeOf(Compiler.prototype, null)
+GenericObject.setPrototypeOf(Compiler.prototype, null)
 
 export default Compiler

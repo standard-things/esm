@@ -1,9 +1,9 @@
-import SafeObject from "../builtin/object.js"
+import GenericObject from "../generic/object.js"
 
 function keys(object) {
   return object == null
     ? []
-    : SafeObject.keys(object)
+    : GenericObject.keys(object)
 }
 
 export default keys
