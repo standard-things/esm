@@ -154,6 +154,10 @@ if (__shared__) {
     return typeof binding.fs.internalModuleReadJSON === "function"
   })
 
+  setDeferred(support, "safeGetEnv", () => {
+    return typeof binding.util.safeGetenv === "function"
+  })
+
   setDeferred(support, "setHiddenValue", () => {
     return typeof binding.util.setHiddenValue === "function"
   })
