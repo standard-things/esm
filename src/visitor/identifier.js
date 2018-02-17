@@ -2,7 +2,7 @@ import GenericArray from "../generic/array.js"
 import SafeWeakMap from "../builtin/weak-map.js"
 import Visitor from "../visitor.js"
 
-import { getLineInfo } from "../vendor/acorn/src/locutil.js"
+import { getLineInfo } from "../acorn/src/locutil.js"
 
 const definedMap = new SafeWeakMap
 

@@ -5,7 +5,7 @@
 import GenericRegExp from "../generic/regexp.js"
 import GenericString from "../generic/string.js"
 
-import { skipWhiteSpace } from "../vendor/acorn/src/whitespace.js"
+import { skipWhiteSpace } from "../acorn/src/whitespace.js"
 
 const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 

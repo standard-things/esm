@@ -1,4 +1,4 @@
-import { getLineInfo } from "../vendor/acorn/src/locutil.js"
+import { getLineInfo } from "../acorn/src/locutil.js"
 
 function createClass(Super) {
   return class AcornError extends Super {

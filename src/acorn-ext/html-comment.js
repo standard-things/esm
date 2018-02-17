@@ -3,7 +3,7 @@ import GenericFunction from "../generic/function.js"
 import GenericRegExp from "../generic/regexp.js"
 import GenericString from "../generic/string.js"
 
-import { lineBreak } from "../vendor/acorn/src/whitespace.js"
+import { lineBreak } from "../acorn/src/whitespace.js"
 import wrap from "../util/wrap.js"
 
 const {
