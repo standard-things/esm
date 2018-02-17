@@ -47,11 +47,9 @@ function compile(content, filename) {
     void 0
 
   const script = new vm.Script(wrapper, {
+    __proto__: null,
     cachedData: buffer,
-    columnOffset: 0,
-    displayErrors: true,
     filename,
-    lineOffset: 0,
     produceCachedData: true
   })
 
@@ -93,10 +91,8 @@ function compile(content, filename) {
   }
 
   const compiledWrapper = script.runInThisContext({
-    columnOffset: 0,
-    displayErrors: true,
-    filename,
-    lineOffset: 0
+    __proto__: null,
+    filename
   })
 
   let inspectorWrapper = null
