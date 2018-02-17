@@ -157,7 +157,7 @@ function tryCompileCJS(entry) {
 
   content += maybeSourceMap(entry, content)
 
-  const exported = {}
+  const exported = new Object
 
   if (Module.wrap === moduleWrapESM) {
     Module.wrap = wrap
@@ -180,7 +180,7 @@ function tryCompileESM(entry) {
 
   content += maybeSourceMap(entry, content)
 
-  const exported = {}
+  const exported = new Object
 
   if (! options.cjs.vars) {
     Module.wrap = moduleWrapESM

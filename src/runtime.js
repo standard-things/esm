@@ -14,7 +14,7 @@ import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
-const indirectEval = eval
+const indirectEval = global.eval
 
 const Runtime = {
   __proto__: null,

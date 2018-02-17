@@ -26,7 +26,7 @@ function init() {
           const source = exported
           const names = keysAll(source)
 
-          exported = {}
+          exported = new Object
 
           for (const name of names) {
             if (name !== "Module") {

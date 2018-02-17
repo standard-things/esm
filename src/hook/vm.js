@@ -105,7 +105,7 @@ function hook(vm) {
     entry = Entry.get(mod)
     entry.package = pkg
     entry.runtimeName = shared.globalName
-    Runtime.enable(entry, {})
+    Runtime.enable(entry, new Object)
   }
 
   Wrapper.manage(vm, "createScript", managerWrapper)

@@ -25,8 +25,9 @@ const builtins = [
   "Reflect", "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol",
   "SyntaxError", "TypeError", "URIError", "Uint8Array", "Uint16Array",
   "Uint32Array", "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly",
-  "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
-  "process"
+  "clearImmediate", "clearInterval", "clearTimeout", "decodeURI",
+  "decodeURIComponent", "encodeURI", "encodeURIComponent", "process",
+  "setImmediate", "setInterval", "setTimeout"
 ]
 
 const isProd = /production/.test(process.env.NODE_ENV)
