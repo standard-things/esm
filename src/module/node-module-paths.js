@@ -2,11 +2,18 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import ASCII from "../ascii.js"
 import GenericArray from "../generic/array.js"
 import GenericString from "../generic/string.js"
 
 import { resolve } from "path"
 import shared from "../shared.js"
+
+const {
+  BSLASH,
+  COLON,
+  SLASH
+} = ASCII
 
 const nmChars = GenericArray.map("node_modules", (char) => {
   return GenericString.charCodeAt(char, 0)
@@ -43,7 +50,7 @@ function posixPaths(from) {
   while (length--) {
     const code = GenericString.charCodeAt(from, length)
 
-    if (code === 47 /* / */) {
+    if (code === SLASH) {
       if (nmCount !== nmLength) {
         GenericArray.push(paths, GenericString.slice(from, 0, last) + "/node_modules")
       }
@@ -69,8 +76,8 @@ function win32Paths(from) {
   from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
-  if (GenericString.charCodeAt(from, from.length - 1) === 92 /* \ */ &&
-      GenericString.charCodeAt(from, from.length - 2) === 58 /* : */) {
+  if (GenericString.charCodeAt(from, from.length - 1) === BSLASH &&
+      GenericString.charCodeAt(from, from.length - 2) === COLON) {
     return [from + "node_modules"]
   }
 
@@ -87,9 +94,9 @@ function win32Paths(from) {
     // node_modules path for every path segment. Use colon as an extra
     // condition since we can get node_modules path for drive root like
     // "C:\node_modules" and don"t need to parse drive name.
-    if (code === 92 /* \ */ ||
-        code === 47 /* / */ ||
-        code === 58 /* : */) {
+    if (code === BSLASH ||
+        code === COLON ||
+        code === SLASH) {
       if (nmCount !== nmLength) {
         GenericArray.push(paths, GenericString.slice(from, 0, last) + "\\node_modules")
       }

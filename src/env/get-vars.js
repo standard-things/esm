@@ -1,3 +1,4 @@
+import ASCII from "../ascii.js"
 import GenericString from "../generic/string.js"
 
 import isPath from "../util/is-path.js"
@@ -5,6 +6,12 @@ import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
 import { resolve } from "path"
 import shared from "../shared.js"
+
+const {
+  APOSTROPHE,
+  LBRACE,
+  QUOTE
+} = ASCII
 
 function getVars() {
   const { env } = shared
@@ -33,9 +40,9 @@ function getVars() {
 
   const code0 = GenericString.charCodeAt(ESM_OPTIONS, 0)
 
-  if (code0 === 123 /* { */ ||
-      code0 === 34 /* " */ ||
-      code0 === 39 /* ' */) {
+  if (code0 === APOSTROPHE ||
+      code0 === LBRACE ||
+      code0 === QUOTE) {
     ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
   }
 

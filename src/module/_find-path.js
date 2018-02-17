@@ -4,6 +4,7 @@
 
 import { isAbsolute, resolve } from "path"
 
+import ASCII from "../ascii.js"
 import GenericArray from "../generic/array.js"
 import GenericRegExp from "../generic/regexp.js"
 import GenericString from "../generic/string.js"
@@ -16,6 +17,11 @@ import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
+
+const {
+  BSLASH,
+  SLASH
+} = ASCII
 
 const { preserveSymlinks } = binding.config
 
@@ -44,11 +50,11 @@ function findPath(request, paths, isMain, searchExts) {
 
   if (trailingSlash) {
     const code = GenericString.charCodeAt(request, request.length - 1)
-    trailingSlash = code === 47 /* / */
+    trailingSlash = code === SLASH
 
     if (shared.env.win32 &&
         ! trailingSlash) {
-      trailingSlash = code === 92 /* \ */
+      trailingSlash = code === BSLASH
     }
   }
 

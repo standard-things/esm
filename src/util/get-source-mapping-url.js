@@ -1,7 +1,19 @@
 // Inspired by `findMagicComment` in
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
 
+import ASCII from "../ascii.js"
 import GenericString from "../generic/string.js"
+
+const {
+  APOSTROPHE,
+  AT,
+  EQ,
+  HT,
+  NUMSIGN,
+  QUOTE,
+  SPACE,
+  SLASH
+} = ASCII
 
 const name = "sourceMappingURL"
 const nameLength = name.length
@@ -35,28 +47,28 @@ function getSourceMappingURL(content) {
     pos -= 4
 
     // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
-    if (GenericString.charCodeAt(content, pos) !== 47 /* / */ ||
-        GenericString.charCodeAt(content, pos + 1) !== 47 /* / */) {
+    if (GenericString.charCodeAt(content, pos) !== SLASH ||
+        GenericString.charCodeAt(content, pos + 1) !== SLASH) {
       continue
     }
 
     let code = GenericString.charCodeAt(content, pos + 2)
 
-    if (code !== 35 /* # */ &&
-        code !== 64 /* @ */) {
+    if (code !== AT &&
+        code !== NUMSIGN) {
       continue
     }
 
     code = GenericString.charCodeAt(content, pos + 3)
 
-    if (code !== 32 /* <space> */ &&
-        code !== 9 /* \t */) {
+    if (code !== HT &&
+        code !== SPACE) {
       continue
     }
 
     // Check for "=" after the name.
     if (equalPos < length &&
-      GenericString.charCodeAt(content, equalPos) !== 61 /* = */) {
+      GenericString.charCodeAt(content, equalPos) !== EQ) {
       continue
     }
 
@@ -81,10 +93,10 @@ function getSourceMappingURL(content) {
   while (++i < matchLength) {
     const code = GenericString.charCodeAt(match, i)
 
-    if (code === 34 /* " */ ||
-        code === 39 /* ' */ ||
-        code === 32 /* <space> */ ||
-        code === 9 /* \t */) {
+    if (code === APOSTROPHE ||
+        code === HT ||
+        code === QUOTE ||
+        code === SPACE) {
       return ""
     }
   }

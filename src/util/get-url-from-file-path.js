@@ -2,10 +2,15 @@
 // Copyright Sindre Sorhus. Released under MIT license:
 // https://github.com/sindresorhus/file-url
 
+import ASCII from "../ascii.js"
 import GenericString from "../generic/string.js"
 
 import encodeURI from "../builtin/encode-uri.js"
 import normalize from "../path/normalize.js"
+
+const {
+  SLASH
+} = ASCII
 
 const encodeCharsRegExp = /[?#]/g
 
@@ -21,7 +26,7 @@ function encodeChar(char) {
 function getURLFromFilePath(filename) {
   filename = normalize(filename)
 
-  if (GenericString.charCodeAt(filename, 0) !== 47 /* / */) {
+  if (GenericString.charCodeAt(filename, 0) !== SLASH) {
     filename = "/" + filename
   }
 

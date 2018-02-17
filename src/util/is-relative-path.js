@@ -1,6 +1,13 @@
+import ASCII from "../ascii.js"
 import GenericString from "../generic/string.js"
 
 import shared from "../shared.js"
+
+const {
+  BSLASH,
+  PERIOD,
+  SLASH
+} = ASCII
 
 function isRelativePath(value) {
   if (typeof value !== "string") {
@@ -15,7 +22,7 @@ function isRelativePath(value) {
 
   let code = GenericString.charCodeAt(value, 0)
 
-  if (code !== 46 /* . */) {
+  if (code !== PERIOD) {
     return false
   }
 
@@ -25,7 +32,7 @@ function isRelativePath(value) {
 
   code = GenericString.charCodeAt(value, 1)
 
-  if (code === 46 /* . */) {
+  if (code === PERIOD) {
     if (length === 2) {
       return true
     }
@@ -34,11 +41,11 @@ function isRelativePath(value) {
   }
 
   if (shared.env.win32 &&
-      code === 92 /* \ */) {
+      code === BSLASH) {
     return true
   }
 
-  return code === 47 /* / */
+  return code === SLASH
 }
 
 export default isRelativePath

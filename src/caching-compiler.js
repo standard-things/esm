@@ -1,5 +1,6 @@
 import { extname, resolve } from "path"
 
+import ASCII from "./ascii.js"
 import Compiler from "./compiler.js"
 import GenericArray from "./generic/array.js"
 import GenericBuffer from "./generic/buffer.js"
@@ -16,6 +17,10 @@ import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
+
+const {
+  PERIOD
+} = ASCII
 
 class CachingCompiler {
   static compile(entry, code, options) {
@@ -231,7 +236,7 @@ if (! shared.inited) {
       let offset = 0
 
       for (const cacheName in scriptDatas) {
-        if (GenericString.charCodeAt(cacheName, 0) === 46 /* . */) {
+        if (GenericString.charCodeAt(cacheName, 0) === PERIOD) {
           continue
         }
 

@@ -1,3 +1,4 @@
+import ASCII from "../../ascii.js"
 import GenericArray from "../../generic/array.js"
 import GenericRegExp from "../../generic/regexp.js"
 import GenericString from "../../generic/string.js"
@@ -16,6 +17,10 @@ import isObject from "../../util/is-object.js"
 import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
+
+const {
+  SLASH
+} = ASCII
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
@@ -64,7 +69,7 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (GenericString.charCodeAt(request, 0) === 47 /* / */ ||
+        (GenericString.charCodeAt(request, 0) === SLASH ||
          GenericString.indexOf(request, ":") !== -1)) {
       const parsed = parseURL(request)
       foundPath = getFilePathFromURL(parsed)

@@ -1,5 +1,6 @@
 import { basename, dirname , extname, resolve } from "path"
 
+import ASCII from "./ascii.js"
 import GenericObject from "./generic/object.js"
 import GenericString from "./generic/string.js"
 import SafeJSON from "./builtin/json.js"
@@ -24,6 +25,10 @@ import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
+
+const {
+  PERIOD
+} = ASCII
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
@@ -91,7 +96,7 @@ class Package {
         const cacheNames = readdir(cachePath)
 
         for (const cacheName of cacheNames) {
-          if (GenericString.charCodeAt(cacheName, 0) !== 46 /* . */) {
+          if (GenericString.charCodeAt(cacheName, 0) !== PERIOD) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
             compileCache[cacheName] = true

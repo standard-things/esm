@@ -1,3 +1,4 @@
+import ASCII from "../ascii.js"
 import GenericRegExp from "../generic/regexp.js"
 import GenericString from "../generic/string.js"
 
@@ -7,6 +8,11 @@ import hasEncodedSlash from "./has-encoded-slash.js"
 import { normalize } from "path"
 import parseURL from "./parse-url.js"
 import shared from "../shared.js"
+
+const {
+  COLON,
+  SLASH
+} = ASCII
 
 const localhostRegExp = /^\/\/localhost\b/
 
@@ -53,7 +59,7 @@ function getFilePathFromURL(url) {
   // https://tools.ietf.org/html/rfc8089#appendix-E.2
   // https://tools.ietf.org/html/rfc8089#appendix-E.2.2
   if (pathname.length < 3 ||
-      GenericString.charCodeAt(pathname, 2) !== 58 /* : */) {
+      GenericString.charCodeAt(pathname, 2) !== COLON) {
     return ""
   }
 
@@ -62,7 +68,7 @@ function getFilePathFromURL(url) {
   // Drive letters must be `[A-Za-z]:/`
   // All slashes of pathnames are forward slashes.
   if (((code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)) &&
-      GenericString.charCodeAt(pathname, 3) === 47 /* / */){
+      GenericString.charCodeAt(pathname, 3) === SLASH){
     return GenericString.slice(normalize(pathname), 1)
   }
 
