@@ -1,4 +1,4 @@
-import { extname as _extname, resolve } from "path"
+import { extname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
@@ -7,10 +7,8 @@ import Runtime from "../runtime.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
 import encodeURI from "../builtin/encode-uri.js"
-import extname from "../path/extname.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
-import gunzip from "../fs/gunzip.js"
 import isError from "../util/is-error.js"
 import isInspect from "../env/is-inspect.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
@@ -37,8 +35,7 @@ function compile(caller, entry, content, filename, fallback) {
     type = "unambiguous"
   }
 
-  if (ext === ".mjs" ||
-      ext === ".mjs.gz") {
+  if (ext === ".mjs") {
     hint = "module"
 
     if (type === "script") {
@@ -56,7 +53,7 @@ function compile(caller, entry, content, filename, fallback) {
     cached = Compiler.from(entry)
 
     if (cached) {
-      cached.code = readCachedCode(resolve(pkg.cachePath, cacheName), options)
+      cached.code = readCachedCode(resolve(pkg.cachePath, cacheName))
       cache.compile[cacheName] = cached
     } else {
       delete cache.compile[cacheName]
@@ -218,21 +215,11 @@ function maybeSourceMap(entry, content) {
   return ""
 }
 
-function readCachedCode(filename, options) {
-  if (options && options.gz &&
-      _extname(filename) === ".gz") {
-    return gunzip(readFile(filename), "utf8")
-  }
-
+function readCachedCode(filename) {
   return readFileFast(filename, "utf8")
 }
 
-function readSourceCode(filename, options) {
-  if (options && options.gz &&
-      _extname(filename) === ".gz") {
-    return gunzip(readFile(filename), "utf8")
-  }
-
+function readSourceCode(filename) {
   return readFile(filename, "utf8")
 }
 
@@ -272,7 +259,7 @@ function tryValidateESM(caller, entry) {
       }
 
       const { filename } = entry.module
-      const content = () => readSourceCode(filename, options)
+      const content = () => readSourceCode(filename)
 
       captureStackTrace(e, caller)
       throw maskStackTrace(e, content, filename, true)

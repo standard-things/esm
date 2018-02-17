@@ -7,7 +7,6 @@ export default () => {
   return new Promise((resolve) => {
     const allRequire = makeRequire(module, { esm: "all" })
     const cjsRequire = makeRequire(module, { cjs: true })
-    const gzRequire = makeRequire(module, { gz: true })
     const jsRequire = makeRequire(module, { esm: "js" })
     const mjsRequire = makeRequire(module, { esm: "mjs" })
     const shorthandRequire = makeRequire(module, { esm: "cjs" })
@@ -15,7 +14,6 @@ export default () => {
 
     allRequire("./fixture/options/all")
     cjsRequire("./fixture/options/cjs")
-    gzRequire("./fixture/options/gz")
     jsRequire("./fixture/options/js")
     mjsRequire("./fixture/options/mjs")
     shorthandRequire("./fixture/options/shorthand")

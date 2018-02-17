@@ -1,7 +1,6 @@
 import GenericString from "../generic/string.js"
 import SafeJSON from "../builtin/json.js"
 
-import { extname } from "path"
 import md5 from "./md5.js"
 import shared from "../shared.js"
 import { version as stdVersion } from "../version.js"
@@ -21,12 +20,6 @@ function getCacheFileName(entry, cacheKey) {
     filename = ""
   }
 
-  let ext = extname(filename)
-
-  if (ext !== ".gz") {
-    ext = ".js"
-  }
-
   // While MD5 is not suitable for verification of untrusted data,
   // it is great for revving files. See Sufian Rhazi's post for more details
   // https://blog.risingstack.com/automatic-cache-busting-for-your-css/.
@@ -41,7 +34,7 @@ function getCacheFileName(entry, cacheKey) {
   )
 
   return GenericString.slice(pathHash, 0, 8) +
-    GenericString.slice(stateHash, 0, 8) + ext
+    GenericString.slice(stateHash, 0, 8) + ".js"
 }
 
 export default getCacheFileName

@@ -1,6 +1,6 @@
 import Module from "../../module.js"
 
-import extname from "../../path/extname.js"
+import { extname } from "path"
 import moduleState from "../state.js"
 
 function loader(entry, preload) {

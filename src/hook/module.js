@@ -1,4 +1,3 @@
-import { extname, resolve } from "path"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -18,7 +17,6 @@ import errors from "../errors.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getEnvVars from "../env/get-vars.js"
-import gunzip from "../fs/gunzip.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
@@ -27,12 +25,13 @@ import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
+import { resolve } from "path"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
-const exts = [".js", ".mjs", ".gz", ".js.gz", ".mjs.gz"]
+const exts = [".js", ".mjs"]
 const importExportRegExp = /\b(?:im|ex)port\b/
 
 function hook(Mod, parent) {
@@ -89,7 +88,7 @@ function hook(Mod, parent) {
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
     const entry = Entry.get(mod)
     const pkg = entry.package
-    const { cache, cachePath, options } = pkg
+    const { cache, cachePath } = pkg
     const cacheName = getCacheFileName(entry, mtime(filename))
 
     const compileFallback = () => {
@@ -120,7 +119,7 @@ function hook(Mod, parent) {
       cached = Compiler.from(entry)
 
       if (cached) {
-        cached.code = readCachedCode(resolve(cachePath, cacheName), options)
+        cached.code = readCachedCode(resolve(cachePath, cacheName))
         cache.compile[cacheName] = cached
       } else {
         delete cache.compile[cacheName]
@@ -141,15 +140,14 @@ function hook(Mod, parent) {
         passthruMap.get(func)) {
       GenericFunction.call(tryPassthru, this, func, args, pkg)
     } else {
-      const content = cached ? cached.code : readSourceCode(filename, options)
+      const content = cached ? cached.code : readSourceCode(filename)
       mod._compile(content, filename)
     }
   }
 
   for (const ext of exts) {
     if (typeof _extensions[ext] !== "function" &&
-        (ext === ".mjs" ||
-         ext === ".mjs.gz")) {
+        ext === ".mjs") {
       _extensions[ext] = mjsCompiler
     }
 
@@ -191,21 +189,11 @@ function mjsCompiler(mod, filename) {
   throw error
 }
 
-function readCachedCode(filename, options) {
-  if (options && options.gz &&
-      extname(filename) === ".gz") {
-    return gunzip(readFile(filename), "utf8")
-  }
-
+function readCachedCode(filename) {
   return readFileFast(filename, "utf8")
 }
 
-function readSourceCode(filename, options) {
-  if (options && options.gz &&
-      extname(filename) === ".gz") {
-    return gunzip(readFile(filename), "utf8")
-  }
-
+function readSourceCode(filename) {
   return readFile(filename, "utf8")
 }
 
@@ -224,7 +212,7 @@ function tryPassthru(func, args, pkg) {
       }
 
       const [, filename] = args
-      const content = () => readSourceCode(filename, options)
+      const content = () => readSourceCode(filename)
       const { message } = e
 
       if (e.name === "SyntaxError" &&

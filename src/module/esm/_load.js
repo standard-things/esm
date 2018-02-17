@@ -1,10 +1,10 @@
+import { dirname, extname } from "path"
+
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../_load.js"
-import { dirname } from "path"
-import extname from "../../path/extname.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isError from "../../util/is-error.js"
@@ -36,9 +36,7 @@ function load(request, parent, isMain, preload) {
     const ext = extname(filename)
     childIsMain = false
 
-    if (ext === ".mjs" ||
-        (pkgOptions && pkgOptions.gz &&
-        ext === ".mjs.gz")) {
+    if (ext === ".mjs") {
       state = moduleState
     }
   }

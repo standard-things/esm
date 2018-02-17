@@ -1,6 +1,6 @@
 import GenericRegExp from "../generic/regexp.js"
 
-const cacheNameRegExp = /^[a-z0-9]{16}\.(?:js|gz)$/
+const cacheNameRegExp = /^[a-z0-9]{16}\.js$/
 
 function isCacheFileName(value) {
   if (typeof value !== "string") {

@@ -47,7 +47,6 @@ const defaultOptions = {
   },
   debug: false,
   esm: "mjs",
-  gz: false,
   sourceMap: void 0,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
@@ -55,7 +54,7 @@ const defaultOptions = {
 const defaultCJS = defaultOptions.cjs
 const cacheKey = SafeJSON.stringify(defaultOptions)
 const cjsKeys = GenericObject.keys(defaultCJS)
-const searchExts = [".mjs", ".js", ".json", ".gz", ".mjs.gz", ".js.gz"]
+const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
   static cache =
@@ -230,7 +229,6 @@ function createOptions(options) {
   }
 
   options.debug = !! options.debug
-  options.gz = !! options.gz
   options.warnings = !! options.warnings
 
   return options
@@ -331,8 +329,7 @@ function readInfo(dirPath, force) {
       pkg =
       Package.cache[dirPath] = new Package(dirPath, "*", {
         cjs: true,
-        esm: "js",
-        gz: true
+        esm: "js"
       })
 
       const { parsing, passthru } = moduleState
@@ -441,8 +438,7 @@ GenericObject.setPrototypeOf(Package.prototype, null)
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {
   cache: false,
-  esm: "cjs",
-  gz: true
+  esm: "cjs"
 })
 
 export default Package

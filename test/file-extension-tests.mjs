@@ -2,22 +2,6 @@ import assert from "assert"
 import require from "./require.js"
 
 describe("file extension", () => {
-  it("should support loading `.gz` files in CJS", () =>
-    import("./gz/gz.js")
-      .then((ns) => ns.default())
-  )
-
-  it("should not error loading `.gz` files in ESM", () =>
-    import("./gz/gz.mjs")
-      .then((ns) => ns.default())
-  )
-
-  it("should error loading `.mjs.gz` with `require`", () =>
-    import("./gz/mjs.gz.js")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "ERR_REQUIRE_ESM"))
-  )
-
   it("should not error loading extensionless files with `require`", () => {
     require("./fixture/ext/no-ext-js")
   })

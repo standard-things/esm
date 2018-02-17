@@ -36,7 +36,6 @@
     "@babel/preset-env": "^7.0.0-beta.40",
     "@babel/register": "^7.0.0-beta.40",
     "@babel/runtime": "^7.0.0-beta.40",
-    "@gfx/zopfli": "^1.0.7",
     "acorn": "^5.4.0",
     "ava": "^0.25.0",
     "babel-eslint": "^8.2.1",
@@ -57,14 +56,12 @@
     "husky": "^0.14.3",
     "jest": "^22.1.3",
     "json-6": "^0.1.128",
-    "minizlib": "^1.0.4",
     "mocha": "^5.0.0",
     "mock-require": "^2.0.2",
     "mock-stdio": "^1.0.0",
     "nop": "^1.0.0",
     "nyc": "^11.4.1",
     "optimize-js-plugin": "0.0.4",
-    "pify": "^3.0.0",
     "pm2": "^2.9.3",
     "postcss": "^6.0.16",
     "semver": "^5.5.0",
@@ -80,6 +77,6 @@
   },
   "files": [
     "index.js",
-    "esm.js.gz"
+    "esm.js"
   ]
 }

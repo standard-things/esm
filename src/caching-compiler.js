@@ -1,5 +1,3 @@
-import { extname, resolve } from "path"
-
 import ASCII from "./ascii.js"
 import Compiler from "./compiler.js"
 import GenericArray from "./generic/array.js"
@@ -11,10 +9,10 @@ import SafeMath from "./builtin/math.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
-import gzip from "./fs/gzip.js"
 import isCacheFileName from "./util/is-cache-file-name.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
+import { resolve } from "path"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
@@ -280,9 +278,7 @@ if (! shared.inited) {
       const contents = pendingWrites[cachePath]
 
       for (const cacheName in contents) {
-        const content = extname(cacheName) === ".gz"
-          ? gzip(contents[cacheName])
-          : contents[cacheName]
+        const content = contents[cacheName]
 
         if (writeFile(resolve(cachePath, cacheName), content)) {
           removeExpired(cachePath, cacheName)

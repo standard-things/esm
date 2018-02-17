@@ -5,14 +5,13 @@ const fs = require("fs")
 const path = require("path")
 const util = require("util")
 const vm = require("vm")
-const zlib = require("zlib")
 
 // Guard against mocked environments (e.g. Jest).
 const useBuiltins = module.constructor.length > 1
 
 const Module = useBuiltins ? module.constructor : require("module")
 
-const stdFilename = path.resolve(__dirname, "esm.js.gz")
+const stdFilename = path.resolve(__dirname, "esm.js")
 const stdMod = new Module(module.id, null)
 const stdReq = useBuiltins ? require : (request) => stdMod.require(request)
 
@@ -21,7 +20,7 @@ stdMod.parent = module.parent
 
 const content =
   "(function(require,module,__shared__){" +
-  zlib.gunzipSync(fs.readFileSync(stdFilename)) +
+  fs.readFileSync(stdFilename, "utf8") +
   "\n})"
 
 const compiled = vm.runInThisContext(content, {

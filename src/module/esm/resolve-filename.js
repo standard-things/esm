@@ -1,5 +1,4 @@
 import ASCII from "../../ascii.js"
-import GenericArray from "../../generic/array.js"
 import GenericRegExp from "../../generic/regexp.js"
 import GenericString from "../../generic/string.js"
 import Package from "../../package.js"
@@ -7,7 +6,7 @@ import Package from "../../package.js"
 import _resolveFilename from "./_resolve-filename.js"
 import decodeURIComponent from "../../builtin/decode-uri-component.js"
 import errors from "../../errors.js"
-import extname from "../../path/extname.js"
+import { extname } from "path"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
@@ -26,18 +25,12 @@ const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
 const esmExts = [".mjs", ".js", ".json", ".node"]
-const gzExts = GenericArray.concat(esmExts, ".gz", ".mjs.gz", ".js.gz")
 const noExts = []
 
 const esmExtsLookup = { __proto__: null }
-const gzExtsLookup = { __proto__: null }
 
 for (const ext of esmExts) {
   esmExtsLookup[ext] = true
-}
-
-for (const ext of gzExts) {
-  gzExtsLookup[ext] = true
 }
 
 function resolveFilename(request, parent, isMain, options) {
@@ -88,15 +81,9 @@ function resolveFilename(request, parent, isMain, options) {
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
       let skipGlobalPaths = true
 
-      if (pkgOptions) {
-        if (pkgOptions.gz) {
-          extLookup = gzExtsLookup
-          searchExts = gzExts
-        }
-
-        if (pkgOptions.cjs.paths) {
-          skipGlobalPaths = false
-        }
+      if (pkgOptions &&
+          pkgOptions.cjs.paths) {
+        skipGlobalPaths = false
       }
 
       const decoded = decodeURIComponent(GenericString.replace(request, queryHashRegExp, ""))

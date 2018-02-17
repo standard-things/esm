@@ -17,7 +17,7 @@ const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
 const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
-const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const esmPath = path.resolve(rootPath, "esm.js")
 const indexPath = path.resolve(rootPath, "index.js")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
@@ -28,7 +28,7 @@ const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglify
 
 const trashPaths = ignorePaths
   .filter((thePath) =>
-    thePath !== gzipPath &&
+    thePath !== esmPath &&
     thePath !== nodeModulesPath &&
     ! thePath.startsWith(buildPath) &&
     ! thePath.startsWith(vendorPath)

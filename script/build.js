@@ -4,7 +4,6 @@ const download = require("download")
 const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
-const pify = require("pify")
 const trash = require("./trash.js")
 
 const argv = require("yargs")
@@ -16,15 +15,9 @@ const NODE_ENV =
   (argv.prod ? "production" : "development") +
   (argv.test ? "-test" : "")
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-const zlib = argv.prod ? require("@gfx/zopfli") : require("zlib")
-const gzip = pify(zlib.gzip)
-const gzipOptions = argv.prod ? { numiterations: 100 } : { level: 0 }
-
 const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
-const bundlePath = path.resolve(buildPath, "esm.js")
-const gzipPath = path.resolve(rootPath, "esm.js.gz")
+const bundlePath = path.resolve(rootPath, "esm.js")
 const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const acornPath = path.resolve(vendorPath, "acorn")
@@ -38,7 +31,7 @@ const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
 
 const trashPaths = [
   buildPath,
-  gzipPath,
+  bundlePath,
   uglifyPath
 ]
 
@@ -52,6 +45,16 @@ function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
 }
 
+function copyBundle() {
+  const srcPath = path.resolve(buildPath, "esm.js")
+
+  if (! fs.pathExistsSync(srcPath)) {
+    return Promise.resolve()
+  }
+
+  return fs.copy(srcPath, bundlePath)
+}
+
 function getAcorn() {
   if (fs.pathExistsSync(acornPath)) {
     return Promise.resolve()
@@ -62,17 +65,6 @@ function getAcorn() {
     filter: (file) => extractFilterRegExp.test(file.path),
     strip: 1
   })
-}
-
-function gzipBundle() {
-  if (! fs.pathExistsSync(bundlePath)) {
-    return Promise.resolve()
-  }
-
-  return fs
-    .readFile(bundlePath)
-    .then((buffer) => gzip(buffer, gzipOptions))
-    .then((buffer) => fs.outputFile(gzipPath, buffer))
 }
 
 function makeBundle() {
@@ -90,4 +82,4 @@ Promise
     getAcorn()
   ])
   .then(makeBundle)
-  .then(gzipBundle)
+  .then(copyBundle)

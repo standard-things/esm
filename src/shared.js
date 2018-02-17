@@ -15,12 +15,7 @@ if (__shared__) {
   const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const { versions } = process
 
-  const fastPath = {
-    __proto__: null,
-    gunzip: true,
-    gzip: true
-  }
-
+  const fastPath = { __proto__: null }
   const support = { __proto__: null }
 
   const symbol = {
