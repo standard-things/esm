@@ -8,6 +8,8 @@ import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
+const ExObject = __external__.Object
+
 function init() {
   const builtinEntries = { __proto__: null }
 
@@ -26,7 +28,7 @@ function init() {
           const source = exported
           const names = keysAll(source)
 
-          exported = new Object
+          exported = new ExObject
 
           for (const name of names) {
             if (name !== "Module") {

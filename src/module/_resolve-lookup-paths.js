@@ -10,13 +10,17 @@ import isRelativePath from "../util/is-relative-path.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
 
+const ExArray = __external__.Array
+
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
   const parentFilename = parent && parent.filename
 
   // Look outside if not a relative path.
   if (! isRelativePath(request)) {
     const parentPaths = parent && parent.paths
-    const paths = parentPaths ? GenericArray.slice(parentPaths) : []
+    const paths = parentPaths
+      ? GenericArray.slice(parentPaths)
+      : new ExArray
 
     if (parentPaths &&
         ! skipGlobalPaths) {
@@ -40,7 +44,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     return paths
   }
 
-  return [dirname(parentFilename)]
+  return new ExArray(dirname(parentFilename))
 }
 
 export default resolveLookupPaths

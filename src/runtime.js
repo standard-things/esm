@@ -14,7 +14,9 @@ import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
-const indirectEval = global.eval
+const ExPromise = __external__.Promise
+
+const indirectEval = __external__.eval
 
 const Runtime = {
   __proto__: null,
@@ -144,7 +146,7 @@ const Runtime = {
       request = String(request)
     }
 
-    return new Promise((resolve, reject) => {
+    return new ExPromise((resolve, reject) => {
       setImmediate(() => {
         const { entry } = this
 

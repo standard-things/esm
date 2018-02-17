@@ -117,9 +117,9 @@ function unknownFileExtension(filename) {
 
 const errors = {
   __proto__: null,
-  Error: createNodeClass(Error),
-  SyntaxError: createBuiltinClass(SyntaxError),
-  TypeError: createNodeClass(TypeError)
+  Error: createNodeClass(__external__.Error),
+  SyntaxError: createBuiltinClass(__external__.SyntaxError),
+  TypeError: createNodeClass(__external__.TypeError)
 }
 
 export default errors

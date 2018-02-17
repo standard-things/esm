@@ -23,6 +23,8 @@ import shared from "../shared.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
+const ExObject = __external__.Object
+
 function hook(vm) {
   let entry
   const pkg = Package.get("")
@@ -105,7 +107,7 @@ function hook(vm) {
     entry = Entry.get(mod)
     entry.package = pkg
     entry.runtimeName = shared.globalName
-    Runtime.enable(entry, new Object)
+    Runtime.enable(entry, new ExObject)
   }
 
   Wrapper.manage(vm, "createScript", managerWrapper)

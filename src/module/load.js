@@ -6,9 +6,11 @@ import { dirname, extname } from "path"
 
 import Module from "../module.js"
 
+const ExError = __external__.Error
+
 function load(filename) {
   if (this.loaded) {
-    throw new Error("Module already loaded: " + this.id)
+    throw new ExError("Module already loaded: " + this.id)
   }
 
   let ext = extname(filename)

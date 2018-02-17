@@ -22,6 +22,8 @@ import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
 
+const ExObject = __external__.Object
+
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
   const ext = extname(filename)
@@ -157,7 +159,7 @@ function tryCompileCJS(entry) {
 
   content += maybeSourceMap(entry, content)
 
-  const exported = new Object
+  const exported = new ExObject
 
   if (Module.wrap === moduleWrapESM) {
     Module.wrap = wrap
@@ -180,7 +182,7 @@ function tryCompileESM(entry) {
 
   content += maybeSourceMap(entry, content)
 
-  const exported = new Object
+  const exported = new ExObject
 
   if (! options.cjs.vars) {
     Module.wrap = moduleWrapESM

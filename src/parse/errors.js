@@ -12,8 +12,8 @@ function createClass(Super) {
 
 const errors = {
   __proto__: null,
-  SyntaxError: createClass(SyntaxError),
-  TypeError: createClass(TypeError)
+  SyntaxError: createClass(__external__.SyntaxError),
+  TypeError: createClass(__external__.TypeError)
 }
 
 export default errors

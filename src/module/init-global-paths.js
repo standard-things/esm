@@ -9,6 +9,8 @@ import GenericString from "../generic/string.js"
 
 import safeGetEnv from "../util/safe-get-env.js"
 
+const ExArray = __external__.Array
+
 function initGlobalPaths() {
   const { env } = process
   const isWin = process.platform === "win32"
@@ -30,7 +32,7 @@ function initGlobalPaths() {
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.
   const prefixDir = resolve(process.execPath, "..", isWin ? "" : "..")
-  const paths = new Array(resolve(prefixDir, "lib", "node"))
+  const paths = new ExArray(resolve(prefixDir, "lib", "node"))
 
   if (homeDir) {
     GenericArray.unshift(paths, resolve(homeDir, ".node_libraries"))

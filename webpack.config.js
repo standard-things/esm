@@ -17,16 +17,13 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 
-const builtins = [
-  "Array", "ArrayBuffer", "Atomics", "Boolean", "Buffer", "DataView", "Date",
-  "Error", "EvalError", "Float32Array", "Float64Array", "Function", "Infinity",
-  "Int8Array", "Int16Array", "Int32Array", "Intl", "JSON", "Map", "Math", "NaN",
-  "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
-  "Reflect", "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol",
-  "SyntaxError", "TypeError", "URIError", "Uint8Array", "Uint16Array",
-  "Uint32Array", "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly",
-  "clearImmediate", "clearInterval", "clearTimeout", "decodeURI",
-  "decodeURIComponent", "encodeURI", "encodeURIComponent", "process",
+const externals = [
+  "Array", "Error", "JSON", "Object", "Promise", "String", "SyntaxError",
+  "TypeError", "eval"
+]
+
+const hosted = [
+  "Buffer", "clearImmediate", "clearInterval", "clearTimeout", "process",
   "setImmediate", "setInterval", "setTimeout"
 ]
 
@@ -57,8 +54,13 @@ const config = {
         '"use strict";\n',
         "var __shared__;",
         "const __non_webpack_module__ = module;",
+        "const __external__ = { " +
+          externals
+            .map((name) => name + ": global." + name)
+            .join(", ") +
+        " };",
         "const " +
-          builtins
+          hosted
             .map((name) => name + " = global." + name)
             .join(", ") +
         ";\n"
