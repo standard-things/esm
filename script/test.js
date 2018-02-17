@@ -15,7 +15,6 @@ const isWin = process.platform === "win32"
 
 const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
-const acornPath = path.resolve(rootPath, "src/acorn")
 const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
 const esmPath = path.resolve(rootPath, "esm.js")
@@ -23,6 +22,7 @@ const indexPath = path.resolve(rootPath, "index.js")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
+const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
 
@@ -30,8 +30,8 @@ const trashPaths = ignorePaths
   .filter((thePath) =>
     thePath !== esmPath &&
     thePath !== nodeModulesPath &&
-    ! thePath.startsWith(acornPath) &&
-    ! thePath.startsWith(buildPath)
+    ! thePath.startsWith(buildPath) &&
+    ! thePath.startsWith(vendorPath)
   )
 
 const HOME = path.resolve(envPath, "home")

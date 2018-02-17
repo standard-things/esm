@@ -1,7 +1,7 @@
 import GenericArray from "../generic/array.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import { types as tt } from "../acorn/src/tokentype.js"
+import { tokTypes as tt } from "../acorn.js"
 
 function enable(parser) {
   parser.parseTopLevel = parseTopLevel

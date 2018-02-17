@@ -11,7 +11,7 @@ esm.js
 package-lock.json
 /build
 /node_modules
-/src/acorn
+/src/vendor
 /test/.esmrc
 /test/env/prefix/bin
 /test/env/prefix/node

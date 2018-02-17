@@ -18,8 +18,9 @@ const NODE_ENV =
 const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
 const bundlePath = path.resolve(rootPath, "esm.js")
+const vendorPath = path.resolve(rootPath, "src/vendor")
 
-const acornPath = path.resolve(rootPath, "src/acorn")
+const acornPath = path.resolve(vendorPath, "acorn")
 const acornPkg = require("acorn/package.json")
 const acornURL = "https://github.com/ternjs/acorn/archive/" + acornPkg.version + ".zip"
 

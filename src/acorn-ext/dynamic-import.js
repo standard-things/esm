@@ -5,7 +5,7 @@
 import GenericFunction from "../generic/function.js"
 
 import lookahead from "../parse/lookahead.js"
-import { types as tt } from "../acorn/src/tokentype.js"
+import { tokTypes as tt } from "../acorn.js"
 import wrap from "../util/wrap.js"
 
 function enable(parser) {

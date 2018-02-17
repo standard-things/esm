@@ -1,4 +1,4 @@
-import AcornParser from "./acorn-parser.js"
+import { Parser as AcornParser } from "./acorn.js"
 import GenericObject from "./generic/object.js"
 
 import _createOptions from "./util/create-options.js"

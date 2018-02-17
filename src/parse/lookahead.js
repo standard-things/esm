@@ -1,12 +1,12 @@
-import AcornParser from "../acorn-parser.js"
+import { Parser } from "../acorn.js"
 
-const acornParser = new AcornParser
+const flyweight = new Parser
 
 function lookahead(parser) {
-  acornParser.input = parser.input
-  acornParser.pos = parser.pos
-  acornParser.nextToken()
-  return acornParser
+  flyweight.input = parser.input
+  flyweight.pos = parser.pos
+  flyweight.nextToken()
+  return flyweight
 }
 
 export default lookahead

@@ -3,8 +3,10 @@ import GenericFunction from "../generic/function.js"
 import GenericRegExp from "../generic/regexp.js"
 import GenericString from "../generic/string.js"
 
-import { lineBreak } from "../acorn/src/whitespace.js"
+import acorn from "../acorn.js"
 import wrap from "../util/wrap.js"
+
+const { lineBreakRegExp } = acorn
 
 const {
   EXMARK,
@@ -50,7 +52,7 @@ function readToken_plus_min(func, args) {
         next === HYPHEN &&
         GenericString.charCodeAt(input, pos + 2) === GT &&
         (lastTokEnd === 0 ||
-          GenericRegExp.test(lineBreak, GenericString.slice(input, lastTokEnd, pos)))) {
+          GenericRegExp.test(lineBreakRegExp, GenericString.slice(input, lastTokEnd, pos)))) {
       this.raise(pos, htmlErrorMessage)
     }
   }

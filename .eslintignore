@@ -1,7 +1,7 @@
 /esm.js
 /build
 /node_modules
-/src/acorn
+/src/vendor
 /test/fixture/error
 /test/fixture/source
 /test/fixture/top-level-await
