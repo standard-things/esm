@@ -25,6 +25,7 @@ const inspectKey = util.inspect.custom || "inspect"
 const readFileSync = fs.readFileSync
 const resolve = path.resolve
 const runInContext = Script.prototype.runInContext
+const unlinkSync = fs.unlinkSync
 const writeFileSync = fs.writeFileSync
 
 const Module = useBuiltins ? module.constructor : require("module")
@@ -53,14 +54,31 @@ function compileESM() {
     produceCachedData: true
   })
 
-  if (script.cachedDataProduced &&
-      ! script.cachedDataRejected) {
-    if (! fs.existsSync(nodeModulesPath)) {
-      fs.mkdirSync(nodeModulesPath)
-      fs.mkdirSync(cachePath)
-    }
+  let changed = false
+  let scriptData = null
 
-    writeFile(cacheFilename, script.cachedData)
+  const cachedDataRejected = script.cachedDataRejected
+
+  if (script.cachedDataProduced &&
+      ! cachedDataRejected) {
+    changed = ! cachedData
+    scriptData = script.cachedData
+  } else if (cachedData &&
+      cachedDataRejected) {
+    changed = true
+  }
+
+  if (changed) {
+    if (scriptData) {
+      if (! fs.existsSync(nodeModulesPath)) {
+        fs.mkdirSync(nodeModulesPath)
+        fs.mkdirSync(cachePath)
+      }
+
+      writeFile(cacheFilename, scriptData)
+    } else {
+      removeFile(cacheFilename)
+    }
   }
 
   return runInContext.call(script, context, {
@@ -88,6 +106,12 @@ function md5(string) {
 function readFile(filename, options) {
   try {
     return readFileSync(filename, options)
+  } catch (e) {}
+}
+
+function removeFile(filename) {
+  try {
+    return unlinkSync(filename)
   } catch (e) {}
 }
 

@@ -42,13 +42,13 @@ function compile(content, filename) {
   const cached = cache.compile[cacheName]
   const wrapper = Module.wrap(stripShebang(content))
 
-  const buffer =
+  const cachedData =
     (cached && cached.scriptData) ||
     void 0
 
   const script = new vm.Script(wrapper, {
     __proto__: null,
-    cachedData: buffer,
+    cachedData,
     filename,
     produceCachedData: true
   })
@@ -60,14 +60,15 @@ function compile(content, filename) {
 
   if (script.cachedDataProduced &&
       ! cachedDataRejected) {
-    changed = ! buffer
+    changed = ! cachedData
     scriptData = script.cachedData
   }
 
   if (cached) {
     if (scriptData) {
       cached.scriptData = scriptData
-    } else if (cachedDataRejected) {
+    } else if (cachedData &&
+        cachedDataRejected) {
       changed = true
 
       const meta = cache.map[cacheName]
@@ -87,6 +88,7 @@ function compile(content, filename) {
     const pendingMetas =
       shared.pendingMetas[cachePath] ||
       (shared.pendingMetas[cachePath] = { __proto__: null })
+
     pendingMetas[cacheName] = scriptData
   }
 
