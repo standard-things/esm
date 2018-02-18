@@ -8,13 +8,14 @@ const rootPath = path.resolve(__dirname, "..")
 const gitignorePath = path.resolve(rootPath, ".gitignore")
 
 const patterns = fs.readFileSync(gitignorePath, "utf8")
-  .replace(/^\s+/gm, "")
-  .replace(/\s+$/gm, "")
-  .split("\n")
-  .map((ignore) => ignore.startsWith("/")
-    ? ignore.slice(1)
-    : "**/" + ignore
-  )
+  .split(/\r?\n/)
+  .map((line) => {
+    line = line.trim()
+    return line
+      ? (line.startsWith("/") ? line.slice(1) : "**/" + line)
+      : line
+  })
+  .filter(Boolean)
 
 module.exports = globby.sync(patterns, {
   absolute: true,
