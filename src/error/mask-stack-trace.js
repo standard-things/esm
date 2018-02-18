@@ -1,6 +1,3 @@
-import GenericArray from "../generic/array.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
@@ -48,7 +45,7 @@ function maskStackTrace(error, content, filename, isESM) {
         ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
         : (stack) => scrubStackTrace(stack)
 
-      stack = GenericString.replace(stack, message, newMessage)
+      stack = stack.replace(message, newMessage)
       stack = masker(stack, content, filename)
       stack = withoutMessage(stack, newMessage, scrubber)
 
@@ -74,7 +71,7 @@ function maskStackTrace(error, content, filename, isESM) {
 // <type>: <message>
 //   ...
 function maskParserStack(stack, content, filename) {
-  const parts = GenericRegExp.exec(parserMessageRegExp, stack)
+  const parts = parserMessageRegExp.exec(stack)
 
   if (parts === null) {
     return stack
@@ -86,10 +83,10 @@ function maskParserStack(stack, content, filename) {
   const lineIndex = lineNum - 1
   const column = +parts[4]
   const spliceArgs = [0, 1]
-  const stackLines = GenericString.split(stack, "\n")
+  const stackLines = stack.split("\n")
 
   if (typeof filename === "string") {
-    GenericArray.push(spliceArgs, filename + ":" + lineNum)
+    spliceArgs.push(filename + ":" + lineNum)
   }
 
   if (typeof content === "function") {
@@ -97,38 +94,38 @@ function maskParserStack(stack, content, filename) {
   }
 
   if (typeof content === "string") {
-    const lines = GenericString.split(content, "\n")
+    const lines = content.split("\n")
 
     if (lineIndex < lines.length) {
       let arrow = "^"
 
-      if (GenericString.startsWith(message, "Export '")) {
+      if (message.startsWith("Export '")) {
         // Increase arrow count to the length of the identifier.
-        arrow = GenericString.repeat(arrow, GenericString.indexOf(message, "'", 8) - 8)
+        arrow = arrow.repeat(message.indexOf("'", 8) - 8)
       }
 
       const line = lines[lineIndex]
 
-      if (! GenericRegExp.test(blankRegExp, line)) {
-        GenericArray.push(spliceArgs,
+      if (! blankRegExp.test(line)) {
+        spliceArgs.push(
           line,
-          GenericString.repeat(" ", column) + arrow,
+          " ".repeat(column) + arrow,
           ""
         )
       }
     }
   }
 
-  GenericArray.push(spliceArgs, type + ": " + message)
-  GenericArray.splice(stackLines, ...spliceArgs)
-  return GenericArray.join(stackLines, "\n")
+  spliceArgs.push(type + ": " + message)
+  stackLines.splice(...spliceArgs)
+  return stackLines.join("\n")
 }
 
 function maskEngineStack(stack, content, filename) {
-  const parts = GenericRegExp.exec(engineMessageRegExp, stack)
+  const parts = engineMessageRegExp.exec(stack)
 
   if (typeof filename === "string" &&
-      ! GenericRegExp.test(headerRegExp, stack)) {
+      ! headerRegExp.test(stack)) {
     stack = filename + ":1\n" + stack
   }
 
@@ -136,10 +133,10 @@ function maskEngineStack(stack, content, filename) {
     return stack
   }
 
-  return GenericString.replace(stack, arrowRegExp, (match, snippet, arrow, newline = "") => {
+  return stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
     const lineNum = +parts[1]
 
-    if (GenericString.indexOf(snippet, ZWJ) !== -1) {
+    if (snippet.indexOf(ZWJ) !== -1) {
       if (typeof content === "function") {
         content = content(filename)
       }
@@ -148,7 +145,7 @@ function maskEngineStack(stack, content, filename) {
         return ""
       }
 
-      const lines = GenericString.split(content, "\n")
+      const lines = content.split("\n")
       const line = lines[lineNum - 1] || ""
       return line + (line ? "\n\n" : "\n")
     }
@@ -159,11 +156,11 @@ function maskEngineStack(stack, content, filename) {
 
     const [prefix] = Module.wrapper
 
-    if (GenericString.startsWith(snippet, prefix)) {
+    if (snippet.startsWith(prefix)) {
       const { length } = prefix
 
-      snippet = GenericString.slice(snippet, length)
-      arrow = GenericString.slice(arrow, length)
+      snippet = snippet.slice(length)
+      arrow = arrow.slice(length)
     }
 
     return snippet + arrow + newline
@@ -171,8 +168,8 @@ function maskEngineStack(stack, content, filename) {
 }
 
 function fileNamesToURLs(stack) {
-  stack = GenericString.replace(stack, headerRegExp, resolveURL)
-  return GenericString.replace(stack, atNameRegExp, replaceAtName)
+  stack = stack.replace(headerRegExp, resolveURL)
+  return stack.replace(atNameRegExp, replaceAtName)
 }
 
 function replaceAtName(match, name) {
@@ -186,8 +183,8 @@ function resolveURL(name) {
 function withoutMessage(stack, message, callback) {
   const token = ZWJ + "message" + ZWJ
 
-  stack = GenericString.replace(stack, message, token)
-  return GenericString.replace(callback(stack), token, message)
+  stack = stack.replace(message, token)
+  return callback(stack).replace(token, message)
 }
 
 export default maskStackTrace

@@ -1,5 +1,4 @@
 import GenericArray from "../generic/array.js"
-import GenericString from "../generic/string.js"
 import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
@@ -19,7 +18,7 @@ function isSideloaded() {
   const [, filename] = argv
   const args = GenericArray.slice(argv, 2)
   const nodeModulesIndex = args.length
-    ? GenericString.lastIndexOf(normalize(filename), "/node_modules/")
+    ? normalize(filename).lastIndexOf("/node_modules/")
     : -1
 
   return env.sideloaded =
@@ -27,7 +26,7 @@ function isSideloaded() {
     (nodeModulesIndex !== -1 &&
      hasLoaderArg(args) &&
      (Package.get(process.cwd()) !== null ||
-      Package.get(realpath(GenericString.slice(filename, 0, nodeModulesIndex + 1))) !== null)) ||
+      Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) ||
     // From istanbuljs/nyc.
     isNyc()
 }

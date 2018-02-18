@@ -1,9 +1,11 @@
 import GenericArray from "../generic/array.js"
 
+const { isArray } = Array
+
 const stdFilename = __non_webpack_module__.filename
 
 function hasLoaderModule(modules) {
-  if (! GenericArray.isArray(modules)) {
+  if (! isArray(modules)) {
     return false
   }
 

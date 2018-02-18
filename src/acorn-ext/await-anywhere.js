@@ -1,5 +1,3 @@
-import GenericFunction from "../generic/function.js"
-
 import wrap from "../util/wrap.js"
 
 function enable(parser) {
@@ -10,7 +8,7 @@ function enable(parser) {
 function parseMaybeUnary(func, args) {
   return this.isContextual("await")
     ? this.parseAwait()
-    : GenericFunction.apply(func, this, args)
+    : func.apply(this, args)
 }
 
 export { enable }

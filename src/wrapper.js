@@ -4,7 +4,6 @@
 
 import GenericArray from "./generic/array.js"
 import GenericFunction from "./generic/function.js"
-import GenericObject from "./generic/object.js"
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
@@ -100,6 +99,6 @@ function getStore(object) {
   return has(object, symbol) ? object[symbol] : null
 }
 
-GenericObject.setPrototypeOf(Wrapper.prototype, null)
+Object.setPrototypeOf(Wrapper.prototype, null)
 
 export default Wrapper

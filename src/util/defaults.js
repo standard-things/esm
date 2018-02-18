@@ -1,17 +1,16 @@
-import GenericObject from "../generic/object.js"
+const { hasOwnProperty } = Object.prototype
 
 function defaults(object) {
   let i = 0
   const argCount = arguments.length
-  const { hasOwnProperty } = GenericObject
 
   while (++i < argCount) {
     const source = arguments[i]
 
     for (const key in source) {
-      if (hasOwnProperty(source, key) &&
+      if (hasOwnProperty.call(source, key) &&
           (object[key] === void 0 ||
-           ! hasOwnProperty(object, key))) {
+           ! hasOwnProperty.call(object, key))) {
         object[key] = source[key]
       }
     }

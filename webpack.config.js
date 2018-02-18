@@ -18,13 +18,12 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 
 const externals = [
-  "Array", "Error", "JSON", "Object", "Promise", "String", "SyntaxError",
+  "Array", "Buffer", "Error", "JSON", "Object", "Promise", "SyntaxError",
   "TypeError", "eval"
 ]
 
 const hosted = [
-  "Buffer", "clearImmediate", "clearInterval", "clearTimeout", "process",
-  "setImmediate", "setInterval", "setTimeout"
+  "console", "process", "setImmediate"
 ]
 
 const isProd = /production/.test(process.env.NODE_ENV)

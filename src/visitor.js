@@ -2,14 +2,12 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/ast-types/blob/master/lib/path-visitor.js
 
-import GenericArray from "./generic/array.js"
-import GenericObject from "./generic/object.js"
-import SafeWeakMap from "./builtin/weak-map.js"
-
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 
-const childNamesMap = new SafeWeakMap
+const { isArray } = Array
+
+const childNamesMap = new WeakMap
 
 const childrenToVisit = {
   __proto__: null,
@@ -54,7 +52,7 @@ class Visitor {
       return
     }
 
-    if (GenericArray.isArray(value)) {
+    if (isArray(value)) {
       path.each(this, "visitWithoutReset")
       return
     }
@@ -132,6 +130,6 @@ function getChildNames(value) {
   return childNames
 }
 
-GenericObject.setPrototypeOf(Visitor.prototype, null)
+Object.setPrototypeOf(Visitor.prototype, null)
 
 export default Visitor

@@ -1,7 +1,4 @@
 import ASCII from "../ascii.js"
-import GenericFunction from "../generic/function.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
 
 import acorn from "../acorn.js"
 import wrap from "../util/wrap.js"
@@ -27,37 +24,37 @@ function readToken_lt_gt(func, args) {
   if (this.inModule) {
     const [code] = args
     const { input, pos } = this
-    const next = GenericString.charCodeAt(input, pos + 1)
+    const next = input.charCodeAt(pos + 1)
 
     // Detect opening HTML comment, i.e. `<!--`.
     if (code === LT &&
         next === EXMARK &&
-        GenericString.charCodeAt(input, pos + 2) === HYPHEN &&
-        GenericString.charCodeAt(input, pos + 3) === HYPHEN) {
+        input.charCodeAt(pos + 2) === HYPHEN &&
+        input.charCodeAt(pos + 3) === HYPHEN) {
       this.raise(pos, htmlErrorMessage)
     }
   }
 
-  return GenericFunction.apply(func, this, args)
+  return func.apply(this, args)
 }
 
 function readToken_plus_min(func, args) {
   if (this.inModule) {
     const [code] = args
     const { input, lastTokEnd, pos } = this
-    const next = GenericString.charCodeAt(input, pos + 1)
+    const next = input.charCodeAt(pos + 1)
 
     // Detect closing HTML comment, i.e. `-->`.
     if (next === code &&
         next === HYPHEN &&
-        GenericString.charCodeAt(input, pos + 2) === GT &&
+        input.charCodeAt(pos + 2) === GT &&
         (lastTokEnd === 0 ||
-          GenericRegExp.test(lineBreakRegExp, GenericString.slice(input, lastTokEnd, pos)))) {
+          lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
       this.raise(pos, htmlErrorMessage)
     }
   }
 
-  return GenericFunction.apply(func, this, args)
+  return func.apply(this, args)
 }
 
 export { enable }

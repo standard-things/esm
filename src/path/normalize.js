@@ -1,5 +1,3 @@
-import GenericString from "../generic/string.js"
-
 import { resolve } from "path"
 
 const backSlashRegExp = /\\/g
@@ -10,7 +8,7 @@ function normalize(filename) {
   }
 
   const resolved = resolve(filename)
-  return GenericString.replace(resolved, backSlashRegExp, "/")
+  return resolved.replace(backSlashRegExp, "/")
 }
 
 export default normalize

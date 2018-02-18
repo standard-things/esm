@@ -1,9 +1,9 @@
-import GenericObject from "../generic/object.js"
+const { getOwnPropertySymbols } = Object
 
 function getSymbols(object) {
   return object == null
     ? []
-    : GenericObject.getOwnPropertySymbols(object)
+    : getOwnPropertySymbols(object)
 }
 
 export default getSymbols

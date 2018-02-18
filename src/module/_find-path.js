@@ -6,10 +6,7 @@ import { isAbsolute, resolve } from "path"
 
 import ASCII from "../ascii.js"
 import GenericArray from "../generic/array.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
 import Module from "../module.js"
-import SafeJSON from "../builtin/json.js"
 
 import binding from "../binding.js"
 import keys from "../util/keys.js"
@@ -23,9 +20,10 @@ const {
   SLASH
 } = ASCII
 
-const { preserveSymlinks } = binding.config
+const { parse } = JSON
 
 const mainFieldRegExp = /"main"/
+const { preserveSymlinks } = binding.config
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
@@ -49,7 +47,7 @@ function findPath(request, paths, isMain, searchExts) {
   let trailingSlash = request.length > 0
 
   if (trailingSlash) {
-    const code = GenericString.charCodeAt(request, request.length - 1)
+    const code = request.charCodeAt(request.length - 1)
     trailingSlash = code === SLASH
 
     if (shared.env.win32 &&
@@ -129,14 +127,14 @@ function readPackage(thePath) {
   const json = readFileFast(jsonPath, "utf8")
 
   if (! json ||
-      ! GenericRegExp.test(mainFieldRegExp, json)) {
+      ! mainFieldRegExp.test(json)) {
     return ""
   }
 
   let main
 
   try {
-    main = SafeJSON.parse(json).main
+    main = parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message

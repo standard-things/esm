@@ -4,7 +4,6 @@
 
 import ASCII from "../ascii.js"
 import GenericArray from "../generic/array.js"
-import GenericString from "../generic/string.js"
 
 import { resolve } from "path"
 import shared from "../shared.js"
@@ -15,11 +14,11 @@ const {
   SLASH
 } = ASCII
 
-const nmChars = GenericArray.map("node_modules", (char) => {
-  return GenericString.charCodeAt(char, 0)
-})
+const ExArray = __external__.Array
 
-GenericArray.reverse(nmChars)
+const nmChars = Array.prototype
+  .map.call("node_modules", (char) => char.charCodeAt(0))
+  .reverse()
 
 const nmLength = nmChars.length
 
@@ -45,14 +44,14 @@ function posixPaths(from) {
   let last = length
   let nmCount = 0
 
-  const paths = []
+  const paths = new ExArray
 
   while (length--) {
-    const code = GenericString.charCodeAt(from, length)
+    const code = from.charCodeAt(length)
 
     if (code === SLASH) {
       if (nmCount !== nmLength) {
-        GenericArray.push(paths, GenericString.slice(from, 0, last) + "/node_modules")
+        GenericArray.push(paths, from.slice(0, last) + "/node_modules")
       }
 
       last = length
@@ -76,8 +75,8 @@ function win32Paths(from) {
   from = resolve(from)
 
   // Return root node_modules when path is "D:\\".
-  if (GenericString.charCodeAt(from, from.length - 1) === BSLASH &&
-      GenericString.charCodeAt(from, from.length - 2) === COLON) {
+  if (from.charCodeAt(from.length - 1) === BSLASH &&
+      from.charCodeAt(from.length - 2) === COLON) {
     return [from + "node_modules"]
   }
 
@@ -85,10 +84,10 @@ function win32Paths(from) {
   let last = length
   let nmCount = 0
 
-  const paths = []
+  const paths = new ExArray
 
   while (length--) {
-    const code = GenericString.charCodeAt(from, length)
+    const code = from.charCodeAt(length)
 
     // The path segment separator check ("\" and "/") was used to get
     // node_modules path for every path segment. Use colon as an extra
@@ -98,7 +97,7 @@ function win32Paths(from) {
         code === COLON ||
         code === SLASH) {
       if (nmCount !== nmLength) {
-        GenericArray.push(paths, GenericString.slice(from, 0, last) + "\\node_modules")
+        GenericArray.push(paths, from.slice(0, last) + "\\node_modules")
       }
 
       last = length

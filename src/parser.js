@@ -1,5 +1,4 @@
 import { Parser as AcornParser } from "./acorn.js"
-import GenericObject from "./generic/object.js"
 
 import _createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
@@ -53,6 +52,6 @@ function extend(parser) {
   return parser
 }
 
-GenericObject.setPrototypeOf(Parser.prototype, null)
+Object.setPrototypeOf(Parser.prototype, null)
 
 export default Parser

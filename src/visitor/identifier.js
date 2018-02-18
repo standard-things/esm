@@ -1,10 +1,8 @@
-import GenericArray from "../generic/array.js"
-import SafeWeakMap from "../builtin/weak-map.js"
 import Visitor from "../visitor.js"
 
 import { getLineInfo } from "../acorn.js"
 
-const definedMap = new SafeWeakMap
+const definedMap = new WeakMap
 
 class IdentifierVisitor extends Visitor {
   reset(rootPath, options) {
@@ -36,7 +34,7 @@ class IdentifierVisitor extends Visitor {
     const { column, line } = getLineInfo(this.magicString.original, node.start)
 
     this.warnedForArguments = true
-    GenericArray.push(this.warnings, { args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
+    this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
   }
 
   visitWithoutReset(path) {

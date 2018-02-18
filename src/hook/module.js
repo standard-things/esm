@@ -2,12 +2,8 @@
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import GenericFunction from "../generic/function.js"
-import GenericObject from "../generic/object.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
 import Module from "../module.js"
 import Package from "../package.js"
-import SafeMap from "../builtin/map.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
@@ -31,12 +27,14 @@ import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
+const { setPrototypeOf } = Object
+
 const exts = [".js", ".mjs"]
 const importExportRegExp = /\b(?:im|ex)port\b/
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
-  const passthruMap = new SafeMap
+  const passthruMap = new Map
 
   const defaultPkg = new Package("", "*", { cache: false })
   const defaultOptions = defaultPkg.options
@@ -78,7 +76,7 @@ function hook(Mod, parent) {
 
     return wrapped
       ? GenericFunction.call(wrapped, this, manager, func, args)
-      : GenericFunction.call(tryPassthru, this, func, args, pkg)
+      : tryPassthru.call(this, func, args, pkg)
   }
 
   function methodWrapper(manager, func, args) {
@@ -93,7 +91,7 @@ function hook(Mod, parent) {
 
     const compileFallback = () => {
       entry.state = 3
-      return GenericFunction.call(tryPassthru, this, func, args, pkg)
+      return tryPassthru.call(this, func, args, pkg)
     }
 
     const compileWrapper = (content, filename) => {
@@ -109,9 +107,9 @@ function hook(Mod, parent) {
     }
 
     entry.cacheName = cacheName
-    entry.runtimeName = encodeId("_" + GenericString.slice(getCacheStateHash(cacheName), 0, 3))
+    entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
 
-    GenericObject.setPrototypeOf(mod, Module.prototype)
+    setPrototypeOf(mod, Module.prototype)
 
     let cached = cache.compile[cacheName]
 
@@ -138,7 +136,7 @@ function hook(Mod, parent) {
 
     if (! cached &&
         passthruMap.get(func)) {
-      GenericFunction.call(tryPassthru, this, func, args, pkg)
+      tryPassthru.call(this, func, args, pkg)
     } else {
       const content = cached ? cached.code : readSourceCode(filename)
       mod._compile(content, filename)
@@ -216,9 +214,9 @@ function tryPassthru(func, args, pkg) {
       const { message } = e
 
       if (e.name === "SyntaxError" &&
-          GenericRegExp.test(importExportRegExp, message)) {
+          importExportRegExp.test(message)) {
         e.message = stdName + " is not enabled for " + filename
-        e.stack = GenericString.replace(e.stack, message, e.message)
+        e.stack = e.stack.replace(message, e.message)
 
         if (pkg) {
           pkg.cache.dirty = true

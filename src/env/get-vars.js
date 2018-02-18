@@ -1,5 +1,4 @@
 import ASCII from "../ascii.js"
-import GenericString from "../generic/string.js"
 
 import isPath from "../util/is-path.js"
 import parseJSON6 from "../util/parse-json6.js"
@@ -28,7 +27,7 @@ function getVars() {
     return env.vars = vars
   }
 
-  let ESM_OPTIONS = GenericString.trim(processEnv.ESM_OPTIONS)
+  let ESM_OPTIONS = processEnv.ESM_OPTIONS.trim()
 
   if (isPath(ESM_OPTIONS)) {
     ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
@@ -38,7 +37,7 @@ function getVars() {
     return env.vars = vars
   }
 
-  const code0 = GenericString.charCodeAt(ESM_OPTIONS, 0)
+  const code0 = ESM_OPTIONS.charCodeAt(0)
 
   if (code0 === APOSTROPHE ||
       code0 === LBRACE ||

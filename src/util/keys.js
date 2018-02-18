@@ -1,9 +1,9 @@
-import GenericObject from "../generic/object.js"
+const _keys = Object.keys
 
 function keys(object) {
   return object == null
     ? []
-    : GenericObject.keys(object)
+    : _keys(object)
 }
 
 export default keys

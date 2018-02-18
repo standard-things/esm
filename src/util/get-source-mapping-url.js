@@ -2,7 +2,6 @@
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
 
 import ASCII from "../ascii.js"
-import GenericString from "../generic/string.js"
 
 const {
   APOSTROPHE,
@@ -34,7 +33,7 @@ function getSourceMappingURL(content) {
   let pos = length
 
   while (match === null) {
-    pos = GenericString.lastIndexOf(content, name, pos)
+    pos = content.lastIndexOf(name, pos)
 
     if (pos === -1 ||
         pos < 4) {
@@ -47,19 +46,19 @@ function getSourceMappingURL(content) {
     pos -= 4
 
     // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
-    if (GenericString.charCodeAt(content, pos) !== SLASH ||
-        GenericString.charCodeAt(content, pos + 1) !== SLASH) {
+    if (content.charCodeAt(pos) !== SLASH ||
+        content.charCodeAt(pos + 1) !== SLASH) {
       continue
     }
 
-    let code = GenericString.charCodeAt(content, pos + 2)
+    let code = content.charCodeAt(pos + 2)
 
     if (code !== AT &&
         code !== NUMSIGN) {
       continue
     }
 
-    code = GenericString.charCodeAt(content, pos + 3)
+    code = content.charCodeAt(pos + 3)
 
     if (code !== HT &&
         code !== SPACE) {
@@ -68,7 +67,7 @@ function getSourceMappingURL(content) {
 
     // Check for "=" after the name.
     if (equalPos < length &&
-      GenericString.charCodeAt(content, equalPos) !== EQ) {
+      content.charCodeAt(equalPos) !== EQ) {
       continue
     }
 
@@ -76,22 +75,22 @@ function getSourceMappingURL(content) {
       return ""
     }
 
-    match = GenericString.slice(content, urlPos)
+    match = content.slice(urlPos)
   }
 
-  const newLinePos = GenericString.indexOf(match, "\n")
+  const newLinePos = match.indexOf("\n")
 
   if (newLinePos !== -1) {
-    match = GenericString.slice(match, 0, newLinePos)
+    match = match.slice(0, newLinePos)
   }
 
-  match = GenericString.trim(match)
+  match = match.trim()
 
   let i = -1
   const matchLength = match.length
 
   while (++i < matchLength) {
-    const code = GenericString.charCodeAt(match, i)
+    const code = match.charCodeAt(i)
 
     if (code === APOSTROPHE ||
         code === HT ||

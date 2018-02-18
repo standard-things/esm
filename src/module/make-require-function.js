@@ -3,7 +3,6 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/module.js
 
 import Entry from "../entry.js"
-import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 
 import errors from "../errors.js"
@@ -27,14 +26,14 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     if (! entry.package.options.cjs.vars) {
       try {
-        return GenericFunction.call(requirer, mod, request)
+        return requirer.call(mod, request)
       } finally {
         moduleState.requireDepth -= 1
       }
     }
 
     try {
-      return GenericFunction.call(requirer, mod, request)
+      return requirer.call(mod, request)
     } catch (e) {
       if (isError(e)) {
         const { code } = e
@@ -55,7 +54,7 @@ function makeRequireFunction(mod, requirer, resolver) {
       throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
     }
 
-    return GenericFunction.call(resolver, mod, request, options)
+    return resolver.call(mod, request, options)
   }
 
   function paths(request) {

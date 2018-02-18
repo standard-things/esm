@@ -1,6 +1,6 @@
-import GenericObject from "../generic/object.js"
-
 const ExError = __external__.Error
+
+const { toString } = Object.prototype
 
 function isError(value) {
   if (value instanceof Error ||
@@ -8,7 +8,7 @@ function isError(value) {
     return true
   }
 
-  return GenericObject.toString(value) === "[object Error]"
+  return toString(value) === "[object Error]"
 }
 
 export default isError

@@ -1,10 +1,10 @@
 import ASCII from "../ascii.js"
-import GenericString from "../generic/string.js"
-import SafeJSON from "../builtin/json.js"
 
 const {
   QUOTE
 } = ASCII
+
+const { stringify } = JSON
 
 const escapedDoubleQuoteRegExp = /\\"/g
 
@@ -24,17 +24,17 @@ const quoteMap = {
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'
-  const string = SafeJSON.stringify(value)
+  const string = stringify(value)
 
   if (quote === '"' &&
-      GenericString.charCodeAt(string, 0) === QUOTE) {
+      string.charCodeAt(0) === QUOTE) {
     return string
   }
 
-  const unquoted = GenericString.slice(string, 1, -1)
-  const escaped = GenericString.replace(unquoted, escapedDoubleQuoteRegExp, '"')
+  const unquoted = string.slice(1, -1)
+  const escaped = unquoted.replace(escapedDoubleQuoteRegExp, '"')
 
-  return quote + GenericString.replace(escaped, escapeRegExpMap[quote], "\\" + quote) + quote
+  return quote + escaped.replace(escapeRegExpMap[quote], "\\" + quote) + quote
 }
 
 export default toStringLiteral

@@ -1,8 +1,8 @@
 import shared from "../shared.js"
 
-function init() {
-  const _decodeURIComponent = shared.global.decodeURIComponent
+const _decodeURIComponent = decodeURIComponent
 
+function init() {
   return function decodeURIComponent(string) {
     return typeof string === "string"
       ? _decodeURIComponent(string)

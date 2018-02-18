@@ -1,5 +1,3 @@
-import GenericArray from "../generic/array.js"
-import GenericString from "../generic/string.js"
 import MagicString from "../magic-string.js"
 import Visitor from "../visitor.js"
 
@@ -183,7 +181,7 @@ class ImportExportVisitor extends Visitor {
     const { runtimeName } = this
     const { source } = node
     const specifierString = getSourceString(this, node)
-    const specifierName = GenericString.slice(specifierString, 1, -1)
+    const specifierName = specifierString.slice(1, -1)
 
     const hoistedCode = pad(
       this,
@@ -197,7 +195,7 @@ class ImportExportVisitor extends Visitor {
       node.end
     )
 
-    GenericArray.push(this.exportStars, specifierName)
+    this.exportStars.push(specifierName)
 
     addToDependencySpecifiers(this, specifierName)
     hoistImports(this, node, hoistedCode)
@@ -215,7 +213,7 @@ class ImportExportVisitor extends Visitor {
     //   1 - Own
     //   2 - Imported
     //   3 - Conflicted
-    GenericArray.push(this.exportNames, "default")
+    this.exportNames.push("default")
 
     const node = path.getValue()
     const { declaration } = node
@@ -281,7 +279,7 @@ class ImportExportVisitor extends Visitor {
         // Support exporting named class and function declarations:
         // export function named() {}
         const { name } = id
-        GenericArray.push(pairs, [name, name])
+        pairs.push([name, name])
       } else if (type === "VariableDeclaration") {
         // Support exporting variable lists:
         // export let name1, name2, ..., nameN
@@ -289,7 +287,7 @@ class ImportExportVisitor extends Visitor {
           const names = getNamesFromPattern(decl.id)
 
           for (const name of names) {
-            GenericArray.push(pairs, [name, name])
+            pairs.push([name, name])
           }
         }
       }
@@ -323,7 +321,7 @@ class ImportExportVisitor extends Visitor {
       for (const specifier of specifiers) {
         const localName = specifier.local.name
 
-        if (GenericArray.indexOf(idents, localName) === -1) {
+        if (idents.indexOf(localName) === -1) {
           throw new errors.SyntaxError(
             this.magicString.original,
             specifier.start,
@@ -331,7 +329,7 @@ class ImportExportVisitor extends Visitor {
           )
         }
 
-        GenericArray.push(pairs, [specifier.exported.name, localName])
+       pairs.push([specifier.exported.name, localName])
       }
 
       hoistExports(this, node, pairs)
@@ -345,7 +343,7 @@ class ImportExportVisitor extends Visitor {
     const specifierMap = { __proto__: null }
 
     const specifierString = getSourceString(this, node)
-    const specifierName = GenericString.slice(specifierString, 1, -1)
+    const specifierName = specifierString.slice(1, -1)
 
     addToDependencySpecifiers(this, specifierName)
 
@@ -353,7 +351,7 @@ class ImportExportVisitor extends Visitor {
       const exportName = specifier.exported.name
       const localName = specifier.local.name
 
-      GenericArray.push(exportNames, exportName)
+      exportNames.push(exportName)
       addToDependencySpecifiers(this, specifierName, localName)
 
       addToSpecifierMap(
@@ -411,8 +409,8 @@ function addToDependencySpecifiers(visitor, specifierName, exportName) {
 
   if (exportName &&
       exportName !== "*" &&
-      GenericArray.indexOf(exportNames, exportName) === -1) {
-    GenericArray.push(exportNames, exportName)
+      exportNames.indexOf(exportName) === -1) {
+    exportNames.push(exportName)
   }
 }
 
@@ -421,7 +419,7 @@ function addToSpecifierMap(visitor, specifierMap, importName, localName) {
     specifierMap[importName] ||
     (specifierMap[importName] = [])
 
-  GenericArray.push(localNames, localName)
+  localNames.push(localName)
 }
 
 function canExportedValuesChange({ declaration, type }) {
@@ -463,11 +461,11 @@ function createSpecifierMap(visitor, node) {
 // Gets a string representation (including quotes) from an import or
 // export declaration node.
 function getSourceString(visitor, { source }) {
-  return GenericString.slice(visitor.code, source.start, source.end)
+  return visitor.code.slice(source.start, source.end)
 }
 
 function hoistExports(visitor, node, pairs) {
-  GenericArray.push(visitor.top.hoistedExports, ...pairs)
+  visitor.top.hoistedExports.push(...pairs)
 
   if (node.declaration) {
     preserveChild(visitor, node, "declaration")
@@ -492,17 +490,17 @@ function overwrite(visitor, oldStart, oldEnd, newCode) {
 }
 
 function pad(visitor, newCode, oldStart, oldEnd) {
-  const oldCode = GenericString.slice(visitor.code, oldStart, oldEnd)
-  const oldLines = GenericString.split(oldCode, "\n")
+  const oldCode = visitor.code.slice(oldStart, oldEnd)
+  const oldLines = oldCode.split("\n")
   const oldLineCount = oldLines.length
-  const newLines = GenericString.split(newCode, "\n")
+  const newLines = newCode.split("\n")
   const lastIndex = newLines.length - 1
 
   let i = lastIndex - 1
 
   while (++i < oldLineCount) {
     const oldLine = oldLines[i]
-    const lastCharCode = GenericString.charCodeAt(oldLine, oldLine.length - 1)
+    const lastCharCode = oldLine.charCodeAt(oldLine.length - 1)
 
     if (i > lastIndex) {
       newLines[i] = ""
@@ -526,7 +524,7 @@ function preserveLine(visitor, { end, start }) {
 }
 
 function safeName(name, localNames) {
-  return GenericArray.indexOf(localNames, name) === -1
+  return localNames.indexOf(name) === -1
     ? name
     : safeName(encodeId(name), localNames)
 }
@@ -545,7 +543,7 @@ function toModuleExport(visitor, pairs) {
   code += visitor.runtimeName + ".e(["
 
   for (const [exportName, localName] of pairs) {
-    GenericArray.push(exportNames, exportName)
+    exportNames.push(exportName)
 
     code +=
       '["' + exportName + '",()=>' +
@@ -564,7 +562,7 @@ function toModuleExport(visitor, pairs) {
 
 function toModuleImport(visitor, specifierString, specifierMap) {
   const importNames = keys(specifierMap)
-  const specifierName = GenericString.slice(specifierString, 1, -1)
+  const specifierName = specifierString.slice(1, -1)
 
   let code = visitor.runtimeName + ".w(" + specifierString
 

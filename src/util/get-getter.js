@@ -1,10 +1,10 @@
-import GenericObject from "../generic/object.js"
-
 import has from "./has.js"
+
+const { __lookupGetter__ } = Object.prototype
 
 function getGetter(object, key) {
   if (has(object, key)) {
-    return GenericObject.__lookupGetter__(object, key) || null
+    return __lookupGetter__.call(object, key) || null
   }
 
   return null

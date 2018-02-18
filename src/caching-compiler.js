@@ -1,11 +1,6 @@
 import ASCII from "./ascii.js"
 import Compiler from "./compiler.js"
-import GenericArray from "./generic/array.js"
 import GenericBuffer from "./generic/buffer.js"
-import GenericObject from "./generic/object.js"
-import GenericString from "./generic/string.js"
-import SafeJSON from "./builtin/json.js"
-import SafeMath from "./builtin/math.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
@@ -19,6 +14,8 @@ import writeFile from "./fs/write-file.js"
 const {
   PERIOD
 } = ASCII
+
+const { stringify } = JSON
 
 class CachingCompiler {
   static compile(entry, code, options) {
@@ -141,11 +138,11 @@ function removeCacheFile(cachePath, cacheName) {
 
 function removeExpired(cachePath, cacheName) {
   const cache = shared.package.dir[cachePath]
-  const shortname = GenericString.slice(cacheName, 0, 8)
+  const shortname = cacheName.slice(0, 8)
 
   for (const otherCacheName in cache) {
     if (otherCacheName !== cacheName &&
-        GenericString.startsWith(otherCacheName, shortname) &&
+        otherCacheName.startsWith(shortname) &&
         isCacheFileName(otherCacheName)) {
       removeCacheFile(cachePath, cacheName)
     }
@@ -170,13 +167,13 @@ function toCompileOptions(entry, options) {
   }
 }
 
-GenericObject.setPrototypeOf(CachingCompiler.prototype, null)
+Object.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)
 
   process.once("exit", () => {
-    process.setMaxListeners(SafeMath.max(process.getMaxListeners() - 1, 0))
+    process.setMaxListeners(Math.max(process.getMaxListeners() - 1, 0))
 
     const { pendingMetas, pendingWrites } = shared
     const { dir } = shared.package
@@ -234,7 +231,7 @@ if (! shared.inited) {
       let offset = 0
 
       for (const cacheName in scriptDatas) {
-        if (GenericString.charCodeAt(cacheName, 0) === PERIOD) {
+        if (cacheName.charCodeAt(0) === PERIOD) {
           continue
         }
 
@@ -246,7 +243,7 @@ if (! shared.inited) {
         if (scriptData) {
           offsetStart = offset
           offsetEnd = offset += scriptData.length
-          GenericArray.push(buffers, scriptData)
+          buffers.push(scriptData)
         }
 
         const cached = cache.compile[cacheName]
@@ -267,7 +264,7 @@ if (! shared.inited) {
       }
 
       writeFile(resolve(cachePath, ".data.blob"), GenericBuffer.concat(buffers))
-      writeFile(resolve(cachePath, ".data.json"), SafeJSON.stringify(map))
+      writeFile(resolve(cachePath, ".data.json"), stringify(map))
     }
 
     for (const cachePath in pendingWrites) {

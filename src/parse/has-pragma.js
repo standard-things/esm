@@ -1,5 +1,3 @@
-import GenericString from "../generic/string.js"
-
 import indexOfPragma from "./index-of-pragma.js"
 
 const modulePragma = "use module"
@@ -18,12 +16,12 @@ function hasPragma(code, pragma) {
 
   if (index >= scriptPragmaWidth &&
       pragma === modulePragma) {
-    return indexOfPragma(GenericString.slice(code, 0, index), scriptPragma) === -1
+    return indexOfPragma(code.slice(0, index), scriptPragma) === -1
   }
 
   if (index >= modulePragmaWidth &&
       pragma === scriptPragma) {
-    return indexOfPragma(GenericString.slice(code, 0, index), modulePragma) === -1
+    return indexOfPragma(code.slice(0, index), modulePragma) === -1
   }
 
   return true

@@ -1,12 +1,10 @@
-import SafeDate from "../builtin/date.js"
-
 import shared from "../shared.js"
 import unapply from "../util/unapply.js"
 
 function init() {
   return {
     __proto__: null,
-    getTime: unapply(SafeDate.prototype.getTime)
+    getTime: unapply(Date.prototype.getTime)
   }
 }
 

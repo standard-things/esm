@@ -2,13 +2,14 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
-import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 
 import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
+
+const { isArray } = Array
 
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
@@ -28,7 +29,7 @@ function resolveFilename(request, parent, isMain, options) {
   let paths
 
   if (! cacheKey &&
-      GenericArray.isArray(options.paths)) {
+      isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 
@@ -38,13 +39,13 @@ function resolveFilename(request, parent, isMain, options) {
       fakeParent.paths = Module._nodeModulePaths(fromPath)
       const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
 
-      if (GenericArray.indexOf(paths, fromPath) === -1) {
-        GenericArray.push(paths, fromPath)
+      if (paths.indexOf(fromPath) === -1) {
+        paths.push(fromPath)
       }
 
       for (const lookupPath of lookupPaths) {
-        if (GenericArray.indexOf(paths, lookupPath) === -1) {
-          GenericArray.push(paths, lookupPath)
+        if (paths.indexOf(lookupPath) === -1) {
+          paths.push(lookupPath)
         }
       }
     }

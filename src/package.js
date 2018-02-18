@@ -1,9 +1,6 @@
 import { basename, dirname , extname, resolve } from "path"
 
 import ASCII from "./ascii.js"
-import GenericObject from "./generic/object.js"
-import GenericString from "./generic/string.js"
-import SafeJSON from "./builtin/json.js"
 
 import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
@@ -33,6 +30,8 @@ const {
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
 
+const ExBuffer = __external__.Buffer
+
 const defaultOptions = {
   __proto__: null,
   cache: true,
@@ -52,8 +51,8 @@ const defaultOptions = {
 }
 
 const defaultCJS = defaultOptions.cjs
-const cacheKey = SafeJSON.stringify(defaultOptions)
-const cjsKeys = GenericObject.keys(defaultCJS)
+const cacheKey = JSON.stringify(defaultOptions)
+const cjsKeys = Object.keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
@@ -95,7 +94,7 @@ class Package {
         const cacheNames = readdir(cachePath)
 
         for (const cacheName of cacheNames) {
-          if (GenericString.charCodeAt(cacheName, 0) !== PERIOD) {
+          if (cacheName.charCodeAt(0) !== PERIOD) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
             compileCache[cacheName] = true
@@ -114,7 +113,7 @@ class Package {
 
         cache.buffer = hasBuffer
           ? readFile(resolve(cachePath, ".data.blob"))
-          : new Buffer(0)
+          : new ExBuffer(0)
 
         cache.map = hasMap
           ? readJSON(resolve(cachePath, ".data.json"))
@@ -151,7 +150,7 @@ function cleanCache(cachePath) {
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
-    if (GenericString.startsWith(cacheName, ".babel.") &&
+    if (cacheName.startsWith(".babel.") &&
         extname(cacheName) === ".json") {
       removeFile(resolve(babelCachePath, cacheName))
     }
@@ -433,7 +432,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-GenericObject.setPrototypeOf(Package.prototype, null)
+Object.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {

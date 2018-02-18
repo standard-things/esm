@@ -1,13 +1,12 @@
-import GenericArray from "../generic/array.js"
-import GenericObject from "../generic/object.js"
+const { getOwnPropertyNames, getOwnPropertySymbols } = Object
 
 function keysAll(object) {
   if (object == null) {
     return []
   }
 
-  const names = GenericObject.getOwnPropertyNames(object)
-  GenericArray.push(names, ...GenericObject.getOwnPropertySymbols(object))
+  const names = getOwnPropertyNames(object)
+  names.push(...getOwnPropertySymbols(object))
   return names
 }
 

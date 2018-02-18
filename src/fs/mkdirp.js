@@ -1,5 +1,3 @@
-import GenericArray from "../generic/array.js"
-
 import { dirname } from "path"
 import isDirectory from "../util/is-directory.js"
 import mkdir from "./mkdir.js"
@@ -16,7 +14,7 @@ function mkdirp(dirPath) {
       break
     }
 
-    GenericArray.push(paths, dirPath)
+    paths.push(dirPath)
 
     const parentPath = dirname(dirPath)
 

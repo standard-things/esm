@@ -1,7 +1,5 @@
-import GenericRegExp from "./generic/regexp.js"
 import Module from "./module.js"
 import Package from "./package.js"
-import SafeJSON from "./builtin/json.js"
 
 import assign from "./util/assign.js"
 import clone from "./module/clone.js"
@@ -22,6 +20,8 @@ import vmHook from "./hook/vm.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
+const { stringify } = JSON
+
 const nodeModulesRegExp = shared.env.win32
   ? /[\\/]node_modules[\\/]/
   : /\/node_modules\//
@@ -37,13 +37,13 @@ if (shared.inited) {
     let cacheKey
 
     if (isObjectLike(options)) {
-      cacheKey = SafeJSON.stringify(options)
+      cacheKey = stringify(options)
     } else {
       const pkg = Package.from(mod)
       const pkgOptions = pkg && pkg.options
 
       if (pkgOptions) {
-        cacheKey = SafeJSON.stringify(pkgOptions)
+        cacheKey = stringify(pkgOptions)
       }
     }
 
@@ -64,7 +64,7 @@ if (shared.inited) {
 
     moduleHook(Module, cloned)
 
-    if (! GenericRegExp.test(nodeModulesRegExp, mod.filename)) {
+    if (! nodeModulesRegExp.test(mod.filename)) {
       processHook(process)
     }
 

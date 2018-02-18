@@ -1,5 +1,4 @@
 import ASCII from "../ascii.js"
-import GenericString from "../generic/string.js"
 
 import shared from "../shared.js"
 
@@ -20,7 +19,7 @@ function isRelativePath(value) {
     return false
   }
 
-  let code = GenericString.charCodeAt(value, 0)
+  let code = value.charCodeAt(0)
 
   if (code !== PERIOD) {
     return false
@@ -30,14 +29,14 @@ function isRelativePath(value) {
     return true
   }
 
-  code = GenericString.charCodeAt(value, 1)
+  code = value.charCodeAt(1)
 
   if (code === PERIOD) {
     if (length === 2) {
       return true
     }
 
-    code = GenericString.charCodeAt(value, 2)
+    code = value.charCodeAt(2)
   }
 
   if (shared.env.win32 &&

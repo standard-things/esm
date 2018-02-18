@@ -1,7 +1,5 @@
-import SafeSet from "./builtin/set.js"
-
 let rootModule = __non_webpack_module__
-let seen = new SafeSet
+let seen = new Set
 
 while (rootModule.parent != null &&
     ! seen.has(rootModule.parent)) {

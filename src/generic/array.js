@@ -11,15 +11,10 @@ function init() {
     concat: unapply(arrayProto.concat),
     filter: unapply(arrayProto.filter),
     indexOf: unapply(arrayProto.indexOf),
-    isArray: SafeArray.isArray,
     join: unapply(arrayProto.join),
-    map: unapply(arrayProto.map),
     push: unapply(arrayProto.push),
-    reverse: unapply(arrayProto.reverse),
     slice: unapply(arrayProto.slice),
     some: unapply(arrayProto.some),
-    sort: unapply(arrayProto.sort),
-    splice: unapply(arrayProto.splice),
     unshift: unapply(arrayProto.unshift)
   }
 }

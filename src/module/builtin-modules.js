@@ -1,27 +1,28 @@
-import GenericArray from "../generic/array.js"
-import GenericObject from "../generic/object.js"
-import GenericString from "../generic/string.js"
-
 import binding from "../binding.js"
 import shared from "../shared.js"
+
+const { isArray } = Array
+const { freeze, isFrozen } = Object
+const { slice } = Array.prototype
 
 function init() {
   let { builtinModules } = __non_webpack_module__.constructor
 
-  if (! GenericArray.isArray(builtinModules) ||
-      ! GenericObject.isFrozen(builtinModules)) {
+  if (! isArray(builtinModules) ||
+      ! isFrozen(builtinModules)) {
     builtinModules = []
 
     for (const name in binding.natives) {
-      if (! GenericString.startsWith(name, "internal/")) {
-        GenericArray.push(builtinModules, name)
+      if (! name.startsWith("internal/")) {
+        builtinModules.push(name)
       }
     }
 
-    GenericObject.freeze(builtinModules)
+  } else {
+    builtinModules = slice.call(builtinModules)
   }
 
-  return builtinModules
+  return freeze(builtinModules)
 }
 
 export default shared.inited

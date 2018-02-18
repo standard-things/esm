@@ -1,7 +1,7 @@
-import GenericObject from "../generic/object.js"
+const { __defineGetter__ } = Object.prototype
 
 function setGetter(object, key, getter) {
-  GenericObject.__defineGetter__(object, key, getter)
+  __defineGetter__.call(object, key, getter)
   return object
 }
 

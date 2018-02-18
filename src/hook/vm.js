@@ -1,7 +1,6 @@
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import GenericFunction from "../generic/function.js"
-import GenericString from "../generic/string.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import { REPLServer } from "repl"
@@ -119,7 +118,7 @@ function hook(vm) {
     vm.Script = function (code, options) {
       vm.Script = Script
       const { wrapper } = Module
-      code = GenericString.slice(code, wrapper[0].length, -wrapper[1].length)
+      code = code.slice(wrapper[0].length, -wrapper[1].length)
       initEntry(rootModule)
       return vm.createScript(code, options)
     }

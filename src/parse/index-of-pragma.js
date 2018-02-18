@@ -4,17 +4,14 @@
 
 import { literalRegExp, skipWhiteSpaceRegExp } from "../acorn.js"
 
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
-
 function indexOfPragma(code, pragma) {
   let pos = 0
 
   while (true) {
     skipWhiteSpaceRegExp.lastIndex = pos
-    pos += GenericRegExp.exec(skipWhiteSpaceRegExp, code)[0].length
+    pos += skipWhiteSpaceRegExp.exec(code)[0].length
 
-    const match = GenericRegExp.exec(literalRegExp, GenericString.slice(code, pos))
+    const match = literalRegExp.exec(code.slice(pos))
 
     if (match === null) {
       return -1

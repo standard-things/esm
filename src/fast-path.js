@@ -2,11 +2,10 @@
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/recast/blob/master/lib/fast-path.js
 
-import GenericArray from "./generic/array.js"
-import GenericObject from "./generic/object.js"
-
 import alwaysTrue from "./util/always-true.js"
 import isObject from "./util/is-object.js"
+
+const { isArray } = Array
 
 class FastPath {
   constructor(ast) {
@@ -21,7 +20,7 @@ class FastPath {
     const { stack } = this
     const object = stack[stack.length - 1]
 
-    GenericArray.push(stack, key, object[key])
+    stack.push(key, object[key])
 
     const result = visitor[methodName](this)
     stack.length -= 2
@@ -39,7 +38,7 @@ class FastPath {
     const { length } = array
 
     while (++i < length) {
-      GenericArray.push(stack, i, array[i])
+      stack.push(i, array[i])
       visitor[methodName](this)
       stack.length -= 2
     }
@@ -73,7 +72,7 @@ function getNode(path, pos, callback) {
     // fuzzy matching of object shapes.
     const value = stack[i--]
     if (isObject(value) &&
-        ! GenericArray.isArray(value) &&
+        ! isArray(value) &&
         callback(value)) {
       return value
     }
@@ -82,6 +81,6 @@ function getNode(path, pos, callback) {
   return null
 }
 
-GenericObject.setPrototypeOf(FastPath.prototype, null)
+Object.setPrototypeOf(FastPath.prototype, null)
 
 export default FastPath

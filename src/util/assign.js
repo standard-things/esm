@@ -1,15 +1,14 @@
-import GenericObject from "../generic/object.js"
+const { hasOwnProperty } = Object.prototype
 
 function assign(object) {
   let i = 0
   const argCount = arguments.length
-  const { hasOwnProperty } = GenericObject
 
   while (++i < argCount) {
     const source = arguments[i]
 
     for (const name in source) {
-      if (hasOwnProperty(source, name)) {
+      if (hasOwnProperty.call(source, name)) {
         object[name] = source[name]
       }
     }

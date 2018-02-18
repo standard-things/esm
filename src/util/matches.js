@@ -1,13 +1,14 @@
 import GenericArray from "../generic/array.js"
-import GenericRegExp from "../generic/regexp.js"
+
+const { isArray } = Array
 
 function matches(array, pattern) {
-  if (! GenericArray.isArray(array)) {
+  if (! isArray(array)) {
     return false
   }
 
   return GenericArray.some(array, (value) => {
-    return GenericRegExp.test(pattern, value)
+    return pattern.test(value)
   })
 }
 

@@ -1,7 +1,3 @@
-import GenericArray from "../generic/array.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
-
 const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const runtimeRegExp = /\w+\u200d\.(\w+)(\.)?/g
 const traceRegExp = /(\n +at .+)+$/
@@ -13,25 +9,22 @@ function scrubStackTrace(stack) {
     return ""
   }
 
-  const match = GenericRegExp.exec(traceRegExp, stack)
+  const match = traceRegExp.exec(stack)
 
   if (match === null) {
     return stack
   }
 
   const { index } = match
-  const message = GenericString.slice(stack, 0, index)
+  const message = stack.slice(0, index)
 
-  let trace = GenericString.slice(stack, index)
-  const lines = GenericString.split(trace, "\n")
+  let trace = stack.slice(index)
+  const lines = trace.split("\n")
+  const filtered = lines.filter((line) => line.indexOf(stdFilename) === -1)
 
-  const filtered = GenericArray.filter(lines, (line) => {
-    return GenericString.indexOf(line, stdFilename) === -1
-  })
-
-  trace = GenericArray.join(filtered, "\n")
-  trace = GenericString.replace(trace, columnInfoRegExp, ":1")
-  trace = GenericString.replace(trace, runtimeRegExp, replaceRuntime)
+  trace = filtered.join("\n")
+  trace = trace.replace(columnInfoRegExp, ":1")
+  trace = trace.replace(runtimeRegExp, replaceRuntime)
 
   return message + trace
 }

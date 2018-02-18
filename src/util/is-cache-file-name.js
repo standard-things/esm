@@ -1,5 +1,3 @@
-import GenericRegExp from "../generic/regexp.js"
-
 const cacheNameRegExp = /^[a-z0-9]{16}\.js$/
 
 function isCacheFileName(value) {
@@ -7,7 +5,7 @@ function isCacheFileName(value) {
     return false
   }
 
-  return GenericRegExp.test(cacheNameRegExp, value)
+  return cacheNameRegExp.test(value)
 }
 
 export default isCacheFileName

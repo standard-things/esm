@@ -1,5 +1,4 @@
 import ASCII from "../ascii.js"
-import GenericString from "../generic/string.js"
 
 const {
   NUMSIGN
@@ -12,8 +11,8 @@ function stripShebang(string) {
     return ""
   }
 
-  return GenericString.charCodeAt(string, 0) === NUMSIGN
-    ? GenericString.replace(string, shebangRegExp, "")
+  return string.charCodeAt(0) === NUMSIGN
+    ? string.replace(shebangRegExp, "")
     : string
 }
 

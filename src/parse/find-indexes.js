@@ -1,8 +1,4 @@
 import ASCII from "../ascii.js"
-import GenericArray from "../generic/array.js"
-import GenericRegExp from "../generic/regexp.js"
-import GenericString from "../generic/string.js"
-import SafeRegExp from "../builtin/regexp.js"
 
 const {
   PERIOD
@@ -15,20 +11,20 @@ function findIndexes(code, identifiers) {
     return indexes
   }
 
-  const pattern = new SafeRegExp(
-    "\\b(?:" + GenericArray.join(identifiers, "|") + ")\\b",
+  const pattern = new RegExp(
+    "\\b(?:" + identifiers.join("|") + ")\\b",
     "g"
   )
 
   let match
 
-  while ((match = GenericRegExp.exec(pattern, code))) {
+  while ((match = pattern.exec(code))) {
     // Make sure the match is not preceded by a `.` character, since that
     // probably means the identifier is a property access rather than a
     // variable reference.
     if (! match.index ||
-        GenericString.charCodeAt(code, match.index - 1) !== PERIOD) {
-      GenericArray.push(indexes, match.index)
+        code.charCodeAt(match.index - 1) !== PERIOD) {
+      indexes.push(match.index)
     }
   }
 

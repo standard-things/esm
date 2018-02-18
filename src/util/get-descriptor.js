@@ -1,11 +1,11 @@
-import GenericObject from "../generic/object.js"
+const { getOwnPropertyDescriptor } = Object
 
 function getDescriptor(object, key) {
   if (object == null) {
     return null
   }
 
-  return GenericObject.getOwnPropertyDescriptor(object, key) || null
+  return getOwnPropertyDescriptor(object, key) || null
 }
 
 export default getDescriptor

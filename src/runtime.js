@@ -1,7 +1,6 @@
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 import GenericFunction from "./generic/function.js"
-import GenericObject from "./generic/object.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
@@ -17,6 +16,7 @@ import shared from "./shared.js"
 const ExPromise = __external__.Promise
 
 const indirectEval = __external__.eval
+const { freeze } = Object
 
 const Runtime = {
   __proto__: null,
@@ -65,7 +65,7 @@ const Runtime = {
         }
       })
     } else if (! (runtimeName in global)) {
-      const globalImport = GenericFunction.bind(this.import, {
+      const globalImport = this.import.bind({
         __proto__: null,
         entry
       })
@@ -84,8 +84,8 @@ const Runtime = {
         writable: false
       })
 
-      GenericObject.freeze(globalImport)
-      GenericObject.freeze(globalRuntime)
+      freeze(globalImport)
+      freeze(globalRuntime)
     }
 
     return content

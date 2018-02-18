@@ -1,10 +1,11 @@
-import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 
 import _findPath from "../_find-path.js"
 import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import errors from "../../errors.js"
 import nodeModulePaths from "../node-module-paths.js"
+
+const { isArray } = Array
 
 function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
   if (typeof request !== "string") {
@@ -14,7 +15,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
   let paths
 
   if (options &&
-      GenericArray.isArray(options.paths)) {
+      isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 
@@ -24,13 +25,13 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
       fakeParent.paths = nodeModulePaths(fromPath)
       const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
 
-      if (GenericArray.indexOf(paths, fromPath) === -1) {
-        GenericArray.push(paths, fromPath)
+      if (paths.indexOf(fromPath) === -1) {
+        paths.push(fromPath)
       }
 
       for (const lookupPath of lookupPaths) {
-        if (GenericArray.indexOf(paths, lookupPath) === -1) {
-          GenericArray.push(paths, lookupPath)
+        if (paths.indexOf(lookupPath) === -1) {
+          paths.push(lookupPath)
         }
       }
     }

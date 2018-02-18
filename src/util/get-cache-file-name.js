@@ -1,9 +1,8 @@
-import GenericString from "../generic/string.js"
-import SafeJSON from "../builtin/json.js"
-
 import md5 from "./md5.js"
 import shared from "../shared.js"
 import { version as stdVersion } from "../version.js"
+
+const { stringify } = JSON
 
 const { process } = shared
 
@@ -29,12 +28,12 @@ function getCacheFileName(entry, cacheKey) {
     nodeVersion + "\0" +
     engineVersion + "\0" +
     stdVersion + "\0" +
-    SafeJSON.stringify(entry.package.options) + "\0" +
+    stringify(entry.package.options) + "\0" +
     cacheKey
   )
 
-  return GenericString.slice(pathHash, 0, 8) +
-    GenericString.slice(stateHash, 0, 8) + ".js"
+  return pathHash.slice(0, 8) +
+    stateHash.slice(0, 8) + ".js"
 }
 
 export default getCacheFileName

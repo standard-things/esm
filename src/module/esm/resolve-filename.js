@@ -1,6 +1,4 @@
 import ASCII from "../../ascii.js"
-import GenericRegExp from "../../generic/regexp.js"
-import GenericString from "../../generic/string.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
@@ -62,14 +60,14 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSlash(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (GenericString.charCodeAt(request, 0) === SLASH ||
-         GenericString.indexOf(request, ":") !== -1)) {
+        (request.charCodeAt(0) === SLASH ||
+         request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
       foundPath = getFilePathFromURL(parsed)
 
       if (! foundPath &&
           parsed.protocol !== "file:" &&
-          ! GenericRegExp.test(localhostRegExp, request)) {
+          ! localhostRegExp.test(request)) {
         throw new errors.Error("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
       }
 
@@ -86,7 +84,7 @@ function resolveFilename(request, parent, isMain, options) {
         skipGlobalPaths = false
       }
 
-      const decoded = decodeURIComponent(GenericString.replace(request, queryHashRegExp, ""))
+      const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts)
     }
   }

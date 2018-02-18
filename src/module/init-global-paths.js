@@ -5,7 +5,6 @@
 import { delimiter, resolve } from "path"
 
 import GenericArray from "../generic/array.js"
-import GenericString from "../generic/string.js"
 
 import safeGetEnv from "../util/safe-get-env.js"
 
@@ -43,7 +42,7 @@ function initGlobalPaths() {
     return paths
   }
 
-  const otherPaths = GenericString.split(nodePath, delimiter)
+  const otherPaths = nodePath.split(delimiter)
   const filtered = GenericArray.filter(otherPaths, Boolean)
 
   return GenericArray.concat(filtered, paths)

@@ -1,8 +1,8 @@
-import GenericObject from "../generic/object.js"
+const { hasOwnProperty } = Object.prototype
 
 function has(object, key) {
   return object != null &&
-    GenericObject.hasOwnProperty(object, key)
+    hasOwnProperty.call(object, key)
 }
 
 export default has

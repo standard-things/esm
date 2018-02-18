@@ -1,5 +1,4 @@
 import GenericFunction from "../generic/function.js"
-import GenericString from "../generic/string.js"
 
 import getDescriptor from "../util/get-descriptor.js"
 
@@ -13,8 +12,8 @@ function isStackTraceMasked(error) {
     descriptor.enumerable === false &&
     typeof descriptor.get === "function" &&
     typeof descriptor.set === "function" &&
-    GenericString.indexOf(GenericFunction.toString(descriptor.get), nativePattern) === -1 &&
-    GenericString.indexOf(GenericFunction.toString(descriptor.set), nativePattern) === -1
+    GenericFunction.toString(descriptor.get).indexOf(nativePattern) === -1 &&
+    GenericFunction.toString(descriptor.set).indexOf(nativePattern) === -1
 }
 
 export default isStackTraceMasked
