@@ -261,15 +261,11 @@ class Entry {
     assignExportsToNamespace(this)
 
     if (setGetters) {
-      setDeferred(this, "cjsNamespace", () => {
-        return toNamespace(this, {
-          default: this.module.exports
-        })
-      })
+      setDeferred(this, "cjsNamespace", () =>
+        toNamespace(this, { default: this.module.exports })
+      )
 
-      setDeferred(this, "esmNamespace", () => {
-        return toNamespace(this)
-      })
+      setDeferred(this, "esmNamespace", () => toNamespace(this))
     }
 
     delete shared.entry.skipExports[this.name]

@@ -95,38 +95,38 @@ if (__shared__) {
       : binding.util.decorated_private_symbol
   })
 
-  setDeferred(shared, "hiddenKeyType", () => {
-    return satisfies(shared.process.version, "<7.0.0")
+  setDeferred(shared, "hiddenKeyType", () =>
+    satisfies(shared.process.version, "<7.0.0")
       ? "string"
       : typeof shared.arrowSymbol
-  })
+  )
 
-  setDeferred(shared, "statValues", () => {
-    return shared.support.getStatValues
+  setDeferred(shared, "statValues", () =>
+    shared.support.getStatValues
       ? binding.fs.getStatValues()
       : new Float64Array(14)
-  })
+  )
 
-  setDeferred(fastPath, "mtime", () => {
-    return typeof binding.fs.stat === "function" &&
+  setDeferred(fastPath, "mtime", () =>
+    typeof binding.fs.stat === "function" &&
       satisfies(shared.process.version, "^6.10.1||>=7.7")
-  })
+  )
 
-  setDeferred(fastPath, "readFile", () => {
-    return support.internalModuleReadFile
-  })
+  setDeferred(fastPath, "readFile", () =>
+    support.internalModuleReadFile
+  )
 
-  setDeferred(fastPath, "readFileFast", () => {
-    return support.internalModuleReadJSON || support.internalModuleReadFile
-  })
+  setDeferred(fastPath, "readFileFast", () =>
+    support.internalModuleReadJSON || support.internalModuleReadFile
+  )
 
-  setDeferred(fastPath, "stat", () => {
-    return typeof binding.fs.internalModuleStat === "function"
-  })
+  setDeferred(fastPath, "stat", () =>
+    typeof binding.fs.internalModuleStat === "function"
+  )
 
-  setDeferred(support, "await", () => {
-    return satisfies(shared.process.version, ">=7.6.0")
-  })
+  setDeferred(support, "await", () =>
+    satisfies(shared.process.version, ">=7.6.0")
+  )
 
   setDeferred(support, "blockScopedDeclarations", () => {
     try {
@@ -137,25 +137,25 @@ if (__shared__) {
     return false
   })
 
-  setDeferred(support, "getStatValues", () => {
-    return typeof binding.fs.getStatValues === "function"
-  })
+  setDeferred(support, "getStatValues", () =>
+    typeof binding.fs.getStatValues === "function"
+  )
 
-  setDeferred(support, "internalModuleReadFile", () => {
-    return typeof binding.fs.internalModuleReadFile === "function"
-  })
+  setDeferred(support, "internalModuleReadFile", () =>
+    typeof binding.fs.internalModuleReadFile === "function"
+  )
 
-  setDeferred(support, "internalModuleReadJSON", () => {
-    return typeof binding.fs.internalModuleReadJSON === "function"
-  })
+  setDeferred(support, "internalModuleReadJSON", () =>
+    typeof binding.fs.internalModuleReadJSON === "function"
+  )
 
-  setDeferred(support, "safeGetEnv", () => {
-    return typeof binding.util.safeGetenv === "function"
-  })
+  setDeferred(support, "safeGetEnv", () =>
+    typeof binding.util.safeGetenv === "function"
+  )
 
-  setDeferred(support, "setHiddenValue", () => {
-    return typeof binding.util.setHiddenValue === "function"
-  })
+  setDeferred(support, "setHiddenValue", () =>
+    typeof binding.util.setHiddenValue === "function"
+  )
 
   setDeferred(symbol, "errorCode", () => {
     let error
