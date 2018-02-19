@@ -1,16 +1,14 @@
-/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const crypto = require("crypto")
-const fs = require("fs")
-const path = require("path")
-const util = require("util")
-const vm = require("vm")
+const { createContext, Script } = require("vm")
+const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
+const { createHash } = require("crypto")
+const { inspect } = require("util")
+const { resolve } = require("path")
 
 // Guard against mocked environments (e.g. Jest).
 const useBuiltins = module.constructor.length > 1
-
-const Script = vm.Script
 
 const engineVersion =
   process.versions.v8 ||
@@ -18,15 +16,9 @@ const engineVersion =
 
 const nodeVersion = process.version
 
-const createContext = vm.createContext
-const defineProperty = Object.defineProperty
-const freeze = Object.freeze
-const inspectKey = util.inspect.custom || "inspect"
-const readFileSync = fs.readFileSync
-const resolve = path.resolve
-const runInContext = Script.prototype.runInContext
-const unlinkSync = fs.unlinkSync
-const writeFileSync = fs.writeFileSync
+const { defineProperty, freeze } = Object
+const inspectKey = inspect.custom || "inspect"
+const { runInContext } = Script.prototype
 
 const Module = useBuiltins ? module.constructor : require("module")
 const esmMod = new Module(module.id, null)
@@ -57,7 +49,7 @@ function compileESM() {
   let changed = false
   let scriptData = null
 
-  const cachedDataRejected = script.cachedDataRejected
+  const { cachedDataRejected } = script
 
   if (script.cachedDataProduced &&
       ! cachedDataRejected) {
@@ -70,9 +62,9 @@ function compileESM() {
 
   if (changed) {
     if (scriptData) {
-      if (! fs.existsSync(nodeModulesPath)) {
-        fs.mkdirSync(nodeModulesPath)
-        fs.mkdirSync(cachePath)
+      if (! existsSync(nodeModulesPath)) {
+        mkdirSync(nodeModulesPath)
+        mkdirSync(cachePath)
       }
 
       writeFile(cacheFilename, scriptData)
@@ -97,8 +89,7 @@ function makeRequireFunction(mod, options) {
 }
 
 function md5(string) {
-  return crypto
-    .createHash("md5")
+  return createHash("md5")
     .update(string)
     .digest("hex")
 }

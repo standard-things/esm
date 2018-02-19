@@ -1,5 +1,3 @@
-import apply from "./util/apply.js"
-import call from "./util/call.js"
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import setDeferred from "./util/set-deferred.js"
@@ -7,6 +5,8 @@ import setGetter from "./util/set-getter.js"
 import silent from "./util/silent.js"
 
 let _binding
+
+const { apply } = Reflect
 
 const ids = ["config", "fs", "icu", "inspector", "natives", "util"]
 
@@ -44,7 +44,7 @@ for (const id of ids) {
       _binding = getSilent(process, "binding")
     }
 
-    const source = silent(() => call(_binding, process, id))
+    const source = silent(() => apply(_binding, process, [id]))
 
     if (! isObjectLike(source)) {
       return { __proto__: null }

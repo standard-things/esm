@@ -1,13 +1,13 @@
-import apply from "../util/apply.js"
-import call from "../util/call.js"
 import shared from "../shared.js"
 import unapply from "../util/unapply.js"
+
+const { apply } = Reflect
 
 function init() {
   return {
     __proto__: null,
     apply,
-    call,
+    call: (target, thisArg, ...args) => apply(target, thisArg, args),
     toString: unapply(Function.prototype.toString)
   }
 }

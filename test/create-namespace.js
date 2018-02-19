@@ -1,8 +1,6 @@
 "use strict"
 
-const toStringTag = Symbol.toStringTag
-
-const useToStringTag = typeof toStringTag === "symbol"
+const { toStringTag } = Symbol
 
 const toStringTagDescriptor = {
   configurable: false,
@@ -17,9 +15,7 @@ function createNamespace(object) {
 }
 
 function setToStringTag(object) {
-  return useToStringTag
-    ? Object.defineProperty(object, toStringTag, toStringTagDescriptor)
-    : object
+  return Object.defineProperty(object, toStringTag, toStringTagDescriptor)
 }
 
 module.exports = createNamespace

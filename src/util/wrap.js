@@ -1,8 +1,8 @@
-import call from "./call.js"
+const { apply } = Reflect
 
 function wrap(func, wrapper) {
   return function (...args) {
-    return call(wrapper, this, func, args)
+    return apply(wrapper, this, [func, args])
   }
 }
 

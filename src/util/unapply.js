@@ -1,4 +1,4 @@
-import apply from "./apply.js"
+const { apply } = Reflect
 
 function unapply(func) {
   return (thisArg, ...args) => apply(func, thisArg, args)

@@ -20,9 +20,6 @@ const STAR_ERROR = {}
 
 const { is, isSealed, seal } = Object
 
-const useProxy = typeof Proxy === "function"
-const useToStringTag = typeof Symbol.toStringTag === "symbol"
-
 const esmDescriptor = {
   configurable: false,
   enumerable: false,
@@ -229,11 +226,10 @@ class Entry {
     const cached = this.package.cache.compile[this.cacheName]
     const isESM = cached && cached.esm
 
+    let exported = this.module.exports
     let setGetters = true
 
     if (isESM) {
-      const exported = this.module.exports
-
       if (! isSealed(exported)) {
         for (const name in this._namespace) {
           setGetter(exported, name, () => {
@@ -254,7 +250,8 @@ class Entry {
       this.merge(otherEntry)
 
       const mod = this.module
-      Entry.set(mod, mod.exports, this)
+      exported = mod.exports
+      Entry.set(mod, exported, this)
 
       if (! mod.loaded) {
         return this._loaded = 0
@@ -400,9 +397,7 @@ function createNamespace() {
   // Section 26.3.1: @@toStringTag
   // Module namespace objects have a @@toStringTag value of "Module".
   // https://tc39.github.io/ecma262/#sec-@@tostringtag
-  return useToStringTag
-    ? setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
-    : namespace
+  return setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
 }
 
 function getExportByName(entry, setter, name) {
@@ -530,46 +525,6 @@ function runSetters(entry, callback) {
 }
 
 function toNamespace(entry, source = entry._namespace) {
-  return useProxy
-    ? toNamespaceProxy(entry, source)
-    : toNamespaceGetter(entry, source)
-}
-
-function toNamespaceGetter(entry, source = entry._namespace) {
-  // Section 9.4.6.11: ModuleNamespaceCreate ( module, exports )
-  // Step 7: Module namespace objects have sorted properties.
-  // https://tc39.github.io/ecma262/#sec-modulenamespacecreate
-  const names = keys(source).sort()
-  const namespace = createNamespace()
-
-  for (const name of names) {
-    setGetter(namespace, name, () => {
-      if (useToStringTag &&
-          name === Symbol.toStringTag) {
-        return namespace[name]
-      }
-
-      return source[name]
-    })
-
-    setSetter(namespace, name, () => {
-      if (entry.package.options.warnings) {
-        if (name in source) {
-          warn("WRN_NS_ASSIGNMENT", entry.module, name)
-        } else {
-          warn("WRN_NS_EXTENSION", entry.module, name)
-        }
-      }
-    })
-  }
-
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Module namespace sources are not extensible.
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  return seal(namespace)
-}
-
-function toNamespaceProxy(entry, source = entry._namespace) {
   const names = keys(source).sort()
   const namespace = createNamespace()
 

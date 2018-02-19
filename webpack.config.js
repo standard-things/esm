@@ -1,4 +1,4 @@
-/* eslint strict: off, node/no-unsupported-features: ["error", { version: 4 }] */
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
 const JSON6 = require("json-6")
@@ -7,10 +7,10 @@ const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
 
-const BannerPlugin = webpack.BannerPlugin
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin
-const EnvironmentPlugin = webpack.EnvironmentPlugin
-const ModuleConcatenationPlugin = webpack.optimize.ModuleConcatenationPlugin
+const { BannerPlugin } = webpack
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
+const { EnvironmentPlugin } = webpack
+const { ModuleConcatenationPlugin } = webpack.optimize
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")

@@ -10,7 +10,7 @@
   "private": true,
   "@std/esm": true,
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "scripts": {
     "precommit": "npm run lint",

@@ -1,5 +1,6 @@
-import apply from "./apply.js"
 import silent from "./silent.js"
+
+const { apply } = Reflect
 
 function getSilent(object, key) {
   const value = silent(() => object[key])

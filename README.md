@@ -1,7 +1,7 @@
 # @std/esm
 
 This fast, small, zero-dependency package is all you need to enable
-ES modules in Node 4+ today!
+ES modules in Node 6+ today!
 
 See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
 :book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
@@ -66,7 +66,7 @@ Out of the box `@std/esm` just works, no configuration necessary, and supports:
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
 * Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
-* Node 4+ support
+* Node 6+ support
 
 Unlockables
 ---
