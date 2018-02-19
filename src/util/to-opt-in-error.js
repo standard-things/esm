@@ -1,9 +1,9 @@
 import { name } from "../version.js"
-import toString from "../util/to-string.js"
+import safeToString from "../util/safe-to-string.js"
 
 function toOptInError(error) {
   if (error.code === "ERR_REQUIRE_ESM") {
-    error.message = toString(error.message)
+    error.message = safeToString(error.message)
       .replace("Must use import", "Must opt-in " + name)
   }
 

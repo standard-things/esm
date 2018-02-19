@@ -4,6 +4,7 @@ import decorateStackTrace from "./decorate-stack-trace.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
+import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import setProperty from "../util/set-property.js"
 
@@ -26,7 +27,7 @@ function maskStackTrace(error, content, filename, isESM) {
     return error
   }
 
-  const message = String(error)
+  const message = safeToString(error)
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
@@ -35,7 +36,7 @@ function maskStackTrace(error, content, filename, isESM) {
   return setProperty(error, "stack", {
     enumerable: false,
     get() {
-      const newMessage = String(error)
+      const newMessage = safeToString(error)
 
       const masker = isParseError(error)
         ? maskParserStack

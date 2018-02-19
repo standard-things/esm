@@ -153,6 +153,10 @@ if (__shared__) {
     typeof binding.util.safeGetenv === "function"
   )
 
+  setDeferred(support, "safeToString", () =>
+    typeof binding.util.safeToString === "function"
+  )
+
   setDeferred(support, "setHiddenValue", () =>
     typeof binding.util.setHiddenValue === "function"
   )

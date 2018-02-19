@@ -32,6 +32,7 @@ const map = {
     "arrow_message_private_symbol",
     "decorated_private_symbol",
     "safeGetenv",
+    "safeToString",
     "setHiddenValue"
   ]
 }
