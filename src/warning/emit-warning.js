@@ -42,7 +42,6 @@ function emitWarning(message, type, code, Ctor) {
   }
 
   process.nextTick(() => {
-    // eslint-disable-next-line no-console
     console.error(
       PREFIX +
       (useCode ? "[" + code + "] " : "") +

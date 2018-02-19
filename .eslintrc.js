@@ -34,7 +34,7 @@ module.exports = {
     "import/no-extraneous-dependencies": ["error", { packageDir: "./" }],
     "import/prefer-default-export": "error",
     "keyword-spacing": "error",
-    "no-console": isTest ? "off" : "error",
+    "no-console": ["error", { allow: ["error"] }],
     "no-constant-condition": ["error", { checkLoops: false }],
     "no-empty": ["error", { allowEmptyCatch: true }],
     "no-multiple-empty-lines": ["error", { max: 1 }],
