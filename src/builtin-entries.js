@@ -1,4 +1,5 @@
 import Entry from "./entry.js"
+import ExportProxy from "./export-proxy.js"
 import Module from "./module.js"
 
 import builtinModules from "./module/builtin-modules.js"
@@ -38,7 +39,14 @@ function init() {
         }
       }
 
-      mod.exports = exported
+      mod.exports = new ExportProxy(exported, {
+        set(proxy, name, value) {
+          exported[name] = value
+          entry.update()
+          return true
+        }
+      })
+
       mod.loaded = true
 
       const entry = Entry.get(mod)
@@ -54,4 +62,3 @@ function init() {
 export default shared.inited
   ? shared.builtinEntries
   : shared.builtinEntries = init()
-

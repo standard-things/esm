@@ -1,3 +1,4 @@
+import ExportProxy from "./export-proxy.js"
 import GenericArray from "./generic/array.js"
 import Package from "./package.js"
 
@@ -331,11 +332,28 @@ function assignExportsToNamespace(entry) {
     ! isESM &&
     ! (isPseudo && has(object, "default"))
 
-  if (skipDefault) {
-    _namespace.default = exported
+  if (skipDefault &&
+      ! ("default" in entry.getters)) {
+    entry.addGetter("default", () => entry._namespace.default)
 
-    if (! ("default" in getters)) {
-      entry.addGetter("default", () => entry._namespace.default)
+    if (entry.builtin) {
+      _namespace.default = exported
+    } else {
+      setDeferred(entry._namespace, "default", () => {
+        const exported = entry.module.exports
+
+        if (! isObjectLike(exported)) {
+          return exported
+        }
+
+        return new ExportProxy(exported, {
+          set(proxy, name, value) {
+            exported[name] = value
+            entry.update()
+            return true
+          }
+        })
+      })
     }
   }
 

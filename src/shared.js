@@ -41,6 +41,7 @@ if (__shared__) {
       __proto__: null,
       win32: process.platform === "win32"
     },
+    exportProxy: new WeakMap,
     fastPath,
     findPath: { __proto__: null },
     generic: { __proto__: null },
