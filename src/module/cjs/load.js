@@ -19,9 +19,13 @@ function load(request, parent, isMain) {
   const childIsESM = childCached && childCached.esm
 
   if (childIsESM &&
-      parent &&
-      ! Entry.get(parent).package.options.cjs.vars) {
-    throw new errors.Error("ERR_REQUIRE_ESM", child)
+      parent) {
+    const { options } = Entry.get(parent).package
+
+    if (options.esm === "mjs" &&
+        ! options.cjs.vars) {
+      throw new errors.Error("ERR_REQUIRE_ESM", child)
+    }
   }
 
   return child.exports
