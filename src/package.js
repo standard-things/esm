@@ -2,7 +2,6 @@ import { basename, dirname , extname, resolve } from "path"
 
 import ASCII from "./ascii.js"
 
-import _createOptions from "./util/create-options.js"
 import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
@@ -20,6 +19,7 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
+import toNullObject from "./util/to-null-object.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
@@ -205,7 +205,7 @@ function createOptions(options) {
     sourceMap = options.sourcemap
   }
 
-  options = _createOptions(options, Package.defaultOptions)
+  options = toNullObject(options, Package.defaultOptions)
 
   if (typeof options.cache !== "string") {
     options.cache = !! options.cache

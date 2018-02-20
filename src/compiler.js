@@ -1,7 +1,6 @@
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
 
-import _createOptions from "./util/create-options.js"
 import assignmentVisitor from "./visitor/assignment.js"
 import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
@@ -9,6 +8,7 @@ import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import keys from "./util/keys.js"
 import stripShebang from "./util/strip-shebang.js"
+import toNullObject from "./util/to-null-object.js"
 
 const defaultOptions = {
   __proto__: null,
@@ -187,7 +187,7 @@ class Compiler {
 }
 
 function createOptions(options) {
-  return _createOptions(options, Compiler.defaultOptions)
+  return toNullObject(options, Compiler.defaultOptions)
 }
 
 Object.setPrototypeOf(Compiler.prototype, null)

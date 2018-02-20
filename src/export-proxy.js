@@ -1,10 +1,10 @@
 import GenericFunction from "./generic/function.js"
 
-import _createOptions from "./util/create-options.js"
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
 import shared from "./shared.js"
+import toNullObject from "./util/to-null-object.js"
 
 const defaultOptions = {
   __proto__: null,
@@ -64,7 +64,7 @@ class ProxyExport {
 }
 
 function createOptions(options) {
-  return _createOptions(options, ProxyExport.defaultOptions)
+  return toNullObject(options, ProxyExport.defaultOptions)
 }
 
 export default ProxyExport

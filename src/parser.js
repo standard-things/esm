@@ -1,12 +1,12 @@
 import { Parser as AcornParser } from "./acorn.js"
 
-import _createOptions from "./util/create-options.js"
 import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
 import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
 import { enable as enableFunctionParamsStart } from "./acorn-ext/function-params-start.js"
 import { enable as enableHTMLComment } from "./acorn-ext/html-comment.js"
 import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
 import { enable as enableTopLevel } from "./acorn-ext/top-level.js"
+import toNullObject from "./util/to-null-object.js"
 
 const defaultOptions = {
   __proto__: null,
@@ -38,7 +38,7 @@ class Parser {
 }
 
 function createOptions(options) {
-  return _createOptions(options, Parser.defaultOptions)
+  return toNullObject(options, Parser.defaultOptions)
 }
 
 function extend(parser) {

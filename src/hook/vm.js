@@ -8,7 +8,6 @@ import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
-import createOptions from "../util/create-options.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
@@ -19,6 +18,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
+import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
@@ -36,7 +36,7 @@ function hook(vm) {
 
   function methodWrapper(manager, func, args) {
     let [content, scriptOptions] = args
-    scriptOptions = createOptions(scriptOptions)
+    scriptOptions = toNullObject(scriptOptions)
 
     if (! scriptOptions.produceCachedData) {
       scriptOptions.produceCachedData = true

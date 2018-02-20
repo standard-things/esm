@@ -1,5 +1,5 @@
-import createOptions from "./create-options.js"
 import setDescriptor from "./set-descriptor.js"
+import toNullObject from "./to-null-object.js"
 
 const defaultDescriptor = {
   __proto__: null,
@@ -10,7 +10,7 @@ const defaultDescriptor = {
 }
 
 function setProperty(object, key, descriptor) {
-  descriptor = createOptions(descriptor, defaultDescriptor)
+  descriptor = toNullObject(descriptor, defaultDescriptor)
 
   if ("get" in descriptor ||
       "set" in descriptor) {
