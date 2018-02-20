@@ -108,7 +108,8 @@ class Entry {
 
     if (! entry) {
       entry = new Entry(mod)
-      Entry.set(mod, exported, entry)
+      Entry.set(mod, entry)
+      Entry.set(exported, entry)
     }
 
     return entry
@@ -123,15 +124,9 @@ class Entry {
     return shared.entry.cache.has(isObjectLike(exported) ? exported : mod)
   }
 
-  static set(mod, exported, entry) {
-    const { cache } = shared.entry
-
-    if (mod) {
-      cache.set(mod, entry)
-    }
-
-    if (isObjectLike(exported)) {
-      cache.set(exported, entry)
+  static set(value, entry) {
+    if (isObjectLike(value)) {
+      shared.entry.cache.set(value, entry)
     }
   }
 
@@ -225,10 +220,11 @@ class Entry {
     const cached = this.package.cache.compile[this.cacheName]
     const isESM = cached && cached.esm
 
-    let exported = this.module.exports
     let setGetters = true
 
     if (isESM) {
+      const exported = this.module.exports
+
       if (! Object.isSealed(exported)) {
         for (const name in this._namespace) {
           setGetter(exported, name, () => {
@@ -246,11 +242,12 @@ class Entry {
     } else {
       const otherEntry = Entry.get(this.module)
       setGetters = otherEntry._loaded !== 1
-      this.merge(otherEntry)
 
+      this.merge(otherEntry)
       const mod = this.module
-      exported = mod.exports
-      Entry.set(mod, exported, this)
+
+      Entry.set(mod, this)
+      Entry.set(mod.exports, this)
 
       if (! mod.loaded) {
         return this._loaded = 0

@@ -100,9 +100,10 @@ const Runtime = {
     const mod = entry.module
     const object = mod.exports
 
-    entry.exports = exported
-    Entry.set(mod, exported, entry)
+    Entry.set(mod, entry)
+    Entry.set(exported, entry)
 
+    entry.exports = exported
     object.compileGlobalEval = Runtime.compileGlobalEval
     object.entry = entry
 

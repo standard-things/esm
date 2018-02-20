@@ -39,15 +39,17 @@ function init() {
         }
       }
 
+      const entry = Entry.get(mod)
+
       mod.exports = exported
       mod.loaded = true
 
-      const entry = Entry.get(mod)
-      entry.builtin = true
-
+      exported =
       mod.exports = new ExportProxy(entry)
-      Entry.set(null, mod.exports, entry)
 
+      Entry.set(exported, entry)
+
+      entry.builtin = true
       entry.loaded()
       return entry
     })
