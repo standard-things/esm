@@ -15,6 +15,7 @@ import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getEnvVars from "../env/get-vars.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
+import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
@@ -79,13 +80,17 @@ function hook(Mod, parent) {
 
   function methodWrapper(manager, func, args) {
     const [mod, filename] = args
-    const { _compile } = mod
-    const shouldOverwrite = ! Entry.has(mod)
+    const exported = mod.exports
+
+    const shouldOverwrite = ! Entry.has(isObjectLike(exported) ? exported : mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
+
     const entry = Entry.get(mod)
     const pkg = entry.package
     const { cache, cachePath } = pkg
     const cacheName = getCacheFileName(entry, mtime(filename))
+
+    const { _compile } = mod
 
     const compileFallback = () => {
       entry.state = 3

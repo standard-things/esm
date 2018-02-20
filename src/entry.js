@@ -83,6 +83,12 @@ class Entry {
     this.url = null
   }
 
+  static delete(value) {
+    if (isObjectLike(value)) {
+      shared.entry.cache.delete(value)
+    }
+  }
+
   static get(mod) {
     if (! mod) {
       return null
@@ -115,13 +121,9 @@ class Entry {
     return entry
   }
 
-  static has(mod) {
-    if (! mod) {
-      return false
-    }
-
-    const exported = mod.exports
-    return shared.entry.cache.has(isObjectLike(exported) ? exported : mod)
+  static has(value) {
+    return isObjectLike(value) &&
+      shared.entry.cache.has(value)
   }
 
   static set(value, entry) {
@@ -240,16 +242,28 @@ class Entry {
 
       Object.seal(exported)
     } else {
-      const otherEntry = Entry.get(this.module)
-      setGetters = otherEntry._loaded !== 1
+      const oldMod = this.module
+      const oldExported = oldMod.exports
+      const newEntry = Entry.get(this.module)
 
-      this.merge(otherEntry)
-      const mod = this.module
+      setGetters = newEntry._loaded !== 1
 
-      Entry.set(mod, this)
-      Entry.set(mod.exports, this)
+      this.merge(newEntry)
 
-      if (! mod.loaded) {
+      const newMod = this.module
+      const newExported = newMod.exports
+
+      if (newMod !== oldMod) {
+        Entry.delete(oldMod, this)
+        Entry.set(newMod, this)
+      }
+
+      if (newExported !== oldExported) {
+        Entry.delete(oldExported, this)
+        Entry.set(newExported, this)
+      }
+
+      if (! newMod.loaded) {
         return this._loaded = 0
       }
     }
