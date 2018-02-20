@@ -1,6 +1,8 @@
+import Entry from "./entry.js"
 import GenericFunction from "./generic/function.js"
 
 import errors from "./errors.js"
+import isError from "./util/is-error.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
 import setProperty from "./util/set-property.js"
@@ -57,8 +59,21 @@ class ProxyExport {
             return Reflect.construct(value, args, new.target)
           }
 
-          const thisArg = this === proxy ? exported : this
-          return GenericFunction.apply(value, thisArg, args)
+          if (this === proxy) {
+            return GenericFunction.apply(value, exported, args)
+          }
+
+          try {
+            return GenericFunction.apply(value, this, args)
+          } catch (e) {
+            if (isError(e) &&
+                e.name === "TypeError" &&
+                e.message === "Illegal invocation") {
+              return GenericFunction.apply(value, exported, args)
+            }
+
+            throw e
+          }
         }
 
         setProperty(wrapper, "length", {
