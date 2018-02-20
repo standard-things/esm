@@ -3,6 +3,7 @@ import GenericFunction from "./generic/function.js"
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
+import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toNullObject from "./util/to-null-object.js"
 
@@ -51,10 +52,30 @@ class ProxyExport {
           return proxyValue[name] = value
         }
 
-        return proxyValue[name] = function (...args) {
+        const wrapper = function (...args) {
+          if (new.target) {
+            return Reflect.construct(value, args, new.target)
+          }
+
           const thisArg = this === proxy ? exported : this
           return GenericFunction.apply(value, thisArg, args)
         }
+
+        setProperty(wrapper, "length", {
+          enumerable: false,
+          value: value.length,
+          writable: false
+        })
+
+        setProperty(wrapper, "name", {
+          enumerable: false,
+          value: value.name,
+          writable: false
+        })
+
+        Object.setPrototypeOf(wrapper, value)
+        wrapper.prototype = value.prototype
+        return proxyValue[name] = wrapper
       },
       set
     })

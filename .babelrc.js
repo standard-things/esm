@@ -32,6 +32,7 @@ module.exports = {
         "transform-for-of",
         "transform-function-name",
         "transform-object-super",
+        "transform-new-target",
         "transform-regenerator"
       ],
       loose: true,
