@@ -1,15 +1,13 @@
+import GenericArray from "../generic/array.js"
+
 import binding from "../binding.js"
 import shared from "../shared.js"
-
-const { isArray } = Array
-const { freeze, isFrozen } = Object
-const { slice } = Array.prototype
 
 function init() {
   let { builtinModules } = __non_webpack_module__.constructor
 
-  if (! isArray(builtinModules) ||
-      ! isFrozen(builtinModules)) {
+  if (! Array.isArray(builtinModules) ||
+      ! Object.isFrozen(builtinModules)) {
     builtinModules = []
 
     for (const name in binding.natives) {
@@ -19,10 +17,10 @@ function init() {
     }
 
   } else {
-    builtinModules = slice.call(builtinModules)
+    builtinModules = GenericArray.slice(builtinModules)
   }
 
-  return freeze(builtinModules)
+  return Object.freeze(builtinModules)
 }
 
 export default shared.inited

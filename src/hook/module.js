@@ -27,8 +27,6 @@ import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
-const { setPrototypeOf } = Object
-
 const exts = [".js", ".mjs"]
 const importExportRegExp = /\b(?:im|ex)port\b/
 
@@ -109,7 +107,7 @@ function hook(Mod, parent) {
     entry.cacheName = cacheName
     entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
 
-    setPrototypeOf(mod, Module.prototype)
+    Object.setPrototypeOf(mod, Module.prototype)
 
     let cached = cache.compile[cacheName]
 

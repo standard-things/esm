@@ -9,8 +9,6 @@ import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
 
-const { isArray } = Array
-
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
@@ -29,7 +27,7 @@ function resolveFilename(request, parent, isMain, options) {
   let paths
 
   if (! cacheKey &&
-      isArray(options.paths)) {
+      Array.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 

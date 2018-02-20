@@ -4,8 +4,6 @@ const {
   QUOTE
 } = ASCII
 
-const { stringify } = JSON
-
 const escapedDoubleQuoteRegExp = /\\"/g
 
 const escapeRegExpMap = {
@@ -24,7 +22,7 @@ const quoteMap = {
 
 function toStringLiteral(value, style = '"') {
   const quote = quoteMap[style] || '"'
-  const string = stringify(value)
+  const string = JSON.stringify(value)
 
   if (quote === '"' &&
       string.charCodeAt(0) === QUOTE) {

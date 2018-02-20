@@ -1,12 +1,10 @@
-const { getOwnPropertyNames, getOwnPropertySymbols } = Object
-
 function keysAll(object) {
   if (object == null) {
     return []
   }
 
-  const names = getOwnPropertyNames(object)
-  names.push(...getOwnPropertySymbols(object))
+  const names = Object.getOwnPropertyNames(object)
+  names.push(...Object.getOwnPropertySymbols(object))
   return names
 }
 

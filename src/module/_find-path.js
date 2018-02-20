@@ -20,8 +20,6 @@ const {
   SLASH
 } = ASCII
 
-const { parse } = JSON
-
 const mainFieldRegExp = /"main"/
 const { preserveSymlinks } = binding.config
 
@@ -134,7 +132,7 @@ function readPackage(thePath) {
   let main
 
   try {
-    main = parse(json).main
+    main = JSON.parse(json).main
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + e.message

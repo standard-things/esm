@@ -5,8 +5,6 @@ import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import errors from "../../errors.js"
 import nodeModulePaths from "../node-module-paths.js"
 
-const { isArray } = Array
-
 function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
   if (typeof request !== "string") {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
@@ -15,7 +13,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
   let paths
 
   if (options &&
-      isArray(options.paths)) {
+      Array.isArray(options.paths)) {
     const fakeParent = new Module("", null)
     const fromPaths = options.paths
 

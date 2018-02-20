@@ -8,10 +8,8 @@ const {
   LBRACE
 } = ASCII
 
-const { isArray } = Array
-
 function hasLoaderArg(args) {
-  if (! isArray(args)) {
+  if (! Array.isArray(args)) {
     return false
   }
 

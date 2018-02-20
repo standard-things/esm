@@ -5,7 +5,6 @@ import moduleState from "../module/state.js"
 import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
-const { apply } = Reflect
 const { isFile } = Stats.prototype
 
 function stat(filename) {
@@ -45,7 +44,7 @@ function baseStat(filename) {
 
 function fallbackStat(filename) {
   try {
-    return apply(isFile, statSync(filename), []) ? 0 : 1
+    return Reflect.apply(isFile, statSync(filename), []) ? 0 : 1
   } catch (e) {}
 
   return -1

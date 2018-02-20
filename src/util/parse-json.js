@@ -1,8 +1,6 @@
-const { parse } = JSON
-
 function parseJSON(string) {
   try {
-    return parse(string)
+    return JSON.parse(string)
   } catch (e) {}
 
   return null

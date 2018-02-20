@@ -20,8 +20,6 @@ import vmHook from "./hook/vm.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
 
-const { stringify } = JSON
-
 const nodeModulesRegExp = shared.env.win32
   ? /[\\/]node_modules[\\/]/
   : /\/node_modules\//
@@ -37,13 +35,13 @@ if (shared.inited) {
     let cacheKey
 
     if (isObjectLike(options)) {
-      cacheKey = stringify(options)
+      cacheKey = JSON.stringify(options)
     } else {
       const pkg = Package.from(mod)
       const pkgOptions = pkg && pkg.options
 
       if (pkgOptions) {
-        cacheKey = stringify(pkgOptions)
+        cacheKey = JSON.stringify(pkgOptions)
       }
     }
 

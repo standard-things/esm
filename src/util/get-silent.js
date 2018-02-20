@@ -1,7 +1,5 @@
 import silent from "./silent.js"
 
-const { apply } = Reflect
-
 function getSilent(object, key) {
   const value = silent(() => object[key])
 
@@ -10,7 +8,7 @@ function getSilent(object, key) {
   }
 
   return function (...args) {
-    return silent(() => apply(value, this, args))
+    return silent(() => Reflect.apply(value, this, args))
   }
 }
 

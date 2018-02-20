@@ -10,8 +10,6 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
-  const { getOwnPropertySymbols } = Object
-  const getSymbolFor = Symbol.for
   const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const { versions } = process
 
@@ -20,9 +18,9 @@ if (__shared__) {
 
   const symbol = {
     __proto__: null,
-    _compile: getSymbolFor("@std/esm:module._compile"),
-    mjs: getSymbolFor('@std/esm:Module._extensions[".mjs"]'),
-    wrapper: getSymbolFor("@std/esm:wrapper")
+    _compile: Symbol.for("@std/esm:module._compile"),
+    mjs: Symbol.for('@std/esm:Module._extensions[".mjs"]'),
+    wrapper: Symbol.for("@std/esm:wrapper")
   }
 
   shared = {
@@ -172,12 +170,12 @@ if (__shared__) {
     }
 
     const symbols = error
-      ? getOwnPropertySymbols(error)
+      ? Object.getOwnPropertySymbols(error)
       : []
 
     return symbols.length
       ? symbols[0]
-      : getSymbolFor("@std/esm:errorCode")
+      : Symbol.for("@std/esm:errorCode")
   })
 }
 

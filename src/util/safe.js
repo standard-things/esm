@@ -1,16 +1,6 @@
 import isDataDescriptor from "./is-data-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 
-const {
-  defineProperty,
-  getOwnPropertyDescriptor,
-  getOwnPropertyNames,
-  getOwnPropertySymbols,
-  setPrototypeOf
-} = Object
-
-const { construct } = Reflect
-
 function safe(Super) {
   if (typeof Super !== "function") {
     return copy({ __proto__: null }, Super)
@@ -18,7 +8,7 @@ function safe(Super) {
 
   const Safe = isObjectLike(Super.prototype)
     ? class extends Super {}
-    : (...args) => construct(Super, args)
+    : (...args) => Reflect.construct(Super, args)
 
   const names = keysAll(Super)
   const safeProto = Safe.prototype
@@ -30,7 +20,7 @@ function safe(Super) {
   }
 
   copy(safeProto, Super.prototype)
-  setPrototypeOf(safeProto, null)
+  Object.setPrototypeOf(safeProto, null)
   return Safe
 }
 
@@ -45,13 +35,13 @@ function copy(object, source) {
 }
 
 function copyProperty(object, source, key) {
-  const descriptor = getOwnPropertyDescriptor(source, key)
+  const descriptor = Object.getOwnPropertyDescriptor(source, key)
 
   if (descriptor) {
     if (isDataDescriptor(descriptor)) {
       object[key] = source[key]
     } else {
-      defineProperty(object, key, descriptor)
+      Object.defineProperty(object, key, descriptor)
     }
   }
 
@@ -63,8 +53,8 @@ function keysAll(object) {
     return []
   }
 
-  const names = getOwnPropertyNames(object)
-  names.push(...getOwnPropertySymbols(object))
+  const names = Object.getOwnPropertyNames(object)
+  names.push(...Object.getOwnPropertySymbols(object))
   return names
 }
 

@@ -1,9 +1,7 @@
 import GenericArray from "../generic/array.js"
 
-const { isArray } = Array
-
 function matches(array, pattern) {
-  if (! isArray(array)) {
+  if (! Array.isArray(array)) {
     return false
   }
 

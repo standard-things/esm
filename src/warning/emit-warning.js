@@ -5,7 +5,6 @@ const PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 const ExError = __external__.Error
 
 const _emitWarning = process.emitWarning
-const { apply } = Reflect
 
 const useEmitWarning = typeof _emitWarning === "function"
 
@@ -22,7 +21,7 @@ function emitWarning(message, type, code, Ctor) {
   }
 
   if (useEmitWarning) {
-    apply(_emitWarning, process, [message, type, code, Ctor])
+    Reflect.apply(_emitWarning, process, [message, type, code, Ctor])
     return
   }
 

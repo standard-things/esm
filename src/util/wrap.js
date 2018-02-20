@@ -1,8 +1,6 @@
-const { apply } = Reflect
-
 function wrap(func, wrapper) {
   return function (...args) {
-    return apply(wrapper, this, [func, args])
+    return Reflect.apply(wrapper, this, [func, args])
   }
 }
 

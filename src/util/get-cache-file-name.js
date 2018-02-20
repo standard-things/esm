@@ -2,8 +2,6 @@ import md5 from "./md5.js"
 import shared from "../shared.js"
 import { version as stdVersion } from "../version.js"
 
-const { stringify } = JSON
-
 const { process } = shared
 
 const engineVersion =
@@ -28,7 +26,7 @@ function getCacheFileName(entry, cacheKey) {
     nodeVersion + "\0" +
     engineVersion + "\0" +
     stdVersion + "\0" +
-    stringify(entry.package.options) + "\0" +
+    JSON.stringify(entry.package.options) + "\0" +
     cacheKey
   )
 

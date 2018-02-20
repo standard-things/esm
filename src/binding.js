@@ -6,8 +6,6 @@ import silent from "./util/silent.js"
 
 let _binding
 
-const { apply } = Reflect
-
 const ids = ["config", "fs", "icu", "inspector", "natives", "util"]
 
 const map = {
@@ -45,7 +43,7 @@ for (const id of ids) {
       _binding = getSilent(process, "binding")
     }
 
-    const source = silent(() => apply(_binding, process, [id]))
+    const source = silent(() => Reflect.apply(_binding, process, [id]))
 
     if (! isObjectLike(source)) {
       return { __proto__: null }
@@ -64,7 +62,7 @@ for (const id of ids) {
         const value = getSilent(source, name)
 
         return typeof value === "function"
-          ? (...args) => apply(value, source, args)
+          ? (...args) => Reflect.apply(value, source, args)
           : value
       })
     }

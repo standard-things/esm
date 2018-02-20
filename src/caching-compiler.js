@@ -15,8 +15,6 @@ const {
   PERIOD
 } = ASCII
 
-const { stringify } = JSON
-
 class CachingCompiler {
   static compile(entry, code, options) {
     if (! options.eval &&
@@ -264,7 +262,7 @@ if (! shared.inited) {
       }
 
       writeFile(resolve(cachePath, ".data.blob"), GenericBuffer.concat(buffers))
-      writeFile(resolve(cachePath, ".data.json"), stringify(map))
+      writeFile(resolve(cachePath, ".data.json"), JSON.stringify(map))
     }
 
     for (const cachePath in pendingWrites) {

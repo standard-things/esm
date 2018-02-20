@@ -1,9 +1,7 @@
-const _keys = Object.keys
-
 function keys(object) {
   return object == null
     ? []
-    : _keys(object)
+    : Object.keys(object)
 }
 
 export default keys

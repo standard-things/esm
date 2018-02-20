@@ -5,8 +5,6 @@
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 
-const { isArray } = Array
-
 const childNamesMap = new WeakMap
 
 const childrenToVisit = {
@@ -52,7 +50,7 @@ class Visitor {
       return
     }
 
-    if (isArray(value)) {
+    if (Array.isArray(value)) {
       path.each(this, "visitWithoutReset")
       return
     }

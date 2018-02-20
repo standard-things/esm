@@ -19,8 +19,6 @@ import warn from "./warn.js"
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
-const { is, isSealed, seal } = Object
-
 const esmDescriptor = {
   configurable: false,
   enumerable: false,
@@ -231,7 +229,7 @@ class Entry {
     let setGetters = true
 
     if (isESM) {
-      if (! isSealed(exported)) {
+      if (! Object.isSealed(exported)) {
         for (const name in this._namespace) {
           setGetter(exported, name, () => {
             return this._namespace[name]
@@ -244,7 +242,7 @@ class Entry {
         setProperty(exported, "__esModule", esmDescriptor)
       }
 
-      seal(exported)
+      Object.seal(exported)
     } else {
       const otherEntry = Entry.get(this.module)
       setGetters = otherEntry._loaded !== 1
@@ -394,7 +392,7 @@ function callGetter(getter) {
 function changed(setter, key, value) {
   const { last } = setter
 
-  if (is(last[key], value)) {
+  if (Object.is(last[key], value)) {
     return false
   }
 
@@ -494,7 +492,7 @@ function runGetter(entry, name) {
 
   if (value !== GETTER_ERROR &&
       ! (name in _namespace &&
-         is(_namespace[name], value))) {
+         Object.is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value
   }
@@ -546,7 +544,7 @@ function toNamespace(entry, source = entry._namespace) {
     namespace[name] = void 0
   }
 
-  return new Proxy(seal(namespace), {
+  return new Proxy(Object.seal(namespace), {
     get: (namespace, name) => {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)
