@@ -87,8 +87,10 @@ function runTests(cached) {
     stdio: "inherit"
   })
   .catch((e) => {
+    const { code } = e
     console.error(e.message)
-    process.exit(e.code)
+    process.exitCode = code
+    process.exit(code)
   })
 }
 
