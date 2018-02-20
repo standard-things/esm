@@ -337,21 +337,11 @@ function assignExportsToNamespace(entry) {
     if (entry.builtin) {
       _namespace.default = exported
     } else {
-      setDeferred(entry._namespace, "default", () => {
-        const exported = entry.module.exports
-
-        if (! isObjectLike(exported)) {
-          return exported
-        }
-
-        return new ExportProxy(exported, {
-          set(proxy, name, value) {
-            exported[name] = value
-            entry.update()
-            return true
-          }
-        })
-      })
+      setDeferred(entry._namespace, "default", () =>
+        isObjectLike(exported)
+          ? new ExportProxy(entry)
+          : exported
+      )
     }
   }
 

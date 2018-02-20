@@ -39,18 +39,15 @@ function init() {
         }
       }
 
-      mod.exports = new ExportProxy(exported, {
-        set(proxy, name, value) {
-          exported[name] = value
-          entry.update()
-          return true
-        }
-      })
-
+      mod.exports = exported
       mod.loaded = true
 
       const entry = Entry.get(mod)
       entry.builtin = true
+
+      mod.exports = new ExportProxy(entry)
+      Entry.set(null, mod.exports, entry)
+
       entry.loaded()
       return entry
     })

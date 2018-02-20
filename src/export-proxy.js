@@ -1,25 +1,15 @@
-import Entry from "./entry.js"
 import GenericFunction from "./generic/function.js"
 
 import errors from "./errors.js"
-import isError from "./util/is-error.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
-import toNullObject from "./util/to-null-object.js"
 
-const defaultOptions = {
-  __proto__: null,
-  get: Reflect.get,
-  set: Reflect.set
-}
+class ExportProxy {
+  constructor(entry) {
+    const exported = entry.module.exports
 
-class ProxyExport {
-  static createOptions = createOptions
-  static defaultOptions = defaultOptions
-
-  constructor(exported, options) {
     if (! isObjectLike(exported)) {
       throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "exported", "object")
     }
@@ -36,12 +26,11 @@ class ProxyExport {
       shared.exportProxy.set(exported, cache)
     }
 
-    const { get, set } = ProxyExport.createOptions(options)
     const { proxyValue, realValue } = cache
 
     const proxy = new Proxy(exported, {
       get(target, name, receiver) {
-        const value = get(target, name, receiver)
+        const value = Reflect.get(target, name, receiver)
 
         if (name in realValue &&
             value === realValue[name]) {
@@ -59,21 +48,15 @@ class ProxyExport {
             return Reflect.construct(value, args, new.target)
           }
 
-          if (this === proxy) {
-            return GenericFunction.apply(value, exported, args)
+          let thisArg = this
+
+          if (thisArg === proxy ||
+              thisArg === entry.cjsNamespace ||
+              thisArg === entry.esmNamespace) {
+            thisArg = target
           }
 
-          try {
-            return GenericFunction.apply(value, this, args)
-          } catch (e) {
-            if (isError(e) &&
-                e.name === "TypeError" &&
-                e.message === "Illegal invocation") {
-              return GenericFunction.apply(value, exported, args)
-            }
-
-            throw e
-          }
+          return GenericFunction.apply(value, thisArg, args)
         }
 
         setProperty(wrapper, "length", {
@@ -92,15 +75,15 @@ class ProxyExport {
         wrapper.prototype = value.prototype
         return proxyValue[name] = wrapper
       },
-      set
+      set(target, name, value, receiver) {
+        Reflect.set(target, name, value, receiver)
+        entry.update()
+        return true
+      }
     })
 
     return proxy
   }
 }
 
-function createOptions(options) {
-  return toNullObject(options, ProxyExport.defaultOptions)
-}
-
-export default ProxyExport
+export default ExportProxy
