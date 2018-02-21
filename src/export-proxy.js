@@ -51,7 +51,6 @@ class ExportProxy {
           let thisArg = this
 
           if (thisArg === proxy ||
-              thisArg === entry.cjsNamespace ||
               thisArg === entry.esmNamespace) {
             thisArg = target
           }
@@ -73,6 +72,7 @@ class ExportProxy {
 
         Object.setPrototypeOf(wrapper, value)
         wrapper.prototype = value.prototype
+
         return proxyValue[name] = wrapper
       },
       set(target, name, value, receiver) {
