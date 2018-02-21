@@ -543,6 +543,9 @@ function toNamespace(entry, source = entry._namespace) {
   const names = keys(source).sort()
   const namespace = createNamespace()
 
+  // Section 9.4.6: Module Namespace Exotic Objects
+  // Properties should be assigned in `Array#sort` order.
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   for (const name of names) {
     namespace[name] = void 0
   }
