@@ -1,9 +1,9 @@
-import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 import Package from "../package.js"
 
 import assign from "../util/assign.js"
 import builtinEntries from "../builtin-entries.js"
+import call from "../util/call.js"
 import { dirname } from "path"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
@@ -66,7 +66,7 @@ function hook(Mod) {
 
   function tickCallback() {
     if (useTickCallback) {
-      GenericFunction.call(_tickCallback, process)
+      call(_tickCallback, process)
     }
   }
 }

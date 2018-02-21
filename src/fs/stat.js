@@ -1,6 +1,7 @@
 import { Stats, statSync } from "fs"
 
 import binding from "../binding.js"
+import call from "../util/call.js"
 import moduleState from "../module/state.js"
 import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
@@ -44,7 +45,7 @@ function baseStat(filename) {
 
 function fallbackStat(filename) {
   try {
-    return Reflect.apply(isFile, statSync(filename), []) ? 0 : 1
+    return call(isFile, statSync(filename)) ? 0 : 1
   } catch (e) {}
 
   return -1

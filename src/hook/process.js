@@ -1,4 +1,3 @@
-import GenericFunction from "../generic/function.js"
 import Wrapper from "../wrapper.js"
 
 import isError from "../util/is-error.js"
@@ -12,8 +11,8 @@ function hook(process) {
     const wrapped = Wrapper.find(process, "_fatalException", version)
 
     return wrapped
-      ? GenericFunction.call(wrapped, this, manager, func, args)
-      : GenericFunction.apply(func, this, args)
+      ? Reflect.apply(wrapped, this, [manager, func, args])
+      : Reflect.apply(func, this, args)
   }
 
   function exceptionMethodWrapper(manager, func, args) {
@@ -24,15 +23,15 @@ function hook(process) {
       maskStackTrace(error)
     }
 
-    return GenericFunction.apply(func, this, args)
+    return Reflect.apply(func, this, args)
   }
 
   function warningManagerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(process, "emitWarning", version)
 
     return wrapped
-      ? GenericFunction.call(wrapped, this, manager, func, args)
-      : GenericFunction.apply(func, this, args)
+      ? Reflect.apply(wrapped, this, [manager, func, args])
+      : Reflect.apply(func, this, args)
   }
 
   function warningMethodWrapper(manager, func, args) {
@@ -42,7 +41,7 @@ function hook(process) {
       args[0] = scrubStackTrace(stack)
     }
 
-    return GenericFunction.apply(func, this, args)
+    return Reflect.apply(func, this, args)
   }
 
   Wrapper.manage(process, "_fatalException", exceptionManagerWrapper)

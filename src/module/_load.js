@@ -4,7 +4,6 @@
 
 import Entry from "../entry.js"
 import GenericArray from "../generic/array.js"
-import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
@@ -76,7 +75,7 @@ function load(request, parent, isMain, state, loader) {
         ? child[symbol]
         : _compile
 
-      return GenericFunction.call(func, child, content, filename)
+      return Reflect.apply(func, child, [content, filename])
     }
   }
 

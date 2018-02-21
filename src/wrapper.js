@@ -3,7 +3,6 @@
 // compatible.
 
 import GenericArray from "./generic/array.js"
-import GenericFunction from "./generic/function.js"
 
 import has from "./util/has.js"
 import maxSatisfying from "./util/max-satisfying.js"
@@ -31,7 +30,7 @@ class Wrapper {
   static manage(object, key, wrapper) {
     const value = Wrapper.unwrap(object, key)
     const manager = function (...args) {
-      return GenericFunction.call(wrapper, this, manager, value, args)
+      return Reflect.apply(wrapper, this, [manager, value, args])
     }
 
     setProperty(manager, shared.symbol.wrapper, {

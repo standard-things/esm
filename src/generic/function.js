@@ -2,15 +2,9 @@ import shared from "../shared.js"
 import unapply from "../util/unapply.js"
 
 function init() {
-  const { apply } = Reflect
-  const { prototype } = Function
-
   return {
     __proto__: null,
-    apply,
-    bind: unapply(prototype.bind),
-    call: (target, thisArg, ...args) => apply(target, thisArg, args),
-    toString: unapply(prototype.toString)
+    bind: unapply(Function.prototype.bind)
   }
 }
 

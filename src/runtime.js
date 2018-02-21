@@ -1,6 +1,5 @@
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
-import GenericFunction from "./generic/function.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
@@ -224,7 +223,7 @@ function runCJS(entry, moduleWrapper) {
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-  return GenericFunction.call(moduleWrapper, exported, shared.global, exported, req)
+  return Reflect.apply(moduleWrapper, exported, [shared.global, exported, req])
 }
 
 function runESM(entry, moduleWrapper) {
@@ -238,9 +237,9 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
     req.main = moduleState.mainModule
-    result = GenericFunction.call(moduleWrapper, exported, shared.global, exported, req)
+    result = Reflect.apply(moduleWrapper, exported, [shared.global, exported, req])
   } else {
-    result = GenericFunction.call(moduleWrapper, void 0, shared.global)
+    result = Reflect.apply(moduleWrapper, void 0, [shared.global])
   }
 
   // Set the loaded state here in case the module was sideloaded.

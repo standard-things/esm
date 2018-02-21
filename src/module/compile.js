@@ -3,7 +3,6 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import Entry from "../entry.js"
-import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 import Package from "../package.js"
 
@@ -129,11 +128,11 @@ function compile(content, filename) {
   let result
 
   if (inspectorWrapper) {
-    result = inspectorWrapper(compiledWrapper,
-      exported, exported, req, this, filename, dirname(filename))
+    result = inspectorWrapper(compiledWrapper, exported,
+      exported, req, this, filename, dirname(filename))
   } else {
-    result = GenericFunction.call(compiledWrapper,
-      exported, exported, req, this, filename, dirname(filename))
+    result = Reflect.apply(compiledWrapper, exported,
+      [exported, req, this, filename, dirname(filename)])
   }
 
   entry.state = 4

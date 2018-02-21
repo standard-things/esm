@@ -1,7 +1,6 @@
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
-import GenericFunction from "../generic/function.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import Wrapper from "../wrapper.js"
@@ -74,7 +73,7 @@ function hook(Mod, parent) {
     const wrapped = Wrapper.find(_extensions, ".js", pkg.range)
 
     return wrapped
-      ? GenericFunction.call(wrapped, this, manager, func, args)
+      ? Reflect.apply(wrapped, this, [manager, func, args])
       : tryPassthru.call(this, func, args, pkg)
   }
 
@@ -202,10 +201,10 @@ function tryPassthru(func, args, pkg) {
   const options = pkg && pkg.options
 
   if (options && options.debug) {
-    GenericFunction.apply(func, this, args)
+    Reflect.apply(func, this, args)
   } else {
     try {
-      GenericFunction.apply(func, this, args)
+      Reflect.apply(func, this, args)
     } catch (e) {
       if (! isError(e) ||
           isStackTraceMasked(e)) {
