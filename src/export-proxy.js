@@ -70,6 +70,11 @@ class ExportProxy {
           writable: false
         })
 
+        setProperty(wrapper, "toString", {
+          enumerable: false,
+          value: GenericFunction.bind(value.toString, value)
+        })
+
         Object.setPrototypeOf(wrapper, value)
         wrapper.prototype = value.prototype
 
