@@ -1,9 +1,9 @@
 import assert from "assert"
 import createNamespace from "../../create-namespace.js"
-import * as abc1 from "../../fixture/export/abc.mjs"
-import abc2, { a as aa, b as bb, c } from "../../fixture/export/abc.mjs"
-import * as def1 from "../../fixture/export/def.js"
-import def2, * as def3 from "../../fixture/export/def.js"
+import abc1, { a as aa, b as bb, c } from "../../fixture/export/abc.mjs"
+import * as abc2 from "../../fixture/export/abc.mjs"
+import def1, * as def2 from "../../fixture/export/def.js"
+import * as def3 from "../../fixture/export/def.js"
 import { default as def4 } from "../../fixture/export/def.js"
 
 export default () => {
@@ -21,14 +21,14 @@ export default () => {
     f: "f"
   })
 
-  assert.deepStrictEqual(abc1, abcNs)
-  assert.strictEqual(abc2, "default")
+  assert.strictEqual(abc1, "default")
   assert.strictEqual(aa, "a")
   assert.strictEqual(bb, "b")
   assert.strictEqual(c, "c")
+  assert.deepStrictEqual(abc2, abcNs)
 
-  assert.deepStrictEqual(def1, defNs)
-  assert.strictEqual(def1, def3)
-  assert.strictEqual(def1.default, def2)
-  assert.strictEqual(def1.default, def4)
+  assert.strictEqual(def1, def2.default)
+  assert.strictEqual(def4, def2.default)
+  assert.strictEqual(def2, def3)
+  assert.deepStrictEqual(def2, defNs)
 }
