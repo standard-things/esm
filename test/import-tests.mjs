@@ -6,8 +6,13 @@ describe("import declarations", () => {
       .then((ns) => ns.default())
   )
 
-  it("should support mixed import styles", () =>
+  it("should support mixed import styles for CJS and ES modules", () =>
     import("./cjs/import/mixed.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should support live binding of named exports for CJS modules", () =>
+    import("./cjs/import/live.mjs")
       .then((ns) => ns.default())
   )
 
