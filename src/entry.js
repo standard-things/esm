@@ -343,18 +343,19 @@ function assignExportsToNamespace(entry) {
     ! isESM &&
     ! (isPseudo && has(object, "default"))
 
-  if (skipDefault &&
-      ! ("default" in entry.getters)) {
-    entry.addGetter("default", () => entry._namespace.default)
-
+  if (skipDefault) {
     if (entry.builtin) {
       _namespace.default = exported
-    } else {
-      setDeferred(entry._namespace, "default", () =>
-        isObjectLike(exported)
+    } else if (! ("default" in entry.getters)) {
+      setDeferred(entry._namespace, "default", () => {
+        const exported = entry.module.exports
+
+        return isObjectLike(exported)
           ? new ExportProxy(entry)
           : exported
-      )
+      })
+
+      entry.addGetter("default", () => entry._namespace.default)
     }
   }
 
