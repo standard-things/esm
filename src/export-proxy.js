@@ -19,31 +19,31 @@ class ExportProxy {
     if (! cache) {
       cache = {
         __proto__: null,
-        proxyValue: { __proto__: null },
-        realValue: { __proto__: null }
+        unwrap: new WeakMap,
+        wrap: new WeakMap
       }
 
       shared.exportProxy.set(exported, cache)
     }
 
-    const { proxyValue, realValue } = cache
+    const { unwrap, wrap } = cache
 
     const proxy = new Proxy(exported, {
       get(target, name, receiver) {
         const value = Reflect.get(target, name, receiver)
 
-        if (name in realValue &&
-            value === realValue[name]) {
-          return proxyValue[name]
+        if (typeof value !== "function" ||
+            ! isNative(value)) {
+          return value
         }
 
-        realValue[name] = value
+        let wrapper = wrap.get(value)
 
-        if (! isNative(value)) {
-          return proxyValue[name] = value
+        if (wrapper) {
+          return wrapper
         }
 
-        const wrapper = function (...args) {
+        wrapper = function (...args) {
           if (new.target) {
             return Reflect.construct(value, args, new.target)
           }
@@ -55,7 +55,7 @@ class ExportProxy {
             thisArg = target
           }
 
-          return GenericFunction.apply(value, thisArg, args)
+          return Reflect.apply(value, thisArg, args)
         }
 
         setProperty(wrapper, "length", {
@@ -73,10 +73,13 @@ class ExportProxy {
         Object.setPrototypeOf(wrapper, value)
         wrapper.prototype = value.prototype
 
-        return proxyValue[name] = wrapper
+        wrap.set(value, wrapper)
+        unwrap.set(wrapper, value)
+
+        return wrapper
       },
       set(target, name, value, receiver) {
-        Reflect.set(target, name, value, receiver)
+        Reflect.set(target, name, unwrap.get(value) || value, receiver)
         entry.update()
         return true
       }
