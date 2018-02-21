@@ -69,6 +69,15 @@ describe("scenarios", function () {
     return exec(nodePath, nodeArgs)
   })
 
+  it("should work with hybrid module with cjs dependency", () => {
+    const nodeArgs = [
+      "-r", pkgPath,
+      path.resolve(testPath, "fixture/scenario/hybrid")
+    ]
+
+    return exec(nodePath, nodeArgs)
+  })
+
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
     const mochaPattern = path.resolve(dirPath, "test.js")
