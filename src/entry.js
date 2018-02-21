@@ -16,10 +16,11 @@ import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import warn from "./warn.js"
 
-const GETTER_ERROR = {}
-const STAR_ERROR = {}
+const GETTER_ERROR = { __proto__: null }
+const STAR_ERROR = { __proto__: null }
 
 const esmDescriptor = {
+  __proto__: null,
   configurable: false,
   enumerable: false,
   value: true,
@@ -27,6 +28,7 @@ const esmDescriptor = {
 }
 
 const toStringTagDescriptor = {
+  __proto__: null,
   configurable: false,
   enumerable: false,
   value: "Module",
