@@ -114,6 +114,10 @@ describe("scenarios", function () {
     return exec("jest", jestArgs)
   })
 
+  it("should work with dual packages", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/dual")])
+  )
+
   it("should work with esmod-pmb", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
   )
