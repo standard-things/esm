@@ -1,8 +1,8 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const { createContext, Script } = require("vm")
 const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
+const { Script } = require("vm")
 const { createHash } = require("crypto")
 const { inspect } = require("util")
 const { resolve } = require("path")
@@ -10,15 +10,13 @@ const { resolve } = require("path")
 // Guard against mocked environments (e.g. Jest).
 const useBuiltins = module.constructor.length > 1
 
-const engineVersion =
-  process.versions.v8 ||
-  process.versions.chakracore
-
+const { versions } = process
+const chakraVersion = versions.chakracore
+const engineVersion = versions.v8 || chakraVersion
 const nodeVersion = process.version
 
 const { defineProperty, freeze } = Object
-const inspectKey = inspect.custom || "inspect"
-const { runInContext } = Script.prototype
+const { runInNewContext, runInThisContext } = Script.prototype
 
 const Module = useBuiltins ? module.constructor : require("module")
 const esmMod = new Module(module.id, null)
@@ -33,7 +31,6 @@ function compileESM() {
   const cachePath = resolve(nodeModulesPath, ".cache")
   const cacheFilename = resolve(cachePath, cacheName)
   const cachedData = readFile(cacheFilename)
-  const context = createContext({ global })
   const filename = resolve(__dirname, "esm.js")
 
   const script = new Script(
@@ -73,10 +70,11 @@ function compileESM() {
     }
   }
 
-  return runInContext.call(script, context, {
-    __proto__: null,
-    filename
-  })
+  const options = { __proto__: null, filename }
+
+  return chakraVersion
+    ? runInThisContext.call(script, options)
+    : runInNewContext.call(script, { __proto__: null, global }, options)
 }
 
 function loadESM() {
@@ -113,6 +111,7 @@ function writeFile(filename, options) {
 }
 
 const compiledESM = compileESM()
+const inspectKey = inspect.custom || "inspect"
 
 let __shared__
 
