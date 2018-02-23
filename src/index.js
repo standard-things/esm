@@ -1,5 +1,6 @@
 import Module from "./module.js"
 import Package from "./package.js"
+import Shim from "./shim.js"
 
 import assign from "./util/assign.js"
 import clone from "./module/clone.js"
@@ -71,6 +72,8 @@ if (shared.inited) {
 } else {
   exported = shared
   exported.inited = true
+
+  Shim.enable()
 
   if (isCheck()) {
     vmHook(vm)

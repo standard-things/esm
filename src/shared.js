@@ -170,6 +170,16 @@ if (__shared__) {
     typeof binding.util.setHiddenValue === "function"
   )
 
+  setDeferred(support, "toStringProxyFunctions", () => {
+    try {
+      const { toString } = shared.global.Function.prototype
+      const proxy = new Proxy(toString, { __proto__: null })
+      return typeof toString.call(proxy) === "string"
+    } catch (e) {}
+
+    return false
+  })
+
   setDeferred(symbol, "errorCode", () => {
     let error
 
