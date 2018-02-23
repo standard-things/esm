@@ -1,22 +1,17 @@
 "use strict"
 
-const { toStringTag } = Symbol
-
-const toStringTagDescriptor = {
-  __proto__: null,
-  configurable: false,
-  enumerable: false,
-  value: "Module",
-  writable: false
-}
-
 function createNamespace(object) {
   const ns = Object.assign({ __proto__: null }, object)
-  return Object.seal(setToStringTag(ns))
-}
 
-function setToStringTag(object) {
-  return Object.defineProperty(object, toStringTag, toStringTagDescriptor)
+  Object.defineProperty(ns, Symbol.toStringTag, {
+    __proto__: null,
+    configurable: false,
+    enumerable: false,
+    value: "Module",
+    writable: false
+  })
+
+  return Object.seal(ns)
 }
 
 module.exports = createNamespace
