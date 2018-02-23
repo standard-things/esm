@@ -5,6 +5,8 @@ import isObjectLike from "./util/is-object-like.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
+const { toString } = Object.prototype
+
 class ExportProxy {
   constructor(entry) {
     const exported = entry.module.exports
@@ -30,7 +32,12 @@ class ExportProxy {
     const proxy = new Proxy(exported, {
       __proto__: null,
       get(target, name, receiver) {
-        const value = Reflect.get(target, name, receiver)
+        let value = Reflect.get(target, name, receiver)
+
+        if (name === Symbol.toStringTag &&
+            typeof value !== "string") {
+          value = toString.call(target).slice(8, -1)
+        }
 
         if (typeof value !== "function" ||
             ! isNative(value)) {
