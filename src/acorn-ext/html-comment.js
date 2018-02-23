@@ -3,8 +3,6 @@ import ASCII from "../ascii.js"
 import acorn from "../acorn.js"
 import wrap from "../util/wrap.js"
 
-const { lineBreakRegExp } = acorn
-
 const {
   EXMARK,
   GT,
@@ -13,6 +11,8 @@ const {
 } = ASCII
 
 const htmlErrorMessage = "HTML comments are not allowed in modules"
+
+const { lineBreakRegExp } = acorn
 
 function enable(parser) {
   parser.readToken_lt_gt = wrap(parser.readToken_lt_gt, readToken_lt_gt)
@@ -57,4 +57,4 @@ function readToken_plus_min(func, args) {
   return func.apply(this, args)
 }
 
-export { enable }
+export default enable

@@ -1,11 +1,11 @@
 import { Parser as AcornParser } from "./acorn.js"
 
-import { enable as enableAwaitAnywhere } from "./acorn-ext/await-anywhere.js"
-import { enable as enableDynamicImport } from "./acorn-ext/dynamic-import.js"
-import { enable as enableFunctionParamsStart } from "./acorn-ext/function-params-start.js"
-import { enable as enableHTMLComment } from "./acorn-ext/html-comment.js"
-import { enable as enableTolerance } from "./acorn-ext/tolerance.js"
-import { enable as enableTopLevel } from "./acorn-ext/top-level.js"
+import enableAwaitAnywhere from "./acorn-ext/await-anywhere.js"
+import enableDynamicImport from "./acorn-ext/dynamic-import.js"
+import enableFunctionParamsStart from "./acorn-ext/function-params-start.js"
+import enableHTMLComment from "./acorn-ext/html-comment.js"
+import enableTolerance from "./acorn-ext/tolerance.js"
+import enableTopLevel from "./acorn-ext/top-level.js"
 import toNullObject from "./util/to-null-object.js"
 
 const defaultOptions = {
@@ -22,8 +22,16 @@ class Parser {
 
   static parse(code, options) {
     options = Parser.createOptions(options)
-    const parser = extend(new AcornParser(options, code))
+
     const { strict } = options
+    const parser = new AcornParser(options, code)
+
+    enableAwaitAnywhere(parser)
+    enableDynamicImport(parser)
+    enableFunctionParamsStart(parser)
+    enableHTMLComment(parser)
+    enableTolerance(parser)
+    enableTopLevel(parser)
 
     if (strict !== void 0) {
       parser.strict = strict
@@ -39,17 +47,6 @@ class Parser {
 
 function createOptions(options) {
   return toNullObject(options, Parser.defaultOptions)
-}
-
-function extend(parser) {
-  enableAwaitAnywhere(parser)
-  enableDynamicImport(parser)
-  enableFunctionParamsStart(parser)
-  enableHTMLComment(parser)
-  enableTolerance(parser)
-  enableTopLevel(parser)
-
-  return parser
 }
 
 Object.setPrototypeOf(Parser.prototype, null)

@@ -58,4 +58,4 @@ function raise(pos, message) {
   throw new errors.SyntaxError(this.input, pos, message)
 }
 
-export { enable }
+export default enable

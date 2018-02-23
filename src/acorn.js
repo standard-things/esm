@@ -18,7 +18,7 @@ import { types as tokTypes } from "./vendor/acorn/src/tokentype.js"
 
 const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 
-export  {
+export {
   Parser,
   getLineInfo,
   lineBreakRegExp,

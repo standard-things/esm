@@ -11,4 +11,4 @@ function parseMaybeUnary(func, args) {
     : func.apply(this, args)
 }
 
-export { enable }
+export default enable

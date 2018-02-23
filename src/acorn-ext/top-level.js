@@ -82,4 +82,4 @@ function parseTopLevel(node) {
   return this.finishNode(node, "Program")
 }
 
-export { enable }
+export default enable

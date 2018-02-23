@@ -102,4 +102,4 @@ function parseImportMetaPropertyAtom(parser) {
   return parser.finishNode(node, "MetaProperty")
 }
 
-export { enable }
+export default enable

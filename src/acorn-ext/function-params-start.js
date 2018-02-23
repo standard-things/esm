@@ -11,4 +11,4 @@ function parseFunctionParams(func, args) {
   return func.apply(this, args)
 }
 
-export { enable }
+export default enable
