@@ -12,8 +12,9 @@ import shared from "./shared.js"
 import silent from "./util/silent.js"
 import { version } from "./version.js"
 
-class Wrapper {
-  static find(object, key, range) {
+const Wrapper = {
+  __proto__: null,
+  find(object, key, range) {
     const map = getMap(object, key)
 
     if (map) {
@@ -25,9 +26,8 @@ class Wrapper {
     }
 
     return null
-  }
-
-  static manage(object, key, wrapper) {
+  },
+  manage(object, key, wrapper) {
     const value = Wrapper.unwrap(object, key)
     const manager = function (...args) {
       return Reflect.apply(wrapper, this, [manager, value, args])
@@ -39,15 +39,13 @@ class Wrapper {
     })
 
     setSilent(object, key, manager)
-  }
-
-  static unwrap(object, key) {
+  },
+  unwrap(object, key) {
     const manager = silent(() => object[key])
     const symbol = shared.symbol.wrapper
     return has(manager, symbol) ? manager[symbol]  : manager
-  }
-
-  static wrap(object, key, wrapper) {
+  },
+  wrap(object, key, wrapper) {
     const map = getOrCreateMap(object, key)
 
     if (typeof map.wrappers[version] !== "function") {
@@ -97,7 +95,5 @@ function getStore(object) {
   const symbol = shared.symbol.wrapper
   return has(object, symbol) ? object[symbol] : null
 }
-
-Object.setPrototypeOf(Wrapper.prototype, null)
 
 export default Wrapper

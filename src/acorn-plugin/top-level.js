@@ -1,9 +1,12 @@
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import { tokTypes as tt } from "../acorn.js"
 
-function enable(parser) {
-  parser.parseTopLevel = parseTopLevel
-  return parser
+const Plugin = {
+  __proto__: null,
+  enable(parser) {
+    parser.parseTopLevel = parseTopLevel
+    return parser
+  }
 }
 
 function parseTopLevel(node) {
@@ -82,4 +85,4 @@ function parseTopLevel(node) {
   return this.finishNode(node, "Program")
 }
 
-export default enable
+export default Plugin

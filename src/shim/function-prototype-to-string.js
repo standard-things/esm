@@ -1,69 +1,73 @@
 import call from "../util/call.js"
 import isProxy from "../util/is-proxy.js"
+import noop from "../util/noop.js"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 const nativeSourceText = "function () { [native code] }"
 
-function enable() {
-  const { support } = shared
+const Shim = {
+  __proto__: null,
+  enable() {
+    const { support } = shared
 
-  if (support.functionToStringWithProxy) {
-    return
-  }
-
-  // Section 19.2.3.5: Function.prototype.toString()
-  // Step 3: Return "function () { [native code] }" for callable objects.
-  // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
-  const { prototype } = shared.global.Function
-  const _toString = prototype.toString
-
-  const toString = function () {
-    let thisArg = this
-
-    if (thisArg === toStringThis) {
-      thisArg = _toString
-    } else if (isProxy(thisArg)) {
-      return nativeSourceText
-    }
-
-    return call(_toString, thisArg)
-  }
-
-  let toStringThis = toString
-
-  toString.prototype = void 0
-  Object.setPrototypeOf(toString, prototype)
-
-  try {
-    if (! support.proxiedFunctions) {
-      prototype.toString = toString
+    if (support.functionToStringWithProxy) {
       return
     }
 
-    const { apply, construct } = Reflect
-    const noop = (function toString() {}).bind()
+    // Section 19.2.3.5: Function.prototype.toString()
+    // Step 3: Return "function () { [native code] }" for callable objects.
+    // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
+    const funcProto = shared.global.Function.prototype
+    const _toString = funcProto.toString
 
-    toStringThis = noop
+    const toString = function () {
+      let thisArg = this
 
-    setProperty(noop, "name", {
-      enumerable: false,
-      value: "toString",
-      writable: false
-    })
-
-    Object.setPrototypeOf(noop, prototype)
-
-    prototype.toString = new Proxy(noop, {
-      __proto__: null,
-      apply(target, thisArg, args) {
-        return apply(toString, thisArg, args)
-      },
-      construct(target, args) {
-        return construct(toString, args)
+      if (thisArg === toStringThis) {
+        thisArg = _toString
+      } else if (isProxy(thisArg)) {
+        return nativeSourceText
       }
-    })
-  } catch (e) {}
+
+      return call(_toString, thisArg)
+    }
+
+    let toStringThis = toString
+
+    toString.prototype = void 0
+    Object.setPrototypeOf(toString, funcProto)
+
+    try {
+      if (! support.proxiedFunctions) {
+        funcProto.toString = toString
+        return
+      }
+
+      const { apply, construct } = Reflect
+      const nativeNoop = noop.bind()
+
+      setProperty(nativeNoop, "name", {
+        enumerable: false,
+        value: "toString",
+        writable: false
+      })
+
+      Object.setPrototypeOf(nativeNoop, funcProto)
+
+      toStringThis = nativeNoop
+
+      funcProto.toString = new Proxy(nativeNoop, {
+        __proto__: null,
+        apply(target, thisArg, args) {
+          return apply(toString, thisArg, args)
+        },
+        construct(target, args) {
+          return construct(toString, args)
+        }
+      })
+    } catch (e) {}
+  }
 }
 
-export default enable
+export default Shim

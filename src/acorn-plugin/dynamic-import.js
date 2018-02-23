@@ -6,12 +6,15 @@ import lookahead from "../parse/lookahead.js"
 import { tokTypes as tt } from "../acorn.js"
 import wrap from "../util/wrap.js"
 
-function enable(parser) {
-  // Allow `yield import()` to parse.
-  tt._import.startsExpr = true
-  parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
-  parser.parseStatement = wrap(parser.parseStatement, parseStatement)
-  return parser
+const Plugin = {
+  __proto__: null,
+  enable(parser) {
+    // Allow `yield import()` to parse.
+    tt._import.startsExpr = true
+    parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
+    parser.parseStatement = wrap(parser.parseStatement, parseStatement)
+    return parser
+  }
 }
 
 function parseExprAtom(func, args) {
@@ -102,4 +105,4 @@ function parseImportMetaPropertyAtom(parser) {
   return parser.finishNode(node, "MetaProperty")
 }
 
-export default enable
+export default Plugin

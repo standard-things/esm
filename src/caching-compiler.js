@@ -15,8 +15,9 @@ const {
   PERIOD
 } = ASCII
 
-class CachingCompiler {
-  static compile(entry, code, options) {
+const CachingCompiler = {
+  __proto__: null,
+  compile(entry, code, options) {
     if (! options.eval &&
         entry.module.filename &&
         entry.package.cachePath) {
@@ -24,9 +25,8 @@ class CachingCompiler {
     }
 
     return compileAndCache(entry, code, options)
-  }
-
-  static from(entry) {
+  },
+  from(entry) {
     const { cache } = entry.package
     const { cacheName } = entry
 
@@ -164,8 +164,6 @@ function toCompileOptions(entry, options) {
     var: options.var
   }
 }
-
-Object.setPrototypeOf(CachingCompiler.prototype, null)
 
 if (! shared.inited) {
   process.setMaxListeners(process.getMaxListeners() + 1)

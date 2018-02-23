@@ -9,35 +9,38 @@ const parserDupPrefix = "Duplicate export '"
 const engineTypePostfix = "may only be used in ES modules"
 const parserTypePostfix = "may appear only with 'sourceType: module'"
 
-function enable(parser) {
-  parser.isDirectiveCandidate =
-  parser.strictDirective = alwaysFalse
+const Plugin = {
+  __proto__: null,
+  enable(parser) {
+    parser.isDirectiveCandidate =
+    parser.strictDirective = alwaysFalse
 
-  parser.canDeclareLexicalName =
-  parser.canDeclareVarName =
-  parser.isSimpleParamList = alwaysTrue
+    parser.canDeclareLexicalName =
+    parser.canDeclareVarName =
+    parser.isSimpleParamList = alwaysTrue
 
-  parser.adaptDirectivePrologue =
-  parser.checkParams =
-  parser.checkPatternErrors =
-  parser.checkPatternExport =
-  parser.checkPropClash =
-  parser.checkVariableExport =
-  parser.checkYieldAwaitInDefaultParams =
-  parser.declareLexicalName =
-  parser.declareVarName =
-  parser.enterFunctionScope =
-  parser.enterLexicalScope =
-  parser.exitFunctionScope =
-  parser.exitLexicalScope =
-  parser.invalidStringToken = noop
+    parser.adaptDirectivePrologue =
+    parser.checkParams =
+    parser.checkPatternErrors =
+    parser.checkPatternExport =
+    parser.checkPropClash =
+    parser.checkVariableExport =
+    parser.checkYieldAwaitInDefaultParams =
+    parser.declareLexicalName =
+    parser.declareVarName =
+    parser.enterFunctionScope =
+    parser.enterLexicalScope =
+    parser.exitFunctionScope =
+    parser.exitLexicalScope =
+    parser.invalidStringToken = noop
 
-  parser.checkExpressionErrors = checkExpressionErrors
+    parser.checkExpressionErrors = checkExpressionErrors
 
-  parser.raise =
-  parser.raiseRecoverable = raise
+    parser.raise =
+    parser.raiseRecoverable = raise
 
-  return parser
+    return parser
+  }
 }
 
 function checkExpressionErrors(refDestructuringErrors) {
@@ -58,4 +61,4 @@ function raise(pos, message) {
   throw new errors.SyntaxError(this.input, pos, message)
 }
 
-export default enable
+export default Plugin

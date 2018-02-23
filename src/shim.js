@@ -1,11 +1,10 @@
-import enableFunctionPrototypeToString from "./shim/function-prototype-to-string.js"
+import functionPrototypeToString from "./shim/function-prototype-to-string.js"
 
-class Shim {
-  static enable() {
-    enableFunctionPrototypeToString()
+const Shim = {
+  __proto__: null,
+  enable() {
+    functionPrototypeToString.enable()
   }
 }
-
-Object.setPrototypeOf(Shim.prototype, null)
 
 export default Shim

@@ -14,10 +14,13 @@ const htmlErrorMessage = "HTML comments are not allowed in modules"
 
 const { lineBreakRegExp } = acorn
 
-function enable(parser) {
-  parser.readToken_lt_gt = wrap(parser.readToken_lt_gt, readToken_lt_gt)
-  parser.readToken_plus_min = wrap(parser.readToken_plus_min, readToken_plus_min)
-  return parser
+const Plugin = {
+  __proto__: null,
+  enable(parser) {
+    parser.readToken_lt_gt = wrap(parser.readToken_lt_gt, readToken_lt_gt)
+    parser.readToken_plus_min = wrap(parser.readToken_plus_min, readToken_plus_min)
+    return parser
+  }
 }
 
 function readToken_lt_gt(func, args) {
@@ -57,4 +60,4 @@ function readToken_plus_min(func, args) {
   return func.apply(this, args)
 }
 
-export default enable
+export default Plugin

@@ -29,11 +29,12 @@ const defaultOptions = {
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
 
-class Compiler {
-  static createOptions = createOptions
-  static defaultOptions = defaultOptions
-
-  static compile(code, options) {
+/* eslint-disable sort-keys */
+const Compiler = {
+  __proto__: null,
+  createOptions,
+  defaultOptions,
+  compile(code, options) {
     code = stripShebang(code)
     options = Compiler.createOptions(options)
 
@@ -189,7 +190,5 @@ class Compiler {
 function createOptions(options) {
   return toNullObject(options, Compiler.defaultOptions)
 }
-
-Object.setPrototypeOf(Compiler.prototype, null)
 
 export default Compiler
