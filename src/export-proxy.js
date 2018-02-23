@@ -1,5 +1,4 @@
-import GenericFunction from "./generic/function.js"
-
+import bind from "./util/bind.js"
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -73,7 +72,7 @@ class ExportProxy {
 
         setProperty(wrapper, "toString", {
           enumerable: false,
-          value: GenericFunction.bind(value.toString, value)
+          value: bind(value.toString, value)
         })
 
         Object.setPrototypeOf(wrapper, value)
