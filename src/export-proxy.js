@@ -95,4 +95,6 @@ class ExportProxy {
   }
 }
 
+Object.setPrototypeOf(ExportProxy.prototype, null)
+
 export default ExportProxy
