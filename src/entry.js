@@ -552,6 +552,7 @@ function toNamespace(entry, source = entry._namespace) {
   }
 
   return new Proxy(Object.seal(namespace), {
+    __proto__: null,
     get: (namespace, name) => {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)

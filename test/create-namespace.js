@@ -3,6 +3,7 @@
 const { toStringTag } = Symbol
 
 const toStringTagDescriptor = {
+  __proto__: null,
   configurable: false,
   enumerable: false,
   value: "Module",

@@ -29,6 +29,7 @@ class ExportProxy {
     const { unwrap, wrap } = cache
 
     const proxy = new Proxy(exported, {
+      __proto__: null,
       get(target, name, receiver) {
         const value = Reflect.get(target, name, receiver)
 
