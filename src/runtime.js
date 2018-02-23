@@ -15,7 +15,6 @@ import shared from "./shared.js"
 const ExPromise = __external__.Promise
 
 const indirectEval = __external__.eval
-const { freeze } = Object
 
 const Runtime = {
   __proto__: null,
@@ -42,7 +41,6 @@ const Runtime = {
     }
 
     const { runtimeName } = entry
-    const { blockScopedDeclarations } = shared.support
 
     content = result.code
 
@@ -50,7 +48,7 @@ const Runtime = {
       return content
     }
 
-    if (blockScopedDeclarations) {
+    if (shared.support.blockScopedDeclarations) {
       content =
         (hasPragma(content, "use strict") ? '"use strict";' : "") +
         "let " + runtimeName + "=global." + runtimeName + ";" +
@@ -83,8 +81,8 @@ const Runtime = {
         writable: false
       })
 
-      freeze(globalImport)
-      freeze(globalRuntime)
+      Object.freeze(globalImport)
+      Object.freeze(globalRuntime)
     }
 
     return content
