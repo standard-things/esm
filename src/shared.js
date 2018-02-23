@@ -117,7 +117,8 @@ if (__shared__) {
   )
 
   setDeferred(fastPath, "readFileFast", () =>
-    support.internalModuleReadJSON || support.internalModuleReadFile
+    support.internalModuleReadJSON ||
+      support.internalModuleReadFile
   )
 
   setDeferred(fastPath, "stat", () =>
@@ -184,6 +185,11 @@ if (__shared__) {
 
     return new B().b !== void 0
   })
+
+  setDeferred(support, "proxiedFunctions", () =>
+    support.proxiedClasses &&
+      support.proxiedFunctionToStringTag
+  )
 
   setDeferred(support, "proxiedFunctionToStringTag", () => {
     const { toString } = Object.prototype

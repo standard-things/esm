@@ -13,8 +13,7 @@ class ExportProxy {
     const { support } = shared
 
     // Avoid using buggy proxies in Chakra.
-    if (! support.proxiedClasses ||
-        ! support.proxiedFunctionToStringTag) {
+    if (! support.proxiedFunctions) {
       return exported
     }
 
@@ -89,8 +88,8 @@ class ExportProxy {
           value: bind(value.toString, value)
         })
 
-        Object.setPrototypeOf(wrapper, value)
         wrapper.prototype = value.prototype
+        Object.setPrototypeOf(wrapper, value)
 
         wrap.set(value, wrapper)
         unwrap.set(wrapper, value)
