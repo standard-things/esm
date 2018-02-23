@@ -1,3 +1,5 @@
+import isProxy from "./is-proxy.js"
+
 const { toString } = Function.prototype
 
 const markerRegExp = /toString|(function).*?(?=\\\()/g
@@ -13,6 +15,7 @@ const nativeRegExp = RegExp(
 
 function isNative(func) {
   return typeof func === "function" &&
+    ! isProxy(func) &&
     nativeRegExp.test(toString.call(func))
 }
 
