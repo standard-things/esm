@@ -28,6 +28,8 @@ const nodeModulesRegExp = shared.env.win32
 let exported
 
 if (shared.inited) {
+  Shim.enable(shared.global)
+
   exported = (mod, options) => {
     if (! isObject(mod)) {
       throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "module", "object")
@@ -73,7 +75,8 @@ if (shared.inited) {
   exported = shared
   exported.inited = true
 
-  Shim.enable()
+  const context = Function("return this")()
+  Shim.enable(context)
 
   if (isCheck()) {
     vmHook(vm)

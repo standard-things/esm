@@ -71,6 +71,7 @@ if (__shared__) {
     readPackage: { __proto__: null },
     resolveFilename: { __proto__: null },
     satisfies: { __proto__: null },
+    shim: { __proto__: null },
     support,
     symbol
   }
@@ -133,17 +134,6 @@ if (__shared__) {
     try {
       (0, eval)("let a")
       return true
-    } catch (e) {}
-
-    return false
-  })
-
-  setDeferred(support, "functionToStringWithProxy", () => {
-    try {
-      const { toString } = shared.global.Function.prototype
-      const proxy = new Proxy(toString, { __proto__: null })
-
-      return typeof toString.call(proxy) === "string"
     } catch (e) {}
 
     return false

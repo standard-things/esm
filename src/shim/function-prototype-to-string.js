@@ -4,21 +4,42 @@ import noop from "../util/noop.js"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
+const checked =
+  shared.shim.functionPrototypeToString ||
+  (shared.shim.functionPrototypeToString = new WeakMap)
+
 const nativeSourceText = "function () { [native code] }"
 
 const Shim = {
   __proto__: null,
-  enable() {
-    const { support } = shared
+  check(context) {
+    const funcProto = context.Function.prototype
+    let result = checked.get(funcProto)
 
-    if (support.functionToStringWithProxy) {
+    if (typeof result !== "boolean") {
+      result = false
+
+      try {
+        const { toString } = funcProto
+        const proxy = new Proxy(toString, { __proto__: null })
+
+        result = typeof toString.call(proxy) === "string"
+      } catch (e) {}
+
+      checked.set(funcProto, result)
+    }
+
+    return result
+  },
+  enable(context) {
+    if (Shim.check(context)) {
       return
     }
 
     // Section 19.2.3.5: Function.prototype.toString()
     // Step 3: Return "function () { [native code] }" for callable objects.
     // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
-    const funcProto = shared.global.Function.prototype
+    const funcProto = context.Function.prototype
     const _toString = funcProto.toString
 
     const toString = function () {
@@ -33,13 +54,13 @@ const Shim = {
       return call(_toString, thisArg)
     }
 
-    let toStringThis = toString
-
     toString.prototype = void 0
     Object.setPrototypeOf(toString, funcProto)
 
+    let toStringThis = toString
+
     try {
-      if (! support.proxiedFunctions) {
+      if (! shared.support.proxiedFunctions) {
         funcProto.toString = toString
         return
       }
@@ -66,6 +87,8 @@ const Shim = {
           return construct(toString, args)
         }
       })
+
+      checked.set(funcProto, true)
     } catch (e) {}
   }
 }
