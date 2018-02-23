@@ -10,6 +10,13 @@ const { toString } = Object.prototype
 class ExportProxy {
   constructor(entry) {
     const exported = entry.module.exports
+    const { support } = shared
+
+    // Avoid using buggy proxies in Chakra.
+    if (! support.proxiedClasses ||
+        ! support.proxiedFunctionToStringTag) {
+      return exported
+    }
 
     if (! isObjectLike(exported)) {
       throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "exported", "object")

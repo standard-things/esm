@@ -7,7 +7,7 @@ import shared from "../shared.js"
 const nativeSourceText = "function () { [native code] }"
 
 function enable() {
-  if (shared.support.toStringProxyFunctions) {
+  if (shared.support.functionToStringWithProxy) {
     return
   }
 

@@ -137,6 +137,17 @@ if (__shared__) {
     return false
   })
 
+  setDeferred(support, "functionToStringWithProxy", () => {
+    try {
+      const { toString } = shared.global.Function.prototype
+      const proxy = new Proxy(toString, { __proto__: null })
+
+      return typeof toString.call(proxy) === "string"
+    } catch (e) {}
+
+    return false
+  })
+
   setDeferred(support, "getProxyDetails", () =>
     typeof binding.util.getProxyDetails === "function"
   )
@@ -158,6 +169,29 @@ if (__shared__) {
       typeof types.isProxy === "function"
   )
 
+  setDeferred(support, "proxiedClasses", () => {
+    class A {}
+
+    Object.setPrototypeOf(A.prototype, null)
+
+    const proxy = new Proxy(A, { __proto__: null })
+
+    class B extends proxy {
+      b() {}
+    }
+
+    Object.setPrototypeOf(B.prototype, null)
+
+    return new B().b !== void 0
+  })
+
+  setDeferred(support, "proxiedFunctionToStringTag", () => {
+    const { toString } = Object.prototype
+    const proxy = new Proxy(toString, { __proto__: null })
+
+    return toString.call(proxy) === "[object Function]"
+  })
+
   setDeferred(support, "safeGetEnv", () =>
     typeof binding.util.safeGetenv === "function"
   )
@@ -169,16 +203,6 @@ if (__shared__) {
   setDeferred(support, "setHiddenValue", () =>
     typeof binding.util.setHiddenValue === "function"
   )
-
-  setDeferred(support, "toStringProxyFunctions", () => {
-    try {
-      const { toString } = shared.global.Function.prototype
-      const proxy = new Proxy(toString, { __proto__: null })
-      return typeof toString.call(proxy) === "string"
-    } catch (e) {}
-
-    return false
-  })
 
   setDeferred(symbol, "errorCode", () => {
     let error
