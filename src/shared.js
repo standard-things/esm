@@ -1,7 +1,8 @@
+import { promisify, types } from "util"
+
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import md5 from "./util/md5.js"
-import { promisify } from "util"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
@@ -136,6 +137,10 @@ if (__shared__) {
     return false
   })
 
+  setDeferred(support, "getProxyDetails", () =>
+    typeof binding.util.getProxyDetails === "function"
+  )
+
   setDeferred(support, "getStatValues", () =>
     typeof binding.fs.getStatValues === "function"
   )
@@ -146,6 +151,11 @@ if (__shared__) {
 
   setDeferred(support, "internalModuleReadJSON", () =>
     typeof binding.fs.internalModuleReadJSON === "function"
+  )
+
+  setDeferred(support, "isProxy", () =>
+    types != null &&
+      typeof types.isProxy === "function"
   )
 
   setDeferred(support, "safeGetEnv", () =>
