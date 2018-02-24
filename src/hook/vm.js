@@ -15,6 +15,7 @@ import isError from "../util/is-error.js"
 import isEval from "../env/is-eval.js"
 import isREPL from "../env/is-repl.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import makeRequireFunction from "../module/make-require-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
@@ -83,6 +84,7 @@ function hook(vm) {
         'k="' + runtimeName + '";' +
         "if(e&&!g[k]){" +
           "m.exports=e.entry.exports;" +
+          "require=e.entry.require;" +
           "Object.defineProperty(g,k,{" +
             "__proto__:null," +
             "value:e" +
@@ -105,6 +107,7 @@ function hook(vm) {
   function initEntry(mod) {
     entry = Entry.get(mod)
     entry.package = pkg
+    entry.require = makeRequireFunction(mod)
     entry.runtimeName = shared.globalName
     Runtime.enable(entry, new ExObject)
   }

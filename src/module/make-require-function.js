@@ -5,6 +5,7 @@
 import Entry from "../entry.js"
 import Module from "../module.js"
 
+import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
@@ -24,16 +25,18 @@ function makeRequireFunction(mod, requirer, resolver) {
       ! isESM &&
       ! isDataProperty(mod, "exports")
 
+    let exported
+
     if (! entry.package.options.cjs.vars) {
       try {
-        return requirer.call(mod, request)
+        exported = requirer.call(mod, request)
       } finally {
         moduleState.requireDepth -= 1
       }
     }
 
     try {
-      return requirer.call(mod, request)
+      exported = requirer.call(mod, request)
     } catch (e) {
       if (isError(e)) {
         const { code } = e
@@ -47,6 +50,16 @@ function makeRequireFunction(mod, requirer, resolver) {
     } finally {
       moduleState.requireDepth -= 1
     }
+
+    if (request in builtinEntries) {
+      const builtinEntry = builtinEntries[request]
+
+      if (exported === builtinEntry.rawExports) {
+        exported = builtinEntry.module.exports
+      }
+    }
+
+    return exported
   }
 
   function resolve(request, options) {
