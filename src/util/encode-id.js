@@ -1,4 +1,8 @@
-const ZWJ = "\u200d"
+import CHARS from "../chars.js"
+
+const {
+  ZWJ
+} = CHARS
 
 function encodeId(id) {
   return id + ZWJ
