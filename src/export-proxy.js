@@ -1,4 +1,4 @@
-import OwnProxy from "./builtin/proxy.js"
+import OwnProxy from "./own/proxy.js"
 
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"

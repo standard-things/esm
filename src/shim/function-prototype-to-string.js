@@ -1,4 +1,4 @@
-import OwnProxy from "../builtin/proxy.js"
+import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
 import isOwnProxy from "../util/is-own-proxy.js"

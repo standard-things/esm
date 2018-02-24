@@ -1,6 +1,6 @@
 import ExportProxy from "./export-proxy.js"
 import GenericArray from "./generic/array.js"
-import OwnProxy from "./builtin/proxy.js"
+import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
 
 import assign from "./util/assign.js"

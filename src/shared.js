@@ -1,4 +1,4 @@
-import { promisify, types } from "util"
+import { inspect, promisify, types } from "util"
 
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
@@ -44,7 +44,7 @@ if (__shared__) {
     globalName,
     inited: false,
     maxSatisfying: { __proto__: null },
-    ownProxy: new WeakSet,
+    own: { __proto__: null },
     package: {
       __proto__: null,
       cache: { __proto__: null },
@@ -144,6 +144,14 @@ if (__shared__) {
   setDeferred(support, "getStatValues", () =>
     typeof binding.fs.getStatValues === "function"
   )
+
+  setDeferred(support, "inspectProxies", () => {
+    const proxy = new Proxy({ __proto__: null }, { "@std/esm": 1, "__proto__": null })
+    const inspected = inspect(proxy, { __proto__: null, showProxy: true })
+
+    return inspected.startsWith("Proxy: ") &&
+      inspected.indexOf("@std/esm") !== -1
+  })
 
   setDeferred(support, "internalModuleReadFile", () =>
     typeof binding.fs.internalModuleReadFile === "function"
