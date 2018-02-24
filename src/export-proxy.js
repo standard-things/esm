@@ -3,7 +3,6 @@ import OwnProxy from "./own/proxy.js"
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
-import noop from "./util/noop.js"
 import shared from "./shared.js"
 
 const { toString } = Object.prototype
@@ -57,9 +56,7 @@ class ExportProxy {
           return wrapper
         }
 
-        const nativeNoop = noop.bind()
-
-        wrapper = new OwnProxy(nativeNoop, {
+        wrapper = new OwnProxy(value, {
           __proto__: null,
           apply(funcTarget, thisArg, args) {
             if (thisArg === proxy ||
@@ -68,12 +65,6 @@ class ExportProxy {
             }
 
             return Reflect.apply(value, thisArg, args)
-          },
-          construct(target, args) {
-            return Reflect.construct(value, args)
-          },
-          get(target, name) {
-            return Reflect.get(value, name)
           }
         })
 

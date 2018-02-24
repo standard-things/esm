@@ -19,6 +19,7 @@ const regexp3 = require("../../fixture/cjs/export/regexp.js")
 
 export default () => {
   const expected = [1, 1, 1, 1]
+  const funcToString = Function.prototype.toString
 
   let oldValue = console1.log
 
@@ -35,6 +36,7 @@ export default () => {
   log(1)
 
   assert.strictEqual(mockIo.end().stdout, "1\n1\n1\n1\n")
+  assert.strictEqual(funcToString.call(log), funcToString.call(console.log))
 
   assert.deepStrictEqual(updated, expected)
   assert.deepStrictEqual(reverted, Array(3).fill(log))
@@ -75,6 +77,7 @@ export default () => {
   assert.strictEqual(cwd(), process1.cwd())
   assert.strictEqual(process2.cwd(), process1.cwd())
   assert.strictEqual(process3.cwd(), process1.cwd())
+  assert.strictEqual(funcToString.call(cwd), funcToString.call(process.cwd))
 
   assert.deepStrictEqual(updated, expected)
   assert.deepStrictEqual(reverted, Array(3).fill(cwd))

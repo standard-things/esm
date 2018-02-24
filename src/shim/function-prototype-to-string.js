@@ -1,9 +1,8 @@
 import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
+import getProxyDetails from "../util/get-proxy-details.js"
 import isOwnProxy from "../util/is-own-proxy.js"
-import noop from "../util/noop.js"
-import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 const checked =
@@ -47,10 +46,16 @@ const Shim = {
     const toString = function () {
       let thisArg = this
 
-      if (thisArg === toStringThis) {
+      if (thisArg === toString) {
         thisArg = _toString
       } else if (isOwnProxy(thisArg)) {
-        return nativeSourceText
+        const details = getProxyDetails(thisArg)
+
+        if (details) {
+          thisArg = details[0]
+        } else {
+          return nativeSourceText
+        }
       }
 
       return call(_toString, thisArg)
@@ -59,27 +64,13 @@ const Shim = {
     toString.prototype = void 0
     Object.setPrototypeOf(toString, funcProto)
 
-    let toStringThis = toString
-
     try {
       if (! shared.support.proxiedFunctions) {
         funcProto.toString = toString
         return
       }
 
-      const nativeNoop = noop.bind()
-
-      setProperty(nativeNoop, "name", {
-        enumerable: false,
-        value: "toString",
-        writable: false
-      })
-
-      Object.setPrototypeOf(nativeNoop, funcProto)
-
-      toStringThis = nativeNoop
-
-      funcProto.toString = new OwnProxy(nativeNoop, {
+      funcProto.toString = new OwnProxy(_toString, {
         __proto__: null,
         apply(target, thisArg, args) {
           return Reflect.apply(toString, thisArg, args)
