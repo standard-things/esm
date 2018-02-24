@@ -1,6 +1,9 @@
 import captureStackTrace from "../error/capture-stack-trace.js"
+import shared from "../shared.js"
 
-const PREFIX = "(" + process.release.name + ":" + process.pid + ") "
+const { pid, release } = shared.process
+
+const PREFIX = "(" + release.name + ":" + pid + ") "
 
 const ExError = __external__.Error
 

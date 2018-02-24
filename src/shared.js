@@ -1,10 +1,16 @@
 import { inspect, promisify, types } from "util"
 
+import PREFIX from "./constant/prefix.js"
+
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import md5 from "./util/md5.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
+
+const {
+  STD_ESM
+} = PREFIX
 
 let shared
 
@@ -19,9 +25,9 @@ if (__shared__) {
 
   const symbol = {
     __proto__: null,
-    _compile: Symbol.for("@std/esm:module._compile"),
-    mjs: Symbol.for('@std/esm:Module._extensions[".mjs"]'),
-    wrapper: Symbol.for("@std/esm:wrapper")
+    _compile: Symbol.for(STD_ESM + ":module._compile"),
+    mjs: Symbol.for(STD_ESM + ':Module._extensions[".mjs"]'),
+    wrapper: Symbol.for(STD_ESM + ":wrapper")
   }
 
   shared = {
@@ -58,6 +64,11 @@ if (__shared__) {
     process: {
       __proto__: null,
       dlopen: process.dlopen,
+      pid: process.pid,
+      release: {
+        __proto__: null,
+        name: process.release.name
+      },
       version: process.version,
       versions: {
         __proto__: null,
@@ -146,11 +157,11 @@ if (__shared__) {
   )
 
   setDeferred(support, "inspectProxies", () => {
-    const proxy = new Proxy({ __proto__: null }, { "@std/esm": 1, "__proto__": null })
+    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [STD_ESM]: 1 })
     const inspected = inspect(proxy, { __proto__: null, showProxy: true })
 
-    return inspected.startsWith("Proxy: ") &&
-      inspected.indexOf("@std/esm") !== -1
+    return inspected.startsWith("Proxy") &&
+      inspected.indexOf(STD_ESM) !== -1
   })
 
   setDeferred(support, "internalModuleReadFile", () =>
@@ -220,7 +231,7 @@ if (__shared__) {
 
     return symbols.length
       ? symbols[0]
-      : Symbol.for("@std/esm:errorCode")
+      : Symbol.for(STD_ESM + ":errorCode")
   })
 }
 

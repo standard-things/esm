@@ -1,5 +1,11 @@
+import PREFIX from "../constant/prefix.js"
+
 import shared from "../shared.js"
 import toNullObject from "../util/to-null-object.js"
+
+const {
+  STD_ESM
+} = PREFIX
 
 function init() {
   class OwnProxy {
@@ -7,7 +13,7 @@ function init() {
 
     constructor(target, handler) {
       handler = toNullObject(handler)
-      handler["@std/esm"] = 1
+      handler[STD_ESM + ":proxy"] = 1
 
       const proxy = new Proxy(target, handler)
       OwnProxy.instances.add(proxy)
