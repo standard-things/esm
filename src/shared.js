@@ -27,10 +27,6 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
-    builtin: { __proto__: null },
-    decodeURI,
-    decodeURIComponent,
-    encodeURI,
     entry: {
       __proto__: null,
       cache: new WeakMap,
@@ -71,6 +67,7 @@ if (__shared__) {
     },
     readPackage: { __proto__: null },
     resolveFilename: { __proto__: null },
+    safe: { __proto__: null },
     satisfies: { __proto__: null },
     shim: { __proto__: null },
     support,

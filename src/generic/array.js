@@ -1,4 +1,4 @@
-import SafeArray from "../builtin/array.js"
+import SafeArray from "../safe/array.js"
 
 import shared from "../shared.js"
 import unapply from "../util/unapply.js"

@@ -1,4 +1,4 @@
-import SafeBuffer from "../builtin/buffer.js"
+import SafeBuffer from "../safe/buffer.js"
 
 import shared from "../shared.js"
 import unapply from "../util/unapply.js"

@@ -6,7 +6,7 @@ import Runtime from "../runtime.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
-import encodeURI from "../builtin/encode-uri.js"
+import encodeURI from "../util/encode-uri.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"

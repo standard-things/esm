@@ -1,5 +1,5 @@
-import decodeURI from "../builtin/decode-uri.js"
-import encodeURI from "../builtin/encode-uri.js"
+import decodeURI from "../util/decode-uri.js"
+import encodeURI from "../util/encode-uri.js"
 
 const queryHashRegExp = /[?#].*$/
 

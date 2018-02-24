@@ -1,4 +1,4 @@
-import SafeJSON from "../builtin/json.js"
+import SafeJSON from "../safe/json.js"
 
 import readFileFast from "../fs/read-file-fast.js"
 import { readFileSync } from "fs"

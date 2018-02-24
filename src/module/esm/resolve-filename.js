@@ -2,7 +2,7 @@ import CHAR_CODES from "../../char-codes.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
-import decodeURIComponent from "../../builtin/decode-uri-component.js"
+import decodeURIComponent from "../../util/decode-uri-component.js"
 import errors from "../../errors.js"
 import { extname } from "path"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
