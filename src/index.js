@@ -75,8 +75,8 @@ if (shared.inited) {
   exported = shared
   exported.inited = true
 
-  const context = Function("return this")()
-  Shim.enable(context)
+  Shim.enable(Function("return this")())
+  Shim.enable(shared.global)
 
   if (isCheck()) {
     vmHook(vm)
