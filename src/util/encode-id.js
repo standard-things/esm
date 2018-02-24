@@ -1,8 +1,8 @@
-import CHARS from "../chars.js"
+import CHAR from "../constant/char.js"
 
 const {
   ZWJ
-} = CHARS
+} = CHAR
 
 function encodeId(id) {
   return id + ZWJ

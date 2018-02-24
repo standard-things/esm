@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-const CHAR_CODES = {
+const CHAR_CODE = {
   __proto__: null,
   HT: 9,
   EXMARK: 33,
@@ -21,4 +21,4 @@ const CHAR_CODES = {
   BOM: 65279
 }
 
-export default CHAR_CODES
+export default CHAR_CODE

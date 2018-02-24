@@ -4,7 +4,7 @@
 
 import { isAbsolute, resolve } from "path"
 
-import CHAR_CODES from "../char-codes.js"
+import CHAR_CODE from "../constant/char-code.js"
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
@@ -18,7 +18,7 @@ import stat from "../fs/stat.js"
 const {
   BSLASH,
   SLASH
-} = CHAR_CODES
+} = CHAR_CODE
 
 const mainFieldRegExp = /"main"/
 const { preserveSymlinks } = binding.config

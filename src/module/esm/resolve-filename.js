@@ -1,4 +1,4 @@
-import CHAR_CODES from "../../char-codes.js"
+import CHAR_CODE from "../../constant/char-code.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
@@ -17,7 +17,7 @@ import shared from "../../shared.js"
 
 const {
   SLASH
-} = CHAR_CODES
+} = CHAR_CODE
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/

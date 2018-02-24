@@ -1,4 +1,4 @@
-import CHAR_CODES from "../char-codes.js"
+import CHAR_CODE from "../constant/char-code.js"
 
 import shared from "../shared.js"
 
@@ -6,7 +6,7 @@ const {
   BSLASH,
   PERIOD,
   SLASH
-} = CHAR_CODES
+} = CHAR_CODE
 
 function isRelativePath(value) {
   if (typeof value !== "string") {

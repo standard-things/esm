@@ -1,8 +1,8 @@
-import CHAR_CODES from "../char-codes.js"
+import CHAR_CODE from "../constant/char-code.js"
 
 const {
   PERIOD
-} = CHAR_CODES
+} = CHAR_CODE
 
 function findIndexes(code, identifiers) {
   const indexes = []

@@ -1,4 +1,4 @@
-import CHARS from "../chars.js"
+import CHAR from "../constant/char.js"
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
@@ -11,7 +11,7 @@ import setProperty from "../util/set-property.js"
 
 const {
   ZWJ
-} = CHARS
+} = CHAR
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/

@@ -1,4 +1,4 @@
-import CHAR_CODES from "../char-codes.js"
+import CHAR_CODE from "../constant/char-code.js"
 
 import decodeURIComponent from "../util/decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
@@ -10,7 +10,7 @@ import shared from "../shared.js"
 const {
   COLON,
   SLASH
-} = CHAR_CODES
+} = CHAR_CODE
 
 const localhostRegExp = /^\/\/localhost\b/
 

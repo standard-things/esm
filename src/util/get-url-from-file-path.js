@@ -2,14 +2,14 @@
 // Copyright Sindre Sorhus. Released under MIT license:
 // https://github.com/sindresorhus/file-url
 
-import CHAR_CODES from "../char-codes.js"
+import CHAR_CODE from "../constant/char-code.js"
 
 import encodeURI from "../util/encode-uri.js"
 import normalize from "../path/normalize.js"
 
 const {
   SLASH
-} = CHAR_CODES
+} = CHAR_CODE
 
 const encodeCharsRegExp = /[?#]/g
 

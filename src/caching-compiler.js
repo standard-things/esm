@@ -1,4 +1,4 @@
-import CHAR_CODES from "./char-codes.js"
+import CHAR_CODE from "./constant/char-code.js"
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
@@ -13,7 +13,7 @@ import writeFile from "./fs/write-file.js"
 
 const {
   PERIOD
-} = CHAR_CODES
+} = CHAR_CODE
 
 const CachingCompiler = {
   __proto__: null,
