@@ -9,14 +9,14 @@ const {
 
 function init() {
   class OwnProxy {
-    static instances = new WeakSet
+    static instances = new WeakMap
 
     constructor(target, handler) {
       handler = toNullObject(handler)
       handler[STD_ESM + ":proxy"] = 1
 
       const proxy = new Proxy(target, handler)
-      OwnProxy.instances.add(proxy)
+      OwnProxy.instances.set(proxy, [target, handler])
       return proxy
     }
   }
