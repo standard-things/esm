@@ -48,6 +48,7 @@ if (__shared__) {
     globalName,
     inited: false,
     maxSatisfying: { __proto__: null },
+    ownProxy: new WeakSet,
     package: {
       __proto__: null,
       cache: { __proto__: null },
@@ -156,8 +157,7 @@ if (__shared__) {
   )
 
   setDeferred(support, "isProxy", () =>
-    types != null &&
-      typeof types.isProxy === "function"
+    typeof (types && types.isProxy) === "function"
   )
 
   setDeferred(support, "proxiedClasses", () => {

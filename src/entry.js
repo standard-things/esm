@@ -1,5 +1,6 @@
 import ExportProxy from "./export-proxy.js"
 import GenericArray from "./generic/array.js"
+import OwnProxy from "./builtin/proxy.js"
 import Package from "./package.js"
 
 import assign from "./util/assign.js"
@@ -551,7 +552,7 @@ function toNamespace(entry, source = entry._namespace) {
     namespace[name] = void 0
   }
 
-  return new Proxy(Object.seal(namespace), {
+  return new OwnProxy(Object.seal(namespace), {
     __proto__: null,
     get: (namespace, name) => {
       return name === Symbol.toStringTag

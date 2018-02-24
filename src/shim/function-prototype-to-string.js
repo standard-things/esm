@@ -1,5 +1,7 @@
+import OwnProxy from "../builtin/proxy.js"
+
 import call from "../util/call.js"
-import isProxy from "../util/is-proxy.js"
+import isOwnProxy from "../util/is-own-proxy.js"
 import noop from "../util/noop.js"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
@@ -21,7 +23,7 @@ const Shim = {
 
       try {
         const { toString } = funcProto
-        const proxy = new Proxy(toString, { __proto__: null })
+        const proxy = new OwnProxy(toString, { __proto__: null })
 
         result = typeof toString.call(proxy) === "string"
       } catch (e) {}
@@ -47,7 +49,7 @@ const Shim = {
 
       if (thisArg === toStringThis) {
         thisArg = _toString
-      } else if (isProxy(thisArg)) {
+      } else if (isOwnProxy(thisArg)) {
         return nativeSourceText
       }
 
@@ -65,7 +67,6 @@ const Shim = {
         return
       }
 
-      const { apply, construct } = Reflect
       const nativeNoop = noop.bind()
 
       setProperty(nativeNoop, "name", {
@@ -78,13 +79,13 @@ const Shim = {
 
       toStringThis = nativeNoop
 
-      funcProto.toString = new Proxy(nativeNoop, {
+      funcProto.toString = new OwnProxy(nativeNoop, {
         __proto__: null,
         apply(target, thisArg, args) {
-          return apply(toString, thisArg, args)
+          return Reflect.apply(toString, thisArg, args)
         },
         construct(target, args) {
-          return construct(toString, args)
+          return Reflect.construct(toString, args)
         }
       })
 

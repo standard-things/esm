@@ -1,8 +1,9 @@
-import bind from "./util/bind.js"
+import OwnProxy from "./builtin/proxy.js"
+
 import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
-import setProperty from "./util/set-property.js"
+import noop from "./util/noop.js"
 import shared from "./shared.js"
 
 const { toString } = Object.prototype
@@ -35,7 +36,7 @@ class ExportProxy {
 
     const { unwrap, wrap } = cache
 
-    const proxy = new Proxy(exported, {
+    const proxy = new OwnProxy(exported, {
       __proto__: null,
       get(target, name, receiver) {
         let value = Reflect.get(target, name, receiver)
@@ -56,40 +57,25 @@ class ExportProxy {
           return wrapper
         }
 
-        wrapper = function (...args) {
-          if (new.target) {
-            return Reflect.construct(value, args, new.target)
+        const nativeNoop = noop.bind()
+
+        wrapper = new OwnProxy(nativeNoop, {
+          __proto__: null,
+          apply(funcTarget, thisArg, args) {
+            if (thisArg === proxy ||
+                thisArg === entry.esmNamespace) {
+              thisArg = target
+            }
+
+            return Reflect.apply(value, thisArg, args)
+          },
+          construct(target, args) {
+            return Reflect.construct(value, args)
+          },
+          get(target, name) {
+            return Reflect.get(value, name)
           }
-
-          let thisArg = this
-
-          if (thisArg === proxy ||
-              thisArg === entry.esmNamespace) {
-            thisArg = target
-          }
-
-          return Reflect.apply(value, thisArg, args)
-        }
-
-        setProperty(wrapper, "length", {
-          enumerable: false,
-          value: value.length,
-          writable: false
         })
-
-        setProperty(wrapper, "name", {
-          enumerable: false,
-          value: value.name,
-          writable: false
-        })
-
-        setProperty(wrapper, "toString", {
-          enumerable: false,
-          value: bind(value.toString, value)
-        })
-
-        wrapper.prototype = value.prototype
-        Object.setPrototypeOf(wrapper, value)
 
         wrap.set(value, wrapper)
         unwrap.set(wrapper, value)
