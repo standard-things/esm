@@ -2,7 +2,7 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 import GenericArray from "../generic/array.js"
 
 import { resolve } from "path"
@@ -12,7 +12,7 @@ const {
   BSLASH,
   COLON,
   SLASH
-} = ASCII
+} = CHAR_CODES
 
 const ExArray = __external__.Array
 

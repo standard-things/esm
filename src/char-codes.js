@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-const ASCII = {
+const CHAR_CODES = {
   __proto__: null,
   HT: 9,
   EXMARK: 33,
@@ -17,7 +17,8 @@ const ASCII = {
   QMARK: 63,
   AT: 64,
   BSLASH: 92,
-  LBRACE: 123
+  LBRACE: 123,
+  BOM: 65279
 }
 
-export default ASCII
+export default CHAR_CODES

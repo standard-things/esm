@@ -1,4 +1,4 @@
-import ASCII from "../../ascii.js"
+import CHAR_CODES from "../../char-codes.js"
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"
@@ -17,7 +17,7 @@ import shared from "../../shared.js"
 
 const {
   SLASH
-} = ASCII
+} = CHAR_CODES
 
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/

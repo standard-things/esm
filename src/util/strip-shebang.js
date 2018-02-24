@@ -1,8 +1,8 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 const {
   NUMSIGN
-} = ASCII
+} = CHAR_CODES
 
 const shebangRegExp = /^#!.*/
 

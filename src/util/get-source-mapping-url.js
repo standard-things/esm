@@ -1,7 +1,7 @@
 // Inspired by `findMagicComment` in
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc.
 
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 const {
   APOSTROPHE,
@@ -12,7 +12,7 @@ const {
   QUOTE,
   SPACE,
   SLASH
-} = ASCII
+} = CHAR_CODES
 
 const name = "sourceMappingURL"
 const nameLength = name.length

@@ -1,8 +1,8 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 const {
   QUOTE
-} = ASCII
+} = CHAR_CODES
 
 const escapedDoubleQuoteRegExp = /\\"/g
 

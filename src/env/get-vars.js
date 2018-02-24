@@ -1,4 +1,4 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 import isPath from "../util/is-path.js"
 import parseJSON6 from "../util/parse-json6.js"
@@ -10,7 +10,7 @@ const {
   APOSTROPHE,
   LBRACE,
   QUOTE
-} = ASCII
+} = CHAR_CODES
 
 function getVars() {
   const { env } = shared

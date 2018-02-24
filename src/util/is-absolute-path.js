@@ -1,4 +1,4 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 import { isAbsolute as _isAbsolutePath } from "path"
 import shared from "../shared.js"
@@ -8,7 +8,7 @@ const {
   PERIOD,
   QMARK,
   SLASH
-} = ASCII
+} = CHAR_CODES
 
 function isAbsolutePath(value) {
   if (typeof value !== "string") {

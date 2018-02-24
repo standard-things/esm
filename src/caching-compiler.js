@@ -1,4 +1,4 @@
-import ASCII from "./ascii.js"
+import CHAR_CODES from "./char-codes.js"
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
@@ -13,7 +13,7 @@ import writeFile from "./fs/write-file.js"
 
 const {
   PERIOD
-} = ASCII
+} = CHAR_CODES
 
 const CachingCompiler = {
   __proto__: null,

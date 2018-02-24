@@ -1,8 +1,8 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 const {
   PERIOD
-} = ASCII
+} = CHAR_CODES
 
 function findIndexes(code, identifiers) {
   const indexes = []

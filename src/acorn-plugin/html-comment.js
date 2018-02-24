@@ -1,4 +1,4 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 import acorn from "../acorn.js"
 import wrap from "../util/wrap.js"
@@ -8,7 +8,7 @@ const {
   GT,
   HYPHEN,
   LT
-} = ASCII
+} = CHAR_CODES
 
 const htmlErrorMessage = "HTML comments are not allowed in modules"
 

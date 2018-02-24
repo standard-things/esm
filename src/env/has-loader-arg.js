@@ -1,4 +1,4 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 import GenericArray from "../generic/array.js"
 
 import hasLoaderValue from "./has-loader-value.js"
@@ -6,7 +6,7 @@ import parseJSON from "../util/parse-json.js"
 
 const {
   LBRACE
-} = ASCII
+} = CHAR_CODES
 
 function hasLoaderArg(args) {
   if (! Array.isArray(args)) {

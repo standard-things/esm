@@ -1,6 +1,6 @@
 import { extname, resolve } from "path"
 
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
@@ -11,7 +11,7 @@ import rootModule from "../root-module.js"
 
 const {
   HYPHEN
-} = ASCII
+} = CHAR_CODES
 
 const stdFilename = __non_webpack_module__.filename
 

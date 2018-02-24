@@ -1,6 +1,6 @@
 import { basename, dirname , extname, resolve } from "path"
 
-import ASCII from "./ascii.js"
+import CHAR_CODES from "./char-codes.js"
 
 import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
@@ -25,7 +25,7 @@ import { version } from "./version.js"
 
 const {
   PERIOD
-} = ASCII
+} = CHAR_CODES
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"

@@ -1,4 +1,4 @@
-import ASCII from "../ascii.js"
+import CHAR_CODES from "../char-codes.js"
 
 import shared from "../shared.js"
 
@@ -6,7 +6,7 @@ const {
   BSLASH,
   PERIOD,
   SLASH
-} = ASCII
+} = CHAR_CODES
 
 function isRelativePath(value) {
   if (typeof value !== "string") {
