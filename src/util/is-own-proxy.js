@@ -1,3 +1,4 @@
+import OwnProxy from "../own/proxy.js"
 import PREFIX from "../constant/prefix.js"
 
 import { inspect } from "util"
@@ -25,7 +26,7 @@ function isOwnProxy(value) {
     return false
   }
 
-  if (shared.own.Proxy.instances.has(value)) {
+  if (OwnProxy.instances.has(value)) {
     return true
   }
 
