@@ -58,7 +58,7 @@ class Entry {
     this.package = Package.from(mod)
     // The namespace object ESM importers receive.
     this.esmNamespace = this._namespace
-    // The initial `module.exports` value.
+    // The temporary store of the initial `module.exports` value.
     this.exports = null
     // Getters for local variables exported by the module.
     this.getters = { __proto__: null }
