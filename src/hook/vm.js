@@ -6,6 +6,7 @@ import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
+import binding from "../binding.js"
 import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
@@ -30,6 +31,18 @@ const ExObject = __external__.Object
 function hook(vm) {
   let entry
   const pkg = Package.get("")
+
+  const builtinModules = [
+    "assert", "async_hooks", "buffer", "child_process", "cluster", "crypto",
+    "dgram", "dns", "domain", "events", "fs", "http", "http2", "https", "net",
+    "os", "path", "perf_hooks", "punycode", "querystring", "readline", "repl",
+    "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
+  ]
+
+  if (typeof binding.inspector.connect === "function") {
+    builtinModules.push("inspector")
+    builtinModules.sort()
+  }
 
   function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkg.range)
@@ -87,6 +100,7 @@ function hook(vm) {
         "if(e&&!g[k]){" +
           "m.exports=e.entry.exports;" +
           "require=e.entry.require;" +
+          "e.entry.addBuiltinModules(g);" +
           "Object.defineProperty(g,k,{" +
             "__proto__:null," +
             "value:e" +
@@ -106,8 +120,33 @@ function hook(vm) {
     return result
   }
 
+  function addBuiltinModules(context) {
+    for (const name of builtinModules) {
+      const set = (value) => {
+        setProperty(context, name, { value })
+      }
+
+      setProperty(context, name, {
+        enumerable: false,
+        get() {
+          const exported = entry.require(name)
+
+          setProperty(context, name, {
+            enumerable: false,
+            get: () => exported,
+            set
+          })
+
+          return exported
+        },
+        set
+      })
+    }
+  }
+
   function initEntry(mod) {
     entry = Entry.get(mod)
+    entry.addBuiltinModules = addBuiltinModules
     entry.package = pkg
     entry.require = makeRequireFunction(mod)
     entry.runtimeName = shared.globalName

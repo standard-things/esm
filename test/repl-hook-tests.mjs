@@ -34,6 +34,9 @@ describe("repl hook", () => {
     const code = 'import { default as globalAssert } from "assert"'
     const entry = Entry.get(r.context.module)
 
+    entry.addBuiltinModules = () => {}
+    entry.require = require
+    entry.runtimeName = "_"
     Runtime.enable(entry, {})
 
     assert.strictEqual(typeof globalAssert, "undefined")
