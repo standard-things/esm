@@ -33,48 +33,58 @@ class ExportProxy {
       shared.exportProxy.set(exported, cache)
     }
 
-    const { unwrap, wrap } = cache
+    const maybeWrap = (target, name, value) => {
+      if (name === Symbol.toStringTag &&
+          typeof value !== "string") {
+        value = toString.call(target).slice(8, -1)
+      }
+
+      if (typeof value !== "function" ||
+          ! isNative(value)) {
+        return value
+      }
+
+      let wrapper = cache.wrap.get(value)
+
+      if (wrapper) {
+        return wrapper
+      }
+
+      wrapper = new OwnProxy(value, {
+        __proto__: null,
+        apply(funcTarget, thisArg, args) {
+          if (thisArg === proxy ||
+              thisArg === entry.esmNamespace) {
+            thisArg = target
+          }
+
+          return Reflect.apply(value, thisArg, args)
+        }
+      })
+
+      cache.wrap.set(value, wrapper)
+      cache.unwrap.set(wrapper, value)
+
+      return wrapper
+    }
 
     const proxy = new OwnProxy(exported, {
       __proto__: null,
       get(target, name, receiver) {
-        let value = Reflect.get(target, name, receiver)
+        return maybeWrap(target, name, Reflect.get(target, name, receiver))
+      },
+      getOwnPropertyDescriptor(target, name) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (name === Symbol.toStringTag &&
-            typeof value !== "string") {
-          value = toString.call(target).slice(8, -1)
+        if (descriptor &&
+            "value" in descriptor) {
+          descriptor.value = maybeWrap(target, name, descriptor.value)
         }
 
-        if (typeof value !== "function" ||
-            ! isNative(value)) {
-          return value
-        }
-
-        let wrapper = wrap.get(value)
-
-        if (wrapper) {
-          return wrapper
-        }
-
-        wrapper = new OwnProxy(value, {
-          __proto__: null,
-          apply(funcTarget, thisArg, args) {
-            if (thisArg === proxy ||
-                thisArg === entry.esmNamespace) {
-              thisArg = target
-            }
-
-            return Reflect.apply(value, thisArg, args)
-          }
-        })
-
-        wrap.set(value, wrapper)
-        unwrap.set(wrapper, value)
-
-        return wrapper
+        return descriptor
       },
       set(target, name, value, receiver) {
-        Reflect.set(target, name, unwrap.get(value) || value, receiver)
+        Reflect.set(target, name, cache.unwrap.get(value) || value, receiver)
         entry.update()
         return true
       }
