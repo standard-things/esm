@@ -2,16 +2,11 @@ import assert from "assert"
 import vm from "vm"
 
 let canUseAsyncGenerators = false
-let canUseDestructuring = false
 let canUseForAwaitOf = false
 let canUseObjectRestSpread = false
 
 try {
   canUseAsyncGenerators = !! new vm.Script("async function*x(){}")
-} catch (e) {}
-
-try {
-  canUseDestructuring = !! new vm.Script("[]=[]")
 } catch (e) {}
 
 try {
@@ -63,15 +58,14 @@ describe("export declarations", () => {
       .then((ns) => ns.default())
   )
 
-  ;(canUseAsyncGenerators ? it : xit)(
-  "should support async generators syntax", () =>
-    import("./export/async-generators.mjs")
+  it("should support destructuring syntax", () =>
+    import("./export/destructuring.mjs")
       .then((ns) => ns.default())
   )
 
-  ;(canUseDestructuring ? it : xit)(
-  "should support destructuring syntax", () =>
-    import("./export/destructuring.mjs")
+  ;(canUseAsyncGenerators ? it : xit)(
+  "should support async generators syntax", () =>
+    import("./export/async-generators.mjs")
       .then((ns) => ns.default())
   )
 
