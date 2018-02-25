@@ -87,20 +87,12 @@ if (__shared__) {
   }
 
   setDeferred(shared, "arrowSymbol", () => {
-    if (satisfies(shared.process.version, "<6.0.0")) {
-      return "arrowMessage"
-    }
-
     return satisfies(shared.process.version, "<7.0.0")
       ? "node:arrowMessage"
       : binding.util.arrow_message_private_symbol
   })
 
   setDeferred(shared, "decoratedSymbol", () => {
-    if (satisfies(shared.process.version, "<6.0.0")) {
-      return
-    }
-
     return satisfies(shared.process.version, "<7.0.0")
       ? "node:decorated"
       : binding.util.decorated_private_symbol
