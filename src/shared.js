@@ -49,6 +49,7 @@ if (__shared__) {
     global,
     globalName,
     inited: false,
+    inspect,
     maxSatisfying: { __proto__: null },
     own: { __proto__: null },
     package: {
@@ -158,7 +159,7 @@ if (__shared__) {
 
   setDeferred(support, "inspectProxies", () => {
     const proxy = new Proxy({ __proto__: null }, { __proto__: null, [STD_ESM]: 1 })
-    const inspected = inspect(proxy, { __proto__: null, showProxy: true })
+    const inspected = shared.inspect(proxy, { __proto__: null, showProxy: true })
 
     return inspected.startsWith("Proxy") &&
       inspected.indexOf(STD_ESM) !== -1

@@ -1,7 +1,6 @@
 import OwnProxy from "../own/proxy.js"
 import PREFIX from "../constant/prefix.js"
 
-import { inspect } from "util"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
@@ -31,7 +30,7 @@ function isOwnProxy(value) {
   }
 
   if (shared.support.inspectProxies) {
-    const inspected = inspect(value, inspectOptions)
+    const inspected = shared.inspect(value, inspectOptions)
 
     return inspected.startsWith("Proxy") &&
       inspected.endsWith("'" + STD_ESM + ":proxy': 1 } ]")
