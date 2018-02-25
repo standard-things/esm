@@ -1,2 +1,2 @@
-import "./modules/dual"
-import "./modules/cjs"
+import "./dual"
+import "./cjs"
