@@ -79,13 +79,11 @@ describe("scenarios", function () {
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
-    const nycArgs = [
+    return exec("nyc", [
       "--cwd", dirPath,
       "-i", cwdPath,
       "ava", avaPattern
-    ]
-
-    return exec("nyc", nycArgs)
+    ])
   })
 
   it("should work with ava, nyc, and tsc", () => {
@@ -111,15 +109,13 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/babel-flow")])
   )
 
-  it("should work with babel and plugins (flag)", () => {
-    const nodeArgs = [
+  it("should work with babel and plugins (flag)", () =>
+    exec(nodePath, [
       "-r", pkgPath,
       "-r", "@babel/register",
       path.resolve(testPath, "fixture/scenario/babel-flow")
-    ]
-
-    return exec(nodePath, nodeArgs)
-  })
+    ])
+  )
 
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
@@ -159,12 +155,10 @@ describe("scenarios", function () {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
     const configPath = path.resolve(dirPath, "jest.config.json")
 
-    const jestArgs = [
+    return exec("jest", [
       "--config", configPath,
       "--rootDir", dirPath
-    ]
-
-    return exec("jest", jestArgs)
+    ])
   })
 
   ;(canTestPM2 ? it : xit)(
