@@ -2,9 +2,6 @@
   "name": "ava-nyc",
   "private": true,
   "ava": {
-    "files": [
-      "test.js"
-    ],
     "require": [
       "../../../../"
     ]
