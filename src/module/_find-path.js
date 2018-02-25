@@ -5,13 +5,13 @@
 import { isAbsolute, resolve } from "path"
 
 import CHAR_CODE from "../constant/char-code.js"
-import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
 import binding from "../binding.js"
 import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
+import safeToString from "../util/safe-to-string.js"
 import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
@@ -34,9 +34,8 @@ function findPath(request, paths, isMain, searchExts) {
 
   const cacheKey =
     request + "\0" +
-    (paths.length === 1
-      ? paths[0]
-      : GenericArray.join(paths, "\0"))
+    safeToString(paths) +
+    (searchExts ? "\0" + safeToString(searchExts) : "")
 
   if (cacheKey in cache) {
     return cache[cacheKey]

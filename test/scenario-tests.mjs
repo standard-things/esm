@@ -27,7 +27,19 @@ describe("scenarios", function () {
   )
 
   it("should work with dual packages", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/dual")])
+    [
+      "index.js",
+      "index.mjs"
+    ]
+    .reduce((promise, basename) =>
+      promise
+        .then(() =>
+          exec(nodePath, [
+            "-r", pkgPath,
+            path.resolve(testPath, "fixture/scenario/dual", basename)
+          ])
+        )
+    , Promise.resolve())
   )
 
   it("should work with esmod-pmb", () =>

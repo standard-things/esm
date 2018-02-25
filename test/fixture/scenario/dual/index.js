@@ -1,4 +1,2 @@
-"use strict"
-
-require = require("../../../../")(module)
-require("./main.js")
+import "./dual"
+import "./cjs"
