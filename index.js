@@ -59,12 +59,18 @@ function compileESM() {
 
   if (changed) {
     if (scriptData) {
-      if (! existsSync(nodeModulesPath)) {
-        mkdirSync(nodeModulesPath)
-        mkdirSync(cachePath)
+      let canWrite = false
+
+      if (existsSync(nodeModulesPath)) {
+        canWrite = true
+      } else if (mkdir(nodeModulesPath) &&
+          mkdir(cachePath)) {
+        canWrite = true
       }
 
-      writeFile(cacheFilename, scriptData)
+      if (canWrite) {
+        writeFile(cacheFilename, scriptData)
+      }
     } else {
       removeFile(cacheFilename)
     }
@@ -90,6 +96,15 @@ function md5(string) {
   return createHash("md5")
     .update(string)
     .digest("hex")
+}
+
+function mkdir(dirPath) {
+  try {
+    mkdirSync(dirPath)
+    return true
+  } catch (e) {}
+
+  return false
 }
 
 function readFile(filename, options) {
