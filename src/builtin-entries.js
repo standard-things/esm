@@ -5,12 +5,12 @@ import OwnProxy from "./own/proxy.js"
 
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
-import getProxyDetails from "./util/get-proxy-details.js"
 import has from "./util/has.js"
-import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
+import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
+import unwrapProxy from "./util/unwrap-proxy.js"
 
 const ExObject = __external__.Object
 
@@ -28,20 +28,15 @@ function init() {
     }
 
     exported.inspect = new OwnProxy(source.inspect, {
-      __proto__: null,
       apply(target, thisArg, args) {
-        const [value] = args
-
-        if (isOwnProxy(value)) {
-          const details = getProxyDetails(value)
-
-          if (details) {
-            args[0] = details[0]
-          }
-        }
-
+        args[0] = unwrapProxy(args[0])
         return Reflect.apply(target, thisArg, args)
       }
+    })
+
+    setProperty(exported, shared.symbol.inspect, {
+      enumerable: false,
+      value: true
     })
 
     return exported
@@ -62,8 +57,7 @@ function init() {
 
   for (const id of builtinModules) {
     setDeferred(builtinEntries, id, () => {
-      const mod = new Module(id, null)
-      const rawExports = __non_webpack_require__(id)
+      const rawExports = unwrapProxy(__non_webpack_require__(id))
       let exported = rawExports
 
       if (id === "module") {
@@ -75,6 +69,7 @@ function init() {
         exported = createVMExports(exported)
       }
 
+      const mod = new Module(id, null)
       const entry = Entry.get(mod)
 
       entry.rawExports = rawExports
