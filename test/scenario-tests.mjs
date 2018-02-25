@@ -22,6 +22,46 @@ function exec(filename, args) {
 describe("scenarios", function () {
   this.timeout(0)
 
+  it("should work with ava", () =>
+    exec("ava", [path.resolve(testPath, "fixture/scenario/ava/test.js")])
+  )
+
+  it("should work with dual packages", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/dual")])
+  )
+
+  it("should work with esmod-pmb", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
+  )
+
+  it("should work with express", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
+  )
+
+  it("should work with global-prefix", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
+  )
+
+  it("should work with native modules", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
+  )
+
+  it("should work with nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
+
+    const nycArgs = [
+      "--cwd", dirPath,
+      "-i", pkgPath,
+      nodePath, dirPath
+    ]
+
+    return exec("nyc", nycArgs)
+  })
+
+  it("should work with postcss", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
+  )
+
   it("should work with ava and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
@@ -101,42 +141,6 @@ describe("scenarios", function () {
       .then(() => exec("nyc", nycArgs))
       .then(() => fs.removeSync(".esmrc"))
   })
-
-  it("should work with dual packages", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/dual")])
-  )
-
-  it("should work with esmod-pmb", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
-  )
-
-  it("should work with express", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
-  )
-
-  it("should work with global-prefix", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
-  )
-
-  it("should work with native modules", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
-  )
-
-  it("should work with nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
-
-    const nycArgs = [
-      "--cwd", dirPath,
-      "-i", pkgPath,
-      nodePath, dirPath
-    ]
-
-    return exec("nyc", nycArgs)
-  })
-
-  it("should work with postcss", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
-  )
 
   ;(canTestJest ? it : xit)(
   "should work with jest and mock-require", () => {

@@ -15,6 +15,7 @@ import setGetter from "./util/set-getter.js"
 import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
+import unwrapProxy from "./util/unwrap-proxy.js"
 import warn from "./warn.js"
 
 const GETTER_ERROR = { __proto__: null }
@@ -223,31 +224,36 @@ class Entry {
     const cached = this.package.cache.compile[this.cacheName]
     const isESM = cached && cached.esm
 
-    let setGetters = true
+    let setNsGetters = true
+    let exported = this.module.exports
 
-    if (isESM) {
-      const exported = this.module.exports
+    if (isESM &&
+        ! Object.isSealed(exported)) {
+      const { _namespace } = this
 
-      if (! Object.isSealed(exported)) {
-        for (const name in this._namespace) {
-          setGetter(exported, name, () => {
-            return this._namespace[name]
-          })
-        }
-      }
+      const isPseudo =
+        this.package.options.cjs.interop &&
+        ! has(_namespace, "__esModule")
 
-      if (this.package.options.cjs.interop &&
-          ! has(exported, "__esModule")) {
+      if (isPseudo) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
 
+      for (const name in _namespace) {
+        setGetter(exported, name, () => this._namespace[name])
+
+        if (isPseudo) {
+          _namespace[name] = unwrapProxy(_namespace[name])
+        }
+      }
+
       Object.seal(exported)
-    } else {
+    } else if (! isESM) {
       const oldMod = this.module
       const oldExported = oldMod.exports
       const newEntry = Entry.get(this.module)
 
-      setGetters = newEntry._loaded !== 1
+      setNsGetters = newEntry._loaded !== 1
 
       this.merge(newEntry)
 
@@ -271,7 +277,7 @@ class Entry {
 
     assignExportsToNamespace(this)
 
-    if (setGetters) {
+    if (setNsGetters) {
       setDeferred(this, "cjsNamespace", () =>
         toNamespace(this, { default: this.module.exports })
       )
@@ -369,9 +375,7 @@ function assignExportsToNamespace(entry) {
       _namespace[name] = exported[name]
     } else if (! (skipDefault && name === "default") &&
         ! has(_namespace, name)) {
-      setGetter(_namespace, name, () => {
-        return exported[name]
-      })
+      setGetter(_namespace, name, () => exported[name])
 
       setSetter(_namespace, name, (value) => {
         exported[name] = value
