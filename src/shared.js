@@ -128,9 +128,14 @@ if (__shared__) {
     typeof binding.fs.internalModuleStat === "function"
   )
 
-  setDeferred(support, "await", () =>
-    satisfies(shared.process.version, ">=7.6.0")
-  )
+  setDeferred(support, "await", () => {
+    try {
+      Function("async()=>await 1")()
+      return true
+    } catch (e) {}
+
+    return false
+  })
 
   setDeferred(support, "blockScopedDeclarations", () => {
     try {
