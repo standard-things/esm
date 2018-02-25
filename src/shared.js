@@ -34,6 +34,10 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
+    cjs: {
+      __proto__: null,
+      resolveFilename: { __proto__: null }
+    },
     entry: {
       __proto__: null,
       cache: new WeakMap,
@@ -42,6 +46,10 @@ if (__shared__) {
     env: {
       __proto__: null,
       win32: process.platform === "win32"
+    },
+    esm: {
+      __proto__: null,
+      resolveFilename: { __proto__: null }
     },
     exportProxy: new WeakMap,
     fastPath,
@@ -79,7 +87,6 @@ if (__shared__) {
       }
     },
     readPackage: { __proto__: null },
-    resolveFilename: { __proto__: null },
     safe: { __proto__: null },
     satisfies: { __proto__: null },
     shim: { __proto__: null },

@@ -36,7 +36,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
   }
 
-  const cache = shared.resolveFilename
+  const cache = shared.esm.resolveFilename
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain
@@ -54,7 +54,6 @@ function resolveFilename(request, parent, isMain, options) {
 
   let foundPath
   let extLookup = esmExtsLookup
-  let searchExts = esmExts
   let skipWarnings = false
 
   if (! hasEncodedSlash(request)) {
@@ -85,7 +84,7 @@ function resolveFilename(request, parent, isMain, options) {
       }
 
       const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
-      foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts)
+      foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
     }
   }
 
