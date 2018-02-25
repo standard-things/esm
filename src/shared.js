@@ -26,6 +26,7 @@ if (__shared__) {
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(STD_ESM + ":module._compile"),
+    inspect: inspect.custom,
     mjs: Symbol.for(STD_ESM + ':Module._extensions[".mjs"]'),
     wrapper: Symbol.for(STD_ESM + ":wrapper")
   }
@@ -70,7 +71,7 @@ if (__shared__) {
         __proto__: null,
         name: process.release.name
       },
-      version: process.version,
+      version: process.version.replace(/[^\d.]/g, ""),
       versions: {
         __proto__: null,
         chakracore: versions.chakracore,
@@ -201,6 +202,10 @@ if (__shared__) {
 
     return toString.call(proxy) === "[object Function]"
   })
+
+  setDeferred(support, "replShowProxy", () =>
+    satisfies(shared.process.version, ">=10")
+  )
 
   setDeferred(support, "safeGetEnv", () =>
     typeof binding.util.safeGetenv === "function"
