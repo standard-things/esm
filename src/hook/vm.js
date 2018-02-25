@@ -6,6 +6,7 @@ import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
+import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
@@ -18,6 +19,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
@@ -138,12 +140,41 @@ function hook(vm) {
 
     if (rootModule.id === "<repl>") {
       initEntry(rootModule)
-    } else if (typeof createContext === "function") {
-      REPLServer.prototype.createContext = function () {
-        REPLServer.prototype.createContext = createContext
-        const context = call(createContext, this)
-        initEntry(context.module)
-        return context
+    } else {
+      if (typeof createContext === "function") {
+        REPLServer.prototype.createContext = function () {
+          REPLServer.prototype.createContext = createContext
+          const context = call(createContext, this)
+          initEntry(context.module)
+          return context
+        }
+      }
+
+      const { support } = shared
+
+      if (support.inspectProxies) {
+        const util = __non_webpack_require__("util")
+        const _inspect = util.inspect
+        const { inspect } = builtinEntries.util.module.exports
+
+        setProperty(util, shared.symbol.inspect, {
+          enumerable: false,
+          value: true
+        })
+
+        if (support.replShowProxy) {
+          util.inspect = inspect
+        } else {
+          setProperty(util, "inspect", {
+            get() {
+              util.inspect = inspect
+              return _inspect
+            },
+            set(value) {
+              setProperty(util, "inspect", { value })
+            }
+          })
+        }
       }
     }
   }
