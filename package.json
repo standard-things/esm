@@ -39,7 +39,7 @@
     "acorn": "^5.4.0",
     "ava": "^0.25.0",
     "babel-eslint": "^8.2.1",
-    "babel-loader": "^8.0.0-beta.0",
+    "babel-loader": "^8.0.0-beta.1",
     "babel-plugin-transform-for-of-as-array": "^1.1.1",
     "babel-plugin-transform-remove-console": "^6.9.0",
     "chai": "^4.1.2",
@@ -70,9 +70,9 @@
     "typescript": "^2.6.1",
     "uglify-es": "^3.3.10",
     "uglifyjs-webpack-plugin": "^1.2.2",
-    "webpack": "^3.10.0",
+    "webpack": "^4.0.0",
     "webpack-bundle-analyzer": "^2.10.1",
-    "webpack-common-shake": "^1.5.3",
+    "webpack-cli": "^2.0.9",
     "yargs": "^11.0.0"
   },
   "files": [

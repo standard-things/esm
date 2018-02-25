@@ -7,15 +7,19 @@ const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
 
+const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
+
 const { BannerPlugin } = webpack
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const { EnvironmentPlugin } = webpack
-const { ModuleConcatenationPlugin } = webpack.optimize
 const OptimizeJsPlugin = require("optimize-js-plugin")
-const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
+const isProd = /production/.test(process.env.NODE_ENV)
+const isTest = /test/.test(process.env.NODE_ENV)
+
+const ESM_VERSION = readJSON("./package.json").version
+const NODE_DEBUG = ! isProd
 
 const externals = [
   "Array", "Buffer", "Error", "JSON", "Object", "Promise", "SyntaxError",
@@ -26,8 +30,7 @@ const hosted = [
   "console", "process", "setImmediate"
 ]
 
-const isProd = /production/.test(process.env.NODE_ENV)
-const isTest = /test/.test(process.env.NODE_ENV)
+const uglifyOptions = readJSON("./.uglifyrc")
 
 /* eslint-disable sort-keys */
 const config = {
@@ -41,11 +44,20 @@ const config = {
     libraryTarget: "commonjs2",
     path: path.resolve(__dirname, "build")
   },
+  mode: isProd ? "production" : "development",
   module: {
     rules: [{
+      loader: "babel-loader",
       test: /\.js$/,
-      loader: "babel-loader"
+      type: "javascript/auto"
     }]
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new UglifyJSPlugin({ uglifyOptions })
+    ],
+    nodeEnv: false
   },
   plugins: [
     new BannerPlugin({
@@ -74,9 +86,7 @@ const config = {
       openAnalyzer: false,
       reportFilename: "report.html"
     }),
-    new EnvironmentPlugin({
-      ESM_VERSION: readJSON("./package.json").version
-    })
+    new EnvironmentPlugin({ ESM_VERSION })
   ]
 }
 /* eslint-enable sort-keys */
@@ -84,14 +94,7 @@ const config = {
 if (isProd) {
   config.plugins.push(
     new OptimizeJsPlugin,
-    new ShakePlugin,
-    new ModuleConcatenationPlugin,
-    new EnvironmentPlugin({
-      NODE_DEBUG: false
-    }),
-    new UglifyJSPlugin({
-      uglifyOptions: readJSON("./.uglifyrc")
-    })
+    new EnvironmentPlugin({ NODE_DEBUG })
   )
 }
 
