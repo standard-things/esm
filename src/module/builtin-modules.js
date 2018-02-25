@@ -20,7 +20,7 @@ function init() {
     builtinModules = GenericArray.slice(builtinModules)
   }
 
-  return Object.freeze(builtinModules)
+  return Object.freeze(GenericArray.sort(builtinModules))
 }
 
 export default shared.inited

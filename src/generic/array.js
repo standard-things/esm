@@ -15,6 +15,7 @@ function init() {
     push: unapply(prototype.push),
     slice: unapply(prototype.slice),
     some: unapply(prototype.some),
+    sort: unapply(prototype.sort),
     unshift: unapply(prototype.unshift)
   }
 }
