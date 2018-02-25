@@ -8,12 +8,15 @@ const {
 } = PREFIX
 
 function init() {
+  const customInspect = () => ""
+
   class OwnProxy {
     static instances = new WeakMap
 
     constructor(target, handler) {
-      handler = toNullObject(handler)
-      handler[STD_ESM + ":proxy"] = 1
+      const proto = toNullObject(handler)
+      proto[shared.symbol.inspect] = customInspect
+      handler = { __proto__: proto, [STD_ESM + ":proxy"]: 1 }
 
       const proxy = new Proxy(target, handler)
       OwnProxy.instances.set(proxy, [target, handler])
