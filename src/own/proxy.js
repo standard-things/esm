@@ -8,7 +8,7 @@ const {
 } = PREFIX
 
 function init() {
-  const customInspect = () => ""
+  const customInspect = () => "{}"
 
   class OwnProxy {
     static instances = new WeakMap
