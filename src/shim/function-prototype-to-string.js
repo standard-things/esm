@@ -22,7 +22,7 @@ const Shim = {
 
       try {
         const { toString } = funcProto
-        const proxy = new OwnProxy(toString, { __proto__: null })
+        const proxy = new OwnProxy(toString)
 
         result = typeof toString.call(proxy) === "string"
       } catch (e) {}
@@ -71,7 +71,6 @@ const Shim = {
       }
 
       funcProto.toString = new OwnProxy(_toString, {
-        __proto__: null,
         apply(target, thisArg, args) {
           return Reflect.apply(toString, thisArg, args)
         },

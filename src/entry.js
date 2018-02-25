@@ -21,7 +21,6 @@ const GETTER_ERROR = { __proto__: null }
 const STAR_ERROR = { __proto__: null }
 
 const esmDescriptor = {
-  __proto__: null,
   configurable: false,
   enumerable: false,
   value: true,
@@ -29,7 +28,6 @@ const esmDescriptor = {
 }
 
 const toStringTagDescriptor = {
-  __proto__: null,
   configurable: false,
   enumerable: false,
   value: "Module",
@@ -553,7 +551,6 @@ function toNamespace(entry, source = entry._namespace) {
   }
 
   return new OwnProxy(Object.seal(namespace), {
-    __proto__: null,
     get: (namespace, name) => {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)

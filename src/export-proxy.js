@@ -51,7 +51,6 @@ class ExportProxy {
       }
 
       wrapper = new OwnProxy(value, {
-        __proto__: null,
         apply(funcTarget, thisArg, args) {
           if (thisArg === proxy ||
               thisArg === entry.esmNamespace) {
@@ -69,7 +68,6 @@ class ExportProxy {
     }
 
     const proxy = new OwnProxy(exported, {
-      __proto__: null,
       get(target, name, receiver) {
         return maybeWrap(target, name, Reflect.get(target, name, receiver))
       },
