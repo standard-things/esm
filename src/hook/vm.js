@@ -10,6 +10,7 @@ import binding from "../binding.js"
 import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
+import clone from "../module/clone.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
@@ -148,7 +149,7 @@ function hook(vm) {
     entry = Entry.get(mod)
     entry.addBuiltinModules = addBuiltinModules
     entry.package = pkg
-    entry.require = makeRequireFunction(mod)
+    entry.require = makeRequireFunction(clone(mod))
     entry.runtimeName = shared.globalName
     Runtime.enable(entry, new ExObject)
   }
