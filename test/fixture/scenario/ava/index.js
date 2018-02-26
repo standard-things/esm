@@ -1,4 +1,4 @@
 "use strict"
 
 require = require("../../../../")(module)
-module.exports = require("./add.mjs")
+module.exports = require("./math.mjs")
