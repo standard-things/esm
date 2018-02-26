@@ -12,7 +12,9 @@ const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 const { BannerPlugin } = webpack
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const { EnvironmentPlugin } = webpack
+const { ModuleConcatenationPlugin } = webpack.optimize
 const OptimizeJsPlugin = require("optimize-js-plugin")
+const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const isProd = /production/.test(process.env.NODE_ENV)
@@ -44,20 +46,11 @@ const config = {
     libraryTarget: "commonjs2",
     path: path.resolve(__dirname, "build")
   },
-  mode: isProd ? "production" : "development",
   module: {
     rules: [{
       loader: "babel-loader",
-      test: /\.js$/,
-      type: "javascript/auto"
+      test: /\.js$/
     }]
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [
-      new UglifyJSPlugin({ uglifyOptions })
-    ],
-    nodeEnv: false
   },
   plugins: [
     new BannerPlugin({
@@ -94,7 +87,10 @@ const config = {
 if (isProd) {
   config.plugins.push(
     new OptimizeJsPlugin,
-    new EnvironmentPlugin({ NODE_DEBUG })
+    new ShakePlugin,
+    new ModuleConcatenationPlugin,
+    new EnvironmentPlugin({ NODE_DEBUG }),
+    new UglifyJSPlugin({ uglifyOptions })
   )
 }
 
