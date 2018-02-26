@@ -13,7 +13,8 @@ module.exports = {
     __external__: false,
     __non_webpack_module__: false,
     __non_webpack_require__: false,
-    __shared__: false
+    __shared__: false,
+    WebAssembly: false
   },
   parser: "eslint-plugin-import/memo-parser",
   parserOptions: {
