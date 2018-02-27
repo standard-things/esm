@@ -25,6 +25,7 @@ import { resolve } from "path"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
+import toExternalFunction from "../util/to-external-function.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const exts = [".js", ".mjs"]
@@ -177,7 +178,7 @@ function hook(Mod, parent) {
   }
 }
 
-function mjsCompiler(mod, filename) {
+const mjsCompiler = toExternalFunction(function (mod, filename) {
   const error = new errors.Error("ERR_REQUIRE_ESM", mod)
   const { mainModule } = moduleState
 
@@ -187,7 +188,7 @@ function mjsCompiler(mod, filename) {
   }
 
   throw error
-}
+})
 
 function readCachedCode(filename) {
   return readFileFast(filename, "utf8")

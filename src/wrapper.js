@@ -10,6 +10,7 @@ import setProperty from "./util/set-property.js"
 import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
+import toExternalFunction from "./util/to-external-function.js"
 import { version } from "./version.js"
 
 const Wrapper = {
@@ -29,9 +30,9 @@ const Wrapper = {
   },
   manage(object, key, wrapper) {
     const value = Wrapper.unwrap(object, key)
-    const manager = function (...args) {
+    const manager = toExternalFunction(function (...args) {
       return Reflect.apply(wrapper, this, [manager, value, args])
-    }
+    })
 
     setProperty(manager, shared.symbol.wrapper, {
       enumerable: false,
@@ -50,7 +51,7 @@ const Wrapper = {
 
     if (typeof map.wrappers[version] !== "function") {
       GenericArray.push(map.versions, version)
-      map.wrappers[version] = wrapper
+      map.wrappers[version] = toExternalFunction(wrapper)
     }
   }
 }
