@@ -24,8 +24,8 @@ const ESM_VERSION = readJSON("./package.json").version
 const NODE_DEBUG = ! isProd
 
 const externals = [
-  "Array", "Buffer", "Error", "JSON", "Object", "Promise", "SyntaxError",
-  "TypeError", "eval"
+  "Array", "Buffer", "Error", "Function", "JSON", "Object", "Promise",
+  "SyntaxError", "TypeError", "eval"
 ]
 
 const hosted = [
