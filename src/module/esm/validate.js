@@ -3,7 +3,8 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 function validate(entry) {
-  const cached = entry.package.cache.compile[entry.cacheName]
+  const pkg = entry.package
+  const cached = pkg.cache.compile[entry.cacheName]
   const { dependencySpecifiers, exportSpecifiers } = cached
 
   const children = { __proto__: null }
@@ -25,7 +26,7 @@ function validate(entry) {
     }
   }
 
-  const { namedExports } = entry.package.options.cjs
+  const { namedExports } = pkg.options.cjs
 
   // Validate requested child export names.
   for (const name in children) {

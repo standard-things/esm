@@ -13,7 +13,8 @@ import shared from "../shared.js"
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
-  const cached = entry.package.cache.compile[entry.cacheName]
+  const pkg = entry.package
+  const cached = pkg.cache.compile[entry.cacheName]
   const isESM = cached && cached.esm
   const { name } = entry
 
@@ -26,7 +27,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     let exported
 
-    if (! entry.package.options.cjs.vars) {
+    if (! pkg.options.cjs.vars) {
       try {
         exported = requirer.call(mod, request)
       } finally {
