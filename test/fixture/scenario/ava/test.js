@@ -1,9 +1,19 @@
-import cjsMath, { add as cjsAdd } from "./math.js"
-import esmMath, { add as esmAdd, picked as esmPicked } from "./"
 import test from "ava"
+
+import cjsMath, {
+  add as cjsAdd,
+  addBound as cjsAddBound
+} from "./math.js"
+
+import esmMath, {
+  add as esmAdd,
+  addBound as esmAddBound,
+  picked as esmPicked
+} from "./"
 
 test("test", (t) => {
   t.is(cjsAdd, esmAdd)
-  t.is(cjsMath.add, esmMath.add)
-  t.is(cjsMath.add, esmPicked.add)
+  t.is(cjsAddBound, esmAddBound)
+  t.deepEqual(cjsMath, esmMath)
+  t.deepEqual(cjsMath, esmPicked)
 })

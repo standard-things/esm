@@ -1,5 +1,5 @@
-import math, { add } from "./math.js"
+import math, { add, addBound } from "./math.js"
 
-export { add }
-export const picked = { add: math.add }
+export { add, addBound }
+export const picked = Object.assign({}, math)
 export default math
