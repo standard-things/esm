@@ -34,10 +34,11 @@ function hook(vm) {
   const pkg = Package.get("")
 
   const builtinModules = [
-    "assert", "async_hooks", "buffer", "child_process", "cluster", "crypto",
-    "dgram", "dns", "domain", "events", "fs", "http", "http2", "https", "net",
-    "os", "path", "perf_hooks", "punycode", "querystring", "readline", "repl",
-    "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
+    "assert", "async_hooks", "buffer", "child_process", "cluster", "console",
+    "crypto", "dgram", "dns", "domain", "events", "fs", "http", "http2",
+    "https", "net", "os", "path", "perf_hooks", "punycode", "querystring",
+    "readline", "repl", "stream", "string_decoder", "tls", "tty", "url", "util",
+    "v8", "vm", "zlib"
   ]
 
   if (typeof binding.inspector.connect === "function") {
