@@ -20,10 +20,12 @@ class ExportProxy {
       throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "exported", "object")
     }
 
-    let cache = shared.exportProxy.get(exported)
+    const cache = shared.exportProxy
 
-    if (cache) {
-      return cache.proxy
+    let cached = cache.get(exported)
+
+    if (cached) {
+      return cached.proxy
     }
 
     const maybeWrap = (target, name, value) => {
@@ -37,7 +39,7 @@ class ExportProxy {
         return value
       }
 
-      let wrapper = cache.wrap.get(value)
+      let wrapper = cached.wrap.get(value)
 
       if (wrapper) {
         return wrapper
@@ -54,8 +56,8 @@ class ExportProxy {
         }
       })
 
-      cache.wrap.set(value, wrapper)
-      cache.unwrap.set(wrapper, value)
+      cached.wrap.set(value, wrapper)
+      cached.unwrap.set(wrapper, value)
 
       return wrapper
     }
@@ -75,20 +77,23 @@ class ExportProxy {
         return descriptor
       },
       set(target, name, value, receiver) {
-        Reflect.set(target, name, cache.unwrap.get(value) || value, receiver)
+        Reflect.set(target, name, cached.unwrap.get(value) || value, receiver)
         entry.update()
         return true
       }
     })
 
-    cache = {
+    cached = {
       __proto__: null,
       proxy,
       unwrap: new WeakMap,
       wrap: new WeakMap
     }
 
-    shared.exportProxy.set(exported, cache)
+    cache
+      .set(exported, cached)
+      .set(proxy, cached)
+
     return proxy
   }
 }

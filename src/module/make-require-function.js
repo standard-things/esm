@@ -5,7 +5,6 @@
 import Entry from "../entry.js"
 import Module from "../module.js"
 
-import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
@@ -49,14 +48,6 @@ function makeRequireFunction(mod, requirer, resolver) {
       throw e
     } finally {
       moduleState.requireDepth -= 1
-    }
-
-    if (request in builtinEntries) {
-      const builtinEntry = builtinEntries[request]
-
-      if (exported === builtinEntry.rawExports) {
-        exported = builtinEntry.module.exports
-      }
     }
 
     return exported

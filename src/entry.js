@@ -9,6 +9,7 @@ import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
+import isOwnProxy from "./util/is-own-proxy.js"
 import keys from "./util/keys.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
@@ -41,7 +42,7 @@ class Entry {
     this._changed = false
     // The loading state of the module.
     this._loaded = 0
-    // The raw namespace object.
+    // The raw namespace object without proxied exports.
     this._namespace = { __proto__: null }
     // The load mode for `module.require`.
     this._requireESM = false
@@ -51,12 +52,12 @@ class Entry {
     this.cacheName = null
     // The child entries of the module.
     this.children = { __proto__: null }
+    // The namespace object which may have proxied exports.
+    this.namespace = this._namespace
     // The namespace object CJS importers receive.
-    this.cjsNamespace = this._namespace
-    // The package data of the module.
-    this.package = Package.from(mod)
+    this.cjsNamespace = this.namespace
     // The namespace object ESM importers receive.
-    this.esmNamespace = this._namespace
+    this.esmNamespace = this.namespace
     // The temporary store of the initial `module.exports` value.
     this.exports = null
     // Getters for local variables exported by the module.
@@ -67,6 +68,8 @@ class Entry {
     this.module = mod
     // The name of the module.
     this.name = getModuleName(mod)
+    // The package data of the module.
+    this.package = Package.from(mod)
     // The `module.parent` entry.
     this.parent = null
     // The name of the runtime identifier.
@@ -229,22 +232,13 @@ class Entry {
 
     if (isESM &&
         ! Object.isSealed(exported)) {
-      const { _namespace } = this
-
-      const isPseudo =
-        this.package.options.cjs.interop &&
-        ! has(_namespace, "__esModule")
-
-      if (isPseudo) {
+      if (this.package.options.cjs.interop &&
+          ! has(this._namespace, "__esModule")) {
         setProperty(exported, "__esModule", esmDescriptor)
       }
 
-      for (const name in _namespace) {
+      for (const name in this._namespace) {
         setGetter(exported, name, () => this._namespace[name])
-
-        if (isPseudo) {
-          _namespace[name] = unwrapProxy(_namespace[name])
-        }
       }
 
       Object.seal(exported)
@@ -349,18 +343,30 @@ function assignExportsToNamespace(entry) {
     ! (isPseudo && has(object, "default"))
 
   if (skipDefault) {
-    if (entry.builtin) {
-      _namespace.default = exported
-    } else if (! ("default" in entry.getters)) {
-      setDeferred(entry._namespace, "default", () => {
-        const exported = entry.module.exports
+    _namespace.default = exported
 
-        return isObjectLike(exported)
-          ? new ExportProxy(entry)
-          : exported
+    if (! ("default" in entry.getters)) {
+      entry.addGetter("default", () => entry.namespace.default)
+
+      entry.namespace = new OwnProxy(_namespace, {
+        get(target, name, receiver) {
+          const value = Reflect.get(target, name, receiver)
+
+          if (name === "default" &&
+              isObjectLike(value)) {
+            return new ExportProxy(entry)
+          }
+
+          return value
+        },
+        set(target, name, value, receiver) {
+          if (isOwnProxy(value)) {
+            value = unwrapProxy(value)
+          }
+
+          return Reflect.set(target, name, value, receiver)
+        }
       })
-
-      entry.addGetter("default", () => entry._namespace.default)
     }
   }
 
@@ -432,7 +438,7 @@ function getExportByName(entry, setter, name) {
   }
 
   if (isESM) {
-    return entry._namespace[name]
+    return entry.namespace[name]
   }
 
   if ((isScript &&
@@ -444,7 +450,7 @@ function getExportByName(entry, setter, name) {
     throw new errors.SyntaxError("ERR_EXPORT_MISSING", entry.module, name)
   }
 
-  const value = entry._namespace[name]
+  const value = entry.namespace[name]
 
   if (value === STAR_ERROR) {
     throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", entry.module, name)
@@ -543,7 +549,7 @@ function runSetters(entry, callback) {
   }
 }
 
-function toNamespace(entry, source = entry._namespace) {
+function toNamespace(entry, source = entry.namespace) {
   const names = keys(source).sort()
   const namespace = createNamespace()
 

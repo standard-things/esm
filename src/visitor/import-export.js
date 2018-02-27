@@ -358,7 +358,7 @@ class ImportExportVisitor extends Visitor {
         this,
         specifierMap,
         localName,
-        this.runtimeName + ".entry._namespace." + exportName
+        this.runtimeName + ".entry.namespace." + exportName
       )
     }
 

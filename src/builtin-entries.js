@@ -57,22 +57,20 @@ function init() {
 
   for (const id of builtinModules) {
     setDeferred(builtinEntries, id, () => {
-      const rawExports = unwrapProxy(__non_webpack_require__(id))
-      let exported = rawExports
+      let exported = unwrapProxy(__non_webpack_require__(id))
 
       if (id === "module") {
         exported = Module
       } else if (id === "util") {
         exported = createUtilExports(exported)
       } else if (id === "vm" &&
-          has(rawExports, "Module")) {
+          has(exported, "Module")) {
         exported = createVMExports(exported)
       }
 
       const mod = new Module(id, null)
       const entry = Entry.get(mod)
 
-      entry.rawExports = rawExports
       mod.exports = exported
       mod.loaded = true
 
