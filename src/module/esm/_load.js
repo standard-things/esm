@@ -27,25 +27,20 @@ function load(request, parent, isMain, preload) {
   const fromPath = dirname(filename)
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
-  const isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
 
-  let childIsMain = isMain
+  let isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
   let state = Module
 
-  if (isUnexposed) {
-    const ext = extname(filename)
-    childIsMain = false
-
-    if (ext === ".mjs") {
-      state = moduleState
-    }
+  if (isUnexposed &&
+      extname(filename) === ".mjs") {
+    state = moduleState
   }
 
   let error
   let called = false
   let threw = false
 
-  const entry = _load(request, parent, childIsMain, state, (entry) => {
+  const entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
 
     state._cache[request] = child
@@ -57,6 +52,31 @@ function load(request, parent, isMain, preload) {
 
     called = true
 
+    child.filename = filename
+    entry.id = request
+
+    if (! moduleState.parsing) {
+      const cached = entry.package.cache.compile[entry.cacheName]
+      const isESM = cached && cached.esm
+
+      if (! isESM) {
+        isUnexposed = false
+      }
+
+      if (isMain) {
+        child.id = "."
+        moduleState.mainModule = child
+
+        if (isUnexposed) {
+          delete process.mainModule
+        }
+      }
+
+      if (isUnexposed) {
+        child.parent = void 0
+      }
+    }
+
     if (! child.paths) {
       child.paths = entry.package.options.cjs.paths
         ? Module._nodeModulePaths(fromPath)
@@ -64,18 +84,7 @@ function load(request, parent, isMain, preload) {
     }
 
     if (! entry.url) {
-      child.filename = filename
-      entry.id = request
       entry.url = getURLFromFilePath(filename) + queryHash
-
-      if (isUnexposed) {
-        child.parent = void 0
-      }
-    }
-
-    if (isMain) {
-      moduleState.mainModule = child
-      child.id = "."
     }
 
     try {
