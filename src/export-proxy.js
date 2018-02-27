@@ -10,10 +10,9 @@ const { toString } = Object.prototype
 class ExportProxy {
   constructor(entry) {
     const exported = entry.module.exports
-    const { support } = shared
 
     // Avoid using buggy proxies in Chakra.
-    if (! support.proxiedFunctions) {
+    if (! shared.support.proxiedFunctions) {
       return exported
     }
 
@@ -23,14 +22,8 @@ class ExportProxy {
 
     let cache = shared.exportProxy.get(exported)
 
-    if (! cache) {
-      cache = {
-        __proto__: null,
-        unwrap: new WeakMap,
-        wrap: new WeakMap
-      }
-
-      shared.exportProxy.set(exported, cache)
+    if (cache) {
+      return cache.proxy
     }
 
     const maybeWrap = (target, name, value) => {
@@ -88,6 +81,14 @@ class ExportProxy {
       }
     })
 
+    cache = {
+      __proto__: null,
+      proxy,
+      unwrap: new WeakMap,
+      wrap: new WeakMap
+    }
+
+    shared.exportProxy.set(exported, cache)
     return proxy
   }
 }
