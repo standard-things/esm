@@ -19,6 +19,7 @@ import isEval from "../env/is-eval.js"
 import isREPL from "../env/is-repl.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
+import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
 import setProperty from "../util/set-property.js"
@@ -171,21 +172,21 @@ function hook(vm) {
   if (isCheck()) {
     const { Script } = vm
 
-    vm.Script = function (code, options) {
+    vm.Script = maskFunction(function (code, options) {
       vm.Script = Script
       const { wrapper } = Module
       code = code.slice(wrapper[0].length, -wrapper[1].length)
       initEntry(rootModule)
       return vm.createScript(code, options)
-    }
+    }, Script)
   } else if (isEval())  {
     const { runInThisContext } = vm
 
-    vm.runInThisContext = function (code, options) {
+    vm.runInThisContext = maskFunction(function (code, options) {
       vm.runInThisContext = runInThisContext
       initEntry(global.module)
       return vm.createScript(code, options).runInThisContext(options)
-    }
+    }, runInThisContext)
   } else if (isREPL()) {
     const { createContext } = REPLServer.prototype
 
@@ -193,12 +194,12 @@ function hook(vm) {
       initEntry(rootModule)
     } else {
       if (typeof createContext === "function") {
-        REPLServer.prototype.createContext = function () {
+        REPLServer.prototype.createContext = maskFunction(function () {
           REPLServer.prototype.createContext = createContext
           const context = call(createContext, this)
           initEntry(context.module)
           return context
-        }
+        }, createContext)
       }
 
       const { support } = shared

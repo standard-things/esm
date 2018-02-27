@@ -58,8 +58,9 @@ function init() {
   for (const id of builtinModules) {
     setDeferred(builtinEntries, id, () => {
       let exported = unwrapProxy(__non_webpack_require__(id))
+      const isModule = id === "module"
 
-      if (id === "module") {
+      if (isModule) {
         exported = Module
       } else if (id === "util") {
         exported = createUtilExports(exported)
@@ -74,10 +75,12 @@ function init() {
       mod.exports = exported
       mod.loaded = true
 
-      exported =
-      mod.exports = new ExportProxy(entry)
+      if (! isModule) {
+        exported =
+        mod.exports = new ExportProxy(entry)
 
-      Entry.set(exported, entry)
+        Entry.set(exported, entry)
+      }
 
       entry.builtin = true
       entry.loaded()

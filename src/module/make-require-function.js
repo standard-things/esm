@@ -8,8 +8,12 @@ import Module from "../module.js"
 import errors from "../errors.js"
 import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
+import maskFunction from "../util/mask-function.js"
 import moduleState from "./state.js"
 import shared from "../shared.js"
+
+const sourceResolve = __non_webpack_require__.resolve
+const sourcePaths = sourceResolve && sourceResolve.paths
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
@@ -18,7 +22,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   const isESM = cached && cached.esm
   const { name } = entry
 
-  const req = function require(request) {
+  const req = maskFunction(function (request) {
     moduleState.requireDepth += 1
 
     shared.entry.skipExports[name] =
@@ -52,7 +56,7 @@ function makeRequireFunction(mod, requirer, resolver) {
     }
 
     return exported
-  }
+  }, __non_webpack_require__)
 
   function resolve(request, options) {
     if (typeof request !== "string") {
@@ -81,8 +85,8 @@ function makeRequireFunction(mod, requirer, resolver) {
   req.cache = Module._cache
   req.extensions = Module._extensions
   req.main = process.mainModule
-  req.resolve = resolve
-  resolve.paths = paths
+  req.resolve = maskFunction(resolve, sourceResolve)
+  resolve.paths = maskFunction(paths, sourcePaths)
 
   return req
 }

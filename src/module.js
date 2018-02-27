@@ -11,39 +11,38 @@ import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import initGlobalPaths from "./module/init-global-paths.js"
 import load from "./module/load.js"
+import maskFunction from "./util/mask-function.js"
 import moduleState from "./module/state.js"
 import req from "./module/require.js"
-import setProperty from "./util/set-property.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
 
 const BuiltinModule = __non_webpack_module__.constructor
+const BuiltinProto = BuiltinModule.prototype
 
-class Module extends BuiltinModule {
-  static _extensions = { __proto__: null }
-  static _findPath = _findPath
-  static _initPaths = _initPaths
-  static _load = _load
-  static _nodeModulePaths = _nodeModulePaths
-  static _resolveFilename = _resolveFilename
-  static _resolveLookupPaths = _resolveLookupPaths
-  static Module = Module
-  static wrap = wrap
-  static wrapper = GenericArray.slice(wrapper)
-}
+const Module = maskFunction((id, parent) => {
+  const mod = new BuiltinModule(id, parent)
+  Object.setPrototypeOf(mod, Module.prototype)
+  return mod
+}, BuiltinModule)
 
-Module.prototype._compile = _compile
-Module.prototype.load = load
-Module.prototype.require = req
+Module._extensions = { __proto__: null }
+Module._findPath = maskFunction(_findPath, BuiltinModule._findPath)
+Module._initPaths = maskFunction(_initPaths, BuiltinModule._initPaths)
+Module._load = maskFunction(_load, BuiltinModule._load)
+Module._nodeModulePaths = maskFunction(_nodeModulePaths, BuiltinModule._nodeModulePaths)
+Module._resolveFilename = maskFunction(_resolveFilename, BuiltinModule._resolveFilename)
+Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, BuiltinModule._resolveLookupPaths)
+Module.Module = Module
+Module.wrap = maskFunction(wrap, BuiltinModule.wrap)
+Module.wrapper = GenericArray.slice(wrapper)
+
+Module.prototype._compile = maskFunction(_compile, BuiltinProto._compile)
+Module.prototype.load = maskFunction(load, BuiltinProto.load)
+Module.prototype.require = maskFunction(req, BuiltinProto.require)
 
 defaults(Module, BuiltinModule)
 assign(Module._extensions, BuiltinModule._extensions)
-
-setProperty(Module, "length", {
-  enumerable: false,
-  value: 2,
-  writable: false
-})
 
 if (! Module.globalPaths) {
   Module.globalPaths = initGlobalPaths()

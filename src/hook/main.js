@@ -7,6 +7,7 @@ import call from "../util/call.js"
 import { dirname } from "path"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
+import maskFunction from "../util/mask-function.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 import shared from "../shared.js"
 
@@ -16,7 +17,7 @@ function hook(Mod) {
 
   const useTickCallback = typeof _tickCallback === "function"
 
-  Mod.runMain = () => {
+  Mod.runMain = maskFunction(function () {
     Mod.runMain = runMain
 
     const [, mainPath] = process.argv
@@ -62,7 +63,7 @@ function hook(Mod) {
 
     loadESM(filename, null, true)
     tickCallback()
-  }
+  }, runMain)
 
   function tickCallback() {
     if (useTickCallback) {
