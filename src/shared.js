@@ -226,6 +226,11 @@ if (__shared__) {
     typeof binding.util.setHiddenValue === "function"
   )
 
+  setDeferred(support, "wasm", () =>
+    typeof WebAssembly === "object" &&
+      WebAssembly !== null
+  )
+
   setDeferred(symbol, "errorCode", () => {
     let error
 
