@@ -33,17 +33,16 @@ function hook(vm) {
   let entry
   const pkg = Package.get("")
 
-  const builtinModules = [
-    "assert", "async_hooks", "buffer", "child_process", "cluster", "console",
-    "crypto", "dgram", "dns", "domain", "events", "fs", "http", "http2",
-    "https", "net", "os", "path", "perf_hooks", "punycode", "querystring",
-    "readline", "repl", "stream", "string_decoder", "tls", "tty", "url", "util",
-    "v8", "vm", "zlib"
+  const lazyModules = [
+    "assert", "async_hooks", "buffer", "child_process", "cluster", "crypto",
+    "dgram", "dns", "domain", "events", "fs", "http", "http2", "https", "net",
+    "os", "path", "perf_hooks", "punycode", "querystring", "readline", "repl",
+    "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
   ]
 
   if (typeof binding.inspector.connect === "function") {
-    builtinModules.push("inspector")
-    builtinModules.sort()
+    lazyModules.push("inspector")
+    lazyModules.sort()
   }
 
   function managerWrapper(manager, func, args) {
@@ -123,7 +122,18 @@ function hook(vm) {
   }
 
   function addBuiltinModules(context) {
-    for (const name of builtinModules) {
+    const req = entry.require
+    const exportedConsole = req("console")
+
+    setProperty(context, "console", {
+      get: () => exportedConsole
+    })
+
+    setProperty(context, "process", {
+      value: req("process")
+    })
+
+    for (const name of lazyModules) {
       const set = (value) => {
         setProperty(context, name, { value })
       }
@@ -131,7 +141,7 @@ function hook(vm) {
       setProperty(context, name, {
         enumerable: false,
         get() {
-          const exported = entry.require(name)
+          const exported = req(name)
 
           setProperty(context, name, {
             enumerable: false,
