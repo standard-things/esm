@@ -501,17 +501,23 @@ describe("Node rules", () => {
   it("should not expose ESM in `module.parent`", () =>
     import("./fixture/parent/off")
       .then((ns) => {
-        const mod = ns.default
-        assert.ok("parent" in mod)
-        assert.strictEqual(typeof mod.parent, "undefined")
+        const parent = ns.parent
+        const child = ns.child
+
+        assert.ok(parent.parent)
+        assert.ok("parent" in child)
+        assert.strictEqual(typeof child.parent, "undefined")
       })
   )
 
   it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
     import("./fixture/parent/on")
       .then((ns) => {
-        const mod = ns.default
-        assert.ok(mod.parent)
+        const parent = ns.parent
+        const child = ns.child
+
+        assert.ok(parent.parent)
+        assert.ok(child.parent)
       })
   )
 

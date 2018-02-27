@@ -16,7 +16,13 @@ import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 function load(request, parent, isMain, preload) {
-  const filename = parent && Entry.get(parent).package.options.cjs.paths
+  const parentEntry = parent && Entry.get(parent)
+  const parentPkg = parentEntry && parentEntry.package
+  const parentPkgOptions = parentPkg && parentPkg.options
+  const parentCached = parentPkg && parentPkg.cache.compile[parentEntry.cacheName]
+  const parentIsESM = parentCached && parentCached.esm
+
+  const filename = parentPkgOptions && parentPkgOptions.cjs.paths
     ? Module._resolveFilename(request, parent, isMain)
     : resolveFilename(request, parent, isMain)
 
@@ -42,6 +48,7 @@ function load(request, parent, isMain, preload) {
 
   const entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
+    const pkg = entry.package
 
     state._cache[request] = child
 
@@ -56,7 +63,7 @@ function load(request, parent, isMain, preload) {
     entry.id = request
 
     if (! moduleState.parsing) {
-      const cached = entry.package.cache.compile[entry.cacheName]
+      const cached = pkg.cache.compile[entry.cacheName]
       const isESM = cached && cached.esm
 
       if (! isESM) {
@@ -72,13 +79,15 @@ function load(request, parent, isMain, preload) {
         }
       }
 
-      if (isUnexposed) {
+      if (! isESM &&
+          (parentIsESM &&
+           ! parentPkgOptions.cjs.cache)) {
         child.parent = void 0
       }
     }
 
     if (! child.paths) {
-      child.paths = entry.package.options.cjs.paths
+      child.paths = pkg.options.cjs.paths
         ? Module._nodeModulePaths(fromPath)
         : moduleNodeModulePaths(fromPath)
     }
