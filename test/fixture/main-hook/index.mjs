@@ -1,3 +1,3 @@
-import console from "console"
+import { log } from "console"
 
-console.log("main-hook:true")
+log("main-hook:true")

@@ -31,8 +31,8 @@ describe("--check hook", function () {
           "echo",
           "'" +
           [
-            'import console from "console"',
-            'console.log("check-hook:true")'
+            'import { log } from "console"',
+            'log("check-hook:true")'
           ].join(";") +
           "'",
           "|",

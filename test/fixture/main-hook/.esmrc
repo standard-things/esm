@@ -1,6 +1,5 @@
 {
   cjs: {
-    cache: true,
     namedExports: true
   },
   debug: true

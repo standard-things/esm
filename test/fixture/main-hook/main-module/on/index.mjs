@@ -1,3 +1,6 @@
+import { log } from "console"
 import process from "process"
 
-console.log("main-module:" + ("mainModule" in process))
+const actual = "mainModule" in process
+
+log("main-module:" + actual)

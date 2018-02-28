@@ -1,1 +1,5 @@
-console.log("import-meta:" + JSON.stringify(import.meta))
+import { log } from "console"
+
+const actual = JSON.stringify(import.meta)
+
+log("import-meta:" + actual)

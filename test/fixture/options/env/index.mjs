@@ -1,3 +1,5 @@
-import console from "console"
+import { log } from "console"
 
-console.log("esm-options:" + (typeof module !== "undefined"))
+const actual = typeof module !== "undefined"
+
+log("esm-options:" + actual)

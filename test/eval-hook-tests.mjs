@@ -24,8 +24,8 @@ describe("--eval hook", function () {
         runs.push([
           requireFlag, "../",
           evalFlag, [
-            'import console from "console"',
-            'console.log("eval-hook:true")'
+            'import { log } from "console"',
+            'log("eval-hook:true")'
           ].join("\n")
         ])
       })
