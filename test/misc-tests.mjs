@@ -223,7 +223,7 @@ describe("errors", () => {
       .catch((e) => assert.strictEqual(e, global.customError))
   )
 
-  it("should not error when accessing `error.stack`", () =>
+  it("should not error accessing `error.stack`", () =>
     import("./fixture/error/no-stack.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
@@ -850,7 +850,7 @@ describe("spec compliance", () => {
       .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
   )
 
-  it("should not error when importing a non-ambiguous export", () =>
+  it("should not error importing a non-ambiguous export", () =>
     import("./misc/import/non-ambiguous.mjs")
       .then((ns) => ns.default())
   )
@@ -1049,15 +1049,15 @@ describe("spec compliance", () => {
       .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
   })
 
-  it("should not error when accessing `arguments` in a function", () =>
+  it("should not error accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
   )
 
-  it("should not error when typeof checking `arguments`", () =>
+  it("should not error type checking `arguments`", () =>
     import("./fixture/source/arguments-typeof.mjs")
   )
 
-  it("should not error when using an opening HTML comment in CJS", () =>
+  it("should not error using an opening HTML comment in CJS", () =>
     import("./fixture/source/html-comment.js")
   )
 
