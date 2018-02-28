@@ -118,7 +118,7 @@ describe("main hook", function () {
       })
   )
 
-  it("should support `import.meta.url`", () =>
+  it("should support `import.meta.url` in ESM", () =>
     runMain("./fixture/main-hook/import-meta.mjs")
       .then((result) => {
         const url = testURL + "/fixture/main-hook/import-meta.mjs"
@@ -127,7 +127,15 @@ describe("main hook", function () {
       })
   )
 
-  it("should not expose ESM in `process.mainModule`", () =>
+  it("should expose `require.main` in CJS", () =>
+    runMain("./fixture/main-hook/require-main.js")
+      .then((result) => {
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("require-main:true"))
+      })
+  )
+
+  it("should not expose `process.mainModule` in ESM", () =>
     runMain("./fixture/main-hook/main-module/off")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
@@ -135,7 +143,7 @@ describe("main hook", function () {
       })
   )
 
-  it("should expose ESM in `process.mainModule` with `options.cjs.cache`", () =>
+  it("should expose `process.mainModule` in ESM with `options.cjs.cache`", () =>
     runMain("./fixture/main-hook/main-module/on")
       .then((result) => {
         assert.strictEqual(result.stderr, "")
