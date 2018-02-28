@@ -1,5 +1,6 @@
 "use strict"
 
+const { log } = console
 const actual = Reflect.has(require, "main")
 
-console.log("require-main:" + actual)
+log("require-main:" + actual)

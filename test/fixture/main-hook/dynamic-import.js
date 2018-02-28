@@ -1,5 +1,7 @@
 "use strict"
 
+const { log } = console
+
 require("../import/dynamic.js")
-  .then(() => console.log("dynamic-import-cjs:true"))
-  .catch((e) => console.log(e))
+  .then(() => log("dynamic-import-cjs:true"))
+  .catch((e) => log(e))
