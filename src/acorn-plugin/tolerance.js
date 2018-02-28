@@ -32,7 +32,9 @@ const Plugin = {
     parser.enterLexicalScope =
     parser.exitFunctionScope =
     parser.exitLexicalScope =
-    parser.invalidStringToken = noop
+    parser.invalidStringToken =
+    parser.validateRegExpFlags =
+    parser.validateRegExpPattern = noop
 
     parser.checkExpressionErrors = checkExpressionErrors
 
