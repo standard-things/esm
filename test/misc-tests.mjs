@@ -1065,6 +1065,10 @@ describe("spec compliance", () => {
     import("./fixture/source/multiline-comment.js")
   )
 
+  it("should not error exporting named classes", () =>
+    import("./fixture/source/named-class.mjs")
+  )
+
   it("should not hang on strings containing '# sourceMappingURL'", () =>
     import("./fixture/source/source-mapping-url-string.mjs")
   )
