@@ -9,17 +9,24 @@ function getProxyDetails(proxy) {
     return
   }
 
-  const details = OwnProxy.instances.get(proxy)
+  const cache = shared.getProxyDetails
+  const cached = cache.get(proxy)
 
-  if (details) {
-    return [details[0], details[1]]
+  if (cached) {
+    return cached.details
   }
 
-  if (shared.support.getProxyDetails) {
+  let details = OwnProxy.instances.get(proxy)
+
+  if (! details &&
+      shared.support.getProxyDetails) {
     try {
-      return binding.util.getProxyDetails(proxy)
+      details = binding.util.getProxyDetails(proxy)
     } catch (e) {}
   }
+
+  cache.set(proxy, { __proto__: null, details })
+  return details
 }
 
 export default getProxyDetails

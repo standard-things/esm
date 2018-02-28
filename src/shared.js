@@ -55,10 +55,12 @@ if (__shared__) {
     fastPath,
     findPath: { __proto__: null },
     generic: { __proto__: null },
+    getProxyDetails: new WeakMap,
     global,
     globalName,
     inited: false,
     inspect,
+    maskFunction: new WeakMap,
     maxSatisfying: { __proto__: null },
     own: { __proto__: null },
     package: {
@@ -91,7 +93,8 @@ if (__shared__) {
     satisfies: { __proto__: null },
     shim: { __proto__: null },
     support,
-    symbol
+    symbol,
+    unwrapProxy: new WeakMap
   }
 
   setDeferred(shared, "arrowSymbol", () => {
