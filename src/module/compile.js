@@ -30,7 +30,7 @@ function compile(content, filename) {
   if (! entry.state) {
     entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
-    entry.runtimeName = shared.globalName
+    entry.runtimeName = shared.runtimeName
 
     return _compile(compile, entry, content, filename)
   }

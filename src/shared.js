@@ -17,7 +17,7 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
-  const globalName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
+  const runtimeName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const { versions } = process
 
   const fastPath = { __proto__: null }
@@ -56,8 +56,6 @@ if (__shared__) {
     findPath: { __proto__: null },
     generic: { __proto__: null },
     getProxyDetails: new WeakMap,
-    global,
-    globalName,
     inited: false,
     inspect,
     maskFunction: new WeakMap,
@@ -89,11 +87,14 @@ if (__shared__) {
       }
     },
     readPackage: { __proto__: null },
+    runtimeName,
     safe: { __proto__: null },
+    safeContext: Function("return this")(),
     satisfies: { __proto__: null },
     shim: { __proto__: null },
     support,
     symbol,
+    unsafeContext: global,
     unwrapProxy: new WeakMap
   }
 

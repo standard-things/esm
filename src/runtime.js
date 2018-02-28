@@ -221,7 +221,7 @@ function runCJS(entry, moduleWrapper) {
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-  return Reflect.apply(moduleWrapper, exported, [shared.global, exported, req])
+  return Reflect.apply(moduleWrapper, exported, [shared.unsafeContext, exported, req])
 }
 
 function runESM(entry, moduleWrapper) {
@@ -235,9 +235,9 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
     req.main = moduleState.mainModule
-    result = Reflect.apply(moduleWrapper, exported, [shared.global, exported, req])
+    result = Reflect.apply(moduleWrapper, exported, [shared.unsafeContext, exported, req])
   } else {
-    result = Reflect.apply(moduleWrapper, void 0, [shared.global])
+    result = Reflect.apply(moduleWrapper, void 0, [shared.unsafeContext])
   }
 
   // Set the loaded state here in case the module was sideloaded.

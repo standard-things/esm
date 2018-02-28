@@ -28,7 +28,7 @@ const nodeModulesRegExp = shared.env.win32
 let exported
 
 if (shared.inited) {
-  Shim.enable(shared.global)
+  Shim.enable(shared.unsafeContext)
 
   exported = (mod, options) => {
     if (! isObject(mod)) {
@@ -75,8 +75,8 @@ if (shared.inited) {
   exported = shared
   exported.inited = true
 
-  Shim.enable(Function("return this")())
-  Shim.enable(shared.global)
+  Shim.enable(shared.safeContext)
+  Shim.enable(shared.unsafeContext)
 
   if (isCheck()) {
     vmHook(vm)

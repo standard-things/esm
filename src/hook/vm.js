@@ -162,7 +162,7 @@ function hook(vm) {
     entry.addBuiltinModules = addBuiltinModules
     entry.package = pkg
     entry.require = makeRequireFunction(clone(mod))
-    entry.runtimeName = shared.globalName
+    entry.runtimeName = shared.runtimeName
     Runtime.enable(entry, new ExObject)
   }
 
@@ -184,7 +184,7 @@ function hook(vm) {
 
     vm.runInThisContext = maskFunction(function (code, options) {
       vm.runInThisContext = runInThisContext
-      initEntry(global.module)
+      initEntry(shared.unsafeContext.module)
       return vm.createScript(code, options).runInThisContext(options)
     }, runInThisContext)
   } else if (isREPL()) {
