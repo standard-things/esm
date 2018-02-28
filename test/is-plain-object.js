@@ -2,7 +2,7 @@
 
 function isPlainObject(object) {
   return object != null &&
-    Object.getPrototypeOf(object) === Object.prototype
+    Reflect.getPrototypeOf(object) === Object.prototype
 }
 
 module.exports = isPlainObject

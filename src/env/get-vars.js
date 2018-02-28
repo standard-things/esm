@@ -15,7 +15,7 @@ const {
 function getVars() {
   const { env } = shared
 
-  if ("vars" in env) {
+  if (Reflect.has(env, "vars")) {
     return env.vars
   }
 

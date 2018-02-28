@@ -9,7 +9,7 @@ import trash from "../script/trash.js"
 import vm from "vm"
 
 const canUseExperimentalModules =
-  "v8" in process.versions &&
+  Reflect.has(process.versions, "v8") &&
   SemVer.satisfies(process.version, ">=8.5.0")
 
 const canUsePreserveSymlinks =

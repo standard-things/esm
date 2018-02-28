@@ -21,7 +21,7 @@ export default () => {
   }
 
   function getPartialDescriptor(object, name) {
-    const descriptor = Object.getOwnPropertyDescriptor(object, name)
+    const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
 
     return {
       configurable: descriptor.configurable,
@@ -29,12 +29,12 @@ export default () => {
     }
   }
 
-  assert.strictEqual(Object.getOwnPropertyDescriptor(defaultNs, "__esModule"), void 0)
-  assert.deepStrictEqual(Object.getOwnPropertyDescriptor(defaultValue, "__esModule"), defaultDescriptor)
+  assert.strictEqual(Reflect.getOwnPropertyDescriptor(defaultNs, "__esModule"), void 0)
+  assert.deepStrictEqual(Reflect.getOwnPropertyDescriptor(defaultValue, "__esModule"), defaultDescriptor)
 
   assert.deepStrictEqual(getPartialDescriptor(customNs, "__esModule"), partialDescriptor)
   assert.deepStrictEqual(getPartialDescriptor(customValue, "__esModule"), partialDescriptor)
 
-  assert.strictEqual(Object.getOwnPropertyDescriptor(noNs, "__esModule"), void 0)
-  assert.strictEqual(Object.getOwnPropertyDescriptor(noValue, "__esModule"), void 0)
+  assert.strictEqual(Reflect.getOwnPropertyDescriptor(noNs, "__esModule"), void 0)
+  assert.strictEqual(Reflect.getOwnPropertyDescriptor(noValue, "__esModule"), void 0)
 }

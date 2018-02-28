@@ -505,7 +505,7 @@ describe("Node rules", () => {
         const child = ns.child
 
         assert.ok(parent.parent)
-        assert.ok("parent" in child)
+        assert.ok(Reflect.has(child, "parent"))
         assert.strictEqual(typeof child.parent, "undefined")
       })
   )
@@ -911,7 +911,7 @@ describe("spec compliance", () => {
       import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
-          assert.strictEqual("loadCount" in global, false)
+          assert.strictEqual(Reflect.has(global, "loadCount"), false)
           assert.strictEqual(e.code, "MODULE_NOT_FOUND")
         })
     ))
@@ -926,7 +926,7 @@ describe("spec compliance", () => {
       import(request)
         .then(() => assert.ok(false))
         .catch((e) => {
-          assert.strictEqual("loadCount" in global, false)
+          assert.strictEqual(Reflect.has(global, "loadCount"), false)
           assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
         })
     ))

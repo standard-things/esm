@@ -69,7 +69,7 @@ class ExportProxy {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
         if (descriptor &&
-            "value" in descriptor) {
+            Reflect.has(descriptor, "value")) {
           descriptor.value = maybeWrap(target, name, descriptor.value)
         }
 
@@ -97,6 +97,6 @@ class ExportProxy {
   }
 }
 
-Object.setPrototypeOf(ExportProxy.prototype, null)
+Reflect.setPrototypeOf(ExportProxy.prototype, null)
 
 export default ExportProxy

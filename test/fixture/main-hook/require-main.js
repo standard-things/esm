@@ -1,5 +1,5 @@
 "use strict"
 
-const actual = "main" in require
+const actual = Reflect.has(require, "main")
 
 console.log("require-main:" + actual)

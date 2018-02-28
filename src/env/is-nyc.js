@@ -6,7 +6,7 @@ import shared from "../shared.js"
 function isNyc() {
   const { env } = shared
 
-  if ("nyc" in env) {
+  if (Reflect.has(env, "nyc")) {
     return env.nyc
   }
 

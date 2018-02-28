@@ -128,6 +128,6 @@ function getChildNames(value) {
   return childNames
 }
 
-Object.setPrototypeOf(Visitor.prototype, null)
+Reflect.setPrototypeOf(Visitor.prototype, null)
 
 export default Visitor

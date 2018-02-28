@@ -3,7 +3,7 @@ function getDescriptor(object, key) {
     return null
   }
 
-  return Object.getOwnPropertyDescriptor(object, key) || null
+  return Reflect.getOwnPropertyDescriptor(object, key) || null
 }
 
 export default getDescriptor

@@ -46,7 +46,7 @@ class Chunk {
   }
 }
 
-Object.setPrototypeOf(Chunk.prototype, null)
+Reflect.setPrototypeOf(Chunk.prototype, null)
 
 class MagicString {
   constructor(string) {
@@ -144,6 +144,6 @@ class MagicString {
   }
 }
 
-Object.setPrototypeOf(MagicString.prototype, null)
+Reflect.setPrototypeOf(MagicString.prototype, null)
 
 export default MagicString

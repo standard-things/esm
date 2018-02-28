@@ -1,11 +1,12 @@
 const ExFunction = __external__.Function
 
-const exFuncSuper = Object.getPrototypeOf(ExFunction)
-const exFuncProtoSuper = Object.getPrototypeOf(ExFunction.prototype)
+const exFuncSuper = Reflect.getPrototypeOf(ExFunction)
+const exFuncProtoSuper = Reflect.getPrototypeOf(ExFunction.prototype)
 
 function toExternalFunction(func) {
-  Object.setPrototypeOf(func.prototype, exFuncProtoSuper)
-  return Object.setPrototypeOf(func, exFuncSuper)
+  Reflect.setPrototypeOf(func.prototype, exFuncProtoSuper)
+  Reflect.setPrototypeOf(func, exFuncSuper)
+  return func
 }
 
 export default toExternalFunction

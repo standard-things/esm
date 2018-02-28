@@ -5,7 +5,7 @@ import shared from "../shared.js"
 function isPreloaded() {
   const { env } = shared
 
-  if ("preloaded" in env) {
+  if (Reflect.has(env, "preloaded")) {
     return env.preloaded
   }
 

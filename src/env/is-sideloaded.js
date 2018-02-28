@@ -10,7 +10,7 @@ import shared from "../shared.js"
 function isSideloaded() {
   const { env } = shared
 
-  if ("sideloaded" in env) {
+  if (Reflect.has(env, "sideloaded")) {
     return env.sideloaded
   }
 

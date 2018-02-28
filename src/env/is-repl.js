@@ -6,7 +6,7 @@ import shared from "../shared.js"
 function isREPL() {
   const { env } = shared
 
-  if ("repl" in env) {
+  if (Reflect.has(env, "repl")) {
     return env.repl
   }
 

@@ -345,7 +345,7 @@ function assignExportsToNamespace(entry) {
   if (skipDefault) {
     _namespace.default = exported
 
-    if (! ("default" in entry.getters)) {
+    if (! Reflect.has(entry.getters, "default")) {
       entry.addGetter("default", () => entry.namespace.default)
 
       entry.namespace = new OwnProxy(_namespace, {
@@ -608,6 +608,6 @@ function toNamespace(entry, source = entry.namespace) {
   })
 }
 
-Object.setPrototypeOf(Entry.prototype, null)
+Reflect.setPrototypeOf(Entry.prototype, null)
 
 export default Entry

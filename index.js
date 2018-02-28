@@ -15,7 +15,8 @@ const chakraVersion = versions.chakracore
 const engineVersion = versions.v8 || chakraVersion
 const nodeVersion = process.version
 
-const { defineProperty, freeze } = Object
+const { defineProperty } = Reflect
+const { freeze } = Object
 const { runInNewContext, runInThisContext } = Script.prototype
 
 const Module = useBuiltins ? module.constructor : require("module")

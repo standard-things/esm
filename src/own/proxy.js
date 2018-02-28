@@ -24,7 +24,7 @@ function init() {
     }
   }
 
-  Object.setPrototypeOf(OwnProxy.prototype, null)
+  Reflect.setPrototypeOf(OwnProxy.prototype, null)
 
   return OwnProxy
 }

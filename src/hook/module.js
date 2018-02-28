@@ -116,7 +116,7 @@ function hook(Mod, parent) {
     entry.cacheName = cacheName
     entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
 
-    Object.setPrototypeOf(mod, Module.prototype)
+    Reflect.setPrototypeOf(mod, Module.prototype)
 
     let cached = cache.compile[cacheName]
 

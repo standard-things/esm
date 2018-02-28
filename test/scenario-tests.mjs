@@ -4,8 +4,8 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
-const canTestJest = "v8" in process.versions
-const canTestPM2 = ! ("TRAVIS" in process.env)
+const canTestJest = Reflect.has(process.versions, "v8")
+const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const isWin = process.platform === "win32"
 

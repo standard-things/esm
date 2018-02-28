@@ -1,9 +1,12 @@
 import isObjectLike from "./is-object-like.js"
 
 function setDescriptor(object, key, descriptor) {
-  return isObjectLike(object) && isObjectLike(descriptor)
-    ? Object.defineProperty(object, key, descriptor)
-    : object
+  if (isObjectLike(object) &&
+      isObjectLike(descriptor)) {
+    Reflect.defineProperty(object, key, descriptor)
+  }
+
+  return object
 }
 
 export default setDescriptor

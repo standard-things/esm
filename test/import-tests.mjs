@@ -1,6 +1,6 @@
 import assert from "assert"
 
-const canTestLiveBinding = "v8" in process.versions
+const canTestLiveBinding = Reflect.has(process.versions, "v8")
 
 describe("import declarations", () => {
   it("should support same symbol as different locals", () =>

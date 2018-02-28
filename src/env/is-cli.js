@@ -5,7 +5,7 @@ import shared from "../shared.js"
 function isCLI() {
   const { env } = shared
 
-  if ("cli" in env) {
+  if (Reflect.has(env, "cli")) {
     return env.cli
   }
 

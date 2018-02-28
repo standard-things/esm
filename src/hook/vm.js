@@ -103,7 +103,7 @@ function hook(vm) {
           "m.exports=e.entry.exports;" +
           "require=e.entry.require;" +
           "e.entry.addBuiltinModules(g);" +
-          "Object.defineProperty(g,k,{" +
+          "Reflect.defineProperty(g,k,{" +
             "__proto__:null," +
             "value:e" +
           "})" +

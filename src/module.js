@@ -22,7 +22,7 @@ const BuiltinProto = BuiltinModule.prototype
 
 const Module = maskFunction(function (id, parent) {
   const mod = new BuiltinModule(id, parent)
-  Object.setPrototypeOf(mod, Module.prototype)
+  Reflect.setPrototypeOf(mod, Module.prototype)
   return mod
 }, BuiltinModule)
 

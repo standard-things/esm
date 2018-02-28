@@ -9,7 +9,7 @@ const names = [
 ]
 
 names.forEach((name) => {
-  Object.defineProperty(regexp, name, {
+  Reflect.defineProperty(regexp, name, {
     configurable: true,
     enumerable: true,
     value: regexp[name],

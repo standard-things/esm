@@ -8,7 +8,6 @@ export default () => {
 
   assert.ok(Object.isSealed(ns))
   assert.strictEqual(Object.prototype.toString.call(ns), "[object Module]")
-  assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), [Symbol.toStringTag])
-  assert.deepStrictEqual(Object.getOwnPropertyNames(ns), ["default"])
+  assert.deepStrictEqual(Reflect.ownKeys(ns), ["default", Symbol.toStringTag])
   assert.deepStrictEqual(ns, nsObject)
 }

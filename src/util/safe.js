@@ -20,7 +20,7 @@ function safe(Super) {
   }
 
   copy(safeProto, Super.prototype)
-  Object.setPrototypeOf(safeProto, null)
+  Reflect.setPrototypeOf(safeProto, null)
   return Safe
 }
 
@@ -35,13 +35,13 @@ function copy(object, source) {
 }
 
 function copyProperty(object, source, key) {
-  const descriptor = Object.getOwnPropertyDescriptor(source, key)
+  const descriptor = Reflect.getOwnPropertyDescriptor(source, key)
 
   if (descriptor) {
     if (isDataDescriptor(descriptor)) {
       object[key] = source[key]
     } else {
-      Object.defineProperty(object, key, descriptor)
+      Reflect.defineProperty(object, key, descriptor)
     }
   }
 
@@ -49,13 +49,9 @@ function copyProperty(object, source, key) {
 }
 
 function keysAll(object) {
-  if (object == null) {
-    return []
-  }
-
-  const names = Object.getOwnPropertyNames(object)
-  names.push(...Object.getOwnPropertySymbols(object))
-  return names
+  return object == null
+    ? []
+    : Reflect.ownKeys(object)
 }
 
 export default safe

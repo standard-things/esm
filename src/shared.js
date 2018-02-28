@@ -188,7 +188,7 @@ if (__shared__) {
   setDeferred(support, "proxiedClasses", () => {
     class A {}
 
-    Object.setPrototypeOf(A.prototype, null)
+    Reflect.setPrototypeOf(A.prototype, null)
 
     const proxy = new Proxy(A, { __proto__: null })
 
@@ -196,7 +196,7 @@ if (__shared__) {
       b() {}
     }
 
-    Object.setPrototypeOf(B.prototype, null)
+    Reflect.setPrototypeOf(B.prototype, null)
 
     return new B().b !== void 0
   })

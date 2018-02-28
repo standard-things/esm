@@ -8,6 +8,7 @@ import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
+import keys from "./util/keys.js"
 import loadESM from "./module/esm/load.js"
 import moduleState from "./module/state.js"
 import parseJSON from "./util/parse-json.js"
@@ -52,7 +53,7 @@ const defaultOptions = {
 
 const defaultCJS = defaultOptions.cjs
 const cacheKey = JSON.stringify(defaultOptions)
-const cjsKeys = Object.keys(defaultCJS)
+const cjsKeys = keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
@@ -432,7 +433,7 @@ function toOptions(value) {
   return isObjectLike(value) ? value : {}
 }
 
-Object.setPrototypeOf(Package.prototype, null)
+Reflect.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {

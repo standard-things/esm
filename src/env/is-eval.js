@@ -5,7 +5,7 @@ import shared from "../shared.js"
 function isEval() {
   const { env } = shared
 
-  if ("eval" in env) {
+  if (Reflect.has(env, "eval")) {
     return env.eval
   }
 

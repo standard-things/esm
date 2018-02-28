@@ -3,7 +3,7 @@
 function createNamespace(object) {
   const ns = Object.assign({ __proto__: null }, object)
 
-  Object.defineProperty(ns, Symbol.toStringTag, {
+  Reflect.defineProperty(ns, Symbol.toStringTag, {
     __proto__: null,
     configurable: false,
     enumerable: false,

@@ -62,7 +62,7 @@ const Shim = {
     }
 
     toString.prototype = void 0
-    Object.setPrototypeOf(toString, funcProto)
+    Reflect.setPrototypeOf(toString, funcProto)
 
     try {
       if (! shared.support.proxiedFunctions) {

@@ -5,7 +5,7 @@ import shared from "../shared.js"
 function isCheck() {
   const { env } = shared
 
-  if ("check" in env) {
+  if (Reflect.has(env, "check")) {
     return env.check
   }
 

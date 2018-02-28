@@ -12,8 +12,8 @@ const defaultDescriptor = {
 function setProperty(object, key, descriptor) {
   descriptor = toNullObject(descriptor, defaultDescriptor)
 
-  if ("get" in descriptor ||
-      "set" in descriptor) {
+  if (Reflect.has(descriptor, "get") ||
+      Reflect.has(descriptor, "set")) {
     delete descriptor.value
     delete descriptor.writable
   }

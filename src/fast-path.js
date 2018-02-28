@@ -79,6 +79,6 @@ function getNode(path, pos, callback) {
   return null
 }
 
-Object.setPrototypeOf(FastPath.prototype, null)
+Reflect.setPrototypeOf(FastPath.prototype, null)
 
 export default FastPath
