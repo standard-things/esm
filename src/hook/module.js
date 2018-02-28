@@ -16,6 +16,7 @@ import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
@@ -25,11 +26,14 @@ import { resolve } from "path"
 import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
-import toExternalFunction from "../util/to-external-function.js"
 import toOptInError from "../util/to-opt-in-error.js"
+
+const BuiltinModule = __non_webpack_module__.constructor
 
 const exts = [".js", ".mjs"]
 const importExportRegExp = /\b(?:im|ex)port\b/
+const sourceExtsJs = BuiltinModule._extensions[".js"]
+const sourceExtsMjs = BuiltinModule._extensions[".mjs"] || sourceExtsJs
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
@@ -147,9 +151,9 @@ function hook(Mod, parent) {
   }
 
   for (const ext of exts) {
-    if (typeof _extensions[ext] !== "function" &&
-        ext === ".mjs") {
-      _extensions[ext] = mjsCompiler
+    if (ext === ".mjs" &&
+        typeof _extensions[ext] !== "function") {
+      _extensions[ext] = maskFunction(mjsCompiler, sourceExtsMjs)
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, ext)
@@ -178,7 +182,7 @@ function hook(Mod, parent) {
   }
 }
 
-const mjsCompiler = toExternalFunction(function (mod, filename) {
+function mjsCompiler(mod, filename) {
   const error = new errors.Error("ERR_REQUIRE_ESM", mod)
   const { mainModule } = moduleState
 
@@ -188,7 +192,7 @@ const mjsCompiler = toExternalFunction(function (mod, filename) {
   }
 
   throw error
-})
+}
 
 function readCachedCode(filename) {
   return readFileFast(filename, "utf8")
