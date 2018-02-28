@@ -21,7 +21,6 @@ class ExportProxy {
     }
 
     const cache = shared.exportProxy
-
     let cached = cache.get(exported)
 
     if (cached) {

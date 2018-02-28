@@ -11,7 +11,6 @@ function maskFunction(func, source) {
   }
 
   const cache = shared.maskFunction
-
   let cached = cache.get(func)
 
   if (cached) {
