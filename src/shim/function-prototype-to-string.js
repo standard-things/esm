@@ -34,7 +34,7 @@ const Shim = {
   },
   enable(context) {
     if (Shim.check(context)) {
-      return
+      return context
     }
 
     // Section 19.2.3.5: Function.prototype.toString()
@@ -81,6 +81,8 @@ const Shim = {
 
       checked.set(funcProto, true)
     } catch (e) {}
+
+    return context
   }
 }
 

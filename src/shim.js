@@ -4,6 +4,7 @@ const Shim = {
   __proto__: null,
   enable(context) {
     functionPrototypeToString.enable(context)
+    return context
   }
 }
 
