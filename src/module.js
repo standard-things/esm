@@ -20,7 +20,7 @@ import wrapper from "./module/wrapper.js"
 const BuiltinModule = __non_webpack_module__.constructor
 const BuiltinProto = BuiltinModule.prototype
 
-const Module = maskFunction((id, parent) => {
+const Module = maskFunction(function (id, parent) {
   const mod = new BuiltinModule(id, parent)
   Object.setPrototypeOf(mod, Module.prototype)
   return mod
