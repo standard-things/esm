@@ -5,6 +5,7 @@
 import GenericArray from "./generic/array.js"
 
 import has from "./util/has.js"
+import maskFunction from "./util/mask-function.js"
 import maxSatisfying from "./util/max-satisfying.js"
 import setProperty from "./util/set-property.js"
 import setSilent from "./util/set-silent.js"
@@ -30,9 +31,9 @@ const Wrapper = {
   },
   manage(object, key, wrapper) {
     const value = Wrapper.unwrap(object, key)
-    const manager = toExternalFunction(function (...args) {
+    const manager = maskFunction(function (...args) {
       return Reflect.apply(wrapper, this, [manager, value, args])
-    })
+    }, value)
 
     setProperty(manager, shared.symbol.wrapper, {
       enumerable: false,
