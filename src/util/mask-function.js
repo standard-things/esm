@@ -3,6 +3,7 @@ import OwnProxy from "../own/proxy.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
+import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
 import unwrapProxy from "./unwrap-proxy.js"
 
 function maskFunction(func, source) {
@@ -68,5 +69,7 @@ function maskFunction(func, source) {
 
   return proxy
 }
+
+shimFunctionPrototypeToString.enable(shared.safeContext)
 
 export default maskFunction
