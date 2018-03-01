@@ -11,9 +11,9 @@ const nopPath = require.resolve("nop")
 export default () => {
   const esmRequire = makeRequire(module)
 
-  delete esmRequire.cache[abcPath]
-  delete esmRequire.cache[defPath]
-  delete esmRequire.cache[nopPath]
+  Reflect.deleteProperty(esmRequire.cache, abcPath)
+  Reflect.deleteProperty(esmRequire.cache, defPath)
+  Reflect.deleteProperty(esmRequire.cache, nopPath)
 
   const abc = esmRequire("./fixture/export/abc.mjs")
   const def = esmRequire("./fixture/export/def.js")

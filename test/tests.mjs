@@ -22,13 +22,13 @@ import "./scenario-tests.mjs"
 const jsonExt = require.extensions[".json"]
 
 beforeEach(() => {
-  delete global.customError
-  delete global.evaluated
-  delete global.loadCount
-  delete global.this
+  Reflect.deleteProperty(global, "customError")
+  Reflect.deleteProperty(global, "evaluated")
+  Reflect.deleteProperty(global, "loadCount")
+  Reflect.deleteProperty(global, "this")
 
-  delete require.cache[path.resolve("fixture/load-count.js")]
-  delete require.extensions[".coffee"]
+  Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
+  Reflect.deleteProperty(require.extensions, ".coffee")
 
   require.extensions[".json"] = jsonExt
 })

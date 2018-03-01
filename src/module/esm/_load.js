@@ -75,7 +75,7 @@ function load(request, parent, isMain, preload) {
         moduleState.mainModule = child
 
         if (isUnexposed) {
-          delete process.mainModule
+          Reflect.deleteProperty(process, "mainModule")
         }
       }
 
@@ -101,7 +101,7 @@ function load(request, parent, isMain, preload) {
     } catch (e) {
       error = e
       threw = true
-      delete state._cache[request]
+      Reflect.deleteProperty(state._cache, request)
     }
   })
 
@@ -121,7 +121,7 @@ function load(request, parent, isMain, preload) {
     throw error
   } finally {
     if (state === Module) {
-      delete state._cache[request]
+      Reflect.deleteProperty(state._cache, request)
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
       setGetter(state._cache, request, () => {

@@ -58,8 +58,8 @@ function compile(caller, entry, content, filename, fallback) {
       cached.code = readCachedCode(resolve(pkg.cachePath, cacheName))
       cache.compile[cacheName] = cached
     } else {
-      delete cache.compile[cacheName]
-      delete cache.map[cacheName]
+      Reflect.deleteProperty(cache.compile, cacheName)
+      Reflect.deleteProperty(cache.map, cacheName)
     }
   }
 
@@ -240,7 +240,7 @@ function tryCompileCode(caller, entry, content, options) {
 
     const isESM = e.sourceType === "module"
 
-    delete e.sourceType
+    Reflect.deleteProperty(e, "sourceType")
     captureStackTrace(e, caller)
     throw maskStackTrace(e, content, entry.module.filename, isESM)
   }

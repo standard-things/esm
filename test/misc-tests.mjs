@@ -55,8 +55,8 @@ function checkErrorCustomProps(error, code, message) {
   assert.strictEqual(error.toString(), "Custom: " + message)
   assert.deepStrictEqual(Object.keys(error), ["code", "name"])
 
-  delete error.code
-  delete error.name
+  Reflect.deleteProperty(error, "code")
+  Reflect.deleteProperty(error, "name")
 }
 
 function checkErrorProps(error, code, message) {
@@ -452,7 +452,7 @@ describe("Node rules", () => {
     ].reduce((promise, request, index) =>
       promise
         .then(() => {
-          delete global.evaluated
+          Reflect.deleteProperty(global, "evaluated")
           return import(request)
             .then(() => assert.ok(false))
             .catch((e) =>
@@ -524,7 +524,8 @@ describe("Node rules", () => {
   it("should not expose ESM in `require.cache`", () => {
     const filename = path.resolve("fixture/cache/out/index.mjs")
 
-    delete require.cache[filename]
+    Reflect.deleteProperty(require.cache, filename)
+
     return import(filename)
       .then(() => assert.strictEqual(filename in require.cache, false))
   })
@@ -837,8 +838,8 @@ describe("spec compliance", () => {
     ].reduce((promise, request) => {
       return promise
         .then(() => {
-          delete global.loadCount
-          delete require.cache[path.resolve("fixture/load-count.js")]
+          Reflect.deleteProperty(global, "loadCount")
+          Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
           return import(request)
         })
         .then(() => assert.strictEqual(global.loadCount, 1))

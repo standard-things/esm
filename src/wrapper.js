@@ -7,7 +7,6 @@ import GenericArray from "./generic/array.js"
 import has from "./util/has.js"
 import maskFunction from "./util/mask-function.js"
 import maxSatisfying from "./util/max-satisfying.js"
-import setProperty from "./util/set-property.js"
 import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
@@ -35,9 +34,11 @@ const Wrapper = {
       return Reflect.apply(wrapper, this, [manager, value, args])
     }, value)
 
-    setProperty(manager, shared.symbol.wrapper, {
-      enumerable: false,
-      value
+    Reflect.defineProperty(manager, shared.symbol.wrapper, {
+      __proto__: null,
+      configurable: true,
+      value,
+      writable: true
     })
 
     setSilent(object, key, manager)
@@ -72,9 +73,11 @@ function createMap(object, key) {
 function createStore(object) {
   const value = { __proto__: null }
 
-  setProperty(object, shared.symbol.wrapper, {
-    enumerable: false,
-    value
+  Reflect.defineProperty(object, shared.symbol.wrapper, {
+    __proto__: null,
+    configurable: true,
+    value,
+    writable: true
   })
 
   return value

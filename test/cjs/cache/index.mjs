@@ -8,6 +8,6 @@ export default () => {
   assert.ok(filename in require.cache)
   assert.strictEqual(require(filename).default, 1)
 
-  delete require.cache[filename]
+  Reflect.deleteProperty(require.cache, filename)
   assert.strictEqual(require(filename).default, 2)
 }

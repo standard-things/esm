@@ -1,4 +1,4 @@
 "use strict"
 
-delete require.cache[__filename]
+Reflect.deleteProperty(require.cache, __filename)
 module.exports = "delete cache"

@@ -23,7 +23,6 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { resolve } from "path"
-import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
@@ -106,7 +105,7 @@ function hook(Mod, parent) {
         if (shouldRestore) {
           mod._compile = _compile
         } else {
-          delete mod._compile
+          Reflect.deleteProperty(mod, "_compile")
         }
       }
 
@@ -127,17 +126,19 @@ function hook(Mod, parent) {
         cached.code = readCachedCode(resolve(cachePath, cacheName))
         cache.compile[cacheName] = cached
       } else {
-        delete cache.compile[cacheName]
-        delete cache.map[cacheName]
+        Reflect.deleteProperty(cache.compile, cacheName)
+        Reflect.deleteProperty(cache.map, cacheName)
       }
     }
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper
     } else {
-      setProperty(mod, shared.symbol._compile, {
-        enumerable: false,
-        value: compileWrapper
+      Reflect.defineProperty(mod, shared.symbol._compile, {
+        __proto__: null,
+        configurable: true,
+        value: compileWrapper,
+        writable: true
       })
     }
 
@@ -235,11 +236,9 @@ function tryPassthru(func, args, pkg) {
   }
 }
 
-setProperty(mjsCompiler, shared.symbol.mjs, {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
+Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
+  __proto__: null,
+  value: true
 })
 
 export default hook

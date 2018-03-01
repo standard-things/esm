@@ -225,7 +225,7 @@ function createOptions(options) {
 
   if (sourceMap !== void 0) {
     options.sourceMap = !! sourceMap
-    delete options.sourcemap
+    Reflect.deleteProperty(options, "sourcemap")
   }
 
   options.debug = !! options.debug

@@ -8,7 +8,8 @@ module.exports = () => {
   const makeRequire = require("../../")
   const esmRequire = makeRequire(module)
 
-  delete esmRequire.cache[livePath]
+  Reflect.deleteProperty(esmRequire.cache, livePath)
+
   const live = esmRequire(livePath)
 
   live.reset()

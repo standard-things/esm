@@ -7,6 +7,11 @@ const {
   STD_ESM
 } = PREFIX
 
+const markerDescriptor = {
+  __proto__: null,
+  value: true
+}
+
 function init() {
   const customInspect = () => "{}"
 
@@ -15,10 +20,13 @@ function init() {
 
     constructor(target, handler) {
       const proto = toNullObject(handler)
+
       proto[shared.symbol.inspect] = customInspect
-      handler = { __proto__: proto, [STD_ESM + ":proxy"]: 1 }
+      handler = { __proto__: proto }
+      Reflect.defineProperty(handler, STD_ESM + ":proxy", markerDescriptor)
 
       const proxy = new Proxy(target, handler)
+
       OwnProxy.instances.set(proxy, [target, handler])
       return proxy
     }

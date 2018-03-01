@@ -8,11 +8,17 @@ import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
 import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
-import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
 
 const ExObject = __external__.Object
+
+const customInspectDescriptor = {
+  __proto__: null,
+  configurable: true,
+  value: true,
+  writable: true
+}
 
 function init() {
   const builtinEntries = { __proto__: null }
@@ -34,10 +40,7 @@ function init() {
       }
     })
 
-    setProperty(exported, shared.symbol.inspect, {
-      enumerable: false,
-      value: true
-    })
+    Reflect.defineProperty(exported, shared.symbol.inspect, customInspectDescriptor)
 
     return exported
   }

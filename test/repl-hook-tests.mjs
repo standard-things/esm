@@ -21,10 +21,10 @@ describe("repl hook", () => {
       module: new module.constructor("<repl>")
     })
 
-    delete require.cache[pkgPath]
+    Reflect.deleteProperty(require.cache, pkgPath)
     context.module.require(pkgPath)
 
-    delete require.cache[pkgPath]
+    Reflect.deleteProperty(require.cache, pkgPath)
     parent.children.splice(pkgIndex, 1)
     parent.require(pkgPath)
   })

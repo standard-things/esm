@@ -5,10 +5,7 @@ function createNamespace(object) {
 
   Reflect.defineProperty(ns, Symbol.toStringTag, {
     __proto__: null,
-    configurable: false,
-    enumerable: false,
-    value: "Module",
-    writable: false
+    value: "Module"
   })
 
   return Object.seal(ns)

@@ -1,3 +1,3 @@
 global.customError = new Error
-delete customError.stack
+Reflect.deleteProperty(customError, "stack")
 throw customError

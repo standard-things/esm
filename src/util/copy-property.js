@@ -1,15 +1,18 @@
-import getDescriptor from "./get-descriptor.js"
 import isDataDescriptor from "./is-data-descriptor.js"
-import setDescriptor from "./set-descriptor.js"
+import isObjectLike from "./is-object-like.js"
 
 function copyProperty(object, source, key) {
-  const descriptor = getDescriptor(source, key)
+  if (! isObjectLike(object) ||
+      ! isObjectLike(source)) {
+    return object
+  }
+  const descriptor = Reflect.getOwnPropertyDescriptor(source, key)
 
   if (descriptor) {
     if (isDataDescriptor(descriptor)) {
       object[key] = source[key]
     } else {
-      setDescriptor(object, key, descriptor)
+      Reflect.defineProperty(object, key, descriptor)
     }
   }
 

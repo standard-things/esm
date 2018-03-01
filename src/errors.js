@@ -1,6 +1,5 @@
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "util"
-import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
@@ -34,9 +33,11 @@ function createNodeClass(Super) {
         this.code = code
         this.name = super.name
       } else {
-        setProperty(this, shared.symbol.errorCode, {
-          enumerable: false,
-          value: code
+        Reflect.defineProperty(this, shared.symbol.errorCode, {
+          __proto__: null,
+          configurable: true,
+          value: code,
+          writable: true
         })
       }
     }
@@ -46,7 +47,13 @@ function createNodeClass(Super) {
     }
 
     set code(value) {
-      setProperty(this, "code", { value })
+      Reflect.defineProperty(this, "code", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true
+      })
     }
 
     get name() {
@@ -54,7 +61,13 @@ function createNodeClass(Super) {
     }
 
     set name(value) {
-      setProperty(this, "name", { value })
+      Reflect.defineProperty(this, "name", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true
+      })
     }
   }
 }

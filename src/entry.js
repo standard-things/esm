@@ -13,7 +13,6 @@ import isOwnProxy from "./util/is-own-proxy.js"
 import keys from "./util/keys.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
-import setProperty from "./util/set-property.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
@@ -22,18 +21,14 @@ import warn from "./warn.js"
 const GETTER_ERROR = { __proto__: null }
 const STAR_ERROR = { __proto__: null }
 
-const esmDescriptor = {
-  configurable: false,
-  enumerable: false,
-  value: true,
-  writable: false
+const pseudoDescriptor = {
+  __proto__: null,
+  value: true
 }
 
 const toStringTagDescriptor = {
-  configurable: false,
-  enumerable: false,
-  value: "Module",
-  writable: false
+  __proto__: null,
+  value: "Module"
 }
 
 class Entry {
@@ -234,7 +229,7 @@ class Entry {
         ! Object.isSealed(exported)) {
       if (this.package.options.cjs.interop &&
           ! has(this._namespace, "__esModule")) {
-        setProperty(exported, "__esModule", esmDescriptor)
+        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
 
       for (const name in this._namespace) {
@@ -279,8 +274,7 @@ class Entry {
       setDeferred(this, "esmNamespace", () => toNamespace(this))
     }
 
-    delete shared.entry.skipExports[this.name]
-
+    Reflect.deleteProperty(shared.entry.skipExports, this.name)
     return this._loaded = 1
   }
 
@@ -422,7 +416,9 @@ function createNamespace() {
   // Section 26.3.1: @@toStringTag
   // Module namespace objects have a @@toStringTag value of "Module".
   // https://tc39.github.io/ecma262/#sec-@@tostringtag
-  return setProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
+  Reflect.defineProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
+
+  return namespace
 }
 
 function getExportByName(entry, setter, name) {
@@ -446,7 +442,7 @@ function getExportByName(entry, setter, name) {
       (entry._loaded === 1 &&
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
-    delete entry.setters[name]
+    Reflect.deleteProperty(entry.setters, name)
     throw new errors.SyntaxError("ERR_EXPORT_MISSING", entry.module, name)
   }
 

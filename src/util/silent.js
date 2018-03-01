@@ -1,6 +1,8 @@
-import getDescriptor from "../util/get-descriptor.js"
-import setDescriptor from "../util/set-descriptor.js"
-import setProperty from "../util/set-property.js"
+const noDeprecationDescriptor = {
+  __proto__: null,
+  configurable: true,
+  value: true
+}
 
 function silent(callback) {
   let oldDescriptor
@@ -8,10 +10,10 @@ function silent(callback) {
   const shouldRestore = ! process.noDeprecation
 
   if (shouldRestore) {
-    oldDescriptor = getDescriptor(process, "noDeprecation")
+    oldDescriptor = Reflect.getOwnPropertyDescriptor(process, "noDeprecation")
 
     if (oldDescriptor) {
-      setProperty(process, "noDeprecation", { value: true, writable: false })
+      Reflect.defineProperty(process, "noDeprecation", noDeprecationDescriptor)
     } else {
       process.noDeprecation = true
     }
@@ -25,9 +27,9 @@ function silent(callback) {
 
   if (shouldRestore) {
     if (oldDescriptor) {
-      setDescriptor(process, "noDeprecation", oldDescriptor)
+      Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
     } else {
-      delete process.noDeprecation
+      Reflect.deleteProperty(process, "noDeprecation")
     }
   }
 

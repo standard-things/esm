@@ -37,7 +37,7 @@ function load(request, parent, isMain, preload) {
       threw = false
     } finally {
       if (threw) {
-        delete Module._cache[filename]
+        Reflect.deleteProperty(Module._cache, filename)
       }
     }
   })

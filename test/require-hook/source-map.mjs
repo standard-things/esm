@@ -17,8 +17,8 @@ export default () => {
         assert.ok(content.includes("sourceMappingURL"))
       }
 
-      delete esmRequire.cache[abcPath]
-      delete esmRequire.cache[defPath]
+      Reflect.deleteProperty(esmRequire.cache, abcPath)
+      Reflect.deleteProperty(esmRequire.cache, defPath)
 
       esmRequire.extensions[".mjs"](mod, abcPath)
       mod.exports = {}

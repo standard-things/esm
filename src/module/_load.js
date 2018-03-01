@@ -68,7 +68,7 @@ function load(request, parent, isMain, state, loader) {
     const { _compile } = child
 
     child._compile = (content, filename) => {
-      delete child._compile
+      Reflect.deleteProperty(child, "_compile")
 
       const symbol = shared.symbol._compile
       const func = typeof child[symbol] === "function"

@@ -9,7 +9,6 @@ import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 import setDeferred from "./util/set-deferred.js"
-import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
 const ExPromise = __external__.Promise
@@ -41,10 +40,11 @@ const Runtime = {
     }
 
     const { runtimeName } = entry
+    const { unsafeContext } = shared
 
     content = result.code
 
-    if (global[runtimeName]) {
+    if (unsafeContext[runtimeName]) {
       return content
     }
 
@@ -54,14 +54,15 @@ const Runtime = {
         "let " + runtimeName + "=global." + runtimeName + ";" +
         content
 
-      setProperty(global, runtimeName, {
-        enumerable: false,
+      Reflect.defineProperty(unsafeContext, runtimeName, {
+        __proto__: null,
+        configurable: true,
         get: () => {
-          delete global[runtimeName]
+          Reflect.deleteProperty(unsafeContext, runtimeName)
           return this
         }
       })
-    } else if (! (runtimeName in global)) {
+    } else if (! (runtimeName in unsafeContext)) {
       const globalImport = this.import.bind({
         __proto__: null,
         entry
@@ -69,16 +70,16 @@ const Runtime = {
 
       const globalRuntime = { __proto__: null }
 
-      setProperty(globalRuntime, "i", {
-        enumerable: false,
-        value: globalImport
+      Reflect.defineProperty(globalRuntime, "i", {
+        __proto__: null,
+        configurable: true,
+        value: globalImport,
+        writable: true
       })
 
-      setProperty(global, runtimeName, {
-        configurable: false,
-        enumerable: false,
-        value: globalRuntime,
-        writable: false
+      Reflect.defineProperty(global, runtimeName, {
+        __proto__: null,
+        value: globalRuntime
       })
 
       Object.freeze(globalImport)

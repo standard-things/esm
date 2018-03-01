@@ -1,11 +1,15 @@
 
-import getDescriptor from "../util/get-descriptor.js"
 import isNative from "../util/is-native.js"
+import isObjectLike from "../util/is-object-like.js"
 
 function isStackTraceMasked(error) {
-  const descriptor = getDescriptor(error, "stack")
+  if (! isObjectLike(error)) {
+    return false
+  }
 
-  return !! descriptor &&
+  const descriptor = Reflect.getOwnPropertyDescriptor(error, "stack")
+
+  return descriptor !== void 0 &&
     descriptor.configurable === true &&
     descriptor.enumerable === false &&
     typeof descriptor.get === "function" &&

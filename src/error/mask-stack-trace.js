@@ -7,7 +7,6 @@ import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
-import setProperty from "../util/set-property.js"
 
 const {
   ZWJ
@@ -36,8 +35,9 @@ function maskStackTrace(error, content, filename, isESM) {
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
   // However, `Error.captureStackTrace()` will throw when receiving a proxy
   // wrapped error object.
-  return setProperty(error, "stack", {
-    enumerable: false,
+  Reflect.defineProperty(error, "stack", {
+    __proto__: null,
+    configurable: true,
     get() {
       const newMessage = safeToString(error)
 
@@ -56,12 +56,16 @@ function maskStackTrace(error, content, filename, isESM) {
       return error.stack = stack
     },
     set(value) {
-      setProperty(error, "stack", {
-        enumerable: false,
-        value
+      Reflect.defineProperty(error, "stack", {
+        __proto__: null,
+        configurable: true,
+        value,
+        writable: true
       })
     }
   })
+
+  return error
 }
 
 // Transform parser stack lines from:

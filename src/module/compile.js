@@ -77,7 +77,7 @@ function compile(content, filename) {
         meta[1] = -1
       }
 
-      delete cached.scriptData
+      Reflect.deleteProperty(cached, "scriptData")
     }
   }
 
@@ -109,7 +109,7 @@ function compile(content, filename) {
 
     // Set breakpoint on module start.
     if (filename === resolvedArgv) {
-      delete process._breakFirstLine
+      Reflect.deleteProperty(process, "_breakFirstLine")
       inspectorWrapper = binding.inspector.callAndPauseOnStart
 
       if (useRunInDebugContext &&

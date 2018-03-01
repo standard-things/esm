@@ -22,7 +22,6 @@ import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
-import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
@@ -126,26 +125,41 @@ function hook(vm) {
     const req = entry.require
     const exportedConsole = req("console")
 
-    setProperty(context, "console", {
+    Reflect.defineProperty(context, "console", {
+      __proto__: null,
+      configurable: true,
+      enumerable: true,
       get: () => exportedConsole
     })
 
-    setProperty(context, "process", {
-      value: req("process")
+    Reflect.defineProperty(context, "process", {
+      __proto__: null,
+      configurable: true,
+      enumerable: true,
+      value: req("process"),
+      writable: true
     })
 
     for (const name of lazyModules) {
       const set = (value) => {
-        setProperty(context, name, { value })
+        Reflect.defineProperty(context, name, {
+          __proto__: null,
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
       }
 
-      setProperty(context, name, {
-        enumerable: false,
+      Reflect.defineProperty(context, name, {
+        __proto__: null,
+        configurable: true,
         get() {
           const exported = req(name)
 
-          setProperty(context, name, {
-            enumerable: false,
+          Reflect.defineProperty(context, name, {
+            __proto__: null,
+            configurable: true,
             get: () => exported,
             set
           })
@@ -209,21 +223,32 @@ function hook(vm) {
         const _inspect = util.inspect
         const { inspect } = builtinEntries.util.module.exports
 
-        setProperty(util, shared.symbol.inspect, {
-          enumerable: false,
-          value: true
+        Reflect.defineProperty(util, shared.symbol.inspect, {
+          __proto__: null,
+          configurable: true,
+          value: true,
+          writable: true
         })
 
         if (support.replShowProxy) {
           util.inspect = inspect
         } else {
-          setProperty(util, "inspect", {
+          Reflect.defineProperty(util, "inspect", {
+            __proto__: null,
+            configurable: true,
+            enumerable: true,
             get() {
               util.inspect = inspect
               return _inspect
             },
             set(value) {
-              setProperty(util, "inspect", { value })
+              Reflect.defineProperty(util, "inspect", {
+                __proto__: null,
+                configurable: true,
+                enumerable: true,
+                value,
+                writable: true
+               })
             }
           })
         }
@@ -260,7 +285,7 @@ function tryWrapper(func, args) {
     const [content] = args
     const isESM = e.sourceType === "module"
 
-    delete e.sourceType
+    Reflect.deleteProperty(e, "sourceType")
     throw maskStackTrace(e, content, null, isESM)
   }
 }

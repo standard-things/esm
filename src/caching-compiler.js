@@ -129,8 +129,8 @@ function compileAndWrite(entry, code, options) {
 function removeCacheFile(cachePath, cacheName) {
   const cache = shared.package.dir[cachePath]
 
-  delete cache.compile[cacheName]
-  delete cache.map[cacheName]
+  Reflect.deleteProperty(cache.compile, cacheName)
+  Reflect.deleteProperty(cache.map, cacheName)
   return removeFile(resolve(cachePath, cacheName))
 }
 
@@ -185,8 +185,8 @@ if (! shared.inited) {
         continue
       }
 
-      delete pendingWrites[cachePath]
-      delete pendingMetas[cachePath]
+      Reflect.deleteProperty(pendingWrites, cachePath)
+      Reflect.deleteProperty(pendingMetas, cachePath)
 
       if (! mkdirp(cachePath)) {
         continue
