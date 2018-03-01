@@ -60,6 +60,7 @@
     "mock-require": "^2.0.2",
     "mock-stdio": "^1.0.0",
     "nop": "^1.0.0",
+    "null-loader": "^0.1.1",
     "nyc": "^11.5.0",
     "optimize-js-plugin": "0.0.4",
     "pm2": "^2.10.1",

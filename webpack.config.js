@@ -44,13 +44,19 @@ const config = {
     filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    path: path.resolve(__dirname, "build")
+    path: path.resolve("build")
   },
   module: {
-    rules: [{
-      loader: "babel-loader",
-      test: /\.js$/
-    }]
+    rules: [
+      {
+        loader: "babel-loader",
+        test: /\.js$/
+      },
+      {
+        test: path.resolve("src/vendor/acorn/src/unicode-property-data.js"),
+        use: "null-loader"
+      }
+    ]
   },
   plugins: [
     new BannerPlugin({
