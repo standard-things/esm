@@ -522,6 +522,7 @@ function runGetters(entry) {
 
 function runSetter(entry, name, callback) {
   const { children, getters } = entry
+  const cached = entry.package.cache.compile[entry.cacheName]
   const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
@@ -533,7 +534,8 @@ function runSetter(entry, name, callback) {
       callback(setter, value)
     } else if (value === void 0 &&
         name in getters &&
-        setter.parent.name in children) {
+        setter.parent.name in children &&
+        cached.exportTemporals.indexOf(name) !== -1) {
       warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }

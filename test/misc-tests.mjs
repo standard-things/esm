@@ -1040,15 +1040,39 @@ describe("spec compliance", () => {
     }, Promise.resolve())
   )
 
-  it("should warn for potential TDZ access", () => {
-    const filename = path.resolve("fixture/cycle/tdz/a.mjs")
-    const url = getURLFromFilePath(filename)
-    const stderr = getWarning(stdName + " detected possible temporal dead zone access of 'a' in %s", url)
+  it("should warn for potential TDZ access of const or let bindings", () =>
+    [
+      "./fixture/cycle/tdz-const/a.mjs",
+      "./fixture/cycle/tdz-let/a.mjs"
+    ]
+    .reduce((promise, request) => {
+      const filename = path.resolve(request)
+      const url = getURLFromFilePath(filename)
+      const stderr = getWarning(stdName + " detected possible temporal dead zone access of 'a' in %s", url)
 
-    mockIo.start()
-    return import(filename)
-      .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
-  })
+      return promise
+        .then(() => {
+          mockIo.start()
+          return import(filename)
+            .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
+        })
+    }, Promise.resolve())
+  )
+
+  it("should not warn for potential TDZ access of class or function bindings", () =>
+    [
+      "./fixture/cycle/tdz-class/a.mjs",
+      "./fixture/cycle/tdz-function/a.mjs"
+    ]
+    .reduce((promise, request) =>
+      promise
+        .then(() => {
+          mockIo.start()
+          return import(request)
+            .then(() => assert.deepStrictEqual(mockIo.end(), { stderr: "", stdout: "" }))
+        })
+    , Promise.resolve())
+  )
 
   it("should not error accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
