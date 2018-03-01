@@ -11,6 +11,7 @@ const Plugin = {
   enable(parser) {
     // Allow `yield import()` to parse.
     tt._import.startsExpr = true
+
     parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
     parser.parseStatement = wrap(parser.parseStatement, parseStatement)
     return parser
@@ -66,22 +67,25 @@ function parseImportCall(parser) {
 
   callExpr.arguments = [parser.parseMaybeAssign()]
   callExpr.callee = callee
-  parser.finishNode(callExpr, "CallExpression")
 
+  parser.finishNode(callExpr, "CallExpression")
   parser.expect(tt.parenR)
 
   const expr = parser.parseSubscripts(callExpr, start)
+
   return parser.parseExpressionStatement(node, expr)
 }
 
 function parseImportMetaProperty(parser) {
   const node = parser.startNode()
   const expr = parser.parseMaybeAssign()
+
   return parser.parseExpressionStatement(node, expr)
 }
 
 function parseImportCallAtom(parser) {
   const node = parser.startNode()
+
   parser.expect(tt._import)
   return parser.finishNode(node, "Import")
 }
