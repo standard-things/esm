@@ -51,8 +51,9 @@ const CachingCompiler = {
       exportNames: meta[4] || null,
       exportSpecifiers: null,
       exportStars: meta[5] || null,
+      exportTemporals: meta[6] || null,
       scriptData: null,
-      warnings: meta[6] || null
+      warnings: meta[7] || null
     }
 
     if (result.esm) {
@@ -252,6 +253,7 @@ if (! shared.inited) {
             cached.dependencySpecifiers,
             cached.exportNames,
             cached.exportStars,
+            cached.exportTemporals,
             cached.warnings
           ]
         } else {

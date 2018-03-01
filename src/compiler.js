@@ -46,6 +46,7 @@ const Compiler = {
       exportNames: null,
       exportSpecifiers: null,
       exportStars: null,
+      exportTemporals: null,
       scriptData: null,
       warnings: null
     }
@@ -162,6 +163,7 @@ const Compiler = {
       result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
       result.exportNames = importExportVisitor.exportNames
       result.exportStars = importExportVisitor.exportStars
+      result.exportTemporals = importExportVisitor.exportTemporals
 
       if (options.warnings &&
           ! options.cjs.vars &&

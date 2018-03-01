@@ -17,6 +17,7 @@ function parseTopLevel(node) {
   const { body } = node
   const exported = { __proto__: null }
   const idents = []
+  const temporals = []
   const top = { __proto__: null }
 
   let hoistedPrefixString = ""
@@ -51,11 +52,18 @@ function parseTopLevel(node) {
     }
 
     if (type === "VariableDeclaration") {
+      const { kind } = object
+      const isTemporal = kind !== "var"
+
       for (const decl of object.declarations) {
         const names = getNamesFromPattern(decl.id)
 
         for (const name of names) {
           idents.push(name)
+
+          if (isTemporal) {
+            temporals.push(name)
+          }
         }
       }
     } else if (type === "ClassDeclaration" ||
@@ -77,6 +85,7 @@ function parseTopLevel(node) {
   top.hoistedExportsString = ""
   top.hoistedImportsString = ""
   top.hoistedPrefixString = hoistedPrefixString
+  top.temporals = temporals
 
   this.next()
   node.sourceType = this.options.sourceType

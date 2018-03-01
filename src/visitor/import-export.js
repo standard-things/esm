@@ -36,6 +36,7 @@ class ImportExportVisitor extends Visitor {
     this.esm = options.esm
     this.exportNames = []
     this.exportStars = []
+    this.exportTemporals = []
     this.generateVarDeclarations = options.generateVarDeclarations
     this.magicString = new MagicString(code)
     this.possibleIndexes = options.possibleIndexes
@@ -266,6 +267,9 @@ class ImportExportVisitor extends Visitor {
     this.changed =
     this.addedImportExport = true
 
+    const { exportTemporals } = this
+    const { temporals } = this.top
+
     const node = path.getValue()
     const { declaration } = node
 
@@ -288,6 +292,10 @@ class ImportExportVisitor extends Visitor {
 
           for (const name of names) {
             pairs.push([name, name])
+
+            if (temporals.indexOf(name) !== -1) {
+              exportTemporals.push(name)
+            }
           }
         }
       }
@@ -329,7 +337,11 @@ class ImportExportVisitor extends Visitor {
           )
         }
 
-       pairs.push([specifier.exported.name, localName])
+        if (temporals.indexOf(localName) !== -1) {
+          exportTemporals.push(localName)
+        }
+
+        pairs.push([specifier.exported.name, localName])
       }
 
       hoistExports(this, node, pairs)
