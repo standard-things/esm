@@ -33,6 +33,8 @@ const Plugin = {
     parser.exitFunctionScope =
     parser.exitLexicalScope =
     parser.invalidStringToken =
+    parser.regexp_validateUnicodePropertyNameAndValue =
+    parser.regexp_validateUnicodePropertyNameOrValue =
     parser.validateRegExpFlags =
     parser.validateRegExpPattern = noop
 
