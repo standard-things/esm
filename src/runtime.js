@@ -218,15 +218,17 @@ function createSetter(from, setter) {
 
 function runCJS(entry, moduleWrapper) {
   const mod = entry.module
+  const runtime = mod.exports
   const exported = mod.exports = entry.exports
   const req = makeRequireFunction(mod)
 
   entry.exports = null
-  return Reflect.apply(moduleWrapper, exported, [shared.unsafeContext, exported, req])
+  return Reflect.apply(moduleWrapper, exported, [runtime, shared.unsafeContext, exported, req])
 }
 
 function runESM(entry, moduleWrapper) {
   const mod = entry.module
+  const runtime = mod.exports
   const exported = mod.exports = entry.exports
 
   entry.exports = null
@@ -236,9 +238,9 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
     req.main = moduleState.mainModule
-    result = Reflect.apply(moduleWrapper, exported, [shared.unsafeContext, exported, req])
+    result = Reflect.apply(moduleWrapper, exported, [runtime, shared.unsafeContext, exported, req])
   } else {
-    result = Reflect.apply(moduleWrapper, void 0, [shared.unsafeContext])
+    result = Reflect.apply(moduleWrapper, void 0, [runtime, shared.unsafeContext])
   }
 
   // Set the loaded state here in case the module was sideloaded.

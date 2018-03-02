@@ -11,6 +11,7 @@ import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isInspect from "../env/is-inspect.js"
+import isPrint from "../env/is-print.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -152,8 +153,8 @@ function tryCompileCJS(entry) {
   const { module:mod, runtimeName } = entry
 
   let content =
-    "const " + runtimeName + "=this;" +
-    "return " + runtimeName + ".r((" + async + "function(global,exports,require){" +
+    (isPrint() ? "return " : "") +
+    "this.r((" + async + "function(" + runtimeName + ",global,exports,require){" +
     entry.package.cache.compile[entry.cacheName].code +
     "\n}))"
 
@@ -175,10 +176,12 @@ function tryCompileESM(entry) {
   const { options } = entry.package
 
   let content =
-    '"use strict";const ' + runtimeName + "=this;" +
-    "return " + runtimeName + ".r((" + async + "function(global" +
+    (isPrint() ? "return " : "") +
+    "this.r((" + async + "function(" + runtimeName + ",global" +
     (options.cjs.vars ? ",exports,require" : "") +
-    "){" + entry.package.cache.compile[entry.cacheName].code + "\n}))"
+    '){"use strict";' +
+    entry.package.cache.compile[entry.cacheName].code +
+    "\n}))"
 
   content += maybeSourceMap(entry, content)
 
