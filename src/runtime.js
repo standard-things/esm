@@ -237,7 +237,7 @@ function runESM(entry, moduleWrapper) {
 
   if (entry.package.options.cjs.vars) {
     const req = makeRequireFunction(mod)
-    req.main = moduleState.mainModule
+
     result = Reflect.apply(moduleWrapper, exported, [runtime, shared.unsafeContext, exported, req])
   } else {
     result = Reflect.apply(moduleWrapper, void 0, [runtime, shared.unsafeContext])
