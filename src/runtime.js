@@ -243,9 +243,30 @@ function runESM(entry, moduleWrapper) {
     result = Reflect.apply(moduleWrapper, void 0, [runtime, shared.unsafeContext])
   }
 
-  // Set the loaded state here in case the module was sideloaded.
-  mod.loaded = true
-  entry.update().loaded()
+  let { loaded } = mod
+
+  Reflect.defineProperty(mod, "loaded", {
+    __proto__: null,
+    configurable: true,
+    enumerable: true,
+    get: () => loaded,
+    set(value) {
+      if (value) {
+        Reflect.defineProperty(mod, "loaded", {
+          __proto__: null,
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
+
+        entry.update().loaded()
+      } else {
+        loaded = value
+      }
+    }
+  })
+
   return result
 }
 
