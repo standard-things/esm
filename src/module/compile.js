@@ -78,7 +78,7 @@ function compile(content, filename) {
         cachedDataRejected) {
       changed = true
 
-      const meta = cache.map[cacheName]
+      const meta = cache.map && cache.map[cacheName]
 
       if (meta) {
         meta[0] =
