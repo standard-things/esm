@@ -18,14 +18,27 @@ function parseTopLevel(node) {
   const exported = { __proto__: null }
   const idents = []
   const temporals = []
-  const top = { __proto__: null }
 
-  let hoistedPrefixString = ""
+  const top = {
+    __proto__: null,
+    hoistedExports: [],
+    hoistedExportsString: "",
+    hoistedImportsString: "",
+    hoistedPrefixString: "",
+    idents,
+    insertCharIndex: node.start,
+    insertNodeIndex: 0,
+    returnOutsideFunction: false,
+    temporals
+  }
+
   let inited = false
-  let insertCharIndex = node.start
-  let insertNodeIndex = 0
 
   while (this.type !== tt.eof) {
+    if (this.type === tt._return) {
+      top.returnOutsideFunction = true
+    }
+
     const stmt = this.parseStatement(true, true, exported)
     let { expression, type } = stmt
 
@@ -36,9 +49,9 @@ function parseTopLevel(node) {
       if (type === "ExpressionStatement" &&
           expression.type === "Literal" &&
           typeof expression.value === "string") {
-        insertCharIndex = stmt.end
-        insertNodeIndex = body.length + 1
-        hoistedPrefixString = ";"
+        top.insertCharIndex = stmt.end
+        top.insertNodeIndex = body.length + 1
+        top.hoistedPrefixString = ";"
       } else {
         inited = true
       }
@@ -78,16 +91,8 @@ function parseTopLevel(node) {
     body.push(stmt)
   }
 
-  top.idents = idents
-  top.insertCharIndex = insertCharIndex
-  top.insertNodeIndex = insertNodeIndex
-  top.hoistedExports = []
-  top.hoistedExportsString = ""
-  top.hoistedImportsString = ""
-  top.hoistedPrefixString = hoistedPrefixString
-  top.temporals = temporals
-
   this.next()
+
   node.sourceType = this.options.sourceType
   node.top = top
   return this.finishNode(node, "Program")

@@ -11,7 +11,6 @@ import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isInspect from "../env/is-inspect.js"
-import isPrint from "../env/is-print.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -150,12 +149,13 @@ function tryCompileCached(entry) {
 
 function tryCompileCJS(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
+  const cached = entry.package.cache.compile[entry.cacheName]
   const mod = entry.module
 
   let content =
-    (isPrint() ? "return " : "") +
+    (cached.topLevelReturn ? "return " : "") +
     "this.r((" + async + "function(" + entry.runtimeName + ",global,exports,require){" +
-    entry.package.cache.compile[entry.cacheName].code +
+    cached.code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)
@@ -173,14 +173,15 @@ function tryCompileCJS(entry) {
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
   const { module:mod, package:pkg } = entry
+  const cached = pkg.cache.compile[entry.cacheName]
   const { options } = pkg
 
   let content =
-    (isPrint() ? "return " : "") +
+    (cached.topLevelReturn ? "return " : "") +
     "this.r((" + async + "function(" + entry.runtimeName + ",global" +
     (options.cjs.vars ? ",exports,require" : "") +
     '){"use strict";' +
-    pkg.cache.compile[entry.cacheName].code +
+    cached.code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)

@@ -48,6 +48,7 @@ const Compiler = {
       exportStars: null,
       exportTemporals: null,
       scriptData: null,
+      topLevelReturn: false,
       warnings: null
     }
 
@@ -66,15 +67,10 @@ const Compiler = {
 
     const possibleIndexes = findIndexes(code, ["export", "eval", "import"])
 
-    if ((type === "script" ||
-         type === "unambiguous") &&
-        ! possibleIndexes.length) {
-      return result
-    }
-
     let ast
     let error
     let threw = true
+    let topLevelOnly = false
 
     const allowReturnOutsideFunction =
       options.cjs.topLevelReturn ||
@@ -82,10 +78,17 @@ const Compiler = {
 
     const sourceType = type === "script" ? type : "module"
 
+    if ((type === "script" ||
+         type === "unambiguous") &&
+        ! possibleIndexes.length) {
+      topLevelOnly = true
+    }
+
     const parserOptions = {
       allowReturnOutsideFunction,
       sourceType,
-      strict: options.strict
+      strict: options.strict,
+      topLevelOnly
     }
 
     try {
@@ -97,6 +100,7 @@ const Compiler = {
     }
 
     if (threw &&
+        ! topLevelOnly &&
         type === "unambiguous") {
       type = parserOptions.sourceType = "script"
 
@@ -110,9 +114,16 @@ const Compiler = {
       throw error
     }
 
+    const { top } = ast
+
+    result.topLevelReturn = top.returnOutsideFunction
+
+    if (topLevelOnly) {
+      return result
+    }
+
     const rootPath = new FastPath(ast)
     const { runtimeName } = options
-    const { top } = ast
 
     try {
       importExportVisitor.visit(rootPath, code, {

@@ -4,6 +4,7 @@ import awaitAnywherePlugin from "./acorn-plugin/await-anywhere.js"
 import dynamicImportPlugin from "./acorn-plugin/dynamic-import.js"
 import functionParamsStartPlugin from "./acorn-plugin/function-params-start.js"
 import htmlCommentPlugin from "./acorn-plugin/html-comment.js"
+import quickParseBlockPlugin from "./acorn-plugin/quick-parse-block.js"
 import toNullObject from "./util/to-null-object.js"
 import tolerancePlugin from "./acorn-plugin/tolerance.js"
 import topLevelPlugin from "./acorn-plugin/top-level.js"
@@ -13,7 +14,8 @@ const defaultOptions = {
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
   sourceType: "module",
-  strict: void 0
+  strict: void 0,
+  topLevelOnly: false
 }
 
 const Parser = {
@@ -32,6 +34,10 @@ const Parser = {
     htmlCommentPlugin.enable(parser)
     tolerancePlugin.enable(parser)
     topLevelPlugin.enable(parser)
+
+    if (options.topLevelOnly) {
+      quickParseBlockPlugin.enable(parser)
+    }
 
     if (strict !== void 0) {
       parser.strict = strict

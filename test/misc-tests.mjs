@@ -13,7 +13,6 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
-const skipDecorateCheck = SemVer.satisfies(process.version, "<5")
 const slashRegExp = /[\\/]/g
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
@@ -294,9 +293,8 @@ describe("errors", () => {
           } else {
             checkErrorStack(e, [
               id7 + ":1",
-              skipDecorateCheck
-                ? "SyntaxError: Unexpected token ILLEGAL"
-                : "syntax@error\n\n"
+              "syntax@error",
+              "      ^\n"
             ].join("\n"))
           }
         }),
@@ -308,9 +306,8 @@ describe("errors", () => {
           } else {
             checkErrorStack(e, [
               id8 + ":1",
-              skipDecorateCheck
-                ? "SyntaxError: Unexpected token ILLEGAL"
-                : "syntax@error"
+              "syntax@error",
+              "      ^\n"
             ].join("\n"))
           }
         })
