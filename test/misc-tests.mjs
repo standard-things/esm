@@ -328,15 +328,19 @@ describe("errors", () => {
 })
 
 describe("Node rules", () => {
-  it("should find .mjs before .js", () =>
-    Promise.all([
-      "./fixture/ext-priority",
-      "ext-priority"
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.strictEqual(ns.default, "mjs"))
-    ))
-  )
+  it("should support requests with trailing backslashs in Windows", function () {
+    if (! isWin) {
+      this.skip()
+      return
+    }
+
+    const request = ".\\fixture\\ext-priority\\"
+
+    return Promise
+      .resolve()
+      .then(() => require(request))
+      .then(() => import(request))
+  })
 
   it("should find a file before a package", () => {
     const actual = require.resolve("./fixture/paths/file")
@@ -362,41 +366,13 @@ describe("Node rules", () => {
     assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
   })
 
-  it("should support URL requests", () =>
-    Promise.all([
-      abcPath + "?a",
-      abcPath + "#a",
-      abcPath.replace("abc", "%61%62%63")
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.deepStrictEqual(ns, abcNs))
-    ))
-  )
-
-  it("should support requests containing colons", () =>
-    Promise.all([
-      "./fixture/with:colon.mjs",
-      "./fixture/with%3acolon.mjs",
-      "./fixture/with%3Acolon.mjs"
-    ]
-    .map((request) => import(request)))
-  )
-
-  it("should support requests containing percents", () =>
-    import("./fixture/with%2520percent.mjs")
-  )
-
-  it("should support requests containing pounds", () =>
-    import("./fixture/with%23pound.mjs")
-  )
-
-  it("should support single character requests", () =>
+  it("should resolve single character requests", () =>
     // Test for single character package name bug:
     // https://github.com/nodejs/node/pull/16634
     import("./fixture/import/single-char.mjs")
   )
 
-  it('should support local "." requests', () =>
+  it('should resolve local "." requests', () =>
     Promise.all([
       "./fixture/relative/dot.js",
       "./fixture/relative/dot-slash.js"
@@ -404,156 +380,6 @@ describe("Node rules", () => {
       import(request)
         .then((ns) => assert.strictEqual(ns.default, "inside dot"))
     ))
-  )
-
-  it("should reevaluate for requests with different query+hash", () =>
-    import("./fixture/load-count.mjs")
-      .then((oldNs) =>
-        [
-          { id: "./fixture/load-count.mjs?",    count: 2 },
-          { id: "./fixture/load-count.mjs#",    count: 3 },
-          { id: "./fixture/load-count.mjs?",    count: 2 },
-          { id: "./fixture/load-count.mjs#",    count: 3 },
-          { id: "./fixture/load-count.mjs?4",   count: 4 },
-          { id: "./fixture/load-count.mjs#5",   count: 5 },
-          { id: "./fixture/load-count.mjs?4",   count: 4 },
-          { id: "./fixture/load-count.mjs#5",   count: 5 },
-          { id: "./fixture/load-count.mjs?6#6", count: 6 },
-          { id: "./fixture/load-count.mjs#5",   count: 5 },
-          { id: "./fixture/load-count.mjs?6#6", count: 6 }
-        ].reduce((promise, data) =>
-          promise
-            .then(() => import(data.id))
-            .then((ns) => {
-              assert.notStrictEqual(ns, oldNs)
-              assert.strictEqual(ns.default, data.count)
-              oldNs = ns
-            })
-        , Promise.resolve())
-      )
-  )
-
-  it("should not support URL requests with encoded slashes", () =>
-    Promise.all([
-      abcPath.replace(slashRegExp, "%2f"),
-      abcPath.replace(slashRegExp, "%2F"),
-      abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
-      abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
-    ))
-  )
-
-  it("should not resolve non-local dependencies", () =>
-    Promise.all([
-      "home-node-libraries",
-      "home-node-modules",
-      "node-path",
-      "prefix-path"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
-    ))
-  )
-
-  it('should not resolve non-local "." requests', () =>
-    import(".")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
-  )
-
-  it("should not reevaluate errors", () =>
-    [
-      "./fixture/reevaluate-error.mjs",
-      "./fixture/reevaluate-error.mjs?a",
-      "./fixture/reevaluate-error.mjs#a"
-    ].reduce((promise, request, index) =>
-      promise
-        .then(() => {
-          Reflect.deleteProperty(global, "evaluated")
-          return import(request)
-            .then(() => assert.ok(false))
-            .catch((e) =>
-              import(request)
-                .then(() => assert.ok(false))
-                .catch((re) => {
-                  if (re.code === "ERR_ASSERTION") {
-                    assert.ok(false)
-                  } else {
-                    assert.strictEqual(e, re)
-                    assert.strictEqual(global.loadCount, index + 1)
-                  }
-                })
-            )
-          })
-    , Promise.resolve())
-  )
-
-  it("should support requests with trailing backslashs in Windows", function () {
-    if (! isWin) {
-      this.skip()
-      return
-    }
-
-    const request = ".\\fixture\\ext-priority\\"
-
-    return Promise
-      .resolve()
-      .then(() => require(request))
-      .then(() => import(request))
-  })
-
-  it("should not support custom file extensions in ESM", () => {
-    require.extensions[".coffee"] = require.extensions[".js"]
-    return import("./fixture/cof")
-      .then(() => assert.ok(false))
-      .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
-  })
-
-  it("should not support overwriting .json handling", () => {
-    require.extensions[".json"] = () => ({})
-    return import("../package.json")
-      .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
-  })
-
-  it("should not expose ESM in `module.parent`", () =>
-    import("./fixture/parent/off")
-      .then((ns) => {
-        const parent = ns.parent
-        const child = ns.child
-
-        assert.ok(parent.parent)
-        assert.ok(Reflect.has(child, "parent"))
-        assert.strictEqual(typeof child.parent, "undefined")
-      })
-  )
-
-  it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
-    import("./fixture/parent/on")
-      .then((ns) => {
-        const parent = ns.parent
-        const child = ns.child
-
-        assert.ok(parent.parent)
-        assert.ok(child.parent)
-      })
-  )
-
-  it("should not expose ESM in `require.cache`", () => {
-    const filename = path.resolve("fixture/cache/out/index.mjs")
-
-    Reflect.deleteProperty(require.cache, filename)
-
-    return import(filename)
-      .then(() => assert.strictEqual(filename in require.cache, false))
-  })
-
-  it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
-    import("./cjs/cache")
-      .then((ns) => ns.default())
   )
 
   it('should not resolve non-local "." requests with `require`', () => {
@@ -564,6 +390,12 @@ describe("Node rules", () => {
       assert.strictEqual(e.code, "MODULE_NOT_FOUND")
     }
   })
+
+  it('should not resolve non-local "." requests with `import`', () =>
+    import(".")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+  )
 
   it("should resolve non-local dependencies with `require`", () =>
     [
@@ -590,6 +422,19 @@ describe("Node rules", () => {
           assert.ok(ns.default(request))
         })
       )
+  )
+
+  it("should not resolve non-local dependencies with `import`", () =>
+    Promise.all([
+      "home-node-libraries",
+      "home-node-modules",
+      "node-path",
+      "prefix-path"
+    ].map((request) =>
+      import(request)
+        .then(() => assert.ok(false))
+        .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+    ))
   )
 
   it("should resolve non-local dependencies with `require.resolve`", () =>
@@ -685,7 +530,162 @@ describe("Node rules", () => {
       })
   )
 
-  it('should add "__esModule" to `module.exports` of ES modules with `options.cjs`', () =>
+  it("should find .mjs before .js in ESM", () =>
+    Promise.all([
+      "./fixture/ext-priority",
+      "ext-priority"
+    ].map((request) =>
+      import(request)
+        .then((ns) => assert.strictEqual(ns.default, "mjs"))
+    ))
+  )
+
+  it("should not respect new `require.extensions` in ESM", () => {
+    require.extensions[".coffee"] = require.extensions[".js"]
+    return import("./fixture/cof")
+      .then(() => assert.ok(false))
+      .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+  })
+
+  it("should not respect modified `require.extensions` in ESM", () => {
+    require.extensions[".json"] = () => ({})
+    return import("../package.json")
+      .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
+  })
+
+  it("should support URL requests in ESM", () =>
+    Promise.all([
+      abcPath + "?a",
+      abcPath + "#a",
+      abcPath.replace("abc", "%61%62%63")
+    ].map((request) =>
+      import(request)
+        .then((ns) => assert.deepStrictEqual(ns, abcNs))
+    ))
+  )
+
+  it("should support requests containing colons in ESM", () =>
+    Promise.all([
+      "./fixture/with:colon.mjs",
+      "./fixture/with%3acolon.mjs",
+      "./fixture/with%3Acolon.mjs"
+    ]
+    .map((request) => import(request)))
+  )
+
+  it("should support requests containing percents in ESM", () =>
+    import("./fixture/with%2520percent.mjs")
+  )
+
+  it("should support requests containing pounds in ESM", () =>
+    import("./fixture/with%23pound.mjs")
+  )
+
+  it("should not support URL requests with encoded slashes", () =>
+    Promise.all([
+      abcPath.replace(slashRegExp, "%2f"),
+      abcPath.replace(slashRegExp, "%2F"),
+      abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
+      abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
+    ].map((request) =>
+      import(request)
+        .then(() => assert.ok(false))
+        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+    ))
+  )
+
+  it("should reevaluate requests with different query+hashes", () =>
+    import("./fixture/load-count.mjs")
+      .then((oldNs) =>
+        [
+          { id: "./fixture/load-count.mjs?",    count: 2 },
+          { id: "./fixture/load-count.mjs#",    count: 3 },
+          { id: "./fixture/load-count.mjs?",    count: 2 },
+          { id: "./fixture/load-count.mjs#",    count: 3 },
+          { id: "./fixture/load-count.mjs?4",   count: 4 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?4",   count: 4 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?6#6", count: 6 },
+          { id: "./fixture/load-count.mjs#5",   count: 5 },
+          { id: "./fixture/load-count.mjs?6#6", count: 6 }
+        ].reduce((promise, data) =>
+          promise
+            .then(() => import(data.id))
+            .then((ns) => {
+              assert.notStrictEqual(ns, oldNs)
+              assert.strictEqual(ns.default, data.count)
+              oldNs = ns
+            })
+        , Promise.resolve())
+      )
+  )
+
+  it("should not reevaluate errors in ESM", () =>
+    [
+      "./fixture/reevaluate-error.mjs",
+      "./fixture/reevaluate-error.mjs?a",
+      "./fixture/reevaluate-error.mjs#a"
+    ].reduce((promise, request, index) =>
+      promise
+        .then(() => {
+          Reflect.deleteProperty(global, "evaluated")
+          return import(request)
+            .then(() => assert.ok(false))
+            .catch((e) =>
+              import(request)
+                .then(() => assert.ok(false))
+                .catch((re) => {
+                  if (re.code === "ERR_ASSERTION") {
+                    assert.ok(false)
+                  } else {
+                    assert.strictEqual(e, re)
+                    assert.strictEqual(global.loadCount, index + 1)
+                  }
+                })
+            )
+          })
+    , Promise.resolve())
+  )
+
+  it("should not expose ESM in `module.parent`", () =>
+    import("./fixture/parent/off")
+      .then((ns) => {
+        const parent = ns.parent
+        const child = ns.child
+
+        assert.ok(parent.parent)
+        assert.ok(Reflect.has(child, "parent"))
+        assert.strictEqual(typeof child.parent, "undefined")
+      })
+  )
+
+  it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
+    import("./fixture/parent/on")
+      .then((ns) => {
+        const parent = ns.parent
+        const child = ns.child
+
+        assert.ok(parent.parent)
+        assert.ok(child.parent)
+      })
+  )
+
+  it("should not expose ESM in `require.cache`", () => {
+    const filename = path.resolve("fixture/cache/out/index.mjs")
+
+    Reflect.deleteProperty(require.cache, filename)
+
+    return import(filename)
+      .then(() => assert.strictEqual(filename in require.cache, false))
+  })
+
+  it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
+    import("./cjs/cache")
+      .then((ns) => ns.default())
+  )
+
+  it('should add "__esModule" to `module.exports` of ES modules with `options.cjs.interop`', () =>
     import("./cjs/export/pseudo.mjs")
       .then((ns) => ns.default())
   )
