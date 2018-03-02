@@ -9,13 +9,11 @@ import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
-import isOwnProxy from "./util/is-own-proxy.js"
 import keys from "./util/keys.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
-import unwrapProxy from "./util/unwrap-proxy.js"
 import warn from "./warn.js"
 
 const GETTER_ERROR = { __proto__: null }
@@ -352,13 +350,6 @@ function assignExportsToNamespace(entry) {
           }
 
           return value
-        },
-        set(target, name, value, receiver) {
-          if (isOwnProxy(value)) {
-            value = unwrapProxy(value)
-          }
-
-          return Reflect.set(target, name, value, receiver)
         }
       })
     }
