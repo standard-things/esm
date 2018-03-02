@@ -17,6 +17,7 @@ import stat from "../fs/stat.js"
 
 const {
   BSLASH,
+  PERIOD,
   SLASH
 } = CHAR_CODE
 
@@ -44,13 +45,20 @@ function findPath(request, paths, isMain, searchExts) {
   let trailingSlash = request.length > 0
 
   if (trailingSlash) {
-    const code = request.charCodeAt(request.length - 1)
-    trailingSlash = code === SLASH
+    let code = request.charCodeAt(request.length - 1)
 
-    if (shared.env.win32 &&
-        ! trailingSlash) {
-      trailingSlash = code === BSLASH
+    if (code === PERIOD) {
+      code = request.charCodeAt(request.length - 2)
+
+      if (code === PERIOD) {
+        code = request.charCodeAt(request.length - 3)
+      }
     }
+
+    trailingSlash =
+      code === SLASH ||
+      (shared.env.win32 &&
+       code === BSLASH)
   }
 
   let i = -1
@@ -78,12 +86,6 @@ function findPath(request, paths, isMain, searchExts) {
         } else {
           filename = realpath(basePath)
         }
-      } else if (isDir) {
-        if (searchExts === void 0) {
-          searchExts = keys(Module._extensions)
-        }
-
-        filename = tryPackage(basePath, searchExts, isMain)
       }
 
       if (! filename) {

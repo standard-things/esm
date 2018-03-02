@@ -338,6 +338,30 @@ describe("Node rules", () => {
     ))
   )
 
+  it("should find a file before a package", () => {
+    const actual = require.resolve("./fixture/paths/file")
+
+    assert.strictEqual(actual, path.resolve("fixture/paths/file.js"))
+  })
+
+  it("should find a package in the current directory", () =>
+    [
+      "./fixture/paths/file/",
+      "./fixture/paths/file/."
+    ]
+    .forEach((request) => {
+      const actual = require.resolve("./fixture/paths/file/.")
+
+      assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
+    })
+  )
+
+  it("should find a package in the parent directory", () => {
+    const actual = require.resolve("./fixture/paths/file/a/..")
+
+    assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
+  })
+
   it("should support URL requests", () =>
     Promise.all([
       abcPath + "?a",
