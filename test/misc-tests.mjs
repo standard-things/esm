@@ -721,6 +721,14 @@ describe("spec compliance", () => {
       .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
   )
 
+  it("should support cyclical dynamic imports", () =>
+    Promise.all([
+      "./fixture/cycle/dynamic-import/a.js",
+      "./fixture/cycle/dynamic-import/a.mjs"
+    ]
+    .map((request) => import(request)))
+  )
+
   it("should support evaled dynamic import in ESM", () => {
     const code = `
       Promise.all([
