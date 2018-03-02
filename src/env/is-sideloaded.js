@@ -21,14 +21,16 @@ function isSideloaded() {
     ? normalize(filename).lastIndexOf("/node_modules/")
     : -1
 
-  return env.sideloaded =
-    // From a package like Mocha.
-    (nodeModulesIndex !== -1 &&
-     hasLoaderArg(args) &&
-     (Package.get(process.cwd()) !== null ||
-      Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) ||
-    // From istanbuljs/nyc.
-    isNyc()
+  // From a package like Mocha.
+  if (nodeModulesIndex !== -1 &&
+      hasLoaderArg(args) &&
+      (Package.get(process.cwd()) !== null ||
+       Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) {
+    return env.sideloaded = true
+  }
+
+  // From istanbuljs/nyc.
+  return env.sideloaded = isNyc()
 }
 
 export default isSideloaded

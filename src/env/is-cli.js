@@ -9,10 +9,12 @@ function isCLI() {
     return env.cli
   }
 
-  return env.cli =
-    (process.argv.length > 1 &&
-      isPreloaded()) ||
-    isSideloaded()
+  if (process.argv.length > 1 &&
+      isPreloaded()) {
+    return env.cli = true
+  }
+
+  return env.cli = isSideloaded()
 }
 
 export default isCLI

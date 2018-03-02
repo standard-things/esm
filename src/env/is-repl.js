@@ -10,14 +10,17 @@ function isREPL() {
     return env.repl
   }
 
+  if (process.argv.length === 1 &&
+      isPreloaded()) {
+    return env.repl = true
+  }
+
   return env.repl =
-    (process.argv.length === 1 &&
-      isPreloaded()) ||
-    (rootModule.id === "<repl>" &&
-     rootModule.filename === null &&
-     rootModule.loaded === false &&
-     rootModule.parent == null &&
-     hasLoaderModule(rootModule.children))
+    rootModule.id === "<repl>" &&
+    rootModule.filename === null &&
+    rootModule.loaded === false &&
+    rootModule.parent == null &&
+    hasLoaderModule(rootModule.children)
 }
 
 export default isREPL
