@@ -32,7 +32,15 @@ function compile(content, filename) {
     entry.package = Package.get("")
     entry.runtimeName = shared.runtimeName
 
-    return _compile(compile, entry, content, filename)
+    let result
+
+    try {
+      result = _compile(compile, entry, content, filename)
+    } finally {
+      entry.state = 0
+    }
+
+    return result
   }
 
   const pkg = entry.package
