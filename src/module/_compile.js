@@ -85,14 +85,14 @@ function compile(caller, entry, content, filename, fallback) {
     const defaultPkg = shared.package.default
     const isESM = cached && cached.esm
     const { parent } = entry
-    const parentCached = parent && parent.package.cache.compile[parent.cacheName]
+    const parentPkg = parent && parent.package
+    const parentCached = parentPkg && parentPkg.cache.compile[parent.cacheName]
     const parentIsESM = parentCached && parentCached.esm
 
     if (! isESM &&
         ! parentIsESM &&
         (pkg === defaultPkg ||
-         (entry.parent &&
-          entry.parent.package === defaultPkg))) {
+         parentPkg === defaultPkg)) {
       return fallback ? fallback() : void 0
     }
 
@@ -150,11 +150,11 @@ function tryCompileCached(entry) {
 
 function tryCompileCJS(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
-  const { module:mod, runtimeName } = entry
+  const mod = entry.module
 
   let content =
     (isPrint() ? "return " : "") +
-    "this.r((" + async + "function(" + runtimeName + ",global,exports,require){" +
+    "this.r((" + async + "function(" + entry.runtimeName + ",global,exports,require){" +
     entry.package.cache.compile[entry.cacheName].code +
     "\n}))"
 
@@ -172,15 +172,15 @@ function tryCompileCJS(entry) {
 
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
-  const { module:mod, runtimeName } = entry
-  const { options } = entry.package
+  const { module:mod, package:pkg } = entry
+  const { options } = pkg
 
   let content =
     (isPrint() ? "return " : "") +
-    "this.r((" + async + "function(" + runtimeName + ",global" +
+    "this.r((" + async + "function(" + entry.runtimeName + ",global" +
     (options.cjs.vars ? ",exports,require" : "") +
     '){"use strict";' +
-    entry.package.cache.compile[entry.cacheName].code +
+    pkg.cache.compile[entry.cacheName].code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)
