@@ -677,7 +677,7 @@ describe("spec compliance", () => {
   )
 
   it("should hoist declarations before the module executes", () =>
-    import("./misc/declarations.mjs")
+    import("./misc/hoist-declarations.mjs")
       .then((ns) => ns.default())
   )
 
@@ -741,8 +741,8 @@ describe("spec compliance", () => {
 
   it("should support evaled dynamic import in CJS", () =>
     Promise.all([
-      "./fixture/eval/direct/dynamic.js",
-      "./fixture/eval/indirect/dynamic.js"
+      "./fixture/eval/direct/dynamic-import.js",
+      "./fixture/eval/indirect/dynamic-import.js"
     ].map((request) =>
       require(request)
         .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
@@ -771,15 +771,15 @@ describe("spec compliance", () => {
   })
 
   it("should support `import.meta` in ESM", () =>
-    import("./misc/meta.mjs")
+    import("./misc/import-meta.mjs")
       .then((ns) => ns.default())
   )
 
   it("should not support `import.meta` in CJS", () =>
     Promise.all([
-      "./fixture/meta.js",
-      "./fixture/eval/direct/meta.js",
-      "./fixture/eval/indirect/meta.js"
+      "./fixture/import-meta.js",
+      "./fixture/eval/direct/import-meta.js",
+      "./fixture/eval/indirect/import-meta.js"
     ].map((request) =>
       import(request)
         .then((ns) => assert.ok(false))
