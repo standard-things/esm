@@ -107,10 +107,10 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function tryCompileCached(entry) {
-  const noDepth = moduleState.requireDepth === 0
-  const { options } = entry.package
-  const cached = entry.package.cache.compile[entry.cacheName]
+  const pkg = entry.package
+  const cached = pkg.cache.compile[entry.cacheName]
   const isESM = cached && cached.esm
+  const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
@@ -119,7 +119,7 @@ function tryCompileCached(entry) {
 
   let result
 
-  if (options.debug) {
+  if (pkg.options.debug) {
     result = tryCompile(entry)
 
     if (noDepth) {
@@ -135,7 +135,7 @@ function tryCompileCached(entry) {
       }
 
       const { filename } = entry.module
-      const content = () => readSourceCode(filename, options)
+      const content = () => readSourceCode(filename)
 
       throw maskStackTrace(e, content, filename, isESM)
     } finally {
