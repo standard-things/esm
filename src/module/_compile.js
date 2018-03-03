@@ -144,26 +144,26 @@ function tryCompileCached(entry) {
 
 function tryCompileCJS(entry) {
   const cached = entry.package.cache.compile[entry.cacheName]
-  const isAsync = useAsyncWrapper(entry)
   const mod = entry.module
+  const useAsync = useAsyncWrapper(entry)
 
   let content = cached.code
 
   if (cached.changed) {
-    const async = isAsync ? "async " :  ""
-
     content =
       (cached.topLevelReturn ? "return " : "") +
-      "this.r((" + async + "function(" + entry.runtimeName + ",global,exports,require){" +
+      "this.r((" +
+      (useAsync ? "async " :  "") +
+      "function(" + entry.runtimeName + ",global,exports,require){" +
       content +
       "\n}))"
 
+    content += maybeSourceMap(entry, content)
+
     Runtime.enable(entry, new ExObject)
-  } else if (isAsync) {
+  } else if (useAsync) {
     Module.wrap = moduleWrapAsyncCJS
   }
-
-  content += maybeSourceMap(entry, content)
 
   try {
     return mod._compile(content, mod.filename)
@@ -175,16 +175,17 @@ function tryCompileCJS(entry) {
 }
 
 function tryCompileESM(entry) {
-  const async = useAsyncWrapper(entry) ? "async " :  ""
   const { module:mod, package:pkg } = entry
   const cached = pkg.cache.compile[entry.cacheName]
+  const cjsVars = pkg.options.cjs.vars
   const { filename } = mod
-  const { options } = pkg
 
   let content =
     (cached.topLevelReturn ? "return " : "") +
-    "this.r((" + async + "function(" + entry.runtimeName + ",global" +
-    (options.cjs.vars ? ",exports,require" : "") +
+    "this.r((" +
+    (useAsyncWrapper(entry) ? "async " :  "") +
+    "function(" + entry.runtimeName + ",global" +
+    (cjsVars ? ",exports,require" : "") +
     '){"use strict";' +
     cached.code +
     "\n}))"
@@ -195,7 +196,7 @@ function tryCompileESM(entry) {
     entry.url = getURLFromFilePath(filename)
   }
 
-  if (! options.cjs.vars) {
+  if (! cjsVars) {
     Module.wrap = moduleWrapESM
   }
 
