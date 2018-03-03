@@ -10,10 +10,11 @@ const nopPath = require.resolve("nop")
 
 export default () => {
   const esmRequire = makeRequire(module)
+  const { cache } = esmRequire
 
-  Reflect.deleteProperty(esmRequire.cache, abcPath)
-  Reflect.deleteProperty(esmRequire.cache, defPath)
-  Reflect.deleteProperty(esmRequire.cache, nopPath)
+  Reflect.deleteProperty(cache, abcPath)
+  Reflect.deleteProperty(cache, defPath)
+  Reflect.deleteProperty(cache, nopPath)
 
   const abc = esmRequire("./fixture/export/abc.mjs")
   const def = esmRequire("./fixture/export/def.js")
@@ -23,7 +24,7 @@ export default () => {
   assert.deepStrictEqual(def, { d: "d", e: "e", f: "f" })
   assert.strictEqual(nop(), void 0)
 
-  const defMod = esmRequire.cache[defPath]
+  const defMod = cache[defPath]
 
   assert.ok(defMod)
   assert.strictEqual(defMod.id, defPath)
