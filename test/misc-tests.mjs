@@ -806,7 +806,7 @@ describe("spec compliance", () => {
 
   it("should not support `import.meta` in CJS", () =>
     Promise.all([
-      "./fixture/import-meta.js",
+      "./fixture/source/import-meta.js",
       "./fixture/eval/direct/import-meta.js",
       "./fixture/eval/indirect/import-meta.js"
     ].map((request) =>
