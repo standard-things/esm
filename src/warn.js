@@ -3,25 +3,21 @@ import getModuleURL from "./util/get-module-url.js"
 import { name as stdName } from "./version.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
-const cacheKeys = {
-  __proto__: null,
-  WRN_NS_ASSIGNMENT: moduleCacheKey,
-  WRN_NS_EXTENSION: moduleCacheKey,
-  WRN_TDZ_ACCESS: moduleCacheKey
-}
-
-const messages = {
-  __proto__: null,
-  WRN_ARGUMENTS_ACCESS: argumentsAccess,
-  WRN_NS_ASSIGNMENT: namespaceAssignment,
-  WRN_NS_EXTENSION: namespaceExtension,
-  WRN_TDZ_ACCESS: temporalDeadZoneAccess
-}
-
+const cacheKeys = { __proto__: null }
+const messages = { __proto__: null }
 const warned = { __proto__: null }
 
-function moduleCacheKey(request, name) {
-  return getModuleURL(request) + "\0" + name
+addWarning("WRN_ARGUMENTS_ACCESS", argumentsAccess)
+addWarning("WRN_NS_ASSIGNMENT", namespaceAssignment, moduleCacheKey)
+addWarning("WRN_NS_EXTENSION", namespaceExtension, moduleCacheKey)
+addWarning("WRN_TDZ_ACCESS", temporalDeadZoneAccess, moduleCacheKey)
+
+function addWarning(code, messageHandler, cacheKeyHandler) {
+  if (cacheKeyHandler) {
+    cacheKeys[code] = cacheKeyHandler
+  }
+
+  messages[code] = messageHandler
 }
 
 function getCacheKey(code, args) {
@@ -30,6 +26,10 @@ function getCacheKey(code, args) {
     : args.join("\0")
 
   return code + "\0" + key
+}
+
+function moduleCacheKey(request, name) {
+  return getModuleURL(request) + "\0" + name
 }
 
 function argumentsAccess(request, line, column) {
