@@ -7,6 +7,7 @@ import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
+import toExternalError from "../util/to-external-error.js"
 
 const {
   ZWJ
@@ -41,13 +42,16 @@ function maskStackTrace(error, content, filename, isESM) {
     get() {
       const newMessage = safeToString(error)
 
-      const masker = isParseError(error)
-        ? maskParserStack
-        : maskEngineStack
-
       const scrubber = isESM
         ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
         : (stack) => scrubStackTrace(stack)
+
+      let masker = maskEngineStack
+
+      if (isParseError(error)) {
+        error = toExternalError(error)
+        masker = maskParserStack
+      }
 
       stack = stack.replace(message, newMessage)
       stack = masker(stack, content, filename)
