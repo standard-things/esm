@@ -26,7 +26,6 @@ const ExObject = __external__.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
-  const ext = extname(filename)
 
   let hint = "script"
   let type = "script"
@@ -37,7 +36,7 @@ function compile(caller, entry, content, filename, fallback) {
     type = "unambiguous"
   }
 
-  if (ext === ".mjs") {
+  if (extname(filename) === ".mjs") {
     hint = "module"
 
     if (type === "script") {
@@ -73,10 +72,6 @@ function compile(caller, entry, content, filename, fallback) {
     for (const warning of cached.warnings) {
       warn(warning.code, filename, ...warning.args)
     }
-  }
-
-  if (! entry.url) {
-    entry.url = getURLFromFilePath(filename)
   }
 
   if (moduleState.parsing) {
@@ -148,32 +143,42 @@ function tryCompileCached(entry) {
 }
 
 function tryCompileCJS(entry) {
-  const async = useAsyncWrapper(entry) ? "async " :  ""
   const cached = entry.package.cache.compile[entry.cacheName]
+  const isAsync = useAsyncWrapper(entry)
   const mod = entry.module
 
-  let content =
-    (cached.topLevelReturn ? "return " : "") +
-    "this.r((" + async + "function(" + entry.runtimeName + ",global,exports,require){" +
-    cached.code +
-    "\n}))"
+  let content = cached.code
+
+  if (cached.changed) {
+    const async = isAsync ? "async " :  ""
+
+    content =
+      (cached.topLevelReturn ? "return " : "") +
+      "this.r((" + async + "function(" + entry.runtimeName + ",global,exports,require){" +
+      content +
+      "\n}))"
+
+    Runtime.enable(entry, new ExObject)
+  } else if (isAsync) {
+    Module.wrap = moduleWrapAsyncCJS
+  }
 
   content += maybeSourceMap(entry, content)
 
-  const exported = new ExObject
-
-  if (Module.wrap === moduleWrapESM) {
-    Module.wrap = wrap
+  try {
+    return mod._compile(content, mod.filename)
+  } finally {
+    if (Module.wrap === moduleWrapAsyncCJS) {
+      Module.wrap = wrap
+    }
   }
-
-  Runtime.enable(entry, exported)
-  return mod._compile(content, mod.filename)
 }
 
 function tryCompileESM(entry) {
   const async = useAsyncWrapper(entry) ? "async " :  ""
   const { module:mod, package:pkg } = entry
   const cached = pkg.cache.compile[entry.cacheName]
+  const { filename } = mod
   const { options } = pkg
 
   let content =
@@ -186,16 +191,18 @@ function tryCompileESM(entry) {
 
   content += maybeSourceMap(entry, content)
 
-  const exported = new ExObject
+  if (! entry.url) {
+    entry.url = getURLFromFilePath(filename)
+  }
 
   if (! options.cjs.vars) {
     Module.wrap = moduleWrapESM
   }
 
-  Runtime.enable(entry, exported)
+  Runtime.enable(entry, new ExObject)
 
   try {
-    return mod._compile(content, mod.filename)
+    return mod._compile(content, filename)
   } finally {
     if (Module.wrap === moduleWrapESM) {
       Module.wrap = wrap
@@ -203,9 +210,15 @@ function tryCompileESM(entry) {
   }
 }
 
+function moduleWrapAsyncCJS(script) {
+  Module.wrap = wrap
+  return "(async function (exports, require, module, __filename, __dirname) { " +
+    script + "\n});"
+}
+
 function moduleWrapESM(script) {
   Module.wrap = wrap
-  return "(function(){" + script + "\n})"
+  return "(function () { " + script + "\n});"
 }
 
 function maybeSourceMap(entry, content) {
@@ -274,10 +287,18 @@ function tryValidateESM(caller, entry) {
 }
 
 function useAsyncWrapper(entry) {
-  if (entry.package.options.await &&
+  const pkg = entry.package
+
+  if (pkg.options.await &&
       shared.support.await) {
-    const cached = entry.package.cache.compile[entry.cacheName]
-    const exportSpecifiers = cached && cached.exportSpecifiers
+    const cached = pkg.cache.compile[entry.cacheName]
+    const isESM = cached && cached.esm
+
+    if (! isESM) {
+      return true
+    }
+
+    const { exportSpecifiers } = cached
 
     if (! exportSpecifiers ||
         ! keys(exportSpecifiers).length) {

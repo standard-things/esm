@@ -44,7 +44,7 @@ const CachingCompiler = {
       : null
 
     const result = {
-      changed: false,
+      changed: true,
       code: null,
       dependencySpecifiers,
       esm: !! meta[2],
@@ -84,18 +84,8 @@ function compileAndCache(entry, code, options) {
   const result = Compiler.compile(code, toCompileOptions(entry, options))
 
   if (options.eval) {
-    const cache = shared.package.dir[""]
     const cacheName = getCacheFileName(entry, code)
-    return cache.compile[cacheName] = result
-  }
-
-  const { cache, cachePath } = entry.package
-  const { cacheName } = entry
-
-  if (cachePath) {
-    // Add "main" to enable the `readFileFast` fast path of
-    // `process.binding("fs").internalModuleReadJSON`.
-    result.code = '"main";' + result.code
+    return shared.package.dir[""].compile[cacheName] = result
   }
 
   if (result.esm) {
@@ -107,7 +97,7 @@ function compileAndCache(entry, code, options) {
     }
   }
 
-  return cache.compile[cacheName] = result
+  return entry.package.cache.compile[entry.cacheName] = result
 }
 
 function compileAndWrite(entry, code, options) {
@@ -118,6 +108,12 @@ function compileAndWrite(entry, code, options) {
   }
 
   const { cachePath } = entry.package
+
+  if (cachePath) {
+    // Add "main" to enable the `readFileFast` fast path of
+    // `process.binding("fs").internalModuleReadJSON`.
+    result.code = '"main";' + result.code
+  }
 
   const pendingWrites =
     shared.pendingWrites[cachePath] ||
