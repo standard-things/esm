@@ -31,10 +31,8 @@ function addNodeError(code, messageHandler, Super) {
 }
 
 function createBuiltinClass(Super, code) {
-  return class BuiltinError extends Super {
-    constructor(...args) {
-      super(messages[code](...args))
-    }
+  return function BuiltinError(...args) {
+    return new Super(messages[code](...args))
   }
 }
 
