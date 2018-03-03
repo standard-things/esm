@@ -22,15 +22,11 @@ export default () => {
       extensions[".mjs"](mod, abcPath)
 
       mod.exports = {}
-      Reflect.deleteProperty(cache, dynPath)
-      extensions[".js"](mod, dynPath)
-
-      mod._compile = (content) => {
-        assert.strictEqual(content.includes("sourceMappingURL"), false)
-      }
-
-      mod.exports = {}
       Reflect.deleteProperty(cache, defPath)
       extensions[".js"](mod, defPath)
+
+      mod.exports = {}
+      Reflect.deleteProperty(cache, dynPath)
+      extensions[".js"](mod, dynPath)
     })
 }

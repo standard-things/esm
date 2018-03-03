@@ -158,12 +158,12 @@ function tryCompileCJS(entry) {
       content +
       "\n}))"
 
-    content += maybeSourceMap(entry, content)
-
     Runtime.enable(entry, new ExObject)
   } else if (useAsync) {
     Module.wrap = moduleWrapAsyncCJS
   }
+
+  content += maybeSourceMap(entry, content)
 
   try {
     return mod._compile(content, mod.filename)
