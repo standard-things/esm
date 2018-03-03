@@ -8,6 +8,7 @@ import errors from "./errors.js"
 import isCLI from "./env/is-cli.js"
 import isCheck from "./env/is-check.js"
 import isEval from "./env/is-eval.js"
+import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import isREPL from "./env/is-repl.js"
@@ -24,10 +25,6 @@ const {
 } = errors
 
 const BuiltinModule = __non_webpack_module__.constructor
-
-const nodeModulesRegExp = shared.env.win32
-  ? /[\\/]node_modules[\\/]/
-  : /\/node_modules\//
 
 let exported
 
@@ -69,7 +66,7 @@ if (shared.inited) {
 
     moduleHook(Module, cloned)
 
-    if (! nodeModulesRegExp.test(mod.filename)) {
+    if (! isInstalled(mod)) {
       processHook(process)
     }
 
