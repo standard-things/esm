@@ -19,6 +19,10 @@ import shared from "./shared.js"
 import vm from "vm"
 import vmHook from "./hook/vm.js"
 
+const {
+  ERR_INVALID_ARG_TYPE
+} = errors
+
 const BuiltinModule = __non_webpack_module__.constructor
 
 const nodeModulesRegExp = shared.env.win32
@@ -32,7 +36,7 @@ if (shared.inited) {
 
   exported = (mod, options) => {
     if (! isObject(mod)) {
-      throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "module", "object")
+      throw new ERR_INVALID_ARG_TYPE("module", "object")
     }
 
     let cacheKey

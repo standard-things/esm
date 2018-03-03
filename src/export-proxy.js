@@ -5,6 +5,10 @@ import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
 import shared from "./shared.js"
 
+const {
+  ERR_INVALID_ARG_TYPE
+} = errors
+
 const { toString } = Object.prototype
 
 class ExportProxy {
@@ -17,7 +21,7 @@ class ExportProxy {
     }
 
     if (! isObjectLike(exported)) {
-      throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "exported", "object")
+      throw new ERR_INVALID_ARG_TYPE("exported", "object")
     }
 
     const cache = shared.exportProxy

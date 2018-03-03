@@ -2,6 +2,11 @@ import _loadESM from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
+const {
+  ERR_EXPORT_MISSING,
+  ERR_EXPORT_STAR_CONFLICT
+} = errors
+
 function validate(entry) {
   const pkg = entry.package
   const cached = pkg.cache.compile[entry.cacheName]
@@ -42,7 +47,7 @@ function validate(entry) {
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
            requestedExportNames[0] !== "default")) {
-        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedExportNames[0])
+        throw new ERR_EXPORT_MISSING(child, requestedExportNames[0])
       }
 
       continue
@@ -59,7 +64,7 @@ function validate(entry) {
           continue
         }
 
-        throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", mod, requestedName)
+        throw new ERR_EXPORT_STAR_CONFLICT(mod, requestedName)
       }
 
       let throwExportMissing = ! skipExportMissing
@@ -74,7 +79,7 @@ function validate(entry) {
       }
 
       if (throwExportMissing) {
-        throw new errors.SyntaxError("ERR_EXPORT_MISSING", child, requestedName)
+        throw new ERR_EXPORT_MISSING(child, requestedName)
       }
     }
   }

@@ -9,9 +9,14 @@ import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
 
+const {
+  ERR_INVALID_ARG_TYPE,
+  MODULE_NOT_FOUND
+} = errors
+
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
-    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
+    throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
   const cache = shared.cjs.resolveFilename
@@ -59,7 +64,7 @@ function resolveFilename(request, parent, isMain, options) {
       : foundPath
   }
 
-  throw new errors.Error("MODULE_NOT_FOUND", request)
+  throw new MODULE_NOT_FOUND(request)
 }
 
 export default resolveFilename

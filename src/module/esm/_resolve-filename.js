@@ -5,9 +5,13 @@ import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import errors from "../../errors.js"
 import nodeModulePaths from "../node-module-paths.js"
 
+const {
+  ERR_INVALID_ARG_TYPE
+} = errors
+
 function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
   if (typeof request !== "string") {
-    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
+    throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
   let paths

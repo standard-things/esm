@@ -9,13 +9,18 @@ import _loadESM from "./esm/_load.js"
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 
+const {
+  ERR_INVALID_ARG_TYPE,
+  ERR_INVALID_ARG_VALUE
+} = errors
+
 const req = function require(request) {
   if (typeof request !== "string") {
-    throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+    throw new ERR_INVALID_ARG_TYPE("request", "string", request)
   }
 
   if (request === "") {
-    throw new errors.Error("ERR_INVALID_ARG_VALUE", "request",  request, "must be a non-empty string")
+    throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
   }
 
   if (request in builtinEntries) {

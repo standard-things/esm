@@ -12,6 +12,10 @@ import maskFunction from "../util/mask-function.js"
 import moduleState from "./state.js"
 import shared from "../shared.js"
 
+const {
+  ERR_INVALID_ARG_TYPE
+} = errors
+
 const sourceResolve = __non_webpack_require__.resolve
 const sourcePaths = sourceResolve && sourceResolve.paths
 
@@ -60,7 +64,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
   function resolve(request, options) {
     if (typeof request !== "string") {
-      throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+      throw new ERR_INVALID_ARG_TYPE("request", "string", request)
     }
 
     return resolver.call(mod, request, options)
@@ -68,7 +72,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
   function paths(request) {
     if (typeof request !== "string") {
-      throw new errors.Error("ERR_INVALID_ARG_TYPE", "request", "string", request)
+      throw new ERR_INVALID_ARG_TYPE("request", "string", request)
     }
 
     return Module._resolveLookupPaths(request, mod, true)

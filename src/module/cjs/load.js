@@ -8,6 +8,10 @@ import _load from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
+const {
+  ERR_REQUIRE_ESM
+} = errors
+
 function load(request, parent, isMain) {
   if (request in builtinEntries) {
     return builtinEntries[request].module.exports
@@ -24,7 +28,7 @@ function load(request, parent, isMain) {
 
     if (options.esm === "mjs" &&
         ! options.cjs.vars) {
-      throw new errors.Error("ERR_REQUIRE_ESM", child)
+      throw new ERR_REQUIRE_ESM(child)
     }
   }
 

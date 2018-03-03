@@ -1,49 +1,56 @@
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "util"
-import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
-const messages = {
-  __proto__: null,
-  ERR_EXPORT_MISSING: exportMissing,
-  ERR_EXPORT_STAR_CONFLICT: exportStarConflict,
-  ERR_INVALID_ARG_TYPE: invalidArgType,
-  ERR_INVALID_ARG_VALUE: invalidArgValue,
-  ERR_INVALID_PROTOCOL: invalidProtocol,
-  ERR_MODULE_RESOLUTION_LEGACY: moduleResolutionLegacy,
-  ERR_REQUIRE_ESM: requireESM,
-  ERR_UNKNOWN_FILE_EXTENSION: unknownFileExtension,
-  MODULE_NOT_FOUND: missingCJS
+const ExError = __external__.Error
+const ExSyntaxError = __external__.SyntaxError
+const ExTypeError = __external__.TypeError
+
+const errors = { __proto__: null }
+const messages = { __proto__: null }
+
+addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
+addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
+
+addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
+addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
+addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
+addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
+addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
+addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
+addNodeError("MODULE_NOT_FOUND", missingCJS, ExError)
+
+function addBuiltinError(code, messageHandler, Super) {
+  errors[code] = createBuiltinClass(Super, code)
+  messages[code] = messageHandler
 }
 
-function createBuiltinClass(Super) {
+function addNodeError(code, messageHandler, Super) {
+  errors[code] = createNodeClass(Super, code)
+  messages[code] = messageHandler
+}
+
+function createBuiltinClass(Super, code) {
   return class BuiltinError extends Super {
-    constructor(code, ...args) {
+    constructor(...args) {
       super(messages[code](...args))
     }
   }
 }
 
-function createNodeClass(Super) {
+function createNodeClass(Super, code) {
   return class NodeError extends Super {
-    constructor(code, ...args) {
+    constructor(...args) {
       super(messages[code](...args))
 
       if (code === "MODULE_NOT_FOUND") {
         this.code = code
         this.name = super.name
-      } else {
-        Reflect.defineProperty(this, shared.symbol.errorCode, {
-          __proto__: null,
-          configurable: true,
-          value: code,
-          writable: true
-        })
       }
     }
 
     get code() {
-      return this[shared.symbol.errorCode]
+      return code
     }
 
     set code(value) {
@@ -57,7 +64,7 @@ function createNodeClass(Super) {
     }
 
     get name() {
-      return super.name + " [" + this[shared.symbol.errorCode] + "]"
+      return super.name + " [" + code + "]"
     }
 
     set name(value) {
@@ -124,13 +131,6 @@ function requireESM(request) {
 
 function unknownFileExtension(filename) {
   return "Unknown file extension: " + filename
-}
-
-const errors = {
-  __proto__: null,
-  Error: createNodeClass(__external__.Error),
-  SyntaxError: createBuiltinClass(__external__.SyntaxError),
-  TypeError: createNodeClass(__external__.TypeError)
 }
 
 export default errors

@@ -19,6 +19,14 @@ const {
   SLASH
 } = CHAR_CODE
 
+const {
+  ERR_INVALID_ARG_TYPE,
+  ERR_INVALID_PROTOCOL,
+  ERR_MODULE_RESOLUTION_LEGACY,
+  ERR_UNKNOWN_FILE_EXTENSION,
+  MODULE_NOT_FOUND
+} = errors
+
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
@@ -33,7 +41,7 @@ for (const ext of esmExts) {
 
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
-    throw new errors.TypeError("ERR_INVALID_ARG_TYPE", "request", "string")
+    throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
   const cache = shared.esm.resolveFilename
@@ -67,7 +75,7 @@ function resolveFilename(request, parent, isMain, options) {
       if (! foundPath &&
           parsed.protocol !== "file:" &&
           ! localhostRegExp.test(request)) {
-        throw new errors.Error("ERR_INVALID_PROTOCOL", parsed.protocol, "file:")
+        throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
       }
 
       if (foundPath) {
@@ -97,17 +105,17 @@ function resolveFilename(request, parent, isMain, options) {
       return cache[cacheKey] = foundPath
     }
 
-    throw new errors.Error("ERR_UNKNOWN_FILE_EXTENSION", foundPath)
+    throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
   }
 
   skipWarnings = true
   foundPath = _resolveFilename(request, parent, isMain, options, skipWarnings)
 
   if (foundPath) {
-    throw new errors.Error("ERR_MODULE_RESOLUTION_LEGACY", request, fromPath, foundPath)
+    throw new ERR_MODULE_RESOLUTION_LEGACY(request, fromPath, foundPath)
   }
 
-  throw new errors.Error("MODULE_NOT_FOUND", request)
+  throw new MODULE_NOT_FOUND(request)
 }
 
 export default resolveFilename

@@ -27,6 +27,10 @@ import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
+const {
+  ERR_REQUIRE_ESM
+} = errors
+
 const BuiltinModule = __non_webpack_module__.constructor
 
 const exts = [".js", ".mjs"]
@@ -184,7 +188,7 @@ function hook(Mod, parent) {
 }
 
 function mjsCompiler(mod, filename) {
-  const error = new errors.Error("ERR_REQUIRE_ESM", mod)
+  const error = new ERR_REQUIRE_ESM(mod)
   const { mainModule } = moduleState
 
   if (mainModule &&

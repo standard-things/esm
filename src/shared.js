@@ -1,4 +1,4 @@
-import { inspect, promisify, types } from "util"
+import { inspect, types } from "util"
 
 import PREFIX from "./constant/prefix.js"
 
@@ -234,24 +234,6 @@ if (__shared__) {
     typeof WebAssembly === "object" &&
       WebAssembly !== null
   )
-
-  setDeferred(symbol, "errorCode", () => {
-    let error
-
-    try {
-      promisify()
-    } catch (e) {
-      error = e
-    }
-
-    const symbols = error
-      ? Object.getOwnPropertySymbols(error)
-      : []
-
-    return symbols.length
-      ? symbols[0]
-      : Symbol.for(STD_ESM + ":errorCode")
-  })
 }
 
 export default shared

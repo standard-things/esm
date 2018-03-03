@@ -16,6 +16,11 @@ import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import warn from "./warn.js"
 
+const {
+  ERR_EXPORT_MISSING,
+  ERR_EXPORT_STAR_CONFLICT
+} = errors
+
 const GETTER_ERROR = { __proto__: null }
 const STAR_ERROR = { __proto__: null }
 
@@ -434,13 +439,13 @@ function getExportByName(entry, setter, name) {
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
-    throw new errors.SyntaxError("ERR_EXPORT_MISSING", entry.module, name)
+    throw new ERR_EXPORT_MISSING(entry.module, name)
   }
 
   const value = entry.namespace[name]
 
   if (value === STAR_ERROR) {
-    throw new errors.SyntaxError("ERR_EXPORT_STAR_CONFLICT", entry.module, name)
+    throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
   }
 
   return value
