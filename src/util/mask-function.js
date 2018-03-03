@@ -46,15 +46,26 @@ function maskFunction(func, source) {
     source = source.source
   }
 
-  const sourceProto = source.prototype
+  const hasProto = has(func, "prototype")
 
-  if (isObjectLike(sourceProto)) {
-    Reflect.setPrototypeOf(func.prototype, Reflect.getPrototypeOf(sourceProto))
-  } else if (Reflect.has(func, "prototype")) {
-    func.prototype = sourceProto
-  }
+  const sourceProto = has(source, "prototype")
+    ? source.prototype
+    : void 0
 
   Reflect.setPrototypeOf(func, Reflect.getPrototypeOf(source))
+
+  if (hasProto &&
+      isObjectLike(sourceProto)) {
+    Reflect.setPrototypeOf(func.prototype, Reflect.getPrototypeOf(sourceProto))
+  } else {
+    const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
+
+    if (descriptor) {
+      Reflect.defineProperty(func, "prototype", descriptor)
+    } else if (hasProto) {
+      func.prototype = sourceProto
+    }
+  }
 
   cached = {
     __proto__: null,
