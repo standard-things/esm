@@ -6,90 +6,88 @@ import shared from "./shared.js"
 
 const { toString } = Object.prototype
 
-class ExportProxy {
-  constructor(entry) {
-    const exported = entry.module.exports
+function ExportProxy(entry) {
+  const exported = entry.module.exports
 
-    if (! shared.support.proxiedFunctions ||
-        ! isObjectLike(exported)) {
-      return exported
+  if (! shared.support.proxiedFunctions ||
+      ! isObjectLike(exported)) {
+    return exported
+  }
+
+  const cache = shared.exportProxy
+  let cached = cache.get(exported)
+
+  if (cached) {
+    return cached.proxy
+  }
+
+  const maybeWrap = (target, name, value) => {
+    if (name === Symbol.toStringTag &&
+        typeof value !== "string") {
+      value = toString.call(target).slice(8, -1)
     }
 
-    const cache = shared.exportProxy
-    let cached = cache.get(exported)
-
-    if (cached) {
-      return cached.proxy
+    if (typeof value !== "function" ||
+        ! isNative(value)) {
+      return value
     }
 
-    const maybeWrap = (target, name, value) => {
-      if (name === Symbol.toStringTag &&
-          typeof value !== "string") {
-        value = toString.call(target).slice(8, -1)
-      }
+    let wrapper = cached.wrap.get(value)
 
-      if (typeof value !== "function" ||
-          ! isNative(value)) {
-        return value
-      }
-
-      let wrapper = cached.wrap.get(value)
-
-      if (wrapper) {
-        return wrapper
-      }
-
-      wrapper = new OwnProxy(value, {
-        apply(funcTarget, thisArg, args) {
-          if (thisArg === proxy ||
-              thisArg === entry.esmNamespace) {
-            thisArg = target
-          }
-
-          return Reflect.apply(value, thisArg, args)
-        }
-      })
-
-      cached.wrap.set(value, wrapper)
-      cached.unwrap.set(wrapper, value)
-
+    if (wrapper) {
       return wrapper
     }
 
-    const proxy = new OwnProxy(exported, {
-      get(target, name, receiver) {
-        return maybeWrap(target, name, Reflect.get(target, name, receiver))
-      },
-      getOwnPropertyDescriptor(target, name) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-        if (descriptor &&
-            Reflect.has(descriptor, "value")) {
-          descriptor.value = maybeWrap(target, name, descriptor.value)
+    wrapper = new OwnProxy(value, {
+      apply(funcTarget, thisArg, args) {
+        if (thisArg === proxy ||
+            thisArg === entry.esmNamespace) {
+          thisArg = target
         }
 
-        return descriptor
-      },
-      set(target, name, value, receiver) {
-        Reflect.set(target, name, cached.unwrap.get(value) || value, receiver)
-        entry.update()
-        return true
+        return Reflect.apply(value, thisArg, args)
       }
     })
 
-    cached = {
-      __proto__: null,
-      proxy,
-      unwrap: new WeakMap,
-      wrap: new WeakMap
-    }
+    cached.wrap.set(value, wrapper)
+    cached.unwrap.set(wrapper, value)
 
-    cache
-      .set(exported, cached)
-      .set(proxy, cached)
-
-    return proxy
+    return wrapper
   }
+
+  const proxy = new OwnProxy(exported, {
+    get(target, name, receiver) {
+      return maybeWrap(target, name, Reflect.get(target, name, receiver))
+    },
+    getOwnPropertyDescriptor(target, name) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+      if (descriptor &&
+          Reflect.has(descriptor, "value")) {
+        descriptor.value = maybeWrap(target, name, descriptor.value)
+      }
+
+      return descriptor
+    },
+    set(target, name, value, receiver) {
+      Reflect.set(target, name, cached.unwrap.get(value) || value, receiver)
+      entry.update()
+      return true
+    }
+  })
+
+  cached = {
+    __proto__: null,
+    proxy,
+    unwrap: new WeakMap,
+    wrap: new WeakMap
+  }
+
+  cache
+    .set(exported, cached)
+    .set(proxy, cached)
+
+  return proxy
 }
 
 Reflect.setPrototypeOf(ExportProxy.prototype, null)

@@ -78,7 +78,7 @@ function init() {
       mod.loaded = true
 
       exported =
-      mod.exports = new ExportProxy(entry)
+      mod.exports = ExportProxy(entry)
 
       Entry.set(exported, entry)
 
