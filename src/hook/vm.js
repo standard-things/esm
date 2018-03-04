@@ -74,8 +74,8 @@ function hook(vm) {
         entry,
         content,
         {
+          sourceType: "unambiguous",
           strict: false,
-          type: "unambiguous",
           var: true,
           warnings: false
         }
@@ -84,7 +84,7 @@ function hook(vm) {
 
     entry.state = 1
 
-    if (cached.esm) {
+    if (cached.sourceType === "module") {
       tryValidateESM(manager, entry, content)
     }
 

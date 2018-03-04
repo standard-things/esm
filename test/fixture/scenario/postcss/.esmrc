@@ -1,5 +1,5 @@
 {
   cjs: true,
   debug: true,
-  esm: "all"
+  mode: "all"
 }

@@ -100,7 +100,7 @@ function resolveFilename(request, parent, isMain, options) {
     if (isMain ||
         (pkgOptions &&
          (pkgOptions.cjs.paths ||
-          pkgOptions.esm === "js")) ||
+          pkgOptions.mode === "js")) ||
         extname(foundPath) in extLookup) {
       return cache[cacheKey] = foundPath
     }

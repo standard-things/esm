@@ -23,8 +23,8 @@ const defaultOptions = {
   },
   hint: "script",
   runtimeName: "_",
+  sourceType: "script",
   strict: void 0,
-  type: "script",
   var: false,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
@@ -42,27 +42,27 @@ const Compiler = {
       changed: false,
       code,
       dependencySpecifiers: null,
-      esm: false,
       exportNames: null,
       exportSpecifiers: null,
       exportStars: null,
       exportTemporals: null,
       scriptData: null,
+      sourceType: "script",
       topLevelReturn: false,
       warnings: null
     }
 
-    let { hint, type } = options
+    let { hint, sourceType } = options
 
-    if (type === "unambiguous" &&
+    if (sourceType === "unambiguous" &&
         hasPragma(code, "use script")) {
-      type = "script"
+      sourceType = "script"
     }
 
-    if (type === "unambiguous" &&
+    if (sourceType === "unambiguous" &&
         (hint === "module" ||
          hasPragma(code, "use module"))) {
-      type = "module"
+      sourceType = "module"
     }
 
     const possibleIndexes = findIndexes(code, ["export", "eval", "import"])
@@ -71,21 +71,19 @@ const Compiler = {
     let error
     let threw = true
 
-    if ((type === "script" ||
-        type === "unambiguous") &&
+    if ((sourceType === "script" ||
+        sourceType === "unambiguous") &&
         ! possibleIndexes.length) {
       return result
     }
 
     const allowReturnOutsideFunction =
       options.cjs.topLevelReturn ||
-      type === "script"
-
-    const sourceType = type === "script" ? type : "module"
+      sourceType === "script"
 
     const parserOptions = {
       allowReturnOutsideFunction,
-      sourceType,
+      sourceType: sourceType === "script" ? sourceType : "module",
       strict: options.strict
     }
 
@@ -98,8 +96,8 @@ const Compiler = {
     }
 
     if (threw &&
-        type === "unambiguous") {
-      type = parserOptions.sourceType = "script"
+        sourceType === "unambiguous") {
+      sourceType = parserOptions.sourceType = "script"
 
       try {
         ast = Parser.parse(code, parserOptions)
@@ -119,10 +117,10 @@ const Compiler = {
 
     try {
       importExportVisitor.visit(rootPath, code, {
-        esm: type !== "script",
         generateVarDeclarations: options.var,
         possibleIndexes,
-        runtimeName
+        runtimeName,
+        sourceType: sourceType === "script" ? sourceType : "module"
       })
     } catch (e) {
       e.sourceType = parserOptions.sourceType
@@ -133,7 +131,7 @@ const Compiler = {
 
     if (importExportVisitor.addedImportExport ||
         importExportVisitor.addedImportMeta) {
-      type = "module"
+      sourceType = "module"
 
       const { assignableExports, assignableImports } = importExportVisitor
 
@@ -161,12 +159,14 @@ const Compiler = {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (type === "module") {
-      result.esm = true
+    if (sourceType === "unambiguous") {
+      sourceType = "script"
+    } else if (sourceType === "module") {
       result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
       result.exportNames = importExportVisitor.exportNames
       result.exportStars = importExportVisitor.exportStars
       result.exportTemporals = importExportVisitor.exportTemporals
+      result.sourceType = "module"
 
       if (options.warnings &&
           ! options.cjs.vars &&

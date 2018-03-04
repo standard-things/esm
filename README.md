@@ -80,15 +80,15 @@ Unlock features with options specified as one of the following:
 
 Commonly used options may be specified in shorthand form:
 
-* `"@std/esm":"js"` is shorthand for `"@std/esm":{"esm":"js"}`
-* `"@std/esm":"cjs"` is shorthand for `"@std/esm":{"cjs":true,"esm":"js"}`
+* `"@std/esm":"js"` is shorthand for `"@std/esm":{"mode":"js"}`
+* `"@std/esm":"cjs"` is shorthand for `"@std/esm":{"cjs":true,"mode":"js"}`
 
 <table>
 <tr>
   <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
-  <td valign="top"><code>"esm":</code></td>
+  <td valign="top"><code>"mode":</code></td>
   <td>
     <p>A string mode:</p>
     <ul>

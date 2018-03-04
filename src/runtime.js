@@ -177,7 +177,7 @@ const Runtime = {
   run(moduleWrapper) {
     const { entry } = this
     const cached = entry.package.cache.compile[entry.cacheName]
-    const isESM = cached && cached.esm
+    const isESM = cached && cached.sourceType === "module"
     const runner =  isESM ? runESM : runCJS
     return runner(entry, moduleWrapper)
   },

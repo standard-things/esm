@@ -1,1 +1,1 @@
-export const esm = "js"
+export const mode = "js"

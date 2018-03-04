@@ -20,7 +20,7 @@ function load(request, parent, isMain, preload) {
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
   const parentCached = parentPkg && parentPkg.cache.compile[parentEntry.cacheName]
-  const parentIsESM = parentCached && parentCached.esm
+  const parentIsESM = parentCached && parentCached.sourceType === "module"
 
   const filename = parentPkgOptions && parentPkgOptions.cjs.paths
     ? Module._resolveFilename(request, parent, isMain)
@@ -64,7 +64,7 @@ function load(request, parent, isMain, preload) {
 
     if (! moduleState.parsing) {
       const cached = pkg.cache.compile[entry.cacheName]
-      const isESM = cached && cached.esm
+      const isESM = cached && cached.sourceType === "module"
 
       if (! isESM) {
         isUnexposed = false

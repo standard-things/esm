@@ -75,8 +75,8 @@ describe("main hook", function () {
 
     return [
       "'cjs'",
-      "{cjs:1,esm:'js'}",
-      "{cjs:true,esm:'js'}"
+      "{cjs:1,mode:'js'}",
+      "{cjs:true,mode:'js'}"
     ].reduce((promise, ESM_OPTIONS) =>
       promise
         .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
@@ -99,7 +99,7 @@ describe("main hook", function () {
     const ESM_OPTIONS =
       "{cache:'" +
       cachePath.replace(/\\/g, "\\\\") +
-      "',esm:'cjs'}"
+      "',mode:'cjs'}"
 
     return runMain(execPath, { ESM_OPTIONS })
       .then(() => {

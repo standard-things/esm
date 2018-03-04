@@ -168,7 +168,7 @@ class Entry {
       }
 
       const cached = this.package.cache.compile[this.cacheName]
-      const isESM = cached && cached.esm
+      const isESM = cached && cached.sourceType === "module"
 
       if (isESM ||
           typeof getter !== "function" ||
@@ -223,7 +223,7 @@ class Entry {
     }
 
     const cached = this.package.cache.compile[this.cacheName]
-    const isESM = cached && cached.esm
+    const isESM = cached && cached.sourceType === "module"
 
     let setNsGetters = true
     let exported = this.module.exports
@@ -327,7 +327,7 @@ function assignExportsToNamespace(entry) {
   const pkg = entry.package
   const cached = pkg.cache.compile[entry.cacheName]
   const exported = entry.module.exports
-  const isESM = cached && cached.esm
+  const isESM = cached && cached.sourceType === "module"
   const object = entry._loaded === 1 ? _namespace : exported
 
   const isPseudo =
@@ -419,7 +419,7 @@ function createNamespace() {
 
 function getExportByName(entry, setter, name) {
   const cached = entry.package.cache.compile[entry.cacheName]
-  const isESM = cached && cached.esm
+  const isESM = cached && cached.sourceType === "module"
 
   const isScript =
     ! isESM &&
@@ -505,7 +505,7 @@ function runGetter(entry, name) {
 
 function runGetters(entry) {
   const cached = entry.package.cache.compile[entry.cacheName]
-  const isESM = cached && cached.esm
+  const isESM = cached && cached.sourceType === "module"
 
   if (isESM) {
     for (const name in entry.getters) {

@@ -9,15 +9,15 @@ const files = globby.sync(["output/**/*.{js,mjs}"])
 const tests = files
   .reduce((tests, thePath) => {
     const dirPath = path.dirname(thePath)
-    const type = path.basename(thePath).replace(/\.m?js$/, "")
+    const kind = path.basename(thePath).replace(/\.m?js$/, "")
 
     if (! tests[dirPath]) {
       tests[dirPath] = { __proto__: null }
     }
 
-    tests[dirPath][type] = {
+    tests[dirPath][kind] = {
       content: fs.readFileSync(thePath, "utf8"),
-      type: path.extname(thePath) === ".mjs" ? "module" : "script"
+      sourceType: path.extname(thePath) === ".mjs" ? "module" : "script"
     }
 
     return tests
@@ -32,7 +32,7 @@ describe("output", () =>
 
       it(`compiles ${name} example as expected`, () => {
         const result = Compiler.compile(test.actual.content, {
-          type: test.actual.type
+          sourceType: test.actual.sourceType
         })
 
         // Remove zero-width joiners and trim trailing whitespace.

@@ -39,7 +39,7 @@ function validate(entry) {
     const child = childEntry.module
     const childPkg = childEntry.package
     const childCached = childPkg.cache.compile[childEntry.cacheName]
-    const childIsESM = childCached && childCached.esm
+    const childIsESM = childCached && childCached.sourceType === "module"
     const requestedExportNames = dependencySpecifiers[name]
 
     if (! childIsESM) {
@@ -92,7 +92,7 @@ function validate(entry) {
 
     const childEntry = children[childName]
     const childCached = childEntry.package.cache.compile[childEntry.cacheName]
-    const childIsESM = childCached && childCached.esm
+    const childIsESM = childCached && childCached.sourceType === "module"
 
     if (! childIsESM) {
       continue

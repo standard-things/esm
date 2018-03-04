@@ -28,19 +28,19 @@ function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
 
   let hint = "script"
-  let type = "script"
+  let sourceType = "script"
 
-  if (options.esm === "all") {
-    type = "module"
-  } else if (options.esm === "js") {
-    type = "unambiguous"
+  if (options.mode === "all") {
+    sourceType = "module"
+  } else if (options.mode === "js") {
+    sourceType = "unambiguous"
   }
 
   if (extname(filename) === ".mjs") {
     hint = "module"
 
-    if (type === "script") {
-      type = "module"
+    if (sourceType === "script") {
+      sourceType = "module"
     }
   }
 
@@ -64,7 +64,10 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (! cached) {
     cached =
-    cache.compile[cacheName] = tryCompileCode(caller, entry, content, { hint, type })
+    cache.compile[cacheName] = tryCompileCode(caller, entry, content, {
+      hint,
+      sourceType
+    })
   }
 
   if (options.warnings &&
@@ -77,11 +80,11 @@ function compile(caller, entry, content, filename, fallback) {
   if (moduleState.parsing) {
     const cached = entry.package.cache.compile[entry.cacheName]
     const defaultPkg = shared.package.default
-    const isESM = cached && cached.esm
+    const isESM = cached && cached.sourceType === "module"
     const { parent } = entry
     const parentPkg = parent && parent.package
     const parentCached = parentPkg && parentPkg.cache.compile[parent.cacheName]
-    const parentIsESM = parentCached && parentCached.esm
+    const parentIsESM = parentCached && parentCached.sourceType === "module"
 
     if (! isESM &&
         ! parentIsESM &&
@@ -103,7 +106,7 @@ function compile(caller, entry, content, filename, fallback) {
 function tryCompileCached(entry) {
   const pkg = entry.package
   const cached = pkg.cache.compile[entry.cacheName]
-  const isESM = cached && cached.esm
+  const isESM = cached && cached.sourceType === "module"
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -293,7 +296,7 @@ function useAsyncWrapper(entry) {
   if (pkg.options.await &&
       shared.support.await) {
     const cached = pkg.cache.compile[entry.cacheName]
-    const isESM = cached && cached.esm
+    const isESM = cached && cached.sourceType === "module"
 
     if (! isESM) {
       return true

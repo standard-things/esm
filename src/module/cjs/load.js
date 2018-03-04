@@ -20,13 +20,13 @@ function load(request, parent, isMain) {
   const childEntry = _load(request, parent, isMain)
   const child = childEntry.module
   const childCached = childEntry.package.cache.compile[childEntry.cacheName]
-  const childIsESM = childCached && childCached.esm
+  const childIsESM = childCached && childCached.sourceType === "module"
 
   if (childIsESM &&
       parent) {
     const { options } = Entry.get(parent).package
 
-    if (options.esm === "mjs" &&
+    if (options.mode === "mjs" &&
         ! options.cjs.vars) {
       throw new ERR_REQUIRE_ESM(child)
     }

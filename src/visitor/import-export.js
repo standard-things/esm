@@ -33,7 +33,6 @@ class ImportExportVisitor extends Visitor {
     this.changed = false
     this.code = code
     this.dependencySpecifiers = { __proto__: null }
-    this.esm = options.esm
     this.exportNames = []
     this.exportStars = []
     this.exportTemporals = []
@@ -41,6 +40,7 @@ class ImportExportVisitor extends Visitor {
     this.magicString = new MagicString(code)
     this.possibleIndexes = options.possibleIndexes
     this.runtimeName = options.runtimeName
+    this.sourceType = options.sourceType
     this.strict = strict
     this.top = top
   }
@@ -124,7 +124,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitImportDeclaration(path) {
-    if (! this.esm) {
+    if (this.sourceType !== "module") {
       return
     }
 
@@ -169,7 +169,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportAllDeclaration(path) {
-    if (! this.esm) {
+    if (this.sourceType !== "module") {
       return
     }
 
@@ -203,7 +203,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportDefaultDeclaration(path) {
-    if (! this.esm) {
+    if (this.sourceType !== "module") {
       return
     }
 
@@ -260,7 +260,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportNamedDeclaration(path) {
-    if (! this.esm) {
+    if (this.sourceType !== "module") {
       return
     }
 

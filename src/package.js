@@ -46,7 +46,7 @@ const defaultOptions = {
     vars: false
   },
   debug: false,
-  esm: "mjs",
+  mode: "mjs",
   sourceMap: void 0,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
@@ -187,8 +187,8 @@ function createOptions(options) {
 
   const hasCJS = has(options, "cjs")
 
-  if (has(options, "esm") &&
-      options.esm === "cjs") {
+  if (has(options, "mode") &&
+      options.mode === "cjs") {
     esmMode = "js"
 
     if (! hasCJS) {
@@ -217,10 +217,10 @@ function createOptions(options) {
   }
 
   if (esmMode) {
-    options.esm = esmMode
-  } else if (options.esm !== "all" &&
-      options.esm !== "js") {
-    options.esm = "mjs"
+    options.mode = esmMode
+  } else if (options.mode !== "all" &&
+      options.mode !== "js") {
+    options.mode = "mjs"
   }
 
   if (sourceMap !== void 0) {
@@ -329,7 +329,7 @@ function readInfo(dirPath, force) {
       pkg =
       Package.cache[dirPath] = new Package(dirPath, "*", {
         cjs: true,
-        esm: "js"
+        mode: "js"
       })
 
       const { parsing, passthru } = moduleState
@@ -426,8 +426,8 @@ function readInfo(dirPath, force) {
 function toOptions(value) {
   if (typeof value === "string") {
     return value === "cjs"
-      ? { cjs: true, esm: "js" }
-      : { esm: value }
+      ? { cjs: true, mode: "js" }
+      : { mode: value }
   }
 
   return isObjectLike(value) ? value : {}
@@ -438,7 +438,7 @@ Reflect.setPrototypeOf(Package.prototype, null)
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {
   cache: false,
-  esm: "cjs"
+  mode: "cjs"
 })
 
 export default Package

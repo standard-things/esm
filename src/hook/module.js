@@ -65,8 +65,8 @@ function hook(Mod, parent) {
     assign(defaultPkg, parentPkg)
   }
 
-  if (defaultOptions.esm === "all") {
-    defaultOptions.esm = "js"
+  if (defaultOptions.mode === "all") {
+    defaultOptions.mode = "js"
   }
 
   defaultPkg.options = defaultOptions

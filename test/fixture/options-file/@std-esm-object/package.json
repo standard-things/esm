@@ -2,6 +2,6 @@
   "name": "@std-esm-object",
   "private": true,
   "@std/esm": {
-    "esm": "js"
+    "mode": "js"
   }
 }

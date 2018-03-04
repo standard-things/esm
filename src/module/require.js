@@ -35,7 +35,7 @@ const req = function require(request) {
 
   const isESM =
     _requireESM ||
-    (cached && cached.esm)
+    (cached && cached.sourceType === "module")
 
   return isESM
     ? _loadESM(request, this, false).module.exports

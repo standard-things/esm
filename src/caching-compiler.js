@@ -47,17 +47,17 @@ const CachingCompiler = {
       changed: true,
       code: null,
       dependencySpecifiers,
-      esm: !! meta[2],
       exportNames: meta[4] || null,
       exportSpecifiers: null,
       exportStars: meta[5] || null,
       exportTemporals: meta[6] || null,
       scriptData: null,
+      sourceType: meta[2],
       topLevelReturn: meta[7] || null,
       warnings: meta[8] || null
     }
 
-    if (result.esm) {
+    if (result.sourceType === "module") {
       const exportSpecifiers =
       result.exportSpecifiers = { __proto__: null }
 
@@ -88,7 +88,7 @@ function compileAndCache(entry, code, options) {
     return shared.package.dir[""].compile[cacheName] = result
   }
 
-  if (result.esm) {
+  if (result.sourceType === "module") {
     const exportSpecifiers =
     result.exportSpecifiers = { __proto__: null }
 
@@ -157,8 +157,8 @@ function toCompileOptions(entry, options) {
     cjs: entry.package.options.cjs,
     hint: options.hint,
     runtimeName: entry.runtimeName,
+    sourceType: options.sourceType,
     strict: options.strict,
-    type: options.type,
     var: options.var
   }
 }
@@ -246,7 +246,7 @@ if (! shared.inited) {
           map[cacheName] = [
             offsetStart,
             offsetEnd,
-            cached.esm,
+            cached.sourceType,
             cached.dependencySpecifiers,
             cached.exportNames,
             cached.exportStars,

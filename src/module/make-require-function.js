@@ -24,7 +24,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
   const pkg = entry.package
   const cached = pkg.cache.compile[entry.cacheName]
-  const isESM = cached && cached.esm
+  const isESM = cached && cached.sourceType === "module"
   const { name } = entry
 
   let req = function require(request) {
