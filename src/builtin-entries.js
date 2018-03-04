@@ -1,5 +1,4 @@
 import Entry from "./entry.js"
-import ExportProxy from "./export-proxy.js"
 import Module from "./module.js"
 import OwnProxy from "./own/proxy.js"
 
@@ -7,6 +6,7 @@ import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
 import keysAll from "./util/keys-all.js"
+import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
@@ -78,7 +78,7 @@ function init() {
       mod.loaded = true
 
       exported =
-      mod.exports = ExportProxy(entry)
+      mod.exports = proxyExports(entry)
 
       Entry.set(exported, entry)
 

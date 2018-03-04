@@ -1,4 +1,3 @@
-import ExportProxy from "./export-proxy.js"
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
@@ -10,6 +9,7 @@ import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
+import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import setSetter from "./util/set-setter.js"
@@ -351,7 +351,7 @@ function assignExportsToNamespace(entry) {
 
           if (name === "default" &&
               isObjectLike(value)) {
-            return new ExportProxy(entry)
+            return proxyExports(entry)
           }
 
           return value

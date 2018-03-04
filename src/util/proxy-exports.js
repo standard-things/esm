@@ -1,12 +1,12 @@
-import OwnProxy from "./own/proxy.js"
+import OwnProxy from "../own/proxy.js"
 
-import isNative from "./util/is-native.js"
-import isObjectLike from "./util/is-object-like.js"
-import shared from "./shared.js"
+import isNative from "./is-native.js"
+import isObjectLike from "./is-object-like.js"
+import shared from "../shared.js"
 
 const { toString } = Object.prototype
 
-function ExportProxy(entry) {
+function proxyExports(entry) {
   const exported = entry.module.exports
 
   if (! shared.support.proxiedFunctions ||
@@ -90,6 +90,4 @@ function ExportProxy(entry) {
   return proxy
 }
 
-Reflect.setPrototypeOf(ExportProxy.prototype, null)
-
-export default ExportProxy
+export default proxyExports
