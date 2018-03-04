@@ -1,3 +1,5 @@
+import SOURCE_TYPE from "../constant/source-type.js"
+
 import MagicString from "../magic-string.js"
 import Visitor from "../visitor.js"
 
@@ -5,6 +7,10 @@ import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import keys from "../util/keys.js"
+
+const {
+  MODULE
+} = SOURCE_TYPE
 
 const ANON_NAME = encodeId("default")
 
@@ -124,7 +130,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitImportDeclaration(path) {
-    if (this.sourceType !== "module") {
+    if (this.sourceType !== MODULE) {
       return
     }
 
@@ -169,7 +175,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportAllDeclaration(path) {
-    if (this.sourceType !== "module") {
+    if (this.sourceType !== MODULE) {
       return
     }
 
@@ -203,7 +209,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportDefaultDeclaration(path) {
-    if (this.sourceType !== "module") {
+    if (this.sourceType !== MODULE) {
       return
     }
 
@@ -260,7 +266,7 @@ class ImportExportVisitor extends Visitor {
   }
 
   visitExportNamedDeclaration(path) {
-    if (this.sourceType !== "module") {
+    if (this.sourceType !== MODULE) {
       return
     }
 

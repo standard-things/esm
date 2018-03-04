@@ -52,11 +52,11 @@ function compile(content, filename) {
   const pkg = entry.package
   const { cacheName } = entry
   const { cache, cachePath } = pkg
-  const cached = cache.compile[cacheName]
+  const { compileData } = entry
   const wrapper = Module.wrap(stripShebang(content))
 
   const cachedData =
-    (cached && cached.scriptData) ||
+    (compileData && compileData.scriptData) ||
     void 0
 
   const script = new vm.Script(wrapper, {
@@ -77,9 +77,9 @@ function compile(content, filename) {
     scriptData = script.cachedData
   }
 
-  if (cached) {
+  if (compileData) {
     if (scriptData) {
-      cached.scriptData = scriptData
+      compileData.scriptData = scriptData
     } else if (cachedData &&
         cachedDataRejected) {
       changed = true
@@ -91,7 +91,7 @@ function compile(content, filename) {
         meta[1] = -1
       }
 
-      Reflect.deleteProperty(cached, "scriptData")
+      Reflect.deleteProperty(compileData, "scriptData")
     }
   }
 

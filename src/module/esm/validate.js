@@ -5,6 +5,7 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 const {
+  MODE,
   STATE
 } = ENTRY
 
@@ -14,9 +15,7 @@ const {
 } = errors
 
 function validate(entry) {
-  const pkg = entry.package
-  const cached = pkg.cache.compile[entry.cacheName]
-  const { dependencySpecifiers, exportSpecifiers } = cached
+  const { dependencySpecifiers, exportSpecifiers } = entry.compileData
 
   const children = { __proto__: null }
   const mod = entry.module
@@ -37,15 +36,14 @@ function validate(entry) {
     }
   }
 
-  const { namedExports } = pkg.options.cjs
+  const { namedExports } = entry.package.options.cjs
 
   // Validate requested child export names.
   for (const name in children) {
     const childEntry = children[name]
     const child = childEntry.module
-    const childPkg = childEntry.package
-    const childCached = childPkg.cache.compile[childEntry.cacheName]
-    const childIsESM = childCached && childCached.sourceType === "module"
+    const childCached = childEntry.compileData
+    const childIsESM = childEntry.mode === MODE.ESM
     const requestedExportNames = dependencySpecifiers[name]
 
     if (! childIsESM) {
@@ -60,7 +58,7 @@ function validate(entry) {
     }
 
     const childExportStars = childCached.exportStars
-    const skipExportMissing = childPkg.options.cjs.vars
+    const skipExportMissing = childEntry.package.options.cjs.vars
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCached
@@ -91,20 +89,19 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const childName of cached.exportStars) {
+  for (const childName of entry.compileData.exportStars) {
     if (childName in builtinEntries) {
       continue
     }
 
     const childEntry = children[childName]
-    const childCached = childEntry.package.cache.compile[childEntry.cacheName]
-    const childIsESM = childCached && childCached.sourceType === "module"
+    const childIsESM = childEntry.mode === MODE.ESM
 
     if (! childIsESM) {
       continue
     }
 
-    for (const exportName in childCached.exportSpecifiers) {
+    for (const exportName in childEntry.compileData.exportSpecifiers) {
       if (exportName in exportSpecifiers) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.

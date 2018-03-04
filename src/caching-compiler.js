@@ -82,7 +82,7 @@ const CachingCompiler = {
       result.scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
     }
 
-    return result
+    return cache.compile[cacheName] = result
   }
 }
 

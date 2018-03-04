@@ -1,5 +1,7 @@
 import { dirname, extname } from "path"
 
+import ENTRY from "../../constant/entry.js"
+
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
@@ -15,12 +17,15 @@ import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
+const {
+  MODE
+} = ENTRY
+
 function load(request, parent, isMain, preload) {
   const parentEntry = parent && Entry.get(parent)
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
-  const parentCached = parentPkg && parentPkg.cache.compile[parentEntry.cacheName]
-  const parentIsESM = parentCached && parentCached.sourceType === "module"
+  const parentIsESM = parentEntry && parentEntry.mode === MODE.ESM
 
   const filename = parentPkgOptions && parentPkgOptions.cjs.paths
     ? Module._resolveFilename(request, parent, isMain)
@@ -48,7 +53,6 @@ function load(request, parent, isMain, preload) {
 
   const entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
-    const pkg = entry.package
 
     state._cache[request] = child
 
@@ -63,8 +67,7 @@ function load(request, parent, isMain, preload) {
     entry.id = request
 
     if (! moduleState.parsing) {
-      const cached = pkg.cache.compile[entry.cacheName]
-      const isESM = cached && cached.sourceType === "module"
+      const isESM = entry.mode === MODE.ESM
 
       if (! isESM) {
         isUnexposed = false
@@ -87,7 +90,7 @@ function load(request, parent, isMain, preload) {
     }
 
     if (! child.paths) {
-      child.paths = pkg.options.cjs.paths
+      child.paths = entry.package.options.cjs.paths
         ? Module._nodeModulePaths(fromPath)
         : moduleNodeModulePaths(fromPath)
     }

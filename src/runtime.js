@@ -1,3 +1,5 @@
+import ENTRY from "./constant/entry.js"
+
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 
@@ -10,6 +12,10 @@ import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
+
+const {
+  MODE
+} = ENTRY
 
 const ExPromise = __external__.Promise
 
@@ -176,9 +182,7 @@ const Runtime = {
 
   run(moduleWrapper) {
     const { entry } = this
-    const cached = entry.package.cache.compile[entry.cacheName]
-    const isESM = cached && cached.sourceType === "module"
-    const runner =  isESM ? runESM : runCJS
+    const runner =  entry.mode === MODE.ESM ? runESM : runCJS
     return runner(entry, moduleWrapper)
   },
 

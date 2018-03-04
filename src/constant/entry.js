@@ -7,6 +7,12 @@ const ENTRY = {
     INCOMPLETE: 0,
     COMPLETED: 1
   },
+  MODE: {
+    __proto__: null,
+    CJS: "cjs",
+    ESM: "esm",
+    PSEUDO: "pseudo"
+  },
   STATE: {
     __proto__: null,
     INITIAL: 0,

@@ -2,6 +2,8 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/module.js
 
+import ENTRY from "../constant/entry.js"
+
 import Entry from "../entry.js"
 import Module from "../module.js"
 
@@ -14,6 +16,10 @@ import moduleState from "./state.js"
 import shared from "../shared.js"
 
 const {
+  MODE
+} = ENTRY
+
+const {
   ERR_INVALID_ARG_TYPE
 } = errors
 
@@ -22,9 +28,7 @@ const sourcePaths = sourceResolve && sourceResolve.paths
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
-  const pkg = entry.package
-  const cached = pkg.cache.compile[entry.cacheName]
-  const isESM = cached && cached.sourceType === "module"
+  const isESM = entry.mode == MODE.ESM
   const { name } = entry
 
   let req = function require(request) {
@@ -36,7 +40,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     let exported
 
-    if (! pkg.options.cjs.vars) {
+    if (! entry.package.options.cjs.vars) {
       try {
         exported = requirer.call(mod, request)
       } finally {

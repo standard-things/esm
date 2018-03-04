@@ -1,4 +1,5 @@
 import ENTRY from "../constant/entry.js"
+import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -30,8 +31,13 @@ import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
 const {
+  MODE,
   STATE
 } = ENTRY
+
+const {
+  MODULE
+} = SOURCE_TYPE
 
 const ExObject = __external__.Object
 
@@ -67,16 +73,16 @@ function hook(vm) {
 
     entry.cacheName = getCacheFileName(entry, content)
 
-    let cached = entry.package.cache.compile[entry.cacheName]
+    let { compileData } = entry
 
-    if (cached) {
-      if (cached.scriptData &&
+    if (compileData) {
+      if (compileData.scriptData &&
           scriptOptions.produceCachedData &&
           ! has(scriptOptions, "cachedData")) {
-        scriptOptions.cachedData = cached.scriptData
+        scriptOptions.cachedData = compileData.scriptData
       }
     } else {
-      cached = tryWrapper(Compiler.compile, [
+      compileData = tryWrapper(Compiler.compile, [
         entry,
         content,
         {
@@ -90,7 +96,7 @@ function hook(vm) {
 
     entry.state = STATE.PARSING_STARTED
 
-    if (cached.sourceType === "module") {
+    if (entry.mode === MODE.ESM) {
       tryValidateESM(manager, entry, content)
     }
 
@@ -114,12 +120,12 @@ function hook(vm) {
           "})" +
         "}" +
       "})();" +
-      cached.code
+      compileData.code
 
     const result = tryWrapper(func, [content, scriptOptions])
 
     if (result.cachedDataProduced) {
-      cached.scriptData = result.cachedData
+      compileData.scriptData = result.cachedData
     }
 
     result.runInContext = wrap(result.runInContext, tryWrapper)
@@ -289,7 +295,7 @@ function tryWrapper(func, args) {
     }
 
     const [content] = args
-    const isESM = e.sourceType === "module"
+    const isESM = e.sourceType === MODULE
 
     Reflect.deleteProperty(e, "sourceType")
     throw maskStackTrace(e, content, null, isESM)

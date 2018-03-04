@@ -26,6 +26,7 @@ import warn from "../warn.js"
 import wrap from "./wrap.js"
 
 const {
+  MODE,
   STATE
 } = ENTRY
 
@@ -60,24 +61,21 @@ function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
   const { cache } = pkg
   const { cacheName } = entry
+  let { compileData } = entry
 
-  let cached = cache.compile[cacheName]
+  if (compileData === true) {
+    compileData = Compiler.from(entry)
 
-  if (cached === true) {
-    cached = Compiler.from(entry)
-
-    if (cached) {
-      cached.code = readCachedCode(resolve(pkg.cachePath, cacheName))
-      cache.compile[cacheName] = cached
+    if (compileData) {
+      compileData.code = readCachedCode(resolve(pkg.cachePath, cacheName))
     } else {
       Reflect.deleteProperty(cache.compile, cacheName)
       Reflect.deleteProperty(cache.map, cacheName)
     }
   }
 
-  if (! cached) {
-    cached =
-    cache.compile[cacheName] = tryCompileCode(caller, entry, content, {
+  if (! compileData) {
+    compileData = tryCompileCode(caller, entry, content, {
       hint,
       sourceType
     })
@@ -85,19 +83,17 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (options.warnings &&
       moduleState.parsing) {
-    for (const warning of cached.warnings) {
+    for (const warning of compileData.warnings) {
       warn(warning.code, filename, ...warning.args)
     }
   }
 
   if (moduleState.parsing) {
-    const cached = entry.package.cache.compile[entry.cacheName]
     const defaultPkg = shared.package.default
-    const isESM = cached && cached.sourceType === MODULE
+    const isESM = entry.mode === MODE.ESM
     const { parent } = entry
     const parentPkg = parent && parent.package
-    const parentCached = parentPkg && parentPkg.cache.compile[parent.cacheName]
-    const parentIsESM = parentCached && parentCached.sourceType === MODULE
+    const parentIsESM = parent && parent.mode === MODE.ESM
 
     if (! isESM &&
         ! parentIsESM &&
@@ -117,9 +113,7 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function tryCompileCached(entry) {
-  const pkg = entry.package
-  const cached = pkg.cache.compile[entry.cacheName]
-  const isESM = cached && cached.sourceType === MODULE
+  const isESM = entry.mode === MODE.ESM
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -129,7 +123,7 @@ function tryCompileCached(entry) {
 
   let result
 
-  if (pkg.options.debug) {
+  if (entry.package.options.debug) {
     result = tryCompile(entry)
 
     if (noDepth) {
@@ -159,15 +153,15 @@ function tryCompileCached(entry) {
 }
 
 function tryCompileCJS(entry) {
-  const cached = entry.package.cache.compile[entry.cacheName]
+  const { compileData } = entry
   const mod = entry.module
   const useAsync = useAsyncWrapper(entry)
 
-  let content = cached.code
+  let content = compileData.code
 
-  if (cached.changed) {
+  if (compileData.changed) {
     content =
-      (cached.topLevelReturn ? "return " : "") +
+      (compileData.topLevelReturn ? "return " : "") +
       "this.r((" +
       (useAsync ? "async " :  "") +
       "function(" + entry.runtimeName + ",global,exports,require){" +
@@ -191,19 +185,19 @@ function tryCompileCJS(entry) {
 }
 
 function tryCompileESM(entry) {
-  const { module:mod, package:pkg } = entry
-  const cached = pkg.cache.compile[entry.cacheName]
-  const cjsVars = pkg.options.cjs.vars
+  const cjsVars = entry.package.options.cjs.vars
+  const { compileData } = entry
+  const mod = entry.module
   const { filename } = mod
 
   let content =
-    (cached.topLevelReturn ? "return " : "") +
+    (compileData.topLevelReturn ? "return " : "") +
     "this.r((" +
     (useAsyncWrapper(entry) ? "async " :  "") +
     "function(" + entry.runtimeName + ",global" +
     (cjsVars ? ",exports,require" : "") +
     '){"use strict";' +
-    cached.code +
+    compileData.code +
     "\n}))"
 
   content += maybeSourceMap(entry, content)
@@ -308,14 +302,11 @@ function useAsyncWrapper(entry) {
 
   if (pkg.options.await &&
       shared.support.await) {
-    const cached = pkg.cache.compile[entry.cacheName]
-    const isESM = cached && cached.sourceType === MODULE
-
-    if (! isESM) {
+    if (entry.mode !== MODE.ESM) {
       return true
     }
 
-    const { exportSpecifiers } = cached
+    const { exportSpecifiers } = entry.compileData
 
     if (! exportSpecifiers ||
         ! keys(exportSpecifiers).length) {

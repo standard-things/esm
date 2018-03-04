@@ -126,14 +126,13 @@ function hook(Mod, parent) {
 
     Reflect.setPrototypeOf(mod, Module.prototype)
 
-    let cached = cache.compile[cacheName]
+    let { compileData } = entry
 
-    if (cached === true) {
-      cached = Compiler.from(entry)
+    if (compileData === true) {
+      compileData = Compiler.from(entry)
 
-      if (cached) {
-        cached.code = readCachedCode(resolve(cachePath, cacheName))
-        cache.compile[cacheName] = cached
+      if (compileData) {
+        compileData.code = readCachedCode(resolve(cachePath, cacheName))
       } else {
         Reflect.deleteProperty(cache.compile, cacheName)
         Reflect.deleteProperty(cache.map, cacheName)
@@ -151,11 +150,14 @@ function hook(Mod, parent) {
       })
     }
 
-    if (! cached &&
+    if (! compileData &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {
-      const content = cached ? cached.code : readSourceCode(filename)
+      const content = compileData
+        ? compileData.code
+        : readSourceCode(filename)
+
       mod._compile(content, filename)
     }
   }

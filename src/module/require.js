@@ -2,12 +2,18 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import ENTRY from "../constant/entry.js"
+
 import Entry from "../entry.js"
 import Module from "../module.js"
 
 import _loadESM from "./esm/_load.js"
 import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
+
+const {
+  MODE
+} = ENTRY
 
 const {
   ERR_INVALID_ARG_TYPE,
@@ -29,13 +35,12 @@ const req = function require(request) {
 
   const entry = Entry.get(this)
   const { _requireESM } = entry
-  const cached = entry.package.cache.compile[entry.cacheName]
 
   entry._requireESM = false
 
   const isESM =
     _requireESM ||
-    (cached && cached.sourceType === "module")
+    entry.mode === MODE.ESM
 
   return isESM
     ? _loadESM(request, this, false).module.exports

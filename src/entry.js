@@ -1,4 +1,5 @@
 import ENTRY from "./constant/entry.js"
+import SOURCE_TYPE from "./constant/source-type.js"
 
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
@@ -20,8 +21,13 @@ import warn from "./warn.js"
 
 const {
   LOAD,
+  MODE,
   STATE
 } = ENTRY
+
+const {
+  MODULE
+} = SOURCE_TYPE
 
 const {
   ERR_EXPORT_MISSING,
@@ -87,6 +93,37 @@ class Entry {
     this.state = STATE.INITIAL
     // The file url of the module.
     this.url = null
+
+    setGetter(this, "compileData", () =>
+      this.package.cache.compile[this.cacheName]
+    )
+
+    setSetter(this, "compileData", (value) => {
+      this.package.cache.compile[this.cacheName] = value
+    })
+
+    setGetter(this, "mode", () => {
+      const { compileData } = this
+
+      if (compileData &&
+          compileData !== true) {
+        return this.mode = compileData.sourceType === MODULE
+          ? MODE.ESM
+          : MODE.CJS
+      }
+
+      return "cjs"
+    })
+
+    setSetter(this, "mode", (value) => {
+      Reflect.defineProperty(this, "mode", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true
+      })
+    })
   }
 
   static delete(value) {
@@ -170,10 +207,7 @@ class Entry {
         getters[key] = getter
       }
 
-      const cached = this.package.cache.compile[this.cacheName]
-      const isESM = cached && cached.sourceType === "module"
-
-      if (isESM ||
+      if (this.mode === MODE.ESM ||
           typeof getter !== "function" ||
           typeof otherGetter !== "function") {
         continue
@@ -225,8 +259,7 @@ class Entry {
       }
     }
 
-    const cached = this.package.cache.compile[this.cacheName]
-    const isESM = cached && cached.sourceType === "module"
+    const isESM = this.mode === MODE.ESM
 
     let setNsGetters = true
     let exported = this.module.exports
@@ -327,14 +360,12 @@ class Entry {
 
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
-  const pkg = entry.package
-  const cached = pkg.cache.compile[entry.cacheName]
   const exported = entry.module.exports
-  const isESM = cached && cached.sourceType === "module"
+  const isESM = entry.mode === MODE.ESM
   const object = entry._loaded === LOAD.COMPLETED ? _namespace : exported
 
   const isPseudo =
-    pkg.options.cjs.interop &&
+    entry.package.options.cjs.interop &&
     has(exported, "__esModule") &&
     !! exported.__esModule
 
@@ -421,8 +452,7 @@ function createNamespace() {
 }
 
 function getExportByName(entry, setter, name) {
-  const cached = entry.package.cache.compile[entry.cacheName]
-  const isESM = cached && cached.sourceType === "module"
+  const isESM = entry.mode === MODE.ESM
 
   const isScript =
     ! isESM &&
@@ -509,10 +539,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  const cached = entry.package.cache.compile[entry.cacheName]
-  const isESM = cached && cached.sourceType === "module"
-
-  if (isESM) {
+  if (entry.mode === MODE.ESM) {
     for (const name in entry.getters) {
       runGetter(entry, name)
     }
@@ -522,8 +549,7 @@ function runGetters(entry) {
 }
 
 function runSetter(entry, name, callback) {
-  const { children, getters } = entry
-  const cached = entry.package.cache.compile[entry.cacheName]
+  const { children, compileData, getters } = entry
   const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
@@ -536,7 +562,7 @@ function runSetter(entry, name, callback) {
     } else if (value === void 0 &&
         name in getters &&
         setter.parent.name in children &&
-        cached.exportTemporals.indexOf(name) !== -1) {
+        compileData.exportTemporals.indexOf(name) !== -1) {
       warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }
