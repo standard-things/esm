@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import CHAR_CODE from "../constant/char-code.js"
+
 import GenericArray from "../generic/array.js"
 
 import { resolve } from "path"

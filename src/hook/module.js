@@ -1,3 +1,4 @@
+import ENTRY from "../constant/entry.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -26,6 +27,10 @@ import { resolve } from "path"
 import shared from "../shared.js"
 import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
+
+const {
+  STATE
+} = ENTRY
 
 const {
   ERR_REQUIRE_ESM
@@ -100,7 +105,7 @@ function hook(Mod, parent) {
     const { _compile } = mod
 
     const compileFallback = () => {
-      entry.state = 3
+      entry.state = STATE.EXECUTION_STARTED
       return tryPassthru.call(this, func, args, pkg)
     }
 

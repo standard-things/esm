@@ -1,6 +1,12 @@
+import ENTRY from "../../constant/entry.js"
+
 import _loadESM from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
+
+const {
+  STATE
+} = ENTRY
 
 const {
   ERR_EXPORT_MISSING,
@@ -26,8 +32,8 @@ function validate(entry) {
 
     entry.children[childEntry.name] = childEntry
 
-    if (childEntry.state < 2) {
-      childEntry.state = 2
+    if (childEntry.state < STATE.PARSING_COMPLETED) {
+      childEntry.state = STATE.PARSING_COMPLETED
     }
   }
 

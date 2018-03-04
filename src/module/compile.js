@@ -2,6 +2,8 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import ENTRY from "../constant/entry.js"
+
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
@@ -16,6 +18,10 @@ import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
 
+const {
+  STATE
+} = ENTRY
+
 // Lazily resolve `process.argv[1]`.
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
@@ -27,7 +33,7 @@ const useRunInDebugContext = typeof runInDebugContext === "function"
 function compile(content, filename) {
   const entry = Entry.get(this)
 
-  if (! entry.state) {
+  if (entry.state === STATE.INITIAL) {
     entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
     entry.runtimeName = shared.runtimeName
@@ -37,7 +43,7 @@ function compile(content, filename) {
     try {
       result = _compile(compile, entry, content, filename)
     } finally {
-      entry.state = 0
+      entry.state = STATE.INITIAL
     }
 
     return result
@@ -131,7 +137,7 @@ function compile(content, filename) {
   const exported = this.exports
   const req = makeRequireFunction(this)
 
-  entry.state = 3
+  entry.state = STATE.EXECUTION_STARTED
 
   let result
 
@@ -143,7 +149,7 @@ function compile(content, filename) {
       [exported, req, this, filename, dirname(filename)])
   }
 
-  entry.state = 4
+  entry.state = STATE.EXECUTION_COMPLETED
   return result
 }
 

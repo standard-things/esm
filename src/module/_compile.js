@@ -1,5 +1,8 @@
 import { extname, resolve } from "path"
 
+import ENTRY from "../constant/entry.js"
+import SOURCE_TYPE from "../constant/source-type.js"
+
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
 import Runtime from "../runtime.js"
@@ -22,25 +25,35 @@ import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
 import wrap from "./wrap.js"
 
+const {
+  STATE
+} = ENTRY
+
+const {
+  MODULE,
+  SCRIPT,
+  UNAMBIGUOUS
+} = SOURCE_TYPE
+
 const ExObject = __external__.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
 
-  let hint = "script"
-  let sourceType = "script"
+  let hint = SCRIPT
+  let sourceType = SCRIPT
 
   if (options.mode === "all") {
-    sourceType = "module"
+    sourceType = MODULE
   } else if (options.mode === "js") {
-    sourceType = "unambiguous"
+    sourceType = UNAMBIGUOUS
   }
 
   if (extname(filename) === ".mjs") {
-    hint = "module"
+    hint = MODULE
 
-    if (sourceType === "script") {
-      sourceType = "module"
+    if (sourceType === SCRIPT) {
+      sourceType = MODULE
     }
   }
 
@@ -80,11 +93,11 @@ function compile(caller, entry, content, filename, fallback) {
   if (moduleState.parsing) {
     const cached = entry.package.cache.compile[entry.cacheName]
     const defaultPkg = shared.package.default
-    const isESM = cached && cached.sourceType === "module"
+    const isESM = cached && cached.sourceType === MODULE
     const { parent } = entry
     const parentPkg = parent && parent.package
     const parentCached = parentPkg && parentPkg.cache.compile[parent.cacheName]
-    const parentIsESM = parentCached && parentCached.sourceType === "module"
+    const parentIsESM = parentCached && parentCached.sourceType === MODULE
 
     if (! isESM &&
         ! parentIsESM &&
@@ -94,11 +107,11 @@ function compile(caller, entry, content, filename, fallback) {
     }
 
     if (isESM &&
-        entry.state === 1) {
+        entry.state === STATE.PARSING_STARTED) {
       tryValidateESM(caller, entry)
     }
   } else {
-    entry.state = 3
+    entry.state = STATE.EXECUTION_STARTED
     return tryCompileCached(entry)
   }
 }
@@ -106,7 +119,7 @@ function compile(caller, entry, content, filename, fallback) {
 function tryCompileCached(entry) {
   const pkg = entry.package
   const cached = pkg.cache.compile[entry.cacheName]
-  const isESM = cached && cached.sourceType === "module"
+  const isESM = cached && cached.sourceType === MODULE
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -259,7 +272,7 @@ function tryCompileCode(caller, entry, content, options) {
       throw e
     }
 
-    const isESM = e.sourceType === "module"
+    const isESM = e.sourceType === MODULE
 
     Reflect.deleteProperty(e, "sourceType")
     captureStackTrace(e, caller)
@@ -296,7 +309,7 @@ function useAsyncWrapper(entry) {
   if (pkg.options.await &&
       shared.support.await) {
     const cached = pkg.cache.compile[entry.cacheName]
-    const isESM = cached && cached.sourceType === "module"
+    const isESM = cached && cached.sourceType === MODULE
 
     if (! isESM) {
       return true

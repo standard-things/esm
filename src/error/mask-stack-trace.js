@@ -1,4 +1,5 @@
 import CHAR from "../constant/char.js"
+
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"

@@ -1,4 +1,6 @@
 import CHAR_CODE from "./constant/char-code.js"
+import SOURCE_TYPE from "./constant/source-type.js"
+
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
@@ -14,6 +16,10 @@ import writeFile from "./fs/write-file.js"
 const {
   PERIOD
 } = CHAR_CODE
+
+const {
+  MODULE
+} = SOURCE_TYPE
 
 const CachingCompiler = {
   __proto__: null,
@@ -57,7 +63,7 @@ const CachingCompiler = {
       warnings: meta[8] || null
     }
 
-    if (result.sourceType === "module") {
+    if (result.sourceType === MODULE) {
       const exportSpecifiers =
       result.exportSpecifiers = { __proto__: null }
 
@@ -88,7 +94,7 @@ function compileAndCache(entry, code, options) {
     return shared.package.dir[""].compile[cacheName] = result
   }
 
-  if (result.sourceType === "module") {
+  if (result.sourceType === MODULE) {
     const exportSpecifiers =
     result.exportSpecifiers = { __proto__: null }
 

@@ -2,12 +2,18 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
+import ENTRY from "../constant/entry.js"
+
 import Entry from "../entry.js"
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
 import shared from "../shared.js"
+
+const {
+  STATE
+} = ENTRY
 
 function load(request, parent, isMain, state, loader) {
   let child
@@ -40,11 +46,11 @@ function load(request, parent, isMain, state, loader) {
     }
 
     if (! moduleState.parsing &&
-        entry.state !== 2) {
+        entry.state !== STATE.PARSING_COMPLETED) {
       return entry
     }
 
-    entry.state = 3
+    entry.state = STATE.EXECUTION_STARTED
   } else {
     child = new Module(filename, parent)
     child.filename = filename
@@ -58,12 +64,14 @@ function load(request, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.id = filename
     entry.parent = Entry.get(parent)
-    entry.state = moduleState.parsing ? 1 : 3
+    entry.state = moduleState.parsing
+      ? STATE.PARSING_STARTED
+      : STATE.EXECUTION_STARTED
   }
 
   if (moduleState.passthru &&
       ! moduleState.parsing) {
-    entry.state = 2
+    entry.state = STATE.PARSING_COMPLETED
   } else {
     const { _compile } = child
 

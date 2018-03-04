@@ -1,5 +1,6 @@
-import OwnProxy from "../own/proxy.js"
 import PREFIX from "../constant/prefix.js"
+
+import OwnProxy from "../own/proxy.js"
 
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"

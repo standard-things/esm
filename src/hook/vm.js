@@ -1,3 +1,5 @@
+import ENTRY from "../constant/entry.js"
+
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
@@ -26,6 +28,10 @@ import shared from "../shared.js"
 import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
+
+const {
+  STATE
+} = ENTRY
 
 const ExObject = __external__.Object
 
@@ -82,13 +88,13 @@ function hook(vm) {
       ])
     }
 
-    entry.state = 1
+    entry.state = STATE.PARSING_STARTED
 
     if (cached.sourceType === "module") {
       tryValidateESM(manager, entry, content)
     }
 
-    entry.state = 3
+    entry.state = STATE.EXECUTION_STARTED
 
     const { runtimeName } = entry
 

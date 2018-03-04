@@ -51,7 +51,6 @@ module.exports = {
     quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "rest-spread-spacing": "error",
     semi: ["error", "never"],
-    "sort-imports": "error",
     "sort-keys": ["error", "asc", { caseSensitive: true, natural: true }],
     "sort-vars": "error",
     "space-before-function-paren": ["error", { named: "never" }],

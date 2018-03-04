@@ -5,6 +5,7 @@
 import { isAbsolute, resolve } from "path"
 
 import CHAR_CODE from "../constant/char-code.js"
+
 import Module from "../module.js"
 
 import binding from "../binding.js"

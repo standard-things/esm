@@ -1,3 +1,5 @@
+import SOURCE_TYPE from "./constant/source-type.js"
+
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
 
@@ -10,6 +12,12 @@ import keys from "./util/keys.js"
 import stripShebang from "./util/strip-shebang.js"
 import toNullObject from "./util/to-null-object.js"
 
+const {
+  MODULE,
+  SCRIPT,
+  UNAMBIGUOUS
+} = SOURCE_TYPE
+
 const defaultOptions = {
   __proto__: null,
   cjs: {
@@ -21,9 +29,9 @@ const defaultOptions = {
     topLevelReturn: false,
     vars: false
   },
-  hint: "script",
+  hint: SCRIPT,
   runtimeName: "_",
-  sourceType: "script",
+  sourceType: SCRIPT,
   strict: void 0,
   var: false,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
@@ -47,22 +55,22 @@ const Compiler = {
       exportStars: null,
       exportTemporals: null,
       scriptData: null,
-      sourceType: "script",
+      sourceType: SCRIPT,
       topLevelReturn: false,
       warnings: null
     }
 
     let { hint, sourceType } = options
 
-    if (sourceType === "unambiguous" &&
+    if (sourceType === UNAMBIGUOUS &&
         hasPragma(code, "use script")) {
-      sourceType = "script"
+      sourceType = SCRIPT
     }
 
-    if (sourceType === "unambiguous" &&
-        (hint === "module" ||
+    if (sourceType === UNAMBIGUOUS &&
+        (hint === MODULE ||
          hasPragma(code, "use module"))) {
-      sourceType = "module"
+      sourceType = MODULE
     }
 
     const possibleIndexes = findIndexes(code, ["export", "eval", "import"])
@@ -71,19 +79,19 @@ const Compiler = {
     let error
     let threw = true
 
-    if ((sourceType === "script" ||
-        sourceType === "unambiguous") &&
+    if ((sourceType === SCRIPT ||
+        sourceType === UNAMBIGUOUS) &&
         ! possibleIndexes.length) {
       return result
     }
 
     const allowReturnOutsideFunction =
       options.cjs.topLevelReturn ||
-      sourceType === "script"
+      sourceType === SCRIPT
 
     const parserOptions = {
       allowReturnOutsideFunction,
-      sourceType: sourceType === "script" ? sourceType : "module",
+      sourceType: sourceType === SCRIPT ? sourceType : MODULE,
       strict: options.strict
     }
 
@@ -96,8 +104,8 @@ const Compiler = {
     }
 
     if (threw &&
-        sourceType === "unambiguous") {
-      sourceType = parserOptions.sourceType = "script"
+        sourceType === UNAMBIGUOUS) {
+      sourceType = parserOptions.sourceType = SCRIPT
 
       try {
         ast = Parser.parse(code, parserOptions)
@@ -120,7 +128,7 @@ const Compiler = {
         generateVarDeclarations: options.var,
         possibleIndexes,
         runtimeName,
-        sourceType: sourceType === "script" ? sourceType : "module"
+        sourceType: sourceType === SCRIPT ? sourceType : MODULE
       })
     } catch (e) {
       e.sourceType = parserOptions.sourceType
@@ -131,7 +139,7 @@ const Compiler = {
 
     if (importExportVisitor.addedImportExport ||
         importExportVisitor.addedImportMeta) {
-      sourceType = "module"
+      sourceType = MODULE
 
       const { assignableExports, assignableImports } = importExportVisitor
 
@@ -159,14 +167,14 @@ const Compiler = {
       importExportVisitor.finalizeHoisting()
     }
 
-    if (sourceType === "unambiguous") {
-      sourceType = "script"
-    } else if (sourceType === "module") {
+    if (sourceType === UNAMBIGUOUS) {
+      sourceType = SCRIPT
+    } else if (sourceType === MODULE) {
       result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
       result.exportNames = importExportVisitor.exportNames
       result.exportStars = importExportVisitor.exportStars
       result.exportTemporals = importExportVisitor.exportTemporals
-      result.sourceType = "module"
+      result.sourceType = MODULE
 
       if (options.warnings &&
           ! options.cjs.vars &&

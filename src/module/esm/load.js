@@ -1,5 +1,11 @@
+import ENTRY from "../../constant/entry.js"
+
 import _load from "./_load.js"
 import moduleState from "../state.js"
+
+const {
+  STATE
+} = ENTRY
 
 function load(request, parent, isMain, preload) {
   let entry
@@ -13,7 +19,7 @@ function load(request, parent, isMain, preload) {
   }
 
   if (entry.module.loaded) {
-    entry.state = 4
+    entry.state = STATE.EXECUTION_COMPLETED
 
     if (preload) {
       preload(entry)
@@ -22,8 +28,8 @@ function load(request, parent, isMain, preload) {
     return entry
   }
 
-  if (entry.state < 3) {
-    entry.state = 2
+  if (entry.state < STATE.EXECUTION_STARTED) {
+    entry.state = STATE.PARSING_COMPLETED
 
     if (preload) {
       preload(entry)
@@ -35,7 +41,7 @@ function load(request, parent, isMain, preload) {
   }
 
   if (entry.module.loaded) {
-    entry.state = 4
+    entry.state = STATE.EXECUTION_COMPLETED
   }
 
   return entry

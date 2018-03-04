@@ -1,4 +1,5 @@
 import CHAR_CODE from "../constant/char-code.js"
+
 import GenericArray from "../generic/array.js"
 
 import hasLoaderValue from "./has-loader-value.js"

@@ -1,4 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
+
 import Package from "../../package.js"
 
 import _resolveFilename from "./_resolve-filename.js"

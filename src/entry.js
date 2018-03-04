@@ -1,3 +1,5 @@
+import ENTRY from "./constant/entry.js"
+
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
@@ -15,6 +17,11 @@ import setGetter from "./util/set-getter.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import warn from "./warn.js"
+
+const {
+  LOAD,
+  STATE
+} = ENTRY
 
 const {
   ERR_EXPORT_MISSING,
@@ -39,7 +46,7 @@ class Entry {
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
-    this._loaded = 0
+    this._loaded = LOAD.INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = { __proto__: null }
     // The load mode for `module.require`.
@@ -77,11 +84,7 @@ class Entry {
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
     // The state of the module:
-    //   1 - Parsing phase started.
-    //   2 - Parsing phase completed.
-    //   3 - Execution phase started.
-    //   4 - Execution phase completed.
-    this.state = 0
+    this.state = STATE.INITIAL
     // The file url of the module.
     this.url = null
   }
@@ -204,21 +207,21 @@ class Entry {
   }
 
   loaded() {
-    if (this._loaded) {
+    if (this._loaded !== LOAD.INCOMPLETE) {
       return this._loaded
     }
 
     if (! this.module.loaded) {
-      return this._loaded = 0
+      return this._loaded = LOAD.INCOMPLETE
     }
 
-    this._loaded = -1
+    this._loaded = LOAD.INDETERMINATE
 
     const { children } = this
 
     for (const id in children) {
-      if (! children[id].loaded()) {
-        return this._loaded = 0
+      if (children[id].loaded() === LOAD.INCOMPLETE) {
+        return this._loaded = LOAD.INCOMPLETE
       }
     }
 
@@ -245,7 +248,7 @@ class Entry {
       const oldExported = oldMod.exports
       const newEntry = Entry.get(this.module)
 
-      setNsGetters = newEntry._loaded !== 1
+      setNsGetters = newEntry._loaded !== LOAD.COMPLETED
 
       this.merge(newEntry)
 
@@ -263,7 +266,7 @@ class Entry {
       }
 
       if (! newMod.loaded) {
-        return this._loaded = 0
+        return this._loaded = LOAD.INCOMPLETE
       }
     }
 
@@ -278,7 +281,7 @@ class Entry {
     }
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
-    return this._loaded = 1
+    return this._loaded = LOAD.COMPLETED
   }
 
   merge(otherEntry) {
@@ -328,7 +331,7 @@ function assignExportsToNamespace(entry) {
   const cached = pkg.cache.compile[entry.cacheName]
   const exported = entry.module.exports
   const isESM = cached && cached.sourceType === "module"
-  const object = entry._loaded === 1 ? _namespace : exported
+  const object = entry._loaded === LOAD.COMPLETED ? _namespace : exported
 
   const isPseudo =
     pkg.options.cjs.interop &&
@@ -435,7 +438,7 @@ function getExportByName(entry, setter, name) {
 
   if ((isScript &&
        name !== "default") ||
-      (entry._loaded === 1 &&
+      (entry._loaded === LOAD.COMPLETED &&
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
@@ -452,8 +455,10 @@ function getExportByName(entry, setter, name) {
 }
 
 function mergeProperty(entry, otherEntry, key) {
-  if ((entry._loaded || otherEntry._loaded) &&
-      (key === "cjsNamespace" || key === "esmNamespace")) {
+  if ((entry._loaded !== LOAD.INCOMPLETE ||
+       otherEntry._loaded !== LOAD.INCOMPLETE) &&
+      (key === "cjsNamespace" ||
+       key === "esmNamespace")) {
     return copyProperty(entry, otherEntry, key)
   }
 
