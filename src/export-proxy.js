@@ -1,13 +1,8 @@
 import OwnProxy from "./own/proxy.js"
 
-import errors from "./errors.js"
 import isNative from "./util/is-native.js"
 import isObjectLike from "./util/is-object-like.js"
 import shared from "./shared.js"
-
-const {
-  ERR_INVALID_ARG_TYPE
-} = errors
 
 const { toString } = Object.prototype
 
@@ -15,13 +10,9 @@ class ExportProxy {
   constructor(entry) {
     const exported = entry.module.exports
 
-    // Avoid using buggy proxies in Chakra.
-    if (! shared.support.proxiedFunctions) {
+    if (! shared.support.proxiedFunctions ||
+        ! isObjectLike(exported)) {
       return exported
-    }
-
-    if (! isObjectLike(exported)) {
-      throw new ERR_INVALID_ARG_TYPE("exported", "object")
     }
 
     const cache = shared.exportProxy
