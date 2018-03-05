@@ -1,5 +1,4 @@
 import ENTRY from "./constant/entry.js"
-import SOURCE_TYPE from "./constant/source-type.js"
 
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
@@ -28,10 +27,6 @@ const {
   TYPE_ESM,
   TYPE_PSEUDO
 } = ENTRY
-
-const {
-  MODULE
-} = SOURCE_TYPE
 
 const {
   ERR_EXPORT_MISSING,
@@ -95,32 +90,12 @@ class Entry {
     this.setters = { __proto__: null }
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
-    // The state of the module:
+    // The state of the module.
     this.state = STATE_INITIAL
+    // The entry type of the module.
+    this.type = TYPE_CJS
     // The file url of the module.
     this.url = null
-
-    setGetter(this, "type", () => {
-      const { compileData } = this
-
-      if (compileData) {
-        return this.type = compileData.sourceType === MODULE
-          ? TYPE_ESM
-          : TYPE_CJS
-      }
-
-      return TYPE_CJS
-    })
-
-    setSetter(this, "type", (value) => {
-      Reflect.defineProperty(this, "type", {
-        __proto__: null,
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true
-      })
-    })
   }
 
   static delete(value) {
@@ -554,15 +529,21 @@ function mergeProperty(entry, otherEntry, key) {
   const value = otherEntry[key]
 
   if (key !== "setters") {
-    if (key === "children") {
+    if (key ===  "_loaded") {
+      if (value > entry._loaded) {
+        entry._loaded = value
+      }
+    } else if (key === "children") {
       assign(entry.children, value)
     } else if (key === "getters") {
       for (const name in value) {
         entry.addGetter(name, value[name])
       }
-    } else if (key ===  "_loaded"
-        ? value > entry._loaded
-        : value != null) {
+    } else if (key === "type") {
+      if (entry.type === TYPE_CJS) {
+        entry.type = value
+      }
+    } else if (value != null) {
       entry[key] = value
     }
 

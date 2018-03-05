@@ -1,4 +1,5 @@
 import CHAR_CODE from "./constant/char-code.js"
+import ENTRY from "./constant/entry.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import Compiler from "./compiler.js"
@@ -16,6 +17,11 @@ import writeFile from "./fs/write-file.js"
 const {
   PERIOD
 } = CHAR_CODE
+
+const {
+  TYPE_CJS,
+  TYPE_ESM
+} = ENTRY
 
 const {
   MODULE
@@ -65,12 +71,16 @@ const CachingCompiler = {
     }
 
     if (result.sourceType === MODULE) {
+      entry.type = TYPE_ESM
+
       const exportSpecifiers =
       result.exportSpecifiers = { __proto__: null }
 
       for (const exportName of result.exportNames) {
         exportSpecifiers[exportName] = 1
       }
+    } else {
+      entry.type = TYPE_CJS
     }
 
     const { buffer } = cache
@@ -96,19 +106,20 @@ function compileAndCache(entry, code, options) {
   if (options.eval) {
     const cacheName = getCacheFileName(entry, code)
 
-    entry.compileData =
-    shared.package.dir[""].compile[cacheName] = result
-
-    return result
+    return shared.package.dir[""].compile[cacheName] = result
   }
 
   if (result.sourceType === MODULE) {
+    entry.type = TYPE_ESM
+
     const exportSpecifiers =
     result.exportSpecifiers = { __proto__: null }
 
     for (const exportName of result.exportNames) {
       exportSpecifiers[exportName] = 1
     }
+  } else {
+    entry.type = TYPE_CJS
   }
 
   entry.compileData =
