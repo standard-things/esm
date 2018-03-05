@@ -15,6 +15,7 @@ import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
+import setSetter from "../../util/set-setter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 const {
@@ -129,6 +130,16 @@ function load(request, parent, isMain, preload) {
       // Unlike CJS, ESM errors are preserved for subsequent loads.
       setGetter(state._cache, request, () => {
         throw error
+      })
+
+      setSetter(state._cache, request, (value) => {
+        Reflect.defineProperty(state._cache, request, {
+          __proto__: null,
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
       })
     }
   }
