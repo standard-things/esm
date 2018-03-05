@@ -4,13 +4,13 @@ import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
 
 import assignmentVisitor from "./visitor/assignment.js"
+import defaults from "./util/defaults.js"
 import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
 import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import keys from "./util/keys.js"
 import stripShebang from "./util/strip-shebang.js"
-import toNullObject from "./util/to-null-object.js"
 
 const {
   MODULE,
@@ -126,6 +126,7 @@ const Compiler = {
 
     try {
       importExportVisitor.visit(rootPath, code, {
+        __proto__: null,
         generateVarDeclarations: options.var,
         possibleIndexes,
         runtimeName,
@@ -153,6 +154,7 @@ const Compiler = {
       if (possibleIndexes.length) {
         try {
           assignmentVisitor.visit(rootPath, {
+            __proto__: null,
             assignableExports,
             assignableImports,
             magicString: importExportVisitor.magicString,
@@ -185,6 +187,7 @@ const Compiler = {
         if (possibleIndexes.length) {
           result.warnings = []
           identifierVisitor.visit(rootPath, {
+            __proto__: null,
             magicString: importExportVisitor.magicString,
             possibleIndexes,
             warnings: result.warnings
@@ -202,7 +205,7 @@ const Compiler = {
 }
 
 function createOptions(options) {
-  return toNullObject(options, Compiler.defaultOptions)
+  return defaults({ __proto__: null }, options, Compiler.defaultOptions)
 }
 
 export default Compiler

@@ -368,7 +368,7 @@ function assignExportsToNamespace(entry) {
     if (isESM) {
       _namespace[name] = exported[name]
     } else if (! (skipDefault && name === "default") &&
-        ! has(_namespace, name)) {
+        ! Reflect.has(_namespace, name)) {
       setGetter(_namespace, name, () => exported[name])
 
       setSetter(_namespace, name, (value) => {

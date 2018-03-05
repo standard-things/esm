@@ -4,6 +4,8 @@ import CHAR_CODE from "./constant/char-code.js"
 import PACKAGE from "./constant/package.js"
 
 import _findPath from "./module/_find-path.js"
+import assign from "./util/assign.js"
+import defaults from "./util/defaults.js"
 import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
@@ -21,7 +23,6 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
-import toNullObject from "./util/to-null-object.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
@@ -193,9 +194,9 @@ function createOptions(options) {
 
   options = toOptions(options)
 
-  const hasCJS = has(options, "cjs")
+  const hasCJS = Reflect.has(options, "cjs")
 
-  if (has(options, "mode") &&
+  if (Reflect.has(options, "mode") &&
       options.mode === "cjs") {
     esmMode = "js"
 
@@ -208,13 +209,13 @@ function createOptions(options) {
     cjsOptions = createCJS(options.cjs)
   }
 
-  if (has(options, "sourceMap")) {
+  if (Reflect.has(options, "sourceMap")) {
     sourceMap = options.sourceMap
-  } else if (has(options, "sourcemap")) {
+  } else if (Reflect.has(options, "sourcemap")) {
     sourceMap = options.sourcemap
   }
 
-  options = toNullObject(options, Package.defaultOptions)
+  defaults(options, Package.defaultOptions)
 
   if (typeof options.cache !== "string") {
     options.cache = !! options.cache
@@ -441,11 +442,11 @@ function readInfo(dirPath, force) {
 function toOptions(value) {
   if (typeof value === "string") {
     return value === "cjs"
-      ? { cjs: true, mode: "js" }
-      : { mode: value }
+      ? { __proto__: null, cjs: true, mode: "js" }
+      : { __proto__: null, mode: value }
   }
 
-  return isObjectLike(value) ? value : {}
+  return assign({ __proto__: null }, value)
 }
 
 Reflect.setPrototypeOf(Package.prototype, null)

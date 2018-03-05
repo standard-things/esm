@@ -1,7 +1,7 @@
 import PREFIX from "../constant/prefix.js"
 
+import assign from "../util/assign.js"
 import shared from "../shared.js"
-import toNullObject from "../util/to-null-object.js"
 
 const {
   STD_ESM
@@ -19,7 +19,7 @@ function init() {
     static instances = new WeakMap
 
     constructor(target, handler) {
-      const proto = toNullObject(handler)
+      const proto = assign({ __proto__: null }, handler)
 
       proto[shared.symbol.inspect] = customInspect
       handler = { __proto__: proto }

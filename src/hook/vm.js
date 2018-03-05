@@ -9,13 +9,13 @@ import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
+import assign from "../util/assign.js"
 import binding from "../binding.js"
 import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
-import has from "../util/has.js"
 import isCheck from "../env/is-check.js"
 import isError from "../util/is-error.js"
 import isEval from "../env/is-eval.js"
@@ -28,7 +28,6 @@ import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
-import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
@@ -69,7 +68,7 @@ function hook(vm) {
 
   function methodWrapper(manager, func, args) {
     let [content, scriptOptions] = args
-    scriptOptions = toNullObject(scriptOptions)
+    scriptOptions = assign({ __proto__: null }, scriptOptions)
 
     if (! scriptOptions.produceCachedData) {
       scriptOptions.produceCachedData = true
@@ -82,7 +81,7 @@ function hook(vm) {
     if (compileData) {
       if (compileData.scriptData &&
           scriptOptions.produceCachedData &&
-          ! has(scriptOptions, "cachedData")) {
+          ! Reflect.has(scriptOptions, "cachedData")) {
         scriptOptions.cachedData = compileData.scriptData
       }
     } else {

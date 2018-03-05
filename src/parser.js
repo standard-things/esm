@@ -3,10 +3,10 @@ import SOURCE_TYPE from "./constant/source-type.js"
 import { Parser as AcornParser } from "./acorn.js"
 
 import awaitAnywherePlugin from "./acorn-plugin/await-anywhere.js"
+import defaults from "./util/defaults.js"
 import dynamicImportPlugin from "./acorn-plugin/dynamic-import.js"
 import functionParamsStartPlugin from "./acorn-plugin/function-params-start.js"
 import htmlCommentPlugin from "./acorn-plugin/html-comment.js"
-import toNullObject from "./util/to-null-object.js"
 import tolerancePlugin from "./acorn-plugin/tolerance.js"
 import topLevelPlugin from "./acorn-plugin/top-level.js"
 
@@ -59,7 +59,7 @@ const Parser = {
 }
 
 function createOptions(options) {
-  options = toNullObject(options, Parser.defaultOptions)
+  options = defaults({ __proto__: null }, options, Parser.defaultOptions)
 
   const { sourceType } = options
 
