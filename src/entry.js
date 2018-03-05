@@ -67,6 +67,8 @@ class Entry {
     this.cacheName = null
     // The child entries of the module.
     this.children = { __proto__: null }
+    // The source compilation data of the module.
+    this.compileData = null
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
     // The namespace object CJS importers receive.
@@ -98,25 +100,10 @@ class Entry {
     // The file url of the module.
     this.url = null
 
-    setGetter(this, "compileData", () =>
-      this.package.cache.compile[this.cacheName]
-    )
-
-    setSetter(this, "compileData", (value) => {
-      Reflect.defineProperty(this, "compileData", {
-        __proto__: null,
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true
-      })
-    })
-
     setGetter(this, "type", () => {
       const { compileData } = this
 
-      if (compileData &&
-          compileData !== true) {
+      if (compileData) {
         return this.type = compileData.sourceType === MODULE
           ? TYPE_ESM
           : TYPE_CJS
