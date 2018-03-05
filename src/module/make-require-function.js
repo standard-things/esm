@@ -16,7 +16,7 @@ import moduleState from "./state.js"
 import shared from "../shared.js"
 
 const {
-  MODE_ESM
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -28,7 +28,7 @@ const sourcePaths = sourceResolve && sourceResolve.paths
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
-  const isESM = entry.mode == MODE_ESM
+  const isESM = entry.type == TYPE_ESM
   const { name } = entry
 
   let req = function require(request) {

@@ -12,7 +12,7 @@ import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 
 const {
-  MODE_ESM
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -40,7 +40,7 @@ const req = function require(request) {
 
   const isESM =
     _requireESM ||
-    entry.mode === MODE_ESM
+    entry.type === TYPE_ESM
 
   return isESM
     ? _loadESM(request, this, false).module.exports

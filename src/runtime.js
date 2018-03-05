@@ -14,7 +14,7 @@ import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
 const {
-  MODE_ESM
+  TYPE_ESM
 } = ENTRY
 
 const ExPromise = __external__.Promise
@@ -182,7 +182,7 @@ const Runtime = {
 
   run(moduleWrapper) {
     const { entry } = this
-    const runner =  entry.mode === MODE_ESM ? runESM : runCJS
+    const runner =  entry.type === TYPE_ESM ? runESM : runCJS
     return runner(entry, moduleWrapper)
   },
 

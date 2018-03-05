@@ -5,8 +5,8 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 const {
-  MODE_ESM,
-  STATE_PARSING_COMPLETED
+  STATE_PARSING_COMPLETED,
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -44,7 +44,7 @@ function validate(entry) {
     const child = childEntry.module
     const requestedExportNames = dependencySpecifiers[name]
 
-    if (childEntry.mode !== MODE_ESM) {
+    if (childEntry.type !== TYPE_ESM) {
       if (! namedExports &&
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
@@ -95,7 +95,7 @@ function validate(entry) {
 
     const childEntry = children[childName]
 
-    if (childEntry.mode !== MODE_ESM) {
+    if (childEntry.type !== TYPE_ESM) {
       continue
     }
 

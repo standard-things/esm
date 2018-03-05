@@ -19,14 +19,14 @@ import setSetter from "../../util/set-setter.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 const {
-  MODE_ESM
+  TYPE_ESM
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
   const parentEntry = parent && Entry.get(parent)
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
-  const parentIsESM = parentEntry && parentEntry.mode === MODE_ESM
+  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
 
   const filename = parentPkgOptions && parentPkgOptions.cjs.paths
     ? Module._resolveFilename(request, parent, isMain)
@@ -68,7 +68,7 @@ function load(request, parent, isMain, preload) {
     entry.id = request
 
     if (! moduleState.parsing) {
-      const isESM = entry.mode === MODE_ESM
+      const isESM = entry.type === TYPE_ESM
 
       if (! isESM) {
         isUnexposed = false

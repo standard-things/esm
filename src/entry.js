@@ -23,10 +23,10 @@ const {
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
-  MODE_CJS,
-  MODE_ESM,
-  MODE_PSEUDO,
-  STATE_INITIAL
+  STATE_INITIAL,
+  TYPE_CJS,
+  TYPE_ESM,
+  TYPE_PSEUDO
 } = ENTRY
 
 const {
@@ -112,21 +112,21 @@ class Entry {
       })
     })
 
-    setGetter(this, "mode", () => {
+    setGetter(this, "type", () => {
       const { compileData } = this
 
       if (compileData &&
           compileData !== true) {
-        return this.mode = compileData.sourceType === MODULE
-          ? MODE_ESM
-          : MODE_CJS
+        return this.type = compileData.sourceType === MODULE
+          ? TYPE_ESM
+          : TYPE_CJS
       }
 
-      return MODE_CJS
+      return TYPE_CJS
     })
 
-    setSetter(this, "mode", (value) => {
-      Reflect.defineProperty(this, "mode", {
+    setSetter(this, "type", (value) => {
+      Reflect.defineProperty(this, "type", {
         __proto__: null,
         configurable: true,
         enumerable: true,
@@ -217,7 +217,7 @@ class Entry {
         getters[key] = getter
       }
 
-      if (this.mode === MODE_ESM ||
+      if (this.type === TYPE_ESM ||
           typeof getter !== "function" ||
           typeof otherGetter !== "function") {
         continue
@@ -269,7 +269,7 @@ class Entry {
       }
     }
 
-    const isESM = this.mode === MODE_ESM
+    const isESM = this.type === TYPE_ESM
 
     let setNsGetters = true
     let exported = this.module.exports
@@ -375,7 +375,7 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
-  const isESM = entry.mode === MODE_ESM
+  const isESM = entry.type === TYPE_ESM
   const object = entry._loaded === LOAD_COMPLETED ? _namespace : exported
 
   if (! isESM &&
@@ -383,10 +383,10 @@ function assignExportsToNamespace(entry) {
       has(object, "default") &&
       has(exported, "__esModule") &&
       !! exported.__esModule) {
-    entry.mode = MODE_PSEUDO
+    entry.type = TYPE_PSEUDO
   }
 
-  const skipDefault = entry.mode === MODE_CJS
+  const skipDefault = entry.type === TYPE_CJS
 
   if (skipDefault) {
     _namespace.default = exported
@@ -509,7 +509,7 @@ function createNamespace(entry, source = entry) {
 
 function getExportByName(entry, setter, name) {
   const { _namespace } = entry
-  const isESM = entry.mode === MODE_ESM
+  const isESM = entry.type === TYPE_ESM
   const { namedExports } = entry.package.options.cjs
   const parentNamedExports = setter.parent.package.options.cjs.namedExports
 
@@ -519,7 +519,7 @@ function getExportByName(entry, setter, name) {
 
   if ((namedExports ||
        parentNamedExports) &&
-      entry.mode === MODE_CJS &&
+      entry.type === TYPE_CJS &&
       entry.namespace === _namespace) {
     entry.namespace = new OwnProxy(_namespace, {
       get(target, name, receiver) {
@@ -611,7 +611,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  if (entry.mode === MODE_ESM) {
+  if (entry.type === TYPE_ESM) {
     for (const name in entry.getters) {
       runGetter(entry, name)
     }

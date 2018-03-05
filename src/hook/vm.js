@@ -33,9 +33,9 @@ import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
 const {
-  MODE_ESM,
   STATE_EXECUTION_STARTED,
-  STATE_PARSING_STARTED
+  STATE_PARSING_STARTED,
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -100,7 +100,7 @@ function hook(vm) {
 
     entry.state = STATE_PARSING_STARTED
 
-    if (entry.mode === MODE_ESM) {
+    if (entry.type === TYPE_ESM) {
       tryValidateESM(manager, entry, content)
     }
 
