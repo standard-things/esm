@@ -380,9 +380,9 @@ function assignExportsToNamespace(entry) {
 
   if (! isESM &&
       entry.package.options.cjs.interop &&
+      has(object, "default") &&
       has(exported, "__esModule") &&
-      !! exported.__esModule &&
-      has(object, "default")) {
+      !! exported.__esModule) {
     entry.mode = MODE_PSEUDO
   }
 
@@ -519,7 +519,7 @@ function getExportByName(entry, setter, name) {
 
   if ((namedExports ||
        parentNamedExports) &&
-      entry.mode === MODE_CJS &
+      entry.mode === MODE_CJS &&
       entry.namespace === _namespace) {
     entry.namespace = new OwnProxy(_namespace, {
       get(target, name, receiver) {
