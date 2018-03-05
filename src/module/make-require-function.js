@@ -28,7 +28,7 @@ const sourcePaths = sourceResolve && sourceResolve.paths
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
-  const isESM = entry.type == TYPE_ESM
+  const isESM = entry.type === TYPE_ESM
   const { name } = entry
 
   let req = function require(request) {
