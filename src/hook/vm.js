@@ -25,6 +25,8 @@ import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import rootModule from "../root-module.js"
+import setGetter from "../util/set-getter.js"
+import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
 import toNullObject from "../util/to-null-object.js"
 import validateESM from "../module/esm/validate.js"
@@ -247,23 +249,19 @@ function hook(vm) {
         if (support.replShowProxy) {
           util.inspect = inspect
         } else {
-          Reflect.defineProperty(util, "inspect", {
-            __proto__: null,
-            configurable: true,
-            enumerable: true,
-            get() {
-              util.inspect = inspect
-              return _inspect
-            },
-            set(value) {
-              Reflect.defineProperty(util, "inspect", {
-                __proto__: null,
-                configurable: true,
-                enumerable: true,
-                value,
-                writable: true
-               })
-            }
+          setGetter(util, "inspect", () => {
+            util.inspect = inspect
+            return _inspect
+          })
+
+          setSetter(util, "inspect", (value) => {
+            Reflect.defineProperty(util, "inspect", {
+              __proto__: null,
+              configurable: true,
+              enumerable: true,
+              value,
+              writable: true
+            })
           })
         }
       }
