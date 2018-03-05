@@ -68,9 +68,10 @@ function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
   const { cache } = pkg
   const { cacheName } = entry
+
   let { compileData } = entry
 
-  if (compileData === true) {
+  if (cache.compile[cacheName] === true) {
     compileData = Compiler.from(entry)
 
     if (compileData) {
