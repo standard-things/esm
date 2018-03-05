@@ -25,6 +25,7 @@ const {
   LOAD_INDETERMINATE,
   MODE_CJS,
   MODE_ESM,
+  MODE_PSEUDO,
   STATE_INITIAL
 } = ENTRY
 
@@ -115,7 +116,7 @@ class Entry {
           : MODE_CJS
       }
 
-      return "cjs"
+      return MODE_CJS
     })
 
     setSetter(this, "mode", (value) => {
@@ -369,37 +370,23 @@ function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
   const isESM = entry.mode === MODE_ESM
-  const object = entry._loaded === LOAD_COMPLETED
-    ? _namespace
-    : exported
+  const object = entry._loaded === LOAD_COMPLETED ? _namespace : exported
 
-  const isPseudo =
-    entry.package.options.cjs.interop &&
-    has(exported, "__esModule") &&
-    !! exported.__esModule
+  if (! isESM &&
+      entry.package.options.cjs.interop &&
+      has(exported, "__esModule") &&
+      !! exported.__esModule &&
+      has(object, "default")) {
+    entry.mode = MODE_PSEUDO
+  }
 
-  const skipDefault =
-    ! isESM &&
-    ! (isPseudo && has(object, "default"))
+  const skipDefault = entry.mode === MODE_CJS
 
   if (skipDefault) {
     _namespace.default = exported
 
     if (! Reflect.has(entry.getters, "default")) {
       entry.addGetter("default", () => entry.namespace.default)
-
-      entry.namespace = new OwnProxy(_namespace, {
-        get(target, name, receiver) {
-          const value = Reflect.get(target, name, receiver)
-
-          if (name === "default" &&
-              isObjectLike(value)) {
-            return proxyExports(entry)
-          }
-
-          return value
-        }
-      })
     }
   }
 
@@ -515,11 +502,27 @@ function createNamespace(entry, source = entry) {
 }
 
 function getExportByName(entry, setter, name) {
+  const { _namespace } = entry
   const isESM = entry.mode === MODE_ESM
+  const { namedExports } = entry.package.options.cjs
+  const parentNamedExports = setter.parent.package.options.cjs.namedExports
 
   const isScript =
     ! isESM &&
-    ! setter.parent.package.options.cjs.namedExports
+    ! parentNamedExports
+
+  if ((namedExports ||
+       parentNamedExports) &&
+      entry.mode === MODE_CJS &
+      entry.namespace === _namespace) {
+    entry.namespace = new OwnProxy(_namespace, {
+      get(target, name, receiver) {
+        return name === "default"
+          ? proxyExports(entry)
+          : Reflect.get(target, name, receiver)
+      }
+    })
+  }
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace
