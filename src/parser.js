@@ -1,3 +1,5 @@
+import SOURCE_TYPE from "./constant/source-type.js"
+
 import { Parser as AcornParser } from "./acorn.js"
 
 import awaitAnywherePlugin from "./acorn-plugin/await-anywhere.js"
@@ -8,12 +10,23 @@ import toNullObject from "./util/to-null-object.js"
 import tolerancePlugin from "./acorn-plugin/tolerance.js"
 import topLevelPlugin from "./acorn-plugin/top-level.js"
 
+const {
+  MODULE,
+  SCRIPT
+} = SOURCE_TYPE
+
 const defaultOptions = {
   __proto__: null,
   allowReturnOutsideFunction: false,
   ecmaVersion: 9,
   sourceType: "module",
   strict: void 0
+}
+
+const sourceTypeMap = {
+  __proto__: null,
+  [MODULE]: "module",
+  [SCRIPT]: "script"
 }
 
 const Parser = {
@@ -46,7 +59,12 @@ const Parser = {
 }
 
 function createOptions(options) {
-  return toNullObject(options, Parser.defaultOptions)
+  options = toNullObject(options, Parser.defaultOptions)
+
+  const { sourceType } = options
+
+  options.sourceType = sourceTypeMap[sourceType] || sourceType
+  return options
 }
 
 export default Parser

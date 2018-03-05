@@ -5,6 +5,9 @@ import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 
+const MODULE = 1
+const SCRIPT = 2
+
 const files = globby.sync(["output/**/*.{js,mjs}"])
 const tests = files
   .reduce((tests, thePath) => {
@@ -17,7 +20,7 @@ const tests = files
 
     tests[dirPath][kind] = {
       content: fs.readFileSync(thePath, "utf8"),
-      sourceType: path.extname(thePath) === ".mjs" ? "module" : "script"
+      sourceType: path.extname(thePath) === ".mjs" ? MODULE : SCRIPT
     }
 
     return tests

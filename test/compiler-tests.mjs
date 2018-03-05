@@ -2,27 +2,31 @@ import Compiler from "../build/compiler.js"
 
 import assert from "assert"
 
+const MODULE = 1
+const SCRIPT = 2
+const UNAMBIGUOUS = 3
+
 describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 
     assert.throws(() => Compiler.compile("return", {
-      sourceType: "module"
+      sourceType: MODULE
     }), SyntaxError)
 
     assert.doesNotThrow(() => Compiler.compile("return", {
       cjs: {
         topLevelReturn: true
       },
-      sourceType: "module"
+      sourceType: MODULE
     }))
   })
 
   it("should support `options.sourceType`", () => {
-    ["module", "unambiguous"]
+    [MODULE, UNAMBIGUOUS]
       .forEach((sourceType) => {
         const result = Compiler.compile('import"a"', { sourceType })
-        assert.strictEqual(result.sourceType, "module")
+        assert.strictEqual(result.sourceType, MODULE)
       })
   })
 
@@ -35,20 +39,20 @@ describe("compiler", () => {
       cjs: {
         vars: true
       },
-      sourceType: "module"
+      sourceType: MODULE
     })
 
     assert.strictEqual(result.warnings, null)
 
     result = Compiler.compile("arguments", {
-      sourceType: "module"
+      sourceType: MODULE
     })
 
     const warnings = result.warnings || []
     assert.strictEqual(warnings.length, 1)
   })
 
-  it('should support `options.sourceType` of "module"', () => {
+  it("should support `options.sourceType` of MODULE", () => {
     [
       "1+2",
       "1+2//import",
@@ -63,32 +67,32 @@ describe("compiler", () => {
     ]
     .forEach((code) => {
       const result = Compiler.compile(code, {
-        sourceType: "module"
+        sourceType: MODULE
       })
 
-      assert.strictEqual(result.sourceType, "module")
+      assert.strictEqual(result.sourceType, MODULE)
     })
   })
 
-  it('should support `options.sourceType` of "unambiguous"', () => {
+  it("should support `options.sourceType` of UNAMBIGUOUS", () => {
     [
-      { code: "1+2", sourceType: "script" },
-      { code: "1+2//import", sourceType: "script" },
-      { code: "1+2//import.meta", sourceType: "script" },
-      { code: "1+2", hint: "module", sourceType: "module" },
-      { code: '"use module";1+2', sourceType: "module" },
-      { code: "'use module';1+2", hint: "module", sourceType: "module" },
-      { code: '"use script";1+2', sourceType: "script" },
-      { code: "'use script';1+2", hint: "module", sourceType: "script" },
-      { code: "import'a'", sourceType: "module" },
-      { code: 'import"a"', hint: "module", sourceType: "module" },
-      { code: "import.meta", sourceType: "module" },
-      { code: "import.meta", hint: "module", sourceType: "module" }
+      { code: "1+2", sourceType: SCRIPT },
+      { code: "1+2//import", sourceType: SCRIPT },
+      { code: "1+2//import.meta", sourceType: SCRIPT },
+      { code: "1+2", hint: MODULE, sourceType: MODULE },
+      { code: '"use module";1+2', sourceType: MODULE },
+      { code: "'use module';1+2", hint: MODULE, sourceType: MODULE },
+      { code: '"use script";1+2', sourceType: SCRIPT },
+      { code: "'use script';1+2", hint: MODULE, sourceType: SCRIPT },
+      { code: "import'a'", sourceType: MODULE },
+      { code: 'import"a"', hint: MODULE, sourceType: MODULE },
+      { code: "import.meta", sourceType: MODULE },
+      { code: "import.meta", hint: MODULE, sourceType: MODULE }
     ]
     .forEach((data) => {
       const result = Compiler.compile(data.code, {
         hint: data.hint,
-        sourceType: "unambiguous"
+        sourceType: UNAMBIGUOUS
       })
 
       assert.strictEqual(result.sourceType, data.sourceType)
@@ -100,7 +104,7 @@ describe("compiler", () => {
       .forEach((value) => {
         const result = Compiler.compile('import a from "a"', {
           var: value,
-          sourceType: "module"
+          sourceType: MODULE
         })
 
         assert.ok(result.code.startsWith(value ? "var a" : "let a"))
@@ -109,10 +113,10 @@ describe("compiler", () => {
 
   it('should support the "use module" directive', () => {
     [
-      { code: "'use module';\"use script\";import'a'", hint: "module" },
-      { code: "'use module';\"use script\";import.meta", hint: "module" },
-      { code: '"use module";\'use script\';import"a"', hint: "module" },
-      { code: '"use module";\'use script\';import.meta', hint: "module" },
+      { code: "'use module';\"use script\";import'a'", hint: MODULE },
+      { code: "'use module';\"use script\";import.meta", hint: MODULE },
+      { code: '"use module";\'use script\';import"a"', hint: MODULE },
+      { code: '"use module";\'use script\';import.meta', hint: MODULE },
       { code: "'use module';\"use script\";import'a'" },
       { code: "'use module';\"use script\";import.meta" },
       { code: '"use module";\'use script\';import"a"' },
@@ -121,19 +125,19 @@ describe("compiler", () => {
     .forEach((data) => {
       const result = Compiler.compile(data.code, {
         hint: data.hint,
-        sourceType: "unambiguous"
+        sourceType: UNAMBIGUOUS
       })
 
-      assert.strictEqual(result.sourceType, "module")
+      assert.strictEqual(result.sourceType, MODULE)
     })
   })
 
   it('should support the "use script" directive', () => {
     [
-      { code: "'use script';\"use module\";import'a'", hint: "module" },
-      { code: "'use script';\"use module\";import.meta", hint: "module" },
-      { code: '"use script";\'use module\';import"a"', hint: "module" },
-      { code: '"use script";\'use module\';import.meta', hint: "module" },
+      { code: "'use script';\"use module\";import'a'", hint: MODULE },
+      { code: "'use script';\"use module\";import.meta", hint: MODULE },
+      { code: '"use script";\'use module\';import"a"', hint: MODULE },
+      { code: '"use script";\'use module\';import.meta', hint: MODULE },
       { code: "'use script';\"use module\";import'a'" },
       { code: "'use script';\"use module\";import.meta" },
       { code: '"use script";\'use module\';import"a"' },
@@ -143,7 +147,7 @@ describe("compiler", () => {
       assert.throws(
         () => Compiler.compile(data.code, {
           hint: data.hint,
-          sourceType: "unambiguous"
+          sourceType: UNAMBIGUOUS
         }),
         SyntaxError
       )
@@ -157,7 +161,7 @@ describe("compiler", () => {
     ].join("\n")
 
     const result = Compiler.compile(code, {
-      sourceType: "module"
+      sourceType: MODULE
     })
 
     assert.ok(result.code.startsWith("let a"))
@@ -165,7 +169,7 @@ describe("compiler", () => {
 
   it("should support trailing comments", () => {
     const result = Compiler.compile('import"a"//trailing comment', {
-      sourceType: "module"
+      sourceType: MODULE
     })
 
     assert.ok(result.code.endsWith("//trailing comment"))
@@ -173,7 +177,7 @@ describe("compiler", () => {
 
   it("should compile dynamic import with script source sourceType", () => {
     const result = Compiler.compile('import("a")', {
-      sourceType: "script"
+      sourceType: SCRIPT
     })
 
     assert.ok(result.code.includes('i("a")'))
@@ -195,7 +199,7 @@ describe("compiler", () => {
     ].join("\r\n")
 
     const result = Compiler.compile(code, {
-      sourceType: "module"
+      sourceType: MODULE
     })
 
     assert.ok(result.code.endsWith("\r\n".repeat(5)))
@@ -232,7 +236,7 @@ describe("compiler", () => {
     ]
     .forEach((code) => {
       Compiler.compile(code, {
-        sourceType: "module"
+        sourceType: MODULE
       })
     })
   })
