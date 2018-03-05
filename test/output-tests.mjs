@@ -5,8 +5,8 @@ import fs from "fs-extra"
 import globby from "globby"
 import path from "path"
 
-const MODULE = 1
-const SCRIPT = 2
+const SCRIPT = 1
+const MODULE = 2
 
 const files = globby.sync(["output/**/*.{js,mjs}"])
 const tests = files

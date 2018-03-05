@@ -2,8 +2,8 @@ import Compiler from "../build/compiler.js"
 
 import assert from "assert"
 
-const MODULE = 1
-const SCRIPT = 2
+const SCRIPT = 1
+const MODULE = 2
 const UNAMBIGUOUS = 3
 
 describe("compiler", () => {

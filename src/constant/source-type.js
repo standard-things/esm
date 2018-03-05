@@ -1,7 +1,8 @@
+/* eslint-disable sort-keys */
 const SOURCE_TYPE = {
   __proto__: null,
-  MODULE: 1,
-  SCRIPT: 2,
+  SCRIPT: 1,
+  MODULE: 2,
   UNAMBIGUOUS: 3
 }
 
