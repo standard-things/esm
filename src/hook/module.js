@@ -1,4 +1,5 @@
 import ENTRY from "../constant/entry.js"
+import PACKAGE from "../constant/package.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -33,6 +34,12 @@ const {
 } = ENTRY
 
 const {
+  OPTIONS_MODE_ALL,
+  OPTIONS_MODE_JS,
+  RANGE_ALL
+} = PACKAGE
+
+const {
   ERR_REQUIRE_ESM
 } = errors
 
@@ -47,7 +54,7 @@ function hook(Mod, parent) {
   const { _extensions } = Mod
   const passthruMap = new Map
 
-  const defaultPkg = new Package("", "*", { cache: false })
+  const defaultPkg = new Package("", RANGE_ALL, { cache: false })
   const defaultOptions = defaultPkg.options
   let parentPkg = Package.from(parent)
 
@@ -70,12 +77,12 @@ function hook(Mod, parent) {
     assign(defaultPkg, parentPkg)
   }
 
-  if (defaultOptions.mode === "all") {
-    defaultOptions.mode = "js"
+  if (defaultOptions.mode === OPTIONS_MODE_ALL) {
+    defaultOptions.mode = OPTIONS_MODE_JS
   }
 
   defaultPkg.options = defaultOptions
-  defaultPkg.range = "*"
+  defaultPkg.range = RANGE_ALL
 
   Module._extensions = _extensions
   shared.package.default = defaultPkg

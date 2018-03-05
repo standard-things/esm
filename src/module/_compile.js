@@ -1,6 +1,7 @@
 import { extname, resolve } from "path"
 
 import ENTRY from "../constant/entry.js"
+import PACKAGE from "../constant/package.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
@@ -32,6 +33,11 @@ const {
 } = ENTRY
 
 const {
+  OPTIONS_MODE_ALL,
+  OPTIONS_MODE_JS
+} = PACKAGE
+
+const {
   MODULE,
   SCRIPT,
   UNAMBIGUOUS
@@ -45,9 +51,9 @@ function compile(caller, entry, content, filename, fallback) {
   let hint = SCRIPT
   let sourceType = SCRIPT
 
-  if (options.mode === "all") {
+  if (options.mode === OPTIONS_MODE_ALL) {
     sourceType = MODULE
-  } else if (options.mode === "js") {
+  } else if (options.mode === OPTIONS_MODE_JS) {
     sourceType = UNAMBIGUOUS
   }
 

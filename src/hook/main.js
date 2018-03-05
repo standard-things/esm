@@ -1,3 +1,5 @@
+import PACKAGE from "../constant/package.js"
+
 import Module from "../module.js"
 import Package from "../package.js"
 
@@ -10,6 +12,10 @@ import loadESM from "../module/esm/load.js"
 import maskFunction from "../util/mask-function.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 import shared from "../shared.js"
+
+const {
+  RANGE_ALL
+} = PACKAGE
 
 function hook(Mod) {
   const _tickCallback = getSilent(process, "_tickCallback")
@@ -53,7 +59,7 @@ function hook(Mod) {
     const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {
-      const pkg = new Package("", "*", { cache: false })
+      const pkg = new Package("", RANGE_ALL, { cache: false })
       const pkgOptions = pkg.options
 
       assign(pkg, defaultPkg)

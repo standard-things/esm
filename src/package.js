@@ -1,6 +1,7 @@
 import { basename, dirname , extname, resolve } from "path"
 
 import CHAR_CODE from "./constant/char-code.js"
+import PACKAGE from "./constant/package.js"
 
 import _findPath from "./module/_find-path.js"
 import getEnvVars from "./env/get-vars.js"
@@ -27,6 +28,13 @@ import { version } from "./version.js"
 const {
   PERIOD
 } = CHAR_CODE
+
+const {
+  OPTIONS_MODE_ALL,
+  OPTIONS_MODE_JS,
+  OPTIONS_MODE_MJS,
+  RANGE_ALL
+} = PACKAGE
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
@@ -218,9 +226,16 @@ function createOptions(options) {
 
   if (esmMode) {
     options.mode = esmMode
-  } else if (options.mode !== "all" &&
-      options.mode !== "js") {
-    options.mode = "mjs"
+  }
+
+  const { mode } = options
+
+  if (mode === "all") {
+    options.mode = OPTIONS_MODE_ALL
+  } else if (mode === "js") {
+    options.mode = OPTIONS_MODE_JS
+  } else {
+    options.mode = OPTIONS_MODE_MJS
   }
 
   if (sourceMap !== void 0) {
@@ -327,7 +342,7 @@ function readInfo(dirPath, force) {
       options = readJSON6(optionsPath)
     } else {
       pkg =
-      Package.cache[dirPath] = new Package(dirPath, "*", {
+      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL, {
         cjs: true,
         mode: "js"
       })
@@ -378,7 +393,7 @@ function readInfo(dirPath, force) {
   let range
 
   if (force) {
-    range = "*"
+    range = RANGE_ALL
   } else if (parentPkg) {
     range = parentPkg.range
   } else {
@@ -398,7 +413,7 @@ function readInfo(dirPath, force) {
     if (range === null) {
       if (optionsFound ||
           getRange(pkgJSON, "devDependencies")) {
-        range = "*"
+        range = RANGE_ALL
       } else {
         return null
       }

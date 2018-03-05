@@ -1,4 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
+import PACKAGE from "../../constant/package.js"
 
 import Package from "../../package.js"
 
@@ -19,6 +20,10 @@ import shared from "../../shared.js"
 const {
   SLASH
 } = CHAR_CODE
+
+const {
+  OPTIONS_MODE_JS
+} = PACKAGE
 
 const {
   ERR_INVALID_ARG_TYPE,
@@ -101,7 +106,7 @@ function resolveFilename(request, parent, isMain, options) {
     if (isMain ||
         (pkgOptions &&
          (pkgOptions.cjs.paths ||
-          pkgOptions.mode === "js")) ||
+          pkgOptions.mode === OPTIONS_MODE_JS)) ||
         extname(foundPath) in extLookup) {
       return cache[cacheKey] = foundPath
     }

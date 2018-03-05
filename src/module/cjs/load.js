@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/module.js
 
 import ENTRY from "../../constant/entry.js"
+import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
 
@@ -13,6 +14,10 @@ import errors from "../../errors.js"
 const {
   MODE_ESM
 } = ENTRY
+
+const {
+  OPTIONS_MODE_MJS
+} = PACKAGE
 
 const {
   ERR_REQUIRE_ESM
@@ -30,7 +35,7 @@ function load(request, parent, isMain) {
       childEntry.mode === MODE_ESM) {
     const { options } = Entry.get(parent).package
 
-    if (options.mode === "mjs" &&
+    if (options.mode === OPTIONS_MODE_MJS &&
         ! options.cjs.vars) {
       throw new ERR_REQUIRE_ESM(child)
     }
