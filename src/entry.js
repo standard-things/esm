@@ -103,7 +103,13 @@ class Entry {
     )
 
     setSetter(this, "compileData", (value) => {
-      this.package.cache.compile[this.cacheName] = value
+      Reflect.defineProperty(this, "compileData", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true
+      })
     })
 
     setGetter(this, "mode", () => {

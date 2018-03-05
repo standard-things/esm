@@ -82,7 +82,10 @@ const CachingCompiler = {
       result.scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
     }
 
-    return cache.compile[cacheName] = result
+    entry.compileData =
+    cache.compile[cacheName] = result
+
+    return result
   }
 }
 
@@ -91,7 +94,11 @@ function compileAndCache(entry, code, options) {
 
   if (options.eval) {
     const cacheName = getCacheFileName(entry, code)
-    return shared.package.dir[""].compile[cacheName] = result
+
+    entry.compileData =
+    shared.package.dir[""].compile[cacheName] = result
+
+    return result
   }
 
   if (result.sourceType === MODULE) {
@@ -103,7 +110,10 @@ function compileAndCache(entry, code, options) {
     }
   }
 
-  return entry.package.cache.compile[entry.cacheName] = result
+  entry.compileData =
+  entry.package.cache.compile[entry.cacheName] = result
+
+  return result
 }
 
 function compileAndWrite(entry, code, options) {
