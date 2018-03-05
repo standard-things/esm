@@ -19,7 +19,9 @@ import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
 
 const {
-  STATE
+  STATE_EXECUTION_COMPLETED,
+  STATE_EXECUTION_STARTED,
+  STATE_INITIAL
 } = ENTRY
 
 // Lazily resolve `process.argv[1]`.
@@ -33,7 +35,7 @@ const useRunInDebugContext = typeof runInDebugContext === "function"
 function compile(content, filename) {
   const entry = Entry.get(this)
 
-  if (entry.state === STATE.INITIAL) {
+  if (entry.state === STATE_INITIAL) {
     entry.cacheName = getCacheFileName(entry, content)
     entry.package = Package.get("")
     entry.runtimeName = shared.runtimeName
@@ -43,7 +45,7 @@ function compile(content, filename) {
     try {
       result = _compile(compile, entry, content, filename)
     } finally {
-      entry.state = STATE.INITIAL
+      entry.state = STATE_INITIAL
     }
 
     return result
@@ -137,7 +139,7 @@ function compile(content, filename) {
   const exported = this.exports
   const req = makeRequireFunction(this)
 
-  entry.state = STATE.EXECUTION_STARTED
+  entry.state = STATE_EXECUTION_STARTED
 
   let result
 
@@ -149,7 +151,7 @@ function compile(content, filename) {
       [exported, req, this, filename, dirname(filename)])
   }
 
-  entry.state = STATE.EXECUTION_COMPLETED
+  entry.state = STATE_EXECUTION_COMPLETED
   return result
 }
 

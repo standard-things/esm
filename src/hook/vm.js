@@ -31,12 +31,14 @@ import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
 const {
-  MODE,
-  STATE
+  MODE_ESM,
+  STATE_EXECUTION_STARTED,
+  STATE_PARSING_STARTED
 } = ENTRY
 
 const {
-  MODULE
+  MODULE,
+  UNAMBIGUOUS
 } = SOURCE_TYPE
 
 const ExObject = __external__.Object
@@ -86,7 +88,7 @@ function hook(vm) {
         entry,
         content,
         {
-          sourceType: "unambiguous",
+          sourceType: UNAMBIGUOUS,
           strict: false,
           var: true,
           warnings: false
@@ -94,13 +96,13 @@ function hook(vm) {
       ])
     }
 
-    entry.state = STATE.PARSING_STARTED
+    entry.state = STATE_PARSING_STARTED
 
-    if (entry.mode === MODE.ESM) {
+    if (entry.mode === MODE_ESM) {
       tryValidateESM(manager, entry, content)
     }
 
-    entry.state = STATE.EXECUTION_STARTED
+    entry.state = STATE_EXECUTION_STARTED
 
     const { runtimeName } = entry
 

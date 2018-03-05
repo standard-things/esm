@@ -11,7 +11,7 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 const {
-  MODE
+  MODE_ESM
 } = ENTRY
 
 const {
@@ -24,11 +24,10 @@ function load(request, parent, isMain) {
   }
 
   const childEntry = _load(request, parent, isMain)
-  const childIsESM = childEntry && childEntry.mode === MODE.ESM
   const child = childEntry.module
 
-  if (childIsESM &&
-      parent) {
+  if (parent &&
+      childEntry.mode === MODE_ESM) {
     const { options } = Entry.get(parent).package
 
     if (options.mode === "mjs" &&

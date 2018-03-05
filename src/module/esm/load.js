@@ -4,7 +4,9 @@ import _load from "./_load.js"
 import moduleState from "../state.js"
 
 const {
-  STATE
+  STATE_EXECUTION_COMPLETED,
+  STATE_EXECUTION_STARTED,
+  STATE_PARSING_COMPLETED
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
@@ -19,7 +21,7 @@ function load(request, parent, isMain, preload) {
   }
 
   if (entry.module.loaded) {
-    entry.state = STATE.EXECUTION_COMPLETED
+    entry.state = STATE_EXECUTION_COMPLETED
 
     if (preload) {
       preload(entry)
@@ -28,8 +30,8 @@ function load(request, parent, isMain, preload) {
     return entry
   }
 
-  if (entry.state < STATE.EXECUTION_STARTED) {
-    entry.state = STATE.PARSING_COMPLETED
+  if (entry.state < STATE_EXECUTION_STARTED) {
+    entry.state = STATE_PARSING_COMPLETED
 
     if (preload) {
       preload(entry)
@@ -41,7 +43,7 @@ function load(request, parent, isMain, preload) {
   }
 
   if (entry.module.loaded) {
-    entry.state = STATE.EXECUTION_COMPLETED
+    entry.state = STATE_EXECUTION_COMPLETED
   }
 
   return entry

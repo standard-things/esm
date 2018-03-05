@@ -20,9 +20,12 @@ import shared from "./shared.js"
 import warn from "./warn.js"
 
 const {
-  LOAD,
-  MODE,
-  STATE
+  LOAD_COMPLETED,
+  LOAD_INCOMPLETE,
+  LOAD_INDETERMINATE,
+  MODE_CJS,
+  MODE_ESM,
+  STATE_INITIAL
 } = ENTRY
 
 const {
@@ -52,7 +55,7 @@ class Entry {
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
-    this._loaded = LOAD.INCOMPLETE
+    this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = { __proto__: null }
     // The load mode for `module.require`.
@@ -90,7 +93,7 @@ class Entry {
     // Initialize empty namespace setter so they are merged properly.
     this.setters["*"] = []
     // The state of the module:
-    this.state = STATE.INITIAL
+    this.state = STATE_INITIAL
     // The file url of the module.
     this.url = null
 
@@ -108,8 +111,8 @@ class Entry {
       if (compileData &&
           compileData !== true) {
         return this.mode = compileData.sourceType === MODULE
-          ? MODE.ESM
-          : MODE.CJS
+          ? MODE_ESM
+          : MODE_CJS
       }
 
       return "cjs"
@@ -207,7 +210,7 @@ class Entry {
         getters[key] = getter
       }
 
-      if (this.mode === MODE.ESM ||
+      if (this.mode === MODE_ESM ||
           typeof getter !== "function" ||
           typeof otherGetter !== "function") {
         continue
@@ -241,25 +244,25 @@ class Entry {
   }
 
   loaded() {
-    if (this._loaded !== LOAD.INCOMPLETE) {
+    if (this._loaded !== LOAD_INCOMPLETE) {
       return this._loaded
     }
 
     if (! this.module.loaded) {
-      return this._loaded = LOAD.INCOMPLETE
+      return this._loaded = LOAD_INCOMPLETE
     }
 
-    this._loaded = LOAD.INDETERMINATE
+    this._loaded = LOAD_INDETERMINATE
 
     const { children } = this
 
     for (const id in children) {
-      if (children[id].loaded() === LOAD.INCOMPLETE) {
-        return this._loaded = LOAD.INCOMPLETE
+      if (children[id].loaded() === LOAD_INCOMPLETE) {
+        return this._loaded = LOAD_INCOMPLETE
       }
     }
 
-    const isESM = this.mode === MODE.ESM
+    const isESM = this.mode === MODE_ESM
 
     let setNsGetters = true
     let exported = this.module.exports
@@ -281,7 +284,7 @@ class Entry {
       const oldExported = oldMod.exports
       const newEntry = Entry.get(this.module)
 
-      setNsGetters = newEntry._loaded !== LOAD.COMPLETED
+      setNsGetters = newEntry._loaded !== LOAD_COMPLETED
 
       this.merge(newEntry)
 
@@ -299,7 +302,7 @@ class Entry {
       }
 
       if (! newMod.loaded) {
-        return this._loaded = LOAD.INCOMPLETE
+        return this._loaded = LOAD_INCOMPLETE
       }
     }
 
@@ -314,7 +317,7 @@ class Entry {
     }
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
-    return this._loaded = LOAD.COMPLETED
+    return this._loaded = LOAD_COMPLETED
   }
 
   merge(otherEntry) {
@@ -361,8 +364,10 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
-  const isESM = entry.mode === MODE.ESM
-  const object = entry._loaded === LOAD.COMPLETED ? _namespace : exported
+  const isESM = entry.mode === MODE_ESM
+  const object = entry._loaded === LOAD_COMPLETED
+    ? _namespace
+    : exported
 
   const isPseudo =
     entry.package.options.cjs.interop &&
@@ -452,7 +457,7 @@ function createNamespace() {
 }
 
 function getExportByName(entry, setter, name) {
-  const isESM = entry.mode === MODE.ESM
+  const isESM = entry.mode === MODE_ESM
 
   const isScript =
     ! isESM &&
@@ -468,7 +473,7 @@ function getExportByName(entry, setter, name) {
 
   if ((isScript &&
        name !== "default") ||
-      (entry._loaded === LOAD.COMPLETED &&
+      (entry._loaded === LOAD_COMPLETED &&
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
@@ -485,8 +490,8 @@ function getExportByName(entry, setter, name) {
 }
 
 function mergeProperty(entry, otherEntry, key) {
-  if ((entry._loaded !== LOAD.INCOMPLETE ||
-       otherEntry._loaded !== LOAD.INCOMPLETE) &&
+  if ((entry._loaded !== LOAD_INCOMPLETE ||
+       otherEntry._loaded !== LOAD_INCOMPLETE) &&
       (key === "cjsNamespace" ||
        key === "esmNamespace")) {
     return copyProperty(entry, otherEntry, key)
@@ -539,7 +544,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry) {
-  if (entry.mode === MODE.ESM) {
+  if (entry.mode === MODE_ESM) {
     for (const name in entry.getters) {
       runGetter(entry, name)
     }

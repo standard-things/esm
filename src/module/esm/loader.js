@@ -6,7 +6,7 @@ import { extname } from "path"
 import moduleState from "../state.js"
 
 const {
-  STATE
+  STATE_PARSING_COMPLETED
 } = ENTRY
 
 function loader(entry, preload) {
@@ -36,7 +36,7 @@ function loader(entry, preload) {
   if (moduleState.parsing &&
       (ext === ".json" ||
        ext === ".node")) {
-    entry.state = STATE.PARSING_COMPLETED
+    entry.state = STATE_PARSING_COMPLETED
     return
   }
 

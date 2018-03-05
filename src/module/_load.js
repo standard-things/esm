@@ -12,7 +12,9 @@ import moduleState from "./state.js"
 import shared from "../shared.js"
 
 const {
-  STATE
+  STATE_EXECUTION_STARTED,
+  STATE_PARSING_COMPLETED,
+  STATE_PARSING_STARTED
 } = ENTRY
 
 function load(request, parent, isMain, state, loader) {
@@ -46,11 +48,11 @@ function load(request, parent, isMain, state, loader) {
     }
 
     if (! moduleState.parsing &&
-        entry.state !== STATE.PARSING_COMPLETED) {
+        entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
 
-    entry.state = STATE.EXECUTION_STARTED
+    entry.state = STATE_EXECUTION_STARTED
   } else {
     child = new Module(filename, parent)
     child.filename = filename
@@ -65,13 +67,13 @@ function load(request, parent, isMain, state, loader) {
     entry.id = filename
     entry.parent = Entry.get(parent)
     entry.state = moduleState.parsing
-      ? STATE.PARSING_STARTED
-      : STATE.EXECUTION_STARTED
+      ? STATE_PARSING_STARTED
+      : STATE_EXECUTION_STARTED
   }
 
   if (moduleState.passthru &&
       ! moduleState.parsing) {
-    entry.state = STATE.PARSING_COMPLETED
+    entry.state = STATE_PARSING_COMPLETED
   } else {
     const { _compile } = child
 

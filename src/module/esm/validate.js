@@ -5,8 +5,8 @@ import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 
 const {
-  MODE,
-  STATE
+  MODE_ESM,
+  STATE_PARSING_COMPLETED
 } = ENTRY
 
 const {
@@ -31,8 +31,8 @@ function validate(entry) {
 
     entry.children[childEntry.name] = childEntry
 
-    if (childEntry.state < STATE.PARSING_COMPLETED) {
-      childEntry.state = STATE.PARSING_COMPLETED
+    if (childEntry.state < STATE_PARSING_COMPLETED) {
+      childEntry.state = STATE_PARSING_COMPLETED
     }
   }
 
@@ -42,11 +42,9 @@ function validate(entry) {
   for (const name in children) {
     const childEntry = children[name]
     const child = childEntry.module
-    const childCached = childEntry.compileData
-    const childIsESM = childEntry.mode === MODE.ESM
     const requestedExportNames = dependencySpecifiers[name]
 
-    if (! childIsESM) {
+    if (childEntry.mode !== MODE_ESM) {
       if (! namedExports &&
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
@@ -57,11 +55,12 @@ function validate(entry) {
       continue
     }
 
-    const childExportStars = childCached.exportStars
+    const childCompileData = childEntry.compileData
+    const childExportStars = childCompileData.exportStars
     const skipExportMissing = childEntry.package.options.cjs.vars
 
     for (const requestedName of requestedExportNames) {
-      const { exportSpecifiers:childExportSpecifiers } = childCached
+      const { exportSpecifiers:childExportSpecifiers } = childCompileData
 
       if (requestedName in childExportSpecifiers) {
         if (childExportSpecifiers[requestedName] < 3) {
@@ -95,9 +94,8 @@ function validate(entry) {
     }
 
     const childEntry = children[childName]
-    const childIsESM = childEntry.mode === MODE.ESM
 
-    if (! childIsESM) {
+    if (childEntry.mode !== MODE_ESM) {
       continue
     }
 

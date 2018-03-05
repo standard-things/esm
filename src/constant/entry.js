@@ -1,26 +1,17 @@
 /* eslint-disable sort-keys */
 const ENTRY = {
   __proto__: null,
-  LOAD: {
-    __proto__: null,
-    INDETERMINATE: -1,
-    INCOMPLETE: 0,
-    COMPLETED: 1
-  },
-  MODE: {
-    __proto__: null,
-    CJS: "cjs",
-    ESM: "esm",
-    PSEUDO: "pseudo"
-  },
-  STATE: {
-    __proto__: null,
-    INITIAL: 0,
-    PARSING_STARTED: 1,
-    PARSING_COMPLETED: 2,
-    EXECUTION_STARTED: 3,
-    EXECUTION_COMPLETED: 4
-  }
+  LOAD_INDETERMINATE: -1,
+  LOAD_INCOMPLETE: 0,
+  LOAD_COMPLETED: 1,
+  MODE_CJS: "cjs",
+  MODE_ESM: "esm",
+  MODE_PSEUDO: "pseudo",
+  STATE_INITIAL: 0,
+  STATE_PARSING_STARTED: 1,
+  STATE_PARSING_COMPLETED: 2,
+  STATE_EXECUTION_STARTED: 3,
+  STATE_EXECUTION_COMPLETED: 4
 }
 
 export default ENTRY

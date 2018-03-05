@@ -91,7 +91,7 @@ const Compiler = {
 
     const parserOptions = {
       allowReturnOutsideFunction,
-      sourceType: sourceType === SCRIPT ? sourceType : MODULE,
+      sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
       strict: options.strict
     }
 
@@ -128,7 +128,7 @@ const Compiler = {
         generateVarDeclarations: options.var,
         possibleIndexes,
         runtimeName,
-        sourceType: sourceType === SCRIPT ? sourceType : MODULE
+        sourceType: sourceType === SCRIPT ? SCRIPT : MODULE
       })
     } catch (e) {
       e.sourceType = parserOptions.sourceType

@@ -29,7 +29,7 @@ import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const {
-  STATE
+  STATE_EXECUTION_STARTED
 } = ENTRY
 
 const {
@@ -105,7 +105,7 @@ function hook(Mod, parent) {
     const { _compile } = mod
 
     const compileFallback = () => {
-      entry.state = STATE.EXECUTION_STARTED
+      entry.state = STATE_EXECUTION_STARTED
       return tryPassthru.call(this, func, args, pkg)
     }
 

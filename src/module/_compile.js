@@ -26,8 +26,9 @@ import warn from "../warn.js"
 import wrap from "./wrap.js"
 
 const {
-  MODE,
-  STATE
+  MODE_ESM,
+  STATE_EXECUTION_STARTED,
+  STATE_PARSING_STARTED
 } = ENTRY
 
 const {
@@ -90,10 +91,10 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (moduleState.parsing) {
     const defaultPkg = shared.package.default
-    const isESM = entry.mode === MODE.ESM
+    const isESM = entry.mode === MODE_ESM
     const { parent } = entry
     const parentPkg = parent && parent.package
-    const parentIsESM = parent && parent.mode === MODE.ESM
+    const parentIsESM = parent && parent.mode === MODE_ESM
 
     if (! isESM &&
         ! parentIsESM &&
@@ -103,17 +104,17 @@ function compile(caller, entry, content, filename, fallback) {
     }
 
     if (isESM &&
-        entry.state === STATE.PARSING_STARTED) {
+        entry.state === STATE_PARSING_STARTED) {
       tryValidateESM(caller, entry)
     }
   } else {
-    entry.state = STATE.EXECUTION_STARTED
+    entry.state = STATE_EXECUTION_STARTED
     return tryCompileCached(entry)
   }
 }
 
 function tryCompileCached(entry) {
-  const isESM = entry.mode === MODE.ESM
+  const isESM = entry.mode === MODE_ESM
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
@@ -302,7 +303,7 @@ function useAsyncWrapper(entry) {
 
   if (pkg.options.await &&
       shared.support.await) {
-    if (entry.mode !== MODE.ESM) {
+    if (entry.mode !== MODE_ESM) {
       return true
     }
 
