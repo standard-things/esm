@@ -309,11 +309,15 @@ class Entry {
     assignExportsToNamespace(this)
 
     if (setNsGetters) {
-      setDeferred(this, "cjsNamespace", () =>
-        toNamespace(this, { default: this.module.exports })
-      )
+      setDeferred(this, "cjsNamespace", () => createNamespace(this, {
+        __proto__: null,
+        namespace: {
+          __proto__: null,
+          default: this.module.exports
+        }
+      }))
 
-      setDeferred(this, "esmNamespace", () => toNamespace(this))
+      setDeferred(this, "esmNamespace", () => createNamespace(this))
     }
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
@@ -442,7 +446,7 @@ function changed(setter, key, value) {
   return true
 }
 
-function createNamespace() {
+function createNamespace(entry, source = entry) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace objects have a null [[Prototype]].
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -453,7 +457,61 @@ function createNamespace() {
   // https://tc39.github.io/ecma262/#sec-@@tostringtag
   Reflect.defineProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
 
-  return namespace
+  // Section 9.4.6: Module Namespace Exotic Objects
+  // Properties should be assigned in `Array#sort` order.
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+  const names = keys(source.namespace).sort()
+
+  for (const name of names) {
+    namespace[name] = void 0
+  }
+
+  return new OwnProxy(Object.seal(namespace), {
+    get: (namespace, name) => {
+      return name === Symbol.toStringTag
+        ? Reflect.get(namespace, name)
+        : Reflect.get(source.namespace, name)
+    },
+    getOwnPropertyDescriptor: (namespace, name) => {
+      if (! Reflect.has(namespace, name)) {
+        return
+      }
+
+      const descriptor = {
+        configurable: false,
+        enumerable: false,
+        value: "Module",
+        writable: false
+      }
+
+      // Section 26.3.1: @@toStringTag
+      // Return descriptor of the module namespace @@toStringTag.
+      // https://tc39.github.io/ecma262/#sec-@@tostringtag
+      if (name === Symbol.toStringTag) {
+        return descriptor
+      }
+
+      // Section 9.4.6: Module Namespace Exotic Objects
+      // Return descriptor of the non-extensible module namespace property.
+      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+      descriptor.enumerable =
+      descriptor.writable = true
+      descriptor.value = Reflect.get(source.namespace, name)
+
+      return descriptor
+    },
+    set: (namespace, name) => {
+      if (entry.package.options.warnings) {
+        if (Reflect.has(source, name)) {
+          warn("WRN_NS_ASSIGNMENT", entry.module, name)
+        } else {
+          warn("WRN_NS_EXTENSION", entry.module, name)
+        }
+      }
+
+      return true
+    }
+  })
 }
 
 function getExportByName(entry, setter, name) {
@@ -577,65 +635,6 @@ function runSetters(entry, callback) {
   for (const name in entry.setters) {
     runSetter(entry, name, callback)
   }
-}
-
-function toNamespace(entry, source = entry.namespace) {
-  const names = keys(source).sort()
-  const namespace = createNamespace()
-
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Properties should be assigned in `Array#sort` order.
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  for (const name of names) {
-    namespace[name] = void 0
-  }
-
-  return new OwnProxy(Object.seal(namespace), {
-    get: (namespace, name) => {
-      return name === Symbol.toStringTag
-        ? Reflect.get(namespace, name)
-        : Reflect.get(source, name)
-    },
-    getOwnPropertyDescriptor: (namespace, name) => {
-      if (! Reflect.has(namespace, name)) {
-        return
-      }
-
-      const descriptor = {
-        configurable: false,
-        enumerable: false,
-        value: "Module",
-        writable: false
-      }
-
-      // Section 26.3.1: @@toStringTag
-      // Return descriptor of the module namespace @@toStringTag.
-      // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      if (name === Symbol.toStringTag) {
-        return descriptor
-      }
-
-      // Section 9.4.6: Module Namespace Exotic Objects
-      // Return descriptor of the non-extensible module namespace property.
-      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      descriptor.enumerable =
-      descriptor.writable = true
-      descriptor.value = Reflect.get(source, name)
-
-      return descriptor
-    },
-    set: (namespace, name) => {
-      if (entry.package.options.warnings) {
-        if (Reflect.has(source, name)) {
-          warn("WRN_NS_ASSIGNMENT", entry.module, name)
-        } else {
-          warn("WRN_NS_EXTENSION", entry.module, name)
-        }
-      }
-
-      return true
-    }
-  })
 }
 
 Reflect.setPrototypeOf(Entry.prototype, null)
