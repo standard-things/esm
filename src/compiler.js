@@ -47,6 +47,7 @@ const Compiler = {
     options = Compiler.createOptions(options)
 
     const result = {
+      __proto__: null,
       changed: false,
       code,
       dependencySpecifiers: null,

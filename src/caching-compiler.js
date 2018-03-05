@@ -50,6 +50,7 @@ const CachingCompiler = {
       : null
 
     const result = {
+      __proto__: null,
       changed: true,
       code: null,
       dependencySpecifiers,
@@ -164,12 +165,14 @@ function removeExpired(cachePath, cacheName) {
 function toCompileOptions(entry, options) {
   if (options.eval) {
     return {
+      __proto__: null,
       cjs: entry.package.options.cjs,
       runtimeName: entry.runtimeName
     }
   }
 
   return {
+    __proto__: null,
     cjs: entry.package.options.cjs,
     hint: options.hint,
     runtimeName: entry.runtimeName,
