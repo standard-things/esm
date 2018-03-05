@@ -68,6 +68,7 @@ function checkErrorProps(error, code, message) {
 
   assert.deepStrictEqual(actual, expected)
   assert.deepStrictEqual(Object.keys(error), [])
+  assert.deepStrictEqual(Object.getOwnPropertySymbols(error), [])
 }
 
 function checkErrorStack(error, startsWith) {
