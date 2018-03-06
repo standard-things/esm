@@ -54,43 +54,19 @@ const Runtime = {
       return content
     }
 
-    if (shared.support.blockScopedDeclarations) {
-      content =
-        (hasPragma(content, "use strict") ? '"use strict";' : "") +
-        "let " + runtimeName + "=global." + runtimeName + ";" +
-        content
+    content =
+      (hasPragma(content, "use strict") ? '"use strict";' : "") +
+      "let " + runtimeName + "=global." + runtimeName + ";" +
+      content
 
-      Reflect.defineProperty(unsafeContext, runtimeName, {
-        __proto__: null,
-        configurable: true,
-        get: () => {
-          Reflect.deleteProperty(unsafeContext, runtimeName)
-          return this
-        }
-      })
-    } else if (! (runtimeName in unsafeContext)) {
-      const globalImport = this.import.bind({
-        __proto__: null,
-        entry
-      })
-
-      const globalRuntime = { __proto__: null }
-
-      Reflect.defineProperty(globalRuntime, "i", {
-        __proto__: null,
-        configurable: true,
-        value: globalImport,
-        writable: true
-      })
-
-      Reflect.defineProperty(global, runtimeName, {
-        __proto__: null,
-        value: globalRuntime
-      })
-
-      Object.freeze(globalImport)
-      Object.freeze(globalRuntime)
-    }
+    Reflect.defineProperty(unsafeContext, runtimeName, {
+      __proto__: null,
+      configurable: true,
+      get: () => {
+        Reflect.deleteProperty(unsafeContext, runtimeName)
+        return this
+      }
+    })
 
     return content
   },

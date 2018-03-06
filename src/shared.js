@@ -138,15 +138,6 @@ if (__shared__) {
     return false
   })
 
-  setDeferred(support, "blockScopedDeclarations", () => {
-    try {
-      (0, eval)("let a")
-      return true
-    } catch (e) {}
-
-    return false
-  })
-
   setDeferred(support, "getProxyDetails", () =>
     typeof binding.util.getProxyDetails === "function"
   )
