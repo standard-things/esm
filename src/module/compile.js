@@ -13,6 +13,7 @@ import binding from "../binding.js"
 import { dirname } from "path"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getSilent from "../util/get-silent.js"
+import has from "../util/has.js"
 import makeRequireFunction from "./make-require-function.js"
 import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
@@ -86,9 +87,11 @@ function compile(content, filename) {
         cachedDataRejected) {
       changed = true
 
-      const meta =
-        cache.map &&
-        cache.map[cacheName]
+      const { map } = cache
+
+      const meta = has(map, cacheName)
+        ? map[cacheName]
+        : null
 
       if (meta) {
         meta[0] =

@@ -7,6 +7,7 @@ import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
+import has from "./util/has.js"
 import isCacheFileName from "./util/is-cache-file-name.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
@@ -41,10 +42,11 @@ const CachingCompiler = {
   from(entry) {
     const { cache } = entry.package
     const { cacheName } = entry
+    const { map } = cache
 
-    const meta =
-      cache.map &&
-      cache.map[cacheName]
+    const meta = has(map, cacheName)
+      ? map[cacheName]
+      : null
 
     if (! meta) {
       return null
