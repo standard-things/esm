@@ -116,17 +116,6 @@ if (__shared__) {
       : typeof shared.arrowSymbol
   )
 
-  setDeferred(shared, "statValues", () =>
-    shared.support.getStatValues
-      ? binding.fs.getStatValues()
-      : new Float64Array(14)
-  )
-
-  setDeferred(fastPath, "mtime", () =>
-    typeof binding.fs.stat === "function" &&
-      satisfies(shared.process.version, "^6.10.1||>=7.7")
-  )
-
   setDeferred(fastPath, "readFile", () =>
     support.internalModuleReadFile
   )
@@ -160,10 +149,6 @@ if (__shared__) {
 
   setDeferred(support, "getProxyDetails", () =>
     typeof binding.util.getProxyDetails === "function"
-  )
-
-  setDeferred(support, "getStatValues", () =>
-    typeof binding.fs.getStatValues === "function"
   )
 
   setDeferred(support, "inspectProxies", () => {

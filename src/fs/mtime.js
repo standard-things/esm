@@ -1,49 +1,17 @@
-import GenericDate from "../generic/date.js"
-
-import binding from "../binding"
-import shared from "../shared.js"
 import { statSync } from "fs"
 
+const { round } = Math
+
 function mtime(filename) {
-  if (typeof filename !== "string") {
-    return -1
-  }
-
-  const { fastPath } = shared
-
-  if (fastPath.mtime) {
+  if (typeof filename === "string") {
     try {
-      return fastPathMtime(filename)
-    } catch ({ code }) {
-      if (code === "ENOENT") {
-        return -1
-      }
-
-      fastPath.mtime = false
-    }
+      // Add 0.5 to avoid rounding down.
+      // https://github.com/nodejs/node/pull/12607
+      return round(statSync(filename).mtimeMs + 0.5)
+    } catch (e) {}
   }
 
-  return fallbackMtime(filename)
-}
-
-function fallbackMtime(filename) {
-  try {
-    return GenericDate.getTime(statSync(filename).mtime)
-  } catch (e) {}
   return -1
-}
-
-function fastPathMtime(filename) {
-  // Used to speed up file stats. Modifies the `statValues` typed array,
-  // with index 11 being the mtime milliseconds stamp. The speedup comes
-  // from not creating Stat objects.
-  if (shared.support.getStatValues) {
-    binding.fs.stat(filename)
-  } else {
-    binding.fs.stat(filename, shared.statValues)
-  }
-
-  return shared.statValues[11]
 }
 
 export default mtime

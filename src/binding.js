@@ -14,11 +14,9 @@ const map = {
     "preserveSymlinks"
   ],
   fs: [
-    "getStatValues",
     "internalModuleReadFile",
     "internalModuleReadJSON",
-    "internalModuleStat",
-    "stat"
+    "internalModuleStat"
   ],
   icu: [
     "toUnicode"
