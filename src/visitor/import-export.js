@@ -101,7 +101,7 @@ class ImportExportVisitor extends Visitor {
     const { type } = parent
 
     if (type === "CallExpression" ||
-        (type == "AssignmentExpression" &&
+        (type === "AssignmentExpression" &&
          parent.left.name === "eval")) {
       return
     }
