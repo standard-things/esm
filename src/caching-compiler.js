@@ -43,7 +43,6 @@ const CachingCompiler = {
     const { cacheName } = entry
 
     const meta =
-      cache &&
       cache.map &&
       cache.map[cacheName]
 

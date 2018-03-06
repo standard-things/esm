@@ -88,6 +88,7 @@ class Package {
     }
 
     const { dir } = shared.package
+
     let cache = dir[cachePath]
 
     if (! cache) {
