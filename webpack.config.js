@@ -21,11 +21,11 @@ const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
-const isProd = /production/.test(process.env.NODE_ENV)
-const isTest = /test/.test(process.env.NODE_ENV)
-
 const ESM_VERSION = readJSON("./package.json").version
-const NODE_DEBUG = ! isProd
+const { NODE_ENV } = process.env
+
+const isProd = /production/.test(NODE_ENV)
+const isTest = /test/.test(NODE_ENV)
 
 const externals = [
   "Array", "Buffer", "Error", "EvalError", "Function", "JSON", "Object",
@@ -100,7 +100,7 @@ if (isProd) {
     new OptimizeJsPlugin,
     new ShakePlugin,
     new ModuleConcatenationPlugin,
-    new EnvironmentPlugin({ NODE_DEBUG }),
+    new EnvironmentPlugin({ NODE_DEBUG: false }),
     new UglifyJSPlugin({ uglifyOptions })
   )
 }
