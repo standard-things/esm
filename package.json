@@ -70,7 +70,7 @@
     "typescript": "^2.6.1",
     "uglify-es": "^3.3.10",
     "uglifyjs-webpack-plugin": "^1.2.2",
-    "webpack": "^3.10.0",
+    "webpack": "^4.1.1",
     "webpack-bundle-analyzer": "^2.10.1",
     "webpack-common-shake": "^1.5.3",
     "yargs": "^11.1.0"
