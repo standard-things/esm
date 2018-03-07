@@ -9,9 +9,13 @@ const webpack = require("webpack")
 
 const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 
-const { BannerPlugin } = webpack
+const {
+  BannerPlugin,
+  EnvironmentPlugin,
+  NormalModuleReplacementPlugin
+} = webpack
+
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const { EnvironmentPlugin } = webpack
 const { ModuleConcatenationPlugin } = webpack.optimize
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const ShakePlugin = require("webpack-common-shake").Plugin
@@ -52,10 +56,6 @@ const config = {
       {
         loader: "babel-loader",
         test: /\.js$/
-      },
-      {
-        test: path.resolve("src/vendor/acorn/src/unicode-property-data.js"),
-        use: "null-loader"
       }
     ]
   },
@@ -86,6 +86,10 @@ const config = {
       openAnalyzer: false,
       reportFilename: "report.html"
     }),
+    new NormalModuleReplacementPlugin(
+      /acorn\/src\/regexp\.js/,
+      path.resolve("src/acorn/replacement/regexp.js")
+    ),
     new EnvironmentPlugin({ ESM_VERSION })
   ]
 }

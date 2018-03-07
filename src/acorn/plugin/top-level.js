@@ -1,5 +1,5 @@
-import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import { tokTypes as tt } from "../acorn.js"
+import getNamesFromPattern from "../../parse/get-names-from-pattern.js"
+import { tokTypes as tt } from "../../acorn.js"
 
 const Plugin = {
   __proto__: null,

@@ -1,4 +1,4 @@
-import wrap from "../util/wrap.js"
+import wrap from "../../util/wrap.js"
 
 const Plugin = {
   __proto__: null,

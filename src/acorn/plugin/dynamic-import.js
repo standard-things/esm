@@ -2,9 +2,9 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 
-import lookahead from "../parse/lookahead.js"
-import { tokTypes as tt } from "../acorn.js"
-import wrap from "../util/wrap.js"
+import lookahead from "../../parse/lookahead.js"
+import { tokTypes as tt } from "../../acorn.js"
+import wrap from "../../util/wrap.js"
 
 const Plugin = {
   __proto__: null,

@@ -1,7 +1,7 @@
-import CHAR_CODE from "../constant/char-code.js"
+import CHAR_CODE from "../../constant/char-code.js"
 
-import acorn from "../acorn.js"
-import wrap from "../util/wrap.js"
+import acorn from "../../acorn.js"
+import wrap from "../../util/wrap.js"
 
 const {
   EXMARK,

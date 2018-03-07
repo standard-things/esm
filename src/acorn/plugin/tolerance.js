@@ -1,7 +1,7 @@
-import alwaysFalse from "../util/always-false.js"
-import alwaysTrue from "../util/always-true.js"
-import errors from "../parse/errors.js"
-import noop from "../util/noop.js"
+import alwaysFalse from "../../util/always-false.js"
+import alwaysTrue from "../../util/always-true.js"
+import errors from "../../parse/errors.js"
+import noop from "../../util/noop.js"
 
 const engineDupPrefix = "Duplicate export of '"
 const parserDupPrefix = "Duplicate export '"
@@ -33,8 +33,6 @@ const Plugin = {
     parser.exitFunctionScope =
     parser.exitLexicalScope =
     parser.invalidStringToken =
-    parser.regexp_validateUnicodePropertyNameAndValue =
-    parser.regexp_validateUnicodePropertyNameOrValue =
     parser.validateRegExpFlags =
     parser.validateRegExpPattern = noop
 
