@@ -37,7 +37,7 @@ module.exports = {
       ],
       loose: true,
       modules: false,
-      targets: { node: 4 }
+      targets: { node: 6 }
     }]
   ]
 }
