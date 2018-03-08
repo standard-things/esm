@@ -2,7 +2,7 @@ import encodeId from "../util/encode-id.js"
 
 const PREFIX = {
   __proto__: null,
-  STD_ESM: encodeId("@std/esm")
+  ESM_PKG: encodeId("esm")
 }
 
 export default PREFIX

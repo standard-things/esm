@@ -1,9 +1,0 @@
-{
-  "name": "@std-object",
-  "private": true,
-  "@std": {
-    "esm": {
-      "mode": "js"
-    }
-  }
-}

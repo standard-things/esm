@@ -1,5 +1,5 @@
 {
   "name": "@std-esm-string-cjs",
   "private": true,
-  "@std/esm": "cjs"
+  "esm": "cjs"
 }

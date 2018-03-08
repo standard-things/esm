@@ -9,7 +9,7 @@ import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
-  STD_ESM
+  ESM_PKG
 } = PREFIX
 
 let shared
@@ -25,10 +25,10 @@ if (__shared__) {
 
   const symbol = {
     __proto__: null,
-    _compile: Symbol.for(STD_ESM + ":module._compile"),
+    _compile: Symbol.for(ESM_PKG + ":module._compile"),
     inspect: inspect.custom,
-    mjs: Symbol.for(STD_ESM + ':Module._extensions[".mjs"]'),
-    wrapper: Symbol.for(STD_ESM + ":wrapper")
+    mjs: Symbol.for(ESM_PKG + ':Module._extensions[".mjs"]'),
+    wrapper: Symbol.for(ESM_PKG + ":wrapper")
   }
 
   shared = {
@@ -143,11 +143,11 @@ if (__shared__) {
   )
 
   setDeferred(support, "inspectProxies", () => {
-    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [STD_ESM]: 1 })
+    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [ESM_PKG]: 1 })
     const inspected = shared.inspect(proxy, { __proto__: null, showProxy: true })
 
     return inspected.startsWith("Proxy") &&
-      inspected.indexOf(STD_ESM) !== -1
+      inspected.indexOf(ESM_PKG) !== -1
   })
 
   setDeferred(support, "internalModuleReadFile", () =>

@@ -22,7 +22,7 @@ const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : pkgJSON["@std/esm"]
+  : pkgJSON["esm"]
 
 const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")

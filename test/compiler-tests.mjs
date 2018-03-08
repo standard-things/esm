@@ -156,7 +156,7 @@ describe("compiler", () => {
 
   it("should support shebangs", () => {
     const code = [
-      "#!/usr/bin/env node -r @std/esm",
+      "#!/usr/bin/env node -r esm",
       'import a from "a"'
     ].join("\n")
 

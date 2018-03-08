@@ -1,7 +1,0 @@
-{
-  "name": "@std-string-js",
-  "private": true,
-  "@std": {
-    "esm": "js"
-  }
-}

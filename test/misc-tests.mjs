@@ -32,9 +32,9 @@ const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgOptions = fs.pathExistsSync(".esmrc")
   ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : pkgJSON["@std/esm"]
+  : pkgJSON["esm"]
 
-const stdName = "@std/esm@" + pkgJSON.version
+const stdName = "esm@" + pkgJSON.version
 
 function checkError(error, code) {
   const message = error.message
@@ -162,14 +162,11 @@ describe("package.json", () => {
     .map((request) => import(request)))
   )
 
-  it("should support @std/esm package options", () =>
+  it("should support esm package options", () =>
     Promise.all([
-      "./fixture/options-file/@std-esm-object",
-      "./fixture/options-file/@std-esm-string-cjs",
-      "./fixture/options-file/@std-esm-string-js",
-      "./fixture/options-file/@std-object",
-      "./fixture/options-file/@std-string-cjs",
-      "./fixture/options-file/@std-string-js"
+      "./fixture/options-file/esm-object",
+      "./fixture/options-file/esm-string-cjs",
+      "./fixture/options-file/esm-string-js"
     ]
     .map((request) => import(request)))
   )
@@ -178,7 +175,7 @@ describe("package.json", () => {
     import("./fixture/options-priority")
   )
 
-  it("should support @std/esm as package dependencies", () =>
+  it("should support esm as package dependencies", () =>
     Promise.all([
       "dependencies",
       "dev-dependencies",

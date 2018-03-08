@@ -136,7 +136,7 @@ __shared__.global = global
 
 defineProperty(makeRequireFunction, inspectKey, {
   __proto__: null,
-  value: () => "@std/esm enabled"
+  value: () => "esm enabled"
 })
 
 freeze(makeRequireFunction)

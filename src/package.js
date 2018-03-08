@@ -82,7 +82,7 @@ class Package {
     if (typeof options.cache === "string") {
       cachePath = resolve(dirPath, options.cache)
     } else if (options.cache !== false) {
-      cachePath = resolve(dirPath, "node_modules/.cache/@std/esm")
+      cachePath = resolve(dirPath, "node_modules/.cache/esm")
     } else {
       cachePath = ""
     }
@@ -289,8 +289,8 @@ function getRange(json, name) {
   if (has(json, name)) {
     const object = json[name]
 
-    if (has(object, "@std/esm")) {
-      return validRange(object["@std/esm"])
+    if (has(object, "esm")) {
+      return validRange(object["esm"])
     }
   }
 
@@ -382,13 +382,9 @@ function readInfo(dirPath, force) {
     pkgParsed = true
     pkgJSON = parseJSON(pkgJSON)
 
-    if (has(pkgJSON, "@std/esm")) {
+    if (has(pkgJSON, "esm")) {
       optionsFound = true
-      options = pkgJSON["@std/esm"]
-    } else if (has(pkgJSON, "@std") &&
-        has(pkgJSON["@std"], "esm")) {
-      optionsFound = true
-      options = pkgJSON["@std"].esm
+      options = pkgJSON["esm"]
     }
   }
 
@@ -405,9 +401,9 @@ function readInfo(dirPath, force) {
       pkgJSON = parseJSON(pkgJSON)
     }
 
-    // A package.json may have `@std/esm` in its "devDependencies" object
-    // because it expects another package or application to enable ESM loading
-    // in production, but needs `@std/esm` during development.
+    // A package.json may have `esm` in its "devDependencies" object because
+    // it expects another package or application to enable ESM loading in
+    // production, but needs `esm` during development.
     range =
       getRange(pkgJSON, "dependencies") ||
       getRange(pkgJSON, "peerDependencies")

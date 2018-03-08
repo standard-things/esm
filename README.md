@@ -1,4 +1,4 @@
-# @std/esm
+# esm
 
 This fast, small, zero-dependency package is all you need to enable
 ES modules in Node 6+ today!
@@ -10,37 +10,37 @@ for all the details.
 Getting started
 ---
 
-Run `npm i --save @std/esm` in your app or package directory.
+Run `npm i --save esm` in your app or package directory.
 
-There are three ways to enable ESM with `@std/esm`.
+There are three ways to enable ESM with `esm`.
 
 1. Enable ESM with a CJS bridge:
 
     **index.js**
     ```js
     // Provide options as a parameter, environment variable, or rc file.
-    require = require("@std/esm")(module/*, options*/)
+    require = require("esm")(module/*, options*/)
     module.exports = require("./main.mjs").default
     ```
 
 2. Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
     ```shell
-    node -r @std/esm main.mjs
+    node -r esm main.mjs
     ```
 
 3. Enable ESM in the Node REPL:
 
     ```shell
-    node -r @std/esm
+    node -r esm
     ```
 
     or upon entering:
 
     ```shell
     $ node
-    > require("@std/esm")
-    @std/esm enabled
+    > require("esm")
+    esm enabled
     ```
 
 *Note: All `"cjs"` options are [unlocked](#unlockables) in the Node REPL.*
@@ -48,7 +48,7 @@ There are three ways to enable ESM with `@std/esm`.
 Standard Features
 ---
 
-The `@std/esm` loader is as spec-compliant
+The `esm` loader is as spec-compliant
 as possible and follows Node’s [ESM rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
 
 :point_right: This means, by default, ESM requires the use of the `.mjs` file
@@ -56,7 +56,7 @@ extension.<br>
 :unlock: You can [unlock](#unlockables) ESM with the `.js` file extension using
 the `"js"` ESM mode.
 
-Out of the box `@std/esm` just works, no configuration necessary, and supports:
+Out of the box `esm` just works, no configuration necessary, and supports:
 
 * [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import) / [`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
 * [`import.meta`](https://github.com/tc39/proposal-import-meta)
@@ -73,15 +73,15 @@ Unlockables
 
 Unlock features with options specified as one of the following:
 
-* The `"@std/esm"` field in your package.json
+* The `"esm"` field in your package.json
 * [JSON6](https://github.com/d3x0r/json6) in an .esmrc or .esmrc.json file
 * JSON6 or file path in the `ESM_OPTIONS` environment variable
 * CJS/ESM in an .esmrc.js or .esmrc.mjs file
 
 Commonly used options may be specified in shorthand form:
 
-* `"@std/esm":"js"` is shorthand for `"@std/esm":{"mode":"js"}`
-* `"@std/esm":"cjs"` is shorthand for `"@std/esm":{"cjs":true,"mode":"js"}`
+* `"esm":"js"` is shorthand for `"esm":{"mode":"js"}`
+* `"esm":"cjs"` is shorthand for `"esm":{"cjs":true,"mode":"js"}`
 
 <table>
 <tr>
@@ -205,20 +205,20 @@ DevOpts
 
 Tips
 ---
-* Load `@std/esm` before
+* Load `esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register) v7+
-* Load `@std/esm` with the *“require”* option of
+* Load `esm` with the *“require”* option of
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules), and
   [`tape`](https://github.com/substack/tape#preloading-modules)
-* Load `@std/esm` with the `--node-arg=-r --node-arg=@std/esm` option of
+* Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
-* Load `@std/esm` with the `--node-args="-r @std/esm"` option of
+* Load `esm` with the `--node-args="-r esm"` option of
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
-* Load `@std/esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
-* Use `@std/esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
-* Use `"@std/esm":"cjs"` for the `--watch` and `--watch-extensions` options of
+* Load `esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
+* Use `esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
+* Use `"esm":"cjs"` for the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
-* Use `"@std/esm":"cjs"` for [`ava`](https://github.com/avajs/ava) and [`webpack`](https://github.com/webpack/webpack)
-* When in doubt, use `"@std/esm":"cjs"`
+* Use `"esm":"cjs"` for [`ava`](https://github.com/avajs/ava) and [`webpack`](https://github.com/webpack/webpack)
+* When in doubt, use `"esm":"cjs"`

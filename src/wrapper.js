@@ -1,4 +1,4 @@
-// This module is important for `@std/esm` versioning support and should be
+// This module is important for `esm` versioning support and should be
 // changed as little as possible. Please ensure any changes are backwards
 // compatible.
 
