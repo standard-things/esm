@@ -1,7 +1,6 @@
 # esm
 
-This fast, small, zero-dependency package is all you need to enable
-ES modules in Node 6+ today!
+A fast, small, zero-dependency package to enable ES modules in Node 6+!
 
 See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
 :book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
@@ -12,9 +11,9 @@ Getting started
 
 Run `npm i --save esm` in your app or package directory.
 
-There are three ways to enable ESM with `esm`.
+There are three ways to enable `esm`.
 
-1. Enable ESM with a CJS bridge:
+1. Enable `esm` with a CJS bridge:
 
     **index.js**
     ```js
@@ -23,13 +22,13 @@ There are three ways to enable ESM with `esm`.
     module.exports = require("./main.mjs").default
     ```
 
-2. Enable ESM in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+2. Enable `esm` in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
 
     ```shell
-    node -r esm main.mjs
+    node -r esm main.js
     ```
 
-3. Enable ESM in the Node REPL:
+3. Enable `esm` in the Node REPL:
 
     ```shell
     node -r esm
@@ -43,18 +42,13 @@ There are three ways to enable ESM with `esm`.
     esm enabled
     ```
 
-*Note: All `"cjs"` options are [unlocked](#unlockables) in the Node REPL.*
-
 Standard Features
 ---
 
-The `esm` loader is as spec-compliant
-as possible and follows Node’s [ESM rules](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md).
+The `esm` loader bridges the ESM of [today](https://babeljs.io/) to the
+ESM of [tomorrow](https://github.com/nodejs/modules).
 
-:point_right: This means, by default, ESM requires the use of the `.mjs` file
-extension.<br>
-:unlock: You can [unlock](#unlockables) ESM with the `.js` file extension using
-the `"auto"` ESM mode.
+:point_right: By default, :100: percent CJS interoperability is enabled so you can get stuff done fast.<br>
 
 Out of the box `esm` just works, no configuration necessary, and supports:
 
@@ -68,20 +62,15 @@ Out of the box `esm` just works, no configuration necessary, and supports:
 * Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
 * Node 6+ support
 
-Unlockables
+Options
 ---
 
-Unlock features with options specified as one of the following:
+Specify options with one of the following:
 
-* The `"esm"` field in your package.json
-* [JSON6](https://github.com/d3x0r/json6) in an .esmrc or .esmrc.json file
+* The `"esm"` field in your `package.json`
+* [JSON6](https://github.com/d3x0r/json6) in an `.esmrc` or `.esmrc.json` file
 * JSON6 or file path in the `ESM_OPTIONS` environment variable
-* CJS/ESM in an .esmrc.js or .esmrc.mjs file
-
-Commonly used options may be specified in shorthand form:
-
-* `"esm":"auto"` is shorthand for `"esm":{"mode":"auto"}`
-* `"esm":"cjs"` is shorthand for `"esm":{"cjs":true,"mode":"auto"}`
+* CJS/ESM in an `.esmrc.js` or `.esmrc.mjs` file
 
 <table>
 <tr>
@@ -92,17 +81,18 @@ Commonly used options may be specified in shorthand form:
   <td>
     <p>A string mode:</p>
     <ul>
-      <li><code>"all"</code> files as ESM</li>
-      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+      <li><code>"auto"</code> to detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+      <li><code>"all"</code> to treat all files as ESM</li>
+      <li><code>"strict"</code> to treat ESM **only** `.mjs` files as ESM</li>
     </ul>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"cjs":</code></td>
   <td>
-    <p>A boolean or object to unlock CJS features in ESM.</p>
+    <p>A boolean or object for toggling CJS features in ESM.</p>
     <details>
-      <summary>Unlockable Features</summary>
+      <summary>Features</summary>
       <table>
       <tr>
         <td colspan="2"><code>{</code></td>

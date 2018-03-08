@@ -1,7 +1,7 @@
 {
   "name": "esm",
   "version": "0.25.2",
-  "description": "Enable ES modules in Node today!",
+  "description": "Tomorrow's ESM, today.",
   "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",
   "license": "MIT",
