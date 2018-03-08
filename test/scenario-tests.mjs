@@ -13,9 +13,14 @@ const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
-function exec(filename, args) {
+const envAuto = {
+  ESM_OPTIONS: "{cjs:true,mode:'auto'}"
+}
+
+function exec(filename, args, env) {
   return execa(filename, args, {
-    cwd: testPath
+    cwd: testPath,
+    env
   })
 }
 
@@ -61,13 +66,11 @@ describe("scenarios", function () {
   it("should work with nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
 
-    const nycArgs = [
+    return exec("nyc", [
       "--cwd", dirPath,
       "-i", pkgPath,
       nodePath, dirPath
-    ]
-
-    return exec("nyc", nycArgs)
+    ])
   })
 
   it("should work with postcss", () =>
@@ -90,19 +93,15 @@ describe("scenarios", function () {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPattern = path.resolve(dirPath, "test.js")
 
-    const tscArgs = [
-      "--project", dirPath
-    ]
-
-    const nycArgs = [
-      "--cwd", dirPath,
-      "-i", pkgPath,
-      "ava", avaPattern
-    ]
-
     return Promise.resolve()
-      .then(() => exec("tsc", tscArgs))
-      .then(() => exec("nyc", nycArgs))
+      .then(() => exec("tsc", [
+        "--project", dirPath
+      ]))
+      .then(() => exec("nyc", [
+        "--cwd", dirPath,
+        "-i", pkgPath,
+        "ava", avaPattern
+      ]))
   })
 
   it("should work with babel and plugins (code)", () =>
@@ -119,35 +118,31 @@ describe("scenarios", function () {
 
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
     const mochaPattern = path.resolve(dirPath, "test.js")
 
-    const nycArgs = [
+    return exec("nyc", [
       "--cwd", dirPath,
       "-x", ".babelrc.js", "-x", "test.js",
-      "-i", pkgPath, "-i", "@babel/register", "-i", "@babel/polyfill",
+      "-i", cwdPath,
+      "-i", pkgPath,
+      "-i", "@babel/register",
+      "-i", "@babel/polyfill",
       "mocha", mochaPattern
-    ]
-
-    return Promise.resolve()
-      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
-      .then(() => exec("nyc", nycArgs))
-      .then(() => fs.removeSync(".esmrc"))
+    ], envAuto)
   })
 
   it("should work with chai, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/chai-mocha-nyc")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
     const mochaPattern = path.resolve(dirPath, "test.js")
 
-    const nycArgs = [
+    return exec("nyc", [
       "--cwd", dirPath,
+      "-i", cwdPath,
       "-i", pkgPath,
       "mocha", mochaPattern
-    ]
-
-    return Promise.resolve()
-      .then(() => fs.outputFileSync(".esmrc", "'cjs'"))
-      .then(() => exec("nyc", nycArgs))
-      .then(() => fs.removeSync(".esmrc"))
+    ], envAuto)
   })
 
   ;(canTestJest ? it : xit)(

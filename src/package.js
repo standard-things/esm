@@ -32,8 +32,8 @@ const {
 
 const {
   OPTIONS_MODE_ALL,
-  OPTIONS_MODE_JS,
-  OPTIONS_MODE_MJS,
+  OPTIONS_MODE_AUTO,
+  OPTIONS_MODE_STRICT,
   RANGE_ALL
 } = PACKAGE
 
@@ -46,6 +46,7 @@ const defaultOptions = {
   __proto__: null,
   cache: true,
   cjs: {
+    __proto__: null,
     cache: false,
     extensions: false,
     interop: false,
@@ -55,10 +56,25 @@ const defaultOptions = {
     vars: false
   },
   debug: false,
-  mode: "mjs",
+  mode: OPTIONS_MODE_STRICT,
   sourceMap: void 0,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
+
+const autoOptions = defaults({
+  __proto__: null,
+  cjs: {
+    __proto__: null,
+    cache: true,
+    extensions: true,
+    interop: true,
+    namedExports: true,
+    paths: true,
+    topLevelReturn: false,
+    vars: true
+  },
+  mode: "auto"
+}, defaultOptions)
 
 const defaultCJS = defaultOptions.cjs
 const cacheKey = JSON.stringify(defaultOptions)
@@ -226,18 +242,14 @@ function createOptions(options) {
     options.cjs = cjsOptions
   }
 
-  if (esmMode) {
-    options.mode = esmMode
-  }
-
   const { mode } = options
 
   if (mode === "all") {
     options.mode = OPTIONS_MODE_ALL
   } else if (mode === "auto") {
-    options.mode = OPTIONS_MODE_JS
+    options.mode = OPTIONS_MODE_AUTO
   } else {
-    options.mode = OPTIONS_MODE_MJS
+    options.mode = OPTIONS_MODE_STRICT
   }
 
   if (sourceMap !== void 0) {
@@ -344,10 +356,7 @@ function readInfo(dirPath, force) {
       options = readJSON6(optionsPath)
     } else {
       pkg =
-      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL, {
-        cjs: true,
-        mode: "auto"
-      })
+      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
       const { parsing, passthru } = moduleState
 
@@ -438,9 +447,13 @@ function readInfo(dirPath, force) {
 
 function toOptions(value) {
   if (typeof value === "string") {
-    return value === "cjs"
-      ? { __proto__: null, cjs: true, mode: "auto" }
-      : { __proto__: null, mode: value }
+    return { __proto__: null, mode: value }
+  }
+
+  if (value === void 0) {
+    const options = assign({ __proto__: null }, autoOptions)
+    options.cjs = assign({ __proto__: null }, autoOptions.cjs)
+    return options
   }
 
   return assign({ __proto__: null }, value)
@@ -451,7 +464,8 @@ Reflect.setPrototypeOf(Package.prototype, null)
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {
   cache: false,
-  mode: "cjs"
+  cjs: true,
+  mode: "auto"
 })
 
 export default Package

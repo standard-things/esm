@@ -22,7 +22,7 @@ const {
 } = CHAR_CODE
 
 const {
-  OPTIONS_MODE_JS
+  OPTIONS_MODE_AUTO
 } = PACKAGE
 
 const {
@@ -106,7 +106,7 @@ function resolveFilename(request, parent, isMain, options) {
     if (isMain ||
         (pkgOptions &&
          (pkgOptions.cjs.paths ||
-          pkgOptions.mode === OPTIONS_MODE_JS)) ||
+          pkgOptions.mode === OPTIONS_MODE_AUTO)) ||
         extname(foundPath) in extLookup) {
       return cache[cacheKey] = foundPath
     }
