@@ -204,8 +204,8 @@ const Compiler = {
   }
 }
 
-function createOptions(options) {
-  return defaults({ __proto__: null }, options, Compiler.defaultOptions)
+function createOptions(value) {
+  return defaults({ __proto__: null }, value, Compiler.defaultOptions)
 }
 
 export default Compiler
