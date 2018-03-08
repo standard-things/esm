@@ -58,9 +58,8 @@ const Parser = {
   }
 }
 
-function createOptions(options) {
-  options = defaults({ __proto__: null }, options, Parser.defaultOptions)
-
+function createOptions(value) {
+  const options = defaults({ __proto__: null }, value, Parser.defaultOptions)
   const { sourceType } = options
 
   options.sourceType = sourceTypeMap[sourceType] || sourceType
