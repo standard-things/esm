@@ -1,4 +1,6 @@
 {
+  cjs: false,
   debug: false,
+  mode: "strict",
   sourceMap: true
 }

@@ -4,7 +4,6 @@ import CHAR_CODE from "./constant/char-code.js"
 import PACKAGE from "./constant/package.js"
 
 import _findPath from "./module/_find-path.js"
-import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
@@ -44,6 +43,7 @@ const ExBuffer = __external__.Buffer
 
 const defaultOptions = {
   __proto__: null,
+  await: false,
   cache: true,
   cjs: {
     __proto__: null,
@@ -76,9 +76,14 @@ const autoOptions = defaults({
   mode: "auto"
 }, defaultOptions)
 
-const defaultCJS = defaultOptions.cjs
+const devOpts = [
+  "cache",
+  "debug",
+  "sourceMap",
+  "warnings"
+]
+
 const cacheKey = JSON.stringify(defaultOptions)
-const cjsKeys = keys(defaultCJS)
 const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
@@ -185,50 +190,59 @@ function cleanCache(cachePath) {
 }
 
 function createCJS(source) {
+  const defaultCJS = Package.defaultOptions.cjs
+  const names = keys(defaultCJS)
   const object = { __proto__: null }
 
-  if (isObjectLike(source)) {
-    for (const key of cjsKeys) {
-      object[key] = has(source, key)
-        ? !! source[key]
-        : defaultCJS[key]
+  if (source == null ||
+      isObjectLike(source)) {
+    for (const name of names) {
+      object[name] = has(source, name)
+        ? !! source[name]
+        : defaultCJS[name]
     }
   } else {
     const value = !! source
 
-    for (const key of cjsKeys) {
-      object[key] = value
+    for (const name of names) {
+      object[name] = value
     }
   }
 
   return object
 }
 
-function createOptions(options) {
-  let cjsOptions
-  let sourceMap
+function createOptions(value) {
+  const { defaultOptions } = Package
+  const names = []
 
-  options = toOptions(options)
+  let options = { __proto__: null }
 
-  const hasCJS = Reflect.has(options, "cjs")
+  if (typeof value === "string") {
+    names.push("mode")
+    options.mode = value
+  } else {
+    const possibleNames = keys(value)
 
-  if (hasCJS) {
-    cjsOptions = createCJS(options.cjs)
+    for (const name of possibleNames) {
+      if (Reflect.has(defaultOptions, name)) {
+        names.push(name)
+        options[name] = value[name]
+      } else if (name === "sourcemap" &&
+          possibleNames.indexOf("sourceMap") === -1) {
+        names.push("sourceMap")
+        options.sourceMap = !! value.sourcemap
+      }
+    }
   }
 
-  if (Reflect.has(options, "sourceMap")) {
-    sourceMap = options.sourceMap
-  } else if (Reflect.has(options, "sourcemap")) {
-    sourceMap = options.sourcemap
-  }
-
-  defaults(options, Package.defaultOptions)
-
-  if (typeof options.cache !== "string") {
-    options.cache = !! options.cache
-  }
-
-  if (cjsOptions) {
+  if (! names.length ||
+      names.every(isDevOpts)) {
+    defaults(options, autoOptions)
+    options.cjs = createCJS(autoOptions.cjs)
+  } else {
+    const cjsOptions = createCJS(options.cjs)
+    defaults(options, defaultOptions)
     options.cjs = cjsOptions
   }
 
@@ -242,9 +256,8 @@ function createOptions(options) {
     options.mode = OPTIONS_MODE_STRICT
   }
 
-  if (sourceMap !== void 0) {
-    options.sourceMap = !! sourceMap
-    Reflect.deleteProperty(options, "sourcemap")
+  if (typeof options.cache !== "string") {
+    options.cache = !! options.cache
   }
 
   options.debug = !! options.debug
@@ -324,6 +337,10 @@ function getRoot(dirPath) {
   return root[dirPath] = ancestorPath === dirname(ancestorPath)
     ? dirPath
     : ancestorPath
+}
+
+function isDevOpts(name) {
+  return devOpts.indexOf(name) !== -1
 }
 
 function readInfo(dirPath, force) {
@@ -433,20 +450,6 @@ function readInfo(dirPath, force) {
   }
 
   return new Package(dirPath, range, options)
-}
-
-function toOptions(value) {
-  if (typeof value === "string") {
-    return { __proto__: null, mode: value }
-  }
-
-  if (value === void 0) {
-    const options = assign({ __proto__: null }, autoOptions)
-    options.cjs = assign({ __proto__: null }, autoOptions.cjs)
-    return options
-  }
-
-  return assign({ __proto__: null }, value)
 }
 
 Reflect.setPrototypeOf(Package.prototype, null)
