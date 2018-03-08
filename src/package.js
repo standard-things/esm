@@ -206,21 +206,11 @@ function createCJS(source) {
 
 function createOptions(options) {
   let cjsOptions
-  let esmMode
   let sourceMap
 
   options = toOptions(options)
 
   const hasCJS = Reflect.has(options, "cjs")
-
-  if (Reflect.has(options, "mode") &&
-      options.mode === "cjs") {
-    esmMode = "auto"
-
-    if (! hasCJS) {
-      cjsOptions = createCJS(true)
-    }
-  }
 
   if (hasCJS) {
     cjsOptions = createCJS(options.cjs)
