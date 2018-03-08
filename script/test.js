@@ -79,6 +79,7 @@ function runTests(cached) {
   return execa(nodePath, nodeArgs, {
     cwd: testPath,
     env: {
+      ESM_OPTIONS: "{cjs:false,mode:'strict'}",
       HOME,
       NODE_ENV: NODE_ENV + (cached ? "-cached" : ""),
       NODE_PATH,

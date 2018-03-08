@@ -16,7 +16,7 @@ const {
 } = ENTRY
 
 const {
-  OPTIONS_MODE_MJS
+  OPTIONS_MODE_STRICT
 } = PACKAGE
 
 const {
@@ -35,7 +35,7 @@ function load(request, parent, isMain) {
       childEntry.type === TYPE_ESM) {
     const { options } = Entry.get(parent).package
 
-    if (options.mode === OPTIONS_MODE_MJS &&
+    if (options.mode === OPTIONS_MODE_STRICT &&
         ! options.cjs.vars) {
       throw new ERR_REQUIRE_ESM(child)
     }

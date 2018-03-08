@@ -35,7 +35,7 @@ const {
 
 const {
   OPTIONS_MODE_ALL,
-  OPTIONS_MODE_JS,
+  OPTIONS_MODE_AUTO,
   RANGE_ALL
 } = PACKAGE
 
@@ -78,7 +78,7 @@ function hook(Mod, parent) {
   }
 
   if (defaultOptions.mode === OPTIONS_MODE_ALL) {
-    defaultOptions.mode = OPTIONS_MODE_JS
+    defaultOptions.mode = OPTIONS_MODE_AUTO
   }
 
   defaultPkg.options = defaultOptions

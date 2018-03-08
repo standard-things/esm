@@ -34,7 +34,7 @@ const {
 
 const {
   OPTIONS_MODE_ALL,
-  OPTIONS_MODE_JS
+  OPTIONS_MODE_AUTO
 } = PACKAGE
 
 const {
@@ -53,7 +53,7 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (options.mode === OPTIONS_MODE_ALL) {
     sourceType = MODULE
-  } else if (options.mode === OPTIONS_MODE_JS) {
+  } else if (options.mode === OPTIONS_MODE_AUTO) {
     sourceType = UNAMBIGUOUS
   }
 

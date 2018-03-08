@@ -12,7 +12,6 @@ package-lock.json
 /build
 /node_modules
 /src/vendor
-/test/.esmrc
 /test/env/prefix/bin
 /test/env/prefix/node
 /test/fixture/scenario/ava-nyc-tsc/*.js
