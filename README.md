@@ -1,5 +1,7 @@
 # esm
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/standard-things/esm.svg)](https://greenkeeper.io/)
+
 This fast, small, zero-dependency package is all you need to enable
 ES modules in Node 6+ today!
 
