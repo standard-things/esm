@@ -1,7 +1,7 @@
 {
-  "name": "@std-esm-object",
+  "name": "esm-object",
   "private": true,
   "esm": {
-    "mode": "js"
+    "mode": "auto"
   }
 }

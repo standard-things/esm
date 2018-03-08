@@ -1,1 +1,1 @@
-export const mode = "js"
+export const mode = "auto"

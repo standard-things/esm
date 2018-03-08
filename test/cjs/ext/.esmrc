@@ -3,5 +3,5 @@
     paths: true
   },
   debug: true,
-  mode: "js"
+  mode: "auto"
 }

@@ -6,15 +6,15 @@ import mockIo from "mock-stdio"
 export default () => {
   return new Promise((resolve) => {
     const allRequire = makeRequire(module, { mode: "all" })
+    const autoRequire = makeRequire(module, { mode: "auto" })
     const cjsRequire = makeRequire(module, { cjs: true })
-    const jsRequire = makeRequire(module, { mode: "js" })
     const mjsRequire = makeRequire(module, { mode: "mjs" })
     const shorthandRequire = makeRequire(module, { mode: "cjs" })
     const warningsRequire = makeRequire(module, { cache: false, warnings: false })
 
     allRequire("./fixture/options/all")
+    autoRequire("./fixture/options/auto")
     cjsRequire("./fixture/options/cjs")
-    jsRequire("./fixture/options/js")
     mjsRequire("./fixture/options/mjs")
     shorthandRequire("./fixture/options/shorthand")
 

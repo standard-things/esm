@@ -54,7 +54,7 @@ as possible and follows Node’s [ESM rules](https://github.com/nodejs/node-eps/
 :point_right: This means, by default, ESM requires the use of the `.mjs` file
 extension.<br>
 :unlock: You can [unlock](#unlockables) ESM with the `.js` file extension using
-the `"js"` ESM mode.
+the `"auto"` ESM mode.
 
 Out of the box `esm` just works, no configuration necessary, and supports:
 
@@ -80,8 +80,8 @@ Unlock features with options specified as one of the following:
 
 Commonly used options may be specified in shorthand form:
 
-* `"esm":"js"` is shorthand for `"esm":{"mode":"js"}`
-* `"esm":"cjs"` is shorthand for `"esm":{"cjs":true,"mode":"js"}`
+* `"esm":"auto"` is shorthand for `"esm":{"mode":"auto"}`
+* `"esm":"cjs"` is shorthand for `"esm":{"cjs":true,"mode":"auto"}`
 
 <table>
 <tr>
@@ -93,7 +93,7 @@ Commonly used options may be specified in shorthand form:
     <p>A string mode:</p>
     <ul>
       <li><code>"all"</code> files as ESM</li>
-      <li><code>"js"</code> and other files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
+      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
     </ul>
   </td>
 </tr>

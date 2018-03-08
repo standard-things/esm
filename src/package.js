@@ -199,7 +199,7 @@ function createOptions(options) {
 
   if (Reflect.has(options, "mode") &&
       options.mode === "cjs") {
-    esmMode = "js"
+    esmMode = "auto"
 
     if (! hasCJS) {
       cjsOptions = createCJS(true)
@@ -234,7 +234,7 @@ function createOptions(options) {
 
   if (mode === "all") {
     options.mode = OPTIONS_MODE_ALL
-  } else if (mode === "js") {
+  } else if (mode === "auto") {
     options.mode = OPTIONS_MODE_JS
   } else {
     options.mode = OPTIONS_MODE_MJS
@@ -346,7 +346,7 @@ function readInfo(dirPath, force) {
       pkg =
       Package.cache[dirPath] = new Package(dirPath, RANGE_ALL, {
         cjs: true,
-        mode: "js"
+        mode: "auto"
       })
 
       const { parsing, passthru } = moduleState
@@ -439,7 +439,7 @@ function readInfo(dirPath, force) {
 function toOptions(value) {
   if (typeof value === "string") {
     return value === "cjs"
-      ? { __proto__: null, cjs: true, mode: "js" }
+      ? { __proto__: null, cjs: true, mode: "auto" }
       : { __proto__: null, mode: value }
   }
 
