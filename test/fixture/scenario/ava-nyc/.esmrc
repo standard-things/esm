@@ -1,4 +1,5 @@
 {
+  cjs: true,
   debug: true,
-  mode: "cjs"
+  mode: "auto"
 }
