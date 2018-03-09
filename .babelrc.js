@@ -35,12 +35,8 @@ module.exports = {
       debug: isTest,
       exclude: [
         "transform-async-to-generator",
-        "transform-classes",
         "transform-for-of",
         "transform-function-name",
-        "transform-object-super",
-        "transform-new-target",
-        "transform-regenerator"
       ],
       loose: true,
       modules: false,
