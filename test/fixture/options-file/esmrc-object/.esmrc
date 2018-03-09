@@ -1,4 +1,3 @@
 {
-  debug: true,
-  mode: "auto"
+  debug: true
 }

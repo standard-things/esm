@@ -1,4 +1,6 @@
 {
   await: true,
-  debug: true
+  cjs: false,
+  debug: true,
+  mode: "strict"
 }

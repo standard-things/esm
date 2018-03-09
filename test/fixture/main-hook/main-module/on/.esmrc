@@ -3,5 +3,6 @@
     cache: true,
     namedExports: true
   },
-  debug: true
+  debug: true,
+  mode: "strict"
 }

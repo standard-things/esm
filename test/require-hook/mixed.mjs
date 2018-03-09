@@ -5,14 +5,26 @@ import mockIo from "mock-stdio"
 
 export default () => {
   return new Promise((resolve) => {
-    const allRequire = makeRequire(module, { cjs: false, mode: "all" })
-    const autoRequire = makeRequire(module, { cjs: false, mode: "auto" })
-    const cjsRequire = makeRequire(module, { cjs: true, mode: "auto" })
-    const mjsRequire = makeRequire(module, { cjs: false, mode: "strict" })
-    const warningsRequire = makeRequire(module, { cache: false, warnings: false })
+    const allRequire = makeRequire(module, {
+      cjs: false,
+      mode: "all"
+    })
+
+    const cjsRequire = makeRequire(module, {})
+
+    const mjsRequire = makeRequire(module, {
+      cjs: false,
+      mode: "strict"
+    })
+
+    const warningsRequire = makeRequire(module, {
+      cache: false,
+      cjs: false,
+      mode: "strict",
+      warnings: false
+    })
 
     allRequire("./fixture/options/all")
-    autoRequire("./fixture/options/auto")
     cjsRequire("./fixture/options/cjs")
     mjsRequire("./fixture/options/mjs")
 

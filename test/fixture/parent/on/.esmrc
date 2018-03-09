@@ -3,6 +3,5 @@
     cache: true,
     vars: true
   },
-  debug: true,
-  mode: "auto"
+  debug: true
 }
