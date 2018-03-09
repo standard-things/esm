@@ -208,6 +208,7 @@ Tips
   [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
 * Load `esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
 * Use `esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
+* Use `esm` to load the webpack.config with the -r/--config-register option of [`webpack`](https://webpack.js.org/api/cli/) v4+ _([undocumented](https://github.com/webpack/webpack-cli/issues/282#issuecomment-369647076))_
 * Use `"esm":"cjs"` for the `--watch` and `--watch-extensions` options of
   [`mocha`](https://mochajs.org/#-w---watch)
 * Use `"esm":"cjs"` for [`ava`](https://github.com/avajs/ava) and [`webpack`](https://github.com/webpack/webpack)
