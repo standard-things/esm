@@ -61,7 +61,7 @@ const defaultOptions = {
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
 
-const autoOptions = defaults({
+const autoOptions = {
   __proto__: null,
   cjs: {
     __proto__: null,
@@ -74,14 +74,7 @@ const autoOptions = defaults({
     vars: true
   },
   mode: "auto"
-}, defaultOptions)
-
-const devOpts = [
-  "cache",
-  "debug",
-  "sourceMap",
-  "warnings"
-]
+}
 
 const cacheKey = JSON.stringify(defaultOptions)
 const searchExts = [".mjs", ".js", ".json"]
@@ -240,15 +233,17 @@ function createOptions(value) {
     }
   }
 
-  if (! names.length ||
-      names.every(isDevOpts)) {
-    defaults(options, autoOptions)
-    options.cjs = createCJS(autoOptions.cjs)
-  } else {
-    const cjsOptions = createCJS(options.cjs)
-    defaults(options, defaultOptions)
-    options.cjs = cjsOptions
+  if (names.indexOf("cjs") === -1) {
+    options.cjs = autoOptions.cjs
   }
+
+  if (names.indexOf("mode") === -1) {
+    options.mode = autoOptions.mode
+  }
+
+  const cjsOptions = createCJS(options.cjs)
+  defaults(options, defaultOptions)
+  options.cjs = cjsOptions
 
   const { mode } = options
 
@@ -341,10 +336,6 @@ function getRoot(dirPath) {
   return root[dirPath] = ancestorPath === dirname(ancestorPath)
     ? dirPath
     : ancestorPath
-}
-
-function isDevOpts(name) {
-  return devOpts.indexOf(name) !== -1
 }
 
 function readInfo(dirPath, force) {
@@ -461,8 +452,7 @@ Reflect.setPrototypeOf(Package.prototype, null)
 // Enable in-memory caching when compiling without a file path.
 Package.cache[""] = new Package("", version, {
   cache: false,
-  cjs: true,
-  mode: "auto"
+  cjs: true
 })
 
 export default Package
