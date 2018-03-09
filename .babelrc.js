@@ -22,10 +22,6 @@ module.exports = {
     ["@babel/transform-block-scoping", {
       throwIfClosureRequired: false
     }],
-    "@babel/transform-parameters",
-    ["@babel/transform-spread", {
-      loose: true
-    }],
     ["transform-for-of-as-array", {
       loose: true
     }]
