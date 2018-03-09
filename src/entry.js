@@ -9,6 +9,7 @@ import copyProperty from "./util/copy-property.js"
 import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
+import isMJS from "./util/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import proxyExports from "./util/proxy-exports.js"
@@ -239,7 +240,8 @@ class Entry {
     if (isESM &&
         ! Object.isSealed(exported)) {
       if (this.package.options.cjs.interop &&
-          ! has(this._namespace, "__esModule")) {
+          ! has(this._namespace, "__esModule") &&
+          ! isMJS(this.module)) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
 
@@ -473,7 +475,11 @@ function getExportByName(entry, setter, name) {
   const { _namespace } = entry
   const isESM = entry.type === TYPE_ESM
   const { namedExports } = entry.package.options.cjs
-  const parentNamedExports = setter.parent.package.options.cjs.namedExports
+  const { parent } = setter
+
+  const parentNamedExports =
+    parent.package.options.cjs.namedExports &&
+    ! isMJS(parent.module)
 
   const isScript =
     ! isESM &&

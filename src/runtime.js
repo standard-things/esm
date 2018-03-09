@@ -7,6 +7,7 @@ import _loadESM from "./module/esm/_load.js"
 import builtinEntries from "./builtin-entries.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
+import isMJS from "./util/is-mjs.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import moduleState from "./module/state.js"
@@ -215,7 +216,8 @@ function runESM(entry, moduleWrapper) {
 
   let result
 
-  if (entry.package.options.cjs.vars) {
+  if (entry.package.options.cjs.vars &&
+      ! isMJS(mod)) {
     const req = makeRequireFunction(mod)
 
     result = Reflect.apply(moduleWrapper, exported, [runtime, shared.unsafeContext, exported, req])

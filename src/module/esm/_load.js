@@ -10,6 +10,7 @@ import _load from "../_load.js"
 import getQueryHash from "../../util/get-query-hash.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isError from "../../util/is-error.js"
+import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
@@ -91,9 +92,12 @@ function load(request, parent, isMain, preload) {
     }
 
     if (! child.paths) {
-      child.paths = entry.package.options.cjs.paths
-        ? Module._nodeModulePaths(fromPath)
-        : moduleNodeModulePaths(fromPath)
+      if (entry.package.options.cjs.paths &&
+          ! isMJS(entry.module)) {
+        child.paths = Module._nodeModulePaths(fromPath)
+      } else {
+        child.paths = moduleNodeModulePaths(fromPath)
+      }
     }
 
     if (! entry.url) {

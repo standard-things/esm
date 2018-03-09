@@ -15,6 +15,7 @@ import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
 import isInspect from "../env/is-inspect.js"
+import isMJS from "../util/is-mjs.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import keys from "../util/keys.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -193,10 +194,13 @@ function tryCompileCJS(entry) {
 }
 
 function tryCompileESM(entry) {
-  const cjsVars = entry.package.options.cjs.vars
   const { compileData } = entry
   const mod = entry.module
   const { filename } = mod
+
+  const cjsVars =
+    entry.package.options.cjs.vars &&
+    ! isMJS(filename)
 
   let content =
     (compileData.topLevelReturn ? "return " : "") +

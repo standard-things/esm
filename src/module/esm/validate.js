@@ -3,6 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import _loadESM from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
+import isMJS from "../../util/is-mjs.js"
 
 const {
   STATE_PARSING_COMPLETED,
@@ -36,7 +37,9 @@ function validate(entry) {
     }
   }
 
-  const { namedExports } = entry.package.options.cjs
+  const namedExports =
+    entry.package.options.cjs.namedExports &&
+    ! isMJS(mod)
 
   // Validate requested child export names.
   for (const name in children) {
@@ -57,7 +60,9 @@ function validate(entry) {
 
     const childCompileData = childEntry.compileData
     const childExportStars = childCompileData.exportStars
-    const skipExportMissing = childEntry.package.options.cjs.vars
+    const skipExportMissing =
+      childEntry.package.options.cjs.vars &&
+      ! isMJS(childEntry.module)
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCompileData

@@ -3,6 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import Module from "../../module.js"
 
 import { extname } from "path"
+import isMJS from "../../util/is-mjs.js"
 import moduleState from "../state.js"
 
 const {
@@ -24,7 +25,8 @@ function loader(entry, preload) {
 
   if (ext === ".js" ||
       (parent &&
-       parent.package.options.cjs.extensions)) {
+       parent.package.options.cjs.extensions &&
+       ! isMJS(parent))) {
     _extensions = Module._extensions
   }
 

@@ -10,6 +10,7 @@ import Entry from "../../entry.js"
 import _load from "./_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
+import isMJS from "../../util/is-mjs.js"
 
 const {
   TYPE_ESM
@@ -36,7 +37,8 @@ function load(request, parent, isMain) {
     const { options } = Entry.get(parent).package
 
     if (options.mode === OPTIONS_MODE_STRICT &&
-        ! options.cjs.vars) {
+        (! options.cjs.vars ||
+         isMJS(parent))) {
       throw new ERR_REQUIRE_ESM(child)
     }
   }
