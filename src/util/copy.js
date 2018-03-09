@@ -7,11 +7,6 @@ function copy(object) {
 
   while (++i < argCount) {
     const source = arguments[i]
-
-    if (source == null) {
-      continue
-    }
-
     const names = keysAll(source)
 
     for (const name of names) {
