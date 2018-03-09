@@ -194,7 +194,7 @@ function createCJS(source) {
   const names = keys(defaultCJS)
   const object = { __proto__: null }
 
-  if (source == null ||
+  if (source === void 0 ||
       isObjectLike(source)) {
     for (const name of names) {
       object[name] = has(source, name)
@@ -230,8 +230,12 @@ function createOptions(value) {
         options[name] = value[name]
       } else if (name === "sourcemap" &&
           possibleNames.indexOf("sourceMap") === -1) {
-        names.push("sourceMap")
-        options.sourceMap = !! value.sourcemap
+        const { sourcemap } = value
+
+        if (sourcemap !== void 0) {
+          names.push("sourceMap")
+          options.sourceMap = !! sourcemap
+        }
       }
     }
   }
