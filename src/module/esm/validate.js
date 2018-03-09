@@ -52,7 +52,9 @@ function validate(entry) {
           requestedExportNames.length &&
           (requestedExportNames.length > 1 ||
            requestedExportNames[0] !== "default")) {
-        throw new ERR_EXPORT_MISSING(child, requestedExportNames[0])
+        throw new ERR_EXPORT_MISSING(child, requestedExportNames.find((requestedName) =>
+          requestedName !== "default"
+        ))
       }
 
       continue
