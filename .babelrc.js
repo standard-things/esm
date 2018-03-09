@@ -16,8 +16,15 @@ module.exports = {
     ["@babel/proposal-class-properties", {
       loose: true
     }],
+    ["@babel/transform-arrow-functions", {
+      spec: false
+    }],
     ["@babel/transform-block-scoping", {
       throwIfClosureRequired: false
+    }],
+    "@babel/transform-parameters",
+    ["@babel/transform-spread", {
+      loose: true
     }],
     ["transform-for-of-as-array", {
       loose: true
