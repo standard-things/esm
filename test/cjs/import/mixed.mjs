@@ -15,10 +15,7 @@ export default () => {
   })
 
   const defNs = createNamespace({
-    d: "d",
-    default: { d: "d", e: "e", f: "f" },
-    e: "e",
-    f: "f"
+    default: { d: "d", e: "e", f: "f" }
   })
 
   assert.strictEqual(abc1, "default")

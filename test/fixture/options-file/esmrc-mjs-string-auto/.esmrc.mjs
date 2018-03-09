@@ -1,3 +1,1 @@
-"use strict"
-
-module.exports = "auto"
+export default "auto"

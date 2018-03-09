@@ -2,5 +2,6 @@
   cjs: {
     vars: true
   },
-  debug: true
+  debug: true,
+  mode: "auto"
 }

@@ -1,3 +1,3 @@
-import { log } from "console"
+import c from "console"
 
-log("main-hook:true")
+c.log("main-hook:true")

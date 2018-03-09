@@ -1,6 +1,6 @@
-import { log } from "console"
-import process from "process"
+import c from "console"
+import p from "process"
 
-const actual = Reflect.has(process, "mainModule")
+const actual = Reflect.has(p, "mainModule")
 
-log("main-module:" + actual)
+c.log("main-module:" + actual)

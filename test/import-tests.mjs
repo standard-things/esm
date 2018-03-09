@@ -14,7 +14,7 @@ describe("import declarations", () => {
   )
 
   it("should support CJS modules setting `module.exports`", () =>
-    import("./cjs/import/exports.mjs")
+    import("./cjs/import/exports.js")
       .then((ns) => ns.default())
   )
 
@@ -31,7 +31,7 @@ describe("import declarations", () => {
 
   ;(canTestLiveBinding ? it : xit)(
   "should support live binding of named exports for CJS modules", () =>
-    import("./cjs/import/live.mjs")
+    import("./cjs/import/live.js")
       .then((ns) => ns.default())
   )
 })

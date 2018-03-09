@@ -1,4 +1,5 @@
 "use strict"
 
 require = require("../../../../")(module)
-module.exports = require("./math.mjs")
+module.exports = require("./math-esm.js")
+

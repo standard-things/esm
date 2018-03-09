@@ -7,7 +7,7 @@ describe("setters", () => {
   )
 
   it("should be called for untouched CJS modules", () =>
-    import("./setter/untouched.mjs")
+    import("./setter/untouched")
       .then((ns) => ns.default())
   )
 })

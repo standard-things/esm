@@ -1,5 +1,8 @@
 {
-  cjs: true,
+  cjs: {
+    interop: true,
+    namedExports: true
+  },
   debug: true,
   mode: "auto"
 }

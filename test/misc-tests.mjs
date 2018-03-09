@@ -679,7 +679,7 @@ describe("Node rules", () => {
   )
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs.interop`', () =>
-    import("./cjs/export/pseudo.mjs")
+    import("./cjs/export/pseudo.js")
       .then((ns) => ns.default())
   )
 })

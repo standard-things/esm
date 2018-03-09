@@ -5,16 +5,13 @@ import defaultArray, * as nsArray from "../../fixture/cjs/export/array.js"
 import defaultClass, * as nsClass from "../../fixture/cjs/export/class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/export/default.js"
 import defaultEmpty, * as nsEmpty from "../../fixture/cjs/export/empty.js"
-import defaultExports from "../../fixture/cjs/export/default-exports.mjs"
 import defaultFunction, { a as aOfFunction } from "../../fixture/cjs/export/function.js"
 import defaultNull, * as nsNull from "../../fixture/cjs/export/null.js"
 import defaultNumber, * as nsNumber from "../../fixture/cjs/export/number.js"
 import defaultObject, { a as aOfObject } from "../../fixture/cjs/export/object.js"
-import defaultOfExports, { a as aOfExports } from "../../fixture/cjs/export/exports.mjs"
 import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/export/pseudo.js"
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/export/undefined.js"
 import * as nsEmptyPseudo from "../../fixture/cjs/export/pseudo-empty.js"
-import * as nsOfExports from "../../fixture/cjs/export/exports.mjs"
 import * as nsPseudo from "../../fixture/cjs/export/pseudo.js"
 import * as nsFunction from "../../fixture/cjs/export/function.js"
 import * as nsSafe from "../../fixture/cjs/export/get-set.js"
@@ -48,11 +45,6 @@ export default () => {
   assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
 
-  ns = createNamespace({ a: "a", b: "b", default: "default" })
-  assert.strictEqual(aOfExports, "a")
-  assert.strictEqual(defaultOfExports, "default")
-  assert.deepStrictEqual(nsOfExports, ns)
-
   ns = createNamespace({ a: "a", default: "default" })
   assert.strictEqual(aOfPseudo, "a")
   assert.strictEqual(defaultPseudo, "default")
@@ -66,8 +58,7 @@ export default () => {
   assert.deepStrictEqual(nsEmpty, ns)
   assert.deepStrictEqual(nsEmptyPseudo, ns)
 
-  const objects = [defaultEmpty, defaultExports]
-  assert.ok(objects.every(isPlainObject))
+  assert.ok(isPlainObject(defaultEmpty))
 
   assert.strictEqual(nsSafe.safe, "safe get")
 }

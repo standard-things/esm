@@ -3,7 +3,7 @@ import test from "ava"
 import cjsMath, {
   add as cjsAdd,
   addBound as cjsAddBound
-} from "./math.js"
+} from "./math-cjs.js"
 
 import esmMath, {
   add as esmAdd,
