@@ -1,6 +1,5 @@
 {
   await: true,
   cjs: false,
-  debug: true,
-  mode: "strict"
+  debug: true
 }

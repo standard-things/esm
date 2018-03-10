@@ -313,6 +313,10 @@ function useAsyncWrapper(entry) {
       return true
     }
 
+    if (isMJS(entry.module)) {
+      return false
+    }
+
     const { exportSpecifiers } = entry.compileData
 
     if (! exportSpecifiers ||
