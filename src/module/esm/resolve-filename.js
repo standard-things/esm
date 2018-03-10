@@ -12,6 +12,7 @@ import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
 import hasEncodedSlash from "../../util/has-encoded-slash.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
+import isMJS from "../../util/is-mjs.js"
 import isObject from "../../util/is-object.js"
 import isRelativePath from "../../util/is-relative-path.js"
 import parseURL from "../../util/parse-url.js"
@@ -66,6 +67,20 @@ function resolveFilename(request, parent, isMain, options) {
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
 
+  let autoMode =
+    pkgOptions &&
+    pkgOptions.mode === OPTIONS_MODE_AUTO
+
+  let cjsPaths =
+    pkgOptions &&
+    pkgOptions.cjs.paths
+
+  if ((autoMode || cjsPaths) &&
+      isMJS(parent)) {
+    autoMode =
+    cjsPaths = false
+  }
+
   let foundPath
   let extLookup = esmExtsLookup
   let skipWarnings = false
@@ -90,14 +105,9 @@ function resolveFilename(request, parent, isMain, options) {
     } else {
       // Prevent resolving non-local dependencies:
       // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      let skipGlobalPaths = true
-
-      if (pkgOptions &&
-          pkgOptions.cjs.paths) {
-        skipGlobalPaths = false
-      }
-
       const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
+      const skipGlobalPaths = ! cjsPaths
+
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
     }
   }
@@ -105,8 +115,7 @@ function resolveFilename(request, parent, isMain, options) {
   if (foundPath) {
     if (isMain ||
         (pkgOptions &&
-         (pkgOptions.cjs.paths ||
-          pkgOptions.mode === OPTIONS_MODE_AUTO)) ||
+         (autoMode || cjsPaths)) ||
         extname(foundPath) in extLookup) {
       return cache[cacheKey] = foundPath
     }

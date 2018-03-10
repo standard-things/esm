@@ -28,12 +28,17 @@ function load(request, parent, isMain, preload) {
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-
-  const filename = parentPkgOptions && parentPkgOptions.cjs.paths
-    ? Module._resolveFilename(request, parent, isMain)
-    : resolveFilename(request, parent, isMain)
-
   const queryHash = getQueryHash(request)
+
+  let filename
+
+  if (parentPkgOptions &&
+      parentPkgOptions.cjs.paths &&
+      ! isMJS(parent)) {
+    filename = Module._resolveFilename(request, parent, isMain)
+  } else {
+    filename = resolveFilename(request, parent, isMain)
+  }
 
   request = filename + queryHash
 

@@ -26,7 +26,7 @@ describe("file extension", () => {
       .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
-  it("should not error extensionless files with dynamic import in ESM with `options.cjs.paths`", () =>
+  it("should error loading extensionless files with dynamic import in ESM with `options.cjs.paths`", () =>
     import("./cjs/ext/no-ext.mjs")
       .then((ns) => ns.default())
   )
@@ -47,7 +47,7 @@ describe("file extension", () => {
       .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
-  it("should not error loading unknown extensions with dynamic import in ESM with `options.cjs.paths`", () =>
+  it("should error loading unknown extensions with dynamic import in ESM with `options.cjs.paths`", () =>
     import("./cjs/ext/unknown.mjs")
       .then((ns) => ns.default())
   )
