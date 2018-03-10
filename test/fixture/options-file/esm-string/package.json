@@ -1,0 +1,5 @@
+{
+  "name": "esm-string",
+  "private": true,
+  "esm": "all"
+}

@@ -1,5 +1,6 @@
 "use strict"
 
 module.exports = {
-  mode: "auto"
+  debug: true,
+  mode: "all"
 }

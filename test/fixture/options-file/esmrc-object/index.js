@@ -1,1 +1,1 @@
-export {}
+const await = 1

@@ -127,43 +127,61 @@ describe("package.json", () => {
   )
 
   it("should support .esmrc options", () =>
-    Promise.all([
+    [
       "./fixture/options-file/esmrc-object",
-      "./fixture/options-file/esmrc-string-auto"
+      "./fixture/options-file/esmrc-string"
     ]
-    .map((request) => import(request)))
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(false))
+        .catch((e) => assert.ok(e instanceof SyntaxError))
+    , Promise.resolve())
   )
 
   it("should support .esmrc.json options", () =>
-    Promise.all([
+    [
       "./fixture/options-file/esmrc-json-object",
-      "./fixture/options-file/esmrc-json-string-auto"
+      "./fixture/options-file/esmrc-json-string"
     ]
-    .map((request) => import(request)))
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(false))
+        .catch((e) => assert.ok(e instanceof SyntaxError))
+    , Promise.resolve())
   )
 
   it("should support .esmrc.js options", () =>
-    Promise.all([
+    [
       "./fixture/options-file/esmrc-js-object",
-      "./fixture/options-file/esmrc-js-string-auto"
+      "./fixture/options-file/esmrc-js-string"
     ]
-    .map((request) => import(request)))
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(false))
+        .catch((e) => assert.ok(e instanceof SyntaxError))
+    , Promise.resolve())
   )
 
   it("should support .esmrc.mjs options", () =>
-    Promise.all([
-      "./fixture/options-file/esmrc-mjs-object",
-      "./fixture/options-file/esmrc-mjs-string-auto"
-    ]
-    .map((request) => import(request)))
+    import("./fixture/options-file/esmrc-mjs")
+      .then(() => assert.ok(false))
+      .catch((e) => assert.ok(e instanceof SyntaxError))
   )
 
   it("should support esm package options", () =>
-    Promise.all([
+    [
       "./fixture/options-file/esm-object",
-      "./fixture/options-file/esm-string-auto"
+      "./fixture/options-file/esm-string"
     ]
-    .map((request) => import(request)))
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(false))
+        .catch((e) => assert.ok(e instanceof SyntaxError))
+    , Promise.resolve())
   )
 
   it("should apply .esmrc over package.json options", () =>

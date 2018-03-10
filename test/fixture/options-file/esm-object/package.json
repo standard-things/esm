@@ -2,6 +2,7 @@
   "name": "esm-object",
   "private": true,
   "esm": {
-    "mode": "auto"
+    "debug": true,
+    "mode": "all"
   }
 }
