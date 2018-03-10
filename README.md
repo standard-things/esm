@@ -82,9 +82,9 @@ Specify options with one of the following:
   <td>
     <p>A string mode:</p>
     <ul>
-      <li><code>"auto"</code> to detect <code>.mjs</code> files or files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
-      <li><code>"all"</code> to treat all files as ESM</li>
-      <li><code>"strict"</code> to treat **only** <code>.mjs</code> files as ESM</li>
+      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>, <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
+      <li><code>"all"</code> script files are treated as ESM</li>
+      <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM</li>
     </ul>
   </td>
 </tr>
