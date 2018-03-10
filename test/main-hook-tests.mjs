@@ -92,13 +92,13 @@ describe("main hook", function () {
       return
     }
 
-    const execPath = path.resolve(testPath, "fixture/options/env")
+    const execPath = path.resolve(testPath, "fixture/options/env-cache")
     const cachePath = path.resolve(execPath, ".cache")
 
     const ESM_OPTIONS =
       "{cache:'" +
       cachePath.replace(/\\/g, "\\\\") +
-      "',cjs:0,mode:'all'}"
+      "'}"
 
     return runMain(execPath, { ESM_OPTIONS })
       .then(() => {
