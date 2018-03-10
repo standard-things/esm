@@ -13,13 +13,6 @@ import unwrapProxy from "./util/unwrap-proxy.js"
 
 const ExObject = __external__.Object
 
-const customInspectDescriptor = {
-  __proto__: null,
-  configurable: true,
-  value: true,
-  writable: true
-}
-
 function init() {
   const builtinEntries = { __proto__: null }
 
@@ -40,7 +33,15 @@ function init() {
       }
     })
 
-    Reflect.defineProperty(exported, shared.symbol.inspect, customInspectDescriptor)
+    // Defining a truthy, but non-function value, for `customInspectSymbol`
+    // will inform builtin `inspect()` to bypass the deprecation warning for
+    // the custom `util.inspect()` function when inspecting `util`.
+    Reflect.defineProperty(exported, shared.symbol.inspect, {
+      __proto__: null,
+      configurable: true,
+      value: true,
+      writable: true
+    })
 
     return exported
   }

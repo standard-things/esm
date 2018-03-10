@@ -238,6 +238,9 @@ function hook(vm) {
         const _inspect = util.inspect
         const { inspect } = builtinEntries.util.module.exports
 
+        // Defining a truthy, but non-function value, for `customInspectSymbol`
+        // will inform builtin `inspect()` to bypass the deprecation warning for
+        // the custom `util.inspect()` function when inspecting `util`.
         Reflect.defineProperty(util, shared.symbol.inspect, {
           __proto__: null,
           configurable: true,
