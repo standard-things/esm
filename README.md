@@ -42,7 +42,7 @@ There are three ways to enable `esm`.
     esm enabled
     ```
 
-Standard Features
+Features
 ---
 
 The `esm` loader bridges the ESM of [today](https://babeljs.io/) to the
