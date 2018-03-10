@@ -154,11 +154,11 @@ describe("main hook", function () {
     Promise
       .resolve()
       .then(() =>
-        runMain("./fixture/ext/no-ext-js")
+        runMain("./fixture/ext/no-ext-cjs")
           .then((result) => assert.strictEqual(result.stderr, ""))
       )
       .then(() =>
-        runMain("./fixture/ext/no-ext-mjs")
+        runMain("./fixture/ext/no-ext-esm")
           .then((result) => assert.ok(result.stderr))
       )
   )

@@ -3,7 +3,7 @@ import require from "./require.js"
 
 describe("file extension", () => {
   it("should not error loading extensionless files with `require`", () => {
-    require("./fixture/ext/no-ext-js")
+    require("./fixture/ext/no-ext-cjs")
   })
 
   it("should not error loading unknown extensions with `require`", () => {
@@ -21,7 +21,7 @@ describe("file extension", () => {
   )
 
   it("should error loading extensionless files with dynamic import in ESM", () =>
-    import("./fixture/ext/no-ext-mjs")
+    import("./fixture/ext/no-ext-esm")
       .then(() => assert.ok(false))
       .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )

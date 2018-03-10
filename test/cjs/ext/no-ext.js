@@ -3,5 +3,5 @@
 const assert = require("assert")
 
 module.exports = () => {
-  return import("../../fixture/cjs/ext/no-ext-js")
+  return import("../../fixture/cjs/ext/no-ext-cjs")
 }
