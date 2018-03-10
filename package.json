@@ -69,7 +69,7 @@
     "trash": "^4.3.0",
     "typescript": "^2.6.1",
     "uglify-es": "^3.3.10",
-    "uglifyjs-webpack-plugin": "^1.2.2",
+    "uglifyjs-webpack-plugin": "^1.2.3",
     "webpack": "^3.10.0",
     "webpack-bundle-analyzer": "^2.10.1",
     "webpack-common-shake": "^1.5.3",
