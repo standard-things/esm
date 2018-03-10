@@ -9,6 +9,7 @@ import assign from "./util/assign.js"
 import getCacheFileName from "./util/get-cache-file-name.js"
 import has from "./util/has.js"
 import isCacheFileName from "./util/is-cache-file-name.js"
+import isMJS from "./util/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
 import { resolve } from "path"
@@ -175,19 +176,25 @@ function removeExpired(cachePath, cacheName) {
 }
 
 function toCompileOptions(entry, options) {
+  const { runtimeName } = entry
+
+  const cjs = isMJS(entry.module)
+    ? void 0
+    : entry.package.options.cjs
+
   if (options.eval) {
     return {
       __proto__: null,
-      cjs: entry.package.options.cjs,
-      runtimeName: entry.runtimeName
+      cjs,
+      runtimeName
     }
   }
 
   return {
     __proto__: null,
-    cjs: entry.package.options.cjs,
+    cjs,
     hint: options.hint,
-    runtimeName: entry.runtimeName,
+    runtimeName,
     sourceType: options.sourceType,
     strict: options.strict,
     var: options.var
