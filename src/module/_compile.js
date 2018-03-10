@@ -52,18 +52,13 @@ function compile(caller, entry, content, filename, fallback) {
   let hint = SCRIPT
   let sourceType = SCRIPT
 
-  if (options.mode === OPTIONS_MODE_ALL) {
+  if (extname(filename) === ".mjs") {
+    hint = MODULE
+    sourceType = MODULE
+  } else if (options.mode === OPTIONS_MODE_ALL) {
     sourceType = MODULE
   } else if (options.mode === OPTIONS_MODE_AUTO) {
     sourceType = UNAMBIGUOUS
-  }
-
-  if (extname(filename) === ".mjs") {
-    hint = MODULE
-
-    if (sourceType === SCRIPT) {
-      sourceType = MODULE
-    }
   }
 
   const pkg = entry.package
