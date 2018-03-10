@@ -197,7 +197,7 @@ DevOpts
 Tips
 ---
 * Load `esm` before
-  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register) v7+
+  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
 * Load `esm` with the *“require”* option of
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
