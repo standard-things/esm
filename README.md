@@ -19,7 +19,7 @@ There are three ways to enable `esm`.
     ```js
     // Provide options as a parameter, environment variable, or rc file.
     require = require("esm")(module/*, options*/)
-    module.exports = require("./main.mjs").default
+    module.exports = require("./main.js").default
     ```
 
 2. Enable `esm` in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
