@@ -113,9 +113,9 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   if (foundPath) {
-    if (isMain ||
-        (pkgOptions &&
-         (autoMode || cjsPaths)) ||
+    if (autoMode ||
+        cjsPaths ||
+        isMain ||
         extname(foundPath) in extLookup) {
       return cache[cacheKey] = foundPath
     }
