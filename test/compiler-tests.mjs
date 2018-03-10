@@ -79,6 +79,7 @@ describe("compiler", () => {
       { code: "1+2", sourceType: SCRIPT },
       { code: "1+2//import", sourceType: SCRIPT },
       { code: "1+2//import.meta", sourceType: SCRIPT },
+      { code: "return 1+2//eval", sourceType: SCRIPT },
       { code: "1+2", hint: MODULE, sourceType: MODULE },
       { code: '"use module";1+2', sourceType: MODULE },
       { code: "'use module';1+2", hint: MODULE, sourceType: MODULE },

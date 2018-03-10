@@ -86,7 +86,7 @@ const Compiler = {
       return result
     }
 
-    const allowReturnOutsideFunction =
+    let allowReturnOutsideFunction =
       options.cjs.topLevelReturn ||
       sourceType === SCRIPT
 
@@ -106,7 +106,11 @@ const Compiler = {
 
     if (threw &&
         sourceType === UNAMBIGUOUS) {
-      sourceType = parserOptions.sourceType = SCRIPT
+      allowReturnOutsideFunction =
+      parserOptions.allowReturnOutsideFunction = true
+
+      sourceType =
+      parserOptions.sourceType = SCRIPT
 
       try {
         ast = Parser.parse(code, parserOptions)
