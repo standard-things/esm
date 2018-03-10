@@ -48,7 +48,8 @@ Standard Features
 The `esm` loader bridges the ESM of [today](https://babeljs.io/) to the
 ESM of [tomorrow](https://github.com/nodejs/modules).
 
-:point_right: By default, :100: percent CJS interoperability is enabled so you can get stuff done fast.<br>
+:clap: By default, :100: percent CJS interoperability is enabled so you can get stuff done fast.<br>
+:lock: `.mjs` files are limited to basic functionality without support for `esm` options.
 
 Out of the box `esm` just works, no configuration necessary, and supports:
 
@@ -83,7 +84,7 @@ Specify options with one of the following:
     <ul>
       <li><code>"auto"</code> to detect <code>.mjs</code> files or files with <code>import</code>, <code>import.meta</code>, <code>export</code>, or <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a> as ESM</li>
       <li><code>"all"</code> to treat all files as ESM</li>
-      <li><code>"strict"</code> to treat ESM **only** <code>.mjs</code> files as ESM</li>
+      <li><code>"strict"</code> to treat **only** <code>.mjs</code> files as ESM</li>
     </ul>
   </td>
 </tr>
