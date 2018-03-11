@@ -14,9 +14,11 @@ addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
 
 addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
 addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
+addNodeError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
 addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
 addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
 addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
+addNodeError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
 addNodeError("MODULE_NOT_FOUND", missingCJS, ExError)
 
@@ -77,6 +79,14 @@ function createNodeClass(Super, code) {
   }
 }
 
+function truncInspect(value) {
+  const inspected = inspect(value)
+
+  return inspected.length > 128
+    ? inspected.slice(0, 128) + "..."
+    : inspected
+}
+
 function exportMissing(request, exportName) {
   const moduleName = getModuleURL(request)
 
@@ -100,13 +110,12 @@ function invalidArgType(argName, expected, actual) {
 }
 
 function invalidArgValue(argName, value, reason = "is invalid") {
-  let inspected = inspect(value)
+  return "The argument '" + argName + "' " + reason +
+    ". Received " + truncInspect(value)
+}
 
-  if (inspected.length > 128) {
-    inspected = inspected.slice(0, 128) + "..."
-  }
-
-  return "The argument '" + argName + "' " + reason + ". Received " + inspected
+function invalidPkgMode(mode) {
+  return "The ESM option 'mode' is invalid. Received " + truncInspect(mode)
 }
 
 function invalidProtocol(protocol, expected) {
@@ -129,6 +138,10 @@ function requireESM(request) {
 
 function unknownFileExtension(filename) {
   return "Unknown file extension: " + filename
+}
+
+function unknownPkgOption(optionName) {
+  return "Unknown ESM option: " + optionName
 }
 
 export default errors

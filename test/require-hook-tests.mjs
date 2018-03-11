@@ -35,4 +35,9 @@ describe("require hook", () => {
     import("./require-hook/mixed.mjs")
       .then((ns) => ns.default())
   )
+
+  it("should throw errors for invalid options", () =>
+    import("./require-hook/invalid-options.mjs")
+      .then((ns) => ns.default())
+  )
 })

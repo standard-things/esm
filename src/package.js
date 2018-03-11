@@ -5,6 +5,7 @@ import PACKAGE from "./constant/package.js"
 
 import _findPath from "./module/_find-path.js"
 import defaults from "./util/defaults.js"
+import errors from "./errors.js"
 import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
@@ -36,6 +37,11 @@ const {
   RANGE_ALL
 } = PACKAGE
 
+const {
+  ERR_INVALID_ESM_MODE,
+  ERR_UNKNOWN_ESM_OPTION
+} = errors
+
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
 
@@ -56,7 +62,7 @@ const defaultOptions = {
     vars: false
   },
   debug: false,
-  mode: OPTIONS_MODE_STRICT,
+  mode: "strict",
   sourceMap: void 0,
   warnings: (process.env && process.env.NODE_ENV) !== "production"
 }
@@ -229,6 +235,8 @@ function createOptions(value) {
           names.push("sourceMap")
           options.sourceMap = !! sourcemap
         }
+      } else {
+        throw new ERR_UNKNOWN_ESM_OPTION(name)
       }
     }
   }
@@ -251,8 +259,10 @@ function createOptions(value) {
     options.mode = OPTIONS_MODE_ALL
   } else if (mode === "auto") {
     options.mode = OPTIONS_MODE_AUTO
-  } else {
+  } else if (mode === "strict") {
     options.mode = OPTIONS_MODE_STRICT
+  } else {
+    throw new ERR_INVALID_ESM_MODE(mode)
   }
 
   if (typeof options.cache !== "string") {
