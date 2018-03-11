@@ -1,12 +1,6 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
-const { Script } = require("vm")
-const { createHash } = require("crypto")
-const { inspect } = require("util")
-const { resolve } = require("path")
-
 // Guard against mocked environments (e.g. Jest).
 const useBuiltins = module.constructor.length > 1
 
@@ -18,6 +12,12 @@ const nodeVersion = process.version
 const { defineProperty } = Reflect
 const { freeze } = Object
 const { runInNewContext, runInThisContext } = Script.prototype
+
+const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
+const { Script } = require("vm")
+const { createHash } = require("crypto")
+const { inspect } = require("util")
+const { resolve } = require("path")
 
 const Module = useBuiltins ? module.constructor : require("module")
 const esmMod = new Module(module.id, null)
