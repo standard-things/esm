@@ -241,7 +241,7 @@ function hook(vm) {
         // Defining a truthy, but non-function value, for `customInspectSymbol`
         // will inform builtin `inspect()` to bypass the deprecation warning for
         // the custom `util.inspect()` function when inspecting `util`.
-        Reflect.defineProperty(util, shared.symbol.inspect, {
+        Reflect.defineProperty(util, shared.customInspectKey, {
           __proto__: null,
           configurable: true,
           value: true,

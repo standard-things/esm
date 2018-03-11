@@ -36,7 +36,7 @@ function init() {
     // Defining a truthy, but non-function value, for `customInspectSymbol`
     // will inform builtin `inspect()` to bypass the deprecation warning for
     // the custom `util.inspect()` function when inspecting `util`.
-    Reflect.defineProperty(exported, shared.symbol.inspect, {
+    Reflect.defineProperty(exported, shared.customInspectKey, {
       __proto__: null,
       configurable: true,
       value: true,

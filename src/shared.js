@@ -104,6 +104,14 @@ if (__shared__) {
       : binding.util.arrow_message_private_symbol
   })
 
+  setDeferred(shared, "customInspectKey", () => {
+    const customInspectSymbol = shared.symbol.inspect
+
+    return typeof customInspectSymbol === "symbol"
+      ? customInspectSymbol
+      : "inspect"
+  })
+
   setDeferred(shared, "decoratedSymbol", () => {
     return satisfies(shared.process.version, "<7.0.0")
       ? "node:decorated"
