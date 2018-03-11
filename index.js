@@ -11,16 +11,9 @@ const { versions } = process
 const chakraVersion = versions.chakracore
 const engineVersion = versions.v8 || chakraVersion
 const nodeVersion = process.version
-const packageSymbol = Symbol.for("esm\u200d:package")
 
 const { Script } = require("vm")
 const { runInNewContext, runInThisContext } = Script.prototype
-
-const { inspect } = require("util")
-const customInspectSymbol = inspect.custom
-const customInspectKey = typeof customInspectSymbol === "symbol"
-  ? customInspectSymbol
-  : "inspect"
 
 const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
 const { resolve } = require("path")
@@ -150,12 +143,12 @@ let __shared__
 __shared__ = loadESM()
 __shared__.global = global
 
-defineProperty(makeRequireFunction, packageSymbol, {
+defineProperty(makeRequireFunction, __shared__.symbol.package, {
   __proto__: null,
   value: true
 })
 
-defineProperty(makeRequireFunction, customInspectKey, {
+defineProperty(makeRequireFunction, __shared__.customInspectKey, {
   __proto__: null,
   value: () => "esm enabled"
 })

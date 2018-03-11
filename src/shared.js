@@ -28,6 +28,7 @@ if (__shared__) {
     _compile: Symbol.for(ESM_PKG + ":module._compile"),
     inspect: inspect.custom,
     mjs: Symbol.for(ESM_PKG + ':Module._extensions[".mjs"]'),
+    package: Symbol.for(ESM_PKG + ":package"),
     wrapper: Symbol.for(ESM_PKG + ":wrapper")
   }
 
