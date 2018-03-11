@@ -1,6 +1,11 @@
 import assert from "assert"
 
 describe("require hook", () => {
+  it("should be detectable", () =>
+    import("./require-hook/detectable.mjs")
+      .then((ns) => ns.default())
+  )
+
   it("should create an ESM loader", () =>
     import("./require-hook/loader.mjs")
       .then((ns) => ns.default())
