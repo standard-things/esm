@@ -6,18 +6,23 @@ const {
 
 const escapedDoubleQuoteRegExp = /\\"/g
 
+/* eslint-disable sort-keys */
 const escapeRegExpMap = {
+  __proto__: null,
+  '"': /\\?"/g,
   "'": /\\?'/g,
   "`": /\\?`/g
 }
 
+/* eslint-disable sort-keys */
 const quoteMap = {
+  __proto__: null,
   '"': '"',
   "'": "'",
   "`": "`",
-  "back": "`",
-  "double": '"',
-  "single": "'"
+  back: "`",
+  double: '"',
+  single: "'"
 }
 
 function toStringLiteral(value, style = '"') {

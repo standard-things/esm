@@ -47,7 +47,7 @@ module.exports = {
     "no-var": "error",
     "node/no-unsupported-features": ["error", { version: 6 }],
     "one-var": ["error", "never"],
-    "quote-props": ["error", "consistent-as-needed"],
+    "quote-props": ["error", "as-needed"],
     quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: true }],
     "rest-spread-spacing": "error",
     semi: ["error", "never"],
