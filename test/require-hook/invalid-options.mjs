@@ -14,4 +14,10 @@ export default () => {
     Error,
     "Error [ERR_UNKNOWN_ESM_OPTION]: Unknown ESM option: esm"
   )
+
+  assert.throws(
+    () => makeRequire(module, { cjs: { namedexports: true } }),
+    Error,
+    'Error [ERR_UNKNOWN_ESM_OPTION]: Unknown ESM option: cjs["namedexports"]'
+  )
 }

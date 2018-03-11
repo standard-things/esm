@@ -4,6 +4,7 @@ import CHAR_CODE from "./constant/char-code.js"
 import PACKAGE from "./constant/package.js"
 
 import _findPath from "./module/_find-path.js"
+import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import errors from "./errors.js"
 import getEnvVars from "./env/get-vars.js"
@@ -23,6 +24,7 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
+import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 import { version } from "./version.js"
 
@@ -188,27 +190,36 @@ function cleanCache(cachePath) {
   }
 }
 
-function createCJS(source) {
+function createCJS(value) {
   const defaultCJS = Package.defaultOptions.cjs
-  const names = keys(defaultCJS)
-  const object = { __proto__: null }
+  const options = { __proto__: null }
 
-  if (source === void 0 ||
-      isObjectLike(source)) {
-    for (const name of names) {
-      object[name] = has(source, name)
-        ? !! source[name]
-        : defaultCJS[name]
-    }
-  } else {
-    const value = !! source
-
-    for (const name of names) {
-      object[name] = value
-    }
+  if (value === void 0) {
+    return assign(options, defaultCJS)
   }
 
-  return object
+  if (isObjectLike(value)) {
+    const possibleNames = keys(value)
+
+    for (const name of possibleNames) {
+      if (Reflect.has(defaultCJS, name)) {
+        options[name] = !! value[name]
+      } else {
+        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name) + "]")
+      }
+    }
+
+    return defaults(options, defaultCJS)
+  }
+
+  const names = keys(defaultCJS)
+  const optionsValue = !! value
+
+  for (const name of names) {
+    options[name] = optionsValue
+  }
+
+  return options
 }
 
 function createOptions(value) {
