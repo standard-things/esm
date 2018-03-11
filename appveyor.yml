@@ -1,5 +1,8 @@
 build: off
+deploy: off
+image: Visual Studio 2017
 shallow_clone: true
+skip_tags: true
 version: '{build}'
 
 environment:
