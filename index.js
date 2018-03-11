@@ -138,10 +138,10 @@ function writeFile(filename, options) {
 
 const compiledESM = compileESM()
 
+// Declare `__shared__` before assignment to avoid the TDZ.
 let __shared__
 
 __shared__ = loadESM()
-__shared__.global = global
 
 defineProperty(makeRequireFunction, __shared__.symbol.package, {
   __proto__: null,
