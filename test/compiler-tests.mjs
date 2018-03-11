@@ -10,9 +10,12 @@ describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 
-    assert.throws(() => Compiler.compile("return", {
-      sourceType: MODULE
-    }), SyntaxError)
+    assert.throws(
+      () => Compiler.compile("return", {
+        sourceType: MODULE
+      }),
+      SyntaxError
+    )
 
     assert.doesNotThrow(() => Compiler.compile("return", {
       cjs: {
