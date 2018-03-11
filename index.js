@@ -4,20 +4,27 @@
 // Guard against mocked environments (e.g. Jest).
 const useBuiltins = module.constructor.length > 1
 
+const { defineProperty } = Reflect
+const { freeze } = Object
+
 const { versions } = process
 const chakraVersion = versions.chakracore
 const engineVersion = versions.v8 || chakraVersion
 const nodeVersion = process.version
+const packageSymbol = Symbol.for("esm\u200d:package")
 
-const { defineProperty } = Reflect
-const { freeze } = Object
+const { Script } = require("vm")
 const { runInNewContext, runInThisContext } = Script.prototype
 
-const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
-const { Script } = require("vm")
-const { createHash } = require("crypto")
 const { inspect } = require("util")
+const customInspectSymbol = inspect.custom
+const customInspectKey = typeof customInspectSymbol === "symbol"
+  ? customInspectSymbol
+  : "inspect"
+
+const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
 const { resolve } = require("path")
+const { createHash } = require("crypto")
 
 const Module = useBuiltins ? module.constructor : require("module")
 const esmMod = new Module(module.id, null)
@@ -127,14 +134,18 @@ function writeFile(filename, options) {
 }
 
 const compiledESM = compileESM()
-const inspectKey = inspect.custom || "inspect"
 
 let __shared__
 
 __shared__ = loadESM()
 __shared__.global = global
 
-defineProperty(makeRequireFunction, inspectKey, {
+defineProperty(makeRequireFunction, packageSymbol, {
+  __proto__: null,
+  value: true
+})
+
+defineProperty(makeRequireFunction, customInspectKey, {
   __proto__: null,
   value: () => "esm enabled"
 })
