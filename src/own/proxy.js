@@ -7,13 +7,16 @@ const {
   ESM_PKG
 } = PREFIX
 
-const markerDescriptor = {
-  __proto__: null,
-  value: true
-}
-
 function init() {
-  const customInspect = () => "{}"
+  const customInspectDescriptor = {
+    __proto__: null,
+    value: () => "{}"
+  }
+
+  const markerDescriptor = {
+    __proto__: null,
+    value: true
+  }
 
   class OwnProxy {
     static instances = new WeakMap
@@ -21,8 +24,8 @@ function init() {
     constructor(target, handler) {
       const proto = assign({ __proto__: null }, handler)
 
-      proto[shared.symbol.inspect] = customInspect
       handler = { __proto__: proto }
+      Reflect.defineProperty(proto, shared.customInspectKey, customInspectDescriptor)
       Reflect.defineProperty(handler, ESM_PKG + ":proxy", markerDescriptor)
 
       const proxy = new Proxy(target, handler)
