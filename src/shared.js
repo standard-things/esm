@@ -151,8 +151,15 @@ if (__shared__) {
   )
 
   setDeferred(support, "inspectProxies", () => {
-    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [ESM_PKG]: 1 })
-    const inspected = shared.inspect(proxy, { __proto__: null, showProxy: true })
+    const proxy = new Proxy({ __proto__: null }, {
+      __proto__: null,
+      [ESM_PKG]: 1
+    })
+
+    const inspected = shared.inspect(proxy, {
+      __proto__: null,
+      showProxy: true
+    })
 
     return inspected.startsWith("Proxy") &&
       inspected.indexOf(ESM_PKG) !== -1

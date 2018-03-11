@@ -84,11 +84,21 @@ function compileESM() {
     }
   }
 
-  const options = { __proto__: null, filename }
+  const options = {
+    __proto__: null,
+    filename
+  }
 
-  return chakraVersion
-    ? runInThisContext.call(script, options)
-    : runInNewContext.call(script, { __proto__: null, global }, options)
+  if (chakraVersion) {
+    return runInThisContext.call(script, options)
+  }
+
+  const context = {
+    __proto__: null,
+    global
+  }
+
+  return runInNewContext.call(script, context, options)
 }
 
 function loadESM() {

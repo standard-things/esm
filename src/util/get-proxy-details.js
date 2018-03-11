@@ -25,7 +25,11 @@ function getProxyDetails(proxy) {
     } catch (e) {}
   }
 
-  cache.set(proxy, { __proto__: null, details })
+  cache.set(proxy, {
+    __proto__: null,
+    details
+  })
+
   return details
 }
 
