@@ -15,33 +15,70 @@ const nodeVersion = process.version
 const { Script } = require("vm")
 const { runInNewContext, runInThisContext } = Script.prototype
 
-const { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } = require("fs")
+const {
+  dirname,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync
+} = require("fs")
+
 const { resolve } = require("path")
 const { createHash } = require("crypto")
 
-const Module = useBuiltins ? module.constructor : require("module")
-const esmMod = new Module(module.id, null)
-const esmReq = useBuiltins ? require : (request) => esmMod.require(request)
+const { filename, id } = module
+const isInternal = id.startsWith("internal/")
 
-esmMod.filename = __filename
+let Module = module.constructor
+
+if (isInternal ||
+    ! useBuiltins) {
+  Module = require("module")
+}
+
+const esmMod = new Module(id, null)
+
+let esmReq = require
+
+if (! useBuiltins &&
+    typeof esmMod.require === "function") {
+  esmReq = (request) => esmMod.require(request)
+}
+
+esmMod.filename = filename
 esmMod.parent = module.parent
 
 function compileESM() {
-  const nodeModulesPath = resolve(__dirname, "node_modules")
-  const cacheName = md5(nodeVersion + "\0" + engineVersion) + ".blob"
-  const cachePath = resolve(nodeModulesPath, ".cache")
-  const cacheFilename = resolve(cachePath, cacheName)
-  const cachedData = readFile(cacheFilename)
-  const filename = resolve(__dirname, "esm.js")
+  let cachedData
+  let cacheFilename
+  let cachePath
+  let content
+  let nodeModulesPath
+  let filename = "esm.js"
+
+  if (isInternal) {
+    content = process.binding("natives")["internal/esm/loader"]
+  } else {
+    const cacheName = md5(nodeVersion + "\0" + engineVersion) + ".blob"
+    const esmDirname = typeof __dirname === "string" ? __dirname : dirname(filename)
+
+    nodeModulesPath = resolve(esmDirname, "node_modules")
+    cachePath = resolve(nodeModulesPath, ".cache")
+    cacheFilename = resolve(cachePath, cacheName)
+    cachedData = readFile(cacheFilename)
+    filename = resolve(esmDirname, filename)
+    content = readFile(resolve(esmDirname, "esm/loader.js"), "utf8")
+  }
 
   const script = new Script(
-    "(function(require,module,__shared__){" +
-    readFile(filename, "utf8") +
-    "\n})", {
+    "(function (require, module, __shared__) { " +
+    content +
+    "\n});", {
     __proto__: null,
     cachedData,
     filename,
-    produceCachedData: true
+    produceCachedData: ! isInternal
   })
 
   let changed = false
@@ -49,13 +86,15 @@ function compileESM() {
 
   const { cachedDataRejected } = script
 
-  if (script.cachedDataProduced &&
-      ! cachedDataRejected) {
-    changed = ! cachedData
-    scriptData = script.cachedData
-  } else if (cachedData &&
-      cachedDataRejected) {
-    changed = true
+  if (! isInternal) {
+    if (script.cachedDataProduced &&
+        ! cachedDataRejected) {
+      changed = ! cachedData
+      scriptData = script.cachedData
+    } else if (cachedData &&
+        cachedDataRejected) {
+      changed = true
+    }
   }
 
   if (changed) {

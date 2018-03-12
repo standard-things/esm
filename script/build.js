@@ -17,7 +17,7 @@ const NODE_ENV =
 
 const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
-const bundlePath = path.resolve(rootPath, "esm.js")
+const loaderPath = path.resolve(rootPath, "esm/loader.js")
 const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const acornPath = path.resolve(vendorPath, "acorn")
@@ -31,7 +31,7 @@ const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
 
 const trashPaths = [
   buildPath,
-  bundlePath,
+  loaderPath,
   uglifyPath
 ]
 
@@ -52,7 +52,7 @@ function copyBundle() {
     return Promise.resolve()
   }
 
-  return fs.copy(srcPath, bundlePath)
+  return fs.copy(srcPath, loaderPath)
 }
 
 function getAcorn() {

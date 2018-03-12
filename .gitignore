@@ -8,8 +8,8 @@
 .pm2
 .vscode
 package-lock.json
-/esm.js
 /build
+/esm
 /node_modules
 /src/vendor
 /test/env/prefix/bin

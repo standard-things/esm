@@ -9,6 +9,7 @@ import isCLI from "./env/is-cli.js"
 import isCheck from "./env/is-check.js"
 import isEval from "./env/is-eval.js"
 import isInstalled from "./util/is-installed.js"
+import isInternal from "./env/is-internal.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import isREPL from "./env/is-repl.js"
@@ -90,7 +91,8 @@ if (shared.inited) {
     moduleHook(Module)
     processHook(process)
     vmHook(vm)
-  } else if (isCLI()) {
+  } else if (isCLI() ||
+      isInternal()) {
     moduleHook(BuiltinModule)
     mainHook(BuiltinModule)
     processHook(process)

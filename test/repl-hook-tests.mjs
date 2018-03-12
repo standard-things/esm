@@ -15,18 +15,25 @@ const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath
 
 describe("repl hook", () => {
   let context
+  const argv = process.argv.slice()
 
   before(() => {
     context = vm.createContext({
       module: new module.constructor("<repl>")
     })
 
+    process.argv = argv.slice(0, 1)
     Reflect.deleteProperty(require.cache, pkgPath)
-    context.module.require(pkgPath)
 
+    context.module.require(pkgPath)
     Reflect.deleteProperty(require.cache, pkgPath)
+
     parent.children.splice(pkgIndex, 1)
     parent.require(pkgPath)
+  })
+
+  after(() => {
+    process.argv = argv
   })
 
   it("should work with a global context", () => {

@@ -1,5 +1,5 @@
-/esm.js
 /build
+/esm
 /node_modules
 /src/vendor
 /test/fixture/error
