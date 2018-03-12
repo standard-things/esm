@@ -286,6 +286,23 @@ function createOptions(value) {
   return options
 }
 
+function findRoot(dirPath) {
+  if (basename(dirPath) === "node_modules" ||
+      isFile(resolve(dirPath, PACKAGE_FILENAME))) {
+    return dirPath
+  }
+
+  const parentPath = dirname(dirPath)
+
+  if (parentPath === dirPath) {
+    return ""
+  }
+
+  return basename(parentPath) === "node_modules"
+    ? dirPath
+    : findRoot(parentPath)
+}
+
 function getInfo(dirPath, force) {
   let pkg
 
@@ -340,23 +357,7 @@ function getRoot(dirPath) {
     return cached
   }
 
-  if (basename(dirPath) === "node_modules" ||
-      isFile(resolve(dirPath, PACKAGE_FILENAME))) {
-    return root[dirPath] = dirPath
-  }
-
-  const parentPath = dirname(dirPath)
-
-  if (parentPath === dirPath ||
-      basename(parentPath) === "node_modules") {
-    return root[dirPath] = dirPath
-  }
-
-  const ancestorPath = getRoot(parentPath)
-
-  return root[dirPath] = ancestorPath === dirname(ancestorPath)
-    ? dirPath
-    : ancestorPath
+  return root[dirPath] = findRoot(dirPath) || dirPath
 }
 
 function readInfo(dirPath, force) {
