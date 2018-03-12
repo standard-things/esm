@@ -36,13 +36,19 @@ const map = {
 
 const binding = { __proto__: null }
 
+function getBinding(id) {
+  try {
+    return silent(() => Reflect.apply(_binding, process, [id]))
+  } catch (e) {}
+}
+
 for (const id of ids) {
   setDeferred(binding, id, () => {
     if (! _binding) {
       _binding = getSilent(process, "binding")
     }
 
-    const source = silent(() => Reflect.apply(_binding, process, [id]))
+    const source = getBinding(id)
 
     if (! isObjectLike(source)) {
       return { __proto__: null }
