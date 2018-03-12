@@ -17,8 +17,9 @@ const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
 const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
-const esmPath = path.resolve(rootPath, "esm")
+const esmPath = path.resolve(rootPath, "esm.js")
 const indexPath = path.resolve(rootPath, "index.js")
+const loaderDirPath = path.resolve(rootPath, "esm")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
@@ -26,9 +27,14 @@ const vendorPath = path.resolve(rootPath, "src/vendor")
 
 const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
 
+const jsPaths = [
+  esmPath,
+  indexPath
+]
+
 const trashPaths = ignorePaths
   .filter((thePath) =>
-    thePath !== esmPath &&
+    thePath !== loaderDirPath &&
     thePath !== nodeModulesPath &&
     ! thePath.startsWith(buildPath) &&
     ! thePath.startsWith(vendorPath)
@@ -58,13 +64,16 @@ nodeArgs.push(
   "tests.mjs"
 )
 
-function cleanIndex() {
-  return fs
-    .readFile(indexPath, "utf8")
-    .then((content) => {
-      process.once("exit", () => fs.outputFileSync(indexPath, content))
-      return fs.outputFile(indexPath, minifyJS(content))
-    })
+function cleanJS() {
+  return jsPaths
+    .reduce((promise, filePath) =>
+      promise
+        .then(() => fs.readFile(filePath, "utf8"))
+        .then((content) => {
+          process.once("exit", () => fs.outputFileSync(filePath, content))
+          return fs.outputFile(filePath, minifyJS(content))
+        })
+    , Promise.resolve())
 }
 
 function cleanRepo() {
@@ -101,7 +110,7 @@ function setupNode() {
 
 Promise
   .all([
-    argv.prod && cleanIndex(),
+    argv.prod && cleanJS(),
     cleanRepo(),
     setupNode()
   ])

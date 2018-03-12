@@ -7,11 +7,17 @@ const path = require("path")
 const uglify = require("uglify-es").minify
 
 const rootPath = path.resolve(__dirname, "..")
+const esmPath = path.resolve(rootPath, "esm.js")
 const indexPath = path.resolve(rootPath, "index.js")
 const pkgPath = path.resolve(rootPath, "package.json")
 const readmePath = path.resolve(rootPath, "README.md")
 
 const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
+
+const jsPaths = [
+  esmPath,
+  indexPath
+]
 
 const defaultScripts = `,
   "scripts": {
@@ -27,13 +33,16 @@ const fieldsToRemove = [
 const scriptsRegExp = makeFieldRegExp("scripts")
 const tableRegExp = /^<table>[^]*?\n<\/table>/gm
 
-function cleanIndex() {
-  return fs
-    .readFile(indexPath, "utf8")
-    .then((content) => {
-      process.once("exit", () => fs.outputFileSync(indexPath, content))
-      return fs.outputFile(indexPath, minifyJS(content))
-    })
+function cleanJS() {
+  return jsPaths
+    .reduce((promise, filePath) =>
+      promise
+        .then(() => fs.readFile(filePath, "utf8"))
+        .then((content) => {
+          process.once("exit", () => fs.outputFileSync(filePath, content))
+          return fs.outputFile(filePath, minifyJS(content))
+        })
+    , Promise.resolve())
 }
 
 function cleanPackageJSON() {
@@ -101,7 +110,7 @@ function resetScripts(content) {
 
 Promise
   .all([
-    cleanIndex(),
+    cleanJS(),
     cleanPackageJSON(),
     cleanReadme()
   ])
