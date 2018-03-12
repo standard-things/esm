@@ -9,31 +9,34 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
+const esmPath = path.resolve("../esm.js")
 const pkgPath = path.resolve("../index.js")
+
 const parent = require.cache[pkgPath].parent
 const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
 
 describe("repl hook", () => {
   let context
-  const argv = process.argv.slice()
 
   before(() => {
+    const argv = process.argv.slice()
+
     context = vm.createContext({
       module: new module.constructor("<repl>")
     })
 
     process.argv = argv.slice(0, 1)
+    Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, pkgPath)
 
     context.module.require(pkgPath)
+
+    process.argv = argv
+    Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, pkgPath)
 
     parent.children.splice(pkgIndex, 1)
     parent.require(pkgPath)
-  })
-
-  after(() => {
-    process.argv = argv
   })
 
   it("should work with a global context", () => {

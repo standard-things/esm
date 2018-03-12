@@ -1,7 +1,13 @@
+import ESM from "../constant/esm.js"
+
 import has from "../util/has.js"
 import normalize from "../path/normalize.js"
 import readJSON from "../fs/read-json.js"
 import shared from "../shared.js"
+
+const {
+  PKG_PARENT
+} = ESM
 
 function isNyc() {
   const { env } = shared
@@ -10,8 +16,7 @@ function isNyc() {
     return env.nyc
   }
 
-  const { parent } = __non_webpack_module__
-  const parentFilename = parent && normalize(parent.filename)
+  const parentFilename = PKG_PARENT && normalize(PKG_PARENT.filename)
 
   const nycIndex = parentFilename
     ? parentFilename.lastIndexOf("/node_modules/nyc/")

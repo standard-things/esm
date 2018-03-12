@@ -1,6 +1,10 @@
+import ESM from "../constant/esm.js"
+
 import GenericArray from "../generic/array.js"
 
-const stdFilename = __non_webpack_module__.filename
+const {
+  PKG_DIRNAME
+} = ESM
 
 function hasLoaderModule(modules) {
   if (! Array.isArray(modules)) {
@@ -8,7 +12,8 @@ function hasLoaderModule(modules) {
   }
 
   return GenericArray.some(modules, ({ filename }) => {
-    return filename === stdFilename
+    return typeof filename === "string" &&
+      filename.startsWith(PKG_DIRNAME)
   })
 }
 

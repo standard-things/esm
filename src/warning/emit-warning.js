@@ -3,7 +3,7 @@ import shared from "../shared.js"
 
 const { pid, release } = shared.process
 
-const PREFIX = "(" + release.name + ":" + pid + ") "
+const WARNING_PREFIX = "(" + release.name + ":" + pid + ") "
 
 const ExError = __external__.Error
 
@@ -45,7 +45,7 @@ function emitWarning(message, type, code, Ctor) {
 
   process.nextTick(() => {
     console.error(
-      PREFIX +
+      WARNING_PREFIX +
       (useCode ? "[" + code + "] " : "") +
       type + ": " + message
     )

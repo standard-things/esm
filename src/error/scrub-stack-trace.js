@@ -1,8 +1,12 @@
+import ESM from "../constant/esm.js"
+
 const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
 const runtimeRegExp = /\w+\u200d\.(\w+)(\.)?/g
 const traceRegExp = /(\n +at .+)+$/
 
-const stdFilename = __non_webpack_module__.filename
+const {
+  PKG_DIRNAME
+} = ESM
 
 function scrubStackTrace(stack) {
   if (typeof stack !== "string") {
@@ -20,7 +24,7 @@ function scrubStackTrace(stack) {
 
   let trace = stack.slice(index)
   const lines = trace.split("\n")
-  const filtered = lines.filter((line) => line.indexOf(stdFilename) === -1)
+  const filtered = lines.filter((line) => line.indexOf(PKG_DIRNAME) === -1)
 
   trace = filtered.join("\n")
   trace = trace.replace(columnInfoRegExp, ":1")

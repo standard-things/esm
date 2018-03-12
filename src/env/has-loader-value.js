@@ -1,6 +1,7 @@
 import { extname, resolve } from "path"
 
 import CHAR_CODE from "../constant/char-code.js"
+import ESM from "../constant/esm.js"
 
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
@@ -13,7 +14,9 @@ const {
   HYPHEN
 } = CHAR_CODE
 
-const stdFilename = __non_webpack_module__.filename
+const {
+  PKG_DIRNAME
+} = ESM
 
 function hasLoaderValue(value) {
   if (typeof value === "string") {
@@ -24,11 +27,11 @@ function hasLoaderValue(value) {
         resolved += "/index.js"
       }
 
-      if (realpath(resolved) === stdFilename) {
+      if (realpath(resolved).startsWith(PKG_DIRNAME)) {
         return true
       }
     } else if (value.charCodeAt(0) !== HYPHEN &&
-        _resolveFilename(value, rootModule) === stdFilename) {
+        _resolveFilename(value, rootModule).startsWith(PKG_DIRNAME)) {
       return true
     }
   } else if (isObjectLike(value)) {
