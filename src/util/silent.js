@@ -19,21 +19,17 @@ function silent(callback) {
     }
   }
 
-  let result
-
   try {
-    result = callback()
-  } catch (e) {}
-
-  if (shouldRestore) {
-    if (oldDescriptor) {
-      Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
-    } else {
-      Reflect.deleteProperty(process, "noDeprecation")
+    return callback()
+  } finally {
+    if (shouldRestore) {
+      if (oldDescriptor) {
+        Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
+      } else {
+        Reflect.deleteProperty(process, "noDeprecation")
+      }
     }
   }
-
-  return result
 }
 
 export default silent

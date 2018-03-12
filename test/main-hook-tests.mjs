@@ -184,7 +184,16 @@ describe("main hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stderr.includes("Cannot find module")))
+          .then((result) => {
+            assert.ok(result.stderr.includes("Cannot find module"))
+          })
       , Promise.resolve())
   })
+
+  it("should not shallow async errors", () =>
+    runMain("./fixture/main-hook/async-error.mjs")
+      .then((result) => {
+        assert.ok(result.stderr.includes("ReferenceError: undefined_variable is not defined"))
+      })
+  )
 })
