@@ -77,6 +77,7 @@
   },
   "files": [
     "index.js",
-    "esm.js"
+    "esm.js",
+    "esm/loader.js"
   ]
 }
