@@ -19,7 +19,7 @@ function cleanEmptyDirs() {
         absolute: true,
         cwd: rootPath,
         expandDirectories: false,
-        onlyFiles: false
+        onlyDirectories: true
       })
       .filter(isEmpty)
       .map(trash)
