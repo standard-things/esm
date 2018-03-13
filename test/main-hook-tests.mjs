@@ -193,7 +193,10 @@ describe("main hook", function () {
   it("should not shallow async errors", () =>
     runMain("./fixture/main-hook/async-error.mjs")
       .then((result) => {
-        assert.ok(result.stderr.includes("ReferenceError: undefined_variable is not defined"))
+        const { stderr } = result
+
+        assert.ok(stderr)
+        assert.strictEqual(stderr.includes("async hook stack has become corrupted"), false)
       })
   )
 })
