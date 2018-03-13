@@ -17,6 +17,7 @@ import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
+import toNamespaceObject from "./util/to-namespace-object.js"
 import warn from "./warn.js"
 
 const {
@@ -37,14 +38,11 @@ const {
 const GETTER_ERROR = { __proto__: null }
 const STAR_ERROR = { __proto__: null }
 
+const ExObject = __external__.Object
+
 const pseudoDescriptor = {
   __proto__: null,
   value: true
-}
-
-const toStringTagDescriptor = {
-  __proto__: null,
-  value: "Module"
 }
 
 class Entry {
@@ -411,31 +409,16 @@ function createNamespace(entry, source = entry) {
   const isCJS = type === TYPE_CJS
   const isESM = type === TYPE_ESM
 
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Module namespace objects have a null [[Prototype]].
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  const namespace = { __proto__: null }
-
-  // Section 26.3.1: @@toStringTag
-  // Module namespace objects have a @@toStringTag value of "Module".
-  // https://tc39.github.io/ecma262/#sec-@@tostringtag
-  Reflect.defineProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
-
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Properties should be assigned in `Array#sort` order.
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  const names = keys(source.namespace).sort()
-
-  for (const name of names) {
+  const namespace = toNamespaceObject(source.namespace, (object, name) => {
     if (isESM ||
         (isCJS && name === "default")) {
-      namespace[name] = source.namespace[name]
-    } else {
-      namespace[name] = Reflect.getOwnPropertyDescriptor(exported, name).value
+      return object[name]
     }
-  }
 
-  return new OwnProxy(Object.seal(namespace), {
+    return Reflect.getOwnPropertyDescriptor(exported, name).value
+  })
+
+  return new OwnProxy(namespace, {
     get: (namespace, name) => {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)
@@ -446,12 +429,14 @@ function createNamespace(entry, source = entry) {
         return
       }
 
-      const descriptor = {
-        configurable: false,
-        enumerable: false,
-        value: "Module",
-        writable: false
-      }
+      const descriptor = new ExObject
+
+      // The de facto order of descriptor properties is:
+      // "value", "writable", "configurable", "enumerable"
+      descriptor.value = "Module"
+      descriptor.writable =
+      descriptor.configurable =
+      descriptor.enumerable = false
 
       // Section 26.3.1: @@toStringTag
       // Return descriptor of the module namespace @@toStringTag.
@@ -493,6 +478,7 @@ function getExportByName(entry, setter, name) {
     ! isMJS(parent.module)
 
   const isESM = entry.type === TYPE_ESM
+  const isLoaded = entry._loaded === LOAD_COMPLETED
 
   const isScript =
     ! isESM &&
@@ -521,7 +507,7 @@ function getExportByName(entry, setter, name) {
 
   if ((isScript &&
        name !== "default") ||
-      (entry._loaded === LOAD_COMPLETED &&
+      (isLoaded &&
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)

@@ -5,11 +5,13 @@ import OwnProxy from "./own/proxy.js"
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
+import isNamespaceObject from "./util/is-namespace-object.js"
 import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
+import toNamespaceObject from "./util/to-namespace-object.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
 
 const ExObject = __external__.Object
@@ -32,7 +34,9 @@ function init() {
         const [value] = args
 
         if (isOwnProxy(value)) {
-          args[0] = unwrapProxy(value)
+          args[0] = isNamespaceObject(value)
+            ? toNamespaceObject(value)
+            : unwrapProxy(value)
         }
 
         return Reflect.apply(target, thisArg, args)
