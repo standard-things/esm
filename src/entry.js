@@ -218,7 +218,9 @@ class Entry {
       return this._loaded
     }
 
-    if (! this.module.loaded) {
+    let mod = this.module
+
+    if (! mod.loaded) {
       return this._loaded = LOAD_INCOMPLETE
     }
 
@@ -234,14 +236,13 @@ class Entry {
 
     const isESM = this.type === TYPE_ESM
 
-    let setNsGetters = true
-    let exported = this.module.exports
+    let exported = mod.exports
 
     if (isESM &&
         ! Object.isSealed(exported)) {
       if (this.package.options.cjs.interop &&
           ! has(this._namespace, "__esModule") &&
-          ! isMJS(this.module)) {
+          ! isMJS(mod)) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
 
@@ -251,35 +252,33 @@ class Entry {
 
       Object.seal(exported)
     } else if (! isESM) {
-      const oldMod = this.module
-      const oldExported = oldMod.exports
-      const newEntry = Entry.get(this.module)
-
-      setNsGetters = newEntry._loaded !== LOAD_COMPLETED
+      const newEntry = Entry.get(mod)
 
       this.merge(newEntry)
 
       const newMod = this.module
       const newExported = newMod.exports
 
-      if (newMod !== oldMod) {
-        Entry.delete(oldMod, this)
+      if (newMod !== mod) {
+        Entry.delete(mod, this)
         Entry.set(newMod, this)
+        mod = newMod
       }
 
-      if (newExported !== oldExported) {
-        Entry.delete(oldExported, this)
+      if (newExported !== exported) {
+        Entry.delete(exported, this)
         Entry.set(newExported, this)
+        exported = newExported
       }
 
-      if (! newMod.loaded) {
+      if (! mod.loaded) {
         return this._loaded = LOAD_INCOMPLETE
       }
     }
 
     assignExportsToNamespace(this)
 
-    if (setNsGetters) {
+    if (this._loaded !== LOAD_COMPLETED) {
       setDeferred(this, "cjsNamespace", () => createNamespace(this, {
         __proto__: null,
         namespace: {
@@ -339,23 +338,25 @@ class Entry {
 function assignExportsToNamespace(entry) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
+
   const isESM = entry.type === TYPE_ESM
-  const object = entry._loaded === LOAD_COMPLETED ? _namespace : exported
+  const isLoaded = entry._loaded === LOAD_COMPLETED
 
   if (! isESM &&
+      ! isLoaded &&
       entry.package.options.cjs.interop &&
-      has(object, "default") &&
+      has(exported, "default") &&
       has(exported, "__esModule") &&
       !! exported.__esModule) {
     entry.type = TYPE_PSEUDO
   }
 
-  const skipDefault = entry.type === TYPE_CJS
+  const isCJS = entry.type === TYPE_CJS
 
-  if (skipDefault) {
+  if (isCJS) {
     _namespace.default = exported
 
-    if (! Reflect.has(entry.getters, "default")) {
+    if (! Reflect.has(getters, "default")) {
       entry.addGetter("default", () => entry.namespace.default)
     }
   }
@@ -364,12 +365,12 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const names = keys(object)
+  const names = keys(isLoaded ? _namespace : exported)
 
   for (const name of names) {
     if (isESM) {
       _namespace[name] = exported[name]
-    } else if (! (skipDefault && name === "default") &&
+    } else if (! (isCJS && name === "default") &&
         ! Reflect.has(_namespace, name)) {
       setGetter(_namespace, name, () => exported[name])
 
@@ -473,13 +474,14 @@ function createNamespace(entry, source = entry) {
 
 function getExportByName(entry, setter, name) {
   const { _namespace } = entry
-  const isESM = entry.type === TYPE_ESM
   const { namedExports } = entry.package.options.cjs
   const { parent } = setter
 
   const parentNamedExports =
     parent.package.options.cjs.namedExports &&
     ! isMJS(parent.module)
+
+  const isESM = entry.type === TYPE_ESM
 
   const isScript =
     ! isESM &&
