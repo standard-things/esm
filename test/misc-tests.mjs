@@ -9,11 +9,17 @@ import path from "path"
 import require from "./require.js"
 import util from "util"
 
+const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
+const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
+
 const fileProtocol = "file://" + (isWin ? "/" : "")
+const pkgPath = path.resolve("../index.js")
+const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const slashRegExp = /[\\/]/g
+const stdName = "esm@" + pkgJSON.version
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
@@ -27,14 +33,6 @@ const abcNs = createNamespace({
 const defNs = createNamespace({
   default: { d: "d", e: "e", f: "f" }
 })
-
-const pkgPath = path.resolve("../index.js")
-const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
-const pkgOptions = fs.pathExistsSync(".esmrc")
-  ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : pkgJSON["esm"]
-
-const stdName = "esm@" + pkgJSON.version
 
 function checkError(error, code) {
   const message = error.message
@@ -299,7 +297,7 @@ describe("errors", () => {
       import(id7)
         .then(() => assert.ok(false))
         .catch((e) => {
-          if (pkgOptions.debug) {
+          if (isDebug) {
             assert.ok(true)
           } else {
             checkErrorStack(e, [
@@ -312,7 +310,7 @@ describe("errors", () => {
       import(id8)
         .then(() => assert.ok(false))
         .catch((e) => {
-          if (pkgOptions.debug) {
+          if (isDebug) {
             assert.ok(true)
           } else {
             checkErrorStack(e, [
@@ -328,13 +326,7 @@ describe("errors", () => {
   it("should mask stack traces", () =>
     import("./fixture/error/import.mjs")
       .then(() => assert.ok(false))
-      .catch((e) => {
-        if (pkgOptions.debug) {
-          assert.ok(true)
-        } else {
-          assert.strictEqual(e.stack.includes(pkgPath), false)
-        }
-      })
+      .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
   )
 })
 
