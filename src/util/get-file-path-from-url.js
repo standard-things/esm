@@ -65,7 +65,8 @@ function getFilePathFromURL(url) {
 
   // Drive letters must be `[A-Za-z]:/`
   // All slashes of pathnames are forward slashes.
-  if (((code1 > 64 && code1 < 91) || (code1 > 96 && code1 < 123)) &&
+  if (((code1 > 64 && code1 < 91) ||
+       (code1 > 96 && code1 < 123)) &&
       pathname.charCodeAt(3) === SLASH){
     return normalize(pathname).slice(1)
   }

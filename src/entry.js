@@ -477,13 +477,6 @@ function getExportByName(entry, setter, name) {
     parent.package.options.cjs.namedExports &&
     ! isMJS(parent.module)
 
-  const isESM = entry.type === TYPE_ESM
-  const isLoaded = entry._loaded === LOAD_COMPLETED
-
-  const isScript =
-    ! isESM &&
-    ! parentNamedExports
-
   if ((namedExports ||
        parentNamedExports) &&
       entry.type === TYPE_CJS &&
@@ -496,6 +489,10 @@ function getExportByName(entry, setter, name) {
       }
     })
   }
+
+  const isESM = entry.type === TYPE_ESM
+  const isLoaded = entry._loaded === LOAD_COMPLETED
+  const isScript = ! isESM && ! parentNamedExports
 
   if (name === "*") {
     return isScript ? entry.cjsNamespace : entry.esmNamespace

@@ -4,9 +4,7 @@ import assert from "assert"
 import execa from "execa"
 import path from "path"
 
-const canTestCheckFlag =
-  SemVer.satisfies(process.version, ">=8")
-
+const canTestCheckFlag = SemVer.satisfies(process.version, ">=8")
 const testPath = path.resolve(".")
 
 function shell(command) {
