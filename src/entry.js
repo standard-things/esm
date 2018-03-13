@@ -405,6 +405,12 @@ function changed(setter, key, value) {
 }
 
 function createNamespace(entry, source = entry) {
+  const exported = entry.module.exports
+  const { type } = entry
+
+  const isCJS = type === TYPE_CJS
+  const isESM = type === TYPE_ESM
+
   // Section 9.4.6: Module Namespace Exotic Objects
   // Module namespace objects have a null [[Prototype]].
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -421,7 +427,12 @@ function createNamespace(entry, source = entry) {
   const names = keys(source.namespace).sort()
 
   for (const name of names) {
-    namespace[name] = Reflect.getOwnPropertyDescriptor(source.namespace, name).value
+    if (isESM ||
+        (isCJS && name === "default")) {
+      namespace[name] = source.namespace[name]
+    } else {
+      namespace[name] = Reflect.getOwnPropertyDescriptor(exported, name).value
+    }
   }
 
   return new OwnProxy(Object.seal(namespace), {
