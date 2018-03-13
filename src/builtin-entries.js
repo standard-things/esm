@@ -5,6 +5,7 @@ import OwnProxy from "./own/proxy.js"
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
+import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
@@ -28,7 +29,12 @@ function init() {
 
     exported.inspect = new OwnProxy(source.inspect, {
       apply(target, thisArg, args) {
-        args[0] = unwrapProxy(args[0])
+        const [value] = args
+
+        if (isOwnProxy(value)) {
+          args[0] = unwrapProxy(value)
+        }
+
         return Reflect.apply(target, thisArg, args)
       }
     })
