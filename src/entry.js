@@ -420,7 +420,7 @@ function createNamespace(entry, source = entry) {
   const names = keys(source.namespace).sort()
 
   for (const name of names) {
-    namespace[name] = void 0
+    namespace[name] = Reflect.getOwnPropertyDescriptor(source.namespace, name).value
   }
 
   return new OwnProxy(Object.seal(namespace), {
