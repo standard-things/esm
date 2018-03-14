@@ -22,11 +22,11 @@ import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
+import { name as pkgName } from "../version.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { resolve } from "path"
 import shared from "../shared.js"
-import { name as stdName } from "../version.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const {
@@ -241,7 +241,7 @@ function tryPassthru(func, args, pkg) {
 
       if (e.name === "SyntaxError" &&
           importExportRegExp.test(message)) {
-        e.message = stdName + " is not enabled for " + filename
+        e.message = pkgName + " is not enabled for " + filename
         e.stack = e.stack.replace(message, e.message)
 
         if (pkg) {

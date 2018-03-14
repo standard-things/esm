@@ -1,6 +1,6 @@
 import emitWarning from "./warning/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
-import { name as stdName } from "./version.js"
+import { name as pkgName } from "./version.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 const cacheKeys = { __proto__: null }
@@ -33,22 +33,22 @@ function moduleCacheKey(request, name) {
 }
 
 function argumentsAccess(request, line, column) {
-  return stdName + " detected undefined arguments access (" +
+  return pkgName + " detected undefined arguments access (" +
     line + ":" + column + "): " + getModuleURL(request)
 }
 
 function namespaceAssignment(request, key) {
-  return stdName + " cannot assign to the read only module namespace property " +
+  return pkgName + " cannot assign to the read only module namespace property " +
     toStringLiteral(key, "'") + " of " + getModuleURL(request)
 }
 
 function namespaceExtension(request, key) {
-  return stdName + " cannot add property " + toStringLiteral(key, "'") +
+  return pkgName + " cannot add property " + toStringLiteral(key, "'") +
     " to module namespace of " + getModuleURL(request)
 }
 
 function temporalDeadZoneAccess(request, varName) {
-  return stdName + " detected possible temporal dead zone access of '" +
+  return pkgName + " detected possible temporal dead zone access of '" +
     varName + "' in " + getModuleURL(request)
 }
 

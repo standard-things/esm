@@ -18,8 +18,8 @@ const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
+const pkgName = "esm@" + pkgJSON.version
 const slashRegExp = /[\\/]/g
-const stdName = "esm@" + pkgJSON.version
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
@@ -1061,7 +1061,7 @@ describe("spec compliance", () => {
     ].reduce((promise, data) => {
       const filename = path.resolve(data.id)
       const url = getURLFromFilePath(filename)
-      const stderr = getWarning(stdName + " detected undefined arguments access (%s): %s", data.loc, url)
+      const stderr = getWarning(pkgName + " detected undefined arguments access (%s): %s", data.loc, url)
 
       return promise
         .then(() => {
@@ -1080,7 +1080,7 @@ describe("spec compliance", () => {
     .reduce((promise, request) => {
       const filename = path.resolve(request)
       const url = getURLFromFilePath(filename)
-      const stderr = getWarning(stdName + " detected possible temporal dead zone access of 'a' in %s", url)
+      const stderr = getWarning(pkgName + " detected possible temporal dead zone access of 'a' in %s", url)
 
       return promise
         .then(() => {
