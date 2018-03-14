@@ -21,7 +21,12 @@ if (__shared__) {
   const { versions } = process
 
   const fastPath = { __proto__: null }
-  const support = { __proto__: null }
+
+  const support = {
+    __proto__: null,
+    isProxy: typeof (types && types.isProxy) === "function",
+    wasm: typeof WebAssembly === "object" && WebAssembly !== null
+  }
 
   const symbol = {
     __proto__: null,
@@ -174,10 +179,6 @@ if (__shared__) {
     typeof binding.fs.internalModuleReadJSON === "function"
   )
 
-  setDeferred(support, "isProxy", () =>
-    typeof (types && types.isProxy) === "function"
-  )
-
   setDeferred(support, "proxiedClasses", () => {
     class A {}
 
@@ -220,11 +221,6 @@ if (__shared__) {
 
   setDeferred(support, "setHiddenValue", () =>
     typeof binding.util.setHiddenValue === "function"
-  )
-
-  setDeferred(support, "wasm", () =>
-    typeof WebAssembly === "object" &&
-      WebAssembly !== null
   )
 }
 
