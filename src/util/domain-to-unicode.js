@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import realRequire from "../real-require.js"
 import url from "url"
 
 let _domainToUnicode = url.domainToUnicode
@@ -9,7 +10,7 @@ if (typeof _domainToUnicode !== "function") {
 
     _domainToUnicode = typeof toUnicode === "function"
       ? (domain) => toUnicode(domain)
-      : __non_webpack_require__("punycode").toUnicode
+      : realRequire("punycode").toUnicode
 
     return _domainToUnicode(domain)
   }

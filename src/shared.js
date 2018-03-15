@@ -28,6 +28,7 @@ if (__shared__) {
     _compile: Symbol.for(STD_ESM + ":module._compile"),
     inspect: inspect.custom,
     mjs: Symbol.for(STD_ESM + ':Module._extensions[".mjs"]'),
+    require: Symbol.for(STD_ESM + ":require"),
     wrapper: Symbol.for(STD_ESM + ":wrapper")
   }
 

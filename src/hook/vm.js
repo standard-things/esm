@@ -24,6 +24,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
+import realRequire from "../real-require.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setSetter from "../util/set-setter.js"
@@ -234,7 +235,7 @@ function hook(vm) {
       const { support } = shared
 
       if (support.inspectProxies) {
-        const util = __non_webpack_require__("util")
+        const util = realRequire("util")
         const _inspect = util.inspect
         const { inspect } = builtinEntries.util.module.exports
 
