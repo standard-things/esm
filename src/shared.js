@@ -34,6 +34,7 @@ if (__shared__) {
     inspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     package: Symbol.for(PKG_PREFIX + ":package"),
+    require: Symbol.for(PKG_PREFIX + ":require"),
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 

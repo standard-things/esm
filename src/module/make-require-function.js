@@ -13,6 +13,7 @@ import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
 import maskFunction from "../util/mask-function.js"
 import moduleState from "./state.js"
+import realRequire from "../real-require.js"
 import shared from "../shared.js"
 
 const {
@@ -23,7 +24,7 @@ const {
   ERR_INVALID_ARG_TYPE
 } = errors
 
-const sourceResolve = __non_webpack_require__.resolve
+const sourceResolve = realRequire.resolve
 const sourcePaths = sourceResolve && sourceResolve.paths
 
 function makeRequireFunction(mod, requirer, resolver) {
@@ -32,6 +33,10 @@ function makeRequireFunction(mod, requirer, resolver) {
   const { name } = entry
 
   let req = function require(request) {
+    if (request === shared.symbol.require) {
+      return realRequire
+    }
+
     moduleState.requireDepth += 1
 
     shared.entry.skipExports[name] =
@@ -40,18 +45,11 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     let exported
 
-    if (! entry.package.options.cjs.vars) {
-      try {
-        exported = requirer.call(mod, request)
-      } finally {
-        moduleState.requireDepth -= 1
-      }
-    }
-
     try {
       exported = requirer.call(mod, request)
     } catch (e) {
-      if (isError(e)) {
+      if (entry.package.options.cjs.vars &&
+          isError(e)) {
         const { code } = e
 
         if (code === "ERR_MODULE_RESOLUTION_LEGACY") {
@@ -100,7 +98,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   if (! isInstalled(mod)) {
     resolve.paths = maskFunction(paths, sourcePaths)
     req.resolve = maskFunction(resolve, sourceResolve)
-    req = maskFunction(req, __non_webpack_require__)
+    req = maskFunction(req, realRequire)
   }
 
   return req

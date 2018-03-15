@@ -9,6 +9,7 @@ import isNamespaceObject from "./util/is-namespace-object.js"
 import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
 import proxyExports from "./util/proxy-exports.js"
+import realRequire from "./real-require.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
@@ -71,7 +72,7 @@ function init() {
 
   for (const id of builtinModules) {
     setDeferred(builtinEntries, id, () => {
-      let exported = unwrapProxy(__non_webpack_require__(id))
+      let exported = unwrapProxy(realRequire(id))
 
       if (id === "module") {
         exported = Module
