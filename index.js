@@ -19,7 +19,7 @@ const { defineProperty } = Reflect
 const { freeze } = Object
 const { runInNewContext, runInThisContext } = Script.prototype
 
-const Module = useBuiltins ? module.constructor : require("module")
+const Module = require("module")
 const esmMod = new Module(module.id, null)
 const esmReq = useBuiltins ? require : (request) => esmMod.require(request)
 
