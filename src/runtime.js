@@ -199,13 +199,11 @@ function createSetter(from, setter) {
 
 function runCJS(entry, moduleWrapper) {
   const mod = entry.module
-  const runtime = mod.exports
   const exported = mod.exports = entry.exports
 
   entry.exports = null
 
   return Reflect.apply(moduleWrapper, exported, [
-    runtime,
     shared.unsafeContext,
     exported,
     makeRequireFunction(mod)
@@ -214,7 +212,6 @@ function runCJS(entry, moduleWrapper) {
 
 function runESM(entry, moduleWrapper) {
   const mod = entry.module
-  const runtime = mod.exports
   const exported = mod.exports = entry.exports
 
   entry.exports = null
@@ -224,14 +221,12 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars &&
       ! isMJS(mod)) {
     result = Reflect.apply(moduleWrapper, exported, [
-      runtime,
       shared.unsafeContext,
       exported,
       makeRequireFunction(mod)
     ])
   } else {
     result = Reflect.apply(moduleWrapper, void 0, [
-      runtime,
       shared.unsafeContext
     ])
   }

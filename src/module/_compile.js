@@ -46,6 +46,8 @@ const {
 
 const ExObject = __external__.Object
 
+const runtimeWrapperRegExp = /^const _\w{3}=this;/
+
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
 
@@ -116,6 +118,11 @@ function compile(caller, entry, content, filename, fallback) {
   }
 }
 
+function isRuntimeWrapped(content) {
+  return runtimeWrapperRegExp.test(content) &&
+    content.endsWith("\n}))")
+}
+
 function tryCompileCached(entry) {
   const isESM = entry.type === TYPE_ESM
   const noDepth = moduleState.requireDepth === 0
@@ -157,27 +164,34 @@ function tryCompileCached(entry) {
 }
 
 function tryCompileCJS(entry) {
-  const { compileData } = entry
+  const { compileData, runtimeName } = entry
   const mod = entry.module
   const useAsync = useAsyncWrapper(entry)
 
   let content = compileData.code
 
-  if (compileData.changed) {
-    content =
-      (compileData.topLevelReturn ? "return " : "") +
-      "this.r((" +
-      (useAsync ? "async " :  "") +
-      "function(" + entry.runtimeName + ",global,exports,require){" +
-      content +
-      "\n}))"
-
-    Runtime.enable(entry, new ExObject)
-  } else if (useAsync) {
-    Module.wrap = moduleWrapAsyncCJS
+  if (Module.wrap === moduleWrapESM) {
+    Module.wrap = wrap
   }
 
-  content += maybeSourceMap(entry, content)
+  if (! isRuntimeWrapped(content)) {
+    if (compileData.changed) {
+      content =
+        "const " + runtimeName + "=this;" +
+        (compileData.topLevelReturn ? "return " : "") +
+        runtimeName + ".r((" +
+        (useAsync ? "async " :  "") +
+        "function(global,exports,require){" +
+        content +
+        "\n}))"
+
+      Runtime.enable(entry, new ExObject)
+    } else if (useAsync) {
+      Module.wrap = moduleWrapAsyncCJS
+    }
+
+    content += maybeSourceMap(entry, content)
+  }
 
   try {
     return mod._compile(content, mod.filename)
@@ -189,7 +203,7 @@ function tryCompileCJS(entry) {
 }
 
 function tryCompileESM(entry) {
-  const { compileData } = entry
+  const { compileData, runtimeName } = entry
   const mod = entry.module
   const { filename } = mod
 
@@ -197,17 +211,22 @@ function tryCompileESM(entry) {
     entry.package.options.cjs.vars &&
     ! isMJS(filename)
 
-  let content =
-    (compileData.topLevelReturn ? "return " : "") +
-    "this.r((" +
-    (useAsyncWrapper(entry) ? "async " :  "") +
-    "function(" + entry.runtimeName + ",global" +
-    (cjsVars ? ",exports,require" : "") +
-    '){"use strict";' +
-    compileData.code +
-    "\n}))"
+  let content = compileData.code
 
-  content += maybeSourceMap(entry, content)
+  if (! isRuntimeWrapped(content)) {
+    content =
+      "const " + runtimeName + "=this;" +
+      (compileData.topLevelReturn ? "return " : "") +
+      runtimeName + ".r((" +
+      (useAsyncWrapper(entry) ? "async " :  "") +
+      "function(global" +
+      (cjsVars ? ",exports,require" : "") +
+      '){"use strict";' +
+      content +
+      "\n}))"
+
+    content += maybeSourceMap(entry, content)
+  }
 
   if (! entry.url) {
     entry.url = getURLFromFilePath(filename)
