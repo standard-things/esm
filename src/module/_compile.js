@@ -46,7 +46,7 @@ const {
 
 const ExObject = __external__.Object
 
-const runtimeWrapperRegExp = /^const _\w{3}=this;/
+const runtimeWrapperRegExp = /^const _\w{3}\u200d=this;/
 
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
@@ -88,7 +88,7 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (isRuntimeWrapped(compileData.code)) {
-    return entry.module._compile(content, filename)
+    return entry.module._compile(compileData.code, filename)
   }
 
   if (options.warnings &&
