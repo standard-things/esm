@@ -91,6 +91,10 @@ function compile(caller, entry, content, filename, fallback) {
     })
   }
 
+  if (isRuntimeWrapped(compileData.code)) {
+    return entry.module._compile(content, filename)
+  }
+
   if (options.warnings &&
       moduleState.parsing) {
     for (const warning of compileData.warnings) {
@@ -172,30 +176,28 @@ function tryCompileCJS(entry) {
   const mod = entry.module
   const useAsync = useAsyncWrapper(entry)
 
-  let content = compileData.code
-
   if (Module.wrap === moduleWrapESM) {
     Module.wrap = wrap
   }
 
-  if (! isRuntimeWrapped(content)) {
-    if (compileData.changed) {
-      content =
-        "const " + runtimeName + "=this;" +
-        (compileData.topLevelReturn ? "return " : "") +
-        runtimeName + ".r((" +
-        (useAsync ? "async " :  "") +
-        "function(global,exports,require){" +
-        content +
-        "\n}))"
+  let content = compileData.code
 
-      Runtime.enable(entry, new ExObject)
-    } else if (useAsync) {
-      Module.wrap = moduleWrapAsyncCJS
-    }
+  if (compileData.changed) {
+    content =
+      "const " + runtimeName + "=this;" +
+      (compileData.topLevelReturn ? "return " : "") +
+      runtimeName + ".r((" +
+      (useAsync ? "async " :  "") +
+      "function(global,exports,require){" +
+      content +
+      "\n}))"
 
-    content += maybeSourceMap(entry, content)
+    Runtime.enable(entry, new ExObject)
+  } else if (useAsync) {
+    Module.wrap = moduleWrapAsyncCJS
   }
+
+  content += maybeSourceMap(entry, content)
 
   try {
     return mod._compile(content, mod.filename)
@@ -212,22 +214,18 @@ function tryCompileESM(entry) {
   const mod = entry.module
   const { filename } = mod
 
-  let content = compileData.code
+  let content =
+    "const " + runtimeName + "=this;" +
+    (compileData.topLevelReturn ? "return " : "") +
+    runtimeName + ".r((" +
+    (useAsyncWrapper(entry) ? "async " :  "") +
+    "function(global" +
+    (cjsVars ? ",exports,require" : "") +
+    '){"use strict";' +
+    compileData.code +
+    "\n}))"
 
-  if (! isRuntimeWrapped(content)) {
-    content =
-      "const " + runtimeName + "=this;" +
-      (compileData.topLevelReturn ? "return " : "") +
-      runtimeName + ".r((" +
-      (useAsyncWrapper(entry) ? "async " :  "") +
-      "function(global" +
-      (cjsVars ? ",exports,require" : "") +
-      '){"use strict";' +
-      content +
-      "\n}))"
-
-    content += maybeSourceMap(entry, content)
-  }
+  content += maybeSourceMap(entry, content)
 
   if (! entry.url) {
     entry.url = getURLFromFilePath(filename)
