@@ -11,8 +11,8 @@ describe("require hook", () => {
       .then((ns) => ns.default())
   )
 
-  it("should support `options.sourceMap`", () =>
-    import("./require-hook/source-map.mjs")
+  it("should load builtin modules", () =>
+    import("./require-hook/builtin-modules.mjs")
       .then((ns) => ns.default())
   )
 
@@ -33,6 +33,11 @@ describe("require hook", () => {
 
   it("should support namespace exports", () =>
     import("./require-hook/namespace.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should support `options.sourceMap`", () =>
+    import("./require-hook/source-map.mjs")
       .then((ns) => ns.default())
   )
 

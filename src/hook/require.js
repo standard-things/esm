@@ -21,7 +21,7 @@ function hook(parent) {
     }
 
     return request in builtinEntries
-      ? builtinEntries.module.exports
+      ? builtinEntries[request].module.exports
       : loadESM(request, parent, false).module.exports
   }
 
