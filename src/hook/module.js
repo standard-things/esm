@@ -152,8 +152,7 @@ function hook(Mod, parent) {
       Reflect.defineProperty(mod, shared.symbol._compile, {
         __proto__: null,
         configurable: true,
-        value: compileWrapper,
-        writable: true
+        value: compileWrapper
       })
     }
 
