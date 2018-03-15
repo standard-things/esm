@@ -27,27 +27,22 @@ const {
 
 const { resolve } = require("path")
 
-let createHash
-let esmReq = require
-let Module = module.constructor
-
-const useBuiltins = Module.length > 1
+const Module = require("module")
 const NativeModule = bootstrap && bootstrap.NativeModule
 
-if (NativeModule ||
-    ! useBuiltins) {
-  Module = require("module")
-}
+const esmModule = new Module(id, null)
+const useBuiltins = module.constructor.length > 1
 
-const esmMod = new Module(id, null)
+esmModule.filename = filename
+esmModule.parent = module.parent
 
-esmMod.filename = filename
-esmMod.parent = module.parent
+let createHash
+let esmRequire = require
 
 if (! useBuiltins &&
     ! NativeModule &&
-    typeof esmMod.require === "function") {
-  esmReq = (request) => esmMod.require(request)
+    typeof esmModule.require === "function") {
+  esmRequire = (request) => esmModule.require(request)
 }
 
 function compileESM() {
@@ -133,8 +128,8 @@ function compileESM() {
 }
 
 function loadESM() {
-  compiledESM(esmReq, esmMod, __shared__)
-  return esmMod.exports
+  compiledESM(esmRequire, esmModule, __shared__)
+  return esmModule.exports
 }
 
 function makeRequireFunction(mod, options) {
