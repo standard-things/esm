@@ -5,6 +5,7 @@ import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
+import RealModule from "../real-module.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
@@ -43,12 +44,10 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-const BuiltinModule = __non_webpack_module__.constructor
-
 const exts = [".js", ".mjs"]
 const importExportRegExp = /\b(?:im|ex)port\b/
-const sourceExtsJs = BuiltinModule._extensions[".js"]
-const sourceExtsMjs = BuiltinModule._extensions[".mjs"] || sourceExtsJs
+const sourceExtsJs = RealModule._extensions[".js"]
+const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
