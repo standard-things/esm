@@ -1,4 +1,5 @@
 import GenericArray from "./generic/array.js"
+import RealModule from "./real-module.js"
 
 import _compile from "./module/compile.js"
 import _findPath from "./module/find-path.js"
@@ -17,32 +18,31 @@ import req from "./module/require.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
 
-const BuiltinModule = __non_webpack_module__.constructor
-const BuiltinProto = BuiltinModule.prototype
+const RealProto = RealModule.prototype
 
 const Module = maskFunction(function (id, parent) {
-  const mod = new BuiltinModule(id, parent)
+  const mod = new RealModule(id, parent)
   Reflect.setPrototypeOf(mod, Module.prototype)
   return mod
-}, BuiltinModule)
+}, RealModule)
 
 Module._extensions = { __proto__: null }
-Module._findPath = maskFunction(_findPath, BuiltinModule._findPath)
-Module._initPaths = maskFunction(_initPaths, BuiltinModule._initPaths)
-Module._load = maskFunction(_load, BuiltinModule._load)
-Module._nodeModulePaths = maskFunction(_nodeModulePaths, BuiltinModule._nodeModulePaths)
-Module._resolveFilename = maskFunction(_resolveFilename, BuiltinModule._resolveFilename)
-Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, BuiltinModule._resolveLookupPaths)
+Module._findPath = maskFunction(_findPath, RealModule._findPath)
+Module._initPaths = maskFunction(_initPaths, RealModule._initPaths)
+Module._load = maskFunction(_load, RealModule._load)
+Module._nodeModulePaths = maskFunction(_nodeModulePaths, RealModule._nodeModulePaths)
+Module._resolveFilename = maskFunction(_resolveFilename, RealModule._resolveFilename)
+Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
-Module.wrap = maskFunction(wrap, BuiltinModule.wrap)
+Module.wrap = maskFunction(wrap, RealModule.wrap)
 Module.wrapper = GenericArray.slice(wrapper)
 
-Module.prototype._compile = maskFunction(_compile, BuiltinProto._compile)
-Module.prototype.load = maskFunction(load, BuiltinProto.load)
-Module.prototype.require = maskFunction(req, BuiltinProto.require)
+Module.prototype._compile = maskFunction(_compile, RealProto._compile)
+Module.prototype.load = maskFunction(load, RealProto.load)
+Module.prototype.require = maskFunction(req, RealProto.require)
 
-defaults(Module, BuiltinModule)
-assign(Module._extensions, BuiltinModule._extensions)
+defaults(Module, RealModule)
+assign(Module._extensions, RealModule._extensions)
 
 if (! Module.globalPaths) {
   Module.globalPaths = initGlobalPaths()

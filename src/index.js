@@ -1,5 +1,6 @@
 import Module from "./module.js"
 import Package from "./package.js"
+import RealModule from "./real-module.js"
 import Shim from "./shim.js"
 
 import assign from "./util/assign.js"
@@ -23,8 +24,6 @@ import vmHook from "./hook/vm.js"
 const {
   ERR_INVALID_ARG_TYPE
 } = errors
-
-const BuiltinModule = __non_webpack_module__.constructor
 
 let exported
 
@@ -82,7 +81,7 @@ if (shared.inited) {
   if (isCheck()) {
     vmHook(vm)
   } else if (isEval()) {
-    BuiltinModule.prototype._compile = Module.prototype._compile
+    RealModule.prototype._compile = Module.prototype._compile
     moduleHook(Module)
     processHook(process)
     vmHook(vm)
@@ -91,8 +90,8 @@ if (shared.inited) {
     processHook(process)
     vmHook(vm)
   } else if (isCLI()) {
-    moduleHook(BuiltinModule)
-    mainHook(BuiltinModule)
+    moduleHook(RealModule)
+    mainHook(RealModule)
     processHook(process)
   }
 }
