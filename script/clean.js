@@ -16,12 +16,11 @@ function cleanEmptyDirs() {
   return Promise
     .all(
       globby.sync(["*/**/"], {
+        absolute: true,
         cwd: rootPath,
         expandDirectories: false,
         onlyDirectories: true
       })
-      .map(realPath)
-      .filter(fs.existsSync)
       .filter(isEmpty)
       .map(trash)
     )
@@ -37,10 +36,6 @@ function cleanRepo() {
 
 function isEmpty(dirPath) {
   return ! fs.readdirSync(dirPath).length
-}
-
-function realPath(thePath) {
-  return path.resolve(rootPath, thePath)
 }
 
 Promise
