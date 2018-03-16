@@ -1,6 +1,6 @@
 // Based on Node's `Module.prototype.load` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/module.js
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import { dirname, extname } from "path"
 

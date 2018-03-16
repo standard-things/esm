@@ -1,6 +1,6 @@
 // Based on Node's `Module._load` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/module.js
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import ENTRY from "../../constant/entry.js"
 import PACKAGE from "../../constant/package.js"

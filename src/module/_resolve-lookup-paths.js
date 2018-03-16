@@ -1,6 +1,6 @@
 // Based on Node's `Module._resolveLookupPaths` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/module.js
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"

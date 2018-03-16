@@ -1,3 +1,7 @@
+// Based on Node's `stripShebang` method.
+// Copyright Node.js contributors. Released under MIT license:
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
+
 import CHAR_CODE from "../constant/char-code.js"
 
 const {

@@ -1,6 +1,6 @@
-// Based on Node's `internalModule.stripBOM` method.
+// Based on Node's `stripBOM` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/internal/module.js
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
 function stripBOM(string) {
   if (typeof string !== "string") {

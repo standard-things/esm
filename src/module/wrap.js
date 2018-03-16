@@ -1,6 +1,6 @@
 // Based on Node's `NativeModule.wrap` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/internal/bootstrap_node.js
+// https://github.com/nodejs/node/blob/master/lib/internal/bootstrap/loaders.js
 
 import wrapper from "./wrapper.js"
 

@@ -1,6 +1,6 @@
-// Based on Node's `internalModule.makeRequireFunction` method.
+// Based on Node's `makeRequireFunction` method.
 // Copyright Node.js contributors. Released under MIT license:
-// https://github.com/nodejs/node/blob/master/lib/internal/module.js
+// https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
 import ENTRY from "../constant/entry.js"
 
