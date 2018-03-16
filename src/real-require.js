@@ -1,19 +1,17 @@
-import CHAR from "./constant/char.js"
-
 import shared from "./shared.js"
 
-const {
-  ZWJ
-} = CHAR
+const realRequire = (() => {
+  const { symbol } = shared
 
-let realRequire = __non_webpack_require__
+  try {
+    return realRequire(symbol.require)
+  } catch (e) {}
 
-try {
-  realRequire = realRequire(shared.symbol.require)
-} catch (e) {}
+  try {
+    return realRequire(symbol.esmRequire)
+  } catch (e) {}
 
-try {
-  realRequire = realRequire(Symbol.for("esm" + ZWJ + ":require"))
-} catch (e) {}
+  return __non_webpack_require__
+})()
 
 export default realRequire

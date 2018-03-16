@@ -1,11 +1,11 @@
-import PREFIX from "../constant/prefix.js"
+import ESM from "../constant/esm.js"
 
 import assign from "../util/assign.js"
 import shared from "../shared.js"
 
 const {
-  STD_ESM
-} = PREFIX
+  PKG_PREFIX
+} = ESM
 
 const markerDescriptor = {
   __proto__: null,
@@ -23,7 +23,7 @@ function init() {
 
       proto[shared.symbol.inspect] = customInspect
       handler = { __proto__: proto }
-      Reflect.defineProperty(handler, STD_ESM + ":proxy", markerDescriptor)
+      Reflect.defineProperty(handler, PKG_PREFIX + ":proxy", markerDescriptor)
 
       const proxy = new Proxy(target, handler)
 

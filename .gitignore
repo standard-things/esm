@@ -7,8 +7,8 @@
 .nyc_output
 .pm2
 .vscode
-esm.js
 package-lock.json
+/esm.js
 /build
 /node_modules
 /src/vendor

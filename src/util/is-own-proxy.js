@@ -1,4 +1,4 @@
-import PREFIX from "../constant/prefix.js"
+import ESM from "../constant/esm.js"
 
 import OwnProxy from "../own/proxy.js"
 
@@ -6,8 +6,8 @@ import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 const {
-  STD_ESM
-} = PREFIX
+  PKG_PREFIX
+} = ESM
 
 const inspectOptions = {
   __proto__: null,
@@ -34,7 +34,7 @@ function isOwnProxy(value) {
     const inspected = shared.inspect(value, inspectOptions)
 
     return inspected.startsWith("Proxy") &&
-      inspected.endsWith("'" + STD_ESM + ":proxy': 1 } ]")
+      inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
   }
 }
 

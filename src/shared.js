@@ -1,6 +1,6 @@
 import { inspect, types } from "util"
 
-import PREFIX from "./constant/prefix.js"
+import ESM from "./constant/esm.js"
 
 import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
@@ -9,8 +9,9 @@ import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
-  STD_ESM
-} = PREFIX
+  ESM_PREFIX,
+  PKG_PREFIX
+} = ESM
 
 let shared
 
@@ -25,11 +26,13 @@ if (__shared__) {
 
   const symbol = {
     __proto__: null,
-    _compile: Symbol.for(STD_ESM + ":module._compile"),
+    _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
+    esmRequire: Symbol.for(ESM_PREFIX + ":require"),
+    esmWrapper: Symbol.for(ESM_PREFIX + ":wrapper"),
     inspect: inspect.custom,
-    mjs: Symbol.for(STD_ESM + ':Module._extensions[".mjs"]'),
-    require: Symbol.for(STD_ESM + ":require"),
-    wrapper: Symbol.for(STD_ESM + ":wrapper")
+    mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
+    require: Symbol.for(PKG_PREFIX + ":require"),
+    wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 
   shared = {
@@ -144,11 +147,11 @@ if (__shared__) {
   )
 
   setDeferred(support, "inspectProxies", () => {
-    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [STD_ESM]: 1 })
+    const proxy = new Proxy({ __proto__: null }, { __proto__: null, [PKG_PREFIX]: 1 })
     const inspected = shared.inspect(proxy, { __proto__: null, showProxy: true })
 
     return inspected.startsWith("Proxy") &&
-      inspected.indexOf(STD_ESM) !== -1
+      inspected.indexOf(PKG_PREFIX) !== -1
   })
 
   setDeferred(support, "internalModuleReadFile", () =>

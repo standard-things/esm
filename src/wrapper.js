@@ -44,9 +44,18 @@ const Wrapper = {
     setSilent(object, key, manager)
   },
   unwrap(object, key) {
+    const { esmWrapper, wrapper } = shared.symbol
     const manager = silent(() => object[key])
-    const symbol = shared.symbol.wrapper
-    return has(manager, symbol) ? manager[symbol]  : manager
+
+    if (has(manager, wrapper)) {
+      return manager[wrapper]
+    }
+
+    if (has(manager, esmWrapper)) {
+      return manager[esmWrapper]
+    }
+
+    return manager
   },
   wrap(object, key, wrapper) {
     const map = getOrCreateMap(object, key)
