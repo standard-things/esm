@@ -14,4 +14,6 @@ package-lock.json
 /src/vendor
 /test/env/prefix/bin
 /test/env/prefix/node
+/test/fixture/main-hook/symlink/symlink.js
+/test/fixture/main-hook/symlink/symlink.mjs
 /test/fixture/scenario/ava-nyc-tsc/*.js

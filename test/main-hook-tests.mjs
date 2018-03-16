@@ -211,4 +211,37 @@ describe("main hook", function () {
         assert.strictEqual(stderr.includes("async hook stack has become corrupted"), false)
       })
   )
+
+  it("should not preserve symlinks", () => {
+    const flags = ["", "--preserve-symlinks"]
+    const destNames = ["symlink.js",  "symlink.mjs"]
+    const runs = []
+
+    flags.forEach((flag) => {
+      destNames.forEach((destName) => {
+        const args = flag ? [flag] : []
+        args.push("-r", "../", "./fixture/main-hook/symlink/" + destName)
+        runs.push(args)
+      })
+    })
+
+    return runs
+      .reduce((promise, args) =>
+        promise
+          .then(() => {
+            const destPath = args[args.length - 1]
+            const ext = path.extname(destPath)
+            const srcPath = "./fixture/main-hook/symlink/real" + ext
+
+            return fs
+              .ensureSymlink(srcPath, destPath)
+              .then(() => node(args))
+              .then((result) => {
+                assert.strictEqual(result.stderr, "")
+                assert.ok(result.stdout.includes("symlink:true"))
+              })
+              .then(() => fs.remove(destPath))
+          })
+      , Promise.resolve())
+  })
 })
