@@ -45,8 +45,6 @@ const {
 
 const ExObject = __external__.Object
 
-const runtimeWrapperRegExp = /^const _\w{3}=this;/
-
 function compile(caller, entry, content, filename, fallback) {
   const { options } = entry.package
 
@@ -91,10 +89,6 @@ function compile(caller, entry, content, filename, fallback) {
     })
   }
 
-  if (isRuntimeWrapped(compileData.code)) {
-    return entry.module._compile(content, filename)
-  }
-
   if (options.warnings &&
       moduleState.parsing) {
     for (const warning of compileData.warnings) {
@@ -124,11 +118,6 @@ function compile(caller, entry, content, filename, fallback) {
     entry.state = STATE_EXECUTION_STARTED
     return tryCompileCached(entry)
   }
-}
-
-function isRuntimeWrapped(content) {
-  return runtimeWrapperRegExp.test(content) &&
-    content.endsWith("\n}))")
 }
 
 function tryCompileCached(entry) {
