@@ -8,7 +8,10 @@ import path from "path"
 const SCRIPT = 1
 const MODULE = 2
 
-const files = globby.sync(["output/**/*.{js,mjs}"])
+const files = globby
+  .sync(["output/**/*.{js,mjs}"])
+  .map(path.normalize)
+
 const tests = files
   .reduce((tests, thePath) => {
     const dirPath = path.dirname(thePath)

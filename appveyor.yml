@@ -13,13 +13,6 @@ environment:
     - nodejs_version: 6
     - nodejs_version: chakracore/latest
 
-matrix:
-  allow_failures:
-    - nodejs_version: 9
-    - nodejs_version: 8
-    - nodejs_version: 6
-    - nodejs_version: chakracore/latest
-
 cache:
   - '%APPDATA%\npm-cache'
 
