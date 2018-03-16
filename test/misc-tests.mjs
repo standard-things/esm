@@ -785,7 +785,9 @@ describe("spec compliance", () => {
     const code = `
       "use strict"
       import("path")
-      ;(function() { return this })()
+      ;(function () {
+        return this
+      })()
     `
 
     assert.strictEqual(typeof eval(code), "undefined")
