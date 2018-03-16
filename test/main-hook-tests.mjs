@@ -122,6 +122,7 @@ describe("main hook", function () {
       .then((result) => {
         const url = testURL + "/fixture/main-hook/import-meta.mjs"
         const expected = JSON.stringify({ url })
+
         assert.ok(result.stdout.includes("import-meta:" + expected))
       })
   )
@@ -163,6 +164,17 @@ describe("main hook", function () {
       )
   )
 
+  it("should support loading `@std/esm`", () =>
+    runMain("./fixture/main-hook/std-esm.js")
+      .then((result) => {
+        const exported = { a: "a", b: "b", c: "c", default: "default" }
+        const expected = JSON.stringify(exported)
+
+        assert.strictEqual(result.stderr, "")
+        assert.ok(result.stdout.includes("std-esm:" + expected))
+      })
+  )
+
   it("should error for missing modules", () => {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
     const otherFlags = [""]
@@ -190,7 +202,7 @@ describe("main hook", function () {
       , Promise.resolve())
   })
 
-  it("should not shallow async errors", () =>
+  it("should not swallow async errors", () =>
     runMain("./fixture/main-hook/async-error.mjs")
       .then((result) => {
         const { stderr } = result
