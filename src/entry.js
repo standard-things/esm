@@ -237,7 +237,7 @@ class Entry {
     let exported = mod.exports
 
     if (isESM &&
-        ! Object.isSealed(exported)) {
+        ! Object.isFrozen(exported)) {
       if (this.package.options.cjs.interop &&
           ! has(this._namespace, "__esModule") &&
           ! isMJS(mod)) {
@@ -248,7 +248,9 @@ class Entry {
         setGetter(exported, name, () => this._namespace[name])
       }
 
-      Object.seal(exported)
+      Object.setPrototypeOf(exported, null)
+      Object.freeze(exported)
+      Object.freeze(mod)
     } else if (! isESM) {
       const newEntry = Entry.get(mod)
 
