@@ -3,11 +3,11 @@ import ESM from "../constant/esm.js"
 import assign from "../util/assign.js"
 import shared from "../shared.js"
 
-const {
-  PKG_PREFIX
-} = ESM
-
 function init() {
+  const {
+    PKG_PREFIX
+  } = ESM
+
   const customInspectDescriptor = {
     __proto__: null,
     value: () => "{}"

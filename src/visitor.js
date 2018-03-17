@@ -4,130 +4,137 @@
 
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
+import shared from "./shared.js"
 
-const childNamesMap = new WeakMap
+function init() {
+  const childNamesMap = new WeakMap
 
-const childrenToVisit = {
-  __proto__: null,
-  alternate: true,
-  argument: true,
-  arguments: true,
-  block: true,
-  body: true,
-  callee: true,
-  cases: true,
-  consequent: true,
-  declaration: true,
-  declarations: true,
-  elements: true,
-  expression: true,
-  expressions: true,
-  init: true,
-  left: true,
-  object: true,
-  properties: true,
-  right: true,
-  value: true
-}
-
-class Visitor {
-  visit(path) {
-    this.reset(...arguments)
-
-    const possibleIndexes = this.possibleIndexes || []
-
-    this.possibleEnd = possibleIndexes.length
-    this.possibleIndexes = possibleIndexes
-    this.possibleStart = 0
-
-    this.visitWithoutReset(path)
+  const childrenToVisit = {
+    __proto__: null,
+    alternate: true,
+    argument: true,
+    arguments: true,
+    block: true,
+    body: true,
+    callee: true,
+    cases: true,
+    consequent: true,
+    declaration: true,
+    declarations: true,
+    elements: true,
+    expression: true,
+    expressions: true,
+    init: true,
+    left: true,
+    object: true,
+    properties: true,
+    right: true,
+    value: true
   }
 
-  visitWithoutReset(path) {
-    const value = path.getValue()
+  class Visitor {
+    visit(path) {
+      this.reset(...arguments)
 
-    if (! isObject(value)) {
-      return
+      const possibleIndexes = this.possibleIndexes || []
+
+      this.possibleEnd = possibleIndexes.length
+      this.possibleIndexes = possibleIndexes
+      this.possibleStart = 0
+
+      this.visitWithoutReset(path)
     }
 
-    if (Array.isArray(value)) {
-      path.each(this, "visitWithoutReset")
-      return
+    visitWithoutReset(path) {
+      const value = path.getValue()
+
+      if (! isObject(value)) {
+        return
+      }
+
+      if (Array.isArray(value)) {
+        path.each(this, "visitWithoutReset")
+        return
+      }
+
+      // The method must call `this.visitChildren(path)` to continue traversing.
+      let methodName = "visit" + value.type
+
+      if (typeof this[methodName] !== "function") {
+        methodName = "visitChildren"
+      }
+
+      this[methodName](path)
     }
 
-    // The method must call `this.visitChildren(path)` to continue traversing.
-    let methodName = "visit" + value.type
+    visitChildren(path) {
+      const node = path.getValue()
+      const names = getChildNames(node)
 
-    if (typeof this[methodName] !== "function") {
-      methodName = "visitChildren"
+      const { end, start } = node
+      const { possibleIndexes } = this
+
+      const oldLeft = this.possibleStart
+      const oldRight = this.possibleEnd
+
+      let left = oldLeft
+      let right = oldRight
+
+      if (typeof start === "number" &&
+          typeof end === "number") {
+        // Find first index not less than `node.start`.
+        while (left < right &&
+            possibleIndexes[left] < start) {
+          ++left
+        }
+
+        // Find first index not greater than `node.end`.
+        while (left < right &&
+            possibleIndexes[right - 1] > end) {
+          --right
+        }
+      }
+
+      if (left < right) {
+        this.possibleStart = left
+        this.possibleEnd = right
+
+        for (const name of names) {
+          path.call(this, "visitWithoutReset", name)
+        }
+
+        this.possibleStart = oldLeft
+        this.possibleEnd = oldRight
+      }
     }
-
-    this[methodName](path)
   }
 
-  visitChildren(path) {
-    const node = path.getValue()
-    const names = getChildNames(node)
+  function getChildNames(value) {
+    let childNames = childNamesMap.get(value)
 
-    const { end, start } = node
-    const { possibleIndexes } = this
+    if (childNames) {
+      return childNames
+    }
 
-    const oldLeft = this.possibleStart
-    const oldRight = this.possibleEnd
+    const names = keys(value)
+    childNames = []
 
-    let left = oldLeft
-    let right = oldRight
-
-    if (typeof start === "number" &&
-        typeof end === "number") {
-      // Find first index not less than `node.start`.
-      while (left < right &&
-          possibleIndexes[left] < start) {
-        ++left
-      }
-
-      // Find first index not greater than `node.end`.
-      while (left < right &&
-          possibleIndexes[right - 1] > end) {
-        --right
+    for (const name of names) {
+      if (name in childrenToVisit &&
+          isObject(value[name])) {
+        childNames.push(name)
       }
     }
 
-    if (left < right) {
-      this.possibleStart = left
-      this.possibleEnd = right
-
-      for (const name of names) {
-        path.call(this, "visitWithoutReset", name)
-      }
-
-      this.possibleStart = oldLeft
-      this.possibleEnd = oldRight
-    }
-  }
-}
-
-function getChildNames(value) {
-  let childNames = childNamesMap.get(value)
-
-  if (childNames) {
+    childNamesMap.set(value, childNames)
     return childNames
   }
 
-  const names = keys(value)
-  childNames = []
+  Reflect.setPrototypeOf(Visitor.prototype, null)
 
-  for (const name of names) {
-    if (name in childrenToVisit &&
-        isObject(value[name])) {
-      childNames.push(name)
-    }
-  }
-
-  childNamesMap.set(value, childNames)
-  return childNames
+  return Visitor
 }
 
-Reflect.setPrototypeOf(Visitor.prototype, null)
-
-export default Visitor
+export default shared.inited
+  ? shared.Visitor
+  : shared.Visitor = init()

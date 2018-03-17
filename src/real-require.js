@@ -1,9 +1,15 @@
 import shared from "./shared.js"
 
-let realRequire = __non_webpack_require__
+function init() {
+  let realRequire = __non_webpack_require__
 
-try {
-  realRequire = realRequire(shared.symbol.require)
-} catch (e) {}
+  try {
+    realRequire = realRequire(shared.symbol.require)
+  } catch (e) {}
 
-export default realRequire
+  return realRequire
+}
+
+export default shared.inited
+  ? shared.realRequire
+  : shared.realRequire = init()

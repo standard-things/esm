@@ -2,148 +2,156 @@
 // Copyright Rich Harris. Released under MIT license:
 // https://github.com/Rich-Harris/magic-string
 
-class Chunk {
-  constructor(start, end, content) {
-    this.start = start
-    this.end = end
-    this.original = content
-    this.intro = ""
-    this.content = content
-    this.next = null
+import shared from "./shared.js"
+
+function init() {
+  class Chunk {
+    constructor(start, end, content) {
+      this.start = start
+      this.end = end
+      this.original = content
+      this.intro = ""
+      this.content = content
+      this.next = null
+    }
+
+    contains(index) {
+      return this.start < index && index < this.end
+    }
+
+    edit(content) {
+      this.content = content
+      this.intro = ""
+    }
+
+    prependRight(content) {
+      this.intro = content + this.intro
+    }
+
+    split(index) {
+      const sliceIndex = index - this.start
+      const originalBefore = this.original.slice(0, sliceIndex)
+      const originalAfter = this.original.slice(sliceIndex)
+      const newChunk = new Chunk(index, this.end, originalAfter)
+
+      this.original = originalBefore
+      this.end = index
+      this.content = originalBefore
+
+      newChunk.next = this.next
+      this.next = newChunk
+
+      return newChunk
+    }
+
+    toString() {
+      return this.intro + this.content
+    }
   }
 
-  contains(index) {
-    return this.start < index && index < this.end
-  }
+  Reflect.setPrototypeOf(Chunk.prototype, null)
 
-  edit(content) {
-    this.content = content
-    this.intro = ""
-  }
+  class MagicString {
+    constructor(string) {
+      const chunk = new Chunk(0, string.length, string)
 
-  prependRight(content) {
-    this.intro = content + this.intro
-  }
+      this.original = string
+      this.intro = ""
+      this.outro = ""
+      this.firstChunk = chunk
+      this.lastSearchedChunk = chunk
 
-  split(index) {
-    const sliceIndex = index - this.start
-    const originalBefore = this.original.slice(0, sliceIndex)
-    const originalAfter = this.original.slice(sliceIndex)
-    const newChunk = new Chunk(index, this.end, originalAfter)
+      this.byStart = { __proto__: null }
+      this.byStart[0] = chunk
 
-    this.original = originalBefore
-    this.end = index
-    this.content = originalBefore
+      this.byEnd = { __proto__: null }
+      this.byEnd[string.length] = chunk
+    }
 
-    newChunk.next = this.next
-    this.next = newChunk
+    overwrite(start, end, content) {
+      this._split(start)
+      this._split(end)
 
-    return newChunk
-  }
+      const first = this.byStart[start]
+      const last = this.byEnd[end]
 
-  toString() {
-    return this.intro + this.content
-  }
-}
+      first.edit(content)
 
-Reflect.setPrototypeOf(Chunk.prototype, null)
+      if (first === last) {
+        return this
+      }
 
-class MagicString {
-  constructor(string) {
-    const chunk = new Chunk(0, string.length, string)
+      let chunk = first.next
 
-    this.original = string
-    this.intro = ""
-    this.outro = ""
-    this.firstChunk = chunk
-    this.lastSearchedChunk = chunk
+      while (chunk !== last) {
+        chunk.edit("")
+        chunk = chunk.next
+      }
 
-    this.byStart = { __proto__: null }
-    this.byStart[0] = chunk
-
-    this.byEnd = { __proto__: null }
-    this.byEnd[string.length] = chunk
-  }
-
-  overwrite(start, end, content) {
-    this._split(start)
-    this._split(end)
-
-    const first = this.byStart[start]
-    const last = this.byEnd[end]
-
-    first.edit(content)
-
-    if (first === last) {
+      chunk.edit("")
       return this
     }
 
-    let chunk = first.next
+    prependRight(index, content) {
+      this._split(index)
+      const chunk = this.byStart[index]
 
-    while (chunk !== last) {
-      chunk.edit("")
-      chunk = chunk.next
+      if (chunk) {
+        chunk.prependRight(content)
+      } else {
+        this.outro = content + this.outro
+      }
+
+      return this
     }
 
-    chunk.edit("")
-    return this
-  }
-
-  prependRight(index, content) {
-    this._split(index)
-    const chunk = this.byStart[index]
-
-    if (chunk) {
-      chunk.prependRight(content)
-    } else {
-      this.outro = content + this.outro
-    }
-
-    return this
-  }
-
-  _split(index) {
-    if (this.byStart[index] ||
-        this.byEnd[index]) {
-      return
-    }
-
-    let chunk = this.lastSearchedChunk
-    const searchForward = index > chunk.end
-
-    while (true) {
-      if (chunk.contains(index)) {
-        this._splitChunk(chunk, index)
+    _split(index) {
+      if (this.byStart[index] ||
+          this.byEnd[index]) {
         return
       }
 
-      chunk = searchForward
-        ? this.byStart[chunk.end]
-        : this.byEnd[chunk.start]
+      let chunk = this.lastSearchedChunk
+      const searchForward = index > chunk.end
+
+      while (true) {
+        if (chunk.contains(index)) {
+          this._splitChunk(chunk, index)
+          return
+        }
+
+        chunk = searchForward
+          ? this.byStart[chunk.end]
+          : this.byEnd[chunk.start]
+      }
+    }
+
+    _splitChunk(chunk, index) {
+      const newChunk = chunk.split(index)
+      this.byEnd[index] = chunk
+      this.byStart[index] = newChunk
+      this.byEnd[newChunk.end] = newChunk
+      this.lastSearchedChunk = chunk
+    }
+
+    toString() {
+      let string = this.intro
+      let chunk = this.firstChunk
+
+      while (chunk) {
+        string += chunk.toString()
+        chunk = chunk.next
+      }
+
+      return string + this.outro
     }
   }
 
-  _splitChunk(chunk, index) {
-    const newChunk = chunk.split(index)
-    this.byEnd[index] = chunk
-    this.byStart[index] = newChunk
-    this.byEnd[newChunk.end] = newChunk
-    this.lastSearchedChunk = chunk
-  }
+  Reflect.setPrototypeOf(MagicString.prototype, null)
 
-  toString() {
-    let string = this.intro
-    let chunk = this.firstChunk
-
-    while (chunk) {
-      string += chunk.toString()
-      chunk = chunk.next
-    }
-
-    return string + this.outro
-  }
+  return MagicString
 }
 
-Reflect.setPrototypeOf(MagicString.prototype, null)
-
-export default MagicString
+export default shared.inited
+  ? shared.MagicString
+  : shared.MagicString = init()

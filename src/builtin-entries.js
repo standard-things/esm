@@ -15,9 +15,9 @@ import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
 
-const ExObject = __external__.Object
-
 function init() {
+  const ExObject = __external__.Object
+
   const builtinEntries = { __proto__: null }
 
   function createUtilExports(source) {

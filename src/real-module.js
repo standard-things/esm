@@ -1,5 +1,6 @@
 import realRequire from "./real-require.js"
+import shared from "./shared.js"
 
-const RealModule = realRequire("module")
-
-export default RealModule
+export default shared.inited
+  ? shared.RealModule
+  : shared.RealModule = realRequire("module")

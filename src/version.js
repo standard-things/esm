@@ -1,8 +1,17 @@
 import SemVer from "semver"
 
-// The `process.env.ESM_VERSION` reference is replaced, at build time, with the
-// `esm` version string. See https://webpack.js.org/plugins/environment-plugin/.
-const semver = new SemVer(process.env.ESM_VERSION)
+import shared from "./shared.js"
+
+function init() {
+  // The `process.env.ESM_VERSION` reference is replaced, at build time, with the
+  // `esm` version string. See https://webpack.js.org/plugins/environment-plugin/.
+  return new SemVer(process.env.ESM_VERSION)
+}
+
+const semver = shared.inited
+  ? shared.version
+  : shared.version = init()
+
 const { major, minor, patch, version } = semver
 const name = "esm@" + version
 
