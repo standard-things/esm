@@ -85,12 +85,22 @@ function init() {
 
       const mod = new Module(id, null)
       const entry = Entry.get(mod)
+      const oldExported = exported
 
-      mod.exports = exported
+      mod.exports = oldExported
       mod.loaded = true
 
       exported =
       mod.exports = proxyExports(entry)
+
+      if (typeof oldExported === "function") {
+        const oldProto = oldExported.prototype
+
+        if (has(oldProto, "constructor") &&
+            oldProto.constructor === oldExported) {
+          oldExported.prototype.constructor = exported
+        }
+      }
 
       Entry.set(exported, entry)
 
