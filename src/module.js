@@ -38,6 +38,7 @@ Module.wrap = maskFunction(wrap, RealModule.wrap)
 Module.wrapper = GenericArray.slice(wrapper)
 
 Module.prototype._compile = maskFunction(_compile, RealProto._compile)
+Module.prototype.constructor = Module
 Module.prototype.load = maskFunction(load, RealProto.load)
 Module.prototype.require = maskFunction(req, RealProto.require)
 
