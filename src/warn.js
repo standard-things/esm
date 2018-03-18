@@ -1,4 +1,4 @@
-import emitWarning from "./warning/emit-warning.js"
+import emitWarning from "./util/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
 import { name as pkgName } from "./version.js"
 import shared from "./shared.js"
