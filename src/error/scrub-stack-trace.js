@@ -26,6 +26,7 @@ function init() {
     const message = stack.slice(0, index)
 
     let trace = stack.slice(index)
+
     const lines = trace.split("\n")
     const filtered = lines.filter((line) => line.indexOf(PKG_DIRNAME) === -1)
 

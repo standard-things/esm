@@ -1,26 +1,33 @@
-import { dirname } from "../safe/path.js"
 import encodeId from "../util/encode-id.js"
+import setDeferred from "../util/set-deferred.js"
+import shared from "../shared.js"
 
-const PKG_DIRNAME = dirname(__non_webpack_module__.filename)
-
-let PKG_PARENT = __non_webpack_module__.parent
-let seen = new Set
-
-while (PKG_PARENT &&
-    typeof PKG_PARENT.filename === "string" &&
-    PKG_PARENT.filename.startsWith(PKG_DIRNAME) &&
-    ! seen.has(PKG_PARENT)) {
-  PKG_PARENT = PKG_PARENT.parent
-  seen.add(PKG_PARENT)
-}
-
-seen = null
+const { filename, parent } = __non_webpack_module__
 
 const ESM = {
   __proto__: null,
-  PKG_DIRNAME,
-  PKG_PARENT,
   PKG_PREFIX: encodeId("esm")
 }
+
+setDeferred(ESM, "PKG_DIRNAME", () => {
+  return shared.module.safePath.dirname(filename)
+})
+
+setDeferred(ESM, "PKG_PARENT", () => {
+  const { PKG_DIRNAME } = ESM
+
+  let PKG_PARENT = parent
+  let seen = new Set
+
+  while (PKG_PARENT &&
+      typeof PKG_PARENT.filename === "string" &&
+      PKG_PARENT.filename.startsWith(PKG_DIRNAME) &&
+      ! seen.has(PKG_PARENT)) {
+    PKG_PARENT = PKG_PARENT.parent
+    seen.add(PKG_PARENT)
+  }
+
+  return PKG_PARENT
+})
 
 export default ESM

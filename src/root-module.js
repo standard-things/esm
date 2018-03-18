@@ -7,6 +7,4 @@ while (rootModule.parent != null &&
   seen.add(rootModule)
 }
 
-seen = null
-
 export default rootModule
