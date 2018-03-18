@@ -9,7 +9,7 @@ function getProxyDetails(proxy) {
     return
   }
 
-  const cache = shared.getProxyDetails
+  const cache = shared.memoize.getProxyDetails
   const cached = cache.get(proxy)
 
   if (cached) {

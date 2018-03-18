@@ -17,10 +17,9 @@ let shared
 if (__shared__) {
   shared = __shared__
 } else {
+  const fastPath = { __proto__: null }
   const runtimeName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const { versions } = process
-
-  const fastPath = { __proto__: null }
 
   const support = {
     __proto__: null,
@@ -41,10 +40,6 @@ if (__shared__) {
   shared = {
     __proto__: null,
     binding,
-    cjs: {
-      __proto__: null,
-      resolveFilename: { __proto__: null }
-    },
     entry: {
       __proto__: null,
       cache: new WeakMap,
@@ -54,20 +49,25 @@ if (__shared__) {
       __proto__: null,
       win32: process.platform === "win32"
     },
-    esm: {
-      __proto__: null,
-      resolveFilename: { __proto__: null }
-    },
-    exportProxy: new WeakMap,
     fastPath,
-    findPath: { __proto__: null },
-    generic: { __proto__: null },
-    getProxyDetails: new WeakMap,
     inited: false,
     inspect,
-    maskFunction: new WeakMap,
-    maxSatisfying: { __proto__: null },
-    own: { __proto__: null },
+    memoize: {
+      __proto__: null,
+      cjsResolveFilename: { __proto__: null },
+      esmResolveFilename: { __proto__: null },
+      findPath: { __proto__: null },
+      functionPrototypeToString: new WeakMap,
+      getProxyDetails: new WeakMap,
+      maskFunction: new WeakMap,
+      maxSatisfying: { __proto__: null },
+      parseURL: { __proto__: null },
+      proxyExports: new WeakMap,
+      readPackage: { __proto__: null },
+      satisfies: { __proto__: null },
+      unwrapProxy: new WeakMap
+    },
+    module: { __proto__: null },
     package: {
       __proto__: null,
       cache: { __proto__: null },
@@ -75,7 +75,6 @@ if (__shared__) {
       dir: { __proto__: null },
       root: { __proto__: null }
     },
-    parseURL: { __proto__: null },
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
     process: {
@@ -93,16 +92,11 @@ if (__shared__) {
         v8: versions.v8
       }
     },
-    readPackage: { __proto__: null },
     runtimeName,
-    safe: { __proto__: null },
     safeContext: Function("return this")(),
-    satisfies: { __proto__: null },
-    shim: { __proto__: null },
     support,
     symbol,
-    unsafeContext: global,
-    unwrapProxy: new WeakMap
+    unsafeContext: global
   }
 
   setDeferred(shared, "arrowSymbol", () => {

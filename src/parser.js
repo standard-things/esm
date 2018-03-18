@@ -72,5 +72,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Parser
-  : shared.Parser = init()
+  ? shared.module.Parser
+  : shared.module.Parser = init()

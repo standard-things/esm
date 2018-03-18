@@ -19,7 +19,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  const cache = shared.cjs.resolveFilename
+  const cache = shared.memoize.cjsResolveFilename
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain

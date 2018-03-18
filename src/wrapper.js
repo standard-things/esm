@@ -106,5 +106,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Wrapper
-  : shared.Wrapper = init()
+  ? shared.module.Wrapper
+  : shared.module.Wrapper = init()

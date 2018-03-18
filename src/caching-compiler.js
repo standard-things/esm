@@ -324,5 +324,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.CachingCompiler
-  : shared.CachingCompiler = init()
+  ? shared.module.CachingCompiler
+  : shared.module.CachingCompiler = init()

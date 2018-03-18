@@ -114,5 +114,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.builtinEntries
-  : shared.builtinEntries = init()
+  ? shared.module.builtinEntries
+  : shared.module.builtinEntries = init()

@@ -10,7 +10,7 @@ function parseURL(url) {
     url = ""
   }
 
-  const cache = shared.parseURL
+  const cache = shared.memoize.parseURL
   const cacheKey = isURL ? url.href : url
 
   return cacheKey in cache

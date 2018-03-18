@@ -21,5 +21,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.generic.Array
-  : shared.generic.Array = init()
+  ? shared.module.GenericArray
+  : shared.module.GenericArray = init()

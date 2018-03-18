@@ -11,5 +11,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.realRequire
-  : shared.realRequire = init()
+  ? shared.module.realRequire
+  : shared.module.realRequire = init()

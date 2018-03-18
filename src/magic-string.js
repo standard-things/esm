@@ -153,5 +153,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.MagicString
-  : shared.MagicString = init()
+  ? shared.module.MagicString
+  : shared.module.MagicString = init()

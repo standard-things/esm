@@ -12,5 +12,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Shim
-  : shared.Shim = init()
+  ? shared.module.Shim
+  : shared.module.Shim = init()

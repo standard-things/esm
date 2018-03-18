@@ -9,5 +9,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.generic.Date
-  : shared.generic.Date = init()
+  ? shared.module.GenericDate
+  : shared.module.GenericDate = init()

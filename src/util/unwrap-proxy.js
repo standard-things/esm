@@ -7,7 +7,7 @@ function unwrapProxy(value) {
     return value
   }
 
-  const cache = shared.unwrapProxy
+  const cache = shared.memoize.unwrapProxy
   const cached = cache.get(value)
 
   if (cached) {

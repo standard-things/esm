@@ -9,8 +9,8 @@ function init() {
 }
 
 const semver = shared.inited
-  ? shared.version
-  : shared.version = init()
+  ? shared.module.version
+  : shared.module.version = init()
 
 const { major, minor, patch, version } = semver
 const name = "esm@" + version

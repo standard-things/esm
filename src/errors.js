@@ -150,5 +150,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.errors
-  : shared.errors = init()
+  ? shared.module.errors
+  : shared.module.errors = init()

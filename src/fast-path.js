@@ -87,5 +87,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.FastPath
-  : shared.FastPath = init()
+  ? shared.module.FastPath
+  : shared.module.FastPath = init()

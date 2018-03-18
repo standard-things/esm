@@ -67,5 +67,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.warn
-  : shared.warn = init()
+  ? shared.module.warn
+  : shared.module.warn = init()

@@ -136,5 +136,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Visitor
-  : shared.Visitor = init()
+  ? shared.module.Visitor
+  : shared.module.Visitor = init()

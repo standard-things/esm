@@ -218,5 +218,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.Compiler
-  : shared.Compiler = init()
+  ? shared.module.Compiler
+  : shared.module.Compiler = init()

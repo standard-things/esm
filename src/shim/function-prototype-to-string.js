@@ -5,17 +5,15 @@ import getProxyDetails from "../util/get-proxy-details.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import shared from "../shared.js"
 
-const checked =
-  shared.shim.functionPrototypeToString ||
-  (shared.shim.functionPrototypeToString = new WeakMap)
-
 const nativeSourceText = "function () { [native code] }"
 
 const Shim = {
   __proto__: null,
   check(context) {
+    const cache = shared.memoize.functionPrototypeToString
     const funcProto = context.Function.prototype
-    let result = checked.get(funcProto)
+
+    let result = cache.get(funcProto)
 
     if (typeof result !== "boolean") {
       result = false
@@ -27,7 +25,7 @@ const Shim = {
         result = typeof toString.call(proxy) === "string"
       } catch (e) {}
 
-      checked.set(funcProto, result)
+      cache.set(funcProto, result)
     }
 
     return result
@@ -40,6 +38,7 @@ const Shim = {
     // Section 19.2.3.5: Function.prototype.toString()
     // Step 3: Return "function () { [native code] }" for callable objects.
     // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
+    const cache = shared.memoize.functionPrototypeToString
     const funcProto = context.Function.prototype
     const _toString = funcProto.toString
 
@@ -79,7 +78,7 @@ const Shim = {
         }
       })
 
-      checked.set(funcProto, true)
+      cache.set(funcProto, true)
     } catch (e) {}
 
     return context
