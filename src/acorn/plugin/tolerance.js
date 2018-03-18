@@ -2,65 +2,72 @@ import alwaysFalse from "../../util/always-false.js"
 import alwaysTrue from "../../util/always-true.js"
 import errors from "../../parse/errors.js"
 import noop from "../../util/noop.js"
+import shared from "../../shared.js"
 
-const engineDupPrefix = "Duplicate export of '"
-const parserDupPrefix = "Duplicate export '"
+function init() {
+  const ENGINE_DUP_PREFIX = "Duplicate export of '"
+  const PARSER_DUP_PREFIX = "Duplicate export '"
 
-const engineTypePostfix = "may only be used in ES modules"
-const parserTypePostfix = "may appear only with 'sourceType: module'"
+  const ENGINE_TYPE_POSTFIX = "may only be used in ES modules"
+  const PARSER_TYPE_POSTFIX = "may appear only with 'sourceType: module'"
 
-const Plugin = {
-  __proto__: null,
-  enable(parser) {
-    parser.isDirectiveCandidate =
-    parser.strictDirective = alwaysFalse
+  const Plugin = {
+    __proto__: null,
+    enable(parser) {
+      parser.isDirectiveCandidate =
+      parser.strictDirective = alwaysFalse
 
-    parser.canDeclareLexicalName =
-    parser.canDeclareVarName =
-    parser.isSimpleParamList = alwaysTrue
+      parser.canDeclareLexicalName =
+      parser.canDeclareVarName =
+      parser.isSimpleParamList = alwaysTrue
 
-    parser.adaptDirectivePrologue =
-    parser.checkParams =
-    parser.checkPatternErrors =
-    parser.checkPatternExport =
-    parser.checkPropClash =
-    parser.checkVariableExport =
-    parser.checkYieldAwaitInDefaultParams =
-    parser.declareLexicalName =
-    parser.declareVarName =
-    parser.enterFunctionScope =
-    parser.enterLexicalScope =
-    parser.exitFunctionScope =
-    parser.exitLexicalScope =
-    parser.invalidStringToken =
-    parser.validateRegExpFlags =
-    parser.validateRegExpPattern = noop
+      parser.adaptDirectivePrologue =
+      parser.checkParams =
+      parser.checkPatternErrors =
+      parser.checkPatternExport =
+      parser.checkPropClash =
+      parser.checkVariableExport =
+      parser.checkYieldAwaitInDefaultParams =
+      parser.declareLexicalName =
+      parser.declareVarName =
+      parser.enterFunctionScope =
+      parser.enterLexicalScope =
+      parser.exitFunctionScope =
+      parser.exitLexicalScope =
+      parser.invalidStringToken =
+      parser.validateRegExpFlags =
+      parser.validateRegExpPattern = noop
 
-    parser.checkExpressionErrors = checkExpressionErrors
+      parser.checkExpressionErrors = checkExpressionErrors
 
-    parser.raise =
-    parser.raiseRecoverable = raise
+      parser.raise =
+      parser.raiseRecoverable = raise
 
-    return parser
-  }
-}
-
-function checkExpressionErrors(refDestructuringErrors) {
-  if (refDestructuringErrors) {
-    return refDestructuringErrors.shorthandAssign !== -1
+      return parser
+    }
   }
 
-  return false
-}
+  function checkExpressionErrors(refDestructuringErrors) {
+    if (refDestructuringErrors) {
+      return refDestructuringErrors.shorthandAssign !== -1
+    }
 
-function raise(pos, message) {
-  if (message.startsWith(parserDupPrefix)) {
-    message = message.replace(parserDupPrefix, engineDupPrefix)
-  } else if (message.endsWith(parserTypePostfix)) {
-    message = message.replace(parserTypePostfix, engineTypePostfix)
+    return false
   }
 
-  throw new errors.SyntaxError(this.input, pos, message)
+  function raise(pos, message) {
+    if (message.startsWith(PARSER_DUP_PREFIX)) {
+      message = message.replace(PARSER_DUP_PREFIX, ENGINE_DUP_PREFIX)
+    } else if (message.endsWith(PARSER_TYPE_POSTFIX)) {
+      message = message.replace(PARSER_TYPE_POSTFIX, ENGINE_TYPE_POSTFIX)
+    }
+
+    throw new errors.SyntaxError(this.input, pos, message)
+  }
+
+  return Plugin
 }
 
-export default Plugin
+export default shared.inited
+  ? shared.module.acornPluginTolerance
+  : shared.module.acornPluginTolerance = init()
