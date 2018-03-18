@@ -1,4 +1,4 @@
-import { createHash } from "crypto"
+import { createHash } from "../safe/crypto.js"
 
 function md5(string) {
   return createHash("md5")

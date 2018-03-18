@@ -3,8 +3,8 @@ import { inspect, types } from "util"
 import ESM from "./constant/esm.js"
 
 import binding from "./binding.js"
+import { createHash } from "crypto"
 import encodeId from "./util/encode-id.js"
-import md5 from "./util/md5.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
@@ -18,7 +18,6 @@ if (__shared__) {
   shared = __shared__
 } else {
   const fastPath = { __proto__: null }
-  const runtimeName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
   const utilBinding = { __proto__: null }
   const { versions } = process
 
@@ -97,7 +96,13 @@ if (__shared__) {
         v8: versions.v8
       }
     },
-    runtimeName,
+    runtimeName: encodeId(
+      "_" +
+      createHash("md5")
+        .update(Date.now().toString())
+        .digest("hex")
+        .slice(0, 3)
+    ),
     safeContext: Function("return this")(),
     support,
     symbol,

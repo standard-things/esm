@@ -1,6 +1,6 @@
 import binding from "../binding.js"
 import realRequire from "../real-require.js"
-import url from "url"
+import url from "../safe/url.js"
 
 let _domainToUnicode = url.domainToUnicode
 

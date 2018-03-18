@@ -1,5 +1,5 @@
 import getModuleURL from "./util/get-module-url.js"
-import { inspect } from "util"
+import { inspect } from "./safe/util.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 

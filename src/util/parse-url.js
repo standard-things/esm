@@ -1,4 +1,4 @@
-import { Url, parse } from "url"
+import { Url, parse } from "../safe/url.js"
 
 import shared from "../shared.js"
 

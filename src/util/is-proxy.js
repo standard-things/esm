@@ -1,6 +1,6 @@
 import getProxyDetails from "./get-proxy-details.js"
 import shared from "../shared.js"
-import { types } from "util"
+import { types } from "../safe/util.js"
 
 const _isProxy = types && types.isProxy
 
