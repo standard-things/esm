@@ -1,70 +1,77 @@
 import Visitor from "../visitor.js"
 
 import { getLineInfo } from "../acorn.js"
+import shared from "../shared.js"
 
-const definedMap = new WeakMap
+function init() {
+  const definedMap = new WeakMap
 
-class IdentifierVisitor extends Visitor {
-  reset(rootPath, options) {
-    this.magicString = options.magicString
-    this.possibleIndexes = options.possibleIndexes
-    this.warnedForArguments = false
-    this.warnings = options.warnings
+  class IdentifierVisitor extends Visitor {
+    reset(rootPath, options) {
+      this.magicString = options.magicString
+      this.possibleIndexes = options.possibleIndexes
+      this.warnedForArguments = false
+      this.warnings = options.warnings
+    }
+
+    visitIdentifier(path) {
+      if (this.warnedForArguments) {
+        return
+      }
+
+      const node = path.getValue()
+
+      if (node.name !== "arguments") {
+        return
+      }
+
+      const { operator, type } = path.getParentNode()
+
+      if ((type === "UnaryExpression" &&
+          operator === "typeof") ||
+          isArgumentsDefined(path)) {
+        return
+      }
+
+      const { column, line } = getLineInfo(this.magicString.original, node.start)
+
+      this.warnedForArguments = true
+      this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
+    }
+
+    visitWithoutReset(path) {
+      if (! this.warnedForArguments) {
+        super.visitWithoutReset(path)
+      }
+    }
   }
 
-  visitIdentifier(path) {
-    if (this.warnedForArguments) {
-      return
-    }
+  function isArgumentsDefined(path) {
+    let defined = false
 
-    const node = path.getValue()
+    path.getParentNode((parent) => {
+      defined = definedMap.get(parent)
 
-    if (node.name !== "arguments") {
-      return
-    }
+      if (defined) {
+        return defined
+      }
 
-    const { operator, type } = path.getParentNode()
+      const { type } = parent
 
-    if ((type === "UnaryExpression" &&
-         operator === "typeof") ||
-        isArgumentsDefined(path)) {
-      return
-    }
+      defined =
+        type === "FunctionDeclaration" ||
+        type === "FunctionExpression"
 
-    const { column, line } = getLineInfo(this.magicString.original, node.start)
-
-    this.warnedForArguments = true
-    this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
-  }
-
-  visitWithoutReset(path) {
-    if (! this.warnedForArguments) {
-      super.visitWithoutReset(path)
-    }
-  }
-}
-
-function isArgumentsDefined(path) {
-  let defined = false
-
-  path.getParentNode((parent) => {
-    defined = definedMap.get(parent)
-
-    if (defined) {
+      definedMap.set(parent, defined)
       return defined
-    }
+    })
 
-    const { type } = parent
-
-    defined =
-      type === "FunctionDeclaration" ||
-      type === "FunctionExpression"
-
-    definedMap.set(parent, defined)
     return defined
-  })
+  }
 
-  return defined
+  return new IdentifierVisitor
 }
 
-export default new IdentifierVisitor
+export default shared.inited
+  ? shared.module.visitorIdentifier
+  : shared.module.visitorIdentifier = init()
