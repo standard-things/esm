@@ -1,11 +1,11 @@
 import indexOfPragma from "./index-of-pragma.js"
 
-const modulePragma = "use module"
-const scriptPragma = "use script"
+const MODULE_PRAGMA = "use module"
+const SCRIPT_PRAGMA = "use script"
 
 // A pragma width includes the enclosing quotes and trailing semicolon.
-const modulePragmaWidth = modulePragma.length + 3
-const scriptPragmaWidth = scriptPragma.length + 3
+const MODULE_PRAGMA_WIDTH = MODULE_PRAGMA.length + 3
+const SCRIPT_PRAGMA_WIDTH = SCRIPT_PRAGMA.length + 3
 
 function hasPragma(code, pragma) {
   const index = indexOfPragma(code, pragma)
@@ -14,14 +14,14 @@ function hasPragma(code, pragma) {
     return false
   }
 
-  if (index >= scriptPragmaWidth &&
-      pragma === modulePragma) {
-    return indexOfPragma(code.slice(0, index), scriptPragma) === -1
+  if (index >= SCRIPT_PRAGMA_WIDTH &&
+      pragma === MODULE_PRAGMA) {
+    return indexOfPragma(code.slice(0, index), SCRIPT_PRAGMA) === -1
   }
 
-  if (index >= modulePragmaWidth &&
-      pragma === scriptPragma) {
-    return indexOfPragma(code.slice(0, index), modulePragma) === -1
+  if (index >= MODULE_PRAGMA_WIDTH &&
+      pragma === SCRIPT_PRAGMA) {
+    return indexOfPragma(code.slice(0, index), MODULE_PRAGMA) === -1
   }
 
   return true
