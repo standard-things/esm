@@ -1,7 +1,7 @@
 import SafeJSON from "../safe/json.js"
 
 import readFileFast from "../fs/read-file-fast.js"
-import { readFileSync } from "fs"
+import { readFileSync } from "../safe/fs.js"
 import shared from "../shared.js"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"

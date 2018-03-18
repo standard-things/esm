@@ -1,4 +1,4 @@
-import { extname, resolve } from "path"
+import { extname, resolve } from "../safe/path.js"
 
 import ENTRY from "../constant/entry.js"
 import PACKAGE from "../constant/package.js"

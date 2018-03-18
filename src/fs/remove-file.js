@@ -1,4 +1,4 @@
-import { unlinkSync } from "fs"
+import { unlinkSync } from "../safe/fs.js"
 
 function removeFile(filename) {
   if (typeof filename === "string") {

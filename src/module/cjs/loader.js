@@ -1,6 +1,6 @@
 import Module from "../../module.js"
 
-import { extname } from "path"
+import { extname } from "../../safe/path.js"
 
 function loader(entry, preload) {
   if (preload) {

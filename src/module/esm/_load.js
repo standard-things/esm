@@ -1,4 +1,4 @@
-import { dirname, extname } from "path"
+import { dirname, extname } from "../../safe/path.js"
 
 import ENTRY from "../../constant/entry.js"
 

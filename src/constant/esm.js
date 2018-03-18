@@ -1,4 +1,4 @@
-import { dirname } from "path"
+import { dirname } from "../safe/path.js"
 import encodeId from "../util/encode-id.js"
 
 const PKG_DIRNAME = dirname(__non_webpack_module__.filename)

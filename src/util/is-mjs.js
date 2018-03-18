@@ -1,4 +1,4 @@
-import { extname } from "path"
+import { extname } from "../safe/path.js"
 import isObject from "./is-object.js"
 
 function isMJS(request) {

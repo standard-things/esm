@@ -1,4 +1,4 @@
-import { Stats, statSync } from "fs"
+import { Stats, statSync } from "../safe/fs.js"
 
 import binding from "../binding.js"
 import call from "../util/call.js"

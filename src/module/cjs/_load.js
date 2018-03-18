@@ -5,7 +5,7 @@
 import Module from "../../module.js"
 
 import _load from "../_load.js"
-import { dirname } from "path"
+import { dirname } from "../../safe/path.js"
 import loader from "./loader.js"
 import moduleState from "../state.js"
 

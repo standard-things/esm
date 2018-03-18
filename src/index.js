@@ -1,3 +1,4 @@
+import shared from "./shared.js"
 import Module from "./module.js"
 import Package from "./package.js"
 import RealModule from "./real-module.js"
@@ -18,7 +19,6 @@ import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
 import requireHook from "./hook/require.js"
-import shared from "./shared.js"
 import vm from "vm"
 import vmHook from "./hook/vm.js"
 

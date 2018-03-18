@@ -12,7 +12,7 @@ import isCacheFileName from "./util/is-cache-file-name.js"
 import isMJS from "./util/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
-import { resolve } from "path"
+import { resolve } from "./safe/path.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 

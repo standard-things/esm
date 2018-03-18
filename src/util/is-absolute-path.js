@@ -1,6 +1,6 @@
 import CHAR_CODE from "../constant/char-code.js"
 
-import { isAbsolute as _isAbsolutePath } from "path"
+import { isAbsolute as _isAbsolutePath } from "../safe/path.js"
 import shared from "../shared.js"
 
 const {

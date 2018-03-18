@@ -1,4 +1,4 @@
-import { resolve } from "path"
+import { resolve } from "../safe/path.js"
 
 const backSlashRegExp = /\\/g
 

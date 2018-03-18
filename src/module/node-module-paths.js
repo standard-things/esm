@@ -6,7 +6,7 @@ import CHAR_CODE from "../constant/char-code.js"
 
 import GenericArray from "../generic/array.js"
 
-import { resolve } from "path"
+import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 
 const {

@@ -10,7 +10,7 @@ import Package from "../package.js"
 
 import _compile from "./_compile.js"
 import binding from "../binding.js"
-import { dirname } from "path"
+import { dirname } from "../safe/path.js"
 import getCacheFileName from "../util/get-cache-file-name.js"
 import getSilent from "../util/get-silent.js"
 import has from "../util/has.js"

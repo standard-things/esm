@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs"
+import { writeFileSync } from "../safe/fs.js"
 
 function writeFile(filename, bufferOrString, options) {
   if (typeof filename === "string") {

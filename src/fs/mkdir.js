@@ -1,4 +1,4 @@
-import { mkdirSync } from "fs"
+import { mkdirSync } from "../safe/fs.js"
 
 function mkdir(dirPath) {
   if (typeof dirPath === "string") {

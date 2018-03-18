@@ -2,7 +2,7 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import { dirname, extname } from "path"
+import { dirname, extname } from "../safe/path.js"
 
 import Module from "../module.js"
 

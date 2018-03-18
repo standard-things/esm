@@ -1,4 +1,4 @@
-import { realpathSync } from "fs"
+import { realpathSync } from "../safe/fs.js"
 
 function realpath(thePath) {
   if (typeof thePath === "string") {

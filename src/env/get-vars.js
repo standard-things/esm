@@ -3,7 +3,7 @@ import CHAR_CODE from "../constant/char-code.js"
 import isPath from "../util/is-path.js"
 import parseJSON6 from "../util/parse-json6.js"
 import readFile from "../fs/read-file.js"
-import { resolve } from "path"
+import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 
 const {

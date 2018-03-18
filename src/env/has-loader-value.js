@@ -1,4 +1,4 @@
-import { extname, resolve } from "path"
+import { extname, resolve } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 import ESM from "../constant/esm.js"

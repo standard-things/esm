@@ -2,7 +2,7 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import { isAbsolute, resolve } from "path"
+import { isAbsolute, resolve } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 

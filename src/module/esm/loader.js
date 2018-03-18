@@ -2,7 +2,7 @@ import ENTRY from "../../constant/entry.js"
 
 import Module from "../../module.js"
 
-import { extname } from "path"
+import { extname } from "../../safe/path.js"
 import isMJS from "../../util/is-mjs.js"
 import moduleState from "../state.js"
 

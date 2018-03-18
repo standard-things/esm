@@ -1,4 +1,4 @@
-import { readdirSync } from "fs"
+import { readdirSync } from "../safe/fs.js"
 
 function readdir(dirPath) {
   if (typeof dirPath === "string") {

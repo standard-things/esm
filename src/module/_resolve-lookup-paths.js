@@ -5,7 +5,7 @@
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
-import { dirname } from "path"
+import { dirname } from "../safe/path.js"
 import isRelativePath from "../util/is-relative-path.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"

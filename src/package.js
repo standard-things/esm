@@ -1,4 +1,4 @@
-import { basename, dirname , extname, resolve } from "path"
+import { basename, dirname , extname, resolve } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import PACKAGE from "./constant/package.js"

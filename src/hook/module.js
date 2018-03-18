@@ -26,7 +26,7 @@ import mtime from "../fs/mtime.js"
 import { name as pkgName } from "../version.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
-import { resolve } from "path"
+import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 import toOptInError from "../util/to-opt-in-error.js"
 

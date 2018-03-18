@@ -1,4 +1,4 @@
-import { dirname } from "path"
+import { dirname } from "../safe/path.js"
 import isObject from "./is-object.js"
 
 function getModuleDirname(request) {

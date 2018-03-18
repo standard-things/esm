@@ -1,6 +1,6 @@
 import GenericDate from "../generic/date.js"
 
-import { statSync } from "fs"
+import { statSync } from "../safe/fs.js"
 
 const { round } = Math
 

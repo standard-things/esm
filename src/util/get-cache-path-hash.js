@@ -1,4 +1,4 @@
-import { basename, extname } from "path"
+import { basename, extname } from "../safe/path.js"
 
 function getCachePathHash(filename) {
   return typeof filename === "string"

@@ -1,4 +1,4 @@
-import { readFileSync as _readFileSync } from "fs"
+import { readFileSync as _readFileSync } from "../safe/fs.js"
 import isFile from "../util/is-file.js"
 import stripBOM from "../util/strip-bom.js"
 
