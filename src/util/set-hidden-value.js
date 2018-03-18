@@ -4,7 +4,7 @@ import shared from "../shared.js"
 
 function setHiddenValue(object, key, value) {
   if (shared.support.setHiddenValue &&
-      typeof key === shared.hiddenKeyType &&
+      typeof key === shared.utilBinding.hiddenKeyType &&
       isObjectLike(object)) {
     try {
       return binding.util.setHiddenValue(object, key, value)

@@ -31,7 +31,7 @@ function isOwnProxy(value) {
   }
 
   if (shared.support.inspectProxies) {
-    const inspected = shared.inspect(value, inspectOptions)
+    const inspected = shared.util.inspect(value, inspectOptions)
 
     return inspected.startsWith("Proxy") &&
       inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")

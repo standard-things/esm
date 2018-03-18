@@ -19,6 +19,7 @@ if (__shared__) {
 } else {
   const fastPath = { __proto__: null }
   const runtimeName = encodeId("_" + md5(Date.now().toString()).slice(0, 3))
+  const utilBinding = { __proto__: null }
   const { versions } = process
 
   const support = {
@@ -37,6 +38,11 @@ if (__shared__) {
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 
+  const util = {
+    __proto__: null,
+    inspect
+  }
+
   shared = {
     __proto__: null,
     binding,
@@ -51,7 +57,6 @@ if (__shared__) {
     },
     fastPath,
     inited: false,
-    inspect,
     memoize: {
       __proto__: null,
       cjsResolveFilename: { __proto__: null },
@@ -96,34 +101,10 @@ if (__shared__) {
     safeContext: Function("return this")(),
     support,
     symbol,
-    unsafeContext: global
+    unsafeContext: global,
+    util,
+    utilBinding
   }
-
-  setDeferred(shared, "arrowSymbol", () => {
-    return satisfies(shared.process.version, "<7.0.0")
-      ? "node:arrowMessage"
-      : binding.util.arrow_message_private_symbol
-  })
-
-  setDeferred(shared, "customInspectKey", () => {
-    const customInspectSymbol = shared.symbol.inspect
-
-    return typeof customInspectSymbol === "symbol"
-      ? customInspectSymbol
-      : "inspect"
-  })
-
-  setDeferred(shared, "decoratedSymbol", () => {
-    return satisfies(shared.process.version, "<7.0.0")
-      ? "node:decorated"
-      : binding.util.decorated_private_symbol
-  })
-
-  setDeferred(shared, "hiddenKeyType", () =>
-    satisfies(shared.process.version, "<7.0.0")
-      ? "string"
-      : typeof shared.arrowSymbol
-  )
 
   setDeferred(fastPath, "readFile", () =>
     support.internalModuleReadFile
@@ -157,7 +138,7 @@ if (__shared__) {
       [PKG_PREFIX]: 1
     })
 
-    const inspected = shared.inspect(proxy, {
+    const inspected = util.inspect(proxy, {
       __proto__: null,
       showProxy: true
     })
@@ -216,6 +197,32 @@ if (__shared__) {
 
   setDeferred(support, "setHiddenValue", () =>
     typeof binding.util.setHiddenValue === "function"
+  )
+
+  setDeferred(util, "customInspectKey", () => {
+    const customInspectSymbol = symbol.inspect
+
+    return typeof customInspectSymbol === "symbol"
+      ? customInspectSymbol
+      : "inspect"
+  })
+
+  setDeferred(utilBinding, "arrowSymbol", () => {
+    return satisfies(shared.process.version, "<7.0.0")
+      ? "node:arrowMessage"
+      : binding.util.arrow_message_private_symbol
+  })
+
+  setDeferred(utilBinding, "decoratedSymbol", () => {
+    return satisfies(shared.process.version, "<7.0.0")
+      ? "node:decorated"
+      : binding.util.decorated_private_symbol
+  })
+
+  setDeferred(utilBinding, "hiddenKeyType", () =>
+    satisfies(shared.process.version, "<7.0.0")
+      ? "string"
+      : typeof utilBinding.arrowSymbol
   )
 }
 
