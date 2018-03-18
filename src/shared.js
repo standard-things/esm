@@ -62,7 +62,6 @@ if (__shared__) {
       cjsResolveFilename: { __proto__: null },
       esmResolveFilename: { __proto__: null },
       findPath: { __proto__: null },
-      functionPrototypeToString: new WeakMap,
       getProxyDetails: new WeakMap,
       maskFunction: new WeakMap,
       maxSatisfying: { __proto__: null },
@@ -70,6 +69,7 @@ if (__shared__) {
       proxyExports: new WeakMap,
       readPackage: { __proto__: null },
       satisfies: { __proto__: null },
+      shimFunctionPrototypeToString: new WeakMap,
       unwrapProxy: new WeakMap
     },
     module: { __proto__: null },

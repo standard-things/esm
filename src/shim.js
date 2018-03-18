@@ -1,14 +1,16 @@
-import functionPrototypeToString from "./shim/function-prototype-to-string.js"
 import shared from "./shared.js"
+import shimFunctionPrototypeToString from "./shim/function-prototype-to-string.js"
 
 function init() {
-  return {
+  const Shim = {
     __proto__: null,
     enable(context) {
-      functionPrototypeToString.enable(context)
+      shimFunctionPrototypeToString.enable(context)
       return context
     }
   }
+
+  return Shim
 }
 
 export default shared.inited
