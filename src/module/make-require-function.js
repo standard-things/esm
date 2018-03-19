@@ -1,4 +1,4 @@
-// Based on Node's `makeRequireFunction` method.
+// Based on Node's `makeRequireFunction`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 

@@ -1,4 +1,4 @@
-// Based on Node's `Module#_compile` method.
+// Based on Node's `Module#_compile`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 

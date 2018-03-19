@@ -1,4 +1,4 @@
-// Based on Node's `Module.prototype.load` method.
+// Based on Node's `Module.prototype.load`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 

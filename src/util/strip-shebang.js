@@ -1,4 +1,4 @@
-// Based on Node's `stripShebang` method.
+// Based on Node's `stripShebang`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 

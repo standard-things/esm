@@ -1,4 +1,4 @@
-// Based on Node's `NativeModule.wrap` method.
+// Based on Node's `NativeModule.wrap`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/bootstrap/loaders.js
 

@@ -1,6 +1,6 @@
-// A simplified version of the AST traversal abstraction used by Recast.
+// A simplified version of Recast's `FastPath`.
 // Copyright Ben Newman. Released under MIT license:
-// https://github.com/benjamn/recast/blob/master/lib/fast-path.js
+// https://github.com/benjamn/recast
 
 import alwaysTrue from "./util/always-true.js"
 import isObject from "./util/is-object.js"

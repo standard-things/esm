@@ -1,6 +1,6 @@
-// Based on a similar API provided by ast-types.
+// Based on `PathVisitor` of ast-types.
 // Copyright Ben Newman. Released under MIT license:
-// https://github.com/benjamn/ast-types/blob/master/lib/path-visitor.js
+// https://github.com/benjamn/ast-types
 
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"

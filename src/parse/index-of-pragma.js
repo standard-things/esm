@@ -1,6 +1,6 @@
-// Based on Acorn's Parser.prototype.strictDirective parser utility.
+// Based on Acorn's `strictDirective`.
 // Copyright Marijn Haverbeke. Released under MIT license:
-// https://github.com/ternjs/acorn/blob/5.1.1/src/parseutil.js#L9-L19
+// https://github.com/acornjs/acorn
 
 import { literalRegExp, skipWhiteSpaceRegExp } from "../acorn.js"
 
