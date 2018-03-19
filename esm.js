@@ -11,7 +11,7 @@ const nodeVersion = process.version
 
 const { filename, id } = module
 const bootstrap = id.startsWith("internal/")
-  ? safeRequire("internal/bootstrap_loaders")
+  ? safeRequire("internal/bootstrap/loaders")
   : void 0
 
 const { Script } = require("vm")
