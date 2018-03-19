@@ -271,43 +271,49 @@ function tryCompileCode(caller, entry, content, options) {
     return Compiler.compile(entry, content, options)
   }
 
+  let error
+
   try {
     return Compiler.compile(entry, content, options)
   } catch (e) {
-    if (! isError(e) ||
-        isStackTraceMasked(e)) {
-      throw e
-    }
-
-    const isESM = e.sourceType === MODULE
-
-    Reflect.deleteProperty(e, "sourceType")
-    captureStackTrace(e, caller)
-    throw maskStackTrace(e, content, entry.module.filename, isESM)
+    error = e
   }
+
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
+
+  const isESM = error.sourceType === MODULE
+
+  Reflect.deleteProperty(error, "sourceType")
+  captureStackTrace(error, caller)
+  throw maskStackTrace(error, content, entry.module.filename, isESM)
 }
 
 function tryValidateESM(caller, entry) {
-  const { options } = entry.package
-
-  if (options.debug) {
-    validateESM(entry)
-  } else {
-    try {
-      validateESM(entry)
-    } catch (e) {
-      if (! isError(e) ||
-          isStackTraceMasked(e)) {
-        throw e
-      }
-
-      const { filename } = entry.module
-      const content = () => readSourceCode(filename)
-
-      captureStackTrace(e, caller)
-      throw maskStackTrace(e, content, filename, true)
-    }
+  if (entry.package.options.debug) {
+    return validateESM(entry)
   }
+
+  let error
+
+  try {
+    return validateESM(entry)
+  } catch (e) {
+    error = e
+  }
+
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
+
+  const { filename } = entry.module
+  const content = () => readSourceCode(filename)
+
+  captureStackTrace(error, caller)
+  throw maskStackTrace(error, content, filename, true)
 }
 
 function useAsyncWrapper(entry) {

@@ -224,36 +224,40 @@ function tryPassthru(func, args, pkg) {
   const options = pkg && pkg.options
 
   if (options && options.debug) {
-    Reflect.apply(func, this, args)
-  } else {
-    try {
-      Reflect.apply(func, this, args)
-    } catch (e) {
-      if (! isError(e) ||
-          isStackTraceMasked(e)) {
-        throw e
-      }
+    return Reflect.apply(func, this, args)
+  }
 
-      const [, filename] = args
-      const content = () => readSourceCode(filename)
+  let error
 
-      if (e.name === "SyntaxError") {
-        const { message } = e
+  try {
+    return Reflect.apply(func, this, args)
+  } catch (e) {
+    error = e
+  }
 
-        if (importExportRegExp.test(message) &&
-            isObjectEmpty(e)) {
-          e.message = pkgName + " is not enabled for " + filename
-          e.stack = e.stack.replace(message, e.message)
-        }
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
 
-        if (pkg) {
-          pkg.cache.dirty = true
-        }
-      }
+  const [, filename] = args
+  const content = () => readSourceCode(filename)
 
-      throw maskStackTrace(e, content, filename)
+  if (error.name === "SyntaxError") {
+    const { message } = error
+
+    if (importExportRegExp.test(message) &&
+        isObjectEmpty(error)) {
+      error.message = pkgName + " is not enabled for " + filename
+      error.stack = error.stack.replace(message, error.message)
+    }
+
+    if (pkg) {
+      pkg.cache.dirty = true
     }
   }
+
+  throw maskStackTrace(error, content, filename)
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
