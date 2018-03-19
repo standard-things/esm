@@ -8,7 +8,10 @@ import acornPluginFunctionParamsStart from "./acorn/plugin/function-params-start
 import acornPluginHTMLComment from "./acorn/plugin/html-comment.js"
 import acornPluginTolerance from "./acorn/plugin/tolerance.js"
 import acornPluginTopLevel from "./acorn/plugin/top-level.js"
+import acornWalkDynamicImport from "./acorn/walk/dynamic-import.js"
 import defaults from "./util/defaults.js"
+import isInternal from "./env/is-internal.js"
+import realRequire from "./real-require.js"
 import shared from "./shared.js"
 
 function init() {
@@ -67,6 +70,20 @@ function init() {
     options.sourceType = sourceTypeMap[sourceType] || sourceType
     return options
   }
+
+  function tryInternalAcornSetup() {
+    if (isInternal()) {
+      try {
+        const acorn = realRequire("internal/deps/acorn/dist/acorn")
+        const walk = realRequire("internal/deps/acorn/dist/walk")
+
+        acorn.parse = Parser.parse
+        acornWalkDynamicImport.enable(walk)
+      } catch (e) {}
+    }
+  }
+
+  tryInternalAcornSetup()
 
   return Parser
 }
