@@ -106,14 +106,12 @@ function hook(vm) {
 
     entry.state = STATE_EXECUTION_STARTED
 
-    const { runtimeName } = entry
-
-    content =
+    const code =
       "(()=>{" +
         'var g=Function("return this")(),' +
         "m=g.module," +
         "e=m&&m.exports," +
-        'k="' + runtimeName + '";' +
+        'k="' + entry.runtimeName + '";' +
         "if(e&&!g[k]){" +
           "m.exports=e.entry.exports;" +
           "require=e.entry.require;" +
@@ -126,14 +124,14 @@ function hook(vm) {
       "})();" +
       compileData.code
 
-    const result = tryWrapper(func, [content, scriptOptions])
+    const result = tryWrapper.call(vm, func, [code, scriptOptions], content)
 
     if (result.cachedDataProduced) {
       compileData.scriptData = result.cachedData
     }
 
-    result.runInContext = wrap(result.runInContext, tryWrapper)
-    result.runInThisContext = wrap(result.runInThisContext, tryWrapper)
+    result.runInContext = createTryWrapper(result.runInContext, content)
+    result.runInThisContext = createTryWrapper(result.runInThisContext, content)
     return result
   }
 
@@ -185,6 +183,12 @@ function hook(vm) {
         set
       })
     }
+  }
+
+  function createTryWrapper(func, content) {
+    return wrap(func, function (func, args) {
+      return tryWrapper.call(this, func, args, content)
+    })
   }
 
   function initEntry(mod) {
@@ -273,36 +277,41 @@ function hook(vm) {
 }
 
 function tryValidateESM(caller, entry, content) {
+  let error
+
   try {
-    validateESM(entry)
+    return validateESM(entry)
   } catch (e) {
-    if (! isError(e) ||
-        isStackTraceMasked(e)) {
-      throw e
-    }
-
-    const { filename } = entry.module
-
-    captureStackTrace(e, caller)
-    throw maskStackTrace(e, content, filename, true)
+    error = e
   }
+
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
+
+  captureStackTrace(error, caller)
+  throw maskStackTrace(error, content, entry.module.filename, true)
 }
 
-function tryWrapper(func, args) {
+function tryWrapper(func, args, content) {
+  let error
+
   try {
     return Reflect.apply(func, this, args)
   } catch (e) {
-    if (! isError(e) ||
-        isStackTraceMasked(e)) {
-      throw e
-    }
-
-    const [content] = args
-    const isESM = e.sourceType === MODULE
-
-    Reflect.deleteProperty(e, "sourceType")
-    throw maskStackTrace(e, content, null, isESM)
+    error = e
   }
+
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
+
+  const isESM = error.sourceType === MODULE
+
+  Reflect.deleteProperty(error, "sourceType")
+  throw maskStackTrace(error, content, null, isESM)
 }
 
 export default hook
