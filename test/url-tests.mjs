@@ -65,15 +65,17 @@ describe("URL parsing", () => {
   })
 
   it("should not resolve URLs with other protocols", () =>
-    Promise.all([
-      "about:blank",
-      "ftp://example.com/",
-      "http://example.com/",
-      "https://example.com/"
-    ].map((id) =>
-      import(id)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
-    ))
+    Promise
+      .all([
+        "about:blank",
+        "ftp://example.com/",
+        "http://example.com/",
+        "https://example.com/"
+      ]
+      .map((id) =>
+        import(id)
+          .then(() => assert.ok(false))
+          .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
+      ))
   )
 })

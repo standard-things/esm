@@ -187,12 +187,13 @@ describe("package.json", () => {
   )
 
   it("should support esm as package dependencies", () =>
-    Promise.all([
-      "dependencies",
-      "dev-dependencies",
-      "peer-dependencies"
-    ]
-    .map((request) => import(request)))
+    Promise
+      .all([
+        "dependencies",
+        "dev-dependencies",
+        "peer-dependencies"
+      ]
+      .map((request) => import(request)))
   )
 })
 
@@ -250,77 +251,78 @@ describe("errors", () => {
     const id7 = path.resolve("fixture/error/syntax.js")
     const id8 = path.resolve("node_modules/error/index.js")
 
-    return Promise.all([
-      import(id1)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(id1) + ":4",
-            "SyntaxError: Unexpected token"
-          ].join("\n"))
-        ),
-      import(id4)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            id2 + ":1",
-            'export const a = "a"',
-            "^\n"
-          ].join("\n"))
-        ),
-      import(id3)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            id3 + ":1",
-            'import { a } from "./export.js"',
-            "^\n"
-          ].join("\n"))
-        ),
-      import(id5)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(id5) + ":1",
-            "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
-          ].join("\n"))
-        ),
-      import(id6)
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(id6) + ":2",
-            '  import"nested"',
-            "  ^\n"
-          ].join("\n"))
-        ),
-      import(id7)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          if (isDebug) {
-            assert.ok(true)
-          } else {
+    return Promise
+      .all([
+        import(id1)
+          .then(() => assert.ok(false))
+          .catch((e) =>
             checkErrorStack(e, [
-              id7 + ":1",
-              "syntax@error",
-              "      ^\n"
+              getURLFromFilePath(id1) + ":4",
+              "SyntaxError: Unexpected token"
             ].join("\n"))
-          }
-        }),
-      import(id8)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          if (isDebug) {
-            assert.ok(true)
-          } else {
+          ),
+        import(id4)
+          .then(() => assert.ok(false))
+          .catch((e) =>
             checkErrorStack(e, [
-              id8 + ":1",
-              "syntax@error",
-              "      ^\n"
+              id2 + ":1",
+              'export const a = "a"',
+              "^\n"
             ].join("\n"))
-          }
-        })
-    ])
+          ),
+        import(id3)
+          .then(() => assert.ok(false))
+          .catch((e) =>
+            checkErrorStack(e, [
+              id3 + ":1",
+              'import { a } from "./export.js"',
+              "^\n"
+            ].join("\n"))
+          ),
+        import(id5)
+          .then(() => assert.ok(false))
+          .catch((e) =>
+            checkErrorStack(e, [
+              getURLFromFilePath(id5) + ":1",
+              "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
+            ].join("\n"))
+          ),
+        import(id6)
+          .then(() => assert.ok(false))
+          .catch((e) =>
+            checkErrorStack(e, [
+              getURLFromFilePath(id6) + ":2",
+              '  import"nested"',
+              "  ^\n"
+            ].join("\n"))
+          ),
+        import(id7)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            if (isDebug) {
+              assert.ok(true)
+            } else {
+              checkErrorStack(e, [
+                id7 + ":1",
+                "syntax@error",
+                "      ^\n"
+              ].join("\n"))
+            }
+          }),
+        import(id8)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            if (isDebug) {
+              assert.ok(true)
+            } else {
+              checkErrorStack(e, [
+                id8 + ":1",
+                "syntax@error",
+                "      ^\n"
+              ].join("\n"))
+            }
+          })
+      ])
   })
 
   it("should mask stack traces", () =>
@@ -376,13 +378,15 @@ describe("Node rules", () => {
   )
 
   it('should resolve local "." requests', () =>
-    Promise.all([
-      "./fixture/relative/dot.js",
-      "./fixture/relative/dot-slash.js"
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.strictEqual(ns.default, "inside dot"))
-    ))
+    Promise
+      .all([
+        "./fixture/relative/dot.js",
+        "./fixture/relative/dot-slash.js"
+      ]
+      .map((request) =>
+        import(request)
+          .then((ns) => assert.strictEqual(ns.default, "inside dot"))
+      ))
   )
 
   it('should not resolve non-local "." requests with `require`', () => {
@@ -428,16 +432,18 @@ describe("Node rules", () => {
   )
 
   it("should not resolve non-local dependencies with `import`", () =>
-    Promise.all([
-      "home-node-libraries",
-      "home-node-modules",
-      "node-path",
-      "prefix-path"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
-    ))
+    Promise
+      .all([
+        "home-node-libraries",
+        "home-node-modules",
+        "node-path",
+        "prefix-path"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+      ))
   )
 
   it("should resolve non-local dependencies with `require.resolve`", () =>
@@ -534,13 +540,15 @@ describe("Node rules", () => {
   )
 
   it("should find .mjs before .js in ESM", () =>
-    Promise.all([
-      "./fixture/ext-priority",
-      "ext-priority"
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.strictEqual(ns.default, "mjs"))
-    ))
+    Promise
+      .all([
+        "./fixture/ext-priority",
+        "ext-priority"
+      ]
+      .map((request) =>
+        import(request)
+          .then((ns) => assert.strictEqual(ns.default, "mjs"))
+      ))
   )
 
   it("should not respect new `require.extensions` in ESM", () => {
@@ -557,23 +565,26 @@ describe("Node rules", () => {
   })
 
   it("should support URL requests in ESM", () =>
-    Promise.all([
-      abcPath + "?a",
-      abcPath + "#a",
-      abcPath.replace("abc", "%61%62%63")
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.deepStrictEqual(ns, abcNs))
-    ))
+    Promise
+      .all([
+        abcPath + "?a",
+        abcPath + "#a",
+        abcPath.replace("abc", "%61%62%63")
+      ]
+      .map((request) =>
+        import(request)
+          .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      ))
   )
 
   it("should support requests containing colons in ESM", () =>
-    Promise.all([
-      "./fixture/with:colon.mjs",
-      "./fixture/with%3acolon.mjs",
-      "./fixture/with%3Acolon.mjs"
-    ]
-    .map((request) => import(request)))
+    Promise
+      .all([
+        "./fixture/with:colon.mjs",
+        "./fixture/with%3acolon.mjs",
+        "./fixture/with%3Acolon.mjs"
+      ]
+      .map((request) => import(request)))
   )
 
   it("should support requests containing percents in ESM", () =>
@@ -585,16 +596,18 @@ describe("Node rules", () => {
   )
 
   it("should not support URL requests with encoded slashes", () =>
-    Promise.all([
-      abcPath.replace(slashRegExp, "%2f"),
-      abcPath.replace(slashRegExp, "%2F"),
-      abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
-      abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
-    ))
+    Promise
+      .all([
+        abcPath.replace(slashRegExp, "%2f"),
+        abcPath.replace(slashRegExp, "%2F"),
+        abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
+        abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+      ))
   )
 
   it("should reevaluate requests with different query+hashes", () =>
@@ -746,19 +759,21 @@ describe("spec compliance", () => {
   )
 
   it("should support cyclical dynamic imports", () =>
-    Promise.all([
-      "./fixture/cycle/dynamic-import/a.js",
-      "./fixture/cycle/dynamic-import/a.mjs"
-    ]
-    .map((request) => import(request)))
+    Promise
+      .all([
+        "./fixture/cycle/dynamic-import/a.js",
+        "./fixture/cycle/dynamic-import/a.mjs"
+      ]
+      .map((request) => import(request)))
   )
 
   it("should support evaled dynamic import in ESM", () => {
     const code = `
-      Promise.all([
-        import("./fixture/export/abc.mjs"),
-        import("./fixture/export/def.js")
-      ])
+      Promise
+        .all([
+          import("./fixture/export/abc.mjs"),
+          import("./fixture/export/def.js")
+        ])
     `
 
     return Promise
@@ -772,13 +787,15 @@ describe("spec compliance", () => {
   })
 
   it("should support evaled dynamic import in CJS", () =>
-    Promise.all([
-      "./fixture/eval/direct/dynamic-import.js",
-      "./fixture/eval/indirect/dynamic-import.js"
-    ].map((request) =>
-      require(request)
-        .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
-    ))
+    Promise
+      .all([
+        "./fixture/eval/direct/dynamic-import.js",
+        "./fixture/eval/indirect/dynamic-import.js"
+      ]
+      .map((request) =>
+        require(request)
+          .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
+      ))
   )
 
   it("should support evaled strict mode code in ESM", () => {
@@ -810,18 +827,20 @@ describe("spec compliance", () => {
   )
 
   it("should not support `import.meta` in CJS", () =>
-    Promise.all([
-      "./fixture/source/import-meta.js",
-      "./fixture/eval/direct/import-meta.js",
-      "./fixture/eval/indirect/import-meta.js"
-    ].map((request) =>
-      import(request)
-        .then((ns) => assert.ok(false))
-        .catch((e) => {
-          assert.ok(e instanceof SyntaxError)
-          assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
-        })
-    ))
+    Promise
+      .all([
+        "./fixture/source/import-meta.js",
+        "./fixture/eval/direct/import-meta.js",
+        "./fixture/eval/indirect/import-meta.js"
+      ]
+      .map((request) =>
+        import(request)
+          .then((ns) => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof SyntaxError)
+            assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
+          })
+      ))
   )
 
   it("should not support evaled `import.meta` in ESM", () => {
@@ -900,85 +919,97 @@ describe("spec compliance", () => {
   )
 
   it("should error when importing or re-exporting a conflicted star exports", () =>
-    Promise.all([
-      "./fixture/import/star-conflict.mjs",
-      "./fixture/export/star-conflict.mjs"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.ok(e instanceof SyntaxError)
-          assert.ok(e.message.includes("contains conflicting star exports for name '"))
-        })
-    ))
+    Promise
+      .all([
+        "./fixture/import/star-conflict.mjs",
+        "./fixture/export/star-conflict.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof SyntaxError)
+            assert.ok(e.message.includes("contains conflicting star exports for name '"))
+          })
+      ))
   )
 
   it("should error with legacy code missing modules in CJS", () =>
-    Promise.all([
-      "./fixture/import/missing/module/cjs.js",
-      "./fixture/import/missing/module/no-ext.js"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
-    ))
+    Promise
+      .all([
+        "./fixture/import/missing/module/cjs.js",
+        "./fixture/import/missing/module/no-ext.js"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+      ))
   )
 
   it("should error with legacy code missing modules in CJS with `options.cjs.vars`", () =>
-    Promise.all([
-      "./fixture/cjs/missing/module/cjs.js",
-      "./fixture/cjs/missing/module/esm.js",
-      "./fixture/cjs/missing/module/no-ext.js"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
-    ))
+    Promise
+      .all([
+        "./fixture/cjs/missing/module/cjs.js",
+        "./fixture/cjs/missing/module/esm.js",
+        "./fixture/cjs/missing/module/no-ext.js"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+      ))
   )
 
   it("should error for missing modules before code execution", () =>
-    Promise.all([
-      "./fixture/import/missing/module/cjs.mjs",
-      "./fixture/import/missing/module/esm.mjs",
-      "./fixture/import/missing/module/no-ext.mjs",
-      "./fixture/cycle/missing/module/a.mjs"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.strictEqual(Reflect.has(global, "loadCount"), false)
-          assert.strictEqual(e.code, "MODULE_NOT_FOUND")
-        })
-    ))
+    Promise
+      .all([
+        "./fixture/import/missing/module/cjs.mjs",
+        "./fixture/import/missing/module/esm.mjs",
+        "./fixture/import/missing/module/no-ext.mjs",
+        "./fixture/cycle/missing/module/a.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.strictEqual(Reflect.has(global, "loadCount"), false)
+            assert.strictEqual(e.code, "MODULE_NOT_FOUND")
+          })
+      ))
   )
 
   it("should error when importing non-exported binding before code execution", () =>
-    Promise.all([
-      "./fixture/import/missing/export/cjs.mjs",
-      "./fixture/import/missing/export/esm.mjs",
-      "./fixture/cycle/missing/export/a.mjs"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.strictEqual(Reflect.has(global, "loadCount"), false)
-          assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
-        })
-    ))
+    Promise
+      .all([
+        "./fixture/import/missing/export/cjs.mjs",
+        "./fixture/import/missing/export/esm.mjs",
+        "./fixture/cycle/missing/export/a.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.strictEqual(Reflect.has(global, "loadCount"), false)
+            assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
+          })
+      ))
   )
 
   it("should error when setting an imported identifier", () =>
-    Promise.all([
-      "./fixture/import/const.mjs",
-      "./fixture/import/let.mjs"
-    ].map((request) =>
-      import(request)
-        .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.ok(e instanceof TypeError)
-          assert.ok(e.message.startsWith("Assignment to constant variable."))
-        })
-    ))
+    Promise
+      .all([
+        "./fixture/import/const.mjs",
+        "./fixture/import/let.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof TypeError)
+            assert.ok(e.message.startsWith("Assignment to constant variable."))
+          })
+      ))
   )
 
   it("should error when creating an `arguments` binding", () => {

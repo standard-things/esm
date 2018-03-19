@@ -93,7 +93,8 @@ describe("scenarios", function () {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
     const avaPattern = path.resolve(dirPath, "test.js")
 
-    return Promise.resolve()
+    return Promise
+      .resolve()
       .then(() => exec("tsc", [
         "--project", dirPath
       ]))
@@ -186,7 +187,8 @@ describe("scenarios", function () {
       path.resolve(testPath, "fixture/scenario/babel")
     ]
 
-    return Promise.resolve()
+    return Promise
+      .resolve()
       .then(() => trash(logsPath))
       .then(() => exec("pm2", ["kill"]))
       .then(() => exec("pm2", pm2Args))

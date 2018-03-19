@@ -48,11 +48,9 @@ function cleanRepo() {
 function copyBundle() {
   const srcPath = path.resolve(buildPath, "esm.js")
 
-  if (! fs.pathExistsSync(srcPath)) {
-    return Promise.resolve()
-  }
-
-  return fs.copy(srcPath, loaderPath)
+  return fs.pathExistsSync(srcPath)
+    ? fs.copy(srcPath, loaderPath)
+    : Promise.resolve()
 }
 
 function getAcorn() {
