@@ -116,6 +116,18 @@ describe("scenarios", function () {
     ])
   )
 
+  it("should expose babel errors", () =>
+    exec(nodePath, [
+      "-r", pkgPath,
+      "-r", "@babel/register",
+      path.resolve(testPath, "fixture/scenario/babel-error")
+    ])
+    .then(() => assert.ok(false))
+    .catch((result) => {
+      assert.ok(result.stderr.includes("Support for the experimental syntax 'importMeta' isn't currently enabled"))
+    })
+  )
+
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")

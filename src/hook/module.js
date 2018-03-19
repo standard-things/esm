@@ -17,6 +17,7 @@ import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getEnvVars from "../env/get-vars.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
+import isObjectEmpty from "../util/is-object-empty.js"
 import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
@@ -45,7 +46,7 @@ const {
 } = errors
 
 const exts = [".js", ".mjs"]
-const importExportRegExp = /\b(?:im|ex)port\b/
+const importExportRegExp = /^.*?\b(?:im|ex)port\b/
 const sourceExtsJs = RealModule._extensions[".js"]
 const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
 
@@ -235,12 +236,15 @@ function tryPassthru(func, args, pkg) {
 
       const [, filename] = args
       const content = () => readSourceCode(filename)
-      const { message } = e
 
-      if (e.name === "SyntaxError" &&
-          importExportRegExp.test(message)) {
-        e.message = pkgName + " is not enabled for " + filename
-        e.stack = e.stack.replace(message, e.message)
+      if (e.name === "SyntaxError") {
+        const { message } = e
+
+        if (importExportRegExp.test(message) &&
+            isObjectEmpty(e)) {
+          e.message = pkgName + " is not enabled for " + filename
+          e.stack = e.stack.replace(message, e.message)
+        }
 
         if (pkg) {
           pkg.cache.dirty = true
