@@ -2,6 +2,7 @@ import Entry from "./entry.js"
 import Module from "./module.js"
 import OwnProxy from "./own/proxy.js"
 
+import assign from "./util/assign.js"
 import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
@@ -25,7 +26,8 @@ function init() {
     const names = keysAll(source)
 
     for (const name of names) {
-      if (name !== "inspect") {
+      if (name !== "inspect" &&
+          name !== "types") {
         copyProperty(exported, source, name)
       }
     }
@@ -43,6 +45,18 @@ function init() {
         return Reflect.apply(target, thisArg, args)
       }
     })
+
+    const sourceTypes = source.types
+
+    if (sourceTypes) {
+      exported.types = assign(new ExObject, sourceTypes)
+      exported.types.isProxy = new OwnProxy(sourceTypes.isProxy, {
+        apply(target, thisArg, args) {
+          return ! isOwnProxy(args[0]) &&
+            Reflect.apply(target, thisArg, args)
+        }
+      })
+    }
 
     // Defining a truthy, but non-function value, for `customInspectSymbol`
     // will inform builtin `inspect()` to bypass the deprecation warning for
