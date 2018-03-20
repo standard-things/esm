@@ -56,7 +56,8 @@ function init() {
   }
 
   function check(utilBinding, cache) {
-    if (! utilBinding) {
+    if (! utilBinding ||
+        typeof utilBinding.getProxyDetails !== "function") {
       return true
     }
 

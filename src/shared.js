@@ -1,12 +1,11 @@
-import { inspect, types } from "util"
-
 import ESM from "./constant/esm.js"
 
 import binding from "./binding.js"
-import { createHash } from "crypto"
 import encodeId from "./util/encode-id.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
+import setGetter from "./util/set-getter.js"
+import setSetter from "./util/set-setter.js"
 
 const {
   PKG_PREFIX
@@ -23,24 +22,17 @@ if (__shared__) {
 
   const support = {
     __proto__: null,
-    isProxy: typeof (types && types.isProxy) === "function",
     wasm: typeof WebAssembly === "object" && WebAssembly !== null
   }
 
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
-    customInspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     package: Symbol.for(PKG_PREFIX + ":package"),
     realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
     realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
-  }
-
-  const util = {
-    __proto__: null,
-    inspect
   }
 
   shared = {
@@ -98,20 +90,30 @@ if (__shared__) {
         v8: versions.v8
       }
     },
-    runtimeName: encodeId(
-      "_" +
-      createHash("md5")
-        .update(Date.now().toString())
-        .digest("hex")
-        .slice(0, 3)
-    ),
     safeContext: Function("return this")(),
     support,
     symbol,
     unsafeContext: global,
-    util,
     utilBinding
   }
+
+  setDeferred(shared, "customInspectKey", () => {
+    const customInspectSymbol = symbol.customInspect
+
+    return typeof customInspectSymbol === "symbol"
+      ? customInspectSymbol
+      : "inspect"
+  })
+
+  setDeferred(shared, "runtimeName", () =>
+    encodeId(
+      "_" +
+      shared.module.safeCrypto.createHash("md5")
+        .update(Date.now().toString())
+        .digest("hex")
+        .slice(0, 3)
+    )
+  )
 
   setDeferred(fastPath, "readFile", () =>
     support.internalModuleReadFile
@@ -139,19 +141,32 @@ if (__shared__) {
     typeof binding.util.getProxyDetails === "function"
   )
 
-  setDeferred(support, "inspectProxies", () => {
+  setGetter(support, "inspectProxies", () => {
+    support.inspectProxies = false
+
     const proxy = new Proxy({ __proto__: null }, {
       __proto__: null,
       [PKG_PREFIX]: 1
     })
 
-    const inspected = util.inspect(proxy, {
+    const inspected = shared.module.safeUtil.inspect(proxy, {
       __proto__: null,
       showProxy: true
     })
 
-    return inspected.startsWith("Proxy") &&
+    return support.inspectProxies =
+      inspected.startsWith("Proxy") &&
       inspected.indexOf(PKG_PREFIX) !== -1
+  })
+
+  setSetter(support, "inspectProxies", (value) => {
+    Reflect.defineProperty(support, "inspectProxies", {
+      __proto__: null,
+      configurable: true,
+      enumerable: true,
+      value,
+      writable: true
+    })
   })
 
   setDeferred(support, "internalModuleReadFile", () =>
@@ -161,6 +176,12 @@ if (__shared__) {
   setDeferred(support, "internalModuleReadJSON", () =>
     typeof binding.fs.internalModuleReadJSON === "function"
   )
+
+  setDeferred(support, "internalModuleReadJSON", () => {
+    const { types } = shared.module.safeUtil
+
+    return typeof (types && types.isProxy) === "function"
+  })
 
   setDeferred(support, "proxiedClasses", () => {
     class A {}
@@ -206,13 +227,9 @@ if (__shared__) {
     typeof binding.util.setHiddenValue === "function"
   )
 
-  setDeferred(util, "customInspectKey", () => {
-    const customInspectSymbol = symbol.customInspect
-
-    return typeof customInspectSymbol === "symbol"
-      ? customInspectSymbol
-      : "inspect"
-  })
+  setDeferred(symbol, "customInspect", () =>
+    shared.module.safeUtil.inspect.custom
+  )
 
   setDeferred(utilBinding, "arrowSymbol", () => {
     return satisfies(shared.process.version, "<7.0.0")

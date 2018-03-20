@@ -3,6 +3,7 @@ import ESM from "../constant/esm.js"
 import OwnProxy from "../own/proxy.js"
 
 import isObjectLike from "./is-object-like.js"
+import { inspect } from "../safe/util.js"
 import shared from "../shared.js"
 
 function init() {
@@ -31,12 +32,14 @@ function init() {
       return true
     }
 
-    if (shared.support.inspectProxies) {
-      const inspected = shared.util.inspect(value, inspectOptions)
-
-      return inspected.startsWith("Proxy") &&
-        inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
+    if (! shared.support.inspectProxies) {
+      return false
     }
+
+    const inspected = inspect(value, inspectOptions)
+
+    return inspected.startsWith("Proxy") &&
+      inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
   }
 
   return isOwnProxy
