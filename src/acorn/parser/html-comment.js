@@ -66,5 +66,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginHTMLComment
-  : shared.module.acornPluginHTMLComment = init()
+  ? shared.module.acornParserHTMLComment
+  : shared.module.acornParserHTMLComment = init()

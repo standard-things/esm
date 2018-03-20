@@ -1,4 +1,4 @@
-import acornPluginParse from "../plugin/parse.js"
+import acornParse from "../acorn/parse.js"
 import isInternal from "../../env/is-internal.js"
 import realRequire from "../../real-require.js"
 import shared from "../../shared.js"
@@ -11,7 +11,7 @@ function init() {
         try {
           const acorn = realRequire("internal/deps/acorn/dist/acorn")
 
-          acornPluginParse.enable(acorn)
+          acornParse.enable(acorn)
         } catch (e) {}
       }
     }

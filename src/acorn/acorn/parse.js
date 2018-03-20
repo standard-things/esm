@@ -56,5 +56,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginParse
-  : shared.module.acornPluginParse = init()
+  ? shared.module.acornAcornParse
+  : shared.module.acornAcornParse = init()

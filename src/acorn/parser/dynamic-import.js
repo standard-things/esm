@@ -115,5 +115,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginDynamicImport
-  : shared.module.acornPluginDynamicImport = init()
+  ? shared.module.acornParserDynamicImport
+  : shared.module.acornParserDynamicImport = init()

@@ -104,5 +104,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginTopLevel
-  : shared.module.acornPluginTopLevel = init()
+  ? shared.module.acornParserTopLevel
+  : shared.module.acornParserTopLevel = init()

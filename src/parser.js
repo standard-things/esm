@@ -2,12 +2,12 @@ import SOURCE_TYPE from "./constant/source-type.js"
 
 import { Parser as AcornParser } from "./acorn.js"
 
-import acornPluginAwaitAnywhere from "./acorn/plugin/await-anywhere.js"
-import acornPluginDynamicImport from "./acorn/plugin/dynamic-import.js"
-import acornPluginFunctionParamsStart from "./acorn/plugin/function-params-start.js"
-import acornPluginHTMLComment from "./acorn/plugin/html-comment.js"
-import acornPluginTolerance from "./acorn/plugin/tolerance.js"
-import acornPluginTopLevel from "./acorn/plugin/top-level.js"
+import acornParserAwaitAnywhere from "./acorn/parser/await-anywhere.js"
+import acornParserDynamicImport from "./acorn/parser/dynamic-import.js"
+import acornParserFunctionParamsStart from "./acorn/parser/function-params-start.js"
+import acornParserHTMLComment from "./acorn/parser/html-comment.js"
+import acornParserTolerance from "./acorn/parser/tolerance.js"
+import acornParserTopLevel from "./acorn/parser/top-level.js"
 import defaults from "./util/defaults.js"
 import shared from "./shared.js"
 
@@ -41,12 +41,12 @@ function init() {
       const { strict } = options
       const parser = new AcornParser(options, code)
 
-      acornPluginAwaitAnywhere.enable(parser)
-      acornPluginDynamicImport.enable(parser)
-      acornPluginFunctionParamsStart.enable(parser)
-      acornPluginHTMLComment.enable(parser)
-      acornPluginTolerance.enable(parser)
-      acornPluginTopLevel.enable(parser)
+      acornParserAwaitAnywhere.enable(parser)
+      acornParserDynamicImport.enable(parser)
+      acornParserFunctionParamsStart.enable(parser)
+      acornParserHTMLComment.enable(parser)
+      acornParserTolerance.enable(parser)
+      acornParserTopLevel.enable(parser)
 
       if (strict !== void 0) {
         parser.strict = strict

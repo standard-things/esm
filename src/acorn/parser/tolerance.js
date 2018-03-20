@@ -69,5 +69,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginTolerance
-  : shared.module.acornPluginTolerance = init()
+  ? shared.module.acornParserTolerance
+  : shared.module.acornParserTolerance = init()

@@ -20,5 +20,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.acornPluginAwaitAnywhere
-  : shared.module.acornPluginAwaitAnywhere = init()
+  ? shared.module.acornParserAwaitAnywhere
+  : shared.module.acornParserAwaitAnywhere = init()
