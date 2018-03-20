@@ -195,6 +195,7 @@ function init() {
       __proto__: null,
       cjs,
       hint: options.hint,
+      pragmas: options.pragmas,
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,

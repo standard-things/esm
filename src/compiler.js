@@ -32,6 +32,7 @@ function init() {
       vars: false
     },
     hint: SCRIPT,
+    pragmas: true,
     runtimeName: "_",
     sourceType: SCRIPT,
     strict: void 0,
@@ -65,7 +66,8 @@ function init() {
 
       let { hint, sourceType } = options
 
-      if (sourceType === UNAMBIGUOUS) {
+      if (sourceType === UNAMBIGUOUS &&
+          options.pragmas !== false) {
         if (hint === MODULE ||
             hasPragma(code, "use module")) {
           sourceType = MODULE

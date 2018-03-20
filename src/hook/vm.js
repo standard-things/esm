@@ -90,6 +90,7 @@ function hook(vm) {
         entry,
         content,
         {
+          pragmas: false,
           sourceType: UNAMBIGUOUS,
           strict: false,
           var: true,
