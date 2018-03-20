@@ -7,6 +7,7 @@ import Shim from "./shim.js"
 import assign from "./util/assign.js"
 import clone from "./module/clone.js"
 import errors from "./errors.js"
+import globalHook from "./hook/global.js"
 import isCLI from "./env/is-cli.js"
 import isCheck from "./env/is-check.js"
 import isEval from "./env/is-eval.js"
@@ -95,6 +96,10 @@ if (shared.inited) {
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(process)
+  }
+
+  if (isInternal()) {
+    globalHook(shared.unsafeContext)
   }
 }
 
