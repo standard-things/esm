@@ -25,7 +25,7 @@ function init() {
       const _getProxyDetails = utilBinding.getProxyDetails
 
       const getProxyDetails = function (value) {
-        if (value === shared.symbol.getProxyDetails) {
+        if (value === shared.symbol.realGetProxyDetails) {
           return realGetProxyDetails
         }
 

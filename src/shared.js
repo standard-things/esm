@@ -30,11 +30,11 @@ if (__shared__) {
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
-    getProxyDetails: Symbol.for(PKG_PREFIX + ":getProxyDetails"),
     inspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     package: Symbol.for(PKG_PREFIX + ":package"),
-    require: Symbol.for(PKG_PREFIX + ":require"),
+    realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
+    realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 

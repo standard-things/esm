@@ -5,7 +5,7 @@ function init() {
   let realGetProxyDetails = binding.util.getProxyDetails
 
   try {
-    const result = realGetProxyDetails(shared.symbol.getProxyDetails)
+    const result = realGetProxyDetails(shared.symbol.realGetProxyDetails)
 
     if (typeof result === "function") {
       realGetProxyDetails = result

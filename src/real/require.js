@@ -4,7 +4,7 @@ function init() {
   let realRequire = __non_webpack_require__
 
   try {
-    const result = realRequire(shared.symbol.require)
+    const result = realRequire(shared.symbol.realRequire)
 
     if (typeof result === "function") {
       realRequire = result
