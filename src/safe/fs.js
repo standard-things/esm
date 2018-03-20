@@ -1,4 +1,4 @@
-import fs from "fs"
+import realRequire from "../real/require.js"
 import safe from "../util/safe.js"
 import shared from "../shared.js"
 
@@ -8,7 +8,7 @@ if (shared.inited) {
   safeFs = shared.module.safeFs
 } else {
   safeFs =
-  shared.module.safeFs = safe(fs)
+  shared.module.safeFs = safe(realRequire("fs"))
   safeFs.Stats = safe(safeFs.Stats)
 }
 
