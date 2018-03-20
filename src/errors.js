@@ -104,11 +104,13 @@ function init() {
   }
 
   function invalidArgType(argName, expected, actual) {
-    const message = "The '" + argName + "' argument must be " + expected
+    let message = "The '" + argName + "' argument must be " + expected
 
-    return arguments.length > 2
-      ? message + ". Received type " + (actual === null ? "null" : typeof actual)
-      : message
+    if (arguments.length > 2) {
+      message += ". Received type " + (actual === null ? "null" : typeof actual)
+    }
+
+    return message
   }
 
   function invalidArgValue(argName, value, reason = "is invalid") {
