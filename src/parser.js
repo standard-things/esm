@@ -71,13 +71,47 @@ function init() {
     return options
   }
 
+  function internalParse(code, options) {
+    let ast
+    let error
+    let threw = true
+
+    options = defaults({
+      ecmaVersion: 9,
+      sourceType: MODULE,
+      strict: false
+    }, options)
+
+    try {
+      ast = Parser.parse(code, options)
+      threw = false
+    } catch (e) {
+      error = e
+    }
+
+    if (threw) {
+      options.sourceType = SCRIPT
+
+      try {
+        ast = Parser.parse(code, options)
+        threw = false
+      } catch (e) {}
+    }
+
+    if (threw) {
+      throw error
+    }
+
+    return ast
+  }
+
   function tryInternalAcornSetup() {
     if (isInternal()) {
       try {
         const acorn = realRequire("internal/deps/acorn/dist/acorn")
         const walk = realRequire("internal/deps/acorn/dist/walk")
 
-        acorn.parse = Parser.parse
+        acorn.parse = internalParse
         acornWalkDynamicImport.enable(walk)
       } catch (e) {}
     }
