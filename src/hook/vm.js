@@ -9,6 +9,8 @@ import { REPLServer } from "repl"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
+import acornInternalAcorn from "../acorn/internal/acorn.js"
+import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
 import binding from "../binding.js"
 import builtinEntries from "../builtin-entries.js"
@@ -47,19 +49,8 @@ const ExObject = __external__.Object
 
 function hook(vm) {
   let entry
+
   const pkg = Package.get("")
-
-  const lazyModules = [
-    "assert", "async_hooks", "buffer", "child_process", "cluster", "crypto",
-    "dgram", "dns", "domain", "events", "fs", "http", "http2", "https", "net",
-    "os", "path", "perf_hooks", "punycode", "querystring", "readline", "repl",
-    "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
-  ]
-
-  if (typeof binding.inspector.connect === "function") {
-    lazyModules.push("inspector")
-    lazyModules.sort()
-  }
 
   function managerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(vm, "createScript", pkg.range)
@@ -136,7 +127,122 @@ function hook(vm) {
     return result
   }
 
-  function addBuiltinModules(context) {
+  function setupCheck() {
+    const { Script } = vm
+
+    vm.Script = maskFunction(function (code, options) {
+      vm.Script = Script
+      const { wrapper } = Module
+      code = code.slice(wrapper[0].length, -wrapper[1].length)
+      setupEntry(rootModule)
+      return vm.createScript(code, options)
+    }, Script)
+  }
+
+  function setupEntry(mod) {
+    entry = Entry.get(mod)
+    entry.addBuiltinModules = createAddBuiltinModules(entry)
+    entry.package = pkg
+    entry.require = makeRequireFunction(clone(mod))
+    entry.runtimeName = shared.runtimeName
+    Runtime.enable(entry, new ExObject)
+  }
+
+  function setupEval() {
+    const { runInThisContext } = vm
+
+    vm.runInThisContext = maskFunction(function (code, options) {
+      vm.runInThisContext = runInThisContext
+      setupEntry(shared.unsafeContext.module)
+      return vm.createScript(code, options).runInThisContext(options)
+    }, runInThisContext)
+  }
+
+  function setupREPL() {
+    acornInternalAcorn.enable()
+    acornInternalWalk.enable()
+
+    const { createContext } = REPLServer.prototype
+
+    if (rootModule.id === "<repl>") {
+      setupEntry(rootModule)
+    } else if (typeof createContext === "function") {
+      REPLServer.prototype.createContext = maskFunction(function () {
+        REPLServer.prototype.createContext = createContext
+        const context = call(createContext, this)
+        setupEntry(context.module)
+        return context
+      }, createContext)
+    }
+
+    const { support } = shared
+
+    if (! support.inspectProxies) {
+      return
+    }
+
+    const util = realRequire("util")
+    const { inspect } = builtinEntries.util.module.exports
+
+    // Defining a truthy, but non-function value, for `customInspectSymbol`
+    // will inform builtin `inspect()` to bypass the deprecation warning for
+    // the custom `util.inspect()` function when inspecting `util`.
+    Reflect.defineProperty(util, shared.customInspectKey, {
+      __proto__: null,
+      configurable: true,
+      value: true,
+      writable: true
+    })
+
+    if (support.replShowProxy) {
+      util.inspect = inspect
+      return
+    }
+
+    const _inspect = util.inspect
+
+    setGetter(util, "inspect", () => {
+      util.inspect = inspect
+      return _inspect
+    })
+
+    setSetter(util, "inspect", (value) => {
+      Reflect.defineProperty(util, "inspect", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value,
+        writable: true
+      })
+    })
+  }
+
+  Wrapper.manage(vm, "createScript", managerWrapper)
+  Wrapper.wrap(vm, "createScript", methodWrapper)
+
+  if (isCheck()) {
+    setupCheck()
+  } else if (isEval())  {
+    setupEval()
+  } else if (isREPL()) {
+    setupREPL()
+  }
+}
+
+function createAddBuiltinModules(entry) {
+  const lazyModules = [
+    "assert", "async_hooks", "buffer", "child_process", "cluster", "crypto",
+    "dgram", "dns", "domain", "events", "fs", "http", "http2", "https", "net",
+    "os", "path", "perf_hooks", "punycode", "querystring", "readline", "repl",
+    "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
+  ]
+
+  if (typeof binding.inspector.connect === "function") {
+    lazyModules.push("inspector")
+    lazyModules.sort()
+  }
+
+  return function addBuiltinModules(context) {
     const req = entry.require
     const exportedConsole = req("console")
 
@@ -185,96 +291,12 @@ function hook(vm) {
       })
     }
   }
+}
 
-  function createTryWrapper(func, content) {
-    return wrap(func, function (func, args) {
-      return tryWrapper.call(this, func, args, content)
-    })
-  }
-
-  function initEntry(mod) {
-    entry = Entry.get(mod)
-    entry.addBuiltinModules = addBuiltinModules
-    entry.package = pkg
-    entry.require = makeRequireFunction(clone(mod))
-    entry.runtimeName = shared.runtimeName
-    Runtime.enable(entry, new ExObject)
-  }
-
-  Wrapper.manage(vm, "createScript", managerWrapper)
-  Wrapper.wrap(vm, "createScript", methodWrapper)
-
-  if (isCheck()) {
-    const { Script } = vm
-
-    vm.Script = maskFunction(function (code, options) {
-      vm.Script = Script
-      const { wrapper } = Module
-      code = code.slice(wrapper[0].length, -wrapper[1].length)
-      initEntry(rootModule)
-      return vm.createScript(code, options)
-    }, Script)
-  } else if (isEval())  {
-    const { runInThisContext } = vm
-
-    vm.runInThisContext = maskFunction(function (code, options) {
-      vm.runInThisContext = runInThisContext
-      initEntry(shared.unsafeContext.module)
-      return vm.createScript(code, options).runInThisContext(options)
-    }, runInThisContext)
-  } else if (isREPL()) {
-    const { createContext } = REPLServer.prototype
-
-    if (rootModule.id === "<repl>") {
-      initEntry(rootModule)
-    } else {
-      if (typeof createContext === "function") {
-        REPLServer.prototype.createContext = maskFunction(function () {
-          REPLServer.prototype.createContext = createContext
-          const context = call(createContext, this)
-          initEntry(context.module)
-          return context
-        }, createContext)
-      }
-
-      const { support } = shared
-
-      if (support.inspectProxies) {
-        const util = realRequire("util")
-        const _inspect = util.inspect
-        const { inspect } = builtinEntries.util.module.exports
-
-        // Defining a truthy, but non-function value, for `customInspectSymbol`
-        // will inform builtin `inspect()` to bypass the deprecation warning for
-        // the custom `util.inspect()` function when inspecting `util`.
-        Reflect.defineProperty(util, shared.customInspectKey, {
-          __proto__: null,
-          configurable: true,
-          value: true,
-          writable: true
-        })
-
-        if (support.replShowProxy) {
-          util.inspect = inspect
-        } else {
-          setGetter(util, "inspect", () => {
-            util.inspect = inspect
-            return _inspect
-          })
-
-          setSetter(util, "inspect", (value) => {
-            Reflect.defineProperty(util, "inspect", {
-              __proto__: null,
-              configurable: true,
-              enumerable: true,
-              value,
-              writable: true
-            })
-          })
-        }
-      }
-    }
-  }
+function createTryWrapper(func, content) {
+  return wrap(func, function (func, args) {
+    return tryWrapper.call(this, func, args, content)
+  })
 }
 
 function tryValidateESM(caller, entry, content) {
