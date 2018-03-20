@@ -12,7 +12,7 @@ function init() {
     LT
   } = CHAR_CODE
 
-  const htmlErrorMessage = "HTML comments are not allowed in modules"
+  const HTML_ERROR_MESSAGE = "HTML comments are not allowed in modules"
 
   const { lineBreakRegExp } = acorn
 
@@ -36,7 +36,7 @@ function init() {
           next === EXMARK &&
           input.charCodeAt(pos + 2) === HYPHEN &&
           input.charCodeAt(pos + 3) === HYPHEN) {
-        this.raise(pos, htmlErrorMessage)
+        this.raise(pos, HTML_ERROR_MESSAGE)
       }
     }
 
@@ -55,7 +55,7 @@ function init() {
           input.charCodeAt(pos + 2) === GT &&
           (lastTokEnd === 0 ||
             lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
-        this.raise(pos, htmlErrorMessage)
+        this.raise(pos, HTML_ERROR_MESSAGE)
       }
     }
 
