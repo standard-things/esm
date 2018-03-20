@@ -53,9 +53,6 @@ function init() {
         funcProto.toString = new OwnProxy(_toString, {
           apply(target, thisArg, args) {
             return Reflect.apply(toString, thisArg, args)
-          },
-          construct(target, args) {
-            return Reflect.construct(toString, args)
           }
         })
 
