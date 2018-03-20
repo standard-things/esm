@@ -65,15 +65,13 @@ function init() {
 
       let { hint, sourceType } = options
 
-      if (sourceType === UNAMBIGUOUS &&
-          hasPragma(code, "use script")) {
-        sourceType = SCRIPT
-      }
-
-      if (sourceType === UNAMBIGUOUS &&
-          (hint === MODULE ||
-          hasPragma(code, "use module"))) {
-        sourceType = MODULE
+      if (sourceType === UNAMBIGUOUS) {
+        if (hint === MODULE ||
+            hasPragma(code, "use module")) {
+          sourceType = MODULE
+        } else if (hasPragma(code, "use script")) {
+          sourceType = SCRIPT
+        }
       }
 
       const possibleIndexes = findIndexes(code, ["export", "eval", "import"])

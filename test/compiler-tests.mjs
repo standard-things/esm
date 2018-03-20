@@ -87,7 +87,7 @@ describe("compiler", () => {
       { code: '"use module";1+2', sourceType: MODULE },
       { code: "'use module';1+2", hint: MODULE, sourceType: MODULE },
       { code: '"use script";1+2', sourceType: SCRIPT },
-      { code: "'use script';1+2", hint: MODULE, sourceType: SCRIPT },
+      { code: "'use script';1+2", hint: MODULE, sourceType: MODULE },
       { code: "import'a'", sourceType: MODULE },
       { code: 'import"a"', hint: MODULE, sourceType: MODULE },
       { code: "import.meta", sourceType: MODULE },
@@ -138,10 +138,10 @@ describe("compiler", () => {
 
   it('should support the "use script" directive', () => {
     [
-      { code: "'use script';\"use module\";import'a'", hint: MODULE },
-      { code: "'use script';\"use module\";import.meta", hint: MODULE },
-      { code: '"use script";\'use module\';import"a"', hint: MODULE },
-      { code: '"use script";\'use module\';import.meta', hint: MODULE },
+      { code: "'use script';\"use module\";import'a'", hint: SCRIPT },
+      { code: "'use script';\"use module\";import.meta", hint: SCRIPT },
+      { code: '"use script";\'use module\';import"a"', hint: SCRIPT },
+      { code: '"use script";\'use module\';import.meta', hint: SCRIPT },
       { code: "'use script';\"use module\";import'a'" },
       { code: "'use script';\"use module\";import.meta" },
       { code: '"use script";\'use module\';import"a"' },
