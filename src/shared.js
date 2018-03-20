@@ -30,7 +30,7 @@ if (__shared__) {
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
-    inspect: inspect.custom,
+    customInspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     package: Symbol.for(PKG_PREFIX + ":package"),
     realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
@@ -207,7 +207,7 @@ if (__shared__) {
   )
 
   setDeferred(util, "customInspectKey", () => {
-    const customInspectSymbol = symbol.inspect
+    const customInspectSymbol = symbol.customInspect
 
     return typeof customInspectSymbol === "symbol"
       ? customInspectSymbol
