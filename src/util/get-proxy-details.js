@@ -1,7 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
-import binding from "../binding.js"
 import isObjectLike from "./is-object-like.js"
+import realGetProxyDetails from "../real/get-proxy-details.js"
 import shared from "../shared.js"
 
 function getProxyDetails(proxy) {
@@ -21,7 +21,7 @@ function getProxyDetails(proxy) {
   if (! details &&
       shared.support.getProxyDetails) {
     try {
-      details = binding.util.getProxyDetails(proxy)
+      details = realGetProxyDetails(proxy)
     } catch (e) {}
   }
 

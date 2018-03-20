@@ -30,6 +30,7 @@ if (__shared__) {
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
+    getProxyDetails: Symbol.for(PKG_PREFIX + ":getProxyDetails"),
     inspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     package: Symbol.for(PKG_PREFIX + ":package"),
@@ -69,6 +70,7 @@ if (__shared__) {
       readPackage: { __proto__: null },
       satisfies: { __proto__: null },
       shimFunctionPrototypeToString: new WeakMap,
+      shimProcessBindingUtilGetProxyDetails: new WeakMap,
       unwrapProxy: new WeakMap
     },
     module: { __proto__: null },

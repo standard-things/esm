@@ -5,7 +5,7 @@ import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
-import RealModule from "../real-module.js"
+import RealModule from "../real/module.js"
 import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"

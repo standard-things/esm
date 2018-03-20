@@ -1,5 +1,5 @@
 import GenericArray from "./generic/array.js"
-import RealModule from "./real-module.js"
+import RealModule from "./real/module.js"
 
 import _compile from "./module/compile.js"
 import _findPath from "./module/find-path.js"

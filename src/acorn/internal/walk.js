@@ -1,6 +1,6 @@
 import acornWalkDynamicImport from "../walk/dynamic-import.js"
 import isInternal from "../../env/is-internal.js"
-import realRequire from "../../real-require.js"
+import realRequire from "../../real/require.js"
 import shared from "../../shared.js"
 
 function init() {

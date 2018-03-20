@@ -10,37 +10,17 @@ function init() {
 
   const Shim = {
     __proto__: null,
-    check(context) {
+    enable(context) {
       const cache = shared.memoize.shimFunctionPrototypeToString
       const funcProto = context.Function.prototype
 
-      let result = cache.get(funcProto)
-
-      if (typeof result !== "boolean") {
-        result = false
-
-        try {
-          const { toString } = funcProto
-          const proxy = new OwnProxy(toString)
-
-          result = typeof toString.call(proxy) === "string"
-        } catch (e) {}
-
-        cache.set(funcProto, result)
-      }
-
-      return result
-    },
-    enable(context) {
-      if (Shim.check(context)) {
+      if (check(funcProto, cache)) {
         return context
       }
 
       // Section 19.2.3.5: Function.prototype.toString()
       // Step 3: Return "function () { [native code] }" for callable objects.
       // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
-      const cache = shared.memoize.shimFunctionPrototypeToString
-      const funcProto = context.Function.prototype
       const _toString = funcProto.toString
 
       const toString = function () {
@@ -84,6 +64,26 @@ function init() {
 
       return context
     }
+  }
+
+  function check(funcProto, cache) {
+    let result = cache.get(funcProto)
+
+    if (typeof result === "boolean") {
+      return result
+    }
+
+    result = false
+
+    try {
+      const { toString } = funcProto
+      const proxy = new OwnProxy(toString)
+
+      result = typeof toString.call(proxy) === "string"
+    } catch (e) {}
+
+    cache.set(funcProto, result)
+    return result
   }
 
   return Shim

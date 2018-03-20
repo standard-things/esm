@@ -1,7 +1,7 @@
 import shared from "./shared.js"
 import Module from "./module.js"
 import Package from "./package.js"
-import RealModule from "./real-module.js"
+import RealModule from "./real/module.js"
 import Shim from "./shim.js"
 
 import assign from "./util/assign.js"

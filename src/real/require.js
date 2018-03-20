@@ -1,10 +1,14 @@
-import shared from "./shared.js"
+import shared from "../shared.js"
 
 function init() {
   let realRequire = __non_webpack_require__
 
   try {
-    realRequire = realRequire(shared.symbol.require)
+    const result = realRequire(shared.symbol.require)
+
+    if (typeof result === "function") {
+      realRequire = result
+    }
   } catch (e) {}
 
   return realRequire

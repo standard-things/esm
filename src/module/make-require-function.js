@@ -13,7 +13,7 @@ import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
 import maskFunction from "../util/mask-function.js"
 import moduleState from "./state.js"
-import realRequire from "../real-require.js"
+import realRequire from "../real/require.js"
 import shared from "../shared.js"
 
 const {
