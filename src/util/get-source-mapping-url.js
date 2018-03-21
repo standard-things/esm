@@ -14,9 +14,9 @@ const {
   SLASH
 } = CHAR_CODE
 
-const name = "sourceMappingURL"
-const nameLength = name.length
-const minLength = nameLength + 6
+const NAME = "sourceMappingURL"
+const NAME_LENGTH = NAME.length
+const MIN_LENGTH = NAME_LENGTH + 6
 
 function getSourceMappingURL(content) {
   if (typeof content !== "string") {
@@ -25,7 +25,7 @@ function getSourceMappingURL(content) {
 
   const { length } = content
 
-  if (length < minLength) {
+  if (length < MIN_LENGTH) {
     return ""
   }
 
@@ -33,19 +33,19 @@ function getSourceMappingURL(content) {
   let pos = length
 
   while (match === null) {
-    pos = content.lastIndexOf(name, pos)
+    pos = content.lastIndexOf(NAME, pos)
 
     if (pos === -1 ||
         pos < 4) {
       return ""
     }
 
-    const equalPos = pos + nameLength
+    const equalPos = pos + NAME_LENGTH
     const urlPos = equalPos + 1
 
     pos -= 4
 
-    // Codeify the regexp check, /\/\/[@#][ \t]/, before the name.
+    // Codeify the regexp check, /\/\/[@#][ \t]/, before `NAME`.
     if (content.charCodeAt(pos) !== SLASH ||
         content.charCodeAt(pos + 1) !== SLASH) {
       continue
@@ -65,7 +65,7 @@ function getSourceMappingURL(content) {
       continue
     }
 
-    // Check for "=" after the name.
+    // Check for "=" after `NAME`.
     if (equalPos < length &&
       content.charCodeAt(equalPos) !== EQ) {
       continue
