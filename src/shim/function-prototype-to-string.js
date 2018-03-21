@@ -26,9 +26,7 @@ function init() {
       const toString = function () {
         let thisArg = this
 
-        if (thisArg === toString) {
-          thisArg = _toString
-        } else if (isOwnProxy(thisArg)) {
+        if (isOwnProxy(thisArg)) {
           const details = getProxyDetails(thisArg)
 
           if (details) {
@@ -40,9 +38,6 @@ function init() {
 
         return call(_toString, thisArg)
       }
-
-      toString.prototype = void 0
-      Reflect.setPrototypeOf(toString, funcProto)
 
       try {
         funcProto.toString = new OwnProxy(_toString, {
