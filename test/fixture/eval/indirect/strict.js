@@ -3,5 +3,5 @@ module.exports = (0, eval)(`
   import("path")
   ;(function () {
     return this
-  }())
+  })()
 `)
