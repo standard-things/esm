@@ -276,6 +276,8 @@ function createAddBuiltinModules(entry) {
         __proto__: null,
         configurable: true,
         get() {
+          context[name] = void 0
+
           const exported = req(name)
 
           Reflect.defineProperty(context, name, {

@@ -4,8 +4,6 @@ import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
-import setGetter from "./util/set-getter.js"
-import setSetter from "./util/set-setter.js"
 
 const {
   PKG_PREFIX
@@ -141,9 +139,7 @@ if (__shared__) {
     typeof binding.util.getProxyDetails === "function"
   )
 
-  setGetter(support, "inspectProxies", () => {
-    support.inspectProxies = false
-
+  setDeferred(support, "inspectProxies", () => {
     const proxy = new Proxy({ __proto__: null }, {
       __proto__: null,
       [PKG_PREFIX]: 1
@@ -154,19 +150,8 @@ if (__shared__) {
       showProxy: true
     })
 
-    return support.inspectProxies =
-      inspected.startsWith("Proxy") &&
+    return inspected.startsWith("Proxy") &&
       inspected.indexOf(PKG_PREFIX) !== -1
-  })
-
-  setSetter(support, "inspectProxies", (value) => {
-    Reflect.defineProperty(support, "inspectProxies", {
-      __proto__: null,
-      configurable: true,
-      enumerable: true,
-      value,
-      writable: true
-    })
   })
 
   setDeferred(support, "internalModuleReadFile", () =>

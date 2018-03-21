@@ -41,6 +41,8 @@ function maskStackTrace(error, content, filename, isESM) {
     __proto__: null,
     configurable: true,
     get() {
+      error.stack = void 0
+
       const newMessage = safeToString(error)
 
       const scrubber = isESM
