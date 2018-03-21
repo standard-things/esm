@@ -45,15 +45,11 @@ function init() {
       Reflect.setPrototypeOf(toString, funcProto)
 
       try {
-        if (shared.support.proxiedFunctions) {
-          funcProto.toString = new OwnProxy(_toString, {
-            apply(target, thisArg, args) {
-              return call(toString, thisArg)
-            }
-          })
-        } else {
-          funcProto.toString = toString
-        }
+        funcProto.toString = new OwnProxy(_toString, {
+          apply(target, thisArg) {
+            return call(toString, thisArg)
+          }
+        })
 
         cache.set(funcProto, true)
       } catch (e) {}

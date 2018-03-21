@@ -37,15 +37,11 @@ function init() {
       getProxyDetails.prototype = _getProxyDetails.prototype
 
       try {
-        if (shared.support.proxiedFunctions) {
-          utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
-            apply(target, thisArg, args) {
-              return getProxyDetails(args[0])
-            }
-          })
-        } else {
-          utilBinding.getProxyDetails = getProxyDetails
-        }
+        utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
+          apply(target, thisArg, args) {
+            return getProxyDetails(args[0])
+          }
+        })
 
         cache.set(utilBinding, true)
       } catch (e) {}

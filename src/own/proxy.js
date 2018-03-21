@@ -18,6 +18,13 @@ function init() {
     value: true
   }
 
+  const funcToStringTagDescriptor = {
+    __proto__: null,
+    configurable: true,
+    value: "Function",
+    writable: true
+  }
+
   class OwnProxy {
     static instances = new WeakMap
 
@@ -29,6 +36,11 @@ function init() {
       Reflect.defineProperty(handler, PKG_PREFIX + ":proxy", markerDescriptor)
 
       const proxy = new Proxy(target, handler)
+
+      if (typeof target === "function" &&
+          ! shared.support.proxiedFunctionToStringTag) {
+        Reflect.defineProperty(proxy, Symbol.toStringTag, funcToStringTagDescriptor)
+      }
 
       OwnProxy.instances.set(proxy, [target, handler])
       return proxy
