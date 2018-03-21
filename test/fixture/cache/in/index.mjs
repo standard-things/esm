@@ -1,5 +1,5 @@
 if (typeof global.loadCount === "number") {
-  global.loadCount++
+  global.loadCount += 1
 } else {
   global.loadCount = 1
 }

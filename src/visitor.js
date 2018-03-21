@@ -85,13 +85,13 @@ function init() {
         // Find first index not less than `node.start`.
         while (left < right &&
             possibleIndexes[left] < start) {
-          ++left
+          left += 1
         }
 
         // Find first index not greater than `node.end`.
         while (left < right &&
             possibleIndexes[right - 1] > end) {
-          --right
+          right -= 1
         }
       }
 

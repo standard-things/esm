@@ -38,7 +38,7 @@ function init() {
       ++inspectDepth === 1) {
       const inspected = inspect(value, inspectOptions)
 
-      --inspectDepth
+      inspectDepth -= 1
       return inspected.startsWith("Proxy") &&
         inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
     }

@@ -59,7 +59,7 @@ function posixPaths(from) {
       nmCount = 0
     } else if (nmCount !== -1) {
       if (nmChars[nmCount] === code) {
-        ++nmCount
+        nmCount += 1
       } else {
         nmCount = -1
       }
@@ -105,7 +105,7 @@ function win32Paths(from) {
       nmCount = 0
     } else if (nmCount !== -1) {
       if (nmChars[nmCount] === code) {
-        ++nmCount
+        nmCount += 1
       } else {
         nmCount = -1
       }
