@@ -184,11 +184,6 @@ if (__shared__) {
     return new B().b !== void 0
   })
 
-  setDeferred(support, "proxiedFunctions", () =>
-    support.proxiedClasses &&
-      support.proxiedFunctionToStringTag
-  )
-
   setDeferred(support, "proxiedFunctionToStringTag", () => {
     const { toString } = Object.prototype
     const proxy = new Proxy(toString, { __proto__: null })

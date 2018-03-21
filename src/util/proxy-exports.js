@@ -9,7 +9,7 @@ const { toString } = Object.prototype
 function proxyExports(entry) {
   const exported = entry.module.exports
 
-  if (! shared.support.proxiedFunctions ||
+  if (! shared.support.proxiedClasses ||
       ! isObjectLike(exported)) {
     return exported
   }
