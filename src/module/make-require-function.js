@@ -33,7 +33,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   const { name } = entry
 
   let req = function require(request) {
-    if (request === shared.symbol.require) {
+    if (request === shared.symbol.realRequire) {
       return realRequire
     }
 

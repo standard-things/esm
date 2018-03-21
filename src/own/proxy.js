@@ -21,7 +21,7 @@ function init() {
     constructor(target, handler) {
       const proto = assign({ __proto__: null }, handler)
 
-      proto[shared.symbol.inspect] = customInspect
+      proto[shared.symbol.customInspect] = customInspect
       handler = { __proto__: proto }
       Reflect.defineProperty(handler, PKG_PREFIX + ":proxy", markerDescriptor)
 

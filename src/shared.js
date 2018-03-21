@@ -27,11 +27,11 @@ if (__shared__) {
   const symbol = {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
-    esmRequire: Symbol.for(ESM_PREFIX + ":require"),
+    customInspect: inspect.custom,
+    esmRealRequire: Symbol.for(ESM_PREFIX + ":realRequire"),
     esmWrapper: Symbol.for(ESM_PREFIX + ":wrapper"),
-    inspect: inspect.custom,
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
-    require: Symbol.for(PKG_PREFIX + ":require"),
+    realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 

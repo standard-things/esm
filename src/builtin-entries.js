@@ -41,7 +41,7 @@ function init() {
       }
     })
 
-    Reflect.defineProperty(exported, shared.symbol.inspect, customInspectDescriptor)
+    Reflect.defineProperty(exported, shared.symbol.customInspect, customInspectDescriptor)
 
     return exported
   }

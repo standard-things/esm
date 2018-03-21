@@ -4,11 +4,11 @@ const realRequire = (() => {
   const { symbol } = shared
 
   try {
-    return realRequire(symbol.require)
+    return realRequire(symbol.realRequire)
   } catch (e) {}
 
   try {
-    return realRequire(symbol.esmRequire)
+    return realRequire(symbol.esmRealRequire)
   } catch (e) {}
 
   return __non_webpack_require__

@@ -239,7 +239,7 @@ function hook(vm) {
         const _inspect = util.inspect
         const { inspect } = builtinEntries.util.module.exports
 
-        Reflect.defineProperty(util, shared.symbol.inspect, {
+        Reflect.defineProperty(util, shared.symbol.customInspect, {
           __proto__: null,
           configurable: true,
           value: true,
