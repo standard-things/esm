@@ -419,12 +419,12 @@ function createNamespace(entry, source = entry) {
   })
 
   return new OwnProxy(namespace, {
-    get: (namespace, name) => {
+    get(namespace, name) {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)
         : Reflect.get(source.namespace, name)
     },
-    getOwnPropertyDescriptor: (namespace, name) => {
+    getOwnPropertyDescriptor(namespace, name) {
       if (! Reflect.has(namespace, name)) {
         return
       }
@@ -455,7 +455,7 @@ function createNamespace(entry, source = entry) {
 
       return descriptor
     },
-    set: (namespace, name) => {
+    set(namespace, name) {
       if (entry.package.options.warnings) {
         if (Reflect.has(source, name)) {
           warn("WRN_NS_ASSIGNMENT", entry.module, name)
