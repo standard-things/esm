@@ -11,6 +11,8 @@ function init() {
     PKG_PREFIX
   } = ESM
 
+  let inspectDepth = 0
+
   const inspectOptions = {
     __proto__: null,
     breakLength: 0,
@@ -32,14 +34,16 @@ function init() {
       return true
     }
 
-    if (! shared.support.inspectProxies) {
-      return false
+    if (shared.support.inspectProxies &&
+      ++inspectDepth === 1) {
+      const inspected = inspect(value, inspectOptions)
+
+      --inspectDepth
+      return inspected.startsWith("Proxy") &&
+        inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
     }
 
-    const inspected = inspect(value, inspectOptions)
-
-    return inspected.startsWith("Proxy") &&
-      inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
+    return false
   }
 
   return isOwnProxy
