@@ -2,8 +2,8 @@ import ESM from "../constant/esm.js"
 
 import OwnProxy from "../own/proxy.js"
 
-import isObjectLike from "./is-object-like.js"
 import { inspect } from "../safe/util.js"
+import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
