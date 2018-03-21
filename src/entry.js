@@ -38,8 +38,6 @@ const {
 const GETTER_ERROR = { __proto__: null }
 const STAR_ERROR = { __proto__: null }
 
-const ExObject = __external__.Object
-
 const pseudoDescriptor = {
   __proto__: null,
   value: true
@@ -431,14 +429,15 @@ function createNamespace(entry, source = entry) {
         return
       }
 
-      const descriptor = new ExObject
-
       // The de facto order of descriptor properties is:
       // "value", "writable", "configurable", "enumerable"
-      descriptor.value = "Module"
-      descriptor.writable =
-      descriptor.configurable =
-      descriptor.enumerable = false
+      /* eslint-disable sort-keys */
+      const descriptor = {
+        value: "Module",
+        writable: false,
+        configurable: false,
+        enumerable: false
+      }
 
       // Section 26.3.1: @@toStringTag
       // Return descriptor of the module namespace @@toStringTag.
