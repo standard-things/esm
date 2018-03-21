@@ -4,8 +4,6 @@ import isNative from "./is-native.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
-const { toString } = Object.prototype
-
 function proxyExports(entry) {
   const exported = entry.module.exports
 
@@ -22,11 +20,6 @@ function proxyExports(entry) {
   }
 
   const maybeWrap = (target, name, value) => {
-    if (name === Symbol.toStringTag &&
-        typeof value !== "string") {
-      value = toString.call(target).slice(8, -1)
-    }
-
     if (typeof value !== "function" ||
         ! isNative(value)) {
       return value
