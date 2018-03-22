@@ -1,4 +1,3 @@
-import CHAR_CODE from "./constant/char-code.js"
 import ENTRY from "./constant/entry.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
@@ -18,10 +17,6 @@ import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
 function init() {
-  const {
-    PERIOD
-  } = CHAR_CODE
-
   const {
     TYPE_CJS,
     TYPE_ESM
@@ -268,10 +263,6 @@ function init() {
         let offset = 0
 
         for (const cacheName in scriptDatas) {
-          if (cacheName.charCodeAt(0) === PERIOD) {
-            continue
-          }
-
           let offsetStart = -1
           let offsetEnd = -1
 
