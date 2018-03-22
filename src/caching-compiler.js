@@ -54,23 +54,23 @@ function init() {
         return null
       }
 
-      const dependencySpecifiers = meta[3]
-        ? assign({ __proto__: null }, meta[3])
+      const dependencySpecifiers = meta[4]
+        ? assign({ __proto__: null }, meta[4])
         : null
 
       const result = {
         __proto__: null,
-        changed: true,
+        changed: !! meta[3],
         code: null,
         dependencySpecifiers,
-        exportNames: meta[4] || null,
+        exportNames: meta[5] || null,
         exportSpecifiers: null,
-        exportStars: meta[5] || null,
-        exportTemporals: meta[6] || null,
+        exportStars: meta[6] || null,
+        exportTemporals: meta[7] || null,
         scriptData: null,
         sourceType: meta[2],
-        topLevelReturn: meta[7] || null,
-        warnings: meta[8] || null
+        topLevelReturn: meta[8] || null,
+        warnings: meta[9] || null
       }
 
       if (result.sourceType === MODULE) {
@@ -247,15 +247,16 @@ function init() {
         }
 
         const cache = dir[cachePath]
+        const compileDatas = cache.compile
         const scriptDatas = pendingMetas[cachePath]
 
-        for (const cacheName in cache) {
-          const cached = cache.compile[cacheName]
+        for (const cacheName in compileDatas) {
+          const compileData = compileDatas[cacheName]
 
-          if (cached &&
-              cached !== true &&
+          if (compileData &&
+              compileData !== true &&
               ! scriptDatas[cacheName]) {
-            scriptDatas[cacheName] = cached.scriptData
+            scriptDatas[cacheName] = compileData.scriptData
           }
         }
 
@@ -280,19 +281,20 @@ function init() {
             buffers.push(scriptData)
           }
 
-          const cached = cache.compile[cacheName]
+          const compileData = compileDatas[cacheName]
 
-          if (cached) {
+          if (compileData) {
             map[cacheName] = [
               offsetStart,
               offsetEnd,
-              cached.sourceType,
-              cached.dependencySpecifiers,
-              cached.exportNames,
-              cached.exportStars,
-              cached.exportTemporals,
-              cached.topLevelReturn,
-              cached.warnings
+              compileData.sourceType,
+              compileData.changed,
+              compileData.dependencySpecifiers,
+              compileData.exportNames,
+              compileData.exportStars,
+              compileData.exportTemporals,
+              compileData.topLevelReturn,
+              compileData.warnings
             ]
           } else {
             map[cacheName] = [offsetStart, offsetEnd]

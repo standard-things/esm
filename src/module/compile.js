@@ -75,8 +75,9 @@ function compile(content, filename) {
   const { cachedDataRejected } = script
 
   if (script.cachedDataProduced &&
-      ! cachedDataRejected) {
-    changed = ! cachedData
+      ! cachedDataRejected &&
+      ! cachedData) {
+    changed = true
     scriptData = script.cachedData
   }
 
