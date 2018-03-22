@@ -79,10 +79,23 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (! compileData) {
-    compileData = tryCompileCode(caller, entry, content, {
-      hint,
-      sourceType
-    })
+    compileData = Compiler.from(entry)
+
+    if (! compileData ||
+        compileData.changed) {
+      const scriptData = compileData
+        ? compileData.scriptData
+        : null
+
+      compileData = tryCompileCode(caller, entry, content, {
+        hint,
+        sourceType
+      })
+
+      compileData.scriptData = scriptData
+    } else {
+      compileData.code = content
+    }
   }
 
   if (options.warnings &&
