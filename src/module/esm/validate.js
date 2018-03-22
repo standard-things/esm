@@ -62,9 +62,6 @@ function validate(entry) {
 
     const childCompileData = childEntry.compileData
     const childExportStars = childCompileData.exportStars
-    const skipExportMissing =
-      childEntry.package.options.cjs.vars &&
-      ! isMJS(childEntry.module)
 
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCompileData
@@ -77,7 +74,7 @@ function validate(entry) {
         throw new ERR_EXPORT_STAR_CONFLICT(mod, requestedName)
       }
 
-      let throwExportMissing = ! skipExportMissing
+      let throwExportMissing = true
 
       if (throwExportMissing) {
         for (const childName of childExportStars) {
