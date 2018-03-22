@@ -283,23 +283,44 @@ function init() {
           }
 
           const compileData = compileDatas[cacheName]
+          const meta = [offsetStart, offsetEnd]
 
           if (compileData) {
-            map[cacheName] = [
-              offsetStart,
-              offsetEnd,
-              compileData.sourceType,
-              +compileData.changed,
-              +compileData.topLevelReturn,
-              compileData.dependencySpecifiers || 0,
-              compileData.exportNames || 0,
-              compileData.exportStars || 0,
-              compileData.exportTemporals || 0,
-              compileData.warnings || 0
-            ]
-          } else {
-            map[cacheName] = [offsetStart, offsetEnd]
+            const { sourceType, warnings } = compileData
+            const changed = +compileData.changed
+            const topLevelReturn = +compileData.topLevelReturn
+
+            if (sourceType === SCRIPT) {
+              if (topLevelReturn) {
+                meta.push(
+                  sourceType,
+                  changed,
+                  topLevelReturn
+                )
+              } else if (changed) {
+                meta.push(
+                  sourceType,
+                  changed
+                )
+              }
+            } else {
+              meta.push(
+                sourceType,
+                changed,
+                topLevelReturn,
+                compileData.dependencySpecifiers || 0,
+                compileData.exportNames || 0,
+                compileData.exportStars || 0,
+                compileData.exportTemporals || 0
+              )
+
+              if (warnings) {
+                meta.push(warnings)
+              }
+            }
           }
+
+          map[cacheName] = meta
         }
 
         writeFile(resolve(cachePath, ".data.blob"), GenericBuffer.concat(buffers))
