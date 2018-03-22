@@ -27,7 +27,8 @@ function init() {
   } = ENTRY
 
   const {
-    MODULE
+    MODULE,
+    SCRIPT
   } = SOURCE_TYPE
 
   const CachingCompiler = {
@@ -54,8 +55,8 @@ function init() {
         return null
       }
 
-      const dependencySpecifiers = meta[4]
-        ? assign({ __proto__: null }, meta[4])
+      const dependencySpecifiers = meta[5]
+        ? assign({ __proto__: null }, meta[5])
         : null
 
       const result = {
@@ -63,13 +64,13 @@ function init() {
         changed: !! meta[3],
         code: null,
         dependencySpecifiers,
-        exportNames: meta[5] || null,
+        exportNames: meta[6] || null,
         exportSpecifiers: null,
-        exportStars: meta[6] || null,
-        exportTemporals: meta[7] || null,
+        exportStars: meta[7] || null,
+        exportTemporals: meta[8] || null,
         scriptData: null,
-        sourceType: meta[2],
-        topLevelReturn: meta[8] || null,
+        sourceType: +meta[2] || SCRIPT,
+        topLevelReturn: !! meta[4],
         warnings: meta[9] || null
       }
 
@@ -288,13 +289,13 @@ function init() {
               offsetStart,
               offsetEnd,
               compileData.sourceType,
-              compileData.changed,
-              compileData.dependencySpecifiers,
-              compileData.exportNames,
-              compileData.exportStars,
-              compileData.exportTemporals,
-              compileData.topLevelReturn,
-              compileData.warnings
+              +compileData.changed,
+              +compileData.topLevelReturn,
+              compileData.dependencySpecifiers || 0,
+              compileData.exportNames || 0,
+              compileData.exportStars || 0,
+              compileData.exportTemporals || 0,
+              compileData.warnings || 0
             ]
           } else {
             map[cacheName] = [offsetStart, offsetEnd]
