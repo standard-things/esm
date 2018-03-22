@@ -157,7 +157,7 @@ function init() {
 
     Reflect.deleteProperty(cache.compile, cacheName)
     Reflect.deleteProperty(cache.map, cacheName)
-    return removeFile(resolve(cachePath, cacheName))
+    removeFile(resolve(cachePath, cacheName))
   }
 
   function removeExpired(cachePath, cacheName) {
