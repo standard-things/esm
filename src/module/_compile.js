@@ -87,7 +87,7 @@ function compile(caller, entry, content, filename, fallback) {
         ? compileData.scriptData
         : null
 
-      compileData = tryCompileCode(caller, entry, content, {
+      compileData = tryCompileCode(caller, entry, content, filename, {
         hint,
         sourceType
       })
@@ -125,11 +125,11 @@ function compile(caller, entry, content, filename, fallback) {
     }
   } else {
     entry.state = STATE_EXECUTION_STARTED
-    return tryCompileCached(entry)
+    return tryCompileCached(entry, filename)
   }
 }
 
-function tryCompileCached(entry) {
+function tryCompileCached(entry, filename) {
   const isESM = entry.type === TYPE_ESM
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
@@ -141,21 +141,20 @@ function tryCompileCached(entry) {
   let result
 
   if (entry.package.options.debug) {
-    result = tryCompile(entry)
+    result = tryCompile(entry, filename)
 
     if (noDepth) {
       moduleState.stat = null
     }
   } else {
     try {
-      result = tryCompile(entry)
+      result = tryCompile(entry, filename)
     } catch (e) {
       if (! isError(e) ||
           isStackTraceMasked(e)) {
         throw e
       }
 
-      const { filename } = entry.module
       const content = () => readSourceCode(filename)
 
       throw maskStackTrace(e, content, filename, isESM)
@@ -169,7 +168,7 @@ function tryCompileCached(entry) {
   return result
 }
 
-function tryCompileCJS(entry) {
+function tryCompileCJS(entry, filename) {
   const { compileData, runtimeName } = entry
   const mod = entry.module
   const useAsync = useAsyncWrapper(entry)
@@ -195,10 +194,10 @@ function tryCompileCJS(entry) {
     Module.wrap = moduleWrapAsyncCJS
   }
 
-  content += maybeSourceMap(entry, content)
+  content += maybeSourceMap(entry, content, filename)
 
   try {
-    return mod._compile(content, mod.filename)
+    return mod._compile(content, filename)
   } finally {
     if (Module.wrap === moduleWrapAsyncCJS) {
       Module.wrap = wrap
@@ -206,10 +205,9 @@ function tryCompileCJS(entry) {
   }
 }
 
-function tryCompileESM(entry) {
+function tryCompileESM(entry, filename) {
   const { compileData, runtimeName } = entry
   const mod = entry.module
-  const { filename } = mod
 
   const cjsVars =
     entry.package.options.cjs.vars &&
@@ -226,7 +224,7 @@ function tryCompileESM(entry) {
     compileData.code +
     "\n}))"
 
-  content += maybeSourceMap(entry, content)
+  content += maybeSourceMap(entry, content, filename)
 
   if (! entry.url) {
     entry.url = getURLFromFilePath(filename)
@@ -258,14 +256,14 @@ function moduleWrapESM(script) {
   return "(function () { " + script + "\n});"
 }
 
-function maybeSourceMap(entry, content) {
+function maybeSourceMap(entry, content, filename) {
   const { sourceMap } = entry.package.options
 
   if (sourceMap !== false &&
      (sourceMap || isInspect()) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(entry.module.filename, content))
+      encodeURI(createSourceMap(filename, content))
   }
 
   return ""
@@ -279,7 +277,7 @@ function readSourceCode(filename) {
   return readFile(filename, "utf8")
 }
 
-function tryCompileCode(caller, entry, content, options) {
+function tryCompileCode(caller, entry, content, filename, options) {
   if (entry.package.options.debug) {
     return Compiler.compile(entry, content, options)
   }
@@ -301,7 +299,7 @@ function tryCompileCode(caller, entry, content, options) {
 
   Reflect.deleteProperty(error, "sourceType")
   captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, entry.module.filename, isESM)
+  throw maskStackTrace(error, content, filename, isESM)
 }
 
 function tryValidateESM(caller, entry) {
