@@ -3,6 +3,8 @@ import { basename, dirname , extname, resolve } from "./safe/path.js"
 import CHAR_CODE from "./constant/char-code.js"
 import PACKAGE from "./constant/package.js"
 
+import GenericBuffer from "./generic/buffer.js"
+
 import _findPath from "./module/_find-path.js"
 import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
@@ -46,8 +48,6 @@ const {
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
-
-const ExBuffer = __external__.Buffer
 
 const defaultOptions = {
   __proto__: null,
@@ -146,7 +146,7 @@ class Package {
 
         cache.buffer = hasBuffer
           ? readFile(resolve(cachePath, ".data.blob"))
-          : new ExBuffer(0)
+          : GenericBuffer.alloc(0)
 
         cache.map = hasMap
           ? readJSON(resolve(cachePath, ".data.json"))
