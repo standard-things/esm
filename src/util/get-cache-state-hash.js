@@ -1,8 +1,6 @@
-import { basename, extname } from "../safe/path.js"
-
-function getCacheStateHash(filename) {
-  return typeof filename === "string"
-    ? basename(filename, extname(filename)).slice(-8)
+function getCacheStateHash(cacheName) {
+  return typeof cacheName === "string"
+    ? cacheName.slice(-11, -3)
     : ""
 }
 

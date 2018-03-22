@@ -7,6 +7,7 @@ import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
 import getCacheName from "./util/get-cache-name.js"
+import getCachePathHash from "./util/get-cache-path-hash.js"
 import has from "./util/has.js"
 import isCacheFileName from "./util/is-cache-file-name.js"
 import isMJS from "./util/is-mjs.js"
@@ -166,11 +167,11 @@ function init() {
 
   function removeExpired(cachePath, cacheName) {
     const cache = shared.package.dir[cachePath]
-    const shortname = cacheName.slice(0, 8)
+    const pathHash = getCachePathHash(cacheName)
 
     for (const otherCacheName in cache) {
       if (otherCacheName !== cacheName &&
-          otherCacheName.startsWith(shortname) &&
+          otherCacheName.startsWith(pathHash) &&
           isCacheFileName(otherCacheName)) {
         removeCacheFile(cachePath, cacheName)
       }
