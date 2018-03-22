@@ -6,7 +6,7 @@ import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
-import getCacheFileName from "./util/get-cache-file-name.js"
+import getCacheName from "./util/get-cache-name.js"
 import has from "./util/has.js"
 import isCacheFileName from "./util/is-cache-file-name.js"
 import isMJS from "./util/is-mjs.js"
@@ -108,7 +108,7 @@ function init() {
     const result = Compiler.compile(code, toCompileOptions(entry, options))
 
     if (options.eval) {
-      const cacheName = getCacheFileName(entry, code)
+      const cacheName = getCacheName(entry, code)
 
       return shared.package.dir[""].compile[cacheName] = result
     }

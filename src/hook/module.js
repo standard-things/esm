@@ -12,7 +12,7 @@ import assign from "../util/assign.js"
 import compile from "../module/_compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
-import getCacheFileName from "../util/get-cache-file-name.js"
+import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getEnvVars from "../env/get-vars.js"
 import has from "../util/has.js"
@@ -107,7 +107,7 @@ function hook(Mod, parent) {
     const entry = Entry.get(mod)
     const pkg = entry.package
     const { cache, cachePath } = pkg
-    const cacheName = getCacheFileName(entry, mtime(filename))
+    const cacheName = getCacheName(entry, mtime(filename))
 
     const { _compile } = mod
 

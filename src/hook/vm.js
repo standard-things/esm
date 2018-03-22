@@ -17,7 +17,7 @@ import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
-import getCacheFileName from "../util/get-cache-file-name.js"
+import getCacheName from "../util/get-cache-name.js"
 import isCheck from "../env/is-check.js"
 import isError from "../util/is-error.js"
 import isEval from "../env/is-eval.js"
@@ -66,7 +66,7 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
-    entry.cacheName = getCacheFileName(entry, content)
+    entry.cacheName = getCacheName(entry, content)
 
     let compileData = entry.package.cache.compile[entry.cacheName]
 

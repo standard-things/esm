@@ -10,7 +10,7 @@ const engineVersion =
 
 const nodeVersion = process.version
 
-function getCacheFileName(entry, cacheKey) {
+function getCacheName(entry, cacheKey) {
   let { filename } = entry.module
 
   if (typeof filename !== "string") {
@@ -34,4 +34,4 @@ function getCacheFileName(entry, cacheKey) {
     stateHash.slice(0, 8) + ".js"
 }
 
-export default getCacheFileName
+export default getCacheName

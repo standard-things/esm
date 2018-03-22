@@ -11,7 +11,7 @@ import Package from "../package.js"
 import _compile from "./_compile.js"
 import binding from "../binding.js"
 import { dirname } from "../safe/path.js"
-import getCacheFileName from "../util/get-cache-file-name.js"
+import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import has from "../util/has.js"
 import makeRequireFunction from "./make-require-function.js"
@@ -37,7 +37,7 @@ function compile(content, filename) {
   const entry = Entry.get(this)
 
   if (entry.state === STATE_INITIAL) {
-    entry.cacheName = getCacheFileName(entry, content)
+    entry.cacheName = getCacheName(entry, content)
     entry.package = Package.get("")
     entry.runtimeName = shared.runtimeName
 
