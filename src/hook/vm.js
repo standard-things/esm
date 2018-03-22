@@ -237,7 +237,7 @@ function createAddBuiltinModules(entry) {
     "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
   ]
 
-  if (typeof binding.inspector.connect === "function") {
+  if (typeof binding.inspector.open === "function") {
     lazyModules.push("inspector")
     lazyModules.sort()
   }
