@@ -9,7 +9,7 @@ import assign from "./util/assign.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
 import has from "./util/has.js"
-import isCacheFileName from "./util/is-cache-file-name.js"
+import isCacheName from "./util/is-cache-name.js"
 import isMJS from "./util/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import removeFile from "./fs/remove-file.js"
@@ -172,7 +172,7 @@ function init() {
     for (const otherCacheName in cache) {
       if (otherCacheName !== cacheName &&
           otherCacheName.startsWith(pathHash) &&
-          isCacheFileName(otherCacheName)) {
+          isCacheName(otherCacheName)) {
         removeCacheFile(cachePath, cacheName)
       }
     }
@@ -237,7 +237,7 @@ function init() {
         for (const cacheName in cache.compile) {
           if (cacheName === ".data.blob" ||
               cacheName === ".data.json" ||
-              isCacheFileName(cacheName)) {
+              isCacheName(cacheName)) {
             removeCacheFile(cachePath, cacheName)
           }
         }
