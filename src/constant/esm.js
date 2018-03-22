@@ -15,9 +15,9 @@ setDeferred(ESM, "PKG_DIRNAME", () => {
 
 setDeferred(ESM, "PKG_PARENT", () => {
   const { PKG_DIRNAME } = ESM
+  const seen = new Set
 
   let PKG_PARENT = parent
-  let seen = new Set
 
   while (PKG_PARENT &&
       typeof PKG_PARENT.filename === "string" &&
