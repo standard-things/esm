@@ -5,13 +5,14 @@ import Module from "../../module.js"
 import { extname } from "../../safe/path.js"
 import isMJS from "../../util/is-mjs.js"
 import moduleState from "../state.js"
+import shared from "../../shared.js"
 
 const {
   STATE_PARSING_COMPLETED
 } = ENTRY
 
 function loader(entry, preload) {
-  if (! moduleState.parsing &&
+  if (! shared.parsing &&
       preload) {
     preload(entry)
   }
@@ -35,7 +36,7 @@ function loader(entry, preload) {
     ext = ".js"
   }
 
-  if (moduleState.parsing &&
+  if (shared.parsing &&
       (ext === ".json" ||
        ext === ".node")) {
     entry.state = STATE_PARSING_COMPLETED
@@ -44,7 +45,7 @@ function loader(entry, preload) {
 
   _extensions[ext](mod, filename)
 
-  if (! moduleState.parsing) {
+  if (! shared.parsing) {
     mod.loaded = true
   }
 }

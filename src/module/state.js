@@ -6,8 +6,6 @@ const state = {
   _extensions,
   globalPaths: null,
   mainModule: null,
-  parsing: null,
-  passthru: null,
   requireDepth: 0,
   stat: null
 }

@@ -7,7 +7,7 @@ import Module from "../../module.js"
 import _load from "../_load.js"
 import { dirname } from "../../safe/path.js"
 import loader from "./loader.js"
-import moduleState from "../state.js"
+import shared from "../../shared.js"
 
 function load(request, parent, isMain, preload) {
   let called = false
@@ -19,8 +19,8 @@ function load(request, parent, isMain, preload) {
 
     Module._cache[filename] = child
 
-    if (moduleState.passthru &&
-        ! moduleState.parsing) {
+    if (shared.passthru &&
+        ! shared.parsing) {
       return
     }
 

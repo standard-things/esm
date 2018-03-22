@@ -71,6 +71,8 @@ if (__shared__) {
       dir: { __proto__: null },
       root: { __proto__: null }
     },
+    parsing: false,
+    passthru: false,
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
     process: {

@@ -43,11 +43,11 @@ function load(request, parent, isMain, state, loader) {
     }
 
     if (child.loaded ||
-        moduleState.parsing) {
+        shared.parsing) {
       return entry
     }
 
-    if (! moduleState.parsing &&
+    if (! shared.parsing &&
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
@@ -66,13 +66,13 @@ function load(request, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.id = filename
     entry.parent = Entry.get(parent)
-    entry.state = moduleState.parsing
+    entry.state = shared.parsing
       ? STATE_PARSING_STARTED
       : STATE_EXECUTION_STARTED
   }
 
-  if (moduleState.passthru &&
-      ! moduleState.parsing) {
+  if (shared.passthru &&
+      ! shared.parsing) {
     entry.state = STATE_PARSING_COMPLETED
   } else {
     const { _compile } = child

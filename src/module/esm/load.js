@@ -1,7 +1,7 @@
 import ENTRY from "../../constant/entry.js"
 
 import _load from "./_load.js"
-import moduleState from "../state.js"
+import shared from "../../shared.js"
 
 const {
   STATE_EXECUTION_COMPLETED,
@@ -12,12 +12,12 @@ const {
 function load(request, parent, isMain, preload) {
   let entry
 
-  moduleState.parsing = true
+  shared.parsing = true
 
   try {
     entry = _load(request, parent, isMain)
   } finally {
-    moduleState.parsing = false
+    shared.parsing = false
   }
 
   if (entry.module.loaded) {
@@ -37,7 +37,7 @@ function load(request, parent, isMain, preload) {
       preload(entry)
     }
 
-    if (! moduleState.passthru) {
+    if (! shared.passthru) {
       _load(request, parent, isMain)
     }
   }

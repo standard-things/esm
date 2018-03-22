@@ -99,13 +99,13 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (options.warnings &&
-      moduleState.parsing) {
+      shared.parsing) {
     for (const warning of compileData.warnings) {
       warn(warning.code, filename, ...warning.args)
     }
   }
 
-  if (moduleState.parsing) {
+  if (shared.parsing) {
     const defaultPkg = shared.package.default
     const isESM = entry.type === TYPE_ESM
     const { parent } = entry

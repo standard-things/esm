@@ -384,15 +384,15 @@ function readInfo(dirPath, force) {
 
       const { parsing, passthru } = moduleState
 
-      moduleState.parsing =
-      moduleState.passthru = false
+      shared.parsing =
+      shared.passthru = false
 
       try {
         pkg.options =
         Package.createOptions(loadESM(optionsPath, null, false).module.exports)
       } finally {
-        moduleState.parsing = parsing
-        moduleState.passthru = passthru
+        shared.parsing = parsing
+        shared.passthru = passthru
       }
     }
   }

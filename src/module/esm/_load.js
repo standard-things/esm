@@ -17,6 +17,7 @@ import moduleState from "../state.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import setSetter from "../../util/set-setter.js"
+import shared from "../../shared.js"
 import toOptInError from "../../util/to-opt-in-error.js"
 
 const {
@@ -63,8 +64,8 @@ function load(request, parent, isMain, preload) {
 
     state._cache[request] = child
 
-    if (moduleState.passthru &&
-        ! moduleState.parsing) {
+    if (shared.passthru &&
+        ! shared.parsing) {
       return
     }
 
@@ -73,7 +74,7 @@ function load(request, parent, isMain, preload) {
     child.filename = filename
     entry.id = request
 
-    if (! moduleState.parsing) {
+    if (! shared.parsing) {
       const isESM = entry.type === TYPE_ESM
 
       if (! isESM) {
