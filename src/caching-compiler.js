@@ -220,8 +220,8 @@ function init() {
           continue
         }
 
-        Reflect.deleteProperty(pendingWrites, cachePath)
         Reflect.deleteProperty(pendingMetas, cachePath)
+        Reflect.deleteProperty(pendingWrites, cachePath)
 
         if (! mkdirp(cachePath)) {
           continue
