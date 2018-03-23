@@ -5,29 +5,17 @@ const noDeprecationDescriptor = {
 }
 
 function silent(callback) {
-  let oldDescriptor
+  const oldDescriptor = Reflect.getOwnPropertyDescriptor(process, "noDeprecation")
 
-  const shouldRestore = ! process.noDeprecation
-
-  if (shouldRestore) {
-    oldDescriptor = Reflect.getOwnPropertyDescriptor(process, "noDeprecation")
-
-    if (oldDescriptor) {
-      Reflect.defineProperty(process, "noDeprecation", noDeprecationDescriptor)
-    } else {
-      process.noDeprecation = true
-    }
-  }
+  Reflect.defineProperty(process, "noDeprecation", noDeprecationDescriptor)
 
   try {
     return callback()
   } finally {
-    if (shouldRestore) {
-      if (oldDescriptor) {
-        Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
-      } else {
-        Reflect.deleteProperty(process, "noDeprecation")
-      }
+    if (oldDescriptor) {
+      Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
+    } else {
+      Reflect.deleteProperty(process, "noDeprecation")
     }
   }
 }
