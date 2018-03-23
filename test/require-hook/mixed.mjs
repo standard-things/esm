@@ -1,7 +1,7 @@
 import assert from "assert"
 import makeRequire from "../../"
+import mockIo from "../../script/mock-stdio.js"
 import module from "../module.js"
-import mockIo from "mock-stdio"
 
 export default () => {
   return new Promise((resolve) => {

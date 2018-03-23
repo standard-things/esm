@@ -91,7 +91,9 @@ function runTests(cached) {
       ESM_OPTIONS: "{cjs:false,mode:'strict'}",
       HOME,
       NODE_ENV: NODE_ENV + (cached ? "-cached" : ""),
+      NODE_OPTIONS: "--trace-warnings",
       NODE_PATH,
+      NODE_PENDING_DEPRECATION: 1,
       USERPROFILE: HOME
     },
     stdio: "inherit"

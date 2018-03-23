@@ -1,10 +1,14 @@
 "use strict"
 
-const _trash = require("trash")
 const fs = require("fs-extra")
 const path = require("path")
 
-const options = { glob: false }
+const options = {
+  __proto__: null,
+  glob: false
+}
+
+let _trash
 
 function trash(iterable) {
   return new Promise((resolve) => {
@@ -13,16 +17,24 @@ function trash(iterable) {
       .map((thePath) => path.resolve(String(thePath)))
       .filter(fs.pathExistsSync)
 
+    process.noDeprecation = true
     return Promise
-      .all(paths.map((thePath) =>
-        _trash([thePath], options)
+      .all(paths.map((thePath) => {
+        if (! _trash) {
+          _trash = require("trash")
+        }
+
+        return _trash([thePath], options)
           .catch((e) => {
-            if (e.code === "EACCES") {
+            if (e && e.code === "EACCES") {
               process.exitCode = e.code
             }
           })
-      ))
-      .then(resolve)
+      }))
+      .then(() => {
+        Reflect.deleteProperty(process, "noDeprecation")
+        resolve()
+      })
   })
 }
 

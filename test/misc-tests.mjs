@@ -5,7 +5,7 @@ import SemVer from "semver"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
-import mockIo from "mock-stdio"
+import mockIo from "../script/mock-stdio.js"
 import path from "path"
 import require from "./require.js"
 import util from "util"
@@ -1124,14 +1124,19 @@ describe("spec compliance", () => {
     ].reduce((promise, data) => {
       const filename = path.resolve(data.id)
       const url = getURLFromFilePath(filename)
-      const stderr = getWarning(pkgName + " detected undefined arguments access (%s): %s", data.loc, url)
+      const warning = getWarning(pkgName + " detected undefined arguments access (%s): %s", data.loc, url)
 
       return promise
         .then(() => {
           mockIo.start()
           return import(filename)
         })
-        .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
+        .then(() => {
+          const result = mockIo.end()
+
+          assert.strictEqual(result.stdout, "")
+          assert.ok(result.stderr.startsWith(warning))
+        })
     }, Promise.resolve())
   )
 
@@ -1143,13 +1148,18 @@ describe("spec compliance", () => {
     .reduce((promise, request) => {
       const filename = path.resolve(request)
       const url = getURLFromFilePath(filename)
-      const stderr = getWarning(pkgName + " detected possible temporal dead zone access of 'a' in %s", url)
+      const warning = getWarning(pkgName + " detected possible temporal dead zone access of 'a' in %s", url)
 
       return promise
         .then(() => {
           mockIo.start()
           return import(filename)
-            .then(() => assert.deepStrictEqual(mockIo.end(), { stderr, stdout: "" }))
+            .then(() => {
+              const result = mockIo.end()
+
+              assert.strictEqual(result.stdout, "")
+              assert.ok(result.stderr.startsWith(warning))
+            })
         })
     }, Promise.resolve())
   )
