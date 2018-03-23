@@ -471,16 +471,19 @@ function createNamespace(entry, source = entry) {
 
 function getExportByName(entry, setter, name) {
   const { _namespace } = entry
-  const { namedExports } = entry.package.options.cjs
+  const isCJS = entry.type === TYPE_CJS
   const { parent } = setter
 
   const parentNamedExports =
     parent.package.options.cjs.namedExports &&
     ! isMJS(parent.module)
 
-  if ((namedExports ||
-       parentNamedExports) &&
-      entry.type === TYPE_CJS &&
+  const noNamedExports =
+    isCJS &&
+    ! parentNamedExports
+
+  if (isCJS &&
+      parentNamedExports &&
       entry.namespace === _namespace) {
     entry.namespace = new OwnProxy(_namespace, {
       get(target, name, receiver) {
@@ -491,21 +494,13 @@ function getExportByName(entry, setter, name) {
     })
   }
 
-  const isESM = entry.type === TYPE_ESM
-  const isLoaded = entry._loaded === LOAD_COMPLETED
-  const isScript = ! isESM && ! parentNamedExports
-
   if (name === "*") {
-    return isScript ? entry.cjsNamespace : entry.esmNamespace
+    return noNamedExports ? entry.cjsNamespace : entry.esmNamespace
   }
 
-  if (isESM) {
-    return entry.namespace[name]
-  }
-
-  if ((isScript &&
+  if ((noNamedExports &&
        name !== "default") ||
-      (isLoaded &&
+      (entry._loaded === LOAD_COMPLETED &&
        ! (name in entry.getters))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
