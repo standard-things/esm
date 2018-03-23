@@ -1,4 +1,4 @@
 "use strict"
 
-require = require("../../../")(module, true)
+require = require("../../../")(module)
 module.exports = require("../export/abc.mjs")

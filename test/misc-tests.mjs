@@ -1011,12 +1011,19 @@ describe("spec compliance", () => {
   )
 
   it("should error when importing non-exported binding after CJS code execution", () =>
-    import("./fixture/cjs/missing/export/cjs.js")
-      .then(() => assert.ok(false))
-      .catch((e) => {
-        assert.strictEqual(global.loadCount, 1)
-        assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
-      })
+    Promise
+      .all([
+        "./fixture/cjs/missing/export/cjs.js",
+        "./fixture/cjs/missing/export/bridge.js"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.strictEqual(global.loadCount, 1)
+            assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
+          })
+      ))
   )
 
   it("should error when setting an imported identifier", () =>
