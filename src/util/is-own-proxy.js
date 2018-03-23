@@ -50,5 +50,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.isOwnProxy
-  : shared.module.isOwnProxy = init()
+  ? shared.module.utilIsOwnProxy
+  : shared.module.utilIsOwnProxy = init()
