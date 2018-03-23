@@ -1,18 +1,24 @@
 import setHiddenValue from "../util/set-hidden-value.js"
 import shared from "../shared.js"
 
-function decorateStackTrace(error) {
-  const { arrowSymbol, decoratedSymbol } = shared.utilBinding
+function init() {
+  function decorateStackTrace(error) {
+    const { arrowSymbol, decoratedSymbol } = shared.utilBinding
 
-  if (arrowSymbol !== void 0) {
-    setHiddenValue(error, arrowSymbol, "")
+    if (arrowSymbol !== void 0) {
+      setHiddenValue(error, arrowSymbol, "")
+    }
+
+    if (decoratedSymbol !== void 0) {
+      setHiddenValue(error, decoratedSymbol, true)
+    }
+
+    return error
   }
 
-  if (decoratedSymbol !== void 0) {
-    setHiddenValue(error, decoratedSymbol, true)
-  }
-
-  return error
+  return decorateStackTrace
 }
 
-export default decorateStackTrace
+export default shared.inited
+  ? shared.module.errorDecorateStackTrace
+  : shared.module.errorDecorateStackTrace = init()

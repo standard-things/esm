@@ -4,25 +4,33 @@
 
 import { literalRegExp, skipWhiteSpaceRegExp } from "../acorn.js"
 
-function indexOfPragma(code, pragma) {
-  let pos = 0
+import shared from "../shared.js"
 
-  while (true) {
-    skipWhiteSpaceRegExp.lastIndex = pos
-    pos += skipWhiteSpaceRegExp.exec(code)[0].length
+function init() {
+  function indexOfPragma(code, pragma) {
+    let pos = 0
 
-    const match = literalRegExp.exec(code.slice(pos))
+    while (true) {
+      skipWhiteSpaceRegExp.lastIndex = pos
+      pos += skipWhiteSpaceRegExp.exec(code)[0].length
 
-    if (match === null) {
-      return -1
+      const match = literalRegExp.exec(code.slice(pos))
+
+      if (match === null) {
+        return -1
+      }
+
+      if ((match[1] || match[2]) === pragma) {
+        return pos
+      }
+
+      pos += match[0].length
     }
-
-    if ((match[1] || match[2]) === pragma) {
-      return pos
-    }
-
-    pos += match[0].length
   }
+
+  return indexOfPragma
 }
 
-export default indexOfPragma
+export default shared.inited
+  ? shared.module.parseIndexOfPragma
+  : shared.module.parseIndexOfPragma = init()
