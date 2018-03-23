@@ -19,7 +19,6 @@ import isMJS from "../util/is-mjs.js"
 import isObjectEmpty from "../util/is-object-empty.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import moduleState from "./state.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import shared from "../shared.js"
@@ -98,14 +97,13 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  if (options.warnings &&
-      shared.moduleState.parsing) {
-    for (const warning of compileData.warnings) {
-      warn(warning.code, filename, ...warning.args)
-    }
-  }
-
   if (shared.moduleState.parsing) {
+    if (options.warnings) {
+      for (const warning of compileData.warnings) {
+        warn(warning.code, filename, ...warning.args)
+      }
+    }
+
     const defaultPkg = shared.package.default
     const isESM = entry.type === TYPE_ESM
     const { parent } = entry
@@ -131,6 +129,7 @@ function compile(caller, entry, content, filename, fallback) {
 
 function tryCompileCached(entry, filename) {
   const isESM = entry.type === TYPE_ESM
+  const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 

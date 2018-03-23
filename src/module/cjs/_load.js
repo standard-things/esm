@@ -15,12 +15,13 @@ function load(request, parent, isMain, preload) {
   const filename = Module._resolveFilename(request, parent, isMain)
 
   const entry = _load(filename, parent, isMain, Module, (entry) => {
+    const { parsing, passthru } = shared.moduleState
     const child = entry.module
 
     Module._cache[filename] = child
 
-    if (shared.moduleState.passthru &&
-        ! shared.moduleState.parsing) {
+    if (passthru &&
+        ! parsing) {
       return
     }
 

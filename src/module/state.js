@@ -5,9 +5,7 @@ const state = {
   _cache: { __proto__: null },
   _extensions,
   globalPaths: null,
-  mainModule: null,
-  requireDepth: 0,
-  stat: null
+  mainModule: null
 }
 
 export default state

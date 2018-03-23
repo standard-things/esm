@@ -10,7 +10,6 @@ import identity from "./util/identity.js"
 import isMJS from "./util/is-mjs.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
-import moduleState from "./module/state.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
@@ -267,8 +266,10 @@ function watchBuiltin(entry, request, setterPairs) {
 }
 
 function watchImport(entry, request, setterPairs, loader) {
+  const { moduleState } = shared
+
   moduleState.requireDepth += 1
-  shared.moduleState.passthru = true
+  moduleState.passthru = true
 
   const mod = entry.module
 
@@ -279,7 +280,7 @@ function watchImport(entry, request, setterPairs, loader) {
       childEntry.addSetters(setterPairs, entry)
     })
   } finally {
-    shared.moduleState.passthru = false
+    moduleState.passthru = false
     moduleState.requireDepth -= 1
   }
 

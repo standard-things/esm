@@ -16,7 +16,6 @@ import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import loadESM from "./module/esm/load.js"
-import moduleState from "./module/state.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
@@ -382,17 +381,18 @@ function readInfo(dirPath, force) {
       pkg =
       Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
+      const { moduleState } = shared
       const { parsing, passthru } = moduleState
 
-      shared.moduleState.parsing =
-      shared.moduleState.passthru = false
+      moduleState.parsing =
+      moduleState.passthru = false
 
       try {
         pkg.options =
         Package.createOptions(loadESM(optionsPath, null, false).module.exports)
       } finally {
-        shared.moduleState.parsing = parsing
-        shared.moduleState.passthru = passthru
+        moduleState.parsing = parsing
+        moduleState.passthru = passthru
       }
     }
   }

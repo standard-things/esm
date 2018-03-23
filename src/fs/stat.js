@@ -2,7 +2,6 @@ import { Stats, statSync } from "../safe/fs.js"
 
 import binding from "../binding.js"
 import call from "../util/call.js"
-import moduleState from "../module/state.js"
 import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
@@ -13,7 +12,7 @@ function stat(filename) {
     return -1
   }
 
-  const cache = moduleState.stat
+  const cache = shared.moduleState.stat
 
   if (cache &&
       filename in cache) {

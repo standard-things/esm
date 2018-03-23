@@ -34,6 +34,8 @@ function load(request, parent, isMain, state, loader) {
     filename = child.filename
   }
 
+  const { parsing, passthru } = shared.moduleState
+
   if (child) {
     const children = parent && parent.children
 
@@ -42,12 +44,12 @@ function load(request, parent, isMain, state, loader) {
       GenericArray.push(children, child)
     }
 
-    if (child.loaded ||
-        shared.moduleState.parsing) {
+    if (parsing ||
+        child.loaded) {
       return entry
     }
 
-    if (! shared.moduleState.parsing &&
+    if (! parsing &&
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
@@ -66,13 +68,13 @@ function load(request, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.id = filename
     entry.parent = Entry.get(parent)
-    entry.state = shared.moduleState.parsing
+    entry.state = parsing
       ? STATE_PARSING_STARTED
       : STATE_EXECUTION_STARTED
   }
 
-  if (shared.moduleState.passthru &&
-      ! shared.moduleState.parsing) {
+  if (passthru &&
+      ! parsing) {
     entry.state = STATE_PARSING_COMPLETED
   } else {
     const { _compile } = child

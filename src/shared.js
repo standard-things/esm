@@ -67,7 +67,9 @@ if (__shared__) {
     moduleState: {
       __proto__: null,
       parsing: false,
-      passthru: false
+      passthru: false,
+      requireDepth: 0,
+      stat: null
     },
     package: {
       __proto__: null,
