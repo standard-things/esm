@@ -1,5 +1,4 @@
 import hasLoaderModule from "./has-loader-module.js"
-import isInternal from "./is-internal.js"
 import isPreloaded from "./is-preloaded.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
@@ -15,8 +14,7 @@ function isREPL() {
     return env.repl = false
   }
 
-  if (isInternal() ||
-      isPreloaded()) {
+  if (isPreloaded()) {
     return env.repl = true
   }
 
