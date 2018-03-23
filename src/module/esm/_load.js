@@ -64,8 +64,8 @@ function load(request, parent, isMain, preload) {
 
     state._cache[request] = child
 
-    if (shared.passthru &&
-        ! shared.parsing) {
+    if (shared.moduleState.passthru &&
+        ! shared.moduleState.parsing) {
       return
     }
 
@@ -74,7 +74,7 @@ function load(request, parent, isMain, preload) {
     child.filename = filename
     entry.id = request
 
-    if (! shared.parsing) {
+    if (! shared.moduleState.parsing) {
       const isESM = entry.type === TYPE_ESM
 
       if (! isESM) {

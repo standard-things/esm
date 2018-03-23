@@ -19,8 +19,8 @@ function load(request, parent, isMain, preload) {
 
     Module._cache[filename] = child
 
-    if (shared.passthru &&
-        ! shared.parsing) {
+    if (shared.moduleState.passthru &&
+        ! shared.moduleState.parsing) {
       return
     }
 

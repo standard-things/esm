@@ -268,7 +268,7 @@ function watchBuiltin(entry, request, setterPairs) {
 
 function watchImport(entry, request, setterPairs, loader) {
   moduleState.requireDepth += 1
-  shared.passthru = true
+  shared.moduleState.passthru = true
 
   const mod = entry.module
 
@@ -279,7 +279,7 @@ function watchImport(entry, request, setterPairs, loader) {
       childEntry.addSetters(setterPairs, entry)
     })
   } finally {
-    shared.passthru = false
+    shared.moduleState.passthru = false
     moduleState.requireDepth -= 1
   }
 

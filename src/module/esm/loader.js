@@ -12,7 +12,7 @@ const {
 } = ENTRY
 
 function loader(entry, preload) {
-  if (! shared.parsing &&
+  if (! shared.moduleState.parsing &&
       preload) {
     preload(entry)
   }
@@ -36,7 +36,7 @@ function loader(entry, preload) {
     ext = ".js"
   }
 
-  if (shared.parsing &&
+  if (shared.moduleState.parsing &&
       (ext === ".json" ||
        ext === ".node")) {
     entry.state = STATE_PARSING_COMPLETED
@@ -45,7 +45,7 @@ function loader(entry, preload) {
 
   _extensions[ext](mod, filename)
 
-  if (! shared.parsing) {
+  if (! shared.moduleState.parsing) {
     mod.loaded = true
   }
 }

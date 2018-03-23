@@ -12,12 +12,12 @@ const {
 function load(request, parent, isMain, preload) {
   let entry
 
-  shared.parsing = true
+  shared.moduleState.parsing = true
 
   try {
     entry = _load(request, parent, isMain)
   } finally {
-    shared.parsing = false
+    shared.moduleState.parsing = false
   }
 
   if (entry.module.loaded) {
@@ -37,7 +37,7 @@ function load(request, parent, isMain, preload) {
       preload(entry)
     }
 
-    if (! shared.passthru) {
+    if (! shared.moduleState.passthru) {
       _load(request, parent, isMain)
     }
   }
