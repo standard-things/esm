@@ -36,7 +36,7 @@ function load(request, parent, isMain, preload) {
   if (parentPkgOptions &&
       parentPkgOptions.cjs.paths &&
       ! isMJS(parent)) {
-    filename = Module._resolveFilename(request, parent, isMain)
+    filename = tryResolveFilename(request, parent, isMain)
   } else {
     filename = resolveFilename(request, parent, isMain)
   }
@@ -154,6 +154,32 @@ function load(request, parent, isMain, preload) {
       })
     }
   }
+}
+
+function tryResolveFilename(request, parent, isMain) {
+  let error
+  let result
+  let threw = true
+
+  try {
+    result = Module._resolveFilename(request, parent, isMain)
+    threw = false
+  } catch (e) {
+    error = e
+  }
+
+  if (threw) {
+    try {
+      result = resolveFilename(request, parent, isMain)
+      threw = false
+    } catch (e) {}
+  }
+
+  if (threw) {
+    throw error
+  }
+
+  return result
 }
 
 export default load

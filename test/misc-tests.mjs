@@ -974,7 +974,7 @@ describe("spec compliance", () => {
       ))
   )
 
-  it("should error for missing modules before code execution", () =>
+  it("should error for missing modules before ESM code execution", () =>
     Promise
       .all([
         "./fixture/import/missing/module/cjs.mjs",
@@ -992,12 +992,13 @@ describe("spec compliance", () => {
       ))
   )
 
-  it("should error when importing non-exported binding before code execution", () =>
+  it("should error when importing non-exported binding before ESM code execution", () =>
     Promise
       .all([
-        "./fixture/import/missing/export/cjs.mjs",
-        "./fixture/import/missing/export/esm.mjs",
-        "./fixture/cycle/missing/export/a.mjs"
+       "./fixture/import/missing/export/cjs.mjs",
+       "./fixture/import/missing/export/esm.mjs",
+       "./fixture/cjs/missing/export/esm.js",
+       "./fixture/cycle/missing/export/a.mjs"
       ]
       .map((request) =>
         import(request)
@@ -1007,6 +1008,15 @@ describe("spec compliance", () => {
             assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
           })
       ))
+  )
+
+  it("should error when importing non-exported binding after CJS code execution", () =>
+    import("./fixture/cjs/missing/export/cjs.js")
+      .then(() => assert.ok(false))
+      .catch((e) => {
+        assert.strictEqual(global.loadCount, 1)
+        assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
+      })
   )
 
   it("should error when setting an imported identifier", () =>
