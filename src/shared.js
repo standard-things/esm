@@ -4,15 +4,15 @@ import encodeId from "./util/encode-id.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
-const {
-  PKG_PREFIX
-} = ESM
-
 let shared
 
 if (__shared__) {
   shared = __shared__
 } else {
+  const {
+    PKG_PREFIX
+  } = ESM
+
   const fastPath = { __proto__: null }
   const utilBinding = { __proto__: null }
   const { versions } = process
