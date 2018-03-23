@@ -50,6 +50,10 @@ function init() {
 
       if (strict !== void 0) {
         parser.strict = strict
+
+        if (! strict) {
+          parser.reservedWords = /^enum$/
+        }
       }
 
       const result = parser.parse()
