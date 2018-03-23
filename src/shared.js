@@ -1,6 +1,5 @@
 import ESM from "./constant/esm.js"
 
-import binding from "./binding.js"
 import encodeId from "./util/encode-id.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
@@ -35,7 +34,6 @@ if (__shared__) {
 
   shared = {
     __proto__: null,
-    binding,
     entry: {
       __proto__: null,
       cache: new WeakMap,
@@ -130,7 +128,7 @@ if (__shared__) {
   )
 
   setDeferred(fastPath, "stat", () =>
-    typeof binding.fs.internalModuleStat === "function"
+    typeof shared.module.binding.fs.internalModuleStat === "function"
   )
 
   setDeferred(support, "await", () => {
@@ -143,7 +141,7 @@ if (__shared__) {
   })
 
   setDeferred(support, "getProxyDetails", () =>
-    typeof binding.util.getProxyDetails === "function"
+    typeof shared.module.binding.util.getProxyDetails === "function"
   )
 
   setDeferred(support, "inspectProxies", () => {
@@ -162,11 +160,11 @@ if (__shared__) {
   })
 
   setDeferred(support, "internalModuleReadFile", () =>
-    typeof binding.fs.internalModuleReadFile === "function"
+    typeof shared.module.binding.fs.internalModuleReadFile === "function"
   )
 
   setDeferred(support, "internalModuleReadJSON", () =>
-    typeof binding.fs.internalModuleReadJSON === "function"
+    typeof shared.module.binding.fs.internalModuleReadJSON === "function"
   )
 
   setDeferred(support, "internalModuleReadJSON", () => {
@@ -203,15 +201,15 @@ if (__shared__) {
   )
 
   setDeferred(support, "safeGetEnv", () =>
-    typeof binding.util.safeGetenv === "function"
+    typeof shared.module.binding.util.safeGetenv === "function"
   )
 
   setDeferred(support, "safeToString", () =>
-    typeof binding.util.safeToString === "function"
+    typeof shared.module.binding.util.safeToString === "function"
   )
 
   setDeferred(support, "setHiddenValue", () =>
-    typeof binding.util.setHiddenValue === "function"
+    typeof shared.module.binding.util.setHiddenValue === "function"
   )
 
   setDeferred(symbol, "customInspect", () =>
@@ -221,13 +219,13 @@ if (__shared__) {
   setDeferred(utilBinding, "arrowSymbol", () => {
     return satisfies(shared.process.version, "<7.0.0")
       ? "node:arrowMessage"
-      : binding.util.arrow_message_private_symbol
+      : shared.module.binding.util.arrow_message_private_symbol
   })
 
   setDeferred(utilBinding, "decoratedSymbol", () => {
     return satisfies(shared.process.version, "<7.0.0")
       ? "node:decorated"
-      : binding.util.decorated_private_symbol
+      : shared.module.binding.util.decorated_private_symbol
   })
 
   setDeferred(utilBinding, "hiddenKeyType", () =>
