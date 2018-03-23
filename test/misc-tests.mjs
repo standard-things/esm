@@ -1,4 +1,5 @@
 import JSON6 from "json-6"
+import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
@@ -115,6 +116,18 @@ describe("integration", () => {
     import("./cjs/intercept/dynamic-import.js")
       .then((ns) => ns.default())
   )
+
+  it("should support ESM in `Module#_compile`", () => {
+    const mod = new Module
+
+    mod._compile('export const a = "a"', "filename")
+
+    assert.deepStrictEqual(mod.exports, {})
+
+    mod.loaded = true
+
+    assert.deepEqual(mod.exports, { a: "a" })
+  })
 })
 
 describe("package.json", () => {
