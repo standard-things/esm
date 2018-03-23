@@ -12,17 +12,19 @@ function init() {
     enable(context) {
       const cache = shared.memoize.shimProcessBindingUtilGetProxyDetails
 
+      let _getProxyDetails
       let utilBinding
 
       try {
-        utilBinding = silent(() => context.process.binding("util"))
+        silent(() => {
+          utilBinding = context.process.binding("util")
+          _getProxyDetails = utilBinding.getProxyDetails
+        })
       } catch (e) {}
 
-      if (check(utilBinding, cache)) {
+      if (check(utilBinding, _getProxyDetails, cache)) {
         return context
       }
-
-      const _getProxyDetails = utilBinding.getProxyDetails
 
       const getProxyDetails = (value) => {
         if (value === shared.symbol.realGetProxyDetails) {
@@ -48,9 +50,9 @@ function init() {
     }
   }
 
-  function check(utilBinding, cache) {
+  function check(utilBinding, getProxyDetails, cache) {
     if (! utilBinding ||
-        typeof utilBinding.getProxyDetails !== "function") {
+        typeof getProxyDetails !== "function") {
       return true
     }
 
@@ -63,7 +65,6 @@ function init() {
     result = false
 
     try {
-      const { getProxyDetails } = utilBinding
       const proxy = new OwnProxy(getProxyDetails)
 
       result = getProxyDetails(proxy) === void 0
