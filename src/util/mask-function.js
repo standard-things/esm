@@ -11,7 +11,7 @@ function maskFunction(func, source) {
     return func
   }
 
-  const cache = shared.memoize.maskFunction
+  const cache = shared.memoize.utilMaskFunction
   let cached = cache.get(func)
 
   if (cached) {

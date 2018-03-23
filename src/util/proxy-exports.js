@@ -14,7 +14,7 @@ function proxyExports(entry) {
     return exported
   }
 
-  const cache = shared.memoize.proxyExports
+  const cache = shared.memoize.utilProxyExports
   let cached = cache.get(exported)
 
   if (cached) {

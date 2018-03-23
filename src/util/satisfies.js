@@ -2,7 +2,7 @@ import { satisfies as _satisfies } from "semver"
 import shared from "../shared.js"
 
 function satisfies(version, range) {
-  const cache = shared.memoize.satisfies
+  const cache = shared.memoize.utilSatisfies
   const cacheKey = version + "\0" + range
 
   return cacheKey in cache

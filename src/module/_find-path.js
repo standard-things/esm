@@ -32,7 +32,7 @@ function findPath(request, paths, isMain, searchExts) {
     return ""
   }
 
-  const cache = shared.memoize.findPath
+  const cache = shared.memoize.moduleFindPath
 
   const cacheKey =
     request + "\0" +
@@ -117,7 +117,7 @@ function findPath(request, paths, isMain, searchExts) {
 }
 
 function readPackage(thePath) {
-  const cache = shared.memoize.readPackage
+  const cache = shared.memoize.moduleReadPackage
 
   if (thePath in cache) {
     return cache[thePath]
