@@ -25,6 +25,7 @@ function resolveFilename(request, parent, isMain, options, skipWarnings, skipGlo
 
     for (const fromPath of fromPaths) {
       fakeParent.paths = nodeModulePaths(fromPath)
+
       const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
 
       if (paths.indexOf(fromPath) === -1) {
