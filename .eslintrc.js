@@ -16,7 +16,7 @@ module.exports = {
   },
   parser: "eslint-plugin-import/memo-parser",
   parserOptions: {
-    ecmaVersion: 8,
+    ecmaVersion: 9,
     parser: "babel-eslint",
     sourceType: "module"
   },
