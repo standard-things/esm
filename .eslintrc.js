@@ -1,7 +1,5 @@
 "use strict"
 
-const isTest = /test/.test(process.env.NODE_ENV)
-
 module.exports = {
   env: {
     es6: true,
