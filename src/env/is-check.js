@@ -9,8 +9,11 @@ function isCheck() {
     return env.check
   }
 
+  const { length } = process.argv
+
   return env.check =
-    process.argv.length === 1 &&
+    (length === 1 ||
+     length === 2) &&
     matches(process.execArgv, /^(?:--check|-c)$/) &&
     isPreloaded()
 }
