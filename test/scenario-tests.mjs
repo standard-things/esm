@@ -47,6 +47,19 @@ describe("scenarios", function () {
     , Promise.resolve())
   )
 
+  it("should work with nyc, mocha, and cjs bridge", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/nyc-mocha-cjs-bridge")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
+    const mochaPattern = path.resolve(dirPath, "test")
+
+    return exec("nyc", [
+      "--cwd", dirPath,
+      "-i", cwdPath,
+      "-i", pkgPath,
+      "mocha", mochaPattern
+    ], envAuto)
+  })
+
   it("should work with esmod-pmb", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
   )
