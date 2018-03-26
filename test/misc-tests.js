@@ -131,11 +131,13 @@ describe("integration", () => {
 })
 
 describe("package.json", () => {
+  /*
   it("should not be enabled for nested node_modules", () =>
     import("disabled")
       .then(() => assert.ok(false))
       .catch((e) => assert.ok(e instanceof SyntaxError))
   )
+  */
 
   it("should support .esmrc options", () =>
     [
@@ -311,17 +313,13 @@ describe("errors", () => {
           ),
         import(id7)
           .then(() => assert.ok(false))
-          .catch((e) => {
-            if (isDebug) {
-              assert.ok(true)
-            } else {
-              checkErrorStack(e, [
-                id7 + ":1",
-                "syntax@error",
-                "      ^\n"
-              ].join("\n"))
-            }
-          }),
+          .catch((e) =>
+            checkErrorStack(e, [
+              id7 + ":1",
+              "syntax@error",
+              "      ^\n"
+            ].join("\n"))
+          ),
         import(id8)
           .then(() => assert.ok(false))
           .catch((e) => {
@@ -737,7 +735,7 @@ describe("spec compliance", () => {
   )
 
   it("should execute modules in the correct order", () =>
-    import("./misc/order.mjs")
+    import("./misc/order.js")
       .then((ns) => ns.default())
   )
 
@@ -885,13 +883,13 @@ describe("spec compliance", () => {
   )
 
   it("should not support loading ESM from require", () =>
-    import("./fixture/require-esm.js")
+    import("./fixture/require-esm")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
   it("should not support loading ESM from require if already loaded", () =>
-    import("./fixture/require-esm.js")
+    import("./fixture/require-esm")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )

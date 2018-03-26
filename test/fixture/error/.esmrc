@@ -1,0 +1,4 @@
+{
+  cjs: false,
+  mode: "strict"
+}
