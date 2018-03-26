@@ -13,6 +13,7 @@ function init() {
 
   addError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
   addError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
+  addError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
   addError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
   addError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 
@@ -116,6 +117,13 @@ function init() {
   function invalidArgValue(argName, value, reason = "is invalid") {
     return "The argument '" + argName + "' " + reason +
       ". Received " + truncInspect(value)
+  }
+
+  function invalidExtension(request) {
+    const moduleName = getModuleURL(request)
+
+    return "ES Module " + toStringLiteral(moduleName, "'") +
+      " cannot be loaded from .mjs files"
   }
 
   function invalidPkgMode(mode) {

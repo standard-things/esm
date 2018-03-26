@@ -4,6 +4,7 @@ import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 
 import _loadESM from "./module/esm/_load.js"
+import errors from "./errors.js"
 import builtinEntries from "./builtin-entries.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
@@ -16,6 +17,10 @@ import shared from "./shared.js"
 const {
   TYPE_ESM
 } = ENTRY
+
+const {
+  ERR_INVALID_ESM_FILE_EXTENSION
+} = errors
 
 const ExPromise = __external__.Promise
 
@@ -277,6 +282,14 @@ function watchImport(entry, request, setterPairs, loader) {
 
   try {
     childEntry = loader(request, mod, false, (childEntry) => {
+      const childMod = childEntry.module
+
+      if (childEntry.type === TYPE_ESM &&
+          isMJS(mod) &&
+          ! isMJS(childMod)) {
+        throw ERR_INVALID_ESM_FILE_EXTENSION(childMod)
+      }
+
       childEntry.addSetters(setterPairs, entry)
     })
   } finally {

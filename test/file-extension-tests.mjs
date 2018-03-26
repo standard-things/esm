@@ -51,4 +51,34 @@ describe("file extension", () => {
     import("./cjs/ext/unknown.mjs")
       .then((ns) => ns.default())
   )
+
+  it('should error loading non `.mjs` ES modules from `.mjs` files with `options.mode` of "strict"', () =>
+    Promise
+      .all([
+        "./fixture/ext/invalid-ext.js",
+        "./fixture/ext/invalid-ext.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e.message.includes("'import' and 'export' may only be used in ES modules"))
+          })
+      ))
+  )
+
+  it('should error loading non `.mjs` ES modules from `.mjs` files with `options.mode` of "auto"', () =>
+    Promise
+      .all([
+        "./fixture/cjs/ext/invalid-ext.js",
+        "./fixture/cjs/ext/invalid-ext.mjs"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e.message.includes("cannot be loaded from .mjs files"))
+          })
+      ))
+  )
 })
