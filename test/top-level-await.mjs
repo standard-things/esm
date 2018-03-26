@@ -17,7 +17,7 @@ describe("top-level await", () => {
         "./fixture/top-level-await/export-cjs.js",
         "./fixture/top-level-await/nested.js"
       ]
-      .map((id) => import(id)))
+      .map((request) => import(request)))
   )
 
   ;(canUseAsyncAwait ? it : xit)(
@@ -27,8 +27,8 @@ describe("top-level await", () => {
         "./fixture/top-level-await/export-esm.js",
         "./fixture/top-level-await/re-export.js"
       ]
-      .map((id) =>
-        import(id)
+      .map((request) =>
+        import(request)
           .then(() => assert.ok(false))
           .catch((e) => assert.strictEqual(e.name, "SyntaxError"))
       ))

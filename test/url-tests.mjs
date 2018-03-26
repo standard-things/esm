@@ -72,8 +72,8 @@ describe("URL parsing", () => {
         "http://example.com/",
         "https://example.com/"
       ]
-      .map((id) =>
-        import(id)
+      .map((request) =>
+        import(request)
           .then(() => assert.ok(false))
           .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
       ))
