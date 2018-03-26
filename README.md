@@ -11,6 +11,8 @@ Getting started
 
 Run `npx create-esm` or `yarn create esm`.
 
+:bulb: Use the `-y` flag to answer “yes” to all prompts.
+
 There are three ways to enable `esm`.
 
 1. Enable `esm` with a CJS bridge:
