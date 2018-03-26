@@ -17,7 +17,7 @@ There are three ways to enable `esm`.
 
     **index.js**
     ```js
-    // Provide options as a parameter, environment variable, or rc file.
+    // Set options as a parameter, environment variable, or rc file.
     require = require("esm")(module/*, options*/)
     module.exports = require("./main.js").default
     ```
@@ -82,7 +82,7 @@ Specify options with one of the following:
   <td>
     <p>A string mode:</p>
     <ul>
-      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>, <a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
+      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
       <li><code>"all"</code> script files are treated as ESM</li>
       <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM</li>
     </ul>
@@ -150,7 +150,7 @@ Specify options with one of the following:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for <a href="https://github.com/MylesBorins/proposal-top-level-await#variant-c-top-level-await-can-only-be-used-in-modules-without-exports">top-level <code>await</code></a> in modules without ESM exports. <i>(requires Node 7.6+)</i></p>
+    <p>A boolean for <a href="https://github.com/MylesBorins/proposal-top-level-await#variant-c-top-level-await-can-only-be-used-in-modules-without-exports">top-level <code>await</code></a> in modules without ESM exports in Node 7.6+.</p>
   </td>
 </tr>
 <tr>
