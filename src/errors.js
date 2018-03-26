@@ -11,36 +11,36 @@ function init() {
   const errors = { __proto__: null }
   const messages = { __proto__: null }
 
-  addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
-  addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
+  addError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
+  addError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
+  addError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
+  addError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
-  addNodeError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
-  addNodeError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
   addNodeError("MODULE_NOT_FOUND", missingCJS, ExError)
 
-  function addBuiltinError(code, messageHandler, Super) {
-    errors[code] = createBuiltinClass(Super, code)
+  function addError(code, messageHandler, Super) {
+    errors[code] = createErrorClass(Super, code)
     messages[code] = messageHandler
   }
 
   function addNodeError(code, messageHandler, Super) {
-    errors[code] = createNodeClass(Super, code)
+    errors[code] = createNodeErrorClass(Super, code)
     messages[code] = messageHandler
   }
 
-  function createBuiltinClass(Super, code) {
+  function createErrorClass(Super, code) {
     return function BuiltinError(...args) {
       return new Super(messages[code](...args))
     }
   }
 
-  function createNodeClass(Super, code) {
+  function createNodeErrorClass(Super, code) {
     return class NodeError extends Super {
       constructor(...args) {
         super(messages[code](...args))
@@ -92,14 +92,14 @@ function init() {
   function exportMissing(request, exportName) {
     const moduleName = getModuleURL(request)
 
-    return "Module " + toStringLiteral(moduleName, "'") +
+    return "ES Module " + toStringLiteral(moduleName, "'") +
       " does not provide an export named '" + exportName + "'"
   }
 
   function exportStarConflict(request, exportName) {
     const moduleName = getModuleURL(request)
 
-    return "Module " + toStringLiteral(moduleName, "'") +
+    return "ES Module " + toStringLiteral(moduleName, "'") +
       " contains conflicting star exports for name '" + exportName + "'"
   }
 

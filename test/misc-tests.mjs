@@ -297,7 +297,7 @@ describe("errors", () => {
           .catch((e) =>
             checkErrorStack(e, [
               getURLFromFilePath(id5) + ":1",
-              "SyntaxError: Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
+              "SyntaxError: ES Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
             ].join("\n"))
           ),
         import(id6)
