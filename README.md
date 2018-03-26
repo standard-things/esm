@@ -9,7 +9,7 @@ for all the details.
 Getting started
 ---
 
-Run `npm i --save esm` in your app or package directory.
+Run `npx create-esm` or `yarn create esm`.
 
 There are three ways to enable `esm`.
 
