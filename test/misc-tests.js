@@ -735,7 +735,7 @@ describe("spec compliance", () => {
   )
 
   it("should execute modules in the correct order", () =>
-    import("./misc/order.js")
+    import("./misc/order")
       .then((ns) => ns.default())
   )
 
