@@ -6,16 +6,19 @@ See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-tod
 :book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
 for all the details.
 
-Getting started
+Install
 ---
 
 Run `npx create-esm` or `yarn create esm`.
 
 :bulb: Use the `-y` flag to answer “yes” to all prompts.
 
-There are three ways to enable `esm`.
+Getting started
+---
 
-1. Enable `esm` with a CJS bridge:
+There are two ways to enable `esm`.
+
+1. Enable `esm` for packages:
 
     **index.js**
     ```js
@@ -24,17 +27,12 @@ There are three ways to enable `esm`.
     module.exports = require("./main.js").default
     ```
 
-2. Enable `esm` in the Node CLI with the [`-r` option](https://nodejs.org/api/cli.html#cli_r_require_module):
+2. Enable `esm` for local runs:
 
     ```shell
     node -r esm main.js
     ```
-
-3. Enable `esm` in the Node REPL:
-
-    ```shell
-    node -r esm
-    ```
+    :bulb: Omit the filename to enable `esm` in the REPL.
 
 Features
 ---
