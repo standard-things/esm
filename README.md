@@ -34,14 +34,6 @@ There are three ways to enable `esm`.
     node -r esm
     ```
 
-    or upon entering:
-
-    ```shell
-    $ node
-    > require("esm")
-    esm enabled
-    ```
-
 Features
 ---
 
