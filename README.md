@@ -194,7 +194,7 @@ Tips
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`tape`](https://github.com/substack/tape#preloading-modules), and
-  [`webpack`](https://github.com/webpack/webpack-cli/issues/205)
+  [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `esm` with the `--node-args="-r esm"` option of
