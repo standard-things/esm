@@ -141,7 +141,7 @@ Specify options with one of the following:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for <a href="https://github.com/MylesBorins/proposal-top-level-await#variant-c-top-level-await-can-only-be-used-in-modules-without-exports">top-level <code>await</code></a> in modules without ESM exports in Node 7.6+.</p>
+    <p>A boolean for top-level <a href="https://node.green/#ES2017-features-async-functions-await"><code>await</code></a> in modules <a href="https://github.com/MylesBorins/proposal-top-level-await#variant-c-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>.</p>
   </td>
 </tr>
 <tr>
