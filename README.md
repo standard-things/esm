@@ -187,6 +187,7 @@ Tips
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
+  [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
   [`tape`](https://github.com/substack/tape#preloading-modules), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
