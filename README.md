@@ -26,6 +26,7 @@ There are two ways to enable `esm`.
     require = require("esm")(module/*, options*/)
     module.exports = require("./main.js").default
     ```
+    :bulb: This is automagically done by [`create-esm`](https://github.com/standard-things/create-esm).
 
 2. Enable `esm` for local runs:
 
