@@ -183,7 +183,7 @@ Tips
 ---
 * Load `esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
-* Load `esm` with the *“require”* option of
+* Load `esm` with the “require” option of
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
