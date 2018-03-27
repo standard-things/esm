@@ -7,6 +7,11 @@ See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-tod
 :book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
 for all the details.
 
+Discontinued
+---
+
+This package has been discontinued in favor of [`esm`](https://www.npmjs.com/package/esm).
+
 Getting started
 ---
 
