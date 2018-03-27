@@ -69,7 +69,6 @@ function makeBundle() {
   return execa("webpack", webpackArgs, {
     cwd: rootPath,
     env: { NODE_ENV },
-    reject: false,
     stdio: "inherit"
   })
 }
@@ -81,3 +80,4 @@ Promise
   ])
   .then(makeBundle)
   .then(copyBundle)
+  .catch(console.error)

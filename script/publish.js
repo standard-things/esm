@@ -90,7 +90,6 @@ function minifyJS(content) {
 function publishPackage() {
   return execa("npm", ["publish"], {
     cwd: rootPath,
-    reject: false,
     stdio: "inherit"
   })
 }
@@ -102,3 +101,4 @@ Promise
     cleanReadme()
   ])
   .then(publishPackage)
+  .catch(console.error)
