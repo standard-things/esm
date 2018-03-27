@@ -120,12 +120,6 @@ Specify options with one of the following:
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"topLevelReturn":</code></td>
-        <td>
-          <p>A boolean for <a href="http://stackoverflow.com/questions/28955047/why-does-a-module-level-return-statement-work-in-node-js/#28955050">top-level <code>return</code></a>.</p>
-        </td>
-      </tr>
-      <tr>
         <td valign="top"><code>"vars":</code></td>
         <td>
           <p>A boolean for <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
