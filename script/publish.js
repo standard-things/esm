@@ -1,6 +1,7 @@
 "use strict"
 
 const execa = require("execa")
+const fleece = require("golden-fleece")
 const fs = require("fs-extra")
 const htmlmin = require("html-minifier").minify
 const path = require("path")
@@ -14,15 +15,11 @@ const readmePath = path.resolve(rootPath, "README.md")
 
 const uglifyOptions = JSON.parse(fs.readFileSync(path.resolve(rootPath, ".uglifyrc")))
 
-const jsPaths = [
-  esmPath,
-  indexPath
-]
+const tableRegExp = /^<table>[^]*?\n<\/table>/gm
 
-const defaultScripts = `,
-  "scripts": {
-    "test": "echo \\"Error: no test specified\\" && exit 1"
-  }`
+const defaultScripts = {
+  test: 'echo "Error: no test specified" && exit 1'
+}
 
 const fieldsToRemove = [
   "devDependencies",
@@ -30,8 +27,10 @@ const fieldsToRemove = [
   "private"
 ]
 
-const scriptsRegExp = makeFieldRegExp("scripts")
-const tableRegExp = /^<table>[^]*?\n<\/table>/gm
+const jsPaths = [
+  esmPath,
+  indexPath
+]
 
 function cleanJS() {
   return jsPaths
@@ -50,7 +49,11 @@ function cleanPackageJSON() {
     .readFile(pkgPath, "utf8")
     .then((content) => {
       process.once("exit", () => fs.outputFileSync(pkgPath, content))
-      return fs.outputFile(pkgPath, removeFields(resetScripts(content), fieldsToRemove))
+
+      const pkgJSON = JSON.parse(content)
+      pkgJSON.scripts = defaultScripts
+      fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
+      return fs.outputFile(pkgPath, fleece.patch(content, pkgJSON))
     })
 }
 
@@ -61,10 +64,6 @@ function cleanReadme() {
       process.once("exit", () => fs.outputFileSync(readmePath, content))
       return fs.outputFile(readmePath, content.replace(tableRegExp, minifyHTML))
     })
-}
-
-function makeFieldRegExp(field) {
-  return RegExp(',\\s*"' + field + '":\\s*(\\{[^]*?\\}|[^]*?)(?=,?\\n)')
 }
 
 function minifyHTML(content) {
@@ -94,18 +93,6 @@ function publishPackage() {
     reject: false,
     stdio: "inherit"
   })
-}
-
-function removeField(content, field) {
-  return String(content).replace(makeFieldRegExp(field), "")
-}
-
-function removeFields(content, fields) {
-  return fields.reduce(removeField, content)
-}
-
-function resetScripts(content) {
-  return String(content).replace(scriptsRegExp, defaultScripts)
 }
 
 Promise
