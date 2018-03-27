@@ -16,9 +16,7 @@ const {
 } = webpack
 
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const { ModuleConcatenationPlugin } = webpack.optimize
 const OptimizeJsPlugin = require("optimize-js-plugin")
-const ShakePlugin = require("webpack-common-shake").Plugin
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
 const ESM_VERSION = readJSON("./package.json").version
@@ -51,13 +49,22 @@ const config = {
     libraryTarget: "commonjs2",
     path: path.resolve("build")
   },
+  mode: isProd ? "production" : "development",
   module: {
     rules: [
       {
         loader: "babel-loader",
-        test: /\.js$/
+        test: /\.js$/,
+        type: "javascript/auto"
       }
     ]
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new UglifyJSPlugin({ uglifyOptions })
+    ],
+    nodeEnv: false
   },
   plugins: [
     new BannerPlugin({
@@ -98,10 +105,7 @@ const config = {
 if (isProd) {
   config.plugins.push(
     new OptimizeJsPlugin,
-    new ShakePlugin,
-    new ModuleConcatenationPlugin,
-    new EnvironmentPlugin({ NODE_DEBUG: false }),
-    new UglifyJSPlugin({ uglifyOptions })
+    new EnvironmentPlugin({ NODE_DEBUG: false })
   )
 }
 
