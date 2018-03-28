@@ -59,6 +59,10 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
   )
 
+  it("should work with module-alias", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/module-alias")])
+  )
+
   it("should work with native modules", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
   )
