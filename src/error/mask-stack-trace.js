@@ -75,6 +75,52 @@ function maskStackTrace(error, content, filename, isESM) {
   return error
 }
 
+function maskEngineStack(stack, content, filename) {
+  const parts = engineMessageRegExp.exec(stack)
+
+  if (typeof filename === "string" &&
+      ! headerRegExp.test(stack)) {
+    stack = filename + ":1\n" + stack
+  }
+
+  if (parts === null) {
+    return stack
+  }
+
+  return stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
+    const lineNum = +parts[1]
+
+    if (snippet.indexOf(ZWJ) !== -1) {
+      if (typeof content === "function") {
+        content = content(filename)
+      }
+
+      if (typeof content !== "string") {
+        return ""
+      }
+
+      const lines = content.split("\n")
+      const line = lines[lineNum - 1] || ""
+      return line + (line ? "\n\n" : "\n")
+    }
+
+    if (lineNum !== 1) {
+      return snippet + arrow + newline
+    }
+
+    const [prefix] = Module.wrapper
+
+    if (snippet.startsWith(prefix)) {
+      const { length } = prefix
+
+      snippet = snippet.slice(length)
+      arrow = arrow.slice(length)
+    }
+
+    return snippet + arrow + newline
+  })
+}
+
 // Transform parser stack lines from:
 // <type>: <message> (<line>:<column>)
 //   ...
@@ -134,52 +180,6 @@ function maskParserStack(stack, content, filename) {
   spliceArgs.push(type + ": " + message)
   stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
-}
-
-function maskEngineStack(stack, content, filename) {
-  const parts = engineMessageRegExp.exec(stack)
-
-  if (typeof filename === "string" &&
-      ! headerRegExp.test(stack)) {
-    stack = filename + ":1\n" + stack
-  }
-
-  if (parts === null) {
-    return stack
-  }
-
-  return stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
-    const lineNum = +parts[1]
-
-    if (snippet.indexOf(ZWJ) !== -1) {
-      if (typeof content === "function") {
-        content = content(filename)
-      }
-
-      if (typeof content !== "string") {
-        return ""
-      }
-
-      const lines = content.split("\n")
-      const line = lines[lineNum - 1] || ""
-      return line + (line ? "\n\n" : "\n")
-    }
-
-    if (lineNum !== 1) {
-      return snippet + arrow + newline
-    }
-
-    const [prefix] = Module.wrapper
-
-    if (snippet.startsWith(prefix)) {
-      const { length } = prefix
-
-      snippet = snippet.slice(length)
-      arrow = arrow.slice(length)
-    }
-
-    return snippet + arrow + newline
-  })
 }
 
 function fileNamesToURLs(stack) {
