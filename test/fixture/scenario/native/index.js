@@ -1,4 +1,4 @@
 "use strict"
 
 require = require("../../../../")(module)
-require("./main.mjs")
+require("./main.js")

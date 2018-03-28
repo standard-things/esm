@@ -2,14 +2,14 @@ import isProxy from "./is-proxy.js"
 
 const { toString } = Function.prototype
 
-const markerRegExp = /toString|(function ).+?(?=\\\()/g
+const markerRegExp = /toString|(function ).*?(?=\\\()/g
 const specialCharRegExp = /[\\^$.*+?()[\]{}|]/g
 
 const nativeRegExp = RegExp(
   "^" +
   toString.call(toString)
     .replace(specialCharRegExp, "\\$&")
-    .replace(markerRegExp, "$1.+?") +
+    .replace(markerRegExp, "$1.*?") +
   "$"
 )
 
