@@ -2,7 +2,7 @@
 
 A fast, production ready, zero-dependency ES module loader for Node 6+!
 
-See the release [post](https://medium.com/web-on-the-edge/es-modules-in-node-today-32cff914e4b)
+See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
 :book: and [video](https://www.youtube.com/watch?v=60S1PFndbn0) :movie_camera:
 for all the details.
 
