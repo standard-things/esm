@@ -36,6 +36,13 @@ function proxyExports(entry) {
       return value
     }
 
+    const funcName = value.name
+
+    if (typeof funcName === "string" &&
+        funcName.startsWith("bound ")) {
+      return value
+    }
+
     let wrapper = cached.wrap.get(value)
 
     if (wrapper) {
