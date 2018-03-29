@@ -17,10 +17,11 @@ const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
+const slashRegExp = /[\\/]/g
+
 const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
 const pkgName = "esm@" + pkgJSON.version
-const slashRegExp = /[\\/]/g
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
