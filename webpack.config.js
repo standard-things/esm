@@ -40,6 +40,7 @@ const uglifyOptions = readJSON("./.uglifyrc")
 /* eslint-disable sort-keys */
 const config = {
   target: "node",
+  devtool: false,
   entry: {
     esm: "./src/index.js"
   },
