@@ -36,11 +36,6 @@ function makeRequireFunction(mod, requirer, resolver) {
       return realRequire
     }
 
-    if (request === "electron" &&
-        shared.process.versions.electron) {
-      return realRequire(request)
-    }
-
     const { moduleState } = shared
 
     moduleState.requireDepth += 1

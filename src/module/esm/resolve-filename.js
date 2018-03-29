@@ -2,6 +2,7 @@ import CHAR_CODE from "../../constant/char-code.js"
 import PACKAGE from "../../constant/package.js"
 
 import Package from "../../package.js"
+import SafeModule from "../../safe/module.js"
 
 import _resolveFilename from "./_resolve-filename.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
@@ -49,6 +50,13 @@ for (const ext of esmExts) {
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
+  }
+
+  // Electron patches `Module._resolveFilename` to return its path.
+  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
+  if (request === "electron" &&
+      shared.process.versions.electron) {
+    return SafeModule._resolveFilename(request)
   }
 
   const cache = shared.memoize.moduleESMResolveFilename

@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import Module from "../../module.js"
+import SafeModule from "../../safe/module.js"
 
 import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
@@ -17,6 +18,13 @@ const {
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
+  }
+
+  // Electron patches `Module._resolveFilename` to return its path.
+  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
+  if (request === "electron" &&
+      shared.process.versions.electron) {
+    return SafeModule._resolveFilename(request)
   }
 
   const cache = shared.memoize.moduleCJSResolveFilename

@@ -5,6 +5,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 
 import GenericArray from "../generic/array.js"
+import SafeModule from "../safe/module.js"
 
 import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
@@ -24,6 +25,13 @@ const nmChars = Array.prototype
 const nmLength = nmChars.length
 
 function nodeModulePaths(from) {
+  // Electron patches `Module_nodeModulePaths` to filter out paths outside
+  // the app to search.
+  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
+  if (shared.process.versions.electron) {
+    return SafeModule._nodeModulePaths(from)
+  }
+
   return shared.env.win32
     ? win32Paths(from)
     : posixPaths(from)
