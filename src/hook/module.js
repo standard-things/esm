@@ -131,8 +131,6 @@ function hook(Mod, parent) {
     entry.cacheName = cacheName
     entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
 
-    Reflect.setPrototypeOf(mod, Module.prototype)
-
     let { compileData } = entry
 
     if (cache.compile[cacheName] === true) {
@@ -148,6 +146,7 @@ function hook(Mod, parent) {
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper
+      Reflect.setPrototypeOf(mod, Module.prototype)
     } else {
       Reflect.defineProperty(mod, shared.symbol._compile, {
         __proto__: null,
