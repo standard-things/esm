@@ -1,4 +1,5 @@
-import shared from "./shared.js"
+import ENV from "./constant/env.js"
+
 import Module from "./module.js"
 import Package from "./package.js"
 import RealModule from "./real/module.js"
@@ -8,20 +9,24 @@ import assign from "./util/assign.js"
 import clone from "./module/clone.js"
 import errors from "./errors.js"
 import globalHook from "./hook/global.js"
-import isCLI from "./env/is-cli.js"
-import isCheck from "./env/is-check.js"
-import isEval from "./env/is-eval.js"
 import isInstalled from "./util/is-installed.js"
-import isInternal from "./env/is-internal.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
-import isREPL from "./env/is-repl.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
 import requireHook from "./hook/require.js"
+import shared from "./shared.js"
 import vm from "vm"
 import vmHook from "./hook/vm.js"
+
+const {
+  CLI,
+  CHECK,
+  EVAL,
+  INTERNAL,
+  REPL
+} = ENV
 
 const {
   ERR_INVALID_ARG_TYPE
@@ -80,25 +85,25 @@ if (shared.inited) {
   Shim.enable(shared.safeContext)
   Shim.enable(shared.unsafeContext)
 
-  if (isCheck()) {
+  if (CHECK) {
     vmHook(vm)
-  } else if (isEval()) {
+  } else if (EVAL) {
     RealModule.prototype._compile = Module.prototype._compile
     moduleHook(Module)
     processHook(process)
     vmHook(vm)
-  } else if (isREPL()) {
+  } else if (REPL) {
     moduleHook(Module)
     processHook(process)
     vmHook(vm)
-  } else if (isCLI() ||
-      isInternal()) {
+  } else if (CLI ||
+      INTERNAL) {
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(process)
   }
 
-  if (isInternal()) {
+  if (INTERNAL) {
     globalHook(shared.unsafeContext)
   }
 }

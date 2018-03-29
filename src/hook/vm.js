@@ -1,4 +1,5 @@
 import ENTRY from "../constant/entry.js"
+import ENV from "../constant/env.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
@@ -18,10 +19,7 @@ import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
 import getCacheName from "../util/get-cache-name.js"
-import isCheck from "../env/is-check.js"
 import isError from "../util/is-error.js"
-import isEval from "../env/is-eval.js"
-import isREPL from "../env/is-repl.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
@@ -39,6 +37,12 @@ const {
   STATE_PARSING_STARTED,
   TYPE_ESM
 } = ENTRY
+
+const {
+ CHECK,
+ EVAL,
+ REPL
+} = ENV
 
 const {
   MODULE,
@@ -222,11 +226,11 @@ function hook(vm) {
   Wrapper.manage(vm, "createScript", managerWrapper)
   Wrapper.wrap(vm, "createScript", methodWrapper)
 
-  if (isCheck()) {
+  if (CHECK) {
     setupCheck()
-  } else if (isEval())  {
+  } else if (EVAL)  {
     setupEval()
-  } else if (isREPL()) {
+  } else if (REPL) {
     setupREPL()
   }
 }

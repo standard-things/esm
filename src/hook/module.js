@@ -1,4 +1,5 @@
 import ENTRY from "../constant/entry.js"
+import ENV from "../constant/env.js"
 import PACKAGE from "../constant/package.js"
 
 import Compiler from "../caching-compiler.js"
@@ -14,7 +15,6 @@ import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
-import getEnvVars from "../env/get-vars.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isObjectEmpty from "../util/is-object-empty.js"
@@ -34,6 +34,10 @@ import toOptInError from "../util/to-opt-in-error.js"
 const {
   STATE_EXECUTION_STARTED
 } = ENTRY
+
+const {
+  VARS
+} = ENV
 
 const {
   OPTIONS_MODE_ALL,
@@ -64,7 +68,7 @@ function hook(Mod, parent) {
   }
 
   if (! parent) {
-    const { ESM_OPTIONS } = getEnvVars()
+    const { ESM_OPTIONS } = VARS
 
     if (ESM_OPTIONS) {
       assign(defaultOptions, Package.createOptions(ESM_OPTIONS))
