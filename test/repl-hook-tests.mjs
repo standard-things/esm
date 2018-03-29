@@ -77,7 +77,7 @@ describe("repl hook", () => {
 
   it("should use a plain object for `module.exports`", () => {
     const r = repl.start({})
-    const code = "this.exports = module.exports"
+    const code = "var exports = module.exports"
 
     r.eval(code, context, "repl", () => {
       assert.ok(isPlainObject(context.exports))
@@ -90,7 +90,7 @@ describe("repl hook", () => {
     const r = repl.start({})
     const code = [
       'import static from "' + pkgPath + '"',
-      'this.dynamic = import("' + pkgPath + '")'
+      'var dynamic = import("' + pkgPath + '")'
     ].join("\n")
 
     r.eval(code, context, "repl", () => {
