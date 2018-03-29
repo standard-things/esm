@@ -1,4 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
+import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
 import Package from "../../package.js"
@@ -48,14 +49,18 @@ for (const ext of esmExts) {
 }
 
 function resolveFilename(request, parent, isMain, options) {
+  const {
+    ELECTRON
+  } = ENV
+
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
   // Electron patches `Module._resolveFilename` to return its path.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
-  if (request === "electron" &&
-      shared.process.versions.electron) {
+  if (ELECTRON &&
+      request === "electron") {
     return SafeModule._resolveFilename(request)
   }
 
