@@ -61,7 +61,7 @@ const config = {
     ]
   },
   optimization: {
-    minimize: true,
+    minimize: isProd,
     minimizer: [
       new UglifyJSPlugin({ uglifyOptions })
     ],
