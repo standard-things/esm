@@ -90,6 +90,7 @@ if (__shared__) {
       versions: {
         __proto__: null,
         chakracore: versions.chakracore,
+        electron: versions.electron,
         v8: versions.v8
       }
     },
