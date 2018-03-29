@@ -11,6 +11,9 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
+const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
+
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")
 const pkgPath = path.resolve("../package.json")
@@ -18,6 +21,7 @@ const pkgPath = path.resolve("../package.json")
 const parent = require.cache[indexPath].parent
 const pkgIndex = parent.children.findIndex((child) => child.filename === indexPath)
 const pkgJSON = fs.readJsonSync(pkgPath)
+const pkgURL = fileProtocol + pkgPath.replace(/\\/g, "/")
 
 describe("repl hook", () => {
   let context
@@ -89,8 +93,8 @@ describe("repl hook", () => {
   it("should support importing `.json` files", (done) => {
     const r = repl.start({})
     const code = [
-      'import static from "' + pkgPath + '"',
-      'var dynamic = import("' + pkgPath + '")'
+      'import static from "' + pkgURL + '"',
+      'var dynamic = import("' + pkgURL + '")'
     ].join("\n")
 
     r.eval(code, context, "repl", () => {
