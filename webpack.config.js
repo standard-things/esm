@@ -39,7 +39,6 @@ const uglifyOptions = readJSON("./.uglifyrc")
 
 /* eslint-disable sort-keys */
 const config = {
-  target: "node",
   devtool: false,
   entry: {
     esm: "./src/index.js"
@@ -61,7 +60,6 @@ const config = {
     ]
   },
   optimization: {
-    minimize: isProd,
     minimizer: [
       new UglifyJSPlugin({ uglifyOptions })
     ],
@@ -99,7 +97,8 @@ const config = {
       path.resolve("src/acorn/replacement/regexp.js")
     ),
     new EnvironmentPlugin({ ESM_VERSION })
-  ]
+  ],
+  target: "node"
 }
 /* eslint-enable sort-keys */
 
