@@ -25,8 +25,7 @@ const nmChars = Array.prototype
 const nmLength = nmChars.length
 
 function nodeModulePaths(from) {
-  // Electron patches `Module_nodeModulePaths` to filter out paths outside
-  // the app to search.
+  // Electron patches `Module_nodeModulePaths` to remove paths outside the app.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   if (shared.process.versions.electron) {
     return SafeModule._nodeModulePaths(from)
