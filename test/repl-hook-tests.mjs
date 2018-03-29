@@ -110,7 +110,7 @@ describe("repl hook", () => {
     r.close()
   })
 
-  it("should recover from import errors", (done) => {
+  it("should recover from import errors", () => {
     const r = repl.start({
       eval(code, callback) {
         let error = null
@@ -131,11 +131,8 @@ describe("repl hook", () => {
         assert.ok(error1.message.includes("' does not provide an export named '"))
         assert.strictEqual(error2, null)
       })
-
-      setImmediate(() => {
-        r.close()
-        done()
-      })
     })
+
+    r.close()
   })
 })
