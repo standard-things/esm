@@ -2,18 +2,18 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
+import GenericArray from "../generic/array.js"
+
 import _resolveLookupPaths from "./_resolve-lookup-paths.js"
 import builtinEntries from "../builtin-entries.js"
 
-const ExArray = __external__.Array
-
 function resolveLookupPaths(request, parent, newReturn) {
   if (request in builtinEntries) {
-    return newReturn ? null : new ExArray(request, new ExArray)
+    return newReturn ? null : GenericArray.of(request, GenericArray.of())
   }
 
   const paths = _resolveLookupPaths(request, parent)
-  return newReturn ? paths : new ExArray(request, paths)
+  return newReturn ? paths : GenericArray.of(request, paths)
 }
 
 export default resolveLookupPaths

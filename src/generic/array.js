@@ -12,6 +12,7 @@ function init() {
     filter: unapply(prototype.filter),
     indexOf: unapply(prototype.indexOf),
     join: unapply(prototype.join),
+    of: SafeArray.of,
     push: unapply(prototype.push),
     slice: unapply(prototype.slice),
     some: unapply(prototype.some),
