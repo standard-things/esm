@@ -2,7 +2,9 @@ import Entry from "../build/entry.js"
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
+import createNamespace from "./create-namespace.js"
 import isPlainObject from "./is-plain-object.js"
+import fs from "fs-extra"
 import module from "./module.js"
 import path from "path"
 import repl from "repl"
@@ -10,10 +12,12 @@ import require from "./require.js"
 import vm from "vm"
 
 const esmPath = path.resolve("../esm.js")
-const pkgPath = path.resolve("../index.js")
+const indexPath = path.resolve("../index.js")
+const pkgPath = path.resolve("../package.json")
 
-const parent = require.cache[pkgPath].parent
-const pkgIndex = parent.children.findIndex((child) => child.filename === pkgPath)
+const parent = require.cache[indexPath].parent
+const pkgIndex = parent.children.findIndex((child) => child.filename === indexPath)
+const pkgJSON = fs.readJsonSync(pkgPath)
 
 describe("repl hook", () => {
   let context
@@ -27,16 +31,16 @@ describe("repl hook", () => {
 
     process.argv = argv.slice(0, 1)
     Reflect.deleteProperty(require.cache, esmPath)
-    Reflect.deleteProperty(require.cache, pkgPath)
+    Reflect.deleteProperty(require.cache, indexPath)
 
-    context.module.require(pkgPath)
+    context.module.require(indexPath)
 
     process.argv = argv
     Reflect.deleteProperty(require.cache, esmPath)
-    Reflect.deleteProperty(require.cache, pkgPath)
+    Reflect.deleteProperty(require.cache, indexPath)
 
     parent.children.splice(pkgIndex, 1)
-    parent.require(pkgPath)
+    parent.require(indexPath)
   })
 
   it("should work with a global context", () => {
@@ -77,6 +81,30 @@ describe("repl hook", () => {
 
     r.eval(code, context, "repl", () => {
       assert.ok(isPlainObject(context.exports))
+    })
+
+    r.close()
+  })
+
+  it("should support importing `.json` files", (done) => {
+    const r = repl.start({})
+    const code = [
+      'import static from "' + pkgPath + '"',
+      'this.dynamic = import("' + pkgPath + '")'
+    ].join("\n")
+
+    r.eval(code, context, "repl", () => {
+      context.dynamic
+        .then((dynamic) => {
+          const pkgNs = createNamespace(Object.assign({
+            default: pkgJSON
+          }, pkgJSON))
+
+          assert.deepStrictEqual(dynamic, pkgNs)
+          assert.deepStrictEqual(context.static, pkgJSON)
+        })
+        .then(done)
+        .catch(done)
     })
 
     r.close()

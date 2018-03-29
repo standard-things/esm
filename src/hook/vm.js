@@ -145,6 +145,8 @@ function hook(vm) {
     entry.package = pkg
     entry.require = makeRequireFunction(clone(mod))
     entry.runtimeName = shared.runtimeName
+
+    Reflect.setPrototypeOf(mod, Module.prototype)
     Runtime.enable(entry, new ExObject)
   }
 
