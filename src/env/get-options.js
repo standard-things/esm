@@ -20,31 +20,31 @@ function getOptions() {
   }
 
   const processEnv = process.env
+  const ESM_OPTIONS = processEnv && processEnv.ESM_OPTIONS
 
-  if (! processEnv ||
-      typeof processEnv.ESM_OPTIONS !== "string") {
+  if (typeof ESM_OPTIONS !== "string") {
     return env.options = null
   }
 
-  let ESM_OPTIONS = processEnv.ESM_OPTIONS.trim()
+  let options = ESM_OPTIONS.trim()
 
-  if (isPath(ESM_OPTIONS)) {
-    ESM_OPTIONS = readFile(resolve(ESM_OPTIONS), "utf8")
+  if (isPath(options)) {
+    options = readFile(resolve(options), "utf8")
   }
 
-  if (! ESM_OPTIONS) {
+  if (! options) {
     return env.options = null
   }
 
-  const code0 = ESM_OPTIONS.charCodeAt(0)
+  const code0 = options.charCodeAt(0)
 
   if (code0 === APOSTROPHE ||
       code0 === LBRACE ||
       code0 === QUOTE) {
-    ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
+    options = parseJSON6(options)
   }
 
-  return env.options = ESM_OPTIONS
+  return env.options = options
 }
 
 export default getOptions
