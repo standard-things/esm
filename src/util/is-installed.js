@@ -1,6 +1,10 @@
-import shared from "../shared.js"
+import ENV from "../constant/env.js"
 
-const nodeModulesRegExp = shared.env.win32
+const {
+  WIN32
+} = ENV
+
+const nodeModulesRegExp = WIN32
   ? /[\\/]node_modules[\\/]/
   : /\/node_modules\//
 

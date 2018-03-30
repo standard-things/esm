@@ -1,16 +1,20 @@
 import CHAR_CODE from "../constant/char-code.js"
+import ENV from "../constant/env.js"
 
 import decodeURIComponent from "../util/decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
 import { normalize } from "../safe/path.js"
 import parseURL from "./parse-url.js"
-import shared from "../shared.js"
 
 const {
   COLON,
   SLASH
 } = CHAR_CODE
+
+const {
+  WIN32
+} = ENV
 
 const localhostRegExp = /^\/\/localhost\b/
 
@@ -35,7 +39,6 @@ function getFilePathFromURL(url) {
   }
 
   let { host } = parsed
-  const { win32 } = shared.env
 
   pathname = decodeURIComponent(pathname)
 
@@ -44,12 +47,12 @@ function getFilePathFromURL(url) {
   if (host === "localhost") {
     host = ""
   } if (host) {
-    return win32
+    return WIN32
       ? "\\\\" + domainToUnicode(host) + normalize(pathname)
       : ""
   }
 
-  if (! win32) {
+  if (! WIN32) {
     return pathname
   }
 

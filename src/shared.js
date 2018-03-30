@@ -41,6 +41,8 @@ if (__shared__) {
     },
     env: {
       __proto__: null,
+      development: process.env.NODE_ENV !== "production",
+      electron: "electron" in versions,
       win32: process.platform === "win32"
     },
     fastPath,
@@ -90,7 +92,6 @@ if (__shared__) {
       versions: {
         __proto__: null,
         chakracore: versions.chakracore,
-        electron: versions.electron,
         v8: versions.v8
       }
     },

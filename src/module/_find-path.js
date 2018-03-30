@@ -5,6 +5,7 @@
 import { isAbsolute, resolve } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
+import ENV from "../constant/env.js"
 
 import Module from "../module.js"
 
@@ -21,6 +22,10 @@ const {
   PERIOD,
   SLASH
 } = CHAR_CODE
+
+const {
+  WIN32
+} = ENV
 
 const mainFieldRegExp = /"main"/
 const { preserveSymlinks } = binding.config
@@ -58,7 +63,7 @@ function findPath(request, paths, isMain, searchExts) {
 
     trailingSlash =
       code === SLASH ||
-      (shared.env.win32 &&
+      (WIN32 &&
        code === BSLASH)
   }
 

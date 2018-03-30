@@ -1,7 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
+import ENV from "../constant/env.js"
 
 import { isAbsolute as _isAbsolutePath } from "../safe/path.js"
-import shared from "../shared.js"
 
 const {
   BSLASH,
@@ -16,10 +16,14 @@ function isAbsolutePath(value) {
   }
 
   if (value.charCodeAt(0) === SLASH) {
+    const {
+      WIN32
+    } = ENV
+
     // Protocol relative URLs are not paths.
     const code1 = value.charCodeAt(1)
 
-    if (! shared.env.win32) {
+    if (! WIN32) {
       return code1 !== SLASH
     }
 

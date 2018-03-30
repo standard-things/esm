@@ -12,6 +12,7 @@ import globalHook from "./hook/global.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
+import isSideloaded from "./env/is-sideloaded.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
@@ -21,8 +22,8 @@ import vm from "vm"
 import vmHook from "./hook/vm.js"
 
 const {
-  CLI,
   CHECK,
+  CLI,
   EVAL,
   INTERNAL,
   REPL
@@ -97,7 +98,8 @@ if (shared.inited) {
     processHook(process)
     vmHook(vm)
   } else if (CLI ||
-      INTERNAL) {
+      INTERNAL ||
+      isSideloaded()) {
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(process)

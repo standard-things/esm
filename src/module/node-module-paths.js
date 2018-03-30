@@ -18,6 +18,11 @@ function init() {
     SLASH
   } = CHAR_CODE
 
+  const {
+    ELECTRON,
+    WIN32
+  } = ENV
+
   const nmChars = Array.prototype
     .map.call("node_modules", (char) => char.charCodeAt(0))
     .reverse()
@@ -25,17 +30,13 @@ function init() {
   const nmLength = nmChars.length
 
   function nodeModulePaths(from) {
-    const {
-      ELECTRON
-    } = ENV
-
     // Electron patches `Module_nodeModulePaths` to remove paths outside the app.
     // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
     if (ELECTRON) {
       return SafeModule._nodeModulePaths(from)
     }
 
-    return shared.env.win32
+    return WIN32
       ? win32Paths(from)
       : posixPaths(from)
   }

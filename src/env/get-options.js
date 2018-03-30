@@ -12,19 +12,18 @@ const {
   QUOTE
 } = CHAR_CODE
 
-function getVars() {
+function getOptions() {
   const { env } = shared
 
-  if (Reflect.has(env, "vars")) {
-    return env.vars
+  if (Reflect.has(env, "options")) {
+    return env.options
   }
 
   const processEnv = process.env
-  const vars = { __proto__: null }
 
   if (! processEnv ||
       typeof processEnv.ESM_OPTIONS !== "string") {
-    return env.vars = vars
+    return env.options = null
   }
 
   let ESM_OPTIONS = processEnv.ESM_OPTIONS.trim()
@@ -34,7 +33,7 @@ function getVars() {
   }
 
   if (! ESM_OPTIONS) {
-    return env.vars = vars
+    return env.options = null
   }
 
   const code0 = ESM_OPTIONS.charCodeAt(0)
@@ -45,8 +44,7 @@ function getVars() {
     ESM_OPTIONS = parseJSON6(ESM_OPTIONS)
   }
 
-  vars.ESM_OPTIONS = ESM_OPTIONS
-  return env.vars = vars
+  return env.options = ESM_OPTIONS
 }
 
-export default getVars
+export default getOptions

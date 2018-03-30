@@ -1,3 +1,4 @@
+import ENV from "./constant/env.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import FastPath from "./fast-path.js"
@@ -14,6 +15,10 @@ import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
 
 function init() {
+  const {
+    DEVELOPMENT
+  } = ENV
+
   const {
     MODULE,
     SCRIPT,
@@ -37,7 +42,7 @@ function init() {
     sourceType: SCRIPT,
     strict: void 0,
     var: false,
-    warnings: (process.env && process.env.NODE_ENV) !== "production"
+    warnings: DEVELOPMENT
   }
 
   /* eslint-disable sort-keys */

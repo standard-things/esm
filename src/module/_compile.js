@@ -1,6 +1,7 @@
 import { extname, resolve } from "../safe/path.js"
 
 import ENTRY from "../constant/entry.js"
+import ENV from "../constant/env.js"
 import PACKAGE from "../constant/package.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
@@ -14,7 +15,6 @@ import encodeURI from "../util/encode-uri.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import getURLFromFilePath from "../util/get-url-from-file-path.js"
 import isError from "../util/is-error.js"
-import isInspect from "../env/is-inspect.js"
 import isMJS from "../util/is-mjs.js"
 import isObjectEmpty from "../util/is-object-empty.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
@@ -31,6 +31,10 @@ const {
   STATE_PARSING_STARTED,
   TYPE_ESM
 } = ENTRY
+
+const {
+  INSPECT
+} = ENV
 
 const {
   OPTIONS_MODE_ALL,
@@ -259,7 +263,7 @@ function maybeSourceMap(entry, content, filename) {
   const { sourceMap } = entry.package.options
 
   if (sourceMap !== false &&
-     (sourceMap || isInspect()) &&
+     (sourceMap || INSPECT) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
       encodeURI(createSourceMap(filename, content))

@@ -1,6 +1,7 @@
 import { basename, dirname , extname, resolve } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
+import ENV from "./constant/env.js"
 import PACKAGE from "./constant/package.js"
 
 import GenericBuffer from "./generic/buffer.js"
@@ -9,7 +10,6 @@ import _findPath from "./module/_find-path.js"
 import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import errors from "./errors.js"
-import getEnvVars from "./env/get-vars.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isFile from "./util/is-file.js"
@@ -32,6 +32,11 @@ import { version } from "./version.js"
 const {
   PERIOD
 } = CHAR_CODE
+
+const {
+  DEVELOPMENT,
+  OPTIONS
+} = ENV
 
 const {
   OPTIONS_MODE_ALL,
@@ -65,7 +70,7 @@ const defaultOptions = {
   debug: false,
   mode: "strict",
   sourceMap: void 0,
-  warnings: (process.env && process.env.NODE_ENV) !== "production"
+  warnings: DEVELOPMENT
 }
 
 const autoOptions = {
@@ -458,7 +463,7 @@ function readInfo(dirPath, force) {
 
   if (options === true ||
       ! optionsFound) {
-    options = getEnvVars().ESM_OPTIONS
+    options = OPTIONS
   }
 
   if (! pkgParsed &&

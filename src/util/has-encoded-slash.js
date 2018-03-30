@@ -1,4 +1,8 @@
-import shared from "../shared.js"
+import ENV from "../constant/env.js"
+
+const {
+  WIN32
+} = ENV
 
 const posixRegExp = /%2f/i
 const win32RegExp = /%5c|%2f/i
@@ -8,7 +12,7 @@ function hasEncodedSlash(string) {
     return false
   }
 
-  return shared.env.win32
+  return WIN32
     ? win32RegExp.test(string)
     : posixRegExp.test(string)
 }

@@ -13,15 +13,15 @@ import isObject from "../../util/is-object.js"
 import shared from "../../shared.js"
 
 const {
+  ELECTRON
+} = ENV
+
+const {
   ERR_INVALID_ARG_TYPE,
   MODULE_NOT_FOUND
 } = errors
 
 function resolveFilename(request, parent, isMain, options) {
-  const {
-    ELECTRON
-  } = ENV
-
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }

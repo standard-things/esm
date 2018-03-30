@@ -25,6 +25,10 @@ const {
 } = CHAR_CODE
 
 const {
+  ELECTRON
+} = ENV
+
+const {
   OPTIONS_MODE_AUTO
 } = PACKAGE
 
@@ -49,10 +53,6 @@ for (const ext of esmExts) {
 }
 
 function resolveFilename(request, parent, isMain, options) {
-  const {
-    ELECTRON
-  } = ENV
-
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }

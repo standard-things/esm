@@ -36,7 +36,7 @@ const {
 } = ENTRY
 
 const {
-  VARS
+  OPTIONS
 } = ENV
 
 const {
@@ -68,10 +68,8 @@ function hook(Mod, parent) {
   }
 
   if (! parent) {
-    const { ESM_OPTIONS } = VARS
-
-    if (ESM_OPTIONS) {
-      assign(defaultOptions, Package.createOptions(ESM_OPTIONS))
+    if (OPTIONS) {
+      assign(defaultOptions, Package.createOptions(OPTIONS))
     }
   }
 

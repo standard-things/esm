@@ -1,6 +1,5 @@
 import CHAR_CODE from "../constant/char-code.js"
-
-import shared from "../shared.js"
+import ENV from "../constant/env.js"
 
 const {
   BSLASH,
@@ -39,7 +38,11 @@ function isRelativePath(value) {
     code = value.charCodeAt(2)
   }
 
-  if (shared.env.win32 &&
+  const {
+    WIN32
+  } = ENV
+
+  if (WIN32 &&
       code === BSLASH) {
     return true
   }
