@@ -1,4 +1,5 @@
 import captureStackTrace from "../error/capture-stack-trace.js"
+import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
 function init() {
@@ -45,7 +46,7 @@ function init() {
     }
 
     process.nextTick(() => {
-      console.error(
+      safeConsole.error(
         WARNING_PREFIX +
         (useCode ? "[" + code + "] " : "") +
         type + ": " + message
