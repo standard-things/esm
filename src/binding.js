@@ -8,7 +8,15 @@ import silent from "./util/silent.js"
 function init() {
   let _binding
 
-  const ids = ["config", "fs", "icu", "inspector", "natives", "util"]
+  const ids = [
+    "config",
+    "fs",
+    "icu",
+    "inspector",
+    "natives",
+    "timers",
+    "util"
+  ]
 
   const map = {
     __proto__: null,
@@ -25,6 +33,9 @@ function init() {
     ],
     inspector: [
       "callAndPauseOnStart"
+    ],
+    timers: [
+      "setImmediate"
     ],
     util: [
       "arrow_message_private_symbol",
