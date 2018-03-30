@@ -12,7 +12,7 @@ import isMJS from "./util/is-mjs.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import setDeferred from "./util/set-deferred.js"
-import setImmediate from "./util/set-immediate.js"
+import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
 
 const {

@@ -14,7 +14,6 @@ function init() {
     "icu",
     "inspector",
     "natives",
-    "timers",
     "util"
   ]
 
@@ -33,9 +32,6 @@ function init() {
     ],
     inspector: [
       "callAndPauseOnStart"
-    ],
-    timers: [
-      "setImmediate"
     ],
     util: [
       "arrow_message_private_symbol",
