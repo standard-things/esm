@@ -2,15 +2,15 @@ import realRequire from "../real/require.js"
 import safe from "../util/safe.js"
 import shared from "../shared.js"
 
-let safeFs
-
-if (shared.inited) {
-  safeFs = shared.module.safeFs
-} else {
-  safeFs =
-  shared.module.safeFs = safe(realRequire("fs"))
+function init() {
+  const safeFs = safe(realRequire("fs"))
   safeFs.Stats = safe(safeFs.Stats)
+  return safeFs
 }
+
+const safeFs = shared.inited
+  ? shared.module.safeFs
+  : shared.module.safeFs = init()
 
 export const {
   mkdirSync,
