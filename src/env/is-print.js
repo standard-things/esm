@@ -1,5 +1,6 @@
 import isPreloaded from "./is-preloaded.js"
 import matches from "../util/matches.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isPrint() {
@@ -10,8 +11,8 @@ function isPrint() {
   }
 
   return env.print =
-    process.argv.length === 1 &&
-    matches(process.execArgv, /^(?:--print|-pe?)$/) &&
+    realProcess.argv.length === 1 &&
+    matches(realProcess.execArgv, /^(?:--print|-pe?)$/) &&
     isPreloaded()
 }
 

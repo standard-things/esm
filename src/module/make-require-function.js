@@ -12,6 +12,7 @@ import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
 import maskFunction from "../util/mask-function.js"
+import realProcess from "../real/process.js"
 import realRequire from "../real/require.js"
 import shared from "../shared.js"
 
@@ -92,7 +93,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
   req.cache = Module._cache
   req.extensions = Module._extensions
-  req.main = process.mainModule
+  req.main = realProcess.mainModule
   req.resolve = resolve
   resolve.paths = paths
 

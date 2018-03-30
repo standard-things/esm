@@ -5,6 +5,7 @@ import hasLoaderArg from "./has-loader-arg.js"
 import isNyc from "./is-nyc.js"
 import normalize from "../path/normalize.js"
 import realpath from "../fs/realpath.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isSideloaded() {
@@ -14,7 +15,7 @@ function isSideloaded() {
     return env.sideloaded
   }
 
-  const { argv } = process
+  const { argv } = realProcess
   const [, filename] = argv
   const args = GenericArray.slice(argv, 2)
   const nodeModulesIndex = args.length
@@ -24,7 +25,7 @@ function isSideloaded() {
   // From a package like Mocha.
   if (nodeModulesIndex !== -1 &&
       hasLoaderArg(args) &&
-      (Package.get(process.cwd()) !== null ||
+      (Package.get(realProcess.cwd()) !== null ||
        Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) {
     return env.sideloaded = true
   }

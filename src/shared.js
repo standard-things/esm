@@ -15,7 +15,6 @@ if (__shared__) {
 
   const fastPath = { __proto__: null }
   const utilBinding = { __proto__: null }
-  const { versions } = process
 
   const support = {
     __proto__: null,
@@ -39,12 +38,7 @@ if (__shared__) {
       cache: new WeakMap,
       skipExports: { __proto__: null }
     },
-    env: {
-      __proto__: null,
-      development: process.env.NODE_ENV !== "production",
-      electron: "electron" in versions,
-      win32: process.platform === "win32"
-    },
+    env: { __proto__: null },
     fastPath,
     inited: false,
     memoize: {
@@ -80,21 +74,6 @@ if (__shared__) {
     },
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
-    process: {
-      __proto__: null,
-      dlopen: process.dlopen,
-      pid: process.pid,
-      release: {
-        __proto__: null,
-        name: process.release.name
-      },
-      version: process.version.replace(/[^\d.]/g, ""),
-      versions: {
-        __proto__: null,
-        chakracore: versions.chakracore,
-        v8: versions.v8
-      }
-    },
     safeContext: Function("return this")(),
     support,
     symbol,
@@ -199,7 +178,7 @@ if (__shared__) {
   })
 
   setDeferred(support, "replShowProxy", () =>
-    satisfies(shared.process.version, ">=10")
+    satisfies(shared.module.safeProcess.version, ">=10")
   )
 
   setDeferred(support, "safeGetEnv", () =>
@@ -219,19 +198,19 @@ if (__shared__) {
   )
 
   setDeferred(utilBinding, "arrowSymbol", () => {
-    return satisfies(shared.process.version, "<7.0.0")
+    return satisfies(shared.module.safeProcess.version, "<7.0.0")
       ? "node:arrowMessage"
       : shared.module.binding.util.arrow_message_private_symbol
   })
 
   setDeferred(utilBinding, "decoratedSymbol", () => {
-    return satisfies(shared.process.version, "<7.0.0")
+    return satisfies(shared.module.safeProcess.version, "<7.0.0")
       ? "node:decorated"
       : shared.module.binding.util.decorated_private_symbol
   })
 
   setDeferred(utilBinding, "hiddenKeyType", () =>
-    satisfies(shared.process.version, "<7.0.0")
+    satisfies(shared.module.safeProcess.version, "<7.0.0")
       ? "string"
       : typeof utilBinding.arrowSymbol
   )

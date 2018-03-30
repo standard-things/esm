@@ -1,9 +1,13 @@
 import isDataDescriptor from "./is-data-descriptor.js"
+import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
+import keysAll from "./keys-all.js"
 
 function safe(Super) {
   if (typeof Super !== "function") {
-    return copy({ __proto__: null }, Super)
+    return isObject(Super)
+      ? copy({ __proto__: null }, Super)
+      : Super
   }
 
   const Safe = isObjectLike(Super.prototype)
@@ -21,6 +25,7 @@ function safe(Super) {
 
   copy(safeProto, Super.prototype)
   Reflect.setPrototypeOf(safeProto, null)
+
   return Safe
 }
 
@@ -41,17 +46,15 @@ function copyProperty(object, source, key) {
     if (isDataDescriptor(descriptor)) {
       object[key] = source[key]
     } else {
+      if (Reflect.has(descriptor, "writable")) {
+        descriptor.writable = true
+      }
+
       Reflect.defineProperty(object, key, descriptor)
     }
   }
 
   return object
-}
-
-function keysAll(object) {
-  return object == null
-    ? []
-    : Reflect.ownKeys(object)
 }
 
 export default safe

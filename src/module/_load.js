@@ -9,6 +9,7 @@ import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
 import moduleState from "./state.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 const {
@@ -61,7 +62,7 @@ function load(request, parent, isMain, state, loader) {
 
     if (isMain) {
       moduleState.mainModule =
-      process.mainModule = child
+      realProcess.mainModule = child
       child.id = "."
     }
 

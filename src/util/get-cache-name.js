@@ -1,14 +1,12 @@
 import md5 from "./md5.js"
 import { version as pkgVersion } from "../version.js"
-import shared from "../shared.js"
-
-const { process } = shared
+import safeProcess from "../safe/process.js"
 
 const engineVersion =
-  process.versions.v8 ||
-  process.versions.chakracore
+  safeProcess.versions.v8 ||
+  safeProcess.versions.chakracore
 
-const nodeVersion = process.version
+const nodeVersion = safeProcess.version
 
 function getCacheName(entry, cacheKey) {
   let { filename } = entry.module

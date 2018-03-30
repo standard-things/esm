@@ -10,6 +10,7 @@ import { dirname } from "../safe/path.js"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
 import maskFunction from "../util/mask-function.js"
+import realProcess from "../real/process.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
 import shared from "../shared.js"
 
@@ -18,7 +19,7 @@ const {
 } = PACKAGE
 
 function hook(Mod) {
-  const _tickCallback = getSilent(process, "_tickCallback")
+  const _tickCallback = getSilent(realProcess, "_tickCallback")
   const { runMain } = Mod
 
   const useTickCallback = typeof _tickCallback === "function"
@@ -26,7 +27,7 @@ function hook(Mod) {
   Mod.runMain = maskFunction(function () {
     Mod.runMain = runMain
 
-    const [, mainPath] = process.argv
+    const [, mainPath] = realProcess.argv
 
     if (mainPath in builtinEntries) {
       Mod.runMain()
@@ -73,7 +74,7 @@ function hook(Mod) {
 
   function tickCallback() {
     if (useTickCallback) {
-      call(_tickCallback, process)
+      call(_tickCallback, realProcess)
     }
   }
 }

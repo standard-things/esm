@@ -11,6 +11,7 @@ import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isMJS from "./util/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
+import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
 import { resolve } from "./safe/path.js"
 import shared from "./shared.js"
@@ -201,10 +202,10 @@ function init() {
   }
 
   if (! shared.inited) {
-    process.setMaxListeners(process.getMaxListeners() + 1)
+    realProcess.setMaxListeners(realProcess.getMaxListeners() + 1)
 
-    process.once("exit", () => {
-      process.setMaxListeners(Math.max(process.getMaxListeners() - 1, 0))
+    realProcess.once("exit", () => {
+      realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
 
       const { pendingMetas, pendingWrites } = shared
       const { dir } = shared.package

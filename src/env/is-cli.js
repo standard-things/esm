@@ -1,4 +1,5 @@
 import isPreloaded from "./is-preloaded.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isCLI() {
@@ -9,7 +10,7 @@ function isCLI() {
   }
 
   return env.cli =
-    process.argv.length > 1 &&
+    realProcess.argv.length > 1 &&
     isPreloaded()
 }
 

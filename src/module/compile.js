@@ -15,6 +15,7 @@ import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import has from "../util/has.js"
 import makeRequireFunction from "./make-require-function.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
 import vm from "vm"
@@ -120,18 +121,18 @@ function compile(content, filename) {
 
   let inspectorWrapper = null
 
-  if (process._breakFirstLine &&
-      process._eval == null) {
+  if (realProcess._breakFirstLine &&
+      realProcess._eval == null) {
     if (resolvedArgv === void 0) {
       // Enter the REPL if not given a file path argument.
-      resolvedArgv = process.argv[1]
-        ? Module._resolveFilename(process.argv[1])
+      resolvedArgv = realProcess.argv[1]
+        ? Module._resolveFilename(realProcess.argv[1])
         : "repl"
     }
 
     // Set breakpoint on module start.
     if (filename === resolvedArgv) {
-      Reflect.deleteProperty(process, "_breakFirstLine")
+      Reflect.deleteProperty(realProcess, "_breakFirstLine")
       inspectorWrapper = binding.inspector.callAndPauseOnStart
 
       if (useRunInDebugContext &&

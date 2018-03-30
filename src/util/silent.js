@@ -1,3 +1,5 @@
+import realProcess from "../real/process.js"
+
 const noDeprecationDescriptor = {
   __proto__: null,
   configurable: true,
@@ -5,17 +7,17 @@ const noDeprecationDescriptor = {
 }
 
 function silent(callback) {
-  const oldDescriptor = Reflect.getOwnPropertyDescriptor(process, "noDeprecation")
+  const oldDescriptor = Reflect.getOwnPropertyDescriptor(realProcess, "noDeprecation")
 
-  Reflect.defineProperty(process, "noDeprecation", noDeprecationDescriptor)
+  Reflect.defineProperty(realProcess, "noDeprecation", noDeprecationDescriptor)
 
   try {
     return callback()
   } finally {
     if (oldDescriptor) {
-      Reflect.defineProperty(process, "noDeprecation", oldDescriptor)
+      Reflect.defineProperty(realProcess, "noDeprecation", oldDescriptor)
     } else {
-      Reflect.deleteProperty(process, "noDeprecation")
+      Reflect.deleteProperty(realProcess, "noDeprecation")
     }
   }
 }

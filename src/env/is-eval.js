@@ -1,6 +1,7 @@
 import isPreloaded from "./is-preloaded.js"
 import isPrint from "./is-print.js"
 import matches from "../util/matches.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isEval() {
@@ -15,8 +16,8 @@ function isEval() {
   }
 
   return env.eval =
-    process.argv.length === 1 &&
-    matches(process.execArgv, /^(?:--eval|-e)$/) &&
+    realProcess.argv.length === 1 &&
+    matches(realProcess.execArgv, /^(?:--eval|-e)$/) &&
     isPreloaded()
 }
 

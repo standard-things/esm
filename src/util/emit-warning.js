@@ -1,15 +1,17 @@
 import captureStackTrace from "../error/capture-stack-trace.js"
+import realProcess from "../real/process.js"
 import safeConsole from "../safe/console.js"
+import safeProcess from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
-  const { pid, release } = shared.process
+  const { pid, release } = safeProcess
 
   const WARNING_PREFIX = "(" + release.name + ":" + pid + ") "
 
   const ExError = __external__.Error
 
-  const _emitWarning = process.emitWarning
+  const _emitWarning = realProcess.emitWarning
 
   const useEmitWarning = typeof _emitWarning === "function"
 
@@ -17,7 +19,7 @@ function init() {
     const isDeprecation = type === "DeprecationWarning"
 
     if (isDeprecation &&
-        process.noDeprecation) {
+        realProcess.noDeprecation) {
       return
     }
 
@@ -26,14 +28,14 @@ function init() {
     }
 
     if (useEmitWarning) {
-      Reflect.apply(_emitWarning, process, [message, type, code, Ctor])
+      Reflect.apply(_emitWarning, realProcess, [message, type, code, Ctor])
       return
     }
 
     const useCode = typeof code === "string"
 
     if (isDeprecation &&
-        process.throwDeprecation) {
+        realProcess.throwDeprecation) {
       const warning = new ExError(message)
       warning.name = type
 
@@ -45,7 +47,7 @@ function init() {
       throw warning
     }
 
-    process.nextTick(() => {
+    realProcess.nextTick(() => {
       safeConsole.error(
         WARNING_PREFIX +
         (useCode ? "[" + code + "] " : "") +

@@ -1,5 +1,6 @@
 import isPreloaded from "./is-preloaded.js"
 import matches from "../util/matches.js"
+import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isCheck() {
@@ -9,12 +10,12 @@ function isCheck() {
     return env.check
   }
 
-  const { length } = process.argv
+  const { length } = realProcess.argv
 
   return env.check =
     (length === 1 ||
      length === 2) &&
-    matches(process.execArgv, /^(?:--check|-c)$/) &&
+    matches(realProcess.execArgv, /^(?:--check|-c)$/) &&
     isPreloaded()
 }
 

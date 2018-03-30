@@ -6,11 +6,12 @@ import { delimiter, resolve } from "../safe/path.js"
 
 import GenericArray from "../generic/array.js"
 
+import realProcess from "../real/process.js"
 import safeGetEnv from "../util/safe-get-env.js"
 
 function initGlobalPaths() {
-  const { env } = process
-  const isWin = process.platform === "win32"
+  const { env } = realProcess
+  const isWin = realProcess.platform === "win32"
 
   let homeDir
   let nodePath
@@ -28,7 +29,7 @@ function initGlobalPaths() {
 
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.
-  const prefixDir = resolve(process.execPath, "..", isWin ? "" : "..")
+  const prefixDir = resolve(realProcess.execPath, "..", isWin ? "" : "..")
   const paths = GenericArray.of(resolve(prefixDir, "lib", "node"))
 
   if (homeDir) {

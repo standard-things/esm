@@ -14,6 +14,7 @@ import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
+import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import setSetter from "../../util/set-setter.js"
@@ -87,7 +88,7 @@ function load(request, parent, isMain, preload) {
         moduleState.mainModule = child
 
         if (isUnexposed) {
-          Reflect.deleteProperty(process, "mainModule")
+          Reflect.deleteProperty(realProcess, "mainModule")
         }
       }
 

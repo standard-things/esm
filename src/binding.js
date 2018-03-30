@@ -1,5 +1,6 @@
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
+import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
 import shared from "./shared.js"
@@ -47,14 +48,14 @@ function init() {
 
   function getBinding(id) {
     try {
-      return silent(() => Reflect.apply(_binding, process, [id]))
+      return silent(() => Reflect.apply(_binding, realProcess, [id]))
     } catch (e) {}
   }
 
   for (const id of ids) {
     setDeferred(binding, id, () => {
       if (! _binding) {
-        _binding = getSilent(process, "binding")
+        _binding = getSilent(realProcess, "binding")
       }
 
       const source = getBinding(id)

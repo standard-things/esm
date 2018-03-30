@@ -32,7 +32,7 @@ const externals = [
 ]
 
 const hosted = [
-  "console", "process"
+  "console"
 ]
 
 const uglifyOptions = readJSON("./.uglifyrc")

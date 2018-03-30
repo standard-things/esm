@@ -16,6 +16,7 @@ import isSideloaded from "./env/is-sideloaded.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
+import realProcess from "./real/process.js"
 import requireHook from "./hook/require.js"
 import shared from "./shared.js"
 import vm from "vm"
@@ -74,7 +75,7 @@ if (shared.inited) {
     moduleHook(Module, cloned)
 
     if (! isInstalled(mod)) {
-      processHook(process)
+      processHook(realProcess)
     }
 
     return requireHook(cloned)
@@ -91,18 +92,18 @@ if (shared.inited) {
   } else if (EVAL) {
     RealModule.prototype._compile = Module.prototype._compile
     moduleHook(Module)
-    processHook(process)
+    processHook(realProcess)
     vmHook(vm)
   } else if (REPL) {
     moduleHook(Module)
-    processHook(process)
+    processHook(realProcess)
     vmHook(vm)
   } else if (CLI ||
       INTERNAL ||
       isSideloaded()) {
     moduleHook(RealModule)
     mainHook(RealModule)
-    processHook(process)
+    processHook(realProcess)
   }
 
   if (INTERNAL) {
