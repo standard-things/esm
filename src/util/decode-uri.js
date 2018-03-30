@@ -1,9 +1,17 @@
-const _decodeURI = decodeURI
+import shared from "../shared.js"
 
-const decodeURIWrapper = function decodeURI(string) {
-  return typeof string === "string"
-    ? _decodeURI(string)
-    : ""
+function init() {
+  const _decodeURI = decodeURI
+
+  const wrapper = function decodeURI(string) {
+    return typeof string === "string"
+      ? _decodeURI(string)
+      : ""
+  }
+
+  return wrapper
 }
 
-export default decodeURIWrapper
+export default shared.inited
+  ? shared.module.utilDecodeURI
+  : shared.module.utilDecodeURI = init()

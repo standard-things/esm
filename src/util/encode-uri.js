@@ -1,9 +1,17 @@
-const _encodeURI = encodeURI
+import shared from "../shared.js"
 
-const encodeURIWrapper = function encodeURI(string) {
-  return typeof string === "string"
-    ? _encodeURI(string)
-    : ""
+function init() {
+  const _encodeURI = encodeURI
+
+  const wrapper = function encodeURI(string) {
+    return typeof string === "string"
+      ? _encodeURI(string)
+      : ""
+  }
+
+  return wrapper
 }
 
-export default encodeURIWrapper
+export default shared.inited
+  ? shared.module.utilEncodeURI
+  : shared.module.utilEncodeURI = init()
