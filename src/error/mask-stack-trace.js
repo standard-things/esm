@@ -8,6 +8,7 @@ import isParseError from "../util/is-parse-error.js"
 import isPath from "../util/is-path.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
+import shared from "../shared.js"
 import toExternalError from "../util/to-external-error.js"
 
 const {
@@ -23,6 +24,10 @@ const blankRegExp = /^\s*$/
 const headerRegExp = /^(.+?)(?=:\d+\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
+  if (shared.package.default.options.debug) {
+    return error
+  }
+
   decorateStackTrace(error)
 
   let { stack } = error

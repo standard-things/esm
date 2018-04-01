@@ -222,12 +222,6 @@ function readSourceCode(filename) {
 }
 
 function tryPassthru(func, args, pkg) {
-  const options = pkg && pkg.options
-
-  if (options && options.debug) {
-    return Reflect.apply(func, this, args)
-  }
-
   let error
 
   try {

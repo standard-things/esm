@@ -143,28 +143,20 @@ function tryCompileCached(entry, filename) {
 
   let result
 
-  if (entry.package.options.debug) {
+  try {
     result = tryCompile(entry, filename)
+  } catch (e) {
+    if (! isError(e) ||
+        isStackTraceMasked(e)) {
+      throw e
+    }
 
+    const content = () => readSourceCode(filename)
+
+    throw maskStackTrace(e, content, filename, isESM)
+  } finally {
     if (noDepth) {
       moduleState.stat = null
-    }
-  } else {
-    try {
-      result = tryCompile(entry, filename)
-    } catch (e) {
-      if (! isError(e) ||
-          isStackTraceMasked(e)) {
-        throw e
-      }
-
-      const content = () => readSourceCode(filename)
-
-      throw maskStackTrace(e, content, filename, isESM)
-    } finally {
-      if (noDepth) {
-        moduleState.stat = null
-      }
     }
   }
 
@@ -281,10 +273,6 @@ function readSourceCode(filename) {
 }
 
 function tryCompileCode(caller, entry, content, filename, options) {
-  if (entry.package.options.debug) {
-    return Compiler.compile(entry, content, options)
-  }
-
   let error
 
   try {
@@ -306,10 +294,6 @@ function tryCompileCode(caller, entry, content, filename, options) {
 }
 
 function tryValidateESM(caller, entry) {
-  if (entry.package.options.debug) {
-    return validateESM(entry)
-  }
-
   let error
 
   try {
