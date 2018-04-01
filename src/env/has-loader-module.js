@@ -1,20 +1,10 @@
-import ESM from "../constant/esm.js"
-
 import GenericArray from "../generic/array.js"
 
-const {
-  PKG_DIRNAME
-} = ESM
+import isOwnpath from "../util/is-own-path.js"
 
 function hasLoaderModule(modules) {
-  if (! Array.isArray(modules)) {
-    return false
-  }
-
-  return GenericArray.some(modules, ({ filename }) => {
-    return typeof filename === "string" &&
-      filename.startsWith(PKG_DIRNAME)
-  })
+  return Array.isArray(modules) &&
+    GenericArray.some(modules, (mod) => isOwnpath(mod.filename))
 }
 
 export default hasLoaderModule

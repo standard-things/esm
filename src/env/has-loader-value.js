@@ -1,10 +1,10 @@
 import { extname, resolve } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
-import ESM from "../constant/esm.js"
 
 import _resolveFilename from "../module/esm/_resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
+import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
 import keys from "../util/keys.js"
 import realpath from "../fs/realpath.js"
@@ -13,10 +13,6 @@ import rootModule from "../root-module.js"
 const {
   HYPHEN
 } = CHAR_CODE
-
-const {
-  PKG_DIRNAME
-} = ESM
 
 function hasLoaderValue(value) {
   if (typeof value === "string") {
@@ -27,11 +23,11 @@ function hasLoaderValue(value) {
         resolved += "/index.js"
       }
 
-      if (realpath(resolved).startsWith(PKG_DIRNAME)) {
+      if (isOwnPath(realpath(resolved))) {
         return true
       }
     } else if (value.charCodeAt(0) !== HYPHEN &&
-        _resolveFilename(value, rootModule).startsWith(PKG_DIRNAME)) {
+        isOwnPath(_resolveFilename(value, rootModule))) {
       return true
     }
   } else if (isObjectLike(value)) {
