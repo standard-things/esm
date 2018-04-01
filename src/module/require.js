@@ -34,13 +34,12 @@ const req = function require(request) {
   }
 
   const entry = Entry.get(this)
-  const { _requireESM } = entry
-
-  entry._requireESM = false
 
   const isESM =
-    _requireESM ||
+    entry._requireESM ||
     entry.type === TYPE_ESM
+
+  entry._requireESM = false
 
   return isESM
     ? _loadESM(request, this, false).module.exports
