@@ -11,6 +11,7 @@ import errors from "../errors.js"
 import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
+import isOwnPath from "../util/is-own-path.js"
 import maskFunction from "../util/mask-function.js"
 import realProcess from "../real/process.js"
 import realRequire from "../real/require.js"
@@ -30,12 +31,14 @@ const sourcePaths = sourceResolve && sourceResolve.paths
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
   const isESM = entry.type === TYPE_ESM
+  const isOwn = isOwnPath(mod.filename)
   const { name } = entry
 
   let req = function require(request) {
     const { moduleState, symbol } = shared
 
-    if (typeof request === "symbol") {
+    if (isOwn &&
+        typeof request === "symbol") {
       if (request === symbol.realRequire) {
         return realRequire
       }
