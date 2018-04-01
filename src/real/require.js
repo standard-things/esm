@@ -1,17 +1,15 @@
 import shared from "../shared.js"
 
 function init() {
-  let realRequire = __non_webpack_require__
-
   try {
-    const result = realRequire(shared.symbol.realRequire)
+    const result = __non_webpack_require__(shared.symbol.realRequire)
 
     if (typeof result === "function") {
-      realRequire = result
+      return result
     }
   } catch (e) {}
 
-  return realRequire
+  return __non_webpack_require__
 }
 
 export default shared.inited

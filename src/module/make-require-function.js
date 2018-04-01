@@ -13,6 +13,7 @@ import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
 import isOwnPath from "../util/is-own-path.js"
 import maskFunction from "../util/mask-function.js"
+import realGetProxyDetails from "../real/get-proxy-details.js"
 import realProcess from "../real/process.js"
 import realRequire from "../real/require.js"
 import shared from "../shared.js"
@@ -39,6 +40,11 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     if (isOwn &&
         typeof request === "symbol") {
+
+      if (request === symbol.realGetProxyDetails) {
+        return realGetProxyDetails
+      }
+
       if (request === symbol.realRequire) {
         return realRequire
       }

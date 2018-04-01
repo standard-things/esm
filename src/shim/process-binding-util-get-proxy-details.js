@@ -2,7 +2,6 @@ import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
 import isOwnProxy from "../util/is-own-proxy.js"
-import realGetProxyDetails from "../real/get-proxy-details.js"
 import shared from "../shared.js"
 import silent from "../util/silent.js"
 
@@ -27,10 +26,6 @@ function init() {
       }
 
       const getProxyDetails = (value) => {
-        if (value === shared.symbol.realGetProxyDetails) {
-          return realGetProxyDetails
-        }
-
         return isOwnProxy(value)
           ? void 0
           : call(_getProxyDetails, utilBinding, value)
