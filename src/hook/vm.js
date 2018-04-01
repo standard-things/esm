@@ -322,7 +322,7 @@ function tryValidateESM(caller, entry, content) {
   }
 
   captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, entry.module.filename, true)
+  throw maskStackTrace(error, content, null, true)
 }
 
 function tryWrapper(func, args, content) {
