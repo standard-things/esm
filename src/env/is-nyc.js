@@ -1,13 +1,23 @@
-import ESM from "../constant/esm.js"
-
 import has from "../util/has.js"
+import isOwnPath from "../util/is-own-path.js"
 import normalize from "../path/normalize.js"
 import readJSON from "../fs/read-json.js"
 import shared from "../shared.js"
 
-const {
-  PKG_PARENT
-} = ESM
+function getOwnParent() {
+  const seen = new Set
+
+  let { parent } = __non_webpack_module__
+
+  while (parent &&
+      isOwnPath(parent.filename) &&
+      ! seen.has(parent)) {
+    parent = parent.parent
+    seen.add(parent)
+  }
+
+  return parent
+}
 
 function isNyc() {
   const { env } = shared
@@ -16,7 +26,8 @@ function isNyc() {
     return env.nyc
   }
 
-  const parentFilename = PKG_PARENT && normalize(PKG_PARENT.filename)
+  const parent = getOwnParent()
+  const parentFilename = parent && normalize(parent.filename)
 
   const nycIndex = parentFilename
     ? parentFilename.lastIndexOf("/node_modules/nyc/")
