@@ -383,11 +383,11 @@ function readInfo(dirPath, force) {
     if (extname(optionsPath) === ".json") {
       options = readJSON6(optionsPath)
     } else {
-      pkg =
-      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
-
       const { moduleState } = shared
       const { parsing, passthru } = moduleState
+
+      pkg =
+      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
       moduleState.parsing =
       moduleState.passthru = false

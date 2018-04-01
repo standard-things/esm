@@ -23,6 +23,8 @@ function load(request, parent, isMain, state, loader) {
   let filename
   let entry = request
 
+  const { parsing, passthru } = shared.moduleState
+
   if (typeof request === "string") {
     filename = request
     child = state._cache[filename]
@@ -34,8 +36,6 @@ function load(request, parent, isMain, state, loader) {
     child = entry.module
     filename = child.filename
   }
-
-  const { parsing, passthru } = shared.moduleState
 
   if (child) {
     const children = parent && parent.children

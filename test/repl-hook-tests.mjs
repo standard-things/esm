@@ -11,8 +11,11 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
+const SHARED_SYMBOL = Symbol.for("esm\u200d:shared")
+
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
+const shared = require(SHARED_SYMBOL)
 
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")
@@ -37,12 +40,14 @@ describe("repl hook", () => {
     Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, indexPath)
 
+    shared.env.repl = true
     context.module.require(indexPath)
 
     process.argv = argv
     Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, indexPath)
 
+    shared.env.repl = false
     parent.children.splice(pkgIndex, 1)
     parent.require(indexPath)
   })

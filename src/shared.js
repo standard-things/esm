@@ -4,15 +4,28 @@ import encodeId from "./util/encode-id.js"
 import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
-let shared
+const {
+  PKG_PREFIX
+} = ESM
 
-if (__shared__) {
-  shared = __shared__
-} else {
-  const {
-    PKG_PREFIX
-  } = ESM
+const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + ":shared")
 
+function getShared() {
+  if (__shared__) {
+    __shared__.inited = true
+    return __shared__
+  }
+
+  try {
+    const shared = __non_webpack_require__(SHARED_SYMBOL)
+    shared.inited = false
+    return shared
+  } catch (e) {}
+
+  return init()
+}
+
+function init() {
   const fastPath = { __proto__: null }
   const utilBinding = { __proto__: null }
 
@@ -28,10 +41,11 @@ if (__shared__) {
     package: Symbol.for(PKG_PREFIX + ":package"),
     realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
     realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
+    shared: SHARED_SYMBOL,
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 
-  shared = {
+  const shared = {
     __proto__: null,
     entry: {
       __proto__: null,
@@ -214,6 +228,8 @@ if (__shared__) {
       ? "string"
       : typeof utilBinding.arrowSymbol
   )
+
+  return shared
 }
 
-export default shared
+export default getShared()

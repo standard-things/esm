@@ -128,7 +128,7 @@ function compileESM() {
 }
 
 function loadESM() {
-  compiledESM(esmRequire, esmModule, __shared__)
+  compiledESM(esmRequire, esmModule, shared)
   return esmModule.exports
 }
 
@@ -181,17 +181,17 @@ function writeFile(filename, options) {
 
 const compiledESM = compileESM()
 
-// Declare `__shared__` before assignment to avoid the TDZ.
-let __shared__
+// Declare `shared` before assignment to avoid the TDZ.
+let shared
 
-__shared__ = loadESM()
+shared = loadESM()
 
-defineProperty(makeRequireFunction, __shared__.symbol.package, {
+defineProperty(makeRequireFunction, shared.symbol.package, {
   __proto__: null,
   value: true
 })
 
-defineProperty(makeRequireFunction, __shared__.customInspectKey, {
+defineProperty(makeRequireFunction, shared.customInspectKey, {
   __proto__: null,
   value: () => "esm enabled"
 })
