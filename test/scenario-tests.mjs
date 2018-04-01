@@ -4,14 +4,14 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
-const canTestJest = Reflect.has(process.versions, "v8")
-const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
-
 const isWin = process.platform === "win32"
 
 const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
+
+const canTestJest = Reflect.has(process.versions, "v8")
+const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const envAuto = {
   ESM_OPTIONS: "{cjs:true,mode:'auto'}"

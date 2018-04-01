@@ -11,17 +11,19 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
-const SHARED_SYMBOL = Symbol.for("esm\u200d:shared")
-
-const isWin = process.platform === "win32"
-const fileProtocol = "file://" + (isWin ? "/" : "")
-const shared = require(SHARED_SYMBOL)
+const ZWJ = "\u200d"
+const PKG_PREFIX = "esm" + ZWJ
+const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + ":shared")
 
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")
 const pkgPath = path.resolve("../package.json")
 
+const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
 const parent = require.cache[indexPath].parent
+const shared = require(SHARED_SYMBOL)
+
 const pkgIndex = parent.children.findIndex((child) => child.filename === indexPath)
 const pkgJSON = fs.readJsonSync(pkgPath)
 const pkgURL = fileProtocol + pkgPath.replace(/\\/g, "/")

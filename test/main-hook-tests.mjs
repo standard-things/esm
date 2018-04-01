@@ -8,24 +8,21 @@ import path from "path"
 import trash from "../script/trash.js"
 import vm from "vm"
 
+const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
+
+const isDebug = !! ESM_OPTIONS.debug
+const isWin = process.platform === "win32"
+const fileProtocol = "file://" + (isWin ? "/" : "")
+
+const testPath = path.resolve(".")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
+
 const canUseExperimentalModules =
   Reflect.has(process.versions, "v8") &&
   SemVer.satisfies(process.version, ">=8.5.0")
 
 const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
-
-const isWin = process.platform === "win32"
-const fileProtocol = "file://" + (isWin ? "/" : "")
-
-const pkgPath = path.resolve("../index.js")
-const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
-const pkgOptions = fs.pathExistsSync(".esmrc")
-  ? JSON6.parse(fs.readFileSync(".esmrc"))
-  : pkgJSON["esm"]
-
-const testPath = path.resolve(".")
-const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 function node(args, env) {
   return execa(process.execPath, args, {
@@ -68,7 +65,7 @@ describe("main hook", function () {
   })
 
   it("should support `ESM_OPTIONS` environment variable", function () {
-    if (pkgOptions.debug) {
+    if (isDebug) {
       this.skip()
       return
     }
@@ -87,7 +84,7 @@ describe("main hook", function () {
   })
 
   it("should support `ESM_OPTIONS` environment variable with `options.cache`", function () {
-    if (pkgOptions.debug) {
+    if (isDebug) {
       this.skip()
       return
     }

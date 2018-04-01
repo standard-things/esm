@@ -15,7 +15,6 @@ const WARNING_PREFIX = "(" + process.release.name + ":" + process.pid + ") "
 
 const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
-
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
