@@ -19,7 +19,6 @@ import isMJS from "../util/is-mjs.js"
 import isObjectEmpty from "../util/is-object-empty.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
@@ -123,15 +122,15 @@ function compile(caller, entry, content, filename, fallback) {
 
     if (isESM &&
         entry.state === STATE_PARSING_STARTED) {
-      tryValidateESM(caller, entry)
+      tryValidateESM(caller, entry, content, filename)
     }
   } else {
     entry.state = STATE_EXECUTION_STARTED
-    return tryCompileCached(entry, filename)
+    return tryCompileCached(caller, entry, content, filename)
   }
 }
 
-function tryCompileCached(entry, filename) {
+function tryCompileCached(caller, entry, content, filename) {
   const isESM = entry.type === TYPE_ESM
   const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
@@ -150,8 +149,6 @@ function tryCompileCached(entry, filename) {
         isStackTraceMasked(e)) {
       throw e
     }
-
-    const content = () => readSourceCode(filename)
 
     throw maskStackTrace(e, content, filename, isESM)
   } finally {
@@ -268,10 +265,6 @@ function readCachedCode(filename) {
   return readFileFast(filename, "utf8")
 }
 
-function readSourceCode(filename) {
-  return readFile(filename, "utf8")
-}
-
 function tryCompileCode(caller, entry, content, filename, options) {
   let error
 
@@ -293,7 +286,7 @@ function tryCompileCode(caller, entry, content, filename, options) {
   throw maskStackTrace(error, content, filename, isESM)
 }
 
-function tryValidateESM(caller, entry) {
+function tryValidateESM(caller, entry, content, filename) {
   let error
 
   try {
@@ -306,9 +299,6 @@ function tryValidateESM(caller, entry) {
       isStackTraceMasked(error)) {
     throw error
   }
-
-  const { filename } = entry.module
-  const content = () => readSourceCode(filename)
 
   captureStackTrace(error, caller)
   throw maskStackTrace(error, content, filename, true)
