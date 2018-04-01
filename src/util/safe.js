@@ -39,18 +39,18 @@ function copy(object, source) {
   return object
 }
 
-function copyProperty(object, source, key) {
-  const descriptor = Reflect.getOwnPropertyDescriptor(source, key)
+function copyProperty(object, source, name) {
+  const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
   if (descriptor) {
     if (isDataDescriptor(descriptor)) {
-      object[key] = source[key]
+      object[name] = source[name]
     } else {
       if (Reflect.has(descriptor, "writable")) {
         descriptor.writable = true
       }
 
-      Reflect.defineProperty(object, key, descriptor)
+      Reflect.defineProperty(object, name, descriptor)
     }
   }
 

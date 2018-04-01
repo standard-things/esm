@@ -1,7 +1,7 @@
 const { __defineGetter__ } = Object.prototype
 
-function setGetter(object, key, getter) {
-  __defineGetter__.call(object, key, getter)
+function setGetter(object, name, getter) {
+  __defineGetter__.call(object, name, getter)
   return object
 }
 

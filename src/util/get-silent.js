@@ -1,7 +1,7 @@
 import silent from "./silent.js"
 
-function getSilent(object, key) {
-  const value = tryGet(object, key)
+function getSilent(object, name) {
+  const value = tryGet(object, name)
 
   if (typeof value !== "function") {
     return value
@@ -12,9 +12,9 @@ function getSilent(object, key) {
   }
 }
 
-function tryGet(object, key) {
+function tryGet(object, name) {
   try {
-    return silent(() => object[key])
+    return silent(() => object[name])
   } catch (e) {}
 }
 

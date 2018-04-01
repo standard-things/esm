@@ -1,9 +1,9 @@
 import silent from "./silent.js"
 
-function setSilent(object, key, value) {
+function setSilent(object, name, value) {
   try {
     silent(() => {
-      object[key] = value
+      object[name] = value
     })
   } catch (e) {}
 }

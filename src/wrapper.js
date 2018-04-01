@@ -16,8 +16,8 @@ import { version } from "./version.js"
 function init() {
   const Wrapper = {
     __proto__: null,
-    find(object, key, range) {
-      const map = getMap(object, key)
+    find(object, name, range) {
+      const map = getMap(object, name)
 
       if (map) {
         const maxVersion = maxSatisfying(map.versions, range)
@@ -29,8 +29,8 @@ function init() {
 
       return null
     },
-    manage(object, key, wrapper) {
-      const value = Wrapper.unwrap(object, key)
+    manage(object, name, wrapper) {
+      const value = Wrapper.unwrap(object, name)
       const manager = maskFunction(function (...args) {
         return Reflect.apply(wrapper, this, [manager, value, args])
       }, value)
@@ -42,15 +42,15 @@ function init() {
         writable: true
       })
 
-      setSilent(object, key, manager)
+      setSilent(object, name, manager)
     },
-    unwrap(object, key) {
-      const manager = silent(() => object[key])
+    unwrap(object, name) {
+      const manager = silent(() => object[name])
       const symbol = shared.symbol.wrapper
       return has(manager, symbol) ? manager[symbol]  : manager
     },
-    wrap(object, key, wrapper) {
-      const map = getOrCreateMap(object, key)
+    wrap(object, name, wrapper) {
+      const map = getOrCreateMap(object, name)
 
       if (typeof map.wrappers[version] !== "function") {
         GenericArray.push(map.versions, version)
@@ -59,13 +59,13 @@ function init() {
     }
   }
 
-  function createMap(object, key) {
-    // Store the wrapper map as `object[shared.symbol.wrapper][key]` rather than
-    // on the function, so that other code can modify the same property without
-    // interfering with our wrapper logic.
-    return getOrCreateStore(object)[key] = {
+  function createMap(object, name) {
+    // Store the wrapper map as `object[shared.symbol.wrapper][name]` rather
+    // than on the function, so that other code can modify the same property
+    // without interfering with our wrapper.
+    return getOrCreateStore(object)[name] = {
       __proto__: null,
-      raw: Wrapper.unwrap(object, key),
+      raw: Wrapper.unwrap(object, name),
       versions: [],
       wrappers: { __proto__: null }
     }
@@ -84,13 +84,13 @@ function init() {
     return value
   }
 
-  function getMap(object, key) {
+  function getMap(object, name) {
     const store = getStore(object)
-    return (store && key in store) ? store[key] : null
+    return (store && name in store) ? store[name] : null
   }
 
-  function getOrCreateMap(object, key) {
-    return getMap(object, key) || createMap(object, key)
+  function getOrCreateMap(object, name) {
+    return getMap(object, name) || createMap(object, name)
   }
 
   function getOrCreateStore(object) {

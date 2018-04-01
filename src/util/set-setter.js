@@ -1,7 +1,7 @@
 const { __defineSetter__ } = Object.prototype
 
-function setSetter(object, key, setter) {
-  __defineSetter__.call(object, key, setter)
+function setSetter(object, name, setter) {
+  __defineSetter__.call(object, name, setter)
   return object
 }
 

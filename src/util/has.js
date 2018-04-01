@@ -1,8 +1,8 @@
 const { hasOwnProperty } = Object.prototype
 
-function has(object, key) {
+function has(object, name) {
   return object != null &&
-    hasOwnProperty.call(object, key)
+    hasOwnProperty.call(object, name)
 }
 
 export default has

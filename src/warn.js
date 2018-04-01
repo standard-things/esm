@@ -23,11 +23,11 @@ function init() {
   }
 
   function getCacheKey(code, args) {
-    const key = code in cacheKeys
+    const serialized = code in cacheKeys
       ? cacheKeys[code](...args)
       : args.join("\0")
 
-    return code + "\0" + key
+    return code + "\0" + serialized
   }
 
   function moduleCacheKey(request, name) {
@@ -39,13 +39,13 @@ function init() {
       line + ":" + column + "): " + getModuleURL(request)
   }
 
-  function namespaceAssignment(request, key) {
+  function namespaceAssignment(request, name) {
     return pkgName + " cannot assign to the read only module namespace property " +
-      toStringLiteral(key, "'") + " of " + getModuleURL(request)
+      toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
-  function namespaceExtension(request, key) {
-    return pkgName + " cannot add property " + toStringLiteral(key, "'") +
+  function namespaceExtension(request, name) {
+    return pkgName + " cannot add property " + toStringLiteral(name, "'") +
       " to module namespace of " + getModuleURL(request)
   }
 

@@ -294,8 +294,8 @@ class Entry {
 
   merge(otherEntry) {
     if (otherEntry !== this) {
-      for (const key in otherEntry) {
-        mergeProperty(this, otherEntry, key)
+      for (const name in otherEntry) {
+        mergeProperty(this, otherEntry, name)
       }
     }
 

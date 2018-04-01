@@ -9,8 +9,8 @@ const dynPath = path.resolve("fixture/import/dynamic.js")
 
 export default () => {
   ["sourceMap", "sourcemap"]
-    .forEach((key) => {
-      const esmRequire = makeRequire(module, { [key]: true })
+    .forEach((name) => {
+      const esmRequire = makeRequire(module, { [name]: true })
       const { cache, extensions } = esmRequire
       const mod = new module.constructor("<mock>", null)
 

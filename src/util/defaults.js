@@ -7,11 +7,11 @@ function defaults(object) {
   while (++i < argCount) {
     const source = arguments[i]
 
-    for (const key in source) {
-      if (hasOwnProperty.call(source, key) &&
-          (object[key] === void 0 ||
-           ! hasOwnProperty.call(object, key))) {
-        object[key] = source[key]
+    for (const name in source) {
+      if (hasOwnProperty.call(source, name) &&
+          (object[name] === void 0 ||
+           ! hasOwnProperty.call(object, name))) {
+        object[name] = source[name]
       }
     }
   }

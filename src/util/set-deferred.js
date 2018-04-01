@@ -1,14 +1,14 @@
 import setGetter from "./set-getter.js"
 import setSetter from "./set-setter.js"
 
-function setDeferred(object, key, getter) {
-  setGetter(object, key, () => {
-    object[key] = void 0
-    return object[key] = getter()
+function setDeferred(object, name, getter) {
+  setGetter(object, name, () => {
+    object[name] = void 0
+    return object[name] = getter()
   })
 
-  setSetter(object, key, (value) => {
-    Reflect.defineProperty(object, key, {
+  setSetter(object, name, (value) => {
+    Reflect.defineProperty(object, name, {
       __proto__: null,
       configurable: true,
       enumerable: true,
