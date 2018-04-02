@@ -36,31 +36,23 @@ function makeRequireFunction(mod, requirer, resolver) {
   const { name } = entry
 
   let req = function require(request) {
-    const { moduleState, symbol } = shared
+    let exported
 
-    if (isOwn &&
-        typeof request === "symbol") {
+    if (isOwn) {
+      exported = ownRequire(request)
 
-      if (request === symbol.realGetProxyDetails) {
-        return realGetProxyDetails
-      }
-
-      if (request === symbol.realRequire) {
-        return realRequire
-      }
-
-      if (request === symbol.shared) {
-        return shared
+      if (exported) {
+        return exported
       }
     }
+
+    const { moduleState } = shared
 
     moduleState.requireDepth += 1
 
     shared.entry.skipExports[name] =
       ! isESM &&
       ! isDataProperty(mod, "exports")
-
-    let exported
 
     try {
       exported = requirer.call(mod, request)
@@ -119,6 +111,26 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   return req
+}
+
+function ownRequire(request) {
+  if (typeof request !== "symbol") {
+    return
+  }
+
+  const { symbol } = shared
+
+  if (request === symbol.realGetProxyDetails) {
+    return realGetProxyDetails
+  }
+
+  if (request === symbol.realRequire) {
+    return realRequire
+  }
+
+  if (request === symbol.shared) {
+    return shared
+  }
 }
 
 export default makeRequireFunction
