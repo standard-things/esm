@@ -62,9 +62,9 @@ function load(request, parent, isMain, preload) {
 
   const entry = _load(request, parent, isMain, state, (entry) => {
     const { parsing, passthru } = shared.moduleState
-    const child = entry.module
+    const mod = entry.module
 
-    state._cache[request] = child
+    state._cache[request] = mod
 
     if (passthru &&
         ! parsing) {
@@ -73,12 +73,12 @@ function load(request, parent, isMain, preload) {
 
     called = true
 
-    child.filename = filename
+    mod.filename = filename
     entry.id = request
 
     if (isMain) {
-      child.id = "."
-      moduleState.mainModule = child
+      mod.id = "."
+      moduleState.mainModule = mod
     }
 
     if (parentEntry) {
@@ -100,16 +100,16 @@ function load(request, parent, isMain, preload) {
       if (! isESM &&
           (parentIsESM &&
            ! parentPkgOptions.cjs.cache)) {
-        child.parent = void 0
+        mod.parent = void 0
       }
     }
 
-    if (! child.paths) {
+    if (! mod.paths) {
       if (entry.package.options.cjs.paths &&
           ! isMJS(entry.module)) {
-        child.paths = Module._nodeModulePaths(fromPath)
+        mod.paths = Module._nodeModulePaths(fromPath)
       } else {
-        child.paths = moduleNodeModulePaths(fromPath)
+        mod.paths = moduleNodeModulePaths(fromPath)
       }
     }
 

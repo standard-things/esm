@@ -16,9 +16,9 @@ function load(request, parent, isMain, preload) {
 
   const entry = _load(filename, parent, isMain, Module, (entry) => {
     const { parsing, passthru } = shared.moduleState
-    const child = entry.module
+    const mod = entry.module
 
-    Module._cache[filename] = child
+    Module._cache[filename] = mod
 
     if (passthru &&
         ! parsing) {
@@ -27,8 +27,8 @@ function load(request, parent, isMain, preload) {
 
     called = true
 
-    if (! child.paths) {
-      child.paths = Module._nodeModulePaths(dirname(filename))
+    if (! mod.paths) {
+      mod.paths = Module._nodeModulePaths(dirname(filename))
     }
 
     let threw = true
