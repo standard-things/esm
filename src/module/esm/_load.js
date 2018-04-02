@@ -76,6 +76,15 @@ function load(request, parent, isMain, preload) {
     child.filename = filename
     entry.id = request
 
+    if (isMain) {
+      child.id = "."
+      moduleState.mainModule = child
+    }
+
+    if (parentEntry) {
+      parentEntry.children[entry.name] = entry
+    }
+
     if (! parsing) {
       const isESM = entry.type === TYPE_ESM
 
@@ -83,13 +92,9 @@ function load(request, parent, isMain, preload) {
         isUnexposed = false
       }
 
-      if (isMain) {
-        child.id = "."
-        moduleState.mainModule = child
-
-        if (isUnexposed) {
-          Reflect.deleteProperty(realProcess, "mainModule")
-        }
+      if (isMain &&
+          isUnexposed) {
+        Reflect.deleteProperty(realProcess, "mainModule")
       }
 
       if (! isESM &&
