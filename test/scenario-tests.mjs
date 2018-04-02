@@ -173,6 +173,17 @@ describe("scenarios", function () {
     ])
   })
 
+  ;(canTestJest ? it : xit)(
+  "should error with jest and circular dependencies", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
+    const configPath = path.resolve(dirPath, "jest.config.json")
+
+    return exec("jest", [
+      "--config", configPath,
+      "--rootDir", dirPath
+    ])
+  })
+
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
