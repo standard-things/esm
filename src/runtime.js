@@ -30,6 +30,10 @@ const indirectEval = __external__.eval
 const Runtime = {
   __proto__: null,
 
+  assertTDZ(value) {
+    return value
+  },
+
   compileEval(content) {
     // Section 18.2.1.1: Runtime Semantics: PerformEval ( x, evalRealm, strictCaller, direct )
     // Setp 2: Only evaluate strings.
@@ -109,6 +113,7 @@ const Runtime = {
     object.k = identity
     object.n = object.nsSetter = Runtime.nsSetter
     object.r = object.run = Runtime.run
+    object.t = object.assertTDZ = Runtime.assertTDZ
     object.u = object.update = Runtime.update
     object.v = indirectEval
     object.w = object.watch = Runtime.watch

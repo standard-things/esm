@@ -6,7 +6,7 @@ import shared from "../shared.js"
 function init() {
   const definedMap = new WeakMap
 
-  class IdentifierVisitor extends Visitor {
+  class ArgumentsVisitor extends Visitor {
     reset(rootPath, options) {
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
@@ -69,9 +69,9 @@ function init() {
     return defined
   }
 
-  return new IdentifierVisitor
+  return new ArgumentsVisitor
 }
 
 export default shared.inited
-  ? shared.module.visitorIdentifier
-  : shared.module.visitorIdentifier = init()
+  ? shared.module.visitorArguments
+  : shared.module.visitorArguments = init()

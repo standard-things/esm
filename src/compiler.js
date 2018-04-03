@@ -4,15 +4,16 @@ import SOURCE_TYPE from "./constant/source-type.js"
 import FastPath from "./fast-path.js"
 import Parser from "./parser.js"
 
+import argumentsVisitor from "./visitor/arguments.js"
 import assignmentVisitor from "./visitor/assignment.js"
 import defaults from "./util/defaults.js"
 import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
-import identifierVisitor from "./visitor/identifier.js"
 import importExportVisitor from "./visitor/import-export.js"
 import keys from "./util/keys.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
+import temporalVisitor from "./visitor/temporal.js"
 
 function init() {
   const {
@@ -27,6 +28,7 @@ function init() {
 
   const defaultOptions = {
     __proto__: null,
+    assertTDZ: false,
     cjs: {
       cache: false,
       extensions: false,
@@ -150,25 +152,37 @@ function init() {
 
       result.changed = importExportVisitor.changed
 
-      if (importExportVisitor.addedImportExport ||
+      const {
+        addedImportExport,
+        importLocals,
+        magicString
+      } = importExportVisitor
+
+      const importLocalNames = keys(importLocals)
+      const possibleLocalIndexes = findIndexes(code, importLocalNames)
+
+      if (addedImportExport ||
           importExportVisitor.addedImportMeta) {
         sourceType = MODULE
 
-        const { assignableExports, assignableImports } = importExportVisitor
+        const { assignableExports } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
           "eval",
-          ...keys(assignableExports),
-          ...keys(assignableImports)
+          ...keys(assignableExports)
         ])
 
+        possibleIndexes.push(...possibleLocalIndexes)
+
         if (possibleIndexes.length) {
+          possibleIndexes.sort()
+
           try {
             assignmentVisitor.visit(rootPath, {
               __proto__: null,
               assignableExports,
-              assignableImports,
-              magicString: importExportVisitor.magicString,
+              importLocals,
+              magicString,
               possibleIndexes,
               runtimeName
             })
@@ -190,6 +204,17 @@ function init() {
         result.exportTemporals = importExportVisitor.exportTemporals
         result.sourceType = MODULE
 
+        if (options.assertTDZ &&
+            addedImportExport) {
+          temporalVisitor.visit(rootPath, {
+            __proto__: null,
+            importLocals,
+            magicString,
+            possibleIndexes: possibleLocalIndexes,
+            runtimeName
+          })
+        }
+
         if (options.warnings &&
             ! options.cjs.vars &&
             top.idents.indexOf("arguments") === -1) {
@@ -197,9 +222,9 @@ function init() {
 
           if (possibleIndexes.length) {
             result.warnings = []
-            identifierVisitor.visit(rootPath, {
+            argumentsVisitor.visit(rootPath, {
               __proto__: null,
-              magicString: importExportVisitor.magicString,
+              magicString,
               possibleIndexes,
               warnings: result.warnings
             })
@@ -208,7 +233,7 @@ function init() {
       }
 
       if (result.changed) {
-        result.code = importExportVisitor.magicString.toString()
+        result.code = magicString.toString()
       }
 
       return result

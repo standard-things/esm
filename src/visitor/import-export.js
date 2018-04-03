@@ -37,7 +37,7 @@ function init() {
       this.addedImportMeta = false
       this.addedIndirectEval = false
       this.assignableExports = { __proto__: null }
-      this.assignableImports = { __proto__: null }
+      this.importLocals = { __proto__: null }
       this.changed = false
       this.code = code
       this.dependencySpecifiers = { __proto__: null }
@@ -173,7 +173,7 @@ function init() {
       )
 
       hoistImports(this, node, hoistedCode)
-      addAssignableImports(this, specifierMap)
+      addImportLocals(this, specifierMap)
     }
 
     visitExportAllDeclaration(path) {
@@ -410,12 +410,12 @@ function init() {
     }
   }
 
-  function addAssignableImports(visitor, specifierMap) {
-    const { assignableImports } = visitor
+  function addImportLocals(visitor, specifierMap) {
+    const { importLocals } = visitor
 
     for (const importName in specifierMap) {
       for (const localName of specifierMap[importName]) {
-        assignableImports[localName] = true
+        importLocals[localName] = true
       }
     }
   }
