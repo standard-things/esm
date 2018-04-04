@@ -11,11 +11,13 @@ function init() {
   const errors = { __proto__: null }
   const messages = { __proto__: null }
 
-  addError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
-  addError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
-  addError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
-  addError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
-  addError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
+  addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
+  addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
+  addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
+  addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
+  addBuiltinError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
+
+  addLegacyError("MODULE_NOT_FOUND", missingCJS, ExError)
 
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
@@ -23,10 +25,14 @@ function init() {
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
-  addNodeError("MODULE_NOT_FOUND", missingCJS, ExError)
 
-  function addError(code, messageHandler, Super) {
-    errors[code] = createErrorClass(Super, code)
+  function addBuiltinError(code, messageHandler, Super) {
+    errors[code] = createBuiltinErrorClass(Super, code)
+    messages[code] = messageHandler
+  }
+
+  function addLegacyError(code, messageHandler, Super) {
+    errors[code] = createLegacyErrorClass(Super, code)
     messages[code] = messageHandler
   }
 
@@ -35,9 +41,18 @@ function init() {
     messages[code] = messageHandler
   }
 
-  function createErrorClass(Super, code) {
+  function createBuiltinErrorClass(Super, code) {
     return function BuiltinError(...args) {
       return new Super(messages[code](...args))
+    }
+  }
+
+  function createLegacyErrorClass(Super, code) {
+    return class LegacyError extends Super {
+      constructor(...args) {
+        super(messages[code](...args))
+        this.code = code
+      }
     }
   }
 

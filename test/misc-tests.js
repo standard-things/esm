@@ -62,8 +62,9 @@ function checkErrorProps(error, code, message) {
   assert.strictEqual(error.name, "Error [" + code + "]")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
 
+  const sampleError = new Error("x")
   const actual = Object.getOwnPropertyNames(error).sort()
-  const expected = Object.getOwnPropertyNames(new Error("x")).sort()
+  const expected = Object.getOwnPropertyNames(sampleError).sort()
 
   assert.deepStrictEqual(actual, expected)
   assert.deepStrictEqual(Object.keys(error), [])
@@ -73,6 +74,22 @@ function checkErrorProps(error, code, message) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+}
+
+function checkLegacyErrorProps(error, code) {
+  assert.strictEqual(error.code, code)
+  assert.strictEqual(error.name, "Error")
+  assert.strictEqual(error.toString(), "Error: " + error.message)
+
+  const sampleError = new Error("x")
+  sampleError.code = "ERR_CODE"
+
+  const actual = Object.getOwnPropertyNames(error).sort()
+  const expected = Object.getOwnPropertyNames(sampleError).sort()
+
+  assert.deepStrictEqual(actual, expected)
+  assert.deepStrictEqual(Object.keys(error), ["code"])
+  assert.deepStrictEqual(Object.getOwnPropertySymbols(error), [])
 }
 
 function getURLFromFilePath(filename) {
@@ -405,14 +422,14 @@ describe("Node rules", () => {
       require(".")
       assert.ok(false)
     } catch (e) {
-      assert.strictEqual(e.code, "MODULE_NOT_FOUND")
+      checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
     }
   })
 
   it('should not resolve non-local "." requests with `import`', () =>
     import(".")
       .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+      .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
   )
 
   it("should resolve non-local dependencies with `require`", () =>
@@ -617,7 +634,7 @@ describe("Node rules", () => {
       .map((request) =>
         import(request)
           .then(() => assert.ok(false))
-          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
       ))
   )
 
@@ -954,7 +971,7 @@ describe("spec compliance", () => {
       .map((request) =>
         import(request)
           .then(() => assert.ok(false))
-          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
       ))
   )
 
@@ -968,7 +985,7 @@ describe("spec compliance", () => {
       .map((request) =>
         import(request)
           .then(() => assert.ok(false))
-          .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
+          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
       ))
   )
 
@@ -985,7 +1002,7 @@ describe("spec compliance", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.strictEqual(Reflect.has(global, "loadCount"), false)
-            assert.strictEqual(e.code, "MODULE_NOT_FOUND")
+            checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
           })
       ))
   )
