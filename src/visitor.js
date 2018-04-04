@@ -29,6 +29,7 @@ function init() {
     object: true,
     properties: true,
     right: true,
+    test: true,
     value: true
   }
 

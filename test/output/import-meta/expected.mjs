@@ -8,3 +8,11 @@ Comment two.
 Comment four.
 */ . // Comment five.
 url
+
+if (_._.meta) {
+  // Empty block.
+}
+
+while (_._.meta) {
+  break
+}

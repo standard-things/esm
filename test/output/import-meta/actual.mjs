@@ -8,3 +8,11 @@ Comment two.
 Comment four.
 */ . // Comment five.
 url
+
+if (import.meta) {
+  // Empty block.
+}
+
+while (import.meta) {
+  break
+}
