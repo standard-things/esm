@@ -6,7 +6,7 @@ import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
-  const shadowedMap = new WeakMap
+  const shadowedMap = new Map
 
   class AssignmentVisitor extends Visitor {
     reset(rootPath, options) {

@@ -4,8 +4,8 @@ import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
-  const checkedMap = new WeakMap
-  const shadowedMap = new WeakMap
+  const checkedMap = new Map
+  const shadowedMap = new Map
 
   class TemporalVisitor extends Visitor {
     reset(rootPath, options) {
