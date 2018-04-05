@@ -29,8 +29,6 @@ function init() {
     }
 
     reset(rootPath, code, options) {
-      const { strict, top } = rootPath.stack[0]
-
       this.addedDirectEval = false
       this.addedDynamicImport = false
       this.addedImportExport = false
@@ -49,8 +47,8 @@ function init() {
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
       this.sourceType = options.sourceType
-      this.strict = strict
-      this.top = top
+      this.strict = options.strict
+      this.top = options.top
     }
 
     visitCallExpression(path) {

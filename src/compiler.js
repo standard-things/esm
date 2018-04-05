@@ -131,7 +131,7 @@ function init() {
         throw error
       }
 
-      const { top } = ast
+      const { strict, top } = ast
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
@@ -146,7 +146,9 @@ function init() {
           generateVarDeclarations: options.var,
           possibleIndexes,
           runtimeName,
-          sourceType: sourceType === SCRIPT ? SCRIPT : MODULE
+          sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
+          strict,
+          top
         })
       } catch (e) {
         e.sourceType = parserOptions.sourceType
