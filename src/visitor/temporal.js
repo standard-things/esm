@@ -4,6 +4,7 @@ import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
+  const checkedMap = new WeakMap
   const shadowedMap = new WeakMap
 
   class TemporalVisitor extends Visitor {
@@ -19,14 +20,6 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      const parent = path.getParentNode()
-
-      if (parent.type === "AssignmentExpression" &&
-          parent.left === node) {
-        this.visitChildren(path)
-        return
-      }
-
       if (this.importLocals[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         wrapInCheck(this, path)
@@ -37,10 +30,35 @@ function init() {
   }
 
   function wrapInCheck(visitor, path) {
-    const { end, start } = path.getValue()
+    let node = path.getValue()
+
+    const { name } = node
+
+    const parent = path.getParentNode(({ type }) => {
+      return type === "AssignmentExpression" ||
+        type === "CallExpression" ||
+        type === "ExpressionStatement" ||
+        type === "ReturnStatement"
+    })
+
+    if (parent) {
+      node = parent
+    }
+
+    if (node.type === "ReturnStatement") {
+      node = node.argument
+    }
+
+    if (checkedMap.has(node)) {
+      return
+    }
+
+    const { end, start } = node
+
+    checkedMap.set(node, true)
 
     visitor.magicString
-      .prependRight(start, visitor.runtimeName + ".t(")
+      .prependRight(start, visitor.runtimeName + '.t("' + name + '",')
       .prependRight(end, ")")
   }
 
