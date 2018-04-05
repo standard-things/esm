@@ -135,7 +135,10 @@ function init() {
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
+      result.ast = ast
       result.topLevelReturn = top.returnOutsideFunction
+
+      Reflect.deleteProperty(ast, "top")
 
       try {
         importExportVisitor.visit(rootPath, code, {
