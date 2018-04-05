@@ -46,7 +46,7 @@ describe("require hook", () => {
       .then((ns) => ns.default())
   )
 
-  it("should throw errors for invalid options", () =>
+  it("should error for invalid options", () =>
     import("./require-hook/invalid-options.mjs")
       .then((ns) => ns.default())
   )

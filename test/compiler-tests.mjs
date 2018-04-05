@@ -219,11 +219,11 @@ describe("compiler", () => {
       .then((ns) => ns.default())
   )
 
-  it("should not error on shorthand async function properties with reserved names", () => {
+  it("should not error for shorthand async function properties with reserved names", () => {
     Compiler.compile("({async delete(){}})")
   })
 
-  it("should not error on arrow functions with destructured arguments", () => {
+  it("should not error for arrow functions with destructured arguments", () => {
     [
       "({a=1})=>{}",
       "({a=1},{b=2})=>{}"
@@ -231,7 +231,7 @@ describe("compiler", () => {
     .forEach(Compiler.compile)
   })
 
-  it("should not error on transforms at the end of the source", () => {
+  it("should not error for transforms at the end of the source", () => {
     [
       'import{a}from"a"',
       'import"a"',
