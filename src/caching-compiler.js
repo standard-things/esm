@@ -11,6 +11,7 @@ import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isMJS from "./util/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
+import noop from "./util/noop.js"
 import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
 import { resolve } from "./safe/path.js"
@@ -61,6 +62,7 @@ function init() {
         changed: !! meta[3],
         code: null,
         dependencySpecifiers,
+        enforceTDZ: noop,
         exportNames: meta[6] || null,
         exportSpecifiers: null,
         exportStars: meta[7] || null,

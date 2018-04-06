@@ -12,6 +12,7 @@ import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
 import keys from "./util/keys.js"
+import noop from "./util/noop.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
@@ -63,6 +64,7 @@ function init() {
         changed: false,
         code,
         dependencySpecifiers: null,
+        enforceTDZ: noop,
         exportNames: null,
         exportSpecifiers: null,
         exportStars: null,
@@ -211,15 +213,20 @@ function init() {
         result.exportTemporals = importExportVisitor.exportTemporals
         result.sourceType = MODULE
 
-        if (options.assertTDZ &&
-            addedImportExport) {
-          temporalVisitor.visit(rootPath, {
-            __proto__: null,
-            importLocals,
-            magicString,
-            possibleIndexes: possibleLocalIndexes,
-            runtimeName
-          })
+        if (addedImportExport) {
+          result.enforceTDZ = () => {
+            result.enforceTDZ = noop
+
+            temporalVisitor.visit(rootPath, {
+              __proto__: null,
+              importLocals,
+              magicString,
+              possibleIndexes: possibleLocalIndexes,
+              runtimeName
+            })
+
+            result.code = magicString.toString()
+          }
         }
 
         if (options.warnings &&
