@@ -587,7 +587,6 @@ function runGetters(entry) {
 }
 
 function runSetter(entry, name, callback) {
-  const { children, compileData, getters } = entry
   const nsChanged = name === "*" && entry._changed
 
   for (const setter of entry.setters[name]) {
@@ -597,11 +596,6 @@ function runSetter(entry, name, callback) {
     if (force ||
         changed(setter, name, value)) {
       callback(setter, value)
-    } else if (value === void 0 &&
-        name in getters &&
-        setter.parent.name in children &&
-        compileData.exportTemporals.indexOf(name) !== -1) {
-      warn("WRN_TDZ_ACCESS", entry.module, name)
     }
   }
 }

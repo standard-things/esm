@@ -12,7 +12,6 @@ function init() {
   addWarning("WRN_ARGUMENTS_ACCESS", argumentsAccess)
   addWarning("WRN_NS_ASSIGNMENT", namespaceAssignment, moduleCacheKey)
   addWarning("WRN_NS_EXTENSION", namespaceExtension, moduleCacheKey)
-  addWarning("WRN_TDZ_ACCESS", temporalDeadZoneAccess, moduleCacheKey)
 
   function addWarning(code, messageHandler, cacheKeyHandler) {
     if (cacheKeyHandler) {
@@ -47,11 +46,6 @@ function init() {
   function namespaceExtension(request, name) {
     return pkgName + " cannot add property " + toStringLiteral(name, "'") +
       " to module namespace of " + getModuleURL(request)
-  }
-
-  function temporalDeadZoneAccess(request, varName) {
-    return pkgName + " detected possible temporal dead zone access of '" +
-      varName + "' in " + getModuleURL(request)
   }
 
   function warn(code, ...args) {
