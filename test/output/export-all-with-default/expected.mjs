@@ -1,1 +1,1 @@
-_.w("./abc.mjs",[["*",_.n()]]);_.d("default");
+_.w("./abc.mjs",[["*",null,_.n()]]);_.d("default");

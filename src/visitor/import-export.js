@@ -196,7 +196,7 @@ function init() {
         source.start
       ) + pad(
         this,
-        ',[["*",' + runtimeName + ".n()]]);",
+        ',[["*",null,' + runtimeName + ".n()]]);",
         source.end,
         node.end
       )
@@ -603,7 +603,10 @@ function init() {
       code +=
         // Generate plain functions, instead of arrow functions,
         // to avoid a perf hit in Node 4.
-        '["' + importName + '",function(' + valueParam + "){" +
+        '["' +
+        importName + '",["' +
+        localNames.join('","') +
+        '"],function(' + valueParam + "){" +
         // Multiple local variables become a compound assignment.
         localNames.join("=") + "=" + valueParam +
         "}]"

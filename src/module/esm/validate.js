@@ -16,10 +16,13 @@ const {
 } = errors
 
 function validate(entry) {
-  const { dependencySpecifiers, exportSpecifiers } = entry.compileData
-
+  const { compileData } = entry
+  const { dependencySpecifiers, exportSpecifiers } = compileData
   const children = { __proto__: null }
   const mod = entry.module
+  const parentName = entry.name
+
+  let isCyclical = false
 
   // Parse children.
   for (const name in dependencySpecifiers) {
@@ -59,6 +62,10 @@ function validate(entry) {
 
       continue
     }
+
+    isCyclical =
+      isCyclical ||
+      (parentName in childEntry.children)
 
     const childCompileData = childEntry.compileData
     const childExportStars = childCompileData.exportStars
@@ -114,6 +121,10 @@ function validate(entry) {
         exportSpecifiers[exportName] = 2
       }
     }
+  }
+
+  if (isCyclical) {
+    compileData.enforceTDZ()
   }
 }
 

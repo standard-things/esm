@@ -53,8 +53,8 @@ class Entry {
     this._namespace = { __proto__: null }
     // The load mode for `module.require`.
     this._requireESM = false
-    // The initialized state of variables imported by the module.
-    this.bindingsInited = false
+    // The initialized state of bindings imported by the module.
+    this.bindings = { __proto__: null }
     // The builtin module indicator.
     this.builtin = false
     // The cache file name of the module.
@@ -152,8 +152,8 @@ class Entry {
     return this
   }
 
-  addGetters(getterPairs) {
-    for (const [name, getter] of getterPairs) {
+  addGetters(argsList) {
+    for (const [name, getter] of argsList) {
       this.addGetter(name, getter)
     }
 
@@ -195,17 +195,23 @@ class Entry {
     return this
   }
 
-  addSetter(name, setter, parent) {
+  addSetter(name, localNames, setter, parent) {
     const setters = this.setters[name] || (this.setters[name] = [])
     setter.last = { __proto__: null }
+    setter.localNames = localNames
     setter.parent = parent
     GenericArray.push(setters, setter)
+
+    for (const name of localNames) {
+      this.bindings[name] = false
+    }
+
     return this
   }
 
-  addSetters(setterPairs, parent) {
-    for (const [name, setter] of setterPairs) {
-      this.addSetter(name, setter, parent)
+  addSetters(argsList, parent) {
+    for (const [name, localNames, setter] of argsList) {
+      this.addSetter(name, localNames, setter, parent)
     }
 
     return this
@@ -313,10 +319,17 @@ class Entry {
 
     runGetters(this)
     runSetters(this, (setter, value) => {
+      const { localNames, parent } = setter
+      const { bindings } = parent
+
       parentsMap || (parentsMap = { __proto__: null })
-      parentsMap[setter.parent.name] = setter.parent
+      parentsMap[parent.name] = parent
+
       setter(value, this)
-      setter.parent.bindingsInited = true
+
+      for (const name of localNames) {
+        bindings[name] = true
+      }
     })
 
     this._changed = false

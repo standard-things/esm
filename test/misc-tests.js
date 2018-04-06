@@ -37,6 +37,7 @@ const defNs = createNamespace({
 
 function checkError(error, code) {
   const message = error.message
+
   checkErrorProps(error, code, message)
   checkErrorCustomProps(error, code, message)
   checkErrorProps(error, code, message)
@@ -937,6 +938,21 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
+  it("should not throw TDZ errors for unaccessed bindings", () =>
+    [
+      "./fixture/cycle/tdz-const/a.mjs",
+      "./fixture/cycle/tdz-let/a.mjs",
+      "./fixture/cycle/tdz-class/a.mjs",
+      "./fixture/cycle/tdz-function/a.mjs"
+    ]
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(true))
+        .catch(() => assert.ok(false))
+    , Promise.resolve())
+  )
+
   it("should error when exporting duplicate local bindings", () =>
     import("./fixture/export/dup-local.mjs")
       .then(() => assert.ok(false))
@@ -1130,7 +1146,7 @@ describe("spec compliance", () => {
           "SyntaxError: HTML comments are not allowed in modules"
         ].join("\n"))
       )
-   })
+  })
 
   it("should warn when creating an `arguments` binding", () =>
     [
@@ -1153,45 +1169,6 @@ describe("spec compliance", () => {
           assert.ok(result.stderr.startsWith(warning))
         })
     }, Promise.resolve())
-  )
-
-  it("should warn for potential TDZ access of const or let bindings", () =>
-    [
-      "./fixture/cycle/tdz-const/a.mjs",
-      "./fixture/cycle/tdz-let/a.mjs"
-    ]
-    .reduce((promise, request) => {
-      const filename = path.resolve(request)
-      const url = getURLFromFilePath(filename)
-      const warning = getWarning(pkgName + " detected possible temporal dead zone access of 'a' in %s", url)
-
-      return promise
-        .then(() => {
-          mockIo.start()
-          return import(filename)
-            .then(() => {
-              const result = mockIo.end()
-
-              assert.strictEqual(result.stdout, "")
-              assert.ok(result.stderr.startsWith(warning))
-            })
-        })
-    }, Promise.resolve())
-  )
-
-  it("should not warn for potential TDZ access of class or function bindings", () =>
-    [
-      "./fixture/cycle/tdz-class/a.mjs",
-      "./fixture/cycle/tdz-function/a.mjs"
-    ]
-    .reduce((promise, request) =>
-      promise
-        .then(() => {
-          mockIo.start()
-          return import(request)
-            .then(() => assert.deepStrictEqual(mockIo.end(), { stderr: "", stdout: "" }))
-        })
-    , Promise.resolve())
   )
 
   it("should not error accessing `arguments` in a function", () =>

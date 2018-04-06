@@ -30,8 +30,14 @@ const indirectEval = __external__.eval
 const Runtime = {
   __proto__: null,
 
-  assertTDZ(value) {
-    return value
+  assertTDZ(name, value) {
+    if (this.entry.bindings[name]) {
+      return value
+    }
+
+    const error = new ReferenceError(name + " is not defined")
+    Error.captureStackTrace(error, Runtime.assertTDZ)
+    throw error
   },
 
   compileEval(content) {
@@ -122,8 +128,8 @@ const Runtime = {
   // Register getter functions for local variables in the scope of an export
   // statement. Pass true as the second argument to indicate that the getter
   // functions always return the same values.
-  export(getterPairs) {
-    this.entry.addGetters(getterPairs)
+  export(getterArgsList) {
+    this.entry.addGetters(getterArgsList)
   },
 
   globalEval(content) {
@@ -142,18 +148,18 @@ const Runtime = {
       setImmediate(() => {
         const { entry } = this
 
-        const setterPairs = [["*", createSetter("import", (value, childEntry) => {
+        const setterArgsList = [["*", null, createSetter("import", (value, childEntry) => {
           if (childEntry._loaded === 1) {
             resolve(value)
           }
         })]]
 
         if (request in builtinEntries) {
-          return watchBuiltin(entry, request, setterPairs)
+          return watchBuiltin(entry, request, setterArgsList)
         }
 
         try {
-          watchImport(entry, request, setterPairs, loadESM)
+          watchImport(entry, request, setterArgsList, loadESM)
         } catch (e) {
           reject(e)
         }
@@ -193,12 +199,12 @@ const Runtime = {
     return valueToPassThrough
   },
 
-  watch(request, setterPairs) {
+  watch(request, setterArgsList) {
     const { entry } = this
 
     return request in builtinEntries
-      ? watchBuiltin(entry, request, setterPairs)
-      : watchImport(entry, request, setterPairs, _loadESM)
+      ? watchBuiltin(entry, request, setterArgsList)
+      : watchImport(entry, request, setterArgsList, _loadESM)
   }
 }
 
@@ -268,15 +274,15 @@ function runESM(entry, moduleWrapper) {
   return result
 }
 
-function watchBuiltin(entry, request, setterPairs) {
+function watchBuiltin(entry, request, setterArgsList) {
   entry.module.require(request)
 
   builtinEntries[request]
-    .addSetters(setterPairs, entry)
+    .addSetters(setterArgsList, entry)
     .update()
 }
 
-function watchImport(entry, request, setterPairs, loader) {
+function watchImport(entry, request, setterArgsList, loader) {
   const { moduleState } = shared
 
   moduleState.passthru = true
@@ -296,7 +302,7 @@ function watchImport(entry, request, setterPairs, loader) {
         throw ERR_INVALID_ESM_FILE_EXTENSION(childMod)
       }
 
-      childEntry.addSetters(setterPairs, entry)
+      childEntry.addSetters(setterArgsList, entry)
     })
   } finally {
     moduleState.passthru = false

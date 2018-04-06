@@ -1,4 +1,4 @@
-let assert;_.w("assert",[["default",function(v){assert=v}]]);
+let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
 
 _.d(() => {
   const that = (function () {
