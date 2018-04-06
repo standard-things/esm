@@ -2,6 +2,7 @@ import ENV from "./constant/env.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import FastPath from "./fast-path.js"
+import MagicString from "./magic-string.js"
 import Parser from "./parser.js"
 
 import argumentsVisitor from "./visitor/arguments.js"
@@ -239,7 +240,7 @@ function init() {
       }
 
       if (result.changed) {
-        result.code = magicString.toString()
+        setDeferred(result, "code", () => magicString.toString())
       }
 
       return result
