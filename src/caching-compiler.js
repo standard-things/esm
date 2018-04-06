@@ -130,25 +130,19 @@ function init() {
   }
 
   function compileAndWrite(entry, code, options) {
+    const { cachePath } = entry.package
     const result = compileAndCache(entry, code, options)
 
-    if (! result.changed) {
+    if (! cachePath ||
+        ! result.changed) {
       return result
-    }
-
-    const { cachePath } = entry.package
-
-    if (cachePath) {
-      // Add "main" to enable the `readFileFast` fast path of
-      // `process.binding("fs").internalModuleReadJSON`.
-      result.code = '"main";' + result.code
     }
 
     const pendingWrites =
       shared.pendingWrites[cachePath] ||
       (shared.pendingWrites[cachePath] = { __proto__: null })
 
-    pendingWrites[entry.cacheName] = result.code
+    pendingWrites[entry.cacheName] = entry
 
     return result
   }
@@ -325,12 +319,16 @@ function init() {
           continue
         }
 
-        const contents = pendingWrites[cachePath]
+        const entries = pendingWrites[cachePath]
 
-        for (const cacheName in contents) {
-          const content = contents[cacheName]
+        for (const cacheName in entries) {
+          const entry = entries[cacheName]
 
-          if (writeFile(resolve(cachePath, cacheName), content)) {
+          // Add "main" to enable the `readFileFast` fast path of
+          // `process.binding("fs").internalModuleReadJSON`.
+          const code = '"main";' + entry.compileData.code
+
+          if (writeFile(resolve(cachePath, cacheName), code)) {
             removeExpired(cachePath, cacheName)
           }
         }
