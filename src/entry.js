@@ -53,6 +53,8 @@ class Entry {
     this._namespace = { __proto__: null }
     // The load mode for `module.require`.
     this._requireESM = false
+    // The initialized state of variables imported by the module.
+    this.bindingsInited = false
     // The builtin module indicator.
     this.builtin = false
     // The cache file name of the module.
@@ -314,6 +316,7 @@ class Entry {
       parentsMap || (parentsMap = { __proto__: null })
       parentsMap[setter.parent.name] = setter.parent
       setter(value, this)
+      setter.parent.bindingsInited = true
     })
 
     this._changed = false
