@@ -211,22 +211,16 @@ function init() {
     shared.module.safeUtil.inspect.custom
   )
 
-  setDeferred(utilBinding, "arrowSymbol", () => {
-    return satisfies(shared.module.safeProcess.version, "<7.0.0")
-      ? "node:arrowMessage"
-      : shared.module.binding.util.arrow_message_private_symbol
-  })
-
-  setDeferred(utilBinding, "decoratedSymbol", () => {
-    return satisfies(shared.module.safeProcess.version, "<7.0.0")
+  setDeferred(utilBinding, "errorDecoratedSymbol", () =>
+    satisfies(shared.module.safeProcess.version, "<7")
       ? "node:decorated"
       : shared.module.binding.util.decorated_private_symbol
-  })
+  )
 
   setDeferred(utilBinding, "hiddenKeyType", () =>
-    satisfies(shared.module.safeProcess.version, "<7.0.0")
+    satisfies(shared.module.safeProcess.version, "<7")
       ? "string"
-      : typeof utilBinding.arrowSymbol
+      : typeof utilBinding.errorDecoratedSymbol
   )
 
   return shared

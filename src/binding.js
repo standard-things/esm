@@ -35,7 +35,6 @@ function init() {
       "callAndPauseOnStart"
     ],
     util: [
-      "arrow_message_private_symbol",
       "decorated_private_symbol",
       "getProxyDetails",
       "safeGetenv",
