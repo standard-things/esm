@@ -11,6 +11,7 @@ import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
 import keys from "./util/keys.js"
+import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
 import temporalVisitor from "./visitor/temporal.js"
@@ -132,18 +133,19 @@ function init() {
       }
 
       const { strict, top } = ast
+      const magicString = new MagicString(code)
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
-      result.ast = ast
-      result.topLevelReturn = top.returnOutsideFunction
-
       Reflect.deleteProperty(ast, "top")
+
+      result.topLevelReturn = top.returnOutsideFunction
 
       try {
         importExportVisitor.visit(rootPath, code, {
           __proto__: null,
           generateVarDeclarations: options.var,
+          magicString,
           possibleIndexes,
           runtimeName,
           sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
@@ -159,8 +161,7 @@ function init() {
 
       const {
         addedImportExport,
-        importLocals,
-        magicString
+        importLocals
       } = importExportVisitor
 
       const importLocalNames = keys(importLocals)

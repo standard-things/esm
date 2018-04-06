@@ -1,6 +1,5 @@
 import SOURCE_TYPE from "../constant/source-type.js"
 
-import MagicString from "../magic-string.js"
 import Visitor from "../visitor.js"
 
 import encodeId from "../util/encode-id.js"
@@ -43,7 +42,7 @@ function init() {
       this.exportStars = []
       this.exportTemporals = []
       this.generateVarDeclarations = options.generateVarDeclarations
-      this.magicString = new MagicString(code)
+      this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
       this.sourceType = options.sourceType
