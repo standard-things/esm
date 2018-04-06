@@ -1,7 +1,6 @@
 import ESM from "./constant/esm.js"
 
 import encodeId from "./util/encode-id.js"
-import satisfies from "./util/satisfies.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
@@ -191,9 +190,11 @@ function init() {
     return toString.call(proxy) === "[object Function]"
   })
 
-  setDeferred(support, "replShowProxy", () =>
-    satisfies(shared.module.safeProcess.version, ">=10")
-  )
+  setDeferred(support, "replShowProxy", () => {
+    const { safeProcess, utilSatisfies } = shared.module
+
+    return utilSatisfies(safeProcess.version, ">=10")
+  })
 
   setDeferred(support, "safeGetEnv", () =>
     typeof shared.module.binding.util.safeGetenv === "function"
@@ -211,17 +212,21 @@ function init() {
     shared.module.safeUtil.inspect.custom
   )
 
-  setDeferred(utilBinding, "errorDecoratedSymbol", () =>
-    satisfies(shared.module.safeProcess.version, "<7")
-      ? "node:decorated"
-      : shared.module.binding.util.decorated_private_symbol
-  )
+  setDeferred(utilBinding, "errorDecoratedSymbol", () => {
+    const { binding, safeProcess, utilSatisfies } = shared.module
 
-  setDeferred(utilBinding, "hiddenKeyType", () =>
-    satisfies(shared.module.safeProcess.version, "<7")
+    return utilSatisfies(safeProcess.version, "<7")
+      ? "node:decorated"
+      : binding.util.decorated_private_symbol
+  })
+
+  setDeferred(utilBinding, "hiddenKeyType", () => {
+    const { safeProcess, utilSatisfies } = shared.module
+
+    return utilSatisfies(safeProcess.version, "<7")
       ? "string"
       : typeof utilBinding.errorDecoratedSymbol
-  )
+  })
 
   return shared
 }
