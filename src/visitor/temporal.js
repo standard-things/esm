@@ -53,13 +53,11 @@ function init() {
       return
     }
 
-    const { end, start } = node
-
     checkedMap.set(node, true)
 
     visitor.magicString
-      .prependRight(start, visitor.runtimeName + '.t("' + name + '",')
-      .prependRight(end, ")")
+      .prependRight(node.start, visitor.runtimeName + '.t("' + name + '",')
+      .prependRight(node.end, ")")
   }
 
   return new TemporalVisitor
