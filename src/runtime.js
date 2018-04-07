@@ -20,7 +20,8 @@ const {
 } = ENTRY
 
 const {
-  ERR_INVALID_ESM_FILE_EXTENSION
+  ERR_INVALID_ESM_FILE_EXTENSION,
+  ERR_UNDEFINED_IDENTIFIER
 } = errors
 
 const ExPromise = __external__.Promise
@@ -35,7 +36,7 @@ const Runtime = {
       return value
     }
 
-    const error = new ReferenceError(name + " is not defined")
+    const error = new ERR_UNDEFINED_IDENTIFIER(name)
     Error.captureStackTrace(error, Runtime.assertTDZ)
     throw error
   },

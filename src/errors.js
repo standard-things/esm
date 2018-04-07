@@ -5,6 +5,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 
 function init() {
   const ExError = __external__.Error
+  const ExReferenceError = __external__.ReferenceError
   const ExSyntaxError = __external__.SyntaxError
   const ExTypeError = __external__.TypeError
 
@@ -15,6 +16,7 @@ function init() {
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
   addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
   addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
+  addBuiltinError("ERR_UNDEFINED_IDENTIFIER", undefinedIdentifier, ExReferenceError)
   addBuiltinError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 
   addLegacyError("MODULE_NOT_FOUND", missingCJS, ExError)
@@ -169,6 +171,10 @@ function init() {
 
   function unknownPkgOption(optionName) {
     return "Unknown ESM option: " + optionName
+  }
+
+  function undefinedIdentifier(identName) {
+    return identName + " is not defined"
   }
 
   return errors
