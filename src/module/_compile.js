@@ -19,6 +19,7 @@ import isMJS from "../util/is-mjs.js"
 import isObjectEmpty from "../util/is-object-empty.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
+import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
@@ -150,6 +151,7 @@ function tryCompileCached(caller, entry, content, filename) {
       throw e
     }
 
+    content = () => readSourceCode(filename)
     throw maskStackTrace(e, content, filename, isESM)
   } finally {
     if (noDepth) {
@@ -263,6 +265,10 @@ function maybeSourceMap(entry, content, filename) {
 
 function readCachedCode(filename) {
   return readFileFast(filename, "utf8")
+}
+
+function readSourceCode(filename) {
+  return readFile(filename, "utf8")
 }
 
 function tryCompileCode(caller, entry, content, filename, options) {
