@@ -231,7 +231,7 @@ function init() {
 
         if (options.warnings &&
             ! options.cjs.vars &&
-            top.idents.indexOf("arguments") === -1) {
+            top.identifiers.indexOf("arguments") === -1) {
           const possibleIndexes = findIndexes(code, ["arguments"])
 
           if (possibleIndexes.length) {

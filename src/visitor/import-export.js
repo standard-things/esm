@@ -229,7 +229,9 @@ function init() {
           (id && type === "ClassDeclaration")) {
         // Support exporting default class and function declarations:
         // export default function named() {}
-        const name = id ? id.name : safeName(ANON_NAME, this.top.idents)
+        const name = id
+          ? id.name
+          : safeName(ANON_NAME, this.top.identifiers)
 
         if (! id) {
           // Convert anonymous functions to named functions so they are hoisted.
@@ -328,13 +330,13 @@ function init() {
       // Support exporting specifiers:
       // export { name1, name2, ..., nameN }
       if (node.source === null) {
-        const { idents } = this.top
+        const { identifiers } = this.top
         const pairs = []
 
         for (const specifier of specifiers) {
           const localName = specifier.local.name
 
-          if (idents.indexOf(localName) === -1) {
+          if (identifiers.indexOf(localName) === -1) {
             throw new errors.SyntaxError(
               this.magicString.original,
               specifier.start,

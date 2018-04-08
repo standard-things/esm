@@ -18,7 +18,7 @@ function init() {
 
     const { body } = node
     const exported = { __proto__: null }
-    const idents = []
+    const identifiers = []
     const temporals = []
 
     const top = {
@@ -27,7 +27,7 @@ function init() {
       hoistedExportsString: "",
       hoistedImportsString: "",
       hoistedPrefixString: "",
-      idents,
+      identifiers,
       insertCharIndex: node.start,
       insertNodeIndex: 0,
       returnOutsideFunction: false,
@@ -74,7 +74,7 @@ function init() {
           const names = getNamesFromPattern(decl.id)
 
           for (const name of names) {
-            idents.push(name)
+            identifiers.push(name)
 
             if (isTemporal) {
               temporals.push(name)
@@ -83,10 +83,10 @@ function init() {
         }
       } else if (type === "ClassDeclaration" ||
           type === "FunctionDeclaration") {
-        idents.push(object.id.name)
+        identifiers.push(object.id.name)
       } else if (type === "ImportDeclaration") {
         for (const specifier of stmt.specifiers) {
-          idents.push(specifier.local.name)
+          identifiers.push(specifier.local.name)
         }
       }
 
