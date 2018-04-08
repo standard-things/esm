@@ -40,7 +40,6 @@ function init() {
       this.dependencySpecifiers = { __proto__: null }
       this.exportNames = []
       this.exportStars = []
-      this.exportTemporals = []
       this.generateVarDeclarations = options.generateVarDeclarations
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
@@ -274,9 +273,6 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
-      const { exportTemporals } = this
-      const { temporals } = this.top
-
       const node = path.getValue()
       const { declaration } = node
 
@@ -299,10 +295,6 @@ function init() {
 
             for (const name of names) {
               pairs.push([name, name])
-
-              if (temporals.indexOf(name) !== -1) {
-                exportTemporals.push(name)
-              }
             }
           }
         }
@@ -342,10 +334,6 @@ function init() {
               specifier.start,
               "Export '" + localName + "' is not defined in module"
             )
-          }
-
-          if (temporals.indexOf(localName) !== -1) {
-            exportTemporals.push(localName)
           }
 
           pairs.push([specifier.exported.name, localName])

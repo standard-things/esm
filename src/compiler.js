@@ -68,7 +68,6 @@ function init() {
         exportNames: null,
         exportSpecifiers: null,
         exportStars: null,
-        exportTemporals: null,
         scriptData: null,
         sourceType: SCRIPT,
         topLevelReturn: false,
@@ -210,7 +209,6 @@ function init() {
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
         result.exportNames = importExportVisitor.exportNames
         result.exportStars = importExportVisitor.exportStars
-        result.exportTemporals = importExportVisitor.exportTemporals
         result.sourceType = MODULE
 
         if (addedImportExport) {

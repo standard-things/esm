@@ -66,11 +66,10 @@ function init() {
         exportNames: meta[6] || null,
         exportSpecifiers: null,
         exportStars: meta[7] || null,
-        exportTemporals: meta[8] || null,
         scriptData: null,
         sourceType: +meta[2] || SCRIPT,
         topLevelReturn: !! meta[4],
-        warnings: meta[9] || null
+        warnings: meta[8] || null
       }
 
       if (result.sourceType === MODULE) {
@@ -299,8 +298,7 @@ function init() {
                 topLevelReturn,
                 compileData.dependencySpecifiers || 0,
                 compileData.exportNames || 0,
-                compileData.exportStars || 0,
-                compileData.exportTemporals || 0
+                compileData.exportStars || 0
               )
 
               if (warnings) {

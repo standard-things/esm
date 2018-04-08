@@ -19,7 +19,6 @@ function init() {
     const { body } = node
     const exported = { __proto__: null }
     const identifiers = []
-    const temporals = []
 
     const top = {
       __proto__: null,
@@ -30,8 +29,7 @@ function init() {
       identifiers,
       insertCharIndex: node.start,
       insertNodeIndex: 0,
-      returnOutsideFunction: false,
-      temporals
+      returnOutsideFunction: false
     }
 
     let inited = false
@@ -67,18 +65,11 @@ function init() {
       }
 
       if (type === "VariableDeclaration") {
-        const { kind } = object
-        const isTemporal = kind !== "var"
-
         for (const decl of object.declarations) {
           const names = getNamesFromPattern(decl.id)
 
           for (const name of names) {
             identifiers.push(name)
-
-            if (isTemporal) {
-              temporals.push(name)
-            }
           }
         }
       } else if (type === "ClassDeclaration" ||
