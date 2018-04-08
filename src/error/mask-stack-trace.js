@@ -18,10 +18,10 @@ const {
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
 const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
 
-const arrowRegExp = /^(.+\n)( *\^+\n)(\n)?/m
-const atNameRegExp = /\((.+?)(?=:\d+)/g
+const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
+const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
 const blankRegExp = /^\s*$/
-const headerRegExp = /^(.+?)(?=:\d+\n)/
+const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
   if (shared.package.default.options.debug) {
@@ -92,8 +92,12 @@ function maskEngineStack(stack, content, filename) {
     return stack
   }
 
-  return stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
-    const lineNum = +parts[1]
+  const lineNum = +parts[1]
+
+  let arrowFound = false
+
+  stack = stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
+    arrowFound = true
 
     if (snippet.indexOf(ZWJ) !== -1) {
       if (typeof content === "function") {
@@ -106,23 +110,45 @@ function maskEngineStack(stack, content, filename) {
 
       const lines = content.split("\n")
       const line = lines[lineNum - 1] || ""
+
       return line + (line ? "\n\n" : "\n")
     }
 
-    if (lineNum !== 1) {
-      return snippet + arrow + newline
+    if (lineNum === 1) {
+      const [prefix] = Module.wrapper
+
+      if (snippet.startsWith(prefix)) {
+        const { length } = prefix
+
+        snippet = snippet.slice(length)
+        arrow = arrow.slice(length)
+      }
     }
 
-    const [prefix] = Module.wrapper
+    return snippet + "\n" + arrow + "\n" + newline
+  })
 
-    if (snippet.startsWith(prefix)) {
-      const { length } = prefix
+  if (arrowFound) {
+    return stack
+  }
 
-      snippet = snippet.slice(length)
-      arrow = arrow.slice(length)
+  if (typeof content === "function") {
+    content = content(filename)
+  }
+
+  if (typeof content !== "string") {
+    return stack
+  }
+
+  return stack.replace(headerRegExp, (match) => {
+    const lines = content.split("\n")
+    const line = lines[lineNum - 1] || ""
+
+    if (line) {
+      match += "\n" + line + "\n"
     }
 
-    return snippet + arrow + newline
+    return match
   })
 }
 
@@ -188,12 +214,16 @@ function maskParserStack(stack, content, filename) {
 }
 
 function fileNamesToURLs(stack) {
-  stack = stack.replace(headerRegExp, resolveURL)
+  stack = stack.replace(headerRegExp, replaceHeader)
   return stack.replace(atNameRegExp, replaceAtName)
 }
 
-function replaceAtName(match, name) {
-  return "(" + resolveURL(name)
+function replaceAtName(match, prelude, name) {
+  return prelude + resolveURL(name)
+}
+
+function replaceHeader(match, name, postlude) {
+  return resolveURL(name) + postlude
 }
 
 function resolveURL(name) {
