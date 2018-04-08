@@ -34,13 +34,13 @@ function init() {
       this.addedImportMeta = false
       this.addedIndirectEval = false
       this.assignableExports = { __proto__: null }
-      this.importLocals = { __proto__: null }
       this.changed = false
       this.code = code
       this.dependencySpecifiers = { __proto__: null }
       this.exportNames = []
       this.exportStars = []
       this.generateVarDeclarations = options.generateVarDeclarations
+      this.importLocals = { __proto__: null }
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
