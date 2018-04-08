@@ -196,10 +196,14 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parent) {
-    const setters = this.setters[name] || (this.setters[name] = [])
+    const setters =
+      this.setters[name] ||
+      (this.setters[name] = [])
+
     setter.last = { __proto__: null }
     setter.localNames = localNames
     setter.parent = parent
+
     GenericArray.push(setters, setter)
 
     for (const name of localNames) {
