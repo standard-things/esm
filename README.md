@@ -20,6 +20,9 @@ There are two ways to enable `esm`.
 
 1. Enable `esm` for packages:
 
+   The first file used as your entrypoint must `require` ESM using `require("esm")`, but then any
+   of your code imported from then on down can use any import/export style supported by ESM.
+
     **index.js**
     ```js
     // Set options as a parameter, environment variable, or rc file.
@@ -28,8 +31,12 @@ There are two ways to enable `esm`.
     ```
     **main.js**
     ```js
-    // Put ESM code here.
-    export {}
+    // Any import/export style is now supported in your code
+    import {...} from '...'
+    const some_import = require(...)
+    ...
+
+    export {...}
     ```
     :bulb: This is automagically done by [`create-esm`](https://github.com/standard-things/create-esm).
 
