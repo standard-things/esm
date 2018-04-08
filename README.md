@@ -38,7 +38,7 @@ There are two ways to enable `esm`.
 
     export {...}
     ```
-    :bulb: This is automagically done by [`create-esm`](https://github.com/standard-things/create-esm).
+    :bulb: A working `index.js` is automagically created if you use [`create-esm`](https://github.com/standard-things/create-esm).
 
 2. Enable `esm` for local runs:
 
