@@ -24,7 +24,12 @@ There are two ways to enable `esm`.
     ```js
     // Set options as a parameter, environment variable, or rc file.
     require = require("esm")(module/*, options*/)
-    module.exports = require("./main.js").default
+    module.exports = require("./main.js")
+    ```
+    **main.js**
+    ```js
+    // Put ESM code here.
+    export {}
     ```
     :bulb: This is automagically done by [`create-esm`](https://github.com/standard-things/create-esm).
 
