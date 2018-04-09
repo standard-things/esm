@@ -30,23 +30,51 @@ function init() {
   }
 
   function wrapInCheck(visitor, path) {
+    let key
     let node = path.getValue()
+    let useParent = false
 
     const { name } = node
 
     const parent = path.getParentNode(({ type }) => {
-      return type === "AssignmentExpression" ||
-        type === "CallExpression" ||
-        type === "ExpressionStatement" ||
-        type === "ReturnStatement"
+      if (type === "ForStatement") {
+        return true
+      }
+
+      if (type === "ReturnStatement") {
+        useParent = true
+        key = "argument"
+        return true
+      }
+
+      if (type === "SwitchStatement") {
+        useParent = true
+        key = "discriminant"
+        return true
+      }
+
+      if (type === "DoWhileStatement" ||
+          type === "IfStatement" ||
+          type === "WhileStatement") {
+        useParent = true
+        key = "test"
+        return true
+      }
+
+      if (type === "AssignmentExpression" ||
+          type === "CallExpression" ||
+          type === "ExpressionStatement") {
+        useParent = true
+        return true
+      }
     })
 
-    if (parent) {
+    if (useParent) {
       node = parent
-    }
 
-    if (node.type === "ReturnStatement") {
-      node = node.argument
+      if (key) {
+        node = node[key]
+      }
     }
 
     if (checkedMap.has(node)) {
