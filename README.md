@@ -20,8 +20,7 @@ There are two ways to enable `esm`.
 
 1. Enable `esm` for packages:
 
-   The first file used as your entrypoint must `require` ESM using `require("esm")`, but then any
-   of your code imported from then on down can use any import/export style supported by ESM.
+   Use `esm` to load the main ES module and export it as CommonJS.
 
     **index.js**
     ```js
@@ -31,14 +30,10 @@ There are two ways to enable `esm`.
     ```
     **main.js**
     ```js
-    // Any import/export style is now supported in your code
-    import {...} from '...'
-    const some_import = require(...)
-    ...
-
-    export {...}
+    // ESM syntax is supported.
+    export {}
     ```
-    :bulb: A working `index.js` is automagically created if you use [`create-esm`](https://github.com/standard-things/create-esm).
+    :bulb: These files are automagically created with [`create-esm`](https://github.com/standard-things/create-esm).
 
 2. Enable `esm` for local runs:
 
