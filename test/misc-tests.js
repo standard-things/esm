@@ -149,13 +149,11 @@ describe("integration", () => {
 })
 
 describe("package.json", () => {
-  /*
-  it("should not be enabled for nested node_modules", () =>
-    import("disabled")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.ok(e instanceof SyntaxError))
+  it("should be enabled for third-party packages", () =>
+    import("third-party")
+      .then(() => assert.ok(true))
+      .catch(() => assert.ok(false))
   )
-  */
 
   it("should support .esmrc options", () =>
     [
