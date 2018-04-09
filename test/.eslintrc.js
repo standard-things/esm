@@ -9,6 +9,7 @@ module.exports = {
     "import/no-unresolved": "off",
     "import/prefer-default-export": "off",
     "no-console": "off",
+    "no-constant-condition": "off",
     "no-empty": "off",
     "no-global-assign": "off",
     "no-undef": "off",

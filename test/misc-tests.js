@@ -940,16 +940,39 @@ describe("spec compliance", () => {
 
   it("should not throw TDZ errors for unaccessed bindings", () =>
     [
-      "./fixture/cycle/tdz-const/a.mjs",
-      "./fixture/cycle/tdz-let/a.mjs",
-      "./fixture/cycle/tdz-class/a.mjs",
-      "./fixture/cycle/tdz-function/a.mjs"
+      "./fixture/cycle/tdz/no-access/class/a.mjs",
+      "./fixture/cycle/tdz/no-access/const/a.mjs",
+      "./fixture/cycle/tdz/no-access/function/a.mjs",
+      "./fixture/cycle/tdz/no-access/let/a.mjs"
     ]
     .reduce((promise, request) =>
       promise
         .then(() => import(request))
         .then(() => assert.ok(true))
         .catch(() => assert.ok(false))
+    , Promise.resolve())
+  )
+
+  it("should not throw TDZ errors for accessed function declaration bindings", () =>
+    import("./fixture/cycle/tdz/access/function/a.mjs")
+      .then(() => assert.ok(true))
+      .catch(() => assert.ok(false))
+  )
+
+  it("should throw TDZ errors for accessed bindings", () =>
+    [
+      "./fixture/cycle/tdz/access/class/a.mjs",
+      "./fixture/cycle/tdz/access/const/a.mjs",
+      "./fixture/cycle/tdz/access/let/a.mjs"
+    ]
+    .reduce((promise, request) =>
+      promise
+        .then(() => import(request))
+        .then(() => assert.ok(false))
+        .catch((e) => {
+          assert.ok(e instanceof ReferenceError)
+          assert.ok(e.message.includes(" is not defined"))
+        })
     , Promise.resolve())
   )
 
