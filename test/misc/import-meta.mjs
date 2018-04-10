@@ -2,11 +2,14 @@ import assert from "assert"
 import createMeta from "../create-meta.js"
 import path from "path"
 import colon1 from "../fixture/with%3Acolon.mjs"
-import colon2 from "../fixture/with%3Acolon.mjs?a#a"
+import colon2 from "../fixture/with%3Acolon.mjs?"
+import colon3 from "../fixture/with%3Acolon.mjs?a#a"
 import pound1 from "../fixture/with%23pound.mjs"
-import pound2 from "../fixture/with%23pound.mjs?b#b"
+import pound2 from "../fixture/with%23pound.mjs?#"
+import pound3 from "../fixture/with%23pound.mjs?b#b"
 import percent1 from "../fixture/with%2520percent.mjs"
-import percent2 from "../fixture/with%2520percent.mjs?c#c"
+import percent2 from "../fixture/with%2520percent.mjs#c"
+import percent3 from "../fixture/with%2520percent.mjs?c#c"
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
@@ -24,26 +27,39 @@ const percentPath = path.resolve(testPath, "fixture/with%2520percent.mjs")
 const percentURL = testURL + "/fixture/with%2520percent.mjs"
 
 export default () => {
-  [colon1, colon2, pound1, pound2, percent1, percent2]
-    .forEach((def) => {
-      assert.strictEqual(Reflect.getPrototypeOf(def), null)
-    })
+  [
+    colon1, colon2, colon3,
+    pound1, pound2, pound3,
+    percent1, percent2, percent3
+  ]
+  .forEach((def) => {
+    assert.strictEqual(Reflect.getPrototypeOf(def), null)
+  })
 
   let meta = createMeta({ url: colonURL })
   assert.deepStrictEqual(colon1, meta)
 
-  meta = createMeta({ url: colonURL + "?a#a" })
+  meta = createMeta({ url: colonURL + "?" })
   assert.deepStrictEqual(colon2, meta)
+
+  meta = createMeta({ url: colonURL + "?a" })
+  assert.deepStrictEqual(colon3, meta)
 
   meta = createMeta({ url: poundURL })
   assert.deepStrictEqual(pound1, meta)
 
-  meta = createMeta({ url: poundURL + "?b#b" })
+  meta = createMeta({ url: poundURL + "?" })
   assert.deepStrictEqual(pound2, meta)
+
+  meta = createMeta({ url: poundURL + "?b" })
+  assert.deepStrictEqual(pound3, meta)
 
   meta = createMeta({ url: percentURL })
   assert.deepStrictEqual(percent1, meta)
 
-  meta = createMeta({ url: percentURL + "?c#c" })
+  meta = createMeta({ url: percentURL })
   assert.deepStrictEqual(percent2, meta)
+
+  meta = createMeta({ url: percentURL + "?c" })
+  assert.deepStrictEqual(percent3, meta)
 }

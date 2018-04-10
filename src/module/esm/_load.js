@@ -7,7 +7,8 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../_load.js"
-import getQueryHash from "../../util/get-query-hash.js"
+import getHash from "../../util/get-hash.js"
+import getQuery from "../../util/get-query.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import isError from "../../util/is-error.js"
 import isMJS from "../../util/is-mjs.js"
@@ -30,7 +31,8 @@ function load(request, parent, isMain, preload) {
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const queryHash = getQueryHash(request)
+  const requestHash = getHash(request)
+  const requestQuery = getQuery(request)
 
   let filename
 
@@ -42,7 +44,7 @@ function load(request, parent, isMain, preload) {
     filename = resolveFilename(request, parent, isMain)
   }
 
-  request = filename + queryHash
+  request = filename + requestQuery + requestHash
 
   const fromPath = dirname(filename)
   const pkg = Package.get(fromPath)
@@ -114,7 +116,7 @@ function load(request, parent, isMain, preload) {
     }
 
     if (! entry.url) {
-      entry.url = getURLFromFilePath(filename) + queryHash
+      entry.url = getURLFromFilePath(filename) + requestQuery
     }
 
     try {
