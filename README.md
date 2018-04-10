@@ -197,7 +197,8 @@ Tips
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
   [`tape`](https://github.com/substack/tape#preloading-modules),
-  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
+  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options),
+  [`nodemon`](https://github.com/remy/nodemon), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
