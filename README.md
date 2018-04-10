@@ -9,9 +9,15 @@ for all the details.
 Install
 ---
 
-Run `npx create-esm` or `yarn create esm`.
+* __New projects__
 
-:bulb: Use the `-y` flag to answer “yes” to all prompts.
+  Run `npx create-esm` or `yarn create esm`.
+
+  :bulb: Use the `-y` flag to answer “yes” to all prompts.
+
+* __Existing projects__
+
+  Run `npm i esm` or `yarn add esm`.
 
 Getting started
 ---
@@ -22,13 +28,13 @@ There are two ways to enable `esm`.
 
    Use `esm` to load the main ES module and export it as CommonJS.
 
-    **index.js**
+    __index.js__
     ```js
     // Set options as a parameter, environment variable, or rc file.
     require = require("esm")(module/*, options*/)
     module.exports = require("./main.js")
     ```
-    **main.js**
+    __main.js__
     ```js
     // ESM syntax is supported.
     export {}
