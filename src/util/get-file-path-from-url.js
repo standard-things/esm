@@ -1,7 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
-import decodeURIComponent from "../util/decode-uri-component.js"
+import decodeURIComponent from "./decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
 import hasEncodedSlash from "./has-encoded-slash.js"
 import { normalize } from "../safe/path.js"

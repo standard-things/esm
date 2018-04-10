@@ -4,7 +4,7 @@
 
 import CHAR_CODE from "../constant/char-code.js"
 
-import encodeURI from "../util/encode-uri.js"
+import encodeURI from "./encode-uri.js"
 import normalize from "../path/normalize.js"
 
 const {
