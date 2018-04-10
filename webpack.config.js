@@ -47,7 +47,8 @@ const config = {
     filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    path: path.resolve("build")
+    path: path.resolve("build"),
+    pathinfo: false
   },
   mode: isProd ? "production" : "development",
   module: {
