@@ -191,14 +191,14 @@ Tips
 ---
 * Load `esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
-* Load `esm` with the “require” option of
+* Load `esm` with the “require” option of<br>
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
+  [`nodemon`](https://github.com/remy/nodemon),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
   [`tape`](https://github.com/substack/tape#preloading-modules),
-  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options),
-  [`nodemon`](https://github.com/remy/nodemon), and
+  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
