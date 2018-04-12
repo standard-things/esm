@@ -1,7 +1,7 @@
 {
   "name": "esm",
   "version": "3.0.17",
-  "description": "Tomorrow's ESM today!",
+  "description": "Tomorrow's ECMAScript modules today!",
   "keywords": "commonjs, ecmascript, export, import, modules, node, require",
   "repository": "standard-things/esm",
   "license": "MIT",
