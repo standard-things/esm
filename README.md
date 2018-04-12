@@ -73,7 +73,7 @@ Options
 
 Specify options with one of the following:
 
-* The `"esm"` field in your `package.json`
+* The `"esm"` field in `package.json`
 * [JSON6](https://github.com/d3x0r/json6) in an `.esmrc` or `.esmrc.json` file
 * JSON6 or file path in the `ESM_OPTIONS` environment variable
 * CJS/ESM in an `.esmrc.js` or `.esmrc.mjs` file
