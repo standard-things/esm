@@ -16,7 +16,7 @@ function isSideloaded() {
   }
 
   const { argv } = realProcess
-  const [, filename] = argv
+  const filename = realpath(argv[1])
   const args = GenericArray.slice(argv, 2)
   const nodeModulesIndex = args.length
     ? normalize(filename).lastIndexOf("/node_modules/")
@@ -26,7 +26,7 @@ function isSideloaded() {
   if (nodeModulesIndex !== -1 &&
       hasLoaderArg(args) &&
       (Package.get(realProcess.cwd()) !== null ||
-       Package.get(realpath(filename.slice(0, nodeModulesIndex + 1))) !== null)) {
+       Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
     return env.sideloaded = true
   }
 
