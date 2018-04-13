@@ -183,7 +183,7 @@ class Package {
 function cleanCache(cachePath) {
   removeFile(resolve(cachePath, ".dirty"))
 
-  const babelCachePath = resolve(cachePath, "../../@babel/register")
+  const babelCachePath = resolve(cachePath, "../@babel/register")
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
