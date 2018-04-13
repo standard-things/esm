@@ -195,9 +195,6 @@ DevOpts
 
 Tips
 ---
-* Load `esm` before
-  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
-* Load `esm` after [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/nodejs-agent-installation/#standard-nodejs-application)
 * Load `esm` with the “require” option of<br>
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
@@ -207,6 +204,9 @@ Tips
   [`tape`](https://github.com/substack/tape#preloading-modules),
   [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
+* Load `esm` before
+  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
+* Load `esm` after [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/nodejs-agent-installation/#standard-nodejs-application)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `esm` with the `--node-args="-r esm"` option of
