@@ -151,8 +151,6 @@ describe("integration", () => {
 describe("package.json", () => {
   it("should be enabled for third-party packages", () =>
     import("third-party")
-      .then(() => assert.ok(true))
-      .catch(() => assert.ok(false))
   )
 
   it("should support .esmrc options", () =>
@@ -938,8 +936,6 @@ describe("spec compliance", () => {
 
   it("should not break class invocations when checking for TDZ violations", () =>
     import("./fixture/cycle/class/a.mjs")
-      .then(() => assert.ok(true))
-      .catch(() => assert.ok(false))
   )
 
   it("should not throw TDZ errors for unaccessed bindings", () =>
@@ -952,15 +948,11 @@ describe("spec compliance", () => {
     .reduce((promise, request) =>
       promise
         .then(() => import(request))
-        .then(() => assert.ok(true))
-        .catch(() => assert.ok(false))
     , Promise.resolve())
   )
 
   it("should not throw TDZ errors for accessed function declaration bindings", () =>
     import("./fixture/cycle/tdz/access/function/a.mjs")
-      .then(() => assert.ok(true))
-      .catch(() => assert.ok(false))
   )
 
   it("should throw TDZ errors for accessed bindings", () =>
