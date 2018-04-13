@@ -63,7 +63,8 @@ function init() {
 
       if (type === "AssignmentExpression" ||
           type === "CallExpression" ||
-          type === "ExpressionStatement") {
+          type === "ExpressionStatement" ||
+          type === "NewExpression") {
         useParent = true
         return true
       }
