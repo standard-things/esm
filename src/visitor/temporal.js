@@ -33,6 +33,7 @@ function init() {
     let key
     let node = path.getValue()
     let useParent = false
+    let wrapExpression = false
 
     const { name } = node
 
@@ -41,32 +42,31 @@ function init() {
         return true
       }
 
+      if (type === "NewExpression") {
+        return wrapExpression = true
+      }
+
       if (type === "ReturnStatement") {
-        useParent = true
         key = "argument"
-        return true
+        return useParent = true
       }
 
       if (type === "SwitchStatement") {
-        useParent = true
         key = "discriminant"
-        return true
+        return useParent = true
       }
 
       if (type === "DoWhileStatement" ||
           type === "IfStatement" ||
           type === "WhileStatement") {
-        useParent = true
         key = "test"
-        return true
+        return useParent = true
       }
 
       if (type === "AssignmentExpression" ||
           type === "CallExpression" ||
-          type === "ExpressionStatement" ||
-          type === "NewExpression") {
-        useParent = true
-        return true
+          type === "ExpressionStatement") {
+        return useParent = true
       }
     })
 
@@ -84,9 +84,12 @@ function init() {
 
     checkedMap.set(node, true)
 
+    const prefix = wrapExpression ? "(" : ""
+    const postfix = wrapExpression ? ")" : ""
+
     visitor.magicString
-      .prependRight(node.start, visitor.runtimeName + '.t("' + name + '",')
-      .prependRight(node.end, ")")
+      .prependRight(node.start, prefix + visitor.runtimeName + '.t("' + name + '",')
+      .prependRight(node.end, ")" + postfix)
   }
 
   return new TemporalVisitor

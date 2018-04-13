@@ -936,6 +936,12 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
+  it("should not break class invocations when checking for TDZ violations", () =>
+    import("./fixture/cycle/class/a.mjs")
+      .then(() => assert.ok(true))
+      .catch(() => assert.ok(false))
+  )
+
   it("should not throw TDZ errors for unaccessed bindings", () =>
     [
       "./fixture/cycle/tdz/no-access/class/a.mjs",
