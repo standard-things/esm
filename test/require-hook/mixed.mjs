@@ -1,6 +1,6 @@
 import assert from "assert"
 import makeRequire from "../../"
-import mockIo from "../../script/mock-stdio.js"
+import mockIo from "mock-stdio"
 import module from "../module.js"
 
 export default () => {
