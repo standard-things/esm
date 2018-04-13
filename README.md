@@ -197,6 +197,7 @@ Tips
 ---
 * Load `esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
+* Load `esm` after [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/nodejs-agent-installation/#standard-nodejs-application)
 * Load `esm` with the “require” option of<br>
   [`ava`](https://github.com/avajs/ava#options),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
