@@ -1,3 +1,3 @@
 import "./b.mjs"
 
-export class a {}
+export class A {}

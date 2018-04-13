@@ -1,5 +1,5 @@
-import { a } from "./a.mjs"
+import { A } from "./a.mjs"
 
 if (true) {
-  a
+  new A()
 }
