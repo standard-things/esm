@@ -151,6 +151,11 @@ function tryCompileCached(caller, entry, content, filename) {
       throw e
     }
 
+    if (isESM &&
+        e.name === "SyntaxError") {
+      entry.package.cache.dirty = true
+    }
+
     content = () => readSourceCode(filename)
     throw maskStackTrace(e, content, filename, isESM)
   } finally {
