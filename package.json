@@ -54,7 +54,7 @@
     "global-prefix": "^1.0.2",
     "globby": "^8.0.1",
     "golden-fleece": "^1.0.8",
-    "html-minifier": "^3.5.12",
+    "html-minifier": "^3.5.15",
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "json-6": "^0.1.128",
