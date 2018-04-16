@@ -13,7 +13,7 @@ function readFileFast(filename, options) {
   if (fastPath.readFileFast &&
       options === "utf8") {
     try {
-      return fastPathReadFile(filename, options)
+      return readFileFastPath(filename, options)
     } catch (e) {
       fastPath.readFileFast = false
     }
@@ -22,7 +22,7 @@ function readFileFast(filename, options) {
   return readFileSync(filename, options)
 }
 
-function fastPathReadFile(filename, options) {
+function readFileFastPath(filename, options) {
   // Used to speed up reading. Returns the contents of the file as a string
   // or undefined when the file cannot be opened. The speedup comes from not
   // creating Error objects on failure.

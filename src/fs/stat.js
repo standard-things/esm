@@ -19,7 +19,7 @@ function stat(filename) {
     return cache[filename]
   }
 
-  const result = baseStat(filename)
+  const result = statBase(filename)
 
   if (cache) {
     cache[filename] = result
@@ -28,21 +28,21 @@ function stat(filename) {
   return result
 }
 
-function baseStat(filename) {
+function statBase(filename) {
   const { fastPath } = shared
 
   if (fastPath.stat) {
     try {
-      return fastPathStat(filename)
+      return statFastPath(filename)
     } catch (e) {
       fastPath.stat = false
     }
   }
 
-  return fallbackStat(filename)
+  return statFallback(filename)
 }
 
-function fallbackStat(filename) {
+function statFallback(filename) {
   try {
     return call(isFile, statSync(filename)) ? 0 : 1
   } catch (e) {}
@@ -50,7 +50,7 @@ function fallbackStat(filename) {
   return -1
 }
 
-function fastPathStat(filename) {
+function statFastPath(filename) {
   // Used to speed up loading. Returns 0 if the path refers to a file,
   // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
   // comes from not creating thousands of Stat and Error objects.
