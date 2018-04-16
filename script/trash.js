@@ -26,7 +26,8 @@ function trash(iterable) {
 
         return _trash([thePath], options)
           .catch((e) => {
-            if (e && e.code === "EACCES") {
+            if (e &&
+                e.code === "EACCES") {
               process.exitCode = e.code
             }
           })
