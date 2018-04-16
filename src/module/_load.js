@@ -18,24 +18,13 @@ const {
   STATE_PARSING_STARTED
 } = ENTRY
 
-function load(request, parent, isMain, state, loader) {
+function load(filename, parent, isMain, state, loader) {
   let child
-  let filename
-  let entry = request
+  let entry
 
   const { parsing, passthru } = shared.moduleState
 
-  if (typeof request === "string") {
-    filename = request
-    child = state._cache[filename]
-
-    if (child) {
-      entry = Entry.get(child)
-    }
-  } else {
-    child = entry.module
-    filename = child.filename
-  }
+  child = state._cache[filename]
 
   if (child) {
     const children = parent && parent.children
@@ -44,6 +33,8 @@ function load(request, parent, isMain, state, loader) {
         GenericArray.indexOf(children, child) === -1) {
       GenericArray.push(children, child)
     }
+
+    entry = Entry.get(child)
 
     if (parsing ||
         child.loaded) {
