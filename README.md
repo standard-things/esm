@@ -206,7 +206,6 @@ Tips
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` before
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
-* Load `esm` after [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/nodejs-agent-installation/#standard-nodejs-application)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `esm` with the `--node-args="-r esm"` option of
