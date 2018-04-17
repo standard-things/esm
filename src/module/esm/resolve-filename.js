@@ -95,7 +95,6 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   let foundPath
-  let extLookup = esmExtsLookup
   let skipWarnings = false
 
   if (! hasEncodedSep(request)) {
@@ -129,7 +128,7 @@ function resolveFilename(request, parent, isMain, options) {
     if (autoMode ||
         cjsPaths ||
         isMain ||
-        Reflect.has(extLookup, extname(foundPath))) {
+        Reflect.has(esmExtsLookup, extname(foundPath))) {
       return cache[cacheKey] = foundPath
     }
 
