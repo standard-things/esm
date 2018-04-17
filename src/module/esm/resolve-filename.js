@@ -12,7 +12,7 @@ import { extname } from "../../safe/path.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
-import hasEncodedSlash from "../../util/has-encoded-slash.js"
+import hasEncodedSep from "../../path/has-encoded-sep.js"
 import isAbsolutePath from "../../util/is-absolute-path.js"
 import isMJS from "../../util/is-mjs.js"
 import isObject from "../../util/is-object.js"
@@ -98,7 +98,7 @@ function resolveFilename(request, parent, isMain, options) {
   let extLookup = esmExtsLookup
   let skipWarnings = false
 
-  if (! hasEncodedSlash(request)) {
+  if (! hasEncodedSep(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
         (request.charCodeAt(0) === SLASH ||

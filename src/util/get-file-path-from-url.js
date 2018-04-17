@@ -3,7 +3,7 @@ import ENV from "../constant/env.js"
 
 import decodeURIComponent from "./decode-uri-component.js"
 import domainToUnicode from "./domain-to-unicode.js"
-import hasEncodedSlash from "./has-encoded-slash.js"
+import hasEncodedSep from "../path/has-encoded-sep.js"
 import { normalize } from "../safe/path.js"
 import parseURL from "./parse-url.js"
 
@@ -34,7 +34,7 @@ function getFilePathFromURL(url) {
     }
   }
 
-  if (hasEncodedSlash(pathname)) {
+  if (hasEncodedSep(pathname)) {
     return ""
   }
 
