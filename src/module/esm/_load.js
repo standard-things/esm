@@ -27,10 +27,12 @@ const {
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
+  const { parsing, passthru } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+  const { parseState } = shared
   const requestHash = getHash(request)
   const requestQuery = getQuery(request)
 
@@ -56,6 +58,11 @@ function load(request, parent, isMain, preload) {
   if (isUnexposed &&
       extname(filename) === ".mjs") {
     state = moduleState
+  } else if (parsing) {
+    state = parseState
+  } else if (request in parseState._cache) {
+    Module._cache[request] = parseState._cache[request]
+    Reflect.deleteProperty(parseState._cache, request)
   }
 
   let error
@@ -63,7 +70,6 @@ function load(request, parent, isMain, preload) {
   let threw = false
 
   const entry = _load(request, parent, isMain, state, (entry) => {
-    const { parsing, passthru } = shared.moduleState
     const mod = entry.module
 
     state._cache[request] = mod
@@ -143,7 +149,7 @@ function load(request, parent, isMain, preload) {
   try {
     throw error
   } finally {
-    if (state === Module) {
+    if (state !== moduleState) {
       Reflect.deleteProperty(state._cache, request)
     } else {
       // Unlike CJS, ESM errors are preserved for subsequent loads.

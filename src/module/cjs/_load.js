@@ -12,13 +12,14 @@ import shared from "../../shared.js"
 function load(request, parent, isMain, preload) {
   let called = false
 
+  const { parsing, passthru } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
+  const state = parsing ? shared.parseState : Module
 
-  const entry = _load(filename, parent, isMain, Module, (entry) => {
-    const { parsing, passthru } = shared.moduleState
+  const entry = _load(filename, parent, isMain, state, (entry) => {
     const mod = entry.module
 
-    Module._cache[filename] = mod
+    state._cache[filename] = mod
 
     if (passthru &&
         ! parsing) {
@@ -38,7 +39,7 @@ function load(request, parent, isMain, preload) {
       threw = false
     } finally {
       if (threw) {
-        Reflect.deleteProperty(Module._cache, filename)
+        Reflect.deleteProperty(state._cache, filename)
       }
     }
   })
