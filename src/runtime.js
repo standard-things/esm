@@ -7,6 +7,7 @@ import _loadESM from "./module/esm/_load.js"
 import errors from "./errors.js"
 import builtinEntries from "./builtin-entries.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
+import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isMJS from "./util/is-mjs.js"
@@ -106,6 +107,7 @@ const Runtime = {
   },
 
   enable(entry, exported) {
+    const { id } = entry
     const mod = entry.module
     const object = mod.exports
 
@@ -119,7 +121,7 @@ const Runtime = {
     setDeferred(object, "meta", () => {
       return {
         __proto__: null,
-        url: entry.url
+        url: id.startsWith("file:") ? id : getURLFromFilePath(id)
       }
     })
 
