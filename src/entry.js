@@ -93,8 +93,6 @@ class Entry {
     this.state = STATE_INITIAL
     // The entry type of the module.
     this.type = TYPE_CJS
-    // The file url of the module.
-    this.url = null
   }
 
   static delete(value) {
