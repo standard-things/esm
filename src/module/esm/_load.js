@@ -60,7 +60,7 @@ function load(request, parent, isMain, preload) {
     state = moduleState
   } else if (parsing) {
     state = parseState
-  } else if (request in parseState._cache) {
+  } else if (Reflect.has(parseState._cache, request)) {
     Module._cache[request] = parseState._cache[request]
     Reflect.deleteProperty(parseState._cache, request)
   }

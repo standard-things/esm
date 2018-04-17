@@ -25,7 +25,7 @@ const {
 } = errors
 
 function load(request, parent, isMain) {
-  if (request in builtinEntries) {
+  if (Reflect.has(builtinEntries, request)) {
     return builtinEntries[request].module.exports
   }
 

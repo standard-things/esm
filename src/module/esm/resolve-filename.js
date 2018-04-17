@@ -70,7 +70,7 @@ function resolveFilename(request, parent, isMain, options) {
     : request + "\0" + getModuleName(parent) + "\0" + isMain
 
   if (cacheKey &&
-      cacheKey in cache) {
+      Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
   }
 
@@ -129,7 +129,7 @@ function resolveFilename(request, parent, isMain, options) {
     if (autoMode ||
         cjsPaths ||
         isMain ||
-        extname(foundPath) in extLookup) {
+        Reflect.has(extLookup, extname(foundPath))) {
       return cache[cacheKey] = foundPath
     }
 

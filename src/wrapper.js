@@ -86,7 +86,13 @@ function init() {
 
   function getMap(object, name) {
     const store = getStore(object)
-    return (store && name in store) ? store[name] : null
+
+    if (store &&
+        Reflect.has(store, name)) {
+      return store[name]
+    }
+
+    return null
   }
 
   function getOrCreateMap(object, name) {

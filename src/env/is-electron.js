@@ -6,7 +6,7 @@ function isElectron() {
 
   return Reflect.has(env, "electron")
     ? env.electron
-    : env.electron = "electron" in safeProcess.versions
+    : env.electron = Reflect.has(safeProcess.versions, "electron")
 }
 
 export default isElectron

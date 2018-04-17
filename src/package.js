@@ -310,7 +310,7 @@ function findRoot(dirPath) {
 function getInfo(dirPath, force) {
   let pkg
 
-  if (dirPath in Package.cache) {
+  if (Reflect.has(Package.cache, dirPath)) {
     pkg = Package.cache[dirPath]
 
     if (! force ||

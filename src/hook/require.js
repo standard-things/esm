@@ -20,7 +20,7 @@ function hook(parent) {
       throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
     }
 
-    return request in builtinEntries
+    return Reflect.has(builtinEntries, request)
       ? builtinEntries[request].module.exports
       : loadESM(request, parent, false).module.exports
   }

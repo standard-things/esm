@@ -15,7 +15,7 @@ function stat(filename) {
   const cache = shared.moduleState.stat
 
   if (cache &&
-      filename in cache) {
+      Reflect.has(cache, filename)) {
     return cache[filename]
   }
 

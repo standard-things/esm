@@ -26,7 +26,7 @@ function validate(entry) {
 
   // Parse children.
   for (const name in dependencySpecifiers) {
-    if (name in builtinEntries) {
+    if (Reflect.has(builtinEntries, name)) {
       continue
     }
 
@@ -65,7 +65,7 @@ function validate(entry) {
 
     isCyclical =
       isCyclical ||
-      (parentName in childEntry.children)
+      Reflect.has(childEntry.children, parentName)
 
     const childCompileData = childEntry.compileData
     const childExportStars = childCompileData.exportStars
@@ -73,7 +73,7 @@ function validate(entry) {
     for (const requestedName of requestedExportNames) {
       const { exportSpecifiers:childExportSpecifiers } = childCompileData
 
-      if (requestedName in childExportSpecifiers) {
+      if (Reflect.has(childExportSpecifiers, requestedName)) {
         if (childExportSpecifiers[requestedName] < 3) {
           continue
         }
@@ -85,7 +85,7 @@ function validate(entry) {
 
       if (throwExportMissing) {
         for (const childName of childExportStars) {
-          if (! (childName in children)) {
+          if (! Reflect.has(children, childName)) {
             throwExportMissing = false
             break
           }
@@ -100,7 +100,7 @@ function validate(entry) {
 
   // Resolve export names from star exports.
   for (const childName of entry.compileData.exportStars) {
-    if (childName in builtinEntries) {
+    if (Reflect.has(builtinEntries, childName)) {
       continue
     }
 
@@ -111,7 +111,7 @@ function validate(entry) {
     }
 
     for (const exportName in childEntry.compileData.exportSpecifiers) {
-      if (exportName in exportSpecifiers) {
+      if (Reflect.has(exportSpecifiers, exportName)) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.
           exportSpecifiers[exportName] = 3

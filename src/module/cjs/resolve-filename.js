@@ -6,7 +6,7 @@ import _resolveFilename from "./_resolve-filename.js"
 import builtinEntries from "../../builtin-entries.js"
 
 function resolveFilename(request, parent, isMain, options) {
-  return request in builtinEntries
+  return Reflect.has(builtinEntries, request)
     ? request
     : _resolveFilename(request, parent, isMain, options)
 }

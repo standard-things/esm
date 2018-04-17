@@ -167,7 +167,7 @@ const Runtime = {
           }
         })]]
 
-        if (request in builtinEntries) {
+        if (Reflect.has(builtinEntries, request)) {
           return watchBuiltin(entry, request, setterArgsList)
         }
 
@@ -215,7 +215,7 @@ const Runtime = {
   watch(request, setterArgsList) {
     const { entry } = this
 
-    return request in builtinEntries
+    return Reflect.has(builtinEntries, request)
       ? watchBuiltin(entry, request, setterArgsList)
       : watchImport(entry, request, setterArgsList, _loadESM)
   }

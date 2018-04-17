@@ -13,7 +13,7 @@ function init() {
     const cache = shared.memoize.utilSatisfies
     const cacheKey = version + "\0" + range
 
-    if (cacheKey in cache) {
+    if (Reflect.has(cache, cacheKey)) {
       return cache[cacheKey]
     }
 

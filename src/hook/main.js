@@ -29,7 +29,7 @@ function hook(Mod) {
 
     const [, mainPath] = realProcess.argv
 
-    if (mainPath in builtinEntries) {
+    if (Reflect.has(builtinEntries, mainPath)) {
       Mod.runMain()
       return
     }

@@ -44,7 +44,7 @@ function findPath(request, paths, isMain, searchExts) {
     safeToString(paths) +
     (searchExts ? "\0" + safeToString(searchExts) : "")
 
-  if (cacheKey in cache) {
+  if (Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
   }
 
@@ -124,7 +124,7 @@ function findPath(request, paths, isMain, searchExts) {
 function readPackage(thePath) {
   const cache = shared.memoize.moduleReadPackage
 
-  if (thePath in cache) {
+  if (Reflect.has(cache, thePath)) {
     return cache[thePath]
   }
 

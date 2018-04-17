@@ -397,7 +397,7 @@ function assignExportsToNamespace(entry) {
       })
     }
 
-    if (! (name in getters)) {
+    if (! Reflect.has(getters, name)) {
       entry.addGetter(name, () => entry._namespace[name])
     }
   }
@@ -521,7 +521,7 @@ function getExportByName(entry, setter, name) {
   if ((noNamedExports &&
        name !== "default") ||
       (entry._loaded === LOAD_COMPLETED &&
-       ! (name in entry.getters))) {
+       ! Reflect.has(entry.getters, name))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
     throw new ERR_EXPORT_MISSING(entry.module, name)
@@ -589,7 +589,7 @@ function runGetter(entry, name) {
   const value = callGetter(entry.getters[name])
 
   if (value !== GETTER_ERROR &&
-      ! (name in _namespace &&
+      ! (Reflect.has(_namespace, name) &&
          Object.is(_namespace[name], value))) {
     entry._changed = true
     _namespace[name] = value

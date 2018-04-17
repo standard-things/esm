@@ -29,7 +29,7 @@ const req = function require(request) {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
   }
 
-  if (request in builtinEntries) {
+  if (Reflect.has(builtinEntries, request)) {
     return builtinEntries[request].module.exports
   }
 

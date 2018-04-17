@@ -121,7 +121,7 @@ function init() {
     childNames = []
 
     for (const name of names) {
-      if (name in childrenToVisit &&
+      if (Reflect.has(childrenToVisit, name) &&
           isObject(value[name])) {
         childNames.push(name)
       }

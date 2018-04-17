@@ -13,7 +13,7 @@ function parseURL(url) {
   const cache = shared.memoize.utilParseURL
   const cacheKey = isURL ? url.href : url
 
-  return cacheKey in cache
+  return Reflect.has(cache, cacheKey)
     ? cache[cacheKey]
     : cache[cacheKey] = (isURL ? url : parse(url))
 }

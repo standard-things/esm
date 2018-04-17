@@ -6,7 +6,7 @@ function init() {
     const cache = shared.memoize.utilMaxSatisfying
     const cacheKey = versions + "\0" + range
 
-    return cacheKey in cache
+    return Reflect.has(cache, cacheKey)
       ? cache[cacheKey]
       : cache[cacheKey] = _maxSatisfying(versions, range)
   }

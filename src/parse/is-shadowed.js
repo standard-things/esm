@@ -35,7 +35,7 @@ function init() {
       let cache = map.get(parent)
 
       if (cache &&
-          name in cache) {
+          Reflect.has(cache, name)) {
         return shadowed = cache[name]
       } else {
         cache = { __proto__: null }

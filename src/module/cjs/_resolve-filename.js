@@ -39,7 +39,7 @@ function resolveFilename(request, parent, isMain, options) {
     : request + "\0" + getModuleName(parent) + "\0" + isMain
 
   if (cacheKey &&
-      cacheKey in cache) {
+      Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
   }
 

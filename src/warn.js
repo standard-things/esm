@@ -22,7 +22,7 @@ function init() {
   }
 
   function getCacheKey(code, args) {
-    const serialized = code in cacheKeys
+    const serialized = Reflect.has(cacheKeys, code)
       ? cacheKeys[code](...args)
       : args.join("\0")
 
@@ -51,7 +51,7 @@ function init() {
   function warn(code, ...args) {
     const cacheKey = getCacheKey(code, args)
 
-    if (! (cacheKey in warned)) {
+    if (! Reflect.has(warned, cacheKey)) {
       warned[cacheKey] = true
       emitWarning(messages[code](...args))
     }
