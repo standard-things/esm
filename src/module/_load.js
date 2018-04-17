@@ -19,12 +19,10 @@ const {
 } = ENTRY
 
 function load(filename, parent, isMain, state, loader) {
-  let child
-  let entry
-
   const { parsing, passthru } = shared.moduleState
 
-  child = state._cache[filename]
+  let entry
+  let child = state._cache[filename]
 
   if (child) {
     const children = parent && parent.children

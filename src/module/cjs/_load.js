@@ -10,11 +10,11 @@ import loader from "./loader.js"
 import shared from "../../shared.js"
 
 function load(request, parent, isMain, preload) {
-  let called = false
-
   const { parsing, passthru } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
   const state = parsing ? shared.parseState : Module
+
+  let called = false
 
   const entry = _load(filename, parent, isMain, state, (entry) => {
     const mod = entry.module
