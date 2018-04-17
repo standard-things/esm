@@ -7,9 +7,8 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../_load.js"
-import getHash from "../../util/get-hash.js"
-import getQuery from "../../util/get-query.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
+import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import isError from "../../util/is-error.js"
 import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
@@ -32,9 +31,6 @@ function load(request, parent, isMain, preload) {
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const { parseState } = shared
-  const requestHash = getHash(request)
-  const requestQuery = getQuery(request)
 
   let filename
 
@@ -46,14 +42,18 @@ function load(request, parent, isMain, preload) {
     filename = resolveFilename(request, parent, isMain)
   }
 
-  request = filename + requestQuery + requestHash
-
   const fromPath = dirname(filename)
+  const { parseState } = shared
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
+  const queryFragment = getURLQueryFragment(request)
 
   let isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
   let state = Module
+
+  request = queryFragment
+    ? getURLFromFilePath(filename) + queryFragment
+    : filename
 
   if (isUnexposed &&
       extname(filename) === ".mjs") {
