@@ -103,6 +103,7 @@ function resolveFilename(request, parent, isMain, options) {
         (request.charCodeAt(0) === SLASH ||
          request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
+
       foundPath = getFilePathFromURL(parsed)
 
       if (! foundPath &&
