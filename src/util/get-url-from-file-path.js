@@ -6,33 +6,40 @@ import CHAR_CODE from "../constant/char-code.js"
 
 import encodeURI from "./encode-uri.js"
 import normalize from "../path/normalize.js"
+import shared from "../shared.js"
 
-const {
-  SLASH
-} = CHAR_CODE
+function init() {
+  const {
+    SLASH
+  } = CHAR_CODE
 
-const encodeCharsRegExp = /[?#]/g
+  const encodeCharsRegExp = /[?#]/g
 
-const encodeCharMap = {
-  "#": "%23",
-  "?": "%3F"
-}
-
-function encodeChar(char) {
-  return encodeCharMap[char]
-}
-
-function getURLFromFilePath(filename) {
-  filename = normalize(filename)
-
-  if (filename.charCodeAt(0) !== SLASH) {
-    filename = "/" + filename
+  const encodeCharMap = {
+    "#": "%23",
+    "?": "%3F"
   }
 
-  // Section 3.3: Escape Path Components
-  // https://tools.ietf.org/html/rfc3986#section-3.3
-  const encoded = encodeURI(filename)
-  return "file://" + encoded.replace(encodeCharsRegExp, encodeChar)
+  function encodeChar(char) {
+    return encodeCharMap[char]
+  }
+
+  function getURLFromFilePath(filename) {
+    filename = normalize(filename)
+
+    if (filename.charCodeAt(0) !== SLASH) {
+      filename = "/" + filename
+    }
+
+    // Section 3.3: Escape Path Components
+    // https://tools.ietf.org/html/rfc3986#section-3.3
+    const encoded = encodeURI(filename)
+    return "file://" + encoded.replace(encodeCharsRegExp, encodeChar)
+  }
+
+  return getURLFromFilePath
 }
 
-export default getURLFromFilePath
+export default shared.inited
+  ? shared.module.utilGetURLFromFilePath
+  : shared.module.utilGetURLFromFilePath = init()
