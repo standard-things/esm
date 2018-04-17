@@ -635,7 +635,7 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should reevaluate requests with different query+hashes", () =>
+  it("should reevaluate requests with different query+fragments", () =>
     import("./fixture/load-count.mjs")
       .then((oldNs) =>
         [
