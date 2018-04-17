@@ -81,6 +81,22 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
   )
 
+  it("should work with sqreen loaded first", () =>
+    exec(nodePath, [
+      "-r", "sqreen",
+      "-r", pkgPath,
+      path.resolve(testPath, "fixture/scenario/sqreen")
+    ])
+  )
+
+  it("should work with sqreen loaded second", () =>
+    exec(nodePath, [
+      "-r", pkgPath,
+      "-r", "sqreen",
+      path.resolve(testPath, "fixture/scenario/sqreen")
+    ])
+  )
+
   it("should work with ava and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")

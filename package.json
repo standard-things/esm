@@ -69,6 +69,7 @@
     "postcss": "^6.0.21",
     "semver": "^5.5.0",
     "sleep": "^5.1.1",
+    "sqreen": "^1.16.0",
     "trash": "^4.3.0",
     "typescript": "^2.6.1",
     "uglify-es": "^3.3.10",
