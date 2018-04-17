@@ -21,16 +21,16 @@ function load(request, parent, isMain, preload) {
 
     state._cache[filename] = mod
 
+    if (! mod.paths) {
+      mod.paths = Module._nodeModulePaths(dirname(filename))
+    }
+
     if (passthru &&
         ! parsing) {
       return
     }
 
     called = true
-
-    if (! mod.paths) {
-      mod.paths = Module._nodeModulePaths(dirname(filename))
-    }
 
     let threw = true
 

@@ -74,15 +74,8 @@ function load(request, parent, isMain, preload) {
 
     state._cache[request] = mod
 
-    if (passthru &&
-        ! parsing) {
-      return
-    }
-
-    called = true
-
-    mod.filename = filename
     entry.id = request
+    mod.filename = filename
 
     if (isMain) {
       mod.id = "."
@@ -92,6 +85,22 @@ function load(request, parent, isMain, preload) {
     if (parentEntry) {
       parentEntry.children[entry.name] = entry
     }
+
+    if (! mod.paths) {
+      if (entry.package.options.cjs.paths &&
+          ! isMJS(entry.module)) {
+        mod.paths = Module._nodeModulePaths(fromPath)
+      } else {
+        mod.paths = moduleNodeModulePaths(fromPath)
+      }
+    }
+
+    if (passthru &&
+        ! parsing) {
+      return
+    }
+
+    called = true
 
     if (! parsing) {
       const isESM = entry.type === TYPE_ESM
@@ -110,19 +119,6 @@ function load(request, parent, isMain, preload) {
            ! parentPkgOptions.cjs.cache)) {
         mod.parent = void 0
       }
-    }
-
-    if (! mod.paths) {
-      if (entry.package.options.cjs.paths &&
-          ! isMJS(entry.module)) {
-        mod.paths = Module._nodeModulePaths(fromPath)
-      } else {
-        mod.paths = moduleNodeModulePaths(fromPath)
-      }
-    }
-
-    if (! entry.url) {
-      entry.url = getURLFromFilePath(filename) + requestQuery + requestHash
     }
 
     try {
