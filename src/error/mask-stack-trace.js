@@ -3,9 +3,8 @@ import CHAR from "../constant/char.js"
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
-import getURLFromFilePath from "../util/get-url-from-file-path.js"
+import getModuleURL from "../util/get-module-url.js"
 import isParseError from "../util/is-parse-error.js"
-import isPath from "../util/is-path.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import shared from "../shared.js"
@@ -219,15 +218,11 @@ function fileNamesToURLs(stack) {
 }
 
 function replaceAtName(match, prelude, name) {
-  return prelude + resolveURL(name)
+  return prelude + getModuleURL(name)
 }
 
 function replaceHeader(match, name, postlude) {
-  return resolveURL(name) + postlude
-}
-
-function resolveURL(name) {
-  return isPath(name) ? getURLFromFilePath(name) : name
+  return getModuleURL(name) + postlude
 }
 
 function withoutMessage(stack, message, callback) {
