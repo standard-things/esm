@@ -42,24 +42,24 @@ export default () => {
   meta = createMeta({ url: colonURL + "?" })
   assert.deepStrictEqual(colon2, meta)
 
-  meta = createMeta({ url: colonURL + "?a" })
+  meta = createMeta({ url: colonURL + "?a#a" })
   assert.deepStrictEqual(colon3, meta)
 
   meta = createMeta({ url: poundURL })
   assert.deepStrictEqual(pound1, meta)
 
-  meta = createMeta({ url: poundURL + "?" })
+  meta = createMeta({ url: poundURL + "?#" })
   assert.deepStrictEqual(pound2, meta)
 
-  meta = createMeta({ url: poundURL + "?b" })
+  meta = createMeta({ url: poundURL + "?b#b" })
   assert.deepStrictEqual(pound3, meta)
 
   meta = createMeta({ url: percentURL })
   assert.deepStrictEqual(percent1, meta)
 
-  meta = createMeta({ url: percentURL })
+  meta = createMeta({ url: percentURL + "#c" })
   assert.deepStrictEqual(percent2, meta)
 
-  meta = createMeta({ url: percentURL + "?c" })
+  meta = createMeta({ url: percentURL + "?c#c" })
   assert.deepStrictEqual(percent3, meta)
 }

@@ -122,7 +122,7 @@ function load(request, parent, isMain, preload) {
     }
 
     if (! entry.url) {
-      entry.url = getURLFromFilePath(filename) + requestQuery
+      entry.url = getURLFromFilePath(filename) + requestQuery + requestHash
     }
 
     try {
