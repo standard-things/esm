@@ -3,6 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import Module from "../../module.js"
 
 import _load from "./_load.js"
+import keys from "../../util/keys.js"
 import shared from "../../shared.js"
 
 const {
@@ -54,9 +55,11 @@ function load(request, parent, isMain, preload) {
     entry.state = STATE_EXECUTION_COMPLETED
   }
 
-  for (const name in parseCache) {
-    Module._cache[name] = parseCache[name]
-    Reflect.deleteProperty(parseCache, name)
+  const cacheKeys = keys(parseCache)
+
+  for (const cacheKey of cacheKeys) {
+    Module._cache[cacheKey] = parseCache[cacheKey]
+    Reflect.deleteProperty(parseCache, cacheKey)
   }
 
   return entry
