@@ -1,5 +1,11 @@
+import JSON6 from "json-6"
+
 import assert from "assert"
 import require from "./require.js"
+
+const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
+
+const isDebug = !! ESM_OPTIONS.debug
 
 describe("file extension", () => {
   it("should not error loading extensionless files with `require`", () => {
@@ -62,7 +68,13 @@ describe("file extension", () => {
         import(request)
           .then(() => assert.ok(false))
           .catch((e) => {
-            assert.ok(e.message.includes("'import' and 'export' may only be used in ES modules"))
+            assert.ok(e instanceof SyntaxError)
+
+            if (isDebug) {
+              assert.ok(true)
+            } else {
+              assert.ok(e.message.includes("'import' and 'export' may only be used in ES modules"))
+            }
           })
       ))
   )
