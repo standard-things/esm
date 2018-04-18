@@ -14,19 +14,20 @@ function init() {
     let maxSV
     let max = null
 
-    const isAsterisk = range === "*"
+    // Work around a SemVer issue with the "*" range.
+    // https://github.com/npm/node-semver/issues/236
+    if (range === "*") {
+      range = ">=0.0.0"
+    }
 
-    if (! isAsterisk) {
-      try {
-        range = new Range(range)
-      } catch (e) {
-        return max
-      }
+    try {
+      range = new Range(range)
+    } catch (e) {
+      return max
     }
 
     for (const version of versions) {
-      if ((isAsterisk ||
-           range.intersects(new Range(version))) &&
+      if (range.intersects(new Range(version)) &&
           (! max ||
            maxSV.compare(version) === -1)) {
         max = version
