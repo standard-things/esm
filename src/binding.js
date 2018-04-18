@@ -45,19 +45,17 @@ function init() {
 
   const binding = { __proto__: null }
 
-  function getBinding(id) {
-    try {
-      return silent(() => Reflect.apply(_binding, realProcess, [id]))
-    } catch (e) {}
-  }
-
   for (const id of ids) {
     setDeferred(binding, id, () => {
       if (! _binding) {
         _binding = getSilent(realProcess, "binding")
       }
 
-      const source = getBinding(id)
+      const source = silent(() => {
+        try {
+          return Reflect.apply(_binding, realProcess, [id])
+        } catch (e) {}
+      })
 
       if (! isObjectLike(source)) {
         return { __proto__: null }

@@ -1,11 +1,11 @@
 import silent from "./silent.js"
 
 function setSilent(object, name, value) {
-  try {
-    silent(() => {
+  silent(() => {
+    try {
       object[name] = value
-    })
-  } catch (e) {}
+    } catch (e) {}
+  })
 }
 
 export default setSilent

@@ -14,12 +14,12 @@ function init() {
       let _getProxyDetails
       let utilBinding
 
-      try {
-        silent(() => {
+      silent(() => {
+        try {
           utilBinding = context.process.binding("util")
           _getProxyDetails = utilBinding.getProxyDetails
-        })
-      } catch (e) {}
+        } catch (e) {}
+      })
 
       if (check(utilBinding, _getProxyDetails, cache)) {
         return context
