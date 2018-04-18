@@ -14,16 +14,21 @@ function init() {
     let maxSV
     let max = null
 
-    try {
-      range = new Range(range)
-    } catch (e) {
-      return max
+    const isAsterisk = range === "*"
+
+    if (! isAsterisk) {
+      try {
+        range = new Range(range)
+      } catch (e) {
+        return max
+      }
     }
 
     for (const version of versions) {
-      if (range.intersects(new Range("^" + version)) &&
-           (! max ||
-            maxSV.compare(version) === -1)) {
+      if ((isAsterisk ||
+           range.intersects(new Range(version))) &&
+          (! max ||
+           maxSV.compare(version) === -1)) {
         max = version
         maxSV = new SemVer(max)
       }
