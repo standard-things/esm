@@ -21,7 +21,7 @@ function init() {
     }
 
     for (const version of versions) {
-      if (range.intersects(new Range(version)) &&
+      if (range.intersects(new Range("^" + version)) &&
            (! max ||
             maxSV.compare(version) === -1)) {
         max = version
