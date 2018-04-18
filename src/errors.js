@@ -108,17 +108,13 @@ function init() {
   }
 
   function exportMissing(request, exportName) {
-    const moduleName = getModuleURL(request)
-
-    return "ES Module " + toStringLiteral(moduleName, "'") +
-      " does not provide an export named '" + exportName + "'"
+    return "Missing export '" + exportName +
+      "' in ES module: " + getModuleURL(request)
   }
 
   function exportStarConflict(request, exportName) {
-    const moduleName = getModuleURL(request)
-
-    return "ES Module " + toStringLiteral(moduleName, "'") +
-      " contains conflicting star exports for name '" + exportName + "'"
+    return "Conflicting star export '" + exportName +
+      "' in ES module: " + getModuleURL(request)
   }
 
   function invalidArgType(argName, expected, actual) {
@@ -139,8 +135,8 @@ function init() {
   function invalidExtension(request) {
     const moduleName = getModuleURL(request)
 
-    return "ES Module " + toStringLiteral(moduleName, "'") +
-      " cannot be loaded from .mjs files"
+    return "Cannot load ES module " + toStringLiteral(moduleName, "'") +
+      " from .mjs files"
   }
 
   function invalidPkgMode(mode) {
@@ -162,6 +158,7 @@ function init() {
   }
 
   function requireESM(request) {
+    // Keep "Module" capitalized to align with Node.
     return "Must use import to load ES Module: " + getModuleURL(request)
   }
 

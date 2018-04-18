@@ -313,7 +313,7 @@ describe("errors", () => {
           .catch((e) =>
             checkErrorStack(e, [
               getURLFromFilePath(id5) + ":1",
-              "SyntaxError: ES Module '" + abcURL + "' does not provide an export named 'NOT_EXPORTED'"
+              "SyntaxError: Missing export 'NOT_EXPORTED' in ES module: " + abcURL
             ].join("\n"))
           ),
         import(id6)
@@ -901,7 +901,7 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.includes("' does not provide an export named '"))
+        assert.ok(e.message.startsWith("Missing export"))
       })
   )
 
@@ -986,7 +986,7 @@ describe("spec compliance", () => {
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Duplicate export of '"))
+        assert.ok(e.message.startsWith("Duplicate export"))
       })
   )
 
@@ -1001,7 +1001,7 @@ describe("spec compliance", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.ok(e instanceof SyntaxError)
-            assert.ok(e.message.includes("contains conflicting star exports for name '"))
+            assert.ok(e.message.startsWith("Conflicting star export"))
           })
       ))
   )
@@ -1068,7 +1068,7 @@ describe("spec compliance", () => {
             if (isDebug) {
               assert.ok(true)
             } else {
-              assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
+              assert.ok(e.message.startsWith("Missing export 'NOT_EXPORTED'"))
             }
           })
       ))
@@ -1085,7 +1085,7 @@ describe("spec compliance", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.strictEqual(global.loadCount, 1)
-            assert.ok(e.message.includes("' does not provide an export named 'NOT_EXPORTED'"))
+            assert.ok(e.message.startsWith("Missing export 'NOT_EXPORTED'"))
           })
       ))
   )

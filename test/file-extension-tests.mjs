@@ -73,7 +73,7 @@ describe("file extension", () => {
             if (isDebug) {
               assert.ok(true)
             } else {
-              assert.ok(e.message.includes("'import' and 'export' may only be used in ES modules"))
+              assert.ok(e.message.startsWith("'import' and 'export' may only be used in ES modules"))
             }
           })
       ))
@@ -89,7 +89,7 @@ describe("file extension", () => {
         import(request)
           .then(() => assert.ok(false))
           .catch((e) => {
-            assert.ok(e.message.includes("cannot be loaded from .mjs files"))
+            assert.ok(e.message.startsWith("Cannot load ES module"))
           })
       ))
   )
