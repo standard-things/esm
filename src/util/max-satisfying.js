@@ -1,4 +1,5 @@
-import { maxSatisfying as _maxSatisfying } from "semver"
+import SemVer, { Range } from "semver"
+
 import shared from "../shared.js"
 
 function init() {
@@ -6,9 +7,29 @@ function init() {
     const cache = shared.memoize.utilMaxSatisfying
     const cacheKey = versions + "\0" + range
 
-    return Reflect.has(cache, cacheKey)
-      ? cache[cacheKey]
-      : cache[cacheKey] = _maxSatisfying(versions, range)
+    if (Reflect.has(cache, cacheKey)) {
+      return cache[cacheKey]
+    }
+
+    let maxSV
+    let max = null
+
+    try {
+      range = new Range(range)
+    } catch (e) {
+      return max
+    }
+
+    for (const version of versions) {
+      if (range.intersects(new Range(version)) &&
+           (! max ||
+            maxSV.compare(version) === -1)) {
+        max = version
+        maxSV = new SemVer(max)
+      }
+    }
+
+    return cache[cacheKey] = max
   }
 
   return maxSatisfying
