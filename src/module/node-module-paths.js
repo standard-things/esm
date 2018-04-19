@@ -13,9 +13,9 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    BSLASH,
+    BACKWARD_SLASH,
     COLON,
-    SLASH
+    FORWARD_SLASH
   } = CHAR_CODE
 
   const {
@@ -62,7 +62,7 @@ function init() {
     while (length--) {
       const code = from.charCodeAt(length)
 
-      if (code === SLASH) {
+      if (code === FORWARD_SLASH) {
         if (nmCount !== nmLength) {
           GenericArray.push(paths, from.slice(0, last) + "/node_modules")
         }
@@ -88,7 +88,7 @@ function init() {
     from = resolve(from)
 
     // Return root node_modules when path is "D:\\".
-    if (from.charCodeAt(from.length - 1) === BSLASH &&
+    if (from.charCodeAt(from.length - 1) === BACKWARD_SLASH &&
         from.charCodeAt(from.length - 2) === COLON) {
       return GenericArray.of(from + "node_modules")
     }
@@ -106,9 +106,9 @@ function init() {
       // node_modules path for every path segment. Use colon as an extra
       // condition since we can get node_modules path for drive root like
       // "C:\node_modules" and don"t need to parse drive name.
-      if (code === BSLASH ||
+      if (code === BACKWARD_SLASH ||
           code === COLON ||
-          code === SLASH) {
+          code === FORWARD_SLASH) {
         if (nmCount !== nmLength) {
           GenericArray.push(paths, from.slice(0, last) + "\\node_modules")
         }

@@ -6,10 +6,10 @@ import wrap from "../../util/wrap.js"
 
 function init() {
   const {
-    EXMARK,
-    GT,
-    HYPHEN,
-    LT
+    EXCLAMATION_MARK,
+    HYPHEN_MINUS,
+    LEFT_ANGLE_BRACKET,
+    RIGHT_ANGLE_BRACKET
   } = CHAR_CODE
 
   const HTML_ERROR_MESSAGE = "HTML comments are not allowed in modules"
@@ -32,10 +32,10 @@ function init() {
       const next = input.charCodeAt(pos + 1)
 
       // Detect opening HTML comment, i.e. `<!--`.
-      if (code === LT &&
-          next === EXMARK &&
-          input.charCodeAt(pos + 2) === HYPHEN &&
-          input.charCodeAt(pos + 3) === HYPHEN) {
+      if (code === LEFT_ANGLE_BRACKET &&
+          next === EXCLAMATION_MARK &&
+          input.charCodeAt(pos + 2) === HYPHEN_MINUS &&
+          input.charCodeAt(pos + 3) === HYPHEN_MINUS) {
         this.raise(pos, HTML_ERROR_MESSAGE)
       }
     }
@@ -51,8 +51,8 @@ function init() {
 
       // Detect closing HTML comment, i.e. `-->`.
       if (next === code &&
-          next === HYPHEN &&
-          input.charCodeAt(pos + 2) === GT &&
+          next === HYPHEN_MINUS &&
+          input.charCodeAt(pos + 2) === RIGHT_ANGLE_BRACKET &&
           (lastTokEnd === 0 ||
             lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
         this.raise(pos, HTML_ERROR_MESSAGE)

@@ -18,9 +18,9 @@ import shared from "../shared.js"
 import stat from "../fs/stat.js"
 
 const {
-  BSLASH,
-  PERIOD,
-  SLASH
+  BACKWARD_SLASH,
+  DOT,
+  FORWARD_SLASH
 } = CHAR_CODE
 
 const {
@@ -53,18 +53,18 @@ function findPath(request, paths, isMain, searchExts) {
   if (trailingSlash) {
     let code = request.charCodeAt(request.length - 1)
 
-    if (code === PERIOD) {
+    if (code === DOT) {
       code = request.charCodeAt(request.length - 2)
 
-      if (code === PERIOD) {
+      if (code === DOT) {
         code = request.charCodeAt(request.length - 3)
       }
     }
 
     trailingSlash =
-      code === SLASH ||
+      code === FORWARD_SLASH ||
       (WIN32 &&
-       code === BSLASH)
+       code === BACKWARD_SLASH)
   }
 
   let i = -1

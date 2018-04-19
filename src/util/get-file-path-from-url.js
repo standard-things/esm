@@ -9,7 +9,11 @@ import parseURL from "./parse-url.js"
 
 const {
   COLON,
-  SLASH
+  FORWARD_SLASH,
+  LOWERCASE_A,
+  LOWERCASE_Z,
+  UPPERCASE_A,
+  UPPERCASE_Z
 } = CHAR_CODE
 
 const {
@@ -68,9 +72,9 @@ function getFilePathFromURL(url) {
 
   // Drive letters must be `[A-Za-z]:/`
   // All slashes of pathnames are forward slashes.
-  if (((code1 > 64 && code1 < 91) ||
-       (code1 > 96 && code1 < 123)) &&
-      pathname.charCodeAt(3) === SLASH){
+  if (((code1 >= UPPERCASE_A && code1 <= UPPERCASE_Z) ||
+       (code1 >= LOWERCASE_A && code1 <= LOWERCASE_Z)) &&
+      pathname.charCodeAt(3) === FORWARD_SLASH){
     return normalize(pathname).slice(1)
   }
 

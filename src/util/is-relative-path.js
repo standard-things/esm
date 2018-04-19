@@ -2,9 +2,9 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 const {
-  BSLASH,
-  PERIOD,
-  SLASH
+  BACKWARD_SLASH,
+  DOT,
+  FORWARD_SLASH
 } = CHAR_CODE
 
 function isRelativePath(value) {
@@ -20,7 +20,7 @@ function isRelativePath(value) {
 
   let code = value.charCodeAt(0)
 
-  if (code !== PERIOD) {
+  if (code !== DOT) {
     return false
   }
 
@@ -30,7 +30,7 @@ function isRelativePath(value) {
 
   code = value.charCodeAt(1)
 
-  if (code === PERIOD) {
+  if (code === DOT) {
     if (length === 2) {
       return true
     }
@@ -43,11 +43,11 @@ function isRelativePath(value) {
   } = ENV
 
   if (WIN32 &&
-      code === BSLASH) {
+      code === BACKWARD_SLASH) {
     return true
   }
 
-  return code === SLASH
+  return code === FORWARD_SLASH
 }
 
 export default isRelativePath

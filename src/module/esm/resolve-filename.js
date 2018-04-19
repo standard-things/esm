@@ -21,7 +21,7 @@ import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
 
 const {
-  SLASH
+  FORWARD_SLASH
 } = CHAR_CODE
 
 const {
@@ -100,7 +100,7 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSep(request)) {
     if (! isAbs &&
         ! isRelativePath(request) &&
-        (request.charCodeAt(0) === SLASH ||
+        (request.charCodeAt(0) === FORWARD_SLASH ||
          request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
 

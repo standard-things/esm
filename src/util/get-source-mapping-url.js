@@ -6,12 +6,12 @@ import CHAR_CODE from "../constant/char-code.js"
 const {
   APOSTROPHE,
   AT,
-  EQ,
-  HT,
+  EQUAL,
+  FORWARD_SLASH,
   NUMSIGN,
   QUOTE,
   SPACE,
-  SLASH
+  TAB
 } = CHAR_CODE
 
 const NAME = "sourceMappingURL"
@@ -46,8 +46,8 @@ function getSourceMappingURL(content) {
     pos -= 4
 
     // Codeify the regexp check, /\/\/[@#][ \t]/, before `NAME`.
-    if (content.charCodeAt(pos) !== SLASH ||
-        content.charCodeAt(pos + 1) !== SLASH) {
+    if (content.charCodeAt(pos) !== FORWARD_SLASH ||
+        content.charCodeAt(pos + 1) !== FORWARD_SLASH) {
       continue
     }
 
@@ -60,14 +60,14 @@ function getSourceMappingURL(content) {
 
     code = content.charCodeAt(pos + 3)
 
-    if (code !== HT &&
-        code !== SPACE) {
+    if (code !== SPACE ||
+        code !== TAB) {
       continue
     }
 
     // Check for "=" after `NAME`.
     if (equalPos < length &&
-      content.charCodeAt(equalPos) !== EQ) {
+      content.charCodeAt(equalPos) !== EQUAL) {
       continue
     }
 
@@ -93,9 +93,9 @@ function getSourceMappingURL(content) {
     const code = match.charCodeAt(i)
 
     if (code === APOSTROPHE ||
-        code === HT ||
         code === QUOTE ||
-        code === SPACE) {
+        code === SPACE ||
+        code === TAB) {
       return ""
     }
   }

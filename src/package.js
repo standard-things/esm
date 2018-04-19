@@ -30,7 +30,7 @@ import { validRange } from "semver"
 import { version } from "./version.js"
 
 const {
-  PERIOD
+  DOT
 } = CHAR_CODE
 
 const {
@@ -131,7 +131,7 @@ class Package {
         const cacheNames = readdir(cachePath)
 
         for (const cacheName of cacheNames) {
-          if (cacheName.charCodeAt(0) !== PERIOD) {
+          if (cacheName.charCodeAt(0) !== DOT) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
             compileCache[cacheName] = true

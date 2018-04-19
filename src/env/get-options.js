@@ -9,7 +9,7 @@ import shared from "../shared.js"
 
 const {
   APOSTROPHE,
-  LBRACE,
+  LEFT_CURLY_BRACKET,
   QUOTE
 } = CHAR_CODE
 
@@ -40,7 +40,7 @@ function getOptions() {
   const code0 = options.charCodeAt(0)
 
   if (code0 === APOSTROPHE ||
-      code0 === LBRACE ||
+      code0 === LEFT_CURLY_BRACKET ||
       code0 === QUOTE) {
     options = parseJSON6(options)
   }

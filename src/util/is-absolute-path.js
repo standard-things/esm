@@ -4,10 +4,10 @@ import ENV from "../constant/env.js"
 import { isAbsolute as _isAbsolutePath } from "../safe/path.js"
 
 const {
-  BSLASH,
-  PERIOD,
-  QMARK,
-  SLASH
+  BACKWARD_SLASH,
+  DOT,
+  FORWARD_SLASH,
+  QUESTION_MARK
 } = CHAR_CODE
 
 function isAbsolutePath(value) {
@@ -15,7 +15,7 @@ function isAbsolutePath(value) {
     return false
   }
 
-  if (value.charCodeAt(0) === SLASH) {
+  if (value.charCodeAt(0) === FORWARD_SLASH) {
     const {
       WIN32
     } = ENV
@@ -24,16 +24,16 @@ function isAbsolutePath(value) {
     const code1 = value.charCodeAt(1)
 
     if (! WIN32) {
-      return code1 !== SLASH
+      return code1 !== FORWARD_SLASH
     }
 
-    if (code1 === BSLASH ||
-        code1 === SLASH) {
+    if (code1 === BACKWARD_SLASH ||
+        code1 === FORWARD_SLASH) {
       // Allow long UNC paths or named pipes.
       // https://en.wikipedia.org/wiki/Path_(computing)#Uniform_Naming_Convention
       // https://en.wikipedia.org/wiki/Named_pipe#In_Windows
       const code2 = value.charCodeAt(2)
-      return code2 === PERIOD || code2 === QMARK
+      return code2 === DOT || code2 === QUESTION_MARK
     }
 
     return true

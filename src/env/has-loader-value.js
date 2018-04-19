@@ -11,7 +11,7 @@ import realpath from "../fs/realpath.js"
 import rootModule from "../root-module.js"
 
 const {
-  HYPHEN
+  HYPHEN_MINUS
 } = CHAR_CODE
 
 function hasLoaderValue(value) {
@@ -26,7 +26,7 @@ function hasLoaderValue(value) {
       if (isOwnPath(realpath(resolved))) {
         return true
       }
-    } else if (value.charCodeAt(0) !== HYPHEN &&
+    } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&
         isOwnPath(_resolveFilename(value, rootModule))) {
       return true
     }

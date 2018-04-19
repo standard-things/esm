@@ -6,7 +6,7 @@ import hasLoaderValue from "./has-loader-value.js"
 import parseJSON from "../util/parse-json.js"
 
 const {
-  LBRACE
+  LEFT_CURLY_BRACKET
 } = CHAR_CODE
 
 function hasLoaderArg(args) {
@@ -15,7 +15,7 @@ function hasLoaderArg(args) {
   }
 
   return GenericArray.some(args, (arg) => {
-    return arg.charCodeAt(0) === LBRACE
+    return arg.charCodeAt(0) === LEFT_CURLY_BRACKET
       ? hasLoaderValue(parseJSON(arg))
       : hasLoaderValue(arg)
   })

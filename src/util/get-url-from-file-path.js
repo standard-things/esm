@@ -10,7 +10,7 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    SLASH
+    FORWARD_SLASH
   } = CHAR_CODE
 
   const encodeCharsRegExp = /[?#]/g
@@ -27,7 +27,7 @@ function init() {
   function getURLFromFilePath(filename) {
     filename = normalize(filename)
 
-    if (filename.charCodeAt(0) !== SLASH) {
+    if (filename.charCodeAt(0) !== FORWARD_SLASH) {
       filename = "/" + filename
     }
 

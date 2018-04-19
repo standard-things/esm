@@ -4,7 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    PERIOD
+    DOT
   } = CHAR_CODE
 
   function findIndexes(code, identifiers) {
@@ -26,7 +26,7 @@ function init() {
       // probably means the identifier is a property access rather than a
       // variable reference.
       if (! match.index ||
-          code.charCodeAt(match.index - 1) !== PERIOD) {
+          code.charCodeAt(match.index - 1) !== DOT) {
         indexes.push(match.index)
       }
     }
