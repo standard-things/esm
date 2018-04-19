@@ -20,7 +20,6 @@ const slashRegExp = /[\\/]/g
 
 const pkgPath = path.resolve("../index.js")
 const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
-const pkgName = "esm@" + pkgJSON.version
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
@@ -1187,8 +1186,11 @@ describe("spec compliance", () => {
       { id: "fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
     ].reduce((promise, data) => {
       const filename = path.resolve(data.id)
-      const url = getURLFromFilePath(filename)
-      const warning = getWarning(pkgName + " detected undefined arguments access (%s): %s", data.loc, url)
+      const warning = getWarning(
+        "esm@" + pkgJSON.version + " detected undefined arguments access (%s): %s",
+        data.loc,
+        getURLFromFilePath(filename)
+      )
 
       return promise
         .then(() => {

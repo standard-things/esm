@@ -13,5 +13,4 @@ const semver = shared.inited
   : shared.module.version = init()
 
 export const { major, minor, patch, version } = semver
-export const name = "esm@" + version
 export default semver

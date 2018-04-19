@@ -1,8 +1,8 @@
 import emitWarning from "./util/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
-import { name as pkgName } from "./version.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
+import { version } from "./version.js"
 
 function init() {
   const cacheKeys = { __proto__: null }
@@ -34,17 +34,20 @@ function init() {
   }
 
   function argumentsAccess(request, line, column) {
-    return pkgName + " detected undefined arguments access (" +
+    return "esm@" + version +
+      " detected undefined arguments access (" +
       line + ":" + column + "): " + getModuleURL(request)
   }
 
   function namespaceAssignment(request, name) {
-    return pkgName + " cannot assign to the read only module namespace property " +
+    return "esm@" + version +
+      " cannot assign to the read only module namespace property " +
       toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
   function namespaceExtension(request, name) {
-    return pkgName + " cannot add property " + toStringLiteral(name, "'") +
+    return "esm@" + version +
+      " cannot add property " + toStringLiteral(name, "'") +
       " to module namespace of " + getModuleURL(request)
   }
 
