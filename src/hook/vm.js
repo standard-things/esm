@@ -55,10 +55,8 @@ const ExObject = __external__.Object
 function hook(vm) {
   let entry
 
-  const pkg = Package.get("")
-
   function managerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(vm, "createScript", pkg.range)
+    const wrapped = Wrapper.find(vm, "createScript", "*")
 
     return Reflect.apply(wrapped, this, [manager, func, args])
   }
@@ -147,7 +145,7 @@ function hook(vm) {
   function setupEntry(mod) {
     entry = Entry.get(mod)
     entry.addBuiltinModules = createAddBuiltinModules(entry)
-    entry.package = pkg
+    entry.package = Package.get("")
     entry.require = makeRequireFunction(clone(mod))
     entry.runtimeName = shared.runtimeName
 
