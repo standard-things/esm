@@ -1,5 +1,6 @@
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
+import { name as pkgName } from "./version.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
@@ -140,7 +141,7 @@ function init() {
   }
 
   function invalidPkgMode(mode) {
-    return "The ESM option 'mode' is invalid. Received " + truncInspect(mode)
+    return "The " + pkgName + " option 'mode' is invalid. Received " + truncInspect(mode)
   }
 
   function invalidProtocol(protocol, expected) {
@@ -167,7 +168,7 @@ function init() {
   }
 
   function unknownPkgOption(optionName) {
-    return "Unknown ESM option: " + optionName
+    return "Unknown " + pkgName + " option: " + optionName
   }
 
   function undefinedIdentifier(identName) {

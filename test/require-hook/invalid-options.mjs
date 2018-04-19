@@ -5,19 +5,16 @@ import module from "../module.js"
 export default () => {
   assert.throws(
     () => makeRequire(module, { mode: "js" }),
-    Error,
-    `Error [ERR_INVALID_ESM_MODE]: The ESM option 'mode' is invalid. Received "js"`
+    /Error: The esm@[\d.]+ option 'mode' is invalid\. Received 'js'/
   )
 
   assert.throws(
     () => makeRequire(module, { esm: "mjs" }),
-    Error,
-    "Error [ERR_UNKNOWN_ESM_OPTION]: Unknown ESM option: esm"
+    /Error: Unknown esm@[\d.]+ option: esm/
   )
 
   assert.throws(
     () => makeRequire(module, { cjs: { namedexports: true } }),
-    Error,
-    'Error [ERR_UNKNOWN_ESM_OPTION]: Unknown ESM option: cjs["namedexports"]'
+    /Error: Unknown esm@[\d.]+ option: cjs\["namedexports"\]/
   )
 }
