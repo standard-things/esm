@@ -21,6 +21,7 @@ function init() {
   const map = {
     __proto__: null,
     config: [
+      "experimentalREPLAwait",
       "preserveSymlinks"
     ],
     fs: [

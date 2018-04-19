@@ -24,13 +24,11 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import realProcess from "../real/process.js"
 import realRequire from "../real/require.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
-import silent from "../util/silent.js"
 import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
@@ -168,12 +166,6 @@ function hook(vm) {
   }
 
   function setupREPL() {
-    if (INTERNAL) {
-      acornInternalAcorn.enable()
-      acornInternalWalk.enable()
-      setupREPLAwait()
-    }
-
     const { createContext } = REPLServer.prototype
 
     if (rootModule.id === "<repl>") {
@@ -189,6 +181,7 @@ function hook(vm) {
 
     const { support } = shared
 
+    // Exit for Node 6.
     if (! support.inspectProxies) {
       return
     }
@@ -206,7 +199,14 @@ function hook(vm) {
       writable: true
     })
 
+    // Exit for Node 10+.
     if (support.replShowProxy) {
+      if (INTERNAL &&
+          binding.config.experimentalREPLAwait) {
+        acornInternalAcorn.enable()
+        acornInternalWalk.enable()
+      }
+
       util.inspect = inspect
       return
     }
@@ -225,17 +225,6 @@ function hook(vm) {
         enumerable: true,
         value,
         writable: true
-      })
-    })
-  }
-
-  function setupREPLAwait() {
-    silent(() => {
-      Reflect.defineProperty(realProcess.binding("config"), "experimentalREPLAwait", {
-        __proto__: null,
-        configurable: true,
-        enumerable: true,
-        value: true
       })
     })
   }
