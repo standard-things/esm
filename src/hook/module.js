@@ -1,3 +1,4 @@
+import CHAR_CODE from "../constant/char-code.js"
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
 import PACKAGE from "../constant/package.js"
@@ -30,6 +31,14 @@ import readFileFast from "../fs/read-file-fast.js"
 import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 import toOptInError from "../util/to-opt-in-error.js"
+
+const {
+  DIGIT_0,
+  DIGIT_9,
+  EQUAL,
+  LOWERCASE_V,
+  TILDE
+} = CHAR_CODE
 
 const {
   STATE_EXECUTION_STARTED
@@ -92,7 +101,20 @@ function hook(Mod, parent) {
   function managerWrapper(manager, func, args) {
     const [, filename] = args
     const pkg = Package.from(filename)
-    const wrapped = Wrapper.find(_extensions, ".js", pkg.range)
+
+    let { range } = pkg
+
+    const code0 = range.charCodeAt(0)
+
+    if (code0 === TILDE ||
+        code0 === EQUAL ||
+        code0 === LOWERCASE_V) {
+      range = "^" + range.slice(1)
+    } else if (code0 >= DIGIT_0 && code0 <= DIGIT_9) {
+      range = "^" + range
+    }
+
+    const wrapped = Wrapper.find(_extensions, ".js", range)
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])
