@@ -18,7 +18,6 @@ import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isObjectEmpty from "../util/is-object-empty.js"
 import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
@@ -266,8 +265,7 @@ function tryPassthru(func, args, pkg) {
   if (error.name === "SyntaxError") {
     const { message } = error
 
-    if (importExportRegExp.test(message) &&
-        isObjectEmpty(error)) {
+    if (importExportRegExp.test(message)) {
       error.message =
         "Expected esm@" + pkg.range +
         ". Using " + pkgName + ": " + filename
