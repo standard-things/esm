@@ -24,12 +24,13 @@ import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
-import { name as pkgName } from "../version.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { resolve } from "../safe/path.js"
+import satisfies from "../util/satisfies.js"
 import shared from "../shared.js"
 import toOptInError from "../util/to-opt-in-error.js"
+import { version } from "../version.js"
 
 const {
   CIRCUMFLEX_ACCENT,
@@ -264,11 +265,13 @@ function tryPassthru(func, args, pkg) {
 
   if (error.name === "SyntaxError") {
     const { message } = error
+    const { range } = pkg
 
-    if (importExportRegExp.test(message)) {
+    if (importExportRegExp.test(message) &&
+        ! satisfies(version, range)) {
       error.message =
-        "Expected esm@" + pkg.range +
-        ". Using " + pkgName + ": " + filename
+        "Expected esm@" + range +
+        ". Using esm@" + version + ": " + filename
 
       error.stack = error.stack.replace(message, error.message)
     }
