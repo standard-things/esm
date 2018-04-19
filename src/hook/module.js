@@ -266,8 +266,8 @@ function tryPassthru(func, args, pkg) {
     if (importExportRegExp.test(message) &&
         isObjectEmpty(error)) {
       error.message =
-         pkgName + " is not enabled for " + filename +
-         ". If in doubt, delete the node_modules folder and reinstall."
+        "Expected esm@" + pkg.range +
+        ". Using " + pkgName + ": " + filename
 
       error.stack = error.stack.replace(message, error.message)
     }
