@@ -114,7 +114,7 @@ function init() {
       let chunk = this.lastSearchedChunk
       const searchForward = index > chunk.end
 
-      while (true) {
+      while (chunk) {
         if (chunk.contains(index)) {
           this._splitChunk(chunk, index)
           return
