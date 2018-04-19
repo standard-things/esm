@@ -33,6 +33,7 @@ import shared from "../shared.js"
 import toOptInError from "../util/to-opt-in-error.js"
 
 const {
+  CIRCUMFLEX_ACCENT,
   DIGIT_0,
   DIGIT_9,
   EQUAL,
@@ -106,12 +107,14 @@ function hook(Mod, parent) {
 
     const code0 = range.charCodeAt(0)
 
-    if (code0 === TILDE ||
-        code0 === EQUAL ||
-        code0 === LOWERCASE_V) {
-      range = "^" + range.slice(1)
-    } else if (code0 >= DIGIT_0 && code0 <= DIGIT_9) {
-      range = "^" + range
+    if (code0 !== CIRCUMFLEX_ACCENT) {
+      if (code0 >= DIGIT_0 && code0 <= DIGIT_9) {
+        range = "^" + range
+      } else if (code0 === TILDE ||
+          code0 === LOWERCASE_V ||
+          code0 === EQUAL) {
+        range = "^" + range.slice(1)
+      }
     }
 
     const wrapped = Wrapper.find(_extensions, ".js", range)
