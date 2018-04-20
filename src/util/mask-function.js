@@ -31,9 +31,9 @@ function maskFunction(func, source) {
 
   const toString = new OwnProxy(func.toString, {
     apply(target, thisArg, args) {
-      if (typeof thisArg === "function" &&
-          unwrapProxy(thisArg) === func &&
-          ! shared.package.default.options.debug) {
+      if (! shared.package.default.options.debug &&
+          typeof thisArg === "function" &&
+          unwrapProxy(thisArg) === func) {
         thisArg = cached.source
       }
 
