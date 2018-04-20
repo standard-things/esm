@@ -2,7 +2,7 @@ import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
 import getProxyDetails from "../util/get-proxy-details.js"
-import isOwnProxy from "../util/is-own-proxy.js"
+import isProxy from "../util/is-proxy.js"
 import shared from "../shared.js"
 
 function init() {
@@ -29,7 +29,7 @@ function init() {
       const toString = function () {
         let thisArg = this
 
-        if (isOwnProxy(thisArg)) {
+        if (isProxy(thisArg)) {
           const details = getProxyDetails(thisArg)
 
           if (details) {
@@ -67,7 +67,7 @@ function init() {
 
     try {
       const { toString } = funcProto
-      const proxy = new OwnProxy(toString)
+      const proxy = new Proxy(toString, { __proto__: null })
 
       result = typeof toString.call(proxy) === "string"
     } catch (e) {}
