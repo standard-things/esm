@@ -20,18 +20,18 @@ function validate(entry) {
   const { dependencySpecifiers, exportSpecifiers } = compileData
   const children = { __proto__: null }
   const mod = entry.module
-  const parentName = entry.name
+  const { name } = entry
 
   let isCyclical = false
 
   // Parse children.
-  for (const name in dependencySpecifiers) {
-    if (Reflect.has(builtinEntries, name)) {
+  for (const specifier in dependencySpecifiers) {
+    if (Reflect.has(builtinEntries, specifier)) {
       continue
     }
 
     const childEntry =
-    children[name] = _loadESM(name, mod)
+    children[specifier] = _loadESM(specifier, mod)
 
     entry.children[childEntry.name] = childEntry
 
@@ -45,10 +45,10 @@ function validate(entry) {
     ! isMJS(mod)
 
   // Validate requested child export names.
-  for (const name in children) {
-    const childEntry = children[name]
+  for (const specifier in children) {
+    const childEntry = children[specifier]
     const child = childEntry.module
-    const requestedExportNames = dependencySpecifiers[name]
+    const requestedExportNames = dependencySpecifiers[specifier]
 
     if (childEntry.type !== TYPE_ESM) {
       if (! namedExports &&
@@ -63,9 +63,9 @@ function validate(entry) {
       continue
     }
 
-    isCyclical =
-      isCyclical ||
-      Reflect.has(childEntry.children, parentName)
+    if (! isCyclical) {
+      isCyclical = Reflect.has(childEntry.children, name)
+    }
 
     const childCompileData = childEntry.compileData
     const childExportStars = childCompileData.exportStars
@@ -84,8 +84,8 @@ function validate(entry) {
       let throwExportMissing = true
 
       if (throwExportMissing) {
-        for (const childName of childExportStars) {
-          if (! Reflect.has(children, childName)) {
+        for (const childSpecifier of childExportStars) {
+          if (! Reflect.has(children, childSpecifier)) {
             throwExportMissing = false
             break
           }
@@ -99,12 +99,12 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const childName of entry.compileData.exportStars) {
-    if (Reflect.has(builtinEntries, childName)) {
+  for (const specifier of entry.compileData.exportStars) {
+    if (Reflect.has(builtinEntries, specifier)) {
       continue
     }
 
-    const childEntry = children[childName]
+    const childEntry = children[specifier]
 
     if (childEntry.type !== TYPE_ESM) {
       continue
