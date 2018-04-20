@@ -88,8 +88,7 @@ function resolveFilename(request, parent, isMain, options) {
     pkgOptions &&
     pkgOptions.cjs.paths
 
-  if ((autoMode || cjsPaths) &&
-      isMJS(parent)) {
+  if (isMJS(parent)) {
     autoMode =
     cjsPaths = false
   }
