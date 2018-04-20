@@ -21,7 +21,7 @@ function init() {
     customInspect: false,
     depth: 1,
     maxArrayLength: 0,
-    showHidden: false,
+    showHidden: true,
     showProxy: true
   }
 
@@ -39,6 +39,7 @@ function init() {
       const inspected = inspect(value, inspectOptions)
 
       inspectDepth -= 1
+
       return inspected.startsWith("Proxy") &&
         inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
     }

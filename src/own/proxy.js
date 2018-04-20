@@ -15,7 +15,7 @@ function init() {
 
   const markerDescriptor = {
     __proto__: null,
-    value: true
+    value: 1
   }
 
   const funcToStringTagDescriptor = {
