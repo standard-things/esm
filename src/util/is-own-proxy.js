@@ -13,38 +13,68 @@ function init() {
 
   let inspectDepth = 0
 
-  const inspectOptions = {
+  const endMarkerRegExp = new RegExp(
+    "[\\[\"']" +
+    PKG_PREFIX +
+    ":proxy['\"\\]]\\s*:\\s*1\\s*\\}\\s*.?$"
+  )
+
+  const deepInspectOptions = {
     __proto__: null,
     breakLength: 0,
     colors: false,
     compact: true,
     customInspect: false,
-    depth: 1,
+    depth: 2,
     maxArrayLength: 0,
     showHidden: true,
     showProxy: true
   }
+
+  const shallowInspectOptions = { __proto__: null }
+
+  for (const name in deepInspectOptions) {
+    shallowInspectOptions[name] = deepInspectOptions[name]
+  }
+
+  shallowInspectOptions.depth = 0
 
   function isOwnProxy(value) {
     if (! isObjectLike(value)) {
       return false
     }
 
-    if (OwnProxy.instances.has(value)) {
-      return true
+    return OwnProxy.instances.has(value) ||
+      isOwnProxyFallback(value)
+  }
+
+  function isOwnProxyFallback(value) {
+    if (! shared.support.inspectProxies ||
+        ++inspectDepth !== 1) {
+      return false
     }
 
-    if (shared.support.inspectProxies &&
-      ++inspectDepth === 1) {
-      const inspected = inspect(value, inspectOptions)
+    let inspected
 
+    try {
+      inspected = inspect(value, shallowInspectOptions)
+    } finally {
       inspectDepth -= 1
-
-      return inspected.startsWith("Proxy") &&
-        inspected.endsWith("'" + PKG_PREFIX + ":proxy': 1 } ]")
     }
 
-    return false
+    if (! inspected.startsWith("Proxy")) {
+      return false
+    }
+
+    inspectDepth += 1
+
+    try {
+      inspected = inspect(value, deepInspectOptions)
+    } finally {
+      inspectDepth -= 1
+    }
+
+    return endMarkerRegExp.test(inspected)
   }
 
   return isOwnProxy
