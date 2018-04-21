@@ -19,25 +19,25 @@ function init() {
     ":proxy['\"\\]]\\s*:\\s*1\\s*\\}\\s*.?$"
   )
 
-  const deepInspectOptions = {
+  const inspectOptions = {
     __proto__: null,
-    breakLength: 0,
+    breakLength: Infinity,
     colors: false,
     compact: true,
     customInspect: false,
-    depth: 2,
+    depth: 1,
     maxArrayLength: 0,
     showHidden: true,
     showProxy: true
   }
 
-  const shallowInspectOptions = { __proto__: null }
+  const noDepthInspectOptions = { __proto__: null }
 
-  for (const name in deepInspectOptions) {
-    shallowInspectOptions[name] = deepInspectOptions[name]
+  for (const name in inspectOptions) {
+    noDepthInspectOptions[name] = inspectOptions[name]
   }
 
-  shallowInspectOptions.depth = 0
+  noDepthInspectOptions.depth = 0
 
   function isOwnProxy(value) {
     if (! isObjectLike(value)) {
@@ -57,7 +57,7 @@ function init() {
     let inspected
 
     try {
-      inspected = inspect(value, shallowInspectOptions)
+      inspected = inspect(value, noDepthInspectOptions)
     } finally {
       inspectDepth -= 1
     }
@@ -69,7 +69,7 @@ function init() {
     inspectDepth += 1
 
     try {
-      inspected = inspect(value, deepInspectOptions)
+      inspected = inspect(value, inspectOptions)
     } finally {
       inspectDepth -= 1
     }
