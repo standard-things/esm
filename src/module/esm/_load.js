@@ -10,7 +10,6 @@ import _load from "../_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
-import isError from "../../util/is-error.js"
 import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
@@ -20,7 +19,6 @@ import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
 import setSetter from "../../util/set-setter.js"
 import shared from "../../shared.js"
-import toOptInError from "../../util/to-opt-in-error.js"
 
 const {
   TYPE_ESM
@@ -152,9 +150,6 @@ function load(request, parent, isMain, preload) {
 
   if (! threw) {
     return entry
-  } else if (isError(error) &&
-      error.code === "ERR_REQUIRE_ESM") {
-    toOptInError(error)
   }
 
   try {
