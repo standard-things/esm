@@ -2,12 +2,14 @@ import { extname, resolve } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 
-import _resolveFilename from "../module/esm/_resolve-filename.js"
+import Module from "../module.js"
+
 import isObjectLike from "../util/is-object-like.js"
 import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
 import keys from "../util/keys.js"
 import realpath from "../fs/realpath.js"
+import resolveFilename from "../module/esm/resolve-filename.js"
 import rootModule from "../root-module.js"
 
 const {
@@ -27,7 +29,7 @@ function hasLoaderValue(value) {
         return true
       }
     } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&
-        isOwnPath(_resolveFilename(value, rootModule))) {
+        isOwnPath(tryResolveFilename(value, rootModule))) {
       return true
     }
   } else if (isObjectLike(value)) {
@@ -41,6 +43,18 @@ function hasLoaderValue(value) {
   }
 
   return false
+}
+
+function tryResolveFilename(request, parent) {
+  try {
+    return Module._resolveFilename(request, parent)
+  } catch (e) {}
+
+  try {
+    return resolveFilename(request, parent)
+  } catch (e) {}
+
+  return ""
 }
 
 export default hasLoaderValue
