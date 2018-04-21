@@ -324,10 +324,14 @@ function watchImport(entry, request, setterArgsList, loader) {
     moduleState.requireDepth -= 1
   }
 
-  entry._requireESM = true
-  mod.require(request)
+  if (childEntry.builtin) {
+    mod.require(childEntry.name)
+  } else {
+    entry._requireESM = true
+    mod.require(request)
+    childEntry.loaded()
+  }
 
-  childEntry.loaded()
   childEntry.update()
 }
 

@@ -5,6 +5,7 @@ import SemVer from "semver"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
+import * as fsNs from "fs"
 import mockIo from "mock-stdio"
 import path from "path"
 import require from "./require.js"
@@ -605,6 +606,21 @@ describe("Node rules", () => {
       ))
   )
 
+  it("should support builtin module specifiers with URL query/fragments", () =>
+    Promise
+      .all([
+        "fs?a",
+        "fs#a",
+        "fs?a#a",
+        "%66%73",
+        "%66%73?a#a"
+      ]
+      .map((request) =>
+        import(request)
+          .then((ns) => assert.deepStrictEqual(ns, fsNs))
+      ))
+  )
+
   it("should support requests containing colons in ESM", () =>
     Promise
       .all([
@@ -615,11 +631,11 @@ describe("Node rules", () => {
       .map((request) => import(request)))
   )
 
-  it("should support requests containing percents in ESM", () =>
+  it("should support requests containing percent signs in ESM", () =>
     import("./fixture/with%2520percent.mjs")
   )
 
-  it("should support requests containing pounds in ESM", () =>
+  it("should support requests containing pound characters in ESM", () =>
     import("./fixture/with%23pound.mjs")
   )
 
@@ -638,7 +654,7 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should reevaluate requests with different query+fragments", () =>
+  it("should reevaluate requests with different URL query/fragments", () =>
     import("./fixture/load-count.mjs")
       .then((oldNs) =>
         [

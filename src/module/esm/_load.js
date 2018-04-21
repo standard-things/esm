@@ -7,6 +7,7 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../_load.js"
+import builtinEntries from "../../builtin-entries.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import isError from "../../util/is-error.js"
@@ -43,6 +44,20 @@ function load(request, parent, isMain, preload) {
   }
 
   const fromPath = dirname(filename)
+
+  let entry
+
+  if (fromPath === "." &&
+      Reflect.has(builtinEntries, filename)) {
+    entry = builtinEntries[filename]
+
+    if (preload) {
+      preload(entry)
+    }
+
+    return entry
+  }
+
   const { parseState } = shared
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
@@ -69,7 +84,7 @@ function load(request, parent, isMain, preload) {
   let called = false
   let threw = false
 
-  const entry = _load(request, parent, isMain, state, (entry) => {
+  entry = _load(request, parent, isMain, state, (entry) => {
     const mod = entry.module
 
     state._cache[request] = mod
@@ -100,8 +115,6 @@ function load(request, parent, isMain, preload) {
       return
     }
 
-    called = true
-
     if (! parsing) {
       const isESM = entry.type === TYPE_ESM
 
@@ -120,6 +133,8 @@ function load(request, parent, isMain, preload) {
         mod.parent = void 0
       }
     }
+
+    called = true
 
     try {
       loader(entry, preload)

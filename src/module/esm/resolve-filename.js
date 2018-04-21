@@ -6,6 +6,7 @@ import Package from "../../package.js"
 import SafeModule from "../../safe/module.js"
 
 import _resolveFilename from "./_resolve-filename.js"
+import builtinEntries from "../../builtin-entries.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import errors from "../../errors.js"
 import { extname } from "../../safe/path.js"
@@ -121,6 +122,11 @@ function resolveFilename(request, parent, isMain, options) {
       const skipGlobalPaths = ! cjsPaths
 
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
+
+      if (! foundPath &&
+          Reflect.has(builtinEntries, decoded)) {
+        return cache[cacheKey] = decoded
+      }
     }
   }
 
