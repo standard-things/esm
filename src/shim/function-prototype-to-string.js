@@ -1,12 +1,8 @@
 import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
-import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isOwnProxy from "../util/is-own-proxy.js"
-import isProxy from "../util/is-proxy.js"
 import shared from "../shared.js"
-import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
   const NATIVE_SOURCE_TEXT = "function () { [native code] }"
@@ -30,29 +26,16 @@ function init() {
       const _toString = funcProto.toString
 
       const toString = function () {
-        let thisArg = this
-
-        if (isProxy(thisArg)) {
-          if (isOwnProxy(thisArg)) {
-            thisArg = unwrapProxy(thisArg)
-          } else {
-            return NATIVE_SOURCE_TEXT
-          }
-        }
-
         try {
-          return call(_toString, thisArg)
+          return call(_toString, this)
         } catch (e) {
           if (isError(e) &&
               e.name === "TypeError" &&
-              typeof thisArg === "function") {
-            if (has(thisArg, "toString") ||
-                typeof thisArg.toString !== "function") {
-              return NATIVE_SOURCE_TEXT
-            }
-
-            return thisArg.toString()
+              typeof this === "function") {
+            return NATIVE_SOURCE_TEXT
           }
+
+          throw e
         }
       }
 
