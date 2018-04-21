@@ -5,7 +5,6 @@ import Entry from "./entry.js"
 
 import _loadESM from "./module/esm/_load.js"
 import errors from "./errors.js"
-import builtinEntries from "./builtin-entries.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
@@ -169,10 +168,6 @@ const Runtime = {
           }
         })]]
 
-        if (Reflect.has(builtinEntries, request)) {
-          return watchBuiltin(entry, request, setterArgsList)
-        }
-
         try {
           watchImport(entry, request, setterArgsList, loadESM)
         } catch (e) {
@@ -215,11 +210,7 @@ const Runtime = {
   },
 
   watch(request, setterArgsList) {
-    const { entry } = this
-
-    return Reflect.has(builtinEntries, request)
-      ? watchBuiltin(entry, request, setterArgsList)
-      : watchImport(entry, request, setterArgsList, _loadESM)
+    return watchImport(this.entry, request, setterArgsList, _loadESM)
   }
 }
 
@@ -287,14 +278,6 @@ function runESM(entry, moduleWrapper) {
   })
 
   return result
-}
-
-function watchBuiltin(entry, request, setterArgsList) {
-  entry.module.require(request)
-
-  builtinEntries[request]
-    .addSetters(setterArgsList, entry)
-    .update()
 }
 
 function watchImport(entry, request, setterArgsList, loader) {

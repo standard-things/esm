@@ -1,7 +1,6 @@
 import ENTRY from "../../constant/entry.js"
 
 import _loadESM from "./_load.js"
-import builtinEntries from "../../builtin-entries.js"
 import errors from "../../errors.js"
 import isMJS from "../../util/is-mjs.js"
 
@@ -26,18 +25,19 @@ function validate(entry) {
 
   // Parse children.
   for (const specifier in dependencySpecifiers) {
-    if (Reflect.has(builtinEntries, specifier)) {
-      continue
-    }
-
-    const childEntry =
-    children[specifier] = _loadESM(specifier, mod)
+    const childEntry = _loadESM(specifier, mod)
 
     entry.children[childEntry.name] = childEntry
+
+    if (childEntry.builtin) {
+      continue
+    }
 
     if (childEntry.state < STATE_PARSING_COMPLETED) {
       childEntry.state = STATE_PARSING_COMPLETED
     }
+
+    children[specifier] = childEntry
   }
 
   const namedExports =
@@ -100,13 +100,10 @@ function validate(entry) {
 
   // Resolve export names from star exports.
   for (const specifier of entry.compileData.exportStars) {
-    if (Reflect.has(builtinEntries, specifier)) {
-      continue
-    }
-
     const childEntry = children[specifier]
 
-    if (childEntry.type !== TYPE_ESM) {
+    if (! childEntry ||
+        childEntry.type !== TYPE_ESM) {
       continue
     }
 

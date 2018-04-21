@@ -8,6 +8,7 @@ import Entry from "../entry.js"
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
+import builtinEntries from "../builtin-entries.js"
 import moduleState from "./state.js"
 import realProcess from "../real/process.js"
 import shared from "../shared.js"
@@ -45,6 +46,8 @@ function load(filename, parent, isMain, state, loader) {
     }
 
     entry.state = STATE_EXECUTION_STARTED
+  } else if (Reflect.has(builtinEntries, filename)) {
+    return builtinEntries[filename]
   } else {
     child = new Module(filename, parent)
     child.filename = filename

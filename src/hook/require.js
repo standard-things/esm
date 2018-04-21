@@ -1,4 +1,3 @@
-import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 import loadESM from "../module/esm/load.js"
 import makeRequireFunction from "../module/make-require-function.js"
@@ -20,9 +19,7 @@ function hook(parent) {
       throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
     }
 
-    return Reflect.has(builtinEntries, request)
-      ? builtinEntries[request].module.exports
-      : loadESM(request, parent, false).module.exports
+    return loadESM(request, parent, false).module.exports
   }
 
   function resolver(request, options) {

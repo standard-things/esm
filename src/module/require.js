@@ -8,7 +8,6 @@ import Entry from "../entry.js"
 import Module from "../module.js"
 
 import _loadESM from "./esm/_load.js"
-import builtinEntries from "../builtin-entries.js"
 import errors from "../errors.js"
 
 const {
@@ -27,10 +26,6 @@ const req = function require(request) {
 
   if (request === "") {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
-  }
-
-  if (Reflect.has(builtinEntries, request)) {
-    return builtinEntries[request].module.exports
   }
 
   const entry = Entry.get(this)
