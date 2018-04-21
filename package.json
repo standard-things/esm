@@ -57,7 +57,7 @@
     "html-minifier": "^3.5.15",
     "husky": "^0.14.3",
     "jest": "^22.4.3",
-    "json-6": "^0.1.128",
+    "json-6": "^1.0.1",
     "mocha": "^5.1.0",
     "mock-require": "^3.0.1",
     "mock-stdio": "^1.0.2",
