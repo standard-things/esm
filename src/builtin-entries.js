@@ -118,6 +118,7 @@ for (const id of builtinModules) {
     Entry.set(exported, entry)
 
     entry.builtin = true
+    entry.id = id
     entry.loaded()
     return entry
   })
