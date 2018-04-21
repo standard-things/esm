@@ -4,9 +4,9 @@ import path from "path"
 import colon1 from "../fixture/with%3Acolon.mjs"
 import colon2 from "../fixture/with%3Acolon.mjs?"
 import colon3 from "../fixture/with%3Acolon.mjs?a#a"
-import pound1 from "../fixture/with%23pound.mjs"
-import pound2 from "../fixture/with%23pound.mjs?#"
-import pound3 from "../fixture/with%23pound.mjs?b#b"
+import hash1 from "../fixture/with%23hash.mjs"
+import hash2 from "../fixture/with%23hash.mjs?#"
+import hash3 from "../fixture/with%23hash.mjs?b#b"
 import percent1 from "../fixture/with%2520percent.mjs"
 import percent2 from "../fixture/with%2520percent.mjs#c"
 import percent3 from "../fixture/with%2520percent.mjs?c#c"
@@ -20,8 +20,8 @@ const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 const colonPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")
 const colonURL = testURL + "/fixture/with:colon.mjs"
 
-const poundPath = path.resolve(testPath, "fixture/with%23pound.mjs")
-const poundURL = testURL + "/fixture/with%23pound.mjs"
+const hashPath = path.resolve(testPath, "fixture/with%23hash.mjs")
+const hashURL = testURL + "/fixture/with%23hash.mjs"
 
 const percentPath = path.resolve(testPath, "fixture/with%2520percent.mjs")
 const percentURL = testURL + "/fixture/with%2520percent.mjs"
@@ -29,7 +29,7 @@ const percentURL = testURL + "/fixture/with%2520percent.mjs"
 export default () => {
   [
     colon1, colon2, colon3,
-    pound1, pound2, pound3,
+    hash1, hash2, hash3,
     percent1, percent2, percent3
   ]
   .forEach((def) => {
@@ -45,14 +45,14 @@ export default () => {
   meta = createMeta({ url: colonURL + "?a#a" })
   assert.deepStrictEqual(colon3, meta)
 
-  meta = createMeta({ url: poundURL })
-  assert.deepStrictEqual(pound1, meta)
+  meta = createMeta({ url: hashURL })
+  assert.deepStrictEqual(hash1, meta)
 
-  meta = createMeta({ url: poundURL + "?#" })
-  assert.deepStrictEqual(pound2, meta)
+  meta = createMeta({ url: hashURL + "?#" })
+  assert.deepStrictEqual(hash2, meta)
 
-  meta = createMeta({ url: poundURL + "?b#b" })
-  assert.deepStrictEqual(pound3, meta)
+  meta = createMeta({ url: hashURL + "?b#b" })
+  assert.deepStrictEqual(hash3, meta)
 
   meta = createMeta({ url: percentURL })
   assert.deepStrictEqual(percent1, meta)

@@ -635,8 +635,8 @@ describe("Node rules", () => {
     import("./fixture/with%2520percent.mjs")
   )
 
-  it("should support requests containing pound characters in ESM", () =>
-    import("./fixture/with%23pound.mjs")
+  it("should support requests containing hash signs in ESM", () =>
+    import("./fixture/with%23hash.mjs")
   )
 
   it("should not support URL requests with encoded slashes", () =>
