@@ -183,28 +183,18 @@ function load(request, parent, isMain, preload) {
 
 function tryResolveFilename(request, parent, isMain) {
   let error
-  let result
-  let threw = true
 
   try {
-    result = Module._resolveFilename(request, parent, isMain)
-    threw = false
+    return Module._resolveFilename(request, parent, isMain)
   } catch (e) {
     error = e
   }
 
-  if (threw) {
-    try {
-      result = resolveFilename(request, parent, isMain)
-      threw = false
-    } catch (e) {}
-  }
+  try {
+    return resolveFilename(request, parent, isMain)
+  } catch (e) {}
 
-  if (threw) {
-    throw error
-  }
-
-  return result
+  throw error
 }
 
 export default load
