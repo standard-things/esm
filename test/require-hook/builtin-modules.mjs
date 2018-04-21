@@ -5,8 +5,8 @@ import require from "../require"
 
 export default () => {
   const esmRequire = makeRequire(module)
-  const requiredAsseert = esmRequire("assert")
+  const requiredAssert = esmRequire("assert")
 
-  assert.strictEqual(requiredAsseert, assert)
-  assert.strictEqual(requiredAsseert, require("assert"))
+  assert.strictEqual(requiredAssert, assert)
+  assert.strictEqual(requiredAssert, require("assert"))
 }
