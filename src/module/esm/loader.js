@@ -21,14 +21,15 @@ function loader(entry, preload) {
 
   const mod = entry.module
   const { filename } = mod
-  const { parent } = entry
+  const parentEntry = entry.parent
+  const parent = parentEntry && parentEntry.module
 
   let { _extensions } = moduleState
   let ext = extname(filename)
 
   if (ext === ".js" ||
-      (parent &&
-       parent.package.options.cjs.extensions &&
+      (parentEntry &&
+        parentEntry.package.options.cjs.extensions &&
        ! isMJS(parent))) {
     _extensions = Module._extensions
   }
