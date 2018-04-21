@@ -2,10 +2,12 @@ import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
+import Module from "../../module.js"
 import Package from "../../package.js"
 import SafeModule from "../../safe/module.js"
 
-import _resolveFilename from "./_resolve-filename.js"
+import _findPath from "../_find-path.js"
+import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import builtinEntries from "../../builtin-entries.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import errors from "../../errors.js"
@@ -18,6 +20,7 @@ import isAbsolutePath from "../../util/is-absolute-path.js"
 import isMJS from "../../util/is-mjs.js"
 import isObject from "../../util/is-object.js"
 import isRelativePath from "../../util/is-relative-path.js"
+import nodeModulePaths from "../node-module-paths.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
 
@@ -56,6 +59,10 @@ for (const ext of esmExts) {
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
+  }
+
+  if (Reflect.has(builtinEntries, request)) {
+    return request
   }
 
   // Electron patches `Module._resolveFilename` to return its path.
@@ -149,6 +156,38 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   throw new MODULE_NOT_FOUND(request)
+}
+
+function _resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
+  let paths
+
+  if (options &&
+      Array.isArray(options.paths)) {
+    const fakeParent = new Module("", null)
+    const fromPaths = options.paths
+
+    paths = []
+
+    for (const fromPath of fromPaths) {
+      fakeParent.paths = nodeModulePaths(fromPath)
+
+      const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
+
+      if (paths.indexOf(fromPath) === -1) {
+        paths.push(fromPath)
+      }
+
+      for (const lookupPath of lookupPaths) {
+        if (paths.indexOf(lookupPath) === -1) {
+          paths.push(lookupPath)
+        }
+      }
+    }
+  } else {
+    paths = _resolveLookupPaths(request, parent, skipGlobalPaths)
+  }
+
+  return _findPath(request, paths, isMain, searchExts)
 }
 
 export default resolveFilename
