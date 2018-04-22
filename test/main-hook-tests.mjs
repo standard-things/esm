@@ -73,7 +73,8 @@ describe("main hook", function () {
     return [
       "{cjs:0,mode:'all'}",
       "{cjs:false,mode:'all'}"
-    ].reduce((promise, ESM_OPTIONS) =>
+    ]
+    .reduce((promise, ESM_OPTIONS) =>
       promise
         .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
         .then((result) => {

@@ -677,7 +677,8 @@ describe("Node rules", () => {
           { id: "./fixture/load-count.mjs?6#6", count: 6 },
           { id: "./fixture/load-count.mjs#5",   count: 5 },
           { id: "./fixture/load-count.mjs?6#6", count: 6 }
-        ].reduce((promise, data) =>
+        ]
+        .reduce((promise, data) =>
           promise
             .then(() => import(data.id))
             .then((ns) => {
@@ -694,7 +695,8 @@ describe("Node rules", () => {
       "./fixture/reevaluate-error.mjs",
       "./fixture/reevaluate-error.mjs?a",
       "./fixture/reevaluate-error.mjs#a"
-    ].reduce((promise, request, index) =>
+    ]
+    .reduce((promise, request, index) =>
       promise
         .then(() => {
           Reflect.deleteProperty(global, "evaluated")
@@ -745,7 +747,7 @@ describe("Node rules", () => {
     Reflect.deleteProperty(require.cache, filename)
 
     return import(filename)
-      .then(() => assert.strictEqual(filename in require.cache, false))
+      .then(() => assert.strictEqual(Reflect.has(require.cache, filename), false))
   })
 
   it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
@@ -945,15 +947,16 @@ describe("spec compliance", () => {
       "./fixture/load-count.js",
       "./fixture/cycle/load-count/a.js",
       "./fixture/cycle/load-count/a.mjs"
-    ].reduce((promise, request) => {
-      return promise
+    ]
+    .reduce((promise, request) =>
+      promise
         .then(() => {
           Reflect.deleteProperty(global, "loadCount")
           Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
           return import(request)
         })
         .then(() => assert.strictEqual(global.loadCount, 1))
-    }, Promise.resolve())
+    , Promise.resolve())
   )
 
   it("should not execute already loaded modules from `require`", () =>
@@ -1208,7 +1211,8 @@ describe("spec compliance", () => {
     [
       { id: "fixture/source/arguments-undefined.mjs", loc: "1:0" },
       { id: "fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
-    ].reduce((promise, data) => {
+    ]
+    .reduce((promise, data) => {
       const filename = path.resolve(data.id)
       const warning = getWarning(
         "esm@" + pkgJSON.version + " detected undefined arguments access (%s): %s",
