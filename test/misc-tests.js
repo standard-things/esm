@@ -568,7 +568,7 @@ describe("Node rules", () => {
       })
   )
 
-  it("should find .mjs before .js in ESM", () =>
+  it("should find `.mjs` before `.js` in ESM", () =>
     Promise
       .all([
         "./fixture/ext-priority",
@@ -920,13 +920,13 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should not support loading ESM from require", () =>
+  it("should not support loading ESM from `require`", () =>
     import("./fixture/require-esm")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
-  it("should not support loading ESM from require if already loaded", () =>
+  it("should not support loading ESM from `require` if already loaded", () =>
     import("./fixture/require-esm")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
@@ -948,7 +948,7 @@ describe("spec compliance", () => {
     }, Promise.resolve())
   )
 
-  it("should not execute already loaded modules from require", () =>
+  it("should not execute already loaded modules from `require`", () =>
     import("./fixture/load-count.js")
       .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
   )
