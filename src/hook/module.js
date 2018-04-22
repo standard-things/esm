@@ -227,16 +227,7 @@ function hook(Mod, parent) {
 }
 
 function mjsCompiler(mod, filename) {
-  const error = new ERR_REQUIRE_ESM(mod)
-  const { mainModule } = moduleState
-
-  if (mainModule &&
-      mainModule.filename === filename) {
-    error.message = safeToString(error.message)
-      .replace("Must use import", "Must opt-in esm@" + version)
-  }
-
-  throw error
+  throw new ERR_REQUIRE_ESM(filename)
 }
 
 function readCachedCode(filename) {
