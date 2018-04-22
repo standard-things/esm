@@ -10,7 +10,10 @@ function init() {
     }
 
     const resolved = resolve(filename)
-    return resolved.replace(backSlashRegExp, "/")
+
+    return shared.env.win32
+      ? resolved.replace(backSlashRegExp, "/")
+      : resolved
   }
 
   return normalize
