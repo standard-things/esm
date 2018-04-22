@@ -27,9 +27,9 @@ const {
 function load(request, parent, isMain, preload) {
   const { parsing, passthru } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
+  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
-  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
 
   let filename
 
@@ -135,7 +135,7 @@ function load(request, parent, isMain, preload) {
     called = true
 
     try {
-      loader(entry, preload)
+      loader(entry, filename, parentEntry, preload)
     } catch (e) {
       error = e
       threw = true

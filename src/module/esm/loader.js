@@ -11,7 +11,7 @@ const {
   STATE_PARSING_COMPLETED
 } = ENTRY
 
-function loader(entry, preload) {
+function loader(entry, filename, parentEntry, preload) {
   const { parsing } = shared.moduleState
 
   if (preload &&
@@ -20,8 +20,6 @@ function loader(entry, preload) {
   }
 
   const mod = entry.module
-  const { filename } = mod
-  const parentEntry = entry.parent
   const parent = parentEntry && parentEntry.module
 
   let { _extensions } = moduleState

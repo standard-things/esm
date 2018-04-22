@@ -580,14 +580,6 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should not support loading `.mjs` files from `require`", () =>
-    Promise
-      .resolve()
-      .then(() => require("./fixture/export/abc.mjs"))
-      .then(() => assert.ok(false))
-      .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
-  )
-
   it("should not respect new `require.extensions` in ESM", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./fixture/cof")
@@ -930,14 +922,44 @@ describe("spec compliance", () => {
       })
   )
 
-  it("should not support loading ESM from `require`", () =>
-    import("./fixture/require-esm")
-      .then(() => assert.ok(false))
-      .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
+  it("should not support loading ESM files from `require`", () =>
+    Promise
+      .all([
+        import("./fixture/require-esm/strict/js.js")
+          .then(() => assert.ok(false))
+          .catch((e) => assert.ok(e instanceof SyntaxError)),
+        import("./fixture/require-esm/strict/mjs.js")
+          .then(() => assert.ok(false))
+          .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
+      ])
   )
 
-  it("should not support loading ESM from `require` if already loaded", () =>
-    import("./fixture/require-esm")
+  it("should not support loading preloaded ESM files from `require`", () =>
+    Promise
+      .all([
+        import("./fixture/export/abc.js"),
+        import("./fixture/export/abc.mjs")
+      ])
+      .then(() =>
+        [
+          "./fixture/require-esm/strict/js.js",
+          "./fixture/require-esm/strict/mjs.js"
+        ]
+        .reduce((promise, request) =>
+          promise
+            .then(() => import(request))
+            .then(() => assert.ok(false))
+            .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
+        , Promise.resolve())
+      )
+  )
+
+  it("should support loading `.js` ESM files from `require` with `options.cjs`", () =>
+    import("./fixture/require-esm/cjs/js.js")
+  )
+
+  it("should not support loading `.mjs` files from `require` with `options.cjs`", () =>
+    import("./fixture/require-esm/cjs/mjs.js")
       .then(() => assert.ok(false))
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )

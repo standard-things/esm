@@ -9,6 +9,7 @@ import Module from "../module.js"
 
 import _loadESM from "./esm/_load.js"
 import errors from "../errors.js"
+import { extname } from "../safe/path.js"
 
 const {
   TYPE_ESM
@@ -29,16 +30,17 @@ const req = function require(request) {
   }
 
   const entry = Entry.get(this)
-
-  const isESM =
-    entry._requireESM ||
-    entry.type === TYPE_ESM
+  const { _requireESM } = entry
 
   entry._requireESM = false
 
-  return isESM
-    ? _loadESM(request, this, false).module.exports
-    : Module._load(request, this, false)
+  if (_requireESM ||
+      (entry.type === TYPE_ESM &&
+       extname(request) !== ".mjs")) {
+    return _loadESM(request, this, false).module.exports
+  }
+
+  return Module._load(request, this, false)
 }
 
 export default req

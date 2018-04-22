@@ -1,11 +1,8 @@
 import assert from "assert"
 import * as customNs from "../../fixture/cjs/export/pseudo-custom.js"
-import * as defaultNs from "../../fixture/cjs/export/nothing.mjs"
-import * as noNs from "../../fixture/export/abc.mjs"
+import * as defaultNs from "../../fixture/export/nothing.mjs"
 
 const customValue = require("../../fixture/cjs/export/pseudo-custom.js")
-const defaultValue = require("../../fixture/cjs/export/nothing.mjs")
-const noValue = require("../../fixture/export/abc.mjs")
 
 export default () => {
   const partialDescriptor = {
@@ -30,11 +27,6 @@ export default () => {
   }
 
   assert.strictEqual(Reflect.getOwnPropertyDescriptor(defaultNs, "__esModule"), void 0)
-  assert.strictEqual(Reflect.getOwnPropertyDescriptor(defaultValue, "__esModule"), void 0)
-
   assert.deepStrictEqual(getPartialDescriptor(customNs, "__esModule"), partialDescriptor)
   assert.deepStrictEqual(getPartialDescriptor(customValue, "__esModule"), partialDescriptor)
-
-  assert.strictEqual(Reflect.getOwnPropertyDescriptor(noNs, "__esModule"), void 0)
-  assert.strictEqual(Reflect.getOwnPropertyDescriptor(noValue, "__esModule"), void 0)
 }
