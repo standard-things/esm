@@ -580,6 +580,14 @@ describe("Node rules", () => {
       ))
   )
 
+  it("should not support loading `.mjs` files from `require`", () =>
+    Promise
+      .resolve()
+      .then(() => require("./fixture/export/abc.mjs"))
+      .then(() => assert.ok(false))
+      .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
+  )
+
   it("should not respect new `require.extensions` in ESM", () => {
     require.extensions[".coffee"] = require.extensions[".js"]
     return import("./fixture/cof")
