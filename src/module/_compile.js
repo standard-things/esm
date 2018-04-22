@@ -109,9 +109,9 @@ function compile(caller, entry, content, filename, fallback) {
 
     const defaultPkg = shared.package.default
     const isESM = entry.type === TYPE_ESM
-    const { parent } = entry
-    const parentPkg = parent && parent.package
-    const parentIsESM = parent && parent.type === TYPE_ESM
+    const parentEntry = entry.parent
+    const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+    const parentPkg = parentEntry && parentEntry.package
 
     if (! isESM &&
         ! parentIsESM &&

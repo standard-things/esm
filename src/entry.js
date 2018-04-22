@@ -313,19 +313,20 @@ class Entry {
   }
 
   update() {
-    // Lazily-initialized mapping of parent module identifiers to parent
-    // module objects whose setters we might need to run.
+    // Lazily-initialized map of parent module names to parent entries whose
+    // setters might need to run.
     let parentsMap
 
     this._changed = false
 
     runGetters(this)
     runSetters(this, (setter, value) => {
-      const { localNames, parent } = setter
-      const { bindings } = parent
+      const parentEntry = setter.parent
+      const { bindings } = parentEntry
+      const { localNames } = setter
 
       parentsMap || (parentsMap = { __proto__: null })
-      parentsMap[parent.name] = parent
+      parentsMap[parentEntry.name] = parentEntry
 
       setter(value, this)
 
@@ -490,11 +491,11 @@ function createNamespace(entry, source = entry) {
 function getExportByName(entry, setter, name) {
   const { _namespace } = entry
   const isCJS = entry.type === TYPE_CJS
-  const { parent } = setter
+  const parentEntry = setter.parent
 
   const parentNamedExports =
-    parent.package.options.cjs.namedExports &&
-    ! isMJS(parent.module)
+    parentEntry.package.options.cjs.namedExports &&
+    ! isMJS(parentEntry.module)
 
   const noNamedExports =
     isCJS &&
@@ -503,6 +504,7 @@ function getExportByName(entry, setter, name) {
   if (isCJS &&
       parentNamedExports &&
       entry.namespace === _namespace) {
+    // Lazily assign proxied namespace object.
     entry.namespace = new OwnProxy(_namespace, {
       get(target, name, receiver) {
         return name === "default"
@@ -516,19 +518,21 @@ function getExportByName(entry, setter, name) {
     return noNamedExports ? entry.cjsNamespace : entry.esmNamespace
   }
 
+  const mod = entry.module
+
   if ((noNamedExports &&
        name !== "default") ||
       (entry._loaded === LOAD_COMPLETED &&
        ! Reflect.has(entry.getters, name))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
-    throw new ERR_EXPORT_MISSING(entry.module, name)
+    throw new ERR_EXPORT_MISSING(mod, name)
   }
 
   const value = entry.namespace[name]
 
   if (value === STAR_ERROR) {
-    throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
+    throw new ERR_EXPORT_STAR_CONFLICT(mod, name)
   }
 
   return value

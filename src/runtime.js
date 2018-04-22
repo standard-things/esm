@@ -281,23 +281,22 @@ function runESM(entry, moduleWrapper) {
 }
 
 function watchImport(entry, request, setterArgsList, loader) {
+  const mod = entry.module
   const { moduleState } = shared
 
   moduleState.passthru = true
   moduleState.requireDepth += 1
 
-  const mod = entry.module
-
   let childEntry
 
   try {
     childEntry = loader(request, mod, false, (childEntry) => {
-      const childMod = childEntry.module
+      const child = childEntry.module
 
       if (childEntry.type === TYPE_ESM &&
           isMJS(mod) &&
-          ! isMJS(childMod)) {
-        throw ERR_INVALID_ESM_FILE_EXTENSION(childMod)
+          ! isMJS(child)) {
+        throw ERR_INVALID_ESM_FILE_EXTENSION(child)
       }
 
       childEntry.addSetters(setterArgsList, entry)
