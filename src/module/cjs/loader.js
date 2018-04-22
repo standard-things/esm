@@ -1,4 +1,5 @@
 import Module from "../../module.js"
+import Wrapper from "../../wrapper.js"
 
 import { extname } from "../../safe/path.js"
 
@@ -7,17 +8,23 @@ function loader(entry, preload) {
     preload(entry)
   }
 
+  const { _extensions } = Module
   const mod = entry.module
   const { filename } = mod
 
   let ext = extname(filename)
 
   if (ext === "" ||
-      typeof Module._extensions[ext] !== "function") {
+      typeof _extensions[ext] !== "function") {
     ext = ".js"
   }
 
-  Module._extensions[ext](mod, filename)
+  if (ext === ".mjs") {
+    Reflect.apply(Wrapper.unwrap(_extensions, ext), _extensions, [mod, filename])
+  } else {
+    _extensions[ext](mod, filename)
+  }
+
   mod.loaded = true
 }
 
