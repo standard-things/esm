@@ -139,10 +139,7 @@ function init() {
   }
 
   function invalidExtension(request) {
-    const moduleName = getModuleURL(request)
-
-    return "Cannot load ES module " + toStringLiteral(moduleName, "'") +
-      " from .mjs files"
+    return "Cannot load ES module from .mjs: " + getModuleURL(request)
   }
 
   function invalidPkgMode(mode) {
