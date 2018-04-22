@@ -4,7 +4,6 @@ import Module from "../module.js"
 import Package from "../package.js"
 
 import assign from "../util/assign.js"
-import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import { dirname } from "../safe/path.js"
 import getSilent from "../util/get-silent.js"
@@ -28,11 +27,6 @@ function hook(Mod) {
     Mod.runMain = runMain
 
     const [, mainPath] = realProcess.argv
-
-    if (Reflect.has(builtinEntries, mainPath)) {
-      Mod.runMain()
-      return
-    }
 
     let error
     let filename
