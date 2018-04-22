@@ -27,9 +27,9 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { resolve } from "../safe/path.js"
+import safeToString from "../util/safe-to-string.js"
 import satisfies from "../util/satisfies.js"
 import shared from "../shared.js"
-import toOptInError from "../util/to-opt-in-error.js"
 import { version } from "../version.js"
 
 const {
@@ -232,7 +232,8 @@ function mjsCompiler(mod, filename) {
 
   if (mainModule &&
       mainModule.filename === filename) {
-    toOptInError(error)
+    error.message = safeToString(error.message)
+      .replace("Must use import", "Must opt-in esm@" + version)
   }
 
   throw error
@@ -264,7 +265,7 @@ function tryPassthru(func, args, pkg) {
   const content = () => readSourceCode(filename)
 
   if (error.name === "SyntaxError") {
-    const { message } = error
+    const message = safeToString(error.message)
     const { range } = pkg
 
     if (importExportRegExp.test(message) &&

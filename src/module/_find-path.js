@@ -8,6 +8,7 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 import Module from "../module.js"
+import SafeJSON from "../safe/json.js"
 
 import binding from "../binding.js"
 import keys from "../util/keys.js"
@@ -139,10 +140,10 @@ function readPackage(thePath) {
   let main
 
   try {
-    main = JSON.parse(json).main
+    main = SafeJSON.parse(json).main
   } catch (e) {
     e.path = jsonPath
-    e.message = "Error parsing " + jsonPath + ": " + e.message
+    e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
     throw e
   }
 

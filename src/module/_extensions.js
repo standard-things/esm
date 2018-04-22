@@ -3,6 +3,7 @@ import SafeJSON from "../safe/json.js"
 import readFileFast from "../fs/read-file-fast.js"
 import { readFileSync } from "../safe/fs.js"
 import safeProcess from "../safe/process.js"
+import safeToString from "../util/safe-to-string.js"
 import stripBOM from "../util/strip-bom.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
@@ -18,7 +19,7 @@ extensions[".json"] = function (mod, filename) {
   try {
     mod.exports = SafeJSON.parse(content)
   } catch (e) {
-    e.message = filename + ": " + e.message
+    e.message = filename + ": " + safeToString(e.message)
     throw e
   }
 }
