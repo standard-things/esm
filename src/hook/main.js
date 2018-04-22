@@ -27,28 +27,7 @@ function hook(Mod) {
     Mod.runMain = runMain
 
     const [, mainPath] = realProcess.argv
-
-    let error
-    let filename
-    let threw = true
-
-    try {
-      filename = resolveFilename(mainPath, null, true)
-      threw = false
-    } catch (e) {
-      error = e
-    }
-
-    if (threw) {
-      try {
-        filename = Module._resolveFilename(mainPath, null, true)
-      } catch (e) {}
-    }
-
-    if (threw &&
-        ! filename) {
-      throw error
-    }
+    const filename = tryResolveFilename(mainPath)
 
     const defaultPkg = shared.package.default
     const dirPath = dirname(filename)
@@ -70,6 +49,22 @@ function hook(Mod) {
     if (useTickCallback) {
       call(_tickCallback, realProcess)
     }
+  }
+
+  function tryResolveFilename(request) {
+    let error
+
+    try {
+      return resolveFilename(request, null, true)
+    } catch (e) {
+      error = e
+    }
+
+    try {
+      return Module._resolveFilename(request, null, true)
+    } catch (e) {}
+
+    throw error
   }
 }
 

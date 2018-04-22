@@ -180,13 +180,13 @@ function tryResolveFilename(request, parent, isMain) {
   let error
 
   try {
-    return Module._resolveFilename(request, parent, isMain)
+    return resolveFilename(request, parent, isMain)
   } catch (e) {
     error = e
   }
 
   try {
-    return resolveFilename(request, parent, isMain)
+    return Module._resolveFilename(request, parent, isMain)
   } catch (e) {}
 
   throw error

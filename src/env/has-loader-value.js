@@ -47,11 +47,11 @@ function hasLoaderValue(value) {
 
 function tryResolveFilename(request, parent) {
   try {
-    return Module._resolveFilename(request, parent)
+    return resolveFilename(request, parent)
   } catch (e) {}
 
   try {
-    return resolveFilename(request, parent)
+    return Module._resolveFilename(request, parent)
   } catch (e) {}
 
   return ""
