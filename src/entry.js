@@ -51,8 +51,8 @@ class Entry {
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = { __proto__: null }
-    // The load mode for `module.require`.
-    this._requireESM = false
+    // The load type for `module.require`.
+    this._require = TYPE_CJS
     // The initialized state of bindings imported by the module.
     this.bindings = { __proto__: null }
     // The builtin module indicator.

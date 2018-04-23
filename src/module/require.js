@@ -12,6 +12,7 @@ import errors from "../errors.js"
 import { extname } from "../safe/path.js"
 
 const {
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -30,11 +31,11 @@ const req = function require(request) {
   }
 
   const entry = Entry.get(this)
-  const { _requireESM } = entry
+  const { _require } = entry
 
-  entry._requireESM = false
+  entry._require = TYPE_CJS
 
-  if (_requireESM ||
+  if (_require === TYPE_ESM ||
       (entry.type === TYPE_ESM &&
        extname(request) !== ".mjs")) {
     return _loadESM(request, this, false).module.exports

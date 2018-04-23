@@ -17,6 +17,7 @@ import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
 
 const {
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -309,8 +310,14 @@ function watchImport(entry, request, setterArgsList, loader) {
   if (childEntry.builtin) {
     mod.require(childEntry.name)
   } else {
-    entry._requireESM = true
-    mod.require(request)
+    entry._require = TYPE_ESM
+
+    try {
+      mod.require(request)
+    } finally {
+      entry._require = TYPE_CJS
+    }
+
     childEntry.loaded()
   }
 
