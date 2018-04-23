@@ -263,8 +263,8 @@ function createAddBuiltinModules(entry) {
     Reflect.defineProperty(context, "console", {
       __proto__: null,
       configurable: true,
-      enumerable: true,
-      get: () => exportedConsole
+      value: exportedConsole,
+      writable: true
     })
 
     Reflect.defineProperty(context, "process", {
