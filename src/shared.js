@@ -165,12 +165,6 @@ function init() {
     typeof shared.module.binding.fs.internalModuleReadJSON === "function"
   )
 
-  setDeferred(support, "internalModuleReadJSON", () => {
-    const { types } = shared.module.safeUtil
-
-    return typeof (types && types.isProxy) === "function"
-  })
-
   setDeferred(support, "proxiedClasses", () => {
     class A {}
 
