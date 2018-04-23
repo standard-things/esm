@@ -31,12 +31,22 @@ function getTagFromSymbol(object) {
 
 export default () => {
   let objects = [console1, console2, console3]
-  let oldValue = console1.log
+  let descriptor = Reflect.getOwnPropertyDescriptor(console1, "log")
 
   console1.log = 1
+
   let updated = [console1.log, console2.log, console3.log, log]
 
-  console1.log = oldValue
+  Reflect.deleteProperty(console1, "log")
+
+  let deleted = [
+    ! Reflect.has(console1, "log"),
+    ! Reflect.has(console2, "log"),
+    ! Reflect.has(console3, "log")
+  ]
+
+  Reflect.defineProperty(console1, "log", descriptor)
+
   let reverted = [console1.log, console2.log, console3.log]
 
   mockIo.start()
@@ -49,6 +59,7 @@ export default () => {
   assert.strictEqual(funcToString(log), funcToString(console.log))
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [false, false, false])
   assert.deepStrictEqual(reverted, Array(3).fill(log))
   assert.strictEqual(console1, console3)
 
@@ -56,15 +67,26 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
   objects = [def1, def2, def3]
-  oldValue = def1.d
+  descriptor = Reflect.getOwnPropertyDescriptor(def1, "d")
 
   def1.d = 1
+
   updated = [def1.d, def2.d, def3.d, d]
 
-  def1.d = oldValue
+  Reflect.deleteProperty(def1, "d")
+
+  deleted = [
+    ! Reflect.has(def1, "d"),
+    ! Reflect.has(def2, "d"),
+    ! Reflect.has(def3, "d")
+  ]
+
+  Reflect.defineProperty(def1, "d", descriptor)
+
   reverted = [def1.d, def2.d, def3.d]
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [true, false, true])
   assert.deepStrictEqual(reverted, Array(3).fill(d))
   assert.notStrictEqual(def1, def3)
 
@@ -72,15 +94,26 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
   objects = [path1, path2, path3]
-  oldValue = path1.join
+  descriptor = Reflect.getOwnPropertyDescriptor(path1, "join")
 
   path1.join = 1
+
   updated = [path1.join, path2.join, path3.join, join]
 
-  path1.join = oldValue
+  Reflect.deleteProperty(path1, "join")
+
+  deleted = [
+    ! Reflect.has(path1, "join"),
+    ! Reflect.has(path2, "join"),
+    ! Reflect.has(path3, "join")
+  ]
+
+  Reflect.defineProperty(path1, "join", descriptor)
+
   reverted = [path1.join, path2.join, path3.join]
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [true, false, true])
   assert.deepStrictEqual(reverted, Array(3).fill(join))
   assert.strictEqual(path1, path3)
 
@@ -88,12 +121,22 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
   objects = [process1, process2, process3]
-  oldValue = process1.cwd
+  descriptor = Reflect.getOwnPropertyDescriptor(process1, "cwd")
 
   process1.cwd = 1
+
   updated = [process1.cwd, process2.cwd, process3.cwd, cwd]
 
-  process1.cwd = oldValue
+  Reflect.deleteProperty(process1, "cwd")
+
+  deleted = [
+    ! Reflect.has(process1, "cwd"),
+    ! Reflect.has(process2, "cwd"),
+    ! Reflect.has(process3, "cwd")
+  ]
+
+  Reflect.defineProperty(process1, "cwd", descriptor)
+
   reverted = [process1.cwd, process2.cwd, process3.cwd]
 
   assert.strictEqual(cwd(), process1.cwd())
@@ -102,6 +145,7 @@ export default () => {
   assert.strictEqual(funcToString(cwd), funcToString(process.cwd))
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [true, false, true])
   assert.deepStrictEqual(reverted, Array(3).fill(cwd))
   assert.strictEqual(process1, process3)
 
@@ -109,12 +153,21 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), ["process", "Module", "process"])
 
   objects = [regexp1, regexp2, regexp3]
-  oldValue = regexp1.test
+  descriptor = Reflect.getOwnPropertyDescriptor(RegExp.prototype, "test")
 
   regexp1.test = 1
+
   updated = [regexp1.test, regexp2.test, regexp3.test, test]
 
-  regexp1.test = oldValue
+  Reflect.deleteProperty(regexp1, "test")
+
+  deleted = [
+    ! Reflect.has(regexp1, "test"),
+    ! Reflect.has(regexp2, "test"),
+    ! Reflect.has(regexp3, "test")
+  ]
+
+  Reflect.defineProperty(regexp1, "test", descriptor)
 
   assert.strictEqual(test.name, "test")
   assert.strictEqual(test.length, 1)
@@ -122,6 +175,7 @@ export default () => {
   assert.ok(test.call(/b/, "b"))
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [false, false, false])
   assert.deepStrictEqual([regexp2.test, regexp3.test], [test, test])
 
   assert.notStrictEqual(regexp1.test, test)
