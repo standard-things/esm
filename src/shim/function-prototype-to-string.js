@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
+import has from "../util/has.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
@@ -47,7 +48,12 @@ function init() {
           return call(_toString, thisArg)
         } catch (e) {}
 
-        return NATIVE_SOURCE_TEXT
+        if (has(thisArg, "toString") ||
+            typeof thisArg.toString !== "function") {
+          return NATIVE_SOURCE_TEXT
+        }
+
+        return thisArg.toString()
       }
 
       try {
