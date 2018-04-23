@@ -86,7 +86,11 @@ function proxyExports(entry) {
       return descriptor
     },
     set(target, name, value, receiver) {
-      Reflect.set(target, name, cached.unwrap.get(value) || value, receiver)
+      if (typeof value === "function") {
+        value = cached.unwrap.get(value) || value
+      }
+
+      Reflect.set(target, name, value, receiver)
       entry.update()
       return true
     }
