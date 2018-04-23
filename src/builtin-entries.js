@@ -57,15 +57,19 @@ function createUtilExports(source) {
     })
   }
 
-  // Defining a truthy, but non-function value, for `customInspectSymbol`
-  // will inform builtin `inspect()` to bypass the deprecation warning for
-  // the custom `util.inspect()` function when inspecting `util`.
-  Reflect.defineProperty(exported, shared.customInspectKey, {
-    __proto__: null,
-    configurable: true,
-    value: true,
-    writable: true
-  })
+  const { customInspectKey } = shared
+
+  // Defining a truthy, but non-function value, for `customInspectKey` will
+  // inform builtin `inspect()` to bypass the deprecation warning for the
+  // custom `util.inspect()` function when inspecting `util`.
+  if (! has(exported, customInspectKey)) {
+    Reflect.defineProperty(exported, customInspectKey, {
+      __proto__: null,
+      configurable: true,
+      value: true,
+      writable: true
+    })
+  }
 
   return exported
 }

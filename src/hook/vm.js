@@ -19,6 +19,7 @@ import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
 import getCacheName from "../util/get-cache-name.js"
+import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
@@ -184,18 +185,21 @@ function hook(vm) {
       return
     }
 
-    const util = realRequire("util")
+    const { customInspectKey } = shared
     const { inspect } = builtinEntries.util.module.exports
+    const util = realRequire("util")
 
-    // Defining a truthy, but non-function value, for `customInspectSymbol`
-    // will inform builtin `inspect()` to bypass the deprecation warning for
-    // the custom `util.inspect()` function when inspecting `util`.
-    Reflect.defineProperty(util, shared.customInspectKey, {
-      __proto__: null,
-      configurable: true,
-      value: true,
-      writable: true
-    })
+    // Defining a truthy, but non-function value, for `customInspectKey` will
+    // inform builtin `inspect()` to bypass the deprecation warning for the
+    // custom `util.inspect()` function when inspecting `util`.
+    if (! has(util, customInspectKey)) {
+      Reflect.defineProperty(util, customInspectKey, {
+        __proto__: null,
+        configurable: true,
+        value: true,
+        writable: true
+      })
+    }
 
     // Exit for Node 10+.
     if (support.replShowProxy) {
