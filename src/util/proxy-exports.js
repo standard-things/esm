@@ -67,6 +67,11 @@ function proxyExports(entry) {
   }
 
   const proxy = new OwnProxy(exported, {
+    deleteProperty(target, name) {
+      const result = Reflect.deleteProperty(target, name)
+      entry.update()
+      return result
+    },
     get(target, name, receiver) {
       return maybeWrap(target, name, Reflect.get(target, name, receiver))
     },
