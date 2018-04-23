@@ -15,6 +15,7 @@ function proxyExports(entry) {
   }
 
   const cache = shared.memoize.utilProxyExports
+
   let cached = cache.get(exported)
 
   if (cached) {
@@ -68,14 +69,20 @@ function proxyExports(entry) {
 
   const proxy = new OwnProxy(exported, {
     defineProperty(target, name, descriptor) {
-      const result = Reflect.defineProperty(target, name, descriptor)
-      entry.update()
-      return result
+      if (Reflect.defineProperty(target, name, descriptor)) {
+        entry.update()
+        return true
+      }
+
+      return false
     },
     deleteProperty(target, name) {
-      const result = Reflect.deleteProperty(target, name)
-      entry.update()
-      return result
+      if (Reflect.deleteProperty(target, name)) {
+        entry.update()
+        return true
+      }
+
+      return false
     },
     get(target, name, receiver) {
       return maybeWrap(target, name, Reflect.get(target, name, receiver))
@@ -95,9 +102,12 @@ function proxyExports(entry) {
         value = cached.unwrap.get(value) || value
       }
 
-      const result = Reflect.set(target, name, value, receiver)
-      entry.update()
-      return result
+      if (Reflect.set(target, name, value, receiver)) {
+        entry.update()
+        return true
+      }
+
+      return false
     }
   })
 
