@@ -1,14 +1,22 @@
-const ExError = __external__.Error
+import shared from "../shared.js"
 
-const { toString } = Object.prototype
+function init() {
+  const ExError = __external__.Error
 
-function isError(value) {
-  if (value instanceof Error ||
-      value instanceof ExError) {
-    return true
+  const { toString } = Object.prototype
+
+  function isError(value) {
+    if (value instanceof Error ||
+        value instanceof ExError) {
+      return true
+    }
+
+    return toString(value) === "[object Error]"
   }
 
-  return toString(value) === "[object Error]"
+  return isError
 }
 
-export default isError
+export default shared.inited
+  ? shared.module.utilIsError
+  : shared.module.utilIsError = init()
