@@ -20,7 +20,7 @@ const {
 } = ENTRY
 
 function load(filename, parent, isMain, state, loader) {
-  const { parsing, passthru } = shared.moduleState
+  const { parseOnly, parsing } = shared.moduleState
 
   let entry
   let child = state._cache[filename]
@@ -66,7 +66,7 @@ function load(filename, parent, isMain, state, loader) {
       : STATE_EXECUTION_STARTED
   }
 
-  if (passthru &&
+  if (parseOnly &&
       ! parsing) {
     entry.state = STATE_PARSING_COMPLETED
   } else {

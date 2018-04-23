@@ -17,7 +17,7 @@ function load(request, parent, isMain, preload) {
 
   const { moduleState } = shared
   const parseCache = shared.parseState._cache
-  const { passthru } = moduleState
+  const { parseOnly } = moduleState
 
   moduleState.parsing = true
 
@@ -46,7 +46,7 @@ function load(request, parent, isMain, preload) {
       preload(entry)
     }
 
-    if (! passthru) {
+    if (! parseOnly) {
       _load(request, parent, isMain)
     }
   }

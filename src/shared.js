@@ -73,8 +73,8 @@ function init() {
     module: { __proto__: null },
     moduleState: {
       __proto__: null,
+      parseOnly: false,
       parsing: false,
-      passthru: false,
       requireDepth: 0,
       stat: null
     },

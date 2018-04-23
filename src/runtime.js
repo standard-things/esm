@@ -284,7 +284,7 @@ function watchImport(entry, request, setterArgsList, loader) {
   const mod = entry.module
   const { moduleState } = shared
 
-  moduleState.passthru = true
+  moduleState.parseOnly = true
   moduleState.requireDepth += 1
 
   let childEntry
@@ -302,7 +302,7 @@ function watchImport(entry, request, setterArgsList, loader) {
       childEntry.addSetters(setterArgsList, entry)
     })
   } finally {
-    moduleState.passthru = false
+    moduleState.parseOnly = false
     moduleState.requireDepth -= 1
   }
 

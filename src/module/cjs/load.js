@@ -27,7 +27,7 @@ const {
 } = errors
 
 function load(request, parent, isMain, preload) {
-  const { parsing, passthru } = shared.moduleState
+  const { parseOnly, parsing } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
   const state = parsing ? shared.parseState : Module
 
@@ -42,7 +42,7 @@ function load(request, parent, isMain, preload) {
       mod.paths = Module._nodeModulePaths(dirname(filename))
     }
 
-    if (passthru &&
+    if (parseOnly &&
         ! parsing) {
       return
     }

@@ -384,20 +384,20 @@ function readInfo(dirPath, force) {
       options = readJSON6(optionsPath)
     } else {
       const { moduleState } = shared
-      const { parsing, passthru } = moduleState
+      const { parseOnly, parsing } = moduleState
 
       pkg =
       Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
-      moduleState.parsing =
-      moduleState.passthru = false
+      moduleState.parseOnly =
+      moduleState.parsing = false
 
       try {
         pkg.options =
         Package.createOptions(loadESM(optionsPath, null, false).module.exports)
       } finally {
+        moduleState.parseOnly = parseOnly
         moduleState.parsing = parsing
-        moduleState.passthru = passthru
       }
     }
   }

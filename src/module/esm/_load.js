@@ -25,7 +25,7 @@ const {
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
-  const { parsing, passthru } = shared.moduleState
+  const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
   const parentPkg = parentEntry && parentEntry.package
@@ -108,7 +108,7 @@ function load(request, parent, isMain, preload) {
       }
     }
 
-    if (passthru &&
+    if (parseOnly &&
         ! parsing) {
       return
     }
