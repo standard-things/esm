@@ -5,15 +5,15 @@ import realGetProxyDetails from "../real/get-proxy-details.js"
 import shared from "../shared.js"
 
 function getProxyDetails(proxy) {
-  if (! isObjectLike(proxy)) {
-    return
-  }
-
   const cache = shared.memoize.utilGetProxyDetails
   const cached = cache.get(proxy)
 
   if (cached) {
     return cached.details
+  }
+
+  if (! isObjectLike(proxy)) {
+    return
   }
 
   let details = OwnProxy.instances.get(proxy)
