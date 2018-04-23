@@ -1,8 +1,9 @@
 import OwnProxy from "../own/proxy.js"
 
 import call from "../util/call.js"
-import isError from "../util/is-error.js"
+import isOwnProxy from "../util/is-own-proxy.js"
 import shared from "../shared.js"
+import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
   const NATIVE_SOURCE_TEXT = "function () { [native code] }"
@@ -26,17 +27,27 @@ function init() {
       const _toString = funcProto.toString
 
       const toString = function () {
-        try {
-          return call(_toString, this)
-        } catch (e) {
-          if (isError(e) &&
-              e.name === "TypeError" &&
-              typeof this === "function") {
-            return NATIVE_SOURCE_TEXT
-          }
+        let thisArg = this
 
-          throw e
+        try {
+          return call(_toString, thisArg)
+        } catch (e) {
+          if (typeof thisArg !== "function") {
+            throw e
+          }
         }
+
+        if (isOwnProxy(thisArg)) {
+          thisArg = unwrapProxy(thisArg)
+        } else {
+          return NATIVE_SOURCE_TEXT
+        }
+
+        try {
+          return call(_toString, thisArg)
+        } catch (e) {}
+
+        return NATIVE_SOURCE_TEXT
       }
 
       try {
@@ -64,9 +75,9 @@ function init() {
 
     try {
       const { toString } = funcProto
-      const proxy = new Proxy(toString, { __proto__: null })
+      const proxy = new OwnProxy(toString)
 
-      result = typeof toString.call(proxy) === "string"
+      result = toString.call(proxy) === toString.call(toString)
     } catch (e) {}
 
     cache.set(funcProto, result)
