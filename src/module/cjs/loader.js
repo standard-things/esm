@@ -1,7 +1,6 @@
 import PACKAGE from "../../constant/package.js"
 
 import Module from "../../module.js"
-import Wrapper from "../../wrapper.js"
 
 import { extname } from "../../safe/path.js"
 
@@ -24,15 +23,16 @@ function loader(entry, filename, parentEntry, preload) {
     ext = ".js"
   }
 
-  const parentIsStrict =
-    parentEntry &&
-    parentEntry.package.options.mode === OPTIONS_MODE_STRICT
+  if (ext === ".mjs" ||
+      (parentEntry &&
+       parentEntry.package.options.mode === OPTIONS_MODE_STRICT)) {
+    entry._passthru = true
+  }
 
-  if (parentIsStrict ||
-      ext === ".mjs") {
-    Reflect.apply(Wrapper.unwrap(_extensions, ext), _extensions, [mod, filename])
-  } else {
+  try {
     _extensions[ext](mod, filename)
+  } finally {
+    entry._passthru = false
   }
 
   mod.loaded = true

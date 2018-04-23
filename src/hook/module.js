@@ -133,6 +133,13 @@ function hook(Mod, parent) {
 
     const entry = Entry.get(mod)
     const pkg = entry.package
+
+    if (entry._passthru) {
+      entry._passthru = false
+      tryPassthru.call(this, func, args, pkg)
+      return
+    }
+
     const { cache, cachePath } = pkg
     const cacheName = getCacheName(entry, mtime(filename))
 
