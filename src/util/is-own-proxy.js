@@ -19,7 +19,19 @@ function init() {
     ":proxy['\"\\]]\\s*:\\s*1\\s*\\}\\s*.?$"
   )
 
-  const inspectOptions = {
+  const liteInspectOptions = {
+    __proto__: null,
+    breakLength: Infinity,
+    colors: false,
+    compact: true,
+    customInspect: false,
+    depth: 0,
+    maxArrayLength: 0,
+    showHidden: false,
+    showProxy: true
+  }
+
+  const markerInspectOptions = {
     __proto__: null,
     breakLength: Infinity,
     colors: false,
@@ -31,25 +43,14 @@ function init() {
     showProxy: true
   }
 
-  const noDepthInspectOptions = { __proto__: null }
-
-  for (const name in inspectOptions) {
-    noDepthInspectOptions[name] = inspectOptions[name]
-  }
-
-  noDepthInspectOptions.depth = 0
-
   function isOwnProxy(value) {
-    if (! isObjectLike(value)) {
-      return false
-    }
-
     return OwnProxy.instances.has(value) ||
       isOwnProxyFallback(value)
   }
 
   function isOwnProxyFallback(value) {
     if (! shared.support.inspectProxies ||
+        ! isObjectLike(value) ||
         ++inspectDepth !== 1) {
       return false
     }
@@ -57,7 +58,7 @@ function init() {
     let inspected
 
     try {
-      inspected = inspect(value, noDepthInspectOptions)
+      inspected = inspect(value, liteInspectOptions)
     } finally {
       inspectDepth -= 1
     }
@@ -69,7 +70,7 @@ function init() {
     inspectDepth += 1
 
     try {
-      inspected = inspect(value, inspectOptions)
+      inspected = inspect(value, markerInspectOptions)
     } finally {
       inspectDepth -= 1
     }
