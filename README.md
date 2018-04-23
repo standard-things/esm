@@ -173,7 +173,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"debug":</code></td>
   <td>
-    <p>A boolean for unmasking stack traces.</p>
+    <p>A boolean for unmasking methods and stack traces.</p>
   </td>
 </tr>
 <tr>
