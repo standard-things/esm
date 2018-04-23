@@ -391,7 +391,11 @@ function assignExportsToNamespace(entry) {
       _namespace[name] = exported[name]
     } else if (! (isCJS && name === "default") &&
         ! Reflect.has(_namespace, name)) {
-      setGetter(_namespace, name, () => exported[name])
+      setGetter(_namespace, name, () => {
+        if (has(exported, name)) {
+          return exported[name]
+        }
+      })
 
       setSetter(_namespace, name, (value) => {
         exported[name] = value
