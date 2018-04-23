@@ -175,15 +175,15 @@ describe("main hook", function () {
 
   it("should error for missing modules", () => {
     const fileNames = ["missing", "missing.js", "missing.mjs"]
-    const otherFlags = [""]
+    const flags = [""]
     const runs = []
 
     if (canUsePreserveSymlinks) {
-      otherFlags.push("--preserve-symlinks")
+      flags.push("--preserve-symlinks")
     }
 
     fileNames.forEach((fileName) => {
-      otherFlags.forEach((flag) => {
+      flags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push("-r", "../", fileName)
         runs.push(args)
@@ -211,9 +211,13 @@ describe("main hook", function () {
   )
 
   it("should not preserve symlinks", () => {
-    const flags = ["", "--preserve-symlinks"]
     const destNames = ["symlink.js",  "symlink.mjs"]
+    const flags = [""]
     const runs = []
+
+    if (canUsePreserveSymlinks) {
+      flags.push("--preserve-symlinks")
+    }
 
     flags.forEach((flag) => {
       destNames.forEach((destName) => {
