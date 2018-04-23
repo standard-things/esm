@@ -2,7 +2,7 @@ import { inspect, types } from "../safe/util.js"
 
 import OwnProxy from "../own/proxy.js"
 
-import getProxyDetails from "../util/get-proxy-details.js"
+import getProxyDetails from "./get-proxy-details.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 

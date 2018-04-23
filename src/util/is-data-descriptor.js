@@ -1,4 +1,4 @@
-import isObject from "../util/is-object.js"
+import isObject from "./is-object.js"
 
 function isDataDescriptor(descriptor) {
   return isObject(descriptor) &&

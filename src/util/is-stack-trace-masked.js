@@ -1,6 +1,6 @@
 
-import isNative from "../util/is-native.js"
-import isObjectLike from "../util/is-object-like.js"
+import isNative from "./is-native.js"
+import isObjectLike from "./is-object-like.js"
 
 function isStackTraceMasked(error) {
   if (! isObjectLike(error)) {
