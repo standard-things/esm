@@ -90,9 +90,9 @@ function proxyExports(entry) {
         value = cached.unwrap.get(value) || value
       }
 
-      Reflect.set(target, name, value, receiver)
+      const result = Reflect.set(target, name, value, receiver)
       entry.update()
-      return true
+      return result
     }
   })
 
