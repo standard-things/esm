@@ -1,5 +1,6 @@
 import assert from "assert"
 import mockIo from "mock-stdio"
+import stripANSI  from "strip-ansi"
 import console1, { log } from "console"
 import * as console2 from "console"
 import def1, { d } from "../../fixture/export/def.js"
@@ -58,7 +59,7 @@ export default () => {
   console3.log(1)
   log(1)
 
-  assert.strictEqual(mockIo.end().stdout, "1\n1\n1\n1\n")
+  assert.strictEqual(stripANSI(mockIo.end().stdout), "1\n1\n1\n1\n")
   assert.strictEqual(funcToString(log), funcToString(console.log))
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
