@@ -4,6 +4,8 @@ import console1, { log } from "console"
 import * as console2 from "console"
 import def1, { d } from "../../fixture/export/def.js"
 import * as def2 from "../../fixture/export/def.js"
+import events1 from "events"
+import * as events2 from "events"
 import path1, { join } from "path"
 import * as path2 from "path"
 import process1, { cwd } from "process"
@@ -13,6 +15,7 @@ import * as regexp2 from "../../fixture/cjs/export/regexp.js"
 
 const console3 = require("console")
 const def3 = require("../../fixture/export/def.js")
+const events3 = require("events")
 const path3 = require("path")
 const process3 = require("process")
 const regexp3 = require("../../fixture/cjs/export/regexp.js")
@@ -155,6 +158,7 @@ export default () => {
   objects = [regexp1, regexp2, regexp3]
   descriptor = Reflect.getOwnPropertyDescriptor(RegExp.prototype, "test")
 
+  regexp1[Symbol.toStringTag] = 1
   regexp1.test = 1
 
   updated = [regexp1.test, regexp2.test, regexp3.test, test]
@@ -182,5 +186,10 @@ export default () => {
   assert.notStrictEqual(regexp1, regexp3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["RegExp", "Module", "RegExp"])
-  assert.deepStrictEqual(objects.map(getTagFromSymbol), ["RegExp", "Module", void 0])
+  assert.deepStrictEqual(objects.map(getTagFromSymbol), ["RegExp", "Module", 1])
+
+  objects = [events1, events2, events3]
+
+  assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
+  assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 }

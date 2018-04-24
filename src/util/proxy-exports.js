@@ -24,8 +24,15 @@ function init() {
     }
 
     const maybeWrap = (target, name, value) => {
+      // Produce a `Symbol.toStringTag` value, otherwise
+      // `Object.prototype.toString.call(proxy)` will return
+      // "[object Function]", if `proxy` is a function, else "[object Object]".
       if (name === Symbol.toStringTag &&
-          value === void 0) {
+          typeof target !== "function" &&
+          typeof value !== "string") {
+        // Section 19.1.3.6: Object.prototype.toString()
+        // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
+        // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
         const toStringTag = toString.call(target).slice(8, -1)
 
         return toStringTag === "Object" ? value : toStringTag
