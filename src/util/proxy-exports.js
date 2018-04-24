@@ -25,12 +25,10 @@ function init() {
 
     const maybeWrap = (target, name, value) => {
       if (name === Symbol.toStringTag &&
-          typeof value !== "string") {
+          value === void 0) {
         const toStringTag = toString.call(target).slice(8, -1)
 
-        if (toStringTag !== "Object") {
-          value = toStringTag
-        }
+        return toStringTag === "Object" ? value : toStringTag
       }
 
       if (! isNative(value)) {
