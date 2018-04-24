@@ -21,21 +21,18 @@ function init() {
       return false
     }
 
-    let result
-
     try {
-      result = nativeRegExp.test(toString.call(func))
+      if (nativeRegExp.test(toString.call(func))) {
+        const { name } = func
+
+        if (typeof name !== "string" ||
+            ! name.startsWith("bound ")) {
+          return true
+        }
+      }
     } catch (e) {}
 
-    const { name } = func
-
-    if (result &&
-        typeof name === "string" &&
-        name.startsWith("bound ")) {
-      return false
-    }
-
-    return result
+    return false
   }
 
   return isNative
