@@ -39,7 +39,6 @@ function init() {
       "decorated_private_symbol",
       "getProxyDetails",
       "safeGetenv",
-      "safeToString",
       "setHiddenValue"
     ]
   }

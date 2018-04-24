@@ -198,10 +198,6 @@ function init() {
     typeof shared.module.binding.util.safeGetenv === "function"
   )
 
-  setDeferred(support, "safeToString", () =>
-    typeof shared.module.binding.util.safeToString === "function"
-  )
-
   setDeferred(support, "setHiddenValue", () =>
     typeof shared.module.binding.util.setHiddenValue === "function"
   )
