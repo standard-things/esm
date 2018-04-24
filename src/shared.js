@@ -99,7 +99,7 @@ function init() {
   }
 
   setDeferred(shared, "customInspectKey", () => {
-    const customInspectSymbol = symbol.customInspect
+    const customInspectSymbol = shared.module.safeUtil.inspect.custom
 
     return typeof customInspectSymbol === "symbol"
       ? customInspectSymbol
@@ -200,10 +200,6 @@ function init() {
 
   setDeferred(support, "setHiddenValue", () =>
     typeof shared.module.binding.util.setHiddenValue === "function"
-  )
-
-  setDeferred(symbol, "customInspect", () =>
-    shared.module.safeUtil.inspect.custom
   )
 
   setDeferred(utilBinding, "errorDecoratedSymbol", () => {
