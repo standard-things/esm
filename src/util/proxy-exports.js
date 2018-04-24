@@ -33,15 +33,7 @@ function init() {
         }
       }
 
-      if (typeof value !== "function" ||
-          ! isNative(value)) {
-        return value
-      }
-
-      const funcName = value.name
-
-      if (typeof funcName === "string" &&
-          funcName.startsWith("bound ")) {
+      if (! isNative(value)) {
         return value
       }
 

@@ -16,14 +16,26 @@ function init() {
   )
 
   function isNative(func) {
-    if (typeof func === "function" &&
-        ! isProxy(func)) {
-      try {
-        return nativeRegExp.test(toString.call(func))
-      } catch (e) {}
+    if (typeof func !== "function" ||
+        isProxy(func)) {
+      return false
     }
 
-    return false
+    let result
+
+    try {
+      result = nativeRegExp.test(toString.call(func))
+    } catch (e) {}
+
+    const { name } = func
+
+    if (result &&
+        typeof name === "string" &&
+        name.startsWith("bound ")) {
+      return false
+    }
+
+    return result
   }
 
   return isNative
