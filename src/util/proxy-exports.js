@@ -68,6 +68,14 @@ function init() {
 
     const proxy = new OwnProxy(exported, {
       defineProperty(target, name, descriptor) {
+        if (has(descriptor, "value")) {
+          const { value } = descriptor
+
+          if (typeof value === "function") {
+            descriptor.value = cached.unwrap.get(value) || value
+          }
+        }
+
         if (Reflect.defineProperty(target, name, descriptor)) {
           entry.update()
           return true

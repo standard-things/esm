@@ -157,7 +157,10 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), ["process", "Module", "process"])
 
   objects = [regexp1, regexp2, regexp3]
-  descriptor = Reflect.getOwnPropertyDescriptor(RegExp.prototype, "test")
+  descriptor = Reflect.getOwnPropertyDescriptor(regexp1, "test")
+
+  let oldProxyValue = regexp1.test
+  let oldRawValue = regexp3.test
 
   regexp1[Symbol.toStringTag] = 1
   regexp1.test = 1
@@ -172,7 +175,13 @@ export default () => {
     ! Reflect.has(regexp3, "test")
   ]
 
+  regexp1.test = oldProxyValue
+
+  assert.strictEqual(regexp3.test, oldRawValue)
+
   Reflect.defineProperty(regexp1, "test", descriptor)
+
+  assert.strictEqual(regexp3.test, oldRawValue)
 
   assert.strictEqual(test.name, "test")
   assert.strictEqual(test.length, 1)
