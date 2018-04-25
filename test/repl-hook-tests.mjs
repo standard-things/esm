@@ -28,6 +28,8 @@ const pkgIndex = parent.children.findIndex((child) => child.filename === indexPa
 const pkgJSON = fs.readJsonSync(pkgPath)
 const pkgURL = fileProtocol + pkgPath.replace(/\\/g, "/")
 
+const canRunInContext = Reflect.has(process.versions, "v8")
+
 describe("repl hook", () => {
   let context
 
@@ -73,54 +75,6 @@ describe("repl hook", () => {
     r.close()
   })
 
-  it("should work with a non-global context", () => {
-    const r = repl.start({})
-    const code = 'import { default as localAssert } from "assert"'
-
-    assert.strictEqual(typeof context.localAssert, "undefined")
-
-    r.eval(code, context, "repl", () => {
-      assert.strictEqual(typeof context.localAssert, "function")
-    })
-
-    r.close()
-  })
-
-  it("should use a plain object for `module.exports`", () => {
-    const r = repl.start({})
-    const code = "var exports = module.exports"
-
-    r.eval(code, context, "repl", () => {
-      assert.ok(isPlainObject(context.exports))
-    })
-
-    r.close()
-  })
-
-  it("should support importing `.json` files", (done) => {
-    const r = repl.start({})
-    const code = [
-      'import static from "' + pkgURL + '"',
-      'var dynamic = import("' + pkgURL + '")'
-    ].join("\n")
-
-    r.eval(code, context, "repl", () => {
-      context.dynamic
-        .then((dynamic) => {
-          const pkgNs = createNamespace(Object.assign({
-            default: pkgJSON
-          }, pkgJSON))
-
-          assert.deepStrictEqual(dynamic, pkgNs)
-          assert.deepStrictEqual(context.static, pkgJSON)
-        })
-        .then(done)
-        .catch(done)
-    })
-
-    r.close()
-  })
-
   it("should recover from import errors", () => {
     const r = repl.start({
       eval(code, callback) {
@@ -142,6 +96,57 @@ describe("repl hook", () => {
         assert.ok(error1.message.startsWith("Missing export"))
         assert.strictEqual(error2, null)
       })
+    })
+
+    r.close()
+  })
+
+  ;(canRunInContext ? it : xit)(
+  "should work with a non-global context", () => {
+    const r = repl.start({})
+    const code = 'import { default as localAssert } from "assert"'
+
+    assert.strictEqual(typeof context.localAssert, "undefined")
+
+    r.eval(code, context, "repl", () => {
+      assert.strictEqual(typeof context.localAssert, "function")
+    })
+
+    r.close()
+  })
+
+  ;(canRunInContext ? it : xit)(
+  "should use a plain object for `module.exports`", () => {
+    const r = repl.start({})
+    const code = "var exports = module.exports"
+
+    r.eval(code, context, "repl", () => {
+      assert.ok(isPlainObject(context.exports))
+    })
+
+    r.close()
+  })
+
+  ;(canRunInContext ? it : xit)(
+  "should support importing `.json` files", (done) => {
+    const r = repl.start({})
+    const code = [
+      'import static from "' + pkgURL + '"',
+      'var dynamic = import("' + pkgURL + '")'
+    ].join("\n")
+
+    r.eval(code, context, "repl", () => {
+      context.dynamic
+        .then((dynamic) => {
+          const pkgNs = createNamespace(Object.assign({
+            default: pkgJSON
+          }, pkgJSON))
+
+          assert.deepStrictEqual(dynamic, pkgNs)
+          assert.deepStrictEqual(context.static, pkgJSON)
+        })
+        .then(done)
+        .catch(done)
     })
 
     r.close()
