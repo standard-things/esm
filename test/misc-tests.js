@@ -968,8 +968,9 @@ describe("spec compliance", () => {
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
-  it("should not execute already loaded modules in cycles", () =>
+  it("should not execute already loaded modules", () =>
     [
+      "./fixture/cjs/load-count",
       "./fixture/cycle/load-count/a.js",
       "./fixture/cycle/load-count/a.mjs"
     ]
