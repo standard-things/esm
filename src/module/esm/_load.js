@@ -10,6 +10,7 @@ import _load from "../_load.js"
 import builtinEntries from "../../builtin-entries.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
+import has from "../../util/has.js"
 import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
@@ -73,8 +74,11 @@ function load(request, parent, isMain, preload) {
     state = moduleState
   } else if (parsing) {
     state = parseState
-  } else if (Reflect.has(parseState._cache, request)) {
-    Module._cache[request] = parseState._cache[request]
+  } else if (has(parseState._cache, request)) {
+    if (! Reflect.has(Module._cache, request)) {
+      Module._cache[request] = parseState._cache[request]
+    }
+
     Reflect.deleteProperty(parseState._cache, request)
   }
 
