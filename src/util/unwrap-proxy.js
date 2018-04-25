@@ -3,10 +3,6 @@ import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function unwrapProxy(value) {
-  if (! isObjectLike(value)) {
-    return value
-  }
-
   const cache = shared.memoize.utilUnwrapProxy
   const cached = cache.get(value)
 
@@ -14,14 +10,18 @@ function unwrapProxy(value) {
     return cached
   }
 
-  let details
   let unwrapped = value
 
-  while ((details = getProxyDetails(unwrapped))) {
-    unwrapped = details[0]
+  if (isObjectLike(unwrapped)) {
+    let details
+
+    while ((details = getProxyDetails(unwrapped))) {
+      unwrapped = details[0]
+    }
+
+    cache.set(value, unwrapped)
   }
 
-  cache.set(value, unwrapped)
   return unwrapped
 }
 
