@@ -3,7 +3,6 @@ import ENTRY from "../../constant/entry.js"
 import Module from "../../module.js"
 
 import _load from "./_load.js"
-import keys from "../../util/keys.js"
 import shared from "../../shared.js"
 
 const {
@@ -16,12 +15,11 @@ function load(request, parent, isMain, preload) {
   let entry
 
   const { moduleState } = shared
-  const parseCache = shared.parseState._cache
   const { parseOnly } = moduleState
 
   moduleState.parsing = true
 
-  Reflect.setPrototypeOf(parseCache, Module._cache)
+  Reflect.setPrototypeOf(shared.parseState._cache, Module._cache)
 
   try {
     entry = _load(request, parent, isMain)
@@ -53,13 +51,6 @@ function load(request, parent, isMain, preload) {
 
   if (entry.module.loaded) {
     entry.state = STATE_EXECUTION_COMPLETED
-  }
-
-  const cacheKeys = keys(parseCache)
-
-  for (const cacheKey of cacheKeys) {
-    Module._cache[cacheKey] = parseCache[cacheKey]
-    Reflect.deleteProperty(parseCache, cacheKey)
   }
 
   return entry

@@ -11,6 +11,7 @@ import Module from "../../module.js"
 import _load from "../_load.js"
 import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
+import has from "../../util/has.js"
 import loader from "./loader.js"
 import shared from "../../shared.js"
 
@@ -29,7 +30,16 @@ const {
 function load(request, parent, isMain, preload) {
   const { parseOnly, parsing } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
-  const state = parsing ? shared.parseState : Module
+  const { parseState } = shared
+
+  let state = Module
+
+  if (parsing) {
+    state = parseState
+  } else if (has(parseState._cache, filename)) {
+    state._cache[filename] = parseState._cache[filename]
+    Reflect.deleteProperty(parseState._cache, filename)
+  }
 
   let called = false
 
