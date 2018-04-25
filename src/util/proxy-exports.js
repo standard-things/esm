@@ -1,5 +1,6 @@
 import OwnProxy from "../own/proxy.js"
 
+import has from "./has.js"
 import isNative from "./is-native.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
@@ -88,24 +89,11 @@ function init() {
       getOwnPropertyDescriptor(target, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (descriptor &&
-            Reflect.has(descriptor, "value")) {
+        if (has(descriptor, "value")) {
           descriptor.value = maybeWrap(target, name, descriptor.value)
         }
 
         return descriptor
-      },
-      set(target, name, value, receiver) {
-        if (typeof value === "function") {
-          value = cached.unwrap.get(value) || value
-        }
-
-        if (Reflect.set(target, name, value, receiver)) {
-          entry.update()
-          return true
-        }
-
-        return false
       }
     })
 
