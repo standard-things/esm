@@ -136,8 +136,7 @@ class Entry {
   }
 
   static has(value) {
-    return isObjectLike(value) &&
-      shared.entry.cache.has(value)
+    return shared.entry.cache.has(value)
   }
 
   static set(value, entry) {
