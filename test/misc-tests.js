@@ -691,7 +691,7 @@ describe("Node rules", () => {
     .reduce((promise, request, index) =>
       promise
         .then(() => {
-          Reflect.deleteProperty(global, "evaluated")
+          Reflect.deleteProperty(global, "loadCount")
           return import(request)
             .then(() => assert.ok(false))
             .catch((e) =>
@@ -702,7 +702,7 @@ describe("Node rules", () => {
                     assert.ok(false)
                   } else {
                     assert.strictEqual(e, re)
-                    assert.strictEqual(global.loadCount, index + 1)
+                    assert.strictEqual(global.loadCount, 1)
                   }
                 })
             )
@@ -742,10 +742,14 @@ describe("Node rules", () => {
       .then(() => assert.strictEqual(Reflect.has(require.cache, filename), false))
   })
 
-  it("should expose ESM in `require.cache` with `options.cjs.cache`", () =>
-    import("./cjs/cache")
-      .then((ns) => ns.default())
-  )
+  it("should expose ESM in `require.cache` with `options.cjs.cache`", () => {
+    const filename = path.resolve("fixture/cache/in/index.mjs")
+
+    Reflect.deleteProperty(require.cache, filename)
+
+    return import(filename)
+      .then(() => assert.strictEqual(Reflect.has(require.cache, filename), true))
+  })
 
   it('should add "__esModule" to `module.exports` of ES modules with `options.cjs.interop`', () =>
     import("./cjs/export/pseudo.js")
@@ -964,9 +968,8 @@ describe("spec compliance", () => {
       .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
   )
 
-  it("should not execute already loaded modules", () =>
+  it("should not execute already loaded modules in cycles", () =>
     [
-      "./fixture/load-count.js",
       "./fixture/cycle/load-count/a.js",
       "./fixture/cycle/load-count/a.mjs"
     ]

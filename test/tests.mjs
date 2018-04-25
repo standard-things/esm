@@ -23,7 +23,6 @@ const jsonExt = require.extensions[".json"]
 
 beforeEach(() => {
   Reflect.deleteProperty(global, "customError")
-  Reflect.deleteProperty(global, "evaluated")
   Reflect.deleteProperty(global, "loadCount")
   Reflect.deleteProperty(global, "this")
 
