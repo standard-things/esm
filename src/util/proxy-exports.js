@@ -102,6 +102,18 @@ function init() {
         }
 
         return descriptor
+      },
+      set(target, name, value, receiver) {
+        if (typeof value === "function") {
+          value = cached.unwrap.get(value) || value
+        }
+
+        if (Reflect.set(target, name, value, receiver)) {
+          entry.update()
+          return true
+        }
+
+        return false
       }
     })
 
