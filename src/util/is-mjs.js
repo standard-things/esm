@@ -1,20 +1,35 @@
 import { extname } from "../safe/path.js"
 import isObject from "./is-object.js"
+import shared from "../shared.js"
 
-function isMJS(request) {
-  if (typeof request === "string") {
-    return extname(request) === ".mjs"
-  }
-
-  if (isObject(request)) {
-    const { filename } = request
-
-    if (typeof filename === "string") {
-      return extname(filename) === ".mjs"
+function init() {
+  function isMJS(request) {
+    if (typeof request === "string") {
+      return isExtMJS(request)
     }
+
+    if (isObject(request)) {
+      const { filename } = request
+
+      if (typeof filename === "string") {
+        return isExtMJS(filename)
+      }
+    }
+
+    return false
   }
 
-  return false
+  function isExtMJS(filename) {
+    const cache = shared.memoize.utilIsMJS
+
+    return Reflect.has(cache, filename)
+      ? cache[filename]
+      : cache[filename] = extname(filename) === ".mjs"
+  }
+
+  return isMJS
 }
 
-export default isMJS
+export default shared.inited
+  ? shared.module.utilIsMJS
+  : shared.module.utilIsMJS = init()

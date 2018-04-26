@@ -63,6 +63,7 @@ function init() {
       shimFunctionPrototypeToString: new WeakMap,
       shimProcessBindingUtilGetProxyDetails: new WeakMap,
       utilGetProxyDetails: new WeakMap,
+      utilIsMJS: { __proto__: null },
       utilMaskFunction: new WeakMap,
       utilMaxSatisfying: { __proto__: null },
       utilParseURL: { __proto__: null },
