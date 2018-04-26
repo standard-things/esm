@@ -9,6 +9,7 @@ import Entry from "../../entry.js"
 import Module from "../../module.js"
 
 import _load from "../_load.js"
+import _loadESM from "../esm/_load.js"
 import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
 import has from "../../util/has.js"
@@ -16,6 +17,7 @@ import loader from "./loader.js"
 import shared from "../../shared.js"
 
 const {
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -28,6 +30,14 @@ const {
 } = errors
 
 function load(request, parent, isMain, preload) {
+  const parentEntry = parent && Entry.get(parent)
+
+  if (parentEntry &&
+      parentEntry._require === TYPE_ESM) {
+    parentEntry._require = TYPE_CJS
+    return _loadESM(request, parent, isMain).module.exports
+  }
+
   const { parseOnly, parsing } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
   const { parseState } = shared
@@ -58,8 +68,6 @@ function load(request, parent, isMain, preload) {
     }
 
     called = true
-
-    const parentEntry = parent && Entry.get(parent)
 
     let threw = true
 

@@ -2,19 +2,9 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import ENTRY from "../constant/entry.js"
-
-import Entry from "../entry.js"
 import Module from "../module.js"
 
-import _loadESM from "./esm/_load.js"
 import errors from "../errors.js"
-import { extname } from "../safe/path.js"
-
-const {
-  TYPE_CJS,
-  TYPE_ESM
-} = ENTRY
 
 const {
   ERR_INVALID_ARG_TYPE,
@@ -28,17 +18,6 @@ const req = function require(request) {
 
   if (request === "") {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
-  }
-
-  const entry = Entry.get(this)
-  const { _require } = entry
-
-  entry._require = TYPE_CJS
-
-  if (_require === TYPE_ESM ||
-      (entry.type === TYPE_ESM &&
-       extname(request) !== ".mjs")) {
-    return _loadESM(request, this, false).module.exports
   }
 
   return Module._load(request, this, false)
