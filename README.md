@@ -202,10 +202,12 @@ Tips
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
   [`tape`](https://github.com/substack/tape#preloading-modules),
-  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
+  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), or
   [`webpack`](https://webpack.js.org/api/cli/#config-options)
 * Load `esm` before
-  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register)
+  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register),
+  [`newrelic`](https://github.com/newrelic/node-newrelic), or
+  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
 * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
   [`node-tap`](http://www.node-tap.org/cli/)
 * Load `esm` with the `--node-args="-r esm"` option of
