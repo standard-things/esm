@@ -1,5 +1,3 @@
-import { extname, resolve } from "../safe/path.js"
-
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
 import PACKAGE from "../constant/package.js"
@@ -20,6 +18,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
+import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
@@ -54,7 +53,7 @@ function compile(caller, entry, content, filename, fallback) {
   let hint = SCRIPT
   let sourceType = SCRIPT
 
-  if (extname(filename) === ".mjs") {
+  if (isMJS(filename)) {
     hint = MODULE
     sourceType = MODULE
   } else if (options.mode === OPTIONS_MODE_ALL) {
