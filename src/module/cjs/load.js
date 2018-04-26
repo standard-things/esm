@@ -44,7 +44,8 @@ function load(request, parent, isMain, preload) {
 
   let state = Module
 
-  if (parsing) {
+  if (parseOnly ||
+      parsing) {
     state = parseState
   } else if (has(parseState._cache, filename)) {
     state._cache[filename] = parseState._cache[filename]

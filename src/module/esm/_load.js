@@ -72,7 +72,8 @@ function load(request, parent, isMain, preload) {
   if (isUnexposed &&
       extname(filename) === ".mjs") {
     state = moduleState
-  } else if (parsing) {
+  } else if (parseOnly ||
+      parsing) {
     state = parseState
   } else if (has(parseState._cache, request)) {
     state._cache[request] = parseState._cache[request]
