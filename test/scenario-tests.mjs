@@ -67,6 +67,18 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
   )
 
+  it("should work with newrelic", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/newrelic")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
+
+    return exec(nodePath, [
+      "-r", pkgPath,
+      "-r", cwdPath,
+      "-r", "newrelic",
+      path.resolve(testPath, dirPath)
+    ])
+  })
+
   it("should work with nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
 
