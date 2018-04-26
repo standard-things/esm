@@ -734,7 +734,7 @@ describe("Node rules", () => {
   )
 
   it("should not expose ESM in `require.cache`", () => {
-    const filename = path.resolve("fixture/cache/out/index.mjs")
+    const filename = path.resolve("fixture/cache/out/index.js")
 
     Reflect.deleteProperty(require.cache, filename)
 
@@ -743,7 +743,7 @@ describe("Node rules", () => {
   })
 
   it("should expose ESM in `require.cache` with `options.cjs.cache`", () => {
-    const filename = path.resolve("fixture/cache/in/index.mjs")
+    const filename = path.resolve("fixture/cache/in/index.js")
 
     Reflect.deleteProperty(require.cache, filename)
 
@@ -945,16 +945,15 @@ describe("spec compliance", () => {
         import("./fixture/export/abc.mjs")
       ])
       .then(() =>
-        [
-          "./fixture/require-esm/strict/js.js",
-          "./fixture/require-esm/strict/mjs.js"
-        ]
-        .reduce((promise, request) =>
-          promise
-            .then(() => import(request))
-            .then(() => assert.ok(false))
-            .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
-        , Promise.resolve())
+        Promise
+          .all([
+            import("./fixture/require-esm/strict/js.js")
+              .then(() => assert.ok(false))
+              .catch((e) => assert.ok(e instanceof SyntaxError)),
+            import("./fixture/require-esm/strict/mjs.js")
+              .then(() => assert.ok(false))
+              .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
+          ])
       )
   )
 

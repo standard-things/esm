@@ -17,7 +17,7 @@ describe("setters", () => {
   )
 
   it("should not prematurely seal star exports", () =>
-    import("./setter/seal.mjs")
+    import("./setter/seal")
       .then((ns) => ns.default())
   )
 })

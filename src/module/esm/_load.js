@@ -1,5 +1,3 @@
-import { dirname, extname } from "../../safe/path.js"
-
 import ENTRY from "../../constant/entry.js"
 
 import Entry from "../../entry.js"
@@ -8,6 +6,7 @@ import Package from "../../package.js"
 
 import _load from "../_load.js"
 import builtinEntries from "../../builtin-entries.js"
+import { dirname } from "../../safe/path.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import has from "../../util/has.js"
@@ -57,6 +56,7 @@ function load(request, parent, isMain, preload) {
     return entry
   }
 
+  const isExtMJS = isMJS(filename)
   const { parseState } = shared
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
@@ -69,15 +69,23 @@ function load(request, parent, isMain, preload) {
     ? getURLFromFilePath(filename) + queryFragment
     : filename
 
-  if (isUnexposed &&
-      extname(filename) === ".mjs") {
+  if (isExtMJS) {
     state = moduleState
   } else if (parseOnly ||
       parsing) {
     state = parseState
   } else if (has(parseState._cache, request)) {
-    state._cache[request] = parseState._cache[request]
+    const mod = parseState._cache[request]
+
+    if (isUnexposed &&
+        Entry.get(mod).type === TYPE_ESM) {
+      state = moduleState
+    }
+
+    state._cache[request] = mod
     Reflect.deleteProperty(parseState._cache, request)
+  } else if (has(moduleState._cache, request)) {
+    state = moduleState
   }
 
   let error
