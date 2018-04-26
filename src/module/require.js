@@ -4,7 +4,9 @@
 
 import Module from "../module.js"
 
+import _loadESM from "./esm/_load.js"
 import errors from "../errors.js"
+import isMJS from "../util/is-mjs.js"
 
 const {
   ERR_INVALID_ARG_TYPE,
@@ -20,7 +22,9 @@ const req = function require(request) {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
   }
 
-  return Module._load(request, this, false)
+  return isMJS(this)
+    ? _loadESM(request, this, false).module.exports
+    : Module._load(request, this, false)
 }
 
 export default req
