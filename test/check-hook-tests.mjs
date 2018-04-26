@@ -2,11 +2,20 @@ import SemVer from "semver"
 
 import assert from "assert"
 import execa from "execa"
+import fs from "fs-extra"
 import path from "path"
 
 const testPath = path.resolve(".")
 
-const canTestCheckFlag = SemVer.satisfies(process.version, ">=8")
+const canTestWithFilename = SemVer.satisfies(process.version, ">=10")
+const canTestWithStdin = SemVer.satisfies(process.version, ">=8")
+
+function node(args) {
+  return execa(process.execPath, args, {
+    cwd: testPath,
+    reject: false
+  })
+}
 
 function shell(command) {
   return execa.shell(command, {
@@ -18,8 +27,8 @@ function shell(command) {
 describe("--check hook", function () {
   this.timeout(0)
 
-  ;(canTestCheckFlag ? it : xit)(
-  "should support `-c` and `--check` flags", () => {
+  ;(canTestWithFilename ? it : xit)(
+  "should support `-c` and `--check` flags with a filename", () => {
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
     const runs = []
@@ -27,17 +36,40 @@ describe("--check hook", function () {
     requireFlags.forEach((requireFlag) => {
       checkFlags.forEach((checkFlag) => {
         runs.push([
-          "echo",
-          "'" +
-          [
-            'import { log } from "console"',
-            'log("check-hook:true")'
-          ].join(";") +
-          "'",
-          "|",
+          requireFlag, "../",
+          checkFlag, "./fixture/check-hook"
+        ])
+      })
+    })
+
+    return runs
+      .reduce((promise, args) =>
+        promise
+          .then(() => node(args))
+          .then((result) => {
+            assert.strictEqual(result.stderr, "")
+            assert.strictEqual(result.stdout, "")
+          })
+      , Promise.resolve())
+  })
+
+  ;(canTestWithStdin ? it : xit)(
+  "should support `-c` and `--check` flags with stdin", () => {
+    const checkFlags = ["-c", "--check"]
+    const requireFlags = ["-r", "--require"]
+    const runs = []
+
+    const code = fs
+      .readFileSync("fixture/check-hook/index.js", "utf8")
+      .replace(/(?:\r?\n)+/g, ";")
+
+    requireFlags.forEach((requireFlag) => {
+      checkFlags.forEach((checkFlag) => {
+        runs.push([
+          "echo '" + code + "' |",
           process.execPath,
-          checkFlag,
-          requireFlag, "../"
+          requireFlag, "../",
+          checkFlag
         ].join(" "))
       })
     })
