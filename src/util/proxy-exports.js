@@ -25,20 +25,6 @@ function init() {
     }
 
     const maybeWrap = (target, name, value) => {
-      // Produce a `Symbol.toStringTag` value, otherwise
-      // `Object.prototype.toString.call(proxy)` will return
-      // "[object Function]", if `proxy` is a function, else "[object Object]".
-      if (name === Symbol.toStringTag &&
-          typeof target !== "function" &&
-          typeof value !== "string") {
-        // Section 19.1.3.6: Object.prototype.toString()
-        // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
-        // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
-        const toStringTag = toString.call(target).slice(8, -1)
-
-        return toStringTag === "Object" ? value : toStringTag
-      }
-
       if (! isNative(value)) {
         return value
       }
@@ -92,13 +78,33 @@ function init() {
         return false
       },
       get(target, name, receiver) {
-        return maybeWrap(target, name, Reflect.get(target, name, receiver))
+        const value = Reflect.get(target, name, receiver)
+
+        // Produce a `Symbol.toStringTag` value, otherwise
+        // `Object.prototype.toString.call(proxy)` will return
+        // "[object Function]", if `proxy` is a function, else "[object Object]".
+        if (name === Symbol.toStringTag &&
+            typeof target !== "function" &&
+            typeof value !== "string") {
+          // Section 19.1.3.6: Object.prototype.toString()
+          // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
+          // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
+          const toStringTag = toString.call(target).slice(8, -1)
+
+          return toStringTag === "Object" ? value : toStringTag
+        }
+
+        return maybeWrap(target, name, value)
       },
       getOwnPropertyDescriptor(target, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
         if (has(descriptor, "value")) {
-          descriptor.value = maybeWrap(target, name, descriptor.value)
+          const { value } = descriptor
+
+          if (typeof value === "function") {
+            descriptor.value = maybeWrap(target, name, value)
+          }
         }
 
         return descriptor
