@@ -93,15 +93,7 @@ describe("scenarios", function () {
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
   )
 
-  it("should work with sqreen loaded first", () =>
-    exec(nodePath, [
-      "-r", "sqreen",
-      "-r", pkgPath,
-      path.resolve(testPath, "fixture/scenario/sqreen")
-    ])
-  )
-
-  it("should work with sqreen loaded second", () =>
+  it("should work with sqreen", () =>
     exec(nodePath, [
       "-r", pkgPath,
       "-r", "sqreen",
