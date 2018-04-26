@@ -67,6 +67,7 @@ Out of the box `esm` just works, no configuration necessary, and supports:
 * [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
 * [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
 * Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
+* Node [`--check`](https://nodejs.org/api/cli.html#cli_c_check) flag _(Node 10+)_
 
 Options
 ---
