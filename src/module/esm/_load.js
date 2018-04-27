@@ -14,6 +14,7 @@ import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
 import moduleState from "../state.js"
+import parseState from "../../parse/state.js"
 import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
 import setGetter from "../../util/set-getter.js"
@@ -57,19 +58,19 @@ function load(request, parent, isMain, preload) {
   }
 
   const isExtMJS = isMJS(filename)
-  const { parseState } = shared
   const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
   const queryFragment = getURLQueryFragment(request)
 
-  let isUnexposed = ! (pkgOptions && pkgOptions.cjs.cache)
+  let isUnexposed = pkgOptions && ! pkgOptions.cjs.cache
   let state = Module
 
   request = queryFragment
     ? getURLFromFilePath(filename) + queryFragment
     : filename
 
-  if (isExtMJS) {
+  if (isExtMJS ||
+      has(moduleState._cache, request)) {
     state = moduleState
   } else if (parseOnly ||
       parsing) {
@@ -84,8 +85,6 @@ function load(request, parent, isMain, preload) {
 
     state._cache[request] = mod
     Reflect.deleteProperty(parseState._cache, request)
-  } else if (has(moduleState._cache, request)) {
-    state = moduleState
   }
 
   let error
@@ -111,7 +110,7 @@ function load(request, parent, isMain, preload) {
 
     if (! mod.paths) {
       if (entry.package.options.cjs.paths &&
-          ! isMJS(entry.module)) {
+          ! isExtMJS) {
         mod.paths = Module._nodeModulePaths(fromPath)
       } else {
         mod.paths = moduleNodeModulePaths(fromPath)
