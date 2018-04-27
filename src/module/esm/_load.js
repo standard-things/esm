@@ -76,14 +76,14 @@ function load(request, parent, isMain, preload) {
       parsing) {
     state = parseState
   } else if (has(parseState._cache, request)) {
-    const mod = parseState._cache[request]
+    const child = parseState._cache[request]
 
     if (isUnexposed &&
-        Entry.get(mod).type === TYPE_ESM) {
+        Entry.get(child).type === TYPE_ESM) {
       state = moduleState
     }
 
-    state._cache[request] = mod
+    state._cache[request] = child
     Reflect.deleteProperty(parseState._cache, request)
   }
 
@@ -92,28 +92,28 @@ function load(request, parent, isMain, preload) {
   let threw = false
 
   entry = _load(request, parent, isMain, state, (entry) => {
-    const mod = entry.module
+    const child = entry.module
 
-    state._cache[request] = mod
+    state._cache[request] = child
 
     entry.id = request
-    mod.filename = filename
+    child.filename = filename
 
     if (isMain) {
-      mod.id = "."
-      moduleState.mainModule = mod
+      child.id = "."
+      moduleState.mainModule = child
     }
 
     if (parentEntry) {
       parentEntry.children[entry.name] = entry
     }
 
-    if (! mod.paths) {
+    if (! child.paths) {
       if (entry.package.options.cjs.paths &&
           ! isExtMJS) {
-        mod.paths = Module._nodeModulePaths(fromPath)
+        child.paths = Module._nodeModulePaths(fromPath)
       } else {
-        mod.paths = moduleNodeModulePaths(fromPath)
+        child.paths = moduleNodeModulePaths(fromPath)
       }
     }
 
@@ -137,7 +137,7 @@ function load(request, parent, isMain, preload) {
       if (! isESM &&
           (parentIsESM &&
            ! parentPkgOptions.cjs.cache)) {
-        mod.parent = void 0
+        child.parent = void 0
       }
     }
 
