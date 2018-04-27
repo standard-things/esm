@@ -140,38 +140,7 @@ function load(request, parent, isMain, preload) {
     }
 
     called = true
-
-    let error
-    let threw = true
-
-    try {
-      loader(entry, filename, parentEntry, preload)
-      threw = false
-    } catch (e) {
-      error = e
-      throw e
-    } finally {
-      if (threw) {
-        if (state === moduleState) {
-          // Unlike CJS, ESM errors are preserved for subsequent loads.
-          setGetter(state._cache, request, () => {
-            throw error
-          })
-
-          setSetter(state._cache, request, (value) => {
-            Reflect.defineProperty(state._cache, request, {
-              __proto__: null,
-              configurable: true,
-              enumerable: true,
-              value,
-              writable: true
-            })
-          })
-        } else {
-          Reflect.deleteProperty(state._cache, request)
-        }
-      }
-    }
+    tryLoader(entry, state, request, filename, parentEntry, preload)
   })
 
   if (! called &&
@@ -180,6 +149,40 @@ function load(request, parent, isMain, preload) {
   }
 
   return entry
+}
+
+function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
+  let error
+  let threw = true
+
+  try {
+    loader(entry, filename, parentEntry, preload)
+    threw = false
+  } catch (e) {
+    error = e
+    throw e
+  } finally {
+    if (threw) {
+      if (state === moduleState) {
+        // Unlike CJS, ESM errors are preserved for subsequent loads.
+        setGetter(state._cache, cacheKey, () => {
+          throw error
+        })
+
+        setSetter(state._cache, cacheKey, (value) => {
+          Reflect.defineProperty(state._cache, cacheKey, {
+            __proto__: null,
+            configurable: true,
+            enumerable: true,
+            value,
+            writable: true
+          })
+        })
+      } else {
+        Reflect.deleteProperty(state._cache, cacheKey)
+      }
+    }
+  }
 }
 
 function tryResolveFilename(request, parent, isMain) {

@@ -55,12 +55,12 @@ function load(request, parent, isMain, preload) {
   let called = false
 
   const entry = _load(filename, parent, isMain, state, (entry) => {
-    const mod = entry.module
+    const child = entry.module
 
-    state._cache[filename] = mod
+    state._cache[filename] = child
 
-    if (! mod.paths) {
-      mod.paths = Module._nodeModulePaths(dirname(filename))
+    if (! child.paths) {
+      child.paths = Module._nodeModulePaths(dirname(filename))
     }
 
     if (parseOnly &&
@@ -69,17 +69,7 @@ function load(request, parent, isMain, preload) {
     }
 
     called = true
-
-    let threw = true
-
-    try {
-      loader(entry, filename, parentEntry, preload)
-      threw = false
-    } finally {
-      if (threw) {
-        Reflect.deleteProperty(state._cache, filename)
-      }
-    }
+    tryLoader(entry, state, filename, filename, parentEntry, preload)
   })
 
   if (! called) {
@@ -95,6 +85,19 @@ function load(request, parent, isMain, preload) {
   }
 
   return entry.module.exports
+}
+
+function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
+  let threw = true
+
+  try {
+    loader(entry, filename, parentEntry, preload)
+    threw = false
+  } finally {
+    if (threw) {
+      Reflect.deleteProperty(state._cache, cacheKey)
+    }
+  }
 }
 
 export default load
