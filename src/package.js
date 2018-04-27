@@ -386,11 +386,11 @@ function readInfo(dirPath, force) {
       const { moduleState } = shared
       const { parseOnly, parsing } = moduleState
 
-      pkg =
-      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
-
       moduleState.parseOnly =
       moduleState.parsing = false
+
+      pkg =
+      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
       try {
         pkg.options =
