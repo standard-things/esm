@@ -87,9 +87,7 @@ function load(request, parent, isMain, preload) {
     Reflect.deleteProperty(parseState._cache, request)
   }
 
-  let error
   let called = false
-  let threw = false
 
   entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
@@ -143,12 +141,36 @@ function load(request, parent, isMain, preload) {
 
     called = true
 
+    let error
+    let threw = true
+
     try {
       loader(entry, filename, parentEntry, preload)
+      threw = false
     } catch (e) {
       error = e
-      threw = true
-      Reflect.deleteProperty(state._cache, request)
+      throw e
+    } finally {
+      if (threw) {
+        if (state === moduleState) {
+          // Unlike CJS, ESM errors are preserved for subsequent loads.
+          setGetter(state._cache, request, () => {
+            throw error
+          })
+
+          setSetter(state._cache, request, (value) => {
+            Reflect.defineProperty(state._cache, request, {
+              __proto__: null,
+              configurable: true,
+              enumerable: true,
+              value,
+              writable: true
+            })
+          })
+        } else {
+          Reflect.deleteProperty(state._cache, request)
+        }
+      }
     }
   })
 
@@ -157,32 +179,7 @@ function load(request, parent, isMain, preload) {
     preload(entry)
   }
 
-  if (! threw) {
-    return entry
-  }
-
-  try {
-    throw error
-  } finally {
-    if (state !== moduleState) {
-      Reflect.deleteProperty(state._cache, request)
-    } else {
-      // Unlike CJS, ESM errors are preserved for subsequent loads.
-      setGetter(state._cache, request, () => {
-        throw error
-      })
-
-      setSetter(state._cache, request, (value) => {
-        Reflect.defineProperty(state._cache, request, {
-          __proto__: null,
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
-      })
-    }
-  }
+  return entry
 }
 
 function tryResolveFilename(request, parent, isMain) {
