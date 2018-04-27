@@ -38,8 +38,8 @@ function loader(entry, filename, parentEntry, preload) {
   }
 
   if (parsing &&
-      (ext === ".json" ||
-       ext === ".node")) {
+      ext !== ".js" &&
+      ext !== ".mjs") {
     entry.state = STATE_PARSING_COMPLETED
     return
   }
