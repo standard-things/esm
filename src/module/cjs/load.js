@@ -31,6 +31,7 @@ const {
 } = errors
 
 function load(request, parent, isMain, preload) {
+  const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
 
   if (parentEntry &&
@@ -39,7 +40,6 @@ function load(request, parent, isMain, preload) {
     return _loadESM(request, parent, isMain).module.exports
   }
 
-  const { parseOnly, parsing } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
 
   let state = Module
