@@ -117,11 +117,6 @@ function load(request, parent, isMain, preload) {
       }
     }
 
-    if (parseOnly &&
-        ! parsing) {
-      return
-    }
-
     if (! parsing) {
       const isESM = entry.type === TYPE_ESM
 
@@ -139,6 +134,11 @@ function load(request, parent, isMain, preload) {
            ! parentPkgOptions.cjs.cache)) {
         child.parent = void 0
       }
+    }
+
+    if (parseOnly &&
+        ! parsing) {
+      return
     }
 
     called = true
