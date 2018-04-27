@@ -318,10 +318,10 @@ function createTryWrapper(func, content) {
 function tryValidateESM(caller, entry, content) {
   const { moduleState } = shared
 
+  moduleState.parsing = true
+
   let error
   let threw = true
-
-  moduleState.parsing = true
 
   try {
     validateESM(entry)
