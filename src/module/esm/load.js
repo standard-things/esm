@@ -1,7 +1,5 @@
 import ENTRY from "../../constant/entry.js"
 
-import Module from "../../module.js"
-
 import _load from "./_load.js"
 import shared from "../../shared.js"
 
@@ -18,8 +16,6 @@ function load(request, parent, isMain, preload) {
   const { parseOnly } = moduleState
 
   moduleState.parsing = true
-
-  Reflect.setPrototypeOf(shared.parseState._cache, Module._cache)
 
   try {
     entry = _load(request, parent, isMain)

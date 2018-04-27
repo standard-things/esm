@@ -14,6 +14,7 @@ import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
 import has from "../../util/has.js"
 import loader from "./loader.js"
+import parseState from "../../parse/state.js"
 import shared from "../../shared.js"
 
 const {
@@ -40,7 +41,6 @@ function load(request, parent, isMain, preload) {
 
   const { parseOnly, parsing } = shared.moduleState
   const filename = Module._resolveFilename(request, parent, isMain)
-  const { parseState } = shared
 
   let state = Module
 

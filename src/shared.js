@@ -86,10 +86,6 @@ function init() {
       dir: { __proto__: null },
       root: { __proto__: null }
     },
-    parseState: {
-      __proto__: null,
-      _cache: { __proto__: null }
-    },
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
     safeContext: Function("return this")(),

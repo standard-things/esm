@@ -14,6 +14,7 @@ import initGlobalPaths from "./module/init-global-paths.js"
 import load from "./module/load.js"
 import maskFunction from "./util/mask-function.js"
 import moduleState from "./module/state.js"
+import parseState from "./parse/state.js"
 import req from "./module/require.js"
 import wrap from "./module/wrap.js"
 import wrapper from "./module/wrapper.js"
@@ -50,5 +51,14 @@ if (! Module.globalPaths) {
 }
 
 moduleState.globalPaths = GenericArray.slice(Module.globalPaths)
+
+parseState._cache = new Proxy(parseState._cache, {
+  __proto__: null,
+  get(target, name) {
+    return Reflect.has(target, name)
+      ? Reflect.get(target, name)
+      : Reflect.get(Module._cache, name)
+  }
+})
 
 export default Module
