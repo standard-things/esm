@@ -48,7 +48,10 @@ const {
 const ExObject = __external__.Object
 
 function compile(caller, entry, content, filename, fallback) {
-  const { options } = entry.package
+  const pkg = entry.package
+  const { cache, options } = pkg
+  const { cacheName } = entry
+  const { parsing } = shared.moduleState
 
   let hint = SCRIPT
   let sourceType = SCRIPT
@@ -61,10 +64,6 @@ function compile(caller, entry, content, filename, fallback) {
   } else if (options.mode === OPTIONS_MODE_AUTO) {
     sourceType = UNAMBIGUOUS
   }
-
-  const pkg = entry.package
-  const { cache } = pkg
-  const { cacheName } = entry
 
   let { compileData } = entry
 
@@ -99,33 +98,27 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  if (shared.moduleState.parsing) {
-    if (options.warnings) {
-      for (const warning of compileData.warnings) {
-        warn(warning.code, filename, ...warning.args)
-      }
-    }
-
-    const defaultPkg = shared.package.default
-    const isESM = entry.type === TYPE_ESM
-    const parentEntry = entry.parent
-    const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-    const parentPkg = parentEntry && parentEntry.package
-
-    if (! isESM &&
-        ! parentIsESM &&
-        (pkg === defaultPkg ||
-         parentPkg === defaultPkg)) {
-      return fallback ? fallback() : void 0
-    }
-
-    if (isESM &&
-        entry.state === STATE_PARSING_STARTED) {
-      tryValidateESM(caller, entry, content, filename)
-    }
-  } else {
+  if (! parsing) {
     entry.state = STATE_EXECUTION_STARTED
     return tryCompileCached(caller, entry, content, filename)
+  }
+
+  const defaultPkg = shared.package.default
+  const isESM = entry.type === TYPE_ESM
+  const parentEntry = entry.parent
+  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+  const parentPkg = parentEntry && parentEntry.package
+
+  if (! isESM &&
+      ! parentIsESM &&
+      (pkg === defaultPkg ||
+        parentPkg === defaultPkg)) {
+    return fallback ? fallback() : void 0
+  }
+
+  if (isESM &&
+      entry.state === STATE_PARSING_STARTED) {
+    tryValidateESM(caller, entry, content, filename)
   }
 }
 
@@ -133,10 +126,19 @@ function tryCompileCached(caller, entry, content, filename) {
   const isESM = entry.type === TYPE_ESM
   const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
+  const pkg = entry.package
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
     moduleState.stat = { __proto__: null }
+  }
+
+  if (pkg.options.warnings) {
+    const { warnings } = entry.compileData
+
+    for (const warning of warnings) {
+      warn(warning.code, filename, ...warning.args)
+    }
   }
 
   let result
@@ -151,7 +153,7 @@ function tryCompileCached(caller, entry, content, filename) {
 
     if (isESM &&
         e.name === "SyntaxError") {
-      entry.package.cache.dirty = true
+      pkg.cache.dirty = true
     }
 
     content = () => readSourceCode(filename)
@@ -310,9 +312,7 @@ function tryValidateESM(caller, entry, content, filename) {
 }
 
 function useAsyncWrapper(entry) {
-  const pkg = entry.package
-
-  if (pkg.options.await &&
+  if (entry.package.options.await &&
       shared.support.await) {
     if (entry.type !== TYPE_ESM) {
       return true
