@@ -1,4 +1,5 @@
 import OwnProxy from "../own/proxy.js"
+import Package from "../package.js"
 
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
@@ -31,7 +32,7 @@ function maskFunction(func, source) {
 
   const toString = new OwnProxy(func.toString, {
     apply(target, thisArg, args) {
-      if (! shared.package.default.options.debug &&
+      if (! Package.state.default.options.debug &&
           typeof thisArg === "function" &&
           unwrapProxy(thisArg) === func) {
         thisArg = cached.source

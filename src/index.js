@@ -56,24 +56,27 @@ if (shared.inited) {
     let cacheKey
 
     if (isObjectLike(options)) {
-      cacheKey = JSON.stringify(options)
+      cacheKey = JSON.stringify(Package.createOptions(options))
     } else {
       const pkg = Package.from(mod)
-      const pkgOptions = pkg && pkg.options
 
-      if (pkgOptions) {
-        cacheKey = JSON.stringify(pkgOptions)
+      if (pkg) {
+        cacheKey = JSON.stringify(pkg.options)
       }
     }
 
     const cloned = clone(mod)
 
     if (cacheKey) {
-      const { cache } = shared.package
+      const { state } = shared.package
 
-      Package.cache =
-        cache[cacheKey] ||
-        (cache[cacheKey] = { __proto__: null })
+      Package.state =
+        state[cacheKey] ||
+        (state[cacheKey] = {
+          __proto__: null,
+          cache: { __proto__: null },
+          default: null
+        })
     }
 
     if (isObjectLike(options)) {

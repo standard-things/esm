@@ -87,7 +87,7 @@ function hook(Mod, parent) {
   defaultPkg.range = RANGE_ALL
 
   Module._extensions = _extensions
-  shared.package.default = defaultPkg
+  Package.state.default = defaultPkg
 
   function managerWrapper(manager, func, args) {
     const [, filename] = args

@@ -2,16 +2,16 @@ import PACKAGE from "../constant/package.js"
 
 import Module from "../module.js"
 import Package from "../package.js"
+import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
 import call from "../util/call.js"
 import { dirname } from "../safe/path.js"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
-import maskFunction from "../util/mask-function.js"
 import realProcess from "../real/process.js"
+import relaxRange from "../util/relax-range.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
-import shared from "../shared.js"
 
 const {
   RANGE_ALL
@@ -19,17 +19,23 @@ const {
 
 function hook(Mod) {
   const _tickCallback = getSilent(realProcess, "_tickCallback")
-  const { runMain } = Mod
-
   const useTickCallback = typeof _tickCallback === "function"
 
-  Mod.runMain = maskFunction(function () {
-    Mod.runMain = runMain
-
+  function managerWrapper(manager, func, args) {
     const [, mainPath] = realProcess.argv
     const filename = tryResolveFilename(mainPath)
+    const pkg = Package.from(filename)
+    const wrapped = Wrapper.find(Mod, "runMain", relaxRange(pkg.range))
 
-    const defaultPkg = shared.package.default
+    return wrapped
+      ? Reflect.apply(wrapped, this, [manager, func, args])
+      : Reflect.apply(func, this, args)
+  }
+
+  function methodWrapper() {
+    const [, mainPath] = realProcess.argv
+    const filename = tryResolveFilename(mainPath)
+    const defaultPkg = Package.state.default
     const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {
@@ -43,7 +49,7 @@ function hook(Mod) {
 
     loadESM(filename, null, true)
     tickCallback()
-  }, runMain)
+  }
 
   function tickCallback() {
     if (useTickCallback) {
@@ -66,6 +72,11 @@ function hook(Mod) {
 
     throw error
   }
+
+  Wrapper.manage(Mod, "runMain", managerWrapper)
+  Wrapper.wrap(Mod, "runMain", methodWrapper)
+
+  Module.runMain = Mod.runMain
 }
 
 export default hook

@@ -5,6 +5,7 @@ import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
 import Module from "../module.js"
+import Package from "../package.js"
 import Runtime from "../runtime.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
@@ -103,7 +104,7 @@ function compile(caller, entry, content, filename, fallback) {
     return tryCompileCached(caller, entry, content, filename)
   }
 
-  const defaultPkg = shared.package.default
+  const defaultPkg = Package.state.default
   const isESM = entry.type === TYPE_ESM
   const parentEntry = entry.parent
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM

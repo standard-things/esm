@@ -92,9 +92,13 @@ const cacheKey = JSON.stringify(defaultOptions)
 const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
-  static cache =
-    shared.package.cache[cacheKey] ||
-    (shared.package.cache[cacheKey] = { __proto__: null })
+  static state =
+    shared.package.state[cacheKey] ||
+    (shared.package.state[cacheKey] = {
+      __proto__: null,
+      cache: { __proto__: null },
+      default: null
+    })
 
   static createOptions = createOptions
   static defaultOptions = defaultOptions
@@ -167,7 +171,7 @@ class Package {
 
   static get(dirPath, force) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-    return getInfo(dirPath, force) || shared.package.default
+    return getInfo(dirPath, force) || Package.state.default
   }
 
   static from(mod, force) {
@@ -176,7 +180,7 @@ class Package {
 
   static set(dirPath, pkg) {
     dirPath = dirPath === "" ? dirPath : resolve(dirPath)
-    Package.cache[dirPath] = pkg || null
+    Package.state.cache[dirPath] = pkg || null
   }
 }
 
@@ -265,6 +269,7 @@ function createOptions(value) {
   }
 
   const cjsOptions = createCJS(options.cjs)
+
   defaults(options, defaultOptions)
   options.cjs = cjsOptions
 
@@ -310,8 +315,8 @@ function findRoot(dirPath) {
 function getInfo(dirPath, force) {
   let pkg
 
-  if (Reflect.has(Package.cache, dirPath)) {
-    pkg = Package.cache[dirPath]
+  if (Reflect.has(Package.state.cache, dirPath)) {
+    pkg = Package.state.cache[dirPath]
 
     if (! force ||
         pkg) {
@@ -320,7 +325,7 @@ function getInfo(dirPath, force) {
   }
 
   if (basename(dirPath) === "node_modules") {
-    return Package.cache[dirPath] = null
+    return Package.state.cache[dirPath] = null
   }
 
   pkg = readInfo(dirPath)
@@ -338,7 +343,7 @@ function getInfo(dirPath, force) {
     pkg = readInfo(dirPath, force)
   }
 
-  return Package.cache[dirPath] = pkg
+  return Package.state.cache[dirPath] = pkg
 }
 
 function getRange(json, name) {
@@ -390,7 +395,7 @@ function readInfo(dirPath, force) {
       moduleState.parsing = false
 
       pkg =
-      Package.cache[dirPath] = new Package(dirPath, RANGE_ALL)
+      Package.state.cache[dirPath] = new Package(dirPath, RANGE_ALL)
 
       try {
         pkg.options =
@@ -477,7 +482,7 @@ function readInfo(dirPath, force) {
 Reflect.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-Package.cache[""] = new Package("", version, {
+Package.state.cache[""] = new Package("", version, {
   cache: false,
   cjs: true
 })

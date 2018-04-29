@@ -1,13 +1,13 @@
 import CHAR from "../constant/char.js"
 
 import Module from "../module.js"
+import Package from "../package.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getModuleURL from "../util/get-module-url.js"
 import isParseError from "../util/is-parse-error.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
-import shared from "../shared.js"
 import toExternalError from "../util/to-external-error.js"
 
 const {
@@ -23,7 +23,7 @@ const blankRegExp = /^\s*$/
 const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
-  if (shared.package.default.options.debug) {
+  if (Package.state.default.options.debug) {
     return error
   }
 
