@@ -1,4 +1,3 @@
-import CHAR_CODE from "../constant/char-code.js"
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
 import PACKAGE from "../constant/package.js"
@@ -26,20 +25,12 @@ import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
+import relaxRange from "../util/relax-range.js"
 import { resolve } from "../safe/path.js"
 import safeToString from "../util/safe-to-string.js"
 import satisfies from "../util/satisfies.js"
 import shared from "../shared.js"
 import { version } from "../version.js"
-
-const {
-  CIRCUMFLEX_ACCENT,
-  DIGIT_0,
-  DIGIT_9,
-  EQUAL,
-  LOWERCASE_V,
-  TILDE
-} = CHAR_CODE
 
 const {
   STATE_EXECUTION_STARTED
@@ -77,10 +68,9 @@ function hook(Mod, parent) {
     assign(defaultOptions, parentPkg.options)
   }
 
-  if (! parent) {
-    if (OPTIONS) {
-      assign(defaultOptions, Package.createOptions(OPTIONS))
-    }
+  if (! parent &&
+      OPTIONS) {
+    assign(defaultOptions, Package.createOptions(OPTIONS))
   }
 
   if (! parentPkg) {
@@ -102,22 +92,7 @@ function hook(Mod, parent) {
   function managerWrapper(manager, func, args) {
     const [, filename] = args
     const pkg = Package.from(filename)
-
-    let { range } = pkg
-
-    const code0 = range.charCodeAt(0)
-
-    if (code0 !== CIRCUMFLEX_ACCENT) {
-      if (code0 >= DIGIT_0 && code0 <= DIGIT_9) {
-        range = "^" + range
-      } else if (code0 === TILDE ||
-          code0 === LOWERCASE_V ||
-          code0 === EQUAL) {
-        range = "^" + range.slice(1)
-      }
-    }
-
-    const wrapped = Wrapper.find(_extensions, ".js", range)
+    const wrapped = Wrapper.find(_extensions, ".js", relaxRange(pkg.range))
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])
