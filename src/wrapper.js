@@ -61,7 +61,7 @@ function init() {
 
   function createMap(object, name) {
     // Store the wrapper map as `object[shared.symbol.wrapper][name]` rather
-    // than on the function, so that other code can modify the same property
+    // than on the function so that other code can modify the same property
     // without interfering with our wrapper.
     return getOrCreateStore(object)[name] = {
       __proto__: null,
@@ -87,12 +87,7 @@ function init() {
   function getMap(object, name) {
     const store = getStore(object)
 
-    if (store &&
-        Reflect.has(store, name)) {
-      return store[name]
-    }
-
-    return null
+    return has(store, name) ? store[name] : null
   }
 
   function getOrCreateMap(object, name) {
@@ -105,6 +100,7 @@ function init() {
 
   function getStore(object) {
     const symbol = shared.symbol.wrapper
+
     return has(object, symbol) ? object[symbol] : null
   }
 
