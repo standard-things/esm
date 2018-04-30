@@ -39,8 +39,7 @@ function init() {
 
       wrapper = new OwnProxy(value, {
         apply(funcTarget, thisArg, args) {
-          if (thisArg === proxy ||
-              thisArg === entry.esmNamespace) {
+          if (thisArg === proxy) {
             thisArg = target
           }
 
