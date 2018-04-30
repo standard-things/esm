@@ -9,12 +9,14 @@ import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
+import isError from "./util/is-error.js"
 import isMJS from "./util/is-mjs.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
+import toStringLiteral from "./util/to-string-literal.js"
 
 const {
   TYPE_CJS,
@@ -289,6 +291,8 @@ function watchImport(entry, request, setterArgsList, loader) {
   moduleState.requireDepth += 1
 
   let childEntry
+  let error
+  let threw = false
 
   try {
     childEntry = loader(request, mod, false, (childEntry) => {
@@ -302,12 +306,25 @@ function watchImport(entry, request, setterArgsList, loader) {
 
       childEntry.addSetters(setterArgsList, entry)
     })
-  } finally {
-    moduleState.parseOnly = false
-    moduleState.requireDepth -= 1
+  } catch (e) {
+    error = e
+    threw = true
   }
 
-  if (childEntry.builtin) {
+  moduleState.parseOnly = false
+  moduleState.requireDepth -= 1
+
+  if (threw &&
+      (! entry.package.options.cjs.paths ||
+       isMJS(mod) ||
+       ! isError(error) ||
+       error.code !== "MODULE_NOT_FOUND" ||
+       ! error.message.includes(toStringLiteral(request, "'")))) {
+    throw error
+  }
+
+  if (childEntry &&
+      childEntry.builtin) {
     mod.require(childEntry.name)
   } else {
     entry._require = TYPE_ESM
@@ -318,10 +335,14 @@ function watchImport(entry, request, setterArgsList, loader) {
       entry._require = TYPE_CJS
     }
 
-    childEntry.loaded()
+    if (childEntry) {
+      childEntry.loaded()
+    }
   }
 
-  childEntry.update()
+  if (childEntry) {
+    childEntry.update()
+  }
 }
 
 export default Runtime
