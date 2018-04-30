@@ -25,6 +25,8 @@ function init() {
     }
 
     const maybeWrap = (target, name, value) => {
+      // Wrap native functions to avoid illegal invocation type errors in V8.
+      // https://bugs.chromium.org/p/v8/issues/detail?id=5773
       if (! isNative(value)) {
         return value
       }
@@ -52,6 +54,10 @@ function init() {
       return wrapper
     }
 
+    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor` trap can be
+    // removed and the `get` trap can be conditionally dropped for `exported`
+    // values that return "[object Function]" or "[object Object]" from
+    // `Object.prototype.toString.call(exported)`.
     const proxy = new OwnProxy(exported, {
       defineProperty(target, name, descriptor) {
         if (has(descriptor, "value")) {
