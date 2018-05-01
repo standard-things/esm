@@ -67,12 +67,12 @@ function init() {
           }
         }
 
-        if (Reflect.defineProperty(target, name, descriptor)) {
-          entry.update()
-          return true
-        }
-
-        return false
+        // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
+        // throw the appropriate error if something goes wrong.
+        // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
+        Object.defineProperty(target, name, descriptor)
+        entry.update()
+        return true
       },
       deleteProperty(target, name) {
         if (Reflect.deleteProperty(target, name)) {
