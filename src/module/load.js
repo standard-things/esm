@@ -6,7 +6,9 @@ import { dirname, extname } from "../safe/path.js"
 
 import Module from "../module.js"
 
-const ExError = __external__.Error
+import shared from "../shared.js"
+
+const ExError = shared.external.Error
 
 function load(filename) {
   if (this.loaded) {

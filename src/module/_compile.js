@@ -46,7 +46,7 @@ const {
   UNAMBIGUOUS
 } = SOURCE_TYPE
 
-const ExObject = __external__.Object
+const ExObject = shared.external.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package

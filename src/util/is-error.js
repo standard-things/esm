@@ -1,7 +1,7 @@
 import shared from "../shared.js"
 
 function init() {
-  const ExError = __external__.Error
+  const ExError = shared.external.Error
 
   const { toString } = Object.prototype
 

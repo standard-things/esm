@@ -52,6 +52,7 @@ function init() {
       skipExports: { __proto__: null }
     },
     env: { __proto__: null },
+    external: __external__,
     fastPath,
     inited: false,
     memoize: {

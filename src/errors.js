@@ -5,10 +5,12 @@ import toStringLiteral from "./util/to-string-literal.js"
 import { version } from "./version.js"
 
 function init() {
-  const ExError = __external__.Error
-  const ExReferenceError = __external__.ReferenceError
-  const ExSyntaxError = __external__.SyntaxError
-  const ExTypeError = __external__.TypeError
+  const { external } = shared
+
+  const ExError = external.Error
+  const ExReferenceError = external.ReferenceError
+  const ExSyntaxError = external.SyntaxError
+  const ExTypeError = external.TypeError
 
   const errors = { __proto__: null }
   const messages = { __proto__: null }

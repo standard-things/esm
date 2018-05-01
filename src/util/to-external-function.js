@@ -2,7 +2,7 @@ import has from "./has.js"
 import shared from "../shared.js"
 
 function init() {
-  const ExFunction = __external__.Function
+  const ExFunction = shared.external.Function
 
   const exFuncSuper = Reflect.getPrototypeOf(ExFunction)
   const exFuncProtoSuper = Reflect.getPrototypeOf(ExFunction.prototype)

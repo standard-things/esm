@@ -9,7 +9,7 @@ function init() {
 
   const WARNING_PREFIX = "(" + release.name + ":" + pid + ") "
 
-  const ExError = __external__.Error
+  const ExError = shared.external.Error
 
   const _emitWarning = realProcess.emitWarning
 

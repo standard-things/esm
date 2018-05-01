@@ -28,9 +28,11 @@ const {
   ERR_UNDEFINED_IDENTIFIER
 } = errors
 
-const ExPromise = __external__.Promise
+const { external } = shared
 
-const indirectEval = __external__.eval
+const ExPromise = external.Promise
+
+const indirectEval = external.eval
 
 const Runtime = {
   __proto__: null,
