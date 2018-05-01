@@ -51,7 +51,7 @@
     "eslint-plugin-node": "^6.0.1",
     "execa": "^0.10.0",
     "express": "^4.16.3",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^6.0.0",
     "global-prefix": "^1.0.2",
     "globby": "^8.0.1",
     "golden-fleece": "^1.0.8",
