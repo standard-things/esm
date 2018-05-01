@@ -1,4 +1,5 @@
 import OwnProxy from "../own/proxy.js"
+import SafeObject from "../safe/object.js"
 
 import has from "./has.js"
 import isNative from "./is-native.js"
@@ -70,7 +71,7 @@ function init() {
         // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
         // throw the appropriate error if something goes wrong.
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
-        Object.defineProperty(target, name, descriptor)
+        SafeObject.defineProperty(target, name, descriptor)
         entry.update()
         return true
       },
