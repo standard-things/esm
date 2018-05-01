@@ -1,24 +1,34 @@
-const exProtos = {
-  __proto__: null,
-  Error: __external__.Error.prototype,
-  EvalError: __external__.EvalError.prototype,
-  RangeError: __external__.RangeError.prototype,
-  ReferenceError: __external__.ReferenceError.prototype,
-  SyntaxError: __external__.SyntaxError.prototype,
-  TypeError: __external__.TypeError.prototype,
-  URIError: __external__.URIError.prototype
-}
+import shared from "../shared.js"
 
-function toExternalError(error) {
-  const proto = Reflect.getPrototypeOf(error)
-  const name = proto ? proto.name : error.name
-  const exProto = exProtos[name]
+function init() {
+  const { external } = shared
 
-  if (exProto) {
-    Reflect.setPrototypeOf(error, exProto)
+  const exProtos = {
+    __proto__: null,
+    Error: external.Error.prototype,
+    EvalError: external.EvalError.prototype,
+    RangeError: external.RangeError.prototype,
+    ReferenceError: external.ReferenceError.prototype,
+    SyntaxError: external.SyntaxError.prototype,
+    TypeError: external.TypeError.prototype,
+    URIError: external.URIError.prototype
   }
 
-  return error
+  function toExternalError(error) {
+    const proto = Reflect.getPrototypeOf(error)
+    const name = proto ? proto.name : error.name
+    const exProto = exProtos[name]
+
+    if (exProto) {
+      Reflect.setPrototypeOf(error, exProto)
+    }
+
+    return error
+  }
+
+  return toExternalError
 }
 
-export default toExternalError
+export default shared.inited
+  ? shared.module.utilExternalError
+  : shared.module.utilExternalError = init()
