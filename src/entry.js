@@ -34,6 +34,7 @@ const {
   ERR_EXPORT_MISSING,
   ERR_EXPORT_STAR_CONFLICT,
   ERR_NS_ASSIGNMENT,
+  ERR_NS_DEFINITION,
   ERR_NS_EXTENSION,
   ERR_NS_REDEFINITION
 } = errors
@@ -448,12 +449,15 @@ function createNamespace(entry, source = entry) {
 
   return new OwnProxy(namespace, {
     defineProperty(target, name, descriptor) {
-      if (Reflect.has(source.namespace, name)) {
-        throw new ERR_NS_REDEFINITION(mod, name)
+      if (Reflect.defineProperty(target, name, descriptor)) {
+        return true
       }
 
-      SafeObject.defineProperty(target, name, descriptor)
-      return true
+      const NsError = Reflect.has(source.namespace, name)
+        ? ERR_NS_REDEFINITION
+        : ERR_NS_DEFINITION
+
+      throw new NsError(mod, name)
     },
     get(namespace, name) {
       return name === Symbol.toStringTag
