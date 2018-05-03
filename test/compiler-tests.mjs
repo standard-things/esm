@@ -52,6 +52,7 @@ describe("compiler", () => {
     })
 
     const warnings = result.warnings || []
+
     assert.strictEqual(warnings.length, 1)
   })
 

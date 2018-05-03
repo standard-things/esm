@@ -36,7 +36,11 @@ function init() {
       const { column, line } = getLineInfo(this.magicString.original, node.start)
 
       this.warnedForArguments = true
-      this.warnings.push({ args: [line, column], code: "WRN_ARGUMENTS_ACCESS" })
+
+      this.warnings.push({
+        args: [line, column],
+        code: "WRN_ARGUMENTS_ACCESS"
+      })
     }
 
     visitWithoutReset(path) {
