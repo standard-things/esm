@@ -244,19 +244,6 @@ export default () => {
 
   objects = [events1, events2, events3]
 
-  objects.forEach((object) =>
-    assert.throws(
-      () => Object.defineProperty(object, "defaultMaxListeners", {
-        __proto__: null,
-        configurable: true,
-        enumerable: true,
-        value: 0,
-        writable: true
-      }),
-      /TypeError: Cannot redefine/
-    )
-  )
-
   assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
@@ -269,4 +256,38 @@ export default () => {
 
   assert.deepStrictEqual([a, b], [void 0, 2])
   objects.forEach(({ a, b }) => assert.deepEqual([a, b], [void 0, 2]))
+
+  assert.throws(
+    () => accessor2.c = 3,
+    /TypeError: Cannot add/
+  )
+
+  assert.throws(
+    () => Object.defineProperty(accessor2, "c", {
+      __proto__: null,
+      configurable: true,
+      enumerable: true,
+      value: 3,
+      writable: true
+    }),
+    /TypeError: Cannot define/
+  )
+
+  assert.throws(
+    () => Object.defineProperty(accessor2, "a", {
+      __proto__: null,
+      configurable: true,
+      enumerable: true,
+      value: 1,
+      writable: true
+    }),
+    /TypeError: Cannot redefine/
+  )
+
+  assert.throws(
+    () => delete accessor2.a,
+    /TypeError: Cannot delete/
+  )
+
+  assert.strictEqual(delete accessor2.c, true)
 }
