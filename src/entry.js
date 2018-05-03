@@ -405,7 +405,7 @@ function assignExportsToNamespace(entry) {
     }
 
     if (! Reflect.has(getters, name)) {
-      entry.addGetter(name, () => entry._namespace[name])
+      entry.addGetter(name, () => entry.namespace[name])
     }
   }
 }
