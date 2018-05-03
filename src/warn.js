@@ -1,36 +1,16 @@
 import emitWarning from "./util/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
 import shared from "./shared.js"
-import toStringLiteral from "./util/to-string-literal.js"
 import { version } from "./version.js"
 
 function init() {
-  const cacheKeys = { __proto__: null }
   const messages = { __proto__: null }
   const warned = { __proto__: null }
 
   addWarning("WRN_ARGUMENTS_ACCESS", argumentsAccess)
-  addWarning("WRN_NS_ASSIGNMENT", namespaceAssignment, moduleCacheKey)
-  addWarning("WRN_NS_EXTENSION", namespaceExtension, moduleCacheKey)
 
-  function addWarning(code, messageHandler, cacheKeyHandler) {
-    if (cacheKeyHandler) {
-      cacheKeys[code] = cacheKeyHandler
-    }
-
+  function addWarning(code, messageHandler) {
     messages[code] = messageHandler
-  }
-
-  function getCacheKey(code, args) {
-    const serialized = Reflect.has(cacheKeys, code)
-      ? cacheKeys[code](...args)
-      : args.join("\0")
-
-    return code + "\0" + serialized
-  }
-
-  function moduleCacheKey(request, name) {
-    return getModuleURL(request) + "\0" + name
   }
 
   function argumentsAccess(request, line, column) {
@@ -39,20 +19,8 @@ function init() {
       line + ":" + column + "): " + getModuleURL(request)
   }
 
-  function namespaceAssignment(request, name) {
-    return "esm@" + version +
-      " cannot assign to the read only module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleURL(request)
-  }
-
-  function namespaceExtension(request, name) {
-    return "esm@" + version +
-      " cannot add property " + toStringLiteral(name, "'") +
-      " to module namespace of " + getModuleURL(request)
-  }
-
   function warn(code, ...args) {
-    const cacheKey = getCacheKey(code, args)
+    const cacheKey = code + "\0" + args.join("\0")
 
     if (! Reflect.has(warned, cacheKey)) {
       warned[cacheKey] = true

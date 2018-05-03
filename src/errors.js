@@ -24,6 +24,8 @@ function init() {
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
   addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
   addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
+  addBuiltinError("ERR_NS_ASSIGNMENT", namespaceAssignment, ExTypeError)
+  addBuiltinError("ERR_NS_REDEFINITION", namespaceRedefinition, ExTypeError)
   addBuiltinError("ERR_UNDEFINED_IDENTIFIER", undefinedIdentifier, ExReferenceError)
   addBuiltinError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 
@@ -161,6 +163,16 @@ function init() {
   function moduleResolutionLegacy(id, fromPath, foundPath) {
     return id + " not found by import in " + fromPath +
       ". Legacy behavior in require() would have found it at " + foundPath
+  }
+
+  function namespaceAssignment(request, identName) {
+    return "Cannot assign to read only module namespace property " +
+      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+  }
+
+  function namespaceRedefinition(request, identName) {
+    return "Cannot redefine module namespace property " +
+      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
   }
 
   function requireESM(request) {

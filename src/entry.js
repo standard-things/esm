@@ -3,6 +3,7 @@ import ENTRY from "./constant/entry.js"
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
+import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
@@ -18,7 +19,6 @@ import setGetter from "./util/set-getter.js"
 import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
-import warn from "./warn.js"
 
 const {
   LOAD_COMPLETED,
@@ -32,7 +32,9 @@ const {
 
 const {
   ERR_EXPORT_MISSING,
-  ERR_EXPORT_STAR_CONFLICT
+  ERR_EXPORT_STAR_CONFLICT,
+  ERR_NS_ASSIGNMENT,
+  ERR_NS_REDEFINITION
 } = errors
 
 const GETTER_ERROR = { __proto__: null }
@@ -427,7 +429,8 @@ function changed(setter, key, value) {
 }
 
 function createNamespace(entry, source = entry) {
-  const exported = entry.module.exports
+  const mod = entry.module
+  const exported = mod.exports
   const { type } = entry
 
   const isCJS = type === TYPE_CJS
@@ -443,6 +446,14 @@ function createNamespace(entry, source = entry) {
   })
 
   return new OwnProxy(namespace, {
+    defineProperty(target, name, descriptor) {
+      if (Reflect.has(source.namespace, name)) {
+        throw new ERR_NS_REDEFINITION(mod, name)
+      }
+
+      SafeObject.defineProperty(target, name, descriptor)
+      return true
+    },
     get(namespace, name) {
       return name === Symbol.toStringTag
         ? Reflect.get(namespace, name)
@@ -479,16 +490,12 @@ function createNamespace(entry, source = entry) {
 
       return descriptor
     },
-    set(namespace, name) {
-      if (entry.package.options.warnings) {
-        if (Reflect.has(source, name)) {
-          warn("WRN_NS_ASSIGNMENT", entry.module, name)
-        } else {
-          warn("WRN_NS_EXTENSION", entry.module, name)
-        }
+    set(namespace, name, value) {
+      if (Reflect.has(source.namespace, name)) {
+        throw new ERR_NS_ASSIGNMENT(mod, name)
       }
 
-      return true
+      namespace[name] = value
     }
   })
 }
