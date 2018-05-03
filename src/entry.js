@@ -523,9 +523,17 @@ function getExportByName(entry, setter, name) {
     // Lazily assign proxied namespace object.
     entry.namespace = new OwnProxy(_namespace, {
       get(target, name, receiver) {
-        return name === "default"
-          ? proxyExports(entry)
-          : Reflect.get(target, name, receiver)
+        const exported = proxyExports(entry)
+
+        if (name === "default") {
+          return exported
+        }
+
+        if (has(exported, name)) {
+          target = exported
+        }
+
+        return Reflect.get(target, name, receiver)
       }
     })
   }
