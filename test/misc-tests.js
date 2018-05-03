@@ -97,9 +97,9 @@ function getURLFromFilePath(filename) {
   return fileProtocol + filename.replace(/\\/g, "/")
 }
 
-function getWarning() {
+function getWarning(...args) {
   return WARNING_PREFIX + "Warning: " +
-    util.format.apply(util, arguments) + "\n"
+    util.format(...args) + "\n"
 }
 
 describe("built-in modules", () => {
