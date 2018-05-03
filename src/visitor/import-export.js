@@ -252,7 +252,7 @@ function init() {
           // If the exported expression is a comma-separated sequence expression,
           // `this.code.slice(declaration.start, declaration.end)` may not include
           // the vital parentheses, so we should wrap the expression with parentheses
-          // to make absolutely sure it is treated as a single argument to
+          // to make absolutely sure it's treated as a single argument to
           // `runtime.default()`, rather than as multiple arguments.
           prefix += "("
           suffix = ")" + suffix

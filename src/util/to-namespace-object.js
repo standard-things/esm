@@ -7,7 +7,7 @@ const toStringTagDescriptor = {
 
 function toNamespaceObject(object, getter = Reflect.get) {
   // Section 9.4.6: Module Namespace Exotic Objects
-  // Module namespace objects have a null [[Prototype]].
+  // Module namespace objects have a `null` [[Prototype]].
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   const namespace = { __proto__: null }
 

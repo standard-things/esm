@@ -22,7 +22,7 @@ function init() {
     let match
 
     while ((match = pattern.exec(code))) {
-      // Make sure the match is not preceded by a `.` character, since that
+      // Make sure the match isn't preceded by a `.` character, since that
       // probably means the identifier is a property access rather than a
       // variable reference.
       if (! match.index ||

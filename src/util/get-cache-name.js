@@ -15,8 +15,8 @@ function getCacheName(entry, cacheKey) {
     filename = ""
   }
 
-  // While MD5 is not suitable for verification of untrusted data,
-  // it is great for revving files. See Sufian Rhazi's post for more details.
+  // While MD5 isn't suitable for verification of untrusted data,
+  // it's great for revving files. See Sufian Rhazi's post for more details.
   // https://blog.risingstack.com/automatic-cache-busting-for-your-css/
   const pathHash = md5(filename)
 

@@ -28,7 +28,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     return paths.length ? paths : null
   }
 
-  // With --eval, `parent.id` is not set and `parent.filename` is `null`.
+  // With --eval, `parent.id` isn't set and `parent.filename` is `null`.
   if (! parent ||
       ! parent.id ||
       ! parentFilename) {
