@@ -25,6 +25,14 @@ function getShared() {
 }
 
 function init() {
+  const dummyProxy = new Proxy(class P {}, {
+    __proto__: null,
+    [PKG_PREFIX]: 1
+  })
+
+  const funcToString = Function.prototype.toString
+  const { toString } = Object.prototype
+
   const fastPath = { __proto__: null }
   const utilBinding = { __proto__: null }
 
@@ -104,6 +112,14 @@ function init() {
       : "inspect"
   })
 
+  setDeferred(shared, "proxyNativeSourceText", () => {
+    try {
+      return funcToString.call(dummyProxy)
+    } catch (e) {}
+
+    return ""
+  })
+
   setDeferred(shared, "runtimeName", () =>
     encodeId(
       "_" +
@@ -141,13 +157,9 @@ function init() {
   )
 
   setDeferred(support, "inspectProxies", () => {
-    const proxy = new Proxy({ __proto__: null }, {
+    const inspected = shared.module.safeUtil.inspect(dummyProxy, {
       __proto__: null,
-      [PKG_PREFIX]: 1
-    })
-
-    const inspected = shared.module.safeUtil.inspect(proxy, {
-      __proto__: null,
+      depth: 1,
       showProxy: true
     })
 
@@ -164,27 +176,16 @@ function init() {
   )
 
   setDeferred(support, "proxiedClasses", () => {
-    class A {}
-
-    Reflect.setPrototypeOf(A.prototype, null)
-
-    const proxy = new Proxy(A, { __proto__: null })
-
-    class B extends proxy {
-      b() {}
+    class C extends dummyProxy {
+      c() {}
     }
 
-    Reflect.setPrototypeOf(B.prototype, null)
-
-    return new B().b !== void 0
+    return new C().c !== void 0
   })
 
-  setDeferred(support, "proxiedFunctionToStringTag", () => {
-    const { toString } = Object.prototype
-    const proxy = new Proxy(toString, { __proto__: null })
-
-    return toString.call(proxy) === "[object Function]"
-  })
+  setDeferred(support, "proxiedFunctionToStringTag", () =>
+    toString.call(dummyProxy) === "[object Function]"
+  )
 
   setDeferred(support, "replShowProxy", () => {
     const { safeProcess, utilSatisfies } = shared.module
