@@ -25,6 +25,7 @@ function init() {
   addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
   addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
   addBuiltinError("ERR_NS_ASSIGNMENT", namespaceAssignment, ExTypeError)
+  addBuiltinError("ERR_NS_EXTENSION", namespaceExtension, ExTypeError)
   addBuiltinError("ERR_NS_REDEFINITION", namespaceRedefinition, ExTypeError)
   addBuiltinError("ERR_UNDEFINED_IDENTIFIER", undefinedIdentifier, ExReferenceError)
   addBuiltinError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
@@ -168,6 +169,11 @@ function init() {
   function namespaceAssignment(request, identName) {
     return "Cannot assign to read only module namespace property " +
       toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+  }
+
+  function namespaceExtension(request, identName) {
+    return "Cannot add module namespace property " +
+      toStringLiteral(identName, "'") + " to " + getModuleURL(request)
   }
 
   function namespaceRedefinition(request, identName) {

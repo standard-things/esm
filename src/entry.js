@@ -34,6 +34,7 @@ const {
   ERR_EXPORT_MISSING,
   ERR_EXPORT_STAR_CONFLICT,
   ERR_NS_ASSIGNMENT,
+  ERR_NS_EXTENSION,
   ERR_NS_REDEFINITION
 } = errors
 
@@ -490,12 +491,12 @@ function createNamespace(entry, source = entry) {
 
       return descriptor
     },
-    set(namespace, name, value) {
-      if (Reflect.has(source.namespace, name)) {
-        throw new ERR_NS_ASSIGNMENT(mod, name)
-      }
+    set(namespace, name, value, receiver) {
+      const NsError = Reflect.has(source.namespace, name)
+        ? ERR_NS_ASSIGNMENT
+        : ERR_NS_EXTENSION
 
-      namespace[name] = value
+      throw new NsError(mod, name)
     }
   })
 }
