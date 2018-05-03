@@ -1,8 +1,12 @@
 import assert from "assert"
 import mockIo from "mock-stdio"
 import stripANSI  from "strip-ansi"
+import accessor1, { a, b } from "../../fixture/cjs/export/accessor.js"
+import * as accessor2 from "../../fixture/cjs/export/accessor.js"
 import console1, { log } from "console"
 import * as console2 from "console"
+import Date1, { now } from "../../fixture/cjs/export/date-constructor.js"
+import * as Date2 from "../../fixture/cjs/export/date-constructor.js"
 import def1, { d } from "../../fixture/export/def.js"
 import * as def2 from "../../fixture/export/def.js"
 import events1 from "events"
@@ -14,7 +18,9 @@ import * as process2 from "process"
 import regexp1, { test } from "../../fixture/cjs/export/regexp.js"
 import * as regexp2 from "../../fixture/cjs/export/regexp.js"
 
+const accessor3 = require("../../fixture/cjs/export/accessor.js")
 const console3 = require("console")
+const Date3 = require("../../fixture/cjs/export/date-constructor.js")
 const def3 = require("../../fixture/export/def.js")
 const events3 = require("events")
 const path3 = require("path")
@@ -36,6 +42,7 @@ function getTagFromSymbol(object) {
 export default () => {
   let objects = [console1, console2, console3]
   let descriptor = Reflect.getOwnPropertyDescriptor(console1, "log")
+  let proxyValue = console1.log
 
   console1.log = 1
 
@@ -51,7 +58,7 @@ export default () => {
 
   Reflect.defineProperty(console1, "log", descriptor)
 
-  let reverted = [console1.log, console2.log, console3.log]
+  let reverted = [console1.log, console2.log, console3.log, log]
 
   mockIo.start()
   console1.log(1)
@@ -64,14 +71,48 @@ export default () => {
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
   assert.deepStrictEqual(deleted, [false, false, false])
-  assert.deepStrictEqual(reverted, Array(3).fill(log))
+  assert.deepStrictEqual(reverted, Array(4).fill(proxyValue))
+  assert.notStrictEqual(console1, console2)
   assert.strictEqual(console1, console3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["Object", "Module", "Object"])
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
+  objects = [Date1, Date2, Date3]
+  descriptor = Reflect.getOwnPropertyDescriptor(Date1, "now")
+  proxyValue = Date1.now
+
+  let rawValue = Date3.now
+
+  Date1.now = 1
+
+  updated = [Date1.now, Date2.now, Date3.now, now]
+
+  Reflect.deleteProperty(Date1, "now")
+
+  deleted = [
+    ! Reflect.has(Date1, "now"),
+    ! Reflect.has(Date2, "now"),
+    ! Reflect.has(Date3, "now")
+  ]
+
+  Reflect.defineProperty(Date1, "now", descriptor)
+
+  reverted = [Date1.now, Date2.now, Date3.now, now]
+
+  assert.deepStrictEqual(updated, [1, 1, 1, 1])
+  assert.deepStrictEqual(deleted, [true, false, true])
+
+  assert.deepStrictEqual(reverted, [proxyValue, proxyValue, rawValue, proxyValue])
+  assert.notStrictEqual(Date1, Date2)
+  assert.notStrictEqual(Date1, Date3)
+
+  assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
+  assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
+
   objects = [def1, def2, def3]
   descriptor = Reflect.getOwnPropertyDescriptor(def1, "d")
+  rawValue = def3.d
 
   def1.d = 1
 
@@ -87,11 +128,12 @@ export default () => {
 
   Reflect.defineProperty(def1, "d", descriptor)
 
-  reverted = [def1.d, def2.d, def3.d]
+  reverted = [def1.d, def2.d, def3.d, d]
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
   assert.deepStrictEqual(deleted, [true, false, true])
-  assert.deepStrictEqual(reverted, Array(3).fill(d))
+  assert.deepStrictEqual(reverted, Array(4).fill(rawValue))
+  assert.notStrictEqual(def1, def2)
   assert.notStrictEqual(def1, def3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["Object", "Module", "Object"])
@@ -99,6 +141,7 @@ export default () => {
 
   objects = [path1, path2, path3]
   descriptor = Reflect.getOwnPropertyDescriptor(path1, "join")
+  rawValue = path3.join
 
   path1.join = 1
 
@@ -114,11 +157,12 @@ export default () => {
 
   Reflect.defineProperty(path1, "join", descriptor)
 
-  reverted = [path1.join, path2.join, path3.join]
+  reverted = [path1.join, path2.join, path3.join, join]
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
   assert.deepStrictEqual(deleted, [true, false, true])
-  assert.deepStrictEqual(reverted, Array(3).fill(join))
+  assert.deepStrictEqual(reverted, Array(4).fill(rawValue))
+  assert.notStrictEqual(path1, path2)
   assert.strictEqual(path1, path3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["Object", "Module", "Object"])
@@ -126,6 +170,7 @@ export default () => {
 
   objects = [process1, process2, process3]
   descriptor = Reflect.getOwnPropertyDescriptor(process1, "cwd")
+  proxyValue = process1.cwd
 
   process1.cwd = 1
 
@@ -141,7 +186,7 @@ export default () => {
 
   Reflect.defineProperty(process1, "cwd", descriptor)
 
-  reverted = [process1.cwd, process2.cwd, process3.cwd]
+  reverted = [process1.cwd, process2.cwd, process3.cwd, cwd]
 
   assert.strictEqual(cwd(), process1.cwd())
   assert.strictEqual(process2.cwd(), process1.cwd())
@@ -150,7 +195,8 @@ export default () => {
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
   assert.deepStrictEqual(deleted, [true, false, true])
-  assert.deepStrictEqual(reverted, Array(3).fill(cwd))
+  assert.deepStrictEqual(reverted, Array(4).fill(proxyValue))
+  assert.notStrictEqual(process1, process2)
   assert.strictEqual(process1, process3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["process", "Module", "process"])
@@ -158,9 +204,8 @@ export default () => {
 
   objects = [regexp1, regexp2, regexp3]
   descriptor = Reflect.getOwnPropertyDescriptor(regexp1, "test")
-
-  let oldProxyValue = regexp1.test
-  let oldRawValue = regexp3.test
+  proxyValue = regexp1.test
+  rawValue = regexp3.test
 
   regexp1[Symbol.toStringTag] = 1
   regexp1.test = 1
@@ -175,13 +220,13 @@ export default () => {
     ! Reflect.has(regexp3, "test")
   ]
 
-  regexp1.test = oldProxyValue
+  regexp1.test = proxyValue
 
-  assert.strictEqual(regexp3.test, oldRawValue)
+  assert.strictEqual(regexp3.test, rawValue)
 
   Reflect.defineProperty(regexp1, "test", descriptor)
 
-  assert.strictEqual(regexp3.test, oldRawValue)
+  reverted = [regexp1.test, regexp2.test, regexp3.test, test]
 
   assert.strictEqual(test.name, "test")
   assert.strictEqual(test.length, 1)
@@ -190,9 +235,8 @@ export default () => {
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
   assert.deepStrictEqual(deleted, [false, false, false])
-  assert.deepStrictEqual([regexp2.test, regexp3.test], [test, test])
-
-  assert.notStrictEqual(regexp1.test, test)
+  assert.deepStrictEqual(reverted, [proxyValue, proxyValue, rawValue, proxyValue])
+  assert.notStrictEqual(regexp1, regexp2)
   assert.notStrictEqual(regexp1, regexp3)
 
   assert.deepStrictEqual(objects.map(getTagFromString), ["RegExp", "Module", "RegExp"])
@@ -200,6 +244,29 @@ export default () => {
 
   objects = [events1, events2, events3]
 
+  objects.forEach((object) =>
+    assert.throws(
+      () => Object.defineProperty(object, "defaultMaxListeners", {
+        __proto__: null,
+        configurable: true,
+        enumerable: true,
+        value: 0,
+        writable: true
+      }),
+      /TypeError: Cannot redefine/
+    )
+  )
+
   assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
+
+  objects = [accessor1, accessor2, accessor3]
+
+  assert.deepStrictEqual([a, b], [void 0, void 0])
+  objects.forEach(({ a, b }) => assert.deepStrictEqual([a, b], [void 0, void 0]))
+
+  accessor1.a = 2
+
+  assert.deepStrictEqual([a, b], [void 0, 2])
+  objects.forEach(({ a, b }) => assert.deepEqual([a, b], [void 0, 2]))
 }
