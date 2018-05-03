@@ -26,6 +26,7 @@ function init() {
   addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
   addBuiltinError("ERR_NS_ASSIGNMENT", namespaceAssignment, ExTypeError)
   addBuiltinError("ERR_NS_DEFINITION", namespaceDefinition, ExTypeError)
+  addBuiltinError("ERR_NS_DELETION", namespaceDeletion, ExTypeError)
   addBuiltinError("ERR_NS_EXTENSION", namespaceExtension, ExTypeError)
   addBuiltinError("ERR_NS_REDEFINITION", namespaceRedefinition, ExTypeError)
   addBuiltinError("ERR_UNDEFINED_IDENTIFIER", undefinedIdentifier, ExReferenceError)
@@ -174,6 +175,11 @@ function init() {
 
   function namespaceDefinition(request, identName) {
     return "Cannot define module namespace property " +
+      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+  }
+
+  function namespaceDeletion(request, identName) {
+    return "Cannot delete module namespace property " +
       toStringLiteral(identName, "'") + " of " + getModuleURL(request)
   }
 

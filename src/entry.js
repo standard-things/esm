@@ -34,6 +34,7 @@ const {
   ERR_EXPORT_STAR_CONFLICT,
   ERR_NS_ASSIGNMENT,
   ERR_NS_DEFINITION,
+  ERR_NS_DELETION,
   ERR_NS_EXTENSION,
   ERR_NS_REDEFINITION
 } = errors
@@ -452,11 +453,18 @@ function createNamespace(entry, source = entry) {
         return true
       }
 
-      const NsError = Reflect.has(source.namespace, name)
+      const NsError = has(source.namespace, name)
         ? ERR_NS_REDEFINITION
         : ERR_NS_DEFINITION
 
       throw new NsError(mod, name)
+    },
+    deleteProperty(target, name) {
+      if (Reflect.deleteProperty(target, name)) {
+        return true
+      }
+
+      throw new ERR_NS_DELETION(mod, name)
     },
     get(namespace, name) {
       return name === Symbol.toStringTag
@@ -464,7 +472,7 @@ function createNamespace(entry, source = entry) {
         : Reflect.get(source.namespace, name)
     },
     getOwnPropertyDescriptor(namespace, name) {
-      if (! Reflect.has(namespace, name)) {
+      if (! has(namespace, name)) {
         return
       }
 
@@ -495,7 +503,7 @@ function createNamespace(entry, source = entry) {
       return descriptor
     },
     set(namespace, name) {
-      const NsError = Reflect.has(source.namespace, name)
+      const NsError = has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
 
