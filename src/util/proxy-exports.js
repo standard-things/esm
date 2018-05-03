@@ -26,7 +26,8 @@ function init() {
     }
 
     const maybeWrap = (target, name, value) => {
-      // Wrap native functions to avoid illegal invocation type errors in V8.
+      // Wrap native methods to avoid throwing illegal invocation type errors
+      // in V8 when their [[ThisValue]] is a proxy.
       // https://bugs.chromium.org/p/v8/issues/detail?id=5773
       if (! isNative(value)) {
         return value
@@ -40,7 +41,10 @@ function init() {
 
       wrapper = new OwnProxy(value, {
         apply(funcTarget, thisArg, args) {
-          if (thisArg === proxy) {
+          // Check for `entry.esmNamespace` because it's a proxy that native
+          // methods could be invoked on.
+          if (thisArg === proxy ||
+              thisArg === entry.esmNamespace) {
             thisArg = target
           }
 
