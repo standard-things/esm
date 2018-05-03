@@ -3,7 +3,6 @@ import ENTRY from "./constant/entry.js"
 import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
-import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
@@ -495,7 +494,7 @@ function createNamespace(entry, source = entry) {
 
       return descriptor
     },
-    set(namespace, name, value, receiver) {
+    set(namespace, name) {
       const NsError = Reflect.has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
