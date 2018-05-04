@@ -591,10 +591,6 @@ function mergeProperty(entry, otherEntry, key) {
       for (const name in value) {
         entry.addGetter(name, value[name])
       }
-    } else if (key === "type") {
-      if (entry.type === TYPE_CJS) {
-        entry.type = value
-      }
     } else if (value != null) {
       entry[key] = value
     }
