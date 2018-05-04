@@ -20,25 +20,14 @@ const {
   WIN32
 } = ENV
 
-const localhostRegExp = /^\/\/localhost\b/
-
 function getFilePathFromURL(url) {
   const parsed = parseURL(url)
+
   let { pathname } = parsed
 
-  if (! pathname) {
-    return ""
-  }
-
-  if (parsed.protocol !== "file:") {
-    if (localhostRegExp.test(pathname)) {
-      pathname = pathname.slice(11)
-    } else {
-      return ""
-    }
-  }
-
-  if (hasEncodedSep(pathname)) {
+  if (! pathname ||
+      parsed.protocol !== "file:" ||
+      hasEncodedSep(pathname)) {
     return ""
   }
 

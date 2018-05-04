@@ -7,8 +7,9 @@ const safeUrl = shared.inited
   : shared.module.safeUrl = safe(realRequire("url"))
 
 export const {
-  parse,
-  Url
+  URL,
+  Url,
+  parse
 } = safeUrl
 
 export default safeUrl
