@@ -594,9 +594,12 @@ function init() {
         // Generate plain functions, instead of arrow functions,
         // to avoid a perf hit in Node 4.
         '["' +
-        importName + '",["' +
-        localNames.join('","') +
-        '"],function(' + valueParam + "){" +
+        importName + '",' +
+        (importName === "*"
+          ? "null"
+          : '["' + localNames.join('","') + '"]'
+        ) +
+        ",function(" + valueParam + "){" +
         // Multiple local variables become a compound assignment.
         localNames.join("=") + "=" + valueParam +
         "}]"
