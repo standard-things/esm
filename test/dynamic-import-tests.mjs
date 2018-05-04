@@ -54,6 +54,7 @@ describe("dynamic import", () => {
 
   it("should coerce specifier to a string", () => {
     const parsed = url.parse(abcURL)
+
     parsed.toString = () => parsed.href
 
     return import(parsed)
@@ -62,12 +63,15 @@ describe("dynamic import", () => {
 
   it("should support `import()` in an initial assignment", () => {
     const p = import("./fixture/export/abc.mjs")
+
     assert.ok(p instanceof Promise)
   })
 
   it("should support `import()` in a reassignment", () => {
     let p
+
     p = import("./fixture/export/abc.mjs")
+
     assert.ok(p instanceof Promise)
   })
 

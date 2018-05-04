@@ -61,6 +61,7 @@ describe("URL parsing", () => {
   it("should resolve URLs with protocol relative localhost", () => {
     const expected = isWin ? "" : "/dev"
     const actual = getFilePathFromURL("//localhost/dev")
+
     assert.strictEqual(actual, expected)
   })
 
