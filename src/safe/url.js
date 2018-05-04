@@ -8,7 +8,6 @@ const safeUrl = shared.inited
 
 export const {
   URL,
-  Url,
   parse
 } = safeUrl
 

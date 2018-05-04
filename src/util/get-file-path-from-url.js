@@ -21,7 +21,9 @@ const {
 } = ENV
 
 function getFilePathFromURL(url) {
-  const parsed = parseURL(url)
+  const parsed = typeof url === "string"
+    ? parseURL(url)
+    : url
 
   let { pathname } = parsed
 

@@ -1,4 +1,4 @@
-import { URL, Url, parse as legacyParse } from "../safe/url.js"
+import { URL, parse as legacyParse } from "../safe/url.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 
@@ -22,21 +22,12 @@ function init() {
   }
 
   function parseURL(url) {
-    const isURL =
-      url instanceof Url ||
-      (useStandard && url instanceof URL)
-
-    if (! isURL &&
-        typeof url !== "string") {
-      url = ""
-    }
-
     const cache = shared.memoize.utilParseURL
-    const cacheKey = isURL ? url.href : url
+    const cacheKey = typeof url === "string" ? url : ""
 
     return Reflect.has(cache, cacheKey)
       ? cache[cacheKey]
-      : cache[cacheKey] = (isURL ? url : parse(url))
+      : cache[cacheKey] = parse(url)
   }
 
   return parseURL
