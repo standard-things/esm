@@ -292,13 +292,14 @@ function watchImport(entry, request, setterArgsList, loader) {
   moduleState.parseOnly = true
   moduleState.requireDepth += 1
 
+  let child
   let childEntry
   let error
   let threw = false
 
   try {
     childEntry = loader(request, mod, false, (childEntry) => {
-      const child = childEntry.module
+      child = childEntry.module
 
       if (childEntry.type === TYPE_ESM &&
           isMJS(mod) &&
@@ -329,12 +330,21 @@ function watchImport(entry, request, setterArgsList, loader) {
       childEntry.builtin) {
     mod.require(childEntry.name)
   } else {
+    let exported
+
     entry._require = TYPE_ESM
 
     try {
-      mod.require(request)
+      exported = mod.require(request)
     } finally {
       entry._require = TYPE_CJS
+    }
+
+    if (child &&
+        ! child.loaded &&
+        child.exports !== exported) {
+      child.exports = exported
+      child.loaded = true
     }
 
     if (childEntry) {

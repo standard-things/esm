@@ -182,6 +182,13 @@ describe("scenarios", function () {
     ], envAuto)
   })
 
+  it("should work with mock-require and require-inject", () =>
+    exec(nodePath, [
+      "-r", pkgPath,
+      path.resolve(testPath, "fixture/scenario/mock-require-inject")
+    ])
+  )
+
   ;(canTestJest ? it : xit)(
   "should work with jest and mock-require", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")

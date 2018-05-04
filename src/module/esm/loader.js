@@ -46,7 +46,8 @@ function loader(entry, filename, parentEntry, preload) {
 
   _extensions[ext](mod, filename)
 
-  if (! parsing) {
+  if (! parsing &&
+      ! mod.loaded) {
     mod.loaded = true
   }
 }
