@@ -80,7 +80,7 @@ class Entry {
     // Getters for local variables exported by the module.
     this.getters = { __proto__: null }
     // The unique id for the module cache.
-    this.id = null
+    this.id = mod.id
     // The module the entry is managing.
     this.module = mod
     // The name of the module.
