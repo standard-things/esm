@@ -73,9 +73,9 @@ function load(request, parent, isMain, preload) {
   })
 
   if (! called) {
-    if (parent &&
+    if (parentEntry &&
         entry.type === TYPE_ESM &&
-        Entry.get(parent).package.options.mode === OPTIONS_MODE_STRICT) {
+        parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {
       throw new ERR_REQUIRE_ESM(filename)
     }
 
