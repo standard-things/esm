@@ -3,6 +3,7 @@ import * as fsNs from "fs"
 import mock from "mock-require"
 import * as pathNs from "path"
 import requireInject from "require-inject"
+import * as utilNs from "util"
 
 let error
 let pass = false
@@ -23,6 +24,10 @@ const mockReal2 = {
   mocked: true
 }
 
+const mockUtil = {
+  default: "util"
+}
+
 Reflect.defineProperty(mockPath, "__esModule", {
   __proto__: null,
   value: true
@@ -35,6 +40,7 @@ Reflect.defineProperty(mockReal2, "__esModule", {
 
 mock("fs", "./fs.js")
 mock("./real1.js", "./mock1.js")
+mock("util", "./util.js")
 
 import("./load.js")
   .then((ns) => {
@@ -47,7 +53,8 @@ import("./load.js")
       },
       real2: {
         default: "real2"
-      }
+      },
+      util: mockUtil
     }
 
     assert.deepEqual(ns, expected)
@@ -68,7 +75,9 @@ import("./load.js")
         import("fs")
           .then((ns) => assert.deepEqual(ns, mockFs)),
         import("path")
-          .then((ns) => assert.strictEqual(ns, pathNs))
+          .then((ns) => assert.strictEqual(ns, pathNs)),
+        import("util")
+          .then((ns) => assert.deepEqual(ns, mockUtil))
       ])
   )
   .then(() => {
@@ -79,7 +88,9 @@ import("./load.js")
         import("fs")
           .then((ns) => assert.strictEqual(ns, fsNs)),
         import("path")
-          .then((ns) => assert.strictEqual(ns, pathNs))
+          .then((ns) => assert.strictEqual(ns, pathNs)),
+        import("util")
+          .then((ns) => assert.strictEqual(ns, utilNs))
       ])
   })
   .then(() => {

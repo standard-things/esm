@@ -2,6 +2,7 @@ import ENTRY from "./constant/entry.js"
 
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
+import Module from "./module.js"
 
 import _loadESM from "./module/esm/_load.js"
 import errors from "./errors.js"
@@ -11,6 +12,7 @@ import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isError from "./util/is-error.js"
 import isMJS from "./util/is-mjs.js"
+import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import setDeferred from "./util/set-deferred.js"
@@ -340,7 +342,19 @@ function watchImport(entry, request, setterArgsList, loader) {
     let newChildEntry
 
     if (child.exports !== exported) {
-      const otherEntry = shared.entry.cache.get(exported)
+      let otherEntry
+
+      if (isObjectLike(exported)) {
+        otherEntry = shared.entry.cache.get(exported)
+      } else {
+        const otherMod = new Module("", null)
+
+        otherMod.exports = exported
+        otherMod.loaded = true
+
+        otherEntry = Entry.get(otherMod)
+        otherEntry.loaded()
+      }
 
       if (otherEntry &&
           otherEntry !== childEntry) {
