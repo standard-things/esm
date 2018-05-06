@@ -186,7 +186,7 @@ describe("scenarios", function () {
     exec(nodePath, [
       "-r", pkgPath,
       path.resolve(testPath, "fixture/scenario/mock-require-inject")
-    ])
+    ], envAuto)
   )
 
   ;(canTestJest ? it : xit)(

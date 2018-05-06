@@ -326,34 +326,38 @@ function watchImport(entry, request, setterArgsList, loader) {
     throw error
   }
 
-  if (childEntry &&
-      childEntry.builtin) {
-    mod.require(childEntry.name)
-  } else {
-    let exported
+  let exported
 
-    entry._require = TYPE_ESM
+  entry._require = TYPE_ESM
 
-    try {
-      exported = mod.require(request)
-    } finally {
-      entry._require = TYPE_CJS
-    }
-
-    if (child &&
-        ! child.loaded &&
-        child.exports !== exported) {
-      child.exports = exported
-      child.loaded = true
-    }
-
-    if (childEntry) {
-      childEntry.loaded()
-    }
+  try {
+    exported = mod.require(request)
+  } finally {
+    entry._require = TYPE_CJS
   }
 
   if (childEntry) {
+    let newChildEntry
+
+    if (child.exports !== exported) {
+      const otherEntry = shared.entry.cache.get(exported)
+
+      if (otherEntry &&
+          otherEntry !== childEntry) {
+        newChildEntry =
+        entry.children[childEntry.name] = otherEntry
+
+        newChildEntry.addSetters(setterArgsList, entry)
+        newChildEntry.update()
+      }
+    }
+
+    childEntry.loaded()
     childEntry.update()
+
+    if (newChildEntry) {
+      newChildEntry.update()
+    }
   }
 }
 

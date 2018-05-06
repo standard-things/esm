@@ -44,17 +44,9 @@ function load(request, parent, isMain, preload) {
 
   const fromPath = dirname(filename)
 
-  let entry
-
   if (fromPath === "." &&
       Reflect.has(builtinEntries, filename)) {
-    entry = builtinEntries[filename]
-
-    if (preload) {
-      preload(entry)
-    }
-
-    return entry
+    request = filename
   }
 
   const isExtMJS = isMJS(filename)
@@ -89,7 +81,7 @@ function load(request, parent, isMain, preload) {
 
   let called = false
 
-  entry = _load(request, parent, isMain, state, (entry) => {
+  const entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
 
     state._cache[request] = child
