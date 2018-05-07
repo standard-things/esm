@@ -3,6 +3,7 @@ import SOURCE_TYPE from "./constant/source-type.js"
 import { Parser as AcornParser } from "./acorn.js"
 
 import acornParserAwaitAnywhere from "./acorn/parser/await-anywhere.js"
+import acornParserClassFields from "./acorn/parser/class-fields.js"
 import acornParserDynamicImport from "./acorn/parser/dynamic-import.js"
 import acornParserFunctionParamsStart from "./acorn/parser/function-params-start.js"
 import acornParserHTMLComment from "./acorn/parser/html-comment.js"
@@ -42,6 +43,7 @@ function init() {
       const parser = new AcornParser(options, code)
 
       acornParserAwaitAnywhere.enable(parser)
+      acornParserClassFields.enable(parser)
       acornParserDynamicImport.enable(parser)
       acornParserFunctionParamsStart.enable(parser)
       acornParserHTMLComment.enable(parser)

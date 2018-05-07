@@ -2,11 +2,16 @@ import assert from "assert"
 import vm from "vm"
 
 let canUseAsyncGenerators = false
+let canUseClassFields = false
 let canUseForAwaitOf = false
 let canUseObjectRestSpread = false
 
 try {
   canUseAsyncGenerators = !! new vm.Script("async function*x(){}")
+} catch (e) {}
+
+try {
+  canUseClassFields = !! new vm.Script("class A { #a = 1 }")
 } catch (e) {}
 
 try {
@@ -66,6 +71,12 @@ describe("export declarations", () => {
   ;(canUseAsyncGenerators ? it : xit)(
   "should support async generators syntax", () =>
     import("./export/async-generators.mjs")
+      .then((ns) => ns.default())
+  )
+
+  ;(canUseClassFields ? it : xit)(
+  "should support class fields syntax", () =>
+    import("./export/class-fields.mjs")
       .then((ns) => ns.default())
   )
 
