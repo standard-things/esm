@@ -1,9 +1,9 @@
-export default async function * a() {}
-
-const B = {
+export const b = {
   async *b() {}
 }
 
-class C {
+export class C {
   async *c() {}
 }
+
+export default async function * a() {}

@@ -1,6 +1,13 @@
 import assert from "assert"
-import def from "../fixture/export/async-generators.mjs"
+import a, { b, C } from "../fixture/export/async-generators.mjs"
 
 export default () => {
-  assert.strictEqual(typeof def, "function")
+  [
+    a(),
+    b.b(),
+    new C().c()
+  ]
+  .forEach((gen) => {
+    assert.strictEqual(gen[Symbol.toStringTag], "AsyncGenerator")
+  })
 }
