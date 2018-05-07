@@ -12,8 +12,11 @@ import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isError from "./util/is-error.js"
 import isMJS from "./util/is-mjs.js"
+import isPath from "./util/is-path.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
+import { resolve } from "./safe/path.js"
+import resolveFilename from "./module/esm/resolve-filename.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
@@ -224,14 +227,19 @@ function createSetter(from, setter) {
   return setter
 }
 
-function getEntryFrom(exported) {
+function getEntryFrom(request, exported) {
   const entry = shared.entry.cache.get(exported)
 
   if (entry) {
     return entry
   }
 
-  const child = new Module("", null)
+  const filename = tryResolveFilename(request)
+  const child = new Module(filename, null)
+
+  if (isPath(filename)) {
+    child.filename = filename
+  }
 
   child.exports = exported
   child.loaded = true
@@ -299,6 +307,28 @@ function runESM(entry, moduleWrapper) {
   return result
 }
 
+function tryResolveFilename(request, parent) {
+  try {
+    return resolveFilename(request, parent)
+  } catch (e) {}
+
+  try {
+    return Module._resolveFilename(request, parent)
+  } catch (e) {}
+
+  if (isPath(request)) {
+    let parentFilename = parent && parent.filename
+
+    if (typeof parentFilename !== "string") {
+      parentFilename = ""
+    }
+
+    return resolve(parentFilename, request)
+  }
+
+  return request
+}
+
 function watchImport(entry, request, setterArgsList, loader) {
   const mod = entry.module
   const { moduleState } = shared
@@ -350,15 +380,16 @@ function watchImport(entry, request, setterArgsList, loader) {
   }
 
   if (! childEntry) {
-    childEntry = getEntryFrom(exported)
+    childEntry = getEntryFrom(request, exported)
     child = childEntry.module
+    entry.children[childEntry.name] = childEntry
     childEntry.addSetters(setterArgsList, entry)
   }
 
   let newChildEntry
 
   if (child.exports !== exported) {
-    const otherEntry = getEntryFrom(exported)
+    const otherEntry = getEntryFrom(request, exported)
 
     if (otherEntry !== childEntry) {
       newChildEntry =
