@@ -1,7 +1,7 @@
 // Load modules referenced by their `shared.module` cache entry.
 import "./binding.js"
+import "./safe/buffer.js"
 import "./safe/crypto.js"
-import "./safe/fs.js"
 import "./safe/path.js"
 import "./safe/process.js"
 import "./safe/util.js"

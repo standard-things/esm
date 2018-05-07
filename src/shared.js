@@ -179,11 +179,11 @@ function init() {
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
     try {
-      new Proxy(shared.module.safeBuffer.alloc(0), {
+      new Proxy(shared.module.SafeBuffer.alloc(0), {
         get: (target, name) => target[name]
       }).toString()
     } catch (e) {
-      return /Illegal/.test(e)
+      return ! /Illegal/.test(e)
     }
 
     return true
