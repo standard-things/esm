@@ -1,6 +1,11 @@
 import assert from "assert"
-import def from "../fixture/export/for-await-of.mjs"
+import convert from "../fixture/export/for-await-of.mjs"
 
-export default () => {
-  assert.strictEqual(typeof def, "function")
+export default async () => {
+  const iterable = [
+    Promise.resolve("a"),
+    Promise.resolve("b")
+  ]
+
+  assert.deepStrictEqual(await convert(iterable), ["a", "b"])
 }
