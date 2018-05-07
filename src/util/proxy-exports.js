@@ -26,9 +26,8 @@ function init() {
     }
 
     const maybeWrap = (target, name, value) => {
-      // Wrap native methods to avoid throwing illegal invocation type errors
-      // in V8 when their [[ThisValue]] is a proxy.
-      // https://bugs.chromium.org/p/v8/issues/detail?id=5773
+      // Wrap native methods to avoid throwing illegal invocation or
+      // incompatible receiver type errors.
       if (! isNative(value)) {
         return value
       }
@@ -58,11 +57,7 @@ function init() {
       return wrapper
     }
 
-    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor` trap can be
-    // removed and the `get` trap can be conditionally dropped for `exported`
-    // values that return "[object Function]" or "[object Object]" from
-    // `Object.prototype.toString.call(exported)`.
-    const proxy = new OwnProxy(exported, {
+    const handler = {
       defineProperty(target, name, descriptor) {
         if (has(descriptor, "value")) {
           const { value } = descriptor
@@ -87,7 +82,26 @@ function init() {
 
         return false
       },
-      get(target, name, receiver) {
+      set(target, name, value, receiver) {
+        if (typeof value === "function") {
+          value = cached.unwrap.get(value) || value
+        }
+
+        if (Reflect.set(target, name, value, receiver)) {
+          entry.update()
+          return true
+        }
+
+        return false
+      }
+    }
+
+    if (! shared.support.nativeProxyReceiver ||
+        isNative(exported) ||
+        (typeof exported !== "function" &&
+         (Reflect.has(exported, Symbol.toStringTag) ||
+          toString.call(exported) !== "[object Object]"))) {
+      handler.get = (target, name, receiver) => {
         const value = Reflect.get(target, name, receiver)
 
         // Produce a `Symbol.toStringTag` value, otherwise
@@ -105,8 +119,9 @@ function init() {
         }
 
         return maybeWrap(target, name, value)
-      },
-      getOwnPropertyDescriptor(target, name) {
+      }
+
+      handler.getOwnPropertyDescriptor = (target, name) => {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
         if (has(descriptor, "value")) {
@@ -118,20 +133,14 @@ function init() {
         }
 
         return descriptor
-      },
-      set(target, name, value, receiver) {
-        if (typeof value === "function") {
-          value = cached.unwrap.get(value) || value
-        }
-
-        if (Reflect.set(target, name, value, receiver)) {
-          entry.update()
-          return true
-        }
-
-        return false
       }
-    })
+    }
+
+    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor` trap can be
+    // removed and the `get` trap can be conditionally dropped for `exported`
+    // values that return "[object Function]" or "[object Object]" from
+    // `Object.prototype.toString.call(exported)`.
+    const proxy = new OwnProxy(exported, handler)
 
     cached = {
       __proto__: null,
