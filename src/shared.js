@@ -175,6 +175,21 @@ function init() {
     typeof shared.module.binding.fs.internalModuleReadJSON === "function"
   )
 
+  setDeferred(support, "nativeProxyReceiver", () => {
+    // Detect support for invoking native functions with a proxy receiver.
+    // https://bugs.chromium.org/p/v8/issues/detail?id=5773
+    const { safeProcess } = shared.module
+    const { cwd } = safeProcess
+    const proxy = new Proxy(safeProcess, { __proto__: null })
+
+    try {
+      Reflect.apply(cwd, proxy, [])
+      return true
+    } catch (e) {}
+
+    return false
+  })
+
   setDeferred(support, "proxiedClasses", () => {
     class C extends dummyProxy {
       c() {}
