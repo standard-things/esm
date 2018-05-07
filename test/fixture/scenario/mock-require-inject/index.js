@@ -24,22 +24,31 @@ const mockReal2 = {
   mocked: true
 }
 
+const mockReal3 = {
+  default: "mock3",
+  mocked: true
+}
+
 const mockUtil = {
   default: "util"
 }
 
-Reflect.defineProperty(mockPath, "__esModule", {
-  __proto__: null,
-  value: true
-})
+const hybridMocks = [
+  mockPath,
+  mockReal2,
+  mockReal3
+]
 
-Reflect.defineProperty(mockReal2, "__esModule", {
-  __proto__: null,
-  value: true
+hybridMocks.forEach((mock) => {
+  Reflect.defineProperty(mock, "__esModule", {
+    __proto__: null,
+    value: true
+  })
 })
 
 mock("fs", "./fs.js")
 mock("./real1.js", "./mock1.js")
+mock("./real2.js", mockReal2)
 mock("util", "./util.js")
 
 import("./load.js")
@@ -51,8 +60,9 @@ import("./load.js")
         default: "mock1",
         mocked: true
       },
-      real2: {
-        default: "real2"
+      real2: mockReal2,
+      real3: {
+        default: "real3"
       },
       util: mockUtil
     }
@@ -61,11 +71,11 @@ import("./load.js")
 
     const exported = requireInject("./load.js", {
       path: mockPath,
-      "./real2.js": mockReal2
+      "./real3.js": mockReal3
     })
 
     expected.path = mockPath
-    expected.real2 = mockReal2
+    expected.real3 = mockReal3
 
     assert.deepEqual(exported, expected)
   })

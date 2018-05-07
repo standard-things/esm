@@ -12,13 +12,11 @@ import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isError from "./util/is-error.js"
 import isMJS from "./util/is-mjs.js"
-import isObjectLike from "./util/is-object-like.js"
 import loadESM from "./module/esm/load.js"
 import makeRequireFunction from "./module/make-require-function.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
-import toStringLiteral from "./util/to-string-literal.js"
 
 const {
   TYPE_CJS,
@@ -226,6 +224,20 @@ function createSetter(from, setter) {
   return setter
 }
 
+function getEntryFrom(exported) {
+  const entry = shared.entry.cache.get(exported)
+
+  if (entry) {
+    return entry
+  }
+
+  const child = new Module("", null)
+
+  child.exports = exported
+  child.loaded = true
+  return Entry.get(child)
+}
+
 function runCJS(entry, moduleWrapper) {
   const mod = entry.module
   const exported = mod.exports = entry.exports
@@ -323,8 +335,7 @@ function watchImport(entry, request, setterArgsList, loader) {
       (! entry.package.options.cjs.paths ||
        isMJS(mod) ||
        ! isError(error) ||
-       error.code !== "MODULE_NOT_FOUND" ||
-       ! error.message.includes(toStringLiteral(request, "'")))) {
+       error.code !== "MODULE_NOT_FOUND")) {
     throw error
   }
 
@@ -338,40 +349,32 @@ function watchImport(entry, request, setterArgsList, loader) {
     entry._require = TYPE_CJS
   }
 
-  if (childEntry) {
-    let newChildEntry
+  if (! childEntry) {
+    childEntry = getEntryFrom(exported)
+    child = childEntry.module
+    childEntry.addSetters(setterArgsList, entry)
+  }
 
-    if (child.exports !== exported) {
-      let otherEntry
+  let newChildEntry
 
-      if (isObjectLike(exported)) {
-        otherEntry = shared.entry.cache.get(exported)
-      } else {
-        const otherMod = new Module("", null)
+  if (child.exports !== exported) {
+    const otherEntry = getEntryFrom(exported)
 
-        otherMod.exports = exported
-        otherMod.loaded = true
+    if (otherEntry !== childEntry) {
+      newChildEntry =
+      entry.children[childEntry.name] = otherEntry
 
-        otherEntry = Entry.get(otherMod)
-        otherEntry.loaded()
-      }
-
-      if (otherEntry &&
-          otherEntry !== childEntry) {
-        newChildEntry =
-        entry.children[childEntry.name] = otherEntry
-
-        newChildEntry.addSetters(setterArgsList, entry)
-        newChildEntry.update()
-      }
-    }
-
-    childEntry.loaded()
-    childEntry.update()
-
-    if (newChildEntry) {
+      newChildEntry.addSetters(setterArgsList, entry)
+      newChildEntry.loaded()
       newChildEntry.update()
     }
+  }
+
+  childEntry.loaded()
+  childEntry.update()
+
+  if (newChildEntry) {
+    newChildEntry.update()
   }
 }
 
