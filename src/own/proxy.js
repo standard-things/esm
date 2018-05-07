@@ -32,8 +32,12 @@ function init() {
       const proto = assign({ __proto__: null }, handler)
 
       handler = { __proto__: proto }
+
       Reflect.defineProperty(proto, shared.customInspectKey, customInspectDescriptor)
+      Object.freeze(proto)
+
       Reflect.defineProperty(handler, PKG_PREFIX + ":proxy", markerDescriptor)
+      Object.freeze(handler)
 
       const proxy = new Proxy(target, handler)
 
@@ -42,7 +46,7 @@ function init() {
         Reflect.defineProperty(proxy, Symbol.toStringTag, funcToStringTagDescriptor)
       }
 
-      OwnProxy.instances.set(proxy, [target, handler])
+      OwnProxy.instances.set(proxy, Object.freeze([target, handler]))
       return proxy
     }
   }
