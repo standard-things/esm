@@ -7,6 +7,10 @@ import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
+  if (typeof (types && types.isProxy) === "function") {
+    return types.isProxy
+  }
+
   const liteInspectOptions = {
     __proto__: null,
     breakLength: Infinity,
@@ -19,7 +23,7 @@ function init() {
     showProxy: true
   }
 
-  function isProxyFallback(value) {
+  return function isProxyFallback(value) {
     if (shared.support.getProxyDetails) {
       return !! getProxyDetails(value)
     }
@@ -32,10 +36,6 @@ function init() {
       isObjectLike(value) &&
       inspect(value, liteInspectOptions).startsWith("Proxy")
   }
-
-  return typeof (types && types.isProxy) === "function"
-    ? types.isProxy
-    : isProxyFallback
 }
 
 export default shared.inited

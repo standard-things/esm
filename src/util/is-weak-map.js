@@ -2,15 +2,15 @@ import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
 function init() {
-  const { toString } = Object.prototype
-
-  function isWeakMapFallback(value) {
-    return toString.call(value) === "[object WeakMap]"
+  if (typeof (types && types.isWeakMap) === "function") {
+    return types.isWeakMap
   }
 
-  return typeof (types && types.isWeakMap) === "function"
-    ? types.isWeakMap
-    : isWeakMapFallback
+  const { toString } = Object.prototype
+
+  return function isWeakMapFallback(value) {
+    return toString.call(value) === "[object WeakMap]"
+  }
 }
 
 export default shared.inited
