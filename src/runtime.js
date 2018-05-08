@@ -333,13 +333,13 @@ function watchImport(entry, request, setterArgsList, loader) {
   const mod = entry.module
   const { moduleState } = shared
 
-  moduleState.parseOnly = true
-  moduleState.requireDepth += 1
-
   let child
   let childEntry
   let error
   let threw = false
+
+  moduleState.parseOnly = true
+  moduleState.requireDepth += 1
 
   try {
     childEntry = loader(request, mod, false, (childEntry) => {
@@ -372,40 +372,43 @@ function watchImport(entry, request, setterArgsList, loader) {
   let exported
 
   entry._require = TYPE_ESM
+  moduleState.requireDepth += 1
 
   try {
     exported = mod.require(request)
   } finally {
     entry._require = TYPE_CJS
+    moduleState.requireDepth -= 1
   }
 
   if (! childEntry) {
+    // Create the child entry for unresolved mocked requests.
     childEntry = getEntryFrom(request, exported)
     child = childEntry.module
     entry.children[childEntry.name] = childEntry
     childEntry.addSetters(setterArgsList, entry)
   }
 
-  let newChildEntry
+  let mockEntry
 
   if (child.exports !== exported) {
-    const otherEntry = getEntryFrom(request, exported)
+    mockEntry =
+    entry.children[childEntry.name] = getEntryFrom(request, exported)
 
-    if (otherEntry !== childEntry) {
-      newChildEntry =
-      entry.children[childEntry.name] = otherEntry
-
-      newChildEntry.addSetters(setterArgsList, entry)
-      newChildEntry.loaded()
-      newChildEntry.update()
-    }
+    // Update the mock entry before the original child entry so dynamic import
+    // requests are resolved with the mock entry instead of the child entry.
+    mockEntry.addSetters(setterArgsList, entry)
+    mockEntry.loaded()
+    mockEntry.update()
   }
 
   childEntry.loaded()
   childEntry.update()
 
-  if (newChildEntry) {
-    newChildEntry.update()
+  if (mockEntry) {
+    // Update the mock entry after the original child entry so static import
+    // requests are updated with mock entry setters last.
+    mockEntry.update()
   }
 }
 
