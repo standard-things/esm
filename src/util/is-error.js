@@ -1,27 +1,19 @@
 import binding from "../binding.js"
+import safeUtil from "../safe/util.js"
 import shared from "../shared.js"
-import { types } from "../safe/util.js"
 
 function init() {
+  const { types } = safeUtil
+
   if (typeof (types && types.isNativeError) === "function") {
     return types.isNativeError
   }
 
   const { isNativeError } = binding.util
 
-  if (typeof isNativeError === "function") {
-    return isNativeError
-  }
-
-  const ExError = shared.external.Error
-
-  const { toString } = Object.prototype
-
-  return function isErrorFallback(value) {
-    return value instanceof ExError ||
-      value instanceof Error ||
-      toString.call(value) === "[object Error]"
-  }
+  return typeof isNativeError === "function"
+    ? isNativeError
+    : safeUtil.isError
 }
 
 export default shared.inited
