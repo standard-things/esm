@@ -8,8 +8,10 @@ function init() {
     return types.isExternal
   }
 
-  return typeof binding.util.isExternal === "function"
-    ? binding.util.isExternal
+  const { isExternal } = binding.util
+
+  return typeof isExternal === "function"
+    ? isExternal
     : alwaysFalse
 }
 

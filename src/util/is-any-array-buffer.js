@@ -7,9 +7,12 @@ function init() {
     return types.isAnyArrayBuffer
   }
 
-  return typeof binding.util.isAnyArrayBuffer === "function"
-    ? binding.util.isAnyArrayBuffer
-    : binding.util.isArrayBuffer
+  const { util } = binding
+  const { isAnyArrayBuffer } = util
+
+  return typeof isAnyArrayBuffer === "function"
+    ? isAnyArrayBuffer
+    : util.isArrayBuffer
 }
 
 export default shared.inited

@@ -7,8 +7,10 @@ function init() {
     return types.isNativeError
   }
 
-  if (binding.util.isNativeError === "function") {
-    return binding.util.isNativeError
+  const { isNativeError } = binding.util
+
+  if (typeof isNativeError === "function") {
+    return isNativeError
   }
 
   const ExError = shared.external.Error
