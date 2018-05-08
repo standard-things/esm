@@ -39,6 +39,17 @@ function init() {
     util: [
       "decorated_private_symbol",
       "getProxyDetails",
+      "isAnyArrayBuffer",
+      "isArrayBuffer",
+      "isDataView",
+      "isDate",
+      "isExternal",
+      "isMap",
+      "isMapIterator",
+      "isRegExp",
+      "isSet",
+      "isSetIterator",
+      "isTypedArray",
       "safeGetenv",
       "setHiddenValue"
     ]
