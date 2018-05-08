@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 import SafeObject from "../safe/object.js"
 
+import builtinEntries from "../builtin-entries.js"
 import has from "./has.js"
 import isNative from "./is-native.js"
 import isObjectLike from "./is-object-like.js"
@@ -97,11 +98,16 @@ function init() {
       }
     }
 
-    if (! shared.support.nativeProxyReceiver ||
-        (typeof exported === "function"
-          ? isNative(exported)
-          : ! isPlainObject(exported)
-        )) {
+    let useGetTraps = ! shared.support.nativeProxyReceiver
+
+    if (! useGetTraps &&
+        ! Reflect.has(builtinEntries, entry.name)) {
+      useGetTraps = typeof exported === "function"
+        ? isNative(exported)
+        : ! isPlainObject(exported)
+    }
+
+    if (useGetTraps) {
       handler.get = (target, name, receiver) => {
         const value = Reflect.get(target, name, receiver)
 
