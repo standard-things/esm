@@ -10,9 +10,16 @@ function init() {
   const { util } = binding
   const { isAnyArrayBuffer } = util
 
-  return typeof isAnyArrayBuffer === "function"
-    ? isAnyArrayBuffer
-    : util.isArrayBuffer
+  if (typeof isAnyArrayBuffer === "function") {
+    return isAnyArrayBuffer
+  }
+
+  const { isArrayBuffer, isSharedArrayBuffer } = util
+
+  return function isAnyArrayBufferFallback(value) {
+    return isArrayBuffer(value) ||
+      isSharedArrayBuffer(value)
+  }
 }
 
 export default shared.inited

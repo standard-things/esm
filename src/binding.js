@@ -49,6 +49,7 @@ function init() {
       "isRegExp",
       "isSet",
       "isSetIterator",
+      "isSharedArrayBuffer",
       "isTypedArray",
       "safeGetenv",
       "setHiddenValue"
