@@ -4,7 +4,6 @@ import SafeObject from "../safe/object.js"
 import builtinEntries from "../builtin-entries.js"
 import has from "./has.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
-import isDataView from "./is-data-view.js"
 import isDate from "./is-date.js"
 import isExternal from "./is-external.js"
 import isMap from "./is-map.js"
@@ -17,7 +16,6 @@ import isRegExp from "./is-regexp.js"
 import isSet from "./is-set.js"
 import isSetIterator from "./is-set-iterator.js"
 import isStringObject from "./is-string-object.js"
-import isTypedArray from "./is-typed-array.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import shared from "../shared.js"
@@ -125,9 +123,8 @@ function init() {
           isWeakMap(exported) ||
           isDate(exported) ||
           isRegExp(exported) ||
-          isTypedArray(exported) ||
+          ArrayBuffer.isView(exported) ||
           isAnyArrayBuffer(exported) ||
-          isDataView(exported) ||
           isNumberObject(exported) ||
           isStringObject(exported) ||
           isMapIterator(exported) ||
