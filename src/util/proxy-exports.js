@@ -4,6 +4,7 @@ import SafeObject from "../safe/object.js"
 import has from "./has.js"
 import isNative from "./is-native.js"
 import isObjectLike from "./is-object-like.js"
+import isPlainObject from "./is-plain-object.js"
 import shared from "../shared.js"
 
 function init() {
@@ -97,10 +98,10 @@ function init() {
     }
 
     if (! shared.support.nativeProxyReceiver ||
-        isNative(exported) ||
-        (typeof exported !== "function" &&
-         (Reflect.has(exported, Symbol.toStringTag) ||
-          toString.call(exported) !== "[object Object]"))) {
+        (typeof exported === "function"
+          ? isNative(exported)
+          : ! isPlainObject(exported)
+        )) {
       handler.get = (target, name, receiver) => {
         const value = Reflect.get(target, name, receiver)
 
