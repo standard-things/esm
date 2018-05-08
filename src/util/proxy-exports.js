@@ -10,11 +10,13 @@ import isExternal from "./is-external.js"
 import isMap from "./is-map.js"
 import isMapIterator from "./is-map-iterator.js"
 import isNative from "./is-native.js"
+import isNumberObject from "./is-number-object.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
 import isRegExp from "./is-regexp.js"
 import isSet from "./is-set.js"
 import isSetIterator from "./is-set-iterator.js"
+import isStringObject from "./is-string-object.js"
 import isTypedArray from "./is-typed-array.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
@@ -121,15 +123,17 @@ function init() {
           isMap(exported) ||
           isSet(exported) ||
           isWeakMap(exported) ||
-          isExternal(exported) ||
           isDate(exported) ||
           isRegExp(exported) ||
           isTypedArray(exported) ||
           isAnyArrayBuffer(exported) ||
           isDataView(exported) ||
+          isNumberObject(exported) ||
+          isStringObject(exported) ||
           isMapIterator(exported) ||
           isSetIterator(exported) ||
-          isWebAssemblyCompiledModule(exported)
+          isWebAssemblyCompiledModule(exported) ||
+          isExternal(exported)
       }
     }
 
