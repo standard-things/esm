@@ -3,9 +3,21 @@ import SafeObject from "../safe/object.js"
 
 import builtinEntries from "../builtin-entries.js"
 import has from "./has.js"
+import isAnyArrayBuffer from "./is-any-array-buffer.js"
+import isDataView from "./is-data-view.js"
+import isDate from "./is-date.js"
+import isExternal from "./is-external.js"
+import isMap from "./is-map.js"
+import isMapIterator from "./is-map-iterator.js"
 import isNative from "./is-native.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
+import isRegExp from "./is-regexp.js"
+import isSet from "./is-set.js"
+import isSetIterator from "./is-set-iterator.js"
+import isTypedArray from "./is-typed-array.js"
+import isWeakMap from "./is-weak-map.js"
+import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import shared from "../shared.js"
 
 function init() {
@@ -102,9 +114,23 @@ function init() {
 
     if (! useGetTraps &&
         ! Reflect.has(builtinEntries, entry.name)) {
-      useGetTraps = typeof exported === "function"
-        ? isNative(exported)
-        : ! isPlainObject(exported)
+      if (typeof exported === "function") {
+        useGetTraps = isNative(exported)
+      } else if (! isPlainObject(exported)) {
+        useGetTraps =
+          isMap(exported) ||
+          isSet(exported) ||
+          isWeakMap(exported) ||
+          isExternal(exported) ||
+          isDate(exported) ||
+          isRegExp(exported) ||
+          isTypedArray(exported) ||
+          isAnyArrayBuffer(exported) ||
+          isDataView(exported) ||
+          isMapIterator(exported) ||
+          isSetIterator(exported) ||
+          isWebAssemblyCompiledModule(exported)
+      }
     }
 
     if (useGetTraps) {
