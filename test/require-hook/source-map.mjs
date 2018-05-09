@@ -1,3 +1,5 @@
+import Module from "module"
+
 import assert from "assert"
 import makeRequire from "../../"
 import module from "../module.js"
@@ -12,7 +14,7 @@ export default () => {
     .forEach((name) => {
       const esmRequire = makeRequire(module, { [name]: true })
       const { cache, extensions } = esmRequire
-      const mod = new module.constructor("<mock>", null)
+      const mod = new Module("<mock>", null)
 
       mod._compile = (content) => {
         assert.ok(content.includes("sourceMappingURL"))
