@@ -65,7 +65,7 @@
     "module-alias": "^2.0.6",
     "newrelic": "^4.1.0",
     "nop": "^1.0.0",
-    "nyc": "^11.6.0",
+    "nyc": "^11.7.2",
     "optimize-js-plugin": "0.0.4",
     "pm2": "^2.10.3",
     "postcss": "^6.0.22",
