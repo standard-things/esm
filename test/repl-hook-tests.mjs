@@ -1,11 +1,11 @@
 import Entry from "../build/entry.js"
+import Module from "module"
 import Runtime from "../build/runtime.js"
 
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import isPlainObject from "./is-plain-object.js"
 import fs from "fs-extra"
-import module from "./module.js"
 import path from "path"
 import repl from "repl"
 import require from "./require.js"
@@ -37,7 +37,7 @@ describe("repl hook", () => {
     const argv = process.argv.slice()
 
     context = vm.createContext({
-      module: new module.constructor("<repl>")
+      module: new Module("<repl>")
     })
 
     process.argv = argv.slice(0, 1)
@@ -59,11 +59,14 @@ describe("repl hook", () => {
   it("should work with a global context", () => {
     const r = repl.start({ useGlobal: true })
     const code = 'import { default as globalAssert } from "assert"'
-    const entry = Entry.get(r.context.module)
+    const mod = r.context.module
+    const entry = Entry.get(mod)
 
     entry.addBuiltinModules = () => {}
     entry.require = require
     entry.runtimeName = "_"
+
+    Reflect.setPrototypeOf(mod, Module.prototype)
     Runtime.enable(entry, {})
 
     assert.strictEqual(typeof globalAssert, "undefined")
