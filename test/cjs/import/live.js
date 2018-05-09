@@ -247,6 +247,13 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
+  const builtinCtors = [events1, events3]
+
+  builtinCtors.forEach((Ctor) => {
+    assert.strictEqual(Ctor.prototype.constructor, Ctor)
+    assert.strictEqual(new Ctor().constructor, Ctor)
+  })
+
   objects = [accessor1, accessor2, accessor3]
 
   assert.deepStrictEqual([a, b], [void 0, void 0])
