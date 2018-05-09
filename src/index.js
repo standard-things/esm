@@ -45,7 +45,8 @@ const {
 
 let exported
 
-if (shared.inited) {
+if (shared.inited &&
+    ! shared.reloaded) {
   Shim.enable(shared.unsafeContext)
 
   exported = (mod, options) => {
@@ -95,6 +96,7 @@ if (shared.inited) {
 } else {
   exported = shared
   exported.inited = true
+  exported.reloaded = false
 
   Shim.enable(shared.safeContext)
   Shim.enable(shared.unsafeContext)

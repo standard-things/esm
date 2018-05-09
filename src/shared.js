@@ -12,12 +12,13 @@ const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + ":shared")
 function getShared() {
   if (__shared__) {
     __shared__.inited = true
+    __shared__.reloaded = false
     return __shared__
   }
 
   try {
     const shared = __non_webpack_require__(SHARED_SYMBOL)
-    shared.inited = false
+    shared.reloaded = true
     return shared
   } catch (e) {}
 
@@ -97,6 +98,7 @@ function init() {
     },
     pendingMetas: { __proto__: null },
     pendingWrites: { __proto__: null },
+    reloaded: false,
     safeContext: Function("return this")(),
     support,
     symbol,
