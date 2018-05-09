@@ -31,6 +31,7 @@ function readFileFastPath(filename) {
   // Warning: This internal method will crash if `filename` is a directory.
   // https://github.com/nodejs/node/issues/8307
   const content = binding.fs.internalModuleReadFile(filename)
+
   return content === void 0 ? null : content
 }
 

@@ -8,6 +8,7 @@ function call(target, thisArg) {
   }
 
   let index = 1
+
   const args = new Array(length - 2)
 
   while (++index < length) {

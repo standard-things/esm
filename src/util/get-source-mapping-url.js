@@ -86,8 +86,9 @@ function getSourceMappingURL(content) {
 
   match = match.trim()
 
-  let i = -1
   const matchLength = match.length
+
+  let i = -1
 
   while (++i < matchLength) {
     const code = match.charCodeAt(i)

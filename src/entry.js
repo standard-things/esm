@@ -173,6 +173,7 @@ class Entry {
       }
 
       let getter = getters[key]
+
       const otherGetter = otherGetters[key]
 
       if (typeof getter !== "function" &&

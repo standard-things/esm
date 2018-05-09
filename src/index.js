@@ -82,6 +82,7 @@ if (shared.inited &&
 
     if (isObjectLike(options)) {
       const parentPkg = Package.from(cloned, true)
+
       assign(parentPkg.options, Package.createOptions(options))
     }
 

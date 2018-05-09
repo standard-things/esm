@@ -144,9 +144,9 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
-      let i = -1
       const node = path.getValue()
       const { specifiers } = node
+      const lastIndex = specifiers.length - 1
       const specifierMap = createSpecifierMap(this, node)
       const specifierString = getSourceString(this, node)
 
@@ -154,7 +154,7 @@ function init() {
         ? (this.generateVarDeclarations ? "var " : "let ")
         : ""
 
-      const lastIndex = specifiers.length - 1
+      let i = -1
 
       for (const specifier of specifiers) {
         hoistedCode +=
@@ -450,8 +450,9 @@ function init() {
     const specifierMap = { __proto__: null }
 
     for (const specifier of specifiers) {
-      let importName = "*"
       const { type } = specifier
+
+      let importName = "*"
 
       if (type === "ImportSpecifier") {
         importName = specifier.imported.name
@@ -523,6 +524,7 @@ function init() {
 
   function preserveChild(visitor, node, childName) {
     const child = node[childName]
+
     overwrite(visitor, node.start, child.start, "")
   }
 
@@ -543,11 +545,12 @@ function init() {
       return code
     }
 
-    let i = -1
+    code += visitor.runtimeName + ".e(["
+
     const lastIndex = pairs.length - 1
     const { exportNames } = visitor
 
-    code += visitor.runtimeName + ".e(["
+    let i = -1
 
     for (const [exportName, localName] of pairs) {
       exportNames.push(exportName)
@@ -579,10 +582,11 @@ function init() {
       return code + ");"
     }
 
-    let i = -1
+    code += ",["
+
     const lastIndex = importNames.length - 1
 
-    code += ",["
+    let i = -1
 
     for (const importName of importNames) {
       const localNames = specifierMap[importName]

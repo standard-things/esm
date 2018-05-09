@@ -8,7 +8,9 @@ function init() {
     return class AcornError extends Super {
       constructor(input, pos, message) {
         super(message)
+
         const { column, line } = getLineInfo(input, pos)
+
         this.message += " (" + line + ":" + column + ")"
       }
     }

@@ -6,6 +6,7 @@ function copyProperty(object, source, name) {
       ! isObjectLike(source)) {
     return object
   }
+
   const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
   if (descriptor) {

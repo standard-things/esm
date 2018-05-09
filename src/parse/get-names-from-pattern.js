@@ -1,7 +1,8 @@
 function getNamesFromPattern(pattern) {
-  let i = -1
   const names = []
   const queue = [pattern]
+
+  let i = -1
 
   while (++i < queue.length) {
     const pattern = queue[i]

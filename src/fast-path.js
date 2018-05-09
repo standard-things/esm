@@ -32,10 +32,11 @@ function init() {
     // `this.getValue()` should be array-like. The `visitor` method is called with
     // a reference to this path object for each element of the array.
     each(visitor, methodName) {
-      let i = -1
       const { stack } = this
       const array = stack[stack.length - 1]
       const { length } = array
+
+      let i = -1
 
       while (++i < length) {
         stack.push(i, array[i])
@@ -57,6 +58,7 @@ function init() {
   function getNode(path, pos, callback) {
     const { stack } = path
     const stackCount = stack.length
+
     let i = stackCount
 
     if (typeof callback !== "function") {

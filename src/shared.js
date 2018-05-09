@@ -18,6 +18,7 @@ function getShared() {
 
   try {
     const shared = __non_webpack_require__(SHARED_SYMBOL)
+
     shared.reloaded = true
     return shared
   } catch (e) {}

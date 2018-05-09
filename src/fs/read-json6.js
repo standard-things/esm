@@ -3,6 +3,7 @@ import readFile from "./read-file.js"
 
 function readJSON6(filename) {
   const content = readFile(filename, "utf8")
+
   return content === null ? content : parseJSON6(content)
 }
 

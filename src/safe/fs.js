@@ -4,6 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   const safeFs = safe(realRequire("fs"))
+
   safeFs.Stats = safe(safeFs.Stats)
   return safeFs
 }

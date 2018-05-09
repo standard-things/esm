@@ -4,6 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   const safeProcess = safe(realProcess)
+
   safeProcess.env = safe(safeProcess.env)
   safeProcess.release = safe(safeProcess.release)
   safeProcess.versions = safe(safeProcess.versions)
