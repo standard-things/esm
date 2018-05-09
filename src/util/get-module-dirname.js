@@ -8,14 +8,14 @@ function getModuleDirname(request) {
   }
 
   if (isObject(request)) {
+    if (Reflect.has(builtinModules, request.id)) {
+      return ""
+    }
+
     const { filename } = request
 
     if (typeof filename === "string") {
       return dirname(filename)
-    }
-
-    if (Reflect.has(builtinModules, request.id)) {
-      return ""
     }
   }
 
