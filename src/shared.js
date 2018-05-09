@@ -182,14 +182,12 @@ function init() {
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
     try {
-      new Proxy(shared.module.SafeBuffer.alloc(0), {
+      return new Proxy(shared.module.SafeBuffer.alloc(0), {
         get: (target, name) => target[name]
-      }).toString()
+      }).toString() === ""
     } catch (e) {
       return ! /Illegal/.test(e)
     }
-
-    return true
   })
 
   setDeferred(support, "proxiedClasses", () => {
