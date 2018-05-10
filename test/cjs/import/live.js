@@ -261,8 +261,9 @@ export default () => {
 
   accessor1.a = 2
 
+  assert.strictEqual(Reflect.has(Object.prototype, "a"), false)
   assert.deepStrictEqual([a, b], [void 0, 2])
-  objects.forEach(({ a, b }) => assert.deepEqual([a, b], [void 0, 2]))
+  objects.forEach(({ a, b }) => assert.deepStrictEqual([a, b], [void 0, 2]))
 
   assert.throws(
     () => accessor2.c = 3,
