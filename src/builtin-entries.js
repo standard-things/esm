@@ -18,6 +18,7 @@ import unwrapProxy from "./util/unwrap-proxy.js"
 function init() {
   const ExObject = shared.external.Object
 
+  const baseHasInstance = shared.external.Function.prototype[Symbol.hasInstance]
   const builtinEntries = { __proto__: null }
 
   function createUtilExports(source) {
@@ -111,6 +112,7 @@ function init() {
       } else if (typeof exported === "function") {
         const func = exported
         const proto = func.prototype
+        const hasInstance = (value) => value instanceof func
 
         const proxyProto = new OwnProxy(proto, {
           get(target, name, receiver) {
@@ -134,17 +136,14 @@ function init() {
         })
 
         const proxyFunc = new OwnProxy(func, {
-          construct(target, args, newTarget) {
-            const result = Reflect.construct(target, args, newTarget)
-
-            if (Reflect.getPrototypeOf(result) === func.prototype) {
-              Reflect.setPrototypeOf(result, exported.prototype)
-            }
-
-            return result
-          },
           get(target, name, receiver) {
             const value = Reflect.get(target, name, receiver)
+
+            if (name === Symbol.hasInstance &&
+               (typeof value !== "function" ||
+                value === baseHasInstance)) {
+              return hasInstance
+            }
 
             return value === proto ? proxyProto : value
           },
