@@ -271,17 +271,33 @@ export default () => {
 
   let count = 0
 
-  Reflect.defineProperty(accessor1, "a", {
+  const countDescriptor = {
     configurable: true,
     enumerable: true,
     get() {
       return count
     }
-  })
+  }
+
+  Reflect.defineProperty(accessor1, "a", countDescriptor)
 
   ++count
 
-  assert.deepStrictEqual([a, accessor1.a, a],  [0, 1, 1])
+  assert.deepStrictEqual([a, accessor1.a, a], [0, 1, 1])
+
+  count = 0
+  rawValue = def1.d
+
+  Reflect.defineProperty(def1, "d", countDescriptor)
+
+  ++count
+
+  try {
+    assert.deepStrictEqual([d, def1.d, d], [0, 1, 1])
+  } finally {
+    Reflect.deleteProperty(def1, "d")
+    def1.d = rawValue
+  }
 
   assert.throws(
     () => accessor2.c = 3,
