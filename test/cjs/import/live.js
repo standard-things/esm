@@ -269,6 +269,20 @@ export default () => {
   assert.deepStrictEqual([a, b], [void 0, 2])
   objects.forEach(({ a, b }) => assert.deepStrictEqual([a, b], [void 0, 2]))
 
+  let count = 0
+
+  Reflect.defineProperty(accessor1, "a", {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return count
+    }
+  })
+
+  ++count
+
+  assert.deepStrictEqual([a, accessor1.a, a],  [0, 1, 1])
+
   assert.throws(
     () => accessor2.c = 3,
     /TypeError: Cannot add/
