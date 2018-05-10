@@ -1,3 +1,5 @@
+import { Stream } from "stream"
+
 import assert from "assert"
 import mockIo from "mock-stdio"
 import stripANSI  from "strip-ansi"
@@ -248,10 +250,12 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
   const builtinCtors = [events1, events3]
+  const stream = new Stream
 
   builtinCtors.forEach((Ctor) => {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
+    assert.ok(stream instanceof Ctor)
   })
 
   objects = [accessor1, accessor2, accessor3]
