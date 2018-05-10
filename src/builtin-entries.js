@@ -8,6 +8,7 @@ import has from "./util/has.js"
 import isNamespaceObject from "./util/is-namespace-object.js"
 import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
+import maskFunction from "./util/mask-function.js"
 import proxyExports from "./util/proxy-exports.js"
 import realRequire from "./real/require.js"
 import setDeferred from "./util/set-deferred.js"
@@ -18,8 +19,8 @@ import unwrapProxy from "./util/unwrap-proxy.js"
 function init() {
   const ExObject = shared.external.Object
 
-  const baseHasInstance = shared.external.Function.prototype[Symbol.hasInstance]
   const builtinEntries = { __proto__: null }
+  const funcHasInstance = Function.prototype[Symbol.hasInstance]
 
   function createUtilExports(source) {
     const exported = new ExObject
@@ -53,7 +54,8 @@ function init() {
       const types = new ExObject
 
       for (const name of names) {
-        if (name !== "isProxy") {
+        if (name !== "isModuleNamespaceObject" &&
+            name !== "isProxy") {
           copyProperty(types, sourceTypes, name)
         }
       }
@@ -112,7 +114,11 @@ function init() {
       } else if (typeof exported === "function") {
         const func = exported
         const proto = func.prototype
-        const hasInstance = (value) => value instanceof func
+
+        const hasInstance = maskFunction(
+          (value) => value instanceof func,
+          funcHasInstance
+        )
 
         const proxyProto = new OwnProxy(proto, {
           get(target, name, receiver) {
@@ -137,13 +143,11 @@ function init() {
 
         const proxyFunc = new OwnProxy(func, {
           get(target, name, receiver) {
-            const value = Reflect.get(target, name, receiver)
-
-            if (name === Symbol.hasInstance &&
-               (typeof value !== "function" ||
-                value === baseHasInstance)) {
+            if (name === Symbol.hasInstance) {
               return hasInstance
             }
+
+            const value = Reflect.get(target, name, receiver)
 
             return value === proto ? proxyProto : value
           },
