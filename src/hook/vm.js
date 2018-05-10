@@ -64,7 +64,7 @@ function hook(vm) {
 
   function methodWrapper(manager, func, args) {
     let [content, scriptOptions] = args
-    scriptOptions = assign({ __proto__: null }, scriptOptions)
+    scriptOptions = assign({}, scriptOptions)
 
     if (! scriptOptions.produceCachedData) {
       scriptOptions.produceCachedData = true
@@ -194,7 +194,6 @@ function hook(vm) {
     // custom `util.inspect()` function when inspecting `util`.
     if (! has(util, customInspectKey)) {
       Reflect.defineProperty(util, customInspectKey, {
-        __proto__: null,
         configurable: true,
         value: true,
         writable: true
@@ -222,7 +221,6 @@ function hook(vm) {
 
     setSetter(util, "inspect", (value) => {
       Reflect.defineProperty(util, "inspect", {
-        __proto__: null,
         configurable: true,
         enumerable: true,
         value,
@@ -261,14 +259,12 @@ function createAddBuiltinModules(entry) {
     const exportedConsole = req("console")
 
     Reflect.defineProperty(context, "console", {
-      __proto__: null,
       configurable: true,
       value: exportedConsole,
       writable: true
     })
 
     Reflect.defineProperty(context, "process", {
-      __proto__: null,
       configurable: true,
       enumerable: true,
       value: req("process"),
@@ -278,7 +274,6 @@ function createAddBuiltinModules(entry) {
     for (const name of lazyModules) {
       const set = (value) => {
         Reflect.defineProperty(context, name, {
-          __proto__: null,
           configurable: true,
           enumerable: true,
           value,
@@ -287,7 +282,6 @@ function createAddBuiltinModules(entry) {
       }
 
       Reflect.defineProperty(context, name, {
-        __proto__: null,
         configurable: true,
         get() {
           context[name] = void 0
@@ -295,7 +289,6 @@ function createAddBuiltinModules(entry) {
           const exported = req(name)
 
           Reflect.defineProperty(context, name, {
-            __proto__: null,
             configurable: true,
             get: () => exported,
             set

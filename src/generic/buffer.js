@@ -5,7 +5,6 @@ import unapply from "../util/unapply.js"
 
 function init() {
   return {
-    __proto__: null,
     alloc: SafeBuffer.alloc,
     concat: SafeBuffer.concat,
     slice: unapply(SafeBuffer.prototype.slice)

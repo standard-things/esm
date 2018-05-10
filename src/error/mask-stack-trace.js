@@ -42,7 +42,6 @@ function maskStackTrace(error, content, filename, isESM) {
   // However, `Error.captureStackTrace()` will throw when receiving a proxy
   // wrapped error object.
   Reflect.defineProperty(error, "stack", {
-    __proto__: null,
     configurable: true,
     get() {
       error.stack = void 0
@@ -68,7 +67,6 @@ function maskStackTrace(error, content, filename, isESM) {
     },
     set(value) {
       Reflect.defineProperty(error, "stack", {
-        __proto__: null,
         configurable: true,
         value,
         writable: true

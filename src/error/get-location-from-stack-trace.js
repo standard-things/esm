@@ -21,7 +21,6 @@ function init() {
       const column = match[3]
 
       return {
-        __proto__: null,
         column,
         filename,
         line

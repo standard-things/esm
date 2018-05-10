@@ -163,7 +163,6 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
 
         setSetter(state._cache, cacheKey, (value) => {
           Reflect.defineProperty(state._cache, cacheKey, {
-            __proto__: null,
             configurable: true,
             enumerable: true,
             value,

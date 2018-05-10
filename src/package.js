@@ -54,11 +54,9 @@ const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_FILENAME = "package.json"
 
 const defaultOptions = {
-  __proto__: null,
   await: false,
   cache: true,
   cjs: {
-    __proto__: null,
     cache: false,
     extensions: false,
     interop: false,
@@ -74,9 +72,7 @@ const defaultOptions = {
 }
 
 const autoOptions = {
-  __proto__: null,
   cjs: {
-    __proto__: null,
     cache: true,
     extensions: true,
     interop: true,
@@ -95,7 +91,6 @@ class Package {
   static state =
     shared.package.state[cacheKey] ||
     (shared.package.state[cacheKey] = {
-      __proto__: null,
       cache: { __proto__: null },
       default: null
     })
@@ -123,7 +118,7 @@ class Package {
 
     if (! cache) {
       cache =
-      dir[cachePath] = { __proto__: null }
+      dir[cachePath] = {}
 
       let compileCache =
       cache.compile = { __proto__: null }
@@ -200,7 +195,7 @@ function cleanCache(cachePath) {
 
 function createCJS(value) {
   const defaultCJS = Package.defaultOptions.cjs
-  const options = { __proto__: null }
+  const options = {}
 
   if (value === void 0) {
     return assign(options, defaultCJS)
@@ -234,7 +229,7 @@ function createOptions(value) {
   const { defaultOptions } = Package
   const names = []
 
-  let options = { __proto__: null }
+  let options = {}
 
   if (typeof value === "string") {
     names.push("mode")

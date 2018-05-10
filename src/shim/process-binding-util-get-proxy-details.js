@@ -7,7 +7,6 @@ import silent from "../util/silent.js"
 
 function init() {
   const Shim = {
-    __proto__: null,
     enable(context) {
       const cache = shared.memoize.shimProcessBindingUtilGetProxyDetails
 

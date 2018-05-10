@@ -8,7 +8,6 @@ const names = [
 
 module.exports = names.reduce((regexp, name) =>
   Object.defineProperty(regexp, name, {
-    __proto__: null,
     configurable: true,
     enumerable: true,
     value: regexp[name],

@@ -4,7 +4,6 @@ import { tokTypes as tt } from "../../acorn.js"
 
 function init() {
   const Plugin = {
-    __proto__: null,
     enable(parser) {
       parser.parseTopLevel = parseTopLevel
       return parser
@@ -21,7 +20,6 @@ function init() {
     const identifiers = []
 
     const top = {
-      __proto__: null,
       hoistedExports: [],
       hoistedExportsString: "",
       hoistedImportsString: "",

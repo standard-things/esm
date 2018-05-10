@@ -11,7 +11,6 @@ function init() {
   } = CHAR_CODE
 
   const Plugin = {
-    __proto__: null,
     enable(parser) {
       parser.getTokenFromCode = wrap(parser.getTokenFromCode, getTokenFromCode)
       parser.parseClassMember = wrap(parser.parseClassMember, parseClassMember)

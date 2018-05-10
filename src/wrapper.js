@@ -15,7 +15,6 @@ import { version } from "./version.js"
 
 function init() {
   const Wrapper = {
-    __proto__: null,
     find(object, name, range) {
       const map = getMap(object, name)
 
@@ -36,7 +35,6 @@ function init() {
       }, value)
 
       Reflect.defineProperty(manager, shared.symbol.wrapper, {
-        __proto__: null,
         configurable: true,
         value,
         writable: true
@@ -64,7 +62,6 @@ function init() {
     // than on the function so that other code can modify the same property
     // without interfering with our wrapper.
     return getOrCreateStore(object)[name] = {
-      __proto__: null,
       raw: Wrapper.unwrap(object, name),
       versions: [],
       wrappers: { __proto__: null }
@@ -75,7 +72,6 @@ function init() {
     const value = { __proto__: null }
 
     Reflect.defineProperty(object, shared.symbol.wrapper, {
-      __proto__: null,
       configurable: true,
       value,
       writable: true

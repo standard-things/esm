@@ -83,7 +83,6 @@ function init() {
     // custom `util.inspect()` function when inspecting `util`.
     if (! has(exported, customInspectKey)) {
       Reflect.defineProperty(exported, customInspectKey, {
-        __proto__: null,
         configurable: true,
         value: true,
         writable: true

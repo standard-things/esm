@@ -6,7 +6,7 @@ import keysAll from "./keys-all.js"
 function safe(Super) {
   if (typeof Super !== "function") {
     return isObject(Super)
-      ? copy({ __proto__: null }, Super)
+      ? copy({}, Super)
       : Super
   }
 

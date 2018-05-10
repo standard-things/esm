@@ -7,7 +7,6 @@ function init() {
   const { prototype } = SafeArray
 
   return {
-    __proto__: null,
     concat: unapply(prototype.concat),
     filter: unapply(prototype.filter),
     indexOf: unapply(prototype.indexOf),

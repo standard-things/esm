@@ -28,7 +28,6 @@ export {
 }
 
 export default {
-  __proto__: null,
   Parser,
   getLineInfo,
   lineBreakRegExp,

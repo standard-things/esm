@@ -7,7 +7,6 @@ import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
   const Shim = {
-    __proto__: null,
     enable(context) {
       const cache = shared.memoize.shimFunctionPrototypeToString
 

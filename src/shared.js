@@ -28,23 +28,20 @@ function getShared() {
 
 function init() {
   const dummyProxy = new Proxy(class P {}, {
-    __proto__: null,
     [PKG_PREFIX]: 1
   })
 
   const funcToString = Function.prototype.toString
   const { toString } = Object.prototype
 
-  const fastPath = { __proto__: null }
-  const utilBinding = { __proto__: null }
+  const fastPath = {}
+  const utilBinding = {}
 
   const support = {
-    __proto__: null,
     wasm: typeof WebAssembly === "object" && WebAssembly !== null
   }
 
   const symbol = {
-    __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     namespace: Symbol.for(PKG_PREFIX + ":namespace"),
@@ -56,18 +53,15 @@ function init() {
   }
 
   const shared = {
-    __proto__: null,
     entry: {
-      __proto__: null,
       cache: new WeakMap,
       skipExports: { __proto__: null }
     },
-    env: { __proto__: null },
+    env: {},
     external: __external__,
     fastPath,
     inited: false,
     memoize: {
-      __proto__: null,
       moduleCJSResolveFilename: { __proto__: null },
       moduleESMResolveFilename: { __proto__: null },
       moduleFindPath: { __proto__: null },
@@ -83,16 +77,14 @@ function init() {
       utilSatisfies: { __proto__: null },
       utilUnwrapProxy: new WeakMap
     },
-    module: { __proto__: null },
+    module: {},
     moduleState: {
-      __proto__: null,
       parseOnly: false,
       parsing: false,
       requireDepth: 0,
       stat: null
     },
     package: {
-      __proto__: null,
       default: null,
       dir: { __proto__: null },
       root: { __proto__: null },
@@ -162,7 +154,6 @@ function init() {
 
   setDeferred(support, "inspectProxies", () => {
     const inspected = shared.module.safeUtil.inspect(dummyProxy, {
-      __proto__: null,
       depth: 1,
       showProxy: true
     })

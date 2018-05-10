@@ -4,7 +4,6 @@ const fs = require("fs-extra")
 const path = require("path")
 
 const options = {
-  __proto__: null,
   glob: false
 }
 

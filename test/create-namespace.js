@@ -4,7 +4,6 @@ function createNamespace(object) {
   const ns = Object.assign({ __proto__: null }, object)
 
   Reflect.defineProperty(ns, Symbol.toStringTag, {
-    __proto__: null,
     value: "Module"
   })
 

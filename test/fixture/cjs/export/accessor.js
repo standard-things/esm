@@ -5,7 +5,6 @@ let b
 const target = {
   set a(value) {
     Reflect.defineProperty(this, "a", {
-      __proto__: null,
       configurable: true,
       enumerable: true,
       value,

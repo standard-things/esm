@@ -158,7 +158,6 @@ function hook(Mod, parent) {
       Reflect.setPrototypeOf(mod, Module.prototype)
     } else {
       Reflect.defineProperty(mod, shared.symbol._compile, {
-        __proto__: null,
         configurable: true,
         value: compileWrapper
       })
@@ -259,7 +258,6 @@ function tryPassthru(func, args, pkg) {
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
-  __proto__: null,
   value: true
 })
 

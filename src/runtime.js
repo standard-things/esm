@@ -38,8 +38,6 @@ const ExPromise = external.Promise
 const indirectEval = external.eval
 
 const Runtime = {
-  __proto__: null,
-
   assertTDZ(name, value) {
     if (this.entry.bindings[name]) {
       return value
@@ -97,7 +95,6 @@ const Runtime = {
       content
 
     Reflect.defineProperty(unsafeContext, runtimeName, {
-      __proto__: null,
       configurable: true,
       get: () => {
         Reflect.deleteProperty(unsafeContext, runtimeName)
@@ -284,14 +281,12 @@ function runESM(entry, moduleWrapper) {
   let { loaded } = mod
 
   Reflect.defineProperty(mod, "loaded", {
-    __proto__: null,
     configurable: true,
     enumerable: true,
     get: () => loaded,
     set(value) {
       if (value) {
         Reflect.defineProperty(mod, "loaded", {
-          __proto__: null,
           configurable: true,
           enumerable: true,
           value,

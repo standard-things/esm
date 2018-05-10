@@ -1,7 +1,6 @@
 import realProcess from "../real/process.js"
 
 const noDeprecationDescriptor = {
-  __proto__: null,
   configurable: true,
   value: true
 }

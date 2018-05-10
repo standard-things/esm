@@ -53,7 +53,6 @@ if (! Module.globalPaths) {
 moduleState.globalPaths = GenericArray.slice(Module.globalPaths)
 
 parseState._cache = new Proxy(parseState._cache, {
-  __proto__: null,
   get(target, name) {
     return Reflect.has(target, name)
       ? Reflect.get(target, name)

@@ -10,7 +10,6 @@ const names = [
 
 module.exports = names.reduce((Date, name) =>
   Object.defineProperty(Date, name, {
-    __proto__: null,
     configurable: true,
     enumerable: true,
     value: Date[name],

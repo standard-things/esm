@@ -9,7 +9,6 @@ function setDeferred(object, name, getter) {
 
   setSetter(object, name, (value) => {
     Reflect.defineProperty(object, name, {
-      __proto__: null,
       configurable: true,
       enumerable: true,
       value,

@@ -12,7 +12,6 @@ function init() {
   }
 
   const liteInspectOptions = {
-    __proto__: null,
     breakLength: Infinity,
     colors: false,
     compact: true,

@@ -3,7 +3,7 @@ import shared from "../shared.js"
 function init() {
   const { external } = shared
 
-  const exProtos = {
+  const exProtoMap = {
     __proto__: null,
     Error: external.Error.prototype,
     EvalError: external.EvalError.prototype,
@@ -17,7 +17,7 @@ function init() {
   function toExternalError(error) {
     const proto = Reflect.getPrototypeOf(error)
     const name = proto ? proto.name : error.name
-    const exProto = exProtos[name]
+    const exProto = exProtoMap[name]
 
     if (exProto) {
       Reflect.setPrototypeOf(error, exProto)

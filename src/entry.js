@@ -39,11 +39,10 @@ const {
   ERR_NS_REDEFINITION
 } = errors
 
-const GETTER_ERROR = { __proto__: null }
-const STAR_ERROR = { __proto__: null }
+const GETTER_ERROR = {}
+const STAR_ERROR = {}
 
 const pseudoDescriptor = {
-  __proto__: null,
   value: true
 }
 
@@ -294,9 +293,7 @@ class Entry {
 
     if (this._loaded !== LOAD_COMPLETED) {
       setDeferred(this, "cjsNamespace", () => createNamespace(this, {
-        __proto__: null,
         namespace: {
-          __proto__: null,
           default: this.module.exports
         }
       }))
@@ -455,7 +452,6 @@ function createNamespace(entry, source = entry) {
   })
 
   return new OwnProxy(namespace, {
-    __proto__: null,
     defineProperty(target, name, descriptor) {
       if (Reflect.defineProperty(target, name, descriptor)) {
         return true
@@ -542,7 +538,6 @@ function getExportByName(entry, setter, name) {
       entry.namespace === _namespace) {
     // Lazily assign proxied namespace object.
     entry.namespace = new OwnProxy(_namespace, {
-      __proto__: null,
       get(target, name, receiver) {
         const exported = proxyExports(entry)
 

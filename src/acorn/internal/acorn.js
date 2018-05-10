@@ -10,7 +10,6 @@ function init() {
   } = ENV
 
   const Plugin = {
-    __proto__: null,
     enable() {
       if (INTERNAL) {
         try {

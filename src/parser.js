@@ -19,7 +19,6 @@ function init() {
   } = SOURCE_TYPE
 
   const defaultOptions = {
-    __proto__: null,
     allowReturnOutsideFunction: false,
     ecmaVersion: 9,
     sourceType: "module",
@@ -33,7 +32,6 @@ function init() {
   }
 
   const Parser = {
-    __proto__: null,
     createOptions,
     defaultOptions,
     parse(code, options) {
@@ -67,7 +65,7 @@ function init() {
   }
 
   function createOptions(value) {
-    const options = defaults({ __proto__: null }, value, Parser.defaultOptions)
+    const options = defaults({}, value, Parser.defaultOptions)
     const { sourceType } = options
 
     options.sourceType = sourceTypeMap[sourceType] || sourceType

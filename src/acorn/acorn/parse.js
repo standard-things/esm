@@ -12,7 +12,6 @@ function init() {
   } = SOURCE_TYPE
 
   const Plugin = {
-    __proto__: null,
     enable(acorn) {
       acorn.parse = parse
     }

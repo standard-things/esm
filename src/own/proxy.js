@@ -8,17 +8,14 @@ function init() {
   } = ESM
 
   const customInspectDescriptor = {
-    __proto__: null,
     value: () => "{}"
   }
 
   const markerDescriptor = {
-    __proto__: null,
     value: 1
   }
 
   const funcToStringTagDescriptor = {
-    __proto__: null,
     configurable: true,
     value: "Function",
     writable: true

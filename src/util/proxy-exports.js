@@ -55,7 +55,6 @@ function init() {
       }
 
       wrapper = new OwnProxy(value, {
-        __proto__: null,
         apply(funcTarget, thisArg, args) {
           // Check for `entry.esmNamespace` because it's a proxy that native
           // methods could be invoked on.
@@ -87,7 +86,6 @@ function init() {
     }
 
     const handler = {
-      __proto__: null,
       defineProperty(target, name, descriptor) {
         if (Reflect.has(descriptor, "value")) {
           const { value } = descriptor
@@ -211,7 +209,6 @@ function init() {
     const proxy = new OwnProxy(exported, handler)
 
     cached = {
-      __proto__: null,
       proxy,
       unwrap: new WeakMap,
       wrap: new WeakMap

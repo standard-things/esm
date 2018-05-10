@@ -30,7 +30,6 @@ function init() {
   } = SOURCE_TYPE
 
   const CachingCompiler = {
-    __proto__: null,
     compile(entry, code, options) {
       if (! options.eval &&
           entry.module.filename &&
@@ -58,7 +57,6 @@ function init() {
         : null
 
       const result = {
-        __proto__: null,
         changed: !! meta[3],
         code: null,
         dependencySpecifiers,
@@ -178,14 +176,12 @@ function init() {
 
     if (options.eval) {
       return {
-        __proto__: null,
         cjs,
         runtimeName
       }
     }
 
     return {
-      __proto__: null,
       cjs,
       hint: options.hint,
       pragmas: options.pragmas,

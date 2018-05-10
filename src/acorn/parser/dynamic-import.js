@@ -9,7 +9,6 @@ import wrap from "../../util/wrap.js"
 
 function init() {
   const Plugin = {
-    __proto__: null,
     enable(parser) {
       // Allow `yield import()` to parse.
       tt._import.startsExpr = true

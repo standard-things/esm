@@ -16,13 +16,10 @@ function init() {
     }
   }
 
-  const errors = {
-    __proto__: null,
+  return {
     SyntaxError: createClass(external.SyntaxError),
     TypeError: createClass(external.TypeError)
   }
-
-  return errors
 }
 
 export default shared.inited

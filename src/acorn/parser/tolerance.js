@@ -12,7 +12,6 @@ function init() {
   const PARSER_TYPE_POSTFIX = "may appear only with 'sourceType: module'"
 
   const Plugin = {
-    __proto__: null,
     enable(parser) {
       parser.isDirectiveCandidate =
       parser.strictDirective = alwaysFalse

@@ -7,7 +7,6 @@ import shared from "../../shared.js"
 
 function init() {
   const Plugin = {
-    __proto__: null,
     enable(walk) {
       walk.base.Import = noop
       return walk

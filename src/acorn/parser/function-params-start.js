@@ -3,7 +3,6 @@ import wrap from "../../util/wrap.js"
 
 function init() {
   const Plugin = {
-    __proto__: null,
     enable(parser) {
       parser.parseFunctionParams = wrap(parser.parseFunctionParams, parseFunctionParams)
       return parser

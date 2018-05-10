@@ -4,7 +4,6 @@ import shimProcessBindingUtilGetProxyDetails from "./shim/process-binding-util-g
 
 function init() {
   const Shim = {
-    __proto__: null,
     enable(context) {
       shimFunctionPrototypeToString.enable(context)
       shimProcessBindingUtilGetProxyDetails.enable(context)

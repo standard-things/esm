@@ -41,7 +41,6 @@ const hybridMocks = [
 
 hybridMocks.forEach((mock) => {
   Reflect.defineProperty(mock, "__esModule", {
-    __proto__: null,
     value: true
   })
 })

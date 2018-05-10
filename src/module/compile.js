@@ -64,7 +64,6 @@ function compile(content, filename) {
     void 0
 
   const script = new vm.Script(wrapper, {
-    __proto__: null,
     cachedData,
     filename,
     produceCachedData: true
@@ -115,7 +114,6 @@ function compile(content, filename) {
   }
 
   const compiledWrapper = script.runInThisContext({
-    __proto__: null,
     filename
   })
 

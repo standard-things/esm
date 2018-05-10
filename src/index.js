@@ -74,7 +74,6 @@ if (shared.inited &&
       Package.state =
         state[cacheKey] ||
         (state[cacheKey] = {
-          __proto__: null,
           cache: { __proto__: null },
           default: null
         })

@@ -276,7 +276,6 @@ export default () => {
 
   assert.throws(
     () => Object.defineProperty(accessor2, "c", {
-      __proto__: null,
       configurable: true,
       enumerable: true,
       value: 3,
@@ -287,7 +286,6 @@ export default () => {
 
   assert.throws(
     () => Object.defineProperty(accessor2, "a", {
-      __proto__: null,
       configurable: true,
       enumerable: true,
       value: 1,

@@ -30,7 +30,6 @@ function init() {
   } = SOURCE_TYPE
 
   const defaultOptions = {
-    __proto__: null,
     assertTDZ: false,
     cjs: {
       cache: false,
@@ -52,7 +51,6 @@ function init() {
 
   /* eslint-disable sort-keys */
   const Compiler = {
-    __proto__: null,
     createOptions,
     defaultOptions,
     compile(code, options) {
@@ -60,7 +58,6 @@ function init() {
       options = Compiler.createOptions(options)
 
       const result = {
-        __proto__: null,
         changed: false,
         code,
         dependencySpecifiers: null,
@@ -145,7 +142,6 @@ function init() {
 
       try {
         importExportVisitor.visit(rootPath, code, {
-          __proto__: null,
           generateVarDeclarations: options.var,
           magicString,
           possibleIndexes,
@@ -187,7 +183,6 @@ function init() {
 
           try {
             assignmentVisitor.visit(rootPath, {
-              __proto__: null,
               assignableExports,
               importLocals,
               magicString,
@@ -216,7 +211,6 @@ function init() {
             result.enforceTDZ = noop
 
             temporalVisitor.visit(rootPath, {
-              __proto__: null,
               importLocals,
               magicString,
               possibleIndexes: possibleLocalIndexes,
@@ -235,7 +229,6 @@ function init() {
           if (possibleIndexes.length) {
             result.warnings = []
             argumentsVisitor.visit(rootPath, {
-              __proto__: null,
               magicString,
               possibleIndexes,
               warnings: result.warnings
@@ -253,7 +246,7 @@ function init() {
   }
 
   function createOptions(value) {
-    return defaults({ __proto__: null }, value, Compiler.defaultOptions)
+    return defaults({}, value, Compiler.defaultOptions)
   }
 
   return Compiler

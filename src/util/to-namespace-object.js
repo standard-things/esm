@@ -1,7 +1,6 @@
 import keys from "./keys.js"
 
 const toStringTagDescriptor = {
-  __proto__: null,
   value: "Module"
 }
 

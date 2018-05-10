@@ -16,7 +16,6 @@ function init() {
   const messages = { __proto__: null }
 
   const truncInspectOptions = {
-    __proto__: null,
     depth: 2
   }
 
@@ -88,7 +87,6 @@ function init() {
 
       set code(value) {
         Reflect.defineProperty(this, "code", {
-          __proto__: null,
           configurable: true,
           enumerable: true,
           value,
@@ -102,7 +100,6 @@ function init() {
 
       set name(value) {
         Reflect.defineProperty(this, "name", {
-          __proto__: null,
           configurable: true,
           enumerable: true,
           value,

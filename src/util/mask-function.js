@@ -70,7 +70,6 @@ function maskFunction(func, source) {
   }
 
   cached = {
-    __proto__: null,
     proxy,
     source,
     toString

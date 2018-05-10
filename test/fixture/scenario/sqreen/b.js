@@ -1,7 +1,6 @@
 "use strict"
 
 Object.defineProperty(exports, "__esModule", {
-  __proto__: null,
   value: true
 })
 
