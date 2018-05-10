@@ -60,6 +60,12 @@ function init() {
         }
       }
 
+      types.isModuleNamespaceObject = new OwnProxy(sourceTypes.isModuleNamespaceObject, {
+        apply(target, thisArg, args) {
+          return Reflect.has(args[0], shared.symbol.namespace)
+        }
+      })
+
       types.isProxy = new OwnProxy(sourceTypes.isProxy, {
         apply(target, thisArg, args) {
           return ! isOwnProxy(args[0]) &&

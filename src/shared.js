@@ -47,6 +47,7 @@ function init() {
     __proto__: null,
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
+    namespace: Symbol.for(PKG_PREFIX + ":namespace"),
     package: Symbol.for(PKG_PREFIX + ":package"),
     realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
     realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),

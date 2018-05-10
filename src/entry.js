@@ -503,6 +503,10 @@ function createNamespace(entry, source = entry) {
 
       return descriptor
     },
+    has(target, name) {
+      return name === shared.symbol.namespace ||
+        Reflect.has(target, name)
+    },
     set(namespace, name) {
       const NsError = has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT

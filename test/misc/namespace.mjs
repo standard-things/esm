@@ -1,9 +1,12 @@
 import assert from "assert"
 import createNamespace from "../create-namespace.js"
+import util from "util"
 import * as ans from "../fixture/cycle/star/a.mjs"
 import * as bns from "../fixture/cycle/star/b.mjs"
 import * as ns1 from "../fixture/export/abc.mjs"
 import * as ns2 from "../fixture/export/abc.mjs"
+
+const { types } = util
 
 export default () => {
   const abcNs = createNamespace({
@@ -33,5 +36,11 @@ export default () => {
     assert.ok(Object.isSealed(ns))
     assert.strictEqual(Object.prototype.toString.call(ns), "[object Module]")
     assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), [Symbol.toStringTag])
+
+    if (types) {
+      assert.ok(types.isModuleNamespaceObject(ns))
+    } else {
+      assert.ok(true)
+    }
   })
 }
