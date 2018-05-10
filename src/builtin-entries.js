@@ -147,7 +147,10 @@ function createUtilExports(source) {
 
     types.isModuleNamespaceObject = new OwnProxy(sourceTypes.isModuleNamespaceObject, {
       apply(target, thisArg, args) {
-        return Reflect.has(args[0], shared.symbol.namespace)
+        const [value] = args
+
+        return isOwnProxy(value) &&
+          Reflect.has(value, shared.symbol.namespace)
       }
     })
 
