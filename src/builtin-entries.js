@@ -117,7 +117,9 @@ function init() {
       } else if (id === "vm" &&
           has(exported, "Module")) {
         exported = createVMExports(exported)
-      } else if (typeof exported === "function") {
+      } else if (id !== "assert" &&
+          typeof exported === "function" &&
+          shared.support.proxiedClasses) {
         const func = exported
         const proto = func.prototype
 
