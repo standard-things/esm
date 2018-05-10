@@ -18,9 +18,94 @@ import unwrapProxy from "./util/unwrap-proxy.js"
 
 const ExObject = shared.external.Object
 
-const builtinEntries = { __proto__: null }
-const cache = shared.memoize.builtinEntries
 const funcHasInstance = Function.prototype[Symbol.hasInstance]
+
+function createEntry(id) {
+  let exported = unwrapProxy(realRequire(id))
+
+  if (id === "module") {
+    exported = Module
+  } else if (id === "util") {
+    exported = createUtilExports(exported)
+  } else if (id === "vm" &&
+      has(exported, "Module")) {
+    exported = createVMExports(exported)
+  } else if (id !== "assert" &&
+      typeof exported === "function" &&
+      shared.support.proxiedClasses) {
+    const func = exported
+    const proto = func.prototype
+
+    const hasInstance = maskFunction(
+      (value) => value instanceof func,
+      funcHasInstance
+    )
+
+    const proxyProto = new OwnProxy(proto, {
+      get(target, name, receiver) {
+        const value = Reflect.get(target, name, receiver)
+
+        return value === func ? exported : value
+      },
+      getOwnPropertyDescriptor(target, name){
+        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+        if (has(descriptor, "value")) {
+          const { value } = descriptor
+
+          if (value === func) {
+            descriptor.value = exported
+          }
+        }
+
+        return descriptor
+      }
+    })
+
+    const proxyFunc = new OwnProxy(func, {
+      get(target, name, receiver) {
+        if (name === Symbol.hasInstance) {
+          return hasInstance
+        }
+
+        const value = Reflect.get(target, name, receiver)
+
+        return value === proto ? proxyProto : value
+      },
+      getOwnPropertyDescriptor(target, name){
+        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+        if (has(descriptor, "value")) {
+          const { value } = descriptor
+
+          if (value === proto) {
+            descriptor.value = proxyProto
+          }
+        }
+
+        return descriptor
+      }
+    })
+
+    exported = proxyFunc
+  }
+
+  const mod = new Module(id, null)
+  const entry = Entry.get(mod)
+
+  mod.exports = exported
+  mod.loaded = true
+
+  exported =
+  mod.exports = proxyExports(entry)
+
+  Entry.set(exported, entry)
+
+  entry.builtin = true
+  entry.id = id
+  entry.loaded()
+  return entry
+}
 
 function createUtilExports(source) {
   const exported = new ExObject
@@ -105,104 +190,23 @@ function createVMExports(source) {
   return exported
 }
 
+const builtinEntries = { __proto__: null }
+const cache = shared.memoize.builtinEntries
+
 for (const id of builtinModules) {
-  setDeferred(builtinEntries, id, () => {
-    if (Reflect.has(cache, id)) {
-      return cache[id]
-    }
+  if (Reflect.has(cache, id)) {
+    builtinEntries[id] = cache[id]
+  } else {
+    setDeferred(builtinEntries, id, () => {
+      const entry = createEntry(id)
 
-    let exported = unwrapProxy(realRequire(id))
+      if (id === "module") {
+        cache[id] = entry
+      }
 
-    const isModule = id === "module"
-
-    if (isModule) {
-      exported = Module
-    } else if (id === "util") {
-      exported = createUtilExports(exported)
-    } else if (id === "vm" &&
-        has(exported, "Module")) {
-      exported = createVMExports(exported)
-    } else if (id !== "assert" &&
-        typeof exported === "function" &&
-        shared.support.proxiedClasses) {
-      const func = exported
-      const proto = func.prototype
-
-      const hasInstance = maskFunction(
-        (value) => value instanceof func,
-        funcHasInstance
-      )
-
-      const proxyProto = new OwnProxy(proto, {
-        get(target, name, receiver) {
-          const value = Reflect.get(target, name, receiver)
-
-          return value === func ? exported : value
-        },
-        getOwnPropertyDescriptor(target, name){
-          const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-          if (has(descriptor, "value")) {
-            const { value } = descriptor
-
-            if (value === func) {
-              descriptor.value = exported
-            }
-          }
-
-          return descriptor
-        }
-      })
-
-      const proxyFunc = new OwnProxy(func, {
-        get(target, name, receiver) {
-          if (name === Symbol.hasInstance) {
-            return hasInstance
-          }
-
-          const value = Reflect.get(target, name, receiver)
-
-          return value === proto ? proxyProto : value
-        },
-        getOwnPropertyDescriptor(target, name){
-          const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-          if (has(descriptor, "value")) {
-            const { value } = descriptor
-
-            if (value === proto) {
-              descriptor.value = proxyProto
-            }
-          }
-
-          return descriptor
-        }
-      })
-
-      exported = proxyFunc
-    }
-
-    const mod = new Module(id, null)
-    const entry = Entry.get(mod)
-
-    mod.exports = exported
-    mod.loaded = true
-
-    exported =
-    mod.exports = proxyExports(entry)
-
-    Entry.set(exported, entry)
-
-    entry.builtin = true
-    entry.id = id
-    entry.loaded()
-
-    if (! isModule) {
-      cache[id] = entry
-    }
-
-    return entry
-  })
+      return entry
+    })
+  }
 }
 
 export default builtinEntries
