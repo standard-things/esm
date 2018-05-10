@@ -62,6 +62,7 @@ function init() {
     fastPath,
     inited: false,
     memoize: {
+      builtinEntries: { __proto__: null },
       moduleCJSResolveFilename: { __proto__: null },
       moduleESMResolveFilename: { __proto__: null },
       moduleFindPath: { __proto__: null },

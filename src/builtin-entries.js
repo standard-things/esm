@@ -16,187 +16,193 @@ import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 import unwrapProxy from "./util/unwrap-proxy.js"
 
-function init() {
-  const ExObject = shared.external.Object
+const ExObject = shared.external.Object
 
-  const builtinEntries = { __proto__: null }
-  const funcHasInstance = Function.prototype[Symbol.hasInstance]
+const builtinEntries = { __proto__: null }
+const cache = shared.memoize.builtinEntries
+const funcHasInstance = Function.prototype[Symbol.hasInstance]
 
-  function createUtilExports(source) {
-    const exported = new ExObject
-    const names = keysAll(source)
+function createUtilExports(source) {
+  const exported = new ExObject
+  const names = keysAll(source)
+
+  for (const name of names) {
+    if (name !== "inspect" &&
+        name !== "types") {
+      copyProperty(exported, source, name)
+    }
+  }
+
+  exported.inspect = new OwnProxy(source.inspect, {
+    apply(target, thisArg, args) {
+      const [value] = args
+
+      if (isOwnProxy(value)) {
+        args[0] = isNamespaceObject(value)
+          ? toNamespaceObject(value)
+          : unwrapProxy(value)
+      }
+
+      return Reflect.apply(target, thisArg, args)
+    }
+  })
+
+  const sourceTypes = source.types
+
+  if (sourceTypes) {
+    const names = keysAll(sourceTypes)
+    const types = new ExObject
 
     for (const name of names) {
-      if (name !== "inspect" &&
-          name !== "types") {
-        copyProperty(exported, source, name)
+      if (name !== "isModuleNamespaceObject" &&
+          name !== "isProxy") {
+        copyProperty(types, sourceTypes, name)
       }
     }
 
-    exported.inspect = new OwnProxy(source.inspect, {
+    types.isModuleNamespaceObject = new OwnProxy(sourceTypes.isModuleNamespaceObject, {
       apply(target, thisArg, args) {
-        const [value] = args
-
-        if (isOwnProxy(value)) {
-          args[0] = isNamespaceObject(value)
-            ? toNamespaceObject(value)
-            : unwrapProxy(value)
-        }
-
-        return Reflect.apply(target, thisArg, args)
+        return Reflect.has(args[0], shared.symbol.namespace)
       }
     })
 
-    const sourceTypes = source.types
-
-    if (sourceTypes) {
-      const names = keysAll(sourceTypes)
-      const types = new ExObject
-
-      for (const name of names) {
-        if (name !== "isModuleNamespaceObject" &&
-            name !== "isProxy") {
-          copyProperty(types, sourceTypes, name)
-        }
+    types.isProxy = new OwnProxy(sourceTypes.isProxy, {
+      apply(target, thisArg, args) {
+        return ! isOwnProxy(args[0]) &&
+          Reflect.apply(target, thisArg, args)
       }
+    })
 
-      types.isModuleNamespaceObject = new OwnProxy(sourceTypes.isModuleNamespaceObject, {
-        apply(target, thisArg, args) {
-          return Reflect.has(args[0], shared.symbol.namespace)
-        }
-      })
-
-      types.isProxy = new OwnProxy(sourceTypes.isProxy, {
-        apply(target, thisArg, args) {
-          return ! isOwnProxy(args[0]) &&
-            Reflect.apply(target, thisArg, args)
-        }
-      })
-
-      exported.types = types
-    }
-
-    const { customInspectKey } = shared
-
-    // Defining a truthy, but non-function value, for `customInspectKey` will
-    // inform builtin `inspect()` to bypass the deprecation warning for the
-    // custom `util.inspect()` function when inspecting `util`.
-    if (! has(exported, customInspectKey)) {
-      Reflect.defineProperty(exported, customInspectKey, {
-        configurable: true,
-        value: true,
-        writable: true
-      })
-    }
-
-    return exported
+    exported.types = types
   }
 
-  function createVMExports(source) {
-    const exported = new ExObject
-    const names = keysAll(source)
+  const { customInspectKey } = shared
 
-    for (const name of names) {
-      if (name !== "Module") {
-        copyProperty(exported, source, name)
-      }
-    }
-
-    return exported
-  }
-
-  for (const id of builtinModules) {
-    setDeferred(builtinEntries, id, () => {
-      let exported = unwrapProxy(realRequire(id))
-
-      if (id === "module") {
-        exported = Module
-      } else if (id === "util") {
-        exported = createUtilExports(exported)
-      } else if (id === "vm" &&
-          has(exported, "Module")) {
-        exported = createVMExports(exported)
-      } else if (id !== "assert" &&
-          typeof exported === "function" &&
-          shared.support.proxiedClasses) {
-        const func = exported
-        const proto = func.prototype
-
-        const hasInstance = maskFunction(
-          (value) => value instanceof func,
-          funcHasInstance
-        )
-
-        const proxyProto = new OwnProxy(proto, {
-          get(target, name, receiver) {
-            const value = Reflect.get(target, name, receiver)
-
-            return value === func ? exported : value
-          },
-          getOwnPropertyDescriptor(target, name){
-            const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-            if (has(descriptor, "value")) {
-              const { value } = descriptor
-
-              if (value === func) {
-                descriptor.value = exported
-              }
-            }
-
-            return descriptor
-          }
-        })
-
-        const proxyFunc = new OwnProxy(func, {
-          get(target, name, receiver) {
-            if (name === Symbol.hasInstance) {
-              return hasInstance
-            }
-
-            const value = Reflect.get(target, name, receiver)
-
-            return value === proto ? proxyProto : value
-          },
-          getOwnPropertyDescriptor(target, name){
-            const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-            if (has(descriptor, "value")) {
-              const { value } = descriptor
-
-              if (value === proto) {
-                descriptor.value = proxyProto
-              }
-            }
-
-            return descriptor
-          }
-        })
-
-        exported = proxyFunc
-      }
-
-      const mod = new Module(id, null)
-      const entry = Entry.get(mod)
-
-      mod.exports = exported
-      mod.loaded = true
-
-      exported =
-      mod.exports = proxyExports(entry)
-
-      Entry.set(exported, entry)
-
-      entry.builtin = true
-      entry.id = id
-      entry.loaded()
-      return entry
+  // Defining a truthy, but non-function value, for `customInspectKey` will
+  // inform builtin `inspect()` to bypass the deprecation warning for the
+  // custom `util.inspect()` function when inspecting `util`.
+  if (! has(exported, customInspectKey)) {
+    Reflect.defineProperty(exported, customInspectKey, {
+      configurable: true,
+      value: true,
+      writable: true
     })
   }
 
-  return builtinEntries
+  return exported
 }
 
-export default shared.inited
-  ? shared.module.builtinEntries
-  : shared.module.builtinEntries = init()
+function createVMExports(source) {
+  const exported = new ExObject
+  const names = keysAll(source)
+
+  for (const name of names) {
+    if (name !== "Module") {
+      copyProperty(exported, source, name)
+    }
+  }
+
+  return exported
+}
+
+for (const id of builtinModules) {
+  setDeferred(builtinEntries, id, () => {
+    if (Reflect.has(cache, id)) {
+      return cache[id]
+    }
+
+    let exported = unwrapProxy(realRequire(id))
+
+    const isModule = id === "module"
+
+    if (isModule) {
+      exported = Module
+    } else if (id === "util") {
+      exported = createUtilExports(exported)
+    } else if (id === "vm" &&
+        has(exported, "Module")) {
+      exported = createVMExports(exported)
+    } else if (id !== "assert" &&
+        typeof exported === "function" &&
+        shared.support.proxiedClasses) {
+      const func = exported
+      const proto = func.prototype
+
+      const hasInstance = maskFunction(
+        (value) => value instanceof func,
+        funcHasInstance
+      )
+
+      const proxyProto = new OwnProxy(proto, {
+        get(target, name, receiver) {
+          const value = Reflect.get(target, name, receiver)
+
+          return value === func ? exported : value
+        },
+        getOwnPropertyDescriptor(target, name){
+          const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+          if (has(descriptor, "value")) {
+            const { value } = descriptor
+
+            if (value === func) {
+              descriptor.value = exported
+            }
+          }
+
+          return descriptor
+        }
+      })
+
+      const proxyFunc = new OwnProxy(func, {
+        get(target, name, receiver) {
+          if (name === Symbol.hasInstance) {
+            return hasInstance
+          }
+
+          const value = Reflect.get(target, name, receiver)
+
+          return value === proto ? proxyProto : value
+        },
+        getOwnPropertyDescriptor(target, name){
+          const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+          if (has(descriptor, "value")) {
+            const { value } = descriptor
+
+            if (value === proto) {
+              descriptor.value = proxyProto
+            }
+          }
+
+          return descriptor
+        }
+      })
+
+      exported = proxyFunc
+    }
+
+    const mod = new Module(id, null)
+    const entry = Entry.get(mod)
+
+    mod.exports = exported
+    mod.loaded = true
+
+    exported =
+    mod.exports = proxyExports(entry)
+
+    Entry.set(exported, entry)
+
+    entry.builtin = true
+    entry.id = id
+    entry.loaded()
+
+    if (! isModule) {
+      cache[id] = entry
+    }
+
+    return entry
+  })
+}
+
+export default builtinEntries
