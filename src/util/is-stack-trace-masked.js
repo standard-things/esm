@@ -9,11 +9,11 @@ function isStackTraceMasked(error) {
 
   const descriptor = Reflect.getOwnPropertyDescriptor(error, "stack")
 
-  return descriptor !== void 0 &&
-    descriptor.configurable === true &&
-    descriptor.enumerable === false &&
-    typeof descriptor.get === "function" &&
-    typeof descriptor.set === "function" &&
+  return descriptor &&
+    descriptor.configurable &&
+    descriptor.get &&
+    descriptor.set &&
+    ! descriptor.enumerable &&
     ! isNative(descriptor.get) &&
     ! isNative(descriptor.set)
 }

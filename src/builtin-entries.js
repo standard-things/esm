@@ -50,7 +50,7 @@ function createEntry(id) {
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (has(descriptor, "value")) {
+        if (descriptor) {
           const { value } = descriptor
 
           if (value === func) {
@@ -75,7 +75,7 @@ function createEntry(id) {
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (has(descriptor, "value")) {
+        if (descriptor) {
           const { value } = descriptor
 
           if (value === proto) {

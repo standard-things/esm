@@ -87,12 +87,10 @@ function init() {
 
     const handler = {
       defineProperty(target, name, descriptor) {
-        if (Reflect.has(descriptor, "value")) {
-          const { value } = descriptor
+        const { value } = descriptor
 
-          if (typeof value === "function") {
-            descriptor.value = cached.unwrap.get(value) || value
-          }
+        if (typeof value === "function") {
+          descriptor.value = cached.unwrap.get(value) || value
         }
 
         // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
@@ -100,8 +98,8 @@ function init() {
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
         SafeObject.defineProperty(target, name, descriptor)
 
-        if (typeof descriptor.get === "function" &&
-            ! Reflect.has(handler, "get")) {
+        if (descriptor.get &&
+            ! handler.get) {
           handler.get = (target, name, receiver) => {
             const value = Reflect.get(target, name, receiver)
 
@@ -190,7 +188,7 @@ function init() {
       handler.getOwnPropertyDescriptor = (target, name) => {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (has(descriptor, "value")) {
+        if (descriptor) {
           const { value } = descriptor
 
           if (typeof value === "function") {
