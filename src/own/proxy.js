@@ -1,6 +1,5 @@
 import ESM from "../constant/esm.js"
 
-import assign from "../util/assign.js"
 import shared from "../shared.js"
 
 function init() {
@@ -29,13 +28,9 @@ function init() {
     static instances = new WeakMap
 
     constructor(target, handler) {
-      const proto = assign({ __proto__: null }, handler)
+      handler = { __proto__: handler }
 
-      handler = { __proto__: proto }
-
-      Reflect.defineProperty(proto, shared.customInspectKey, customInspectDescriptor)
-      Object.freeze(proto)
-
+      Reflect.defineProperty(handler, shared.customInspectKey, customInspectDescriptor)
       Reflect.defineProperty(handler, PKG_PREFIX + ":proxy", markerDescriptor)
       Object.freeze(handler)
 

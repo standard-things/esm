@@ -39,6 +39,8 @@ function init() {
       return cached.proxy
     }
 
+    let updating = false
+
     const maybeWrap = (target, name, value) => {
       // Wrap native methods to avoid throwing illegal invocation or
       // incompatible receiver type errors.
@@ -53,6 +55,7 @@ function init() {
       }
 
       wrapper = new OwnProxy(value, {
+        __proto__: null,
         apply(funcTarget, thisArg, args) {
           // Check for `entry.esmNamespace` because it's a proxy that native
           // methods could be invoked on.
@@ -71,9 +74,22 @@ function init() {
       return wrapper
     }
 
+    const tryUpdate = (name) => {
+      if (! updating) {
+        updating = true
+
+        try {
+          entry.update(name)
+        } finally {
+          updating = false
+        }
+      }
+    }
+
     const handler = {
+      __proto__: null,
       defineProperty(target, name, descriptor) {
-        if (has(descriptor, "value")) {
+        if (Reflect.has(descriptor, "value")) {
           const { value } = descriptor
 
           if (typeof value === "function") {
@@ -85,12 +101,26 @@ function init() {
         // throw the appropriate error if something goes wrong.
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
         SafeObject.defineProperty(target, name, descriptor)
-        entry.update()
+
+        if (typeof descriptor.get === "function" &&
+            ! Reflect.has(handler, "get")) {
+          handler.get = (target, name, receiver) => {
+            const value = Reflect.get(target, name, receiver)
+
+            if (has(target, name)) {
+              tryUpdate(name)
+            }
+
+            return value
+          }
+        }
+
+        entry.update(name)
         return true
       },
       deleteProperty(target, name) {
         if (Reflect.deleteProperty(target, name)) {
-          entry.update()
+          entry.update(name)
           return true
         }
 
@@ -137,6 +167,10 @@ function init() {
     if (useGetTraps) {
       handler.get = (target, name, receiver) => {
         const value = Reflect.get(target, name, receiver)
+
+        if (has(target, name)) {
+          tryUpdate(name)
+        }
 
         // Produce a `Symbol.toStringTag` value, otherwise
         // `Object.prototype.toString.call(proxy)` will return

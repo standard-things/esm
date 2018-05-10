@@ -79,7 +79,7 @@ function init() {
 
     try {
       const { toString } = funcProto
-      const proxy = new OwnProxy(toString)
+      const proxy = new OwnProxy(toString, {})
 
       result = toString.call(proxy) === toString.call(toString)
     } catch (e) {}

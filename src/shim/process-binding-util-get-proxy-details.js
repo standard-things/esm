@@ -60,7 +60,7 @@ function init() {
     result = false
 
     try {
-      const proxy = new OwnProxy(getProxyDetails)
+      const proxy = new OwnProxy(getProxyDetails, {})
 
       result = getProxyDetails(proxy) === void 0
     } catch (e) {}
