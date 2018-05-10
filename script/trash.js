@@ -17,7 +17,18 @@ function trash(iterable) {
       .map((thePath) => path.resolve(String(thePath)))
       .filter(fs.pathExistsSync)
 
+    const _emit = process.emit
+
+    process.emit = function (...args) {
+      const [name] = args
+
+      if (name !== "warning") {
+        return Reflect.apply(_emit, this, args)
+      }
+    }
+
     process.noDeprecation = true
+
     return Promise
       .all(paths.map((thePath) => {
         if (! _trash) {
@@ -33,6 +44,7 @@ function trash(iterable) {
           })
       }))
       .then(() => {
+        process.emit = _emit
         Reflect.deleteProperty(process, "noDeprecation")
         resolve()
       })
