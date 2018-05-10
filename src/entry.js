@@ -318,15 +318,19 @@ class Entry {
     return this
   }
 
-  update() {
+  update(names) {
     // Lazily-initialized map of parent module names to parent entries whose
     // setters might need to run.
     let parentsMap
 
     this._changed = false
 
-    runGetters(this)
-    runSetters(this, (setter, value) => {
+    if (typeof names === "string") {
+      names = [names]
+    }
+
+    runGetters(this, names)
+    runSetters(this, names, (setter, value) => {
       const parentEntry = setter.parent
       const { bindings } = parentEntry
       const { localNames } = setter
@@ -358,7 +362,7 @@ class Entry {
   }
 }
 
-function assignExportsToNamespace(entry) {
+function assignExportsToNamespace(entry, names) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
 
@@ -388,7 +392,9 @@ function assignExportsToNamespace(entry) {
     return
   }
 
-  const names = keys(isLoaded ? _namespace : exported)
+  if (! names) {
+    names = keys(isLoaded ? _namespace : exported)
+  }
 
   for (const name of names) {
     if (isESM) {
@@ -449,6 +455,7 @@ function createNamespace(entry, source = entry) {
   })
 
   return new OwnProxy(namespace, {
+    __proto__: null,
     defineProperty(target, name, descriptor) {
       if (Reflect.defineProperty(target, name, descriptor)) {
         return true
@@ -535,6 +542,7 @@ function getExportByName(entry, setter, name) {
       entry.namespace === _namespace) {
     // Lazily assign proxied namespace object.
     entry.namespace = new OwnProxy(_namespace, {
+      __proto__: null,
       get(target, name, receiver) {
         const exported = proxyExports(entry)
 
@@ -631,13 +639,19 @@ function runGetter(entry, name) {
   }
 }
 
-function runGetters(entry) {
+function runGetters(entry, names) {
   if (entry.type === TYPE_ESM) {
-    for (const name in entry.getters) {
-      runGetter(entry, name)
+    if (names) {
+      for (const name of names) {
+        runGetter(entry, name)
+      }
+    } else {
+      for (const name in entry.getters) {
+        runGetter(entry, name)
+      }
     }
   } else {
-    assignExportsToNamespace(entry)
+    assignExportsToNamespace(entry, names)
   }
 }
 
@@ -655,9 +669,15 @@ function runSetter(entry, name, callback) {
   }
 }
 
-function runSetters(entry, callback) {
-  for (const name in entry.setters) {
-    runSetter(entry, name, callback)
+function runSetters(entry, names, callback) {
+  if (names) {
+    for (const name of names) {
+      runSetter(entry, name, callback)
+    }
+  } else {
+    for (const name in entry.setters) {
+      runSetter(entry, name, callback)
+    }
   }
 }
 
