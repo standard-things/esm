@@ -18,6 +18,7 @@ import isSetIterator from "./is-set-iterator.js"
 import isStringObject from "./is-string-object.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
+import keys from "./keys.js"
 import shared from "../shared.js"
 
 function init() {
@@ -140,23 +141,37 @@ function init() {
 
     if (! useGetTraps &&
         ! Reflect.has(builtinEntries, entry.name)) {
-      if (typeof exported === "function") {
-        useGetTraps = isNative(exported)
-      } else if (! isPlainObject(exported)) {
-        useGetTraps =
-          isMap(exported) ||
-          isSet(exported) ||
-          isWeakMap(exported) ||
-          isDate(exported) ||
-          isRegExp(exported) ||
-          ArrayBuffer.isView(exported) ||
-          isAnyArrayBuffer(exported) ||
-          isNumberObject(exported) ||
-          isStringObject(exported) ||
-          isMapIterator(exported) ||
-          isSetIterator(exported) ||
-          isWebAssemblyCompiledModule(exported) ||
-          isExternal(exported)
+      const names = keys(exported)
+
+      for (const name of names) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
+
+        if (descriptor &&
+            descriptor.get) {
+          useGetTraps = true
+          break
+        }
+      }
+
+      if (! useGetTraps) {
+        if (typeof exported === "function") {
+          useGetTraps = isNative(exported)
+        } else if (! isPlainObject(exported)) {
+          useGetTraps =
+            isMap(exported) ||
+            isSet(exported) ||
+            isWeakMap(exported) ||
+            isDate(exported) ||
+            isRegExp(exported) ||
+            ArrayBuffer.isView(exported) ||
+            isAnyArrayBuffer(exported) ||
+            isNumberObject(exported) ||
+            isStringObject(exported) ||
+            isMapIterator(exported) ||
+            isSetIterator(exported) ||
+            isWebAssemblyCompiledModule(exported) ||
+            isExternal(exported)
+        }
       }
     }
 
