@@ -401,8 +401,10 @@ function init() {
     const { importLocals } = visitor
 
     for (const importName in specifierMap) {
-      for (const localName of specifierMap[importName]) {
-        importLocals[localName] = true
+      if (importName !== "*") {
+        for (const localName of specifierMap[importName]) {
+          importLocals[localName] = true
+        }
       }
     }
   }
