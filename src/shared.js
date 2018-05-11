@@ -171,6 +171,22 @@ function init() {
     typeof shared.module.binding.fs.internalModuleReadJSON === "function"
   )
 
+  setDeferred(support, "lookupShadowed", () => {
+    // Node < 8 will lookup accessors in the prototype chain despite being
+    // shadowed by data properties.
+    // https://node.green/#ES2017-annex-b
+    const o = {
+      __proto__: {
+        get a() {},
+        set a(v) {}
+      },
+      a: 1
+    }
+
+    return ! o.__lookupGetter__("a") &&
+      ! o.__lookupSetter__("a")
+  })
+
   setDeferred(support, "nativeProxyReceiver", () => {
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
