@@ -1,8 +1,8 @@
 import OwnProxy from "../own/proxy.js"
 import SafeObject from "../safe/object.js"
 
-import builtinEntries from "../builtin-entries.js"
-import has from "./has.js"
+import getGetter from "./get-getter.js"
+import getSetter from "./get-setter.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
 import isDate from "./is-date.js"
 import isExternal from "./is-external.js"
@@ -40,7 +40,16 @@ function init() {
       return cached.proxy
     }
 
-    let updating = false
+    const get = (target, name, receiver) => {
+      const accessor = getGetter(target, name)
+      const value = Reflect.get(target, name, receiver)
+
+      if (accessor) {
+        tryUpdate(name, value)
+      }
+
+      return value
+    }
 
     const maybeWrap = (target, name, value) => {
       // Wrap native methods to avoid throwing illegal invocation or
@@ -74,14 +83,18 @@ function init() {
       return wrapper
     }
 
-    const tryUpdate = (name) => {
-      if (! updating) {
-        updating = true
+    const tryUpdate = (name, value) => {
+      const getter = entry.getters[name]
 
-        try {
-          entry.update(name)
-        } finally {
-          updating = false
+      entry.addGetter(name, () => value)
+
+      try {
+        entry.update(name)
+      } finally {
+        if (getter) {
+          entry.getters[name] = getter
+        } else {
+          Reflect.deleteProperty(entry.getters, name)
         }
       }
     }
@@ -101,15 +114,7 @@ function init() {
 
         if (descriptor.get &&
             ! handler.get) {
-          handler.get = (target, name, receiver) => {
-            const value = Reflect.get(target, name, receiver)
-
-            if (has(target, name)) {
-              tryUpdate(name)
-            }
-
-            return value
-          }
+          handler.get = get
         }
 
         entry.update(name)
@@ -128,8 +133,14 @@ function init() {
           value = cached.unwrap.get(value) || value
         }
 
+        const accessor = getSetter(target, name)
+
         if (Reflect.set(target, name, value, receiver)) {
-          entry.update()
+          if (accessor) {
+            entry.update()
+          } else {
+            entry.update(name)
+          }
           return true
         }
 
@@ -137,51 +148,47 @@ function init() {
       }
     }
 
-    let useGetTraps = ! shared.support.nativeProxyReceiver
+    const { builtin } = entry
+    const names = builtin ? null : keys(exported)
 
-    if (! useGetTraps &&
-        ! Reflect.has(builtinEntries, entry.name)) {
-      const names = keys(exported)
+    for (const name of names) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
 
-      for (const name of names) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
-
-        if (descriptor &&
-            descriptor.get) {
-          useGetTraps = true
-          break
-        }
-      }
-
-      if (! useGetTraps) {
-        if (typeof exported === "function") {
-          useGetTraps = isNative(exported)
-        } else if (! isPlainObject(exported)) {
-          useGetTraps =
-            isMap(exported) ||
-            isSet(exported) ||
-            isWeakMap(exported) ||
-            isDate(exported) ||
-            isRegExp(exported) ||
-            ArrayBuffer.isView(exported) ||
-            isAnyArrayBuffer(exported) ||
-            isNumberObject(exported) ||
-            isStringObject(exported) ||
-            isMapIterator(exported) ||
-            isSetIterator(exported) ||
-            isWebAssemblyCompiledModule(exported) ||
-            isExternal(exported)
-        }
+      if (descriptor &&
+          descriptor.get) {
+        handler.get = get
+        break
       }
     }
 
-    if (useGetTraps) {
-      handler.get = (target, name, receiver) => {
-        const value = Reflect.get(target, name, receiver)
+    let useWrappers = ! shared.support.nativeProxyReceiver
 
-        if (has(target, name)) {
-          tryUpdate(name)
-        }
+    if (builtin) {
+      useWrappers = false
+    } else if (! useWrappers) {
+      if (typeof exported === "function") {
+        useWrappers = isNative(exported)
+      } else if (! isPlainObject(exported)) {
+        useWrappers =
+          isMap(exported) ||
+          isSet(exported) ||
+          isWeakMap(exported) ||
+          isDate(exported) ||
+          isRegExp(exported) ||
+          ArrayBuffer.isView(exported) ||
+          isAnyArrayBuffer(exported) ||
+          isNumberObject(exported) ||
+          isStringObject(exported) ||
+          isMapIterator(exported) ||
+          isSetIterator(exported) ||
+          isWebAssemblyCompiledModule(exported) ||
+          isExternal(exported)
+      }
+    }
+
+    if (useWrappers) {
+      handler.get = (target, name, receiver) => {
+        const value = get(target, name, receiver)
 
         // Produce a `Symbol.toStringTag` value, otherwise
         // `Object.prototype.toString.call(proxy)` will return
