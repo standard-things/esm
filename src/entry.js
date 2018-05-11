@@ -58,6 +58,8 @@ class Entry {
     this._passthru = false
     // The load type for `module.require`.
     this._require = TYPE_CJS
+    // The name of the running setter.
+    this._runningSetter = null
     // The initialized state of bindings imported by the module.
     this.bindings = { __proto__: null }
     // The builtin module indicator.
@@ -415,14 +417,6 @@ function assignExportsToNamespace(entry, names) {
   }
 }
 
-function callGetter(getter) {
-  try {
-    return getter()
-  } catch (e) {}
-
-  return GETTER_ERROR
-}
-
 function changed(setter, key, value) {
   const { last } = setter
 
@@ -569,13 +563,15 @@ function getExportByName(entry, setter, name) {
     throw new ERR_EXPORT_MISSING(mod, name)
   }
 
-  const value = entry.namespace[name]
+  const value = tryGetter(entry.getters[name])
 
   if (value === STAR_ERROR) {
     throw new ERR_EXPORT_STAR_CONFLICT(mod, name)
   }
 
-  return value
+  if (value !== GETTER_ERROR) {
+    return value
+  }
 }
 
 function mergeProperty(entry, otherEntry, key) {
@@ -624,7 +620,7 @@ function mergeProperty(entry, otherEntry, key) {
 
 function runGetter(entry, name) {
   const { _namespace } = entry
-  const value = callGetter(entry.getters[name])
+  const value = tryGetter(entry.getters[name])
 
   if (value !== GETTER_ERROR &&
       ! (Reflect.has(_namespace, name) &&
@@ -651,29 +647,53 @@ function runGetters(entry, names) {
 }
 
 function runSetter(entry, name, callback) {
+  entry._runningSetter = name
+
   const nsChanged = name === "*" && entry._changed
 
-  for (const setter of entry.setters[name]) {
-    const force = nsChanged && setter.from === "nsSetter"
-    const value = force ? void 0 : getExportByName(entry, setter, name)
+  try {
+    for (const setter of entry.setters[name]) {
+      const force = nsChanged && setter.from === "nsSetter"
+      const value = force ? void 0 : getExportByName(entry, setter, name)
 
-    if (force ||
-        changed(setter, name, value)) {
-      callback(setter, value)
+      if (force ||
+          changed(setter, name, value)) {
+        callback(setter, value)
+      }
     }
+  } finally {
+    entry._runningSetter = null
   }
 }
 
 function runSetters(entry, names, callback) {
+  const { _runningSetter } = entry
+
   if (names) {
     for (const name of names) {
+      if (name === _runningSetter) {
+        break
+      }
+
       runSetter(entry, name, callback)
     }
   } else {
     for (const name in entry.setters) {
+      if (name === _runningSetter) {
+        break
+      }
+
       runSetter(entry, name, callback)
     }
   }
+}
+
+function tryGetter(getter) {
+  try {
+    return getter()
+  } catch (e) {}
+
+  return GETTER_ERROR
 }
 
 Reflect.setPrototypeOf(Entry.prototype, null)
