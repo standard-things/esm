@@ -33,7 +33,10 @@ function init() {
         return
       }
 
-      const { column, line } = getLineInfo(this.magicString.original, node.start)
+      const {
+        column,
+        line
+      } = getLineInfo(this.magicString.original, node.start)
 
       this.warnedForArguments = true
 
