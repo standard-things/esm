@@ -84,7 +84,13 @@ function init() {
     }
 
     const tryUpdate = (name, value) => {
-      const getter = entry.getters[name]
+      if (! Reflect.has(entry._namespace, name)) {
+        entry.update()
+        return
+      }
+
+      const { getters } = entry
+      const getter = getters[name]
 
       entry.addGetter(name, () => value)
 
@@ -92,9 +98,9 @@ function init() {
         entry.update(name)
       } finally {
         if (getter) {
-          entry.getters[name] = getter
+          getters[name] = getter
         } else {
-          Reflect.deleteProperty(entry.getters, name)
+          Reflect.deleteProperty(getters, name)
         }
       }
     }
@@ -117,12 +123,18 @@ function init() {
           handler.get = get
         }
 
-        entry.update(name)
+        if (Reflect.has(entry._namespace, name)) {
+          entry.update(name)
+        }
+
         return true
       },
       deleteProperty(target, name) {
         if (Reflect.deleteProperty(target, name)) {
-          entry.update(name)
+          if (Reflect.has(entry._namespace, name)) {
+            entry.update(name)
+          }
+
           return true
         }
 
@@ -138,7 +150,7 @@ function init() {
         if (Reflect.set(target, name, value, receiver)) {
           if (accessor) {
             entry.update()
-          } else {
+          } else if (Reflect.has(entry._namespace, name)) {
             entry.update(name)
           }
           return true
