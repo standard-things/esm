@@ -6,8 +6,6 @@ import * as bns from "../fixture/cycle/star/b.mjs"
 import * as ns1 from "../fixture/export/abc.mjs"
 import * as ns2 from "../fixture/export/abc.mjs"
 
-const { types } = util
-
 export default () => {
   const abcNs = createNamespace({
     a: "a",
@@ -21,8 +19,6 @@ export default () => {
     b: "b"
   })
 
-  const namespaces = [ans, bns, ns1, ns2]
-
   assert.deepStrictEqual(ans, starNs)
   assert.deepStrictEqual(bns, ans)
   assert.deepStrictEqual(Object.keys(ans), ["a", "b"])
@@ -31,6 +27,9 @@ export default () => {
 
   assert.strictEqual(ns1, ns2)
   assert.deepStrictEqual(ns1, abcNs)
+
+  const namespaces = [ans, bns, ns1, ns2]
+  const { types } = util
 
   namespaces.forEach((ns) => {
     assert.ok(Object.isSealed(ns))

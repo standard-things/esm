@@ -527,8 +527,9 @@ function getExportByName(entry, setter, name) {
   const parentEntry = setter.parent
 
   const parentNamedExports =
-    parentEntry.package.options.cjs.namedExports &&
-    ! isMJS(parentEntry.module)
+    entry.builtin ||
+    (parentEntry.package.options.cjs.namedExports &&
+     ! isMJS(parentEntry.module))
 
   const noNamedExports =
     isCJS &&
