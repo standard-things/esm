@@ -370,10 +370,10 @@ function assignExportsToNamespace(entry, names) {
 
   if (! isESM &&
       ! isLoaded &&
-      entry.package.options.cjs.interop &&
-      has(exported, "default") &&
-      has(exported, "__esModule") &&
-      !! exported.__esModule) {
+      exported &&
+      exported.__esModule &&
+      exported.default &&
+      entry.package.options.cjs.interop) {
     entry.type = TYPE_PSEUDO
   }
 
@@ -451,7 +451,7 @@ function createNamespace(entry, source = entry) {
         return true
       }
 
-      const NsError = has(source.namespace, name)
+      const NsError = Reflect.has(source.namespace, name)
         ? ERR_NS_REDEFINITION
         : ERR_NS_DEFINITION
 
@@ -470,7 +470,7 @@ function createNamespace(entry, source = entry) {
         : Reflect.get(source.namespace, name)
     },
     getOwnPropertyDescriptor(namespace, name) {
-      if (! has(namespace, name)) {
+      if (! Reflect.has(namespace, name)) {
         return
       }
 
@@ -505,7 +505,7 @@ function createNamespace(entry, source = entry) {
         Reflect.has(target, name)
     },
     set(namespace, name) {
-      const NsError = has(source.namespace, name)
+      const NsError = Reflect.has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
 
