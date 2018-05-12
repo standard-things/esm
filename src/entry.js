@@ -391,18 +391,11 @@ function assignExportsToNamespace(entry, names) {
     return
   }
 
-  const checkOwn = !! names
-
-  if (! checkOwn) {
+  if (! names) {
     names = keys(isLoaded ? _namespace : exported)
   }
 
   for (const name of names) {
-    if (checkOwn &&
-        ! Reflect.has(_namespace, name)) {
-      continue
-    }
-
     if (isESM) {
       _namespace[name] = exported[name]
     } else if (! (isCJS && name === "default") &&
@@ -639,17 +632,13 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry, names) {
-  const { getters } = entry
-
   if (entry.type === TYPE_ESM) {
     if (names) {
       for (const name of names) {
-        if (Reflect.has(getters, name)) {
-          runGetter(entry, name)
-        }
+        runGetter(entry, name)
       }
     } else {
-      for (const name in getters) {
+      for (const name in entry.getters) {
         runGetter(entry, name)
       }
     }
@@ -679,20 +668,18 @@ function runSetter(entry, name, callback) {
 }
 
 function runSetters(entry, names, callback) {
-  const { _runningSetter, setters } = entry
+  const { _runningSetter } = entry
 
   if (names) {
     for (const name of names) {
-      if (Reflect.has(setters, name)) {
-        if (name === _runningSetter) {
-          break
-        }
-
-        runSetter(entry, name, callback)
+      if (name === _runningSetter) {
+        break
       }
+
+      runSetter(entry, name, callback)
     }
   } else {
-    for (const name in setters) {
+    for (const name in entry.setters) {
       if (name === _runningSetter) {
         break
       }
