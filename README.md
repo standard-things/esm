@@ -11,7 +11,7 @@ Install
 
 * __New projects__
 
-  Run `npm init esm` _(with `npm@6`)_ or `yarn create esm`.
+  Run `npm init esm` or `yarn create esm`.
 
   :bulb: Use the `-y` flag to answer “yes” to all prompts.
 
