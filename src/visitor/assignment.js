@@ -72,8 +72,8 @@ function init() {
     const { end, start } = path.getValue()
 
     visitor.magicString
-      .prependRight(start, visitor.runtimeName + ".u(")
-      .prependRight(end, ")")
+      .prependLeft(start, visitor.runtimeName + ".u(")
+      .prependLeft(end, ")")
   }
 
   return new AssignmentVisitor

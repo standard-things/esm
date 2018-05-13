@@ -4,10 +4,10 @@ _.e([["A",()=>A],["a",()=>a],["default",()=>default]]);class A {
   }
 }
 
-const a = () => {
+       const a = () => {
   _.i("./a.mjs")
 }
 
-function  default() {
+               function  default() {
   _.i("./a.mjs")
 }

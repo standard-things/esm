@@ -1,3 +1,4 @@
+import CHAR_CODE from "../constant/char-code.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Visitor from "../visitor.js"
@@ -6,9 +7,14 @@ import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import keys from "../util/keys.js"
+import { lineBreakRegExp } from "../acorn.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    CARRIAGE_RETURN
+  } = CHAR_CODE
+
   const {
     MODULE
   } = SOURCE_TYPE
@@ -24,10 +30,12 @@ function init() {
         top.hoistedExportsString +
         top.hoistedImportsString
 
-      this.magicString.prependRight(top.insertCharIndex, code)
+      this.magicString.prependLeft(top.insertCharIndex, code)
     }
 
     reset(rootPath, code, options) {
+      const { magicString } = options
+
       this.addedDirectEval = false
       this.addedDynamicImport = false
       this.addedImportExport = false
@@ -39,9 +47,10 @@ function init() {
       this.dependencySpecifiers = { __proto__: null }
       this.exportNames = []
       this.exportStars = []
+      this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
       this.generateVarDeclarations = options.generateVarDeclarations
       this.importLocals = { __proto__: null }
-      this.magicString = options.magicString
+      this.magicString = magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
       this.sourceType = options.sourceType
@@ -74,8 +83,8 @@ function init() {
         }
 
         this.magicString
-          .prependRight(callee.end, "(" + code)
-          .prependRight(node.end, ")")
+          .prependLeft(callee.end, "(" + code)
+          .prependLeft(node.end, ")")
       } else if (callee.type === "Import") {
         // Support dynamic import:
         // import("mod")
@@ -121,7 +130,7 @@ function init() {
 
       if (type === "Property" &&
           parent.shorthand) {
-        this.magicString.prependRight(node.end, ":" + code)
+        this.magicString.prependLeft(node.end, ":" + code)
       } else {
         overwrite(this, node.start, node.end, code)
       }
@@ -234,7 +243,10 @@ function init() {
 
         if (! id) {
           // Convert anonymous functions to named functions so they are hoisted.
-          this.magicString.prependRight(declaration.functionParamsStart, " " + name)
+          this.magicString.prependLeft(
+            declaration.functionParamsStart,
+            " " + name
+          )
         }
 
         // If the exported default value is a function or class declaration,
@@ -274,7 +286,7 @@ function init() {
       this.addedImportExport = true
 
       const node = path.getValue()
-      const { declaration } = node
+      const { declaration, specifiers } = node
 
       if (declaration) {
         const pairs = []
@@ -290,8 +302,8 @@ function init() {
         } else if (type === "VariableDeclaration") {
           // Support exporting variable lists:
           // export let name1, name2, ..., nameN
-          for (const decl of declaration.declarations) {
-            const names = getNamesFromPattern(decl.id)
+          for (const { id } of declaration.declarations) {
+            const names = getNamesFromPattern(id)
 
             for (const name of names) {
               pairs.push([name, name])
@@ -310,18 +322,9 @@ function init() {
         }
 
         path.call(this, "visitWithoutReset", "declaration")
-        return
-      }
-
-      const { specifiers } = node
-
-      if (! specifiers) {
-        return
-      }
-
-      // Support exporting specifiers:
-      // export { name1, name2, ..., nameN }
-      if (node.source === null) {
+      } else if (node.source === null) {
+        // Support exporting specifiers:
+        // export { name1, name2, ..., nameN }
         const { identifiers } = this.top
         const pairs = []
 
@@ -341,39 +344,38 @@ function init() {
 
         hoistExports(this, node, pairs)
         addAssignableExports(this, pairs)
-        return
-      }
+      } else {
+        // Support re-exporting specifiers of an imported module:
+        // export { name1, name2, ..., nameN } from "mod"
+        const { exportNames } = this
+        const specifierMap = { __proto__: null }
 
-      // Support re-exporting specifiers of an imported module:
-      // export { name1, name2, ..., nameN } from "mod"
-      const { exportNames } = this
-      const specifierMap = { __proto__: null }
+        const specifierString = getSourceString(this, node)
+        const specifierName = specifierString.slice(1, -1)
 
-      const specifierString = getSourceString(this, node)
-      const specifierName = specifierString.slice(1, -1)
+        addToDependencySpecifiers(this, specifierName)
 
-      addToDependencySpecifiers(this, specifierName)
+        for (const specifier of specifiers) {
+          const exportName = specifier.exported.name
+          const localName = specifier.local.name
 
-      for (const specifier of specifiers) {
-        const exportName = specifier.exported.name
-        const localName = specifier.local.name
+          exportNames.push(exportName)
+          addToDependencySpecifiers(this, specifierName, localName)
 
-        exportNames.push(exportName)
-        addToDependencySpecifiers(this, specifierName, localName)
+          addToSpecifierMap(
+            this,
+            specifierMap,
+            localName,
+            this.runtimeName + ".entry.namespace." + exportName
+          )
+        }
 
-        addToSpecifierMap(
+        hoistImports(this, node, toModuleImport(
           this,
-          specifierMap,
-          localName,
-          this.runtimeName + ".entry.namespace." + exportName
-        )
+          specifierString,
+          specifierMap
+        ))
       }
-
-      hoistImports(this, node, toModuleImport(
-        this,
-        specifierString,
-        specifierMap
-      ))
     }
 
     visitMetaProperty(path) {
@@ -490,12 +492,13 @@ function init() {
   }
 
   function overwrite(visitor, oldStart, oldEnd, newCode) {
+    const { magicString } = visitor
     const padded = pad(visitor, newCode, oldStart, oldEnd)
 
     if (oldStart !== oldEnd) {
-      visitor.magicString.overwrite(oldStart, oldEnd, padded)
+      magicString.overwrite(oldStart, oldEnd, padded)
     } else if (padded !== "") {
-      visitor.magicString.prependRight(oldStart, padded)
+      magicString.prependLeft(oldStart, padded)
     }
   }
 
@@ -516,7 +519,7 @@ function init() {
         newLines[i] = ""
       }
 
-      if (lastCharCode === 13 /* \r */) {
+      if (lastCharCode === CARRIAGE_RETURN) {
         newLines[i] += "\r"
       }
     }
@@ -526,8 +529,20 @@ function init() {
 
   function preserveChild(visitor, node, childName) {
     const child = node[childName]
+    const childStart = child.start
+    const nodeStart = node.start
 
-    overwrite(visitor, node.start, child.start, "")
+    let padding
+
+    if (childStart > visitor.firstLineBreakPos) {
+      const count = childStart - nodeStart
+
+      padding = count === 7 ? "       " : " ".repeat(count)
+    } else {
+      padding = ""
+    }
+
+    overwrite(visitor, nodeStart, childStart, padding)
   }
 
   function preserveLine(visitor, { end, start }) {

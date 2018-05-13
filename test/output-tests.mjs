@@ -41,9 +41,14 @@ describe("output", () =>
           sourceType: test.actual.sourceType
         })
 
-        // Remove zero-width joiners and trim trailing whitespace.
-        const expected = test.expected.content.trimRight()
-        const actual = result.code.replace(/\u200d/g, "").trimRight()
+        // Remove zero-width joiners and trim lines.
+        const expected = test.expected.content
+          .trimRight()
+
+        const actual = result.code
+          .replace(/\u200d/g, "")
+          .replace(/[ \t]+$/gm, "")
+          .trimRight()
 
         assert.strictEqual(actual, expected)
       })

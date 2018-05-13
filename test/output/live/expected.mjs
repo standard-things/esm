@@ -1,9 +1,9 @@
 _.e([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset()
 
-function reset() {
+       function reset() {
   return _.u(value = 0)
 }
 
-function add(x) {
+       function add(x) {
   _.u(value += x)
 }
