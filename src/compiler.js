@@ -83,7 +83,10 @@ function init() {
         }
       }
 
-      const possibleIndexes = findIndexes(code, ["export", "eval", "import"])
+      const possibleExportIndexes = findIndexes(code, ["export"])
+      const possibleIndexes = findIndexes(code, ["eval", "import"])
+
+      possibleIndexes.push(...possibleExportIndexes)
 
       let ast
       let error
@@ -136,9 +139,9 @@ function init() {
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
-      Reflect.deleteProperty(ast, "top")
-
+      possibleIndexes.sort()
       result.topLevelReturn = top.returnOutsideFunction
+      Reflect.deleteProperty(ast, "top")
 
       try {
         importExportVisitor.visit(rootPath, code, {
@@ -210,10 +213,14 @@ function init() {
           result.enforceTDZ = () => {
             result.enforceTDZ = noop
 
+            const possibleIndexes = possibleExportIndexes
+              .concat(possibleLocalIndexes)
+              .sort()
+
             temporalVisitor.visit(rootPath, {
               importLocals,
               magicString,
-              possibleIndexes: possibleLocalIndexes,
+              possibleIndexes,
               runtimeName
             })
 

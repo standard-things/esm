@@ -1,5 +1,6 @@
 import Visitor from "../visitor.js"
 
+import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
@@ -26,6 +27,48 @@ function init() {
       }
 
       this.visitChildren(path)
+    }
+
+    visitExportDefaultDeclaration(path) {
+      const node = path.getValue()
+
+      this.magicString.prependRight(
+        node.end,
+        this.runtimeName + '.u(["default"]);'
+      )
+    }
+
+    visitExportNamedDeclaration(path) {
+      const node = path.getValue()
+      const { declaration } = node
+
+      let names
+      let child = node
+
+      if (declaration) {
+        const { type } = declaration
+
+        child = declaration
+
+        if (type === "ClassDeclaration") {
+          names = [declaration.id.name]
+        } else if (type === "VariableDeclaration") {
+          names = []
+
+          for (const { id } of declaration.declarations) {
+            names.push(...getNamesFromPattern(id))
+          }
+        }
+      } else if (node.source === null) {
+        names = node.specifiers.map((specifier) => specifier.local.name)
+      }
+
+      if (names) {
+        this.magicString.prependRight(
+          child.end,
+          ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"
+        )
+      }
     }
   }
 
