@@ -2,6 +2,7 @@
 const CHAR_CODE = {
   __proto__: null,
   TAB: 9,
+  CARRIAGE_RETURN: 13,
   SPACE: 32,
   EXCLAMATION_MARK: 33,
   QUOTE: 34,

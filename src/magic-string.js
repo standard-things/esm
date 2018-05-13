@@ -7,12 +7,13 @@ import shared from "./shared.js"
 function init() {
   class Chunk {
     constructor(start, end, content) {
-      this.start = start
-      this.end = end
-      this.original = content
-      this.intro = ""
       this.content = content
+      this.end = end
+      this.intro = ""
+      this.original = content
+      this.outro = ""
       this.next = null
+      this.start = start
     }
 
     contains(index) {
@@ -22,6 +23,11 @@ function init() {
     edit(content) {
       this.content = content
       this.intro = ""
+      this.outro = ""
+    }
+
+    prependLeft(content) {
+      this.outro = content + this.outro
     }
 
     prependRight(content) {
@@ -34,18 +40,20 @@ function init() {
       const originalAfter = this.original.slice(sliceIndex)
       const newChunk = new Chunk(index, this.end, originalAfter)
 
+      newChunk.outro = this.outro
+      newChunk.next = this.next
+
       this.original = originalBefore
       this.end = index
       this.content = originalBefore
-
-      newChunk.next = this.next
+      this.outro = ""
       this.next = newChunk
 
       return newChunk
     }
 
     toString() {
-      return this.intro + this.content
+      return this.intro + this.content + this.outro
     }
   }
 
@@ -92,8 +100,23 @@ function init() {
       return this
     }
 
+    prependLeft(index, content) {
+      this._split(index)
+
+      const chunk = this.byEnd[index]
+
+      if (chunk) {
+        chunk.prependLeft(content)
+      } else {
+        this.intro = content + this.intro
+      }
+
+      return this
+    }
+
     prependRight(index, content) {
       this._split(index)
+
       const chunk = this.byStart[index]
 
       if (chunk) {
@@ -112,6 +135,7 @@ function init() {
       }
 
       let chunk = this.lastSearchedChunk
+
       const searchForward = index > chunk.end
 
       while (chunk) {
@@ -128,6 +152,7 @@ function init() {
 
     _splitChunk(chunk, index) {
       const newChunk = chunk.split(index)
+
       this.byEnd[index] = chunk
       this.byStart[index] = newChunk
       this.byEnd[newChunk.end] = newChunk
