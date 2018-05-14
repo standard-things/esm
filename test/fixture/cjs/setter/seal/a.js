@@ -1,3 +1,4 @@
 import * as ns from "./b.js"
-ns.a = "a"
+
+export const a = "a"
 export default ns
