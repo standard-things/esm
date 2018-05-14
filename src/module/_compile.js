@@ -11,6 +11,7 @@ import Runtime from "../runtime.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import createSourceMap from "../util/create-source-map.js"
 import encodeURI from "../util/encode-uri.js"
+import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../util/get-source-mapping-url.js"
 import isError from "../util/is-error.js"
 import isMJS from "../util/is-mjs.js"
@@ -142,30 +143,43 @@ function tryCompileCached(caller, entry, content, filename) {
     }
   }
 
+  let error
   let result
+  let threw = false
 
   try {
     result = tryCompile(entry, filename)
   } catch (e) {
-    if (! isError(e) ||
-        isStackTraceMasked(e)) {
-      throw e
-    }
-
-    if (isESM &&
-        e.name === "SyntaxError") {
-      pkg.cache.dirty = true
-    }
-
-    content = () => readSourceCode(filename)
-    throw maskStackTrace(e, content, filename, isESM)
-  } finally {
-    if (noDepth) {
-      moduleState.stat = null
-    }
+    error = e
+    threw = true
   }
 
-  return result
+  if (noDepth) {
+    moduleState.stat = null
+  }
+
+  if (! threw) {
+    return result
+  }
+
+  if (! isError(error) ||
+      isStackTraceMasked(error)) {
+    throw error
+  }
+
+  if (isESM &&
+      error.name === "SyntaxError") {
+    pkg.cache.dirty = true
+  }
+
+  const loc = getLocationFromStackTrace(error)
+
+  if (loc) {
+    filename = loc.filename
+  }
+
+  content = () => readSourceCode(filename)
+  throw maskStackTrace(error, content, filename, isESM)
 }
 
 function tryCompileCJS(entry, filename) {
@@ -309,6 +323,15 @@ function tryValidateESM(caller, entry, content, filename) {
   }
 
   captureStackTrace(error, caller)
+
+  const loc = getLocationFromStackTrace(error)
+
+  if (loc &&
+      loc.filename !== filename) {
+    filename = loc.filename
+    content = () => readSourceCode(filename)
+  }
+
   throw maskStackTrace(error, content, filename, true)
 }
 

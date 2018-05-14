@@ -15,6 +15,7 @@ import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
+import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isObjectLike from "../util/is-object-like.js"
@@ -234,7 +235,6 @@ function tryPassthru(func, args, pkg) {
   }
 
   const [, filename] = args
-  const content = () => readSourceCode(filename)
 
   if (error.name === "SyntaxError") {
     const message = safeToString(error.message)
@@ -253,6 +253,14 @@ function tryPassthru(func, args, pkg) {
       pkg.cache.dirty = true
     }
   }
+
+  const loc = getLocationFromStackTrace(error)
+
+  if (loc) {
+    filename = loc.filename
+  }
+
+  const content = () => readSourceCode(filename)
 
   throw maskStackTrace(error, content, filename)
 }
