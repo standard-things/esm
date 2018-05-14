@@ -125,6 +125,14 @@ function validate(entry) {
   if (entry.cyclical) {
     compileData.enforceTDZ()
   }
+
+  for (const exportName in exportSpecifiers) {
+    if (! Reflect.has(entry.namespace, exportName)) {
+      entry.namespace[exportName] = void 0
+    }
+  }
+
+  entry.initNamespace()
 }
 
 export default validate

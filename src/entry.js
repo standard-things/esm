@@ -229,6 +229,16 @@ class Entry {
     return this
   }
 
+  initNamespace() {
+    setDeferred(this, "cjsNamespace", () => createNamespace(this, {
+      namespace: {
+        default: this.module.exports
+      }
+    }))
+
+    setDeferred(this, "esmNamespace", () => createNamespace(this))
+  }
+
   loaded() {
     if (this._loaded !== LOAD_INCOMPLETE) {
       return this._loaded
@@ -297,13 +307,7 @@ class Entry {
     assignExportsToNamespace(this)
 
     if (this._loaded !== LOAD_COMPLETED) {
-      setDeferred(this, "cjsNamespace", () => createNamespace(this, {
-        namespace: {
-          default: this.module.exports
-        }
-      }))
-
-      setDeferred(this, "esmNamespace", () => createNamespace(this))
+      this.initNamespace()
     }
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
