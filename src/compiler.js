@@ -62,6 +62,7 @@ function init() {
         code,
         dependencySpecifiers: null,
         enforceTDZ: noop,
+        exportFrom: null,
         exportNames: null,
         exportSpecifiers: null,
         exportStars: null,
@@ -205,6 +206,7 @@ function init() {
         sourceType = SCRIPT
       } else if (sourceType === MODULE) {
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
+        result.exportFrom = importExportVisitor.exportFrom
         result.exportNames = importExportVisitor.exportNames
         result.exportStars = importExportVisitor.exportStars
         result.sourceType = MODULE

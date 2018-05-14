@@ -45,6 +45,7 @@ function init() {
       this.changed = false
       this.code = code
       this.dependencySpecifiers = { __proto__: null }
+      this.exportFrom = { __proto__: null }
       this.exportNames = []
       this.exportStars = []
       this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
@@ -347,7 +348,7 @@ function init() {
       } else {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
-        const { exportNames } = this
+        const { exportFrom, exportNames, runtimeName } = this
         const specifierMap = { __proto__: null }
 
         const specifierString = getSourceString(this, node)
@@ -355,26 +356,47 @@ function init() {
 
         addToDependencySpecifiers(this, specifierName)
 
+        const fromNames =
+          exportFrom[specifierName] ||
+          (exportFrom[specifierName] = [])
+
         for (const specifier of specifiers) {
           const exportName = specifier.exported.name
           const localName = specifier.local.name
 
           exportNames.push(exportName)
+          fromNames.push(exportName)
+
           addToDependencySpecifiers(this, specifierName, localName)
 
           addToSpecifierMap(
             this,
             specifierMap,
             localName,
-            this.runtimeName + ".entry.namespace." + exportName
+            runtimeName + ".entry.namespace." + exportName
           )
         }
 
-        hoistImports(this, node, toModuleImport(
-          this,
-          specifierString,
-          specifierMap
-        ))
+        const importNames = keys(specifierMap)
+        const lastIndex = importNames.length - 1
+
+        let hoistedCode = runtimeName + ".w(" + specifierString + ",["
+        let i = -1
+
+        for (const importName of importNames) {
+          hoistedCode +=
+            '["' + importName + '",null,function(v){' +
+            specifierMap[importName].join("=") +
+            "=v}]"
+
+          if (++i !== lastIndex) {
+            hoistedCode += ","
+          }
+        }
+
+        hoistedCode += "]);"
+
+        hoistImports(this, node, hoistedCode)
       }
     }
 
