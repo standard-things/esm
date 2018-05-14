@@ -21,8 +21,6 @@ function validate(entry) {
   const mod = entry.module
   const { name } = entry
 
-  let isCyclical = false
-
   // Parse children.
   for (const specifier in dependencySpecifiers) {
     const childEntry = _loadESM(specifier, mod)
@@ -63,8 +61,8 @@ function validate(entry) {
       continue
     }
 
-    if (! isCyclical) {
-      isCyclical = Reflect.has(childEntry.children, name)
+    if (! entry.cyclical) {
+      entry.cyclical = Reflect.has(childEntry.children, name)
     }
 
     const childCompileData = childEntry.compileData
@@ -120,7 +118,7 @@ function validate(entry) {
     }
   }
 
-  if (isCyclical) {
+  if (entry.cyclical) {
     compileData.enforceTDZ()
   }
 }
