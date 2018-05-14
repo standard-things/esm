@@ -1,7 +1,13 @@
+import ESM from "../constant/esm.js"
+
 import isPath from "../util/is-path.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    PKG_DIRNAME
+  } = ESM
+
   /* eslint-disable no-useless-escape */
   const locRegExp = /^ *at (?:.+? \()?(.+?):(\d+)(?:\:(\d+))?/gm
 
@@ -10,10 +16,13 @@ function init() {
 
     let match
 
+    locRegExp.lastIndex = 0
+
     while ((match = locRegExp.exec(stack))) {
       const filename = match[1]
 
-      if (! isPath(filename)) {
+      if (! isPath(filename) ||
+          filename.startsWith(PKG_DIRNAME)) {
         continue
       }
 
