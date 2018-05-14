@@ -6,7 +6,6 @@ import Module from "./module.js"
 
 import _loadESM from "./module/esm/_load.js"
 import errors from "./errors.js"
-import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
@@ -43,20 +42,7 @@ const Runtime = {
       return value
     }
 
-    const error = new ERR_UNDEFINED_IDENTIFIER(name)
-
-    Error.captureStackTrace(error, Runtime.assertTDZ)
-
-    const loc = getLocationFromStackTrace(error)
-
-    if (loc) {
-      error.stack =
-        loc.filename + ":" +
-        loc.line + "\n" +
-        error.stack
-    }
-
-    throw error
+    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertTDZ)
   },
 
   compileEval(content) {

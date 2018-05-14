@@ -1,3 +1,5 @@
+import captureStackTrace from "./error/capture-stack-trace.js"
+import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
 import shared from "./shared.js"
@@ -57,7 +59,25 @@ function init() {
 
   function createBuiltinErrorClass(Super, code) {
     return function BuiltinError(...args) {
-      return new Super(messages[code](...args))
+      const { length } = args
+      const last = length ? args[length - 1] : null
+      const beforeFunc = typeof last === "function" ? args.pop() : null
+      const error = new Super(messages[code](...args))
+
+      if (beforeFunc) {
+        captureStackTrace(error, beforeFunc)
+      }
+
+      const loc = getLocationFromStackTrace(error)
+
+      if (loc) {
+        error.stack =
+          loc.filename + ":" +
+          loc.line + "\n" +
+          error.stack
+      }
+
+      return error
     }
   }
 
