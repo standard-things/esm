@@ -106,6 +106,10 @@ function validate(entry) {
     }
 
     for (const exportName in childEntry.compileData.exportSpecifiers) {
+      if (exportName === "default") {
+        continue
+      }
+
       if (Reflect.has(exportSpecifiers, exportName)) {
         if (exportSpecifiers[exportName] === 2) {
           // Export specifier is conflicted.
