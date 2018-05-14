@@ -36,7 +36,8 @@ const {
   ERR_NS_DEFINITION,
   ERR_NS_DELETION,
   ERR_NS_EXTENSION,
-  ERR_NS_REDEFINITION
+  ERR_NS_REDEFINITION,
+  ERR_UNDEFINED_IDENTIFIER
 } = errors
 
 const GETTER_ERROR = {}
@@ -438,16 +439,16 @@ function createNamespace(entry, source = entry) {
   const isCJS = type === TYPE_CJS
   const isESM = type === TYPE_ESM
 
-  const namespace = toNamespaceObject(source.namespace, (object, name) => {
+  const namespace = toNamespaceObject(source.namespace, (target, name) => {
     if (isESM ||
         (isCJS && name === "default")) {
-      return object[name]
+      return Reflect.get(target, name)
     }
 
     return Reflect.getOwnPropertyDescriptor(exported, name).value
   })
 
-  return new OwnProxy(namespace, {
+  const handler = {
     defineProperty(target, name, descriptor) {
       if (Reflect.defineProperty(target, name, descriptor)) {
         return true
@@ -466,13 +467,31 @@ function createNamespace(entry, source = entry) {
 
       throw new ERR_NS_DELETION(mod, name)
     },
-    get(namespace, name) {
-      return name === Symbol.toStringTag
-        ? Reflect.get(namespace, name)
-        : Reflect.get(source.namespace, name)
+    get(target, name, receiver) {
+      if (name === Symbol.toStringTag) {
+        return Reflect.get(target, name)
+      }
+
+      const { compileData } = entry
+      const getter = entry.getters[name]
+      const exportSpecifiers = compileData && compileData.exportSpecifiers
+
+      if (getter &&
+          exportSpecifiers &&
+          exportSpecifiers[name] === 1 &&
+          name !== "default") {
+        return getter()
+      }
+
+      if (name === "default" &&
+          ! getter) {
+        throw new ERR_UNDEFINED_IDENTIFIER(name)
+      }
+
+      return Reflect.get(source.namespace, name, receiver)
     },
-    getOwnPropertyDescriptor(namespace, name) {
-      if (! Reflect.has(namespace, name)) {
+    getOwnPropertyDescriptor(target, name) {
+      if (! Reflect.has(target, name)) {
         return
       }
 
@@ -498,7 +517,7 @@ function createNamespace(entry, source = entry) {
       // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
       descriptor.enumerable =
       descriptor.writable = true
-      descriptor.value = Reflect.get(source.namespace, name)
+      descriptor.value = handler.get(target, name)
 
       return descriptor
     },
@@ -506,14 +525,16 @@ function createNamespace(entry, source = entry) {
       return name === shared.symbol.namespace ||
         Reflect.has(target, name)
     },
-    set(namespace, name) {
+    set(target, name) {
       const NsError = Reflect.has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
 
       throw new NsError(mod, name)
     }
-  })
+  }
+
+  return new OwnProxy(namespace, handler)
 }
 
 function getExportByName(entry, setter, name) {
