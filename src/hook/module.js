@@ -234,7 +234,7 @@ function tryPassthru(func, args, pkg) {
     throw error
   }
 
-  const [, filename] = args
+  let [, filename] = args
 
   if (error.name === "SyntaxError") {
     const message = safeToString(error.message)
