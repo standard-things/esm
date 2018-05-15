@@ -115,6 +115,7 @@ describe("scenarios", function () {
 
   it("should work with ava, nyc, and tsc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
     return Promise
@@ -124,6 +125,7 @@ describe("scenarios", function () {
       ]))
       .then(() => exec("nyc", [
         "--cwd", dirPath,
+        "-i", cwdPath,
         "-i", pkgPath,
         "ava", avaPattern
       ]))
