@@ -37,7 +37,21 @@ function createEntry(id) {
     const proto = func.prototype
 
     const hasInstance = maskFunction(
-      (value) => value instanceof func,
+      (value) => {
+        if (value instanceof func) {
+          return true
+        }
+
+        let proto = value
+
+        while ((proto = Reflect.getPrototypeOf(proto))) {
+          if (proto === proxyProto) {
+            return true
+          }
+        }
+
+        return false
+      },
       funcHasInstance
     )
 
