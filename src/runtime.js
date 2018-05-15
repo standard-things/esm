@@ -59,7 +59,8 @@ const Runtime = {
       return content
     }
 
-    const { entry } = this
+    const runtime = this
+    const { entry } = runtime
     const result = Compiler.compile(entry, content, { eval: true })
 
     if (! result.changed) {
@@ -82,9 +83,9 @@ const Runtime = {
 
     Reflect.defineProperty(unsafeContext, runtimeName, {
       configurable: true,
-      get: () => {
-        Reflect.deleteProperty(unsafeContext, runtimeName)
-        return this
+      get() {
+        Reflect.deleteProperty(this, runtimeName)
+        return runtime
       }
     })
 
@@ -272,7 +273,7 @@ function runESM(entry, moduleWrapper) {
     get: () => loaded,
     set(value) {
       if (value) {
-        Reflect.defineProperty(mod, "loaded", {
+        Reflect.defineProperty(this, "loaded", {
           configurable: true,
           enumerable: true,
           value,

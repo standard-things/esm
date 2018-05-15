@@ -214,13 +214,13 @@ function hook(vm) {
 
     const _inspect = util.inspect
 
-    setGetter(util, "inspect", () => {
-      util.inspect = inspect
+    setGetter(util, "inspect", function () {
+      this.inspect = inspect
       return _inspect
     })
 
-    setSetter(util, "inspect", (value) => {
-      Reflect.defineProperty(util, "inspect", {
+    setSetter(util, "inspect", function (value) {
+      Reflect.defineProperty(this, "inspect", {
         configurable: true,
         enumerable: true,
         value,
@@ -272,8 +272,8 @@ function createAddBuiltinModules(entry) {
     })
 
     for (const name of lazyModules) {
-      const set = (value) => {
-        Reflect.defineProperty(context, name, {
+      const set = function (value) {
+        Reflect.defineProperty(this, name, {
           configurable: true,
           enumerable: true,
           value,
@@ -284,11 +284,11 @@ function createAddBuiltinModules(entry) {
       Reflect.defineProperty(context, name, {
         configurable: true,
         get() {
-          context[name] = void 0
+          this[name] = void 0
 
           const exported = req(name)
 
-          Reflect.defineProperty(context, name, {
+          Reflect.defineProperty(this, name, {
             configurable: true,
             get: () => exported,
             set

@@ -161,8 +161,8 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
           throw error
         })
 
-        setSetter(state._cache, cacheKey, (value) => {
-          Reflect.defineProperty(state._cache, cacheKey, {
+        setSetter(state._cache, cacheKey, function (value) {
+          Reflect.defineProperty(this, cacheKey, {
             configurable: true,
             enumerable: true,
             value,

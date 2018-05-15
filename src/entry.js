@@ -230,13 +230,17 @@ class Entry {
   }
 
   initNamespace() {
-    setDeferred(this, "cjsNamespace", () => createNamespace(this, {
-      namespace: {
-        default: this.module.exports
-      }
-    }))
+    setDeferred(this, "cjsNamespace", function () {
+      return createNamespace(this, {
+        namespace: {
+          default: this.module.exports
+        }
+      })
+    })
 
-    setDeferred(this, "esmNamespace", () => createNamespace(this))
+    setDeferred(this, "esmNamespace", function () {
+      return createNamespace(this)
+    })
   }
 
   loaded() {

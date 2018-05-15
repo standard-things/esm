@@ -8,7 +8,6 @@ import getModuleURL from "../util/get-module-url.js"
 import isParseError from "../util/is-parse-error.js"
 import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
-import toExternalError from "../util/to-external-error.js"
 
 const {
   ZWJ
@@ -44,9 +43,9 @@ function maskStackTrace(error, content, filename, isESM) {
   Reflect.defineProperty(error, "stack", {
     configurable: true,
     get() {
-      error.stack = void 0
+      this.stack = void 0
 
-      const newMessage = safeToString(error)
+      const newMessage = safeToString(this)
 
       const scrubber = isESM
         ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
@@ -54,8 +53,7 @@ function maskStackTrace(error, content, filename, isESM) {
 
       let masker = maskEngineStack
 
-      if (isParseError(error)) {
-        error = toExternalError(error)
+      if (isParseError(this)) {
         masker = maskParserStack
       }
 
@@ -63,10 +61,10 @@ function maskStackTrace(error, content, filename, isESM) {
       stack = masker(stack, content, filename)
       stack = withoutMessage(stack, newMessage, scrubber)
 
-      return error.stack = stack
+      return this.stack = stack
     },
     set(value) {
-      Reflect.defineProperty(error, "stack", {
+      Reflect.defineProperty(this, "stack", {
         configurable: true,
         value,
         writable: true
