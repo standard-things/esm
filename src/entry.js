@@ -735,7 +735,7 @@ function runSetter(entry, name, callback) {
     return
   }
 
-  const length = setters.length
+  const { length } = setters
 
   let i = -1
 
