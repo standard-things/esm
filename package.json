@@ -72,7 +72,7 @@
     "require-inject": "^1.4.3",
     "semver": "^5.5.0",
     "sleep": "^5.1.1",
-    "sqreen": "^1.18.2",
+    "sqreen": "^1.18.4",
     "strip-ansi": "^4.0.0",
     "trash": "^4.3.0",
     "typescript": "^2.6.1",
