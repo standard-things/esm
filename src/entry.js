@@ -267,26 +267,39 @@ class Entry {
       }
     }
 
-    const isESM = this.type === TYPE_ESM
-
     let exported = mod.exports
 
-    if (isESM &&
-        ! Object.isFrozen(exported)) {
-      if (this.package.options.cjs.interop &&
-          ! has(this._namespace, "__esModule") &&
-          ! isMJS(mod)) {
-        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
-      }
+    if (this.type === TYPE_ESM) {
+      const { _namespace } = this
 
-      for (const name in this._namespace) {
-        setGetter(exported, name, () => this._namespace[name])
-      }
+      if (Object.isFrozen(exported)) {
+        for (const name in _namespace) {
+          this.addGetter(name, () => this.namespace[name])
+        }
 
-      Object.setPrototypeOf(exported, null)
-      Object.freeze(exported)
-      Object.freeze(mod)
-    } else if (! isESM) {
+        this.initNamespace()
+      } else {
+        if (this.package.options.cjs.interop &&
+            ! has(_namespace, "__esModule") &&
+            ! isMJS(mod)) {
+          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+        }
+
+        const { getters } = this
+
+        for (const name in _namespace) {
+          setGetter(exported, name, () => this._namespace[name])
+
+          if (! Reflect.has(getters, name)) {
+            this.addGetter(name, () => this.namespace[name])
+          }
+        }
+
+        Object.setPrototypeOf(exported, null)
+        Object.freeze(exported)
+        Object.freeze(mod)
+      }
+    } else {
       const newEntry = Entry.get(mod)
 
       this.merge(newEntry)
@@ -309,12 +322,10 @@ class Entry {
       if (! mod.loaded) {
         return this._loaded = LOAD_INCOMPLETE
       }
+
+      assignExportsToNamespace(this)
+      this.initNamespace()
     }
-
-    // Update CJS and bridged ES modules.
-    assignExportsToNamespace(this)
-
-    this.initNamespace()
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
     return this._loaded = LOAD_COMPLETED
@@ -377,12 +388,9 @@ class Entry {
 function assignExportsToNamespace(entry, names) {
   const { _namespace, getters } = entry
   const exported = entry.module.exports
-
-  const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
 
-  if (! isESM &&
-      ! isLoaded &&
+  if (! isLoaded &&
       exported &&
       exported.__esModule &&
       exported.default &&
@@ -409,9 +417,7 @@ function assignExportsToNamespace(entry, names) {
   }
 
   for (const name of names) {
-    if (isESM) {
-      _namespace[name] = exported[name]
-    } else if (! (isCJS && name === "default") &&
+    if (! (isCJS && name === "default") &&
         ! Reflect.has(_namespace, name)) {
       setGetter(_namespace, name, () => {
         if (has(exported, name)) {
@@ -422,9 +428,7 @@ function assignExportsToNamespace(entry, names) {
       setSetter(_namespace, name, (value) => {
         exported[name] = value
       })
-    }
 
-    if (! Reflect.has(getters, name)) {
       entry.addGetter(name, () => entry.namespace[name])
     }
   }
@@ -685,9 +689,10 @@ function runSetter(entry, name, callback) {
 
   const isNs = name === "*"
   const isNsChanged = isNs && entry._changed
+  const { setters } = entry
 
   try {
-    for (const setter of entry.setters[name]) {
+    for (const setter of setters[name]) {
       const nsImport = isNs && setter.from === "import"
       const nsSetter = isNsChanged && setter.from === "nsSetter"
       const value = nsSetter ? void 0 : getExportByName(entry, setter, name)
