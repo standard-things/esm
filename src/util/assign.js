@@ -1,11 +1,11 @@
 const { hasOwnProperty } = Object.prototype
 
 function assign(object) {
-  const argCount = arguments.length
+  const { length } = arguments
 
   let i = 0
 
-  while (++i < argCount) {
+  while (++i < length) {
     const source = arguments[i]
 
     for (const name in source) {

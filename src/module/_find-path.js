@@ -68,13 +68,7 @@ function findPath(request, paths, isMain, searchExts) {
        code === BACKWARD_SLASH)
   }
 
-  const pathsCount = paths.length
-
-  let i = -1
-
-  while (++i < pathsCount) {
-    const curPath = paths[i]
-
+  for (const curPath of paths) {
     if (curPath &&
         stat(curPath) !== 1) {
       continue

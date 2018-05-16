@@ -527,13 +527,13 @@ function init() {
   function pad(visitor, newCode, oldStart, oldEnd) {
     const oldCode = visitor.code.slice(oldStart, oldEnd)
     const oldLines = oldCode.split("\n")
-    const oldLineCount = oldLines.length
     const newLines = newCode.split("\n")
     const lastIndex = newLines.length - 1
+    const { length } = oldLines
 
     let i = lastIndex - 1
 
-    while (++i < oldLineCount) {
+    while (++i < length) {
       const oldLine = oldLines[i]
       const lastCharCode = oldLine.charCodeAt(oldLine.length - 1)
 

@@ -2,11 +2,11 @@ import copyProperty from "./copy-property.js"
 import keysAll from "./keys-all.js"
 
 function copy(object) {
-  const argCount = arguments.length
+  const { length } = arguments
 
   let i = 0
 
-  while (++i < argCount) {
+  while (++i < length) {
     const source = arguments[i]
     const names = keysAll(source)
 
