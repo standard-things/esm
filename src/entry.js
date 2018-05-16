@@ -688,13 +688,13 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback) {
   entry._runningSetter = name
 
+  const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
   const isNsChanged = isNs && entry._changed
-  const { setters } = entry
 
   try {
-    for (const setter of setters[name]) {
-      const nsImport = isNs && setter.from === "import"
+    for (const setter of entry.setters[name]) {
+      const nsImport = isNs && isLoaded && setter.from === "import"
       const nsSetter = isNsChanged && setter.from === "nsSetter"
       const value = nsSetter ? void 0 : getExportByName(entry, setter, name)
 
