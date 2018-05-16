@@ -1,6 +1,5 @@
 import encodeId from "../util/encode-id.js"
 import setDeferred from "../util/set-deferred.js"
-import shared from "../shared.js"
 
 const { filename } = __non_webpack_module__
 
@@ -10,7 +9,7 @@ const ESM = {
 }
 
 setDeferred(ESM, "PKG_DIRNAME", () => {
-  return shared.module.safePath.dirname(filename)
+  return __shared__.module.safePath.dirname(filename)
 })
 
 export default ESM

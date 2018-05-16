@@ -1,6 +1,5 @@
 import ENTRY from "./constant/entry.js"
 
-import GenericArray from "./generic/array.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
 
@@ -212,7 +211,7 @@ class Entry {
     setter.localNames = localNames
     setter.parent = parent
 
-    GenericArray.push(setters, setter)
+    setters.push(setter)
 
     for (const name of localNames) {
       this.bindings[name] = false
@@ -649,8 +648,8 @@ function mergeProperty(entry, otherEntry, key) {
     const otherSetters = settersMap[name] = value[name]
 
     for (const setter of setters) {
-      if (GenericArray.indexOf(otherSetters, setter) === -1) {
-        GenericArray.push(otherSetters, setter)
+      if (otherSetters.indexOf(setter) === -1) {
+        otherSetters.push(setter)
       }
     }
   }

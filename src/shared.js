@@ -20,7 +20,9 @@ function getShared() {
     const shared = __non_webpack_require__(SHARED_SYMBOL)
 
     shared.reloaded = true
-    return shared
+
+    /* eslint-disable no-global-assign */
+    return __shared__ = shared
   } catch (e) {}
 
   return init()
@@ -241,7 +243,8 @@ function init() {
       : typeof utilBinding.errorDecoratedSymbol
   })
 
-  return shared
+  /* eslint-disable no-global-assign */
+  return __shared__ = shared
 }
 
 export default getShared()
