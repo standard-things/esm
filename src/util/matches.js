@@ -1,13 +1,13 @@
-import GenericArray from "../generic/array.js"
-
 function matches(array, pattern) {
-  if (! Array.isArray(array)) {
-    return false
+  if (Array.isArray(array)) {
+    for (const value of array) {
+      if (pattern.test(value)) {
+        return true
+      }
+    }
   }
 
-  return GenericArray.some(array, (value) => {
-    return pattern.test(value)
-  })
+  return false
 }
 
 export default matches
