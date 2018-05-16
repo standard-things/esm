@@ -48,6 +48,8 @@ const pseudoDescriptor = {
 
 class Entry {
   constructor(mod) {
+    // Entries that have added getters to this entry.
+    this._addedGettersFrom = new WeakSet
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
@@ -167,6 +169,12 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
+    const seen = this._addedGettersFrom
+
+    if (seen.has(otherEntry)) {
+      return this
+    }
+
     const { getters, name } = this
     const { getters:otherGetters } = otherEntry
 
@@ -198,6 +206,8 @@ class Entry {
         this.addGetter(key, () => STAR_ERROR)
       }
     }
+
+    seen.add(otherEntry)
 
     return this
   }
