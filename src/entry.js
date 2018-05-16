@@ -699,10 +699,13 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback) {
   entry._runningSetter = name
 
+  const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
   const isNsChanged = isNs && entry._changed
-  const isNsLoaded = isNs && entry._loaded === LOAD_COMPLETED
-  const setters = entry.setters[name]
+  const isNsLoaded = isNs && isLoaded
+
+  const settersMap = entry.setters
+  const setters = settersMap[name]
 
   try {
     for (const setter of setters) {
@@ -717,18 +720,29 @@ function runSetter(entry, name, callback) {
         callback(setter, value)
       }
     }
-
-    const length = isNsLoaded ? setters.length : 0
-
-    let i = -1
-
-    while (++i < length) {
-      if (setters[i].from === "import") {
-        setters.splice(i, 1)
-      }
-    }
   } finally {
     entry._runningSetter = null
+  }
+
+  if (isLoaded &&
+      name === "default") {
+    Reflect.deleteProperty(settersMap, name)
+    return
+  }
+
+  if (! isLoaded ||
+      ! isNs) {
+    return
+  }
+
+  const length = setters.length
+
+  let i = -1
+
+  while (++i < length) {
+    if (setters[i].from === "import") {
+      setters.splice(i, 1)
+    }
   }
 }
 
