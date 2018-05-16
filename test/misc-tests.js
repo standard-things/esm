@@ -1003,7 +1003,8 @@ describe("spec compliance", () => {
       "./fixture/cycle/tdz/no-access/class/a.mjs",
       "./fixture/cycle/tdz/no-access/const/a.mjs",
       "./fixture/cycle/tdz/no-access/function/a.mjs",
-      "./fixture/cycle/tdz/no-access/let/a.mjs"
+      "./fixture/cycle/tdz/no-access/let/a.mjs",
+      "./fixture/cycle/tdz/no-access/namespace/a.mjs"
     ]
     .reduce((promise, request) =>
       promise
@@ -1019,7 +1020,8 @@ describe("spec compliance", () => {
     [
       "./fixture/cycle/tdz/access/class/a.mjs",
       "./fixture/cycle/tdz/access/const/a.mjs",
-      "./fixture/cycle/tdz/access/let/a.mjs"
+      "./fixture/cycle/tdz/access/let/a.mjs",
+      "./fixture/cycle/tdz/access/namespace/a.mjs"
     ]
     .reduce((promise, request) =>
       promise
