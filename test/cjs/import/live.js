@@ -249,13 +249,20 @@ export default () => {
   assert.deepStrictEqual(objects.map(getTagFromString), ["Function", "Module", "Function"])
   assert.deepStrictEqual(objects.map(getTagFromSymbol), [void 0, "Module", void 0])
 
+  class SubEvents1 extends events1 {}
+  class SubEvents3 extends events3 {}
+
   const builtinCtors = [events1, events3]
   const stream = new Stream
+  const subEvents1 = new SubEvents1
+  const subEvents3 = new SubEvents3
 
   builtinCtors.forEach((Ctor) => {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
     assert.ok(stream instanceof Ctor)
+    assert.ok(subEvents1 instanceof Ctor)
+    assert.ok(subEvents3 instanceof Ctor)
   })
 
   objects = [accessor1, accessor2, accessor3]
