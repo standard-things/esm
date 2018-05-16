@@ -12,6 +12,7 @@ import has from "./util/has.js"
 import isMJS from "./util/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
+import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
@@ -230,23 +231,19 @@ class Entry {
   }
 
   initNamespace() {
-    const { namespace } = this
+    this.initNamespace = noop
 
-    if (this.cjsNamespace === namespace) {
-      setDeferred(this, "cjsNamespace", function () {
-        return createNamespace(this, {
-          namespace: {
-            default: this.module.exports
-          }
-        })
+    setDeferred(this, "cjsNamespace", function () {
+      return createNamespace(this, {
+        namespace: {
+          default: this.module.exports
+        }
       })
-    }
+    })
 
-    if (this.esmNamespace === namespace) {
-      setDeferred(this, "esmNamespace", function () {
-        return createNamespace(this)
-      })
-    }
+    setDeferred(this, "esmNamespace", function () {
+      return createNamespace(this)
+    })
   }
 
   loaded() {
@@ -314,11 +311,10 @@ class Entry {
       }
     }
 
+    // Update CJS and bridged ES modules.
     assignExportsToNamespace(this)
 
-    if (this._loaded !== LOAD_COMPLETED) {
-      this.initNamespace()
-    }
+    this.initNamespace()
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
     return this._loaded = LOAD_COMPLETED
