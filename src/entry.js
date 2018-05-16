@@ -207,6 +207,7 @@ class Entry {
       this.setters[name] ||
       (this.setters[name] = [])
 
+    setter.from = setter.from || ""
     setter.last = { __proto__: null }
     setter.localNames = localNames
     setter.parent = parent
@@ -688,20 +689,32 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback) {
   entry._runningSetter = name
 
-  const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
   const isNsChanged = isNs && entry._changed
+  const isNsLoaded = isNs && entry._loaded === LOAD_COMPLETED
+  const setters = entry.setters[name]
 
   try {
-    for (const setter of entry.setters[name]) {
-      const nsImport = isNs && isLoaded && setter.from === "import"
-      const nsSetter = isNsChanged && setter.from === "nsSetter"
+    for (const setter of setters) {
+      const { from } = setter
+      const nsImport = isNsLoaded && from === "import"
+      const nsSetter = isNsChanged && from === "nsSetter"
       const value = nsSetter ? void 0 : getExportByName(entry, setter, name)
 
       if (nsImport ||
           nsSetter ||
           changed(setter, name, value)) {
         callback(setter, value)
+      }
+    }
+
+    const length = isNsLoaded ? setters.length : 0
+
+    let i = -1
+
+    while (++i < length) {
+      if (setters[i].from === "import") {
+        setters.splice(i, 1)
       }
     }
   } finally {
