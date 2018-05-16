@@ -10,18 +10,17 @@ function init() {
 
   class TemporalVisitor extends Visitor {
     reset(rootPath, options) {
-      this.assignableExports = options.assignableExports
-      this.importLocals = options.importLocals
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
+      this.temporals = options.temporals
     }
 
     visitIdentifier(path) {
       const node = path.getValue()
       const { name } = node
 
-      if (this.importLocals[name] === true &&
+      if (this.temporals[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         wrapInCheck(this, path)
       }

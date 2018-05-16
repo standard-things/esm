@@ -56,6 +56,7 @@ function init() {
       this.runtimeName = options.runtimeName
       this.sourceType = options.sourceType
       this.strict = options.strict
+      this.temporals = { __proto__: null }
       this.top = options.top
     }
 
@@ -179,7 +180,7 @@ function init() {
       )
 
       hoistImports(this, node, hoistedCode)
-      addImportLocals(this, specifierMap)
+      addLocals(this, specifierMap)
     }
 
     visitExportAllDeclaration(path) {
@@ -421,13 +422,15 @@ function init() {
     }
   }
 
-  function addImportLocals(visitor, specifierMap) {
-    const { importLocals } = visitor
+  function addLocals(visitor, specifierMap) {
+    const { importLocals, temporals } = visitor
 
     for (const importName in specifierMap) {
-      if (importName !== "*") {
-        for (const localName of specifierMap[importName]) {
-          importLocals[localName] = true
+      for (const localName of specifierMap[importName]) {
+        importLocals[localName] = true
+
+        if (importName !== "*") {
+          temporals[localName] = true
         }
       }
     }

@@ -163,11 +163,9 @@ function init() {
 
       const {
         addedImportExport,
-        importLocals
+        importLocals,
+        temporals
       } = importExportVisitor
-
-      const importLocalNames = keys(importLocals)
-      const possibleLocalIndexes = findIndexes(code, importLocalNames)
 
       if (addedImportExport ||
           importExportVisitor.addedImportMeta) {
@@ -177,14 +175,11 @@ function init() {
 
         const possibleIndexes = findIndexes(code, [
           "eval",
+          ...keys(importLocals),
           ...keys(assignableExports)
         ])
 
-        possibleIndexes.push(...possibleLocalIndexes)
-
         if (possibleIndexes.length) {
-          possibleIndexes.sort()
-
           try {
             assignmentVisitor.visit(rootPath, {
               assignableExports,
@@ -215,15 +210,16 @@ function init() {
           result.enforceTDZ = () => {
             result.enforceTDZ = noop
 
-            const possibleIndexes = possibleExportIndexes
-              .concat(possibleLocalIndexes)
-              .sort()
+            const possibleIndexes = findIndexes(code, keys(temporals))
+
+            possibleIndexes.push(...possibleExportIndexes)
+            possibleIndexes.sort()
 
             temporalVisitor.visit(rootPath, {
-              importLocals,
               magicString,
               possibleIndexes,
-              runtimeName
+              runtimeName,
+              temporals
             })
 
             result.code = magicString.toString()
