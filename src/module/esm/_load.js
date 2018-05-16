@@ -17,8 +17,6 @@ import moduleState from "../state.js"
 import parseState from "../../parse/state.js"
 import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
-import setGetter from "../../util/set-getter.js"
-import setSetter from "../../util/set-setter.js"
 import shared from "../../shared.js"
 
 const {
@@ -157,17 +155,20 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
     if (threw) {
       if (state === moduleState) {
         // Unlike CJS, ESM errors are preserved for subsequent loads.
-        setGetter(state._cache, cacheKey, () => {
-          throw error
-        })
-
-        setSetter(state._cache, cacheKey, function (value) {
-          Reflect.defineProperty(this, cacheKey, {
-            configurable: true,
-            enumerable: true,
-            value,
-            writable: true
-          })
+        Reflect.defineProperty(state._cache, cacheKey, {
+          configurable: true,
+          enumerable: true,
+          get() {
+            throw error
+          },
+          set(value) {
+            Reflect.defineProperty(this, cacheKey, {
+              configurable: true,
+              enumerable: true,
+              value,
+              writable: true
+            })
+          }
         })
       } else {
         Reflect.deleteProperty(state._cache, cacheKey)

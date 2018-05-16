@@ -16,7 +16,6 @@ import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import setGetter from "./util/set-getter.js"
-import setSetter from "./util/set-setter.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 
@@ -419,14 +418,17 @@ function assignExportsToNamespace(entry, names) {
   for (const name of names) {
     if (! (isCJS && name === "default") &&
         ! Reflect.has(_namespace, name)) {
-      setGetter(_namespace, name, () => {
-        if (has(exported, name)) {
-          return exported[name]
+      Reflect.defineProperty(_namespace, name, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          if (has(exported, name)) {
+            return exported[name]
+          }
+        },
+        set(value) {
+          exported[name] = value
         }
-      })
-
-      setSetter(_namespace, name, (value) => {
-        exported[name] = value
       })
 
       entry.addGetter(name, () => entry.namespace[name])
