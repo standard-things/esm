@@ -131,8 +131,7 @@ class Package {
 
         if (cacheNames &&
             cacheNames.length) {
-          const nycCachePath = resolve(cachePath, "../nyc")
-          const nycCacheNames = readdir(nycCachePath)
+          const { nycCacheNames } = shared
 
           if (nycCacheNames &&
               ! nycCacheNames.length) {

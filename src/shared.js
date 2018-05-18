@@ -111,6 +111,14 @@ function init() {
       : "inspect"
   })
 
+  setDeferred(shared, "nycCacheNames", () => {
+    const { fsReaddir, safePath, safeProcess } = shared.module
+    const cwd = safeProcess.cwd()
+    const nycCachePath = safePath.resolve(cwd, "node_modules/.cache/nyc")
+
+    return fsReaddir(nycCachePath)
+  })
+
   setDeferred(shared, "proxyNativeSourceText", () => {
     try {
       return funcToString.call(dummyProxy)
