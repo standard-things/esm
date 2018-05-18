@@ -186,8 +186,7 @@ function cleanCache(cachePath) {
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
-    if (cacheName.startsWith(".babel.") &&
-        extname(cacheName) === ".json") {
+    if (extname(cacheName) === ".json") {
       removeFile(resolve(babelCachePath, cacheName))
     }
   }
