@@ -12,7 +12,6 @@ import defaults from "./util/defaults.js"
 import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
-import isDirectory from "./util/is-directory.js"
 import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
@@ -131,9 +130,14 @@ class Package {
         let cacheNames = readdir(cachePath)
 
         if (cacheNames &&
-            cacheNames.length &&
-            isDirectory(resolve(cachePath, "../nyc"))) {
-          cacheNames = null
+            cacheNames.length) {
+          const nycCachePath = resolve(cachePath, "../nyc")
+          const nycCacheNames = readdir(nycCachePath)
+
+          if (nycCacheNames &&
+              ! nycCacheNames.length) {
+            cacheNames = null
+          }
         }
 
         let hasBuffer = false
