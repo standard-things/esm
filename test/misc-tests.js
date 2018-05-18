@@ -1027,10 +1027,7 @@ describe("spec compliance", () => {
       promise
         .then(() => import(request))
         .then(() => assert.ok(false))
-        .catch((e) => {
-          assert.ok(e instanceof ReferenceError)
-          assert.ok(e.message.includes(" is not defined"))
-        })
+        .catch((e) => assert.ok(e instanceof ReferenceError))
     , Promise.resolve())
   )
 
