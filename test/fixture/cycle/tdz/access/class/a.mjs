@@ -1,3 +1,9 @@
-import "./b.mjs"
+import { B } from "./b.mjs"
 
-export class A {}
+B.A()
+
+export class A {
+  static B() {
+    return B
+  }
+}

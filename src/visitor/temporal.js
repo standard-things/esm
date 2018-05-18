@@ -24,8 +24,6 @@ function init() {
           ! isShadowed(path, name, shadowedMap)) {
         wrapInCheck(this, path)
       }
-
-      this.visitChildren(path)
     }
 
     visitExportDefaultDeclaration(path) {
@@ -35,6 +33,8 @@ function init() {
         node.end,
         this.runtimeName + '.u(["default"]);'
       )
+
+      path.call(this, "visitWithoutReset", "declaration")
     }
 
     visitExportNamedDeclaration(path) {
@@ -68,6 +68,10 @@ function init() {
           ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"
         )
       }
+
+      if (declaration) {
+        path.call(this, "visitWithoutReset", "declaration")
+      }
     }
   }
 
@@ -80,7 +84,8 @@ function init() {
     const { name } = node
 
     const parent = path.getParentNode(({ type }) => {
-      if (type === "ForStatement") {
+      if (type === "CallExpression" ||
+          type === "ForStatement") {
         return true
       }
 
@@ -106,7 +111,6 @@ function init() {
       }
 
       if (type === "AssignmentExpression" ||
-          type === "CallExpression" ||
           type === "ExpressionStatement") {
         return useParent = true
       }

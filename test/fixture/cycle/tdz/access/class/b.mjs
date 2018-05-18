@@ -1,5 +1,7 @@
 import { A } from "./a.mjs"
 
-if (true) {
-  new A()
+export class B {
+  static A() {
+    return A
+  }
 }
