@@ -11,6 +11,18 @@ function init() {
   return safeProcess
 }
 
-export default shared.inited
+const safeProcess = shared.inited
   ? shared.module.safeProcess
   : shared.module.safeProcess = init()
+
+export const {
+  cwd,
+  env,
+  release,
+  pid,
+  platform,
+  version,
+  versions
+} = safeProcess
+
+export default safeProcess

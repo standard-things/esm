@@ -1,12 +1,11 @@
+import { pid, release } from "../safe/process.js"
+
 import captureStackTrace from "../error/capture-stack-trace.js"
 import realProcess from "../real/process.js"
 import safeConsole from "../safe/console.js"
-import safeProcess from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
-  const { pid, release } = safeProcess
-
   const WARNING_PREFIX = "(" + release.name + ":" + pid + ") "
 
   const ExError = shared.external.Error
