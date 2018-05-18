@@ -12,6 +12,7 @@ import defaults from "./util/defaults.js"
 import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
+import isDirectory from "./util/is-directory.js"
 import isFile from "./util/is-file.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
@@ -118,16 +119,25 @@ class Package {
 
     if (! cache) {
       cache =
-      dir[cachePath] = {}
+      dir[cachePath] = {
+        buffer: null,
+        compile: null,
+        map: null
+      }
 
-      let compileCache =
-      cache.compile = { __proto__: null }
+      let compileCache = { __proto__: null }
 
       if (cachePath) {
-        let hasBuffer
-        let hasMap
+        let cacheNames = readdir(cachePath)
 
-        const cacheNames = readdir(cachePath)
+        if (cacheNames &&
+            cacheNames.length &&
+            isDirectory(resolve(cachePath, "../nyc"))) {
+          cacheNames = null
+        }
+
+        let hasBuffer = false
+        let hasMap = false
 
         for (const cacheName of cacheNames) {
           if (cacheName.charCodeAt(0) !== DOT) {
@@ -155,6 +165,8 @@ class Package {
           ? readJSON(resolve(cachePath, ".data.json"))
           : {}
       }
+
+      cache.compile = compileCache
     }
 
     this.cache = cache
