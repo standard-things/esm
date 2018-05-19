@@ -150,20 +150,20 @@ const Runtime = {
       request = String(request)
     }
 
-    return new ExPromise((resolve, reject) => {
+    return new ExPromise((resolvePromise, rejectPromise) => {
       setImmediate(() => {
         const { entry } = this
 
         const setterArgsList = [["*", null, createSetter("import", (value, childEntry) => {
           if (childEntry._loaded === 1) {
-            resolve(value)
+            resolvePromise(value)
           }
         })]]
 
         try {
           watchImport(entry, request, setterArgsList, loadESM)
         } catch (e) {
-          reject(e)
+          rejectPromise(e)
         }
       })
     })
