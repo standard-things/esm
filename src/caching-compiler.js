@@ -215,150 +215,152 @@ function init() {
     }
   }
 
-  if (! shared.inited) {
-    realProcess.setMaxListeners(realProcess.getMaxListeners() + 1)
+  if (shared.inited) {
+    return CachingCompiler
+  }
 
-    realProcess.once("exit", () => {
-      realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
+  realProcess.setMaxListeners(realProcess.getMaxListeners() + 1)
 
-      const { pendingMetas, pendingWrites } = shared
-      const { dir } = shared.package
+  realProcess.once("exit", () => {
+    realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
 
-      for (const cachePath in dir) {
-        if (cachePath === "") {
-          continue
+    const { pendingMetas, pendingWrites } = shared
+    const { dir } = shared.package
+
+    for (const cachePath in dir) {
+      if (cachePath === "") {
+        continue
+      }
+
+      if (NYC) {
+        writeMarker(cachePath + sep + ".nyc")
+      }
+
+      const cache = dir[cachePath]
+
+      if (! cache.dirty) {
+        continue
+      }
+
+      Reflect.deleteProperty(pendingMetas, cachePath)
+      Reflect.deleteProperty(pendingWrites, cachePath)
+
+      if (! mkdirp(cachePath)) {
+        continue
+      }
+
+      writeMarker(cachePath + sep + ".dirty")
+
+      for (const cacheName in cache.compile) {
+        if (cacheName === ".data.blob" ||
+            cacheName === ".data.json" ||
+            isCacheName(cacheName)) {
+          removeCacheFile(cachePath, cacheName)
         }
+      }
+    }
 
-        if (NYC) {
-          writeMarker(cachePath + sep + ".nyc")
-        }
+    for (const cachePath in pendingMetas) {
+      if (! mkdirp(cachePath)) {
+        continue
+      }
 
-        const cache = dir[cachePath]
+      const cache = dir[cachePath]
+      const compileDatas = cache.compile
+      const scriptDatas = pendingMetas[cachePath]
 
-        if (! cache.dirty) {
-          continue
-        }
+      for (const cacheName in compileDatas) {
+        const compileData = compileDatas[cacheName]
 
-        Reflect.deleteProperty(pendingMetas, cachePath)
-        Reflect.deleteProperty(pendingWrites, cachePath)
-
-        if (! mkdirp(cachePath)) {
-          continue
-        }
-
-        writeMarker(cachePath + sep + ".dirty")
-
-        for (const cacheName in cache.compile) {
-          if (cacheName === ".data.blob" ||
-              cacheName === ".data.json" ||
-              isCacheName(cacheName)) {
-            removeCacheFile(cachePath, cacheName)
-          }
+        if (compileData &&
+            compileData !== true &&
+            ! scriptDatas[cacheName]) {
+          scriptDatas[cacheName] = compileData.scriptData
         }
       }
 
-      for (const cachePath in pendingMetas) {
-        if (! mkdirp(cachePath)) {
-          continue
+      const buffers = []
+      const map = { __proto__: null }
+
+      let offset = 0
+
+      for (const cacheName in scriptDatas) {
+        let offsetStart = -1
+        let offsetEnd = -1
+
+        const scriptData = scriptDatas[cacheName]
+
+        if (scriptData) {
+          offsetStart = offset
+          offsetEnd = offset += scriptData.length
+          buffers.push(scriptData)
         }
 
-        const cache = dir[cachePath]
-        const compileDatas = cache.compile
-        const scriptDatas = pendingMetas[cachePath]
+        const compileData = compileDatas[cacheName]
+        const meta = [offsetStart, offsetEnd]
 
-        for (const cacheName in compileDatas) {
-          const compileData = compileDatas[cacheName]
+        if (compileData) {
+          const { sourceType, warnings } = compileData
+          const changed = +compileData.changed
+          const topLevelReturn = +compileData.topLevelReturn
 
-          if (compileData &&
-              compileData !== true &&
-              ! scriptDatas[cacheName]) {
-            scriptDatas[cacheName] = compileData.scriptData
-          }
-        }
-
-        const buffers = []
-        const map = { __proto__: null }
-
-        let offset = 0
-
-        for (const cacheName in scriptDatas) {
-          let offsetStart = -1
-          let offsetEnd = -1
-
-          const scriptData = scriptDatas[cacheName]
-
-          if (scriptData) {
-            offsetStart = offset
-            offsetEnd = offset += scriptData.length
-            buffers.push(scriptData)
-          }
-
-          const compileData = compileDatas[cacheName]
-          const meta = [offsetStart, offsetEnd]
-
-          if (compileData) {
-            const { sourceType, warnings } = compileData
-            const changed = +compileData.changed
-            const topLevelReturn = +compileData.topLevelReturn
-
-            if (sourceType === SCRIPT) {
-              if (topLevelReturn) {
-                meta.push(
-                  sourceType,
-                  changed,
-                  topLevelReturn
-                )
-              } else if (changed) {
-                meta.push(
-                  sourceType,
-                  changed
-                )
-              }
-            } else {
+          if (sourceType === SCRIPT) {
+            if (topLevelReturn) {
               meta.push(
                 sourceType,
                 changed,
-                topLevelReturn,
-                compileData.dependencySpecifiers || 0,
-                compileData.exportFrom || 0,
-                compileData.exportNames || 0,
-                compileData.exportStars || 0
+                topLevelReturn
               )
+            } else if (changed) {
+              meta.push(
+                sourceType,
+                changed
+              )
+            }
+          } else {
+            meta.push(
+              sourceType,
+              changed,
+              topLevelReturn,
+              compileData.dependencySpecifiers || 0,
+              compileData.exportFrom || 0,
+              compileData.exportNames || 0,
+              compileData.exportStars || 0
+            )
 
-              if (warnings) {
-                meta.push(warnings)
-              }
+            if (warnings) {
+              meta.push(warnings)
             }
           }
-
-          map[cacheName] = meta
         }
 
-        writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
-        writeFile(cachePath + sep + ".data.json", JSON.stringify(map))
+        map[cacheName] = meta
       }
 
-      for (const cachePath in pendingWrites) {
-        if (! mkdirp(cachePath)) {
-          continue
-        }
+      writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
+      writeFile(cachePath + sep + ".data.json", JSON.stringify(map))
+    }
 
-        const entries = pendingWrites[cachePath]
+    for (const cachePath in pendingWrites) {
+      if (! mkdirp(cachePath)) {
+        continue
+      }
 
-        for (const cacheName in entries) {
-          const entry = entries[cacheName]
+      const entries = pendingWrites[cachePath]
 
-          // Add "main" to enable the `readFileFast` fast path of
-          // `process.binding("fs").internalModuleReadJSON`.
-          const code = '"main";' + entry.compileData.code
+      for (const cacheName in entries) {
+        const entry = entries[cacheName]
 
-          if (writeFile(cachePath + sep + cacheName, code)) {
-            removeExpired(cachePath, cacheName)
-          }
+        // Add "main" to enable the `readFileFast` fast path of
+        // `process.binding("fs").internalModuleReadJSON`.
+        const code = '"main";' + entry.compileData.code
+
+        if (writeFile(cachePath + sep + cacheName, code)) {
+          removeExpired(cachePath, cacheName)
         }
       }
-    })
-  }
+    }
+  })
 
   return CachingCompiler
 }
