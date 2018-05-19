@@ -1,9 +1,10 @@
+import url, { URL } from "url"
+
 import Compiler from "../build/compiler.js"
 
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import path from "path"
-import url from "url"
 
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
@@ -53,9 +54,14 @@ describe("dynamic import", () => {
   )
 
   it("should coerce specifier to a string", () => {
-    const parsed = url.parse(abcURL)
+    let parsed
 
-    parsed.toString = () => parsed.href
+    if (URL) {
+      parsed = new URL(abcURL)
+    } else {
+      parsed = url.parse(abcURL)
+      parsed.toString = () => parsed.href
+    }
 
     return import(parsed)
       .then((ns) => assert.deepStrictEqual(ns, abcNs))
