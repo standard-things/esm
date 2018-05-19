@@ -3,9 +3,7 @@ import shared from "../shared.js"
 function init() {
   function hasNamed(nodes, name) {
     for (const node of nodes) {
-      const id = node.type === "VariableDeclarator" ? node.id : node
-
-      if (id.name === name) {
+      if (isNamed(node, name)) {
         return true
       }
     }
@@ -26,6 +24,27 @@ function init() {
     }
 
     return false
+  }
+
+  function isNamed(node, name) {
+    const { type } = node
+
+    if (type === "ArrowFunctionExpression") {
+      return false
+    }
+
+    if (type === "FunctionDeclaration" ||
+        type === "VariableDeclarator") {
+      return node.id.name === name
+    }
+
+    if (type === "FunctionExpression") {
+      const { id } = node
+
+      return id !== null && id.name === name
+    }
+
+    return node.name === name
   }
 
   function isShadowed(path, name, map) {
@@ -49,7 +68,9 @@ function init() {
       } else if (type === "FunctionDeclaration" ||
           type === "FunctionExpression" ||
           type === "ArrowFunctionExpression") {
-        shadowed = hasParameter(parent, name)
+        shadowed =
+          isNamed(parent, name) ||
+          hasParameter(parent, name)
       }
 
       return cache[name] = shadowed
