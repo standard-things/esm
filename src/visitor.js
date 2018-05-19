@@ -24,6 +24,7 @@ function init() {
     elements: true,
     expression: true,
     expressions: true,
+    handler: true,
     init: true,
     left: true,
     object: true,

@@ -18,6 +18,10 @@ const abcNs = createNamespace({
   default: "default"
 })
 
+function assertAbcNs(ns) {
+  assert.deepStrictEqual(ns, abcNs)
+}
+
 describe("dynamic import", () => {
   it("should establish live binding of values", () =>
     import("./fixture/live.mjs").then((ns) => {
@@ -35,22 +39,22 @@ describe("dynamic import", () => {
 
   it("should accept a variable", () =>
     import(abcPath)
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      .then(assertAbcNs)
   )
 
   it("should accept a template string", () =>
     import(`${abcPath}`)
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      .then(assertAbcNs)
   )
 
   it("should accept an expression", () =>
     import((() => abcPath)())
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      .then(assertAbcNs)
   )
 
   it("should support the file protocol", () =>
     import(abcURL)
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      .then(assertAbcNs)
   )
 
   it("should coerce specifier to a string", () => {
@@ -64,13 +68,14 @@ describe("dynamic import", () => {
     }
 
     return import(parsed)
-      .then((ns) => assert.deepStrictEqual(ns, abcNs))
+      .then(assertAbcNs)
   })
 
   it("should support `import()` in an initial assignment", () => {
     const p = import("./fixture/export/abc.mjs")
 
-    assert.ok(p instanceof Promise)
+    return p
+      .then(assertAbcNs)
   })
 
   it("should support `import()` in a reassignment", () => {
@@ -78,11 +83,26 @@ describe("dynamic import", () => {
 
     p = import("./fixture/export/abc.mjs")
 
-    assert.ok(p instanceof Promise)
+    return p
+      .then(assertAbcNs)
   })
 
-  it("should support `import()` in call expression", () => {
-    assert.ok(import("./fixture/export/abc.mjs") instanceof Promise)
+  it("should support `import()` in a call expression", () => {
+    function identity(value) {
+      return value
+    }
+
+    return identity(import("./fixture/export/abc.mjs"))
+      .then(assertAbcNs)
+  })
+
+  it("should support `import()` in a catch block", () => {
+    try {
+      throw new Error
+    } catch (e) {
+      return import("./fixture/export/abc.mjs")
+        .then(assertAbcNs)
+    }
   })
 
   it("should support `import()` in a class", () => {
@@ -92,7 +112,8 @@ describe("dynamic import", () => {
       }
     }
 
-    assert.ok(new P instanceof Promise)
+    return new P()
+      .then(assertAbcNs)
   })
 
   it("should support `import()` in a function", () => {
@@ -100,7 +121,8 @@ describe("dynamic import", () => {
       return import("./fixture/export/abc.mjs")
     }
 
-    assert.ok(p() instanceof Promise)
+    return p()
+      .then(assertAbcNs)
   })
 
   it("should support `import()` with yield", () => {
@@ -108,7 +130,10 @@ describe("dynamic import", () => {
       yield import("./fixture/export/abc.mjs")
     }
 
-    assert.ok(p())
+    return p()
+      .next()
+      .value
+      .then(assertAbcNs)
   })
 
   it("should be syntactic", () =>
