@@ -25,7 +25,7 @@ const {
   writeFileSync
 } = require("fs")
 
-const { resolve } = require("path")
+const { sep } = require("path")
 
 const Module = require("module")
 const NativeModule = bootstrap && bootstrap.NativeModule
@@ -57,14 +57,14 @@ function compileESM() {
     content = NativeModule._source["internal/esm/loader"]
   } else {
     const cacheName = md5(nodeVersion + "\0" + engineVersion) + ".blob"
-    const loaderPath = resolve(__dirname, "esm/loader.js")
+    const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
 
-    nodeModulesPath = resolve(__dirname, "node_modules")
-    cachePath = resolve(nodeModulesPath, ".cache")
-    cacheFilename = resolve(cachePath, cacheName)
+    nodeModulesPath = __dirname + sep + "node_modules"
+    cachePath = nodeModulesPath + sep + ".cache"
+    cacheFilename = cachePath + sep + cacheName
     cachedData = readFile(cacheFilename)
     content = readFile(loaderPath, "utf8")
-    filename = resolve(__dirname, filename)
+    filename = __dirname + sep + filename
   }
 
   const script = new Script(
