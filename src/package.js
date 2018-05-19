@@ -151,16 +151,24 @@ class Package {
           }
         }
 
+        const hasNycNoMarker = NYC && ! hasNycMarker
+        const noNycHasMarker = ! NYC && hasNycMarker
+
         if (hasDirtyMarker ||
-            (NYC &&
-             ! hasNycMarker)) {
+            hasNycNoMarker ||
+            noNycHasMarker) {
           compileCache = { __proto__: null }
           hasBuffer =
           hasMap = false
         }
 
+        if (noNycHasMarker) {
+          removeFile(cachePath + sep + ".nyc")
+        }
+
         if (hasDirtyMarker) {
-          cleanCache()
+          removeFile(cachePath + sep + ".dirty")
+          clearBabelCache()
         }
 
         cache.buffer = hasBuffer
@@ -195,9 +203,7 @@ class Package {
   }
 }
 
-function cleanCache(cachePath) {
-  removeFile(cachePath + sep + ".dirty")
-
+function clearBabelCache(cachePath) {
   const babelCachePath = resolve(cachePath, "../@babel/register")
   const cacheNames = readdir(babelCachePath)
 
