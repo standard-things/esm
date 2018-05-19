@@ -21,6 +21,7 @@ function init() {
     consequent: true,
     declaration: true,
     declarations: true,
+    discriminant: true,
     elements: true,
     expression: true,
     expressions: true,
