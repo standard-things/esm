@@ -1,4 +1,4 @@
-import { basename, dirname , extname, resolve } from "./safe/path.js"
+import { basename, dirname , extname, resolve, sep } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import ENV from "./constant/env.js"
@@ -99,7 +99,6 @@ class Package {
   static defaultOptions = defaultOptions
 
   constructor(dirPath, range, options) {
-    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     options = Package.createOptions(options)
 
     let cachePath
@@ -107,7 +106,7 @@ class Package {
     if (typeof options.cache === "string") {
       cachePath = resolve(dirPath, options.cache)
     } else if (options.cache !== false) {
-      cachePath = resolve(dirPath, "node_modules/.cache/esm")
+      cachePath = dirPath + sep + "node_modules" + sep + ".cache" + sep + "esm"
     } else {
       cachePath = ""
     }
@@ -161,11 +160,11 @@ class Package {
         }
 
         cache.buffer = hasBuffer
-          ? readFile(resolve(cachePath, ".data.blob"))
+          ? readFile(cachePath + sep + ".data.blob")
           : GenericBuffer.alloc(0)
 
         cache.map = hasMap
-          ? readJSON(resolve(cachePath, ".data.json"))
+          ? readJSON(cachePath + sep + ".data.json")
           : {}
       }
 
@@ -180,7 +179,6 @@ class Package {
   }
 
   static get(dirPath, force) {
-    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     return getInfo(dirPath, force) || Package.state.default
   }
 
@@ -189,20 +187,19 @@ class Package {
   }
 
   static set(dirPath, pkg) {
-    dirPath = dirPath === "" ? dirPath : resolve(dirPath)
     Package.state.cache[dirPath] = pkg || null
   }
 }
 
 function cleanCache(cachePath) {
-  removeFile(resolve(cachePath, ".dirty"))
+  removeFile(cachePath + sep + ".dirty")
 
   const babelCachePath = resolve(cachePath, "../@babel/register")
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
     if (extname(cacheName) === ".json") {
-      removeFile(resolve(babelCachePath, cacheName))
+      removeFile(babelCachePath + sep + cacheName)
     }
   }
 }
@@ -306,7 +303,7 @@ function createOptions(value) {
 
 function findRoot(dirPath) {
   if (basename(dirPath) === "node_modules" ||
-      isFile(resolve(dirPath, PACKAGE_FILENAME))) {
+      isFile(dirPath + sep + PACKAGE_FILENAME)) {
     return dirPath
   }
 
@@ -382,7 +379,7 @@ function readInfo(dirPath, force) {
   let optionsPath
   let pkg
 
-  let options = readFile(resolve(dirPath, ESMRC_FILENAME), "utf8")
+  let options = readFile(dirPath + sep + ESMRC_FILENAME, "utf8")
   let optionsFound = options !== null
 
   if (optionsFound) {
@@ -418,7 +415,7 @@ function readInfo(dirPath, force) {
 
   let parentPkg
   let pkgParsed = false
-  let pkgJSON = readFileFast(resolve(dirPath, PACKAGE_FILENAME), "utf8")
+  let pkgJSON = readFileFast(dirPath + sep + PACKAGE_FILENAME, "utf8")
 
   if (! force &&
       pkgJSON === null) {

@@ -1,4 +1,3 @@
-import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 
 function init() {
@@ -9,11 +8,9 @@ function init() {
       return ""
     }
 
-    const resolved = resolve(filename)
-
     return shared.env.win32
-      ? resolved.replace(backSlashRegExp, "/")
-      : resolved
+      ? filename.replace(backSlashRegExp, "/")
+      : filename
   }
 
   return normalize

@@ -27,9 +27,9 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import relaxRange from "../util/relax-range.js"
-import { resolve } from "../safe/path.js"
 import safeToString from "../util/safe-to-string.js"
 import satisfies from "../util/satisfies.js"
+import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 import { version } from "../version.js"
 
@@ -147,7 +147,7 @@ function hook(Mod, parent) {
       compileData = Compiler.from(entry)
 
       if (compileData) {
-        compileData.code = readCachedCode(resolve(cachePath, cacheName))
+        compileData.code = readCachedCode(cachePath + sep + cacheName)
       } else {
         Reflect.deleteProperty(cache.compile, cacheName)
         Reflect.deleteProperty(cache.map, cacheName)

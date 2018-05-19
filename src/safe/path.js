@@ -13,7 +13,8 @@ export const {
   extname,
   isAbsolute,
   normalize,
-  resolve
+  resolve,
+  sep
 } = safePath
 
 export default safePath

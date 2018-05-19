@@ -20,7 +20,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
-import { resolve } from "../safe/path.js"
+import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
 import warn from "../warn.js"
@@ -73,7 +73,7 @@ function compile(caller, entry, content, filename, fallback) {
     compileData = Compiler.from(entry)
 
     if (compileData) {
-      compileData.code = readCachedCode(resolve(pkg.cachePath, cacheName))
+      compileData.code = readCachedCode(pkg.cachePath + sep + cacheName)
     } else {
       Reflect.deleteProperty(cache.compile, cacheName)
       Reflect.deleteProperty(cache.map, cacheName)

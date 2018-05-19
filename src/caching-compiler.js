@@ -14,7 +14,7 @@ import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
 import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
-import { resolve } from "./safe/path.js"
+import { sep } from "./safe/path.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
@@ -162,7 +162,7 @@ function init() {
 
     Reflect.deleteProperty(cache.compile, cacheName)
     Reflect.deleteProperty(cache.map, cacheName)
-    removeFile(resolve(cachePath, cacheName))
+    removeFile(cachePath + sep + cacheName)
   }
 
   function removeExpired(cachePath, cacheName) {
@@ -230,7 +230,7 @@ function init() {
           continue
         }
 
-        writeFile(resolve(cachePath, ".dirty"), "")
+        writeFile(cachePath + sep + ".dirty", "")
 
         for (const cacheName in cache.compile) {
           if (cacheName === ".data.blob" ||
@@ -318,8 +318,8 @@ function init() {
           map[cacheName] = meta
         }
 
-        writeFile(resolve(cachePath, ".data.blob"), GenericBuffer.concat(buffers))
-        writeFile(resolve(cachePath, ".data.json"), JSON.stringify(map))
+        writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
+        writeFile(cachePath + sep + ".data.json", JSON.stringify(map))
       }
 
       for (const cachePath in pendingWrites) {
@@ -336,7 +336,7 @@ function init() {
           // `process.binding("fs").internalModuleReadJSON`.
           const code = '"main";' + entry.compileData.code
 
-          if (writeFile(resolve(cachePath, cacheName), code)) {
+          if (writeFile(cachePath + sep + cacheName, code)) {
             removeExpired(cachePath, cacheName)
           }
         }

@@ -6,6 +6,7 @@ import CHAR_CODE from "../constant/char-code.js"
 
 import encodeURI from "./encode-uri.js"
 import normalize from "../path/normalize.js"
+import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 
 function init() {
@@ -25,7 +26,9 @@ function init() {
   }
 
   function getURLFromFilePath(filename) {
-    filename = normalize(filename)
+    filename = typeof filename === "string"
+      ? normalize(resolve(filename))
+      : ""
 
     if (filename.charCodeAt(0) !== FORWARD_SLASH) {
       filename = "/" + filename
@@ -34,6 +37,7 @@ function init() {
     // Section 3.3: Escape Path Components
     // https://tools.ietf.org/html/rfc3986#section-3.3
     const encoded = encodeURI(filename)
+
     return "file://" + encoded.replace(encodeCharsRegExp, encodeChar)
   }
 
