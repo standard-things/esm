@@ -7,7 +7,7 @@ import keys from "./util/keys.js"
 import shared from "./shared.js"
 
 function init() {
-  const childNamesMap = new WeakMap
+  const childNamesMap = new Map
 
   const childrenToVisit = {
     __proto__: null,
