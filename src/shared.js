@@ -112,11 +112,24 @@ function init() {
   })
 
   setDeferred(shared, "nycCacheNames", () => {
-    const { fsReaddir, safePath, safeProcess } = shared.module
-    const cwd = safeProcess.cwd()
-    const nycCachePath = safePath.resolve(cwd, "node_modules/.cache/nyc")
+    const { fsReaddir, safePath, safeProcess, utilIsFile } = shared.module
+    const { dirname, sep } = safePath
 
-    return fsReaddir(nycCachePath)
+    let dirPath = safeProcess.cwd()
+
+    while (true) {
+      if (utilIsFile(dirPath + sep +  "package.json")) {
+        return fsReaddir(dirPath + sep + "node_modules" + sep + ".cache" + sep + "nyc")
+      }
+
+      const parentPath = dirname(dirPath)
+
+      if (dirPath === parentPath) {
+        return null
+      }
+
+      dirPath = parentPath
+    }
   })
 
   setDeferred(shared, "proxyNativeSourceText", () => {
