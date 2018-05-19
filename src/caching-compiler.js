@@ -1,10 +1,12 @@
 import ENTRY from "./constant/entry.js"
+import ENV from "./constant/env.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
+import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
 import has from "./util/has.js"
@@ -23,6 +25,10 @@ function init() {
     TYPE_CJS,
     TYPE_ESM
   } = ENTRY
+
+  const {
+    NYC
+  } = ENV
 
   const {
     MODULE,
@@ -203,6 +209,12 @@ function init() {
     }
   }
 
+  function writeMarker(filename) {
+    if (! exists(filename)) {
+      writeFile(filename, "")
+    }
+  }
+
   if (! shared.inited) {
     realProcess.setMaxListeners(realProcess.getMaxListeners() + 1)
 
@@ -215,6 +227,10 @@ function init() {
       for (const cachePath in dir) {
         if (cachePath === "") {
           continue
+        }
+
+        if (NYC) {
+          writeMarker(cachePath + sep + ".nyc")
         }
 
         const cache = dir[cachePath]
@@ -230,7 +246,7 @@ function init() {
           continue
         }
 
-        writeFile(cachePath + sep + ".dirty", "")
+        writeMarker(cachePath + sep + ".dirty")
 
         for (const cacheName in cache.compile) {
           if (cacheName === ".data.blob" ||

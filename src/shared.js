@@ -111,27 +111,6 @@ function init() {
       : "inspect"
   })
 
-  setDeferred(shared, "nycCacheNames", () => {
-    const { fsReaddir, safePath, safeProcess, utilIsFile } = shared.module
-    const { dirname, sep } = safePath
-
-    let dirPath = safeProcess.cwd()
-
-    while (true) {
-      if (utilIsFile(dirPath + sep +  "package.json")) {
-        return fsReaddir(dirPath + sep + "node_modules" + sep + ".cache" + sep + "nyc")
-      }
-
-      const parentPath = dirname(dirPath)
-
-      if (dirPath === parentPath) {
-        return null
-      }
-
-      dirPath = parentPath
-    }
-  })
-
   setDeferred(shared, "proxyNativeSourceText", () => {
     try {
       return funcToString.call(dummyProxy)

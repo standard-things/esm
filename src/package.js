@@ -35,7 +35,8 @@ const {
 
 const {
   DEVELOPMENT,
-  OPTIONS
+  OPTIONS,
+  NYC
 } = ENV
 
 const {
@@ -126,20 +127,12 @@ class Package {
       let compileCache = { __proto__: null }
 
       if (cachePath) {
-        let cacheNames = readdir(cachePath)
-
-        if (cacheNames &&
-            cacheNames.length) {
-          const { nycCacheNames } = shared
-
-          if (nycCacheNames &&
-              ! nycCacheNames.length) {
-            cacheNames = null
-          }
-        }
+        const cacheNames = readdir(cachePath)
 
         let hasBuffer = false
+        let hasDirtyMarker = false
         let hasMap = false
+        let hasNycMarker = false
 
         for (const cacheName of cacheNames) {
           if (cacheName.charCodeAt(0) !== DOT) {
@@ -151,12 +144,23 @@ class Package {
           } else if (cacheName === ".data.json") {
             hasMap = true
           } else if (cacheName === ".dirty") {
-            compileCache = { __proto__: null }
-            hasBuffer =
-            hasMap = false
-            cleanCache(cachePath)
+            hasDirtyMarker = true
             break
+          } else if (cacheName === ".nyc") {
+            hasNycMarker = true
           }
+        }
+
+        if (hasDirtyMarker ||
+            (NYC &&
+             ! hasNycMarker)) {
+          compileCache = { __proto__: null }
+          hasBuffer =
+          hasMap = false
+        }
+
+        if (hasDirtyMarker) {
+          cleanCache()
         }
 
         cache.buffer = hasBuffer
