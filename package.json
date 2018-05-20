@@ -59,7 +59,7 @@
     "husky": "^0.14.3",
     "jest": "^22.4.4",
     "json-6": "^1.0.2",
-    "mocha": "^5.1.0",
+    "mocha": "^5.2.0",
     "mock-require": "^3.0.1",
     "mock-stdio": "^1.0.3",
     "module-alias": "^2.0.6",
