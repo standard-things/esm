@@ -6,6 +6,7 @@ import builtinModules from "./module/builtin-modules.js"
 import copyProperty from "./util/copy-property.js"
 import has from "./util/has.js"
 import isNamespaceObject from "./util/is-namespace-object.js"
+import isObjectLike from "./util/is-object-like.js"
 import isOwnProxy from "./util/is-own-proxy.js"
 import keysAll from "./util/keys-all.js"
 import maskFunction from "./util/mask-function.js"
@@ -42,11 +43,13 @@ function createEntry(id) {
           return true
         }
 
-        let proto = value
+        if (isObjectLike(value)) {
+          let proto = value
 
-        while ((proto = Reflect.getPrototypeOf(proto))) {
-          if (proto === proxyProto) {
-            return true
+          while ((proto = Reflect.getPrototypeOf(proto))) {
+            if (proto === proxyProto) {
+              return true
+            }
           }
         }
 

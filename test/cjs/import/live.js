@@ -260,9 +260,14 @@ export default () => {
   builtinCtors.forEach((Ctor) => {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
+
     assert.ok(stream instanceof Ctor)
     assert.ok(subEvents1 instanceof Ctor)
     assert.ok(subEvents3 instanceof Ctor)
+
+    assert.strictEqual(null instanceof Ctor, false)
+    assert.strictEqual(void 0 instanceof Ctor, false)
+    assert.strictEqual("" instanceof Ctor, false)
   })
 
   objects = [accessor1, accessor2, accessor3]
