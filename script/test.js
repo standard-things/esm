@@ -65,15 +65,13 @@ nodeArgs.push(
 )
 
 function cleanJS() {
-  return jsPaths
-    .reduce((promise, filePath) =>
-      promise
-        .then(() => fs.readFile(filePath, "utf8"))
-        .then((content) => {
-          process.once("exit", () => fs.outputFileSync(filePath, content))
-          return fs.outputFile(filePath, minifyJS(content))
-        })
-    , Promise.resolve())
+  jsPaths.forEach((filename) => {
+    const content = fs.readFileSync(filename, "utf8")
+
+    process.once("exit", () => fs.outputFileSync(filename, content))
+
+    fs.outputFileSync(filename, minifyJS(content))
+  })
 }
 
 function cleanRepo() {

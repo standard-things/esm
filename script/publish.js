@@ -33,38 +33,33 @@ const jsPaths = [
 ]
 
 function cleanJS() {
-  return jsPaths
-    .reduce((promise, filePath) =>
-      promise
-        .then(() => fs.readFile(filePath, "utf8"))
-        .then((content) => {
-          process.once("exit", () => fs.outputFileSync(filePath, content))
-          return fs.outputFile(filePath, minifyJS(content))
-        })
-    , Promise.resolve())
+  jsPaths.forEach((filename) => {
+    const content = fs.readFileSync(filename, "utf8")
+
+    process.once("exit", () => fs.outputFileSync(filename, content))
+
+    fs.outputFileSync(filename, minifyJS(content))
+  })
 }
 
 function cleanPackageJSON() {
-  return fs
-    .readFile(pkgPath, "utf8")
-    .then((content) => {
-      process.once("exit", () => fs.outputFileSync(pkgPath, content))
+  const content = fs.readFileSync(pkgPath, "utf8")
 
-      const pkgJSON = JSON.parse(content)
+  process.once("exit", () => fs.outputFileSync(pkgPath, content))
 
-      pkgJSON.scripts = defaultScripts
-      fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
-      return fs.outputFile(pkgPath, fleece.patch(content, pkgJSON))
-    })
+  const pkgJSON = JSON.parse(content)
+
+  pkgJSON.scripts = defaultScripts
+  fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
+  fs.outputFileSync(pkgPath, fleece.patch(content, pkgJSON))
 }
 
 function cleanReadme() {
-  return fs
-    .readFile(readmePath, "utf8")
-    .then((content) => {
-      process.once("exit", () => fs.outputFileSync(readmePath, content))
-      return fs.outputFile(readmePath, content.replace(tableRegExp, minifyHTML))
-    })
+  const content = fs.readFileSync(readmePath, "utf8")
+
+  process.once("exit", () => fs.outputFileSync(readmePath, content))
+
+  fs.outputFileSync(readmePath, content.replace(tableRegExp, minifyHTML))
 }
 
 function minifyHTML(content) {
