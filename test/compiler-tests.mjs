@@ -193,6 +193,23 @@ describe("compiler", () => {
     assert.ok(result.code.includes('i("a")'))
   })
 
+  it("should transform dynamic import in switch statements", () => {
+    const code = [
+      "(() => {",
+      '   switch (await import("a")) {',
+      '    case await import("b"):',
+      '      return await import ("c")',
+      "  }",
+      "})()"
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
+
+      assert.strictEqual(result.code.includes("import"), false)
+    })
+  })
+
   it("should preserve line numbers", () =>
     import("./compiler/lines.mjs")
       .then((ns) => ns.default())
