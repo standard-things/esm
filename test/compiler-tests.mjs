@@ -6,6 +6,9 @@ const SCRIPT = 1
 const MODULE = 2
 const UNAMBIGUOUS = 3
 
+const modernTypes = [MODULE, UNAMBIGUOUS]
+const sourceTypes = [SCRIPT, MODULE, UNAMBIGUOUS]
+
 describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
@@ -26,11 +29,11 @@ describe("compiler", () => {
   })
 
   it("should support `options.sourceType`", () => {
-    [MODULE, UNAMBIGUOUS]
-      .forEach((sourceType) => {
-        const result = Compiler.compile('import"a"', { sourceType })
-        assert.strictEqual(result.sourceType, MODULE)
-      })
+    modernTypes.forEach((sourceType) => {
+      const result = Compiler.compile('import"a"', { sourceType })
+
+      assert.strictEqual(result.sourceType, MODULE)
+    })
   })
 
   it("should support `options.cjs.vars`", () => {
@@ -107,12 +110,14 @@ describe("compiler", () => {
   it("should support `options.var`", () => {
     [void 0, false, true]
       .forEach((value) => {
-        const result = Compiler.compile('import a from "a"', {
-          var: value,
-          sourceType: MODULE
-        })
+        modernTypes.forEach((sourceType) => {
+          const result = Compiler.compile('import a from "a"', {
+            var: value,
+            sourceType
+          })
 
-        assert.ok(result.code.startsWith(value ? "var a" : "let a"))
+          assert.ok(result.code.startsWith(value ? "var a" : "let a"))
+        })
       })
   })
 
@@ -165,19 +170,19 @@ describe("compiler", () => {
       'import a from "a"'
     ].join("\n")
 
-    const result = Compiler.compile(code, {
-      sourceType: MODULE
-    })
+    modernTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
 
-    assert.ok(result.code.startsWith("let a"))
+      assert.ok(result.code.startsWith("let a"))
+    })
   })
 
   it("should support trailing comments", () => {
-    const result = Compiler.compile('import"a"//trailing comment', {
-      sourceType: MODULE
-    })
+    modernTypes.forEach((sourceType) => {
+      const result = Compiler.compile('import"a"//trailing comment', { sourceType })
 
-    assert.ok(result.code.endsWith("//trailing comment"))
+      assert.ok(result.code.endsWith("//trailing comment"))
+    })
   })
 
   it("should compile dynamic import with script source sourceType", () => {
@@ -203,11 +208,11 @@ describe("compiler", () => {
       'from "assert"'
     ].join("\r\n")
 
-    const result = Compiler.compile(code, {
-      sourceType: MODULE
-    })
+    modernTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
 
-    assert.ok(result.code.endsWith("\r\n".repeat(5)))
+      assert.ok(result.code.endsWith("\r\n".repeat(5)))
+    })
   })
 
   it('should not hoist above "use strict"', () =>
@@ -240,8 +245,8 @@ describe("compiler", () => {
       "export default a"
     ]
     .forEach((code) => {
-      Compiler.compile(code, {
-        sourceType: MODULE
+      modernTypes.forEach((sourceType) => {
+        Compiler.compile(code, { sourceType })
       })
     })
   })
