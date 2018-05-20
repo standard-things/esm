@@ -51,6 +51,7 @@ function cleanPackageJSON() {
       process.once("exit", () => fs.outputFileSync(pkgPath, content))
 
       const pkgJSON = JSON.parse(content)
+
       pkgJSON.scripts = defaultScripts
       fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
       return fs.outputFile(pkgPath, fleece.patch(content, pkgJSON))
