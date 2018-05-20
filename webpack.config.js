@@ -19,11 +19,11 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
+const { ESM_ENV } = process.env
 const ESM_VERSION = readJSON("./package.json").version
-const { NODE_ENV } = process.env
 
-const isProd = /production/.test(NODE_ENV)
-const isTest = /test/.test(NODE_ENV)
+const isProd = /production/.test(ESM_ENV)
+const isTest = /test/.test(ESM_ENV)
 
 const externals = [
   "Array", "Buffer", "Error", "EvalError", "Function", "JSON", "Object",

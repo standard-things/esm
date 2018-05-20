@@ -11,9 +11,8 @@ const argv = require("yargs")
   .boolean("test")
   .argv
 
-const NODE_ENV =
-  (argv.prod ? "production" : "development") +
-  (argv.test ? "-test" : "")
+const NODE_ENV = argv.prod ? "production" : "development"
+const ESM_ENV = NODE_ENV + (argv.test ? "-test" : "")
 
 const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
@@ -68,7 +67,10 @@ function getAcorn() {
 function makeBundle() {
   return execa("webpack", webpackArgs, {
     cwd: rootPath,
-    env: { NODE_ENV },
+    env: {
+      ESM_ENV,
+      NODE_ENV
+    },
     stdio: "inherit"
   })
 }

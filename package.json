@@ -15,7 +15,7 @@
   "scripts": {
     "precommit": "npm run lint",
     "prelint": "npm run pretest",
-    "prepub": "npm run test:prod",
+    "prepub": "npm run test:prod && npm run build:prod",
     "pretest": "npm run build -- --test",
     "pretest:prod": "npm run build:prod -- --test",
     "build": "node script/build.js",

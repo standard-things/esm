@@ -45,13 +45,15 @@ describe("compiler", () => {
       cjs: {
         vars: true
       },
-      sourceType: MODULE
+      sourceType: MODULE,
+      warnings: true
     })
 
     assert.strictEqual(result.warnings, null)
 
     result = Compiler.compile("arguments", {
-      sourceType: MODULE
+      sourceType: MODULE,
+      warnings: true
     })
 
     const warnings = result.warnings || []

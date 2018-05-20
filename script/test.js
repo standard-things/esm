@@ -40,11 +40,9 @@ const trashPaths = ignorePaths
     ! thePath.startsWith(vendorPath)
   )
 
+const NODE_ENV = argv.prod ? "production" : "development"
+const ESM_ENV = NODE_ENV + "-test"
 const HOME = path.resolve(envPath, "home")
-
-const NODE_ENV =
-  (argv.prod ? "production" : "development") +
-  "-test"
 
 const NODE_PATH = [
   path.resolve(envPath, "node_path"),
@@ -86,9 +84,10 @@ function runTests(cached) {
   return execa(nodePath, nodeArgs, {
     cwd: testPath,
     env: {
+      ESM_ENV: ESM_ENV + (cached ? "-cached" : ""),
       ESM_OPTIONS: "{cjs:false,mode:'auto'}",
       HOME,
-      NODE_ENV: NODE_ENV + (cached ? "-cached" : ""),
+      NODE_ENV,
       NODE_OPTIONS: "--trace-warnings",
       NODE_PATH,
       NODE_PENDING_DEPRECATION: 1,
@@ -104,6 +103,7 @@ function runTests(cached) {
 
 function setupNode() {
   const basePath = path.resolve(nodePath, isWin ? "" : "..")
+
   return trash(basePath)
     .then(() => fs.ensureLink(process.execPath, nodePath))
 }

@@ -1,6 +1,6 @@
 "use strict"
 
-const isTest = /test/.test(process.env.NODE_ENV)
+const isTest = /test/.test(process.env.ESM_ENV)
 
 module.exports = {
   env: {
