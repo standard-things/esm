@@ -1270,10 +1270,6 @@ describe("spec compliance", () => {
     import("./fixture/source/html-comment.js")
   )
 
-  it("should not error parsing metadata of CJS modules with leading multiline comments", () =>
-    import("./fixture/source/multiline-comment.js")
-  )
-
   it("should not error exporting named classes", () =>
     import("./fixture/source/named-class.mjs")
   )
