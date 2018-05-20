@@ -724,12 +724,6 @@ function runSetter(entry, name, callback) {
     entry._runningSetter = null
   }
 
-  if (isLoaded &&
-      name === "default") {
-    Reflect.deleteProperty(settersMap, name)
-    return
-  }
-
   if (! isLoaded ||
       ! isNs) {
     return
