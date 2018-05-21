@@ -24,6 +24,20 @@ import shared from "../shared.js"
 function init() {
   const { toString } = Object.prototype
 
+  function getToStringTag(target, value) {
+    if (typeof target !== "function" &&
+        typeof value !== "string") {
+      // Section 19.1.3.6: Object.prototype.toString()
+      // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
+      // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
+      const toStringTag = toString.call(target).slice(8, -1)
+
+      return toStringTag === "Object" ? value : toStringTag
+    }
+
+    return value
+  }
+
   function proxyExports(entry) {
     const exported = entry.exports
 
@@ -176,13 +190,7 @@ function init() {
     let useWrappers = ! shared.support.nativeProxyReceiver
 
     if (builtin) {
-      if (typeof exported === "function" ||
-          Reflect.has(exported, Symbol.toStringTag) ||
-          toString.call(exported) === "[object Object]") {
-        useWrappers = false
-      } else {
-        useWrappers = true
-      }
+      useWrappers = false
     } else if (! useWrappers) {
       if (typeof exported === "function") {
         useWrappers = isNative(exported)
@@ -206,20 +214,13 @@ function init() {
 
     if (useWrappers) {
       handler.get = (target, name, receiver) => {
-        const value = get(target, name, receiver)
+        let value = get(target, name, receiver)
 
         // Produce a `Symbol.toStringTag` value, otherwise
         // `Object.prototype.toString.call(proxy)` will return
         // "[object Function]", if `proxy` is a function, else "[object Object]".
-        if (name === Symbol.toStringTag &&
-            typeof target !== "function" &&
-            typeof value !== "string") {
-          // Section 19.1.3.6: Object.prototype.toString()
-          // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
-          // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
-          const toStringTag = toString.call(target).slice(8, -1)
-
-          return toStringTag === "Object" ? value : toStringTag
+        if (name === Symbol.toStringTag) {
+          value = getToStringTag(target, value)
         }
 
         return maybeWrap(target, name, value)
@@ -237,6 +238,17 @@ function init() {
         }
 
         return descriptor
+      }
+    } else if (builtin &&
+        typeof exported !== "function" &&
+        ! Reflect.has(exported, Symbol.toStringTag) &&
+        toString.call(exported) !== "[object Object]") {
+      handler.get = (target, name, receiver) => {
+        const value = Reflect.get(target, name, receiver)
+
+        return name === Symbol.toStringTag
+          ? getToStringTag(target, value)
+          : value
       }
     }
 
