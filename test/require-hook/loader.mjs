@@ -22,13 +22,7 @@ export default () => {
 
   const abcExpected = { a: "a", b: "b", c: "c", default: "default" }
 
-  assert.ok(Object.isFrozen(abc))
   assert.deepEqual(abc, abcExpected)
-
-  Object.keys(abc).forEach((name) => {
-    assert.ok(Reflect.getOwnPropertyDescriptor(abc, name).get)
-  })
-
   assert.deepStrictEqual(def, { d: "d", e: "e", f: "f" })
   assert.strictEqual(nop(), void 0)
 

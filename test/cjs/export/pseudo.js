@@ -5,28 +5,16 @@ import * as defaultNs from "../../fixture/export/nothing.mjs"
 const customValue = require("../../fixture/cjs/export/pseudo-custom.js")
 
 export default () => {
-  const partialDescriptor = {
-    configurable: false,
-    enumerable: true
-  }
+  function getDescriptor(object, name) {
+    const {
+      configurable,
+      enumerable
+    } = Reflect.getOwnPropertyDescriptor(object, name)
 
-  const defaultDescriptor = {
-    configurable: false,
-    enumerable: false,
-    value: true,
-    writable: false
-  }
-
-  function getPartialDescriptor(object, name) {
-    const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
-
-    return {
-      configurable: descriptor.configurable,
-      enumerable: descriptor.enumerable
-    }
+    return { configurable, enumerable }
   }
 
   assert.strictEqual(Reflect.getOwnPropertyDescriptor(defaultNs, "__esModule"), void 0)
-  assert.deepStrictEqual(getPartialDescriptor(customNs, "__esModule"), partialDescriptor)
-  assert.deepStrictEqual(getPartialDescriptor(customValue, "__esModule"), partialDescriptor)
+  assert.deepStrictEqual(getDescriptor(customNs, "__esModule"), { configurable: false, enumerable: true })
+  assert.deepStrictEqual(getDescriptor(customValue, "__esModule"), { configurable: true, enumerable: true })
 }

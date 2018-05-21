@@ -14,7 +14,6 @@ import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
-import setGetter from "./util/set-getter.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 
@@ -155,8 +154,31 @@ class Entry {
   }
 
   addGetter(name, getter) {
+    const { getters } = this
+
+    if (this.type === TYPE_ESM &&
+        ! Reflect.has(getters, name)) {
+      const { _namespace } = this
+      const exported = this.exports
+
+      exported[name] = _namespace[name]
+
+      Reflect.defineProperty(_namespace, name, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          if (has(exported, name)) {
+            return exported[name]
+          }
+        },
+        set(value) {
+          exported[name] = value
+        }
+      })
+    }
+
     getter.owner = this
-    this.getters[name] = getter
+    getters[name] = getter
     return this
   }
 
@@ -276,42 +298,24 @@ class Entry {
       }
     }
 
-    let exported = mod.exports
-
     if (this.type === TYPE_ESM) {
-      const { _namespace } = this
+      const { _namespace, getters } = this
 
-      if (Object.isFrozen(exported)) {
-        for (const name in _namespace) {
+      if (this.package.options.cjs.interop &&
+          ! has(getters, "__esModule") &&
+          ! isMJS(mod)) {
+        Reflect.defineProperty(this.exports, "__esModule", pseudoDescriptor)
+      }
+
+      for (const name in _namespace) {
+        if (! Reflect.has(getters, name)) {
           this.addGetter(name, () => this.namespace[name])
         }
-
-        this.initNamespace()
-      } else {
-        if (this.package.options.cjs.interop &&
-            ! has(_namespace, "__esModule") &&
-            ! isMJS(mod)) {
-          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
-        }
-
-        const { getters } = this
-
-        for (const name in _namespace) {
-          setGetter(exported, name, () => this._namespace[name])
-
-          if (! Reflect.has(getters, name)) {
-            this.addGetter(name, () => this.namespace[name])
-          }
-        }
-
-        Object.setPrototypeOf(exported, null)
-        Object.freeze(exported)
-        Object.freeze(mod)
       }
     } else {
-      const newEntry = Entry.get(mod)
+      const exported = mod.exports
 
-      this.merge(newEntry)
+      this.merge(Entry.get(mod))
 
       const newMod = this.module
       const newExported = newMod.exports
@@ -319,23 +323,23 @@ class Entry {
       if (newMod !== mod) {
         Entry.delete(mod, this)
         Entry.set(newMod, this)
-        mod = newMod
       }
 
       if (newExported !== exported) {
         Entry.delete(exported, this)
         Entry.set(newExported, this)
-        exported = newExported
       }
 
-      if (! mod.loaded) {
+      if (! newMod.loaded) {
         return this._loaded = LOAD_INCOMPLETE
       }
 
+      this.exports = newExported
+
       assignExportsToNamespace(this)
-      this.initNamespace()
     }
 
+    this.initNamespace()
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
     return this._loaded = LOAD_COMPLETED
   }
@@ -427,7 +431,7 @@ function assignExportsToNamespace(entry, names) {
 
   for (const name of names) {
     if (! (isCJS && name === "default") &&
-        ! Reflect.has(_namespace, name)) {
+        ! Reflect.has(getters, name)) {
       Reflect.defineProperty(_namespace, name, {
         configurable: true,
         enumerable: true,
