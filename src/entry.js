@@ -625,44 +625,38 @@ function getExportByName(entry, setter, name) {
 }
 
 function mergeProperty(entry, otherEntry, key) {
-  if ((entry._loaded !== LOAD_INCOMPLETE ||
-       otherEntry._loaded !== LOAD_INCOMPLETE) &&
-      (key === "cjsNamespace" ||
-       key === "esmNamespace")) {
+  if (key === "cjsNamespace" ||
+       key === "esmNamespace") {
     return copyProperty(entry, otherEntry, key)
   }
 
   const value = otherEntry[key]
 
-  if (key !== "setters") {
-    if (key ===  "_loaded") {
-      if (value > entry._loaded) {
-        entry._loaded = value
-      }
-    } else if (key === "children") {
-      assign(entry.children, value)
-    } else if (key === "getters") {
-      for (const name in value) {
-        entry.addGetter(name, value[name])
-      }
-    } else if (value != null) {
-      entry[key] = value
+  if (key ===  "_loaded") {
+    if (value > entry._loaded) {
+      entry._loaded = value
     }
+  } else if (key === "children") {
+    assign(entry.children, value)
+  } else if (key === "getters") {
+    for (const name in value) {
+      entry.addGetter(name, value[name])
+    }
+  } else if (key === "setters") {
+    const settersMap = entry.setters
 
-    return entry
-  }
+    for (const name in value) {
+      const setters = settersMap[name]
+      const newSetters = settersMap[name] = value[name]
 
-  const settersMap = entry.setters
-
-  for (const name in value) {
-    const setters = settersMap[name]
-    const otherSetters = settersMap[name] = value[name]
-
-    for (const setter of setters) {
-      if (otherSetters.indexOf(setter) === -1) {
-        otherSetters.push(setter)
+      for (const setter of setters) {
+        if (newSetters.indexOf(setter) === -1) {
+          newSetters.push(setter)
+        }
       }
     }
+  } else if (value != null) {
+    entry[key] = value
   }
 
   return entry
