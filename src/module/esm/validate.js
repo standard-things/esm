@@ -15,11 +15,10 @@ const {
 } = errors
 
 function validate(entry) {
-  const { compileData } = entry
+  const { compileData, name } = entry
   const { dependencySpecifiers, exportSpecifiers } = compileData
   const children = { __proto__: null }
   const mod = entry.module
-  const { name } = entry
 
   // Parse children.
   for (const specifier in dependencySpecifiers) {
@@ -126,10 +125,10 @@ function validate(entry) {
     compileData.enforceTDZ()
   }
 
+  const { _namespace } = entry
+
   for (const exportName in exportSpecifiers) {
-    if (! Reflect.has(entry.namespace, exportName)) {
-      entry.namespace[exportName] = void 0
-    }
+    _namespace[exportName] = void 0
   }
 
   entry.initNamespace()
