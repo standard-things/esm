@@ -34,7 +34,6 @@ export default () => {
     setImmediate(() => {
       mockIo.end()
       assert.deepStrictEqual(mockIo.end(), { stderr: "", stdout: "" })
-
       assert.ok(Reflect.has(global, "this"))
       assert.strictEqual(global.this, "undefined")
       resolve()
