@@ -19,6 +19,28 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
 
+class WebpackRequirePlugin {
+  apply(compiler) {
+    compiler.hooks.compilation.tap("MainTemplate", (compilation) => {
+      compilation.mainTemplate.hooks.requireExtensions.tap("MainTemplate", () =>
+        [
+          "__webpack_require__.d = function (exported, name, get) {",
+          "  Reflect.defineProperty(exported, name, {",
+          "    configurable: true,",
+          "    enumerable: true,",
+          "    get",
+          "  })",
+          "}",
+          "__webpack_require__.n = function (exported) {",
+          "  return exported.a = exported",
+          "}",
+          "__webpack_require__.r = function () {}"
+        ].join("\n")
+      )
+    })
+  }
+}
+
 const { ESM_ENV } = process.env
 const ESM_VERSION = readJSON("./package.json").version
 
@@ -97,7 +119,8 @@ const config = {
       /acorn\/src\/regexp\.js/,
       path.resolve("src/acorn/replacement/regexp.js")
     ),
-    new EnvironmentPlugin({ ESM_VERSION })
+    new EnvironmentPlugin({ ESM_VERSION }),
+    new WebpackRequirePlugin
   ],
   target: "node"
 }
