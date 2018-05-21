@@ -106,6 +106,7 @@ const Runtime = {
     Entry.set(exported, entry)
 
     entry.exports = exported
+
     object.compileGlobalEval = Runtime.compileGlobalEval
     object.entry = entry
 
@@ -235,8 +236,6 @@ function runCJS(entry, moduleWrapper) {
   const mod = entry.module
   const exported = mod.exports = entry.exports
 
-  entry.exports = null
-
   return Reflect.apply(moduleWrapper, exported, [
     shared.unsafeContext,
     exported,
@@ -247,8 +246,6 @@ function runCJS(entry, moduleWrapper) {
 function runESM(entry, moduleWrapper) {
   const mod = entry.module
   const exported = mod.exports = entry.exports
-
-  entry.exports = null
 
   let result
 

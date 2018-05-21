@@ -25,7 +25,7 @@ function init() {
   const { toString } = Object.prototype
 
   function proxyExports(entry) {
-    const exported = entry.module.exports
+    const exported = entry.exports
 
     if (! shared.support.proxiedClasses ||
         ! isObjectLike(exported)) {

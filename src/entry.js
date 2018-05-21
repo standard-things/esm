@@ -80,8 +80,8 @@ class Entry {
     this.cjsNamespace = this.namespace
     // The namespace object ESM importers receive.
     this.esmNamespace = this.namespace
-    // The temporary store of the initial `module.exports` value.
-    this.exports = null
+    // The `module.exports` value at the time the module loaded.
+    this.exports = mod.exports
     // Getters for local variables exported by the module.
     this.getters = { __proto__: null }
     // The unique id for the module cache.
@@ -396,7 +396,7 @@ class Entry {
 
 function assignExportsToNamespace(entry, names) {
   const { _namespace, getters } = entry
-  const exported = entry.module.exports
+  const exported = entry.exports
   const isLoaded = entry._loaded === LOAD_COMPLETED
 
   if (! isLoaded &&
@@ -459,7 +459,7 @@ function changed(setter, key, value) {
 
 function createNamespace(entry, source = entry) {
   const mod = entry.module
-  const exported = mod.exports
+  const exported = entry.exports
   const { type } = entry
 
   const isCJS = type === TYPE_CJS

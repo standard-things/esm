@@ -36,6 +36,7 @@ function loader(entry, filename, parentEntry, preload) {
   }
 
   mod.loaded = true
+  entry.loaded()
 }
 
 export default loader
