@@ -138,10 +138,8 @@ function tryCompileCached(caller, entry, content, filename) {
   }
 
   if (pkg.options.warnings) {
-    const { warnings } = entry.compileData
-
-    for (const warning of warnings) {
-      warn(warning.code, filename, ...warning.args)
+    for (const { args, code } of entry.compileData.warnings) {
+      warn(code, filename, ...args)
     }
   }
 
