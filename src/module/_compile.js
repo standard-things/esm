@@ -51,7 +51,8 @@ const ExObject = shared.external.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
-  const { cache, options } = pkg
+  const { mode, warnings } = pkg.options
+  const { cache } = pkg
   const { cacheName } = entry
   const { parsing } = shared.moduleState
 
@@ -61,9 +62,9 @@ function compile(caller, entry, content, filename, fallback) {
   if (isMJS(filename)) {
     hint = MODULE
     sourceType = MODULE
-  } else if (options.mode === OPTIONS_MODE_ALL) {
+  } else if (mode === OPTIONS_MODE_ALL) {
     sourceType = MODULE
-  } else if (options.mode === OPTIONS_MODE_AUTO) {
+  } else if (mode === OPTIONS_MODE_AUTO) {
     sourceType = UNAMBIGUOUS
   }
 
@@ -91,7 +92,8 @@ function compile(caller, entry, content, filename, fallback) {
 
       compileData = tryCompileCode(caller, entry, content, filename, {
         hint,
-        sourceType
+        sourceType,
+        warnings
       })
 
       compileData.scriptData = scriptData

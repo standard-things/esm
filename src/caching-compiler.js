@@ -186,6 +186,7 @@ function init() {
 
   function toCompileOptions(entry, options) {
     const { runtimeName } = entry
+    const { warnings } = options
 
     const cjs = isMJS(entry.module)
       ? void 0
@@ -194,7 +195,8 @@ function init() {
     if (options.eval) {
       return {
         cjs,
-        runtimeName
+        runtimeName,
+        warnings
       }
     }
 
@@ -205,7 +207,8 @@ function init() {
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,
-      var: options.var
+      var: options.var,
+      warnings
     }
   }
 
