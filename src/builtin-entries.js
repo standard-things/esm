@@ -108,18 +108,18 @@ function createEntry(id) {
   }
 
   const mod = new Module(id, null)
-  const entry = Entry.get(mod)
 
   mod.exports = exported
   mod.loaded = true
 
-  exported =
-  mod.exports = proxyExports(entry)
-
-  Entry.set(exported, entry)
+  const entry = Entry.get(mod)
 
   entry.builtin = true
-  entry.id = id
+
+  exported =
+  entry.exports =
+  mod.exports = proxyExports(entry)
+
   entry.loaded()
   return entry
 }
