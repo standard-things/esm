@@ -14,6 +14,7 @@ import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
+import setGetter from "./util/set-getter.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 
@@ -155,30 +156,42 @@ class Entry {
 
   addGetter(name, getter) {
     const { getters } = this
-
-    if (this.type === TYPE_ESM &&
-        ! Reflect.has(getters, name)) {
-      const { _namespace } = this
-      const exported = this.exports
-
-      exported[name] = _namespace[name]
-
-      Reflect.defineProperty(_namespace, name, {
-        configurable: true,
-        enumerable: true,
-        get() {
-          if (has(exported, name)) {
-            return exported[name]
-          }
-        },
-        set(value) {
-          exported[name] = value
-        }
-      })
-    }
+    const inited = Reflect.has(getters, name)
 
     getter.owner = this
     getters[name] = getter
+
+    if (inited) {
+      return this
+    }
+
+    const { _namespace, type } = this
+
+    if (type === TYPE_CJS &&
+        name === "default") {
+      setGetter(_namespace, "default", () => this.exports)
+      return this
+    }
+
+    if (type === TYPE_ESM) {
+      this.exports[name] = _namespace[name]
+    }
+
+    Reflect.defineProperty(_namespace, name, {
+      configurable: true,
+      enumerable: true,
+      get: () => {
+        const exported = this.exports
+
+        if (has(exported, name)) {
+          return exported[name]
+        }
+      },
+      set: (value) => {
+        this.exports[name] = value
+      }
+    })
+
     return this
   }
 
@@ -406,19 +419,15 @@ function assignExportsToNamespace(entry, names) {
   if (! isLoaded &&
       exported &&
       exported.__esModule &&
-      exported.default &&
       entry.package.options.cjs.interop) {
     entry.type = TYPE_PSEUDO
   }
 
   const isCJS = entry.type === TYPE_CJS
 
-  if (isCJS) {
-    _namespace.default = exported
-
-    if (! Reflect.has(getters, "default")) {
-      entry.addGetter("default", () => entry.namespace.default)
-    }
+  if (isCJS &&
+      ! Reflect.has(getters, "default")) {
+    entry.addGetter("default", () => entry.namespace.default)
   }
 
   if (! isObjectLike(exported)) {
@@ -432,19 +441,6 @@ function assignExportsToNamespace(entry, names) {
   for (const name of names) {
     if (! (isCJS && name === "default") &&
         ! Reflect.has(getters, name)) {
-      Reflect.defineProperty(_namespace, name, {
-        configurable: true,
-        enumerable: true,
-        get() {
-          if (has(exported, name)) {
-            return exported[name]
-          }
-        },
-        set(value) {
-          exported[name] = value
-        }
-      })
-
       entry.addGetter(name, () => entry.namespace[name])
     }
   }
