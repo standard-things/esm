@@ -5,7 +5,7 @@ import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
-  const checkedMap = new Map
+  const checked = new Set
   const shadowedMap = new Map
 
   class TemporalVisitor extends Visitor {
@@ -22,7 +22,7 @@ function init() {
 
       if (this.temporals[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
-        wrapInCheck(this, path)
+        maybeWrap(this, path)
       }
     }
 
@@ -75,18 +75,30 @@ function init() {
     }
   }
 
-  function wrapInCheck(visitor, path) {
+  function maybeWrap(visitor, path) {
     let key
     let node = path.getValue()
+    let noWrap = false
     let useParent = false
     let wrapExpression = false
 
     const { name } = node
 
     const parent = path.getParentNode(({ type }) => {
-      if (type === "CallExpression" ||
-          type === "ForStatement") {
+      if (type === "BinaryExpression" ||
+          type === "CallExpression" ||
+          type === "ForStatement" ||
+          type === "ParenthesizedExpression" ||
+          type === "SwitchCase" ||
+          type === "TemplateLiteral") {
         return true
+      }
+
+      if (type === "BreakStatement" ||
+          type === "ContinueStatement" ||
+          type === "LabeledStatement" ||
+          type === "Property") {
+        return noWrap = true
       }
 
       if (type === "NewExpression") {
@@ -124,11 +136,15 @@ function init() {
       }
     }
 
-    if (checkedMap.has(node)) {
+    if (checked.has(node)) {
       return
     }
 
-    checkedMap.set(node, true)
+    checked.add(node)
+
+    if (noWrap) {
+      return
+    }
 
     const prefix = wrapExpression ? "(" : ""
     const postfix = wrapExpression ? ")" : ""
