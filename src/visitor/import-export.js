@@ -70,14 +70,13 @@ function init() {
       }
 
       const { callee } = node
+      const { runtimeName } = this
 
       if (callee.name === "eval") {
         // Support direct eval:
         // eval(code)
         this.changed =
         this.addedDirectEval = true
-
-        const { runtimeName } = this
 
         let code = runtimeName + ".c"
 
@@ -94,7 +93,7 @@ function init() {
         this.changed =
         this.addedDynamicImport = true
 
-        overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
+        overwrite(this, callee.start, callee.end, runtimeName + ".i")
       }
 
       this.visitChildren(path)
