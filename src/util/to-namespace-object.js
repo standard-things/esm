@@ -24,10 +24,7 @@ function toNamespaceObject(object, getter = Reflect.get) {
     namespace[name] = getter(object, name)
   }
 
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Namespace objects should be sealed.
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  return Object.seal(namespace)
+  return namespace
 }
 
 export default toNamespaceObject

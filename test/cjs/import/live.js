@@ -312,22 +312,22 @@ export default () => {
   }
 
   assert.throws(
-    () => accessor2.c = 3,
+    () => def2.g = "g",
     /TypeError: Cannot add/
   )
 
   assert.throws(
-    () => Object.defineProperty(accessor2, "c", {
+    () => Object.defineProperty(def2, "g", {
       configurable: true,
       enumerable: true,
-      value: 3,
+      value: "g",
       writable: true
     }),
     /TypeError: Cannot define/
   )
 
   assert.throws(
-    () => Object.defineProperty(accessor2, "a", {
+    () => Object.defineProperty(def2, "d", {
       configurable: true,
       enumerable: true,
       value: 1,
@@ -337,9 +337,9 @@ export default () => {
   )
 
   assert.throws(
-    () => delete accessor2.a,
+    () => delete def2.d,
     /TypeError: Cannot delete/
   )
 
-  assert.strictEqual(delete accessor2.c, true)
+  assert.strictEqual(delete def2.g, true)
 }

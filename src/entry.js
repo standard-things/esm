@@ -55,7 +55,7 @@ class Entry {
     // The loading state of the module.
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
-    this._namespace = { __proto__: null }
+    this._namespace = toNamespaceObject()
     // The passthru indicator for `module._compile`.
     this._passthru = false
     // The load type for `module.require`.
@@ -279,9 +279,9 @@ class Entry {
 
     setDeferred(this, "cjsNamespace", function () {
       return createNamespace(this, {
-        namespace: {
+        namespace: toNamespaceObject({
           default: this.module.exports
-        }
+        })
       })
     })
 
@@ -475,29 +475,7 @@ function createNamespace(entry, source = entry) {
   })
 
   const handler = {
-    defineProperty(target, name, descriptor) {
-      if (Reflect.defineProperty(target, name, descriptor)) {
-        return true
-      }
-
-      const NsError = Reflect.has(source.namespace, name)
-        ? ERR_NS_REDEFINITION
-        : ERR_NS_DEFINITION
-
-      throw new NsError(mod, name)
-    },
-    deleteProperty(target, name) {
-      if (Reflect.deleteProperty(target, name)) {
-        return true
-      }
-
-      throw new ERR_NS_DELETION(mod, name)
-    },
     get(target, name, receiver) {
-      if (name === Symbol.toStringTag) {
-        return Reflect.get(target, name)
-      }
-
       const { compileData } = entry
       const getter = entry.getters[name]
       const exportSpecifiers = compileData && compileData.exportSpecifiers
@@ -516,48 +494,72 @@ function createNamespace(entry, source = entry) {
 
       return Reflect.get(source.namespace, name, receiver)
     },
-    getOwnPropertyDescriptor(target, name) {
-      if (! Reflect.has(target, name)) {
-        return
-      }
 
-      // The de facto order of descriptor properties is:
-      // "value", "writable", "configurable", "enumerable"
-      /* eslint-disable sort-keys */
-      const descriptor = {
-        value: "Module",
-        writable: false,
-        configurable: false,
-        enumerable: false
-      }
-
-      // Section 26.3.1: @@toStringTag
-      // Return descriptor of the module namespace @@toStringTag.
-      // https://tc39.github.io/ecma262/#sec-@@tostringtag
-      if (name === Symbol.toStringTag) {
-        return descriptor
-      }
-
-      // Section 9.4.6: Module Namespace Exotic Objects
-      // Return descriptor of the non-extensible module namespace property.
-      // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-      descriptor.enumerable =
-      descriptor.writable = true
-      descriptor.value = handler.get(target, name)
-
-      return descriptor
-    },
     has(target, name) {
       return name === shared.symbol.namespace ||
-        Reflect.has(target, name)
-    },
-    set(target, name) {
+        Reflect.has(source.namespace, name)
+    }
+  }
+
+  if (entry.package.options.cjs.mutableNamespace) {
+    handler.defineProperty = (target, name, descriptor) => {
+      return Reflect.defineProperty(source.namespace, name, descriptor)
+    }
+
+    handler.deleteProperty = (target, name) => {
+      return Reflect.deleteProperty(source.namespace, name)
+    }
+
+    handler.getOwnPropertyDescriptor = (target, name) => {
+      return Reflect.getOwnPropertyDescriptor(source.namespace, name)
+    }
+
+    handler.set = (target, name, receiver) => {
+      return Reflect.set(source.namespace, name, receiver)
+    }
+  } else {
+    handler.defineProperty = (target, name, descriptor) => {
+      if (Reflect.defineProperty(target, name, descriptor)) {
+        return true
+      }
+
+      const NsError = Reflect.has(source.namespace, name)
+        ? ERR_NS_REDEFINITION
+        : ERR_NS_DEFINITION
+
+      throw new NsError(mod, name)
+    }
+
+    handler.deleteProperty = (target, name) => {
+      if (Reflect.deleteProperty(target, name)) {
+        return true
+      }
+
+      throw new ERR_NS_DELETION(mod, name)
+    }
+
+    handler.getOwnPropertyDescriptor = (target, name) => {
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+      if (descriptor) {
+        descriptor.value = handler.get(target, name)
+      }
+
+      return descriptor
+    }
+
+    handler.set = (target, name) => {
       const NsError = Reflect.has(source.namespace, name)
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
 
       throw new NsError(mod, name)
     }
+
+    // Section 9.4.6: Module Namespace Exotic Objects
+    // Namespace objects should be sealed.
+    // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+    Object.seal(namespace)
   }
 
   return new OwnProxy(namespace, handler)
@@ -589,7 +591,8 @@ function getExportByName(entry, setter, name) {
           return exported
         }
 
-        if (has(exported, name)) {
+        if (name !== Symbol.toStringTag &&
+            has(exported, name)) {
           target = exported
         }
 

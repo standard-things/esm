@@ -123,6 +123,12 @@ Specify options with one of the following:
         </td>
       </tr>
       <tr>
+        <td valign="top"><code>"mutableNamespace":</code></td>
+        <td>
+          <p>A boolean for mutable <a href="https://ponyfoo.com/articles/es6-modules-in-depth#import-all-the-things">namespace objects</a>.</p>
+        </td>
+      </tr>
+      <tr>
         <td valign="top"><code>"namedExports":</code></td>
         <td>
           <p>A boolean for <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>

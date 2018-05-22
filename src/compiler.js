@@ -35,6 +35,7 @@ function init() {
       cache: false,
       extensions: false,
       interop: false,
+      mutableNamespace: false,
       namedExports: false,
       paths: false,
       topLevelReturn: false,
