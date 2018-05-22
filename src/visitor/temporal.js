@@ -96,8 +96,7 @@ function init() {
 
       if (type === "BreakStatement" ||
           type === "ContinueStatement" ||
-          type === "LabeledStatement" ||
-          type === "Property") {
+          type === "LabeledStatement") {
         return noWrap = true
       }
 
@@ -123,7 +122,8 @@ function init() {
       }
 
       if (type === "AssignmentExpression" ||
-          type === "ExpressionStatement") {
+          type === "ExpressionStatement" ||
+          type === "ObjectExpression") {
         return useParent = true
       }
     })
