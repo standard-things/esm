@@ -28,7 +28,7 @@ function init() {
       if (node.arguments.length &&
           node.callee.name === "eval") {
         // Wrap direct eval calls.
-        wrapInUpdate(this, path)
+        wrap(this, path)
       }
 
       this.visitChildren(path)
@@ -62,13 +62,13 @@ function init() {
       if (assignableExports[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         // Wrap assignments to exported identifiers.
-        wrapInUpdate(visitor, path)
+        wrap(visitor, path)
         return
       }
     }
   }
 
-  function wrapInUpdate(visitor, path) {
+  function wrap(visitor, path) {
     const { end, start } = path.getValue()
 
     visitor.magicString
