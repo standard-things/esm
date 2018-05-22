@@ -189,9 +189,8 @@ function init() {
 
     let useWrappers = ! shared.support.nativeProxyReceiver
 
-    if (builtin) {
-      useWrappers = false
-    } else if (! useWrappers) {
+    if (! builtin &&
+        ! useWrappers) {
       if (typeof exported === "function") {
         useWrappers = isNative(exported)
       } else if (! isPlainObject(exported)) {
