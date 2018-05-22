@@ -1,6 +1,7 @@
 import Visitor from "../visitor.js"
 
 import { getLineInfo } from "../acorn.js"
+import isIdentifier from "../parse/is-identifier.js"
 import shared from "../shared.js"
 
 function init() {
@@ -25,10 +26,11 @@ function init() {
         return
       }
 
-      const { operator, type } = path.getParentNode()
+      const parent = path.getParentNode()
 
-      if ((type === "UnaryExpression" &&
-          operator === "typeof") ||
+      if ((parent.type === "UnaryExpression" &&
+           parent.operator === "typeof") ||
+          ! isIdentifier(node, parent) ||
           isArgumentsDefined(path)) {
         return
       }

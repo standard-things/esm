@@ -1,6 +1,7 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import isIdentifer from "../parse/is-identifier.js"
 import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
@@ -76,64 +77,46 @@ function init() {
   }
 
   function maybeWrap(visitor, path) {
-    let key
     let node = path.getValue()
-    let noWrap = false
-    let useParent = false
-    let wrapExpression = false
+
+    const parent = path.getParentNode()
+    const { type } = parent
+
+    if ((type === "AssignmentExpression" &&
+         parent.left === node) ||
+        ! isIdentifer(node, parent)) {
+      return
+    }
 
     const { name } = node
+    const { runtimeName } = visitor
 
-    const parent = path.getParentNode(({ type }) => {
-      if (type === "BinaryExpression" ||
-          type === "CallExpression" ||
-          type === "ForStatement" ||
-          type === "ParenthesizedExpression" ||
-          type === "SwitchCase" ||
-          type === "TemplateLiteral") {
-        return true
+    let prefix = ""
+    let postfix = ""
+
+    if (type === "NewExpression") {
+      prefix = "("
+      postfix = ")"
+    } else if (type === "Property") {
+      if (parent.shorthand) {
+        visitor.magicString
+          .prependLeft(node.end, ":" + runtimeName + '.t("' + name + '",' + name + ")")
+
+        return
       }
+    } else if (type !== "SwitchCase" &&
+        type !== "TemplateLiteral" &&
+        ! type.endsWith("Expression") &&
+        ! type.endsWith("Statement")) {
+      path.getParentNode((parent) => {
+        const { type } = parent
 
-      if (type === "BreakStatement" ||
-          type === "ContinueStatement" ||
-          type === "LabeledStatement") {
-        return noWrap = true
-      }
-
-      if (type === "NewExpression") {
-        return wrapExpression = true
-      }
-
-      if (type === "ReturnStatement") {
-        key = "argument"
-        return useParent = true
-      }
-
-      if (type === "SwitchStatement") {
-        key = "discriminant"
-        return useParent = true
-      }
-
-      if (type === "DoWhileStatement" ||
-          type === "IfStatement" ||
-          type === "WhileStatement") {
-        key = "test"
-        return useParent = true
-      }
-
-      if (type === "AssignmentExpression" ||
-          type === "ExpressionStatement" ||
-          type === "ObjectExpression") {
-        return useParent = true
-      }
-    })
-
-    if (useParent) {
-      node = parent
-
-      if (key) {
-        node = node[key]
-      }
+        if (type === "AssignmentExpression" ||
+            type === "ExpressionStatement") {
+          node = parent
+          return true
+        }
+      })
     }
 
     if (checked.has(node)) {
@@ -142,15 +125,8 @@ function init() {
 
     checked.add(node)
 
-    if (noWrap) {
-      return
-    }
-
-    const prefix = wrapExpression ? "(" : ""
-    const postfix = wrapExpression ? ")" : ""
-
     visitor.magicString
-      .prependRight(node.start, prefix + visitor.runtimeName + '.t("' + name + '",')
+      .prependRight(node.start, prefix + runtimeName + '.t("' + name + '",')
       .prependRight(node.end, ")" + postfix)
   }
 

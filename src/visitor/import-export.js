@@ -6,6 +6,7 @@ import Visitor from "../visitor.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
+import isIdentifier from "../parse/is-identifier.js"
 import keys from "../util/keys.js"
 import { lineBreakRegExp } from "../acorn.js"
 import shared from "../shared.js"
@@ -111,7 +112,8 @@ function init() {
 
       if (type === "CallExpression" ||
           (type === "AssignmentExpression" &&
-          parent.left.name === "eval")) {
+           parent.left === node) ||
+          ! isIdentifier(node, parent)) {
         return
       }
 
