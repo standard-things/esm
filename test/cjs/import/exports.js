@@ -56,6 +56,8 @@ export default () => {
 
   ns = createNamespace({ default: {} })
   assert.deepStrictEqual(nsEmpty, ns)
+
+  ns = createNamespace({})
   assert.deepStrictEqual(nsEmptyPseudo, ns)
 
   assert.ok(isPlainObject(defaultEmpty))
