@@ -140,7 +140,7 @@ describe("integration", () => {
 
     mod._compile('export const a = "a"', "filename")
 
-    assert.deepStrictEqual(mod.exports, { a: void 0 })
+    assert.deepStrictEqual(mod.exports, {})
 
     mod.loaded = true
 

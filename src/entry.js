@@ -158,23 +158,22 @@ class Entry {
     const { getters } = this
     const inited = Reflect.has(getters, name)
 
-    getter.owner = this
     getters[name] = getter
+
+    if (! has(getter, "owner")) {
+      getter.owner = this
+    }
 
     if (inited) {
       return this
     }
 
-    const { _namespace, type } = this
+    const { _namespace } = this
 
-    if (type === TYPE_CJS &&
+    if (this.type === TYPE_CJS &&
         name === "default") {
       setGetter(_namespace, "default", () => this.exports)
       return this
-    }
-
-    if (type === TYPE_ESM) {
-      this.exports[name] = _namespace[name]
     }
 
     Reflect.defineProperty(_namespace, name, {
@@ -225,7 +224,7 @@ class Entry {
       if (typeof getter !== "function" &&
           typeof otherGetter === "function") {
         getter = otherGetter
-        getters[key] = getter
+        this.addGetter(key, getter)
       }
 
       if (this.type === TYPE_ESM ||
@@ -412,7 +411,6 @@ class Entry {
 }
 
 function assignExportsToNamespace(entry, names) {
-  const { _namespace, getters } = entry
   const exported = entry.exports
   const isLoaded = entry._loaded === LOAD_COMPLETED
 
@@ -423,6 +421,7 @@ function assignExportsToNamespace(entry, names) {
     entry.type = TYPE_PSEUDO
   }
 
+  const { getters } = entry
   const isCJS = entry.type === TYPE_CJS
 
   if (isCJS &&
@@ -435,7 +434,7 @@ function assignExportsToNamespace(entry, names) {
   }
 
   if (! names) {
-    names = keys(isLoaded ? _namespace : exported)
+    names = keys(isLoaded ? entry._namespace : exported)
   }
 
   for (const name of names) {
@@ -459,7 +458,6 @@ function changed(setter, key, value) {
 
 function createNamespace(entry, source = entry) {
   const mod = entry.module
-  const exported = entry.exports
   const { type } = entry
 
   const isCJS = type === TYPE_CJS
@@ -471,7 +469,7 @@ function createNamespace(entry, source = entry) {
       return Reflect.get(target, name)
     }
 
-    return Reflect.getOwnPropertyDescriptor(exported, name).value
+    return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
   })
 
   const handler = {
@@ -605,18 +603,19 @@ function getExportByName(entry, setter, name) {
     return noNamedExports ? entry.cjsNamespace : entry.esmNamespace
   }
 
+  const { getters } = entry
   const mod = entry.module
 
   if ((noNamedExports &&
        name !== "default") ||
       (entry._loaded === LOAD_COMPLETED &&
-       ! Reflect.has(entry.getters, name))) {
+       ! Reflect.has(getters, name))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
     throw new ERR_EXPORT_MISSING(mod, name)
   }
 
-  const value = tryGetter(entry.getters[name])
+  const value = tryGetter(getters[name])
 
   if (value === STAR_ERROR) {
     throw new ERR_EXPORT_STAR_CONFLICT(mod, name)

@@ -375,7 +375,7 @@ function init() {
             this,
             specifierMap,
             localName,
-            runtimeName + ".entry.namespace." + exportName
+            runtimeName + ".entry.exports." + exportName
           )
         }
 
