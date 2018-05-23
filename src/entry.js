@@ -348,7 +348,6 @@ class Entry {
       }
 
       this.exports = newExported
-
       assignExportsToNamespace(this)
     }
 
