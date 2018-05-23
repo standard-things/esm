@@ -23,7 +23,8 @@ function init() {
     config: [
       "experimentalREPLAwait",
       "exposeInternals",
-      "preserveSymlinks"
+      "preserveSymlinks",
+      "preserveSymlinksMain"
     ],
     fs: [
       "internalModuleReadFile",

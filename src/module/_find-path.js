@@ -29,7 +29,7 @@ const {
 } = ENV
 
 const mainFieldRegExp = /"main"/
-const { preserveSymlinks } = binding.config
+const { preserveSymlinks, preserveSymlinksMain } = binding.config
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
@@ -82,8 +82,9 @@ function findPath(request, paths, isMain, searchExts) {
 
     if (! trailingSlash) {
       if (isFile) {
-        if (preserveSymlinks &&
-            ! isMain) {
+        if (isMain
+            ? preserveSymlinksMain
+            : preserveSymlinks) {
           filename = resolve(basePath)
         } else {
           filename = realpath(basePath)
