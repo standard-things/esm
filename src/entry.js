@@ -500,7 +500,8 @@ function createNamespace(entry, source = entry) {
     }
   }
 
-  if (entry.package.options.cjs.mutableNamespace) {
+  if (entry.package.options.cjs.mutableNamespace &&
+      ! isMJS(mod)) {
     handler.defineProperty = (target, name, descriptor) => {
       SafeObject.defineProperty(entry.exports, name, descriptor)
 
