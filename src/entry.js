@@ -2,6 +2,7 @@ import ENTRY from "./constant/entry.js"
 
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
+import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
@@ -501,19 +502,51 @@ function createNamespace(entry, source = entry) {
 
   if (entry.package.options.cjs.mutableNamespace) {
     handler.defineProperty = (target, name, descriptor) => {
-      return Reflect.defineProperty(source.namespace, name, descriptor)
+      SafeObject.defineProperty(entry.exports, name, descriptor)
+
+      if (Reflect.has(source.namespace, name)) {
+        entry
+          .addGetter(name, () => entry.namespace[name])
+          .update(name)
+      }
+
+      return true
     }
 
     handler.deleteProperty = (target, name) => {
-      return Reflect.deleteProperty(source.namespace, name)
+      if (Reflect.deleteProperty(entry.exports, name)) {
+        if (Reflect.has(source.namespace, name)) {
+          entry
+            .addGetter(name, () => entry.namespace[name])
+            .update(name)
+        }
+
+        return true
+      }
+
+      return false
     }
 
     handler.getOwnPropertyDescriptor = (target, name) => {
-      return Reflect.getOwnPropertyDescriptor(source.namespace, name)
+      const exported = entry.exports
+
+      return (isObjectLike(exported) &&
+          Reflect.getOwnPropertyDescriptor(exported, name)) ||
+        Reflect.getOwnPropertyDescriptor(source.namespace, name)
     }
 
-    handler.set = (target, name, receiver) => {
-      return Reflect.set(source.namespace, name, receiver)
+    handler.set = (target, name, value, receiver) => {
+      if (Reflect.set(entry.exports, name, value, receiver)) {
+        if (Reflect.has(source.namespace, name)) {
+          entry
+            .addGetter(name, () => entry.namespace[name])
+            .update(name)
+        }
+
+        return true
+      }
+
+      return false
     }
   } else {
     handler.defineProperty = (target, name, descriptor) => {
