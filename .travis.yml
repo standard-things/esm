@@ -7,7 +7,7 @@ os:
   # https://www.traviscistatus.com/
 
 node_js:
-  - 10.1.0
+  - 10
   - 8
   - 6
 
@@ -17,5 +17,5 @@ cache:
 
 matrix:
   include:
-    - node_js: 10.1.0
+    - node_js: 10
       env: HARMONY=true
