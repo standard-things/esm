@@ -315,7 +315,7 @@ class Entry {
       const { _namespace, getters } = this
 
       if (this.package.options.cjs.interop &&
-          ! has(getters, "__esModule") &&
+          ! Reflect.has(getters, "__esModule") &&
           ! isMJS(mod)) {
         Reflect.defineProperty(this.exports, "__esModule", pseudoDescriptor)
       }
