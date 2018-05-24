@@ -108,9 +108,7 @@ class Entry {
   }
 
   static delete(value) {
-    if (isObjectLike(value)) {
-      shared.entry.cache.delete(value)
-    }
+    shared.entry.cache.delete(value)
   }
 
   static get(mod) {
