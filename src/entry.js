@@ -310,18 +310,20 @@ class Entry {
     }
 
     if (this.type === TYPE_ESM) {
-      const { _namespace, getters } = this
+      const exported = this.exports
+      const { getters } = this
+      const names = keys(exported)
+
+      for (const name of names) {
+        if (! Reflect.has(getters, name)) {
+          this.addGetter(name, () => this.namespace[name])
+        }
+      }
 
       if (this.package.options.cjs.interop &&
           ! Reflect.has(getters, "__esModule") &&
           ! isMJS(mod)) {
-        Reflect.defineProperty(this.exports, "__esModule", pseudoDescriptor)
-      }
-
-      for (const name in _namespace) {
-        if (! Reflect.has(getters, name)) {
-          this.addGetter(name, () => this.namespace[name])
-        }
+        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
       const exported = mod.exports
