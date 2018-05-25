@@ -475,8 +475,8 @@ function createNamespace(entry, source = entry) {
   const handler = {
     get(target, name, receiver) {
       const { compileData } = entry
-      const getter = entry.getters[name]
       const exportSpecifiers = compileData && compileData.exportSpecifiers
+      const getter = entry.getters[name]
 
       if (getter &&
           exportSpecifiers &&
@@ -624,12 +624,14 @@ function getExportByName(entry, setter, name) {
           return exported
         }
 
+        let object = target
+
         if (name !== Symbol.toStringTag &&
             has(exported, name)) {
-          target = exported
+          object = exported
         }
 
-        return Reflect.get(target, name, receiver)
+        return Reflect.get(object, name, receiver)
       }
     })
   }
