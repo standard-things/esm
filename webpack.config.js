@@ -57,6 +57,7 @@ const hosted = [
   "console"
 ]
 
+const babelOptions = require("./.babel.config.js")
 const uglifyOptions = readJSON("./.uglifyrc")
 
 /* eslint-disable sort-keys */
@@ -77,6 +78,7 @@ const config = {
     rules: [
       {
         loader: "babel-loader",
+        options: babelOptions,
         test: /\.js$/,
         type: "javascript/auto"
       }
