@@ -111,6 +111,7 @@ describe("repl hook", () => {
 
     assert.strictEqual(typeof context.localAssert, "undefined")
 
+    r.context = context
     r.eval(code, context, "repl", () => {
       assert.strictEqual(typeof context.localAssert, "function")
     })
@@ -123,6 +124,7 @@ describe("repl hook", () => {
     const r = repl.start({})
     const code = "var exports = module.exports"
 
+    r.context = context
     r.eval(code, context, "repl", () => {
       assert.ok(isPlainObject(context.exports))
     })
@@ -138,6 +140,7 @@ describe("repl hook", () => {
       'var dynamic = import("' + pkgURL + '")'
     ].join("\n")
 
+    r.context = context
     r.eval(code, context, "repl", () => {
       context.dynamic
         .then((dynamic) => {
