@@ -15,6 +15,7 @@ import RealModule from "./real/module.js"
 import Shim from "./shim.js"
 
 import assign from "./util/assign.js"
+import builtinVM from "./builtin/vm.js"
 import clone from "./module/clone.js"
 import errors from "./errors.js"
 import globalHook from "./hook/global.js"
@@ -26,9 +27,9 @@ import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
 import realProcess from "./real/process.js"
+import realVM from "./real/vm.js"
 import requireHook from "./hook/require.js"
 import shared from "./shared.js"
-import vm from "vm"
 import vmHook from "./hook/vm.js"
 
 const {
@@ -102,16 +103,16 @@ if (shared.inited &&
   Shim.enable(shared.unsafeContext)
 
   if (CHECK) {
-    vmHook(vm)
+    vmHook(realVM)
   } else if (EVAL) {
     RealModule.prototype._compile = Module.prototype._compile
     moduleHook(Module)
     processHook(realProcess)
-    vmHook(vm)
+    vmHook(realVM)
   } else if (REPL) {
     moduleHook(Module)
     processHook(realProcess)
-    vmHook(vm)
+    vmHook(realVM)
   } else if (CLI ||
       INTERNAL ||
       isSideloaded()) {
