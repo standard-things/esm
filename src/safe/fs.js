@@ -1,9 +1,9 @@
-import realRequire from "../real/require.js"
+import realFs from "../real/fs.js"
 import safe from "../util/safe.js"
 import shared from "../shared.js"
 
 function init() {
-  const safeFs = safe(realRequire("fs"))
+  const safeFs = safe(realFs)
 
   safeFs.Stats = safe(safeFs.Stats)
   return safeFs
