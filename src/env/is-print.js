@@ -1,6 +1,7 @@
+import { argv, execArgv } from "../safe/process.js"
+
 import isPreloaded from "./is-preloaded.js"
 import matches from "../util/matches.js"
-import realProcess from "../real/process.js"
 import shared from "../shared.js"
 
 function isPrint() {
@@ -11,8 +12,8 @@ function isPrint() {
   }
 
   return env.print =
-    realProcess.argv.length === 1 &&
-    matches(realProcess.execArgv, /^(?:--print|-pe?)$/) &&
+    argv.length === 1 &&
+    matches(execArgv, /^(?:--print|-pe?)$/) &&
     isPreloaded()
 }
 

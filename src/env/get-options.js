@@ -2,8 +2,8 @@ import CHAR_CODE from "../constant/char-code.js"
 
 import isPath from "../util/is-path.js"
 import parseJSON6 from "../util/parse-json6.js"
+import { env as processEnv } from "../safe/process.js"
 import readFile from "../fs/read-file.js"
-import realProcess from "../real/process.js"
 import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
 
@@ -20,7 +20,6 @@ function getOptions() {
     return env.options
   }
 
-  const processEnv = realProcess.env
   const ESM_OPTIONS = processEnv && processEnv.ESM_OPTIONS
 
   if (typeof ESM_OPTIONS !== "string") {

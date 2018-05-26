@@ -1,7 +1,7 @@
 import GenericArray from "../generic/array.js"
 
 import binding from "../binding.js"
-import realProcess from "../real/process.js"
+import { execArgv } from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
@@ -18,7 +18,7 @@ function init() {
     const flagRegExp = /^--expose[-_]internals$/
 
     exposeInternals = GenericArray
-      .some(realProcess.execArgv, (arg) => flagRegExp.test(arg))
+      .some(execArgv, (arg) => flagRegExp.test(arg))
   }
 
   builtinModules = []

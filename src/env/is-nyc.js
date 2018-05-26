@@ -1,8 +1,8 @@
 import has from "../util/has.js"
 import isOwnPath from "../util/is-own-path.js"
 import normalize from "../path/normalize.js"
+import { env as processEnv } from "../safe/process.js"
 import readJSON from "../fs/read-json.js"
-import safeProcess from "../safe/process.js"
 import shared from "../shared.js"
 
 function getOwnParent() {
@@ -27,7 +27,7 @@ function isNyc() {
     return env.nyc
   }
 
-  if (has(safeProcess.env, "NYC_ROOT_ID")) {
+  if (has(processEnv, "NYC_ROOT_ID")) {
     return env.nyc = true
   }
 

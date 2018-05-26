@@ -1,6 +1,6 @@
+import { argv } from "../safe/process.js"
 import hasLoaderModule from "./has-loader-module.js"
 import isPreloaded from "./is-preloaded.js"
-import realProcess from "../real/process.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
 
@@ -11,7 +11,7 @@ function isREPL() {
     return env.repl
   }
 
-  if (realProcess.argv.length !== 1) {
+  if (argv.length !== 1) {
     return env.repl = false
   }
 

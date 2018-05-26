@@ -17,8 +17,10 @@ const safeProcess = shared.inited
   : shared.module.safeProcess = init()
 
 export const {
+  argv,
   cwd,
   env,
+  execArgv,
   release,
   pid,
   platform,
