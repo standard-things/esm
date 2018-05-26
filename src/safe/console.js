@@ -8,8 +8,7 @@ const safeConsole = shared.inited
 
 export const {
   Console,
-  error,
-  log
+  error
 } = safeConsole
 
 export default safeConsole

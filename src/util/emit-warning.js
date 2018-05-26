@@ -1,8 +1,8 @@
 import { pid, release } from "../safe/process.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
+import { error as consoleError } from "../safe/console.js"
 import realProcess from "../real/process.js"
-import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
 function init() {
@@ -47,7 +47,7 @@ function init() {
     }
 
     realProcess.nextTick(() => {
-      safeConsole.error(
+      consoleError(
         WARNING_PREFIX +
         (useCode ? "[" + code + "] " : "") +
         type + ": " + message
