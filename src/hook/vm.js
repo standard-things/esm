@@ -25,7 +25,7 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import realRequire from "../real/require.js"
+import realUtil from "../real/util.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setSetter from "../util/set-setter.js"
@@ -187,13 +187,12 @@ function hook(vm) {
 
     const { customInspectKey } = shared
     const { inspect } = builtinEntries.util.module.exports
-    const util = realRequire("util")
 
     // Defining a truthy, but non-function value, for `customInspectKey` will
     // inform builtin `inspect()` to bypass the deprecation warning for the
     // custom `util.inspect()` function when inspecting `util`.
-    if (! has(util, customInspectKey)) {
-      Reflect.defineProperty(util, customInspectKey, {
+    if (! has(realUtil, customInspectKey)) {
+      Reflect.defineProperty(realUtil, customInspectKey, {
         configurable: true,
         value: true,
         writable: true
@@ -208,18 +207,18 @@ function hook(vm) {
         acornInternalWalk.enable()
       }
 
-      util.inspect = inspect
+      realUtil.inspect = inspect
       return
     }
 
-    const _inspect = util.inspect
+    const _inspect = realUtil.inspect
 
-    setGetter(util, "inspect", function () {
+    setGetter(realUtil, "inspect", function () {
       this.inspect = inspect
       return _inspect
     })
 
-    setSetter(util, "inspect", function (value) {
+    setSetter(realUtil, "inspect", function (value) {
       Reflect.defineProperty(this, "inspect", {
         configurable: true,
         enumerable: true,
