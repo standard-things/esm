@@ -5,6 +5,7 @@ import Entry from "./entry.js"
 import Module from "./module.js"
 
 import _loadESM from "./module/esm/_load.js"
+import builtinConsole from "./builtin/console.js"
 import errors from "./errors.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
@@ -238,6 +239,7 @@ function runCJS(entry, moduleWrapper) {
 
   return Reflect.apply(moduleWrapper, exported, [
     shared.unsafeContext,
+    builtinConsole,
     exported,
     makeRequireFunction(mod)
   ])
@@ -246,19 +248,22 @@ function runCJS(entry, moduleWrapper) {
 function runESM(entry, moduleWrapper) {
   const mod = entry.module
   const exported = mod.exports = entry.exports
+  const { unsafeContext } = shared
 
   let result
 
   if (entry.package.options.cjs.vars &&
       ! isMJS(mod)) {
     result = Reflect.apply(moduleWrapper, exported, [
-      shared.unsafeContext,
+      unsafeContext,
+      builtinConsole,
       exported,
       makeRequireFunction(mod)
     ])
   } else {
     result = Reflect.apply(moduleWrapper, void 0, [
-      shared.unsafeContext
+      unsafeContext,
+      builtinConsole
     ])
   }
 
