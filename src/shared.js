@@ -104,7 +104,7 @@ function init() {
   }
 
   setDeferred(shared, "customInspectKey", () => {
-    const customInspectSymbol = shared.module.safeUtil.inspect.custom
+    const { customInspectSymbol } = shared.module.safeUtil
 
     return typeof customInspectSymbol === "symbol"
       ? customInspectSymbol
