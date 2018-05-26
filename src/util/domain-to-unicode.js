@@ -1,16 +1,16 @@
 import binding from "../binding.js"
-import realRequire from "../real/require.js"
-import url from "../safe/url.js"
+import { toUnicode as punycodeToUnicode } from "../safe/punycode.js"
+import { domainToUnicode as urlDomainToUnicode } from "../safe/url.js"
 
-let _domainToUnicode = url.domainToUnicode
+let _domainToUnicode = urlDomainToUnicode
 
 if (typeof _domainToUnicode !== "function") {
   _domainToUnicode = (domain) => {
     const { toUnicode } = binding.icu
 
     _domainToUnicode = typeof toUnicode === "function"
-      ? (domain) => toUnicode(domain)
-      : realRequire("punycode").toUnicode
+      ? toUnicode
+      : punycodeToUnicode
 
     return _domainToUnicode(domain)
   }
