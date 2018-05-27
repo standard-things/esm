@@ -1,9 +1,10 @@
-import GenericArray from "../generic/array.js"
-
 import isDataDescriptor from "./is-data-descriptor.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
+import unapply from "./unapply.js"
+
+const safeSlice = unapply(Array.prototype.slice)
 
 function safe(Super) {
   if (typeof Super !== "function") {
@@ -49,7 +50,7 @@ function copyProperty(object, source, name) {
       const { value } = descriptor
 
       if (Array.isArray(value)) {
-        descriptor.value = GenericArray.slice(value)
+        descriptor.value = safeSlice(value)
       }
     }
 
