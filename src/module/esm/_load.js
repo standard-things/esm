@@ -77,7 +77,7 @@ function load(request, parent, isMain, preload) {
     Reflect.deleteProperty(parseState._cache, request)
   }
 
-  let called = false
+  let preloadCalled = false
 
   const entry = _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
@@ -129,12 +129,16 @@ function load(request, parent, isMain, preload) {
       return
     }
 
-    called = true
-    tryLoader(entry, state, request, filename, parentEntry, preload)
+    tryLoader(entry, state, request, filename, parentEntry, (entry) => {
+      if (preload) {
+        preloadCalled = true
+        preload(entry)
+      }
+    })
   })
 
-  if (! called &&
-      preload) {
+  if (preload &&
+      ! preloadCalled) {
     preload(entry)
   }
 

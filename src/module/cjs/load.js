@@ -52,7 +52,7 @@ function load(request, parent, isMain, preload) {
     Reflect.deleteProperty(parseState._cache, filename)
   }
 
-  let called = false
+  let loaderCalled = false
 
   const entry = _load(filename, parent, isMain, state, (entry) => {
     const child = entry.module
@@ -68,11 +68,11 @@ function load(request, parent, isMain, preload) {
       return
     }
 
-    called = true
+    loaderCalled = true
     tryLoader(entry, state, filename, filename, parentEntry, preload)
   })
 
-  if (! called) {
+  if (! loaderCalled) {
     if (parentEntry &&
         entry.type === TYPE_ESM &&
         parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {

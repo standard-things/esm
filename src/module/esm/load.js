@@ -18,27 +18,18 @@ function load(request, parent, isMain, preload) {
   moduleState.parsing = true
 
   try {
-    entry = _load(request, parent, isMain)
+    entry = _load(request, parent, isMain, preload)
   } finally {
     moduleState.parsing = false
   }
 
   if (entry.module.loaded) {
     entry.state = STATE_EXECUTION_COMPLETED
-
-    if (preload) {
-      preload(entry)
-    }
-
     return entry
   }
 
   if (entry.state < STATE_EXECUTION_STARTED) {
     entry.state = STATE_PARSING_COMPLETED
-
-    if (preload) {
-      preload(entry)
-    }
 
     if (! parseOnly) {
       _load(request, parent, isMain)
