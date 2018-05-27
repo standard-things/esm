@@ -2,70 +2,77 @@ import isDataDescriptor from "./is-data-descriptor.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
+import shared from "../shared.js"
 import unapply from "./unapply.js"
 
-const safeSlice = unapply(Array.prototype.slice)
+function init() {
+  const safeSlice = unapply(Array.prototype.slice)
 
-function safe(Super) {
-  if (typeof Super !== "function") {
-    return isObject(Super)
-      ? copy({}, Super)
-      : Super
-  }
-
-  const Safe = isObjectLike(Super.prototype)
-    ? class extends Super {}
-    : (...args) => Reflect.construct(Super, args)
-
-  const names = keysAll(Super)
-  const safeProto = Safe.prototype
-
-  for (const name of names) {
-    if (name !== "prototype") {
-      copyProperty(Safe, Super, name)
+  function safe(Super) {
+    if (typeof Super !== "function") {
+      return isObject(Super)
+        ? copy({}, Super)
+        : Super
     }
-  }
 
-  copy(safeProto, Super.prototype)
-  Reflect.setPrototypeOf(safeProto, null)
+    const Safe = isObjectLike(Super.prototype)
+      ? class extends Super {}
+      : (...args) => Reflect.construct(Super, args)
 
-  return Safe
-}
+    const names = keysAll(Super)
+    const safeProto = Safe.prototype
 
-function copy(object, source) {
-  const names = keysAll(source)
-
-  for (const name of names) {
-    copyProperty(object, source, name)
-  }
-
-  return object
-}
-
-function copyProperty(object, source, name) {
-  const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
-
-  if (descriptor) {
-    if (Reflect.has(descriptor, "value")) {
-      const { value } = descriptor
-
-      if (Array.isArray(value)) {
-        descriptor.value = safeSlice(value)
+    for (const name of names) {
+      if (name !== "prototype") {
+        copyProperty(Safe, Super, name)
       }
     }
 
-    if (isDataDescriptor(descriptor)) {
-      object[name] = descriptor.value
-    } else {
-      if (Reflect.has(descriptor, "writable")) {
-        descriptor.writable = true
-      }
+    copy(safeProto, Super.prototype)
+    Reflect.setPrototypeOf(safeProto, null)
 
-      Reflect.defineProperty(object, name, descriptor)
-    }
+    return Safe
   }
 
-  return object
+  function copy(object, source) {
+    const names = keysAll(source)
+
+    for (const name of names) {
+      copyProperty(object, source, name)
+    }
+
+    return object
+  }
+
+  function copyProperty(object, source, name) {
+    const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
+
+    if (descriptor) {
+      if (Reflect.has(descriptor, "value")) {
+        const { value } = descriptor
+
+        if (Array.isArray(value)) {
+          descriptor.value = safeSlice(value)
+        }
+      }
+
+      if (isDataDescriptor(descriptor)) {
+        object[name] = descriptor.value
+      } else {
+        if (Reflect.has(descriptor, "writable")) {
+          descriptor.writable = true
+        }
+
+        Reflect.defineProperty(object, name, descriptor)
+      }
+    }
+
+    return object
+  }
+
+  return safe
 }
 
-export default safe
+export default shared.inited
+  ? shared.module.utilSafe
+  : shared.module.utilSafe = init()
