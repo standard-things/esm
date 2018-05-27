@@ -1,3 +1,5 @@
+import GenericArray from "../generic/array.js"
+
 import isDataDescriptor from "./is-data-descriptor.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
@@ -43,8 +45,16 @@ function copyProperty(object, source, name) {
   const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
   if (descriptor) {
+    if (Reflect.has(descriptor, "value")) {
+      const { value } = descriptor
+
+      if (Array.isArray(value)) {
+        descriptor.value = GenericArray.slice(value)
+      }
+    }
+
     if (isDataDescriptor(descriptor)) {
-      object[name] = source[name]
+      object[name] = descriptor.value
     } else {
       if (Reflect.has(descriptor, "writable")) {
         descriptor.writable = true
