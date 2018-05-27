@@ -7,7 +7,7 @@ import maskFunction from "../util/mask-function.js"
 import shared from "../shared.js"
 
 function init() {
-  const builtinConsole = new Console({ stderr, stdout })
+  const builtinConsole = new Console(stdout, stderr)
   const inspectOptionsRegExp = /inspect/i
   const stderrRegExp = /stderr/i
   const stdoutRegExp = /stdout/i
