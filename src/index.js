@@ -113,6 +113,7 @@ if (shared.inited &&
     moduleHook(Module)
     processHook(realProcess)
     vmHook(realVM)
+    builtinVM.createScript = realVM.createScript
   } else if (CLI ||
       INTERNAL ||
       isSideloaded()) {
