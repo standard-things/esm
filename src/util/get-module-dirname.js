@@ -1,5 +1,6 @@
+import { dirname, resolve } from "../safe/path.js"
+
 import builtinModules from "../module/builtin-modules.js"
-import { dirname } from "../safe/path.js"
 import isObject from "./is-object.js"
 
 function getModuleDirname(request) {
@@ -19,7 +20,7 @@ function getModuleDirname(request) {
     }
   }
 
-  return "."
+  return resolve(".")
 }
 
 export default getModuleDirname
