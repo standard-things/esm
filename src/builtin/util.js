@@ -1,5 +1,7 @@
 import copyProperty from "../util/copy-property.js"
 import has from "../util/has.js"
+import format from "../util/format.js"
+import formatWithOptions from "../util/format-with-options.js"
 import inspect from "../util/inspect.js"
 import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import isOwnProxy from "../util/is-own-proxy.js"
@@ -15,15 +17,24 @@ function init() {
   const names = keysAll(safeUtil)
 
   for (const name of names) {
-    if (name !== "inspect" &&
+    if (name !== "format" &&
+        name !== "formatWithOptions" &&
+        name !== "inspect" &&
         name !== "types") {
       copyProperty(builtinUtil, safeUtil, name)
     }
   }
 
-  builtinUtil.inspect = proxyWrap(safeUtil.inspect, inspect)
-
+  const safeFormatWithOptions = safeUtil.formatWithOptions
   const safeTypes = safeUtil.types
+
+  builtinUtil.format = proxyWrap(safeUtil.format, format)
+
+  builtinUtil.formatWithOptions = safeFormatWithOptions
+    ? proxyWrap(safeFormatWithOptions, formatWithOptions)
+    : formatWithOptions
+
+  builtinUtil.inspect = proxyWrap(safeUtil.inspect, inspect)
 
   if (safeTypes) {
     const names = keysAll(safeTypes)

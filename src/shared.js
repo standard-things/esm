@@ -103,6 +103,17 @@ function init() {
     utilBinding
   }
 
+  setDeferred(shared, "circularErrorMessage", () => {
+    try {
+      const object = {}
+
+      object.a = object
+      JSON.stringify(object)
+    } catch ({ message }) {
+      return message
+    }
+  })
+
   setDeferred(shared, "customInspectKey", () => {
     const { customInspectSymbol } = shared.module.safeUtil
 
@@ -177,7 +188,7 @@ function init() {
     // Node < 8 will lookup accessors in the prototype chain despite being
     // shadowed by data properties.
     // https://node.green/#ES2017-annex-b
-    const o = {
+    const object = {
       __proto__: {
         get a() {},
         set a(v) {}
@@ -185,8 +196,8 @@ function init() {
       a: 1
     }
 
-    return ! o.__lookupGetter__("a") &&
-      ! o.__lookupSetter__("a")
+    return ! object.__lookupGetter__("a") &&
+      ! object.__lookupSetter__("a")
   })
 
   setDeferred(support, "nativeProxyReceiver", () => {
