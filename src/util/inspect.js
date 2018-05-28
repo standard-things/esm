@@ -124,7 +124,8 @@ function wrap(object, options, showProxy) {
     getOwnPropertyDescriptor: (target, name) => {
       const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-      if (! has(descriptor, "value")) {
+      if (! descriptor ||
+          ! Reflect.has(descriptor, "value")) {
         return descriptor
       }
 
