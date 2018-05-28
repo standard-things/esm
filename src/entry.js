@@ -528,13 +528,19 @@ function createNamespace(entry, source = entry) {
     }
 
     handler.getOwnPropertyDescriptor = (target, name) => {
-      let object = entry.exports
+      const exported = entry.exports
 
-      if (! has(object, name)) {
-        object = source.namespace
+      if (has(exported, name)) {
+        return Reflect.getOwnPropertyDescriptor(exported, name)
       }
 
-      return Reflect.getOwnPropertyDescriptor(object, name)
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+      if (descriptor) {
+        descriptor.value = handler.get(target, name)
+      }
+
+      return descriptor
     }
 
     handler.set = (target, name, value, receiver) => {
