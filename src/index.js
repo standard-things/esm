@@ -1,12 +1,3 @@
-// Load modules referenced by their `shared.module` cache entry.
-import "./binding.js"
-import "./safe/buffer.js"
-import "./safe/crypto.js"
-import "./safe/path.js"
-import "./safe/process.js"
-import "./safe/util.js"
-import "./util/satisfies.js"
-
 import ENV from "./constant/env.js"
 
 import Module from "./module.js"
