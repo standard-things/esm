@@ -248,9 +248,18 @@ function createAddBuiltinModules(entry) {
     "stream", "string_decoder", "tls", "tty", "url", "util", "v8", "vm", "zlib"
   ]
 
+  const { length } = lazyModules
+
   if (typeof binding.inspector.open === "function") {
     lazyModules.push("inspector")
-    lazyModules.sort()
+  }
+
+  if (binding.config.experimentalWorker) {
+    lazyModules.push("worker")
+  }
+
+  if (lazyModules.length !== length) {
+    lazyModules.slice()
   }
 
   return function addBuiltinModules(context) {

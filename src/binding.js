@@ -22,6 +22,7 @@ function init() {
     __proto__: null,
     config: [
       "experimentalREPLAwait",
+      "experimentalWorker",
       "exposeInternals",
       "preserveSymlinks",
       "preserveSymlinksMain"
