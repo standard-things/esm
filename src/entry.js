@@ -15,7 +15,6 @@ import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
-import setGetter from "./util/set-getter.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 
@@ -169,27 +168,40 @@ class Entry {
 
     const { _namespace } = this
 
-    if (this.type === TYPE_CJS &&
-        name === "default") {
-      setGetter(_namespace, "default", () => this.exports)
-      return this
-    }
-
-    Reflect.defineProperty(_namespace, name, {
+    const descriptor = {
       configurable: true,
       enumerable: true,
-      get: () => {
+      get: null,
+      set: null
+    }
+
+    if (this.type === TYPE_CJS &&
+        name === "default") {
+      descriptor.get = () => this.exports
+
+      descriptor.set = function (value) {
+        Reflect.defineProperty(this, name, {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
+      }
+    } else {
+      descriptor.get = () => {
         const exported = this.exports
 
         if (has(exported, name)) {
           return exported[name]
         }
-      },
-      set: (value) => {
+      }
+
+      descriptor.set = (value) => {
         this.exports[name] = value
       }
-    })
+    }
 
+    Reflect.defineProperty(_namespace, name, descriptor)
     return this
   }
 
@@ -241,7 +253,6 @@ class Entry {
     }
 
     seen.add(otherEntry)
-
     return this
   }
 
