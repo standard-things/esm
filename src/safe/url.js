@@ -1,15 +1,15 @@
-import realUrl from "../real/url.js"
+import realURL from "../real/url.js"
 import safe from "../util/safe.js"
 import shared from "../shared.js"
 
-const safeUrl = shared.inited
-  ? shared.module.safeUrl
-  : shared.module.safeUrl = safe(realUrl)
+const safeURL = shared.inited
+  ? shared.module.safeURL
+  : shared.module.safeURL = safe(realURL)
 
 export const {
   URL,
   domainToUnicode,
   parse
-} = safeUrl
+} = safeURL
 
-export default safeUrl
+export default safeURL

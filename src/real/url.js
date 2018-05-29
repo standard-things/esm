@@ -3,5 +3,5 @@ import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
 export default shared.inited
-  ? shared.module.realUrl
-  : shared.module.realUrl = unwrapProxy(realRequire("url"))
+  ? shared.module.realURL
+  : shared.module.realURL = unwrapProxy(realRequire("url"))
