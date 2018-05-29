@@ -263,7 +263,7 @@ function createAddBuiltinModules(entry) {
   }
 
   if (lazyModules.length !== length) {
-    lazyModules.slice()
+    lazyModules.sort()
   }
 
   return function addBuiltinModules(context) {
