@@ -6,7 +6,7 @@ import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Module from "../module.js"
 import Package from "../package.js"
-import { REPLServer } from "repl"
+import { REPLServer } from "../safe/repl.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
 
