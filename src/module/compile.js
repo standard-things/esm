@@ -16,9 +16,9 @@ import getSilent from "../util/get-silent.js"
 import has from "../util/has.js"
 import makeRequireFunction from "./make-require-function.js"
 import realProcess from "../real/process.js"
+import realVM from "../real/vm.js"
 import shared from "../shared.js"
 import stripShebang from "../util/strip-shebang.js"
-import vm from "vm"
 
 const {
   STATE_EXECUTION_COMPLETED,
@@ -30,7 +30,7 @@ const {
 // Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
 
-const runInDebugContext = getSilent(vm, "runInDebugContext")
+const runInDebugContext = getSilent(realVM, "runInDebugContext")
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 
@@ -63,7 +63,7 @@ function compile(content, filename) {
     (compileData && compileData.scriptData) ||
     void 0
 
-  const script = new vm.Script(wrapper, {
+  const script = new realVM.Script(wrapper, {
     cachedData,
     filename,
     produceCachedData: true
