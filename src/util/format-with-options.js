@@ -118,12 +118,14 @@ function init() {
       const value = args[argsIndex]
       const type = typeof value
 
+      result += " "
+
       if (value === null ||
           (type !== "object" &&
-          type !== "symbol")) {
-        result += " " + value
+           type !== "symbol")) {
+        result += value
       } else {
-        result += " " + inspect(value, options)
+        result += inspect(value, options)
       }
     }
 
