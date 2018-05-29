@@ -7,20 +7,22 @@ import maskFunction from "../util/mask-function.js"
 import shared from "../shared.js"
 
 function init() {
-  const builtinConsole = new Console(stdout, stderr)
   const inspectOptionsRegExp = /inspect/i
   const stderrRegExp = /stderr/i
   const stdoutRegExp = /stdout/i
-  const symbols = Object.getOwnPropertySymbols(Console.prototype)
+
+  const symbols = Object
+    .getOwnPropertySymbols(Console.prototype)
+    .map(String)
 
   const formatForStderrSymbol = symbols
-    .find((symbol) => stderrRegExp.test(String(symbol)))
+    .find((symbol) => stderrRegExp.test(symbol))
 
   const formatForStdoutSymbol = symbols
-    .find((symbol) => stdoutRegExp.test(String(symbol)))
+    .find((symbol) => stdoutRegExp.test(symbol))
 
   const getInspectOptionsSymbol = symbols
-    .find((symbol) => inspectOptionsRegExp.test(String(symbol)))
+    .find((symbol) => inspectOptionsRegExp.test(symbol))
 
   function createFormatter(object, name, stdio) {
     return maskFunction(function (args) {
@@ -29,6 +31,8 @@ function init() {
       return builtinUtil.formatWithOptions(options, ...args)
     }, object[name])
   }
+
+  const builtinConsole = new Console(stdout, stderr)
 
   if (getInspectOptionsSymbol) {
     if (formatForStderrSymbol) {
