@@ -79,8 +79,8 @@ function init() {
   function maybeWrap(visitor, path) {
     let node = path.getValue()
 
-    const parent = path.getParentNode()
-    const { type } = parent
+    let parent = path.getParentNode()
+    let { type } = parent
 
     if ((type === "AssignmentExpression" &&
          parent.left === node) ||
@@ -88,10 +88,25 @@ function init() {
       return
     }
 
+    if (type === "MemberExpression") {
+      const grandParent = path.getNode(-3)
+
+      if (grandParent) {
+        parent = grandParent
+        type = parent.type
+      }
+    }
+
     const { name } = node
     const { runtimeName } = visitor
 
-    if (type === "Property") {
+    let prefix = ""
+    let postfix = ""
+
+    if (type === "NewExpression") {
+      prefix = "("
+      postfix = ")"
+    } else if (type === "Property") {
       if (parent.shorthand) {
         visitor.magicString
           .prependLeft(node.end, ":" + runtimeName + '.t("' + name + '",' + name + ")")
@@ -120,8 +135,8 @@ function init() {
     checked.add(node)
 
     visitor.magicString
-      .prependRight(node.start, "(" + runtimeName + '.t("' + name + '",')
-      .prependRight(node.end, "))")
+      .prependRight(node.start, prefix + runtimeName + '.t("' + name + '",')
+      .prependRight(node.end, ")" + postfix)
   }
 
   return new TemporalVisitor
