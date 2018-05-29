@@ -14,6 +14,7 @@ import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import isSideloaded from "./env/is-sideloaded.js"
+import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import processHook from "./hook/process.js"
@@ -104,7 +105,12 @@ if (shared.inited &&
     moduleHook(Module)
     processHook(realProcess)
     vmHook(realVM)
-    builtinVM.createScript = realVM.createScript
+
+    const names = keys(builtinVM)
+
+    for (const name of names) {
+      builtinVM[name] = realVM[name]
+    }
   } else if (CLI ||
       INTERNAL ||
       isSideloaded()) {
