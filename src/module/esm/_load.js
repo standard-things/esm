@@ -9,7 +9,6 @@ import builtinEntries from "../../builtin-entries.js"
 import { dirname } from "../../safe/path.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
-import has from "../../util/has.js"
 import isMJS from "../../util/is-mjs.js"
 import loader from "./loader.js"
 import moduleNodeModulePaths from "../node-module-paths.js"
@@ -60,12 +59,12 @@ function load(request, parent, isMain, preload) {
     : filename
 
   if (isExtMJS ||
-      has(moduleState._cache, request)) {
+      Reflect.has(moduleState._cache, request)) {
     state = moduleState
   } else if (parseOnly ||
       parsing) {
     state = parseState
-  } else if (has(parseState._cache, request)) {
+  } else if (Reflect.has(parseState._cache, request)) {
     const child = parseState._cache[request]
 
     if (isUnexposed &&

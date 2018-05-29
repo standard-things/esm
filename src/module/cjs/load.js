@@ -12,7 +12,6 @@ import _load from "../_load.js"
 import _loadESM from "../esm/_load.js"
 import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
-import has from "../../util/has.js"
 import loader from "./loader.js"
 import parseState from "../../parse/state.js"
 import shared from "../../shared.js"
@@ -47,7 +46,7 @@ function load(request, parent, isMain, preload) {
   if (parseOnly ||
       parsing) {
     state = parseState
-  } else if (has(parseState._cache, filename)) {
+  } else if (Reflect.has(parseState._cache, filename)) {
     state._cache[filename] = parseState._cache[filename]
     Reflect.deleteProperty(parseState._cache, filename)
   }
