@@ -63,7 +63,9 @@ function init() {
 
       const { type } = parent
 
-      if (type === "BlockStatement") {
+      if (type === "WithStatement") {
+        shadowed = true
+      } else if (type === "BlockStatement") {
         shadowed = hasVariable(parent, name)
       } else if (type === "FunctionDeclaration" ||
           type === "FunctionExpression" ||
