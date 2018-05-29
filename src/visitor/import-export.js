@@ -1,4 +1,3 @@
-import CHAR_CODE from "../constant/char-code.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Visitor from "../visitor.js"
@@ -6,16 +5,15 @@ import Visitor from "../visitor.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import isIdentifier from "../parse/is-identifier.js"
 import keys from "../util/keys.js"
 import { lineBreakRegExp } from "../acorn.js"
+import overwrite from "../parse/overwrite.js"
+import pad from "../parse/pad.js"
+import preserveChild from "../parse/preserve-child.js"
+import preserveLine from "../parse/preserve-line.js"
 import shared from "../shared.js"
 
 function init() {
-  const {
-    CARRIAGE_RETURN
-  } = CHAR_CODE
-
   const {
     MODULE
   } = SOURCE_TYPE
@@ -34,17 +32,13 @@ function init() {
       this.magicString.prependLeft(top.insertCharIndex, code)
     }
 
-    reset(rootPath, code, options) {
+    reset(rootPath, options) {
       const { magicString } = options
 
-      this.addedDirectEval = false
-      this.addedDynamicImport = false
       this.addedImportExport = false
       this.addedImportMeta = false
-      this.addedIndirectEval = false
       this.assignableExports = { __proto__: null }
       this.changed = false
-      this.code = code
       this.dependencySpecifiers = { __proto__: null }
       this.exportFrom = { __proto__: null }
       this.exportNames = []
@@ -75,8 +69,7 @@ function init() {
       if (callee.name === "eval") {
         // Support direct eval:
         // eval(code)
-        this.changed =
-        this.addedDirectEval = true
+        this.changed = true
 
         let code = runtimeName + ".c"
 
@@ -90,53 +83,12 @@ function init() {
       } else if (callee.type === "Import") {
         // Support dynamic import:
         // import("mod")
-        this.changed =
-        this.addedDynamicImport = true
+        this.changed = true
 
         overwrite(this, callee.start, callee.end, runtimeName + ".i")
       }
 
       this.visitChildren(path)
-    }
-
-    visitIdentifier(path) {
-      const node = path.getValue()
-
-      if (node.name !== "eval") {
-        return
-      }
-
-      const parent = path.getParentNode()
-      const { type } = parent
-
-      if (type === "CallExpression" ||
-          (type === "AssignmentExpression" &&
-           parent.left === node) ||
-          ! isIdentifier(node, parent)) {
-        return
-      }
-
-      // Support indirect eval:
-      // o = { eval }
-      // o.e = eval
-      // (0, eval)(code)
-      this.changed =
-      this.addedIndirectEval = true
-
-      const { runtimeName } = this
-
-      let code = runtimeName + ".g"
-
-      if (! this.strict) {
-        code = "(eval===" + runtimeName + ".v?" + code + ":eval)"
-      }
-
-      if (type === "Property" &&
-          parent.shorthand) {
-        this.magicString.prependLeft(node.end, ":" + code)
-      } else {
-        overwrite(this, node.start, node.end, code)
-      }
     }
 
     visitImportDeclaration(path) {
@@ -195,18 +147,19 @@ function init() {
       this.addedImportExport = true
 
       const node = path.getValue()
+      const { original } = this.magicString
       const { runtimeName } = this
       const { source } = node
       const specifierString = getSourceString(this, node)
       const specifierName = specifierString.slice(1, -1)
 
       const hoistedCode = pad(
-        this,
+        original,
         runtimeName + ".w(" + specifierString,
         node.start,
         source.start
       ) + pad(
-        this,
+        original,
         ',[["*",null,' + runtimeName + ".n()]]);",
         source.end,
         node.end
@@ -264,11 +217,10 @@ function init() {
         let suffix = ");"
 
         if (type === "SequenceExpression") {
-          // If the exported expression is a comma-separated sequence expression,
-          // `this.code.slice(declaration.start, declaration.end)` may not include
-          // the vital parentheses, so we should wrap the expression with parentheses
-          // to make absolutely sure it's treated as a single argument to
-          // `runtime.default()`, rather than as multiple arguments.
+          // If the exported expression is a comma-separated sequence expression
+          // it may not include the vital parentheses, so we should wrap the
+          // expression with parentheses to make sure it's treated as a single
+          // argument to `runtime.default()`, rather than as multiple arguments.
           prefix += "("
           suffix = ")" + suffix
         }
@@ -499,7 +451,7 @@ function init() {
   // Gets a string representation (including quotes) from an import or
   // export declaration node.
   function getSourceString(visitor, { source }) {
-    return visitor.code.slice(source.start, source.end)
+    return visitor.magicString.original.slice(source.start, source.end)
   }
 
   function hoistExports(visitor, node, pairs) {
@@ -515,64 +467,6 @@ function init() {
   function hoistImports(visitor, node, hoistedCode) {
     preserveLine(visitor, node)
     visitor.top.hoistedImportsString += hoistedCode
-  }
-
-  function overwrite(visitor, oldStart, oldEnd, newCode) {
-    const { magicString } = visitor
-    const padded = pad(visitor, newCode, oldStart, oldEnd)
-
-    if (oldStart !== oldEnd) {
-      magicString.overwrite(oldStart, oldEnd, padded)
-    } else if (padded !== "") {
-      magicString.prependLeft(oldStart, padded)
-    }
-  }
-
-  function pad(visitor, newCode, oldStart, oldEnd) {
-    const oldCode = visitor.code.slice(oldStart, oldEnd)
-    const oldLines = oldCode.split("\n")
-    const newLines = newCode.split("\n")
-    const lastIndex = newLines.length - 1
-    const { length } = oldLines
-
-    let i = lastIndex - 1
-
-    while (++i < length) {
-      const oldLine = oldLines[i]
-      const lastCharCode = oldLine.charCodeAt(oldLine.length - 1)
-
-      if (i > lastIndex) {
-        newLines[i] = ""
-      }
-
-      if (lastCharCode === CARRIAGE_RETURN) {
-        newLines[i] += "\r"
-      }
-    }
-
-    return newLines.join("\n")
-  }
-
-  function preserveChild(visitor, node, childName) {
-    const child = node[childName]
-    const childStart = child.start
-    const nodeStart = node.start
-
-    let padding
-
-    if (childStart > visitor.firstLineBreakPos) {
-      const count = childStart - nodeStart
-
-      padding = count === 7 ? "       " : " ".repeat(count)
-    } else {
-      padding = ""
-    }
-
-    overwrite(visitor, nodeStart, childStart, padding)
-  }
-
-  function preserveLine(visitor, { end, start }) {
-    overwrite(visitor, start, end, "")
   }
 
   function safeName(name, localNames) {
