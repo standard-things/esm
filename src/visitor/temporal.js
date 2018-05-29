@@ -91,13 +91,7 @@ function init() {
     const { name } = node
     const { runtimeName } = visitor
 
-    let prefix = ""
-    let postfix = ""
-
-    if (type === "NewExpression") {
-      prefix = "("
-      postfix = ")"
-    } else if (type === "Property") {
+    if (type === "Property") {
       if (parent.shorthand) {
         visitor.magicString
           .prependLeft(node.end, ":" + runtimeName + '.t("' + name + '",' + name + ")")
@@ -126,8 +120,8 @@ function init() {
     checked.add(node)
 
     visitor.magicString
-      .prependRight(node.start, prefix + runtimeName + '.t("' + name + '",')
-      .prependRight(node.end, ")" + postfix)
+      .prependRight(node.start, "(" + runtimeName + '.t("' + name + '",')
+      .prependRight(node.end, "))")
   }
 
   return new TemporalVisitor
