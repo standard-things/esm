@@ -1,6 +1,7 @@
 import { stderr, stdout } from "../safe/process.js"
 
 import { Console } from "../safe/console.js"
+import GenericSymbol from "../generic/symbol.js"
 
 import builtinUtil from "./util.js"
 import maskFunction from "../util/mask-function.js"
@@ -11,18 +12,16 @@ function init() {
   const stderrRegExp = /stderr/i
   const stdoutRegExp = /stdout/i
 
-  const symbols = Object
-    .getOwnPropertySymbols(Console.prototype)
-    .map(String)
+  const symbols = Object.getOwnPropertySymbols(Console.prototype)
 
   const formatForStderrSymbol = symbols
-    .find((symbol) => stderrRegExp.test(symbol))
+    .find((symbol) => stderrRegExp.test(GenericSymbol.toString(symbol)))
 
   const formatForStdoutSymbol = symbols
-    .find((symbol) => stdoutRegExp.test(symbol))
+    .find((symbol) => stdoutRegExp.test(GenericSymbol.toString(symbol)))
 
   const getInspectOptionsSymbol = symbols
-    .find((symbol) => inspectOptionsRegExp.test(symbol))
+    .find((symbol) => inspectOptionsRegExp.test(GenericSymbol.toString(symbol)))
 
   function createFormatter(object, name, stdio) {
     return maskFunction(function (args) {
