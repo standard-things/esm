@@ -239,7 +239,6 @@ function runCJS(entry, moduleWrapper) {
 
   return Reflect.apply(moduleWrapper, exported, [
     builtinGlobal,
-    builtinGlobal.console,
     exported,
     makeRequireFunction(mod)
   ])
@@ -255,14 +254,12 @@ function runESM(entry, moduleWrapper) {
       ! isMJS(mod)) {
     result = Reflect.apply(moduleWrapper, exported, [
       builtinGlobal,
-      builtinGlobal.console,
       exported,
       makeRequireFunction(mod)
     ])
   } else {
     result = Reflect.apply(moduleWrapper, void 0, [
-      builtinGlobal,
-      builtinGlobal.console
+      builtinGlobal
     ])
   }
 

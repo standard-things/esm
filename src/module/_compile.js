@@ -199,7 +199,7 @@ function tryCompileCJS(entry, filename) {
       (compileData.topLevelReturn ? "return " : "") +
       runtimeName + ".r((" +
       (useAsync ? "async " :  "") +
-      "function(global,console,exports,require){" +
+      "function(global,exports,require){" +
       content +
       "\n}))"
 
@@ -232,7 +232,7 @@ function tryCompileESM(entry, filename) {
     (compileData.topLevelReturn ? "return " : "") +
     runtimeName + ".r((" +
     (useAsyncWrapper(entry) ? "async " :  "") +
-    "function(global,console" +
+    "function(global" +
     (cjsVars ? ",exports,require" : "") +
     '){"use strict";' +
     compileData.code +
