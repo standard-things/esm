@@ -46,13 +46,18 @@ function inspect(...args) {
 }
 
 function formatNamespaceObject(namespace, options) {
-  return safeInspect(toNamespaceObject(namespace, (target, name) => {
-    try {
-      return target[name]
-    } catch (e) {}
+  const object = toNamespaceObject()
+  const names = Object.getOwnPropertyNames(namespace)
 
-    return uninitializedValue
-  }), options)
+  for (const name of names) {
+    try {
+      object[name] = namespace[name]
+    } catch (e) {
+      object[name] = uninitializedValue
+    }
+  }
+
+  return safeInspect(object, options)
 }
 
 function formatProxy(proxy, options) {
