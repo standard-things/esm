@@ -214,6 +214,10 @@ function hook(vm) {
     const _inspect = realUtil.inspect
 
     setGetter(realUtil, "inspect", function () {
+      // The first get occurs in Node's lib/repl.js as an assignment to
+      // `repl.writer`. It needs to be the original `util.inspect` for ANSI
+      // coloring to be enabled.
+      // https://github.com/nodejs/node/blob/v9.11.1/lib/repl.js#L377-L382
       this.inspect = inspect
       return _inspect
     })
