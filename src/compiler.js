@@ -7,6 +7,7 @@ import Parser from "./parser.js"
 
 import argumentsVisitor from "./visitor/arguments.js"
 import assignmentVisitor from "./visitor/assignment.js"
+import evalVisitor from "./visitor/eval.js"
 import defaults from "./util/defaults.js"
 import findIndexes from "./parse/find-indexes.js"
 import hasPragma from "./parse/has-pragma.js"
@@ -86,9 +87,10 @@ function init() {
       }
 
       const possibleExportIndexes = findIndexes(code, ["export"])
-      const possibleIndexes = findIndexes(code, ["eval", "import"])
+      const possibleEvalIndexes = findIndexes(code, ["eval"])
+      const possibleIndexes = findIndexes(code, ["import"])
 
-      possibleIndexes.push(...possibleExportIndexes)
+      possibleIndexes.push(...possibleExportIndexes, ...possibleEvalIndexes)
 
       let ast
       let error
@@ -146,7 +148,7 @@ function init() {
       Reflect.deleteProperty(ast, "top")
 
       try {
-        importExportVisitor.visit(rootPath, code, {
+        importExportVisitor.visit(rootPath, {
           generateVarDeclarations: options.var,
           magicString,
           possibleIndexes,
@@ -160,7 +162,14 @@ function init() {
         throw e
       }
 
-      result.changed = importExportVisitor.changed
+      if (possibleEvalIndexes.length) {
+        evalVisitor.visit(rootPath, {
+          magicString,
+          possibleIndexes: possibleEvalIndexes,
+          runtimeName,
+          strict
+        })
+      }
 
       const {
         addedImportExport,
@@ -175,12 +184,15 @@ function init() {
         const { assignableExports } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
-          "eval",
           ...keys(importLocals),
           ...keys(assignableExports)
         ])
 
+        possibleIndexes.push(...possibleEvalIndexes)
+
         if (possibleIndexes.length) {
+          possibleIndexes.sort()
+
           try {
             assignmentVisitor.visit(rootPath, {
               assignableExports,
@@ -197,6 +209,10 @@ function init() {
 
         importExportVisitor.finalizeHoisting()
       }
+
+      result.changed =
+        evalVisitor.changed ||
+        importExportVisitor.changed
 
       if (sourceType === UNAMBIGUOUS) {
         sourceType = SCRIPT
