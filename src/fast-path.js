@@ -23,14 +23,14 @@ function init() {
       stack.push(key, object[key])
 
       const result = visitor[methodName](this)
-      stack.length -= 2
 
+      stack.length -= 2
       return result
     }
 
     // Similar to `FastPath.prototype.call`, except that the value obtained by
-    // `this.getValue()` should be array-like. The `visitor` method is called with
-    // a reference to this path object for each element of the array.
+    // `this.getValue()` should be array-like. The `visitor` method is called
+    // with a reference to this path object for each element of the array.
     each(visitor, methodName) {
       const { stack } = this
       const array = stack[stack.length - 1]
@@ -45,42 +45,43 @@ function init() {
       }
     }
 
+    getNode(pos = -1, callback) {
+      const { stack } = this
+
+      let i = stack.length
+
+      if (typeof callback !== "function") {
+        callback = alwaysTrue
+      }
+
+      if (pos !== void 0) {
+        i = pos < 0 ? i + pos : pos
+      }
+
+      while (i-- > 0) {
+        // Without a complete list of node type names, we have to settle for this
+        // fuzzy matching of object shapes.
+        const value = stack[i--]
+
+        if (isObject(value) &&
+            ! Array.isArray(value) &&
+            callback(value)) {
+          return value
+        }
+      }
+
+      return null
+    }
+
     getParentNode(callback) {
-      return getNode(this, -2, callback)
+      return this.getNode(-2, callback)
     }
 
     getValue() {
       const { stack } = this
+
       return stack[stack.length - 1]
     }
-  }
-
-  function getNode(path, pos, callback) {
-    const { stack } = path
-    const stackCount = stack.length
-
-    let i = stackCount
-
-    if (typeof callback !== "function") {
-      callback = alwaysTrue
-    }
-
-    if (pos !== void 0) {
-      i = pos < 0 ? i + pos : pos
-    }
-
-    while (i-- > 0) {
-      // Without a complete list of node type names, we have to settle for this
-      // fuzzy matching of object shapes.
-      const value = stack[i--]
-      if (isObject(value) &&
-          ! Array.isArray(value) &&
-          callback(value)) {
-        return value
-      }
-    }
-
-    return null
   }
 
   Reflect.setPrototypeOf(FastPath.prototype, null)
