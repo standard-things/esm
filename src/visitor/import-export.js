@@ -23,6 +23,7 @@ function init() {
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
+
       const code =
         top.hoistedPrefixString +
         toModuleExport(this, top.hoistedExports) +
@@ -465,8 +466,8 @@ function init() {
   }
 
   function hoistImports(visitor, node, hoistedCode) {
-    preserveLine(visitor, node)
     visitor.top.hoistedImportsString += hoistedCode
+    preserveLine(visitor, node)
   }
 
   function safeName(name, localNames) {
