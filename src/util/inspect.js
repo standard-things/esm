@@ -61,24 +61,29 @@ function formatNamespaceObject(namespace, context) {
 }
 
 function formatProxy(proxy, context) {
-  const contextAsOptions = assign({}, context)
-  const [object, handler] = getProxyDetails(proxy)
+  const details = getProxyDetails(proxy)
 
-  const mockObject = {
-    [shared.customInspectKey]: (recurseTimes) => {
-      contextAsOptions.depth = recurseTimes
-      return inspect(object, contextAsOptions)
-    }
+  let object = proxy
+
+  if (details) {
+    const contextAsOptions = assign({}, context)
+    const { customInspectKey } = shared
+    const [target, handler] = details
+
+    object = new Proxy({
+      [customInspectKey]: (recurseTimes) => {
+        contextAsOptions.depth = recurseTimes
+        return inspect(target, contextAsOptions)
+      }
+    }, {
+      [customInspectKey]: (recurseTimes) => {
+        contextAsOptions.depth = recurseTimes
+        return inspect(handler, contextAsOptions)
+      }
+    })
   }
 
-  const mockHandler = {
-    [shared.customInspectKey]: (recurseTimes) => {
-      contextAsOptions.depth = recurseTimes
-      return inspect(handler, contextAsOptions)
-    }
-  }
-
-  return safeInspect(new Proxy(mockObject, mockHandler), context)
+  return safeInspect(object, context)
 }
 
 function wrap(object, options, showProxy) {
