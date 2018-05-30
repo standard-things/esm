@@ -65,28 +65,13 @@ function init() {
       }
 
       const { callee } = node
-      const { runtimeName } = this
 
-      if (callee.name === "eval") {
-        // Support direct eval:
-        // eval(code)
-        this.changed = true
-
-        let code = runtimeName + ".c"
-
-        if (! this.strict) {
-          code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
-        }
-
-        this.magicString
-          .prependLeft(callee.end, "(" + code)
-          .prependLeft(node.end, ")")
-      } else if (callee.type === "Import") {
+      if (callee.type === "Import") {
         // Support dynamic import:
         // import("mod")
         this.changed = true
 
-        overwrite(this, callee.start, callee.end, runtimeName + ".i")
+        overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
       }
 
       this.visitChildren(path)

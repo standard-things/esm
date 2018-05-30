@@ -22,18 +22,6 @@ function init() {
       this.visitChildren(path)
     }
 
-    visitCallExpression(path) {
-      const node = path.getValue()
-
-      if (node.arguments.length &&
-          node.callee.name === "eval") {
-        // Wrap direct eval calls.
-        wrap(this, path)
-      }
-
-      this.visitChildren(path)
-    }
-
     visitUpdateExpression(path) {
       assignmentHelper(this, path, "argument")
       this.visitChildren(path)

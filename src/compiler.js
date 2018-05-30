@@ -87,11 +87,17 @@ function init() {
         }
       }
 
+      const possibleConsoleIndexes = findIndexes(code, ["console"])
       const possibleExportIndexes = findIndexes(code, ["export"])
       const possibleEvalIndexes = findIndexes(code, ["eval"])
       const possibleIndexes = findIndexes(code, ["import"])
 
-      possibleIndexes.push(...possibleExportIndexes, ...possibleEvalIndexes)
+      const possibleChanges = !! (
+        possibleConsoleIndexes.length ||
+        possibleExportIndexes.length ||
+        possibleEvalIndexes.length ||
+        possibleIndexes.length
+      )
 
       let ast
       let error
@@ -99,7 +105,7 @@ function init() {
 
       if ((sourceType === SCRIPT ||
           sourceType === UNAMBIGUOUS) &&
-          ! possibleIndexes.length) {
+          ! possibleChanges) {
         return result
       }
 
@@ -144,7 +150,9 @@ function init() {
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
+      possibleIndexes.push(...possibleExportIndexes)
       possibleIndexes.sort()
+
       result.topLevelReturn = top.returnOutsideFunction
       Reflect.deleteProperty(ast, "top")
 
@@ -163,7 +171,16 @@ function init() {
         throw e
       }
 
-      const possibleConsoleIndexes = findIndexes(code, ["console"])
+      const {
+        addedImportExport,
+        importLocals,
+        temporals
+      } = importExportVisitor
+
+      if (addedImportExport ||
+          importExportVisitor.addedImportMeta) {
+        sourceType = MODULE
+      }
 
       if (possibleConsoleIndexes.length &&
           top.identifiers.indexOf("console") === -1) {
@@ -176,6 +193,7 @@ function init() {
       if (possibleEvalIndexes.length &&
           top.identifiers.indexOf("eval") === -1) {
         evalVisitor.visit(rootPath, {
+          addedImportExport,
           magicString,
           possibleIndexes: possibleEvalIndexes,
           runtimeName,
@@ -183,16 +201,7 @@ function init() {
         })
       }
 
-      const {
-        addedImportExport,
-        importLocals,
-        temporals
-      } = importExportVisitor
-
-      if (addedImportExport ||
-          importExportVisitor.addedImportMeta) {
-        sourceType = MODULE
-
+      if (addedImportExport) {
         const { assignableExports } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
@@ -200,11 +209,7 @@ function init() {
           ...keys(assignableExports)
         ])
 
-        possibleIndexes.push(...possibleEvalIndexes)
-
         if (possibleIndexes.length) {
-          possibleIndexes.sort()
-
           try {
             assignmentVisitor.visit(rootPath, {
               assignableExports,
