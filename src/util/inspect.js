@@ -45,7 +45,7 @@ function inspect(...args) {
   return Reflect.apply(safeInspect, this, args)
 }
 
-function formatNamespaceObject(namespace, options) {
+function formatNamespaceObject(namespace, context) {
   const object = toNamespaceObject()
   const names = Object.getOwnPropertyNames(namespace)
 
@@ -57,30 +57,32 @@ function formatNamespaceObject(namespace, options) {
     }
   }
 
-  return safeInspect(object, options)
+  return inspect(object, context)
 }
 
-function formatProxy(proxy, options) {
-  const { depth } = options
+function formatProxy(proxy, context) {
+  const contextAsOptions = assign({}, context)
+  const [object, handler] = getProxyDetails(proxy)
 
-  if (depth != null) {
-    if (depth < 0) {
-      return options.stylize("Proxy [Array]", "special")
+  const mockObject = {
+    [shared.customInspectKey]: (recurseTimes) => {
+      contextAsOptions.depth = recurseTimes
+      return inspect(object, contextAsOptions)
     }
-
-    options.depth -= 1
   }
 
-  const details = getProxyDetails(proxy)
+  const mockHandler = {
+    [shared.customInspectKey]: (recurseTimes) => {
+      contextAsOptions.depth = recurseTimes
+      return inspect(handler, contextAsOptions)
+    }
+  }
 
-  options.indentationLvl += 2
-
-  return "Proxy [" +
-    safeInspect(details[0], options) + ", " +
-    safeInspect(details[1], options) + "]"
+  return safeInspect(new Proxy(mockObject, mockHandler), context)
 }
 
 function wrap(object, options, showProxy) {
+  let initedContext = false
   let inspecting = false
 
   return new OwnProxy(object, {
@@ -97,29 +99,33 @@ function wrap(object, options, showProxy) {
 
         let [recurseTimes, context] = args
 
+        if (! initedContext) {
+          initedContext = true
+          context.showProxy = showProxy
+        }
+
+        const contextAsOptions = assign({}, context)
         const [unwrapped] = getProxyDetails(this)
 
-        options = assign({}, options, context)
-        options.depth = recurseTimes
+        contextAsOptions.depth = recurseTimes
 
         try {
           if (isModuleNamespaceObject(unwrapped)) {
-            return formatNamespaceObject(this, options)
+            return formatNamespaceObject(this, contextAsOptions)
           }
 
           if (! showProxy ||
               ! isProxy(unwrapped) ||
               isOwnProxy(unwrapped)) {
-            if (typeof value !== "function") {
-              return safeInspect(this, options)
+            if (typeof value === "function") {
+              return Reflect.apply(value, unwrapped, args)
             }
 
-            args[1] = assign({}, context)
-            args[1].showProxy = showProxy
-            return Reflect.apply(value, unwrapped, args)
+            contextAsOptions.showProxy = false
+            return safeInspect(this, contextAsOptions)
           }
 
-          return formatProxy(unwrapped, options)
+          return formatProxy(unwrapped, contextAsOptions)
         } finally {
           inspecting = false
         }
