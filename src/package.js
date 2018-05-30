@@ -193,6 +193,10 @@ class Package {
   }
 
   static get(dirPath, force) {
+    if (dirPath === ".") {
+      dirPath = resolve(dirPath)
+    }
+
     return getInfo(dirPath, force) || Package.state.default
   }
 
