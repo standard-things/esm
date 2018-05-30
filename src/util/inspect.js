@@ -90,7 +90,7 @@ function wrap(object, options, showProxy) {
   let initedContext = false
   let inspecting = false
 
-  return new OwnProxy(object, {
+  const proxy = new OwnProxy(object, {
     get: (target, name, receiver) => {
       const value = Reflect.get(target, name, receiver)
 
@@ -99,7 +99,7 @@ function wrap(object, options, showProxy) {
         return value
       }
 
-      return function (...args) {
+      return (...args) => {
         inspecting = true
 
         let [recurseTimes, context] = args
@@ -110,27 +110,26 @@ function wrap(object, options, showProxy) {
         }
 
         const contextAsOptions = assign({}, context)
-        const [unwrapped] = getProxyDetails(this)
 
         contextAsOptions.depth = recurseTimes
 
         try {
-          if (isModuleNamespaceObject(unwrapped)) {
-            return formatNamespaceObject(this, contextAsOptions)
+          if (isModuleNamespaceObject(target)) {
+            return formatNamespaceObject(target, contextAsOptions)
           }
 
           if (! showProxy ||
-              ! isProxy(unwrapped) ||
-              isOwnProxy(unwrapped)) {
+              ! isProxy(target) ||
+              isOwnProxy(target)) {
             if (typeof value === "function") {
-              return Reflect.apply(value, unwrapped, args)
+              return Reflect.apply(value, target, args)
             }
 
             contextAsOptions.showProxy = false
-            return safeInspect(this, contextAsOptions)
+            return safeInspect(proxy, contextAsOptions)
           }
 
-          return formatProxy(unwrapped, contextAsOptions)
+          return formatProxy(target, contextAsOptions)
         } finally {
           inspecting = false
         }
@@ -155,6 +154,8 @@ function wrap(object, options, showProxy) {
       return descriptor
     }
   })
+
+  return proxy
 }
 
 export default inspect
