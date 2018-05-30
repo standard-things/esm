@@ -7,6 +7,7 @@ import shared from "../shared.js"
 function init() {
   class EvalVisitor extends Visitor {
     reset(rootPath, options) {
+      this.changed = false
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
