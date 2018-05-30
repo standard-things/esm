@@ -19,20 +19,18 @@ function init() {
 
     visitAssignmentExpression(path) {
       assignmentHelper(this, path, "left")
-      this.visitChildren(path)
+      path.call(this, "visitWithoutReset", "right")
     }
 
     visitUpdateExpression(path) {
       assignmentHelper(this, path, "argument")
-      this.visitChildren(path)
     }
   }
 
   function assignmentHelper(visitor, path, childName) {
     const { assignableExports, importLocals } = visitor
     const node = path.getValue()
-    const child = node[childName]
-    const names = getNamesFromPattern(child)
+    const names = getNamesFromPattern(node[childName])
 
     // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {

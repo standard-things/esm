@@ -19,32 +19,38 @@ function init() {
       const node = path.getValue()
       const { callee } = node
 
-      if (node.arguments.length &&
-          callee.name === "eval") {
-        // Support direct eval:
-        // eval(code)
-        this.changed = true
-
-        const { runtimeName } = this
-
-        let code = runtimeName + ".c"
-
-        if (! this.strict) {
-          code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
-        }
-
-        this.magicString
-          .prependLeft(callee.end, "(" + code)
-          .prependLeft(node.end, ")")
-
-        if (this.addedImportExport) {
-          this.magicString
-            .prependLeft(node.start, runtimeName + ".u(")
-            .prependLeft(node.end, ")")
-        }
+      if (callee.name !== "eval") {
+        this.visitChildren(path)
+        return
       }
 
-      this.visitChildren(path)
+      if (! node.arguments.length) {
+        return
+      }
+
+      // Support direct eval:
+      // eval(code)
+      this.changed = true
+
+      const { runtimeName } = this
+
+      let code = runtimeName + ".c"
+
+      if (! this.strict) {
+        code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
+      }
+
+      this.magicString
+        .prependLeft(callee.end, "(" + code)
+        .prependLeft(node.end, ")")
+
+      if (this.addedImportExport) {
+        this.magicString
+          .prependLeft(node.start, runtimeName + ".u(")
+          .prependLeft(node.end, ")")
+      }
+
+      path.call(this, "visitWithoutReset", "arguments")
     }
 
     visitIdentifier(path) {

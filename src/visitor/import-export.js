@@ -58,23 +58,24 @@ function init() {
 
     visitCallExpression(path) {
       const node = path.getValue()
+      const { callee } = node
 
       if (! node.arguments.length) {
+        path.call(this, "visitWithoutReset", "callee")
+        return
+      }
+
+      if (callee.type !== "Import") {
         this.visitChildren(path)
         return
       }
 
-      const { callee } = node
+      // Support dynamic import:
+      // import("mod")
+      this.changed = true
 
-      if (callee.type === "Import") {
-        // Support dynamic import:
-        // import("mod")
-        this.changed = true
-
-        overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
-      }
-
-      this.visitChildren(path)
+      overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
+      path.call(this, "visitWithoutReset", "arguments")
     }
 
     visitImportDeclaration(path) {
@@ -165,10 +166,6 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
-      // Export specifier states:
-      //   1 - Own
-      //   2 - Imported
-      //   3 - Conflicted
       this.exportNames.push("default")
 
       const node = path.getValue()
