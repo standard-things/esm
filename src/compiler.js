@@ -7,6 +7,7 @@ import Parser from "./parser.js"
 
 import argumentsVisitor from "./visitor/arguments.js"
 import assignmentVisitor from "./visitor/assignment.js"
+import consoleVisitor from "./visitor/console.js"
 import evalVisitor from "./visitor/eval.js"
 import defaults from "./util/defaults.js"
 import findIndexes from "./parse/find-indexes.js"
@@ -162,6 +163,15 @@ function init() {
         throw e
       }
 
+      const possibleConsoleIndexes = findIndexes(code, ["console"])
+
+      if (possibleConsoleIndexes.length) {
+        consoleVisitor.visit(rootPath, {
+          magicString,
+          possibleIndexes: possibleConsoleIndexes
+        })
+      }
+
       if (possibleEvalIndexes.length) {
         evalVisitor.visit(rootPath, {
           magicString,
@@ -210,10 +220,6 @@ function init() {
         importExportVisitor.finalizeHoisting()
       }
 
-      result.changed =
-        evalVisitor.changed ||
-        importExportVisitor.changed
-
       if (sourceType === UNAMBIGUOUS) {
         sourceType = SCRIPT
       } else if (sourceType === MODULE) {
@@ -258,6 +264,11 @@ function init() {
           }
         }
       }
+
+      result.changed =
+        consoleVisitor.changed ||
+        evalVisitor.changed ||
+        importExportVisitor.changed
 
       if (result.changed) {
         setDeferred(result, "code", () => magicString.toString())
