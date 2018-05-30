@@ -165,14 +165,16 @@ function init() {
 
       const possibleConsoleIndexes = findIndexes(code, ["console"])
 
-      if (possibleConsoleIndexes.length) {
+      if (possibleConsoleIndexes.length &&
+          top.identifiers.indexOf("console") === -1) {
         consoleVisitor.visit(rootPath, {
           magicString,
           possibleIndexes: possibleConsoleIndexes
         })
       }
 
-      if (possibleEvalIndexes.length) {
+      if (possibleEvalIndexes.length &&
+          top.identifiers.indexOf("eval") === -1) {
         evalVisitor.visit(rootPath, {
           magicString,
           possibleIndexes: possibleEvalIndexes,
