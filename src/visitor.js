@@ -60,20 +60,18 @@ function init() {
         return
       }
 
-      // The method must call `this.visitChildren(path)` to continue traversing.
-      let methodName = "visit" + value.type
+      const methodName = "visit" + value.type
 
-      if (typeof this[methodName] !== "function") {
-        methodName = "visitChildren"
+      if (typeof this[methodName] === "function") {
+        // The method must call `this.visitChildren(path)` to continue traversing.
+        this[methodName](path)
+      } else {
+        this.visitChildren(path)
       }
-
-      this[methodName](path)
     }
 
     visitChildren(path) {
       const node = path.getValue()
-      const names = getChildNames(node)
-
       const { end, start } = node
       const { possibleIndexes } = this
 
@@ -101,6 +99,8 @@ function init() {
       if (left < right) {
         this.possibleStart = left
         this.possibleEnd = right
+
+        const names = getChildNames(node)
 
         for (const name of names) {
           path.call(this, "visitWithoutReset", name)
