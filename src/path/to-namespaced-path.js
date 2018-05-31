@@ -1,10 +1,11 @@
-import safePath from "../safe/path.js"
+import { _makeLong, toNamespacedPath } from "../safe/path.js"
+
 import shared from "../shared.js"
 
 function init() {
-  return typeof safePath.toNamespacedPath === "function"
-    ? safePath.toNamespacedPath
-    : safePath._makeLong
+  return typeof toNamespacedPath === "function"
+    ? toNamespacedPath
+    : _makeLong
 }
 
 export default shared.inited
