@@ -36,7 +36,7 @@ Module._resolveFilename = maskFunction(_resolveFilename, RealModule._resolveFile
 Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
 Module.wrap = maskFunction(wrap, RealModule.wrap)
-Module.wrapper = GenericArray.slice(wrapper)
+Module.wrapper = GenericArray.from(wrapper)
 
 Module.prototype._compile = maskFunction(_compile, RealProto._compile)
 Module.prototype.constructor = Module
@@ -50,7 +50,7 @@ if (! Module.globalPaths) {
   Module.globalPaths = initGlobalPaths()
 }
 
-moduleState.globalPaths = GenericArray.slice(Module.globalPaths)
+moduleState.globalPaths = GenericArray.from(Module.globalPaths)
 
 parseState._cache = new Proxy(parseState._cache, {
   get(target, name) {

@@ -3,11 +3,8 @@ import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
 import shared from "../shared.js"
-import unapply from "./unapply.js"
 
 function init() {
-  const safeSlice = unapply(Array.prototype.slice)
-
   function safe(Super) {
     if (typeof Super !== "function") {
       return isObject(Super)
@@ -52,7 +49,7 @@ function init() {
         const { value } = descriptor
 
         if (Array.isArray(value)) {
-          descriptor.value = safeSlice(value)
+          descriptor.value = Array.from(value)
         }
       }
 

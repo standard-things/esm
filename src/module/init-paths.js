@@ -11,7 +11,7 @@ import moduleState from "./state.js"
 function initPaths() {
   const globalPaths = initGlobalPaths()
   moduleState.globalPaths = globalPaths
-  Module.globalPaths = GenericArray.slice(globalPaths)
+  Module.globalPaths = GenericArray.from(globalPaths)
 }
 
 export default initPaths
