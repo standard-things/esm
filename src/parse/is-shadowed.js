@@ -33,12 +33,14 @@ function init() {
       return false
     }
 
-    if (type === "FunctionDeclaration" ||
-        type === "VariableDeclarator") {
+    if (type === "VariableDeclarator") {
       return node.id.name === name
     }
 
-    if (type === "FunctionExpression") {
+    // Exported function declarations may not have an id.
+    // For example, `export default function () {}`.
+    if (type === "FunctionDeclaration" ||
+        type === "FunctionExpression") {
       const { id } = node
 
       return id !== null && id.name === name
