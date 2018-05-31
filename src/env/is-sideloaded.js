@@ -1,6 +1,5 @@
 import { argv, cwd } from "../safe/process.js"
 
-import GenericArray from "../generic/array.js"
 import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
@@ -17,7 +16,7 @@ function isSideloaded() {
   }
 
   const filename = realpath(argv[1])
-  const args = GenericArray.slice(argv, 2)
+  const args = argv.slice(2)
   const nodeModulesIndex = args.length
     ? normalize(filename).lastIndexOf("/node_modules/")
     : -1
