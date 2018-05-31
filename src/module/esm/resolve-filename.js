@@ -8,7 +8,7 @@ import SafeModule from "../../safe/module.js"
 
 import _findPath from "../_find-path.js"
 import _resolveLookupPaths from "../_resolve-lookup-paths.js"
-import builtinEntries from "../../builtin-entries.js"
+import builtinLookup from "../../builtin-lookup.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import errors from "../../errors.js"
 import { extname } from "../../safe/path.js"
@@ -61,7 +61,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  if (Reflect.has(builtinEntries, request)) {
+  if (Reflect.has(builtinLookup, request)) {
     return request
   }
 
@@ -131,7 +131,7 @@ function resolveFilename(request, parent, isMain, options) {
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
 
       if (! foundPath &&
-          Reflect.has(builtinEntries, decoded)) {
+          Reflect.has(builtinLookup, decoded)) {
         return cache[cacheKey] = decoded
       }
     }

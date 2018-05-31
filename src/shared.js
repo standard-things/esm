@@ -65,6 +65,7 @@ function init() {
     inited: false,
     memoize: {
       builtinEntries: { __proto__: null },
+      builtinModules: { __proto__: null },
       moduleCJSResolveFilename: { __proto__: null },
       moduleESMResolveFilename: { __proto__: null },
       moduleFindPath: { __proto__: null },

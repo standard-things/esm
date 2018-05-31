@@ -1,14 +1,14 @@
-import builtinModules from "../module/builtin-modules.js"
+import builtinLookup from "../builtin-lookup.js"
 import { dirname } from "../safe/path.js"
 import isObject from "./is-object.js"
 
 function getModuleDirname(request) {
   if (typeof request === "string") {
-    return Reflect.has(builtinModules, request) ? "" : dirname(request)
+    return Reflect.has(builtinLookup, request) ? "" : dirname(request)
   }
 
   if (isObject(request)) {
-    if (Reflect.has(builtinModules, request.id)) {
+    if (Reflect.has(builtinLookup, request.id)) {
       return ""
     }
 

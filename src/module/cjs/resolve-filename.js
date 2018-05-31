@@ -7,7 +7,7 @@ import ENV from "../../constant/env.js"
 import Module from "../../module.js"
 import SafeModule from "../../safe/module.js"
 
-import builtinEntries from "../../builtin-entries.js"
+import builtinLookup from "../../builtin-lookup.js"
 import errors from "../../errors.js"
 import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
@@ -27,7 +27,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  if (Reflect.has(builtinEntries, request)) {
+  if (Reflect.has(builtinLookup, request)) {
     return request
   }
 

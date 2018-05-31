@@ -5,10 +5,10 @@
 import GenericArray from "../generic/array.js"
 
 import _resolveLookupPaths from "./_resolve-lookup-paths.js"
-import builtinEntries from "../builtin-entries.js"
+import builtinLookup from "../builtin-lookup.js"
 
 function resolveLookupPaths(request, parent, newReturn) {
-  if (Reflect.has(builtinEntries, request)) {
+  if (Reflect.has(builtinLookup, request)) {
     return newReturn ? null : GenericArray.of(request, GenericArray.of())
   }
 

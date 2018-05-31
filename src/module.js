@@ -9,6 +9,7 @@ import _nodeModulePaths from "./module/node-module-paths.js"
 import _resolveFilename from "./module/cjs/resolve-filename.js"
 import _resolveLookupPaths from "./module/resolve-lookup-paths.js"
 import assign from "./util/assign.js"
+import builtinIds from "./builtin-ids.js"
 import defaults from "./util/defaults.js"
 import initGlobalPaths from "./module/init-global-paths.js"
 import load from "./module/load.js"
@@ -35,6 +36,7 @@ Module._nodeModulePaths = maskFunction(_nodeModulePaths, RealModule._nodeModuleP
 Module._resolveFilename = maskFunction(_resolveFilename, RealModule._resolveFilename)
 Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
+Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.wrap = maskFunction(wrap, RealModule.wrap)
 Module.wrapper = GenericArray.from(wrapper)
 

@@ -1,12 +1,12 @@
-import builtinModules from "../module/builtin-modules.js"
+import builtinLookup from "../builtin-lookup.js"
 import realRequire from "./require.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
-  return builtinModules.indexOf("punycode") === -1
-    ? null
-    : unwrapProxy(realRequire("punycode"))
+  return Reflect.has(builtinLookup, "punycode")
+    ? unwrapProxy(realRequire("punycode"))
+    : null
 }
 
 export default shared.inited

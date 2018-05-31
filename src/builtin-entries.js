@@ -3,7 +3,8 @@ import Module from "./module.js"
 import OwnProxy from "./own/proxy.js"
 
 import builtinConsole from "./builtin/console.js"
-import builtinModules from "./module/builtin-modules.js"
+import builtinIds from "./builtin-ids.js"
+import builtinModules from "./builtin-modules.js"
 import builtinUtil from "./builtin/util.js"
 import builtinVM from "./builtin/vm.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -107,7 +108,7 @@ function createEntry(id) {
     }
   }
 
-  const mod = new Module(id, null)
+  const mod = builtinModules[id]
 
   mod.exports = exported
   mod.loaded = true
@@ -127,14 +128,14 @@ function createEntry(id) {
 const builtinEntries = { __proto__: null }
 const cache = shared.memoize.builtinEntries
 
-for (const id of builtinModules) {
+for (const id of builtinIds) {
   if (Reflect.has(cache, id)) {
     builtinEntries[id] = cache[id]
   } else {
     setDeferred(builtinEntries, id, () => {
       const entry = createEntry(id)
 
-      if (id === "module") {
+      if (id !== "module") {
         cache[id] = entry
       }
 
