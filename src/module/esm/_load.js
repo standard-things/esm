@@ -5,7 +5,7 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../_load.js"
-import builtinEntries from "../../builtin-entries.js"
+import builtinLookup from "../../builtin-lookup.js"
 import { dirname } from "../../safe/path.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
@@ -41,13 +41,17 @@ function load(request, parent, isMain, preload) {
 
   const fromPath = dirname(filename)
 
+  let pkg
+
   if (fromPath === "." &&
-      Reflect.has(builtinEntries, filename)) {
+      Reflect.has(builtinLookup, filename)) {
+    pkg = Package.get("")
     request = filename
+  } else {
+    pkg = Package.get(fromPath)
   }
 
   const isExtMJS = isMJS(filename)
-  const pkg = Package.get(fromPath)
   const pkgOptions = pkg && pkg.options
   const queryFragment = getURLQueryFragment(request)
 
