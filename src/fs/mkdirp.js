@@ -1,4 +1,4 @@
-import { dirname } from "../safe/path.js"
+import dirname from "../path/dirname.js"
 import isDirectory from "../util/is-directory.js"
 import mkdir from "./mkdir.js"
 

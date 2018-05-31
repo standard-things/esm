@@ -2,7 +2,7 @@ import PACKAGE from "../../constant/package.js"
 
 import Module from "../../module.js"
 
-import { extname } from "../../safe/path.js"
+import extname from "../../path/extname.js"
 
 const {
   OPTIONS_MODE_STRICT

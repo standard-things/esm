@@ -1,5 +1,5 @@
 import builtinLookup from "../builtin-lookup.js"
-import { dirname } from "../safe/path.js"
+import dirname from "../path/dirname.js"
 import isObject from "./is-object.js"
 
 function getModuleDirname(request) {

@@ -10,7 +10,7 @@ import Module from "../../module.js"
 
 import _load from "../_load.js"
 import _loadESM from "../esm/_load.js"
-import { dirname } from "../../safe/path.js"
+import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
 import loader from "./loader.js"
 import parseState from "../../parse/state.js"

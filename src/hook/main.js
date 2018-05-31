@@ -6,7 +6,7 @@ import Wrapper from "../wrapper.js"
 
 import assign from "../util/assign.js"
 import call from "../util/call.js"
-import { dirname } from "../safe/path.js"
+import dirname from "../path/dirname.js"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
 import realProcess from "../real/process.js"

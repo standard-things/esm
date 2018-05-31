@@ -2,10 +2,10 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import { dirname, extname } from "../safe/path.js"
-
 import Module from "../module.js"
 
+import dirname from "../path/dirname.js"
+import extname from "../path/extname.js"
 import shared from "../shared.js"
 
 const ExError = shared.external.Error
