@@ -41,17 +41,13 @@ function load(request, parent, isMain, preload) {
 
   const fromPath = dirname(filename)
 
-  let pkg
-
   if (fromPath === "." &&
       Reflect.has(builtinLookup, filename)) {
-    pkg = Package.get("")
     request = filename
-  } else {
-    pkg = Package.get(fromPath)
   }
 
   const isExtMJS = isMJS(filename)
+  const pkg = Package.from(filename)
   const pkgOptions = pkg && pkg.options
   const queryFragment = getURLQueryFragment(request)
 
