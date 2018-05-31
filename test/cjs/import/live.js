@@ -3,6 +3,7 @@ import { Stream } from "stream"
 import assert from "assert"
 import mockIo from "mock-stdio"
 import stripANSI  from "strip-ansi"
+import * as abcNs from "../../fixture/export/abc.mjs"
 import accessor1, { a, b } from "../../fixture/cjs/export/accessor.js"
 import * as accessor2 from "../../fixture/cjs/export/accessor.js"
 import console1, { log } from "console"
@@ -312,22 +313,22 @@ export default () => {
   }
 
   assert.throws(
-    () => def2.g = "g",
+    () => abcNs.d = "d",
     /TypeError: Cannot add/
   )
 
   assert.throws(
-    () => Object.defineProperty(def2, "g", {
+    () => Object.defineProperty(abcNs, "d", {
       configurable: true,
       enumerable: true,
-      value: "g",
+      value: "d",
       writable: true
     }),
     /TypeError: Cannot define/
   )
 
   assert.throws(
-    () => Object.defineProperty(def2, "d", {
+    () => Object.defineProperty(abcNs, "a", {
       configurable: true,
       enumerable: true,
       value: 1,
@@ -337,9 +338,9 @@ export default () => {
   )
 
   assert.throws(
-    () => delete def2.d,
+    () => delete abcNs.a,
     /TypeError: Cannot delete/
   )
 
-  assert.strictEqual(delete def2.g, true)
+  assert.strictEqual(delete abcNs.d, true)
 }

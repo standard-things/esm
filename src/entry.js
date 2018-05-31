@@ -76,8 +76,12 @@ class Entry {
     this.cyclical = false
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
+    // The mutable namespace object CJS importers receive.
+    this.cjsMutableNamespace = this.namespace
     // The namespace object CJS importers receive.
     this.cjsNamespace = this.namespace
+    // The mutable namespace object ESM importers receive.
+    this.esmMutableNamespace = this.namespace
     // The namespace object ESM importers receive.
     this.esmNamespace = this.namespace
     // The `module.exports` value at the time the module loaded.
@@ -286,16 +290,28 @@ class Entry {
   initNamespace() {
     this.initNamespace = noop
 
-    setDeferred(this, "cjsNamespace", function () {
-      return createNamespace(this, {
+    setDeferred(this, "cjsMutableNamespace", function () {
+      return createMutableNamespaceProxy(this, {
         namespace: toNamespaceObject({
           default: this.module.exports
         })
       })
     })
 
+    setDeferred(this, "cjsNamespace", function () {
+      return createNamespaceProxy(this, {
+        namespace: toNamespaceObject({
+          default: this.module.exports
+        })
+      })
+    })
+
+    setDeferred(this, "esmMutableNamespace", function () {
+      return createMutableNamespaceProxy(this)
+    })
+
     setDeferred(this, "esmNamespace", function () {
-      return createNamespace(this)
+      return createNamespaceProxy(this)
     })
   }
 
@@ -467,14 +483,12 @@ function changed(setter, key, value) {
   return true
 }
 
-function createNamespace(entry, source = entry) {
-  const mod = entry.module
+function createNamespace(entry, source) {
   const { type } = entry
-
   const isCJS = type === TYPE_CJS
   const isESM = type === TYPE_ESM
 
-  const namespace = toNamespaceObject(source.namespace, (target, name) => {
+  return toNamespaceObject(source.namespace, (target, name) => {
     if (isESM ||
         (isCJS && name === "default")) {
       return Reflect.get(target, name)
@@ -482,7 +496,9 @@ function createNamespace(entry, source = entry) {
 
     return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
   })
+}
 
+function createNamespaceHandler(entry, source, mutable) {
   const handler = {
     get(target, name, receiver) {
       const { compileData } = entry
@@ -510,8 +526,7 @@ function createNamespace(entry, source = entry) {
     }
   }
 
-  if (entry.package.options.cjs.mutableNamespace &&
-      ! isMJS(mod)) {
+  if (mutable) {
     handler.defineProperty = (target, name, descriptor) => {
       SafeObject.defineProperty(entry.exports, name, descriptor)
 
@@ -577,7 +592,7 @@ function createNamespace(entry, source = entry) {
         ? ERR_NS_REDEFINITION
         : ERR_NS_DEFINITION
 
-      throw new NsError(mod, name)
+      throw new NsError(entry.module, name)
     }
 
     handler.deleteProperty = (target, name) => {
@@ -585,7 +600,7 @@ function createNamespace(entry, source = entry) {
         return true
       }
 
-      throw new ERR_NS_DELETION(mod, name)
+      throw new ERR_NS_DELETION(entry.module, name)
     }
 
     handler.getOwnPropertyDescriptor = (target, name) => {
@@ -603,27 +618,45 @@ function createNamespace(entry, source = entry) {
         ? ERR_NS_ASSIGNMENT
         : ERR_NS_EXTENSION
 
-      throw new NsError(mod, name)
+      throw new NsError(entry.module, name)
     }
-
-    // Section 9.4.6: Module Namespace Exotic Objects
-    // Namespace objects should be sealed.
-    // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-    Object.seal(namespace)
   }
 
-  return new OwnProxy(namespace, handler)
+  return handler
+}
+
+function createMutableNamespaceProxy(entry, source = entry) {
+  return new OwnProxy(
+    createNamespace(entry, source),
+    createNamespaceHandler(entry, source, true)
+  )
+}
+
+function createNamespaceProxy(entry, source = entry) {
+  // Section 9.4.6: Module Namespace Exotic Objects
+  // Namespace objects should be sealed.
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+  return new OwnProxy(
+    Object.seal(createNamespace(entry, source)),
+    createNamespaceHandler(entry, source)
+  )
 }
 
 function getExportByName(entry, setter, name) {
   const { _namespace } = entry
   const isCJS = entry.type === TYPE_CJS
   const parentEntry = setter.parent
+  const parentIsMJS = isMJS(parentEntry.module)
+  const parentOptions = parentEntry.package.options
+
+  const parentMutableNamespace =
+    ! parentIsMJS &&
+    parentOptions.cjs.mutableNamespace
 
   const parentNamedExports =
     entry.builtin ||
-    (parentEntry.package.options.cjs.namedExports &&
-     ! isMJS(parentEntry.module))
+    (! parentIsMJS &&
+     parentOptions.cjs.namedExports)
 
   const noNamedExports =
     isCJS &&
@@ -654,7 +687,16 @@ function getExportByName(entry, setter, name) {
   }
 
   if (name === "*") {
-    return noNamedExports ? entry.cjsNamespace : entry.esmNamespace
+    if (parentMutableNamespace &&
+        ! isMJS(entry.module)) {
+      return noNamedExports
+        ? entry.cjsMutableNamespace
+        : entry.esmMutableNamespace
+    }
+
+    return noNamedExports
+      ? entry.cjsNamespace
+      : entry.esmNamespace
   }
 
   const { getters } = entry
