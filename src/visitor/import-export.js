@@ -236,6 +236,7 @@ function init() {
           // Support exporting named class and function declarations:
           // export function named() {}
           const { name } = id
+
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
           // Support exporting variable lists:
@@ -396,8 +397,10 @@ function init() {
 
   function canExportedValuesChange({ declaration, type }) {
     if (type === "ExportDefaultDeclaration") {
-      return declaration.type === "FunctionDeclaration" ||
-            declaration.type === "ClassDeclaration"
+      const declType = declaration.type
+
+      return declType === "FunctionDeclaration" ||
+        declType === "ClassDeclaration"
     }
 
     if (type === "ExportNamedDeclaration" &&
