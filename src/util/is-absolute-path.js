@@ -1,7 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
-import { isAbsolute as _isAbsolutePath } from "../safe/path.js"
+import { isAbsolute } from "../safe/path.js"
 
 const {
   BACKWARD_SLASH,
@@ -39,7 +39,7 @@ function isAbsolutePath(value) {
     return true
   }
 
-  return _isAbsolutePath(value)
+  return isAbsolute(value)
 }
 
 export default isAbsolutePath
