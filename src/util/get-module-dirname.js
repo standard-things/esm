@@ -4,7 +4,14 @@ import isObject from "./is-object.js"
 
 function getModuleDirname(request) {
   if (typeof request === "string") {
-    return Reflect.has(builtinLookup, request) ? "" : dirname(request)
+    const result = dirname(request)
+
+    if (result === "." &&
+        Reflect.has(builtinLookup, request)) {
+      return ""
+    }
+
+    return result
   }
 
   if (isObject(request)) {
