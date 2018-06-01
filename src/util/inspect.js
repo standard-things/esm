@@ -13,6 +13,8 @@ import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
 
 function init() {
+  const nonWhitespaceRegExp = /\S/
+
   const uninitializedValue = {
     [shared.customInspectKey]: uninitializedCustomizer
   }
@@ -61,7 +63,11 @@ function init() {
       }
     }
 
-    return inspect(object, context)
+    const result = inspect(object, context)
+    const indentation = result.slice(0, result.search(nonWhitespaceRegExp))
+    const trimmed = result.slice(result.indexOf("{"), result.lastIndexOf("}") + 1)
+
+    return indentation + "[Module] " + trimmed
   }
 
   function formatProxy(proxy, context) {
