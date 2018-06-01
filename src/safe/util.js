@@ -8,7 +8,16 @@ function init() {
   const { types } = safeUtil
 
   safeUtil.customInspectSymbol = custom
-  safeUtil.defaultInspectOptions = defaultOptions
+  safeUtil.defaultInspectOptions = defaultOptions || {
+    breakLength: 60,
+    colors: false,
+    compact: true,
+    customInspect: true,
+    depth: 2,
+    maxArrayLength: 100,
+    showHidden: false,
+    showProxy: false
+  }
 
   if (types) {
     safeUtil.types = safe(types)
