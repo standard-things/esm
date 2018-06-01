@@ -4,20 +4,18 @@ import shared from "../shared.js"
 import unapply from "../util/unapply.js"
 
 function init() {
-  const { prototype } = SafeArray
+  const proto = Array.prototype
+  const safeProto = SafeArray.prototype
 
   return {
-    concat: unapply(prototype.concat),
-    filter: unapply(prototype.filter),
+    concat: unapply(safeProto.concat),
+    filter: unapply(safeProto.filter),
     from: SafeArray.from,
-    indexOf: unapply(prototype.indexOf),
-    join: unapply(prototype.join),
+    indexOf: unapply(proto.indexOf),
     of: SafeArray.of,
-    push: unapply(prototype.push),
-    slice: unapply(prototype.slice),
-    some: unapply(prototype.some),
-    sort: unapply(prototype.sort),
-    unshift: unapply(prototype.unshift)
+    push: unapply(proto.push),
+    some: unapply(proto.some),
+    unshift: unapply(proto.unshift)
   }
 }
 
