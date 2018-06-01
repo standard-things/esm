@@ -4,6 +4,8 @@ import Module from "module"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
+import * as fsExtraNs from "fs-extra"
+import * as fsNs from "fs"
 import mockIo from "mock-stdio"
 import path from "path"
 import require from "./require.js"
@@ -18,7 +20,7 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
 const pkgPath = path.resolve("../index.js")
-const pkgJSON = JSON6.parse(fs.readFileSync("../package.json"))
+const pkgJSON = fs.readJsonSync("../package.json")
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)
@@ -622,14 +624,38 @@ describe("Node rules", () => {
     import("./fixture/with%23hash.mjs")
   )
 
+  it("should support builtin module specifiers with percent encodings", () =>
+    import("%66%73")
+      .then((ns) => assert.deepStrictEqual(ns, fsNs))
+  )
+
+  it("should support bare module specifiers with percent encodings", () =>
+    import("%66%73-extra")
+      .then((ns) => assert.deepStrictEqual(ns, fsExtraNs))
+  )
+
   it("should not support builtin module specifiers with URL query/fragments", () =>
     Promise
       .all([
         "fs?a",
         "fs#a",
         "fs?a#a",
-        "%66%73",
         "%66%73?a#a"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+      ))
+  )
+
+  it("should not support bare module specifiers with URL query/fragments", () =>
+    Promise
+      .all([
+        "fs-extra?a",
+        "fs-extra#a",
+        "fs-extra?a#a",
+        "%66%73-extra?a#a"
       ]
       .map((request) =>
         import(request)

@@ -105,8 +105,10 @@ function resolveFilename(request, parent, isMain, options) {
   let skipWarnings = false
 
   if (! hasEncodedSep(request)) {
+    const isRel = ! isAbs && isRelativePath(request)
+
     if (! isAbs &&
-        ! isRelativePath(request) &&
+        ! isRel &&
         (request.charCodeAt(0) === FORWARD_SLASH ||
          request.indexOf(":") !== -1)) {
       const parsed = parseURL(request)
@@ -123,12 +125,25 @@ function resolveFilename(request, parent, isMain, options) {
         foundPath = _resolveFilename(foundPath, parent, isMain, options, true, true, noExts)
       }
     } else {
+      let pathname = request
+
+      if (isAbs ||
+          isRel) {
+        pathname = pathname.replace(queryHashRegExp, "")
+      }
+
+      const decoded = decodeURIComponent(pathname)
+
       // Prevent resolving non-local dependencies:
-      // https://github.com/bmeck/node-eps/blob/rewrite-esm/002-es-modules.md#432-removal-of-non-local-dependencies
-      const decoded = decodeURIComponent(request.replace(queryHashRegExp, ""))
+      // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
       const skipGlobalPaths = ! cjsPaths
 
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
+
+      if (! foundPath &&
+          Reflect.has(builtinLookup, decoded)) {
+        return cache[cacheKey] = decoded
+      }
     }
   }
 
