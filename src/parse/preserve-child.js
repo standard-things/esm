@@ -5,17 +5,17 @@ function preserveChild(visitor, node, childName) {
   const childStart = child.start
   const nodeStart = node.start
 
-  let padding
+  let indentation
 
   if (childStart > visitor.firstLineBreakPos) {
     const count = childStart - nodeStart
 
-    padding = count === 7 ? "       " : " ".repeat(count)
+    indentation = count === 7 ? "       " : " ".repeat(count)
   } else {
-    padding = ""
+    indentation = ""
   }
 
-  overwrite(visitor, nodeStart, childStart, padding)
+  overwrite(visitor, nodeStart, childStart, indentation)
 }
 
 export default preserveChild
