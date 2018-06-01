@@ -6,7 +6,6 @@ import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
-import vm from "vm"
 
 const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 

@@ -1,6 +1,5 @@
 import JSON6 from "json-6"
 import Module from "module"
-import SemVer from "semver"
 
 import assert from "assert"
 import createNamespace from "./create-namespace.js"

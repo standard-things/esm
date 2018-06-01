@@ -1,4 +1,3 @@
-import assert from "assert"
 import vm from "vm"
 
 let canUseAsyncGenerators = false
