@@ -6,6 +6,7 @@ import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
+import isObjectLike from "../util/is-object.js"
 import maskFunction from "../util/mask-function.js"
 import shared from "../shared.js"
 
@@ -17,6 +18,10 @@ function init() {
   }
 
   function toInspectable(value) {
+    if (! isObjectLike(value)) {
+      return value
+    }
+
     return {
       [shared.customInspectKey](recurseTimes, context) {
         const contextAsOptions = assign({}, context)
