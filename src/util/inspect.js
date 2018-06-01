@@ -1,3 +1,5 @@
+import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
+
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
@@ -7,8 +9,6 @@ import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
-import realUtil from "../real/util.js"
-import { inspect as safeInspect } from "../safe/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
 
@@ -28,15 +28,13 @@ function init() {
       ? { showHidden: true }
       : assign({}, options)
 
-    const { defaultOptions } = realUtil.inspect
-
     const customInspect = has(options, "customInspect")
       ? options.customInspect
-      : defaultOptions.customInspect
+      : defaultInspectOptions.customInspect
 
     const showProxy = has(options, "showProxy")
       ? options.showProxy
-      : defaultOptions.showProxy
+      : defaultInspectOptions.showProxy
 
     options.customInspect = true
     options.showProxy = false

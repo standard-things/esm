@@ -4,9 +4,9 @@ import { Console } from "../safe/console.js"
 
 import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
+import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import maskFunction from "../util/mask-function.js"
-import realUtil from "../real/util.js"
 import shared from "../shared.js"
 
 function init() {
@@ -41,15 +41,14 @@ function init() {
 
   function wrap(func, wrapper = defaultWrapper) {
     return maskFunction(function (...args) {
-      const { defaultOptions } = realUtil.inspect
-      const { customInspect } = defaultOptions
+      const { customInspect } = defaultInspectOptions
 
-      defaultOptions.customInspect = true
+      defaultInspectOptions.customInspect = true
 
       try {
         return wrapper(func, args)
       } finally {
-        defaultOptions.customInspect = customInspect
+        defaultInspectOptions.customInspect = customInspect
       }
     }, func)
   }

@@ -4,13 +4,16 @@ import shared from "../shared.js"
 
 function init() {
   const safeUtil = safe(realUtil)
+  const { custom, defaultOptions } = safeUtil.inspect
   const { types } = safeUtil
+
+  safeUtil.customInspectSymbol = custom
+  safeUtil.defaultInspectOptions = defaultOptions
 
   if (types) {
     safeUtil.types = safe(types)
   }
 
-  safeUtil.customInspectSymbol = safeUtil.inspect.custom
   return safeUtil
 }
 
@@ -20,6 +23,7 @@ const safeUtil = shared.inited
 
 export const {
   customInspectSymbol,
+  defaultInspectOptions,
   inspect,
   types
 } = safeUtil
