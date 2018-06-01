@@ -197,7 +197,7 @@ describe("compiler", () => {
 
   it("should transform dynamic import in switch statements", () => {
     const code = [
-      "(() => {",
+      "(async () => {",
       '   switch (await import("a")) {',
       '    case await import("b"):',
       '      return await import ("c")',

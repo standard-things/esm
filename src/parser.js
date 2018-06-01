@@ -2,7 +2,6 @@ import SOURCE_TYPE from "./constant/source-type.js"
 
 import { Parser as AcornParser } from "./acorn.js"
 
-import acornParserAwaitAnywhere from "./acorn/parser/await-anywhere.js"
 import acornParserClassFields from "./acorn/parser/class-fields.js"
 import acornParserDynamicImport from "./acorn/parser/dynamic-import.js"
 import acornParserFunctionParamsStart from "./acorn/parser/function-params-start.js"
@@ -19,6 +18,7 @@ function init() {
   } = SOURCE_TYPE
 
   const defaultOptions = {
+    allowAwaitOutsideFunction: true,
     allowReturnOutsideFunction: false,
     ecmaVersion: 9,
     sourceType: "module",
@@ -40,7 +40,6 @@ function init() {
       const { strict } = options
       const parser = new AcornParser(options, code)
 
-      acornParserAwaitAnywhere.enable(parser)
       acornParserClassFields.enable(parser)
       acornParserDynamicImport.enable(parser)
       acornParserFunctionParamsStart.enable(parser)
