@@ -20,7 +20,7 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
 const pkgPath = path.resolve("../index.js")
-const pkgJSON = fs.readJsonSync("../package.json")
+const pkgJSON = fs.readJSONSync("../package.json")
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
 const abcURL = getURLFromFilePath(abcPath)

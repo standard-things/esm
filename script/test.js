@@ -25,7 +25,7 @@ const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node"
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
 const vendorPath = path.resolve(rootPath, "src/vendor")
 
-const uglifyOptions = fs.readJsonSync(path.resolve(rootPath, ".uglifyrc"))
+const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
 
 const jsPaths = [
   esmPath,

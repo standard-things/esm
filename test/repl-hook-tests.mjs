@@ -20,7 +20,7 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const { parent } = require.cache[indexPath]
 
 const pkgIndex = parent.children.findIndex((child) => child.filename === indexPath)
-const pkgJSON = fs.readJsonSync(pkgPath)
+const pkgJSON = fs.readJSONSync(pkgPath)
 const pkgURL = fileProtocol + pkgPath.replace(/\\/g, "/")
 
 const ZWJ = "\u200d"

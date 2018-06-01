@@ -13,7 +13,7 @@ const indexPath = path.resolve(rootPath, "index.js")
 const pkgPath = path.resolve(rootPath, "package.json")
 const readmePath = path.resolve(rootPath, "README.md")
 
-const uglifyOptions = fs.readJsonSync(path.resolve(rootPath, ".uglifyrc"))
+const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
 
 const tableRegExp = /^<table>[^]*?\n<\/table>/gm
 
