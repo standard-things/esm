@@ -13,7 +13,7 @@ function init() {
   const dirOptions = { customInspect: true }
 
   function defaultWrapper(func, args) {
-    return func(toInspectableArgs(args))
+    return Reflect.apply(func, this, toInspectableArgs(args))
   }
 
   function toInspectable(value) {
@@ -46,7 +46,7 @@ function init() {
       defaultInspectOptions.customInspect = true
 
       try {
-        return wrapper(func, args)
+        return Reflect.apply(wrapper, this, [func, args])
       } finally {
         defaultInspectOptions.customInspect = customInspect
       }
