@@ -1,13 +1,9 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const JSON6 = require("json-6")
-
 const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
-
-const readJSON = (filename) => JSON6.parse(fs.readFileSync(filename))
 
 const {
   BannerPlugin,
@@ -42,7 +38,7 @@ class WebpackRequirePlugin {
 }
 
 const { ESM_ENV } = process.env
-const PKG_VERSION = readJSON("./package.json").version
+const PKG_VERSION = fs.readJSONSync("./package.json").version
 
 const isProd = /production/.test(ESM_ENV)
 const isTest = /test/.test(ESM_ENV)
@@ -58,7 +54,7 @@ const hosted = [
 ]
 
 const babelOptions = require("./.babel.config.js")
-const uglifyOptions = readJSON("./.uglifyrc")
+const uglifyOptions = fs.readJSONSync("./.uglifyrc")
 
 /* eslint-disable sort-keys */
 const config = {
