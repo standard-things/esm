@@ -136,6 +136,7 @@ function compile(content, filename) {
       if (useRunInDebugContext &&
           typeof inspectorWrapper !== "function") {
         const Debug = runInDebugContext("Debug")
+
         Debug.setBreakPoint(compiledWrapper, 0, 0)
       }
     }

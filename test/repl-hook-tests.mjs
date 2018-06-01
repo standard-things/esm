@@ -136,6 +136,7 @@ describe("repl hook", () => {
   ;(canRunInContext ? it : xit)(
   "should support importing `.json` files", (done) => {
     const r = repl.start({})
+
     const code = [
       'import static from "' + pkgURL + '"',
       'var dynamic = import("' + pkgURL + '")'
