@@ -723,8 +723,10 @@ function getExportByName(entry, setter, name) {
 }
 
 function mergeProperty(entry, otherEntry, key) {
-  if (key === "cjsNamespace" ||
-       key === "esmNamespace") {
+  if (key === "cjsMutableNamespace" ||
+      key === "cjsNamespace" ||
+      key === "esmMutableNamespace" ||
+      key === "esmNamespace") {
     return copyProperty(entry, otherEntry, key)
   }
 
