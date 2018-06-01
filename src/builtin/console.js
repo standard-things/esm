@@ -83,13 +83,20 @@ function init() {
     }, dirOptions)
   })
 
-  builtinConsole.debug =
-  builtinConsole.dirxml =
+  const log =
   builtinConsole.info =
   builtinConsole.log = wrap(builtinConsole.log)
 
   builtinConsole.warn = wrap(builtinConsole.warn)
   builtinConsole.trace = wrap(builtinConsole.trace)
+
+  if (has(builtinConsole, "debug")) {
+    builtinConsole.debug = log
+  }
+
+  if (has(builtinConsole, "dirxml")) {
+    builtinConsole.dirxml = log
+  }
 
   return builtinConsole
 }
