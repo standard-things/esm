@@ -1,6 +1,6 @@
 const CHAR = {
   __proto__: null,
-  ZWJ: "\u200d"
+  ZERO_WIDTH_NOBREAK_SPACE: "\u200d"
 }
 
 export default CHAR

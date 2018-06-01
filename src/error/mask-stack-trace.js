@@ -10,7 +10,7 @@ import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 
 const {
-  ZWJ
+  ZERO_WIDTH_NOBREAK_SPACE
 } = CHAR
 
 const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
@@ -94,7 +94,7 @@ function maskEngineStack(stack, content, filename) {
   stack = stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
     arrowFound = true
 
-    if (snippet.indexOf(ZWJ) !== -1) {
+    if (snippet.indexOf(ZERO_WIDTH_NOBREAK_SPACE) !== -1) {
       if (typeof content === "function") {
         content = content(filename)
       }
@@ -222,7 +222,7 @@ function replaceHeader(match, name, postlude) {
 }
 
 function withoutMessage(stack, message, callback) {
-  const token = ZWJ + "message" + ZWJ
+  const token = ZERO_WIDTH_NOBREAK_SPACE + "message" + ZERO_WIDTH_NOBREAK_SPACE
 
   stack = stack.replace(message, token)
   return callback(stack).replace(token, message)
