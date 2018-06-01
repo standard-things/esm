@@ -14,9 +14,7 @@ import toNamespaceObject from "./to-namespace-object.js"
 
 function init() {
   const uninitializedValue = {
-    [shared.customInspectKey](recurseTimes, context) {
-      return context.stylize("<uninitialized>", "special")
-    }
+    [shared.customInspectKey]: uninitializedCustomizer
   }
 
   function inspect(...args) {
@@ -30,10 +28,17 @@ function init() {
       ? { showHidden: true }
       : assign({}, options)
 
+    const { defaultOptions } = realUtil.inspect
+
+    const customInspect = has(options, "customInspect")
+      ? options.customInspect
+      : defaultOptions.customInspect
+
     const showProxy = has(options, "showProxy")
       ? options.showProxy
-      : realUtil.inspect.defaultOptions.showProxy
+      : defaultOptions.showProxy
 
+    options.customInspect = true
     options.showProxy = false
 
     if (depth !== void 0 &&
@@ -41,7 +46,7 @@ function init() {
       options.depth = depth
     }
 
-    args[0] = wrap(value, options, showProxy)
+    args[0] = wrap(value, options, customInspect, showProxy)
     args[1] = options
     return Reflect.apply(safeInspect, this, args)
   }
@@ -87,7 +92,11 @@ function init() {
     return safeInspect(object, context)
   }
 
-  function wrap(object, options, showProxy) {
+  function uninitializedCustomizer(recurseTimes, context) {
+    return context.stylize("<uninitialized>", "special")
+  }
+
+  function wrap(object, options, customInspect, showProxy) {
     let initedContext = false
     let inspecting = false
 
@@ -107,6 +116,7 @@ function init() {
 
           if (! initedContext) {
             initedContext = true
+            context.customInspect = customInspect
             context.showProxy = showProxy
           }
 
@@ -119,11 +129,20 @@ function init() {
               return formatNamespaceObject(target, contextAsOptions)
             }
 
+            const isCustomizer = typeof value === "function"
+
             if (! showProxy ||
                 ! isProxy(target) ||
                 isOwnProxy(target)) {
-              if (typeof value === "function") {
+              if (isCustomizer &&
+                  (customInspect ||
+                   value === uninitializedCustomizer)) {
                 return Reflect.apply(value, target, args)
+              }
+
+              if (! customInspect &&
+                  ! isCustomizer) {
+                contextAsOptions.customInspect = true
               }
 
               contextAsOptions.showProxy = false
@@ -151,7 +170,7 @@ function init() {
           return descriptor
         }
 
-        descriptor.value = wrap(value, showProxy)
+        descriptor.value = wrap(value, options, customInspect, showProxy)
         return descriptor
       }
     })
