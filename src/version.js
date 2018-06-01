@@ -1,11 +1,15 @@
+import ESM from "./constant/esm.js"
+
 import SemVer from "semver"
 
 import shared from "./shared.js"
 
 function init() {
-  // `process.env.ESM_VERSION` is replaced with the `esm` version at build time.
-  // https://webpack.js.org/plugins/environment-plugin/
-  return new SemVer(process.env.ESM_VERSION)
+  const {
+    PKG_VERSION
+  } = ESM
+
+  return new SemVer(PKG_VERSION)
 }
 
 const semver = shared.inited

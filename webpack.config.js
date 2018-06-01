@@ -42,7 +42,7 @@ class WebpackRequirePlugin {
 }
 
 const { ESM_ENV } = process.env
-const ESM_VERSION = readJSON("./package.json").version
+const PKG_VERSION = readJSON("./package.json").version
 
 const isProd = /production/.test(ESM_ENV)
 const isTest = /test/.test(ESM_ENV)
@@ -121,7 +121,7 @@ const config = {
       /acorn\/src\/regexp\.js/,
       path.resolve("src/acorn/replacement/regexp.js")
     ),
-    new EnvironmentPlugin({ ESM_VERSION }),
+    new EnvironmentPlugin({ PKG_VERSION }),
     new WebpackRequirePlugin
   ],
   target: "node"

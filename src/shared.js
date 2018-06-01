@@ -4,10 +4,11 @@ import encodeId from "./util/encode-id.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
-  PKG_PREFIX
+  PKG_PREFIX,
+  PKG_VERSION
 } = ESM
 
-const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + ":shared")
+const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + "@" + PKG_VERSION + ":shared")
 
 function getShared() {
   if (__shared__) {
