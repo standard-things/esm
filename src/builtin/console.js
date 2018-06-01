@@ -1,49 +1,91 @@
 import { stderr, stdout } from "../safe/process.js"
 
 import { Console } from "../safe/console.js"
-import GenericSymbol from "../generic/symbol.js"
 
+import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
+import has from "../util/has.js"
 import maskFunction from "../util/mask-function.js"
+import realUtil from "../real/util.js"
 import shared from "../shared.js"
 
 function init() {
-  const inspectOptionsRegExp = /inspect/i
-  const stderrRegExp = /stderr/i
-  const stdoutRegExp = /stdout/i
+  const dirOptions = { customInspect: true }
 
-  const symbols = Object.getOwnPropertySymbols(Console.prototype)
+  function defaultWrapper(func, args) {
+    return func(toInspectableArgs(args))
+  }
 
-  const formatForStderrSymbol = symbols
-    .find((symbol) => stderrRegExp.test(GenericSymbol.toString(symbol)))
+  function toInspectable(value) {
+    return {
+      [shared.customInspectKey](recurseTimes, context) {
+        const contextAsOptions = assign({}, context)
 
-  const formatForStdoutSymbol = symbols
-    .find((symbol) => stdoutRegExp.test(GenericSymbol.toString(symbol)))
+        contextAsOptions.depth = recurseTimes
+        return builtinUtil.inspect(value, contextAsOptions)
+      }
+    }
+  }
 
-  const getInspectOptionsSymbol = symbols
-    .find((symbol) => inspectOptionsRegExp.test(GenericSymbol.toString(symbol)))
+  function toInspectableArgs(args) {
+    const { length } = args
 
-  function createFormatter(object, name, stdio) {
-    return maskFunction(function (args) {
-      const options = this[getInspectOptionsSymbol](this[stdio])
+    let i = -1
 
-      return builtinUtil.formatWithOptions(options, ...args)
-    }, object[name])
+    while (++i < length) {
+      args[i] = toInspectable(args[i])
+    }
+
+    return args
+  }
+
+  function wrap(func, wrapper = defaultWrapper) {
+    return maskFunction(function (...args) {
+      const { defaultOptions } = realUtil.inspect
+      const { customInspect } = defaultOptions
+
+      defaultOptions.customInspect = true
+
+      try {
+        return wrapper(func, args)
+      } finally {
+        defaultOptions.customInspect = customInspect
+      }
+    }, func)
   }
 
   const builtinConsole = new Console(stdout, stderr)
 
-  if (getInspectOptionsSymbol) {
-    if (formatForStderrSymbol) {
-      builtinConsole[formatForStderrSymbol] =
-        createFormatter(builtinConsole, formatForStderrSymbol, "_stderr")
-    }
+  builtinConsole.assert = wrap(builtinConsole.assert, (func, args) => {
+    const [expression, ...rest] = args
 
-    if (formatForStdoutSymbol) {
-      builtinConsole[formatForStdoutSymbol] =
-        createFormatter(builtinConsole, formatForStdoutSymbol, "_stdout")
-    }
-  }
+    return func(expression, toInspectableArgs(rest))
+  })
+
+  builtinConsole.dir = wrap(builtinConsole.dir, (func, args) => {
+    const [object, options] = args
+
+    return func({
+      [shared.customInspectKey](recurseTimes, context) {
+        const contextAsOptions = assign({}, context, options)
+
+        contextAsOptions.customInspect = has(options, "customInspect")
+          ? options.customInspect
+          : false
+
+        contextAsOptions.depth = recurseTimes
+        return builtinUtil.inspect(object, contextAsOptions)
+      }
+    }, dirOptions)
+  })
+
+  builtinConsole.debug =
+  builtinConsole.dirxml =
+  builtinConsole.info =
+  builtinConsole.log = wrap(builtinConsole.log)
+
+  builtinConsole.warn = wrap(builtinConsole.warn)
+  builtinConsole.trace = wrap(builtinConsole.trace)
 
   return builtinConsole
 }
