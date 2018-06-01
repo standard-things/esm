@@ -23,7 +23,6 @@ function init() {
     let threw = true
 
     options = defaults({
-      ecmaVersion: 9,
       sourceType: MODULE,
       strict: false
     }, options)
