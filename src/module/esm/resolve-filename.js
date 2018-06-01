@@ -129,11 +129,6 @@ function resolveFilename(request, parent, isMain, options) {
       const skipGlobalPaths = ! cjsPaths
 
       foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
-
-      if (! foundPath &&
-          Reflect.has(builtinLookup, decoded)) {
-        return cache[cacheKey] = decoded
-      }
     }
   }
 

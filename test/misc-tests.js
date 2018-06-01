@@ -4,7 +4,6 @@ import Module from "module"
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
-import * as fsNs from "fs"
 import mockIo from "mock-stdio"
 import path from "path"
 import require from "./require.js"
@@ -605,21 +604,6 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should support builtin module specifiers with URL query/fragments", () =>
-    Promise
-      .all([
-        "fs?a",
-        "fs#a",
-        "fs?a#a",
-        "%66%73",
-        "%66%73?a#a"
-      ]
-      .map((request) =>
-        import(request)
-          .then((ns) => assert.deepStrictEqual(ns, fsNs))
-      ))
-  )
-
   it("should support requests containing colons in ESM", () =>
     Promise
       .all([
@@ -636,6 +620,22 @@ describe("Node rules", () => {
 
   it("should support requests containing hash signs in ESM", () =>
     import("./fixture/with%23hash.mjs")
+  )
+
+  it("should not support builtin module specifiers with URL query/fragments", () =>
+    Promise
+      .all([
+        "fs?a",
+        "fs#a",
+        "fs?a#a",
+        "%66%73",
+        "%66%73?a#a"
+      ]
+      .map((request) =>
+        import(request)
+          .then(() => assert.ok(false))
+          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+      ))
   )
 
   it("should not support URL requests with encoded slashes", () =>
