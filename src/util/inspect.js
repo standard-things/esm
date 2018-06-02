@@ -9,14 +9,18 @@ import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
+import { inspect as realInspect } from "../real/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
+import unwrapProxy from "./unwrap-proxy.js";
 
 function init() {
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
-    [shared.customInspectKey]: uninitializedCustomizer
+    [shared.customInspectKey]: (recurseTimes, context) => {
+      return context.stylize("<uninitialized>", "special")
+    }
   }
 
   function inspect(...args) {
@@ -76,40 +80,34 @@ function init() {
     let object = proxy
 
     if (details) {
-      const contextAsOptions = assign({}, context)
-      const { customInspectKey } = shared
-      const [target, handler] = details
+      const { customInspect, showProxy } = context
 
-      object = new Proxy({
-        [customInspectKey]: (recurseTimes) => {
-          contextAsOptions.depth = recurseTimes
-          return inspect(target, contextAsOptions)
-        }
-      }, {
-        [customInspectKey]: (recurseTimes) => {
-          contextAsOptions.depth = recurseTimes
-          return inspect(handler, contextAsOptions)
-        }
-      })
+      object = new Proxy(
+        wrap(details[0], context, customInspect, showProxy),
+        wrap(details[1], context, customInspect, showProxy)
+      )
     }
 
-    return safeInspect(object, context)
+    return inspect(object, context)
   }
 
-  function uninitializedCustomizer(recurseTimes, context) {
-    return context.stylize("<uninitialized>", "special")
-  }
-
-  function wrap(object, options, customInspect, showProxy) {
-    let initedContext = false
+  function wrap(target, options, customInspect, showProxy) {
     let inspecting = false
 
-    const proxy = new OwnProxy(object, {
+    const proxy = new OwnProxy(target, {
       get: (target, name, receiver) => {
+        const { customInspectKey } = shared
         const value = Reflect.get(target, name, receiver)
 
+        if ((name === customInspectKey ||
+             name === "inspect") &&
+            typeof value === "function" &&
+            unwrapProxy(value) === realInspect) {
+          return realInspect
+        }
+
         if (inspecting ||
-            name !== shared.customInspectKey) {
+            name !== customInspectKey) {
           return value
         }
 
@@ -118,34 +116,29 @@ function init() {
 
           let [recurseTimes, context] = args
 
-          if (! initedContext) {
-            initedContext = true
-            context.customInspect = customInspect
-            context.showProxy = showProxy
-          }
-
           const contextAsOptions = assign({}, context)
 
+          contextAsOptions.customInspect = customInspect
+          contextAsOptions.showProxy = showProxy
           contextAsOptions.depth = recurseTimes
 
           try {
+            if (target === uninitializedValue) {
+              return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
+            }
+
             if (isModuleNamespaceObject(target)) {
               return formatNamespaceObject(target, contextAsOptions)
             }
 
-            const isCustomizer = typeof value === "function"
-
             if (! showProxy ||
                 ! isProxy(target) ||
                 isOwnProxy(target)) {
-              if (isCustomizer &&
-                  (customInspect ||
-                   value === uninitializedCustomizer)) {
-                return Reflect.apply(value, target, args)
-              }
-
-              if (! customInspect &&
-                  ! isCustomizer) {
+              if (typeof value === "function") {
+                if (customInspect) {
+                  return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
+                }
+              } else if (! customInspect) {
                 contextAsOptions.customInspect = true
               }
 
