@@ -3,6 +3,7 @@ import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
+import builtinEntries from "../builtin-entries.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
@@ -12,9 +13,10 @@ import isProxy from "./is-proxy.js"
 import { inspect as realInspect } from "../real/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
-import unwrapProxy from "./unwrap-proxy.js";
 
 function init() {
+  let exportedInspect
+
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
@@ -91,6 +93,14 @@ function init() {
     return inspect(object, context)
   }
 
+  function getExportedInspect() {
+    if (exportedInspect) {
+      return exportedInspect
+    }
+
+    return exportedInspect = builtinEntries.util.module.exports.inspect
+  }
+
   function wrap(target, options, customInspect, showProxy) {
     let inspecting = false
 
@@ -101,8 +111,7 @@ function init() {
 
         if ((name === customInspectKey ||
              name === "inspect") &&
-            typeof value === "function" &&
-            unwrapProxy(value) === realInspect) {
+            value === getExportedInspect()) {
           return realInspect
         }
 
