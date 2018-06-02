@@ -1,5 +1,4 @@
 import copyProperty from "../util/copy-property.js"
-import has from "../util/has.js"
 import format from "../util/format.js"
 import formatWithOptions from "../util/format-with-options.js"
 import inspect from "../util/inspect.js"
@@ -57,19 +56,6 @@ function init() {
     })
 
     builtinUtil.types = types
-  }
-
-  const { customInspectKey } = shared
-
-  // Defining a truthy, but non-function value, for `customInspectKey` will
-  // inform builtin `inspect()` to bypass the deprecation warning for the
-  // custom `util.inspect()` function when inspecting `util`.
-  if (! has(builtinUtil, customInspectKey)) {
-    Reflect.defineProperty(builtinUtil, customInspectKey, {
-      configurable: true,
-      value: true,
-      writable: true
-    })
   }
 
   return builtinUtil
