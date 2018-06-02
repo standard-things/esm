@@ -7,6 +7,7 @@ import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import keysAll from "../util/keys-all.js"
 import proxyWrap from "../util/proxy-wrap.js"
+import realUtil from "../real/util.js"
 import safeUtil from "../safe/util.js"
 import shared from "../shared.js"
 
@@ -14,7 +15,7 @@ function init() {
   const ExObject = shared.external.Object
 
   const builtinUtil = new ExObject
-  const names = keysAll(safeUtil)
+  const names = keysAll(realUtil)
 
   for (const name of names) {
     if (name !== "format" &&
