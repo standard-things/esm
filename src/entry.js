@@ -224,8 +224,11 @@ class Entry {
       return this
     }
 
-    const { getters, name } = this
+    const { getters } = this
     const { getters:otherGetters } = otherEntry
+
+    assignExportsToNamespace(this)
+    assignExportsToNamespace(otherEntry)
 
     for (const key in otherEntry._namespace) {
       if (key === "default") {
@@ -250,7 +253,7 @@ class Entry {
 
       const ownerName = getter.owner.name
 
-      if (ownerName !== name &&
+      if (ownerName !== this.name &&
           ownerName !== otherGetter.owner.name) {
         this.addGetter(key, () => STAR_ERROR)
       }
