@@ -10,7 +10,7 @@ import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
-import { inspect as realInspect } from "../real/util.js"
+import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
 
@@ -112,7 +112,7 @@ function init() {
         if ((name === customInspectKey ||
              name === "inspect") &&
             value === getExportedInspect()) {
-          return realInspect
+          return realUtil.inspect
         }
 
         if (inspecting ||

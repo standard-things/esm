@@ -14,11 +14,11 @@ import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
 import binding from "../binding.js"
-import builtinEntries from "../builtin-entries.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
 import getCacheName from "../util/get-cache-name.js"
+import inspect from "../util/inspect.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
@@ -177,23 +177,14 @@ function hook(vm) {
       }, createContext)
     }
 
-    const { support } = shared
-
-    // Exit for Node 6.
-    if (! support.inspectProxies) {
-      return
+    if (INTERNAL &&
+        binding.config.experimentalREPLAwait) {
+      acornInternalAcorn.enable()
+      acornInternalWalk.enable()
     }
 
-    const { inspect } = builtinEntries.util.module.exports
-
     // Exit for Node 10+.
-    if (support.replShowProxy) {
-      if (INTERNAL &&
-          binding.config.experimentalREPLAwait) {
-        acornInternalAcorn.enable()
-        acornInternalWalk.enable()
-      }
-
+    if (shared.support.replShowProxy) {
       realUtil.inspect = inspect
       return
     }
