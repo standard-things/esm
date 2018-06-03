@@ -175,19 +175,19 @@ class Package {
           isCacheInvalid = dataJSON.version !== PKG_VERSION
         }
 
-        if (isCacheInvalid) {
-          compileCache = { __proto__: null }
-          hasBuffer =
-          hasMap = false
+        if (hasDirtyMarker) {
+          removeFile(cachePath + sep + ".dirty")
         }
 
         if (noNycHasMarker) {
           removeFile(cachePath + sep + ".nyc")
         }
 
-        if (hasDirtyMarker) {
-          removeFile(cachePath + sep + ".dirty")
-          clearBabelCache()
+        if (isCacheInvalid) {
+          compileCache = { __proto__: null }
+          hasBuffer =
+          hasMap = false
+          clearBabelCache(cachePath)
         }
 
         cache.buffer = hasBuffer
