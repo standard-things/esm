@@ -2,6 +2,8 @@
 // changed as little as possible. Please ensure any changes are backwards
 // compatible.
 
+import ESM from "./constant/esm.js"
+
 import GenericArray from "./generic/array.js"
 
 import has from "./util/has.js"
@@ -11,9 +13,12 @@ import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
 import toExternalFunction from "./util/to-external-function.js"
-import { version } from "./version.js"
 
 function init() {
+  const {
+    PKG_VERSION
+  } = ESM
+
   const Wrapper = {
     find(object, name, range) {
       const map = getMap(object, name)
@@ -50,9 +55,9 @@ function init() {
     wrap(object, name, wrapper) {
       const map = getOrCreateMap(object, name)
 
-      if (typeof map.wrappers[version] !== "function") {
-        GenericArray.push(map.versions, version)
-        map.wrappers[version] = toExternalFunction(wrapper)
+      if (typeof map.wrappers[PKG_VERSION] !== "function") {
+        GenericArray.push(map.versions, PKG_VERSION)
+        map.wrappers[PKG_VERSION] = toExternalFunction(wrapper)
       }
     }
   }

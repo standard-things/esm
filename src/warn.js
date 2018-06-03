@@ -1,9 +1,14 @@
+import ESM from "./constant/esm.js"
+
 import emitWarning from "./util/emit-warning.js"
 import getModuleURL from "./util/get-module-url.js"
 import shared from "./shared.js"
-import { version } from "./version.js"
 
 function init() {
+  const {
+    PKG_VERSION
+  } = ESM
+
   const messages = { __proto__: null }
   const warned = { __proto__: null }
 
@@ -14,7 +19,7 @@ function init() {
   }
 
   function argumentsAccess(request, line, column) {
-    return "esm@" + version +
+    return "esm@" + PKG_VERSION +
       " detected undefined arguments access (" +
       line + ":" + column + "): " + getModuleURL(request)
   }

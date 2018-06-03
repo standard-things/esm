@@ -1,12 +1,17 @@
+import ESM from "./constant/esm.js"
+
 import captureStackTrace from "./error/capture-stack-trace.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
-import { version } from "./version.js"
 
 function init() {
+  const {
+    PKG_VERSION
+  } = ESM
+
   const { external } = shared
 
   const ExError = external.Error
@@ -167,7 +172,7 @@ function init() {
   }
 
   function invalidPkgMode(mode) {
-    return "The esm@" + version +
+    return "The esm@" + PKG_VERSION +
       " option 'mode' is invalid. Received " + truncInspect(mode)
   }
 
@@ -220,7 +225,7 @@ function init() {
   }
 
   function unknownPkgOption(optionName) {
-    return "Unknown esm@" + version + " option: " + optionName
+    return "Unknown esm@" + PKG_VERSION + " option: " + optionName
   }
 
   function undefinedIdentifier(identName) {

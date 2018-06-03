@@ -1,14 +1,19 @@
+import ESM from "../constant/esm.js"
+
 import Wrapper from "../wrapper.js"
 
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
-import { version } from "../version.js"
+
+const {
+  PKG_VERSION
+} = ESM
 
 function hook(process) {
   function exceptionManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "_fatalException", version)
+    const wrapped = Wrapper.find(process, "_fatalException", PKG_VERSION)
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])
@@ -27,7 +32,7 @@ function hook(process) {
   }
 
   function warningManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "emitWarning", version)
+    const wrapped = Wrapper.find(process, "emitWarning", PKG_VERSION)
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])

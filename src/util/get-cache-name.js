@@ -1,7 +1,12 @@
 import { version as nodeVersion, versions } from "../safe/process.js"
 
+import ESM from "../constant/esm.js"
+
 import md5 from "./md5.js"
-import { version as pkgVersion } from "../version.js"
+
+const {
+  PKG_VERSION
+} = ESM
 
 const engineVersion =
   versions.v8 ||
@@ -22,7 +27,7 @@ function getCacheName(entry, cacheKey) {
   const stateHash = md5(
     nodeVersion + "\0" +
     engineVersion + "\0" +
-    pkgVersion + "\0" +
+    PKG_VERSION + "\0" +
     JSON.stringify(entry.package.options) + "\0" +
     cacheKey
   )

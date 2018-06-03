@@ -2,6 +2,7 @@ import { basename, resolve, sep } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import ENV from "./constant/env.js"
+import ESM from "./constant/esm.js"
 import PACKAGE from "./constant/package.js"
 
 import GenericBuffer from "./generic/buffer.js"
@@ -29,7 +30,6 @@ import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
-import { version } from "./version.js"
 
 const {
   DOT
@@ -40,6 +40,10 @@ const {
   OPTIONS,
   NYC
 } = ENV
+
+const {
+  PKG_VERSION
+} = ESM
 
 const {
   OPTIONS_MODE_ALL,
@@ -180,7 +184,7 @@ class Package {
           : GenericBuffer.alloc(0)
 
         cache.map = hasMap
-          ? readJSON(cachePath + sep + ".data.json")
+          ? dataJSON.map
           : {}
       }
 
@@ -506,7 +510,7 @@ function readInfo(dirPath, force) {
 Reflect.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-Package.state.cache[""] = new Package("", version, {
+Package.state.cache[""] = new Package("", PKG_VERSION, {
   cache: false,
   cjs: true
 })

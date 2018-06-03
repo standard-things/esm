@@ -1,5 +1,6 @@
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
+import ESM from "../constant/esm.js"
 import PACKAGE from "../constant/package.js"
 
 import Compiler from "../caching-compiler.js"
@@ -31,7 +32,6 @@ import safeToString from "../util/safe-to-string.js"
 import satisfies from "../util/satisfies.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
-import { version } from "../version.js"
 
 const {
   STATE_EXECUTION_STARTED
@@ -40,6 +40,10 @@ const {
 const {
   OPTIONS
 } = ENV
+
+const {
+  PKG_VERSION
+} = ESM
 
 const {
   OPTIONS_MODE_ALL,
@@ -241,10 +245,10 @@ function tryPassthru(func, args, pkg) {
     const { range } = pkg
 
     if (importExportRegExp.test(message) &&
-        ! satisfies(version, range)) {
+        ! satisfies(PKG_VERSION, range)) {
       error.message =
         "Expected esm@" + range +
-        ". Using esm@" + version + ": " + filename
+        ". Using esm@" + PKG_VERSION + ": " + filename
 
       error.stack = error.stack.replace(message, error.message)
     }
