@@ -8,7 +8,7 @@ function init() {
     PKG_DIRNAME
   } = ESM
 
-  /* eslint-disable no-useless-escape */
+  // eslint-disable-next-line no-useless-escape
   const locRegExp = /^ *at (?:.+? \()?(.+?):(\d+)(?:\:(\d+))?/gm
 
   function getLocationFromStackTrace(error) {

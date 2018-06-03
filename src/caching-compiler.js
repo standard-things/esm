@@ -348,6 +348,7 @@ function init() {
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
       writeFile(cachePath + sep + ".data.json", JSON.stringify({
         version: PKG_VERSION,
+        // eslint-disable-next-line sort-keys
         map
       }))
     }

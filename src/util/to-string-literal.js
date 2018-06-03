@@ -6,17 +6,17 @@ const {
 
 const escapedDoubleQuoteRegExp = /\\"/g
 
-/* eslint-disable sort-keys */
 const escapeRegExpMap = {
   __proto__: null,
+  // eslint-disable-next-line sort-keys
   '"': /\\?"/g,
   "'": /\\?'/g,
   "`": /\\?`/g
 }
 
-/* eslint-disable sort-keys */
 const quoteMap = {
   __proto__: null,
+  // eslint-disable-next-line sort-keys
   '"': '"',
   "'": "'",
   "`": "`",

@@ -52,10 +52,10 @@ function init() {
     warnings: DEVELOPMENT
   }
 
-  /* eslint-disable sort-keys */
   const Compiler = {
     createOptions,
     defaultOptions,
+    // eslint-disable-next-line sort-keys
     compile(code, options) {
       code = stripShebang(code)
       options = Compiler.createOptions(options)

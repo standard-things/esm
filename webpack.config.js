@@ -56,18 +56,10 @@ const hosted = [
 const babelOptions = require("./.babel.config.js")
 const uglifyOptions = fs.readJSONSync("./.uglifyrc")
 
-/* eslint-disable sort-keys */
 const config = {
   devtool: false,
   entry: {
     esm: "./src/index.js"
-  },
-  output: {
-    filename: "[name].js",
-    libraryExport: "default",
-    libraryTarget: "commonjs2",
-    path: path.resolve("build"),
-    pathinfo: false
   },
   mode: isProd ? "production" : "development",
   module: {
@@ -85,6 +77,13 @@ const config = {
       new UglifyJSPlugin({ uglifyOptions })
     ],
     nodeEnv: false
+  },
+  output: {
+    filename: "[name].js",
+    libraryExport: "default",
+    libraryTarget: "commonjs2",
+    path: path.resolve("build"),
+    pathinfo: false
   },
   plugins: [
     new BannerPlugin({

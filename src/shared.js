@@ -22,7 +22,7 @@ function getShared() {
 
     shared.reloaded = true
 
-    /* eslint-disable no-global-assign */
+    // eslint-disable-next-line no-global-assign
     return __shared__ = shared
   } catch (e) {}
 
@@ -257,7 +257,7 @@ function init() {
       : typeof utilBinding.errorDecoratedSymbol
   })
 
-  /* eslint-disable no-global-assign */
+  // eslint-disable-next-line no-global-assign
   return __shared__ = shared
 }
 
