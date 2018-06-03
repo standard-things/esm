@@ -143,11 +143,7 @@ function init() {
             if (! showProxy ||
                 ! isProxy(target) ||
                 isOwnProxy(target)) {
-              if (typeof value === "function") {
-                if (customInspect) {
-                  return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
-                }
-              } else if (! customInspect) {
+              if (typeof value !== "function") {
                 contextAsOptions.customInspect = true
               }
 
