@@ -1,5 +1,6 @@
 import ENTRY from "./constant/entry.js"
 import ENV from "./constant/env.js"
+import ESM from "./constant/esm.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import Compiler from "./compiler.js"
@@ -29,6 +30,10 @@ function init() {
   const {
     NYC
   } = ENV
+
+  const {
+    PKG_VERSION
+  } = ESM
 
   const {
     MODULE,
@@ -341,7 +346,10 @@ function init() {
       }
 
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
-      writeFile(cachePath + sep + ".data.json", JSON.stringify(map))
+      writeFile(cachePath + sep + ".data.json", JSON.stringify({
+        version: PKG_VERSION,
+        map
+      }))
     }
 
     for (const cachePath in pendingWrites) {

@@ -162,9 +162,20 @@ class Package {
         const hasNycNoMarker = NYC && ! hasNycMarker
         const noNycHasMarker = ! NYC && hasNycMarker
 
-        if (hasDirtyMarker ||
-            hasNycNoMarker ||
-            noNycHasMarker) {
+        let isCacheInvalid =
+          hasDirtyMarker ||
+          hasNycNoMarker ||
+          noNycHasMarker
+
+        let dataJSON
+
+        if (hasMap &&
+            ! isCacheInvalid) {
+          dataJSON = readJSON(cachePath + sep + ".data.json")
+          isCacheInvalid = dataJSON.version !== PKG_VERSION
+        }
+
+        if (isCacheInvalid) {
           compileCache = { __proto__: null }
           hasBuffer =
           hasMap = false
