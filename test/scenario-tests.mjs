@@ -17,6 +17,10 @@ const envAuto = {
   ESM_OPTIONS: "{cjs:true,mode:'auto'}"
 }
 
+const envCI = {
+  CI: 1
+}
+
 function exec(filename, args, env) {
   return execa(filename, args, {
     cwd: testPath,
@@ -28,7 +32,9 @@ describe("scenarios", function () {
   this.timeout(0)
 
   it("should work with ava", () =>
-    exec("ava", [path.resolve(testPath, "fixture/scenario/ava/test.js")])
+    exec("ava", [
+      path.resolve(testPath, "fixture/scenario/ava/test.js")
+    ], envCI)
   )
 
   it("should work with dual packages", () =>
@@ -110,7 +116,7 @@ describe("scenarios", function () {
       "--cwd", dirPath,
       "-i", cwdPath,
       "ava", avaPattern
-    ])
+    ], envCI)
   })
 
   it("should work with ava, nyc, and tsc", () => {
@@ -128,7 +134,7 @@ describe("scenarios", function () {
         "-i", cwdPath,
         "-i", pkgPath,
         "ava", avaPattern
-      ]))
+      ], envCI))
   })
 
   it("should work with babel and plugins (code)", () =>
