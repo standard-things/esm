@@ -1068,7 +1068,9 @@ describe("spec compliance", () => {
   it("should error when importing or re-exporting a conflicted star exports", () =>
     Promise
       .all([
+        "./fixture/import/star-conflict.js",
         "./fixture/import/star-conflict.mjs",
+        "./fixture/export/star-conflict.js",
         "./fixture/export/star-conflict.mjs"
       ]
       .map((request) =>
