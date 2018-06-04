@@ -48,8 +48,6 @@ const pseudoDescriptor = {
 
 class Entry {
   constructor(mod) {
-    // Entries that have added getters to this entry.
-    this._addedGettersFrom = new WeakSet
     // The namespace object change indicator.
     this._changed = false
     // The loading state of the module.
@@ -218,12 +216,6 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
-    const seen = this._addedGettersFrom
-
-    if (seen.has(otherEntry)) {
-      return this
-    }
-
     const { getters } = this
     const { getters:otherGetters } = otherEntry
 
@@ -243,6 +235,7 @@ class Entry {
           typeof otherGetter === "function") {
         getter = otherGetter
         this.addGetter(key, getter)
+        runGetter(this, key)
       }
 
       if (this.type === TYPE_ESM ||
@@ -259,7 +252,6 @@ class Entry {
       }
     }
 
-    seen.add(otherEntry)
     return this
   }
 
@@ -416,7 +408,9 @@ class Entry {
       parentsMap || (parentsMap = { __proto__: null })
       parentsMap[parentEntry.name] = parentEntry
 
-      setter(value, this)
+      if (setter.from !== "nsSetter") {
+        setter(value, this)
+      }
 
       for (const name of localNames) {
         bindings[name] = true
@@ -796,15 +790,24 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback) {
   entry._runningSetter = name
 
-  const isLoaded = entry._loaded === LOAD_COMPLETED
-  const isNs = name === "*"
-  const isNsChanged = isNs && entry._changed
-  const isNsLoaded = isNs && isLoaded
-
   const settersMap = entry.setters
   const setters = settersMap[name]
 
+  const isLoaded = entry._loaded === LOAD_COMPLETED
+  const isNs = name === "*"
+  const isNsLoaded = isNs && isLoaded
+
   try {
+    if (isNs) {
+      for (const setter of setters) {
+        if (setter.from === "nsSetter") {
+          setter(void 0, entry)
+        }
+      }
+    }
+
+    const isNsChanged = isNs && entry._changed
+
     for (const setter of setters) {
       const { from } = setter
       const nsImport = isNsLoaded && from === "import"
