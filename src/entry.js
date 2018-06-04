@@ -42,6 +42,8 @@ const {
 const GETTER_ERROR = {}
 const STAR_ERROR = {}
 
+const noopSetter = () => {}
+
 const pseudoDescriptor = {
   value: true
 }
@@ -408,9 +410,7 @@ class Entry {
       parentsMap || (parentsMap = { __proto__: null })
       parentsMap[parentEntry.name] = parentEntry
 
-      if (setter.from !== "nsSetter") {
-        setter(value, this)
-      }
+      setter(value, this)
 
       for (const name of localNames) {
         bindings[name] = true
@@ -795,7 +795,9 @@ function runSetter(entry, name, callback) {
 
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
-  const isNsLoaded = isNs && isLoaded
+
+  let isNsChanged = false
+  let isNsLoaded = false
 
   try {
     if (isNs) {
@@ -804,20 +806,29 @@ function runSetter(entry, name, callback) {
           setter(void 0, entry)
         }
       }
+
+      isNsChanged = entry._changed
+      isNsLoaded = isLoaded
     }
 
-    const isNsChanged = isNs && entry._changed
-
-    for (const setter of setters) {
+    for (let setter of setters) {
       const { from } = setter
-      const nsImport = isNsLoaded && from === "import"
-      const nsSetter = isNsChanged && from === "nsSetter"
-      const value = nsSetter ? void 0 : getExportByName(entry, setter, name)
 
-      if (nsImport ||
-          nsSetter ||
-          changed(setter, name, value)) {
-        callback(setter, value)
+      if (isNsChanged &&
+          from === "nsSetter") {
+        noopSetter.from = setter.from
+        noopSetter.last = setter.last
+        noopSetter.localNames = setter.localNames
+        noopSetter.parent = setter.parent
+        callback(noopSetter)
+      } else {
+        const value = getExportByName(entry, setter, name)
+
+        if ((isNsLoaded &&
+              from === "import") ||
+            changed(setter, name, value)) {
+          callback(setter, value)
+        }
       }
     }
   } finally {

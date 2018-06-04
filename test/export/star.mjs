@@ -11,10 +11,7 @@ export default () => {
     c: "c"
   })
 
-  assert.strictEqual(a, "a")
-  assert.strictEqual(b, "b")
-  assert.strictEqual(c, "c")
-  assert.strictEqual(d, "d")
   assert.strictEqual(def, "default")
+  assert.deepStrictEqual([a, b, c, d], ["a", "b", "c", "d"])
   assert.deepStrictEqual(ns, starNs)
 }
