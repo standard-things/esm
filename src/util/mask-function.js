@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 import Package from "../package.js"
 
+import copyProperty from "./copy-property.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
@@ -13,6 +14,7 @@ function maskFunction(func, source) {
   }
 
   const cache = shared.memoize.utilMaskFunction
+
   let cached = cache.get(func)
 
   if (cached) {
@@ -54,6 +56,7 @@ function maskFunction(func, source) {
     ? source.prototype
     : void 0
 
+  copyProperty(func, source, "name")
   Reflect.setPrototypeOf(func, Reflect.getPrototypeOf(source))
 
   if (hasProto &&
