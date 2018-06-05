@@ -131,6 +131,17 @@ describe("util module", () => {
     assert.strictEqual(isModuleNamespaceObject(1), false)
     assert.strictEqual(isModuleNamespaceObject(), false)
   })
+
+  ;(canTestUtilTypes ? it : xit)(
+  "should support `util.types.isProxy`", () => {
+    const { isProxy } = util.types
+
+    assert.strictEqual(isProxy(new Proxy({}, {})), true)
+    assert.strictEqual(isProxy(fsNs), false)
+    assert.strictEqual(isProxy(util), false)
+    assert.strictEqual(isProxy(1), false)
+    assert.strictEqual(isProxy(), false)
+  })
 })
 
 describe("integration", () => {
