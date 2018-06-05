@@ -35,6 +35,8 @@ const defNs = createNamespace({
   default: { d: "d", e: "e", f: "f" }
 })
 
+const canTestUtilTypes = Reflect.has(util, "types")
+
 function checkError(error, code) {
   const message = error.message
 
@@ -120,7 +122,8 @@ describe("built-in modules", () => {
 })
 
 describe("util module", () => {
-  it("should support `util.types.isModuleNamespaceObject`", () => {
+  (canTestUtilTypes ? it : xit)(
+  "should support `util.types.isModuleNamespaceObject`", () => {
     const { isModuleNamespaceObject } = util.types
 
     assert.strictEqual(isModuleNamespaceObject(fsNs), true)
