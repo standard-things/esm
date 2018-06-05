@@ -237,7 +237,7 @@ function createAddBuiltinModules(entry) {
   }
 
   if (binding.config.experimentalWorker) {
-    lazyModules.push("worker")
+    lazyModules.push("worker_threads")
   }
 
   if (lazyModules.length !== length) {
