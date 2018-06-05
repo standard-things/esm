@@ -13,49 +13,57 @@ import shared from "../shared.js"
 function init() {
   const ExObject = shared.external.Object
 
+  const safeTypes = safeUtil.types
+
+  let builtinTypes
+
+  if (safeTypes) {
+    const builtinIsModuleNamespaceObject = proxyWrap(safeTypes.isModuleNamespaceObject, isModuleNamespaceObject)
+    const safeIsProxy = safeTypes.isProxy
+
+    const builtinIsProxy = proxyWrap(safeIsProxy, (value) => {
+      return safeIsProxy(value) &&
+        ! isOwnProxy(value)
+    })
+
+    builtinTypes = new ExObject
+
+    const names = keysAll(safeTypes)
+
+    for (const name of names) {
+      if (name === "isModuleNamespaceObject") {
+        builtinTypes.isModuleNamespaceObject = builtinIsModuleNamespaceObject
+      } else if (name === "isProxy") {
+        builtinTypes.isProxy = builtinIsProxy
+      } else {
+        copyProperty(builtinTypes, safeTypes, name)
+      }
+    }
+  }
+
+  const builtinFormat = proxyWrap(safeUtil.format, format)
+  const builtinInspect = proxyWrap(safeUtil.inspect, inspect)
+  const safeFormatWithOptions = safeUtil.formatWithOptions
+
+  const builtinFormatWithOptions = safeFormatWithOptions
+    ? proxyWrap(safeFormatWithOptions, formatWithOptions)
+    : formatWithOptions
+
   const builtinUtil = new ExObject
   const names = keysAll(realUtil)
 
   for (const name of names) {
-    if (name !== "format" &&
-        name !== "formatWithOptions" &&
-        name !== "inspect" &&
-        name !== "types") {
+    if (name == "format") {
+      builtinUtil.format = builtinFormat
+    } else if (name === "formatWithOptions") {
+      builtinUtil.formatWithOptions = builtinFormatWithOptions
+    } else if (name === "inspect") {
+      builtinUtil.inspect = builtinInspect
+    } else if (name === "types") {
+      builtinUtil.types = builtinTypes
+    } else {
       copyProperty(builtinUtil, safeUtil, name)
     }
-  }
-
-  const safeFormatWithOptions = safeUtil.formatWithOptions
-  const safeTypes = safeUtil.types
-
-  builtinUtil.format = proxyWrap(safeUtil.format, format)
-
-  builtinUtil.formatWithOptions = safeFormatWithOptions
-    ? proxyWrap(safeFormatWithOptions, formatWithOptions)
-    : formatWithOptions
-
-  builtinUtil.inspect = proxyWrap(safeUtil.inspect, inspect)
-
-  if (safeTypes) {
-    const names = keysAll(safeTypes)
-    const safeIsProxy = safeTypes.isProxy
-    const types = new ExObject
-
-    for (const name of names) {
-      if (name !== "isModuleNamespaceObject" &&
-          name !== "isProxy") {
-        copyProperty(types, safeTypes, name)
-      }
-    }
-
-    types.isModuleNamespaceObject = proxyWrap(safeTypes.isModuleNamespaceObject, isModuleNamespaceObject)
-
-    types.isProxy = proxyWrap(safeIsProxy, (value) => {
-      return ! isOwnProxy(value) &&
-        safeIsProxy(value)
-    })
-
-    builtinUtil.types = types
   }
 
   return builtinUtil
