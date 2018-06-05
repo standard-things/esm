@@ -2,6 +2,7 @@ import JSON6 from "json-6"
 import Module from "module"
 
 import assert from "assert"
+import console from "console"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import * as fsExtraNs from "fs-extra"
@@ -119,10 +120,15 @@ describe("built-in modules", () => {
     import("./misc/builtin/namespace.mjs")
       .then((ns) => ns.default())
   )
-})
 
-describe("util module", () => {
-  (canTestUtilTypes ? it : xit)(
+  it("should support `console.Console`", () => {
+    const { Console } = console
+    const actual = new Console(process.stdout, process.stderr)
+
+    assert.ok(actual instanceof Console)
+  })
+
+  ;(canTestUtilTypes ? it : xit)(
   "should support `util.types.isModuleNamespaceObject`", () => {
     const { isModuleNamespaceObject } = util.types
 

@@ -1,13 +1,17 @@
 import { stderr, stdout } from "../safe/process.js"
 
-import { Console } from "../safe/console.js"
+import GenericFunction from "../generic/function.js"
 
 import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
+import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
+import keys from "../util/keys.js"
+import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
+import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
 function init() {
@@ -58,18 +62,38 @@ function init() {
     }, func)
   }
 
-  const builtinConsole = new Console(stdout, stderr)
+  const _Console = safeConsole.Console
+  const _proto = _Console.prototype
 
-  builtinConsole.assert = wrap(builtinConsole.assert, (func, args) => {
+  const Console = maskFunction(function (...args) {
+    const proto = Console.prototype
+    const result = new _Console(...args)
+
+    Reflect.setPrototypeOf(result, proto)
+
+    const names = keys(proto)
+
+    for (const name of names) {
+      const value = proto[name]
+
+      if (typeof value === "function")  {
+        result[name] = GenericFunction.bind(value, result)
+      }
+    }
+
+    return result
+  }, _Console)
+
+  const builtinAssert = wrap(_proto.assert, (func, args) => {
     const [expression, ...rest] = args
 
-    return func(expression, toInspectableArgs(rest))
+    return Reflect.apply(func, this, [expression, toInspectableArgs(rest)])
   })
 
-  builtinConsole.dir = wrap(builtinConsole.dir, (func, args) => {
+  const builtinDir = wrap(_proto.dir, (func, args) => {
     const [object, options] = args
 
-    return func({
+    return Reflect.apply(func, this, [{
       [shared.customInspectKey](recurseTimes, context) {
         const contextAsOptions = assign({}, context, options)
 
@@ -80,22 +104,44 @@ function init() {
         contextAsOptions.depth = recurseTimes
         return builtinUtil.inspect(object, contextAsOptions)
       }
-    }, dirOptions)
+    }, dirOptions])
   })
 
-  const log =
-  builtinConsole.info =
-  builtinConsole.log = wrap(builtinConsole.log)
+  const builtinLog = wrap(_proto.log)
+  const builtinTrace = wrap(_proto.trace)
+  const builtinWarn = wrap(_proto.warn)
 
-  builtinConsole.warn = wrap(builtinConsole.warn)
-  builtinConsole.trace = wrap(builtinConsole.trace)
+  const proto = Console.prototype
+  const protoNames = keysAll(_proto)
 
-  if (has(builtinConsole, "debug")) {
-    builtinConsole.debug = log
+  for (const name of protoNames) {
+    if (name === "assert") {
+      proto.assert = builtinAssert
+    } if (name === "debug" ||
+        name === "dirxml" ||
+        name === "info" ||
+        name === "log") {
+      proto[name] = builtinLog
+    } else if (name === "dir") {
+      proto.dir = builtinDir
+    } else if (name === "trace") {
+      proto.trace = builtinTrace
+    } else if (name === "warn") {
+      proto.warn = builtinWarn
+    } else {
+      copyProperty(proto, _proto, name)
+    }
   }
 
-  if (has(builtinConsole, "dirxml")) {
-    builtinConsole.dirxml = log
+  const builtinConsole = new Console(stdout, stderr)
+  const names = keysAll(safeConsole)
+
+  for (const name of names) {
+    if (name === "Console") {
+      builtinConsole.Console = Console
+    } else if (! has(builtinConsole, name)) {
+      copyProperty(builtinConsole, safeConsole, name)
+    }
   }
 
   return builtinConsole

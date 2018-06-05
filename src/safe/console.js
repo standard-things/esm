@@ -7,7 +7,6 @@ const safeConsole = shared.inited
   : shared.module.safeConsole = safe(realConsole)
 
 export const {
-  Console,
   error
 } = safeConsole
 
