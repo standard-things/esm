@@ -84,13 +84,13 @@ function init() {
     return result
   }, _Console)
 
-  const builtinAssert = wrap(_proto.assert, (func, args) => {
+  const builtinAssert = wrap(_proto.assert, function (func, args) {
     const [expression, ...rest] = args
 
-    return Reflect.apply(func, this, [expression, toInspectableArgs(rest)])
+    return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
   })
 
-  const builtinDir = wrap(_proto.dir, (func, args) => {
+  const builtinDir = wrap(_proto.dir, function (func, args) {
     const [object, options] = args
 
     return Reflect.apply(func, this, [{
