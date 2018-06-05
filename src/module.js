@@ -24,6 +24,7 @@ const RealProto = RealModule.prototype
 
 const Module = maskFunction(function (id, parent) {
   const mod = new RealModule(id, parent)
+
   Reflect.setPrototypeOf(mod, Module.prototype)
   return mod
 }, RealModule)
