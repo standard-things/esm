@@ -119,6 +119,17 @@ describe("built-in modules", () => {
   )
 })
 
+describe("util module", () => {
+  it("should support `util.types.isModuleNamespaceObject`", () => {
+    const { isModuleNamespaceObject } = util.types
+
+    assert.strictEqual(isModuleNamespaceObject(fsNs), true)
+    assert.strictEqual(isModuleNamespaceObject(abcNs), false)
+    assert.strictEqual(isModuleNamespaceObject(1), false)
+    assert.strictEqual(isModuleNamespaceObject(), false)
+  })
+})
+
 describe("integration", () => {
   it("should support intercepting `require`", () =>
     import("./cjs/intercept/require.js")
