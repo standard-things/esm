@@ -22,8 +22,8 @@ import inspect from "../util/inspect.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import makeRequireFunction from "../module/make-require-function.js"
-import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
+import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
@@ -131,15 +131,17 @@ function hook(vm) {
   }
 
   function setupCheck() {
-    const { Script } = vm
-
-    vm.Script = maskFunction(function (code, options) {
+    vm.Script = proxyWrap(vm.Script, (Script, args) => {
       vm.Script = Script
+
+      let [code, options] = args
+
       const { wrapper } = Module
+
       code = code.slice(wrapper[0].length, -wrapper[1].length)
       setupEntry(rootModule)
       return vm.createScript(code, options)
-    }, Script)
+    })
   }
 
   function setupEntry(mod) {
@@ -154,13 +156,14 @@ function hook(vm) {
   }
 
   function setupEval() {
-    const { runInThisContext } = vm
-
-    vm.runInThisContext = maskFunction(function (code, options) {
+    vm.runInThisContext = proxyWrap(vm.runInThisContext, (runInThisContext, args) => {
       vm.runInThisContext = runInThisContext
+
+      const [code, options] = args
+
       setupEntry(shared.unsafeContext.module)
       return vm.createScript(code, options).runInThisContext(options)
-    }, runInThisContext)
+    })
   }
 
   function setupREPL() {
@@ -169,12 +172,14 @@ function hook(vm) {
     if (rootModule.id === "<repl>") {
       setupEntry(rootModule)
     } else if (typeof createContext === "function") {
-      REPLServer.prototype.createContext = maskFunction(function () {
+      REPLServer.prototype.createContext = proxyWrap(createContext, function () {
         REPLServer.prototype.createContext = createContext
+
         const context = call(createContext, this)
+
         setupEntry(context.module)
         return context
-      }, createContext)
+      })
     }
 
     if (INTERNAL &&
