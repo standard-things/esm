@@ -62,12 +62,12 @@ function init() {
     }, func)
   }
 
-  const _Console = safeConsole.Console
-  const _proto = _Console.prototype
+  const SafeConsole = safeConsole.Console
+  const safeProto = SafeConsole.prototype
 
   const Console = maskFunction(function (...args) {
     const proto = Console.prototype
-    const result = new _Console(...args)
+    const result = new SafeConsole(...args)
 
     Reflect.setPrototypeOf(result, proto)
 
@@ -82,15 +82,15 @@ function init() {
     }
 
     return result
-  }, _Console)
+  }, SafeConsole)
 
-  const builtinAssert = wrap(_proto.assert, function (func, args) {
+  const builtinAssert = wrap(safeProto.assert, function (func, args) {
     const [expression, ...rest] = args
 
     return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
   })
 
-  const builtinDir = wrap(_proto.dir, function (func, args) {
+  const builtinDir = wrap(safeProto.dir, function (func, args) {
     const [object, options] = args
 
     return Reflect.apply(func, this, [{
@@ -107,12 +107,12 @@ function init() {
     }, dirOptions])
   })
 
-  const builtinLog = wrap(_proto.log)
-  const builtinTrace = wrap(_proto.trace)
-  const builtinWarn = wrap(_proto.warn)
+  const builtinLog = wrap(safeProto.log)
+  const builtinTrace = wrap(safeProto.trace)
+  const builtinWarn = wrap(safeProto.warn)
 
   const proto = Console.prototype
-  const protoNames = keysAll(_proto)
+  const protoNames = keysAll(safeProto)
 
   for (const name of protoNames) {
     if (name === "assert") {
@@ -129,7 +129,7 @@ function init() {
     } else if (name === "warn") {
       proto.warn = builtinWarn
     } else {
-      copyProperty(proto, _proto, name)
+      copyProperty(proto, safeProto, name)
     }
   }
 
