@@ -9,6 +9,7 @@ import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
 import safeUtil from "../safe/util.js"
 import shared from "../shared.js"
+import toWrapper from "../util/to-wrapper.js"
 
 function init() {
   const ExObject = shared.external.Object
@@ -18,11 +19,13 @@ function init() {
   let builtinTypes
 
   if (safeTypes) {
-    const builtinIsModuleNamespaceObject = proxyWrap(safeTypes.isModuleNamespaceObject, isModuleNamespaceObject)
-    const safeIsProxy = safeTypes.isProxy
+    const builtinIsModuleNamespaceObject =
+      proxyWrap(safeTypes.isModuleNamespaceObject, toWrapper(isModuleNamespaceObject))
 
-    const builtinIsProxy = proxyWrap(safeIsProxy, (value) => {
-      return safeIsProxy(value) &&
+    const builtinIsProxy = proxyWrap(safeTypes.isProxy, (func, args) => {
+      const [value] = args
+
+      return func(value) &&
         ! isOwnProxy(value)
     })
 
@@ -41,12 +44,12 @@ function init() {
     }
   }
 
-  const builtinFormat = proxyWrap(safeUtil.format, format)
-  const builtinInspect = proxyWrap(safeUtil.inspect, inspect)
+  const builtinFormat = proxyWrap(safeUtil.format, toWrapper(format))
+  const builtinInspect = proxyWrap(safeUtil.inspect, toWrapper(inspect))
   const safeFormatWithOptions = safeUtil.formatWithOptions
 
   const builtinFormatWithOptions = safeFormatWithOptions
-    ? proxyWrap(safeFormatWithOptions, formatWithOptions)
+    ? proxyWrap(safeFormatWithOptions, toWrapper(formatWithOptions))
     : formatWithOptions
 
   const builtinUtil = new ExObject
