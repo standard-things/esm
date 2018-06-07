@@ -22,9 +22,7 @@ function init() {
     const builtinIsModuleNamespaceObject =
       proxyWrap(safeTypes.isModuleNamespaceObject, toWrapper(isModuleNamespaceObject))
 
-    const builtinIsProxy = proxyWrap(safeTypes.isProxy, (func, args) => {
-      const [value] = args
-
+    const builtinIsProxy = proxyWrap(safeTypes.isProxy, (func, [value]) => {
       return func(value) &&
         ! isOwnProxy(value)
     })

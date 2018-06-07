@@ -32,8 +32,8 @@ function init() {
 
       try {
         utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
-          apply(target, thisArg, args) {
-            return getProxyDetails(args[0])
+          apply(target, thisArg, [value]) {
+            return getProxyDetails(value)
           }
         })
 

@@ -131,14 +131,12 @@ function hook(vm) {
   }
 
   function setupCheck() {
-    vm.Script = proxyWrap(vm.Script, (Script, args) => {
+    vm.Script = proxyWrap(vm.Script, (Script, [code, options]) => {
       vm.Script = Script
 
-      let [code, options] = args
+      const [prefix, postfix] = Module.wrapper
 
-      const { wrapper } = Module
-
-      code = code.slice(wrapper[0].length, -wrapper[1].length)
+      code = code.slice(prefix.length, -postfix.length)
       setupEntry(rootModule)
       return vm.createScript(code, options)
     })
@@ -156,11 +154,8 @@ function hook(vm) {
   }
 
   function setupEval() {
-    vm.runInThisContext = proxyWrap(vm.runInThisContext, (runInThisContext, args) => {
+    vm.runInThisContext = proxyWrap(vm.runInThisContext, (runInThisContext, [code, options]) => {
       vm.runInThisContext = runInThisContext
-
-      const [code, options] = args
-
       setupEntry(shared.unsafeContext.module)
       return vm.createScript(code, options).runInThisContext(options)
     })

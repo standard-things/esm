@@ -84,15 +84,11 @@ function init() {
     return result
   }, SafeConsole)
 
-  const builtinAssert = wrap(safeProto.assert, function (func, args) {
-    const [expression, ...rest] = args
-
+  const builtinAssert = wrap(safeProto.assert, function (func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
   })
 
-  const builtinDir = wrap(safeProto.dir, function (func, args) {
-    const [object, options] = args
-
+  const builtinDir = wrap(safeProto.dir, function (func, [object, options]) {
     return Reflect.apply(func, this, [{
       [shared.customInspectKey](recurseTimes, context) {
         const contextAsOptions = assign({}, context, options)
