@@ -18,7 +18,7 @@ function load(filename) {
   let ext = extname(filename)
 
   if (ext === "" ||
-      typeof Module._extensions[ext] !== "function") {
+      ! Reflect.has(Module._extensions, ext)) {
     ext = ".js"
   }
 

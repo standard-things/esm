@@ -33,7 +33,7 @@ function loader(entry, filename, parentEntry, preload) {
   }
 
   if (ext === "" ||
-      typeof _extensions[ext] !== "function") {
+      ! Reflect.has(_extensions, ext)) {
     ext = ".js"
   }
 

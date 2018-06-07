@@ -182,7 +182,7 @@ function hook(Mod, parent) {
 
   for (const ext of exts) {
     if (ext === ".mjs" &&
-        typeof _extensions[ext] !== "function") {
+        ! Reflect.has(_extensions, ext)) {
       _extensions[ext] = maskFunction(mjsCompiler, sourceExtsMjs)
     }
 

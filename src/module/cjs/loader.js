@@ -19,7 +19,7 @@ function loader(entry, filename, parentEntry, preload) {
   let ext = extname(filename)
 
   if (ext === "" ||
-      typeof _extensions[ext] !== "function") {
+      ! Reflect.has(_extensions, ext)) {
     ext = ".js"
   }
 
