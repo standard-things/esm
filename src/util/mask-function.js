@@ -24,7 +24,7 @@ function maskFunction(func, source) {
   const proxy = new OwnProxy(func, {
     get(target, name, receiver) {
       if (name === "toString" &&
-          ! has(func, "toString")) {
+          ! has(target, "toString")) {
         return cached.toString
       }
 
