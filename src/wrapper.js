@@ -1,14 +1,13 @@
-// This module is important for `esm` versioning support and should be
-// changed as little as possible. Please ensure any changes are backwards
-// compatible.
+// This module is important for `esm` versioning support and should be changed
+// as little as possible. Please ensure any changes are backwards compatible.
 
 import ESM from "./constant/esm.js"
 
 import GenericArray from "./generic/array.js"
 
 import has from "./util/has.js"
-import maskFunction from "./util/mask-function.js"
 import maxSatisfying from "./util/max-satisfying.js"
+import proxyWrap from "./util/proxy-wrap.js"
 import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
@@ -34,14 +33,15 @@ function init() {
       return null
     },
     manage(object, name, wrapper) {
-      const value = Wrapper.unwrap(object, name)
-      const manager = maskFunction(function (...args) {
-        return Reflect.apply(wrapper, this, [manager, value, args])
-      }, value)
+      const func = Wrapper.unwrap(object, name)
+
+      const manager = proxyWrap(func, function (func, args) {
+        return Reflect.apply(wrapper, this, [manager, func, args])
+      })
 
       Reflect.defineProperty(manager, shared.symbol.wrapper, {
         configurable: true,
-        value,
+        value: func,
         writable: true
       })
 
@@ -50,6 +50,7 @@ function init() {
     unwrap(object, name) {
       const manager = silent(() => object[name])
       const symbol = shared.symbol.wrapper
+
       return has(manager, symbol) ? manager[symbol]  : manager
     },
     wrap(object, name, wrapper) {
