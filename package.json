@@ -78,9 +78,9 @@
     "typescript": "^2.6.1",
     "uglify-es": "^3.3.10",
     "uglifyjs-webpack-plugin": "^1.2.4",
-    "webpack": "^4.11.0",
+    "webpack": "^4.12.0",
     "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-cli": "^3.0.2",
+    "webpack-cli": "^3.0.3",
     "yargs": "^11.1.0"
   },
   "files": [
