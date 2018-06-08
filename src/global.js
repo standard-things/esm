@@ -13,7 +13,7 @@ function init() {
         : Reflect.get(target, name, receiver)
     },
     getOwnPropertyDescriptor(target, name) {
-      const descriptor = Object.getOwnPropertyDescriptor(target, name)
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
       if (name === target &&
           descriptor &&
