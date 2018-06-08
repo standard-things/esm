@@ -12,7 +12,7 @@ function init() {
   function parseFunctionParams(func, args) {
     const [node] = args
     node.functionParamsStart = this.start
-    return func.apply(this, args)
+    return Reflect.apply(func, this, args)
   }
 
   return Plugin

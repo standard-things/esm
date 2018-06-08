@@ -34,7 +34,7 @@ function init() {
       this.unexpected()
     }
 
-    return func.apply(this, args)
+    return Reflect.apply(func, this, args)
   }
 
   function parseStatement(func, args) {
@@ -54,7 +54,7 @@ function init() {
       }
     }
 
-    return func.apply(this, args)
+    return Reflect.apply(func, this, args)
   }
 
   function parseImportCall(parser) {

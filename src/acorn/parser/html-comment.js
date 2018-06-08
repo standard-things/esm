@@ -39,7 +39,7 @@ function init() {
       }
     }
 
-    return func.apply(this, args)
+    return Reflect.apply(func, this, args)
   }
 
   function readToken_plus_min(func, args) {
@@ -58,7 +58,7 @@ function init() {
       }
     }
 
-    return func.apply(this, args)
+    return Reflect.apply(func, this, args)
   }
 
   return Plugin

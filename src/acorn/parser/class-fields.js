@@ -22,7 +22,7 @@ function init() {
     const [code] = args
 
     if (code !== NUMSIGN) {
-      return func.apply(this, args)
+      return Reflect.apply(func, this, args)
     }
 
     ++this.pos
@@ -31,7 +31,7 @@ function init() {
 
   function parseClassMember(func, args) {
     if (this.type !== tt.name) {
-      return func.apply(this, args)
+      return Reflect.apply(func, this, args)
     }
 
     const { type } = lookahead(this)
@@ -45,7 +45,7 @@ function init() {
           this.isContextual("get") ||
           this.isContextual("set") ||
           this.isContextual("static")))) {
-      return func.apply(this, args)
+      return Reflect.apply(func, this, args)
     }
 
     const [classBody] = args
