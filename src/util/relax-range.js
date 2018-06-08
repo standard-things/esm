@@ -17,7 +17,8 @@ function relaxRange(range) {
   const code0 = range.charCodeAt(0)
 
   if (code0 !== CIRCUMFLEX_ACCENT) {
-    if (code0 >= DIGIT_0 && code0 <= DIGIT_9) {
+    if (code0 >= DIGIT_0 &&
+        code0 <= DIGIT_9) {
       return "^" + range
     }
 
