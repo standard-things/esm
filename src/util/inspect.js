@@ -82,15 +82,16 @@ function init() {
     let object = proxy
 
     if (details) {
-      const { customInspect, showProxy } = context
-
       object = new Proxy(
-        wrap(details[0], context, customInspect, showProxy),
-        wrap(details[1], context, customInspect, showProxy)
+        toInspectable(details[0], context),
+        toInspectable(details[1], context)
       )
     }
 
-    return inspect(object, context)
+    const contextAsOptions = assign({}, context)
+
+    contextAsOptions.customInspect = true
+    return safeInspect(object, contextAsOptions)
   }
 
   function getExportedInspect() {
@@ -99,6 +100,17 @@ function init() {
     }
 
     return exportedInspect = builtinEntries.util.module.exports.inspect
+  }
+
+  function toInspectable(target, options) {
+    return {
+      [shared.customInspectKey]: (recurseTimes) => {
+        const contextAsOptions = assign({}, options)
+
+        contextAsOptions.depth = recurseTimes
+        return inspect(target, contextAsOptions)
+      }
+    }
   }
 
   function wrap(target, options, customInspect, showProxy) {
