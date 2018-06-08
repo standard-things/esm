@@ -198,7 +198,7 @@ describe("compiler", () => {
   it("should transform dynamic import in switch statements", () => {
     const code = [
       "(async () => {",
-      '   switch (await import("a")) {',
+      '  switch (await import("a")) {',
       '    case await import("b"):',
       '      return await import ("c")',
       "  }",
@@ -212,16 +212,38 @@ describe("compiler", () => {
     })
   })
 
-  it("should preserve line numbers", () =>
-    import("./compiler/lines.mjs")
-      .then((ns) => ns.default())
-  )
+  it("should preserve line numbers", () => {
+    const code = [
+      "import",
+      "",
+      "a",
+      "",
+      'from "a"',
+      "",
+      "export",
+      "",
+      "default",
+      "",
+      "() =>",
+      "//",
+      "{",
+      "b",
+      "}"
+    ].join("\n")
+
+    modernTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
+      const lines = result.code.split("\n")
+
+      assert.strictEqual(lines[13], "b")
+    })
+  })
 
   it("should preserve crlf newlines", () => {
     const code = [
       "import {",
       "  strictEqual,",
-      "  // blank line",
+      "",
       "  deepEqual",
       "}",
       'from "assert"'
@@ -234,39 +256,122 @@ describe("compiler", () => {
     })
   })
 
-  it('should not hoist above "use strict"', () =>
-    import("./compiler/strict.mjs")
-      .then((ns) => ns.default())
-  )
+  it("should not get confused by string literals", () => {
+    const code = [
+      "'a; import b from " + '"c"; d' + "'",
+      '"a; import b " + ' + "'from " + '"c"; d' + "'"
+    ].join("\n")
 
-  it("should not get confused by string literals", () =>
-    import("./compiler/strings.mjs")
-      .then((ns) => ns.default())
-  )
+    sourceTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
 
-  it("should not error for shorthand async function properties with reserved names", () => {
-    Compiler.compile("({async delete(){}})")
+      assert.strictEqual(result.code, code)
+    })
   })
 
-  it("should not error for arrow functions with destructured arguments", () => {
+  it("should parse shorthand async function properties with reserved names", () => {
+    sourceTypes.forEach((sourceType) => {
+      Compiler.compile("({ async delete() {} })", { sourceType })
+    })
+  })
+
+  it("should parse arrow functions with destructured arguments", () => {
     [
-      "({a=1})=>{}",
-      "({a=1},{b=2})=>{}"
+      "({ a = 1 }) => {}",
+      "({ a = 1 }, { b = 2 }) => {}"
     ]
-    .forEach(Compiler.compile)
+    .forEach((code) => {
+      sourceTypes.forEach((sourceType) => {
+        Compiler.compile(code, { sourceType })
+      })
+    })
   })
 
-  it("should not error for transforms at the end of the source", () => {
+  it("should parse transforms at the end of the source", () => {
     [
-      'import{a}from"a"',
-      'import"a"',
-      "let a;export{a}",
+      'import { a } from "a"',
+      'import "a"',
+      "let a; export { a }",
       "export default a"
     ]
     .forEach((code) => {
       modernTypes.forEach((sourceType) => {
         Compiler.compile(code, { sourceType })
       })
+    })
+  })
+
+  it("should parse async generator syntax", () => {
+    const code = [
+      "export default async function * a() {}",
+      "export const b = {",
+      "  async *b() {}",
+      "}",
+      "export class C {",
+      "  async *c() {}",
+      "}"
+    ].join("\n")
+
+    modernTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse class fields syntax", () => {
+    const code = [
+      "export class A { a }",
+      'export class B { b = "b" }',
+      "export class C { #c }",
+      "export class D { async }",
+      "export class E { get }",
+      "export class F { set }",
+      "export class G { static }",
+      "export class H {",
+      '  #h= "h"',
+      "  h() {",
+      "    return this.#h",
+      "  }",
+      "}",
+      "export class I {",
+      "  async = 1;",
+      "  get = 1",
+      "  set = 1",
+      "  static = 1",
+      "}"
+    ].join("\n")
+
+    modernTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse for-await-of syntax", () => {
+    const code = [
+      "export default async function convert(iterable) {",
+      "  const result = []",
+      "  for await (const value of iterable) {",
+      "    result.push(value)",
+      "  }",
+      "  return result",
+      "}"
+    ].join("\n")
+
+    modernTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse object rest/spread syntax", () => {
+    const code = [
+      'const ab = { a: "a", b: "b" }',
+      'const abc = { ...K(ab), c: "c" }',
+      "export const { a, ...bc } = abc",
+      "export const d = ({ a, ...bcd } = {}) => bcd",
+      "export default { ...abc, d }"
+    ].join("\n")
+
+    modernTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
     })
   })
 })

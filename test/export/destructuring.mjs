@@ -10,7 +10,7 @@ export default () => {
   assert.strictEqual(c, "c")
   assert.deepStrictEqual(rest, [b, c])
 
-  // Should not crash on array patterns with holes.
+  // Should support array patterns with holes.
   assert.strictEqual(a0, 0)
   assert.strictEqual(a2, 2)
   assert.strictEqual(update(3, 4, 5), 8)
