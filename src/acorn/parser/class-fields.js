@@ -1,3 +1,6 @@
+// Parser support for class fields syntax.
+// https://github.com/tc39/proposal-class-fields
+
 import CHAR_CODE from "../../constant/char-code.js"
 
 import lookahead from "../../parse/lookahead.js"
