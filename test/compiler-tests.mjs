@@ -317,6 +317,20 @@ describe("compiler", () => {
     })
   })
 
+  it("should parse big integer syntax", () => {
+    const code = [
+      "0b101011101n",
+      "0xFFF123n",
+      "1234567890123456789n",
+      "0o16432n",
+      "100n"
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
   it("should parse class fields syntax", () => {
     const code = [
       "export class A { a }",
@@ -357,6 +371,23 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse numeric separator syntax", () => {
+    const code = [
+      "1_0",
+      "1e1_0",
+      "0.0_1",
+      "0b1_0_1_0_1_1_1_0_1n",
+      "0xF_F_F_1_2_3n",
+      "1_2_3_4_5_6_7_8_9_0_1_2_3_4_5_6_7_8_9n",
+      "0o1_6_4_3_2n",
+      "1_0_0n"
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
       Compiler.compile(code, { sourceType })
     })
   })

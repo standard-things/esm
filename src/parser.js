@@ -2,10 +2,12 @@ import SOURCE_TYPE from "./constant/source-type.js"
 
 import { Parser as AcornParser } from "./acorn.js"
 
+import acornParserBigInt from "./acorn/parser/big-int.js"
 import acornParserClassFields from "./acorn/parser/class-fields.js"
 import acornParserDynamicImport from "./acorn/parser/dynamic-import.js"
 import acornParserFunctionParamsStart from "./acorn/parser/function-params-start.js"
 import acornParserHTMLComment from "./acorn/parser/html-comment.js"
+import acornNumericSeparator from "./acorn/parser/numeric-separator.js"
 import acornParserTolerance from "./acorn/parser/tolerance.js"
 import acornParserTopLevel from "./acorn/parser/top-level.js"
 import defaults from "./util/defaults.js"
@@ -40,10 +42,12 @@ function init() {
       const { strict } = options
       const parser = new AcornParser(options, code)
 
+      acornParserBigInt.enable(parser)
       acornParserClassFields.enable(parser)
       acornParserDynamicImport.enable(parser)
       acornParserFunctionParamsStart.enable(parser)
       acornParserHTMLComment.enable(parser)
+      acornNumericSeparator.enable(parser)
       acornParserTolerance.enable(parser)
       acornParserTopLevel.enable(parser)
 
