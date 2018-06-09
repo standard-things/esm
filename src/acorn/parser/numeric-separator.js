@@ -1,4 +1,4 @@
-// Parser support for numeric separator syntax.
+// A loose implementation of numeric separator syntax.
 // https://github.com/tc39/proposal-numeric-separator
 
 import CHAR_CODE from "../../constant/char-code.js"

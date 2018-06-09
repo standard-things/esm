@@ -1,4 +1,4 @@
-// Parser support for big integer syntax.
+// A loose implementation of BigInt syntax.
 // https://github.com/tc39/proposal-bigint
 
 import CHAR_CODE from "../../constant/char-code.js"
