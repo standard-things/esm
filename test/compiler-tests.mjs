@@ -317,13 +317,56 @@ describe("compiler", () => {
     })
   })
 
-  it("should parse big integer syntax", () => {
+  it("should parse BigInt syntax", () => {
     const code = [
-      "0b101011101n",
-      "0xFFF123n",
+      "1n",
       "1234567890123456789n",
-      "0o16432n",
-      "100n"
+      "0b01n",
+      "0B01n",
+      "0xan",
+      "0xAn",
+      "0xfn",
+      "0xFn",
+      "0o01n",
+      "0O01n"
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse numeric separator syntax", () => {
+    const code = [
+      "1_0",
+      ".1_0e1_0",
+      ".1_0E1_0",
+      "0b0_1",
+      "0B0_1",
+      "0x0_a",
+      "0x0_A",
+      "0x0_f",
+      "0x0_F",
+      "0o0_1",
+      "0O0_1"
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      Compiler.compile(code, { sourceType })
+    })
+  })
+
+  it("should parse BigInt and numeric separator syntax", () => {
+    const code = [
+      "1_0n",
+      "0b0_1n",
+      "0B0_1n",
+      "0x0_an",
+      "0x0_An",
+      "0x0_fn",
+      "0x0_Fn",
+      "0o0_1n",
+      "0O0_1n"
     ].join("\n")
 
     sourceTypes.forEach((sourceType) => {
@@ -371,23 +414,6 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
-    })
-  })
-
-  it("should parse numeric separator syntax", () => {
-    const code = [
-      "1_0",
-      "1e1_0",
-      "0.0_1",
-      "0b1_0_1_0_1_1_1_0_1n",
-      "0xF_F_F_1_2_3n",
-      "1_2_3_4_5_6_7_8_9_0_1_2_3_4_5_6_7_8_9n",
-      "0o1_6_4_3_2n",
-      "1_0_0n"
-    ].join("\n")
-
-    sourceTypes.forEach((sourceType) => {
       Compiler.compile(code, { sourceType })
     })
   })
