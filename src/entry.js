@@ -288,27 +288,33 @@ class Entry {
     this.initNamespace = noop
 
     setDeferred(this, "cjsMutableNamespace", function () {
-      return createMutableNamespaceProxy(this, {
-        namespace: toNamespaceObject({
-          default: this.module.exports
-        })
-      })
+      return createMutableNamespaceProxy(
+        this,
+        cjsNamespaceGetter(this),
+        cjsNamespaceSource(this)
+      )
     })
 
     setDeferred(this, "cjsNamespace", function () {
-      return createNamespaceProxy(this, {
-        namespace: toNamespaceObject({
-          default: this.module.exports
-        })
-      })
+      return createNamespaceProxy(
+        this,
+        cjsNamespaceGetter(this),
+        cjsNamespaceSource(this)
+      )
     })
 
     setDeferred(this, "esmMutableNamespace", function () {
-      return createMutableNamespaceProxy(this)
+      return createMutableNamespaceProxy(
+        this,
+        esmNamespaceGetter(this)
+      )
     })
 
     setDeferred(this, "esmNamespace", function () {
-      return createNamespaceProxy(this)
+      return createNamespaceProxy(
+        this,
+        esmNamespaceGetter(this)
+      )
     })
   }
 
@@ -462,7 +468,8 @@ function assignExportsToNamespace(entry, names) {
   }
 
   for (const name of names) {
-    if (! (isCJS && name === "default") &&
+    if (! (isCJS &&
+           name === "default") &&
         ! Reflect.has(getters, name)) {
       entry.addGetter(name, () => entry.namespace[name])
     }
@@ -480,19 +487,24 @@ function changed(setter, key, value) {
   return true
 }
 
-function createNamespace(entry, source) {
-  const { type } = entry
-  const isCJS = type === TYPE_CJS
-  const isESM = type === TYPE_ESM
+function cjsNamespaceGetter(entry) {
+  return (target, name) => {
+    return name === "default"
+      ? Reflect.get(target, name)
+      : Reflect.getOwnPropertyDescriptor(entry.exports, name).value
+  }
+}
 
-  return toNamespaceObject(source.namespace, (target, name) => {
-    if (isESM ||
-        (isCJS && name === "default")) {
-      return Reflect.get(target, name)
-    }
+function cjsNamespaceSource(entry) {
+  return {
+    namespace: toNamespaceObject({
+      default: entry.module.exports
+    })
+  }
+}
 
-    return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
-  })
+function createNamespace(source, getter) {
+  return toNamespaceObject(source.namespace, getter)
 }
 
 function createNamespaceHandler(entry, source, mutable) {
@@ -622,26 +634,42 @@ function createNamespaceHandler(entry, source, mutable) {
   return handler
 }
 
-function createMutableNamespaceProxy(entry, source = entry) {
+function createMutableNamespaceProxy(entry, getter, source = entry) {
   return new OwnProxy(
-    createNamespace(entry, source),
+    createNamespace(source, getter),
     createNamespaceHandler(entry, source, true)
   )
 }
 
-function createNamespaceProxy(entry, source = entry) {
+function createNamespaceProxy(entry, getter, source = entry) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Namespace objects should be sealed.
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   return new OwnProxy(
-    Object.seal(createNamespace(entry, source)),
+    Object.seal(createNamespace(source, getter)),
     createNamespaceHandler(entry, source)
   )
 }
 
+function esmNamespaceGetter(entry) {
+  return (target, name) => {
+    const { type } = entry
+
+    if (type === TYPE_ESM ||
+        (type === TYPE_CJS &&
+         name === "default")) {
+      return Reflect.get(target, name)
+    }
+
+    return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
+  }
+}
+
 function getExportByName(entry, setter, name) {
-  const { _namespace } = entry
-  const isCJS = entry.type === TYPE_CJS
+  const { _namespace, type } = entry
+  const isCJS = type === TYPE_CJS
+  const isPseudo = type === TYPE_PSEUDO
+  const mod = entry.module
   const parentEntry = setter.parent
   const parentIsMJS = isMJS(parentEntry.module)
   const parentOptions = parentEntry.package.options
@@ -655,9 +683,15 @@ function getExportByName(entry, setter, name) {
     (! parentIsMJS &&
      parentOptions.cjs.namedExports)
 
+  const noMutableNamespace =
+    ! parentMutableNamespace ||
+    isMJS(mod)
+
   const noNamedExports =
-    isCJS &&
-    ! parentNamedExports
+    (isCJS &&
+     ! parentNamedExports) ||
+    (isPseudo &&
+     parentIsMJS)
 
   if (isCJS &&
       parentNamedExports &&
@@ -684,20 +718,26 @@ function getExportByName(entry, setter, name) {
   }
 
   if (name === "*") {
-    if (parentMutableNamespace &&
-        ! isMJS(entry.module)) {
+    if (noMutableNamespace) {
       return noNamedExports
-        ? entry.cjsMutableNamespace
-        : entry.esmMutableNamespace
+        ? entry.cjsNamespace
+        : entry.esmNamespace
     }
 
     return noNamedExports
-      ? entry.cjsNamespace
-      : entry.esmNamespace
+      ? entry.cjsMutableNamespace
+      : entry.esmMutableNamespace
+  }
+
+  if (isPseudo &&
+      noNamedExports &&
+      name === "default") {
+    return noMutableNamespace
+      ? entry.cjsNamespace.default
+      : entry.cjsMutableNamespace.default
   }
 
   const { getters } = entry
-  const mod = entry.module
 
   if ((noNamedExports &&
        name !== "default") ||
