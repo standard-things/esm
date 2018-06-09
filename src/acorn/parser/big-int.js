@@ -31,7 +31,8 @@ function init() {
 
     if (parser.readInt(radix) !== null &&
         input.charCodeAt(parser.pos) === LOWERCASE_N) {
-      return parser.finishToken(tt.num, input.slice(pos, ++parser.pos))
+      ++parser.pos
+      return parser.finishToken(tt.num, null)
     }
 
     parser.pos = pos
