@@ -510,23 +510,19 @@ function createNamespace(source, getter) {
 function createNamespaceHandler(entry, source, mutable) {
   const handler = {
     get(target, name, receiver) {
-      const { compileData } = entry
-      const exportSpecifiers = compileData && compileData.exportSpecifiers
       const getter = entry.getters[name]
+      const { namespace } = source
 
-      if (getter &&
-          exportSpecifiers &&
-          exportSpecifiers[name] === 1 &&
-          name !== "default") {
-        return getter()
+      if (entry.type === TYPE_ESM) {
+        if (getter) {
+          getter()
+        } else if (typeof name === "string" &&
+            Reflect.has(namespace, name)) {
+          throw new ERR_UNDEFINED_IDENTIFIER(name)
+        }
       }
 
-      if (name === "default" &&
-          ! getter) {
-        throw new ERR_UNDEFINED_IDENTIFIER(name)
-      }
-
-      return Reflect.get(source.namespace, name, receiver)
+      return Reflect.get(namespace, name, receiver)
     },
 
     has(target, name) {
