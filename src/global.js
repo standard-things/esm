@@ -25,7 +25,7 @@ function init() {
     },
     set(target, name, value, receiver) {
       if (Reflect.set(target, name, value, receiver)) {
-        if (name == "console") {
+        if (name === "console") {
           Reflect.deleteProperty(target, "get")
           Reflect.deleteProperty(target, "getOwnPropertyDescriptor")
           Reflect.deleteProperty(target, "set")

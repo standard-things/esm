@@ -54,7 +54,7 @@ function init() {
   const names = keysAll(realUtil)
 
   for (const name of names) {
-    if (name == "format") {
+    if (name === "format") {
       builtinUtil.format = builtinFormat
     } else if (name === "formatWithOptions") {
       builtinUtil.formatWithOptions = builtinFormatWithOptions

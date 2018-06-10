@@ -29,6 +29,7 @@ module.exports = {
     "comma-dangle": "error",
     curly: "error",
     "eol-last": "error",
+    "eqeqeq": ["error", "always", { null: "ignore" }],
     "import/no-duplicates": "error",
     "import/no-extraneous-dependencies": ["error", { packageDir: "./" }],
     "import/prefer-default-export": "error",
