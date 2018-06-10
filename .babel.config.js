@@ -1,5 +1,22 @@
 "use strict"
 
+function BabelEqEqEqPlugin() {
+  return {
+    visitor: {
+      BinaryExpression({ node }) {
+        const { operator } = node
+
+        if ((operator === "==" ||
+             operator === "!=") &&
+            node.left.type !== "NullLiteral" &&
+            node.right.type !== "NullLiteral") {
+          node.operator += "="
+        }
+      }
+    }
+  }
+}
+
 const isTest = /test/.test(process.env.ESM_ENV)
 
 module.exports = {
@@ -24,7 +41,8 @@ module.exports = {
     }],
     ["transform-for-of-as-array", {
       loose: true
-    }]
+    }],
+    BabelEqEqEqPlugin()
   ],
   presets: [
     ["@babel/env", {
