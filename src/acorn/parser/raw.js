@@ -13,8 +13,8 @@ function init() {
   function parseLiteral(value) {
     const node = this.startNode()
 
-    node.value = value
     node.raw = ""
+    node.value = value
     this.next()
     return this.finishNode(node, "Literal")
   }

@@ -54,8 +54,8 @@ function init() {
     const [classBody] = args
     const node = this.startNode()
 
-    node.key = this.parseIdent(true)
     node.computed = false
+    node.key = this.parseIdent(true)
     node.value = this.eat(tt.eq) ? this.parseExpression() : null
 
     this.finishNode(node, "FieldDefinition")
