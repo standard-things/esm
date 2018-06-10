@@ -99,7 +99,6 @@ function init() {
       const { specifiers } = node
       const lastIndex = specifiers.length - 1
       const specifierMap = createSpecifierMap(this, node)
-      const specifierString = getSourceString(this, node)
 
       let hoistedCode = specifiers.length
         ? (this.generateVarDeclarations ? "var " : "let ")
@@ -115,7 +114,7 @@ function init() {
 
       hoistedCode += toModuleImport(
         this,
-        specifierString,
+        node.source.value,
         specifierMap
       )
 
@@ -137,12 +136,11 @@ function init() {
       const { original } = this.magicString
       const { runtimeName } = this
       const { source } = node
-      const specifierString = getSourceString(this, node)
-      const specifierName = specifierString.slice(1, -1)
+      const specifierName = source.value
 
       const hoistedCode = pad(
         original,
-        runtimeName + ".w(" + specifierString,
+        runtimeName + '.w("' + specifierName + '"',
         node.start,
         source.start
       ) + pad(
@@ -287,10 +285,9 @@ function init() {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
         const { exportFrom, exportNames, runtimeName } = this
-        const specifierMap = { __proto__: null }
 
-        const specifierString = getSourceString(this, node)
-        const specifierName = specifierString.slice(1, -1)
+        const specifierMap = { __proto__: null }
+        const specifierName = node.source.value
 
         addToDependencySpecifiers(this, specifierName)
 
@@ -318,7 +315,7 @@ function init() {
         const importNames = keys(specifierMap)
         const lastIndex = importNames.length - 1
 
-        let hoistedCode = runtimeName + ".w(" + specifierString + ",["
+        let hoistedCode = runtimeName + '.w("' + specifierName + '",['
         let i = -1
 
         for (const importName of importNames) {
@@ -434,12 +431,6 @@ function init() {
     return specifierMap
   }
 
-  // Gets a string representation (including quotes) from an import or
-  // export declaration node.
-  function getSourceString(visitor, { source }) {
-    return visitor.magicString.original.slice(source.start, source.end)
-  }
-
   function hoistExports(visitor, node, pairs) {
     visitor.top.hoistedExports.push(...pairs)
 
@@ -493,11 +484,10 @@ function init() {
     return code
   }
 
-  function toModuleImport(visitor, specifierString, specifierMap) {
+  function toModuleImport(visitor, specifierName, specifierMap) {
     const importNames = keys(specifierMap)
-    const specifierName = specifierString.slice(1, -1)
 
-    let code = visitor.runtimeName + ".w(" + specifierString
+    let code = visitor.runtimeName + '.w("' + specifierName + '"'
 
     addToDependencySpecifiers(visitor, specifierName)
 
