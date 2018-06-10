@@ -1,6 +1,14 @@
-// A more accurate version of acorn-dynamic-import.
+// Parser support for dynamic import and import meta property syntax.
+// https://github.com/tc39/proposal-dynamic-import
+// https://github.com/tc39/proposal-import-meta
+//
+// Dynamic import syntax is based on acorn-dynamic-import.
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
+//
+// Import meta property syntax is adapted from the Babel parser.
+// Copyright Babel parser contributors. Released under MIT license:
+// https://github.com/babel/babel/blob/master/packages/babel-parser/src/parser/expression.js
 
 import lookahead from "../../parse/lookahead.js"
 import shared from "../../shared.js"
@@ -34,7 +42,16 @@ function init() {
       this.unexpected()
     }
 
-    return Reflect.apply(func, this, args)
+    const node = Reflect.apply(func, this, args)
+    const { type } = node
+
+    if (type === tt._false ||
+        type === tt._null ||
+        type === tt._true) {
+      node.raw = ""
+    }
+
+    return node
   }
 
   function parseStatement(func, args) {
@@ -42,14 +59,10 @@ function init() {
       const { type } = lookahead(this)
 
       if (type === tt.dot) {
-        // import.meta
-        // https://tc39.github.io/proposal-import-meta/#prod-ImportMeta
         return parseImportMetaProperty(this)
       }
 
       if (type === tt.parenL) {
-        // import(...)
-        // https://tc39.github.io/proposal-dynamic-import/#prod-ImportCall
         return parseImportCall(this)
       }
     }
@@ -92,10 +105,8 @@ function init() {
   }
 
   function parseImportMetaPropertyAtom(parser) {
-    // Support for meta properties adapted from Babylon.
-    // Copyright Babylon contributors. Released under MIT license:
-    // https://github.com/babel/babel/blob/master/packages/babylon/src/parser/expression.js
     const node = parser.startNode()
+
     node.meta = parser.parseIdent(true)
 
     parser.expect(tt.dot)
