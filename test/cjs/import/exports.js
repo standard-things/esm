@@ -11,13 +11,14 @@ import defaultNumber, * as nsNumber from "../../fixture/cjs/export/number.js"
 import defaultObject, { a as aOfObject } from "../../fixture/cjs/export/object.js"
 import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/export/pseudo.js"
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/export/undefined.js"
-import * as nsEmptyPseudo from "../../fixture/cjs/export/pseudo-empty.js"
-import * as nsPseudo from "../../fixture/cjs/export/pseudo.js"
 import * as nsFunction from "../../fixture/cjs/export/function.js"
-import * as nsSafe from "../../fixture/cjs/export/get-set.js"
+import * as nsGetSet from "../../fixture/cjs/export/get-set.js"
+import * as nsPseudo from "../../fixture/cjs/export/pseudo.js"
+import * as nsPseudoEmpty from "../../fixture/cjs/export/pseudo-empty.js"
 
 export default () => {
   let ns = createNamespace({ 0: "a", default: defaultArray })
+
   assert.deepStrictEqual(defaultArray, ["a"])
   assert.deepStrictEqual(nsArray, ns)
 
@@ -58,9 +59,8 @@ export default () => {
   assert.deepStrictEqual(nsEmpty, ns)
 
   ns = createNamespace({})
-  assert.deepStrictEqual(nsEmptyPseudo, ns)
+  assert.deepStrictEqual(nsPseudoEmpty, ns)
 
   assert.ok(isPlainObject(defaultEmpty))
-
-  assert.strictEqual(nsSafe.safe, "safe get")
+  assert.strictEqual(nsGetSet.safe, "safe get")
 }

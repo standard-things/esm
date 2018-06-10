@@ -807,9 +807,35 @@ describe("Node rules", () => {
       .then(() => assert.strictEqual(Reflect.has(require.cache, filename), true))
   })
 
-  it('should add "__esModule" to `module.exports` of ES modules with `options.cjs.interop`', () =>
-    import("./cjs/export/pseudo.js")
-      .then((ns) => ns.default())
+  it("should add `module.exports.__esModule` to ES modules with `options.cjs.interop`", () => {
+    const exported = require("./fixture/cjs/export/nothing.js")
+    const descriptor = Reflect.getOwnPropertyDescriptor(exported, "__esModule")
+
+    assert.deepStrictEqual(descriptor, {
+      configurable: false,
+      enumerable: false,
+      value: true,
+      writable: false
+    })
+  })
+
+  it("should treat pseudo modules as CJS in `.mjs` files", () =>
+    Promise
+      .all([
+        import("./fixture/export/star-pseudo.mjs")
+          .then((ns) => {
+            assert.deepStrictEqual(ns, createNamespace({}))
+          }),
+        import("./fixture/export/default/pseudo.mjs")
+          .then((ns) => {
+            assert.deepStrictEqual(ns, createNamespace({
+              default: {
+                a: "a",
+                default: "default"
+              }
+            }))
+          })
+      ])
   )
 })
 
