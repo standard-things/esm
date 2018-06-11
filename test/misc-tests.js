@@ -994,13 +994,13 @@ describe("spec compliance", () => {
     })
   })
 
-  it("should not have CJS free variables", () =>
+  it("should not have CJS free variables in `.mjs` files", () =>
     import("./misc/free-vars.mjs")
       .then((ns) => ns.default())
   )
 
-  it("should not export CJS named binding", () =>
-    import("./fixture/export/cjs-named.mjs")
+  it("should not import CJS named binding in `.mjs` files", () =>
+    import("./fixture/import/cjs-named.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)
