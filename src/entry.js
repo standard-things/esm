@@ -218,8 +218,18 @@ class Entry {
   }
 
   addGettersFrom(otherEntry) {
+    const otherType = otherEntry.type
+
+    if ((this.type === TYPE_ESM &&
+         otherType !== TYPE_ESM &&
+         isMJS(this.module)) ||
+        (otherType === TYPE_CJS &&
+         ! otherEntry.package.options.cjs.namedExports)) {
+      return this
+    }
+
     const { getters } = this
-    const { getters:otherGetters } = otherEntry
+    const otherGetters = otherEntry.getters
 
     assignExportsToNamespace(this)
     assignExportsToNamespace(otherEntry)
