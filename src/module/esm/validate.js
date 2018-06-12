@@ -17,24 +17,19 @@ const {
 function validate(entry) {
   const { compileData, name } = entry
   const { dependencySpecifiers, exportedSpecifiers } = compileData
-  const children = { __proto__: null }
   const mod = entry.module
 
   // Parse children.
   for (const specifier in dependencySpecifiers) {
     const childEntry = _loadESM(specifier, mod)
 
+    dependencySpecifiers[specifier].entry =
     entry.children[childEntry.name] = childEntry
 
-    if (childEntry.builtin) {
-      continue
-    }
-
-    if (childEntry.state < STATE_PARSING_COMPLETED) {
+    if (! childEntry.builtin &&
+        childEntry.state < STATE_PARSING_COMPLETED) {
       childEntry.state = STATE_PARSING_COMPLETED
     }
-
-    children[specifier] = childEntry
   }
 
   const namedExports =
@@ -42,8 +37,13 @@ function validate(entry) {
     ! isMJS(mod)
 
   // Validate requested child export names.
-  for (const specifier in children) {
-    const childEntry = children[specifier]
+  for (const specifier in dependencySpecifiers) {
+    const childEntry = dependencySpecifiers[specifier].entry
+
+    if (childEntry.builtin) {
+      continue
+    }
+
     const child = childEntry.module
     const requestedExportNames = dependencySpecifiers[specifier].exportedNames
 
@@ -82,7 +82,7 @@ function validate(entry) {
 
       if (throwExportMissing) {
         for (const childSpecifier of childExportedStars) {
-          if (! Reflect.has(children, childSpecifier)) {
+          if (! Reflect.has(dependencySpecifiers, childSpecifier)) {
             throwExportMissing = false
             break
           }
@@ -97,9 +97,10 @@ function validate(entry) {
 
   // Resolve export names from star exports.
   for (const specifier of entry.compileData.exportedStars) {
-    const childEntry = children[specifier]
+    const childEntry = dependencySpecifiers[specifier].entry
 
     if (! childEntry ||
+        childEntry.builtin ||
         childEntry.type !== TYPE_ESM) {
       continue
     }
