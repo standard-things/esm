@@ -3,6 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import _loadESM from "./_load.js"
 import errors from "../../errors.js"
 import isMJS from "../../util/is-mjs.js"
+import isObject from "../../util/is-object.js"
 
 const {
   STATE_PARSING_COMPLETED,
@@ -10,6 +11,7 @@ const {
 } = ENTRY
 
 const {
+  ERR_EXPORT_CYCLE,
   ERR_EXPORT_MISSING,
   ERR_EXPORT_STAR_CONFLICT
 } = errors
@@ -66,33 +68,60 @@ function validate(entry) {
       entry.cyclical = Reflect.has(childEntry.children, name)
     }
 
-    const childCompileData = childEntry.compileData
-    const childExportedStars = childCompileData.exportedStars
+    const {
+      dependencySpecifiers:childDependencySpecifiers,
+      exportedSpecifiers:childExportedSpecifiers,
+      exportedStars:childExportedStars
+     } = childEntry.compileData
 
-    for (const requestedName of childExportedNames) {
-      const { exportedSpecifiers:childExportedSpecifiers } = childCompileData
+    for (const exportedName of childExportedNames) {
+      if (Reflect.has(childExportedSpecifiers, exportedName)) {
+        const childExportedSpecifier = childExportedSpecifiers[exportedName]
 
-      if (Reflect.has(childExportedSpecifiers, requestedName)) {
-        if (childExportedSpecifiers[requestedName]) {
+        if (childExportedSpecifier) {
+          const { local, specifier } = childExportedSpecifier
+          const childDependencySpecifier = childDependencySpecifiers[specifier]
+
+          const otherEntry = isObject(childDependencySpecifier)
+            ? childDependencySpecifier.entry
+            : null
+
+          if (! otherEntry ||
+              ! otherEntry.compileData ||
+              ! otherEntry.compileData.exportedSpecifiers ||
+              ! Reflect.has(otherEntry.compileData.exportedSpecifiers, local)) {
+            continue
+          }
+
+          const {
+            dependencySpecifiers:otherDependencySpecifiers,
+            exportedSpecifiers:otherExportedSpecifiers
+          } = otherEntry.compileData
+
+          const otherDependency = otherDependencySpecifiers[otherExportedSpecifiers[local].specifier]
+
+          if (otherDependency &&
+              otherDependency.entry === childEntry) {
+            throw new ERR_EXPORT_CYCLE(child, exportedName)
+          }
+
           continue
         }
 
-        throw new ERR_EXPORT_STAR_CONFLICT(mod, requestedName)
+        throw new ERR_EXPORT_STAR_CONFLICT(mod, exportedName)
       }
 
       let throwExportMissing = true
 
-      if (throwExportMissing) {
-        for (const childSpecifier of childExportedStars) {
-          if (! Reflect.has(dependencySpecifiers, childSpecifier)) {
-            throwExportMissing = false
-            break
-          }
+      for (const specifier of childExportedStars) {
+        if (! Reflect.has(dependencySpecifiers, specifier)) {
+          throwExportMissing = false
+          break
         }
       }
 
       if (throwExportMissing) {
-        throw new ERR_EXPORT_MISSING(child, requestedName)
+        throw new ERR_EXPORT_MISSING(child, exportedName)
       }
     }
   }
