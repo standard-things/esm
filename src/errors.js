@@ -26,6 +26,7 @@ function init() {
     depth: 2
   }
 
+  addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
   addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
@@ -142,13 +143,18 @@ function init() {
       : inspected
   }
 
-  function exportMissing(request, exportName) {
-    return "Missing export '" + exportName +
+  function exportCycle(request, exportedName) {
+    return "Detected cycle while resolving name '" + exportedName +
+      "' in " + toStringLiteral(getModuleURL(request), "'")
+  }
+
+  function exportMissing(request, exportedName) {
+    return "Missing export '" + exportedName +
       "' in ES module: " + getModuleURL(request)
   }
 
-  function exportStarConflict(request, exportName) {
-    return "Conflicting star export '" + exportName +
+  function exportStarConflict(request, exportedName) {
+    return "Conflicting star export '" + exportedName +
       "' in ES module: " + getModuleURL(request)
   }
 
