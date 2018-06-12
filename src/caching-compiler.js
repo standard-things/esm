@@ -63,20 +63,12 @@ function init() {
         return null
       }
 
-      const dependencySpecifiers = meta[5]
-        ? assign({ __proto__: null }, meta[5])
-        : null
-
-      const exportedFrom = meta[6]
-        ? assign({ __proto__: null }, meta[6])
-        : null
-
       const result = {
         changed: !! meta[3],
         code: null,
-        dependencySpecifiers,
+        dependencySpecifiers: meta[5] || null,
         enforceTDZ: noop,
-        exportedFrom,
+        exportedFrom: meta[6] || null,
         exportedNames: meta[7] || null,
         exportedSpecifiers: null,
         exportedStars: meta[8] || null,
@@ -89,7 +81,8 @@ function init() {
       if (result.sourceType === MODULE) {
         entry.type = TYPE_ESM
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
-        result.exportedSpecifiers = inflateExportSpecifiers(result)
+        result.exportedFrom = inflateExportedFrom(result)
+        result.exportedSpecifiers = inflateExportedSpecifiers(result)
       } else {
         entry.type = TYPE_CJS
       }
@@ -122,8 +115,9 @@ function init() {
 
     if (result.sourceType === MODULE) {
       entry.type = TYPE_ESM
-      result.dependencySpecifier = inflateDependencySpecifiers(result)
-      result.exportedSpecifiers = inflateExportSpecifiers(result)
+      result.dependencySpecifiers = inflateDependencySpecifiers(result)
+      result.exportedFrom = inflateExportedFrom(result)
+      result.exportedSpecifiers = inflateExportedSpecifiers(result)
     } else {
       entry.type = TYPE_CJS
     }
@@ -152,38 +146,54 @@ function init() {
     return result
   }
 
-  function inflateDependencySpecifiers(compileData) {
+  function deflateDependencySpecifiers(compileData) {
     const { dependencySpecifiers } = compileData
+    const result = { __proto__: null }
 
     for (const specifier in dependencySpecifiers) {
-      dependencySpecifiers[specifier] = {
+      result[specifier] = dependencySpecifiers[specifier].exportedNames
+    }
+
+    return result
+  }
+
+  function inflateDependencySpecifiers(compileData) {
+    const { dependencySpecifiers } = compileData
+    const result = { __proto__: null }
+
+    for (const specifier in dependencySpecifiers) {
+      result[specifier] = {
         entry: null,
         exportedNames: dependencySpecifiers[specifier]
       }
     }
 
-    return dependencySpecifiers
+    return result
   }
 
-  function inflateExportSpecifiers(compileData) {
-    const exportedSpecifiers = { __proto__: null }
+  function inflateExportedFrom(compileData) {
+    return assign({ __proto__: null }, compileData.exportedFrom)
+  }
+
+  function inflateExportedSpecifiers(compileData) {
+    const result = { __proto__: null }
 
     for (const exportedName of compileData.exportedNames) {
-      exportedSpecifiers[exportedName] = true
+      result[exportedName] = true
     }
 
     const { exportedFrom } = compileData
 
-    for (const dependencySpecifier in exportedFrom) {
-      for (const names of exportedFrom[dependencySpecifier]) {
-        exportedSpecifiers[names[0]] = {
+    for (const specifier in exportedFrom) {
+      for (const names of exportedFrom[specifier]) {
+        result[names[0]] = {
           local: names[names.length - 1],
-          specifier: dependencySpecifier
+          specifier
         }
       }
     }
 
-    return exportedSpecifiers
+    return result
   }
 
   function removeCacheFile(cachePath, cacheName) {
@@ -348,7 +358,7 @@ function init() {
               sourceType,
               changed,
               topLevelReturn,
-              compileData.dependencySpecifiers || 0,
+              deflateDependencySpecifiers(compileData) || 0,
               compileData.exportedFrom || 0,
               compileData.exportedNames || 0,
               compileData.exportedStars || 0
