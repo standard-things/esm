@@ -1,7 +1,6 @@
 import CHAR from "../constant/char.js"
 
 import Module from "../module.js"
-import Package from "../package.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getModuleURL from "../util/get-module-url.js"
@@ -22,10 +21,6 @@ const blankRegExp = /^\s*$/
 const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
-  if (Package.state.default.options.debug) {
-    return error
-  }
-
   decorateStackTrace(error)
 
   let { stack } = error

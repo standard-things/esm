@@ -162,7 +162,8 @@ function tryCompileCached(caller, entry, content, filename) {
     return result
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }
@@ -296,7 +297,8 @@ function tryCompileCode(caller, entry, content, filename, options) {
     error = e
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }
@@ -317,7 +319,8 @@ function tryValidateESM(caller, entry, content, filename) {
     error = e
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }

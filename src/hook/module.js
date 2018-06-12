@@ -233,7 +233,8 @@ function tryPassthru(func, args, pkg) {
     error = e
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }

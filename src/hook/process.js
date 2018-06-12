@@ -1,5 +1,6 @@
 import ESM from "../constant/esm.js"
 
+import Package from "../package.js"
 import Wrapper from "../wrapper.js"
 
 import isError from "../util/is-error.js"
@@ -23,7 +24,8 @@ function hook(process) {
   function exceptionMethodWrapper(manager, func, args) {
     const [error] = args
 
-    if (isError(error) &&
+    if (! Package.state.default.options.debug &&
+        isError(error) &&
         ! isStackTraceMasked(error)) {
       maskStackTrace(error)
     }

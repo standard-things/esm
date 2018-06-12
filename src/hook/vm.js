@@ -319,7 +319,8 @@ function tryValidateESM(caller, entry, content) {
     return
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }
@@ -337,7 +338,8 @@ function tryWrapper(func, args, content) {
     error = e
   }
 
-  if (! isError(error) ||
+  if (Package.state.default.options.debug ||
+      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }
