@@ -41,9 +41,9 @@ function init() {
       this.assignableExports = { __proto__: null }
       this.changed = false
       this.dependencySpecifiers = { __proto__: null }
-      this.exportFrom = { __proto__: null }
-      this.exportNames = []
-      this.exportStars = []
+      this.exportedFrom = { __proto__: null }
+      this.exportedNames = []
+      this.exportedStars = []
       this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
       this.generateVarDeclarations = options.generateVarDeclarations
       this.importLocals = { __proto__: null }
@@ -150,7 +150,7 @@ function init() {
         node.end
       )
 
-      this.exportStars.push(specifierName)
+      this.exportedStars.push(specifierName)
 
       addToDependencySpecifiers(this, specifierName)
       hoistImports(this, node, hoistedCode)
@@ -164,7 +164,7 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
-      this.exportNames.push("default")
+      this.exportedNames.push("default")
 
       const node = path.getValue()
       const { declaration } = node
@@ -284,7 +284,7 @@ function init() {
       } else {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
-        const { exportFrom, exportNames, runtimeName } = this
+        const { exportedFrom, exportedNames, runtimeName } = this
 
         const specifierMap = { __proto__: null }
         const specifierName = node.source.value
@@ -292,15 +292,20 @@ function init() {
         addToDependencySpecifiers(this, specifierName)
 
         const fromNames =
-          exportFrom[specifierName] ||
-          (exportFrom[specifierName] = [])
+          exportedFrom[specifierName] ||
+          (exportedFrom[specifierName] = [])
 
         for (const specifier of specifiers) {
-          const exportName = specifier.exported.name
+          const exportedName = specifier.exported.name
           const localName = specifier.local.name
 
-          exportNames.push(exportName)
-          fromNames.push(exportName)
+          exportedNames.push(exportedName)
+
+          if (exportedName === localName) {
+            fromNames.push([exportedName])
+          } else {
+            fromNames.push([exportedName, localName])
+          }
 
           addToDependencySpecifiers(this, specifierName, localName)
 
@@ -308,7 +313,7 @@ function init() {
             this,
             specifierMap,
             localName,
-            runtimeName + ".entry.exports." + exportName
+            runtimeName + ".entry.exports." + exportedName
           )
         }
 
@@ -370,17 +375,17 @@ function init() {
     }
   }
 
-  function addToDependencySpecifiers(visitor, specifierName, exportName) {
+  function addToDependencySpecifiers(visitor, specifierName, exportedName) {
     const { dependencySpecifiers } = visitor
 
-    const exportNames =
+    const exportedNames =
       dependencySpecifiers[specifierName] ||
       (dependencySpecifiers[specifierName] = [])
 
-    if (exportName &&
-        exportName !== "*" &&
-        exportNames.indexOf(exportName) === -1) {
-      exportNames.push(exportName)
+    if (exportedName &&
+        exportedName !== "*" &&
+        exportedNames.indexOf(exportedName) === -1) {
+      exportedNames.push(exportedName)
     }
   }
 
@@ -462,15 +467,15 @@ function init() {
     code += visitor.runtimeName + ".e(["
 
     const lastIndex = pairs.length - 1
-    const { exportNames } = visitor
+    const { exportedNames } = visitor
 
     let i = -1
 
-    for (const [exportName, localName] of pairs) {
-      exportNames.push(exportName)
+    for (const [exportedName, localName] of pairs) {
+      exportedNames.push(exportedName)
 
       code +=
-        '["' + exportName + '",()=>' +
+        '["' + exportedName + '",()=>' +
         localName +
         "]"
 

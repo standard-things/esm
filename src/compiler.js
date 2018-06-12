@@ -65,10 +65,10 @@ function init() {
         code,
         dependencySpecifiers: null,
         enforceTDZ: noop,
-        exportFrom: null,
-        exportNames: null,
-        exportSpecifiers: null,
-        exportStars: null,
+        exportedFrom: null,
+        exportedNames: null,
+        exportedSpecifiers: null,
+        exportedStars: null,
         scriptData: null,
         sourceType: SCRIPT,
         topLevelReturn: false,
@@ -231,9 +231,9 @@ function init() {
         sourceType = SCRIPT
       } else if (sourceType === MODULE) {
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
-        result.exportFrom = importExportVisitor.exportFrom
-        result.exportNames = importExportVisitor.exportNames
-        result.exportStars = importExportVisitor.exportStars
+        result.exportedFrom = importExportVisitor.exportedFrom
+        result.exportedNames = importExportVisitor.exportedNames
+        result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = MODULE
 
         if (addedImportExport) {

@@ -67,7 +67,7 @@ function init() {
         ? assign({ __proto__: null }, meta[5])
         : null
 
-      const exportFrom = meta[6]
+      const exportedFrom = meta[6]
         ? assign({ __proto__: null }, meta[6])
         : null
 
@@ -76,10 +76,10 @@ function init() {
         code: null,
         dependencySpecifiers,
         enforceTDZ: noop,
-        exportFrom,
-        exportNames: meta[7] || null,
-        exportSpecifiers: null,
-        exportStars: meta[8] || null,
+        exportedFrom,
+        exportedNames: meta[7] || null,
+        exportedSpecifiers: null,
+        exportedStars: meta[8] || null,
         scriptData: null,
         sourceType: +meta[2] || SCRIPT,
         topLevelReturn: !! meta[4],
@@ -88,7 +88,8 @@ function init() {
 
       if (result.sourceType === MODULE) {
         entry.type = TYPE_ESM
-        result.exportSpecifiers = createExportSpecifiers(result)
+        result.dependencySpecifiers = inflateDependencySpecifiers(result)
+        result.exportedSpecifiers = inflateExportSpecifiers(result)
       } else {
         entry.type = TYPE_CJS
       }
@@ -121,7 +122,8 @@ function init() {
 
     if (result.sourceType === MODULE) {
       entry.type = TYPE_ESM
-      result.exportSpecifiers = createExportSpecifiers(result)
+      result.dependencySpecifier = inflateDependencySpecifiers(result)
+      result.exportedSpecifiers = inflateExportSpecifiers(result)
     } else {
       entry.type = TYPE_CJS
     }
@@ -150,22 +152,38 @@ function init() {
     return result
   }
 
-  function createExportSpecifiers(compileData) {
-    const exportSpecifiers = { __proto__: null }
+  function inflateDependencySpecifiers(compileData) {
+    const { dependencySpecifiers } = compileData
 
-    for (const exportName of compileData.exportNames) {
-      exportSpecifiers[exportName] = 1
-    }
-
-    const { exportFrom } = compileData
-
-    for (const dependencySpecifier in exportFrom) {
-      for (const exportName of exportFrom[dependencySpecifier]) {
-        exportSpecifiers[exportName] = 2
+    for (const specifier in dependencySpecifiers) {
+      dependencySpecifiers[specifier] = {
+        entry: null,
+        exportedNames: dependencySpecifiers[specifier]
       }
     }
 
-    return exportSpecifiers
+    return dependencySpecifiers
+  }
+
+  function inflateExportSpecifiers(compileData) {
+    const exportedSpecifiers = { __proto__: null }
+
+    for (const exportedName of compileData.exportedNames) {
+      exportedSpecifiers[exportedName] = true
+    }
+
+    const { exportedFrom } = compileData
+
+    for (const dependencySpecifier in exportedFrom) {
+      for (const names of exportedFrom[dependencySpecifier]) {
+        exportedSpecifiers[names[0]] = {
+          local: names[names.length - 1],
+          specifier: dependencySpecifier
+        }
+      }
+    }
+
+    return exportedSpecifiers
   }
 
   function removeCacheFile(cachePath, cacheName) {
@@ -331,9 +349,9 @@ function init() {
               changed,
               topLevelReturn,
               compileData.dependencySpecifiers || 0,
-              compileData.exportFrom || 0,
-              compileData.exportNames || 0,
-              compileData.exportStars || 0
+              compileData.exportedFrom || 0,
+              compileData.exportedNames || 0,
+              compileData.exportedStars || 0
             )
 
             if (warnings) {

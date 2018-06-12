@@ -346,10 +346,10 @@ function useAsyncWrapper(entry) {
       return false
     }
 
-    const { exportSpecifiers } = entry.compileData
+    const { exportedSpecifiers } = entry.compileData
 
-    if (! exportSpecifiers ||
-        isObjectEmpty(exportSpecifiers)) {
+    if (! exportedSpecifiers ||
+        isObjectEmpty(exportedSpecifiers)) {
       return true
     }
   }

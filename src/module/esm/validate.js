@@ -16,7 +16,7 @@ const {
 
 function validate(entry) {
   const { compileData, name } = entry
-  const { dependencySpecifiers, exportSpecifiers } = compileData
+  const { dependencySpecifiers, exportedSpecifiers } = compileData
   const children = { __proto__: null }
   const mod = entry.module
 
@@ -45,7 +45,7 @@ function validate(entry) {
   for (const specifier in children) {
     const childEntry = children[specifier]
     const child = childEntry.module
-    const requestedExportNames = dependencySpecifiers[specifier]
+    const requestedExportNames = dependencySpecifiers[specifier].exportedNames
 
     if (childEntry.type !== TYPE_ESM) {
       if (! namedExports &&
@@ -65,13 +65,13 @@ function validate(entry) {
     }
 
     const childCompileData = childEntry.compileData
-    const childExportStars = childCompileData.exportStars
+    const childExportedStars = childCompileData.exportedStars
 
     for (const requestedName of requestedExportNames) {
-      const { exportSpecifiers:childExportSpecifiers } = childCompileData
+      const { exportedSpecifiers:childExportedSpecifiers } = childCompileData
 
-      if (Reflect.has(childExportSpecifiers, requestedName)) {
-        if (childExportSpecifiers[requestedName] < 3) {
+      if (Reflect.has(childExportedSpecifiers, requestedName)) {
+        if (childExportedSpecifiers[requestedName]) {
           continue
         }
 
@@ -81,7 +81,7 @@ function validate(entry) {
       let throwExportMissing = true
 
       if (throwExportMissing) {
-        for (const childSpecifier of childExportStars) {
+        for (const childSpecifier of childExportedStars) {
           if (! Reflect.has(children, childSpecifier)) {
             throwExportMissing = false
             break
@@ -96,7 +96,7 @@ function validate(entry) {
   }
 
   // Resolve export names from star exports.
-  for (const specifier of entry.compileData.exportStars) {
+  for (const specifier of entry.compileData.exportedStars) {
     const childEntry = children[specifier]
 
     if (! childEntry ||
@@ -104,19 +104,22 @@ function validate(entry) {
       continue
     }
 
-    for (const exportName in childEntry.compileData.exportSpecifiers) {
-      if (exportName === "default") {
+    for (const exportedName in childEntry.compileData.exportedSpecifiers) {
+      if (exportedName === "default") {
         continue
       }
 
-      if (Reflect.has(exportSpecifiers, exportName)) {
-        if (exportSpecifiers[exportName] === 2) {
+      if (Reflect.has(exportedSpecifiers, exportedName)) {
+        if (exportedSpecifiers[exportedName] !== true) {
           // Export specifier is conflicted.
-          exportSpecifiers[exportName] = 3
+          exportedSpecifiers[exportedName] = false
         }
       } else {
         // Export specifier is imported.
-        exportSpecifiers[exportName] = 2
+        exportedSpecifiers[exportedName] = {
+          local: exportedName,
+          specifier
+        }
       }
     }
   }
@@ -127,8 +130,8 @@ function validate(entry) {
 
   const { _namespace } = entry
 
-  for (const exportName in exportSpecifiers) {
-    _namespace[exportName] = void 0
+  for (const exportedName in exportedSpecifiers) {
+    _namespace[exportedName] = void 0
   }
 
   entry.initNamespace()
