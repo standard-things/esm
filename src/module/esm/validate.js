@@ -38,23 +38,25 @@ function validate(entry) {
 
   // Validate requested child export names.
   for (const specifier in dependencySpecifiers) {
-    const childEntry = dependencySpecifiers[specifier].entry
+    const {
+      entry:childEntry,
+      exportedNames:childExportedNames
+    } = dependencySpecifiers[specifier]
 
     if (childEntry.builtin) {
       continue
     }
 
     const child = childEntry.module
-    const requestedExportNames = dependencySpecifiers[specifier].exportedNames
 
     if (childEntry.type !== TYPE_ESM) {
-      if (! namedExports &&
-          requestedExportNames.length &&
-          (requestedExportNames.length > 1 ||
-           requestedExportNames[0] !== "default")) {
-        throw new ERR_EXPORT_MISSING(child, requestedExportNames.find((requestedName) =>
-          requestedName !== "default"
-        ))
+      if (! namedExports) {
+        const exportedName = childExportedNames
+          .find((name) => name !== "default")
+
+        if (exportedName) {
+          throw new ERR_EXPORT_MISSING(child, exportedName)
+        }
       }
 
       continue
@@ -67,7 +69,7 @@ function validate(entry) {
     const childCompileData = childEntry.compileData
     const childExportedStars = childCompileData.exportedStars
 
-    for (const requestedName of requestedExportNames) {
+    for (const requestedName of childExportedNames) {
       const { exportedSpecifiers:childExportedSpecifiers } = childCompileData
 
       if (Reflect.has(childExportedSpecifiers, requestedName)) {
