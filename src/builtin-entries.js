@@ -4,6 +4,7 @@ import OwnProxy from "./own/proxy.js"
 import builtinIds from "./builtin-ids.js"
 import builtinModules from "./builtin-modules.js"
 import isObjectLike from "./util/is-object-like.js"
+import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import maskFunction from "./util/mask-function.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
@@ -56,12 +57,10 @@ function createEntry(id) {
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (descriptor) {
-          const { value } = descriptor
-
-          if (value === proto) {
-            descriptor.value = proxyProto
-          }
+        if (descriptor &&
+            descriptor.value === proto &&
+            isUpdatableDescriptor(descriptor)) {
+          descriptor.value = proxyProto
         }
 
         return descriptor

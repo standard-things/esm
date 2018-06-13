@@ -18,6 +18,7 @@ import isSetIterator from "./is-set-iterator.js"
 import isStringObject from "./is-string-object.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
+import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import keys from "./keys.js"
 import shared from "../shared.js"
 
@@ -228,7 +229,7 @@ function init() {
       handler.getOwnPropertyDescriptor = (target, name) => {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (descriptor) {
+        if (isUpdatableDescriptor(descriptor)) {
           const { value } = descriptor
 
           if (typeof value === "function") {

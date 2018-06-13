@@ -10,6 +10,7 @@ import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
+import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
@@ -173,18 +174,14 @@ function init() {
       getOwnPropertyDescriptor: (target, name) => {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (! descriptor ||
-            ! Reflect.has(descriptor, "value")) {
-          return descriptor
+        if (isUpdatableDescriptor(descriptor)) {
+          const { value } = descriptor
+
+          if (isObjectLike(value)) {
+            descriptor.value = wrap(value, options, customInspect, showProxy)
+          }
         }
 
-        const { value } = descriptor
-
-        if (! isObjectLike(value)) {
-          return descriptor
-        }
-
-        descriptor.value = wrap(value, options, customInspect, showProxy)
         return descriptor
       }
     })
