@@ -339,25 +339,11 @@ function tryValidateESM(caller, entry, content, filename) {
 }
 
 function useAsyncWrapper(entry) {
-  if (entry.package.options.await &&
-      shared.support.await) {
-    if (entry.type !== TYPE_ESM) {
-      return true
-    }
-
-    if (isMJS(entry.module)) {
-      return false
-    }
-
-    const { exportedSpecifiers } = entry.compileData
-
-    if (! exportedSpecifiers ||
-        isObjectEmpty(exportedSpecifiers)) {
-      return true
-    }
-  }
-
-  return false
+  return entry.package.options.await &&
+    shared.support.await &&
+    (entry.type !== TYPE_ESM ||
+     (isObjectEmpty(entry.compileData.exportedSpecifiers) &&
+      ! isMJS(entry.module)))
 }
 
 export default compile
