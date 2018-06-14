@@ -81,8 +81,10 @@ function resolveExportedStars(entry) {
       }
 
       if (Reflect.has(exportedSpecifiers, exportedName)) {
-        if (typeof exportedSpecifiers[exportedName] !== "boolean" &&
-            exportedSpecifiers[exportedName].specifier !== specifier) {
+        const exportedSpecifier = exportedSpecifiers[exportedName]
+
+        if (typeof exportedSpecifier !== "boolean" &&
+            exportedSpecifier.specifier !== specifier) {
           // Export specifier is conflicted.
           exportedSpecifiers[exportedName] = false
         }
@@ -136,16 +138,23 @@ function validateExportedName(entry, exportedName, seen) {
     return
   }
 
+  const { compileData, name } = entry
   const mod = entry.module
-  const { name } = entry
+
+  const {
+    dependencySpecifiers,
+    exportedSpecifiers,
+    exportedStars
+  } = compileData
 
   if (seen &&
       Reflect.has(seen, name)) {
-    throw new ERR_EXPORT_CYCLE(mod, exportedName)
+    if (exportedStars.includes(exportedSpecifiers[exportedName].specifier)) {
+      throw new ERR_EXPORT_MISSING(mod, exportedName)
+    } else {
+      throw new ERR_EXPORT_CYCLE(mod, exportedName)
+    }
   }
-
-  const { compileData } = entry
-  const { dependencySpecifiers, exportedSpecifiers } = compileData
 
   if (Reflect.has(exportedSpecifiers, exportedName)) {
     const exportedSpecifier = exportedSpecifiers[exportedName]
@@ -167,7 +176,7 @@ function validateExportedName(entry, exportedName, seen) {
   } else {
     let throwExportMissing = true
 
-    for (const specifier of compileData.exportedStars) {
+    for (const specifier of exportedStars) {
       const childEntry = dependencySpecifiers[specifier].entry
 
       if (! childEntry ||
