@@ -72,8 +72,6 @@ class Entry {
     this.children = { __proto__: null }
     // The source compilation data of the module.
     this.compileData = null
-    // The cyclical module indicator.
-    this.cyclical = false
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
     // The mutable namespace object CJS importers receive.

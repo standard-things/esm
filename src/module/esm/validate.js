@@ -3,7 +3,6 @@ import ENTRY from "../../constant/entry.js"
 import _loadESM from "./_load.js"
 import errors from "../../errors.js"
 import isMJS from "../../util/is-mjs.js"
-import isObject from "../../util/is-object.js"
 
 const {
   STATE_PARSING_COMPLETED,
@@ -16,12 +15,40 @@ const {
   ERR_EXPORT_STAR_CONFLICT
 } = errors
 
-function validate(entry) {
-  const { compileData, name } = entry
-  const { dependencySpecifiers, exportedSpecifiers } = compileData
+function isDescendant(sourceEntry, searchEntry, seen) {
+  if (sourceEntry.builtin ||
+      sourceEntry.type !== TYPE_ESM) {
+    return false
+  }
+
+  const sourceName = sourceEntry.name
+
+  if (seen &&
+      Reflect.has(seen, sourceName)) {
+    return false
+  } else {
+    seen || (seen = { __proto__: null })
+  }
+
+  seen[sourceName] = true
+
+  const { children } = sourceEntry
+  const searchName = searchEntry.name
+
+  for (const name in children) {
+    if (name === searchName ||
+        isDescendant(children[name], searchEntry, seen)) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function parseDependencies(entry) {
+  const { dependencySpecifiers } = entry.compileData
   const mod = entry.module
 
-  // Parse children.
   for (const specifier in dependencySpecifiers) {
     const childEntry = _loadESM(specifier, mod)
 
@@ -33,101 +60,13 @@ function validate(entry) {
       childEntry.state = STATE_PARSING_COMPLETED
     }
   }
+}
 
-  const namedExports =
-    entry.package.options.cjs.namedExports &&
-    ! isMJS(mod)
+function resolveExportedStars(entry) {
+  const { compileData } = entry
+  const { dependencySpecifiers, exportedSpecifiers } = compileData
 
-  // Validate requested child export names.
-  for (const specifier in dependencySpecifiers) {
-    const {
-      entry:childEntry,
-      exportedNames:childExportedNames
-    } = dependencySpecifiers[specifier]
-
-    if (childEntry.builtin) {
-      continue
-    }
-
-    const child = childEntry.module
-
-    if (childEntry.type !== TYPE_ESM) {
-      if (! namedExports) {
-        const exportedName = childExportedNames
-          .find((name) => name !== "default")
-
-        if (exportedName) {
-          throw new ERR_EXPORT_MISSING(child, exportedName)
-        }
-      }
-
-      continue
-    }
-
-    if (! entry.cyclical) {
-      entry.cyclical = Reflect.has(childEntry.children, name)
-    }
-
-    const {
-      dependencySpecifiers:childDependencySpecifiers,
-      exportedSpecifiers:childExportedSpecifiers,
-      exportedStars:childExportedStars
-     } = childEntry.compileData
-
-    for (const exportedName of childExportedNames) {
-      if (Reflect.has(childExportedSpecifiers, exportedName)) {
-        const childExportedSpecifier = childExportedSpecifiers[exportedName]
-
-        if (childExportedSpecifier) {
-          const { local, specifier } = childExportedSpecifier
-          const childDependencySpecifier = childDependencySpecifiers[specifier]
-
-          const otherEntry = isObject(childDependencySpecifier)
-            ? childDependencySpecifier.entry
-            : null
-
-          if (! otherEntry ||
-              ! otherEntry.compileData ||
-              ! otherEntry.compileData.exportedSpecifiers ||
-              ! Reflect.has(otherEntry.compileData.exportedSpecifiers, local)) {
-            continue
-          }
-
-          const {
-            dependencySpecifiers:otherDependencySpecifiers,
-            exportedSpecifiers:otherExportedSpecifiers
-          } = otherEntry.compileData
-
-          const otherDependency = otherDependencySpecifiers[otherExportedSpecifiers[local].specifier]
-
-          if (otherDependency &&
-              otherDependency.entry === childEntry) {
-            throw new ERR_EXPORT_CYCLE(child, exportedName)
-          }
-
-          continue
-        }
-
-        throw new ERR_EXPORT_STAR_CONFLICT(mod, exportedName)
-      }
-
-      let throwExportMissing = true
-
-      for (const specifier of childExportedStars) {
-        if (! Reflect.has(dependencySpecifiers, specifier)) {
-          throwExportMissing = false
-          break
-        }
-      }
-
-      if (throwExportMissing) {
-        throw new ERR_EXPORT_MISSING(child, exportedName)
-      }
-    }
-  }
-
-  // Resolve export names from star exports.
-  for (const specifier of entry.compileData.exportedStars) {
+  for (const specifier of compileData.exportedStars) {
     const childEntry = dependencySpecifiers[specifier].entry
 
     if (! childEntry ||
@@ -142,7 +81,8 @@ function validate(entry) {
       }
 
       if (Reflect.has(exportedSpecifiers, exportedName)) {
-        if (exportedSpecifiers[exportedName] !== true) {
+        if (typeof exportedSpecifiers[exportedName] !== "boolean" &&
+            exportedSpecifiers[exportedName].specifier !== specifier) {
           // Export specifier is conflicted.
           exportedSpecifiers[exportedName] = false
         }
@@ -155,14 +95,106 @@ function validate(entry) {
       }
     }
   }
+}
 
-  if (entry.cyclical) {
+function validateDependencies(entry) {
+  const { dependencySpecifiers } = entry.compileData
+
+  const namedExports =
+    entry.package.options.cjs.namedExports &&
+    ! isMJS(entry.module)
+
+  for (const specifier in dependencySpecifiers) {
+    const {
+      entry:childEntry,
+      exportedNames:childExportedNames
+    } = dependencySpecifiers[specifier]
+
+    if (! childEntry ||
+        childEntry.builtin) {
+      continue
+    }
+
+    if (childEntry.type === TYPE_ESM) {
+      for (const exportedName of childExportedNames) {
+        validateExportedName(childEntry, exportedName)
+      }
+    } else if (! namedExports) {
+      const exportedName = childExportedNames
+        .find((name) => name !== "default")
+
+      if (exportedName) {
+        throw new ERR_EXPORT_MISSING(childEntry.module, exportedName)
+      }
+    }
+  }
+}
+
+function validateExportedName(entry, exportedName, seen) {
+  if (entry.builtin ||
+      entry.type !== TYPE_ESM) {
+    return
+  }
+
+  const mod = entry.module
+  const { name } = entry
+
+  if (seen &&
+      Reflect.has(seen, name)) {
+    throw new ERR_EXPORT_CYCLE(mod, exportedName)
+  }
+
+  const { compileData } = entry
+  const { dependencySpecifiers, exportedSpecifiers } = compileData
+
+  if (Reflect.has(exportedSpecifiers, exportedName)) {
+    const exportedSpecifier = exportedSpecifiers[exportedName]
+
+    if (exportedSpecifier) {
+      if (exportedSpecifier !== true) {
+        const { local, specifier } = exportedSpecifier
+        const childEntry = dependencySpecifiers[specifier].entry
+
+        if (childEntry) {
+          seen || (seen = { __proto__: null })
+          seen[name] = true
+          validateExportedName(childEntry, local, seen)
+        }
+      }
+    } else {
+      throw new ERR_EXPORT_STAR_CONFLICT(mod, exportedName)
+    }
+  } else {
+    let throwExportMissing = true
+
+    for (const specifier of compileData.exportedStars) {
+      const childEntry = dependencySpecifiers[specifier].entry
+
+      if (! childEntry ||
+          childEntry.type !== TYPE_ESM) {
+        throwExportMissing = false
+        break
+      }
+    }
+
+    if (throwExportMissing) {
+      throw new ERR_EXPORT_MISSING(mod, exportedName)
+    }
+  }
+}
+
+function validate(entry) {
+  parseDependencies(entry)
+  resolveExportedStars(entry)
+  validateDependencies(entry)
+
+  const { _namespace, compileData } = entry
+
+  if (isDescendant(entry, entry)) {
     compileData.enforceTDZ()
   }
 
-  const { _namespace } = entry
-
-  for (const exportedName in exportedSpecifiers) {
+  for (const exportedName in compileData.exportedSpecifiers) {
     _namespace[exportedName] = void 0
   }
 
