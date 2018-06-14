@@ -343,8 +343,8 @@ class Entry {
 
     const { children } = this
 
-    for (const id in children) {
-      if (children[id].loaded() === LOAD_INCOMPLETE) {
+    for (const name in children) {
+      if (children[name].loaded() === LOAD_INCOMPLETE) {
         return this._loaded = LOAD_INCOMPLETE
       }
     }
