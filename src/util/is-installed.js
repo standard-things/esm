@@ -11,7 +11,7 @@ const nodeModulesRegExp = WIN32
 function isInstalled(mod) {
   const { filename } = mod
 
-  return typeof filename !== "string" ||
+  return typeof filename === "string" &&
     nodeModulesRegExp.test(filename)
 }
 
