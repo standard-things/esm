@@ -50,6 +50,10 @@ function createEntry(id) {
           return hasInstance
         }
 
+        if (receiver === proxyFunc) {
+          receiver = target
+        }
+
         const value = Reflect.get(target, name, receiver)
 
         return value === proto ? proxyProto : value
@@ -69,6 +73,10 @@ function createEntry(id) {
 
     const proxyProto = new OwnProxy(proto, {
       get(target, name, receiver) {
+        if (receiver === proxyProto) {
+          receiver = target
+        }
+
         const value = Reflect.get(target, name, receiver)
 
         return value === func ? exported : value

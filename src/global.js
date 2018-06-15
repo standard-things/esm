@@ -9,9 +9,15 @@ function init() {
 
   const handler = {
     get(target, name, receiver) {
-      return name === "console"
-        ? getConsole()
-        : Reflect.get(target, name, receiver)
+      if (name === "console") {
+        return getConsole()
+      }
+
+      if (receiver === proxy) {
+        receiver = target
+      }
+
+      return Reflect.get(target, name, receiver)
     },
     getOwnPropertyDescriptor(target, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
@@ -26,9 +32,9 @@ function init() {
     set(target, name, value, receiver) {
       if (Reflect.set(target, name, value, receiver)) {
         if (name === "console") {
-          Reflect.deleteProperty(target, "get")
-          Reflect.deleteProperty(target, "getOwnPropertyDescriptor")
-          Reflect.deleteProperty(target, "set")
+          Reflect.deleteProperty(handler, "get")
+          Reflect.deleteProperty(handler, "getOwnPropertyDescriptor")
+          Reflect.deleteProperty(handler, "set")
         }
 
         return true
@@ -38,7 +44,9 @@ function init() {
     }
   }
 
-  return new OwnProxy(shared.unsafeContext, handler)
+  const proxy = new OwnProxy(shared.unsafeContext, handler)
+
+  return proxy
 }
 
 export default shared.inited

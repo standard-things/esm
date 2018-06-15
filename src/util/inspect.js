@@ -1,5 +1,6 @@
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
+import GenericFunction from "../generic/function.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
@@ -120,6 +121,11 @@ function init() {
     const proxy = new OwnProxy(target, {
       get: (target, name, receiver) => {
         const { customInspectKey } = shared
+
+        if (receiver === proxy) {
+          receiver = target
+        }
+
         const value = Reflect.get(target, name, receiver)
 
         if ((name === customInspectKey ||
@@ -130,6 +136,11 @@ function init() {
 
         if (inspecting ||
             name !== customInspectKey) {
+          if (name === "toString" &&
+              typeof value === "function") {
+            return GenericFunction.bind(value, target)
+          }
+
           return value
         }
 

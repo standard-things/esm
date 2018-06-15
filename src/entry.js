@@ -700,8 +700,7 @@ function getExportByName(entry, setter, name) {
   if (isCJS &&
       parentNamedExports &&
       entry.namespace === _namespace) {
-    // Lazily assign proxied namespace object.
-    entry.namespace = new OwnProxy(_namespace, {
+    const proxy = new OwnProxy(_namespace, {
       get(target, name, receiver) {
         const exported = proxyExports(entry)
 
@@ -716,9 +715,16 @@ function getExportByName(entry, setter, name) {
           object = exported
         }
 
+        if (receiver === proxy) {
+          receiver = object
+        }
+
         return Reflect.get(object, name, receiver)
       }
     })
+
+    // Lazily assign proxied namespace object.
+    entry.namespace = proxy
   }
 
   if (name === "*") {

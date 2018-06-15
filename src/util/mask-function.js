@@ -28,6 +28,10 @@ function maskFunction(func, source) {
         return cached.toString
       }
 
+      if (receiver === proxy) {
+        receiver = target
+      }
+
       return Reflect.get(target, name, receiver)
     }
   })

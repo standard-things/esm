@@ -57,6 +57,11 @@ function init() {
 
     const get = (target, name, receiver) => {
       const accessor = getGetter(target, name)
+
+      if (receiver === proxy) {
+        receiver = target
+      }
+
       const value = Reflect.get(target, name, receiver)
 
       if (accessor) {
@@ -244,6 +249,10 @@ function init() {
         ! Reflect.has(exported, Symbol.toStringTag) &&
         toString.call(exported) !== "[object Object]") {
       handler.get = (target, name, receiver) => {
+        if (receiver === proxy) {
+          receiver = target
+        }
+
         const value = Reflect.get(target, name, receiver)
 
         return name === Symbol.toStringTag
