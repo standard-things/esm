@@ -4,7 +4,7 @@ import copyProperty from "../util/copy-property.js"
 import keysAll from "../util/keys-all.js"
 
 function clone(mod) {
-  const cloned = new Module(mod.id, null)
+  const cloned = new Module(mod.id)
 
   cloned.id = mod.id
   cloned.filename = mod.filename

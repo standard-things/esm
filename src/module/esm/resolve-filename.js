@@ -173,7 +173,7 @@ function _resolveFilename(request, parent, isMain, options, skipWarnings, skipGl
 
   if (options &&
       Array.isArray(options.paths)) {
-    const fakeParent = new Module("", null)
+    const fakeParent = new Module("")
     const fromPaths = options.paths
 
     paths = []

@@ -30,7 +30,7 @@ const { sep } = require("path")
 const Module = require("module")
 const NativeModule = bootstrap && bootstrap.NativeModule
 
-const esmModule = new Module(id, null)
+const esmModule = new Module(id)
 const useBuiltins = module.constructor.length > 1
 
 esmModule.filename = filename

@@ -14,7 +14,7 @@ export default () => {
     .forEach((name) => {
       const esmRequire = makeRequire(module, { [name]: true })
       const { cache, extensions } = esmRequire
-      const mod = new Module("<mock>", null)
+      const mod = new Module("<mock>")
 
       mod._compile = (content) => {
         assert.ok(content.includes("sourceMappingURL"))

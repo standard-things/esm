@@ -222,7 +222,7 @@ function getEntryFrom(request, exported) {
   }
 
   const filename = tryResolveFilename(request)
-  const child = new Module(filename, null)
+  const child = new Module(filename)
 
   if (isPath(filename)) {
     child.filename = filename

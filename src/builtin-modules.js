@@ -38,7 +38,7 @@ for (const id of builtinIds) {
     builtinModules[id] = cache[id]
   } else {
     setDeferred(builtinModules, id, () => {
-      const mod = new Module(id, null)
+      const mod = new Module(id)
 
       mod.exports = getExports(id)
       mod.loaded = true

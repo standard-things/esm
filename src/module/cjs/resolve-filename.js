@@ -52,7 +52,7 @@ function resolveFilename(request, parent, isMain, options) {
 
   if (! cacheKey &&
       Array.isArray(options.paths)) {
-    const fakeParent = new Module("", null)
+    const fakeParent = new Module("")
     const fromPaths = options.paths
 
     paths = []
