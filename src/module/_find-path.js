@@ -24,6 +24,8 @@ const {
 } = CHAR_CODE
 
 const {
+  CLI,
+  INTERNAL,
   WIN32
 } = ENV
 
@@ -143,7 +145,9 @@ function readPackage(thePath) {
     throw e
   }
 
-  if (json.esm) {
+  if ((CLI ||
+       INTERNAL) &&
+      json.esm) {
     const modField = json.module
 
     if (typeof modField === "string") {
