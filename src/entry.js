@@ -11,6 +11,7 @@ import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
 import isMJS from "./util/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
+import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
@@ -304,7 +305,7 @@ class Entry {
     })
 
     setDeferred(this, "cjsNamespace", function () {
-      return createNamespaceProxy(
+      return createImmutableNamespaceProxy(
         this,
         cjsNamespaceGetter(this),
         cjsNamespaceSource(this)
@@ -319,7 +320,7 @@ class Entry {
     })
 
     setDeferred(this, "esmNamespace", function () {
-      return createNamespaceProxy(
+      return createImmutableNamespaceProxy(
         this,
         esmNamespaceGetter(this)
       )
@@ -448,6 +449,43 @@ class Entry {
   }
 }
 
+function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
+  handler.get = (target, name, receiver) => {
+    const getter = entry.getters[name]
+    const { namespace } = source
+
+    if (entry.type === TYPE_ESM) {
+      if (getter) {
+        getter()
+      } else if (typeof name === "string" &&
+          Reflect.has(namespace, name)) {
+        throw new ERR_UNDEFINED_IDENTIFIER(name)
+      }
+    }
+
+    if (receiver === proxy) {
+      receiver = namespace
+    }
+
+    return Reflect.get(namespace, name, receiver)
+  }
+
+  handler.getOwnPropertyDescriptor = (target, name) => {
+    const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+    if (isUpdatableDescriptor(descriptor)) {
+      descriptor.value = handler.get(target, name)
+    }
+
+    return descriptor
+  }
+
+  handler.has = (target, name) => {
+    return name === shared.symbol.namespace ||
+      Reflect.has(source.namespace, name)
+  }
+}
+
 function assignExportsToNamespace(entry, names) {
   const exported = entry.exports
   const isLoaded = entry._loaded === LOAD_COMPLETED
@@ -484,6 +522,88 @@ function assignExportsToNamespace(entry, names) {
   }
 }
 
+function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
+  handler.defineProperty = (target, name, descriptor) => {
+    if (Reflect.defineProperty(target, name, descriptor)) {
+      return true
+    }
+
+    const NsError = Reflect.has(source.namespace, name)
+      ? ERR_NS_REDEFINITION
+      : ERR_NS_DEFINITION
+
+    throw new NsError(entry.module, name)
+  }
+
+  handler.deleteProperty = (target, name) => {
+    if (Reflect.deleteProperty(target, name)) {
+      return true
+    }
+
+    throw new ERR_NS_DELETION(entry.module, name)
+  }
+
+  handler.set = (target, name) => {
+    if (Reflect.has(source.namespace, name)) {
+      throw new ERR_NS_ASSIGNMENT(entry.module, name)
+    }
+
+    throw new ERR_NS_EXTENSION(entry.module, name)
+  }
+}
+
+function assignMutableNamespaceHandlerTraps(handler, entry, source) {
+  const { getOwnPropertyDescriptor } = handler
+
+  handler.defineProperty = (target, name, descriptor) => {
+    SafeObject.defineProperty(entry.exports, name, descriptor)
+
+    if (Reflect.has(source.namespace, name)) {
+      entry
+        .addGetter(name, () => entry.namespace[name])
+        .update(name)
+    }
+
+    return true
+  }
+
+  handler.deleteProperty = (target, name) => {
+    if (Reflect.deleteProperty(entry.exports, name)) {
+      if (Reflect.has(source.namespace, name)) {
+        entry
+          .addGetter(name, () => entry.namespace[name])
+          .update(name)
+      }
+
+      return true
+    }
+
+    return false
+  }
+
+  handler.getOwnPropertyDescriptor = (target, name) => {
+    const exported = entry.exports
+
+    return has(exported, name)
+      ? Reflect.getOwnPropertyDescriptor(exported, name)
+      : getOwnPropertyDescriptor(target, name)
+  }
+
+  handler.set = (target, name, value, receiver) => {
+    if (Reflect.set(entry.exports, name, value, receiver)) {
+      if (Reflect.has(source.namespace, name)) {
+        entry
+          .addGetter(name, () => entry.namespace[name])
+          .update(name)
+      }
+
+      return true
+    }
+
+    return false
+  }
+}
+
 function changed(setter, key, value) {
   const { last } = setter
 
@@ -511,148 +631,31 @@ function cjsNamespaceSource(entry) {
   }
 }
 
+function createImmutableNamespaceProxy(entry, getter, source = entry) {
+  // Section 9.4.6: Module Namespace Exotic Objects
+  // Namespace objects should be sealed.
+  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+  const handler = initNamespaceHandler()
+  const target = Object.seal(createNamespace(source, getter))
+  const proxy = new OwnProxy(target, handler)
+
+  assignCommonNamespaceHandlerTraps(handler, entry, source, proxy)
+  assignImmutableNamespaceHandlerTraps(handler, entry, source)
+  return proxy
+}
+
 function createNamespace(source, getter) {
   return toNamespaceObject(source.namespace, getter)
 }
 
-function createNamespaceHandler(entry, source, mutable) {
-  const handler = {
-    get(target, name, receiver) {
-      const getter = entry.getters[name]
-      const { namespace } = source
-
-      if (entry.type === TYPE_ESM) {
-        if (getter) {
-          getter()
-        } else if (typeof name === "string" &&
-            Reflect.has(namespace, name)) {
-          throw new ERR_UNDEFINED_IDENTIFIER(name)
-        }
-      }
-
-      return Reflect.get(namespace, name, receiver)
-    },
-
-    has(target, name) {
-      return name === shared.symbol.namespace ||
-        Reflect.has(source.namespace, name)
-    }
-  }
-
-  if (mutable) {
-    handler.defineProperty = (target, name, descriptor) => {
-      SafeObject.defineProperty(entry.exports, name, descriptor)
-
-      if (Reflect.has(source.namespace, name)) {
-        entry
-          .addGetter(name, () => entry.namespace[name])
-          .update(name)
-      }
-
-      return true
-    }
-
-    handler.deleteProperty = (target, name) => {
-      if (Reflect.deleteProperty(entry.exports, name)) {
-        if (Reflect.has(source.namespace, name)) {
-          entry
-            .addGetter(name, () => entry.namespace[name])
-            .update(name)
-        }
-
-        return true
-      }
-
-      return false
-    }
-
-    handler.getOwnPropertyDescriptor = (target, name) => {
-      const exported = entry.exports
-
-      if (has(exported, name)) {
-        return Reflect.getOwnPropertyDescriptor(exported, name)
-      }
-
-      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-      if (descriptor) {
-        descriptor.value = handler.get(target, name)
-      }
-
-      return descriptor
-    }
-
-    handler.set = (target, name, value, receiver) => {
-      if (Reflect.set(entry.exports, name, value, receiver)) {
-        if (Reflect.has(source.namespace, name)) {
-          entry
-            .addGetter(name, () => entry.namespace[name])
-            .update(name)
-        }
-
-        return true
-      }
-
-      return false
-    }
-  } else {
-    handler.defineProperty = (target, name, descriptor) => {
-      if (Reflect.defineProperty(target, name, descriptor)) {
-        return true
-      }
-
-      const NsError = Reflect.has(source.namespace, name)
-        ? ERR_NS_REDEFINITION
-        : ERR_NS_DEFINITION
-
-      throw new NsError(entry.module, name)
-    }
-
-    handler.deleteProperty = (target, name) => {
-      if (Reflect.deleteProperty(target, name)) {
-        return true
-      }
-
-      throw new ERR_NS_DELETION(entry.module, name)
-    }
-
-    handler.getOwnPropertyDescriptor = (target, name) => {
-      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
-
-      if (descriptor) {
-        descriptor.value = handler.get(target, name)
-      }
-
-      return descriptor
-    }
-
-    handler.set = (target, name) => {
-      const NsError = Reflect.has(source.namespace, name)
-        ? ERR_NS_ASSIGNMENT
-        : ERR_NS_EXTENSION
-
-      throw new NsError(entry.module, name)
-    }
-  }
-
-  return handler
-}
-
 function createMutableNamespaceProxy(entry, getter, source = entry) {
-  return new OwnProxy(
-    createNamespace(source, getter),
-    createNamespaceHandler(entry, source, true)
-  )
-}
+  const handler = initNamespaceHandler()
+  const target = createNamespace(source, getter)
+  const proxy = new OwnProxy(target, handler)
 
-function createNamespaceProxy(entry, getter, source = entry) {
-  // Section 9.4.6: Module Namespace Exotic Objects
-  // Namespace objects should be sealed.
-  // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-  return new OwnProxy(
-    Object.seal(createNamespace(source, getter)),
-    createNamespaceHandler(entry, source)
-  )
+  assignCommonNamespaceHandlerTraps(handler, entry, source, proxy)
+  assignMutableNamespaceHandlerTraps(handler, entry, source)
+  return proxy
 }
 
 function esmNamespaceGetter(entry) {
@@ -662,7 +665,7 @@ function esmNamespaceGetter(entry) {
     if (type === TYPE_ESM ||
         (type === TYPE_CJS &&
          name === "default")) {
-      return Reflect.get(target, name)
+      return target[name]
     }
 
     return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
@@ -766,6 +769,17 @@ function getExportByName(entry, setter, name) {
 
   if (value !== GETTER_ERROR) {
     return value
+  }
+}
+
+function initNamespaceHandler() {
+  return {
+    defineProperty: null,
+    deleteProperty: null,
+    get: null,
+    getOwnPropertyDescriptor: null,
+    has: null,
+    set: null
   }
 }
 
