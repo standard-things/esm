@@ -58,8 +58,8 @@ moduleState.globalPaths = GenericArray.from(Module.globalPaths)
 parseState._cache = new Proxy(parseState._cache, {
   get(target, name) {
     return Reflect.has(target, name)
-      ? Reflect.get(target, name)
-      : Reflect.get(Module._cache, name)
+      ? target[name]
+      : Module._cache[name]
   }
 })
 

@@ -498,7 +498,7 @@ function changed(setter, key, value) {
 function cjsNamespaceGetter(entry) {
   return (target, name) => {
     return name === "default"
-      ? Reflect.get(target, name)
+      ? target[name]
       : Reflect.getOwnPropertyDescriptor(entry.exports, name).value
   }
 }
