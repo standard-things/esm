@@ -8,7 +8,6 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 import Module from "../module.js"
-import SafeJSON from "../safe/json.js"
 
 import binding from "../binding.js"
 import keys from "../util/keys.js"
@@ -75,6 +74,7 @@ function findPath(request, paths, isMain, searchExts) {
     }
 
     let filename
+
     const basePath = resolve(curPath, request)
     const rc = stat(basePath)
     const isFile = rc === 0
@@ -126,22 +126,32 @@ function readPackage(thePath) {
   }
 
   const jsonPath = resolve(thePath, "package.json")
-  const json = readFileFast(jsonPath, "utf8")
+  const jsonString = readFileFast(jsonPath, "utf8")
 
-  if (! json ||
-      ! mainFieldRegExp.test(json)) {
+  if (! jsonString ||
+      ! mainFieldRegExp.test(jsonString)) {
     return ""
   }
 
-  let main
+  let json
 
   try {
-    main = SafeJSON.parse(json).main
+    json = JSON.parse(jsonString)
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
     throw e
   }
+
+  if (json.esm) {
+    const modField = json.module
+
+    if (typeof modField === "string") {
+      return cache[thePath] = modField
+    }
+  }
+
+  const { main } = json
 
   return typeof main === "string"
     ? cache[thePath] = main
