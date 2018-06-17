@@ -121,14 +121,14 @@ function findPath(request, paths, isMain, searchExts) {
   return ""
 }
 
-function readPackage(thePath) {
+function readPackage(dirPath) {
   const cache = shared.memoize.moduleReadPackage
 
-  if (Reflect.has(cache, thePath)) {
-    return cache[thePath]
+  if (Reflect.has(cache, dirPath)) {
+    return cache[dirPath]
   }
 
-  const jsonPath = resolve(thePath, "package.json")
+  const jsonPath = resolve(dirPath, "package.json")
   const jsonString = readFileFast(jsonPath, "utf8")
 
   if (! jsonString ||
@@ -137,7 +137,7 @@ function readPackage(thePath) {
   }
 
   try {
-    return cache[thePath] = JSON.parse(jsonString)
+    return cache[dirPath] = JSON.parse(jsonString)
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
@@ -159,14 +159,14 @@ function tryExtensions(thePath, exts, isMain) {
   return filename
 }
 
-function tryField(json, field, thePath, exts, isMain) {
+function tryField(json, field, basePath, exts, isMain) {
   const fieldPath = json[field]
 
   if (typeof fieldPath !== "string") {
     return ""
   }
 
-  const filename = resolve(thePath, fieldPath)
+  const filename = resolve(basePath, fieldPath)
 
   return tryFilename(filename, isMain) ||
     tryExtensions(filename, exts, isMain) ||
@@ -186,8 +186,8 @@ function tryFilename(filename, isMain) {
   return realpath(filename)
 }
 
-function tryPackage(thePath, exts, isMain) {
-  const json = readPackage(thePath)
+function tryPackage(dirPath, exts, isMain) {
+  const json = readPackage(dirPath)
 
   if (! json) {
     return ""
@@ -196,14 +196,14 @@ function tryPackage(thePath, exts, isMain) {
   if ((CLI ||
        INTERNAL) &&
       json.esm) {
-    const filename = tryField(json, "module", thePath, exts, isMain)
+    const filename = tryField(json, "module", dirPath, exts, isMain)
 
     if (! isMJS(filename)) {
       return filename
     }
   }
 
-  return tryField(json, "main", thePath, exts, isMain)
+  return tryField(json, "main", dirPath, exts, isMain)
 }
 
 export default findPath
