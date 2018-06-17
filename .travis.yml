@@ -2,9 +2,7 @@ language: node_js
 sudo: false
 os:
   - linux
-  # - osx
-  # Disabled during Mac builds outage:
-  # https://www.traviscistatus.com/
+  - osx
 
 node_js:
   - 10
