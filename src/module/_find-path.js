@@ -10,6 +10,7 @@ import ENV from "../constant/env.js"
 import Module from "../module.js"
 
 import binding from "../binding.js"
+import isMJS from "../util/is-mjs.js"
 import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
@@ -29,8 +30,8 @@ const {
   WIN32
 } = ENV
 
-const mainFieldRegExp = /"main"/
 const { preserveSymlinks, preserveSymlinksMain } = binding.config
+const mainFieldRegExp = /"main"/
 
 function findPath(request, paths, isMain, searchExts) {
   if (isAbsolute(request)) {
@@ -132,41 +133,23 @@ function readPackage(thePath) {
 
   if (! jsonString ||
       ! mainFieldRegExp.test(jsonString)) {
-    return ""
+    return null
   }
 
-  let json
-
   try {
-    json = JSON.parse(jsonString)
+    return cache[thePath] = JSON.parse(jsonString)
   } catch (e) {
     e.path = jsonPath
     e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
     throw e
   }
-
-  if ((CLI ||
-       INTERNAL) &&
-      json.esm) {
-    const modField = json.module
-
-    if (typeof modField === "string") {
-      return cache[thePath] = modField
-    }
-  }
-
-  const { main } = json
-
-  return typeof main === "string"
-    ? cache[thePath] = main
-    : ""
 }
 
 function tryExtensions(thePath, exts, isMain) {
   let filename = ""
 
   for (const ext of exts) {
-    filename = tryFile(thePath + ext, isMain)
+    filename = tryFilename(thePath + ext, isMain)
 
     if (filename) {
       return filename
@@ -176,31 +159,52 @@ function tryExtensions(thePath, exts, isMain) {
   return filename
 }
 
-function tryFile(thePath, isMain) {
-  if (stat(thePath)) {
-    return false
+function tryField(json, field, thePath, exts, isMain) {
+  const fieldPath = json[field]
+
+  if (typeof fieldPath !== "string") {
+    return ""
+  }
+
+  const filename = resolve(thePath, fieldPath)
+
+  return tryFilename(filename, isMain) ||
+    tryExtensions(filename, exts, isMain) ||
+    tryExtensions(resolve(filename, "index"), exts, isMain)
+}
+
+function tryFilename(filename, isMain) {
+  if (stat(filename)) {
+    return ""
   }
 
   if (preserveSymlinks &&
       ! isMain) {
-    return resolve(thePath)
+    return resolve(filename)
   }
 
-  return realpath(thePath)
+  return realpath(filename)
 }
 
 function tryPackage(thePath, exts, isMain) {
-  const mainPath = readPackage(thePath)
+  const json = readPackage(thePath)
 
-  if (! mainPath) {
-    return mainPath
+  if (! json) {
+    return ""
   }
 
-  const filename = resolve(thePath, mainPath)
+  if ((CLI ||
+       INTERNAL) &&
+      json.esm) {
+    const filename = tryField(json, "module", thePath, exts, isMain)
 
-  return tryFile(filename, isMain) ||
-         tryExtensions(filename, exts, isMain) ||
-         tryExtensions(resolve(filename, "index"), exts, isMain)
+    if (filename &&
+        ! isMJS(filename)) {
+      return filename
+    }
+  }
+
+  return tryField(json, "main", thePath, exts, isMain)
 }
 
 export default findPath
