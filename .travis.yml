@@ -19,3 +19,6 @@ matrix:
   include:
     - node_js: 10
       env: HARMONY=true
+
+before_install:
+  - npm i -g npm
