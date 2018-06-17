@@ -3,14 +3,16 @@ import isObject from "./is-object.js"
 
 function isMJS(request) {
   if (typeof request === "string") {
-    return extname(request) === ".mjs"
+    return request.length > 4 &&
+      extname(request) === ".mjs"
   }
 
   if (isObject(request)) {
     const { filename } = request
 
     if (typeof filename === "string") {
-      return extname(filename) === ".mjs"
+      return filename.length > 4 &&
+        extname(filename) === ".mjs"
     }
   }
 
