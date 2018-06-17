@@ -178,8 +178,9 @@ function tryFilename(filename, isMain) {
     return ""
   }
 
-  if (preserveSymlinks &&
-      ! isMain) {
+  if (isMain
+      ? preserveSymlinksMain
+      : preserveSymlinks) {
     return resolve(filename)
   }
 
