@@ -198,8 +198,7 @@ function tryPackage(thePath, exts, isMain) {
       json.esm) {
     const filename = tryField(json, "module", thePath, exts, isMain)
 
-    if (filename &&
-        ! isMJS(filename)) {
+    if (! isMJS(filename)) {
       return filename
     }
   }
