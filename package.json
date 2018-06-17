@@ -81,7 +81,7 @@
     "uglifyjs-webpack-plugin": "^1.2.4",
     "webpack": "^4.12.0",
     "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-cli": "^3.0.7",
+    "webpack-cli": "^3.0.8",
     "yargs": "^11.1.0"
   },
   "files": [
