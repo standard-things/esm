@@ -84,14 +84,9 @@ Specify options with one of the following:
   <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
-  <td valign="top"><code>"mode":</code></td>
+  <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A string mode:</p>
-    <ul>
-      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
-      <li><code>"all"</code> script files are treated as ESM</li>
-      <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM</li>
-    </ul>
+    <p>A boolean for top-level <a href="https://node.green/#ES2017-features-async-functions-await"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>.</p>
   </td>
 </tr>
 <tr>
@@ -156,13 +151,18 @@ Specify options with one of the following:
 <tr>
   <td valign="top"><code>"mainFields":</code></td>
   <td>
-    <p>An array of <code>package.json</code> fields, i.e. <code>["main"]</code>, to check when importing a package.</p>
+    <p>An array of fields, e.g. <code>["main"]</code>, to check when importing a package.</p>
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"await":</code></td>
+  <td valign="top"><code>"mode":</code></td>
   <td>
-    <p>A boolean for top-level <a href="https://node.green/#ES2017-features-async-functions-await"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>.</p>
+    <p>A string mode:</p>
+    <ul>
+      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
+      <li><code>"all"</code> script files are treated as ESM</li>
+      <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM</li>
+    </ul>
   </td>
 </tr>
 <tr>
