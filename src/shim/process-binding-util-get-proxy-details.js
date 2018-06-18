@@ -56,7 +56,7 @@ function init() {
       return result
     }
 
-    result = false
+    result = true
 
     try {
       const proxy = new OwnProxy(getProxyDetails, {})

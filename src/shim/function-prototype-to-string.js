@@ -74,14 +74,19 @@ function init() {
       return result
     }
 
-    result = false
+    result = true
 
     try {
       const { toString } = funcProto
-      const proxy = new OwnProxy(toString, {})
 
-      result = toString.call(proxy) === toString.call(toString)
-    } catch (e) {}
+      if (typeof toString === "function") {
+        const proxy = new OwnProxy(toString, {})
+
+        result = toString.call(proxy) === toString.call(toString)
+      }
+    } catch (e) {
+      result = false
+    }
 
     cache.set(funcProto, result)
     return result
