@@ -149,10 +149,10 @@ function validateExportedName(entry, exportedName, seen) {
 
   if (seen &&
       Reflect.has(seen, name)) {
-    if (exportedStars.includes(exportedSpecifiers[exportedName].specifier)) {
-      throw new ERR_EXPORT_MISSING(mod, exportedName)
-    } else {
+    if (exportedStars.indexOf(exportedSpecifiers[exportedName].specifier) === -1) {
       throw new ERR_EXPORT_CYCLE(mod, exportedName)
+    } else {
+      throw new ERR_EXPORT_MISSING(mod, exportedName)
     }
   }
 
