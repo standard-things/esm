@@ -553,7 +553,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
   }
 }
 
-function assignMutableNamespaceHandlerTraps(handler, entry, source) {
+function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
   const { getOwnPropertyDescriptor } = handler
 
   handler.defineProperty = (target, name, descriptor) => {
@@ -591,7 +591,13 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source) {
   }
 
   handler.set = (target, name, value, receiver) => {
-    if (Reflect.set(entry.exports, name, value, receiver)) {
+    const exported = entry.exports
+
+    if (receiver === proxy) {
+      receiver = exported
+    }
+
+    if (Reflect.set(exported, name, value, receiver)) {
       if (Reflect.has(source.namespace, name)) {
         entry
           .addGetter(name, () => entry.namespace[name])
@@ -655,7 +661,7 @@ function createMutableNamespaceProxy(entry, getter, source = entry) {
   const proxy = new OwnProxy(target, handler)
 
   assignCommonNamespaceHandlerTraps(handler, entry, source, proxy)
-  assignMutableNamespaceHandlerTraps(handler, entry, source)
+  assignMutableNamespaceHandlerTraps(handler, entry, source, proxy)
   return proxy
 }
 
