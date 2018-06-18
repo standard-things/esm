@@ -53,7 +53,7 @@ const {
 } = PACKAGE
 
 const {
-  ERR_INVALID_ESM_MODE,
+  ERR_INVALID_ESM_OPTION,
   ERR_UNKNOWN_ESM_OPTION
 } = errors
 
@@ -313,6 +313,16 @@ function createOptions(value) {
   defaults(options, defaultOptions)
   options.cjs = cjsOptions
 
+  const { mainFields } = options
+
+  if (Array.isArray(mainFields)) {
+    options.mainFields = Array.from(mainFields)
+  } else if (typeof mainFields === "string") {
+    options.mainFields = [mainFields]
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("mainFields", mainFields)
+  }
+
   const { mode } = options
 
   if (mode === "all") {
@@ -322,7 +332,7 @@ function createOptions(value) {
   } else if (mode === "strict") {
     options.mode = OPTIONS_MODE_STRICT
   } else {
-    throw new ERR_INVALID_ESM_MODE(mode)
+    throw new ERR_INVALID_ESM_OPTION("mode", mode)
   }
 
   if (typeof options.cache !== "string") {

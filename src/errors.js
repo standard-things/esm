@@ -30,7 +30,7 @@ function init() {
   addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
   addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
-  addBuiltinError("ERR_INVALID_ESM_MODE", invalidPkgMode, ExError)
+  addBuiltinError("ERR_INVALID_ESM_OPTION", invalidPkgOption, ExError)
   addBuiltinError("ERR_NS_ASSIGNMENT", namespaceAssignment, ExTypeError)
   addBuiltinError("ERR_NS_DEFINITION", namespaceDefinition, ExTypeError)
   addBuiltinError("ERR_NS_DELETION", namespaceDeletion, ExTypeError)
@@ -177,9 +177,9 @@ function init() {
     return "Cannot load ES module from .mjs: " + getModuleURL(request)
   }
 
-  function invalidPkgMode(mode) {
+  function invalidPkgOption(optionName, value) {
     return "The esm@" + PKG_VERSION +
-      " option 'mode' is invalid. Received " + truncInspect(mode)
+      " option '" + optionName + "' is invalid. Received " + truncInspect(value)
   }
 
   function invalidProtocol(protocol, expected) {
