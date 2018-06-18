@@ -145,16 +145,16 @@ function init() {
 
   function exportCycle(request, name) {
     return "Detected cycle while resolving name '" + name +
-      "' in " + toStringLiteral(getModuleURL(request), "'")
+      "' in ES module: " + getModuleURL(request)
   }
 
   function exportMissing(request, name) {
-    return "Missing export '" + name +
+    return "Missing export name '" + name +
       "' in ES module: " + getModuleURL(request)
   }
 
   function exportStarConflict(request, name) {
-    return "Conflicting star export '" + name +
+    return "Conflicting indirect export name '" + name +
       "' in ES module: " + getModuleURL(request)
   }
 
@@ -222,8 +222,7 @@ function init() {
   }
 
   function requireESM(request) {
-    // Keep "Module" capitalized to align with Node.
-    return "Must use import to load ES Module: " + getModuleURL(request)
+    return "Must use import to load ES module: " + getModuleURL(request)
   }
 
   function unknownFileExtension(filename) {

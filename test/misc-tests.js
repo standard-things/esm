@@ -344,7 +344,7 @@ describe("errors", () => {
           .catch((e) =>
             checkErrorStack(e, [
               getURLFromFilePath(id5) + ":1",
-              "SyntaxError: Missing export 'NOT_EXPORTED' in ES module: " + abcURL
+              "SyntaxError: Missing export name 'NOT_EXPORTED' in ES module: " + abcURL
             ].join("\n"))
           ),
         import(id6)
@@ -1135,7 +1135,7 @@ describe("spec compliance", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.ok(e instanceof SyntaxError)
-            assert.ok(e.message.startsWith("Conflicting star export"))
+            assert.ok(e.message.startsWith("Conflicting indirect export"))
           })
       ))
   )
@@ -1202,7 +1202,7 @@ describe("spec compliance", () => {
             if (isDebug) {
               assert.ok(true)
             } else {
-              assert.ok(e.message.startsWith("Missing export 'NOT_EXPORTED'"))
+              assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
             }
           })
       ))
@@ -1219,7 +1219,7 @@ describe("spec compliance", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.strictEqual(global.loadCount, 1)
-            assert.ok(e.message.startsWith("Missing export 'NOT_EXPORTED'"))
+            assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
           })
       ))
   )
