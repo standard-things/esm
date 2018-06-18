@@ -288,12 +288,7 @@ function createOptions(value) {
         options[name] = value[name]
       } else if (name === "sourcemap" &&
           possibleNames.indexOf("sourceMap") === -1) {
-        const { sourcemap } = value
-
-        if (sourcemap !== void 0) {
-          names.push("sourceMap")
-          options.sourceMap = !! sourcemap
-        }
+        options.sourceMap = value.sourcemap
       } else {
         throw new ERR_UNKNOWN_ESM_OPTION(name)
       }
@@ -312,6 +307,30 @@ function createOptions(value) {
 
   defaults(options, defaultOptions)
   options.cjs = cjsOptions
+
+  const awaitOption = options.await
+
+  if (isFlag(awaitOption)) {
+    options.await = !! awaitOption
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("await", awaitOption)
+  }
+
+  const { cache } = options
+
+  if (isFlag(cache)) {
+    options.cache = !! cache
+  } else if (typeof cache !== "string") {
+    throw new ERR_INVALID_ESM_OPTION("cache", cache)
+  }
+
+  const { debug } = options
+
+  if (isFlag(debug)) {
+    options.debug = !! debug
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("debug", debug)
+  }
 
   const { mainFields } = options
 
@@ -335,12 +354,21 @@ function createOptions(value) {
     throw new ERR_INVALID_ESM_OPTION("mode", mode)
   }
 
-  if (typeof options.cache !== "string") {
-    options.cache = !! options.cache
+  const { sourceMap } = options
+
+  if (isFlag(sourceMap)) {
+    options.sourceMap = !! sourceMap
+  } else if (sourceMap !== void 0) {
+    throw new ERR_INVALID_ESM_OPTION("sourceMap", sourceMap)
   }
 
-  options.debug = !! options.debug
-  options.warnings = !! options.warnings
+  const { warnings } = options
+
+  if (isFlag(warnings)) {
+    options.warnings = !! warnings
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("warnings", warnings)
+  }
 
   return options
 }
@@ -417,6 +445,12 @@ function getRoot(dirPath) {
   }
 
   return root[dirPath] = findRoot(dirPath) || dirPath
+}
+
+function isFlag(value) {
+  return typeof value === "boolean" ||
+    value === 0 ||
+    value === 1
 }
 
 function readInfo(dirPath, force) {
