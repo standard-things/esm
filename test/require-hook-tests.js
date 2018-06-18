@@ -36,6 +36,11 @@ describe("require hook", () => {
       .then((ns) => ns.default())
   )
 
+  it("should support `options.mainFields`", () =>
+    import("./require-hook/main-fields.mjs")
+      .then((ns) => ns.default())
+  )
+
   it("should support `options.sourceMap`", () =>
     import("./require-hook/source-map.mjs")
       .then((ns) => ns.default())
