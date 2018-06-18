@@ -8,6 +8,7 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 import Module from "../module.js"
+import Package from "../package.js"
 
 import binding from "../binding.js"
 import isMJS from "../util/is-mjs.js"
@@ -25,8 +26,6 @@ const {
 } = CHAR_CODE
 
 const {
-  CLI,
-  INTERNAL,
   WIN32
 } = ENV
 
@@ -146,31 +145,27 @@ function readPackage(dirPath) {
 }
 
 function tryExtensions(thePath, exts, isMain) {
-  let filename = ""
-
   for (const ext of exts) {
-    filename = tryFilename(thePath + ext, isMain)
+    const filename = tryFilename(thePath + ext, isMain)
 
     if (filename) {
       return filename
     }
   }
 
-  return filename
+  return ""
 }
 
-function tryField(json, field, basePath, exts, isMain) {
-  const fieldPath = json[field]
-
+function tryField(fieldPath, basePath, exts, isMain) {
   if (typeof fieldPath !== "string") {
     return ""
   }
 
-  const filename = resolve(basePath, fieldPath)
+  const thePath = resolve(basePath, fieldPath)
 
-  return tryFilename(filename, isMain) ||
-    tryExtensions(filename, exts, isMain) ||
-    tryExtensions(resolve(filename, "index"), exts, isMain)
+  return tryFilename(thePath, isMain) ||
+    tryExtensions(thePath, exts, isMain) ||
+    tryExtensions(resolve(thePath, "index"), exts, isMain)
 }
 
 function tryFilename(filename, isMain) {
@@ -194,17 +189,20 @@ function tryPackage(dirPath, exts, isMain) {
     return ""
   }
 
-  if ((CLI ||
-       INTERNAL) &&
-      json.esm) {
-    const filename = tryField(json, "module", dirPath, exts, isMain)
+  let { mainFields } = Package.state.default.options
 
-    if (! isMJS(filename)) {
+  if (mainFields.indexOf("main") === -1) {
+    mainFields = mainFields.concat("main")
+  }
+
+  for (const mainField of mainFields) {
+    const filename = tryField(json[mainField], dirPath, exts, isMain)
+
+    if (mainField === "main" ||
+        ! isMJS(filename)) {
       return filename
     }
   }
-
-  return tryField(json, "main", dirPath, exts, isMain)
 }
 
 export default findPath

@@ -74,6 +74,7 @@ const defaultOptions = {
     vars: false
   },
   debug: false,
+  mainFields: ["main"],
   mode: "strict",
   sourceMap: void 0,
   warnings: DEVELOPMENT

@@ -154,6 +154,12 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"mainFields":</code></td>
+  <td>
+    <p>An array of <code>package.json</code> fields, i.e. <code>["main"]</code>, to check when importing a package.</p>
+  </td>
+</tr>
+<tr>
   <td valign="top"><code>"await":</code></td>
   <td>
     <p>A boolean for top-level <a href="https://node.green/#ES2017-features-async-functions-await"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>.</p>
