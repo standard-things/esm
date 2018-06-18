@@ -143,23 +143,23 @@ function init() {
       : inspected
   }
 
-  function exportCycle(request, exportedName) {
-    return "Detected cycle while resolving name '" + exportedName +
+  function exportCycle(request, name) {
+    return "Detected cycle while resolving name '" + name +
       "' in " + toStringLiteral(getModuleURL(request), "'")
   }
 
-  function exportMissing(request, exportedName) {
-    return "Missing export '" + exportedName +
+  function exportMissing(request, name) {
+    return "Missing export '" + name +
       "' in ES module: " + getModuleURL(request)
   }
 
-  function exportStarConflict(request, exportedName) {
-    return "Conflicting star export '" + exportedName +
+  function exportStarConflict(request, name) {
+    return "Conflicting star export '" + name +
       "' in ES module: " + getModuleURL(request)
   }
 
-  function invalidArgType(argName, expected, actual) {
-    let message = "The '" + argName + "' argument must be " + expected
+  function invalidArgType(name, expected, actual) {
+    let message = "The '" + name + "' argument must be " + expected
 
     if (arguments.length > 2) {
       message += ". Received type " + (actual === null ? "null" : typeof actual)
@@ -168,8 +168,8 @@ function init() {
     return message
   }
 
-  function invalidArgValue(argName, value, reason = "is invalid") {
-    return "The argument '" + argName + "' " + reason +
+  function invalidArgValue(name, value, reason = "is invalid") {
+    return "The argument '" + name + "' " + reason +
       ". Received " + truncInspect(value)
   }
 
@@ -177,9 +177,9 @@ function init() {
     return "Cannot load ES module from .mjs: " + getModuleURL(request)
   }
 
-  function invalidPkgOption(optionName, value) {
+  function invalidPkgOption(name, value) {
     return "The esm@" + PKG_VERSION +
-      " option '" + optionName + "' is invalid. Received " + truncInspect(value)
+      " option '" + name + "' is invalid. Received " + truncInspect(value)
   }
 
   function invalidProtocol(protocol, expected) {
@@ -196,29 +196,29 @@ function init() {
       ". Legacy behavior in require() would have found it at " + foundPath
   }
 
-  function namespaceAssignment(request, identName) {
+  function namespaceAssignment(request, name) {
     return "Cannot assign to read only module namespace property " +
-      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+      toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
-  function namespaceDefinition(request, identName) {
+  function namespaceDefinition(request, name) {
     return "Cannot define module namespace property " +
-      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+      toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
-  function namespaceDeletion(request, identName) {
+  function namespaceDeletion(request, name) {
     return "Cannot delete module namespace property " +
-      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+      toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
-  function namespaceExtension(request, identName) {
+  function namespaceExtension(request, name) {
     return "Cannot add module namespace property " +
-      toStringLiteral(identName, "'") + " to " + getModuleURL(request)
+      toStringLiteral(name, "'") + " to " + getModuleURL(request)
   }
 
-  function namespaceRedefinition(request, identName) {
+  function namespaceRedefinition(request, name) {
     return "Cannot redefine module namespace property " +
-      toStringLiteral(identName, "'") + " of " + getModuleURL(request)
+      toStringLiteral(name, "'") + " of " + getModuleURL(request)
   }
 
   function requireESM(request) {
@@ -230,12 +230,12 @@ function init() {
     return "Unknown file extension: " + filename
   }
 
-  function unknownPkgOption(optionName) {
-    return "Unknown esm@" + PKG_VERSION + " option: " + optionName
+  function unknownPkgOption(name) {
+    return "Unknown esm@" + PKG_VERSION + " option: " + name
   }
 
-  function undefinedIdentifier(identName) {
-    return identName + " is not defined"
+  function undefinedIdentifier(name) {
+    return name + " is not defined"
   }
 
   return errors
