@@ -34,12 +34,6 @@ function init() {
   const defaultOptions = {
     assertTDZ: false,
     cjs: {
-      cache: false,
-      extensions: false,
-      interop: false,
-      mutableNamespace: false,
-      namedExports: false,
-      paths: false,
       topLevelReturn: false,
       vars: false
     },
