@@ -48,10 +48,9 @@ function load(request, parent, isMain, preload) {
 
   const isExtMJS = isMJS(filename)
   const pkg = Package.from(filename)
-  const pkgOptions = pkg && pkg.options
   const queryFragment = getURLQueryFragment(request)
 
-  let isUnexposed = pkgOptions && ! pkgOptions.cjs.cache
+  let isUnexposed = ! pkg.options.cjs.cache
   let state = Module
 
   request = queryFragment
