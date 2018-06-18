@@ -899,6 +899,42 @@ describe("spec compliance", () => {
       .map((request) => import(request)))
   )
 
+  it("should detect cycles while resolving export names", () =>
+    Promise
+      .all([
+        import("./fixture/cycle/detected/direct/a.mjs")
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof SyntaxError)
+            assert.strictEqual(
+              e.message,
+              "Detected cycle while resolving name 'x2' in ES module: " +
+              getURLFromFilePath(path.resolve("fixture/cycle/detected/direct/b.mjs"))
+            )
+          }),
+        import("./fixture/cycle/detected/indirect/a.mjs")
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof SyntaxError)
+            assert.strictEqual(
+              e.message,
+              "Missing export name 'x2' in ES module: " +
+              getURLFromFilePath(path.resolve("fixture/cycle/detected/indirect/b.mjs"))
+            )
+          }),
+        import("./fixture/cycle/detected/self/a.mjs")
+          .then(() => assert.ok(false))
+          .catch((e) => {
+            assert.ok(e instanceof SyntaxError)
+            assert.strictEqual(
+              e.message,
+              "Detected cycle while resolving name 'x' in ES module: " +
+              getURLFromFilePath(path.resolve("fixture/cycle/detected/self/a.mjs"))
+            )
+          })
+      ])
+  )
+
   it("should support evaled dynamic import in ESM", () => {
     const code = `
       Promise
