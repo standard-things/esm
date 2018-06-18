@@ -332,14 +332,20 @@ function createOptions(value) {
     throw new ERR_INVALID_ESM_OPTION("debug", debug)
   }
 
-  const { mainFields } = options
+  let { mainFields } = options
 
   if (Array.isArray(mainFields)) {
+    mainFields =
     options.mainFields = Array.from(mainFields)
   } else if (typeof mainFields === "string") {
+    mainFields =
     options.mainFields = [mainFields]
   } else {
     throw new ERR_INVALID_ESM_OPTION("mainFields", mainFields)
+  }
+
+  if (mainFields.indexOf("main") === -1) {
+    mainFields.push("main")
   }
 
   const { mode } = options

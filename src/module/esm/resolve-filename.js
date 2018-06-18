@@ -47,13 +47,13 @@ const {
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
-const esmExts = [".mjs", ".js", ".json", ".node"]
-const noExts = []
+const emptyArray = []
+const strictExts = [".mjs", ".js", ".json", ".node"]
+const strictFields = ["main"]
+const strictExtsLookup = { __proto__: null }
 
-const esmExtsLookup = { __proto__: null }
-
-for (const ext of esmExts) {
-  esmExtsLookup[ext] = true
+for (const ext of strictExts) {
+  strictExtsLookup[ext] = true
 }
 
 function resolveFilename(request, parent, isMain, options) {
@@ -84,25 +84,19 @@ function resolveFilename(request, parent, isMain, options) {
 
   const isAbs = isAbsolutePath(request)
   const fromPath = getModuleDirname(isAbs ? request : parent)
+  const pkgOptions = Package.get(fromPath).options
 
-  const pkg = Package.get(fromPath)
-  const pkgOptions = pkg && pkg.options
-
-  let autoMode =
-    pkgOptions &&
-    pkgOptions.mode === OPTIONS_MODE_AUTO
-
-  let cjsPaths =
-    pkgOptions &&
-    pkgOptions.cjs.paths
+  let autoMode = pkgOptions.mode === OPTIONS_MODE_AUTO
+  let cjsPaths = pkgOptions.cjs.paths
+  let fields = pkgOptions.mainFields
 
   if (isMJS(parent)) {
     autoMode =
     cjsPaths = false
+    fields = strictFields
   }
 
   let foundPath
-  let skipWarnings = false
 
   if (! hasEncodedSep(request)) {
     const isRel = ! isAbs && isRelativePath(request)
@@ -122,7 +116,7 @@ function resolveFilename(request, parent, isMain, options) {
       }
 
       if (foundPath) {
-        foundPath = _resolveFilename(foundPath, parent, isMain, options, true, true, noExts)
+        foundPath = _resolveFilename(foundPath, parent, isMain, options, emptyArray, emptyArray, true)
       }
     } else {
       let pathname = request
@@ -138,7 +132,7 @@ function resolveFilename(request, parent, isMain, options) {
       // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
       const skipGlobalPaths = ! cjsPaths
 
-      foundPath = _resolveFilename(decoded, parent, isMain, options, skipWarnings, skipGlobalPaths, esmExts)
+      foundPath = _resolveFilename(decoded, parent, isMain, options, fields, strictExts, skipGlobalPaths)
 
       if (! foundPath &&
           Reflect.has(builtinLookup, decoded)) {
@@ -151,15 +145,14 @@ function resolveFilename(request, parent, isMain, options) {
     if (autoMode ||
         cjsPaths ||
         isMain ||
-        Reflect.has(esmExtsLookup, extname(foundPath))) {
+        Reflect.has(strictExtsLookup, extname(foundPath))) {
       return cache[cacheKey] = foundPath
     }
 
     throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
   }
 
-  skipWarnings = true
-  foundPath = _resolveFilename(request, parent, isMain, options, skipWarnings)
+  foundPath = _resolveFilename(request, parent, isMain, options, fields)
 
   if (foundPath) {
     throw new ERR_MODULE_RESOLUTION_LEGACY(request, fromPath, foundPath)
@@ -168,7 +161,7 @@ function resolveFilename(request, parent, isMain, options) {
   throw new MODULE_NOT_FOUND(request)
 }
 
-function _resolveFilename(request, parent, isMain, options, skipWarnings, skipGlobalPaths, searchExts) {
+function _resolveFilename(request, parent, isMain, options, fields, exts, skipGlobalPaths) {
   let paths
 
   if (options &&
@@ -197,7 +190,7 @@ function _resolveFilename(request, parent, isMain, options, skipWarnings, skipGl
     paths = _resolveLookupPaths(request, parent, skipGlobalPaths)
   }
 
-  return _findPath(request, paths, isMain, searchExts)
+  return _findPath(request, paths, isMain, fields, exts)
 }
 
 export default resolveFilename

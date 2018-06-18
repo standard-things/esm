@@ -8,7 +8,6 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 import Module from "../module.js"
-import Package from "../package.js"
 
 import binding from "../binding.js"
 import isMJS from "../util/is-mjs.js"
@@ -31,8 +30,9 @@ const {
 
 const { preserveSymlinks, preserveSymlinksMain } = binding.config
 const mainFieldRegExp = /"main"/
+const mainFields = ["main"]
 
-function findPath(request, paths, isMain, searchExts) {
+function findPath(request, paths, isMain, fields, exts) {
   if (isAbsolute(request)) {
     paths = [""]
   } else if (! paths || ! paths.length) {
@@ -44,7 +44,8 @@ function findPath(request, paths, isMain, searchExts) {
   const cacheKey =
     request + "\0" +
     safeToString(paths) +
-    (searchExts ? "\0" + safeToString(searchExts) : "")
+    (fields ? "\0" + safeToString(fields) : "") +
+    (exts ? "\0" + safeToString(exts) : "")
 
   if (Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
@@ -94,22 +95,26 @@ function findPath(request, paths, isMain, searchExts) {
       }
 
       if (! filename) {
-        if (searchExts === void 0) {
-          searchExts = keys(Module._extensions)
+        if (exts === void 0) {
+          exts = keys(Module._extensions)
         }
 
-        filename = tryExtensions(basePath, searchExts, isMain)
+        filename = tryExtensions(basePath, exts, isMain)
       }
     }
 
     if (isDir && ! filename) {
-      if (searchExts === void 0) {
-        searchExts = keys(Module._extensions)
+      if (exts === void 0) {
+        exts = keys(Module._extensions)
+      }
+
+      if (fields === void 0) {
+        fields = mainFields
       }
 
       filename =
-        tryPackage(basePath, searchExts, isMain) ||
-        tryExtensions(resolve(basePath, "index"), searchExts, isMain)
+        tryPackage(basePath, fields, exts, isMain) ||
+        tryExtensions(resolve(basePath, "index"), exts, isMain)
     }
 
     if (filename) {
@@ -156,7 +161,7 @@ function tryExtensions(thePath, exts, isMain) {
   return ""
 }
 
-function tryField(fieldPath, basePath, exts, isMain) {
+function tryField(basePath, fieldPath, exts, isMain) {
   if (typeof fieldPath !== "string") {
     return ""
   }
@@ -182,25 +187,17 @@ function tryFilename(filename, isMain) {
   return realpath(filename)
 }
 
-function tryPackage(dirPath, exts, isMain) {
+function tryPackage(dirPath, fields, exts, isMain) {
   const json = readPackage(dirPath)
 
   if (! json) {
     return ""
   }
 
-  let { mainFields } = Package.state.default.options
+  for (const field of fields) {
+    const filename = tryField(dirPath, json[field], exts, isMain)
 
-  if (mainFields.length === 1
-      ? mainFields[0] !== "main"
-      : mainFields.indexOf("main") === -1) {
-    mainFields = mainFields.concat("main")
-  }
-
-  for (const mainField of mainFields) {
-    const filename = tryField(json[mainField], dirPath, exts, isMain)
-
-    if (mainField === "main" ||
+    if (field === "main" ||
         ! isMJS(filename)) {
       return filename
     }
