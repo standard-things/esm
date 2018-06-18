@@ -1,6 +1,10 @@
+import SemVer from "semver"
+
 import assert from "assert"
 
-const canTestLiveBinding = Reflect.has(process.versions, "v8")
+const canTestLiveBinding =
+  Reflect.has(process.versions, "v8") &&
+  SemVer.satisfies(process.version, ">=6.2.0")
 
 describe("import declarations", () => {
   it("should support same symbol as different locals", () =>
