@@ -78,8 +78,8 @@ function findPath(request, paths, isMain, fields, exts) {
 
     let filename
 
-    const basePath = resolve(curPath, request)
-    const rc = stat(basePath)
+    const thePath = resolve(curPath, request)
+    const rc = stat(thePath)
     const isFile = rc === 0
     const isDir = rc === 1
 
@@ -88,9 +88,9 @@ function findPath(request, paths, isMain, fields, exts) {
         if (isMain
             ? preserveSymlinksMain
             : preserveSymlinks) {
-          filename = resolve(basePath)
+          filename = resolve(thePath)
         } else {
-          filename = realpath(basePath)
+          filename = realpath(thePath)
         }
       }
 
@@ -99,7 +99,7 @@ function findPath(request, paths, isMain, fields, exts) {
           exts = keys(Module._extensions)
         }
 
-        filename = tryExtensions(basePath, exts, isMain)
+        filename = tryExtensions(thePath, exts, isMain)
       }
     }
 
@@ -113,8 +113,8 @@ function findPath(request, paths, isMain, fields, exts) {
       }
 
       filename =
-        tryPackage(basePath, fields, exts, isMain) ||
-        tryExtensions(resolve(basePath, "index"), exts, isMain)
+        tryPackage(thePath, fields, exts, isMain) ||
+        tryExtensions(resolve(thePath, "index"), exts, isMain)
     }
 
     if (filename) {
@@ -161,12 +161,12 @@ function tryExtensions(thePath, exts, isMain) {
   return ""
 }
 
-function tryField(basePath, fieldPath, exts, isMain) {
+function tryField(dirPath, fieldPath, exts, isMain) {
   if (typeof fieldPath !== "string") {
     return ""
   }
 
-  const thePath = resolve(basePath, fieldPath)
+  const thePath = resolve(dirPath, fieldPath)
 
   return tryFilename(thePath, isMain) ||
     tryExtensions(thePath, exts, isMain) ||
