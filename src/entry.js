@@ -529,11 +529,11 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
       return true
     }
 
-    const NsError = Reflect.has(source.namespace, name)
-      ? ERR_NS_REDEFINITION
-      : ERR_NS_DEFINITION
-
-    throw new NsError(entry.module, name)
+    if (Reflect.has(source.namespace, name)) {
+      throw new ERR_NS_REDEFINITION(entry.module, name)
+    } else {
+      throw new ERR_NS_DEFINITION(entry.module, name)
+    }
   }
 
   handler.deleteProperty = (target, name) => {
