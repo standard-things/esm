@@ -191,7 +191,9 @@ function tryPackage(dirPath, exts, isMain) {
 
   let { mainFields } = Package.state.default.options
 
-  if (mainFields.indexOf("main") === -1) {
+  if (mainFields.length === 1
+      ? mainFields[0] !== "main"
+      : mainFields.indexOf("main") === -1) {
     mainFields = mainFields.concat("main")
   }
 
