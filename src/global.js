@@ -1,8 +1,8 @@
 import OwnProxy from "./own/proxy.js"
 
 import builtinEntries from "./builtin-entries.js"
-import has from "./util/has.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
+import isUpdatableProperty from "./util/is-updatable-property.js"
 import shared from "./shared.js"
 
 function init() {
@@ -20,8 +20,7 @@ function init() {
         const newValue = getConsole()
 
         if (newValue !== value &&
-            (! has(target, name) ||
-             isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+            isUpdatableProperty(target, name)) {
           return newValue
         }
       }

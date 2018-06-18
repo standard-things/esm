@@ -3,7 +3,6 @@ import SafeObject from "../safe/object.js"
 
 import getGetter from "./get-getter.js"
 import getSetter from "./get-setter.js"
-import has from "./has.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
 import isDate from "./is-date.js"
 import isExternal from "./is-external.js"
@@ -20,6 +19,7 @@ import isStringObject from "./is-string-object.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
+import isUpdatableProperty from "./is-updatable-property.js"
 import keys from "./keys.js"
 import shared from "../shared.js"
 
@@ -233,8 +233,7 @@ function init() {
         newValue = maybeWrap(target, name, newValue)
 
         if (newValue !== value &&
-            (! has(target, name) ||
-              isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+            isUpdatableProperty(target, name)) {
           return newValue
         }
 
@@ -269,8 +268,7 @@ function init() {
           const newValue = getToStringTag(target, value)
 
           if (newValue !== value &&
-              (! has(target, name) ||
-               isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+              isUpdatableProperty(target, name)) {
             return newValue
           }
         }
