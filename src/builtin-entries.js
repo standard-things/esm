@@ -5,7 +5,7 @@ import builtinIds from "./builtin-ids.js"
 import builtinModules from "./builtin-modules.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
-import isUpdatableProperty from "./util/is-updatable-property.js"
+import isUpdatableGet from "./util/is-updatable-get.js"
 import maskFunction from "./util/mask-function.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
@@ -62,7 +62,7 @@ function createEntry(id) {
         }
 
         if (newValue !== value &&
-            isUpdatableProperty(target, name)) {
+            isUpdatableGet(target, name)) {
           return newValue
         }
 
@@ -90,7 +90,7 @@ function createEntry(id) {
         const value = Reflect.get(target, name, receiver)
 
         if (value === func &&
-            isUpdatableProperty(target, name)) {
+            isUpdatableGet(target, name)) {
           return exported
         }
 

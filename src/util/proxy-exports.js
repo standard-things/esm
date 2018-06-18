@@ -19,7 +19,8 @@ import isStringObject from "./is-string-object.js"
 import isWeakMap from "./is-weak-map.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
-import isUpdatableProperty from "./is-updatable-property.js"
+import isUpdatableGet from "./is-updatable-get.js"
+import isUpdatableSet from "./is-updatable-set.js"
 import keys from "./keys.js"
 import shared from "../shared.js"
 
@@ -162,7 +163,16 @@ function init() {
       },
       set(target, name, value, receiver) {
         if (typeof value === "function") {
-          value = cached.unwrap.get(value) || value
+          const newValue = cached.unwrap.get(value) || value
+
+          if (newValue !== value &&
+              isUpdatableSet(target, name)) {
+            value = newValue
+          }
+        }
+
+        if (receiver === proxy) {
+          receiver = target
         }
 
         const accessor = getSetter(target, name)
@@ -173,6 +183,7 @@ function init() {
           } else if (Reflect.has(entry._namespace, name)) {
             entry.update(name)
           }
+
           return true
         }
 
@@ -233,7 +244,7 @@ function init() {
         newValue = maybeWrap(target, name, newValue)
 
         if (newValue !== value &&
-            isUpdatableProperty(target, name)) {
+            isUpdatableGet(target, name)) {
           return newValue
         }
 
@@ -268,7 +279,7 @@ function init() {
           const newValue = getToStringTag(target, value)
 
           if (newValue !== value &&
-              isUpdatableProperty(target, name)) {
+              isUpdatableGet(target, name)) {
             return newValue
           }
         }

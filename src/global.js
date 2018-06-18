@@ -2,7 +2,7 @@ import OwnProxy from "./own/proxy.js"
 
 import builtinEntries from "./builtin-entries.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
-import isUpdatableProperty from "./util/is-updatable-property.js"
+import isUpdatableGet from "./util/is-updatable-get.js"
 import shared from "./shared.js"
 
 function init() {
@@ -20,7 +20,7 @@ function init() {
         const newValue = getConsole()
 
         if (newValue !== value &&
-            isUpdatableProperty(target, name)) {
+            isUpdatableGet(target, name)) {
           return newValue
         }
       }
@@ -38,6 +38,10 @@ function init() {
       return descriptor
     },
     set(target, name, value, receiver) {
+      if (receiver === proxy) {
+        receiver = target
+      }
+
       if (Reflect.set(target, name, value, receiver)) {
         if (name === "console") {
           Reflect.deleteProperty(handler, "get")

@@ -12,7 +12,7 @@ import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
-import isUpdatableProperty from "./is-updatable-property.js"
+import isUpdatableGet from "./is-updatable-get.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toNamespaceObject from "./to-namespace-object.js"
@@ -182,7 +182,7 @@ function init() {
         }
 
         if (newValue !== value &&
-            isUpdatableProperty(target, name)) {
+            isUpdatableGet(target, name)) {
           return newValue
         }
 

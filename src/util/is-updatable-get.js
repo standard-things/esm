@@ -1,4 +1,4 @@
-function isUpdatableProperty(object, name) {
+function isUpdatableGet(object, name) {
   const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
 
   if (descriptor) {
@@ -18,4 +18,4 @@ function isUpdatableProperty(object, name) {
   return true
 }
 
-export default isUpdatableProperty
+export default isUpdatableGet
