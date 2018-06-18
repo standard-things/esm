@@ -120,66 +120,73 @@ function init() {
 
     const proxy = new OwnProxy(target, {
       get: (target, name, receiver) => {
-        const { customInspectKey } = shared
-
         if (receiver === proxy) {
           receiver = target
         }
 
+        const { customInspectKey } = shared
         const value = Reflect.get(target, name, receiver)
+
+        let newValue = value
 
         if ((name === customInspectKey ||
              name === "inspect") &&
             value === getExportedInspect()) {
-          return realUtil.inspect
-        }
-
-        if (inspecting ||
+          newValue = realUtil.inspect
+        } else if (inspecting ||
             name !== customInspectKey) {
           if (name === "toString" &&
               typeof value === "function") {
-            return GenericFunction.bind(value, target)
+            newValue = GenericFunction.bind(value, target)
+          } else {
+            return value
           }
+        } else {
+          newValue = (...args) => {
+            inspecting = true
 
-          return value
-        }
+            let [recurseTimes, context] = args
 
-        return (...args) => {
-          inspecting = true
+            const contextAsOptions = assign({}, context)
 
-          let [recurseTimes, context] = args
+            contextAsOptions.customInspect = customInspect
+            contextAsOptions.showProxy = showProxy
+            contextAsOptions.depth = recurseTimes
 
-          const contextAsOptions = assign({}, context)
-
-          contextAsOptions.customInspect = customInspect
-          contextAsOptions.showProxy = showProxy
-          contextAsOptions.depth = recurseTimes
-
-          try {
-            if (target === uninitializedValue) {
-              return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
-            }
-
-            if (isModuleNamespaceObject(target)) {
-              return formatNamespaceObject(target, contextAsOptions)
-            }
-
-            if (! showProxy ||
-                ! isProxy(target) ||
-                isOwnProxy(target)) {
-              if (typeof value !== "function") {
-                contextAsOptions.customInspect = true
+            try {
+              if (target === uninitializedValue) {
+                return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
               }
 
-              contextAsOptions.showProxy = false
-              return safeInspect(proxy, contextAsOptions)
-            }
+              if (isModuleNamespaceObject(target)) {
+                return formatNamespaceObject(target, contextAsOptions)
+              }
 
-            return formatProxy(target, contextAsOptions)
-          } finally {
-            inspecting = false
+              if (! showProxy ||
+                  ! isProxy(target) ||
+                  isOwnProxy(target)) {
+                if (typeof value !== "function") {
+                  contextAsOptions.customInspect = true
+                }
+
+                contextAsOptions.showProxy = false
+                return safeInspect(proxy, contextAsOptions)
+              }
+
+              return formatProxy(target, contextAsOptions)
+            } finally {
+              inspecting = false
+            }
           }
         }
+
+        if (newValue !== value &&
+            (! has(target, name) ||
+             isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+          return newValue
+        }
+
+        return value
       },
 
       getOwnPropertyDescriptor: (target, name) => {

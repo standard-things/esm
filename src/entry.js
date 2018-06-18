@@ -451,10 +451,11 @@ class Entry {
 
 function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
   handler.get = (target, name, receiver) => {
-    const getter = entry.getters[name]
     const { namespace } = source
 
     if (entry.type === TYPE_ESM) {
+      const getter = entry.getters[name]
+
       if (getter) {
         getter()
       } else if (typeof name === "string" &&

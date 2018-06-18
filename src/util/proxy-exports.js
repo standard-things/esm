@@ -3,6 +3,7 @@ import SafeObject from "../safe/object.js"
 
 import getGetter from "./get-getter.js"
 import getSetter from "./get-setter.js"
+import has from "./has.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
 import isDate from "./is-date.js"
 import isExternal from "./is-external.js"
@@ -56,12 +57,11 @@ function init() {
     }
 
     const get = (target, name, receiver) => {
-      const accessor = getGetter(target, name)
-
       if (receiver === proxy) {
         receiver = target
       }
 
+      const accessor = getGetter(target, name)
       const value = Reflect.get(target, name, receiver)
 
       if (accessor) {
@@ -219,16 +219,26 @@ function init() {
 
     if (useWrappers) {
       handler.get = (target, name, receiver) => {
-        let value = get(target, name, receiver)
+        const value = get(target, name, receiver)
+
+        let newValue = value
 
         // Produce a `Symbol.toStringTag` value, otherwise
         // `Object.prototype.toString.call(proxy)` will return
         // "[object Function]", if `proxy` is a function, else "[object Object]".
         if (name === Symbol.toStringTag) {
-          value = getToStringTag(target, value)
+          newValue = getToStringTag(target, value)
         }
 
-        return maybeWrap(target, name, value)
+        newValue = maybeWrap(target, name, newValue)
+
+        if (newValue !== value &&
+            (! has(target, name) ||
+              isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+          return newValue
+        }
+
+        return value
       }
 
       handler.getOwnPropertyDescriptor = (target, name) => {
@@ -255,9 +265,17 @@ function init() {
 
         const value = Reflect.get(target, name, receiver)
 
-        return name === Symbol.toStringTag
-          ? getToStringTag(target, value)
-          : value
+        if (name === Symbol.toStringTag) {
+          const newValue = getToStringTag(target, value)
+
+          if (newValue !== value &&
+              (! has(target, name) ||
+               isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+            return newValue
+          }
+        }
+
+        return value
       }
     }
 

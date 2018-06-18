@@ -1,6 +1,7 @@
 import OwnProxy from "./own/proxy.js"
 
 import builtinEntries from "./builtin-entries.js"
+import has from "./util/has.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import shared from "./shared.js"
 
@@ -9,15 +10,23 @@ function init() {
 
   const handler = {
     get(target, name, receiver) {
-      if (name === "console") {
-        return getConsole()
-      }
-
       if (receiver === proxy) {
         receiver = target
       }
 
-      return Reflect.get(target, name, receiver)
+      const value = Reflect.get(target, name, receiver)
+
+      if (name === "console") {
+        const newValue = getConsole()
+
+        if (newValue !== value &&
+            (! has(target, name) ||
+             isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+          return newValue
+        }
+      }
+
+      return value
     },
     getOwnPropertyDescriptor(target, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(target, name)

@@ -3,6 +3,7 @@ import OwnProxy from "./own/proxy.js"
 
 import builtinIds from "./builtin-ids.js"
 import builtinModules from "./builtin-modules.js"
+import has from "./util/has.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import maskFunction from "./util/mask-function.js"
@@ -46,17 +47,27 @@ function createEntry(id) {
 
     const proxyFunc = new OwnProxy(func, {
       get(target, name, receiver) {
-        if (name === Symbol.hasInstance) {
-          return hasInstance
-        }
-
         if (receiver === proxyFunc) {
           receiver = target
         }
 
         const value = Reflect.get(target, name, receiver)
 
-        return value === proto ? proxyProto : value
+        let newValue = value
+
+        if (name === Symbol.hasInstance) {
+          newValue = hasInstance
+        } else if (value === proto) {
+          newValue = proxyProto
+        }
+
+        if (newValue !== value &&
+            (! has(target, name) ||
+             isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+          return newValue
+        }
+
+        return value
       },
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
@@ -79,7 +90,13 @@ function createEntry(id) {
 
         const value = Reflect.get(target, name, receiver)
 
-        return value === func ? exported : value
+        if (value === func &&
+            (! has(target, name) ||
+             isUpdatableDescriptor(Reflect.getOwnPropertyDescriptor(target, name)))) {
+          return exported
+        }
+
+        return value
       },
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
