@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-node -r esm $*
+exec node -r esm $*
