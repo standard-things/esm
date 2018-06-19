@@ -8,54 +8,54 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 function init() {
   const { isFile } = Stats.prototype
 
-  function stat(filename) {
-    if (typeof filename !== "string") {
+  function stat(thePath) {
+    if (typeof thePath !== "string") {
       return -1
     }
 
     const cache = shared.moduleState.stat
 
     if (cache &&
-        Reflect.has(cache, filename)) {
-      return cache[filename]
+        Reflect.has(cache, thePath)) {
+      return cache[thePath]
     }
 
-    const result = statBase(filename)
+    const result = statBase(thePath)
 
     if (cache) {
-      cache[filename] = result
+      cache[thePath] = result
     }
 
     return result
   }
 
-  function statBase(filename) {
+  function statBase(thePath) {
     const { fastPath } = shared
 
     if (fastPath.stat) {
       try {
-        return statFastPath(filename)
+        return statFastPath(thePath)
       } catch (e) {
         fastPath.stat = false
       }
     }
 
-    return statFallback(filename)
+    return statFallback(thePath)
   }
 
-  function statFallback(filename) {
+  function statFallback(thePath) {
     try {
-      return call(isFile, statSync(filename)) ? 0 : 1
+      return call(isFile, statSync(thePath)) ? 0 : 1
     } catch (e) {}
 
     return -1
   }
 
-  function statFastPath(filename) {
+  function statFastPath(thePath) {
     // Used to speed up loading. Returns 0 if the path refers to a file,
     // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
     // comes from not creating thousands of Stat and Error objects.
-    return binding.fs.internalModuleStat(toNamespacedPath(filename))
+    return binding.fs.internalModuleStat(toNamespacedPath(thePath))
   }
 
   return stat
