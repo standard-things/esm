@@ -1,7 +1,7 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const { defineProperty } = Reflect
+const { apply, defineProperty } = Reflect
 const { freeze } = Object
 
 const { chakracore } = process.versions
@@ -14,13 +14,15 @@ const { Script } = require("vm")
 const { runInNewContext, runInThisContext } = Script.prototype
 
 const {
-  existsSync,
+  Stats,
   mkdirSync,
   readFileSync,
+  statSync,
   unlinkSync,
   writeFileSync
 } = require("fs")
 
+const { isFile } = Stats.prototype
 const { sep } = require("path")
 
 const Module = require("module")
@@ -81,23 +83,7 @@ function compileESM() {
 
   if (changed) {
     if (scriptData) {
-      let canWrite = true
-      let thePath = cachePath
-
-      while (thePath !== __dirname) {
-        if (existsSync(thePath)) {
-          break
-        }
-
-        if (! mkdir(thePath)) {
-          canWrite = false
-          break
-        }
-
-        thePath = thePath.slice(0, thePath.lastIndexOf(sep))
-      }
-
-      if (canWrite) {
+      if (mkdirp(cachePath)) {
         writeFile(cacheFilename, scriptData)
       }
     } else {
@@ -140,6 +126,37 @@ function mkdir(dirPath) {
   return false
 }
 
+function mkdirp(dirPath) {
+  const paths = []
+
+  while (true) {
+    if (stat(dirPath) === 1) {
+      break
+    }
+
+    paths.push(dirPath)
+
+    const lastIndex = dirPath.lastIndexOf(sep)
+    const parentPath = lastIndex === -1 ? "." : dirPath.slice(0, lastIndex)
+
+    if (dirPath === parentPath) {
+      break
+    }
+
+    dirPath = parentPath
+  }
+
+  let { length } = paths
+
+  while (length--) {
+    if (! mkdir(paths[length])) {
+      return false
+    }
+  }
+
+  return true
+}
+
 function readFile(filename, options) {
   try {
     return readFileSync(filename, options)
@@ -156,6 +173,14 @@ function safeRequire(request) {
   try {
     return require(request)
   } catch (e) {}
+}
+
+function stat(thePath) {
+  try {
+    return apply(isFile, statSync(thePath), []) ? 0 : 1
+  } catch (e) {}
+
+  return -1
 }
 
 function writeFile(filename, options) {
