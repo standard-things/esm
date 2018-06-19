@@ -389,11 +389,9 @@ function init() {
       const entries = pendingWrites[cachePath]
 
       for (const cacheName in entries) {
-        const entry = entries[cacheName]
-
         // Add "main" to enable the `readFileFast` fast path of
         // `process.binding("fs").internalModuleReadJSON`.
-        const code = '"main";' + entry.compileData.code
+        const code = '"main";' + entries[cacheName].compileData.code
 
         if (writeFile(cachePath + sep + cacheName, code)) {
           removeExpired(cachePath, cacheName)
