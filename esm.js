@@ -4,11 +4,7 @@
 const { defineProperty } = Reflect
 const { freeze } = Object
 
-const { versions } = process
-const chakraVersion = versions.chakracore
-const engineVersion = versions.v8 || chakraVersion
-const nodeVersion = process.version
-
+const { chakracore } = process.versions
 const { filename, id } = module
 const bootstrap = id.startsWith("internal/")
   ? safeRequire("internal/bootstrap/loaders")
@@ -36,7 +32,6 @@ const useBuiltins = module.constructor.length > 1
 esmModule.filename = filename
 esmModule.parent = module.parent
 
-let createHash
 let esmRequire = require
 
 if (! useBuiltins &&
@@ -47,19 +42,16 @@ if (! useBuiltins &&
 
 function compileESM() {
   let cachedData
-  let cacheFilename
-  let cachePath
   let content
   let filename = "esm.js"
+
+  const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
+  const cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
+  const cacheFilename = cachePath + sep + ".loader.blob"
 
   if (NativeModule) {
     content = NativeModule._source["internal/esm/loader"]
   } else {
-    const cacheName = md5(nodeVersion + "\0" + engineVersion) + ".blob"
-    const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
-
-    cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
-    cacheFilename = cachePath + sep + cacheName
     cachedData = readFile(cacheFilename)
     content = readFile(loaderPath, "utf8")
     filename = __dirname + sep + filename
@@ -118,7 +110,7 @@ function compileESM() {
     filename
   }
 
-  if (chakraVersion) {
+  if (chakracore) {
     return runInThisContext.call(script, options)
   }
 
@@ -137,16 +129,6 @@ function loadESM() {
 
 function makeRequireFunction(mod, options) {
   return loadESM()(mod, options)
-}
-
-function md5(string) {
-  if (! createHash) {
-    createHash = require("crypto").createHash
-  }
-
-  return createHash("md5")
-    .update(string)
-    .digest("hex")
 }
 
 function mkdir(dirPath) {
