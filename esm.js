@@ -50,7 +50,6 @@ function compileESM() {
   let cacheFilename
   let cachePath
   let content
-  let nodeModulesPath
   let filename = "esm.js"
 
   if (NativeModule) {
@@ -59,8 +58,7 @@ function compileESM() {
     const cacheName = md5(nodeVersion + "\0" + engineVersion) + ".blob"
     const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
 
-    nodeModulesPath = __dirname + sep + "node_modules"
-    cachePath = nodeModulesPath + sep + ".cache"
+    cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
     cacheFilename = cachePath + sep + cacheName
     cachedData = readFile(cacheFilename)
     content = readFile(loaderPath, "utf8")
@@ -91,13 +89,20 @@ function compileESM() {
 
   if (changed) {
     if (scriptData) {
-      let canWrite = false
+      let canWrite = true
+      let thePath = cachePath
 
-      if (existsSync(nodeModulesPath)) {
-        canWrite = true
-      } else if (mkdir(nodeModulesPath) &&
-          mkdir(cachePath)) {
-        canWrite = true
+      while (thePath !== __dirname) {
+        if (existsSync(thePath)) {
+          break
+        }
+
+        if (! mkdir(thePath)) {
+          canWrite = false
+          break
+        }
+
+        thePath = thePath.slice(0, thePath.lastIndexOf(sep))
       }
 
       if (canWrite) {
