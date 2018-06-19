@@ -80,14 +80,12 @@ function compileESM() {
   let changed = false
   let scriptData = null
 
-  const { cachedDataRejected } = script
-
-  if (script.cachedDataProduced &&
-      ! cachedDataRejected) {
-    changed = ! cachedData
+  if (! cachedData &&
+      script.cachedData) {
+    changed = true
     scriptData = script.cachedData
   } else if (cachedData &&
-      cachedDataRejected) {
+      script.cachedDataRejected) {
     changed = true
   }
 

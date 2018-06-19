@@ -72,11 +72,8 @@ function compile(content, filename) {
   let changed = false
   let scriptData = null
 
-  const { cachedDataRejected } = script
-
-  if (script.cachedDataProduced &&
-      ! cachedDataRejected &&
-      ! cachedData) {
+  if (! cachedData &&
+      script.cachedData) {
     changed = true
     scriptData = script.cachedData
   }
@@ -85,7 +82,7 @@ function compile(content, filename) {
     if (scriptData) {
       compileData.scriptData = scriptData
     } else if (cachedData &&
-        cachedDataRejected) {
+        script.cachedDataRejected) {
       changed = true
 
       const { map } = cache
