@@ -67,8 +67,8 @@ function compileESM() {
     produceCachedData: ! NativeModule
   })
 
+  let scriptData
   let changed = false
-  let scriptData = null
 
   if (! cachedData &&
       script.cachedData) {
