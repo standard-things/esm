@@ -17,13 +17,8 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
-const colonPath = path.resolve(testPath, "fixture/with%3Acolon.mjs")
 const colonURL = testURL + "/fixture/with:colon.mjs"
-
-const hashPath = path.resolve(testPath, "fixture/with%23hash.mjs")
 const hashURL = testURL + "/fixture/with%23hash.mjs"
-
-const percentPath = path.resolve(testPath, "fixture/with%2520percent.mjs")
 const percentURL = testURL + "/fixture/with%2520percent.mjs"
 
 export default () => {

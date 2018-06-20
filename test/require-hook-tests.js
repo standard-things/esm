@@ -27,7 +27,7 @@ describe("require hook", () => {
   )
 
   it("should support named exports", () =>
-    import("./require-hook/named")
+    import("./require-hook/named-exports")
       .then((ns) => ns.default())
   )
 

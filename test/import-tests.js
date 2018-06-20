@@ -12,7 +12,12 @@ describe("import declarations", () => {
       .then((ns) => ns.default())
   )
 
-  it("should support mixed import styles for CJS and ES modules", () =>
+  it("should support mixed import styles of ES modules", () =>
+    import("./import/mixed.mjs")
+      .then((ns) => ns.default())
+  )
+
+  it("should support mixed import styles of CJS modules", () =>
     import("./cjs/import/mixed.mjs")
       .then((ns) => ns.default())
   )
@@ -20,17 +25,6 @@ describe("import declarations", () => {
   it("should support CJS modules setting `module.exports`", () =>
     import("./cjs/import/exports.js")
       .then((ns) => ns.default())
-  )
-
-  it("should parse URL ids", () =>
-    import("./import/url-ids.mjs")
-      .then((ns) => ns.default())
-  )
-
-  it("should not parse URL ids with encoded slashes", () =>
-    import("./import/url-slashes.mjs")
-      .then(() => assert.ok(false))
-      .catch((e) => assert.strictEqual(e.code, "MODULE_NOT_FOUND"))
   )
 
   ;(canTestLiveBinding ? it : xit)(

@@ -624,12 +624,15 @@ describe("Node rules", () => {
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
   })
 
-  it("should support URL requests in ESM", () =>
+  it("should support requests with URL query/fragments in ESM", () =>
     Promise
       .all([
         abcPath + "?a",
         abcPath + "#a",
-        abcPath.replace("abc", "%61%62%63")
+        abcPath.replace("abc", "%61%62%63"),
+        abcURL + "?a",
+        abcURL + "#a",
+        abcURL.replace("abc", "%61%62%63")
       ]
       .map((request) =>
         import(request)
@@ -695,13 +698,15 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should not support URL requests with encoded slashes", () =>
+  it("should not support requests with encoded slashes", () =>
     Promise
       .all([
         abcPath.replace(slashRegExp, "%2f"),
         abcPath.replace(slashRegExp, "%2F"),
         abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
-        abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F")
+        abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F"),
+        abcURL.replace(slashRegExp, "%2f"),
+        abcURL.replace(slashRegExp, "%2F")
       ]
       .map((request) =>
         import(request)
@@ -875,11 +880,6 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
-  it("should export CJS `module.exports` as default", () =>
-    import("./misc/export/cjs-default.mjs")
-      .then((ns) => ns.default())
-  )
-
   it("should load CJS modules that delete their cache entry", () => {
     return import("./fixture/delete-cache.js")
       .then((ns) => assert.strictEqual(ns.default, "delete cache"))
@@ -1035,8 +1035,8 @@ describe("spec compliance", () => {
       .then((ns) => ns.default())
   )
 
-  it("should not import CJS named binding in `.mjs` files", () =>
-    import("./fixture/import/cjs-named.mjs")
+  it("should not import CJS bindings in `.mjs` files", () =>
+    import("./fixture/import/cjs-bindings.mjs")
       .then(() => assert.ok(false))
       .catch((e) => {
         assert.ok(e instanceof SyntaxError)

@@ -1,6 +1,6 @@
 import assert from "assert"
-import def from "../fixture/cycle/named/a.mjs"
+import a from "../fixture/cycle/bindings/a.mjs"
 
 export default () => {
-  assert.strictEqual(def, true)
+  assert.strictEqual(a, "a")
 }
