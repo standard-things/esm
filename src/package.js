@@ -251,7 +251,13 @@ function createCJS(value) {
 
     for (const name of possibleNames) {
       if (Reflect.has(defaultCJS, name)) {
-        options[name] = !! value[name]
+        const optionsValue = value[name]
+
+        if (isFlag(optionsValue)) {
+          options[name] = !! optionsValue
+        } else {
+          throw new ERR_INVALID_ESM_OPTION("cjs[" + toStringLiteral(name) + "]", optionsValue)
+        }
       } else {
         throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name) + "]")
       }
