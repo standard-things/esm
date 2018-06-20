@@ -177,9 +177,10 @@ function init() {
     return "Cannot load ES module from .mjs: " + getModuleURL(request)
   }
 
-  function invalidPkgOption(name, value) {
+  function invalidPkgOption(name, value, unquoted) {
     return "The esm@" + PKG_VERSION +
-      " option '" + name + "' is invalid. Received " + truncInspect(value)
+      " option " + (unquoted ? name : toStringLiteral(name, "'")) +
+      " is invalid. Received " + truncInspect(value)
   }
 
   function invalidProtocol(protocol, expected) {

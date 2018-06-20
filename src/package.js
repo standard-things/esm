@@ -256,10 +256,14 @@ function createCJS(value) {
         if (isFlag(optionsValue)) {
           options[name] = !! optionsValue
         } else {
-          throw new ERR_INVALID_ESM_OPTION("cjs[" + toStringLiteral(name) + "]", optionsValue)
+          throw new ERR_INVALID_ESM_OPTION(
+            "cjs[" + toStringLiteral(name, "'") + "]",
+            optionsValue,
+            true
+          )
         }
       } else {
-        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name) + "]")
+        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, "'") + "]")
       }
     }
 
