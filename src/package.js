@@ -332,14 +332,24 @@ function createOptions(value) {
     throw new ERR_INVALID_ESM_OPTION("debug", debug)
   }
 
+  const defaultMainFields = defaultOptions.mainFields
+
   let { mainFields } = options
 
   if (Array.isArray(mainFields)) {
-    mainFields =
-    options.mainFields = Array.from(mainFields)
+    if (mainFields === defaultMainFields) {
+      mainFields = [defaultMainFields[0]]
+    } else {
+      mainFields = Array.from(mainFields, (field) => {
+        if (typeof field !== "string") {
+          throw new ERR_INVALID_ESM_OPTION("mainFields", mainFields)
+        }
+
+        return field
+      })
+    }
   } else if (typeof mainFields === "string") {
-    mainFields =
-    options.mainFields = [mainFields]
+    mainFields = [mainFields]
   } else {
     throw new ERR_INVALID_ESM_OPTION("mainFields", mainFields)
   }
@@ -347,6 +357,8 @@ function createOptions(value) {
   if (mainFields.indexOf("main") === -1) {
     mainFields.push("main")
   }
+
+  options.mainFields = mainFields
 
   const { mode } = options
 
