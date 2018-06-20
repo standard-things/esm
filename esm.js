@@ -3,15 +3,16 @@
 
 const { apply, defineProperty } = Reflect
 const { freeze } = Object
-
 const { chakracore } = process.versions
 const { filename, id } = module
+
 const bootstrap = id.startsWith("internal/")
   ? safeRequire("internal/bootstrap/loaders")
   : void 0
 
 const { Script } = require("vm")
 const { runInNewContext, runInThisContext } = Script.prototype
+const { sep } = require("path")
 
 const {
   Stats,
@@ -23,7 +24,6 @@ const {
 } = require("fs")
 
 const { isFile } = Stats.prototype
-const { sep } = require("path")
 
 const Module = require("module")
 const NativeModule = bootstrap && bootstrap.NativeModule
@@ -97,7 +97,7 @@ function compileESM() {
   }
 
   if (chakracore) {
-    return runInThisContext.call(script, options)
+    return apply(runInThisContext, script, [options])
   }
 
   const context = {
@@ -105,7 +105,7 @@ function compileESM() {
     global
   }
 
-  return runInNewContext.call(script, context, options)
+  return apply(runInNewContext, script, [context, options])
 }
 
 function loadESM() {
