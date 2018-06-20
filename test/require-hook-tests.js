@@ -37,7 +37,7 @@ describe("require hook", () => {
   )
 
   it("should support `options.mainFields`", () =>
-    import("./require-hook/main-fields.mjs")
+    import("./require-hook/main-fields")
       .then((ns) => ns.default())
   )
 
