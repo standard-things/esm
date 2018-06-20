@@ -474,7 +474,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
   handler.getOwnPropertyDescriptor = (target, name) => {
     const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-    if (isUpdatableDescriptor(descriptor)) {
+    if (descriptor) {
       descriptor.value = handler.get(target, name)
     }
 
@@ -554,8 +554,6 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
 }
 
 function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
-  const { getOwnPropertyDescriptor } = handler
-
   handler.defineProperty = (target, name, descriptor) => {
     SafeObject.defineProperty(entry.exports, name, descriptor)
 
@@ -583,11 +581,19 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
   }
 
   handler.getOwnPropertyDescriptor = (target, name) => {
-    const exported = entry.exports
+    const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-    return has(exported, name)
-      ? Reflect.getOwnPropertyDescriptor(exported, name)
-      : getOwnPropertyDescriptor(target, name)
+    if (isUpdatableDescriptor(descriptor)) {
+      const exported = entry.exports
+
+      if (has(exported, name)) {
+        return Reflect.getOwnPropertyDescriptor(exported, name)
+      }
+
+      descriptor.value = handler.get(target, name)
+    }
+
+    return descriptor
   }
 
   handler.set = (target, name, value, receiver) => {
