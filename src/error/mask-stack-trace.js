@@ -5,23 +5,32 @@ import Module from "../module.js"
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getModuleURL from "../util/get-module-url.js"
 import isParseError from "../util/is-parse-error.js"
-import safeToString from "../util/safe-to-string.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 
 const {
   ZERO_WIDTH_NOBREAK_SPACE
 } = CHAR
 
-const engineMessageRegExp = /^.+?:(\d+)(?=\n)/
-const parserMessageRegExp = /^(.+?): (.+?) \((\d+):(\d+)\)(?=\n)/
-
 const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
 const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
 const blankRegExp = /^\s*$/
+const engineLineRegExp = /^.+?:(\d+)(?=\n)/
 const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
 function maskStackTrace(error, content, filename, isESM) {
   decorateStackTrace(error)
+
+  let column
+  let line
+
+  const fromParser = isParseError(error)
+
+  if (fromParser) {
+    column = error.column
+    line = error.line
+    Reflect.deleteProperty(error, "column")
+    Reflect.deleteProperty(error, "line")
+  }
 
   let { stack } = error
 
@@ -29,7 +38,7 @@ function maskStackTrace(error, content, filename, isESM) {
     return error
   }
 
-  const message = safeToString(error)
+  const oldToStringed = error.name + ": " + error.message
 
   // Defer any file read operations until `error.stack` is accessed. Ideally,
   // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
@@ -38,24 +47,21 @@ function maskStackTrace(error, content, filename, isESM) {
   Reflect.defineProperty(error, "stack", {
     configurable: true,
     get() {
-      this.stack = void 0
+      this.stack = ""
 
-      const newMessage = safeToString(this)
+      const { message, name } = this
+      const newToStringed = name + ": " + message
+
+      stack = stack.replace(oldToStringed, newToStringed)
+      stack = fromParser
+        ? maskParserStack(stack, name, message, line, column, content, filename)
+        : maskEngineStack(stack, content, filename)
 
       const scrubber = isESM
         ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
         : (stack) => scrubStackTrace(stack)
 
-      let masker = maskEngineStack
-
-      if (isParseError(this)) {
-        masker = maskParserStack
-      }
-
-      stack = stack.replace(message, newMessage)
-      stack = masker(stack, content, filename)
-      stack = withoutMessage(stack, newMessage, scrubber)
-
+      stack = withoutMessage(stack, newToStringed, scrubber)
       return this.stack = stack
     },
     set(value) {
@@ -71,18 +77,18 @@ function maskStackTrace(error, content, filename, isESM) {
 }
 
 function maskEngineStack(stack, content, filename) {
-  const parts = engineMessageRegExp.exec(stack)
+  const match = engineLineRegExp.exec(stack)
 
   if (typeof filename === "string" &&
       ! headerRegExp.test(stack)) {
     stack = filename + ":1\n" + stack
   }
 
-  if (parts === null) {
+  if (match === null) {
     return stack
   }
 
-  const lineNum = +parts[1]
+  const line = +match[1]
 
   let arrowFound = false
 
@@ -98,13 +104,13 @@ function maskEngineStack(stack, content, filename) {
         return ""
       }
 
-      const lines = content.split("\n")
-      const line = lines[lineNum - 1] || ""
+      const codeLines = content.split("\n")
+      const codeLine = codeLines[line - 1] || ""
 
-      return line + (line ? "\n\n" : "\n")
+      return codeLine + (codeLine ? "\n\n" : "\n")
     }
 
-    if (lineNum === 1) {
+    if (line === 1) {
       const [prefix] = Module.wrapper
 
       if (snippet.startsWith(prefix)) {
@@ -131,44 +137,32 @@ function maskEngineStack(stack, content, filename) {
   }
 
   return stack.replace(headerRegExp, (match) => {
-    const lines = content.split("\n")
-    const line = lines[lineNum - 1] || ""
+    const codeLines = content.split("\n")
+    const codeLine = codeLines[line - 1] || ""
 
-    if (line) {
-      match += "\n" + line + "\n"
+    if (codeLine) {
+      match += "\n" + codeLine + "\n"
     }
 
     return match
   })
 }
 
-// Transform parser stack lines from:
-// <type>: <message> (<line>:<column>)
+// Transform parser stack codeLines from:
+// <type>: <message> (<codeLine>:<column>)
 //   ...
 // to:
-// path/to/file.js:<line>
-// <line of code, from the original source, where the error occurred>
+// path/to/file.js:<codeLine>
+// <codeLine of code, from the original source, where the error occurred>
 // <column indicator arrow>
 //
 // <type>: <message>
 //   ...
-function maskParserStack(stack, content, filename) {
-  const parts = parserMessageRegExp.exec(stack)
-
-  if (parts === null) {
-    return stack
-  }
-
-  const type = parts[1]
-  const message = parts[2]
-  const lineNum = +parts[3]
-  const lineIndex = lineNum - 1
-  const column = +parts[4]
+function maskParserStack(stack, name, message, line, column, content, filename) {
   const spliceArgs = [0, 1]
-  const stackLines = stack.split("\n")
 
   if (typeof filename === "string") {
-    spliceArgs.push(filename + ":" + lineNum)
+    spliceArgs.push(filename + ":" + line)
   }
 
   if (typeof content === "function") {
@@ -176,9 +170,10 @@ function maskParserStack(stack, content, filename) {
   }
 
   if (typeof content === "string") {
-    const lines = content.split("\n")
+    const codeLines = content.split("\n")
+    const lineIndex = line - 1
 
-    if (lineIndex < lines.length) {
+    if (lineIndex < codeLines.length) {
       let arrow = "^"
 
       if (message.startsWith("Export '")) {
@@ -186,11 +181,11 @@ function maskParserStack(stack, content, filename) {
         arrow = arrow.repeat(message.indexOf("'", 8) - 8)
       }
 
-      const line = lines[lineIndex]
+      const codeLine = codeLines[lineIndex]
 
-      if (! blankRegExp.test(line)) {
+      if (! blankRegExp.test(codeLine)) {
         spliceArgs.push(
-          line,
+          codeLine,
           " ".repeat(column) + arrow,
           ""
         )
@@ -198,7 +193,9 @@ function maskParserStack(stack, content, filename) {
     }
   }
 
-  spliceArgs.push(type + ": " + message)
+  const stackLines = stack.split("\n")
+
+  spliceArgs.push(name + ": " + message)
   stackLines.splice(...spliceArgs)
   return stackLines.join("\n")
 }

@@ -11,7 +11,8 @@ function init() {
 
         const { column, line } = getLineInfo(input, pos)
 
-        this.message += " (" + line + ":" + column + ")"
+        this.column = column
+        this.line = line
       }
     }
   }

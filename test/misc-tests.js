@@ -318,7 +318,7 @@ describe("errors", () => {
           .catch((e) =>
             checkErrorStack(e, [
               getURLFromFilePath(id1) + ":4",
-              "SyntaxError: Unexpected token"
+              "SyntaxError: Unexpected end of input"
             ].join("\n"))
           ),
         import(id4)
