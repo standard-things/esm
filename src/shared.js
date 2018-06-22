@@ -165,6 +165,10 @@ function init() {
     return false
   })
 
+  setDeferred(support, "createCachedData", () =>
+    typeof shared.module.safeVM.Script.prototype.createCachedData === "function"
+  )
+
   setDeferred(support, "getProxyDetails", () =>
     typeof shared.module.binding.util.getProxyDetails === "function"
   )

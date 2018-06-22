@@ -296,6 +296,8 @@ function init() {
       }
     }
 
+    const useCreateCachedData = shared.support.createCachedData
+
     for (const cachePath in pendingScripts) {
       if (! mkdirp(cachePath)) {
         continue
@@ -306,7 +308,7 @@ function init() {
       const scriptDatas = { __proto__: null }
       const scripts = pendingScripts[cachePath]
 
-      for (const cacheName of scripts) {
+      for (const cacheName in scripts) {
         const compileData = compileDatas[cacheName]
         const script = scripts[cacheName]
 
@@ -320,10 +322,15 @@ function init() {
         let scriptData
         let changed = false
 
-        if (! cachedData &&
-            script.cachedData) {
+        if (! cachedData) {
+          scriptData = useCreateCachedData
+            ? script.createCachedData()
+            : script.cachedData
+        }
+
+        if (scriptData &&
+            scriptData.length) {
           changed = true
-          scriptData = script.cachedData
         }
 
         if (compileData) {

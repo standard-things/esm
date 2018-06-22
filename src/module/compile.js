@@ -65,11 +65,22 @@ function compile(content, filename) {
       void 0
   }
 
-  const script = new realVM.Script(wrapper, {
-    cachedData,
-    filename,
-    produceCachedData: true
-  })
+  let scriptOptions
+
+  if (shared.support.createCachedData) {
+    scriptOptions = {
+      cachedData,
+      filename
+    }
+  } else {
+    scriptOptions = {
+      cachedData,
+      filename,
+      produceCachedData: true
+    }
+  }
+
+  const script = new realVM.Script(wrapper, scriptOptions)
 
   if (cachePath) {
     const pendingScripts =
