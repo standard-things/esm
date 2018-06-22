@@ -96,7 +96,7 @@ function init() {
       root: { __proto__: null },
       state: { __proto__: null }
     },
-    pendingMetas: { __proto__: null },
+    pendingScripts: { __proto__: null },
     pendingWrites: { __proto__: null },
     reloaded: false,
     safeContext: Function("return this")(),

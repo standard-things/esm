@@ -260,7 +260,7 @@ function init() {
   realProcess.once("exit", () => {
     realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
 
-    const { pendingMetas, pendingWrites } = shared
+    const { pendingScripts, pendingWrites } = shared
     const { dir } = shared.package
 
     for (const cachePath in dir) {
@@ -278,7 +278,7 @@ function init() {
         continue
       }
 
-      Reflect.deleteProperty(pendingMetas, cachePath)
+      Reflect.deleteProperty(pendingScripts, cachePath)
       Reflect.deleteProperty(pendingWrites, cachePath)
 
       if (! mkdirp(cachePath)) {
@@ -296,14 +296,63 @@ function init() {
       }
     }
 
-    for (const cachePath in pendingMetas) {
+    for (const cachePath in pendingScripts) {
       if (! mkdirp(cachePath)) {
         continue
       }
 
       const cache = dir[cachePath]
       const compileDatas = cache.compile
-      const scriptDatas = pendingMetas[cachePath]
+      const scriptDatas = { __proto__: null }
+      const scripts = pendingScripts[cachePath]
+
+      for (const cacheName of scripts) {
+        const compileData = compileDatas[cacheName]
+        const script = scripts[cacheName]
+
+        let cachedData
+
+        if (compileData &&
+            compileData !== true) {
+          cachedData = compileData.scriptData
+        }
+
+        let scriptData
+        let changed = false
+
+        if (! cachedData &&
+            script.cachedData) {
+          changed = true
+          scriptData = script.cachedData
+        }
+
+        if (compileData) {
+          if (scriptData) {
+            compileData.scriptData = scriptData
+          } else if (cachedData &&
+              script.cachedDataRejected) {
+            changed = true
+
+            const { map } = cache
+
+            const meta = has(map, cacheName)
+              ? map[cacheName]
+              : null
+
+            if (meta) {
+              meta[0] =
+              meta[1] = -1
+            }
+
+            Reflect.deleteProperty(compileData, "scriptData")
+          }
+        }
+
+        if (changed &&
+            cacheName) {
+          scriptDatas[cacheName] = cachedData
+        }
+      }
 
       for (const cacheName in compileDatas) {
         const compileData = compileDatas[cacheName]

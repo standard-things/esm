@@ -13,7 +13,6 @@ import binding from "../binding.js"
 import dirname from "../path/dirname.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
-import has from "../util/has.js"
 import makeRequireFunction from "./make-require-function.js"
 import realProcess from "../real/process.js"
 import realVM from "../real/vm.js"
@@ -53,15 +52,18 @@ function compile(content, filename) {
     return result
   }
 
-  const pkg = entry.package
-  const { cacheName } = entry
-  const { cache, cachePath } = pkg
-  const { compileData } = entry
+  const { cacheName, compileData } = entry
+  const { cachePath } = entry.package
   const wrapper = Module.wrap(stripShebang(content))
 
-  const cachedData =
-    (compileData && compileData.scriptData) ||
-    void 0
+  let cachedData
+
+  if (compileData &&
+      compileData !== true) {
+    cachedData =
+      compileData.scriptData ||
+      void 0
+  }
 
   const script = new realVM.Script(wrapper, {
     cachedData,
@@ -69,45 +71,12 @@ function compile(content, filename) {
     produceCachedData: true
   })
 
-  let changed = false
-  let scriptData = null
+  if (cachePath) {
+    const pendingScripts =
+      shared.pendingScripts[cachePath] ||
+      (shared.pendingScripts[cachePath] = { __proto__: null })
 
-  if (! cachedData &&
-      script.cachedData) {
-    changed = true
-    scriptData = script.cachedData
-  }
-
-  if (compileData) {
-    if (scriptData) {
-      compileData.scriptData = scriptData
-    } else if (cachedData &&
-        script.cachedDataRejected) {
-      changed = true
-
-      const { map } = cache
-
-      const meta = has(map, cacheName)
-        ? map[cacheName]
-        : null
-
-      if (meta) {
-        meta[0] =
-        meta[1] = -1
-      }
-
-      Reflect.deleteProperty(compileData, "scriptData")
-    }
-  }
-
-  if (changed &&
-      cachePath &&
-      cacheName) {
-    const pendingMetas =
-      shared.pendingMetas[cachePath] ||
-      (shared.pendingMetas[cachePath] = { __proto__: null })
-
-    pendingMetas[cacheName] = scriptData
+    pendingScripts[cacheName] = script
   }
 
   const compiledWrapper = script.runInThisContext({
