@@ -22,7 +22,7 @@ function createEntry(id) {
       typeof exported === "function" &&
       shared.support.proxiedClasses) {
     const func = exported
-    const proto = func.prototype
+    const { prototype } = func
 
     const hasInstance = maskFunction(
       (value) => {
@@ -57,7 +57,7 @@ function createEntry(id) {
 
         if (name === Symbol.hasInstance) {
           newValue = hasInstance
-        } else if (value === proto) {
+        } else if (value === prototype) {
           newValue = proxyProto
         }
 
@@ -72,7 +72,7 @@ function createEntry(id) {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
         if (descriptor &&
-            descriptor.value === proto &&
+            descriptor.value === prototype &&
             isUpdatableDescriptor(descriptor)) {
           descriptor.value = proxyProto
         }
@@ -81,7 +81,7 @@ function createEntry(id) {
       }
     })
 
-    const proxyProto = new OwnProxy(proto, {
+    const proxyProto = new OwnProxy(prototype, {
       get(target, name, receiver) {
         if (receiver === proxyProto) {
           receiver = target

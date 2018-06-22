@@ -66,15 +66,15 @@ function init() {
   const safeProto = SafeConsole.prototype
 
   const Console = maskFunction(function (...args) {
-    const proto = Console.prototype
+    const { prototype } = Console
     const result = new SafeConsole(...args)
 
-    Reflect.setPrototypeOf(result, proto)
+    Reflect.setPrototypeOf(result, prototype)
 
-    const names = keys(proto)
+    const names = keys(prototype)
 
     for (const name of names) {
-      const value = proto[name]
+      const value = prototype[name]
 
       if (typeof value === "function")  {
         result[name] = GenericFunction.bind(value, result)
