@@ -44,16 +44,18 @@ if (! useBuiltins &&
 
 function compileESM() {
   let cachedData
+  let cacheFilename
+  let cachePath
   let content
   let filename = "esm.js"
-
-  const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
-  const cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
-  const cacheFilename = cachePath + sep + ".loader.blob"
 
   if (NativeModule) {
     content = NativeModule._source["internal/esm/loader"]
   } else {
+    const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
+
+    cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
+    cacheFilename = cachePath + sep + ".loader.blob"
     cachedData = readFile(cacheFilename)
     content = readFile(loaderPath, "utf8")
     filename = __dirname + sep + filename
