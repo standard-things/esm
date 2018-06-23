@@ -14,10 +14,8 @@ describe("compiler", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 
     assert.throws(
-      () => Compiler.compile("return", {
-        sourceType: MODULE
-      }),
-      SyntaxError
+      () => Compiler.compile("return", { sourceType: MODULE }),
+      /SyntaxError: Illegal return statement/
     )
 
     assert.doesNotThrow(() => Compiler.compile("return", {
@@ -75,9 +73,7 @@ describe("compiler", () => {
       "import.meta"
     ]
     .forEach((code) => {
-      const result = Compiler.compile(code, {
-        sourceType: MODULE
-      })
+      const result = Compiler.compile(code, { sourceType: MODULE })
 
       assert.strictEqual(result.sourceType, MODULE)
     })
@@ -430,5 +426,29 @@ describe("compiler", () => {
     modernTypes.forEach((sourceType) => {
       Compiler.compile(code, { sourceType })
     })
+  })
+
+  it("should support V8 parse errors", () => {
+    const options = { sourceType: MODULE }
+
+    assert.throws(
+      () => Compiler.compile("a(", options),
+      /SyntaxError: Unexpected end of input/
+    )
+
+    assert.throws(
+      () => Compiler.compile("a(b c)", options),
+      /SyntaxError: missing \) after argument list/
+    )
+
+    assert.throws(
+      () => Compiler.compile("'", options),
+      /SyntaxError: Invalid or unexpected token/
+    )
+
+    assert.throws(
+      () => Compiler.compile("`a", options),
+      /SyntaxError: Unterminated template literal/
+    )
   })
 })
