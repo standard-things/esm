@@ -52,11 +52,13 @@ function checkError(error, code) {
 
 function checkErrorCustomProps(error, code, message) {
   error.code = "ERR_CUSTOM"
+
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
   assert.deepStrictEqual(Object.keys(error), ["code"])
 
   error.name = "Custom"
+
   assert.strictEqual(error.name, "Custom")
   assert.strictEqual(error.toString(), "Custom: " + message)
   assert.deepStrictEqual(Object.keys(error), ["code", "name"])
@@ -81,6 +83,7 @@ function checkErrorProps(error, code, message) {
 
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
+
   assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
 }
 
@@ -90,6 +93,7 @@ function checkLegacyErrorProps(error, code) {
   assert.strictEqual(error.toString(), "Error: " + error.message)
 
   const sampleError = new Error("x")
+
   sampleError.code = "ERR_CODE"
 
   const actual = Object.getOwnPropertyNames(error).sort()
@@ -585,6 +589,7 @@ describe("Node rules", () => {
     ]
 
     const actual = require.resolve.paths("a").slice(0, 2)
+
     assert.deepStrictEqual(actual, expected)
   })
 
@@ -599,6 +604,7 @@ describe("Node rules", () => {
         ]
 
         const actual = ns.default.resolve.paths("a").slice(0, 4)
+
         assert.deepStrictEqual(actual, expected)
       })
   )

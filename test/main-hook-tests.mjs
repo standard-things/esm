@@ -91,19 +91,11 @@ describe("main hook", function () {
 
     const execPath = path.resolve(testPath, "fixture/options/env-cache")
     const cachePath = path.resolve(execPath, ".cache")
+    const ESM_OPTIONS = "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
 
-    const ESM_OPTIONS =
-      "{cache:'" +
-      cachePath.replace(/\\/g, "\\\\") +
-      "'}"
-
-    return runMain(execPath, { ESM_OPTIONS })
-      .then(() => {
-        const pathExists = fs.pathExistsSync(cachePath)
-
-        return trash(cachePath)
-          .then(() => assert.ok(pathExists))
-      })
+    return trash(cachePath)
+      .then(() => runMain(execPath, { ESM_OPTIONS }))
+      .then(() => assert.ok(fs.pathExistsSync(cachePath)))
   })
 
   it("should support dynamic import in CJS", () =>
@@ -151,14 +143,10 @@ describe("main hook", function () {
   it("should treat extensionless files as CJS", () =>
     Promise
       .resolve()
-      .then(() =>
-        runMain("./fixture/ext/no-ext-cjs")
-          .then((result) => assert.strictEqual(result.stderr, ""))
-      )
-      .then(() =>
-        runMain("./fixture/ext/no-ext-esm")
-          .then((result) => assert.ok(result.stderr))
-      )
+      .then(() => runMain("./fixture/ext/no-ext-cjs"))
+      .then((result) => assert.strictEqual(result.stderr, ""))
+      .then(() => runMain("./fixture/ext/no-ext-esm"))
+      .then((result) => assert.ok(result.stderr))
   )
 
   it("should support loading `@std/esm`", () =>
