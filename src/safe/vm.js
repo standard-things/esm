@@ -21,6 +21,7 @@ function init() {
     }
   }
 
+  Reflect.setPrototypeOf(prototype, contextifyProto)
   return safeVM
 }
 
