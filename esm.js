@@ -11,7 +11,13 @@ const bootstrap = id.startsWith("internal/")
   : void 0
 
 const { Script } = require("vm")
-const { runInNewContext, runInThisContext } = Script.prototype
+
+const {
+  createCachedData,
+  runInNewContext,
+  runInThisContext
+} = Script.prototype
+
 const { sep } = require("path")
 
 const {
@@ -25,11 +31,13 @@ const {
 
 const { isFile } = Stats.prototype
 
+const useBuiltins = module.constructor.length > 1
+const useCreateCachedData = typeof createCachedData === "function"
+
 const Module = require("module")
 const NativeModule = bootstrap && bootstrap.NativeModule
 
 const esmModule = new Module(id)
-const useBuiltins = module.constructor.length > 1
 
 esmModule.filename = filename
 esmModule.parent = module.parent
@@ -61,25 +69,55 @@ function compileESM() {
     filename = __dirname + sep + filename
   }
 
+  let scriptOptions
+
+  if (NativeModule ||
+      useCreateCachedData) {
+    scriptOptions = {
+      __proto__: null,
+      cachedData,
+      filename
+    }
+  } else {
+    scriptOptions = {
+      __proto__: null,
+      cachedData,
+      filename,
+      produceCachedData: true
+    }
+  }
+
   const script = new Script(
     "(function (require, module, __shared__) { " +
     content +
-    "\n});", {
+    "\n});",
+    scriptOptions
+  )
+
+  const options = {
     __proto__: null,
-    cachedData,
-    filename,
-    produceCachedData: ! NativeModule
-  })
+    filename
+  }
+
+  const result = chakracore
+    ? apply(runInThisContext, script, [options])
+    : apply(runInNewContext, script, [{ __proto__: null, global }, options])
 
   let scriptData
+
+  if (! NativeModule &&
+      ! cachedData) {
+    scriptData = useCreateCachedData
+      ? apply(createCachedData, script, [])
+      : script.cachedData
+  }
+
   let changed = false
 
-  if (! cachedData &&
-      script.cachedData) {
-    changed = true
-    scriptData = script.cachedData
-  } else if (cachedData &&
-      script.cachedDataRejected) {
+  if ((scriptData &&
+       scriptData.length) ||
+      (cachedData &&
+       script.cachedDataRejected)) {
     changed = true
   }
 
@@ -93,21 +131,7 @@ function compileESM() {
     }
   }
 
-  const options = {
-    __proto__: null,
-    filename
-  }
-
-  if (chakracore) {
-    return apply(runInThisContext, script, [options])
-  }
-
-  const context = {
-    __proto__: null,
-    global
-  }
-
-  return apply(runInNewContext, script, [context, options])
+  return result
 }
 
 function loadESM() {
