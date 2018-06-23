@@ -197,6 +197,7 @@ function init() {
     // https://node.green/#ES2017-annex-b
     const object = {
       __proto__: {
+        // eslint-disable-next-line getter-return
         get a() {},
         set a(v) {}
       },
