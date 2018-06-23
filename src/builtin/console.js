@@ -107,25 +107,25 @@ function init() {
   const builtinTrace = wrap(safeProto.trace)
   const builtinWarn = wrap(safeProto.warn)
 
-  const proto = Console.prototype
   const protoNames = keysAll(safeProto)
+  const { prototype } = Console
 
   for (const name of protoNames) {
     if (name === "assert") {
-      proto.assert = builtinAssert
+      prototype.assert = builtinAssert
     } if (name === "debug" ||
         name === "dirxml" ||
         name === "info" ||
         name === "log") {
-      proto[name] = builtinLog
+      prototype[name] = builtinLog
     } else if (name === "dir") {
-      proto.dir = builtinDir
+      prototype.dir = builtinDir
     } else if (name === "trace") {
-      proto.trace = builtinTrace
+      prototype.trace = builtinTrace
     } else if (name === "warn") {
-      proto.warn = builtinWarn
+      prototype.warn = builtinWarn
     } else {
-      copyProperty(proto, safeProto, name)
+      copyProperty(prototype, safeProto, name)
     }
   }
 
