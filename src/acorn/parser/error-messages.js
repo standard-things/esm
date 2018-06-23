@@ -4,14 +4,17 @@ import { tokTypes as tt } from "../../acorn.js"
 
 function init() {
   const PARSER_DUPLICATE_EXPORT = "Duplicate export '"
+  const PARSER_ILLEGAL_RETURN_STATEMENT = "'return' outside of function"
   const PARSER_IMPORT_EXPORT_IN_SCRIPT = "may appear only with 'sourceType: module'"
   const PARSER_UNTERMINATED_STRING = "Unterminated string constant"
   const PARSER_UNTERMINATED_TEMPLATE = "Unterminated template"
 
   const ENGINE_DUPLICATE_EXPORT = "Duplicate export of '"
+  const ENGINE_ILLEGAL_RETURN_STATEMENT = "Illegal return statement"
   const ENGINE_IMPORT_EXPORT_IN_SCRIPT = "may only be used in ES modules"
   const ENGINE_UNEXPECTED_EOS = "Unexpected end of input"
   const ENGINE_UNEXPECTED_TOKEN = "Invalid or unexpected token"
+  const ENGINE_UNTERMINATED_ARGUMENTS_LIST = "missing ) after argument list"
   const ENGINE_UNTERMINATED_TEMPLATE = "Unterminated template literal"
 
   const Plugin = {
@@ -37,7 +40,7 @@ function init() {
             close !== tt.parenR) {
           this.expect(tt.comma)
         } else if (! this.eat(tt.comma)) {
-          this.raise(this.start, "missing ) after argument list")
+          this.raise(this.start, ENGINE_UNTERMINATED_ARGUMENTS_LIST)
         }
 
         if (allowTrailingComma &&
@@ -72,12 +75,14 @@ function init() {
   }
 
   function raise(pos, message) {
-    if (message.startsWith(PARSER_DUPLICATE_EXPORT)) {
-      message = message.replace(PARSER_DUPLICATE_EXPORT, ENGINE_DUPLICATE_EXPORT)
-    } else if (message.startsWith(PARSER_UNTERMINATED_STRING)) {
+    if (message === PARSER_ILLEGAL_RETURN_STATEMENT) {
+      message = ENGINE_ILLEGAL_RETURN_STATEMENT
+    } else if (message === PARSER_UNTERMINATED_STRING) {
       message = ENGINE_UNEXPECTED_TOKEN
-    } else if (message.startsWith(PARSER_UNTERMINATED_TEMPLATE)) {
-      message = message.replace(PARSER_UNTERMINATED_TEMPLATE, ENGINE_UNTERMINATED_TEMPLATE)
+    } else if (message === PARSER_UNTERMINATED_TEMPLATE) {
+      message = ENGINE_UNTERMINATED_TEMPLATE
+    } else if (message.startsWith(PARSER_DUPLICATE_EXPORT)) {
+      message = message.replace(PARSER_DUPLICATE_EXPORT, ENGINE_DUPLICATE_EXPORT)
     } else if (message.endsWith(PARSER_IMPORT_EXPORT_IN_SCRIPT)) {
       message = message.replace(PARSER_IMPORT_EXPORT_IN_SCRIPT, ENGINE_IMPORT_EXPORT_IN_SCRIPT)
     }
