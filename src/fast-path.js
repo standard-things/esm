@@ -45,7 +45,7 @@ function init() {
       }
     }
 
-    getNode(pos = -1, callback) {
+    getNode(pos, callback) {
       const { stack } = this
 
       let i = stack.length
