@@ -1,10 +1,13 @@
 import Visitor from "../visitor.js"
 
 import isIdentifier from "../parse/is-identifier.js"
+import isShadowed from "../parse/is-shadowed.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
+  const shadowedMap = new Map
+
   class EvalVisitor extends Visitor {
     reset(rootPath, options) {
       this.addedImportExport = options.addedImportExport
@@ -66,7 +69,8 @@ function init() {
       if (type === "CallExpression" ||
           (type === "AssignmentExpression" &&
            parent.left === node) ||
-          ! isIdentifier(node, parent)) {
+          ! isIdentifier(node, parent) ||
+          isShadowed(path, "eval", shadowedMap)) {
         return
       }
 

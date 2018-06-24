@@ -53,6 +53,14 @@ function init() {
     let shadowed = false
 
     path.getParentNode((parent) => {
+      const { type } = parent
+
+      if (type === "WithStatement") {
+        const node = path.getValue()
+
+        return shadowed = parent.object !== node
+      }
+
       let cache = map.get(parent)
 
       if (cache &&
@@ -63,11 +71,7 @@ function init() {
         map.set(parent, cache)
       }
 
-      const { type } = parent
-
-      if (type === "WithStatement") {
-        shadowed = true
-      } else if (type === "BlockStatement") {
+      if (type === "BlockStatement") {
         shadowed = hasVariable(parent, name)
       } else if (type === "FunctionDeclaration" ||
           type === "FunctionExpression" ||
