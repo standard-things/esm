@@ -428,6 +428,71 @@ describe("compiler", () => {
     })
   })
 
+  it("should add TDZ asserts to bindings", () => {
+    const lines = [
+      "a",
+      "new a.b.c()",
+      "`a ${ a } a`",
+      "switch (a) { case a: a }",
+      "const b = { a }",
+      "const b = () => a",
+      "function b() { return a }",
+      "b(a, c)"
+    ]
+
+    const compiled = [
+      '_.t("a",a)',
+      'new (_.t("a",a)).b.c()',
+      '`a ${ _.t("a",a) } a`',
+      'switch (_.t("a",a)) { case _.t("a",a): _.t("a",a) }',
+      'const b = { a:_.t("a",a) }',
+      'const b = () => _.t("a",a)',
+      'function b() { return _.t("a",a) }',
+      'b(_.t("a",a), c)'
+    ]
+
+    lines.forEach((line, index) => {
+      const code = [
+        'import a from "a"',
+        line
+      ].join("\n")
+
+      modernTypes.forEach((sourceType) => {
+        const result = Compiler.compile(code, { sourceType })
+
+        result.enforceTDZ()
+
+        const actual = result.code.split("\n").pop()
+
+        assert.strictEqual(actual, compiled[index])
+      })
+    })
+  })
+
+  it("should not add TDZ asserts to shadowed bindings", () =>
+    [
+      "function b(a) { a = a }",
+      "const b = function a() { a = a }",
+      "a: while (true) { break a; continue a }"
+    ]
+    .forEach((line) => {
+      const code = [
+        'import a from "a"',
+        line
+      ].join("\n")
+
+      modernTypes.forEach((sourceType) => {
+        const result = Compiler.compile(code, { sourceType })
+
+        result.enforceTDZ()
+
+        const actual = result.code.split("\n").pop()
+
+        assert.strictEqual(actual, line)
+      })
+    })
+  )
+
   it("should support V8 parse errors", () => {
     const options = { sourceType: MODULE }
 
