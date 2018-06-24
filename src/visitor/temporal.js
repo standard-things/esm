@@ -88,13 +88,19 @@ function init() {
       return
     }
 
-    if (type === "MemberExpression") {
-      const grandParent = path.getNode(-3)
+    let nodeIndex = -2
 
-      if (grandParent) {
-        parent = grandParent
-        type = parent.type
+    while (type === "MemberExpression") {
+      nodeIndex -= 2
+
+      const grandParent = path.getNode(nodeIndex)
+
+      if (! grandParent) {
+        break
       }
+
+      parent = grandParent
+      type = parent.type
     }
 
     const { name } = node
