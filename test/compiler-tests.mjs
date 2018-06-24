@@ -493,6 +493,28 @@ describe("compiler", () => {
     })
   )
 
+  it("should not wrap shadowed eval", () =>
+    [
+      "function b(eval) { eval = eval }",
+      "const b = function eval() { eval = eval }",
+      "eval: while (true) { break eval; continue eval }"
+    ]
+    .forEach((code) => {
+      const result = Compiler.compile(code)
+
+      assert.strictEqual(result.code, code)
+    })
+  )
+
+  it("should not wrap shadowed eval in with statements", () => {
+    const result = Compiler.compile("with (eval) { eval = eval }")
+
+    assert.strictEqual(
+      result.code,
+      "with ((eval===_.v?_.g:eval)) { eval = eval }"
+    )
+  })
+
   it("should support V8 parse errors", () => {
     const options = { sourceType: MODULE }
 
