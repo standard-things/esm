@@ -296,6 +296,7 @@ function init() {
       }
     }
 
+    const pendingScriptDatas = { __proto__: null }
     const useCreateCachedData = shared.support.createCachedData
 
     for (const cachePath in pendingScripts) {
@@ -305,7 +306,6 @@ function init() {
 
       const cache = dir[cachePath]
       const compileDatas = cache.compile
-      const scriptDatas = { __proto__: null }
       const scripts = pendingScripts[cachePath]
 
       for (const cacheName in scripts) {
@@ -351,15 +351,26 @@ function init() {
               meta[1] = -1
             }
 
-            Reflect.deleteProperty(compileData, "scriptData")
+            scriptData =
+            compileData.scriptData = null
           }
         }
 
         if (changed &&
             cacheName) {
-          scriptDatas[cacheName] = cachedData
+          const scriptDatas =
+            pendingScriptDatas[cachePath] ||
+            (pendingScriptDatas[cachePath] = { __proto__: null })
+
+          scriptDatas[cacheName] = scriptData
         }
       }
+    }
+
+    for (const cachePath in pendingScriptDatas) {
+      const cache = dir[cachePath]
+      const compileDatas = cache.compile
+      const scriptDatas = pendingScriptDatas[cachePath]
 
       for (const cacheName in compileDatas) {
         const compileData = compileDatas[cacheName]
