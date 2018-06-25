@@ -272,7 +272,9 @@ function init() {
         importExportVisitor.changed
 
       if (result.changed) {
-        setDeferred(result, "code", () => magicString.toString())
+        // Add "main" to enable the `readFileFast` fast path of
+        // `process.binding("fs").internalModuleReadJSON`.
+        setDeferred(result, "code", () => '"main";' + magicString.toString())
       }
 
       return result

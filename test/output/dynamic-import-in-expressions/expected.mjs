@@ -1,3 +1,3 @@
-1, _.i("./a.mjs")
+"main";1, _.i("./a.mjs")
 
 true && _.i("./b.mjs")

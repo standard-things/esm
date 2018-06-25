@@ -1,4 +1,4 @@
-_._
+"main";_._
 // Comment one.
 /*
 Comment two.

@@ -1,4 +1,4 @@
-_.e([["A",()=>A],["a",()=>a],["default",()=>default]]);class A {
+"main";_.e([["A",()=>A],["a",()=>a],["default",()=>default]]);class A {
   constructor() {
     _.i("./a.mjs")
   }

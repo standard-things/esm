@@ -114,7 +114,7 @@ describe("compiler", () => {
             sourceType
           })
 
-          assert.ok(result.code.startsWith(value ? "var a" : "let a"))
+          assert.ok(result.code.includes(value ? "var a" : "let a"))
         })
       })
   })
@@ -163,15 +163,17 @@ describe("compiler", () => {
   })
 
   it("should support shebangs", () => {
+    const shebang = "#!/usr/bin/env node -r esm"
+
     const code = [
-      "#!/usr/bin/env node -r esm",
+      shebang,
       'import a from "a"'
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
       const result = Compiler.compile(code, { sourceType })
 
-      assert.ok(result.code.startsWith("let a"))
+      assert.strictEqual(result.code.includes(shebang), false)
     })
   })
 
@@ -509,10 +511,7 @@ describe("compiler", () => {
   it("should not wrap shadowed eval in with statements", () => {
     const result = Compiler.compile("with (eval) { eval = eval }")
 
-    assert.strictEqual(
-      result.code,
-      "with ((eval===_.v?_.g:eval)) { eval = eval }"
-    )
+    assert.ok(result.code.includes("with ((eval===_.v?_.g:eval)) { eval = eval }"))
   })
 
   it("should support V8 parse errors", () => {

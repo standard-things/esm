@@ -1,4 +1,4 @@
-const o = { d, eval:(eval===_.v?_.g:eval), f }
+"main";const o = { d, eval:(eval===_.v?_.g:eval), f }
 
 o.eval = (eval===_.v?_.g:eval)
 
