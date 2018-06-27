@@ -21,27 +21,27 @@ export default () => {
 
     assert.throws(
       () => makeRequire(module, { [name]: -1 }),
-      new RegExp("Error: The esm@[\\d.]+ option '" + realName + "' is invalid")
+      new RegExp("Error: The esm@[-\\w.]+ option '" + realName + "' is invalid")
     )
   })
 
   assert.throws(
     () => makeRequire(module, { mainFields: [-1] }),
-    /Error: The esm@[\d.]+ option 'mainFields' is invalid/
+    /Error: The esm@[-\w.]+ option 'mainFields' is invalid/
   )
 
   assert.throws(
     () => makeRequire(module, { cjs: { namedExports: -1 } }),
-    /Error: The esm@[\d.]+ option cjs\['namedExports'\] is invalid/
+    /Error: The esm@[-\w.]+ option cjs\['namedExports'\] is invalid/
   )
 
   assert.throws(
     () => makeRequire(module, { cjs: { namedexports: true } }),
-    /Error: Unknown esm@[\d.]+ option: cjs\['namedexports'\]/
+    /Error: Unknown esm@[-\w.]+ option: cjs\['namedexports'\]/
   )
 
   assert.throws(
     () => makeRequire(module, { esm: "mjs" }),
-    /Error: Unknown esm@[\d.]+ option: esm/
+    /Error: Unknown esm@[-\w.]+ option: esm/
   )
 }
