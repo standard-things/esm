@@ -4,6 +4,11 @@ import shared from "../shared.js"
 
 function init() {
   function maxSatisfying(versions, range) {
+    if (! Array.isArray(versions) ||
+        typeof range !== "string") {
+      return null
+    }
+
     const cache = shared.memoize.utilMaxSatisfying
     const cacheKey = versions + "\0" + range
 
