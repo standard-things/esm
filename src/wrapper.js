@@ -11,12 +11,15 @@ import proxyWrap from "./util/proxy-wrap.js"
 import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
+import stripPrereleaseTag from "./util/strip-prerelease-tag.js"
 import toExternalFunction from "./util/to-external-function.js"
 
 function init() {
   const {
     PKG_VERSION
   } = ESM
+
+  const wrapperVersion = stripPrereleaseTag(PKG_VERSION)
 
   const Wrapper = {
     find(object, name, range) {
@@ -56,9 +59,9 @@ function init() {
     wrap(object, name, wrapper) {
       const map = getOrCreateMap(object, name)
 
-      if (typeof map.wrappers[PKG_VERSION] !== "function") {
-        GenericArray.push(map.versions, PKG_VERSION)
-        map.wrappers[PKG_VERSION] = toExternalFunction(wrapper)
+      if (typeof map.wrappers[wrapperVersion] !== "function") {
+        GenericArray.push(map.versions, wrapperVersion)
+        map.wrappers[wrapperVersion] = toExternalFunction(wrapper)
       }
     }
   }

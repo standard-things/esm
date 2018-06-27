@@ -28,6 +28,7 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
+import stripPrereleaseTag from "./util/strip-prerelease-tag.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 
@@ -594,7 +595,7 @@ function readInfo(dirPath, force) {
 Reflect.setPrototypeOf(Package.prototype, null)
 
 // Enable in-memory caching when compiling without a file path.
-Package.state.cache[""] = new Package("", PKG_VERSION, {
+Package.state.cache[""] = new Package("", stripPrereleaseTag(PKG_VERSION), {
   cache: false,
   cjs: true
 })

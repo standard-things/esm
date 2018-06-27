@@ -1,9 +1,8 @@
 import { satisfies as _satisfies } from "semver"
 import shared from "../shared.js"
+import stripPrereleaseTag from "./strip-prerelease-tag.js"
 
 function init() {
-  const nonDigitRegExp = /[^\d.]/g
-
   function satisfies(version, range) {
     if (typeof version !== "string" ||
         typeof range !== "string") {
@@ -13,12 +12,9 @@ function init() {
     const cache = shared.memoize.utilSatisfies
     const cacheKey = version + "\0" + range
 
-    if (Reflect.has(cache, cacheKey)) {
-      return cache[cacheKey]
-    }
-
-    version = version.replace(nonDigitRegExp, "")
-    return cache[cacheKey] = _satisfies(version, range)
+    return Reflect.has(cache, cacheKey)
+      ? cache[cacheKey]
+      : cache[cacheKey] = _satisfies(stripPrereleaseTag(version), range)
   }
 
   return satisfies
