@@ -99,10 +99,10 @@ function init() {
     pendingScripts: { __proto__: null },
     pendingWrites: { __proto__: null },
     reloaded: false,
-    safeContext: Function("return this")(),
+    safeGlobal: Function("return this")(),
     support,
     symbol,
-    unsafeContext: global,
+    unsafeGlobal: global,
     utilBinding
   }
 
@@ -125,6 +125,12 @@ function init() {
       : "inspect"
   })
 
+  setDeferred(shared, "defaultGlobal", () => {
+    const script = new shared.module.safeVM.Script("this")
+
+    return script.runInThisContext()
+  })
+
   setDeferred(shared, "proxyNativeSourceText", () => {
     try {
       return funcToString.call(dummyProxy)
@@ -141,6 +147,10 @@ function init() {
         .digest("hex")
         .slice(0, 3)
     )
+  )
+
+  setDeferred(shared, "unsafeContext", () =>
+    shared.module.safeVM.createContext(shared.unsafeGlobal)
   )
 
   setDeferred(fastPath, "readFile", () =>

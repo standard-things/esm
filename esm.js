@@ -99,9 +99,16 @@ function compileESM() {
     filename
   }
 
-  const result = chakracore
-    ? apply(runInThisContext, script, [options])
-    : apply(runInNewContext, script, [{ __proto__: null, global }, options])
+  let result
+
+  if (chakracore) {
+    result = apply(runInThisContext, script, [options])
+  } else {
+    result = apply(runInNewContext, script, [{
+      __proto__: null,
+      global: Function("return this")()
+    }, options])
+  }
 
   let scriptData
 

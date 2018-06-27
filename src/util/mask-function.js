@@ -89,6 +89,6 @@ function maskFunction(func, source) {
   return proxy
 }
 
-shimFunctionPrototypeToString.enable(shared.safeContext)
+shimFunctionPrototypeToString.enable(shared.safeGlobal)
 
 export default maskFunction

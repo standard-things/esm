@@ -40,7 +40,7 @@ let exported
 
 if (shared.inited &&
     ! shared.reloaded) {
-  Shim.enable(shared.unsafeContext)
+  Shim.enable(shared.unsafeGlobal)
 
   exported = (mod, options) => {
     if (! isObject(mod)) {
@@ -91,8 +91,8 @@ if (shared.inited &&
   exported.inited = true
   exported.reloaded = false
 
-  Shim.enable(shared.safeContext)
-  Shim.enable(shared.unsafeContext)
+  Shim.enable(shared.safeGlobal)
+  Shim.enable(shared.unsafeGlobal)
 
   if (CHECK) {
     vmHook(realVM)
@@ -120,7 +120,7 @@ if (shared.inited &&
   }
 
   if (INTERNAL) {
-    globalHook(shared.unsafeContext)
+    globalHook(shared.unsafeGlobal)
   }
 }
 

@@ -90,9 +90,17 @@ function compile(content, filename) {
     pendingScripts[cacheName] = script
   }
 
-  const compiledWrapper = script.runInThisContext({
-    filename
-  })
+  let compiledWrapper
+
+  if (shared.unsafeGlobal === shared.defaultGlobal) {
+    compiledWrapper = script.runInThisContext({
+      filename
+    })
+  } else {
+    compiledWrapper = script.runInContext(shared.unsafeContext, {
+      filename
+    })
+  }
 
   let inspectorWrapper = null
 

@@ -56,7 +56,7 @@ function init() {
     }
   }
 
-  const proxy = new OwnProxy(shared.unsafeContext, handler)
+  const proxy = new OwnProxy(shared.unsafeGlobal, handler)
 
   return proxy
 }

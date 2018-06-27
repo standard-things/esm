@@ -156,7 +156,7 @@ function hook(vm) {
   function setupEval() {
     vm.runInThisContext = proxyWrap(vm.runInThisContext, (runInThisContext, [code, options]) => {
       vm.runInThisContext = runInThisContext
-      setupEntry(shared.unsafeContext.module)
+      setupEntry(shared.unsafeGlobal.module)
       return vm.createScript(code, options).runInThisContext(options)
     })
   }

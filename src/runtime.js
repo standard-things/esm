@@ -69,11 +69,11 @@ const Runtime = {
     }
 
     const { runtimeName } = entry
-    const { unsafeContext } = shared
+    const { unsafeGlobal } = shared
 
     content = result.code
 
-    if (unsafeContext[runtimeName]) {
+    if (unsafeGlobal[runtimeName]) {
       return content
     }
 
@@ -82,7 +82,7 @@ const Runtime = {
       "let " + runtimeName + "=global." + runtimeName + ";" +
       content
 
-    Reflect.defineProperty(unsafeContext, runtimeName, {
+    Reflect.defineProperty(unsafeGlobal, runtimeName, {
       configurable: true,
       get() {
         Reflect.deleteProperty(this, runtimeName)
