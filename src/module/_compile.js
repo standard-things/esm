@@ -33,6 +33,7 @@ const {
 } = ENTRY
 
 const {
+  ELECTRON,
   INSPECT
 } = ENV
 
@@ -271,7 +272,9 @@ function maybeSourceMap(entry, content, filename) {
   const { sourceMap } = entry.package.options
 
   if (sourceMap !== false &&
-     (sourceMap || INSPECT) &&
+      (sourceMap ||
+       ELECTRON ||
+       INSPECT) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
       encodeURI(createSourceMap(filename, content))
