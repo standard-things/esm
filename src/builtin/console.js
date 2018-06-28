@@ -18,7 +18,8 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    ELECTRON
+    ELECTRON_RENDERER,
+    INSPECT
   } = ENV
 
   const dirOptions = { customInspect: true }
@@ -137,8 +138,9 @@ function init() {
 
   const builtinConsole = new Console(stdout, stderr)
 
-  if (ELECTRON) {
-    const { log } = console
+  if (ELECTRON_RENDERER ||
+      INSPECT) {
+    const log = wrap(shared.unsafeGlobal.console.log)
     const names = ["debug", "dirxml", "info", "log"]
 
     for (const name of names) {

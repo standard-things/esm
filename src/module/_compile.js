@@ -33,7 +33,7 @@ const {
 } = ENTRY
 
 const {
-  ELECTRON,
+  ELECTRON_RENDERER,
   INSPECT
 } = ENV
 
@@ -273,7 +273,7 @@ function maybeSourceMap(entry, content, filename) {
 
   if (sourceMap !== false &&
       (sourceMap ||
-       ELECTRON ||
+       ELECTRON_RENDERER ||
        INSPECT) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +

@@ -3,6 +3,7 @@ import isCheck from "../env/is-check.js"
 import isCLI from "../env/is-cli.js"
 import isDevelopment from "../env/is-development.js"
 import isElectron from "../env/is-electron.js"
+import isElectronRenderer from "../env/is-electron-renderer.js"
 import isEval from "../env/is-eval.js"
 import isInspect from "../env/is-inspect.js"
 import isInternal from "../env/is-internal.js"
@@ -19,6 +20,7 @@ setDeferred(ENV, "CHECK", isCheck)
 setDeferred(ENV, "CLI", isCLI)
 setDeferred(ENV, "DEVELOPMENT", isDevelopment)
 setDeferred(ENV, "ELECTRON", isElectron)
+setDeferred(ENV, "ELECTRON_RENDERER", isElectronRenderer)
 setDeferred(ENV, "EVAL", isEval)
 setDeferred(ENV, "INSPECT", isInspect)
 setDeferred(ENV, "INTERNAL", isInternal)

@@ -26,6 +26,7 @@ export const {
   platform,
   stderr,
   stdout,
+  type,
   version,
   versions
 } = safeProcess
