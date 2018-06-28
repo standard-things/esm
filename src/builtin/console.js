@@ -10,7 +10,6 @@ import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
-import keys from "../util/keys.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
 import safeConsole from "../safe/console.js"
@@ -70,26 +69,21 @@ function init() {
   }
 
   const SafeConsole = safeConsole.Console
-  const safeProto = SafeConsole.prototype
 
   const Console = maskFunction(function (...args) {
-    const { prototype } = Console
-    const result = new SafeConsole(...args)
+    const target = new.target
 
-    Reflect.setPrototypeOf(result, prototype)
+    if (target) {
+      const result = Reflect.construct(SafeConsole, args, target)
 
-    const names = keys(prototype)
-
-    for (const name of names) {
-      const value = prototype[name]
-
-      if (typeof value === "function")  {
-        result[name] = GenericFunction.bind(value, result)
-      }
+      Reflect.setPrototypeOf(result, Reflect.getPrototypeOf(this))
+      return result
     }
 
-    return result
+    return new Console(...args)
   }, SafeConsole)
+
+  const safeProto = SafeConsole.prototype
 
   const builtinAssert = wrap(safeProto.assert, function (func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
