@@ -1,5 +1,7 @@
 import { stderr, stdout } from "../safe/process.js"
 
+import ENV from "../constant/env.js"
+
 import GenericFunction from "../generic/function.js"
 
 import assign from "../util/assign.js"
@@ -15,6 +17,10 @@ import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    ELECTRON
+  } = ENV
+
   const dirOptions = { customInspect: true }
 
   function defaultWrapper(func, args) {
@@ -130,6 +136,18 @@ function init() {
   }
 
   const builtinConsole = new Console(stdout, stderr)
+
+  if (ELECTRON) {
+    const { log } = console
+    const names = ["debug", "dirxml", "info", "log"]
+
+    for (const name of names) {
+      if (typeof builtinConsole[name] === "function") {
+        builtinConsole[name] = GenericFunction.bind(log, builtinConsole)
+      }
+    }
+  }
+
   const names = keysAll(safeConsole)
 
   for (const name of names) {
