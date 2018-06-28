@@ -136,6 +136,23 @@ describe("built-in modules", () => {
     assert.ok(actual instanceof Console)
   })
 
+  it("should support subclassing `console.Console`", () => {
+    const { Console } = console
+
+    class SubConsole extends Console {
+      constructor(...args) {
+        super(...args)
+        this.sub = "sub"
+      }
+    }
+
+    const actual = new SubConsole(process.stdout, process.stderr)
+
+    assert.ok(actual instanceof Console)
+    assert.ok(actual instanceof SubConsole)
+    assert.strictEqual(actual.sub, "sub")
+  })
+
   ;(canTestUtilTypes ? it : xit)(
   "should support `util.types.isModuleNamespaceObject`", () => {
     const { isModuleNamespaceObject } = util.types
