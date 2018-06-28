@@ -25,9 +25,8 @@ const {
   STATE_INITIAL
 } = ENTRY
 
-// Lazily resolve `process.argv[1]`.
-// Needed for setting the breakpoint when called with --inspect-brk.
 let resolvedArgv
+let useRunInContext
 
 const runInDebugContext = getSilent(realVM, "runInDebugContext")
 
@@ -90,14 +89,18 @@ function compile(content, filename) {
     pendingScripts[cacheName] = script
   }
 
+  if (useRunInContext === void 0) {
+    useRunInContext = shared.unsafeGlobal !== shared.defaultGlobal
+  }
+
   let compiledWrapper
 
-  if (shared.unsafeGlobal === shared.defaultGlobal) {
-    compiledWrapper = script.runInThisContext({
+  if (useRunInContext) {
+    compiledWrapper = script.runInContext(shared.unsafeContext, {
       filename
     })
   } else {
-    compiledWrapper = script.runInContext(shared.unsafeContext, {
+    compiledWrapper = script.runInThisContext({
       filename
     })
   }
@@ -107,9 +110,13 @@ function compile(content, filename) {
   if (realProcess._breakFirstLine &&
       realProcess._eval == null) {
     if (resolvedArgv === void 0) {
-      // Enter the REPL if not given a file path argument.
-      resolvedArgv = realProcess.argv[1]
-        ? Module._resolveFilename(realProcess.argv[1])
+      // Lazily resolve `process.argv[1]` which is needed for setting the
+      // breakpoint when Node is called with the --inspect-brk flag.
+      const argv = realProcess.argv[1]
+
+      // Enter the REPL if no file path argument is provided.
+      resolvedArgv = argv
+        ? Module._resolveFilename(argv)
         : "repl"
     }
 
