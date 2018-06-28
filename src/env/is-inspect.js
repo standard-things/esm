@@ -7,7 +7,7 @@ function isInspect() {
 
   return Reflect.has(env, "inspect")
     ? env.inspect
-    : env.inspect = matches(execArgv, /^--(?:debug|inspect)(?:-brk)?$/)
+    : env.inspect = matches(execArgv, /^--(?:debug|inspect)(?:-brk)?(?:=.*)?$/)
 }
 
 export default isInspect
