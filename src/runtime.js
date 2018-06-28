@@ -5,7 +5,7 @@ import Entry from "./entry.js"
 import Module from "./module.js"
 
 import _loadESM from "./module/esm/_load.js"
-import builtinGlobal from "./global.js"
+import builtinGlobal from "./builtin/global.js"
 import errors from "./errors.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"

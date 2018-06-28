@@ -1,9 +1,9 @@
-import OwnProxy from "./own/proxy.js"
+import OwnProxy from "../own/proxy.js"
 
-import builtinEntries from "./builtin-entries.js"
-import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
-import isUpdatableGet from "./util/is-updatable-get.js"
-import shared from "./shared.js"
+import builtinEntries from "../builtin-entries.js"
+import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
+import isUpdatableGet from "../util/is-updatable-get.js"
+import shared from "../shared.js"
 
 function init() {
   const getConsole = () => builtinEntries.console.module.exports
