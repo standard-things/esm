@@ -26,6 +26,7 @@ function load(request, parent, isMain, preload) {
   const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+  const parentIsMJS = parent && isMJS(parent)
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
 
@@ -33,7 +34,7 @@ function load(request, parent, isMain, preload) {
 
   if (parentPkgOptions &&
       parentPkgOptions.cjs.paths &&
-      ! isMJS(parent)) {
+      ! parentIsMJS) {
     filename = tryResolveFilename(request, parent, isMain)
   } else {
     filename = resolveFilename(request, parent, isMain)
@@ -116,7 +117,8 @@ function load(request, parent, isMain, preload) {
       }
 
       if (! isESM &&
-          (parentIsESM &&
+          parentIsESM &&
+          (parentIsMJS ||
            ! parentPkgOptions.cjs.cache)) {
         child.parent = void 0
       }
