@@ -23,27 +23,25 @@ function init() {
     }
 
     const { index } = match
-    const message = stack.slice(0, index)
 
     let trace = stack.slice(index)
 
+    const message = stack.slice(0, index)
     const lines = trace.split("\n")
 
-    const filtered = lines.filter((line) => {
-      for (const filename of PKG_FILENAMES) {
-        if (line.indexOf(filename) !== -1) {
-          return false
+    return message + lines
+      .filter((line) => {
+        for (const filename of PKG_FILENAMES) {
+          if (line.indexOf(filename) !== -1) {
+            return false
+          }
         }
-      }
 
-      return true
-    })
-
-    trace = filtered.join("\n")
-    trace = trace.replace(columnInfoRegExp, ":1")
-    trace = trace.replace(runtimeRegExp, replaceRuntime)
-
-    return message + trace
+        return true
+      })
+      .join("\n")
+      .replace(columnInfoRegExp, ":1")
+      .replace(runtimeRegExp, replaceRuntime)
   }
 
   function replaceRuntime(match, name, dot = "") {
