@@ -1,12 +1,11 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import isIdentifer from "../parse/is-identifier.js"
 import isShadowed from "../parse/is-shadowed.js"
+import maybeWrap from "../parse/maybe-wrap.js"
 import shared from "../shared.js"
 
 function init() {
-  const checked = new Set
   const shadowedMap = new Map
 
   class TemporalVisitor extends Visitor {
@@ -21,10 +20,32 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (this.temporals[name] === true &&
-          ! isShadowed(path, name, shadowedMap)) {
-        maybeWrap(this, path)
+      if (this.temporals[name] !== true ||
+          isShadowed(path, name, shadowedMap)) {
+        return
       }
+
+      const { magicString, runtimeName } = this
+
+      maybeWrap(this, path, (node, parent) => {
+        if (parent.shorthand) {
+          magicString
+            .prependLeft(
+              node.end,
+              ":" + runtimeName + '.a("' + name + '",' + name + ")"
+            )
+
+          return
+        }
+
+        const isNewExpression = parent.type === "NewExpression"
+        const prefix = isNewExpression ? "(" : ""
+        const postfix = isNewExpression ? ")" : ""
+
+        magicString
+          .prependRight(node.start, prefix + runtimeName + '.a("' + name + '",')
+          .prependRight(node.end, ")" + postfix)
+      })
     }
 
     visitExportDefaultDeclaration(path) {
@@ -74,75 +95,6 @@ function init() {
         path.call(this, "visitWithoutReset", "declaration")
       }
     }
-  }
-
-  function maybeWrap(visitor, path) {
-    let node = path.getValue()
-
-    let parent = path.getParentNode()
-    let { type } = parent
-
-    if ((type === "AssignmentExpression" &&
-         parent.left === node) ||
-        ! isIdentifer(node, parent)) {
-      return
-    }
-
-    let nodeIndex = -2
-
-    while (type === "MemberExpression") {
-      nodeIndex -= 2
-
-      const grandParent = path.getNode(nodeIndex)
-
-      if (! grandParent) {
-        break
-      }
-
-      parent = grandParent
-      type = parent.type
-    }
-
-    const { name } = node
-    const { runtimeName } = visitor
-
-    let prefix = ""
-    let postfix = ""
-
-    if (type === "NewExpression") {
-      prefix = "("
-      postfix = ")"
-    } else if (type === "Property") {
-      if (parent.shorthand) {
-        visitor.magicString
-          .prependLeft(node.end, ":" + runtimeName + '.t("' + name + '",' + name + ")")
-
-        return
-      }
-    } else if (type !== "SwitchCase" &&
-        type !== "TemplateLiteral" &&
-        ! type.endsWith("Expression") &&
-        ! type.endsWith("Statement")) {
-      path.getParentNode((parent) => {
-        const { type } = parent
-
-        if (type === "AssignmentExpression" ||
-            type === "ExpressionStatement") {
-          node = parent
-          return true
-        }
-      })
-    }
-
-    if (checked.has(node)) {
-      return
-    }
-
-    checked.add(node)
-
-    visitor.magicString
-      .prependRight(node.start, prefix + runtimeName + '.t("' + name + '",')
-      .prependRight(node.end, ")" + postfix)
   }
 
   return new TemporalVisitor

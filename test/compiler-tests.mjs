@@ -439,14 +439,14 @@ describe("compiler", () => {
     ]
 
     const compiled = [
-      '_.t("a",a)',
-      'new (_.t("a",a)).b.c()',
-      '`a ${ _.t("a",a) } a`',
-      'switch (_.t("a",a)) { case _.t("a",a): _.t("a",a) }',
-      'const b = { a:_.t("a",a) }',
-      'const b = () => _.t("a",a)',
-      'function b() { return _.t("a",a) }',
-      'b(_.t("a",a), c)'
+      '_.a("a",a)',
+      'new (_.a("a",a)).b.c()',
+      '`a ${ _.a("a",a) } a`',
+      'switch (_.a("a",a)) { case _.a("a",a): _.a("a",a) }',
+      'const b = { a:_.a("a",a) }',
+      'const b = () => _.a("a",a)',
+      'function b() { return _.a("a",a) }',
+      'b(_.a("a",a), c)'
     ]
 
     lines.forEach((line, index) => {
