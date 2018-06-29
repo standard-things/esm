@@ -159,7 +159,7 @@ function init() {
 
       const {
         addedImportExport,
-        importLocals,
+        importedLocals,
         temporals
       } = importExportVisitor
 
@@ -191,7 +191,7 @@ function init() {
         const { assignableExports } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
-          ...keys(importLocals),
+          ...keys(importedLocals),
           ...keys(assignableExports)
         ])
 
@@ -199,7 +199,7 @@ function init() {
           try {
             assignmentVisitor.visit(rootPath, {
               assignableExports,
-              importLocals,
+              importedLocals,
               magicString,
               possibleIndexes,
               runtimeName

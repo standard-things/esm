@@ -11,7 +11,7 @@ function init() {
   class AssignmentVisitor extends Visitor {
     reset(rootPath, options) {
       this.assignableExports = options.assignableExports
-      this.importLocals = options.importLocals
+      this.importedLocals = options.importedLocals
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
@@ -28,13 +28,13 @@ function init() {
   }
 
   function assignmentHelper(visitor, path, childName) {
-    const { assignableExports, importLocals } = visitor
+    const { assignableExports, importedLocals } = visitor
     const node = path.getValue()
     const names = getNamesFromPattern(node[childName])
 
     // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {
-      if (importLocals[name] === true &&
+      if (importedLocals[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         throw new errors.TypeError(
           visitor.magicString.original,

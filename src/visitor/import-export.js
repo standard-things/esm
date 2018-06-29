@@ -46,7 +46,7 @@ function init() {
       this.exportedStars = []
       this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
       this.generateVarDeclarations = options.generateVarDeclarations
-      this.importLocals = { __proto__: null }
+      this.importedLocals = { __proto__: null }
       this.magicString = magicString
       this.possibleIndexes = options.possibleIndexes
       this.runtimeName = options.runtimeName
@@ -317,16 +317,16 @@ function init() {
           )
         }
 
-        const importNames = keys(specifierMap)
-        const lastIndex = importNames.length - 1
+        const importedNames = keys(specifierMap)
+        const lastIndex = importedNames.length - 1
 
         let hoistedCode = runtimeName + '.w("' + specifierName + '",['
         let i = -1
 
-        for (const importName of importNames) {
+        for (const importedName of importedNames) {
           hoistedCode +=
-            '["' + importName + '",null,function(v){' +
-            specifierMap[importName].join("=") +
+            '["' + importedName + '",null,function(v){' +
+            specifierMap[importedName].join("=") +
             "=v}]"
 
           if (++i !== lastIndex) {
@@ -362,13 +362,13 @@ function init() {
   }
 
   function addLocals(visitor, specifierMap) {
-    const { importLocals, temporals } = visitor
+    const { importedLocals, temporals } = visitor
 
-    for (const importName in specifierMap) {
-      for (const localName of specifierMap[importName]) {
-        importLocals[localName] = true
+    for (const importedName in specifierMap) {
+      for (const localName of specifierMap[importedName]) {
+        importedLocals[localName] = true
 
-        if (importName !== "*") {
+        if (importedName !== "*") {
           temporals[localName] = true
         }
       }
@@ -389,10 +389,10 @@ function init() {
     }
   }
 
-  function addToSpecifierMap(visitor, specifierMap, importName, localName) {
+  function addToSpecifierMap(visitor, specifierMap, importedName, localName) {
     const localNames =
-      specifierMap[importName] ||
-      (specifierMap[importName] = [])
+      specifierMap[importedName] ||
+      (specifierMap[importedName] = [])
 
     localNames.push(localName)
   }
@@ -422,15 +422,15 @@ function init() {
     for (const specifier of specifiers) {
       const { type } = specifier
 
-      let importName = "*"
+      let importedName = "*"
 
       if (type === "ImportSpecifier") {
-        importName = specifier.imported.name
+        importedName = specifier.imported.name
       } else if (type === "ImportDefaultSpecifier") {
-        importName = "default"
+        importedName = "default"
       }
 
-      addToSpecifierMap(visitor, specifierMap, importName, specifier.local.name)
+      addToSpecifierMap(visitor, specifierMap, importedName, specifier.local.name)
     }
 
     return specifierMap
@@ -490,34 +490,34 @@ function init() {
   }
 
   function toModuleImport(visitor, specifierName, specifierMap) {
-    const importNames = keys(specifierMap)
+    const importedNames = keys(specifierMap)
 
     let code = visitor.runtimeName + '.w("' + specifierName + '"'
 
     addToDependencySpecifiers(visitor, specifierName)
 
-    if (! importNames.length) {
+    if (! importedNames.length) {
       return code + ");"
     }
 
     code += ",["
 
-    const lastIndex = importNames.length - 1
+    const lastIndex = importedNames.length - 1
 
     let i = -1
 
-    for (const importName of importNames) {
-      const localNames = specifierMap[importName]
+    for (const importedName of importedNames) {
+      const localNames = specifierMap[importedName]
       const valueParam = safeName("v", localNames)
 
-      addToDependencySpecifiers(visitor, specifierName, importName)
+      addToDependencySpecifiers(visitor, specifierName, importedName)
 
       code +=
         // Generate plain functions, instead of arrow functions,
         // to avoid a perf hit in Node 4.
         '["' +
-        importName + '",' +
-        (importName === "*"
+        importedName + '",' +
+        (importedName === "*"
           ? "null"
           : '["' + localNames.join('","') + '"]'
         ) +
