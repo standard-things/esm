@@ -11,8 +11,7 @@ function isElectronRenderer() {
 
   return env.electronRenderer =
     isElectron() &&
-    (type === "renderer" ||
-     shared.unsafeGlobal.process === void 0)
+    type === "renderer"
 }
 
 export default isElectronRenderer
