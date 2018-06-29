@@ -1,6 +1,52 @@
 import shared from "../shared.js"
 
 function init() {
+  function isShadowed(path, name, map) {
+    const isArguments = name === "arguments"
+
+    let shadowed = false
+
+    path.getParentNode((parent) => {
+      const { type } = parent
+
+      if (type === "WithStatement") {
+        const node = path.getValue()
+
+        return shadowed = parent.object !== node
+      }
+
+      let cache = map.get(parent)
+
+      if (cache &&
+          Reflect.has(cache, name)) {
+        return shadowed = cache[name]
+      } else {
+        cache = { __proto__: null }
+        map.set(parent, cache)
+      }
+
+      const isNonArrowFunc =
+        type === "FunctionDeclaration" ||
+        type === "FunctionExpression"
+
+      if (isArguments &&
+          isNonArrowFunc) {
+        shadowed = true
+      } else if (type === "BlockStatement") {
+        shadowed = hasVariable(parent, name)
+      } else if (isNonArrowFunc ||
+          type === "ArrowFunctionExpression") {
+        shadowed =
+          isNamed(parent, name) ||
+          hasNamed(parent.params, name)
+      }
+
+      return cache[name] = shadowed
+    })
+
+    return shadowed
+  }
+
   function hasNamed(nodes, name) {
     for (const node of nodes) {
       if (isNamed(node, name)) {
@@ -9,10 +55,6 @@ function init() {
     }
 
     return false
-  }
-
-  function hasParameter(node, name) {
-    return hasNamed(node.params, name)
   }
 
   function hasVariable(node, name) {
@@ -47,44 +89,6 @@ function init() {
     }
 
     return node.name === name
-  }
-
-  function isShadowed(path, name, map) {
-    let shadowed = false
-
-    path.getParentNode((parent) => {
-      const { type } = parent
-
-      if (type === "WithStatement") {
-        const node = path.getValue()
-
-        return shadowed = parent.object !== node
-      }
-
-      let cache = map.get(parent)
-
-      if (cache &&
-          Reflect.has(cache, name)) {
-        return shadowed = cache[name]
-      } else {
-        cache = { __proto__: null }
-        map.set(parent, cache)
-      }
-
-      if (type === "BlockStatement") {
-        shadowed = hasVariable(parent, name)
-      } else if (type === "FunctionDeclaration" ||
-          type === "FunctionExpression" ||
-          type === "ArrowFunctionExpression") {
-        shadowed =
-          isNamed(parent, name) ||
-          hasParameter(parent, name)
-      }
-
-      return cache[name] = shadowed
-    })
-
-    return shadowed
   }
 
   return isShadowed
