@@ -18,6 +18,7 @@ function init() {
     const { body } = node
     const exported = { __proto__: null }
     const identifiers = []
+    const importedLocals = []
 
     const top = {
       hoistedExports: [],
@@ -25,6 +26,7 @@ function init() {
       hoistedImportsString: "",
       hoistedPrefixString: "",
       identifiers,
+      importedLocals,
       insertCharIndex: node.start,
       insertNodeIndex: 0,
       returnOutsideFunction: false
@@ -75,7 +77,10 @@ function init() {
         identifiers.push(object.id.name)
       } else if (type === "ImportDeclaration") {
         for (const specifier of stmt.specifiers) {
-          identifiers.push(specifier.local.name)
+          const { name } = specifier.local
+
+          identifiers.push(name)
+          importedLocals.push(name)
         }
       }
 
