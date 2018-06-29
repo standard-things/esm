@@ -119,6 +119,7 @@ const Runtime = {
     })
 
     object._ = object
+    object.a = object.assertTDZ = Runtime.assertTDZ
     object.c = object.compileEval = Runtime.compileEval.bind(object)
     object.d = object.default = Runtime.default
     object.e = object.export = Runtime.export
@@ -127,7 +128,7 @@ const Runtime = {
     object.k = identity
     object.n = object.nsSetter = Runtime.nsSetter
     object.r = object.run = Runtime.run
-    object.t = object.assertTDZ = Runtime.assertTDZ
+    object.t = object.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
     object.u = object.update = Runtime.update
     object.v = indirectEval
     object.w = object.watch = Runtime.watch
@@ -182,6 +183,10 @@ const Runtime = {
     const runner =  entry.type === TYPE_ESM ? runESM : runCJS
 
     return runner(entry, moduleWrapper)
+  },
+
+  throwUndefinedIdentifier(name) {
+    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.throwUndefinedIdentifier)
   },
 
   update(valueToPassThrough) {

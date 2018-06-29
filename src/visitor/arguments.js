@@ -1,81 +1,75 @@
 import Visitor from "../visitor.js"
 
-import { getLineInfo } from "../acorn.js"
-import isIdentifier from "../parse/is-identifier.js"
+import isIdentifer from "../parse/is-identifier.js"
+import isShadowed from "../parse/is-shadowed.js"
+import maybeWrap from "../parse/maybe-wrap.js"
+import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
-  const definedMap = new WeakMap
+  const shadowedMap = new Map
 
   class ArgumentsVisitor extends Visitor {
     reset(rootPath, options) {
+      this.changed = false
       this.magicString = options.magicString
       this.possibleIndexes = options.possibleIndexes
-      this.warnedForArguments = false
-      this.warnings = options.warnings
+      this.runtimeName = options.runtimeName
+      this.top = options.top
     }
 
     visitIdentifier(path) {
-      if (this.warnedForArguments) {
-        return
-      }
-
       const node = path.getValue()
+      const { name } = node
 
-      if (node.name !== "arguments") {
+      if (name !== "__dirname" &&
+          name !== "__filename" &&
+          name !== "arguments" &&
+          name !== "exports" &&
+          name !== "module" &&
+          name !== "require") {
         return
       }
 
       const parent = path.getParentNode()
+      const { type } = parent
 
-      if ((parent.type === "UnaryExpression" &&
+      if ((type === "AssignmentExpression" &&
+           parent.left === node) ||
+          (type === "UnaryExpression" &&
            parent.operator === "typeof") ||
-          ! isIdentifier(node, parent) ||
-          isArgumentsDefined(path)) {
+          ! isIdentifer(node, parent) ||
+          isShadowed(path, name, shadowedMap)) {
         return
       }
 
-      const {
-        column,
-        line
-      } = getLineInfo(this.magicString.original, node.start)
+      const { runtimeName } = this
 
-      this.warnedForArguments = true
+      maybeWrap(this, path, (node, parent) => {
+        this.changed = true
 
-      this.warnings.push({
-        args: [line, column],
-        code: "WRN_ARGUMENTS_ACCESS"
+        if (parent.shorthand) {
+          this.magicString
+            .prependLeft(
+              node.end,
+              ":" + runtimeName + '.t("' + name + '")'
+            )
+
+          return
+        }
+
+        const isNewExpression = parent.type === "NewExpression"
+        const prefix = isNewExpression ? "(" : ""
+        const postfix = isNewExpression ? ")" : ""
+
+        overwrite(
+          this,
+          node.start,
+          node.end,
+          prefix + runtimeName + '.t("' + name + '")' + postfix
+        )
       })
     }
-
-    visitWithoutReset(path) {
-      if (! this.warnedForArguments) {
-        super.visitWithoutReset(path)
-      }
-    }
-  }
-
-  function isArgumentsDefined(path) {
-    let defined = false
-
-    path.getParentNode((parent) => {
-      defined = definedMap.get(parent)
-
-      if (defined) {
-        return defined
-      }
-
-      const { type } = parent
-
-      defined =
-        type === "FunctionDeclaration" ||
-        type === "FunctionExpression"
-
-      definedMap.set(parent, defined)
-      return defined
-    })
-
-    return defined
   }
 
   return new ArgumentsVisitor

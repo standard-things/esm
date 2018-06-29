@@ -242,23 +242,40 @@ function init() {
           }
         }
 
-        if (options.warnings &&
-            ! options.cjs.vars &&
-            top.identifiers.indexOf("arguments") === -1) {
-          const possibleIndexes = findIndexes(code, ["arguments"])
+        if (! options.cjs.vars) {
+          const { importedLocals } = top
+          const possibleNames = []
+
+          const names = [
+            "__dirname",
+            "__filename",
+            "arguments",
+            "exports",
+            "module",
+            "require"
+          ]
+
+          for (const name of names) {
+            if (importedLocals.indexOf(name) === -1) {
+              possibleNames.push(name)
+            }
+          }
+
+          const possibleIndexes = findIndexes(code, possibleNames)
 
           if (possibleIndexes.length) {
-            result.warnings = []
             argumentsVisitor.visit(rootPath, {
               magicString,
               possibleIndexes,
-              warnings: result.warnings
+              runtimeName,
+              top
             })
           }
         }
       }
 
       result.changed =
+        argumentsVisitor.changed ||
         consoleVisitor.changed ||
         evalVisitor.changed ||
         importExportVisitor.changed

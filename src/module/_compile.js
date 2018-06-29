@@ -4,7 +4,6 @@ import PACKAGE from "../constant/package.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
-import Module from "../module.js"
 import Package from "../package.js"
 import Runtime from "../runtime.js"
 
@@ -23,8 +22,6 @@ import readFileFast from "../fs/read-file-fast.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
-import warn from "../warn.js"
-import wrap from "./wrap.js"
 
 const {
   STATE_EXECUTION_STARTED,
@@ -52,9 +49,9 @@ const ExObject = shared.external.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
-  const { mode, warnings } = pkg.options
   const { cache } = pkg
   const { cacheName } = entry
+  const { mode } = pkg.options
   const { parsing } = shared.moduleState
 
   let hint = SCRIPT
@@ -93,8 +90,7 @@ function compile(caller, entry, content, filename, fallback) {
 
       compileData = tryCompileCode(caller, entry, content, filename, {
         hint,
-        sourceType,
-        warnings
+        sourceType
       })
 
       compileData.scriptData = scriptData
@@ -105,7 +101,7 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (! parsing) {
     entry.state = STATE_EXECUTION_STARTED
-    return tryCompileCached(caller, entry, content, filename)
+    return tryCompileCached(entry, content, filename)
   }
 
   const defaultPkg = Package.state.default
@@ -127,7 +123,7 @@ function compile(caller, entry, content, filename, fallback) {
   }
 }
 
-function tryCompileCached(caller, entry, content, filename) {
+function tryCompileCached(entry, content, filename) {
   const isESM = entry.type === TYPE_ESM
   const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
@@ -136,12 +132,6 @@ function tryCompileCached(caller, entry, content, filename) {
 
   if (noDepth) {
     moduleState.stat = { __proto__: null }
-  }
-
-  if (pkg.options.warnings) {
-    for (const { args, code } of entry.compileData.warnings) {
-      warn(code, filename, ...args)
-    }
   }
 
   let error
@@ -189,10 +179,6 @@ function tryCompileCJS(entry, filename) {
   const mod = entry.module
   const useAsync = useAsyncWrapper(entry)
 
-  if (Module.wrap === moduleWrapESM) {
-    Module.wrap = wrap
-  }
-
   let content = compileData.code
 
   if (compileData.changed) {
@@ -207,18 +193,14 @@ function tryCompileCJS(entry, filename) {
 
     Runtime.enable(entry, new ExObject)
   } else if (useAsync) {
-    Module.wrap = moduleWrapAsyncCJS
+    content =
+      "(async () => { " +
+      content +
+      "\n})();"
   }
 
   content += maybeSourceMap(entry, content, filename)
-
-  try {
-    return mod._compile(content, filename)
-  } finally {
-    if (Module.wrap === moduleWrapAsyncCJS) {
-      Module.wrap = wrap
-    }
-  }
+  return mod._compile(content, filename)
 }
 
 function tryCompileESM(entry, filename) {
@@ -231,41 +213,26 @@ function tryCompileESM(entry, filename) {
 
   let content =
     "const " + runtimeName + "=this;" +
+    (cjsVars
+      ? ""
+      : "__dirname=__filename=module=void 0;"
+    ) +
     (compileData.topLevelReturn ? "return " : "") +
     runtimeName + ".r((" +
     (useAsyncWrapper(entry) ? "async " :  "") +
     "function(global" +
-    (cjsVars ? ",exports,require" : "") +
+    (cjsVars
+      ? ",exports,require"
+      : ""
+    ) +
     '){"use strict";' +
     compileData.code +
     "\n}))"
 
   content += maybeSourceMap(entry, content, filename)
 
-  if (! cjsVars) {
-    Module.wrap = moduleWrapESM
-  }
-
   Runtime.enable(entry, new ExObject)
-
-  try {
-    return mod._compile(content, filename)
-  } finally {
-    if (Module.wrap === moduleWrapESM) {
-      Module.wrap = wrap
-    }
-  }
-}
-
-function moduleWrapAsyncCJS(script) {
-  Module.wrap = wrap
-  return "(async function (exports, require, module, __filename, __dirname) { " +
-    script + "\n});"
-}
-
-function moduleWrapESM(script) {
-  Module.wrap = wrap
-  return "(function () { " + script + "\n});"
+  return mod._compile(content, filename)
 }
 
 function maybeSourceMap(entry, content, filename) {
