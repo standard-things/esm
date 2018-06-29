@@ -1,13 +1,8 @@
-import ESM from "../constant/esm.js"
-
+import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
 import shared from "../shared.js"
 
 function init() {
-  const {
-    PKG_DIRNAME
-  } = ESM
-
   // eslint-disable-next-line no-useless-escape
   const locRegExp = /^ *at (?:.+? \()?(.+?):(\d+)(?:\:(\d+))?/gm
 
@@ -22,7 +17,7 @@ function init() {
       const filename = match[1]
 
       if (! isPath(filename) ||
-          filename.startsWith(PKG_DIRNAME)) {
+          isOwnPath(filename)) {
         continue
       }
 

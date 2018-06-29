@@ -4,7 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    PKG_DIRNAME
+    PKG_FILENAMES
   } = ESM
 
   const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
@@ -28,7 +28,16 @@ function init() {
     let trace = stack.slice(index)
 
     const lines = trace.split("\n")
-    const filtered = lines.filter((line) => line.indexOf(PKG_DIRNAME) === -1)
+
+    const filtered = lines.filter((line) => {
+      for (const filename of PKG_FILENAMES) {
+        if (line.indexOf(filename) !== -1) {
+          return false
+        }
+      }
+
+      return true
+    })
 
     trace = filtered.join("\n")
     trace = trace.replace(columnInfoRegExp, ":1")

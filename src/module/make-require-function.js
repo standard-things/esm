@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
 import ENTRY from "../constant/entry.js"
+import ESM from "../constant/esm.js"
 
 import Entry from "../entry.js"
 import Module from "../module.js"
@@ -11,7 +12,6 @@ import errors from "../errors.js"
 import isDataProperty from "../util/is-data-property.js"
 import isError from "../util/is-error.js"
 import isInstalled from "../util/is-installed.js"
-import isOwnPath from "../util/is-own-path.js"
 import maskFunction from "../util/mask-function.js"
 import realGetProxyDetails from "../real/get-proxy-details.js"
 import realProcess from "../real/process.js"
@@ -23,6 +23,10 @@ const {
 } = ENTRY
 
 const {
+  PKG_DIRNAME
+} = ESM
+
+const {
   ERR_INVALID_ARG_TYPE
 } = errors
 
@@ -32,7 +36,7 @@ const sourcePaths = sourceResolve && sourceResolve.paths
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
   const isESM = entry.type === TYPE_ESM
-  const isOwn = isOwnPath(mod.filename)
+  const isOwn = isOwnModule(mod)
   const { name } = entry
 
   let req = function require(request) {
@@ -111,6 +115,13 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   return req
+}
+
+function isOwnModule(mod) {
+  const { filename } = mod
+
+  return typeof filename === "string" &&
+    filename.startsWith(PKG_DIRNAME)
 }
 
 function ownRequire(request) {

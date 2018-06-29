@@ -1,12 +1,19 @@
 import ESM from "../constant/esm.js"
 
 const {
-  PKG_DIRNAME
+  PKG_FILENAMES
 } = ESM
 
 function isOwnPath(thePath) {
-  return typeof thePath === "string" &&
-    thePath.startsWith(PKG_DIRNAME)
+  if (typeof thePath === "string") {
+    for (const filename of PKG_FILENAMES) {
+      if (thePath === filename) {
+        return true
+      }
+    }
+  }
+
+  return false
 }
 
 export default isOwnPath

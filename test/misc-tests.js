@@ -1382,25 +1382,34 @@ describe("spec compliance", () => {
       )
   })
 
-  it("should error when accessing an `arguments` binding", () =>
-    [
-      "fixture/source/arguments-top-level.mjs",
-      "fixture/source/arguments-nested.mjs"
-    ]
-    .reduce((promise, request) => {
-      const filename = path.resolve(request)
+  it("should error when accessing an `arguments` binding", () => {
+    const id1 = path.resolve("fixture/source/arguments-top-level.mjs")
+    const id2 = path.resolve("fixture/source/arguments-nested.mjs")
 
-      return promise
-        .then(() => import(filename))
-        .then(() => assert.ok(false))
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(filename) + ":1",
-            "ReferenceError: arguments is not defined"
-          ].join("\n"))
-        )
-    }, Promise.resolve())
-  )
+    return Promise
+      .all([
+        import(id1)
+          .then(() => assert.ok(false))
+          .catch((e) =>
+            checkErrorStack(e, [
+              getURLFromFilePath(id1) + ":1",
+              "arguments",
+              "",
+              "ReferenceError: arguments is not defined"
+            ].join("\n"))
+          ),
+        import(id2)
+          .then(() => assert.ok(false))
+          .catch((e) =>
+            checkErrorStack(e, [
+              getURLFromFilePath(id2) + ":2",
+              "  arguments",
+              "",
+              "ReferenceError: arguments is not defined"
+            ].join("\n"))
+          )
+      ])
+  })
 
   it("should not error accessing `arguments` in a function", () =>
     import("./fixture/source/arguments-function.mjs")
