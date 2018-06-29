@@ -139,32 +139,32 @@ function init() {
     return ""
   })
 
-  setDeferred(shared, "runtimeName", () =>
-    encodeId(
+  setDeferred(shared, "runtimeName", () => {
+    return encodeId(
       "_" +
       shared.module.safeCrypto.createHash("md5")
         .update(Date.now().toString())
         .digest("hex")
         .slice(0, 3)
     )
-  )
+  })
 
-  setDeferred(shared, "unsafeContext", () =>
-    shared.module.safeVM.createContext(shared.unsafeGlobal)
-  )
+  setDeferred(shared, "unsafeContext", () => {
+    return shared.module.safeVM.createContext(shared.unsafeGlobal)
+  })
 
-  setDeferred(fastPath, "readFile", () =>
-    support.internalModuleReadFile
-  )
+  setDeferred(fastPath, "readFile", () => {
+    return support.internalModuleReadFile
+  })
 
-  setDeferred(fastPath, "readFileFast", () =>
-    support.internalModuleReadJSON ||
+  setDeferred(fastPath, "readFileFast", () => {
+    return support.internalModuleReadJSON ||
       support.internalModuleReadFile
-  )
+  })
 
-  setDeferred(fastPath, "stat", () =>
-    typeof shared.module.binding.fs.internalModuleStat === "function"
-  )
+  setDeferred(fastPath, "stat", () => {
+    return typeof shared.module.binding.fs.internalModuleStat === "function"
+  })
 
   setDeferred(support, "await", () => {
     try {
@@ -175,13 +175,13 @@ function init() {
     return false
   })
 
-  setDeferred(support, "createCachedData", () =>
-    typeof shared.module.safeVM.Script.prototype.createCachedData === "function"
-  )
+  setDeferred(support, "createCachedData", () => {
+    return typeof shared.module.safeVM.Script.prototype.createCachedData === "function"
+  })
 
-  setDeferred(support, "getProxyDetails", () =>
-    typeof shared.module.binding.util.getProxyDetails === "function"
-  )
+  setDeferred(support, "getProxyDetails", () => {
+    return typeof shared.module.binding.util.getProxyDetails === "function"
+  })
 
   setDeferred(support, "inspectProxies", () => {
     const inspected = shared.module.safeUtil.inspect(dummyProxy, {
@@ -193,13 +193,13 @@ function init() {
       inspected.indexOf(PKG_PREFIX) !== -1
   })
 
-  setDeferred(support, "internalModuleReadFile", () =>
-    typeof shared.module.binding.fs.internalModuleReadFile === "function"
-  )
+  setDeferred(support, "internalModuleReadFile", () => {
+    return typeof shared.module.binding.fs.internalModuleReadFile === "function"
+  })
 
-  setDeferred(support, "internalModuleReadJSON", () =>
-    typeof shared.module.binding.fs.internalModuleReadJSON === "function"
-  )
+  setDeferred(support, "internalModuleReadJSON", () => {
+    return typeof shared.module.binding.fs.internalModuleReadJSON === "function"
+  })
 
   setDeferred(support, "lookupShadowed", () => {
     // Node < 8 will lookup accessors in the prototype chain despite being
@@ -238,9 +238,9 @@ function init() {
     return new C().c !== void 0
   })
 
-  setDeferred(support, "proxiedFunctionToStringTag", () =>
-    toString.call(dummyProxy) === "[object Function]"
-  )
+  setDeferred(support, "proxiedFunctionToStringTag", () => {
+    return toString.call(dummyProxy) === "[object Function]"
+  })
 
   setDeferred(support, "replShowProxy", () => {
     const { safeProcess, utilSatisfies } = shared.module
@@ -248,13 +248,13 @@ function init() {
     return utilSatisfies(safeProcess.version, ">=10")
   })
 
-  setDeferred(support, "safeGetEnv", () =>
-    typeof shared.module.binding.util.safeGetenv === "function"
-  )
+  setDeferred(support, "safeGetEnv", () => {
+    return typeof shared.module.binding.util.safeGetenv === "function"
+  })
 
-  setDeferred(support, "setHiddenValue", () =>
-    typeof shared.module.binding.util.setHiddenValue === "function"
-  )
+  setDeferred(support, "setHiddenValue", () => {
+    return typeof shared.module.binding.util.setHiddenValue === "function"
+  })
 
   setDeferred(utilBinding, "errorDecoratedSymbol", () => {
     const { binding, safeProcess, utilSatisfies } = shared.module
