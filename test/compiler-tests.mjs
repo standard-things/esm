@@ -265,7 +265,9 @@ describe("compiler", () => {
 
   it("should parse shorthand async function properties with reserved names", () => {
     sourceTypes.forEach((sourceType) => {
-      Compiler.compile("({ async delete() {} })", { sourceType })
+      assert.doesNotThrow(
+        () => Compiler.compile("({ async delete() {} })", { sourceType })
+      )
     })
   })
 
@@ -276,7 +278,7 @@ describe("compiler", () => {
     ]
     .forEach((code) => {
       sourceTypes.forEach((sourceType) => {
-        Compiler.compile(code, { sourceType })
+        assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
       })
     })
   })
@@ -290,7 +292,7 @@ describe("compiler", () => {
     ]
     .forEach((code) => {
       modernTypes.forEach((sourceType) => {
-        Compiler.compile(code, { sourceType })
+        assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
       })
     })
   })
@@ -307,7 +309,7 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -326,7 +328,7 @@ describe("compiler", () => {
     ].join("\n")
 
     sourceTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -346,7 +348,7 @@ describe("compiler", () => {
     ].join("\n")
 
     sourceTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -364,7 +366,7 @@ describe("compiler", () => {
     ].join("\n")
 
     sourceTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -392,7 +394,7 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -408,7 +410,7 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
@@ -422,7 +424,7 @@ describe("compiler", () => {
     ].join("\n")
 
     modernTypes.forEach((sourceType) => {
-      Compiler.compile(code, { sourceType })
+      assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
     })
   })
 
