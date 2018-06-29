@@ -12,6 +12,9 @@ function isIdentifier(node, parent) {
 
     if (type === "BreakStatement" ||
         type === "ContinueStatement" ||
+        type === "ImportDefaultSpecifier" ||
+        type === "ImportNamespaceSpecifier" ||
+        type === "ImportSpecifier" ||
         type === "LabeledStatement") {
       return false
     }
