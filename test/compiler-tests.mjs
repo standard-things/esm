@@ -13,17 +13,17 @@ describe("compiler", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 
-    assert.throws(
-      () => Compiler.compile("return", { sourceType: MODULE }),
-      /SyntaxError: Illegal return statement/
-    )
-
     assert.doesNotThrow(() => Compiler.compile("return", {
       cjs: {
         topLevelReturn: true
       },
       sourceType: MODULE
     }))
+
+    assert.throws(
+      () => Compiler.compile("return", { sourceType: MODULE }),
+      /SyntaxError: Illegal return statement/
+    )
   })
 
   it("should support `options.sourceType`", () => {
@@ -35,28 +35,24 @@ describe("compiler", () => {
   })
 
   it("should support `options.cjs.vars`", () => {
-    let result = Compiler.compile("arguments")
+    const code = "arguments"
 
-    assert.strictEqual(result.warnings, null)
+    let result = Compiler.compile(code)
 
-    result = Compiler.compile("arguments", {
+    assert.strictEqual(result.code, code)
+
+    result = Compiler.compile(code, {
       cjs: {
         vars: true
       },
-      sourceType: MODULE,
-      warnings: true
+      sourceType: MODULE
     })
 
-    assert.strictEqual(result.warnings, null)
+    assert.strictEqual(result.code, code)
 
-    result = Compiler.compile("arguments", {
-      sourceType: MODULE,
-      warnings: true
-    })
+    result = Compiler.compile(code, { sourceType: MODULE })
 
-    const warnings = result.warnings || []
-
-    assert.strictEqual(warnings.length, 1)
+    assert.ok(result.code.includes('_.t("arguments")'))
   })
 
   it("should support `options.sourceType` of MODULE", () => {

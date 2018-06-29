@@ -10,8 +10,7 @@ export default () => {
     "mainFields",
     "mode",
     "sourcemap",
-    "sourceMap",
-    "warnings"
+    "sourceMap"
   ]
 
   optionNames.forEach((name) => {

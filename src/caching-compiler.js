@@ -74,8 +74,7 @@ function init() {
         exportedStars: meta[8] || null,
         scriptData: null,
         sourceType: +meta[2] || SCRIPT,
-        topLevelReturn: !! meta[4],
-        warnings: meta[9] || null
+        topLevelReturn: !! meta[4]
       }
 
       if (result.sourceType === MODULE) {
@@ -219,7 +218,6 @@ function init() {
 
   function toCompileOptions(entry, options) {
     const { runtimeName } = entry
-    const { warnings } = options
 
     const cjs = isMJS(entry.module)
       ? void 0
@@ -228,8 +226,7 @@ function init() {
     if (options.eval) {
       return {
         cjs,
-        runtimeName,
-        warnings
+        runtimeName
       }
     }
 
@@ -240,8 +237,7 @@ function init() {
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,
-      var: options.var,
-      warnings
+      var: options.var
     }
   }
 
@@ -403,8 +399,8 @@ function init() {
         const meta = [offsetStart, offsetEnd]
 
         if (compileData) {
-          const { sourceType, warnings } = compileData
           const changed = +compileData.changed
+          const { sourceType } = compileData
           const topLevelReturn = +compileData.topLevelReturn
 
           if (sourceType === SCRIPT) {
@@ -430,10 +426,6 @@ function init() {
               compileData.exportedNames || 0,
               compileData.exportedStars || 0
             )
-
-            if (warnings) {
-              meta.push(warnings)
-            }
           }
         }
 

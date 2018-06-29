@@ -196,12 +196,6 @@ DevOpts
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"warnings":</code></td>
-  <td>
-    <p>A boolean for logging development parse and runtime warnings.</p>
-  </td>
-</tr>
-<tr>
   <td colspan="2"><code>}</code></td>
 </tr>
 </table>

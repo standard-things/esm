@@ -7,7 +7,6 @@ import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import * as fsExtraNs from "fs-extra"
 import * as fsNs from "fs"
-import mockIo from "mock-stdio"
 import path from "path"
 import require from "./require.js"
 import util from "util"
@@ -1383,30 +1382,23 @@ describe("spec compliance", () => {
       )
   })
 
-  it("should warn when creating an `arguments` binding", () =>
+  it("should error when accessing an `arguments` binding", () =>
     [
-      { id: "fixture/source/arguments-undefined.mjs", loc: "1:0" },
-      { id: "fixture/source/arguments-undefined-nested.mjs", loc: "2:2" }
+      "fixture/source/arguments-top-level.mjs",
+      "fixture/source/arguments-nested.mjs"
     ]
-    .reduce((promise, data) => {
-      const filename = path.resolve(data.id)
-      const warning = getWarning(
-        "esm@" + pkgJSON.version + " detected undefined arguments access (%s): %s",
-        data.loc,
-        getURLFromFilePath(filename)
-      )
+    .reduce((promise, request) => {
+      const filename = path.resolve(request)
 
       return promise
-        .then(() => {
-          mockIo.start()
-          return import(filename)
-        })
-        .then(() => {
-          const result = mockIo.end()
-
-          assert.strictEqual(result.stdout, "")
-          assert.ok(result.stderr.startsWith(warning))
-        })
+        .then(() => import(filename))
+        .then(() => assert.ok(false))
+        .catch((e) =>
+          checkErrorStack(e, [
+            getURLFromFilePath(filename) + ":1",
+            "ReferenceError: arguments is not defined"
+          ].join("\n"))
+        )
     }, Promise.resolve())
   )
 

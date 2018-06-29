@@ -87,8 +87,7 @@ function hook(vm) {
           pragmas: false,
           sourceType: UNAMBIGUOUS,
           strict: false,
-          var: true,
-          warnings: false
+          var: true
         }
       ])
     }

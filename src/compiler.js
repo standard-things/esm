@@ -1,4 +1,3 @@
-import ENV from "./constant/env.js"
 import SOURCE_TYPE from "./constant/source-type.js"
 
 import FastPath from "./fast-path.js"
@@ -22,17 +21,12 @@ import temporalVisitor from "./visitor/temporal.js"
 
 function init() {
   const {
-    DEVELOPMENT
-  } = ENV
-
-  const {
     MODULE,
     SCRIPT,
     UNAMBIGUOUS
   } = SOURCE_TYPE
 
   const defaultOptions = {
-    assertTDZ: false,
     cjs: {
       topLevelReturn: false,
       vars: false
@@ -42,8 +36,7 @@ function init() {
     runtimeName: "_",
     sourceType: SCRIPT,
     strict: void 0,
-    var: false,
-    warnings: DEVELOPMENT
+    var: false
   }
 
   const Compiler = {
@@ -65,8 +58,7 @@ function init() {
         exportedStars: null,
         scriptData: null,
         sourceType: SCRIPT,
-        topLevelReturn: false,
-        warnings: null
+        topLevelReturn: false
       }
 
       let { hint, sourceType } = options

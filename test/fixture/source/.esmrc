@@ -2,6 +2,5 @@
   cjs: false,
   debug: false,
   mode: "strict",
-  sourceMap: true,
-  warnings: true
+  sourceMap: true
 }

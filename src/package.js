@@ -37,7 +37,6 @@ const {
 } = CHAR_CODE
 
 const {
-  DEVELOPMENT,
   OPTIONS,
   NYC
 } = ENV
@@ -77,8 +76,7 @@ const defaultOptions = {
   debug: false,
   mainFields: ["main"],
   mode: "strict",
-  sourceMap: void 0,
-  warnings: DEVELOPMENT
+  sourceMap: void 0
 }
 
 const autoOptions = {
@@ -389,14 +387,6 @@ function createOptions(value) {
     options.sourceMap = !! sourceMap
   } else if (sourceMap !== void 0) {
     throw new ERR_INVALID_ESM_OPTION("sourceMap", sourceMap)
-  }
-
-  const { warnings } = options
-
-  if (isFlag(warnings)) {
-    options.warnings = !! warnings
-  } else {
-    throw new ERR_INVALID_ESM_OPTION("warnings", warnings)
   }
 
   return options
