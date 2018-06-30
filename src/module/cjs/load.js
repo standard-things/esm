@@ -29,7 +29,7 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-function load(request, parent, isMain, preload) {
+function load(request, parent, isMain) {
   const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
 
@@ -68,7 +68,7 @@ function load(request, parent, isMain, preload) {
     }
 
     loaderCalled = true
-    tryLoader(entry, state, filename, filename, parentEntry, preload)
+    tryLoader(entry, state, filename, filename, parentEntry)
   })
 
   if (! loaderCalled) {
@@ -77,20 +77,16 @@ function load(request, parent, isMain, preload) {
         parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {
       throw new ERR_REQUIRE_ESM(filename)
     }
-
-    if (preload) {
-      preload(entry)
-    }
   }
 
   return entry.module.exports
 }
 
-function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
+function tryLoader(entry, state, cacheKey, filename, parentEntry) {
   let threw = true
 
   try {
-    loader(entry, filename, parentEntry, preload)
+    loader(entry, filename, parentEntry)
     threw = false
   } finally {
     if (threw) {

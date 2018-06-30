@@ -8,11 +8,7 @@ const {
   OPTIONS_MODE_STRICT
 } = PACKAGE
 
-function loader(entry, filename, parentEntry, preload) {
-  if (preload) {
-    preload(entry)
-  }
-
+function loader(entry, filename, parentEntry) {
   const { _extensions } = Module
   const mod = entry.module
 
