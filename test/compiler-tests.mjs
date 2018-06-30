@@ -435,6 +435,7 @@ describe("compiler", () => {
       "`a ${ a } a`",
       "switch (a) { case a: a }",
       "const b = { a }",
+      "const b = { a() { a } }",
       "const b = () => a",
       "function b() { return a }",
       "b(a, c)"
@@ -446,6 +447,7 @@ describe("compiler", () => {
       '`a ${ _.a("a",a) } a`',
       'switch (_.a("a",a)) { case _.a("a",a): _.a("a",a) }',
       'const b = { a:_.a("a",a) }',
+      'const b = { a() { _.a("a",a) } }',
       'const b = () => _.a("a",a)',
       'function b() { return _.a("a",a) }',
       'b(_.a("a",a), c)'
@@ -472,6 +474,7 @@ describe("compiler", () => {
   it("should not add TDZ asserts to shadowed bindings", () =>
     [
       "function b(a) { a = a }",
+      "const b = { a: 1 }",
       "const b = function a() { a = a }",
       "a: while (true) { break a; continue a }"
     ]
@@ -496,6 +499,7 @@ describe("compiler", () => {
   it("should not wrap shadowed eval", () =>
     [
       "function b(eval) { eval = eval }",
+      "const b = { eval: 1 }",
       "const b = function eval() { eval = eval }",
       "eval: while (true) { break eval; continue eval }"
     ]

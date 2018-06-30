@@ -2,7 +2,7 @@ import Visitor from "../visitor.js"
 
 import isIdentifer from "../parse/is-identifier.js"
 import isShadowed from "../parse/is-shadowed.js"
-import maybeWrap from "../parse/maybe-wrap.js"
+import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
@@ -45,7 +45,7 @@ function init() {
 
       const { runtimeName } = this
 
-      maybeWrap(this, path, (node, parent) => {
+      maybeIdentifier(path, (node, parent) => {
         this.changed = true
 
         const { end, start } = node

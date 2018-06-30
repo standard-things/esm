@@ -2,7 +2,7 @@ import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import isShadowed from "../parse/is-shadowed.js"
-import maybeWrap from "../parse/maybe-wrap.js"
+import maybeIdentifier from "../parse/maybe-identifier.js"
 import shared from "../shared.js"
 
 function init() {
@@ -27,7 +27,7 @@ function init() {
 
       const { magicString, runtimeName } = this
 
-      maybeWrap(this, path, (node, parent) => {
+      maybeIdentifier(path, (node, parent) => {
         const { end, start } = node
 
         if (parent.shorthand) {
