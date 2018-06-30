@@ -1,6 +1,6 @@
-import c from "console"
-import p from "process"
+import { log } from "console"
+import { mainModule } from "process"
 
-const actual = Reflect.has(p, "mainModule")
+const actual = mainModule !== void 0
 
-c.log("main-module:" + actual)
+log("main-module:" + actual)

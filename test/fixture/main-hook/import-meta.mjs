@@ -1,5 +1,5 @@
-import c from "console"
+import { log } from "console"
 
 const actual = JSON.stringify(import.meta)
 
-c.log("import-meta:" + actual)
+log("import-meta:" + actual)

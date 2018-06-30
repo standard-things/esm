@@ -1,3 +1,3 @@
-import c from "console"
+import { log } from "console"
 
-c.log("symlink:true")
+log("symlink:true")
