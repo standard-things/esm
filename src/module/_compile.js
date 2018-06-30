@@ -215,7 +215,7 @@ function tryCompileESM(entry, filename) {
     "const " + runtimeName + "=this;" +
     (cjsVars
       ? ""
-      : "__dirname=__filename=module=void 0;"
+      : "__dirname=__filename=arguments=exports=module=require=void 0;"
     ) +
     (compileData.topLevelReturn ? "return " : "") +
     runtimeName + ".r((" +

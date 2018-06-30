@@ -1,7 +1,11 @@
-const { log } = console
+import { log } from "console"
 
 const actual =
   this === void 0 &&
-  typeof module === "undefined"
+  typeof __dirname === "undefined" &&
+  typeof __filename === "undefined" &&
+  typeof exports === "undefined" &&
+  typeof module === "undefined" &&
+  typeof require === "undefined"
 
 log("esm-options:" + actual)
