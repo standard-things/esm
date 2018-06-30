@@ -62,8 +62,7 @@ function hook(vm) {
     return Reflect.apply(wrapped, this, [manager, func, args])
   }
 
-  function methodWrapper(manager, func, args) {
-    let [content, scriptOptions] = args
+  function methodWrapper(manager, func, [content, scriptOptions]) {
     scriptOptions = assign({}, scriptOptions)
 
     if (! scriptOptions.produceCachedData) {
