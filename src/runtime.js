@@ -237,83 +237,6 @@ function getEntryFrom(request, exported) {
   return Entry.get(child)
 }
 
-function runCJS(entry, moduleWrapper) {
-  const mod = entry.module
-  const exported = mod.exports = entry.exports
-
-  return Reflect.apply(moduleWrapper, exported, [
-    builtinGlobal,
-    exported,
-    makeRequireFunction(mod)
-  ])
-}
-
-function runESM(entry, moduleWrapper) {
-  const mod = entry.module
-  const exported = mod.exports = entry.exports
-
-  let result
-
-  if (entry.package.options.cjs.vars &&
-      ! isMJS(mod)) {
-    result = Reflect.apply(moduleWrapper, exported, [
-      builtinGlobal,
-      exported,
-      makeRequireFunction(mod)
-    ])
-  } else {
-    result = Reflect.apply(moduleWrapper, void 0, [
-      builtinGlobal
-    ])
-  }
-
-  let { loaded } = mod
-
-  Reflect.defineProperty(mod, "loaded", {
-    configurable: true,
-    enumerable: true,
-    get: () => loaded,
-    set(value) {
-      if (value) {
-        Reflect.defineProperty(this, "loaded", {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
-
-        entry.update().loaded()
-      } else {
-        loaded = value
-      }
-    }
-  })
-
-  return result
-}
-
-function tryResolveFilename(request, parent) {
-  try {
-    return resolveFilename(request, parent)
-  } catch (e) {}
-
-  try {
-    return Module._resolveFilename(request, parent)
-  } catch (e) {}
-
-  if (isPath(request)) {
-    let parentFilename = parent && parent.filename
-
-    if (typeof parentFilename !== "string") {
-      parentFilename = ""
-    }
-
-    return resolve(parentFilename, request)
-  }
-
-  return request
-}
-
 function importModule(entry, request, setterArgsList, loader) {
   const mod = entry.module
   const { moduleState } = shared
@@ -395,6 +318,83 @@ function importModule(entry, request, setterArgsList, loader) {
     // requests are updated with mock entry setters last.
     mockEntry.update()
   }
+}
+
+function runCJS(entry, moduleWrapper) {
+  const mod = entry.module
+  const exported = mod.exports = entry.exports
+
+  return Reflect.apply(moduleWrapper, exported, [
+    builtinGlobal,
+    exported,
+    makeRequireFunction(mod)
+  ])
+}
+
+function runESM(entry, moduleWrapper) {
+  const mod = entry.module
+  const exported = mod.exports = entry.exports
+
+  let result
+
+  if (entry.package.options.cjs.vars &&
+      ! isMJS(mod)) {
+    result = Reflect.apply(moduleWrapper, exported, [
+      builtinGlobal,
+      exported,
+      makeRequireFunction(mod)
+    ])
+  } else {
+    result = Reflect.apply(moduleWrapper, void 0, [
+      builtinGlobal
+    ])
+  }
+
+  let { loaded } = mod
+
+  Reflect.defineProperty(mod, "loaded", {
+    configurable: true,
+    enumerable: true,
+    get: () => loaded,
+    set(value) {
+      if (value) {
+        Reflect.defineProperty(this, "loaded", {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
+
+        entry.update().loaded()
+      } else {
+        loaded = value
+      }
+    }
+  })
+
+  return result
+}
+
+function tryResolveFilename(request, parent) {
+  try {
+    return resolveFilename(request, parent)
+  } catch (e) {}
+
+  try {
+    return Module._resolveFilename(request, parent)
+  } catch (e) {}
+
+  if (isPath(request)) {
+    let parentFilename = parent && parent.filename
+
+    if (typeof parentFilename !== "string") {
+      parentFilename = ""
+    }
+
+    return resolve(parentFilename, request)
+  }
+
+  return request
 }
 
 export default Runtime
