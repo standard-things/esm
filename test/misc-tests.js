@@ -1392,24 +1392,32 @@ describe("spec compliance", () => {
       .all([
         import(id1)
           .then(() => assert.ok(false))
-          .catch((e) =>
-            checkErrorStack(e, [
-              getURLFromFilePath(id1) + ":1",
-              "arguments",
-              "",
-              "ReferenceError: arguments is not defined"
-            ].join("\n"))
-          ),
+          .catch((e) => {
+            if (isDebug) {
+              assert.ok(true)
+            } else {
+              checkErrorStack(e, [
+                getURLFromFilePath(id1) + ":1",
+                "arguments",
+                "",
+                "ReferenceError: arguments is not defined"
+              ].join("\n"))
+            }
+          }),
         import(id2)
           .then(() => assert.ok(false))
-          .catch((e) =>
-            checkErrorStack(e, [
-              getURLFromFilePath(id2) + ":2",
-              "  arguments",
-              "",
-              "ReferenceError: arguments is not defined"
-            ].join("\n"))
-          )
+          .catch((e) => {
+            if (isDebug) {
+              assert.ok(true)
+            } else {
+              checkErrorStack(e, [
+                getURLFromFilePath(id2) + ":2",
+                "  arguments",
+                "",
+                "ReferenceError: arguments is not defined"
+              ].join("\n"))
+            }
+          })
       ])
   })
 
