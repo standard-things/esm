@@ -35,15 +35,12 @@ function init() {
       // eval(code)
       this.changed = true
 
+      const { end, start } = node
       const { magicString, runtimeName } = this
 
-      let code = runtimeName + ".c"
-
-      if (! this.strict) {
-        code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
-      }
-
-      const { end, start } = node
+      const code = this.strict
+        ? runtimeName + ".c"
+        : "(eval===" + runtimeName + ".v?" + runtimeName + ".c:" + runtimeName + ".k)"
 
       magicString
         .prependLeft(callee.end, "(" + code)
@@ -84,19 +81,18 @@ function init() {
       // (0, eval)(code)
       this.changed = true
 
+      const { end, start } = node
       const { runtimeName } = this
 
-      let code = runtimeName + ".g"
-
-      if (! this.strict) {
-        code = "(eval===" + runtimeName + ".v?" + code + ":eval)"
-      }
+      const code = this.strict
+        ? runtimeName + ".g"
+        : "(eval===" + runtimeName + ".v?" + runtimeName + ".g:eval)"
 
       if (type === "Property" &&
           parent.shorthand) {
-        this.magicString.prependLeft(node.end, ":" + code)
+        this.magicString.prependLeft(end, ":" + code)
       } else {
-        overwrite(this, node.start, node.end, code)
+        overwrite(this, start, end, code)
       }
     }
   }
