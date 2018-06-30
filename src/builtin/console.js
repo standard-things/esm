@@ -2,8 +2,6 @@ import { stderr, stdout } from "../safe/process.js"
 
 import ENV from "../constant/env.js"
 
-import GenericFunction from "../generic/function.js"
-
 import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
@@ -12,6 +10,7 @@ import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
+import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
@@ -22,6 +21,25 @@ function init() {
   } = ENV
 
   const dirOptions = { customInspect: true }
+
+  function assertWrapper(func, [expression, ...rest]) {
+    return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
+  }
+
+  function dirWrapper(func, [object, options]) {
+    return Reflect.apply(func, this, [{
+      [shared.customInspectKey](recurseTimes, context) {
+        const contextAsOptions = assign({}, context, options)
+
+        contextAsOptions.customInspect = has(options, "customInspect")
+          ? options.customInspect
+          : false
+
+        contextAsOptions.depth = recurseTimes
+        return builtinUtil.inspect(object, contextAsOptions)
+      }
+    }, dirOptions])
+  }
 
   function defaultWrapper(func, args) {
     return Reflect.apply(func, this, toInspectableArgs(args))
@@ -85,25 +103,8 @@ function init() {
 
   const safeProto = SafeConsole.prototype
 
-  const builtinAssert = wrap(safeProto.assert, function (func, [expression, ...rest]) {
-    return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
-  })
-
-  const builtinDir = wrap(safeProto.dir, function (func, [object, options]) {
-    return Reflect.apply(func, this, [{
-      [shared.customInspectKey](recurseTimes, context) {
-        const contextAsOptions = assign({}, context, options)
-
-        contextAsOptions.customInspect = has(options, "customInspect")
-          ? options.customInspect
-          : false
-
-        contextAsOptions.depth = recurseTimes
-        return builtinUtil.inspect(object, contextAsOptions)
-      }
-    }, dirOptions])
-  })
-
+  const builtinAssert = wrap(safeProto.assert, assertWrapper)
+  const builtinDir = wrap(safeProto.dir, dirWrapper)
   const builtinLog = wrap(safeProto.log)
   const builtinTrace = wrap(safeProto.trace)
   const builtinWarn = wrap(safeProto.warn)
@@ -134,12 +135,11 @@ function init() {
 
   if (ELECTRON_RENDERER ||
       INSPECT) {
-    const log = wrap(shared.unsafeGlobal.console.log)
-    const names = ["debug", "dirxml", "info", "log"]
+    const names = keysAll(realConsole)
 
     for (const name of names) {
-      if (typeof builtinConsole[name] === "function") {
-        builtinConsole[name] = GenericFunction.bind(log, builtinConsole)
+      if (name !== "Console") {
+        copyProperty(builtinConsole, realConsole, name)
       }
     }
   }
