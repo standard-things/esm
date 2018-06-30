@@ -17,8 +17,6 @@ import maskFunction from "./util/mask-function.js"
 import moduleState from "./module/state.js"
 import parseState from "./parse/state.js"
 import req from "./module/require.js"
-import wrap from "./module/wrap.js"
-import wrapper from "./module/wrapper.js"
 
 const RealProto = RealModule.prototype
 
@@ -38,8 +36,6 @@ Module._resolveFilename = maskFunction(_resolveFilename, RealModule._resolveFile
 Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
-Module.wrap = maskFunction(wrap, RealModule.wrap)
-Module.wrapper = GenericArray.from(wrapper)
 
 Module.prototype._compile = maskFunction(_compile, RealProto._compile)
 Module.prototype.constructor = Module
