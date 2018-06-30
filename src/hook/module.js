@@ -19,6 +19,7 @@ import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
+import isMJS from "../util/is-mjs.js"
 import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
@@ -114,7 +115,9 @@ function hook(Mod, parent) {
     const entry = Entry.get(mod)
     const pkg = entry.package
 
-    if (entry._passthru) {
+    if (entry._passthru ||
+        (shouldOverwrite &&
+         isMJS(mod))) {
       entry._passthru = false
       tryPassthru.call(this, func, args, pkg)
       return

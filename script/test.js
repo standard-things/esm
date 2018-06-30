@@ -59,7 +59,7 @@ nodeArgs.push(
   mochaPath,
   "--full-trace",
   "--require", "../index.js",
-  "tests.mjs"
+  "tests.js"
 )
 
 function cleanJS() {
