@@ -28,23 +28,29 @@ function init() {
       const { magicString, runtimeName } = this
 
       maybeWrap(this, path, (node, parent) => {
+        const { end, start } = node
+
         if (parent.shorthand) {
           magicString
             .prependLeft(
-              node.end,
+              end,
               ":" + runtimeName + '.a("' + name + '",' + name + ")"
             )
 
           return
         }
 
-        const isNewExpression = parent.type === "NewExpression"
-        const prefix = isNewExpression ? "(" : ""
-        const postfix = isNewExpression ? ")" : ""
+        let prefix = ""
+        let postfix = ""
+
+        if (parent.type === "NewExpression") {
+          prefix = "("
+          postfix = ")"
+        }
 
         magicString
-          .prependRight(node.start, prefix + runtimeName + '.a("' + name + '",')
-          .prependRight(node.end, ")" + postfix)
+          .prependRight(start, prefix + runtimeName + '.a("' + name + '",')
+          .prependRight(end, ")" + postfix)
       })
     }
 

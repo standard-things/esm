@@ -48,24 +48,30 @@ function init() {
       maybeWrap(this, path, (node, parent) => {
         this.changed = true
 
+        const { end, start } = node
+
         if (parent.shorthand) {
           this.magicString
             .prependLeft(
-              node.end,
+              end,
               ":" + runtimeName + '.t("' + name + '")'
             )
 
           return
         }
 
-        const isNewExpression = parent.type === "NewExpression"
-        const prefix = isNewExpression ? "(" : ""
-        const postfix = isNewExpression ? ")" : ""
+        let prefix = ""
+        let postfix = ""
+
+        if (parent.type === "NewExpression") {
+          prefix = "("
+          postfix = ")"
+        }
 
         overwrite(
           this,
-          node.start,
-          node.end,
+          start,
+          end,
           prefix + runtimeName + '.t("' + name + '")' + postfix
         )
       })

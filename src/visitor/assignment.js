@@ -18,27 +18,28 @@ function init() {
     }
 
     visitAssignmentExpression(path) {
-      assignmentHelper(this, path, "left")
+      checkAndMaybeWrap(this, path, "left")
       path.call(this, "visitWithoutReset", "right")
     }
 
     visitUpdateExpression(path) {
-      assignmentHelper(this, path, "argument")
+      checkAndMaybeWrap(this, path, "argument")
     }
   }
 
-  function assignmentHelper(visitor, path, childName) {
-    const { assignableExports, importedLocals } = visitor
+  function checkAndMaybeWrap(visitor, path, childName) {
+    const { assignableExports, importedLocals, magicString } = visitor
     const node = path.getValue()
     const names = getNamesFromPattern(node[childName])
+    const { end, start } = node
 
     // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {
       if (importedLocals[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         throw new errors.TypeError(
-          visitor.magicString.original,
-          node.start,
+          magicString.original,
+          start,
           "Assignment to constant variable."
         )
       }
@@ -48,18 +49,13 @@ function init() {
       if (assignableExports[name] === true &&
           ! isShadowed(path, name, shadowedMap)) {
         // Wrap assignments to exported identifiers.
-        wrap(visitor, path)
+        magicString
+          .prependLeft(start, visitor.runtimeName + ".u(")
+          .prependLeft(end, ")")
+
         return
       }
     }
-  }
-
-  function wrap(visitor, path) {
-    const { end, start } = path.getValue()
-
-    visitor.magicString
-      .prependLeft(start, visitor.runtimeName + ".u(")
-      .prependLeft(end, ")")
   }
 
   return new AssignmentVisitor

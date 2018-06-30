@@ -35,7 +35,7 @@ function init() {
       // eval(code)
       this.changed = true
 
-      const { runtimeName } = this
+      const { magicString, runtimeName } = this
 
       let code = runtimeName + ".c"
 
@@ -43,14 +43,16 @@ function init() {
         code = "(eval===" + runtimeName + ".v?" + code + ":" + runtimeName + ".k)"
       }
 
-      this.magicString
+      const { end, start } = node
+
+      magicString
         .prependLeft(callee.end, "(" + code)
-        .prependLeft(node.end, ")")
+        .prependLeft(end, ")")
 
       if (this.addedImportExport) {
-        this.magicString
-          .prependLeft(node.start, runtimeName + ".u(")
-          .prependLeft(node.end, ")")
+        magicString
+          .prependLeft(start, runtimeName + ".u(")
+          .prependLeft(end, ")")
       }
 
       path.call(this, "visitWithoutReset", "arguments")
