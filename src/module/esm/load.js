@@ -10,12 +10,12 @@ const {
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
-  let entry
-
   const { moduleState } = shared
   const { parseOnly } = moduleState
 
   moduleState.parsing = true
+
+  let entry
 
   try {
     entry = _load(request, parent, isMain, preload)
