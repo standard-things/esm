@@ -798,11 +798,8 @@ describe("Node rules", () => {
   )
 
   it("should not expose ESM in `module.parent`", () =>
-    import("./fixture/parent/off")
-      .then((ns) => {
-        const parent = ns.parent
-        const child = ns.child
-
+    import("./fixture/parent/off/parent.js")
+      .then(({ child, parent }) => {
         assert.ok(parent.parent)
         assert.ok(Reflect.has(child, "parent"))
         assert.strictEqual(typeof child.parent, "undefined")
@@ -810,13 +807,18 @@ describe("Node rules", () => {
   )
 
   it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
-    import("./fixture/parent/on")
-      .then((ns) => {
-        const parent = ns.parent
-        const child = ns.child
-
+    import("./fixture/parent/on/parent.js")
+      .then(({ child, parent }) => {
         assert.ok(parent.parent)
         assert.ok(child.parent)
+      })
+  )
+
+  it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () =>
+    import("./fixture/parent/on/parent.mjs")
+      .then(({ child }) => {
+        assert.ok(Reflect.has(child, "parent"))
+        assert.strictEqual(typeof child.parent, "undefined")
       })
   )
 
