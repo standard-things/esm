@@ -4,6 +4,7 @@ import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getModuleURL from "../util/get-module-url.js"
+import getSilent from "../util/get-silent.js"
 import isParseError from "../util/is-parse-error.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 
@@ -111,7 +112,7 @@ function maskEngineStack(stack, content, filename) {
     }
 
     if (line === 1) {
-      const { wrapper } = Module
+      const wrapper = getSilent(Module, "wrapper")
 
       if (Array.isArray(wrapper)) {
         const [prefix] = wrapper

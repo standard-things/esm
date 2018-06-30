@@ -18,6 +18,7 @@ import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import clone from "../module/clone.js"
 import getCacheName from "../util/get-cache-name.js"
+import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
@@ -133,7 +134,7 @@ function hook(vm) {
     vm.Script = proxyWrap(vm.Script, (Script, [code, options]) => {
       vm.Script = Script
 
-      const { wrapper } = Module
+      const wrapper = getSilent(Module, "wrapper")
 
       if (Array.isArray(wrapper)) {
         const [prefix, postfix] = wrapper
