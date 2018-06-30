@@ -29,16 +29,19 @@ describe("--check hook", function () {
 
   ;(canTestWithFilename ? it : xit)(
   "should support `-c` and `--check` flags with a filename", () => {
+    const basenames = ["", "index.js", "index.mjs"]
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
     const runs = []
 
-    requireFlags.forEach((requireFlag) => {
-      checkFlags.forEach((checkFlag) => {
-        runs.push([
-          requireFlag, "../",
-          checkFlag, "./fixture/check-hook"
-        ])
+    basenames.forEach((basename) => {
+      requireFlags.forEach((requireFlag) => {
+        checkFlags.forEach((checkFlag) => {
+          runs.push([
+            requireFlag, "../",
+            checkFlag, "./fixture/check-hook/" + basename
+          ])
+        })
       })
     })
 
