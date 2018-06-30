@@ -3,6 +3,7 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import ENTRY from "../constant/entry.js"
+import ENV from "../constant/env.js"
 
 import Entry from "../entry.js"
 import Module from "../module.js"
@@ -24,6 +25,10 @@ const {
   STATE_EXECUTION_STARTED,
   STATE_INITIAL
 } = ENTRY
+
+const {
+  ELECTRON
+} = ENV
 
 let resolvedArgv
 let useRunInContext
@@ -136,18 +141,17 @@ function compile(content, filename) {
 
   const exported = this.exports
   const req = makeRequireFunction(this)
+  const args = [exported, req, this, filename, dirname(filename)]
+
+  if (ELECTRON) {
+    args.push(realProcess, shared.unsafeGlobal, shared.external.Buffer)
+  }
 
   entry.state = STATE_EXECUTION_STARTED
 
-  let result
-
-  if (inspectorWrapper) {
-    result = inspectorWrapper(compiledWrapper, exported,
-      exported, req, this, filename, dirname(filename))
-  } else {
-    result = Reflect.apply(compiledWrapper, exported,
-      [exported, req, this, filename, dirname(filename)])
-  }
+  const result = inspectorWrapper
+    ? Reflect.apply(inspectorWrapper, void 0, [compiledWrapper, exported, ...args])
+    : Reflect.apply(compiledWrapper, exported, args)
 
   entry.state = STATE_EXECUTION_COMPLETED
   return result
