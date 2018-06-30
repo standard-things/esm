@@ -133,9 +133,17 @@ function hook(vm) {
     vm.Script = proxyWrap(vm.Script, (Script, [code, options]) => {
       vm.Script = Script
 
-      const [prefix, postfix] = Module.wrapper
+      const { wrapper } = Module
 
-      code = code.slice(prefix.length, -postfix.length)
+      if (Array.isArray(wrapper)) {
+        const [prefix, postfix] = wrapper
+
+        if (typeof prefix === "string" &&
+            typeof postfix === "string") {
+          code = code.slice(prefix.length, -postfix.length)
+        }
+      }
+
       setupEntry(rootModule)
       return vm.createScript(code, options)
     })

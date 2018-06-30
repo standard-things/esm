@@ -111,13 +111,18 @@ function maskEngineStack(stack, content, filename) {
     }
 
     if (line === 1) {
-      const [prefix] = Module.wrapper
+      const { wrapper } = Module
 
-      if (snippet.startsWith(prefix)) {
-        const { length } = prefix
+      if (Array.isArray(wrapper)) {
+        const [prefix] = wrapper
 
-        snippet = snippet.slice(length)
-        arrow = arrow.slice(length)
+        if (typeof prefix === "string" &&
+            snippet.startsWith(prefix)) {
+          const { length } = prefix
+
+          snippet = snippet.slice(length)
+          arrow = arrow.slice(length)
+        }
       }
     }
 
