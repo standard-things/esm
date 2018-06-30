@@ -32,12 +32,25 @@ const {
 } = errors
 
 const { external } = shared
+const evalIndirect = external.eval
 
 const ExPromise = external.Promise
 
-const indirectEval = external.eval
-
 const Runtime = {
+  addDefaultValue(value) {
+    this.addExportGetter([["default", () => value]])
+  },
+
+  addExportGetter(getterArgsList) {
+    this.entry.addGetters(getterArgsList)
+  },
+
+  addNamespaceSetter() {
+    return createSetter("namespace", (value, childEntry) => {
+      this.entry.addGettersFrom(childEntry)
+    })
+  },
+
   assertTDZ(name, value) {
     if (this.entry.bindings[name]) {
       return value
@@ -93,23 +106,18 @@ const Runtime = {
     return content
   },
 
-  // Register a getter function that always returns the given value.
-  default(value) {
-    this.export([["default", () => value]])
-  },
-
   enable(entry, exported) {
     const { id } = entry
     const mod = entry.module
     const object = mod.exports
 
+    const boundCompileEval = (code) => Runtime.compileEval.call(object, code)
+    const boundEvalGlobal = (code) => Runtime.evalGlobal.call(object, code)
+
     Entry.set(mod, entry)
     Entry.set(exported, entry)
 
     entry.exports = exported
-
-    object.compileGlobalEval = Runtime.compileGlobalEval
-    object.entry = entry
 
     setDeferred(object, "meta", () => {
       return {
@@ -118,34 +126,31 @@ const Runtime = {
       }
     })
 
+    object.compileGlobalEval = Runtime.compileGlobalEval
+    object.entry = entry
+
     object._ = object
-    object.a = object.assertTDZ = Runtime.assertTDZ
-    object.c = object.compileEval = Runtime.compileEval.bind(object)
-    object.d = object.default = Runtime.default
-    object.e = object.export = Runtime.export
-    object.g = object.globalEval = Runtime.globalEval.bind(object)
-    object.i = object.import = Runtime.import
     object.k = identity
-    object.n = object.nsSetter = Runtime.nsSetter
+    object.v = evalIndirect
+
+    object.d = object.addDefaultValue = Runtime.addDefaultValue
+    object.e = object.addExportGetter = Runtime.addExportGetter
+    object.n = object.addNamespaceSetter = Runtime.addNamespaceSetter
+    object.a = object.assertTDZ = Runtime.assertTDZ
+    object.c = object.compileEval = boundCompileEval
+    object.g = object.evalGlobal = boundEvalGlobal
+    object.i = object.importDynamic = Runtime.importDynamic
+    object.w = object.importStatic = Runtime.importStatic
     object.r = object.run = Runtime.run
     object.t = object.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
-    object.u = object.update = Runtime.update
-    object.v = indirectEval
-    object.w = object.watch = Runtime.watch
+    object.u = object.updateBindings = Runtime.updateBindings
   },
 
-  // Register getter functions for local variables in the scope of an export
-  // statement. Pass true as the second argument to indicate that the getter
-  // functions always return the same values.
-  export(getterArgsList) {
-    this.entry.addGetters(getterArgsList)
+  evalGlobal(content) {
+    return evalIndirect(this.compileGlobalEval(content))
   },
 
-  globalEval(content) {
-    return indirectEval(this.compileGlobalEval(content))
-  },
-
-  import(request) {
+  importDynamic(request) {
     // Section 2.2.1: Runtime Semantics: Evaluation
     // Step 6: Coerce request to a string.
     // https://tc39.github.io/proposal-dynamic-import/#sec-import-call-runtime-semantics-evaluation
@@ -157,14 +162,14 @@ const Runtime = {
       setImmediate(() => {
         const { entry } = this
 
-        const setterArgsList = [["*", null, createSetter("import", (value, childEntry) => {
+        const setterArgsList = [["*", null, createSetter("dynamic", (value, childEntry) => {
           if (childEntry._loaded === 1) {
             resolvePromise(value)
           }
         })]]
 
         try {
-          watchImport(entry, request, setterArgsList, loadESM)
+          importModule(entry, request, setterArgsList, loadESM)
         } catch (e) {
           rejectPromise(e)
         }
@@ -172,10 +177,8 @@ const Runtime = {
     })
   },
 
-  nsSetter() {
-    return createSetter("nsSetter", (value, childEntry) => {
-      this.entry.addGettersFrom(childEntry)
-    })
+  importStatic(request, setterArgsList) {
+    return importModule(this.entry, request, setterArgsList, _loadESM)
   },
 
   run(moduleWrapper) {
@@ -189,7 +192,7 @@ const Runtime = {
     throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.throwUndefinedIdentifier)
   },
 
-  update(valueToPassThrough) {
+  updateBindings(valueToPassThrough) {
     this.entry.update()
 
     // Returns the `valueToPassThrough` parameter to allow the value of the
@@ -207,15 +210,11 @@ const Runtime = {
     // This ensures `entry.update()` runs immediately after the assignment,
     // and does not interfere with the larger computation.
     return valueToPassThrough
-  },
-
-  watch(request, setterArgsList) {
-    return watchImport(this.entry, request, setterArgsList, _loadESM)
   }
 }
 
-function createSetter(from, setter) {
-  setter.from = from
+function createSetter(type, setter) {
+  setter.type = type
   return setter
 }
 
@@ -315,7 +314,7 @@ function tryResolveFilename(request, parent) {
   return request
 }
 
-function watchImport(entry, request, setterArgsList, loader) {
+function importModule(entry, request, setterArgsList, loader) {
   const mod = entry.module
   const { moduleState } = shared
 

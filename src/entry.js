@@ -169,8 +169,6 @@ class Entry {
       return this
     }
 
-    const { _namespace } = this
-
     const descriptor = {
       configurable: true,
       enumerable: true,
@@ -204,7 +202,7 @@ class Entry {
       }
     }
 
-    Reflect.defineProperty(_namespace, name, descriptor)
+    Reflect.defineProperty(this._namespace, name, descriptor)
     return this
   }
 
@@ -271,10 +269,13 @@ class Entry {
       this.setters[name] ||
       (this.setters[name] = [])
 
-    setter.from = setter.from || ""
     setter.last = { __proto__: null }
     setter.localNames = localNames
     setter.parent = parent
+
+    if (! has(setter, "type")) {
+      setter.type = "static"
+    }
 
     setters.push(setter)
 
@@ -879,7 +880,7 @@ function runSetter(entry, name, callback) {
   try {
     if (isNs) {
       for (const setter of setters) {
-        if (setter.from === "nsSetter") {
+        if (setter.type === "namespace") {
           setter(void 0, entry)
         }
       }
@@ -889,20 +890,20 @@ function runSetter(entry, name, callback) {
     }
 
     for (let setter of setters) {
-      const { from } = setter
+      const { type } = setter
 
       if (isNsChanged &&
-          from === "nsSetter") {
-        noopSetter.from = setter.from
+          type === "namespace") {
         noopSetter.last = setter.last
         noopSetter.localNames = setter.localNames
         noopSetter.parent = setter.parent
+        noopSetter.type = type
         callback(noopSetter)
       } else {
         const value = getExportByName(entry, setter, name)
 
         if ((isNsLoaded &&
-              from === "import") ||
+             type === "dynamic") ||
             changed(setter, name, value)) {
           callback(setter, value)
         }
@@ -922,7 +923,7 @@ function runSetter(entry, name, callback) {
   let i = -1
 
   while (++i < length) {
-    if (setters[i].from === "import") {
+    if (setters[i].type === "dynamic") {
       setters.splice(i, 1)
     }
   }
