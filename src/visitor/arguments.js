@@ -21,10 +21,11 @@ function init() {
     visitIdentifier(path) {
       const node = path.getValue()
       const { name } = node
+      const isArguments = name === "arguments"
 
-      if (name !== "__dirname" &&
+      if (! isArguments &&
+          name !== "__dirname" &&
           name !== "__filename" &&
-          name !== "arguments" &&
           name !== "exports" &&
           name !== "module" &&
           name !== "require") {
@@ -32,18 +33,26 @@ function init() {
       }
 
       const parent = path.getParentNode()
+      const { runtimeName } = this
       const { type } = parent
 
-      if ((type === "AssignmentExpression" &&
-           parent.left === node) ||
-          (type === "UnaryExpression" &&
-           parent.operator === "typeof") ||
+      const isTypeOf =
+        type === "UnaryExpression" &&
+        parent.operator === "typeof"
+
+      if (isArguments &&
+          isTypeOf &&
+          ! isShadowed(path, name, shadowedMap)) {
+        this.changed = true
+        overwrite(this, node.start, node.end, "void " + runtimeName)
+        return
+      }
+
+      if (isTypeOf ||
           ! isIdentifer(node, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
-
-      const { runtimeName } = this
 
       maybeIdentifier(path, (node, parent) => {
         this.changed = true
