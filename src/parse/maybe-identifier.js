@@ -12,9 +12,8 @@ function init() {
     }
 
     let nodeIndex = -2
-    let { type } = parent
 
-    while (type === "MemberExpression") {
+    while (parent.type === "MemberExpression") {
       nodeIndex -= 2
 
       const grandParent = path.getNode(nodeIndex)
@@ -24,7 +23,6 @@ function init() {
       }
 
       parent = grandParent
-      type = parent.type
     }
 
     callback(node, parent)
