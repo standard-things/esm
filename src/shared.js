@@ -150,7 +150,13 @@ function init() {
   })
 
   setDeferred(shared, "unsafeContext", () => {
-    return shared.module.safeVM.createContext(shared.unsafeGlobal)
+    const unsafeContext = shared.module.safeVM.createContext(shared.unsafeGlobal)
+
+    if (! Reflect.has(unsafeContext, "global")) {
+      unsafeContext.global = unsafeContext
+    }
+
+    return unsafeContext
   })
 
   setDeferred(fastPath, "readFile", () => {
