@@ -2,12 +2,13 @@
 
 test("test", () => {
   const expected = {
-    default: true
+    CJS_JEST_ENV: "JEST_ENV_VALUE",
+    ESM_JEST_ENV: "JEST_ENV_VALUE"
   }
 
   expect(require("../")).toEqual(expected)
 
   require = require("../../../../../")(module)
 
-  expect(require("../main.mjs")).toEqual(expected)
+  expect(require("../main.js")).toEqual(expected)
 })

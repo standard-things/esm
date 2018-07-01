@@ -198,6 +198,28 @@ describe("scenarios", function () {
   )
 
   ;(canTestJest ? it : xit)(
+  "should carry over the global object of jest", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+    const configPath = path.resolve(dirPath, "jest.config.json")
+
+    return exec("jest", [
+      "--config", configPath,
+      "--rootDir", dirPath
+    ])
+  })
+
+  ;(canTestJest ? it : xit)(
+  "should carry over the process object of jest", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+    const configPath = path.resolve(dirPath, "jest.config.json")
+
+    return exec("jest", [
+      "--config", configPath,
+      "--rootDir", dirPath
+    ])
+  })
+
+  ;(canTestJest ? it : xit)(
   "should work with jest and mock-require", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
     const configPath = path.resolve(dirPath, "jest.config.json")
