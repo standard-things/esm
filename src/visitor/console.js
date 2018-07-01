@@ -24,9 +24,7 @@ function init() {
       const parent = path.getParentNode()
       const { type } = parent
 
-      if ((type === "AssignmentExpression" &&
-           parent.left === node) ||
-          (type === "UnaryExpression" &&
+      if ((type === "UnaryExpression" &&
            parent.operator === "typeof") ||
           ! isIdentifer(node, parent) ||
           isShadowed(path, "console", shadowedMap)) {

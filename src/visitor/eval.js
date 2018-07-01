@@ -66,8 +66,6 @@ function init() {
       const { type } = parent
 
       if (type === "CallExpression" ||
-          (type === "AssignmentExpression" &&
-           parent.left === node) ||
           (type === "UnaryExpression" &&
            parent.operator === "typeof") ||
           ! isIdentifer(node, parent) ||

@@ -6,15 +6,13 @@ function init() {
     const node = path.getValue()
 
     let parent = path.getParentNode()
-    let { type } = parent
 
-    if ((type === "AssignmentExpression" &&
-         parent.left === node) ||
-        ! isIdentifer(node, parent)) {
+    if (! isIdentifer(node, parent)) {
       return
     }
 
     let nodeIndex = -2
+    let { type } = parent
 
     while (type === "MemberExpression") {
       nodeIndex -= 2

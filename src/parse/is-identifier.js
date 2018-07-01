@@ -10,7 +10,9 @@ function isIdentifier(node, parent) {
       return parent.computed || parent.shorthand
     }
 
-    if (type === "BreakStatement" ||
+    if ((type === "AssignmentExpression" &&
+         parent.left === node) ||
+        type === "BreakStatement" ||
         type === "ContinueStatement" ||
         type === "ImportDefaultSpecifier" ||
         type === "ImportNamespaceSpecifier" ||
