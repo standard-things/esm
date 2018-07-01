@@ -1,21 +1,21 @@
 import overwrite from "./overwrite.js"
 
-function preserveChild(visitor, node, childName) {
-  const child = node[childName]
+function preserveChild(visitor, parent, childName) {
+  const child = parent[childName]
   const childStart = child.start
-  const nodeStart = node.start
+  const parentStart = parent.start
 
   let indentation
 
   if (childStart > visitor.firstLineBreakPos) {
-    const count = childStart - nodeStart
+    const count = childStart - parentStart
 
     indentation = count === 7 ? "       " : " ".repeat(count)
   } else {
     indentation = ""
   }
 
-  overwrite(visitor, nodeStart, childStart, indentation)
+  overwrite(visitor, parentStart, childStart, indentation)
 }
 
 export default preserveChild
