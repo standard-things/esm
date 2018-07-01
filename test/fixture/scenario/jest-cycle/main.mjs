@@ -1,3 +1,3 @@
-import { CIRCULAR_EXPORT as a } from "./"
+import { CIRCULAR_EXPORT as value } from "./"
 
-export const CIRCULAR_EXPORT = "a" + a
+export const CIRCULAR_EXPORT = value
