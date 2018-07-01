@@ -40,12 +40,15 @@ function init() {
           return
         }
 
-        let prefix = ""
-        let postfix = ""
+        let prefix
+        let postfix
 
         if (parent.type === "NewExpression") {
           prefix = "("
           postfix = ")"
+        } else {
+          prefix =
+          postfix = ""
         }
 
         magicString
