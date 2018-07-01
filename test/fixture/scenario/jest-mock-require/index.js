@@ -1,9 +1,6 @@
-"use strict"
+require("mock-require").stopAll()
 
-const mock = require("mock-require")
-
-mock.stopAll()
-
+JEST_GLOBAL = "JEST_GLOBAL_VALUE"
 process.env.JEST_ENV = "JEST_ENV_VALUE"
 
 require = require("../../../../")(module)
