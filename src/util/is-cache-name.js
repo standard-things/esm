@@ -1,8 +1,16 @@
-const cacheNameRegExp = /^[a-z0-9]{16}\.js$/
+import shared from "../shared.js"
 
-function isCacheName(value) {
-  return typeof value === "string" &&
-    cacheNameRegExp.test(value)
+function init() {
+  const cacheNameRegExp = /^[a-z0-9]{16}\.js$/
+
+  function isCacheName(value) {
+    return typeof value === "string" &&
+      cacheNameRegExp.test(value)
+  }
+
+  return isCacheName
 }
 
-export default isCacheName
+export default shared.inited
+  ? shared.module.utilIsCacheName
+  : shared.module.utilIsCacheName = init()

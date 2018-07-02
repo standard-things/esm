@@ -4,20 +4,28 @@
 
 import CHAR_CODE from "../constant/char-code.js"
 
-const {
-  NUMSIGN
-} = CHAR_CODE
+import shared from "../shared.js"
 
-const shebangRegExp = /^#!.*/
+function init() {
+  const {
+    NUMSIGN
+  } = CHAR_CODE
 
-function stripShebang(string) {
-  if (typeof string !== "string") {
-    return ""
+  const shebangRegExp = /^#!.*/
+
+  function stripShebang(string) {
+    if (typeof string !== "string") {
+      return ""
+    }
+
+    return string.charCodeAt(0) === NUMSIGN
+      ? string.replace(shebangRegExp, "")
+      : string
   }
 
-  return string.charCodeAt(0) === NUMSIGN
-    ? string.replace(shebangRegExp, "")
-    : string
+  return stripShebang
 }
 
-export default stripShebang
+export default shared.inited
+  ? shared.module.utilStripShebang
+  : shared.module.utilStripShebang = init()

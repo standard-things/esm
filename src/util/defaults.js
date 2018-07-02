@@ -1,23 +1,31 @@
-const { hasOwnProperty } = Object.prototype
+import shared from "../shared.js"
 
-function defaults(object) {
-  const { length } = arguments
+function init() {
+  const { hasOwnProperty } = Object.prototype
 
-  let i = 0
+  function defaults(object) {
+    const { length } = arguments
 
-  while (++i < length) {
-    const source = arguments[i]
+    let i = 0
 
-    for (const name in source) {
-      if (hasOwnProperty.call(source, name) &&
-          (object[name] === void 0 ||
-           ! hasOwnProperty.call(object, name))) {
-        object[name] = source[name]
+    while (++i < length) {
+      const source = arguments[i]
+
+      for (const name in source) {
+        if (hasOwnProperty.call(source, name) &&
+            (object[name] === void 0 ||
+            ! hasOwnProperty.call(object, name))) {
+          object[name] = source[name]
+        }
       }
     }
+
+    return object
   }
 
-  return object
+  return defaults
 }
 
-export default defaults
+export default shared.inited
+  ? shared.module.utilDefaults
+  : shared.module.utilDefaults = init()

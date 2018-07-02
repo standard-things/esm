@@ -1,53 +1,61 @@
 import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
-const {
-  BACKWARD_SLASH,
-  DOT,
-  FORWARD_SLASH
-} = CHAR_CODE
+import shared from "../shared.js"
 
-function isRelativePath(value) {
-  if (typeof value !== "string") {
-    return false
-  }
+function init() {
+  const {
+    BACKWARD_SLASH,
+    DOT,
+    FORWARD_SLASH
+  } = CHAR_CODE
 
-  const { length } = value
+  function isRelativePath(value) {
+    if (typeof value !== "string") {
+      return false
+    }
 
-  if (! length) {
-    return false
-  }
+    const { length } = value
 
-  let code = value.charCodeAt(0)
+    if (! length) {
+      return false
+    }
 
-  if (code !== DOT) {
-    return false
-  }
+    let code = value.charCodeAt(0)
 
-  if (length === 1) {
-    return true
-  }
+    if (code !== DOT) {
+      return false
+    }
 
-  code = value.charCodeAt(1)
-
-  if (code === DOT) {
-    if (length === 2) {
+    if (length === 1) {
       return true
     }
 
-    code = value.charCodeAt(2)
+    code = value.charCodeAt(1)
+
+    if (code === DOT) {
+      if (length === 2) {
+        return true
+      }
+
+      code = value.charCodeAt(2)
+    }
+
+    const {
+      WIN32
+    } = ENV
+
+    if (WIN32 &&
+        code === BACKWARD_SLASH) {
+      return true
+    }
+
+    return code === FORWARD_SLASH
   }
 
-  const {
-    WIN32
-  } = ENV
-
-  if (WIN32 &&
-      code === BACKWARD_SLASH) {
-    return true
-  }
-
-  return code === FORWARD_SLASH
+  return isRelativePath
 }
 
-export default isRelativePath
+export default shared.inited
+  ? shared.module.utilIsRelativePath
+  : shared.module.utilIsRelativePath = init()

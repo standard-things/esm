@@ -1,7 +1,6 @@
 import ESM from "./constant/esm.js"
 
 import encodeId from "./util/encode-id.js"
-import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
@@ -182,7 +181,7 @@ function init() {
       }
     }
 
-    const names = keysAll(defaultGlobal)
+    const names = Reflect.ownKeys(defaultGlobal)
 
     for (const name of names) {
       let descriptor

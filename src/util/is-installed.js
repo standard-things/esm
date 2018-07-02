@@ -1,18 +1,26 @@
 import ENV from "../constant/env.js"
 
-const {
-  WIN32
-} = ENV
+import shared from "../shared.js"
 
-const nodeModulesRegExp = WIN32
-  ? /[\\/]node_modules[\\/]/
-  : /\/node_modules\//
+function init() {
+  const {
+    WIN32
+  } = ENV
 
-function isInstalled(mod) {
-  const { filename } = mod
+  const nodeModulesRegExp = WIN32
+    ? /[\\/]node_modules[\\/]/
+    : /\/node_modules\//
 
-  return typeof filename === "string" &&
-    nodeModulesRegExp.test(filename)
+  function isInstalled(mod) {
+    const { filename } = mod
+
+    return typeof filename === "string" &&
+      nodeModulesRegExp.test(filename)
+  }
+
+  return isInstalled
 }
 
-export default isInstalled
+export default shared.inited
+  ? shared.module.utilIsInstalled
+  : shared.module.utilIsInstalled = init()

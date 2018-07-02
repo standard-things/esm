@@ -1,9 +1,17 @@
-function parseJSON(string) {
-  try {
-    return JSON.parse(string)
-  } catch (e) {}
+import shared from "../shared.js"
 
-  return null
+function init() {
+  function parseJSON(string) {
+    try {
+      return JSON.parse(string)
+    } catch (e) {}
+
+    return null
+  }
+
+  return parseJSON
 }
 
-export default parseJSON
+export default shared.inited
+  ? shared.module.utilParseJSON
+  : shared.module.utilParseJSON = init()

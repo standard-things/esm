@@ -1,13 +1,20 @@
 import errors from "../parse/errors.js"
+import shared from "../shared.js"
 
-function isParseError(value) {
-  for (const name in errors) {
-    if (value instanceof errors[name]) {
-      return true
+function init() {
+  function isParseError(value) {
+    for (const name in errors) {
+      if (value instanceof errors[name]) {
+        return true
+      }
     }
+
+    return false
   }
 
-  return false
+  return isParseError
 }
 
-export default isParseError
+export default shared.inited
+  ? shared.module.utilIsParseError
+  : shared.module.utilIsParseError = init()

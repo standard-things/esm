@@ -1,11 +1,18 @@
+import shared from "../shared.js"
 import silent from "./silent.js"
 
-function setSilent(object, name, value) {
-  silent(() => {
-    try {
-      object[name] = value
-    } catch (e) {}
-  })
+function init() {
+  function setSilent(object, name, value) {
+    silent(() => {
+      try {
+        object[name] = value
+      } catch (e) {}
+    })
+  }
+
+  return setSilent
 }
 
-export default setSilent
+export default shared.inited
+  ? shared.module.utilSetSilent
+  : shared.module.utilSetSilent = init()

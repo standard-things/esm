@@ -1,13 +1,20 @@
 import has from "./has.js"
+import shared from "../shared.js"
 
-function isObjectEmpty(object) {
-  for (const name in object) {
-    if (has(object, name)) {
-      return false
+function init() {
+  function isObjectEmpty(object) {
+    for (const name in object) {
+      if (has(object, name)) {
+        return false
+      }
     }
+
+    return true
   }
 
-  return true
+  return isObjectEmpty
 }
 
-export default isObjectEmpty
+export default shared.inited
+  ? shared.module.utilIsObjectEmpty
+  : shared.module.utilIsObjectEmpty = init()

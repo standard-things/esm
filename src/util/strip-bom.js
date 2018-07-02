@@ -4,18 +4,26 @@
 
 import CHAR_CODE from "../constant/char-code.js"
 
-const {
-  ZERO_WIDTH_NOBREAK_SPACE
-} = CHAR_CODE
+import shared from "../shared.js"
 
-function stripBOM(string) {
-  if (typeof string !== "string") {
-    return ""
+function init() {
+  const {
+    ZERO_WIDTH_NOBREAK_SPACE
+  } = CHAR_CODE
+
+  function stripBOM(string) {
+    if (typeof string !== "string") {
+      return ""
+    }
+
+    return string.charCodeAt(0) === ZERO_WIDTH_NOBREAK_SPACE
+      ? string.slice(1)
+      : string
   }
 
-  return string.charCodeAt(0) === ZERO_WIDTH_NOBREAK_SPACE
-    ? string.slice(1)
-    : string
+  return stripBOM
 }
 
-export default stripBOM
+export default shared.inited
+  ? shared.module.utilStripBOM
+  : shared.module.utilStripBOM = init()

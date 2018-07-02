@@ -1,5 +1,5 @@
-import shared from "../shared.js"
 import getURLFromFilePath from "./get-url-from-file-path.js"
+import shared from "../shared.js"
 import toStringLiteral from "./to-string-literal.js"
 
 function init() {

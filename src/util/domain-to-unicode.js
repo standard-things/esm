@@ -1,25 +1,32 @@
 import binding from "../binding.js"
 import { toUnicode as punycodeToUnicode } from "../safe/punycode.js"
 import { domainToUnicode as urlDomainToUnicode } from "../safe/url.js"
+import shared from "../shared.js"
 
-let _domainToUnicode = urlDomainToUnicode
+function init() {
+  let _domainToUnicode = urlDomainToUnicode
 
-if (typeof _domainToUnicode !== "function") {
-  _domainToUnicode = (domain) => {
-    const { toUnicode } = binding.icu
+  if (typeof _domainToUnicode !== "function") {
+    _domainToUnicode = (domain) => {
+      const { toUnicode } = binding.icu
 
-    _domainToUnicode = typeof toUnicode === "function"
-      ? toUnicode
-      : punycodeToUnicode
+      _domainToUnicode = typeof toUnicode === "function"
+        ? toUnicode
+        : punycodeToUnicode
 
-    return _domainToUnicode(domain)
+      return _domainToUnicode(domain)
+    }
   }
+
+  function domainToUnicode(domain) {
+    return typeof domain === "string"
+      ? _domainToUnicode(domain)
+      : ""
+  }
+
+  return domainToUnicode
 }
 
-function domainToUnicode(domain) {
-  return typeof domain === "string"
-    ? _domainToUnicode(domain)
-    : ""
-}
-
-export default domainToUnicode
+export default shared.inited
+  ? shared.module.utilDomainToUnicode
+  : shared.module.utilDomainToUnicode = init()

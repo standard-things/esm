@@ -1,21 +1,29 @@
-const emptyArgs = []
+import shared from "../shared.js"
 
-function call(target, thisArg) {
-  const { length } = arguments
+function init() {
+  const emptyArgs = []
 
-  if (length < 3) {
-    return Reflect.apply(target, thisArg, emptyArgs)
+  function call(target, thisArg) {
+    const { length } = arguments
+
+    if (length < 3) {
+      return Reflect.apply(target, thisArg, emptyArgs)
+    }
+
+    let index = 1
+
+    const args = new Array(length - 2)
+
+    while (++index < length) {
+      args[index - 2] = arguments[index]
+    }
+
+    return Reflect.apply(target, thisArg, args)
   }
 
-  let index = 1
-
-  const args = new Array(length - 2)
-
-  while (++index < length) {
-    args[index - 2] = arguments[index]
-  }
-
-  return Reflect.apply(target, thisArg, args)
+  return call
 }
 
-export default call
+export default shared.inited
+  ? shared.module.utilCall
+  : shared.module.utilCall = init()

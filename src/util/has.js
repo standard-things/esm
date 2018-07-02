@@ -1,8 +1,16 @@
-const { hasOwnProperty } = Object.prototype
+import shared from "../shared.js"
 
-function has(object, name) {
-  return object != null &&
-    hasOwnProperty.call(object, name)
+function init() {
+  const { hasOwnProperty } = Object.prototype
+
+  function has(object, name) {
+    return object != null &&
+      hasOwnProperty.call(object, name)
+  }
+
+  return has
 }
 
-export default has
+export default shared.inited
+  ? shared.module.utilHas
+  : shared.module.utilHas = init()

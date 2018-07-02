@@ -1,32 +1,39 @@
 import builtinLookup from "../builtin-lookup.js"
 import dirname from "../path/dirname.js"
 import isObject from "./is-object.js"
+import shared from "../shared.js"
 
-function getModuleDirname(request) {
-  if (typeof request === "string") {
-    const result = dirname(request)
+function init() {
+  function getModuleDirname(request) {
+    if (typeof request === "string") {
+      const result = dirname(request)
 
-    if (result === "." &&
-        Reflect.has(builtinLookup, request)) {
-      return ""
+      if (result === "." &&
+          Reflect.has(builtinLookup, request)) {
+        return ""
+      }
+
+      return result
     }
 
-    return result
+    if (isObject(request)) {
+      if (Reflect.has(builtinLookup, request.id)) {
+        return ""
+      }
+
+      const { filename } = request
+
+      if (typeof filename === "string") {
+        return dirname(filename)
+      }
+    }
+
+    return "."
   }
 
-  if (isObject(request)) {
-    if (Reflect.has(builtinLookup, request.id)) {
-      return ""
-    }
-
-    const { filename } = request
-
-    if (typeof filename === "string") {
-      return dirname(filename)
-    }
-  }
-
-  return "."
+  return getModuleDirname
 }
 
-export default getModuleDirname
+export default shared.inited
+  ? shared.module.utilGetModuleDirname
+  : shared.module.utilGetModuleDirname = init()

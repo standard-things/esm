@@ -1,21 +1,29 @@
-const { hasOwnProperty } = Object.prototype
+import shared from "../shared.js"
 
-function assign(object) {
-  const { length } = arguments
+function init() {
+  const { hasOwnProperty } = Object.prototype
 
-  let i = 0
+  function assign(object) {
+    const { length } = arguments
 
-  while (++i < length) {
-    const source = arguments[i]
+    let i = 0
 
-    for (const name in source) {
-      if (hasOwnProperty.call(source, name)) {
-        object[name] = source[name]
+    while (++i < length) {
+      const source = arguments[i]
+
+      for (const name in source) {
+        if (hasOwnProperty.call(source, name)) {
+          object[name] = source[name]
+        }
       }
     }
+
+    return object
   }
 
-  return object
+  return assign
 }
 
-export default assign
+export default shared.inited
+  ? shared.module.utilAssign
+  : shared.module.utilAssign = init()

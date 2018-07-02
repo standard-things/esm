@@ -1,19 +1,27 @@
 import ESM from "../constant/esm.js"
 
-const {
-  PKG_FILENAMES
-} = ESM
+import shared from "../shared.js"
 
-function isOwnPath(thePath) {
-  if (typeof thePath === "string") {
-    for (const filename of PKG_FILENAMES) {
-      if (thePath === filename) {
-        return true
+function init() {
+  const {
+    PKG_FILENAMES
+  } = ESM
+
+  function isOwnPath(thePath) {
+    if (typeof thePath === "string") {
+      for (const filename of PKG_FILENAMES) {
+        if (thePath === filename) {
+          return true
+        }
       }
     }
+
+    return false
   }
 
-  return false
+  return isOwnPath
 }
 
-export default isOwnPath
+export default shared.inited
+  ? shared.module.utilIsOwnPath
+  : shared.module.utilIsOwnPath = init()
