@@ -1,4 +1,5 @@
 import shared from "../shared.js"
+import getURLFromFilePath from "./get-url-from-file-path.js"
 import toStringLiteral from "./to-string-literal.js"
 
 function init() {
@@ -15,7 +16,7 @@ function init() {
     }
 
     return '{"version":3,"sources":[' +
-      toStringLiteral(filename) +
+      toStringLiteral(getURLFromFilePath(filename)) +
       '],"names":[],"mappings":"' + mapping + '"}'
   }
 
