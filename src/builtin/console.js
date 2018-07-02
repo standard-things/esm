@@ -10,7 +10,6 @@ import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
-import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
@@ -135,11 +134,11 @@ function init() {
 
   if (ELECTRON_RENDERER ||
       INSPECT) {
-    const names = keysAll(realConsole)
+    const names = keysAll(console)
 
     for (const name of names) {
       if (name !== "Console") {
-        copyProperty(builtinConsole, realConsole, name)
+        copyProperty(builtinConsole, console, name)
       }
     }
   }
