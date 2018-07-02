@@ -15,6 +15,24 @@ const {
   ERR_EXPORT_STAR_CONFLICT
 } = errors
 
+function validate(entry) {
+  parseDependencies(entry)
+  resolveExportedStars(entry)
+  validateDependencies(entry)
+
+  const { _namespace, compileData } = entry
+
+  if (isDescendant(entry, entry)) {
+    compileData.enforceTDZ()
+  }
+
+  for (const exportedName in compileData.exportedSpecifiers) {
+    _namespace[exportedName] = void 0
+  }
+
+  entry.initNamespace()
+}
+
 function isDescendant(sourceEntry, searchEntry, seen) {
   if (sourceEntry.builtin ||
       sourceEntry.type !== TYPE_ESM) {
@@ -190,24 +208,6 @@ function validateExportedName(entry, exportedName, seen) {
       throw new ERR_EXPORT_MISSING(mod, exportedName)
     }
   }
-}
-
-function validate(entry) {
-  parseDependencies(entry)
-  resolveExportedStars(entry)
-  validateDependencies(entry)
-
-  const { _namespace, compileData } = entry
-
-  if (isDescendant(entry, entry)) {
-    compileData.enforceTDZ()
-  }
-
-  for (const exportedName in compileData.exportedSpecifiers) {
-    _namespace[exportedName] = void 0
-  }
-
-  entry.initNamespace()
 }
 
 export default validate
