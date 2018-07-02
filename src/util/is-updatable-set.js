@@ -6,13 +6,15 @@ function isUpdatableSet(object, name) {
     // Step 11: If either the data descriptor is not configurable or writable, or
     // the accessor descriptor has no setter, then the value must be the same.
     // https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver
-    if (descriptor.configurable === true) {
+    if (descriptor.configurable ||
+        (Reflect.has(descriptor, "writable")
+          ? descriptor.writable
+          : descriptor.set
+        )) {
       return true
     }
 
-    return descriptor.set
-      ? descriptor.get !== void 0
-      : descriptor.writable === true
+    return false
   }
 
   return true
