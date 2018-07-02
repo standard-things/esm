@@ -1,6 +1,7 @@
 import ESM from "./constant/esm.js"
 
 import encodeId from "./util/encode-id.js"
+import keysAll from "./util/keys-all.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
@@ -150,10 +151,58 @@ function init() {
   })
 
   setDeferred(shared, "unsafeContext", () => {
-    const unsafeContext = shared.module.safeVM.createContext(shared.unsafeGlobal)
+    const { safeUtil, safeVM } = shared.module
+    const { defaultGlobal } = shared
+    const { deprecate } = safeUtil
 
-    if (! Reflect.has(unsafeContext, "global")) {
-      unsafeContext.global = unsafeContext
+    const depCode = "DEP0016"
+    const unsafeContext = safeVM.createContext(shared.unsafeGlobal)
+
+    const globalDescriptor = {
+      configurable: true,
+      enumerable: true,
+      value: unsafeContext,
+      writable: true
+    }
+
+    const getDeprecatedGlobalDescriptor = (name) => {
+      const depMessage =  "'" + name + "' is deprecated, use 'global'"
+
+      return {
+        configurable: true,
+        get: deprecate(() => unsafeContext, depMessage, depCode),
+        set: deprecate(function (value) {
+          Reflect.defineProperty(this, name, {
+            configurable: true,
+            enumerable: true,
+            value,
+            writable: true
+          })
+        }, depMessage, depCode)
+      }
+    }
+
+    const names = keysAll(defaultGlobal)
+
+    for (const name of names) {
+      let descriptor
+
+      if (name === "global") {
+        descriptor = globalDescriptor
+      } else if (name === "GLOBAL" ||
+          name === "root") {
+        descriptor = getDeprecatedGlobalDescriptor(name)
+      } else if (Reflect.has(unsafeContext, name)) {
+        descriptor = Reflect.getOwnPropertyDescriptor(unsafeContext, name)
+      } else {
+        descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
+      }
+
+      if (Reflect.deleteProperty(unsafeContext, name)) {
+        unsafeContext[name] = void 0
+      }
+
+      Reflect.defineProperty(unsafeContext, name, descriptor)
     }
 
     return unsafeContext
