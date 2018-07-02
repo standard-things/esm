@@ -1,14 +1,21 @@
+import shared from "../shared.js"
 import { unlinkSync } from "../safe/fs.js"
 
-function removeFile(filename) {
-  if (typeof filename === "string") {
-    try {
-      unlinkSync(filename)
-      return true
-    } catch (e) {}
+function init() {
+  function removeFile(filename) {
+    if (typeof filename === "string") {
+      try {
+        unlinkSync(filename)
+        return true
+      } catch (e) {}
+    }
+
+    return false
   }
 
-  return false
+  return removeFile
 }
 
-export default removeFile
+export default shared.inited
+  ? shared.module.fsRemoveFile
+  : shared.module.fsRemoveFile = init()

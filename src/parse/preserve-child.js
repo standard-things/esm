@@ -1,21 +1,28 @@
 import overwrite from "./overwrite.js"
+import shared from "../shared.js"
 
-function preserveChild(visitor, parent, childName) {
-  const child = parent[childName]
-  const childStart = child.start
-  const parentStart = parent.start
+function init() {
+  function preserveChild(visitor, parent, childName) {
+    const child = parent[childName]
+    const childStart = child.start
+    const parentStart = parent.start
 
-  let indentation
+    let indentation
 
-  if (childStart > visitor.firstLineBreakPos) {
-    const count = childStart - parentStart
+    if (childStart > visitor.firstLineBreakPos) {
+      const count = childStart - parentStart
 
-    indentation = count === 7 ? "       " : " ".repeat(count)
-  } else {
-    indentation = ""
+      indentation = count === 7 ? "       " : " ".repeat(count)
+    } else {
+      indentation = ""
+    }
+
+    overwrite(visitor, parentStart, childStart, indentation)
   }
 
-  overwrite(visitor, parentStart, childStart, indentation)
+  return preserveChild
 }
 
-export default preserveChild
+export default shared.inited
+  ? shared.module.parsePreserveChild
+  : shared.module.parsePreserveChild = init()

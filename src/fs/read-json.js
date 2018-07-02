@@ -1,10 +1,17 @@
 import parseJSON from "../util/parse-json.js"
 import readFile from "./read-file.js"
+import shared from "../shared.js"
 
-function readJSON(filename) {
-  const content = readFile(filename, "utf8")
+function init() {
+  function readJSON(filename) {
+    const content = readFile(filename, "utf8")
 
-  return content === null ? content : parseJSON(content)
+    return content === null ? content : parseJSON(content)
+  }
+
+  return readJSON
 }
 
-export default readJSON
+export default shared.inited
+  ? shared.module.fsReadJSON
+  : shared.module.fsReadJSON = init()

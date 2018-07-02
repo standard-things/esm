@@ -1,19 +1,26 @@
 import silent from "./silent.js"
+import shared from "../shared.js"
 
-function getSilent(object, name) {
-  const value = silent(() => {
-    try {
-      return object[name]
-    } catch (e) {}
-  })
+function init() {
+  function getSilent(object, name) {
+    const value = silent(() => {
+      try {
+        return object[name]
+      } catch (e) {}
+    })
 
-  if (typeof value !== "function") {
-    return value
+    if (typeof value !== "function") {
+      return value
+    }
+
+    return function (...args) {
+      return silent(() => Reflect.apply(value, this, args))
+    }
   }
 
-  return function (...args) {
-    return silent(() => Reflect.apply(value, this, args))
-  }
+  return getSilent
 }
 
-export default getSilent
+export default shared.inited
+  ? shared.module.utilGetSilent
+  : shared.module.utilGetSilent = init()

@@ -1,14 +1,21 @@
 import { mkdirSync } from "../safe/fs.js"
+import shared from "../shared.js"
 
-function mkdir(dirPath) {
-  if (typeof dirPath === "string") {
-    try {
-      mkdirSync(dirPath)
-      return true
-    } catch (e) {}
+function init() {
+  function mkdir(dirPath) {
+    if (typeof dirPath === "string") {
+      try {
+        mkdirSync(dirPath)
+        return true
+      } catch (e) {}
+    }
+
+    return false
   }
 
-  return false
+  return mkdir
 }
 
-export default mkdir
+export default shared.inited
+  ? shared.module.fsMkdir
+  : shared.module.fsMkdir = init()
