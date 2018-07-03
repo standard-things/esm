@@ -1,3 +1,12 @@
+import "./binding.js"
+import "./safe/buffer.js"
+import "./safe/crypto.js"
+import "./safe/process.js"
+import "./safe/util.js"
+import "./safe/vm.js"
+import "./util/prepare-context.js"
+import "./util/satisfies.js"
+
 import ENV from "./constant/env.js"
 
 import Module from "./module.js"
