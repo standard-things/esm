@@ -2,16 +2,22 @@ import isElectron from "./is-electron.js"
 import shared from "../shared.js"
 import { type } from "../safe/process.js"
 
-function isElectronRenderer() {
-  const { env } = shared
+function init() {
+  function isElectronRenderer() {
+    const { env } = shared
 
-  if (Reflect.has(env, "electronRenderer")) {
-    return env.electronRenderer
+    if (Reflect.has(env, "electronRenderer")) {
+      return env.electronRenderer
+    }
+
+    return env.electronRenderer =
+      isElectron() &&
+      type === "renderer"
   }
 
-  return env.electronRenderer =
-    isElectron() &&
-    type === "renderer"
+  return isElectronRenderer
 }
 
-export default isElectronRenderer
+export default shared.inited
+  ? shared.module.envIsElectronRenderer
+  : shared.module.envIsElectronRenderer = init()

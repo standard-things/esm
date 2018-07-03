@@ -1,12 +1,18 @@
 import { platform } from "../safe/process.js"
 import shared from "../shared.js"
 
-function isWin32() {
-  const { env } = shared
+function init() {
+  function isWin32() {
+    const { env } = shared
 
-  return Reflect.has(env, "electron")
-    ? env.win32
-    : env.win32 = platform === "win32"
+    return Reflect.has(env, "electron")
+      ? env.win32
+      : env.win32 = platform === "win32"
+  }
+
+  return isWin32
 }
 
-export default isWin32
+export default shared.inited
+  ? shared.module.envIsWin32
+  : shared.module.envIsWin32 = init()

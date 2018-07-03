@@ -1,10 +1,17 @@
 import GenericArray from "../generic/array.js"
 
-import isOwnpath from "../util/is-own-path.js"
+import isOwnPath from "../util/is-own-path.js"
+import shared from "../shared.js"
 
-function hasLoaderModule(modules) {
-  return Array.isArray(modules) &&
-    GenericArray.some(modules, (mod) => isOwnpath(mod.filename))
+function init() {
+  function hasLoaderModule(modules) {
+    return Array.isArray(modules) &&
+      GenericArray.some(modules, (mod) => isOwnPath(mod.filename))
+  }
+
+  return hasLoaderModule
 }
 
-export default hasLoaderModule
+export default shared.inited
+  ? shared.module.envHasLoaderModule
+  : shared.module.envHasLoaderModule = init()
