@@ -172,7 +172,10 @@ class Package {
         if (hasMap &&
             ! isCacheInvalid) {
           dataJSON = readJSON(cachePath + sep + ".data.json")
-          isCacheInvalid = dataJSON.version !== PKG_VERSION
+
+          isCacheInvalid =
+            ! has(dataJSON, "version") ||
+            dataJSON.version !== PKG_VERSION
         }
 
         if (hasDirtyMarker) {
@@ -194,7 +197,7 @@ class Package {
           ? readFile(cachePath + sep + ".data.blob")
           : GenericBuffer.alloc(0)
 
-        cache.map = hasMap
+        cache.map = has(dataJSON, "map")
           ? dataJSON.map
           : {}
       }
