@@ -126,24 +126,34 @@ const Runtime = {
       }
     })
 
+    object.addDefaultValue = Runtime.addDefaultValue
+    object.addExportGetter = Runtime.addExportGetter
+    object.addNamespaceSetter = Runtime.addNamespaceSetter
+    object.assertTDZ = Runtime.assertTDZ
+    object.compileEval = boundCompileEval
     object.compileGlobalEval = Runtime.compileGlobalEval
     object.entry = entry
+    object.evalGlobal = boundEvalGlobal
+    object.importDynamic = Runtime.importDynamic
+    object.importStatic = Runtime.importStatic
+    object.run = Runtime.run
+    object.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
+    object.updateBindings = Runtime.updateBindings
 
     object._ = object
+    object.a = object.assertTDZ
+    object.c = object.compileEval
+    object.d = object.addDefaultValue
+    object.e = object.addExportGetter
+    object.g = object.evalGlobal
+    object.i = object.importDynamic
     object.k = identity
+    object.n = object.addNamespaceSetter
+    object.r = object.run
+    object.t = object.throwUndefinedIdentifier
+    object.u = object.updateBindings
     object.v = evalIndirect
-
-    object.d = object.addDefaultValue = Runtime.addDefaultValue
-    object.e = object.addExportGetter = Runtime.addExportGetter
-    object.n = object.addNamespaceSetter = Runtime.addNamespaceSetter
-    object.a = object.assertTDZ = Runtime.assertTDZ
-    object.c = object.compileEval = boundCompileEval
-    object.g = object.evalGlobal = boundEvalGlobal
-    object.i = object.importDynamic = Runtime.importDynamic
-    object.w = object.importStatic = Runtime.importStatic
-    object.r = object.run = Runtime.run
-    object.t = object.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
-    object.u = object.updateBindings = Runtime.updateBindings
+    object.w = object.importStatic
   },
 
   evalGlobal(content) {
