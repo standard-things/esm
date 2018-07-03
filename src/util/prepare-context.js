@@ -47,8 +47,10 @@ function init() {
     for (const name of globalNames) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
-      if (descriptor) {
-        Reflect.deleteProperty(context, name)
+      // For an unknown reason some global properties aren't accessible as free
+      // global variables unless they are deleted and re-added to the context.
+      if (descriptor &&
+          Reflect.deleteProperty(context, name)) {
         Reflect.defineProperty(context, name, descriptor)
       }
     }
