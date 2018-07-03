@@ -191,17 +191,13 @@ function init() {
       } else if (name === "GLOBAL" ||
           name === "root") {
         descriptor = getDeprecatedGlobalDescriptor(name)
-      } else if (Reflect.has(unsafeContext, name)) {
-        descriptor = Reflect.getOwnPropertyDescriptor(unsafeContext, name)
-      } else {
+      } else if (! Reflect.has(unsafeContext, name)) {
         descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
       }
 
-      if (Reflect.deleteProperty(unsafeContext, name)) {
-        unsafeContext[name] = void 0
+      if (descriptor) {
+        Reflect.defineProperty(unsafeContext, name, descriptor)
       }
-
-      Reflect.defineProperty(unsafeContext, name, descriptor)
     }
 
     return unsafeContext
