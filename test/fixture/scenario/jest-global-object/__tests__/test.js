@@ -9,6 +9,8 @@ test("test", () => {
   }
 
   const funcNames = [
+    "CJS_BUFFER_PROP",
+    "CJS_BUFFER_VAR",
     "CJS_CLEAR_IMMEDIATE_PROP",
     "CJS_CLEAR_IMMEDIATE_VAR",
     "CJS_CLEAR_INTERVAL_PROP",
@@ -43,9 +45,23 @@ test("test", () => {
     "ESM_URL_VAR"
   ]
 
+  const objectNames = [
+    "CJS_PROCESS_PROP",
+    "CJS_PROCESS_VAR",
+    "ESM_PROCESS_PROP",
+    "ESM_PROCESS_VAR"
+  ]
+
   function checkTypes(actual) {
     for (const name of funcNames) {
       expect(typeof actual[name]).toBe("function")
+    }
+
+    for (const name of objectNames) {
+      const value = actual[name]
+      const result = typeof value === "object" && value !== null
+
+      expect(result).toBe(true)
     }
   }
 

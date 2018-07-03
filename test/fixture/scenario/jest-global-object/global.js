@@ -1,14 +1,18 @@
 "use strict"
 
 module.exports = {
+  CJS_BUFFER_PROP: global.Buffer,
+  CJS_BUFFER_VAR: Buffer,
   CJS_CLEAR_IMMEDIATE_PROP: global.clearImmediate,
   CJS_CLEAR_IMMEDIATE_VAR: clearImmediate,
   CJS_CLEAR_INTERVAL_PROP: global.clearInterval,
   CJS_CLEAR_INTERVAL_VAR: clearInterval,
   CJS_CLEAR_TIMEOUT_PROP: global.clearTimeout,
   CJS_CLEAR_TIMEOUT_VAR: clearTimeout,
-  CJS_JEST_GLOBAL_VAR: JEST_GLOBAL,
   CJS_JEST_GLOBAL_PROP: global.JEST_GLOBAL,
+  CJS_JEST_GLOBAL_VAR: JEST_GLOBAL,
+  CJS_PROCESS_PROP: global.process,
+  CJS_PROCESS_VAR: process,
   CJS_SET_IMMEDIATE_PROP: global.setImmediate,
   CJS_SET_IMMEDIATE_VAR: setImmediate,
   CJS_SET_INTERVAL_PROP: global.setInterval,

@@ -207,21 +207,21 @@ describe("scenarios", function () {
   })
 
   ;(canTestJest ? it : xit)(
+  "should carry over the process object of jest", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+
+    return exec("jest", [
+      "--rootDir", dirPath
+    ])
+  })
+
+  ;(canTestJest ? it : xit)(
   "should carry over globals from `jest.config.json`", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
     const configPath = path.resolve(dirPath, "jest.config.json")
 
     return exec("jest", [
       "--config", configPath,
-      "--rootDir", dirPath
-    ])
-  })
-
-  ;(canTestJest ? it : xit)(
-  "should carry over the process object of jest", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
-
-    return exec("jest", [
       "--rootDir", dirPath
     ])
   })

@@ -4,11 +4,13 @@ import shared from "../shared.js"
 
 function init() {
   const globalNames = [
+    "Buffer",
     "clearImmediate",
     "clearInterval",
     "clearTimeout",
     "console",
     "global",
+    "process",
     "setImmediate",
     "setInterval",
     "setTimeout",
