@@ -82,7 +82,7 @@ function init() {
       if (typeof toString === "function") {
         const proxy = new OwnProxy(toString, {})
 
-        result = toString.call(proxy) === toString.call(toString)
+        result = Reflect.apply(toString, proxy, []) === Reflect.apply(toString, toString, [])
       }
     } catch (e) {
       result = false
