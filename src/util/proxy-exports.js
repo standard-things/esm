@@ -90,6 +90,7 @@ function init() {
           // Check for `entry.esmNamespace` because it's a proxy that native
           // methods could be invoked on.
           if (thisArg === proxy ||
+              thisArg === entry.esmMutableNamespace ||
               thisArg === entry.esmNamespace) {
             thisArg = target
           }
