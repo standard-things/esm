@@ -1,4 +1,5 @@
 import { deprecate } from "../safe/util.js"
+import keysAll from "./keys-all.js"
 import shared from "../shared.js"
 
 function init() {
@@ -17,7 +18,7 @@ function init() {
 
   function prepareContext(context) {
     const { defaultGlobal } = shared
-    const names = Reflect.ownKeys(defaultGlobal)
+    const names = keysAll(defaultGlobal)
 
     for (const name of names) {
       let descriptor
