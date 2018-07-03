@@ -1,3 +1,4 @@
+import SemVer from "semver"
 import { Stream } from "stream"
 
 import assert from "assert"
@@ -29,6 +30,8 @@ const events3 = require("events")
 const path3 = require("path")
 const process3 = require("process")
 const regexp3 = require("../../fixture/cjs/export/regexp.js")
+
+const canTestSubclassing = SemVer.satisfies(process.version, ">=6.5.0")
 
 function funcToString(func) {
   return Function.prototype.toString.call(func)
@@ -258,17 +261,19 @@ export default () => {
   const subEvents1 = new SubEvents1
   const subEvents3 = new SubEvents3
 
-  builtinCtors.forEach((Ctor) => {
+  builtinCtors.forEach((Ctor, index) => {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
-
-    assert.ok(stream instanceof Ctor)
-    assert.ok(subEvents1 instanceof Ctor)
-    assert.ok(subEvents3 instanceof Ctor)
 
     assert.strictEqual(null instanceof Ctor, false)
     assert.strictEqual(void 0 instanceof Ctor, false)
     assert.strictEqual("" instanceof Ctor, false)
+
+    if (canTestSubclassing) {
+      assert.ok(stream instanceof Ctor)
+      assert.ok(subEvents1 instanceof Ctor)
+      assert.ok(subEvents3 instanceof Ctor)
+    }
   })
 
   objects = [accessor1, accessor2, accessor3]
