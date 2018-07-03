@@ -33,6 +33,7 @@ const safeUtil = shared.inited
 export const {
   customInspectSymbol,
   defaultInspectOptions,
+  deprecate,
   inspect,
   types
 } = safeUtil

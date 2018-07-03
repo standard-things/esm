@@ -15,7 +15,6 @@ import dirname from "../path/dirname.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import makeRequireFunction from "./make-require-function.js"
-import prepareContext from "../util/prepare-context.js"
 import realProcess from "../real/process.js"
 import realVM from "../real/vm.js"
 import shared from "../shared.js"
@@ -102,7 +101,7 @@ function compile(content, filename) {
   let compiledWrapper
 
   if (useRunInContext) {
-    compiledWrapper = script.runInContext(prepareContext(shared.unsafeContext), {
+    compiledWrapper = script.runInContext(shared.unsafeContext, {
       filename
     })
   } else {

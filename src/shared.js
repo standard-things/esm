@@ -150,57 +150,9 @@ function init() {
   })
 
   setDeferred(shared, "unsafeContext", () => {
-    const { safeUtil, safeVM } = shared.module
-    const { defaultGlobal } = shared
-    const { deprecate } = safeUtil
+    const { safeVM, utilPrepareContext } = shared.module
 
-    const depCode = "DEP0016"
-    const unsafeContext = safeVM.createContext(shared.unsafeGlobal)
-
-    const globalDescriptor = {
-      configurable: true,
-      enumerable: true,
-      value: unsafeContext,
-      writable: true
-    }
-
-    const getDeprecatedGlobalDescriptor = (name) => {
-      const depMessage =  "'" + name + "' is deprecated, use 'global'"
-
-      return {
-        configurable: true,
-        get: deprecate(() => unsafeContext, depMessage, depCode),
-        set: deprecate(function (value) {
-          Reflect.defineProperty(this, name, {
-            configurable: true,
-            enumerable: true,
-            value,
-            writable: true
-          })
-        }, depMessage, depCode)
-      }
-    }
-
-    const names = Reflect.ownKeys(defaultGlobal)
-
-    for (const name of names) {
-      let descriptor
-
-      if (name === "global") {
-        descriptor = globalDescriptor
-      } else if (name === "GLOBAL" ||
-          name === "root") {
-        descriptor = getDeprecatedGlobalDescriptor(name)
-      } else if (! Reflect.has(unsafeContext, name)) {
-        descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
-      }
-
-      if (descriptor) {
-        Reflect.defineProperty(unsafeContext, name, descriptor)
-      }
-    }
-
-    return unsafeContext
+    return utilPrepareContext(safeVM.createContext(shared.unsafeGlobal))
   })
 
   setDeferred(fastPath, "readFile", () => {

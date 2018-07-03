@@ -1,3 +1,4 @@
+import { deprecate } from "../safe/util.js"
 import shared from "../shared.js"
 
 function init() {
@@ -15,6 +16,31 @@ function init() {
   ]
 
   function prepareContext(context) {
+    const { defaultGlobal } = shared
+    const names = Reflect.ownKeys(defaultGlobal)
+
+    for (const name of names) {
+      let descriptor
+
+      if (name === "global") {
+        descriptor = {
+          configurable: true,
+          enumerable: true,
+          value: context,
+          writable: true
+        }
+      } else if (name === "GLOBAL" ||
+          name === "root") {
+        descriptor = getDeprecatedGlobalDescriptor(name)
+      } else if (! Reflect.has(context, name)) {
+        descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
+      }
+
+      if (descriptor) {
+        Reflect.defineProperty(context, name, descriptor)
+      }
+    }
+
     for (const name of globalNames) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
@@ -25,6 +51,24 @@ function init() {
     }
 
     return context
+  }
+
+  function getDeprecatedGlobalDescriptor(name, context) {
+    const depCode = "DEP0016"
+    const depMessage =  "'" + name + "' is deprecated, use 'global'"
+
+    return {
+      configurable: true,
+      get: deprecate(() => context, depMessage, depCode),
+      set: deprecate(function (value) {
+        Reflect.defineProperty(this, name, {
+          configurable: true,
+          enumerable: true,
+          value,
+          writable: true
+        })
+      }, depMessage, depCode)
+    }
   }
 
   return prepareContext
