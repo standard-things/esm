@@ -2,12 +2,12 @@
 /esm
 /node_modules
 /src/vendor
+/test/export/star-cycle.mjs
 /test/fixture/error
+/test/fixture/export/dup-local.mjs
 /test/fixture/options-file
 /test/fixture/source
 /test/fixture/top-level-await
 /test/node_modules/error
 /test/output
-/test/export/star-cycle.mjs
-/test/fixture/export/dup-local.mjs
 /test/misc/builtin/namespace.mjs
