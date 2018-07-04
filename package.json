@@ -39,7 +39,7 @@
     "@babel/runtime": "^7.0.0-beta.51",
     "@std/esm": "^0.25.5",
     "acorn": "^5.7.1",
-    "ava": "1.0.0-beta.5.1",
+    "ava": "1.0.0-beta.6",
     "babel-eslint": "^8.2.5",
     "babel-loader": "^8.0.0-beta.4",
     "babel-plugin-transform-for-of-as-array": "^1.1.1",
