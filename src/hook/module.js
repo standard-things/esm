@@ -184,7 +184,9 @@ function hook(Mod, parent) {
   }
 
   for (const ext of exts) {
-    if (ext === ".mjs" &&
+    const extIsMJS = ext === ".mjs"
+
+    if (extIsMJS &&
         ! Reflect.has(_extensions, ext)) {
       _extensions[ext] = maskFunction(mjsCompiler, sourceExtsMjs)
     }
@@ -196,7 +198,7 @@ function hook(Mod, parent) {
       ! extCompiler[shared.symbol.mjs]
 
     if (passthru &&
-        ext === ".mjs") {
+        extIsMJS) {
       try {
         extCompiler()
       } catch (e) {
