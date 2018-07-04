@@ -203,7 +203,7 @@ DevOpts
 Tips
 ---
 * Load `esm` with the “require” option of<br>
-  [`ava`](https://github.com/avajs/ava#options),
+  [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
   [`nodemon`](https://github.com/remy/nodemon),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
