@@ -247,7 +247,7 @@ describe("scenarios", function () {
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
-    const errorPath = path.resolve(logsPath, "pm2-error-0.log")
+    const errorPath = path.resolve(logsPath, "pm2-error.log")
 
     const nodeArgs = [
       "-r", pkgPath,
