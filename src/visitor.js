@@ -36,8 +36,8 @@ function init() {
   }
 
   class Visitor {
-    visit(path) {
-      this.reset(...arguments)
+    visit(rootPath, options) {
+      this.reset(options)
 
       const possibleIndexes = this.possibleIndexes || []
 
@@ -45,7 +45,7 @@ function init() {
       this.possibleIndexes = possibleIndexes
       this.possibleStart = 0
 
-      this.visitWithoutReset(path)
+      this.visitWithoutReset(rootPath)
     }
 
     visitWithoutReset(path) {

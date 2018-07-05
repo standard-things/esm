@@ -9,12 +9,20 @@ function init() {
   const shadowedMap = new Map
 
   class AssignmentVisitor extends Visitor {
-    reset(rootPath, options) {
-      this.assignableExports = options.assignableExports
-      this.importedLocals = options.importedLocals
-      this.magicString = options.magicString
-      this.possibleIndexes = options.possibleIndexes
-      this.runtimeName = options.runtimeName
+    reset(options) {
+      this.assignableExports = null
+      this.importedLocals = null
+      this.magicString = null
+      this.possibleIndexes = null
+      this.runtimeName = null
+
+      if (options) {
+        this.assignableExports = options.assignableExports
+        this.importedLocals = options.importedLocals
+        this.magicString = options.magicString
+        this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
+      }
     }
 
     visitAssignmentExpression(path) {

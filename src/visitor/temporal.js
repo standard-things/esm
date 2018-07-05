@@ -9,11 +9,19 @@ function init() {
   const shadowedMap = new Map
 
   class TemporalVisitor extends Visitor {
-    reset(rootPath, options) {
-      this.magicString = options.magicString
-      this.possibleIndexes = options.possibleIndexes
-      this.runtimeName = options.runtimeName
-      this.temporals = options.temporals
+    reset(options) {
+      this.changed = false
+      this.magicString = null
+      this.possibleIndexes = null
+      this.runtimeName = null
+      this.temporals = null
+
+      if (options) {
+        this.magicString = options.magicString
+        this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
+        this.temporals = options.temporals
+      }
     }
 
     visitIdentifier(path) {
@@ -28,6 +36,8 @@ function init() {
       const { magicString, runtimeName } = this
 
       maybeIdentifier(path, (node, parent) => {
+        this.changed = true
+
         const { end, start } = node
 
         if (parent.shorthand) {
@@ -58,6 +68,8 @@ function init() {
     }
 
     visitExportDefaultDeclaration(path) {
+      this.changed = true
+
       const node = path.getValue()
 
       this.magicString.prependRight(
@@ -94,6 +106,7 @@ function init() {
       }
 
       if (names) {
+        this.changed = true
         this.magicString.prependRight(
           child.end,
           ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"

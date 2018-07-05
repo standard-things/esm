@@ -26,6 +26,10 @@ function init() {
     UNAMBIGUOUS
   } = SOURCE_TYPE
 
+  // Add "main" to compiled code to enable the `readFileFast` fast path of
+  // `process.binding("fs").internalModuleReadJSON`.
+  const FAST_READ_PREFIX = '"main";'
+
   const defaultOptions = {
     cjs: {
       topLevelReturn: false,
@@ -142,6 +146,13 @@ function init() {
       result.topLevelReturn = top.returnOutsideFunction
       Reflect.deleteProperty(ast, "top")
 
+      argumentsVisitor.reset()
+      assignmentVisitor.reset()
+      consoleVisitor.reset()
+      evalVisitor.reset()
+      importExportVisitor.reset()
+      temporalVisitor.reset()
+
       try {
         importExportVisitor.visit(rootPath, {
           generateVarDeclarations: options.var,
@@ -238,7 +249,9 @@ function init() {
               temporals
             })
 
-            result.code = magicString.toString()
+            if (temporalVisitor.changed) {
+              result.code = FAST_READ_PREFIX + magicString.toString()
+            }
           }
         }
 
@@ -281,9 +294,7 @@ function init() {
         importExportVisitor.changed
 
       if (result.changed) {
-        // Add "main" to enable the `readFileFast` fast path of
-        // `process.binding("fs").internalModuleReadJSON`.
-        setDeferred(result, "code", () => '"main";' + magicString.toString())
+        setDeferred(result, "code", () => FAST_READ_PREFIX + magicString.toString())
       }
 
       return result

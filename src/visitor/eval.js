@@ -9,13 +9,21 @@ function init() {
   const shadowedMap = new Map
 
   class EvalVisitor extends Visitor {
-    reset(rootPath, options) {
-      this.addedImportExport = options.addedImportExport
+    reset(options) {
+      this.addedImportExport = false
       this.changed = false
-      this.magicString = options.magicString
-      this.possibleIndexes = options.possibleIndexes
-      this.runtimeName = options.runtimeName
-      this.strict = options.strict
+      this.magicString = null
+      this.possibleIndexes = null
+      this.runtimeName = null
+      this.strict = false
+
+      if (options) {
+        this.addedImportExport = options.addedImportExport
+        this.magicString = options.magicString
+        this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
+        this.strict = options.strict
+      }
     }
 
     visitCallExpression(path) {

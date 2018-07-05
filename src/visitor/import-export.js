@@ -33,27 +33,45 @@ function init() {
       this.magicString.prependLeft(top.insertCharIndex, code)
     }
 
-    reset(rootPath, options) {
-      const { magicString } = options
-
+    reset(options) {
       this.addedImportExport = false
       this.addedImportMeta = false
-      this.assignableExports = { __proto__: null }
+      this.assignableExports = null
       this.changed = false
-      this.dependencySpecifiers = { __proto__: null }
-      this.exportedFrom = { __proto__: null }
-      this.exportedNames = []
-      this.exportedStars = []
-      this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
-      this.generateVarDeclarations = options.generateVarDeclarations
-      this.importedLocals = { __proto__: null }
-      this.magicString = magicString
-      this.possibleIndexes = options.possibleIndexes
-      this.runtimeName = options.runtimeName
-      this.sourceType = options.sourceType
-      this.strict = options.strict
-      this.temporals = { __proto__: null }
-      this.top = options.top
+      this.dependencySpecifiers = null
+      this.exportedFrom = null
+      this.exportedNames = null
+      this.exportedStars = null
+      this.firstLineBreakPos = -1
+      this.generateVarDeclarations = false
+      this.importedLocals = null
+      this.magicString = null
+      this.possibleIndexes = null
+      this.runtimeName = null
+      this.sourceType = null
+      this.strict = false
+      this.temporals = null
+      this.top = null
+
+      if (options) {
+        const { magicString } = options
+
+        this.assignableExports = { __proto__: null }
+        this.dependencySpecifiers = { __proto__: null }
+        this.exportedFrom = { __proto__: null }
+        this.exportedNames = []
+        this.exportedStars = []
+        this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
+        this.generateVarDeclarations = options.generateVarDeclarations
+        this.importedLocals = { __proto__: null }
+        this.magicString = magicString
+        this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
+        this.sourceType = options.sourceType
+        this.strict = options.strict
+        this.temporals = { __proto__: null }
+        this.top = options.top
+      }
     }
 
     visitCallExpression(path) {

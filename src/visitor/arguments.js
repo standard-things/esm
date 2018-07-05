@@ -10,12 +10,19 @@ function init() {
   const shadowedMap = new Map
 
   class ArgumentsVisitor extends Visitor {
-    reset(rootPath, options) {
+    reset(options) {
       this.changed = false
-      this.magicString = options.magicString
-      this.possibleIndexes = options.possibleIndexes
-      this.runtimeName = options.runtimeName
-      this.top = options.top
+      this.magicString = null
+      this.possibleIndexes = null
+      this.runtimeName = null
+      this.top = null
+
+      if (options) {
+        this.magicString = options.magicString
+        this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
+        this.top = options.top
+      }
     }
 
     visitIdentifier(path) {
