@@ -130,7 +130,7 @@ describe("built-in modules", () => {
 
   it("should support `console.Console`", () => {
     const { Console } = console
-    const actual = new Console(process.stdout, process.stderr)
+    const actual = new Console(process.stdout)
 
     assert.ok(actual instanceof Console)
   })
@@ -145,11 +145,13 @@ describe("built-in modules", () => {
       }
     }
 
-    const actual = new SubConsole(process.stdout, process.stderr)
+    const actual = new SubConsole(process.stdout)
 
     assert.ok(actual instanceof Console)
     assert.ok(actual instanceof SubConsole)
+
     assert.strictEqual(actual.sub, "sub")
+    assert.ok(Reflect.has(actual, "_stdout"))
   })
 
   ;(canTestUtilTypes ? it : xit)(

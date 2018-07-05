@@ -2,6 +2,8 @@ import { stderr, stdout } from "../safe/process.js"
 
 import ENV from "../constant/env.js"
 
+import GenericFunction from "../generic/function.js"
+
 import assign from "../util/assign.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
@@ -10,6 +12,7 @@ import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
+import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
 
@@ -85,30 +88,45 @@ function init() {
     }, func)
   }
 
-  const SafeConsole = safeConsole.Console
+  const RealConsole = realConsole.Console
 
   const Console = maskFunction(function (...args) {
     const target = new.target
 
     if (target) {
-      const result = Reflect.construct(SafeConsole, args, target)
+      const proto = Console.prototype
+      const protoNames = keysAll(proto)
 
-      Reflect.setPrototypeOf(result, Reflect.getPrototypeOf(this))
-      return result
+      for (const name of protoNames) {
+        const value = this[name]
+
+        if (typeof value === "function") {
+          this[name] = GenericFunction.bind(value, this)
+        }
+      }
+
+      const result = Reflect.construct(RealConsole, args, target)
+      const names = keysAll(result)
+
+      for (const name of names) {
+        if (! Reflect.has(this, name)) {
+          copyProperty(this, result, name)
+        }
+      }
+    } else {
+      return new Console(...args)
     }
+  }, RealConsole)
 
-    return new Console(...args)
-  }, SafeConsole)
+  const realProto = RealConsole.prototype
 
-  const safeProto = SafeConsole.prototype
+  const builtinAssert = wrap(realProto.assert, assertWrapper)
+  const builtinDir = wrap(realProto.dir, dirWrapper)
+  const builtinLog = wrap(realProto.log)
+  const builtinTrace = wrap(realProto.trace)
+  const builtinWarn = wrap(realProto.warn)
 
-  const builtinAssert = wrap(safeProto.assert, assertWrapper)
-  const builtinDir = wrap(safeProto.dir, dirWrapper)
-  const builtinLog = wrap(safeProto.log)
-  const builtinTrace = wrap(safeProto.trace)
-  const builtinWarn = wrap(safeProto.warn)
-
-  const protoNames = keysAll(safeProto)
+  const protoNames = keysAll(realProto)
   const { prototype } = Console
 
   for (const name of protoNames) {
@@ -126,7 +144,7 @@ function init() {
     } else if (name === "warn") {
       prototype.warn = builtinWarn
     } else {
-      copyProperty(prototype, safeProto, name)
+      copyProperty(prototype, realProto, name)
     }
   }
 

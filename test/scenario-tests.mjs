@@ -227,6 +227,18 @@ describe("scenarios", function () {
   })
 
   ;(canTestJest ? it : xit)(
+  "should work with jest subclassed console", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
+    const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
+
+    return exec(nodePath, [
+      "-r", pkgPath,
+      jestPath,
+      "--rootDir", dirPath
+    ])
+  })
+
+  ;(canTestJest ? it : xit)(
   "should work with jest and mock-require", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
 
