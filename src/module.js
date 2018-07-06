@@ -45,11 +45,11 @@ Module.prototype.require = maskFunction(req, realProto.require)
 defaults(Module, RealModule)
 assign(Module._extensions, RealModule._extensions)
 
-if (! Module.globalPaths) {
+if (Module.globalPaths) {
+  moduleState.globalPaths = GenericArray.from(Module.globalPaths)
+} else {
   Module.globalPaths = initGlobalPaths()
 }
-
-moduleState.globalPaths = GenericArray.from(Module.globalPaths)
 
 parseState._cache = new Proxy(parseState._cache, {
   get(target, name) {
