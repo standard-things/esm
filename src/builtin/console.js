@@ -90,14 +90,21 @@ function init() {
 
   const RealConsole = realConsole.Console
 
+  const realMethodNames = []
+  const realProto = RealConsole.prototype
+  const realProtoNames = keysAll(realProto)
+
+  const builtinAssert = wrap(realProto.assert, assertWrapper)
+  const builtinDir = wrap(realProto.dir, dirWrapper)
+  const builtinLog = wrap(realProto.log)
+  const builtinTrace = wrap(realProto.trace)
+  const builtinWarn = wrap(realProto.warn)
+
   const Console = maskFunction(function (...args) {
     const target = new.target
 
     if (target) {
-      const proto = Console.prototype
-      const protoNames = keysAll(proto)
-
-      for (const name of protoNames) {
+      for (const name of realMethodNames) {
         const value = this[name]
 
         if (typeof value === "function") {
@@ -114,22 +121,17 @@ function init() {
         }
       }
     } else {
-      return new Console(...args)
+      return Reflect.construct(Console, args)
     }
   }, RealConsole)
 
-  const realProto = RealConsole.prototype
-
-  const builtinAssert = wrap(realProto.assert, assertWrapper)
-  const builtinDir = wrap(realProto.dir, dirWrapper)
-  const builtinLog = wrap(realProto.log)
-  const builtinTrace = wrap(realProto.trace)
-  const builtinWarn = wrap(realProto.warn)
-
-  const protoNames = keysAll(realProto)
   const { prototype } = Console
 
-  for (const name of protoNames) {
+  for (const name of realProtoNames) {
+    if (typeof realProto[name] === "function") {
+      realMethodNames.push(name)
+    }
+
     if (name === "assert") {
       prototype.assert = builtinAssert
     } if (name === "debug" ||
