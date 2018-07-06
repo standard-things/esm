@@ -112,8 +112,8 @@ function getWarning(...args) {
     util.format(...args) + "\n"
 }
 
-describe("built-in modules", () => {
-  it("should load built-in modules", () =>
+describe("builtin modules", () => {
+  it("should load builtin modules", () =>
     import("./misc/builtin/load.mjs")
       .then((ns) => ns.default())
   )
