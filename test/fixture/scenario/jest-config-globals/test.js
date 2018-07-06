@@ -8,9 +8,9 @@ test("test", () => {
     ESM_JEST_CONFIG_GLOBAL_VAR: "JEST_CONFIG_GLOBAL_VALUE"
   }
 
-  expect(require("../")).toEqual(expected)
+  expect(require("./")).toEqual(expected)
 
-  require = require("../../../../../")(module)
+  require = require("../../../../")(module)
 
-  expect(require("../main.js")).toEqual(expected)
+  expect(require("./main.js")).toEqual(expected)
 })

@@ -73,14 +73,14 @@ test("test", () => {
     }
   }
 
-  const bridged = require("../")
+  const bridged = require("./")
 
   checkValues(bridged)
   checkTypes(bridged)
 
-  require = require("../../../../../")(module)
+  require = require("../../../../")(module)
 
-  const rebridged = require("../main.js")
+  const rebridged = require("./main.js")
 
   checkValues(rebridged)
   checkTypes(rebridged)
