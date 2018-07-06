@@ -276,10 +276,10 @@ describe("scenarios", function () {
 
     return Promise
       .resolve()
-      .then(() => trash(logsPath))
       .then(() => exec("pm2", ["kill"]))
+      .then(() => trash(logsPath))
       .then(() => exec("pm2", pm2Args))
-      .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
+      .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
       .then(() => assert.strictEqual(fs.readFileSync(errorPath, "utf8"), ""))
   })
 })
