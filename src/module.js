@@ -18,7 +18,7 @@ import moduleState from "./module/state.js"
 import parseState from "./parse/state.js"
 import req from "./module/require.js"
 
-const RealProto = RealModule.prototype
+const realProto = RealModule.prototype
 
 const Module = maskFunction(function (id, parent) {
   const mod = new RealModule(id, parent)
@@ -37,10 +37,10 @@ Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resol
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 
-Module.prototype._compile = maskFunction(_compile, RealProto._compile)
+Module.prototype._compile = maskFunction(_compile, realProto._compile)
 Module.prototype.constructor = Module
-Module.prototype.load = maskFunction(load, RealProto.load)
-Module.prototype.require = maskFunction(req, RealProto.require)
+Module.prototype.load = maskFunction(load, realProto.load)
+Module.prototype.require = maskFunction(req, realProto.require)
 
 defaults(Module, RealModule)
 assign(Module._extensions, RealModule._extensions)
