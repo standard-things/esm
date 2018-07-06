@@ -31,10 +31,10 @@ const {
   ERR_UNDEFINED_IDENTIFIER
 } = errors
 
-const { external } = shared
-const evalIndirect = external.eval
-
-const ExPromise = external.Promise
+const {
+  Promise: ExPromise,
+  eval: evalIndirect
+} = shared.external
 
 const Runtime = {
   addDefaultValue(value) {

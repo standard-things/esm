@@ -8,11 +8,9 @@ import dirname from "../path/dirname.js"
 import extname from "../path/extname.js"
 import shared from "../shared.js"
 
-const ExError = shared.external.Error
-
 function load(filename) {
   if (this.loaded) {
-    throw new ExError("Module already loaded: " + this.id)
+    throw new shared.external.Error("Module already loaded: " + this.id)
   }
 
   let ext = extname(filename)

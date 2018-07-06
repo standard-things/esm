@@ -12,12 +12,12 @@ function init() {
     PKG_VERSION
   } = ESM
 
-  const { external } = shared
-
-  const ExError = external.Error
-  const ExReferenceError = external.ReferenceError
-  const ExSyntaxError = external.SyntaxError
-  const ExTypeError = external.TypeError
+  const {
+    Error: ExError,
+    ReferenceError: ExReferenceError,
+    SyntaxError: ExSyntaxError,
+    TypeError: ExTypeError
+  } = shared.external
 
   const errors = { __proto__: null }
   const messages = { __proto__: null }

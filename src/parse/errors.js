@@ -2,7 +2,10 @@ import { getLineInfo } from "../acorn.js"
 import shared from "../shared.js"
 
 function init() {
-  const { external } = shared
+  const {
+    SyntaxError: ExSyntaxError,
+    TypeError: ExTypeError
+  } = shared.external
 
   function createClass(Super) {
     return class AcornError extends Super {
@@ -18,8 +21,8 @@ function init() {
   }
 
   return {
-    SyntaxError: createClass(external.SyntaxError),
-    TypeError: createClass(external.TypeError)
+    SyntaxError: createClass(ExSyntaxError),
+    TypeError: createClass(ExTypeError)
   }
 }
 
