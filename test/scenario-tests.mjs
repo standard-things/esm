@@ -31,12 +31,6 @@ function exec(filename, args, env) {
 describe("scenarios", function () {
   this.timeout(0)
 
-  it("should work with ava", () =>
-    exec("ava", [
-      path.resolve(testPath, "fixture/scenario/ava/test.js")
-    ], envCI)
-  )
-
   it("should work with dual packages", () =>
     [
       "index.js",
@@ -51,6 +45,36 @@ describe("scenarios", function () {
           ])
         )
     , Promise.resolve())
+  )
+
+  it("should work with ava", () =>
+    exec("ava", [
+      path.resolve(testPath, "fixture/scenario/ava/test.js")
+    ], envCI)
+  )
+
+  it("should expose babel errors", () =>
+    exec(nodePath, [
+      "-r", pkgPath,
+      "-r", "@babel/register",
+      path.resolve(testPath, "fixture/scenario/babel-error")
+    ])
+    .then(() => assert.ok(false))
+    .catch(({ stderr }) => {
+      assert.ok(stderr.includes("Support for the experimental syntax 'importMeta' isn't currently enabled"))
+    })
+  )
+
+  it("should work with babel plugins (code)", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/babel-flow")])
+  )
+
+  it("should work with babel plugins (flag)", () =>
+    exec(nodePath, [
+      "-r", pkgPath,
+      "-r", "@babel/register",
+      path.resolve(testPath, "fixture/scenario/babel-flow")
+    ])
   )
 
   it("should work with esmod-pmb", () =>
@@ -136,30 +160,6 @@ describe("scenarios", function () {
         "ava", avaPattern
       ], envCI))
   })
-
-  it("should work with babel and plugins (code)", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/babel-flow")])
-  )
-
-  it("should work with babel and plugins (flag)", () =>
-    exec(nodePath, [
-      "-r", pkgPath,
-      "-r", "@babel/register",
-      path.resolve(testPath, "fixture/scenario/babel-flow")
-    ])
-  )
-
-  it("should expose babel errors", () =>
-    exec(nodePath, [
-      "-r", pkgPath,
-      "-r", "@babel/register",
-      path.resolve(testPath, "fixture/scenario/babel-error")
-    ])
-    .then(() => assert.ok(false))
-    .catch(({ stderr }) => {
-      assert.ok(stderr.includes("Support for the experimental syntax 'importMeta' isn't currently enabled"))
-    })
-  )
 
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
