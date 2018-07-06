@@ -1,6 +1,7 @@
 import ENV from "./constant/env.js"
 
 import GenericArray from "./generic/array.js"
+import GenericObject from "./generic/object.js"
 import RealModule from "./real/module.js"
 
 import _compile from "./module/compile.js"
@@ -24,13 +25,19 @@ const {
   JEST
 } = ENV
 
-const realProto = RealModule.prototype
-
 const Module = maskFunction(function (id, parent) {
-  const mod = new RealModule(id, parent)
+  this.children = GenericArray.of()
+  this.exports = GenericObject.create()
+  this.filename = null
+  this.id = id
+  this.loaded = false
+  this.parent = parent
 
-  Reflect.setPrototypeOf(mod, Module.prototype)
-  return mod
+  const children = parent && parent.children
+
+  if (children) {
+    GenericArray.push(children, this)
+  }
 }, RealModule)
 
 Module._extensions = { __proto__: null }
@@ -43,10 +50,13 @@ Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resol
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 
-Module.prototype._compile = maskFunction(_compile, realProto._compile)
-Module.prototype.constructor = Module
-Module.prototype.load = maskFunction(load, realProto.load)
-Module.prototype.require = maskFunction(req, realProto.require)
+const { prototype } = Module
+const realProto = RealModule.prototype
+
+prototype._compile = maskFunction(_compile, realProto._compile)
+prototype.constructor = Module
+prototype.load = maskFunction(load, realProto.load)
+prototype.require = maskFunction(req, realProto.require)
 
 defaults(Module, RealModule)
 assign(Module._extensions, RealModule._extensions)
