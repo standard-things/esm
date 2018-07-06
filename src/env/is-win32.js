@@ -5,7 +5,7 @@ function init() {
   function isWin32() {
     const { env } = shared
 
-    return Reflect.has(env, "electron")
+    return Reflect.has(env, "win32")
       ? env.win32
       : env.win32 = platform === "win32"
   }
