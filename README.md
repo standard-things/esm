@@ -202,6 +202,9 @@ DevOpts
 
 Tips
 ---
+
+:reminder_ribbon: The `require` function cannot load `.mjs` files.
+
 * Load `esm` with the “require” option of<br>
   [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
   [`mocha`](https://mochajs.org/#-r---require-module-name),
