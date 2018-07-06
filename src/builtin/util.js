@@ -1,3 +1,5 @@
+import GenericObject from "../generic/object.js"
+
 import copyProperty from "../util/copy-property.js"
 import format from "../util/format.js"
 import formatWithOptions from "../util/format-with-options.js"
@@ -12,8 +14,6 @@ import shared from "../shared.js"
 import toWrapper from "../util/to-wrapper.js"
 
 function init() {
-  const ExObject = shared.external.Object
-
   const safeTypes = safeUtil.types
 
   let builtinTypes
@@ -27,7 +27,7 @@ function init() {
         ! isOwnProxy(value)
     })
 
-    builtinTypes = new ExObject
+    builtinTypes = GenericObject.create()
 
     const names = keysAll(safeTypes)
 
@@ -50,7 +50,7 @@ function init() {
     ? proxyWrap(safeFormatWithOptions, toWrapper(formatWithOptions))
     : formatWithOptions
 
-  const builtinUtil = new ExObject
+  const builtinUtil = GenericObject.create()
   const names = keysAll(realUtil)
 
   for (const name of names) {

@@ -1,10 +1,12 @@
+import GenericObject from "../generic/object.js"
+
 import copyProperty from "../util/copy-property.js"
 import keysAll from "../util/keys-all.js"
 import safeVM from "../safe/vm.js"
 import shared from "../shared.js"
 
 function init() {
-  const builtinVM = new shared.external.Object
+  const builtinVM = GenericObject.create()
   const names = keysAll(safeVM)
 
   for (const name of names) {

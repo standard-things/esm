@@ -4,6 +4,7 @@ import PACKAGE from "../constant/package.js"
 import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
+import GenericObject from "../generic/object.js"
 import Package from "../package.js"
 import Runtime from "../runtime.js"
 
@@ -44,8 +45,6 @@ const {
   SCRIPT,
   UNAMBIGUOUS
 } = SOURCE_TYPE
-
-const ExObject = shared.external.Object
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
@@ -191,7 +190,7 @@ function tryCompileCJS(entry, filename) {
       content +
       "\n}))"
 
-    Runtime.enable(entry, new ExObject)
+    Runtime.enable(entry, GenericObject.create())
   } else if (useAsync) {
     content =
       "(async () => { " +
@@ -231,7 +230,7 @@ function tryCompileESM(entry, filename) {
 
   content += maybeSourceMap(entry, content, filename)
 
-  Runtime.enable(entry, new ExObject)
+  Runtime.enable(entry, GenericObject.create())
   return mod._compile(content, filename)
 }
 

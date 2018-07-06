@@ -4,6 +4,7 @@ import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
+import GenericObject from "../generic/object.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import { REPLServer } from "../safe/repl.js"
@@ -50,8 +51,6 @@ const {
   MODULE,
   UNAMBIGUOUS
 } = SOURCE_TYPE
-
-const ExObject = shared.external.Object
 
 function hook(vm) {
   let entry
@@ -157,7 +156,7 @@ function hook(vm) {
     entry.runtimeName = shared.runtimeName
 
     Reflect.setPrototypeOf(mod, Module.prototype)
-    Runtime.enable(entry, new ExObject)
+    Runtime.enable(entry, GenericObject.create())
   }
 
   function setupEval() {
