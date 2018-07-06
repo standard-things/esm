@@ -31,7 +31,7 @@ const {
 
 const { isFile } = Stats.prototype
 
-const useBuiltins = module.constructor.length > 1
+const useBuiltinRequire = module.constructor.length > 1
 const useCreateCachedData = typeof createCachedData === "function"
 
 const Module = require("module")
@@ -44,10 +44,17 @@ esmModule.parent = module.parent
 
 let esmRequire = require
 
-if (! useBuiltins &&
+if (! useBuiltinRequire &&
     ! NativeModule &&
     typeof esmModule.require === "function") {
   esmRequire = (request) => esmModule.require(request)
+}
+
+let freeJest
+
+if (typeof jest === "object" && jest !== null &&
+    global.jest !== jest) {
+  freeJest = jest
 }
 
 function compileESM() {
@@ -88,7 +95,7 @@ function compileESM() {
   }
 
   const script = new Script(
-    "(function (require, module, __shared__) { " +
+    "(function (require, module, __jest__, __shared__) { " +
     content +
     "\n});",
     scriptOptions
@@ -142,7 +149,7 @@ function compileESM() {
 }
 
 function loadESM() {
-  compiledESM(esmRequire, esmModule, shared)
+  compiledESM(esmRequire, esmModule, freeJest, shared)
   return esmModule.exports
 }
 

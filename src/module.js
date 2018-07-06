@@ -1,3 +1,5 @@
+import ENV from "./constant/env.js"
+
 import GenericArray from "./generic/array.js"
 import RealModule from "./real/module.js"
 
@@ -17,6 +19,10 @@ import maskFunction from "./util/mask-function.js"
 import moduleState from "./module/state.js"
 import parseState from "./parse/state.js"
 import req from "./module/require.js"
+
+const {
+  JEST
+} = ENV
 
 const realProto = RealModule.prototype
 
@@ -44,6 +50,10 @@ Module.prototype.require = maskFunction(req, realProto.require)
 
 defaults(Module, RealModule)
 assign(Module._extensions, RealModule._extensions)
+
+if (JEST) {
+  Module._cache = { __proto__: null }
+}
 
 if (Module.globalPaths) {
   moduleState.globalPaths = GenericArray.from(Module.globalPaths)
