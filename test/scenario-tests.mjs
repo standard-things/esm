@@ -227,6 +227,15 @@ describe("scenarios", function () {
   })
 
   ;(canTestJest ? it : xit)(
+  "should use an empty module cache with jest", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
+
+    return exec("jest", [
+      "--rootDir", dirPath
+    ])
+  })
+
+  ;(canTestJest ? it : xit)(
   "should work with jest subclassed console", () => {
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
     const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
