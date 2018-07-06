@@ -128,7 +128,8 @@ function init() {
   const { prototype } = Console
 
   for (const name of realProtoNames) {
-    if (typeof realProto[name] === "function") {
+    if (typeof name === "string" &&
+        typeof realProto[name] === "function") {
       realMethodNames.push(name)
     }
 
