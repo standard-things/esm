@@ -36,7 +36,8 @@ function init() {
       "toUnicode"
     ],
     inspector: [
-      "callAndPauseOnStart"
+      "callAndPauseOnStart",
+      "open"
     ],
     util: [
       "decorated_private_symbol",
