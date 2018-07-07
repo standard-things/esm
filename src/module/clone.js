@@ -6,8 +6,8 @@ import keysAll from "../util/keys-all.js"
 function clone(mod) {
   const cloned = new Module(mod.id)
 
-  cloned.id = mod.id
   cloned.filename = mod.filename
+  cloned.id = mod.id
   cloned.parent = mod.parent
 
   const names = keysAll(mod)
