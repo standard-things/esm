@@ -11,11 +11,14 @@ import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
+import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import shared from "../shared.js"
+import toModuleNamespaceObject from "../util/to-module-namespace-object"
+import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
 function init() {
   const {
@@ -82,6 +85,35 @@ function init() {
     }
   }
 
+  function toUnwrapped(value, seen) {
+    if (isModuleNamespaceObject(value)) {
+      seen || (seen = new Map)
+
+      let object = seen.get(value)
+
+      if (object) {
+        return object
+      }
+
+      object = toModuleNamespaceObject()
+      seen.set(value, object)
+
+      const names = Object.getOwnPropertyNames(value)
+
+      for (const name of names) {
+        try {
+          object[name] = toUnwrapped(value[name], seen)
+        } catch (e) {
+          object[name] = "<uninitialized>"
+        }
+      }
+
+      return object
+    }
+
+    return unwrapOwnProxy(value)
+  }
+
   function toInspectableArgs(args) {
     const { length } = args
 
@@ -89,6 +121,18 @@ function init() {
 
     while (++i < length) {
       args[i] = toInspectable(args[i])
+    }
+
+    return args
+  }
+
+  function toUnwrappedArgs(args) {
+    const { length } = args
+
+    let i = -1
+
+    while (++i < length) {
+      args[i] = toUnwrapped(args[i])
     }
 
     return args
@@ -165,7 +209,7 @@ function init() {
           builtinConsole[name] = GenericFunction.bind(
             consoleCall,
             void 0,
-            value,
+            (...args) => Reflect.apply(value, originalConsole, toUnwrappedArgs(args)),
             builtinConsole[name],
             emptyConfig
           )
