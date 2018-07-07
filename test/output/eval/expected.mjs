@@ -1,10 +1,10 @@
-"main";_.e([["a",()=>a]]);let a = "a"
+"main";_.x([["a",()=>a]]);let a = "a"
 
-const o = { d, eval:_.g, f }
+const o = { d, eval:_.e, f }
 
-o.eval = _.g
+o.eval = _.e
 
-;(0, _.g)(code)
+;(0, _.e)(code)
 
 eval()
 

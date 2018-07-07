@@ -183,7 +183,8 @@ function init() {
           top.identifiers.indexOf("console") === -1) {
         consoleVisitor.visit(rootPath, {
           magicString,
-          possibleIndexes: possibleConsoleIndexes
+          possibleIndexes: possibleConsoleIndexes,
+          runtimeName
         })
       }
 

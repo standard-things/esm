@@ -513,7 +513,7 @@ describe("compiler", () => {
   it("should not wrap shadowed eval in with statements", () => {
     const result = Compiler.compile("with (eval) { eval = eval }")
 
-    assert.ok(result.code.includes("with ((eval===_.v?_.g:eval)) { eval = eval }"))
+    assert.ok(result.code.includes("with ((eval===_.v?_.e:eval)) { eval = eval }"))
   })
 
   it("should support V8 parse errors", () => {

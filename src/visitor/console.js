@@ -12,10 +12,12 @@ function init() {
       this.changed = false
       this.magicString = null
       this.possibleIndexes = null
+      this.runtimeName = null
 
       if (options) {
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
+        this.runtimeName = options.runtimeName
       }
     }
 
@@ -37,7 +39,7 @@ function init() {
       }
 
       this.changed = true
-      this.magicString.prependLeft(node.start, "global.")
+      this.magicString.prependLeft(node.start, this.runtimeName + ".g.")
     }
   }
 

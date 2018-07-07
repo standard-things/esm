@@ -6,6 +6,7 @@ import Module from "./module.js"
 
 import _loadESM from "./module/esm/_load.js"
 import builtinGlobal from "./builtin/global.js"
+import call from "./util/call.js"
 import errors from "./errors.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
@@ -135,6 +136,7 @@ const Runtime = {
     object.compileGlobalEval = Runtime.compileGlobalEval
     object.entry = entry
     object.evalGlobal = boundEvalGlobal
+    object.global = builtinGlobal
     object.importDynamic = Runtime.importDynamic
     object.importStatic = Runtime.importStatic
     object.run = Runtime.run
@@ -145,8 +147,8 @@ const Runtime = {
     object.a = object.assertTDZ
     object.c = object.compileEval
     object.d = object.addDefaultValue
-    object.e = object.addExportGetter
-    object.g = object.evalGlobal
+    object.g = object.global
+    object.e = object.evalGlobal
     object.i = object.importDynamic
     object.k = identity
     object.n = object.addNamespaceSetter
@@ -155,6 +157,7 @@ const Runtime = {
     object.u = object.updateBindings
     object.v = evalIndirect
     object.w = object.importStatic
+    object.x = object.addExportGetter
   },
 
   evalGlobal(content) {
@@ -336,7 +339,6 @@ function runCJS(entry, moduleWrapper) {
   const exported = mod.exports = entry.exports
 
   return Reflect.apply(moduleWrapper, exported, [
-    builtinGlobal,
     exported,
     makeRequireFunction(mod)
   ])
@@ -351,14 +353,11 @@ function runESM(entry, moduleWrapper) {
   if (entry.package.options.cjs.vars &&
       ! isMJS(mod)) {
     result = Reflect.apply(moduleWrapper, exported, [
-      builtinGlobal,
       exported,
       makeRequireFunction(mod)
     ])
   } else {
-    result = Reflect.apply(moduleWrapper, void 0, [
-      builtinGlobal
-    ])
+    result = call(moduleWrapper)
   }
 
   let { loaded } = mod

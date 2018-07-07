@@ -91,8 +91,8 @@ function init() {
       const { runtimeName } = this
 
       const code = this.strict
-        ? runtimeName + ".g"
-        : "(eval===" + runtimeName + ".v?" + runtimeName + ".g:eval)"
+        ? runtimeName + ".e"
+        : "(eval===" + runtimeName + ".v?" + runtimeName + ".e:eval)"
 
       if (type === "Property" &&
           parent.shorthand) {

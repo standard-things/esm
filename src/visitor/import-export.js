@@ -482,7 +482,7 @@ function init() {
       return code
     }
 
-    code += visitor.runtimeName + ".e(["
+    code += visitor.runtimeName + ".x(["
 
     const lastIndex = pairs.length - 1
     const { exportedNames } = visitor
