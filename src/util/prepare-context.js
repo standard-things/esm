@@ -1,5 +1,6 @@
 import { deprecate } from "../safe/util.js"
 import keysAll from "./keys-all.js"
+import setProperty from "./set-property.js"
 import shared from "../shared.js"
 
 function init() {
@@ -66,12 +67,7 @@ function init() {
       configurable: true,
       get: deprecate(() => context, depMessage, depCode),
       set: deprecate(function (value) {
-        Reflect.defineProperty(this, name, {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
+        setProperty(this, name, value)
       }, depMessage, depCode)
     }
   }

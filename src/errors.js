@@ -4,6 +4,7 @@ import captureStackTrace from "./error/capture-stack-trace.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
+import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
@@ -112,12 +113,7 @@ function init() {
       }
 
       set code(value) {
-        Reflect.defineProperty(this, "code", {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
+        setProperty(this, "code", value)
       }
 
       get name() {
@@ -125,12 +121,7 @@ function init() {
       }
 
       set name(value) {
-        Reflect.defineProperty(this, "name", {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
+        setProperty(this, "name", value)
       }
     }
   }

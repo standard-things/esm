@@ -1,6 +1,13 @@
 import setGetter from "./set-getter.js"
 import setSetter from "./set-setter.js"
 
+const dataDescriptor = {
+  configurable: true,
+  enumerable: true,
+  value: void 0,
+  writable: true
+}
+
 function setDeferred(object, name, getter) {
   setGetter(object, name, function () {
     this[name] = void 0
@@ -8,12 +15,8 @@ function setDeferred(object, name, getter) {
   })
 
   setSetter(object, name, function (value) {
-    Reflect.defineProperty(this, name, {
-      configurable: true,
-      enumerable: true,
-      value,
-      writable: true
-    })
+    dataDescriptor.value = value
+    Reflect.defineProperty(this, name, dataDescriptor)
   })
 
   return object

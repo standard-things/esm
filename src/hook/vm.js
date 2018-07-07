@@ -29,6 +29,7 @@ import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
+import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
 import validateESM from "../module/esm/validate.js"
@@ -207,12 +208,7 @@ function hook(vm) {
     })
 
     setSetter(realUtil, "inspect", function (value) {
-      Reflect.defineProperty(this, "inspect", {
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true
-      })
+      setProperty(this, "inspect", value)
     })
   }
 
@@ -252,29 +248,18 @@ function createAddBuiltinModules(entry) {
 
   return function addBuiltinModules(context) {
     const req = entry.require
-    const exportedConsole = req("console")
 
     Reflect.defineProperty(context, "console", {
       configurable: true,
-      value: exportedConsole,
+      value: req("console"),
       writable: true
     })
 
-    Reflect.defineProperty(context, "process", {
-      configurable: true,
-      enumerable: true,
-      value: req("process"),
-      writable: true
-    })
+    setProperty(context, "process", req("process"))
 
     for (const name of lazyModules) {
       const set = function (value) {
-        Reflect.defineProperty(this, name, {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
+        setProperty(this, name, value)
       }
 
       Reflect.defineProperty(context, name, {

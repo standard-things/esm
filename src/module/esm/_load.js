@@ -16,6 +16,7 @@ import moduleState from "../state.js"
 import parseState from "../../parse/state.js"
 import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
+import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 
 const {
@@ -166,12 +167,7 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
             throw error
           },
           set(value) {
-            Reflect.defineProperty(this, cacheKey, {
-              configurable: true,
-              enumerable: true,
-              value,
-              writable: true
-            })
+            setProperty(this, cacheKey, value)
           }
         })
       } else {

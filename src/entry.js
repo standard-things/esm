@@ -16,6 +16,7 @@ import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
+import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toNamespaceObject from "./util/to-namespace-object.js"
 
@@ -181,12 +182,7 @@ class Entry {
       descriptor.get = () => this.exports
 
       descriptor.set = function (value) {
-        Reflect.defineProperty(this, name, {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
+        setProperty(this, name, value)
       }
     } else {
       descriptor.get = () => {

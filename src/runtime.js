@@ -19,6 +19,7 @@ import { resolve } from "./safe/path.js"
 import resolveFilename from "./module/esm/resolve-filename.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
+import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
 const {
@@ -368,13 +369,7 @@ function runESM(entry, moduleWrapper) {
     get: () => loaded,
     set(value) {
       if (value) {
-        Reflect.defineProperty(this, "loaded", {
-          configurable: true,
-          enumerable: true,
-          value,
-          writable: true
-        })
-
+        setProperty(this, "loaded", value)
         entry.update().loaded()
       } else {
         loaded = value
