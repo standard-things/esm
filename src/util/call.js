@@ -1,10 +1,10 @@
 import shared from "../shared.js"
 
 function init() {
-  const emptyArgs = []
+  const emptyArray = []
 
   function call(target, thisArg) {
-    return Reflect.apply(target, thisArg, emptyArgs)
+    return Reflect.apply(target, thisArg, emptyArray)
   }
 
   return call
