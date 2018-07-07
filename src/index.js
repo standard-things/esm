@@ -1,6 +1,7 @@
 import "./binding.js"
 import "./safe/buffer.js"
 import "./safe/crypto.js"
+import "./safe/inspector.js"
 import "./safe/process.js"
 import "./safe/util.js"
 import "./safe/vm.js"
