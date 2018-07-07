@@ -48,7 +48,7 @@ function init() {
   }
 
   function assertWrapper(func, [expression, ...rest]) {
-    return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
+    return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
   }
 
   function dirWrapper(func, [object, options]) {
@@ -67,10 +67,10 @@ function init() {
   }
 
   function defaultWrapper(func, args) {
-    return Reflect.apply(func, this, toInspectableArgs(args))
+    return Reflect.apply(func, this, transform(args, toCustomInspectable))
   }
 
-  function toInspectable(value) {
+  function toCustomInspectable(value) {
     if (! isObjectLike(value)) {
       return value
     }
@@ -85,7 +85,7 @@ function init() {
     }
   }
 
-  function toUnwrapped(value, seen) {
+  function toInspectable(value, seen) {
     if (isModuleNamespaceObject(value)) {
       seen || (seen = new Map)
 
@@ -102,7 +102,7 @@ function init() {
 
       for (const name of names) {
         try {
-          object[name] = toUnwrapped(value[name], seen)
+          object[name] = toInspectable(value[name], seen)
         } catch (e) {
           object[name] = "<uninitialized>"
         }
@@ -114,28 +114,16 @@ function init() {
     return unwrapOwnProxy(value)
   }
 
-  function toInspectableArgs(args) {
-    const { length } = args
+  function transform(array, iteratee) {
+    const { length } = array
 
     let i = -1
 
     while (++i < length) {
-      args[i] = toInspectable(args[i])
+      array[i] = iteratee(array[i])
     }
 
-    return args
-  }
-
-  function toUnwrappedArgs(args) {
-    const { length } = args
-
-    let i = -1
-
-    while (++i < length) {
-      args[i] = toUnwrapped(args[i])
-    }
-
-    return args
+    return array
   }
 
   function wrap(func, wrapper = defaultWrapper) {
@@ -209,7 +197,7 @@ function init() {
           builtinConsole[name] = GenericFunction.bind(
             consoleCall,
             void 0,
-            (...args) => Reflect.apply(value, originalConsole, toUnwrappedArgs(args)),
+            (...args) => Reflect.apply(value, originalConsole, transform(args, toInspectable)),
             builtinConsole[name],
             emptyConfig
           )
