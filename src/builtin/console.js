@@ -156,10 +156,10 @@ function init() {
 
     if (typeof consoleCall === "function") {
       const emptyConfig = { __proto__: null }
+      const { originalConsole } = shared
 
       for (const name in wrapperMap) {
-        // eslint-disable-next-line no-console
-        const value = console[name]
+        const value = originalConsole[name]
 
         if (typeof value === "function") {
           builtinConsole[name] = GenericFunction.bind(

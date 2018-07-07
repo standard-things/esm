@@ -124,9 +124,15 @@ function init() {
   })
 
   setDeferred(shared, "defaultGlobal", () => {
-    const script = new shared.module.safeVM.Script("this")
+    const { safeVM } = shared.module
 
-    return script.runInThisContext()
+    return new safeVM.Script("this").runInThisContext()
+  })
+
+  setDeferred(shared, "originalConsole", () => {
+    const { safeVM } = shared.module
+
+    return new safeVM.Script("console").runInNewContext()
   })
 
   setDeferred(shared, "proxyNativeSourceText", () => {
