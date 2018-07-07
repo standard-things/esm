@@ -2,7 +2,6 @@ import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
-import setGetter from "./util/set-getter.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
 
@@ -82,7 +81,7 @@ function init() {
       const names = map[id]
 
       for (const name of names) {
-        setGetter(object, name, () => {
+        setDeferred(object, name, () => {
           const value = getSilent(source, name)
 
           return typeof value === "function"
