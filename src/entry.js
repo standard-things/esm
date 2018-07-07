@@ -18,7 +18,7 @@ import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
-import toNamespaceObject from "./util/to-namespace-object.js"
+import toModuleNamespaceObject from "./util/to-module-namespace-object.js"
 
 const {
   LOAD_COMPLETED,
@@ -57,7 +57,7 @@ class Entry {
     // The loading state of the module.
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
-    this._namespace = toNamespaceObject()
+    this._namespace = toModuleNamespaceObject()
     // The passthru indicator for `module._compile`.
     this._passthru = false
     // The load type for `module.require`.
@@ -635,7 +635,7 @@ function cjsNamespaceGetter(entry) {
 
 function cjsNamespaceSource(entry) {
   return {
-    namespace: toNamespaceObject({
+    namespace: toModuleNamespaceObject({
       default: entry.module.exports
     })
   }
@@ -655,7 +655,7 @@ function createImmutableNamespaceProxy(entry, getter, source = entry) {
 }
 
 function createNamespace(source, getter) {
-  return toNamespaceObject(source.namespace, getter)
+  return toModuleNamespaceObject(source.namespace, getter)
 }
 
 function createMutableNamespaceProxy(entry, getter, source = entry) {

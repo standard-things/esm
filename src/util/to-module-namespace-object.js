@@ -6,7 +6,7 @@ function init() {
     value: "Module"
   }
 
-  function toNamespaceObject(object, getter = Reflect.get) {
+  function toModuleNamespaceObject(object, getter = Reflect.get) {
     // Section 9.4.6: Module Namespace Exotic Objects
     // Module namespace objects have a `null` [[Prototype]].
     // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
@@ -29,9 +29,9 @@ function init() {
     return namespace
   }
 
-  return toNamespaceObject
+  return toModuleNamespaceObject
 }
 
 export default shared.inited
-  ? shared.module.utilToNamespaceObject
-  : shared.module.utilToNamespaceObject = init()
+  ? shared.module.utilToModuleNamespaceObject
+  : shared.module.utilToModuleNamespaceObject = init()

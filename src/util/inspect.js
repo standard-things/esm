@@ -15,7 +15,7 @@ import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
-import toNamespaceObject from "./to-namespace-object.js"
+import toModuleNamespaceObject from "./to-module-namespace-object.js"
 
 function init() {
   let exportedInspect
@@ -61,7 +61,7 @@ function init() {
   }
 
   function formatNamespaceObject(namespace, context) {
-    const object = toNamespaceObject()
+    const object = toModuleNamespaceObject()
     const names = Object.getOwnPropertyNames(namespace)
 
     for (const name of names) {
