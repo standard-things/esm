@@ -26,13 +26,12 @@ function init() {
     }
   }
 
-  setProperty(safeUtil, "customInspectSymbol", custom)
-  setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
-
   if (types) {
     setProperty(safeUtil, "types", safe(types))
   }
 
+  setProperty(safeUtil, "customInspectSymbol", custom)
+  setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
   return safeUtil
 }
 
