@@ -63,7 +63,7 @@ function init() {
 
   for (const id of ids) {
     setDeferred(binding, id, () => {
-      if (! _binding) {
+      if (_binding === void 0) {
         _binding = getSilent(realProcess, "binding")
       }
 
@@ -73,17 +73,13 @@ function init() {
         } catch (e) {}
       })
 
+      const object = { __proto__: null }
+
       if (! isObjectLike(source)) {
-        return { __proto__: null }
+        return object
       }
 
       const names = map[id]
-
-      if (! names) {
-        return source
-      }
-
-      const object = { __proto__: null }
 
       for (const name of names) {
         setGetter(object, name, () => {
