@@ -1,10 +1,11 @@
-import { stderr, stdout } from "../safe/process.js"
+import { config, stderr, stdout } from "../safe/process.js"
 
 import ENV from "../constant/env.js"
 
 import GenericFunction from "../generic/function.js"
 
 import assign from "../util/assign.js"
+import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
@@ -22,7 +23,26 @@ function init() {
     INSPECT
   } = ENV
 
+  const RealConsole = realConsole.Console
+
+  const realMethodNames = []
+  const realProto = RealConsole.prototype
+  const realProtoNames = keysAll(realProto)
+
+  const builtinLog = wrap(realProto.log)
   const dirOptions = { customInspect: true }
+
+  const wrapperMap = {
+    __proto__: null,
+    assert: wrap(realProto.assert, assertWrapper),
+    debug: builtinLog,
+    dir: wrap(realProto.dir, dirWrapper),
+    dirxml: builtinLog,
+    info: builtinLog,
+    log: builtinLog,
+    trace: wrap(realProto.trace),
+    warn: wrap(realProto.warn)
+  }
 
   function assertWrapper(func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...toInspectableArgs(rest)])
@@ -88,18 +108,6 @@ function init() {
     }, func)
   }
 
-  const RealConsole = realConsole.Console
-
-  const realMethodNames = []
-  const realProto = RealConsole.prototype
-  const realProtoNames = keysAll(realProto)
-
-  const builtinAssert = wrap(realProto.assert, assertWrapper)
-  const builtinDir = wrap(realProto.dir, dirWrapper)
-  const builtinLog = wrap(realProto.log)
-  const builtinTrace = wrap(realProto.trace)
-  const builtinWarn = wrap(realProto.warn)
-
   const Console = maskFunction(function (...args) {
     const target = new.target
 
@@ -133,19 +141,8 @@ function init() {
       realMethodNames.push(name)
     }
 
-    if (name === "assert") {
-      prototype.assert = builtinAssert
-    } if (name === "debug" ||
-        name === "dirxml" ||
-        name === "info" ||
-        name === "log") {
-      prototype[name] = builtinLog
-    } else if (name === "dir") {
-      prototype.dir = builtinDir
-    } else if (name === "trace") {
-      prototype.trace = builtinTrace
-    } else if (name === "warn") {
-      prototype.warn = builtinWarn
+    if (Reflect.has(wrapperMap, name)) {
+      prototype[name] = wrapperMap[name]
     } else {
       copyProperty(prototype, realProto, name)
     }
@@ -153,8 +150,29 @@ function init() {
 
   const builtinConsole = new Console(stdout, stderr)
 
-  if (ELECTRON_RENDERER ||
-      INSPECT) {
+  if (INSPECT &&
+      config.variables.v8_enable_inspector) {
+    const { consoleCall } = binding.inspector
+
+    if (typeof consoleCall === "function") {
+      const emptyConfig = { __proto__: null }
+
+      for (const name in wrapperMap) {
+        // eslint-disable-next-line no-console
+        const value = console[name]
+
+        if (typeof value === "function") {
+          builtinConsole[name] = GenericFunction.bind(
+            consoleCall,
+            void 0,
+            value,
+            builtinConsole[name],
+            emptyConfig
+          )
+        }
+      }
+    }
+  } else if (ELECTRON_RENDERER) {
     const names = keysAll(console)
 
     for (const name of names) {
