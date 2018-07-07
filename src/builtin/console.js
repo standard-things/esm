@@ -32,19 +32,19 @@ function init() {
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
 
-  const builtinLog = wrap(realProto.log)
+  const builtinLog = wrapCustomInspectable(realProto.log)
   const dirOptions = { customInspect: true }
 
   const wrapperMap = {
     __proto__: null,
-    assert: wrap(realProto.assert, assertWrapper),
+    assert: wrapCustomInspectable(realProto.assert, assertWrapper),
     debug: builtinLog,
-    dir: wrap(realProto.dir, dirWrapper),
+    dir: wrapCustomInspectable(realProto.dir, dirWrapper),
     dirxml: builtinLog,
     info: builtinLog,
     log: builtinLog,
-    trace: wrap(realProto.trace),
-    warn: wrap(realProto.warn)
+    trace: wrapCustomInspectable(realProto.trace),
+    warn: wrapCustomInspectable(realProto.warn)
   }
 
   function assertWrapper(func, [expression, ...rest]) {
@@ -126,7 +126,13 @@ function init() {
     return array
   }
 
-  function wrap(func, wrapper = defaultWrapper) {
+  function wrapBoundInspectable(object, name) {
+    const func = object[name]
+
+    return (...args) => Reflect.apply(func, object, transform(args, toInspectable))
+  }
+
+  function wrapCustomInspectable(func, wrapper = defaultWrapper) {
     return maskFunction(function (...args) {
       const { customInspect } = defaultInspectOptions
 
@@ -191,13 +197,11 @@ function init() {
       const { originalConsole } = shared
 
       for (const name in wrapperMap) {
-        const value = originalConsole[name]
-
-        if (typeof value === "function") {
+        if (typeof originalConsole[name] === "function") {
           builtinConsole[name] = GenericFunction.bind(
             consoleCall,
             void 0,
-            (...args) => Reflect.apply(value, originalConsole, transform(args, toInspectable)),
+            wrapBoundInspectable(originalConsole, name),
             builtinConsole[name],
             emptyConfig
           )
@@ -205,11 +209,20 @@ function init() {
       }
     }
   } else if (ELECTRON_RENDERER) {
-    const names = keysAll(console)
+    const names = Object.getOwnPropertyNames(console)
 
     for (const name of names) {
-      if (name !== "Console") {
-        copyProperty(builtinConsole, console, name)
+      if (name !== "Console" &&
+          has(builtinConsole, name)) {
+        // eslint-disable-next-line no-console
+        const value = console[name]
+
+        if (typeof value === "function") {
+          builtinConsole[name] = maskFunction(
+            wrapBoundInspectable(console, name),
+            value
+          )
+        }
       }
     }
   }
