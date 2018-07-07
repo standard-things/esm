@@ -1,3 +1,4 @@
+import isObject from "../util/is-object.js"
 import realUtil from "../real/util.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -8,15 +9,21 @@ function init() {
   const { custom, defaultOptions } = safeUtil.inspect
   const { types } = safeUtil
 
-  const defaultInspectOptions = defaultOptions || {
-    breakLength: 60,
-    colors: false,
-    compact: true,
-    customInspect: true,
-    depth: 2,
-    maxArrayLength: 100,
-    showHidden: false,
-    showProxy: false
+  let defaultInspectOptions
+
+  if (isObject(defaultOptions)) {
+    defaultInspectOptions = defaultOptions
+  } else {
+    defaultInspectOptions = {
+      breakLength: 60,
+      colors: false,
+      compact: true,
+      customInspect: true,
+      depth: 2,
+      maxArrayLength: 100,
+      showHidden: false,
+      showProxy: false
+    }
   }
 
   setProperty(safeUtil, "customInspectSymbol", custom)
