@@ -133,7 +133,7 @@ function init() {
   setDeferred(shared, "originalConsole", () => {
     const { safeInspector, safeVM } = shared.module
 
-    return safeInspector.console ||
+    return (safeInspector && safeInspector.console) ||
       new safeVM.Script("console").runInNewContext()
   })
 
