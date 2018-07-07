@@ -56,6 +56,8 @@ function init() {
       if (isDataDescriptor(descriptor)) {
         object[name] = descriptor.value
       } else {
+        descriptor.configurable = true
+
         if (Reflect.has(descriptor, "writable")) {
           descriptor.writable = true
         }

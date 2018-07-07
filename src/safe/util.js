@@ -1,5 +1,6 @@
 import realUtil from "../real/util.js"
 import safe from "../util/safe.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
@@ -7,8 +8,7 @@ function init() {
   const { custom, defaultOptions } = safeUtil.inspect
   const { types } = safeUtil
 
-  safeUtil.customInspectSymbol = custom
-  safeUtil.defaultInspectOptions = defaultOptions || {
+  const defaultInspectOptions = defaultOptions || {
     breakLength: 60,
     colors: false,
     compact: true,
@@ -19,8 +19,11 @@ function init() {
     showProxy: false
   }
 
+  setProperty(safeUtil, "customInspectSymbol", custom)
+  setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
+
   if (types) {
-    safeUtil.types = safe(types)
+    setProperty(safeUtil, "types", safe(types))
   }
 
   return safeUtil

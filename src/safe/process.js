@@ -1,14 +1,15 @@
 import realProcess from "../real/process.js"
 import safe from "../util/safe.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
   const safeProcess = safe(realProcess)
   const { env, release, versions } = safeProcess
 
-  safeProcess.env = safe(env)
-  safeProcess.release = safe(release)
-  safeProcess.versions = safe(versions)
+  setProperty(safeProcess, "env", safe(env))
+  setProperty(safeProcess, "release", safe(release))
+  setProperty(safeProcess, "versions", safe(versions))
   return safeProcess
 }
 

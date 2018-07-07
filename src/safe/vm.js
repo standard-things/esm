@@ -3,6 +3,7 @@ import has from "../util/has.js"
 import keysAll from "../util/keys-all.js"
 import realVM from "../real/vm.js"
 import safe from "../util/safe.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,7 +11,7 @@ function init() {
   const { Script } = safeVM
   const contextifyProto = Reflect.getPrototypeOf(Script.prototype)
 
-  safeVM.Script = safe(Script)
+  setProperty(safeVM, "Script", safe(Script))
 
   const names = keysAll(contextifyProto)
   const { prototype } = safeVM.Script
