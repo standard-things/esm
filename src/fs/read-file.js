@@ -4,19 +4,23 @@ import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
+  let useFastPath
+
   function readFile(filename, options) {
     if (typeof filename !== "string") {
       return null
     }
 
-    const { fastPath } = shared
+    if (useFastPath === void 0) {
+      useFastPath = typeof binding.fs.internalModuleReadFile === "function"
+    }
 
-    if (fastPath.readFile &&
+    if (useFastPath &&
         options === "utf8") {
       try {
         return readFileFastPath(filename)
       } catch (e) {
-        fastPath.readFile = false
+        useFastPath = false
       }
     }
 

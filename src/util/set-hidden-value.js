@@ -3,8 +3,14 @@ import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
+  let useSetHiddenValue
+
   function setHiddenValue(object, name, value) {
-    if (shared.support.setHiddenValue &&
+    if (useSetHiddenValue === void 0) {
+      useSetHiddenValue = typeof binding.util.setHiddenValue === "function"
+    }
+
+    if (useSetHiddenValue &&
         typeof name === shared.utilBinding.hiddenKeyType &&
         isObjectLike(object)) {
       try {

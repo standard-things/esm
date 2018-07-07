@@ -6,6 +6,8 @@ import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
+  let useFastPath
+
   const { isFile } = Stats.prototype
 
   function stat(thePath) {
@@ -30,13 +32,15 @@ function init() {
   }
 
   function statBase(thePath) {
-    const { fastPath } = shared
+    if (useFastPath === void 0) {
+      useFastPath = typeof binding.fs.internalModuleStat === "function"
+    }
 
-    if (fastPath.stat) {
+    if (useFastPath) {
       try {
         return statFastPath(thePath)
       } catch (e) {
-        fastPath.stat = false
+        useFastPath = false
       }
     }
 

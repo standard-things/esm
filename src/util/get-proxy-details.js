@@ -19,16 +19,14 @@ function init() {
 
     let details = OwnProxy.instances.get(proxy)
 
-    if (! details &&
-        shared.support.getProxyDetails) {
+    if (realGetProxyDetails &&
+        ! details) {
       try {
         details = realGetProxyDetails(proxy)
       } catch (e) {}
     }
 
-    cache.set(proxy, {
-      details
-    })
+    cache.set(proxy, { details })
 
     return details
   }

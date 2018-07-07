@@ -4,6 +4,7 @@ import OwnProxy from "../own/proxy.js"
 
 import getProxyDetails from "./get-proxy-details.js"
 import isObjectLike from "./is-object-like.js"
+import realGetProxyDetails from "../real/get-proxy-details.js"
 import shared from "../shared.js"
 
 function init() {
@@ -23,7 +24,7 @@ function init() {
   }
 
   return function isProxyFallback(value) {
-    if (shared.support.getProxyDetails) {
+    if (realGetProxyDetails) {
       return !! getProxyDetails(value)
     }
 

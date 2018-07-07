@@ -37,9 +37,6 @@ function init() {
   const funcToString = Function.prototype.toString
   const { toString } = Object.prototype
 
-  const fastPath = {}
-  const utilBinding = {}
-
   const support = {
     wasm: typeof WebAssembly === "object" && WebAssembly !== null
   }
@@ -55,6 +52,8 @@ function init() {
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
 
+  const utilBinding = {}
+
   const shared = {
     entry: {
       cache: new WeakMap,
@@ -62,7 +61,6 @@ function init() {
     },
     env: {},
     external: __external__,
-    fastPath,
     inited: false,
     memoize: {
       builtinEntries: { __proto__: null },
@@ -155,19 +153,6 @@ function init() {
     return utilPrepareContext(safeVM.createContext(shared.unsafeGlobal))
   })
 
-  setDeferred(fastPath, "readFile", () => {
-    return support.internalModuleReadFile
-  })
-
-  setDeferred(fastPath, "readFileFast", () => {
-    return support.internalModuleReadJSON ||
-      support.internalModuleReadFile
-  })
-
-  setDeferred(fastPath, "stat", () => {
-    return typeof shared.module.binding.fs.internalModuleStat === "function"
-  })
-
   setDeferred(support, "await", () => {
     try {
       Function("async()=>await 1")()
@@ -181,10 +166,6 @@ function init() {
     return typeof shared.module.safeVM.Script.prototype.createCachedData === "function"
   })
 
-  setDeferred(support, "getProxyDetails", () => {
-    return typeof shared.module.binding.util.getProxyDetails === "function"
-  })
-
   setDeferred(support, "inspectProxies", () => {
     const inspected = shared.module.safeUtil.inspect(dummyProxy, {
       depth: 1,
@@ -193,14 +174,6 @@ function init() {
 
     return inspected.startsWith("Proxy") &&
       inspected.indexOf(PKG_PREFIX) !== -1
-  })
-
-  setDeferred(support, "internalModuleReadFile", () => {
-    return typeof shared.module.binding.fs.internalModuleReadFile === "function"
-  })
-
-  setDeferred(support, "internalModuleReadJSON", () => {
-    return typeof shared.module.binding.fs.internalModuleReadJSON === "function"
   })
 
   setDeferred(support, "lookupShadowed", () => {
@@ -248,14 +221,6 @@ function init() {
     const { safeProcess, utilSatisfies } = shared.module
 
     return utilSatisfies(safeProcess.version, ">=10")
-  })
-
-  setDeferred(support, "safeGetEnv", () => {
-    return typeof shared.module.binding.util.safeGetenv === "function"
-  })
-
-  setDeferred(support, "setHiddenValue", () => {
-    return typeof shared.module.binding.util.setHiddenValue === "function"
   })
 
   setDeferred(utilBinding, "errorDecoratedSymbol", () => {

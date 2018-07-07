@@ -4,19 +4,29 @@ import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
+  let useFastPath
+  let useInternalModuleReadJSON
+
   function readFileFast(filename, options) {
     if (typeof filename !== "string") {
       return null
     }
 
-    const { fastPath } = shared
+    if (useFastPath === void 0) {
+      useInternalModuleReadJSON =
+        typeof binding.fs.internalModuleReadJSON === "function"
 
-    if (fastPath.readFileFast &&
+      useFastPath =
+        useInternalModuleReadJSON ||
+        typeof binding.fs.internalModuleReadFile === "function"
+    }
+
+    if (useFastPath &&
         options === "utf8") {
       try {
         return readFileFastPath(filename, options)
       } catch (e) {
-        fastPath.readFileFast = false
+        useFastPath = false
       }
     }
 
@@ -28,8 +38,6 @@ function init() {
     // or undefined when the file cannot be opened. The speedup comes from not
     // creating Error objects on failure.
     filename = toNamespacedPath(filename)
-
-    const useInternalModuleReadJSON = shared.support.internalModuleReadJSON
 
     // Warning: These internal methods will crash if `filename` is a directory.
     // https://github.com/nodejs/node/issues/8307
