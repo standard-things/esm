@@ -1,3 +1,4 @@
+import isObject from "../util/is-object.js"
 import realProcess from "../real/process.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -5,10 +6,21 @@ import shared from "../shared.js"
 
 function init() {
   const safeProcess = safe(realProcess)
-  const { env, release, versions } = safeProcess
+  const { config, env, versions } = safeProcess
 
+  const safeConfig = {
+    variables: {
+      v8_enable_inspector: 0
+    }
+  }
+
+  if (isObject(config) &&
+      isObject(config.variables)) {
+    safeConfig.variables.v8_enable_inspector = config.variables.v8_enable_inspector
+  }
+
+  setProperty(safeProcess, "config", safeConfig)
   setProperty(safeProcess, "env", safe(env))
-  setProperty(safeProcess, "release", safe(release))
   setProperty(safeProcess, "versions", safe(versions))
   return safeProcess
 }
@@ -19,11 +31,10 @@ const safeProcess = shared.inited
 
 export const {
   argv,
+  config,
   cwd,
   env,
   execArgv,
-  release,
-  pid,
   platform,
   stderr,
   stdout,
