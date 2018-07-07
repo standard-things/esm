@@ -1,3 +1,4 @@
+import has from "../util/has.js"
 import isObject from "../util/is-object.js"
 import realProcess from "../real/process.js"
 import safe from "../util/safe.js"
@@ -15,7 +16,8 @@ function init() {
   }
 
   if (isObject(config) &&
-      isObject(config.variables)) {
+      isObject(config.variables) &&
+      has(config.variables, "v8_enable_inspector")) {
     safeConfig.variables.v8_enable_inspector = config.variables.v8_enable_inspector
   }
 
