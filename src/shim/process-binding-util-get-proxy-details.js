@@ -1,6 +1,5 @@
 import OwnProxy from "../own/proxy.js"
 
-import call from "../util/call.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import shared from "../shared.js"
 import silent from "../util/silent.js"
@@ -27,7 +26,7 @@ function init() {
       const getProxyDetails = (value) => {
         return isOwnProxy(value)
           ? void 0
-          : call(_getProxyDetails, utilBinding, value)
+          : Reflect.apply(_getProxyDetails, utilBinding, [value])
       }
 
       try {
