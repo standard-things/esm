@@ -105,12 +105,12 @@ function hook(vm) {
         'var g=Function("return this")(),' +
         "m=g.module," +
         "e=m&&m.exports," +
-        'k="' + entry.runtimeName + '";' +
-        "if(e&&!g[k]){" +
+        'n="' + entry.runtimeName + '";' +
+        "if(e&&!g[n]){" +
           "m.exports=e.entry.exports;" +
           "require=e.entry.require;" +
           "e.entry.addBuiltinModules(g);" +
-          "Reflect.defineProperty(g,k,{" +
+          "Reflect.defineProperty(g,n,{" +
             "__proto__:null," +
             "value:e" +
           "})" +
