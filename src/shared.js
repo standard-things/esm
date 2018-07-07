@@ -79,6 +79,7 @@ function init() {
       utilParseURL: { __proto__: null },
       utilProxyExports: new WeakMap,
       utilSatisfies: { __proto__: null },
+      utilUnwrapOwnProxy: new WeakMap,
       utilUnwrapProxy: new WeakMap
     },
     module: {},

@@ -4,6 +4,10 @@ import shared from "../shared.js"
 
 function init() {
   function unwrapProxy(value) {
+    if (! isObjectLike(value)) {
+      return value
+    }
+
     const cache = shared.memoize.utilUnwrapProxy
     const cached = cache.get(value)
 
@@ -11,18 +15,14 @@ function init() {
       return cached
     }
 
+    let details
     let unwrapped = value
 
-    if (isObjectLike(unwrapped)) {
-      let details
-
-      while ((details = getProxyDetails(unwrapped))) {
-        unwrapped = details[0]
-      }
-
-      cache.set(value, unwrapped)
+    while ((details = getProxyDetails(unwrapped))) {
+      unwrapped = details[0]
     }
 
+    cache.set(value, unwrapped)
     return unwrapped
   }
 
