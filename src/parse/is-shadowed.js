@@ -53,21 +53,20 @@ function init() {
         }
       }
 
+      if (isNonArrowFunc) {
+        const { id } = parent
+
+        // Exported function declarations may not have an id.
+        // For example, `export default function () {}`.
+        if (id !== null &&
+            id.name === name) {
+          shadowed = true
+          return cache[name] = shadowed
+        }
+      }
+
       if (isNonArrowFunc ||
           type === "ArrowFunctionExpression") {
-        if (type === "FunctionDeclaration" ||
-            type === "FunctionExpression") {
-          const { id } = parent
-
-          // Exported function declarations may not have an id.
-          // For example, `export default function () {}`.
-          if (id !== null &&
-              id.name === name) {
-            shadowed = true
-            return cache[name] = shadowed
-          }
-        }
-
         for (const param of parent.params) {
           const [paramName] = getNamesFromPattern(param)
 
