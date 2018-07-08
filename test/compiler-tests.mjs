@@ -428,6 +428,36 @@ describe("compiler", () => {
     })
   })
 
+  it("should instrument console use", () => {
+    const lines = [
+      "console",
+      "console.log(a)",
+      "new console.Console(a)",
+      "class C extends console.Console {}"
+    ]
+
+    const compiled = [
+      "_.g.console",
+      "_.g.console.log(a)",
+      "new _.g.console.Console(a)",
+      "class C extends _.g.console.Console {}"
+    ]
+
+    lines.forEach((line, index) => {
+      const code = [
+        "",
+        line
+      ].join("\n")
+
+      sourceTypes.forEach((sourceType) => {
+        const result = Compiler.compile(code, { sourceType })
+        const actual = result.code.split("\n").pop()
+
+        assert.strictEqual(actual, compiled[index])
+      })
+    })
+  })
+
   it("should add TDZ asserts to bindings", () => {
     const lines = [
       "a",
