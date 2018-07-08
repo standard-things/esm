@@ -13,8 +13,9 @@ function init() {
         return parent.computed || parent.shorthand
       }
 
-      if ((type === "AssignmentExpression" &&
-          parent.left === node) ||
+      if (((type === "AssignmentExpression" ||
+            type === "AssignmentPattern") &&
+           parent.left === node) ||
           type === "BreakStatement" ||
           type === "ContinueStatement" ||
           type === "ImportDefaultSpecifier" ||

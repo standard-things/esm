@@ -45,13 +45,13 @@ function init() {
     handler: true,
     // ForStatement, VariableDeclarator
     init: true,
-    // AssignmentExpression
+    // AssignmentExpression, AssignmentPattern
     left: true,
     // MemberExpression
     object: true,
     // ObjectPattern
     properties: true,
-    // AssignmentExpression
+    // AssignmentExpression, AssignmentPattern
     right: true,
     // ClassDeclaration
     superClass: true,
