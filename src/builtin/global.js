@@ -62,5 +62,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.global
-  : shared.module.global = init()
+  ? shared.module.builtinGlobal
+  : shared.module.builtinGlobal = init()
