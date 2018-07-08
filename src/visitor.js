@@ -11,27 +11,55 @@ function init() {
 
   const childrenToVisit = {
     __proto__: null,
+    // ConditionalExpression
     alternate: true,
+    // ReturnStatement
     argument: true,
+    // CallExpression
     arguments: true,
+    // TryStatement
     block: true,
+    // BlockStatement, FunctionDeclaration, FunctionExpression
     body: true,
+    // CallExpression
     callee: true,
+    // SwitchStatement
     cases: true,
+    // ConditionalExpression, SwitchCase
     consequent: true,
+    // ExportDefaultDeclaration, ExportNamedDeclaration
     declaration: true,
+    // VariableDeclaration
     declarations: true,
+    // SwitchStatement
     discriminant: true,
+    // ArrayPattern
     elements: true,
+    // ExpressionStatement
     expression: true,
+    // SequenceExpression, TemplateLiteral
     expressions: true,
+    // TryStatement
+    finalizer: true,
+    // TryStatement
     handler: true,
+    // ForStatement, VariableDeclarator
     init: true,
+    // AssignmentExpression
     left: true,
+    // MemberExpression
     object: true,
+    // ObjectPattern
     properties: true,
+    // AssignmentExpression
     right: true,
+    // ClassDeclaration
+    superClass: true,
+    // ForStatement, IfStatement, SwitchCase, WhileStatement
     test: true,
+    // ForStatement
+    update: true,
+    // Property
     value: true
   }
 
