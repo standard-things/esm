@@ -1,3 +1,4 @@
+import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import shared from "../shared.js"
 
 function init() {
@@ -32,63 +33,55 @@ function init() {
       if (isArguments &&
           isNonArrowFunc) {
         shadowed = true
-      } else if (type === "BlockStatement") {
-        shadowed = hasVariable(parent, name)
-      } else if (isNonArrowFunc ||
+        return cache[name] = shadowed
+      }
+
+      if (type === "BlockStatement") {
+        for (const stmt of parent.body) {
+          if (stmt.type === "VariableDeclaration") {
+            for (const { id } of stmt.declarations) {
+              const varNames = getNamesFromPattern(id)
+
+              for (const varName of varNames) {
+                if (varName === name) {
+                  shadowed = true
+                  return cache[name] = shadowed
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (isNonArrowFunc ||
           type === "ArrowFunctionExpression") {
-        shadowed =
-          isNamed(parent, name) ||
-          hasNamed(parent.params, name)
+        if (type === "FunctionDeclaration" ||
+            type === "FunctionExpression") {
+          const { id } = parent
+
+          // Exported function declarations may not have an id.
+          // For example, `export default function () {}`.
+          if (id !== null &&
+              id.name === name) {
+            shadowed = true
+            return cache[name] = shadowed
+          }
+        }
+
+        for (const param of parent.params) {
+          const [paramName] = getNamesFromPattern(param)
+
+          if (paramName === name) {
+            shadowed = true
+            return cache[name] = shadowed
+          }
+        }
       }
 
       return cache[name] = shadowed
     })
 
     return shadowed
-  }
-
-  function hasNamed(nodes, name) {
-    for (const node of nodes) {
-      if (isNamed(node, name)) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  function hasVariable(node, name) {
-    for (const stmt of node.body) {
-      if (stmt.type === "VariableDeclaration" &&
-          hasNamed(stmt.declarations, name)) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  function isNamed(node, name) {
-    const { type } = node
-
-    if (type === "ArrowFunctionExpression") {
-      return false
-    }
-
-    if (type === "VariableDeclarator") {
-      return node.id.name === name
-    }
-
-    // Exported function declarations may not have an id.
-    // For example, `export default function () {}`.
-    if (type === "FunctionDeclaration" ||
-        type === "FunctionExpression") {
-      const { id } = node
-
-      return id !== null && id.name === name
-    }
-
-    return node.name === name
   }
 
   return isShadowed
