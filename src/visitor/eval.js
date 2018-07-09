@@ -73,8 +73,7 @@ function init() {
       const parent = path.getParentNode()
       const { type } = parent
 
-      if (type === "CallExpression" ||
-          (type === "UnaryExpression" &&
+      if ((type === "UnaryExpression" &&
            parent.operator === "typeof") ||
           ! isIdentifer(node, parent) ||
           isShadowed(path, "eval", shadowedMap)) {
@@ -84,6 +83,7 @@ function init() {
       // Support indirect eval:
       // o = { eval }
       // o.e = eval
+      // f(eval)
       // (0, eval)(code)
       this.changed = true
 
