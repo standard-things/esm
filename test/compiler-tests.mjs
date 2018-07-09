@@ -458,6 +458,123 @@ describe("compiler", () => {
     })
   })
 
+  it("should not instrument console in a typeof expression", () => {
+    const line = "typeof console"
+
+    const code = [
+      "",
+      line
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
+      const actual = result.code.split("\n").pop()
+
+      assert.strictEqual(actual, line)
+    })
+  })
+
+  it("should wrap eval use", () => {
+    const lines = [
+      "eval",
+      "function b(c, d = 1, ...e) { return eval }",
+      "const b = { eval }",
+      "const b = { eval() { eval } }",
+      "const b = () => eval",
+      "b(eval, c)",
+      "new eval.b.c()",
+      "`eval ${ eval } eval`",
+      "switch (eval) { case eval: eval }",
+      "try {} catch { eval }"
+    ]
+
+    const compiledModule = [
+      "_.e",
+      "function b(c, d = 1, ...e) { return _.e }",
+      "const b = { eval:_.e }",
+      "const b = { eval() { _.e } }",
+      "const b = () => _.e",
+      "b(_.e, c)",
+      "new _.e.b.c()",
+      "`eval ${ _.e } eval`",
+      "switch (_.e) { case _.e: _.e }",
+      "try {} catch { _.e }"
+    ]
+
+    const compiledScript = [
+      "(eval===_.v?_.e:eval)",
+      "function b(c, d = 1, ...e) { return (eval===_.v?_.e:eval) }",
+      "const b = { eval:(eval===_.v?_.e:eval) }",
+      "const b = { eval() { (eval===_.v?_.e:eval) } }",
+      "const b = () => (eval===_.v?_.e:eval)",
+      "b((eval===_.v?_.e:eval), c)",
+      "new (eval===_.v?_.e:eval).b.c()",
+      "`eval ${ (eval===_.v?_.e:eval) } eval`",
+      "switch ((eval===_.v?_.e:eval)) { case (eval===_.v?_.e:eval): (eval===_.v?_.e:eval) }",
+      "try {} catch { (eval===_.v?_.e:eval) }"
+    ]
+
+    lines.forEach((line, index) => {
+      const code = [
+        "",
+        line
+      ].join("\n")
+
+      sourceTypes.forEach((sourceType) => {
+        const result = Compiler.compile(code, { sourceType })
+        const actual = result.code.split("\n").pop()
+        const compiled = sourceType === SCRIPT ? compiledScript : compiledModule
+
+        assert.strictEqual(actual, compiled[index])
+      })
+    })
+  })
+
+  it("should not wrap shadowed eval", () =>
+    [
+      "function b(eval) { eval = eval }",
+      "function b(...eval) { eval = eval }",
+      "function b(eval = 1) { eval = eval }",
+      "const b = { eval: 1 }",
+      "const b = function eval() { eval = eval }",
+      "try {} catch(eval) { eval = eval }",
+      "eval: while (true) { break eval; continue eval }"
+    ]
+    .forEach((code) => {
+      const result = Compiler.compile(code)
+
+      assert.strictEqual(result.code, code)
+    })
+  )
+
+  it("should not wrap eval in a typeof expression", () => {
+    const line = "typeof eval"
+
+    const code = [
+      "",
+      line
+    ].join("\n")
+
+    sourceTypes.forEach((sourceType) => {
+      const result = Compiler.compile(code, { sourceType })
+      const actual = result.code.split("\n").pop()
+
+      assert.strictEqual(actual, line)
+    })
+  })
+
+  it("should not wrap eval in a with statement", () => {
+    const code = [
+      "",
+      "with (eval) { eval = eval }"
+    ].join("\n")
+
+    const result = Compiler.compile(code)
+    const actual = result.code.split("\n").pop()
+
+    assert.strictEqual(actual, "with ((eval===_.v?_.e:eval)) { eval = eval }")
+  })
+
   it("should add TDZ asserts to bindings", () => {
     const lines = [
       "a",
@@ -530,29 +647,6 @@ describe("compiler", () => {
       })
     })
   )
-
-  it("should not wrap shadowed eval", () =>
-    [
-      "function b(eval) { eval = eval }",
-      "function b(...eval) { eval = eval }",
-      "function b(eval = 1) { eval = eval }",
-      "const b = { eval: 1 }",
-      "const b = function eval() { eval = eval }",
-      "try {} catch(eval) { eval = eval }",
-      "eval: while (true) { break eval; continue eval }"
-    ]
-    .forEach((code) => {
-      const result = Compiler.compile(code)
-
-      assert.strictEqual(result.code, code)
-    })
-  )
-
-  it("should not wrap shadowed eval in with statements", () => {
-    const result = Compiler.compile("with (eval) { eval = eval }")
-
-    assert.ok(result.code.includes("with ((eval===_.v?_.e:eval)) { eval = eval }"))
-  })
 
   it("should support V8 parse errors", () => {
     const options = { sourceType: MODULE }
