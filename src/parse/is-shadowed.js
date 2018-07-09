@@ -53,6 +53,16 @@ function init() {
         }
       }
 
+      if (type === "CatchClause") {
+        const { param } = parent
+
+        if (param !== null &&
+            param.name === name) {
+          shadowed = true
+          return cache[name] = shadowed
+        }
+      }
+
       if (isNonArrowFunc) {
         const { id } = parent
 
