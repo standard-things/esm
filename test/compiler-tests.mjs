@@ -461,26 +461,28 @@ describe("compiler", () => {
   it("should add TDZ asserts to bindings", () => {
     const lines = [
       "a",
-      "new a.b.c()",
-      "`a ${ a } a`",
-      "switch (a) { case a: a }",
+      "function b(c, d = 1, ...e) { return a }",
       "const b = { a }",
       "const b = { a() { a } }",
       "const b = () => a",
-      "function b() { return a }",
-      "b(a, c)"
+      "b(a, c)",
+      "new a.b.c()",
+      "`a ${ a } a`",
+      "switch (a) { case a: a }",
+      "try {} catch { a }"
     ]
 
     const compiled = [
       '_.a("a",a)',
-      'new (_.a("a",a)).b.c()',
-      '`a ${ _.a("a",a) } a`',
-      'switch (_.a("a",a)) { case _.a("a",a): _.a("a",a) }',
+      'function b(c, d = 1, ...e) { return _.a("a",a) }',
       'const b = { a:_.a("a",a) }',
       'const b = { a() { _.a("a",a) } }',
       'const b = () => _.a("a",a)',
-      'function b() { return _.a("a",a) }',
-      'b(_.a("a",a), c)'
+      'b(_.a("a",a), c)',
+      'new (_.a("a",a)).b.c()',
+      '`a ${ _.a("a",a) } a`',
+      'switch (_.a("a",a)) { case _.a("a",a): _.a("a",a) }',
+      'try {} catch { _.a("a",a) }'
     ]
 
     lines.forEach((line, index) => {
@@ -504,8 +506,11 @@ describe("compiler", () => {
   it("should not add TDZ asserts to shadowed bindings", () =>
     [
       "function b(a) { a = a }",
+      "function b(...a) { a = a }",
+      "function b(a = 1) { a = a }",
       "const b = { a: 1 }",
       "const b = function a() { a = a }",
+      "try {} catch(a) { a = a }",
       "a: while (true) { break a; continue a }"
     ]
     .forEach((line) => {
@@ -529,8 +534,11 @@ describe("compiler", () => {
   it("should not wrap shadowed eval", () =>
     [
       "function b(eval) { eval = eval }",
+      "function b(...eval) { eval = eval }",
+      "function b(eval = 1) { eval = eval }",
       "const b = { eval: 1 }",
       "const b = function eval() { eval = eval }",
+      "try {} catch(eval) { eval = eval }",
       "eval: while (true) { break eval; continue eval }"
     ]
     .forEach((code) => {
