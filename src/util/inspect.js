@@ -4,7 +4,6 @@ import GenericFunction from "../generic/function.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
-import builtinEntries from "../builtin-entries.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
@@ -18,8 +17,6 @@ import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
 
 function init() {
-  let exportedInspect
-
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
@@ -97,14 +94,6 @@ function init() {
     return safeInspect(object, contextAsOptions)
   }
 
-  function getExportedInspect() {
-    if (exportedInspect) {
-      return exportedInspect
-    }
-
-    return exportedInspect = builtinEntries.util.module.exports.inspect
-  }
-
   function toInspectable(target, options) {
     return {
       [shared.customInspectKey]: (recurseTimes) => {
@@ -132,7 +121,7 @@ function init() {
 
         if ((name === customInspectKey ||
              name === "inspect") &&
-            value === getExportedInspect()) {
+            value === shared.module.utilInspect) {
           newValue = realUtil.inspect
         } else if (inspecting ||
             name !== customInspectKey) {
