@@ -6,8 +6,6 @@ import isUpdatableGet from "../util/is-updatable-get.js"
 import shared from "../shared.js"
 
 function init() {
-  const getConsole = () => builtinEntries.console.module.exports
-
   const handler = {
     get(target, name, receiver) {
       if (receiver === proxy) {
@@ -17,7 +15,7 @@ function init() {
       const value = Reflect.get(target, name, receiver)
 
       if (name === "console") {
-        const newValue = getConsole()
+        const newValue = builtinEntries.console.module.exports
 
         if (newValue !== value &&
             isUpdatableGet(target, name)) {
@@ -32,7 +30,7 @@ function init() {
 
       if (name === "console" &&
           isUpdatableDescriptor(descriptor)) {
-        descriptor.value = getConsole()
+        descriptor.value = builtinEntries.console.module.exports
       }
 
       return descriptor
