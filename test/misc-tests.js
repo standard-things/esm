@@ -639,17 +639,41 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should not respect new `require.extensions` in ESM", () => {
-    require.extensions[".coffee"] = require.extensions[".js"]
-    return import("./fixture/cof")
-      .then(() => assert.ok(false))
-      .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+  it("should respect modified `require.extensions` in CJS", () => {
+    require.extensions[".mjs"] = () => ({})
+
+    Reflect.deleteProperty(require.cache, abcPath)
+
+    assert.doesNotThrow(() => require(abcPath))
+
+    require.extensions[".mjs"] = require.extensions[".js"]
+
+    Reflect.deleteProperty(require.cache, abcPath)
+
+    assert.throws(() => require(abcPath), SyntaxError)
   })
 
   it("should not respect modified `require.extensions` in ESM", () => {
+    const filename = path.resolve("../package.json")
+
     require.extensions[".json"] = () => ({})
-    return import("../package.json")
+
+    Reflect.deleteProperty(require.cache, filename)
+
+    return import(filename)
       .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
+  })
+
+  it("should not respect new `require.extensions` in ESM", () => {
+    const filename = path.resolve("./fixture/cof")
+
+    require.extensions[".coffee"] = require.extensions[".js"]
+
+    Reflect.deleteProperty(require.cache, filename)
+
+    return import(filename)
+      .then(() => assert.ok(false))
+      .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
   })
 
   it("should support requests with URL query/fragments in ESM", () =>

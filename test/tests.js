@@ -19,7 +19,7 @@ import "./require-hook-tests.js"
 import "./repl-hook-tests.mjs"
 import "./scenario-tests.mjs"
 
-const jsonExt = require.extensions[".json"]
+const extensions = Object.assign({}, require.extensions)
 
 beforeEach(() => {
   Reflect.deleteProperty(global, "customError")
@@ -27,7 +27,13 @@ beforeEach(() => {
   Reflect.deleteProperty(global, "this")
 
   Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
-  Reflect.deleteProperty(require.extensions, ".coffee")
+  Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.mjs"))
 
-  require.extensions[".json"] = jsonExt
+  const names = Object.keys(require.extensions)
+
+  for (const name of names) {
+    Reflect.deleteProperty(require.extensions, name)
+  }
+
+  Object.assign(require.extensions, extensions)
 })
