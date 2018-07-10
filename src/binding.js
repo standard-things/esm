@@ -1,5 +1,6 @@
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
+import keys from "./util/keys.js"
 import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
@@ -79,7 +80,9 @@ function init() {
         return object
       }
 
-      const names = map[id]
+      const names =
+        map[id] ||
+        keys(source)
 
       for (const name of names) {
         setDeferred(object, name, () => {
