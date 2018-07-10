@@ -12,6 +12,7 @@ import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
+import keys from "./keys.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
@@ -59,7 +60,7 @@ function init() {
 
   function formatNamespaceObject(namespace, context) {
     const object = toModuleNamespaceObject()
-    const names = Object.getOwnPropertyNames(namespace)
+    const names = keys(namespace)
 
     for (const name of names) {
       try {

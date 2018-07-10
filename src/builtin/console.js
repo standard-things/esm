@@ -12,6 +12,7 @@ import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
+import keys from "../util/keys.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
@@ -98,7 +99,7 @@ function init() {
       object = toModuleNamespaceObject()
       seen.set(value, object)
 
-      const names = Object.getOwnPropertyNames(value)
+      const names = keys(value)
 
       for (const name of names) {
         try {
@@ -209,7 +210,7 @@ function init() {
       }
     }
   } else if (ELECTRON_RENDERER) {
-    const names = Object.getOwnPropertyNames(console)
+    const names = keys(console)
 
     for (const name of names) {
       if (name !== "Console" &&
