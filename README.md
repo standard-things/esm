@@ -205,37 +205,46 @@ Tips
 
 ### :package: Bundling
 
-* Make your `esm` enabled package more bundler friendly by adding a “module”
-  field to your `package.json` containing the relative path to the main ES module.
+* Add a “module” field to the `package.json` containing the relative path to the main ES module.
 
   :bulb: This is done automagically with `npm init esm` or `yarn create esm`.<br>
 
-* When bundling with Browserify use the [`esmify`](https://github.com/mattdesl/esmify) plugin
+* When bundling with `browserify` use the [`esmify`](https://github.com/mattdesl/esmify) plugin
+
+### :wrench: Extensions
+
+* Enable ESM syntax for [`wallaby.js`](https://wallabyjs.com/) following their
+  [integration example](https://wallabyjs.com/docs/integration/node.html#es-modules).
 
 ### :truck: Loading
 
-* Load `esm` before other loaders or APM packages like<br>
-  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register),
-  [`newrelic`](https://github.com/newrelic/node-newrelic), and
-  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
+* The [`jasmine`](https://jasmine.github.io/) test runner does not have a
+  mechanism to load `esm`. However, `esm` can load a bootstrap file that
+  programmaticly runs tests following their
+  [library usage example](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library).
 
-* Load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library) with `esm`
+* Load `esm` before other runtime loaders or APM packages like<br>
+  - [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html)
+  - [`newrelic`](https://github.com/newrelic/node-newrelic)
+  - [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
 
-* Many packages support loading `esm`.
-  * [`node-tap`](http://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
-  * [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options): `--node-args="-r esm"`
-  * [`wallaby.js`](https://wallabyjs.com/docs/): [`esm` integration example](https://wallabyjs.com/docs/integration/node.html#es-modules)
-  * Use the “require” option of packages like<br>
-    [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
-    [`mocha`](https://mochajs.org/#-r---require-module-name),
-    [`nodemon`](https://github.com/remy/nodemon),
-    [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
-    [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
-    [`tape`](https://github.com/substack/tape#preloading-modules),
-    [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
-    [`webpack`](https://webpack.js.org/api/cli/#config-options)
+* Load `esm` with the “node-args” options of packages like<br>
+  - [`node-tap`](https://www.node-tap.org/cli/):<br>
+    `--node-arg=-r --node-arg=esm`
+  - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags):<br>
+    `--node-args="-r esm"`
 
-    :reminder_ribbon: When using a package’s “require” option remember that,
-    per Node’s rules, the builtin `require` function cannot sideload `.mjs` files.
-    However, with `esm` you can sideload ES modules as `.js` files or load `.mjs`
-    entry files with dynamic `import`.
+* Load `esm` with the “require” option of packages like<br>
+  - [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md)
+  - [`mocha`](https://mochajs.org/#-r---require-module-name)
+  - [`nodemon`](https://nodemon.io/)
+  - [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules)
+  - [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0)
+  - [`tape`](https://github.com/substack/tape#preloading-modules)
+  - [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options)
+  - [`webpack`](https://webpack.js.org/api/cli/#config-options)
+
+  :reminder_ribbon: When using a package’s “require” option remember that,
+  per Node’s rules, the builtin `require` function cannot sideload `.mjs` files.
+  However, with `esm`, ES modules can be sideloaded as `.js` files or `.mjs`
+  files can be loaded with dynamic `import`.
