@@ -140,11 +140,10 @@ function validateDependencies(entry) {
         validateExportedName(childEntry, exportedName)
       }
     } else if (! namedExports) {
-      const exportedName = childExportedNames
-        .find((name) => name !== "default")
-
-      if (exportedName) {
-        throw new ERR_EXPORT_MISSING(childEntry.module, exportedName)
+      for (const exportedName of childExportedNames) {
+        if (exportedName !== "default") {
+          throw new ERR_EXPORT_MISSING(childEntry.module, exportedName)
+        }
       }
     }
   }
