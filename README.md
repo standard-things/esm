@@ -203,15 +203,20 @@ DevOpts
 Tips
 ---
 
+### :package: Bundling
+
 * Make your `esm` enabled package more bundler friendly by adding a “module”
   field to your `package.json` containing the relative path to the main ES module.
 
   :bulb: This is done automagically with `npm init esm` or `yarn create esm`.<br>
-  :bulb: When bundling with Browserify use the [`esmify`](https://github.com/mattdesl/esmify) plugin
+
+* When bundling with Browserify use the [`esmify`](https://github.com/mattdesl/esmify) plugin
+
+### :truck: Loading
 
 * Load `esm` before other loaders or APM packages like<br>
   [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register),
-  [`newrelic`](https://github.com/newrelic/node-newrelic), or
+  [`newrelic`](https://github.com/newrelic/node-newrelic), and
   [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
 
 * Load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library) with `esm`
@@ -227,7 +232,7 @@ Tips
     [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
     [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
     [`tape`](https://github.com/substack/tape#preloading-modules),
-    [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), or
+    [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
     [`webpack`](https://webpack.js.org/api/cli/#config-options)
 
     :reminder_ribbon: When using a package’s “require” option remember that,
