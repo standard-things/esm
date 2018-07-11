@@ -203,24 +203,34 @@ DevOpts
 Tips
 ---
 
-:reminder_ribbon: The builtin `require` function cannot load `.mjs` files.
+:reminder_ribbon: When using a package’s “require” option remember that,
+per Node’s rules, the builtin `require` function cannot sideload `.mjs` files.
+However, with `esm` you can sideload ES modules as `.js` files or load `.mjs`
+entry files with dynamic `import`.
 
-* Load `esm` with the “require” option of<br>
-  [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
-  [`mocha`](https://mochajs.org/#-r---require-module-name),
-  [`nodemon`](https://github.com/remy/nodemon),
-  [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
-  [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
-  [`tape`](https://github.com/substack/tape#preloading-modules),
-  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), or
-  [`webpack`](https://webpack.js.org/api/cli/#config-options)
-* Load `esm` before
-  [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register),
-  [`newrelic`](https://github.com/newrelic/node-newrelic), or
-  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
-* Load `esm` with the `--node-arg=-r --node-arg=esm` option of
-  [`node-tap`](http://www.node-tap.org/cli/)
-* Load `esm` with the `--node-args="-r esm"` option of
-  [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
-* Load `esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
-* Use `esm` to load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library)
+:package: To make your `esm` enabled package more bundler friendly add a “module”
+field to your `package.json` containing the relative path to the main ES module.
+
+:sparkles: To bundle ES modules with Browserify use the
+[`esmify`](https://github.com/mattdesl/esmify) plugin
+
+:truck: Load tips
+  * Load `esm` with the “require” option of<br>
+    [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
+    [`mocha`](https://mochajs.org/#-r---require-module-name),
+    [`nodemon`](https://github.com/remy/nodemon),
+    [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
+    [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
+    [`tape`](https://github.com/substack/tape#preloading-modules),
+    [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), or
+    [`webpack`](https://webpack.js.org/api/cli/#config-options)
+  * Load `esm` before
+    [`@babel/register`](https://github.com/babel/babel/tree/master/packages/babel-register),
+    [`newrelic`](https://github.com/newrelic/node-newrelic), or
+    [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
+  * Load `esm` with the `--node-arg=-r --node-arg=esm` option of
+    [`node-tap`](http://www.node-tap.org/cli/)
+  * Load `esm` with the `--node-args="-r esm"` option of
+    [`pm2`](http://pm2.keymetrics.io/docs/usage/quick-start/#options)
+  * Load `esm` with [`wallaby.js`](https://wallabyjs.com/docs/integration/node.html#es-modules)
+  * Load [`jasmine`](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library) with `esm`
