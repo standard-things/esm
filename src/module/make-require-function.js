@@ -62,12 +62,9 @@ function makeRequireFunction(mod, requirer, resolver) {
       exported = requirer.call(mod, request)
     } catch (e) {
       if (entry.package.options.cjs.vars &&
-          isError(e)) {
-        const { code } = e
-
-        if (code === "ERR_MODULE_RESOLUTION_LEGACY") {
-          return Module._load(request, mod, false)
-        }
+          isError(e) &&
+          e.code === "ERR_MODULE_RESOLUTION_LEGACY") {
+        return Module._load(request, mod, false)
       }
 
       throw e
