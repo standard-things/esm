@@ -1,5 +1,5 @@
 import binding from "../binding.js"
-import readFileSync from "./read-file-sync.js"
+import readFile from "./read-file.js"
 import shared from "../shared.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
@@ -30,7 +30,7 @@ function init() {
       }
     }
 
-    return readFileSync(filename, options)
+    return readFile(filename, options)
   }
 
   function readFileFastPath(filename, options) {
@@ -52,7 +52,7 @@ function init() {
 
       if (useInternalModuleReadJSON &&
             ! content) {
-          return readFileSync(filename, options)
+          return readFile(filename, options)
       }
     }
 

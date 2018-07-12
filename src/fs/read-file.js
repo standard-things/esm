@@ -1,47 +1,21 @@
-import binding from "../binding.js"
-import readFileSync from "./read-file-sync.js"
+import { readFileSync } from "../safe/fs.js"
 import shared from "../shared.js"
-import toNamespacedPath from "../path/to-namespaced-path.js"
+import stripBOM from "../util/strip-bom.js"
 
 function init() {
-  let useFastPath
-
   function readFile(filename, options) {
-    if (typeof filename !== "string") {
-      return null
-    }
+    let content = null
 
-    if (useFastPath === void 0) {
-      useFastPath = typeof binding.fs.internalModuleReadFile === "function"
-    }
+    try {
+      content = readFileSync(filename, options)
+    } catch (e) {}
 
-    if (useFastPath &&
+    if (content &&
         options === "utf8") {
-      try {
-        return readFileFastPath(filename)
-      } catch (e) {
-        useFastPath = false
-      }
+      return stripBOM(content)
     }
 
-    return readFileSync(filename, options)
-  }
-
-  function readFileFastPath(filename) {
-    let content
-
-    if (typeof filename === "string") {
-      // Used to speed up reading. Returns the contents of the file as a string
-      // or undefined when the file cannot be opened. The speedup comes from not
-      // creating Error objects on failure.
-      filename = toNamespacedPath(filename)
-
-      // Warning: This internal method will crash if `filename` is a directory.
-      // https://github.com/nodejs/node/issues/8307
-      content = binding.fs.internalModuleReadFile(filename)
-    }
-
-    return content === void 0 ? null : content
+    return content
   }
 
   return readFile
