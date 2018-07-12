@@ -57,9 +57,13 @@ function init() {
 
   function statFastPath(thePath) {
     // Used to speed up loading. Returns 0 if the path refers to a file,
-    // 1 when it's a directory or -1 on error (usually ENOENT). The speedup
-    // comes from not creating thousands of Stat and Error objects.
-    return binding.fs.internalModuleStat(toNamespacedPath(thePath))
+    // 1 when it's a directory, or a negative number on error (usually ENOENT).
+    // The speedup comes from not creating thousands of Stat and Error objects.
+    const result = typeof thePath === "string"
+      ? binding.fs.internalModuleStat(toNamespacedPath(thePath))
+      : -1
+
+    return result < 0 ? -1 : result
   }
 
   return stat
