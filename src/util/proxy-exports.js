@@ -17,6 +17,7 @@ import isSet from "./is-set.js"
 import isSetIterator from "./is-set-iterator.js"
 import isStringObject from "./is-string-object.js"
 import isWeakMap from "./is-weak-map.js"
+import isWeakSet from "./is-weak-set.js"
 import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
@@ -216,6 +217,7 @@ function init() {
           isMap(exported) ||
           isSet(exported) ||
           isWeakMap(exported) ||
+          isWeakSet(exported) ||
           isDate(exported) ||
           isRegExp(exported) ||
           ArrayBuffer.isView(exported) ||
