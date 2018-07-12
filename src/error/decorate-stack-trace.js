@@ -3,12 +3,7 @@ import shared from "../shared.js"
 
 function init() {
   function decorateStackTrace(error) {
-    const { errorDecoratedSymbol } = shared.utilBinding
-
-    if (errorDecoratedSymbol !== void 0) {
-      setHiddenValue(error, errorDecoratedSymbol, true)
-    }
-
+    setHiddenValue(error, shared.utilBinding.errorDecoratedSymbol, true)
     return error
   }
 

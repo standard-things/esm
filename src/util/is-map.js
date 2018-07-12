@@ -3,9 +3,21 @@ import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
 function init() {
-  return typeof (types && types.isMap) === "function"
-    ? types.isMap
-    : binding.util.isMap
+  if (typeof (types && types.isMap) === "function") {
+    return types.isMap
+  }
+
+  let useIsMap
+
+  const isMap = function (value) {
+    if (useIsMap === void 0) {
+      useIsMap = typeof binding.util.isMap === "function"
+    }
+
+    return useIsMap && binding.util.isMap(value)
+  }
+
+  return isMap
 }
 
 export default shared.inited

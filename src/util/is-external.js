@@ -1,4 +1,3 @@
-import alwaysFalse from "./always-false.js"
 import binding from "../binding.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
@@ -8,11 +7,17 @@ function init() {
     return types.isExternal
   }
 
-  const { isExternal } = binding.util
+  let useIsExternal
 
-  return typeof isExternal === "function"
-    ? isExternal
-    : alwaysFalse
+  const isExternal = function (value) {
+    if (useIsExternal === void 0) {
+      useIsExternal = typeof binding.util.isExternal === "function"
+    }
+
+    return useIsExternal && binding.util.isExternal(value)
+  }
+
+  return isExternal
 }
 
 export default shared.inited

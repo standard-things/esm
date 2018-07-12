@@ -3,21 +3,29 @@ import realRequire from "./require.js"
 import shared from "../shared.js"
 
 function init() {
-  let result
+  let realGetProxyDetails
 
   try {
-    result = realRequire(shared.symbol.realGetProxyDetails)
+    realGetProxyDetails = realRequire(shared.symbol.realGetProxyDetails)
 
-    if (typeof result === "function") {
-      return result
+    if (typeof realGetProxyDetails === "function") {
+      return realGetProxyDetails
     }
   } catch (e) {}
 
-  result = binding.util.getProxyDetails
+  let useGetProxyDetails
 
-  if (typeof result === "function") {
-    return result
+  realGetProxyDetails = function (value) {
+    if (useGetProxyDetails === void 0) {
+      useGetProxyDetails = typeof binding.util.getProxyDetails === "function"
+    }
+
+    if (useGetProxyDetails) {
+      return binding.util.getProxyDetails(value)
+    }
   }
+
+  return realGetProxyDetails
 }
 
 export default shared.inited

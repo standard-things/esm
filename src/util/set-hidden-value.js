@@ -12,6 +12,7 @@ function init() {
 
     if (useSetHiddenValue &&
         typeof name === shared.utilBinding.hiddenKeyType &&
+        name != null &&
         isObjectLike(object)) {
       try {
         return binding.util.setHiddenValue(object, name, value)

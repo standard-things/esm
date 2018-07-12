@@ -28,14 +28,18 @@ function init() {
   }
 
   function readFileFastPath(filename) {
-    // Used to speed up reading. Returns the contents of the file as a string
-    // or undefined when the file cannot be opened. The speedup comes from not
-    // creating Error objects on failure.
-    filename = toNamespacedPath(filename)
+    let content
 
-    // Warning: This internal method will crash if `filename` is a directory.
-    // https://github.com/nodejs/node/issues/8307
-    const content = binding.fs.internalModuleReadFile(filename)
+    if (typeof filename === "string") {
+      // Used to speed up reading. Returns the contents of the file as a string
+      // or undefined when the file cannot be opened. The speedup comes from not
+      // creating Error objects on failure.
+      filename = toNamespacedPath(filename)
+
+      // Warning: This internal method will crash if `filename` is a directory.
+      // https://github.com/nodejs/node/issues/8307
+      content = binding.fs.internalModuleReadFile(filename)
+    }
 
     return content === void 0 ? null : content
   }
