@@ -45,7 +45,6 @@ function init() {
       "getProxyDetails",
       "isAnyArrayBuffer",
       "isArrayBuffer",
-      "isDataView",
       "isDate",
       "isExternal",
       "isMap",
@@ -54,7 +53,6 @@ function init() {
       "isSet",
       "isSetIterator",
       "isSharedArrayBuffer",
-      "isTypedArray",
       "safeGetenv",
       "setHiddenValue"
     ]
