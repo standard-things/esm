@@ -1,6 +1,5 @@
 import SafeJSON from "../safe/json.js"
 
-import readFileFast from "../fs/read-file-fast.js"
 import { readFileSync } from "../safe/fs.js"
 import safeProcess from "../safe/process.js"
 import safeToString from "../util/safe-to-string.js"
@@ -14,7 +13,7 @@ extensions[".js"] = function (mod, filename) {
 }
 
 extensions[".json"] = function (mod, filename) {
-  const content = readFileFast(filename, "utf8")
+  const content = readFileSync(filename, "utf8")
 
   try {
     mod.exports = SafeJSON.parse(content)
