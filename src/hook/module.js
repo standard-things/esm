@@ -150,14 +150,14 @@ function hook(Mod, parent) {
 
     let { compileData } = entry
 
-    if (cache.compile[cacheName] === true) {
+    if (! compileData &&
+        cache.compile[cacheName] === true) {
       compileData = Compiler.from(entry)
 
       if (compileData) {
         compileData.code = readCachedCode(cachePath + sep + cacheName)
       } else {
         Reflect.deleteProperty(cache.compile, cacheName)
-        Reflect.deleteProperty(cache.map, cacheName)
       }
     }
 
