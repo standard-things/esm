@@ -153,7 +153,7 @@ function tryCompileCached(entry, content, filename) {
     filename = loc.filename
   }
 
-  content = () => readSourceCode(filename)
+  content = () => readFile(filename, "utf8")
   throw maskStackTrace(error, content, filename, isESM)
 }
 
@@ -233,10 +233,6 @@ function maybeSourceMap(entry, content, filename) {
   return ""
 }
 
-function readSourceCode(filename) {
-  return readFile(filename, "utf8")
-}
-
 function tryCompileCode(caller, entry, content, filename, options) {
   let error
 
@@ -281,7 +277,7 @@ function tryValidateESM(caller, entry, content, filename) {
   if (loc &&
       loc.filename !== filename) {
     filename = loc.filename
-    content = () => readSourceCode(filename)
+    content = () => readFile(filename, "utf8")
   }
 
   throw maskStackTrace(error, content, filename, true)

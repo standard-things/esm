@@ -155,7 +155,7 @@ function hook(Mod, parent) {
       compileData = Compiler.from(entry)
 
       if (compileData) {
-        compileData.code = readCachedCode(cachePath + sep + cacheName)
+        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8")
       } else {
         Reflect.deleteProperty(cache.compile, cacheName)
       }
@@ -177,7 +177,7 @@ function hook(Mod, parent) {
     } else {
       const content = compileData
         ? compileData.code
-        : readSourceCode(filename)
+        : readFile(filename, "utf8")
 
       mod._compile(content, filename)
     }
@@ -221,14 +221,6 @@ function mjsCompiler(mod, filename) {
   throw new ERR_REQUIRE_ESM(filename)
 }
 
-function readCachedCode(filename) {
-  return readFileFast(filename, "utf8")
-}
-
-function readSourceCode(filename) {
-  return readFile(filename, "utf8")
-}
-
 function tryPassthru(func, args, pkg) {
   let error
 
@@ -270,7 +262,7 @@ function tryPassthru(func, args, pkg) {
     filename = loc.filename
   }
 
-  const content = () => readSourceCode(filename)
+  const content = () => readFile(filename, "utf8")
 
   throw maskStackTrace(error, content, filename)
 }
