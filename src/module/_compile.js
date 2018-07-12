@@ -19,8 +19,6 @@ import isObjectEmpty from "../util/is-object-empty.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import readFile from "../fs/read-file.js"
-import readFileFast from "../fs/read-file-fast.js"
-import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 import validateESM from "./esm/validate.js"
 
@@ -48,8 +46,6 @@ const {
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
-  const { cache } = pkg
-  const { cacheName } = entry
   const { mode } = pkg.options
   const { parsing } = shared.moduleState
 
@@ -66,17 +62,6 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   let { compileData } = entry
-
-  if (cache.compile[cacheName] === true) {
-    compileData = Compiler.from(entry)
-
-    if (compileData) {
-      compileData.code = readCachedCode(pkg.cachePath + sep + cacheName)
-    } else {
-      Reflect.deleteProperty(cache.compile, cacheName)
-      Reflect.deleteProperty(cache.map, cacheName)
-    }
-  }
 
   if (! compileData) {
     compileData = Compiler.from(entry)
@@ -126,7 +111,6 @@ function tryCompileCached(entry, content, filename) {
   const isESM = entry.type === TYPE_ESM
   const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
-  const pkg = entry.package
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
 
   if (noDepth) {
@@ -160,7 +144,7 @@ function tryCompileCached(entry, content, filename) {
 
   if (isESM &&
       error.name === "SyntaxError") {
-    pkg.cache.dirty = true
+    entry.package.cache.dirty = true
   }
 
   const loc = getLocationFromStackTrace(error)
@@ -247,10 +231,6 @@ function maybeSourceMap(entry, content, filename) {
   }
 
   return ""
-}
-
-function readCachedCode(filename) {
-  return readFileFast(filename, "utf8")
 }
 
 function readSourceCode(filename) {
