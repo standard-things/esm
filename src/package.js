@@ -475,10 +475,13 @@ function isFlag(value) {
 }
 
 function readInfo(dirPath, force) {
-  let optionsPath
   let pkg
+  let optionsPath = dirPath + sep + ESMRC_FILENAME
 
-  let options = readFile(dirPath + sep + ESMRC_FILENAME, "utf8")
+  let options = isFile(optionsPath)
+    ? readFile(optionsPath, "utf8")
+    : null
+
   let optionsFound = options !== null
 
   if (optionsFound) {
@@ -487,7 +490,8 @@ function readInfo(dirPath, force) {
     optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, searchExts)
   }
 
-  if (optionsPath) {
+  if (! optionsFound &&
+      optionsPath) {
     optionsFound = true
 
     if (extname(optionsPath) === ".json") {
@@ -512,9 +516,13 @@ function readInfo(dirPath, force) {
     }
   }
 
+  const pkgPath = dirPath + sep + PACKAGE_FILENAME
+
+  let pkgJSON = isFile(pkgPath)
+    ? readFile(pkgPath, "utf8")
+    : null
+
   let parentPkg
-  let pkgParsed = false
-  let pkgJSON = readFile(dirPath + sep + PACKAGE_FILENAME, "utf8")
 
   if (! force &&
       pkgJSON === null) {
@@ -524,6 +532,8 @@ function readInfo(dirPath, force) {
       return null
     }
   }
+
+  let pkgParsed = false
 
   if (! optionsFound &&
       pkgJSON !== null) {
