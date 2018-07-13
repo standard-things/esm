@@ -51,8 +51,8 @@ function init() {
       }
 
       if (useInternalModuleReadJSON &&
-            ! content) {
-          return readFile(filename, options)
+          ! content) {
+        return readFile(filename, options)
       }
     }
 
