@@ -2,6 +2,9 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
+import ENV from "../constant/env.js"
+import ESM from "../constant/esm.js"
+
 import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
@@ -9,6 +12,16 @@ import dirname from "../path/dirname.js"
 import isRelativePath from "../util/is-relative-path.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
+
+const {
+  RUNKIT
+} = ENV
+
+const {
+  PKG_DIRNAME
+} = ESM
+
+let availableModulesPath
 
 function resolveLookupPaths(request, parent, skipGlobalPaths) {
   const parentFilename = parent && parent.filename
@@ -23,6 +36,14 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     if (parentPaths &&
         ! skipGlobalPaths) {
       GenericArray.push(paths, ...moduleState.globalPaths)
+    }
+
+    if (RUNKIT) {
+      if (availableModulesPath === void 0) {
+        availableModulesPath = dirname(PKG_DIRNAME)
+      }
+
+      paths.push(availableModulesPath)
     }
 
     return paths.length ? paths : null

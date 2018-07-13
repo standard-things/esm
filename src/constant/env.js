@@ -11,6 +11,7 @@ import isNyc from "../env/is-nyc.js"
 import isPreloaded from "../env/is-preloaded.js"
 import isPrint from "../env/is-print.js"
 import isREPL from "../env/is-repl.js"
+import isRunkit from "../env/is-runkit.js"
 import isWin32 from "../env/is-win32.js"
 import setDeferred from "../util/set-deferred.js"
 
@@ -29,6 +30,7 @@ setDeferred(ENV, "OPTIONS", getOptions)
 setDeferred(ENV, "PRELOADED", isPreloaded)
 setDeferred(ENV, "PRINT", isPrint)
 setDeferred(ENV, "REPL", isREPL)
+setDeferred(ENV, "RUNKIT", isRunkit)
 setDeferred(ENV, "WIN32", isWin32)
 
 export default ENV
