@@ -166,7 +166,16 @@ class Package {
           hasNycNoMarker ||
           noNycHasMarker
 
+        let dataBuffer
         let dataJSON
+
+        if (hasDirtyMarker) {
+          removeFile(cachePath + sep + ".dirty")
+        }
+
+        if (noNycHasMarker) {
+          removeFile(cachePath + sep + ".nyc")
+        }
 
         if (hasMap &&
             ! isCacheInvalid) {
@@ -177,24 +186,21 @@ class Package {
             dataJSON.version !== PKG_VERSION
         }
 
-        if (hasDirtyMarker) {
-          removeFile(cachePath + sep + ".dirty")
-        }
-
-        if (noNycHasMarker) {
-          removeFile(cachePath + sep + ".nyc")
-        }
-
         if (isCacheInvalid) {
-          compileCache = { __proto__: null }
           hasBuffer =
           hasMap = false
+          compileCache = { __proto__: null }
+          dataJSON = void 0
           clearBabelCache(cachePath)
         }
 
-        cache.buffer = hasBuffer
-          ? readFile(cachePath + sep + ".data.blob")
-          : GenericBuffer.alloc(0)
+        if (hasBuffer) {
+          dataBuffer = readFile(cachePath + sep + ".data.blob")
+        }
+
+        cache.buffer =
+          dataBuffer ||
+          GenericBuffer.alloc(0)
 
         cache.map = has(dataJSON, "map")
           ? dataJSON.map
