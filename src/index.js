@@ -16,7 +16,6 @@ import Package from "./package.js"
 import RealModule from "./real/module.js"
 import Shim from "./shim.js"
 
-import assign from "./util/assign.js"
 import builtinVM from "./builtin/vm.js"
 import clone from "./module/clone.js"
 import errors from "./errors.js"
@@ -86,7 +85,7 @@ if (shared.inited &&
     if (isObjectLike(options)) {
       const parentPkg = Package.from(cloned, true)
 
-      assign(parentPkg.options, Package.createOptions(options))
+      parentPkg.options = Package.createOptions(options)
     }
 
     moduleHook(Module, cloned)
