@@ -36,6 +36,11 @@ describe("require hook", () => {
       .then((ns) => ns.default())
   )
 
+  it("should support `options.force`", () =>
+    import("./require-hook/force.mjs")
+      .then((ns) => ns.default())
+  )
+
   it("should support `options.mainFields`", () =>
     import("./require-hook/main-fields")
       .then((ns) => ns.default())

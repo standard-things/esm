@@ -82,7 +82,8 @@ function hook(Mod, parent) {
     assign(defaultPkg, parentPkg)
   }
 
-  if (defaultOptions.mode === OPTIONS_MODE_ALL) {
+  if (! defaultOptions.force &&
+      defaultOptions.mode === OPTIONS_MODE_ALL) {
     defaultOptions.mode = OPTIONS_MODE_AUTO
   }
 

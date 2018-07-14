@@ -7,6 +7,7 @@ export default () => {
     "await",
     "cache",
     "debug",
+    "force",
     "mainFields",
     "mode",
     "sourcemap",
