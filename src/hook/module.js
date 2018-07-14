@@ -63,24 +63,20 @@ const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
+  const defaultPkg = new Package("", RANGE_ALL, { cache: false })
   const passthruMap = new Map
 
-  const defaultPkg = new Package("", RANGE_ALL, { cache: false })
-  const defaultOptions = defaultPkg.options
-
+  let defaultOptions = defaultPkg.options
   let parentPkg = Package.from(parent)
 
   if (parentPkg) {
     assign(defaultPkg, parentPkg)
     assign(defaultOptions, parentPkg.options)
-  }
+  } else {
+    if (OPTIONS) {
+      defaultOptions = Package.createOptions(OPTIONS)
+    }
 
-  if (! parent &&
-      OPTIONS) {
-    assign(defaultOptions, Package.createOptions(OPTIONS))
-  }
-
-  if (! parentPkg) {
     parentPkg = Package.from(parent, true)
     assign(parentPkg.options, defaultOptions)
     assign(defaultPkg, parentPkg)
