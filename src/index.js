@@ -17,12 +17,10 @@ import RealModule from "./real/module.js"
 import Shim from "./shim.js"
 
 import builtinVM from "./builtin/vm.js"
-import clone from "./module/clone.js"
 import errors from "./errors.js"
 import globalHook from "./hook/global.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
-import isObjectLike from "./util/is-object-like.js"
 import isSideloaded from "./env/is-sideloaded.js"
 import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
@@ -59,17 +57,16 @@ if (shared.inited &&
 
     let cacheKey
 
-    if (isObjectLike(options)) {
-      cacheKey = JSON.stringify(Package.createOptions(options))
-    } else {
+    if (options === void 0) {
       const pkg = Package.from(mod)
 
       if (pkg) {
         cacheKey = JSON.stringify(pkg.options)
       }
+    } else {
+      options = Package.createOptions(options)
+      cacheKey = JSON.stringify(options)
     }
-
-    const cloned = clone(mod)
 
     if (cacheKey) {
       const { state } = shared.package
@@ -82,19 +79,19 @@ if (shared.inited &&
         })
     }
 
-    if (isObjectLike(options)) {
-      const parentPkg = Package.from(cloned, true)
+    if (options) {
+      const pkg = Package.from(mod, true)
 
-      parentPkg.options = Package.createOptions(options)
+      pkg.options = options
     }
 
-    moduleHook(Module, cloned)
+    moduleHook(Module, mod)
 
     if (! isInstalled(mod)) {
       processHook(realProcess)
     }
 
-    return requireHook(cloned)
+    return requireHook(mod)
   }
 } else {
   exported = shared
