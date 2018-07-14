@@ -97,7 +97,7 @@ function compile(caller, entry, content, filename, fallback) {
   if (! isESM &&
       ! parentIsESM &&
       (pkg === defaultPkg ||
-        parentPkg === defaultPkg)) {
+       parentPkg === defaultPkg)) {
     return fallback ? fallback() : void 0
   }
 
