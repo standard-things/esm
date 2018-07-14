@@ -95,7 +95,7 @@ function init() {
       pos = this.start
     }
 
-    const message = pos === this.input.length
+    const message = this.type === tt.eof
       ? ENGINE_UNEXPECTED_EOS
       : ENGINE_UNEXPECTED_TOKEN
 
