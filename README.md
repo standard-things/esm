@@ -59,7 +59,7 @@ ESM of [tomorrow](https://github.com/nodejs/modules).
 
 Out of the box `esm` just works, no configuration necessary, and supports:
 
-* [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import) / [`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
+* [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import)/[`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
 * [`import.meta`](https://github.com/tc39/proposal-import-meta)
 * [Dynamic `import`](https://github.com/tc39/proposal-dynamic-import)
 * [Improved errors](https://github.com/standard-things/esm/wiki/improved-errors)
@@ -149,9 +149,15 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"force":</code></td>
+  <td>
+    <p>A boolean to apply these options to all module loads.</p>
+  </td>
+</tr>
+<tr>
   <td valign="top"><code>"mainFields":</code></td>
   <td>
-    <p>An array of fields, e.g. <code>["main"]</code>, to check when importing a package.</p>
+    <p>An array of fields, e.g. <code>["main"]</code>, checked when importing a package.</p>
   </td>
 </tr>
 <tr>
@@ -180,7 +186,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":</code></td>
   <td>
-    <p>A boolean for toggling cache creation or string path of the cache directory.</p>
+    <p>A boolean for toggling cache creation or cache directory path.</p>
   </td>
 </tr>
 <tr>
@@ -200,36 +206,16 @@ DevOpts
 </tr>
 </table>
 
-ProgrammaticOpts
----
-
-For use with `require("esm")(module, {/*options*/})`.
-
-<table>
-<tr>
-  <td colspan="2"><code>{</code></td>
-</tr>
-<tr>
-  <td valign="top"><code>"force":</code></td>
-  <td>
-    <p>A boolean to force `esm` to use these options, without consulting any other configuration files.</p>
-  </td>
-</tr>
-<tr>
-  <td colspan="2"><code>}</code></td>
-</tr>
-</table>
-
 Tips
 ---
 
 ### :package: Bundling
 
-* Add a “module” field to the `package.json` containing the relative path to the main ES module.
+* Add a “module” field to `package.json` with the path to the main ES module.
 
-  :bulb: This is done automagically with `npm init esm` or `yarn create esm`.<br>
+  :bulb: This is automagically done with `npm init esm` or `yarn create esm`.
 
-* When bundling with `browserify` use the [`esmify`](https://github.com/mattdesl/esmify) plugin
+* Use [`esmify`](https://github.com/mattdesl/esmify) with [`browserify`](http://browserify.org/).
 
 ### :wrench: Extensions
 
@@ -243,26 +229,24 @@ Tips
   programmaticly runs tests following their
   [library usage example](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library).
 
-* Load `esm` before other runtime loaders or APM packages like<br>
-  - [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html)
-  - [`newrelic`](https://github.com/newrelic/node-newrelic)
-  - [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/)
+* Load `esm` before APMs/loaders like
+  [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html),
+  [`newrelic`](https://github.com/newrelic/node-newrelic), and
+  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/).
 
-* Load `esm` with the “node-args” options of packages like<br>
-  - [`node-tap`](https://www.node-tap.org/cli/):<br>
-    `--node-arg=-r --node-arg=esm`
-  - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags):<br>
-    `--node-args="-r esm"`
+* Load `esm` with the “node-args” options of<br>
+  - [`node-tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
+  - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags): `--node-args="-r esm"`
 
-* Load `esm` with the “require” option of packages like<br>
-  - [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md)
-  - [`mocha`](https://mochajs.org/#-r---require-module-name)
-  - [`nodemon`](https://nodemon.io/)
-  - [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules)
-  - [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0)
-  - [`tape`](https://github.com/substack/tape#preloading-modules)
-  - [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options)
-  - [`webpack`](https://webpack.js.org/api/cli/#config-options)
+* Load `esm` with “require” options of
+  [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
+  [`mocha`](https://mochajs.org/#-r---require-module-name),
+  [`nodemon`](https://nodemon.io/),
+  [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
+  [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
+  [`tape`](https://github.com/substack/tape#preloading-modules),
+  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
+  [`webpack`](https://webpack.js.org/api/cli/#config-options).
 
   :reminder_ribbon: When using a package’s “require” option remember that,
   per Node’s rules, the builtin `require` function cannot sideload `.mjs` files.
