@@ -17,7 +17,6 @@ import assign from "../util/assign.js"
 import binding from "../binding.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
-import clone from "../module/clone.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
@@ -153,7 +152,7 @@ function hook(vm) {
     entry = Entry.get(mod)
     entry.addBuiltinModules = createAddBuiltinModules(entry)
     entry.package = Package.get("")
-    entry.require = makeRequireFunction(clone(mod))
+    entry.require = makeRequireFunction(mod)
     entry.runtimeName = shared.runtimeName
 
     Reflect.setPrototypeOf(mod, Module.prototype)
