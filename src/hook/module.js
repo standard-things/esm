@@ -67,6 +67,7 @@ function hook(Mod, parent) {
 
   const defaultPkg = new Package("", RANGE_ALL, { cache: false })
   const defaultOptions = defaultPkg.options
+
   let parentPkg = Package.from(parent)
 
   if (parentPkg) {
