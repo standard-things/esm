@@ -24,7 +24,8 @@ const defaultScripts = {
 const fieldsToRemove = [
   "devDependencies",
   "esm",
-  "private"
+  "private",
+  "scripts"
 ]
 
 const jsPaths = [
@@ -49,8 +50,8 @@ function cleanPackageJSON() {
 
   const pkgJSON = JSON.parse(content)
 
-  pkgJSON.scripts = defaultScripts
   fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
+  pkgJSON.scripts = defaultScripts
   fs.outputFileSync(pkgPath, fleece.patch(content, pkgJSON))
 }
 
