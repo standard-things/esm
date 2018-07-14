@@ -31,6 +31,10 @@ function init() {
 
     if (isPath(options)) {
       options = readFile(resolve(options), "utf8")
+
+      if (options) {
+        options = options.trim()
+      }
     }
 
     if (! options) {
