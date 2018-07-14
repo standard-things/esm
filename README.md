@@ -200,6 +200,26 @@ DevOpts
 </tr>
 </table>
 
+ProgrammaticOpts
+---
+
+For use with `require("esm")(module, {/*options*/})`.
+
+<table>
+<tr>
+  <td colspan="2"><code>{</code></td>
+</tr>
+<tr>
+  <td valign="top"><code>"force":</code></td>
+  <td>
+    <p>A boolean to force `esm` to use these options, without consulting any other configuration files.</p>
+  </td>
+</tr>
+<tr>
+  <td colspan="2"><code>}</code></td>
+</tr>
+</table>
+
 Tips
 ---
 
