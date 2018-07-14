@@ -73,6 +73,7 @@ const defaultOptions = {
     vars: false
   },
   debug: false,
+  force: false,
   mainFields: ["main"],
   mode: "strict",
   sourceMap: void 0
@@ -349,6 +350,14 @@ function createOptions(value) {
     throw new ERR_INVALID_ESM_OPTION("debug", debug)
   }
 
+  const { force } = options
+
+  if (isFlag(force)) {
+    options.force = !! force
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("force", cache)
+  }
+
   const defaultMainFields = defaultOptions.mainFields
 
   let { mainFields } = options
@@ -418,7 +427,14 @@ function findRoot(dirPath) {
 }
 
 function getInfo(dirPath, force) {
-  let pkg
+  const defaultPkg = Package.state.default
+
+  let pkg = null
+
+  if (defaultPkg &&
+      defaultPkg.options.force === true) {
+    return pkg
+  }
 
   if (Reflect.has(Package.state.cache, dirPath)) {
     pkg = Package.state.cache[dirPath]
@@ -518,6 +534,7 @@ function readInfo(dirPath, force) {
       } finally {
         moduleState.parseOnly = parseOnly
         moduleState.parsing = parsing
+        Package.state.cache[dirPath] = null
       }
     }
   }
