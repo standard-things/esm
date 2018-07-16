@@ -122,9 +122,14 @@ function hook(Mod, parent) {
     }
 
     const { cache, cachePath } = pkg
-    const cacheName = getCacheName(entry, mtime(filename))
-
     const { _compile } = mod
+
+    let { cacheName } = entry
+
+    if (! cacheName) {
+      cacheName =
+      entry.cacheName = getCacheName(entry, mtime(filename))
+    }
 
     const compileFallback = () => {
       entry.state = STATE_EXECUTION_STARTED
