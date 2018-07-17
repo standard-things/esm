@@ -58,6 +58,7 @@ const {
 
 const exts = [".js", ".mjs"]
 const importExportRegExp = /^.*?\b(?:im|ex)port\b/
+
 const sourceExtsJs = RealModule._extensions[".js"]
 const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
 
@@ -115,7 +116,7 @@ function hook(Mod, parent) {
 
     if (entry._passthru ||
         (shouldOverwrite &&
-         isMJS(mod))) {
+         isMJS(filename))) {
       entry._passthru = false
       tryPassthru.call(this, func, args, pkg)
       return
