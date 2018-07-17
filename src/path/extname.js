@@ -5,8 +5,7 @@ function init() {
   function extname(filename) {
     const cache = shared.memoize.pathExtname
 
-    if (typeof filename === "string" &&
-        Reflect.has(cache, filename)) {
+    if (Reflect.has(cache, filename)) {
       return cache[filename]
     }
 

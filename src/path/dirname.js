@@ -5,8 +5,7 @@ function init() {
   function dirname(filename) {
     const cache = shared.memoize.pathDirname
 
-    if (typeof filename === "string" &&
-        Reflect.has(cache, filename)) {
+    if (Reflect.has(cache, filename)) {
       return cache[filename]
     }
 
