@@ -5,6 +5,11 @@ import shared from "../shared.js"
 
 function init() {
   const safeFs = safe(realFs)
+  const { native } = safeFs.realpathSync
+
+  if (native) {
+    setProperty(safeFs, "realpathNativeSync", native)
+  }
 
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
   return safeFs
@@ -19,6 +24,7 @@ export const {
   readdirSync,
   readFileSync,
   realpathSync,
+  realpathNativeSync,
   Stats,
   statSync,
   unlinkSync,

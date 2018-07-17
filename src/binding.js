@@ -28,6 +28,7 @@ function init() {
       "preserveSymlinksMain"
     ],
     fs: [
+      "realpath",
       "internalModuleReadFile",
       "internalModuleReadJSON",
       "internalModuleStat"
