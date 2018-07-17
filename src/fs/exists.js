@@ -1,9 +1,9 @@
 import shared from "../shared.js"
-import stat from "./stat.js"
+import statFast from "./stat-fast.js"
 
 function init() {
   function exists(thePath) {
-    return stat(thePath) !== -1
+    return statFast(thePath) !== -1
   }
 
   return exists

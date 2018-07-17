@@ -109,13 +109,7 @@ function compile(caller, entry, content, filename, fallback) {
 
 function tryCompileCached(entry, content, filename) {
   const isESM = entry.type === TYPE_ESM
-  const { moduleState } = shared
-  const noDepth = moduleState.requireDepth === 0
   const tryCompile = isESM ? tryCompileESM : tryCompileCJS
-
-  if (noDepth) {
-    moduleState.stat = { __proto__: null }
-  }
 
   let error
   let result
@@ -126,10 +120,6 @@ function tryCompileCached(entry, content, filename) {
   } catch (e) {
     error = e
     threw = true
-  }
-
-  if (noDepth) {
-    moduleState.stat = null
   }
 
   if (! threw) {

@@ -1,8 +1,9 @@
-import { Stats, statSync } from "../safe/fs.js"
+import { Stats } from "../safe/fs.js"
 
 import binding from "../binding.js"
 import call from "../util/call.js"
 import shared from "../shared.js"
+import statSync from "./stat-sync.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
@@ -10,12 +11,12 @@ function init() {
 
   const { isFile } = Stats.prototype
 
-  function stat(thePath) {
+  function statFast(thePath) {
     if (typeof thePath !== "string") {
       return -1
     }
 
-    const cache = shared.moduleState.stat
+    const cache = shared.moduleState.statFast
 
     if (cache &&
         Reflect.has(cache, thePath)) {
@@ -66,9 +67,9 @@ function init() {
     return result < 0 ? -1 : result
   }
 
-  return stat
+  return statFast
 }
 
 export default shared.inited
-  ? shared.module.fsStat
-  : shared.module.fsStat = init()
+  ? shared.module.fsStatFast
+  : shared.module.fsStatFast = init()

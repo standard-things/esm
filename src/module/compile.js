@@ -140,6 +140,8 @@ function compile(content, filename) {
   }
 
   const exported = this.exports
+  const { moduleState } = shared
+  const noDepth = moduleState.requireDepth === 0
   const req = makeRequireFunction(this)
   const args = [exported, req, this, filename, dirname(filename)]
 
@@ -147,11 +149,21 @@ function compile(content, filename) {
     args.push(realProcess, shared.unsafeGlobal, shared.external.Buffer)
   }
 
+  if (noDepth) {
+    moduleState.statFast = { __proto__: null }
+    moduleState.statSync = { __proto__: null }
+  }
+
   entry.state = STATE_EXECUTION_STARTED
 
   const result = inspectorWrapper
     ? Reflect.apply(inspectorWrapper, void 0, [compiledWrapper, exported, ...args])
     : Reflect.apply(compiledWrapper, exported, args)
+
+  if (noDepth) {
+    moduleState.statFast =
+    moduleState.statSync = null
+  }
 
   entry.state = STATE_EXECUTION_COMPLETED
   return result

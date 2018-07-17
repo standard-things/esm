@@ -1,7 +1,7 @@
 import GenericDate from "../generic/date.js"
 
 import shared from "../shared.js"
-import { statSync } from "../safe/fs.js"
+import statSync from "../fs/stat-sync.js"
 
 function init() {
   const { round } = Math

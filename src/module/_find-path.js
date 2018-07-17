@@ -16,7 +16,7 @@ import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
 import safeToString from "../util/safe-to-string.js"
 import shared from "../shared.js"
-import stat from "../fs/stat.js"
+import statFast from "../fs/stat-fast.js"
 
 const {
   BACKWARD_SLASH,
@@ -72,14 +72,14 @@ function findPath(request, paths, isMain, fields, exts) {
 
   for (const curPath of paths) {
     if (curPath &&
-        stat(curPath) !== 1) {
+        statFast(curPath) !== 1) {
       continue
     }
 
     let filename
 
     const thePath = resolve(curPath, request)
-    const rc = stat(thePath)
+    const rc = statFast(thePath)
     const isFile = rc === 0
     const isDir = rc === 1
 
@@ -174,7 +174,7 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 }
 
 function tryFilename(filename, isMain) {
-  if (stat(filename)) {
+  if (statFast(filename)) {
     return ""
   }
 

@@ -1,9 +1,9 @@
 import shared from "../shared.js"
-import stat from "../fs/stat.js"
+import statFast from "../fs/stat-fast.js"
 
 function init() {
   function isFile(thePath) {
-    return stat(thePath) === 0
+    return statFast(thePath) === 0
   }
 
   return isFile

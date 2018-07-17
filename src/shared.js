@@ -87,7 +87,8 @@ function init() {
       parseOnly: false,
       parsing: false,
       requireDepth: 0,
-      stat: null
+      statFast: null,
+      statSync: null
     },
     package: {
       default: null,
