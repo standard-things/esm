@@ -68,9 +68,10 @@ function hook(vm) {
       scriptOptions.produceCachedData = true
     }
 
+    const cacheName =
     entry.cacheName = getCacheName(entry, content)
 
-    let compileData = entry.package.cache.compile[entry.cacheName]
+    let compileData = entry.package.cache.compile[cacheName]
 
     if (compileData) {
       if (compileData.scriptData &&
