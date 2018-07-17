@@ -39,6 +39,7 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   const cache = shared.memoize.moduleCJSResolveFilename
+
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain
@@ -52,26 +53,7 @@ function resolveFilename(request, parent, isMain, options) {
 
   if (! cacheKey &&
       Array.isArray(options.paths)) {
-    const fakeParent = new Module("")
-    const fromPaths = options.paths
-
-    paths = []
-
-    for (const fromPath of fromPaths) {
-      fakeParent.paths = Module._nodeModulePaths(fromPath)
-
-      const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
-
-      if (paths.indexOf(fromPath) === -1) {
-        paths.push(fromPath)
-      }
-
-      for (const lookupPath of lookupPaths) {
-        if (paths.indexOf(lookupPath) === -1) {
-          paths.push(lookupPath)
-        }
-      }
-    }
+    paths = resolveLookupPathsFrom(request, options.paths)
   } else {
     paths = Module._resolveLookupPaths(request, parent, true)
   }
@@ -85,6 +67,29 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   throw new MODULE_NOT_FOUND(request)
+}
+
+function resolveLookupPathsFrom(request, fromPaths) {
+  const fakeParent = new Module("")
+  const paths = []
+
+  for (const fromPath of fromPaths) {
+    fakeParent.paths = Module._nodeModulePaths(fromPath)
+
+    const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
+
+    if (paths.indexOf(fromPath) === -1) {
+      paths.push(fromPath)
+    }
+
+    for (const lookupPath of lookupPaths) {
+      if (paths.indexOf(lookupPath) === -1) {
+        paths.push(lookupPath)
+      }
+    }
+  }
+
+  return paths
 }
 
 export default resolveFilename

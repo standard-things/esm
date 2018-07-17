@@ -73,6 +73,7 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   const cache = shared.memoize.moduleESMResolveFilename
+
   const cacheKey = isObject(options)
     ? null
     : request + "\0" + getModuleName(parent) + "\0" + isMain
@@ -99,7 +100,9 @@ function resolveFilename(request, parent, isMain, options) {
   let foundPath
 
   if (! hasEncodedSep(request)) {
-    const isRel = ! isAbs && isRelativePath(request)
+    const isRel =
+      ! isAbs &&
+      isRelativePath(request)
 
     if (! isAbs &&
         ! isRel &&
@@ -166,31 +169,35 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
 
   if (options &&
       Array.isArray(options.paths)) {
-    const fakeParent = new Module("")
-    const fromPaths = options.paths
-
-    paths = []
-
-    for (const fromPath of fromPaths) {
-      fakeParent.paths = nodeModulePaths(fromPath)
-
-      const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
-
-      if (paths.indexOf(fromPath) === -1) {
-        paths.push(fromPath)
-      }
-
-      for (const lookupPath of lookupPaths) {
-        if (paths.indexOf(lookupPath) === -1) {
-          paths.push(lookupPath)
-        }
-      }
-    }
+    paths = resolveLookupPathsFrom(request, options.paths, skipGlobalPaths)
   } else {
     paths = _resolveLookupPaths(request, parent, skipGlobalPaths)
   }
 
   return _findPath(request, paths, isMain, fields, exts)
+}
+
+function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {
+  const fakeParent = new Module("")
+  const paths = []
+
+  for (const fromPath of fromPaths) {
+    fakeParent.paths = nodeModulePaths(fromPath)
+
+    const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
+
+    if (paths.indexOf(fromPath) === -1) {
+      paths.push(fromPath)
+    }
+
+    for (const lookupPath of lookupPaths) {
+      if (paths.indexOf(lookupPath) === -1) {
+        paths.push(lookupPath)
+      }
+    }
+  }
+
+  return paths
 }
 
 export default resolveFilename
