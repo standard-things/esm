@@ -10,6 +10,7 @@ import ENV from "../constant/env.js"
 import Module from "../module.js"
 
 import binding from "../binding.js"
+import extname from "../path/extname.js"
 import isMJS from "../util/is-mjs.js"
 import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
@@ -17,6 +18,7 @@ import realpath from "../fs/realpath.js"
 import safeToString from "../util/safe-to-string.js"
 import shared from "../shared.js"
 import statFast from "../fs/stat-fast.js"
+import statFastFallback from "../fs/stat-fast-fallback.js"
 
 const {
   BACKWARD_SLASH,
@@ -76,12 +78,22 @@ function findPath(request, paths, isMain, fields, exts) {
       continue
     }
 
-    let filename
-
     const thePath = resolve(curPath, request)
-    const rc = statFast(thePath)
+    const ext = extname(thePath)
+
+    let rc
+
+    if (ext === ".js" ||
+        ext === ".mjs") {
+      rc = statFastFallback(thePath)
+    } else {
+      rc = statFast(thePath)
+    }
+
     const isFile = rc === 0
     const isDir = rc === 1
+
+    let filename
 
     if (! trailingSlash) {
       if (isFile) {
