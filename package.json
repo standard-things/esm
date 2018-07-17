@@ -51,7 +51,7 @@
     "download": "^7.1.0",
     "eslint": "^5.1.0",
     "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-node": "^7.0.0",
     "execa": "^0.10.0",
     "express": "^4.16.3",
     "fs-extra": "^6.0.1",
