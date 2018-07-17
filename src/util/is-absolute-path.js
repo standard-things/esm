@@ -1,7 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
-import { isAbsolute } from "../safe/path.js"
+import isAbsolute from "../path/is-absolute.js"
 import shared from "../shared.js"
 
 function init() {

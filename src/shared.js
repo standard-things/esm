@@ -71,6 +71,7 @@ function init() {
       moduleReadPackage: { __proto__: null },
       pathDirname: { __proto__: null },
       pathExtname: { __proto__: null },
+      pathIsAbsolute: { __proto__: null },
       shimFunctionPrototypeToString: new WeakMap,
       shimProcessBindingUtilGetProxyDetails: new WeakMap,
       utilGetProxyDetails: new WeakMap,

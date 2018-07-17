@@ -2,8 +2,6 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import { isAbsolute, resolve } from "../safe/path.js"
-
 import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
@@ -13,10 +11,12 @@ import { Stats } from "../safe/fs.js"
 import binding from "../binding.js"
 import call from "../util/call.js"
 import extname from "../path/extname.js"
+import isAbsolute from "../path/is-absolute.js"
 import isMJS from "../util/is-mjs.js"
 import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
+import { resolve } from "../safe/path.js"
 import safeToString from "../util/safe-to-string.js"
 import shared from "../shared.js"
 import statFast from "../fs/stat-fast.js"
