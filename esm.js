@@ -1,10 +1,14 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const { apply, defineProperty } = Reflect
+const { apply, defineProperty, has } = Reflect
 const { freeze } = Object
-const { chakracore } = process.versions
+const { type, versions } = process
 const { filename, id } = module
+
+const isChakra = has(versions, "chakracore")
+const isElectron = has(versions, "electron")
+const isElectronRenderer = isElectron && type === "renderer"
 
 const bootstrap = id.startsWith("internal/")
   ? safeRequire("internal/bootstrap/loaders")
@@ -108,7 +112,8 @@ function compileESM() {
 
   let result
 
-  if (chakracore) {
+  if (isChakra ||
+      isElectronRenderer) {
     result = apply(runInThisContext, script, [options])
   } else {
     result = apply(runInNewContext, script, [{
