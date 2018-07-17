@@ -42,12 +42,6 @@ const resolveSymlinks = ! preserveSymlinks
 const resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain, fields, exts) {
-  if (isAbsolute(request)) {
-    paths = [""]
-  } else if (! paths || ! paths.length) {
-    return ""
-  }
-
   const cache = shared.memoize.moduleFindPath
 
   const cacheKey =
@@ -58,6 +52,12 @@ function findPath(request, paths, isMain, fields, exts) {
 
   if (Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
+  }
+
+  if (isAbsolute(request)) {
+    paths = [""]
+  } else if (! paths || ! paths.length) {
+    return ""
   }
 
   let trailingSlash = request.length > 0
@@ -79,7 +79,9 @@ function findPath(request, paths, isMain, fields, exts) {
        code === BACKWARD_SLASH)
   }
 
-  const useRealpath = isMain ? resolveSymlinksMain : resolveSymlinks
+  const useRealpath = isMain
+    ? resolveSymlinksMain
+    : resolveSymlinks
 
   for (const curPath of paths) {
     if (curPath &&
