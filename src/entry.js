@@ -261,11 +261,16 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parent) {
-    const setters =
-      this.setters[name] ||
-      (this.setters[name] = [])
+    const { bindings } = this
+    const settersMap = this.setters
 
+    const setters =
+      settersMap[name] ||
+      (settersMap[name] = [])
+
+    const last =
     setter.last = { __proto__: null }
+
     setter.localNames = localNames
     setter.parent = parent
 
@@ -276,7 +281,8 @@ class Entry {
     setters.push(setter)
 
     for (const name of localNames) {
-      this.bindings[name] = false
+      last[name] = void 0
+      bindings[name] = false
     }
 
     return this
@@ -614,17 +620,6 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
   }
 }
 
-function changed(setter, key, value) {
-  const { last } = setter
-
-  if (Object.is(last[key], value)) {
-    return false
-  }
-
-  last[key] = value
-  return true
-}
-
 function cjsNamespaceGetter(entry) {
   return (target, name) => {
     return name === "default"
@@ -896,11 +891,13 @@ function runSetter(entry, name, callback) {
         noopSetter.type = type
         callback(noopSetter)
       } else {
+        const { last } = setter
         const value = getExportByName(entry, setter, name)
 
         if ((isNsLoaded &&
              type === "dynamic") ||
-            changed(setter, name, value)) {
+            ! Object.is(last[name], value)) {
+          last[name] = value
           callback(setter, value)
         }
       }
