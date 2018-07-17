@@ -1,4 +1,4 @@
-import { statSync as _statSync } from "../safe/fs.js"
+import { lstatSync } from "../safe/fs.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,7 +10,11 @@ function init() {
       return cache[thePath]
     }
 
-    const result = _statSync(thePath)
+    let result = null
+
+    try {
+      result = lstatSync(thePath)
+    } catch (e) {}
 
     if (cache) {
       cache[thePath] = result

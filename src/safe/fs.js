@@ -26,7 +26,7 @@ export const {
   realpathSync,
   realpathNativeSync,
   Stats,
-  statSync,
+  lstatSync,
   unlinkSync,
   writeFileSync
 } = safeFs

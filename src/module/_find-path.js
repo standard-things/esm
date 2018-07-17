@@ -8,8 +8,10 @@ import CHAR_CODE from "../constant/char-code.js"
 import ENV from "../constant/env.js"
 
 import Module from "../module.js"
+import { Stats } from "../safe/fs.js"
 
 import binding from "../binding.js"
+import call from "../util/call.js"
 import extname from "../path/extname.js"
 import isMJS from "../util/is-mjs.js"
 import keys from "../util/keys.js"
@@ -18,7 +20,7 @@ import realpath from "../fs/realpath.js"
 import safeToString from "../util/safe-to-string.js"
 import shared from "../shared.js"
 import statFast from "../fs/stat-fast.js"
-import statFastFallback from "../fs/stat-fast-fallback.js"
+import statSync from "../fs/stat-sync.js"
 
 const {
   BACKWARD_SLASH,
@@ -30,9 +32,14 @@ const {
   WIN32
 } = ENV
 
+const { isFile, isSymbolicLink } = Stats.prototype
 const { preserveSymlinks, preserveSymlinksMain } = binding.config
+
 const mainFieldRegExp = /"main"/
 const mainFields = ["main"]
+
+const resolveSymlinks = ! preserveSymlinks
+const resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain, fields, exts) {
   if (isAbsolute(request)) {
@@ -72,6 +79,8 @@ function findPath(request, paths, isMain, fields, exts) {
        code === BACKWARD_SLASH)
   }
 
+  const useRealpath = isMain ? resolveSymlinksMain : resolveSymlinks
+
   for (const curPath of paths) {
     if (curPath &&
         statFast(curPath) !== 1) {
@@ -81,28 +90,31 @@ function findPath(request, paths, isMain, fields, exts) {
     const thePath = resolve(curPath, request)
     const ext = extname(thePath)
 
-    let rc
+    let rc = -1
+    let stat = null
 
     if (ext === ".js" ||
         ext === ".mjs") {
-      rc = statFastFallback(thePath)
+      stat = statSync(thePath)
+
+      if (stat) {
+        rc = call(isFile, stat) ? 0 : 1
+      }
     } else {
       rc = statFast(thePath)
     }
 
-    const isFile = rc === 0
-    const isDir = rc === 1
-
     let filename
 
     if (! trailingSlash) {
-      if (isFile) {
-        if (isMain
-            ? preserveSymlinksMain
-            : preserveSymlinks) {
-          filename = resolve(thePath)
-        } else {
+      // If a file.
+      if (rc === 0) {
+        if (useRealpath &&
+            (! stat ||
+             call(isSymbolicLink, stat))) {
           filename = realpath(thePath)
+        } else {
+          filename = thePath
         }
       }
 
@@ -115,7 +127,9 @@ function findPath(request, paths, isMain, fields, exts) {
       }
     }
 
-    if (isDir && ! filename) {
+    // If a directory.
+    if (rc === 1 &&
+        ! filename) {
       if (exts === void 0) {
         exts = keys(Module._extensions)
       }

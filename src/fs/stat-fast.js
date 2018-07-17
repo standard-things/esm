@@ -1,9 +1,14 @@
+import { Stats } from "../safe/fs.js"
+
 import binding from "../binding.js"
+import call from "../util/call.js"
 import shared from "../shared.js"
-import statFastFallback from "./stat-fast-fallback.js"
+import statSync from "./stat-sync.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
+  const { isFile } = Stats.prototype
+
   let useFastPath
 
   function statFast(thePath) {
@@ -35,12 +40,20 @@ function init() {
     if (useFastPath) {
       try {
         return statFastPath(thePath)
-      } catch (e) {
-        useFastPath = false
-      }
+      } catch (e) {}
+
+      useFastPath = false
     }
 
     return statFastFallback(thePath)
+  }
+
+  function statFastFallback(thePath) {
+    try {
+      return call(isFile, statSync(thePath)) ? 0 : 1
+    } catch (e) {}
+
+    return -1
   }
 
   function statFastPath(thePath) {
