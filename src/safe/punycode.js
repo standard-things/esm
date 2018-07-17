@@ -8,6 +8,6 @@ const safePunycode = shared.inited
 
 export const toUnicode = safePunycode
   ? safePunycode.toUnicode
-  : null
+  : void 0
 
 export default safePunycode

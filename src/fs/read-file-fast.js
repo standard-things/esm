@@ -25,9 +25,9 @@ function init() {
         options === "utf8") {
       try {
         return readFileFastPath(filename, options)
-      } catch (e) {
-        useFastPath = false
-      }
+      } catch (e) {}
+
+      useFastPath = false
     }
 
     return readFile(filename, options)
