@@ -38,8 +38,8 @@ const { preserveSymlinks, preserveSymlinksMain } = binding.config
 const mainFieldRegExp = /"main"/
 const mainFields = ["main"]
 
-const resolveSymlinks = ! preserveSymlinks
-const resolveSymlinksMain = ! preserveSymlinksMain
+let resolveSymlinks = ! preserveSymlinks
+let resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain, fields, exts) {
   const cache = shared.memoize.moduleFindPath
@@ -92,6 +92,7 @@ function findPath(request, paths, isMain, fields, exts) {
     const thePath = resolve(curPath, request)
     const ext = extname(thePath)
 
+    let isSymlink = false
     let rc = -1
     let stat = null
 
@@ -100,7 +101,13 @@ function findPath(request, paths, isMain, fields, exts) {
       stat = statSync(thePath)
 
       if (stat) {
-        rc = call(isFile, stat) ? 0 : 1
+        isSymlink = call(isSymbolicLink, stat)
+
+        if (isSymlink) {
+          rc = statFast(thePath)
+        } else {
+          rc = call(isFile, stat) ? 0 : 1
+        }
       }
     } else {
       rc = statFast(thePath)
@@ -113,7 +120,7 @@ function findPath(request, paths, isMain, fields, exts) {
       if (rc === 0) {
         if (useRealpath &&
             (! stat ||
-             call(isSymbolicLink, stat))) {
+             isSymlink)) {
           filename = realpath(thePath)
         } else {
           filename = thePath
@@ -202,17 +209,44 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 }
 
 function tryFilename(filename, isMain) {
-  if (statFast(filename)) {
+  const ext = extname(filename)
+
+  let isSymlink = false
+  let rc = -1
+  let stat = null
+
+  if (ext === ".js" ||
+      ext === ".mjs") {
+    stat = statSync(filename)
+
+    if (stat) {
+      isSymlink = call(isSymbolicLink, stat)
+
+      if (isSymlink) {
+        rc = statFast(filename)
+      } else {
+        rc = call(isFile, stat) ? 0 : 1
+      }
+    }
+  } else {
+    rc = statFast(filename)
+  }
+
+  if (rc) {
     return ""
   }
 
-  if (isMain
-      ? preserveSymlinksMain
-      : preserveSymlinks) {
-    return resolve(filename)
+  const useRealpath = isMain
+    ? resolveSymlinksMain
+    : resolveSymlinks
+
+  if (useRealpath &&
+      (! stat ||
+       isSymlink)) {
+    return realpath(filename)
   }
 
-  return realpath(filename)
+  return filename
 }
 
 function tryPackage(dirPath, fields, exts, isMain) {
