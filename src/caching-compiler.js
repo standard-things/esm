@@ -302,11 +302,16 @@ function init() {
 
       const cache = dir[cachePath]
       const compileDatas = cache.compile
+      const { map } = cache
       const scripts = pendingScripts[cachePath]
 
       for (const cacheName in scripts) {
         const compileData = compileDatas[cacheName]
         const script = scripts[cacheName]
+
+        const meta = has(map, cacheName)
+          ? map[cacheName]
+          : null
 
         let cachedData
 
@@ -319,9 +324,13 @@ function init() {
         let changed = false
 
         if (! cachedData) {
-          scriptData = useCreateCachedData
-            ? script.createCachedData()
-            : script.cachedData
+          if (useCreateCachedData &&
+              (! meta ||
+               script.cachedDataRejected)) {
+            scriptData = script.createCachedData()
+          } else {
+            scriptData = script.cachedData
+          }
         }
 
         if (scriptData &&
@@ -335,12 +344,6 @@ function init() {
           } else if (cachedData &&
               script.cachedDataRejected) {
             changed = true
-
-            const { map } = cache
-
-            const meta = has(map, cacheName)
-              ? map[cacheName]
-              : null
 
             if (meta) {
               meta[0] =
