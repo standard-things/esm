@@ -30,17 +30,6 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  if (Reflect.has(builtinLookup, request)) {
-    return request
-  }
-
-  // Electron patches `Module._resolveFilename` to return its path.
-  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
-  if (ELECTRON &&
-      request === "electron") {
-    return SafeModule._resolveFilename(request)
-  }
-
   const cache = shared.memoize.moduleCJSResolveFilename
 
   const cacheKey = isObject(options)
@@ -50,6 +39,17 @@ function resolveFilename(request, parent, isMain, options) {
   if (cacheKey &&
       Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
+  }
+
+  if (Reflect.has(builtinLookup, request)) {
+    return cache[cacheKey] = request
+  }
+
+  // Electron patches `Module._resolveFilename` to return its path.
+  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
+  if (ELECTRON &&
+      request === "electron") {
+    return cache[cacheKey] = SafeModule._resolveFilename(request)
   }
 
   const parentFilename = parent && parent.filename
