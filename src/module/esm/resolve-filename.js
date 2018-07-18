@@ -16,10 +16,11 @@ import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import getModuleDirname from "../../util/get-module-dirname.js"
 import getModuleName from "../../util/get-module-name.js"
 import hasEncodedSep from "../../path/has-encoded-sep.js"
-import isAbsolutePath from "../../util/is-absolute-path.js"
+import isAbsolute from "../../path/is-absolute.js"
+import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
 import isObject from "../../util/is-object.js"
-import isRelativePath from "../../util/is-relative-path.js"
+import isRelative from "../../path/is-relative.js"
 import nodeModulePaths from "../node-module-paths.js"
 import parseURL from "../../util/parse-url.js"
 import shared from "../../shared.js"
@@ -83,7 +84,7 @@ function resolveFilename(request, parent, isMain, options) {
     return cache[cacheKey]
   }
 
-  const isAbs = isAbsolutePath(request)
+  const isAbs = isAbsolute(request)
   const fromPath = getModuleDirname(isAbs ? request : parent)
   const pkgOptions = Package.get(fromPath).options
 
@@ -102,7 +103,7 @@ function resolveFilename(request, parent, isMain, options) {
   if (! hasEncodedSep(request)) {
     const isRel =
       ! isAbs &&
-      isRelativePath(request)
+      isRelative(request)
 
     if (! isAbs &&
         ! isRel &&
@@ -126,20 +127,23 @@ function resolveFilename(request, parent, isMain, options) {
 
       if (isAbs ||
           isRel) {
+        const paths = isAbs ? [""] : [fromPath]
+
         pathname = pathname.replace(queryHashRegExp, "")
+        pathname = decodeURIComponent(pathname)
+        foundPath = _findPath(pathname, paths, isMain, fields, strictExts)
+      } else {
+        // Prevent resolving non-local dependencies:
+        // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
+        const skipGlobalPaths = ! cjsPaths
+
+        pathname = decodeURIComponent(pathname)
+        foundPath = _resolveFilename(pathname, parent, isMain, options, fields, strictExts, skipGlobalPaths)
       }
 
-      const decoded = decodeURIComponent(pathname)
-
-      // Prevent resolving non-local dependencies:
-      // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
-      const skipGlobalPaths = ! cjsPaths
-
-      foundPath = _resolveFilename(decoded, parent, isMain, options, fields, strictExts, skipGlobalPaths)
-
       if (! foundPath &&
-          Reflect.has(builtinLookup, decoded)) {
-        return cache[cacheKey] = decoded
+          Reflect.has(builtinLookup, pathname)) {
+        return cache[cacheKey] = pathname
       }
     }
   }
@@ -148,6 +152,8 @@ function resolveFilename(request, parent, isMain, options) {
     if (autoMode ||
         cjsPaths ||
         isMain ||
+        isJS(foundPath) ||
+        isMJS(foundPath) ||
         Reflect.has(strictExtsLookup, extname(foundPath))) {
       return cache[cacheKey] = foundPath
     }

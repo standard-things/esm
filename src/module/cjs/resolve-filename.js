@@ -9,8 +9,11 @@ import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
 import errors from "../../errors.js"
+import findPath from "../find-path.js"
 import getModuleName from "../../util/get-module-name.js"
 import isObject from "../../util/is-object.js"
+import isPath from "../../util/is-path.js"
+import resolveLookupPaths from "../resolve-lookup-paths.js"
 import shared from "../../shared.js"
 
 const {
@@ -49,9 +52,16 @@ function resolveFilename(request, parent, isMain, options) {
     return cache[cacheKey]
   }
 
+  const parentFilename = parent && parent.filename
+
   let paths
 
-  if (! cacheKey &&
+  if (parentFilename &&
+      Module._findPath === findPath &&
+      Module._resolveLookupPaths === resolveLookupPaths &&
+      isPath(request)) {
+    paths = [parentFilename]
+  } else if (! cacheKey &&
       Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths)
   } else {
