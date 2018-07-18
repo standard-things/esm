@@ -9,7 +9,7 @@ import GenericArray from "../generic/array.js"
 import Module from "../module.js"
 
 import dirname from "../path/dirname.js"
-import isRelativePath from "../util/is-relative-path.js"
+import isRelative from "../path/is-relative.js"
 import moduleState from "./state.js"
 import nodeModulePaths from "./node-module-paths.js"
 
@@ -27,7 +27,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   const parentFilename = parent && parent.filename
 
   // Look outside if not a relative path.
-  if (! isRelativePath(request)) {
+  if (! isRelative(request)) {
     const parentPaths = parent && parent.paths
     const paths = parentPaths
       ? GenericArray.from(parentPaths)

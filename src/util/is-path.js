@@ -1,10 +1,10 @@
-import isAbsolutePath from "./is-absolute-path.js"
-import isRelativePath from "./is-relative-path.js"
+import isAbsolute from "../path/is-absolute.js"
+import isRelative from "../path/is-relative.js"
 import shared from "../shared.js"
 
 function init() {
   function isPath(value) {
-    return isRelativePath(value) || isAbsolutePath(value)
+    return isRelative(value) || isAbsolute(value)
   }
 
   return isPath

@@ -10,7 +10,7 @@ function init() {
     FORWARD_SLASH
   } = CHAR_CODE
 
-  function isRelativePath(value) {
+  function isRelative(value) {
     if (typeof value !== "string") {
       return false
     }
@@ -21,21 +21,27 @@ function init() {
       return false
     }
 
+    const cache = shared.memoize.pathIsRelative
+
+    if (Reflect.has(cache, value)) {
+      return cache[value]
+    }
+
     let code = value.charCodeAt(0)
 
     if (code !== DOT) {
-      return false
+      return cache[value] = false
     }
 
     if (length === 1) {
-      return true
+      return cache[value] = true
     }
 
     code = value.charCodeAt(1)
 
     if (code === DOT) {
       if (length === 2) {
-        return true
+        return cache[value] = true
       }
 
       code = value.charCodeAt(2)
@@ -47,15 +53,15 @@ function init() {
 
     if (WIN32 &&
         code === BACKWARD_SLASH) {
-      return true
+      return cache[value] = true
     }
 
-    return code === FORWARD_SLASH
+    return cache[value] = code === FORWARD_SLASH
   }
 
-  return isRelativePath
+  return isRelative
 }
 
 export default shared.inited
-  ? shared.module.utilIsRelativePath
-  : shared.module.utilIsRelativePath = init()
+  ? shared.module.pathIsRelativePath
+  : shared.module.pathIsRelativePath = init()
