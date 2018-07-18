@@ -678,84 +678,90 @@ function esmNamespaceGetter(entry) {
 }
 
 function getExportByName(entry, setter, name) {
-  const { _namespace, type } = entry
-  const isCJS = type === TYPE_CJS
-  const isPseudo = type === TYPE_PSEUDO
+  const { _namespace, getters, type } = entry
+  const isESM = type === TYPE_ESM
   const mod = entry.module
-  const parentEntry = setter.parent
-  const parentIsMJS = isMJS(parentEntry.module)
-  const parentOptions = parentEntry.package.options
 
-  const parentMutableNamespace =
-    ! parentIsMJS &&
-    parentOptions.cjs.mutableNamespace
+  let noNamedExports
 
-  const parentNamedExports =
-    entry.builtin ||
-    (! parentIsMJS &&
-     parentOptions.cjs.namedExports)
+  if (! isESM ||
+      name === "*") {
+    const isCJS = type === TYPE_CJS
+    const isPseudo = type === TYPE_PSEUDO
 
-  const noMutableNamespace =
-    ! parentMutableNamespace ||
-    isMJS(mod)
+    const parentEntry = setter.parent
+    const parentOptions = parentEntry.package.options
+    const parentIsMJS = isMJS(parentEntry.module)
 
-  const noNamedExports =
-    (isCJS &&
-     ! parentNamedExports) ||
-    (isPseudo &&
-     parentIsMJS)
+    const parentMutableNamespace =
+      ! parentIsMJS &&
+      parentOptions.cjs.mutableNamespace
 
-  if (isCJS &&
-      parentNamedExports &&
-      entry.namespace === _namespace) {
-    const proxy = new OwnProxy(_namespace, {
-      get(target, name, receiver) {
-        const exported = proxyExports(entry)
+    const parentNamedExports =
+      entry.builtin ||
+      (! parentIsMJS &&
+      parentOptions.cjs.namedExports)
 
-        if (name === "default") {
-          return exported
+    const noMutableNamespace =
+      ! parentMutableNamespace ||
+      isMJS(mod)
+
+    noNamedExports =
+      (isCJS &&
+      ! parentNamedExports) ||
+      (isPseudo &&
+      parentIsMJS)
+
+    if (isCJS &&
+        parentNamedExports &&
+        entry.namespace === _namespace) {
+      const proxy = new OwnProxy(_namespace, {
+        get(target, name, receiver) {
+          const exported = proxyExports(entry)
+
+          if (name === "default") {
+            return exported
+          }
+
+          let object = target
+
+          if (name !== Symbol.toStringTag &&
+              has(exported, name)) {
+            object = exported
+          }
+
+          if (receiver === proxy) {
+            receiver = object
+          }
+
+          return Reflect.get(object, name, receiver)
         }
+      })
 
-        let object = target
-
-        if (name !== Symbol.toStringTag &&
-            has(exported, name)) {
-          object = exported
-        }
-
-        if (receiver === proxy) {
-          receiver = object
-        }
-
-        return Reflect.get(object, name, receiver)
-      }
-    })
-
-    // Lazily assign proxied namespace object.
-    entry.namespace = proxy
-  }
-
-  if (name === "*") {
-    if (noMutableNamespace) {
-      return noNamedExports
-        ? entry.cjsNamespace
-        : entry.esmNamespace
+      // Lazily assign proxied namespace object.
+      entry.namespace = proxy
     }
 
-    return noNamedExports
-      ? entry.cjsMutableNamespace
-      : entry.esmMutableNamespace
-  }
+    if (name === "*") {
+      if (noMutableNamespace) {
+        return noNamedExports
+          ? entry.cjsNamespace
+          : entry.esmNamespace
+      }
 
-  if (isPseudo &&
-      noNamedExports &&
-      name === "default") {
-    return noMutableNamespace
-      ? entry.cjsNamespace.default
-      : entry.cjsMutableNamespace.default
-  }
+      return noNamedExports
+        ? entry.cjsMutableNamespace
+        : entry.esmMutableNamespace
+    }
 
-  const { getters } = entry
+    if (isPseudo &&
+        noNamedExports &&
+        name === "default") {
+      return noMutableNamespace
+        ? entry.cjsNamespace.default
+        : entry.cjsMutableNamespace.default
+    }
+  }
 
   if ((noNamedExports &&
        name !== "default") ||
