@@ -12,10 +12,10 @@ import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import dirname from "./path/dirname.js"
 import errors from "./errors.js"
-import extname from "./path/extname.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isFile from "./util/is-file.js"
+import isJSON from "./path/is-json.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import loadESM from "./module/esm/load.js"
@@ -240,7 +240,7 @@ function clearBabelCache(cachePath) {
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
-    if (extname(cacheName) === ".json") {
+    if (isJSON(cacheName)) {
       removeFile(babelCachePath + sep + cacheName)
     }
   }
@@ -516,7 +516,7 @@ function readInfo(dirPath, force) {
       optionsPath) {
     optionsFound = true
 
-    if (extname(optionsPath) === ".json") {
+    if (isJSON(optionsPath)) {
       options = readJSON6(optionsPath)
     } else {
       const { moduleState } = shared
