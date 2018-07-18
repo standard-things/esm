@@ -32,8 +32,8 @@ function init() {
     const { length } = filename
 
     return length > 5 &&
-      filename.charCodeAt(length - 5) === DOT &&
       filename.charCodeAt(length - 4) === LOWERCASE_J &&
+      filename.charCodeAt(length - 5) === DOT &&
       filename.charCodeAt(length - 3) === LOWERCASE_S &&
       filename.charCodeAt(length - 2) === LOWERCASE_O &&
       filename.charCodeAt(length - 1) === LOWERCASE_N
