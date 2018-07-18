@@ -10,9 +10,9 @@ import { Stats } from "../safe/fs.js"
 
 import binding from "../binding.js"
 import call from "../util/call.js"
-import extname from "../path/extname.js"
 import isAbsolute from "../path/is-absolute.js"
-import isMJS from "../util/is-mjs.js"
+import isJS from "../path/is-js.js"
+import isMJS from "../path/is-mjs.js"
 import keys from "../util/keys.js"
 import readFileFast from "../fs/read-file-fast.js"
 import realpath from "../fs/realpath.js"
@@ -90,23 +90,24 @@ function findPath(request, paths, isMain, fields, exts) {
     }
 
     const thePath = resolve(curPath, request)
-    const ext = extname(thePath)
 
     let isSymlink = false
     let rc = -1
     let stat = null
 
-    if (ext === ".js" ||
-        ext === ".mjs") {
+    if (isJS(thePath) ||
+        isMJS(thePath)) {
       stat = statSync(thePath)
 
       if (stat) {
-        isSymlink = call(isSymbolicLink, stat)
+        rc = call(isFile, stat) ? 0 : 1
 
-        if (isSymlink) {
-          rc = statFast(thePath)
-        } else {
-          rc = call(isFile, stat) ? 0 : 1
+        if (rc) {
+          isSymlink = call(isSymbolicLink, stat)
+
+          if (isSymlink) {
+            rc = statFast(thePath)
+          }
         }
       }
     } else {
@@ -209,23 +210,23 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 }
 
 function tryFilename(filename, isMain) {
-  const ext = extname(filename)
-
   let isSymlink = false
   let rc = -1
   let stat = null
 
-  if (ext === ".js" ||
-      ext === ".mjs") {
+  if (isJS(filename) ||
+      isMJS(filename)) {
     stat = statSync(filename)
 
     if (stat) {
-      isSymlink = call(isSymbolicLink, stat)
+      rc = call(isFile, stat) ? 0 : 1
 
-      if (isSymlink) {
-        rc = statFast(filename)
-      } else {
-        rc = call(isFile, stat) ? 0 : 1
+      if (rc) {
+        isSymlink = call(isSymbolicLink, stat)
+
+        if (isSymlink) {
+          rc = statFast(filename)
+        }
       }
     }
   } else {
