@@ -766,7 +766,11 @@ function getExportByName(entry, setter, name) {
     throw new ERR_EXPORT_MISSING(mod, name)
   }
 
-  const value = tryGetter(getters[name])
+  const getter = getters[name]
+
+  const value = getter
+    ? tryGetter(getter)
+    : GETTER_ERROR
 
   if (value === STAR_ERROR) {
     throw new ERR_EXPORT_STAR_CONFLICT(mod, name)
@@ -830,7 +834,11 @@ function mergeProperty(entry, otherEntry, key) {
 
 function runGetter(entry, name) {
   const { _namespace } = entry
-  const value = tryGetter(entry.getters[name])
+  const getter = entry.getters[name]
+
+  const value = getter
+    ? tryGetter(getter)
+    : GETTER_ERROR
 
   if (value !== GETTER_ERROR &&
       ! (Reflect.has(_namespace, name) &&
