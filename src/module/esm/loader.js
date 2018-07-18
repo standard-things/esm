@@ -3,7 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import Module from "../../module.js"
 
 import extname from "../../path/extname.js"
-import isMJS from "../../util/is-mjs.js"
+import isMJS from "../../path/is-mjs.js"
 import moduleState from "../state.js"
 import shared from "../../shared.js"
 

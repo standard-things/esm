@@ -2,7 +2,7 @@ import ENTRY from "../../constant/entry.js"
 
 import _loadESM from "./_load.js"
 import errors from "../../errors.js"
-import isMJS from "../../util/is-mjs.js"
+import isMJS from "../../path/is-mjs.js"
 
 const {
   STATE_PARSING_COMPLETED,
