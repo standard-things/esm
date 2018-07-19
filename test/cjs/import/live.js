@@ -31,7 +31,7 @@ const path3 = require("path")
 const process3 = require("process")
 const regexp3 = require("../../fixture/cjs/export/regexp.js")
 
-const canTestSubclassing = SemVer.satisfies(process.version, ">=6.5.0")
+const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
 
 function funcToString(func) {
   return Function.prototype.toString.call(func)
@@ -269,7 +269,7 @@ export default () => {
     assert.strictEqual(void 0 instanceof Ctor, false)
     assert.strictEqual("" instanceof Ctor, false)
 
-    if (canTestSubclassing) {
+    if (canTestHasInstance) {
       assert.ok(stream instanceof Ctor)
       assert.ok(subEvents1 instanceof Ctor)
       assert.ok(subEvents3 instanceof Ctor)

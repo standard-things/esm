@@ -47,7 +47,8 @@ function createEntry(id) {
 
     const proxyFunc = new OwnProxy(func, {
       get(target, name, receiver) {
-        if (receiver === proxyFunc) {
+        if (receiver === exported ||
+            receiver === proxyFunc) {
           receiver = target
         }
 
@@ -57,6 +58,8 @@ function createEntry(id) {
 
         if (name === Symbol.hasInstance) {
           newValue = hasInstance
+        } else if (value === func) {
+          newValue = exported
         } else if (value === prototype) {
           newValue = proxyProto
         }
