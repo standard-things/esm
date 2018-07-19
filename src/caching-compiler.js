@@ -11,7 +11,6 @@ import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
 import has from "./util/has.js"
-import isCacheName from "./util/is-cache-name.js"
 import isMJS from "./path/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
@@ -86,14 +85,11 @@ function init() {
         entry.type = TYPE_CJS
       }
 
-      const { buffer } = cache
-      const offsetStart = meta[0]
-      const offsetEnd = meta[1]
+      const [offsetStart, offsetEnd] = meta
 
-      if (buffer &&
-          offsetStart !== -1 &&
+      if (offsetStart !== -1 &&
           offsetEnd !== -1) {
-        result.scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
+        result.scriptData = GenericBuffer.slice(cache.buffer, offsetStart, offsetEnd)
       }
 
       entry.compileData =
@@ -195,23 +191,16 @@ function init() {
     return result
   }
 
-  function removeCacheFile(cachePath, cacheName) {
-    const cache = shared.package.dir[cachePath]
-
-    Reflect.deleteProperty(cache.compile, cacheName)
-    Reflect.deleteProperty(cache.map, cacheName)
-    removeFile(cachePath + sep + cacheName)
-  }
-
   function removeExpired(cachePath, cacheName) {
     const cache = shared.package.dir[cachePath]
     const pathHash = getCachePathHash(cacheName)
 
     for (const otherCacheName in cache) {
       if (otherCacheName !== cacheName &&
-          otherCacheName.startsWith(pathHash) &&
-          isCacheName(otherCacheName)) {
-        removeCacheFile(cachePath, cacheName)
+          otherCacheName.startsWith(pathHash)) {
+        Reflect.deleteProperty(cache.compile, otherCacheName)
+        Reflect.deleteProperty(cache.map, otherCacheName)
+        removeFile(cachePath + sep + otherCacheName)
       }
     }
   }
@@ -219,7 +208,7 @@ function init() {
   function toCompileOptions(entry, options) {
     const { runtimeName } = entry
 
-    const cjs = isMJS(entry.module)
+    const cjs = isMJS(entry.module.filename)
       ? void 0
       : entry.package.options.cjs
 
@@ -264,6 +253,13 @@ function init() {
         continue
       }
 
+      if (! mkdirp(cachePath)) {
+        Reflect.deleteProperty(dir, cachePath)
+        Reflect.deleteProperty(pendingScripts, cachePath)
+        Reflect.deleteProperty(pendingWrites, cachePath)
+        continue
+      }
+
       if (NYC) {
         writeMarker(cachePath + sep + ".nyc")
       }
@@ -274,21 +270,16 @@ function init() {
         continue
       }
 
+      Reflect.deleteProperty(dir, cachePath)
       Reflect.deleteProperty(pendingScripts, cachePath)
       Reflect.deleteProperty(pendingWrites, cachePath)
 
-      if (! mkdirp(cachePath)) {
-        continue
-      }
-
       writeMarker(cachePath + sep + ".dirty")
+      removeFile(cachePath + sep + ".data.blob")
+      removeFile(cachePath + sep + ".data.json")
 
       for (const cacheName in cache.compile) {
-        if (cacheName === ".data.blob" ||
-            cacheName === ".data.json" ||
-            isCacheName(cacheName)) {
-          removeCacheFile(cachePath, cacheName)
-        }
+        removeFile(cachePath + sep + cacheName)
       }
     }
 
@@ -296,10 +287,6 @@ function init() {
     const useCreateCachedData = shared.support.createCachedData
 
     for (const cachePath in pendingScripts) {
-      if (! mkdirp(cachePath)) {
-        continue
-      }
-
       const cache = dir[cachePath]
       const compileDatas = cache.compile
       const { map } = cache
@@ -307,18 +294,12 @@ function init() {
 
       for (const cacheName in scripts) {
         const compileData = compileDatas[cacheName]
+        const cachedData = compileData && compileData.scriptData
         const script = scripts[cacheName]
 
         const meta = has(map, cacheName)
           ? map[cacheName]
           : null
-
-        let cachedData
-
-        if (compileData &&
-            compileData !== true) {
-          cachedData = compileData.scriptData
-        }
 
         let scriptData
         let changed = false
@@ -368,38 +349,17 @@ function init() {
 
     for (const cachePath in pendingScriptDatas) {
       const cache = dir[cachePath]
+      const { buffer, map } = cache
       const compileDatas = cache.compile
       const scriptDatas = pendingScriptDatas[cachePath]
 
-      for (const cacheName in compileDatas) {
-        const compileData = compileDatas[cacheName]
-
-        if (compileData &&
-            compileData !== true &&
-            ! scriptDatas[cacheName]) {
-          scriptDatas[cacheName] = compileData.scriptData
-        }
-      }
-
-      const buffers = []
-      const map = { __proto__: null }
-
-      let offset = 0
-
       for (const cacheName in scriptDatas) {
-        let offsetStart = -1
-        let offsetEnd = -1
-
-        const scriptData = scriptDatas[cacheName]
-
-        if (scriptData) {
-          offsetStart = offset
-          offsetEnd = offset += scriptData.length
-          buffers.push(scriptData)
+        if (map[cacheName]) {
+          continue
         }
 
         const compileData = compileDatas[cacheName]
-        const meta = [offsetStart, offsetEnd]
+        const meta = [-1, -1]
 
         if (compileData) {
           const changed = +compileData.changed
@@ -435,6 +395,33 @@ function init() {
         map[cacheName] = meta
       }
 
+      const buffers = []
+
+      let offset = 0
+
+      for (const cacheName in map) {
+        const meta = map[cacheName]
+        const [offsetStart, offsetEnd] = meta
+        const compileData = compileDatas[cacheName]
+
+        let scriptData = scriptDatas[cacheName]
+
+        if (scriptData === void 0) {
+          if (compileData) {
+            scriptData = compileData.scriptData
+          } else if (offsetStart !== -1 &&
+              offsetEnd !== -1) {
+            scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
+          }
+        }
+
+        if (scriptData) {
+          meta[0] = offset
+          meta[1] = offset += scriptData.length
+          buffers.push(scriptData)
+        }
+      }
+
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
       writeFile(cachePath + sep + ".data.json", JSON.stringify({
         version: PKG_VERSION,
@@ -444,10 +431,6 @@ function init() {
     }
 
     for (const cachePath in pendingWrites) {
-      if (! mkdirp(cachePath)) {
-        continue
-      }
-
       const entries = pendingWrites[cachePath]
 
       for (const cacheName in entries) {
