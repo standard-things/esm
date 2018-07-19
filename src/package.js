@@ -17,6 +17,7 @@ import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
 import isJSON from "./path/is-json.js"
+import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import loadESM from "./module/esm/load.js"
@@ -173,28 +174,36 @@ class Package {
         let bufferData
         let jsonData
 
-        if (hasDirtyMarker) {
-          removeFile(cachePath + sep + ".dirty")
-        }
-
-        if (noNycHasMarker) {
-          removeFile(cachePath + sep + ".nyc")
-        }
-
         if (hasMap &&
             ! isCacheInvalid) {
           jsonData = readJSON(cachePath + sep + ".data.json")
 
-          isCacheInvalid =
-            ! has(jsonData, "version") ||
-            jsonData.version !== PKG_VERSION
+          if (jsonData &&
+              has(jsonData, "version") &&
+              jsonData.version === PKG_VERSION &&
+              has(jsonData, "map") &&
+              isObject(jsonData.map)) {
+            Reflect.setPrototypeOf(jsonData.map, null)
+          } else {
+            isCacheInvalid = true
+          }
         }
 
         if (isCacheInvalid) {
           hasBuffer =
           hasMap = false
+
           compileDatas = { __proto__: null }
           jsonData = void 0
+
+          if (hasDirtyMarker) {
+            removeFile(cachePath + sep + ".dirty")
+          }
+
+          if (noNycHasMarker) {
+            removeFile(cachePath + sep + ".nyc")
+          }
+
           clearBabelCache(cachePath)
         }
 
@@ -206,9 +215,9 @@ class Package {
           bufferData ||
           GenericBuffer.alloc(0)
 
-        cache.map = has(jsonData, "map")
+        cache.map = jsonData
           ? jsonData.map
-          : {}
+          : { __proto__: null }
       }
 
       cache.compile = compileDatas

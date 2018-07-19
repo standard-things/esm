@@ -10,7 +10,6 @@ import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
-import has from "./util/has.js"
 import isMJS from "./path/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
@@ -53,10 +52,7 @@ function init() {
       const { cache } = entry.package
       const { cacheName } = entry
       const { map } = cache
-
-      const meta = has(map, cacheName)
-        ? map[cacheName]
-        : null
+      const meta = map[cacheName]
 
       if (! meta) {
         return null
@@ -318,9 +314,7 @@ function init() {
               script.cachedDataRejected) {
             changed = true
 
-            const meta = has(map, cacheName)
-              ? map[cacheName]
-              : null
+            const meta = map[cacheName]
 
             if (meta) {
               meta[0] =
@@ -350,9 +344,7 @@ function init() {
       const scriptDatas = pendingScriptDatas[cachePath]
 
       for (const cacheName in scriptDatas) {
-        let meta = has(map, cacheName)
-          ? map[cacheName]
-          : null
+        let meta = map[cacheName]
 
         if (meta) {
           continue
@@ -401,9 +393,7 @@ function init() {
       let offset = 0
 
       for (const cacheName in map) {
-        const meta = has(map, cacheName)
-          ? map[cacheName]
-          : null
+        const meta = map[cacheName]
 
         if (! meta) {
           continue
