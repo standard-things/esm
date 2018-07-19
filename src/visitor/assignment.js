@@ -43,7 +43,7 @@ function init() {
 
     // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {
-      if (importedLocals[name] === true &&
+      if (importedLocals[name] &&
           ! isShadowed(path, name, shadowedMap)) {
         throw new errors.TypeError(
           magicString.original,
@@ -54,7 +54,7 @@ function init() {
     }
 
     for (const name of names) {
-      if (assignableExports[name] === true &&
+      if (assignableExports[name] &&
           ! isShadowed(path, name, shadowedMap)) {
         // Wrap assignments to exported identifiers.
         magicString

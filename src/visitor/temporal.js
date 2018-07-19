@@ -28,7 +28,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (this.temporals[name] !== true ||
+      if (! this.temporals[name] ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
