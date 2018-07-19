@@ -28,7 +28,7 @@ function loader(entry, filename, parentEntry, preload) {
   if (ext === ".js" ||
       (parentEntry &&
        parentEntry.package.options.cjs.extensions &&
-       ! isMJS(parent))) {
+       ! isMJS(parent.filename))) {
     _extensions = Module._extensions
   }
 

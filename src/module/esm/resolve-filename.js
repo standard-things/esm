@@ -92,7 +92,8 @@ function resolveFilename(request, parent, isMain, options) {
   let cjsPaths = pkgOptions.cjs.paths
   let fields = pkgOptions.mainFields
 
-  if (isMJS(parent)) {
+  if (parent &&
+      isMJS(parent.filename)) {
     autoMode =
     cjsPaths = false
     fields = strictFields

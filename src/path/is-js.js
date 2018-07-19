@@ -1,6 +1,5 @@
 import CHAR_CODE from "../constant/char-code.js"
 
-import isObject from "../util/is-object.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,23 +9,11 @@ function init() {
     LOWERCASE_S
   } = CHAR_CODE
 
-  function isJS(request) {
-    if (typeof request === "string") {
-      return endsWithJS(request)
+  function isJS(filename) {
+    if (typeof filename !== "string") {
+      return false
     }
 
-    if (isObject(request)) {
-      const { filename } = request
-
-      if (typeof filename === "string") {
-        return endsWithJS(filename)
-      }
-    }
-
-    return false
-  }
-
-  function endsWithJS(filename) {
     const { length } = filename
 
     return length > 3 &&

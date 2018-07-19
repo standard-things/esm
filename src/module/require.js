@@ -30,7 +30,7 @@ const req = function require(request) {
   }
 
   const parentEntry =
-    isMJS(this) &&
+    isMJS(this.filename) &&
     Entry.get(this)
 
   if (parentEntry &&

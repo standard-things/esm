@@ -277,8 +277,8 @@ function useAsyncWrapper(entry) {
   return entry.package.options.await &&
     shared.support.await &&
     (entry.type !== TYPE_ESM ||
-     (isObjectEmpty(entry.compileData.exportedSpecifiers) &&
-      ! isMJS(entry.module)))
+     (! isMJS(entry.module.filename) &&
+      isObjectEmpty(entry.compileData.exportedSpecifiers)))
 }
 
 export default compile

@@ -253,6 +253,7 @@ function getEntryFrom(request, exported) {
 
 function importModule(entry, request, setterArgsList, loader) {
   const mod = entry.module
+  const { filename } = mod
   const { moduleState } = shared
 
   let child
@@ -268,8 +269,8 @@ function importModule(entry, request, setterArgsList, loader) {
       child = childEntry.module
 
       if (childEntry.type === TYPE_ESM &&
-          isMJS(mod) &&
-          ! isMJS(child)) {
+          isMJS(filename) &&
+          ! isMJS(child.filename)) {
         throw ERR_INVALID_ESM_FILE_EXTENSION(child)
       }
 
@@ -285,7 +286,7 @@ function importModule(entry, request, setterArgsList, loader) {
 
   if (threw &&
       (! entry.package.options.cjs.paths ||
-       isMJS(mod) ||
+       isMJS(filename) ||
        ! isError(error) ||
        error.code !== "MODULE_NOT_FOUND")) {
     throw error
@@ -351,7 +352,7 @@ function runESM(entry, moduleWrapper) {
   let result
 
   if (entry.package.options.cjs.vars &&
-      ! isMJS(mod)) {
+      ! isMJS(mod.filename)) {
     result = Reflect.apply(moduleWrapper, exported, [
       exported,
       makeRequireFunction(mod)

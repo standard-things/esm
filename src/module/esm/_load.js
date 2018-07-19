@@ -27,7 +27,7 @@ function load(request, parent, isMain, preload) {
   const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const parentIsMJS = parent && isMJS(parent)
+  const parentIsMJS = parent && isMJS(parent.filename)
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
 

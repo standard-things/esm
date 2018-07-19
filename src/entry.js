@@ -215,7 +215,7 @@ class Entry {
 
     if ((this.type === TYPE_ESM &&
          otherType !== TYPE_ESM &&
-         isMJS(this.module)) ||
+         isMJS(this.module.filename)) ||
         (otherType === TYPE_CJS &&
          ! otherEntry.package.options.cjs.namedExports)) {
       return this
@@ -364,7 +364,7 @@ class Entry {
 
       if (this.package.options.cjs.interop &&
           ! Reflect.has(getters, "__esModule") &&
-          ! isMJS(mod)) {
+          ! isMJS(mod.filename)) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
@@ -685,7 +685,7 @@ function getExportByName(entry, name, parent) {
   const isPseudo = type === TYPE_PSEUDO
 
   const parentOptions = parent.package.options
-  const parentIsMJS = isMJS(parent.module)
+  const parentIsMJS = isMJS(parent.module.filename)
 
   const parentMutableNamespace =
     ! parentIsMJS &&
@@ -698,7 +698,7 @@ function getExportByName(entry, name, parent) {
 
   const noMutableNamespace =
     ! parentMutableNamespace ||
-    isMJS(mod)
+    isMJS(mod.filename)
 
   const noNamedExports =
     (isCJS &&

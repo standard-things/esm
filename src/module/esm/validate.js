@@ -122,7 +122,7 @@ function validateDependencies(entry) {
 
   const namedExports =
     entry.package.options.cjs.namedExports &&
-    ! isMJS(entry.module)
+    ! isMJS(entry.module.filename)
 
   for (const specifier in dependencySpecifiers) {
     const {
