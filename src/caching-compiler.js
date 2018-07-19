@@ -253,33 +253,33 @@ function init() {
         continue
       }
 
-      if (! mkdirp(cachePath)) {
+      const cache = dir[cachePath]
+      const { dirty } = cache
+      const noCacheDir = ! mkdirp(cachePath)
+
+      if (dirty ||
+          noCacheDir) {
         Reflect.deleteProperty(dir, cachePath)
         Reflect.deleteProperty(pendingScripts, cachePath)
         Reflect.deleteProperty(pendingWrites, cachePath)
+      }
+
+      if (noCacheDir) {
         continue
+      }
+
+      if (dirty) {
+        writeMarker(cachePath + sep + ".dirty")
+        removeFile(cachePath + sep + ".data.blob")
+        removeFile(cachePath + sep + ".data.json")
+
+        for (const cacheName in cache.compile) {
+          removeFile(cachePath + sep + cacheName)
+        }
       }
 
       if (NYC) {
         writeMarker(cachePath + sep + ".nyc")
-      }
-
-      const cache = dir[cachePath]
-
-      if (! cache.dirty) {
-        continue
-      }
-
-      Reflect.deleteProperty(dir, cachePath)
-      Reflect.deleteProperty(pendingScripts, cachePath)
-      Reflect.deleteProperty(pendingWrites, cachePath)
-
-      writeMarker(cachePath + sep + ".dirty")
-      removeFile(cachePath + sep + ".data.blob")
-      removeFile(cachePath + sep + ".data.json")
-
-      for (const cacheName in cache.compile) {
-        removeFile(cachePath + sep + cacheName)
       }
     }
 
