@@ -155,7 +155,7 @@ function hook(Mod, parent) {
     let { compileData } = entry
 
     if (! compileData &&
-        cache.compile[cacheName] === true) {
+        cache.compile[cacheName] === null) {
       compileData = Compiler.from(entry)
 
       if (compileData) {

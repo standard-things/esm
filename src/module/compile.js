@@ -62,8 +62,7 @@ function compile(content, filename) {
 
   let cachedData
 
-  if (compileData &&
-      compileData !== true) {
+  if (compileData) {
     cachedData =
       compileData.scriptData ||
       void 0

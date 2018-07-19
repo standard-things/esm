@@ -14,6 +14,7 @@ import dirname from "./path/dirname.js"
 import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
+import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
 import isJSON from "./path/is-json.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -132,7 +133,7 @@ class Package {
         map: null
       }
 
-      let compileCache = { __proto__: null }
+      let compileDatas = { __proto__: null }
 
       if (cachePath) {
         const cacheNames = readdir(cachePath)
@@ -143,19 +144,21 @@ class Package {
         let hasNycMarker = false
 
         for (const cacheName of cacheNames) {
-          if (cacheName.charCodeAt(0) !== DOT) {
+          if (isCacheName(cacheName)) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
-            compileCache[cacheName] = true
-          } else if (cacheName === ".data.blob") {
-            hasBuffer = true
-          } else if (cacheName === ".data.json") {
-            hasMap = true
-          } else if (cacheName === ".dirty") {
-            hasDirtyMarker = true
-            break
-          } else if (cacheName === ".nyc") {
-            hasNycMarker = true
+            compileDatas[cacheName] = null
+          } else if (cacheName.charCodeAt(0) === DOT) {
+            if (cacheName === ".data.blob") {
+              hasBuffer = true
+            } else if (cacheName === ".data.json") {
+              hasMap = true
+            } else if (cacheName === ".dirty") {
+              hasDirtyMarker = true
+              break
+            } else if (cacheName === ".nyc") {
+              hasNycMarker = true
+            }
           }
         }
 
@@ -167,8 +170,8 @@ class Package {
           hasNycNoMarker ||
           noNycHasMarker
 
-        let dataBuffer
-        let dataJSON
+        let bufferData
+        let jsonData
 
         if (hasDirtyMarker) {
           removeFile(cachePath + sep + ".dirty")
@@ -180,35 +183,35 @@ class Package {
 
         if (hasMap &&
             ! isCacheInvalid) {
-          dataJSON = readJSON(cachePath + sep + ".data.json")
+          jsonData = readJSON(cachePath + sep + ".data.json")
 
           isCacheInvalid =
-            ! has(dataJSON, "version") ||
-            dataJSON.version !== PKG_VERSION
+            ! has(jsonData, "version") ||
+            jsonData.version !== PKG_VERSION
         }
 
         if (isCacheInvalid) {
           hasBuffer =
           hasMap = false
-          compileCache = { __proto__: null }
-          dataJSON = void 0
+          compileDatas = { __proto__: null }
+          jsonData = void 0
           clearBabelCache(cachePath)
         }
 
         if (hasBuffer) {
-          dataBuffer = readFile(cachePath + sep + ".data.blob")
+          bufferData = readFile(cachePath + sep + ".data.blob")
         }
 
         cache.buffer =
-          dataBuffer ||
+          bufferData ||
           GenericBuffer.alloc(0)
 
-        cache.map = has(dataJSON, "map")
-          ? dataJSON.map
+        cache.map = has(jsonData, "map")
+          ? jsonData.map
           : {}
       }
 
-      cache.compile = compileCache
+      cache.compile = compileDatas
     }
 
     this.cache = cache
