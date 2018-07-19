@@ -1,13 +1,21 @@
+import PACKAGE from "../constant/package.js"
+
 import Module from "../module.js"
 import Package from "../package.js"
 import Wrapper from "../wrapper.js"
 
+import assign from "../util/assign.js"
 import call from "../util/call.js"
+import dirname from "../path/dirname.js"
 import getSilent from "../util/get-silent.js"
 import loadESM from "../module/esm/load.js"
 import realProcess from "../real/process.js"
 import relaxRange from "../util/relax-range.js"
 import resolveFilename from "../module/esm/resolve-filename.js"
+
+const {
+  RANGE_ALL
+} = PACKAGE
 
 function hook(Mod) {
   const _tickCallback = getSilent(realProcess, "_tickCallback")
@@ -27,6 +35,17 @@ function hook(Mod) {
   function methodWrapper() {
     const [, mainPath] = realProcess.argv
     const filename = tryResolveFilename(mainPath)
+    const defaultPkg = Package.state.default
+    const dirPath = dirname(filename)
+
+    if (Package.get(dirPath) === defaultPkg) {
+      const pkg = new Package("", RANGE_ALL, { cache: false })
+      const pkgOptions = pkg.options
+
+      assign(pkg, defaultPkg)
+      pkg.options = assign(pkgOptions, defaultPkg.options)
+      Package.set(dirPath, pkg)
+    }
 
     loadESM(filename, null, true)
     tickCallback()
