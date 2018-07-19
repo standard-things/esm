@@ -460,7 +460,7 @@ describe("errors", () => {
 })
 
 describe("Node rules", () => {
-  it("should support requests with trailing backslashs in Windows", function () {
+  it("should support requests with trailing backward slashs in Windows", function () {
     if (! isWin) {
       this.skip()
       return
@@ -791,22 +791,52 @@ describe("Node rules", () => {
       ))
   )
 
-  it("should not support requests with encoded slashes", () =>
-    Promise
+  it("should not support requests with encoded slashes", () => {
+    const requests = [
+      abcPath.replace(slashRegExp, "%2f"),
+      abcPath.replace(slashRegExp, "%2F"),
+      abcURL.replace(slashRegExp, "%2f"),
+      abcURL.replace(slashRegExp, "%2F")
+    ]
+
+    if (isWin) {
+      requests.push(
+        abcPath.replace(slashRegExp, "%5c"),
+        abcPath.replace(slashRegExp, "%5C"),
+      )
+    }
+
+    return Promise
+      .all(
+        requests
+          .map((request) =>
+            import(request)
+              .then(() => assert.ok(false))
+              .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+          )
+      )
+  })
+
+  it("should support URL query/fragments with encoded slashes", () => {
+    const encodedLower = isWin ? "%5cc" : ""
+    const encodedUpper = isWin ? "%5Cc" : ""
+
+    return Promise
       .all([
-        abcPath.replace(slashRegExp, "%2f"),
-        abcPath.replace(slashRegExp, "%2F"),
-        abcPath.replace(slashRegExp, isWin ? "%5c" : "%2f"),
-        abcPath.replace(slashRegExp, isWin ? "%5C" : "%2F"),
-        abcURL.replace(slashRegExp, "%2f"),
-        abcURL.replace(slashRegExp, "%2F")
+        abcPath + "?a%2fb" + encodedLower,
+        abcPath + "?a%2Fb" + encodedUpper,
+        abcPath + "#a%2fb" + encodedLower,
+        abcPath + "#a%2Fb" + encodedUpper,
+        abcURL + "?a%2fb" + encodedLower,
+        abcURL + "?a%2Fb" + encodedUpper,
+        abcURL + "#a%2fb" + encodedLower,
+        abcURL + "#a%2Fb" + encodedUpper
       ]
       .map((request) =>
         import(request)
-          .then(() => assert.ok(false))
-          .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+          .then((ns) => assert.deepStrictEqual(ns, abcNs))
       ))
-  )
+  })
 
   it("should reevaluate requests with different URL query/fragments", () =>
     import("./fixture/load-count.mjs")

@@ -85,6 +85,9 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   const isAbs = isAbsolute(request)
+  const isRel = ! isAbs && isRelative(request)
+  const isPath = isAbs || isRel
+
   const fromPath = getModuleDirname(isAbs ? request : parent)
   const pkgOptions = Package.get(fromPath).options
 
@@ -101,51 +104,43 @@ function resolveFilename(request, parent, isMain, options) {
 
   let foundPath
 
-  if (! hasEncodedSep(request)) {
-    const isRel =
-      ! isAbs &&
-      isRelative(request)
+  if (! isPath &&
+      (request.charCodeAt(0) === FORWARD_SLASH ||
+       request.indexOf(":") !== -1)) {
+    const parsed = parseURL(request)
 
-    if (! isAbs &&
-        ! isRel &&
-        (request.charCodeAt(0) === FORWARD_SLASH ||
-         request.indexOf(":") !== -1)) {
-      const parsed = parseURL(request)
+    foundPath = getFilePathFromURL(parsed)
 
-      foundPath = getFilePathFromURL(parsed)
+    if (! foundPath &&
+        parsed.protocol !== "file:" &&
+        ! localhostRegExp.test(request)) {
+      throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
+    }
 
-      if (! foundPath &&
-          parsed.protocol !== "file:" &&
-          ! localhostRegExp.test(request)) {
-        throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
-      }
+    if (foundPath) {
+      foundPath = _resolveFilename(foundPath, parent, isMain, options, emptyArray, emptyArray, true)
+    }
+  } else if (isPath) {
+    let pathname = request.replace(queryHashRegExp, "")
 
-      if (foundPath) {
-        foundPath = _resolveFilename(foundPath, parent, isMain, options, emptyArray, emptyArray, true)
-      }
-    } else {
-      let pathname = request
+    if (! hasEncodedSep(pathname)) {
+      const paths = isAbs ? [""] : [fromPath]
 
-      if (isAbs ||
-          isRel) {
-        const paths = isAbs ? [""] : [fromPath]
+      pathname = decodeURIComponent(pathname)
+      foundPath = _findPath(pathname, paths, isMain, fields, strictExts)
+    }
+  } else if (! hasEncodedSep(request)) {
+    const decoded = decodeURIComponent(request)
 
-        pathname = pathname.replace(queryHashRegExp, "")
-        pathname = decodeURIComponent(pathname)
-        foundPath = _findPath(pathname, paths, isMain, fields, strictExts)
-      } else {
-        // Prevent resolving non-local dependencies:
-        // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
-        const skipGlobalPaths = ! cjsPaths
+    // Prevent resolving non-local dependencies:
+    // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
+    const skipGlobalPaths = ! cjsPaths
 
-        pathname = decodeURIComponent(pathname)
-        foundPath = _resolveFilename(pathname, parent, isMain, options, fields, strictExts, skipGlobalPaths)
-      }
+    foundPath = _resolveFilename(decoded, parent, isMain, options, fields, strictExts, skipGlobalPaths)
 
-      if (! foundPath &&
-          Reflect.has(builtinLookup, pathname)) {
-        return cache[cacheKey] = pathname
-      }
+    if (! foundPath &&
+        Reflect.has(builtinLookup, decoded)) {
+      return cache[cacheKey] = decoded
     }
   }
 
