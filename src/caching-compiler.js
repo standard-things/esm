@@ -297,21 +297,13 @@ function init() {
         const cachedData = compileData && compileData.scriptData
         const script = scripts[cacheName]
 
-        const meta = has(map, cacheName)
-          ? map[cacheName]
-          : null
-
         let scriptData
         let changed = false
 
         if (! cachedData) {
-          if (useCreateCachedData &&
-              (! meta ||
-               script.cachedDataRejected)) {
-            scriptData = script.createCachedData()
-          } else {
-            scriptData = script.cachedData
-          }
+          scriptData = useCreateCachedData
+            ? script.createCachedData()
+            : script.cachedData
         }
 
         if (scriptData &&
@@ -325,6 +317,10 @@ function init() {
           } else if (cachedData &&
               script.cachedDataRejected) {
             changed = true
+
+            const meta = has(map, cacheName)
+              ? map[cacheName]
+              : null
 
             if (meta) {
               meta[0] =
@@ -354,12 +350,17 @@ function init() {
       const scriptDatas = pendingScriptDatas[cachePath]
 
       for (const cacheName in scriptDatas) {
-        if (map[cacheName]) {
+        let meta = has(map, cacheName)
+          ? map[cacheName]
+          : null
+
+        if (meta) {
           continue
         }
 
+        meta = [-1, -1]
+
         const compileData = compileDatas[cacheName]
-        const meta = [-1, -1]
 
         if (compileData) {
           const changed = +compileData.changed
@@ -400,9 +401,16 @@ function init() {
       let offset = 0
 
       for (const cacheName in map) {
-        const meta = map[cacheName]
-        const [offsetStart, offsetEnd] = meta
+        const meta = has(map, cacheName)
+          ? map[cacheName]
+          : null
+
+        if (! meta) {
+          continue
+        }
+
         const compileData = compileDatas[cacheName]
+        const [offsetStart, offsetEnd] = meta
 
         let scriptData = scriptDatas[cacheName]
 
