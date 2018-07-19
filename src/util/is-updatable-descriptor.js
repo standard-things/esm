@@ -9,7 +9,7 @@ function init() {
     // https://tc39.github.io/ecma262/#sec-validateandapplypropertydescriptor
     return isObject(descriptor) &&
       (descriptor.configurable === true ||
-      descriptor.writable === true) &&
+       descriptor.writable === true) &&
       Reflect.has(descriptor, "value")
   }
 
