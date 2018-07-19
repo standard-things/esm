@@ -2,7 +2,7 @@ import { platform } from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
-  const backSlashRegExp = /\\/g
+  const backwardSlashRegExp = /\\/g
   const isWin = platform === "win32"
 
   function normalize(filename) {
@@ -11,7 +11,7 @@ function init() {
     }
 
     return isWin
-      ? filename.replace(backSlashRegExp, "/")
+      ? filename.replace(backwardSlashRegExp, "/")
       : filename
   }
 
