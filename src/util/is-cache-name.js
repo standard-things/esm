@@ -1,11 +1,35 @@
+import CHAR_CODE from "../constant/char-code.js"
+
+import isJS from "../path/is-js.js"
 import shared from "../shared.js"
 
 function init() {
-  const cacheNameRegExp = /^[a-z0-9]{16}\.js$/
+  const {
+    DIGIT_0,
+    DIGIT_9,
+    LOWERCASE_A,
+    LOWERCASE_Z
+  } = CHAR_CODE
 
   function isCacheName(value) {
-    return typeof value === "string" &&
-      cacheNameRegExp.test(value)
+    if (typeof value !== "string" ||
+        value.length !== 19 ||
+        ! isJS(value)) {
+      return false
+    }
+
+    let i = -1
+
+    while (++i < 16) {
+      const code = value.charCodeAt(i)
+
+      if (! (code >= LOWERCASE_A && code <= LOWERCASE_Z ||
+             code >= DIGIT_0 && code <= DIGIT_9)) {
+        return false
+      }
+    }
+
+    return true
   }
 
   return isCacheName
