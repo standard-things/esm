@@ -442,7 +442,7 @@ function init() {
       const entries = pendingWrites[cachePath]
 
       for (const cacheName in entries) {
-        const code = entries[cacheName].compileData.code
+        const { code } = entries[cacheName].compileData
 
         if (writeFile(cachePath + sep + cacheName, code)) {
           removeExpired(cachePath, cacheName)
