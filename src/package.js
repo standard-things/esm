@@ -134,6 +134,8 @@ class Package {
         map: null
       }
 
+      let bufferData
+      let mapData
       let compileDatas = { __proto__: null }
 
       if (cachePath) {
@@ -171,7 +173,6 @@ class Package {
           hasNycNoMarker ||
           noNycHasMarker
 
-        let bufferData
         let jsonData
 
         if (hasMap &&
@@ -194,7 +195,6 @@ class Package {
           hasMap = false
 
           compileDatas = { __proto__: null }
-          jsonData = void 0
 
           if (hasDirtyMarker) {
             removeFile(cachePath + sep + ".dirty")
@@ -211,16 +211,14 @@ class Package {
           bufferData = readFile(cachePath + sep + ".data.blob")
         }
 
-        cache.buffer =
-          bufferData ||
-          GenericBuffer.alloc(0)
-
-        cache.map = jsonData
-          ? jsonData.map
-          : { __proto__: null }
+        if (hasMap) {
+          mapData = jsonData.map
+        }
       }
 
+      cache.buffer = bufferData || GenericBuffer.alloc(0)
       cache.compile = compileDatas
+      cache.map = mapData || { __proto__: null }
     }
 
     this.cache = cache
