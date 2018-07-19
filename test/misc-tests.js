@@ -1,5 +1,6 @@
 import JSON6 from "json-6"
 import Module from "module"
+import SemVer from "semver"
 
 import assert from "assert"
 import console from "console"
@@ -9,6 +10,7 @@ import * as fsExtraNs from "fs-extra"
 import * as fsNs from "fs"
 import path from "path"
 import require from "./require.js"
+import stream from "stream"
 import util from "util"
 
 const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
@@ -39,6 +41,8 @@ const canTestBridgeExports =
   Reflect.has(process.versions, "v8") ||
   ! Reflect.has(process.env, "APPVEYOR")
 
+const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
+const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
 const canTestUtilTypes = Reflect.has(util, "types")
 
 function checkError(error, code) {
@@ -138,20 +142,57 @@ describe("builtin modules", () => {
   it("should support subclassing `console.Console`", () => {
     const { Console } = console
 
-    class SubConsole extends Console {
+    class Sub extends Console {
       constructor(...args) {
         super(...args)
         this.sub = "sub"
       }
     }
 
-    const actual = new SubConsole(process.stdout)
+    const actual = new Sub(process.stdout)
 
     assert.ok(actual instanceof Console)
-    assert.ok(actual instanceof SubConsole)
+    assert.ok(actual instanceof Sub)
 
     assert.strictEqual(actual.sub, "sub")
     assert.ok(Reflect.has(actual, "_stdout"))
+  })
+
+  it("should support subclassing `stream.Stream`", () => {
+    const Ctors = [
+      stream,
+      stream.Duplex,
+      stream.Readable,
+      stream.Stream,
+      stream.Transform,
+      stream.Writable
+    ]
+
+    Ctors.forEach((Ctor, index) => {
+      class Sub extends Ctor {
+        constructor(...args) {
+          super(...args)
+          this.sub = "sub"
+        }
+      }
+
+      const actual = new Sub
+
+      assert.strictEqual(actual.sub, "sub")
+      assert.ok(Reflect.has(actual, "domain"))
+
+      assert.ok(actual instanceof Ctor)
+      assert.ok(actual instanceof Sub)
+
+      if (canTestHasInstance) {
+        if (canTestDuplexInstance &&
+            Ctor === stream.Duplex) {
+          assert.ok(actual instanceof stream.Writable)
+        }
+
+        assert.ok(actual instanceof stream)
+      }
+    })
   })
 
   ;(canTestUtilTypes ? it : xit)(
