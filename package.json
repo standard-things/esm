@@ -66,12 +66,12 @@
     "mock-require": "^3.0.1",
     "mock-stdio": "^1.0.3",
     "module-alias": "^2.1.0",
-    "newrelic": "^4.5.0",
+    "newrelic": "^4.5.1",
     "nop": "^1.0.0",
     "nyc": "^12.0.2",
     "optimize-js-plugin": "0.0.4",
     "pm2": "^3.0.0",
-    "postcss": "^6.0.23",
+    "postcss": "^7.0.1",
     "require-inject": "^1.4.3",
     "semver": "^5.5.0",
     "sleep": "^5.1.1",
@@ -83,7 +83,7 @@
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^4.16.1",
     "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-cli": "^3.0.8",
+    "webpack-cli": "^3.1.0",
     "yargs": "^12.0.1"
   },
   "files": [
