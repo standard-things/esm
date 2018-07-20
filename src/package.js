@@ -228,6 +228,13 @@ class Package {
     this.range = range
   }
 
+  clone()  {
+    const cloned = assign({ __proto__: Package.prototype }, this)
+
+    cloned.options = assign({}, cloned.options)
+    return cloned
+  }
+
   static get(dirPath, force) {
     if (dirPath === ".") {
       dirPath = resolve(dirPath)
@@ -441,11 +448,6 @@ function getInfo(dirPath, force) {
 
   let pkg = null
 
-  if (defaultPkg &&
-      defaultPkg.options.force === true) {
-    return pkg
-  }
-
   if (Reflect.has(Package.state.cache, dirPath)) {
     pkg = Package.state.cache[dirPath]
 
@@ -459,7 +461,12 @@ function getInfo(dirPath, force) {
     return Package.state.cache[dirPath] = null
   }
 
-  pkg = readInfo(dirPath)
+  if (defaultPkg &&
+      defaultPkg.options.force === true) {
+    pkg = defaultPkg.clone()
+  } else {
+    pkg = readInfo(dirPath)
+  }
 
   if (pkg === null) {
     const parentPath = dirname(dirPath)

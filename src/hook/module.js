@@ -10,7 +10,6 @@ import Package from "../package.js"
 import RealModule from "../real/module.js"
 import Wrapper from "../wrapper.js"
 
-import assign from "../util/assign.js"
 import compile from "../module/_compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
@@ -64,31 +63,26 @@ const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
-  const defaultPkg = new Package("", RANGE_ALL, { cache: false })
   const passthruMap = new Map
 
-  let defaultOptions = defaultPkg.options
   let parentPkg = Package.from(parent)
 
-  if (parentPkg) {
-    assign(defaultPkg, parentPkg)
-    assign(defaultOptions, parentPkg.options)
-  } else {
-    if (OPTIONS) {
-      defaultOptions = Package.createOptions(OPTIONS)
-    }
-
+  if (! parentPkg) {
     parentPkg = Package.from(parent, true)
-    assign(parentPkg.options, defaultOptions)
-    assign(defaultPkg, parentPkg)
+
+    if (OPTIONS) {
+      parentPkg.options = Package.createOptions(OPTIONS)
+    }
   }
+
+  const defaultPkg = parentPkg.clone()
+  const defaultOptions = defaultPkg.options
 
   if (! defaultOptions.force &&
       defaultOptions.mode === OPTIONS_MODE_ALL) {
     defaultOptions.mode = OPTIONS_MODE_AUTO
   }
 
-  defaultPkg.options = defaultOptions
   defaultPkg.range = RANGE_ALL
 
   Module._extensions = _extensions
