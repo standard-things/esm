@@ -59,7 +59,7 @@ describe("main hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stdout.includes("main-hook:true")))
+          .then(({ stdout }) => assert.ok(stdout.includes("main-hook:true")))
       , Promise.resolve())
   })
 
@@ -76,10 +76,7 @@ describe("main hook", function () {
     .reduce((promise, ESM_OPTIONS) =>
       promise
         .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
-        .then((result) => {
-          assert.strictEqual(result.stderr, "")
-          assert.ok(result.stdout.includes("esm-options:true"))
-        })
+        .then(({ stdout }) => assert.ok(stdout.includes("esm-options:true")))
     , Promise.resolve())
   })
 
@@ -100,63 +97,50 @@ describe("main hook", function () {
 
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main-hook/dynamic-import.js")
-      .then((result) => {
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("dynamic-import-cjs:true"))
-      })
+      .then(({ stdout }) => assert.ok(stdout.includes("dynamic-import-cjs:true")))
   )
 
   it("should support `import.meta.url` in ESM", () =>
     runMain("./fixture/main-hook/import-meta.mjs")
-      .then((result) => {
+      .then(({ stdout }) => {
         const url = testURL + "/fixture/main-hook/import-meta.mjs"
         const expected = JSON.stringify({ url })
 
-        assert.ok(result.stdout.includes("import-meta:" + expected))
+        assert.ok(stdout.includes("import-meta:" + expected))
       })
   )
 
   it("should expose `require.main` in CJS", () =>
     runMain("./fixture/main-hook/require-main.js")
-      .then((result) => {
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("require-main:true"))
-      })
+      .then(({ stdout }) => assert.ok(stdout.includes("require-main:true")))
   )
 
   it("should not expose `process.mainModule` in ESM", () =>
     runMain("./fixture/main-hook/main-module/off")
-      .then((result) => {
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("main-module:false"))
-      })
+      .then(({ stdout }) => assert.ok(stdout.includes("main-module:false")))
   )
 
   it("should expose `process.mainModule` in ESM with `options.cjs.cache`", () =>
     runMain("./fixture/main-hook/main-module/on")
-      .then((result) => {
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("main-module:true"))
-      })
+      .then(({ stdout }) => assert.ok(stdout.includes("main-module:true")))
   )
 
   it("should treat extensionless files as CJS", () =>
     Promise
       .resolve()
       .then(() => runMain("./fixture/ext/no-ext-cjs"))
-      .then((result) => assert.strictEqual(result.stderr, ""))
+      .then(({ stderr }) => assert.strictEqual(stderr, ""))
       .then(() => runMain("./fixture/ext/no-ext-esm"))
-      .then((result) => assert.ok(result.stderr))
+      .then(({ stderr }) => assert.ok(stderr))
   )
 
   it("should support loading `@std/esm`", () =>
     runMain("./fixture/main-hook/std-esm.js")
-      .then((result) => {
+      .then(({ stdout }) => {
         const exported = { a: "a", b: "b", c: "c", default: "default" }
         const expected = JSON.stringify(exported)
 
-        assert.strictEqual(result.stderr, "")
-        assert.ok(result.stdout.includes("std-esm:" + expected))
+        assert.ok(stdout.includes("std-esm:" + expected))
       })
   )
 
@@ -181,17 +165,13 @@ describe("main hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => {
-            assert.ok(result.stderr.includes("Cannot find module"))
-          })
+          .then(({ stderr }) => assert.ok(stderr.includes("Cannot find module")))
       , Promise.resolve())
   })
 
   it("should not swallow async errors", () =>
     runMain("./fixture/main-hook/async-error.mjs")
-      .then((result) => {
-        const { stderr } = result
-
+      .then(({ stderr }) => {
         assert.ok(stderr)
         assert.strictEqual(stderr.includes("async hook stack has become corrupted"), false)
       })
@@ -225,10 +205,7 @@ describe("main hook", function () {
             return fs
               .ensureSymlink(srcPath, destPath)
               .then(() => node(args))
-              .then((result) => {
-                assert.strictEqual(result.stderr, "")
-                assert.ok(result.stdout.includes("symlink:true"))
-              })
+              .then(({ stdout }) => assert.ok(stdout.includes("symlink:true")))
               .then(() => fs.remove(destPath))
           })
       , Promise.resolve())
