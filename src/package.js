@@ -463,6 +463,8 @@ function getInfo(dirPath, force) {
 
   if (defaultPkg &&
       defaultPkg.options.force === true) {
+    // Clone the default package to avoid the parsing phase fallback path
+    // of module/_compile.
     pkg = defaultPkg.clone()
   } else {
     pkg = readInfo(dirPath)

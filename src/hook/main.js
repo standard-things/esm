@@ -32,6 +32,8 @@ function hook(Mod) {
     const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {
+      // Clone the default package to avoid the parsing phase fallback path
+      // of module/_compile.
       Package.set(dirPath, defaultPkg.clone())
     }
 
