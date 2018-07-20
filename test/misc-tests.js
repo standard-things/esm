@@ -797,7 +797,7 @@ describe("Node rules", () => {
     if (isWin) {
       requests.unshift(
         abcPath.replace(slashRegExp, "%5c"),
-        abcPath.replace(slashRegExp, "%5C"),
+        abcPath.replace(slashRegExp, "%5C")
       )
     }
 
