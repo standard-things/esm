@@ -35,7 +35,7 @@ describe("--eval hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stdout.includes("eval-hook:true")))
+          .then(({ stdout }) => assert.ok(stdout.includes("eval-hook:true")))
       , Promise.resolve())
   })
 
@@ -60,7 +60,7 @@ describe("--eval hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => assert.ok(result.stdout.includes("print-hook:true")))
+          .then(({ stdout }) => assert.ok(stdout.includes("print-hook:true")))
       , Promise.resolve())
   })
 })

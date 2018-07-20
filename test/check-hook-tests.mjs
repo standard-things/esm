@@ -49,9 +49,9 @@ describe("--check hook", function () {
       .reduce((promise, args) =>
         promise
           .then(() => node(args))
-          .then((result) => {
-            assert.strictEqual(result.stderr, "")
-            assert.strictEqual(result.stdout, "")
+          .then(({ stderr, stdout }) => {
+            assert.strictEqual(stderr, "")
+            assert.strictEqual(stdout, "")
           })
       , Promise.resolve())
   })
@@ -81,9 +81,9 @@ describe("--check hook", function () {
       .reduce((promise, command) =>
         promise
           .then(() => shell(command))
-          .then((result) => {
-            assert.strictEqual(result.stderr, "")
-            assert.strictEqual(result.stdout, "")
+          .then(({ stderr, stdout }) => {
+            assert.strictEqual(stderr, "")
+            assert.strictEqual(stdout, "")
           })
       , Promise.resolve())
   })
