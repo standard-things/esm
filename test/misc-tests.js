@@ -802,7 +802,7 @@ describe("Node rules", () => {
     if (isWin) {
       requests.push(
         abcPath.replace(slashRegExp, "%5c"),
-        abcPath.replace(slashRegExp, "%5C"),
+        abcPath.replace(slashRegExp, "%5C")
       )
     }
 
