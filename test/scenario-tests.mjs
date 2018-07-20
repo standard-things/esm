@@ -79,22 +79,27 @@ describe("scenarios", function () {
 
   it("should work with esmod-pmb", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
+      .then(({ stdout }) => assert.ok(stdout.includes("esmod-pmb:true")))
   )
 
   it("should work with express", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
+      .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
   )
 
   it("should work with global-prefix", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
+      .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
 
   it("should work with module-alias", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/module-alias")])
+      .then(({ stdout }) => assert.ok(stdout.includes("module-alias:true")))
   )
 
   it("should work with native modules", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
+      .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
   )
 
   it("should work with newrelic", () => {
@@ -107,6 +112,7 @@ describe("scenarios", function () {
       "-r", "newrelic",
       path.resolve(testPath, dirPath)
     ])
+    .then(({ stdout }) => assert.ok(stdout.includes("newrelic:true")))
   })
 
   it("should work with nyc", () => {
@@ -121,6 +127,7 @@ describe("scenarios", function () {
 
   it("should work with postcss", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
+      .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
 
   it("should work with sqreen", () =>
@@ -129,6 +136,7 @@ describe("scenarios", function () {
       "-r", "sqreen",
       path.resolve(testPath, "fixture/scenario/sqreen")
     ])
+    .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
   )
 
   it("should work with ava and nyc", () => {
