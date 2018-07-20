@@ -111,11 +111,6 @@ function getURLFromFilePath(filename) {
   return fileProtocol + filename.replace(/\\/g, "/")
 }
 
-function getWarning(...args) {
-  return WARNING_PREFIX + "Warning: " +
-    util.format(...args) + "\n"
-}
-
 describe("builtin modules", () => {
   it("should load builtin modules", () =>
     import("./misc/builtin/load.mjs")
