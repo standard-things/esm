@@ -800,7 +800,7 @@ describe("Node rules", () => {
     ]
 
     if (isWin) {
-      requests.push(
+      requests.unshift(
         abcPath.replace(slashRegExp, "%5c"),
         abcPath.replace(slashRegExp, "%5C"),
       )
@@ -812,7 +812,14 @@ describe("Node rules", () => {
           .map((request) =>
             import(request)
               .then(() => assert.ok(false))
-              .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+              .catch((e) => {
+                if (isWin &&
+                    ! request.startsWith("file:")) {
+                  checkError(e, "ERR_INVALID_PROTOCOL")
+                } else {
+                  checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
+                }
+              })
           )
       )
   })
