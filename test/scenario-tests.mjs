@@ -188,6 +188,22 @@ describe("scenarios", function () {
       "-i", pkgPath,
       "mocha", mochaPattern
     ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("chai-mocha-nyc:true")))
+  })
+
+  it("should work with mocha and nyc", () => {
+    const dirPath = path.resolve(testPath, "fixture/scenario/mocha-nyc")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
+    const mochaPattern = path.resolve(dirPath, "test.js")
+
+    return exec("nyc", [
+      "--cwd", dirPath,
+      "-x", "test.js",
+      "-i", cwdPath,
+      "-i", pkgPath,
+      "mocha", mochaPattern
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("mocha-nyc:true")))
   })
 
   it("should work with mock-require and require-inject", () =>
@@ -268,7 +284,8 @@ describe("scenarios", function () {
   ;(canTestPM2 ? it : xit)(
   "should work with pm2", () => {
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
-    const errorPath = path.resolve(logsPath, "pm2-error.log")
+    const stderrPath = path.resolve(logsPath, "pm2-error.log")
+    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
 
     const nodeArgs = [
       "-r", pkgPath,
@@ -280,7 +297,7 @@ describe("scenarios", function () {
       "--no-autorestart",
       "--name", "pm2",
       "--node-args", nodeArgs.join(" "),
-      path.resolve(testPath, "fixture/scenario/babel")
+      path.resolve(testPath, "fixture/scenario/pm2")
     ]
 
     return Promise
@@ -289,6 +306,12 @@ describe("scenarios", function () {
       .then(() => trash(logsPath))
       .then(() => exec("pm2", pm2Args))
       .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
-      .then(() => assert.strictEqual(fs.readFileSync(errorPath, "utf8"), ""))
+      .then(() => {
+        const stderr = fs.readFileSync(stderrPath, "utf8")
+        const stdout = fs.readFileSync(stdoutPath, "utf8")
+
+        assert.strictEqual(stderr, "")
+        assert.ok(stdout.includes("pm2:true"))
+      })
   })
 })
