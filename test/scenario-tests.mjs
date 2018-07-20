@@ -300,16 +300,39 @@ describe("scenarios", function () {
       path.resolve(testPath, "fixture/scenario/pm2")
     ]
 
+    const maxWait = 4000
+
+    function waitForLogs() {
+      const started = Date.now()
+
+      return new Promise(function check(resolve) {
+        const waited = Date.now() - started
+
+        const stderr = fs.existsSync(stderrPath)
+          ? fs.readFileSync(stderrPath, "utf8")
+          : ""
+
+        const stdout = fs.existsSync(stdoutPath)
+          ? fs.readFileSync(stdoutPath, "utf8")
+          : ""
+
+        if (stderr ||
+            stdout ||
+            waited > maxWait) {
+          resolve({ stderr, stdout })
+        } else {
+          setTimeout(() => check(resolve), 100)
+        }
+      })
+    }
+
     return Promise
       .resolve()
       .then(() => exec("pm2", ["kill"]))
       .then(() => trash(logsPath))
       .then(() => exec("pm2", pm2Args))
-      .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
-      .then(() => {
-        const stderr = fs.readFileSync(stderrPath, "utf8")
-        const stdout = fs.readFileSync(stdoutPath, "utf8")
-
+      .then(() => waitForLogs())
+      .then(({ stderr, stdout }) => {
         assert.strictEqual(stderr, "")
         assert.ok(stdout.includes("pm2:true"))
       })
