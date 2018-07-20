@@ -8,11 +8,16 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
   const {
+    ELECTRON,
     WIN32
   } = ENV
 
+  const useBindingOrNative =
+    ! ELECTRON &&
+    ! WIN32
+
   const useNative =
-    ! WIN32 &&
+    useBindingOrNative &&
     typeof realpathNativeSync === "function"
 
   let useBinding
@@ -28,7 +33,7 @@ function init() {
 
     if (useBinding === void 0) {
       useBinding =
-        ! WIN32 &&
+        useBindingOrNative &&
         typeof binding.fs.realpath === "function"
     }
 
