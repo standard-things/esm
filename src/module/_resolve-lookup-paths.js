@@ -49,21 +49,16 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
     return paths.length ? paths : null
   }
 
-  // With --eval, `parent.id` isn't set and `parent.filename` is `null`.
-  if (! parent ||
-      ! parent.id ||
-      ! parentFilename) {
-    // Normally, the path is taken from `realpath(__filename)`,
-    // but with --eval there is no `__filename`.
-    const paths = skipGlobalPaths
-      ? nodeModulePaths(".")
-      : Module._nodeModulePaths(".")
-
-    GenericArray.unshift(paths, ".")
-    return paths
+  if (typeof parentFilename === "string") {
+    return GenericArray.of(dirname(parentFilename))
   }
 
-  return GenericArray.of(dirname(parentFilename))
+  const paths = skipGlobalPaths
+    ? nodeModulePaths(".")
+    : Module._nodeModulePaths(".")
+
+  GenericArray.unshift(paths, ".")
+  return paths
 }
 
 export default resolveLookupPaths
