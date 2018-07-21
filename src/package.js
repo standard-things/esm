@@ -8,10 +8,10 @@ import PACKAGE from "./constant/package.js"
 import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
+import builtinLookup from "./builtin-lookup.js"
 import defaults from "./util/defaults.js"
 import dirname from "./path/dirname.js"
 import errors from "./errors.js"
-import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
@@ -258,8 +258,26 @@ class Package {
     return getInfo(dirPath, force) || Package.state.default
   }
 
-  static from(mod, force) {
-    return Package.get(getModuleDirname(mod), force)
+  static from(request, force) {
+    let dirPath = "."
+
+    if (typeof request === "string") {
+      if (Reflect.has(builtinLookup, request)) {
+        dirPath = ""
+      } else {
+        dirPath = dirname(request)
+      }
+    } else if (isObject(request)) {
+      const { filename } = request
+
+      if (Reflect.has(builtinLookup, request.id)) {
+        dirPath = ""
+      } else if (typeof filename === "string") {
+        dirPath = dirname(filename)
+      }
+    }
+
+    return Package.get(dirPath, force)
   }
 
   static set(dirPath, pkg) {
