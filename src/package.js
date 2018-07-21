@@ -7,7 +7,6 @@ import PACKAGE from "./constant/package.js"
 
 import GenericBuffer from "./generic/buffer.js"
 
-import _findPath from "./module/_find-path.js"
 import assign from "./util/assign.js"
 import defaults from "./util/defaults.js"
 import dirname from "./path/dirname.js"
@@ -96,7 +95,6 @@ const autoOptions = {
 }
 
 const cacheKey = JSON.stringify(defaultOptions)
-const searchExts = [".mjs", ".js", ".json"]
 
 class Package {
   static state =
@@ -134,8 +132,8 @@ class Package {
         map: null
       }
 
-      let bufferData
-      let mapData
+      let buffer
+      let map
       let compileDatas = { __proto__: null }
 
       if (cachePath) {
@@ -173,18 +171,18 @@ class Package {
           hasNycNoMarker ||
           noNycHasMarker
 
-        let jsonData
+        let json
 
         if (hasMap &&
             ! isCacheInvalid) {
-          jsonData = readJSON(cachePath + sep + ".data.json")
+          json = readJSON(cachePath + sep + ".data.json")
 
-          if (jsonData &&
-              has(jsonData, "version") &&
-              jsonData.version === PKG_VERSION &&
-              has(jsonData, "map") &&
-              isObject(jsonData.map)) {
-            Reflect.setPrototypeOf(jsonData.map, null)
+          if (json &&
+              has(json, "version") &&
+              json.version === PKG_VERSION &&
+              has(json, "map") &&
+              isObject(json.map)) {
+            Reflect.setPrototypeOf(json.map, null)
           } else {
             isCacheInvalid = true
           }
@@ -208,17 +206,17 @@ class Package {
         }
 
         if (hasBuffer) {
-          bufferData = readFile(cachePath + sep + ".data.blob")
+          buffer = readFile(cachePath + sep + ".data.blob")
         }
 
         if (hasMap) {
-          mapData = jsonData.map
+          map = json.map
         }
       }
 
-      cache.buffer = bufferData || GenericBuffer.alloc(0)
+      cache.buffer = buffer || GenericBuffer.alloc(0)
       cache.compile = compileDatas
-      cache.map = mapData || { __proto__: null }
+      cache.map = map || { __proto__: null }
     }
 
     this.cache = cache
@@ -527,8 +525,14 @@ function readInfo(dirPath, force) {
 
   if (optionsFound) {
     options = parseJSON6(options)
+  } else if (isFile(optionsPath + ".mjs")) {
+    optionsPath = optionsPath + ".mjs"
+  } else if (isFile(optionsPath + ".js")) {
+    optionsPath = optionsPath + ".js"
+  } else if (isFile(optionsPath + ".json")) {
+    optionsPath = optionsPath + ".json"
   } else {
-    optionsPath = _findPath(ESMRC_FILENAME, [dirPath], false, searchExts)
+    optionsPath = ""
   }
 
   if (! optionsFound &&
