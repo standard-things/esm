@@ -8,11 +8,12 @@ import Module from "../../module.js"
 import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
+import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
 import findPath from "../find-path.js"
-import getModuleName from "../../util/get-module-name.js"
+import isAbsolute from "../../path/is-absolute.js"
 import isObject from "../../util/is-object.js"
-import isPath from "../../util/is-path.js"
+import isRelative from "../../path/is-relative.js"
 import resolveLookupPaths from "../resolve-lookup-paths.js"
 import shared from "../../shared.js"
 
@@ -30,37 +31,59 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  const cache = shared.memoize.moduleCJSResolveFilename
+  // Electron patches `Module._resolveFilename` to return its path.
+  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
+  if (ELECTRON &&
+      request === "electron") {
+    return SafeModule._resolveFilename(request)
+  }
 
-  const cacheKey = isObject(options)
-    ? null
-    : request + "\0" + getModuleName(parent) + "\0" + isMain
+  if (Reflect.has(builtinLookup, request)) {
+    return request
+  }
+
+  const cache = shared.memoize.moduleCJSResolveFilename
+  const isAbs = isAbsolute(request)
+  const parentFilename = parent && parent.filename
+
+  let fromPath
+
+  if (! isAbs &&
+      typeof parentFilename === "string") {
+    fromPath = dirname(parentFilename)
+  } else {
+    fromPath = ""
+  }
+
+  let cacheKey
+
+  if (isObject(options)) {
+    cacheKey = ""
+  } else {
+    cacheKey =
+      request + "\0" +
+      fromPath + "\0" +
+      (isMain ? "1" : "")
+  }
 
   if (cacheKey &&
       Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
   }
 
-  if (Reflect.has(builtinLookup, request)) {
-    return cache[cacheKey] = request
+  if (isAbs) {
+    fromPath = dirname(request)
   }
 
-  // Electron patches `Module._resolveFilename` to return its path.
-  // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
-  if (ELECTRON &&
-      request === "electron") {
-    return cache[cacheKey] = SafeModule._resolveFilename(request)
-  }
-
-  const parentFilename = parent && parent.filename
+  const isRel = ! isAbs && isRelative(request)
+  const isPath = isAbs || isRel
 
   let paths
 
-  if (parentFilename &&
+  if (isPath &&
       Module._findPath === findPath &&
-      Module._resolveLookupPaths === resolveLookupPaths &&
-      isPath(request)) {
-    paths = [parentFilename]
+      Module._resolveLookupPaths === resolveLookupPaths) {
+    paths = [fromPath]
   } else if (! cacheKey &&
       Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths)
