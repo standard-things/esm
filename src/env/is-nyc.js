@@ -20,7 +20,7 @@ function init() {
     const parent = getOwnParent()
     const parentFilename = parent && normalize(parent.filename)
 
-    const nycIndex = parentFilename
+    const nycIndex = typeof parentFilename === "string"
       ? parentFilename.lastIndexOf("/node_modules/nyc/")
       : -1
 

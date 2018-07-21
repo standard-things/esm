@@ -390,13 +390,11 @@ function tryResolveFilename(request, parent) {
   } catch (e) {}
 
   if (isPath(request)) {
-    let parentFilename = parent && parent.filename
+    const parentFilename = parent && parent.filename
 
-    if (typeof parentFilename !== "string") {
-      parentFilename = ""
-    }
-
-    return resolve(parentFilename, request)
+    return typeof parentFilename === "string"
+      ? resolve(parentFilename, request)
+      : resolve(request)
   }
 
   return request
