@@ -2,13 +2,9 @@ import isObject from "./is-object.js"
 import shared from "../shared.js"
 
 function init() {
-  function getModuleName(request) {
-    if (typeof request === "string") {
-      return request
-    }
-
-    if (isObject(request)) {
-      const { filename, id } = request
+  function getModuleName(mod) {
+    if (isObject(mod)) {
+      const { filename, id } = mod
 
       if (typeof filename === "string") {
         return filename
