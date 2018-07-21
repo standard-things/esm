@@ -177,15 +177,12 @@ class Package {
             ! isCacheInvalid) {
           json = readJSON(cachePath + sep + ".data.json")
 
-          if (json &&
-              has(json, "version") &&
-              json.version === PKG_VERSION &&
-              has(json, "map") &&
-              isObject(json.map)) {
-            Reflect.setPrototypeOf(json.map, null)
-          } else {
-            isCacheInvalid = true
-          }
+          isCacheInvalid =
+            ! json ||
+            ! has(json, "version") ||
+            json.version !== PKG_VERSION ||
+            ! has(json, "map") ||
+            ! isObject(json.map)
         }
 
         if (isCacheInvalid) {
@@ -210,7 +207,27 @@ class Package {
         }
 
         if (hasMap) {
+          const { memoize } = shared
+
+          const {
+            pathDirname,
+            pathExtname,
+            pathIsAbsolute,
+            pathIsRelative
+          } = json.memoize
+
           map = json.map
+          Reflect.setPrototypeOf(map, null)
+
+          Reflect.setPrototypeOf(pathDirname, null)
+          Reflect.setPrototypeOf(pathExtname, null)
+          Reflect.setPrototypeOf(pathIsAbsolute, null)
+          Reflect.setPrototypeOf(pathIsRelative, null)
+
+          memoize.pathDirname = pathDirname
+          memoize.pathExtname = pathExtname
+          memoize.pathIsAbsolute = pathIsAbsolute
+          memoize.pathIsRelative = pathIsRelative
         }
       }
 
