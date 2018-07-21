@@ -54,7 +54,9 @@ function findPath(request, paths, isMain, fields, exts) {
     return cache[cacheKey]
   }
 
-  if (isAbsolute(request)) {
+  const isAbs = isAbsolute(request)
+
+  if (isAbs) {
     paths = [""]
   } else if (! paths || ! paths.length) {
     return ""
@@ -89,7 +91,9 @@ function findPath(request, paths, isMain, fields, exts) {
       continue
     }
 
-    const thePath = resolve(curPath, request)
+    const thePath = isAbs
+      ? request
+      : resolve(curPath, request)
 
     let isSymlink = false
     let rc = -1
