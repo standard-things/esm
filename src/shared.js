@@ -221,7 +221,11 @@ function init() {
       c() {}
     }
 
-    return new C().c !== void 0
+    try {
+      return new C().c !== void 0
+    } catch (e) {}
+
+    return false
   })
 
   setDeferred(support, "proxiedFunctionToStringTag", () => {
