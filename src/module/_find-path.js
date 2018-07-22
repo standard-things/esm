@@ -95,7 +95,7 @@ function findPath(request, paths, isMain, fields, exts) {
       ? request
       : resolve(curPath, request)
 
-    let isSymlink = false
+    let isSymLink = false
     let rc = -1
     let stat = null
 
@@ -106,12 +106,10 @@ function findPath(request, paths, isMain, fields, exts) {
       if (stat) {
         rc = call(isFile, stat) ? 0 : 1
 
-        if (rc) {
-          isSymlink = call(isSymbolicLink, stat)
-
-          if (isSymlink) {
-            rc = statFast(thePath)
-          }
+        if (rc &&
+            call(isSymbolicLink, stat)) {
+          isSymLink = true
+          rc = statFast(thePath)
         }
       }
     } else {
@@ -125,7 +123,8 @@ function findPath(request, paths, isMain, fields, exts) {
       if (rc === 0) {
         if (useRealpath &&
             (! stat ||
-             isSymlink)) {
+             stat.nlink > 1 ||
+             isSymLink)) {
           filename = realpath(thePath)
         } else {
           filename = thePath
@@ -214,7 +213,7 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 }
 
 function tryFilename(filename, isMain) {
-  let isSymlink = false
+  let isSymLink = false
   let rc = -1
   let stat = null
 
@@ -225,12 +224,10 @@ function tryFilename(filename, isMain) {
     if (stat) {
       rc = call(isFile, stat) ? 0 : 1
 
-      if (rc) {
-        isSymlink = call(isSymbolicLink, stat)
-
-        if (isSymlink) {
-          rc = statFast(filename)
-        }
+      if (rc &&
+          call(isSymbolicLink, stat)) {
+        isSymLink = true
+        rc = statFast(filename)
       }
     }
   } else {
@@ -247,7 +244,8 @@ function tryFilename(filename, isMain) {
 
   if (useRealpath &&
       (! stat ||
-       isSymlink)) {
+       stat.nlink > 1 ||
+       isSymLink)) {
     return realpath(filename)
   }
 
