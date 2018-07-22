@@ -13,6 +13,7 @@ import _loadESM from "../esm/_load.js"
 import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
 import loader from "./loader.js"
+import moduleLoad from "../load.js"
 import parseState from "../../parse/state.js"
 import shared from "../../shared.js"
 
@@ -83,10 +84,17 @@ function load(request, parent, isMain) {
 }
 
 function tryLoader(entry, state, cacheKey, filename, parentEntry) {
+  const mod = entry.module
+
   let threw = true
 
   try {
-    loader(entry, filename, parentEntry)
+    if (mod.load === moduleLoad) {
+      loader(entry, filename, parentEntry)
+    } else {
+      mod.load(filename)
+    }
+
     threw = false
   } finally {
     if (threw) {

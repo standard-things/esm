@@ -2,10 +2,9 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import Module from "../module.js"
+import Entry from "../entry.js"
 
-import dirname from "../path/dirname.js"
-import extname from "../path/extname.js"
+import loader from "./cjs/loader.js"
 import shared from "../shared.js"
 
 function load(filename) {
@@ -13,18 +12,11 @@ function load(filename) {
     throw new shared.external.Error("Module already loaded: " + this.id)
   }
 
-  let ext = extname(filename)
+  const entry = Entry.get(this)
+  const { parent } = this
+  const parentEntry = parent && Entry.get(parent)
 
-  if (ext === "" ||
-      ! Reflect.has(Module._extensions, ext)) {
-    ext = ".js"
-  }
-
-  this.filename = filename
-  this.paths = Module._nodeModulePaths(dirname(filename))
-
-  Module._extensions[ext](this, filename)
-  this.loaded = true
+  loader(entry, filename, parentEntry)
 }
 
 export default load

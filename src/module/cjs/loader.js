@@ -2,6 +2,7 @@ import PACKAGE from "../../constant/package.js"
 
 import Module from "../../module.js"
 
+import dirname from "../../path/dirname.js"
 import extname from "../../path/extname.js"
 
 const {
@@ -9,13 +10,10 @@ const {
 } = PACKAGE
 
 function loader(entry, filename, parentEntry) {
-  const { _extensions } = Module
-  const mod = entry.module
-
   let ext = extname(filename)
 
   if (ext === "" ||
-      ! Reflect.has(_extensions, ext)) {
+      ! Reflect.has(Module._extensions, ext)) {
     ext = ".js"
   }
 
@@ -25,8 +23,13 @@ function loader(entry, filename, parentEntry) {
     entry._passthru = true
   }
 
+  const mod = entry.module
+
+  mod.filename = filename
+  mod.paths = Module._nodeModulePaths(dirname(filename))
+
   try {
-    _extensions[ext](mod, filename)
+    Module._extensions[ext](mod, filename)
   } finally {
     entry._passthru = false
   }
