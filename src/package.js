@@ -182,7 +182,9 @@ class Package {
             ! has(json, "version") ||
             json.version !== PKG_VERSION ||
             ! has(json, "map") ||
-            ! isObject(json.map)
+            ! isObject(json.map) ||
+            ! has(json, "memoize") ||
+            ! isObject(json.memoize)
         }
 
         if (isCacheInvalid) {
