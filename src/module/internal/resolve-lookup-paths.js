@@ -2,16 +2,16 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import ENV from "../constant/env.js"
-import ESM from "../constant/esm.js"
+import ENV from "../../constant/env.js"
+import ESM from "../../constant/esm.js"
 
-import GenericArray from "../generic/array.js"
-import Module from "../module.js"
+import GenericArray from "../../generic/array.js"
+import Module from "../../module.js"
 
-import dirname from "../path/dirname.js"
-import isRelative from "../path/is-relative.js"
-import moduleState from "./state.js"
-import nodeModulePaths from "./node-module-paths.js"
+import dirname from "../../path/dirname.js"
+import esmState from "../esm/state.js"
+import isRelative from "../../path/is-relative.js"
+import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
   RUNKIT
@@ -35,7 +35,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
 
     if (parentPaths &&
         ! skipGlobalPaths) {
-      GenericArray.push(paths, ...moduleState.globalPaths)
+      GenericArray.push(paths, ...esmState.globalPaths)
     }
 
     if (RUNKIT) {
@@ -54,7 +54,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   }
 
   const paths = skipGlobalPaths
-    ? nodeModulePaths(".")
+    ? staticNodeModulePaths(".")
     : Module._nodeModulePaths(".")
 
   GenericArray.unshift(paths, ".")

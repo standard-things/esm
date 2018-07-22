@@ -1,26 +1,26 @@
-import ENTRY from "../constant/entry.js"
-import ENV from "../constant/env.js"
-import PACKAGE from "../constant/package.js"
-import SOURCE_TYPE from "../constant/source-type.js"
+import ENTRY from "../../constant/entry.js"
+import ENV from "../../constant/env.js"
+import PACKAGE from "../../constant/package.js"
+import SOURCE_TYPE from "../../constant/source-type.js"
 
-import Compiler from "../caching-compiler.js"
-import GenericObject from "../generic/object.js"
-import Package from "../package.js"
-import Runtime from "../runtime.js"
+import Compiler from "../../caching-compiler.js"
+import GenericObject from "../../generic/object.js"
+import Package from "../../package.js"
+import Runtime from "../../runtime.js"
 
-import captureStackTrace from "../error/capture-stack-trace.js"
-import createSourceMap from "../util/create-source-map.js"
-import encodeURI from "../util/encode-uri.js"
-import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
-import getSourceMappingURL from "../util/get-source-mapping-url.js"
-import isError from "../util/is-error.js"
-import isMJS from "../path/is-mjs.js"
-import isObjectEmpty from "../util/is-object-empty.js"
-import isStackTraceMasked from "../util/is-stack-trace-masked.js"
-import maskStackTrace from "../error/mask-stack-trace.js"
-import readFile from "../fs/read-file.js"
-import shared from "../shared.js"
-import validateESM from "./esm/validate.js"
+import captureStackTrace from "../../error/capture-stack-trace.js"
+import createSourceMap from "../../util/create-source-map.js"
+import encodeURI from "../../util/encode-uri.js"
+import esmValidate from "../esm/validate.js"
+import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
+import getSourceMappingURL from "../../util/get-source-mapping-url.js"
+import isError from "../../util/is-error.js"
+import isMJS from "../../path/is-mjs.js"
+import isObjectEmpty from "../../util/is-object-empty.js"
+import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
+import maskStackTrace from "../../error/mask-stack-trace.js"
+import readFile from "../../fs/read-file.js"
+import shared from "../../shared.js"
 
 const {
   STATE_EXECUTION_STARTED,
@@ -103,7 +103,7 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (isESM &&
       entry.state === STATE_PARSING_STARTED) {
-    tryValidateESM(caller, entry, content, filename)
+    tryValidate(caller, entry, content, filename)
   }
 }
 
@@ -245,11 +245,11 @@ function tryCompileCode(caller, entry, content, filename, options) {
   throw maskStackTrace(error, content, filename, isESM)
 }
 
-function tryValidateESM(caller, entry, content, filename) {
+function tryValidate(caller, entry, content, filename) {
   let error
 
   try {
-    return validateESM(entry)
+    return esmValidate(entry)
   } catch (e) {
     error = e
   }

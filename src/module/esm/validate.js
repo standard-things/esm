@@ -1,7 +1,7 @@
 import ENTRY from "../../constant/entry.js"
 
-import _loadESM from "./_load.js"
 import errors from "../../errors.js"
+import esmLoad from "./load.js"
 import isMJS from "../../path/is-mjs.js"
 
 const {
@@ -68,7 +68,7 @@ function parseDependencies(entry) {
   const mod = entry.module
 
   for (const specifier in dependencySpecifiers) {
-    const childEntry = _loadESM(specifier, mod)
+    const childEntry = esmLoad(specifier, mod)
 
     dependencySpecifiers[specifier].entry =
     entry.children[childEntry.name] = childEntry

@@ -12,6 +12,7 @@ import builtinLookup from "./builtin-lookup.js"
 import defaults from "./util/defaults.js"
 import dirname from "./path/dirname.js"
 import errors from "./errors.js"
+import esmParseLoad from "./module/esm/parse-load.js"
 import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
@@ -19,7 +20,6 @@ import isJSON from "./path/is-json.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
-import loadESM from "./module/esm/load.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
 import readFile from "./fs/read-file.js"
@@ -499,7 +499,7 @@ function getInfo(dirPath, force) {
   if (defaultPkg &&
       defaultPkg.options.force === true) {
     // Clone the default package to avoid the parsing phase fallback path
-    // of module/_compile.
+    // of module/internal/compile.
     pkg = defaultPkg.clone()
   } else {
     pkg = readInfo(dirPath)
@@ -590,7 +590,7 @@ function readInfo(dirPath, force) {
 
       try {
         pkg.options =
-        Package.createOptions(loadESM(optionsPath, null, false).module.exports)
+        Package.createOptions(esmParseLoad(optionsPath, null, false).module.exports)
       } finally {
         moduleState.parseOnly = parseOnly
         moduleState.parsing = parsing

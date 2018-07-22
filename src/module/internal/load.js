@@ -2,16 +2,16 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import ENTRY from "../constant/entry.js"
+import ENTRY from "../../constant/entry.js"
 
-import Entry from "../entry.js"
-import GenericArray from "../generic/array.js"
-import Module from "../module.js"
+import Entry from "../../entry.js"
+import GenericArray from "../../generic/array.js"
+import Module from "../../module.js"
 
-import builtinEntries from "../builtin-entries.js"
-import moduleState from "./state.js"
-import realProcess from "../real/process.js"
-import shared from "../shared.js"
+import builtinEntries from "../../builtin-entries.js"
+import esmState from "../esm/state.js"
+import realProcess from "../../real/process.js"
+import shared from "../../shared.js"
 
 const {
   STATE_EXECUTION_STARTED,
@@ -53,7 +53,7 @@ function load(filename, parent, isMain, state, loader) {
     child.filename = filename
 
     if (isMain) {
-      moduleState.mainModule =
+      esmState.mainModule =
       realProcess.mainModule = child
       child.id = "."
     }

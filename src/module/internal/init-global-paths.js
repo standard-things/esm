@@ -2,12 +2,12 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import { delimiter, resolve } from "../safe/path.js"
+import { delimiter, resolve } from "../../safe/path.js"
 
-import GenericArray from "../generic/array.js"
+import GenericArray from "../../generic/array.js"
 
-import realProcess from "../real/process.js"
-import safeGetEnv from "../util/safe-get-env.js"
+import realProcess from "../../real/process.js"
+import safeGetEnv from "../../util/safe-get-env.js"
 
 function initGlobalPaths() {
   const { env } = realProcess

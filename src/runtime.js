@@ -4,20 +4,20 @@ import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 import Module from "./module.js"
 
-import _loadESM from "./module/esm/_load.js"
 import builtinGlobal from "./builtin/global.js"
 import call from "./util/call.js"
 import errors from "./errors.js"
+import esmLoad from "./module/esm/load.js"
+import esmParseLoad from "./module/esm/parse-load.js"
+import esmResolveFilename from "./module/esm/resolve-filename.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isError from "./util/is-error.js"
 import isMJS from "./path/is-mjs.js"
 import isPath from "./util/is-path.js"
-import loadESM from "./module/esm/load.js"
-import makeRequireFunction from "./module/make-require-function.js"
+import makeRequireFunction from "./module/internal/make-require-function.js"
 import { resolve } from "./safe/path.js"
-import resolveFilename from "./module/esm/resolve-filename.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import setProperty from "./util/set-property.js"
@@ -183,7 +183,7 @@ const Runtime = {
         })]]
 
         try {
-          importModule(entry, request, setterArgsList, loadESM)
+          importModule(entry, request, setterArgsList, esmParseLoad)
         } catch (e) {
           rejectPromise(e)
         }
@@ -192,7 +192,7 @@ const Runtime = {
   },
 
   importStatic(request, setterArgsList) {
-    return importModule(this.entry, request, setterArgsList, _loadESM)
+    return importModule(this.entry, request, setterArgsList, esmLoad)
   },
 
   run(moduleWrapper) {
@@ -382,7 +382,7 @@ function runESM(entry, moduleWrapper) {
 
 function tryResolveFilename(request, parent) {
   try {
-    return resolveFilename(request, parent)
+    return esmResolveFilename(request, parent)
   } catch (e) {}
 
   try {

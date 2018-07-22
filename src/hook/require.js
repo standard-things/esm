@@ -1,8 +1,8 @@
 import errors from "../errors.js"
-import loadESM from "../module/esm/load.js"
-import makeRequireFunction from "../module/make-require-function.js"
-import moduleState from "../module/state.js"
-import resolveFilename from "../module/esm/resolve-filename.js"
+import esmParseLoad from "../module/esm/parse-load.js"
+import esmResolveFilename from "../module/esm/resolve-filename.js"
+import esmState from "../module/esm/state.js"
+import makeRequireFunction from "../module/internal/make-require-function.js"
 
 const {
   ERR_INVALID_ARG_TYPE,
@@ -19,16 +19,16 @@ function hook(parent) {
       throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
     }
 
-    return loadESM(request, parent, false).module.exports
+    return esmParseLoad(request, parent, false).module.exports
   }
 
   function resolver(request, options) {
-    return resolveFilename(request, parent, false, options)
+    return esmResolveFilename(request, parent, false, options)
   }
 
   const req = makeRequireFunction(parent, requirer, resolver)
 
-  req.main = moduleState.mainModule
+  req.main = esmState.mainModule
   return req
 }
 

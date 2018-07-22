@@ -10,12 +10,12 @@ import SafeModule from "../../safe/module.js"
 import builtinLookup from "../../builtin-lookup.js"
 import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
-import findPath from "../find-path.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
-import resolveLookupPaths from "../resolve-lookup-paths.js"
 import shared from "../../shared.js"
+import staticFindPath from "./find-path.js"
+import staticResolveLookupPaths from "./resolve-lookup-paths.js"
 
 const {
   ELECTRON
@@ -42,7 +42,7 @@ function resolveFilename(request, parent, isMain, options) {
     return request
   }
 
-  const cache = shared.memoize.moduleCJSResolveFilename
+  const cache = shared.memoize.moduleStaticResolveFilename
   const isAbs = isAbsolute(request)
   const parentFilename = parent && parent.filename
 
@@ -81,8 +81,8 @@ function resolveFilename(request, parent, isMain, options) {
   let paths
 
   if (isPath &&
-      Module._findPath === findPath &&
-      Module._resolveLookupPaths === resolveLookupPaths) {
+      Module._findPath === staticFindPath &&
+      Module._resolveLookupPaths === staticResolveLookupPaths) {
     paths = [fromPath]
   } else if (! cacheKey &&
       Array.isArray(options.paths)) {

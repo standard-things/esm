@@ -1,4 +1,4 @@
-import _extensions from "./_extensions.js"
+import _extensions from "./extensions.js"
 
 const state = {
   _cache: { __proto__: null },

@@ -2,13 +2,13 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import CHAR_CODE from "../constant/char-code.js"
-import ENV from "../constant/env.js"
+import CHAR_CODE from "../../constant/char-code.js"
+import ENV from "../../constant/env.js"
 
-import GenericArray from "../generic/array.js"
-import SafeModule from "../safe/module.js"
+import GenericArray from "../../generic/array.js"
+import SafeModule from "../../safe/module.js"
 
-import { resolve } from "../safe/path.js"
+import { resolve } from "../../safe/path.js"
 
 const {
   BACKWARD_SLASH,

@@ -2,23 +2,23 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import ENTRY from "../constant/entry.js"
-import ENV from "../constant/env.js"
+import ENTRY from "../../constant/entry.js"
+import ENV from "../../constant/env.js"
 
-import Entry from "../entry.js"
-import Module from "../module.js"
-import Package from "../package.js"
+import Entry from "../../entry.js"
+import Module from "../../module.js"
+import Package from "../../package.js"
 
-import _compile from "./_compile.js"
-import binding from "../binding.js"
-import dirname from "../path/dirname.js"
-import getCacheName from "../util/get-cache-name.js"
-import getSilent from "../util/get-silent.js"
-import makeRequireFunction from "./make-require-function.js"
-import realProcess from "../real/process.js"
-import realVM from "../real/vm.js"
-import shared from "../shared.js"
-import stripShebang from "../util/strip-shebang.js"
+import _compile from "../internal/compile.js"
+import binding from "../../binding.js"
+import dirname from "../../path/dirname.js"
+import getCacheName from "../../util/get-cache-name.js"
+import getSilent from "../../util/get-silent.js"
+import makeRequireFunction from "../internal/make-require-function.js"
+import realProcess from "../../real/process.js"
+import realVM from "../../real/vm.js"
+import shared from "../../shared.js"
+import stripShebang from "../../util/strip-shebang.js"
 
 const {
   STATE_EXECUTION_COMPLETED,

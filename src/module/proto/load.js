@@ -2,10 +2,10 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import Entry from "../entry.js"
+import Entry from "../../entry.js"
 
-import loader from "./cjs/loader.js"
-import shared from "../shared.js"
+import loader from "../cjs/loader.js"
+import shared from "../../shared.js"
 
 function load(filename) {
   if (this.loaded) {

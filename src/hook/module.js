@@ -10,9 +10,10 @@ import Package from "../package.js"
 import RealModule from "../real/module.js"
 import Wrapper from "../wrapper.js"
 
-import compile from "../module/_compile.js"
+import compile from "../module/internal/compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
+import esmState from "../module/esm/state.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
@@ -23,7 +24,6 @@ import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import moduleState from "../module/state.js"
 import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
@@ -211,7 +211,7 @@ function hook(Mod, parent) {
     Wrapper.wrap(_extensions, ext, methodWrapper)
 
     passthruMap.set(extCompiler, passthru)
-    moduleState._extensions[ext] = _extensions[ext]
+    esmState._extensions[ext] = _extensions[ext]
   }
 }
 

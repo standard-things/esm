@@ -2,25 +2,25 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import CHAR_CODE from "../constant/char-code.js"
-import ENV from "../constant/env.js"
+import CHAR_CODE from "../../constant/char-code.js"
+import ENV from "../../constant/env.js"
 
-import Module from "../module.js"
-import { Stats } from "../safe/fs.js"
+import Module from "../../module.js"
+import { Stats } from "../../safe/fs.js"
 
-import binding from "../binding.js"
-import call from "../util/call.js"
-import isAbsolute from "../path/is-absolute.js"
-import isJS from "../path/is-js.js"
-import isMJS from "../path/is-mjs.js"
-import keys from "../util/keys.js"
-import readFileFast from "../fs/read-file-fast.js"
-import realpath from "../fs/realpath.js"
-import { resolve } from "../safe/path.js"
-import safeToString from "../util/safe-to-string.js"
-import shared from "../shared.js"
-import statFast from "../fs/stat-fast.js"
-import statSync from "../fs/stat-sync.js"
+import binding from "../../binding.js"
+import call from "../../util/call.js"
+import isAbsolute from "../../path/is-absolute.js"
+import isJS from "../../path/is-js.js"
+import isMJS from "../../path/is-mjs.js"
+import keys from "../../util/keys.js"
+import readPackage from "./read-package.js"
+import realpath from "../../fs/realpath.js"
+import { resolve } from "../../safe/path.js"
+import safeToString from "../../util/safe-to-string.js"
+import shared from "../../shared.js"
+import statFast from "../../fs/stat-fast.js"
+import statSync from "../../fs/stat-sync.js"
 
 const {
   BACKWARD_SLASH,
@@ -35,14 +35,13 @@ const {
 const { isFile, isSymbolicLink } = Stats.prototype
 const { preserveSymlinks, preserveSymlinksMain } = binding.config
 
-const mainFieldRegExp = /"main"/
 const mainFields = ["main"]
 
 let resolveSymlinks = ! preserveSymlinks
 let resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain, fields, exts) {
-  const cache = shared.memoize.moduleFindPath
+  const cache = shared.memoize.moduleInternalFindPath
 
   const cacheKey =
     request + "\0" +
@@ -162,30 +161,6 @@ function findPath(request, paths, isMain, fields, exts) {
   }
 
   return ""
-}
-
-function readPackage(dirPath) {
-  const cache = shared.memoize.moduleReadPackage
-
-  if (Reflect.has(cache, dirPath)) {
-    return cache[dirPath]
-  }
-
-  const jsonPath = resolve(dirPath, "package.json")
-  const jsonString = readFileFast(jsonPath, "utf8")
-
-  if (! jsonString ||
-      ! mainFieldRegExp.test(jsonString)) {
-    return null
-  }
-
-  try {
-    return cache[dirPath] = JSON.parse(jsonString)
-  } catch (e) {
-    e.path = jsonPath
-    e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
-    throw e
-  }
 }
 
 function tryExtensions(thePath, exts, isMain) {

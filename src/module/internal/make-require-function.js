@@ -2,21 +2,21 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
-import ENTRY from "../constant/entry.js"
-import ESM from "../constant/esm.js"
+import ENTRY from "../../constant/entry.js"
+import ESM from "../../constant/esm.js"
 
-import Entry from "../entry.js"
-import Module from "../module.js"
+import Entry from "../../entry.js"
+import Module from "../../module.js"
 
-import errors from "../errors.js"
-import isDataProperty from "../util/is-data-property.js"
-import isError from "../util/is-error.js"
-import isInstalled from "../util/is-installed.js"
-import maskFunction from "../util/mask-function.js"
-import realGetProxyDetails from "../real/get-proxy-details.js"
-import realProcess from "../real/process.js"
-import realRequire from "../real/require.js"
-import shared from "../shared.js"
+import errors from "../../errors.js"
+import isDataProperty from "../../util/is-data-property.js"
+import isError from "../../util/is-error.js"
+import isInstalled from "../../util/is-installed.js"
+import maskFunction from "../../util/mask-function.js"
+import realGetProxyDetails from "../../real/get-proxy-details.js"
+import realProcess from "../../real/process.js"
+import realRequire from "../../real/require.js"
+import shared from "../../shared.js"
 
 const {
   TYPE_ESM

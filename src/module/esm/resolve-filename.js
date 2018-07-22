@@ -6,13 +6,12 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 import SafeModule from "../../safe/module.js"
 
-import _findPath from "../_find-path.js"
-import _resolveLookupPaths from "../_resolve-lookup-paths.js"
 import builtinLookup from "../../builtin-lookup.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
 import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
 import extname from "../../path/extname.js"
+import findPath from "../internal/find-path.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import hasEncodedSep from "../../path/has-encoded-sep.js"
 import isAbsolute from "../../path/is-absolute.js"
@@ -20,9 +19,10 @@ import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
-import nodeModulePaths from "../node-module-paths.js"
 import parseURL from "../../util/parse-url.js"
+import resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import shared from "../../shared.js"
+import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
   FORWARD_SLASH
@@ -145,7 +145,7 @@ function resolveFilename(request, parent, isMain, options) {
       const paths = isAbs ? [""] : [fromPath]
 
       pathname = decodeURIComponent(pathname)
-      foundPath = _findPath(pathname, paths, isMain, fields, strictExts)
+      foundPath = findPath(pathname, paths, isMain, fields, strictExts)
     }
   } else if (! hasEncodedSep(request)) {
     const decoded = decodeURIComponent(request)
@@ -191,10 +191,10 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
       Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths, skipGlobalPaths)
   } else {
-    paths = _resolveLookupPaths(request, parent, skipGlobalPaths)
+    paths = resolveLookupPaths(request, parent, skipGlobalPaths)
   }
 
-  return _findPath(request, paths, isMain, fields, exts)
+  return findPath(request, paths, isMain, fields, exts)
 }
 
 function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {
@@ -202,9 +202,9 @@ function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {
   const paths = []
 
   for (const fromPath of fromPaths) {
-    fakeParent.paths = nodeModulePaths(fromPath)
+    fakeParent.paths = staticNodeModulePaths(fromPath)
 
-    const lookupPaths = _resolveLookupPaths(request, fakeParent, skipGlobalPaths)
+    const lookupPaths = resolveLookupPaths(request, fakeParent, skipGlobalPaths)
 
     if (paths.indexOf(fromPath) === -1) {
       paths.push(fromPath)

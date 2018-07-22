@@ -4,22 +4,22 @@ import GenericArray from "./generic/array.js"
 import GenericObject from "./generic/object.js"
 import RealModule from "./real/module.js"
 
-import _compile from "./module/compile.js"
-import _findPath from "./module/find-path.js"
-import _initPaths from "./module/init-paths.js"
-import _load from "./module/cjs/load.js"
-import _nodeModulePaths from "./module/node-module-paths.js"
-import _resolveFilename from "./module/cjs/resolve-filename.js"
-import _resolveLookupPaths from "./module/resolve-lookup-paths.js"
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
 import defaults from "./util/defaults.js"
-import initGlobalPaths from "./module/init-global-paths.js"
-import load from "./module/load.js"
+import esmState from "./module/esm/state.js"
+import initGlobalPaths from "./module/internal/init-global-paths.js"
 import maskFunction from "./util/mask-function.js"
-import moduleState from "./module/state.js"
 import parseState from "./parse/state.js"
-import req from "./module/require.js"
+import protoCompile from "./module/proto/compile.js"
+import protoLoad from "./module/proto/load.js"
+import req from "./module/proto/require.js"
+import staticFindPath from "./module/static/find-path.js"
+import staticInitPaths from "./module/static/init-paths.js"
+import staticLoad from "./module/static/load.js"
+import staticNodeModulePaths from "./module/static/node-module-paths.js"
+import staticResolveFilename from "./module/static/resolve-filename.js"
+import staticResolveLookupPaths from "./module/static/resolve-lookup-paths.js"
 
 const {
   JEST
@@ -41,21 +41,21 @@ const Module = maskFunction(function (id, parent) {
 }, RealModule)
 
 Module._extensions = { __proto__: null }
-Module._findPath = maskFunction(_findPath, RealModule._findPath)
-Module._initPaths = maskFunction(_initPaths, RealModule._initPaths)
-Module._load = maskFunction(_load, RealModule._load)
-Module._nodeModulePaths = maskFunction(_nodeModulePaths, RealModule._nodeModulePaths)
-Module._resolveFilename = maskFunction(_resolveFilename, RealModule._resolveFilename)
-Module._resolveLookupPaths = maskFunction(_resolveLookupPaths, RealModule._resolveLookupPaths)
+Module._findPath = maskFunction(staticFindPath, RealModule.staticFindPath)
+Module._initPaths = maskFunction(staticInitPaths, RealModule.staticInitPaths)
+Module._load = maskFunction(staticLoad, RealModule._load)
+Module._nodeModulePaths = maskFunction(staticNodeModulePaths, RealModule.staticNodeModulePaths)
+Module._resolveFilename = maskFunction(staticResolveFilename, RealModule.staticResolveFilename)
+Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule.staticResolveLookupPaths)
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 
 const { prototype } = Module
 const realProto = RealModule.prototype
 
-prototype._compile = maskFunction(_compile, realProto._compile)
+prototype._compile = maskFunction(protoCompile, realProto._compile)
 prototype.constructor = Module
-prototype.load = maskFunction(load, realProto.load)
+prototype.load = maskFunction(protoLoad, realProto.load)
 prototype.require = maskFunction(req, realProto.require)
 
 defaults(Module, RealModule)
@@ -66,9 +66,12 @@ if (JEST) {
 }
 
 if (Module.globalPaths) {
-  moduleState.globalPaths = GenericArray.from(Module.globalPaths)
+  esmState.globalPaths = GenericArray.from(Module.globalPaths)
 } else {
-  Module.globalPaths = initGlobalPaths()
+  const globalPaths = initGlobalPaths()
+
+  esmState.globalPaths = globalPaths
+  Module.globalPaths = GenericArray.from(globalPaths)
 }
 
 parseState._cache = new Proxy(parseState._cache, {

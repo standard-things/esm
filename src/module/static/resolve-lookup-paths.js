@@ -2,10 +2,10 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import GenericArray from "../generic/array.js"
+import GenericArray from "../../generic/array.js"
 
-import _resolveLookupPaths from "./_resolve-lookup-paths.js"
-import builtinLookup from "../builtin-lookup.js"
+import _resolveLookupPaths from "../internal/resolve-lookup-paths.js"
+import builtinLookup from "../../builtin-lookup.js"
 
 function resolveLookupPaths(request, parent, newReturn) {
   if (Reflect.has(builtinLookup, request)) {

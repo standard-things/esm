@@ -65,10 +65,10 @@ function init() {
     memoize: {
       builtinEntries: { __proto__: null },
       builtinModules: { __proto__: null },
-      moduleCJSResolveFilename: { __proto__: null },
       moduleESMResolveFilename: { __proto__: null },
-      moduleFindPath: { __proto__: null },
-      moduleReadPackage: { __proto__: null },
+      moduleInternalFindPath: { __proto__: null },
+      moduleInternalReadPackage: { __proto__: null },
+      moduleStaticResolveFilename: { __proto__: null },
       pathDirname: { __proto__: null },
       pathExtname: { __proto__: null },
       pathIsAbsolute: { __proto__: null },

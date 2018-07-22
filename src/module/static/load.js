@@ -8,13 +8,13 @@ import PACKAGE from "../../constant/package.js"
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 
-import _load from "../_load.js"
-import _loadESM from "../esm/_load.js"
+import _load from "../internal/load.js"
 import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
-import loader from "./loader.js"
-import moduleLoad from "../load.js"
+import esmLoad from "../esm/load.js"
+import loader from "../cjs/loader.js"
 import parseState from "../../parse/state.js"
+import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
 
 const {
@@ -37,7 +37,7 @@ function load(request, parent, isMain) {
   if (parentEntry &&
       parentEntry._require === TYPE_ESM) {
     parentEntry._require = TYPE_CJS
-    return _loadESM(request, parent, isMain).module.exports
+    return esmLoad(request, parent, isMain).module.exports
   }
 
   const filename = Module._resolveFilename(request, parent, isMain)
@@ -89,7 +89,7 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry) {
   let threw = true
 
   try {
-    if (mod.load === moduleLoad) {
+    if (mod.load === protoLoad) {
       loader(entry, filename, parentEntry)
     } else {
       mod.load(filename)

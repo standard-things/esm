@@ -4,11 +4,11 @@ import Wrapper from "../wrapper.js"
 
 import call from "../util/call.js"
 import dirname from "../path/dirname.js"
+import esmParseLoad from "../module/esm/parse-load.js"
+import esmResolveFilename from "../module/esm/resolve-filename.js"
 import getSilent from "../util/get-silent.js"
-import loadESM from "../module/esm/load.js"
 import realProcess from "../real/process.js"
 import relaxRange from "../util/relax-range.js"
-import resolveFilename from "../module/esm/resolve-filename.js"
 
 function hook(Mod) {
   const _tickCallback = getSilent(realProcess, "_tickCallback")
@@ -33,11 +33,11 @@ function hook(Mod) {
 
     if (Package.get(dirPath) === defaultPkg) {
       // Clone the default package to avoid the parsing phase fallback path
-      // of module/_compile.
+      // of module/internal/compile.
       Package.set(dirPath, defaultPkg.clone())
     }
 
-    loadESM(filename, null, true)
+    esmParseLoad(filename, null, true)
     tickCallback()
   }
 
@@ -51,7 +51,7 @@ function hook(Mod) {
     let error
 
     try {
-      return resolveFilename(request, null, true)
+      return esmResolveFilename(request, null, true)
     } catch (e) {
       error = e
     }

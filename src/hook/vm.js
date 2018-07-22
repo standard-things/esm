@@ -17,12 +17,13 @@ import assign from "../util/assign.js"
 import binding from "../binding.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
+import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
 import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
-import makeRequireFunction from "../module/make-require-function.js"
+import makeRequireFunction from "../module/internal/make-require-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
@@ -31,7 +32,6 @@ import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
-import validateESM from "../module/esm/validate.js"
 import wrap from "../util/wrap.js"
 
 const {
@@ -95,7 +95,7 @@ function hook(vm) {
     entry.state = STATE_PARSING_STARTED
 
     if (entry.type === TYPE_ESM) {
-      tryValidateESM(manager, entry, content)
+      tryValidate(manager, entry, content)
     }
 
     entry.state = STATE_EXECUTION_STARTED
@@ -289,7 +289,7 @@ function createTryWrapper(func, content) {
   })
 }
 
-function tryValidateESM(caller, entry, content) {
+function tryValidate(caller, entry, content) {
   const { moduleState } = shared
 
   moduleState.parsing = true
@@ -298,7 +298,7 @@ function tryValidateESM(caller, entry, content) {
   let threw = true
 
   try {
-    validateESM(entry)
+    esmValidate(entry)
     threw = false
   } catch (e) {
     error = e

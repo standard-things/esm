@@ -1,4 +1,5 @@
 import "./binding.js"
+import "./module/internal/make-require-function.js"
 import "./safe/buffer.js"
 import "./safe/crypto.js"
 import "./safe/inspector.js"

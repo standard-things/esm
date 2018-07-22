@@ -2,9 +2,9 @@ import ENTRY from "../../constant/entry.js"
 
 import Module from "../../module.js"
 
+import esmState from "./state.js"
 import extname from "../../path/extname.js"
 import isMJS from "../../path/is-mjs.js"
-import moduleState from "../state.js"
 import shared from "../../shared.js"
 
 const {
@@ -22,7 +22,7 @@ function loader(entry, filename, parentEntry, preload) {
   const mod = entry.module
   const parent = parentEntry && parentEntry.module
 
-  let { _extensions } = moduleState
+  let { _extensions } = esmState
   let ext = extname(filename)
 
   if (ext === ".js" ||
