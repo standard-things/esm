@@ -1,14 +1,13 @@
+import isEnumerable from "./is-enumerable.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 
 function init() {
-  const { propertyIsEnumerable } = Object.prototype
-
   function isNamespaceObject(value) {
     return isObject(value) &&
       Reflect.getPrototypeOf(value) === null &&
       value[Symbol.toStringTag] === "Module" &&
-      ! propertyIsEnumerable.call(value, Symbol.toStringTag)
+      ! isEnumerable(value, Symbol.toStringTag)
   }
 
   return isNamespaceObject
