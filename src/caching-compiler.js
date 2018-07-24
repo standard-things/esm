@@ -419,22 +419,9 @@ function init() {
         }
       }
 
-      const {
-        pathDirname,
-        pathExtname,
-        pathIsAbsolute,
-        pathIsRelative
-      } = shared.memoize
-
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
       writeFile(cachePath + sep + ".data.json", JSON.stringify({
         map,
-        memoize: {
-          pathDirname,
-          pathExtname,
-          pathIsAbsolute,
-          pathIsRelative
-        },
         version: PKG_VERSION
       }))
     }
