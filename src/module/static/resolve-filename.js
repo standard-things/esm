@@ -9,7 +9,7 @@ import Module from "../../module.js"
 import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
-import dirname from "../../path/dirname.js"
+import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isObject from "../../util/is-object.js"

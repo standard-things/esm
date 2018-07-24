@@ -6,7 +6,7 @@ import Package from "../../package.js"
 
 import _load from "../internal/load.js"
 import builtinLookup from "../../builtin-lookup.js"
-import dirname from "../../path/dirname.js"
+import { dirname } from "../../safe/path.js"
 import esmState from "./state.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"

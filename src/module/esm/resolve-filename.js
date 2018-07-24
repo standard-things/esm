@@ -1,3 +1,5 @@
+import { dirname, extname } from "../../safe/path.js"
+
 import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
@@ -9,9 +11,7 @@ import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
-import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
-import extname from "../../path/extname.js"
 import findPath from "../internal/find-path.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import hasEncodedSep from "../../path/has-encoded-sep.js"

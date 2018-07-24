@@ -3,7 +3,7 @@ import Package from "../package.js"
 import Wrapper from "../wrapper.js"
 
 import call from "../util/call.js"
-import dirname from "../path/dirname.js"
+import { dirname } from "../safe/path.js"
 import esmParseLoad from "../module/esm/parse-load.js"
 import esmResolveFilename from "../module/esm/resolve-filename.js"
 import getSilent from "../util/get-silent.js"

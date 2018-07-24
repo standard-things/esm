@@ -10,14 +10,9 @@ function init() {
   } = CHAR_CODE
 
   function isAbsolute(value) {
-    if (typeof value !== "string") {
+    if (typeof value !== "string" ||
+        ! value.length) {
       return false
-    }
-
-    const cache = shared.memoize.pathIsAbsolute
-
-    if (Reflect.has(cache, value)) {
-      return cache[value]
     }
 
     if (value.charCodeAt(0) === FORWARD_SLASH) {
@@ -29,11 +24,11 @@ function init() {
       const code1 = value.charCodeAt(1)
 
       if (! WIN32) {
-        return cache[value] = code1 !== FORWARD_SLASH
+        return code1 !== FORWARD_SLASH
       }
     }
 
-    return cache[value] = _isAbsolute(value)
+    return _isAbsolute(value)
   }
 
   return isAbsolute

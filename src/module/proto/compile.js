@@ -11,7 +11,7 @@ import Package from "../../package.js"
 
 import _compile from "../internal/compile.js"
 import binding from "../../binding.js"
-import dirname from "../../path/dirname.js"
+import { dirname } from "../../safe/path.js"
 import getCacheName from "../../util/get-cache-name.js"
 import getSilent from "../../util/get-silent.js"
 import makeRequireFunction from "../internal/make-require-function.js"

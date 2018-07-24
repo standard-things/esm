@@ -1,15 +1,15 @@
+import { extname, resolve } from "../safe/path.js"
+
 import CHAR_CODE from "../constant/char-code.js"
 
 import Module from "../module.js"
 
 import esmResolveFilename from "../module/esm/resolve-filename.js"
-import extname from "../path/extname.js"
 import isObjectLike from "../util/is-object-like.js"
 import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
 import keys from "../util/keys.js"
 import realpath from "../fs/realpath.js"
-import { resolve } from "../safe/path.js"
 import rootModule from "../root-module.js"
 import shared from "../shared.js"
 

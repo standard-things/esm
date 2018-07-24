@@ -1,4 +1,4 @@
-import dirname from "../path/dirname.js"
+import { dirname } from "../safe/path.js"
 import isDirectory from "../util/is-directory.js"
 import mkdir from "./mkdir.js"
 import shared from "../shared.js"

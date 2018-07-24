@@ -1,4 +1,4 @@
-import { resolve, sep } from "./safe/path.js"
+import { basename, dirname, resolve, sep } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import ENV from "./constant/env.js"
@@ -8,10 +8,8 @@ import PACKAGE from "./constant/package.js"
 import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
-import basename from "./path/basename.js"
 import builtinLookup from "./builtin-lookup.js"
 import defaults from "./util/defaults.js"
-import dirname from "./path/dirname.js"
 import errors from "./errors.js"
 import esmParseLoad from "./module/esm/parse-load.js"
 import getModuleDirname from "./util/get-module-dirname.js"

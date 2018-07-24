@@ -1,5 +1,5 @@
 import builtinLookup from "../builtin-lookup.js"
-import extname from "../path/extname.js"
+import { extname } from "../safe/path.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 

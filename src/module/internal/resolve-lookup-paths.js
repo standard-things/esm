@@ -8,7 +8,7 @@ import ESM from "../../constant/esm.js"
 import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 
-import dirname from "../../path/dirname.js"
+import { dirname } from "../../safe/path.js"
 import esmState from "../esm/state.js"
 import isRelative from "../../path/is-relative.js"
 import staticNodeModulePaths from "../static/node-module-paths.js"
