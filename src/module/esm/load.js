@@ -26,7 +26,6 @@ const {
 function load(request, parent, isMain, preload) {
   const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
-  const parentCompileData = parentEntry && parentEntry.compileData
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
   const parentIsMJS = parentEntry && parentEntry.extname === ".mjs"
   const parentPkg = parentEntry && parentEntry.package

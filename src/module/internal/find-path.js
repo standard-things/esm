@@ -5,7 +5,7 @@
 import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 
-import GenericArray from "../generic/array.js"
+import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 

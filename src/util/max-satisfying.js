@@ -14,7 +14,7 @@ function init() {
     const cache = shared.memoize.utilMaxSatisfying
 
     const cacheKey =
-      (version.length === 1 ? versions[0] : GenericArray.join(versions)) + "\0" +
+      (versions.length === 1 ? versions[0] : GenericArray.join(versions)) + "\0" +
       range
 
     return Reflect.has(cache, cacheKey)
