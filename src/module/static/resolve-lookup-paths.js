@@ -13,6 +13,7 @@ function resolveLookupPaths(request, parent, newReturn) {
   }
 
   const paths = _resolveLookupPaths(request, parent)
+
   return newReturn ? paths : GenericArray.of(request, paths)
 }
 
