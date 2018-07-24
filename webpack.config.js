@@ -1,19 +1,19 @@
-/* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
-"use strict"
-
-const fs = require("fs-extra")
-const path = require("path")
-const webpack = require("webpack")
-
-const {
+/* eslint strict: off, node/no-unsupported-features: ["error", { version: 6, ignores: ["modules"] }] */
+import { readJSONSync } from "fs-extra"
+import { resolve } from "path"
+import {
   BannerPlugin,
   EnvironmentPlugin,
   NormalModuleReplacementPlugin
-} = webpack
-
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-const OptimizeJsPlugin = require("optimize-js-plugin")
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+} from "webpack"
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer"
+import OptimizeJsPlugin from "optimize-js-plugin"
+import UglifyJSPlugin from "uglifyjs-webpack-plugin"
+import babelOptions from "./.babel.config.js"
+import {
+  files as PKG_FILENAMES,
+  version as PKG_VERSION
+} from "./package.json"
 
 class WebpackRequirePlugin {
   apply(compiler) {
@@ -39,11 +39,6 @@ class WebpackRequirePlugin {
 
 const { ESM_ENV } = process.env
 
-const {
-  files: PKG_FILENAMES,
-  version: PKG_VERSION
-} = fs.readJSONSync("./package.json")
-
 const isProd = /production/.test(ESM_ENV)
 const isTest = /test/.test(ESM_ENV)
 
@@ -57,8 +52,7 @@ const hosted = [
   "console"
 ]
 
-const babelOptions = require("./.babel.config.js")
-const uglifyOptions = fs.readJSONSync("./.uglifyrc")
+const uglifyOptions = readJSONSync("./.uglifyrc")
 
 const config = {
   devtool: false,
@@ -86,7 +80,7 @@ const config = {
     filename: "[name].js",
     libraryExport: "default",
     libraryTarget: "commonjs2",
-    path: path.resolve("build"),
+    path: resolve("build"),
     pathinfo: false
   },
   plugins: [
@@ -118,7 +112,7 @@ const config = {
     }),
     new NormalModuleReplacementPlugin(
       /acorn\/src\/regexp\.js/,
-      path.resolve("src/acorn/replacement/regexp.js")
+      resolve("src/acorn/replacement/regexp.js")
     ),
     new EnvironmentPlugin({
       PKG_FILENAMES,
@@ -144,4 +138,4 @@ if (isTest) {
   config.entry["get-file-path-from-url"] = "./src/util/get-file-path-from-url.js"
 }
 
-module.exports = config
+export default config
