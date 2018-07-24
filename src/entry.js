@@ -11,6 +11,7 @@ import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleExtname from "./util/get-module-extname.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
+import isEnumerable from "./util/is-enumerable.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import keys from "./util/keys.js"
@@ -199,7 +200,8 @@ class Entry {
       descriptor.get = () => {
         const exported = this.exports
 
-        if (has(exported, name)) {
+        if (has(exported, name) &&
+            isEnumerable(exported, name)) {
           return exported[name]
         }
       }
@@ -617,7 +619,8 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
     if (isUpdatableDescriptor(descriptor)) {
       const exported = entry.exports
 
-      if (has(exported, name)) {
+      if (has(exported, name) &&
+          isEnumerable(exported, name)) {
         return Reflect.getOwnPropertyDescriptor(exported, name)
       }
 
@@ -748,7 +751,8 @@ function getExportByName(entry, name, parentEntry) {
         let object = target
 
         if (name !== Symbol.toStringTag &&
-            has(exported, name)) {
+            has(exported, name) &&
+            isEnumerable(exported, name)) {
           object = exported
         }
 
