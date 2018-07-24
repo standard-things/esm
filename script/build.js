@@ -35,6 +35,8 @@ const trashPaths = [
 ]
 
 const webpackArgs = [
+  "-r",
+  "esm",
   argv.prod && ! argv.test
     ? "--display-optimization-bailout"
     : "--hide-modules"
