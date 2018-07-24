@@ -1,5 +1,7 @@
 import { maxSatisfying as _maxSatisfying } from "semver"
 
+import GenericArray from "../generic/array.js"
+
 import shared from "../shared.js"
 
 function init() {
@@ -10,7 +12,10 @@ function init() {
     }
 
     const cache = shared.memoize.utilMaxSatisfying
-    const cacheKey = versions + "\0" + range
+
+    const cacheKey =
+      (version.length === 1 ? versions[0] : GenericArray.join(versions)) + "\0" +
+      range
 
     return Reflect.has(cache, cacheKey)
       ? cache[cacheKey]

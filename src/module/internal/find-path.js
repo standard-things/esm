@@ -5,6 +5,7 @@
 import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 
+import GenericArray from "../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 
@@ -17,7 +18,6 @@ import keys from "../../util/keys.js"
 import readPackage from "./read-package.js"
 import realpath from "../../fs/realpath.js"
 import { resolve } from "../../safe/path.js"
-import safeToString from "../../util/safe-to-string.js"
 import shared from "../../shared.js"
 import statFast from "../../fs/stat-fast.js"
 import statSync from "../../fs/stat-sync.js"
@@ -43,11 +43,19 @@ let resolveSymlinksMain = ! preserveSymlinksMain
 function findPath(request, paths, isMain, fields, exts) {
   const cache = shared.memoize.moduleInternalFindPath
 
-  const cacheKey =
-    request + "\0" +
-    (paths && paths.length === 1 ? paths[0] : safeToString(paths)) +
-    (fields ? "\0" + safeToString(fields) : "") +
-    (exts ? "\0" + safeToString(exts) : "")
+  let cacheKey = request
+
+  if (paths) {
+    cacheKey += "\0" + (paths.length === 1 ? paths[0] : GenericArray.join(paths))
+  }
+
+  if (fields) {
+    cacheKey += "\0" + (fields.length === 1 ? fields[0] : GenericArray.join(fields))
+  }
+
+  if (exts) {
+    cacheKey += "\0" + (exts.length === 1 ? exts[0] : GenericArray.join(exts))
+  }
 
   if (Reflect.has(cache, cacheKey)) {
     return cache[cacheKey]
