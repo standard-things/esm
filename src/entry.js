@@ -118,7 +118,7 @@ class Entry {
     // The entry type of the module.
     this.type = TYPE_CJS
 
-    this.updateFilename()
+    this.updateFilename(true)
   }
 
   static delete(value) {
@@ -458,14 +458,20 @@ class Entry {
     return this
   }
 
-  updateFilename(filename) {
+  updateFilename(filename, force) {
     const mod = this.module
+
+    if (typeof filename === "boolean") {
+      force = filename
+      filename = void 0
+    }
 
     if (filename !== void 0) {
       mod.filename = filename
     }
 
-    if (this.filename !== mod.filename) {
+    if (force ||
+        this.filename !== mod.filename) {
       this.filename = mod.filename
       this.dirname = getModuleDirname(mod)
       this.extname = getModuleExtname(mod)
