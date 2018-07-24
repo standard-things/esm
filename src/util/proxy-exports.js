@@ -67,7 +67,7 @@ function init() {
       const value = Reflect.get(target, name, receiver)
 
       if (accessor) {
-        tryUpdate(name, value)
+        tryUpdateBindings(name, value)
       }
 
       return value
@@ -106,9 +106,9 @@ function init() {
       return wrapper
     }
 
-    const tryUpdate = (name, value) => {
+    const tryUpdateBindings = (name, value) => {
       if (! Reflect.has(entry._namespace, name)) {
-        entry.update()
+        entry.updateBindings()
         return
       }
 
@@ -118,7 +118,7 @@ function init() {
       entry.addGetter(name, () => value)
 
       try {
-        entry.update(name)
+        entry.updateBindings(name)
       } finally {
         if (getter) {
           getters[name] = getter
@@ -147,7 +147,7 @@ function init() {
         }
 
         if (Reflect.has(entry._namespace, name)) {
-          entry.update(name)
+          entry.updateBindings(name)
         }
 
         return true
@@ -155,7 +155,7 @@ function init() {
       deleteProperty(target, name) {
         if (Reflect.deleteProperty(target, name)) {
           if (Reflect.has(entry._namespace, name)) {
-            entry.update(name)
+            entry.updateBindings(name)
           }
 
           return true
@@ -181,9 +181,9 @@ function init() {
 
         if (Reflect.set(target, name, value, receiver)) {
           if (accessor) {
-            entry.update()
+            entry.updateBindings()
           } else if (Reflect.has(entry._namespace, name)) {
-            entry.update(name)
+            entry.updateBindings(name)
           }
 
           return true

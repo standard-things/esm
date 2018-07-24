@@ -4,6 +4,7 @@
 
 import ENV from "../../constant/env.js"
 
+import Entry from "../../entry.js"
 import Module from "../../module.js"
 import SafeModule from "../../safe/module.js"
 
@@ -44,13 +45,17 @@ function resolveFilename(request, parent, isMain, options) {
 
   const cache = shared.memoize.moduleStaticResolveFilename
   const isAbs = isAbsolute(request)
-  const parentFilename = parent && parent.filename
+  const parentEntry = parent && Entry.get(parent)
 
   let fromPath
 
-  if (! isAbs &&
-      typeof parentFilename === "string") {
-    fromPath = dirname(parentFilename)
+  if (parentEntry) {
+    parentEntry.updateFilename()
+  }
+
+  if (parentEntry &&
+      ! isAbs) {
+    fromPath = parentEntry.dirname
   } else {
     fromPath = ""
   }

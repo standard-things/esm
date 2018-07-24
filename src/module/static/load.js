@@ -9,7 +9,6 @@ import Entry from "../../entry.js"
 import Module from "../../module.js"
 
 import _load from "../internal/load.js"
-import dirname from "../../path/dirname.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import loader from "../cjs/loader.js"
@@ -58,10 +57,6 @@ function load(request, parent, isMain) {
     const child = entry.module
 
     state._cache[filename] = child
-
-    if (! child.paths) {
-      child.paths = Module._nodeModulePaths(dirname(filename))
-    }
 
     if (parseOnly &&
         ! parsing) {

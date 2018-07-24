@@ -1,4 +1,4 @@
-import { basename, resolve, sep } from "./safe/path.js"
+import { resolve, sep } from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import ENV from "./constant/env.js"
@@ -8,11 +8,13 @@ import PACKAGE from "./constant/package.js"
 import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
+import basename from "./path/basename.js"
 import builtinLookup from "./builtin-lookup.js"
 import defaults from "./util/defaults.js"
 import dirname from "./path/dirname.js"
 import errors from "./errors.js"
 import esmParseLoad from "./module/esm/parse-load.js"
+import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
@@ -264,19 +266,9 @@ class Package {
     let dirPath = "."
 
     if (typeof request === "string") {
-      if (Reflect.has(builtinLookup, request)) {
-        dirPath = ""
-      } else {
-        dirPath = dirname(request)
-      }
-    } else if (isObject(request)) {
-      const { filename } = request
-
-      if (Reflect.has(builtinLookup, request.id)) {
-        dirPath = ""
-      } else if (typeof filename === "string") {
-        dirPath = dirname(filename)
-      }
+      dirPath = Reflect.has(builtinLookup, request) ? "" : dirname(request)
+    } else {
+      dirPath = getModuleDirname(request)
     }
 
     return Package.get(dirPath, force)

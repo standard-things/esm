@@ -3,8 +3,6 @@ import ENTRY from "../../constant/entry.js"
 import Module from "../../module.js"
 
 import esmState from "./state.js"
-import extname from "../../path/extname.js"
-import isMJS from "../../path/is-mjs.js"
 import shared from "../../shared.js"
 
 const {
@@ -14,26 +12,25 @@ const {
 function loader(entry, filename, parentEntry, preload) {
   const { parsing } = shared.moduleState
 
+  entry.updateFilename(filename)
+
   if (preload &&
       ! parsing) {
     preload(entry)
   }
 
-  const mod = entry.module
-  const parent = parentEntry && parentEntry.module
-
-  let { _extensions } = esmState
-  let ext = extname(filename)
+  let ext = entry.extname
+  let state = esmState
 
   if (ext === ".js" ||
       (parentEntry &&
        parentEntry.package.options.cjs.extensions &&
-       ! isMJS(parent.filename))) {
-    _extensions = Module._extensions
+       parentEntry.extname !== ".mjs")) {
+    state = Module
   }
 
   if (ext === "" ||
-      ! Reflect.has(_extensions, ext)) {
+      ! Reflect.has(state._extensions, ext)) {
     ext = ".js"
   }
 
@@ -44,7 +41,9 @@ function loader(entry, filename, parentEntry, preload) {
     return
   }
 
-  _extensions[ext](mod, filename)
+  const mod = entry.module
+
+  state._extensions[ext](mod, filename)
 
   if (! parsing &&
       ! mod.loaded) {

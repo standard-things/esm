@@ -2,7 +2,6 @@ import ENTRY from "../../constant/entry.js"
 
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
-import isMJS from "../../path/is-mjs.js"
 
 const {
   STATE_PARSING_COMPLETED,
@@ -122,7 +121,7 @@ function validateDependencies(entry) {
 
   const namedExports =
     entry.package.options.cjs.namedExports &&
-    ! isMJS(entry.module.filename)
+    entry.extname !== ".mjs"
 
   for (const specifier in dependencySpecifiers) {
     const {

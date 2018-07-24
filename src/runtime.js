@@ -14,7 +14,6 @@ import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isError from "./util/is-error.js"
-import isMJS from "./path/is-mjs.js"
 import isPath from "./util/is-path.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
 import { resolve } from "./safe/path.js"
@@ -207,7 +206,7 @@ const Runtime = {
   },
 
   updateBindings(valueToPassThrough) {
-    this.entry.update()
+    this.entry.updateBindings()
 
     // Returns the `valueToPassThrough` parameter to allow the value of the
     // original expression to pass through. For example,
@@ -217,12 +216,12 @@ const Runtime = {
     //
     // becomes
     //
-    //   runtime.export("a", () => a)
+    //   runtime.addExportGetter("a", () => a)
     //   let a = 1
-    //   runtime.update(a += 3)
+    //   runtime.updateBindings(a += 3)
     //
-    // This ensures `entry.update()` runs immediately after the assignment,
-    // and does not interfere with the larger computation.
+    // This ensures `entry.updateBindings()` runs immediately after assignment,
+    // without interfering with the larger computation.
     return valueToPassThrough
   }
 }
@@ -252,8 +251,8 @@ function getEntryFrom(request, exported) {
 }
 
 function importModule(entry, request, setterArgsList, loader) {
+  const extIsMJS = entry.extname === ".mjs"
   const mod = entry.module
-  const { filename } = mod
   const { moduleState } = shared
 
   let child
@@ -268,9 +267,9 @@ function importModule(entry, request, setterArgsList, loader) {
     childEntry = loader(request, mod, false, (childEntry) => {
       child = childEntry.module
 
-      if (childEntry.type === TYPE_ESM &&
-          isMJS(filename) &&
-          ! isMJS(child.filename)) {
+      if (extIsMJS &&
+          childEntry.type === TYPE_ESM &&
+          childEntry.extname !== ".mjs") {
         throw ERR_INVALID_ESM_FILE_EXTENSION(child)
       }
 
@@ -285,17 +284,17 @@ function importModule(entry, request, setterArgsList, loader) {
   moduleState.requireDepth -= 1
 
   if (threw &&
-      (! entry.package.options.cjs.paths ||
-       isMJS(filename) ||
+      (extIsMJS ||
+       ! entry.package.options.cjs.paths ||
        ! isError(error) ||
        error.code !== "MODULE_NOT_FOUND")) {
     throw error
   }
 
-  let exported
-
   entry._require = TYPE_ESM
   moduleState.requireDepth += 1
+
+  let exported
 
   try {
     exported = mod.require(request)
@@ -322,16 +321,16 @@ function importModule(entry, request, setterArgsList, loader) {
     // requests are resolved with the mock entry instead of the child entry.
     mockEntry.addSetters(setterArgsList, entry)
     mockEntry.loaded()
-    mockEntry.update()
+    mockEntry.updateBindings()
   }
 
   childEntry.loaded()
-  childEntry.update()
+  childEntry.updateBindings()
 
   if (mockEntry) {
     // Update the mock entry after the original child entry so static import
     // requests are updated with mock entry setters last.
-    mockEntry.update()
+    mockEntry.updateBindings()
   }
 }
 
@@ -352,7 +351,7 @@ function runESM(entry, moduleWrapper) {
   let result
 
   if (entry.package.options.cjs.vars &&
-      ! isMJS(mod.filename)) {
+      entry.extname !== ".mjs") {
     result = Reflect.apply(moduleWrapper, exported, [
       exported,
       makeRequireFunction(mod)
@@ -370,7 +369,7 @@ function runESM(entry, moduleWrapper) {
     set(value) {
       if (value) {
         setProperty(this, "loaded", value)
-        entry.update().loaded()
+        entry.updateBindings().loaded()
       } else {
         loaded = value
       }

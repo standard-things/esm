@@ -10,7 +10,6 @@ import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
-import isMJS from "./path/is-mjs.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
 import realProcess from "./real/process.js"
@@ -204,7 +203,7 @@ function init() {
   function toCompileOptions(entry, options) {
     const { runtimeName } = entry
 
-    const cjs = isMJS(entry.module.filename)
+    const cjs = entry.extname === ".mjs"
       ? void 0
       : entry.package.options.cjs
 

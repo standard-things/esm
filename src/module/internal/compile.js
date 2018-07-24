@@ -15,7 +15,6 @@ import esmValidate from "../esm/validate.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
 import isError from "../../util/is-error.js"
-import isMJS from "../../path/is-mjs.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
 import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
@@ -52,7 +51,7 @@ function compile(caller, entry, content, filename, fallback) {
   let hint = SCRIPT
   let sourceType = SCRIPT
 
-  if (isMJS(filename)) {
+  if (entry.extname === ".mjs") {
     hint = MODULE
     sourceType = MODULE
   } else if (mode === OPTIONS_MODE_ALL) {
@@ -182,7 +181,7 @@ function tryCompileESM(entry, filename) {
 
   const cjsVars =
     entry.package.options.cjs.vars &&
-    ! isMJS(filename)
+    entry.extname !== ".mjs"
 
   let content =
     "const " + runtimeName + "=this;" +
@@ -277,7 +276,7 @@ function useAsyncWrapper(entry) {
   return entry.package.options.await &&
     shared.support.await &&
     (entry.type !== TYPE_ESM ||
-     (! isMJS(entry.module.filename) &&
+     (entry.extname !== ".mjs" &&
       isObjectEmpty(entry.compileData.exportedSpecifiers)))
 }
 

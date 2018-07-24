@@ -26,8 +26,9 @@ const {
 function load(request, parent, isMain, preload) {
   const { parseOnly, parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
+  const parentCompileData = parentEntry && parentEntry.compileData
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const parentIsMJS = parent && isMJS(parent.filename)
+  const parentIsMJS = parentEntry && parentEntry.extname === ".mjs"
   const parentPkg = parentEntry && parentEntry.package
   const parentPkgOptions = parentPkg && parentPkg.options
 
@@ -83,14 +84,6 @@ function load(request, parent, isMain, preload) {
     const child = entry.module
 
     state._cache[request] = child
-
-    entry.id = request
-    child.filename = filename
-
-    if (isMain) {
-      child.id = "."
-      esmState.mainModule = child
-    }
 
     if (parentEntry) {
       parentEntry.children[entry.name] = entry

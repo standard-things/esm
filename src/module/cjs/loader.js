@@ -2,15 +2,14 @@ import PACKAGE from "../../constant/package.js"
 
 import Module from "../../module.js"
 
-import dirname from "../../path/dirname.js"
-import extname from "../../path/extname.js"
-
 const {
   OPTIONS_MODE_STRICT
 } = PACKAGE
 
 function loader(entry, filename, parentEntry) {
-  let ext = extname(filename)
+  entry.updateFilename(filename)
+
+  let ext = entry.extname
 
   if (ext === "" ||
       ! Reflect.has(Module._extensions, ext)) {
@@ -25,8 +24,7 @@ function loader(entry, filename, parentEntry) {
 
   const mod = entry.module
 
-  mod.filename = filename
-  mod.paths = Module._nodeModulePaths(dirname(filename))
+  mod.paths = Module._nodeModulePaths(entry.dirname)
 
   try {
     Module._extensions[ext](mod, filename)

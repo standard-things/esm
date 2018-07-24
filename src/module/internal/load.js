@@ -10,6 +10,8 @@ import Module from "../../module.js"
 
 import builtinEntries from "../../builtin-entries.js"
 import esmState from "../esm/state.js"
+import getFilePathfromURL from "../../util/get-file-path-from-url.js"
+import isFileProtocol from "../../util/is-file-protocol.js"
 import realProcess from "../../real/process.js"
 import shared from "../../shared.js"
 
@@ -50,7 +52,10 @@ function load(filename, parent, isMain, state, loader) {
     return builtinEntries[filename]
   } else {
     child = new Module(filename, parent)
-    child.filename = filename
+
+    child.filename = isFileProtocol(filename)
+      ? getFilePathfromURL(filename)
+      : filename
 
     if (isMain) {
       esmState.mainModule =
@@ -61,6 +66,7 @@ function load(filename, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.id = filename
     entry.parent = Entry.get(parent)
+
     entry.state = parsing
       ? STATE_PARSING_STARTED
       : STATE_EXECUTION_STARTED

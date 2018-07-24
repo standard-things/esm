@@ -7,9 +7,10 @@ import SafeObject from "./safe/object.js"
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
 import errors from "./errors.js"
+import getModuleDirname from "./util/get-module-dirname.js"
+import getModuleExtname from "./util/get-module-extname.js"
 import getModuleName from "./util/get-module-name.js"
 import has from "./util/has.js"
-import isMJS from "./path/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import keys from "./util/keys.js"
@@ -54,6 +55,8 @@ class Entry {
   constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
+    // The module filename.
+    this._filename = null
     // The loading state of the module.
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
@@ -80,12 +83,18 @@ class Entry {
     this.cjsMutableNamespace = this.namespace
     // The namespace object CJS importers receive.
     this.cjsNamespace = this.namespace
+    // The module dirname.
+    this.dirname = null
     // The mutable namespace object ESM importers receive.
     this.esmMutableNamespace = this.namespace
     // The namespace object ESM importers receive.
     this.esmNamespace = this.namespace
     // The `module.exports` value at the time the module loaded.
     this.exports = mod.exports
+    // The module extname.
+    this.extname = null
+    // The module filename.
+    this.filename = null
     // Getters for local variables exported by the module.
     this.getters = { __proto__: null }
     // The unique id for the module cache.
@@ -93,7 +102,7 @@ class Entry {
     // The module the entry is managing.
     this.module = mod
     // The name of the module.
-    this.name = getModuleName(mod)
+    this.name = null
     // The package data of the module.
     this.package = Package.from(mod)
     // The `module.parent` entry.
@@ -108,6 +117,8 @@ class Entry {
     this.state = STATE_INITIAL
     // The entry type of the module.
     this.type = TYPE_CJS
+
+    this.updateFilename()
   }
 
   static delete(value) {
@@ -215,7 +226,7 @@ class Entry {
 
     if ((this.type === TYPE_ESM &&
          otherType !== TYPE_ESM &&
-         isMJS(this.module.filename)) ||
+         this.extname === ".mjs") ||
         (otherType === TYPE_CJS &&
          ! otherEntry.package.options.cjs.namedExports)) {
       return this
@@ -364,7 +375,7 @@ class Entry {
 
       if (this.package.options.cjs.interop &&
           ! Reflect.has(getters, "__esModule") &&
-          ! isMJS(mod.filename)) {
+          this.extname !== ".mjs") {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
@@ -408,7 +419,7 @@ class Entry {
     return this
   }
 
-  update(names) {
+  updateBindings(names) {
     // Lazily-initialized map of parent module names to parent entries whose
     // setters might need to run.
     let parentsMap
@@ -441,14 +452,25 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     for (const id in parentsMap) {
-      // What happens if `parents[parentIDs[id]] === module`, or if
-      // longer cycles exist in the parent chain? Thanks to our `setter.last`
-      // bookkeeping in `changed()`, the `entry.update()` broadcast will only
-      // proceed as far as there are any actual changes to report.
-      parentsMap[id].update()
+      parentsMap[id].updateBindings()
     }
 
     return this
+  }
+
+  updateFilename(filename) {
+    const mod = this.module
+
+    if (filename !== void 0) {
+      mod.filename = filename
+    }
+
+    if (this.filename !== mod.filename) {
+      this.filename = mod.filename
+      this.dirname = getModuleDirname(mod)
+      this.extname = getModuleExtname(mod)
+      this.name = getModuleName(mod)
+    }
   }
 }
 
@@ -563,7 +585,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
     if (Reflect.has(source.namespace, name)) {
       entry
         .addGetter(name, () => entry.namespace[name])
-        .update(name)
+        .updateBindings(name)
     }
 
     return true
@@ -574,7 +596,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
       if (Reflect.has(source.namespace, name)) {
         entry
           .addGetter(name, () => entry.namespace[name])
-          .update(name)
+          .updateBindings(name)
       }
 
       return true
@@ -610,7 +632,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
       if (Reflect.has(source.namespace, name)) {
         entry
           .addGetter(name, () => entry.namespace[name])
-          .update(name)
+          .updateBindings(name)
       }
 
       return true
@@ -677,15 +699,15 @@ function esmNamespaceGetter(entry) {
   }
 }
 
-function getExportByName(entry, name, parent) {
+function getExportByName(entry, name, parentEntry) {
   const { _namespace, getters, type } = entry
   const mod = entry.module
 
   const isCJS = type === TYPE_CJS
   const isPseudo = type === TYPE_PSEUDO
 
-  const parentOptions = parent.package.options
-  const parentIsMJS = isMJS(parent.module.filename)
+  const parentOptions = parentEntry.package.options
+  const parentIsMJS = parentEntry.extname === ".mjs"
 
   const parentMutableNamespace =
     ! parentIsMJS &&
@@ -698,7 +720,7 @@ function getExportByName(entry, name, parent) {
 
   const noMutableNamespace =
     ! parentMutableNamespace ||
-    isMJS(mod.filename)
+    entry.extname === ".mjs"
 
   const noNamedExports =
     (isCJS &&

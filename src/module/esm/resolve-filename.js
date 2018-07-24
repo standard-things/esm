@@ -2,6 +2,7 @@ import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
+import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
 import SafeModule from "../../safe/module.js"
@@ -74,13 +75,17 @@ function resolveFilename(request, parent, isMain, options) {
 
   const cache = shared.memoize.moduleESMResolveFilename
   const isAbs = isAbsolute(request)
-  const parentFilename = parent && parent.filename
+  const parentEntry = parent && Entry.get(parent)
 
   let fromPath
 
-  if (! isAbs &&
-      typeof parentFilename === "string") {
-    fromPath = dirname(parentFilename)
+  if (parentEntry) {
+    parentEntry.updateFilename()
+  }
+
+  if (parentEntry &&
+      ! isAbs) {
+    fromPath = parentEntry.dirname
   } else {
     fromPath = ""
   }
@@ -113,8 +118,8 @@ function resolveFilename(request, parent, isMain, options) {
   let cjsPaths = pkgOptions.cjs.paths
   let fields = pkgOptions.mainFields
 
-  if (parentFilename &&
-      isMJS(parentFilename)) {
+  if (parentEntry &&
+      parentEntry.extname === ".mjs") {
     autoMode =
     cjsPaths = false
     fields = strictFields

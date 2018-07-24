@@ -45,7 +45,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
   const cacheKey =
     request + "\0" +
-    safeToString(paths) +
+    (paths && paths.length === 1 ? paths[0] : safeToString(paths)) +
     (fields ? "\0" + safeToString(fields) : "") +
     (exts ? "\0" + safeToString(exts) : "")
 
