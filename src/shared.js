@@ -69,6 +69,7 @@ function init() {
       moduleInternalFindPath: { __proto__: null },
       moduleInternalReadPackage: { __proto__: null },
       moduleStaticResolveFilename: { __proto__: null },
+      pathBasename: { __proto__: null },
       pathDirname: { __proto__: null },
       pathExtname: { __proto__: null },
       pathIsAbsolute: { __proto__: null },
