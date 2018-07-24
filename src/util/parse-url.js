@@ -15,6 +15,7 @@ function init() {
     if (typeof url === "string" &&
         url.charCodeAt(0) === FORWARD_SLASH &&
         url.charCodeAt(1) === FORWARD_SLASH) {
+      // Prefix protocol relative URLs with "file:"
       url = "file:" + url
     }
 
