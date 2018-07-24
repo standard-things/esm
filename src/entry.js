@@ -14,6 +14,7 @@ import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
+import isUpdatableGet from "./util/is-updatable-get.js"
 import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
@@ -611,6 +612,22 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
     }
 
     return false
+  }
+
+  const { get } = handler
+
+  if (typeof get === "function") {
+    handler.get = (target, name, receiver) => {
+      const value = Reflect.get(target, name, receiver)
+      const newValue = get(target, name, receiver)
+
+      if (newValue !== value &&
+          isUpdatableGet(target, name)) {
+        return newValue
+      }
+
+      return value
+    }
   }
 
   handler.getOwnPropertyDescriptor = (target, name) => {
