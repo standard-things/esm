@@ -334,15 +334,24 @@ describe("scenarios", function () {
       })
     }
 
+    function cleanup() {
+      return exec("pm2", ["kill"])
+    }
+
     return Promise
       .resolve()
-      .then(() => exec("pm2", ["kill"]))
+      .then(cleanup)
       .then(() => trash(logsPath))
       .then(() => exec("pm2", pm2Args))
       .then(() => waitForLogs())
       .then(({ stderr, stdout }) => {
         assert.strictEqual(stderr, "")
         assert.ok(stdout.includes("pm2:true"))
+      })
+      .then(cleanup)
+      .catch((e) => {
+        cleanup()
+        throw e
       })
   })
 })
