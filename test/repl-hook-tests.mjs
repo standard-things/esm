@@ -105,8 +105,11 @@ describe("repl hook", () => {
     r.close()
   })
 
-  ;(canRunInContext ? it : xit)(
-  "should work with a non-global context", () => {
+  it("should work with a non-global context", function () {
+    if (! canRunInContext) {
+      this.skip()
+    }
+
     const r = repl.start({})
     const code = 'import { default as localAssert } from "assert"'
 
@@ -120,8 +123,11 @@ describe("repl hook", () => {
     r.close()
   })
 
-  ;(canRunInContext ? it : xit)(
-  "should use a plain object for `module.exports`", () => {
+  it("should use a plain object for `module.exports`", function () {
+    if (! canRunInContext) {
+      this.skip()
+    }
+
     const r = repl.start({})
     const code = "var exports = module.exports"
 
@@ -133,8 +139,11 @@ describe("repl hook", () => {
     r.close()
   })
 
-  ;(canRunInContext ? it : xit)(
-  "should support importing `.json` files", (done) => {
+  it("should support importing `.json` files", function (done) {
+    if (! canRunInContext) {
+      this.skip()
+    }
+
     const r = repl.start({})
 
     const code = [

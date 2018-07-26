@@ -7,10 +7,14 @@ try {
   canUseAsyncAwait = !! new vm.Script("async()=>await 1")
 } catch (e) {}
 
-describe("top-level await", () => {
-  (canUseAsyncAwait ? it : xit)(
-  "should support `options.await`", () =>
-    Promise
+describe("top-level await", function () {
+
+  it("should support `options.await`", function () {
+    if (! canUseAsyncAwait) {
+      this.skip()
+    }
+
+    return Promise
       .all([
         "./fixture/top-level-await/empty-cjs.js",
         "./fixture/top-level-await/empty-esm.js",
@@ -18,11 +22,14 @@ describe("top-level await", () => {
         "./fixture/top-level-await/nested.js"
       ]
       .map((request) => import(request)))
-  )
+  })
 
-  ;(canUseAsyncAwait ? it : xit)(
-  "should not support `options.await` for ES modules with exports", () =>
-    Promise
+  it("should not support `options.await` for ES modules with exports", function () {
+    if (! canUseAsyncAwait) {
+      this.skip()
+    }
+
+    return Promise
       .all([
         "./fixture/top-level-await/export-esm.js",
         "./fixture/top-level-await/re-export.js"
@@ -32,5 +39,5 @@ describe("top-level await", () => {
           .then(() => assert.ok(false))
           .catch((e) => assert.strictEqual(e.name, "SyntaxError"))
       ))
-  )
+  })
 })

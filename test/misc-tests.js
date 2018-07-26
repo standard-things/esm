@@ -190,8 +190,11 @@ describe("builtin modules", () => {
     })
   })
 
-  ;(canTestUtilTypes ? it : xit)(
-  "should support `util.types.isModuleNamespaceObject`", () => {
+  it("should support `util.types.isModuleNamespaceObject`", function () {
+    if (! canTestUtilTypes) {
+      this.skip()
+    }
+
     const { isModuleNamespaceObject } = util.types
 
     assert.strictEqual(isModuleNamespaceObject(fsNs), true)
@@ -200,8 +203,11 @@ describe("builtin modules", () => {
     assert.strictEqual(isModuleNamespaceObject(), false)
   })
 
-  ;(canTestUtilTypes ? it : xit)(
-  "should support `util.types.isProxy`", () => {
+  it("should support `util.types.isProxy`", function () {
+    if (! canTestUtilTypes) {
+      this.skip
+    }
+
     const { isProxy } = util.types
 
     assert.strictEqual(isProxy(new Proxy({}, {})), true)

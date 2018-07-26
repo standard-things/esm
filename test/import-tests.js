@@ -27,9 +27,12 @@ describe("import declarations", () => {
       .then((ns) => ns.default())
   )
 
-  ;(canTestLiveBinding ? it : xit)(
-  "should support live binding of named exports for CJS modules", () =>
-    import("./cjs/import/live.js")
+  it("should support live binding of named exports for CJS modules", function () {
+    if (! canTestLiveBinding) {
+      this.skip()
+    }
+
+    return import("./cjs/import/live.js")
       .then((ns) => ns.default())
-  )
+  })
 })

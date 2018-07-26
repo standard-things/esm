@@ -27,8 +27,11 @@ function shell(command) {
 describe("--check hook", function () {
   this.timeout(0)
 
-  ;(canTestWithFilename ? it : xit)(
-  "should support `-c` and `--check` flags with a filename", () => {
+  it("should support `-c` and `--check` flags with a filename", function () {
+    if (! canTestWithFilename) {
+      this.skip()
+    }
+
     const basenames = ["", "index.js", "index.mjs"]
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
@@ -56,8 +59,11 @@ describe("--check hook", function () {
       , Promise.resolve())
   })
 
-  ;(canTestWithStdin ? it : xit)(
-  "should support `-c` and `--check` flags with stdin", () => {
+  it("should support `-c` and `--check` flags with stdin", function () {
+    if (! canTestWithStdin) {
+      this.skip
+    }
+
     const checkFlags = ["-c", "--check"]
     const requireFlags = ["-r", "--require"]
     const runs = []

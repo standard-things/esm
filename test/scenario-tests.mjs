@@ -219,8 +219,11 @@ describe("scenarios", function () {
     ], envAuto)
   )
 
-  ;(canTestJest ? it : xit)(
-  "should carry over the global object of jest", () => {
+  it("should carry over the global object of jest", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
 
     return exec("jest", [
@@ -228,8 +231,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should carry over the process object of jest", () => {
+  it("should carry over the process object of jest", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
 
     return exec("jest", [
@@ -237,8 +243,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should carry over globals from `jest.config.json`", () => {
+  it("should carry over globals from `jest.config.json`", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
     const configPath = path.resolve(dirPath, "jest.config.json")
 
@@ -248,8 +257,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should use an empty module cache with jest", () => {
+  it("should use an empty module cache with jest", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
 
     return exec("jest", [
@@ -257,8 +269,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should work with jest subclassed console", () => {
+  it("should work with jest subclassed console", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
     const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 
@@ -269,8 +284,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should work with jest and mock-require", () => {
+  it("should work with jest and mock-require", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
 
     return exec("jest", [
@@ -278,8 +296,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestJest ? it : xit)(
-  "should error with jest and circular dependencies", () => {
+  it("should error with jest and circular dependencies", function () {
+    if (! canTestJest) {
+      this.skip()
+    }
+
     const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
 
     return exec("jest", [
@@ -287,8 +308,11 @@ describe("scenarios", function () {
     ])
   })
 
-  ;(canTestPM2 ? it : xit)(
-  "should work with pm2", () => {
+  it("should work with pm2", function () {
+    if (! canTestPM2) {
+      this.skip()
+    }
+
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
     const stderrPath = path.resolve(logsPath, "pm2-error.log")
     const stdoutPath = path.resolve(logsPath, "pm2-out.log")
