@@ -219,93 +219,74 @@ describe("scenarios", function () {
     ], envAuto)
   )
 
-  it("should carry over the global object of jest", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
+  describe("should work with jest", () => {
 
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+    before(function () {
+      if (! canTestJest) {
+        this.skip()
+      }
+    })
 
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
+    it("should carry over the global object of jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
 
-  it("should carry over the process object of jest", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
 
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+    it("should carry over the process object of jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
 
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
 
-  it("should carry over globals from `jest.config.json`", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
+    it("should carry over globals from `jest.config.json`", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
-    const configPath = path.resolve(dirPath, "jest.config.json")
+      return exec("jest", [
+        "--config", configPath,
+        "--rootDir", dirPath
+      ])
+    })
 
-    return exec("jest", [
-      "--config", configPath,
-      "--rootDir", dirPath
-    ])
-  })
+    it("should use an empty module cache with jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
 
-  it("should use an empty module cache with jest", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
 
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
+    it("should work with jest subclassed console", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
+      const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
+      return exec(nodePath, [
+        "-r", pkgPath,
+        jestPath,
+        "--rootDir", dirPath
+      ])
+    })
 
-  it("should work with jest subclassed console", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
+    it("should work with jest and mock-require", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
 
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
-    const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
 
-    return exec(nodePath, [
-      "-r", pkgPath,
-      jestPath,
-      "--rootDir", dirPath
-    ])
-  })
+    it("should error with jest and circular dependencies", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
 
-  it("should work with jest and mock-require", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
-
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
-
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
-
-  it("should error with jest and circular dependencies", function () {
-    if (! canTestJest) {
-      this.skip()
-    }
-
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
-
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
   })
 
   describe("should work with pm2", () => {
