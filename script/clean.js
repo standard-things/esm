@@ -38,8 +38,6 @@ function isEmpty(dirPath) {
   return ! fs.readdirSync(dirPath).length
 }
 
-Promise
-  .resolve()
-  .then(cleanRepo)
+cleanRepo()
   .then(cleanEmptyDirs)
   .then(cleanNodeModules)

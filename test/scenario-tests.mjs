@@ -156,11 +156,9 @@ describe("scenarios", function () {
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
-    return Promise
-      .resolve()
-      .then(() => exec("tsc", [
+    return exec("tsc", [
         "--project", dirPath
-      ]))
+      ])
       .then(() => exec("nyc", [
         "--cwd", dirPath,
         "-i", cwdPath,
@@ -338,9 +336,7 @@ describe("scenarios", function () {
       return exec("pm2", ["kill"])
     }
 
-    return Promise
-      .resolve()
-      .then(cleanup)
+    return cleanup()
       .then(() => trash(logsPath))
       .then(() => exec("pm2", pm2Args))
       .then(() => waitForLogs())
