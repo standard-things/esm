@@ -464,7 +464,6 @@ describe("Node rules", () => {
   it("should support requests with trailing backward slashs in Windows", function () {
     if (! isWin) {
       this.skip()
-      return
     }
 
     const request = ".\\fixture\\ext-priority\\"
