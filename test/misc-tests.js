@@ -461,7 +461,7 @@ describe("errors", () => {
 })
 
 describe("Node rules", () => {
-  it("should support requests with trailing backward slashs in Windows", function () {
+  it("should support requests with trailing backslashes in Windows", function () {
     if (! isWin) {
       this.skip()
     }
