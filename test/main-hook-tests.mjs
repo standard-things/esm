@@ -151,13 +151,13 @@ describe("main hook", function () {
       flags.push("--preserve-symlinks")
     }
 
-    fileNames.forEach((fileName) => {
+    fileNames.forEach((fileName) =>
       flags.forEach((flag) => {
         const args = flag ? [flag] : []
         args.push("-r", "../", fileName)
         runs.push(args)
       })
-    })
+    )
 
     return runs
       .reduce((promise, args) =>
@@ -184,13 +184,13 @@ describe("main hook", function () {
       flags.push("--preserve-symlinks")
     }
 
-    flags.forEach((flag) => {
+    flags.forEach((flag) =>
       destNames.forEach((destName) => {
         const args = flag ? [flag] : []
         args.push("-r", "../", "./fixture/main-hook/symlink/" + destName)
         runs.push(args)
       })
-    })
+    )
 
     return runs
       .reduce((promise, args) =>
