@@ -308,70 +308,78 @@ describe("scenarios", function () {
     ])
   })
 
-  it("should work with pm2", function () {
-    if (! canTestPM2) {
-      this.skip()
-    }
+  describe("should work with pm2", () => {
+
+    before(function () {
+      if (! canTestPM2) {
+        this.skip()
+      }
+    })
+
+    beforeEach(function () {
+      return cleanup()
+    })
+
+    afterEach(function () {
+      return cleanup()
+    })
 
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
-    const stderrPath = path.resolve(logsPath, "pm2-error.log")
-    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
-
-    const nodeArgs = [
-      "-r", pkgPath,
-      "-r", "@babel/register"
-    ]
-
-    const pm2Args = [
-      "start",
-      "--no-autorestart",
-      "--name", "pm2",
-      "--node-args", nodeArgs.join(" "),
-      path.resolve(testPath, "fixture/scenario/pm2")
-    ]
-
-    const maxWait = 4000
-
-    function waitForLogs() {
-      const started = Date.now()
-
-      return new Promise(function check(resolve) {
-        const waited = Date.now() - started
-
-        const stderr = fs.existsSync(stderrPath)
-          ? fs.readFileSync(stderrPath, "utf8")
-          : ""
-
-        const stdout = fs.existsSync(stdoutPath)
-          ? fs.readFileSync(stdoutPath, "utf8")
-          : ""
-
-        if (stderr ||
-            stdout ||
-            waited > maxWait) {
-          resolve({ stderr, stdout })
-        } else {
-          setTimeout(() => check(resolve), 100)
-        }
-      })
-    }
 
     function cleanup() {
       return exec("pm2", ["kill"])
+        .then(() => trash(logsPath))
     }
 
-    return cleanup()
-      .then(() => trash(logsPath))
-      .then(() => exec("pm2", pm2Args))
-      .then(() => waitForLogs())
-      .then(({ stderr, stdout }) => {
-        assert.strictEqual(stderr, "")
-        assert.ok(stdout.includes("pm2:true"))
-      })
-      .then(cleanup)
-      .catch((e) => {
-        cleanup()
-        throw e
-      })
+    it("should work with pm2", () => {
+      const stderrPath = path.resolve(logsPath, "pm2-error.log")
+      const stdoutPath = path.resolve(logsPath, "pm2-out.log")
+
+      const nodeArgs = [
+        "-r", pkgPath,
+        "-r", "@babel/register"
+      ]
+
+      const pm2Args = [
+        "start",
+        "--no-autorestart",
+        "--name", "pm2",
+        "--node-args", nodeArgs.join(" "),
+        path.resolve(testPath, "fixture/scenario/pm2")
+      ]
+
+      const maxWait = 4000
+
+      function waitForLogs() {
+        const started = Date.now()
+
+        return new Promise(function check(resolve) {
+          const waited = Date.now() - started
+
+          const stderr = fs.existsSync(stderrPath)
+            ? fs.readFileSync(stderrPath, "utf8")
+            : ""
+
+          const stdout = fs.existsSync(stdoutPath)
+            ? fs.readFileSync(stdoutPath, "utf8")
+            : ""
+
+          if (stderr ||
+              stdout ||
+              waited > maxWait) {
+            resolve({ stderr, stdout })
+          } else {
+            setTimeout(() => check(resolve), 100)
+          }
+        })
+      }
+
+      return exec("pm2", pm2Args)
+        .then(waitForLogs)
+        .then(({ stderr, stdout }) => {
+          assert.strictEqual(stderr, "")
+          assert.ok(stdout.includes("pm2:true"))
+        })
+    })
   })
 })
