@@ -61,7 +61,7 @@ describe("--check hook", function () {
 
   it("should support `-c` and `--check` flags with stdin", function () {
     if (! canTestWithStdin) {
-      this.skip
+      this.skip()
     }
 
     const checkFlags = ["-c", "--check"]

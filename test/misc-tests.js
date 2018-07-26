@@ -205,7 +205,7 @@ describe("builtin modules", () => {
 
   it("should support `util.types.isProxy`", function () {
     if (! canTestUtilTypes) {
-      this.skip
+      this.skip()
     }
 
     const { isProxy } = util.types
