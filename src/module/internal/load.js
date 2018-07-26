@@ -22,7 +22,7 @@ const {
 } = ENTRY
 
 function load(filename, parent, isMain, state, loader) {
-  const { parseOnly, parsing } = shared.moduleState
+  const { parsing } = shared.moduleState
 
   let entry
   let child = state._cache[filename]
@@ -38,11 +38,7 @@ function load(filename, parent, isMain, state, loader) {
     entry = Entry.get(child)
 
     if (parsing ||
-        child.loaded) {
-      return entry
-    }
-
-    if (! parsing &&
+        child.loaded ||
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
@@ -72,22 +68,17 @@ function load(filename, parent, isMain, state, loader) {
       : STATE_EXECUTION_STARTED
   }
 
-  if (parseOnly &&
-      ! parsing) {
-    entry.state = STATE_PARSING_COMPLETED
-  } else {
-    const { _compile } = child
+  const { _compile } = child
 
-    child._compile = (content, filename) => {
-      Reflect.deleteProperty(child, "_compile")
+  child._compile = (content, filename) => {
+    Reflect.deleteProperty(child, "_compile")
 
-      const symbol = shared.symbol._compile
-      const func = typeof child[symbol] === "function"
-        ? child[symbol]
-        : _compile
+    const symbol = shared.symbol._compile
+    const func = typeof child[symbol] === "function"
+      ? child[symbol]
+      : _compile
 
-      return Reflect.apply(func, child, [content, filename])
-    }
+    return Reflect.apply(func, child, [content, filename])
   }
 
   loader(entry)

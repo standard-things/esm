@@ -82,7 +82,6 @@ function init() {
     },
     module: {},
     moduleState: {
-      parseOnly: false,
       parsing: false,
       requireDepth: 0,
       statFast: null,

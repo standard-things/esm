@@ -4,20 +4,16 @@ import Module from "../../module.js"
 
 import esmState from "./state.js"
 import shared from "../../shared.js"
+import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
   STATE_PARSING_COMPLETED
 } = ENTRY
 
-function loader(entry, filename, parentEntry, preload) {
+function loader(entry, filename, parentEntry) {
   const { parsing } = shared.moduleState
 
   entry.updateFilename(filename)
-
-  if (preload &&
-      ! parsing) {
-    preload(entry)
-  }
 
   let ext = entry.extname
   let state = esmState
@@ -34,14 +30,22 @@ function loader(entry, filename, parentEntry, preload) {
     ext = ".js"
   }
 
-  if (parsing &&
-      ext !== ".js" &&
-      ext !== ".mjs") {
-    entry.state = STATE_PARSING_COMPLETED
-    return
-  }
-
   const mod = entry.module
+
+  if (parsing) {
+    if (entry.package.options.cjs.paths &&
+        ext !== ".mjs") {
+      mod.paths = Module._nodeModulePaths(entry.dirname)
+    } else {
+      mod.paths = staticNodeModulePaths(entry.dirname)
+    }
+
+    if (ext !== ".js" &&
+        ext !== ".mjs") {
+      entry.state = STATE_PARSING_COMPLETED
+      return
+    }
+  }
 
   state._extensions[ext](mod, filename)
 

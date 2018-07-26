@@ -30,7 +30,7 @@ const {
 } = errors
 
 function load(request, parent, isMain) {
-  const { parseOnly, parsing } = shared.moduleState
+  const { parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
 
   if (parentEntry &&
@@ -43,8 +43,7 @@ function load(request, parent, isMain) {
 
   let state = Module
 
-  if (parseOnly ||
-      parsing) {
+  if (parsing) {
     state = parseState
   } else if (Reflect.has(parseState._cache, filename)) {
     state._cache[filename] = parseState._cache[filename]
@@ -54,25 +53,16 @@ function load(request, parent, isMain) {
   let loaderCalled = false
 
   const entry = _load(filename, parent, isMain, state, (entry) => {
-    const child = entry.module
-
-    state._cache[filename] = child
-
-    if (parseOnly &&
-        ! parsing) {
-      return
-    }
-
     loaderCalled = true
+    state._cache[filename] = entry.module
     tryLoader(entry, state, filename, filename, parentEntry)
   })
 
-  if (! loaderCalled) {
-    if (parentEntry &&
-        entry.type === TYPE_ESM &&
-        parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {
-      throw new ERR_REQUIRE_ESM(filename)
-    }
+  if (! loaderCalled &&
+      parentEntry &&
+      entry.type === TYPE_ESM &&
+      parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {
+    throw new ERR_REQUIRE_ESM(filename)
   }
 
   return entry.module.exports

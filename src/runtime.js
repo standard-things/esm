@@ -2,33 +2,25 @@ import ENTRY from "./constant/entry.js"
 
 import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
-import Module from "./module.js"
 
 import builtinGlobal from "./builtin/global.js"
 import call from "./util/call.js"
 import errors from "./errors.js"
-import esmLoad from "./module/esm/load.js"
-import esmParseLoad from "./module/esm/parse-load.js"
-import esmResolveFilename from "./module/esm/resolve-filename.js"
+import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
-import isError from "./util/is-error.js"
-import isPath from "./util/is-path.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
-import { resolve } from "./safe/path.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
 const {
-  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
 const {
-  ERR_INVALID_ESM_FILE_EXTENSION,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
 
@@ -173,16 +165,12 @@ const Runtime = {
 
     return new ExPromise((resolvePromise, rejectPromise) => {
       setImmediate(() => {
-        const { entry } = this
-
-        const setterArgsList = [["*", null, createSetter("dynamic", (value, childEntry) => {
-          if (childEntry._loaded === 1) {
-            resolvePromise(value)
-          }
-        })]]
-
         try {
-          importModule(entry, request, setterArgsList, esmParseLoad)
+          esmImport(this.entry, request, [["*", null, createSetter("dynamic", (value, childEntry) => {
+            if (childEntry._loaded === 1) {
+              resolvePromise(value)
+            }
+          })]])
         } catch (e) {
           rejectPromise(e)
         }
@@ -191,7 +179,7 @@ const Runtime = {
   },
 
   importStatic(request, setterArgsList) {
-    return importModule(this.entry, request, setterArgsList, esmLoad)
+    return esmImport(this.entry, request, setterArgsList)
   },
 
   run(moduleWrapper) {
@@ -229,109 +217,6 @@ const Runtime = {
 function createSetter(type, setter) {
   setter.type = type
   return setter
-}
-
-function getEntryFrom(request, exported) {
-  const entry = shared.entry.cache.get(exported)
-
-  if (entry) {
-    return entry
-  }
-
-  const filename = tryResolveFilename(request)
-  const child = new Module(filename)
-
-  if (isPath(filename)) {
-    child.filename = filename
-  }
-
-  child.exports = exported
-  child.loaded = true
-  return Entry.get(child)
-}
-
-function importModule(entry, request, setterArgsList, loader) {
-  const extIsMJS = entry.extname === ".mjs"
-  const mod = entry.module
-  const { moduleState } = shared
-
-  let child
-  let childEntry
-  let error
-  let threw = false
-
-  moduleState.parseOnly = true
-  moduleState.requireDepth += 1
-
-  try {
-    childEntry = loader(request, mod, false, (childEntry) => {
-      child = childEntry.module
-
-      if (extIsMJS &&
-          childEntry.type === TYPE_ESM &&
-          childEntry.extname !== ".mjs") {
-        throw ERR_INVALID_ESM_FILE_EXTENSION(child)
-      }
-
-      childEntry.addSetters(setterArgsList, entry)
-    })
-  } catch (e) {
-    error = e
-    threw = true
-  }
-
-  moduleState.parseOnly = false
-  moduleState.requireDepth -= 1
-
-  if (threw &&
-      (extIsMJS ||
-       ! entry.package.options.cjs.paths ||
-       ! isError(error) ||
-       error.code !== "MODULE_NOT_FOUND")) {
-    throw error
-  }
-
-  entry._require = TYPE_ESM
-  moduleState.requireDepth += 1
-
-  let exported
-
-  try {
-    exported = mod.require(request)
-  } finally {
-    entry._require = TYPE_CJS
-    moduleState.requireDepth -= 1
-  }
-
-  if (! childEntry) {
-    // Create the child entry for unresolved mocked requests.
-    childEntry = getEntryFrom(request, exported)
-    child = childEntry.module
-    entry.children[childEntry.name] = childEntry
-    childEntry.addSetters(setterArgsList, entry)
-  }
-
-  let mockEntry
-
-  if (child.exports !== exported) {
-    mockEntry =
-    entry.children[childEntry.name] = getEntryFrom(request, exported)
-
-    // Update the mock entry before the original child entry so dynamic import
-    // requests are resolved with the mock entry instead of the child entry.
-    mockEntry.addSetters(setterArgsList, entry)
-    mockEntry.loaded()
-    mockEntry.updateBindings()
-  }
-
-  childEntry.loaded()
-  childEntry.updateBindings()
-
-  if (mockEntry) {
-    // Update the mock entry after the original child entry so static import
-    // requests are updated with mock entry setters last.
-    mockEntry.updateBindings()
-  }
 }
 
 function runCJS(entry, moduleWrapper) {
@@ -377,26 +262,6 @@ function runESM(entry, moduleWrapper) {
   })
 
   return result
-}
-
-function tryResolveFilename(request, parent) {
-  try {
-    return esmResolveFilename(request, parent)
-  } catch (e) {}
-
-  try {
-    return Module._resolveFilename(request, parent)
-  } catch (e) {}
-
-  if (isPath(request)) {
-    const parentFilename = parent && parent.filename
-
-    return typeof parentFilename === "string"
-      ? resolve(parentFilename, request)
-      : resolve(request)
-  }
-
-  return request
 }
 
 export default Runtime

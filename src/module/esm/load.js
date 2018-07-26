@@ -17,14 +17,13 @@ import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
-import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
   TYPE_ESM
 } = ENTRY
 
-function load(request, parent, isMain, preload) {
-  const { parseOnly, parsing } = shared.moduleState
+function load(request, parent, isMain) {
+  const { parsing } = shared.moduleState
   const parentEntry = parent && Entry.get(parent)
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
   const parentIsMJS = parentEntry && parentEntry.extname === ".mjs"
@@ -62,8 +61,7 @@ function load(request, parent, isMain, preload) {
   if (isExtMJS ||
       Reflect.has(esmState._cache, request)) {
     state = esmState
-  } else if (parseOnly ||
-      parsing) {
+  } else if (parsing) {
     state = parseState
   } else if (Reflect.has(parseState._cache, request)) {
     const child = parseState._cache[request]
@@ -77,24 +75,13 @@ function load(request, parent, isMain, preload) {
     Reflect.deleteProperty(parseState._cache, request)
   }
 
-  let preloadCalled = false
-
-  const entry = _load(request, parent, isMain, state, (entry) => {
+  return _load(request, parent, isMain, state, (entry) => {
     const child = entry.module
 
     state._cache[request] = child
 
     if (parentEntry) {
       parentEntry.children[entry.name] = entry
-    }
-
-    if (! child.paths) {
-      if (entry.package.options.cjs.paths &&
-          ! isExtMJS) {
-        child.paths = Module._nodeModulePaths(fromPath)
-      } else {
-        child.paths = staticNodeModulePaths(fromPath)
-      }
     }
 
     if (! parsing) {
@@ -117,25 +104,8 @@ function load(request, parent, isMain, preload) {
       }
     }
 
-    if (parseOnly &&
-        ! parsing) {
-      return
-    }
-
-    tryLoader(entry, state, request, filename, parentEntry, (entry) => {
-      if (preload) {
-        preloadCalled = true
-        preload(entry)
-      }
-    })
+    tryLoader(entry, state, request, filename, parentEntry)
   })
-
-  if (preload &&
-      ! preloadCalled) {
-    preload(entry)
-  }
-
-  return entry
 }
 
 function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {

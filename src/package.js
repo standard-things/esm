@@ -549,9 +549,8 @@ function readInfo(dirPath, force) {
       options = readJSON6(optionsPath)
     } else {
       const { moduleState } = shared
-      const { parseOnly, parsing } = moduleState
+      const { parsing } = moduleState
 
-      moduleState.parseOnly =
       moduleState.parsing = false
 
       pkg =
@@ -561,7 +560,6 @@ function readInfo(dirPath, force) {
         pkg.options =
         Package.createOptions(esmParseLoad(optionsPath, null, false).module.exports)
       } finally {
-        moduleState.parseOnly = parseOnly
         moduleState.parsing = parsing
         Package.state.cache[dirPath] = null
       }

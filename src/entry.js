@@ -28,6 +28,7 @@ const {
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
   STATE_INITIAL,
+  STATE_EXECUTION_COMPLETED,
   TYPE_CJS,
   TYPE_ESM,
   TYPE_PSEUDO
@@ -407,8 +408,10 @@ class Entry {
       assignExportsToNamespace(this)
     }
 
-    this.initNamespace()
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
+
+    this.initNamespace()
+    this.state = STATE_EXECUTION_COMPLETED
     return this._loaded = LOAD_COMPLETED
   }
 
