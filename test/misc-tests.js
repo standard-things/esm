@@ -463,10 +463,9 @@ describe("Node rules", () => {
 
     const request = ".\\fixture\\ext-priority\\"
 
-    return Promise
-      .resolve()
-      .then(() => require(request))
-      .then(() => import(request))
+    require(request)
+
+    return import(request)
   })
 
   it("should find a file before a package", () => {
