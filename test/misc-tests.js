@@ -614,7 +614,7 @@ describe("Node rules", () => {
         ]
         .forEach((data) =>
           assert.strictEqual(ns.default.resolve(data.id), data.resolved)
-        })
+        )
       )
   )
 
