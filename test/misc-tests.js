@@ -612,7 +612,7 @@ describe("Node rules", () => {
             resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
           }
         ]
-        .forEach((data) => {
+        .forEach((data) =>
           assert.strictEqual(ns.default.resolve(data.id), data.resolved)
         })
       )
@@ -873,7 +873,7 @@ describe("Node rules", () => {
       "./fixture/reevaluate-error.mjs?a",
       "./fixture/reevaluate-error.mjs#a"
     ]
-    .reduce((promise, request, index) =>
+    .reduce((promise, request) =>
       promise
         .then(() => {
           Reflect.deleteProperty(global, "loadCount")
