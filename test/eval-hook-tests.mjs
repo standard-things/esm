@@ -19,8 +19,8 @@ describe("--eval hook", function () {
     const requireFlags = ["-r", "--require"]
     const runs = []
 
-    requireFlags.forEach((requireFlag) =>
-      evalFlags.forEach((evalFlag) =>
+    requireFlags.forEach((requireFlag) => {
+      evalFlags.forEach((evalFlag) => {
         runs.push([
           requireFlag, "../",
           evalFlag, [
@@ -28,8 +28,8 @@ describe("--eval hook", function () {
             'log("eval-hook:true")'
           ].join("\n")
         ])
-      )
-    )
+      })
+    })
 
     return runs
       .reduce((promise, args) =>
