@@ -43,12 +43,12 @@ const Module = maskFunction(function (id, parent) {
 }, RealModule)
 
 Module._extensions = { __proto__: null }
-Module._findPath = maskFunction(staticFindPath, RealModule.staticFindPath)
-Module._initPaths = maskFunction(staticInitPaths, RealModule.staticInitPaths)
+Module._findPath = maskFunction(staticFindPath, RealModule._findPath)
+Module._initPaths = maskFunction(staticInitPaths, RealModule._initPaths)
 Module._load = maskFunction(staticLoad, RealModule._load)
-Module._nodeModulePaths = maskFunction(staticNodeModulePaths, RealModule.staticNodeModulePaths)
-Module._resolveFilename = maskFunction(staticResolveFilename, RealModule.staticResolveFilename)
-Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule.staticResolveLookupPaths)
+Module._nodeModulePaths = maskFunction(staticNodeModulePaths, RealModule._nodeModulePaths)
+Module._resolveFilename = maskFunction(staticResolveFilename, RealModule._resolveFilename)
+Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.wrap = maskFunction(staticWrap, RealModule.wrap)
