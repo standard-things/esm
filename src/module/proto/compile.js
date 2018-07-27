@@ -27,7 +27,6 @@ const {
 } = ENTRY
 
 const {
-  BRAVE,
   ELECTRON
 } = ENV
 
@@ -146,8 +145,7 @@ function compile(content, filename) {
   const req = makeRequireFunction(this)
   const args = [exported, req, this, filename, dirname(filename)]
 
-  if (BRAVE ||
-      ELECTRON) {
+  if (ELECTRON) {
     args.push(realProcess, shared.unsafeGlobal)
 
     if (useBufferArg === void 0) {

@@ -11,8 +11,7 @@ function init() {
 
   const bundledLookup = { __proto__: null }
 
-  if (BRAVE ||
-      ELECTRON) {
+  if (ELECTRON) {
     bundledLookup.electron = true
   }
 

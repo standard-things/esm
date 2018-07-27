@@ -20,7 +20,6 @@ import staticFindPath from "./find-path.js"
 import staticResolveLookupPaths from "./resolve-lookup-paths.js"
 
 const {
-  BRAVE,
   ELECTRON
 } = ENV
 
@@ -37,8 +36,7 @@ function resolveFilename(request, parent, isMain, options) {
   // Electron and Muon patch `Module._resolveFilename`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
-  if ((BRAVE ||
-       ELECTRON) &&
+  if (ELECTRON &&
       Reflect.has(bundledLookup, request)) {
     return SafeModule._resolveFilename(request)
   }

@@ -1,3 +1,4 @@
+import isBrave from "./is-brave.js"
 import shared from "../shared.js"
 import { versions } from "../safe/process.js"
 
@@ -5,9 +6,13 @@ function init() {
   function isElectron() {
     const { env } = shared
 
-    return Reflect.has(env, "electron")
-      ? env.electron
-      : env.electron = Reflect.has(versions, "electron")
+    if (Reflect.has(env, "electron")) {
+      return env.electron
+    }
+
+    return env.electron =
+      Reflect.has(versions, "electron") ||
+      isBrave()
   }
 
   return isElectron
