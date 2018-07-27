@@ -32,6 +32,7 @@ const {
 } = ENV
 
 let resolvedArgv
+let useBufferArg
 let useRunInContext
 
 const runInDebugContext = getSilent(realVM, "runInDebugContext")
@@ -59,7 +60,7 @@ function compile(content, filename) {
 
   const { cacheName, compileData } = entry
   const { cachePath } = entry.package
-  const wrapper = Module.wrap(stripShebang(content))
+  const wrappedContent = Module.wrap(stripShebang(content))
 
   let cachedData
 
@@ -84,7 +85,7 @@ function compile(content, filename) {
     }
   }
 
-  const script = new realVM.Script(wrapper, scriptOptions)
+  const script = new realVM.Script(wrappedContent, scriptOptions)
 
   if (cachePath) {
     const pendingScripts =
@@ -145,10 +146,17 @@ function compile(content, filename) {
   const req = makeRequireFunction(this)
   const args = [exported, req, this, filename, dirname(filename)]
 
-  if (BRAVE) {
+  if (BRAVE ||
+      ELECTRON) {
     args.push(realProcess, shared.unsafeGlobal)
-  } else if (ELECTRON) {
-    args.push(realProcess, shared.unsafeGlobal, shared.external.Buffer)
+
+    if (useBufferArg === void 0) {
+      useBufferArg = Module.wrap("").indexOf("Buffer") !== -1
+    }
+
+    if (useBufferArg) {
+      args.push(shared.external.Buffer)
+    }
   }
 
   if (noDepth) {
