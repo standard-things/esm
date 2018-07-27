@@ -9,6 +9,7 @@ import Module from "../../module.js"
 import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
+import bundledLookup from "../../bundled-lookup.js"
 import { dirname } from "../../safe/path.js"
 import errors from "../../errors.js"
 import isAbsolute from "../../path/is-absolute.js"
@@ -19,6 +20,7 @@ import staticFindPath from "./find-path.js"
 import staticResolveLookupPaths from "./resolve-lookup-paths.js"
 
 const {
+  BRAVE,
   ELECTRON
 } = ENV
 
@@ -32,10 +34,12 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  // Electron patches `Module._resolveFilename` to return its path.
+  // Electron and Muon patch `Module._resolveFilename`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
-  if (ELECTRON &&
-      request === "electron") {
+  // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
+  if ((BRAVE ||
+       ELECTRON) &&
+      Reflect.has(bundledLookup, request)) {
     return SafeModule._resolveFilename(request)
   }
 

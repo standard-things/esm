@@ -17,6 +17,7 @@ const {
 } = CHAR_CODE
 
 const {
+  BRAVE,
   ELECTRON,
   WIN32
 } = ENV
@@ -28,9 +29,11 @@ const nmChars = Array.prototype
 const nmLength = nmChars.length
 
 function nodeModulePaths(from) {
-  // Electron patches `Module_nodeModulePaths` to remove paths outside the app.
+  // Electron and Muon patch `Module_nodeModulePaths` to remove paths outside the app.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
-  if (ELECTRON) {
+  // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
+  if (BRAVE ||
+      ELECTRON) {
     return SafeModule._nodeModulePaths(from)
   }
 

@@ -8,11 +8,13 @@ import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
   const {
+    BRAVE,
     ELECTRON,
     WIN32
   } = ENV
 
   const useBindingOrNative =
+    ! BRAVE &&
     ! ELECTRON &&
     ! WIN32
 

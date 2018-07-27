@@ -1,4 +1,5 @@
 import getOptions from "../env/get-options.js"
+import isBrave from "../env/is-brave.js"
 import isCheck from "../env/is-check.js"
 import isCLI from "../env/is-cli.js"
 import isElectron from "../env/is-electron.js"
@@ -17,6 +18,7 @@ import setDeferred from "../util/set-deferred.js"
 
 const ENV = { __proto__: null }
 
+setDeferred(ENV, "BRAVE", isBrave)
 setDeferred(ENV, "CHECK", isCheck)
 setDeferred(ENV, "CLI", isCLI)
 setDeferred(ENV, "ELECTRON", isElectron)

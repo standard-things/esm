@@ -155,7 +155,7 @@ function tryCompileCJS(entry, filename) {
 
   if (compileData.changed) {
     content =
-      "const " + runtimeName + "=this;" +
+      "const " + runtimeName + "=exports;" +
       (compileData.topLevelReturn ? "return " : "") +
       runtimeName + ".r((" +
       (useAsync ? "async " :  "") +
@@ -184,7 +184,7 @@ function tryCompileESM(entry, filename) {
     entry.extname !== ".mjs"
 
   let content =
-    "const " + runtimeName + "=this;" +
+    "const " + runtimeName + "=exports;" +
     (cjsVars
       ? ""
       : "__dirname=__filename=arguments=exports=module=require=void 0;"
