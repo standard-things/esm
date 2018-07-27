@@ -42,8 +42,6 @@ function load(filename, parent, isMain, state, loader) {
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
-
-    entry.state = STATE_EXECUTION_STARTED
   } else if (Reflect.has(builtinEntries, filename)) {
     return builtinEntries[filename]
   } else {
@@ -62,11 +60,11 @@ function load(filename, parent, isMain, state, loader) {
     entry = Entry.get(child)
     entry.id = filename
     entry.parent = Entry.get(parent)
-
-    entry.state = parsing
-      ? STATE_PARSING_STARTED
-      : STATE_EXECUTION_STARTED
   }
+
+  entry.state = parsing
+    ? STATE_PARSING_STARTED
+    : STATE_EXECUTION_STARTED
 
   const { _compile } = child
 
