@@ -17,6 +17,7 @@ import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
+import setDeferred from "../util/set-deferred.js"
 import shared from "../shared.js"
 import toModuleNamespaceObject from "../util/to-module-namespace-object"
 import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
@@ -195,18 +196,25 @@ function init() {
 
     if (typeof consoleCall === "function") {
       const emptyConfig = { __proto__: null }
-      const { originalConsole } = shared
 
       for (const name in wrapperMap) {
-        if (typeof originalConsole[name] === "function") {
-          builtinConsole[name] = GenericFunction.bind(
+        const func = builtinConsole[name]
+
+        setDeferred(builtinConsole, name, () => {
+          const { originalConsole } = shared
+
+          if (typeof originalConsole[name] !== "function") {
+            return func
+          }
+
+          return GenericFunction.bind(
             consoleCall,
             void 0,
             wrapBoundInspectable(originalConsole, name),
-            builtinConsole[name],
+            func,
             emptyConfig
           )
-        }
+        })
       }
     }
   } else if (ELECTRON_RENDERER) {
