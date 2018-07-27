@@ -20,6 +20,8 @@ import staticLoad from "./module/static/load.js"
 import staticNodeModulePaths from "./module/static/node-module-paths.js"
 import staticResolveFilename from "./module/static/resolve-filename.js"
 import staticResolveLookupPaths from "./module/static/resolve-lookup-paths.js"
+import staticWrap from "./module/static/wrap.js"
+import staticWrapper from "./module/static/wrapper.js"
 
 const {
   JEST
@@ -49,6 +51,8 @@ Module._resolveFilename = maskFunction(staticResolveFilename, RealModule.staticR
 Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule.staticResolveLookupPaths)
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
+Module.wrap = maskFunction(staticWrap, RealModule.wrap)
+Module.wrapper = staticWrapper
 
 const { prototype } = Module
 const realProto = RealModule.prototype
