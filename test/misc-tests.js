@@ -617,7 +617,7 @@ describe("Node rules", () => {
             resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
           }
         ]
-        .forEach((data) =>
+        .forEach((data) => {
           assert.strictEqual(ns.default.resolve(data.id), data.resolved)
         })
       )
