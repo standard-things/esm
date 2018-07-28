@@ -1,6 +1,7 @@
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
+import noop from "./util/noop.js"
 import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
@@ -65,6 +66,10 @@ function init() {
     setDeferred(binding, id, () => {
       if (_binding === void 0) {
         _binding = getSilent(realProcess, "binding")
+
+        if (typeof _binding !== "function") {
+          _binding = noop
+        }
       }
 
       const source = silent(() => {
