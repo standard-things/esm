@@ -434,10 +434,10 @@ describe("compiler", () => {
       "console.log(a)",
       "new console.Console(a)",
       "class C extends console.Console {}",
-      "const b = { console }",
-      "const b = { [console]: console }",
-      "const b = { console() { console } }",
-      "const b = () => console"
+      "const a = { console }",
+      "const a = { [console]: console }",
+      "const a = { console() { console } }",
+      "const a = () => console"
     ]
 
     const compiled = [
@@ -445,10 +445,10 @@ describe("compiler", () => {
       "_.g.console.log(a)",
       "new _.g.console.Console(a)",
       "class C extends _.g.console.Console {}",
-      "const b = { console:_.g.console }",
-      "const b = { [_.g.console]: _.g.console }",
-      "const b = { console() { _.g.console } }",
-      "const b = () => _.g.console"
+      "const a = { console:_.g.console }",
+      "const a = { [_.g.console]: _.g.console }",
+      "const a = { console() { _.g.console } }",
+      "const a = () => _.g.console"
     ]
 
     lines.forEach((line, index) => {
@@ -485,12 +485,12 @@ describe("compiler", () => {
   it("should wrap eval use", () => {
     const lines = [
       "eval",
-      "function b(c, d = 1, ...e) { return eval }",
-      "const b = { eval }",
-      "const b = { [eval]: eval }",
-      "const b = { eval() { eval } }",
-      "const b = () => eval",
-      "b(eval, c)",
+      "function a(b, c = 1, ...d) { return eval }",
+      "const a = { eval }",
+      "const a = { [eval]: eval }",
+      "const a = { eval() { eval } }",
+      "const a = () => eval",
+      "a(eval, c)",
       "new eval.b.c()",
       "`eval ${ eval } eval`",
       "switch (eval) { case eval: eval }",
@@ -499,12 +499,12 @@ describe("compiler", () => {
 
     const compiledModule = [
       "_.e",
-      "function b(c, d = 1, ...e) { return _.e }",
-      "const b = { eval:_.e }",
-      "const b = { [_.e]: _.e }",
-      "const b = { eval() { _.e } }",
-      "const b = () => _.e",
-      "b(_.e, c)",
+      "function a(b, c = 1, ...d) { return _.e }",
+      "const a = { eval:_.e }",
+      "const a = { [_.e]: _.e }",
+      "const a = { eval() { _.e } }",
+      "const a = () => _.e",
+      "a(_.e, c)",
       "new _.e.b.c()",
       "`eval ${ _.e } eval`",
       "switch (_.e) { case _.e: _.e }",
@@ -513,12 +513,12 @@ describe("compiler", () => {
 
     const compiledScript = [
       "(eval===_.v?_.e:eval)",
-      "function b(c, d = 1, ...e) { return (eval===_.v?_.e:eval) }",
-      "const b = { eval:(eval===_.v?_.e:eval) }",
-      "const b = { [(eval===_.v?_.e:eval)]: (eval===_.v?_.e:eval) }",
-      "const b = { eval() { (eval===_.v?_.e:eval) } }",
-      "const b = () => (eval===_.v?_.e:eval)",
-      "b((eval===_.v?_.e:eval), c)",
+      "function a(b, c = 1, ...d) { return (eval===_.v?_.e:eval) }",
+      "const a = { eval:(eval===_.v?_.e:eval) }",
+      "const a = { [(eval===_.v?_.e:eval)]: (eval===_.v?_.e:eval) }",
+      "const a = { eval() { (eval===_.v?_.e:eval) } }",
+      "const a = () => (eval===_.v?_.e:eval)",
+      "a((eval===_.v?_.e:eval), c)",
       "new (eval===_.v?_.e:eval).b.c()",
       "`eval ${ (eval===_.v?_.e:eval) } eval`",
       "switch ((eval===_.v?_.e:eval)) { case (eval===_.v?_.e:eval): (eval===_.v?_.e:eval) }",
@@ -543,11 +543,11 @@ describe("compiler", () => {
 
   it("should not wrap shadowed eval", () =>
     [
-      "function b(eval) { eval = eval }",
-      "function b(...eval) { eval = eval }",
-      "function b(eval = 1) { eval = eval }",
-      "const b = { eval: 1 }",
-      "const b = function eval() { eval = eval }",
+      "function a(eval) { eval = eval }",
+      "function a(...eval) { eval = eval }",
+      "function a(eval = 1) { eval = eval }",
+      "const a = { eval: 1 }",
+      "const a = function eval() { eval = eval }",
       "try {} catch(eval) { eval = eval }",
       "eval: while (true) { break eval; continue eval }"
     ]
@@ -588,36 +588,36 @@ describe("compiler", () => {
 
   it("should add TDZ asserts to bindings", () => {
     const lines = [
-      "a",
-      "function b(c, d = 1, ...e) { return a }",
-      "const b = { a }",
-      "const b = { [a]: a }",
-      "const b = { a() { a } }",
-      "const b = () => a",
-      "b(a, c)",
-      "new a.b.c()",
-      "`a ${ a } a`",
-      "switch (a) { case a: a }",
-      "try {} catch { a }"
+      "tdz",
+      "function a(b, c = 1, ...d) { return tdz }",
+      "const a = { tdz }",
+      "const a = { [tdz]: tdz }",
+      "const a = { tdz() { tdz } }",
+      "const a = () => tdz",
+      "a(tdz, c)",
+      "new tdz.b.c()",
+      "`tdz ${ tdz } tdz`",
+      "switch (tdz) { case tdz: tdz }",
+      "try {} catch { tdz }"
     ]
 
     const compiled = [
-      '_.a("a",a)',
-      'function b(c, d = 1, ...e) { return _.a("a",a) }',
-      'const b = { a:_.a("a",a) }',
-      'const b = { [_.a("a",a)]: _.a("a",a) }',
-      'const b = { a() { _.a("a",a) } }',
-      'const b = () => _.a("a",a)',
-      'b(_.a("a",a), c)',
-      'new (_.a("a",a)).b.c()',
-      '`a ${ _.a("a",a) } a`',
-      'switch (_.a("a",a)) { case _.a("a",a): _.a("a",a) }',
-      'try {} catch { _.a("a",a) }'
+      '_.a("tdz",tdz)',
+      'function a(b, c = 1, ...d) { return _.a("tdz",tdz) }',
+      'const a = { tdz:_.a("tdz",tdz) }',
+      'const a = { [_.a("tdz",tdz)]: _.a("tdz",tdz) }',
+      'const a = { tdz() { _.a("tdz",tdz) } }',
+      'const a = () => _.a("tdz",tdz)',
+      'a(_.a("tdz",tdz), c)',
+      'new (_.a("tdz",tdz)).b.c()',
+      '`tdz ${ _.a("tdz",tdz) } tdz`',
+      'switch (_.a("tdz",tdz)) { case _.a("tdz",tdz): _.a("tdz",tdz) }',
+      'try {} catch { _.a("tdz",tdz) }'
     ]
 
     lines.forEach((line, index) => {
       const code = [
-        'import a from "a"',
+        'import tdz from "tdz"',
         line
       ].join("\n")
 
@@ -635,17 +635,17 @@ describe("compiler", () => {
 
   it("should not add TDZ asserts to shadowed bindings", () =>
     [
-      "function b(a) { a = a }",
-      "function b(...a) { a = a }",
-      "function b(a = 1) { a = a }",
-      "const b = { a: 1 }",
-      "const b = function a() { a = a }",
-      "try {} catch(a) { a = a }",
-      "a: while (true) { break a; continue a }"
+      "function a(tdz) { tdz = tdz }",
+      "function a(...tdz) { tdz = tdz }",
+      "function a(tdz = 1) { tdz = tdz }",
+      "const a = { tdz: 1 }",
+      "const a = function tdz() { tdz = tdz }",
+      "try {} catch(tdz) { tdz = tdz }",
+      "tdz: while (true) { break tdz; continue tdz }"
     ]
     .forEach((line) => {
       const code = [
-        'import a from "a"',
+        'import tdz from "tdz"',
         line
       ].join("\n")
 
