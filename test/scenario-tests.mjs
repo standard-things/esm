@@ -228,16 +228,20 @@ describe("scenario tests", function () {
 
     it("should carry over the global object of jest", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
 
     it("should carry over the process object of jest", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
@@ -254,35 +258,43 @@ describe("scenario tests", function () {
 
     it("should use an empty module cache with jest", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
 
     it("should work with jest subclassed console", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
+      const configPath = path.resolve(dirPath, "jest.config.json")
       const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 
       return exec(nodePath, [
         "-r", pkgPath,
         jestPath,
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
 
     it("should work with jest and mock-require", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
 
     it("should error with jest and circular dependencies", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
+      const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
+        "--config", configPath,
         "--rootDir", dirPath
       ])
     })
