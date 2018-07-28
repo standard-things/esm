@@ -39,7 +39,17 @@ function init() {
       }
 
       this.changed = true
-      this.magicString.prependLeft(node.start, this.runtimeName + ".g.")
+
+      let code = this.runtimeName + ".g."
+      let pos = node.start
+
+      if (type === "Property" &&
+          parent.shorthand) {
+        code = ":" + code + "console"
+        pos = node.end
+      }
+
+      this.magicString.prependLeft(pos, code)
     }
   }
 

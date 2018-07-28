@@ -433,14 +433,20 @@ describe("compiler", () => {
       "console",
       "console.log(a)",
       "new console.Console(a)",
-      "class C extends console.Console {}"
+      "class C extends console.Console {}",
+      "const b = { console }",
+      "const b = { console() { console } }",
+      "const b = () => console"
     ]
 
     const compiled = [
       "_.g.console",
       "_.g.console.log(a)",
       "new _.g.console.Console(a)",
-      "class C extends _.g.console.Console {}"
+      "class C extends _.g.console.Console {}",
+      "const b = { console:_.g.console }",
+      "const b = { console() { _.g.console } }",
+      "const b = () => _.g.console"
     ]
 
     lines.forEach((line, index) => {
