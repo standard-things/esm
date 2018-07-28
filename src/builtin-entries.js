@@ -133,19 +133,19 @@ const builtinEntries = { __proto__: null }
 const cache = shared.memoize.builtinEntries
 
 for (const id of builtinIds) {
-  if (Reflect.has(cache, id)) {
-    builtinEntries[id] = cache[id]
-  } else {
-    setDeferred(builtinEntries, id, () => {
-      const entry = createEntry(id)
+  setDeferred(builtinEntries, id, () => {
+    if (Reflect.has(cache, id)) {
+      return cache[id]
+    }
 
-      if (id !== "module") {
-        cache[id] = entry
-      }
+    const entry = createEntry(id)
 
-      return entry
-    })
-  }
+    if (id !== "module") {
+      cache[id] = entry
+    }
+
+    return entry
+  })
 }
 
 export default builtinEntries

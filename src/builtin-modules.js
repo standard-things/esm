@@ -34,22 +34,22 @@ function getExports(id) {
 }
 
 for (const id of builtinIds) {
-  if (Reflect.has(cache, id)) {
-    builtinModules[id] = cache[id]
-  } else {
-    setDeferred(builtinModules, id, () => {
-      const mod = new Module(id)
+  setDeferred(builtinModules, id, () => {
+    if (Reflect.has(cache, id)) {
+      return cache[id]
+    }
 
-      mod.exports = getExports(id)
-      mod.loaded = true
+    const mod = new Module(id)
 
-      if (id !== "module") {
-        cache[id] = mod
-      }
+    mod.exports = getExports(id)
+    mod.loaded = true
 
-      return mod
-    })
-  }
+    if (id !== "module") {
+      cache[id] = mod
+    }
+
+    return mod
+  })
 }
 
 export default builtinModules
