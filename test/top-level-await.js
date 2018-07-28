@@ -7,9 +7,15 @@ try {
   canUseAsyncAwait = !! new vm.Script("async()=>await 1")
 } catch (e) {}
 
-describe("top-level await", () => {
-  (canUseAsyncAwait ? it : xit)(
-  "should support `options.await`", () =>
+describe("top-level await", function () {
+
+  before(function () {
+    if (! canUseAsyncAwait) {
+      this.skip()
+    }
+  })
+
+  it("should support `options.await`", () =>
     Promise
       .all([
         "./fixture/top-level-await/empty-cjs.js",
@@ -20,8 +26,7 @@ describe("top-level await", () => {
       .map((request) => import(request)))
   )
 
-  ;(canUseAsyncAwait ? it : xit)(
-  "should not support `options.await` for ES modules with exports", () =>
+  it("should not support `options.await` for ES modules with exports", () =>
     Promise
       .all([
         "./fixture/top-level-await/export-esm.js",

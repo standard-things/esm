@@ -156,11 +156,9 @@ describe("scenarios", function () {
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
-    return Promise
-      .resolve()
-      .then(() => exec("tsc", [
+    return exec("tsc", [
         "--project", dirPath
-      ]))
+      ])
       .then(() => exec("nyc", [
         "--cwd", dirPath,
         "-i", cwdPath,
@@ -221,137 +219,148 @@ describe("scenarios", function () {
     ], envAuto)
   )
 
-  ;(canTestJest ? it : xit)(
-  "should carry over the global object of jest", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+  describe("should work with jest", () => {
 
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
+    before(function () {
+      if (! canTestJest) {
+        this.skip()
+      }
+    })
+
+    it("should carry over the global object of jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should carry over the process object of jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should carry over globals from `jest.config.json`", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
+      const configPath = path.resolve(dirPath, "jest.config.json")
+
+      return exec("jest", [
+        "--config", configPath,
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should use an empty module cache with jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
+
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should work with jest subclassed console", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
+      const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
+
+      return exec(nodePath, [
+        "-r", pkgPath,
+        jestPath,
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should work with jest and mock-require", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
+
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
+
+    it("should error with jest and circular dependencies", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
+
+      return exec("jest", [
+        "--rootDir", dirPath
+      ])
+    })
   })
 
-  ;(canTestJest ? it : xit)(
-  "should carry over the process object of jest", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+  describe("should work with pm2", () => {
 
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
+    before(function () {
+      if (! canTestPM2) {
+        this.skip()
+      }
+    })
 
-  ;(canTestJest ? it : xit)(
-  "should carry over globals from `jest.config.json`", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
-    const configPath = path.resolve(dirPath, "jest.config.json")
+    beforeEach(function () {
+      return cleanup()
+    })
 
-    return exec("jest", [
-      "--config", configPath,
-      "--rootDir", dirPath
-    ])
-  })
+    afterEach(function () {
+      return cleanup()
+    })
 
-  ;(canTestJest ? it : xit)(
-  "should use an empty module cache with jest", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
-
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
-
-  ;(canTestJest ? it : xit)(
-  "should work with jest subclassed console", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
-    const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
-
-    return exec(nodePath, [
-      "-r", pkgPath,
-      jestPath,
-      "--rootDir", dirPath
-    ])
-  })
-
-  ;(canTestJest ? it : xit)(
-  "should work with jest and mock-require", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
-
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
-
-  ;(canTestJest ? it : xit)(
-  "should error with jest and circular dependencies", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
-
-    return exec("jest", [
-      "--rootDir", dirPath
-    ])
-  })
-
-  ;(canTestPM2 ? it : xit)(
-  "should work with pm2", () => {
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
-    const stderrPath = path.resolve(logsPath, "pm2-error.log")
-    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
-
-    const nodeArgs = [
-      "-r", pkgPath,
-      "-r", "@babel/register"
-    ]
-
-    const pm2Args = [
-      "start",
-      "--no-autorestart",
-      "--name", "pm2",
-      "--node-args", nodeArgs.join(" "),
-      path.resolve(testPath, "fixture/scenario/pm2")
-    ]
-
-    const maxWait = 4000
-
-    function waitForLogs() {
-      const started = Date.now()
-
-      return new Promise(function check(resolve) {
-        const waited = Date.now() - started
-
-        const stderr = fs.existsSync(stderrPath)
-          ? fs.readFileSync(stderrPath, "utf8")
-          : ""
-
-        const stdout = fs.existsSync(stdoutPath)
-          ? fs.readFileSync(stdoutPath, "utf8")
-          : ""
-
-        if (stderr ||
-            stdout ||
-            waited > maxWait) {
-          resolve({ stderr, stdout })
-        } else {
-          setTimeout(() => check(resolve), 100)
-        }
-      })
-    }
 
     function cleanup() {
       return exec("pm2", ["kill"])
+        .then(() => trash(logsPath))
     }
 
-    return Promise
-      .resolve()
-      .then(cleanup)
-      .then(() => trash(logsPath))
-      .then(() => exec("pm2", pm2Args))
-      .then(() => waitForLogs())
-      .then(({ stderr, stdout }) => {
-        assert.strictEqual(stderr, "")
-        assert.ok(stdout.includes("pm2:true"))
-      })
-      .then(cleanup)
-      .catch((e) => {
-        cleanup()
-        throw e
-      })
+    it("should work with pm2", () => {
+      const stderrPath = path.resolve(logsPath, "pm2-error.log")
+      const stdoutPath = path.resolve(logsPath, "pm2-out.log")
+
+      const nodeArgs = [
+        "-r", pkgPath,
+        "-r", "@babel/register"
+      ]
+
+      const pm2Args = [
+        "start",
+        "--no-autorestart",
+        "--name", "pm2",
+        "--node-args", nodeArgs.join(" "),
+        path.resolve(testPath, "fixture/scenario/pm2")
+      ]
+
+      const maxWait = 4000
+
+      function waitForLogs() {
+        const started = Date.now()
+
+        return new Promise(function check(resolve) {
+          const waited = Date.now() - started
+
+          const stderr = fs.existsSync(stderrPath)
+            ? fs.readFileSync(stderrPath, "utf8")
+            : ""
+
+          const stdout = fs.existsSync(stdoutPath)
+            ? fs.readFileSync(stdoutPath, "utf8")
+            : ""
+
+          if (stderr ||
+              stdout ||
+              waited > maxWait) {
+            resolve({ stderr, stdout })
+          } else {
+            setTimeout(() => check(resolve), 100)
+          }
+        })
+      }
+
+      return exec("pm2", pm2Args)
+        .then(waitForLogs)
+        .then(({ stderr, stdout }) => {
+          assert.strictEqual(stderr, "")
+          assert.ok(stdout.includes("pm2:true"))
+        })
+    })
   })
 })

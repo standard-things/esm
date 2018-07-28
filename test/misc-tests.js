@@ -190,8 +190,11 @@ describe("builtin modules", () => {
     })
   })
 
-  ;(canTestUtilTypes ? it : xit)(
-  "should support `util.types.isModuleNamespaceObject`", () => {
+  it("should support `util.types.isModuleNamespaceObject`", function () {
+    if (! canTestUtilTypes) {
+      this.skip()
+    }
+
     const { isModuleNamespaceObject } = util.types
 
     assert.strictEqual(isModuleNamespaceObject(fsNs), true)
@@ -200,8 +203,11 @@ describe("builtin modules", () => {
     assert.strictEqual(isModuleNamespaceObject(), false)
   })
 
-  ;(canTestUtilTypes ? it : xit)(
-  "should support `util.types.isProxy`", () => {
+  it("should support `util.types.isProxy`", function () {
+    if (! canTestUtilTypes) {
+      this.skip()
+    }
+
     const { isProxy } = util.types
 
     assert.strictEqual(isProxy(new Proxy({}, {})), true)
@@ -455,18 +461,16 @@ describe("errors", () => {
 })
 
 describe("Node rules", () => {
-  it("should support requests with trailing backward slashs in Windows", function () {
+  it("should support requests with trailing backslashes in Windows", function () {
     if (! isWin) {
       this.skip()
-      return
     }
 
     const request = ".\\fixture\\ext-priority\\"
 
-    return Promise
-      .resolve()
-      .then(() => require(request))
-      .then(() => import(request))
+    require(request)
+
+    return import(request)
   })
 
   it("should find a file before a package", () => {
@@ -874,7 +878,7 @@ describe("Node rules", () => {
       "./fixture/reevaluate-error.mjs?a",
       "./fixture/reevaluate-error.mjs#a"
     ]
-    .reduce((promise, request, index) =>
+    .reduce((promise, request) =>
       promise
         .then(() => {
           Reflect.deleteProperty(global, "loadCount")

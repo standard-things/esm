@@ -126,9 +126,7 @@ describe("main hook", function () {
   )
 
   it("should treat extensionless files as CJS", () =>
-    Promise
-      .resolve()
-      .then(() => runMain("./fixture/ext/no-ext-cjs"))
+    runMain("./fixture/ext/no-ext-cjs")
       .then(({ stderr }) => assert.strictEqual(stderr, ""))
       .then(() => runMain("./fixture/ext/no-ext-esm"))
       .then(({ stderr }) => assert.ok(stderr))
