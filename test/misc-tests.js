@@ -468,7 +468,7 @@ describe("Node rules", () => {
 
     const request = ".\\fixture\\ext-priority\\"
 
-    require(request)
+    assert.doesNotThrow(() => require(request))
 
     return import(request)
   })
