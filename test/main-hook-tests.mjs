@@ -50,6 +50,7 @@ describe("main hook", function () {
     requireFlags.forEach((requireFlag) => {
       otherFlags.forEach((flag) => {
         const args = flag ? [flag] : []
+
         args.push(requireFlag, "../", "./fixture/main-hook")
         runs.push(args)
       })
@@ -154,6 +155,7 @@ describe("main hook", function () {
     fileNames.forEach((fileName) => {
       flags.forEach((flag) => {
         const args = flag ? [flag] : []
+
         args.push("-r", "../", fileName)
         runs.push(args)
       })
@@ -187,6 +189,7 @@ describe("main hook", function () {
     flags.forEach((flag) => {
       destNames.forEach((destName) => {
         const args = flag ? [flag] : []
+
         args.push("-r", "../", "./fixture/main-hook/symlink/" + destName)
         runs.push(args)
       })

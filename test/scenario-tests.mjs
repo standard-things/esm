@@ -220,7 +220,6 @@ describe("scenarios", function () {
   )
 
   describe("should work with jest", () => {
-
     before(function () {
       if (! canTestJest) {
         this.skip()
@@ -290,7 +289,6 @@ describe("scenarios", function () {
   })
 
   describe("should work with pm2", () => {
-
     before(function () {
       if (! canTestPM2) {
         this.skip()

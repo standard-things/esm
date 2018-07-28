@@ -7,8 +7,7 @@ try {
   canUseAsyncAwait = !! new vm.Script("async()=>await 1")
 } catch (e) {}
 
-describe("top-level await", function () {
-
+describe("top-level await", () => {
   before(function () {
     if (! canUseAsyncAwait) {
       this.skip()
