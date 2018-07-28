@@ -149,16 +149,16 @@ function init() {
       return childNames
     }
 
-    const isShorthand =
-      value.type === "Property" &&
-      value.shorthand
+    const noComputed =
+      value.type !== "Property" ||
+      ! value.computed
 
     const names = keys(value)
 
     childNames = []
 
     for (const name of names) {
-      if (isShorthand &&
+      if (noComputed &&
           name === "key") {
         continue
       }
