@@ -435,6 +435,7 @@ describe("compiler", () => {
       "new console.Console(a)",
       "class C extends console.Console {}",
       "const b = { console }",
+      "const b = { [console]: console }",
       "const b = { console() { console } }",
       "const b = () => console"
     ]
@@ -445,6 +446,7 @@ describe("compiler", () => {
       "new _.g.console.Console(a)",
       "class C extends _.g.console.Console {}",
       "const b = { console:_.g.console }",
+      "const b = { [_.g.console]: _.g.console }",
       "const b = { console() { _.g.console } }",
       "const b = () => _.g.console"
     ]
@@ -485,6 +487,7 @@ describe("compiler", () => {
       "eval",
       "function b(c, d = 1, ...e) { return eval }",
       "const b = { eval }",
+      "const b = { [eval]: eval }",
       "const b = { eval() { eval } }",
       "const b = () => eval",
       "b(eval, c)",
@@ -498,6 +501,7 @@ describe("compiler", () => {
       "_.e",
       "function b(c, d = 1, ...e) { return _.e }",
       "const b = { eval:_.e }",
+      "const b = { [_.e]: _.e }",
       "const b = { eval() { _.e } }",
       "const b = () => _.e",
       "b(_.e, c)",
@@ -511,6 +515,7 @@ describe("compiler", () => {
       "(eval===_.v?_.e:eval)",
       "function b(c, d = 1, ...e) { return (eval===_.v?_.e:eval) }",
       "const b = { eval:(eval===_.v?_.e:eval) }",
+      "const b = { [(eval===_.v?_.e:eval)]: (eval===_.v?_.e:eval) }",
       "const b = { eval() { (eval===_.v?_.e:eval) } }",
       "const b = () => (eval===_.v?_.e:eval)",
       "b((eval===_.v?_.e:eval), c)",
@@ -586,6 +591,7 @@ describe("compiler", () => {
       "a",
       "function b(c, d = 1, ...e) { return a }",
       "const b = { a }",
+      "const b = { [a]: a }",
       "const b = { a() { a } }",
       "const b = () => a",
       "b(a, c)",
@@ -599,6 +605,7 @@ describe("compiler", () => {
       '_.a("a",a)',
       'function b(c, d = 1, ...e) { return _.a("a",a) }',
       'const b = { a:_.a("a",a) }',
+      'const b = { [_.a("a",a)]: _.a("a",a) }',
       'const b = { a() { _.a("a",a) } }',
       'const b = () => _.a("a",a)',
       'b(_.a("a",a), c)',

@@ -45,6 +45,8 @@ function init() {
     handler: true,
     // ForStatement, VariableDeclarator
     init: true,
+    // Property
+    key: true,
     // AssignmentExpression, AssignmentPattern
     left: true,
     // MemberExpression
@@ -147,10 +149,20 @@ function init() {
       return childNames
     }
 
+    const isShorthand =
+      value.type === "Property" &&
+      value.shorthand
+
     const names = keys(value)
+
     childNames = []
 
     for (const name of names) {
+      if (isShorthand &&
+          name === "key") {
+        continue
+      }
+
       if (Reflect.has(childrenToVisit, name) &&
           isObject(value[name])) {
         childNames.push(name)
