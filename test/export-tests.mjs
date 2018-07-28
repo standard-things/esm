@@ -1,4 +1,4 @@
-describe("export declarations", () => {
+describe("export declaration tests", () => {
   it("should support star exports", () =>
     import("./export/star.mjs")
       .then((ns) => ns.default())

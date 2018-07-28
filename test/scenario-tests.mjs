@@ -28,7 +28,7 @@ function exec(filename, args, env) {
   })
 }
 
-describe("scenarios", function () {
+describe("scenario tests", function () {
   this.timeout(0)
 
   it("should work with dual packages", () =>

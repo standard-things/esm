@@ -3,7 +3,7 @@ import getFilePathFromURL from "../build/get-file-path-from-url.js"
 
 const isWin = process.platform === "win32"
 
-describe("URL parsing", () => {
+describe("URL tests", () => {
   it("should resolve URLs with file protocols", () => {
     let actual
     let expected

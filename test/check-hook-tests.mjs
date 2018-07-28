@@ -24,7 +24,7 @@ function shell(command) {
   })
 }
 
-describe("--check hook", function () {
+describe("--check hook tests", function () {
   this.timeout(0)
 
   it("should support `-c` and `--check` flags with a filename", function () {

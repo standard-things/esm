@@ -22,7 +22,7 @@ function assertAbcNs(ns) {
   assert.deepStrictEqual(ns, abcNs)
 }
 
-describe("dynamic import", () => {
+describe("dynamic import tests", () => {
   it("should establish live binding of values", () =>
     import("./fixture/live.mjs").then((ns) => {
       ns.reset()

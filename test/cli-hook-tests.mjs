@@ -11,7 +11,7 @@ function node(args) {
   })
 }
 
-describe("command-line hook", function () {
+describe("CLI hook tests", function () {
   this.timeout(0)
 
   const esmPaths = [
@@ -20,7 +20,7 @@ describe("command-line hook", function () {
     "../esm.js"
   ]
 
-  it("should not fail on unresolvable command-line arguments", () =>
+  it("should not fail on unresolvable CLI arguments", () =>
     esmPaths
       .reduce((promise, request) =>
         promise
@@ -34,7 +34,7 @@ describe("command-line hook", function () {
       , Promise.resolve())
   )
 
-  it("should inspect JSON encoded command-line arguments", () =>
+  it("should inspect JSON encoded CLI arguments", () =>
     esmPaths
       .reduce((promise, request) =>
         promise

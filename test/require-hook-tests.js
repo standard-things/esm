@@ -1,6 +1,6 @@
 import assert from "assert"
 
-describe("require hook", () => {
+describe("require hook tests", () => {
   it("should be detectable", () =>
     import("./require-hook/detectable.mjs")
       .then((ns) => ns.default())

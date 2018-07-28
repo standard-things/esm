@@ -29,7 +29,7 @@ const tests = files
     return tests
   }, {})
 
-describe("output", () =>
+describe("output tests", () =>
   Object
     .keys(tests)
     .forEach((dirPath) => {

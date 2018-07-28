@@ -1,6 +1,6 @@
 import assert from "assert"
 
-describe("setters", () => {
+describe("setter tests", () => {
   it("should run setters after eval(...)", () =>
     import("./setter/eval.mjs")
       .then((ns) => ns.default())

@@ -35,7 +35,7 @@ function runMain(filename, env) {
   return node(["-r", "../", filename], env)
 }
 
-describe("main hook", function () {
+describe("main hook tests", function () {
   this.timeout(0)
 
   it("should support `-r` and `--require` flags", () => {

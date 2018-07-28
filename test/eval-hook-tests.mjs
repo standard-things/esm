@@ -11,7 +11,7 @@ function node(args) {
   })
 }
 
-describe("--eval hook", function () {
+describe("--eval hook tests", function () {
   this.timeout(0)
 
   it("should support `-e` and `--eval` flags", () => {

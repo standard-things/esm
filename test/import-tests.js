@@ -4,7 +4,7 @@ const canTestLiveBinding =
   Reflect.has(process.versions, "v8") &&
   SemVer.satisfies(process.version, ">=6.2.0")
 
-describe("import declarations", () => {
+describe("import declaration tests", () => {
   it("should support same symbol as different locals", () =>
     import("./import/locals.mjs")
       .then((ns) => ns.default())

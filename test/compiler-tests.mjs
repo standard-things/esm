@@ -9,7 +9,7 @@ const UNAMBIGUOUS = 3
 const modernTypes = [MODULE, UNAMBIGUOUS]
 const sourceTypes = [SCRIPT, MODULE, UNAMBIGUOUS]
 
-describe("compiler", () => {
+describe("compiler tests", () => {
   it("should support `options.cjs.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 

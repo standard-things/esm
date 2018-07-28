@@ -7,7 +7,7 @@ const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 
 const isDebug = !! ESM_OPTIONS.debug
 
-describe("file extension", () => {
+describe("file extension tests", () => {
   it("should not error loading extensionless files with `require`", () => {
     require("./fixture/ext/no-ext-cjs")
   })

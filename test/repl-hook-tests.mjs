@@ -31,7 +31,7 @@ const shared = require(SHARED_SYMBOL)
 
 const canRunInContext = Reflect.has(process.versions, "v8")
 
-describe("repl hook", () => {
+describe("REPL hook tests", () => {
   let context
 
   before(() => {
