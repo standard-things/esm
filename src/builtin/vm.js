@@ -10,7 +10,8 @@ function init() {
   const names = keysAll(safeVM)
 
   for (const name of names) {
-    if (name !== "Module") {
+    if (name !== "Module" &&
+        name !== "SourceTextModule") {
       copyProperty(builtinVM, safeVM, name)
     }
   }
