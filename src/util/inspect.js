@@ -12,7 +12,6 @@ import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
-import keys from "./keys.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
@@ -59,8 +58,16 @@ function init() {
   }
 
   function formatNamespaceObject(namespace, context) {
+    // Avoid `Object.keys` because it calls `[[GetOwnProperty]]`,
+    // which calls `[[Get]]`, which calls `GetBindingValue`,
+    // which throws for uninitialized bindings.
+    //
+    // Section 8.1.1.5.1: GetBindingValue()
+    // Step 5: Throw a reference error if the binding is uninitialized.
+    // https://tc39.github.io/ecma262/#sec-module-environment-records-getbindingvalue-n-s
+    const names = Object.getOwnPropertyNames(namespace)
+
     const object = toModuleNamespaceObject()
-    const names = keys(namespace)
 
     for (const name of names) {
       try {
