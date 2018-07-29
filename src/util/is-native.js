@@ -27,7 +27,8 @@ function init() {
 
     const { name } = func
 
-    // By default, bound function names start with "bound ".
+    // Section 19.2.3.2: Function.prototype.bind()
+    // Step 11: Bound function names start with "bound ".
     // https://tc39.github.io/ecma262/#sec-function.prototype.bind
     if (typeof name === "string" &&
         name.startsWith("bound ")) {
