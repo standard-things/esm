@@ -497,7 +497,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
         getter()
       } else if (typeof name === "string" &&
           Reflect.has(namespace, name)) {
-        throw new ERR_UNDEFINED_IDENTIFIER(name)
+        throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
       }
     }
 
