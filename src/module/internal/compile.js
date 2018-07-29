@@ -28,6 +28,7 @@ const {
 } = ENTRY
 
 const {
+  DEVELOPMENT,
   ELECTRON_RENDERER,
   INSPECT
 } = ENV
@@ -89,6 +90,7 @@ function compile(caller, entry, content, filename, fallback) {
 
   const defaultPkg = Package.state.default
   const isESM = entry.type === TYPE_ESM
+
   const parentEntry = entry.parent
   const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
   const parentPkg = parentEntry && parentEntry.package
@@ -212,6 +214,7 @@ function maybeSourceMap(entry, content, filename) {
 
   if (sourceMap !== false &&
       (sourceMap ||
+       DEVELOPMENT ||
        ELECTRON_RENDERER ||
        INSPECT) &&
       ! getSourceMappingURL(content)) {
