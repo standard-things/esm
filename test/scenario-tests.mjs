@@ -1,4 +1,5 @@
 import assert from "assert"
+import SemVer from "semver"
 import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
@@ -12,6 +13,7 @@ const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/
 const nodemodulesPath = path.resolve("../node_modules")
 
 const canTestJest = Reflect.has(process.versions, "v8")
+const canTestLab = SemVer.satisfies(process.version, ">=8.0.0")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const envAuto = {
@@ -301,7 +303,14 @@ describe("scenario tests", function () {
     })
   })
 
-  describe("should work with lab", () => {
+  describe("should work with lab", function () {
+
+    before(function () {
+      if (! canTestLab) {
+        this.skip()
+      }
+    })
+
     it("should work with lab", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/lab")
 
