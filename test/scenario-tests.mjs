@@ -9,6 +9,7 @@ const isWin = process.platform === "win32"
 const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
+const nodemodulesPath = path.resolve("../node_modules")
 
 const canTestJest = Reflect.has(process.versions, "v8")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
@@ -296,6 +297,29 @@ describe("scenario tests", function () {
       return exec("jest", [
         "--config", configPath,
         "--rootDir", dirPath
+      ])
+    })
+  })
+
+  describe("should work with lab", () => {
+    it("should work with lab", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/lab")
+
+      return exec("node", [
+        "-r", pkgPath,
+        nodemodulesPath + "/.bin/lab",
+        dirPath
+      ])
+    })
+
+    it("should work with lab and @babel/register", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/lab-babel")
+
+      return exec("node", [
+        "-r", pkgPath,
+        "-r", "@babel/register",
+        nodemodulesPath + "/.bin/lab",
+        dirPath
       ])
     })
   })
