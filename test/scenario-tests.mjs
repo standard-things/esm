@@ -316,7 +316,7 @@ describe("scenario tests", function () {
 
       return exec("node", [
         "-r", pkgPath,
-        nodemodulesPath + "/.bin/lab",
+        path.resolve(nodemodulesPath + "/.bin/lab"),
         dirPath
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("lab:true")))
@@ -328,7 +328,7 @@ describe("scenario tests", function () {
       return exec("node", [
         "-r", pkgPath,
         "-r", "@babel/register",
-        nodemodulesPath + "/.bin/lab",
+        path.resolve(nodemodulesPath + "/.bin/lab"),
         dirPath
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
