@@ -304,7 +304,6 @@ describe("scenario tests", function () {
   })
 
   describe("should work with lab", function () {
-
     before(function () {
       if (! canTestLab) {
         this.skip()
