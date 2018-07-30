@@ -10,7 +10,6 @@ const isWin = process.platform === "win32"
 const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
-const nodeModulesPath = path.resolve("../node_modules")
 
 const canTestJest = Reflect.has(process.versions, "v8")
 const canTestLab = SemVer.satisfies(process.version, ">=8.0.0")
@@ -304,6 +303,8 @@ describe("scenario tests", function () {
   })
 
   describe("should work with lab", function () {
+    const labPath = path.resolve("../node_modules/lab/bin/lab")
+
     before(function () {
       if (! canTestLab) {
         this.skip()
@@ -315,7 +316,7 @@ describe("scenario tests", function () {
 
       return exec("node", [
         "-r", pkgPath,
-        path.resolve(nodeModulesPath, "lab/bin/lab"),
+        labPath,
         dirPath
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("lab:true")))
@@ -327,7 +328,7 @@ describe("scenario tests", function () {
       return exec("node", [
         "-r", pkgPath,
         "-r", "@babel/register",
-        path.resolve(nodeModulesPath, "lab/bin/lab"),
+        labPath,
         dirPath
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
