@@ -319,6 +319,7 @@ describe("scenario tests", function () {
         nodemodulesPath + "/.bin/lab",
         dirPath
       ])
+      .then(({ stdout }) => assert.ok(stdout.includes("lab:true")))
     })
 
     it("should work with lab and @babel/register", function () {
@@ -330,6 +331,7 @@ describe("scenario tests", function () {
         nodemodulesPath + "/.bin/lab",
         dirPath
       ])
+      .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
     })
   })
 
