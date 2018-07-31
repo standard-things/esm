@@ -100,7 +100,6 @@ const Runtime = {
   },
 
   enable(entry, exported) {
-    const { id } = entry
     const mod = entry.module
     const runtime = mod.exports
 
@@ -113,6 +112,8 @@ const Runtime = {
     entry.exports = exported
 
     setDeferred(runtime, "meta", () => {
+      const { id } = entry
+
       return {
         __proto__: null,
         url: id.startsWith("file:") ? id : getURLFromFilePath(id)
