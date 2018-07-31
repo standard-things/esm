@@ -60,8 +60,6 @@ class Entry {
     this._changed = false
     // The module filename.
     this._filename = null
-    // The compiled ESM generator function.
-    this._generator = null
     // The loading state of the module.
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.

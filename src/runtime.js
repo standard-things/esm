@@ -102,53 +102,56 @@ const Runtime = {
   enable(entry, exported) {
     const { id } = entry
     const mod = entry.module
-    const object = mod.exports
+    const runtime = mod.exports
 
-    const boundCompileEval = (code) => Runtime.compileEval.call(object, code)
-    const boundEvalGlobal = (code) => Runtime.evalGlobal.call(object, code)
+    const boundCompileEval = (code) => Runtime.compileEval.call(runtime, code)
+    const boundEvalGlobal = (code) => Runtime.evalGlobal.call(runtime, code)
 
     Entry.set(mod, entry)
     Entry.set(exported, entry)
 
     entry.exports = exported
 
-    setDeferred(object, "meta", () => {
+    setDeferred(runtime, "meta", () => {
       return {
         __proto__: null,
         url: id.startsWith("file:") ? id : getURLFromFilePath(id)
       }
     })
 
-    object.addDefaultValue = Runtime.addDefaultValue
-    object.addExportGetter = Runtime.addExportGetter
-    object.addNamespaceSetter = Runtime.addNamespaceSetter
-    object.assertTDZ = Runtime.assertTDZ
-    object.compileEval = boundCompileEval
-    object.compileGlobalEval = Runtime.compileGlobalEval
-    object.entry = entry
-    object.evalGlobal = boundEvalGlobal
-    object.global = builtinGlobal
-    object.importDynamic = Runtime.importDynamic
-    object.importStatic = Runtime.importStatic
-    object.run = Runtime.run
-    object.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
-    object.updateBindings = Runtime.updateBindings
+    runtime._runResult = void 0
+    runtime.addDefaultValue = Runtime.addDefaultValue
+    runtime.addExportGetter = Runtime.addExportGetter
+    runtime.addNamespaceSetter = Runtime.addNamespaceSetter
+    runtime.assertTDZ = Runtime.assertTDZ
+    runtime.compileEval = boundCompileEval
+    runtime.compileGlobalEval = Runtime.compileGlobalEval
+    runtime.entry = entry
+    runtime.evalGlobal = boundEvalGlobal
+    runtime.global = builtinGlobal
+    runtime.importDynamic = Runtime.importDynamic
+    runtime.importStatic = Runtime.importStatic
+    runtime.run = Runtime.run
+    runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
+    runtime.updateBindings = Runtime.updateBindings
 
-    object._ = object
-    object.a = object.assertTDZ
-    object.c = object.compileEval
-    object.d = object.addDefaultValue
-    object.g = object.global
-    object.e = object.evalGlobal
-    object.i = object.importDynamic
-    object.k = identity
-    object.n = object.addNamespaceSetter
-    object.r = object.run
-    object.t = object.throwUndefinedIdentifier
-    object.u = object.updateBindings
-    object.v = evalIndirect
-    object.w = object.importStatic
-    object.x = object.addExportGetter
+    runtime._ = runtime
+    runtime.a = runtime.assertTDZ
+    runtime.c = runtime.compileEval
+    runtime.d = runtime.addDefaultValue
+    runtime.g = runtime.global
+    runtime.e = runtime.evalGlobal
+    runtime.i = runtime.importDynamic
+    runtime.k = identity
+    runtime.n = runtime.addNamespaceSetter
+    runtime.r = runtime.run
+    runtime.t = runtime.throwUndefinedIdentifier
+    runtime.u = runtime.updateBindings
+    runtime.v = evalIndirect
+    runtime.w = runtime.importStatic
+    runtime.x = runtime.addExportGetter
+
+    return runtime
   },
 
   evalGlobal(content) {
@@ -186,7 +189,7 @@ const Runtime = {
     const { entry } = this
     const runner =  entry.type === TYPE_ESM ? runESM : runCJS
 
-    return runner(entry, moduleWrapper)
+    return this._runResult = runner(entry, moduleWrapper)
   },
 
   throwUndefinedIdentifier(name) {
@@ -261,7 +264,7 @@ function runESM(entry, moduleWrapper) {
     }
   })
 
-  return entry._generator = result
+  return result
 }
 
 export default Runtime
