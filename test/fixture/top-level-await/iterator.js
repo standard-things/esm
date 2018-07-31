@@ -1,6 +1,3 @@
-const imports = [
-  import("./a.js"),
-  import("./b.js")
-]
+"use strict"
 
-for await (const i of imports) {}
+for await (const ns of [import("../export/abc.mjs")]) {}
