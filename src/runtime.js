@@ -10,6 +10,7 @@ import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
+import isFileProtocol from "./util/is-file-protocol.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
@@ -116,7 +117,7 @@ const Runtime = {
 
       return {
         __proto__: null,
-        url: id.startsWith("file:") ? id : getURLFromFilePath(id)
+        url: isFileProtocol(id) ? id : getURLFromFilePath(id)
       }
     })
 
