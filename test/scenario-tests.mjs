@@ -17,11 +17,8 @@ const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const envAuto = {
+  CI: 1,
   ESM_OPTIONS: "{cjs:true,mode:'auto'}"
-}
-
-const envCI = {
-  CI: 1
 }
 
 function exec(filename, args, env) {
@@ -53,7 +50,7 @@ describe("scenario tests", function () {
   it("should work with ava", () =>
     exec("ava", [
       path.resolve(testPath, "fixture/scenario/ava/test.js")
-    ], envCI)
+    ], envAuto)
   )
 
   it("should expose babel errors", () =>
@@ -101,8 +98,10 @@ describe("scenario tests", function () {
   )
 
   it("should work with native modules", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/native")])
-      .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
+    exec(nodePath, [
+      path.resolve(testPath, "fixture/scenario/native")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
   )
 
   it("should work with newrelic", () => {
@@ -138,7 +137,7 @@ describe("scenario tests", function () {
       "-r", pkgPath,
       "-r", "sqreen",
       path.resolve(testPath, "fixture/scenario/sqreen")
-    ])
+    ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
   )
 
@@ -151,7 +150,7 @@ describe("scenario tests", function () {
       "--cwd", dirPath,
       "-i", cwdPath,
       "ava", avaPattern
-    ], envCI)
+    ], envAuto)
   })
 
   it("should work with ava, nyc, and tsc", () => {
@@ -167,7 +166,7 @@ describe("scenario tests", function () {
         "-i", cwdPath,
         "-i", pkgPath,
         "ava", avaPattern
-      ], envCI))
+      ], envAuto))
   })
 
   it("should work with babel, mocha, and nyc", () => {
@@ -236,7 +235,7 @@ describe("scenario tests", function () {
       return exec("jest", [
         "--config", configPath,
         "--rootDir", dirPath
-      ])
+      ], envAuto)
     })
 
     it("should carry over the process object of jest", function () {
@@ -246,7 +245,7 @@ describe("scenario tests", function () {
       return exec("jest", [
         "--config", configPath,
         "--rootDir", dirPath
-      ])
+      ], envAuto)
     })
 
     it("should carry over globals from `jest.config.json`", function () {
@@ -256,7 +255,7 @@ describe("scenario tests", function () {
       return exec("jest", [
         "--config", configPath,
         "--rootDir", dirPath
-      ])
+      ], envAuto)
     })
 
     it("should use an empty module cache with jest", function () {

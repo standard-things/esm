@@ -1,7 +1,0 @@
-{
-  cjs: {
-    interop: true,
-    namedExports: true
-  },
-  debug: true
-}

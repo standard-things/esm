@@ -1,5 +1,0 @@
-{
-  cjs: true,
-  debug: true,
-  mode: "all"
-}
