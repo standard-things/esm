@@ -4,11 +4,11 @@ async function* gen() {
 }
 
 export default async () => {
-  const array = []
+  const result = []
 
   for await (const value of gen()) {
-    array.push(value)
+    result.push(value)
   }
 
-  return array
+  return result
 }
