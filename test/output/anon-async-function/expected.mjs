@@ -1,4 +1,4 @@
-"main";_.x([["default",()=>default]]);yield;
+"main";_.x([["default",()=>default]]);
 
 
 

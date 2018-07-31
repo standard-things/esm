@@ -182,11 +182,25 @@ function tryCompileESM(entry, filename) {
   const { compileData, runtimeName } = entry
   const mod = entry.module
 
+  const useGenerator =
+    ! isObjectEmpty(compileData.exportedSpecifiers)
+
+  const useAsync =
+    ! useGenerator &&
+    useAsyncWrapper(entry)
+
   const cjsVars =
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
-  const useAsync = useAsyncWrapper(entry)
+  let { code, yieldIndex } = compileData
+
+  if (useGenerator &&
+      yieldIndex !== -1) {
+    code =
+    compileData.code = code.slice(0, yieldIndex) + "yield;" + code.slice(yieldIndex)
+    compileData.yieldIndex = -1
+  }
 
   let content =
     "const " + runtimeName + "=exports;" +
@@ -197,33 +211,36 @@ function tryCompileESM(entry, filename) {
     "return " +
     runtimeName + ".r((" +
     (useAsync ? "async " :  "") +
-    "function *(" +
+    "function" +
+    (useGenerator ? " *" : "") +
+    "(" +
     (cjsVars
       ? "exports,require"
       : ""
     ) +
     '){"use strict";' +
-    compileData.code +
+    code +
     "\n}))"
 
   content += maybeSourceMap(entry, content, filename)
 
   const runtime = Runtime.enable(entry, GenericObject.create())
-
-  // Debuggers may wrap `Module#_compile` with
-  // `process.binding("inspector").callAndPauseOnStart()`
-  // and not forward the return value.
   const result = mod._compile(content, filename)
 
-  const { _runResult } = runtime
+  if (useGenerator) {
+    // Debuggers may wrap `Module#_compile` with
+    // `process.binding("inspector").callAndPauseOnStart()`
+    // and not forward the return value.
+    const { _runResult } = runtime
 
-  if (useAsync) {
-    _runResult
-      .next()
-      .then(() => _runResult.next())
-  } else {
-    _runResult.next()
-    _runResult.next()
+    if (useAsync) {
+      _runResult
+        .next()
+        .then(() => _runResult.next())
+    } else {
+      _runResult.next()
+      _runResult.next()
+    }
   }
 
   return result
@@ -299,9 +316,7 @@ function tryValidate(caller, entry, content, filename) {
 function useAsyncWrapper(entry) {
   return entry.package.options.await &&
     shared.support.await &&
-    (entry.type !== TYPE_ESM ||
-     (entry.extname !== ".mjs" &&
-      isObjectEmpty(entry.compileData.exportedSpecifiers)))
+    entry.extname !== ".mjs"
 }
 
 export default compile

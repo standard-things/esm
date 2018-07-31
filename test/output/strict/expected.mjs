@@ -1,4 +1,4 @@
-"main";let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);yield;
+"main";let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
 
 _.d(() => {
   const that = (function () {

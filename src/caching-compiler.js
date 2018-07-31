@@ -67,7 +67,8 @@ function init() {
         exportedSpecifiers: null,
         exportedStars: meta[7] || null,
         scriptData: null,
-        sourceType: +meta[2] || SCRIPT
+        sourceType: +meta[2] || SCRIPT,
+        yieldIndex: -1
       }
 
       if (result.sourceType === MODULE) {
@@ -75,6 +76,7 @@ function init() {
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
         result.exportedFrom = inflateExportedFrom(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
+        result.yieldIndex = +meta[8] || -1
       } else {
         entry.type = TYPE_CJS
       }
@@ -220,8 +222,7 @@ function init() {
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,
-      var: options.var,
-      yield: options.yield
+      var: options.var
     }
   }
 
@@ -368,10 +369,11 @@ function init() {
             meta.push(
               sourceType,
               changed,
-              deflateDependencySpecifiers(compileData) || 0,
-              compileData.exportedFrom || 0,
-              compileData.exportedNames || 0,
-              compileData.exportedStars || 0
+              deflateDependencySpecifiers(compileData),
+              compileData.exportedFrom,
+              compileData.exportedNames,
+              compileData.exportedStars,
+              compileData.yieldIndex
             )
           }
         }

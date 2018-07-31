@@ -21,13 +21,10 @@ function init() {
     const importedLocals = []
 
     const top = {
-      hoistedExports: [],
-      hoistedImportsString: "",
-      hoistedPrefixString: "",
       identifiers,
       importedLocals,
-      insertCharIndex: node.start,
-      insertNodeIndex: 0
+      insertIndex: node.start,
+      insertPrefix: ""
     }
 
     let inited = false
@@ -43,9 +40,8 @@ function init() {
         if (type === "ExpressionStatement" &&
             expression.type === "Literal" &&
             typeof expression.value === "string") {
-          top.insertCharIndex = stmt.end
-          top.insertNodeIndex = body.length + 1
-          top.hoistedPrefixString = ";"
+          top.insertIndex = stmt.end
+          top.insertPrefix = ";"
         } else {
           inited = true
         }

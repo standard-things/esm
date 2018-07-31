@@ -40,8 +40,7 @@ function init() {
     runtimeName: "_",
     sourceType: SCRIPT,
     strict: void 0,
-    var: false,
-    yield: true
+    var: false
   }
 
   const Compiler = {
@@ -62,7 +61,8 @@ function init() {
         exportedSpecifiers: null,
         exportedStars: null,
         scriptData: null,
-        sourceType: SCRIPT
+        sourceType: SCRIPT,
+        yieldIndex: -1
       }
 
       let { hint, sourceType } = options
@@ -160,8 +160,7 @@ function init() {
           runtimeName,
           sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
           strict,
-          top,
-          yield: options.yield
+          top
         })
       } catch (e) {
         e.sourceType = parserOptions.sourceType
@@ -228,11 +227,18 @@ function init() {
       if (sourceType === UNAMBIGUOUS) {
         sourceType = SCRIPT
       } else if (sourceType === MODULE) {
+        let { yieldIndex } = importExportVisitor
+
+        if (yieldIndex !== -1) {
+          yieldIndex += FAST_READ_PREFIX.length
+        }
+
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
         result.exportedFrom = importExportVisitor.exportedFrom
         result.exportedNames = importExportVisitor.exportedNames
         result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = MODULE
+        result.yieldIndex = yieldIndex
 
         if (addedImportExport) {
           result.enforceTDZ = () => {

@@ -23,14 +23,15 @@ function init() {
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
+      const { insertIndex } = top
 
       const code =
-        top.hoistedPrefixString +
-        toModuleExport(this, top.hoistedExports) +
-        top.hoistedImportsString +
-        (this.yield ? "yield;" : "")
+        top.insertPrefix +
+        toModuleExport(this, this.hoistedExports) +
+        this.hoistedImportsString
 
-      this.magicString.prependLeft(top.insertCharIndex, code)
+      this.magicString.prependLeft(insertIndex, code)
+      this.yieldIndex = insertIndex + code.length
     }
 
     reset(options) {
@@ -44,6 +45,8 @@ function init() {
       this.exportedStars = null
       this.firstLineBreakPos = -1
       this.generateVarDeclarations = false
+      this.hoistedExports = null
+      this.hoistedImportsString = ""
       this.importedLocals = null
       this.magicString = null
       this.possibleIndexes = null
@@ -52,7 +55,7 @@ function init() {
       this.strict = false
       this.temporals = null
       this.top = null
-      this.yield = false
+      this.yieldIndex = -1
 
       if (options) {
         const { magicString } = options
@@ -64,6 +67,7 @@ function init() {
         this.exportedStars = []
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
+        this.hoistedExports = []
         this.importedLocals = { __proto__: null }
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
@@ -72,7 +76,6 @@ function init() {
         this.strict = options.strict
         this.temporals = { __proto__: null }
         this.top = options.top
-        this.yield = options.yield
       }
     }
 
@@ -152,9 +155,9 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
+      const { exportedFrom, runtimeName } = this
       const node = path.getValue()
       const { original } = this.magicString
-      const { runtimeName } = this
       const { source } = node
       const specifierName = source.value
 
@@ -169,6 +172,10 @@ function init() {
         source.end,
         node.end
       )
+
+      if (! exportedFrom[specifierName]) {
+        exportedFrom[specifierName] = []
+      }
 
       this.exportedStars.push(specifierName)
 
@@ -305,7 +312,6 @@ function init() {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
         const { exportedFrom, exportedNames, runtimeName } = this
-
         const specifierMap = { __proto__: null }
         const specifierName = node.source.value
 
@@ -457,7 +463,7 @@ function init() {
   }
 
   function hoistExports(visitor, node, pairs) {
-    visitor.top.hoistedExports.push(...pairs)
+    visitor.hoistedExports.push(...pairs)
 
     if (node.declaration) {
       preserveChild(visitor, node, "declaration")
@@ -467,7 +473,7 @@ function init() {
   }
 
   function hoistImports(visitor, node, hoistedCode) {
-    visitor.top.hoistedImportsString += hoistedCode
+    visitor.hoistedImportsString += hoistedCode
     preserveLine(visitor, node)
   }
 
