@@ -30,8 +30,12 @@ function init() {
         toModuleExport(this, this.hoistedExports) +
         this.hoistedImportsString
 
+      if (this.exportedNames.length ||
+          this.exportedStars.length) {
+        this.yieldIndex = insertIndex + code.length
+      }
+
       this.magicString.prependLeft(insertIndex, code)
-      this.yieldIndex = insertIndex + code.length
     }
 
     reset(options) {
