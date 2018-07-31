@@ -30,7 +30,8 @@ const {
 const {
   DEVELOPMENT,
   ELECTRON_RENDERER,
-  INSPECT
+  INSPECT,
+  NDB
 } = ENV
 
 const {
@@ -230,7 +231,8 @@ function maybeSourceMap(entry, content, filename) {
       (sourceMap ||
        DEVELOPMENT ||
        ELECTRON_RENDERER ||
-       INSPECT) &&
+       INSPECT ||
+       NDB) &&
       ! getSourceMappingURL(content)) {
     return "//# sourceMappingURL=data:application/json;charset=utf-8," +
       encodeURI(createSourceMap(filename, content))

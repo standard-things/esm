@@ -9,6 +9,7 @@ import isEval from "../env/is-eval.js"
 import isInspect from "../env/is-inspect.js"
 import isInternal from "../env/is-internal.js"
 import isJest from "../env/is-jest.js"
+import isNdb from "../env/is-ndb.js"
 import isNyc from "../env/is-nyc.js"
 import isPreloaded from "../env/is-preloaded.js"
 import isPrint from "../env/is-print.js"
@@ -29,6 +30,7 @@ setDeferred(ENV, "EVAL", isEval)
 setDeferred(ENV, "INSPECT", isInspect)
 setDeferred(ENV, "INTERNAL", isInternal)
 setDeferred(ENV, "JEST", isJest)
+setDeferred(ENV, "NDB", isNdb)
 setDeferred(ENV, "NYC", isNyc)
 setDeferred(ENV, "OPTIONS", getOptions)
 setDeferred(ENV, "PRELOADED", isPreloaded)
