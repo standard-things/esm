@@ -233,14 +233,8 @@ function tryCompileESM(entry, filename) {
     // and not forward the return value.
     const { _runResult } = runtime
 
-    if (useAsync) {
-      _runResult
-        .next()
-        .then(() => _runResult.next())
-    } else {
-      _runResult.next()
-      _runResult.next()
-    }
+    _runResult.next()
+    _runResult.next()
   }
 
   return result
