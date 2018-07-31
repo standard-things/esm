@@ -1,13 +1,12 @@
 // @flow
-import Lab from "lab"
 import assert from "assert"
 import { log } from "console"
+import { script } from "lab"
 import { add } from "./"
 
-const lab = Lab.script()
-const { it } = lab
+const lab = script()
 
-it("test", function (): void {
+lab.it("test", function (): void {
   assert.strictEqual(add(1, 2), 3)
 })
 

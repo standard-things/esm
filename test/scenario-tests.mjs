@@ -1,5 +1,6 @@
-import assert from "assert"
 import SemVer from "semver"
+
+import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
@@ -12,7 +13,7 @@ const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 const canTestJest = Reflect.has(process.versions, "v8")
-const canTestLab = SemVer.satisfies(process.version, ">=8.0.0")
+const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const envAuto = {
@@ -313,24 +314,24 @@ describe("scenario tests", function () {
 
     it("should work with lab", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/lab")
+      const labPattern = path.resolve(dirPath, "test.js")
 
       return exec("node", [
         "-r", pkgPath,
-        labPath,
-        dirPath
-      ])
+        labPath, labPattern
+      ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("lab:true")))
     })
 
     it("should work with lab and @babel/register", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/lab-babel")
+      const labPattern = path.resolve(dirPath, "test.js")
 
       return exec("node", [
         "-r", pkgPath,
         "-r", "@babel/register",
-        labPath,
-        dirPath
-      ])
+        labPath, labPattern
+      ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
     })
   })

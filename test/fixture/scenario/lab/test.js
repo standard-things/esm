@@ -1,12 +1,11 @@
-import Lab from "lab"
 import assert from "assert"
 import { log } from "console"
+import { script } from "lab"
 import { add } from "./"
 
-const lab = Lab.script()
-const { it } = lab
+const lab = script()
 
-it("test", () => {
+lab.it("test", () => {
   assert.strictEqual(add(1, 2), 3)
 })
 
