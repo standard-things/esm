@@ -1,3 +1,3 @@
-"main";_.x([["default",()=>f]]);function f() {
+"main";_.x([["default",()=>f]]);yield;function f() {
   return f
 }

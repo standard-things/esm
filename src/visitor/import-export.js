@@ -28,7 +28,8 @@ function init() {
         top.hoistedPrefixString +
         toModuleExport(this, top.hoistedExports) +
         top.hoistedExportsString +
-        top.hoistedImportsString
+        top.hoistedImportsString +
+        (this.yield ? "yield;" : "")
 
       this.magicString.prependLeft(top.insertCharIndex, code)
     }
@@ -52,6 +53,7 @@ function init() {
       this.strict = false
       this.temporals = null
       this.top = null
+      this.yield = false
 
       if (options) {
         const { magicString } = options
@@ -71,6 +73,7 @@ function init() {
         this.strict = options.strict
         this.temporals = { __proto__: null }
         this.top = options.top
+        this.yield = options.yield
       }
     }
 

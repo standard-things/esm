@@ -1,4 +1,4 @@
-"main";_.x([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset()
+"main";_.x([["value",()=>value],["reset",()=>reset],["add",()=>add]]);yield;var value = reset()
 
        function reset() {
   return _.u(value = 0)

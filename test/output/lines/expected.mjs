@@ -1,4 +1,4 @@
-"main";let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
+"main";let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);yield;
 
 
 

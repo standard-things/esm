@@ -40,7 +40,8 @@ function init() {
     runtimeName: "_",
     sourceType: SCRIPT,
     strict: void 0,
-    var: false
+    var: false,
+    yield: true
   }
 
   const Compiler = {
@@ -161,7 +162,8 @@ function init() {
           runtimeName,
           sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
           strict,
-          top
+          top,
+          yield: options.yield
         })
       } catch (e) {
         e.sourceType = parserOptions.sourceType

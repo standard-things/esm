@@ -1,4 +1,4 @@
-"main";_.x([["A",()=>A],["a",()=>a],["default",()=>default]]);class A {
+"main";_.x([["A",()=>A],["a",()=>a],["default",()=>default]]);yield;class A {
   constructor() {
     _.i("./a.mjs")
   }

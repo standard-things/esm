@@ -1,4 +1,4 @@
-"main";_.d(class {
+"main";yield;_.d(class {
   constructor(value) {
     this.value = value
   }

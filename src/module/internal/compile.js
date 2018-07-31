@@ -158,7 +158,7 @@ function tryCompileCJS(entry, filename) {
   if (compileData.changed) {
     content =
       "const " + runtimeName + "=exports;" +
-      (compileData.topLevelReturn ? "return " : "") +
+      "return " +
       runtimeName + ".r((" +
       (useAsync ? "async " :  "") +
       "function(exports,require){" +
@@ -185,16 +185,18 @@ function tryCompileESM(entry, filename) {
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
+  const isAsync = useAsyncWrapper(entry)
+
   let content =
     "const " + runtimeName + "=exports;" +
     (cjsVars
       ? ""
       : "__dirname=__filename=arguments=exports=module=require=void 0;"
     ) +
-    (compileData.topLevelReturn ? "return " : "") +
+    "return " +
     runtimeName + ".r((" +
-    (useAsyncWrapper(entry) ? "async " :  "") +
-    "function(" +
+    (isAsync ? "async " :  "") +
+    "function *(" +
     (cjsVars
       ? "exports,require"
       : ""
@@ -206,7 +208,19 @@ function tryCompileESM(entry, filename) {
   content += maybeSourceMap(entry, content, filename)
 
   Runtime.enable(entry, GenericObject.create())
-  return mod._compile(content, filename)
+
+  let generator = mod._compile(content, filename)
+
+  if (isAsync) {
+    generator
+      .next()
+      .then(() => generator.next())
+  } else {
+    generator.next()
+    generator.next()
+  }
+
+  return generator.value
 }
 
 function maybeSourceMap(entry, content, filename) {

@@ -221,7 +221,8 @@ function init() {
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,
-      var: options.var
+      var: options.var,
+      yield: options.yield
     }
   }
 
