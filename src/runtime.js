@@ -261,7 +261,7 @@ function runESM(entry, moduleWrapper) {
     }
   })
 
-  return result
+  return entry._generator = result
 }
 
 export default Runtime

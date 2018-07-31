@@ -210,18 +210,23 @@ function tryCompileESM(entry, filename) {
 
   Runtime.enable(entry, GenericObject.create())
 
-  let generator = mod._compile(content, filename)
+  // Debuggers may wrap `Module#_compile` with
+  // `process.binding("inspector").callAndPauseOnStart()`
+  // and not forward the return value.
+  const result = mod._compile(content, filename)
+
+  const { _generator } = entry
 
   if (useAsync) {
-    generator
+    _generator
       .next()
-      .then(() => generator.next())
+      .then(() => _generator.next())
   } else {
-    generator.next()
-    generator.next()
+    _generator.next()
+    _generator.next()
   }
 
-  return generator.value
+  return result
 }
 
 function maybeSourceMap(entry, content, filename) {
