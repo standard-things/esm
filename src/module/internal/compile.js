@@ -185,7 +185,7 @@ function tryCompileESM(entry, filename) {
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
-  const isAsync = useAsyncWrapper(entry)
+  const useAsync = useAsyncWrapper(entry)
 
   let content =
     "const " + runtimeName + "=exports;" +
@@ -195,7 +195,7 @@ function tryCompileESM(entry, filename) {
     ) +
     "return " +
     runtimeName + ".r((" +
-    (isAsync ? "async " :  "") +
+    (useAsync ? "async " :  "") +
     "function *(" +
     (cjsVars
       ? "exports,require"
@@ -211,7 +211,7 @@ function tryCompileESM(entry, filename) {
 
   let generator = mod._compile(content, filename)
 
-  if (isAsync) {
+  if (useAsync) {
     generator
       .next()
       .then(() => generator.next())

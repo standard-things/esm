@@ -1,15 +1,12 @@
+import SemVer from "semver"
+
 import assert from "assert"
-import vm from "vm"
 
-let canUseAsyncAwait = false
-
-try {
-  canUseAsyncAwait = !! new vm.Script("async()=>await 1")
-} catch (e) {}
+const canTestTopLevelAwait = SemVer.satisfies(process.version, ">=10")
 
 describe("top-level await tests", () => {
   before(function () {
-    if (! canUseAsyncAwait) {
+    if (! canTestTopLevelAwait) {
       this.skip()
     }
   })
