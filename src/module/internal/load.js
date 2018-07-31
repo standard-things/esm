@@ -11,7 +11,7 @@ import Module from "../../module.js"
 import builtinEntries from "../../builtin-entries.js"
 import esmState from "../esm/state.js"
 import getFilePathfromURL from "../../util/get-file-path-from-url.js"
-import isFileProtocol from "../../util/is-file-protocol.js"
+import isFileOrigin from "../../util/is-file-origin.js"
 import realProcess from "../../real/process.js"
 import shared from "../../shared.js"
 
@@ -47,7 +47,7 @@ function load(filename, parent, isMain, state, loader) {
   } else {
     child = new Module(filename, parent)
 
-    child.filename = isFileProtocol(filename)
+    child.filename = isFileOrigin(filename)
       ? getFilePathfromURL(filename)
       : filename
 

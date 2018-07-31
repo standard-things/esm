@@ -12,7 +12,7 @@ function init() {
     LOWERCASE_L
   } = CHAR_CODE
 
-  function isFileProtocol(url) {
+  function isFileOrigin(url) {
     if (typeof url !== "string") {
       return false
     }
@@ -29,9 +29,9 @@ function init() {
       url.charCodeAt(6) === FORWARD_SLASH
   }
 
-  return isFileProtocol
+  return isFileOrigin
 }
 
 export default shared.inited
-  ? shared.module.utilIsFileProtocol
-  : shared.module.utilIsFileProtocol = init()
+  ? shared.module.utilIsFileOrigin
+  : shared.module.utilIsFileOrigin = init()
