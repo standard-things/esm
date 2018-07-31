@@ -9,13 +9,18 @@ const Plugin = {
 }
 
 function parseForStatement(func, args) {
-  if (! this.inAsync &&
+  const { inAsync } = this
+
+  if (! inAsync &&
       ! this.inFunction &&
       this.options.allowAwaitOutsideFunction)  {
     this.inAsync = true
   }
 
-  return func.apply(this, args)
+  const result = func.apply(this, args)
+
+  this.inAsync = inAsync
+  return result
 }
 
 export default Plugin
