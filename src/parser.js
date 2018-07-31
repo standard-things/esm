@@ -5,6 +5,7 @@ import { Parser as AcornParser } from "./acorn.js"
 import acornParserBigInt from "./acorn/parser/big-int.js"
 import acornParserClassFields from "./acorn/parser/class-fields.js"
 import acornParserErrorMessages from "./acorn/parser/error-messages.js"
+import acornParserForAwaitOutsideFunction from "./acorn/parser/for-await-outside-function.js"
 import acornParserFunctionParamsStart from "./acorn/parser/function-params-start.js"
 import acornParserHTMLComment from "./acorn/parser/html-comment.js"
 import acornParserImport from "./acorn/parser/import.js"
@@ -47,6 +48,7 @@ function init() {
       acornParserBigInt.enable(parser)
       acornParserClassFields.enable(parser)
       acornParserErrorMessages.enable(parser)
+      acornParserForAwaitOutsideFunction.enable(parser)
       acornParserFunctionParamsStart.enable(parser)
       acornParserHTMLComment.enable(parser)
       acornParserImport.enable(parser)
