@@ -17,7 +17,8 @@ describe("top-level await tests", () => {
         "./fixture/top-level-await/empty-cjs.js",
         "./fixture/top-level-await/empty-esm.js",
         "./fixture/top-level-await/export-cjs.js",
-        "./fixture/top-level-await/nested.js"
+        "./fixture/top-level-await/nested.js",
+        "./fixture/top-level-await/iterator.js"
       ]
       .map((request) => import(request)))
   )
