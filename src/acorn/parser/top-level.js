@@ -22,7 +22,6 @@ function init() {
 
     const top = {
       hoistedExports: [],
-      hoistedExportsString: "",
       hoistedImportsString: "",
       hoistedPrefixString: "",
       identifiers,

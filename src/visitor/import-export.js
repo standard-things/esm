@@ -27,7 +27,6 @@ function init() {
       const code =
         top.hoistedPrefixString +
         toModuleExport(this, top.hoistedExports) +
-        top.hoistedExportsString +
         top.hoistedImportsString +
         (this.yield ? "yield;" : "")
 
