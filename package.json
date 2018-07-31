@@ -76,7 +76,7 @@
     "postcss": "^7.0.2",
     "require-inject": "^1.4.3",
     "semver": "^5.5.0",
-    "sleep": "5.1.1",
+    "sleep": "5.2.3",
     "sqreen": "^1.21.0",
     "strip-ansi": "^4.0.0",
     "trash": "^4.3.0",
