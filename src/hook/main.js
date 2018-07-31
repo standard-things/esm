@@ -37,7 +37,7 @@ function hook(Mod) {
       Package.set(dirPath, defaultPkg.clone())
     }
 
-    esmParseLoad(filename, null, true)
+    esmParseLoad(mainPath, null, true)
     tickCallback()
   }
 
