@@ -27,17 +27,12 @@ function init() {
       identifiers,
       importedLocals,
       insertCharIndex: node.start,
-      insertNodeIndex: 0,
-      returnOutsideFunction: false
+      insertNodeIndex: 0
     }
 
     let inited = false
 
     while (this.type !== tt.eof) {
-      if (this.type === tt._return) {
-        top.returnOutsideFunction = true
-      }
-
       const stmt = this.parseStatement(true, true, exported)
       let { expression, type } = stmt
 

@@ -62,8 +62,7 @@ function init() {
         exportedSpecifiers: null,
         exportedStars: null,
         scriptData: null,
-        sourceType: SCRIPT,
-        topLevelReturn: false
+        sourceType: SCRIPT
       }
 
       let { hint, sourceType } = options
@@ -144,7 +143,6 @@ function init() {
       possibleIndexes.push(...possibleExportIndexes)
       possibleIndexes.sort()
 
-      result.topLevelReturn = top.returnOutsideFunction
       Reflect.deleteProperty(ast, "top")
 
       argumentsVisitor.reset()

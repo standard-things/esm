@@ -60,15 +60,14 @@ function init() {
       const result = {
         changed: !! meta[3],
         code: null,
-        dependencySpecifiers: meta[5] || null,
+        dependencySpecifiers: meta[4] || null,
         enforceTDZ: noop,
-        exportedFrom: meta[6] || null,
-        exportedNames: meta[7] || null,
+        exportedFrom: meta[5] || null,
+        exportedNames: meta[6] || null,
         exportedSpecifiers: null,
-        exportedStars: meta[8] || null,
+        exportedStars: meta[7] || null,
         scriptData: null,
-        sourceType: +meta[2] || SCRIPT,
-        topLevelReturn: !! meta[4]
+        sourceType: +meta[2] || SCRIPT
       }
 
       if (result.sourceType === MODULE) {
@@ -357,16 +356,9 @@ function init() {
         if (compileData) {
           const changed = +compileData.changed
           const { sourceType } = compileData
-          const topLevelReturn = +compileData.topLevelReturn
 
           if (sourceType === SCRIPT) {
-            if (topLevelReturn) {
-              meta.push(
-                sourceType,
-                changed,
-                topLevelReturn
-              )
-            } else if (changed) {
+            if (changed) {
               meta.push(
                 sourceType,
                 changed
@@ -376,7 +368,6 @@ function init() {
             meta.push(
               sourceType,
               changed,
-              topLevelReturn,
               deflateDependencySpecifiers(compileData) || 0,
               compileData.exportedFrom || 0,
               compileData.exportedNames || 0,
