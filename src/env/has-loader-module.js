@@ -1,12 +1,10 @@
-import GenericArray from "../generic/array.js"
-
 import isOwnPath from "../util/is-own-path.js"
+import matches from "../util/matches.js"
 import shared from "../shared.js"
 
 function init() {
   function hasLoaderModule(modules) {
-    return Array.isArray(modules) &&
-      GenericArray.some(modules, (mod) => isOwnPath(mod.filename))
+    return matches(modules, ({ filename }) => isOwnPath(filename))
   }
 
   return hasLoaderModule

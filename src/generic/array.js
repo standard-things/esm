@@ -15,7 +15,6 @@ function init() {
     join: unapply(prototype.join),
     of: SafeArray.of,
     push: unapply(prototype.push),
-    some: unapply(prototype.some),
     unshift: unapply(prototype.unshift)
   }
 }

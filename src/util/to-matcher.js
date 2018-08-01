@@ -3,6 +3,10 @@ import shared from "../shared.js"
 
 function init() {
   function toMatcher(source) {
+    if (typeof source === "function") {
+      return (value) => source(value)
+    }
+
     if (isRegExp(source)) {
       return (value) => source.test(value)
     }
