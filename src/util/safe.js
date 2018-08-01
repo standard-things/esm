@@ -1,5 +1,6 @@
+import GenericArray from "../generic/array.js"
+
 import isDataDescriptor from "./is-data-descriptor.js"
-import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
 import shared from "../shared.js"
@@ -7,9 +8,15 @@ import shared from "../shared.js"
 function init() {
   function safe(Super) {
     if (typeof Super !== "function") {
-      return isObject(Super)
-        ? copy({}, Super)
-        : Super
+      if (Array.isArray(Super)) {
+        return GenericArray.of(Super)
+      }
+
+      if (isObjectLike(Super)) {
+        return copy({}, Super)
+      }
+
+      return Super
     }
 
     const Safe = isObjectLike(Super.prototype)
