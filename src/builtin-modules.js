@@ -1,4 +1,3 @@
-
 import Module from "./module.js"
 
 import builtinConsole from "./builtin/console.js"
