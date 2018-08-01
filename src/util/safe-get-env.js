@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import { env } from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
@@ -15,6 +16,8 @@ function init() {
         return binding.util.safeGetenv(name)
       } catch (e) {}
     }
+
+    return env[name]
   }
 
   return safeGetEnv
