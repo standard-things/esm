@@ -12,7 +12,6 @@ import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import isMJS from "../../path/is-mjs.js"
 import loader from "./loader.js"
-import parseState from "../../parse/state.js"
 import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
 import setProperty from "../../util/set-property.js"
@@ -50,35 +49,36 @@ function load(request, parent, isMain) {
   const isExtMJS = isMJS(filename)
   const pkg = Package.from(filename)
   const queryFragment = getURLQueryFragment(request)
+  const { moduleCache, scratchCache } = esmState
 
+  let cache = Module._cache
   let isUnexposed = ! pkg.options.cjs.cache
-  let state = Module
 
   request = queryFragment
     ? getURLFromFilePath(filename) + queryFragment
     : filename
 
   if (isExtMJS ||
-      Reflect.has(esmState._cache, request)) {
-    state = esmState
+      Reflect.has(moduleCache, request)) {
+    cache = moduleCache
   } else if (parsing) {
-    state = parseState
-  } else if (Reflect.has(parseState._cache, request)) {
-    const child = parseState._cache[request]
+    cache = scratchCache
+  } else if (Reflect.has(scratchCache, request)) {
+    const child = scratchCache[request]
 
     if (isUnexposed &&
         Entry.get(child).type === TYPE_ESM) {
-      state = esmState
+      cache = moduleCache
     }
 
-    state._cache[request] = child
-    Reflect.deleteProperty(parseState._cache, request)
+    cache[request] = child
+    Reflect.deleteProperty(scratchCache, request)
   }
 
-  return _load(request, parent, isMain, state, (entry) => {
+  return _load(request, parent, isMain, cache, (entry) => {
     const child = entry.module
 
-    state._cache[request] = child
+    cache[request] = child
 
     if (parentEntry) {
       parentEntry.children[entry.name] = entry
@@ -104,11 +104,11 @@ function load(request, parent, isMain) {
       }
     }
 
-    tryLoader(entry, state, request, filename, parentEntry)
+    tryLoader(entry, cache, request, filename, parentEntry)
   })
 }
 
-function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
+function tryLoader(entry, cache, cacheKey, filename, parentEntry, preload) {
   let error
   let threw = true
 
@@ -120,9 +120,9 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
     throw e
   } finally {
     if (threw) {
-      if (state === esmState) {
+      if (cache === esmState.moduleCache) {
         // Unlike CJS, ESM errors are preserved for subsequent loads.
-        Reflect.defineProperty(state._cache, cacheKey, {
+        Reflect.defineProperty(cache, cacheKey, {
           configurable: true,
           enumerable: true,
           get() {
@@ -133,7 +133,7 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry, preload) {
           }
         })
       } else {
-        Reflect.deleteProperty(state._cache, cacheKey)
+        Reflect.deleteProperty(cache, cacheKey)
       }
     }
   }

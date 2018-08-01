@@ -210,7 +210,7 @@ function hook(Mod, parent) {
     Wrapper.wrap(_extensions, ext, methodWrapper)
 
     passthruMap.set(extCompiler, passthru)
-    esmState._extensions[ext] = _extensions[ext]
+    esmState.extensions[ext] = _extensions[ext]
   }
 }
 

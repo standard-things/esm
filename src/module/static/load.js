@@ -11,8 +11,8 @@ import Module from "../../module.js"
 import _load from "../internal/load.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
+import esmState from "../esm/state.js"
 import loader from "../cjs/loader.js"
-import parseState from "../../parse/state.js"
 import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
 
@@ -40,22 +40,23 @@ function load(request, parent, isMain) {
   }
 
   const filename = Module._resolveFilename(request, parent, isMain)
+  const { scratchCache } = esmState
 
-  let state = Module
+  let cache = Module._cache
 
   if (parsing) {
-    state = parseState
-  } else if (Reflect.has(parseState._cache, filename)) {
-    state._cache[filename] = parseState._cache[filename]
-    Reflect.deleteProperty(parseState._cache, filename)
+    cache = scratchCache
+  } else if (Reflect.has(scratchCache, filename)) {
+    cache[filename] = scratchCache[filename]
+    Reflect.deleteProperty(scratchCache, filename)
   }
 
   let loaderCalled = false
 
-  const entry = _load(filename, parent, isMain, state, (entry) => {
+  const entry = _load(filename, parent, isMain, cache, (entry) => {
     loaderCalled = true
-    state._cache[filename] = entry.module
-    tryLoader(entry, state, filename, filename, parentEntry)
+    cache[filename] = entry.module
+    tryLoader(entry, cache, filename, filename, parentEntry)
   })
 
   if (! loaderCalled &&
@@ -68,7 +69,7 @@ function load(request, parent, isMain) {
   return entry.module.exports
 }
 
-function tryLoader(entry, state, cacheKey, filename, parentEntry) {
+function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
   const mod = entry.module
 
   let threw = true
@@ -83,7 +84,7 @@ function tryLoader(entry, state, cacheKey, filename, parentEntry) {
     threw = false
   } finally {
     if (threw) {
-      Reflect.deleteProperty(state._cache, cacheKey)
+      Reflect.deleteProperty(cache, cacheKey)
     }
   }
 }

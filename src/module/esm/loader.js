@@ -16,17 +16,17 @@ function loader(entry, filename, parentEntry) {
   entry.updateFilename(filename)
 
   let ext = entry.extname
-  let state = esmState
+  let { extensions } = esmState
 
   if (ext === ".js" ||
       (parentEntry &&
        parentEntry.package.options.cjs.extensions &&
        parentEntry.extname !== ".mjs")) {
-    state = Module
+    extensions = Module._extensions
   }
 
   if (ext === "" ||
-      ! Reflect.has(state._extensions, ext)) {
+      ! Reflect.has(extensions, ext)) {
     ext = ".js"
   }
 
@@ -47,7 +47,7 @@ function loader(entry, filename, parentEntry) {
     }
   }
 
-  state._extensions[ext](mod, filename)
+  extensions[ext](mod, filename)
 
   if (! parsing &&
       ! mod.loaded) {

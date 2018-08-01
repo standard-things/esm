@@ -21,11 +21,11 @@ const {
   STATE_PARSING_STARTED
 } = ENTRY
 
-function load(filename, parent, isMain, state, loader) {
+function load(filename, parent, isMain, cache, loader) {
   const { parsing } = shared.moduleState
 
   let entry
-  let child = state._cache[filename]
+  let child = cache[filename]
 
   if (child) {
     const children = parent && parent.children

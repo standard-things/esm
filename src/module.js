@@ -10,7 +10,6 @@ import defaults from "./util/defaults.js"
 import esmState from "./module/esm/state.js"
 import initGlobalPaths from "./module/internal/init-global-paths.js"
 import maskFunction from "./util/mask-function.js"
-import parseState from "./parse/state.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
 import req from "./module/proto/require.js"
@@ -78,7 +77,7 @@ if (Module.globalPaths) {
   Module.globalPaths = GenericArray.from(globalPaths)
 }
 
-parseState._cache = new Proxy(parseState._cache, {
+esmState.scratchCache = new Proxy(esmState.scratchCache, {
   get(target, name) {
     return Reflect.has(target, name)
       ? target[name]

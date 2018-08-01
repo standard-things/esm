@@ -1,10 +1,11 @@
-import _extensions from "./extensions.js"
+import extensions from "./extensions.js"
 
 const state = {
-  _cache: { __proto__: null },
-  _extensions,
+  extensions,
   globalPaths: null,
-  mainModule: null
+  mainModule: null,
+  moduleCache: { __proto__: null },
+  scratchCache: { __proto__: null }
 }
 
 export default state

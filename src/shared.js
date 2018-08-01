@@ -82,6 +82,7 @@ function init() {
     },
     module: {},
     moduleState: {
+      instantiating: false,
       parsing: false,
       requireDepth: 0,
       statFast: null,
