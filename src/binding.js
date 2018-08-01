@@ -31,7 +31,6 @@ function init() {
     ],
     inspector: [
       "callAndPauseOnStart",
-      "consoleCall",
       "open"
     ],
     util: [

@@ -53,6 +53,11 @@ function init() {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
   }
 
+  function consoleCall(originalFunc, builtinFunc, ...args) {
+    originalFunc(...args)
+    builtinFunc(...args)
+  }
+
   function dirWrapper(func, [object, options]) {
     return Reflect.apply(func, this, [{
       [shared.customInspectKey](recurseTimes, context) {
@@ -192,30 +197,24 @@ function init() {
 
   if (INSPECT &&
       config.variables.v8_enable_inspector) {
-    const { consoleCall } = binding.inspector
 
-    if (typeof consoleCall === "function") {
-      const emptyConfig = { __proto__: null }
+    for (const name in wrapperMap) {
+      const builtinFunc = builtinConsole[name]
 
-      for (const name in wrapperMap) {
-        const func = builtinConsole[name]
+      setDeferred(builtinConsole, name, () => {
+        const { originalConsole } = shared
 
-        setDeferred(builtinConsole, name, () => {
-          const { originalConsole } = shared
+        if (typeof originalConsole[name] !== "function") {
+          return builtinFunc
+        }
 
-          if (typeof originalConsole[name] !== "function") {
-            return func
-          }
-
-          return GenericFunction.bind(
-            consoleCall,
-            void 0,
-            wrapBoundInspectable(originalConsole, name),
-            func,
-            emptyConfig
-          )
-        })
-      }
+        return GenericFunction.bind(
+          consoleCall,
+          void 0,
+          wrapBoundInspectable(originalConsole, name),
+          builtinFunc
+        )
+      })
     }
   } else if (ELECTRON_RENDERER) {
     const names = keys(console)
