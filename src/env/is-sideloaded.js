@@ -16,22 +16,29 @@ function init() {
       return env.sideloaded
     }
 
-    const filename = realpath(argv[1])
+    if (isNyc()) {
+      return env.sideloaded = true
+    }
+
     const args = argv.slice(2)
-    const nodeModulesIndex = args.length
-      ? normalize(filename).lastIndexOf("/node_modules/")
-      : -1
+
+    let filename
+    let nodeModulesIndex = -1
+
+    if (args.length) {
+      filename = realpath(argv[1])
+      nodeModulesIndex = normalize(filename).lastIndexOf("/node_modules/")
+    }
 
     // From a package like Mocha.
     if (nodeModulesIndex !== -1 &&
         hasLoaderArg(args) &&
         (Package.get(cwd()) !== null ||
-        Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
+         Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
       return env.sideloaded = true
     }
 
-    // From istanbuljs/nyc.
-    return env.sideloaded = isNyc()
+    return env.sideloaded = false
   }
 
   return isSideloaded
