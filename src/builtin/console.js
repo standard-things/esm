@@ -5,7 +5,6 @@ import ENV from "../constant/env.js"
 import GenericFunction from "../generic/function.js"
 
 import assign from "../util/assign.js"
-import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"

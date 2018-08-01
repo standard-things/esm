@@ -1,5 +1,3 @@
-import GenericArray from "../generic/array.js"
-
 import isDataDescriptor from "./is-data-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
@@ -9,7 +7,7 @@ function init() {
   function safe(Super) {
     if (typeof Super !== "function") {
       if (Array.isArray(Super)) {
-        return GenericArray.of(Super)
+        return Array.from(Super)
       }
 
       if (isObjectLike(Super)) {
