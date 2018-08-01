@@ -9,7 +9,6 @@ import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 
-import binding from "../../binding.js"
 import call from "../../util/call.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isJS from "../../path/is-js.js"
@@ -29,11 +28,12 @@ const {
 } = CHAR_CODE
 
 const {
+  FLAGS,
   WIN32
 } = ENV
 
 const { isFile, isSymbolicLink } = Stats.prototype
-const { preserveSymlinks, preserveSymlinksMain } = binding.config
+const { preserveSymlinks, preserveSymlinksMain } = FLAGS
 
 const mainFields = ["main"]
 

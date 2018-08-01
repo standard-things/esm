@@ -1,21 +1,20 @@
+import ENV from "./constant/env.js"
+
 import binding from "./binding.js"
-import { execArgv } from "./safe/process.js"
 import shared from "./shared.js"
 
 function init() {
+  const {
+    FLAGS
+  } = ENV
+
   let ids = __non_webpack_module__.constructor.builtinModules
 
   if (Array.isArray(ids) &&
       Object.isFrozen(ids)) {
     ids = Array.from(ids)
   } else {
-    let { exposeInternals } = binding.config
-
-    if (exposeInternals === void 0) {
-      const flagRegExp = /^--expose[-_]internals$/
-
-      exposeInternals = execArgv.some((arg) => flagRegExp.test(arg))
-    }
+    const { exposeInternals } = FLAGS
 
     ids = []
 

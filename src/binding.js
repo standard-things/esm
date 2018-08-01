@@ -11,7 +11,6 @@ function init() {
   let _binding
 
   const ids = [
-    "config",
     "fs",
     "icu",
     "inspector",
@@ -21,13 +20,6 @@ function init() {
 
   const map = {
     __proto__: null,
-    config: [
-      "experimentalREPLAwait",
-      "experimentalWorker",
-      "exposeInternals",
-      "preserveSymlinks",
-      "preserveSymlinksMain"
-    ],
     fs: [
       "realpath",
       "internalModuleReadFile",

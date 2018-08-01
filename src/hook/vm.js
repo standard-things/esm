@@ -43,6 +43,7 @@ const {
 const {
  CHECK,
  EVAL,
+ FLAGS,
  INTERNAL,
  REPL
 } = ENV
@@ -185,7 +186,7 @@ function hook(vm) {
     }
 
     if (INTERNAL &&
-        binding.config.experimentalREPLAwait) {
+        FLAGS.experimentalREPLAwait) {
       acornInternalAcorn.enable()
       acornInternalWalk.enable()
     }
@@ -238,7 +239,7 @@ function createAddBuiltinModules(entry) {
     lazyModules.push("inspector")
   }
 
-  if (binding.config.experimentalWorker) {
+  if (FLAGS.experimentalWorker) {
     lazyModules.push("worker_threads")
   }
 
