@@ -7,7 +7,14 @@ import shared from "../shared.js"
 
 function init() {
   const safeProcess = safe(realProcess)
-  const { config, env, versions } = safeProcess
+
+  const {
+    argv,
+    config,
+    env,
+    execArgv,
+    versions
+  } = safeProcess
 
   const safeConfig = {
     variables: {
@@ -21,8 +28,10 @@ function init() {
     safeConfig.variables.v8_enable_inspector = config.variables.v8_enable_inspector
   }
 
+  setProperty(safeProcess, "argv", safe(argv))
   setProperty(safeProcess, "config", safeConfig)
   setProperty(safeProcess, "env", safe(env))
+  setProperty(safeProcess, "execArgv", safe(execArgv))
   setProperty(safeProcess, "versions", safe(versions))
   return safeProcess
 }
