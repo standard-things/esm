@@ -111,6 +111,15 @@ describe("main hook tests", function () {
       })
   )
 
+  it("should support query fragments in ESM", () =>
+    runMain("./fixture/main-hook/query-fragment.js?foo=bar")
+      .then(({ stdout }) => {
+        const url = testURL + "/fixture/main-hook/query-fragment.js?foo=bar"
+
+        assert.ok(stdout.includes("query-fragment:" + url))
+      })
+  )
+
   it("should expose `require.main` in CJS", () =>
     runMain("./fixture/main-hook/require-main.js")
       .then(({ stdout }) => assert.ok(stdout.includes("require-main:true")))
