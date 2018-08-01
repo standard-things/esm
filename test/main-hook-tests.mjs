@@ -14,7 +14,7 @@ const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.resolve(".")
-const testURL = fileProtocol + testPath.replace(/\\/g, "/")
+const fileURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const canUseExperimentalModules =
   Reflect.has(process.versions, "v8") &&
@@ -101,24 +101,28 @@ describe("main hook tests", function () {
       .then(({ stdout }) => assert.ok(stdout.includes("dynamic-import-cjs:true")))
   )
 
-  it("should support `import.meta.url` in ESM", () =>
-    runMain("./fixture/main-hook/import-meta.mjs")
+  it("should support `import.meta.url` in ESM", () => {
+    const testURL = "/fixture/main-hook/import-meta.mjs"
+
+    return runMain("." + testURL)
       .then(({ stdout }) => {
-        const url = testURL + "/fixture/main-hook/import-meta.mjs"
+        const url = fileURL + testURL
         const expected = JSON.stringify({ url })
 
         assert.ok(stdout.includes("import-meta:" + expected))
       })
-  )
+  })
 
-  it("should support query fragments in ESM", () =>
-    runMain("./fixture/main-hook/query-fragment.js?foo=bar")
+  it("should support query fragments in ESM", () => {
+    const testURL = "/fixture/main-hook/query-fragment.js?foo=bar"
+
+    return runMain("." + testURL)
       .then(({ stdout }) => {
-        const url = testURL + "/fixture/main-hook/query-fragment.js?foo=bar"
+        const url = fileURL + testURL
 
         assert.ok(stdout.includes("query-fragment:" + url))
       })
-  )
+  })
 
   it("should expose `require.main` in CJS", () =>
     runMain("./fixture/main-hook/require-main.js")
