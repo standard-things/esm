@@ -1,10 +1,13 @@
 import shared from "../shared.js"
+import toMatcher from "./to-matcher.js"
 
 function init() {
   function matches(array, pattern) {
     if (Array.isArray(array)) {
+      const matcher = toMatcher(pattern)
+
       for (const value of array) {
-        if (pattern.test(value)) {
+        if (matcher(value)) {
           return true
         }
       }
