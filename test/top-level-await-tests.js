@@ -3,11 +3,11 @@ import SemVer from "semver"
 import assert from "assert"
 
 const canTestAsyncIterators = SemVer.satisfies(process.version, ">=10")
-const canTestTopLevelAwait = SemVer.satisfies(process.version, ">=7.6.0")
+const canTestAsyncFunctions = SemVer.satisfies(process.version, ">=7.6.0")
 
 describe("top-level await tests", () => {
   before(function () {
-    if (! canTestTopLevelAwait) {
+    if (! canTestAsyncFunctions) {
       this.skip()
     }
   })
