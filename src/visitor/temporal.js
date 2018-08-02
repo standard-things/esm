@@ -107,6 +107,7 @@ function init() {
 
       if (names) {
         this.changed = true
+
         this.magicString.prependRight(
           child.end,
           ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"
