@@ -32,10 +32,10 @@ const {
 
 const Runtime = {
   addDefaultValue(value) {
-    this.addExportGetter([["default", () => value]])
+    this.addExportGetters([["default", () => value]])
   },
 
-  addExportGetter(getterArgsList) {
+  addExportGetters(getterArgsList) {
     this.entry.addGetters(getterArgsList)
   },
 
@@ -123,7 +123,7 @@ const Runtime = {
 
     runtime._runResult = void 0
     runtime.addDefaultValue = Runtime.addDefaultValue
-    runtime.addExportGetter = Runtime.addExportGetter
+    runtime.addExportGetters = Runtime.addExportGetters
     runtime.addNamespaceSetter = Runtime.addNamespaceSetter
     runtime.assertTDZ = Runtime.assertTDZ
     runtime.compileEval = boundCompileEval
@@ -151,7 +151,7 @@ const Runtime = {
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
     runtime.w = runtime.importStatic
-    runtime.x = runtime.addExportGetter
+    runtime.x = runtime.addExportGetters
 
     return runtime
   },
@@ -209,7 +209,7 @@ const Runtime = {
     //
     // becomes
     //
-    //   runtime.addExportGetter("a", () => a)
+    //   runtime.addExportGetters([["a", () => a]])
     //   let a = 1
     //   runtime.updateBindings(a += 3)
     //
