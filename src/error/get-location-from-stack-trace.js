@@ -4,6 +4,7 @@ import isPath from "../util/is-path.js"
 import shared from "../shared.js"
 
 function init() {
+  const headerRegExp = /^(.+?)(:\d+)(?=\n)/
   // eslint-disable-next-line no-useless-escape
   const locRegExp = /^ *at (?:.+? \()?(.+?):(\d+)(?:\:(\d+))?/gm
 
@@ -14,24 +15,40 @@ function init() {
 
     const { stack } = error
 
-    let match
+    let match = headerRegExp.exec(stack)
+
+    if (match) {
+      const [, filename, line] = match
+
+      if (isFilename(filename)) {
+        return {
+          column: 0,
+          filename,
+          line
+        }
+      }
+    }
 
     locRegExp.lastIndex = 0
 
     while ((match = locRegExp.exec(stack))) {
-      const filename = match[1]
+      const [, filename, line, column] = match
 
-      if (isPath(filename) &&
-          ! isOwnPath(filename)) {
+      if (isFilename(filename)) {
         return {
-          column: match[3],
+          column,
           filename,
-          line: match[2]
+          line
         }
       }
     }
 
     return null
+  }
+
+  function isFilename(value) {
+    return isPath(value) &&
+      ! isOwnPath(value)
   }
 
   return getLocationFromStackTrace
