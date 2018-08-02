@@ -1,11 +1,10 @@
-
+import isError from "./is-error.js"
 import isNative from "./is-native.js"
-import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
   function isStackTraceMasked(error) {
-    const descriptor = isObjectLike(error)
+    const descriptor = isError(error)
       ? Reflect.getOwnPropertyDescriptor(error, "stack")
       : void 0
 

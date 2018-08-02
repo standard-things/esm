@@ -5,6 +5,7 @@ import Module from "../module.js"
 import decorateStackTrace from "./decorate-stack-trace.js"
 import getModuleURL from "../util/get-module-url.js"
 import getSilent from "../util/get-silent.js"
+import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import shared from "../shared.js"
@@ -21,6 +22,10 @@ function init() {
   const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
   function maskStackTrace(error, content, filename, isESM) {
+    if (! isError(error)) {
+      return error
+    }
+
     decorateStackTrace(error)
 
     let column
