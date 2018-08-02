@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 import Package from "../package.js"
 
+import captureStackTrace from "../error/capture-stack-trace.js"
 import copyProperty from "./copy-property.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
@@ -23,7 +24,7 @@ function init() {
     }
 
     const proxy = new OwnProxy(func, {
-      get(target, name, receiver) {
+      get: function get(target, name, receiver) {
         if (name === "toString" &&
             ! has(target, "toString")) {
           return cached.toString
@@ -33,19 +34,27 @@ function init() {
           receiver = target
         }
 
-        return Reflect.get(target, name, receiver)
+        try {
+          return Reflect.get(target, name, receiver)
+        } catch (e) {
+          throw captureStackTrace(e, get)
+        }
       }
     })
 
     const toString = new OwnProxy(func.toString, {
-      apply(target, thisArg, args) {
+      apply: function apply(target, thisArg, args) {
         if (! Package.state.default.options.debug &&
             typeof thisArg === "function" &&
             unwrapProxy(thisArg) === func) {
           thisArg = cached.source
         }
 
-        return Reflect.apply(target, thisArg, args)
+        try {
+          return Reflect.apply(target, thisArg, args)
+        } catch (e) {
+          throw captureStackTrace(e, apply)
+        }
       }
     })
 
