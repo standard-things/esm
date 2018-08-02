@@ -52,11 +52,6 @@ function init() {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
   }
 
-  function consoleCall(originalFunc, builtinFunc, ...args) {
-    originalFunc(...args)
-    builtinFunc(...args)
-  }
-
   function dirWrapper(func, [object, options]) {
     return Reflect.apply(func, this, [{
       [shared.customInspectKey](recurseTimes, context) {
@@ -202,17 +197,18 @@ function init() {
 
       setDeferred(builtinConsole, name, () => {
         const { originalConsole } = shared
+        const originalFunc = originalConsole[name]
 
-        if (typeof originalConsole[name] !== "function") {
+        if (typeof originalFunc !== "function") {
           return builtinFunc
         }
 
-        return GenericFunction.bind(
-          consoleCall,
-          void 0,
-          wrapBoundInspectable(originalConsole, name),
-          builtinFunc
-        )
+        const originalWrapper = wrapBoundInspectable(originalConsole, name)
+
+        return maskFunction((...args) => {
+          originalWrapper(...args)
+          builtinFunc(...args)
+        }, builtinFunc)
       })
     }
   } else if (ELECTRON_RENDERER) {
@@ -222,12 +218,14 @@ function init() {
       if (name !== "Console" &&
           has(builtinConsole, name)) {
         // eslint-disable-next-line no-console
-        const value = console[name]
+        const consoleFunc = console[name]
+        const builtinFunc = builtinConsole[name]
 
-        if (typeof value === "function") {
+        if (typeof builtinFunc === "function" &&
+            typeof consoleFunc === "function") {
           builtinConsole[name] = maskFunction(
             wrapBoundInspectable(console, name),
-            value
+            builtinFunc
           )
         }
       }
