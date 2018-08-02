@@ -21,19 +21,14 @@ function init() {
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
-      const { insertIndex } = top
 
       const code =
         top.insertPrefix +
         toModuleExport(this, this.hoistedExports) +
         this.hoistedImportsString
 
-      if (this.exportedNames.length ||
-          this.exportedStars.length) {
-        this.yieldIndex = insertIndex + code.length
-      }
-
-      this.magicString.prependLeft(insertIndex, code)
+      this.magicString.prependLeft(top.insertIndex, code)
+      this.yieldIndex += code.length
     }
 
     reset(options) {
@@ -57,7 +52,7 @@ function init() {
       this.strict = false
       this.temporals = null
       this.top = null
-      this.yieldIndex = -1
+      this.yieldIndex = 0
 
       if (options) {
         const { magicString } = options
@@ -78,6 +73,7 @@ function init() {
         this.strict = options.strict
         this.temporals = { __proto__: null }
         this.top = options.top
+        this.yieldIndex = options.yieldIndex
       }
     }
 

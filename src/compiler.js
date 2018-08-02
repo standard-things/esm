@@ -62,7 +62,7 @@ function init() {
         exportedStars: null,
         scriptData: null,
         sourceType: SCRIPT,
-        yieldIndex: -1
+        yieldIndex: 0
       }
 
       let { hint, sourceType } = options
@@ -140,6 +140,8 @@ function init() {
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
 
+      let yieldIndex = top.insertIndex
+
       possibleIndexes.push(...possibleExportIndexes)
       possibleIndexes.sort()
 
@@ -160,7 +162,8 @@ function init() {
           runtimeName,
           sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
           strict,
-          top
+          top,
+          yieldIndex
         })
       } catch (e) {
         e.sourceType = parserOptions.sourceType
@@ -227,18 +230,11 @@ function init() {
       if (sourceType === UNAMBIGUOUS) {
         sourceType = SCRIPT
       } else if (sourceType === MODULE) {
-        let { yieldIndex } = importExportVisitor
-
-        if (yieldIndex !== -1) {
-          yieldIndex += FAST_READ_PREFIX.length
-        }
-
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
         result.exportedFrom = importExportVisitor.exportedFrom
         result.exportedNames = importExportVisitor.exportedNames
         result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = MODULE
-        result.yieldIndex = yieldIndex
 
         if (addedImportExport) {
           result.enforceTDZ = () => {
@@ -294,15 +290,20 @@ function init() {
         }
       }
 
-      result.changed =
-        argumentsVisitor.changed ||
-        consoleVisitor.changed ||
-        evalVisitor.changed ||
-        importExportVisitor.changed
+      if (argumentsVisitor.changed ||
+          consoleVisitor.changed ||
+          evalVisitor.changed ||
+          importExportVisitor.changed) {
+        result.changed = true
 
-      if (result.changed) {
+        yieldIndex =
+          FAST_READ_PREFIX.length +
+          importExportVisitor.yieldIndex
+
         setDeferred(result, "code", () => FAST_READ_PREFIX + magicString.toString())
       }
+
+      result.yieldIndex = yieldIndex
 
       return result
     }

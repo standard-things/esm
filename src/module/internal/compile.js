@@ -1,3 +1,4 @@
+import CHAR_CODE from "../../constant/char-code.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
@@ -21,6 +22,9 @@ import maskStackTrace from "../../error/mask-stack-trace.js"
 import readFile from "../../fs/read-file.js"
 import shared from "../../shared.js"
 
+const {
+  SEMICOLON
+} = CHAR_CODE
 const {
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
@@ -182,11 +186,8 @@ function tryCompileESM(entry, filename) {
   const { compileData, runtimeName } = entry
   const mod = entry.module
 
-  const useGenerator =
-    ! isObjectEmpty(compileData.exportedSpecifiers)
-
   const useAsync =
-    ! useGenerator &&
+    isObjectEmpty(compileData.exportedSpecifiers) &&
     useAsyncWrapper(entry)
 
   const cjsVars =
@@ -195,11 +196,16 @@ function tryCompileESM(entry, filename) {
 
   let { code, yieldIndex } = compileData
 
-  if (useGenerator &&
+  if (! useAsync &&
       yieldIndex !== -1) {
-    code =
-    compileData.code = code.slice(0, yieldIndex) + "yield;" + code.slice(yieldIndex)
     compileData.yieldIndex = -1
+
+    code =
+    compileData.code =
+      code.slice(0, yieldIndex) +
+      (code.charCodeAt(0) === SEMICOLON ? "" : ";") +
+      "yield;" +
+      code.slice(yieldIndex)
   }
 
   let content =
@@ -212,7 +218,7 @@ function tryCompileESM(entry, filename) {
     runtimeName + ".r((" +
     (useAsync ? "async " :  "") +
     "function" +
-    (useGenerator ? " *" : "") +
+    (useAsync ? "" : " *") +
     "(" +
     (cjsVars
       ? "exports,require"
@@ -227,7 +233,7 @@ function tryCompileESM(entry, filename) {
   const runtime = Runtime.enable(entry, GenericObject.create())
   const result = mod._compile(content, filename)
 
-  if (useGenerator) {
+  if (! useAsync) {
     // Debuggers may wrap `Module#_compile` with
     // `process.binding("inspector").callAndPauseOnStart()`
     // and not forward the return value.
