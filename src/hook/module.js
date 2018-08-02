@@ -77,15 +77,22 @@ function hook(Mod, parent) {
   const defaultPkg = parentPkg.clone()
   const defaultOptions = defaultPkg.options
 
+  defaultPkg.range = RANGE_ALL
+
   if (! defaultOptions.force &&
       defaultOptions.mode === OPTIONS_MODE_ALL) {
     defaultOptions.mode = OPTIONS_MODE_AUTO
   }
 
-  defaultPkg.range = RANGE_ALL
+  const pkgStateCache = shared.package.state
+
+  for (const cacheKey in pkgStateCache) {
+    const pkgState = pkgStateCache[cacheKey]
+
+    pkgState.default || (pkgState.default = defaultPkg)
+  }
 
   Module._extensions = _extensions
-  Package.state.default = defaultPkg
 
   function managerWrapper(manager, func, args) {
     const [, filename] = args
