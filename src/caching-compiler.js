@@ -187,58 +187,7 @@ function init() {
     return result
   }
 
-  function removeExpired(cachePath, cacheName) {
-    const cache = shared.package.dir[cachePath]
-    const pathHash = getCachePathHash(cacheName)
-
-    for (const otherCacheName in cache) {
-      if (otherCacheName !== cacheName &&
-          otherCacheName.startsWith(pathHash)) {
-        Reflect.deleteProperty(cache.compile, otherCacheName)
-        Reflect.deleteProperty(cache.map, otherCacheName)
-        removeFile(cachePath + sep + otherCacheName)
-      }
-    }
-  }
-
-  function toCompileOptions(entry, options) {
-    const { runtimeName } = entry
-
-    const cjs = entry.extname === ".mjs"
-      ? void 0
-      : entry.package.options.cjs
-
-    if (options.eval) {
-      return {
-        cjs,
-        runtimeName
-      }
-    }
-
-    return {
-      cjs,
-      hint: options.hint,
-      pragmas: options.pragmas,
-      runtimeName,
-      sourceType: options.sourceType,
-      strict: options.strict,
-      var: options.var
-    }
-  }
-
-  function writeMarker(filename) {
-    if (! exists(filename)) {
-      writeFile(filename, "")
-    }
-  }
-
-  if (shared.inited) {
-    return CachingCompiler
-  }
-
-  realProcess.setMaxListeners(realProcess.getMaxListeners() + 1)
-
-  realProcess.once("exit", () => {
+  function onExit() {
     realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
 
     const { pendingScripts, pendingWrites } = shared
@@ -431,7 +380,58 @@ function init() {
         }
       }
     }
-  })
+  }
+
+  function removeExpired(cachePath, cacheName) {
+    const cache = shared.package.dir[cachePath]
+    const pathHash = getCachePathHash(cacheName)
+
+    for (const otherCacheName in cache) {
+      if (otherCacheName !== cacheName &&
+          otherCacheName.startsWith(pathHash)) {
+        Reflect.deleteProperty(cache.compile, otherCacheName)
+        Reflect.deleteProperty(cache.map, otherCacheName)
+        removeFile(cachePath + sep + otherCacheName)
+      }
+    }
+  }
+
+  function toCompileOptions(entry, options) {
+    const { runtimeName } = entry
+
+    const cjs = entry.extname === ".mjs"
+      ? void 0
+      : entry.package.options.cjs
+
+    if (options.eval) {
+      return {
+        cjs,
+        runtimeName
+      }
+    }
+
+    return {
+      cjs,
+      hint: options.hint,
+      pragmas: options.pragmas,
+      runtimeName,
+      sourceType: options.sourceType,
+      strict: options.strict,
+      var: options.var
+    }
+  }
+
+  function writeMarker(filename) {
+    if (! exists(filename)) {
+      writeFile(filename, "")
+    }
+  }
+
+  realProcess
+    .setMaxListeners(realProcess.getMaxListeners() + 1)
+    .once("exit", onExit)
+    .once("SIGINT", onExit)
+    .once("SIGTERM", onExit)
 
   return CachingCompiler
 }
