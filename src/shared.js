@@ -89,7 +89,6 @@ function init() {
       statSync: null
     },
     package: {
-      default: null,
       dir: { __proto__: null },
       root: { __proto__: null },
       state: { __proto__: null }
