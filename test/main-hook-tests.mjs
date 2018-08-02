@@ -14,7 +14,7 @@ const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.resolve(".")
-const fileURL = fileProtocol + testPath.replace(/\\/g, "/")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const canUseExperimentalModules =
   Reflect.has(process.versions, "v8") &&
@@ -100,23 +100,23 @@ describe("main hook tests", function () {
   )
 
   it("should support `import.meta.url` in ESM", () => {
-    const testURL = "/fixture/main-hook/import-meta.mjs"
+    const filename = "fixture/main-hook/import-meta.mjs"
 
-    return runMain("." + testURL)
+    return runMain(filename)
       .then(({ stdout }) => {
-        const url = fileURL + testURL
+        const url = testURL + "/" + filename
         const expected = JSON.stringify({ url })
 
         assert.ok(stdout.includes("import-meta:" + expected))
       })
   })
 
-  it("should support query fragments in ESM", () => {
-    const testURL = "/fixture/main-hook/query-fragment.js?foo=bar"
+  it("should support filenames with query/fragments in ESM", () => {
+    const filename = "fixture/main-hook/query-fragment.js?a#a"
 
-    return runMain("." + testURL)
+    return runMain(filename)
       .then(({ stdout }) => {
-        const url = fileURL + testURL
+        const url = testURL + "/" + filename
 
         assert.ok(stdout.includes("query-fragment:" + url))
       })
@@ -155,7 +155,7 @@ describe("main hook tests", function () {
   )
 
   it("should error for missing modules", () => {
-    const fileNames = ["missing", "missing.js", "missing.mjs"]
+    const filenames = ["missing", "missing.js", "missing.mjs"]
     const flags = [""]
     const runs = []
 
@@ -163,7 +163,7 @@ describe("main hook tests", function () {
       flags.push("--preserve-symlinks")
     }
 
-    fileNames.forEach((fileName) => {
+    filenames.forEach((fileName) => {
       flags.forEach((flag) => {
         const args = flag ? [flag] : []
 
