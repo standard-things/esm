@@ -67,7 +67,6 @@ describe("main hook tests", function () {
   it("should support `ESM_OPTIONS` environment variable", function () {
     if (isDebug) {
       this.skip()
-      return
     }
 
     return [
@@ -84,7 +83,6 @@ describe("main hook tests", function () {
   it("should support `ESM_OPTIONS` environment variable with `options.cache`", function () {
     if (isDebug) {
       this.skip()
-      return
     }
 
     const execPath = path.resolve(testPath, "fixture/options/env-cache")
