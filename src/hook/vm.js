@@ -64,10 +64,7 @@ function hook(vm) {
 
   function methodWrapper(manager, func, [content, scriptOptions]) {
     scriptOptions = assign({}, scriptOptions)
-
-    if (! scriptOptions.produceCachedData) {
-      scriptOptions.produceCachedData = true
-    }
+    scriptOptions.produceCachedData = true
 
     const cacheName =
     entry.cacheName = getCacheName(entry, content)

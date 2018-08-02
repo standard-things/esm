@@ -79,13 +79,11 @@ function init() {
           break
 
         case LOWERCASE_O:
-          if (! altOptions) {
-            altOptions = assign({}, options, {
-              depth: 4,
-              showHidden: true,
-              showProxy: true
-            })
-          }
+          altOptions || (altOptions = assign({}, options, {
+            depth: 4,
+            showHidden: true,
+            showProxy: true
+          }))
 
           segment = inspect(args[++argsIndex], altOptions)
           break

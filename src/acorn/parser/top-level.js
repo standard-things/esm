@@ -11,9 +11,7 @@ function init() {
   }
 
   function parseTopLevel(node) {
-    if (! node.body) {
-      node.body = []
-    }
+    node.body || (node.body = [])
 
     const { body } = node
     const exported = { __proto__: null }
