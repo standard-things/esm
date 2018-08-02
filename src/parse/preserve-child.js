@@ -17,7 +17,7 @@ function init() {
       indentation = ""
     }
 
-    overwrite(visitor, parentStart, childStart, indentation)
+    return overwrite(visitor, parentStart, childStart, indentation)
   }
 
   return preserveChild

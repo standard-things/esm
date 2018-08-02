@@ -3,7 +3,7 @@ import shared from "../shared.js"
 
 function init() {
   function preserveLine(visitor, { end, start }) {
-    overwrite(visitor, start, end, "")
+    return overwrite(visitor, start, end, "")
   }
 
   return preserveLine

@@ -11,6 +11,8 @@ function init() {
     } else if (padded !== "") {
       magicString.prependLeft(oldStart, padded)
     }
+
+    return magicString
   }
 
   return overwrite
