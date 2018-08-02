@@ -84,28 +84,28 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  if (! parsing) {
+  if (parsing) {
+    const defaultPkg = Package.state.default
+    const isESM = entry.type === TYPE_ESM
+
+    const parentEntry = entry.parent
+    const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+    const parentPkg = parentEntry && parentEntry.package
+
+    if (! isESM &&
+        ! parentIsESM &&
+        (pkg === defaultPkg ||
+        parentPkg === defaultPkg)) {
+      return fallback ? fallback() : void 0
+    }
+
+    if (isESM &&
+        entry.state === STATE_PARSING_STARTED) {
+      tryValidate(caller, entry, content, filename)
+    }
+  } else {
     entry.state = STATE_EXECUTION_STARTED
     return tryCompileCached(entry, content, filename)
-  }
-
-  const defaultPkg = Package.state.default
-  const isESM = entry.type === TYPE_ESM
-
-  const parentEntry = entry.parent
-  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const parentPkg = parentEntry && parentEntry.package
-
-  if (! isESM &&
-      ! parentIsESM &&
-      (pkg === defaultPkg ||
-       parentPkg === defaultPkg)) {
-    return fallback ? fallback() : void 0
-  }
-
-  if (isESM &&
-      entry.state === STATE_PARSING_STARTED) {
-    tryValidate(caller, entry, content, filename)
   }
 }
 
