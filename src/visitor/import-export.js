@@ -18,8 +18,6 @@ function init() {
     MODULE
   } = SOURCE_TYPE
 
-  const ANON_NAME = encodeId("default")
-
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
@@ -199,36 +197,48 @@ function init() {
 
       const node = path.getValue()
       const { declaration } = node
-      const { id, type } = declaration
+      const { runtimeName } = this
+
+      let { id, type } = declaration
+
+      if (type === "ParenthesizedExpression") {
+        const { expression } = declaration
+
+        id = expression.id
+        type = expression.type
+      }
+
+      const name = id
+        ? id.name
+        : runtimeName + "anonymous"
 
       if (type === "FunctionDeclaration" ||
           (id && type === "ClassDeclaration")) {
-        // Support exporting default class and function declarations:
+        // Support exporting default function declarations:
         // export default function named() {}
-        const name = id
-          ? id.name
-          : safeName(ANON_NAME, this.top.identifiers)
-
         if (! id) {
-          // Convert anonymous functions to named functions so they are hoisted.
-          this.magicString.prependLeft(
-            declaration.functionParamsStart,
-            " " + name
-          )
+          // Convert anonymous functions to hoisted named functions.
+          this.magicString.prependLeft(declaration.functionParamsStart, " " + name)
         }
 
-        // If the exported default value is a function or class declaration,
-        // it's important that the declaration be visible to the rest of the
-        // code in the exporting module, so we must avoid compiling it to a
-        // named function or class expression.
         hoistExports(this, node, [["default", name]])
       } else {
-        // Otherwise, since the exported value is an expression, we use the
-        // special `runtime.default(value)` form.
-        let prefix = this.runtimeName + ".d("
+        // Support exporting other default declarations:
+        // export default value
+        let prefix = runtimeName + ".d("
         let suffix = ");"
 
-        if (type === "SequenceExpression") {
+        if (! id &&
+            (type === "ArrowFunctionExpression" ||
+             type === "ClassDeclaration" ||
+             type === "ClassExpression" ||
+             type === "FunctionExpression")) {
+          // Assign anonymous functions to a variable so they're given a
+          // temporary name, which we'll rename later to "default".
+          // https://tc39.github.io/ecma262/#sec-exports-runtime-semantics-evaluation
+          prefix = "const " + name + "="
+          suffix = ";" + runtimeName + ".d(" + name + ");"
+        } else if (type === "SequenceExpression") {
           // If the exported expression is a comma-separated sequence expression
           // it may not include the vital parentheses, so we should wrap the
           // expression with parentheses to make sure it's treated as a single

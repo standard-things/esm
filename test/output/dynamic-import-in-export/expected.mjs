@@ -1,4 +1,4 @@
-"main";_.x([["A",()=>A],["a",()=>a],["default",()=>default]]);class A {
+"main";_.x([["A",()=>A],["a",()=>a],["default",()=>_anonymous]]);class A {
   constructor() {
     _.i("./a.mjs")
   }
@@ -8,6 +8,6 @@
   _.i("./a.mjs")
 }
 
-               function  default() {
+               function  _anonymous() {
   _.i("./a.mjs")
 }

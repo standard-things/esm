@@ -1,4 +1,4 @@
-"main";_.x([["default",()=>default]]);
+"main";_.x([["default",()=>_anonymous]]);
 
 
 
@@ -7,4 +7,4 @@ async /* Comment three. */ function
 /*
 Comment four.
 */ // Comment five.
- default() {}
+ _anonymous() {}

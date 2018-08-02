@@ -1,3 +1,1 @@
-export default function named(value) {
-  return value
-}
+export default function named() {}

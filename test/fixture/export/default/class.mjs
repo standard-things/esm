@@ -1,5 +1,1 @@
-export default class Named {
-  constructor(value) {
-    this.value = value
-  }
-}
+export default class Named {}

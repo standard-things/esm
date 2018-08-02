@@ -4,7 +4,7 @@
 
 
 
-_.d(
+const _anonymous=
 
 
 
@@ -14,4 +14,4 @@ _.d(
   const error = new Error // Line 14.
   const line = error.stack.match(/:(\d+)/)[1]
   assert.strictEqual(line, "14")
-});
+};_.d(_anonymous);

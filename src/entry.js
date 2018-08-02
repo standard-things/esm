@@ -171,7 +171,7 @@ class Entry {
   }
 
   addGetter(name, getter) {
-    const { getters } = this
+    const { getters, type } = this
     const inited = Reflect.has(getters, name)
 
     getters[name] = getter
@@ -191,7 +191,10 @@ class Entry {
       set: null
     }
 
-    if (this.type === TYPE_CJS &&
+    const isCJS = type === TYPE_CJS
+    const isESM = type === TYPE_ESM
+
+    if (isCJS &&
         name === "default") {
       descriptor.get = () => this.exports
 
@@ -210,6 +213,23 @@ class Entry {
 
       descriptor.set = (value) => {
         this.exports[name] = value
+      }
+    }
+
+    if (isESM &&
+        name === "default") {
+      const value = tryGetter(getter)
+
+      // Give default exported anonymous functions the name "default".
+      // https://tc39.github.io/ecma262/#sec-exports-runtime-semantics-evaluation
+      if (typeof value === "function" &&
+          value.name === (this.runtimeName + "anonymous")) {
+        Reflect.defineProperty(value, "name", {
+          configurable: true,
+          enumerable: false,
+          value: "default",
+          writable: false
+        })
       }
     }
 
