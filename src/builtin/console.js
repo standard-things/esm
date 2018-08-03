@@ -5,6 +5,7 @@ import ENV from "../constant/env.js"
 import GenericFunction from "../generic/function.js"
 
 import assign from "../util/assign.js"
+import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
@@ -33,19 +34,19 @@ function init() {
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
 
-  const builtinLog = wrapCustomInspectable(realProto.log)
+  const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
 
   const wrapperMap = {
     __proto__: null,
-    assert: wrapCustomInspectable(realProto.assert, assertWrapper),
+    assert: wrapBuiltin(realProto.assert, assertWrapper),
     debug: builtinLog,
-    dir: wrapCustomInspectable(realProto.dir, dirWrapper),
+    dir: wrapBuiltin(realProto.dir, dirWrapper),
     dirxml: builtinLog,
     info: builtinLog,
     log: builtinLog,
-    trace: wrapCustomInspectable(realProto.trace),
-    warn: wrapCustomInspectable(realProto.warn)
+    trace: wrapBuiltin(realProto.trace),
+    warn: wrapBuiltin(realProto.warn)
   }
 
   function assertWrapper(func, [expression, ...rest]) {
@@ -127,24 +128,24 @@ function init() {
     return array
   }
 
-  function wrapBoundInspectable(object, name) {
-    const func = object[name]
-
-    return (...args) => Reflect.apply(func, object, transform(args, toInspectable))
-  }
-
-  function wrapCustomInspectable(func, wrapper = defaultWrapper) {
+  function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
     return maskFunction(function (...args) {
       const { customInspect } = defaultInspectOptions
 
       defaultInspectOptions.customInspect = true
 
       try {
-        return Reflect.apply(wrapper, this, [func, args])
+        return Reflect.apply(wrapper, this, [builtinFunc, args])
       } finally {
         defaultInspectOptions.customInspect = customInspect
       }
-    }, func)
+    }, builtinFunc)
+  }
+
+  function wrapOriginal(originalConsole, name) {
+    const originalFunc = originalConsole[name]
+
+    return (...args) => Reflect.apply(originalFunc, originalConsole, transform(args, toInspectable))
   }
 
   const Console = maskFunction(function (...args) {
@@ -191,25 +192,38 @@ function init() {
 
   if (config.variables.v8_enable_inspector &&
       FLAGS.inspect) {
+    const { consoleCall } = binding.inspector
 
-    for (const name in wrapperMap) {
-      const builtinFunc = builtinConsole[name]
+    if (typeof consoleCall === "function") {
+      const emptyConfig = { __proto__: null }
+      const names = keys(builtinConsole)
 
-      setDeferred(builtinConsole, name, () => {
-        const { originalConsole } = shared
-        const originalFunc = originalConsole[name]
+      for (const name of names) {
+        const builtinFunc = builtinConsole[name]
 
-        if (typeof originalFunc !== "function") {
-          return builtinFunc
-        }
+        setDeferred(builtinConsole, name, () => {
+          const { originalConsole } = shared
+          const originalFunc = originalConsole[name]
 
-        const originalWrapper = wrapBoundInspectable(originalConsole, name)
+          if (typeof builtinFunc !== "function" ||
+              typeof originalFunc !== "function" ||
+              ! has(originalConsole, name)) {
+            return builtinFunc
+          }
 
-        return maskFunction((...args) => {
-          originalWrapper(...args)
-          builtinFunc(...args)
-        }, builtinFunc)
-      })
+          const wrappedOriginal = Reflect.has(wrapperMap, name)
+            ? wrapOriginal(originalConsole, name)
+            : originalFunc
+
+          return GenericFunction.bind(
+            consoleCall,
+            void 0,
+            wrappedOriginal,
+            builtinFunc,
+            emptyConfig
+          )
+        })
+      }
     }
   } else if (ELECTRON_RENDERER) {
     const names = keys(console)
@@ -223,10 +237,11 @@ function init() {
 
         if (typeof builtinFunc === "function" &&
             typeof consoleFunc === "function") {
-          builtinConsole[name] = maskFunction(
-            wrapBoundInspectable(console, name),
-            builtinFunc
-          )
+          const wrappedOriginal = Reflect.has(wrapperMap, name)
+            ? wrapOriginal(console, name)
+            : consoleFunc
+
+          builtinConsole[name] = GenericFunction.bind(wrappedOriginal)
         }
       }
     }
