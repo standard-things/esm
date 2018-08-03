@@ -14,9 +14,9 @@ import Wrapper from "../wrapper.js"
 import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
-import binding from "../binding.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
+import { config } from "../safe/process.js"
 import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
@@ -232,7 +232,7 @@ function createAddBuiltinModules(entry) {
 
   const { length } = lazyModules
 
-  if (typeof binding.inspector.open === "function") {
+  if (config.variables.v8_enable_inspector) {
     lazyModules.push("inspector")
   }
 

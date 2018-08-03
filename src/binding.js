@@ -33,8 +33,7 @@ function init() {
     ],
     inspector: [
       "callAndPauseOnStart",
-      "consoleCall",
-      "open"
+      "consoleCall"
     ],
     util: [
       "decorated_private_symbol",
