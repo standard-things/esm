@@ -7,7 +7,6 @@ import isDevelopment from "../env/is-development.js"
 import isElectron from "../env/is-electron.js"
 import isElectronRenderer from "../env/is-electron-renderer.js"
 import isEval from "../env/is-eval.js"
-import isInspect from "../env/is-inspect.js"
 import isInternal from "../env/is-internal.js"
 import isJest from "../env/is-jest.js"
 import isNdb from "../env/is-ndb.js"
@@ -29,7 +28,6 @@ setDeferred(ENV, "ELECTRON", isElectron)
 setDeferred(ENV, "ELECTRON_RENDERER", isElectronRenderer)
 setDeferred(ENV, "EVAL", isEval)
 setDeferred(ENV, "FLAGS", getFlags)
-setDeferred(ENV, "INSPECT", isInspect)
 setDeferred(ENV, "INTERNAL", isInternal)
 setDeferred(ENV, "JEST", isJest)
 setDeferred(ENV, "NDB", isNdb)

@@ -17,6 +17,7 @@ function init() {
     setDeferred(flags, "experimentalREPLAwait", () => matches(execArgv, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(execArgv, "--experimental-worker"))
     setDeferred(flags, "exposeInternals", () => matches(execArgv, /^--expose[-_]internals$/))
+    setDeferred(flags, "inspect", () => matches(execArgv, /^--(?:debug|inspect)(?:-brk)?(?:=.*)?$/))
     setDeferred(flags, "preserveSymlinks", () => matches(execArgv, "--preserve-symlinks"))
     setDeferred(flags, "preserveSymlinksMain", () => matches(execArgv, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(execArgv, /^(?:--print|-pe?)$/))

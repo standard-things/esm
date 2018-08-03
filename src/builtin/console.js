@@ -24,7 +24,7 @@ import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 function init() {
   const {
     ELECTRON_RENDERER,
-    INSPECT
+    FLAGS
   } = ENV
 
   const RealConsole = realConsole.Console
@@ -189,8 +189,8 @@ function init() {
 
   const builtinConsole = new Console(stdout, stderr)
 
-  if (INSPECT &&
-      config.variables.v8_enable_inspector) {
+  if (config.variables.v8_enable_inspector &&
+      FLAGS.inspect) {
 
     for (const name in wrapperMap) {
       const builtinFunc = builtinConsole[name]
