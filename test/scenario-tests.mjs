@@ -87,6 +87,11 @@ describe("scenario tests", function () {
       .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
   )
 
+  it("should work with uuid", () =>
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/uuid")])
+      .then(({ stdout }) => assert.ok(stdout.includes("uuid:true")))
+  )
+
   it("should work with global-prefix", () =>
     exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
       .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
