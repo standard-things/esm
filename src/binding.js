@@ -1,3 +1,5 @@
+import GenericFunction from "./generic/function.js"
+
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
@@ -31,6 +33,7 @@ function init() {
     ],
     inspector: [
       "callAndPauseOnStart",
+      "consoleCall",
       "open"
     ],
     util: [
@@ -81,10 +84,14 @@ function init() {
 
       for (const name of names) {
         setDeferred(object, name, () => {
+          if (name === "consoleCall") {
+            return silent(() => source[name])
+          }
+
           const value = getSilent(source, name)
 
           return typeof value === "function"
-            ? (...args) => Reflect.apply(value, source, args)
+            ? GenericFunction.bind(value, source)
             : value
         })
       }
