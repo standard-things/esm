@@ -88,7 +88,7 @@ describe("scenario tests", function () {
   )
 
   it("should work with uuid", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/uuid-test")])
+    exec(nodePath, [path.resolve(testPath, "fixture/scenario/uuid")])
       .then(({ stdout }) => assert.ok(stdout.includes("uuid:true")))
   )
 
