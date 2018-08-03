@@ -203,14 +203,17 @@ function init() {
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
     try {
-      new Proxy(shared.module.SafeBuffer.alloc(0), {
+      const proxy = new Proxy(shared.module.SafeBuffer.alloc(0), {
         get: (target, name) => target[name]
-      }).toString()
+      })
+
+      // Return a result so that the test has a side effect and won't be
+      // removed by the minifier's "unsafe" option.
+      // https://github.com/mishoo/UglifyJS2#the-unsafe-compress-option
+      return typeof proxy.toString() === "string"
     } catch (e) {
       return ! /Illegal/.test(e)
     }
-
-    return true
   })
 
   setDeferred(support, "proxiedClasses", () => {
