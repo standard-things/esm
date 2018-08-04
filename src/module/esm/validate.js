@@ -165,14 +165,15 @@ function validateExportedName(entry, exportedName, seen) {
 
   if (seen &&
       Reflect.has(seen, name)) {
-    if (exportedStars.indexOf(exportedSpecifiers[exportedName].specifier) === -1) {
+    const { specifier } =  exportedSpecifiers[exportedName]
+    const childEntry = dependencySpecifiers[specifier].entry
+
+    if (exportedStars.indexOf(specifier) === -1) {
       throw new ERR_EXPORT_CYCLE(mod, exportedName)
-    } else {
+    } else if (childEntry.compileData.exportedSpecifiers[exportedName] !== true) {
       throw new ERR_EXPORT_MISSING(mod, exportedName)
     }
-  }
-
-  if (Reflect.has(exportedSpecifiers, exportedName)) {
+  } else if (Reflect.has(exportedSpecifiers, exportedName)) {
     const exportedSpecifier = exportedSpecifiers[exportedName]
 
     if (exportedSpecifier) {
