@@ -3,7 +3,6 @@
 module.exports = {
   plugins: [
     ["@babel/transform-runtime", {
-      polyfill: false,
       useESModules: true
     }],
   ],
