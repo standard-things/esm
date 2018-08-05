@@ -4,7 +4,6 @@ module.exports = {
   plugins: [
     ["@babel/transform-runtime", {
       polyfill: false,
-      useBuiltIns: true,
       useESModules: true
     }],
   ],
