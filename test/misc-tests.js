@@ -1467,7 +1467,7 @@ describe("miscellaneous tests", () => {
             getURLFromFilePath(filename) + ":1",
             "new.target",
             "^\n",
-            "SyntaxError: new.target can only be used in functions"
+            "SyntaxError: new.target expression is not allowed here"
           ].join("\n"))
         )
     })

@@ -4,18 +4,36 @@ import { tokTypes as tt } from "../../acorn.js"
 
 function init() {
   const PARSER_DUPLICATE_EXPORT = "Duplicate export '"
-  const PARSER_ILLEGAL_RETURN_STATEMENT = "'return' outside of function"
   const PARSER_IMPORT_EXPORT_IN_SCRIPT = "may appear only with 'sourceType: module'"
-  const PARSER_UNTERMINATED_STRING = "Unterminated string constant"
-  const PARSER_UNTERMINATED_TEMPLATE = "Unterminated template"
 
   const ENGINE_DUPLICATE_EXPORT = "Duplicate export of '"
-  const ENGINE_ILLEGAL_RETURN_STATEMENT = "Illegal return statement"
   const ENGINE_IMPORT_EXPORT_IN_SCRIPT = "may only be used in ES modules"
   const ENGINE_UNEXPECTED_EOS = "Unexpected end of input"
   const ENGINE_UNEXPECTED_TOKEN = "Invalid or unexpected token"
   const ENGINE_UNTERMINATED_ARGUMENTS_LIST = "missing ) after argument list"
-  const ENGINE_UNTERMINATED_TEMPLATE = "Unterminated template literal"
+
+  const messages = {
+    __proto__: null,
+    "'import' and 'export' may only appear at the top level": true,
+    "Binding arguments in strict mode": true,
+    "Binding await in strict mode": true,
+    "Can not use keyword 'await' outside an async function": true,
+    "Cannot use 'import.meta' outside a module": true,
+    "HTML comments are not allowed in modules": true,
+    "The keyword 'await' is reserved": true,
+    "The only valid meta property for 'import' is 'import.meta'": true,
+    [ENGINE_UNEXPECTED_EOS]: true,
+    [ENGINE_UNEXPECTED_TOKEN]: true,
+    [ENGINE_UNTERMINATED_ARGUMENTS_LIST]: true
+  }
+
+  const replacements = {
+    __proto__: null,
+    "'return' outside of function": "Illegal return statement",
+    "new.target can only be used in functions": "new.target expression is not allowed here",
+    "Unterminated string constant": ENGINE_UNEXPECTED_TOKEN,
+    "Unterminated template": "Unterminated template literal"
+  }
 
   const Plugin = {
     enable(parser) {
@@ -75,16 +93,14 @@ function init() {
   }
 
   function raise(pos, message) {
-    if (message === PARSER_ILLEGAL_RETURN_STATEMENT) {
-      message = ENGINE_ILLEGAL_RETURN_STATEMENT
-    } else if (message === PARSER_UNTERMINATED_STRING) {
-      message = ENGINE_UNEXPECTED_TOKEN
-    } else if (message === PARSER_UNTERMINATED_TEMPLATE) {
-      message = ENGINE_UNTERMINATED_TEMPLATE
+    if (Reflect.has(replacements, message)) {
+      message = replacements[message]
     } else if (message.startsWith(PARSER_DUPLICATE_EXPORT)) {
       message = message.replace(PARSER_DUPLICATE_EXPORT, ENGINE_DUPLICATE_EXPORT)
     } else if (message.endsWith(PARSER_IMPORT_EXPORT_IN_SCRIPT)) {
       message = message.replace(PARSER_IMPORT_EXPORT_IN_SCRIPT, ENGINE_IMPORT_EXPORT_IN_SCRIPT)
+    } else if (! Reflect.has(messages, message)) {
+      return
     }
 
     throw new errors.SyntaxError(this.input, pos, message)
