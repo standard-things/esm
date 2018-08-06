@@ -22,6 +22,7 @@ function init() {
     "Cannot use 'import.meta' outside a module": true,
     "HTML comments are not allowed in modules": true,
     "The keyword 'await' is reserved": true,
+    "The keyword 'yield' is reserved": true,
     "The only valid meta property for 'import' is 'import.meta'": true,
     // eslint-disable-next-line sort-keys
     [ENGINE_UNEXPECTED_EOS]: true,
