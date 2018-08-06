@@ -27,8 +27,15 @@ function init() {
       return ""
     }
 
+    const cache = shared.memoize.fsRealpath
+    const cached = cache[thePath]
+
+    if (cached) {
+      return cached
+    }
+
     if (useNative) {
-      return realpathNative(thePath)
+      return cache[thePath] = realpathNative(thePath)
     }
 
     if (useBinding === void 0) {
@@ -37,7 +44,7 @@ function init() {
         typeof binding.fs.realpath === "function"
     }
 
-    return useBinding
+    return cache[thePath] = useBinding
       ? realpathBinding(thePath)
       : realpathFallback(thePath)
   }

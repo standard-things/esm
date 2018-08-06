@@ -65,6 +65,7 @@ function init() {
     memoize: {
       builtinEntries: { __proto__: null },
       builtinModules: { __proto__: null },
+      fsRealpath: { __proto__: null },
       moduleESMResolveFilename: { __proto__: null },
       moduleInternalFindPath: { __proto__: null },
       moduleInternalReadPackage: { __proto__: null },
