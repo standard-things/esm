@@ -18,12 +18,15 @@ function init() {
 
       let cache = map.get(parent)
 
-      if (cache &&
-          Reflect.has(cache, name)) {
-        return shadowed = cache[name]
-      } else {
+      if (! cache) {
         cache = { __proto__: null }
         map.set(parent, cache)
+      }
+
+      const cached = cache[name]
+
+      if (cached !== void 0) {
+        return shadowed = cache[name]
       }
 
       const isNonArrowFunc =

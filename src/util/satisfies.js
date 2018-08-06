@@ -9,12 +9,13 @@ function init() {
       return false
     }
 
-    const cache = shared.memoize.utilSatisfies
     const cacheKey = version + "\0" + range
+    const cache = shared.memoize.utilSatisfies
+    const cached = cache[cacheKey]
 
-    return Reflect.has(cache, cacheKey)
-      ? cache[cacheKey]
-      : cache[cacheKey] = _satisfies(stripPrereleaseTag(version), range)
+    return cached === void 0
+      ? cache[cacheKey] = _satisfies(stripPrereleaseTag(version), range)
+      : cached
   }
 
   return satisfies

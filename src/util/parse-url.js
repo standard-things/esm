@@ -23,12 +23,10 @@ function init() {
   }
 
   function parseURL(url) {
-    const cache = shared.memoize.utilParseURL
     const cacheKey = typeof url === "string" ? url : ""
+    const cache = shared.memoize.utilParseURL
 
-    return Reflect.has(cache, cacheKey)
-      ? cache[cacheKey]
-      : cache[cacheKey] = parse(url)
+    return cache[cacheKey] || (cache[cacheKey] = parse(url))
   }
 
   return parseURL

@@ -34,8 +34,10 @@ function getExports(id) {
 
 for (const id of builtinIds) {
   setDeferred(builtinModules, id, () => {
-    if (Reflect.has(cache, id)) {
-      return cache[id]
+    const cached = cache[id]
+
+    if (cached) {
+      return cached
     }
 
     const mod = new Module(id)

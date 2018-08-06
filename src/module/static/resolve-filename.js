@@ -45,7 +45,6 @@ function resolveFilename(request, parent, isMain, options) {
     return request
   }
 
-  const cache = shared.memoize.moduleStaticResolveFilename
   const isAbs = isAbsolute(request)
   const parentEntry = parent && Entry.get(parent)
 
@@ -73,9 +72,11 @@ function resolveFilename(request, parent, isMain, options) {
       (isMain ? "1" : "")
   }
 
-  if (cacheKey &&
-      Reflect.has(cache, cacheKey)) {
-    return cache[cacheKey]
+  const cache = shared.memoize.moduleStaticResolveFilename
+  const cached = cacheKey && cache[cacheKey]
+
+  if (cached) {
+    return cached
   }
 
   if (isAbs) {

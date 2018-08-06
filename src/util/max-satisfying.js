@@ -11,15 +11,16 @@ function init() {
       return null
     }
 
-    const cache = shared.memoize.utilMaxSatisfying
-
     const cacheKey =
       (versions.length === 1 ? versions[0] : GenericArray.join(versions)) + "\0" +
       range
 
-    return Reflect.has(cache, cacheKey)
-      ? cache[cacheKey]
-      : cache[cacheKey] = _maxSatisfying(versions, range)
+    const cache = shared.memoize.utilMaxSatisfying
+    const cached = cache[cacheKey]
+
+    return cached === void 0
+      ? cache[cacheKey] = _maxSatisfying(versions, range)
+      : cached
   }
 
   return maxSatisfying
