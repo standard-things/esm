@@ -14,6 +14,7 @@ function init() {
 
   const messages = {
     __proto__: null,
+    // eslint-disable-next-line sort-keys
     "'import' and 'export' may only appear at the top level": true,
     "Binding arguments in strict mode": true,
     "Binding await in strict mode": true,
@@ -22,6 +23,7 @@ function init() {
     "HTML comments are not allowed in modules": true,
     "The keyword 'await' is reserved": true,
     "The only valid meta property for 'import' is 'import.meta'": true,
+    // eslint-disable-next-line sort-keys
     [ENGINE_UNEXPECTED_EOS]: true,
     [ENGINE_UNEXPECTED_TOKEN]: true,
     [ENGINE_UNTERMINATED_ARGUMENTS_LIST]: true
@@ -29,10 +31,11 @@ function init() {
 
   const replacements = {
     __proto__: null,
+    // eslint-disable-next-line sort-keys
     "'return' outside of function": "Illegal return statement",
-    "new.target can only be used in functions": "new.target expression is not allowed here",
     "Unterminated string constant": ENGINE_UNEXPECTED_TOKEN,
-    "Unterminated template": "Unterminated template literal"
+    "Unterminated template": "Unterminated template literal",
+    "new.target can only be used in functions": "new.target expression is not allowed here"
   }
 
   const Plugin = {
