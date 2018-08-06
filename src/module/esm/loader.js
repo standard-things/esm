@@ -7,7 +7,8 @@ import shared from "../../shared.js"
 import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
-  STATE_PARSING_COMPLETED
+  STATE_PARSING_COMPLETED,
+  TYPE_ESM
 } = ENTRY
 
 function loader(entry, filename, parentEntry) {
@@ -32,19 +33,22 @@ function loader(entry, filename, parentEntry) {
 
   const mod = entry.module
 
-  if (parsing) {
-    if (entry.package.options.cjs.paths &&
-        ext !== ".mjs") {
+  if (! mod.paths) {
+    if ((parentEntry &&
+         parentEntry.type !== TYPE_ESM) ||
+        (entry.package.options.cjs.paths &&
+         ext !== ".mjs")) {
       mod.paths = Module._nodeModulePaths(entry.dirname)
     } else {
       mod.paths = staticNodeModulePaths(entry.dirname)
     }
+  }
 
-    if (ext !== ".js" &&
-        ext !== ".mjs") {
-      entry.state = STATE_PARSING_COMPLETED
-      return
-    }
+  if (parsing &&
+      ext !== ".js" &&
+      ext !== ".mjs") {
+    entry.state = STATE_PARSING_COMPLETED
+    return
   }
 
   extensions[ext](mod, filename)
