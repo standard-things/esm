@@ -2,6 +2,8 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
+import { basename, dirname, resolve, sep } from "../../safe/path.js"
+
 import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 
@@ -16,7 +18,6 @@ import isMJS from "../../path/is-mjs.js"
 import keys from "../../util/keys.js"
 import readPackage from "./read-package.js"
 import realpath from "../../fs/realpath.js"
-import { resolve } from "../../safe/path.js"
 import shared from "../../shared.js"
 import statFast from "../../fs/stat-fast.js"
 import statSync from "../../fs/stat-sync.js"
@@ -41,8 +42,6 @@ let resolveSymlinks = ! preserveSymlinks
 let resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain, fields, exts) {
-  const cache = shared.memoize.moduleInternalFindPath
-
   let cacheKey = request
 
   if (paths) {
@@ -57,8 +56,11 @@ function findPath(request, paths, isMain, fields, exts) {
     cacheKey += "\0" + (exts.length === 1 ? exts[0] : GenericArray.join(exts))
   }
 
-  if (Reflect.has(cache, cacheKey)) {
-    return cache[cacheKey]
+  const cache = shared.memoize.moduleInternalFindPath
+  const cached = cache[cacheKey]
+
+  if (cached !== void 0) {
+    return cached
   }
 
   const isAbs = isAbsolute(request)
@@ -92,15 +94,34 @@ function findPath(request, paths, isMain, fields, exts) {
     ? resolveSymlinksMain
     : resolveSymlinks
 
-  for (const curPath of paths) {
+  for (let curPath of paths) {
     if (curPath &&
         statFast(curPath) !== 1) {
       continue
     }
 
-    const thePath = isAbs
-      ? request
-      : resolve(curPath, request)
+    if (useRealpath) {
+      if (isAbs) {
+        curPath = dirname(request)
+        request = basename(request)
+      }
+
+      curPath = realpath(curPath)
+
+      if (! curPath) {
+        continue
+      }
+    }
+
+    let thePath
+
+    if (isAbs) {
+      thePath = useRealpath
+        ? curPath + sep + request
+        : request
+    } else {
+      thePath = resolve(curPath, request)
+    }
 
     let isSymLink = false
     let rc = -1
@@ -156,6 +177,10 @@ function findPath(request, paths, isMain, fields, exts) {
 
       if (fields === void 0) {
         fields = mainFields
+      }
+
+      if (useRealpath) {
+        thePath = realpath(thePath)
       }
 
       filename =
