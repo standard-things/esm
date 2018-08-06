@@ -773,9 +773,9 @@ function getExportByName(entry, name, parentEntry) {
 
   const noNamedExports =
     (isCJS &&
-    ! parentNamedExports) ||
+     ! parentNamedExports) ||
     (isPseudo &&
-    parentIsMJS)
+     parentIsMJS)
 
   if (isCJS &&
       parentNamedExports &&

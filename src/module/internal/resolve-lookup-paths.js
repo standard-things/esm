@@ -29,6 +29,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
   // Look outside if not a relative path.
   if (! isRelative(request)) {
     const parentPaths = parent && parent.paths
+
     const paths = parentPaths
       ? GenericArray.from(parentPaths)
       : GenericArray.of()
