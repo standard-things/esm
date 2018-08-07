@@ -22,6 +22,7 @@ const {
 } = ENTRY
 
 const {
+  ERR_CONST_ASSIGNMENT,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
 
@@ -134,15 +135,17 @@ const Runtime = {
     runtime.importDynamic = Runtime.importDynamic
     runtime.importStatic = Runtime.importStatic
     runtime.run = Runtime.run
+    runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
     runtime.updateBindings = Runtime.updateBindings
 
     runtime._ = runtime
     runtime.a = runtime.assertTDZ
+    runtime.b = runtime.throwConstAssignment
     runtime.c = runtime.compileEval
     runtime.d = runtime.addDefaultValue
-    runtime.g = runtime.global
     runtime.e = runtime.evalGlobal
+    runtime.g = runtime.global
     runtime.i = runtime.importDynamic
     runtime.k = identity
     runtime.n = runtime.addNamespaceSetter
@@ -192,6 +195,10 @@ const Runtime = {
     const runner =  entry.type === TYPE_ESM ? runESM : runCJS
 
     return this._runResult = runner(entry, moduleWrapper)
+  },
+
+  throwConstAssignment() {
+    throw new ERR_CONST_ASSIGNMENT(Runtime.throwConstAssignment)
   },
 
   throwUndefinedIdentifier(name) {

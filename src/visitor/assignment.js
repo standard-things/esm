@@ -1,8 +1,8 @@
 import Visitor from "../visitor.js"
 
-import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import isShadowed from "../parse/is-shadowed.js"
+import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
@@ -36,19 +36,26 @@ function init() {
   }
 
   function checkAndMaybeWrap(visitor, path, childName) {
-    const { assignableExports, importedLocals, magicString } = visitor
+    const {
+      assignableExports,
+      importedLocals,
+      magicString,
+      runtimeName
+    } = visitor
+
     const node = path.getValue()
     const names = getNamesFromPattern(node[childName])
     const { end, start } = node
 
-    // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {
       if (Reflect.has(importedLocals, name) &&
           ! isShadowed(path, name, shadowedMap)) {
-        throw new errors.TypeError(
-          magicString.original,
+        // Throw a type error for assignments to imported locals.
+        overwrite(
+          visitor,
           start,
-          "Assignment to constant variable."
+          end,
+          runtimeName + ".b()"
         )
       }
     }
@@ -58,7 +65,7 @@ function init() {
           ! isShadowed(path, name, shadowedMap)) {
         // Wrap assignments to exported identifiers.
         magicString
-          .prependLeft(start, visitor.runtimeName + ".u(")
+          .prependLeft(start, runtimeName + ".u(")
           .prependLeft(end, ")")
 
         return

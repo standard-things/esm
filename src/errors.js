@@ -27,6 +27,7 @@ function init() {
     depth: 2
   }
 
+  addBuiltinError("ERR_CONST_ASSIGNMENT", constAssignment, ExTypeError)
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
@@ -132,6 +133,10 @@ function init() {
     return inspected.length > 128
       ? inspected.slice(0, 128) + "..."
       : inspected
+  }
+
+  function constAssignment() {
+    return "Assignment to constant variable."
   }
 
   function exportCycle(request, name) {
