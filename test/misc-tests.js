@@ -404,7 +404,8 @@ describe("miscellaneous tests", () => {
               checkErrorStack(e, [
                 id3 + ":1",
                 'import { a } from "./export.js"',
-                "^\n"
+                "       ^\n",
+                "SyntaxError: Unexpected token {"
               ].join("\n"))
             ),
           import(id5)
@@ -421,7 +422,8 @@ describe("miscellaneous tests", () => {
               checkErrorStack(e, [
                 getURLFromFilePath(id6) + ":2",
                 '  import"nested"',
-                "  ^\n"
+                "        ^\n",
+                "SyntaxError: Unexpected string"
               ].join("\n"))
             ),
           import(id7)
@@ -1437,7 +1439,7 @@ describe("miscellaneous tests", () => {
             getURLFromFilePath(filename) + ":1",
             "const await = 1",
             "      ^\n",
-            "SyntaxError: Unexpected reserved word"
+            "SyntaxError: await is only valid in async function"
           ].join("\n"))
         )
     })

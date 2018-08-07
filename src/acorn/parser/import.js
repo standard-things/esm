@@ -19,8 +19,10 @@ import wrap from "../../util/wrap.js"
 
 function init() {
   const {
-    ILLEGAL_IMPORT_META_PROPERTY,
-    ILLEGAL_IMPORT_META_OUTSIDE_MODULE
+    ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
+    UNEXPECTED_IDENTIFIER,
+    UNEXPECTED_STRING,
+    UNEXPECTED_TOKEN
   } = PARSER_MESSAGE
 
   const Plugin = {
@@ -62,8 +64,10 @@ function init() {
   }
 
   function parseStatement(func, args) {
+    const [, topLevel] = args
+
     if (this.type === tt._import) {
-      const { type } = lookahead(this)
+      const { start, type } = lookahead(this)
 
       if (type === tt.dot) {
         return parseImportMetaProperty(this)
@@ -71,6 +75,21 @@ function init() {
 
       if (type === tt.parenL) {
         return parseImportCall(this)
+      }
+
+      if (! topLevel ||
+          ! this.inModule) {
+        let message
+
+        if (type === tt.name) {
+          message = UNEXPECTED_IDENTIFIER
+        } else if (type === tt.string) {
+          message = UNEXPECTED_STRING
+        } else {
+          message = UNEXPECTED_TOKEN + " " + type.label
+        }
+
+        this.raise(start, message)
       }
     }
 
@@ -120,7 +139,7 @@ function init() {
     node.property = parser.parseIdent(true)
 
     if (node.property.name !== "meta") {
-      parser.raise(node.property.start, ILLEGAL_IMPORT_META_PROPERTY)
+      parser.raise(node.property.start, UNEXPECTED_IDENTIFIER)
     } else if (! parser.inModule) {
       parser.raise(node.meta.start, ILLEGAL_IMPORT_META_OUTSIDE_MODULE)
     }

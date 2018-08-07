@@ -73,7 +73,7 @@ describe("file extension tests", () => {
             if (isDebug) {
               assert.ok(true)
             } else {
-              assert.ok(e.message.startsWith("'import' and 'export' may only be used in ES modules"))
+              assert.ok(e.message.startsWith("Unexpected token export"))
             }
           })
       ))
