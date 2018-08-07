@@ -17,6 +17,7 @@ function init() {
     const funcs = { __proto__: null }
     const identifiers = { __proto__: null }
     const importedLocals = { __proto__: null }
+    const { inModule } = this
 
     const top = {
       identifiers,
@@ -29,6 +30,7 @@ function init() {
 
     while (this.type !== tt.eof) {
       const stmt = this.parseStatement(true, true, exported)
+
       let { expression, type } = stmt
 
       if (! inited) {
@@ -51,8 +53,6 @@ function init() {
         object = stmt.declaration
         type = object ? object.type : ""
       }
-
-      const { inModule } = this
 
       if (type === "VariableDeclaration") {
         for (const { id } of object.declarations) {
