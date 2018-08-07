@@ -1,4 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
+import PARSER_MESSAGE from "../../constant/parser-message.js"
 
 import acorn from "../../acorn.js"
 import shared from "../../shared.js"
@@ -12,7 +13,9 @@ function init() {
     RIGHT_ANGLE_BRACKET
   } = CHAR_CODE
 
-  const HTML_ERROR_MESSAGE = "HTML comments are not allowed in modules"
+  const {
+    ILLEGAL_HTML_COMMENT
+  } = PARSER_MESSAGE
 
   const { lineBreakRegExp } = acorn
 
@@ -35,7 +38,7 @@ function init() {
           next === EXCLAMATION_MARK &&
           input.charCodeAt(pos + 2) === HYPHEN_MINUS &&
           input.charCodeAt(pos + 3) === HYPHEN_MINUS) {
-        this.raise(pos, HTML_ERROR_MESSAGE)
+        this.raise(pos, ILLEGAL_HTML_COMMENT)
       }
     }
 
@@ -54,7 +57,7 @@ function init() {
           input.charCodeAt(pos + 2) === RIGHT_ANGLE_BRACKET &&
           (lastTokEnd === 0 ||
             lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
-        this.raise(pos, HTML_ERROR_MESSAGE)
+        this.raise(pos, ILLEGAL_HTML_COMMENT)
       }
     }
 

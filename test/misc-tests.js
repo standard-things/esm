@@ -1415,14 +1415,14 @@ describe("miscellaneous tests", () => {
     it("should error when creating an `arguments` binding", () => {
       const filename = path.resolve("fixture/source/arguments-binding.mjs")
 
-      import(filename)
+      return import(filename)
         .then(() => assert.ok(false))
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
             "const arguments = 1",
             "      ^\n",
-            "SyntaxError: Binding arguments in strict mode"
+            "SyntaxError: Unexpected eval or arguments in strict mode"
           ].join("\n"))
         )
     })
@@ -1437,7 +1437,7 @@ describe("miscellaneous tests", () => {
             getURLFromFilePath(filename) + ":1",
             "const await = 1",
             "      ^\n",
-            "SyntaxError: Can not use keyword 'await' outside an async function"
+            "SyntaxError: Unexpected reserved word"
           ].join("\n"))
         )
     })

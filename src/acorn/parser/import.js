@@ -10,12 +10,19 @@
 // Copyright Babel parser contributors. Released under MIT license:
 // https://github.com/babel/babel/blob/master/packages/babel-parser/src/parser/expression.js
 
+import PARSER_MESSAGE from "../../constant/parser-message.js"
+
 import lookahead from "../../parse/lookahead.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
 import wrap from "../../util/wrap.js"
 
 function init() {
+  const {
+    ILLEGAL_IMPORT_META_IN_MODULE,
+    ILLEGAL_IMPORT_META_IN_SCRIPT
+  } = PARSER_MESSAGE
+
   const Plugin = {
     enable(parser) {
       // Allow `yield import()` to parse.
@@ -113,9 +120,9 @@ function init() {
     node.property = parser.parseIdent(true)
 
     if (node.property.name !== "meta") {
-      parser.raise(node.property.start, "The only valid meta property for 'import' is 'import.meta'")
+      parser.raise(node.property.start, ILLEGAL_IMPORT_META_IN_MODULE)
     } else if (! parser.inModule) {
-      parser.raise(node.meta.start, "Cannot use 'import.meta' outside a module")
+      parser.raise(node.meta.start, ILLEGAL_IMPORT_META_IN_SCRIPT)
     }
 
     return parser.finishNode(node, "MetaProperty")
