@@ -77,21 +77,21 @@ function init() {
         }
 
         let prefix
-        let postfix
+        let suffix
 
         if (parent.type === "NewExpression") {
           prefix = "("
-          postfix = ")"
+          suffix = ")"
         } else {
           prefix =
-          postfix = ""
+          suffix = ""
         }
 
         overwrite(
           this,
           start,
           end,
-          prefix + runtimeName + '.t("' + name + '")' + postfix
+          prefix + runtimeName + '.t("' + name + '")' + suffix
         )
       })
     }

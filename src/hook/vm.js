@@ -134,11 +134,11 @@ function hook(vm) {
       const wrapper = getSilent(Module, "wrapper")
 
       if (Array.isArray(wrapper)) {
-        const [prefix, postfix] = wrapper
+        const [prefix, suffix] = wrapper
 
         if (typeof prefix === "string" &&
-            typeof postfix === "string") {
-          code = code.slice(prefix.length, -postfix.length)
+            typeof suffix === "string") {
+          code = code.slice(prefix.length, -suffix.length)
         }
       }
 

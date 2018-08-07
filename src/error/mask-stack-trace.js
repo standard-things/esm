@@ -218,12 +218,12 @@ function init() {
     return stack.replace(atNameRegExp, replaceAtName)
   }
 
-  function replaceAtName(match, prelude, name) {
-    return prelude + getModuleURL(name)
+  function replaceAtName(match, prefix, name) {
+    return prefix + getModuleURL(name)
   }
 
-  function replaceHeader(match, name, postlude) {
-    return getModuleURL(name) + postlude
+  function replaceHeader(match, name, suffix) {
+    return getModuleURL(name) + suffix
   }
 
   function withoutMessage(stack, message, callback) {
