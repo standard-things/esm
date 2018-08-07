@@ -53,8 +53,8 @@ function init() {
       }
 
       if (type === "VariableDeclaration") {
-        for (const decl of object.declarations) {
-          const names = getNamesFromPattern(decl.id)
+        for (const { id } of object.declarations) {
+          const names = getNamesFromPattern(id)
 
           for (const name of names) {
             identifiers.push(name)
@@ -64,8 +64,8 @@ function init() {
           type === "FunctionDeclaration") {
         identifiers.push(object.id.name)
       } else if (type === "ImportDeclaration") {
-        for (const specifier of stmt.specifiers) {
-          const { name } = specifier.local
+        for (const { local } of stmt.specifiers) {
+          const { name } = local
 
           identifiers.push(name)
           importedLocals.push(name)

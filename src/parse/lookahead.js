@@ -5,9 +5,9 @@ import shared from "../shared.js"
 function init() {
   const flyweight = new Parser
 
-  function lookahead(parser) {
-    flyweight.input = parser.input
-    flyweight.pos = parser.pos
+  function lookahead({ input, pos }) {
+    flyweight.input = input
+    flyweight.pos = pos
     flyweight.nextToken()
     return flyweight
   }
