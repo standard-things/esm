@@ -43,7 +43,7 @@ function init() {
 
     // Perform checks, which may throw errors, before source transformations.
     for (const name of names) {
-      if (importedLocals[name] &&
+      if (Reflect.has(importedLocals, name) &&
           ! isShadowed(path, name, shadowedMap)) {
         throw new errors.TypeError(
           magicString.original,

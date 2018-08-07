@@ -1,3 +1,4 @@
+import errors from "../../parse/errors.js"
 import getNamesFromPattern from "../../parse/get-names-from-pattern.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
@@ -11,12 +12,11 @@ function init() {
   }
 
   function parseTopLevel(node) {
-    node.body || (node.body = [])
-
-    const { body } = node
+    const body = node.body || (node.body = [])
     const exported = { __proto__: null }
-    const identifiers = []
-    const importedLocals = []
+    const funcs = { __proto__: null }
+    const identifiers = { __proto__: null }
+    const importedLocals = { __proto__: null }
 
     const top = {
       identifiers,
@@ -57,18 +57,30 @@ function init() {
           const names = getNamesFromPattern(id)
 
           for (const name of names) {
-            identifiers.push(name)
+            if (Reflect.has(funcs, name)) {
+              raiseRedeclaration(this, object.start, name)
+            }
+
+            identifiers[name] = true
           }
         }
-      } else if (type === "ClassDeclaration" ||
-          type === "FunctionDeclaration") {
-        identifiers.push(object.id.name)
+      } else if (type === "ClassDeclaration") {
+        identifiers[object.id.name] = true
+      } else if (type === "FunctionDeclaration") {
+        const { name } = object.id
+
+        if (Reflect.has(identifiers, name)) {
+          raiseRedeclaration(this, object.start, name)
+        }
+
+        funcs[name] =
+        identifiers[name] = true
       } else if (type === "ImportDeclaration") {
         for (const { local } of stmt.specifiers) {
           const { name } = local
 
-          identifiers.push(name)
-          importedLocals.push(name)
+          identifiers[name] =
+          importedLocals[name] = true
         }
       }
 
@@ -80,6 +92,14 @@ function init() {
     node.sourceType = this.options.sourceType
     node.top = top
     return this.finishNode(node, "Program")
+  }
+
+  function raiseRedeclaration(parser, pos, name) {
+    throw new errors.SyntaxError(
+      parser.input,
+      pos,
+      "Identifier '" + name + "' has already been declared"
+    )
   }
 
   return Plugin

@@ -684,4 +684,24 @@ describe("compiler tests", () => {
       /SyntaxError: Unterminated template literal/
     )
   })
+
+  it("should treat top-level function declarations as lexically scoped in ESM", () => {
+    const lines = [
+      "var a; function a() {}",
+      "function a() {}; var a"
+    ]
+
+    const options = { sourceType: MODULE }
+
+    lines.forEach((line) => {
+      assert.throws(
+        () => Compiler.compile(line, options),
+        /SyntaxError: Identifier 'a' has already been declared/
+      )
+    })
+
+    assert.doesNotThrow(
+      () => Compiler.compile("function a() { var b; function b() {} }", options)
+    )
+  })
 })

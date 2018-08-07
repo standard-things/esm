@@ -136,6 +136,7 @@ function init() {
       }
 
       const { strict, top } = ast
+      const { identifiers } = top
       const magicString = new MagicString(code)
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
@@ -182,7 +183,7 @@ function init() {
       }
 
       if (possibleConsoleIndexes.length &&
-          top.identifiers.indexOf("console") === -1) {
+          ! Reflect.has(identifiers, "console")) {
         consoleVisitor.visit(rootPath, {
           magicString,
           possibleIndexes: possibleConsoleIndexes,
@@ -191,7 +192,7 @@ function init() {
       }
 
       if (possibleEvalIndexes.length &&
-          top.identifiers.indexOf("eval") === -1) {
+          ! Reflect.has(identifiers, "eval")) {
         evalVisitor.visit(rootPath, {
           addedImportExport,
           magicString,
@@ -272,7 +273,7 @@ function init() {
           ]
 
           for (const name of names) {
-            if (importedLocals.indexOf(name) === -1) {
+            if (! Reflect.has(importedLocals, name)) {
               possibleNames.push(name)
             }
           }

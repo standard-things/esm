@@ -305,7 +305,7 @@ function init() {
         for (const specifier of specifiers) {
           const localName = specifier.local.name
 
-          if (identifiers.indexOf(localName) === -1) {
+          if (! Reflect.has(identifiers, localName)) {
             throw new errors.SyntaxError(
               this.magicString.original,
               specifier.start,
