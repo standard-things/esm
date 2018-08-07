@@ -9,11 +9,12 @@ function init() {
   const ENGINE_DUPLICATE_EXPORT = "Duplicate export of '"
 
   const {
+    ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION,
     ILLEGAL_HTML_COMMENT,
-    ILLEGAL_IMPORT_EXPORT_IN_MODULE,
-    ILLEGAL_IMPORT_EXPORT_IN_SCRIPT,
-    ILLEGAL_IMPORT_META_IN_MODULE,
-    ILLEGAL_IMPORT_META_IN_SCRIPT,
+    ILLEGAL_IMPORT_EXPORT_LEVEL,
+    ILLEGAL_IMPORT_EXPORT_OUTSIDE_MODULE,
+    ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
+    ILLEGAL_IMPORT_META_PROPERTY,
     ILLEGAL_NEW_TARGET,
     ILLEGAL_RETURN_STATEMENT,
     UNEXPECTED_EOS,
@@ -27,11 +28,12 @@ function init() {
 
   const messages = {
     __proto__: null,
+    [ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION]: true,
     [ILLEGAL_HTML_COMMENT]: true,
-    [ILLEGAL_IMPORT_EXPORT_IN_MODULE]: true,
-    [ILLEGAL_IMPORT_EXPORT_IN_SCRIPT]: true,
-    [ILLEGAL_IMPORT_META_IN_MODULE]: true,
-    [ILLEGAL_IMPORT_META_IN_SCRIPT]: true,
+    [ILLEGAL_IMPORT_EXPORT_LEVEL]: true,
+    [ILLEGAL_IMPORT_EXPORT_OUTSIDE_MODULE]: true,
+    [ILLEGAL_IMPORT_META_OUTSIDE_MODULE]: true,
+    [ILLEGAL_IMPORT_META_PROPERTY]: true,
     [ILLEGAL_NEW_TARGET]: true,
     [ILLEGAL_RETURN_STATEMENT]: true,
     [UNEXPECTED_EOS]: true,
@@ -46,10 +48,11 @@ function init() {
   const replacements = {
     __proto__: null,
     // eslint-disable-next-line sort-keys
-    "'import' and 'export' may appear only with 'sourceType: module'": ILLEGAL_IMPORT_EXPORT_IN_SCRIPT,
+    "'import' and 'export' may appear only with 'sourceType: module'": ILLEGAL_IMPORT_EXPORT_OUTSIDE_MODULE,
     "'return' outside of function": ILLEGAL_RETURN_STATEMENT,
     "Binding arguments in strict mode": UNEXPECTED_EVAL_OR_ARGUMENTS,
     "Binding await in strict mode": UNEXPECTED_RESERVED_WORD,
+    "Can not use keyword 'await' outside an async function": ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION,
     "The keyword 'await' is reserved": UNEXPECTED_RESERVED_WORD,
     "The keyword 'yield' is reserved": UNEXPECTED_STRICT_MODE_RESERVED_WORD,
     "Unterminated string constant": UNEXPECTED_TOKEN,

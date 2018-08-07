@@ -19,8 +19,8 @@ import wrap from "../../util/wrap.js"
 
 function init() {
   const {
-    ILLEGAL_IMPORT_META_IN_MODULE,
-    ILLEGAL_IMPORT_META_IN_SCRIPT
+    ILLEGAL_IMPORT_META_PROPERTY,
+    ILLEGAL_IMPORT_META_OUTSIDE_MODULE
   } = PARSER_MESSAGE
 
   const Plugin = {
@@ -120,9 +120,9 @@ function init() {
     node.property = parser.parseIdent(true)
 
     if (node.property.name !== "meta") {
-      parser.raise(node.property.start, ILLEGAL_IMPORT_META_IN_MODULE)
+      parser.raise(node.property.start, ILLEGAL_IMPORT_META_PROPERTY)
     } else if (! parser.inModule) {
-      parser.raise(node.meta.start, ILLEGAL_IMPORT_META_IN_SCRIPT)
+      parser.raise(node.meta.start, ILLEGAL_IMPORT_META_OUTSIDE_MODULE)
     }
 
     return parser.finishNode(node, "MetaProperty")
