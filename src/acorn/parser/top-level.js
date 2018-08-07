@@ -52,12 +52,15 @@ function init() {
         type = object ? object.type : ""
       }
 
+      const { inModule } = this
+
       if (type === "VariableDeclaration") {
         for (const { id } of object.declarations) {
           const names = getNamesFromPattern(id)
 
           for (const name of names) {
-            if (Reflect.has(funcs, name)) {
+            if (inModule &&
+                Reflect.has(funcs, name)) {
               raiseRedeclaration(this, object.start, name)
             }
 
@@ -69,7 +72,8 @@ function init() {
       } else if (type === "FunctionDeclaration") {
         const { name } = object.id
 
-        if (Reflect.has(identifiers, name)) {
+        if (inModule &&
+            Reflect.has(identifiers, name)) {
           raiseRedeclaration(this, object.start, name)
         }
 

@@ -181,7 +181,7 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should compile dynamic import with script source sourceType", () => {
+  it("should compile dynamic import for SCRIPT", () => {
     const result = Compiler.compile('import("a")', {
       sourceType: SCRIPT
     })
@@ -685,23 +685,38 @@ describe("compiler tests", () => {
     )
   })
 
-  it("should treat top-level function declarations as lexically scoped in ESM", () => {
+  it("should lexically scope top-level function declarations for MODULE", () => {
     const lines = [
       "var a; function a() {}",
       "function a() {}; var a"
     ]
 
-    const options = { sourceType: MODULE }
+    const suffix = "; export {}"
 
-    lines.forEach((line) => {
-      assert.throws(
-        () => Compiler.compile(line, options),
-        /SyntaxError: Identifier 'a' has already been declared/
+    modernTypes.forEach((sourceType) => {
+      lines.forEach((line) => {
+        assert.throws(
+          () => Compiler.compile(line + suffix, { sourceType }),
+          /SyntaxError: Identifier 'a' has already been declared/
+        )
+      })
+
+      assert.doesNotThrow(
+        () => Compiler.compile("function a() { var b; function b() {} }" + suffix, { sourceType })
       )
     })
+  })
 
-    assert.doesNotThrow(
-      () => Compiler.compile("function a() { var b; function b() {} }", options)
-    )
+  it("should not lexically scope top-level function declarations for SCRIPT", () => {
+    const lines = [
+      "var a; function a() {}",
+      "function a() {}; var a"
+    ]
+
+    const suffix = '; import("a")'
+
+    lines.forEach((line) => {
+      assert.doesNotThrow(() => Compiler.compile(line + suffix, { sourceType: SCRIPT }))
+    })
   })
 })
