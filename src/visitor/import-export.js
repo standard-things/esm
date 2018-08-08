@@ -321,7 +321,12 @@ function init() {
       } else {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
-        const { exportedFrom, exportedNames, runtimeName } = this
+        const {
+          exportedFrom,
+          exportedNames,
+          runtimeName
+        } = this
+
         const specifierMap = { __proto__: null }
         const specifierName = node.source.value
 

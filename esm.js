@@ -1,7 +1,12 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
-const { apply, defineProperty, has } = Reflect
+const {
+  apply,
+  defineProperty,
+  has
+} = Reflect
+
 const { freeze } = Object
 const { type, versions } = process
 const { filename, id } = module

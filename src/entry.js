@@ -556,6 +556,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
 
 function assignExportsToNamespace(entry, names) {
   const exported = entry.exports
+  const { getters } = entry
   const isLoaded = entry._loaded === LOAD_COMPLETED
 
   if (! isLoaded &&
@@ -565,7 +566,6 @@ function assignExportsToNamespace(entry, names) {
     entry.type = TYPE_PSEUDO
   }
 
-  const { getters } = entry
   const isCJS = entry.type === TYPE_CJS
 
   if (isCJS &&
@@ -759,8 +759,11 @@ function esmNamespaceGetter(entry) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const { _namespace, getters, type } = entry
-  const mod = entry.module
+  const {
+    _namespace,
+    getters,
+    type
+  } = entry
 
   const isCJS = type === TYPE_CJS
   const isPseudo = type === TYPE_PSEUDO
@@ -844,7 +847,7 @@ function getExportByName(entry, name, parentEntry) {
        ! Reflect.has(getters, name))) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
-    throw new ERR_EXPORT_MISSING(mod, name)
+    throw new ERR_EXPORT_MISSING(entry.module, name)
   }
 
   const getter = getters[name]

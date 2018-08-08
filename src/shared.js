@@ -240,7 +240,11 @@ function init() {
   })
 
   setDeferred(utilBinding, "errorDecoratedSymbol", () => {
-    const { binding, safeProcess, utilSatisfies } = shared.module
+    const {
+      binding,
+      safeProcess,
+      utilSatisfies
+    } = shared.module
 
     return utilSatisfies(safeProcess.version, "<7")
       ? "node:decorated"

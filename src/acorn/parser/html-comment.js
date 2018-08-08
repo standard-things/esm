@@ -48,7 +48,13 @@ function init() {
   function readToken_plus_min(func, args) {
     if (this.inModule) {
       const [code] = args
-      const { input, lastTokEnd, pos } = this
+
+      const {
+        input,
+        lastTokEnd,
+        pos
+      } = this
+
       const next = input.charCodeAt(pos + 1)
 
       // Detect closing HTML comment, i.e. `-->`.
