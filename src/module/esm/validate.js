@@ -25,8 +25,12 @@ function validate(entry) {
     compileData.enforceTDZ()
   }
 
-  for (const exportedName in compileData.exportedSpecifiers) {
-    _namespace[exportedName] = void 0
+  const { exportedSpecifiers } = compileData
+
+  for (const exportedName in exportedSpecifiers) {
+    if (exportedSpecifiers[exportedName]) {
+      _namespace[exportedName] = void 0
+    }
   }
 
   entry.initNamespace()

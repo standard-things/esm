@@ -171,7 +171,20 @@ class Entry {
   }
 
   addGetter(name, getter) {
-    const { getters, type } = this
+    const {
+      _namespace,
+      getters,
+      type
+    } = this
+
+    const isESM = type === TYPE_ESM
+
+    if (isESM &&
+        this.compileData.exportedSpecifiers[name] === false) {
+      // Skip getters for conflicted export specifiers.
+      return this
+    }
+
     const inited = Reflect.has(getters, name)
 
     getters[name] = getter
@@ -191,10 +204,7 @@ class Entry {
       set: null
     }
 
-    const isCJS = type === TYPE_CJS
-    const isESM = type === TYPE_ESM
-
-    if (isCJS &&
+    if (type === TYPE_CJS &&
         name === "default") {
       descriptor.get = () => this.exports
 
@@ -233,7 +243,7 @@ class Entry {
       }
     }
 
-    Reflect.defineProperty(this._namespace, name, descriptor)
+    Reflect.defineProperty(_namespace, name, descriptor)
     return this
   }
 
