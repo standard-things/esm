@@ -14,6 +14,20 @@ function init() {
     QUOTE
   } = CHAR_CODE
 
+  const booleanLookup = {
+    false: true,
+    true: true
+  }
+
+  const quoteLookup = {
+    __proto__: null,
+    // eslint-disable-next-line sort-keys
+    '"': true,
+    "'": true
+  }
+
+  const unquotedRegExp = /(|[^a-zA-Z])([a-zA-Z]+)([^a-zA-Z]|)/g
+
   function getOptions() {
     const { env } = shared
 
@@ -46,10 +60,24 @@ function init() {
     if (code0 === APOSTROPHE ||
         code0 === LEFT_CURLY_BRACKET ||
         code0 === QUOTE) {
-      options = parseJSON6(options)
+      options =
+        parseJSON6(options) ||
+        parseJSON6(quotify(options))
     }
 
     return env.options = options
+  }
+
+  function quotify(string) {
+    return string.replace(unquotedRegExp, (match, prefix, value, suffix) => {
+      if (! quoteLookup[prefix] &&
+          ! booleanLookup[value] &&
+          ! quoteLookup[suffix]) {
+        return prefix + '"' + value + '"' + suffix
+      }
+
+      return match
+    })
   }
 
   return getOptions

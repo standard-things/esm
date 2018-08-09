@@ -71,7 +71,9 @@ describe("main hook tests", function () {
 
     return [
       "{cjs:0,mode:'all'}",
-      "{cjs:false,mode:'all'}"
+      "{cjs:0,mode:all}",
+      "{cjs:false,mode:'all'}",
+      "{cjs:false,mode:all}"
     ]
     .reduce((promise, ESM_OPTIONS) =>
       promise
