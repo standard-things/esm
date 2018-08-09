@@ -1,8 +1,7 @@
+import has from "./has.js"
 import shared from "../shared.js"
 
 function init() {
-  const { hasOwnProperty } = Object.prototype
-
   function assign(object) {
     const { length } = arguments
 
@@ -12,7 +11,7 @@ function init() {
       const source = arguments[i]
 
       for (const name in source) {
-        if (hasOwnProperty.call(source, name)) {
+        if (has(source, name)) {
           object[name] = source[name]
         }
       }
