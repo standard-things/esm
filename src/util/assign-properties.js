@@ -3,7 +3,7 @@ import keysAll from "./keys-all.js"
 import shared from "../shared.js"
 
 function init() {
-  function copy(object) {
+  function assignProperties(object) {
     const { length } = arguments
 
     let i = 0
@@ -20,10 +20,10 @@ function init() {
     return object
   }
 
-  return copy
+  return assignProperties
 }
 
 export default shared.inited
-  ? shared.module.utilCopy
-  : shared.module.utilCopy = init()
+  ? shared.module.utilAssignProperties
+  : shared.module.utilAssignProperties = init()
 

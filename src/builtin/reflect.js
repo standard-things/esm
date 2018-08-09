@@ -1,6 +1,6 @@
 import GenericObject from "../generic/object.js"
 
-import copy from "../util/copy.js"
+import assignProperties from "../util/assign-properties.js"
 import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import maskFunction from "../util/mask-function.js"
 import shared from "../shared.js"
@@ -52,7 +52,7 @@ function init() {
 
   const BuiltinReflect = GenericObject.create()
 
-  copy(BuiltinReflect, ExReflect)
+  assignProperties(BuiltinReflect, ExReflect)
 
   if (typeof exDefineProperty === "function") {
     BuiltinReflect.defineProperty = maskFunction(defineProperty, exDefineProperty)
