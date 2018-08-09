@@ -1,8 +1,14 @@
 import { parse } from "json-6"
+import quotifyJSON from "./quotify-json.js"
 import shared from "../shared.js"
 
 function init() {
   function parseJSON6(string) {
+    return tryParse(string) ||
+      tryParse(quotifyJSON(string))
+  }
+
+  function tryParse(string) {
     try {
       return parse(string)
     } catch (e) {}
