@@ -1,7 +1,7 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import isShadowed from "../parse/is-shadowed.js"
+import getShadowed from "../parse/get-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import shared from "../shared.js"
 
@@ -29,7 +29,7 @@ function init() {
       const { name } = node
 
       if (! this.temporals[name] ||
-          isShadowed(path, name, shadowedMap)) {
+          getShadowed(path, name, shadowedMap)) {
         return
       }
 

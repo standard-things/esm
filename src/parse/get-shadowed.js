@@ -2,10 +2,10 @@ import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import shared from "../shared.js"
 
 function init() {
-  function isShadowed(path, name, map) {
-    const isArguments = name === "arguments"
+  function getShadowed(path, name, map) {
+    const isArgs = name === "arguments"
 
-    let shadowed = false
+    let shadowed = null
 
     path.getParentNode((parent) => {
       const { type } = parent
@@ -13,7 +13,9 @@ function init() {
       if (type === "WithStatement") {
         const node = path.getValue()
 
-        return shadowed = parent.object !== node
+        return shadowed = parent.object === node
+          ? null
+          : parent
       }
 
       let cache = map.get(parent)
@@ -33,21 +35,21 @@ function init() {
         type === "FunctionDeclaration" ||
         type === "FunctionExpression"
 
-      if (isArguments &&
+      if (isArgs &&
           isNonArrowFunc) {
-        shadowed = true
+        shadowed = parent
         return cache[name] = shadowed
       }
 
       if (type === "BlockStatement") {
         for (const stmt of parent.body) {
           if (stmt.type === "VariableDeclaration") {
-            for (const { id } of stmt.declarations) {
-              const varNames = getNamesFromPattern(id)
+            for (const declaration of stmt.declarations) {
+              const varNames = getNamesFromPattern(declaration.id)
 
               for (const varName of varNames) {
                 if (varName === name) {
-                  shadowed = true
+                  shadowed = declaration
                   return cache[name] = shadowed
                 }
               }
@@ -61,7 +63,7 @@ function init() {
 
         if (param !== null &&
             param.name === name) {
-          shadowed = true
+          shadowed = param
           return cache[name] = shadowed
         }
       }
@@ -73,7 +75,7 @@ function init() {
         // For example, `export default function () {}`.
         if (id !== null &&
             id.name === name) {
-          shadowed = true
+          shadowed = parent
           return cache[name] = shadowed
         }
       }
@@ -84,7 +86,7 @@ function init() {
           const [paramName] = getNamesFromPattern(param)
 
           if (paramName === name) {
-            shadowed = true
+            shadowed = param
             return cache[name] = shadowed
           }
         }
@@ -96,9 +98,9 @@ function init() {
     return shadowed
   }
 
-  return isShadowed
+  return getShadowed
 }
 
 export default shared.inited
-  ? shared.module.parseIsShadowed
-  : shared.module.parseIsShadowed = init()
+  ? shared.module.parseGetShadowed
+  : shared.module.parseGetShadowed = init()

@@ -1,7 +1,7 @@
 import Visitor from "../visitor.js"
 
+import getShadowed from "../parse/get-shadowed.js"
 import isIdentifer from "../parse/is-identifier.js"
-import isShadowed from "../parse/is-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
@@ -49,7 +49,7 @@ function init() {
 
       if (isArguments &&
           isTypeOf &&
-          ! isShadowed(path, name, shadowedMap)) {
+          ! getShadowed(path, name, shadowedMap)) {
         this.changed = true
         overwrite(this, node.start, node.end, "void " + runtimeName)
         return
@@ -57,7 +57,7 @@ function init() {
 
       if (isTypeOf ||
           ! isIdentifer(node, parent) ||
-          isShadowed(path, name, shadowedMap)) {
+          getShadowed(path, name, shadowedMap)) {
         return
       }
 

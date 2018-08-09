@@ -1,7 +1,7 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import isShadowed from "../parse/is-shadowed.js"
+import getShadowed from "../parse/get-shadowed.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
@@ -49,7 +49,7 @@ function init() {
 
     for (const name of names) {
       if (Reflect.has(importedLocals, name) &&
-          ! isShadowed(path, name, shadowedMap)) {
+          ! getShadowed(path, name, shadowedMap)) {
         // Throw a type error for assignments to imported locals.
         overwrite(
           visitor,
@@ -61,14 +61,18 @@ function init() {
     }
 
     for (const name of names) {
-      if (assignableExports[name] &&
-          ! isShadowed(path, name, shadowedMap)) {
-        // Wrap assignments to exported identifiers.
-        magicString
-          .prependLeft(start, runtimeName + ".u(")
-          .prependLeft(end, ")")
+      if (assignableExports[name]) {
+        const shadowed = getShadowed(path, name, shadowedMap)
 
-        return
+        if (! shadowed ||
+            shadowed.type === "FunctionDeclaration")  {
+          // Wrap assignments to exported identifiers.
+          magicString
+            .prependLeft(start, runtimeName + ".u(")
+            .prependLeft(end, ")")
+
+          return
+        }
       }
     }
   }

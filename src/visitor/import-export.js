@@ -208,6 +208,8 @@ function init() {
         ? id.name
         : runtimeName + "anonymous"
 
+      const pairs = [["default", name]]
+
       if (type === "FunctionDeclaration" ||
           (id && type === "ClassDeclaration")) {
         // Support exporting default function declarations:
@@ -217,7 +219,7 @@ function init() {
           this.magicString.prependLeft(declaration.functionParamsStart, " " + name)
         }
 
-        hoistExports(this, node, [["default", name]])
+        hoistExports(this, node, pairs)
       } else {
         // Support exporting other default declarations:
         // export default value
@@ -245,6 +247,10 @@ function init() {
 
         overwrite(this, node.start, declaration.start, prefix)
         overwrite(this, declaration.end, node.end, suffix)
+      }
+
+      if (id) {
+        addAssignableExports(this, pairs)
       }
 
       path.call(this, "visitWithoutReset", "declaration")
