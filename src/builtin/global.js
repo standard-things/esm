@@ -1,11 +1,21 @@
 import OwnProxy from "../own/proxy.js"
 
 import builtinEntries from "../builtin-entries.js"
+import builtinReflect from "./reflect.js"
+import isObjectEmpty from "../util/is-object-empty.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import isUpdatableGet from "../util/is-updatable-get.js"
 import shared from "../shared.js"
 
 function init() {
+  const globals = {
+    __proto__: null,
+    Reflect: builtinReflect,
+    get console() {
+      return builtinEntries.console.module.exports
+    }
+  }
+
   const handler = {
     get(target, name, receiver) {
       if (receiver === proxy) {
@@ -14,8 +24,8 @@ function init() {
 
       const value = Reflect.get(target, name, receiver)
 
-      if (name === "console") {
-        const newValue = builtinEntries.console.module.exports
+      if (Reflect.has(globals, name)) {
+        const newValue = globals[name]
 
         if (newValue !== value &&
             isUpdatableGet(target, name)) {
@@ -28,9 +38,9 @@ function init() {
     getOwnPropertyDescriptor(target, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-      if (name === "console" &&
+      if (Reflect.has(globals, name) &&
           isUpdatableDescriptor(descriptor)) {
-        descriptor.value = builtinEntries.console.module.exports
+        descriptor.value = globals[name]
       }
 
       return descriptor
@@ -41,10 +51,14 @@ function init() {
       }
 
       if (Reflect.set(target, name, value, receiver)) {
-        if (name === "console") {
-          Reflect.deleteProperty(handler, "get")
-          Reflect.deleteProperty(handler, "getOwnPropertyDescriptor")
-          Reflect.deleteProperty(handler, "set")
+        if (Reflect.has(globals, name)) {
+          Reflect.deleteProperty(globals, name)
+
+          if (isObjectEmpty(globals)) {
+            Reflect.deleteProperty(handler, "get")
+            Reflect.deleteProperty(handler, "getOwnPropertyDescriptor")
+            Reflect.deleteProperty(handler, "set")
+          }
         }
 
         return true

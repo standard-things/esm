@@ -1,15 +1,23 @@
 import Visitor from "../visitor.js"
 
+import assign from "../util/assign.js"
 import getShadowed from "../parse/get-shadowed.js"
 import isIdentifer from "../parse/is-identifier.js"
 import shared from "../shared.js"
 
 function init() {
+  const globalLookup = {
+    __proto__: null,
+    Reflect: true,
+    console: true
+  }
+
   const shadowedMap = new Map
 
-  class ConsoleVisitor extends Visitor {
+  class GlobalsVisitor extends Visitor {
     reset(options) {
       this.changed = false
+      this.globals = assign({ __proto__: null }, globalLookup)
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
@@ -23,8 +31,9 @@ function init() {
 
     visitIdentifier(path) {
       const node = path.getValue()
+      const { name } = node
 
-      if (node.name !== "console") {
+      if (! Reflect.has(this.globals, name)) {
         return
       }
 
@@ -34,7 +43,7 @@ function init() {
       if ((type === "UnaryExpression" &&
            parent.operator === "typeof") ||
           ! isIdentifer(node, parent) ||
-          getShadowed(path, "console", shadowedMap)) {
+          getShadowed(path, name, shadowedMap)) {
         return
       }
 
@@ -45,7 +54,7 @@ function init() {
 
       if (type === "Property" &&
           parent.shorthand) {
-        code = ":" + code + "console"
+        code = ":" + code + name
         pos = node.end
       }
 
@@ -53,9 +62,9 @@ function init() {
     }
   }
 
-  return new ConsoleVisitor
+  return new GlobalsVisitor
 }
 
 export default shared.inited
-  ? shared.module.visitorConsole
-  : shared.module.visitorConsole = init()
+  ? shared.module.visitorGlobals
+  : shared.module.visitorGlobals = init()

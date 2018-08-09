@@ -6,12 +6,13 @@ import Parser from "./parser.js"
 
 import argumentsVisitor from "./visitor/arguments.js"
 import assignmentVisitor from "./visitor/assignment.js"
-import consoleVisitor from "./visitor/console.js"
 import evalVisitor from "./visitor/eval.js"
 import defaults from "./util/defaults.js"
 import findIndexes from "./parse/find-indexes.js"
+import globalsVisitor from "./visitor/globals.js"
 import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
+import isObjectEmpty from "./util/is-object-empty.js"
 import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import setDeferred from "./util/set-deferred.js"
@@ -51,6 +52,13 @@ function init() {
       code = stripShebang(code)
       options = Compiler.createOptions(options)
 
+      argumentsVisitor.reset()
+      assignmentVisitor.reset()
+      evalVisitor.reset()
+      globalsVisitor.reset()
+      importExportVisitor.reset()
+      temporalVisitor.reset()
+
       const result = {
         changed: false,
         code,
@@ -77,15 +85,15 @@ function init() {
         }
       }
 
-      const possibleConsoleIndexes = findIndexes(code, ["console"])
       const possibleExportIndexes = findIndexes(code, ["export"])
       const possibleEvalIndexes = findIndexes(code, ["eval"])
+      const possibleGlobalsIndexes = findIndexes(code, keys(globalsVisitor.globals))
       const possibleIndexes = findIndexes(code, ["import"])
 
       const possibleChanges = !! (
-        possibleConsoleIndexes.length ||
         possibleExportIndexes.length ||
         possibleEvalIndexes.length ||
+        possibleGlobalsIndexes.length ||
         possibleIndexes.length
       )
 
@@ -136,6 +144,9 @@ function init() {
       }
 
       const { strict, top } = ast
+
+      Reflect.deleteProperty(ast, "top")
+
       const { identifiers } = top
       const magicString = new MagicString(code)
       const rootPath = new FastPath(ast)
@@ -145,15 +156,6 @@ function init() {
 
       possibleIndexes.push(...possibleExportIndexes)
       possibleIndexes.sort()
-
-      Reflect.deleteProperty(ast, "top")
-
-      argumentsVisitor.reset()
-      assignmentVisitor.reset()
-      consoleVisitor.reset()
-      evalVisitor.reset()
-      importExportVisitor.reset()
-      temporalVisitor.reset()
 
       try {
         importExportVisitor.visit(rootPath, {
@@ -182,13 +184,22 @@ function init() {
         sourceType = MODULE
       }
 
-      if (possibleConsoleIndexes.length &&
-          ! Reflect.has(identifiers, "console")) {
-        consoleVisitor.visit(rootPath, {
-          magicString,
-          possibleIndexes: possibleConsoleIndexes,
-          runtimeName
-        })
+      if (possibleGlobalsIndexes.length) {
+        const { globals } = globalsVisitor
+
+        for (const name in globals) {
+          if (Reflect.has(identifiers, name)) {
+            Reflect.deleteProperty(globals, name)
+          }
+        }
+
+        if (! isObjectEmpty(globals)) {
+          globalsVisitor.visit(rootPath, {
+            magicString,
+            possibleIndexes: possibleGlobalsIndexes,
+            runtimeName
+          })
+        }
       }
 
       if (possibleEvalIndexes.length &&
@@ -292,8 +303,8 @@ function init() {
       }
 
       if (argumentsVisitor.changed ||
-          consoleVisitor.changed ||
           evalVisitor.changed ||
+          globalsVisitor.changed ||
           importExportVisitor.changed) {
         result.changed = true
 

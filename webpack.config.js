@@ -49,8 +49,8 @@ const isTest = /test/.test(ESM_ENV)
 
 const externals = [
   "Array", "Buffer", "Error", "EvalError", "Function", "JSON", "Object",
-  "Promise", "RangeError", "ReferenceError", "SyntaxError", "TypeError",
-  "URIError", "eval"
+  "Promise", "RangeError", "ReferenceError", "Reflect", "SyntaxError",
+  "TypeError", "URIError", "eval"
 ]
 
 const hosted = [
