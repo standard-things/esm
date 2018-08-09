@@ -9,7 +9,7 @@ import shared from "./shared.js"
 function init() {
   const childNamesMap = new Map
 
-  const childrenToVisit = {
+  const visitLookup = {
     __proto__: null,
     // ConditionalExpression
     alternate: true,
@@ -163,7 +163,7 @@ function init() {
         continue
       }
 
-      if (Reflect.has(childrenToVisit, name) &&
+      if (Reflect.has(visitLookup, name) &&
           isObject(value[name])) {
         childNames.push(name)
       }
