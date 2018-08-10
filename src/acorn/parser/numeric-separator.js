@@ -53,7 +53,7 @@ function init() {
       }
 
       ++this.pos
-      total *= radix + value
+      total = (total * radix) + value
     }
 
     if (this.pos === start ||
