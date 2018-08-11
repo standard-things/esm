@@ -1,4 +1,5 @@
 import CHAR_CODE from "../constant/char-code.js"
+import toString from "./to-string.js"
 import shared from "../shared.js"
 
 function init() {
@@ -29,7 +30,7 @@ function init() {
 
   function toStringLiteral(value, style = '"') {
     const quote = quoteMap[style] || '"'
-    const string = JSON.stringify(value)
+    const string = JSON.stringify(value) || toString(value)
 
     if (quote === '"' &&
         string.charCodeAt(0) === QUOTE) {
