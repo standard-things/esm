@@ -14,6 +14,7 @@ const {
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+const UnusedPlugin = require("unused-webpack-plugin")
 
 class WebpackRequirePlugin {
   apply(compiler) {
@@ -117,13 +118,22 @@ const config = {
       openAnalyzer: false,
       reportFilename: "report.html"
     }),
+    new EnvironmentPlugin({
+      PKG_FILENAMES,
+      PKG_VERSION
+    }),
     new NormalModuleReplacementPlugin(
       /acorn\/src\/regexp\.js/,
       path.resolve("src/acorn/replacement/regexp.js")
     ),
-    new EnvironmentPlugin({
-      PKG_FILENAMES,
-      PKG_VERSION
+    new UnusedPlugin({
+      directories : [path.resolve("src")],
+      exclude: [
+        ".*",
+        "*.json",
+        "**/vendor/*"
+      ],
+      root : __dirname
     }),
     new WebpackRequirePlugin
   ],
