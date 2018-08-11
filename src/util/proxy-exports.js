@@ -2,6 +2,7 @@ import OwnProxy from "../own/proxy.js"
 import SafeObject from "../safe/object.js"
 
 import getGetter from "./get-getter.js"
+import getObjectTag from "./get-object-tag.js"
 import getSetter from "./get-setter.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
 import isDate from "./is-date.js"
@@ -26,15 +27,13 @@ import keys from "./keys.js"
 import shared from "../shared.js"
 
 function init() {
-  const { toString } = Object.prototype
-
   function getToStringTag(target, value) {
     if (typeof target !== "function" &&
         typeof value !== "string") {
       // Section 19.1.3.6: Object.prototype.toString()
       // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
       // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
-      const toStringTag = toString.call(target).slice(8, -1)
+      const toStringTag = getObjectTag(target).slice(8, -1)
 
       return toStringTag === "Object" ? value : toStringTag
     }

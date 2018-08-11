@@ -1,3 +1,4 @@
+import getObjectTag from "./get-object-tag.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -6,10 +7,8 @@ function init() {
     return types.isWeakSet
   }
 
-  const { toString } = Object.prototype
-
   return function isWeakSetFallback(value) {
-    return toString.call(value) === "[object WeakSet]"
+    return getObjectTag(value) === "[object WeakSet]"
   }
 }
 

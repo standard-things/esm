@@ -1,3 +1,4 @@
+import getObjectTag from "./get-object-tag.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
@@ -7,11 +8,9 @@ function init() {
     return types.isStringObject
   }
 
-  const { toString } = Object.prototype
-
   return function isStringObjectFallback(value) {
     return isObject(value) &&
-      toString.call(value) === "[object String]"
+      getObjectTag(value) === "[object String]"
   }
 }
 

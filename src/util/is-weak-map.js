@@ -1,3 +1,4 @@
+import getObjectTag from "./get-object-tag.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -6,10 +7,8 @@ function init() {
     return types.isWeakMap
   }
 
-  const { toString } = Object.prototype
-
   return function isWeakMapFallback(value) {
-    return toString.call(value) === "[object WeakMap]"
+    return getObjectTag(value) === "[object WeakMap]"
   }
 }
 
