@@ -351,19 +351,43 @@ describe("scenario tests", function () {
     })
 
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
+    const stderrPath = path.resolve(logsPath, "pm2-error.log")
+    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
 
     function cleanup() {
       return exec("pm2", ["kill"])
         .then(() => trash(logsPath))
     }
 
-    it("should work with pm2", () => {
-      const stderrPath = path.resolve(logsPath, "pm2-error.log")
-      const stdoutPath = path.resolve(logsPath, "pm2-out.log")
+    const maxWait = 4000
 
+    function waitForLogs(stderrPath, stdoutPath) {
+      const started = Date.now()
+
+      return new Promise(function check(resolve) {
+        const waited = Date.now() - started
+
+        const stderr = fs.existsSync(stderrPath)
+          ? fs.readFileSync(stderrPath, "utf8")
+          : ""
+
+        const stdout = fs.existsSync(stdoutPath)
+          ? fs.readFileSync(stdoutPath, "utf8")
+          : ""
+
+        if (stderr ||
+            stdout ||
+            waited > maxWait) {
+          resolve({ stderr, stdout })
+        } else {
+          setTimeout(() => check(resolve), 100)
+        }
+      })
+    }
+
+    it("should work with pm2 and require flag", () => {
       const nodeArgs = [
-        "-r", pkgPath,
-        "-r", "@babel/register"
+        "-r", pkgPath
       ]
 
       const pm2Args = [
@@ -374,37 +398,65 @@ describe("scenario tests", function () {
         path.resolve(testPath, "fixture/scenario/pm2")
       ]
 
-      const maxWait = 4000
-
-      function waitForLogs() {
-        const started = Date.now()
-
-        return new Promise(function check(resolve) {
-          const waited = Date.now() - started
-
-          const stderr = fs.existsSync(stderrPath)
-            ? fs.readFileSync(stderrPath, "utf8")
-            : ""
-
-          const stdout = fs.existsSync(stdoutPath)
-            ? fs.readFileSync(stdoutPath, "utf8")
-            : ""
-
-          if (stderr ||
-              stdout ||
-              waited > maxWait) {
-            resolve({ stderr, stdout })
-          } else {
-            setTimeout(() => check(resolve), 100)
-          }
-        })
-      }
-
       return exec("pm2", pm2Args)
-        .then(waitForLogs)
+        .then(() => waitForLogs(stderrPath, stdoutPath))
         .then(({ stderr, stdout }) => {
           assert.strictEqual(stderr, "")
           assert.ok(stdout.includes("pm2:true"))
+        })
+    })
+
+    it("should work with pm2 and bridge mode", () => {
+      const pm2Args = [
+        "start",
+        "--no-autorestart",
+        "--name", "pm2",
+        path.resolve(testPath, "fixture/scenario/pm2/bridge.js")
+      ]
+
+      return exec("pm2", pm2Args)
+        .then(() => waitForLogs(stderrPath, stdoutPath))
+        .then(({ stderr, stdout }) => {
+          assert.strictEqual(stderr, "")
+          assert.ok(stdout.includes("pm2:true"))
+        })
+    })
+
+    it("should work with pm2 and babel/register and require flag", () => {
+      const nodeArgs = [
+        "-r", pkgPath,
+        "-r", "@babel/register"
+      ]
+
+      const pm2Args = [
+        "start",
+        "--no-autorestart",
+        "--name", "pm2-babel",
+        "--node-args", nodeArgs.join(" "),
+        path.resolve(testPath, "fixture/scenario/pm2-babel")
+      ]
+
+      return exec("pm2", pm2Args)
+        .then(() => waitForLogs(stderrPath, stdoutPath))
+        .then(({ stderr, stdout }) => {
+          assert.strictEqual(stderr, "")
+          assert.ok(stdout.includes("pm2-babel:true"))
+        })
+    })
+
+    it("should work with pm2 and babel/register with bridge mode", () => {
+      const pm2Args = [
+        "start",
+        "--no-autorestart",
+        "--name", "pm2-babel",
+        path.resolve(testPath, "fixture/scenario/pm2-babel/bridge.js")
+      ]
+
+      return exec("pm2", pm2Args)
+        .then(() => waitForLogs(stderrPath, stdoutPath))
+        .then(({ stderr, stdout }) => {
+          assert.strictEqual(stderr, "")
+          assert.ok(stdout.includes("pm2-babel:true"))
         })
     })
   })
