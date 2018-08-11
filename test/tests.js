@@ -18,6 +18,7 @@ import "./cli-hook-tests.mjs"
 import "./main-hook-tests.mjs"
 import "./require-hook-tests.js"
 import "./repl-hook-tests.mjs"
+import "./cache-tests.js"
 import "./scenario-tests.mjs"
 
 const extensions = Object.assign({}, require.extensions)
