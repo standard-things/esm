@@ -237,8 +237,8 @@ function init() {
         let newValue = value
 
         // Produce a `Symbol.toStringTag` value, otherwise
-        // `Object.prototype.toString.call(proxy)` will return
-        // "[object Function]", if `proxy` is a function, else "[object Object]".
+        // `getObjectTag(proxy)` will return "[object Function]",
+        // if `proxy` is a function, else "[object Object]".
         if (name === Symbol.toStringTag) {
           newValue = getToStringTag(target, value)
         }
@@ -269,7 +269,7 @@ function init() {
     } else if (builtin &&
         typeof exported !== "function" &&
         ! Reflect.has(exported, Symbol.toStringTag) &&
-        toString.call(exported) !== "[object Object]") {
+        getObjectTag(exported) !== "[object Object]") {
       handler.get = (target, name, receiver) => {
         if (receiver === proxy) {
           receiver = target
@@ -293,7 +293,7 @@ function init() {
     // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor` trap can be
     // removed and the `get` trap can be conditionally dropped for `exported`
     // values that return "[object Function]" or "[object Object]" from
-    // `Object.prototype.toString.call(exported)`.
+    // `getObjectTag(exported)`.
     const proxy = new OwnProxy(exported, handler)
 
     cached = {
