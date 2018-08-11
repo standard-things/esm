@@ -1,7 +1,7 @@
 import shared from "../shared.js"
 
 function init() {
-  function safeToString(value) {
+  function toString(value) {
     if (typeof value === "string") {
       return value
     }
@@ -13,9 +13,9 @@ function init() {
     return ""
   }
 
-  return safeToString
+  return toString
 }
 
 export default shared.inited
-  ? shared.module.utilSafeToString
-  : shared.module.utilSafeToString = init()
+  ? shared.module.utilToString
+  : shared.module.utilToString = init()

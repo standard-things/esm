@@ -2,7 +2,7 @@ import SafeJSON from "../../safe/json.js"
 
 import readFileFast from "../../fs/read-file-fast.js"
 import { resolve } from "../../safe/path.js"
-import safeToString from "../../util/safe-to-string.js"
+import toString from "../../util/to-string.js"
 import shared from "../../shared.js"
 
 const mainFieldRegExp = /"main"/
@@ -26,7 +26,7 @@ function readPackage(dirPath) {
     return cache[dirPath] = SafeJSON.parse(jsonString)
   } catch (e) {
     e.path = jsonPath
-    e.message = "Error parsing " + jsonPath + ": " + safeToString(e.message)
+    e.message = "Error parsing " + jsonPath + ": " + toString(e.message)
     throw e
   }
 }

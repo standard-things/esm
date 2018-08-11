@@ -27,7 +27,7 @@ import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import relaxRange from "../util/relax-range.js"
-import safeToString from "../util/safe-to-string.js"
+import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
@@ -243,7 +243,7 @@ function tryPassthru(func, args, pkg) {
   let [, filename] = args
 
   if (error.name === "SyntaxError") {
-    const message = safeToString(error.message)
+    const message = toString(error.message)
     const { range } = pkg
 
     if (importExportRegExp.test(message) &&
