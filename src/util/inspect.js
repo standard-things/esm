@@ -4,6 +4,7 @@ import GenericFunction from "../generic/function.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
+import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
@@ -55,7 +56,7 @@ function init() {
 
     const result = Reflect.apply(safeInspect, this, args)
 
-    if (! showProxy ||
+    if (! isWrappable(value) ||
         result.indexOf(PROXY_PREFIX) === -1) {
       return result
     }
@@ -112,6 +113,14 @@ function init() {
     return safeInspect(object, contextAsOptions)
   }
 
+  function isWrappable(value) {
+    return isObjectLike(value) &&
+      (typeof value === "function" ||
+       Array.isArray(value) ||
+       getObjectTag(value) === "[object Object]" ||
+       isModuleNamespaceObject(value))
+  }
+
   function toInspectable(target, options) {
     return {
       [shared.customInspectKey]: (recurseTimes) => {
@@ -124,6 +133,10 @@ function init() {
   }
 
   function wrap(target, options, customInspect, showProxy) {
+    if (! isWrappable(target)) {
+      return target
+    }
+
     let inspecting = false
 
     const proxy = new OwnProxy(target, {
