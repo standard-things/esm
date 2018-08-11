@@ -350,6 +350,14 @@ describe("scenario tests", function () {
       return cleanup()
     })
 
+    const defaultArgs = [
+      "start",
+      "--no-autorestart",
+      "--name", "pm2"
+    ]
+
+    const maxWait = 4000
+
     const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
     const stderrPath = path.resolve(logsPath, "pm2-error.log")
     const stdoutPath = path.resolve(logsPath, "pm2-out.log")
@@ -358,8 +366,6 @@ describe("scenario tests", function () {
       return exec("pm2", ["kill"])
         .then(() => trash(logsPath))
     }
-
-    const maxWait = 4000
 
     function waitForLogs(stderrPath, stdoutPath) {
       const started = Date.now()
@@ -390,13 +396,10 @@ describe("scenario tests", function () {
         "-r", pkgPath
       ]
 
-      const pm2Args = [
-        "start",
-        "--no-autorestart",
-        "--name", "pm2",
+      const pm2Args = defaultArgs.concat(
         "--node-args", nodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2")
-      ]
+      )
 
       return exec("pm2", pm2Args)
         .then(() => waitForLogs(stderrPath, stdoutPath))
@@ -407,12 +410,9 @@ describe("scenario tests", function () {
     })
 
     it("should work with pm2 and bridge mode", () => {
-      const pm2Args = [
-        "start",
-        "--no-autorestart",
-        "--name", "pm2",
+      const pm2Args = defaultArgs.concat(
         path.resolve(testPath, "fixture/scenario/pm2/bridge.js")
-      ]
+      )
 
       return exec("pm2", pm2Args)
         .then(() => waitForLogs(stderrPath, stdoutPath))
@@ -428,13 +428,10 @@ describe("scenario tests", function () {
         "-r", "@babel/register"
       ]
 
-      const pm2Args = [
-        "start",
-        "--no-autorestart",
-        "--name", "pm2",
+      const pm2Args = defaultArgs.concat(
         "--node-args", nodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2-babel")
-      ]
+      )
 
       return exec("pm2", pm2Args)
         .then(() => waitForLogs(stderrPath, stdoutPath))
@@ -445,12 +442,9 @@ describe("scenario tests", function () {
     })
 
     it("should work with pm2 and babel/register with bridge mode", () => {
-      const pm2Args = [
-        "start",
-        "--no-autorestart",
-        "--name", "pm2",
+      const pm2Args = defaultArgs.concat(
         path.resolve(testPath, "fixture/scenario/pm2-babel/bridge.js")
-      ]
+      )
 
       return exec("pm2", pm2Args)
         .then(() => waitForLogs(stderrPath, stdoutPath))
