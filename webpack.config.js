@@ -28,7 +28,8 @@ class WebpackRequirePlugin {
           "  })",
           "}",
           "__webpack_require__.n = function (exported) {",
-          "  return exported.a = exported",
+          "  exported.a = exported",
+          "  return () => exported.a",
           "}",
           "__webpack_require__.r = function () {}"
         ].join("\n")
