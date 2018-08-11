@@ -593,7 +593,9 @@ function assignExportsToNamespace(entry, names) {
 function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
   handler.defineProperty = (target, name, descriptor) => {
     if (Reflect.defineProperty(target, name, descriptor)) {
-      return true
+      return name === Symbol.toStringTag ||
+        Reflect.has(entry.bindings, name) ||
+        descriptor.value === void 0
     }
 
     if (Reflect.has(source.namespace, name)) {
