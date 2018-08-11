@@ -4,9 +4,9 @@ import GenericArray from "./generic/array.js"
 import GenericObject from "./generic/object.js"
 import RealModule from "./real/module.js"
 
-import assign from "./util/assign.js"
+import assignAll from "./util/assign-all.js"
 import builtinIds from "./builtin-ids.js"
-import defaults from "./util/defaults.js"
+import defaultsProperties from "./util/defaults-properties.js"
 import esmState from "./module/esm/state.js"
 import initGlobalPaths from "./module/internal/init-global-paths.js"
 import maskFunction from "./util/mask-function.js"
@@ -61,8 +61,8 @@ prototype.constructor = Module
 prototype.load = maskFunction(protoLoad, realProto.load)
 prototype.require = maskFunction(req, realProto.require)
 
-defaults(Module, RealModule)
-assign(Module._extensions, RealModule._extensions)
+defaultsProperties(Module, RealModule)
+assignAll(Module._extensions, RealModule._extensions)
 
 if (JEST) {
   Module._cache = { __proto__: null }
