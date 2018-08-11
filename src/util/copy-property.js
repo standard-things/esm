@@ -1,4 +1,4 @@
-import isDataDescriptor from "./is-data-descriptor.js"
+import isDataPropertyDescriptor from "./is-data-property-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
@@ -12,7 +12,7 @@ function init() {
     const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
     if (descriptor) {
-      if (isDataDescriptor(descriptor)) {
+      if (isDataPropertyDescriptor(descriptor)) {
         object[name] = source[name]
       } else {
         Reflect.defineProperty(object, name, descriptor)

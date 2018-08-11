@@ -1,4 +1,4 @@
-import isDataDescriptor from "./is-data-descriptor.js"
+import isDataPropertyDescriptor from "./is-data-property-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
 import shared from "../shared.js"
@@ -58,7 +58,7 @@ function init() {
         }
       }
 
-      if (isDataDescriptor(descriptor)) {
+      if (isDataPropertyDescriptor(descriptor)) {
         object[name] = descriptor.value
       } else {
         descriptor.configurable = true

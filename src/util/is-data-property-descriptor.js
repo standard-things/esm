@@ -2,7 +2,7 @@ import isObject from "./is-object.js"
 import shared from "../shared.js"
 
 function init() {
-  function isDataDescriptor(descriptor) {
+  function isDataPropertyDescriptor(descriptor) {
     return isObject(descriptor) &&
       descriptor.configurable === true &&
       descriptor.enumerable === true &&
@@ -10,9 +10,9 @@ function init() {
       Reflect.has(descriptor, "value")
   }
 
-  return isDataDescriptor
+  return isDataPropertyDescriptor
 }
 
 export default shared.inited
-  ? shared.module.utilIsDataDescriptor
-  : shared.module.utilIsDataDescriptor = init()
+  ? shared.module.utilIsDataPropertyDescriptor
+  : shared.module.utilIsDataPropertyDescriptor = init()
