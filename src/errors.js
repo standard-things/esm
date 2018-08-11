@@ -6,6 +6,7 @@ import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
+import toString from "./util/to-string.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 function init() {
@@ -127,6 +128,12 @@ function init() {
     }
   }
 
+  function stringifyName(name) {
+    return typeof name === "symbol"
+      ? toString(name)
+      : toStringLiteral(name, "'")
+  }
+
   function truncInspect(value) {
     const inspected = inspect(value, truncInspectOptions)
 
@@ -174,8 +181,8 @@ function init() {
   }
 
   function invalidPkgOption(name, value, unquoted) {
-    return "The esm@" + PKG_VERSION +
-      " option " + (unquoted ? name : toStringLiteral(name, "'")) +
+    return "The esm@" + PKG_VERSION + " option " +
+      (unquoted ? toString(name) : toStringLiteral(name, "'")) +
       " is invalid. Received " + truncInspect(value)
   }
 
@@ -195,27 +202,27 @@ function init() {
 
   function namespaceAssignment(request, name) {
     return "Cannot assign to read only module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleURL(request)
+      stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceDefinition(request, name) {
     return "Cannot define module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleURL(request)
+      stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceDeletion(request, name) {
     return "Cannot delete module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleURL(request)
+      stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceExtension(request, name) {
     return "Cannot add module namespace property " +
-      toStringLiteral(name, "'") + " to " + getModuleURL(request)
+      stringifyName(name) + " to " + getModuleURL(request)
   }
 
   function namespaceRedefinition(request, name) {
     return "Cannot redefine module namespace property " +
-      toStringLiteral(name, "'") + " of " + getModuleURL(request)
+      stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function requireESM(request) {
