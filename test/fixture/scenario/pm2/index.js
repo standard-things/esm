@@ -1,5 +1,3 @@
-"use strict"
+import { log } from "console"
 
-require = require("../../../../")(module)
-require("@babel/register")
-require("./main.mjs")
+log("pm2:true")
