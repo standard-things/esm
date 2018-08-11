@@ -1,5 +1,3 @@
-import assert from "assert"
-
 describe("setter tests", () => {
   it("should run setters after eval(...)", () =>
     import("./setter/eval.mjs")
