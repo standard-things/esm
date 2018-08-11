@@ -17,6 +17,8 @@ import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
 
 function init() {
+  const PROXY_PREFIX = "Proxy ["
+
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
@@ -44,16 +46,24 @@ function init() {
       ? options.showProxy
       : defaultInspectOptions.showProxy
 
-    options.customInspect = true
-    options.showProxy = false
-
     if (depth !== void 0 &&
         ! has(options, "depth")) {
       options.depth = depth
     }
 
-    args[0] = wrap(value, options, customInspect, showProxy)
     args[1] = options
+
+    const result = Reflect.apply(safeInspect, this, args)
+
+    if (! showProxy ||
+        result.indexOf(PROXY_PREFIX) === -1) {
+      return result
+    }
+
+    options.customInspect = true
+    options.showProxy = false
+    args[0] = wrap(value, options, customInspect, showProxy)
+
     return Reflect.apply(safeInspect, this, args)
   }
 
