@@ -29,8 +29,8 @@ describe("test builtin modules", function () {
       runMainPlain(test),
       runMain(test)
     ])
-    .then(([result1, result2]) => {
+    .then(([result1, result2]) =>
       assert.strictEqual(result1.stdout, result2.stdout)
-    })
+    )
   })
 })
