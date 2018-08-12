@@ -11,7 +11,6 @@ import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
-import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import keys from "../util/keys.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
@@ -19,8 +18,6 @@ import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import setDeferred from "../util/set-deferred.js"
 import shared from "../shared.js"
-import toModuleNamespaceObject from "../util/to-module-namespace-object"
-import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
 function init() {
   const {
@@ -87,35 +84,6 @@ function init() {
     }
   }
 
-  function toInspectable(value, seen) {
-    if (isModuleNamespaceObject(value)) {
-      seen || (seen = new Map)
-
-      let object = seen.get(value)
-
-      if (object) {
-        return object
-      }
-
-      object = toModuleNamespaceObject()
-      seen.set(value, object)
-
-      const names = keys(value)
-
-      for (const name of names) {
-        try {
-          object[name] = toInspectable(value[name], seen)
-        } catch (e) {
-          object[name] = "<uninitialized>"
-        }
-      }
-
-      return object
-    }
-
-    return unwrapOwnProxy(value)
-  }
-
   function transform(array, iteratee) {
     const { length } = array
 
@@ -140,12 +108,6 @@ function init() {
         defaultInspectOptions.customInspect = customInspect
       }
     }, builtinFunc)
-  }
-
-  function wrapOriginal(originalConsole, name) {
-    const originalFunc = originalConsole[name]
-
-    return (...args) => Reflect.apply(originalFunc, originalConsole, transform(args, toInspectable))
   }
 
   const Console = maskFunction(function (...args) {
@@ -211,14 +173,10 @@ function init() {
             return builtinFunc
           }
 
-          const wrappedOriginal = Reflect.has(wrapperMap, name)
-            ? wrapOriginal(originalConsole, name)
-            : originalFunc
-
           return GenericFunction.bind(
             consoleCall,
             void 0,
-            wrappedOriginal,
+            originalFunc,
             builtinFunc,
             emptyConfig
           )
@@ -237,11 +195,7 @@ function init() {
 
         if (typeof builtinFunc === "function" &&
             typeof consoleFunc === "function") {
-          const wrappedOriginal = Reflect.has(wrapperMap, name)
-            ? wrapOriginal(console, name)
-            : consoleFunc
-
-          builtinConsole[name] = GenericFunction.bind(wrappedOriginal)
+          builtinConsole[name] = consoleFunc
         }
       }
     }
