@@ -32,6 +32,7 @@ export default () => {
   })
 
   let meta = createMeta({ url: colonURL })
+
   assert.deepStrictEqual(colon1, meta)
 
   meta = createMeta({ url: colonURL + "?" })

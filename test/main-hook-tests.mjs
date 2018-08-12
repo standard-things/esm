@@ -32,7 +32,10 @@ function node(args, env) {
 }
 
 function runMain(filename, env) {
-  return node(["-r", "../", filename], env)
+  return node([
+    "-r", "../",
+    filename
+  ], env)
 }
 
 describe("main hook tests", function () {
