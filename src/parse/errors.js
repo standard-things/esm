@@ -8,7 +8,7 @@ function init() {
   } = shared.external
 
   function createClass(Super) {
-    return class AcornError extends Super {
+    class AcornError extends Super {
       constructor(input, pos, message) {
         super(message)
 
@@ -18,6 +18,15 @@ function init() {
         this.line = line
       }
     }
+
+    Reflect.defineProperty(AcornError, "name", {
+      configurable: true,
+      enumerable: false,
+      value: Super.name,
+      writable: false
+    })
+
+    return AcornError
   }
 
   return {

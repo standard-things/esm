@@ -34,10 +34,14 @@ function init() {
     const fromParser = isParseError(error)
 
     if (fromParser) {
+      const ExCtor = shared.external[error.name]
+
       column = error.column
       line = error.line
+
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "line")
+      Reflect.setPrototypeOf(error, ExCtor.prototype)
     }
 
     let { stack } = error
