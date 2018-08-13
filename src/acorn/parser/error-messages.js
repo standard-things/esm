@@ -10,6 +10,7 @@ function init() {
 
   const PARSER_IMPORT_EXPORT_INVALID_LEVEL = "'import' and 'export' may only appear at the top level"
   const PARSER_IMPORT_EXPORT_OUTSIDE_MODULE = "'import' and 'export' may appear only with 'sourceType: module'"
+  const PARSER_INVALID_ESCAPED_RESERVED_WORD = "Escape sequence in keyword "
 
   const {
     ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION,
@@ -17,6 +18,7 @@ function init() {
     ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
     ILLEGAL_NEW_TARGET,
     ILLEGAL_RETURN_STATEMENT,
+    INVALID_ESCAPED_RESERVED_WORD,
     INVALID_OR_UNEXPECTED_TOKEN,
     UNEXPECTED_EOS,
     UNEXPECTED_EVAL_OR_ARGUMENTS,
@@ -36,6 +38,7 @@ function init() {
     [ILLEGAL_IMPORT_META_OUTSIDE_MODULE]: true,
     [ILLEGAL_NEW_TARGET]: true,
     [ILLEGAL_RETURN_STATEMENT]: true,
+    [INVALID_ESCAPED_RESERVED_WORD]: true,
     [INVALID_OR_UNEXPECTED_TOKEN]: true,
     [UNEXPECTED_EOS]: true,
     [UNEXPECTED_EVAL_OR_ARGUMENTS]: true,
@@ -127,6 +130,8 @@ function init() {
       message = UNEXPECTED_TOKEN + " " + this.type.label
     } else if (message.startsWith(PARSER_DUPLICATE_EXPORT)) {
       message = message.replace(PARSER_DUPLICATE_EXPORT, ENGINE_DUPLICATE_EXPORT)
+    } else if (message.startsWith(PARSER_INVALID_ESCAPED_RESERVED_WORD)) {
+      message = INVALID_ESCAPED_RESERVED_WORD
     } else if (! Reflect.has(messages, message) &&
         ! message.startsWith(UNEXPECTED_TOKEN)) {
       return
