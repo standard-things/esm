@@ -1,5 +1,5 @@
 import errors from "../../parse/errors.js"
-import getNamesFromPattern from "../../parse/get-names-from-pattern.js"
+import getIdentifiersFromPattern from "../../parse/get-identifiers-from-pattern.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
 
@@ -55,13 +55,15 @@ function init() {
       }
 
       if (type === "VariableDeclaration") {
-        for (const { id } of object.declarations) {
-          const names = getNamesFromPattern(id)
+        for (const declaration of object.declarations) {
+          const ids = getIdentifiersFromPattern(declaration.id)
 
-          for (const name of names) {
+          for (const id of ids) {
+            const { name } = id
+
             if (inModule &&
                 Reflect.has(funcs, name)) {
-              raiseRedeclaration(this, object.start, name)
+              raiseRedeclaration(this, id.start, name)
             }
 
             identifiers[name] = true
@@ -70,18 +72,23 @@ function init() {
       } else if (type === "ClassDeclaration") {
         identifiers[object.id.name] = true
       } else if (type === "FunctionDeclaration") {
-        const { name } = object.id
+        const { id } = object
+        const { name } = id
 
         if (inModule &&
             Reflect.has(identifiers, name)) {
-          raiseRedeclaration(this, object.start, name)
+          raiseRedeclaration(this, id.start, name)
         }
 
         funcs[name] =
         identifiers[name] = true
       } else if (type === "ImportDeclaration") {
-        for (const { local } of stmt.specifiers) {
+        for (const { local } of object.specifiers) {
           const { name } = local
+
+          if (Reflect.has(importedLocals, name)) {
+            raiseRedeclaration(this, local.start, name)
+          }
 
           identifiers[name] =
           importedLocals[name] = true
