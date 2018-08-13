@@ -91,11 +91,11 @@ function init() {
   }
 
   function createLegacyErrorClass(Super, code) {
-    return class LegacyError extends Super {
-      constructor(...args) {
-        super(messages[code](...args))
-        this.code = code
-      }
+    return function LegacyError(...args) {
+      const error = new Super(messages[code](...args))
+
+      error.code = code
+      return error
     }
   }
 
