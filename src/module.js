@@ -43,8 +43,6 @@ const Module = maskFunction(function (id, parent) {
 
 const _extensions = { __proto__: null }
 const { prototype } = Module
-
-const realExts = RealModule._extensions
 const realProto = RealModule.prototype
 
 Module._extensions = _extensions
@@ -64,7 +62,10 @@ prototype.constructor = Module
 prototype.load = maskFunction(protoLoad, realProto.load)
 prototype.require = maskFunction(req, realProto.require)
 
-assign(_extensions, realExts)
+// Initialize `Module._extensions` with only the enumerable string keyed
+// properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`
+// and other meta properties.
+assign(_extensions, RealModule._extensions)
 safeDefaultProperties(Module, RealModule)
 
 if (JEST) {
