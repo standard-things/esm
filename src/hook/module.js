@@ -84,13 +84,7 @@ function hook(Mod, parent) {
     defaultOptions.mode = OPTIONS_MODE_AUTO
   }
 
-  const pkgStateCache = shared.package.state
-
-  for (const cacheKey in pkgStateCache) {
-    const pkgState = pkgStateCache[cacheKey]
-
-    pkgState.default || (pkgState.default = defaultPkg)
-  }
+  Package.state.default = defaultPkg
 
   Module._extensions = _extensions
 

@@ -72,12 +72,10 @@ if (shared.inited &&
     if (cacheKey) {
       const { state } = shared.package
 
-      Package.state =
-        state[cacheKey] ||
-        (state[cacheKey] = {
-          cache: { __proto__: null },
-          default: null
-        })
+      Package.state = state[cacheKey] || (state[cacheKey] = {
+        cache: { __proto__: null },
+        default: null
+      })
     }
 
     if (options) {

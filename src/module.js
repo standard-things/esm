@@ -3,17 +3,18 @@ import ENV from "./constant/env.js"
 import GenericArray from "./generic/array.js"
 import GenericObject from "./generic/object.js"
 import RealModule from "./real/module.js"
+import Wrapper from "./wrapper.js"
 
+import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
 import esmState from "./module/esm/state.js"
 import initGlobalPaths from "./module/internal/init-global-paths.js"
+import keys from "./util/keys.js"
 import maskFunction from "./util/mask-function.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
 import req from "./module/proto/require.js"
-import safeAssignProperties from "./util/safe-assign-properties.js"
 import safeDefaultProperties from "./util/safe-default-properties.js"
-import shared from "./shared.js"
 import staticFindPath from "./module/static/find-path.js"
 import staticInitPaths from "./module/static/init-paths.js"
 import staticLoad from "./module/static/load.js"
@@ -44,6 +45,8 @@ const Module = maskFunction(function (id, parent) {
 
 const _extensions = { __proto__: null }
 const { prototype } = Module
+
+const realExts = RealModule._extensions
 const realProto = RealModule.prototype
 
 Module._extensions = _extensions
@@ -63,10 +66,16 @@ prototype.constructor = Module
 prototype.load = maskFunction(protoLoad, realProto.load)
 prototype.require = maskFunction(req, realProto.require)
 
-safeAssignProperties(_extensions, RealModule._extensions)
+assign(_extensions, realExts)
 safeDefaultProperties(Module, RealModule)
 
-Reflect.deleteProperty(_extensions, shared.symbol.wrapper)
+const exts = keys(realExts)
+
+for (const ext of exts) {
+  if (typeof realExts[ext] === "function") {
+    _extensions[ext] = Wrapper.unwrap(realExts, ext)
+  }
+}
 
 if (JEST) {
   Module._cache = { __proto__: null }

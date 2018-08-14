@@ -94,18 +94,10 @@ const autoOptions = {
   mode: "auto"
 }
 
-const cacheKey = JSON.stringify(defaultOptions)
-
 class Package {
-  static state =
-    shared.package.state[cacheKey] ||
-    (shared.package.state[cacheKey] = {
-      cache: { __proto__: null },
-      default: null
-    })
-
   static createOptions = createOptions
   static defaultOptions = defaultOptions
+  static state = null
 
   constructor(dirPath, range, options) {
     options = Package.createOptions(options)
@@ -646,7 +638,14 @@ function readInfo(dirPath, force) {
 
 Reflect.setPrototypeOf(Package.prototype, null)
 
-// Enable in-memory caching when compiling without a file path.
+const cacheKey = JSON.stringify(Package.createOptions())
+const { state } = shared.package
+
+Package.state = state[cacheKey] || (state[cacheKey] = {
+  cache: { __proto__: null },
+  default: null
+})
+
 Package.state.cache[""] = new Package("", stripPrereleaseTag(PKG_VERSION), {
   cache: false,
   cjs: true
