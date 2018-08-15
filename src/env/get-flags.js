@@ -10,6 +10,7 @@ function init() {
     if (Reflect.has(env, "flags")) {
       return env.flags
     }
+
     const flags = {}
 
     setDeferred(flags, "check", () => matches(execArgv, /^(?:--check|-c)$/))
