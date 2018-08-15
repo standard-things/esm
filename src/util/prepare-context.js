@@ -1,11 +1,26 @@
+import { Script } from "../safe/vm.js"
+
 import { deprecate } from "../safe/util.js"
 import keysAll from "./keys-all.js"
 import setProperty from "./set-property.js"
 import shared from "../shared.js"
 
 function init() {
-  const globalNames = [
+  const possibleBuiltinNames = [
+    "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
+    "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError",
+    "Float32Array", "Float64Array", "Function", "Infinity", "Int16Array",
+    "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math", "NaN", "Number",
+    "Object", "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect",
+    "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol", "SyntaxError",
+    "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
+    "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly"
+  ]
+
+  const reassignNames = [
     "Buffer",
+    "URL",
+    "URLSearchParams",
     "clearImmediate",
     "clearInterval",
     "clearTimeout",
@@ -14,9 +29,7 @@ function init() {
     "process",
     "setImmediate",
     "setInterval",
-    "setTimeout",
-    "URL",
-    "URLSearchParams"
+    "setTimeout"
   ]
 
   function prepareContext(context) {
@@ -45,7 +58,7 @@ function init() {
       }
     }
 
-    for (const name of globalNames) {
+    for (const name of reassignNames) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
       // For an unknown reason some global properties aren't accessible as free
@@ -54,6 +67,30 @@ function init() {
           Reflect.deleteProperty(context, name)) {
         Reflect.defineProperty(context, name, descriptor)
       }
+    }
+
+    const builtinNames = []
+
+    for (const name of possibleBuiltinNames) {
+      if (Reflect.has(context, name)) {
+        builtinNames.push(name)
+        Reflect.deleteProperty(context, name)
+      }
+    }
+
+    const builtins = new Script(
+      "({" +
+      builtinNames.join(",") +
+      "})"
+    ).runInContext(context)
+
+    for (const name in builtins) {
+      Reflect.defineProperty(context, name, {
+        configurable: true,
+        enumerable: false,
+        value: builtins[name],
+        writable: true
+      })
     }
 
     return context

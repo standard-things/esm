@@ -26,6 +26,12 @@ function init() {
   return safeVM
 }
 
-export default shared.inited
+const safeVM = shared.inited
   ? shared.module.safeVM
   : shared.module.safeVM = init()
+
+export const {
+  Script
+} = safeVM
+
+export default safeVM
