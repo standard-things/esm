@@ -208,7 +208,7 @@ const Runtime = {
   updateBindings(valueToPassThrough) {
     this.entry.updateBindings()
 
-    // Returns the `valueToPassThrough` parameter to allow the value of the
+    // Returns the `valueToPassThrough()` parameter to allow the value of the
     // original expression to pass through. For example,
     //
     //   export let a = 1

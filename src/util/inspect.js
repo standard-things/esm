@@ -69,8 +69,8 @@ function init() {
   }
 
   function formatNamespaceObject(namespace, context) {
-    // Avoid `Object.keys` because it calls `[[GetOwnProperty]]`,
-    // which calls `[[Get]]`, which calls `GetBindingValue`,
+    // Avoid `Object.keys()` because it calls `[[GetOwnProperty]]()`,
+    // which calls `[[Get]]()`, which calls `GetBindingValue()`,
     // which throws for uninitialized bindings.
     //
     // Section 8.1.1.5.1: GetBindingValue()

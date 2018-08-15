@@ -1,4 +1,4 @@
-// Based on `PathVisitor` of ast-types.
+// Based on `PathVisitor()` of ast-types.
 // Copyright Ben Newman. Released under MIT license:
 // https://github.com/benjamn/ast-types
 

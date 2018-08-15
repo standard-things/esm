@@ -1,4 +1,4 @@
-// Based on Node's `Module._nodeModulePaths`.
+// Based on `Module._nodeModulePaths()`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
@@ -28,7 +28,7 @@ const nmChars = Array.prototype
 const nmLength = nmChars.length
 
 function nodeModulePaths(from) {
-  // Electron and Muon patch `Module_nodeModulePaths` to remove paths outside the app.
+  // Electron and Muon patch `Module_nodeModulePaths()` to remove paths outside the app.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
   if (ELECTRON) {

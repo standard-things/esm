@@ -1,4 +1,4 @@
-// Based on Acorn's `strictDirective`.
+// Based on `strictDirective()`.
 // Copyright Marijn Haverbeke. Released under MIT license:
 // https://github.com/acornjs/acorn
 

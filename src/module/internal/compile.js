@@ -234,7 +234,7 @@ function tryCompileESM(entry, filename) {
   const result = mod._compile(content, filename)
 
   if (! useAsync) {
-    // Debuggers may wrap `Module#_compile` with
+    // Debuggers may wrap `Module#_compile()` with
     // `process.binding("inspector").callAndPauseOnStart()`
     // and not forward the return value.
     const { _runResult } = runtime

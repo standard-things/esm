@@ -1,4 +1,4 @@
-// Based on Node's `Module._initPaths`.
+// Based on `Module._initPaths()`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
@@ -20,7 +20,7 @@ function initGlobalPaths() {
     homeDir = env.USERPROFILE
     nodePath = env.HOME
   } else {
-    // Use `safeGetEnv` to ensure nothing is returned when the setuid bit is set,
+    // Use `safeGetEnv()` to ensure nothing is returned when the setuid bit is set,
     // i.e. when Node is ran with privileges other than the user executing it.
     // https://github.com/nodejs/node/pull/18511
     homeDir = safeGetEnv("HOME")

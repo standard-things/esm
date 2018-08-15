@@ -64,9 +64,9 @@ class Entry {
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = toModuleNamespaceObject()
-    // The passthru indicator for `module._compile`.
+    // The passthru indicator for `module._compile()`.
     this._passthru = false
-    // The load type for `module.require`.
+    // The load type for `module.require()`.
     this._require = TYPE_CJS
     // The name of the running setter.
     this._runningSetter = null

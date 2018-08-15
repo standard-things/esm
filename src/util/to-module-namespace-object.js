@@ -18,7 +18,7 @@ function init() {
     Reflect.defineProperty(namespace, Symbol.toStringTag, toStringTagDescriptor)
 
     // Table 29: Internal Slots of Module Namespace Exotic Objects
-    // Properties should be assigned in `Array#sort` order.
+    // Properties should be assigned in `Array#sort()` order.
     // https://tc39.github.io/ecma262/#table-29
     const names = keys(object).sort()
 

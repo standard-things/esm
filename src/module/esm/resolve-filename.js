@@ -63,7 +63,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_INVALID_ARG_TYPE("request", "string")
   }
 
-  // Electron and Muon patch `Module._resolveFilename`.
+  // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
   if (ELECTRON &&

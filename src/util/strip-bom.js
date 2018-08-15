@@ -1,4 +1,4 @@
-// Based on Node's `stripBOM`.
+// Based on `stripBOM()`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 

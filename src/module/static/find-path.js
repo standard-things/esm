@@ -1,4 +1,4 @@
-// Based on Node's `Module._findPath`.
+// Based on `Module._findPath()`.
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 

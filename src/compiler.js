@@ -27,8 +27,8 @@ function init() {
     UNAMBIGUOUS
   } = SOURCE_TYPE
 
-  // Add "main" to compiled code to enable the `readFileFast` fast path of
-  // `process.binding("fs").internalModuleReadJSON`.
+  // Add "main" to compiled code to enable the `readFileFast()` fast path of
+  // `process.binding("fs").internalModuleReadJSON()`.
   const FAST_READ_PREFIX = '"main";'
 
   const defaultOptions = {

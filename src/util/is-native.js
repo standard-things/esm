@@ -2,12 +2,12 @@ import isProxy from "./is-proxy.js"
 import shared from "../shared.js"
 
 function init() {
-  // `Function.prototype.toString` is used to extract the coerced string source
-  // of a function regardless of any custom `toString` method it may have.
+  // `Function#toString()` is used to extract the coerced string source of a
+  // function regardless of any custom `toString()` method it may have.
   const { toString } = Function.prototype
 
-  // A native method, e.g. `Function.prototype.toString`, is used as a template
-  // to compare other native methods against. Escape special RegExp characters
+  // A native method, e.g. `Function#toString()`, is used as a template to
+  // compare other native methods against. Escape special RegExp characters
   // and remove method identifiers before converting the template to a regexp.
   const markerRegExp = /toString|(function ).*?(?=\\\()/g
   const specialCharRegExp = /[\\^$.*+?()[\]{}|]/g
@@ -27,7 +27,7 @@ function init() {
 
     const { name } = func
 
-    // Section 19.2.3.2: Function.prototype.bind()
+    // Section 19.2.3.2: Function#bind()
     // Step 11: Bound function names start with "bound ".
     // https://tc39.github.io/ecma262/#sec-function.prototype.bind
     if (typeof name === "string" &&
