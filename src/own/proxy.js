@@ -34,7 +34,7 @@ function init() {
       const proxy = new Proxy(target, handler)
 
       if (typeof target === "function" &&
-          ! shared.support.proxiedFunctionToStringTag) {
+          shared.env.chakra) {
         Reflect.defineProperty(proxy, Symbol.toStringTag, funcToStringTagDescriptor)
       }
 

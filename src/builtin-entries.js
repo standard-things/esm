@@ -1,3 +1,5 @@
+import ENV from "./constant/env.js"
+
 import Entry from "./entry.js"
 import OwnProxy from "./own/proxy.js"
 
@@ -11,6 +13,10 @@ import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
+const {
+  CHAKRA
+} = ENV
+
 const funcHasInstance = Function.prototype[Symbol.hasInstance]
 
 function createEntry(id) {
@@ -18,9 +24,9 @@ function createEntry(id) {
 
   let exported = mod.exports
 
-  if (id !== "assert" &&
-      typeof exported === "function" &&
-      shared.support.proxiedClasses) {
+  if (! CHAKRA &&
+      id !== "assert" &&
+      typeof exported === "function") {
     const func = exported
     const { prototype } = func
 

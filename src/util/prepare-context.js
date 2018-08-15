@@ -1,3 +1,5 @@
+import ENV from "../constant/env.js"
+
 import { Script } from "../safe/vm.js"
 
 import { deprecate } from "../safe/util.js"
@@ -6,6 +8,10 @@ import setProperty from "./set-property.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    CHAKRA
+  } = ENV
+
   const possibleBuiltinNames = [
     "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
     "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError",
@@ -34,6 +40,11 @@ function init() {
 
   function prepareContext(context) {
     const { defaultGlobal } = shared
+
+    if (context === defaultGlobal) {
+      return context
+    }
+
     const names = keysAll(defaultGlobal)
 
     for (const name of names) {
@@ -69,29 +80,37 @@ function init() {
       }
     }
 
+    if (CHAKRA) {
+      return context
+    }
+
     // Replace builtin `context` properties with those from the realm it backs to
     // preserve the realm specific wirings of methods like `Error.prepareStackTrace()`.
     // https://github.com/nodejs/node/issues/21574
     const builtinNames = []
+    const oldBuiltinValues = { __proto__: null }
 
     for (const name of possibleBuiltinNames) {
       if (Reflect.has(context, name)) {
         builtinNames.push(name)
+        oldBuiltinValues[name] = context[name]
         Reflect.deleteProperty(context, name)
       }
     }
 
     const builtinValues = new Script(
-      "({" +
-      builtinNames.join(",") +
+      "({__proto__:null," +
+      builtinNames
+        .map((name) => name + ":this." + name)
+        .join(",") +
       "})"
     ).runInContext(context)
 
-    for (const name in builtinValues) {
+    for (const name of builtinNames) {
       Reflect.defineProperty(context, name, {
         configurable: true,
         enumerable: false,
-        value: builtinValues[name],
+        value: builtinValues[name] || oldBuiltinValues[name],
         writable: true
       })
     }

@@ -35,7 +35,6 @@ function init() {
   })
 
   const funcToString = Function.prototype.toString
-  const { toString } = Object.prototype
 
   const support = {
     wasm: typeof WebAssembly === "object" && WebAssembly !== null
@@ -137,8 +136,11 @@ function init() {
   })
 
   setDeferred(shared, "proxyNativeSourceText", () => {
+    // Node < 10 does not implement the `Function#toString()`
+    // revision for proxied functions.
+    // https://node.green/#ESNEXT-candidate--stage-3--Function-prototype-toString-revision
     try {
-      return funcToString.call(dummyProxy)
+      return typeof funcToString.call(dummyProxy) === "string"
     } catch (e) {}
 
     return ""
@@ -174,18 +176,19 @@ function init() {
   })
 
   setDeferred(support, "inspectProxies", () => {
+    // Node < 6.1.0 does not support inspecting proxies.
     const inspected = shared.module.safeUtil.inspect(dummyProxy, {
       depth: 1,
       showProxy: true
     })
 
-    return inspected.startsWith("Proxy") &&
+    return inspected.indexOf("Proxy") !== -1 &&
       inspected.indexOf(PKG_PREFIX) !== -1
   })
 
   setDeferred(support, "lookupShadowed", () => {
-    // Node < 8 will lookup accessors in the prototype chain despite being
-    // shadowed by data properties.
+    // Node < 8 will lookup accessors in the prototype chain
+    // despite being shadowed by data properties.
     // https://node.green/#ES2017-annex-b
     const object = {
       __proto__: {
@@ -208,29 +211,13 @@ function init() {
         get: (target, name) => target[name]
       })
 
-      // Return a result so that the test has a side effect and won't be
-      // removed by the minifier's "unsafe" option.
+      // Return a result so that the test has a side effect and
+      // won't be removed by the minifier's "unsafe" option.
       // https://github.com/mishoo/UglifyJS2#the-unsafe-compress-option
       return typeof proxy.toString() === "string"
     } catch (e) {
       return ! /Illegal/.test(e)
     }
-  })
-
-  setDeferred(support, "proxiedClasses", () => {
-    class C extends dummyProxy {
-      c() {}
-    }
-
-    try {
-      return new C().c !== void 0
-    } catch (e) {}
-
-    return false
-  })
-
-  setDeferred(support, "proxiedFunctionToStringTag", () => {
-    return toString.call(dummyProxy) === "[object Function]"
   })
 
   setDeferred(support, "replShowProxy", () => {
