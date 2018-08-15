@@ -17,7 +17,7 @@ function init() {
     "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly"
   ]
 
-  const reassignNames = [
+  const reassignGlobalNames = [
     "Buffer",
     "URL",
     "URLSearchParams",
@@ -58,17 +58,20 @@ function init() {
       }
     }
 
-    for (const name of reassignNames) {
+    // For an unknown reason some `context` properties aren't accessible as
+    // free global variables unless they are deleted and reassigned.
+    for (const name of reassignGlobalNames) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
-      // For an unknown reason some global properties aren't accessible as free
-      // global variables unless they are deleted and re-added to the context.
       if (descriptor &&
           Reflect.deleteProperty(context, name)) {
         Reflect.defineProperty(context, name, descriptor)
       }
     }
 
+    // Replace builtin `context` properties with those from the realm it backs to
+    // preserve the realm specific wirings of methods like `Error.prepareStackTrace()`.
+    // https://github.com/nodejs/node/issues/21574
     const builtinNames = []
 
     for (const name of possibleBuiltinNames) {
@@ -78,17 +81,17 @@ function init() {
       }
     }
 
-    const builtins = new Script(
+    const builtinValues = new Script(
       "({" +
       builtinNames.join(",") +
       "})"
     ).runInContext(context)
 
-    for (const name in builtins) {
+    for (const name in builtinValues) {
       Reflect.defineProperty(context, name, {
         configurable: true,
         enumerable: false,
-        value: builtins[name],
+        value: builtinValues[name],
         writable: true
       })
     }
