@@ -20,7 +20,6 @@ function init() {
   const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
   const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
   const blankRegExp = /^\s*$/
-  const engineLineRegExp = /^.+?:(\d+)(?=\n)/
   const headerRegExp = /^(.+?)(:\d+)(?=\n)/
 
   function maskStackTrace(error, content, filename, isESM) {
@@ -93,18 +92,18 @@ function init() {
   }
 
   function maskEngineStack(stack, content, filename) {
-    const match = engineLineRegExp.exec(stack)
-
-    if (typeof filename === "string" &&
-        ! headerRegExp.test(stack)) {
-      stack = filename + ":1\n" + stack
-    }
+    const match = headerRegExp.exec(stack)
 
     if (match === null) {
+      if (typeof filename === "string") {
+        stack = filename + ":1\n" + stack
+      }
+
       return stack
     }
 
-    const line = +match[1]
+    const header = match[0]
+    const line = +match[2]
 
     let arrowFound = false
 
@@ -157,16 +156,19 @@ function init() {
       return stack
     }
 
-    return stack.replace(headerRegExp, (match) => {
-      const codeLines = content.split("\n")
-      const codeLine = codeLines[line - 1] || ""
+    const codeLines = content.split("\n")
+    const codeLine = codeLines[line - 1] || ""
 
-      if (codeLine) {
-        match += "\n" + codeLine + "\n"
-      }
+    if (codeLine) {
+      const { length } = header
 
-      return match
-    })
+      stack =
+        stack.slice(0, length) + "\n" +
+        codeLine + "\n" +
+        stack.slice(length)
+    }
+
+    return stack
   }
 
   // Transform parser stack codeLines from:
