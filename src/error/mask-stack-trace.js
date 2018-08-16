@@ -20,7 +20,7 @@ function init() {
   const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
   const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
   const blankRegExp = /^\s*$/
-  const headerRegExp = /^(.+?)(:\d+)(?=\n)/
+  const headerRegExp = /^(.+?):(\d+)(?=\n)/
 
   function maskStackTrace(error, content, filename, isESM) {
     if (! isError(error)) {
@@ -30,7 +30,7 @@ function init() {
     decorateStackTrace(error)
 
     let column
-    let line
+    let lineNum
 
     const fromParser = isParseError(error)
 
@@ -39,7 +39,7 @@ function init() {
       const ExCtor = shared.external[name]
 
       column = error.column
-      line = error.line
+      lineNum = error.line
 
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "line")
@@ -70,7 +70,7 @@ function init() {
         let masked = stack.replace(oldString, newString)
 
         masked = fromParser
-          ? maskParserStack(masked, name, message, line, column, content, filename)
+          ? maskParserStack(masked, name, message, lineNum, column, content, filename)
           : maskEngineStack(masked, content, filename)
 
         const scrubber = isESM
@@ -95,15 +95,13 @@ function init() {
     const match = headerRegExp.exec(stack)
 
     if (match === null) {
-      if (typeof filename === "string") {
-        stack = filename + ":1\n" + stack
-      }
-
-      return stack
+      return typeof filename === "string"
+        ? filename + ":1\n" + stack
+        : stack
     }
 
     const header = match[0]
-    const line = +match[2]
+    const lineNum = +match[2]
 
     let arrowFound = false
 
@@ -120,12 +118,12 @@ function init() {
         }
 
         const codeLines = content.split("\n")
-        const codeLine = codeLines[line - 1] || ""
+        const codeLine = codeLines[lineNum - 1] || ""
 
         return codeLine + (codeLine ? "\n\n" : "\n")
       }
 
-      if (line === 1) {
+      if (lineNum === 1) {
         const wrapper = getSilent(Module, "wrapper")
 
         if (Array.isArray(wrapper)) {
@@ -157,7 +155,7 @@ function init() {
     }
 
     const codeLines = content.split("\n")
-    const codeLine = codeLines[line - 1] || ""
+    const codeLine = codeLines[lineNum - 1] || ""
 
     if (codeLine) {
       const { length } = header
@@ -181,11 +179,11 @@ function init() {
   //
   // <type>: <message>
   //   ...
-  function maskParserStack(stack, name, message, line, column, content, filename) {
+  function maskParserStack(stack, name, message, lineNum, column, content, filename) {
     const spliceArgs = [0, 1]
 
     if (typeof filename === "string") {
-      spliceArgs.push(filename + ":" + line)
+      spliceArgs.push(filename + ":" + lineNum)
     }
 
     if (typeof content === "function") {
@@ -194,7 +192,7 @@ function init() {
 
     if (typeof content === "string") {
       const codeLines = content.split("\n")
-      const lineIndex = line - 1
+      const lineIndex = lineNum - 1
 
       if (lineIndex < codeLines.length) {
         let arrow = "^"
@@ -232,8 +230,8 @@ function init() {
     return prefix + getModuleURL(name)
   }
 
-  function replaceHeader(match, name, suffix) {
-    return getModuleURL(name) + suffix
+  function replaceHeader(match, name, lineNum) {
+    return getModuleURL(name) + ":" + lineNum
   }
 
   function tryErrorToString(error) {

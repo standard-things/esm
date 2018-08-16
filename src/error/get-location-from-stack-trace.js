@@ -5,7 +5,8 @@ import isPath from "../util/is-path.js"
 import shared from "../shared.js"
 
 function init() {
-  const headerRegExp = /^(.+?)(:\d+)(?=\n)/
+  const headerRegExp = /^(.+?):(\d+)(?=\n)/
+
   // eslint-disable-next-line no-useless-escape
   const locRegExp = /^ *at (?:.+? \()?(.+?):(\d+)(?:\:(\d+))?/gm
 
@@ -23,13 +24,17 @@ function init() {
     let match = headerRegExp.exec(stack)
 
     if (match) {
-      const [, filename, line] = match
+      const [
+        ,
+        filename,
+        lineNum
+      ] = match
 
       if (isFilename(filename)) {
         return {
           column: 0,
           filename,
-          line
+          line: lineNum
         }
       }
     }
@@ -37,13 +42,18 @@ function init() {
     locRegExp.lastIndex = 0
 
     while ((match = locRegExp.exec(stack))) {
-      const [, filename, line, column] = match
+      const [
+        ,
+        filename,
+        lineNum,
+        column
+      ] = match
 
       if (isFilename(filename)) {
         return {
           column,
           filename,
-          line
+          line: lineNum
         }
       }
     }
