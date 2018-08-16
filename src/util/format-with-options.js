@@ -1,6 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 
 import assign from "./assign.js"
+import get from "./get.js"
 import inspect from "./inspect.js"
 import isError from "./is-error.js"
 import shared from "../shared.js"
@@ -151,8 +152,8 @@ function init() {
       return JSON.stringify(value)
     } catch (e) {
       if (isError(e) &&
-          e.name === "TypeError" &&
-          e.message === shared.circularErrorMessage) {
+          get(e, "name") === "TypeError" &&
+          get(e, "message") === shared.circularErrorMessage) {
         return "[Circular]"
       }
 
