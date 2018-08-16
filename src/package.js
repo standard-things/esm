@@ -223,15 +223,15 @@ class Package {
     return cloned
   }
 
-  static get(dirPath, force) {
+  static get(dirPath, forceOptions) {
     if (dirPath === ".") {
       dirPath = resolve(dirPath)
     }
 
-    return getInfo(dirPath, force) || Package.state.default
+    return getInfo(dirPath, forceOptions) || Package.state.default
   }
 
-  static from(request, force) {
+  static from(request, forceOptions) {
     let dirPath = "."
 
     if (typeof request === "string") {
@@ -240,7 +240,7 @@ class Package {
       dirPath = getModuleDirname(request)
     }
 
-    return Package.get(dirPath, force)
+    return Package.get(dirPath, forceOptions)
   }
 
   static set(dirPath, pkg) {
@@ -401,11 +401,14 @@ function createOptions(value) {
 
   const { mode } = options
 
-  if (mode === "all") {
+  if (mode === OPTIONS_MODE_ALL ||
+      mode === "all") {
     options.mode = OPTIONS_MODE_ALL
-  } else if (mode === "auto") {
+  } else if (mode === OPTIONS_MODE_AUTO ||
+      mode === "auto") {
     options.mode = OPTIONS_MODE_AUTO
-  } else if (mode === "strict") {
+  } else if (mode === OPTIONS_MODE_STRICT ||
+      mode === "strict") {
     options.mode = OPTIONS_MODE_STRICT
   } else {
     throw new ERR_INVALID_ESM_OPTION("mode", mode)
@@ -439,7 +442,7 @@ function findRoot(dirPath) {
     : findRoot(parentPath)
 }
 
-function getInfo(dirPath, force) {
+function getInfo(dirPath, forceOptions) {
   const defaultPkg = Package.state.default
 
   let pkg = null
@@ -447,7 +450,7 @@ function getInfo(dirPath, force) {
   if (Reflect.has(Package.state.cache, dirPath)) {
     pkg = Package.state.cache[dirPath]
 
-    if (! force ||
+    if (! forceOptions ||
         pkg) {
       return pkg
     }
@@ -463,7 +466,7 @@ function getInfo(dirPath, force) {
     // of module/internal/compile.
     pkg = defaultPkg.clone()
   } else {
-    pkg = readInfo(dirPath)
+    pkg = readInfo(dirPath, forceOptions)
   }
 
   if (pkg === null) {
@@ -472,11 +475,6 @@ function getInfo(dirPath, force) {
     if (parentPath !== dirPath) {
       pkg = getInfo(parentPath)
     }
-  }
-
-  if (force &&
-      pkg === null) {
-    pkg = readInfo(dirPath, force)
   }
 
   return Package.state.cache[dirPath] = pkg
@@ -511,7 +509,7 @@ function isFlag(value) {
     value === 1
 }
 
-function readInfo(dirPath, force) {
+function readInfo(dirPath, forceOptions) {
   let pkg
   let optionsPath = dirPath + sep + ESMRC_FILENAME
 
@@ -542,11 +540,12 @@ function readInfo(dirPath, force) {
     } else {
       const { moduleState } = shared
       const { parsing } = moduleState
+      const { cache } = Package.createOptions(forceOptions)
 
       moduleState.parsing = false
 
       pkg =
-      Package.state.cache[dirPath] = new Package(dirPath, RANGE_ALL)
+      Package.state.cache[dirPath] = new Package(dirPath, RANGE_ALL, { cache })
 
       try {
         pkg.options =
@@ -566,7 +565,7 @@ function readInfo(dirPath, force) {
 
   let parentPkg
 
-  if (! force &&
+  if (! forceOptions &&
       pkgJSON === null) {
     if (optionsFound) {
       parentPkg = getInfo(dirname(dirPath))
@@ -590,7 +589,7 @@ function readInfo(dirPath, force) {
 
   let range
 
-  if (force) {
+  if (forceOptions) {
     range = RANGE_ALL
   } else if (parentPkg) {
     range = parentPkg.range
@@ -621,6 +620,12 @@ function readInfo(dirPath, force) {
   if (pkg) {
     pkg.range = range
     return pkg
+  }
+
+  if (forceOptions &&
+      ! optionsFound) {
+    optionsFound = true
+    options = forceOptions
   }
 
   if (options === true ||

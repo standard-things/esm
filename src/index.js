@@ -79,9 +79,7 @@ if (shared.inited &&
     }
 
     if (options) {
-      const pkg = Package.from(mod, true)
-
-      pkg.options = options
+      Package.from(mod, options)
     }
 
     moduleHook(Module, mod)

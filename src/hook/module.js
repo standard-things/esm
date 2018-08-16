@@ -69,11 +69,7 @@ function hook(Mod, parent) {
   let parentPkg = Package.from(parent)
 
   if (! parentPkg) {
-    parentPkg = Package.from(parent, true)
-
-    if (OPTIONS) {
-      parentPkg.options = Package.createOptions(OPTIONS)
-    }
+    parentPkg = Package.from(parent, OPTIONS || true)
   }
 
   const defaultPkg = parentPkg.clone()
