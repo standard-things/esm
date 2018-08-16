@@ -1,3 +1,5 @@
+import { sep, resolve } from "./safe/path.js"
+
 import ENTRY from "./constant/entry.js"
 import ENV from "./constant/env.js"
 import ESM from "./constant/esm.js"
@@ -14,7 +16,6 @@ import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
 import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
-import { sep } from "./safe/path.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
 
@@ -206,8 +207,17 @@ function init() {
       }
 
       const cache = dir[cachePath]
-      const { dirty } = cache
       const noCacheDir = ! mkdirp(cachePath)
+
+      let { dirty } = cache
+
+      if (! dirty &&
+          ! noCacheDir) {
+        const babelCachePath = resolve(cachePath, "../@babel/register")
+
+        dirty =
+        cache.dirty = exists(babelCachePath)
+      }
 
       if (dirty ||
           noCacheDir) {
