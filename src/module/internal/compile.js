@@ -21,6 +21,7 @@ import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import readFile from "../../fs/read-file.js"
 import shared from "../../shared.js"
+import toString from "../../util/to-string.js"
 
 const {
   SEMICOLON
@@ -48,6 +49,8 @@ const {
   SCRIPT,
   UNAMBIGUOUS
 } = SOURCE_TYPE
+
+const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
@@ -138,8 +141,13 @@ function tryCompileCached(entry, content, filename) {
     throw error
   }
 
+  const message = toString(error.message)
+  const { name } = error
+
   if (isESM &&
-      error.name === "SyntaxError") {
+      (name === "SyntaxError" ||
+       (name === "ReferenceError" &&
+        exportsRegExp.test(message)))) {
     entry.package.cache.dirty = true
   }
 
