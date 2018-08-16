@@ -11,5 +11,6 @@ module.exports = {
       modules: false,
       shippedProposals: true
     }]
-  ]
+  ],
+  sourceMaps: false
 }

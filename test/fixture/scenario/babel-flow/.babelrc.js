@@ -8,5 +8,6 @@ module.exports = {
     ["@babel/env", {
       modules: false
     }]
-  ]
+  ],
+  sourceMaps: false
 }
