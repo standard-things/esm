@@ -200,12 +200,17 @@ function tryCompileESM(entry, filename) {
       yieldIndex !== -1) {
     compileData.yieldIndex = -1
 
-    code =
-    compileData.code =
-      code.slice(0, yieldIndex) +
-      (code.charCodeAt(0) === SEMICOLON ? "" : ";") +
-      "yield;" +
-      code.slice(yieldIndex)
+    if (yieldIndex) {
+      code =
+        code.slice(0, yieldIndex) +
+        (code.charCodeAt(yieldIndex - 1) === SEMICOLON ? "" : ";") +
+        "yield;" +
+        code.slice(yieldIndex)
+    } else {
+      code = "yield;" + code
+    }
+
+    compileData.code = code
   }
 
   let content =
