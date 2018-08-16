@@ -249,9 +249,7 @@ function tryPassthru(func, args, pkg) {
       error.stack = error.stack.replace(message, error.message)
     }
 
-    if (pkg) {
-      pkg.cache.dirty = true
-    }
+    pkg.cache.dirty = true
   }
 
   const loc = getLocationFromStackTrace(error)
