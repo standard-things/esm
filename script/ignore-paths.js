@@ -9,11 +9,16 @@ const gitignorePath = path.resolve(rootPath, ".gitignore")
 
 const patterns = fs.readFileSync(gitignorePath, "utf8")
   .split(/\r?\n/)
-  .map((line) => {
-    line = line.trim()
-    return line
-      ? (line.startsWith("/") ? line.slice(1) : "**/" + line)
-      : line
+  .map((sourceLine) => {
+    sourceLine = sourceLine.trim()
+
+    if (sourceLine) {
+      return sourceLine.startsWith("/")
+        ? sourceLine.slice(1)
+        : "**/" + sourceLine
+    }
+
+    return sourceLine
   })
   .filter(Boolean)
 
