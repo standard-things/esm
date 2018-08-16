@@ -16,6 +16,10 @@ const canTestJest = Reflect.has(process.versions, "v8")
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
+const defaultNodeArgs = [
+  "--no-deprecation"
+]
+
 const envAuto = {
   CI: 1,
   ESM_OPTIONS: "{cjs:true,mode:'auto'}"
@@ -26,6 +30,10 @@ function exec(filename, args, env) {
     cwd: testPath,
     env
   })
+}
+
+function node(args, env) {
+  return exec(nodePath, defaultNodeArgs.concat(args), env)
 }
 
 describe("scenario tests", function () {
@@ -39,7 +47,7 @@ describe("scenario tests", function () {
     .reduce((promise, basename) =>
       promise
         .then(() =>
-          exec(nodePath, [
+          node([
             "-r", pkgPath,
             path.resolve(testPath, "fixture/scenario/dual", basename)
           ])
@@ -54,7 +62,7 @@ describe("scenario tests", function () {
   )
 
   it("should expose babel errors", () =>
-    exec(nodePath, [
+    node([
       "-r", pkgPath,
       "-r", "@babel/register",
       path.resolve(testPath, "fixture/scenario/babel-error")
@@ -66,11 +74,13 @@ describe("scenario tests", function () {
   )
 
   it("should work with babel plugins (code)", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/babel-flow")])
+    node([
+      path.resolve(testPath, "fixture/scenario/babel-flow")
+    ])
   )
 
   it("should work with babel plugins (flag)", () =>
-    exec(nodePath, [
+    node([
       "-r", pkgPath,
       "-r", "@babel/register",
       path.resolve(testPath, "fixture/scenario/babel-flow")
@@ -78,27 +88,35 @@ describe("scenario tests", function () {
   )
 
   it("should work with esmod-pmb", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")])
-      .then(({ stdout }) => assert.ok(stdout.includes("esmod-pmb:true")))
+    node([
+      path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("esmod-pmb:true")))
   )
 
   it("should work with express", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/express")])
-      .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
+    node([
+      path.resolve(testPath, "fixture/scenario/express")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
   )
 
   it("should work with global-prefix", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/global-prefix")])
-      .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
+    node([
+      path.resolve(testPath, "fixture/scenario/global-prefix")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
 
   it("should work with module-alias", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/module-alias")])
-      .then(({ stdout }) => assert.ok(stdout.includes("module-alias:true")))
+    node([
+      path.resolve(testPath, "fixture/scenario/module-alias")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("module-alias:true")))
   )
 
   it("should work with native modules", () =>
-    exec(nodePath, [
+    node([
       path.resolve(testPath, "fixture/scenario/native")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
@@ -108,7 +126,7 @@ describe("scenario tests", function () {
     const dirPath = path.resolve(testPath, "fixture/scenario/newrelic")
     const cwdPath = path.resolve(dirPath, "cwd.js")
 
-    return exec(nodePath, [
+    return node([
       "-r", pkgPath,
       "-r", cwdPath,
       "-r", "newrelic",
@@ -123,17 +141,19 @@ describe("scenario tests", function () {
     return exec("nyc", [
       "--cwd", dirPath,
       "-i", pkgPath,
-      nodePath, dirPath
+      nodePath, ...defaultNodeArgs, dirPath
     ])
   })
 
   it("should work with postcss", () =>
-    exec(nodePath, [path.resolve(testPath, "fixture/scenario/postcss")])
-      .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
+    node([
+      path.resolve(testPath, "fixture/scenario/postcss")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
 
   it("should work with sqreen", () =>
-    exec(nodePath, [
+    node([
       "-r", pkgPath,
       "-r", "sqreen",
       path.resolve(testPath, "fixture/scenario/sqreen")
@@ -215,7 +235,7 @@ describe("scenario tests", function () {
   })
 
   it("should work with mock-require and require-inject", () =>
-    exec(nodePath, [
+    node([
       "-r", pkgPath,
       path.resolve(testPath, "fixture/scenario/mock-require-inject")
     ], envAuto)
@@ -273,7 +293,7 @@ describe("scenario tests", function () {
       const configPath = path.resolve(dirPath, "jest.config.json")
       const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 
-      return exec(nodePath, [
+      return node([
         "-r", pkgPath,
         jestPath,
         "--config", configPath,
@@ -350,7 +370,7 @@ describe("scenario tests", function () {
       return cleanup()
     })
 
-    const defaultArgs = [
+    const defaultPM2Args = [
       "start",
       "--no-autorestart",
       "--name", "pm2"
@@ -392,11 +412,11 @@ describe("scenario tests", function () {
     }
 
     it("should work with pm2 and require flag", () => {
-      const nodeArgs = [
+      const nodeArgs = defaultNodeArgs.concat(
         "-r", pkgPath
-      ]
+      )
 
-      const pm2Args = defaultArgs.concat(
+      const pm2Args = defaultPM2Args.concat(
         "--node-args", nodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2")
       )
@@ -410,7 +430,8 @@ describe("scenario tests", function () {
     })
 
     it("should work with pm2 and bridge mode", () => {
-      const pm2Args = defaultArgs.concat(
+      const pm2Args = defaultPM2Args.concat(
+        "--node-args", defaultNodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2/bridge.js")
       )
 
@@ -423,12 +444,12 @@ describe("scenario tests", function () {
     })
 
     it("should work with pm2 and babel/register and require flag", () => {
-      const nodeArgs = [
+      const nodeArgs = defaultNodeArgs.concat(
         "-r", pkgPath,
         "-r", "@babel/register"
-      ]
+      )
 
-      const pm2Args = defaultArgs.concat(
+      const pm2Args = defaultPM2Args.concat(
         "--node-args", nodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2-babel")
       )
@@ -442,7 +463,8 @@ describe("scenario tests", function () {
     })
 
     it("should work with pm2 and babel/register with bridge mode", () => {
-      const pm2Args = defaultArgs.concat(
+      const pm2Args = defaultPM2Args.concat(
+        "--node-args", defaultNodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2-babel/bridge.js")
       )
 
