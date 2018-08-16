@@ -13,6 +13,7 @@ import captureStackTrace from "../../error/capture-stack-trace.js"
 import createSourceMap from "../../util/create-source-map.js"
 import encodeURI from "../../util/encode-uri.js"
 import esmValidate from "../esm/validate.js"
+import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
 import isError from "../../util/is-error.js"
@@ -141,8 +142,8 @@ function tryCompileCached(entry, content, filename) {
     throw error
   }
 
-  const message = toString(error.message)
-  const { name } = error
+  const message = toString(get(error, "message"))
+  const name = get(error, "name")
 
   if (isESM &&
       (name === "SyntaxError" ||

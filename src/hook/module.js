@@ -14,6 +14,7 @@ import compile from "../module/internal/compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import esmState from "../module/esm/state.js"
+import get from "../util/get.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
@@ -29,6 +30,7 @@ import readFileFast from "../fs/read-file-fast.js"
 import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
+import set from "../util/set.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 
@@ -234,19 +236,27 @@ function tryPassthru(func, args, pkg) {
     throw error
   }
 
+  const name = get(error, "name")
+
   let [, filename] = args
 
-  if (error.name === "SyntaxError") {
-    const message = toString(error.message)
+  if (name === "SyntaxError") {
+    const message = toString(get(error, "message"))
     const { range } = pkg
 
     if (importExportRegExp.test(message) &&
         ! satisfies(PKG_VERSION, range)) {
-      error.message =
+      const newMessage =
         "Expected esm@" + range +
         ". Using esm@" + PKG_VERSION + ": " + filename
 
-      error.stack = error.stack.replace(message, error.message)
+      set(error, "message", newMessage)
+
+      const stack = get(error, "stack")
+
+      if (typeof stack === "string") {
+        set(error, "stack", stack.replace(message, newMessage))
+      }
     }
 
     pkg.cache.dirty = true

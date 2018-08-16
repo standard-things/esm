@@ -3,12 +3,14 @@ import CHAR from "../constant/char.js"
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
+import get from "../util/get.js"
 import getModuleURL from "../util/get-module-url.js"
 import getSilent from "../util/get-silent.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import shared from "../shared.js"
+import toString from "../util/to-string.js"
 
 function init() {
   const {
@@ -34,7 +36,8 @@ function init() {
     const fromParser = isParseError(error)
 
     if (fromParser) {
-      const ExCtor = shared.external[error.name]
+      const name = toString(get(error, "name"))
+      const ExCtor = shared.external[name]
 
       column = error.column
       line = error.line
@@ -44,13 +47,13 @@ function init() {
       Reflect.setPrototypeOf(error, ExCtor.prototype)
     }
 
-    let { stack } = error
+    const stack = get(error, "stack")
 
     if (typeof stack !== "string") {
       return error
     }
 
-    const oldToStringed = error.name + ": " + error.message
+    const oldString = tryErrorToString(error)
 
     // Defer any file read operations until `error.stack` is accessed. Ideally,
     // we'd wrap `error` in a proxy to defer the initial `error.stack` access.
@@ -61,20 +64,21 @@ function init() {
       get() {
         this.stack = ""
 
-        const { message, name } = this
-        const newToStringed = name + ": " + message
+        const message = toString(get(this, "message"))
+        const name = toString(get(this, "name"))
+        const newString = tryErrorToString(this)
 
-        stack = stack.replace(oldToStringed, newToStringed)
-        stack = fromParser
-          ? maskParserStack(stack, name, message, line, column, content, filename)
-          : maskEngineStack(stack, content, filename)
+        let masked = stack.replace(oldString, newString)
+
+        masked = fromParser
+          ? maskParserStack(masked, name, message, line, column, content, filename)
+          : maskEngineStack(masked, content, filename)
 
         const scrubber = isESM
           ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
           : (stack) => scrubStackTrace(stack)
 
-        stack = withoutMessage(stack, newToStringed, scrubber)
-        return this.stack = stack
+        return this.stack = withoutMessage(masked, newString, scrubber)
       },
       set(value) {
         Reflect.defineProperty(this, "stack", {
@@ -228,6 +232,14 @@ function init() {
 
   function replaceHeader(match, name, suffix) {
     return getModuleURL(name) + suffix
+  }
+
+  function tryErrorToString(error) {
+    try {
+      return error.name + ": " + error.message
+    } catch (e) {}
+
+    return ""
   }
 
   function withoutMessage(stack, message, callback) {

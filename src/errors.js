@@ -1,9 +1,11 @@
 import ESM from "./constant/esm.js"
 
 import captureStackTrace from "./error/capture-stack-trace.js"
+import get from "./util/get.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
+import set from "./util/set.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toString from "./util/to-string.js"
@@ -80,10 +82,15 @@ function init() {
       const loc = getLocationFromStackTrace(error)
 
       if (loc) {
-        error.stack =
-          loc.filename + ":" +
-          loc.line + "\n" +
-          error.stack
+        const stack = get(error, "stack")
+
+       if (typeof stack === "string") {
+          set(error, "stack",
+            loc.filename + ":" +
+            loc.line + "\n" +
+            stack
+          )
+       }
       }
 
       return error
