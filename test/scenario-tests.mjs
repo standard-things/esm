@@ -228,8 +228,8 @@ describe("scenario tests", function () {
       }
     })
 
-    it("should carry over the global object of jest", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-global-object")
+    it("should carry over the context object of jest", function () {
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-context")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [
@@ -239,7 +239,7 @@ describe("scenario tests", function () {
     })
 
     it("should carry over the process object of jest", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-process-object")
+      const dirPath = path.resolve(testPath, "fixture/scenario/jest-process")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return exec("jest", [

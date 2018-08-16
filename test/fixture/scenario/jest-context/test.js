@@ -1,12 +1,10 @@
 "use strict"
 
 test("test", () => {
-  const expectedValues = {
-    CJS_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
-    CJS_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE",
-    ESM_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
-    ESM_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE"
-  }
+  const arrayNames = [
+    "CJS_STRUCTURED_STACK_TRACE",
+    "ESM_STRUCTURED_STACK_TRACE"
+  ]
 
   const funcNames = [
     "CJS_BUFFER_PROP",
@@ -52,7 +50,18 @@ test("test", () => {
     "ESM_PROCESS_VAR"
   ]
 
+  const expectedValues = {
+    CJS_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
+    CJS_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE",
+    ESM_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
+    ESM_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE"
+  }
+
   function checkTypes(actual) {
+    for (const name of arrayNames) {
+      expect(Array.isArray(actual[name])).toBe(true)
+    }
+
     for (const name of funcNames) {
       expect(typeof actual[name]).toBe("function")
     }

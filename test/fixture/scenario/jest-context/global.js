@@ -1,5 +1,17 @@
 "use strict"
 
+const { prepareStackTrace } = Error
+
+Error.prepareStackTrace = (error, structuredStackTrace) => structuredStackTrace
+
+const error = new Error
+
+Error.captureStackTrace(error)
+
+const CJS_STRUCTURED_STACK_TRACE = error.stack
+
+Error.prepareStackTrace = prepareStackTrace
+
 module.exports = {
   CJS_BUFFER_PROP: global.Buffer,
   CJS_BUFFER_VAR: Buffer,
@@ -19,6 +31,7 @@ module.exports = {
   CJS_SET_INTERVAL_VAR: setInterval,
   CJS_SET_TIMEOUT_PROP: global.setTimeout,
   CJS_SET_TIMEOUT_VAR: setTimeout,
+  CJS_STRUCTURED_STACK_TRACE,
   CJS_URL_PROP: global.URL,
   CJS_URL_SEARCH_PARAMS_PROP: global.URLSearchParams,
   CJS_URL_SEARCH_PARAMS_VAR: typeof URLSearchParams === "undefined" ? void 0 : URLSearchParams,

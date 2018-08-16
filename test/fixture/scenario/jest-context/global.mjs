@@ -1,3 +1,15 @@
+const { prepareStackTrace } = Error
+
+Error.prepareStackTrace = (error, structuredStackTrace) => structuredStackTrace
+
+const error = new Error
+
+Error.captureStackTrace(error)
+
+export const ESM_STRUCTURED_STACK_TRACE = error.stack
+
+Error.prepareStackTrace = prepareStackTrace
+
 export const ESM_BUFFER_PROP = global.Buffer
 export const ESM_BUFFER_VAR = Buffer
 export const ESM_CLEAR_IMMEDIATE_PROP = global.clearImmediate
