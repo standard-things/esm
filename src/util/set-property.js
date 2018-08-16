@@ -1,3 +1,4 @@
+import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
@@ -9,8 +10,11 @@ function init() {
   }
 
   function setProperty(object, name, value) {
-    dataDescriptor.value = value
-    Reflect.defineProperty(object, name, dataDescriptor)
+    if (isObjectLike(object)) {
+      dataDescriptor.value = value
+      Reflect.defineProperty(object, name, dataDescriptor)
+    }
+
     return object
   }
 
