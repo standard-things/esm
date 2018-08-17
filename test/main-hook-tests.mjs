@@ -7,9 +7,6 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
-const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
-
-const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
@@ -67,12 +64,8 @@ describe("main hook tests", function () {
       , Promise.resolve())
   })
 
-  it("should support `ESM_OPTIONS` environment variable", function () {
-    if (isDebug) {
-      this.skip()
-    }
-
-    return [
+  it("should support `ESM_OPTIONS` environment variable", () =>
+    [
       "{cjs:0,mode:'all'}",
       "{cjs:0,mode:all}",
       "{cjs:false,mode:'all'}",
@@ -83,21 +76,25 @@ describe("main hook tests", function () {
         .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
         .then(({ stdout }) => assert.ok(stdout.includes("esm-options:true")))
     , Promise.resolve())
-  })
+  )
 
-  it("should support `ESM_OPTIONS` environment variable with `options.cache`", function () {
-    if (isDebug) {
-      this.skip()
-    }
-
+  it("should support `ESM_OPTIONS` environment variable with `options.cache`", () => {
     const execPath = path.resolve(testPath, "fixture/options/env-cache")
     const cachePath = path.resolve(execPath, ".cache")
-    const ESM_OPTIONS = "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
 
     return trash(cachePath)
-      .then(() => runMain(execPath, { ESM_OPTIONS }))
+      .then(() => runMain(execPath, {
+        ESM_OPTIONS:  "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
+       }))
       .then(() => assert.ok(fs.pathExistsSync(cachePath)))
   })
+
+  it("should support `ESM_OPTIONS` environment variable with `options.mainFields`", () =>
+    runMain("./fixture/options/env-main-fields", {
+      ESM_OPTIONS: "{mainFields:['module']}"
+    })
+    .then(({ stdout }) => assert.ok(stdout.includes("esm-options-main-fields:true")))
+  )
 
   it("should support dynamic import in CJS", () =>
     runMain("./fixture/main-hook/dynamic-import.js")
