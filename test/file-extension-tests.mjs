@@ -3,10 +3,6 @@ import JSON6 from "json-6"
 import assert from "assert"
 import require from "./require.js"
 
-const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
-
-const isDebug = !! ESM_OPTIONS.debug
-
 describe("file extension tests", () => {
   it("should not error loading extensionless files with `require`", () => {
     require("./fixture/ext/no-ext-cjs")
@@ -69,12 +65,7 @@ describe("file extension tests", () => {
           .then(() => assert.ok(false))
           .catch((e) => {
             assert.ok(e instanceof SyntaxError)
-
-            if (isDebug) {
-              assert.ok(true)
-            } else {
-              assert.ok(e.message.startsWith("Unexpected token export"))
-            }
+            assert.ok(e.message.startsWith("Unexpected token export"))
           })
       ))
   )
