@@ -1139,12 +1139,7 @@ describe("miscellaneous tests", () => {
             .then((ns) => assert.ok(false))
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
-
-              if (isDebug) {
-                assert.ok(true)
-              } else {
-                assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
-              }
+              assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
             })
         ))
     )
@@ -1367,12 +1362,7 @@ describe("miscellaneous tests", () => {
             .then(() => assert.ok(false))
             .catch((e) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
-
-              if (isDebug) {
-                assert.ok(true)
-              } else {
-                assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
-              }
+              assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
             })
         ))
     )
