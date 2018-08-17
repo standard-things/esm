@@ -190,12 +190,6 @@ DevOpts
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"debug":</code></td>
-  <td>
-    <p>A boolean for unmasking methods and stack traces.</p>
-  </td>
-</tr>
-<tr>
   <td valign="top"><code>"sourceMap":</code></td>
   <td>
     <p>A boolean for including inline source maps.</p>
