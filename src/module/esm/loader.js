@@ -14,14 +14,15 @@ const {
 function loader(entry, filename, parentEntry) {
   const { parsing } = shared.moduleState
 
+  parentEntry || (parentEntry = entry)
+
   entry.updateFilename(filename)
 
   let ext = entry.extname
   let { extensions } = esmState
 
   if (ext === ".js" ||
-      (parentEntry &&
-       parentEntry.package.options.cjs.extensions &&
+      (parentEntry.package.options.cjs.extensions &&
        parentEntry.extname !== ".mjs")) {
     extensions = Module._extensions
   }
@@ -34,8 +35,7 @@ function loader(entry, filename, parentEntry) {
   const mod = entry.module
 
   if (! mod.paths) {
-    if ((parentEntry &&
-         parentEntry.type !== TYPE_ESM) ||
+    if (parentEntry.type !== TYPE_ESM ||
         (entry.package.options.cjs.paths &&
          ext !== ".mjs")) {
       mod.paths = Module._nodeModulePaths(entry.dirname)
