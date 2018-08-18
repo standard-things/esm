@@ -223,7 +223,7 @@ Tips
   programmaticly runs tests following their
   [library usage example](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library).
 
-* Load `esm` before APMs/loaders like
+* Load `esm` before loaders/monitors like
   [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html),
   [`newrelic`](https://github.com/newrelic/node-newrelic),
   [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/), and
