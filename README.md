@@ -225,8 +225,9 @@ Tips
 
 * Load `esm` before APMs/loaders like
   [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html),
-  [`newrelic`](https://github.com/newrelic/node-newrelic), and
-  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/).
+  [`newrelic`](https://github.com/newrelic/node-newrelic),
+  [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/), and
+  [`ts-node`](https://github.com/TypeStrong/ts-node#programmatic).
 
 * Load `esm` with the “node-args” options of<br>
   - [`node-tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
@@ -238,8 +239,7 @@ Tips
   [`nodemon`](https://nodemon.io/),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
-  [`tape`](https://github.com/substack/tape#preloading-modules),
-  [`ts-node`](https://github.com/TypeStrong/ts-node#cli-options), and
+  [`tape`](https://github.com/substack/tape#preloading-modules), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options).
 
   :reminder_ribbon: When using a package’s “require” option remember that,
