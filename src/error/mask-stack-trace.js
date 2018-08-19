@@ -9,6 +9,7 @@ import getSilent from "../util/get-silent.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
+import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 import toString from "../util/to-string.js"
 
@@ -43,7 +44,7 @@ function init() {
 
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "line")
-      Reflect.setPrototypeOf(error, ExCtor.prototype)
+      setPrototypeOf(error, ExCtor.prototype)
     }
 
     const stack = get(error, "stack")

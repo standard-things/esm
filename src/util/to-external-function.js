@@ -1,4 +1,6 @@
 import has from "./has.js"
+import isObjectLike from "./is-object-like.js"
+import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
@@ -8,10 +10,14 @@ function init() {
   const exFuncProtoSuper = Reflect.getPrototypeOf(ExFunction.prototype)
 
   function toExternalFunction(func) {
-    Reflect.setPrototypeOf(func, exFuncSuper)
+    setPrototypeOf(func, exFuncSuper)
 
     if (has(func, "prototype")) {
-      Reflect.setPrototypeOf(func.prototype, exFuncProtoSuper)
+      const { prototype } = func
+
+      if (isObjectLike(prototype)) {
+        setPrototypeOf(prototype, exFuncProtoSuper)
+      }
     }
 
     return func

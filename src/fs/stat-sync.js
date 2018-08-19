@@ -1,5 +1,6 @@
 import { lstatSync, Stats } from "../safe/fs.js"
 
+import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
@@ -22,7 +23,7 @@ function init() {
       // https://github.com/electron/electron/blob/master/lib/common/asar.js
       // https://github.com/brave/muon/blob/master/lib/common/asar.js
       if (! (result instanceof Stats)) {
-        Reflect.setPrototypeOf(result, prototype)
+        setPrototypeOf(result, prototype)
       }
     } catch (e) {}
 

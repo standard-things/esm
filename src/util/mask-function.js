@@ -5,6 +5,7 @@ import captureStackTrace from "../error/capture-stack-trace.js"
 import copyProperty from "./copy-property.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
+import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
 import unwrapProxy from "./unwrap-proxy.js"
@@ -65,14 +66,14 @@ function init() {
     }
 
     copyProperty(func, source, "name")
-    Reflect.setPrototypeOf(func, Reflect.getPrototypeOf(source))
+    setPrototypeOf(func, Reflect.getPrototypeOf(source))
 
     const proto = has(func, "prototype") ? func.prototype : void 0
     const sourceProto = has(source, "prototype") ? source.prototype : void 0
 
     if (isObjectLike(proto) &&
         isObjectLike(sourceProto)) {
-      Reflect.setPrototypeOf(proto, Reflect.getPrototypeOf(sourceProto))
+      setPrototypeOf(proto, Reflect.getPrototypeOf(sourceProto))
     } else {
       const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
 

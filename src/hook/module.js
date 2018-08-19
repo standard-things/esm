@@ -31,6 +31,7 @@ import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
 import set from "../util/set.js"
+import setPrototypeOf from "../util/set-prototype-of.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 
@@ -159,7 +160,7 @@ function hook(Mod, parent) {
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper
-      Reflect.setPrototypeOf(mod, Module.prototype)
+      setPrototypeOf(mod, Module.prototype)
     } else {
       Reflect.defineProperty(mod, shared.symbol._compile, {
         configurable: true,

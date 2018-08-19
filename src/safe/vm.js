@@ -4,6 +4,7 @@ import keysAll from "../util/keys-all.js"
 import realVM from "../real/vm.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
+import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
@@ -22,7 +23,7 @@ function init() {
     }
   }
 
-  Reflect.setPrototypeOf(prototype, contextifyProto)
+  setPrototypeOf(prototype, contextifyProto)
   return safeVM
 }
 

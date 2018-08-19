@@ -30,6 +30,7 @@ import realUtil from "../real/util.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
+import setPrototypeOf from "../util/set-prototype-of.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
 import wrap from "../util/wrap.js"
@@ -154,7 +155,7 @@ function hook(vm) {
     entry.require = makeRequireFunction(mod)
     entry.runtimeName = shared.runtimeName
 
-    Reflect.setPrototypeOf(mod, Module.prototype)
+    setPrototypeOf(mod, Module.prototype)
     Runtime.enable(entry, GenericObject.create())
   }
 
