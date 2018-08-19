@@ -1,5 +1,9 @@
 "use strict"
 
+const hasGlobalURL =
+  typeof global.URL === "function" &&
+  typeof global.URLSearchParams === "function"
+
 test("test", () => {
   const array = []
   const boolean = true
@@ -43,10 +47,6 @@ test("test", () => {
     "CJS_SET_INTERVAL_VAR",
     "CJS_SET_TIMEOUT_PROP",
     "CJS_SET_TIMEOUT_VAR",
-    "CJS_URL_PROP",
-    "CJS_URL_SEARCH_PARAMS_PROP",
-    "CJS_URL_SEARCH_PARAMS_VAR",
-    "CJS_URL_VAR",
     "ESM_CLEAR_IMMEDIATE_PROP",
     "ESM_CLEAR_IMMEDIATE_VAR",
     "ESM_CLEAR_INTERVAL_PROP",
@@ -58,11 +58,7 @@ test("test", () => {
     "ESM_SET_INTERVAL_PROP",
     "ESM_SET_INTERVAL_VAR",
     "ESM_SET_TIMEOUT_PROP",
-    "ESM_SET_TIMEOUT_VAR",
-    "ESM_URL_PROP",
-    "ESM_URL_SEARCH_PARAMS_PROP",
-    "ESM_URL_SEARCH_PARAMS_VAR",
-    "ESM_URL_VAR"
+    "ESM_SET_TIMEOUT_VAR"
   ]
 
   const objectNames = [
@@ -70,6 +66,17 @@ test("test", () => {
     "CJS_PROCESS_VAR",
     "ESM_PROCESS_PROP",
     "ESM_PROCESS_VAR"
+  ]
+
+  const urlNames = [
+    "CJS_URL_PROP",
+    "CJS_URL_SEARCH_PARAMS_PROP",
+    "CJS_URL_SEARCH_PARAMS_VAR",
+    "CJS_URL_VAR",
+    "ESM_URL_PROP",
+    "ESM_URL_SEARCH_PARAMS_PROP",
+    "ESM_URL_SEARCH_PARAMS_VAR",
+    "ESM_URL_VAR"
   ]
 
   const expectedValues = {
@@ -102,6 +109,12 @@ test("test", () => {
 
       expect(result).toBe(true)
     }
+
+    const expected = hasGlobalURL ? "function" : "undefined"
+
+    for (const name of urlNames) {
+      expect(typeof actual[name]).toBe(expected)
+    }
   }
 
   function checkValues(actual) {
@@ -117,14 +130,14 @@ test("test", () => {
   const bridged = require("./")
 
   checkInstances()
-  checkValues(bridged)
   checkTypes(bridged)
+  checkValues(bridged)
 
   require = require("../../../../")(module)
 
   const rebridged = require("./main.js")
 
   checkInstances()
-  checkValues(rebridged)
   checkTypes(rebridged)
+  checkValues(rebridged)
 })
