@@ -89,6 +89,30 @@ describe("scenario tests", function () {
     ])
   )
 
+  describe("should work with flow-remove-types", function () {
+    it("with cli", function () {
+      node([
+        "-r", pkgPath,
+        "-r", "flow-remove-types/register",
+        path.resolve(testPath, "fixture/scenario/flow-remove-types/main.js")
+      ], envAuto)
+      .then(({ stdout, stderr }) => {
+        assert.strictEqual(stdout, "flow-remove-types")
+        assert.strictEqual(stderr, "")
+      })
+    })
+
+    it("with bridge", function () {
+      node(
+        path.resolve(testPath, "fixture/scenario/flow-remove-types/bridge.js")
+      )
+      .then(({ stdout, stderr }) => {
+        assert.strictEqual(stdout, "flow-remove-types")
+        assert.strictEqual(stderr, "")
+      })
+    })
+  })
+
   it("should work with esmod-pmb", () =>
     node([
       path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
