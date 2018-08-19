@@ -3,8 +3,11 @@ import ENV from "../constant/env.js"
 import { Script } from "../safe/vm.js"
 
 import { deprecate } from "../safe/util.js"
+import has from "./has.js"
+import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
 import setProperty from "./set-property.js"
+import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
@@ -84,21 +87,19 @@ function init() {
       return context
     }
 
-    // Replace builtin `context` properties with those from the realm it backs to
-    // preserve the realm specific wirings of methods like `Error.prepareStackTrace()`.
-    // https://github.com/nodejs/node/issues/21574
+    const builtinDescriptors = {}
     const builtinNames = []
-    const oldBuiltinValues = { __proto__: null }
 
     for (const name of possibleBuiltinNames) {
       if (Reflect.has(context, name)) {
+        // Delete shadowed builtins to expose those of its realm.
         builtinNames.push(name)
-        oldBuiltinValues[name] = context[name]
+        builtinDescriptors[name] = Reflect.getOwnPropertyDescriptor(context, name)
         Reflect.deleteProperty(context, name)
       }
     }
 
-    const builtinValues = new Script(
+    const realmBuiltins = new Script(
       "({__proto__:null," +
       builtinNames
         .map((name) => name + ":this." + name)
@@ -107,12 +108,28 @@ function init() {
     ).runInContext(context)
 
     for (const name of builtinNames) {
-      Reflect.defineProperty(context, name, {
-        configurable: true,
-        enumerable: false,
-        value: builtinValues[name] || oldBuiltinValues[name],
-        writable: true
-      })
+      Reflect.defineProperty(context, name, builtinDescriptors[name])
+
+      const builtin = context[name]
+      const realmBuiltin = realmBuiltins[name]
+
+      if (builtin === realmBuiltin ||
+          ! isObjectLike(builtin) ||
+          ! isObjectLike(realmBuiltin)) {
+        continue
+      }
+
+      if (name === "Error") {
+        realmBuiltin.prepareStackTrace =
+          (...args) => Reflect.apply(builtin.prepareStackTrace, builtin, args)
+      }
+
+      if (typeof realmBuiltin === "function" &&
+          has(realmBuiltin, "prototype")) {
+        setPrototypeOf(realmBuiltin.prototype, builtin.prototype)
+      }
+
+      setPrototypeOf(realmBuiltin, builtin)
     }
 
     return context

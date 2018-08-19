@@ -1,6 +1,28 @@
 "use strict"
 
 test("test", () => {
+  const array = []
+  const boolean = true
+  const date = new Date
+  const number = 1
+  const object = {}
+  const regexp = /a/
+  const string = "a"
+
+  const instances = [
+    [() => array instanceof Array],
+    [() => boolean instanceof Boolean],
+    [() => date instanceof Date],
+    [() => number instanceof Number],
+    [() => object instanceof Object],
+    [() => regexp instanceof RegExp],
+    [() => string instanceof String]
+  ]
+
+  for (const pair of instances) {
+    pair.push(pair[0]())
+  }
+
   const arrayNames = [
     "CJS_STRUCTURED_STACK_TRACE",
     "ESM_STRUCTURED_STACK_TRACE"
@@ -51,10 +73,18 @@ test("test", () => {
   ]
 
   const expectedValues = {
+    CJS_BUILTIN_PROTOTYPE_MODIFICATION: true,
     CJS_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
     CJS_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE",
+    ESM_BUILTIN_PROTOTYPE_MODIFICATION: true,
     ESM_JEST_GLOBAL_VAR: "JEST_GLOBAL_VALUE",
     ESM_JEST_GLOBAL_PROP: "JEST_GLOBAL_VALUE"
+  }
+
+  function checkInstances() {
+    for (const [tester, expected] of instances) {
+      expect(tester()).toBe(expected)
+    }
   }
 
   function checkTypes(actual) {
@@ -82,8 +112,11 @@ test("test", () => {
     }
   }
 
+  checkInstances()
+
   const bridged = require("./")
 
+  checkInstances()
   checkValues(bridged)
   checkTypes(bridged)
 
@@ -91,6 +124,7 @@ test("test", () => {
 
   const rebridged = require("./main.js")
 
+  checkInstances()
   checkValues(rebridged)
   checkTypes(rebridged)
 })

@@ -1,14 +1,17 @@
 const { prepareStackTrace } = Error
 
 Error.prepareStackTrace = (error, structuredStackTrace) => structuredStackTrace
+String.prototype.a = "a"
 
 const error = new Error
 
 Error.captureStackTrace(error)
 
+export const ESM_BUILTIN_PROTOTYPE_MODIFICATION = "".a === "a"
 export const ESM_STRUCTURED_STACK_TRACE = error.stack
 
 Error.prepareStackTrace = prepareStackTrace
+Reflect.deleteProperty(String.prototype, "a")
 
 export const ESM_BUFFER_PROP = global.Buffer
 export const ESM_BUFFER_VAR = Buffer

@@ -1,2 +1,2 @@
-export * from "./global.js"
-export * from "./global.mjs"
+export * from "./context.js"
+export * from "./context.mjs"

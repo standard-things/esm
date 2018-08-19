@@ -3,18 +3,22 @@
 const { prepareStackTrace } = Error
 
 Error.prepareStackTrace = (error, structuredStackTrace) => structuredStackTrace
+String.prototype.a = "a"
 
 const error = new Error
 
 Error.captureStackTrace(error)
 
+const CJS_BUILTIN_PROTOTYPE_MODIFICATION = "".a === "a"
 const CJS_STRUCTURED_STACK_TRACE = error.stack
 
 Error.prepareStackTrace = prepareStackTrace
+Reflect.deleteProperty(String.prototype, "a")
 
 module.exports = {
   CJS_BUFFER_PROP: global.Buffer,
   CJS_BUFFER_VAR: Buffer,
+  CJS_BUILTIN_PROTOTYPE_MODIFICATION,
   CJS_CLEAR_IMMEDIATE_PROP: global.clearImmediate,
   CJS_CLEAR_IMMEDIATE_VAR: clearImmediate,
   CJS_CLEAR_INTERVAL_PROP: global.clearInterval,
