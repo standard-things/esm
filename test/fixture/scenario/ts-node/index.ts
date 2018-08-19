@@ -1,6 +1,5 @@
-import foo from "./foo.ts"
+import { log } from "console"
 
-foo()
-  .then((out) =>
-    process.stdout.write(out)
-  )
+const actual: boolean = true
+
+log("ts-node:" + actual)

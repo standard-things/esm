@@ -87,15 +87,6 @@ describe("scenario tests", function () {
     ])
   )
 
-  it("should work with ts-node/register/transpile-only", () =>
-    node([
-      "-r", pkgPath,
-      "-r", "ts-node/register/transpile-only",
-      path.resolve(testPath, "fixture/scenario/ts-node/index.ts")
-    ])
-    .then(({ stdout }) => assert.ok(stdout === "ts-node"))
-  )
-
   it("should work with esmod-pmb", () =>
     node([
       path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
@@ -168,6 +159,22 @@ describe("scenario tests", function () {
       path.resolve(testPath, "fixture/scenario/sqreen")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
+  )
+
+  it("should work with ts-node", () =>
+    Promise
+      .all([
+        "ts-node/register",
+        "ts-node/register/transpile-only"
+      ]
+      .map((request) =>
+        node([
+          "-r", pkgPath,
+          "-r", request,
+          path.resolve(testPath, "fixture/scenario/ts-node/index.ts")
+        ], envAuto)
+        .then(({ stdout }) => assert.ok(stdout.includes("ts-node:true")))
+      ))
   )
 
   it("should work with ava and nyc", () => {
