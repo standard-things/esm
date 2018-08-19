@@ -437,7 +437,6 @@ function init() {
     }
   }
 
-
   // Create cache in an "exit" event handler. "SIGINT" and "SIGTERM" events are
   // not safe to observe because handlers conflict with applications managing
   // "SIGINT" and "SIGTERM" themselves.
