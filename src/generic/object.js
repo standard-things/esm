@@ -1,15 +1,23 @@
 import shared from "../shared.js"
+import isObjectLike from "../util/is-object-like.js"
 
 function init() {
   const ExObject = shared.external.Object
 
-  const { create } = Object
+  const { create, defineProperties } = Object
 
   return {
     create(proto, properties) {
-      return proto === void 0
+      if (proto === null ||
+          isObjectLike(proto)) {
+        return properties === null
+          ? create(proto)
+          : create(proto, properties)
+      }
+
+      return properties == null
         ? new ExObject
-        : create(proto, properties)
+        : defineProperties(new ExObject, properties)
     }
   }
 }
