@@ -2,15 +2,10 @@
   "compilerOptions": {
     "inlineSourceMap": true,
     "inlineSources": true,
-    "lib": [
-      "dom",
-      "es6",
-      "scripthost"
-    ],
+    "lib": ["es6"],
     "moduleResolution": "node",
-    "target": "es6"
+    "target": "es6",
+    "types": []
   },
-  "exlcude": [
-    "node_modules"
-  ]
+  "exlcude": ["node_modules"]
 }
