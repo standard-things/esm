@@ -87,6 +87,15 @@ describe("scenario tests", function () {
     ])
   )
 
+  it("should work with ts-node/register/transpile-only", () =>
+    node([
+      "-r", pkgPath,
+      "-r", "ts-node/register/transpile-only",
+      path.resolve(testPath, "fixture/scenario/ts-node/index.ts")
+    ])
+    .then(({ stdout }) => assert.ok(stdout === "ts-node"))
+  )
+
   it("should work with esmod-pmb", () =>
     node([
       path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
