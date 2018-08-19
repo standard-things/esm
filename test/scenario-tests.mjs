@@ -8,6 +8,8 @@ import trash from "../script/trash.js"
 
 const isWin = process.platform === "win32"
 
+const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
+const labPath = path.resolve("../node_modules/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
 const testPath = path.resolve(".")
 const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
@@ -268,7 +270,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-context")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ], envAuto)
@@ -278,7 +281,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-process")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ], envAuto)
@@ -288,7 +292,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ], envAuto)
@@ -298,7 +303,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ])
@@ -307,7 +313,6 @@ describe("scenario tests", function () {
     it("should work with jest subclassed console", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
       const configPath = path.resolve(dirPath, "jest.config.json")
-      const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 
       return node([
         "-r", pkgPath,
@@ -321,7 +326,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ])
@@ -331,7 +337,8 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
-      return exec("jest", [
+      return node([
+        jestPath,
         "--config", configPath,
         "--rootDir", dirPath
       ])
@@ -339,8 +346,6 @@ describe("scenario tests", function () {
   })
 
   describe("should work with lab", function () {
-    const labPath = path.resolve("../node_modules/lab/bin/lab")
-
     before(function () {
       if (! canTestLab) {
         this.skip()
@@ -351,7 +356,7 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/lab")
       const labPattern = path.resolve(dirPath, "test.js")
 
-      return exec("node", [
+      return node([
         "-r", pkgPath,
         labPath, labPattern
       ], envAuto)
@@ -362,7 +367,7 @@ describe("scenario tests", function () {
       const dirPath = path.resolve(testPath, "fixture/scenario/lab-babel")
       const labPattern = path.resolve(dirPath, "test.js")
 
-      return exec("node", [
+      return node([
         "-r", pkgPath,
         "-r", "@babel/register",
         labPath, labPattern
@@ -378,13 +383,8 @@ describe("scenario tests", function () {
       }
     })
 
-    beforeEach(function () {
-      return cleanup()
-    })
-
-    afterEach(function () {
-      return cleanup()
-    })
+    beforeEach(cleanup)
+    afterEach(cleanup)
 
     const defaultPM2Args = [
       "start",
