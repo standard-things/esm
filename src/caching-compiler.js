@@ -38,8 +38,6 @@ function init() {
     SCRIPT
   } = SOURCE_TYPE
 
-  let onExitCalled = false
-
   const CachingCompiler = {
     compile(entry, code, options) {
       if (! options.eval &&
@@ -190,12 +188,7 @@ function init() {
     return result
   }
 
-  function onExit(exitCode, exitProcess, signal) {
-    if (onExitCalled) {
-      return
-    }
-
-    onExitCalled = true
+  function onExit() {
     realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
 
     const { pendingScripts, pendingWrites } = shared
@@ -397,13 +390,6 @@ function init() {
         }
       }
     }
-
-    if (exitProcess) {
-      // "SIGINT" and "SIGTERM" have handlers that reset the terminal mode
-      // before exiting with code 128 + signal number.
-      // https://nodejs.org/api/process.html#process_signal_events
-      realProcess.exit(128 + signal)
-    }
   }
 
   function removeExpired(cachePath, cacheName) {
@@ -451,11 +437,13 @@ function init() {
     }
   }
 
+
+  // Create cache in an "exit" event handler. "SIGINT" and "SIGTERM" events are
+  // not safe to observe because handlers conflict with applications managing
+  // "SIGINT" and "SIGTERM" themselves.
   realProcess
     .setMaxListeners(realProcess.getMaxListeners() + 1)
     .once("exit", onExit)
-    .once("SIGINT", onExit.bind(void 0, 0, true, 2))
-    .once("SIGTERM", onExit.bind(void 0, 0, true, 15))
 
   return CachingCompiler
 }
