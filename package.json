@@ -80,6 +80,7 @@
     "sqreen": "^1.22.0",
     "strip-ansi": "^4.0.0",
     "trash": "^4.3.0",
+    "ts-node": "^7.0.1",
     "typescript": "^3.0.1",
     "uglify-es": "^3.3.10",
     "uglifyjs-webpack-plugin": "^1.3.0",
