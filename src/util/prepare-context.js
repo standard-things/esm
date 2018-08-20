@@ -18,12 +18,11 @@ function init() {
   const possibleBuiltinNames = [
     "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
     "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError",
-    "Float32Array", "Float64Array", "Function", "Infinity", "Int16Array",
-    "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math", "NaN", "Number",
-    "Object", "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect",
-    "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol", "SyntaxError",
-    "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
-    "Uint8ClampedArray", "WeakMap", "WeakSet", "WebAssembly"
+    "Float32Array", "Float64Array", "Function", "Int16Array", "Int32Array",
+    "Int8Array", "Map","Number", "Object", "Promise", "Proxy", "RangeError",
+    "ReferenceError", "Reflect", "RegExp", "Set", "SharedArrayBuffer",
+    "String", "Symbol", "SyntaxError", "TypeError", "URIError", "Uint16Array",
+    "Uint32Array", "Uint8Array", "Uint8ClampedArray", "WeakMap", "WeakSet"
   ]
 
   const reassignGlobalNames = [
@@ -100,9 +99,9 @@ function init() {
     }
 
     const realmBuiltins = new Script(
-      "({__proto__:null," +
+      "({" +
       builtinNames
-        .map((name) => name + ":this." + name)
+        .map(toRealmPropertySnippet)
         .join(",") +
       "})"
     ).runInContext(context)
@@ -146,6 +145,28 @@ function init() {
         setProperty(this, name, value)
       }, depMessage, depCode)
     }
+  }
+
+  function toRealmPropertySnippet(name) {
+    let snippet = name + ":"
+
+    if (name === "Array") {
+      snippet += "[].constructor"
+    } else if (name === "BigInt") {
+      snippet += "1n.constructor"
+    } else if (name === "Boolean") {
+      snippet += "true.constructor"
+    } else if (name === "Number") {
+      snippet += "1..constructor"
+    } else if (name === "RegExp") {
+      snippet += "/./.constructor"
+    } else if (name === "String") {
+      snippet += '"".constructor'
+    } else {
+      snippet += "this." + name
+    }
+
+    return snippet
   }
 
   return prepareContext
