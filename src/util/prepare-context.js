@@ -15,7 +15,18 @@ function init() {
     CHAKRA
   } = ENV
 
-  const possibleBuiltinNames = [
+  const ctorBySyntax = {
+    __proto__: null,
+    Array: true,
+    BigInt: true,
+    Boolean: true,
+    Number: true,
+    Object: true,
+    RegExp: true,
+    String: true
+  }
+
+  const possibleBuiltins = [
     "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
     "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError",
     "Float32Array", "Float64Array", "Function", "Int16Array", "Int32Array",
@@ -25,7 +36,7 @@ function init() {
     "Uint32Array", "Uint8Array", "Uint8ClampedArray", "WeakMap", "WeakSet"
   ]
 
-  const reassignGlobalNames = [
+  const reassignableBuiltins = [
     "Buffer",
     "URL",
     "URLSearchParams",
@@ -73,7 +84,7 @@ function init() {
 
     // For an unknown reason some `context` properties aren't accessible as
     // free global variables unless they are deleted and reassigned.
-    for (const name of reassignGlobalNames) {
+    for (const name of reassignableBuiltins) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
       if (descriptor &&
@@ -86,15 +97,18 @@ function init() {
       return context
     }
 
-    const builtinDescriptors = {}
+    const builtinDescriptors = { __proto__: null }
     const builtinNames = []
 
-    for (const name of possibleBuiltinNames) {
+    for (const name of possibleBuiltins) {
       if (Reflect.has(context, name)) {
-        // Delete shadowed builtins to expose those of its realm.
         builtinNames.push(name)
-        builtinDescriptors[name] = Reflect.getOwnPropertyDescriptor(context, name)
-        Reflect.deleteProperty(context, name)
+
+        if (! Reflect.has(ctorBySyntax, name)) {
+          // Delete shadowed builtins to expose those of its realm.
+          builtinDescriptors[name] = Reflect.getOwnPropertyDescriptor(context, name)
+          Reflect.deleteProperty(context, name)
+        }
       }
     }
 
@@ -107,7 +121,9 @@ function init() {
     ).runInContext(context)
 
     for (const name of builtinNames) {
-      Reflect.defineProperty(context, name, builtinDescriptors[name])
+      if (Reflect.has(builtinDescriptors, name)) {
+        Reflect.defineProperty(context, name, builtinDescriptors[name])
+      }
 
       const builtin = context[name]
       const realmBuiltin = realmBuiltins[name]
@@ -158,6 +174,8 @@ function init() {
       snippet += "true.constructor"
     } else if (name === "Number") {
       snippet += "1..constructor"
+    } else if (name === "Object") {
+      snippet += "({}).constructor"
     } else if (name === "RegExp") {
       snippet += "/./.constructor"
     } else if (name === "String") {
