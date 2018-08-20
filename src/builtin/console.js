@@ -184,13 +184,16 @@ function init() {
       }
     }
   } else if (ELECTRON_RENDERER) {
-    const names = keys(console)
+    // Assign `console` to a variable so it won't be removed by
+    // `babel-plugin-transform-remove-console`.
+    const unmunged = console
+    const names = keys(unmunged)
 
     for (const name of names) {
       if (name !== "Console" &&
           has(builtinConsole, name)) {
         // eslint-disable-next-line no-console
-        const consoleFunc = console[name]
+        const consoleFunc = unmunged[name]
         const builtinFunc = builtinConsole[name]
 
         if (typeof builtinFunc === "function" &&
