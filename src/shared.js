@@ -136,8 +136,7 @@ function init() {
   })
 
   setDeferred(shared, "proxyNativeSourceText", () => {
-    // Node < 10 does not implement the `Function#toString()`
-    // revision for proxied functions.
+    // Node < 10 doesn't support `Function#toString()` of proxied functions.
     // https://node.green/#ESNEXT-candidate--stage-3--Function-prototype-toString-revision
     try {
       return typeof funcToString.call(dummyProxy) === "string"
@@ -211,8 +210,8 @@ function init() {
         get: (target, name) => target[name]
       })
 
-      // Return a result so that the test has a side effect and
-      // won't be removed by the minifier's "unsafe" option.
+      // Return a result so the test has a side effect and won't be removed by
+      // Uglify's "unsafe" option.
       // https://github.com/mishoo/UglifyJS2#the-unsafe-compress-option
       return typeof proxy.toString() === "string"
     } catch (e) {

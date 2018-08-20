@@ -68,8 +68,8 @@ function init() {
 
   function createMap(object, name) {
     // Store the wrapper map as `object[shared.symbol.wrapper][name]` rather
-    // than on the function so that other code can modify the same property
-    // without interfering with our wrapper.
+    // than on the function so other code can modify the same property without
+    // interfering with our wrapper.
     return getOrCreateStore(object)[name] = {
       raw: Wrapper.unwrap(object, name),
       versions: [],
