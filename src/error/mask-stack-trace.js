@@ -106,10 +106,10 @@ function init() {
 
     let arrowFound = false
 
-    stack = stack.replace(arrowRegExp, (match, snippet, arrow, newline = "") => {
+    stack = stack.replace(arrowRegExp, (match, decoratorLine, decoratorArrow, decoratorNewline = "") => {
       arrowFound = true
 
-      if (snippet.indexOf(ZERO_WIDTH_NOBREAK_SPACE) !== -1) {
+      if (decoratorLine.indexOf(ZERO_WIDTH_NOBREAK_SPACE) !== -1) {
         if (typeof content === "function") {
           content = content(filename)
         }
@@ -118,10 +118,10 @@ function init() {
           return ""
         }
 
-        const codeLines = content.split("\n")
-        const codeLine = codeLines[lineNum - 1] || ""
+        const contentLines = content.split("\n")
+        const contentLine = contentLines[lineNum - 1] || ""
 
-        return codeLine + (codeLine ? "\n\n" : "\n")
+        return contentLine + (contentLine ? "\n\n" : "\n")
       }
 
       if (lineNum === 1) {
@@ -131,16 +131,16 @@ function init() {
           const [prefix] = wrapper
 
           if (typeof prefix === "string" &&
-              snippet.startsWith(prefix)) {
+              decoratorLine.startsWith(prefix)) {
             const { length } = prefix
 
-            snippet = snippet.slice(length)
-            arrow = arrow.slice(length)
+            decoratorLine = decoratorLine.slice(length)
+            decoratorArrow = decoratorArrow.slice(length)
           }
         }
       }
 
-      return snippet + "\n" + arrow + "\n" + newline
+      return decoratorLine + "\n" + decoratorArrow + "\n" + decoratorNewline
     })
 
     if (arrowFound) {
@@ -155,27 +155,27 @@ function init() {
       return stack
     }
 
-    const codeLines = content.split("\n")
-    const codeLine = codeLines[lineNum - 1] || ""
+    const contentLines = content.split("\n")
+    const contentLine = contentLines[lineNum - 1] || ""
 
-    if (codeLine) {
+    if (contentLine) {
       const { length } = header
 
       stack =
         stack.slice(0, length) + "\n" +
-        codeLine + "\n" +
+        contentLine + "\n" +
         stack.slice(length)
     }
 
     return stack
   }
 
-  // Transform parser stack codeLines from:
-  // <type>: <message> (<codeLine>:<column>)
+  // Transform parser stack contentLines from:
+  // <type>: <message> (<contentLine>:<column>)
   //   ...
   // to:
-  // path/to/file.js:<codeLine>
-  // <codeLine of code, from the original source, where the error occurred>
+  // path/to/file.js:<contentLine>
+  // <contentLine of code, from the original source, where the error occurred>
   // <column indicator arrow>
   //
   // <type>: <message>
@@ -192,23 +192,23 @@ function init() {
     }
 
     if (typeof content === "string") {
-      const codeLines = content.split("\n")
+      const contentLines = content.split("\n")
       const lineIndex = lineNum - 1
 
-      if (lineIndex < codeLines.length) {
-        let arrow = "^"
+      if (lineIndex < contentLines.length) {
+        let decoratorArrow = "^"
 
         if (message.startsWith("Export '")) {
           // Increase arrow count to the length of the identifier.
-          arrow = arrow.repeat(message.indexOf("'", 8) - 8)
+          decoratorArrow = decoratorArrow.repeat(message.indexOf("'", 8) - 8)
         }
 
-        const codeLine = codeLines[lineIndex]
+        const contentLine = contentLines[lineIndex]
 
-        if (! blankRegExp.test(codeLine)) {
+        if (! blankRegExp.test(contentLine)) {
           spliceArgs.push(
-            codeLine,
-            " ".repeat(column) + arrow,
+            contentLine,
+            " ".repeat(column) + decoratorArrow,
             ""
           )
         }
