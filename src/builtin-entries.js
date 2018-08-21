@@ -5,7 +5,7 @@ import OwnProxy from "./own/proxy.js"
 
 import builtinIds from "./builtin-ids.js"
 import builtinModules from "./builtin-modules.js"
-import isObjectLike from "./util/is-object-like.js"
+import instanceOf from "./util/instance-of.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import maskFunction from "./util/mask-function.js"
@@ -31,23 +31,9 @@ function createEntry(id) {
     const { prototype } = func
 
     const hasInstance = maskFunction(
-      (value) => {
-        if (value instanceof func) {
-          return true
-        }
-
-        if (isObjectLike(value)) {
-          let proto = value
-
-          while ((proto = Reflect.getPrototypeOf(proto))) {
-            if (proto === proxyProto) {
-              return true
-            }
-          }
-        }
-
-        return false
-      },
+      (value) =>
+        value instanceof func ||
+        instanceOf(value, proxyFunc),
       funcHasInstance
     )
 
