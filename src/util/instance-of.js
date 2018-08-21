@@ -1,3 +1,4 @@
+import getPrototypeOf from "./get-prototype-of.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
@@ -8,7 +9,7 @@ function init() {
     if (isObjectLike(value)) {
       let proto = value
 
-      while ((proto = Reflect.getPrototypeOf(proto))) {
+      while ((proto = getPrototypeOf(proto))) {
         if (proto === prototype) {
           return true
         }

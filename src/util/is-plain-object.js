@@ -1,3 +1,4 @@
+import getPrototypeOf from "./get-prototype-of.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 
@@ -7,17 +8,14 @@ function init() {
       return false
     }
 
-    const proto = Reflect.getPrototypeOf(value)
+    const proto = getPrototypeOf(value)
 
+    let nextProto = proto
     let rootProto = null
 
-    if (proto) {
-      let nextProto = proto
-
-      do {
-        rootProto = nextProto
-        nextProto = Reflect.getPrototypeOf(rootProto)
-      } while (nextProto !== null)
+    while (nextProto) {
+      rootProto = nextProto
+      nextProto = getPrototypeOf(rootProto)
     }
 
     return proto === rootProto

@@ -1,4 +1,5 @@
 import copyProperty from "../util/copy-property.js"
+import getPrototypeOf from "../util/get-prototype-of.js"
 import has from "../util/has.js"
 import keysAll from "../util/keys-all.js"
 import realVM from "../real/vm.js"
@@ -10,7 +11,7 @@ import shared from "../shared.js"
 function init() {
   const safeVM = safe(realVM)
   const { Script } = safeVM
-  const contextifyProto = Reflect.getPrototypeOf(Script.prototype)
+  const contextifyProto = getPrototypeOf(Script.prototype)
 
   setProperty(safeVM, "Script", safe(Script))
 

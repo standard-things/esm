@@ -3,6 +3,7 @@ import Package from "../package.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
 import copyProperty from "./copy-property.js"
+import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
 import setPrototypeOf from "./set-prototype-of.js"
@@ -66,14 +67,14 @@ function init() {
     }
 
     copyProperty(func, source, "name")
-    setPrototypeOf(func, Reflect.getPrototypeOf(source))
+    setPrototypeOf(func, getPrototypeOf(source))
 
     const proto = has(func, "prototype") ? func.prototype : void 0
     const sourceProto = has(source, "prototype") ? source.prototype : void 0
 
     if (isObjectLike(proto) &&
         isObjectLike(sourceProto)) {
-      setPrototypeOf(proto, Reflect.getPrototypeOf(sourceProto))
+      setPrototypeOf(proto, getPrototypeOf(sourceProto))
     } else {
       const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
 
