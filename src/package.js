@@ -37,8 +37,7 @@ const {
 } = CHAR_CODE
 
 const {
-  OPTIONS,
-  NYC
+  OPTIONS
 } = ENV
 
 const {
@@ -134,7 +133,6 @@ class Package {
         let hasBuffer = false
         let hasDirtyMarker = false
         let hasMap = false
-        let hasNycMarker = false
 
         for (const cacheName of cacheNames) {
           if (isCacheName(cacheName)) {
@@ -149,21 +147,12 @@ class Package {
             } else if (cacheName === ".dirty") {
               hasDirtyMarker = true
               break
-            } else if (cacheName === ".nyc") {
-              hasNycMarker = true
             }
           }
         }
 
-        const hasNycNoMarker = NYC && ! hasNycMarker
-        const noNycHasMarker = ! NYC && hasNycMarker
-
-        let isCacheInvalid =
-          hasDirtyMarker ||
-          hasNycNoMarker ||
-          noNycHasMarker
-
         let json
+        let isCacheInvalid = hasDirtyMarker
 
         if (hasMap &&
             ! isCacheInvalid) {
@@ -185,10 +174,6 @@ class Package {
 
           if (hasDirtyMarker) {
             removeFile(cachePath + sep + ".dirty")
-          }
-
-          if (noNycHasMarker) {
-            removeFile(cachePath + sep + ".nyc")
           }
 
           clearBabelCache(cachePath)

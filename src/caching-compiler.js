@@ -206,10 +206,10 @@ function init() {
 
       if (! dirty &&
           ! noCacheDir) {
-        const babelCachePath = resolve(cachePath, "../@babel/register")
-
         dirty =
-        cache.dirty = exists(babelCachePath)
+        cache.dirty =
+          NYC ||
+          exists(resolve(cachePath, "../@babel/register"))
       }
 
       if (dirty ||
@@ -231,10 +231,6 @@ function init() {
         for (const cacheName in cache.compile) {
           removeFile(cachePath + sep + cacheName)
         }
-      }
-
-      if (NYC) {
-        writeMarker(cachePath + sep + ".nyc")
       }
     }
 
