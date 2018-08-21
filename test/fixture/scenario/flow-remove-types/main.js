@@ -1,6 +1,7 @@
 // @flow
-import { test } from "./test"
+import { log } from "console"
+import test from "./test.js"
 
-const msg: string = test()
+const actual: boolean = test()
 
-process.stdout.write(msg)
+log("flow-remove-types:" + actual)

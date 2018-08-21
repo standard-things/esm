@@ -75,44 +75,6 @@ describe("scenario tests", function () {
     })
   )
 
-  it("should work with babel plugins (code)", () =>
-    node([
-      path.resolve(testPath, "fixture/scenario/babel-flow")
-    ])
-  )
-
-  it("should work with babel plugins (flag)", () =>
-    node([
-      "-r", pkgPath,
-      "-r", "@babel/register",
-      path.resolve(testPath, "fixture/scenario/babel-flow")
-    ])
-  )
-
-  describe("should work with flow-remove-types", function () {
-    it("with cli", function () {
-      node([
-        "-r", pkgPath,
-        "-r", "flow-remove-types/register",
-        path.resolve(testPath, "fixture/scenario/flow-remove-types/main.js")
-      ], envAuto)
-      .then(({ stdout, stderr }) => {
-        assert.strictEqual(stdout, "flow-remove-types")
-        assert.strictEqual(stderr, "")
-      })
-    })
-
-    it("with bridge", function () {
-      node(
-        path.resolve(testPath, "fixture/scenario/flow-remove-types/bridge.js")
-      )
-      .then(({ stdout, stderr }) => {
-        assert.strictEqual(stdout, "flow-remove-types")
-        assert.strictEqual(stderr, "")
-      })
-    })
-  })
-
   it("should work with esmod-pmb", () =>
     node([
       path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
@@ -282,6 +244,42 @@ describe("scenario tests", function () {
       path.resolve(testPath, "fixture/scenario/mock-require-inject")
     ], envAuto)
   )
+
+  describe("should work with babel plugins", () => {
+    it("should work from the bridge", () =>
+      node([
+        path.resolve(testPath, "fixture/scenario/babel-flow")
+      ])
+      .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
+    )
+
+    it("should work from the CLI", () =>
+      node([
+        "-r", pkgPath,
+        "-r", "@babel/register",
+        path.resolve(testPath, "fixture/scenario/babel-flow")
+      ])
+      .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
+    )
+  })
+
+  describe("should work with flow-remove-types", () => {
+    it("should work from the bridge",  () =>
+      node([
+        path.resolve(testPath, "fixture/scenario/flow-remove-types")
+      ], envAuto)
+      .then(({ stdout }) => assert.ok(stdout.includes("flow-remove-types:true")))
+    )
+
+    it("should work from the CLI", () =>
+      node([
+        "-r", pkgPath,
+        "-r", "flow-remove-types/register",
+        path.resolve(testPath, "fixture/scenario/flow-remove-types/main.js")
+      ], envAuto)
+      .then(({ stdout }) => assert.ok(stdout.includes("flow-remove-types:true")))
+    )
+  })
 
   describe("should work with jest", () => {
     before(function () {

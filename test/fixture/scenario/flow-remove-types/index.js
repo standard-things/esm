@@ -1,5 +1,5 @@
 "use strict"
 
-require = require("../../../../")(module, { cjs:true, mode: "auto" })
+require = require("../../../../")(module)
 require("flow-remove-types/register")
 require("./main.js")

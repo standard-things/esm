@@ -1,4 +1,7 @@
 // @flow
-import test from "./test"
+import { log } from "console"
+import test from "./test.js"
 
-const x: number = test()
+const actual: boolean = test()
+
+log("babel-flow:" + actual)

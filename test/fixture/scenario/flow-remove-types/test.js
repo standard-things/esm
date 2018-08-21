@@ -1,4 +1,4 @@
 // @flow
-export function test(): string {
-  return "flow-remove-types"
+export default function test(): boolean {
+  return true
 }

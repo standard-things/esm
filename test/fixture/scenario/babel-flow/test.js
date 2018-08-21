@@ -1,4 +1,4 @@
 // @flow
-export default function foo(): number {
-  return 0
+export default function test(): boolean {
+  return true
 }
