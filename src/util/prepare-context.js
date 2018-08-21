@@ -3,7 +3,9 @@ import ENV from "../constant/env.js"
 import { Script } from "../safe/vm.js"
 
 import { deprecate } from "../safe/util.js"
+import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
+import instanceOf from "./instance-of.js"
 import isObjectLike from "./is-object-like.js"
 import keysAll from "./keys-all.js"
 import setProperty from "./set-property.js"
@@ -20,6 +22,7 @@ function init() {
     Array: true,
     BigInt: true,
     Boolean: true,
+    Function: true,
     Number: true,
     Object: true,
     RegExp: true,
@@ -137,14 +140,33 @@ function init() {
       if (name === "Error") {
         realmBuiltin.prepareStackTrace =
           (...args) => Reflect.apply(builtin.prepareStackTrace, builtin, args)
+      } else if (name === "Object") {
+        Reflect.defineProperty(builtin, Symbol.hasInstance, {
+          configurable: true,
+          enumerable: false,
+          value: (value) =>
+            value instanceof realmBuiltin ||
+            instanceOf(value, builtin),
+          writable: false
+        })
       }
 
-      if (typeof realmBuiltin === "function" &&
-          has(realmBuiltin, "prototype")) {
-        setPrototypeOf(realmBuiltin.prototype, builtin.prototype)
-      }
+      if (typeof realmBuiltin === "function") {
+        setPrototypeOf(realmBuiltin, getPrototypeOf(builtin))
 
-      setPrototypeOf(realmBuiltin, builtin)
+        if (has(realmBuiltin, "prototype")) {
+          const { prototype } = realmBuiltin
+          const builtinProto = builtin.prototype
+
+          if (isObjectLike(prototype)) {
+            if (has(builtinProto, "constructor")) {
+              prototype.constructor = builtinProto.constructor
+            }
+
+            setPrototypeOf(prototype, builtinProto)
+          }
+        }
+      }
     }
 
     return context
@@ -172,6 +194,8 @@ function init() {
       snippet += "1n.constructor"
     } else if (name === "Boolean") {
       snippet += "true.constructor"
+    } else if (name === "Function") {
+      snippet += "(function () {}).constructor"
     } else if (name === "Number") {
       snippet += "1..constructor"
     } else if (name === "Object") {
