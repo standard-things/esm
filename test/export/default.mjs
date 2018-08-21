@@ -1,3 +1,5 @@
+import hoisted, { declaration } from "../fixture/export/default/hoisted.mjs"
+
 import AnonymousClass from "../fixture/export/default/anonymous-class.mjs"
 import AnonymousClassParens from "../fixture/export/default/anonymous-class-parens.mjs"
 import NamedClass from "../fixture/export/default/class.mjs"
@@ -29,6 +31,7 @@ export default () => {
   assert.strictEqual(typeof AnonymousClass, "function")
   assert.strictEqual(typeof AnonymousClassParens, "function")
   assert.strictEqual(typeof NamedClass, "function")
+  assert.strictEqual(declaration, hoisted)
   assert.strictEqual(expression, 1)
   assert.strictEqual(identifier, 1)
   assert.strictEqual(typeof namedFunction, "function")

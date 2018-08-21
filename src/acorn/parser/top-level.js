@@ -49,7 +49,8 @@ function init() {
 
       let object = stmt
 
-      if (type === "ExportNamedDeclaration") {
+      if (type === "ExportDefaultDeclaration" ||
+          type === "ExportNamedDeclaration") {
         object = stmt.declaration
         type = object ? object.type : ""
       }
@@ -70,18 +71,25 @@ function init() {
           }
         }
       } else if (type === "ClassDeclaration") {
-        identifiers[object.id.name] = true
+        const { id } = object
+
+        if (id) {
+          identifiers[id.name] = true
+        }
       } else if (type === "FunctionDeclaration") {
         const { id } = object
-        const { name } = id
 
-        if (inModule &&
-            Reflect.has(identifiers, name)) {
-          raiseRedeclaration(this, id.start, name)
+        if (id) {
+          const { name } = id
+
+          if (inModule &&
+              Reflect.has(identifiers, name)) {
+            raiseRedeclaration(this, id.start, name)
+          }
+
+          funcs[name] =
+          identifiers[name] = true
         }
-
-        funcs[name] =
-        identifiers[name] = true
       } else if (type === "ImportDeclaration") {
         for (const { local } of object.specifiers) {
           const { name } = local
