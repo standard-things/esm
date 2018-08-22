@@ -15,6 +15,8 @@ const CJS_STRUCTURED_STACK_TRACE = error.stack
 Error.prepareStackTrace = prepareStackTrace
 Reflect.deleteProperty(String.prototype, "a")
 
+const object = {}
+
 module.exports = {
   CJS_BUFFER_PROP: global.Buffer,
   CJS_BUFFER_VAR: Buffer,
@@ -27,6 +29,9 @@ module.exports = {
   CJS_CLEAR_TIMEOUT_VAR: clearTimeout,
   CJS_JEST_GLOBAL_PROP: global.JEST_GLOBAL,
   CJS_JEST_GLOBAL_VAR: JEST_GLOBAL,
+  CJS_OBJECT_CONSTRUCTOR: object.constructor === Object,
+  CJS_OBJECT_CONSTRUCTOR_INSTANCE: Object instanceof Object,
+  CJS_OBJECT_LITERAL_INSTANCE: object instanceof Object,
   CJS_PROCESS_PROP: global.process,
   CJS_PROCESS_VAR: process,
   CJS_SET_IMMEDIATE_PROP: global.setImmediate,

@@ -17,7 +17,7 @@ function init() {
     CHAKRA
   } = ENV
 
-  const ctorBySyntax = {
+  const builtinByCtor = {
     __proto__: null,
     Array: true,
     BigInt: true,
@@ -86,7 +86,7 @@ function init() {
     }
 
     // For an unknown reason some `context` properties aren't accessible as
-    // free global variables unless they are deleted and reassigned.
+    // free global variables unless they're deleted and reassigned.
     for (const name of reassignableBuiltins) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
@@ -107,7 +107,7 @@ function init() {
       if (Reflect.has(context, name)) {
         builtinNames.push(name)
 
-        if (! Reflect.has(ctorBySyntax, name)) {
+        if (! Reflect.has(builtinByCtor, name)) {
           // Delete shadowed builtins to expose those of its realm.
           builtinDescriptors[name] = Reflect.getOwnPropertyDescriptor(context, name)
           Reflect.deleteProperty(context, name)
@@ -118,7 +118,7 @@ function init() {
     const realmBuiltins = new Script(
       "({" +
       builtinNames
-        .map(toRealmPropertySnippet)
+        .map(toBuiltinPropertySnippet)
         .join(",") +
       "})"
     ).runInContext(context)
@@ -185,7 +185,7 @@ function init() {
     }
   }
 
-  function toRealmPropertySnippet(name) {
+  function toBuiltinPropertySnippet(name) {
     let snippet = name + ":"
 
     if (name === "Array") {

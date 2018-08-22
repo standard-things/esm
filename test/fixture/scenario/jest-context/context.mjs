@@ -13,6 +13,8 @@ export const ESM_STRUCTURED_STACK_TRACE = error.stack
 Error.prepareStackTrace = prepareStackTrace
 Reflect.deleteProperty(String.prototype, "a")
 
+const object = {}
+
 export const ESM_BUFFER_PROP = global.Buffer
 export const ESM_BUFFER_VAR = Buffer
 export const ESM_CLEAR_IMMEDIATE_PROP = global.clearImmediate
@@ -23,6 +25,9 @@ export const ESM_CLEAR_TIMEOUT_PROP = global.clearTimeout
 export const ESM_CLEAR_TIMEOUT_VAR = clearTimeout
 export const ESM_JEST_GLOBAL_PROP = global.JEST_GLOBAL
 export const ESM_JEST_GLOBAL_VAR = JEST_GLOBAL
+export const ESM_OBJECT_CONSTRUCTOR = object.constructor === Object
+export const ESM_OBJECT_CONSTRUCTOR_INSTANCE = Object instanceof Object
+export const ESM_OBJECT_LITERAL_INSTANCE = object instanceof Object
 export const ESM_PROCESS_PROP = global.process
 export const ESM_PROCESS_VAR = process
 export const ESM_SET_IMMEDIATE_PROP = global.setImmediate
