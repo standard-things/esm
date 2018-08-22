@@ -6,7 +6,7 @@ import statSync from "../fs/stat-sync.js"
 function init() {
   const { round } = Math
 
-  function mtime(filename) {
+  function getMtime(filename) {
     if (typeof filename === "string") {
       try {
         const stat = statSync(filename)
@@ -23,9 +23,9 @@ function init() {
     return -1
   }
 
-  return mtime
+  return getMtime
 }
 
 export default shared.inited
-  ? shared.module.fsMtime
-  : shared.module.fsMtime = init()
+  ? shared.module.fsGetMtime
+  : shared.module.fsGetMtime = init()

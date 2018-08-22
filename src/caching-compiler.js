@@ -59,16 +59,18 @@ function init() {
       }
 
       const result = {
-        changed: !! meta[3],
+        changed: !! meta[5],
         code: null,
-        dependencySpecifiers: meta[4] || null,
+        dependencySpecifiers: meta[6] || null,
         enforceTDZ: noop,
-        exportedFrom: meta[5] || null,
-        exportedNames: meta[6] || null,
+        exportedFrom: meta[7] || null,
+        exportedNames: meta[8] || null,
         exportedSpecifiers: null,
-        exportedStars: meta[7] || null,
+        exportedStars: meta[9] || null,
+        filename: meta[2],
+        mtime: meta[3],
         scriptData: null,
-        sourceType: +meta[2] || SCRIPT,
+        sourceType: +meta[4] || SCRIPT,
         yieldIndex: -1
       }
 
@@ -77,7 +79,7 @@ function init() {
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
         result.exportedFrom = inflateExportedFrom(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
-        result.yieldIndex = +meta[8] || -1
+        result.yieldIndex = +meta[10] || -1
       } else {
         entry.type = TYPE_CJS
       }
@@ -117,6 +119,8 @@ function init() {
     entry.compileData =
     entry.package.cache.compile[entry.cacheName] = result
 
+    result.filename = entry.filename
+    result.mtime = entry.mtime
     return result
   }
 
@@ -310,18 +314,27 @@ function init() {
         const compileData = compileDatas[cacheName]
 
         if (compileData) {
+          const {
+            filename,
+            mtime,
+            sourceType
+          } = compileData
+
           const changed = +compileData.changed
-          const { sourceType } = compileData
 
           if (sourceType === SCRIPT) {
             if (changed) {
               meta.push(
+                filename,
+                mtime,
                 sourceType,
                 changed
               )
             }
           } else {
             meta.push(
+              filename,
+              mtime,
               sourceType,
               changed,
               deflateDependencySpecifiers(compileData),

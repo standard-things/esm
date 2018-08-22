@@ -74,7 +74,7 @@ class Entry {
     this.bindings = { __proto__: null }
     // The builtin module indicator.
     this.builtin = false
-    // The cache file name of the module.
+    // The cache name of the module.
     this.cacheName = null
     // The child entries of the module.
     this.children = { __proto__: null }
@@ -104,6 +104,8 @@ class Entry {
     this.id = mod.id
     // The module the entry is managing.
     this.module = mod
+    // The mtime of the module.
+    this.mtime = -1
     // The name of the module.
     this.name = null
     // The package data of the module.

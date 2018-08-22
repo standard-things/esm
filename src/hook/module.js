@@ -18,13 +18,13 @@ import get from "../util/get.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
+import getMtime from "../fs/get-mtime.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
-import mtime from "../fs/mtime.js"
 import readFile from "../fs/read-file.js"
 import readFileFast from "../fs/read-file-fast.js"
 import relaxRange from "../util/relax-range.js"
@@ -118,11 +118,16 @@ function hook(Mod, parent) {
     const { cache, cachePath } = pkg
     const { _compile } = mod
 
-    let { cacheName } = entry
+    let { cacheName, mtime } = entry
+
+    if (mtime === -1) {
+      mtime =
+      entry.mtime = getMtime(filename)
+    }
 
     if (! cacheName) {
       cacheName =
-      entry.cacheName = getCacheName(entry, mtime(filename))
+      entry.cacheName = getCacheName(entry, mtime)
     }
 
     const compileFallback = () => {
