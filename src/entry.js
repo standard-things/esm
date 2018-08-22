@@ -114,7 +114,7 @@ class Entry {
     this.runtimeName = null
     // Setters for assigning to local variables in parent modules.
     this.setters = { __proto__: null }
-    // Initialize empty namespace setter so they are merged properly.
+    // Initialize empty namespace setter so they're merged properly.
     this.setters["*"] = []
     // The state of the module.
     this.state = STATE_INITIAL
