@@ -1,3 +1,4 @@
-import { log } from "console"
+"use strict"
 
-log("pm2:true")
+require = require("../../../../")(module)
+require("./main.js")

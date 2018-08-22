@@ -246,14 +246,14 @@ describe("scenario tests", function () {
   )
 
   describe("should work with babel plugins", () => {
-    it("should work from the bridge", () =>
+    it("should work from the `esm` bridge", () =>
       node([
         path.resolve(testPath, "fixture/scenario/babel-flow")
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
     )
 
-    it("should work from the CLI", () =>
+    it("should work from the Node CLI", () =>
       node([
         "-r", pkgPath,
         "-r", "@babel/register",
@@ -264,14 +264,14 @@ describe("scenario tests", function () {
   })
 
   describe("should work with flow-remove-types", () => {
-    it("should work from the bridge",  () =>
+    it("should work from the `esm` bridge",  () =>
       node([
         path.resolve(testPath, "fixture/scenario/flow-remove-types")
       ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("flow-remove-types:true")))
     )
 
-    it("should work from the CLI", () =>
+    it("should work from the Node CLI", () =>
       node([
         "-r", pkgPath,
         "-r", "flow-remove-types/register",
@@ -449,13 +449,9 @@ describe("scenario tests", function () {
       })
     }
 
-    it("should work with pm2 and require flag", () => {
-      const nodeArgs = defaultNodeArgs.concat(
-        "-r", pkgPath
-      )
-
+    it("should work from the `esm` bridge", () => {
       const pm2Args = defaultPM2Args.concat(
-        "--node-args", nodeArgs.join(" "),
+        "--node-args", defaultNodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2")
       )
 
@@ -467,10 +463,14 @@ describe("scenario tests", function () {
         })
     })
 
-    it("should work with pm2 and bridge mode", () => {
+    it("should work from the Node CLI", () => {
+      const nodeArgs = defaultNodeArgs.concat(
+        "-r", pkgPath
+      )
+
       const pm2Args = defaultPM2Args.concat(
-        "--node-args", defaultNodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2/bridge.js")
+        "--node-args", nodeArgs.join(" "),
+        path.resolve(testPath, "fixture/scenario/pm2/main.js")
       )
 
       return exec("pm2", pm2Args)
@@ -481,14 +481,9 @@ describe("scenario tests", function () {
         })
     })
 
-    it("should work with pm2 and babel/register and require flag", () => {
-      const nodeArgs = defaultNodeArgs.concat(
-        "-r", pkgPath,
-        "-r", "@babel/register"
-      )
-
+    it("should work with babel/register from the `esm` bridge", () => {
       const pm2Args = defaultPM2Args.concat(
-        "--node-args", nodeArgs.join(" "),
+        "--node-args", defaultNodeArgs.join(" "),
         path.resolve(testPath, "fixture/scenario/pm2-babel")
       )
 
@@ -500,10 +495,15 @@ describe("scenario tests", function () {
         })
     })
 
-    it("should work with pm2 and babel/register with bridge mode", () => {
+    it("should work with babel/register from the Node CLI", () => {
+      const nodeArgs = defaultNodeArgs.concat(
+        "-r", pkgPath,
+        "-r", "@babel/register"
+      )
+
       const pm2Args = defaultPM2Args.concat(
-        "--node-args", defaultNodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2-babel/bridge.js")
+        "--node-args", nodeArgs.join(" "),
+        path.resolve(testPath, "fixture/scenario/pm2-babel/main.js")
       )
 
       return exec("pm2", pm2Args)

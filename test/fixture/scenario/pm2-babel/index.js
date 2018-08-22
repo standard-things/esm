@@ -1,7 +1,5 @@
-import { log } from "console"
+"use strict"
 
-class Console {
-  static log = log
-}
-
-Console.log("pm2-babel:true")
+require = require("../../../../")(module)
+require("@babel/register")
+require("./main.js")
