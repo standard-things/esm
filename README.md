@@ -3,8 +3,7 @@
 A fast, production ready, zero-dependency ES module loader for Node 6+!
 
 See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
-:book: and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) :movie_camera:
-for all the details.
+and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) for all the details.
 
 Install
 ---
@@ -203,7 +202,7 @@ DevOpts
 Tips
 ---
 
-### :package: Bundling
+### Bundling
 
 * Add a “module” field to `package.json` with the path to the main ES module.
 
@@ -211,12 +210,12 @@ Tips
 
 * Use [`esmify`](https://github.com/mattdesl/esmify) with [`browserify`](http://browserify.org/).
 
-### :wrench: Extensions
+### Extensions
 
 * Enable ESM syntax for [`wallaby.js`](https://wallabyjs.com/) following their
   [integration example](https://wallabyjs.com/docs/integration/node.html#es-modules).
 
-### :truck: Loading
+### Loading
 
 * The [`jasmine`](https://jasmine.github.io/) test runner does not have a
   mechanism to load `esm`. However, `esm` can load a bootstrap file that
@@ -242,7 +241,7 @@ Tips
   [`tape`](https://github.com/substack/tape#preloading-modules), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options).
 
-  :reminder_ribbon: When using a package’s “require” option remember that,
+  :bulb: When using a package’s “require” option remember that,
   per Node’s rules, the builtin `require` function cannot sideload `.mjs` files.
   However, with `esm`, ES modules can be sideloaded as `.js` files or `.mjs`
   files can be loaded with dynamic `import`.
