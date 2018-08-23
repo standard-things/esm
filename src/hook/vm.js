@@ -95,6 +95,7 @@ function hook(vm) {
 
     if (entry.type === TYPE_ESM) {
       tryValidate(manager, entry, content)
+      entry.initNamespace()
     }
 
     entry.state = STATE_EXECUTION_STARTED

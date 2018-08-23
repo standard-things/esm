@@ -95,7 +95,6 @@ function compile(caller, entry, content, filename, fallback) {
   if (parsing) {
     const defaultPkg = Package.state.default
     const isESM = entry.type === TYPE_ESM
-
     const parentEntry = entry.parent
     const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
     const parentPkg = parentEntry && parentEntry.package
@@ -110,9 +109,9 @@ function compile(caller, entry, content, filename, fallback) {
     if (isESM &&
         entry.state === STATE_PARSING_STARTED) {
       tryValidate(caller, entry, content, filename)
+      entry.initNamespace()
     }
   } else {
-    entry.state = STATE_EXECUTION_STARTED
     return tryCompileCached(entry, content, filename)
   }
 }
@@ -124,6 +123,8 @@ function tryCompileCached(entry, content, filename) {
   let error
   let result
   let threw = false
+
+  entry.state = STATE_EXECUTION_STARTED
 
   try {
     result = tryCompile(entry, filename)

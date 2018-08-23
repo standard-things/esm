@@ -19,21 +19,9 @@ function validate(entry) {
   resolveExportedStars(entry)
   validateDependencies(entry)
 
-  const { _namespace, compileData } = entry
-
   if (isDescendant(entry, entry)) {
-    compileData.enforceTDZ()
+    entry.compileData.enforceTDZ()
   }
-
-  const { exportedSpecifiers } = compileData
-
-  for (const exportedName in exportedSpecifiers) {
-    if (exportedSpecifiers[exportedName]) {
-      _namespace[exportedName] = void 0
-    }
-  }
-
-  entry.initNamespace()
 }
 
 function isDescendant(sourceEntry, searchEntry, seen) {

@@ -346,6 +346,18 @@ class Entry {
   initNamespace() {
     this.initNamespace = noop
 
+    if (this.type === TYPE_ESM) {
+      const { _namespace } = this
+      const { exportedSpecifiers } = this.compileData
+
+      for (const exportedName in exportedSpecifiers) {
+        if (exportedSpecifiers[exportedName] &&
+            ! Reflect.has(_namespace, exportedName)) {
+          _namespace[exportedName] = void 0
+        }
+      }
+    }
+
     setDeferred(this, "cjsMutableNamespace", function () {
       return createMutableNamespaceProxy(
         this,
