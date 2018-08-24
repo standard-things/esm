@@ -24,7 +24,7 @@ function runMainLoader(filename) {
 
 describe("test builtin modules", function () {
   it("should inspect values with `console.log`", function () {
-    const dirPath = path.resolve(testPath, "fixture/builtin-modules/console")
+    const dirPath = path.resolve("fixture/builtin-modules/console")
 
     return Promise.all([
       runMainBuiltin(dirPath),

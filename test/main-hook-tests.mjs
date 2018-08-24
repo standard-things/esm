@@ -79,7 +79,7 @@ describe("main hook tests", function () {
   )
 
   it("should support `ESM_OPTIONS` environment variable with `options.cache`", () => {
-    const execPath = path.resolve(testPath, "fixture/options/env-cache")
+    const execPath = path.resolve("fixture/options/env-cache")
     const cachePath = path.resolve(execPath, ".cache")
 
     return trash(cachePath)

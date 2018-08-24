@@ -11,8 +11,8 @@ const isWin = process.platform === "win32"
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
+const nodePath = path.resolve("env/prefix", isWin ? "node.exe" : "bin/node")
 const testPath = path.resolve(".")
-const nodePath = path.resolve(testPath, "env/prefix", isWin ? "node.exe" : "bin/node")
 
 const canTestJest = Reflect.has(process.versions, "v8")
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
@@ -51,7 +51,7 @@ describe("scenario tests", function () {
         .then(() =>
           node([
             "-r", pkgPath,
-            path.resolve(testPath, "fixture/scenario/dual", basename)
+            path.resolve("fixture/scenario/dual", basename)
           ])
         )
     , Promise.resolve())
@@ -59,7 +59,7 @@ describe("scenario tests", function () {
 
   it("should work with ava", () =>
     exec("ava", [
-      path.resolve(testPath, "fixture/scenario/ava/test.js")
+      path.resolve("fixture/scenario/ava/test.js")
     ], envAuto)
   )
 
@@ -67,7 +67,7 @@ describe("scenario tests", function () {
     node([
       "-r", pkgPath,
       "-r", "@babel/register",
-      path.resolve(testPath, "fixture/scenario/babel-error")
+      path.resolve("fixture/scenario/babel-error")
     ])
     .then(() => assert.ok(false))
     .catch(({ stderr }) => {
@@ -77,54 +77,54 @@ describe("scenario tests", function () {
 
   it("should work with esmod-pmb", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/esmod-pmb/test.node.js")
+      path.resolve("fixture/scenario/esmod-pmb/test.node.js")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("esmod-pmb:true")))
   )
 
   it("should work with express", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/express")
+      path.resolve("fixture/scenario/express")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
   )
 
   it("should work with global-prefix", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/global-prefix")
+      path.resolve("fixture/scenario/global-prefix")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
 
   it("should work with module-alias", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/module-alias")
+      path.resolve("fixture/scenario/module-alias")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("module-alias:true")))
   )
 
   it("should work with native modules", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/native")
+      path.resolve("fixture/scenario/native")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
   )
 
   it("should work with newrelic", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/newrelic")
+    const dirPath = path.resolve("fixture/scenario/newrelic")
     const cwdPath = path.resolve(dirPath, "cwd.js")
 
     return node([
       "-r", pkgPath,
       "-r", cwdPath,
       "-r", "newrelic",
-      path.resolve(testPath, dirPath)
+      dirPath
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("newrelic:true")))
   })
 
   it("should work with nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/nyc")
+    const dirPath = path.resolve("fixture/scenario/nyc")
 
     return exec("nyc", [
       "--cwd", dirPath,
@@ -135,7 +135,7 @@ describe("scenario tests", function () {
 
   it("should work with postcss", () =>
     node([
-      path.resolve(testPath, "fixture/scenario/postcss")
+      path.resolve("fixture/scenario/postcss")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
@@ -144,7 +144,7 @@ describe("scenario tests", function () {
     node([
       "-r", pkgPath,
       "-r", "sqreen",
-      path.resolve(testPath, "fixture/scenario/sqreen")
+      path.resolve("fixture/scenario/sqreen")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
   )
@@ -159,14 +159,14 @@ describe("scenario tests", function () {
         node([
           "-r", pkgPath,
           "-r", request,
-          path.resolve(testPath, "fixture/scenario/ts-node/index.ts")
+          path.resolve("fixture/scenario/ts-node/index.ts")
         ], envAuto)
         .then(({ stdout }) => assert.ok(stdout.includes("ts-node:true")))
       ))
   )
 
   it("should work with ava and nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc")
+    const dirPath = path.resolve("fixture/scenario/ava-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
@@ -178,7 +178,7 @@ describe("scenario tests", function () {
   })
 
   it("should work with ava, nyc, and tsc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/ava-nyc-tsc")
+    const dirPath = path.resolve("fixture/scenario/ava-nyc-tsc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const avaPattern = path.resolve(dirPath, "test.js")
 
@@ -194,7 +194,7 @@ describe("scenario tests", function () {
   })
 
   it("should work with babel, mocha, and nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/babel-mocha-nyc")
+    const dirPath = path.resolve("fixture/scenario/babel-mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const mochaPattern = path.resolve(dirPath, "test.js")
 
@@ -210,7 +210,7 @@ describe("scenario tests", function () {
   })
 
   it("should work with chai, mocha, and nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/chai-mocha-nyc")
+    const dirPath = path.resolve("fixture/scenario/chai-mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const mochaPattern = path.resolve(dirPath, "test.js")
 
@@ -224,7 +224,7 @@ describe("scenario tests", function () {
   })
 
   it("should work with mocha and nyc", () => {
-    const dirPath = path.resolve(testPath, "fixture/scenario/mocha-nyc")
+    const dirPath = path.resolve("fixture/scenario/mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
     const mochaPattern = path.resolve(dirPath, "test.js")
 
@@ -241,14 +241,14 @@ describe("scenario tests", function () {
   it("should work with mock-require and require-inject", () =>
     node([
       "-r", pkgPath,
-      path.resolve(testPath, "fixture/scenario/mock-require-inject")
+      path.resolve("fixture/scenario/mock-require-inject")
     ], envAuto)
   )
 
   describe("should work with babel plugins", () => {
     it("should work from the `esm` bridge", () =>
       node([
-        path.resolve(testPath, "fixture/scenario/babel-flow")
+        path.resolve("fixture/scenario/babel-flow")
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
     )
@@ -257,7 +257,7 @@ describe("scenario tests", function () {
       node([
         "-r", pkgPath,
         "-r", "@babel/register",
-        path.resolve(testPath, "fixture/scenario/babel-flow")
+        path.resolve("fixture/scenario/babel-flow")
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
     )
@@ -266,7 +266,7 @@ describe("scenario tests", function () {
   describe("should work with flow-remove-types", () => {
     it("should work from the `esm` bridge",  () =>
       node([
-        path.resolve(testPath, "fixture/scenario/flow-remove-types")
+        path.resolve("fixture/scenario/flow-remove-types")
       ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("flow-remove-types:true")))
     )
@@ -275,7 +275,7 @@ describe("scenario tests", function () {
       node([
         "-r", pkgPath,
         "-r", "flow-remove-types/register",
-        path.resolve(testPath, "fixture/scenario/flow-remove-types/main.js")
+        path.resolve("fixture/scenario/flow-remove-types/main.js")
       ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("flow-remove-types:true")))
     )
@@ -289,7 +289,7 @@ describe("scenario tests", function () {
     })
 
     it("should carry over the context object of jest", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-context")
+      const dirPath = path.resolve("fixture/scenario/jest-context")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -300,7 +300,7 @@ describe("scenario tests", function () {
     })
 
     it("should carry over the process object of jest", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-process")
+      const dirPath = path.resolve("fixture/scenario/jest-process")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -311,7 +311,7 @@ describe("scenario tests", function () {
     })
 
     it("should carry over globals from `jest.config.json`", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-config-globals")
+      const dirPath = path.resolve("fixture/scenario/jest-config-globals")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -322,7 +322,7 @@ describe("scenario tests", function () {
     })
 
     it("should use an empty module cache with jest", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-module-cache")
+      const dirPath = path.resolve("fixture/scenario/jest-module-cache")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -333,7 +333,7 @@ describe("scenario tests", function () {
     })
 
     it("should work with jest subclassed console", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-console")
+      const dirPath = path.resolve("fixture/scenario/jest-console")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -345,7 +345,7 @@ describe("scenario tests", function () {
     })
 
     it("should work with jest and mock-require", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-mock-require")
+      const dirPath = path.resolve("fixture/scenario/jest-mock-require")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -356,7 +356,7 @@ describe("scenario tests", function () {
     })
 
     it("should error with jest and circular dependencies", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/jest-cycle")
+      const dirPath = path.resolve("fixture/scenario/jest-cycle")
       const configPath = path.resolve(dirPath, "jest.config.json")
 
       return node([
@@ -375,7 +375,7 @@ describe("scenario tests", function () {
     })
 
     it("should work with lab", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/lab")
+      const dirPath = path.resolve("fixture/scenario/lab")
       const labPattern = path.resolve(dirPath, "test.js")
 
       return node([
@@ -386,7 +386,7 @@ describe("scenario tests", function () {
     })
 
     it("should work with lab and @babel/register", function () {
-      const dirPath = path.resolve(testPath, "fixture/scenario/lab-babel")
+      const dirPath = path.resolve("fixture/scenario/lab-babel")
       const labPattern = path.resolve(dirPath, "test.js")
 
       return node([
@@ -416,7 +416,7 @@ describe("scenario tests", function () {
 
     const maxWait = 4000
 
-    const logsPath = path.resolve(testPath, "env/home/.pm2/logs")
+    const logsPath = path.resolve("env/home/.pm2/logs")
     const stderrPath = path.resolve(logsPath, "pm2-error.log")
     const stdoutPath = path.resolve(logsPath, "pm2-out.log")
 
@@ -452,7 +452,7 @@ describe("scenario tests", function () {
     it("should work from the `esm` bridge", () => {
       const pm2Args = defaultPM2Args.concat(
         "--node-args", defaultNodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2")
+        path.resolve("fixture/scenario/pm2")
       )
 
       return exec("pm2", pm2Args)
@@ -470,7 +470,7 @@ describe("scenario tests", function () {
 
       const pm2Args = defaultPM2Args.concat(
         "--node-args", nodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2/main.js")
+        path.resolve("fixture/scenario/pm2/main.js")
       )
 
       return exec("pm2", pm2Args)
@@ -484,7 +484,7 @@ describe("scenario tests", function () {
     it("should work with babel/register from the `esm` bridge", () => {
       const pm2Args = defaultPM2Args.concat(
         "--node-args", defaultNodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2-babel")
+        path.resolve("fixture/scenario/pm2-babel")
       )
 
       return exec("pm2", pm2Args)
@@ -503,7 +503,7 @@ describe("scenario tests", function () {
 
       const pm2Args = defaultPM2Args.concat(
         "--node-args", nodeArgs.join(" "),
-        path.resolve(testPath, "fixture/scenario/pm2-babel/main.js")
+        path.resolve("fixture/scenario/pm2-babel/main.js")
       )
 
       return exec("pm2", pm2Args)
