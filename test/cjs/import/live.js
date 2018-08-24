@@ -279,13 +279,19 @@ export default () => {
   objects = [accessor1, accessor2, accessor3]
 
   assert.deepStrictEqual([a, b], [void 0, void 0])
-  objects.forEach(({ a, b }) => assert.deepStrictEqual([a, b], [void 0, void 0]))
+
+  objects.forEach(({ a, b }) => {
+    assert.deepStrictEqual([a, b], [void 0, void 0])
+  })
 
   accessor1.a = "b"
 
   assert.strictEqual(Reflect.has(Object.prototype, "a"), false)
   assert.deepStrictEqual([a, b], [void 0, "b"])
-  objects.forEach(({ a, b }) => assert.deepStrictEqual([a, b], [void 0, "b"]))
+
+  objects.forEach(({ a, b }) => {
+    assert.deepStrictEqual([a, b], [void 0, "b"])
+  })
 
   let count = 0
 

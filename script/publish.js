@@ -46,11 +46,16 @@ function cleanJS() {
 function cleanPackageJSON() {
   const content = fs.readFileSync(pkgPath, "utf8")
 
-  process.once("exit", () => fs.outputFileSync(pkgPath, content))
+  process.once("exit", () => {
+    fs.outputFileSync(pkgPath, content)
+  })
 
   const pkgJSON = JSON.parse(content)
 
-  fieldsToRemove.forEach((field) => Reflect.deleteProperty(pkgJSON, field))
+  fieldsToRemove.forEach((field) => {
+    Reflect.deleteProperty(pkgJSON, field)
+  })
+
   pkgJSON.scripts = defaultScripts
   fs.outputFileSync(pkgPath, fleece.patch(content, pkgJSON))
 }
