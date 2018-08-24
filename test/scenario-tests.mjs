@@ -405,8 +405,12 @@ describe("scenario tests", function () {
       }
     })
 
-    beforeEach(cleanup)
-    afterEach(cleanup)
+    beforeEach(beforeAndAfterEach)
+    afterEach(beforeAndAfterEach)
+
+    const logsPath = path.resolve("env/home/.pm2/logs")
+    const stderrPath = path.resolve(logsPath, "pm2-error.log")
+    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
 
     const defaultPM2Args = [
       "start",
@@ -416,9 +420,13 @@ describe("scenario tests", function () {
 
     const maxWait = 4000
 
-    const logsPath = path.resolve("env/home/.pm2/logs")
-    const stderrPath = path.resolve(logsPath, "pm2-error.log")
-    const stdoutPath = path.resolve(logsPath, "pm2-out.log")
+    function beforeAndAfterEach() {
+      if (! canTestPM2) {
+        this.skip()
+      }
+
+      return cleanup()
+    }
 
     function cleanup() {
       return exec("pm2", ["kill"])
