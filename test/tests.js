@@ -1,6 +1,7 @@
 import path from "path"
 import require from "./require.js"
 
+import "./cache-tests.js"
 import "./compiler-tests.mjs"
 import "./builtin-modules.mjs"
 import "./dynamic-import-tests.mjs"
@@ -18,7 +19,6 @@ import "./cli-hook-tests.mjs"
 import "./main-hook-tests.mjs"
 import "./require-hook-tests.js"
 import "./repl-hook-tests.mjs"
-import "./cache-tests.js"
 import "./scenario-tests.mjs"
 
 const extensions = Object.assign({}, require.extensions)

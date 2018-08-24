@@ -678,7 +678,7 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should respect modified `require.extensions` in CJS", () => {
+    it("should support modified `require.extensions` in CJS", () => {
       require.extensions[".mjs"] = () => ({})
 
       Reflect.deleteProperty(require.cache, abcPath)
@@ -692,7 +692,7 @@ describe("miscellaneous tests", () => {
       assert.throws(() => require(abcPath), SyntaxError)
     })
 
-    it("should not respect modified `require.extensions` in ESM", () => {
+    it("should not support modified `require.extensions` in ESM", () => {
       const filename = path.resolve("../package.json")
 
       require.extensions[".json"] = () => ({})
@@ -703,7 +703,7 @@ describe("miscellaneous tests", () => {
         .then((ns) => assert.deepStrictEqual(ns.default, pkgJSON))
     })
 
-    it("should not respect new `require.extensions` in ESM", () => {
+    it("should not support new `require.extensions` in ESM", () => {
       const filename = path.resolve("./fixture/cof")
 
       require.extensions[".coffee"] = require.extensions[".js"]
@@ -900,7 +900,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `module.parent`", () =>
-      import("./fixture/parent/off/parent.js")
+      import("./fixture/options/cjs-cache/parent/off/parent.js")
         .then(({ child, parent }) => {
           assert.ok(parent.parent)
           assert.ok(Reflect.has(child, "parent"))
@@ -909,7 +909,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
-      import("./fixture/parent/on/parent.js")
+      import("./fixture/options/cjs-cache/parent/on/parent.js")
         .then(({ child, parent }) => {
           assert.ok(parent.parent)
           assert.ok(child.parent)
@@ -917,7 +917,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () =>
-      import("./fixture/parent/on/parent.mjs")
+      import("./fixture/options/cjs-cache/parent/on/parent.mjs")
         .then(({ child }) => {
           assert.ok(Reflect.has(child, "parent"))
           assert.strictEqual(typeof child.parent, "undefined")
@@ -925,7 +925,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `require.cache`", () => {
-      const filename = path.resolve("fixture/cache/out/index.js")
+      const filename = path.resolve("fixture/options/cjs-cache/require/out/index.js")
 
       Reflect.deleteProperty(require.cache, filename)
 
@@ -934,7 +934,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should expose ESM in `require.cache` with `options.cjs.cache`", () => {
-      const filename = path.resolve("fixture/cache/in/index.js")
+      const filename = path.resolve("fixture/options/cjs-cache/require/in/index.js")
 
       Reflect.deleteProperty(require.cache, filename)
 
