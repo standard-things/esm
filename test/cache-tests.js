@@ -4,7 +4,9 @@ import fs from "fs-extra"
 import path from "path"
 import process from "process"
 
-const canRunCacheTest = process.env.ESM_ENV.includes("-cached")
+const canTestCache =
+  process.env.ESM_ENV.includes("-cached") &&
+  ! Reflect.has(process.env, "APPVEYOR")
 
 const fixtureCacheFiles = [
   ".data.blob",
@@ -65,7 +67,7 @@ describe("cache tests", function () {
   this.timeout(0)
 
   before(function () {
-    if (! canRunCacheTest) {
+    if (! canTestCache) {
       this.skip()
     }
 
@@ -73,7 +75,7 @@ describe("cache tests", function () {
   })
 
   beforeEach(function () {
-    if (! canRunCacheTest) {
+    if (! canTestCache) {
       this.skip()
     }
 
@@ -82,7 +84,7 @@ describe("cache tests", function () {
   })
 
   after(function () {
-    if (! canRunCacheTest) {
+    if (! canTestCache) {
       this.skip()
     }
 
