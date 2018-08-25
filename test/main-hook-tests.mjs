@@ -1,4 +1,3 @@
-import JSON6 from "json-6"
 import SemVer from "semver"
 
 import assert from "assert"
