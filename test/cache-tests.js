@@ -3,6 +3,7 @@ import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
 import process from "process"
+import trash from "../script/trash.js"
 
 const canTestCache =
   process.env.ESM_ENV.includes("-cached") &&
@@ -79,8 +80,10 @@ describe("cache tests", function () {
       this.skip()
     }
 
-    fs.removeSync(loaderCachePath)
-    fs.removeSync(fixtureCachePath)
+    trash([
+      loaderCachePath,
+      fixtureCachePath
+    ])
   })
 
   after(function () {
