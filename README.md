@@ -241,6 +241,6 @@ Tips
   [`tape`](https://github.com/substack/tape#preloading-modules), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options).
 
-  :bulb: By Node’s rules, the builtin `require` function cannot sideload `.mjs`
-  files. However, with `esm`, ES modules can be sideloaded as `.js` files or
-  `.mjs` files may be loaded with dynamic `import`.
+  :bulb: By Node’s rules, builtin `require` cannot sideload `.mjs` files.
+  However, with `esm`, ES modules can be sideloaded as `.js` files or `.mjs`
+  files may be loaded with dynamic `import`.
