@@ -54,7 +54,7 @@
     "eslint": "^5.4.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-node": "^7.0.1",
-    "execa": "^0.11.0",
+    "execa": "^1.0.0",
     "express": "^4.16.3",
     "flow-remove-types": "^1.2.3",
     "fs-extra": "^7.0.0",
