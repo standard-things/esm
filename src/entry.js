@@ -271,8 +271,8 @@ class Entry {
     const { getters } = this
     const otherGetters = otherEntry.getters
 
-    assignExportsToNamespace(this)
-    assignExportsToNamespace(otherEntry)
+    this.assignExportsToNamespace()
+    otherEntry.assignExportsToNamespace()
 
     for (const key in otherEntry._namespace) {
       if (key === "default") {
@@ -341,6 +341,42 @@ class Entry {
     }
 
     return this
+  }
+
+  assignExportsToNamespace(names) {
+    const exported = this.exports
+    const { getters } = this
+    const isLoaded = this._loaded === LOAD_COMPLETED
+
+    if (! isLoaded &&
+        exported &&
+        exported.__esModule &&
+        this.package.options.cjs.interop) {
+      this.type = TYPE_PSEUDO
+    }
+
+    const isCJS = this.type === TYPE_CJS
+
+    if (isCJS &&
+        ! Reflect.has(getters, "default")) {
+      this.addGetter("default", () => this.namespace.default)
+    }
+
+    if (! isObjectLike(exported)) {
+      return
+    }
+
+    if (! names) {
+      names = keys(isLoaded ? this._namespace : exported)
+    }
+
+    for (const name of names) {
+      if (! (isCJS &&
+             name === "default") &&
+          ! Reflect.has(getters, name)) {
+        this.addGetter(name, () => this.namespace[name])
+      }
+    }
   }
 
   initNamespace() {
@@ -449,7 +485,7 @@ class Entry {
       }
 
       this.exports = newExported
-      assignExportsToNamespace(this)
+      this.assignExportsToNamespace()
     }
 
     Reflect.deleteProperty(shared.entry.skipExports, this.name)
@@ -565,42 +601,6 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
   handler.has = (target, name) => {
     return name === shared.symbol.namespace ||
       Reflect.has(source.namespace, name)
-  }
-}
-
-function assignExportsToNamespace(entry, names) {
-  const exported = entry.exports
-  const { getters } = entry
-  const isLoaded = entry._loaded === LOAD_COMPLETED
-
-  if (! isLoaded &&
-      exported &&
-      exported.__esModule &&
-      entry.package.options.cjs.interop) {
-    entry.type = TYPE_PSEUDO
-  }
-
-  const isCJS = entry.type === TYPE_CJS
-
-  if (isCJS &&
-      ! Reflect.has(getters, "default")) {
-    entry.addGetter("default", () => entry.namespace.default)
-  }
-
-  if (! isObjectLike(exported)) {
-    return
-  }
-
-  if (! names) {
-    names = keys(isLoaded ? entry._namespace : exported)
-  }
-
-  for (const name of names) {
-    if (! (isCJS &&
-           name === "default") &&
-        ! Reflect.has(getters, name)) {
-      entry.addGetter(name, () => entry.namespace[name])
-    }
   }
 }
 
@@ -969,7 +969,7 @@ function runGetters(entry, names) {
       }
     }
   } else {
-    assignExportsToNamespace(entry, names)
+    entry.assignExportsToNamespace(names)
   }
 }
 
