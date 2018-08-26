@@ -6,6 +6,7 @@ const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const trash = require("./trash.js")
 const uglify = require("uglify-es").minify
+const bootstrapTest262 = require("./test262/bootstrap.js")
 
 const argv = require("yargs")
   .boolean("prod")
@@ -114,5 +115,6 @@ Promise
     cleanRepo(),
     setupNode()
   ])
+  .then(bootstrapTest262)
   .then(() => runTests())
   .then(() => runTests(true))
