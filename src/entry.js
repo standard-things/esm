@@ -257,6 +257,20 @@ class Entry {
     return this
   }
 
+  addGetterFrom(otherEntry, importedName, exportedName) {
+    const { getters } = this
+    const otherGetters = otherEntry.getters
+
+    const getter = getters[exportedName]
+    const otherGetter = otherGetters[importedName]
+
+    if (typeof getter !== "function" &&
+        typeof otherGetter === "function") {
+      this.addGetter(exportedName, otherGetter)
+      runGetter(this, exportedName)
+    }
+  }
+
   addGettersFrom(otherEntry) {
     const otherType = otherEntry.type
 
