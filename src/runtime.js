@@ -46,12 +46,12 @@ const Runtime = {
     })
   },
 
-  assertTDZ(name, value) {
+  assertBinding(name, value) {
     if (this.entry.bindings[name]) {
       return value
     }
 
-    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertTDZ)
+    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertBinding)
   },
 
   compileEval(content) {
@@ -126,7 +126,7 @@ const Runtime = {
     runtime.addDefaultValue = Runtime.addDefaultValue
     runtime.addExportGetters = Runtime.addExportGetters
     runtime.addNamespaceSetter = Runtime.addNamespaceSetter
-    runtime.assertTDZ = Runtime.assertTDZ
+    runtime.assertBinding = Runtime.assertBinding
     runtime.compileEval = boundCompileEval
     runtime.compileGlobalEval = Runtime.compileGlobalEval
     runtime.entry = entry
@@ -140,7 +140,7 @@ const Runtime = {
     runtime.updateBindings = Runtime.updateBindings
 
     runtime._ = runtime
-    runtime.a = runtime.assertTDZ
+    runtime.a = runtime.assertBinding
     runtime.b = runtime.throwConstAssignment
     runtime.c = runtime.compileEval
     runtime.d = runtime.addDefaultValue
