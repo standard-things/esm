@@ -257,7 +257,7 @@ class Entry {
     return this
   }
 
-  addGetterFrom(otherEntry, importedName, exportedName) {
+  addGetterFrom(otherEntry, importedName, exportedName = importedName) {
     const { getters } = this
     const otherGetters = otherEntry.getters
 
@@ -288,21 +288,15 @@ class Entry {
     this.assignExportsToNamespace()
     otherEntry.assignExportsToNamespace()
 
-    for (const key in otherEntry._namespace) {
-      if (key === "default") {
+    for (const name in otherEntry._namespace) {
+      if (name === "default") {
         continue
       }
 
-      let getter = getters[key]
+      this.addGetterFrom(otherEntry, name)
 
-      const otherGetter = otherGetters[key]
-
-      if (typeof getter !== "function" &&
-          typeof otherGetter === "function") {
-        getter = otherGetter
-        this.addGetter(key, getter)
-        runGetter(this, key)
-      }
+      const getter = getters[name]
+      const otherGetter = otherGetters[name]
 
       if (this.type === TYPE_ESM ||
           typeof getter !== "function" ||
@@ -314,7 +308,7 @@ class Entry {
 
       if (ownerName !== this.name &&
           ownerName !== otherGetter.owner.name) {
-        this.addGetter(key, () => STAR_ERROR)
+        this.addGetter(name, () => STAR_ERROR)
       }
     }
 
