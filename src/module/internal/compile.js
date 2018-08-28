@@ -22,6 +22,7 @@ import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import readFile from "../../fs/read-file.js"
 import shared from "../../shared.js"
+import stripShebang from "../../util/strip-shebang.js"
 import toString from "../../util/to-string.js"
 
 const {
@@ -184,7 +185,7 @@ function tryCompileCJS(entry, filename) {
   } else if (useAsync) {
     content =
       "(async () => { " +
-      content +
+      stripShebang(content) +
       "\n})();"
   }
 
@@ -205,6 +206,10 @@ function tryCompileESM(entry, filename) {
     entry.extname !== ".mjs"
 
   let { code, yieldIndex } = compileData
+
+  if (! compileData.changed) {
+    code = stripShebang(code)
+  }
 
   if (! useAsync &&
       yieldIndex !== -1) {
