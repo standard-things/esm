@@ -43,7 +43,7 @@
     "@types/node": "^10.9.2",
     "acorn": "^5.7.2",
     "ava": "1.0.0-beta.7",
-    "babel-eslint": "^8.2.6",
+    "babel-eslint": "^9.0.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-transform-for-of-as-array": "^1.1.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
