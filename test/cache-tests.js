@@ -119,6 +119,22 @@ describe("cache tests", function () {
         .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
         .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedLoaderCacheCount))
     )
+
+    it("should not insert `yield` into cache files", () =>
+      runMain(mainFilename)
+        .then(() => {
+          const filenames = fs
+            .readdirSync(loaderCachePath)
+            .filter((filename) => path.extname(filename) === ".js")
+            .map((filename) => path.resolve(loaderCachePath, filename))
+
+          filenames.forEach((filename) => {
+            const content  = fs.readFileSync(filename, "utf8")
+
+            assert.strictEqual(content.includes("yield"), false)
+          })
+        })
+    )
   })
 
   describe("should support `options.cache` paths", () => {
