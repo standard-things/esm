@@ -1,1 +1,3 @@
 await Promise.resolve()
+
+export {}
