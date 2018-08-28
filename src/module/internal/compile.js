@@ -205,16 +205,16 @@ function tryCompileESM(entry, filename) {
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
-  let { code, yieldIndex } = compileData
+  let { code } = compileData
 
   if (! compileData.changed) {
     code = stripShebang(code)
   }
 
+  const { yieldIndex } = compileData
+
   if (! useAsync &&
       yieldIndex !== -1) {
-    compileData.yieldIndex = -1
-
     if (yieldIndex) {
       code =
         code.slice(0, yieldIndex) +
@@ -224,8 +224,6 @@ function tryCompileESM(entry, filename) {
     } else {
       code = "yield;" + code
     }
-
-    compileData.code = code
   }
 
   let content =
