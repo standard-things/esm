@@ -159,7 +159,7 @@ describe("compiler tests", () => {
   })
 
   it("should support shebangs", () => {
-    const shebang = "#!/usr/bin/env node -r esm"
+    const shebang = "#!/usr/bin/env node"
 
     const code = [
       shebang,

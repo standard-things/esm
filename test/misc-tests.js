@@ -1529,6 +1529,10 @@ describe("miscellaneous tests", () => {
       import("./fixture/source/named-class.mjs")
     )
 
+    it("should not error on side effect only ES modules with shebangs", () =>
+      import("./fixture/source/shebang.mjs")
+    )
+
     it("should not hang on strings containing '# sourceMappingURL'", () =>
       import("./fixture/source/source-mapping-url-string.mjs")
     )
