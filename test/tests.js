@@ -20,6 +20,7 @@ import "./main-hook-tests.mjs"
 import "./require-hook-tests.js"
 import "./repl-hook-tests.mjs"
 import "./scenario-tests.mjs"
+import "./vendor/test262/index.js"
 
 const extensions = Object.assign({}, require.extensions)
 

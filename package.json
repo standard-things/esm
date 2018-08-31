@@ -81,6 +81,7 @@
     "sleep": "^5.2.3",
     "sqreen": "^1.23.0",
     "strip-ansi": "^4.0.0",
+    "test262-parser": "^2.0.7",
     "trash": "^4.3.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.0.3",
