@@ -5,6 +5,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 
 import encodeURI from "./encode-uri.js"
+import isSep from "../path/is-sep.js"
 import normalize from "../path/normalize.js"
 import { resolve } from "../safe/path.js"
 import shared from "../shared.js"
@@ -26,12 +27,23 @@ function init() {
   }
 
   function getURLFromFilePath(filename) {
-    filename = typeof filename === "string"
-      ? normalize(resolve(filename))
-      : ""
+    const length = typeof filename === "string" ? filename.length : 0
 
-    if (filename.charCodeAt(0) !== FORWARD_SLASH) {
-      filename = "/" + filename
+    if (length) {
+      const lastCode = filename.charCodeAt(length - 1)
+
+      filename = normalize(resolve(filename))
+
+      if (filename.charCodeAt(filename.length - 1) !== FORWARD_SLASH &&
+          isSep(lastCode)) {
+        filename += "/"
+      }
+
+      if (filename.charCodeAt(0) !== FORWARD_SLASH) {
+        filename = "/" + filename
+      }
+    } else {
+      filename = "/"
     }
 
     // Section 3.3: Escape Path Components

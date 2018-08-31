@@ -153,6 +153,7 @@ if (isTest) {
   config.entry.entry = "./src/entry.js"
   config.entry.runtime = "./src/runtime.js"
   config.entry["get-file-path-from-url"] = "./src/util/get-file-path-from-url.js"
+  config.entry["get-url-from-file-path"] = "./src/util/get-url-from-file-path.js"
 }
 
 module.exports = config
