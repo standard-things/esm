@@ -27,19 +27,27 @@ function init() {
   }
 
   function getURLFromFilePath(filename) {
-    const length = typeof filename === "string" ? filename.length : 0
+    let length = typeof filename === "string" ? filename.length : 0
 
     if (length) {
       const lastCode = filename.charCodeAt(length - 1)
 
       filename = normalize(resolve(filename))
+      length = filename.length
 
-      if (filename.charCodeAt(filename.length - 1) !== FORWARD_SLASH &&
+      if (filename.charCodeAt(length - 1) !== FORWARD_SLASH &&
           isSep(lastCode)) {
         filename += "/"
       }
 
-      if (filename.charCodeAt(0) !== FORWARD_SLASH) {
+      let i = -1
+
+      // eslint-disable-next-line no-empty
+      while (++i < length && filename.charCodeAt(i) === FORWARD_SLASH) {}
+
+      if (i > 1) {
+        filename = "/" + filename.slice(i)
+      } else if (! i) {
         filename = "/" + filename
       }
     } else {
