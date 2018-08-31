@@ -1,13 +1,11 @@
 import CHAR_CODE from "../constant/char-code.js"
-import ENV from "../constant/env.js"
 
+import isSep from "./is-sep.js"
 import shared from "../shared.js"
 
 function init() {
   const {
-    BACKWARD_SLASH,
-    DOT,
-    FORWARD_SLASH
+    DOT
   } = CHAR_CODE
 
   function isRelative(value) {
@@ -41,16 +39,7 @@ function init() {
       code = value.charCodeAt(2)
     }
 
-    const {
-      WIN32
-    } = ENV
-
-    if (WIN32 &&
-        code === BACKWARD_SLASH) {
-      return true
-    }
-
-    return code === FORWARD_SLASH
+    return isSep(code)
   }
 
   return isRelative

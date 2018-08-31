@@ -15,6 +15,7 @@ import call from "../../util/call.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
+import isSep from "../../path/is-sep.js"
 import keys from "../../util/keys.js"
 import readPackage from "./read-package.js"
 import realpath from "../../fs/realpath.js"
@@ -23,14 +24,11 @@ import statFast from "../../fs/stat-fast.js"
 import statSync from "../../fs/stat-sync.js"
 
 const {
-  BACKWARD_SLASH,
-  DOT,
-  FORWARD_SLASH
+  DOT
 } = CHAR_CODE
 
 const {
-  FLAGS,
-  WIN32
+  FLAGS
 } = ENV
 
 const { isFile, isSymbolicLink } = Stats.prototype
@@ -84,10 +82,7 @@ function findPath(request, paths, isMain, fields, exts) {
       }
     }
 
-    trailingSlash =
-      code === FORWARD_SLASH ||
-      (WIN32 &&
-       code === BACKWARD_SLASH)
+    trailingSlash = isSep(code)
   }
 
   const useRealpath = isMain
