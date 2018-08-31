@@ -110,10 +110,16 @@ describe("URL tests", () => {
       assert.strictEqual(actual, expected)
     })
 
-    it("should encode percent signs", () => {
-      const expected = testURL + "/a/%25"
-      const actual = getURLFromFilePath("a/%")
+    it("should encode the URI", () => {
+      let actual
+      let expected
 
+      expected = testURL + "/a/%25"
+      actual = getURLFromFilePath("a/%")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/%E4%BD%A0%E5%A5%BD.js"
+      actual = getURLFromFilePath("你好.js")
       assert.strictEqual(actual, expected)
     })
   })
