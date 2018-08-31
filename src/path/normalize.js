@@ -1,9 +1,9 @@
-import { platform } from "../safe/process.js"
+import isWin32 from "../env/is-win32.js"
 import shared from "../shared.js"
 
 function init() {
   const backwardSlashRegExp = /\\/g
-  const isWin = platform === "win32"
+  const isWin = isWin32()
 
   function normalize(filename) {
     if (typeof filename !== "string") {
