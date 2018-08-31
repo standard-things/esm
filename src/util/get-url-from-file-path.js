@@ -30,13 +30,14 @@ function init() {
     let length = typeof filename === "string" ? filename.length : 0
 
     if (length) {
-      const lastCode = filename.charCodeAt(length - 1)
+      const oldFilename = filename
+      const oldLength = length
 
       filename = normalize(resolve(filename))
       length = filename.length
 
       if (filename.charCodeAt(length - 1) !== FORWARD_SLASH &&
-          isSep(lastCode)) {
+          isSep(oldFilename.charCodeAt(oldLength - 1))) {
         filename += "/"
       }
 
