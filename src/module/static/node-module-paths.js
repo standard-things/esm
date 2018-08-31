@@ -81,7 +81,7 @@ function nodeModulePaths(from) {
   }
 
   if (! WIN32) {
-     // Append "/node_modules" to handle root paths.
+    // Append "/node_modules" to handle root paths.
     GenericArray.push(paths, "/node_modules")
   }
 
