@@ -29,37 +29,37 @@ function init() {
   function getURLFromFilePath(filename) {
     let length = typeof filename === "string" ? filename.length : 0
 
-    if (length) {
-      const oldFilename = filename
-      const oldLength = length
-
-      filename = normalize(resolve(filename))
-      length = filename.length
-
-      if (filename.charCodeAt(length - 1) !== FORWARD_SLASH &&
-          isSep(oldFilename.charCodeAt(oldLength - 1))) {
-        filename += "/"
-      }
-
-      let i = -1
-
-      // eslint-disable-next-line no-empty
-      while (++i < length && filename.charCodeAt(i) === FORWARD_SLASH) {}
-
-      if (i > 1) {
-        filename = "/" + filename.slice(i)
-      } else if (! i) {
-        filename = "/" + filename
-      }
-    } else {
-      filename = "/"
+    if (! length) {
+      return "file:///"
     }
+
+    const oldFilename = filename
+    const oldLength = length
+
+    filename = normalize(resolve(filename))
 
     // Section 3.3: Escape Path Components
     // https://tools.ietf.org/html/rfc3986#section-3.3
-    const encoded = encodeURI(filename)
+    filename = encodeURI(filename).replace(encodeCharsRegExp, encodeChar)
+    length = filename.length
 
-    return "file://" + encoded.replace(encodeCharsRegExp, encodeChar)
+    if (filename.charCodeAt(length - 1) !== FORWARD_SLASH &&
+        isSep(oldFilename.charCodeAt(oldLength - 1))) {
+      filename += "/"
+    }
+
+    let i = -1
+
+    // eslint-disable-next-line no-empty
+    while (++i < length && filename.charCodeAt(i) === FORWARD_SLASH) {}
+
+    if (i > 1) {
+      filename = "/" + filename.slice(i)
+    } else if (! i) {
+      filename = "/" + filename
+    }
+
+    return "file://" + filename
   }
 
   return getURLFromFilePath
