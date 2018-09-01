@@ -14,6 +14,7 @@ export const {
   extname,
   isAbsolute,
   normalize,
+  relative,
   resolve,
   sep,
   toNamespacedPath

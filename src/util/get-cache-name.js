@@ -1,8 +1,8 @@
-import { version as nodeVersion, versions } from "../safe/process.js"
-
 import ESM from "../constant/esm.js"
 
 import md5 from "./md5.js"
+import normalize from "../path/normalize.js"
+import { relative } from "../safe/path.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,27 +10,22 @@ function init() {
     PKG_VERSION
   } = ESM
 
-  const engineVersion =
-    versions.v8 ||
-    versions.chakracore
+  const EMPTY_MD5_HASH = "d41d8cd98f00b204e9800998ecf8427e"
 
   function getCacheName(entry, cacheKey) {
-    let { filename } = entry.module
-
-    if (typeof filename !== "string") {
-      filename = ""
-    }
+    const { filename } = entry.module
+    const pkg = entry.package
 
     // While MD5 isn't suitable for verification of untrusted data,
     // it's great for revving files. See Sufian Rhazi's post for more details.
     // https://blog.risingstack.com/automatic-cache-busting-for-your-css/
-    const pathHash = md5(filename)
+    const pathHash = typeof filename === "string"
+      ? md5(normalize(relative(pkg.cachePath, filename)))
+      : EMPTY_MD5_HASH
 
     const stateHash = md5(
-      nodeVersion + "\0" +
-      engineVersion + "\0" +
       PKG_VERSION + "\0" +
-      JSON.stringify(entry.package.options) + "\0" +
+      JSON.stringify(pkg.options) + "\0" +
       cacheKey
     )
 
