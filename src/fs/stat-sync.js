@@ -1,9 +1,15 @@
 import { statSync as _statSync, Stats } from "../safe/fs.js"
 
+import ENV from "../constant/env.js"
+
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    ELECTRON
+  } = ENV
+
   const { prototype } = Stats
 
   function statSync(thePath) {
@@ -22,7 +28,8 @@ function init() {
       // Electron and Muon return a plain object for asar files.
       // https://github.com/electron/electron/blob/master/lib/common/asar.js
       // https://github.com/brave/muon/blob/master/lib/common/asar.js
-      if (! (result instanceof Stats)) {
+      if (ELECTRON &&
+          ! (result instanceof Stats)) {
         setPrototypeOf(result, prototype)
       }
     } catch (e) {}
