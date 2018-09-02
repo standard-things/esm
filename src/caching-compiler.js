@@ -1,4 +1,4 @@
-import { sep, resolve } from "./safe/path.js"
+import { sep, relative, resolve } from "./safe/path.js"
 
 import ENTRY from "./constant/entry.js"
 import ENV from "./constant/env.js"
@@ -49,13 +49,19 @@ function init() {
       return compileAndCache(entry, code, options)
     },
     from(entry) {
-      const { cache } = entry.package
+      const { cache, cachePath } = entry.package
       const { cacheName } = entry
       const { map } = cache
       const meta = map[cacheName]
 
       if (! meta) {
         return null
+      }
+
+      let filename = meta[2]
+
+      if (filename) {
+        filename = resolve(cachePath, filename)
       }
 
       const result = {
@@ -67,8 +73,8 @@ function init() {
         exportedNames: meta[8] || null,
         exportedSpecifiers: null,
         exportedStars: meta[9] || null,
-        filename: meta[2],
-        mtime: meta[3],
+        filename,
+        mtime: meta[3] || -1,
         scriptData: null,
         sourceType: +meta[4] || SCRIPT,
         yieldIndex: -1
@@ -314,13 +320,9 @@ function init() {
         const compileData = compileDatas[cacheName]
 
         if (compileData) {
-          const {
-            filename,
-            mtime,
-            sourceType
-          } = compileData
-
+          const { mtime, sourceType } = compileData
           const changed = +compileData.changed
+          const filename = relative(cachePath, compileData.filename)
 
           if (sourceType === SCRIPT) {
             if (changed) {
