@@ -1,4 +1,4 @@
-import { lstatSync, Stats } from "../safe/fs.js"
+import { statSync as _statSync, Stats } from "../safe/fs.js"
 
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
@@ -17,7 +17,7 @@ function init() {
     let result = null
 
     try {
-      result = lstatSync(thePath)
+      result = _statSync(thePath)
 
       // Electron and Muon return a plain object for asar files.
       // https://github.com/electron/electron/blob/master/lib/common/asar.js

@@ -31,7 +31,7 @@ const {
   FLAGS
 } = ENV
 
-const { isFile, isSymbolicLink } = Stats.prototype
+const { isFile } = Stats.prototype
 const { preserveSymlinks, preserveSymlinksMain } = FLAGS
 
 const mainFields = ["main"]
@@ -118,7 +118,6 @@ function findPath(request, paths, isMain, fields, exts) {
       thePath = resolve(curPath, request)
     }
 
-    let isSymLink = false
     let rc = -1
     let stat = null
 
@@ -128,12 +127,6 @@ function findPath(request, paths, isMain, fields, exts) {
 
       if (stat) {
         rc = call(isFile, stat) ? 0 : 1
-
-        if (rc &&
-            call(isSymbolicLink, stat)) {
-          isSymLink = true
-          rc = statFast(thePath)
-        }
       }
     } else {
       rc = statFast(thePath)
@@ -144,14 +137,9 @@ function findPath(request, paths, isMain, fields, exts) {
     if (! trailingSlash) {
       // If a file.
       if (rc === 0) {
-        if (useRealpath &&
-            (! stat ||
-             stat.nlink > 1 ||
-             isSymLink)) {
-          filename = realpath(thePath)
-        } else {
-          filename = thePath
-        }
+        filename = useRealpath
+          ? realpath(thePath)
+          : thePath
       }
 
       if (! filename) {
@@ -226,12 +214,6 @@ function tryFilename(filename, isMain) {
 
     if (stat) {
       rc = call(isFile, stat) ? 0 : 1
-
-      if (rc &&
-          call(isSymbolicLink, stat)) {
-        isSymLink = true
-        rc = statFast(filename)
-      }
     }
   } else {
     rc = statFast(filename)

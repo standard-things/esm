@@ -2,13 +2,12 @@ import { Stats } from "../safe/fs.js"
 
 import binding from "../binding.js"
 import call from "../util/call.js"
-import realpath from "./realpath.js"
 import shared from "../shared.js"
 import statSync from "./stat-sync.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
 
 function init() {
-  const { isFile, isSymbolicLink } = Stats.prototype
+  const { isFile } = Stats.prototype
 
   let useFastPath
 
@@ -53,19 +52,7 @@ function init() {
     const stat = statSync(thePath)
 
     if (stat) {
-      if (call(isFile, stat)) {
-        return 0
-      }
-
-      if (! call(isSymbolicLink, stat)) {
-        return 1
-      }
-
-      thePath = realpath(thePath)
-
-      if (thePath) {
-        return call(isFile, statSync(thePath)) ? 0 : 1
-      }
+      return call(isFile, stat) ? 0 : 1
     }
 
     return -1
