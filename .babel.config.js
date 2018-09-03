@@ -59,5 +59,5 @@ module.exports = {
       targets: { node: 6 }
     }]
   ],
-  sourceMap: false
+  sourceMaps: false
 }
