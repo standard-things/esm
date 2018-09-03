@@ -169,11 +169,13 @@ function init() {
         return false
       },
       set(target, name, value, receiver) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+        const isUpdatable = isUpdatableSet(descriptor)
+
         if (typeof value === "function") {
           const newValue = cached.unwrap.get(value) || value
 
-          if (newValue !== value &&
-              isUpdatableSet(target, name)) {
+          if (isUpdatable) {
             value = newValue
           }
         }
@@ -182,7 +184,12 @@ function init() {
           receiver = target
         }
 
-        const accessor = getSetter(target, name)
+        const accessor = getSetter(descriptor)
+
+        if (! isUpdatable) {
+          target[name] = value
+          return false
+        }
 
         if (Reflect.set(target, name, value, receiver)) {
           if (accessor) {

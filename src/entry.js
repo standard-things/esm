@@ -15,6 +15,7 @@ import isEnumerable from "./util/is-enumerable.js"
 import isObjectLike from "./util/is-object-like.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
+import isUpdatableSet from "./util/is-updatable-set.js"
 import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import proxyExports from "./util/proxy-exports.js"
@@ -709,6 +710,11 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
 
     if (receiver === proxy) {
       receiver = exported
+    }
+
+    if (! isUpdatableSet(exported, name)) {
+      exported[name] = value
+      return false
     }
 
     if (Reflect.set(exported, name, value, receiver)) {
