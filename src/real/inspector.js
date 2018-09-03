@@ -4,9 +4,14 @@ import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
-  return Reflect.has(builtinLookup, "inspector")
-    ? unwrapProxy(realRequire("inspector"))
-    : null
+  if (Reflect.has(builtinLookup, "inspector")) {
+    // An `ERR_INSPECTOR_NOT_AVAILABLE` error may be thrown on initialization.
+    try {
+      return unwrapProxy(realRequire("inspector"))
+    } catch (e) {}
+  }
+
+  return null
 }
 
 export default shared.inited
