@@ -4,8 +4,13 @@ function init() {
   const { __lookupSetter__ } = Object.prototype
 
   function getSetter(object, name) {
-    if (! shared.support.lookupShadowed) {
-      const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
+    const useAsDescriptor = name === void 0
+
+    if (useAsDescriptor ||
+        ! shared.support.lookupShadowed) {
+      const descriptor = useAsDescriptor
+        ? object
+        : Reflect.getOwnPropertyDescriptor(object, name)
 
       if (! descriptor ||
           ! descriptor.set) {

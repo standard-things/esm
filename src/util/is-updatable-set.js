@@ -2,7 +2,9 @@ import shared from "../shared.js"
 
 function init() {
   function isUpdatableSet(object, name) {
-    const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
+    const descriptor = name === void 0
+      ? object
+      : Reflect.getOwnPropertyDescriptor(object, name)
 
     if (descriptor) {
       // Section 9.5.9: [[Set]]()
