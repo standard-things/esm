@@ -24,7 +24,7 @@ function getShared() {
 
     // eslint-disable-next-line no-global-assign
     return __shared__ = shared
-  } catch (e) {}
+  } catch {}
 
   return init()
 }
@@ -140,7 +140,7 @@ function init() {
     // https://node.green/#ESNEXT-candidate--stage-3--Function-prototype-toString-revision
     try {
       return typeof funcToString.call(dummyProxy) === "string"
-    } catch (e) {}
+    } catch {}
 
     return ""
   })
@@ -165,7 +165,7 @@ function init() {
     try {
       Function("async()=>await 1")()
       return true
-    } catch (e) {}
+    } catch {}
 
     return false
   })

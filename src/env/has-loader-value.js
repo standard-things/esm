@@ -50,11 +50,11 @@ function init() {
   function tryResolveFilename(request, parent) {
     try {
       return esmResolveFilename(request, parent)
-    } catch (e) {}
+    } catch {}
 
     try {
       return Module._resolveFilename(request, parent)
-    } catch (e) {}
+    } catch {}
 
     return ""
   }

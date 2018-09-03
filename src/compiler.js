@@ -136,7 +136,7 @@ function init() {
         try {
           ast = Parser.parse(code, parserOptions)
           threw = false
-        } catch (e) {}
+        } catch {}
       }
 
       if (threw) {

@@ -7,7 +7,7 @@ function init() {
       try {
         writeFileSync(filename, bufferOrString, options)
         return true
-      } catch (e) {}
+      } catch {}
     }
 
     return false

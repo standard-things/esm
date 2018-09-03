@@ -32,7 +32,7 @@ function init() {
           ! (result instanceof Stats)) {
         setPrototypeOf(result, prototype)
       }
-    } catch (e) {}
+    } catch {}
 
     if (cache) {
       cache[thePath] = result

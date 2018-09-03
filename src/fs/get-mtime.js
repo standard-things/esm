@@ -17,7 +17,7 @@ function init() {
         return typeof mtimeMs === "number"
           ? round(mtimeMs + 0.5)
           : GenericDate.getTime(stat.mtime)
-      } catch (e) {}
+      } catch {}
     }
 
     return -1

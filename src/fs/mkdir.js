@@ -7,7 +7,7 @@ function init() {
       try {
         mkdirSync(dirPath)
         return true
-      } catch (e) {}
+      } catch {}
     }
 
     return false

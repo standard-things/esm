@@ -4,7 +4,7 @@ function init() {
   function parseJSON(string) {
     try {
       return JSON.parse(string)
-    } catch (e) {}
+    } catch {}
 
     return null
   }

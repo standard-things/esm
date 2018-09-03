@@ -53,7 +53,7 @@ function init() {
     if (typeof thePath === "string") {
       try {
         return binding.fs.realpath(toNamespacedPath(thePath))
-      } catch (e) {}
+      } catch {}
     }
 
     return realpathFallback(thePath)
@@ -62,7 +62,7 @@ function init() {
   function realpathFallback(thePath) {
     try {
       return realpathSync(thePath)
-    } catch (e) {}
+    } catch {}
 
     return ""
   }
@@ -70,7 +70,7 @@ function init() {
   function realpathNative(thePath) {
     try {
       return realpathNativeSync(thePath)
-    } catch (e) {}
+    } catch {}
 
     return realpathFallback(thePath)
   }

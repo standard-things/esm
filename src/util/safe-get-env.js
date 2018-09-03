@@ -14,7 +14,7 @@ function init() {
         typeof name === "string") {
       try {
         return binding.util.safeGetenv(name)
-      } catch (e) {}
+      } catch {}
     }
 
     return env[name]

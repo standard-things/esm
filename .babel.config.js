@@ -34,6 +34,7 @@ module.exports = {
     ["@babel/proposal-class-properties", {
       loose: true
     }],
+    "@babel/proposal-optional-catch-binding",
     ["@babel/transform-arrow-functions", {
       spec: false
     }],

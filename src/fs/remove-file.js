@@ -7,7 +7,7 @@ function init() {
       try {
         unlinkSync(filename)
         return true
-      } catch (e) {}
+      } catch {}
     }
 
     return false

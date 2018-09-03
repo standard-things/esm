@@ -68,7 +68,7 @@ function init() {
       const source = silent(() => {
         try {
           return Reflect.apply(_binding, realProcess, [id])
-        } catch (e) {}
+        } catch {}
       })
 
       const object = { __proto__: null }

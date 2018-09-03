@@ -58,7 +58,7 @@ function hook(Mod) {
 
     try {
       return Module._resolveFilename(request, null, true)
-    } catch (e) {}
+    } catch {}
 
     throw error
   }

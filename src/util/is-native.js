@@ -43,7 +43,7 @@ function init() {
     // coercing proxy wrapped functions.
     try {
       return nativeRegExp.test(toString.call(func))
-    } catch (e) {}
+    } catch {}
 
     return false
   }

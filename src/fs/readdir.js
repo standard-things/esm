@@ -6,7 +6,7 @@ function init() {
     if (typeof dirPath === "string") {
       try {
         return readdirSync(dirPath)
-      } catch (e) {}
+      } catch {}
     }
 
     return null

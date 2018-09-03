@@ -8,7 +8,7 @@ function init() {
     // An `ERR_INSPECTOR_NOT_AVAILABLE` error may be thrown on initialization.
     try {
       return unwrapProxy(realRequire("inspector"))
-    } catch (e) {}
+    } catch {}
   }
 
   return null

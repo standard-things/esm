@@ -6,7 +6,7 @@ function init() {
     const value = silent(() => {
       try {
         return object[name]
-      } catch (e) {}
+      } catch {}
     })
 
     if (typeof value !== "function") {

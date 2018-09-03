@@ -16,7 +16,7 @@ function init() {
         isObjectLike(object)) {
       try {
         return binding.util.setHiddenValue(object, name, value)
-      } catch (e) {}
+      } catch {}
     }
 
     return false

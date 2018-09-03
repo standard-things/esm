@@ -150,7 +150,7 @@ function tryResolveFilename(request, parent, isMain) {
 
   try {
     return Module._resolveFilename(request, parent, isMain)
-  } catch (e) {}
+  } catch {}
 
   throw error
 }

@@ -7,7 +7,7 @@ function init() {
     if (typeof result === "function") {
       return result
     }
-  } catch (e) {}
+  } catch {}
 
   return __non_webpack_require__
 }

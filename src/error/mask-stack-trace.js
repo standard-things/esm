@@ -238,7 +238,7 @@ function init() {
   function tryErrorToString(error) {
     try {
       return error.name + ": " + error.message
-    } catch (e) {}
+    } catch {}
 
     return ""
   }

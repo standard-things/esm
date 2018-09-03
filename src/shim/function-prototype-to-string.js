@@ -47,7 +47,7 @@ function init() {
         if (isOwnProxy(thisArg)) {
           try {
             return call(_toString, unwrapProxy(thisArg))
-          } catch (e) {}
+          } catch {}
         }
 
         return NATIVE_SOURCE_TEXT
@@ -61,7 +61,7 @@ function init() {
         })
 
         cache.set(funcProto, true)
-      } catch (e) {}
+      } catch {}
 
       return context
     }

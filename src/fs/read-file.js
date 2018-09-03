@@ -8,7 +8,7 @@ function init() {
 
     try {
       content = readFileSync(filename, options)
-    } catch (e) {}
+    } catch {}
 
     if (content &&
         options === "utf8") {

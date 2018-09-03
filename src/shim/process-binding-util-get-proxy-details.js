@@ -16,7 +16,7 @@ function init() {
         try {
           utilBinding = context.process.binding("util")
           _getProxyDetails = utilBinding.getProxyDetails
-        } catch (e) {}
+        } catch {}
       })
 
       if (check(utilBinding, _getProxyDetails, cache)) {
@@ -37,7 +37,7 @@ function init() {
         })
 
         cache.set(utilBinding, true)
-      } catch (e) {}
+      } catch {}
 
       return context
     }
@@ -61,7 +61,7 @@ function init() {
       const proxy = new OwnProxy(getProxyDetails, {})
 
       result = getProxyDetails(proxy) === void 0
-    } catch (e) {}
+    } catch {}
 
     cache.set(utilBinding, result)
     return result

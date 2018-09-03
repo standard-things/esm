@@ -11,7 +11,7 @@ function init() {
   function tryParse(string) {
     try {
       return parse(string)
-    } catch (e) {}
+    } catch {}
 
     return null
   }

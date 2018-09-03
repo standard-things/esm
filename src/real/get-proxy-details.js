@@ -11,7 +11,7 @@ function init() {
     if (typeof realGetProxyDetails === "function") {
       return realGetProxyDetails
     }
-  } catch (e) {}
+  } catch {}
 
   let useGetProxyDetails
 

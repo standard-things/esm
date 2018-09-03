@@ -4,7 +4,7 @@ function init() {
   function set(object, name, value) {
     try {
       object[name] = value
-    } catch (e) {}
+    } catch {}
 
     return object
   }

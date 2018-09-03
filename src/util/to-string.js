@@ -8,7 +8,7 @@ function init() {
 
     try {
       return String(value)
-    } catch (e) {}
+    } catch {}
 
     return ""
   }

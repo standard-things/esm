@@ -6,7 +6,7 @@ function init() {
     silent(() => {
       try {
         object[name] = value
-      } catch (e) {}
+      } catch {}
     })
   }
 

@@ -149,11 +149,11 @@ function tryRequire(request, entry) {
 function tryResolveFilename(request, parent) {
   try {
     return esmResolveFilename(request, parent)
-  } catch (e) {}
+  } catch {}
 
   try {
     return Module._resolveFilename(request, parent)
-  } catch (e) {}
+  } catch {}
 
   if (isPath(request)) {
     const parentFilename = parent && parent.filename

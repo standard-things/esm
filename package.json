@@ -31,6 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-optional-catch-binding": "^7.0.0",
     "@babel/plugin-transform-arrow-functions": "^7.0.0",
     "@babel/plugin-transform-block-scoping": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",

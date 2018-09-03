@@ -40,7 +40,7 @@ function init() {
     if (useFastPath) {
       try {
         return statFastPath(thePath)
-      } catch (e) {}
+      } catch {}
 
       useFastPath = false
     }

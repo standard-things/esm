@@ -4,7 +4,7 @@ function init() {
   function get(object, name) {
     try {
       return object[name]
-    } catch (e) {}
+    } catch {}
   }
 
   return get
