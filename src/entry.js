@@ -25,6 +25,8 @@ import shared from "./shared.js"
 import toModuleNamespaceObject from "./util/to-module-namespace-object.js"
 
 const {
+  ERROR_GETTER,
+  ERROR_STAR,
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
@@ -45,9 +47,6 @@ const {
   ERR_NS_REDEFINITION,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
-
-const GETTER_ERROR = {}
-const STAR_ERROR = {}
 
 const noopSetter = () => {}
 
@@ -961,9 +960,9 @@ function runGetter(entry, name) {
 
   const value = getter
     ? tryGetter(getter)
-    : GETTER_ERROR
+    : ERROR_GETTER
 
-  if (value !== GETTER_ERROR &&
+  if (value !== ERROR_GETTER &&
       ! (Reflect.has(_namespace, name) &&
          Object.is(_namespace[name], value))) {
     entry._changed = true
@@ -1031,9 +1030,9 @@ function runSetter(entry, name, callback) {
           value = getExportByName(entry, name, setter.parent)
         }
 
-        if (value === GETTER_ERROR) {
+        if (value === ERROR_GETTER) {
           value = void 0
-        } else if (value === STAR_ERROR) {
+        } else if (value === ERROR_STAR) {
           throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
         }
 
@@ -1092,9 +1091,9 @@ function runSetters(entry, names, callback) {
 function tryGetter(getter) {
   try {
     return getter()
-  } catch (e) {}
+  } catch {}
 
-  return GETTER_ERROR
+  return ERROR_GETTER
 }
 
 Reflect.setPrototypeOf(Entry.prototype, null)
