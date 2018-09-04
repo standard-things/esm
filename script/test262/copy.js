@@ -6,7 +6,6 @@ const { copySync, removeSync } = require("fs-extra")
 const rootPath = resolve(".")
 const test262RepoPath = resolve(rootPath, "test/vendor/test262/.repo-clone")
 const jsTestPath = resolve(rootPath, "test/vendor/test262/.js-tests")
-const mjsTestPath = resolve(rootPath, "test/vendor/test262/.mjs-tests")
 
 const testDirs = [
   "test/language/export",
@@ -17,11 +16,9 @@ const testDirs = [
 
 function copyTests() {
   removeSync(jsTestPath)
-  removeSync(mjsTestPath)
 
   testDirs.map((testDir) => {
     copySync(resolve(test262RepoPath, testDir), resolve(jsTestPath, testDir))
-    copySync(resolve(test262RepoPath, testDir), resolve(mjsTestPath, testDir))
   })
 }
 
@@ -36,10 +33,6 @@ copyTests.dynamicImport = function () {
     copySync(
       resolve(test262RepoPath, testDirDynamicImport),
       resolve(jsTestPath, testDirDynamicImport)
-    )
-    copySync(
-      resolve(test262RepoPath, testDirDynamicImport),
-      resolve(mjsTestPath, testDirDynamicImport)
     )
   })
 }

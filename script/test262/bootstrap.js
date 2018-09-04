@@ -6,7 +6,6 @@ const copy = require("./copy.js")
 const renameFileExtension = require("./file-extension.js")
 
 const rootPath = resolve(".")
-const mjsTestPath = resolve(rootPath, "test/vendor/test262/.mjs-tests")
 
 function bootstrap() {
   return (
@@ -19,7 +18,6 @@ function bootstrap() {
       .then(clone.dynamicImport)
       .then(copy.dynamicImport)
       // -- END
-      .then(() => renameFileExtension(mjsTestPath, "js", "mjs"))
   )
 }
 
