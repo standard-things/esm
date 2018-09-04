@@ -20,3 +20,4 @@
 /test/vendor/test262/.repo
 /test/vendor/test262/.js-tests
 /test/vendor/test262/.mjs-tests
+/test/vendor/test262/.repo-clone
