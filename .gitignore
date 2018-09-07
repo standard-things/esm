@@ -16,7 +16,4 @@
 /test/fixture/main-hook/symlink/symlink.js
 /test/fixture/main-hook/symlink/symlink.mjs
 /test/fixture/scenario/ava-nyc-tsc/*.js
-
-/test/vendor/test262/.repo
-/test/vendor/test262/.js-tests
-/test/vendor/test262/.repo-clone
+/test/vendor

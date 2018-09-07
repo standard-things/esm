@@ -4,9 +4,9 @@ const execa = require("execa")
 const fs = require("fs-extra")
 const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
+const setupTest262 = require("./setup-test262.js")
 const trash = require("./trash.js")
 const uglify = require("uglify-es").minify
-const bootstrapTest262 = require("./test262/bootstrap.js")
 
 const argv = require("yargs")
   .boolean("prod")
@@ -113,8 +113,8 @@ Promise
   .all([
     argv.prod && cleanJS(),
     cleanRepo(),
-    setupNode()
+    setupNode(),
+    setupTest262()
   ])
-  .then(bootstrapTest262)
   .then(() => runTests())
   .then(() => runTests(true))

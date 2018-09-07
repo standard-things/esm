@@ -1,13 +1,27 @@
-import process from "process"
-import harnessContext from "./context.js"
+import fs from "fs-extra"
+import path from "path"
+import test262Parser from "test262-parser"
+import vm from "vm"
 
-const { argv, stderr, stdout } = process
+const testPath = path.resolve("../vendor/test262")
+const harnessPath = path.resolve(testPath, "harness")
 
-const [, , testUrl, isAsync] = argv
+const harnessFilenames = [
+  path.resolve(harnessPath, "assert.js"),
+  path.resolve(harnessPath, "doneprintHandle.js"),
+  path.resolve(harnessPath, "fnGlobalObject.js"),
+  path.resolve(harnessPath, "sta.js")
+]
+
+const [, , testUrl, isAsync] = process.argv
 const _isAsync = isAsync === "true"
+const sandbox = vm.createContext(global)
 
-// attach test262 harness onto global scope
-harnessContext()
+for (const filename of harnessFilenames) {
+  const { contents } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
+
+  new vm.Script(contents).runInContext(sandbox)
+}
 
 let _msg
 
@@ -34,7 +48,7 @@ function waitForAsyncTest() {
 
 import(testUrl)
   .then(() => {
-    if (!_isAsync) {
+    if (! _isAsync) {
       return
     }
 
@@ -47,16 +61,14 @@ import(testUrl)
   .catch((e) => {
     const name = typeof e === "string" ? e : e.constructor.name
 
-    const send = JSON.stringify({
+    console.log(JSON.stringify({
       name,
       message: typeof e !== "string" && e.message,
-      argv
-    })
-
-    stdout.write(send)
+      argv: process.argv
+    }))
   })
   .catch((e) =>
-    stderr.write(
+    console.error(
       `[last resort catch] something happened in the previous catch block: ${
         e.message
       }}`

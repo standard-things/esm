@@ -1,30 +1,26 @@
 import SemVer from "semver"
+
 import assert from "assert"
 import execa from "execa"
-import globby from "globby"
-import { basename, resolve, sep } from "path"
 import fs from "fs-extra"
+import globby from "globby"
+import path from "path"
 import test262Parser from "test262-parser"
 
-const { execArgv, execPath, versions } = process
+const fixturePath = path.resolve("test262")
+const skiplistPath = path.resolve(fixturePath, "skiplist")
+const testPath = path.resolve(".")
+const test262Path = path.resolve("vendor/test262")
+const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 
-const testPath = resolve(".")
-const test262Path = resolve(testPath, "vendor/test262/.js-tests")
+let nodeVersion = Reflect.has(process.versions, "v8")
+  ? SemVer.major(process.version)
+  : ""
 
-let nodeVersion = Reflect.has(process.versions, "v8") ? SemVer.major(process.version) : ""
-
-if (execArgv.includes("--harmony")) {
+if (process.execArgv.includes("--harmony")) {
   nodeVersion = "harmony"
-} else if (Reflect.has(versions, "chakracore")) {
+} else if (Reflect.has(process.versions, "chakracore")) {
   nodeVersion = "chakra"
-}
-
-function node(args, env) {
-  return execa(execPath, args, {
-    cwd: testPath,
-    env,
-    reject: false
-  })
 }
 
 const nodeArgs = []
@@ -33,19 +29,7 @@ if (nodeVersion === "harmony") {
   nodeArgs.push("--harmony")
 }
 
-function runEsm(filename, env, args) {
-  return node([...nodeArgs, "-r", "esm", filename, ...args], env)
-}
-
-function runNodeModFlag(filename, args) {
-  return node([
-    ...nodeArgs,
-    "--experimental-modules",
-    "--no-warnings",
-    filename,
-    ...args
-  ])
-}
+const skiplist = new Map
 
 const test262Tests = globby.sync(
   [
@@ -56,30 +40,26 @@ const test262Tests = globby.sync(
   ],
   {
     absolute: true,
-    cwd: test262Path,
-    // https://github.com/sindresorhus/globby/issues/38
-    transform: (entry) => (sep === "\\" ? entry.replace(/\//g, "\\") : entry)
+    cwd: test262Path
   }
 )
 
-const skiplist = new Map()
+function isSkiplisted(test) {
+  const item = skiplist.get(test)
 
-function parseTest(filepath) {
-  const rawTest = fs.readFileSync(filepath, "utf-8")
-
-  const {
-    attrs: { description, negative, flags }
-  } = test262Parser.parseFile(rawTest)
-
-  return {
-    description,
-    isAsync: flags && flags.async,
-    errorType: negative && negative.type
+  if (! item) {
+    return false
   }
+
+  if (item.skiplistFlags.includes(`@${nodeVersion}`) || item.skiplistFlags.length === 0) {
+    return true
+  }
+
+  return false
 }
 
 function loadSkiplist() {
-  const content = fs.readFileSync(resolve(test262Path, "../skiplist"), "utf-8")
+  const content = fs.readFileSync(skiplistPath, "utf-8")
 
   content
     .split("\n")
@@ -104,7 +84,7 @@ function loadSkiplist() {
 
       const skiplistFlags = comment.match(/@[a-z0-9-]*/g) || []
 
-      const fullPath = resolve(test262Path, line)
+      const fullPath = path.resolve(test262Path, line)
 
       if (isSkiplisted(fullPath)) {
         throw new Error(`Same entry in skiplist already exists for: "${line}".`)
@@ -121,29 +101,43 @@ function loadSkiplist() {
     }, null)
 }
 
-loadSkiplist()
+function node(args, env) {
+  return execa(process.execPath, args, {
+    cwd: fixturePath,
+    env,
+    reject: false
+  })
+}
 
-function isSkiplisted(test) {
-  const item = skiplist.get(test)
+function parseTest(filepath) {
+  const rawTest = fs.readFileSync(filepath, "utf-8")
 
-  if (! item) {
-    return false
+  const {
+    attrs: { description, negative, flags }
+  } = test262Parser.parseFile(rawTest)
+
+  return {
+    description,
+    isAsync: flags && flags.async,
+    errorType: negative && negative.type
   }
+}
 
-  if (item.skiplistFlags.includes(`@${nodeVersion}`) || item.skiplistFlags.length === 0) {
-    return true
-  }
-
-  return false
+function runEsm(filename, env, args) {
+  return node([
+    ...nodeArgs,
+    "-r", "esm",
+    filename,
+    ...args
+  ], env)
 }
 
 function skiplistReason(test) {
   return skiplist.get(test).comment
 }
 
-const test262Error = "Test262: This statement should not be evaluated."
+loadSkiplist()
 
-// const ESM_OPTIONS = JSON.stringify({ /* mode: "strict" */ })
 const ESM_OPTIONS = JSON.stringify({ mode: "all", cjs: false })
 
 describe.only("test262 module tests", function () {
@@ -158,22 +152,17 @@ describe.only("test262 module tests", function () {
 
     const testfunc = skip ? it.skip : it
 
-    const filename = basename(test262TestPath)
+    const filename = path.basename(test262TestPath)
 
     testfunc(
       `[${index}] ${description} (${filename}) ${skipReason}`,
       function () {
         const { isAsync, errorType } = parseTest(test262TestPath)
 
-        // return runMain(resolve(test262Path, "../wrapper.mjs"), [test262TestPath, isAsync])
-        return runEsm(resolve(test262Path, "../wrapper.js"), { ESM_OPTIONS }, [
+        return runEsm(wrapperPath, { ESM_OPTIONS }, [
           test262TestPath,
           isAsync
-        ]).then((out) => {
-          const { stdout, stderr } = out
-
-          // console.log(stdout, stderr)
-
+        ]).then(({ stderr, stdout }) => {
           if (stdout) {
             const { name } = JSON.parse(stdout)
 
