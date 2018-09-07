@@ -1,9 +1,9 @@
 "use strict"
 
 const globby = require("globby")
-const { resolve } = require("path")
+const path = require("path")
 
-const testPath = resolve(__dirname, "../../test/vendor/test262/.test")
+const testPath = path.resolve("../../test/vendor/test262/.test")
 
 exports.getTestFiles = function getTestFiles() {
   return globby(

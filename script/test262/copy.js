@@ -1,41 +1,29 @@
 "use strict"
 
-const { resolve } = require("path")
-const { copySync, removeSync } = require("fs-extra")
+const fs = require("fs-extra")
+const path = require("path")
 
-const rootPath = resolve(".")
-const test262RepoPath = resolve(rootPath, "test/vendor/test262/.repo-clone")
-const jsTestPath = resolve(rootPath, "test/vendor/test262/.js-tests")
+const rootPath = path.resolve(".")
+const test262RepoPath = path.resolve(rootPath, "test/vendor/test262/.repo-clone")
+const jsTestPath = path.resolve(rootPath, "test/vendor/test262/.js-tests")
 
 const testDirs = [
   "test/language/export",
   "test/language/import",
   "test/language/module-code",
+  "test/language/module-code/dynamic-import",
   "harness"
 ]
 
 function copyTests() {
-  removeSync(jsTestPath)
+  fs.removeSync(jsTestPath)
 
-  testDirs.map((testDir) => {
-    copySync(resolve(test262RepoPath, testDir), resolve(jsTestPath, testDir))
-  })
-}
-
-// TODO remove:
-// temporary measure and can be safily removed once
-// the `dynamic import` test PR is merged into test262
-// -- BEGIN
-const testDirsDynamicImport = ["test/language/module-code/dynamic-import"]
-
-copyTests.dynamicImport = function () {
-  testDirsDynamicImport.map((testDirDynamicImport) => {
-    copySync(
-      resolve(test262RepoPath, testDirDynamicImport),
-      resolve(jsTestPath, testDirDynamicImport)
+  for (const testDir of testDirs) {
+    fs.copySync(
+      path.resolve(test262RepoPath, testDir),
+      path.resolve(jsTestPath, testDir)
     )
-  })
+  }
 }
-// -- END
 
 module.exports = copyTests
