@@ -1,7 +1,12 @@
+import { error, log } from "console"
+
 import fs from "fs-extra"
 import path from "path"
 import test262Parser from "test262-parser"
 import vm from "vm"
+
+const MAX_WAIT = 1000
+const [,, testUrl, isAsync] = process.argv
 
 const testPath = path.resolve("../vendor/test262")
 const harnessPath = path.resolve(testPath, "harness")
@@ -13,64 +18,77 @@ const harnessFilenames = [
   path.resolve(harnessPath, "sta.js")
 ]
 
-const [, , testUrl, isAsync] = process.argv
-const _isAsync = isAsync === "true"
-const sandbox = vm.createContext(global)
+function waitForAsyncTest() {
+  const started = Date.now()
+
+  return new Promise(function check(resolve, reject) {
+    const waited = Date.now() - started
+
+    if (_message) {
+      return resolve()
+    } else if (waited > MAX_WAIT) {
+      return reject("test262: async test timed out.")
+    }
+
+    setTimeout(() => check(resolve, reject), 100)
+  })
+}
+
+let _message
+
+global.print = function print(value) {
+  _message = value
+}
 
 for (const filename of harnessFilenames) {
   const { contents } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
 
-  new vm.Script(contents).runInContext(sandbox)
-}
-
-let _msg
-
-// global print function expected by test262
-global.print = function print(val) {
-  _msg = val
-}
-
-const MAX_WAIT = 1000
-
-function waitForAsyncTest() {
-  let wait = 0
-
-  return new Promise(function time(res, rej) {
-    if (_msg) {
-      return res()
-    } else if (wait === MAX_WAIT) {
-      return rej("test262: async test timed out.")
-    }
-
-    setTimeout(() => time(res, rej), (wait += 200))
-  })
+  new vm.Script(contents).runInThisContext()
 }
 
 import(testUrl)
   .then(() => {
-    if (! _isAsync) {
-      return
+    if (isAsync === "true") {
+      return waitForAsyncTest()
+        .then(() => {
+          if (_message !== "Test262:AsyncTestComplete") {
+            throw _message
+          }
+        })
     }
-
-    return waitForAsyncTest().then(() => {
-      if (_msg !== "Test262:AsyncTestComplete") {
-        throw _msg
-      }
-    })
   })
   .catch((e) => {
-    const name = typeof e === "string" ? e : e.constructor.name
+    let message = ""
+    let name = ""
 
-    console.log(JSON.stringify({
+    const type = typeof e
+
+    if (type === "string") {
+      name = e
+    } else if (type === "object" &&
+        e !== null) {
+      const { constructor } = e
+      const errorMessage = e.message
+      const errorName = constructor ? constructor.name : e.name
+
+      if (errorMessage !== void 0) {
+        message = String(errorMessage)
+      }
+
+      if (errorName !== void 0) {
+        name = String(errorName)
+      }
+    }
+
+    log(JSON.stringify({
+      argv: process.argv,
       name,
-      message: typeof e !== "string" && e.message,
-      argv: process.argv
+      message
     }))
   })
-  .catch((e) =>
-    console.error(
-      `[last resort catch] something happened in the previous catch block: ${
-        e.message
-      }}`
+  .catch((e) => {
+    error(
+      "[last resort catch] something happened in the previous catch block:",
+      e
     )
-  )
+  })

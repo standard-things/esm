@@ -7,29 +7,33 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
+const ESM_OPTIONS = JSON.stringify({
+  cjs: false,
+  mode: "all"
+})
+
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")
-const testPath = path.resolve(".")
 const test262Path = path.resolve("vendor/test262")
 const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 
-let nodeVersion = Reflect.has(process.versions, "v8")
-  ? SemVer.major(process.version)
-  : ""
-
-if (process.execArgv.includes("--harmony")) {
-  nodeVersion = "harmony"
-} else if (Reflect.has(process.versions, "chakracore")) {
-  nodeVersion = "chakra"
-}
+const skipRegExp = /^(#.*)\n([^#\n].*)/gm
+const skipFlagsRegExp = /@[-\w]+/g
 
 const nodeArgs = []
 
-if (nodeVersion === "harmony") {
+let nodeVersion
+
+if (process.execArgv.indexOf("--harmony") !== -1) {
   nodeArgs.push("--harmony")
+  nodeVersion = "harmony"
+} else if (Reflect.has(process.versions, "chakracore")) {
+  nodeVersion = "chakra"
+} else {
+  nodeVersion = String(SemVer.major(process.version))
 }
 
-const skiplist = new Map
+const skiplist = parseSkiplist(skiplistPath)
 
 const test262Tests = globby.sync([
   "test/language/**/*.js",
@@ -40,63 +44,6 @@ const test262Tests = globby.sync([
   transform: path.normalize
 })
 
-function isSkiplisted(test) {
-  const item = skiplist.get(test)
-
-  if (! item) {
-    return false
-  }
-
-  if (item.skiplistFlags.includes(`@${nodeVersion}`) || item.skiplistFlags.length === 0) {
-    return true
-  }
-
-  return false
-}
-
-function loadSkiplist() {
-  const content = fs.readFileSync(skiplistPath, "utf-8")
-
-  content
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line !== "")
-    .reduce((comment, line) => {
-      if (line.startsWith("#")) {
-        if (comment) {
-          throw new Error(
-            `The skiplist contains multiple comments in consecutive rows: "${comment}" and "${line}". This is not allowed.`
-          )
-        }
-
-        return line
-      }
-
-      if (! comment) {
-        throw new Error(
-          `A reason for skipping is required! None was given for: "${line}".`
-        )
-      }
-
-      const skiplistFlags = comment.match(/@[a-z0-9-]*/g) || []
-
-      const fullPath = path.resolve(test262Path, line)
-
-      if (isSkiplisted(fullPath)) {
-        throw new Error(`Same entry in skiplist already exists for: "${line}".`)
-      }
-
-      comment = comment.slice(1).trimLeft()
-
-      skiplist.set(fullPath, {
-        comment,
-        skiplistFlags
-      })
-
-      return null
-    }, null)
-}
-
 function node(args, env) {
   return execa(process.execPath, args, {
     cwd: fixturePath,
@@ -105,74 +52,104 @@ function node(args, env) {
   })
 }
 
-function parseTest(filepath) {
-  const rawTest = fs.readFileSync(filepath, "utf-8")
+function parseSkiplist(filename) {
+  const content = fs.readFileSync(filename, "utf-8")
+  const result = new Map
 
-  const {
-    attrs: { description, negative, flags }
-  } = test262Parser.parseFile(rawTest)
+  let match
+
+  while ((match = skipRegExp.exec(content))) {
+    let flags
+    let reason
+    let [, comment, filename] = match
+
+    filename = path.resolve(test262Path, filename)
+
+    if (skipFlagsRegExp.test(comment)) {
+      flags = comment
+        .match(skipFlagsRegExp)
+        .map((flag) => flag.slice(1))
+
+      reason = comment
+        .slice(1, comment.search(skipFlagsRegExp))
+        .trim()
+
+    } else {
+      flags = []
+      reason = comment
+        .slice(1)
+        .trim()
+    }
+
+    result.set(filename, {
+      flags,
+      reason
+    })
+  }
+
+  return result
+}
+
+function parseTest(filename) {
+  const { attrs } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
+  const { flags, negative } = attrs
+  const description = attrs.description.trim()
+  const errorType = negative ? negative.type : void 0
+  const isAsync = !! (flags && flags.async)
 
   return {
     description,
-    isAsync: flags && flags.async,
-    errorType: negative && negative.type
+    errorType,
+    isAsync
   }
 }
 
-function runEsm(filename, env, args) {
+function runEsm(filename, args, env) {
   return node([
     ...nodeArgs,
     "-r", "esm",
-    filename,
-    ...args
+    filename, ...args
   ], env)
 }
 
-function skiplistReason(test) {
-  return skiplist.get(test).comment
-}
-
-loadSkiplist()
-
-const ESM_OPTIONS = JSON.stringify({ mode: "all", cjs: false })
-
-describe.only("test262 module tests", function () {
+describe("test262 tests", function () {
   this.timeout(0)
 
-  test262Tests.forEach(function (test262TestPath, index) {
-    const { description } = parseTest(test262TestPath)
+  for (const filename of test262Tests) {
+    let skipped = skiplist.get(filename)
 
-    const skip = isSkiplisted(test262TestPath)
+    if (skipped) {
+      const { flags } = skipped
 
-    const skipReason = skip ? `| ${skiplistReason(test262TestPath)}` : ""
-
-    const testfunc = skip ? it.skip : it
-
-    const filename = path.basename(test262TestPath)
-
-    testfunc(
-      `[${index}] ${description} (${filename}) ${skipReason}`,
-      function () {
-        const { isAsync, errorType } = parseTest(test262TestPath)
-
-        return runEsm(wrapperPath, { ESM_OPTIONS }, [
-          test262TestPath,
-          isAsync
-        ]).then(({ stderr, stdout }) => {
-          if (stdout) {
-            const { name } = JSON.parse(stdout)
-
-            // possible known "supported" test262 constructors:
-            // SyntaxError, Test262Error, ReferenceError, TypeError
-            assert.strictEqual(errorType, name)
-          }
-
-          if (stderr) {
-            console.log("stderr ==>", stderr)
-            assert.fail("possible test262 Error")
-          }
-        })
+      if (flags.length &&
+          flags.indexOf(nodeVersion) === -1) {
+        skipped = void 0
       }
+    }
+
+    const reason = skipped ? "; " + skipped.reason : ""
+    const postfix = " (" + path.basename(filename) + ")" + reason
+    const testData = parseTest(filename)
+    const testFunc = skipped ? it.skip : it
+
+    testFunc(testData.description + postfix, () =>
+      runEsm(wrapperPath, [
+        filename,
+        testData.isAsync
+      ], { ESM_OPTIONS })
+      .then(({ stderr, stdout }) => {
+        if (stderr) {
+          assert.fail(stderr)
+        }
+
+        if (stdout) {
+          const { name } = JSON.parse(stdout)
+
+          // Known test262 constructors:
+          // ReferenceError, SyntaxError, Test262Error, TypeError
+          assert.strictEqual(name, testData.errorType)
+        }
+      })
     )
-  })
+  }
 })

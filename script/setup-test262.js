@@ -13,7 +13,6 @@ const testDirs = [
   "test/language/export",
   "test/language/import",
   "test/language/module-code",
-  "test/language/module-code/dynamic-import",
   "harness"
 ]
 
@@ -62,7 +61,7 @@ function setupTest262() {
 
           return promise
             .then(() => trash(testDirPath))
-            .then(() => fs.copy(repoDirPath, testDirPath))
+            .then(() => fs.move(repoDirPath, testDirPath))
         }, Promise.resolve())
     )
     .then(() => trash(repoPath))
