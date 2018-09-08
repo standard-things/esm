@@ -16,30 +16,11 @@ const isWin = process.platform === "win32"
 
 const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
-const buildPath = path.resolve(rootPath, "build")
 const envPath = path.resolve(testPath, "env")
 const esmPath = path.resolve(rootPath, "esm.js")
 const indexPath = path.resolve(rootPath, "index.js")
-const loaderDirPath = path.resolve(rootPath, "esm")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
-const nodeModulesPath = path.resolve(rootPath, "node_modules")
-const vendorPath = path.resolve(rootPath, "src/vendor")
-
-const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
-
-const jsPaths = [
-  esmPath,
-  indexPath
-]
-
-const trashPaths = ignorePaths
-  .filter((thePath) =>
-    thePath !== loaderDirPath &&
-    thePath !== nodeModulesPath &&
-    ! thePath.startsWith(buildPath) &&
-    ! thePath.startsWith(vendorPath)
-  )
 
 const NODE_ENV = argv.prod ? "production" : "development"
 const ESM_ENV = NODE_ENV + "-test"
@@ -49,6 +30,19 @@ const NODE_PATH = [
   path.resolve(envPath, "node_path"),
   path.resolve(envPath, "node_path/relative")
 ].join(path.delimiter)
+
+const jsPaths = [
+  esmPath,
+  indexPath
+]
+
+const keptPaths = [
+  path.resolve(rootPath, "build"),
+  path.resolve(rootPath, "esm"),
+  path.resolve(rootPath, "node_modules"),
+  path.resolve(rootPath, "src/vendor"),
+  path.resolve(rootPath, "test/vendor")
+]
 
 const nodeArgs = []
 
@@ -63,6 +57,9 @@ nodeArgs.push(
   "tests.js"
 )
 
+const trashPaths = ignorePaths.filter(isKept)
+const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
+
 function cleanJS() {
   jsPaths.forEach((filename) => {
     const content = fs.readFileSync(filename, "utf8")
@@ -75,6 +72,10 @@ function cleanJS() {
 
 function cleanRepo() {
   return Promise.all(trashPaths.map(trash))
+}
+
+function isKept(thePath) {
+  return keptPaths.every((dirname) => ! thePath.startsWith(dirname))
 }
 
 function minifyJS(content) {

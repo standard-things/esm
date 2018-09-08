@@ -9,8 +9,8 @@ const trash = require("./trash.js")
 const rootPath = path.resolve(__dirname, "..")
 const nodeModulesPath = path.resolve(rootPath, "node_modules")
 
-const trashPaths = ignorePaths
-  .filter((thePath) => thePath !== nodeModulesPath)
+const keptPaths = [nodeModulesPath]
+const trashPaths = ignorePaths.filter(isKept)
 
 function cleanEmptyDirs() {
   return Promise
@@ -36,6 +36,10 @@ function cleanRepo() {
 
 function isEmpty(dirPath) {
   return ! fs.readdirSync(dirPath).length
+}
+
+function isKept(thePath) {
+  return keptPaths.every((dirname) => ! thePath.startsWith(dirname))
 }
 
 cleanRepo()
