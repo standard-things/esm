@@ -3,12 +3,11 @@
 const execa = require("execa")
 const fs = require("fs-extra")
 const path = require("path")
+const trash = require("./trash.js")
 
 const rootPath = path.resolve(__dirname, "..")
 const test262Path = path.resolve(rootPath, "test/vendor/test262")
-
-const repoDir = ".repo"
-const repoPath = path.resolve(test262Path, repoDir)
+const repoPath = path.resolve(test262Path, ".repo")
 
 const testDirs = [
   "test/language/export",
@@ -30,9 +29,7 @@ function setupTest262() {
     return Promise.resolve()
   }
 
-  fs.removeSync(repoPath)
-
-  return git(rootPath, ["--version"])
+  return trash(repoPath)
     .then(() =>
       git(rootPath, [
         "clone",
@@ -57,17 +54,18 @@ function setupTest262() {
         "dynamic-import"
       ])
     )
-    .then(() => {
-      for (const testDir of testDirs) {
-        const repoDirPath = path.resolve(repoPath, testDir)
-        const testDirPath = path.resolve(test262Path, testDir)
+    .then(() =>
+      testDirs
+        .reduce((promise, testDir) => {
+          const repoDirPath = path.resolve(repoPath, testDir)
+          const testDirPath = path.resolve(test262Path, testDir)
 
-        fs.removeSync(testDirPath)
-        fs.copySync(repoDirPath, testDirPath)
-      }
-
-      fs.removeSync(repoPath)
-    })
+          return promise
+            .then(() => trash(testDirPath))
+            .then(() => fs.copy(repoDirPath, testDirPath))
+        }, Promise.resolve())
+    )
+    .then(() => trash(repoPath))
 }
 
 module.exports = setupTest262
