@@ -31,18 +31,14 @@ if (nodeVersion === "harmony") {
 
 const skiplist = new Map
 
-const test262Tests = globby.sync(
-  [
-    "test/language/export/**/*.js",
-    "test/language/import/**/*.js",
-    "test/language/module-code/**/*.js",
-    "!**/*_FIXTURE.js"
-  ],
-  {
-    absolute: true,
-    cwd: test262Path
-  }
-)
+const test262Tests = globby.sync([
+  "test/language/**/*.js",
+  "!**/*_FIXTURE.js"
+], {
+  absolute: true,
+  cwd: test262Path,
+  transform: path.normalize
+})
 
 function isSkiplisted(test) {
   const item = skiplist.get(test)

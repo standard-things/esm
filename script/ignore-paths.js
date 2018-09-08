@@ -22,12 +22,11 @@ const patterns = fs.readFileSync(gitignorePath, "utf8")
   })
   .filter(Boolean)
 
-module.exports = globby
-  .sync(patterns, {
-    absolute: true,
-    cwd: rootPath,
-    dot: true,
-    expandDirectories: false,
-    onlyFiles: false
-  })
-  .map(path.normalize)
+module.exports = globby.sync(patterns, {
+  absolute: true,
+  cwd: rootPath,
+  dot: true,
+  expandDirectories: false,
+  onlyFiles: false,
+  transform: path.normalize
+})
