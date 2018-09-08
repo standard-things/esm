@@ -425,10 +425,6 @@ describe("scenario tests", function () {
         this.skip()
       }
 
-      return cleanup()
-    }
-
-    function cleanup() {
       return exec("pm2", ["kill"])
         .then(() => trash(logsPath))
     }
