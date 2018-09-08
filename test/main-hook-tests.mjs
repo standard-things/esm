@@ -82,9 +82,11 @@ describe("main hook tests", function () {
     const cachePath = path.resolve(execPath, ".cache")
 
     return trash(cachePath)
-      .then(() => runMain(execPath, {
-        ESM_OPTIONS:  "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
-       }))
+      .then(() =>
+        runMain(execPath, {
+          ESM_OPTIONS:  "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
+        })
+      )
       .then(() => assert.ok(fs.existsSync(cachePath)))
   })
 
