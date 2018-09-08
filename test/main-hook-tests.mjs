@@ -85,7 +85,7 @@ describe("main hook tests", function () {
       .then(() => runMain(execPath, {
         ESM_OPTIONS:  "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
        }))
-      .then(() => assert.ok(fs.pathExistsSync(cachePath)))
+      .then(() => assert.ok(fs.existsSync(cachePath)))
   })
 
   it("should support `ESM_OPTIONS` environment variable with `options.mainFields`", () =>

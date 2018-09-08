@@ -14,7 +14,7 @@ function trash(iterable) {
     const paths = Array
       .from(typeof iterable === "string" ? [iterable] : iterable)
       .map((thePath) => path.resolve(String(thePath)))
-      .filter(fs.pathExistsSync)
+      .filter(fs.existsSync)
 
     const _emit = process.emit
 
