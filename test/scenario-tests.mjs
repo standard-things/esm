@@ -408,6 +408,8 @@ describe("scenario tests", function () {
     beforeEach(beforeAndAfterEach)
     afterEach(beforeAndAfterEach)
 
+    const MAX_WAIT = 4000
+
     const logsPath = path.resolve("env/home/.pm2/logs")
     const stderrPath = path.resolve(logsPath, "pm2-error.log")
     const stdoutPath = path.resolve(logsPath, "pm2-out.log")
@@ -417,8 +419,6 @@ describe("scenario tests", function () {
       "--no-autorestart",
       "--name", "pm2"
     ]
-
-    const maxWait = 4000
 
     function beforeAndAfterEach() {
       if (! canTestPM2) {
@@ -445,7 +445,7 @@ describe("scenario tests", function () {
 
         if (stderr ||
             stdout ||
-            waited > maxWait) {
+            waited > MAX_WAIT) {
           resolve({ stderr, stdout })
         } else {
           setTimeout(() => check(resolve), 100)
