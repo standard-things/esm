@@ -431,7 +431,8 @@ describe("compiler tests", () => {
   it("should instrument console use", () => {
     const lines = [
       "console",
-      "console.log(a)",
+      "console.a(b)",
+      'console["a"](b)',
       "new console.Console(a)",
       "class C extends console.Console {}",
       "const a = { console }",
@@ -442,7 +443,8 @@ describe("compiler tests", () => {
 
     const compiled = [
       "_.g.console",
-      "_.g.console.log(a)",
+      "_.g.console.a(b)",
+      '_.g.console["a"](b)',
       "new _.g.console.Console(a)",
       "class C extends _.g.console.Console {}",
       "const a = { console:_.g.console }",
