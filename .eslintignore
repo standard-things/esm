@@ -11,3 +11,4 @@
 /test/node_modules/error
 /test/output
 /test/misc/builtin/namespace.mjs
+/test/vendor
