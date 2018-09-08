@@ -80,7 +80,7 @@ describe("cache tests", function () {
       this.skip()
     }
 
-    trash([
+    return trash([
       loaderCachePath,
       fixtureCachePath
     ])
