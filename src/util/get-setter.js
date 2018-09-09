@@ -12,9 +12,12 @@ function init() {
         ? object
         : Reflect.getOwnPropertyDescriptor(object, name)
 
-      if (! descriptor ||
-          ! descriptor.set) {
-        return false
+      if (descriptor) {
+        return descriptor.set
+      }
+
+      if (useAsDescriptor) {
+        return
       }
     }
 
