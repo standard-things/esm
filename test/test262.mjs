@@ -7,11 +7,6 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
-const ESM_OPTIONS = JSON.stringify({
-  cjs: false,
-  mode: "all"
-})
-
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")
 const test262Path = path.resolve("vendor/test262")
@@ -20,18 +15,9 @@ const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 const skipRegExp = /^(#.*)\n([^#\n].*)/gm
 const skipFlagsRegExp = /@[-\w]+/g
 
-const nodeArgs = []
-
-let nodeVersion
-
-if (process.execArgv.indexOf("--harmony") !== -1) {
-  nodeArgs.push("--harmony")
-  nodeVersion = "harmony"
-} else if (Reflect.has(process.versions, "chakracore")) {
-  nodeVersion = "chakra"
-} else {
-  nodeVersion = String(SemVer.major(process.version))
-}
+const nodeVersion = Reflect.has(process.versions, "chakracore")
+  ? "chakra"
+  : String(SemVer.major(process.version))
 
 const skiplist = parseSkiplist(skiplistPath)
 
@@ -73,7 +59,6 @@ function parseSkiplist(filename) {
       reason = comment
         .slice(1, comment.search(skipFlagsRegExp))
         .trim()
-
     } else {
       flags = []
       reason = comment
@@ -106,7 +91,6 @@ function parseTest(filename) {
 
 function runEsm(filename, args, env) {
   return node([
-    ...nodeArgs,
     "-r", "esm",
     filename, ...args
   ], env)
@@ -136,7 +120,7 @@ describe("test262 tests", function () {
       runEsm(wrapperPath, [
         filename,
         testData.isAsync
-      ], { ESM_OPTIONS })
+      ], { ESM_OPTIONS: "{cjs:0,mode:all}" })
       .then(({ stderr, stdout }) => {
         if (stderr) {
           assert.fail(stderr)
