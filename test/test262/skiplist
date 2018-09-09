@@ -1,92 +1,90 @@
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-rqstd-once.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-rqstd-order.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-self-once.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-once.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-star-as-props-dflt-skip.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-star-props-nrml.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
 
-# NOT YET SUPPORTED 🚧  (export * as ns from "mod")
+# NOT YET SUPPORTED 🚧 (export-ns-from)
 test/language/module-code/namespace/internals/get-nested-namespace-props-nrml.js
 
 
 
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-iee-bndng-fun.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-iee-bndng-gen.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-iee-bndng-var.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-iee-star-cycle.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-iee-trlng-comma.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-named-bndng-dflt-named.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-named-bndng-trlng-comma.js
-
-# CONFIRMED BUG 🐛  (instantiation phase)
-test/language/module-code/instn-named-bndng-var.js
-
-
-
-# CONFIRMED BUG 🐛  (cycle import)
-test/language/module-code/instn-iee-iee-cycle.js
-
-# NEEDS INVESTIGATION 🐛  (cycle import)
-test/language/module-code/instn-named-iee-cycle.js
-
-# NEEDS INVESTIGATION 🐛  (cycle import)
-test/language/module-code/instn-star-iee-cycle.js
-
-
-
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-1.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-2.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-3.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-4.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-5.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-6.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-7.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-8.js
 
-# PRIVATE CLASS FIELD 🔥  @6 @8 @10 @chakra
+# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-valid-no-earlyerr.js
+
+
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-iee-bndng-fun.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-iee-bndng-gen.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-iee-bndng-var.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-iee-star-cycle.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-iee-trlng-comma.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-named-bndng-dflt-named.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-named-bndng-trlng-comma.js
+
+# CONFIRMED BUG 🐛 (instantiation phase)
+test/language/module-code/instn-named-bndng-var.js
+
+# CONFIRMED BUG 🐛 (cycle import)
+test/language/module-code/instn-iee-iee-cycle.js
+
+# NEEDS INVESTIGATION 🐛 (cycle import)
+test/language/module-code/instn-named-iee-cycle.js
+
+# NEEDS INVESTIGATION 🐛 (cycle import)
+test/language/module-code/instn-star-iee-cycle.js
 
 
 
@@ -104,8 +102,6 @@ test/language/module-code/namespace/internals/get-str-initialize.js
 
 # NEEDS INVESTIGATION 👀
 test/language/module-code/namespace/internals/get-str-update.js
-
-
 
 # NEEDS INVESTIGATION 👀  @6
 test/language/module-code/eval-export-dflt-cls-anon.js
@@ -127,91 +123,91 @@ test/language/module-code/namespace/internals/object-keys-binding-uninit.js
 
 
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-arrow-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-async-function-await-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-async-function-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-async-function-return-await-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-block-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-block-labeled-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-do-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-do-while-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-else-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-function-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-if-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-labeled-block-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-nested-while-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (test wrong)
+# DYNAMIC IMPORT ❌ (test wrong)
 test/language/module-code/dynamic-import/catch-top-level-import-catch-instn-iee-err-not-found.js
 
-# DYNAMIC IMPORT ❌  (incomplete test)
+# DYNAMIC IMPORT ❌ (incomplete test)
 test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbdng-indirect-update-as.js
 
-# DYNAMIC IMPORT ❌  (incomplete test)
+# DYNAMIC IMPORT ❌ (incomplete test)
 test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbdng-indirect-update-dflt.js
 
-# DYNAMIC IMPORT ❌  (incomplete test)
+# DYNAMIC IMPORT ❌ (incomplete test)
 test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbndng-indirect-update.js
 
-# DYNAMIC IMPORT ❌  (incomplete test)
+# DYNAMIC IMPORT ❌ (incomplete test)
 test/language/module-code/dynamic-import/nested-if-braceless-returns-promise.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-block-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-block-labeled-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-do-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-do-while-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-else-braceless-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-else-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-if-braceless-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-if-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-labeled-block-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-while-empty-str-arg.js
 
-# DYNAMIC IMPORT ❌  (incomplete test: empty import)
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-top-level-empty-str-arg.js
 
 
@@ -290,68 +286,68 @@ test/language/module-code/dynamic-import/nested-async-function-returns-promise.j
 
 
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-iee-bndng-cls.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-iee-bndng-const.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-iee-bndng-let.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-cls.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-const.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-dflt-cls.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-dflt-expr.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-dflt-star.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-fun.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-gen.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-named-bndng-let.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-star-binding.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/instn-uniq-env-rec.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/define-own-property.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/delete-exported-uninit.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/delete-non-exported.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/get-own-property-str-found-uninit.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/get-str-found-uninit.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/set.js
 
-# CHAKRA ONLY ⚠️  - NEEDS INVESTIGATION 👀 @chakra
+# CHAKRA ONLY ⚠️ @chakra
 test/language/module-code/namespace/internals/set-prototype-of-null.js
