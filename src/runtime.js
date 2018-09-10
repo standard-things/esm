@@ -18,6 +18,8 @@ import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 
 const {
+  ERROR_STAR,
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -36,13 +38,67 @@ const Runtime = {
     this.addExportGetters([["default", () => value]])
   },
 
+  addExportFromSetter(importedName, exportedName = importedName) {
+    return createSetter("from", (value, childEntry) => {
+      const { entry } = this
+
+      entry.exports[importedName] = value
+      entry.assignExportsToNamespace([importedName])
+
+      if (! Reflect.has(entry.getters, exportedName)) {
+        entry.addGetterFrom(childEntry, importedName,  exportedName)
+      }
+    })
+  },
+
   addExportGetters(getterArgsList) {
     this.entry.addGetters(getterArgsList)
   },
 
   addNamespaceSetter() {
     return createSetter("namespace", (value, childEntry) => {
-      this.entry.addGettersFrom(childEntry)
+      const { _namespace } = childEntry
+      const { entry } = this
+      const { getters, type } = entry
+      const otherGetters = childEntry.getters
+      const otherType = childEntry.type
+
+      if ((type === TYPE_ESM &&
+           otherType !== TYPE_ESM &&
+           entry.extname === ".mjs") ||
+          (otherType === TYPE_CJS &&
+           ! childEntry.package.options.cjs.namedExports)) {
+        return
+      }
+
+      for (const name in _namespace) {
+        if (name === "default") {
+          continue
+        }
+
+        entry.exports[name] = _namespace[name]
+        entry.assignExportsToNamespace([name])
+
+        if (! Reflect.has(getters, name)) {
+          entry.addGetterFrom(childEntry, name)
+
+          const getter = getters[name]
+          const otherGetter = otherGetters[name]
+
+          if (type === TYPE_ESM ||
+              typeof getter !== "function" ||
+              typeof otherGetter !== "function") {
+            continue
+          }
+
+          const ownerName = getter.owner.name
+
+          if (ownerName !== entry.name &&
+              ownerName !== otherGetter.owner.name) {
+            entry.addGetter(name, () => ERROR_STAR)
+          }
+        }
+      }
     })
   },
 
@@ -124,6 +180,7 @@ const Runtime = {
 
     runtime._runResult = void 0
     runtime.addDefaultValue = Runtime.addDefaultValue
+    runtime.addExportFromSetter = Runtime.addExportFromSetter
     runtime.addExportGetters = Runtime.addExportGetters
     runtime.addNamespaceSetter = Runtime.addNamespaceSetter
     runtime.assertBinding = Runtime.assertBinding
@@ -145,6 +202,7 @@ const Runtime = {
     runtime.c = runtime.compileEval
     runtime.d = runtime.addDefaultValue
     runtime.e = runtime.evalGlobal
+    runtime.f = runtime.addExportFromSetter
     runtime.g = runtime.global
     runtime.i = runtime.importDynamic
     runtime.k = identity
