@@ -1,83 +1,83 @@
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-rqstd-once.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-rqstd-order.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/eval-self-once.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-once.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-star-as-props-dflt-skip.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/instn-star-props-nrml.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
 
-# NOT YET SUPPORTED 🚧 (export-ns-from)
+# UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/namespace/internals/get-nested-namespace-props-nrml.js
 
 
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-1.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-2.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-3.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-4.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-5.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-6.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-7.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-not-valid-earlyerr-module-8.js
 
-# NOT YET SUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
+# UNSUPPORTED 🚧 (private fields) @6 @8 @10 @chakra
 test/language/module-code/privatename-valid-no-earlyerr.js
 
 
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-iee-bndng-fun.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-iee-bndng-gen.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-iee-bndng-var.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-iee-star-cycle.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-iee-trlng-comma.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-named-bndng-dflt-named.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-named-bndng-trlng-comma.js
 
-# CONFIRMED BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase)
 test/language/module-code/instn-named-bndng-var.js
 
-# CONFIRMED BUG 🐛 (cycle import)
+# BUG 🐛 (cycle import)
 test/language/module-code/instn-iee-iee-cycle.js
 
 # NEEDS INVESTIGATION 🐛 (cycle import)

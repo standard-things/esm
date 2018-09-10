@@ -6,7 +6,7 @@ import test262Parser from "test262-parser"
 import vm from "vm"
 
 const MAX_WAIT = 1000
-const [,, testUrl, isAsync] = process.argv
+const [,, testFilename, isAsync] = process.argv
 
 const testPath = path.resolve("../vendor/test262")
 const harnessPath = path.resolve(testPath, "harness")
@@ -40,13 +40,15 @@ global.print = function print(value) {
   _message = value
 }
 
-for (const filename of harnessFilenames) {
-  const { contents } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
+for (const harnessFilename of harnessFilenames) {
+  const {
+    contents
+  } = test262Parser.parseFile(fs.readFileSync(harnessFilename, "utf-8"))
 
   new vm.Script(contents).runInThisContext()
 }
 
-import(testUrl)
+import(testFilename)
   .then(() => {
     if (isAsync === "true") {
       return waitForAsyncTest()
