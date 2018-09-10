@@ -265,7 +265,13 @@ function init() {
       this.addedImportExport = true
 
       const node = path.getValue()
-      const { declaration, specifiers } = node
+      const { original } =  this.magicString
+
+      const {
+        declaration,
+        source,
+        specifiers
+      } = node
 
       if (declaration) {
         const pairs = []
@@ -293,7 +299,7 @@ function init() {
 
         hoistExports(this, node, pairs)
 
-        // Skip adding declared names to `this.assignableExports` if the
+        // Skip adding declared names to `this.assignableExports()` if the
         // declaration is a const-kinded VariableDeclaration, because the
         // assignmentVisitor doesn't need to worry about changes to these
         // variables.
@@ -302,7 +308,7 @@ function init() {
         }
 
         path.call(this, "visitWithoutReset", "declaration")
-      } else if (node.source === null) {
+      } else if (source === null) {
         // Support exporting specifiers:
         // export { name1, name2, ..., nameN }
         const { identifiers } = this.top
@@ -313,7 +319,7 @@ function init() {
 
           if (! Reflect.has(identifiers, localName)) {
             throw new errors.SyntaxError(
-              this.magicString.original,
+              original,
               specifier.start,
               "Export '" + localName + "' is not defined in module"
             )
@@ -333,8 +339,7 @@ function init() {
           runtimeName
         } = this
 
-        const specifierMap = { __proto__: null }
-        const specifierName = node.source.value
+        const specifierName = source.value
 
         addToDependencySpecifiers(this, specifierName)
 
@@ -354,36 +359,21 @@ function init() {
             fromNames.push([exportedName, localName])
           }
 
-          addToDependencySpecifiers(this, specifierName, localName)
-
-          addToSpecifierMap(
-            this,
-            specifierMap,
-            localName,
-            runtimeName + ".entry.exports." + exportedName
+          const hoistedCode = pad(
+            original,
+            runtimeName + '.w("' + specifierName + '"',
+            node.start,
+            source.start
+          ) + pad(
+            original,
+            ',[["' + localName + '",null,' + runtimeName + '.f("' + localName + '","' + exportedName + '")]]);',
+            source.end,
+            node.end
           )
+
+          addToDependencySpecifiers(this, specifierName, localName)
+          hoistImports(this, node, hoistedCode)
         }
-
-        const importedNames = keys(specifierMap)
-        const lastIndex = importedNames.length - 1
-
-        let hoistedCode = runtimeName + '.w("' + specifierName + '",['
-        let i = -1
-
-        for (const importedName of importedNames) {
-          hoistedCode +=
-            '["' + importedName + '",null,function(v){' +
-            specifierMap[importedName].join("=") +
-            "=v}]"
-
-          if (++i !== lastIndex) {
-            hoistedCode += ","
-          }
-        }
-
-        hoistedCode += "]);"
-
-        hoistImports(this, node, hoistedCode)
       }
     }
 
