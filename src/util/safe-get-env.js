@@ -1,6 +1,7 @@
 import binding from "../binding.js"
-import { env } from "../safe/process.js"
+import getEnv from "./get-env.js"
 import shared from "../shared.js"
+import toString from "./to-string.js"
 
 function init() {
   let useSafeGetEnv
@@ -10,14 +11,13 @@ function init() {
       useSafeGetEnv = typeof binding.util.safeGetenv === "function"
     }
 
-    if (useSafeGetEnv &&
-        typeof name === "string") {
+    if (useSafeGetEnv) {
       try {
-        return binding.util.safeGetenv(name)
+        return binding.util.safeGetenv(toString(name))
       } catch {}
     }
 
-    return env[name]
+    return getEnv(name)
   }
 
   return safeGetEnv
