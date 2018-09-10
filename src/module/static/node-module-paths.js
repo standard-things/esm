@@ -42,7 +42,8 @@ function nodeModulePaths(from) {
   // an array of two items for a root path.
   if (WIN32) {
     // Return root node_modules when path is "D:\\".
-    if (from.charCodeAt(from.length - 1) === BACKWARD_SLASH &&
+    if (from.length > 1 &&
+        from.charCodeAt(from.length - 1) === BACKWARD_SLASH &&
         from.charCodeAt(from.length - 2) === COLON) {
       return GenericArray.of(from + "node_modules")
     }
