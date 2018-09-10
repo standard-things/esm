@@ -178,6 +178,12 @@ test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbndng-indire
 test/language/module-code/dynamic-import/nested-if-braceless-returns-promise.js
 
 # DYNAMIC IMPORT ❌ (incomplete test: empty import)
+test/language/module-code/dynamic-import/syntax-nested-arrow-assignment-expression-empty-str-arg.js
+
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
+test/language/module-code/dynamic-import/syntax-nested-arrow-empty-str-arg.js
+
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-block-empty-str-arg.js
 
 # DYNAMIC IMPORT ❌ (incomplete test: empty import)
@@ -194,6 +200,12 @@ test/language/module-code/dynamic-import/syntax-nested-else-braceless-empty-str-
 
 # DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-else-empty-str-arg.js
+
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
+test/language/module-code/dynamic-import/syntax-nested-function-empty-str-arg.js
+
+# DYNAMIC IMPORT ❌ (incomplete test: empty import)
+test/language/module-code/dynamic-import/syntax-nested-function-return-empty-str-arg.js
 
 # DYNAMIC IMPORT ❌ (incomplete test: empty import)
 test/language/module-code/dynamic-import/syntax-nested-if-braceless-empty-str-arg.js
