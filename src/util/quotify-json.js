@@ -16,7 +16,8 @@ function init() {
   const unquotedRegExp = /(|[^a-zA-Z])([a-zA-Z]+)([^a-zA-Z]|)/g
 
   function quotifyJSON(string) {
-    if (typeof string !== "string") {
+    if (typeof string !== "string" ||
+        ! string.length) {
       return string
     }
 

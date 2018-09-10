@@ -9,9 +9,12 @@ function init() {
   }
 
   function tryParse(string) {
-    try {
-      return parse(string)
-    } catch {}
+    if (typeof string === "string" &&
+        string.length) {
+      try {
+        return parse(string)
+      } catch {}
+    }
 
     return null
   }

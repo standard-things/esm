@@ -13,6 +13,7 @@ function init() {
 
   function parse(url) {
     if (typeof url === "string" &&
+        url.length > 1 &&
         url.charCodeAt(0) === FORWARD_SLASH &&
         url.charCodeAt(1) === FORWARD_SLASH) {
       // Prefix protocol relative URLs with "file:"

@@ -2,9 +2,12 @@ import shared from "../shared.js"
 
 function init() {
   function parseJSON(string) {
-    try {
-      return JSON.parse(string)
-    } catch {}
+    if (typeof string === "string" &&
+        string.length) {
+      try {
+        return JSON.parse(string)
+      } catch {}
+    }
 
     return null
   }
