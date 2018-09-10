@@ -82,7 +82,7 @@ describe("URL tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
         ))
     )

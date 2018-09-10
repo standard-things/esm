@@ -257,7 +257,7 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(() => assert.ok(false))
+          .then(() => assert.fail())
           .catch((e) => assert.ok(e instanceof SyntaxError))
       , Promise.resolve())
     )
@@ -270,7 +270,7 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(() => assert.ok(false))
+          .then(() => assert.fail())
           .catch((e) => assert.ok(e instanceof SyntaxError))
       , Promise.resolve())
     )
@@ -283,14 +283,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(() => assert.ok(false))
+          .then(() => assert.fail())
           .catch((e) => assert.ok(e instanceof SyntaxError))
       , Promise.resolve())
     )
 
     it("should support .esmrc.mjs options", () =>
       import("./fixture/options-file/esmrc-mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => assert.ok(e instanceof SyntaxError))
     )
 
@@ -302,7 +302,7 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(() => assert.ok(false))
+          .then(() => assert.fail())
           .catch((e) => assert.ok(e instanceof SyntaxError))
       , Promise.resolve())
     )
@@ -326,7 +326,7 @@ describe("miscellaneous tests", () => {
     it("should error when `require` receives an empty `request`", () => {
       try {
         require("")
-        assert.ok(false)
+        assert.fail()
       } catch (e) {
         assert.strictEqual(e.code, "ERR_INVALID_ARG_VALUE")
       }
@@ -343,7 +343,7 @@ describe("miscellaneous tests", () => {
           .forEach((request) => {
             try {
               func(request)
-              assert.ok(false)
+              assert.fail()
             } catch (e) {
               assert.strictEqual(e.code, "ERR_INVALID_ARG_TYPE")
             }
@@ -353,13 +353,13 @@ describe("miscellaneous tests", () => {
 
     it("should not wrap custom errors", () =>
       import("./fixture/error/custom.mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => assert.strictEqual(e, global.customError))
     )
 
     it("should not error accessing `error.stack`", () =>
       import("./fixture/error/no-stack.mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => {
           assert.doesNotThrow(() => e.stack)
           assert.strictEqual(e, global.customError)
@@ -379,7 +379,7 @@ describe("miscellaneous tests", () => {
       return Promise
         .all([
           import(id1)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) =>
               checkErrorStack(e, [
                 getURLFromFilePath(id1) + ":4",
@@ -387,7 +387,7 @@ describe("miscellaneous tests", () => {
               ].join("\n"))
             ),
           import(id4)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) =>
               checkErrorStack(e, [
                 id2 + ":1",
@@ -396,7 +396,7 @@ describe("miscellaneous tests", () => {
               ].join("\n"))
             ),
           import(id3)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) =>
               checkErrorStack(e, [
                 id3 + ":1",
@@ -406,7 +406,7 @@ describe("miscellaneous tests", () => {
               ].join("\n"))
             ),
           import(id5)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) =>
               checkErrorStack(e, [
                 getURLFromFilePath(id5) + ":1",
@@ -414,7 +414,7 @@ describe("miscellaneous tests", () => {
               ].join("\n"))
             ),
           import(id6)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) =>
               checkErrorStack(e, [
                 getURLFromFilePath(id6) + ":2",
@@ -424,7 +424,7 @@ describe("miscellaneous tests", () => {
               ].join("\n"))
             ),
           import(id7)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               if (isDebug) {
                 assert.ok(true)
@@ -437,7 +437,7 @@ describe("miscellaneous tests", () => {
               }
             }),
           import(id8)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               if (isDebug) {
                 assert.ok(true)
@@ -454,7 +454,7 @@ describe("miscellaneous tests", () => {
 
     it("should mask stack traces", () =>
       import("./fixture/error/import.mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
     )
   })
@@ -517,7 +517,7 @@ describe("miscellaneous tests", () => {
     it('should not resolve non-local "." requests with `require`', () => {
       try {
         require(".")
-        assert.ok(false)
+        assert.fail()
       } catch (e) {
         checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
       }
@@ -525,7 +525,7 @@ describe("miscellaneous tests", () => {
 
     it('should not resolve non-local "." requests with `import`', () =>
       import(".")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
     )
 
@@ -566,7 +566,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
         ))
     )
@@ -711,7 +711,7 @@ describe("miscellaneous tests", () => {
       Reflect.deleteProperty(require.cache, filename)
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     })
 
@@ -769,7 +769,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
         ))
     )
@@ -784,7 +784,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
         ))
     )
@@ -809,7 +809,7 @@ describe("miscellaneous tests", () => {
           requests
             .map((request) =>
               import(request)
-                .then(() => assert.ok(false))
+                .then(() => assert.fail())
                 .catch((e) => {
                   if (isWin &&
                       ! request.startsWith("file:")) {
@@ -882,13 +882,13 @@ describe("miscellaneous tests", () => {
           .then(() => {
             Reflect.deleteProperty(global, "loadCount")
             return import(request)
-              .then(() => assert.ok(false))
+              .then(() => assert.fail())
               .catch((e) =>
                 import(request)
-                  .then(() => assert.ok(false))
+                  .then(() => assert.fail())
                   .catch((re) => {
                     if (re.code === "ERR_ASSERTION") {
-                      assert.ok(false)
+                      assert.fail()
                     } else {
                       assert.strictEqual(e, re)
                       assert.strictEqual(global.loadCount, 1)
@@ -1033,7 +1033,7 @@ describe("miscellaneous tests", () => {
       Promise
         .all([
           import("./fixture/cycle/detected/direct/a.mjs")
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
@@ -1043,7 +1043,7 @@ describe("miscellaneous tests", () => {
               )
             }),
           import("./fixture/cycle/detected/indirect/a.mjs")
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
@@ -1053,7 +1053,7 @@ describe("miscellaneous tests", () => {
               )
             }),
           import("./fixture/cycle/detected/self/a.mjs")
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
@@ -1133,7 +1133,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then((ns) => assert.ok(false))
+            .then((ns) => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
               assert.ok(e.message.startsWith("Cannot use 'import.meta' outside a module"))
@@ -1162,7 +1162,7 @@ describe("miscellaneous tests", () => {
 
     it("should not import CJS bindings in `.mjs` files", () =>
       import("./fixture/import/cjs-bindings.mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
           assert.ok(e.message.startsWith("Missing export"))
@@ -1173,10 +1173,10 @@ describe("miscellaneous tests", () => {
       Promise
         .all([
           import("./fixture/require-esm/strict/js.js")
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => assert.ok(e instanceof SyntaxError)),
           import("./fixture/require-esm/strict/mjs.js")
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
         ])
     )
@@ -1191,10 +1191,10 @@ describe("miscellaneous tests", () => {
           Promise
             .all([
               import("./fixture/require-esm/strict/js.js")
-                .then(() => assert.ok(false))
+                .then(() => assert.fail())
                 .catch((e) => assert.ok(e instanceof SyntaxError)),
               import("./fixture/require-esm/strict/mjs.js")
-                .then(() => assert.ok(false))
+                .then(() => assert.fail())
                 .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
             ])
         )
@@ -1206,7 +1206,7 @@ describe("miscellaneous tests", () => {
 
     it("should not support loading `.mjs` files from `require` with `options.cjs`", () =>
       import("./fixture/require-esm/cjs/mjs.js")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
     )
 
@@ -1269,14 +1269,14 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => import(request))
-          .then(() => assert.ok(false))
+          .then(() => assert.fail())
           .catch((e) => assert.ok(e instanceof ReferenceError))
       , Promise.resolve())
     )
 
     it("should error when exporting duplicate local bindings", () =>
       import("./fixture/export/dup-local.mjs")
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
           assert.ok(e.message.startsWith("Duplicate export"))
@@ -1293,7 +1293,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
               assert.ok(e.message.startsWith("Conflicting indirect export"))
@@ -1309,7 +1309,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
         ))
     )
@@ -1323,7 +1323,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
         ))
     )
@@ -1338,7 +1338,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
               checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
@@ -1356,7 +1356,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
               assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
@@ -1372,7 +1372,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.strictEqual(global.loadCount, 1)
 
@@ -1393,7 +1393,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               assert.ok(e instanceof TypeError)
               assert.ok(e.message.startsWith("Assignment to constant variable."))
@@ -1405,7 +1405,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/arguments-binding.mjs")
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
@@ -1420,7 +1420,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/await-binding.mjs")
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
@@ -1435,7 +1435,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/non-local-export.mjs")
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
@@ -1450,7 +1450,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/new-target.mjs")
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
@@ -1465,7 +1465,7 @@ describe("miscellaneous tests", () => {
       const filename = path.resolve("fixture/source/html-comment.mjs")
 
       return import(filename)
-        .then(() => assert.ok(false))
+        .then(() => assert.fail())
         .catch((e) =>
           checkErrorStack(e, [
             getURLFromFilePath(filename) + ":1",
@@ -1483,7 +1483,7 @@ describe("miscellaneous tests", () => {
       return Promise
         .all([
           import(id1)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               if (isDebug) {
                 assert.ok(true)
@@ -1497,7 +1497,7 @@ describe("miscellaneous tests", () => {
               }
             }),
           import(id2)
-            .then(() => assert.ok(false))
+            .then(() => assert.fail())
             .catch((e) => {
               if (isDebug) {
                 assert.ok(true)
