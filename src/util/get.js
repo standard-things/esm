@@ -2,9 +2,11 @@ import shared from "../shared.js"
 
 function init() {
   function get(object, name) {
-    try {
-      return object[name]
-    } catch {}
+    if (object != null) {
+      try {
+        return object[name]
+      } catch {}
+    }
   }
 
   return get

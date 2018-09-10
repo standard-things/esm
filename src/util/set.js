@@ -1,10 +1,13 @@
+import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
   function set(object, name, value) {
-    try {
-      object[name] = value
-    } catch {}
+    if (isObjectLike(object)) {
+      try {
+        object[name] = value
+      } catch {}
+    }
 
     return object
   }
