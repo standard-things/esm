@@ -111,29 +111,47 @@ describe("test262 tests", function () {
       }
     }
 
-    const reason = skipped ? "; " + skipped.reason : ""
-    const postfix = " (" + path.basename(filename) + ")" + reason
     const testData = parseTest(filename)
-    const testFunc = skipped ? it.skip : it
 
-    testFunc(testData.description + postfix, () =>
-      runEsm(wrapperPath, [
+    const description =
+      testData.description +
+      " (" + path.basename(filename) + ")" +
+      (skipped ? "; " + skipped.reason : "")
+
+    it(description, function () {
+      return runEsm(wrapperPath, [
         filename,
         testData.isAsync
       ], { ESM_OPTIONS: "{cjs:0,mode:all}" })
       .then(({ stderr, stdout }) => {
         if (stderr) {
+          if (skipped) {
+            this.skip()
+          }
+
           assert.fail(stderr)
         }
 
         if (stdout) {
           const { name } = JSON.parse(stdout)
+          const expected = testData.errorType
 
           // Known test262 constructors:
           // ReferenceError, SyntaxError, Test262Error, TypeError
-          assert.strictEqual(name, testData.errorType)
+          if (skipped) {
+            if (name !== expected ||
+                name !== "SyntaxError") {
+              assert.notStrictEqual(name, expected)
+            }
+
+            this.skip()
+          } else {
+            assert.strictEqual(name, expected)
+          }
+        } else if (skipped) {
+          assert.fail("Expected skipped test to fail")
         }
       })
-    )
+    })
   }
 })
