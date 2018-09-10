@@ -271,50 +271,6 @@ class Entry {
     }
   }
 
-  addGettersFrom(otherEntry) {
-    const otherType = otherEntry.type
-
-    if ((this.type === TYPE_ESM &&
-         otherType !== TYPE_ESM &&
-         this.extname === ".mjs") ||
-        (otherType === TYPE_CJS &&
-         ! otherEntry.package.options.cjs.namedExports)) {
-      return this
-    }
-
-    const { getters } = this
-    const otherGetters = otherEntry.getters
-
-    this.assignExportsToNamespace()
-    otherEntry.assignExportsToNamespace()
-
-    for (const name in otherEntry._namespace) {
-      if (name === "default") {
-        continue
-      }
-
-      this.addGetterFrom(otherEntry, name)
-
-      const getter = getters[name]
-      const otherGetter = otherGetters[name]
-
-      if (this.type === TYPE_ESM ||
-          typeof getter !== "function" ||
-          typeof otherGetter !== "function") {
-        continue
-      }
-
-      const ownerName = getter.owner.name
-
-      if (ownerName !== this.name &&
-          ownerName !== otherGetter.owner.name) {
-        this.addGetter(name, () => STAR_ERROR)
-      }
-    }
-
-    return this
-  }
-
   addSetter(name, localNames, setter, parent) {
     const { bindings } = this
     const settersMap = this.setters
