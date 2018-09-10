@@ -11,9 +11,6 @@ import realProcess from "../real/process.js"
 import relaxRange from "../util/relax-range.js"
 
 function hook(Mod) {
-  const _tickCallback = getSilent(realProcess, "_tickCallback")
-  const useTickCallback = typeof _tickCallback === "function"
-
   function managerWrapper(manager, func, args) {
     const [, mainPath] = realProcess.argv
     const filename = tryResolveFilename(mainPath)
@@ -42,7 +39,9 @@ function hook(Mod) {
   }
 
   function tickCallback() {
-    if (useTickCallback) {
+    const _tickCallback = getSilent(realProcess, "_tickCallback")
+
+    if (typeof _tickCallback === "function") {
       call(_tickCallback, realProcess)
     }
   }
