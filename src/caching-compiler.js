@@ -12,8 +12,10 @@ import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
+import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
+import parseJSON from "./util/parse-json.js"
 import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
@@ -219,6 +221,7 @@ function init() {
         dirty =
         cache.dirty =
           NYC ||
+          parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
           exists(resolve(cachePath, "../@babel/register"))
       }
 
