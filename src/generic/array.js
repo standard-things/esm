@@ -9,7 +9,6 @@ function init() {
 
   return {
     concat: unapply(safeProto.concat),
-    filter: unapply(safeProto.filter),
     from: SafeArray.from,
     indexOf: unapply(prototype.indexOf),
     join: unapply(prototype.join),

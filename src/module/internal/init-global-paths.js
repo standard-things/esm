@@ -6,19 +6,19 @@ import { delimiter, resolve } from "../../safe/path.js"
 
 import GenericArray from "../../generic/array.js"
 
+import getEnv from "../../util/get-env.js"
 import realProcess from "../../real/process.js"
 import safeGetEnv from "../../util/safe-get-env.js"
 
 function initGlobalPaths() {
-  const { env } = realProcess
   const isWin = realProcess.platform === "win32"
 
   let homeDir
   let nodePath
 
   if (isWin) {
-    homeDir = env.USERPROFILE
-    nodePath = env.HOME
+    homeDir = getEnv("USERPROFILE")
+    nodePath = getEnv("HOME")
   } else {
     // Use `safeGetEnv()` to ensure nothing is returned when the setuid bit is set,
     // i.e. when Node is ran with privileges other than the user executing it.
@@ -27,24 +27,41 @@ function initGlobalPaths() {
     nodePath = safeGetEnv("NODE_PATH")
   }
 
+  let paths
+
+  if (homeDir &&
+      typeof homeDir === "string") {
+    paths = GenericArray.of(
+      resolve(homeDir, ".node_modules"),
+      resolve(homeDir, ".node_libraries")
+    )
+  } else {
+    paths = GenericArray.of()
+  }
+
   // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
   // everywhere else, where `$PREFIX` is the root of the Node.js installation.
   const prefixDir = resolve(realProcess.execPath, "..", isWin ? "" : "..")
-  const paths = GenericArray.of(resolve(prefixDir, "lib", "node"))
 
-  if (homeDir) {
-    GenericArray.unshift(paths, resolve(homeDir, ".node_libraries"))
-    GenericArray.unshift(paths, resolve(homeDir, ".node_modules"))
+  GenericArray.push(paths, resolve(prefixDir, "lib", "node"))
+
+  if (nodePath &&
+      typeof nodePath === "string") {
+    const nodePaths = nodePath.split(delimiter)
+    const oldPaths = paths
+
+    paths = GenericArray.of()
+
+    for (const thePath of nodePaths) {
+      if (thePath) {
+        GenericArray.push(paths, thePath)
+      }
+    }
+
+    GenericArray.push(paths, ...oldPaths)
   }
 
-  if (typeof nodePath !== "string") {
-    return paths
-  }
-
-  const otherPaths = nodePath.split(delimiter)
-  const filtered = GenericArray.filter(otherPaths, Boolean)
-
-  return GenericArray.concat(filtered, paths)
+  return paths
 }
 
 export default initGlobalPaths
