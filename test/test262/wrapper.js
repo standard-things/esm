@@ -21,16 +21,16 @@ const harnessFilenames = [
 function waitForAsyncTest() {
   const started = Date.now()
 
-  return new Promise(function check(resolve, reject) {
+  return new Promise(function check(resolvePromise, rejectPromise) {
     const waited = Date.now() - started
 
     if (_message) {
-      return resolve()
+      return resolvePromise()
     } else if (waited > MAX_WAIT) {
-      return reject("test262: async test timed out.")
+      return rejectPromise("test262: async test timed out.")
     }
 
-    setTimeout(() => check(resolve, reject), 100)
+    setTimeout(() => check(resolvePromise, rejectPromise), 100)
   })
 }
 

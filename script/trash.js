@@ -10,7 +10,7 @@ const options = {
 let _trash
 
 function trash(iterable) {
-  return new Promise((resolve) => {
+  return new Promise((resolvePromise) => {
     const paths = Array
       .from(typeof iterable === "string" ? [iterable] : iterable)
       .map((thePath) => path.resolve(String(thePath)))
@@ -43,7 +43,7 @@ function trash(iterable) {
       .then(() => {
         process.emit = _emit
         Reflect.deleteProperty(process, "noDeprecation")
-        resolve()
+        resolvePromise()
       })
   })
 }
