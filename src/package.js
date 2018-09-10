@@ -9,6 +9,7 @@ import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
 import builtinLookup from "./builtin-lookup.js"
+import { cwd } from "./safe/process.js"
 import defaults from "./util/defaults.js"
 import errors from "./errors.js"
 import esmParseLoad from "./module/esm/parse-load.js"
@@ -210,7 +211,7 @@ class Package {
 
   static get(dirPath, forceOptions) {
     if (dirPath === ".") {
-      dirPath = resolve(dirPath)
+      dirPath = cwd()
     }
 
     return getInfo(dirPath, forceOptions) || Package.state.default

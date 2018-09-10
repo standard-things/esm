@@ -1,4 +1,4 @@
-import { extname, resolve } from "../safe/path.js"
+import { extname, sep } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 
@@ -21,13 +21,13 @@ function init() {
   function hasLoaderValue(value) {
     if (typeof value === "string") {
       if (isPath(value)) {
-        let resolved = resolve(value)
+        let thePath = value
 
-        if (! extname(resolved)) {
-          resolved += "/index.js"
+        if (! extname(thePath)) {
+          thePath += sep + "index.js"
         }
 
-        if (isOwnPath(realpath(resolved))) {
+        if (isOwnPath(realpath(thePath))) {
           return true
         }
       } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&

@@ -2,9 +2,9 @@ import GenericArray from "../../generic/array.js"
 import SafeJSON from "../../safe/json.js"
 
 import readFileFast from "../../fs/read-file-fast.js"
-import { resolve } from "../../safe/path.js"
-import toString from "../../util/to-string.js"
+import { sep } from "../../safe/path.js"
 import shared from "../../shared.js"
+import toString from "../../util/to-string.js"
 
 const mainFieldRegExp = /"main"/
 
@@ -22,7 +22,7 @@ function readPackage(dirPath, fields) {
     return cache[cacheKey]
   }
 
-  const jsonPath = resolve(dirPath, "package.json")
+  const jsonPath = dirPath + sep + "package.json"
   const jsonString = readFileFast(jsonPath, "utf8")
 
   if (! jsonString ||
