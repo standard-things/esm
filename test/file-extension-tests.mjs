@@ -24,7 +24,7 @@ describe("file extension tests", () => {
 
   it("should error loading extensionless files with dynamic import in ESM", () =>
     import("./fixture/ext/no-ext-esm")
-      .then(() => assert.fail())
+      .then(assert.fail)
       .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
@@ -45,7 +45,7 @@ describe("file extension tests", () => {
 
   it("should error loading unknown extensions with dynamic import in ESM", () =>
     import("./fixture/ext/a.mjs.unknown")
-      .then(() => assert.fail())
+      .then(assert.fail)
       .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
@@ -62,7 +62,7 @@ describe("file extension tests", () => {
       ]
       .map((request) =>
         import(request)
-          .then(() => assert.fail())
+          .then(assert.fail)
           .catch((e) => {
             assert.ok(e instanceof SyntaxError)
             assert.ok(e.message.startsWith("Unexpected token export"))
@@ -78,7 +78,7 @@ describe("file extension tests", () => {
       ]
       .map((request) =>
         import(request)
-          .then(() => assert.fail())
+          .then(assert.fail)
           .catch((e) => {
             assert.ok(e.message.startsWith("Cannot load ES module"))
           })

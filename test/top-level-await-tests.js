@@ -36,7 +36,7 @@ describe("top-level await tests", () => {
       ]
       .map((request) =>
         import(request)
-          .then(() => assert.fail())
+          .then(assert.fail)
           .catch((e) => assert.strictEqual(e.name, "SyntaxError"))
       ))
   )

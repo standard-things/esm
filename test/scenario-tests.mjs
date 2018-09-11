@@ -70,7 +70,7 @@ describe("scenario tests", function () {
       "-r", "@babel/register",
       path.resolve("fixture/scenario/babel-error")
     ])
-    .then(() => assert.fail())
+    .then(assert.fail)
     .catch(({ stderr }) => {
       assert.ok(stderr.includes("Support for the experimental syntax 'importMeta' isn't currently enabled"))
     })
