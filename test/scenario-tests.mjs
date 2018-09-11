@@ -6,12 +6,13 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
+const isTravis = Reflect.has(process.env, "TRAVIS")
 const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
 const canTestJest = isV8
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
-const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
+const canTestPM2 = ! isTravis
 
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
