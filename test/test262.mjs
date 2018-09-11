@@ -12,10 +12,11 @@ const skiplistPath = path.resolve(fixturePath, "skiplist")
 const test262Path = path.resolve("vendor/test262")
 const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 
+const isChakra = Reflect.has(process.versions, "chakracore")
 const skipRegExp = /^(#.*)\n([^#\n].*)/gm
 const skipFlagsRegExp = /@[-\w]+/g
 
-const nodeVersion = Reflect.has(process.versions, "chakracore")
+const nodeVersion = isChakra
   ? "chakra"
   : String(SemVer.major(process.version))
 
@@ -157,7 +158,8 @@ describe("test262 tests", function () {
           } else {
             assert.strictEqual(name, expected)
           }
-        } else if (skipped) {
+        } else if (! isChakra &&
+            skipped) {
           assert.fail("Expected skipped test to fail")
         }
       })
