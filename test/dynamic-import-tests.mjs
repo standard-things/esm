@@ -7,6 +7,7 @@ import path from "path"
 import url from "url"
 
 const isWin = process.platform === "win32"
+
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const abcPath = path.resolve("fixture/export/abc.mjs")

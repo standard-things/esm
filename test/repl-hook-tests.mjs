@@ -11,11 +11,15 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
+const isChakra = Reflect.has(process.versions, "chakracore")
+const isWin = process.platform === "win32"
+
+const canRunInContext = ! isChakra
+
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")
 const pkgPath = path.resolve("../package.json")
 
-const isWin = process.platform === "win32"
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const { parent } = require.cache[indexPath]
 
@@ -28,8 +32,6 @@ const PKG_PREFIX = "esm" + ZWJ
 const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + "@" + pkgJSON.version + ":shared")
 
 const shared = require(SHARED_SYMBOL)
-
-const canRunInContext = Reflect.has(process.versions, "v8")
 
 describe("REPL hook tests", () => {
   let context

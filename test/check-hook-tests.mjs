@@ -5,10 +5,10 @@ import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
 
-const testPath = path.resolve(".")
-
 const canTestWithFilename = SemVer.satisfies(process.version, ">=10")
 const canTestWithStdin = SemVer.satisfies(process.version, ">=8")
+
+const testPath = path.resolve(".")
 
 function node(args) {
   return execa(process.execPath, args, {

@@ -12,6 +12,7 @@ import percent2 from "../fixture/with%2520percent.mjs#c"
 import percent3 from "../fixture/with%2520percent.mjs?c#c"
 
 const isWin = process.platform === "win32"
+
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.resolve(".")

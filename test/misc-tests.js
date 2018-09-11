@@ -15,8 +15,15 @@ import util from "util"
 
 const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 
+const isChakra = Reflect.has(process.versions, "chakracore")
 const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
+
+const canTestBridgeExports = ! isChakra
+const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
+const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
+const canTestUtilTypes = Reflect.has(util, "types")
+
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
@@ -35,14 +42,6 @@ const abcNs = createNamespace({
 const defNs = createNamespace({
   default: { d: "d", e: "e", f: "f" }
 })
-
-const canTestBridgeExports =
-  Reflect.has(process.versions, "v8") ||
-  ! Reflect.has(process.env, "APPVEYOR")
-
-const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
-const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
-const canTestUtilTypes = Reflect.has(util, "types")
 
 function checkError(error, code) {
   const message = error.message

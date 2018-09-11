@@ -6,18 +6,20 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
+const isChakra = Reflect.has(process.versions, "chakracore")
 const isWin = process.platform === "win32"
-const fileProtocol = "file://" + (isWin ? "/" : "")
-
-const testPath = path.resolve(".")
-const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 const canUseExperimentalModules =
-  Reflect.has(process.versions, "v8") &&
+  ! isChakra &&
   SemVer.satisfies(process.version, ">=8.5.0")
 
 const canUsePreserveSymlinks =
   SemVer.satisfies(process.version, ">=6.3.0")
+
+const fileProtocol = "file://" + (isWin ? "/" : "")
+
+const testPath = path.resolve(".")
+const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
 function node(args, env) {
   return execa(process.execPath, args, {

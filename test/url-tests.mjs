@@ -4,6 +4,7 @@ import getFilePathFromURL from "../build/get-file-path-from-url.js"
 import getURLFromFilePath from "../build/get-url-from-file-path.js"
 
 const isWin = process.platform === "win32"
+
 const fileProtocol = "file://" + (isWin ? "/" : "")
 
 const testPath = path.resolve(".")

@@ -8,15 +8,15 @@ import trash from "../script/trash.js"
 
 const isWin = process.platform === "win32"
 
+const canTestJest = Reflect.has(process.versions, "v8")
+const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
+const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
+
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
 const nodePath = path.resolve("env/prefix", isWin ? "node.exe" : "bin/node")
 const testPath = path.resolve(".")
-
-const canTestJest = Reflect.has(process.versions, "v8")
-const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
-const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 
 const defaultNodeArgs = [
   "--no-deprecation"

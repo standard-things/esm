@@ -5,9 +5,11 @@ import path from "path"
 import process from "process"
 import trash from "../script/trash.js"
 
+const isAppVeyor = Reflect.has(process.env, "APPVEYOR")
+
 const canTestCache =
-  process.env.ESM_ENV.includes("-cached") &&
-  ! Reflect.has(process.env, "APPVEYOR")
+  ! isAppVeyor &&
+  /cached/.test(process.env.ESM_ENV)
 
 const fixtureCacheFiles = [
   ".data.blob",
