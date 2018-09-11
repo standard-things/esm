@@ -6,9 +6,10 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
+const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
-const canTestJest = Reflect.has(process.versions, "v8")
+const canTestJest = isV8
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! Reflect.has(process.env, "TRAVIS")
 

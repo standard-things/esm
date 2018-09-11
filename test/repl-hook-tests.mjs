@@ -11,10 +11,10 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
-const isChakra = Reflect.has(process.versions, "chakracore")
+const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
-const canRunInContext = ! isChakra
+const canRunInContext = isV8
 
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")

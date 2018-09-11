@@ -1,7 +1,9 @@
 import SemVer from "semver"
 
+const isV8 = Reflect.has(process.versions, "v8")
+
 const canTestLiveBinding =
-  Reflect.has(process.versions, "v8") &&
+  isV8 &&
   SemVer.satisfies(process.version, ">=6.2.0")
 
 describe("import declaration tests", () => {
