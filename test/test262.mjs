@@ -7,6 +7,9 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
+const isAppVeyor = Reflect.has(process.env, "APPVEYOR")
+const isChakra = Reflect.has(process.versions, "chakracore")
+
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")
 const test262Path = path.resolve("vendor/test262")
@@ -15,7 +18,7 @@ const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 const skipRegExp = /^(#.*)\n([^#\n].*)/gm
 const skipFlagsRegExp = /@[-\w]+/g
 
-const nodeVersion = Reflect.has(process.versions, "chakracore")
+const nodeVersion = isChakra
   ? "chakra"
   : String(SemVer.major(process.version))
 
@@ -128,8 +131,8 @@ describe("test262 tests", function () {
         isAsync
       ], { ESM_OPTIONS: "{cjs:0,mode:all}" })
       .then(({ stderr, stdout }) => {
-        if (isAsync &&
-            skipped) {
+        if (skipped &&
+            isAsync) {
           this.skip()
         }
 
@@ -157,7 +160,8 @@ describe("test262 tests", function () {
           } else {
             assert.strictEqual(name, expected)
           }
-        } else if (skipped) {
+        } else if (skipped &&
+            ! isAppVeyor) {
           assert.fail("Expected skipped test to fail")
         }
       })
