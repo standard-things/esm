@@ -125,7 +125,7 @@ if (shared.inited &&
 
     if (INTERNAL) {
       globalHook(shared.unsafeGlobal)
-    } else {
+    } else if (! isSideloaded()) {
       const { _cache } = Module
       const { id } = __non_webpack_module__
 
