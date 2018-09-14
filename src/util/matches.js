@@ -3,13 +3,14 @@ import toMatcher from "./to-matcher.js"
 
 function init() {
   function matches(array, pattern) {
-    if (Array.isArray(array)) {
-      const matcher = toMatcher(pattern)
+    const length = array ? array.length : 0
+    const matcher = length ? toMatcher(pattern) : null
 
-      for (const value of array) {
-        if (matcher(value)) {
-          return true
-        }
+    let i = -1
+
+    while (++i < length) {
+      if (matcher(array[i])) {
+        return true
       }
     }
 
