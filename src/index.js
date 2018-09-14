@@ -37,6 +37,7 @@ const {
   CHECK,
   CLI,
   EVAL,
+  FLAGS,
   INTERNAL,
   REPL
 } = ENV
@@ -121,10 +122,21 @@ if (shared.inited &&
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(realProcess)
-  }
 
-  if (INTERNAL) {
-    globalHook(shared.unsafeGlobal)
+    if (INTERNAL) {
+      globalHook(shared.unsafeGlobal)
+    } else {
+      const { _cache } = Module
+      const { id } = __non_webpack_module__
+
+      for (const name in _cache) {
+        if (name !== id) {
+          Reflect.deleteProperty(_cache, name)
+        }
+      }
+
+      Module._preloadModules(FLAGS.preloadModules)
+    }
   }
 }
 
