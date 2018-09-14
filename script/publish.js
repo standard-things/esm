@@ -5,7 +5,7 @@ const fleece = require("golden-fleece")
 const fs = require("fs-extra")
 const htmlmin = require("html-minifier").minify
 const path = require("path")
-const uglify = require("uglify-es").minify
+const terser = require("terser").minify
 
 const rootPath = path.resolve(__dirname, "..")
 const esmPath = path.resolve(rootPath, "esm.js")
@@ -13,9 +13,8 @@ const indexPath = path.resolve(rootPath, "index.js")
 const pkgPath = path.resolve(rootPath, "package.json")
 const readmePath = path.resolve(rootPath, "README.md")
 
-const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
-
 const tableRegExp = /^<table>[^]*?\n<\/table>/gm
+const terserOptions = fs.readJSONSync(path.resolve(rootPath, ".terserrc"))
 
 const defaultScripts = {
   test: 'echo "Error: no test specified" && exit 1'
@@ -86,7 +85,7 @@ function minifyHTML(content) {
 }
 
 function minifyJS(content) {
-  return uglify(content, uglifyOptions).code
+  return terser(content, terserOptions).code
 }
 
 function publishPackage() {

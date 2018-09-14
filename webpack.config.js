@@ -13,7 +13,7 @@ const {
 
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const OptimizeJsPlugin = require("optimize-js-plugin")
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin")
+const TerserPlugin = require("terser-webpack-plugin")
 const UnusedPlugin = require("unused-webpack-plugin")
 
 class WebpackRequirePlugin {
@@ -60,7 +60,7 @@ const hosted = [
 ]
 
 const babelOptions = require("./.babel.config.js")
-const uglifyOptions = fs.readJSONSync("./.uglifyrc")
+const terserOptions = fs.readJSONSync("./.terserrc")
 
 const config = {
   devtool: false,
@@ -80,7 +80,7 @@ const config = {
   },
   optimization: {
     minimizer: [
-      new UglifyJSPlugin({ uglifyOptions })
+      new TerserPlugin({ terserOptions })
     ],
     nodeEnv: false
   },

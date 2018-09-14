@@ -1,20 +1,20 @@
-import "./vendor/acorn/src/expression.js"
-import "./vendor/acorn/src/location.js"
-import "./vendor/acorn/src/lval.js"
-import "./vendor/acorn/src/node.js"
-import "./vendor/acorn/src/scope.js"
-import "./vendor/acorn/src/statement.js"
-import "./vendor/acorn/src/tokencontext.js"
-import "./vendor/acorn/src/tokenize.js"
+import "./vendor/acorn/acorn/src/expression.js"
+import "./vendor/acorn/acorn/src/location.js"
+import "./vendor/acorn/acorn/src/lval.js"
+import "./vendor/acorn/acorn/src/node.js"
+import "./vendor/acorn/acorn/src/scope.js"
+import "./vendor/acorn/acorn/src/statement.js"
+import "./vendor/acorn/acorn/src/tokencontext.js"
+import "./vendor/acorn/acorn/src/tokenize.js"
 
 import {
   lineBreak as lineBreakRegExp,
   skipWhiteSpace as skipWhiteSpaceRegExp
-} from "./vendor/acorn/src/whitespace.js"
+} from "./vendor/acorn/acorn/src/whitespace.js"
 
-import { Parser } from "./vendor/acorn/src/state.js"
-import { getLineInfo } from "./vendor/acorn/src/locutil.js"
-import { types as tokTypes } from "./vendor/acorn/src/tokentype.js"
+import { Parser } from "./vendor/acorn/acorn/src/state.js"
+import { getLineInfo } from "./vendor/acorn/acorn/src/locutil.js"
+import { types as tokTypes } from "./vendor/acorn/acorn/src/tokentype.js"
 
 const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 

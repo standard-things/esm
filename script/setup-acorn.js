@@ -11,7 +11,7 @@ const acornPath = path.resolve(vendorPath, "acorn")
 const acornPkg = require("acorn/package.json")
 const acornURL = "https://github.com/ternjs/acorn/archive/" + acornPkg.version + ".zip"
 
-const extractFilterRegExp = /^(?:pack|src).*?\.(?:js|json)$/
+const extractFilterRegExp = /^acorn[\\/].*?\.(?:js|json)$/
 
 function setupAcorn() {
   if (fs.existsSync(acornPath)) {

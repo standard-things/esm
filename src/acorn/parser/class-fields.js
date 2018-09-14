@@ -16,7 +16,7 @@ function init() {
   const Plugin = {
     enable(parser) {
       parser.getTokenFromCode = wrap(parser.getTokenFromCode, getTokenFromCode)
-      parser.parseClassMember = wrap(parser.parseClassMember, parseClassMember)
+      parser.parseClassElement = wrap(parser.parseClassElement, parseClassElement)
       return parser
     }
   }
@@ -32,7 +32,7 @@ function init() {
     return this.finishToken(tt.name, this.readWord1())
   }
 
-  function parseClassMember(func, args) {
+  function parseClassElement(func, args) {
     if (this.type !== tt.name) {
       return Reflect.apply(func, this, args)
     }
@@ -51,7 +51,6 @@ function init() {
       return Reflect.apply(func, this, args)
     }
 
-    const [classBody] = args
     const node = this.startNode()
 
     node.computed = false
@@ -59,7 +58,6 @@ function init() {
     node.value = this.eat(tt.eq) ? this.parseExpression() : null
 
     this.finishNode(node, "FieldDefinition")
-    classBody.body.push(node)
     this.semicolon()
     return node
   }

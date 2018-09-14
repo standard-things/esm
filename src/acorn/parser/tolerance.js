@@ -4,13 +4,13 @@ import noop from "../../util/noop.js"
 import shared from "../../shared.js"
 
 function init() {
+  const scopes = { __proto__: null }
+
   const Plugin = {
     enable(parser) {
       parser.isDirectiveCandidate =
       parser.strictDirective = alwaysFalse
 
-      parser.canDeclareLexicalName =
-      parser.canDeclareVarName =
       parser.isSimpleParamList = alwaysTrue
 
       parser.adaptDirectivePrologue =
@@ -20,17 +20,13 @@ function init() {
       parser.checkPropClash =
       parser.checkVariableExport =
       parser.checkYieldAwaitInDefaultParams =
-      parser.declareLexicalName =
-      parser.declareVarName =
-      parser.enterFunctionScope =
-      parser.enterLexicalScope =
-      parser.exitFunctionScope =
-      parser.exitLexicalScope =
+      parser.declareName =
       parser.invalidStringToken =
       parser.validateRegExpFlags =
       parser.validateRegExpPattern = noop
 
       parser.checkExpressionErrors = checkExpressionErrors
+      parser.enterScope = enterScope
       return parser
     }
   }
@@ -41,6 +37,22 @@ function init() {
     }
 
     return false
+  }
+
+  function enterScope(flags) {
+    this.scopeStack.push(getScope(flags))
+  }
+
+  function getScope(flags) {
+    if (Reflect.has(scopes, flags)) {
+      return scopes[flags]
+    }
+
+    return scopes[flags] = {
+      flags,
+      lexical: [],
+      var: []
+    }
   }
 
   return Plugin

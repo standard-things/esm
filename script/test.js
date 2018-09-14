@@ -6,7 +6,7 @@ const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const setupTest262 = require("./setup-test262.js")
 const trash = require("./trash.js")
-const uglify = require("uglify-es").minify
+const terser = require("terser").minify
 
 const argv = require("yargs")
   .boolean("prod")
@@ -58,7 +58,7 @@ nodeArgs.push(
 )
 
 const trashPaths = ignorePaths.filter(isKept)
-const uglifyOptions = fs.readJSONSync(path.resolve(rootPath, ".uglifyrc"))
+const terserOptions = fs.readJSONSync(path.resolve(rootPath, ".terserrc"))
 
 function cleanJS() {
   jsPaths.forEach((filename) => {
@@ -79,7 +79,7 @@ function isKept(thePath) {
 }
 
 function minifyJS(content) {
-  return uglify(content, uglifyOptions).code
+  return terser(content, terserOptions).code
 }
 
 function runTests(cached) {

@@ -29,7 +29,7 @@ function init() {
     let inited = false
 
     while (this.type !== tt.eof) {
-      const stmt = this.parseStatement(true, true, exported)
+      const stmt = this.parseStatement(null, true, exported)
 
       let { expression, type } = stmt
 

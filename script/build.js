@@ -18,13 +18,13 @@ const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
 const loaderPath = path.resolve(rootPath, "esm/loader.js")
 
-const uglifyPluginPath = path.resolve(rootPath, "node_modules/uglifyjs-webpack-plugin")
-const uglifyPath = path.resolve(uglifyPluginPath, "node_modules/uglify-es")
+const terserPluginPath = path.resolve(rootPath, "node_modules/terser-webpack-plugin")
+const terserPath = path.resolve(terserPluginPath, "node_modules/terser")
 
 const trashPaths = [
   buildPath,
   loaderPath,
-  uglifyPath
+  terserPath
 ]
 
 const webpackArgs = [
