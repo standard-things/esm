@@ -71,6 +71,9 @@ describe("cache tests", function () {
 
   before(function () {
     if (! canTestCache) {
+      // skip() doesn't work for nested describe() calls.
+      // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
+      this.test.parent.pending = true
       this.skip()
     }
 
