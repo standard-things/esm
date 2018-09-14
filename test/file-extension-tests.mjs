@@ -57,8 +57,8 @@ describe("file extension tests", () => {
   it('should error loading non `.mjs` ES modules from `.mjs` files with `options.mode` of "strict"', () =>
     Promise
       .all([
-        "./fixture/ext/invalid-ext.js",
-        "./fixture/ext/invalid-ext.mjs"
+        "./fixture/ext/invalid.js",
+        "./fixture/ext/invalid.mjs"
       ]
       .map((request) =>
         import(request)
@@ -73,8 +73,8 @@ describe("file extension tests", () => {
   it('should error loading non `.mjs` ES modules from `.mjs` files with `options.mode` of "auto"', () =>
     Promise
       .all([
-        "./fixture/cjs/ext/invalid-ext.js",
-        "./fixture/cjs/ext/invalid-ext.mjs"
+        "./fixture/cjs/ext/invalid.js",
+        "./fixture/cjs/ext/invalid.mjs"
       ]
       .map((request) =>
         import(request)

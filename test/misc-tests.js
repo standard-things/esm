@@ -464,7 +464,7 @@ describe("miscellaneous tests", () => {
         this.skip()
       }
 
-      const request = ".\\fixture\\ext-priority\\"
+      const request = ".\\node_modules\\ext-priority\\"
 
       assert.doesNotThrow(() => require(request))
 
@@ -668,7 +668,7 @@ describe("miscellaneous tests", () => {
     it("should find `.mjs` before `.js` in ESM", () =>
       Promise
         .all([
-          "./fixture/ext-priority",
+          "./fixture/ext/priority",
           "ext-priority"
         ]
         .map((request) =>
