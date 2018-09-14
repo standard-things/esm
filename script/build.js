@@ -18,13 +18,9 @@ const rootPath = path.resolve(__dirname, "..")
 const buildPath = path.resolve(rootPath, "build")
 const loaderPath = path.resolve(rootPath, "esm/loader.js")
 
-const terserPluginPath = path.resolve(rootPath, "node_modules/terser-webpack-plugin")
-const terserPath = path.resolve(terserPluginPath, "node_modules/terser")
-
 const trashPaths = [
   buildPath,
-  loaderPath,
-  terserPath
+  loaderPath
 ]
 
 const webpackArgs = [
