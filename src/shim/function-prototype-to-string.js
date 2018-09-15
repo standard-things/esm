@@ -9,10 +9,7 @@ function init() {
   const Shim = {
     enable(context) {
       const cache = shared.memoize.shimFunctionPrototypeToString
-
-      // Avoid a silent fail accessing `context.Function` in Electron 1.
-      const funcCtor = Function("c", "return c.Function")(context)
-      const funcProto = funcCtor.prototype
+      const funcProto = context.Function.prototype
 
       if (check(funcProto, cache)) {
         return context

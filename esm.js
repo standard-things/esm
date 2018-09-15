@@ -1,5 +1,4 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
-"use strict"
 
 const {
   apply,
@@ -104,6 +103,7 @@ function compileESM() {
   }
 
   const script = new Script(
+    "const __global__ = this;" +
     "(function (require, module, __jest__, __shared__) { " +
     content +
     "\n});",
@@ -123,7 +123,9 @@ function compileESM() {
   } else {
     result = apply(runInNewContext, script, [{
       __proto__: null,
-      global: Function("return this")()
+      global: (function () {
+        return this
+      })()
     }, options])
   }
 

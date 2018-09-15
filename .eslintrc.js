@@ -9,9 +9,10 @@ module.exports = {
   extends: ["eslint:recommended", "plugin:import/errors"],
   globals: {
     __external__: false,
+    __global__: false,
+    __jest__: false,
     __non_webpack_module__: false,
     __non_webpack_require__: false,
-    __jest__: false,
     __shared__: false,
     jest: false,
     WebAssembly: false

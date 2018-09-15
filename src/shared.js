@@ -96,7 +96,7 @@ function init() {
     pendingScripts: { __proto__: null },
     pendingWrites: { __proto__: null },
     reloaded: false,
-    safeGlobal: Function("return this")(),
+    safeGlobal: __global__,
     support,
     symbol,
     unsafeGlobal: global,
@@ -115,7 +115,8 @@ function init() {
   })
 
   setDeferred(shared, "customInspectKey", () => {
-    const { customInspectSymbol } = shared.module.safeUtil
+    const { safeUtil } = shared.module
+    const { customInspectSymbol } = safeUtil
 
     return typeof customInspectSymbol === "symbol"
       ? customInspectSymbol
@@ -129,7 +130,10 @@ function init() {
   })
 
   setDeferred(shared, "originalConsole", () => {
-    const { safeInspector, safeVM } = shared.module
+    const {
+      safeInspector,
+      safeVM
+    } = shared.module
 
     return (safeInspector && safeInspector.console) ||
       new safeVM.Script("console").runInNewContext()
@@ -146,9 +150,11 @@ function init() {
   })
 
   setDeferred(shared, "runtimeName", () => {
+    const { safeCrypto } =  shared.module
+
     return encodeId(
       "_" +
-      shared.module.safeCrypto.createHash("md5")
+      safeCrypto.createHash("md5")
         .update(Date.now().toString())
         .digest("hex")
         .slice(0, 3)
@@ -156,14 +162,19 @@ function init() {
   })
 
   setDeferred(shared, "unsafeContext", () => {
-    const { safeVM, utilPrepareContext } = shared.module
+    const {
+      safeVM,
+      utilPrepareContext
+    } = shared.module
 
     return utilPrepareContext(safeVM.createContext(shared.unsafeGlobal))
   })
 
   setDeferred(support, "await", () => {
+    const { safeVM } = shared.module
+
     try {
-      Function("async()=>await 1")()
+      new safeVM.Script("async()=>await 1").runInThisContext()
       return true
     } catch {}
 
@@ -171,12 +182,16 @@ function init() {
   })
 
   setDeferred(support, "createCachedData", () => {
-    return typeof shared.module.safeVM.Script.prototype.createCachedData === "function"
+    const { safeVM } = shared.module
+
+    return typeof safeVM.Script.prototype.createCachedData === "function"
   })
 
   setDeferred(support, "inspectProxies", () => {
+    const { safeUtil } = shared.module
+
     // Node < 6.1.0 does not support inspecting proxies.
-    const inspected = shared.module.safeUtil.inspect(dummyProxy, {
+    const inspected = safeUtil.inspect(dummyProxy, {
       depth: 1,
       showProxy: true
     })
@@ -203,10 +218,12 @@ function init() {
   })
 
   setDeferred(support, "nativeProxyReceiver", () => {
+    const { SafeBuffer } = shared.module
+
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
     try {
-      const proxy = new Proxy(shared.module.SafeBuffer.alloc(0), {
+      const proxy = new Proxy(SafeBuffer.alloc(0), {
         get: (target, name) => target[name]
       })
 
@@ -220,7 +237,10 @@ function init() {
   })
 
   setDeferred(support, "replShowProxy", () => {
-    const { safeProcess, utilSatisfies } = shared.module
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
 
     return utilSatisfies(safeProcess.version, ">=10")
   })
@@ -238,7 +258,10 @@ function init() {
   })
 
   setDeferred(utilBinding, "hiddenKeyType", () => {
-    const { safeProcess, utilSatisfies } = shared.module
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
 
     return utilSatisfies(safeProcess.version, "<7")
       ? "string"
