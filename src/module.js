@@ -13,6 +13,7 @@ import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
 import req from "./module/proto/require.js"
 import safeDefaultProperties from "./util/safe-default-properties.js"
+import staticCreateRequireFromPath from "./module/static/create-require-from-path.js"
 import staticFindPath from "./module/static/find-path.js"
 import staticInitPaths from "./module/static/init-paths.js"
 import staticLoad from "./module/static/load.js"
@@ -56,6 +57,7 @@ Module._resolveFilename = maskFunction(staticResolveFilename, RealModule._resolv
 Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule._resolveLookupPaths)
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
+Module.createRequireFromPath = maskFunction(staticCreateRequireFromPath, RealModule.createRequireFromPath)
 Module.wrap = maskFunction(staticWrap, RealModule.wrap)
 Module.wrapper = staticWrapper
 
