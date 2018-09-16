@@ -11,16 +11,6 @@ const canTestCache =
   ! isAppVeyor &&
   /cached/.test(process.env.ESM_ENV)
 
-const fixtureCacheFiles = [
-  ".data.blob",
-  ".data.json"
-]
-
-const loaderCacheFiles = [
-  ".loader.blob",
-  ...fixtureCacheFiles
-]
-
 const fixturePath = path.resolve("fixture/cache")
 const testPath = path.resolve(".")
 const mainFilename = path.resolve(fixturePath, "main.mjs")
@@ -30,8 +20,7 @@ const loaderCachePath = path.resolve("../node_modules/.cache/esm")
 const fixtureCachePath = path.resolve(fixturePath, ".cache")
 const sharedCachePath = path.resolve("../node_modules/.cache")
 
-const expectedLoaderCacheCount = countFiles(fixturePath) + loaderCacheFiles.length - 1
-const expectedFixtureCacheCount = countFiles(fixturePath) + fixtureCacheFiles.length - 1
+const expectedCacheCount = 5
 
 function countFiles(dirPath) {
   return fs.existsSync(dirPath)
@@ -108,7 +97,7 @@ describe("cache tests", function () {
               ESM_OPTIONS: '{cache:"' + fixtureCachePath + '"}'
             })
           )
-          .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedFixtureCacheCount))
+          .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedCacheCount))
       , Promise.resolve())
   )
 
@@ -116,13 +105,13 @@ describe("cache tests", function () {
     it("should work from the `esm` bridge", () =>
       runNode(fixturePath)
         .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-        .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedLoaderCacheCount))
+        .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedCacheCount))
     )
 
     it("should work from the Node CLI", () =>
       runMain(mainFilename)
         .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-        .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedLoaderCacheCount))
+        .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedCacheCount))
     )
 
     it("should not insert `yield` into cache files", () =>
@@ -148,7 +137,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: '{cache:"' + fixtureCachePath + '"}'
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedFixtureCacheCount))
+      .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedCacheCount))
     )
 
     it("should work from the Node CLI", () =>
@@ -156,7 +145,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: '{cache:"' + fixtureCachePath + '"}'
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedFixtureCacheCount))
+      .then(() => assert.strictEqual(countFiles(fixtureCachePath), expectedCacheCount))
     )
   })
 
@@ -166,7 +155,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: "{cache:1}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedLoaderCacheCount))
+      .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedCacheCount))
     )
 
     it("should work from the Node CLI", () =>
@@ -174,7 +163,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: "{cache:1}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedLoaderCacheCount))
+      .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedCacheCount))
     )
   })
 
@@ -184,7 +173,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: "{cache:0}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(loaderCachePath), 1))
+      .then(() => assert.strictEqual(countFiles(loaderCachePath), 2))
     )
 
     it("should work from the Node CLI", () =>
@@ -192,7 +181,7 @@ describe("cache tests", function () {
         ESM_OPTIONS: "{cache:0}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
-      .then(() => assert.strictEqual(countFiles(loaderCachePath), 1))
+      .then(() => assert.strictEqual(countFiles(loaderCachePath), 2))
     )
   })
 })

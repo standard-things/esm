@@ -1,5 +1,9 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 
+const globalThis = (function () {
+  return this
+})()
+
 const {
   apply,
   defineProperty,
@@ -8,16 +12,24 @@ const {
 
 const { freeze } = Object
 const { type, versions } = process
-const { filename, id } = module
+
+const {
+  filename,
+  id,
+  parent
+} = module
 
 const isChakra = has(versions, "chakracore")
 const isElectron = has(versions, "electron")
 const isElectronRenderer = isElectron && type === "renderer"
 
-const bootstrap = id.startsWith("internal/")
-  ? safeRequire("internal/bootstrap/loaders")
-  : void 0
+let nativeContent
 
+if (id.startsWith("internal/")) {
+  nativeContent = getNativeSource("internal/esm/loader")
+}
+
+const Module = require("module")
 const { Script } = require("vm")
 
 const {
@@ -27,36 +39,12 @@ const {
 } = Script.prototype
 
 const { sep } = require("path")
-
-const {
-  Stats,
-  mkdirSync,
-  readFileSync,
-  statSync,
-  unlinkSync,
-  writeFileSync
-} = require("fs")
-
-const { isFile } = Stats.prototype
-
-const useBuiltinRequire = module.constructor.length > 1
-const useCreateCachedData = typeof createCachedData === "function"
-
-const Module = require("module")
-const NativeModule = bootstrap && bootstrap.NativeModule
+const { readFileSync } = require("fs")
 
 const esmModule = new Module(id)
 
 esmModule.filename = filename
-esmModule.parent = module.parent
-
-let esmRequire = require
-
-if (! useBuiltinRequire &&
-    ! NativeModule &&
-    typeof esmModule.require === "function") {
-  esmRequire = (request) => esmModule.require(request)
-}
+esmModule.parent = parent
 
 let freeJest
 
@@ -65,148 +53,19 @@ if (typeof jest === "object" && jest !== null &&
   freeJest = jest
 }
 
-function compileESM() {
-  let cachedData
-  let cacheFilename
-  let cachePath
-  let content
-  let filename = "esm.js"
-
-  if (NativeModule) {
-    content = NativeModule._source["internal/esm/loader"]
-  } else {
-    const loaderPath = __dirname + sep + "esm" + sep + "loader.js"
-
-    cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
-    cacheFilename = cachePath + sep + ".loader.blob"
-    cachedData = readFile(cacheFilename)
-    content = readFile(loaderPath, "utf8")
-    filename = __dirname + sep + filename
-  }
-
-  let scriptOptions
-
-  if (NativeModule ||
-      useCreateCachedData) {
-    scriptOptions = {
-      __proto__: null,
-      cachedData,
-      filename
-    }
-  } else {
-    scriptOptions = {
-      __proto__: null,
-      cachedData,
-      filename,
-      produceCachedData: true
-    }
-  }
-
-  const script = new Script(
-    "const __global__ = this;" +
-    "(function (require, module, __jest__, __shared__) { " +
-    content +
-    "\n});",
-    scriptOptions
-  )
-
-  const options = {
-    __proto__: null,
-    filename
-  }
-
-  let result
-
-  if (isChakra ||
-      isElectronRenderer) {
-    result = apply(runInThisContext, script, [options])
-  } else {
-    result = apply(runInNewContext, script, [{
-      __proto__: null,
-      global: (function () {
-        return this
-      })()
-    }, options])
-  }
-
-  let scriptData
-
-  if (! NativeModule &&
-      ! cachedData) {
-    scriptData = useCreateCachedData
-      ? apply(createCachedData, script, [])
-      : script.cachedData
-  }
-
-  let changed = false
-
-  if ((scriptData &&
-       scriptData.length) ||
-      (cachedData &&
-       script.cachedDataRejected)) {
-    changed = true
-  }
-
-  if (changed) {
-    if (scriptData) {
-      if (mkdirp(cachePath)) {
-        writeFile(cacheFilename, scriptData)
-      }
-    } else {
-      removeFile(cacheFilename)
-    }
-  }
-
-  return result
+function getNativeSource(thePath) {
+  try {
+    return require("internal/bootstrap/loaders").NativeModule._source[thePath]
+  } catch (e) {}
 }
 
 function loadESM() {
-  compiledESM(esmRequire, esmModule, freeJest, shared)
+  compiledESM(require, esmModule, freeJest, shared)
   return esmModule.exports
 }
 
 function makeRequireFunction(mod, options) {
   return loadESM()(mod, options)
-}
-
-function mkdir(dirPath) {
-  try {
-    mkdirSync(dirPath)
-    return true
-  } catch (e) {}
-
-  return false
-}
-
-function mkdirp(dirPath) {
-  const paths = []
-
-  while (true) {
-    if (stat(dirPath) === 1) {
-      break
-    }
-
-    paths.push(dirPath)
-
-    const lastIndex = dirPath.lastIndexOf(sep)
-    const parentPath = lastIndex === -1 ? "." : dirPath.slice(0, lastIndex)
-
-    if (dirPath === parentPath) {
-      break
-    }
-
-    dirPath = parentPath
-  }
-
-  let { length } = paths
-
-  while (length--) {
-    if (! mkdir(paths[length])) {
-      return false
-    }
-  }
-
-  return true
 }
 
 function readFile(filename, options) {
@@ -215,38 +74,83 @@ function readFile(filename, options) {
   } catch (e) {}
 }
 
-function removeFile(filename) {
-  try {
-    return unlinkSync(filename)
-  } catch (e) {}
+let cachedData
+let cachePath
+let content
+let scriptOptions
+
+if (nativeContent) {
+  content = nativeContent
+
+  scriptOptions = {
+    __proto__: null,
+    filename: "esm.js"
+  }
+} else {
+  cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
+  cachedData = readFile(cachePath + sep + ".data.blob")
+  content = readFile(__dirname + sep + "esm" + sep + "loader.js", "utf8")
+
+  scriptOptions = {
+    __proto__: null,
+    cachedData,
+    filename,
+    produceCachedData: typeof createCachedData !== "function"
+  }
 }
 
-function safeRequire(request) {
-  try {
-    return require(request)
-  } catch (e) {}
+const script = new Script(
+  "const __global__ = this;" +
+  "(function (require, module, __jest__, __shared__) { " +
+  content +
+  "\n});",
+  scriptOptions
+)
+
+let compiledESM
+
+if (isChakra ||
+    isElectronRenderer) {
+  compiledESM = apply(runInThisContext, script, [{
+    __proto__: null,
+    filename
+  }])
+} else {
+  compiledESM = apply(runInNewContext, script, [{
+    __proto__: null,
+    global: globalThis
+  }, {
+    __proto__: null,
+    filename
+  }])
 }
-
-function stat(thePath) {
-  try {
-    return apply(isFile, statSync(thePath), []) ? 0 : 1
-  } catch (e) {}
-
-  return -1
-}
-
-function writeFile(filename, options) {
-  try {
-    return writeFileSync(filename, options)
-  } catch (e) {}
-}
-
-const compiledESM = compileESM()
 
 // Declare `shared` before assignment to avoid the TDZ.
 let shared
 
 shared = loadESM()
+
+if (cachePath) {
+  const { dir } = shared.package
+
+  dir[cachePath] || (dir[cachePath] = {
+    buffer: cachedData,
+    compile: {
+      __proto__: null,
+      esm: {
+        changed: false,
+        scriptData: cachedData,
+        sourceType: 1
+      }
+    },
+    map: { __proto__: null }
+  })
+
+  shared.pendingScripts[cachePath] = {
+    __proto__: null,
+    esm: script
+  }
+}
 
 defineProperty(makeRequireFunction, shared.symbol.package, {
   __proto__: null,
