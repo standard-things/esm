@@ -57,8 +57,8 @@ nodeArgs.push(
   "tests.js"
 )
 
-const trashPaths = ignorePaths.filter(isKept)
 const terserOptions = fs.readJSONSync(path.resolve(rootPath, ".terserrc"))
+const trashPaths = ignorePaths.filter(isKept)
 
 function cleanJS() {
   jsPaths.forEach((filename) => {
@@ -75,7 +75,8 @@ function cleanRepo() {
 }
 
 function isKept(thePath) {
-  return keptPaths.every((dirname) => ! thePath.startsWith(dirname))
+  return thePath.endsWith(".cache") ||
+    keptPaths.every((dirname) => ! thePath.startsWith(dirname))
 }
 
 function minifyJS(content) {
