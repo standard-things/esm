@@ -91,22 +91,21 @@ function resolveFilename(request, parent, isMain, options) {
     fromPath = ""
   }
 
+  const cache = shared.memoize.moduleESMResolveFilename
+
   let cacheKey
 
-  if (isObject(options)) {
-    cacheKey = ""
-  } else {
+  if (! isObject(options)) {
     cacheKey =
       request + "\0" +
       fromPath + "\0" +
       (isMain ? "1" : "")
-  }
 
-  const cache = shared.memoize.moduleESMResolveFilename
-  const cached = cacheKey && cache[cacheKey]
+    const cached = cache.get(cacheKey)
 
-  if (cached) {
-    return cached
+    if (cached) {
+      return cached
+    }
   }
 
   if (isAbs) {
@@ -172,7 +171,8 @@ function resolveFilename(request, parent, isMain, options) {
 
     if (! foundPath &&
         Reflect.has(builtinLookup, decoded)) {
-      return cache[cacheKey] = decoded
+      cache.set(cacheKey, decoded)
+      return decoded
     }
   }
 
@@ -183,7 +183,8 @@ function resolveFilename(request, parent, isMain, options) {
         isJS(foundPath) ||
         isMJS(foundPath) ||
         Reflect.has(strictExtsLookup, extname(foundPath))) {
-      return cache[cacheKey] = foundPath
+      cache.set(cacheKey, foundPath)
+      return foundPath
     }
 
     throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)

@@ -28,7 +28,8 @@ function init() {
     }
 
     const cache = shared.memoize.fsRealpath
-    const cached = cache[thePath]
+
+    let cached = cache.get(thePath)
 
     if (cached) {
       return cached
@@ -44,9 +45,12 @@ function init() {
         typeof binding.fs.realpath === "function"
     }
 
-    return cache[thePath] = useBinding
+    cached = useBinding
       ? realpathBinding(thePath)
       : realpathFallback(thePath)
+
+    cache.set(thePath, cached)
+    return cached
   }
 
   function realpathBinding(thePath) {

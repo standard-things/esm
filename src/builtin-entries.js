@@ -126,7 +126,7 @@ const cache = shared.memoize.builtinEntries
 
 for (const id of builtinIds) {
   setDeferred(builtinEntries, id, () => {
-    const cached = cache[id]
+    const cached = cache.get(id)
 
     if (cached) {
       return cached
@@ -135,7 +135,7 @@ for (const id of builtinIds) {
     const entry = createEntry(id)
 
     if (id !== "module") {
-      cache[id] = entry
+      cache.set(id, entry)
     }
 
     return entry

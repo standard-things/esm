@@ -27,7 +27,14 @@ function init() {
     const cacheKey = typeof url === "string" ? url : ""
     const cache = shared.memoize.utilParseURL
 
-    return cache[cacheKey] || (cache[cacheKey] = parse(url))
+    let cached = cache.get(cacheKey)
+
+    if (cached === void 0) {
+      cached = parse(url)
+      cache.set(cacheKey, cached)
+    }
+
+    return cached
   }
 
   return parseURL

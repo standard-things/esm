@@ -61,22 +61,21 @@ function resolveFilename(request, parent, isMain, options) {
     fromPath = ""
   }
 
+  const cache = shared.memoize.moduleStaticResolveFilename
+
   let cacheKey
 
-  if (isObject(options)) {
-    cacheKey = ""
-  } else {
+  if (! isObject(options)) {
     cacheKey =
       request + "\0" +
       fromPath + "\0" +
       (isMain ? "1" : "")
-  }
 
-  const cache = shared.memoize.moduleStaticResolveFilename
-  const cached = cacheKey && cache[cacheKey]
+    const cached = cache.get(cacheKey)
 
-  if (cached) {
-    return cached
+    if (cached) {
+      return cached
+    }
   }
 
   if (isAbs) {
@@ -102,9 +101,11 @@ function resolveFilename(request, parent, isMain, options) {
   const foundPath = Module._findPath(request, paths, isMain)
 
   if (foundPath) {
-    return cacheKey
-      ? cache[cacheKey] = foundPath
-      : foundPath
+    if (cacheKey) {
+      cache.set(cacheKey, foundPath)
+    }
+
+    return foundPath
   }
 
   throw new MODULE_NOT_FOUND(request)

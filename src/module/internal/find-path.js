@@ -55,7 +55,7 @@ function findPath(request, paths, isMain, fields, exts) {
   }
 
   const cache = shared.memoize.moduleInternalFindPath
-  const cached = cache[cacheKey]
+  const cached = cache.get(cacheKey)
 
   if (cached !== void 0) {
     return cached
@@ -172,7 +172,8 @@ function findPath(request, paths, isMain, fields, exts) {
     }
 
     if (filename) {
-      return cache[cacheKey] = filename
+      cache.set(cacheKey, filename)
+      return filename
     }
   }
 

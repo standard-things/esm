@@ -16,11 +16,15 @@ function init() {
       range
 
     const cache = shared.memoize.utilMaxSatisfying
-    const cached = cache[cacheKey]
 
-    return cached === void 0
-      ? cache[cacheKey] = _maxSatisfying(versions, range)
-      : cached
+    let cached = cache.get(cacheKey)
+
+    if (cached === void 0) {
+      cached = _maxSatisfying(versions, range)
+      cache.set(cacheKey, cached)
+    }
+
+    return cached
   }
 
   return maxSatisfying

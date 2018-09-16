@@ -34,7 +34,7 @@ function getExports(id) {
 
 for (const id of builtinIds) {
   setDeferred(builtinModules, id, () => {
-    const cached = cache[id]
+    const cached = cache.get(id)
 
     if (cached) {
       return cached
@@ -46,7 +46,7 @@ for (const id of builtinIds) {
     mod.loaded = true
 
     if (id !== "module") {
-      cache[id] = mod
+      cache.set(id, mod)
     }
 
     return mod

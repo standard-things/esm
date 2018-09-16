@@ -11,11 +11,15 @@ function init() {
 
     const cacheKey = version + "\0" + range
     const cache = shared.memoize.utilSatisfies
-    const cached = cache[cacheKey]
 
-    return cached === void 0
-      ? cache[cacheKey] = _satisfies(stripPrereleaseTag(version), range)
-      : cached
+    let cached = cache.get(cacheKey)
+
+    if (cached === void 0) {
+      cached = _satisfies(stripPrereleaseTag(version), range)
+      cache.set(cacheKey, cached)
+    }
+
+    return cached
   }
 
   return satisfies
