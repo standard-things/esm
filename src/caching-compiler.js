@@ -323,14 +323,18 @@ function init() {
         const compileData = compileDatas[cacheName]
 
         if (compileData) {
-          const { mtime, sourceType } = compileData
+          const {
+            filename,
+            mtime,
+            sourceType
+          } = compileData
+
           const changed = +compileData.changed
-          const filename = relative(cachePath, compileData.filename)
 
           if (sourceType === SCRIPT) {
             if (changed) {
               meta.push(
-                filename,
+                relative(cachePath, filename),
                 mtime,
                 sourceType,
                 changed
@@ -338,7 +342,7 @@ function init() {
             }
           } else {
             meta.push(
-              filename,
+              relative(cachePath, filename),
               mtime,
               sourceType,
               changed,
