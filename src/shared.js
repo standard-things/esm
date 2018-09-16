@@ -30,7 +30,7 @@ function getShared() {
 }
 
 function init() {
-  const dummyProxy = new Proxy(class P {}, {
+  const dummyProxy = new Proxy(class {}, {
     [PKG_PREFIX]: 1
   })
 
