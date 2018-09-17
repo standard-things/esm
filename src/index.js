@@ -22,6 +22,7 @@ import errors from "./errors.js"
 import globalHook from "./hook/global.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
+import isOwnPath from "./util/is-own-path.js"
 import isSideloaded from "./env/is-sideloaded.js"
 import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
@@ -127,10 +128,9 @@ if (shared.inited &&
       globalHook(shared.unsafeGlobal)
     } else if (! isSideloaded()) {
       const { _cache } = Module
-      const { id } = __non_webpack_module__
 
       for (const name in _cache) {
-        if (name !== id) {
+        if (! isOwnPath(name)) {
           Reflect.deleteProperty(_cache, name)
         }
       }
