@@ -1,1 +1,1 @@
-export default "mjs"
+export default ".mjs"

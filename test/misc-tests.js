@@ -673,7 +673,7 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then((ns) => assert.strictEqual(ns.default, "mjs"))
+            .then((ns) => assert.strictEqual(ns.default, ".mjs"))
         ))
     )
 

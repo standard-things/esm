@@ -1,3 +1,3 @@
 "use strict"
 
-module.exports = "js"
+module.exports = ".js"
