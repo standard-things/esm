@@ -13,32 +13,41 @@ function init() {
   const { prototype } = Stats
 
   function statSync(thePath) {
-    const cache = shared.moduleState.statSync
-
-    if (cache &&
-        Reflect.has(cache, thePath)) {
-      return cache[thePath]
+    if (typeof thePath !== "string") {
+      return null
     }
 
-    let result = null
+    const cache = shared.moduleState.statSync
+
+    let cached
+
+    if (cache) {
+      cached = cache.get(thePath)
+
+      if (cached !== void 0) {
+        return cached
+      }
+    }
 
     try {
-      result = _statSync(thePath)
+      cached = _statSync(thePath)
 
       // Electron and Muon return a plain object for asar files.
       // https://github.com/electron/electron/blob/master/lib/common/asar.js
       // https://github.com/brave/muon/blob/master/lib/common/asar.js
       if (ELECTRON &&
-          ! (result instanceof Stats)) {
-        setPrototypeOf(result, prototype)
+          ! (cached instanceof Stats)) {
+        setPrototypeOf(cached, prototype)
       }
-    } catch {}
-
-    if (cache) {
-      cache[thePath] = result
+    } catch {
+      cached = null
     }
 
-    return result
+    if (cache) {
+      cache.set(thePath, cached)
+    }
+
+    return cached
   }
 
   return statSync

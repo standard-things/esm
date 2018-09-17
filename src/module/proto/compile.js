@@ -143,7 +143,14 @@ function compile(content, filename) {
   const { moduleState } = shared
   const noDepth = moduleState.requireDepth === 0
   const req = makeRequireFunction(this)
-  const args = [exported, req, this, filename, dirname(filename)]
+
+  const args = [
+    exported,
+    req,
+    this,
+    filename,
+    dirname(filename)
+  ]
 
   if (ELECTRON) {
     args.push(realProcess, shared.unsafeGlobal)
@@ -158,8 +165,8 @@ function compile(content, filename) {
   }
 
   if (noDepth) {
-    moduleState.statFast = { __proto__: null }
-    moduleState.statSync = { __proto__: null }
+    moduleState.statFast = new Map
+    moduleState.statSync = new Map
   }
 
   entry.state = STATE_EXECUTION_STARTED

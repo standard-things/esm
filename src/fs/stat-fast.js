@@ -18,18 +18,23 @@ function init() {
 
     const cache = shared.moduleState.statFast
 
-    if (cache &&
-        Reflect.has(cache, thePath)) {
-      return cache[thePath]
-    }
-
-    const result = statBase(thePath)
+    let cached
 
     if (cache) {
-      cache[thePath] = result
+      cached = cache.get(thePath)
+
+      if (cached) {
+        return cached
+      }
     }
 
-    return result
+    cached = statBase(thePath)
+
+    if (cache) {
+      cache.set(thePath, cached)
+    }
+
+    return cached
   }
 
   function statBase(thePath) {
