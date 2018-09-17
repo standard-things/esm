@@ -25,7 +25,7 @@ describe("file extension tests", () => {
   it("should error loading extensionless files with dynamic import in ESM", () =>
     import("./fixture/ext/no-ext-esm")
       .then(assert.fail)
-      .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
+      .catch(({ code }) => assert.strictEqual(code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
   it("should error loading extensionless files with dynamic import in ESM with `options.cjs.paths`", () =>
@@ -46,7 +46,7 @@ describe("file extension tests", () => {
   it("should error loading unknown extensions with dynamic import in ESM", () =>
     import("./fixture/ext/a.mjs.unknown")
       .then(assert.fail)
-      .catch((e) => assert.strictEqual(e.code, "ERR_UNKNOWN_FILE_EXTENSION"))
+      .catch(({ code }) => assert.strictEqual(code, "ERR_UNKNOWN_FILE_EXTENSION"))
   )
 
   it("should error loading unknown extensions with dynamic import in ESM with `options.cjs.paths`", () =>

@@ -84,7 +84,7 @@ describe("URL tests", () => {
         .map((request) =>
           import(request)
             .then(assert.fail)
-            .catch((e) => assert.strictEqual(e.code, "ERR_INVALID_PROTOCOL"))
+            .catch(({ code }) => assert.strictEqual(code, "ERR_INVALID_PROTOCOL"))
         ))
     )
   })
