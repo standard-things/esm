@@ -517,24 +517,21 @@ function init() {
       return code
     }
 
-    code += visitor.runtimeName + ".x(["
-
-    const lastIndex = pairs.length - 1
     const { exportedNames } = visitor
+    const lastIndex = pairs.length - 1
 
     let i = -1
 
-    for (const [exportedName, localName] of pairs) {
-      exportedNames.push(exportedName)
+    code += visitor.runtimeName + ".x(["
 
+    for (const [exportedName, localName] of pairs) {
       code +=
         '["' + exportedName + '",()=>' +
         localName +
-        "]"
+        "]" +
+        (++i === lastIndex ? "" : ",")
 
-      if (++i !== lastIndex) {
-        code += ","
-      }
+      exportedNames.push(exportedName)
     }
 
     code += "]);"
@@ -544,30 +541,27 @@ function init() {
 
   function toModuleImport(visitor, specifierName, specifierMap) {
     const importedNames = keys(specifierMap)
+    const { length } = importedNames
 
     let code = visitor.runtimeName + '.w("' + specifierName + '"'
 
     addToDependencySpecifiers(visitor, specifierName)
 
-    if (! importedNames.length) {
+    if (! length) {
       return code + ");"
     }
 
-    code += ",["
-
-    const lastIndex = importedNames.length - 1
+    const lastIndex = length - 1
 
     let i = -1
+
+    code += ",["
 
     for (const importedName of importedNames) {
       const localNames = specifierMap[importedName]
       const valueParam = safeName("v", localNames)
 
-      addToDependencySpecifiers(visitor, specifierName, importedName)
-
       code +=
-        // Generate plain functions, instead of arrow functions,
-        // to avoid a perf hit in Node 4.
         '["' +
         importedName + '",' +
         (importedName === "*"
@@ -577,11 +571,10 @@ function init() {
         ",function(" + valueParam + "){" +
         // Multiple local variables become a compound assignment.
         localNames.join("=") + "=" + valueParam +
-        "}]"
+        "}]" +
+        (++i === lastIndex ? "" : ",")
 
-      if (++i !== lastIndex) {
-        code += ","
-      }
+      addToDependencySpecifiers(visitor, specifierName, importedName)
     }
 
     code += "]);"
