@@ -7,7 +7,6 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
-const isAppVeyor = Reflect.has(process.env, "APPVEYOR")
 const isChakra = Reflect.has(process.versions, "chakracore")
 
 const fixturePath = path.resolve("test262")
@@ -160,9 +159,8 @@ describe("test262 tests", function () {
           } else {
             assert.strictEqual(name, expected)
           }
-        } else if (skipped &&
-            ! isAppVeyor) {
-          assert.fail("Expected skipped test to fail")
+        } else if (skipped) {
+          this.skip()
         }
       })
     })

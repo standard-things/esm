@@ -118,10 +118,11 @@ function init() {
 
       const node = path.getValue()
       const { specifiers } = node
-      const lastIndex = specifiers.length - 1
+      const { length } = specifiers
+      const lastIndex = length - 1
       const specifierMap = createSpecifierMap(this, node)
 
-      let hoistedCode = specifiers.length
+      let hoistedCode = length
         ? (this.generateVarDeclarations ? "var " : "let ")
         : ""
 
@@ -341,15 +342,34 @@ function init() {
 
         const specifierName = source.value
 
-        addToDependencySpecifiers(this, specifierName)
-
         const fromNames =
           exportedFrom[specifierName] ||
           (exportedFrom[specifierName] = [])
 
+        const lastIndex = specifiers.length - 1
+
+        let hoistedCode = pad(
+          original,
+          runtimeName + '.w("' + specifierName + '"',
+          node.start,
+          source.start
+        )
+
+        let i = -1
+        let setterArgsList = ""
+
+        addToDependencySpecifiers(this, specifierName)
+
         for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
           const localName = specifier.local.name
+
+          setterArgsList +=
+            '["' +
+            localName + '",null,' +
+            runtimeName + '.f("' + localName + '","' + exportedName +
+            '")]' +
+            (++i === lastIndex ? "" : ",")
 
           exportedNames.push(exportedName)
 
@@ -359,21 +379,17 @@ function init() {
             fromNames.push([exportedName, localName])
           }
 
-          const hoistedCode = pad(
-            original,
-            runtimeName + '.w("' + specifierName + '"',
-            node.start,
-            source.start
-          ) + pad(
-            original,
-            ',[["' + localName + '",null,' + runtimeName + '.f("' + localName + '","' + exportedName + '")]]);',
-            source.end,
-            node.end
-          )
-
           addToDependencySpecifiers(this, specifierName, localName)
-          hoistImports(this, node, hoistedCode)
         }
+
+        hoistedCode += pad(
+          original,
+          ",[" + setterArgsList + "]);",
+          source.end,
+          node.end
+        )
+
+        hoistImports(this, node, hoistedCode)
       }
     }
 
