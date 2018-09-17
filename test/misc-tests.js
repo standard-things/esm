@@ -677,6 +677,11 @@ describe("miscellaneous tests", () => {
         ))
     )
 
+    it("should find `.js` before `.mjs` with `options.cjs.paths`", () =>
+      import("./cjs/ext/priority.js")
+        .then((ns) => ns.default())
+    )
+
     it("should support modified `require.extensions` in CJS", () => {
       require.extensions[".mjs"] = () => ({})
 
