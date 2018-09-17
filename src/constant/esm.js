@@ -14,13 +14,16 @@ const ESM = {
 const { filename } = __non_webpack_module__
 
 setDeferred(ESM, "PKG_DIRNAME", () => {
-  return __shared__.module.safePath.dirname(filename)
+  const { safePath } = __shared__.module
+
+  return safePath.dirname(filename)
 })
 
 setDeferred(ESM, "PKG_FILENAMES", function () {
+  const { safePath } = __shared__.module
+  const { sep } = safePath
   const { PKG_DIRNAME } = this
   const { PKG_FILENAMES } = process.env
-  const { sep } = __shared__.module.safePath
 
   let { length } = PKG_FILENAMES
 
