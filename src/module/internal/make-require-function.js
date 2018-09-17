@@ -10,7 +10,6 @@ import Module from "../../module.js"
 
 import errors from "../../errors.js"
 import isDataProperty from "../../util/is-data-property.js"
-import isError from "../../util/is-error.js"
 import isInstalled from "../../util/is-installed.js"
 import maskFunction from "../../util/mask-function.js"
 import realGetProxyDetails from "../../real/get-proxy-details.js"
@@ -40,10 +39,8 @@ function makeRequireFunction(mod, requirer, resolver) {
   const { name } = entry
 
   let req = function require(request) {
-    let exported
-
     if (isOwn) {
-      exported = ownRequire(request)
+      const exported = ownRequire(request)
 
       if (exported) {
         return exported
@@ -52,27 +49,17 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     const { moduleState } = shared
 
-    moduleState.requireDepth += 1
-
     shared.entry.skipExports[name] =
       ! isESM &&
       ! isDataProperty(mod, "exports")
 
-    try {
-      exported = requirer.call(mod, request)
-    } catch (e) {
-      if (entry.package.options.cjs.vars &&
-          isError(e) &&
-          e.code === "ERR_MODULE_RESOLUTION_LEGACY") {
-        return Module._load(request, mod, false)
-      }
+    moduleState.requireDepth += 1
 
-      throw e
+    try {
+      return requirer.call(mod, request)
     } finally {
       moduleState.requireDepth -= 1
     }
-
-    return exported
   }
 
   function resolve(request, options) {
