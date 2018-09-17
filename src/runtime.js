@@ -42,11 +42,8 @@ const Runtime = {
     return createSetter("from", (value, childEntry) => {
       const { entry } = this
 
-      entry.exports[importedName] = value
-      entry.assignExportsToNamespace([importedName])
-
       if (! Reflect.has(entry.getters, exportedName)) {
-        entry.addGetterFrom(childEntry, importedName,  exportedName)
+        entry.addGetterFrom(childEntry, importedName, exportedName)
       }
     })
   },
@@ -57,13 +54,13 @@ const Runtime = {
 
   addNamespaceSetter() {
     return createSetter("namespace", (value, childEntry) => {
-      const { _namespace } = childEntry
       const { entry } = this
       const { getters, type } = entry
+      const isESM = type === TYPE_ESM
       const otherGetters = childEntry.getters
       const otherType = childEntry.type
 
-      if ((type === TYPE_ESM &&
+      if ((isESM &&
            otherType !== TYPE_ESM &&
            entry.extname === ".mjs") ||
           (otherType === TYPE_CJS &&
@@ -71,30 +68,24 @@ const Runtime = {
         return
       }
 
-      for (const name in _namespace) {
+      for (const name in childEntry._namespace) {
         if (name === "default") {
           continue
         }
 
-        entry.exports[name] = _namespace[name]
-        entry.assignExportsToNamespace([name])
-
         if (! Reflect.has(getters, name)) {
           entry.addGetterFrom(childEntry, name)
 
-          const getter = getters[name]
-          const otherGetter = otherGetters[name]
-
-          if (type === TYPE_ESM ||
-              typeof getter !== "function" ||
-              typeof otherGetter !== "function") {
+          if (isESM ||
+              ! Reflect.has(getters, name) ||
+              ! Reflect.has(otherGetters, name)) {
             continue
           }
 
-          const ownerName = getter.owner.name
+          const ownerName = getters[name].owner.name
 
           if (ownerName !== entry.name &&
-              ownerName !== otherGetter.owner.name) {
+              ownerName !== otherGetters[name].owner.name) {
             entry.addGetter(name, () => ERROR_STAR)
           }
         }

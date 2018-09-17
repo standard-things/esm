@@ -261,14 +261,20 @@ class Entry {
     const { getters } = this
     const otherGetters = otherEntry.getters
 
-    const getter = getters[exportedName]
-    const otherGetter = otherGetters[importedName]
-
-    if (typeof getter !== "function" &&
-        typeof otherGetter === "function") {
-      this.addGetter(exportedName, otherGetter)
-      runGetter(this, exportedName)
+    if (Reflect.has(getters, exportedName) ||
+        ! Reflect.has(otherGetters, importedName)) {
+      return this
     }
+
+    let otherGetter = otherGetters[importedName]
+
+    if (this.extname === ".mjs" &&
+        otherEntry.type !== TYPE_ESM) {
+      otherGetter = () => otherEntry.cjsNamespace[importedName]
+      otherGetter.owner = otherEntry
+    }
+
+    return this.addGetter(exportedName, otherGetter)
   }
 
   addSetter(name, localNames, setter, parent) {
