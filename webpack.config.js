@@ -123,7 +123,7 @@ const config = {
       PKG_VERSION
     }),
     new NormalModuleReplacementPlugin(
-      /acorn\/src\/regexp\.js/,
+      /acorn[\\/]src[\\/]regexp\.js/,
       path.resolve("src/acorn/replacement/regexp.js")
     ),
     new UnusedPlugin({
