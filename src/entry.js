@@ -422,8 +422,8 @@ class Entry {
       }
 
       if (this.package.options.cjs.interop &&
-          ! Reflect.has(getters, "__esModule") &&
-          this.extname !== ".mjs") {
+          this.extname !== ".mjs" &&
+          ! Reflect.has(getters, "__esModule")) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
@@ -763,7 +763,7 @@ function getExportByName(entry, name, parentEntry) {
   const parentNamedExports =
     entry.builtin ||
     (! parentIsMJS &&
-    parentOptions.cjs.namedExports)
+     parentOptions.cjs.namedExports)
 
   const noMutableNamespace =
     ! parentMutableNamespace ||
