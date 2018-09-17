@@ -313,7 +313,6 @@ function tryValidate(caller, entry, content, filename) {
   }
 
   if (Package.state.default.options.debug ||
-      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }

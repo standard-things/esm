@@ -311,7 +311,6 @@ function tryValidate(caller, entry, content) {
   }
 
   if (Package.state.default.options.debug ||
-      ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
   }
