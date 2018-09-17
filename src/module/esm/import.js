@@ -6,7 +6,6 @@ import Module from "../../module.js"
 import errors from "../../errors.js"
 import esmParse from "./parse.js"
 import esmResolveFilename from "./resolve-filename.js"
-import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
 import { resolve } from "../../safe/path.js"
 import shared from "../../shared.js"
@@ -119,9 +118,7 @@ function tryParse(request, entry) {
 
   if (threw &&
       (entry.extname === ".mjs" ||
-      ! entry.package.options.cjs.paths ||
-      ! isError(error) ||
-      error.code !== "MODULE_NOT_FOUND")) {
+       error.code !== "MODULE_NOT_FOUND")) {
     throw error
   }
 
