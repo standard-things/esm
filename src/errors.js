@@ -26,10 +26,6 @@ function init() {
   const errors = { __proto__: null }
   const messages = { __proto__: null }
 
-  const truncInspectOptions = {
-    depth: 2
-  }
-
   addBuiltinError("ERR_CONST_ASSIGNMENT", constAssignment, ExTypeError)
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
@@ -142,7 +138,7 @@ function init() {
   }
 
   function truncInspect(value) {
-    const inspected = inspect(value, truncInspectOptions)
+    const inspected = inspect(value)
 
     return inspected.length > 128
       ? inspected.slice(0, 128) + "..."
