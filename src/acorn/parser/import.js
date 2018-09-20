@@ -77,8 +77,9 @@ function init() {
         return parseImportCall(this)
       }
 
-      if (! topLevel ||
-          ! this.inModule) {
+      if (! this.inModule ||
+          (! topLevel &&
+           ! this.options.allowImportExportEverywhere)) {
         let message
 
         if (type === tt.name) {
