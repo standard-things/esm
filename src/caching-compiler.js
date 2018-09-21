@@ -41,7 +41,7 @@ function init() {
   } = SOURCE_TYPE
 
   const CachingCompiler = {
-    compile(entry, code, options) {
+    compile(entry, code, options = {}) {
       if (! options.eval &&
           entry.module.filename &&
           entry.package.cachePath) {
