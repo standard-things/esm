@@ -12,20 +12,22 @@ function init() {
 
   const EMPTY_MD5_HASH = "d41d8cd98f00b204e9800998ecf8427e"
 
-  function getCacheName(entry, cacheKey) {
-    const { filename } = entry.module
-    const pkg = entry.package
+  function getCacheName(cacheKey, options = {}) {
+    const { cachePath, filename } = options
 
-    // While MD5 isn't suitable for verification of untrusted data,
-    // it's great for revving files. See Sufian Rhazi's post for more details.
-    // https://blog.risingstack.com/automatic-cache-busting-for-your-css/
-    const pathHash = typeof filename === "string"
-      ? md5(normalize(relative(pkg.cachePath, filename)))
-      : EMPTY_MD5_HASH
+    let pathHash = EMPTY_MD5_HASH
+
+    if (cachePath &&
+        typeof filename === "string") {
+      // While MD5 isn't suitable for verification of untrusted data,
+      // it's great for revving files. See Sufian Rhazi's post for more details.
+      // https://blog.risingstack.com/automatic-cache-busting-for-your-css/
+      pathHash = md5(normalize(relative(cachePath, filename)))
+    }
 
     const stateHash = md5(
       PKG_VERSION + "\0" +
-      JSON.stringify(pkg.options) + "\0" +
+      JSON.stringify(options.packageOptions) + "\0" +
       cacheKey
     )
 

@@ -42,8 +42,13 @@ function compile(content, filename) {
   const entry = Entry.get(this)
 
   if (entry.state === STATE_INITIAL) {
-    entry.cacheName = getCacheName(entry, content)
-    entry.package = Package.get("")
+    const pkg = Package.get("")
+
+    entry.cacheName = getCacheName(content, {
+      packageOptions: pkg.options
+    })
+
+    entry.package = pkg
     entry.runtimeName = shared.runtimeName
 
     let result

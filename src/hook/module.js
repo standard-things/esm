@@ -127,7 +127,11 @@ function hook(Mod, parent) {
 
     if (! cacheName) {
       cacheName =
-      entry.cacheName = getCacheName(entry, mtime)
+      entry.cacheName = getCacheName(mtime, {
+        cachePath,
+        filename,
+        packageOptions: pkg.options
+      })
     }
 
     const compileFallback = () => {

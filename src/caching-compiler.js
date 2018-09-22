@@ -110,7 +110,13 @@ function init() {
     const result = Compiler.compile(code, toCompileOptions(entry, options))
 
     if (options.eval) {
-      const cacheName = getCacheName(entry, code)
+      const pkg = entry.package
+
+      const cacheName = getCacheName(code, {
+        cachePath: pkg.cachePath,
+        filename: entry.filename,
+        packageOptions: pkg.options
+      })
 
       return shared.package.dir[""].compile[cacheName] = result
     }

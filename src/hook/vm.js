@@ -68,7 +68,7 @@ function hook(vm) {
     scriptOptions.produceCachedData = true
 
     const cacheName =
-    entry.cacheName = getCacheName(entry, content)
+    entry.cacheName = getCacheName(content)
 
     let compileData = entry.package.cache.compile[cacheName]
 
