@@ -32,16 +32,14 @@ function init() {
   const FAST_READ_PREFIX = '"main";'
 
   const defaultOptions = {
-    cjs: {
-      topLevelReturn: false,
-      vars: false
-    },
+    cjsVars: false,
+    generateVarDeclarations: false,
     hint: SCRIPT,
     pragmas: true,
     runtimeName: "_",
     sourceType: SCRIPT,
     strict: void 0,
-    var: false
+    topLevelReturn: false
   }
 
   const Compiler = {
@@ -108,7 +106,7 @@ function init() {
       }
 
       let allowReturnOutsideFunction =
-        options.cjs.topLevelReturn ||
+        options.topLevelReturn ||
         sourceType === SCRIPT
 
       const parserOptions = {
@@ -159,7 +157,7 @@ function init() {
 
       try {
         importExportVisitor.visit(rootPath, {
-          generateVarDeclarations: options.var,
+          generateVarDeclarations: options.generateVarDeclarations,
           magicString,
           possibleIndexes,
           runtimeName,
@@ -270,7 +268,7 @@ function init() {
           }
         }
 
-        if (! options.cjs.vars) {
+        if (! options.cjsVars) {
           const { importedLocals } = top
           const possibleNames = []
 

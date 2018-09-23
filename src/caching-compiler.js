@@ -433,25 +433,33 @@ function init() {
   function toCompileOptions(entry, options) {
     const { runtimeName } = entry
 
-    const cjs = entry.extname === ".mjs"
-      ? void 0
-      : entry.package.options.cjs
+    let cjsVars
+    let topLevelReturn
+
+    if (entry.extname !== ".mjs") {
+      const { cjs } = entry.package.options
+
+      cjsVars = cjs.vars
+      topLevelReturn = cjs.topLevelReturn
+    }
 
     if (options.eval) {
       return {
-        cjs,
-        runtimeName
+        cjsVars,
+        runtimeName,
+        topLevelReturn
       }
     }
 
     return {
-      cjs,
+      cjsVars,
+      generateVarDeclarations: options.generateVarDeclarations,
       hint: options.hint,
       pragmas: options.pragmas,
       runtimeName,
       sourceType: options.sourceType,
       strict: options.strict,
-      var: options.var
+      topLevelReturn
     }
   }
 

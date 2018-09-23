@@ -10,14 +10,12 @@ const modernTypes = [MODULE, UNAMBIGUOUS]
 const sourceTypes = [SCRIPT, MODULE, UNAMBIGUOUS]
 
 describe("compiler tests", () => {
-  it("should support `options.cjs.topLevelReturn`", () => {
+  it("should support `options.topLevelReturn`", () => {
     assert.doesNotThrow(() => Compiler.compile("return"))
 
     assert.doesNotThrow(() => Compiler.compile("return", {
-      cjs: {
-        topLevelReturn: true
-      },
-      sourceType: MODULE
+      sourceType: MODULE,
+      topLevelReturn: true
     }))
 
     assert.throws(
@@ -34,7 +32,7 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should support `options.cjs.vars`", () => {
+  it("should support `options.cjsVars`", () => {
     const code = "arguments"
 
     let result = Compiler.compile(code)
@@ -42,9 +40,7 @@ describe("compiler tests", () => {
     assert.strictEqual(result.code, code)
 
     result = Compiler.compile(code, {
-      cjs: {
-        vars: true
-      },
+      cjsVars: true,
       sourceType: MODULE
     })
 
@@ -101,12 +97,12 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should support `options.var`", () => {
+  it("should support `options.generateVarDeclarations`", () => {
     [void 0, false, true]
       .forEach((value) => {
         modernTypes.forEach((sourceType) => {
           const result = Compiler.compile('import a from "a"', {
-            var: value,
+            generateVarDeclarations: value,
             sourceType
           })
 

@@ -83,10 +83,10 @@ function hook(vm) {
         entry,
         content,
         {
+          generateVarDeclarations: true,
           pragmas: false,
           sourceType: UNAMBIGUOUS,
-          strict: false,
-          var: true
+          strict: false
         }
       ])
     }
