@@ -12,6 +12,7 @@ import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
+import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
@@ -107,15 +108,22 @@ function init() {
   }
 
   function compileAndCache(entry, code, options) {
-    const result = Compiler.compile(code, toCompileOptions(entry, options))
+    const pkg = entry.package
+    const packageOptions = pkg.options
+    const { cjs } = packageOptions
+
+    options.filename = entry.filename
+    options.runtimeName = entry.runtimeName
+    options.cjsVars = cjs.vars
+    options.topLevelReturn = cjs.topLevelReturn
+
+    const result = Compiler.compile(code, toCompileOptions(options))
 
     if (options.eval) {
-      const pkg = entry.package
-
       const cacheName = getCacheName(code, {
         cachePath: pkg.cachePath,
         filename: entry.filename,
-        packageOptions: pkg.options
+        packageOptions
       })
 
       return shared.package.dir[""].compile[cacheName] = result
@@ -430,17 +438,15 @@ function init() {
     }
   }
 
-  function toCompileOptions(entry, options) {
-    const { runtimeName } = entry
+  function toCompileOptions(options = {}) {
+    const { runtimeName } = options
 
     let cjsVars
     let topLevelReturn
 
-    if (entry.extname !== ".mjs") {
-      const { cjs } = entry.package.options
-
-      cjsVars = cjs.vars
-      topLevelReturn = cjs.topLevelReturn
+    if (! isMJS(options.filename)) {
+      cjsVars = options.cjsVars
+      topLevelReturn = options.topLevelReturn
     }
 
     if (options.eval) {
