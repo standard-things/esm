@@ -43,13 +43,42 @@ function init() {
 
   const CachingCompiler = {
     compile(entry, code, options = {}) {
+      const pkg = entry.package
+      const packageOptions = pkg.options
+      const { cjs } = packageOptions
+
+      options.cacheName = entry.cacheName
+      options.cachePath = pkg.cachePath
+      options.filename = entry.filename
+      options.cjsVars = cjs.vars
+      options.packageOptions = packageOptions
+      options.runtimeName = entry.runtimeName
+      options.topLevelReturn = cjs.topLevelReturn
+
+      let result
+
       if (! options.eval &&
-          entry.module.filename &&
-          entry.package.cachePath) {
-        return compileAndWrite(entry, code, options)
+          options.filename &&
+          options.cachePath) {
+        result = compileAndWrite(code, options)
+      } else {
+        result = compileAndCache(code, options)
       }
 
-      return compileAndCache(entry, code, options)
+      if (options.eval) {
+        return result
+      }
+
+      if (result.sourceType === MODULE) {
+        entry.type = TYPE_ESM
+      } else {
+        entry.type = TYPE_CJS
+      }
+
+      entry.compileData =
+      entry.package.cache.compile[entry.cacheName] = result
+
+      return result
     },
     from(entry) {
       const { cache, cachePath } = entry.package
@@ -107,48 +136,33 @@ function init() {
     }
   }
 
-  function compileAndCache(entry, code, options) {
-    const pkg = entry.package
-    const packageOptions = pkg.options
-    const { cjs } = packageOptions
-
-    options.filename = entry.filename
-    options.runtimeName = entry.runtimeName
-    options.cjsVars = cjs.vars
-    options.topLevelReturn = cjs.topLevelReturn
-
+  function compileAndCache(code, options) {
     const result = Compiler.compile(code, toCompileOptions(options))
 
     if (options.eval) {
       const cacheName = getCacheName(code, {
-        cachePath: pkg.cachePath,
-        filename: entry.filename,
-        packageOptions
+        cachePath: options.cachePath,
+        filename: options.filename,
+        packageOptions: options.packageOptions
       })
 
       return shared.package.dir[""].compile[cacheName] = result
     }
 
     if (result.sourceType === MODULE) {
-      entry.type = TYPE_ESM
       result.dependencySpecifiers = inflateDependencySpecifiers(result)
       result.exportedFrom = inflateExportedFrom(result)
       result.exportedSpecifiers = inflateExportedSpecifiers(result)
-    } else {
-      entry.type = TYPE_CJS
     }
 
-    entry.compileData =
-    entry.package.cache.compile[entry.cacheName] = result
-
-    result.filename = entry.filename
-    result.mtime = entry.mtime
+    result.filename = options.filename
+    result.mtime = options.mtime
     return result
   }
 
-  function compileAndWrite(entry, code, options) {
-    const { cachePath } = entry.package
-    const result = compileAndCache(entry, code, options)
+  function compileAndWrite(code, options) {
+    const { cachePath } = options
+    const result = compileAndCache(code, options)
 
     if (! cachePath ||
         ! result.changed) {
@@ -159,7 +173,7 @@ function init() {
       shared.pendingWrites[cachePath] ||
       (shared.pendingWrites[cachePath] = { __proto__: null })
 
-    pendingWrites[entry.cacheName] = result.code
+    pendingWrites[options.cacheName] = result.code
 
     return result
   }
