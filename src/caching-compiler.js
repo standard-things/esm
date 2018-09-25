@@ -16,6 +16,7 @@ import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
 import noop from "./util/noop.js"
+import normalize from "./path/normalize.js"
 import parseJSON from "./util/parse-json.js"
 import realProcess from "./real/process.js"
 import removeFile from "./fs/remove-file.js"
@@ -362,7 +363,7 @@ function init() {
           if (sourceType === SCRIPT) {
             if (changed) {
               meta.push(
-                relative(cachePath, filename),
+                normalize(relative(cachePath, filename)),
                 mtime,
                 sourceType,
                 changed
@@ -370,7 +371,7 @@ function init() {
             }
           } else {
             meta.push(
-              relative(cachePath, filename),
+              normalize(relative(cachePath, filename)),
               mtime,
               sourceType,
               changed,
