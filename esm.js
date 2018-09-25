@@ -1,7 +1,7 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 
 const globalThis = (function () {
-  return this
+  return this || Function("return this")()
 })()
 
 const {
