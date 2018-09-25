@@ -44,7 +44,7 @@
     "@types/node": "^10.11.0",
     "acorn": "^6.0.1",
     "ava": "1.0.0-beta.7",
-    "babel-eslint": "^9.0.0",
+    "babel-eslint": "^10.0.0",
     "babel-loader": "^8.0.2",
     "babel-plugin-transform-for-of-as-array": "^1.1.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
