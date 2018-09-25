@@ -159,7 +159,7 @@ function init() {
       shared.pendingWrites[cachePath] ||
       (shared.pendingWrites[cachePath] = { __proto__: null })
 
-    pendingWrites[entry.cacheName] = entry
+    pendingWrites[entry.cacheName] = result.code
 
     return result
   }
@@ -412,12 +412,12 @@ function init() {
     }
 
     for (const cachePath in pendingWrites) {
-      const entries = pendingWrites[cachePath]
+      const contents = pendingWrites[cachePath]
 
-      for (const cacheName in entries) {
-        const { code } = entries[cacheName].compileData
+      for (const cacheName in contents) {
+        const content = contents[cacheName]
 
-        if (writeFile(cachePath + sep + cacheName, code)) {
+        if (writeFile(cachePath + sep + cacheName, content)) {
           removeExpired(cachePath, cacheName)
         }
       }
