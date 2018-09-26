@@ -43,43 +43,14 @@ function init() {
   } = SOURCE_TYPE
 
   const CachingCompiler = {
-    compile(entry, code, options = {}) {
-      const pkg = entry.package
-      const packageOptions = pkg.options
-      const { cjs } = packageOptions
-
-      options.cacheName = entry.cacheName
-      options.cachePath = pkg.cachePath
-      options.filename = entry.filename
-      options.cjsVars = cjs.vars
-      options.packageOptions = packageOptions
-      options.runtimeName = entry.runtimeName
-      options.topLevelReturn = cjs.topLevelReturn
-
-      let result
-
+    compile(code, options = {}) {
       if (! options.eval &&
           options.filename &&
           options.cachePath) {
-        result = compileAndWrite(code, options)
-      } else {
-        result = compileAndCache(code, options)
+        return compileAndWrite(code, options)
       }
 
-      if (options.eval) {
-        return result
-      }
-
-      if (result.sourceType === MODULE) {
-        entry.type = TYPE_ESM
-      } else {
-        entry.type = TYPE_CJS
-      }
-
-      entry.compileData =
-      entry.package.cache.compile[entry.cacheName] = result
-
-      return result
+      return compileAndCache(code, options)
     },
     from(entry) {
       const { cache, cachePath } = entry.package
@@ -162,10 +133,11 @@ function init() {
   }
 
   function compileAndWrite(code, options) {
-    const { cachePath } = options
+    const { cacheName, cachePath } = options
     const result = compileAndCache(code, options)
 
-    if (! cachePath ||
+    if (! cacheName ||
+        ! cachePath ||
         ! result.changed) {
       return result
     }
@@ -174,8 +146,7 @@ function init() {
       shared.pendingWrites[cachePath] ||
       (shared.pendingWrites[cachePath] = { __proto__: null })
 
-    pendingWrites[options.cacheName] = result.code
-
+    pendingWrites[cacheName] = result.code
     return result
   }
 
@@ -454,15 +425,14 @@ function init() {
   }
 
   function toCompileOptions(options = {}) {
-    const { runtimeName } = options
+    let { cjsVars, topLevelReturn } = options
 
-    let cjsVars
-    let topLevelReturn
-
-    if (! isMJS(options.filename)) {
-      cjsVars = options.cjsVars
-      topLevelReturn = options.topLevelReturn
+    if (isMJS(options.filename)) {
+      cjsVars =
+      topLevelReturn = void 0
     }
+
+    const { runtimeName } = options
 
     if (options.eval) {
       return {

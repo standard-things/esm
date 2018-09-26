@@ -80,11 +80,12 @@ function hook(vm) {
       }
     } else {
       compileData = tryWrapper(Compiler.compile, [
-        entry,
         content,
         {
+          cjsVars: true,
           generateVarDeclarations: true,
           pragmas: false,
+          runtimeName: entry.runtimeName,
           sourceType: UNAMBIGUOUS,
           strict: false
         }

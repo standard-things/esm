@@ -31,6 +31,7 @@ const {
 const {
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -56,7 +57,8 @@ const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
-  const { mode } = pkg.options
+  const packageOptions = pkg.options
+  const { mode } = packageOptions
   const { parsing } = shared.moduleState
 
   let hint = SCRIPT
@@ -78,16 +80,36 @@ function compile(caller, entry, content, filename, fallback) {
 
     if (! compileData ||
         compileData.changed) {
+      const { cacheName } = entry
+      const { cjs } = packageOptions
+
       const scriptData = compileData
         ? compileData.scriptData
         : null
 
-      compileData = tryCompileCode(caller, entry, content, filename, {
+      compileData = tryCompileCode(caller, content, {
+        cacheName,
+        cachePath: pkg.cachePath,
+        cjsVars: cjs.vars,
+        filename,
         hint,
-        sourceType
+        mtime: entry.mtime,
+        packageOptions,
+        runtimeName: entry.runtimeName,
+        sourceType,
+        topLevelReturn: cjs.topLevelReturn
       })
 
+      if (compileData.sourceType === MODULE) {
+        entry.type = TYPE_ESM
+      } else {
+        entry.type = TYPE_CJS
+      }
+
       compileData.scriptData = scriptData
+
+      entry.compileData =
+      entry.package.cache.compile[entry.cacheName] = compileData
     } else {
       compileData.code = content
     }
@@ -281,11 +303,11 @@ function maybeSourceMap(entry, content, filename) {
   return ""
 }
 
-function tryCompileCode(caller, entry, content, filename, options) {
+function tryCompileCode(caller, content, options) {
   let error
 
   try {
-    return Compiler.compile(entry, content, options)
+    return Compiler.compile(content, options)
   } catch (e) {
     error = e
   }
@@ -300,7 +322,7 @@ function tryCompileCode(caller, entry, content, filename, options) {
 
   Reflect.deleteProperty(error, "sourceType")
   captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, filename, isESM)
+  throw maskStackTrace(error, content, options.filename, isESM)
 }
 
 function tryValidate(caller, entry, content, filename) {

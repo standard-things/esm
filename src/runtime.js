@@ -102,12 +102,22 @@ const Runtime = {
   },
 
   compileEval(content) {
+    if (typeof content !== "string") {
+      return content
+    }
+
+    const { entry } = this
+    const { cjs } = entry.package.options
+
     // Section 18.2.1.1: PerformEval()
     // Setp 2: Only evaluate strings.
     // https://tc39.github.io/ecma262/#sec-performeval
-    return typeof content === "string"
-      ? Compiler.compile(this.entry, content, { eval: true }).code
-      : content
+    return Compiler.compile(content, {
+      cjsVars: cjs.vars,
+      eval: true,
+      runtimeName: entry.runtimeName,
+      topLevelReturn: cjs.topLevelReturn
+    }).code
   },
 
   compileGlobalEval(content) {
@@ -117,13 +127,20 @@ const Runtime = {
 
     const runtime = this
     const { entry } = runtime
-    const result = Compiler.compile(entry, content, { eval: true })
+    const { cjs } = entry.package.options
+    const { runtimeName } = entry
+
+    const result = Compiler.compile(content, {
+      cjsVars: cjs.vars,
+      eval: true,
+      runtimeName,
+      topLevelReturn: cjs.topLevelReturn
+    })
 
     if (! result.changed) {
       return content
     }
 
-    const { runtimeName } = entry
     const { unsafeGlobal } = shared
 
     content = result.code
