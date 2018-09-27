@@ -105,12 +105,8 @@ function init() {
         return result
       }
 
-      let allowReturnOutsideFunction =
-        options.topLevelReturn ||
-        sourceType === SCRIPT
-
       const parserOptions = {
-        allowReturnOutsideFunction,
+        allowReturnOutsideFunction: options.topLevelReturn || sourceType === SCRIPT,
         sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
         strict: options.strict
       }
@@ -125,7 +121,6 @@ function init() {
 
       if (threw &&
           sourceType === UNAMBIGUOUS) {
-        allowReturnOutsideFunction =
         parserOptions.allowReturnOutsideFunction = true
 
         sourceType =
