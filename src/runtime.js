@@ -107,7 +107,8 @@ const Runtime = {
     }
 
     const { entry } = this
-    const { cjs } = entry.package.options
+    const pkg = entry.package
+    const { cjs } = pkg.options
 
     // Section 18.2.1.1: PerformEval()
     // Setp 2: Only evaluate strings.
@@ -125,34 +126,31 @@ const Runtime = {
       return content
     }
 
-    const runtime = this
-    const { entry } = runtime
-    const { cjs } = entry.package.options
+    const { entry } = this
+    const pkg = entry.package
+    const { cjs } = pkg.options
     const { runtimeName } = entry
 
-    const result = Compiler.compile(content, {
+    const compileData = Compiler.compile(content, {
       cjsVars: cjs.vars,
       eval: true,
       runtimeName,
       topLevelReturn: cjs.topLevelReturn
     })
 
-    if (! result.changed) {
+    if (! compileData.changed) {
       return content
     }
 
     const { unsafeGlobal } = shared
 
-    content = result.code
+    let { code } = compileData
 
     if (unsafeGlobal[runtimeName]) {
-      return content
+      return code
     }
 
-    content =
-      (hasPragma(content, "use strict") ? '"use strict";' : "") +
-      "let " + runtimeName + "=global." + runtimeName + ";" +
-      content
+    const runtime = this
 
     Reflect.defineProperty(unsafeGlobal, runtimeName, {
       configurable: true,
@@ -162,7 +160,12 @@ const Runtime = {
       }
     })
 
-    return content
+    code =
+      (hasPragma(code, "use strict") ? '"use strict";' : "") +
+      "let " + runtimeName + "=global." + runtimeName + ";" +
+      code
+
+    return code
   },
 
   enable(entry, exported) {

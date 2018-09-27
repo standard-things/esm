@@ -57,8 +57,8 @@ const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
   const pkg = entry.package
-  const packageOptions = pkg.options
-  const { mode } = packageOptions
+  const { options } = pkg
+  const { mode } = options
   const { parsing } = shared.moduleState
 
   let hint = SCRIPT
@@ -81,7 +81,7 @@ function compile(caller, entry, content, filename, fallback) {
     if (! compileData ||
         compileData.changed) {
       const { cacheName } = entry
-      const { cjs } = packageOptions
+      const { cjs } = options
 
       const scriptData = compileData
         ? compileData.scriptData
@@ -94,22 +94,19 @@ function compile(caller, entry, content, filename, fallback) {
         filename,
         hint,
         mtime: entry.mtime,
-        packageOptions,
         runtimeName: entry.runtimeName,
         sourceType,
         topLevelReturn: cjs.topLevelReturn
       })
 
-      if (compileData.sourceType === MODULE) {
-        entry.type = TYPE_ESM
-      } else {
-        entry.type = TYPE_CJS
-      }
+      entry.type = compileData.sourceType === MODULE
+        ? TYPE_ESM
+        : TYPE_CJS
 
       compileData.scriptData = scriptData
 
       entry.compileData =
-      entry.package.cache.compile[entry.cacheName] = compileData
+      pkg.cache.compile[cacheName] = compileData
     } else {
       compileData.code = content
     }

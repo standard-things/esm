@@ -10,7 +10,6 @@ import GenericBuffer from "./generic/buffer.js"
 
 import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
-import getCacheName from "./util/get-cache-name.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
 import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
@@ -112,13 +111,7 @@ function init() {
     const result = Compiler.compile(code, toCompileOptions(options))
 
     if (options.eval) {
-      const cacheName = getCacheName(code, {
-        cachePath: options.cachePath,
-        filename: options.filename,
-        packageOptions: options.packageOptions
-      })
-
-      return shared.package.dir[""].compile[cacheName] = result
+      return result
     }
 
     if (result.sourceType === MODULE) {
