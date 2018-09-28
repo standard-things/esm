@@ -24,7 +24,6 @@ import writeFile from "./fs/write-file.js"
 
 function init() {
   const {
-    TYPE_CJS,
     TYPE_ESM
   } = ENTRY
 
@@ -89,8 +88,6 @@ function init() {
         result.exportedFrom = inflateExportedFrom(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
         result.yieldIndex = +meta[10] || -1
-      } else {
-        entry.type = TYPE_CJS
       }
 
       const [offsetStart, offsetEnd] = meta
