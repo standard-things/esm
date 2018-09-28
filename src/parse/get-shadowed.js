@@ -13,9 +13,11 @@ function init() {
       if (type === "WithStatement") {
         const node = path.getValue()
 
-        return shadowed = parent.object === node
+        shadowed = parent.object === node
           ? null
           : parent
+
+        return shadowed
       }
 
       let cache = map.get(parent)
