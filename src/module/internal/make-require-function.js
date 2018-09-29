@@ -31,6 +31,14 @@ const {
 
 const sourceResolve = realRequire.resolve
 const sourcePaths = sourceResolve && sourceResolve.paths
+const { symbol } = shared
+
+const ownExports = {
+  __proto__: null,
+  [symbol.realGetProxyDetails]: realGetProxyDetails,
+  [symbol.realRequire]: realRequire,
+  [symbol.shared]: shared
+}
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
@@ -109,22 +117,8 @@ function isOwnModule(mod) {
 }
 
 function ownRequire(request) {
-  if (typeof request !== "symbol") {
-    return
-  }
-
-  const { symbol } = shared
-
-  if (request === symbol.realGetProxyDetails) {
-    return realGetProxyDetails
-  }
-
-  if (request === symbol.realRequire) {
-    return realRequire
-  }
-
-  if (request === symbol.shared) {
-    return shared
+  if (typeof request === "symbol") {
+    return ownExports[request]
   }
 }
 
