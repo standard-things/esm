@@ -7,6 +7,7 @@ import ESM from "../../constant/esm.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
+import Runtime from "../../runtime.js"
 
 import errors from "../../errors.js"
 import isDataProperty from "../../util/is-data-property.js"
@@ -35,8 +36,10 @@ const { symbol } = shared
 
 const ownExports = {
   __proto__: null,
+  [symbol.entry]: Entry,
   [symbol.realGetProxyDetails]: realGetProxyDetails,
   [symbol.realRequire]: realRequire,
+  [symbol.runtime]: Runtime,
   [symbol.shared]: shared
 }
 

@@ -42,11 +42,13 @@ function init() {
 
   const symbol = {
     _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
+    entry: Symbol.for(PKG_PREFIX + ":entry"),
     mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
     namespace: Symbol.for(PKG_PREFIX + ":namespace"),
     package: Symbol.for(PKG_PREFIX + ":package"),
     realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
     realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
+    runtime: Symbol.for(PKG_PREFIX + ":runtime"),
     shared: SHARED_SYMBOL,
     wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
   }
