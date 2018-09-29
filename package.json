@@ -85,7 +85,7 @@
     "semver": "^5.5.1",
     "sleep": "^5.2.3",
     "sqreen": "^1.25.0",
-    "strip-ansi": "^4.0.0",
+    "strip-ansi": "^5.0.0",
     "terser": "^3.9.2",
     "terser-webpack-plugin": "^1.1.0",
     "test262-parser": "^2.0.7",
