@@ -1,4 +1,3 @@
-import CHAR_CODE from "../../constant/char-code.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
@@ -10,24 +9,19 @@ import Package from "../../package.js"
 import Runtime from "../../runtime.js"
 
 import captureStackTrace from "../../error/capture-stack-trace.js"
-import createSourceMap from "../../util/create-source-map.js"
-import encodeURI from "../../util/encode-uri.js"
+import compileSource from "../../util/compile-source.js"
 import esmValidate from "../esm/validate.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
-import isError from "../../util/is-error.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
+import isError from "../../util/is-error.js"
 import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import readFile from "../../fs/read-file.js"
 import shared from "../../shared.js"
-import stripShebang from "../../util/strip-shebang.js"
 import toString from "../../util/to-string.js"
 
-const {
-  SEMICOLON
-} = CHAR_CODE
 const {
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
@@ -137,8 +131,13 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function tryCompileCached(entry, content, filename) {
-  const isESM = entry.type === TYPE_ESM
-  const tryCompile = isESM ? tryCompileESM : tryCompileCJS
+  const { compileData } = entry
+  const isESM = compileData.sourceType === MODULE
+  const mod = entry.module
+
+  const cjsVars =
+    entry.package.options.cjs.vars &&
+    entry.extname !== ".mjs"
 
   let error
   let result
@@ -147,7 +146,34 @@ function tryCompileCached(entry, content, filename) {
   entry.state = STATE_EXECUTION_STARTED
 
   try {
-    result = tryCompile(entry, filename)
+    const async = useAsync(entry)
+
+    const source = compileSource(compileData, {
+      async,
+      cjsVars,
+      runtimeName: entry.runtimeName,
+      sourceMap: useSourceMap(entry)
+    })
+
+    if (isESM ||
+        compileData.changed) {
+      const runtime = Runtime.enable(entry, GenericObject.create())
+
+      result = mod._compile(source, filename)
+
+      if (isESM &&
+          ! async) {
+        // Debuggers may wrap `Module#_compile()` with
+        // `process.binding("inspector").callAndPauseOnStart()`
+        // and not forward the return value.
+        const { _runResult } = runtime
+
+        _runResult.next()
+        _runResult.next()
+      }
+    } else {
+      result = mod._compile(source, filename)
+    }
   } catch (e) {
     error = e
     threw = true
@@ -181,123 +207,6 @@ function tryCompileCached(entry, content, filename) {
 
   content = () => readFile(filename, "utf8")
   throw maskStackTrace(error, content, filename, isESM)
-}
-
-function tryCompileCJS(entry, filename) {
-  const { compileData, runtimeName } = entry
-  const mod = entry.module
-  const useAsync = useAsyncWrapper(entry)
-
-  let content = compileData.code
-
-  if (compileData.changed) {
-    content =
-      "const " + runtimeName + "=exports;" +
-      "return " +
-      runtimeName + ".r((" +
-      (useAsync ? "async " :  "") +
-      "function(exports,require){" +
-      content +
-      "\n}))"
-
-    Runtime.enable(entry, GenericObject.create())
-  } else if (useAsync) {
-    content =
-      "(async () => { " +
-      stripShebang(content) +
-      "\n})();"
-  }
-
-  content += maybeSourceMap(entry, content, filename)
-  return mod._compile(content, filename)
-}
-
-function tryCompileESM(entry, filename) {
-  const { compileData, runtimeName } = entry
-  const mod = entry.module
-
-  const useAsync =
-    isObjectEmpty(compileData.exportedSpecifiers) &&
-    useAsyncWrapper(entry)
-
-  const cjsVars =
-    entry.package.options.cjs.vars &&
-    entry.extname !== ".mjs"
-
-  let { code } = compileData
-
-  if (! compileData.changed) {
-    code = stripShebang(code)
-  }
-
-  const { yieldIndex } = compileData
-
-  if (! useAsync &&
-      yieldIndex !== -1) {
-    if (yieldIndex) {
-      code =
-        code.slice(0, yieldIndex) +
-        (code.charCodeAt(yieldIndex - 1) === SEMICOLON ? "" : ";") +
-        "yield;" +
-        code.slice(yieldIndex)
-    } else {
-      code = "yield;" + code
-    }
-  }
-
-  let content =
-    "const " + runtimeName + "=exports;" +
-    (cjsVars
-      ? ""
-      : "__dirname=__filename=arguments=exports=module=require=void 0;"
-    ) +
-    "return " +
-    runtimeName + ".r((" +
-    (useAsync ? "async " :  "") +
-    "function" +
-    (useAsync ? "" : " *") +
-    "(" +
-    (cjsVars
-      ? "exports,require"
-      : ""
-    ) +
-    '){"use strict";' +
-    code +
-    "\n}))"
-
-  content += maybeSourceMap(entry, content, filename)
-
-  const runtime = Runtime.enable(entry, GenericObject.create())
-  const result = mod._compile(content, filename)
-
-  if (! useAsync) {
-    // Debuggers may wrap `Module#_compile()` with
-    // `process.binding("inspector").callAndPauseOnStart()`
-    // and not forward the return value.
-    const { _runResult } = runtime
-
-    _runResult.next()
-    _runResult.next()
-  }
-
-  return result
-}
-
-function maybeSourceMap(entry, content, filename) {
-  const { sourceMap } = entry.package.options
-
-  if (sourceMap !== false &&
-      (sourceMap ||
-       DEVELOPMENT ||
-       ELECTRON_RENDERER ||
-       NDB ||
-       FLAGS.inspect) &&
-      ! getSourceMappingURL(content)) {
-    return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(filename, content))
-  }
-
-  return ""
 }
 
 function tryCompileCode(caller, content, options) {
@@ -349,10 +258,23 @@ function tryValidate(caller, entry, content, filename) {
   throw maskStackTrace(error, content, filename, true)
 }
 
-function useAsyncWrapper(entry) {
+function useAsync(entry) {
   return entry.package.options.await &&
     shared.support.await &&
-    entry.extname !== ".mjs"
+    entry.extname !== ".mjs" &&
+    isObjectEmpty(entry.compileData.exportedSpecifiers)
+}
+
+function useSourceMap(entry) {
+  const { sourceMap } = entry.package.options
+
+  return sourceMap !== false &&
+    (sourceMap ||
+     DEVELOPMENT ||
+     ELECTRON_RENDERER ||
+     NDB ||
+     FLAGS.inspect) &&
+    ! getSourceMappingURL(entry.compileData.code)
 }
 
 export default compile
