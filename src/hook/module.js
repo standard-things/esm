@@ -13,6 +13,7 @@ import Wrapper from "../wrapper.js"
 import compile from "../module/internal/compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
+import esmLoad from "../module/esm/load.js"
 import esmState from "../module/esm/state.js"
 import get from "../util/get.js"
 import getCacheName from "../util/get-cache-name.js"
@@ -221,6 +222,9 @@ function hook(Mod, parent) {
     passthruMap.set(extCompiler, passthru)
     esmState.extensions[ext] = _extensions[ext]
   }
+
+  _extensions[".wasm"] =
+  esmState.extensions[".wasm"] = wasmCompiler
 }
 
 function mjsCompiler(mod, filename) {
@@ -277,6 +281,26 @@ function tryPassthru(func, args, pkg) {
   const content = () => readFile(filename, "utf8")
 
   throw maskStackTrace(error, content, filename)
+}
+
+function wasmCompiler(mod, filename) {
+  const {
+    Instance:wasmInstance,
+    Module:wasmModule
+  } = WebAssembly
+
+  const wasmMod = new wasmModule(readFile(filename))
+
+  const imported = wasmModule
+    .imports(wasmMod)
+    .reduce((object, specifier) => {
+      const request = specifier.module
+
+      object[request] = esmLoad(request, null).module.exports
+      return object
+    }, { __proto__: null })
+
+  mod.exports = new wasmInstance(wasmMod, imported).exports
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
