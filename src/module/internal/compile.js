@@ -168,8 +168,10 @@ function tryCompileCached(entry, content, filename) {
         // and not forward the return value.
         const { _runResult } = runtime
 
+        // Eventually, we will call this in the instantiate phase.
         _runResult.next()
-        _runResult.next()
+
+        result = _runResult.next().value
       }
     } else {
       result = mod._compile(source, filename)
