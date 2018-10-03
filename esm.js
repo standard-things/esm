@@ -48,7 +48,6 @@ const esmModule = new Module(id)
 esmModule.filename = filename
 esmModule.parent = parent
 
-let jestLoader
 let jestObject
 
 if (typeof jest === "object" && jest !== null &&
@@ -83,14 +82,14 @@ function tryRequire(request) {
   } catch (e) {}
 }
 
-
 const jestEnvironmentHooks = { __proto__: null }
 
 function jestTransform(content, filename, { cwd, testEnvironment }) {
 
   if (! jestEnvironmentHooks[cwd]) {
     jestEnvironmentHooks[cwd] = {
-      loader: makeRequireFunction(module)
+      loader: makeRequireFunction(module),
+      compile: { __proto__: null }
     }
   }
 
@@ -105,37 +104,61 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
   const runtimeName = "_"
   const { symbol } = shared
 
-  const { CachingCompiler } = shared.module
+  const { CachingCompiler, utilCompileSource } = shared.module
   const Entry = loader(symbol.entry)
   const Runtime = loader(symbol.runtime)
 
   const compileData = CachingCompiler.compile(content, {
+    cjsVars: true,
     filename,
     runtimeName,
     sourceType: 3
   })
 
-  const code =
-    "const " + runtimeName + "=exports;" +
-    compileData.code
+  jestEnvironmentHooks[cwd].compile[filename] = compileData
+
+  const isESM = compileData.sourceType === 2
+
+  const code = utilCompileSource(compileData, {
+    cjsVars: true,
+    runtimeName
+  })
 
   if (! jestEnvironmentHooks[cwd][testEnvironment]) {
     jestEnvironmentHooks[testEnvironment] = true
 
     Environment.prototype.runScript = function (...args) {
-      const result = Reflect.apply(runScript, this, args)
-      const wrapper = result[JEST_EVAL_RESULT_VARIABLE]
+      const scriptResult = Reflect.apply(runScript, this, args)
+      const wrapper = scriptResult[JEST_EVAL_RESULT_VARIABLE]
 
-      result[JEST_EVAL_RESULT_VARIABLE] = function (...args) {
+      scriptResult[JEST_EVAL_RESULT_VARIABLE] = function (...args) {
         const [mod] = args
         const entry = Entry.get(mod)
 
+        entry.compileData = jestEnvironmentHooks[cwd].compile[entry.filename]
+        entry.type = isESM ? 2 : 1
         entry.runtimeName = runtimeName
-        Runtime.enable(entry, {})
-        return Reflect.apply(wrapper, this, args)
+
+        const runtime = Runtime.enable(entry, {})
+
+        let moduleResult = Reflect.apply(wrapper, this, args)
+
+        if (isESM) {
+          // Debuggers may wrap `Module#_compile()` with
+          // `process.binding("inspector").callAndPauseOnStart()`
+          // and not forward the return value.
+          const { _runResult } = runtime
+
+          // Eventually, we will call this in the instantiate phase.
+          _runResult.next()
+
+          moduleResult = _runResult.next().value
+        }
+
+        return moduleResult
       }
 
-      return result
+      return scriptResult
     }
   }
 
