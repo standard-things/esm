@@ -105,44 +105,6 @@ test/language/module-code/namespace/internals/get-str-update.js
 
 
 
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-async-function-await-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-async-function-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-block-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-block-labeled-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-do-while-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-else-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-function-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-if-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js
-
-# DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/catch/top-level-import-catch-instn-iee-err-ambiguous-import.js
-
-
-
 # DYNAMIC IMPORT ❌ (empty import)
 test/language/module-code/dynamic-import/syntax/valid/nested-arrow-assignment-expression-empty-str-is-valid-assign-expr.js
 
