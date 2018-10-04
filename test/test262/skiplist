@@ -123,178 +123,102 @@ test/language/module-code/namespace/internals/object-keys-binding-uninit.js
 
 
 
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-arrow-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-async-function-await-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-async-function-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-async-function-return-await-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-block-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-block-labeled-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-do-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-do-while-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-else-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-function-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-if-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-labeled-block-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-nested-while-import-catch-instn-iee-err-not-found.js
-
-# DYNAMIC IMPORT ❌ (test wrong)
-test/language/module-code/dynamic-import/catch-top-level-import-catch-instn-iee-err-not-found.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js
 
 # DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbdng-indirect-update-as.js
+test/language/module-code/dynamic-import/catch/nested-async-function-await-instn-iee-err-ambiguous-import.js
 
 # DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbdng-indirect-update-dflt.js
+test/language/module-code/dynamic-import/catch/nested-async-function-instn-iee-err-ambiguous-import.js
 
 # DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/nested-if-braceless-eval-gtbndng-indirect-update.js
+test/language/module-code/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js
 
 # DYNAMIC IMPORT ❌ (incomplete test)
-test/language/module-code/dynamic-import/nested-if-braceless-returns-promise.js
+test/language/module-code/dynamic-import/catch/nested-block-import-catch-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-arrow-assignment-expression-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-block-labeled-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-arrow-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-do-while-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-block-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-else-import-catch-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-block-labeled-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-function-import-catch-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-do-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-if-import-catch-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-do-while-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js
 
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-else-braceless-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-else-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-function-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-function-return-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-if-braceless-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-if-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-labeled-block-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-nested-while-empty-str-arg.js
-
-# DYNAMIC IMPORT ❌ (incomplete test: empty import)
-test/language/module-code/dynamic-import/syntax-top-level-empty-str-arg.js
+# DYNAMIC IMPORT ❌ (incomplete test)
+test/language/module-code/dynamic-import/catch/top-level-import-catch-instn-iee-err-ambiguous-import.js
 
 
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-await-eval-rqstd-abrupt-typeerror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-arrow-assignment-expression-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-await-eval-rqstd-abrupt-urierror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-arrow-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-await-instn-iee-err-ambiguous-import.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-async-function-await-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-await-instn-iee-err-circular.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-async-function-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-eval-rqstd-abrupt-typeerror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-async-function-return-await-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-eval-rqstd-abrupt-urierror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-block-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-instn-iee-err-ambiguous-import.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-block-labeled-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-instn-iee-err-circular.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-do-while-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-return-await-eval-rqstd-abrupt-typeerror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-else-braceless-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-return-await-eval-rqstd-abrupt-urierror.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-else-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-return-await-instn-iee-err-ambiguous-import.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-function-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/catch-nested-async-function-return-await-instn-iee-err-circular.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-function-return-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-await-eval-gtbdng-indirect-update-as.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-if-braceless-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-await-eval-gtbdng-indirect-update-dflt.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-if-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-await-eval-gtbndng-indirect-update.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/nested-while-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-await-returns-promise.js
+# DYNAMIC IMPORT ❌ (empty import)
+test/language/module-code/dynamic-import/syntax/valid/top-level-empty-str-is-valid-assign-expr.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-eval-gtbdng-indirect-update-as.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-eval-gtbdng-indirect-update-dflt.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-eval-gtbndng-indirect-update.js
+# DYNAMIC IMPORT ❌ (async timeout)
+test/language/module-code/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update-dflt.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-return-await-eval-gtbdng-indirect-update-as.js
+# DYNAMIC IMPORT ❌ (async timeout)
+test/language/module-code/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update.js
 
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-return-await-eval-gtbdng-indirect-update-dflt.js
-
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-return-await-eval-gtbndng-indirect-update.js
-
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-return-await-returns-promise.js
-
-# ASYNC FUNCTION @6
-test/language/module-code/dynamic-import/nested-async-function-returns-promise.js
+# DYNAMIC IMPORT ❌ (async timeout)
+test/language/module-code/dynamic-import/usage/nested-if-braceless-returns-promise.js
 
 
 
