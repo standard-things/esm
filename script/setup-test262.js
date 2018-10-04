@@ -39,21 +39,6 @@ function setupTest262() {
       ])
     )
     .then(() =>
-      git(repoPath, [
-        "fetch",
-        "origin",
-        "--depth",
-        "1",
-        "pull/1588/head:dynamic-import"
-      ])
-    )
-    .then(() =>
-      git(repoPath, [
-        "checkout",
-        "dynamic-import"
-      ])
-    )
-    .then(() =>
       testDirs
         .reduce((promise, testDir) => {
           const repoDirPath = path.resolve(repoPath, testDir)
