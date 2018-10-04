@@ -410,7 +410,7 @@ describe("scenario tests", function () {
     beforeEach(beforeAndAfterEach)
     afterEach(beforeAndAfterEach)
 
-    const MAX_WAIT = 4000
+    const MAX_WAIT = 10000
 
     const logsPath = path.resolve("env/home/.pm2/logs")
     const stderrPath = path.resolve(logsPath, "pm2-error.log")
