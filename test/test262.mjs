@@ -7,7 +7,11 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
-const isChakra = Reflect.has(process.versions, "chakracore")
+const isV8 = Reflect.has(process.versions, "v8")
+
+const canRunTest262 =
+  isV8 &&
+  SemVer.satisfies(process.version, ">=10")
 
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")
@@ -15,12 +19,6 @@ const test262Path = path.resolve("vendor/test262")
 const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 
 const skipRegExp = /^(#.*)\n([^#\n].*)/gm
-const skipFlagsRegExp = /@[-\w]+/g
-
-const nodeVersion = isChakra
-  ? "chakra"
-  : String(SemVer.major(process.version))
-
 const skiplist = parseSkiplist(skiplistPath)
 
 const test262Tests = globby.sync([
@@ -47,29 +45,15 @@ function parseSkiplist(filename) {
   let match
 
   while ((match = skipRegExp.exec(content))) {
-    let flags
-    let reason
     let [, comment, filename] = match
 
     filename = path.resolve(test262Path, filename)
 
-    if (skipFlagsRegExp.test(comment)) {
-      flags = comment
-        .match(skipFlagsRegExp)
-        .map((flag) => flag.slice(1))
-
-      reason = comment
-        .slice(1, comment.search(skipFlagsRegExp))
-        .trim()
-    } else {
-      flags = []
-      reason = comment
-        .slice(1)
-        .trim()
-    }
+    const reason = comment
+      .slice(1)
+      .trim()
 
     result.set(filename, {
-      flags,
       reason
     })
   }
@@ -103,18 +87,14 @@ function runEsm(filename, args, env) {
 describe("test262 tests", function () {
   this.timeout(0)
 
-  for (const filename of test262Tests) {
-    let skipped = skiplist.get(filename)
-
-    if (skipped) {
-      const { flags } = skipped
-
-      if (flags.length &&
-          flags.indexOf(nodeVersion) === -1) {
-        skipped = void 0
-      }
+  before(function () {
+    if (! canRunTest262) {
+      this.skip()
     }
+  })
 
+  for (const filename of test262Tests) {
+    const skipped = skiplist.get(filename)
     const testData = parseTest(filename)
 
     const description =
