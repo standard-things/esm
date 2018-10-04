@@ -22,32 +22,6 @@ test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
 # UNSUPPORTED 🚧 (export-ns-from)
 test/language/module-code/namespace/internals/get-nested-namespace-props-nrml.js
 
-
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-1.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-2.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-3.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-4.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-5.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-6.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-7.js
-
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-not-valid-earlyerr-module-8.js
-
 # UNSUPPORTED 🚧 (private fields)
 test/language/module-code/privatename-valid-no-earlyerr.js
 
@@ -77,31 +51,29 @@ test/language/module-code/instn-named-bndng-trlng-comma.js
 # BUG 🐛 (instantiation phase)
 test/language/module-code/instn-named-bndng-var.js
 
-# BUG 🐛 (cycle import)
-test/language/module-code/instn-iee-iee-cycle.js
-
-# NEEDS INVESTIGATION 🐛 (cycle import)
-test/language/module-code/instn-named-iee-cycle.js
-
-# NEEDS INVESTIGATION 🐛 (cycle import)
-test/language/module-code/instn-star-iee-cycle.js
-
-
-
-# NEEDS INVESTIGATION 👀
+# BUG 🐛 (instantiation phase)
 test/language/module-code/namespace/internals/delete-exported-init.js
 
-# NEEDS INVESTIGATION 👀
+# BUG 🐛 (instantiation phase)
 test/language/module-code/namespace/internals/get-own-property-str-found-init.js
 
-# NEEDS INVESTIGATION 👀
+# BUG 🐛 (instantiation phase)
 test/language/module-code/namespace/internals/get-str-found-init.js
 
-# NEEDS INVESTIGATION 👀
+# BUG 🐛 (instantiation phase)
 test/language/module-code/namespace/internals/get-str-initialize.js
 
-# NEEDS INVESTIGATION 👀
+# BUG 🐛 (instantiation phase)
 test/language/module-code/namespace/internals/get-str-update.js
+
+# BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-iee-iee-cycle.js
+
+# BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-named-iee-cycle.js
+
+# BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-star-iee-cycle.js
 
 
 
@@ -153,8 +125,6 @@ test/language/module-code/dynamic-import/syntax/valid/nested-while-empty-str-is-
 # DYNAMIC IMPORT ⏭️ (empty import)
 test/language/module-code/dynamic-import/syntax/valid/top-level-empty-str-is-valid-assign-expr.js
 
-
-
 # DYNAMIC IMPORT ⏭️ (async timeout)
 test/language/module-code/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update-dflt.js
 
@@ -163,8 +133,6 @@ test/language/module-code/dynamic-import/usage/nested-if-braceless-eval-gtbndng-
 
 # DYNAMIC IMPORT ⏭️ (async timeout)
 test/language/module-code/dynamic-import/usage/nested-if-braceless-returns-promise.js
-
-
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/module-code/dynamic-import/eval-self-once-script.js

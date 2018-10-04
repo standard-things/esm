@@ -11,7 +11,8 @@ const isV8 = Reflect.has(process.versions, "v8")
 
 const canRunTest262 =
   isV8 &&
-  SemVer.satisfies(process.version, ">=10")
+  process.execArgv.includes("--harmony") &&
+  SemVer.satisfies(process.version, ">=10.3.0")
 
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")
