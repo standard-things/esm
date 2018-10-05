@@ -27,43 +27,43 @@ test/language/module-code/privatename-valid-no-earlyerr.js
 
 
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-bndng-fun.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-bndng-gen.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-bndng-var.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-star-cycle.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-trlng-comma.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-named-bndng-dflt-named.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-named-bndng-trlng-comma.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-named-bndng-var.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/delete-exported-init.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/get-own-property-str-found-init.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/get-str-found-init.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/get-str-initialize.js
 
-# BUG 🐛 (instantiation phase)
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/get-str-update.js
 
 # BUG 🐛 (instantiation phase + cycle import)
