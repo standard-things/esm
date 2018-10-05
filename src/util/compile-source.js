@@ -29,9 +29,13 @@ function init() {
     if (compileData.changed) {
       const { runtimeName } = options
 
+      const returnRun = options.return === void 0
+        ? true
+        : options.return
+
       content =
         "const " + runtimeName + "=exports;" +
-        "return " +
+        (returnRun ? "return " : "") +
         runtimeName + ".r((" +
         (options.async ? "async " :  "") +
         "function(exports,require){" +
@@ -64,6 +68,10 @@ function init() {
       runtimeName
     } = options
 
+    const returnRun = options.return === void 0
+      ? true
+      : options.return
+
     const { yieldIndex } = compileData
 
     if (! async &&
@@ -85,7 +93,7 @@ function init() {
         ? ""
         : "__dirname=__filename=arguments=exports=module=require=void 0;"
       ) +
-      "return " +
+      (returnRun ? "return " : "") +
       runtimeName + ".r((" +
       (async ? "async " :  "") +
       "function" +

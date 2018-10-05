@@ -16,6 +16,7 @@ import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
+import compileSource from "../util/compile-source.js"
 import { config } from "../safe/process.js"
 import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
@@ -67,6 +68,8 @@ function hook(vm) {
     scriptOptions = assign({}, scriptOptions)
     scriptOptions.produceCachedData = true
 
+    const { runtimeName } = entry
+
     const cacheName =
     entry.cacheName = getCacheName(content)
 
@@ -85,7 +88,7 @@ function hook(vm) {
           cjsVars: true,
           generateVarDeclarations: true,
           pragmas: false,
-          runtimeName: entry.runtimeName,
+          runtimeName,
           sourceType: UNAMBIGUOUS,
           strict: false
         }
@@ -106,7 +109,7 @@ function hook(vm) {
         'var g=Function("return this")(),' +
         "m=g.module," +
         "e=m&&m.exports," +
-        'n="' + entry.runtimeName + '";' +
+        'n="' + runtimeName + '";' +
         "if(e&&!g[n]){" +
           "m.exports=e.entry.exports;" +
           "require=e.entry.require;" +
@@ -117,7 +120,10 @@ function hook(vm) {
           "})" +
         "}" +
       "})();" +
-      compileData.code
+      compileSource(compileData, {
+        cjsVars: true,
+        runtimeName
+      })
 
     const result = tryWrapper.call(vm, func, [code, scriptOptions], content)
 
