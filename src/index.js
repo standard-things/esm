@@ -40,6 +40,7 @@ const {
   EVAL,
   FLAGS,
   INTERNAL,
+  PRELOADED,
   REPL
 } = ENV
 
@@ -102,41 +103,45 @@ if (shared.inited &&
 
   if (CHECK) {
     vmHook(realVM)
-  } else if (EVAL) {
-    RealModule.prototype._compile = Module.prototype._compile
+  } else if (EVAL ||
+      REPL) {
     moduleHook(Module)
     processHook(realProcess)
     vmHook(realVM)
-  } else if (REPL) {
-    moduleHook(Module)
-    processHook(realProcess)
-    vmHook(realVM)
-
-    const names = keys(builtinVM)
-
-    for (const name of names) {
-      builtinVM[name] = realVM[name]
-    }
   } else if (CLI ||
       INTERNAL ||
       isSideloaded()) {
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(realProcess)
+  }
 
-    if (INTERNAL) {
-      globalHook(shared.unsafeGlobal)
-    } else if (! isSideloaded()) {
-      const { _cache } = Module
+  if (EVAL) {
+    RealModule.prototype._compile = Module.prototype._compile
+  }
 
-      for (const name in _cache) {
-        if (! isOwnPath(name)) {
-          Reflect.deleteProperty(_cache, name)
-        }
-      }
+  if (INTERNAL) {
+    globalHook(shared.unsafeGlobal)
+  }
 
-      Module._preloadModules(FLAGS.preloadModules)
+  if (REPL) {
+    const names = keys(builtinVM)
+
+    for (const name of names) {
+      builtinVM[name] = realVM[name]
     }
+  }
+
+  if (PRELOADED) {
+    const { _cache } = Module
+
+    for (const name in _cache) {
+      if (! isOwnPath(name)) {
+        Reflect.deleteProperty(_cache, name)
+      }
+    }
+
+    Module._preloadModules(FLAGS.preloadModules)
   }
 }
 
