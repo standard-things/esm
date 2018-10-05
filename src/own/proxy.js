@@ -22,6 +22,8 @@ function init() {
   }
 
   class OwnProxy {
+    // TODO: Remove this eslint comment when the false positive is resolved.
+    // eslint-disable-next-line no-undef
     static instances = new WeakMap
 
     constructor(target, handler) {
