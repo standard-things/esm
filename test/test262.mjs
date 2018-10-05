@@ -64,12 +64,10 @@ function parseSkiplist(filename) {
 
 function parseTest(filename) {
   const { attrs } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
-  const { features, flags, negative } = attrs
+  const { flags, negative } = attrs
   const description = attrs.description.trim()
   const errorType = negative ? negative.type : void 0
-  const isAsync =
-    !! (flags && flags.async) ||
-    !! (features && features.indexOf("dynamic-import") !== -1)
+  const isAsync = !! (flags && flags.async)
 
   return {
     description,

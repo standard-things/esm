@@ -40,6 +40,9 @@ global.print = function print(value) {
   _message = value
 }
 
+// Suppress unhandled `Promise` rejection warnings.
+process.on("unhandledRejection", () => {})
+
 for (const harnessFilename of harnessFilenames) {
   const {
     contents

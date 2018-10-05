@@ -77,54 +77,6 @@ test/language/module-code/instn-star-iee-cycle.js
 
 
 
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-arrow-assignment-expression-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-arrow-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-async-function-await-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-async-function-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-async-function-return-await-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-block-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-block-labeled-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-do-while-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-else-braceless-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-else-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-function-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-function-return-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-if-braceless-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-if-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/nested-while-empty-str-is-valid-assign-expr.js
-
-# DYNAMIC IMPORT ⏭️ (empty import)
-test/language/module-code/dynamic-import/syntax/valid/top-level-empty-str-is-valid-assign-expr.js
-
 # DYNAMIC IMPORT ⏭️ (async timeout)
 test/language/module-code/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update-dflt.js
 
