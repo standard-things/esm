@@ -19,7 +19,7 @@ function init() {
       colors: false,
       compact: true,
       customInspect: true,
-      depth: 20,
+      depth: 2,
       maxArrayLength: 100,
       showHidden: false,
       showProxy: false
