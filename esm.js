@@ -88,8 +88,8 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
 
   if (! jestEnvironmentHooks[cwd]) {
     jestEnvironmentHooks[cwd] = {
-      loader: makeRequireFunction(module),
-      compile: { __proto__: null }
+      compile: { __proto__: null },
+      loader: makeRequireFunction(module)
     }
   }
 
