@@ -17,15 +17,20 @@ function init() {
   class GlobalsVisitor extends Visitor {
     reset(options) {
       this.changed = false
-      this.globals = assign({ __proto__: null }, globalLookup)
+      this.globals = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
 
       if (options) {
+        this.globals = options.globals
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
+      }
+
+      if (this.globals == null) {
+        this.globals = assign({ __proto__: null }, globalLookup)
       }
     }
 

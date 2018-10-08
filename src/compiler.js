@@ -181,13 +181,14 @@ function init() {
 
       if (possibleGlobalsIndexes.length) {
         for (const name of possibleGlobalsNames) {
-          if (Reflect.has(importedLocals, name)) {
+          if (Reflect.has(identifiers, name)) {
             Reflect.deleteProperty(globals, name)
           }
         }
 
         if (! isObjectEmpty(globals)) {
           globalsVisitor.visit(rootPath, {
+            globals,
             magicString,
             possibleIndexes: possibleGlobalsIndexes,
             runtimeName
