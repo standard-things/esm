@@ -16,7 +16,6 @@ import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
 import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
-import compileSource from "../util/compile-source.js"
 import { config } from "../safe/process.js"
 import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
@@ -120,10 +119,7 @@ function hook(vm) {
           "})" +
         "}" +
       "})();" +
-      compileSource(compileData, {
-        cjsVars: true,
-        runtimeName
-      })
+      compileData.code
 
     const result = tryWrapper.call(vm, func, [code, scriptOptions], content)
 
