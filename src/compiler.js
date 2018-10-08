@@ -83,9 +83,12 @@ function init() {
         }
       }
 
+      const { globals } = globalsVisitor
+      const possibleGlobalsNames = keys(globals)
+
       const possibleExportIndexes = findIndexes(code, ["export"])
       const possibleEvalIndexes = findIndexes(code, ["eval"])
-      const possibleGlobalsIndexes = findIndexes(code, keys(globalsVisitor.globals))
+      const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
       const possibleIndexes = findIndexes(code, ["import"])
 
       const possibleChanges = !! (
@@ -140,7 +143,7 @@ function init() {
 
       Reflect.deleteProperty(ast, "top")
 
-      const { identifiers } = top
+      const { identifiers, importedLocals } = top
       const magicString = new MagicString(code)
       const rootPath = new FastPath(ast)
       const { runtimeName } = options
@@ -168,7 +171,6 @@ function init() {
 
       const {
         addedImportExport,
-        importedLocals,
         temporals
       } = importExportVisitor
 
@@ -178,10 +180,8 @@ function init() {
       }
 
       if (possibleGlobalsIndexes.length) {
-        const { globals } = globalsVisitor
-
-        for (const name in globals) {
-          if (Reflect.has(identifiers, name)) {
+        for (const name of possibleGlobalsNames) {
+          if (Reflect.has(importedLocals, name)) {
             Reflect.deleteProperty(globals, name)
           }
         }
@@ -264,7 +264,6 @@ function init() {
         }
 
         if (! options.cjsVars) {
-          const { importedLocals } = top
           const possibleNames = []
 
           const names = [

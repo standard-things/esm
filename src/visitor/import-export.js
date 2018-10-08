@@ -44,7 +44,6 @@ function init() {
       this.generateVarDeclarations = false
       this.hoistedExports = null
       this.hoistedImportsString = ""
-      this.importedLocals = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
@@ -65,7 +64,6 @@ function init() {
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
-        this.importedLocals = { __proto__: null }
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -415,13 +413,11 @@ function init() {
   }
 
   function addLocals(visitor, specifierMap) {
-    const { importedLocals, temporals } = visitor
+    const { temporals } = visitor
 
     for (const importedName in specifierMap) {
-      for (const localName of specifierMap[importedName]) {
-        importedLocals[localName] = true
-
-        if (importedName !== "*") {
+      if (importedName !== "*") {
+        for (const localName of specifierMap[importedName]) {
           temporals[localName] = true
         }
       }
