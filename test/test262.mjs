@@ -64,15 +64,12 @@ function parseSkiplist(filename) {
 
 function parseTest(filename) {
   const { attrs } = test262Parser.parseFile(fs.readFileSync(filename, "utf-8"))
-  const { flags, negative } = attrs
-  const description = attrs.description.trim()
-  const errorType = negative ? negative.type : void 0
-  const isAsync = !! (flags && flags.async)
+  const { description, negative } = attrs
 
   return {
-    description,
-    errorType,
-    isAsync
+    description: description ? description.trim() : "",
+    errorType: negative ? negative.type : void 0,
+    isAsync: !! attrs.flags.async
   }
 }
 
@@ -107,7 +104,7 @@ describe("test262 tests", function () {
       return runEsm(wrapperPath, [
         filename,
         isAsync
-      ], { ESM_OPTIONS: "{cjs:0,mode:all}" })
+      ], { ESM_OPTIONS: "{cjs:false}" })
       .then(({ stderr, stdout }) => {
         if (skipped &&
             isAsync) {
