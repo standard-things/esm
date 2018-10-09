@@ -32,6 +32,7 @@ function init() {
 
       parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
       parser.parseStatement = wrap(parser.parseStatement, parseStatement)
+      parser.parseSubscripts = wrap(parser.parseSubscripts, parseSubscripts)
       return parser
     }
   }
@@ -61,6 +62,26 @@ function init() {
     }
 
     return node
+  }
+
+  function parseSubscripts(func, args) {
+    const [base, startPos, startLoc] = args
+
+    if (base.type === "Import" &&
+        this.type === tt.parenL) {
+      const callExpr = this.startNode(startPos, startLoc)
+
+      this.expect(tt.parenL)
+
+      callExpr.arguments = [this.parseMaybeAssign()]
+      callExpr.callee = base
+
+      this.finishNode(callExpr, "CallExpression")
+      this.expect(tt.parenR)
+      return base
+    }
+
+    return Reflect.apply(func, this, args)
   }
 
   function parseStatement(func, args) {
@@ -99,8 +120,6 @@ function init() {
 
   function parseImportCall(parser) {
     const node = parser.startNode()
-    const { start } = parser
-
     const callExpr = parser.startNode()
     const callee = parser.parseExprAtom()
 
@@ -112,9 +131,7 @@ function init() {
     parser.finishNode(callExpr, "CallExpression")
     parser.expect(tt.parenR)
 
-    const expr = parser.parseSubscripts(callExpr, start)
-
-    return parser.parseExpressionStatement(node, expr)
+    return parser.parseExpressionStatement(node, callExpr)
   }
 
   function parseImportMetaProperty(parser) {
