@@ -75,7 +75,7 @@ function parseTest(filename) {
 
 function runEsm(filename, args, env) {
   return node([
-    "-r", "esm",
+    "-r", "../",
     filename, ...args
   ], env)
 }

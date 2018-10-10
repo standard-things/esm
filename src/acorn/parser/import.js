@@ -78,7 +78,8 @@ function init() {
 
       this.finishNode(callExpr, "CallExpression")
       this.expect(tt.parenR)
-      return base
+
+      args[0] = callExpr
     }
 
     return Reflect.apply(func, this, args)
@@ -120,18 +121,11 @@ function init() {
 
   function parseImportCall(parser) {
     const node = parser.startNode()
-    const callExpr = parser.startNode()
+    const { start } = parser
     const callee = parser.parseExprAtom()
+    const expr = parser.parseSubscripts(callee, start)
 
-    parser.expect(tt.parenL)
-
-    callExpr.arguments = [parser.parseMaybeAssign()]
-    callExpr.callee = callee
-
-    parser.finishNode(callExpr, "CallExpression")
-    parser.expect(tt.parenR)
-
-    return parser.parseExpressionStatement(node, callExpr)
+    return parser.parseExpressionStatement(node, expr)
   }
 
   function parseImportMetaProperty(parser) {
