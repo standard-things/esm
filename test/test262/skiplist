@@ -37,6 +37,9 @@ test/language/module-code/instn-iee-bndng-gen.js
 test/language/module-code/instn-iee-bndng-var.js
 
 # BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-iee-iee-cycle.js
+
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-star-cycle.js
 
 # BUG 🐛 (instantiation phase + cycle import)
@@ -50,6 +53,12 @@ test/language/module-code/instn-named-bndng-trlng-comma.js
 
 # BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-named-bndng-var.js
+
+# BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-named-iee-cycle.js
+
+# BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-star-iee-cycle.js
 
 # BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/delete-exported-init.js
@@ -66,16 +75,43 @@ test/language/module-code/namespace/internals/get-str-initialize.js
 # BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/namespace/internals/get-str-update.js
 
-# BUG 🐛 (instantiation phase + cycle import)
-test/language/module-code/instn-iee-iee-cycle.js
-
-# BUG 🐛 (instantiation phase + cycle import)
-test/language/module-code/instn-named-iee-cycle.js
-
-# BUG 🐛 (instantiation phase + cycle import)
-test/language/module-code/instn-star-iee-cycle.js
-
 
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/module-code/dynamic-import/eval-self-once-script.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-arrow-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-async-function-await-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-async-function-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-async-function-return-await-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-block-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-block-labeled-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-do-while-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-else-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-function-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-if-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-while-import-catch-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/top-level-import-catch-eval-script-code-target.js
