@@ -69,15 +69,15 @@ function init() {
 
     if (base.type === "Import" &&
         this.type === tt.parenL) {
-      const callExpr = this.startNode(startPos, startLoc)
+      const callExpr = this.startNodeAt(startPos, startLoc)
 
       this.expect(tt.parenL)
 
       callExpr.arguments = [this.parseMaybeAssign()]
       callExpr.callee = base
 
-      this.finishNode(callExpr, "CallExpression")
       this.expect(tt.parenR)
+      this.finishNode(callExpr, "CallExpression")
 
       args[0] = callExpr
     }
