@@ -67,13 +67,18 @@ function setupTest262() {
         let content = fs.readFileSync(filename, "utf-8")
 
         const { attrs } = test262Parser.parseFile(content)
+        const { flags } = attrs
+
+        content =
+          (flags.onlyStrict ? '"use strict";\n' : "") +
+          content
+
+        const pos = content.indexOf(YAML_END)
 
         const pragma =
           '"use ' +
-          (attrs.flags.module ? "module" : "script") +
+          (flags.module ? "module" : "script") +
           '";'
-
-        const pos = content.indexOf(YAML_END)
 
         if (pos === -1) {
           content =
