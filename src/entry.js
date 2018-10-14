@@ -10,9 +10,11 @@ import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleExtname from "./util/get-module-extname.js"
 import getModuleName from "./util/get-module-name.js"
+import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObjectLike from "./util/is-object-like.js"
+import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
@@ -582,6 +584,10 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
         descriptor.value === void 0
     }
 
+    if (! isCalledFromStrictCode()) {
+      return false
+    }
+
     if (Reflect.has(source.namespace, name)) {
       throw new ERR_NS_REDEFINITION(entry.module, name)
     } else {
@@ -594,10 +600,18 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
       return true
     }
 
+    if (! isCalledFromStrictCode()) {
+      return false
+    }
+
     throw new ERR_NS_DELETION(entry.module, name)
   }
 
   handler.set = (target, name) => {
+    if (! isCalledFromStrictCode()) {
+      return false
+    }
+
     if (Reflect.has(source.namespace, name)) {
       throw new ERR_NS_ASSIGNMENT(entry.module, name)
     }
@@ -874,6 +888,21 @@ function initNamespaceHandler() {
     has: null,
     set: null
   }
+}
+
+function isCalledFromStrictCode() {
+  const frames = getStackFrames(new Error)
+
+  for (const frame of frames) {
+    const filename = frame.getFileName()
+
+    if (filename &&
+        ! isOwnPath(filename)) {
+      return frame.getFunction() === void 0
+    }
+  }
+
+  return true
 }
 
 function mergeProperty(entry, otherEntry, key) {
