@@ -34,7 +34,7 @@ class WebpackTemplatePlugin {
           "}",
           "__webpack_require__.n = function (exported) {",
           "  exported.a = exported",
-          "  return () => exported.a",
+          "  return () => exported",
           "}",
           "__webpack_require__.r = function () {}"
         ].join("\n")
