@@ -8,6 +8,7 @@ import getModuleURL from "../util/get-module-url.js"
 import getSilent from "../util/get-silent.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
+import replaceWithout from "../util/replace-without.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
@@ -78,7 +79,7 @@ function init() {
           ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
           : (stack) => scrubStackTrace(stack)
 
-        return this.stack = withoutMessage(masked, newString, scrubber)
+        return this.stack = replaceWithout(masked, newString, scrubber)
       },
       set(value) {
         Reflect.defineProperty(this, "stack", {
@@ -223,8 +224,9 @@ function init() {
   }
 
   function fileNamesToURLs(stack) {
-    stack = stack.replace(headerRegExp, replaceHeader)
-    return stack.replace(atNameRegExp, replaceAtName)
+    return stack
+      .replace(headerRegExp, replaceHeader)
+      .replace(atNameRegExp, replaceAtName)
   }
 
   function replaceAtName(match, prefix, name) {
@@ -241,13 +243,6 @@ function init() {
     } catch {}
 
     return ""
-  }
-
-  function withoutMessage(stack, message, callback) {
-    const token = ZERO_WIDTH_NOBREAK_SPACE + "message" + ZERO_WIDTH_NOBREAK_SPACE
-
-    stack = stack.replace(message, token)
-    return callback(stack).replace(token, message)
   }
 
   return maskStackTrace
