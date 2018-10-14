@@ -3,6 +3,7 @@ import isError from "../util/is-error.js"
 import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
 import shared from "../shared.js"
+import toString from "../util/to-string.js"
 
 function init() {
   const headerRegExp = /^(.+?):(\d+)(?=\n)/
@@ -15,11 +16,15 @@ function init() {
       return null
     }
 
-    const stack = get(error, "stack")
+    let stack = get(error, "stack")
 
     if (typeof stack !== "string") {
       return null
     }
+
+    const message = toString(get(error, "message"))
+
+    stack = stack.replace(message, "")
 
     let match = headerRegExp.exec(stack)
 
