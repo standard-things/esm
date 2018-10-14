@@ -23,9 +23,7 @@ function init() {
     }
 
     const { index } = match
-
-    let trace = stack.slice(index)
-
+    const trace = stack.slice(index)
     const message = stack.slice(0, index)
     const lines = trace.split("\n")
 
