@@ -38,6 +38,7 @@ function init() {
     setDeferred(flags, "preserveSymlinks", () => matches(execArgv, "--preserve-symlinks"))
     setDeferred(flags, "preserveSymlinksMain", () => matches(execArgv, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(execArgv, /^(?:--print|-pe?)$/))
+    setDeferred(flags, "strict", () => matches(execArgs, "--strict"))
 
     return env.flags = flags
   }
