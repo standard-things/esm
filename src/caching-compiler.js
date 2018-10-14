@@ -60,34 +60,58 @@ function init() {
         return null
       }
 
-      let filename = meta[2]
+      let sourceType = SCRIPT
 
-      if (filename) {
-        filename = resolve(cachePath, filename)
-      }
+      const { length } = meta
 
       const result = {
-        changed: !! meta[5],
+        changed: false,
         code: null,
-        dependencySpecifiers: meta[6] || null,
+        dependencySpecifiers: null,
         enforceTDZ: noop,
-        exportedFrom: meta[7] || null,
-        exportedNames: meta[8] || null,
+        exportedFrom: null,
+        exportedNames: null,
         exportedSpecifiers: null,
-        exportedStars: meta[9] || null,
-        filename,
-        mtime: meta[3] || -1,
+        exportedStars: null,
+        filename: null,
+        mtime: -1,
         scriptData: null,
-        sourceType: +meta[4] || SCRIPT,
+        sourceType,
+        strict: false,
         yieldIndex: -1
       }
 
-      if (result.sourceType === MODULE) {
+      if (length > 2) {
+        result.strict = !! meta[2]
+      }
+
+      if (length > 3) {
+        let filename = meta[6]
+
+        if (filename) {
+          filename = resolve(cachePath, filename)
+        }
+
+        sourceType = +meta[4]
+
+        result.changed = !! meta[3]
+        result.filename = filename
+        result.mtime = +meta[5]
+      }
+
+      result.sourceType = sourceType
+
+      if (length > 7 &&
+          sourceType === MODULE) {
+        result.dependencySpecifiers = meta[7]
+        result.exportedFrom = assign({ __proto__: null }, meta[8])
+        result.exportedNames = meta[9]
+        result.exportedStars = meta[10]
+        result.yieldIndex = +meta[11]
+
         entry.type = TYPE_ESM
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
-        result.exportedFrom = inflateExportedFrom(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
-        result.yieldIndex = +meta[10] || -1
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -113,7 +137,6 @@ function init() {
 
     if (result.sourceType === MODULE) {
       result.dependencySpecifiers = inflateDependencySpecifiers(result)
-      result.exportedFrom = inflateExportedFrom(result)
       result.exportedSpecifiers = inflateExportedSpecifiers(result)
     }
 
@@ -163,10 +186,6 @@ function init() {
     }
 
     return result
-  }
-
-  function inflateExportedFrom(compileData) {
-    return assign({ __proto__: null }, compileData.exportedFrom)
   }
 
   function inflateExportedSpecifiers(compileData) {
@@ -320,22 +339,27 @@ function init() {
           } = compileData
 
           const changed = +compileData.changed
+          const strict = +compileData.strict
 
           if (sourceType === SCRIPT) {
             if (changed) {
               meta.push(
-                normalize(relative(cachePath, filename)),
-                mtime,
+                strict,
+                changed,
                 sourceType,
-                changed
+                mtime,
+                normalize(relative(cachePath, filename))
               )
+            } else if (strict) {
+              meta.push(strict)
             }
           } else {
             meta.push(
-              normalize(relative(cachePath, filename)),
-              mtime,
-              sourceType,
+              strict,
               changed,
+              sourceType,
+              mtime,
+              normalize(relative(cachePath, filename)),
               deflateDependencySpecifiers(compileData),
               compileData.exportedFrom,
               compileData.exportedNames,

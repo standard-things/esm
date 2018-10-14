@@ -68,6 +68,7 @@ function init() {
         exportedStars: null,
         scriptData: null,
         sourceType: SCRIPT,
+        strict: false,
         yieldIndex: 0
       }
 
@@ -105,6 +106,7 @@ function init() {
       if ((sourceType === SCRIPT ||
           sourceType === UNAMBIGUOUS) &&
           ! possibleChanges) {
+        result.strict = hasPragma(code, "use strict")
         return result
       }
 
@@ -140,13 +142,13 @@ function init() {
       }
 
       const { strict, top } = ast
+      const { identifiers, importedLocals } = top
+      const { runtimeName } = options
 
       Reflect.deleteProperty(ast, "top")
 
-      const { identifiers, importedLocals } = top
       const magicString = new MagicString(code)
       const rootPath = new FastPath(ast)
-      const { runtimeName } = options
 
       let yieldIndex = top.insertIndex
 
@@ -308,8 +310,8 @@ function init() {
         setDeferred(result, "code", () => FAST_READ_PREFIX + magicString.toString())
       }
 
+      result.strict = strict
       result.yieldIndex = yieldIndex
-
       return result
     }
   }
