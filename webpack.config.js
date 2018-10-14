@@ -16,10 +16,14 @@ const OptimizeJsPlugin = require("optimize-js-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
 const UnusedPlugin = require("unused-webpack-plugin")
 
-class WebpackRequirePlugin {
-  apply(compiler) {
-    compiler.hooks.compilation.tap("MainTemplate", (compilation) => {
-      compilation.mainTemplate.hooks.requireExtensions.tap("MainTemplate", () =>
+class WebpackTemplatePlugin {
+  apply({ hooks }) {
+    const STRICT_STRING = '"use strict";\n'
+
+    hooks.compilation.tap("MainTemplate", ({ mainTemplate }) => {
+      const { hooks } = mainTemplate
+
+      hooks.requireExtensions.tap("MainTemplate", () =>
         [
           "__webpack_require__.d = function (exported, name, get) {",
           "  Reflect.defineProperty(exported, name, {",
@@ -35,6 +39,14 @@ class WebpackRequirePlugin {
           "__webpack_require__.r = function () {}"
         ].join("\n")
       )
+
+      hooks.render.tap("ModuleTemplate", ({ children }) => {
+        let index
+
+        while ((index = children.indexOf(STRICT_STRING)) !== -1) {
+          children.splice(index, 1)
+        }
+      })
     })
   }
 }
@@ -94,7 +106,6 @@ const config = {
   plugins: [
     new BannerPlugin({
       banner: [
-        '"use strict";\n',
         "var __shared__;",
         "const __non_webpack_module__ = module;",
         "const __external__ = { " +
@@ -135,7 +146,7 @@ const config = {
       ],
       root : __dirname
     }),
-    new WebpackRequirePlugin
+    new WebpackTemplatePlugin
   ],
   target: "node"
 }
