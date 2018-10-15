@@ -13,6 +13,7 @@ import getModuleName from "./util/get-module-name.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
+import isMJS from "./path/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
 import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
@@ -577,6 +578,8 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
 }
 
 function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
+  "use sloppy"
+
   handler.defineProperty = (target, name, descriptor) => {
     if (Reflect.defineProperty(target, name, descriptor)) {
       return name === Symbol.toStringTag ||
@@ -891,6 +894,8 @@ function initNamespaceHandler() {
 }
 
 function isCalledFromStrictCode() {
+  "use sloppy"
+
   const frames = getStackFrames(new Error)
 
   for (const frame of frames) {
@@ -898,11 +903,12 @@ function isCalledFromStrictCode() {
 
     if (filename &&
         ! isOwnPath(filename)) {
-      return frame.getFunction() === void 0
+      return isMJS(filename) ||
+        frame.getFunction() === void 0
     }
   }
 
-  return true
+  return false
 }
 
 function mergeProperty(entry, otherEntry, key) {

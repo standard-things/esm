@@ -4,6 +4,8 @@ import isNative from "../util/is-native.js"
 import shared from "../shared.js"
 
 function init() {
+  "use sloppy"
+
   function getStackFrames(error, beforeFunc) {
     if (! isError(error)) {
       return []

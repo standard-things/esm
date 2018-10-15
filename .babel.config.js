@@ -1,5 +1,7 @@
 "use strict"
 
+const { types } = require("@babel/core")
+
 function BabelEqEqEqPlugin() {
   return {
     visitor: {
@@ -13,6 +15,68 @@ function BabelEqEqEqPlugin() {
           node.operator += "="
         }
       }
+    }
+  }
+}
+
+function BabelStrictBodyPlugin() {
+  // Based on `isInStrictMode()`.
+  // Copyright babel-traverse contributors. Released under MIT license:
+  // https://github.com/babel/babel/blob/master/packages/babel-traverse/src/path/introspection.js
+
+  function isInMode(path) {
+    const parent = path.find((path) => {
+      if (path.isClass()) {
+        return true
+      }
+
+      if (! path.isProgram() &&
+          ! path.isFunction()) {
+        return false
+      }
+
+      if (path.isArrowFunctionExpression() &&
+          ! path.get("body").isBlockStatement()) {
+        return false
+      }
+
+      let { node } = path
+
+      if (path.isFunction()) {
+        node = node.body
+      }
+
+      for (const directive of node.directives) {
+        const { value } = directive.value
+
+        if (value === "use sloppy" ||
+            value === "use strict") {
+          return true
+        }
+      }
+    })
+
+    return !! parent
+  }
+
+  function isSimpleParameterList(params) {
+    return params.every(({ type }) => type === "Identifier")
+  }
+
+  function enterFunction(path) {
+    const { node } = path
+
+    if (isSimpleParameterList(node.params) &&
+        ! isInMode(path)) {
+      node.body.directives.push(types.directive(types.directiveLiteral("use strict")))
+    }
+  }
+
+  return {
+    visitor: {
+      ArrowFunctionExpression: enterFunction,
+      FunctionDeclaration: enterFunction,
+      FunctionExpression: enterFunction
     }
   }
 }
@@ -44,7 +108,8 @@ module.exports = {
     ["transform-for-of-as-array", {
       loose: true
     }],
-    BabelEqEqEqPlugin()
+    BabelEqEqEqPlugin(),
+    BabelStrictBodyPlugin()
   ],
   presets: [
     ["@babel/env", {
