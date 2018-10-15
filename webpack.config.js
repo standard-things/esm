@@ -18,8 +18,6 @@ const UnusedPlugin = require("unused-webpack-plugin")
 
 class WebpackTemplatePlugin {
   apply({ hooks }) {
-    const STRICT_STRING = '"use strict";\n'
-
     hooks.compilation.tap("MainTemplate", ({ mainTemplate }) => {
       const { hooks } = mainTemplate
 
@@ -43,10 +41,12 @@ class WebpackTemplatePlugin {
 
       // Remove "use strict" directives inserted by webpack.
       hooks.render.tap("ModuleTemplate", ({ children }) => {
-        let index
+        let { length } = children
 
-        while ((index = children.indexOf(STRICT_STRING)) !== -1) {
-          children.splice(index, 1)
+        while (length--) {
+          if (children[length] === '"use strict";\n') {
+            children.splice(length, 1)
+          }
         }
       })
     })
