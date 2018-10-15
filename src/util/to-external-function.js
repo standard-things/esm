@@ -6,7 +6,6 @@ import shared from "../shared.js"
 
 function init() {
   const ExFunction = shared.external.Function
-
   const exFuncSuper = getPrototypeOf(ExFunction)
   const exFuncProtoSuper = getPrototypeOf(ExFunction.prototype)
 
