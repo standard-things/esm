@@ -4,20 +4,20 @@ import isObjectLike from "../util/is-object-like.js"
 function init() {
   const ExObject = shared.external.Object
 
-  const { create, defineProperties } = Object
-
   return {
     create(proto, properties) {
-      if (proto === null ||
-          isObjectLike(proto)) {
-        return properties === null
-          ? create(proto)
-          : create(proto, properties)
+      if (properties === null) {
+        properties = void 0
       }
 
-      return properties == null
+      if (proto === null ||
+          isObjectLike(proto)) {
+        return Object.create(proto, properties)
+      }
+
+      return properties === void 0
         ? new ExObject
-        : defineProperties(new ExObject, properties)
+        : Object.defineProperties(new ExObject, properties)
     }
   }
 }
