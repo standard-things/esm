@@ -28,8 +28,6 @@ function init() {
   } = ENV
 
   const RealConsole = realConsole.Console
-
-  const realMethodNames = []
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
 
@@ -113,38 +111,34 @@ function init() {
   }
 
   const Console = maskFunction(function (...args) {
-    const target = new.target
-
-    if (target) {
-      for (const name of realMethodNames) {
-        const value = this[name]
-
-        if (typeof value === "function") {
-          this[name] = GenericFunction.bind(value, this)
-        }
-      }
-
-      const result = Reflect.construct(RealConsole, args, target)
-      const names = keysAll(result)
-
-      for (const name of names) {
-        if (! Reflect.has(this, name)) {
-          copyProperty(this, result, name)
-        }
-      }
-    } else {
+    if (! (this instanceof Console)) {
       return Reflect.construct(Console, args)
+    }
+
+    const { prototype } = Console
+    const names = keys(prototype)
+
+    for (const name of names) {
+      const value = this[name]
+
+      if (typeof value === "function") {
+        this[name] = GenericFunction.bind(value, this)
+      }
+    }
+
+    const result = Reflect.construct(RealConsole, args, new.target)
+    const resultNames = keysAll(result)
+
+    for (const name of resultNames) {
+      if (! Reflect.has(this, name)) {
+        copyProperty(this, result, name)
+      }
     }
   }, RealConsole)
 
   const { prototype } = Console
 
   for (const name of realProtoNames) {
-    if (typeof name === "string" &&
-        typeof realProto[name] === "function") {
-      realMethodNames.push(name)
-    }
-
     if (Reflect.has(wrapperMap, name)) {
       prototype[name] = wrapperMap[name]
     } else {
