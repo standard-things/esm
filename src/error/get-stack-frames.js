@@ -30,16 +30,22 @@ function init() {
   }
 
   function getErrorConstructor(error) {
+    if (error instanceof Error) {
+      return Error
+    }
+
+    if (error instanceof ExError) {
+      return ExError
+    }
+
     let proto = error
 
     while ((proto = Reflect.getPrototypeOf(proto))) {
       const ctor = proto ? proto.constructor : void 0
 
-      if (ctor === Error ||
-          ctor === ExError ||
-          (typeof ctor === "function" &&
-           ctor.name === "Error" &&
-           isNative(ctor))) {
+      if (typeof ctor === "function" &&
+          ctor.name === "Error" &&
+          isNative(ctor)) {
         return ctor
       }
     }
