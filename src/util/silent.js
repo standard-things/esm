@@ -1,22 +1,18 @@
 import realProcess from "../real/process.js"
+import setProperty from "./set-property.js"
 import shared from "../shared.js"
 
 function init() {
-  const noDeprecationDescriptor = {
-    configurable: true,
-    value: true
-  }
-
   function silent(callback) {
-    const oldDescriptor = Reflect.getOwnPropertyDescriptor(realProcess, "noDeprecation")
+    const descriptor = Reflect.getOwnPropertyDescriptor(realProcess, "noDeprecation")
 
-    Reflect.defineProperty(realProcess, "noDeprecation", noDeprecationDescriptor)
+    setProperty(realProcess, "noDeprecation", true)
 
     try {
       return callback()
     } finally {
-      if (oldDescriptor) {
-        Reflect.defineProperty(realProcess, "noDeprecation", oldDescriptor)
+      if (descriptor) {
+        Reflect.defineProperty(realProcess, "noDeprecation", descriptor)
       } else {
         Reflect.deleteProperty(realProcess, "noDeprecation")
       }
