@@ -13,7 +13,6 @@ import getModuleName from "./util/get-module-name.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
-import isMJS from "./path/is-mjs.js"
 import isObjectLike from "./util/is-object-like.js"
 import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
@@ -904,8 +903,7 @@ function isCalledFromStrictCode() {
     if (filename &&
         ! isOwnPath(filename) &&
         ! frame.isNative()) {
-      return isMJS(filename) ||
-        frame.getFunction() === void 0
+      return frame.getFunction() === void 0
     }
   }
 
