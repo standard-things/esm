@@ -19,7 +19,7 @@ function BabelEqEqEqPlugin() {
   }
 }
 
-function BabelStrictBodyPlugin() {
+function BabelModePlugin() {
   // Based on `isInStrictMode()`.
   // Copyright babel-traverse contributors. Released under MIT license:
   // https://github.com/babel/babel/blob/master/packages/babel-traverse/src/path/introspection.js
@@ -81,6 +81,28 @@ function BabelStrictBodyPlugin() {
   }
 }
 
+function BabelRemoveSloppyPlugin() {
+  function enterFunction({ node }) {
+    const { directives } = node.body
+
+    let { length } = directives
+
+    while (length--) {
+      if (directives[length].value.value === "use sloppy") {
+        directives.splice(length, 1)
+      }
+    }
+  }
+
+  return {
+    visitor: {
+      ArrowFunctionExpression: enterFunction,
+      FunctionDeclaration: enterFunction,
+      FunctionExpression: enterFunction
+    }
+  }
+}
+
 const isTest = /test/.test(process.env.ESM_ENV)
 
 module.exports = {
@@ -109,7 +131,8 @@ module.exports = {
       loose: true
     }],
     BabelEqEqEqPlugin(),
-    BabelStrictBodyPlugin()
+    BabelModePlugin(),
+    BabelRemoveSloppyPlugin()
   ],
   presets: [
     ["@babel/env", {
