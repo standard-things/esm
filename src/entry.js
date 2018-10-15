@@ -902,7 +902,8 @@ function isCalledFromStrictCode() {
     const filename = frame.getFileName()
 
     if (filename &&
-        ! isOwnPath(filename)) {
+        ! isOwnPath(filename) &&
+        ! frame.isNative()) {
       return isMJS(filename) ||
         frame.getFunction() === void 0
     }
