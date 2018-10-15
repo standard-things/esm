@@ -2,8 +2,6 @@ import isError from "../util/is-error.js"
 import shared from "../shared.js"
 
 function init() {
-  "use sloppy"
-
   // Collect the call stack using the V8 stack trace API.
   // https://github.com/v8/v8/wiki/Stack-Trace-API#stack-trace-collection-for-custom-exceptions
   const _captureStackTrace = Error.captureStackTrace

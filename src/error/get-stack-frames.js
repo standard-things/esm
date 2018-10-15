@@ -1,4 +1,3 @@
-import captureStackTrace from "./capture-stack-trace.js"
 import isError from "../util/is-error.js"
 import isNative from "../util/is-native.js"
 import shared from "../shared.js"
@@ -6,7 +5,7 @@ import shared from "../shared.js"
 function init() {
   "use sloppy"
 
-  function getStackFrames(error, beforeFunc) {
+  function getStackFrames(error) {
     if (! isError(error)) {
       return []
     }
@@ -14,7 +13,7 @@ function init() {
     const Ctor = getErrorConstructor(error)
 
     return Ctor
-      ? tryGetStackFrames(Ctor, beforeFunc)
+      ? tryGetStackFrames(Ctor)
       : []
   }
 
@@ -38,14 +37,13 @@ function init() {
     return structuredStackTrace
   }
 
-  function tryGetStackFrames(BuiltinError, beforeFunc) {
+  function tryGetStackFrames(BuiltinError) {
     try {
       const descriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "prepareStackTrace")
       const { prepareStackTrace } = BuiltinError
       const error = new BuiltinError
 
       BuiltinError.prepareStackTrace = getStructuredStackTrace
-      captureStackTrace(error, beforeFunc)
 
       const { stack } = error
 
