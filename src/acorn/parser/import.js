@@ -6,8 +6,8 @@
 // Copyright Jordan Gensler. Released under MIT license:
 // https://github.com/kesne/acorn-dynamic-import
 //
-// Import meta property syntax is adapted from the Babel parser.
-// Copyright Babel parser contributors. Released under MIT license:
+// Import meta property syntax is adapted from babel-parser.
+// Copyright babel-parser contributors. Released under MIT license:
 // https://github.com/babel/babel/blob/master/packages/babel-parser/src/parser/expression.js
 
 import PARSER_MESSAGE from "../../constant/parser-message.js"

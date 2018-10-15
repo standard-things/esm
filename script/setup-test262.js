@@ -69,6 +69,8 @@ function setupTest262() {
         const { attrs } = test262Parser.parseFile(content)
         const { flags } = attrs
 
+        // Follow Test262 guidance for strict mode.
+        // https://github.com/tc39/test262/blob/master/INTERPRETING.md#strict-mode
         content =
           (flags.onlyStrict ? '"use strict";\n' : "") +
           content
