@@ -3,8 +3,10 @@ import { config, stderr, stdout } from "../safe/process.js"
 import ENV from "../constant/env.js"
 
 import GenericFunction from "../generic/function.js"
+import GenericObject from "../generic/object.js"
 
 import assign from "../util/assign.js"
+import assignProperties from "../util/assign-properties.js"
 import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
@@ -150,7 +152,7 @@ function init() {
     }
   }
 
-  const builtinConsole = new Console(stdout, stderr)
+  const builtinConsole = assignProperties(GenericObject.create(), new Console(stdout, stderr))
 
   if (config.variables.v8_enable_inspector &&
       FLAGS.inspect) {

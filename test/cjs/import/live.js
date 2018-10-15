@@ -76,7 +76,7 @@ export default () => {
   assert.strictEqual(funcToString(log), funcToString(console.log))
 
   assert.deepStrictEqual(updated, [1, 1, 1, 1])
-  assert.deepStrictEqual(deleted, [false, false, false])
+  assert.deepStrictEqual(deleted, [true, false, true])
   assert.deepStrictEqual(reverted, Array(4).fill(proxyValue))
   assert.notStrictEqual(console1, console2)
   assert.strictEqual(console1, console3)
