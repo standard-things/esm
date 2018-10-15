@@ -23,6 +23,7 @@ class WebpackTemplatePlugin {
     hooks.compilation.tap("MainTemplate", ({ mainTemplate }) => {
       const { hooks } = mainTemplate
 
+      // Simplify webpack module scaffolding.
       hooks.requireExtensions.tap("MainTemplate", () =>
         [
           "__webpack_require__.d = function (exported, name, get) {",
@@ -40,6 +41,7 @@ class WebpackTemplatePlugin {
         ].join("\n")
       )
 
+      // Remove "use strict" directives inserted by webpack.
       hooks.render.tap("ModuleTemplate", ({ children }) => {
         let index
 
