@@ -1,5 +1,6 @@
 "use strict"
 
+const arrayRemove = require("./script/array-remove.js")
 const babel = require("@babel/core")
 
 function BabelEqEqEqPlugin() {
@@ -95,16 +96,8 @@ function BabelOrderPlugin(plugins) {
 }
 
 function BabelRemoveSloppyPlugin() {
-  function enterFunction({ node }) {
-    const { directives } = node.body
-
-    let length = directives ? directives.length : 0
-
-    while (length--) {
-      if (directives[length].value.value === "use sloppy") {
-        directives.splice(length, 1)
-      }
-    }
+  function enterFunction({ node: { body: directives } }) {
+    arrayRemove(directives, ({ value: { value } }) => value === "use sloppy")
   }
 
   return {

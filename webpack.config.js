@@ -1,6 +1,7 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 "use strict"
 
+const arrayRemove = require("./script/array-remove.js")
 const fs = require("fs-extra")
 const path = require("path")
 const webpack = require("webpack")
@@ -19,16 +20,6 @@ const UnusedPlugin = require("unused-webpack-plugin")
 class WebpackTemplatePlugin {
   apply({ hooks: { compilation } }) {
     compilation.tap("MainTemplate", ({ mainTemplate: { hooks } }) => {
-      function remove(array, iteratee) {
-        let length = array ? array.length : 0
-
-        while (length--) {
-          if (iteratee(array[length])) {
-            array.splice(length, 1)
-          }
-        }
-      }
-
       // Simplify webpack module scaffolding.
       hooks.requireExtensions.tap("MainTemplate", () =>
         [
@@ -51,13 +42,12 @@ class WebpackTemplatePlugin {
         const COMPATIBILITY_HELPER = "__webpack_require__.r(__webpack_exports__);\n"
         const USE_STRICT = '"use strict";\n'
 
-        remove(children, (child) => child === USE_STRICT)
+        arrayRemove(children, (child) => child === USE_STRICT)
 
-        for (const child of children) {
-          const { _source } = child
+        for (const { _source } of children) {
           const replacements = _source && _source.replacements
 
-          remove(replacements, ({ content }) => content === COMPATIBILITY_HELPER)
+          arrayRemove(replacements, ({ content }) => content === COMPATIBILITY_HELPER)
         }
       })
     })
