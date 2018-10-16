@@ -77,37 +77,32 @@ function init() {
         mtime: -1,
         scriptData: null,
         sourceType,
-        strict: false,
         yieldIndex: -1
       }
 
       if (length > 2) {
-        result.strict = !! meta[2]
-      }
-
-      if (length > 3) {
-        let filename = meta[6]
+        let filename = meta[5]
 
         if (filename) {
           filename = resolve(cachePath, filename)
         }
 
-        sourceType = +meta[4]
+        sourceType = +meta[3]
 
-        result.changed = !! meta[3]
+        result.changed = !! meta[2]
         result.filename = filename
-        result.mtime = +meta[5]
+        result.mtime = +meta[4]
       }
 
       result.sourceType = sourceType
 
-      if (length > 7 &&
+      if (length > 6 &&
           sourceType === MODULE) {
-        result.dependencySpecifiers = meta[7]
-        result.exportedFrom = assign({ __proto__: null }, meta[8])
-        result.exportedNames = meta[9]
-        result.exportedStars = meta[10]
-        result.yieldIndex = +meta[11]
+        result.dependencySpecifiers = meta[6]
+        result.exportedFrom = assign({ __proto__: null }, meta[7])
+        result.exportedNames = meta[8]
+        result.exportedStars = meta[9]
+        result.yieldIndex = +meta[10]
 
         entry.type = TYPE_ESM
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
@@ -339,23 +334,18 @@ function init() {
           } = compileData
 
           const changed = +compileData.changed
-          const strict = +compileData.strict
 
           if (sourceType === SCRIPT) {
             if (changed) {
               meta.push(
-                strict,
                 changed,
                 sourceType,
                 mtime,
                 normalize(relative(cachePath, filename))
               )
-            } else if (strict) {
-              meta.push(strict)
             }
           } else {
             meta.push(
-              strict,
               changed,
               sourceType,
               mtime,

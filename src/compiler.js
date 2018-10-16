@@ -68,7 +68,6 @@ function init() {
         exportedStars: null,
         scriptData: null,
         sourceType: SCRIPT,
-        strict: false,
         yieldIndex: 0
       }
 
@@ -106,7 +105,6 @@ function init() {
       if ((sourceType === SCRIPT ||
           sourceType === UNAMBIGUOUS) &&
           ! possibleChanges) {
-        result.strict = hasPragma(code, "use strict")
         return result
       }
 
@@ -310,7 +308,6 @@ function init() {
         setDeferred(result, "code", () => FAST_READ_PREFIX + magicString.toString())
       }
 
-      result.strict = strict
       result.yieldIndex = yieldIndex
       return result
     }
