@@ -1,6 +1,6 @@
 "use strict"
 
-const { types } = require("@babel/core")
+const babel = require("@babel/core")
 
 function BabelEqEqEqPlugin() {
   return {
@@ -19,7 +19,7 @@ function BabelEqEqEqPlugin() {
   }
 }
 
-function BabelModePlugin() {
+function BabelModePlugin({ types }) {
   // Based on `isInStrictMode()`.
   // Copyright Sebastian McKenzie and other contributors. Released under MIT license:
   // https://github.com/babel/babel/blob/master/packages/babel-traverse/src/path/introspection.js
@@ -30,24 +30,23 @@ function BabelModePlugin() {
         return true
       }
 
-      if (! path.isProgram() &&
-          ! path.isFunction()) {
+      const isFunction = path.isFunction()
+
+      if (! isFunction &&
+          ! path.isProgram()) {
         return false
       }
 
-      if (path.isArrowFunctionExpression() &&
-          ! path.get("body").isBlockStatement()) {
-        return false
-      }
+      const node = isFunction
+        ? path.node.body
+        : path.node
 
-      let { node } = path
+      const { directives } = node
 
-      if (path.isFunction()) {
-        node = node.body
-      }
+      let length = directives ? directives.length : 0
 
-      for (const directive of node.directives) {
-        const { value } = directive.value
+      while (length--) {
+        const { value } = directives[length].value
 
         if (value === "use sloppy" ||
             value === "use strict") {
@@ -65,10 +64,12 @@ function BabelModePlugin() {
 
   function enterFunction(path) {
     const { node } = path
+    const { directives } = node.body
 
-    if (isSimpleParameterList(node.params) &&
+    if (directives &&
+        isSimpleParameterList(node.params) &&
         ! isInMode(path)) {
-      node.body.directives.push(types.directive(types.directiveLiteral("use strict")))
+      directives.push(types.directive(types.directiveLiteral("use strict")))
     }
   }
 
@@ -81,11 +82,23 @@ function BabelModePlugin() {
   }
 }
 
+function BabelOrderPlugin(plugins) {
+  return {
+    visitor: {
+      Program(path) {
+        for (const plugin of plugins) {
+          path.traverse(plugin(babel).visitor)
+        }
+      }
+    }
+  }
+}
+
 function BabelRemoveSloppyPlugin() {
   function enterFunction({ node }) {
     const { directives } = node.body
 
-    let { length } = directives
+    let length = directives ? directives.length : 0
 
     while (length--) {
       if (directives[length].value.value === "use sloppy") {
@@ -130,9 +143,11 @@ module.exports = {
     ["transform-for-of-as-array", {
       loose: true
     }],
-    BabelEqEqEqPlugin(),
-    BabelModePlugin(),
-    BabelRemoveSloppyPlugin()
+    BabelOrderPlugin([
+      BabelEqEqEqPlugin,
+      BabelModePlugin,
+      BabelRemoveSloppyPlugin
+    ])
   ],
   presets: [
     ["@babel/env", {
