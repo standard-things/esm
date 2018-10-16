@@ -17,9 +17,17 @@ const TerserPlugin = require("terser-webpack-plugin")
 const UnusedPlugin = require("unused-webpack-plugin")
 
 class WebpackTemplatePlugin {
-  apply({ hooks }) {
-    hooks.compilation.tap("MainTemplate", ({ mainTemplate }) => {
-      const { hooks } = mainTemplate
+  apply({ hooks: { compilation } }) {
+    compilation.tap("MainTemplate", ({ mainTemplate: { hooks } }) => {
+      function remove(array, iteratee) {
+        let length = array ? array.length : 0
+
+        while (length--) {
+          if (iteratee(array[length])) {
+            array.splice(length, 1)
+          }
+        }
+      }
 
       // Simplify webpack module scaffolding.
       hooks.requireExtensions.tap("MainTemplate", () =>
@@ -34,19 +42,22 @@ class WebpackTemplatePlugin {
           "__webpack_require__.n = function (exported) {",
           "  exported.a = exported",
           "  return function () { return exported }",
-          "}",
-          "__webpack_require__.r = function () {}"
+          "}"
         ].join("\n")
       )
 
-      // Remove "use strict" directives inserted by webpack.
+      // Remove webpack additions.
       hooks.render.tap("ModuleTemplate", ({ children }) => {
-        let { length } = children
+        const COMPATIBILITY_HELPER = "__webpack_require__.r(__webpack_exports__);\n"
+        const USE_STRICT = '"use strict";\n'
 
-        while (length--) {
-          if (children[length] === '"use strict";\n') {
-            children.splice(length, 1)
-          }
+        remove(children, (child) => child === USE_STRICT)
+
+        for (const child of children) {
+          const { _source } = child
+          const replacements = _source && _source.replacements
+
+          remove(replacements, ({ content }) => content === COMPATIBILITY_HELPER)
         }
       })
     })
