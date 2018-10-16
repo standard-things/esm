@@ -1051,13 +1051,11 @@ function runSetter(entry, name, callback) {
     return
   }
 
-  const { length } = setters
+  let { length } = setters
 
-  let i = -1
-
-  while (++i < length) {
-    if (setters[i].type === "dynamic") {
-      setters.splice(i, 1)
+  while (length--) {
+    if (setters[length].type === "dynamic") {
+      setters.splice(length, 1)
     }
   }
 }
