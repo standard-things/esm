@@ -20,6 +20,7 @@ import nullValue from "../fixture/export/default/null.mjs"
 import number from "../fixture/export/default/number.mjs"
 import object from "../fixture/export/default/object.mjs"
 import reExport from "../fixture/export/default/re-export.mjs"
+import { reExportNamed } from "../fixture/export/default/re-export-named.mjs"
 import undefinedValue from "../fixture/export/default/undefined.mjs"
 
 const canGenerateNamesFromVars = SemVer.satisfies(process.version, ">=6.5.0")
@@ -39,6 +40,7 @@ export default () => {
   assert.strictEqual(number, 1)
   assert.deepStrictEqual(object, { value: 1 })
   assert.strictEqual(reExport, object)
+  assert.strictEqual(reExportNamed, "foo")
   assert.strictEqual(undefinedValue, void 0)
 
   const anonymousFuncs = [
