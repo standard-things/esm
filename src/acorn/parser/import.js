@@ -7,7 +7,7 @@
 // https://github.com/kesne/acorn-dynamic-import
 //
 // Import meta property syntax is adapted from babel-parser.
-// Copyright babel-parser contributors. Released under MIT license:
+// Copyright Sebastian McKenzie and other contributors. Released under MIT license:
 // https://github.com/babel/babel/blob/master/packages/babel-parser/src/parser/expression.js
 
 import PARSER_MESSAGE from "../../constant/parser-message.js"

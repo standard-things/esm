@@ -21,7 +21,7 @@ function BabelEqEqEqPlugin() {
 
 function BabelModePlugin() {
   // Based on `isInStrictMode()`.
-  // Copyright babel-traverse contributors. Released under MIT license:
+  // Copyright Sebastian McKenzie and other contributors. Released under MIT license:
   // https://github.com/babel/babel/blob/master/packages/babel-traverse/src/path/introspection.js
 
   function isInMode(path) {
