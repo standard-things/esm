@@ -42,12 +42,17 @@ class WebpackTemplatePlugin {
         const COMPATIBILITY_HELPER = "__webpack_require__.r(__webpack_exports__);\n"
         const USE_STRICT = '"use strict";\n'
 
-        arrayRemove(children, (child) => child === USE_STRICT)
+        function shouldRemove(value) {
+          return value === COMPATIBILITY_HELPER ||
+                 value === USE_STRICT
+        }
 
-        for (const { _source } of children) {
-          const replacements = _source && _source.replacements
+        arrayRemove(children, shouldRemove)
 
-          arrayRemove(replacements, ({ content }) => content === COMPATIBILITY_HELPER)
+        for (let child of children) {
+          do {
+            arrayRemove(child.replacements, ({ content }) => shouldRemove(content))
+          } while ((child = child._source))
         }
       })
     })
