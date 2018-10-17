@@ -3,6 +3,7 @@ import Visitor from "../visitor.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import getShadowed from "../parse/get-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
+import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
@@ -61,9 +62,12 @@ function init() {
           suffix = ""
         }
 
-        magicString
-          .prependRight(start, prefix + runtimeName + '.a("' + name + '",')
-          .prependRight(end, ")" + suffix)
+        const code =
+          prefix +
+          runtimeName + '.a("' + name + '",' + name + ")" +
+          suffix
+
+        overwrite(this, start, end, code)
       })
     }
 
@@ -72,7 +76,7 @@ function init() {
 
       const node = path.getValue()
 
-      this.magicString.prependRight(
+      this.magicString.appendRight(
         node.end,
         this.runtimeName + '.u(["default"]);'
       )
@@ -108,7 +112,7 @@ function init() {
       if (names) {
         this.changed = true
 
-        this.magicString.prependRight(
+        this.magicString.appendRight(
           child.end,
           ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"
         )

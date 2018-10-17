@@ -52,12 +52,12 @@ function init() {
 
       magicString
         .prependLeft(callee.end, "(" + code)
-        .prependLeft(end, ")")
+        .prependRight(end, ")")
 
       if (this.addedImportExport) {
         magicString
           .prependLeft(start, runtimeName + ".u(")
-          .prependLeft(end, ")")
+          .prependRight(end, ")")
       }
 
       path.call(this, "visitWithoutReset", "arguments")

@@ -192,7 +192,7 @@ function init() {
 
       const node = path.getValue()
       const { declaration } = node
-      const { runtimeName } = this
+      const { magicString, runtimeName } = this
 
       let { id, type } = declaration
 
@@ -215,7 +215,7 @@ function init() {
         // export default function named() {}
         if (! id) {
           // Convert anonymous functions to hoisted named functions.
-          this.magicString.prependLeft(declaration.functionParamsStart, " " + name)
+          magicString.prependLeft(declaration.functionParamsStart, " " + name)
         }
 
         hoistExports(this, node, pairs)
@@ -244,8 +244,12 @@ function init() {
           suffix = ")" + suffix
         }
 
-        overwrite(this, node.start, declaration.start, prefix)
-        overwrite(this, declaration.end, node.end, suffix)
+        overwrite(this, node.start, declaration.start, "")
+        overwrite(this, declaration.end, node.end, "")
+
+        magicString
+          .prependLeft(declaration.start, prefix)
+          .prependRight(declaration.end, suffix)
       }
 
       if (id) {

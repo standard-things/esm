@@ -4,11 +4,11 @@
 
 
 
-const _anonymous=
 
 
 
-() =>
+
+const _anonymous=() =>
 // eslint-disable-next-line brace-style
 {
   const error = new Error // Line 14.

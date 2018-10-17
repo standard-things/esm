@@ -69,7 +69,7 @@ function init() {
           // Wrap assignments to exported identifiers.
           magicString
             .prependLeft(start, runtimeName + ".u(")
-            .prependLeft(end, ")")
+            .prependRight(end, ")")
 
           return
         }
