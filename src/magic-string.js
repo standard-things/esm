@@ -119,6 +119,12 @@ function init() {
       const first = this.byStart[start]
       const last = this.byEnd[end]
 
+      if (start === end) {
+        return content
+          ? this.appendLeft(start, content)
+          : this
+      }
+
       first.edit(content)
 
       if (first === last) {

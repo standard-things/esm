@@ -2,17 +2,11 @@ import pad from "./pad.js"
 import shared from "../shared.js"
 
 function init() {
-  function overwrite(visitor, oldStart, oldEnd, newCode) {
+  function overwrite(visitor, start, end, content) {
     const { magicString } = visitor
-    const padded = pad(magicString.original, newCode, oldStart, oldEnd)
+    const padded = pad(magicString.original, content, start, end)
 
-    if (oldStart !== oldEnd) {
-      magicString.overwrite(oldStart, oldEnd, padded)
-    } else if (padded !== "") {
-      magicString.prependLeft(oldStart, padded)
-    }
-
-    return magicString
+    return magicString.overwrite(start, end, padded)
   }
 
   return overwrite
