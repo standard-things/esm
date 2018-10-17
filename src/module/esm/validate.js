@@ -155,9 +155,12 @@ function validateExportedName(entry, exportedName, seen) {
     exportedStars
   } = compileData
 
+  const exportedSpecifier = exportedSpecifiers[exportedName]
+
   if (seen &&
-      Reflect.has(seen, name)) {
-    const { specifier } =  exportedSpecifiers[exportedName]
+      Reflect.has(seen, name) &&
+      exportedSpecifier !== true) {
+    const { specifier } = exportedSpecifier
     const childEntry = dependencySpecifiers[specifier].entry
 
     if (exportedStars.indexOf(specifier) === -1) {
@@ -166,8 +169,6 @@ function validateExportedName(entry, exportedName, seen) {
       throw new ERR_EXPORT_MISSING(mod, exportedName)
     }
   } else if (Reflect.has(exportedSpecifiers, exportedName)) {
-    const exportedSpecifier = exportedSpecifiers[exportedName]
-
     if (exportedSpecifier) {
       if (exportedSpecifier !== true) {
         const { local, specifier } = exportedSpecifier
