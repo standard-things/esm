@@ -16,6 +16,14 @@ function init() {
       this.start = start
     }
 
+    appendLeft(content) {
+      this.outro += content
+    }
+
+    appendRight(content) {
+      this.intro += content
+    }
+
     contains(index) {
       return this.start < index && index < this.end
     }
@@ -74,6 +82,34 @@ function init() {
 
       this.byEnd = { __proto__: null }
       this.byEnd[string.length] = chunk
+    }
+
+    appendLeft(index, content) {
+      this._split(index)
+
+      const chunk = this.byEnd[index]
+
+      if (chunk) {
+        chunk.appendLeft(content)
+      } else {
+        this.intro += content
+      }
+
+      return this
+    }
+
+    appendRight(index, content) {
+      this._split(index)
+
+      const chunk = this.byStart[index]
+
+      if (chunk) {
+        chunk.appendRight(content)
+      } else {
+        this.outro += content
+      }
+
+      return this
     }
 
     overwrite(start, end, content) {
