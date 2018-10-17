@@ -31,14 +31,14 @@ function BabelModePlugin({ types }) {
         return true
       }
 
-      const isFunction = path.isFunction()
+      const isFunc = path.isFunction()
 
-      if (! isFunction &&
+      if (! isFunc &&
           ! path.isProgram()) {
         return false
       }
 
-      const node = isFunction
+      const node = isFunc
         ? path.node.body
         : path.node
 
