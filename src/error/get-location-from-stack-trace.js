@@ -29,11 +29,7 @@ function init() {
     let match = headerRegExp.exec(stack)
 
     if (match) {
-      const [
-        ,
-        filename,
-        lineNum
-      ] = match
+      const [, filename, lineNum] = match
 
       if (isFilename(filename)) {
         return {
