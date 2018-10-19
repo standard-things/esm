@@ -111,6 +111,12 @@ test/language/module-code/dynamic-import/catch/nested-async-function-eval-script
 test/language/module-code/dynamic-import/catch/nested-async-function-return-await-eval-script-code-target.js
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-async-gen-await-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/module-code/dynamic-import/catch/nested-async-gen-return-await-eval-script-code-target.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/module-code/dynamic-import/catch/nested-block-import-catch-eval-script-code-target.js
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
