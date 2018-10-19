@@ -1,8 +1,5 @@
-import { error, log } from "console"
-
 import fs from "fs-extra"
 import path from "path"
-import test262Parser from "test262-parser"
 import vm from "vm"
 
 const MAX_WAIT = 1000
@@ -40,16 +37,22 @@ global.print = function print(value) {
   _message = value
 }
 
+for (const filename of harnessFilenames) {
+  vm.runInThisContext(fs.readFileSync(filename, "utf-8"))
+}
+
+// Suppress logging.
+const { error, log } = console
+const noop = () => {}
+
+Reflect.ownKeys(console).forEach((name) => {
+  if (typeof console[name] === "function") {
+    console[name] = noop
+  }
+})
+
 // Suppress unhandled `Promise` rejection warnings.
 process.on("unhandledRejection", () => {})
-
-for (const harnessFilename of harnessFilenames) {
-  const {
-    contents
-  } = test262Parser.parseFile(fs.readFileSync(harnessFilename, "utf-8"))
-
-  new vm.Script(contents).runInThisContext()
-}
 
 import(testFilename)
   .then(() => {
