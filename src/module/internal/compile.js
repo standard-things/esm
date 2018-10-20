@@ -110,32 +110,31 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (parsing) {
-    const defaultPkg = Package.state.default
-    const isESM = entry.type === TYPE_ESM
-    const parentEntry = entry.parent
-    const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-    const parentPkg = parentEntry && parentEntry.package
+    if (entry.type === TYPE_ESM) {
+      if (entry.state === STATE_PARSING_STARTED) {
+        tryValidate(caller, entry, content, filename)
+        entry.initNamespace()
+      }
+    } else if (fallback) {
+      const defaultPkg = Package.state.default
+      const parentEntry = entry.parent
+      const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
+      const parentPkg = parentEntry && parentEntry.package
 
-    if (! isESM &&
-        ! parentIsESM &&
-        (pkg === defaultPkg ||
-         parentPkg === defaultPkg)) {
-      const frames = getStackFrames(new Error)
+      if (! parentIsESM &&
+          (pkg === defaultPkg ||
+           parentPkg === defaultPkg)) {
+        const frames = getStackFrames(new Error)
 
-      for (const frame of frames) {
-        const framePath = frame.getFileName()
+        for (const frame of frames) {
+          const framePath = frame.getFileName()
 
-        if (isAbsolute(framePath) &&
-            ! isOwnPath(framePath)) {
-          return fallback ? fallback() : void 0
+          if (isAbsolute(framePath) &&
+              ! isOwnPath(framePath)) {
+            return fallback()
+          }
         }
       }
-    }
-
-    if (isESM &&
-        entry.state === STATE_PARSING_STARTED) {
-      tryValidate(caller, entry, content, filename)
-      entry.initNamespace()
     }
   } else {
     return tryCompileCached(entry, content, filename)
