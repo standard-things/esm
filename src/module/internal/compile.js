@@ -137,11 +137,11 @@ function compile(caller, entry, content, filename, fallback) {
       }
     }
   } else {
-    return tryCompileCached(entry, content, filename)
+    return tryCompileCached(entry, filename)
   }
 }
 
-function tryCompileCached(entry, content, filename) {
+function tryCompileCached(entry, filename) {
   const { compileData } = entry
   const isESM = compileData.sourceType === MODULE
   const mod = entry.module
@@ -218,7 +218,8 @@ function tryCompileCached(entry, content, filename) {
     filename = loc.filename
   }
 
-  content = () => readFile(filename, "utf8")
+  const content = () => readFile(filename, "utf8")
+
   throw maskStackTrace(error, content, filename, isESM)
 }
 
