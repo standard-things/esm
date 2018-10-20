@@ -3,7 +3,7 @@ import shared from "../shared.js"
 
 function init() {
   // Collect the call stack using the V8 stack trace API.
-  // https://github.com/v8/v8/wiki/Stack-Trace-API#stack-trace-collection-for-custom-exceptions
+  // https://v8.dev/docs/stack-trace-api#stack-trace-collection-for-custom-exceptions
   const _captureStackTrace = Error.captureStackTrace
 
   function captureStackTrace(error, beforeFunc) {
