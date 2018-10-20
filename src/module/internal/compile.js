@@ -9,7 +9,7 @@ import Package from "../../package.js"
 import Runtime from "../../runtime.js"
 
 import captureStackTrace from "../../error/capture-stack-trace.js"
-import compileSource from "../../util/compile-source.js"
+import compileSource from "./compile-source.js"
 import esmValidate from "../esm/validate.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"

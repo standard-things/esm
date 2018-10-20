@@ -1,10 +1,10 @@
-import CHAR_CODE from "../constant/char-code.js"
-import SOURCE_TYPE from "../constant/source-type.js"
+import CHAR_CODE from "../../constant/char-code.js"
+import SOURCE_TYPE from "../../constant/source-type.js"
 
-import createSourceMap from "./create-source-map.js"
-import encodeURI from "./encode-uri.js"
-import shared from "../shared.js"
-import stripShebang from "./strip-shebang.js"
+import createSourceMap from "../../util/create-source-map.js"
+import encodeURI from "../../util/encode-uri.js"
+import shared from "../../shared.js"
+import stripShebang from "../../util/strip-shebang.js"
 
 function init() {
   const {
