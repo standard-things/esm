@@ -14,7 +14,10 @@ import esmValidate from "../esm/validate.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
+import getStackFrames from "../../error/get-stack-frames.js"
+import isAbsolute from "../../path/is-absolute.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
+import isOwnPath from "../../util/is-own-path.js"
 import isError from "../../util/is-error.js"
 import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
@@ -116,8 +119,17 @@ function compile(caller, entry, content, filename, fallback) {
     if (! isESM &&
         ! parentIsESM &&
         (pkg === defaultPkg ||
-        parentPkg === defaultPkg)) {
-      return fallback ? fallback() : void 0
+         parentPkg === defaultPkg)) {
+      const frames = getStackFrames(new Error)
+
+      for (const frame of frames) {
+        const framePath = frame.getFileName()
+
+        if (isAbsolute(framePath) &&
+            ! isOwnPath(framePath)) {
+          return fallback ? fallback() : void 0
+        }
+      }
     }
 
     if (isESM &&
