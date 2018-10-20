@@ -14,10 +14,11 @@ const test262Path = path.resolve(rootPath, "test/vendor/test262")
 const repoPath = path.resolve(test262Path, ".repo")
 
 const testDirs = [
+  "harness",
   "test/language/export",
+  "test/language/expressions/dynamic-import",
   "test/language/import",
-  "test/language/module-code",
-  "harness"
+  "test/language/module-code"
 ]
 
 function git(cwd, args) {
