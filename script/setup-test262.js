@@ -64,11 +64,20 @@ function setupTest262() {
         cwd: test262Path
       })
 
+      const trashed = []
+
       for (const filename of test262Tests) {
         let content = fs.readFileSync(filename, "utf-8")
 
         const { attrs } = test262Parser.parseFile(content)
+        const features = attrs.features || []
         const { flags } = attrs
+
+        if (! flags.module &&
+            ! features.includes("dynamic-import")) {
+          trashed.push(filename)
+          continue
+        }
 
         // Follow Test262 guidance for strict mode.
         // https://github.com/tc39/test262/blob/master/INTERPRETING.md#strict-mode
@@ -98,6 +107,8 @@ function setupTest262() {
 
         fs.writeFileSync(filename, content)
       }
+
+      return trash(trashed)
     })
 }
 
