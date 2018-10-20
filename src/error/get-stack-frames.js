@@ -6,6 +6,8 @@ import shared from "../shared.js"
 function init() {
   "use sloppy"
 
+  const STACK_TRACE_LIMIT = 10
+
   const ExError = shared.external.Error
 
   function getStackFrames(error) {
@@ -14,16 +16,24 @@ function init() {
     }
 
     const BuiltinError = getErrorConstructor(error)
-    const descriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "prepareStackTrace")
+    const prepareStackTraceDescriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "prepareStackTrace")
+    const stackTraceLimitDescriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "stackTraceLimit")
 
+    setProperty(BuiltinError, "stackTraceLimit", STACK_TRACE_LIMIT)
     setProperty(BuiltinError, "prepareStackTrace", getStructuredStackTrace)
 
     const { stack } = error
 
-    if (descriptor) {
-      Reflect.defineProperty(BuiltinError, "prepareStackTrace", descriptor)
+    if (prepareStackTraceDescriptor) {
+      Reflect.defineProperty(BuiltinError, "prepareStackTrace", prepareStackTraceDescriptor)
     } else {
       Reflect.deleteProperty(BuiltinError, "prepareStackTrace")
+    }
+
+    if (stackTraceLimitDescriptor) {
+      Reflect.defineProperty(BuiltinError, "stackTraceLimit", stackTraceLimitDescriptor)
+    } else {
+      Reflect.deleteProperty(BuiltinError, "stackTraceLimit")
     }
 
     return Array.isArray(stack) ? stack : []
