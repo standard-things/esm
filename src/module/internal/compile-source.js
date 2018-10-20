@@ -123,5 +123,5 @@ function init() {
 }
 
 export default shared.inited
-  ? shared.module.utilCompileSource
-  : shared.module.utilCompileSource = init()
+  ? shared.module.moduleInternalCompileSource
+  : shared.module.moduleInternalCompileSource = init()
