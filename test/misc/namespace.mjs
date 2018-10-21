@@ -31,7 +31,7 @@ export default () => {
   const namespaces = [ans, bns, ns1, ns2]
   const { types } = util
 
-  namespaces.forEach((ns) => {
+  for (const ns of namespaces) {
     assert.ok(Object.isSealed(ns))
     assert.strictEqual(Object.prototype.toString.call(ns), "[object Module]")
     assert.deepStrictEqual(Object.getOwnPropertySymbols(ns), [Symbol.toStringTag])
@@ -41,5 +41,5 @@ export default () => {
     } else {
       assert.ok(true)
     }
-  })
+  }
 }

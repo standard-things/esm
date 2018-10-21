@@ -39,11 +39,11 @@ const hybridMocks = [
   mockReal3
 ]
 
-hybridMocks.forEach((mock) => {
+for (const mock of hybridMocks) {
   Reflect.defineProperty(mock, "__esModule", {
     value: true
   })
-})
+}
 
 mock("fs", "./fs.js")
 mock("./real1.js", "./mock1.js")

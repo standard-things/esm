@@ -3,8 +3,12 @@ import cjs from "../../fixture/builtin/load.js"
 import esm from "../../fixture/builtin/load.mjs"
 
 export default () => {
-  [cjs, esm]
-    .forEach((exported) => {
-      assert.ok(Object.keys(exported).length)
-    })
+  const imports = [
+    cjs,
+    esm
+  ]
+
+  for (const def of imports) {
+    assert.ok(Object.keys(def).length)
+  }
 }

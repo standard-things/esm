@@ -122,11 +122,11 @@ describe("cache tests", function () {
             .filter((filename) => path.extname(filename) === ".js")
             .map((filename) => path.resolve(loaderCachePath, filename))
 
-          filenames.forEach((filename) => {
-            const content  = fs.readFileSync(filename, "utf8")
+          for (const filename of filenames) {
+            const content = fs.readFileSync(filename, "utf8")
 
             assert.strictEqual(content.includes("yield"), false)
-          })
+          }
         })
     )
   })

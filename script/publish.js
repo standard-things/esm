@@ -33,13 +33,13 @@ const jsPaths = [
 ]
 
 function cleanJS() {
-  jsPaths.forEach((filename) => {
+  for (const filename of jsPaths) {
     const content = fs.readFileSync(filename, "utf8")
 
     process.once("exit", () => fs.outputFileSync(filename, content))
 
     fs.outputFileSync(filename, minifyJS(content))
-  })
+  }
 }
 
 function cleanPackageJSON() {
@@ -51,9 +51,9 @@ function cleanPackageJSON() {
 
   const pkgJSON = JSON.parse(content)
 
-  fieldsToRemove.forEach((field) => {
+  for (const field of fieldsToRemove) {
     Reflect.deleteProperty(pkgJSON, field)
-  })
+  }
 
   pkgJSON.scripts = defaultScripts
   fs.outputFileSync(pkgPath, fleece.patch(content, pkgJSON))

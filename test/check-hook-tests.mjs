@@ -37,16 +37,16 @@ describe("--check hook tests", function () {
     const requireFlags = ["-r", "--require"]
     const runs = []
 
-    basenames.forEach((basename) => {
-      requireFlags.forEach((requireFlag) => {
-        checkFlags.forEach((checkFlag) => {
+    for (const basename of basenames) {
+      for (const requireFlag of requireFlags) {
+        for (const checkFlag of checkFlags) {
           runs.push([
             requireFlag, "../",
             checkFlag, "./fixture/check-hook/" + basename
           ])
-        })
-      })
-    })
+        }
+      }
+    }
 
     return runs
       .reduce((promise, args) =>
@@ -72,16 +72,16 @@ describe("--check hook tests", function () {
       .readFileSync("fixture/check-hook/index.js", "utf8")
       .replace(/(?:\r?\n)+/g, ";")
 
-    requireFlags.forEach((requireFlag) => {
-      checkFlags.forEach((checkFlag) => {
+    for (const requireFlag of requireFlags) {
+      for (const checkFlag of checkFlags) {
         runs.push([
           "echo '" + code + "' |",
           process.execPath,
           requireFlag, "../",
           checkFlag
         ].join(" "))
-      })
-    })
+      }
+    }
 
     return runs
       .reduce((promise, command) =>

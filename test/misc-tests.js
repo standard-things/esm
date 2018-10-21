@@ -159,7 +159,7 @@ describe("miscellaneous tests", () => {
         stream.Writable
       ]
 
-      Ctors.forEach((Ctor, index) => {
+      for (const Ctor of Ctors) {
         class Sub extends Ctor {
           constructor(...args) {
             super(...args)
@@ -183,7 +183,7 @@ describe("miscellaneous tests", () => {
 
           assert.ok(actual instanceof stream)
         }
-      })
+      }
     })
 
     it("should support `util.types.isModuleNamespaceObject`", function () {
@@ -332,22 +332,30 @@ describe("miscellaneous tests", () => {
     })
 
     it("should error when `require` methods receive a non-string `request`", () => {
-      [
+      const funcs = [
         require,
         require.resolve,
         require.resolve.paths
       ]
-      .forEach((func) => {
-        [1, false, null, void 0, {}]
-          .forEach((request) => {
-            try {
-              func(request)
-              assert.fail()
-            } catch (e) {
-              assert.strictEqual(e.code, "ERR_INVALID_ARG_TYPE")
-            }
-          })
-      })
+
+      for (const func of funcs) {
+        const requests = [
+          1,
+          false,
+          null,
+          void 0,
+          {}
+        ]
+
+        for (const request of requests) {
+          try {
+            func(request)
+            assert.fail()
+          } catch (e) {
+            assert.strictEqual(e.code, "ERR_INVALID_ARG_TYPE")
+          }
+        }
+      }
     })
 
     it("should not wrap custom errors", () =>
@@ -477,17 +485,18 @@ describe("miscellaneous tests", () => {
       assert.strictEqual(actual, path.resolve("fixture/paths/file.js"))
     })
 
-    it("should find a package in the current directory", () =>
-      [
+    it("should find a package in the current directory", () => {
+      const requests = [
         "./fixture/paths/file/",
         "./fixture/paths/file/."
       ]
-      .forEach((request) => {
-        const actual = require.resolve("./fixture/paths/file/.")
+
+      for (const request of requests) {
+        const actual = require.resolve(request)
 
         assert.strictEqual(actual, path.resolve("fixture/paths/file/index.js"))
-      })
-    )
+      }
+    })
 
     it("should find a package in the parent directory", () => {
       const actual = require.resolve("./fixture/paths/file/a/..")
@@ -528,31 +537,33 @@ describe("miscellaneous tests", () => {
         .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
     )
 
-    it("should resolve non-local dependencies with `require`", () =>
-      [
+    it("should resolve non-local dependencies with `require`", () => {
+      const requests = [
         "home-node-libraries",
         "home-node-modules",
         "node-path",
         "prefix-path"
       ]
-      .forEach((request) => {
+
+      for (const request of requests) {
         assert.ok(require(request))
-      })
-    )
+      }
+    })
 
     it("should resolve non-local dependencies with `require` in ESM", () =>
       import("./fixture/require-paths")
-        .then((ns) =>
-          [
+        .then((ns) => {
+          const requests = [
             "home-node-libraries",
             "home-node-modules",
             "node-path",
             "prefix-path"
           ]
-          .forEach((request) => {
+
+          for (const request of requests) {
             assert.ok(ns.default(request))
-          })
-        )
+          }
+        })
     )
 
     it("should not resolve non-local dependencies with `import`", () =>
@@ -570,8 +581,8 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should resolve non-local dependencies with `require.resolve`", () =>
-      [
+    it("should resolve non-local dependencies with `require.resolve`", () => {
+      const datas = [
         {
           id: "home-node-libraries",
           resolved: path.resolve("env/home/.node_libraries/home-node-libraries/index.js")
@@ -589,15 +600,16 @@ describe("miscellaneous tests", () => {
           resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
         }
       ]
-      .forEach((data) => {
+
+      for (const data of datas) {
         assert.strictEqual(require.resolve(data.id), data.resolved)
-      })
-    )
+      }
+    })
 
     it("should resolve non-local dependencies with `require.resolve` in ESM", () =>
       import("./fixture/require-paths")
-        .then((ns) =>
-          [
+        .then((ns) => {
+          const datas = [
             {
               id: "home-node-libraries",
               resolved: path.resolve("env/home/.node_libraries/home-node-libraries/index.js")
@@ -615,10 +627,11 @@ describe("miscellaneous tests", () => {
               resolved: path.resolve("env/prefix/lib/node/prefix-path/index.js")
             }
           ]
-          .forEach((data) => {
+
+          for (const data of datas) {
             assert.strictEqual(ns.default.resolve(data.id), data.resolved)
-          })
-        )
+          }
+        })
     )
 
     it("should support `options` in `require.resolve`", () => {
@@ -1146,13 +1159,14 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support evaled strict mode code in CJS", () => {
-      [
+      const requests = [
         "./fixture/eval/direct/strict.js",
         "./fixture/eval/indirect/strict.js"
       ]
-      .forEach((request) => {
+
+      for (const request of requests) {
         assert.strictEqual(typeof require(request), "undefined")
-      })
+      }
     })
 
     it("should support `import.meta` in ESM", () =>
@@ -1178,17 +1192,18 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not support evaled `import.meta` in ESM", () => {
-      [
+      const evalers = [
         () => eval("import.meta"),
         () => (0, eval)("import.meta")
       ]
-      .forEach((evaler) => {
+
+      for (const evaler of evalers) {
         assert.throws(
           evaler,
           SyntaxError,
           "Cannot use 'import.meta' outside a module"
         )
-      })
+      }
     })
 
     it("should not have CJS free variables in `.mjs` files", () =>

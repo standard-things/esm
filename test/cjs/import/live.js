@@ -261,7 +261,7 @@ export default () => {
   const subEvents1 = new SubEvents1
   const subEvents3 = new SubEvents3
 
-  builtinCtors.forEach((Ctor, index) => {
+  for (const Ctor of builtinCtors) {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
 
@@ -274,24 +274,24 @@ export default () => {
       assert.ok(subEvents1 instanceof Ctor)
       assert.ok(subEvents3 instanceof Ctor)
     }
-  })
+  }
 
   objects = [accessor1, accessor2, accessor3]
 
   assert.deepStrictEqual([a, b], [void 0, void 0])
 
-  objects.forEach(({ a, b }) => {
+  for (const { a, b } of objects) {
     assert.deepStrictEqual([a, b], [void 0, void 0])
-  })
+  }
 
   accessor1.a = "b"
 
   assert.strictEqual(Reflect.has(Object.prototype, "a"), false)
   assert.deepStrictEqual([a, b], [void 0, "b"])
 
-  objects.forEach(({ a, b }) => {
+  for (const { a, b } of objects) {
     assert.deepStrictEqual([a, b], [void 0, "b"])
-  })
+  }
 
   let count = 0
 

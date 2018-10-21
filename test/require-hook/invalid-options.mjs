@@ -14,7 +14,7 @@ export default () => {
     "sourceMap"
   ]
 
-  optionNames.forEach((name) => {
+  for (const name of optionNames) {
     const realName = name === "sourcemap"
       ? "sourceMap"
       : name
@@ -23,7 +23,7 @@ export default () => {
       () => makeRequire(module, { [name]: -1 }),
       new RegExp("Error: The esm@[-\\w.]+ option '" + realName + "' is invalid")
     )
-  })
+  }
 
   assert.throws(
     () => makeRequire(module, { mainFields: [-1] }),

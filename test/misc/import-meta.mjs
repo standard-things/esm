@@ -39,7 +39,7 @@ const questionMarkURL = testURL + "/fixture/with%3Fquestion-mark.mjs"
 const tabURL = testURL + "/fixture/with%09tab.mjs"
 
 export default () => {
-  [
+  const imports = [
     carriageReturn1, carriageReturn2, carriageReturn3,
     colon1, colon2, colon3,
     hash1, hash2, hash3,
@@ -48,9 +48,10 @@ export default () => {
     questionMark1, questionMark2, questionMark3,
     tab1, tab2, tab3
   ]
-  .forEach((def) => {
+
+  for (const def of imports) {
     assert.strictEqual(Reflect.getPrototypeOf(def), null)
-  })
+  }
 
   let meta = createMeta({ url: carriageReturnURL })
 

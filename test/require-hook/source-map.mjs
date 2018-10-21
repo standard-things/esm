@@ -9,26 +9,30 @@ const defPath = path.resolve("fixture/export/def.js")
 const dynPath = path.resolve("fixture/import/dynamic.js")
 
 export default () => {
-  ["sourceMap", "sourcemap"]
-    .forEach((name) => {
-      const esmRequire = makeRequire(module, {
-        force: true,
-        [name]: true
-      })
+  const optionNames = [
+    "sourceMap",
+    "sourcemap"
+  ]
 
-      const { cache, extensions } = esmRequire
-      const mod = new Module("<mock>")
-
-      mod._compile = (content) => {
-        assert.ok(content.includes("sourceMappingURL"))
-      }
-
-      mod.exports = {}
-      Reflect.deleteProperty(cache, defPath)
-      extensions[".js"](mod, defPath)
-
-      mod.exports = {}
-      Reflect.deleteProperty(cache, dynPath)
-      extensions[".js"](mod, dynPath)
+  for (const name of optionNames) {
+    const esmRequire = makeRequire(module, {
+      force: true,
+      [name]: true
     })
+
+    const { cache, extensions } = esmRequire
+    const mod = new Module("<mock>")
+
+    mod._compile = (content) => {
+      assert.ok(content.includes("sourceMappingURL"))
+    }
+
+    mod.exports = {}
+    Reflect.deleteProperty(cache, defPath)
+    extensions[".js"](mod, defPath)
+
+    mod.exports = {}
+    Reflect.deleteProperty(cache, dynPath)
+    extensions[".js"](mod, dynPath)
+  }
 }

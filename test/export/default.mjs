@@ -78,10 +78,10 @@ export default () => {
   return Promise
     .all(anonymousFuncs)
     .then((funcs) => {
-      funcs.forEach((func) => {
+      for (const func of funcs) {
         const { name } = typeof func === "function" ? func : func.default
 
         assert.strictEqual(name, "default")
-      })
+      }
     })
 }

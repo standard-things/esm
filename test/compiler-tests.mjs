@@ -25,11 +25,11 @@ describe("compiler tests", () => {
   })
 
   it("should support `options.sourceType`", () => {
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       const result = Compiler.compile('import"a"', { sourceType })
 
       assert.strictEqual(result.sourceType, MODULE)
-    })
+    }
   })
 
   it("should support `options.cjsVars`", () => {
@@ -52,7 +52,7 @@ describe("compiler tests", () => {
   })
 
   it("should support `options.sourceType` of MODULE", () => {
-    [
+    const lines = [
       "1+2",
       "1+2//import",
       "1+2//import.meta",
@@ -64,15 +64,16 @@ describe("compiler tests", () => {
       'import"a"',
       "import.meta"
     ]
-    .forEach((code) => {
-      const result = Compiler.compile(code, { sourceType: MODULE })
+
+    for (const line of lines) {
+      const result = Compiler.compile(line, { sourceType: MODULE })
 
       assert.strictEqual(result.sourceType, MODULE)
-    })
+    }
   })
 
   it("should support `options.sourceType` of UNAMBIGUOUS", () => {
-    [
+    const datas = [
       { code: "1+2", sourceType: SCRIPT },
       { code: "1+2//import", sourceType: SCRIPT },
       { code: "1+2//import.meta", sourceType: SCRIPT },
@@ -87,32 +88,38 @@ describe("compiler tests", () => {
       { code: "import.meta", sourceType: MODULE },
       { code: "import.meta", hint: MODULE, sourceType: MODULE }
     ]
-    .forEach((data) => {
+
+    for (const data of datas) {
       const result = Compiler.compile(data.code, {
         hint: data.hint,
         sourceType: UNAMBIGUOUS
       })
 
       assert.strictEqual(result.sourceType, data.sourceType)
-    })
+    }
   })
 
   it("should support `options.generateVarDeclarations`", () => {
-    [void 0, false, true]
-      .forEach((value) => {
-        modernTypes.forEach((sourceType) => {
-          const result = Compiler.compile('import a from "a"', {
-            generateVarDeclarations: value,
-            sourceType
-          })
+    const values = [
+      void 0,
+      false,
+      true
+    ]
 
-          assert.ok(result.code.includes(value ? "var a" : "let a"))
+    for (const value of values) {
+      for (const sourceType of modernTypes) {
+        const result = Compiler.compile('import a from "a"', {
+          generateVarDeclarations: value,
+          sourceType
         })
-      })
+
+        assert.ok(result.code.includes(value ? "var a" : "let a"))
+      }
+    }
   })
 
   it('should support the "use module" directive', () => {
-    [
+    const datas = [
       { code: "'use module';\"use script\";import'a'", hint: MODULE },
       { code: "'use module';\"use script\";import.meta", hint: MODULE },
       { code: '"use module";\'use script\';import"a"', hint: MODULE },
@@ -122,18 +129,19 @@ describe("compiler tests", () => {
       { code: '"use module";\'use script\';import"a"' },
       { code: '"use module";\'use script\';import.meta' }
     ]
-    .forEach((data) => {
+
+    for (const data of datas) {
       const result = Compiler.compile(data.code, {
         hint: data.hint,
         sourceType: UNAMBIGUOUS
       })
 
       assert.strictEqual(result.sourceType, MODULE)
-    })
+    }
   })
 
   it('should support the "use script" directive', () => {
-    [
+    const datas = [
       { code: "'use script';\"use module\";import'a'", hint: SCRIPT },
       { code: "'use script';\"use module\";import.meta", hint: SCRIPT },
       { code: '"use script";\'use module\';import"a"', hint: SCRIPT },
@@ -143,7 +151,8 @@ describe("compiler tests", () => {
       { code: '"use script";\'use module\';import"a"' },
       { code: '"use script";\'use module\';import.meta' }
     ]
-    .forEach((data) => {
+
+    for (const data of datas) {
       assert.throws(
         () => Compiler.compile(data.code, {
           hint: data.hint,
@@ -151,7 +160,7 @@ describe("compiler tests", () => {
         }),
         SyntaxError
       )
-    })
+    }
   })
 
   it("should support shebangs", () => {
@@ -162,19 +171,19 @@ describe("compiler tests", () => {
       'import a from "a"'
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       const result = Compiler.compile(code, { sourceType })
 
       assert.strictEqual(result.code.includes(shebang), false)
-    })
+    }
   })
 
   it("should support trailing comments", () => {
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       const result = Compiler.compile('import"a"//trailing comment', { sourceType })
 
       assert.ok(result.code.endsWith("//trailing comment"))
-    })
+    }
   })
 
   it("should compile dynamic import for SCRIPT", () => {
@@ -195,11 +204,11 @@ describe("compiler tests", () => {
       "})()"
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       const result = Compiler.compile(code, { sourceType })
 
       assert.strictEqual(result.code.includes("import"), false)
-    })
+    }
   })
 
   it("should preserve line numbers", () => {
@@ -221,12 +230,12 @@ describe("compiler tests", () => {
       "}"
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       const result = Compiler.compile(code, { sourceType })
       const lines = result.code.split("\n")
 
       assert.strictEqual(lines[13], "b")
-    })
+    }
   })
 
   it("should preserve crlf newlines", () => {
@@ -239,11 +248,11 @@ describe("compiler tests", () => {
       'from "assert"'
     ].join("\r\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       const result = Compiler.compile(code, { sourceType })
 
       assert.ok(result.code.endsWith("\r\n".repeat(5)))
-    })
+    }
   })
 
   it("should not get confused by string literals", () => {
@@ -252,45 +261,47 @@ describe("compiler tests", () => {
       '"a; import b " + ' + "'from " + '"c"; d' + "'"
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       const result = Compiler.compile(code, { sourceType })
 
       assert.strictEqual(result.code, code)
-    })
+    }
   })
 
   it("should parse shorthand async function properties with reserved names", () => {
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       assert.doesNotThrow(
         () => Compiler.compile("({ async delete() {} })", { sourceType })
       )
-    })
+    }
   })
 
   it("should parse arrow functions with destructured arguments", () => {
-    [
+    const lines = [
       "({ a = 1 }) => {}",
       "({ a = 1 }, { b = 2 }) => {}"
     ]
-    .forEach((code) => {
-      sourceTypes.forEach((sourceType) => {
-        assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-      })
-    })
+
+    for (const line of lines) {
+      for (const sourceType of sourceTypes) {
+        assert.doesNotThrow(() => Compiler.compile(lines, { sourceType }))
+      }
+    }
   })
 
   it("should parse transforms at the end of the source", () => {
-    [
+    const lines = [
       'import { a } from "a"',
       'import "a"',
       "let a; export { a }",
       "export default a"
     ]
-    .forEach((code) => {
-      modernTypes.forEach((sourceType) => {
-        assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-      })
-    })
+
+    for (const line of lines) {
+      for (const sourceType of modernTypes) {
+        assert.doesNotThrow(() => Compiler.compile(line, { sourceType }))
+      }
+    }
   })
 
   it("should parse async generator syntax", () => {
@@ -304,9 +315,9 @@ describe("compiler tests", () => {
       "}"
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse BigInt syntax", () => {
@@ -323,9 +334,9 @@ describe("compiler tests", () => {
       "0O01n"
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse numeric separator syntax", () => {
@@ -343,9 +354,9 @@ describe("compiler tests", () => {
       "0O0_1"
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse BigInt and numeric separator syntax", () => {
@@ -361,9 +372,9 @@ describe("compiler tests", () => {
       "0O0_1n"
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse class fields syntax", () => {
@@ -389,9 +400,9 @@ describe("compiler tests", () => {
       "}"
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse for-await-of syntax", () => {
@@ -405,9 +416,9 @@ describe("compiler tests", () => {
       "}"
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should parse object rest/spread syntax", () => {
@@ -419,9 +430,9 @@ describe("compiler tests", () => {
       "export default { ...abc, d }"
     ].join("\n")
 
-    modernTypes.forEach((sourceType) => {
+    for (const sourceType of modernTypes) {
       assert.doesNotThrow(() => Compiler.compile(code, { sourceType }))
-    })
+    }
   })
 
   it("should instrument console use", () => {
@@ -455,12 +466,12 @@ describe("compiler tests", () => {
         line
       ].join("\n")
 
-      sourceTypes.forEach((sourceType) => {
+      for (const sourceType of sourceTypes) {
         const result = Compiler.compile(code, { sourceType })
         const actual = result.code.split("\n").pop()
 
         assert.strictEqual(actual, compiled[index])
-      })
+      }
     })
   })
 
@@ -472,12 +483,12 @@ describe("compiler tests", () => {
       line
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       const result = Compiler.compile(code, { sourceType })
       const actual = result.code.split("\n").pop()
 
       assert.strictEqual(actual, line)
-    })
+    }
   })
 
   it("should wrap eval use", () => {
@@ -529,18 +540,18 @@ describe("compiler tests", () => {
         line
       ].join("\n")
 
-      sourceTypes.forEach((sourceType) => {
+      for (const sourceType of sourceTypes) {
         const result = Compiler.compile(code, { sourceType })
         const actual = result.code.split("\n").pop()
         const compiled = sourceType === SCRIPT ? compiledScript : compiledModule
 
         assert.strictEqual(actual, compiled[index])
-      })
+      }
     })
   })
 
-  it("should not wrap shadowed eval", () =>
-    [
+  it("should not wrap shadowed eval", () => {
+    const lines = [
       "function a(eval) { eval = eval }",
       "function a(...eval) { eval = eval }",
       "function a(eval = 1) { eval = eval }",
@@ -549,12 +560,13 @@ describe("compiler tests", () => {
       "try {} catch(eval) { eval = eval }",
       "eval: while (true) { break eval; continue eval }"
     ]
-    .forEach((code) => {
-      const result = Compiler.compile(code)
 
-      assert.strictEqual(result.code, code)
-    })
-  )
+    for (const line of lines) {
+      const result = Compiler.compile(line)
+
+      assert.strictEqual(result.code, line)
+    }
+  })
 
   it("should not wrap eval in a typeof expression", () => {
     const line = "typeof eval"
@@ -564,12 +576,12 @@ describe("compiler tests", () => {
       line
     ].join("\n")
 
-    sourceTypes.forEach((sourceType) => {
+    for (const sourceType of sourceTypes) {
       const result = Compiler.compile(code, { sourceType })
       const actual = result.code.split("\n").pop()
 
       assert.strictEqual(actual, line)
-    })
+    }
   })
 
   it("should not wrap eval in a with statement", () => {
@@ -619,7 +631,7 @@ describe("compiler tests", () => {
         line
       ].join("\n")
 
-      modernTypes.forEach((sourceType) => {
+      for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
 
         result.enforceTDZ()
@@ -627,12 +639,12 @@ describe("compiler tests", () => {
         const actual = result.code.split("\n").pop()
 
         assert.strictEqual(actual, compiled[index])
-      })
+      }
     })
   })
 
-  it("should not add TDZ asserts to shadowed bindings", () =>
-    [
+  it("should not add TDZ asserts to shadowed bindings", () => {
+    const lines = [
       "function a(tdz) { tdz = tdz }",
       "function a(...tdz) { tdz = tdz }",
       "function a(tdz = 1) { tdz = tdz }",
@@ -641,13 +653,14 @@ describe("compiler tests", () => {
       "try {} catch(tdz) { tdz = tdz }",
       "tdz: while (true) { break tdz; continue tdz }"
     ]
-    .forEach((line) => {
+
+    for (const line of lines) {
       const code = [
         'import tdz from "tdz"',
         line
       ].join("\n")
 
-      modernTypes.forEach((sourceType) => {
+      for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
 
         result.enforceTDZ()
@@ -655,9 +668,9 @@ describe("compiler tests", () => {
         const actual = result.code.split("\n").pop()
 
         assert.strictEqual(actual, line)
-      })
-    })
-  )
+      }
+    }
+  })
 
   it("should support V8 parse errors", () => {
     const options = { sourceType: MODULE }
@@ -691,18 +704,18 @@ describe("compiler tests", () => {
 
     const suffix = "; export {}"
 
-    modernTypes.forEach((sourceType) => {
-      lines.forEach((line) => {
+    for (const sourceType of modernTypes) {
+      for (const line of lines) {
         assert.throws(
           () => Compiler.compile(line + suffix, { sourceType }),
           /SyntaxError: Identifier 'a' has already been declared/
         )
-      })
+      }
 
       assert.doesNotThrow(
         () => Compiler.compile("function a() { var b; function b() {} }" + suffix, { sourceType })
       )
-    })
+    }
   })
 
   it("should not lexically scope top-level function declarations for SCRIPT", () => {
@@ -713,8 +726,8 @@ describe("compiler tests", () => {
 
     const suffix = '; import("a")'
 
-    lines.forEach((line) => {
+    for (const line of lines) {
       assert.doesNotThrow(() => Compiler.compile(line + suffix, { sourceType: SCRIPT }))
-    })
+    }
   })
 })

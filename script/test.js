@@ -61,13 +61,13 @@ const terserOptions = fs.readJSONSync(path.resolve(rootPath, ".terserrc"))
 const trashPaths = ignorePaths.filter(isKept)
 
 function cleanJS() {
-  jsPaths.forEach((filename) => {
+  for (const filename of jsPaths) {
     const content = fs.readFileSync(filename, "utf8")
 
     process.once("exit", () => fs.outputFileSync(filename, content))
 
     fs.outputFileSync(filename, minifyJS(content))
-  })
+  }
 }
 
 function cleanRepo() {

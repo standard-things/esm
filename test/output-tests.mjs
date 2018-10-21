@@ -29,28 +29,28 @@ const tests = files
     return tests
   }, {})
 
-describe("output tests", () =>
-  Object
-    .keys(tests)
-    .forEach((dirPath) => {
-      const name = path.basename(dirPath).split("-").join(" ")
-      const test = tests[dirPath]
+describe("output tests", () => {
+  const dirPaths = Object.keys(tests)
 
-      it(`compiles ${name} example as expected`, () => {
-        const result = Compiler.compile(test.actual.content, {
-          sourceType: test.actual.sourceType
-        })
+  for (const dirPath of dirPaths) {
+    const name = path.basename(dirPath).split("-").join(" ")
+    const test = tests[dirPath]
 
-        // Remove zero-width joiners and trim lines.
-        const expected = test.expected.content
-          .trimRight()
-
-        const actual = result.code
-          .replace(/\u200d/g, "")
-          .replace(/[ \t]+$/gm, "")
-          .trimRight()
-
-        assert.strictEqual(actual, expected)
+    it(`compiles ${name} example as expected`, () => {
+      const result = Compiler.compile(test.actual.content, {
+        sourceType: test.actual.sourceType
       })
+
+      // Remove zero-width joiners and trim lines.
+      const expected = test.expected.content
+        .trimRight()
+
+      const actual = result.code
+        .replace(/\u200d/g, "")
+        .replace(/[ \t]+$/gm, "")
+        .trimRight()
+
+      assert.strictEqual(actual, expected)
     })
-)
+  }
+})

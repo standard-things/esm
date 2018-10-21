@@ -47,14 +47,14 @@ describe("main hook tests", function () {
       otherFlags.push("--experimental-modules")
     }
 
-    requireFlags.forEach((requireFlag) => {
-      otherFlags.forEach((flag) => {
+    for (const requireFlag of requireFlags) {
+      for (const flag of otherFlags) {
         const args = flag ? [flag] : []
 
         args.push(requireFlag, "../", "./fixture/main-hook")
         runs.push(args)
-      })
-    })
+      }
+    }
 
     return runs
       .reduce((promise, args) =>
@@ -167,14 +167,14 @@ describe("main hook tests", function () {
       flags.push("--preserve-symlinks")
     }
 
-    filenames.forEach((fileName) => {
-      flags.forEach((flag) => {
+    for (const name of filenames) {
+      for (const flag of flags) {
         const args = flag ? [flag] : []
 
-        args.push("-r", "../", fileName)
+        args.push("-r", "../", name)
         runs.push(args)
-      })
-    })
+      }
+    }
 
     return runs
       .reduce((promise, args) =>
@@ -201,14 +201,14 @@ describe("main hook tests", function () {
       flags.push("--preserve-symlinks")
     }
 
-    flags.forEach((flag) => {
-      destNames.forEach((destName) => {
+    for (const flag of flags) {
+      for (const destName of destNames) {
         const args = flag ? [flag] : []
 
         args.push("-r", "../", "./fixture/main-hook/symlink/" + destName)
         runs.push(args)
-      })
-    })
+      }
+    }
 
     return runs
       .reduce((promise, args) =>

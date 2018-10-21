@@ -139,8 +139,8 @@ describe("dynamic import tests", () => {
       .then(assertAbcNs)
   })
 
-  it("should be syntactic", () =>
-    [
+  it("should be syntactic", () => {
+    const lines = [
       "const f = import",
       "import.length",
       "import.name",
@@ -148,19 +148,21 @@ describe("dynamic import tests", () => {
       "import.call()",
       "import.toString()"
     ]
-    .forEach((code) => {
-      assert.throws(() => Compiler.compile(code), SyntaxError)
-    })
-  )
 
-  it("should accept exactly one argument", () =>
-    [
+    for (const line of lines) {
+      assert.throws(() => Compiler.compile(line), SyntaxError)
+    }
+  })
+
+  it("should accept exactly one argument", () => {
+    const lines = [
       "import()",
       "import(a,b)",
       "import(...[a])"
     ]
-    .forEach((code) => {
-      assert.throws(() => Compiler.compile(code), SyntaxError)
-    })
-  )
+
+    for (const line of lines) {
+      assert.throws(() => Compiler.compile(line), SyntaxError)
+    }
+  })
 })
