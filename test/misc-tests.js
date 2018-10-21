@@ -736,8 +736,6 @@ describe("miscellaneous tests", () => {
       Promise
         .all([
           "./fixture/with%23hash.mjs",
-          "./fixture/with%3Fquestion-mark.mjs",
-          "./fixture/with%3fquestion-mark.mjs",
           "./fixture/with%2520percent.mjs"
         ]
         .map((request) => import(request)))
@@ -753,16 +751,6 @@ describe("miscellaneous tests", () => {
         .then((ns) => assert.deepStrictEqual(ns, fsExtraNs))
     )
 
-    it("should support requests containing carriage returns in ESM", () =>
-      Promise
-        .all([
-          "./fixture/with\rcarriage-return.mjs",
-          "./fixture/with%0Dcarriage-return.mjs",
-          "./fixture/with%0dcarriage-return.mjs"
-        ]
-        .map((request) => import(request)))
-    )
-
     it("should support requests containing colons in ESM", () =>
       Promise
         .all([
@@ -773,24 +761,59 @@ describe("miscellaneous tests", () => {
         .map((request) => import(request)))
     )
 
-    it("should support requests containing newlines in ESM", () =>
-      Promise
+    it("should support requests containing carriage returns in ESM", function () {
+      if (isWin) {
+        this.skip()
+      }
+
+      return Promise
+        .all([
+          "./fixture/with\rcarriage-return.mjs",
+          "./fixture/with%0Dcarriage-return.mjs",
+          "./fixture/with%0dcarriage-return.mjs"
+        ]
+        .map((request) => import(request)))
+    })
+
+    it("should support requests containing newlines in ESM", function () {
+      if (isWin) {
+        this.skip()
+      }
+
+      return Promise
         .all([
           "./fixture/with\nnewline.mjs",
           "./fixture/with%0Anewline.mjs",
           "./fixture/with%0anewline.mjs"
         ]
         .map((request) => import(request)))
-    )
+    })
 
-    it("should support requests containing tabs in ESM", () =>
-      Promise
+    it("should support requests containing encoded question marks in ESM", function () {
+      if (isWin) {
+        this.skip()
+      }
+
+      return Promise
+        .all([
+          "./fixture/with%3Fquestion-mark.mjs",
+          "./fixture/with%3fquestion-mark.mjs"
+        ]
+        .map((request) => import(request)))
+    })
+
+    it("should support requests containing tabs in ESM", function () {
+      if (isWin) {
+        this.skip()
+      }
+
+      return Promise
         .all([
           "./fixture/with\ttab.mjs",
           "./fixture/with%09tab.mjs"
         ]
         .map((request) => import(request)))
-    )
+    })
 
     it("should support requests with URL query/fragments in ESM", () =>
       Promise

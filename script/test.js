@@ -18,6 +18,7 @@ const rootPath = path.resolve(__dirname, "..")
 const testPath = path.resolve(rootPath, "test")
 const envPath = path.resolve(testPath, "env")
 const esmPath = path.resolve(rootPath, "esm.js")
+const fixturePath = path.resolve(testPath, "fixture")
 const indexPath = path.resolve(rootPath, "index.js")
 const mochaPath = path.resolve(rootPath, "node_modules/mocha/bin/_mocha")
 const nodePath = path.resolve(envPath, "prefix", isWin ? "node.exe" : "bin/node")
@@ -70,10 +71,6 @@ function cleanJS() {
   }
 }
 
-function cleanRepo() {
-  return Promise.all(trashPaths.map(trash))
-}
-
 function isKept(thePath) {
   return thePath.endsWith(".cache") ||
     keptPaths.every((dirname) => ! thePath.startsWith(dirname))
@@ -111,10 +108,37 @@ function setupNode() {
     .then(() => fs.ensureLink(process.execPath, nodePath))
 }
 
+function setupRepo() {
+  return Promise
+    .all(trashPaths.map(trash))
+    .then(() => {
+      if (isWin) {
+        return
+      }
+
+      const fixtureNames = [
+        "with\ttab.mjs",
+        "with\rcarriage-return.mjs",
+        "with\nnewline.mjs",
+        "with?question-mark.mjs"
+      ]
+
+      const sourcePath = path.resolve(fixturePath, "with#hash.mjs")
+
+      for (const name of fixtureNames) {
+        const filename = path.resolve(fixturePath, name)
+
+        if (! fs.existsSync(filename)) {
+          fs.copySync(sourcePath, filename)
+        }
+      }
+    })
+}
+
 Promise
   .all([
     argv.prod && cleanJS(),
-    cleanRepo(),
+    setupRepo(),
     setupNode(),
     setupTest262()
   ])
