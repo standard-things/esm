@@ -16,6 +16,9 @@ import newline3 from "../fixture/with%0Anewline.mjs?b#b"
 import percent1 from "../fixture/with%2520percent.mjs"
 import percent2 from "../fixture/with%2520percent.mjs#c"
 import percent3 from "../fixture/with%2520percent.mjs?c#c"
+import questionMark1 from "../fixture/with%3Fquestion-mark.mjs"
+import questionMark2 from "../fixture/with%3Fquestion-mark.mjs#c"
+import questionMark3 from "../fixture/with%3Fquestion-mark.mjs?c#c"
 import tab1 from "../fixture/with%09tab.mjs"
 import tab2 from "../fixture/with%09tab.mjs#c"
 import tab3 from "../fixture/with%09tab.mjs?c#c"
@@ -32,6 +35,7 @@ const colonURL = testURL + "/fixture/with:colon.mjs"
 const hashURL = testURL + "/fixture/with%23hash.mjs"
 const newlineURL = testURL + "/fixture/with%0Anewline.mjs"
 const percentURL = testURL + "/fixture/with%2520percent.mjs"
+const questionMarkURL = testURL + "/fixture/with%3Fquestion-mark.mjs"
 const tabURL = testURL + "/fixture/with%09tab.mjs"
 
 export default () => {
@@ -41,6 +45,7 @@ export default () => {
     hash1, hash2, hash3,
     newline1, newline2, newline3,
     percent1, percent2, percent3,
+    questionMark1, questionMark2, questionMark3,
     tab1, tab2, tab3
   ]
   .forEach((def) => {
@@ -92,6 +97,15 @@ export default () => {
 
   meta = createMeta({ url: percentURL + "?c#c" })
   assert.deepStrictEqual(percent3, meta)
+
+  meta = createMeta({ url: questionMarkURL })
+  assert.deepStrictEqual(questionMark1, meta)
+
+  meta = createMeta({ url: questionMarkURL + "#c" })
+  assert.deepStrictEqual(questionMark2, meta)
+
+  meta = createMeta({ url: questionMarkURL + "?c#c" })
+  assert.deepStrictEqual(questionMark3, meta)
 
   meta = createMeta({ url: tabURL })
   assert.deepStrictEqual(tab1, meta)

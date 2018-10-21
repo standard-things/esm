@@ -719,20 +719,25 @@ describe("miscellaneous tests", () => {
         .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     })
 
-    it("should support requests with URL query/fragments in ESM", () =>
+    it("should support requests containing percent encodings in ESM", () =>
       Promise
         .all([
-          abcPath + "?a",
-          abcPath + "#a",
-          abcPath.replace("abc", "%61%62%63"),
-          abcURL + "?a",
-          abcURL + "#a",
-          abcURL.replace("abc", "%61%62%63")
+          "./fixture/with%23hash.mjs",
+          "./fixture/with%3Fquestion-mark.mjs",
+          "./fixture/with%3fquestion-mark.mjs",
+          "./fixture/with%2520percent.mjs"
         ]
-        .map((request) =>
-          import(request)
-            .then((ns) => assert.deepStrictEqual(ns, abcNs))
-        ))
+        .map((request) => import(request)))
+    )
+
+    it("should support builtin module specifiers with percent encodings", () =>
+      import("%66%73")
+        .then((ns) => assert.deepStrictEqual(ns, fsNs))
+    )
+
+    it("should support bare module specifiers with percent encodings", () =>
+      import("%66%73-extra")
+        .then((ns) => assert.deepStrictEqual(ns, fsExtraNs))
     )
 
     it("should support requests containing carriage returns in ESM", () =>
@@ -755,10 +760,6 @@ describe("miscellaneous tests", () => {
         .map((request) => import(request)))
     )
 
-    it("should support requests containing hash signs in ESM", () =>
-      import("./fixture/with%23hash.mjs")
-    )
-
     it("should support requests containing newlines in ESM", () =>
       Promise
         .all([
@@ -769,20 +770,6 @@ describe("miscellaneous tests", () => {
         .map((request) => import(request)))
     )
 
-    it("should support requests containing percent encodings in ESM", () =>
-      import("./fixture/with%2520percent.mjs")
-    )
-
-    it("should support builtin module specifiers with percent encodings", () =>
-      import("%66%73")
-        .then((ns) => assert.deepStrictEqual(ns, fsNs))
-    )
-
-    it("should support bare module specifiers with percent encodings", () =>
-      import("%66%73-extra")
-        .then((ns) => assert.deepStrictEqual(ns, fsExtraNs))
-    )
-
     it("should support requests containing tabs in ESM", () =>
       Promise
         .all([
@@ -790,6 +777,22 @@ describe("miscellaneous tests", () => {
           "./fixture/with%09tab.mjs"
         ]
         .map((request) => import(request)))
+    )
+
+    it("should support requests with URL query/fragments in ESM", () =>
+      Promise
+        .all([
+          abcPath + "?a",
+          abcPath + "#a",
+          abcPath.replace("abc", "%61%62%63"),
+          abcURL + "?a",
+          abcURL + "#a",
+          abcURL.replace("abc", "%61%62%63")
+        ]
+        .map((request) =>
+          import(request)
+            .then((ns) => assert.deepStrictEqual(ns, abcNs))
+        ))
     )
 
     it("should not support builtin module specifiers with URL query/fragments", () =>
