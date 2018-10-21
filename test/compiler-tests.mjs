@@ -89,13 +89,13 @@ describe("compiler tests", () => {
       { code: "import.meta", hint: MODULE, sourceType: MODULE }
     ]
 
-    for (const data of datas) {
-      const result = Compiler.compile(data.code, {
-        hint: data.hint,
+    for (const { code, hint, sourceType } of datas) {
+      const result = Compiler.compile(code, {
+        hint,
         sourceType: UNAMBIGUOUS
       })
 
-      assert.strictEqual(result.sourceType, data.sourceType)
+      assert.strictEqual(result.sourceType, sourceType)
     }
   })
 
@@ -130,9 +130,9 @@ describe("compiler tests", () => {
       { code: '"use module";\'use script\';import.meta' }
     ]
 
-    for (const data of datas) {
-      const result = Compiler.compile(data.code, {
-        hint: data.hint,
+    for (const { code, hint } of datas) {
+      const result = Compiler.compile(code, {
+        hint,
         sourceType: UNAMBIGUOUS
       })
 
@@ -152,10 +152,10 @@ describe("compiler tests", () => {
       { code: '"use script";\'use module\';import.meta' }
     ]
 
-    for (const data of datas) {
+    for (const { code, hint } of datas) {
       assert.throws(
-        () => Compiler.compile(data.code, {
-          hint: data.hint,
+        () => Compiler.compile(code, {
+          hint,
           sourceType: UNAMBIGUOUS
         }),
         SyntaxError

@@ -32,23 +32,23 @@ export default () => {
     }))
     .then((unsafeMetas) => {
       const datas = [
-        { actual: safeCharacters1, expected: safeCharactersURL },
-        { actual: safeCharacters2, expected: safeCharactersURL + "?" },
-        { actual: safeCharacters3, expected: safeCharactersURL + "?#" },
-        { actual: safeCharacters4, expected: safeCharactersURL + "?a#a" }
+        { actual: safeCharacters1, url: safeCharactersURL },
+        { actual: safeCharacters2, url: safeCharactersURL + "?" },
+        { actual: safeCharacters3, url: safeCharactersURL + "?#" },
+        { actual: safeCharacters4, url: safeCharactersURL + "?a#a" }
       ]
 
       if (! isWin) {
         datas.push(
-          { actual: unsafeMetas[0], expected: unsafeCharactersURL },
-          { actual: unsafeMetas[1], expected: unsafeCharactersURL + "?" },
-          { actual: unsafeMetas[2], expected: unsafeCharactersURL + "?#" },
-          { actual: unsafeMetas[3], expected: unsafeCharactersURL + "?a#a" }
+          { actual: unsafeMetas[0], url: unsafeCharactersURL },
+          { actual: unsafeMetas[1], url: unsafeCharactersURL + "?" },
+          { actual: unsafeMetas[2], url: unsafeCharactersURL + "?#" },
+          { actual: unsafeMetas[3], url: unsafeCharactersURL + "?a#a" }
         )
       }
 
-      for (const { actual, expected } of datas) {
-        assert.deepStrictEqual(actual, createMeta({ url: expected }))
+      for (const { actual, url } of datas) {
+        assert.deepStrictEqual(actual, createMeta({ url }))
         assert.strictEqual(Reflect.getPrototypeOf(actual), null)
       }
     })

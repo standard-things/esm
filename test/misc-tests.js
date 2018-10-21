@@ -601,8 +601,8 @@ describe("miscellaneous tests", () => {
         }
       ]
 
-      for (const data of datas) {
-        assert.strictEqual(require.resolve(data.id), data.resolved)
+      for (const { id, resolved } of datas) {
+        assert.strictEqual(require.resolve(id), resolved)
       }
     })
 
@@ -628,8 +628,8 @@ describe("miscellaneous tests", () => {
             }
           ]
 
-          for (const data of datas) {
-            assert.strictEqual(ns.default.resolve(data.id), data.resolved)
+          for (const { id, resolved } of datas) {
+            assert.strictEqual(ns.default.resolve(id), resolved)
           }
         })
     )
