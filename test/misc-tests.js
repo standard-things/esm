@@ -732,14 +732,28 @@ describe("miscellaneous tests", () => {
         .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
     })
 
-    it("should support requests containing percent encodings in ESM", () =>
+    it("should support requests containing safe characters in ESM", () =>
       Promise
         .all([
-          "./fixture/with%23hash.mjs",
-          "./fixture/with%2520percent.mjs"
+          "./fixture/safe-characters%5B%23%25&;=%5D.mjs",
+          "./fixture/safe-characters%5b%23%25&;=%5d.mjs"
         ]
         .map((request) => import(request)))
     )
+
+    it("should support requests containing unsafe characters in ESM", function () {
+      if (isWin) {
+        this.skip()
+      }
+
+      return Promise
+        .all([
+          "./fixture/unsafe-characters%5B\b\t\n\r:%3F%5D.mjs",
+          "./fixture/unsafe-characters%5B%08%09%0A%0D:%3F%5D.mjs",
+          "./fixture/unsafe-characters%5b%08%09%0a%0d:%3f%5d.mjs"
+        ]
+        .map((request) => import(request)))
+    })
 
     it("should support builtin module specifiers with percent encodings", () =>
       import("%66%73")
@@ -751,79 +765,17 @@ describe("miscellaneous tests", () => {
         .then((ns) => assert.deepStrictEqual(ns, fsExtraNs))
     )
 
-    it("should support requests containing colons in ESM", () =>
-      Promise
-        .all([
-          "./fixture/with:colon.mjs",
-          "./fixture/with%3Acolon.mjs",
-          "./fixture/with%3acolon.mjs"
-        ]
-        .map((request) => import(request)))
-    )
-
-    it("should support requests containing carriage returns in ESM", function () {
-      if (isWin) {
-        this.skip()
-      }
-
-      return Promise
-        .all([
-          "./fixture/with\rcarriage-return.mjs",
-          "./fixture/with%0Dcarriage-return.mjs",
-          "./fixture/with%0dcarriage-return.mjs"
-        ]
-        .map((request) => import(request)))
-    })
-
-    it("should support requests containing newlines in ESM", function () {
-      if (isWin) {
-        this.skip()
-      }
-
-      return Promise
-        .all([
-          "./fixture/with\nnewline.mjs",
-          "./fixture/with%0Anewline.mjs",
-          "./fixture/with%0anewline.mjs"
-        ]
-        .map((request) => import(request)))
-    })
-
-    it("should support requests containing encoded question marks in ESM", function () {
-      if (isWin) {
-        this.skip()
-      }
-
-      return Promise
-        .all([
-          "./fixture/with%3Fquestion-mark.mjs",
-          "./fixture/with%3fquestion-mark.mjs"
-        ]
-        .map((request) => import(request)))
-    })
-
-    it("should support requests containing tabs in ESM", function () {
-      if (isWin) {
-        this.skip()
-      }
-
-      return Promise
-        .all([
-          "./fixture/with\ttab.mjs",
-          "./fixture/with%09tab.mjs"
-        ]
-        .map((request) => import(request)))
-    })
-
     it("should support requests with URL query/fragments in ESM", () =>
       Promise
         .all([
           abcPath + "?a",
           abcPath + "#a",
-          abcPath.replace("abc", "%61%62%63"),
+          abcPath + "?a#a",
+          abcPath.replace("abc", "%61%62%63") + "?a#a",
           abcURL + "?a",
           abcURL + "#a",
-          abcURL.replace("abc", "%61%62%63")
+          abcURL + "?a#a",
+          abcURL.replace("abc", "%61%62%63") + "?a#a"
         ]
         .map((request) =>
           import(request)

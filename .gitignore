@@ -13,10 +13,7 @@
 /src/vendor
 /test/env/prefix/bin
 /test/env/prefix/node
-/test/fixture/with*carriage-return.mjs
-/test/fixture/with*newline.mjs
-/test/fixture/with*question-mark.mjs
-/test/fixture/with*tab.mjs
+/test/fixture/unsafe-characters\[*\].mjs
 /test/fixture/main-hook/symlink/symlink.js
 /test/fixture/main-hook/symlink/symlink.mjs
 /test/fixture/scenario/ava-nyc-tsc/*.js

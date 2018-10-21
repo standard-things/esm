@@ -1,15 +1,10 @@
 import assert from "assert"
 import createMeta from "../create-meta.js"
 import path from "path"
-import colon1 from "../fixture/with%3Acolon.mjs"
-import colon2 from "../fixture/with%3Acolon.mjs?"
-import colon3 from "../fixture/with%3Acolon.mjs?a#a"
-import hash1 from "../fixture/with%23hash.mjs"
-import hash2 from "../fixture/with%23hash.mjs?#"
-import hash3 from "../fixture/with%23hash.mjs?b#b"
-import percent1 from "../fixture/with%2520percent.mjs"
-import percent2 from "../fixture/with%2520percent.mjs#c"
-import percent3 from "../fixture/with%2520percent.mjs?c#c"
+import safeCharacters1 from "../fixture/safe-characters%5B%23%25&;=%5D.mjs"
+import safeCharacters2 from "../fixture/safe-characters%5B%23%25&;=%5D.mjs?"
+import safeCharacters3 from "../fixture/safe-characters%5B%23%25&;=%5D.mjs?#"
+import safeCharacters4 from "../fixture/safe-characters%5B%23%25&;=%5D.mjs?a#a"
 
 const isWin = process.platform === "win32"
 
@@ -18,29 +13,16 @@ const fileProtocol = "file://" + (isWin ? "/" : "")
 const testPath = path.resolve(".")
 const testURL = fileProtocol + testPath.replace(/\\/g, "/")
 
-const carriageReturnURL = testURL + "/fixture/with%0Dcarriage-return.mjs"
-const colonURL = testURL + "/fixture/with:colon.mjs"
-const hashURL = testURL + "/fixture/with%23hash.mjs"
-const newlineURL = testURL + "/fixture/with%0Anewline.mjs"
-const percentURL = testURL + "/fixture/with%2520percent.mjs"
-const questionMarkURL = testURL + "/fixture/with%3Fquestion-mark.mjs"
-const tabURL = testURL + "/fixture/with%09tab.mjs"
+const safeCharactersURL = testURL + "/fixture/safe-characters%5B%23%25&;=%5D.mjs"
+const unsafeCharactersURL = testURL + "/fixture/unsafe-characters%5B%08%09%0A%0D:%3F%5D.mjs"
 
 export default () => {
   return Promise
     .all([
-      "../fixture/with%0Dcarriage-return.mjs",
-      "../fixture/with%0Dcarriage-return.mjs?",
-      "../fixture/with%0Dcarriage-return.mjs?a#a",
-      "../fixture/with%0Anewline.mjs",
-      "../fixture/with%0Anewline.mjs?#",
-      "../fixture/with%0Anewline.mjs?b#b",
-      "../fixture/with%3Fquestion-mark.mjs",
-      "../fixture/with%3Fquestion-mark.mjs#c",
-      "../fixture/with%3Fquestion-mark.mjs?c#c",
-      "../fixture/with%09tab.mjs",
-      "../fixture/with%09tab.mjs#c",
-      "../fixture/with%09tab.mjs?c#c"
+      unsafeCharactersURL,
+      unsafeCharactersURL + "?",
+      unsafeCharactersURL + "?#",
+      unsafeCharactersURL + "?a#a"
     ]
     .map((request) => {
       if (! isWin) {
@@ -48,94 +30,26 @@ export default () => {
           .then((ns) => ns.default)
       }
     }))
-    .then((conditionals) => {
-      const [
-        carriageReturn1, carriageReturn2, carriageReturn3,
-        newline1, newline2, newline3,
-        questionMark1, questionMark2, questionMark3,
-        tab1, tab2, tab3
-      ] = conditionals
-
-      const imports = [
-        carriageReturn1, carriageReturn2, carriageReturn3,
-        colon1, colon2, colon3,
-        hash1, hash2, hash3,
-        newline1, newline2, newline3,
-        percent1, percent2, percent3,
-        questionMark1, questionMark2, questionMark3,
-        tab1, tab2, tab3
+    .then((unsafeMetas) => {
+      const datas = [
+        { actual: safeCharacters1, expected: safeCharactersURL },
+        { actual: safeCharacters2, expected: safeCharactersURL + "?" },
+        { actual: safeCharacters3, expected: safeCharactersURL + "?#" },
+        { actual: safeCharacters4, expected: safeCharactersURL + "?a#a" }
       ]
 
-      let meta = createMeta({ url: colonURL })
-
-      assert.deepStrictEqual(colon1, meta)
-
-      meta = createMeta({ url: colonURL + "?" })
-      assert.deepStrictEqual(colon2, meta)
-
-      meta = createMeta({ url: colonURL + "?a#a" })
-      assert.deepStrictEqual(colon3, meta)
-
-      meta = createMeta({ url: hashURL })
-      assert.deepStrictEqual(hash1, meta)
-
-      meta = createMeta({ url: hashURL + "?#" })
-      assert.deepStrictEqual(hash2, meta)
-
-      meta = createMeta({ url: hashURL + "?b#b" })
-      assert.deepStrictEqual(hash3, meta)
-
-      meta = createMeta({ url: percentURL })
-      assert.deepStrictEqual(percent1, meta)
-
-      meta = createMeta({ url: percentURL + "#c" })
-      assert.deepStrictEqual(percent2, meta)
-
-      meta = createMeta({ url: percentURL + "?c#c" })
-      assert.deepStrictEqual(percent3, meta)
-
       if (! isWin) {
-        meta = createMeta({ url: carriageReturnURL })
-        assert.deepStrictEqual(carriageReturn1, meta)
-
-        meta = createMeta({ url: carriageReturnURL + "?" })
-        assert.deepStrictEqual(carriageReturn2, meta)
-
-        meta = createMeta({ url: carriageReturnURL + "?a#a" })
-        assert.deepStrictEqual(carriageReturn3, meta)
-
-        meta = createMeta({ url: newlineURL })
-        assert.deepStrictEqual(newline1, meta)
-
-        meta = createMeta({ url: newlineURL + "?#" })
-        assert.deepStrictEqual(newline2, meta)
-
-        meta = createMeta({ url: newlineURL + "?b#b" })
-        assert.deepStrictEqual(newline3, meta)
-
-        meta = createMeta({ url: questionMarkURL })
-        assert.deepStrictEqual(questionMark1, meta)
-
-        meta = createMeta({ url: questionMarkURL + "#c" })
-        assert.deepStrictEqual(questionMark2, meta)
-
-        meta = createMeta({ url: questionMarkURL + "?c#c" })
-        assert.deepStrictEqual(questionMark3, meta)
-
-        meta = createMeta({ url: tabURL })
-        assert.deepStrictEqual(tab1, meta)
-
-        meta = createMeta({ url: tabURL + "#c" })
-        assert.deepStrictEqual(tab2, meta)
-
-        meta = createMeta({ url: tabURL + "?c#c" })
-        assert.deepStrictEqual(tab3, meta)
+        datas.push(
+          { actual: unsafeMetas[0], expected: unsafeCharactersURL },
+          { actual: unsafeMetas[1], expected: unsafeCharactersURL + "?" },
+          { actual: unsafeMetas[2], expected: unsafeCharactersURL + "?#" },
+          { actual: unsafeMetas[3], expected: unsafeCharactersURL + "?a#a" }
+        )
       }
 
-      for (const def of imports) {
-        if (def) {
-          assert.strictEqual(Reflect.getPrototypeOf(def), null)
-        }
+      for (const { actual, expected } of datas) {
+        assert.deepStrictEqual(actual, createMeta({ url: expected }))
+        assert.strictEqual(Reflect.getPrototypeOf(actual), null)
       }
     })
 }

@@ -112,24 +112,12 @@ function setupRepo() {
   return Promise
     .all(trashPaths.map(trash))
     .then(() => {
-      if (isWin) {
-        return
-      }
+      if (! isWin) {
+        const safeCharactersPath = path.resolve(fixturePath, "safe-characters[#%&;=].mjs")
+        const unsafeCharactersPath = path.resolve(fixturePath, "unsafe-characters[\b\t\n\r:?].mjs")
 
-      const fixtureNames = [
-        "with\ttab.mjs",
-        "with\rcarriage-return.mjs",
-        "with\nnewline.mjs",
-        "with?question-mark.mjs"
-      ]
-
-      const sourcePath = path.resolve(fixturePath, "with#hash.mjs")
-
-      for (const name of fixtureNames) {
-        const filename = path.resolve(fixturePath, name)
-
-        if (! fs.existsSync(filename)) {
-          fs.copySync(sourcePath, filename)
+        if (! fs.existsSync(unsafeCharactersPath)) {
+          fs.copySync(safeCharactersPath, unsafeCharactersPath)
         }
       }
     })
