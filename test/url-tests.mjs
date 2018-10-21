@@ -115,12 +115,36 @@ describe("URL tests", () => {
       let actual
       let expected
 
+      expected = testURL + "/a" + (isWin ? "/b.js" : "%5Cb.js")
+      actual = getURLFromFilePath("a\\b.js")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/a%20space.js"
+      actual = getURLFromFilePath("a space.js")
+      assert.strictEqual(actual, expected)
+
       expected = testURL + "/a/%25"
       actual = getURLFromFilePath("a/%")
       assert.strictEqual(actual, expected)
 
-      expected = testURL + "/%E4%BD%A0%E5%A5%BD.js"
-      actual = getURLFromFilePath("你好.js")
+      expected = testURL + "/%08%09%0A%0D%23%25&:;=%3F.js"
+      actual = getURLFromFilePath("\b\t\n\r#%&:;=?.js")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/%C3%A0.js"
+      actual = getURLFromFilePath("à.js")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/%E2%82%AC.js"
+      actual = getURLFromFilePath("€.js")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/%E4%BD%A0.js"
+      actual = getURLFromFilePath("你.js")
+      assert.strictEqual(actual, expected)
+
+      expected = testURL + "/%F0%9F%9A%80.js"
+      actual = getURLFromFilePath("🚀.js")
       assert.strictEqual(actual, expected)
     })
   })
