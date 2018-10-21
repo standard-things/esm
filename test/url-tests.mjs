@@ -90,27 +90,6 @@ describe("URL tests", () => {
   })
 
   describe("getURLFromFilePath() tests", () => {
-    it("should preserve trailing slashes", () => {
-      let actual
-      let expected
-
-      expected = isWin ? "file:///C:/" : "file:///"
-      actual = getURLFromFilePath("/")
-      assert.strictEqual(actual, expected)
-
-      expected = testURL + "/a/"
-      actual = getURLFromFilePath("a/")
-      assert.strictEqual(actual, expected)
-
-      expected = testURL + "/a" + (isWin ? "/" : "%5C")
-      actual = getURLFromFilePath("a\\")
-      assert.strictEqual(actual, expected)
-
-      expected = isWin ? "file:///host/a/" : testURL + "/%5C%5Chost%5Ca%5C"
-      actual = getURLFromFilePath("\\\\host\\a\\")
-      assert.strictEqual(actual, expected)
-    })
-
     it("should encode the URI", () => {
       let actual
       let expected
@@ -147,5 +126,26 @@ describe("URL tests", () => {
       actual = getURLFromFilePath("🚀.js")
       assert.strictEqual(actual, expected)
     })
+  })
+
+  it("should preserve trailing slashes", () => {
+    let actual
+    let expected
+
+    expected = isWin ? "file:///C:/" : "file:///"
+    actual = getURLFromFilePath("/")
+    assert.strictEqual(actual, expected)
+
+    expected = testURL + "/a/"
+    actual = getURLFromFilePath("a/")
+    assert.strictEqual(actual, expected)
+
+    expected = testURL + "/a" + (isWin ? "/" : "%5C")
+    actual = getURLFromFilePath("a\\")
+    assert.strictEqual(actual, expected)
+
+    expected = isWin ? "file:///host/a/" : testURL + "/%5C%5Chost%5Ca%5C"
+    actual = getURLFromFilePath("\\\\host\\a\\")
+    assert.strictEqual(actual, expected)
   })
 })
