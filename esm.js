@@ -106,7 +106,11 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
   const runtimeName = "_"
   const { symbol } = shared
 
-  const { CachingCompiler, utilCompileSource } = shared.module
+  const {
+    CachingCompiler,
+    moduleInternalCompileSource
+  } = shared.module
+
   const Entry = loader(symbol.entry)
   const Runtime = loader(symbol.runtime)
 
@@ -121,7 +125,7 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
 
   const isESM = compileData.sourceType === 2
 
-  const code = utilCompileSource(compileData, {
+  const code = moduleInternalCompileSource(compileData, {
     cjsVars: true,
     runtimeName
   })
@@ -138,8 +142,8 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
         const entry = Entry.get(mod)
 
         entry.compileData = jestEnvironmentHooks[cwd].compile[entry.filename]
-        entry.type = isESM ? 2 : 1
         entry.runtimeName = runtimeName
+        entry.type = isESM ? 2 : 1
 
         const runtime = Runtime.enable(entry, {})
 
