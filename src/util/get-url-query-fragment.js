@@ -3,11 +3,11 @@ import encodeURI from "./encode-uri.js"
 import shared from "../shared.js"
 
 function init() {
-  const qmarkHashRegExp = /[?#]/
+  const questionMarkHashRegExp = /[?#]/
 
   function getURLQueryFragment(request) {
     const index = typeof request === "string"
-      ? request.search(qmarkHashRegExp)
+      ? request.search(questionMarkHashRegExp)
       : -1
 
     return index === -1
