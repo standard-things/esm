@@ -33,10 +33,10 @@ describe("URL tests", () => {
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "" : "/home/us\\er"
-      actual = getFilePathFromURL("file:///home/us%5cer")
+      actual = getFilePathFromURL("file:///home/us%5Cer")
       assert.strictEqual(actual, expected)
 
-      actual = getFilePathFromURL("file:///home/us%5Cer")
+      actual = getFilePathFromURL("file:///home/us%5cer")
       assert.strictEqual(actual, expected)
 
       expected = isWin ? "" : "/dev"
@@ -59,10 +59,10 @@ describe("URL tests", () => {
       actual = getFilePathFromURL("file://xn--weird-prdj8vva.com/host/a")
       assert.strictEqual(actual, expected)
 
-      actual = getFilePathFromURL("file:///C:/a%2fb")
+      actual = getFilePathFromURL("file:///C:/a%2Fb")
       assert.strictEqual(actual, "")
 
-      actual = getFilePathFromURL("file:///C:/a%2Fb")
+      actual = getFilePathFromURL("file:///C:/a%2fb")
       assert.strictEqual(actual, "")
     })
 

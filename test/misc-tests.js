@@ -795,16 +795,16 @@ describe("miscellaneous tests", () => {
 
     it("should not support requests with encoded slashes", () => {
       const requests = [
-        abcPath.replace(slashRegExp, "%2f"),
         abcPath.replace(slashRegExp, "%2F"),
-        abcURL.replace(slashRegExp, "%2f"),
-        abcURL.replace(slashRegExp, "%2F")
+        abcPath.replace(slashRegExp, "%2f"),
+        abcURL.replace(slashRegExp, "%2F"),
+        abcURL.replace(slashRegExp, "%2f")
       ]
 
       if (isWin) {
         requests.unshift(
-          abcPath.replace(slashRegExp, "%5c"),
-          abcPath.replace(slashRegExp, "%5C")
+          abcPath.replace(slashRegExp, "%5C"),
+          abcPath.replace(slashRegExp, "%5c")
         )
       }
 
@@ -832,14 +832,14 @@ describe("miscellaneous tests", () => {
 
       return Promise
         .all([
-          abcPath + "?a%2fb" + encodedLower,
           abcPath + "?a%2Fb" + encodedUpper,
-          abcPath + "#a%2fb" + encodedLower,
+          abcPath + "?a%2fb" + encodedLower,
           abcPath + "#a%2Fb" + encodedUpper,
-          abcURL + "?a%2fb" + encodedLower,
+          abcPath + "#a%2fb" + encodedLower,
           abcURL + "?a%2Fb" + encodedUpper,
-          abcURL + "#a%2fb" + encodedLower,
-          abcURL + "#a%2Fb" + encodedUpper
+          abcURL + "?a%2fb" + encodedLower,
+          abcURL + "#a%2Fb" + encodedUpper,
+          abcURL + "#a%2fb" + encodedLower
         ]
         .map((request) =>
           import(request)
