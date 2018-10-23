@@ -30,11 +30,51 @@ function init() {
       // Allow `yield import()` to parse.
       tt._import.startsExpr = true
 
+      parser.parseExport = wrap(parser.parseExport, parseExport)
       parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
       parser.parseStatement = wrap(parser.parseStatement, parseStatement)
       parser.parseSubscripts = wrap(parser.parseSubscripts, parseSubscripts)
       return parser
     }
+  }
+
+  function parseExport(func, args) {
+    const { type } = lookahead(this)
+
+    if (type !== tt.star) {
+      return Reflect.apply(func, this, args)
+    }
+
+    const [node, exported] = args
+
+    this.next()
+
+    const { start, startLoc } = this
+
+    this.next()
+
+    let finishType = "ExportAllDeclaration"
+
+    if (this.eatContextual("as")) {
+      const specifier = this.startNodeAt(start, startLoc)
+      const identifier = this.parseIdent()
+
+      this.checkExport(exported, identifier.name, identifier.start)
+
+      finishType = "ExportNamedDeclaration"
+      specifier.exported = identifier
+      node.specifiers = [this.finishNode(specifier, "ExportNamespaceSpecifier")]
+    }
+
+    this.expectContextual("from")
+
+    if (this.type !== tt.string) {
+      this.unexpected()
+    }
+
+    node.source = this.parseExprAtom()
+    this.semicolon()
+    return this.finishNode(node, finishType)
   }
 
   function parseExprAtom(func, args) {
