@@ -142,7 +142,8 @@ function validateDependencies(entry) {
 
 function validateExportedName(entry, exportedName, seen) {
   if (entry.builtin ||
-      entry.type !== TYPE_ESM) {
+      entry.type !== TYPE_ESM ||
+      exportedName === "*") {
     return
   }
 
