@@ -364,7 +364,9 @@ function init() {
 
         for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
-          const localName = specifier.local.name
+          const localName = specifier.type === "ExportNamespaceSpecifier"
+            ? "*"
+            : specifier.local.name
 
           setterArgsList +=
             '["' +
