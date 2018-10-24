@@ -56,7 +56,7 @@ function init() {
     let finishType = "ExportAllDeclaration"
 
     if (this.eatContextual("as")) {
-      const identifier = this.parseIdent()
+      const identifier = this.parseIdent(true)
 
       this.checkExport(exported, identifier.name, identifier.start)
 
