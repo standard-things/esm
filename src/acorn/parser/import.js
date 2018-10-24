@@ -56,10 +56,11 @@ function init() {
     let finishType = "ExportAllDeclaration"
 
     if (this.eatContextual("as")) {
-      const specifier = this.startNodeAt(start, startLoc)
       const identifier = this.parseIdent()
 
       this.checkExport(exported, identifier.name, identifier.start)
+
+      const specifier = this.startNodeAt(start, startLoc)
 
       finishType = "ExportNamedDeclaration"
       specifier.exported = identifier
