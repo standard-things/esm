@@ -154,7 +154,7 @@ function init() {
       shared.pendingWrites[cachePath] ||
       (shared.pendingWrites[cachePath] = { __proto__: null })
 
-    pendingWrites[cacheName] = result.code
+    pendingWrites[cacheName] = result
     return result
   }
 
@@ -405,9 +405,9 @@ function init() {
       const contents = pendingWrites[cachePath]
 
       for (const cacheName in contents) {
-        const content = contents[cacheName]
+        const { code } = contents[cacheName]
 
-        if (writeFile(cachePath + sep + cacheName, content)) {
+        if (writeFile(cachePath + sep + cacheName, code)) {
           removeExpired(cachePath, cacheName)
         }
       }
