@@ -73,7 +73,7 @@ class Entry {
     // The name of the running setter.
     this._runningSetter = null
     // The initialized state of bindings imported by the module.
-    this.bindings = { __proto__: null }
+    this.importedBindings = { __proto__: null }
     // The builtin module indicator.
     this.builtin = false
     // The cache name of the module.
@@ -280,7 +280,7 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parent) {
-    const { bindings } = this
+    const { importedBindings } = this
     const settersMap = this.setters
 
     const setters =
@@ -301,7 +301,7 @@ class Entry {
 
     for (const name of localNames) {
       last[name] = void 0
-      bindings[name] = false
+      importedBindings[name] = false
     }
 
     return this
@@ -491,7 +491,7 @@ class Entry {
     runGetters(this, names)
     runSetters(this, names, (setter, value) => {
       const parentEntry = setter.parent
-      const { bindings } = parentEntry
+      const { importedBindings } = parentEntry
       const { localNames } = setter
 
       parentsMap || (parentsMap = { __proto__: null })
@@ -500,7 +500,7 @@ class Entry {
       setter(value, this)
 
       for (const name of localNames) {
-        bindings[name] = true
+        importedBindings[name] = true
       }
     })
 
@@ -582,7 +582,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
   handler.defineProperty = (target, name, descriptor) => {
     if (Reflect.defineProperty(target, name, descriptor)) {
       return name === Symbol.toStringTag ||
-        Reflect.has(entry.bindings, name) ||
+        Reflect.has(entry.importedBindings, name) ||
         descriptor.value === void 0
     }
 
