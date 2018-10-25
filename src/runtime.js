@@ -93,12 +93,12 @@ const Runtime = {
     })
   },
 
-  assertBinding(name, value) {
-    if (this.entry.bindings[name]) {
+  assertImportedBinding(name, value) {
+    if (this.entry.importedBindings[name]) {
       return value
     }
 
-    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertBinding)
+    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertImportedBinding)
   },
 
   compileEval(content) {
@@ -194,7 +194,7 @@ const Runtime = {
     runtime.addExportFromSetter = Runtime.addExportFromSetter
     runtime.addExportGetters = Runtime.addExportGetters
     runtime.addNamespaceSetter = Runtime.addNamespaceSetter
-    runtime.assertBinding = Runtime.assertBinding
+    runtime.assertImportedBinding = Runtime.assertImportedBinding
     runtime.compileEval = boundCompileEval
     runtime.compileGlobalEval = Runtime.compileGlobalEval
     runtime.entry = entry
@@ -208,7 +208,7 @@ const Runtime = {
     runtime.updateBindings = Runtime.updateBindings
 
     runtime._ = runtime
-    runtime.a = runtime.assertBinding
+    runtime.a = runtime.assertImportedBinding
     runtime.b = runtime.throwConstAssignment
     runtime.c = runtime.compileEval
     runtime.d = runtime.addDefaultValue
