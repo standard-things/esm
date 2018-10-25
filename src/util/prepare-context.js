@@ -143,11 +143,9 @@ function init() {
       } else if (name === "Object") {
         Reflect.defineProperty(builtin, Symbol.hasInstance, {
           configurable: true,
-          enumerable: false,
-          value: (value) =>
-            value instanceof realmBuiltin ||
-            instanceOf(value, builtin),
-          writable: false
+          value: (instance) =>
+            instance instanceof realmBuiltin ||
+            instanceOf(instance, builtin)
         })
       }
 

@@ -21,9 +21,7 @@ function init() {
 
     Reflect.defineProperty(AcornError, "name", {
       configurable: true,
-      enumerable: false,
-      value: Super.name,
-      writable: false
+      value: Super.name
     })
 
     return AcornError

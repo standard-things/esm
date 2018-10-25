@@ -240,9 +240,7 @@ class Entry {
           value.name === (this.runtimeName + "anonymous")) {
         Reflect.defineProperty(value, "name", {
           configurable: true,
-          enumerable: false,
-          value: "default",
-          writable: false
+          value: "default"
         })
       }
     }

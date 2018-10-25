@@ -31,9 +31,9 @@ function createEntry(id) {
     const { prototype } = func
 
     const hasInstance = maskFunction(
-      (value) =>
-        value instanceof func ||
-        instanceOf(value, proxyFunc),
+      (instance) =>
+        instance instanceof func ||
+        instanceOf(instance, proxyFunc),
       funcHasInstance
     )
 
