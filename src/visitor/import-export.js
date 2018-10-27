@@ -256,6 +256,11 @@ function init() {
         addAssignableExports(this, pairs)
       }
 
+      magicString.appendRight(
+        node.end,
+        runtimeName + '.entry.updateBindings(["default"], true);'
+      )
+
       path.call(this, "visitWithoutReset", "declaration")
     }
 
@@ -276,16 +281,24 @@ function init() {
         specifiers
       } = node
 
+      let updates
+      let updateNode = node
+
       if (declaration) {
+        updateNode = declaration
+
         const pairs = []
         const { id, type } = declaration
+        const isClassDecl = type === "ClassDeclaration"
 
         if (id &&
-            (type === "ClassDeclaration" ||
-            type === "FunctionDeclaration")) {
+            (isClassDecl ||
+             type === "FunctionDeclaration")) {
           // Support exporting named class and function declarations:
           // export function named() {}
           const { name } = id
+
+          updates = [id.name]
 
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
@@ -293,6 +306,8 @@ function init() {
           // export let name1, name2, ..., nameN
           for (const { id } of declaration.declarations) {
             const names = getNamesFromPattern(id)
+
+            updates.push(...names)
 
             for (const name of names) {
               pairs.push([name, name])
@@ -309,16 +324,18 @@ function init() {
         if (canExportedValuesChange(node)) {
           addAssignableExports(this, pairs)
         }
-
-        path.call(this, "visitWithoutReset", "declaration")
       } else if (source === null) {
         // Support exporting specifiers:
         // export { name1, name2, ..., nameN }
         const { identifiers } = this.top
         const pairs = []
 
+        updates = []
+
         for (const specifier of specifiers) {
           const localName = specifier.local.name
+
+          updates.push(localName)
 
           if (! Reflect.has(identifiers, localName)) {
             throw new errors.SyntaxError(
@@ -394,6 +411,17 @@ function init() {
         )
 
         hoistImports(this, node, hoistedCode)
+      }
+
+      if (updates) {
+        this.magicString.appendRight(
+          updateNode.end,
+          ";" + runtimeName + ".entry.updateBindings(" + JSON.stringify(updates) + ", true);"
+        )
+      }
+
+      if (declaration) {
+        path.call(this, "visitWithoutReset", "declaration")
       }
     }
 

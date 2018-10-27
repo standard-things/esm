@@ -1,6 +1,5 @@
 import Visitor from "../visitor.js"
 
-import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import getShadowed from "../parse/get-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
@@ -69,58 +68,6 @@ function init() {
 
         overwrite(this, start, end, code)
       })
-    }
-
-    visitExportDefaultDeclaration(path) {
-      this.changed = true
-
-      const node = path.getValue()
-
-      this.magicString.appendRight(
-        node.end,
-        this.runtimeName + '.u(["default"]);'
-      )
-
-      path.call(this, "visitWithoutReset", "declaration")
-    }
-
-    visitExportNamedDeclaration(path) {
-      const node = path.getValue()
-      const { declaration } = node
-
-      let names
-      let child = node
-
-      if (declaration) {
-        const { type } = declaration
-
-        child = declaration
-
-        if (type === "ClassDeclaration") {
-          names = [declaration.id.name]
-        } else if (type === "VariableDeclaration") {
-          names = []
-
-          for (const { id } of declaration.declarations) {
-            names.push(...getNamesFromPattern(id))
-          }
-        }
-      } else if (node.source === null) {
-        names = node.specifiers.map((specifier) => specifier.local.name)
-      }
-
-      if (names) {
-        this.changed = true
-
-        this.magicString.appendRight(
-          child.end,
-          ";" + this.runtimeName + ".u(" + JSON.stringify(names) + ");"
-        )
-      }
-
-      if (declaration) {
-        path.call(this, "visitWithoutReset", "declaration")
-      }
     }
   }
 
