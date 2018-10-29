@@ -299,9 +299,10 @@ function init() {
           const { name } = id
 
           updates = [id.name]
-
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
+          updates = []
+
           // Support exporting variable lists:
           // export let name1, name2, ..., nameN
           for (const { id } of declaration.declarations) {
@@ -416,7 +417,7 @@ function init() {
       if (updates) {
         this.magicString.appendRight(
           updateNode.end,
-          ";" + runtimeName + ".entry.updateBindings(" + JSON.stringify(updates) + ", true);"
+          ";" + this.runtimeName + ".entry.updateBindings(" + JSON.stringify(updates) + ", true);"
         )
       }
 
