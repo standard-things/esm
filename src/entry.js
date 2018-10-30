@@ -262,8 +262,13 @@ class Entry {
     const otherGetters = otherEntry.getters
 
     if (Reflect.has(getters, exportedName) ||
-        ! Reflect.has(otherGetters, importedName)) {
+        (importedName !== "*" &&
+         ! Reflect.has(otherGetters, importedName))) {
       return this
+    }
+
+    if (importedName === "*") {
+      return this.addGetter(exportedName, () => otherEntry.esmNamespace)
     }
 
     let otherGetter = otherGetters[importedName]
@@ -986,6 +991,7 @@ function runSetter(entry, name, callback) {
   const settersMap = entry.setters
   const setters = settersMap[name]
 
+  const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
 
@@ -1004,7 +1010,7 @@ function runSetter(entry, name, callback) {
       isNsLoaded = isLoaded
     }
 
-    for (let setter of setters) {
+    for (const setter of setters) {
       const { type } = setter
 
       if (isNsChanged &&
@@ -1017,8 +1023,8 @@ function runSetter(entry, name, callback) {
       } else {
         let value
 
-        if (name !== "*" &&
-            entry.type === TYPE_ESM) {
+        if (isESM &&
+            ! isNs) {
           value = getExportByNameFast(entry, name)
         } else {
           value = getExportByName(entry, name, setter.parent)
