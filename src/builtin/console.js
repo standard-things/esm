@@ -6,7 +6,6 @@ import GenericFunction from "../generic/function.js"
 import GenericObject from "../generic/object.js"
 
 import assign from "../util/assign.js"
-import assignProperties from "../util/assign-properties.js"
 import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
@@ -30,6 +29,13 @@ function init() {
   const RealConsole = realConsole.Console
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
+
+  const instanceRegExp = /IsConsole/i
+
+  const instanceSymbol = Object
+    .getOwnPropertySymbols(safeConsole)
+    .find((symbol) => instanceRegExp.test(String(symbol))) ||
+    Symbol("kIsConsole")
 
   const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
@@ -115,11 +121,13 @@ function init() {
       return Reflect.construct(Console, args)
     }
 
+    this[instanceSymbol] = true
+
     const { prototype } = Console
     const names = keys(prototype)
 
     for (const name of names) {
-      const value = this[name]
+      const value = prototype[name]
 
       if (typeof value === "function") {
         this[name] = GenericFunction.bind(value, this)
@@ -146,7 +154,15 @@ function init() {
     }
   }
 
-  const builtinConsole = assignProperties(GenericObject.create(), new Console(stdout, stderr))
+  const builtinConsole = new Console(stdout, stderr)
+
+  for (const name of realProtoNames) {
+    if (! has(builtinConsole, name)) {
+      copyProperty(builtinConsole, prototype, name)
+    }
+  }
+
+  Reflect.setPrototypeOf(builtinConsole, GenericObject.create())
 
   if (config.variables.v8_enable_inspector &&
       FLAGS.inspect) {
@@ -208,6 +224,12 @@ function init() {
     } else if (! has(builtinConsole, name)) {
       copyProperty(builtinConsole, safeConsole, name)
     }
+  }
+
+  if (!  has(Console, Symbol.hasInstance)) {
+    Reflect.defineProperty(Console, Symbol.hasInstance, {
+      value: (instance) => instance[instanceSymbol]
+    })
   }
 
   return builtinConsole
