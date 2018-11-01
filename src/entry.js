@@ -290,9 +290,7 @@ class Entry {
       settersMap[name] ||
       (settersMap[name] = [])
 
-    const last =
     setter.last = { __proto__: null }
-
     setter.localNames = localNames
     setter.parent = parent
 
@@ -303,7 +301,6 @@ class Entry {
     setters.push(setter)
 
     for (const name of localNames) {
-      last[name] = void 0
       importedBindings[name] = false
     }
 
