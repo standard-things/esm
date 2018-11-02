@@ -16,6 +16,7 @@ import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
+import toExternalError from "./util/to-external-error.js"
 
 const {
   ERROR_STAR,
@@ -249,7 +250,7 @@ const Runtime = {
             }
           })]])
         } catch (e) {
-          rejectPromise(e)
+          rejectPromise(toExternalError(e))
         }
       })
     })
