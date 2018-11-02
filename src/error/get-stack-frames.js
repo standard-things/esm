@@ -1,3 +1,4 @@
+import getPrototypeOf from "../util/get-prototype-of.js"
 import isError from "../util/is-error.js"
 import isNative from "../util/is-native.js"
 import setProperty from "../util/set-property.js"
@@ -50,7 +51,7 @@ function init() {
 
     let proto = error
 
-    while ((proto = Reflect.getPrototypeOf(proto))) {
+    while ((proto = getPrototypeOf(proto))) {
       const ctor = proto ? proto.constructor : void 0
 
       if (typeof ctor === "function" &&
