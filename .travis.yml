@@ -14,7 +14,7 @@ cache: npm
 
 matrix:
   include:
-    - node_js: 10
+    - node_js: 11
       env: HARMONY=true
 
 before_install:

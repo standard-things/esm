@@ -1,8 +1,3 @@
-# UNSUPPORTED 🚧 (private fields)
-test/language/module-code/privatename-valid-no-earlyerr.js
-
-
-
 # BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-iee-bndng-fun.js
 
@@ -31,6 +26,9 @@ test/language/module-code/instn-named-bndng-trlng-comma.js
 test/language/module-code/instn-named-bndng-var.js
 
 # BUG 🐛 (instantiation phase + cycle import)
+test/language/module-code/instn-named-id-name.js
+
+# BUG 🐛 (instantiation phase + cycle import)
 test/language/module-code/instn-named-iee-cycle.js
 
 # BUG 🐛 (instantiation phase + cycle import)
@@ -43,18 +41,21 @@ test/language/module-code/namespace/internals/delete-exported-init.js
 test/language/module-code/namespace/internals/get-own-property-str-found-init.js
 
 # BUG 🐛 (instantiation phase + cycle import)
-test/language/expressions/namespace/internals/get-str-found-init.js
+test/language/module-code/namespace/internals/get-str-initialize.js
 
 # BUG 🐛 (instantiation phase + cycle import)
-test/language/expressions/namespace/internals/get-str-initialize.js
-
-# BUG 🐛 (instantiation phase + cycle import)
-test/language/expressions/namespace/internals/get-str-update.js
+test/language/module-code/namespace/internals/get-str-found-init.js
 
 
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/expressions/dynamic-import/eval-self-once-script.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/expressions/dynamic-import/indirect-resolution.js
+
+# DYNAMIC IMPORT ⏭️ (not applicable)
+test/language/expressions/dynamic-import/update-to-dynamic-import.js
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-eval-script-code-target.js
