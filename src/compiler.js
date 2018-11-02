@@ -244,12 +244,12 @@ function init() {
 
         if (addedImportExport) {
           result.enforceTDZ = () => {
-            result.enforceTDZ = noop
-
             const possibleIndexes = findIndexes(code, keys(temporals))
 
             possibleIndexes.push(...possibleExportIndexes)
             possibleIndexes.sort()
+
+            result.enforceTDZ = noop
 
             temporalVisitor.visit(rootPath, {
               magicString,

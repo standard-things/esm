@@ -105,6 +105,7 @@ function init() {
         result.yieldIndex = +meta[10]
 
         entry.type = TYPE_ESM
+
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
       }
