@@ -75,6 +75,7 @@ function parseTest(filename) {
 
 function runEsm(filename, args, env) {
   return node([
+    "--harmony",
     "-r", "../",
     filename, ...args
   ], env)
