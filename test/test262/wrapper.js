@@ -46,7 +46,7 @@ for (const filename of harnessFilenames) {
 const { error, log } = console
 const noop = () => {}
 
-Reflect.ownKeys(console).forEach((name) => {
+Object.keys(console).forEach((name) => {
   if (typeof console[name] === "function") {
     console[name] = noop
   }
