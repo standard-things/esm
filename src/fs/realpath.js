@@ -42,6 +42,7 @@ function init() {
     if (useBinding === void 0) {
       useBinding =
         useBindingOrNative &&
+        ! shared.support.realpathNative &&
         typeof binding.fs.realpath === "function"
     }
 

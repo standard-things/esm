@@ -230,12 +230,21 @@ function init() {
       })
 
       // Return a result so the test has a side effect and won't be removed by
-      // Uglify's "unsafe" option.
-      // https://github.com/mishoo/UglifyJS2#the-unsafe-compress-option
+      // Terser's "unsafe" option.
+      // https://github.com/terser-js/terser#the-unsafe-compress-option
       return typeof proxy.toString() === "string"
     } catch (e) {
       return ! /Illegal/.test(e)
     }
+  })
+
+  setDeferred(support, "realpathNative", () => {
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
+
+    return utilSatisfies(safeProcess.version, ">=9.2.0")
   })
 
   setDeferred(support, "replShowProxy", () => {
