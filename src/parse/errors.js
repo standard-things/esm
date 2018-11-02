@@ -3,8 +3,8 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    SyntaxError: ExSyntaxError,
-    TypeError: ExTypeError
+    ReferenceError: ExReferenceError,
+    SyntaxError: ExSyntaxError
   } = shared.external
 
   function createClass(Super) {
@@ -28,8 +28,8 @@ function init() {
   }
 
   return {
-    SyntaxError: createClass(ExSyntaxError),
-    TypeError: createClass(ExTypeError)
+    ReferenceError: createClass(ExReferenceError),
+    SyntaxError: createClass(ExSyntaxError)
   }
 }
 

@@ -12,6 +12,7 @@
 
 import PARSER_MESSAGE from "../../constant/parser-message.js"
 
+import errors from "../../parse/errors.js"
 import lookahead from "../../parse/lookahead.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
@@ -20,6 +21,7 @@ import wrap from "../../util/wrap.js"
 function init() {
   const {
     ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
+    INVALID_LEFT_HAND_SIDE_ASSIGNMENT,
     UNEXPECTED_IDENTIFIER,
     UNEXPECTED_STRING,
     UNEXPECTED_TOKEN
@@ -30,12 +32,25 @@ function init() {
       // Allow `yield import()` to parse.
       tt._import.startsExpr = true
 
+      parser.checkLVal = wrap(parser.checkLVal, checkLVal)
       parser.parseExport = wrap(parser.parseExport, parseExport)
       parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
+      parser.parseNew = wrap(parser.parseNew, parseNew)
       parser.parseStatement = wrap(parser.parseStatement, parseStatement)
       parser.parseSubscripts = wrap(parser.parseSubscripts, parseSubscripts)
       return parser
     }
+  }
+
+  function checkLVal(func, args) {
+    const [expr] = args
+
+    if (expr.type === "CallExpression" &&
+        expr.callee.type === "Import") {
+      throw new errors.ReferenceError(this.input, expr.start, INVALID_LEFT_HAND_SIDE_ASSIGNMENT)
+    }
+
+    return Reflect.apply(func, this, args)
   }
 
   function parseExport(func, args) {
@@ -105,6 +120,16 @@ function init() {
     return node
   }
 
+  function parseNew(func, args) {
+    const { type } = lookahead(this)
+
+    if (type === tt._import) {
+      this.unexpected()
+    }
+
+    return Reflect.apply(func, this, args)
+  }
+
   function parseSubscripts(func, args) {
     const [base, startPos, startLoc] = args
 
@@ -132,12 +157,12 @@ function init() {
     if (this.type === tt._import) {
       const { start, type } = lookahead(this)
 
-      if (type === tt.dot) {
-        return parseImportMetaProperty(this)
-      }
+      if (type === tt.dot ||
+          type === tt.parenL) {
+        const node = this.startNode()
+        const expr = this.parseMaybeAssign()
 
-      if (type === tt.parenL) {
-        return parseImportCall(this)
+        return this.parseExpressionStatement(node, expr)
       }
 
       if (! this.inModule ||
@@ -160,22 +185,6 @@ function init() {
     return Reflect.apply(func, this, args)
   }
 
-  function parseImportCall(parser) {
-    const node = parser.startNode()
-    const { start } = parser
-    const callee = parser.parseExprAtom()
-    const expr = parser.parseSubscripts(callee, start)
-
-    return parser.parseExpressionStatement(node, expr)
-  }
-
-  function parseImportMetaProperty(parser) {
-    const node = parser.startNode()
-    const expr = parser.parseMaybeAssign()
-
-    return parser.parseExpressionStatement(node, expr)
-  }
-
   function parseImportCallAtom(parser) {
     const node = parser.startNode()
 
@@ -187,7 +196,6 @@ function init() {
     const node = parser.startNode()
 
     node.meta = parser.parseIdent(true)
-
     parser.expect(tt.dot)
     node.property = parser.parseIdent(true)
 

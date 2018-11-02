@@ -9,6 +9,7 @@ const PARSER_MESSAGE = {
   ILLEGAL_NEW_TARGET: "new.target expression is not allowed here",
   ILLEGAL_RETURN_STATEMENT: "Illegal return statement",
   INVALID_ESCAPED_RESERVED_WORD: "Keyword must not contain escaped characters",
+  INVALID_LEFT_HAND_SIDE_ASSIGNMENT: "Invalid left-hand side in assignment",
   INVALID_OR_UNEXPECTED_TOKEN: "Invalid or unexpected token",
   UNEXPECTED_EOS: "Unexpected end of input",
   UNEXPECTED_EVAL_OR_ARGUMENTS: "Unexpected eval or arguments in strict mode",
