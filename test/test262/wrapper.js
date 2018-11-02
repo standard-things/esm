@@ -9,10 +9,11 @@ const testPath = path.resolve("../vendor/test262")
 const harnessPath = path.resolve(testPath, "harness")
 
 const harnessFilenames = [
-  path.resolve(harnessPath, "assert.js"),
-  path.resolve(harnessPath, "doneprintHandle.js"),
-  path.resolve(harnessPath, "fnGlobalObject.js"),
-  path.resolve(harnessPath, "sta.js")
+  "assert.js",
+  "compareArray.js",
+  "doneprintHandle.js",
+  "fnGlobalObject.js",
+  "sta.js"
 ]
 
 function waitForAsyncTest() {
@@ -38,7 +39,7 @@ global.print = function print(value) {
 }
 
 for (const filename of harnessFilenames) {
-  vm.runInThisContext(fs.readFileSync(filename, "utf-8"))
+  vm.runInThisContext(fs.readFileSync(path.resolve(harnessPath, filename), "utf-8"))
 }
 
 // Suppress logging.
