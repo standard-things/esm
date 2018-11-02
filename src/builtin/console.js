@@ -117,7 +117,9 @@ function init() {
   }
 
   const Console = maskFunction(function (...args) {
-    if (! (this instanceof Console)) {
+    const target = new.target
+
+    if (! target) {
       return Reflect.construct(Console, args)
     }
 
@@ -127,14 +129,14 @@ function init() {
     const names = keys(prototype)
 
     for (const name of names) {
-      const value = prototype[name]
+      const value = this[name]
 
       if (typeof value === "function") {
         this[name] = GenericFunction.bind(value, this)
       }
     }
 
-    const result = Reflect.construct(RealConsole, args, new.target)
+    const result = Reflect.construct(RealConsole, args, target)
     const resultNames = keysAll(result)
 
     for (const name of resultNames) {
