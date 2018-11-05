@@ -477,7 +477,7 @@ class Entry {
     return this
   }
 
-  updateBindings(names) {
+  updateBindings(names, init) {
     // Lazily-initialized map of parent module names to parent entries whose
     // setters might need to run.
     let parentsMap
@@ -492,25 +492,26 @@ class Entry {
     runSetters(this, names, (setter, value) => {
       const parentEntry = setter.parent
       const { importedBindings } = parentEntry
-      const { localNames } = setter
 
       parentsMap || (parentsMap = { __proto__: null })
       parentsMap[parentEntry.name] = parentEntry
 
       setter(value, this)
 
-      for (const name of localNames) {
+      for (const name of setter.localNames) {
         importedBindings[name] = true
       }
-    })
+    }, init)
 
     this._changed = false
 
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    for (const id in parentsMap) {
-      parentsMap[id].updateBindings()
+    if (this._loaded === LOAD_COMPLETED) {
+      for (const id in parentsMap) {
+        parentsMap[id].updateBindings()
+      }
     }
 
     return this
@@ -982,7 +983,7 @@ function runGetters(entry, names) {
   }
 }
 
-function runSetter(entry, name, callback) {
+function runSetter(entry, name, callback, init) {
   entry._runningSetter = name
 
   const settersMap = entry.setters
@@ -1035,7 +1036,8 @@ function runSetter(entry, name, callback) {
 
         const { last } = setter
 
-        if ((isNsLoaded &&
+        if (init ||
+            (isNsLoaded &&
              type === "dynamic") ||
             ! Object.is(last[name], value)) {
           last[name] = value
@@ -1061,7 +1063,7 @@ function runSetter(entry, name, callback) {
   }
 }
 
-function runSetters(entry, names, callback) {
+function runSetters(entry, names, callback, init) {
   const { _runningSetter } = entry
 
   if (names) {
@@ -1070,7 +1072,7 @@ function runSetters(entry, names, callback) {
         break
       }
 
-      runSetter(entry, name, callback)
+      runSetter(entry, name, callback, init)
     }
   } else {
     for (const name in entry.setters) {
@@ -1078,7 +1080,7 @@ function runSetters(entry, names, callback) {
         break
       }
 
-      runSetter(entry, name, callback)
+      runSetter(entry, name, callback, init)
     }
   }
 }
