@@ -234,9 +234,6 @@ describe("miscellaneous tests", () => {
       const mod = new Module
 
       mod._compile('export const a = "a"', "filename")
-
-      assert.deepStrictEqual(mod.exports, {})
-
       mod.loaded = true
 
       assert.deepEqual(mod.exports, { a: "a" })
