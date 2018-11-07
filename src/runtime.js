@@ -39,55 +39,59 @@ const Runtime = {
     this.addExportGetters([["default", () => value]])
   },
 
-  addExportFromSetter(childEntry, importedName, exportedName = importedName) {
-    const { entry } = this
+  addExportFromSetter(importedName, exportedName = importedName) {
+    return createSetter("from", (value, childEntry) => {
+      const { entry } = this
 
-    if (! Reflect.has(entry.getters, exportedName)) {
-      entry.addGetterFrom(childEntry, importedName, exportedName)
-    }
+      if (! Reflect.has(entry.getters, exportedName)) {
+        entry.addGetterFrom(childEntry, importedName, exportedName)
+      }
+    })
   },
 
   addExportGetters(getterArgsList) {
     this.entry.addGetters(getterArgsList)
   },
 
-  addNamespaceSetter(childEntry) {
-    const { entry } = this
-    const { getters, type } = entry
-    const isESM = type === TYPE_ESM
-    const otherGetters = childEntry.getters
-    const otherType = childEntry.type
+  addNamespaceSetter() {
+    return createSetter("namespace", (value, childEntry) => {
+      const { entry } = this
+      const { getters, type } = entry
+      const isESM = type === TYPE_ESM
+      const otherGetters = childEntry.getters
+      const otherType = childEntry.type
 
-    if ((isESM &&
-          otherType !== TYPE_ESM &&
-          entry.extname === ".mjs") ||
-        (otherType === TYPE_CJS &&
-          ! childEntry.package.options.cjs.namedExports)) {
-      return
-    }
-
-    for (const name in childEntry._namespace) {
-      if (name === "default") {
-        continue
+      if ((isESM &&
+           otherType !== TYPE_ESM &&
+           entry.extname === ".mjs") ||
+          (otherType === TYPE_CJS &&
+           ! childEntry.package.options.cjs.namedExports)) {
+        return
       }
 
-      if (! Reflect.has(getters, name)) {
-        entry.addGetterFrom(childEntry, name)
-
-        if (isESM ||
-            ! Reflect.has(getters, name) ||
-            ! Reflect.has(otherGetters, name)) {
+      for (const name in childEntry._namespace) {
+        if (name === "default") {
           continue
         }
 
-        const ownerName = getters[name].owner.name
+        if (! Reflect.has(getters, name)) {
+          entry.addGetterFrom(childEntry, name)
 
-        if (ownerName !== entry.name &&
-            ownerName !== otherGetters[name].owner.name) {
-          entry.addGetter(name, () => ERROR_STAR)
+          if (isESM ||
+              ! Reflect.has(getters, name) ||
+              ! Reflect.has(otherGetters, name)) {
+            continue
+          }
+
+          const ownerName = getters[name].owner.name
+
+          if (ownerName !== entry.name &&
+              ownerName !== otherGetters[name].owner.name) {
+            entry.addGetter(name, () => ERROR_STAR)
+          }
         }
       }
-    }
+    })
   },
 
   assertImportedBinding(name, value) {
@@ -199,6 +203,7 @@ const Runtime = {
     runtime.global = builtinGlobal
     runtime.importDynamic = Runtime.importDynamic
     runtime.importStatic = Runtime.importStatic
+    runtime.importStatic2 = Runtime.importStatic2
     runtime.run = Runtime.run
     runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
@@ -220,6 +225,7 @@ const Runtime = {
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
     runtime.w = runtime.importStatic
+    runtime.w2 = runtime.importStatic2
     runtime.x = runtime.addExportGetters
 
     return runtime
@@ -254,6 +260,10 @@ const Runtime = {
 
   importStatic(request, setterArgsList) {
     return esmImport(this.entry, request, setterArgsList)
+  },
+
+  importStatic2(request, setterArgsList) {
+    return esmImport(this.entry, request, setterArgsList, true)
   },
 
   run(moduleWrapper) {

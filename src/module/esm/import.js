@@ -19,7 +19,7 @@ const {
   TYPE_ESM
 } = ENTRY
 
-function esmImport(entry, request, setterArgsList) {
+function esmImport(entry, request, setterArgsList, isExport) {
   const { compileData } = entry
   const dependencySpecifiers = compileData && compileData.dependencySpecifiers
 
@@ -43,7 +43,7 @@ function esmImport(entry, request, setterArgsList) {
       throw ERR_INVALID_ESM_FILE_EXTENSION(child)
     }
 
-    childEntry.addSetters(setterArgsList, entry)
+    childEntry.addSetters(setterArgsList, entry, isExport)
   }
 
   const exported = tryRequire(request, entry)
@@ -53,7 +53,7 @@ function esmImport(entry, request, setterArgsList) {
     childEntry = getEntryFrom(request, exported)
     child = childEntry.module
     entry.children[childEntry.name] = childEntry
-    childEntry.addSetters(setterArgsList, entry)
+    childEntry.addSetters(setterArgsList, entry, isExport)
   }
 
   let mockEntry
@@ -64,7 +64,7 @@ function esmImport(entry, request, setterArgsList) {
 
     // Update the mock entry before the original child entry so dynamic import
     // requests are resolved with the mock entry instead of the child entry.
-    mockEntry.addSetters(setterArgsList, entry)
+    mockEntry.addSetters(setterArgsList, entry, isExport)
     mockEntry.loaded()
     mockEntry.updateBindings()
   }

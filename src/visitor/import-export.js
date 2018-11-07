@@ -8,6 +8,7 @@ import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import keys from "../util/keys.js"
 import { lineBreakRegExp } from "../acorn.js"
 import overwrite from "../parse/overwrite.js"
+import pad from "../parse/pad.js"
 import preserveChild from "../parse/preserve-child.js"
 import preserveLine from "../parse/preserve-line.js"
 import shared from "../shared.js"
@@ -24,7 +25,7 @@ function init() {
       const code =
         top.insertPrefix +
         toModuleExport(this, this.hoistedExports) +
-        toModuleImport(this, this.specifierMap)
+        this.hoistedImportsString
 
       this.magicString.prependLeft(top.insertIndex, code)
       this.yieldIndex += code.length
@@ -42,11 +43,11 @@ function init() {
       this.firstLineBreakPos = -1
       this.generateVarDeclarations = false
       this.hoistedExports = null
+      this.hoistedImportsString = ""
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
       this.sourceType = null
-      this.specifierMap = null
       this.strict = false
       this.temporals = null
       this.top = null
@@ -67,7 +68,6 @@ function init() {
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
         this.sourceType = options.sourceType
-        this.specifierMap = { __proto__: null }
         this.strict = options.strict
         this.temporals = { __proto__: null }
         this.top = options.top
@@ -115,44 +115,31 @@ function init() {
       this.addedImportExport = true
 
       const node = path.getValue()
-      const { specifierMap, temporals } = this
-      const sourceName = node.source.value
+      const { specifiers } = node
+      const { length } = specifiers
+      const lastIndex = length - 1
+      const specifierMap = createSpecifierMap(this, node)
 
-      const importSpecifiers =
-        specifierMap[sourceName] ||
-        (specifierMap[sourceName] = { __proto__: null })
+      let hoistedCode = length
+        ? (this.generateVarDeclarations ? "var " : "let ")
+        : ""
 
-      addToDependencySpecifiers(this, sourceName)
+      let i = -1
 
-      for (const specifier of node.specifiers) {
-        const localName = specifier.local.name
-        const { type } = specifier
-
-        let importedName = "*"
-
-        if (type === "ImportSpecifier") {
-          importedName = specifier.imported.name
-        } else if (type === "ImportDefaultSpecifier") {
-          importedName = "default"
-        }
-
-        const types =
-          importSpecifiers[importedName] ||
-          (importSpecifiers[importedName] = {
-            exported: [],
-            imported: []
-          })
-
-        addToDependencySpecifiers(this, sourceName, importedName)
-
-        if (importedName !== "*") {
-          temporals[localName] = true
-        }
-
-        types.imported.push(localName)
+      for (const specifier of specifiers) {
+        hoistedCode +=
+          specifier.local.name +
+          (++i === lastIndex ? ";" : ",")
       }
 
-      preserveLine(this, node)
+      hoistedCode += toModuleImport(
+        this,
+        node.source.value,
+        specifierMap
+      )
+
+      hoistImports(this, node, hoistedCode)
+      addLocals(this, specifierMap)
     }
 
     visitExportAllDeclaration(path) {
@@ -165,30 +152,32 @@ function init() {
       this.changed =
       this.addedImportExport = true
 
+      const { exportedFrom, runtimeName } = this
       const node = path.getValue()
-      const { exportedFrom, specifierMap } = this
-      const sourceName = node.source.value
+      const { original } = this.magicString
+      const { source } = node
+      const specifierName = source.value
 
-      if (! exportedFrom[sourceName]) {
-        exportedFrom[sourceName] = []
+      const hoistedCode = pad(
+        original,
+        runtimeName + '.w("' + specifierName + '"',
+        node.start,
+        source.start
+      ) + pad(
+        original,
+        ',[["*",null,' + runtimeName + ".n()]]);",
+        source.end,
+        node.end
+      )
+
+      if (! exportedFrom[specifierName]) {
+        exportedFrom[specifierName] = []
       }
 
-      this.exportedStars.push(sourceName)
-      addToDependencySpecifiers(this, sourceName)
+      this.exportedStars.push(specifierName)
 
-      const importSpecifiers =
-        specifierMap[sourceName] ||
-        (specifierMap[sourceName] = { __proto__: null })
-
-      const types =
-        importSpecifiers["*"] ||
-        (importSpecifiers["*"] = {
-          exported: [],
-          imported: []
-        })
-
-      types.exported.push("*")
-      preserveLine(this, node)
+      addToDependencySpecifiers(this, specifierName)
+      hoistImports(this, node, hoistedCode)
     }
 
     visitExportDefaultDeclaration(path) {
@@ -284,15 +273,20 @@ function init() {
       this.addedImportExport = true
 
       const node = path.getValue()
+      const { original } =  this.magicString
 
       const {
         declaration,
-        source
+        source,
+        specifiers
       } = node
 
-      const updates = { __proto__: null }
+      let updates
+      let updateNode = node
 
       if (declaration) {
+        updateNode = declaration
+
         const pairs = []
         const { id, type } = declaration
         const isClassDecl = type === "ClassDeclaration"
@@ -304,16 +298,19 @@ function init() {
           // export function named() {}
           const { name } = id
 
-          updates[name] = true
+          updates = [id.name]
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
+          updates = []
+
           // Support exporting variable lists:
           // export let name1, name2, ..., nameN
           for (const { id } of declaration.declarations) {
             const names = getNamesFromPattern(id)
 
+            updates.push(...names)
+
             for (const name of names) {
-              updates[name] = true
               pairs.push([name, name])
             }
           }
@@ -332,11 +329,14 @@ function init() {
         // Support exporting specifiers:
         // export { name1, name2, ..., nameN }
         const { identifiers } = this.top
-        const { original } =  this.magicString
         const pairs = []
 
-        for (const specifier of node.specifiers) {
+        updates = []
+
+        for (const specifier of specifiers) {
           const localName = specifier.local.name
+
+          updates.push(localName)
 
           if (! Reflect.has(identifiers, localName)) {
             throw new errors.SyntaxError(
@@ -346,7 +346,6 @@ function init() {
             )
           }
 
-          updates[localName] = true
           pairs.push([specifier.exported.name, localName])
         }
 
@@ -355,37 +354,46 @@ function init() {
       } else {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
-        // export * as ns from "mod"
         const {
           exportedFrom,
           exportedNames,
-          specifierMap
+          runtimeName
         } = this
 
-        const sourceName = source.value
+        const specifierName = source.value
 
         const fromNames =
-          exportedFrom[sourceName] ||
-          (exportedFrom[sourceName] = [])
+          exportedFrom[specifierName] ||
+          (exportedFrom[specifierName] = [])
 
-        const importSpecifiers =
-          specifierMap[sourceName] ||
-          (specifierMap[sourceName] = { __proto__: null })
+        const lastIndex = specifiers.length - 1
 
-        addToDependencySpecifiers(this, sourceName)
+        let hoistedCode = pad(
+          original,
+          runtimeName + '.w2("' + specifierName + '"',
+          node.start,
+          source.start
+        )
 
-        for (const specifier of node.specifiers) {
+        let i = -1
+        let setterArgsList = ""
+
+        addToDependencySpecifiers(this, specifierName)
+
+        for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
           const localName = specifier.type === "ExportNamespaceSpecifier"
             ? "*"
             : specifier.local.name
 
-          const types =
-            importSpecifiers[localName] ||
-            (importSpecifiers[localName] = {
-              exported: [],
-              imported: []
-            })
+          setterArgsList +=
+            '["' +
+            localName + '",null,' +
+            runtimeName + '.f("' + localName + '","' + exportedName +
+            '")]' +
+            (++i === lastIndex ? "" : ",")
+
+          exportedNames.push(exportedName)
 
           if (exportedName === localName) {
             fromNames.push([exportedName])
@@ -393,22 +401,23 @@ function init() {
             fromNames.push([exportedName, localName])
           }
 
-          exportedNames.push(exportedName)
-          types.exported.push(exportedName)
-          addToDependencySpecifiers(this, sourceName, localName)
+          addToDependencySpecifiers(this, specifierName, localName)
         }
 
-        preserveLine(this, node)
+        hoistedCode += pad(
+          original,
+          ",[" + setterArgsList + "]);",
+          source.end,
+          node.end
+        )
+
+        hoistImports(this, node, hoistedCode)
       }
 
-      const updateNames = keys(updates)
-
-      if (updateNames.length) {
-        const { end } = declaration || node
-
+      if (updates) {
         this.magicString.appendRight(
-          end,
-          ";" + this.runtimeName + ".entry.updateBindings(" + JSON.stringify(updateNames) + ", true);"
+          updateNode.end,
+          ";" + this.runtimeName + ".entry.updateBindings(" + JSON.stringify(updates) + ", true);"
         )
       }
 
@@ -438,18 +447,38 @@ function init() {
     }
   }
 
-  function addToDependencySpecifiers(visitor, sourceName, exportedName) {
+  function addLocals(visitor, specifierMap) {
+    const { temporals } = visitor
+
+    for (const importedName in specifierMap) {
+      if (importedName !== "*") {
+        for (const localName of specifierMap[importedName]) {
+          temporals[localName] = true
+        }
+      }
+    }
+  }
+
+  function addToDependencySpecifiers(visitor, specifierName, exportedName) {
     const { dependencySpecifiers } = visitor
 
     const exportedNames =
-      dependencySpecifiers[sourceName] ||
-      (dependencySpecifiers[sourceName] = [])
+      dependencySpecifiers[specifierName] ||
+      (dependencySpecifiers[specifierName] = [])
 
     if (exportedName &&
         exportedName !== "*" &&
         exportedNames.indexOf(exportedName) === -1) {
       exportedNames.push(exportedName)
     }
+  }
+
+  function addToSpecifierMap(visitor, specifierMap, importedName, localName) {
+    const localNames =
+      specifierMap[importedName] ||
+      (specifierMap[importedName] = [])
+
+    localNames.push(localName)
   }
 
   function canExportedValuesChange({ declaration, type }) {
@@ -470,6 +499,27 @@ function init() {
     return true
   }
 
+  function createSpecifierMap(visitor, node) {
+    const { specifiers } = node
+    const specifierMap = { __proto__: null }
+
+    for (const specifier of specifiers) {
+      const { type } = specifier
+
+      let importedName = "*"
+
+      if (type === "ImportSpecifier") {
+        importedName = specifier.imported.name
+      } else if (type === "ImportDefaultSpecifier") {
+        importedName = "default"
+      }
+
+      addToSpecifierMap(visitor, specifierMap, importedName, specifier.local.name)
+    }
+
+    return specifierMap
+  }
+
   function hoistExports(visitor, node, pairs) {
     visitor.hoistedExports.push(...pairs)
 
@@ -478,6 +528,11 @@ function init() {
     } else {
       preserveLine(visitor, node)
     }
+  }
+
+  function hoistImports(visitor, node, hoistedCode) {
+    visitor.hoistedImportsString += hoistedCode
+    preserveLine(visitor, node)
   }
 
   function safeName(name, localNames) {
@@ -515,88 +570,45 @@ function init() {
     return code
   }
 
-  function toModuleImport(visitor, specifierMap) {
-    const { runtimeName } = visitor
+  function toModuleImport(visitor, specifierName, specifierMap) {
+    const importedNames = keys(specifierMap)
+    const { length } = importedNames
 
-    let code = ""
+    let code = visitor.runtimeName + '.w("' + specifierName + '"'
 
-    const varNames = []
+    addToDependencySpecifiers(visitor, specifierName)
 
-    for (const sourceName in specifierMap) {
-      const importSpecifiers = specifierMap[sourceName]
-      const specifierNames = keys(importSpecifiers)
-
-      for (const specifierName of specifierNames) {
-        varNames.push(...importSpecifiers[specifierName].imported)
-      }
+    if (! length) {
+      return code + ");"
     }
 
-    if (varNames.length) {
+    const lastIndex = length - 1
+
+    let i = -1
+
+    code += ",["
+
+    for (const importedName of importedNames) {
+      const localNames = specifierMap[importedName]
+      const valueParam = safeName("v", localNames)
+
       code +=
-        (visitor.generateVarDeclarations ? "var " : "let ") +
-        varNames.join(",") + ";"
+        '["' +
+        importedName + '",' +
+        (importedName === "*"
+          ? "null"
+          : '["' + localNames.join('","') + '"]'
+        ) +
+        ",function(" + valueParam + "){" +
+        // Multiple local variables become a compound assignment.
+        localNames.join("=") + "=" + valueParam +
+        "}]" +
+        (++i === lastIndex ? "" : ",")
+
+      addToDependencySpecifiers(visitor, specifierName, importedName)
     }
 
-    for (const sourceName in specifierMap) {
-      const importSpecifiers = specifierMap[sourceName]
-      const specifierNames = keys(importSpecifiers)
-      const { length } = specifierNames
-
-      addToDependencySpecifiers(visitor, sourceName)
-
-      code += runtimeName + '.w("' + sourceName + '"'
-
-      if (! length) {
-        code += ");"
-        continue
-      }
-
-      const lastIndex = length - 1
-
-      let i = -1
-
-      code += ",["
-
-      for (const specifierName of specifierNames) {
-        const { exported, imported } = importSpecifiers[specifierName]
-        const bindingNames = [...new Set([...exported, ...imported])]
-        const importedLength = imported.length
-        const entryParam = safeName("e", imported)
-        const valueParam = safeName("v", imported)
-
-        code +=
-          '["' +
-          specifierName + '",' +
-          (specifierName === "*"
-            ? "null"
-            : '["' + bindingNames.join('","') + '"]'
-          ) +
-          ",function(" + valueParam + "," + entryParam + "){"
-
-        if (importedLength) {
-          // Multiple local variables become a compound assignment.
-          code += imported.join("=") + "=" + valueParam
-        }
-
-        if (exported.length) {
-          code +=
-            (importedLength ? ";" : "") +
-            exported
-              .map((exportedName) =>
-                exportedName === "*"
-                  ? runtimeName + ".n(" + entryParam + ")"
-                  : runtimeName + ".f(" + entryParam + ',"' + specifierName + '","' + exportedName + '")'
-              )
-              .join(";")
-        }
-
-        code +=
-          "}]" +
-          (++i === lastIndex ? "" : ",")
-      }
-
-      code += "]);"
-    }
+    code += "]);"
 
     return code
   }
