@@ -1,4 +1,4 @@
-"main";_.x([["value",()=>value]]);let value = 0
+"main";_.x([["value",()=>value]]);let value = 0;_.j(["value"]);
 
 function add(x, y) {
   const value = x

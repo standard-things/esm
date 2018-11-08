@@ -7,4 +7,4 @@ function /* Comment three. */ *
 /*
 Comment four.
 */ // Comment five.
- _anonymous() {}
+ _anonymous() {}_.j(["default"]);

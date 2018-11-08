@@ -205,6 +205,7 @@ const Runtime = {
     runtime.global = builtinGlobal
     runtime.importDynamic = Runtime.importDynamic
     runtime.importStatic = Runtime.importStatic
+    runtime.initBindings = Runtime.initBindings
     runtime.run = Runtime.run
     runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
@@ -219,6 +220,7 @@ const Runtime = {
     runtime.f = runtime.addExportFromSetter
     runtime.g = runtime.global
     runtime.i = runtime.importDynamic
+    runtime.j = runtime.initBindings
     runtime.k = identity
     runtime.n = runtime.addNamespaceSetter
     runtime.r = runtime.run
@@ -260,6 +262,10 @@ const Runtime = {
 
   importStatic(request, setterArgsList) {
     return esmImport(this.entry, request, setterArgsList)
+  },
+
+  initBindings(names) {
+    this.entry.updateBindings(names, true)
   },
 
   run(moduleWrapper) {

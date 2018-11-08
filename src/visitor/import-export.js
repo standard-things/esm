@@ -258,7 +258,7 @@ function init() {
 
       magicString.appendRight(
         node.end,
-        runtimeName + '.entry.updateBindings(["default"], true);'
+        runtimeName + '.j(["default"]);'
       )
 
       path.call(this, "visitWithoutReset", "declaration")
@@ -417,7 +417,7 @@ function init() {
       if (updates) {
         this.magicString.appendRight(
           updateNode.end,
-          ";" + this.runtimeName + ".entry.updateBindings(" + JSON.stringify(updates) + ", true);"
+          ";" + this.runtimeName + ".j(" + JSON.stringify(updates) + ");"
         )
       }
 
