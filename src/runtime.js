@@ -96,12 +96,12 @@ const Runtime = {
     })
   },
 
-  assertImportedBinding(name, value) {
-    if (this.entry.importedBindings[name]) {
-      return value
+  assertImportedBinding: function assertImportedBinding(name, value) {
+    if (! this.entry.importedBindings[name]) {
+      throw new ERR_UNDEFINED_IDENTIFIER(name, assertImportedBinding)
     }
 
-    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.assertImportedBinding)
+    return value
   },
 
   compileEval(content) {
@@ -275,12 +275,12 @@ const Runtime = {
     return this._runResult = runner(entry, moduleWrapper)
   },
 
-  throwConstAssignment() {
-    throw new ERR_CONST_ASSIGNMENT(Runtime.throwConstAssignment)
+  throwConstAssignment: function throwConstAssignment() {
+    throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)
   },
 
-  throwUndefinedIdentifier(name) {
-    throw new ERR_UNDEFINED_IDENTIFIER(name, Runtime.throwUndefinedIdentifier)
+  throwUndefinedIdentifier: function throwUndefinedIdentifier(name) {
+    throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndefinedIdentifier)
   },
 
   updateBindings(valueToPassThrough) {

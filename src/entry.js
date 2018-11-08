@@ -538,7 +538,7 @@ class Entry {
 }
 
 function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
-  handler.get = (target, name, receiver) => {
+  handler.get = function get(target, name, receiver) {
     const { namespace } = source
 
     if (entry.type === TYPE_ESM) {
@@ -548,7 +548,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
         getter()
       } else if (typeof name === "string" &&
           Reflect.has(namespace, name)) {
-        throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
+        throw new ERR_UNDEFINED_IDENTIFIER(name, get)
       }
     }
 
