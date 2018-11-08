@@ -370,7 +370,7 @@ function init() {
 
         let hoistedCode = pad(
           original,
-          runtimeName + '.w2("' + specifierName + '"',
+          runtimeName + '.w("' + specifierName + '"',
           node.start,
           source.start
         )

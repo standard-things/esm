@@ -508,10 +508,8 @@ class Entry {
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    if (this._loaded === LOAD_COMPLETED) {
-      for (const id in parentsMap) {
-        parentsMap[id].updateBindings()
-      }
+    for (const id in parentsMap) {
+      parentsMap[id].updateBindings()
     }
 
     return this
@@ -932,7 +930,7 @@ function mergeProperty(entry, otherEntry, key) {
       entry.addGetter(name, value[name])
     }
   } else if (key === "setters") {
-    const settersMap = entry.setters
+    const settersMap = entry[key]
 
     for (const name in value) {
       const setters = settersMap[name]
@@ -986,15 +984,15 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback, init) {
   entry._runningSetter = name
 
-  const settersMap = entry.setters
-  const setters = settersMap[name]
-
+  const setters = entry.setters[name]
   const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
 
   let isNsChanged = false
   let isNsLoaded = false
+
+  const removed = []
 
   try {
     if (isNs) {
@@ -1008,7 +1006,10 @@ function runSetter(entry, name, callback, init) {
       isNsLoaded = isLoaded
     }
 
+    let i = -1
+
     for (const setter of setters) {
+      ++i
       const { type } = setter
 
       if (isNsChanged &&
@@ -1021,6 +1022,8 @@ function runSetter(entry, name, callback, init) {
       } else {
         let value
 
+        let threw = false
+
         if (isESM &&
             ! isNs) {
           value = getExportByNameFast(entry, name)
@@ -1029,6 +1032,7 @@ function runSetter(entry, name, callback, init) {
         }
 
         if (value === ERROR_GETTER) {
+          threw = true
           value = void 0
         } else if (value === ERROR_STAR) {
           throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
@@ -1037,11 +1041,20 @@ function runSetter(entry, name, callback, init) {
         const { last } = setter
 
         if (init ||
+            (type === "from" &&
+             ! threw &&
+             ! setter.inited) ||
             (isNsLoaded &&
              type === "dynamic") ||
             ! Object.is(last[name], value)) {
           last[name] = value
-          callback(setter, value)
+          const result = callback(setter, value)
+
+          setter.inited = true
+
+          if (result === true) {
+            removed.push(i)
+          }
         }
       }
     }
@@ -1049,15 +1062,17 @@ function runSetter(entry, name, callback, init) {
     entry._runningSetter = null
   }
 
-  if (! isLoaded ||
-      ! isNs) {
-    return
+  for (const i of removed) {
+    setters.splice(i, 1)
   }
 
-  let { length } = setters
+  let length = setters ? setters.length : 0
 
   while (length--) {
-    if (setters[length].type === "dynamic") {
+    const { type } = setters[length]
+
+    if (isNsLoaded &&
+        type === "dynamic") {
       setters.splice(length, 1)
     }
   }

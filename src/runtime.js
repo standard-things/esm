@@ -46,6 +46,8 @@ const Runtime = {
       if (! Reflect.has(entry.getters, exportedName)) {
         entry.addGetterFrom(childEntry, importedName, exportedName)
       }
+
+      return Reflect.has(entry.getters, exportedName)
     })
   },
 
@@ -203,7 +205,6 @@ const Runtime = {
     runtime.global = builtinGlobal
     runtime.importDynamic = Runtime.importDynamic
     runtime.importStatic = Runtime.importStatic
-    runtime.importStatic2 = Runtime.importStatic2
     runtime.run = Runtime.run
     runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
@@ -225,7 +226,6 @@ const Runtime = {
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
     runtime.w = runtime.importStatic
-    runtime.w2 = runtime.importStatic2
     runtime.x = runtime.addExportGetters
 
     return runtime
@@ -260,10 +260,6 @@ const Runtime = {
 
   importStatic(request, setterArgsList) {
     return esmImport(this.entry, request, setterArgsList)
-  },
-
-  importStatic2(request, setterArgsList) {
-    return esmImport(this.entry, request, setterArgsList, true)
   },
 
   run(moduleWrapper) {
