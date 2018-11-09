@@ -1,5 +1,7 @@
 # esm
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/standard-things/esm.svg)](https://greenkeeper.io/)
+
 A fast, production ready, zero-dependency ES module loader for Node 6+!
 
 See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
