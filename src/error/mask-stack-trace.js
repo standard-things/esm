@@ -1,5 +1,3 @@
-import CHAR from "../constant/char.js"
-
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
@@ -15,10 +13,6 @@ import shared from "../shared.js"
 import toString from "../util/to-string.js"
 
 function init() {
-  const {
-    ZERO_WIDTH_NOBREAK_SPACE
-  } = CHAR
-
   const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
   const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
   const blankRegExp = /^\s*$/
@@ -105,24 +99,25 @@ function init() {
     const header = match[0]
     const lineNum = +match[2]
 
+    if (typeof content === "function") {
+      content = content(filename)
+    }
+
+    let contentLines
+    let contentLine
+
+    if (typeof content === "string") {
+      contentLines = content.split("\n")
+      contentLine = contentLines[lineNum - 1] || ""
+    }
+
     let arrowFound = false
 
     stack = stack.replace(arrowRegExp, (match, decoratorLine, decoratorArrow, decoratorNewline = "") => {
       arrowFound = true
 
-      if (decoratorLine.indexOf(ZERO_WIDTH_NOBREAK_SPACE) !== -1) {
-        if (typeof content === "function") {
-          content = content(filename)
-        }
-
-        if (typeof content !== "string") {
-          return ""
-        }
-
-        const contentLines = content.split("\n")
-        const contentLine = contentLines[lineNum - 1] || ""
-
-        return contentLine + (contentLine ? "\n\n" : "\n")
+      if (typeof contentLine !== "string") {
+        return ""
       }
 
       if (lineNum === 1) {
@@ -141,25 +136,17 @@ function init() {
         }
       }
 
-      return decoratorLine + "\n" + decoratorArrow + "\n" + decoratorNewline
+      return decoratorLine === contentLine
+        ? contentLine + "\n" + decoratorArrow + "\n" + decoratorNewline
+        : contentLine + (contentLine ? "\n\n" : "\n")
     })
 
     if (arrowFound) {
       return stack
     }
 
-    if (typeof content === "function") {
-      content = content(filename)
-    }
-
-    if (typeof content !== "string") {
-      return stack
-    }
-
-    const contentLines = content.split("\n")
-    const contentLine = contentLines[lineNum - 1] || ""
-
-    if (contentLine) {
+    if (contentLine &&
+        typeof contentLine === "string") {
       const { length } = header
 
       stack =
