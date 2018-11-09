@@ -127,6 +127,8 @@ function validateDependencies(entry) {
     }
 
     if (childEntry.type === TYPE_ESM) {
+      resolveExportedStars(childEntry)
+
       for (const exportedName of childExportedNames) {
         validateExportedName(childEntry, exportedName)
       }

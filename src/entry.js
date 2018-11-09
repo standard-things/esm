@@ -301,7 +301,9 @@ class Entry {
     setters.push(setter)
 
     for (const name of localNames) {
-      importedBindings[name] = false
+      if (! Reflect.has(importedBindings, name)) {
+        importedBindings[name] = false
+      }
     }
 
     return this
