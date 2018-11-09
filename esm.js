@@ -197,7 +197,7 @@ if (nativeContent) {
 }
 
 const script = new Script(
-  "const __global__ = this;" +
+  "var __global__ = this;" +
   "(function (require, module, __jest__, __shared__) { " +
   content +
   "\n});",
