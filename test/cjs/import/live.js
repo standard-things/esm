@@ -264,7 +264,6 @@ export default () => {
   for (const Ctor of builtinCtors) {
     assert.strictEqual(Ctor.prototype.constructor, Ctor)
     assert.strictEqual(new Ctor().constructor, Ctor)
-
     assert.strictEqual(null instanceof Ctor, false)
     assert.strictEqual(void 0 instanceof Ctor, false)
     assert.strictEqual("" instanceof Ctor, false)
@@ -273,6 +272,8 @@ export default () => {
       assert.ok(stream instanceof Ctor)
       assert.ok(subEvents1 instanceof Ctor)
       assert.ok(subEvents3 instanceof Ctor)
+      assert.strictEqual(subEvents1 instanceof SubEvents3, false)
+      assert.strictEqual(subEvents3 instanceof SubEvents1, false)
     }
   }
 

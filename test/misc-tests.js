@@ -160,28 +160,34 @@ describe("miscellaneous tests", () => {
       ]
 
       for (const Ctor of Ctors) {
-        class Sub extends Ctor {
+        class Sub1 extends Ctor {
           constructor(...args) {
             super(...args)
             this.sub = "sub"
           }
         }
 
-        const actual = new Sub
+        class Sub2 extends Ctor {}
 
-        assert.strictEqual(actual.sub, "sub")
-        assert.ok(Reflect.has(actual, "domain"))
+        const sub1 = new Sub1
+        const sub2 = new Sub2
 
-        assert.ok(actual instanceof Ctor)
-        assert.ok(actual instanceof Sub)
+        assert.ok(sub1 instanceof Ctor)
+        assert.ok(sub1 instanceof Sub1)
+        assert.ok(Reflect.has(sub1, "domain"))
+        assert.strictEqual(sub1.sub, "sub")
+
+        assert.ok(sub2 instanceof Ctor)
+        assert.ok(sub2 instanceof Sub2)
+        assert.strictEqual(sub2 instanceof Sub1, false)
 
         if (canTestHasInstance) {
           if (canTestDuplexInstance &&
               Ctor === stream.Duplex) {
-            assert.ok(actual instanceof stream.Writable)
+            assert.ok(sub1 instanceof stream.Writable)
           }
 
-          assert.ok(actual instanceof stream)
+          assert.ok(sub1 instanceof stream)
         }
       }
     })

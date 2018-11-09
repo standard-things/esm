@@ -143,9 +143,14 @@ function init() {
       } else if (name === "Object") {
         Reflect.defineProperty(builtin, Symbol.hasInstance, {
           configurable: true,
-          value: (instance) =>
-            instance instanceof realmBuiltin ||
-            instanceOf(instance, builtin)
+          value: function (instance) {
+            if (this === builtin) {
+              return instance instanceof realmBuiltin ||
+                instanceOf(instance, builtin)
+            }
+
+            return instanceOf(instance, this)
+          }
         })
       }
 
