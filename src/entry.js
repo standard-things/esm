@@ -72,8 +72,6 @@ class Entry {
     this._require = TYPE_CJS
     // The name of the running setter.
     this._runningSetter = null
-    // The initialized state of bindings imported by the module.
-    this.importedBindings = { __proto__: null }
     // The builtin module indicator.
     this.builtin = false
     // The cache name of the module.
@@ -104,6 +102,8 @@ class Entry {
     this.getters = { __proto__: null }
     // The unique id for the module cache.
     this.id = mod.id
+    // The initialized state of bindings imported by the module.
+    this.importedBindings = { __proto__: null }
     // The module the entry is managing.
     this.module = mod
     // The mtime of the module.

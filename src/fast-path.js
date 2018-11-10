@@ -59,8 +59,8 @@ function init() {
       }
 
       while (i-- > 0) {
-        // Without a complete list of node type names, we have to settle for this
-        // fuzzy matching of object shapes.
+        // Without a complete list of node type names, we have to settle for
+        // this fuzzy matching of object shapes.
         const value = stack[i--]
 
         if (isObject(value) &&

@@ -12,7 +12,9 @@ function init() {
     if (childStart > visitor.firstLineBreakPos) {
       const count = childStart - parentStart
 
-      indentation = count === 7 ? "       " : " ".repeat(count)
+      indentation = count === 7
+        ? "       "
+        : " ".repeat(count)
     } else {
       indentation = ""
     }

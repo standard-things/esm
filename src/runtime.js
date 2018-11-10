@@ -57,8 +57,8 @@ const Runtime = {
   addNamespaceSetter() {
     return createSetter("namespace", (value, childEntry) => {
       const { entry } = this
-      const { getters, type } = entry
-      const isESM = type === TYPE_ESM
+      const { getters } = entry
+      const isESM = entry.type === TYPE_ESM
       const otherGetters = childEntry.getters
       const otherType = childEntry.type
 
