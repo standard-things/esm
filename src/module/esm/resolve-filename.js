@@ -190,9 +190,14 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
   }
 
-  foundPath = _resolveFilename(request, parent, isMain, options, fields)
+  foundPath = Module._resolveFilename(request, parent, isMain, options)
 
   if (foundPath) {
+    if (cjsPaths) {
+      cache.set(cacheKey, foundPath)
+      return foundPath
+    }
+
     throw new ERR_MODULE_RESOLUTION_LEGACY(request, fromPath, foundPath)
   }
 
