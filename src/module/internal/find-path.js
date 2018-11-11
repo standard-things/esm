@@ -11,7 +11,6 @@ import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 
-import call from "../../util/call.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
@@ -126,7 +125,7 @@ function findPath(request, paths, isMain, fields, exts) {
       stat = statSync(thePath)
 
       if (stat) {
-        rc = call(isFile, stat) ? 0 : 1
+        rc = Reflect.apply(isFile, stat, []) ? 0 : 1
       }
     } else {
       rc = statFast(thePath)
@@ -214,7 +213,7 @@ function tryFilename(filename, isMain) {
     stat = statSync(filename)
 
     if (stat) {
-      rc = call(isFile, stat) ? 0 : 1
+      rc = Reflect.apply(isFile, stat, []) ? 0 : 1
     }
   } else {
     rc = statFast(filename)

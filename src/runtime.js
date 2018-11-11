@@ -4,7 +4,6 @@ import Compiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 
 import builtinGlobal from "./builtin/global.js"
-import call from "./util/call.js"
 import errors from "./errors.js"
 import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
@@ -332,7 +331,7 @@ function runESM(entry, moduleWrapper) {
       makeRequireFunction(mod)
     ])
   } else {
-    result = call(moduleWrapper)
+    result = Reflect.apply(moduleWrapper, void 0, [])
   }
 
   let { loaded } = mod

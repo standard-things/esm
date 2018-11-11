@@ -2,7 +2,6 @@ import Module from "../module.js"
 import Package from "../package.js"
 import Wrapper from "../wrapper.js"
 
-import call from "../util/call.js"
 import { dirname } from "../safe/path.js"
 import esmParseLoad from "../module/esm/parse-load.js"
 import esmResolveFilename from "../module/esm/resolve-filename.js"
@@ -42,7 +41,7 @@ function hook(Mod) {
     const _tickCallback = getSilent(realProcess, "_tickCallback")
 
     if (typeof _tickCallback === "function") {
-      call(_tickCallback, realProcess)
+      Reflect.apply(_tickCallback, realProcess, [])
     }
   }
 

@@ -1,7 +1,6 @@
 import { Stats } from "../safe/fs.js"
 
 import binding from "../binding.js"
-import call from "../util/call.js"
 import shared from "../shared.js"
 import statSync from "./stat-sync.js"
 import toNamespacedPath from "../path/to-namespaced-path.js"
@@ -57,7 +56,7 @@ function init() {
     const stat = statSync(thePath)
 
     if (stat) {
-      return call(isFile, stat) ? 0 : 1
+      return Reflect.apply(isFile, stat, []) ? 0 : 1
     }
 
     return -1

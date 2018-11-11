@@ -1,6 +1,5 @@
 import OwnProxy from "../own/proxy.js"
 
-import call from "../util/call.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
@@ -34,7 +33,7 @@ function init() {
         }
 
         try {
-          return call(_toString, thisArg)
+          return Reflect.apply(_toString, thisArg, [])
         } catch (e) {
           if (typeof thisArg !== "function") {
             throw e
@@ -43,7 +42,7 @@ function init() {
 
         if (isOwnProxy(thisArg)) {
           try {
-            return call(_toString, unwrapProxy(thisArg))
+            return Reflect.apply(_toString, unwrapProxy(thisArg), [])
           } catch {}
         }
 
@@ -53,7 +52,7 @@ function init() {
       try {
         funcProto.toString = new OwnProxy(_toString, {
           apply(target, thisArg) {
-            return call(toString, thisArg)
+            return Reflect.apply(toString, thisArg, [])
           }
         })
 

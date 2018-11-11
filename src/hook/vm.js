@@ -14,7 +14,6 @@ import Wrapper from "../wrapper.js"
 import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
-import call from "../util/call.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
 import { config } from "../safe/process.js"
 import esmValidate from "../module/esm/validate.js"
@@ -180,7 +179,7 @@ function hook(vm) {
       REPLServer.prototype.createContext = proxyWrap(createContext, function () {
         REPLServer.prototype.createContext = createContext
 
-        const context = call(createContext, this)
+        const context = Reflect.apply(createContext, this, [])
 
         setupEntry(context.module)
         return context
