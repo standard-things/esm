@@ -16,12 +16,12 @@ function init() {
     const exported = { __proto__: null }
     const funcs = { __proto__: null }
     const identifiers = { __proto__: null }
-    const importedLocals = { __proto__: null }
+    const importedBindings = { __proto__: null }
     const { inModule } = this
 
     const top = {
       identifiers,
-      importedLocals,
+      importedBindings,
       insertIndex: node.start,
       insertPrefix: ""
     }
@@ -94,12 +94,12 @@ function init() {
         for (const { local } of object.specifiers) {
           const { name } = local
 
-          if (Reflect.has(importedLocals, name)) {
+          if (Reflect.has(importedBindings, name)) {
             raiseRedeclaration(this, local.start, name)
           }
 
           identifiers[name] =
-          importedLocals[name] = true
+          importedBindings[name] = true
         }
       }
 

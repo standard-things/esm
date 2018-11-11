@@ -14,13 +14,13 @@ function init() {
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
-      this.temporals = null
+      this.temporalBindings = null
 
       if (options) {
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
-        this.temporals = options.temporals
+        this.temporalBindings = options.temporalBindings
       }
     }
 
@@ -28,7 +28,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (! this.temporals[name] ||
+      if (! this.temporalBindings[name] ||
           getShadowed(path, name, shadowedMap)) {
         return
       }

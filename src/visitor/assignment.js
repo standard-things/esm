@@ -10,15 +10,15 @@ function init() {
 
   class AssignmentVisitor extends Visitor {
     reset(options) {
-      this.assignableExports = null
-      this.importedLocals = null
+      this.assignableBindings = null
+      this.importedBindings = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
 
       if (options) {
-        this.assignableExports = options.assignableExports
-        this.importedLocals = options.importedLocals
+        this.assignableBindings = options.assignableBindings
+        this.importedBindings = options.importedBindings
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -37,8 +37,8 @@ function init() {
 
   function checkAndMaybeWrap(visitor, path, childName) {
     const {
-      assignableExports,
-      importedLocals,
+      assignableBindings,
+      importedBindings,
       magicString,
       runtimeName
     } = visitor
@@ -48,9 +48,9 @@ function init() {
     const { end, start } = node
 
     for (const name of names) {
-      if (Reflect.has(importedLocals, name) &&
+      if (Reflect.has(importedBindings, name) &&
           ! getShadowed(path, name, shadowedMap)) {
-        // Throw a type error for assignments to imported locals.
+        // Throw a type error for assignments to imported bindings.
         overwrite(
           visitor,
           start,
@@ -61,7 +61,7 @@ function init() {
     }
 
     for (const name of names) {
-      if (assignableExports[name]) {
+      if (assignableBindings[name]) {
         const shadowed = getShadowed(path, name, shadowedMap)
 
         if (! shadowed ||

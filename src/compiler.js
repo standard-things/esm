@@ -140,7 +140,7 @@ function init() {
       }
 
       const { strict, top } = ast
-      const { identifiers, importedLocals } = top
+      const { identifiers, importedBindings } = top
       const { runtimeName } = options
 
       Reflect.deleteProperty(ast, "top")
@@ -169,10 +169,7 @@ function init() {
         throw e
       }
 
-      const {
-        addedImportExport,
-        temporals
-      } = importExportVisitor
+      const { addedImportExport } = importExportVisitor
 
       if (addedImportExport ||
           importExportVisitor.addedImportMeta) {
@@ -208,18 +205,18 @@ function init() {
       }
 
       if (addedImportExport) {
-        const { assignableExports } = importExportVisitor
+        const { assignableBindings } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
-          ...keys(importedLocals),
-          ...keys(assignableExports)
+          ...keys(importedBindings),
+          ...keys(assignableBindings)
         ])
 
         if (possibleIndexes.length) {
           try {
             assignmentVisitor.visit(rootPath, {
-              assignableExports,
-              importedLocals,
+              assignableBindings,
+              importedBindings,
               magicString,
               possibleIndexes,
               runtimeName
@@ -243,8 +240,10 @@ function init() {
         result.sourceType = MODULE
 
         if (addedImportExport) {
+          const { temporalBindings } = importExportVisitor
+
           result.enforceTDZ = () => {
-            const possibleIndexes = findIndexes(code, keys(temporals))
+            const possibleIndexes = findIndexes(code, keys(temporalBindings))
 
             possibleIndexes.push(...possibleExportIndexes)
             possibleIndexes.sort()
@@ -255,7 +254,7 @@ function init() {
               magicString,
               possibleIndexes,
               runtimeName,
-              temporals
+              temporalBindings
             })
 
             if (temporalVisitor.changed) {
@@ -277,7 +276,7 @@ function init() {
           ]
 
           for (const name of names) {
-            if (! Reflect.has(importedLocals, name)) {
+            if (! Reflect.has(importedBindings, name)) {
               possibleNames.push(name)
             }
           }
