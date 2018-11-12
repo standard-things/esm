@@ -290,6 +290,7 @@ class Entry {
       settersMap[name] ||
       (settersMap[name] = [])
 
+    setter.inited = false
     setter.last = { __proto__: null }
     setter.localNames = localNames
     setter.parent = parent
@@ -1043,18 +1044,16 @@ function runSetter(entry, name, callback, init) {
         const { last } = setter
 
         if (init ||
-            (type === "from" &&
-             ! threw &&
-             ! setter.inited) ||
+            (! threw &&
+             ! setter.inited &&
+             type === "from") ||
             (isNsLoaded &&
              type === "dynamic") ||
             ! Object.is(last[name], value)) {
           last[name] = value
-          const result = callback(setter, value)
-
           setter.inited = true
 
-          if (result === true) {
+          if (callback(setter, value)) {
             removed.push(i)
           }
         }
