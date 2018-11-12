@@ -25,6 +25,12 @@ function init() {
       return cached.proxy
     }
 
+    cached = cache.get(source)
+
+    if (cached) {
+      source = cached.source
+    }
+
     const proxy = new OwnProxy(func, {
       get: function get(target, name, receiver) {
         if (name === "toString" &&
@@ -59,12 +65,6 @@ function init() {
         }
       }
     })
-
-    source = cache.get(source) || source
-
-    if (typeof source !== "function") {
-      source = source.source
-    }
 
     copyProperty(func, source, "name")
     setPrototypeOf(func, getPrototypeOf(source))
