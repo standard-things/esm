@@ -124,8 +124,10 @@ function init() {
     ).runInContext(context)
 
     for (const name of builtinNames) {
-      if (Reflect.has(builtinDescriptors, name)) {
-        Reflect.defineProperty(context, name, builtinDescriptors[name])
+      const descriptor = builtinDescriptors[name]
+
+      if (descriptor) {
+        Reflect.defineProperty(context, name, descriptor)
       }
 
       const builtin = context[name]
