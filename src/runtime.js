@@ -322,35 +322,27 @@ function runESM(entry, moduleWrapper) {
   const mod = entry.module
   const exported = mod.exports = entry.exports
 
-  let result
-
-  if (entry.package.options.cjs.vars &&
-      entry.extname !== ".mjs") {
-    result = Reflect.apply(moduleWrapper, exported, [
-      exported,
-      makeRequireFunction(mod)
-    ])
-  } else {
-    result = Reflect.apply(moduleWrapper, void 0, [])
-  }
-
-  let { loaded } = mod
-
   Reflect.defineProperty(mod, "loaded", {
     configurable: true,
     enumerable: true,
-    get: () => loaded,
+    get: () => false,
     set(value) {
       if (value) {
         setProperty(this, "loaded", value)
         entry.updateBindings().loaded()
-      } else {
-        loaded = value
       }
     }
   })
 
-  return result
+  if (entry.package.options.cjs.vars &&
+      entry.extname !== ".mjs") {
+    return Reflect.apply(moduleWrapper, exported, [
+      exported,
+      makeRequireFunction(mod)
+    ])
+  }
+
+  return Reflect.apply(moduleWrapper, void 0, [])
 }
 
 export default Runtime
