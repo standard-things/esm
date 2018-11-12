@@ -163,8 +163,8 @@ function init() {
     const { dependencySpecifiers } = compileData
     const result = { __proto__: null }
 
-    for (const specifier in dependencySpecifiers) {
-      result[specifier] = dependencySpecifiers[specifier].exportedNames
+    for (const request in dependencySpecifiers) {
+      result[request] = dependencySpecifiers[request].exportedNames
     }
 
     return result
@@ -174,10 +174,10 @@ function init() {
     const { dependencySpecifiers } = compileData
     const result = { __proto__: null }
 
-    for (const specifier in dependencySpecifiers) {
-      result[specifier] = {
+    for (const request in dependencySpecifiers) {
+      result[request] = {
         entry: null,
-        exportedNames: dependencySpecifiers[specifier]
+        exportedNames: dependencySpecifiers[request]
       }
     }
 
@@ -193,11 +193,11 @@ function init() {
 
     const { exportedFrom } = compileData
 
-    for (const specifier in exportedFrom) {
-      for (const names of exportedFrom[specifier]) {
+    for (const request in exportedFrom) {
+      for (const names of exportedFrom[request]) {
         result[names[0]] = {
           local: names[names.length - 1],
-          specifier
+          request
         }
       }
     }

@@ -24,29 +24,29 @@ function validate(entry) {
   }
 }
 
-function isDescendant(sourceEntry, searchEntry, seen) {
-  if (sourceEntry.builtin ||
-      sourceEntry.type !== TYPE_ESM) {
+function isDescendant(entry, parentEntry, seen) {
+  if (entry.builtin ||
+      entry.type !== TYPE_ESM) {
     return false
   }
 
-  const sourceName = sourceEntry.name
+  const parentName = parentEntry.name
 
   if (seen &&
-      Reflect.has(seen, sourceName)) {
+      Reflect.has(seen, parentName)) {
     return false
   } else {
     seen || (seen = { __proto__: null })
   }
 
-  seen[sourceName] = true
+  seen[parentName] = true
 
-  const { children } = sourceEntry
-  const searchName = searchEntry.name
+  const { children } = parentEntry
+  const { name } = entry
 
-  for (const name in children) {
-    if (name === searchName ||
-        isDescendant(children[name], searchEntry, seen)) {
+  for (const childName in children) {
+    if (childName === name ||
+        isDescendant(entry, children[childName], seen)) {
       return true
     }
   }
@@ -58,10 +58,10 @@ function parseDependencies(entry) {
   const { dependencySpecifiers } = entry.compileData
   const mod = entry.module
 
-  for (const specifier in dependencySpecifiers) {
-    const childEntry = esmLoad(specifier, mod)
+  for (const request in dependencySpecifiers) {
+    const childEntry = esmLoad(request, mod)
 
-    dependencySpecifiers[specifier].entry =
+    dependencySpecifiers[request].entry =
     entry.children[childEntry.name] = childEntry
 
     if (! childEntry.builtin &&
@@ -75,8 +75,8 @@ function resolveExportedStars(entry) {
   const { compileData } = entry
   const { dependencySpecifiers, exportedSpecifiers } = compileData
 
-  for (const specifier of compileData.exportedStars) {
-    const childEntry = dependencySpecifiers[specifier].entry
+  for (const request of compileData.exportedStars) {
+    const childEntry = dependencySpecifiers[request].entry
 
     if (! childEntry ||
         childEntry.builtin ||
@@ -93,7 +93,7 @@ function resolveExportedStars(entry) {
         const exportedSpecifier = exportedSpecifiers[exportedName]
 
         if (typeof exportedSpecifier !== "boolean" &&
-            exportedSpecifier.specifier !== specifier) {
+            exportedSpecifier.request !== request) {
           // Export specifier is conflicted.
           exportedSpecifiers[exportedName] = false
         }
@@ -101,7 +101,7 @@ function resolveExportedStars(entry) {
         // Export specifier is imported.
         exportedSpecifiers[exportedName] = {
           local: exportedName,
-          specifier
+          request
         }
       }
     }
@@ -115,11 +115,11 @@ function validateDependencies(entry) {
     entry.package.options.cjs.namedExports &&
     entry.extname !== ".mjs"
 
-  for (const specifier in dependencySpecifiers) {
+  for (const request in dependencySpecifiers) {
     const {
       entry:childEntry,
       exportedNames:childExportedNames
-    } = dependencySpecifiers[specifier]
+    } = dependencySpecifiers[request]
 
     if (! childEntry ||
         childEntry.builtin) {
@@ -163,10 +163,10 @@ function validateExportedName(entry, exportedName, seen) {
   if (seen &&
       Reflect.has(seen, name) &&
       exportedSpecifier !== true) {
-    const { specifier } = exportedSpecifier
-    const childEntry = dependencySpecifiers[specifier].entry
+    const { request } = exportedSpecifier
+    const childEntry = dependencySpecifiers[request].entry
 
-    if (exportedStars.indexOf(specifier) === -1) {
+    if (exportedStars.indexOf(request) === -1) {
       throw new ERR_EXPORT_CYCLE(mod, exportedName)
     } else if (childEntry.compileData.exportedSpecifiers[exportedName] !== true) {
       throw new ERR_EXPORT_MISSING(mod, exportedName)
@@ -174,8 +174,8 @@ function validateExportedName(entry, exportedName, seen) {
   } else if (Reflect.has(exportedSpecifiers, exportedName)) {
     if (exportedSpecifier) {
       if (exportedSpecifier !== true) {
-        const { local, specifier } = exportedSpecifier
-        const childEntry = dependencySpecifiers[specifier].entry
+        const { local, request } = exportedSpecifier
+        const childEntry = dependencySpecifiers[request].entry
 
         if (childEntry) {
           seen || (seen = { __proto__: null })
@@ -189,8 +189,8 @@ function validateExportedName(entry, exportedName, seen) {
   } else {
     let throwExportMissing = true
 
-    for (const specifier of exportedStars) {
-      const childEntry = dependencySpecifiers[specifier].entry
+    for (const request of exportedStars) {
+      const childEntry = dependencySpecifiers[request].entry
 
       if (! childEntry ||
           childEntry.type !== TYPE_ESM) {
