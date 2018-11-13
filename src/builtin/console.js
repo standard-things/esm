@@ -19,6 +19,7 @@ import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import setDeferred from "../util/set-deferred.js"
 import shared from "../shared.js"
+import toString from "../util/to-string.js"
 
 function init() {
   const {
@@ -34,7 +35,7 @@ function init() {
 
   const instanceSymbol = Object
     .getOwnPropertySymbols(safeConsole)
-    .find((symbol) => instanceRegExp.test(String(symbol))) ||
+    .find((symbol) => instanceRegExp.test(toString(symbol))) ||
     Symbol("kIsConsole")
 
   const builtinLog = wrapBuiltin(realProto.log)
@@ -198,16 +199,16 @@ function init() {
       }
     }
   } else if (ELECTRON_RENDERER) {
-    // Assign `console` to a variable so it won't be removed by
+    // Assign `console` to a variable so it's not removed by
     // `babel-plugin-transform-remove-console`.
-    const unmunged = console
-    const names = keys(unmunged)
+    const unmungedConsole = console
+    const names = keys(unmungedConsole)
 
     for (const name of names) {
       if (name !== "Console" &&
           has(builtinConsole, name)) {
         // eslint-disable-next-line no-console
-        const consoleFunc = unmunged[name]
+        const consoleFunc = unmungedConsole[name]
         const builtinFunc = builtinConsole[name]
 
         if (typeof builtinFunc === "function" &&

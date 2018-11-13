@@ -247,7 +247,7 @@ const Runtime = {
           // Step 6: Coerce request to a string.
           // https://tc39.github.io/proposal-dynamic-import/#sec-import-call-runtime-semantics-evaluation
           if (typeof request !== "string") {
-            request = String(request)
+            request = request + ""
           }
 
           esmImport(this.entry, request, [["*", null, createSetter("dynamic", (value, childEntry) => {

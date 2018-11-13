@@ -229,8 +229,7 @@ function init() {
         get: (target, name) => target[name]
       })
 
-      // Return a result so the test has a side effect and won't be removed by
-      // Terser's "unsafe" option.
+      // Return a result so the test won't be removed by Terser.
       // https://github.com/terser-js/terser#the-unsafe-compress-option
       return typeof proxy.toString() === "string"
     } catch (e) {
