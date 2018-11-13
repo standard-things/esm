@@ -330,7 +330,7 @@ function init() {
         specifiers
       } = node
 
-      const inited = { __proto__: null }
+      const initBindings = { __proto__: null }
 
       if (declaration) {
         const pairs = []
@@ -353,7 +353,7 @@ function init() {
           }
 
           if (! initedBindings[name]) {
-            inited[name] =
+            initBindings[name] =
             initedBindings[name] = true
           }
 
@@ -373,7 +373,7 @@ function init() {
               }
 
               if (! initedBindings[name]) {
-                inited[name] =
+                initBindings[name] =
                 initedBindings[name] = true
               }
 
@@ -403,7 +403,7 @@ function init() {
           }
 
           if (! initedBindings[localName]) {
-            inited[localName] =
+            initBindings[localName] =
             initedBindings[localName] = true
           }
 
@@ -460,14 +460,14 @@ function init() {
         hoistImports(this, node, code)
       }
 
-      const initedNames = keys(inited)
+      const initNames = keys(initBindings)
 
-      if (initedNames.length) {
+      if (initNames.length) {
         const { end } = declaration || node
 
         magicString.appendRight(
           end,
-          ";" + runtimeName + ".j(" + JSON.stringify(initedNames) + ");"
+          ";" + runtimeName + ".j(" + JSON.stringify(initNames) + ");"
         )
       }
 
