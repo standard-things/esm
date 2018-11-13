@@ -19,6 +19,7 @@ import toExternalError from "./util/to-external-error.js"
 
 const {
   ERROR_STAR,
+  LOAD_COMPLETED,
   TYPE_CJS,
   TYPE_ESM
 } = ENTRY
@@ -45,8 +46,6 @@ const Runtime = {
       if (! Reflect.has(entry.getters, exportedName)) {
         entry.addGetterFrom(childEntry, importedName, exportedName)
       }
-
-      return Reflect.has(entry.getters, exportedName)
     })
   },
 
@@ -248,8 +247,9 @@ const Runtime = {
           }
 
           esmImport(this.entry, request, [["*", null, createSetter("dynamic", (value, childEntry) => {
-            if (childEntry._loaded === 1) {
+            if (childEntry._loaded === LOAD_COMPLETED) {
               resolvePromise(value)
+              return true
             }
           })]])
         } catch (e) {
