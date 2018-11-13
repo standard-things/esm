@@ -68,8 +68,6 @@ class Entry {
     this._passthru = false
     // The load type for `module.require()`.
     this._require = TYPE_CJS
-    // The name of the running setter.
-    this._runningSetter = null
     // The builtin module indicator.
     this.builtin = false
     // The cache name of the module.
@@ -986,83 +984,67 @@ function runSetter(entry, name, callback, init) {
     return
   }
 
-  entry._runningSetter = name
-
   const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
   const isNsChanged = entry._changed
 
-  try {
-    let { length } = setters
+  let { length } = setters
 
-    while (length--) {
-      const setter = setters[length]
+  while (length--) {
+    const setter = setters[length]
 
-      let value
+    let value
 
-      if (isESM &&
-          ! isNs) {
-        value = getExportByNameFast(entry, name)
-      } else {
-        value = getExportByName(entry, name, setter.parent)
-      }
-
-      if (value === ERROR_GETTER) {
-        value = void 0
-      } else if (value === ERROR_STAR) {
-        throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
-      }
-
-      const { last, type } = setter
-      const changed = type !== "dynamic" && ! Object.is(last, value)
-      const isDynamicImport = isLoaded && type === "dynamic"
-      const isExportFrom = type === "from"
-      const isExportNs = isNsChanged && type === "namespace"
-
-      if (changed ||
-          init ||
-          isDynamicImport ||
-          isExportFrom ||
-          isExportNs) {
-        setter.last = value
-
-        const result = setter(value, entry)
-
-        if (result) {
-          if (isDynamicImport) {
-            setters.splice(length, 1)
-          }
-        } else if (isExportFrom &&
-            ! changed) {
-          continue
-        }
-
-        callback(setter)
-      }
+    if (isESM &&
+        ! isNs) {
+      value = getExportByNameFast(entry, name)
+    } else {
+      value = getExportByName(entry, name, setter.parent)
     }
-  } finally {
-    entry._runningSetter = null
+
+    if (value === ERROR_GETTER) {
+      value = void 0
+    } else if (value === ERROR_STAR) {
+      throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
+    }
+
+    const { last, type } = setter
+    const changed = type !== "dynamic" && ! Object.is(last, value)
+    const isDynamicImport = isLoaded && type === "dynamic"
+    const isExportFrom = type === "from"
+    const isExportNs = isNsChanged && type === "namespace"
+
+    if (changed ||
+        init ||
+        isDynamicImport ||
+        isExportFrom ||
+        isExportNs) {
+      setter.last = value
+
+      const result = setter(value, entry)
+
+      if (result) {
+        if (isDynamicImport) {
+          setters.splice(length, 1)
+        }
+      } else if (isExportFrom &&
+          ! changed) {
+        continue
+      }
+
+      callback(setter)
+    }
   }
 }
 
 function runSetters(entry, names, callback, init) {
-  const { _runningSetter } = entry
-
   if (names) {
     for (const name of names) {
-      if (name === _runningSetter) {
-        break
-      }
-
       runSetter(entry, name, callback, init)
     }
   } else {
     for (const name in entry.setters) {
-      if (name === _runningSetter) {
-        break
-      }
-
       runSetter(entry, name, callback, init)
     }
   }
