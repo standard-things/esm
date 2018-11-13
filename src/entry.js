@@ -50,8 +50,6 @@ const {
   ERR_UNDEFINED_IDENTIFIER
 } = errors
 
-const noopSetter = () => {}
-
 const pseudoDescriptor = {
   value: true
 }
@@ -290,8 +288,7 @@ class Entry {
       settersMap[name] ||
       (settersMap[name] = [])
 
-    setter.inited = false
-    setter.last = { __proto__: null }
+    setter.last = void 0
     setter.localNames = localNames
     setter.parent = parent
 
@@ -492,14 +489,12 @@ class Entry {
     }
 
     runGetters(this, names)
-    runSetters(this, names, (setter, value) => {
+    runSetters(this, names, (setter) => {
       const parentEntry = setter.parent
       const { importedBindings } = parentEntry
 
       parentsMap || (parentsMap = { __proto__: null })
       parentsMap[parentEntry.name] = parentEntry
-
-      setter(value, this)
 
       for (const name of setter.localNames) {
         importedBindings[name] = true
@@ -985,97 +980,69 @@ function runGetters(entry, names) {
 }
 
 function runSetter(entry, name, callback, init) {
+  const setters = entry.setters[name]
+
+  if (! setters) {
+    return
+  }
+
   entry._runningSetter = name
 
-  const setters = entry.setters[name]
   const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNs = name === "*"
-
-  let isNsChanged = false
-  let isNsLoaded = false
-
-  const removed = []
+  const isNsChanged = entry._changed
 
   try {
-    if (isNs) {
-      for (const setter of setters) {
-        if (setter.type === "namespace") {
-          setter(void 0, entry)
-        }
+    let { length } = setters
+
+    while (length--) {
+      const setter = setters[length]
+
+      let value
+
+      if (isESM &&
+          ! isNs) {
+        value = getExportByNameFast(entry, name)
+      } else {
+        value = getExportByName(entry, name, setter.parent)
       }
 
-      isNsChanged = entry._changed
-      isNsLoaded = isLoaded
-    }
+      if (value === ERROR_GETTER) {
+        value = void 0
+      } else if (value === ERROR_STAR) {
+        throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
+      }
 
-    let i = -1
+      const { last, type } = setter
+      const changed = type !== "dynamic" && ! Object.is(last, value)
+      const isDynamicImport = isLoaded && type === "dynamic"
+      const isExportFrom = type === "from"
+      const isExportNs = isNsChanged && type === "namespace"
 
-    for (const setter of setters) {
-      ++i
-      const { type } = setter
+      if (changed ||
+          init ||
+          isDynamicImport ||
+          isExportFrom ||
+          isExportNs) {
+        setter.last = value
 
-      if (isNsChanged &&
-          type === "namespace") {
-        noopSetter.last = setter.last
-        noopSetter.localNames = setter.localNames
-        noopSetter.parent = setter.parent
-        noopSetter.type = type
-        callback(noopSetter)
-      } else {
-        let value
+        const result = setter(value, entry)
 
-        let threw = false
-
-        if (isESM &&
-            ! isNs) {
-          value = getExportByNameFast(entry, name)
-        } else {
-          value = getExportByName(entry, name, setter.parent)
-        }
-
-        if (value === ERROR_GETTER) {
-          threw = true
-          value = void 0
-        } else if (value === ERROR_STAR) {
-          throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
-        }
-
-        const { last } = setter
-
-        if (init ||
-            (! threw &&
-             ! setter.inited &&
-             type === "from") ||
-            (isNsLoaded &&
-             type === "dynamic") ||
-            ! Object.is(last[name], value)) {
-          last[name] = value
-          setter.inited = true
-
-          if (callback(setter, value)) {
-            removed.push(i)
+        if (result) {
+          if (isDynamicImport) {
+            setters.splice(length, 1)
           }
+        } else if (isExportFrom &&
+            ! changed) {
+          continue
         }
+
+        callback(setter)
       }
     }
   } finally {
     entry._runningSetter = null
-  }
-
-  for (const i of removed) {
-    setters.splice(i, 1)
-  }
-
-  let length = setters ? setters.length : 0
-
-  while (length--) {
-    const { type } = setters[length]
-
-    if (isNsLoaded &&
-        type === "dynamic") {
-      setters.splice(length, 1)
-    }
   }
 }
 
