@@ -43,6 +43,7 @@ function init() {
       this.generateVarDeclarations = false
       this.hoistedExports = null
       this.hoistedImportsString = ""
+      this.initedBindings = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
@@ -63,6 +64,7 @@ function init() {
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
+        this.initedBindings = { __proto__: null }
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -315,6 +317,7 @@ function init() {
       const {
         assignableBindings,
         exportedNames,
+        initedBindings,
         magicString,
         runtimeName
       } = this
@@ -349,7 +352,10 @@ function init() {
             assignableBindings[name] = true
           }
 
-          inited[name] = true
+          if (! initedBindings[name]) {
+            inited[name] =
+            initedBindings[name] = true
+          }
 
           exportedNames.push(name)
           pairs.push([name, name])
@@ -366,7 +372,10 @@ function init() {
                 assignableBindings[name] = true
               }
 
-              inited[name] = true
+              if (! initedBindings[name]) {
+                inited[name] =
+                initedBindings[name] = true
+              }
 
               exportedNames.push(name)
               pairs.push([name, name])
@@ -393,8 +402,12 @@ function init() {
             )
           }
 
-          assignableBindings[localName] =
-          inited[localName] = true
+          if (! initedBindings[localName]) {
+            inited[localName] =
+            initedBindings[localName] = true
+          }
+
+          assignableBindings[localName] = true
 
           exportedNames.push(exportedName)
           pairs.push([exportedName, localName])
