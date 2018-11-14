@@ -761,11 +761,7 @@ function esmNamespaceGetter(entry) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const {
-    _namespace,
-    getters,
-    type
-  } = entry
+  const { _namespace, type } = entry
 
   const isCJS = type === TYPE_CJS
   const isPseudo = type === TYPE_PSEUDO
@@ -842,6 +838,8 @@ function getExportByName(entry, name, parentEntry) {
       ? entry.cjsNamespace.default
       : entry.cjsMutableNamespace.default
   }
+
+  const { getters } = entry
 
   if ((noNamedExports &&
        name !== "default") ||
