@@ -768,20 +768,19 @@ function getExportByName(entry, name, parentEntry) {
   } = entry
 
   const isCJS = type === TYPE_CJS
-  const isESM = type === TYPE_ESM
   const isPseudo = type === TYPE_PSEUDO
 
-  const parentOptions = parentEntry.package.options
+  const parentCJS = parentEntry.package.options.cjs
   const parentIsMJS = parentEntry.extname === ".mjs"
 
   const parentMutableNamespace =
     ! parentIsMJS &&
-    parentOptions.cjs.mutableNamespace
+    parentCJS.mutableNamespace
 
   const parentNamedExports =
     entry.builtin ||
     (! parentIsMJS &&
-     parentOptions.cjs.namedExports)
+     parentCJS.namedExports)
 
   const noMutableNamespace =
     ! parentMutableNamespace ||
@@ -853,10 +852,6 @@ function getExportByName(entry, name, parentEntry) {
     throw new ERR_EXPORT_MISSING(entry.module, name)
   }
 
-  if (isESM) {
-    return _namespace[name]
-  }
-
   const getter = getters[name]
 
   if (getter) {
@@ -864,7 +859,21 @@ function getExportByName(entry, name, parentEntry) {
   }
 }
 
-function getExportByNameFast(entry, name) {
+function getExportByNameFast(entry, name, parentEntry) {
+  if (name === "*") {
+    const parentMutableNamespace =
+      parentEntry.extname !== ".mjs" &&
+      parentEntry.package.options.cjs.mutableNamespace
+
+    const noMutableNamespace =
+      ! parentMutableNamespace ||
+      entry.extname === ".mjs"
+
+    return noMutableNamespace
+      ? entry.esmNamespace
+      : entry.esmMutableNamespace
+  }
+
   if (entry._loaded === LOAD_COMPLETED &&
       ! Reflect.has(entry.getters, name)) {
     // Remove problematic setter to unblock subsequent imports.
@@ -985,21 +994,20 @@ function runSetter(entry, name, callback, init) {
 
   const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
-  const isNs = name === "*"
   const isNsChanged = entry._changed
 
   let { length } = setters
 
   while (length--) {
     const setter = setters[length]
+    const parentEntry = setter.parent
 
     let value
 
-    if (isESM &&
-        ! isNs) {
-      value = getExportByNameFast(entry, name)
+    if (isESM) {
+      value = getExportByNameFast(entry, name, parentEntry)
     } else {
-      value = getExportByName(entry, name, setter.parent)
+      value = getExportByName(entry, name, parentEntry)
     }
 
     if (value === ERROR_GETTER) {
