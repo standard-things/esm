@@ -7,6 +7,7 @@ const path = require("path")
 const setupTest262 = require("./setup-test262.js")
 const trash = require("./trash.js")
 const terser = require("terser").minify
+const SemVer = require("semver")
 
 const argv = require("yargs")
   .boolean("prod")
@@ -49,6 +50,11 @@ const nodeArgs = []
 
 if (process.env.HARMONY) {
   nodeArgs.push("--harmony")
+}
+
+// The Workers were introduced as an experimental feature in NodeJS 10.5.0
+if (SemVer.satisfies(process.version, ">=10.5.0")) {
+  nodeArgs.push("--experimental-worker")
 }
 
 nodeArgs.push(

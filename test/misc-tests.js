@@ -22,6 +22,7 @@ const isWin = process.platform === "win32"
 const canTestBridgeExports = isV8
 const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
 const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
+const canTestWorker = SemVer.satisfies(process.version, ">=10.5.0")
 const canTestUtilTypes = Reflect.has(util, "types")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
@@ -1565,5 +1566,45 @@ describe("miscellaneous tests", () => {
     it("should not hang on strings containing '# sourceMappingURL'", () =>
       import("./fixture/source/source-mapping-url-string.mjs")
     )
+  })
+
+  // Test for https://github.com/standard-things/esm/issues/591
+  describe("Workers support", () => {
+    before(function ()  {
+      if (! canTestWorker) {
+        this.skip()
+      }
+    })
+
+    it("should work with workers - inlined", () => {
+      return new Promise((resolve, reject) => {
+        const {Worker} = require("worker_threads")
+        const worker = new Worker(
+          "const { parentPort } = require(\"worker_threads\");\n\nparentPort.postMessage(\"Success!\")",
+          { eval: true }
+        )
+        worker.on("message", resolve)
+        worker.on("error", reject)
+        worker.on("exit", (code) => {
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`))
+          }
+        })
+      })
+    })
+
+    it("should work with workers - separate files", () => {
+      return new Promise((resolve, reject) => {
+        const {Worker} = require("worker_threads")
+        const worker = new Worker("./misc/worker.mjs")
+        worker.on("message", resolve)
+        worker.on("error", reject)
+        worker.on("exit", (code) => {
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`))
+          }
+        })
+      })
+    })
   })
 })
