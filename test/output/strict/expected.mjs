@@ -6,4 +6,4 @@ const _anonymous=() => {
   })()
 
   assert.strictEqual(typeof that, "undefined")
-};_.d(_anonymous);_.j(["default"]);
+};_.d(_anonymous);

@@ -292,16 +292,20 @@ function init() {
           .prependRight(declaration.end, suffix)
       }
 
+      this.exportedNames.push("default")
+
       if (id) {
         this.assignableBindings[name] = true
       }
 
-      this.exportedNames.push("default")
+      if (isInitable(declaration)) {
+        this.initedBindings.default = true
 
-      magicString.appendRight(
-        node.end,
-        runtimeName + '.j(["default"]);'
-      )
+        magicString.appendRight(
+          declaration.end,
+          runtimeName + '.j(["default"]);'
+        )
+      }
 
       path.call(this, "visitWithoutReset", "declaration")
     }
@@ -330,7 +334,7 @@ function init() {
         specifiers
       } = node
 
-      const initBindings = { __proto__: null }
+      const initees = { __proto__: null }
 
       if (declaration) {
         const pairs = []
@@ -352,11 +356,6 @@ function init() {
             assignableBindings[name] = true
           }
 
-          if (! initedBindings[name]) {
-            initBindings[name] =
-            initedBindings[name] = true
-          }
-
           exportedNames.push(name)
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
@@ -364,7 +363,8 @@ function init() {
 
           // Support exporting variable lists:
           // export let name1, name2, ..., nameN
-          for (const { id } of declaration.declarations) {
+          for (const { id, init } of declaration.declarations) {
+            const initable = isInitable(init)
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
@@ -372,8 +372,9 @@ function init() {
                 assignableBindings[name] = true
               }
 
-              if (! initedBindings[name]) {
-                initBindings[name] =
+              if (initable &&
+                  ! initedBindings[name]) {
+                initees[name] =
                 initedBindings[name] = true
               }
 
@@ -403,7 +404,7 @@ function init() {
           }
 
           if (! initedBindings[localName]) {
-            initBindings[localName] =
+            initees[localName] =
             initedBindings[localName] = true
           }
 
@@ -460,14 +461,14 @@ function init() {
         hoistImports(this, node, code)
       }
 
-      const initNames = keys(initBindings)
+      const names = keys(initees)
 
-      if (initNames.length) {
+      if (names.length) {
         const { end } = declaration || node
 
         magicString.appendRight(
           end,
-          ";" + runtimeName + ".j(" + JSON.stringify(initNames) + ");"
+          ";" + runtimeName + ".j(" + JSON.stringify(names) + ");"
         )
       }
 
@@ -534,6 +535,19 @@ function init() {
     }
 
     return true
+  }
+
+  function isInitable(node) {
+    if (! node) {
+      return true
+    }
+
+    const { type } = node
+
+    return type === "CallExpression" ||
+      type === "Identifier" ||
+      type === "MemberExpression" ||
+      type === "SequenceExpression"
   }
 
   function safeName(name, localNames) {

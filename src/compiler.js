@@ -240,7 +240,7 @@ function init() {
         result.sourceType = MODULE
 
         if (addedImportExport) {
-          const { temporalBindings } = importExportVisitor
+          const { initedBindings, temporalBindings } = importExportVisitor
 
           result.enforceTDZ = () => {
             const possibleIndexes = findIndexes(code, keys(temporalBindings))
@@ -251,6 +251,7 @@ function init() {
             result.enforceTDZ = noop
 
             temporalVisitor.visit(rootPath, {
+              initedBindings,
               magicString,
               possibleIndexes,
               runtimeName,

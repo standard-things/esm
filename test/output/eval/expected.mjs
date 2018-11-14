@@ -1,4 +1,4 @@
-"main";_.x([["a",()=>a]]);let a = "a";_.j(["a"]);
+"main";_.x([["a",()=>a]]);let a = "a"
 
 const o = { d, eval:_.e, f }
 

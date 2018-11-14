@@ -2,4 +2,4 @@
   constructor(value) {
     this.value = value
   }
-};_.d(_anonymous);_.j(["default"]);
+};_.d(_anonymous);
