@@ -768,6 +768,7 @@ function getExportByName(entry, name, parentEntry) {
   } = entry
 
   const isCJS = type === TYPE_CJS
+  const isESM = type === TYPE_ESM
   const isPseudo = type === TYPE_PSEUDO
 
   const parentOptions = parentEntry.package.options
@@ -852,28 +853,26 @@ function getExportByName(entry, name, parentEntry) {
     throw new ERR_EXPORT_MISSING(entry.module, name)
   }
 
+  if (isESM) {
+    return _namespace[name]
+  }
+
   const getter = getters[name]
 
   if (getter) {
-    return tryGetter(getter)
+    return getter()
   }
 }
 
 function getExportByNameFast(entry, name) {
-  const { getters } = entry
-
   if (entry._loaded === LOAD_COMPLETED &&
-      ! Reflect.has(getters, name)) {
+      ! Reflect.has(entry.getters, name)) {
     // Remove problematic setter to unblock subsequent imports.
     Reflect.deleteProperty(entry.setters, name)
     throw new ERR_EXPORT_MISSING(entry.module, name)
   }
 
-  const getter = getters[name]
-
-  if (getter) {
-    return tryGetter(getter)
-  }
+  return entry._namespace[name]
 }
 
 function initNamespaceHandler() {
