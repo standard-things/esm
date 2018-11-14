@@ -1,12 +1,14 @@
 "use strict"
 
+const SemVer = require("semver")
+
 const execa = require("execa")
 const fs = require("fs-extra")
 const ignorePaths = require("./ignore-paths.js")
 const path = require("path")
 const setupTest262 = require("./setup-test262.js")
-const trash = require("./trash.js")
 const terser = require("terser").minify
+const trash = require("./trash.js")
 
 const argv = require("yargs")
   .boolean("prod")
@@ -46,6 +48,10 @@ const keptPaths = [
 ]
 
 const nodeArgs = []
+
+if (SemVer.satisfies(process.version, ">=10.5.0")) {
+  nodeArgs.push("--experimental-worker")
+}
 
 if (process.env.HARMONY) {
   nodeArgs.push("--harmony")

@@ -23,6 +23,7 @@ const canTestBridgeExports = isV8
 const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
 const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
 const canTestUtilTypes = Reflect.has(util, "types")
+const canTestWorker = SemVer.satisfies(process.version, ">=10.5.0")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
@@ -1571,6 +1572,46 @@ describe("miscellaneous tests", () => {
 
     it("should not hang on strings containing '# sourceMappingURL'", () =>
       import("./fixture/source/source-mapping-url-string.mjs")
+    )
+  })
+
+  describe("Workers support", () => {
+    before(function () {
+      if (! canTestWorker) {
+        this.skip()
+      }
+    })
+
+    const Worker = canTestWorker
+      ? require("worker_threads").Worker
+      : null
+
+    const createOnExit = (reject) => {
+      return (code) => {
+        if (code !== 0) {
+          reject(new Error("Worker stopped with exit code " + code))
+        }
+      }
+    }
+
+    it("should work with inlined workers", () =>
+      new Promise((resolve, reject) =>
+        new Worker('require("./fixture/worker")', {
+          eval: true
+        })
+        .on("message", resolve)
+        .on("error", reject)
+        .on("exit", createOnExit(reject))
+      )
+    )
+
+    it("should work with external workers", () =>
+      new Promise((resolve, reject) =>
+        new Worker("./fixture/worker/index.js")
+          .on("message", resolve)
+          .on("error", reject)
+          .on("exit", createOnExit(reject))
+      )
     )
   })
 })
