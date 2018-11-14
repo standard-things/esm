@@ -10,7 +10,7 @@ function init() {
   function findIndexes(code, identifiers) {
     const indexes = []
 
-    if (! identifiers.length) {
+    if (identifiers.length === 0) {
       return indexes
     }
 
@@ -25,7 +25,7 @@ function init() {
       // Make sure the match isn't preceded by a `.` character, since that
       // probably means the identifier is a property access rather than a
       // variable reference.
-      if (! match.index ||
+      if (match.index === 0 ||
           code.charCodeAt(match.index - 1) !== DOT) {
         indexes.push(match.index)
       }

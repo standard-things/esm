@@ -32,7 +32,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (! this.temporalBindings[name] ||
+      if (! Reflect.has(this.temporalBindings, name) ||
           getShadowed(path, name, shadowedMap)) {
         return
       }
@@ -77,7 +77,7 @@ function init() {
     visitExportDefaultDeclaration(path) {
       const { initedBindings } = this
 
-      if (! initedBindings.default) {
+      if (! Reflect.has(initedBindings, "default")) {
         initedBindings.default = true
 
         const node = path.getValue()
@@ -104,7 +104,7 @@ function init() {
         if (type === "ClassDeclaration") {
           const { name } = declaration.id
 
-          if (! initedBindings[name]) {
+          if (! Reflect.has(initedBindings, name)) {
             initees[name] =
             initedBindings[name] = true
           }
@@ -113,7 +113,7 @@ function init() {
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
-              if (! initedBindings[name]) {
+              if (! Reflect.has(initedBindings, name)) {
                 initees[name] =
                 initedBindings[name] = true
               }

@@ -24,7 +24,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
   const dependencySpecifiers = compileData && compileData.dependencySpecifiers
 
   let child
-  let childEntry
+  let childEntry = null
 
   if (dependencySpecifiers &&
       dependencySpecifiers[request] &&
@@ -48,7 +48,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
 
   const exported = tryRequire(request, entry)
 
-  if (! childEntry) {
+  if (childEntry === null) {
     // Create the child entry for unresolved mocked requests.
     childEntry = getEntryFrom(request, exported)
     child = childEntry.module

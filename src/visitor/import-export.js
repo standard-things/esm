@@ -80,7 +80,7 @@ function init() {
       const node = path.getValue()
       const { callee } = node
 
-      if (! node.arguments.length) {
+      if (node.arguments.length === 0) {
         path.call(this, "visitWithoutReset", "callee")
         return
       }
@@ -214,7 +214,7 @@ function init() {
         runtimeName + '.w("' + request +
         '",[["*",null,' + runtimeName + ".n()]]);"
 
-      if (! exportedFrom[request]) {
+      if (! Reflect.has(exportedFrom, request)) {
         exportedFrom[request] = []
       }
 
@@ -253,7 +253,7 @@ function init() {
           (id && type === "ClassDeclaration")) {
         // Support exporting default function declarations:
         // export default function named() {}
-        if (! id) {
+        if (id === null) {
           // Convert anonymous functions to hoisted named functions.
           magicString.prependLeft(declaration.functionParamsStart, " " + name)
         }
@@ -265,7 +265,7 @@ function init() {
         let prefix = runtimeName + ".d("
         let suffix = ");"
 
-        if (! id &&
+        if (id === null &&
             (type === "ArrowFunctionExpression" ||
              type === "ClassDeclaration" ||
              type === "ClassExpression" ||
@@ -373,7 +373,7 @@ function init() {
               }
 
               if (initable &&
-                  ! initedBindings[name]) {
+                  ! Reflect.has(initedBindings, name)) {
                 initees[name] =
                 initedBindings[name] = true
               }
@@ -403,7 +403,7 @@ function init() {
             )
           }
 
-          if (! initedBindings[localName]) {
+          if (! Reflect.has(initedBindings, localName)) {
             initees[localName] =
             initedBindings[localName] = true
           }
@@ -538,7 +538,7 @@ function init() {
   }
 
   function isInitable(node) {
-    if (! node) {
+    if (node === null) {
       return true
     }
 
@@ -559,7 +559,7 @@ function init() {
   function toModuleExport(visitor, pairs) {
     let code = ""
 
-    if (! pairs.length) {
+    if (pairs.length === 0) {
       return code
     }
 

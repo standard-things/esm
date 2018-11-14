@@ -146,8 +146,8 @@ function init() {
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
         SafeObject.defineProperty(target, name, descriptor)
 
-        if (descriptor.get &&
-            ! handler.get) {
+        if (typeof descriptor.get === "function" &&
+            typeof handler.get !== "function") {
           handler.get = get
         }
 

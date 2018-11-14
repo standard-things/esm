@@ -17,14 +17,14 @@ function init() {
 
   function quotifyJSON(string) {
     if (typeof string !== "string" ||
-        ! string.length) {
+        string.length === 0) {
       return string
     }
 
     return string.replace(unquotedRegExp, (match, prefix, value, suffix) => {
-      if (! quoteLookup[prefix] &&
-          ! booleanLookup[value] &&
-          ! quoteLookup[suffix]) {
+      if (! Reflect.has(quoteLookup, prefix) &&
+          ! Reflect.has(booleanLookup, value) &&
+          ! Reflect.has(quoteLookup, suffix)) {
         return prefix + '"' + value + '"' + suffix
       }
 

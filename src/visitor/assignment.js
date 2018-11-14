@@ -64,7 +64,7 @@ function init() {
       if (assignableBindings[name]) {
         const shadowed = getShadowed(path, name, shadowedMap)
 
-        if (! shadowed ||
+        if (shadowed === null ||
             shadowed.type === "FunctionDeclaration")  {
           // Wrap assignments to exported identifiers.
           magicString

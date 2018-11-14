@@ -56,7 +56,7 @@ function init() {
       const { map } = cache
       const meta = map[cacheName]
 
-      if (! meta) {
+      if (meta === void 0) {
         return null
       }
 
@@ -145,8 +145,8 @@ function init() {
     const { cacheName, cachePath } = options
     const result = compileAndCache(code, options)
 
-    if (! cacheName ||
-        ! cachePath ||
+    if (cacheName === void 0 ||
+        cachePath === void 0 ||
         ! result.changed) {
       return result
     }
@@ -269,7 +269,7 @@ function init() {
         let scriptData
         let changed = false
 
-        if (! cachedData) {
+        if (cachedData === void 0) {
           scriptData = useCreateCachedData
             ? script.createCachedData()
             : script.cachedData
@@ -370,7 +370,7 @@ function init() {
       for (const cacheName in map) {
         const meta = map[cacheName]
 
-        if (! meta) {
+        if (meta === void 0) {
           continue
         }
 

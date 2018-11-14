@@ -91,7 +91,7 @@ function resolveFilename(request, parent, isMain, options) {
       Module._findPath === staticFindPath &&
       Module._resolveLookupPaths === staticResolveLookupPaths) {
     paths = [fromPath]
-  } else if (! cacheKey &&
+  } else if (cacheKey === void 0 &&
       Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths)
   } else {

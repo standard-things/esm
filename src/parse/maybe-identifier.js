@@ -18,7 +18,7 @@ function init() {
 
       const grandParent = path.getNode(nodeIndex)
 
-      if (! grandParent) {
+      if (grandParent === null) {
         break
       }
 

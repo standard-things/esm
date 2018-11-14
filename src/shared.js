@@ -215,8 +215,8 @@ function init() {
       a: 1
     }
 
-    return ! object.__lookupGetter__("a") &&
-      ! object.__lookupSetter__("a")
+    return object.__lookupGetter__("a") === void 0 &&
+      object.__lookupSetter__("a") === void 0
   })
 
   setDeferred(support, "nativeProxyReceiver", () => {

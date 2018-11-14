@@ -9,7 +9,7 @@ function init() {
     let lineCount = 0
     let mapping = ""
 
-    while (! lineCount ||
+    while (lineCount === 0 ||
         newlineRegExp.test(content)) {
       mapping += (lineCount ? ";" : "") + "AA" + (lineCount ? "C" : "A") + "A"
       lineCount += 1

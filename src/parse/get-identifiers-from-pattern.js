@@ -11,8 +11,8 @@ function init() {
       const pattern = queue[i]
 
       if (pattern === null) {
-        // The ArrayPattern .elements array can contain null to indicate that
-        // the position is a hole.
+        // The ArrayPattern `.elements` array can contain `null` to indicate
+        // that the position is a hole.
         continue
       }
 

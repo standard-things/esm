@@ -28,9 +28,9 @@ function init() {
     visitIdentifier(path) {
       const node = path.getValue()
       const { name } = node
-      const isArguments = name === "arguments"
+      const isArgs = name === "arguments"
 
-      if (! isArguments &&
+      if (! isArgs &&
           name !== "__dirname" &&
           name !== "__filename" &&
           name !== "exports" &&
@@ -47,7 +47,7 @@ function init() {
         type === "UnaryExpression" &&
         parent.operator === "typeof"
 
-      if (isArguments &&
+      if (isArgs &&
           isTypeOf &&
           ! getShadowed(path, name, shadowedMap)) {
         this.changed = true

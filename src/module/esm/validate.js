@@ -78,7 +78,7 @@ function resolveExportedStars(entry) {
   for (const request of compileData.exportedStars) {
     const childEntry = dependencySpecifiers[request].entry
 
-    if (! childEntry ||
+    if (childEntry === null ||
         childEntry.builtin ||
         childEntry.type !== TYPE_ESM) {
       continue
@@ -121,7 +121,7 @@ function validateDependencies(entry) {
       exportedNames:childExportedNames
     } = dependencySpecifiers[request]
 
-    if (! childEntry ||
+    if (childEntry === null ||
         childEntry.builtin) {
       continue
     }
@@ -192,7 +192,7 @@ function validateExportedName(entry, exportedName, seen) {
     for (const request of exportedStars) {
       const childEntry = dependencySpecifiers[request].entry
 
-      if (! childEntry ||
+      if (childEntry === null ||
           childEntry.type !== TYPE_ESM) {
         throwExportMissing = false
         break

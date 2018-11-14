@@ -70,7 +70,7 @@ function hook(Mod, parent) {
 
   let parentPkg = Package.from(parent)
 
-  if (! parentPkg) {
+  if (parentPkg === null) {
     parentPkg = Package.from(parent, OPTIONS || true)
   }
 
@@ -126,7 +126,7 @@ function hook(Mod, parent) {
       entry.mtime = getMtime(filename)
     }
 
-    if (! cacheName) {
+    if (cacheName === null) {
       cacheName =
       entry.cacheName = getCacheName(mtime, {
         cachePath,
@@ -157,7 +157,7 @@ function hook(Mod, parent) {
 
     let { compileData } = entry
 
-    if (! compileData &&
+    if (compileData === null &&
         cache.compile[cacheName] === null) {
       compileData = Compiler.from(entry)
 
@@ -178,7 +178,7 @@ function hook(Mod, parent) {
       })
     }
 
-    if (! compileData &&
+    if (compileData === null &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {
@@ -202,7 +202,7 @@ function hook(Mod, parent) {
 
     let passthru =
       typeof extCompiler === "function" &&
-      ! extCompiler[shared.symbol.mjs]
+      ! has(extCompiler, shared.symbol.mjs)
 
     if (passthru &&
         extIsMJS) {

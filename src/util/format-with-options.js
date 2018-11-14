@@ -106,7 +106,7 @@ function init() {
       }
     }
 
-    if (! lastPos) {
+    if (lastPos === 0) {
       result = string
     } else if (lastPos < length) {
       result += string.slice(lastPos)

@@ -103,7 +103,7 @@ function resolveFilename(request, parent, isMain, options) {
 
     const cached = cache.get(cacheKey)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
   }
@@ -137,7 +137,7 @@ function resolveFilename(request, parent, isMain, options) {
     skipGlobalPaths = false
   }
 
-  let foundPath
+  let foundPath = ""
 
   if (! isPath &&
       (request.charCodeAt(0) === FORWARD_SLASH ||
@@ -146,13 +146,13 @@ function resolveFilename(request, parent, isMain, options) {
 
     foundPath = getFilePathFromURL(parsed)
 
-    if (! foundPath &&
+    if (foundPath.length === 0 &&
         parsed.protocol !== "file:" &&
         ! localhostRegExp.test(request)) {
       throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
     }
 
-    if (foundPath) {
+    if (foundPath.length > 0) {
       foundPath = _resolveFilename(foundPath, parent, isMain, options, emptyArray, emptyArray, true)
     }
   } else if (isPath) {
@@ -169,14 +169,14 @@ function resolveFilename(request, parent, isMain, options) {
 
     foundPath = _resolveFilename(decoded, parent, isMain, options, fields, exts, skipGlobalPaths)
 
-    if (! foundPath &&
+    if (foundPath.length === 0 &&
         Reflect.has(builtinLookup, decoded)) {
       cache.set(cacheKey, decoded)
       return decoded
     }
   }
 
-  if (foundPath) {
+  if (foundPath.length > 0) {
     if (autoMode ||
         cjsPaths ||
         isMain ||
@@ -192,7 +192,7 @@ function resolveFilename(request, parent, isMain, options) {
 
   foundPath = Module._resolveFilename(request, parent, isMain, options)
 
-  if (foundPath) {
+  if (foundPath.length > 0) {
     if (cjsPaths) {
       cache.set(cacheKey, foundPath)
       return foundPath

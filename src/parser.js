@@ -56,9 +56,9 @@ function init() {
       acornParserTopLevel.enable(parser)
 
       if (strict !== void 0) {
-        parser.strict = strict
+        parser.strict = !! strict
 
-        if (! strict) {
+        if (! parser.strict) {
           parser.reservedWords = /^enum$/
         }
       }

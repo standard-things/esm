@@ -56,7 +56,7 @@ function BabelModePlugin({ types }) {
       }
     })
 
-    return !! parent
+    return parent !== void 0
   }
 
   function isSimpleParameterList(params) {

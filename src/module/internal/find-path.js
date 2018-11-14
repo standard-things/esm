@@ -64,7 +64,8 @@ function findPath(request, paths, isMain, fields, exts) {
 
   if (isAbs) {
     paths = [""]
-  } else if (! paths || ! paths.length) {
+  } else if (! Array.isArray(paths) ||
+      paths.length === 0) {
     return ""
   }
 
@@ -89,7 +90,8 @@ function findPath(request, paths, isMain, fields, exts) {
     : resolveSymlinks
 
   for (let curPath of paths) {
-    if (curPath &&
+    if (typeof curPath === "string" &&
+        curPath.length > 0 &&
         statFast(curPath) !== 1) {
       continue
     }
@@ -102,7 +104,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
       curPath = realpath(curPath)
 
-      if (! curPath) {
+      if (curPath.length === 0) {
         continue
       }
     }
@@ -124,14 +126,14 @@ function findPath(request, paths, isMain, fields, exts) {
         isMJS(thePath)) {
       stat = statSync(thePath)
 
-      if (stat) {
+      if (stat !== null) {
         rc = Reflect.apply(isFile, stat, []) ? 0 : 1
       }
     } else {
       rc = statFast(thePath)
     }
 
-    let filename
+    let filename = ""
 
     if (! trailingSlash) {
       // If a file.
@@ -141,7 +143,7 @@ function findPath(request, paths, isMain, fields, exts) {
           : thePath
       }
 
-      if (! filename) {
+      if (filename.length === 0) {
         if (exts === void 0) {
           exts = keys(Module._extensions)
         }
@@ -152,7 +154,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
     // If a directory.
     if (rc === 1 &&
-        ! filename) {
+        filename.length === 0) {
       if (exts === void 0) {
         exts = keys(Module._extensions)
       }
@@ -170,7 +172,7 @@ function findPath(request, paths, isMain, fields, exts) {
         tryExtensions(resolve(thePath, "index"), exts, isMain)
     }
 
-    if (filename) {
+    if (filename.length > 0) {
       cache.set(cacheKey, filename)
       return filename
     }
@@ -212,7 +214,7 @@ function tryFilename(filename, isMain) {
       isMJS(filename)) {
     stat = statSync(filename)
 
-    if (stat) {
+    if (stat !== null) {
       rc = Reflect.apply(isFile, stat, []) ? 0 : 1
     }
   } else {
@@ -228,7 +230,7 @@ function tryFilename(filename, isMain) {
     : resolveSymlinks
 
   if (useRealpath &&
-      (! stat ||
+      (stat === null ||
        stat.nlink > 1 ||
        isSymLink)) {
     return realpath(filename)
@@ -238,10 +240,10 @@ function tryFilename(filename, isMain) {
 }
 
 function tryPackage(dirPath, fields, exts, isMain) {
-  const json = readPackage(dirPath, fields)
+  const json = readPackage(dirPath, fields) || ""
 
-  if (! json) {
-    return ""
+  if (json.length === 0) {
+    return json
   }
 
   for (const field of fields) {

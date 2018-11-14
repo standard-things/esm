@@ -141,7 +141,7 @@ function init() {
   }
 
   function unexpected(pos) {
-    if (pos == null) {
+    if (pos === void 0) {
       pos = this.start
     }
 
@@ -149,7 +149,7 @@ function init() {
       ? UNEXPECTED_EOS
       : INVALID_OR_UNEXPECTED_TOKEN
 
-    this.raise(pos != null ? pos : this.start, message)
+    this.raise(pos, message)
   }
 
   return Plugin

@@ -35,7 +35,7 @@ function init() {
         return
       }
 
-      if (! node.arguments.length) {
+      if (node.arguments.length === 0) {
         return
       }
 

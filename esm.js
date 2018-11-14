@@ -88,7 +88,7 @@ const jestEnvironmentHooks = { __proto__: null }
 
 function jestTransform(content, filename, { cwd, testEnvironment }) {
 
-  if (! jestEnvironmentHooks[cwd]) {
+  if (! has(jestEnvironmentHooks, cwd)) {
     jestEnvironmentHooks[cwd] = {
       compile: { __proto__: null },
       loader: makeRequireFunction(module)
@@ -130,7 +130,7 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
     runtimeName
   })
 
-  if (! jestEnvironmentHooks[cwd][testEnvironment]) {
+  if (! has(jestEnvironmentHooks[cwd], testEnvironment)) {
     jestEnvironmentHooks[testEnvironment] = true
 
     Environment.prototype.runScript = function (...args) {

@@ -23,7 +23,7 @@ function init() {
       if (isPath(value)) {
         let thePath = value
 
-        if (! extname(thePath)) {
+        if (extname(thePath) === "") {
           thePath += sep + "index.js"
         }
 

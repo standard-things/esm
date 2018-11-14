@@ -22,7 +22,7 @@ function init() {
 
       let cache = map.get(parent)
 
-      if (! cache) {
+      if (cache === void 0) {
         cache = { __proto__: null }
         map.set(parent, cache)
       }

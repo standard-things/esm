@@ -116,7 +116,7 @@ class Package {
 
     let cache = dir[cachePath]
 
-    if (! cache) {
+    if (cache === void 0) {
       cache =
       dir[cachePath] = {
         buffer: null,
@@ -493,7 +493,7 @@ function isFlag(value) {
     value === 1
 }
 
-function readInfo(dirPath, forceOptions) {
+function readInfo(dirPath, forceOptions = false) {
   let pkg
   let optionsPath = dirPath + sep + ESMRC_FILENAME
 

@@ -15,7 +15,7 @@ function init() {
 
     const { length } = value
 
-    if (! length) {
+    if (length === 0) {
       return false
     }
 

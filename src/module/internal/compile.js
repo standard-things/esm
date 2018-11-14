@@ -72,10 +72,10 @@ function compile(caller, entry, content, filename, fallback) {
 
   let { compileData } = entry
 
-  if (! compileData) {
+  if (compileData === null) {
     compileData = Compiler.from(entry)
 
-    if (! compileData ||
+    if (compileData === null ||
         compileData.changed) {
       const { cacheName } = entry
       const { cjs } = options

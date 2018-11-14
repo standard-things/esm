@@ -29,7 +29,7 @@ function init() {
   function getURLFromFilePath(filename) {
     let length = typeof filename === "string" ? filename.length : 0
 
-    if (! length) {
+    if (length === 0) {
       return "file:///"
     }
 
@@ -55,7 +55,7 @@ function init() {
 
     if (i > 1) {
       filename = "/" + filename.slice(i)
-    } else if (! i) {
+    } else if (i === 0) {
       filename = "/" + filename
     }
 

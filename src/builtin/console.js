@@ -120,7 +120,7 @@ function init() {
   const Console = maskFunction(function (...args) {
     const target = new.target
 
-    if (! target) {
+    if (target === void 0) {
       return Reflect.construct(Console, args)
     }
 

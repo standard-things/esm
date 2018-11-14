@@ -30,14 +30,14 @@ function init() {
     let options = ESM_OPTIONS.trim()
 
     if (isPath(options)) {
-      options = readFile(resolve(options), "utf8")
+      options = readFile(resolve(options), "utf8") || ""
 
       if (options) {
         options = options.trim()
       }
     }
 
-    if (! options) {
+    if (options === "") {
       return env.options = null
     }
 
