@@ -81,6 +81,8 @@ class Entry {
     this.cacheName = null
     // The child entries of the module.
     this.children = { __proto__: null }
+    // The circular import indicator.
+    this.circular = false
     // The source compilation data of the module.
     this.compileData = null
     // The namespace object which may have proxied exports.

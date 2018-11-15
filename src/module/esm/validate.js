@@ -20,6 +20,7 @@ function validate(entry) {
   validateDependencies(entry)
 
   if (isDescendant(entry, entry)) {
+    entry.circular = true
     entry.compileData.enforceTDZ()
   }
 }
