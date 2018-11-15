@@ -33,11 +33,17 @@ const {
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
+  SETTER_TYPE_DYNAMIC_IMPORT,
+  SETTER_TYPE_EXPORT_FROM,
+  SETTER_TYPE_NAMESPACE,
+  SETTER_TYPE_STATIC_IMPORT,
   STATE_INITIAL,
   STATE_EXECUTION_COMPLETED,
   TYPE_CJS,
   TYPE_ESM,
-  TYPE_PSEUDO
+  TYPE_PSEUDO,
+  UPDATE_TYPE_INIT,
+  UPDATE_TYPE_LIVE
 } = ENTRY
 
 const {
@@ -292,7 +298,7 @@ class Entry {
     setter.parent = parent
 
     if (! has(setter, "type")) {
-      setter.type = "static"
+      setter.type = SETTER_TYPE_STATIC_IMPORT
     }
 
     setters.push(setter)
@@ -476,19 +482,28 @@ class Entry {
     return this
   }
 
-  updateBindings(names, init) {
-    // Lazily-initialized map of parent module names to parent entries whose
-    // setters might need to run.
-    let parentsMap
-
-    this._changed = false
-
+  updateBindings(names, type) {
     if (typeof names === "string") {
       names = [names]
     }
 
+    // Lazily-initialized map of parent module names to parent entries whose
+    // setters might need to run.
+    let parentsMap
+
+    const updateAncestors =
+      this.circular ||
+      type === UPDATE_TYPE_INIT ||
+      type === UPDATE_TYPE_LIVE
+
+    this._changed = false
+
     runGetters(this, names)
     runSetters(this, names, (setter) => {
+      if (! updateAncestors) {
+        return
+      }
+
       const parentEntry = setter.parent
       const { importedBindings } = parentEntry
 
@@ -498,7 +513,7 @@ class Entry {
       for (const name of setter.localNames) {
         importedBindings[name] = true
       }
-    }, init)
+    }, type)
 
     this._changed = false
 
@@ -506,7 +521,7 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     for (const id in parentsMap) {
-      parentsMap[id].updateBindings()
+      parentsMap[id].updateBindings(null, UPDATE_TYPE_LIVE)
     }
 
     return this
@@ -970,7 +985,7 @@ function runGetter(entry, name) {
 
 function runGetters(entry, names) {
   if (entry.type === TYPE_ESM) {
-    if (names) {
+    if (Array.isArray(names)) {
       for (const name of names) {
         runGetter(entry, name)
       }
@@ -984,7 +999,7 @@ function runGetters(entry, names) {
   }
 }
 
-function runSetter(entry, name, callback, init) {
+function runSetter(entry, name, callback, updateType) {
   const setters = entry.setters[name]
 
   if (! setters) {
@@ -1016,13 +1031,14 @@ function runSetter(entry, name, callback, init) {
     }
 
     const { last, type } = setter
-    const changed = type !== "dynamic" && ! Object.is(last, value)
-    const isDynamicImport = isLoaded && type === "dynamic"
-    const isExportFrom = type === "from"
-    const isExportNs = isNsChanged && type === "namespace"
+    const changed = type !== SETTER_TYPE_DYNAMIC_IMPORT && ! Object.is(last, value)
+    const isDynamicImport = isLoaded && type === SETTER_TYPE_DYNAMIC_IMPORT
+    const isExportFrom = type === SETTER_TYPE_EXPORT_FROM
+    const isExportNs = isNsChanged && type === SETTER_TYPE_NAMESPACE
+    const isInit = updateType === UPDATE_TYPE_INIT
 
     if (changed ||
-        init ||
+        isInit ||
         isDynamicImport ||
         isExportFrom ||
         isExportNs) {
@@ -1044,14 +1060,14 @@ function runSetter(entry, name, callback, init) {
   }
 }
 
-function runSetters(entry, names, callback, init) {
-  if (names) {
+function runSetters(entry, names, callback, updateType) {
+  if (Array.isArray(names)) {
     for (const name of names) {
-      runSetter(entry, name, callback, init)
+      runSetter(entry, name, callback, updateType)
     }
   } else {
     for (const name in entry.setters) {
-      runSetter(entry, name, callback, init)
+      runSetter(entry, name, callback, updateType)
     }
   }
 }

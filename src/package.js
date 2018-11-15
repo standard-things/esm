@@ -46,9 +46,9 @@ const {
 } = ESM
 
 const {
-  OPTIONS_MODE_ALL,
-  OPTIONS_MODE_AUTO,
-  OPTIONS_MODE_STRICT,
+  MODE_ALL,
+  MODE_AUTO,
+  MODE_STRICT,
   RANGE_ALL
 } = PACKAGE
 
@@ -385,15 +385,15 @@ function createOptions(value) {
 
   const { mode } = options
 
-  if (mode === OPTIONS_MODE_ALL ||
+  if (mode === MODE_ALL ||
       mode === "all") {
-    options.mode = OPTIONS_MODE_ALL
-  } else if (mode === OPTIONS_MODE_AUTO ||
+    options.mode = MODE_ALL
+  } else if (mode === MODE_AUTO ||
       mode === "auto") {
-    options.mode = OPTIONS_MODE_AUTO
-  } else if (mode === OPTIONS_MODE_STRICT ||
+    options.mode = MODE_AUTO
+  } else if (mode === MODE_STRICT ||
       mode === "strict") {
-    options.mode = OPTIONS_MODE_STRICT
+    options.mode = MODE_STRICT
   } else {
     throw new ERR_INVALID_ESM_OPTION("mode", mode)
   }

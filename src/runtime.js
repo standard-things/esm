@@ -20,8 +20,13 @@ import toExternalError from "./util/to-external-error.js"
 const {
   ERROR_STAR,
   LOAD_COMPLETED,
+  SETTER_TYPE_DYNAMIC_IMPORT,
+  SETTER_TYPE_EXPORT_FROM,
+  SETTER_TYPE_NAMESPACE,
   TYPE_CJS,
-  TYPE_ESM
+  TYPE_ESM,
+  UPDATE_TYPE_INIT,
+  UPDATE_TYPE_LIVE
 } = ENTRY
 
 const {
@@ -44,7 +49,7 @@ const Runtime = {
   },
 
   addExportFromSetter(importedName, exportedName = importedName) {
-    return createSetter("from", (value, childEntry) => {
+    return createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
       const { entry } = this
       const { getters } = entry
 
@@ -62,7 +67,7 @@ const Runtime = {
   },
 
   addNamespaceSetter() {
-    return createSetter("namespace", (value, childEntry) => {
+    return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
       const { getters } = entry
       const isESM = entry.type === TYPE_ESM
@@ -254,7 +259,7 @@ const Runtime = {
             request = request + ""
           }
 
-          esmImport(this.entry, request, [["*", null, createSetter("dynamic", (value, childEntry) => {
+          esmImport(this.entry, request, [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
               resolvePromise(value)
               return true
@@ -272,7 +277,7 @@ const Runtime = {
   },
 
   initBindings(names) {
-    this.entry.updateBindings(names, true)
+    this.entry.updateBindings(names, UPDATE_TYPE_INIT)
   },
 
   run(moduleWrapper) {
@@ -291,7 +296,7 @@ const Runtime = {
   },
 
   updateBindings(valueToPassThrough) {
-    this.entry.updateBindings()
+    this.entry.updateBindings(null, UPDATE_TYPE_LIVE)
 
     // Returns the `valueToPassThrough()` parameter to allow the value of the
     // original expression to pass through. For example,

@@ -1,6 +1,6 @@
+import COMPILER from "../constant/compiler.js"
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
-import SOURCE_TYPE from "../constant/source-type.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
@@ -35,6 +35,11 @@ import shared from "../shared.js"
 import wrap from "../util/wrap.js"
 
 const {
+  SOURCE_TYPE_MODULE,
+  SOURCE_TYPE_UNAMBIGUOUS
+} = COMPILER
+
+const {
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
   TYPE_ESM
@@ -47,11 +52,6 @@ const {
  INTERNAL,
  REPL
 } = ENV
-
-const {
-  MODULE,
-  UNAMBIGUOUS
-} = SOURCE_TYPE
 
 function hook(vm) {
   let entry
@@ -81,7 +81,7 @@ function hook(vm) {
           generateVarDeclarations: true,
           pragmas: false,
           runtimeName,
-          sourceType: UNAMBIGUOUS,
+          sourceType: SOURCE_TYPE_UNAMBIGUOUS,
           strict: false
         }
       ])
@@ -334,7 +334,7 @@ function tryWrapper(func, args, content) {
     throw error
   }
 
-  const isESM = error.sourceType === MODULE
+  const isESM = error.sourceType === SOURCE_TYPE_MODULE
 
   Reflect.deleteProperty(error, "sourceType")
   throw maskStackTrace(error, content, null, isESM)

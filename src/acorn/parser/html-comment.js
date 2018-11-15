@@ -1,5 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
-import PARSER_MESSAGE from "../../constant/parser-message.js"
+import MESSAGE from "../../constant/message.js"
 
 import acorn from "../../acorn.js"
 import shared from "../../shared.js"
@@ -15,7 +15,7 @@ function init() {
 
   const {
     ILLEGAL_HTML_COMMENT
-  } = PARSER_MESSAGE
+  } = MESSAGE
 
   const { lineBreakRegExp } = acorn
 

@@ -35,7 +35,7 @@ const {
 } = ENV
 
 const {
-  OPTIONS_MODE_AUTO
+  MODE_AUTO
 } = PACKAGE
 
 const {
@@ -116,7 +116,7 @@ function resolveFilename(request, parent, isMain, options) {
   const isPath = isAbs || isRel
   const pkgOptions = Package.get(fromPath).options
 
-  let autoMode = pkgOptions.mode === OPTIONS_MODE_AUTO
+  let autoMode = pkgOptions.mode === MODE_AUTO
   let cjsPaths = pkgOptions.cjs.paths
   let exts = strictExts
   let fields = pkgOptions.mainFields

@@ -1,7 +1,7 @@
+import COMPILER from "../../constant/compiler.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
-import SOURCE_TYPE from "../../constant/source-type.js"
 
 import Compiler from "../../caching-compiler.js"
 import GenericObject from "../../generic/object.js"
@@ -26,6 +26,12 @@ import shared from "../../shared.js"
 import toString from "../../util/to-string.js"
 
 const {
+  SOURCE_TYPE_MODULE,
+  SOURCE_TYPE_SCRIPT,
+  SOURCE_TYPE_UNAMBIGUOUS
+} = COMPILER
+
+const {
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
   TYPE_CJS,
@@ -40,15 +46,9 @@ const {
 } = ENV
 
 const {
-  OPTIONS_MODE_ALL,
-  OPTIONS_MODE_AUTO
+  MODE_ALL,
+  MODE_AUTO
 } = PACKAGE
-
-const {
-  MODULE,
-  SCRIPT,
-  UNAMBIGUOUS
-} = SOURCE_TYPE
 
 const exportsRegExp = /^.*?\bexports\b/
 
@@ -58,16 +58,16 @@ function compile(caller, entry, content, filename, fallback) {
   const { mode } = options
   const { parsing } = shared.moduleState
 
-  let hint = SCRIPT
-  let sourceType = SCRIPT
+  let hint = SOURCE_TYPE_SCRIPT
+  let sourceType = SOURCE_TYPE_SCRIPT
 
   if (entry.extname === ".mjs") {
-    hint = MODULE
-    sourceType = MODULE
-  } else if (mode === OPTIONS_MODE_ALL) {
-    sourceType = MODULE
-  } else if (mode === OPTIONS_MODE_AUTO) {
-    sourceType = UNAMBIGUOUS
+    hint = SOURCE_TYPE_MODULE
+    sourceType = SOURCE_TYPE_MODULE
+  } else if (mode === MODE_ALL) {
+    sourceType = SOURCE_TYPE_MODULE
+  } else if (mode === MODE_AUTO) {
+    sourceType = SOURCE_TYPE_UNAMBIGUOUS
   }
 
   let { compileData } = entry
@@ -96,7 +96,7 @@ function compile(caller, entry, content, filename, fallback) {
         topLevelReturn: cjs.topLevelReturn
       })
 
-      entry.type = compileData.sourceType === MODULE
+      entry.type = compileData.sourceType === SOURCE_TYPE_MODULE
         ? TYPE_ESM
         : TYPE_CJS
 
@@ -143,7 +143,7 @@ function compile(caller, entry, content, filename, fallback) {
 
 function tryCompileCached(entry, filename) {
   const { compileData } = entry
-  const isESM = compileData.sourceType === MODULE
+  const isESM = compileData.sourceType === SOURCE_TYPE_MODULE
   const mod = entry.module
 
   const cjsVars =
@@ -238,7 +238,7 @@ function tryCompileCode(caller, content, options) {
     throw error
   }
 
-  const isESM = error.sourceType === MODULE
+  const isESM = error.sourceType === SOURCE_TYPE_MODULE
 
   Reflect.deleteProperty(error, "sourceType")
   captureStackTrace(error, caller)

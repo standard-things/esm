@@ -10,7 +10,7 @@
 // Copyright Sebastian McKenzie and other contributors. Released under MIT license:
 // https://github.com/babel/babel/blob/master/packages/babel-parser/src/parser/expression.js
 
-import PARSER_MESSAGE from "../../constant/parser-message.js"
+import MESSAGE from "../../constant/message.js"
 
 import errors from "../../parse/errors.js"
 import lookahead from "../../parse/lookahead.js"
@@ -25,7 +25,7 @@ function init() {
     UNEXPECTED_IDENTIFIER,
     UNEXPECTED_STRING,
     UNEXPECTED_TOKEN
-  } = PARSER_MESSAGE
+  } = MESSAGE
 
   const Plugin = {
     enable(parser) {

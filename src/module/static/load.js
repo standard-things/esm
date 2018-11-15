@@ -22,7 +22,7 @@ const {
 } = ENTRY
 
 const {
-  OPTIONS_MODE_STRICT
+  MODE_STRICT
 } = PACKAGE
 
 const {
@@ -62,7 +62,7 @@ function load(request, parent, isMain) {
   if (! loaderCalled &&
       parentEntry &&
       entry.type === TYPE_ESM &&
-      parentEntry.package.options.mode === OPTIONS_MODE_STRICT) {
+      parentEntry.package.options.mode === MODE_STRICT) {
     throw new ERR_REQUIRE_ESM(filename)
   }
 

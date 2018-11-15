@@ -1,7 +1,7 @@
 // Error messages are based on V8.
 // https://github.com/v8/v8/blob/master/src/messages.h
 
-const PARSER_MESSAGE = {
+const MESSAGE = {
   __proto__: null,
   ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION: "await is only valid in async function",
   ILLEGAL_HTML_COMMENT: "HTML comments are not allowed in modules",
@@ -22,4 +22,4 @@ const PARSER_MESSAGE = {
   UNTERMINATED_TEMPLATE: "Unterminated template literal"
 }
 
-export default PARSER_MESSAGE
+export default MESSAGE

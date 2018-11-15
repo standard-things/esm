@@ -1,4 +1,4 @@
-import SOURCE_TYPE from "../constant/source-type.js"
+import COMPILER from "../constant/compiler.js"
 
 import Visitor from "../visitor.js"
 
@@ -14,8 +14,8 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    MODULE
-  } = SOURCE_TYPE
+    SOURCE_TYPE_MODULE
+  } = COMPILER
 
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
@@ -99,7 +99,7 @@ function init() {
     }
 
     visitImportDeclaration(path) {
-      if (this.sourceType !== MODULE) {
+      if (this.sourceType !== SOURCE_TYPE_MODULE) {
         return
       }
 
@@ -197,7 +197,7 @@ function init() {
     }
 
     visitExportAllDeclaration(path) {
-      if (this.sourceType !== MODULE) {
+      if (this.sourceType !== SOURCE_TYPE_MODULE) {
         return
       }
 
@@ -225,7 +225,7 @@ function init() {
     }
 
     visitExportDefaultDeclaration(path) {
-      if (this.sourceType !== MODULE) {
+      if (this.sourceType !== SOURCE_TYPE_MODULE) {
         return
       }
 

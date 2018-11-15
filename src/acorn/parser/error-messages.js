@@ -1,17 +1,10 @@
-import PARSER_MESSAGE from "../../constant/parser-message.js"
+import MESSAGE from "../../constant/message.js"
 
 import errors from "../../parse/errors.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
 
 function init() {
-  const ENGINE_DUPLICATE_EXPORT = "Duplicate export of '"
-  const PARSER_DUPLICATE_EXPORT = "Duplicate export '"
-
-  const PARSER_IMPORT_EXPORT_INVALID_LEVEL = "'import' and 'export' may only appear at the top level"
-  const PARSER_IMPORT_EXPORT_OUTSIDE_MODULE = "'import' and 'export' may appear only with 'sourceType: module'"
-  const PARSER_INVALID_ESCAPED_RESERVED_WORD = "Escape sequence in keyword "
-
   const {
     ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION,
     ILLEGAL_HTML_COMMENT,
@@ -29,7 +22,14 @@ function init() {
     UNEXPECTED_TOKEN,
     UNTERMINATED_ARGUMENTS_LIST,
     UNTERMINATED_TEMPLATE
-  } = PARSER_MESSAGE
+  } = MESSAGE
+
+  const ENGINE_DUPLICATE_EXPORT = "Duplicate export of '"
+  const PARSER_DUPLICATE_EXPORT = "Duplicate export '"
+
+  const PARSER_IMPORT_EXPORT_INVALID_LEVEL = "'import' and 'export' may only appear at the top level"
+  const PARSER_IMPORT_EXPORT_OUTSIDE_MODULE = "'import' and 'export' may appear only with 'sourceType: module'"
+  const PARSER_INVALID_ESCAPED_RESERVED_WORD = "Escape sequence in keyword "
 
   const messages = {
     __proto__: null,

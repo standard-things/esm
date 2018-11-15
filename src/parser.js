@@ -1,4 +1,4 @@
-import SOURCE_TYPE from "./constant/source-type.js"
+import COMPILER from "./constant/compiler.js"
 
 import { Parser as AcornParser } from "./acorn.js"
 
@@ -17,9 +17,9 @@ import shared from "./shared.js"
 
 function init() {
   const {
-    MODULE,
-    SCRIPT
-  } = SOURCE_TYPE
+    SOURCE_TYPE_MODULE,
+    SOURCE_TYPE_SCRIPT
+  } = COMPILER
 
   const defaultOptions = {
     allowAwaitOutsideFunction: true,
@@ -31,8 +31,8 @@ function init() {
 
   const sourceTypeMap = {
     __proto__: null,
-    [MODULE]: "module",
-    [SCRIPT]: "script"
+    [SOURCE_TYPE_MODULE]: "module",
+    [SOURCE_TYPE_SCRIPT]: "script"
   }
 
   const Parser = {

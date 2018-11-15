@@ -49,8 +49,8 @@ const {
 } = ESM
 
 const {
-  OPTIONS_MODE_ALL,
-  OPTIONS_MODE_AUTO,
+  MODE_ALL,
+  MODE_AUTO,
   RANGE_ALL
 } = PACKAGE
 
@@ -80,8 +80,8 @@ function hook(Mod, parent) {
   defaultPkg.range = RANGE_ALL
 
   if (! defaultOptions.force &&
-      defaultOptions.mode === OPTIONS_MODE_ALL) {
-    defaultOptions.mode = OPTIONS_MODE_AUTO
+      defaultOptions.mode === MODE_ALL) {
+    defaultOptions.mode = MODE_AUTO
   }
 
   Package.state.default = defaultPkg

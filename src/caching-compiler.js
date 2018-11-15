@@ -1,9 +1,9 @@
 import { sep, relative, resolve } from "./safe/path.js"
 
+import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
 import ENV from "./constant/env.js"
 import ESM from "./constant/esm.js"
-import SOURCE_TYPE from "./constant/source-type.js"
 
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
@@ -24,6 +24,11 @@ import writeFile from "./fs/write-file.js"
 
 function init() {
   const {
+    SOURCE_TYPE_MODULE,
+    SOURCE_TYPE_SCRIPT
+  } = COMPILER
+
+  const {
     TYPE_ESM
   } = ENTRY
 
@@ -34,11 +39,6 @@ function init() {
   const {
     PKG_VERSION
   } = ESM
-
-  const {
-    MODULE,
-    SCRIPT
-  } = SOURCE_TYPE
 
   const CachingCompiler = {
     compile(code, options = {}) {
@@ -60,7 +60,7 @@ function init() {
         return null
       }
 
-      let sourceType = SCRIPT
+      let sourceType = SOURCE_TYPE_SCRIPT
 
       const { length } = meta
 
@@ -87,25 +87,20 @@ function init() {
           filename = resolve(cachePath, filename)
         }
 
-        sourceType = +meta[3]
-
         result.changed = !! meta[2]
         result.filename = filename
-        result.mtime = +meta[4]
+        result.mtime = +meta[3]
+        result.sourceType = +meta[4]
       }
 
-      result.sourceType = sourceType
-
       if (length > 6 &&
-          sourceType === MODULE) {
+          result.sourceType === SOURCE_TYPE_MODULE) {
+        entry.type = TYPE_ESM
         result.dependencySpecifiers = meta[6]
         result.exportedFrom = assign({ __proto__: null }, meta[7])
         result.exportedNames = meta[8]
         result.exportedStars = meta[9]
         result.yieldIndex = +meta[10]
-
-        entry.type = TYPE_ESM
-
         result.dependencySpecifiers = inflateDependencySpecifiers(result)
         result.exportedSpecifiers = inflateExportedSpecifiers(result)
       }
@@ -131,7 +126,7 @@ function init() {
       return result
     }
 
-    if (result.sourceType === MODULE) {
+    if (result.sourceType === SOURCE_TYPE_MODULE) {
       result.dependencySpecifiers = inflateDependencySpecifiers(result)
       result.exportedSpecifiers = inflateExportedSpecifiers(result)
     }
@@ -212,7 +207,7 @@ function init() {
     const { dir } = shared.package
 
     for (const cachePath in dir) {
-      if (cachePath === "") {
+      if (cachePath.length === 0) {
         continue
       }
 
@@ -226,7 +221,7 @@ function init() {
         dirty =
         cache.dirty =
           NYC ||
-          parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
+          !! parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
           exists(resolve(cachePath, "../@babel/register"))
       }
 
@@ -289,7 +284,7 @@ function init() {
 
             const meta = map[cacheName]
 
-            if (meta) {
+            if (meta !== void 0) {
               meta[0] =
               meta[1] = -1
             }
@@ -319,7 +314,7 @@ function init() {
       for (const cacheName in scriptDatas) {
         let meta = map[cacheName]
 
-        if (meta) {
+        if (meta !== void 0) {
           continue
         }
 
@@ -336,20 +331,20 @@ function init() {
 
           const changed = +compileData.changed
 
-          if (sourceType === SCRIPT) {
+          if (sourceType === SOURCE_TYPE_SCRIPT) {
             if (changed) {
               meta.push(
                 changed,
-                sourceType,
                 mtime,
+                sourceType,
                 normalize(relative(cachePath, filename))
               )
             }
           } else {
             meta.push(
               changed,
-              sourceType,
               mtime,
+              sourceType,
               normalize(relative(cachePath, filename)),
               deflateDependencySpecifiers(compileData),
               compileData.exportedFrom,

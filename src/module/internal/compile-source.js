@@ -1,5 +1,5 @@
 import CHAR_CODE from "../../constant/char-code.js"
-import SOURCE_TYPE from "../../constant/source-type.js"
+import COMPILER from "../../constant/compiler.js"
 
 import createSourceMap from "../../util/create-source-map.js"
 import encodeURI from "../../util/encode-uri.js"
@@ -12,11 +12,11 @@ function init() {
   } = CHAR_CODE
 
   const {
-    MODULE
-  } = SOURCE_TYPE
+    SOURCE_TYPE_MODULE
+  } = COMPILER
 
   function compileSource(compileData, options = {}) {
-    const compile = compileData.sourceType === MODULE
+    const compile = compileData.sourceType === SOURCE_TYPE_MODULE
       ? compileESM
       : compileCJS
 

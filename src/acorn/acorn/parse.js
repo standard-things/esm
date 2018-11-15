@@ -1,4 +1,4 @@
-import SOURCE_TYPE from "../../constant/source-type.js"
+import COMPILER from "../../constant/compiler.js"
 
 import Parser from "../../parser.js"
 
@@ -7,9 +7,9 @@ import shared from "../../shared.js"
 
 function init() {
   const {
-    MODULE,
-    SCRIPT
-  } = SOURCE_TYPE
+    SOURCE_TYPE_MODULE,
+    SOURCE_TYPE_SCRIPT
+  } = COMPILER
 
   const Plugin = {
     enable(acorn) {
@@ -23,7 +23,7 @@ function init() {
     let threw = true
 
     options = defaults({
-      sourceType: MODULE,
+      sourceType: SOURCE_TYPE_MODULE,
       strict: false
     }, options)
 
@@ -35,7 +35,7 @@ function init() {
     }
 
     if (threw) {
-      options.sourceType = SCRIPT
+      options.sourceType = SOURCE_TYPE_SCRIPT
 
       try {
         ast = Parser.parse(code, options)

@@ -27,9 +27,7 @@ const pkgIndex = parent.children.findIndex((child) => child.filename === indexPa
 const pkgJSON = fs.readJSONSync(pkgPath)
 const pkgURL = fileProtocol + pkgPath.replace(/\\/g, "/")
 
-const ZWJ = "\u200d"
-const PKG_PREFIX = "esm" + ZWJ
-const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + "@" + pkgJSON.version + ":shared")
+const SHARED_SYMBOL = Symbol.for("esm\u200d@" + pkgJSON.version + ":shared")
 
 const shared = require(SHARED_SYMBOL)
 

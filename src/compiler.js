@@ -1,4 +1,4 @@
-import SOURCE_TYPE from "./constant/source-type.js"
+import COMPILER from "./constant/compiler.js"
 
 import FastPath from "./fast-path.js"
 import MagicString from "./magic-string.js"
@@ -22,10 +22,10 @@ import temporalVisitor from "./visitor/temporal.js"
 
 function init() {
   const {
-    MODULE,
-    SCRIPT,
-    UNAMBIGUOUS
-  } = SOURCE_TYPE
+    SOURCE_TYPE_MODULE,
+    SOURCE_TYPE_SCRIPT,
+    SOURCE_TYPE_UNAMBIGUOUS
+  } = COMPILER
 
   // Add "main" to compiled code to enable the `readFileFast()` fast path of
   // `process.binding("fs").internalModuleReadJSON()`.
@@ -34,10 +34,10 @@ function init() {
   const defaultOptions = {
     cjsVars: false,
     generateVarDeclarations: false,
-    hint: SCRIPT,
+    hint: SOURCE_TYPE_SCRIPT,
     pragmas: true,
     runtimeName: "_",
-    sourceType: SCRIPT,
+    sourceType: SOURCE_TYPE_SCRIPT,
     strict: void 0,
     topLevelReturn: false
   }
@@ -66,20 +66,21 @@ function init() {
         exportedNames: null,
         exportedSpecifiers: null,
         exportedStars: null,
+        live: false,
         scriptData: null,
-        sourceType: SCRIPT,
+        sourceType: SOURCE_TYPE_SCRIPT,
         yieldIndex: 0
       }
 
       let { hint, sourceType } = options
 
-      if (sourceType === UNAMBIGUOUS &&
+      if (sourceType === SOURCE_TYPE_UNAMBIGUOUS &&
           options.pragmas !== false) {
-        if (hint === MODULE ||
+        if (hint === SOURCE_TYPE_MODULE ||
             hasPragma(code, "use module")) {
-          sourceType = MODULE
+          sourceType = SOURCE_TYPE_MODULE
         } else if (hasPragma(code, "use script")) {
-          sourceType = SCRIPT
+          sourceType = SOURCE_TYPE_SCRIPT
         }
       }
 
@@ -102,15 +103,15 @@ function init() {
       let error
       let threw = true
 
-      if ((sourceType === SCRIPT ||
-          sourceType === UNAMBIGUOUS) &&
+      if ((sourceType === SOURCE_TYPE_SCRIPT ||
+          sourceType === SOURCE_TYPE_UNAMBIGUOUS) &&
           ! possibleChanges) {
         return result
       }
 
       const parserOptions = {
-        allowReturnOutsideFunction: options.topLevelReturn || sourceType === SCRIPT,
-        sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
+        allowReturnOutsideFunction: options.topLevelReturn || sourceType === SOURCE_TYPE_SCRIPT,
+        sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
         strict: options.strict
       }
 
@@ -123,11 +124,11 @@ function init() {
       }
 
       if (threw &&
-          sourceType === UNAMBIGUOUS) {
+          sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
         parserOptions.allowReturnOutsideFunction = true
 
         sourceType =
-        parserOptions.sourceType = SCRIPT
+        parserOptions.sourceType = SOURCE_TYPE_SCRIPT
 
         try {
           ast = Parser.parse(code, parserOptions)
@@ -159,7 +160,7 @@ function init() {
           magicString,
           possibleIndexes,
           runtimeName,
-          sourceType: sourceType === SCRIPT ? SCRIPT : MODULE,
+          sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
           strict,
           top,
           yieldIndex
@@ -173,7 +174,7 @@ function init() {
 
       if (addedImportExport ||
           importExportVisitor.addedImportMeta) {
-        sourceType = MODULE
+        sourceType = SOURCE_TYPE_MODULE
       }
 
       if (possibleGlobalsIndexes.length) {
@@ -230,14 +231,14 @@ function init() {
         importExportVisitor.finalizeHoisting()
       }
 
-      if (sourceType === UNAMBIGUOUS) {
-        sourceType = SCRIPT
-      } else if (sourceType === MODULE) {
+      if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
+        sourceType = SOURCE_TYPE_SCRIPT
+      } else if (sourceType === SOURCE_TYPE_MODULE) {
         result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
         result.exportedFrom = importExportVisitor.exportedFrom
         result.exportedNames = importExportVisitor.exportedNames
         result.exportedStars = importExportVisitor.exportedStars
-        result.sourceType = MODULE
+        result.sourceType = SOURCE_TYPE_MODULE
 
         if (addedImportExport) {
           const { initedBindings, temporalBindings } = importExportVisitor
