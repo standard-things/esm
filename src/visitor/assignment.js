@@ -16,7 +16,7 @@ function init() {
       this.possibleIndexes = null
       this.runtimeName = null
 
-      if (options) {
+      if (options !== void 0) {
         this.assignableBindings = options.assignableBindings
         this.importedBindings = options.importedBindings
         this.magicString = options.magicString

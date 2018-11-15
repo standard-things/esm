@@ -36,7 +36,7 @@ for (const id of builtinIds) {
   setDeferred(builtinModules, id, () => {
     const cached = cache.get(id)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
 

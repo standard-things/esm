@@ -78,7 +78,9 @@ function init() {
       const specifier = this.startNodeAt(start, startLoc)
 
       finishType = "ExportNamedDeclaration"
+
       specifier.exported = identifier
+      node.declaration = null
       node.specifiers = [this.finishNode(specifier, "ExportNamespaceSpecifier")]
     }
 

@@ -53,7 +53,7 @@ function init() {
       this.top = null
       this.yieldIndex = 0
 
-      if (options) {
+      if (options !== void 0) {
         const { magicString } = options
 
         this.assignableBindings = { __proto__: null }
@@ -163,7 +163,7 @@ function init() {
 
       code += this.runtimeName + '.w("' + request + '"'
 
-      if (length) {
+      if (length > 0) {
         i = -1
         lastIndex = length - 1
         code += ",["
@@ -294,7 +294,7 @@ function init() {
 
       this.exportedNames.push("default")
 
-      if (id) {
+      if (id !== null) {
         this.assignableBindings[name] = true
       }
 
@@ -336,7 +336,7 @@ function init() {
 
       const initees = { __proto__: null }
 
-      if (declaration) {
+      if (declaration !== null) {
         const pairs = []
         const { id, type } = declaration
         const isClassDecl = type === "ClassDeclaration"
@@ -472,7 +472,7 @@ function init() {
         )
       }
 
-      if (declaration) {
+      if (declaration !== null) {
         path.call(this, "visitWithoutReset", "declaration")
       }
     }

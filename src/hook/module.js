@@ -161,10 +161,10 @@ function hook(Mod, parent) {
         cache.compile[cacheName] === null) {
       compileData = Compiler.from(entry)
 
-      if (compileData) {
-        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8")
-      } else {
+      if (compileData === null) {
         Reflect.deleteProperty(cache.compile, cacheName)
+      } else {
+        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8")
       }
     }
 
@@ -274,7 +274,7 @@ function tryPassthru(func, args, pkg) {
 
   const loc = getLocationFromStackTrace(error)
 
-  if (loc) {
+  if (loc !== null) {
     filename = loc.filename
   }
 

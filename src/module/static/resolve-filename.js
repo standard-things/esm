@@ -46,15 +46,15 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   const isAbs = isAbsolute(request)
-  const parentEntry = parent && Entry.get(parent)
+  const parentEntry = Entry.get(parent)
 
   let fromPath
 
-  if (parentEntry) {
+  if (parentEntry !== null) {
     parentEntry.updateFilename()
   }
 
-  if (parentEntry &&
+  if (parentEntry !== null &&
       ! isAbs) {
     fromPath = parentEntry.dirname
   } else {
@@ -73,7 +73,7 @@ function resolveFilename(request, parent, isMain, options) {
 
     const cached = cache.get(cacheKey)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
   }
@@ -100,8 +100,8 @@ function resolveFilename(request, parent, isMain, options) {
 
   const foundPath = Module._findPath(request, paths, isMain)
 
-  if (foundPath) {
-    if (cacheKey) {
+  if (foundPath.length > 0) {
+    if (cacheKey !== void 0) {
       cache.set(cacheKey, foundPath)
     }
 

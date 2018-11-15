@@ -27,7 +27,7 @@ function load(filename, parent, isMain, cache, loader) {
   let entry
   let child = cache[filename]
 
-  if (child) {
+  if (child !== void 0) {
     const children = parent && parent.children
 
     if (children &&

@@ -22,7 +22,7 @@ function init() {
       this.possibleIndexes = null
       this.runtimeName = null
 
-      if (options) {
+      if (options !== void 0) {
         this.globals = options.globals
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes

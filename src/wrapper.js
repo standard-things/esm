@@ -25,10 +25,10 @@ function init() {
     find(object, name, range) {
       const map = getMap(object, name)
 
-      if (map) {
+      if (map !== null) {
         const maxVersion = maxSatisfying(map.versions, range)
 
-        if (maxVersion) {
+        if (maxVersion !== null) {
           return map.wrappers[maxVersion]
         }
       }

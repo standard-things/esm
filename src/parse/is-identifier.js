@@ -6,24 +6,26 @@ function init() {
       return false
     }
 
-    if (parent) {
-      const { type } = parent
+    if (parent === void 0) {
+      return true
+    }
 
-      if (type === "Property") {
-        return parent.computed || parent.shorthand
-      }
+    const { type } = parent
 
-      if (((type === "AssignmentExpression" ||
-            type === "AssignmentPattern") &&
-           parent.left === node) ||
-          type === "BreakStatement" ||
-          type === "ContinueStatement" ||
-          type === "ImportDefaultSpecifier" ||
-          type === "ImportNamespaceSpecifier" ||
-          type === "ImportSpecifier" ||
-          type === "LabeledStatement") {
-        return false
-      }
+    if (type === "Property") {
+      return parent.computed || parent.shorthand
+    }
+
+    if (((type === "AssignmentExpression" ||
+          type === "AssignmentPattern") &&
+          parent.left === node) ||
+        type === "BreakStatement" ||
+        type === "ContinueStatement" ||
+        type === "ImportDefaultSpecifier" ||
+        type === "ImportNamespaceSpecifier" ||
+        type === "ImportSpecifier" ||
+        type === "LabeledStatement") {
+      return false
     }
 
     return true

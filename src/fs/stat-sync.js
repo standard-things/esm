@@ -21,7 +21,7 @@ function init() {
 
     let cached
 
-    if (cache) {
+    if (cache !== null) {
       cached = cache.get(thePath)
 
       if (cached !== void 0) {
@@ -43,7 +43,7 @@ function init() {
       cached = null
     }
 
-    if (cache) {
+    if (cache !== null) {
       cache.set(thePath, cached)
     }
 

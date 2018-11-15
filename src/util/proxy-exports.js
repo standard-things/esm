@@ -59,7 +59,7 @@ function init() {
 
     let cached = cache.get(exported)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached.proxy
     }
 
@@ -71,7 +71,7 @@ function init() {
       const accessor = getGetter(target, name)
       const value = Reflect.get(target, name, receiver)
 
-      if (accessor) {
+      if (accessor !== void 0) {
         tryUpdateBindings(name, value)
       }
 
@@ -87,7 +87,7 @@ function init() {
 
       let wrapper = cached.wrap.get(value)
 
-      if (wrapper) {
+      if (wrapper !== void 0) {
         return wrapper
       }
 
@@ -125,7 +125,7 @@ function init() {
       try {
         entry.updateBindings(name)
       } finally {
-        if (getter) {
+        if (typeof getter === "function") {
           getters[name] = getter
         } else {
           Reflect.deleteProperty(getters, name)
@@ -184,15 +184,15 @@ function init() {
           receiver = target
         }
 
-        const accessor = getSetter(descriptor)
-
         if (! isUpdatable) {
           target[name] = value
           return false
         }
 
+        const accessor = getSetter(descriptor)
+
         if (Reflect.set(target, name, value, receiver)) {
-          if (accessor) {
+          if (accessor !== void 0) {
             entry.updateBindings()
           } else if (Reflect.has(entry._namespace, name)) {
             entry.updateBindings(name)

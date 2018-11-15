@@ -145,8 +145,8 @@ function init() {
     const { cacheName, cachePath } = options
     const result = compileAndCache(code, options)
 
-    if (cacheName === void 0 ||
-        cachePath === void 0 ||
+    if (! cacheName ||
+        ! cachePath ||
         ! result.changed) {
       return result
     }
@@ -263,13 +263,13 @@ function init() {
 
       for (const cacheName in scripts) {
         const compileData = compileDatas[cacheName]
-        const cachedData = compileData && compileData.scriptData
+        const cachedData = compileData ? compileData.scriptData : null
         const script = scripts[cacheName]
 
         let scriptData
         let changed = false
 
-        if (cachedData === void 0) {
+        if (cachedData === null) {
           scriptData = useCreateCachedData
             ? script.createCachedData()
             : script.cachedData

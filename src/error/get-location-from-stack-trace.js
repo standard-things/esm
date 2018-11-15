@@ -28,7 +28,7 @@ function init() {
 
     let match = headerRegExp.exec(stack)
 
-    if (match) {
+    if (match !== null) {
       const [, filename, lineNum] = match
 
       if (isFilename(filename)) {

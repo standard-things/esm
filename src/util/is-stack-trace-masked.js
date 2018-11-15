@@ -10,8 +10,8 @@ function init() {
 
     if (descriptor &&
         descriptor.configurable &&
-        descriptor.get &&
-        descriptor.set &&
+        typeof descriptor.get === "function" &&
+        typeof descriptor.set === "function" &&
         ! descriptor.enumerable &&
         ! isNative(descriptor.get) &&
         ! isNative(descriptor.set)) {

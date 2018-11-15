@@ -89,10 +89,10 @@ function init() {
 
       const chunk = this.byEnd[index]
 
-      if (chunk) {
-        chunk.appendLeft(content)
-      } else {
+      if (chunk === void 0) {
         this.intro += content
+      } else {
+        chunk.appendLeft(content)
       }
 
       return this
@@ -103,10 +103,10 @@ function init() {
 
       const chunk = this.byStart[index]
 
-      if (chunk) {
-        chunk.appendRight(content)
-      } else {
+      if (chunk === void 0) {
         this.outro += content
+      } else {
+        chunk.appendRight(content)
       }
 
       return this
@@ -147,10 +147,10 @@ function init() {
 
       const chunk = this.byEnd[index]
 
-      if (chunk) {
-        chunk.prependLeft(content)
-      } else {
+      if (chunk === void 0) {
         this.intro = content + this.intro
+      } else {
+        chunk.prependLeft(content)
       }
 
       return this
@@ -161,10 +161,10 @@ function init() {
 
       const chunk = this.byStart[index]
 
-      if (chunk) {
-        chunk.prependRight(content)
-      } else {
+      if (chunk === void 0) {
         this.outro = content + this.outro
+      } else {
+        chunk.prependRight(content)
       }
 
       return this

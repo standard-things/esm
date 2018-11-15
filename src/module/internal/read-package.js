@@ -16,13 +16,13 @@ function init() {
 
     let cacheKey = dirPath
 
-    if (fields) {
+    if (fieldsLength > 0) {
       cacheKey += "\0" + (fieldsLength === 1 ? fields[0] : GenericArray.join(fields))
     }
 
     let cached = cache.get(cacheKey)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
 

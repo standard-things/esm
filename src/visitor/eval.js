@@ -17,7 +17,7 @@ function init() {
       this.runtimeName = null
       this.strict = false
 
-      if (options) {
+      if (options !== void 0) {
         this.addedImportExport = options.addedImportExport
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes

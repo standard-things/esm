@@ -71,13 +71,13 @@ function init() {
       const beforeFunc = typeof last === "function" ? args.pop() : null
       const error = new Super(messages[code](...args))
 
-      if (beforeFunc) {
+      if (beforeFunc !== null) {
         captureStackTrace(error, beforeFunc)
       }
 
       const loc = getLocationFromStackTrace(error)
 
-      if (loc) {
+      if (loc !== null) {
         const stack = get(error, "stack")
 
        if (typeof stack === "string") {

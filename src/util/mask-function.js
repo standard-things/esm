@@ -21,13 +21,13 @@ function init() {
 
     let cached = cache.get(func)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached.proxy
     }
 
     cached = cache.get(source)
 
-    if (cached) {
+    if (cached !== void 0) {
       source = cached.source
     }
 
@@ -78,10 +78,10 @@ function init() {
     } else {
       const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
 
-      if (descriptor) {
-        Reflect.defineProperty(func, "prototype", descriptor)
-      } else {
+      if (descriptor === void 0) {
         Reflect.deleteProperty(func, "prototype")
+      } else {
+        Reflect.defineProperty(func, "prototype", descriptor)
       }
     }
 

@@ -11,6 +11,17 @@ function init() {
 
   const useStandard = !! URL
 
+  const legacyNames = [
+    "hash",
+    "host",
+    "hostname",
+    "href",
+    "pathname",
+    "port",
+    "protocol",
+    "search"
+  ]
+
   function parse(url) {
     if (typeof url === "string" &&
         url.length > 1 &&
@@ -20,7 +31,19 @@ function init() {
       url = "file:" + url
     }
 
-    return useStandard ? new URL(url) : legacyParse(url)
+    if (useStandard) {
+      return new URL(url)
+    }
+
+    const result = legacyParse(url)
+
+    for (const name of legacyNames) {
+      if (typeof result[name] !== "string") {
+        result[name] = ""
+      }
+    }
+
+    return result
   }
 
   function parseURL(url) {

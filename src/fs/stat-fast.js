@@ -19,17 +19,17 @@ function init() {
 
     let cached
 
-    if (cache) {
+    if (cache !== null) {
       cached = cache.get(thePath)
 
-      if (cached) {
+      if (cached !== void 0) {
         return cached
       }
     }
 
     cached = statBase(thePath)
 
-    if (cache) {
+    if (cache !== null) {
       cache.set(thePath, cached)
     }
 
@@ -55,7 +55,7 @@ function init() {
   function statFastFallback(thePath) {
     const stat = statSync(thePath)
 
-    if (stat) {
+    if (stat !== null) {
       return Reflect.apply(isFile, stat, []) ? 0 : 1
     }
 

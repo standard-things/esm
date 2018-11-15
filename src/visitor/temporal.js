@@ -19,7 +19,7 @@ function init() {
       this.runtimeName = null
       this.temporalBindings = null
 
-      if (options) {
+      if (options !== void 0) {
         this.initedBindings = options.initedBindings
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
@@ -98,7 +98,7 @@ function init() {
 
       const initees = { __proto__: null }
 
-      if (declaration) {
+      if (declaration !== null) {
         const { type } = declaration
 
         if (type === "ClassDeclaration") {
@@ -124,7 +124,7 @@ function init() {
 
       const names = keys(initees)
 
-      if (names.length) {
+      if (names.length > 0) {
         const { end } = declaration || node
 
         this.magicString.appendRight(
@@ -133,7 +133,7 @@ function init() {
         )
       }
 
-      if (declaration) {
+      if (declaration !== null) {
         path.call(this, "visitWithoutReset", "declaration")
       }
     }

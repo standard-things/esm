@@ -25,16 +25,16 @@ function init() {
 
     const { stack } = error
 
-    if (prepareStackTraceDescriptor) {
-      Reflect.defineProperty(BuiltinError, "prepareStackTrace", prepareStackTraceDescriptor)
-    } else {
+    if (prepareStackTraceDescriptor === void 0) {
       Reflect.deleteProperty(BuiltinError, "prepareStackTrace")
+    } else {
+      Reflect.defineProperty(BuiltinError, "prepareStackTrace", prepareStackTraceDescriptor)
     }
 
-    if (stackTraceLimitDescriptor) {
-      Reflect.defineProperty(BuiltinError, "stackTraceLimit", stackTraceLimitDescriptor)
-    } else {
+    if (stackTraceLimitDescriptor === void 0) {
       Reflect.deleteProperty(BuiltinError, "stackTraceLimit")
+    } else {
+      Reflect.defineProperty(BuiltinError, "stackTraceLimit", stackTraceLimitDescriptor)
     }
 
     return Array.isArray(stack) ? stack : []

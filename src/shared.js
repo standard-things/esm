@@ -11,7 +11,7 @@ const {
 const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + "@" + PKG_VERSION + ":shared")
 
 function getShared() {
-  if (__shared__) {
+  if (__shared__ !== void 0) {
     __shared__.inited = true
     __shared__.reloaded = false
     return __shared__

@@ -145,7 +145,7 @@ function init() {
   function getChildNames(value) {
     let childNames = childNamesMap.get(value)
 
-    if (childNames) {
+    if (childNames !== void 0) {
       return childNames
     }
 

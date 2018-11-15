@@ -11,7 +11,7 @@ function init() {
 
     const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
-    if (descriptor) {
+    if (descriptor !== void 0) {
       if (isDataPropertyDescriptor(descriptor)) {
         object[name] = source[name]
       } else {

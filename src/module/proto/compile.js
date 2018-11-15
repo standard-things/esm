@@ -63,7 +63,7 @@ function compile(content, filename) {
 
   let cachedData
 
-  if (compileData) {
+  if (compileData !== null) {
     cachedData =
       compileData.scriptData ||
       void 0
@@ -86,7 +86,7 @@ function compile(content, filename) {
 
   const script = new realVM.Script(wrappedContent, scriptOptions)
 
-  if (cachePath) {
+  if (cachePath.length > 0) {
     const pendingScripts =
       shared.pendingScripts[cachePath] ||
       (shared.pendingScripts[cachePath] = { __proto__: null })

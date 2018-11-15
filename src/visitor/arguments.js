@@ -17,7 +17,7 @@ function init() {
       this.runtimeName = null
       this.top = null
 
-      if (options) {
+      if (options !== void 0) {
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName

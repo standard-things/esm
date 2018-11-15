@@ -31,9 +31,9 @@ const {
 
 function load(request, parent, isMain) {
   const { parsing } = shared.moduleState
-  const parentEntry = parent && Entry.get(parent)
+  const parentEntry = Entry.get(parent)
 
-  if (parentEntry &&
+  if (parentEntry !== null &&
       parentEntry._require === TYPE_ESM) {
     parentEntry._require = TYPE_CJS
     return esmLoad(request, parent, isMain).module.exports

@@ -36,9 +36,9 @@ const Module = maskFunction(function (id, parent) {
   this.loaded = false
   this.parent = parent
 
-  const children = parent && parent.children
+  const children = parent ? parent.children : null
 
-  if (children) {
+  if (Array.isArray(children)) {
     GenericArray.push(children, this)
   }
 }, RealModule)

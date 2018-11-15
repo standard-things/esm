@@ -31,7 +31,7 @@ function init() {
 
     let cached = cache.get(thePath)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
 

@@ -115,11 +115,11 @@ function compile(caller, entry, content, filename, fallback) {
         tryValidate(caller, entry, content, filename)
         entry.initNamespace()
       }
-    } else if (fallback) {
+    } else if (typeof fallback === "function") {
       const defaultPkg = Package.state.default
       const parentEntry = entry.parent
-      const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-      const parentPkg = parentEntry && parentEntry.package
+      const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
+      const parentPkg = parentEntry === null ? null : parentEntry.package
 
       if (! parentIsESM &&
           (pkg === defaultPkg ||
@@ -214,7 +214,7 @@ function tryCompileCached(entry, filename) {
 
   const loc = getLocationFromStackTrace(error)
 
-  if (loc) {
+  if (loc !== null) {
     filename = loc.filename
   }
 

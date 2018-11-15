@@ -73,13 +73,13 @@ function init() {
       } else if (type === "ClassDeclaration") {
         const { id } = object
 
-        if (id) {
+        if (id !== null) {
           identifiers[id.name] = true
         }
       } else if (type === "FunctionDeclaration") {
         const { id } = object
 
-        if (id) {
+        if (id !== null) {
           const { name } = id
 
           if (inModule &&

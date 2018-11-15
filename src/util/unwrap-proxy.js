@@ -11,7 +11,7 @@ function init() {
     const cache = shared.memoize.utilUnwrapProxy
     const cached = cache.get(value)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
 

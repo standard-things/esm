@@ -64,7 +64,7 @@ if (shared.inited &&
     if (options === void 0) {
       const pkg = Package.from(mod)
 
-      if (pkg) {
+      if (pkg !== null) {
         cacheKey = JSON.stringify(pkg.options)
       }
     } else {
@@ -72,7 +72,7 @@ if (shared.inited &&
       cacheKey = JSON.stringify(options)
     }
 
-    if (cacheKey) {
+    if (cacheKey !== void 0) {
       const { state } = shared.package
 
       Package.state = state[cacheKey] || (state[cacheKey] = {
@@ -81,7 +81,7 @@ if (shared.inited &&
       })
     }
 
-    if (options) {
+    if (options !== void 0) {
       Package.from(mod, options)
     }
 

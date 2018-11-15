@@ -29,11 +29,9 @@ const req = function require(request) {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
   }
 
-  const parentEntry =
-    isMJS(this.filename) &&
-    Entry.get(this)
+  const parentEntry = isMJS(this.filename) ? Entry.get(this) : null
 
-  if (parentEntry &&
+  if (parentEntry !== null &&
       parentEntry._require === TYPE_ESM) {
     return esmLoad(request, this, false).module.exports
   }

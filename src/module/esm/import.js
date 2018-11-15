@@ -34,7 +34,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
     childEntry = tryParse(request, entry)
   }
 
-  if (childEntry) {
+  if (childEntry !== null) {
     child = childEntry.module
 
     if (entry.extname === ".mjs" &&
@@ -56,7 +56,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
     childEntry.addSetters(setterArgsList, entry, isExport)
   }
 
-  let mockEntry
+  let mockEntry = null
 
   if (child.exports !== exported) {
     mockEntry =
@@ -72,7 +72,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
   childEntry.loaded()
   childEntry.updateBindings()
 
-  if (mockEntry) {
+  if (mockEntry !== null) {
     // Update the mock entry after the original child entry so static import
     // requests are updated with mock entry setters last.
     mockEntry.updateBindings()
@@ -82,7 +82,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
 function getEntryFrom(request, exported) {
   const entry = shared.entry.cache.get(exported)
 
-  if (entry) {
+  if (entry !== void 0) {
     return entry
   }
 

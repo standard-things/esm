@@ -53,7 +53,7 @@ function makeRequireFunction(mod, requirer, resolver) {
     if (isOwn) {
       const exported = ownRequire(request)
 
-      if (exported) {
+      if (exported !== void 0) {
         return exported
       }
     }

@@ -80,7 +80,7 @@ function init() {
         descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
       }
 
-      if (descriptor) {
+      if (descriptor !== void 0) {
         Reflect.defineProperty(context, name, descriptor)
       }
     }
@@ -126,7 +126,7 @@ function init() {
     for (const name of builtinNames) {
       const descriptor = builtinDescriptors[name]
 
-      if (descriptor) {
+      if (descriptor !== void 0) {
         Reflect.defineProperty(context, name, descriptor)
       }
 

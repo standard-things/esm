@@ -6,7 +6,7 @@ function init() {
       ? object
       : Reflect.getOwnPropertyDescriptor(object, name)
 
-    if (descriptor) {
+    if (descriptor !== void 0) {
       // Section 9.5.9: [[Set]]()
       // Step 11: If either the data descriptor is not configurable or writable, or
       // the accessor descriptor has no setter, then the value must be the same.

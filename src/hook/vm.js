@@ -71,15 +71,9 @@ function hook(vm) {
     const cacheName =
     entry.cacheName = getCacheName(content)
 
-    let compileData = entry.package.cache.compile[cacheName]
+    let compileData = entry.package.cache.compile[cacheName] || null
 
-    if (compileData) {
-      if (compileData.scriptData &&
-          scriptOptions.produceCachedData &&
-          ! Reflect.has(scriptOptions, "cachedData")) {
-        scriptOptions.cachedData = compileData.scriptData
-      }
-    } else {
+    if (compileData === null) {
       compileData = tryWrapper(Compiler.compile, [
         content,
         {
@@ -91,6 +85,10 @@ function hook(vm) {
           strict: false
         }
       ])
+    } else if (compileData.scriptData !== null &&
+        scriptOptions.produceCachedData &&
+        ! Reflect.has(scriptOptions, "cachedData")) {
+      scriptOptions.cachedData = compileData.scriptData
     }
 
     entry.state = STATE_PARSING_STARTED

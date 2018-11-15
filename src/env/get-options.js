@@ -32,12 +32,12 @@ function init() {
     if (isPath(options)) {
       options = readFile(resolve(options), "utf8") || ""
 
-      if (options) {
+      if (options.length > 0) {
         options = options.trim()
       }
     }
 
-    if (options === "") {
+    if (options.length === 0) {
       return env.options = null
     }
 

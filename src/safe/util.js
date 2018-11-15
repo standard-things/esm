@@ -1,4 +1,4 @@
-import isObject from "../util/is-object.js"
+import isObjectLike from "../util/is-object-like.js"
 import realUtil from "../real/util.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -11,7 +11,7 @@ function init() {
 
   let defaultInspectOptions
 
-  if (isObject(defaultOptions)) {
+  if (isObjectLike(defaultOptions)) {
     defaultInspectOptions = defaultOptions
   } else {
     defaultInspectOptions = {
@@ -26,7 +26,7 @@ function init() {
     }
   }
 
-  if (types) {
+  if (isObjectLike(types)) {
     setProperty(safeUtil, "types", safe(types))
   }
 

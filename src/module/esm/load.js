@@ -23,11 +23,11 @@ const {
 
 function load(request, parent, isMain) {
   const { parsing } = shared.moduleState
-  const parentEntry = parent && Entry.get(parent)
-  const parentIsESM = parentEntry && parentEntry.type === TYPE_ESM
-  const parentIsMJS = parentEntry && parentEntry.extname === ".mjs"
-  const parentPkg = parentEntry && parentEntry.package
-  const parentPkgOptions = parentPkg && parentPkg.options
+  const parentEntry = Entry.get(parent)
+  const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
+  const parentIsMJS = parentEntry === null ? false : parentEntry.extname === ".mjs"
+  const parentPkg = parentEntry === null ? null : parentEntry.package
+  const parentPkgOptions = parentPkg === null ? null : parentPkg.options
 
   let filename
 
@@ -80,7 +80,7 @@ function load(request, parent, isMain) {
 
     cache[request] = child
 
-    if (parentEntry) {
+    if (parentEntry !== null) {
       parentEntry.children[entry.name] = entry
     }
 

@@ -99,7 +99,7 @@ function createEntry(id) {
       getOwnPropertyDescriptor(target, name){
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
-        if (descriptor) {
+        if (descriptor !== void 0) {
           const { value } = descriptor
 
           if (value === func) {
@@ -133,7 +133,7 @@ for (const id of builtinIds) {
   setDeferred(builtinEntries, id, () => {
     const cached = cache.get(id)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached
     }
 

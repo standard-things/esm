@@ -9,7 +9,7 @@ function init() {
     const cache = shared.memoize.utilGetProxyDetails
     const cached = cache.get(proxy)
 
-    if (cached) {
+    if (cached !== void 0) {
       return cached.details
     }
 

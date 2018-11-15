@@ -100,7 +100,7 @@ function init() {
 
     let object = proxy
 
-    if (details) {
+    if (details !== void 0) {
       object = new Proxy(
         toInspectable(details[0], context),
         toInspectable(details[1], context)

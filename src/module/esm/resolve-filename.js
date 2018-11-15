@@ -76,16 +76,16 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   const isAbs = isAbsolute(request)
-  const parentEntry = parent && Entry.get(parent)
+  const parentEntry = Entry.get(parent)
 
   let fromPath
 
-  if (parentEntry) {
+  if (parentEntry !== null) {
     parentEntry.updateFilename()
   }
 
-  if (parentEntry &&
-      ! isAbs) {
+  if (! isAbs &&
+      parentEntry !== null) {
     fromPath = parentEntry.dirname
   } else {
     fromPath = ""
@@ -125,7 +125,7 @@ function resolveFilename(request, parent, isMain, options) {
   // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
   let skipGlobalPaths = true
 
-  if (parentEntry &&
+  if (parentEntry !== null &&
       parentEntry.extname === ".mjs") {
     autoMode =
     cjsPaths = false

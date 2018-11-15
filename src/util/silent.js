@@ -11,10 +11,10 @@ function init() {
     try {
       return callback()
     } finally {
-      if (descriptor) {
-        Reflect.defineProperty(realProcess, "noDeprecation", descriptor)
-      } else {
+      if (descriptor === void 0) {
         Reflect.deleteProperty(realProcess, "noDeprecation")
+      } else {
+        Reflect.defineProperty(realProcess, "noDeprecation", descriptor)
       }
     }
   }

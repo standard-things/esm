@@ -76,14 +76,14 @@ function init() {
 
     if (! async &&
         yieldIndex !== -1) {
-      if (yieldIndex) {
+      if (yieldIndex === 0) {
+        code = "yield;" + code
+      } else {
         code =
           code.slice(0, yieldIndex) +
           (code.charCodeAt(yieldIndex - 1) === SEMICOLON ? "" : ";") +
           "yield;" +
           code.slice(yieldIndex)
-      } else {
-        code = "yield;" + code
       }
     }
 

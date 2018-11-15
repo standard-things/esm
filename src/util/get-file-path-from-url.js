@@ -29,7 +29,7 @@ function init() {
 
     let { pathname } = parsed
 
-    if (! pathname ||
+    if (pathname.length === 0 ||
         parsed.protocol !== "file:" ||
         hasEncodedSep(pathname)) {
       return ""
@@ -41,9 +41,8 @@ function init() {
 
     // Section 2: Syntax
     // https://tools.ietf.org/html/rfc8089#section-2
-    if (host === "localhost") {
-      host = ""
-    } if (host) {
+    if (host.length > 0 &&
+        host !== "localhost") {
       return WIN32
         ? "\\\\" + domainToUnicode(host) + normalize(pathname)
         : ""

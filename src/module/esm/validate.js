@@ -177,7 +177,7 @@ function validateExportedName(entry, exportedName, seen) {
         const { local, request } = exportedSpecifier
         const childEntry = dependencySpecifiers[request].entry
 
-        if (childEntry) {
+        if (childEntry !== null) {
           seen || (seen = { __proto__: null })
           seen[name] = true
           validateExportedName(childEntry, local, seen)

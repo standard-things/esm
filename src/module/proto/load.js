@@ -13,8 +13,7 @@ function load(filename) {
   }
 
   const entry = Entry.get(this)
-  const { parent } = this
-  const parentEntry = parent && Entry.get(parent)
+  const parentEntry = Entry.get(this.parent)
 
   loader(entry, filename, parentEntry)
 }

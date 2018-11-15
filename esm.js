@@ -27,11 +27,9 @@ const isChakra = has(versions, "chakracore")
 const isElectron = has(versions, "electron")
 const isElectronRenderer = isElectron && type === "renderer"
 
-let nativeContent
-
-if (id.startsWith("internal/")) {
-  nativeContent = getNativeSource("internal/esm/loader")
-}
+const nativeContent = id.startsWith("internal/")
+  ? getNativeSource("internal/esm/loader")
+  : ""
 
 const Module = require("module")
 const { Script } = require("vm")
@@ -59,8 +57,10 @@ if (typeof jest === "object" && jest !== null &&
 
 function getNativeSource(thePath) {
   try {
-    return require("internal/bootstrap/loaders").NativeModule._source[thePath]
+    return require("internal/bootstrap/loaders").NativeModule._source[thePath] || ""
   } catch (e) {}
+
+  return ""
 }
 
 function loadESM() {
@@ -76,6 +76,8 @@ function readFile(filename, options) {
   try {
     return readFileSync(filename, options)
   } catch (e) {}
+
+  return null
 }
 
 function tryRequire(request) {
@@ -172,11 +174,11 @@ function jestTransform(content, filename, { cwd, testEnvironment }) {
 }
 
 let cachedData
-let cachePath
-let content
 let scriptOptions
+let cachePath = ""
+let content = ""
 
-if (nativeContent) {
+if (nativeContent.length > 0) {
   content = nativeContent
 
   scriptOptions = {
@@ -185,8 +187,8 @@ if (nativeContent) {
   }
 } else {
   cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
-  cachedData = readFile(cachePath + sep + ".data.blob")
-  content = readFile(__dirname + sep + "esm" + sep + "loader.js", "utf8")
+  cachedData = readFile(cachePath + sep + ".data.blob") || void 0
+  content = readFile(__dirname + sep + "esm" + sep + "loader.js", "utf8") || ""
 
   scriptOptions = {
     __proto__: null,
@@ -227,8 +229,9 @@ let shared
 
 shared = loadESM()
 
-if (cachePath) {
+if (cachePath.length > 0) {
   const { dir } = shared.package
+  const scriptData = cachedData || null
 
   dir[cachePath] || (dir[cachePath] = {
     buffer: cachedData,
@@ -236,7 +239,7 @@ if (cachePath) {
       __proto__: null,
       esm: {
         changed: false,
-        scriptData: cachedData,
+        scriptData,
         sourceType: 1
       }
     },

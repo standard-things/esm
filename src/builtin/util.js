@@ -5,6 +5,7 @@ import format from "../util/format.js"
 import formatWithOptions from "../util/format-with-options.js"
 import inspect from "../util/inspect.js"
 import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
+import isObjectLike from "../util/is-object-like.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import keysAll from "../util/keys-all.js"
 import proxyWrap from "../util/proxy-wrap.js"
@@ -18,7 +19,7 @@ function init() {
 
   let builtinTypes
 
-  if (safeTypes) {
+  if (isObjectLike(safeTypes)) {
     const builtinIsModuleNamespaceObject =
       proxyWrap(safeTypes.isModuleNamespaceObject, toWrapper(isModuleNamespaceObject))
 
