@@ -3,7 +3,7 @@ import PACKAGE from "../../constant/package.js"
 import Module from "../../module.js"
 
 const {
-  OPTIONS_MODE_STRICT
+  MODE_STRICT
 } = PACKAGE
 
 function loader(entry, filename, parentEntry) {
@@ -18,7 +18,7 @@ function loader(entry, filename, parentEntry) {
 
   if (ext === ".mjs" ||
       (parentEntry &&
-       parentEntry.package.options.mode === OPTIONS_MODE_STRICT)) {
+       parentEntry.package.options.mode === MODE_STRICT)) {
     entry._passthru = true
   }
 

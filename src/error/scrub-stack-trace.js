@@ -4,7 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    FILENAMES
+    PKG_FILENAMES
   } = ESM
 
   const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
@@ -29,7 +29,7 @@ function init() {
 
     return message + lines
       .filter((line) => {
-        for (const filename of FILENAMES) {
+        for (const filename of PKG_FILENAMES) {
           if (line.indexOf(filename) !== -1) {
             return false
           }
