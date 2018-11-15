@@ -81,6 +81,7 @@ function init() {
 
         case LOWERCASE_O:
           altOptions || (altOptions = assign({}, options, {
+            depth: 4,
             showHidden: true,
             showProxy: true
           }))
