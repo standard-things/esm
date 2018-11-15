@@ -13,6 +13,7 @@ import getModuleName from "./util/get-module-name.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
+import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
@@ -129,7 +130,7 @@ class Entry {
   }
 
   static get(mod) {
-    if (! mod) {
+    if (! isObject(mod)) {
       return null
     }
 

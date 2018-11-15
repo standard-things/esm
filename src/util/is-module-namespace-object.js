@@ -1,10 +1,10 @@
-import isObjectLike from "./is-object-like.js"
+import isObject from "./is-object.js"
 import isOwnProxy from "./is-own-proxy.js"
 import shared from "../shared.js"
 
 function init() {
   function isModuleNamespaceObject(value) {
-    return isObjectLike(value) &&
+    return isObject(value) &&
       Reflect.has(value, shared.symbol.namespace) &&
       isOwnProxy(value)
   }
