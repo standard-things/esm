@@ -11,7 +11,7 @@ function init() {
 
   function isAbsolute(value) {
     if (typeof value !== "string" ||
-        value.length === 0) {
+        value === "") {
       return false
     }
 

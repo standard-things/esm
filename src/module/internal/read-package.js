@@ -29,7 +29,7 @@ function init() {
     const jsonPath = dirPath + sep + "package.json"
     const jsonString = readFileFast(jsonPath, "utf8") || ""
 
-    if (jsonString.length === 0 ||
+    if (jsonString === "" ||
         (fieldsLength === 1 &&
         fields[0] === "main" &&
         ! mainFieldRegExp.test(jsonString))) {

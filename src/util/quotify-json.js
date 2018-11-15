@@ -17,7 +17,7 @@ function init() {
 
   function quotifyJSON(string) {
     if (typeof string !== "string" ||
-        string.length === 0) {
+        string === "") {
       return string
     }
 

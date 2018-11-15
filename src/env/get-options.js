@@ -31,13 +31,10 @@ function init() {
 
     if (isPath(options)) {
       options = readFile(resolve(options), "utf8") || ""
-
-      if (options.length > 0) {
-        options = options.trim()
-      }
+      options = options.trim()
     }
 
-    if (options.length === 0) {
+    if (options === "") {
       return env.options = null
     }
 

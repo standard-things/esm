@@ -207,7 +207,7 @@ function init() {
     const { dir } = shared.package
 
     for (const cachePath in dir) {
-      if (cachePath.length === 0) {
+      if (cachePath === "") {
         continue
       }
 

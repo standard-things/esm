@@ -146,13 +146,13 @@ function resolveFilename(request, parent, isMain, options) {
 
     foundPath = getFilePathFromURL(parsed)
 
-    if (foundPath.length === 0 &&
+    if (foundPath === "" &&
         parsed.protocol !== "file:" &&
         ! localhostRegExp.test(request)) {
       throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
     }
 
-    if (foundPath.length > 0) {
+    if (foundPath !== "") {
       foundPath = _resolveFilename(foundPath, parent, isMain, options, emptyArray, emptyArray, true)
     }
   } else if (isPath) {
@@ -169,14 +169,14 @@ function resolveFilename(request, parent, isMain, options) {
 
     foundPath = _resolveFilename(decoded, parent, isMain, options, fields, exts, skipGlobalPaths)
 
-    if (foundPath.length === 0 &&
+    if (foundPath === "" &&
         Reflect.has(builtinLookup, decoded)) {
       cache.set(cacheKey, decoded)
       return decoded
     }
   }
 
-  if (foundPath.length > 0) {
+  if (foundPath !== "") {
     if (autoMode ||
         cjsPaths ||
         isMain ||

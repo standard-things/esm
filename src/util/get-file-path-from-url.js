@@ -29,7 +29,7 @@ function init() {
 
     let { pathname } = parsed
 
-    if (pathname.length === 0 ||
+    if (pathname === "" ||
         parsed.protocol !== "file:" ||
         hasEncodedSep(pathname)) {
       return ""

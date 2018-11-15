@@ -104,7 +104,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
       curPath = realpath(curPath)
 
-      if (curPath.length === 0) {
+      if (curPath === "") {
         continue
       }
     }
@@ -143,7 +143,7 @@ function findPath(request, paths, isMain, fields, exts) {
           : thePath
       }
 
-      if (filename.length === 0) {
+      if (filename === "") {
         if (exts === void 0) {
           exts = keys(Module._extensions)
         }
@@ -154,7 +154,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
     // If a directory.
     if (rc === 1 &&
-        filename.length === 0) {
+        filename === "") {
       if (exts === void 0) {
         exts = keys(Module._extensions)
       }
@@ -242,7 +242,7 @@ function tryFilename(filename, isMain) {
 function tryPackage(dirPath, fields, exts, isMain) {
   const json = readPackage(dirPath, fields) || ""
 
-  if (json.length === 0) {
+  if (json === "") {
     return json
   }
 
