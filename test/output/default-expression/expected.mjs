@@ -2,4 +2,4 @@
 
 // This default expression will evaluate to 0 if the parentheses are
 // mistakenly stripped away.
-_.d((value++, value));_.j(["default"]);
+_.d((value++, value));

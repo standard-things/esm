@@ -37,6 +37,10 @@ const {
 const Runtime = {
   addDefaultValue(value) {
     this.addExportGetters([["default", () => value]])
+
+    if (value === void 0) {
+      this.initBindings(["default"])
+    }
   },
 
   addExportFromSetter(importedName, exportedName = importedName) {

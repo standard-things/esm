@@ -279,7 +279,8 @@ function init() {
           // If the exported expression is a comma-separated sequence expression
           // it may not include the vital parentheses, so we should wrap the
           // expression with parentheses to make sure it's treated as a single
-          // argument to `runtime.default()`, rather than as multiple arguments.
+          // argument to `runtime.addDefaultValue()`, rather than as multiple
+          // arguments.
           prefix += "("
           suffix = ")" + suffix
         }
@@ -300,11 +301,6 @@ function init() {
 
       if (isInitable(declaration)) {
         this.initedBindings.default = true
-
-        magicString.appendRight(
-          declaration.end,
-          runtimeName + '.j(["default"]);'
-        )
       }
 
       path.call(this, "visitWithoutReset", "declaration")
