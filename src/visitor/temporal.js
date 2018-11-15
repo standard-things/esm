@@ -77,7 +77,7 @@ function init() {
     visitExportDefaultDeclaration(path) {
       const { initedBindings } = this
 
-      if (! Reflect.has(initedBindings, "default")) {
+      if (initedBindings.default !== true) {
         initedBindings.default = true
 
         const node = path.getValue()
@@ -104,7 +104,7 @@ function init() {
         if (type === "ClassDeclaration") {
           const { name } = declaration.id
 
-          if (! Reflect.has(initedBindings, name)) {
+          if (initedBindings[name] !== true) {
             initees[name] =
             initedBindings[name] = true
           }
@@ -113,7 +113,7 @@ function init() {
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
-              if (! Reflect.has(initedBindings, name)) {
+              if (initedBindings[name] !== true) {
                 initees[name] =
                 initedBindings[name] = true
               }

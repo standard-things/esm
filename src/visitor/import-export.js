@@ -293,21 +293,18 @@ function init() {
           .prependRight(declaration.end, suffix)
       }
 
-      this.exportedNames.push("default")
-
       if (id !== null) {
         this.assignableBindings[name] = true
       }
 
-      if (isInitable(declaration)) {
-        this.initedBindings.default = true
-      }
+      this.exportedNames.push("default")
+      this.initedBindings.default = isInitable(declaration)
 
       path.call(this, "visitWithoutReset", "declaration")
     }
 
     visitExportNamedDeclaration(path) {
-      if (this.sourceType !== MODULE) {
+      if (this.sourceType !== SOURCE_TYPE_MODULE) {
         return
       }
 
@@ -368,10 +365,13 @@ function init() {
                 assignableBindings[name] = true
               }
 
-              if (initable &&
-                  ! Reflect.has(initedBindings, name)) {
-                initees[name] =
-                initedBindings[name] = true
+              if (! Reflect.has(initedBindings, name)) {
+                if (initable) {
+                  initees[name] =
+                  initedBindings[name] = true
+                } else {
+                  initedBindings[name] = false
+                }
               }
 
               exportedNames.push(name)
