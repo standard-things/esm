@@ -1,3 +1,5 @@
+import { basename, extname } from "./safe/path.js"
+
 import ENTRY from "./constant/entry.js"
 
 import OwnProxy from "./own/proxy.js"
@@ -8,7 +10,6 @@ import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
 import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
-import getModuleExtname from "./util/get-module-extname.js"
 import getModuleName from "./util/get-module-name.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
@@ -75,6 +76,8 @@ class Entry {
     this._passthru = false
     // The load type for `module.require()`.
     this._require = TYPE_CJS
+    // The module basename.
+    this.basename = null
     // The builtin module indicator.
     this.builtin = false
     // The cache name of the module.
@@ -541,13 +544,35 @@ class Entry {
       mod.filename = filename
     }
 
-    if (force ||
-        this.filename !== mod.filename) {
-      this.filename = mod.filename
-      this.dirname = getModuleDirname(mod)
-      this.extname = getModuleExtname(mod)
-      this.name = getModuleName(mod)
+    if (! force &&
+        this.filename === mod.filename) {
+      return
     }
+
+    const modDirname = getModuleDirname(mod)
+    const modFilename = mod.filename
+
+    this.dirname = modDirname
+    this.filename = modFilename
+    this.name = getModuleName(mod)
+
+    if (modDirname === "") {
+      this.basename = modFilename
+      this.extname = ""
+      return
+    }
+
+    if (typeof modFilename !== "string") {
+      this.basename =
+      this.extname = ""
+      return
+    }
+
+    this.basename = modDirname === "."
+      ? basename(modFilename)
+      : modFilename.slice(modDirname.length + 1)
+
+    this.extname = extname(modFilename)
   }
 }
 

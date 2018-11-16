@@ -2,6 +2,8 @@ import PACKAGE from "../../constant/package.js"
 
 import Module from "../../module.js"
 
+import findCompilerExtension from "../internal/find-compiler-extension.js"
+
 const {
   MODE_STRICT
 } = PACKAGE
@@ -9,10 +11,9 @@ const {
 function loader(entry, filename, parentEntry) {
   entry.updateFilename(filename)
 
-  let ext = entry.extname
+  let ext = findCompilerExtension(Module._extensions, entry)
 
-  if (ext === "" ||
-      ! Reflect.has(Module._extensions, ext)) {
+  if (ext === "") {
     ext = ".js"
   }
 
