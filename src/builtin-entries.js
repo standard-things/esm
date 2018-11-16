@@ -23,11 +23,14 @@ function createEntry(id) {
   const mod = builtinModules[id]
 
   let exported = mod.exports
+  let unwrapped = exported
 
-  if (! CHAKRA &&
-      id !== "assert" &&
-      typeof exported === "function") {
-    const func = exported
+  const isFunc = typeof unwrapped === "function"
+
+  if (isFunc &&
+      ! CHAKRA &&
+      id !== "assert") {
+    const func = unwrapped
     const { prototype } = func
 
     const hasInstance = maskFunction(
@@ -121,6 +124,11 @@ function createEntry(id) {
   exported =
   entry.exports =
   mod.exports = proxyExports(entry)
+
+  if (isFunc &&
+      id === "module") {
+    unwrapped.prototype.constructor = exported
+  }
 
   entry.loaded()
   return entry
