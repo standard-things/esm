@@ -130,6 +130,7 @@ describe("miscellaneous tests", () => {
       const actual = new Console(process.stdout)
 
       assert.ok(actual instanceof Console)
+      assert.strictEqual(actual.constructor, Console)
     })
 
     it("should support subclassing `console.Console`", () => {
@@ -144,9 +145,15 @@ describe("miscellaneous tests", () => {
 
       assert.ok(actual instanceof Console)
       assert.ok(actual instanceof Sub)
-
-      assert.strictEqual(actual.sub, "sub")
       assert.ok(Reflect.has(actual, "_stdout"))
+      assert.strictEqual(actual.sub, "sub")
+    })
+
+    it("should support `Module`", () => {
+      const actual = new Module
+
+      assert.ok(actual instanceof Module)
+      assert.strictEqual(actual.constructor, Module)
     })
 
     it("should support subclassing `stream.Stream`", () => {
