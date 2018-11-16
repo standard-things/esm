@@ -61,7 +61,7 @@ function init() {
     }
 
     for (const name of names) {
-      if (assignableBindings[name]) {
+      if (assignableBindings[name] === true) {
         const shadowed = getShadowed(path, name, shadowedMap)
 
         if (shadowed === null ||

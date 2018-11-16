@@ -18,7 +18,7 @@ function loader(entry, filename, parentEntry) {
   }
 
   if (ext === ".mjs" ||
-      (parentEntry &&
+      (parentEntry !== null &&
        parentEntry.package.options.mode === MODE_STRICT)) {
     entry._passthru = true
   }

@@ -21,14 +21,17 @@ const {
 
 function esmImport(entry, request, setterArgsList, isExport) {
   const { compileData } = entry
-  const dependencySpecifiers = compileData && compileData.dependencySpecifiers
 
-  let child
+  const dependencySpecifiers = compileData === null
+    ? null
+    : compileData.dependencySpecifiers
+
+  let child = null
   let childEntry = null
 
-  if (dependencySpecifiers &&
-      dependencySpecifiers[request] &&
-      dependencySpecifiers[request].entry)  {
+  if (dependencySpecifiers !== null &&
+      Reflect.has(dependencySpecifiers, request) &&
+      dependencySpecifiers[request].entry !== null)  {
     childEntry = dependencySpecifiers[request].entry
   } else {
     childEntry = tryParse(request, entry)

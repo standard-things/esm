@@ -190,9 +190,9 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
   }
 
-  foundPath = Module._resolveFilename(request, parent, isMain, options)
+  foundPath = Module._resolveFilename(request, parent, isMain, options) || ""
 
-  if (foundPath.length > 0) {
+  if (foundPath !== "") {
     if (cjsPaths) {
       cache.set(cacheKey, foundPath)
       return foundPath

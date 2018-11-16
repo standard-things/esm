@@ -291,13 +291,6 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parent) {
-    const { importedBindings } = this
-    const settersMap = this.setters
-
-    const setters =
-      settersMap[name] ||
-      (settersMap[name] = [])
-
     setter.last = void 0
     setter.localNames = localNames
     setter.parent = parent
@@ -306,7 +299,15 @@ class Entry {
       setter.type = SETTER_TYPE_STATIC_IMPORT
     }
 
-    setters.push(setter)
+    const settersMap = this.setters
+
+    if (! Reflect.has(settersMap, name)) {
+      settersMap[name] = []
+    }
+
+    settersMap[name].push(setter)
+
+    const { importedBindings } = this
 
     for (const name of localNames) {
       if (! Reflect.has(importedBindings, name)) {
@@ -369,7 +370,7 @@ class Entry {
       const { exportedSpecifiers } = this.compileData
 
       for (const exportedName in exportedSpecifiers) {
-        if (exportedSpecifiers[exportedName] &&
+        if (exportedSpecifiers[exportedName] !== false &&
             ! Reflect.has(_namespace, exportedName)) {
           _namespace[exportedName] = void 0
         }
@@ -512,7 +513,10 @@ class Entry {
       const parentEntry = setter.parent
       const { importedBindings } = parentEntry
 
-      parentsMap || (parentsMap = { __proto__: null })
+      if (parentsMap === void 0) {
+        parentsMap = { __proto__: null }
+      }
+
       parentsMap[parentEntry.name] = parentEntry
 
       for (const name of setter.localNames) {

@@ -114,19 +114,16 @@ class Package {
 
     const { dir } = shared.package
 
-    let cache = dir[cachePath]
-
-    if (cache === void 0) {
-      cache =
-      dir[cachePath] = {
+    if (! Reflect.has(dir, cachePath)) {
+      const cache = {
         buffer: null,
         compile: null,
         map: null
       }
 
-      let buffer
-      let map
+      let buffer = null
       let compileDatas = { __proto__: null }
+      let map = null
 
       if (cachePath) {
         const cacheNames = readdir(cachePath)
@@ -152,15 +149,15 @@ class Package {
           }
         }
 
-        let json
         let isCacheInvalid = hasDirtyMarker
+        let json = null
 
         if (hasMap &&
             ! isCacheInvalid) {
           json = readJSON(cachePath + sep + ".data.json")
 
           isCacheInvalid =
-            ! json ||
+            json === null ||
             ! has(json, "version") ||
             json.version !== PKG_VERSION ||
             ! has(json, "map") ||
@@ -190,12 +187,22 @@ class Package {
         }
       }
 
-      cache.buffer = buffer || GenericBuffer.alloc(0)
+      if (buffer === null) {
+        buffer = GenericBuffer.alloc(0)
+      }
+
+      if (map === null) {
+        map = { __proto__: null }
+      }
+
+      cache.buffer = buffer
       cache.compile = compileDatas
-      cache.map = map || { __proto__: null }
+      cache.map = map
+
+      dir[cachePath] = cache
     }
 
-    this.cache = cache
+    this.cache = dir[cachePath]
     this.cachePath = cachePath
     this.dirPath = dirPath
     this.options = options
@@ -630,14 +637,20 @@ Reflect.setPrototypeOf(Package.prototype, null)
 const cacheKey = JSON.stringify(Package.createOptions())
 const { state } = shared.package
 
-Package.state = state[cacheKey] || (state[cacheKey] = {
-  cache: { __proto__: null },
-  default: null
-})
+if (! Reflect.has(state, cacheKey)) {
+  state[cacheKey] = {
+    cache: { __proto__: null },
+    default: null
+  }
+}
 
-Package.state.cache[""] = new Package("", stripPrereleaseTag(PKG_VERSION), {
-  cache: false,
-  cjs: true
-})
+if (! Reflect.has(state[cacheKey].cache, "")) {
+  state[cacheKey].cache[""] = new Package("", stripPrereleaseTag(PKG_VERSION), {
+    cache: false,
+    cjs: true
+  })
+}
+
+Package.state = state[cacheKey]
 
 export default Package

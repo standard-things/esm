@@ -127,12 +127,13 @@ function hook(Mod, parent) {
     }
 
     if (cacheName === null) {
-      cacheName =
-      entry.cacheName = getCacheName(mtime, {
+      cacheName = getCacheName(mtime, {
         cachePath,
         filename,
         packageOptions: pkg.options
       })
+
+      entry.cacheName = cacheName
     }
 
     const compileFallback = () => {
@@ -164,7 +165,7 @@ function hook(Mod, parent) {
       if (compileData === null) {
         Reflect.deleteProperty(cache.compile, cacheName)
       } else {
-        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8")
+        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8") || ""
       }
     }
 

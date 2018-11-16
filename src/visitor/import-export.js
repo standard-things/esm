@@ -137,11 +137,11 @@ function init() {
           importedName = "default"
         }
 
-        const localNames =
-          specifierMap[importedName] ||
-          (specifierMap[importedName] = [])
+        if (! Reflect.has(specifierMap, importedName)) {
+          specifierMap[importedName] = []
+        }
 
-        localNames.push(localName)
+        specifierMap[importedName].push(localName)
 
         if (importedName !== "*") {
           temporalBindings[localName] = true
@@ -415,12 +415,14 @@ function init() {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
         const { exportedFrom } = this
-        const lastIndex = specifiers.length - 1
         const request = source.value
 
-        const fromNames =
-          exportedFrom[request] ||
-          (exportedFrom[request] = [])
+        if (! Reflect.has(exportedFrom, request)) {
+          exportedFrom[request] = []
+        }
+
+        const fromNames = exportedFrom[request]
+        const lastIndex = specifiers.length - 1
 
         let code = runtimeName + '.w("' + request + '"'
         let i = -1
@@ -489,9 +491,11 @@ function init() {
   function addToDependencySpecifiers(visitor, request, exportedName) {
     const { dependencySpecifiers } = visitor
 
-    const exportedNames =
-      dependencySpecifiers[request] ||
-      (dependencySpecifiers[request] = [])
+    if (! Reflect.has(dependencySpecifiers, request)) {
+      dependencySpecifiers[request] = []
+    }
+
+    const exportedNames = dependencySpecifiers[request]
 
     if (exportedName &&
         exportedName !== "*" &&

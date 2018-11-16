@@ -69,7 +69,7 @@ function findPath(request, paths, isMain, fields, exts) {
     return ""
   }
 
-  let trailingSlash = request.length > 0
+  let trailingSlash = request !== ""
 
   if (trailingSlash) {
     let code = request.charCodeAt(request.length - 1)
@@ -91,7 +91,7 @@ function findPath(request, paths, isMain, fields, exts) {
 
   for (let curPath of paths) {
     if (typeof curPath === "string" &&
-        curPath.length > 0 &&
+        curPath !== "" &&
         statFast(curPath) !== 1) {
       continue
     }
@@ -172,7 +172,7 @@ function findPath(request, paths, isMain, fields, exts) {
         tryExtensions(resolve(thePath, "index"), exts, isMain)
     }
 
-    if (filename.length > 0) {
+    if (filename !== "") {
       cache.set(cacheKey, filename)
       return filename
     }

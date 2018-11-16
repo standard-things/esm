@@ -295,12 +295,12 @@ function init() {
         }
 
         if (changed &&
-            cacheName) {
-          const scriptDatas =
-            pendingScriptDatas[cachePath] ||
-            (pendingScriptDatas[cachePath] = { __proto__: null })
+            cacheName !== "") {
+          if (! Reflect.has(pendingScriptDatas, cachePath)) {
+            pendingScriptDatas[cachePath] = { __proto__: null }
+          }
 
-          scriptDatas[cacheName] = scriptData
+          pendingScriptDatas[cachePath][cacheName] = scriptData
         }
       }
     }

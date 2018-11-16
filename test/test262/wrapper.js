@@ -22,7 +22,7 @@ function waitForAsyncTest() {
   return new Promise(function check(resolvePromise, rejectPromise) {
     const waited = Date.now() - started
 
-    if (_message.length > 0) {
+    if (_message !== void 0) {
       return resolvePromise()
     } else if (waited > MAX_WAIT) {
       return rejectPromise("test262: async test timed out.")
@@ -32,7 +32,7 @@ function waitForAsyncTest() {
   })
 }
 
-let _message = ""
+let _message
 
 global.print = function print(value) {
   _message = String(value)

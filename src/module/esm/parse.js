@@ -24,7 +24,7 @@ function parse(request, parent, isMain) {
 
   if (entry.module.loaded) {
     entry.state = STATE_EXECUTION_COMPLETED
-  } else if (entry.compileData &&
+  } else if (entry.compileData !== null &&
       entry.state < STATE_EXECUTION_STARTED) {
     entry.state = STATE_PARSING_COMPLETED
   }

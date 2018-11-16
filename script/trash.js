@@ -30,7 +30,9 @@ function trash(iterable) {
 
     return Promise
       .all(paths.map((thePath) => {
-        _trash || (_trash = require("trash"))
+        if (_trash === void 0) {
+          _trash = require("trash")
+        }
 
         return _trash([thePath], options)
           .catch((e) => {

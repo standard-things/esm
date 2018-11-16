@@ -15,9 +15,11 @@ const {
 function loader(entry, filename, parentEntry) {
   const { parsing } = shared.moduleState
 
-  parentEntry || (parentEntry = entry)
-
   entry.updateFilename(filename)
+
+  if (parentEntry === null) {
+    parentEntry = entry
+  }
 
   let { extensions } = esmState
 

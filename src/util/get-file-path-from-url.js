@@ -41,7 +41,7 @@ function init() {
 
     // Section 2: Syntax
     // https://tools.ietf.org/html/rfc8089#section-2
-    if (host.length > 0 &&
+    if (host !== "" &&
         host !== "localhost") {
       return WIN32
         ? "\\\\" + domainToUnicode(host) + normalize(pathname)

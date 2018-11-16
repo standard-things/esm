@@ -66,12 +66,15 @@ function hook(vm) {
     scriptOptions = assign({}, scriptOptions)
     scriptOptions.produceCachedData = true
 
+    const cacheName = getCacheName(content)
+    const compileDatas = entry.package.cache.compile
     const { runtimeName } = entry
 
-    const cacheName =
-    entry.cacheName = getCacheName(content)
+    entry.cacheName = cacheName
 
-    let compileData = entry.package.cache.compile[cacheName] || null
+    let compileData = Reflect.has(compileDatas, cacheName)
+      ? compileDatas[cacheName]
+      : null
 
     if (compileData === null) {
       compileData = tryWrapper(Compiler.compile, [

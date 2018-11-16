@@ -109,7 +109,7 @@ function init() {
 
         if (refDestructuringErrors &&
             this.type === tt.comma &&
-            refDestructuringErrors.trailingComma < 0) {
+            refDestructuringErrors.trailingComma === -1) {
           refDestructuringErrors.trailingComma = this.start
         }
       } else {

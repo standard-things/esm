@@ -27,9 +27,7 @@ function init() {
         map.set(parent, cache)
       }
 
-      const cached = cache[name]
-
-      if (cached !== void 0) {
+      if (Reflect.has(cache, name)) {
         return shadowed = cache[name]
       }
 

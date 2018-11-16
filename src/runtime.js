@@ -160,7 +160,7 @@ const Runtime = {
 
     let { code } = compileData
 
-    if (unsafeGlobal[runtimeName]) {
+    if (Reflect.has(unsafeGlobal, runtimeName)) {
       return code
     }
 

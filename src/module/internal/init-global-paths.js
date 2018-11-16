@@ -56,7 +56,7 @@ function init() {
 
       for (const thePath of nodePaths) {
         if (typeof thePath === "string" &&
-            thePath.length > 0) {
+            thePath !== "") {
           GenericArray.push(paths, thePath)
         }
       }

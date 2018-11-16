@@ -33,11 +33,11 @@ function isDescendant(entry, parentEntry, seen) {
 
   const parentName = parentEntry.name
 
-  if (seen &&
+  if (seen !== void 0 &&
       Reflect.has(seen, parentName)) {
     return false
-  } else {
-    seen || (seen = { __proto__: null })
+  } else if (seen === void 0) {
+    seen = { __proto__: null }
   }
 
   seen[parentName] = true
@@ -161,7 +161,7 @@ function validateExportedName(entry, exportedName, seen) {
 
   const exportedSpecifier = exportedSpecifiers[exportedName]
 
-  if (seen &&
+  if (seen !== void 0 &&
       Reflect.has(seen, name) &&
       exportedSpecifier !== true) {
     const { request } = exportedSpecifier
@@ -179,7 +179,10 @@ function validateExportedName(entry, exportedName, seen) {
         const childEntry = dependencySpecifiers[request].entry
 
         if (childEntry !== null) {
-          seen || (seen = { __proto__: null })
+          if (seen === void 0) {
+            seen = { __proto__: null }
+          }
+
           seen[name] = true
           validateExportedName(childEntry, local, seen)
         }

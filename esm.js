@@ -178,7 +178,7 @@ let scriptOptions
 let cachePath = ""
 let content = ""
 
-if (nativeContent.length > 0) {
+if (nativeContent !== "") {
   content = nativeContent
 
   scriptOptions = {
@@ -229,22 +229,23 @@ let shared
 
 shared = loadESM()
 
-if (cachePath.length > 0) {
+if (cachePath !== "") {
   const { dir } = shared.package
-  const scriptData = cachedData || null
 
-  dir[cachePath] || (dir[cachePath] = {
-    buffer: cachedData,
-    compile: {
-      __proto__: null,
-      esm: {
-        changed: false,
-        scriptData,
-        sourceType: 1
-      }
-    },
-    map: { __proto__: null }
-  })
+  if (! Reflect.has(dir, cachePath)) {
+    dir[cachePath] = {
+      buffer: cachedData,
+      compile: {
+        __proto__: null,
+        esm: {
+          changed: false,
+          scriptData: cachedData || null,
+          sourceType: 1
+        }
+      },
+      map: { __proto__: null }
+    }
+  }
 
   shared.pendingScripts[cachePath] = {
     __proto__: null,

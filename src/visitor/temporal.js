@@ -124,7 +124,7 @@ function init() {
 
       const names = keys(initees)
 
-      if (names.length > 0) {
+      if (names.length !== 0) {
         const { end } = declaration || node
 
         this.magicString.appendRight(

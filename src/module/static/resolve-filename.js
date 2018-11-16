@@ -98,9 +98,9 @@ function resolveFilename(request, parent, isMain, options) {
     paths = Module._resolveLookupPaths(request, parent, true)
   }
 
-  const foundPath = Module._findPath(request, paths, isMain)
+  const foundPath = Module._findPath(request, paths, isMain) || ""
 
-  if (foundPath.length > 0) {
+  if (foundPath !== "") {
     if (cacheKey !== void 0) {
       cache.set(cacheKey, foundPath)
     }

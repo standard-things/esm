@@ -12,7 +12,11 @@ function init() {
   }
 
   function parseTopLevel(node) {
-    const body = node.body || (node.body = [])
+    if (! Array.isArray(node.body)) {
+      node.body = []
+    }
+
+    const { body } = node
     const exported = { __proto__: null }
     const funcs = { __proto__: null }
     const identifiers = { __proto__: null }

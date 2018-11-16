@@ -12,7 +12,7 @@ const patterns = fs.readFileSync(gitignorePath, "utf8")
   .map((sourceLine) => {
     sourceLine = sourceLine.trim()
 
-    if (sourceLine.length > 0) {
+    if (sourceLine !== "") {
       return sourceLine.startsWith("/")
         ? sourceLine.slice(1)
         : "**/" + sourceLine
