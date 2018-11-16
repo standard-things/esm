@@ -152,7 +152,7 @@ function init() {
   for (const name of realProtoNames) {
     if (Reflect.has(wrapperMap, name)) {
       prototype[name] = wrapperMap[name]
-    } else {
+    } else if (name !== "constructor") {
       copyProperty(prototype, realProto, name)
     }
   }
