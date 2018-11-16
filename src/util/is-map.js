@@ -1,4 +1,5 @@
-import binding from "../binding.js"
+import getObjectTag from "./get-object-tag.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -7,17 +8,10 @@ function init() {
     return types.isMap
   }
 
-  let useIsMap
-
-  const isMap = function (value) {
-    if (useIsMap === void 0) {
-      useIsMap = typeof binding.util.isMap === "function"
-    }
-
-    return useIsMap && binding.util.isMap(value)
+  return function isMapFallback(value) {
+    return isObject(value) &&
+      getObjectTag(value) === "[object Map]"
   }
-
-  return isMap
 }
 
 export default shared.inited

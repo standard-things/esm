@@ -1,4 +1,5 @@
-import binding from "../binding.js"
+import getObjectTag from "./get-object-tag.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -7,17 +8,10 @@ function init() {
     return types.isSet
   }
 
-  let useIsSet
-
-  const isSet = function (value) {
-    if (useIsSet === void 0) {
-      useIsSet = typeof binding.util.isSet === "function"
-    }
-
-    return useIsSet && binding.util.isSet(value)
+  return function isSetFallback(value) {
+    return isObject(value) &&
+      getObjectTag(value) === "[object Set]"
   }
-
-  return isSet
 }
 
 export default shared.inited

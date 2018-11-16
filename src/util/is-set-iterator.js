@@ -1,4 +1,5 @@
-import binding from "../binding.js"
+import getObjectTag from "./get-object-tag.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -7,17 +8,10 @@ function init() {
     return types.isSetIterator
   }
 
-  let useIsSetIterator
-
-  const isSetIterator = function (value) {
-    if (useIsSetIterator === void 0) {
-      useIsSetIterator = typeof binding.util.isSetIterator === "function"
-    }
-
-    return useIsSetIterator && binding.util.isSetIterator(value)
+  return function isSetIteratorFallback(value) {
+    return isObject(value) &&
+      getObjectTag(value) === "[object Set Iterator]"
   }
-
-  return isSetIterator
 }
 
 export default shared.inited

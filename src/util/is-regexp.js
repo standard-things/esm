@@ -1,4 +1,5 @@
-import binding from "../binding.js"
+import getObjectTag from "./get-object-tag.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -7,17 +8,10 @@ function init() {
     return types.isRegExp
   }
 
-  let useIsRegExp
-
-  const isRegExp = function (value) {
-    if (useIsRegExp === void 0) {
-      useIsRegExp = typeof binding.util.isRegExp === "function"
-    }
-
-    return useIsRegExp && binding.util.isRegExp(value)
+  return function isRegExpFallback(value) {
+    return isObject(value) &&
+      getObjectTag(value) === "[object RegExp]"
   }
-
-  return isRegExp
 }
 
 export default shared.inited

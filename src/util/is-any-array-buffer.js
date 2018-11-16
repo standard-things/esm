@@ -1,4 +1,5 @@
-import binding from "../binding.js"
+import getObjectTag from "./get-object-tag.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import { types } from "../safe/util.js"
 
@@ -7,18 +8,15 @@ function init() {
     return types.isAnyArrayBuffer
   }
 
-  const { util } = binding
-  const { isAnyArrayBuffer } = util
-
-  if (typeof isAnyArrayBuffer === "function") {
-    return isAnyArrayBuffer
-  }
-
-  const { isArrayBuffer, isSharedArrayBuffer } = util
-
   return function isAnyArrayBufferFallback(value) {
-    return isArrayBuffer(value) ||
-      isSharedArrayBuffer(value)
+    if (! isObject(value)) {
+      return false
+    }
+
+    const tag = getObjectTag(value)
+
+    return tag === "[object ArrayBuffer]" ||
+      tag === "[object SharedArrayBuffer]"
   }
 }
 

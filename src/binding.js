@@ -14,7 +14,6 @@ function init() {
 
   const ids = [
     "fs",
-    "icu",
     "inspector",
     "natives",
     "util"
@@ -23,11 +22,7 @@ function init() {
   const map = {
     __proto__: null,
     fs: [
-      "realpath",
       "internalModuleStat"
-    ],
-    icu: [
-      "toUnicode"
     ],
     inspector: [
       "callAndPauseOnStart",
@@ -36,16 +31,6 @@ function init() {
     util: [
       "decorated_private_symbol",
       "getProxyDetails",
-      "isAnyArrayBuffer",
-      "isArrayBuffer",
-      "isDate",
-      "isExternal",
-      "isMap",
-      "isMapIterator",
-      "isRegExp",
-      "isSet",
-      "isSetIterator",
-      "isSharedArrayBuffer",
       "safeGetenv",
       "setHiddenValue"
     ]
