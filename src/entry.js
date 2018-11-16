@@ -496,7 +496,7 @@ class Entry {
     // setters might need to run.
     let parentsMap
 
-    const updateAncestors =
+    const shouldUpdateParents =
       this.circular ||
       type === UPDATE_TYPE_INIT ||
       type === UPDATE_TYPE_LIVE
@@ -505,7 +505,7 @@ class Entry {
 
     runGetters(this, names)
     runSetters(this, names, (setter) => {
-      if (! updateAncestors) {
+      if (! shouldUpdateParents) {
         return
       }
 
@@ -525,8 +525,10 @@ class Entry {
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    for (const id in parentsMap) {
-      parentsMap[id].updateBindings(null, UPDATE_TYPE_LIVE)
+    if (shouldUpdateParents) {
+      for (const id in parentsMap) {
+        parentsMap[id].updateBindings(null, UPDATE_TYPE_LIVE)
+      }
     }
 
     return this
