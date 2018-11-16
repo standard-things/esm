@@ -68,10 +68,10 @@ function init() {
         receiver = target
       }
 
-      const accessor = getGetter(target, name)
+      const hasGetter = getGetter(target, name) !== void 0
       const value = Reflect.get(target, name, receiver)
 
-      if (accessor !== void 0) {
+      if (hasGetter) {
         tryUpdateBindings(name, value)
       }
 
@@ -189,10 +189,10 @@ function init() {
           return false
         }
 
-        const accessor = getSetter(descriptor)
+        const hasSetter = getSetter(descriptor) !== void 0
 
         if (Reflect.set(target, name, value, receiver)) {
-          if (accessor !== void 0) {
+          if (hasSetter) {
             entry.updateBindings()
           } else if (Reflect.has(entry._namespace, name)) {
             entry.updateBindings(name)
