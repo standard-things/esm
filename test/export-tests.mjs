@@ -4,7 +4,7 @@ describe("export declaration tests", () => {
       .then((ns) => ns.default())
   )
 
-  it("should tolerate mutual star exports", () =>
+  it("should support cyclical star exports", () =>
     import("./export/star-cycle.mjs")
       .then((ns) => ns.default())
   )
