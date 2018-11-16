@@ -27,10 +27,6 @@ function init() {
     SOURCE_TYPE_UNAMBIGUOUS
   } = COMPILER
 
-  // Add "main" to compiled code to enable the `readFileFast()` fast path of
-  // `process.binding("fs").internalModuleReadJSON()`.
-  const FAST_READ_PREFIX = '"main";'
-
   const defaultOptions = {
     cjsVars: false,
     generateVarDeclarations: false,
@@ -260,7 +256,7 @@ function init() {
             })
 
             if (temporalVisitor.changed) {
-              result.code = FAST_READ_PREFIX + magicString.toString()
+              result.code = magicString.toString()
             }
           }
         }
@@ -301,12 +297,8 @@ function init() {
           globalsVisitor.changed ||
           importExportVisitor.changed) {
         result.changed = true
-
-        yieldIndex =
-          FAST_READ_PREFIX.length +
-          importExportVisitor.yieldIndex
-
-        setDeferred(result, "code", () => FAST_READ_PREFIX + magicString.toString())
+        yieldIndex = importExportVisitor.yieldIndex
+        setDeferred(result, "code", () =>  magicString.toString())
       }
 
       result.yieldIndex = yieldIndex

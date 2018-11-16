@@ -1,4 +1,4 @@
-"main";let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
+let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
 
 const _anonymous=() => {
   const that = (function () {

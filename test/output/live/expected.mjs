@@ -1,4 +1,4 @@
-"main";_.x([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset();_.j(["value"]);
+_.x([["value",()=>value],["reset",()=>reset],["add",()=>add]]);var value = reset();_.j(["value"]);
 
        function reset() {
   return _.u(value = 0)

@@ -1,4 +1,4 @@
-"main";_.x([["default",()=>_anonymous]]);
+_.x([["default",()=>_anonymous]]);
 
 
 

@@ -2,7 +2,7 @@ import GenericArray from "../../generic/array.js"
 import GenericObject from "../../generic/object.js"
 import SafeJSON from "../../safe/json.js"
 
-import readFileFast from "../../fs/read-file-fast.js"
+import readFile from "../../fs/read-file.js"
 import { sep } from "../../safe/path.js"
 import shared from "../../shared.js"
 import toString from "../../util/to-string.js"
@@ -27,7 +27,7 @@ function init() {
     }
 
     const jsonPath = dirPath + sep + "package.json"
-    const jsonString = readFileFast(jsonPath, "utf8") || ""
+    const jsonString = readFile(jsonPath, "utf8") || ""
 
     if (jsonString === "" ||
         (fieldsLength === 1 &&

@@ -1,4 +1,4 @@
-"main";const _anonymous=class {
+const _anonymous=class {
   constructor(value) {
     this.value = value
   }

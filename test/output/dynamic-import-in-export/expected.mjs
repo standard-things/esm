@@ -1,4 +1,4 @@
-"main";_.x([["A",()=>A],["a",()=>a],["default",()=>_anonymous]]);class A {
+_.x([["A",()=>A],["a",()=>a],["default",()=>_anonymous]]);class A {
   constructor() {
     _.i("./a.mjs")
   }

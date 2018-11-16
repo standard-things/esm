@@ -1,3 +1,3 @@
-"main";1, _.i("./a.mjs")
+1, _.i("./a.mjs")
 
 true && _.i("./b.mjs")

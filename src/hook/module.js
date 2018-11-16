@@ -27,7 +27,6 @@ import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import readFile from "../fs/read-file.js"
-import readFileFast from "../fs/read-file-fast.js"
 import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
@@ -165,7 +164,7 @@ function hook(Mod, parent) {
       if (compileData === null) {
         Reflect.deleteProperty(cache.compile, cacheName)
       } else {
-        compileData.code = readFileFast(cachePath + sep + cacheName, "utf8") || ""
+        compileData.code = readFile(cachePath + sep + cacheName, "utf8") || ""
       }
     }
 

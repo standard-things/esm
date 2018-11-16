@@ -24,8 +24,6 @@ function init() {
     __proto__: null,
     fs: [
       "realpath",
-      "internalModuleReadFile",
-      "internalModuleReadJSON",
       "internalModuleStat"
     ],
     icu: [
