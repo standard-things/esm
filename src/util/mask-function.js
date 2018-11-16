@@ -1,3 +1,4 @@
+import GenericObject from "../generic/object.js"
 import OwnProxy from "../own/proxy.js"
 import Package from "../package.js"
 
@@ -69,11 +70,17 @@ function init() {
     copyProperty(func, source, "name")
     setPrototypeOf(func, getPrototypeOf(source))
 
-    const proto = has(func, "prototype") ? func.prototype : void 0
     const sourceProto = has(source, "prototype") ? source.prototype : void 0
 
-    if (isObjectLike(proto) &&
-        isObjectLike(sourceProto)) {
+    if (isObjectLike(sourceProto)) {
+      let proto = has(func, "prototype") ? func.prototype : void 0
+
+      if (! isObjectLike(proto)) {
+        proto =
+        func.prototype = GenericObject.create()
+      }
+
+      proto.constructor = proxy
       setPrototypeOf(proto, getPrototypeOf(sourceProto))
     } else {
       const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
