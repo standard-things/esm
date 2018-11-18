@@ -29,7 +29,6 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
-import stripPrereleaseTag from "./util/strip-prerelease-tag.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 
@@ -42,7 +41,8 @@ const {
 } = ENV
 
 const {
-  PKG_VERSION
+  PACKAGE_RANGE,
+  PACKAGE_VERSION
 } = ESM
 
 const {
@@ -58,7 +58,7 @@ const {
 } = errors
 
 const ESMRC_FILENAME = ".esmrc"
-const PACKAGE_FILENAME = "package.json"
+const PACKAGE_JSON_FILENAME = "package.json"
 
 const defaultOptions = {
   await: false,
@@ -159,7 +159,7 @@ class Package {
           isCacheInvalid =
             json === null ||
             ! has(json, "version") ||
-            json.version !== PKG_VERSION ||
+            json.version !== PACKAGE_VERSION ||
             ! has(json, "map") ||
             ! isObject(json.map)
         }
@@ -418,7 +418,7 @@ function createOptions(value) {
 
 function findRoot(dirPath) {
   if (basename(dirPath) === "node_modules" ||
-      isFile(dirPath + sep + PACKAGE_FILENAME)) {
+      isFile(dirPath + sep + PACKAGE_JSON_FILENAME)) {
     return dirPath
   }
 
@@ -548,7 +548,7 @@ function readInfo(dirPath, forceOptions = false) {
     }
   }
 
-  const pkgPath = dirPath + sep + PACKAGE_FILENAME
+  const pkgPath = dirPath + sep + PACKAGE_JSON_FILENAME
 
   let pkgJSON = isFile(pkgPath)
     ? readFile(pkgPath, "utf8")
@@ -645,7 +645,7 @@ if (! Reflect.has(state, cacheKey)) {
 }
 
 if (! Reflect.has(state[cacheKey].cache, "")) {
-  state[cacheKey].cache[""] = new Package("", stripPrereleaseTag(PKG_VERSION), {
+  state[cacheKey].cache[""] = new Package("", PACKAGE_RANGE, {
     cache: false,
     cjs: true
   })

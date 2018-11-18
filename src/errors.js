@@ -13,7 +13,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 
 function init() {
   const {
-    PKG_VERSION
+    PACKAGE_VERSION
   } = ESM
 
   const {
@@ -184,7 +184,7 @@ function init() {
   }
 
   function invalidPkgOption(name, value, unquoted) {
-    return "The esm@" + PKG_VERSION + " option " +
+    return "The esm@" + PACKAGE_VERSION + " option " +
       (unquoted ? toString(name) : toStringLiteral(name, "'")) +
       " is invalid. Received " + truncInspect(value)
   }
@@ -237,7 +237,7 @@ function init() {
   }
 
   function unknownPkgOption(name) {
-    return "Unknown esm@" + PKG_VERSION + " option: " + name
+    return "Unknown esm@" + PACKAGE_VERSION + " option: " + name
   }
 
   function undefinedIdentifier(name) {

@@ -23,7 +23,7 @@ const {
 } = ENTRY
 
 const {
-  PKG_DIRNAME
+  PACKAGE_DIRNAME
 } = ESM
 
 const {
@@ -116,7 +116,7 @@ function isOwnModule(mod) {
   const { filename } = mod
 
   return typeof filename === "string" &&
-    filename.startsWith(PKG_DIRNAME)
+    filename.startsWith(PACKAGE_DIRNAME)
 }
 
 function ownRequire(request) {

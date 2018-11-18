@@ -16,10 +16,10 @@ import toExternalFunction from "./util/to-external-function.js"
 
 function init() {
   const {
-    PKG_VERSION
+    PACKAGE_VERSION
   } = ESM
 
-  const wrapperVersion = stripPrereleaseTag(PKG_VERSION)
+  const wrapperVersion = stripPrereleaseTag(PACKAGE_VERSION)
 
   const Wrapper = {
     find(object, name, range) {

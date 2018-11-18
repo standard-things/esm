@@ -1,17 +1,9 @@
-import shared from "../shared.js"
+const nonDigitRegExp = /[^\d.]/g
 
-function init() {
-  const nonDigitRegExp = /[^\d.]/g
-
-  function stripPrereleaseTag(version) {
-    return typeof version === "string"
-      ? version.replace(nonDigitRegExp, "")
-      : ""
-  }
-
-  return stripPrereleaseTag
+function stripPrereleaseTag(version) {
+  return typeof version === "string"
+    ? version.replace(nonDigitRegExp, "")
+    : ""
 }
 
-export default shared.inited
-  ? shared.module.utilStripPrereleaseTag
-  : shared.module.utilStripPrereleaseTag = init()
+export default stripPrereleaseTag

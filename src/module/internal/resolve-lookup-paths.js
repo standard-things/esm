@@ -18,7 +18,7 @@ const {
 } = ENV
 
 const {
-  PKG_DIRNAME
+  PACKAGE_DIRNAME
 } = ESM
 
 let availableModulesPath
@@ -41,7 +41,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
 
     if (RUNKIT) {
       if (availableModulesPath === void 0) {
-        availableModulesPath = dirname(PKG_DIRNAME)
+        availableModulesPath = dirname(PACKAGE_DIRNAME)
       }
 
       paths.push(availableModulesPath)

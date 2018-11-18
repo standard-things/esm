@@ -8,14 +8,14 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    PKG_PREFIX
+    PACKAGE_PREFIX
   } = ESM
 
   let inspectDepth = 0
 
   const endMarkerRegExp = new RegExp(
     "[\\[\"']" +
-    PKG_PREFIX +
+    PACKAGE_PREFIX +
     ":proxy['\"\\]]\\s*:\\s*1\\s*\\}\\s*.?$"
   )
 

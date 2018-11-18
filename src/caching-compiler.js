@@ -37,7 +37,7 @@ function init() {
   } = ENV
 
   const {
-    PKG_VERSION
+    PACKAGE_VERSION
   } = ESM
 
   const CachingCompiler = {
@@ -393,7 +393,7 @@ function init() {
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
       writeFile(cachePath + sep + ".data.json", JSON.stringify({
         map,
-        version: PKG_VERSION
+        version: PACKAGE_VERSION
       }))
     }
 

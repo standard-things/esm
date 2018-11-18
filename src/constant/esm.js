@@ -1,37 +1,41 @@
 import encodeId from "../util/encode-id.js"
 import setDeferred from "../util/set-deferred.js"
+import stripPrereleaseTag from "../util/strip-prerelease-tag.js"
 
 // The `process.env` properties are replaced at build time.
 // https://webpack.js.org/plugins/environment-plugin/
+const { PACKAGE_FILENAMES } = process.env
+const { PACKAGE_VERSION } = process.env
+
 const ESM = {
   __proto__: null,
-  PKG_DIRNAME: null,
-  PKG_FILENAMES: null,
-  PKG_PREFIX: encodeId("esm"),
-  PKG_VERSION: process.env.PKG_VERSION
+  PACKAGE_DIRNAME: null,
+  PACKAGE_FILENAMES: null,
+  PACKAGE_PREFIX: encodeId("esm"),
+  PACKAGE_RANGE: stripPrereleaseTag(PACKAGE_VERSION),
+  PACKAGE_VERSION
 }
 
 const { filename } = __non_webpack_module__
 
-setDeferred(ESM, "PKG_DIRNAME", () => {
+setDeferred(ESM, "PACKAGE_DIRNAME", () => {
   const { safePath } = __shared__.module
 
   return safePath.dirname(filename)
 })
 
-setDeferred(ESM, "PKG_FILENAMES", function () {
+setDeferred(ESM, "PACKAGE_FILENAMES", function () {
   const { safePath } = __shared__.module
   const { sep } = safePath
-  const { PKG_DIRNAME } = this
-  const { PKG_FILENAMES } = process.env
+  const { PACKAGE_DIRNAME } = this
 
-  let { length } = PKG_FILENAMES
+  let { length } = PACKAGE_FILENAMES
 
   while (length--) {
-    PKG_FILENAMES[length] = PKG_DIRNAME + sep + PKG_FILENAMES[length]
+    PACKAGE_FILENAMES[length] = PACKAGE_DIRNAME + sep + PACKAGE_FILENAMES[length]
   }
 
-  return PKG_FILENAMES
+  return PACKAGE_FILENAMES
 })
 
 export default ESM

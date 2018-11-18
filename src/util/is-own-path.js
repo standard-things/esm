@@ -4,12 +4,12 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    PKG_FILENAMES
+    PACKAGE_FILENAMES
   } = ESM
 
   function isOwnPath(thePath) {
     if (typeof thePath === "string") {
-      for (const filename of PKG_FILENAMES) {
+      for (const filename of PACKAGE_FILENAMES) {
         if (thePath === filename) {
           return true
         }

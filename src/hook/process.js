@@ -7,17 +7,14 @@ import isError from "../util/is-error.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
-import stripPrereleaseTag from "../util/strip-prerelease-tag.js"
 
 const {
-  PKG_VERSION
+  PACKAGE_RANGE
 } = ESM
-
-const wrapperRange = stripPrereleaseTag(PKG_VERSION)
 
 function hook(process) {
   function exceptionManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "_fatalException", wrapperRange)
+    const wrapped = Wrapper.find(process, "_fatalException", PACKAGE_RANGE)
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])
@@ -37,7 +34,7 @@ function hook(process) {
   }
 
   function warningManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "emitWarning", wrapperRange)
+    const wrapped = Wrapper.find(process, "emitWarning", PACKAGE_RANGE)
 
     return wrapped
       ? Reflect.apply(wrapped, this, [manager, func, args])

@@ -44,7 +44,7 @@ const {
 } = ENV
 
 const {
-  PKG_VERSION
+  PACKAGE_VERSION
 } = ESM
 
 const {
@@ -255,10 +255,10 @@ function tryPassthru(func, args, pkg) {
     const { range } = pkg
 
     if (importExportRegExp.test(message) &&
-        ! satisfies(PKG_VERSION, range)) {
+        ! satisfies(PACKAGE_VERSION, range)) {
       const newMessage =
         "Expected esm@" + range +
-        ". Using esm@" + PKG_VERSION + ": " + filename
+        ". Using esm@" + PACKAGE_VERSION + ": " + filename
 
       set(error, "message", newMessage)
 

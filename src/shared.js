@@ -4,11 +4,11 @@ import encodeId from "./util/encode-id.js"
 import setDeferred from "./util/set-deferred.js"
 
 const {
-  PKG_PREFIX,
-  PKG_VERSION
+  PACKAGE_PREFIX,
+  PACKAGE_VERSION
 } = ESM
 
-const SHARED_SYMBOL = Symbol.for(PKG_PREFIX + "@" + PKG_VERSION + ":shared")
+const SHARED_SYMBOL = Symbol.for(PACKAGE_PREFIX + "@" + PACKAGE_VERSION + ":shared")
 
 function getShared() {
   if (__shared__ !== void 0) {
@@ -31,7 +31,7 @@ function getShared() {
 
 function init() {
   const dummyProxy = new Proxy(class {}, {
-    [PKG_PREFIX]: 1
+    [PACKAGE_PREFIX]: 1
   })
 
   const funcToString = Function.prototype.toString
@@ -41,16 +41,16 @@ function init() {
   }
 
   const symbol = {
-    _compile: Symbol.for(PKG_PREFIX + ":module._compile"),
-    entry: Symbol.for(PKG_PREFIX + ":entry"),
-    mjs: Symbol.for(PKG_PREFIX + ':Module._extensions[".mjs"]'),
-    namespace: Symbol.for(PKG_PREFIX + ":namespace"),
-    package: Symbol.for(PKG_PREFIX + ":package"),
-    realGetProxyDetails: Symbol.for(PKG_PREFIX + ":realGetProxyDetails"),
-    realRequire: Symbol.for(PKG_PREFIX + ":realRequire"),
-    runtime: Symbol.for(PKG_PREFIX + ":runtime"),
+    _compile: Symbol.for(PACKAGE_PREFIX + ":module._compile"),
+    entry: Symbol.for(PACKAGE_PREFIX + ":entry"),
+    mjs: Symbol.for(PACKAGE_PREFIX + ':Module._extensions[".mjs"]'),
+    namespace: Symbol.for(PACKAGE_PREFIX + ":namespace"),
+    package: Symbol.for(PACKAGE_PREFIX + ":package"),
+    realGetProxyDetails: Symbol.for(PACKAGE_PREFIX + ":realGetProxyDetails"),
+    realRequire: Symbol.for(PACKAGE_PREFIX + ":realRequire"),
+    runtime: Symbol.for(PACKAGE_PREFIX + ":runtime"),
     shared: SHARED_SYMBOL,
-    wrapper: Symbol.for(PKG_PREFIX + ":wrapper")
+    wrapper: Symbol.for(PACKAGE_PREFIX + ":wrapper")
   }
 
   const utilBinding = {}
@@ -199,7 +199,7 @@ function init() {
     })
 
     return inspected.indexOf("Proxy") !== -1 &&
-      inspected.indexOf(PKG_PREFIX) !== -1
+      inspected.indexOf(PACKAGE_PREFIX) !== -1
   })
 
   setDeferred(support, "lookupShadowed", () => {

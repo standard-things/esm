@@ -7,7 +7,7 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    PKG_VERSION
+    PACKAGE_VERSION
   } = ESM
 
   const EMPTY_MD5_HASH = "d41d8cd98f00b204e9800998ecf8427e"
@@ -26,7 +26,7 @@ function init() {
     }
 
     const stateHash = md5(
-      PKG_VERSION + "\0" +
+      PACKAGE_VERSION + "\0" +
       JSON.stringify(options.packageOptions) + "\0" +
       cacheKey
     )

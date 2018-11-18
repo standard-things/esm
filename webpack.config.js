@@ -62,8 +62,8 @@ class WebpackTemplatePlugin {
 const { ESM_ENV } = process.env
 
 const {
-  files: PKG_FILENAMES,
-  version: PKG_VERSION
+  files: PACKAGE_FILENAMES,
+  version: PACKAGE_VERSION
 } = fs.readJSONSync("./package.json")
 
 const isProd = /production/.test(ESM_ENV)
@@ -138,8 +138,8 @@ const config = {
       reportFilename: "report.html"
     }),
     new EnvironmentPlugin({
-      PKG_FILENAMES,
-      PKG_VERSION
+      PACKAGE_FILENAMES,
+      PACKAGE_VERSION
     }),
     new NormalModuleReplacementPlugin(
       /acorn[\\/]src[\\/]regexp\.js/,
