@@ -97,6 +97,9 @@ const autoOptions = {
 class Package {
   static createOptions = createOptions
   static defaultOptions = defaultOptions
+
+  // TODO: Remove this eslint comment when the false positive is resolved.
+  // eslint-disable-next-line no-undef
   static state = null
 
   constructor(dirPath, range, options) {
