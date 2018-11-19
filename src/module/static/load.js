@@ -6,12 +6,12 @@ import ENTRY from "../../constant/entry.js"
 import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 
 import _load from "../internal/load.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
-import esmState from "../esm/state.js"
 import loader from "../cjs/loader.js"
 import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
@@ -40,7 +40,7 @@ function load(request, parent, isMain) {
   }
 
   const filename = Module._resolveFilename(request, parent, isMain)
-  const { scratchCache } = esmState
+  const { scratchCache } = Loader.state.module
 
   let cache = Module._cache
 

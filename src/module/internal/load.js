@@ -6,10 +6,10 @@ import ENTRY from "../../constant/entry.js"
 
 import Entry from "../../entry.js"
 import GenericArray from "../../generic/array.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 
 import builtinEntries from "../../builtin-entries.js"
-import esmState from "../esm/state.js"
 import getFilePathfromURL from "../../util/get-file-path-from-url.js"
 import isFileOrigin from "../../util/is-file-origin.js"
 import realProcess from "../../real/process.js"
@@ -52,7 +52,7 @@ function load(filename, parent, isMain, cache, loader) {
       : filename
 
     if (isMain) {
-      esmState.mainModule =
+      Loader.state.module.mainModule =
       realProcess.mainModule = child
       child.id = "."
     }

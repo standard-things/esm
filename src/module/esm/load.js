@@ -1,13 +1,13 @@
 import ENTRY from "../../constant/entry.js"
 
 import Entry from "../../entry.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../internal/load.js"
 import builtinLookup from "../../builtin-lookup.js"
 import { dirname } from "../../safe/path.js"
-import esmState from "./state.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import isMJS from "../../path/is-mjs.js"
@@ -49,7 +49,7 @@ function load(request, parent, isMain) {
   const isExtMJS = isMJS(filename)
   const pkg = Package.from(filename)
   const queryFragment = getURLQueryFragment(request)
-  const { moduleCache, scratchCache } = esmState
+  const { moduleCache, scratchCache } = Loader.state.module
 
   let cache = Module._cache
   let isUnexposed = ! pkg.options.cjs.cache
@@ -120,7 +120,7 @@ function tryLoader(entry, cache, cacheKey, filename, parentEntry, preload) {
     throw e
   } finally {
     if (threw) {
-      if (cache === esmState.moduleCache) {
+      if (cache === Loader.state.module.moduleCache) {
         // Unlike CJS, ESM errors are preserved for subsequent loads.
         Reflect.defineProperty(cache, cacheKey, {
           configurable: true,

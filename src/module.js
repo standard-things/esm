@@ -6,8 +6,6 @@ import RealModule from "./real/module.js"
 
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
-import esmState from "./module/esm/state.js"
-import initGlobalPaths from "./module/internal/init-global-paths.js"
 import maskFunction from "./util/mask-function.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
@@ -76,21 +74,8 @@ if (JEST) {
   Module._cache = { __proto__: null }
 }
 
-if (Module.globalPaths) {
-  esmState.globalPaths = GenericArray.from(Module.globalPaths)
-} else {
-  const globalPaths = initGlobalPaths()
-
-  esmState.globalPaths = globalPaths
-  Module.globalPaths = GenericArray.from(globalPaths)
+if (! Array.isArray(Module.globalPaths)) {
+  Module._initPaths()
 }
-
-esmState.scratchCache = new Proxy(esmState.scratchCache, {
-  get(target, name) {
-    return Reflect.has(target, name)
-      ? target[name]
-      : Module._cache[name]
-  }
-})
 
 export default Module

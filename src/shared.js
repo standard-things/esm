@@ -63,6 +63,7 @@ function init() {
     env: {},
     external: __external__,
     inited: false,
+    loader: new Map,
     memoize: {
       builtinEntries: new Map,
       builtinModules: new Map,
@@ -92,8 +93,7 @@ function init() {
     },
     package: {
       dir: { __proto__: null },
-      root: { __proto__: null },
-      state: { __proto__: null }
+      root: { __proto__: null }
     },
     pendingScripts: { __proto__: null },
     pendingWrites: { __proto__: null },

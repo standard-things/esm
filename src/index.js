@@ -12,6 +12,7 @@ import "./util/satisfies.js"
 
 import ENV from "./constant/env.js"
 
+import Loader from "./loader.js"
 import Module from "./module.js"
 import Package from "./package.js"
 import RealModule from "./real/module.js"
@@ -73,16 +74,7 @@ if (shared.inited &&
     }
 
     if (cacheKey !== void 0) {
-      const { state } = shared.package
-
-      if (! Reflect.has(state, cacheKey)) {
-        state[cacheKey] = {
-          cache: { __proto__: null },
-          default: null
-        }
-      }
-
-      Package.state = state[cacheKey]
+      Loader.init(cacheKey)
     }
 
     if (options !== void 0) {

@@ -6,10 +6,10 @@ import ENV from "../../constant/env.js"
 import ESM from "../../constant/esm.js"
 
 import GenericArray from "../../generic/array.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 
 import { dirname } from "../../safe/path.js"
-import esmState from "../esm/state.js"
 import isRelative from "../../path/is-relative.js"
 import staticNodeModulePaths from "../static/node-module-paths.js"
 
@@ -36,7 +36,7 @@ function resolveLookupPaths(request, parent, skipGlobalPaths) {
 
     if (parentPaths &&
         ! skipGlobalPaths) {
-      GenericArray.push(paths, ...esmState.globalPaths)
+      GenericArray.push(paths, ...Loader.state.module.globalPaths)
     }
 
     if (RUNKIT) {

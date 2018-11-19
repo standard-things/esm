@@ -1,7 +1,8 @@
+import Loader from "../loader.js"
+
 import errors from "../errors.js"
 import esmParseLoad from "../module/esm/parse-load.js"
 import esmResolveFilename from "../module/esm/resolve-filename.js"
-import esmState from "../module/esm/state.js"
 import makeRequireFunction from "../module/internal/make-require-function.js"
 
 const {
@@ -28,7 +29,7 @@ function hook(parent) {
 
   const req = makeRequireFunction(parent, requirer, resolver)
 
-  req.main = esmState.mainModule
+  req.main = Loader.state.module.mainModule
   return req
 }
 

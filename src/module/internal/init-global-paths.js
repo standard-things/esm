@@ -4,8 +4,6 @@
 
 import { delimiter, resolve } from "../../safe/path.js"
 
-import GenericArray from "../../generic/array.js"
-
 import getEnv from "../../util/get-env.js"
 import realProcess from "../../real/process.js"
 import safeGetEnv from "../../util/safe-get-env.js"
@@ -33,35 +31,35 @@ function init() {
 
     if (homeDir &&
         typeof homeDir === "string") {
-      paths = GenericArray.of(
+      paths = [
         resolve(homeDir, ".node_modules"),
         resolve(homeDir, ".node_libraries")
-      )
+      ]
     } else {
-      paths = GenericArray.of()
+      paths = []
     }
 
     // The executable path, `$PREFIX\node.exe` on Windows or `$PREFIX/lib/node`
     // everywhere else, where `$PREFIX` is the root of the Node.js installation.
     const prefixDir = resolve(realProcess.execPath, "..", isWin ? "" : "..")
 
-    GenericArray.push(paths, resolve(prefixDir, "lib", "node"))
+    paths.push(resolve(prefixDir, "lib", "node"))
 
     if (nodePath &&
         typeof nodePath === "string") {
       const nodePaths = nodePath.split(delimiter)
       const oldPaths = paths
 
-      paths = GenericArray.of()
+      paths = []
 
       for (const thePath of nodePaths) {
         if (typeof thePath === "string" &&
             thePath !== "") {
-          GenericArray.push(paths, thePath)
+          paths.push(thePath)
         }
       }
 
-      GenericArray.push(paths, ...oldPaths)
+      paths.push(...oldPaths)
     }
 
     return paths

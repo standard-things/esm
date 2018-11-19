@@ -29,6 +29,7 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
+import setDeferred from "./util/set-deferred.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 
@@ -224,7 +225,18 @@ class Package {
       dirPath = cwd()
     }
 
-    return getInfo(dirPath, forceOptions) || Package.state.default
+    const { state } = Package
+    const { cache } = state
+
+    if (dirPath === "" &&
+        ! cache.has("")) {
+      cache.set("", new Package("", PACKAGE_RANGE, {
+        cache: false,
+        cjs: true
+      }))
+    }
+
+    return getInfo(dirPath, forceOptions) || state.default
   }
 
   static from(request, forceOptions) {
@@ -240,7 +252,7 @@ class Package {
   }
 
   static set(dirPath, pkg) {
-    Package.state.cache[dirPath] = pkg || null
+    Package.state.cache.get(dirPath, pkg || null)
   }
 }
 
@@ -437,21 +449,23 @@ function findRoot(dirPath) {
 }
 
 function getInfo(dirPath, forceOptions) {
-  const defaultPkg = Package.state.default
+  const { state } = Package
+  const { cache } = state
+  const defaultPkg = state.default
 
   let pkg = null
 
-  if (Reflect.has(Package.state.cache, dirPath)) {
-    pkg = Package.state.cache[dirPath]
+  if (cache.has(dirPath)) {
+    pkg = cache.get(dirPath)
 
     if (! forceOptions ||
-        pkg) {
+        pkg !== null) {
       return pkg
     }
   }
 
   if (basename(dirPath) === "node_modules") {
-    return Package.state.cache[dirPath] = null
+    cache.set(dirPath, null)
   }
 
   if (defaultPkg &&
@@ -471,7 +485,8 @@ function getInfo(dirPath, forceOptions) {
     }
   }
 
-  return Package.state.cache[dirPath] = pkg
+  cache.set(dirPath, pkg)
+  return pkg
 }
 
 function getRange(json, name) {
@@ -532,21 +547,19 @@ function readInfo(dirPath, forceOptions = false) {
     if (isJSON(optionsPath)) {
       options = readJSON6(optionsPath)
     } else {
+      const { cache } = Package.state
       const { moduleState } = shared
       const { parsing } = moduleState
-      const { cache } = Package.createOptions(forceOptions)
 
+      pkg = new Package(dirPath, RANGE_ALL, { cache: Package.createOptions(forceOptions).cache })
       moduleState.parsing = false
-
-      pkg =
-      Package.state.cache[dirPath] = new Package(dirPath, RANGE_ALL, { cache })
+      cache.set(dirPath, pkg)
 
       try {
-        pkg.options =
-        Package.createOptions(esmParseLoad(optionsPath, null, false).module.exports)
+        pkg.options = Package.createOptions(esmParseLoad(optionsPath, null, false).module.exports)
       } finally {
         moduleState.parsing = parsing
-        Package.state.cache[dirPath] = null
+        cache.set(dirPath, null)
       }
     }
   }
@@ -635,25 +648,14 @@ function readInfo(dirPath, forceOptions = false) {
   return new Package(dirPath, range, options)
 }
 
-Reflect.setPrototypeOf(Package.prototype, null)
-
-const cacheKey = JSON.stringify(Package.createOptions())
-const { state } = shared.package
-
-if (! Reflect.has(state, cacheKey)) {
-  state[cacheKey] = {
-    cache: { __proto__: null },
+setDeferred(Package, "state", () =>
+  Package.state = {
+    __proto__: null,
+    cache: new Map,
     default: null
   }
-}
+)
 
-if (! Reflect.has(state[cacheKey].cache, "")) {
-  state[cacheKey].cache[""] = new Package("", PACKAGE_RANGE, {
-    cache: false,
-    cjs: true
-  })
-}
-
-Package.state = state[cacheKey]
+Reflect.setPrototypeOf(Package.prototype, null)
 
 export default Package

@@ -1,8 +1,8 @@
 import ENTRY from "../../constant/entry.js"
 
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 
-import esmState from "./state.js"
 import findCompilerExtension from "../internal/find-compiler-extension.js"
 import shared from "../../shared.js"
 import staticNodeModulePaths from "../static/node-module-paths.js"
@@ -21,7 +21,7 @@ function loader(entry, filename, parentEntry) {
     parentEntry = entry
   }
 
-  let { extensions } = esmState
+  let { extensions } = Loader.state.module
 
   if (entry.extname === ".js" ||
       (parentEntry.package.options.cjs.extensions &&

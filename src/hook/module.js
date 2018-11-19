@@ -5,6 +5,7 @@ import PACKAGE from "../constant/package.js"
 
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
+import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import RealModule from "../real/module.js"
@@ -14,7 +15,6 @@ import compile from "../module/internal/compile.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import esmLoad from "../module/esm/load.js"
-import esmState from "../module/esm/state.js"
 import get from "../util/get.js"
 import getCacheName from "../util/get-cache-name.js"
 import getCacheStateHash from "../util/get-cache-state-hash.js"
@@ -220,11 +220,11 @@ function hook(Mod, parent) {
     Wrapper.wrap(_extensions, ext, methodWrapper)
 
     passthruMap.set(extCompiler, passthru)
-    esmState.extensions[ext] = _extensions[ext]
+    Loader.state.module.extensions[ext] = _extensions[ext]
   }
 
   _extensions[".wasm"] =
-  esmState.extensions[".wasm"] = wasmCompiler
+  Loader.state.module.extensions[".wasm"] = wasmCompiler
 }
 
 function mjsCompiler(mod, filename) {
