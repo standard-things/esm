@@ -58,7 +58,7 @@ function init() {
   const shared = {
     entry: {
       cache: new WeakMap,
-      skipExports: { __proto__: null }
+      skipExports: new Map
     },
     env: {},
     external: __external__,

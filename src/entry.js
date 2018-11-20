@@ -151,7 +151,7 @@ class Entry {
     let exported
     let useExports = false
 
-    if (! skipExports[name]) {
+    if (! skipExports.has(name)) {
       exported = mod.exports
       useExports = isObjectLike(exported)
     }
@@ -471,7 +471,7 @@ class Entry {
       this.assignExportsToNamespace()
     }
 
-    Reflect.deleteProperty(shared.entry.skipExports, this.name)
+    shared.entry.skipExports.delete(this.name)
 
     this.initNamespace()
     this.state = STATE_EXECUTION_COMPLETED

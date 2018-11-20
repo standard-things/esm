@@ -60,10 +60,11 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     const { moduleState } = shared
 
-    shared.entry.skipExports[name] =
+    const skipExports =
       ! isESM &&
       ! isDataProperty(mod, "exports")
 
+    shared.entry.skipExports.set(name, skipExports)
     moduleState.requireDepth += 1
 
     try {
