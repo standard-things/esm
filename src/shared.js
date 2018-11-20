@@ -93,7 +93,7 @@ function init() {
     },
     package: {
       dir: { __proto__: null },
-      root: { __proto__: null }
+      root: new Map
     },
     pendingScripts: { __proto__: null },
     pendingWrites: { __proto__: null },

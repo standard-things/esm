@@ -503,13 +503,15 @@ function getRange(json, name) {
 
 function getRoot(dirPath) {
   const { root } = shared.package
-  const cached = root[dirPath]
 
-  if (cached) {
-    return cached
+  let cached = root.get(dirPath)
+
+  if (cached === void 0) {
+    cached = findRoot(dirPath) || dirPath
+    root.set(dirPath, cached)
   }
 
-  return root[dirPath] = findRoot(dirPath) || dirPath
+  return cached
 }
 
 function isFlag(value) {
