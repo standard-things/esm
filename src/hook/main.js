@@ -1,3 +1,4 @@
+import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import Wrapper from "../wrapper.js"
@@ -24,7 +25,7 @@ function hook(Mod) {
   function methodWrapper() {
     const [, mainPath] = realProcess.argv
     const filename = tryResolveFilename(mainPath)
-    const defaultPkg = Package.state.default
+    const defaultPkg = Loader.state.package.default
     const dirPath = dirname(filename)
 
     if (Package.get(dirPath) === defaultPkg) {

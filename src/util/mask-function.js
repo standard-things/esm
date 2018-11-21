@@ -1,6 +1,6 @@
 import GenericObject from "../generic/object.js"
+import Loader from "../loader.js"
 import OwnProxy from "../own/proxy.js"
-import Package from "../package.js"
 
 import captureStackTrace from "../error/capture-stack-trace.js"
 import copyProperty from "./copy-property.js"
@@ -53,7 +53,7 @@ function init() {
 
     const toString = new OwnProxy(func.toString, {
       apply: function apply(target, thisArg, args) {
-        if (! Package.state.default.options.debug &&
+        if (! Loader.state.package.default.options.debug &&
             typeof thisArg === "function" &&
             unwrapProxy(thisArg) === func) {
           thisArg = cached.source

@@ -5,7 +5,7 @@ import PACKAGE from "../../constant/package.js"
 
 import Compiler from "../../caching-compiler.js"
 import GenericObject from "../../generic/object.js"
-import Package from "../../package.js"
+import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
 
 import captureStackTrace from "../../error/capture-stack-trace.js"
@@ -116,7 +116,7 @@ function compile(caller, entry, content, filename, fallback) {
         entry.initNamespace()
       }
     } else if (typeof fallback === "function") {
-      const defaultPkg = Package.state.default
+      const defaultPkg = Loader.state.package.default
       const parentEntry = entry.parent
       const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
       const parentPkg = parentEntry === null ? null : parentEntry.package
@@ -196,7 +196,7 @@ function tryCompileCached(entry, filename) {
     return result
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
@@ -232,7 +232,7 @@ function tryCompileCode(caller, content, options) {
     error = e
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error
@@ -254,7 +254,7 @@ function tryValidate(caller, entry, content, filename) {
     error = e
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       isStackTraceMasked(error)) {
     throw error
   }

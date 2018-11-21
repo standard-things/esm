@@ -5,6 +5,7 @@ import ENV from "../constant/env.js"
 import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import GenericObject from "../generic/object.js"
+import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
 import { REPLServer } from "../safe/repl.js"
@@ -313,7 +314,7 @@ function tryValidate(caller, entry, content) {
     return
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       isStackTraceMasked(error)) {
     throw error
   }
@@ -331,7 +332,7 @@ function tryWrapper(func, args, content) {
     error = e
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error

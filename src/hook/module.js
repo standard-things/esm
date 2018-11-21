@@ -83,7 +83,7 @@ function hook(Mod, parent) {
     defaultOptions.mode = MODE_AUTO
   }
 
-  Package.state.default = defaultPkg
+  Loader.state.package.default = defaultPkg
 
   Module._extensions = _extensions
 
@@ -240,7 +240,7 @@ function tryPassthru(func, args, pkg) {
     error = e
   }
 
-  if (Package.state.default.options.debug ||
+  if (Loader.state.package.default.options.debug ||
       ! isError(error) ||
       isStackTraceMasked(error)) {
     throw error

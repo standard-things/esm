@@ -6,6 +6,7 @@ import ESM from "./constant/esm.js"
 import PACKAGE from "./constant/package.js"
 
 import GenericBuffer from "./generic/buffer.js"
+import Loader from "./loader.js"
 
 import assign from "./util/assign.js"
 import builtinLookup from "./builtin-lookup.js"
@@ -29,7 +30,6 @@ import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
-import setDeferred from "./util/set-deferred.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 
@@ -225,8 +225,8 @@ class Package {
       dirPath = cwd()
     }
 
-    const { state } = Package
-    const { cache } = state
+    const pkgState = Loader.state.package
+    const { cache } = pkgState
 
     if (dirPath === "" &&
         ! cache.has("")) {
@@ -236,7 +236,7 @@ class Package {
       }))
     }
 
-    return getInfo(dirPath, forceOptions) || state.default
+    return getInfo(dirPath, forceOptions) || pkgState.default
   }
 
   static from(request, forceOptions) {
@@ -252,7 +252,7 @@ class Package {
   }
 
   static set(dirPath, pkg) {
-    Package.state.cache.get(dirPath, pkg || null)
+    Loader.state.package.cache.get(dirPath, pkg || null)
   }
 }
 
@@ -449,9 +449,9 @@ function findRoot(dirPath) {
 }
 
 function getInfo(dirPath, forceOptions) {
-  const { state } = Package
-  const { cache } = state
-  const defaultPkg = state.default
+  const pkgState = Loader.state.package
+  const { cache } = pkgState
+  const defaultPkg = pkgState.default
 
   let pkg = null
 
@@ -549,7 +549,7 @@ function readInfo(dirPath, forceOptions = false) {
     if (isJSON(optionsPath)) {
       options = readJSON6(optionsPath)
     } else {
-      const { cache } = Package.state
+      const { cache } = Loader.state.package
       const { moduleState } = shared
       const { parsing } = moduleState
 
@@ -649,14 +649,6 @@ function readInfo(dirPath, forceOptions = false) {
 
   return new Package(dirPath, range, options)
 }
-
-setDeferred(Package, "state", () =>
-  Package.state = {
-    __proto__: null,
-    cache: new Map,
-    default: null
-  }
-)
 
 Reflect.setPrototypeOf(Package.prototype, null)
 

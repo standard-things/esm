@@ -41,9 +41,7 @@ class Loader {
       loader.set(cacheKey, cached)
     }
 
-    Loader.state = cached
-    Package.state = cached.package
-    return cached
+    return Loader.state = cached
   }
 }
 
