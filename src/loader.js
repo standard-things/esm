@@ -17,7 +17,6 @@ class Loader {
 
     if (cached === void 0) {
       cached = {
-        __proto__: null,
         module: {
           extensions: esmExtensions,
           globalPaths: Array.from(Module.globalPaths),
@@ -32,7 +31,6 @@ class Loader {
           })
         },
         package: {
-          __proto__: null,
           cache: new Map,
           default: null
         }
