@@ -117,11 +117,13 @@ function compile(caller, entry, content, filename, fallback) {
       }
     } else if (typeof fallback === "function") {
       const defaultPkg = Loader.state.package.default
+      const { mainModule } = Loader.state.module
       const parentEntry = entry.parent
       const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
       const parentPkg = parentEntry === null ? null : parentEntry.package
 
       if (! parentIsESM &&
+          entry.module !== mainModule &&
           (pkg === defaultPkg ||
            parentPkg === defaultPkg)) {
         const frames = getStackFrames(new Error)

@@ -5,5 +5,5 @@ test("test", () => {
 
   require = require("../../../../")(module)
 
-  expect(require("./main.js").getCount()).toBe(1)
+  expect(require("./main.js").getCount()).toBe(2)
 })
