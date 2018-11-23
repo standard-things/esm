@@ -466,6 +466,7 @@ function getInfo(dirPath, forceOptions) {
 
   if (basename(dirPath) === "node_modules") {
     cache.set(dirPath, null)
+    return null
   }
 
   if (defaultPkg &&
