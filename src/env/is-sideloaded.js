@@ -10,14 +10,8 @@ import shared from "../shared.js"
 
 function init() {
   function isSideloaded() {
-    const { env } = shared
-
-    if (Reflect.has(env, "sideloaded")) {
-      return env.sideloaded
-    }
-
     if (isNyc()) {
-      return env.sideloaded = true
+      return true
     }
 
     const args = argv.slice(2)
@@ -35,10 +29,10 @@ function init() {
         hasLoaderArg(args) &&
         (Package.get(cwd()) !== null ||
          Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
-      return env.sideloaded = true
+      return true
     }
 
-    return env.sideloaded = false
+    return false
   }
 
   return isSideloaded

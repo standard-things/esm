@@ -4,14 +4,7 @@ import { versions } from "../safe/process.js"
 
 function init() {
   function isElectron() {
-    const { env } = shared
-
-    if (Reflect.has(env, "electron")) {
-      return env.electron
-    }
-
-    return env.electron =
-      Reflect.has(versions, "electron") ||
+    return Reflect.has(versions, "electron") ||
       isBrave()
   }
 

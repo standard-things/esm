@@ -60,7 +60,6 @@ function init() {
       cache: new WeakMap,
       skipExports: new Map
     },
-    env: {},
     external: __external__,
     inited: false,
     loader: new Map,

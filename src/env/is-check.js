@@ -5,16 +5,9 @@ import shared from "../shared.js"
 
 function init() {
   function isCheck() {
-    const { env } = shared
-
-    if (Reflect.has(env, "check")) {
-      return env.check
-    }
-
     const { length } = argv
 
-    return env.check =
-      (length === 1 ||
+    return (length === 1 ||
        length === 2) &&
       getFlags().check &&
       isPreloaded()

@@ -6,22 +6,15 @@ import shared from "../shared.js"
 
 function init() {
   function isREPL() {
-    const { env } = shared
-
-    if (Reflect.has(env, "repl")) {
-      return env.repl
-    }
-
     if (argv.length !== 1) {
-      return env.repl = false
+      return false
     }
 
     if (isPreloaded()) {
-      return env.repl = true
+      return true
     }
 
-    return env.repl =
-      rootModule.id === "<repl>" &&
+    return rootModule.id === "<repl>" &&
       rootModule.filename === null &&
       rootModule.loaded === false &&
       rootModule.parent == null &&

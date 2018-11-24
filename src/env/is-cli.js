@@ -4,14 +4,7 @@ import shared from "../shared.js"
 
 function init() {
   function isCLI() {
-    const { env } = shared
-
-    if (Reflect.has(env, "cli")) {
-      return env.cli
-    }
-
-    return env.cli =
-      argv.length > 1 &&
+    return argv.length > 1 &&
       isPreloaded()
   }
 

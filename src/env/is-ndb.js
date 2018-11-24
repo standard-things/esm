@@ -3,11 +3,7 @@ import { versions } from "../safe/process.js"
 
 function init() {
   function isNdb() {
-    const { env } = shared
-
-    return Reflect.has(env, "ndb")
-      ? env.ndb
-      : env.ndb = Reflect.has(versions, "ndb")
+    return Reflect.has(versions, "ndb")
   }
 
   return isNdb

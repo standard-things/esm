@@ -45,14 +45,17 @@ describe("REPL hook tests", () => {
     Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, indexPath)
 
-    shared.env.repl = true
+    const sharedModule = shared.module
+    const { envIsREPL } = sharedModule
+
+    shared.module.envIsREPL = () => true
     context.module.require(indexPath)
 
     process.argv = argv
     Reflect.deleteProperty(require.cache, esmPath)
     Reflect.deleteProperty(require.cache, indexPath)
 
-    shared.env.repl = false
+    sharedModule.envIsREPL = envIsREPL
     parent.children.splice(pkgIndex, 1)
     parent.require(indexPath)
   })

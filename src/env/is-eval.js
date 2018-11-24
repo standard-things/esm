@@ -6,18 +6,11 @@ import shared from "../shared.js"
 
 function init() {
   function isEval() {
-    const { env } = shared
-
-    if (Reflect.has(env, "eval")) {
-      return env.eval
-    }
-
     if (isPrint()) {
-      return env.eval = true
+      return true
     }
 
-    return env.eval =
-      argv.length === 1 &&
+    return argv.length === 1 &&
       getFlags().eval &&
       isPreloaded()
   }

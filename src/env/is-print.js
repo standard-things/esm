@@ -5,14 +5,7 @@ import shared from "../shared.js"
 
 function init() {
   function isPrint() {
-    const { env } = shared
-
-    if (Reflect.has(env, "print")) {
-      return env.print
-    }
-
-    return env.print =
-      argv.length === 1 &&
+    return argv.length === 1 &&
       getFlags().print &&
       isPreloaded()
   }

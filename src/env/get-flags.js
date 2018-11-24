@@ -5,12 +5,6 @@ import shared from "../shared.js"
 
 function init() {
   function getFlags() {
-    const { env } = shared
-
-    if (Reflect.has(env, "flags")) {
-      return env.flags
-    }
-
     const execArgs = Array.isArray(execArgv) ? execArgv : []
     const flags = {}
 
@@ -40,7 +34,7 @@ function init() {
     setDeferred(flags, "print", () => matches(execArgv, /^(?:--print|-pe?)$/))
     setDeferred(flags, "strict", () => matches(execArgs, "--strict"))
 
-    return env.flags = flags
+    return flags
   }
 
   return getFlags

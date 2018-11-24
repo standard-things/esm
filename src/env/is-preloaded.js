@@ -5,18 +5,11 @@ import shared from "../shared.js"
 
 function init() {
   function isPreloaded() {
-    const { env } = shared
-
-    if (Reflect.has(env, "preloaded")) {
-      return env.preloaded
-    }
-
     if (isInternal()) {
-      return env.preloaded = true
+      return true
     }
 
-    return env.preloaded =
-      rootModule.id === "internal/preload" &&
+    return rootModule.id === "internal/preload" &&
       hasLoaderModule(rootModule.children)
   }
 

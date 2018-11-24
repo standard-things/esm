@@ -3,11 +3,7 @@ import shared from "../shared.js"
 
 function init() {
   function isWin32() {
-    const { env } = shared
-
-    return Reflect.has(env, "win32")
-      ? env.win32
-      : env.win32 = platform === "win32"
+    return platform === "win32"
   }
 
   return isWin32

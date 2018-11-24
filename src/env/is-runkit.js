@@ -1,14 +1,10 @@
 import has from "../util/has.js"
-import { env as processEnv } from "../safe/process.js"
+import { env } from "../safe/process.js"
 import shared from "../shared.js"
 
 function init() {
   function isRunkit() {
-    const { env } = shared
-
-    return Reflect.has(env, "runkit")
-      ? env.runkit
-      : env.runkit = has(processEnv, "RUNKIT_HOST")
+    return has(env, "RUNKIT_HOST")
   }
 
   return isRunkit
