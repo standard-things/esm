@@ -1,6 +1,5 @@
 /* eslint-disable sort-keys */
 const ENTRY = {
-  __proto__: null,
   ERROR_GETTER: {},
   ERROR_STAR: {},
   LOAD_INDETERMINATE: -1,

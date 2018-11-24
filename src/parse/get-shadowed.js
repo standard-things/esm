@@ -23,12 +23,14 @@ function init() {
       let cache = map.get(parent)
 
       if (cache === void 0) {
-        cache = { __proto__: null }
+        cache = new Map
         map.set(parent, cache)
       }
 
-      if (Reflect.has(cache, name)) {
-        return shadowed = cache[name]
+      let cached = cache.get(name)
+
+      if (cached !== void 0) {
+        return shadowed = cached
       }
 
       const isNonArrowFunc =
@@ -38,7 +40,8 @@ function init() {
       if (isArgs &&
           isNonArrowFunc) {
         shadowed = parent
-        return cache[name] = shadowed
+        cache.set(name, shadowed)
+        return shadowed
       }
 
       if (type === "BlockStatement") {
@@ -50,7 +53,8 @@ function init() {
               for (const varName of varNames) {
                 if (varName === name) {
                   shadowed = declaration
-                  return cache[name] = shadowed
+                  cache.set(name, shadowed)
+                  return shadowed
                 }
               }
             }
@@ -64,7 +68,8 @@ function init() {
         if (param !== null &&
             param.name === name) {
           shadowed = param
-          return cache[name] = shadowed
+          cache.set(name, shadowed)
+          return shadowed
         }
       }
 
@@ -76,7 +81,8 @@ function init() {
         if (id !== null &&
             id.name === name) {
           shadowed = parent
-          return cache[name] = shadowed
+          cache.set(name, shadowed)
+          return shadowed
         }
       }
 
@@ -87,12 +93,14 @@ function init() {
 
           if (paramName === name) {
             shadowed = param
-            return cache[name] = shadowed
+            cache.set(name, shadowed)
+            return shadowed
           }
         }
       }
 
-      return cache[name] = shadowed
+      cache.set(name, shadowed)
+      return shadowed
     })
 
     return shadowed

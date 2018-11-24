@@ -34,14 +34,13 @@ const sourceResolve = realRequire.resolve
 const sourcePaths = sourceResolve && sourceResolve.paths
 const { symbol } = shared
 
-const ownExports = {
-  __proto__: null,
-  [symbol.entry]: Entry,
-  [symbol.realGetProxyDetails]: realGetProxyDetails,
-  [symbol.realRequire]: realRequire,
-  [symbol.runtime]: Runtime,
-  [symbol.shared]: shared
-}
+const ownExports = new Map([
+  [symbol.entry, Entry],
+  [symbol.realGetProxyDetails, realGetProxyDetails],
+  [symbol.realRequire, realRequire],
+  [symbol.runtime, Runtime],
+  [symbol.shared, shared]
+])
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
@@ -122,7 +121,7 @@ function isOwnModule(mod) {
 
 function ownRequire(request) {
   if (typeof request === "symbol") {
-    return ownExports[request]
+    return ownExports.get(request)
   }
 }
 

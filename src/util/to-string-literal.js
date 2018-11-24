@@ -9,27 +9,23 @@ function init() {
 
   const escapedDoubleQuoteRegExp = /\\"/g
 
-  const escapeRegExpMap = {
-    __proto__: null,
-    // eslint-disable-next-line sort-keys
-    '"': /\\?"/g,
-    "'": /\\?'/g,
-    "`": /\\?`/g
-  }
+  const escapeRegExpMap = new Map([
+    ['"', /\\?"/g],
+    ["'", /\\?'/g],
+    ["`", /\\?`/g]
+  ])
 
-  const quoteMap = {
-    __proto__: null,
-    // eslint-disable-next-line sort-keys
-    '"': '"',
-    "'": "'",
-    "`": "`",
-    back: "`",
-    double: '"',
-    single: "'"
-  }
+  const quoteMap = new Map([
+    ['"', '"'],
+    ["'", "'"],
+    ["`", "`"],
+    ["back", "`"],
+    ["double", '"'],
+    ["single", "'"]
+  ])
 
   function toStringLiteral(value, style = '"') {
-    const quote = quoteMap[style] || '"'
+    const quote = quoteMap.get(style) || '"'
     const string = JSON.stringify(value) || toString(value)
 
     if (quote === '"' &&
@@ -40,7 +36,7 @@ function init() {
     const unquoted = string.slice(1, -1)
     const escaped = unquoted.replace(escapedDoubleQuoteRegExp, '"')
 
-    return quote + escaped.replace(escapeRegExpMap[quote], "\\" + quote) + quote
+    return quote + escaped.replace(escapeRegExpMap.get(quote), "\\" + quote) + quote
   }
 
   return toStringLiteral

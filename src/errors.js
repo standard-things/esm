@@ -23,8 +23,8 @@ function init() {
     TypeError: ExTypeError
   } = shared.external
 
-  const errors = { __proto__: null }
-  const messages = { __proto__: null }
+  const errors = {}
+  const messages = new Map
 
   addBuiltinError("ERR_CONST_ASSIGNMENT", constAssignment, ExTypeError)
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
@@ -51,17 +51,17 @@ function init() {
 
   function addBuiltinError(code, messageHandler, Super) {
     errors[code] = createBuiltinErrorClass(Super, code)
-    messages[code] = messageHandler
+    messages.set(code, messageHandler)
   }
 
   function addLegacyError(code, messageHandler, Super) {
     errors[code] = createLegacyErrorClass(Super, code)
-    messages[code] = messageHandler
+    messages.set(code, messageHandler)
   }
 
   function addNodeError(code, messageHandler, Super) {
     errors[code] = createNodeErrorClass(Super, code)
-    messages[code] = messageHandler
+    messages.set(code, messageHandler)
   }
 
   function createBuiltinErrorClass(Super, code) {
@@ -69,7 +69,8 @@ function init() {
       const { length } = args
       const last = length ? args[length - 1] : null
       const beforeFunc = typeof last === "function" ? args.pop() : null
-      const error = new Super(messages[code](...args))
+      const messageTemplate = messages.get(code)
+      const error = new Super(messageTemplate(...args))
 
       if (beforeFunc !== null) {
         captureStackTrace(error, beforeFunc)
@@ -95,7 +96,8 @@ function init() {
 
   function createLegacyErrorClass(Super, code) {
     return function LegacyError(...args) {
-      const error = new Super(messages[code](...args))
+      const messageTemplate = messages.get(code)
+      const error = new Super(messageTemplate(...args))
 
       error.code = code
       return error
@@ -105,7 +107,8 @@ function init() {
   function createNodeErrorClass(Super, code) {
     return class NodeError extends Super {
       constructor(...args) {
-        super(messages[code](...args))
+        const messageTemplate = messages.get(code)
+        super(messageTemplate(...args))
 
         if (code === "MODULE_NOT_FOUND") {
           this.code = code

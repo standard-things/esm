@@ -1,17 +1,15 @@
 import shared from "../shared.js"
 
 function init() {
-  const booleanLookup = {
-    false: true,
-    true: true
-  }
+  const booleanLookup = new Set([
+    "false",
+    "true"
+  ])
 
-  const quoteLookup = {
-    __proto__: null,
-    // eslint-disable-next-line sort-keys
-    '"': true,
-    "'": true
-  }
+  const quoteLookup = new Set([
+    '"',
+    "'"
+  ])
 
   const unquotedRegExp = /(|[^a-zA-Z])([a-zA-Z]+)([^a-zA-Z]|)/g
 
@@ -22,9 +20,9 @@ function init() {
     }
 
     return string.replace(unquotedRegExp, (match, prefix, value, suffix) => {
-      if (! Reflect.has(quoteLookup, prefix) &&
-          ! Reflect.has(booleanLookup, value) &&
-          ! Reflect.has(quoteLookup, suffix)) {
+      if (! quoteLookup.has(prefix) &&
+          ! booleanLookup.has(value) &&
+          ! quoteLookup.has(suffix)) {
         return prefix + '"' + value + '"' + suffix
       }
 

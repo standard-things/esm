@@ -77,17 +77,17 @@ function init() {
       this.firstChunk = chunk
       this.lastSearchedChunk = chunk
 
-      this.byStart = { __proto__: null }
-      this.byStart[0] = chunk
+      this.byStart = new Map
+      this.byStart.set(0, chunk)
 
-      this.byEnd = { __proto__: null }
-      this.byEnd[string.length] = chunk
+      this.byEnd = new Map
+      this.byEnd.set(string.length, chunk)
     }
 
     appendLeft(index, content) {
       this._split(index)
 
-      const chunk = this.byEnd[index]
+      const chunk = this.byEnd.get(index)
 
       if (chunk === void 0) {
         this.intro += content
@@ -101,7 +101,7 @@ function init() {
     appendRight(index, content) {
       this._split(index)
 
-      const chunk = this.byStart[index]
+      const chunk = this.byStart.get(index)
 
       if (chunk === void 0) {
         this.outro += content
@@ -116,8 +116,8 @@ function init() {
       this._split(start)
       this._split(end)
 
-      const first = this.byStart[start]
-      const last = this.byEnd[end]
+      const first = this.byStart.get(start)
+      const last = this.byEnd.get(end)
 
       if (start === end) {
         return content
@@ -145,7 +145,7 @@ function init() {
     prependLeft(index, content) {
       this._split(index)
 
-      const chunk = this.byEnd[index]
+      const chunk = this.byEnd.get(index)
 
       if (chunk === void 0) {
         this.intro = content + this.intro
@@ -159,7 +159,7 @@ function init() {
     prependRight(index, content) {
       this._split(index)
 
-      const chunk = this.byStart[index]
+      const chunk = this.byStart.get(index)
 
       if (chunk === void 0) {
         this.outro = content + this.outro
@@ -171,8 +171,8 @@ function init() {
     }
 
     _split(index) {
-      if (this.byStart[index] ||
-          this.byEnd[index]) {
+      if (this.byStart.has(index) ||
+          this.byEnd.has(index)) {
         return
       }
 
@@ -187,17 +187,17 @@ function init() {
         }
 
         chunk = searchForward
-          ? this.byStart[chunk.end]
-          : this.byEnd[chunk.start]
+          ? this.byStart.get(chunk.end)
+          : this.byEnd.get(chunk.start)
       }
     }
 
     _splitChunk(chunk, index) {
       const newChunk = chunk.split(index)
 
-      this.byEnd[index] = chunk
-      this.byStart[index] = newChunk
-      this.byEnd[newChunk.end] = newChunk
+      this.byEnd.set(index, chunk)
+      this.byStart.set(index, newChunk)
+      this.byEnd.set(newChunk.end, newChunk)
       this.lastSearchedChunk = chunk
     }
 

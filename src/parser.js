@@ -29,11 +29,10 @@ function init() {
     strict: void 0
   }
 
-  const sourceTypeMap = {
-    __proto__: null,
-    [SOURCE_TYPE_MODULE]: "module",
-    [SOURCE_TYPE_SCRIPT]: "script"
-  }
+  const sourceTypeMap = new Map([
+    [SOURCE_TYPE_MODULE, "module"],
+    [SOURCE_TYPE_SCRIPT, "script"]
+  ])
 
   const Parser = {
     createOptions,
@@ -73,9 +72,15 @@ function init() {
 
   function createOptions(value) {
     const options = defaults({}, value, Parser.defaultOptions)
-    const { sourceType } = options
 
-    options.sourceType = sourceTypeMap[sourceType] || sourceType
+    let { sourceType } = options
+    let resolvedType = sourceTypeMap.get(sourceType)
+
+    if (resolvedType !== void 0) {
+      sourceType = resolvedType
+    }
+
+    options.sourceType = sourceType
     return options
   }
 

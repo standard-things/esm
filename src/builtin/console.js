@@ -41,17 +41,16 @@ function init() {
   const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
 
-  const wrapperMap = {
-    __proto__: null,
-    assert: wrapBuiltin(realProto.assert, assertWrapper),
-    debug: builtinLog,
-    dir: wrapBuiltin(realProto.dir, dirWrapper),
-    dirxml: builtinLog,
-    info: builtinLog,
-    log: builtinLog,
-    trace: wrapBuiltin(realProto.trace),
-    warn: wrapBuiltin(realProto.warn)
-  }
+  const wrapperMap = new Map([
+    ["assert", wrapBuiltin(realProto.assert, assertWrapper)],
+    ["debug", builtinLog],
+    ["dir", wrapBuiltin(realProto.dir, dirWrapper)],
+    ["dirxml", builtinLog],
+    ["info", builtinLog],
+    ["log", builtinLog],
+    ["trace", wrapBuiltin(realProto.trace)],
+    ["warn", wrapBuiltin(realProto.warn)]
+  ])
 
   function assertWrapper(func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
@@ -150,8 +149,10 @@ function init() {
   const { prototype } = Console
 
   for (const name of realProtoNames) {
-    if (Reflect.has(wrapperMap, name)) {
-      prototype[name] = wrapperMap[name]
+    const value = wrapperMap.get(name)
+
+    if (value !== void 0) {
+      prototype[name] = value
     } else if (name !== "constructor") {
       copyProperty(prototype, realProto, name)
     }
@@ -172,7 +173,7 @@ function init() {
     const { consoleCall } = binding.inspector
 
     if (typeof consoleCall === "function") {
-      const emptyConfig = { __proto__: null }
+      const emptyConfig = {}
       const names = keys(builtinConsole)
 
       for (const name of names) {

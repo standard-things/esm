@@ -17,17 +17,16 @@ function init() {
     CHAKRA
   } = ENV
 
-  const builtinByCtor = {
-    __proto__: null,
-    Array: true,
-    BigInt: true,
-    Boolean: true,
-    Function: true,
-    Number: true,
-    Object: true,
-    RegExp: true,
-    String: true
-  }
+  const builtinByCtor = new Set([
+    "Array",
+    "BigInt",
+    "Boolean",
+    "Function",
+    "Number",
+    "Object",
+    "RegExp",
+    "String"
+  ])
 
   const possibleBuiltins = [
     "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
@@ -100,16 +99,16 @@ function init() {
       return context
     }
 
-    const builtinDescriptors = { __proto__: null }
+    const builtinDescriptors = new Map
     const builtinNames = []
 
     for (const name of possibleBuiltins) {
       if (Reflect.has(context, name)) {
         builtinNames.push(name)
 
-        if (! Reflect.has(builtinByCtor, name)) {
+        if (! builtinByCtor.has(name)) {
           // Delete shadowed builtins to expose those of its realm.
-          builtinDescriptors[name] = Reflect.getOwnPropertyDescriptor(context, name)
+          builtinDescriptors.set(name, Reflect.getOwnPropertyDescriptor(context, name))
           Reflect.deleteProperty(context, name)
         }
       }
@@ -124,7 +123,7 @@ function init() {
     ).runInContext(context)
 
     for (const name of builtinNames) {
-      const descriptor = builtinDescriptors[name]
+      const descriptor = builtinDescriptors.get(name)
 
       if (descriptor !== void 0) {
         Reflect.defineProperty(context, name, descriptor)

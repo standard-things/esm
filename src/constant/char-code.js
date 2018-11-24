@@ -1,6 +1,5 @@
 /* eslint-disable sort-keys */
 const CHAR_CODE = {
-  __proto__: null,
   TAB: 9,
   CARRIAGE_RETURN: 13,
   SPACE: 32,

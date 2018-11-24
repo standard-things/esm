@@ -2,7 +2,6 @@
 // https://github.com/v8/v8/blob/master/src/messages.h
 
 const MESSAGE = {
-  __proto__: null,
   ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION: "await is only valid in async function",
   ILLEGAL_HTML_COMMENT: "HTML comments are not allowed in modules",
   ILLEGAL_IMPORT_META_OUTSIDE_MODULE: "Cannot use 'import.meta' outside a module",

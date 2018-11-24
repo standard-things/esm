@@ -36,7 +36,7 @@ function init() {
     ]
   }
 
-  const binding = { __proto__: null }
+  const binding = {}
 
   for (const id of ids) {
     setDeferred(binding, id, () => {

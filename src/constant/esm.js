@@ -8,7 +8,6 @@ const { PACKAGE_FILENAMES } = process.env
 const { PACKAGE_VERSION } = process.env
 
 const ESM = {
-  __proto__: null,
   PACKAGE_DIRNAME: null,
   PACKAGE_FILENAMES: null,
   PACKAGE_PREFIX: encodeId("esm"),

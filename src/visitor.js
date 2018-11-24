@@ -9,61 +9,60 @@ import shared from "./shared.js"
 function init() {
   const childNamesMap = new Map
 
-  const visitLookup = {
-    __proto__: null,
+  const visitLookup = new Set([
     // ConditionalExpression
-    alternate: true,
+    "alternate",
     // ReturnStatement
-    argument: true,
+    "argument",
     // CallExpression
-    arguments: true,
+    "arguments",
     // TryStatement
-    block: true,
+    "block",
     // BlockStatement, FunctionDeclaration, FunctionExpression
-    body: true,
+    "body",
     // CallExpression
-    callee: true,
+    "callee",
     // SwitchStatement
-    cases: true,
+    "cases",
     // ConditionalExpression, SwitchCase
-    consequent: true,
+    "consequent",
     // ExportDefaultDeclaration, ExportNamedDeclaration
-    declaration: true,
+    "declaration",
     // VariableDeclaration
-    declarations: true,
+    "declarations",
     // SwitchStatement
-    discriminant: true,
+    "discriminant",
     // ArrayPattern
-    elements: true,
+    "elements",
     // ExpressionStatement
-    expression: true,
+    "expression",
     // SequenceExpression, TemplateLiteral
-    expressions: true,
+    "expressions",
     // TryStatement
-    finalizer: true,
+    "finalizer",
     // TryStatement
-    handler: true,
+    "handler",
     // ForStatement, VariableDeclarator
-    init: true,
+    "init",
     // Property
-    key: true,
+    "key",
     // AssignmentExpression, AssignmentPattern
-    left: true,
+    "left",
     // MemberExpression
-    object: true,
+    "object",
     // ObjectPattern
-    properties: true,
+    "properties",
     // AssignmentExpression, AssignmentPattern
-    right: true,
+    "right",
     // ClassDeclaration
-    superClass: true,
+    "superClass",
     // ForStatement, IfStatement, SwitchCase, WhileStatement
-    test: true,
+    "test",
     // ForStatement
-    update: true,
+    "update",
     // Property
-    value: true
-  }
+    "value"
+  ])
 
   class Visitor {
     visit(rootPath, options) {
@@ -163,7 +162,7 @@ function init() {
         continue
       }
 
-      if (Reflect.has(visitLookup, name) &&
+      if (visitLookup.has(name) &&
           isObject(value[name])) {
         childNames.push(name)
       }

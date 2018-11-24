@@ -4,7 +4,7 @@ import noop from "../../util/noop.js"
 import shared from "../../shared.js"
 
 function init() {
-  const scopes = { __proto__: null }
+  const scopes = new Map
 
   const Plugin = {
     enable(parser) {
@@ -44,15 +44,19 @@ function init() {
   }
 
   function getScope(flags) {
-    if (Reflect.has(scopes, flags)) {
-      return scopes[flags]
+    let scope = scopes.get(flags)
+
+    if (scope === void 0) {
+      scope = {
+        flags,
+        lexical: [],
+        var: []
+      }
+
+      scopes.set(flags, scope)
     }
 
-    return scopes[flags] = {
-      flags,
-      lexical: [],
-      var: []
-    }
+    return scope
   }
 
   return Plugin

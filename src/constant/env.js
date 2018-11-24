@@ -19,7 +19,7 @@ import isRunkit from "../env/is-runkit.js"
 import isWin32 from "../env/is-win32.js"
 import setDeferred from "../util/set-deferred.js"
 
-const ENV = { __proto__: null }
+const ENV = {}
 
 setDeferred(ENV, "BRAVE", isBrave)
 setDeferred(ENV, "CHAKRA", isChakra)
