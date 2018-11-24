@@ -11,15 +11,12 @@ import proxyWrap from "./util/proxy-wrap.js"
 import setSilent from "./util/set-silent.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
-import stripPrereleaseTag from "./util/strip-prerelease-tag.js"
 import toExternalFunction from "./util/to-external-function.js"
 
 function init() {
   const {
-    PACKAGE_VERSION
+    PACKAGE_RANGE
   } = ESM
-
-  const wrapperVersion = stripPrereleaseTag(PACKAGE_VERSION)
 
   const Wrapper = {
     find(object, name, range) {
@@ -29,7 +26,11 @@ function init() {
         const maxVersion = maxSatisfying(map.versions, range)
 
         if (maxVersion !== null) {
-          return map.wrappers[maxVersion]
+          const wrapper = map.wrappers.get(maxVersion)
+
+          if (wrapper !== void 0) {
+            return wrapper
+          }
         }
       }
 
@@ -59,9 +60,9 @@ function init() {
     wrap(object, name, wrapper) {
       const map = getOrCreateMap(object, name)
 
-      if (typeof map.wrappers[wrapperVersion] !== "function") {
-        GenericArray.push(map.versions, wrapperVersion)
-        map.wrappers[wrapperVersion] = toExternalFunction(wrapper)
+      if (map.wrappers.get(PACKAGE_RANGE) === void 0) {
+        GenericArray.push(map.versions, PACKAGE_RANGE)
+        map.wrappers.set(PACKAGE_RANGE, toExternalFunction(wrapper))
       }
     }
   }
@@ -70,15 +71,20 @@ function init() {
     // Store the wrapper map as `object[shared.symbol.wrapper][name]` rather
     // than on the function so other code can modify the same property without
     // interfering with our wrapper.
-    return getOrCreateStore(object)[name] = {
+    const store = getOrCreateStore(object)
+
+    const map = {
       raw: Wrapper.unwrap(object, name),
       versions: [],
-      wrappers: { __proto__: null }
+      wrappers: new Map
     }
+
+    store.set(name, map)
+    return map
   }
 
   function createStore(object) {
-    const value = { __proto__: null }
+    const value = new Map
 
     Reflect.defineProperty(object, shared.symbol.wrapper, {
       configurable: true,
@@ -92,21 +98,39 @@ function init() {
   function getMap(object, name) {
     const store = getStore(object)
 
-    return has(store, name) ? store[name] : null
+    let map
+
+    if (store !== null) {
+      map = store.get(name)
+    }
+
+    return map === void 0
+      ? null
+      : map
   }
 
   function getOrCreateMap(object, name) {
-    return getMap(object, name) || createMap(object, name)
+    const map = getMap(object, name)
+
+    return map === null
+      ? createMap(object, name)
+      : map
   }
 
   function getOrCreateStore(object) {
-    return getStore(object) || createStore(object)
+    const store = getStore(object)
+
+    return store === null
+      ? createStore(object)
+      : store
   }
 
   function getStore(object) {
     const symbol = shared.symbol.wrapper
 
-    return has(object, symbol) ? object[symbol] : null
+    return has(object, symbol)
+      ? object[symbol]
+      : null
   }
 
   return Wrapper

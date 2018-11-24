@@ -19,22 +19,21 @@ function init() {
     "util"
   ]
 
-  const map = {
-    __proto__: null,
-    fs: [
+  const map = new Map([
+    ["fs", [
       "internalModuleStat"
-    ],
-    inspector: [
+    ]],
+    ["inspector", [
       "callAndPauseOnStart",
       "consoleCall"
-    ],
-    util: [
+    ]],
+    ["util", [
       "decorated_private_symbol",
       "getProxyDetails",
       "safeGetenv",
       "setHiddenValue"
-    ]
-  }
+    ]]
+  ])
 
   const binding = {}
 
@@ -54,15 +53,17 @@ function init() {
         } catch {}
       })
 
-      const object = { __proto__: null }
+      const object = {}
 
       if (! isObjectLike(source)) {
         return object
       }
 
-      const names =
-        map[id] ||
-        keys(source)
+      let names = map.get(id)
+
+      if (names === void 0) {
+        names = keys(source)
+      }
 
       for (const name of names) {
         setDeferred(object, name, () => {
