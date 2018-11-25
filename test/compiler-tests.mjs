@@ -238,6 +238,14 @@ describe("compiler tests", () => {
     }
   })
 
+  it("should escape newlines in source specifiers", () => {
+    for (const sourceType of modernTypes) {
+      const result = Compiler.compile('import"\\r\\n"', { sourceType })
+
+      assert.strictEqual(/[\n\r]/.test(result.code), false)
+    }
+  })
+
   it("should preserve crlf newlines", () => {
     const code = [
       "import {",

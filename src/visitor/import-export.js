@@ -161,7 +161,7 @@ function init() {
 
       addToDependencySpecifiers(this, request)
 
-      code += this.runtimeName + '.w("' + request + '"'
+      code += this.runtimeName + ".w(" + JSON.stringify(request)
 
       if (length > 0) {
         i = -1
@@ -211,8 +211,8 @@ function init() {
       const request = node.source.value
 
       const code =
-        runtimeName + '.w("' + request +
-        '",[["*",null,' + runtimeName + ".n()]]);"
+        runtimeName + ".w(" + JSON.stringify(request) +
+        ',[["*",null,' + runtimeName + ".n()]]);"
 
       if (! Reflect.has(exportedFrom, request)) {
         exportedFrom[request] = []
@@ -424,7 +424,7 @@ function init() {
         const fromNames = exportedFrom[request]
         const lastIndex = specifiers.length - 1
 
-        let code = runtimeName + '.w("' + request + '"'
+        let code = runtimeName + ".w(" + JSON.stringify(request)
         let i = -1
         let setterArgsList = ""
 
