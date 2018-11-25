@@ -108,7 +108,7 @@ const Runtime = {
   },
 
   assertImportedBinding: function assertImportedBinding(name, value) {
-    if (! this.entry.importedBindings[name]) {
+    if (this.entry.importedBindings[name] !== true) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, assertImportedBinding)
     }
 
