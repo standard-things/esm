@@ -236,6 +236,15 @@ function init() {
     }
   })
 
+  setDeferred(support, "realpathNative", () => {
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
+
+    return utilSatisfies(safeProcess.version, ">=9.2.0")
+  })
+
   setDeferred(support, "replShowProxy", () => {
     const {
       safeProcess,

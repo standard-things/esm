@@ -21,7 +21,8 @@ function init() {
 
   const map = new Map([
     ["fs", [
-      "internalModuleStat"
+      "internalModuleStat",
+      "realpath"
     ]],
     ["inspector", [
       "callAndPauseOnStart",
