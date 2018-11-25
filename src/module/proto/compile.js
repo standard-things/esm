@@ -85,11 +85,13 @@ function compile(content, filename) {
   const script = new realVM.Script(wrappedContent, scriptOptions)
 
   if (cachePath !== "") {
-    const pendingScripts =
-      shared.pendingScripts[cachePath] ||
-      (shared.pendingScripts[cachePath] = { __proto__: null })
+    const { pendingScripts } = shared
 
-    pendingScripts[cacheName] = script
+    if (! Reflect.has(pendingScripts, cachePath)) {
+      pendingScripts[cachePath] = { __proto__: null }
+    }
+
+    pendingScripts[cachePath][cacheName] = script
   }
 
   if (useRunInContext === void 0) {

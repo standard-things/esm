@@ -146,11 +146,13 @@ function init() {
       return result
     }
 
-    const pendingWrites =
-      shared.pendingWrites[cachePath] ||
-      (shared.pendingWrites[cachePath] = { __proto__: null })
+    const { pendingWrites } = shared
 
-    pendingWrites[cacheName] = result
+    if (! Reflect.has(pendingWrites, cachePath)) {
+      pendingWrites[cachePath] = { __proto__: null }
+    }
+
+    pendingWrites[cachePath][cacheName] = result
     return result
   }
 
