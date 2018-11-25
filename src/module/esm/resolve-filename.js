@@ -52,11 +52,7 @@ const queryHashRegExp = /[?#].*$/
 const emptyArray = []
 const strictExts = [".mjs", ".js", ".json", ".node", ".wasm"]
 const strictFields = ["main"]
-const strictExtsLookup = { __proto__: null }
-
-for (const ext of strictExts) {
-  strictExtsLookup[ext] = true
-}
+const strictExtsLookup = new Set(strictExts)
 
 function resolveFilename(request, parent, isMain, options) {
   if (typeof request !== "string") {
@@ -182,7 +178,7 @@ function resolveFilename(request, parent, isMain, options) {
         isMain ||
         isJS(foundPath) ||
         isMJS(foundPath) ||
-        Reflect.has(strictExtsLookup, extname(foundPath))) {
+        strictExtsLookup.has(extname(foundPath))) {
       cache.set(cacheKey, foundPath)
       return foundPath
     }
