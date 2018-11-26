@@ -11,6 +11,7 @@ import overwrite from "../parse/overwrite.js"
 import preserveChild from "../parse/preserve-child.js"
 import preserveLine from "../parse/preserve-line.js"
 import shared from "../shared.js"
+import toStringLiteral from "../util/to-string-literal.js"
 
 function init() {
   const {
@@ -161,7 +162,7 @@ function init() {
 
       addToDependencySpecifiers(this, request)
 
-      code += this.runtimeName + ".w(" + JSON.stringify(request)
+      code += this.runtimeName + ".w(" + toStringLiteral(request)
 
       if (length > 0) {
         i = -1
@@ -211,7 +212,7 @@ function init() {
       const request = node.source.value
 
       const code =
-        runtimeName + ".w(" + JSON.stringify(request) +
+        runtimeName + ".w(" + toStringLiteral(request) +
         ',[["*",null,' + runtimeName + ".n()]]);"
 
       if (! Reflect.has(exportedFrom, request)) {
@@ -424,7 +425,7 @@ function init() {
         const fromNames = exportedFrom[request]
         const lastIndex = specifiers.length - 1
 
-        let code = runtimeName + ".w(" + JSON.stringify(request)
+        let code = runtimeName + ".w(" + toStringLiteral(request)
         let i = -1
         let setterArgsList = ""
 

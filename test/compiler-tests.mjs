@@ -240,9 +240,9 @@ describe("compiler tests", () => {
 
   it("should escape newlines in source specifiers", () => {
     for (const sourceType of modernTypes) {
-      const result = Compiler.compile('import"\\r\\n"', { sourceType })
+      const result = Compiler.compile('import"\\n\\r\\u2028\\u2029"', { sourceType })
 
-      assert.strictEqual(/[\n\r]/.test(result.code), false)
+      assert.strictEqual(/[\n\r\u2028\u2029]/.test(result.code), false)
     }
   })
 

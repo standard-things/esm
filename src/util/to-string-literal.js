@@ -1,4 +1,5 @@
 import CHAR_CODE from "../constant/char-code.js"
+
 import toString from "./to-string.js"
 import shared from "../shared.js"
 
@@ -8,6 +9,7 @@ function init() {
   } = CHAR_CODE
 
   const escapedDoubleQuoteRegExp = /\\"/g
+  const separatorsRegExp = /[\u2028\u2029]/g
 
   const escapeRegExpMap = new Map([
     ['"', /\\?"/g],
@@ -15,18 +17,19 @@ function init() {
     ["`", /\\?`/g]
   ])
 
-  const quoteMap = new Map([
-    ['"', '"'],
-    ["'", "'"],
-    ["`", "`"],
-    ["back", "`"],
-    ["double", '"'],
-    ["single", "'"]
+  const escapeSeparatorsMap = new Map([
+    ["\u2028", "\\u2028"],
+    ["\u2029", "\\u2029"]
   ])
 
-  function toStringLiteral(value, style = '"') {
-    const quote = quoteMap.get(style) || '"'
-    const string = JSON.stringify(value) || toString(value)
+  function toStringLiteral(value, quote = '"') {
+    let string = JSON.stringify(value)
+
+    if (typeof string !== "string") {
+      string = toString(value)
+    }
+
+    string = string.replace(separatorsRegExp, replaceSeparators)
 
     if (quote === '"' &&
         string.charCodeAt(0) === QUOTE) {
@@ -34,9 +37,14 @@ function init() {
     }
 
     const unquoted = string.slice(1, -1)
-    const escaped = unquoted.replace(escapedDoubleQuoteRegExp, '"')
+    const unescaped = unquoted.replace(escapedDoubleQuoteRegExp, '"')
+    const escaped = unescaped.replace(escapeRegExpMap.get(quote), "\\" + quote)
 
-    return quote + escaped.replace(escapeRegExpMap.get(quote), "\\" + quote) + quote
+    return quote + escaped + quote
+  }
+
+  function replaceSeparators(match) {
+    return "\\" + escapeSeparatorsMap.get(match)
   }
 
   return toStringLiteral
