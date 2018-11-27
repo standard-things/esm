@@ -8,8 +8,8 @@ import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
 import replaceWithout from "../util/replace-without.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
-import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
+import toExternalError from "../util/to-external-error.js"
 import toString from "../util/to-string.js"
 
 function init() {
@@ -31,15 +31,12 @@ function init() {
     const fromParser = isParseError(error)
 
     if (fromParser) {
-      const name = toString(get(error, "name"))
-      const ExCtor = shared.external[name]
-
       column = error.column
       lineNum = error.line
 
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "line")
-      setPrototypeOf(error, ExCtor.prototype)
+      toExternalError(error)
     }
 
     const stack = get(error, "stack")
