@@ -15,18 +15,23 @@ function init() {
   } = shared.external
 
   const protoMap = new Map([
-    [Error.prototype, ExError.prototype],
-    [EvalError.prototype, ExEvalError.prototype],
-    [RangeError.prototype, ExRangeError.prototype],
-    [ReferenceError.prototype, ExReferenceError.prototype],
-    [SyntaxError.prototype, ExSyntaxError.prototype],
-    [TypeError.prototype, ExTypeError.prototype],
-    [URIError.prototype, ExURIError.prototype]
+    ["Error", ExError.prototype],
+    ["EvalError", ExEvalError.prototype],
+    ["RangeError", ExRangeError.prototype],
+    ["ReferenceError", ExReferenceError.prototype],
+    ["SyntaxError", ExSyntaxError.prototype],
+    ["TypeError", ExTypeError.prototype],
+    ["URIError", ExURIError.prototype]
   ])
 
   function toExternalError(error) {
     if (isOwnError(error)) {
-      setPrototypeOf(error, protoMap.get(getPrototypeOf(error)))
+      const { name } = getPrototypeOf(error)
+      const proto = protoMap.get(name)
+
+      if (proto !== void 0) {
+        setPrototypeOf(error, proto)
+      }
     }
 
     return error
