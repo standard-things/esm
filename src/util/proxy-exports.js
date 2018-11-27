@@ -1,5 +1,3 @@
-import ENV from "../constant/env.js"
-
 import OwnProxy from "../own/proxy.js"
 import SafeObject from "../safe/object.js"
 
@@ -29,10 +27,6 @@ import keys from "./keys.js"
 import shared from "../shared.js"
 
 function init() {
-  const {
-    CHAKRA
-  } = ENV
-
   function getToStringTag(target, value) {
     if (typeof target !== "function" &&
         typeof value !== "string") {
@@ -50,8 +44,7 @@ function init() {
   function proxyExports(entry) {
     const exported = entry.exports
 
-    if (CHAKRA ||
-        ! isObjectLike(exported)) {
+    if (! isObjectLike(exported)) {
       return exported
     }
 
