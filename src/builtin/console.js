@@ -31,12 +31,11 @@ function init() {
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
 
-  const instanceRegExp = /IsConsole/i
+  let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
 
-  const instanceSymbol = Object
-    .getOwnPropertySymbols(safeConsole)
-    .find((symbol) => instanceRegExp.test(toString(symbol))) ||
-    Symbol("kIsConsole")
+  if (isConsoleSymbol === void 0) {
+    isConsoleSymbol = Symbol("kIsConsole")
+  }
 
   const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
@@ -73,6 +72,14 @@ function init() {
 
   function defaultWrapper(func, args) {
     return Reflect.apply(func, this, transform(args, toCustomInspectable))
+  }
+
+  function findByRegExp(array, regexp) {
+    for (const value of array) {
+      if (regexp.test(toString(value))) {
+        return value
+      }
+    }
   }
 
   function toCustomInspectable(value) {
@@ -123,7 +130,7 @@ function init() {
       return Reflect.construct(Console, args)
     }
 
-    this[instanceSymbol] = true
+    this[isConsoleSymbol] = true
 
     const { prototype } = Console
     const names = keys(prototype)
@@ -232,7 +239,7 @@ function init() {
 
   if (!  has(Console, Symbol.hasInstance)) {
     Reflect.defineProperty(Console, Symbol.hasInstance, {
-      value: (instance) => instance[instanceSymbol]
+      value: (instance) => instance[isConsoleSymbol]
     })
   }
 
