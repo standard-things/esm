@@ -34,6 +34,7 @@ function init() {
     reset(options) {
       this.addedImportExport = false
       this.addedImportMeta = false
+      this.addedNsImport = false
       this.assignableBindings = null
       this.changed = false
       this.dependencySpecifiers = null
@@ -130,12 +131,15 @@ function init() {
         const localName = specifier.local.name
         const { type } = specifier
 
-        let importedName = "*"
+        let importedName
 
         if (type === "ImportSpecifier") {
           importedName = specifier.imported.name
         } else if (type === "ImportDefaultSpecifier") {
           importedName = "default"
+        } else {
+          importedName = "*"
+          this.addedNsImport = true
         }
 
         if (! Reflect.has(specifierMap, importedName)) {

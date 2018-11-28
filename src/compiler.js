@@ -80,18 +80,13 @@ function init() {
         }
       }
 
-      const { globals } = globalsVisitor
-      const possibleGlobalsNames = keys(globals)
-
       const possibleExportIndexes = findIndexes(code, ["export"])
       const possibleEvalIndexes = findIndexes(code, ["eval"])
-      const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
       const possibleIndexes = findIndexes(code, ["import"])
 
       const possibleChanges = !! (
         possibleExportIndexes.length ||
         possibleEvalIndexes.length ||
-        possibleGlobalsIndexes.length ||
         possibleIndexes.length
       )
 
@@ -173,20 +168,26 @@ function init() {
         sourceType = SOURCE_TYPE_MODULE
       }
 
-      if (possibleGlobalsIndexes.length) {
-        for (const name of possibleGlobalsNames) {
-          if (Reflect.has(identifiers, name)) {
-            Reflect.deleteProperty(globals, name)
-          }
-        }
+      if (importExportVisitor.addedNsImport) {
+        const { globals } = globalsVisitor
+        const possibleGlobalsNames = keys(globals)
+        const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
 
-        if (! isObjectEmpty(globals)) {
-          globalsVisitor.visit(rootPath, {
-            globals,
-            magicString,
-            possibleIndexes: possibleGlobalsIndexes,
-            runtimeName
-          })
+        if (possibleGlobalsIndexes.length) {
+          for (const name of possibleGlobalsNames) {
+            if (Reflect.has(identifiers, name)) {
+              Reflect.deleteProperty(globals, name)
+            }
+          }
+
+          if (! isObjectEmpty(globals)) {
+            globalsVisitor.visit(rootPath, {
+              globals,
+              magicString,
+              possibleIndexes: possibleGlobalsIndexes,
+              runtimeName
+            })
+          }
         }
       }
 

@@ -470,11 +470,11 @@ describe("compiler tests", () => {
 
     lines.forEach((line, index) => {
       const code = [
-        "",
+        'import * as ns from "a"',
         line
       ].join("\n")
 
-      for (const sourceType of sourceTypes) {
+      for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
         const actual = result.code.split("\n").pop()
 
