@@ -34,9 +34,9 @@ function init() {
       column = error.column
       lineNum = error.line
 
+      toExternalError(error)
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "line")
-      toExternalError(error)
     }
 
     const stack = get(error, "stack")
