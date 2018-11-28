@@ -1,7 +1,6 @@
 import getFlags from "../env/get-flags.js"
 import getOptions from "../env/get-options.js"
 import isBrave from "../env/is-brave.js"
-import isChakra from "../env/is-chakra.js"
 import isCheck from "../env/is-check.js"
 import isCLI from "../env/is-cli.js"
 import isDevelopment from "../env/is-development.js"
@@ -22,7 +21,6 @@ import setDeferred from "../util/set-deferred.js"
 const ENV = {}
 
 setDeferred(ENV, "BRAVE", isBrave)
-setDeferred(ENV, "CHAKRA", isChakra)
 setDeferred(ENV, "CHECK", isCheck)
 setDeferred(ENV, "CLI", isCLI)
 setDeferred(ENV, "DEVELOPMENT", isDevelopment)

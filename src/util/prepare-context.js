@@ -1,5 +1,3 @@
-import ENV from "../constant/env.js"
-
 import { Script } from "../safe/vm.js"
 
 import { deprecate } from "../safe/util.js"
@@ -13,10 +11,6 @@ import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
-  const {
-    CHAKRA
-  } = ENV
-
   const builtinByCtor = new Set([
     "Array",
     "BigInt",
@@ -93,10 +87,6 @@ function init() {
           Reflect.deleteProperty(context, name)) {
         Reflect.defineProperty(context, name, descriptor)
       }
-    }
-
-    if (CHAKRA) {
-      return context
     }
 
     const builtinDescriptors = new Map

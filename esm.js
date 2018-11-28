@@ -23,7 +23,6 @@ const {
   parent
 } = module
 
-const isChakra = has(versions, "chakracore")
 const isElectron = has(versions, "electron")
 const isElectronRenderer = isElectron && type === "renderer"
 
@@ -208,8 +207,7 @@ const script = new Script(
 
 let compiledESM
 
-if (isChakra ||
-    isElectronRenderer) {
+if (isElectronRenderer) {
   compiledESM = apply(runInThisContext, script, [{
     __proto__: null,
     filename

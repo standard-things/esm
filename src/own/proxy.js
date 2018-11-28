@@ -15,14 +15,6 @@ function init() {
     value: 1
   }
 
-  const funcToStringTagDescriptor = {
-    configurable: true,
-    value: "Function",
-    writable: true
-  }
-
-  let setFuncToStringTag
-
   class OwnProxy {
     // TODO: Remove this eslint comment when the false positive is resolved.
     // eslint-disable-next-line no-undef
@@ -36,18 +28,6 @@ function init() {
       Object.freeze(handler)
 
       const proxy = new Proxy(target, handler)
-
-      if (typeof target === "function") {
-        if (setFuncToStringTag === void 0) {
-          const { envIsChakra } = shared.module
-
-          setFuncToStringTag = envIsChakra()
-        }
-
-        if (setFuncToStringTag) {
-          Reflect.defineProperty(proxy, Symbol.toStringTag, funcToStringTagDescriptor)
-        }
-      }
 
       OwnProxy.instances.set(proxy, Object.freeze([target, handler]))
       return proxy
