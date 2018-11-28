@@ -57,7 +57,8 @@ function init() {
     const result = Reflect.apply(safeInspect, this, args)
 
     if (! isWrappable(value) ||
-        result.indexOf(PROXY_PREFIX) === -1) {
+        (result.indexOf(PROXY_PREFIX) === -1 &&
+         ! isModuleNamespaceObject(value))) {
       return result
     }
 
