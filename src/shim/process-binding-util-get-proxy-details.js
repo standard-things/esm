@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
+import proxyWrap from "../util/proxy-wrap.js"
 import shared from "../shared.js"
 import silent from "../util/silent.js"
 
@@ -30,10 +31,8 @@ function init() {
       }
 
       try {
-        utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
-          apply(target, thisArg, [value]) {
-            return getProxyDetails(value)
-          }
+        utilBinding.getProxyDetails = proxyWrap(_getProxyDetails, (target, [value]) => {
+          return getProxyDetails(value)
         })
 
         cache.set(utilBinding, true)

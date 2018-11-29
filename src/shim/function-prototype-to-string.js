@@ -1,6 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
+import proxyWrap from "../util/proxy-wrap.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
@@ -50,10 +51,8 @@ function init() {
       }
 
       try {
-        funcProto.toString = new OwnProxy(_toString, {
-          apply(target, thisArg) {
-            return Reflect.apply(toString, thisArg, [])
-          }
+        funcProto.toString = proxyWrap(_toString, function (target, args) {
+          return Reflect.apply(toString, this, args)
         })
 
         cache.set(funcProto, true)

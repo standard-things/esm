@@ -24,6 +24,7 @@ import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import isUpdatableSet from "./is-updatable-set.js"
 import keys from "./keys.js"
+import proxyWrap from "./proxy-wrap.js"
 import shared from "../shared.js"
 
 function init() {
@@ -84,18 +85,18 @@ function init() {
         return wrapper
       }
 
-      wrapper = new OwnProxy(value, {
-        apply(funcTarget, thisArg, args) {
-          // Check for `entry.esmNamespace` because it's a proxy that native
-          // methods could be invoked on.
-          if (thisArg === proxy ||
-              thisArg === entry.esmMutableNamespace ||
-              thisArg === entry.esmNamespace) {
-            thisArg = target
-          }
+      wrapper = proxyWrap(value, function (funcTarget, args) {
+        let thisArg = this
 
-          return Reflect.apply(value, thisArg, args)
+        // Check for `entry.esmNamespace` because it's a proxy that native
+        // methods could be invoked on.
+        if (thisArg === proxy ||
+            thisArg === entry.esmMutableNamespace ||
+            thisArg === entry.esmNamespace) {
+          thisArg = target
         }
+
+        return Reflect.apply(value, thisArg, args)
       })
 
       cached.wrap.set(value, wrapper)

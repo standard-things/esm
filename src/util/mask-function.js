@@ -7,6 +7,7 @@ import copyProperty from "./copy-property.js"
 import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
+import proxyWrap from "./proxy-wrap.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
@@ -51,19 +52,19 @@ function init() {
       }
     })
 
-    const toString = new OwnProxy(func.toString, {
-      apply: function apply(target, thisArg, args) {
-        if (! Loader.state.package.default.options.debug &&
-            typeof thisArg === "function" &&
-            unwrapProxy(thisArg) === func) {
-          thisArg = cached.source
-        }
+    const toString = proxyWrap(func.toString, function (target, args) {
+      let thisArg = this
 
-        try {
-          return Reflect.apply(target, thisArg, args)
-        } catch (e) {
-          throw captureStackTrace(e, apply)
-        }
+      if (! Loader.state.package.default.options.debug &&
+          typeof thisArg === "function" &&
+          unwrapProxy(thisArg) === func) {
+        thisArg = cached.source
+      }
+
+      try {
+        return Reflect.apply(target, thisArg, args)
+      } catch (e) {
+        throw captureStackTrace(e, toString)
       }
     })
 
