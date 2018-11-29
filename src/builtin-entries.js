@@ -64,7 +64,7 @@ function createEntry(id) {
 
         return value
       },
-      getOwnPropertyDescriptor(target, name){
+      getOwnPropertyDescriptor(target, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
 
         if (descriptor &&
