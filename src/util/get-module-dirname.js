@@ -8,7 +8,7 @@ function init() {
     if (isObject(mod)) {
       const { filename } = mod
 
-      if (Reflect.has(builtinLookup, mod.id)) {
+      if (builtinLookup.has(mod.id)) {
         return ""
       } else if (typeof filename === "string") {
         return dirname(filename)

@@ -2,13 +2,7 @@ import builtinIds from "./builtin-ids.js"
 import shared from "./shared.js"
 
 function init() {
-  const builtinLookup = { __proto__: null }
-
-  for (const id of builtinIds) {
-    builtinLookup[id] = true
-  }
-
-  return builtinLookup
+  return new Set(builtinIds)
 }
 
 export default shared.inited

@@ -8,15 +8,16 @@ function init() {
     ELECTRON
   } = ENV
 
-  const bundledLookup = { __proto__: null }
+  const bundledLookup = new Set
 
   if (ELECTRON) {
-    bundledLookup.electron = true
+    bundledLookup.add("electron")
   }
 
   if (BRAVE) {
-    bundledLookup["ad-block"] =
-    bundledLookup["tracking-protection"] = true
+    bundledLookup
+      .add("ad-block")
+      .add("tracking-protection")
   }
 
   return bundledLookup

@@ -243,7 +243,7 @@ class Package {
     let dirPath = "."
 
     if (typeof request === "string") {
-      dirPath = Reflect.has(builtinLookup, request) ? "" : dirname(request)
+      dirPath = builtinLookup.has(request) ? "" : dirname(request)
     } else {
       dirPath = getModuleDirname(request)
     }

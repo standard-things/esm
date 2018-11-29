@@ -37,11 +37,11 @@ function resolveFilename(request, parent, isMain, options) {
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
   if (ELECTRON &&
-      Reflect.has(bundledLookup, request)) {
+      bundledLookup.has(request)) {
     return SafeModule._resolveFilename(request)
   }
 
-  if (Reflect.has(builtinLookup, request)) {
+  if (builtinLookup.has(request)) {
     return request
   }
 

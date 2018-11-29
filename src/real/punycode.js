@@ -4,7 +4,7 @@ import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
-  return Reflect.has(builtinLookup, "punycode")
+  return builtinLookup.has("punycode")
     ? unwrapProxy(realRequire("punycode"))
     : null
 }

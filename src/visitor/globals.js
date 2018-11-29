@@ -6,8 +6,7 @@ import isIdentifer from "../parse/is-identifier.js"
 import shared from "../shared.js"
 
 function init() {
-  const globalLookup = {
-    __proto__: null,
+  const defaultGlobals = {
     Reflect: true,
     console: true
   }
@@ -30,7 +29,7 @@ function init() {
       }
 
       if (this.globals == null) {
-        this.globals = assign({ __proto__: null }, globalLookup)
+        this.globals = assign({ __proto__: null }, defaultGlobals)
       }
     }
 

@@ -8,7 +8,7 @@ import _resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import builtinLookup from "../../builtin-lookup.js"
 
 function resolveLookupPaths(request, parent, newReturn) {
-  if (Reflect.has(builtinLookup, request)) {
+  if (builtinLookup.has(request)) {
     return newReturn ? null : GenericArray.of(request, GenericArray.of())
   }
 

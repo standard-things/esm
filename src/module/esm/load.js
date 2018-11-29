@@ -42,7 +42,7 @@ function load(request, parent, isMain) {
   const fromPath = dirname(filename)
 
   if (fromPath === "." &&
-      Reflect.has(builtinLookup, filename)) {
+      builtinLookup.has(filename)) {
     request = filename
   }
 
