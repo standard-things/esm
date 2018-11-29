@@ -133,11 +133,15 @@ function init() {
   setDeferred(shared, "originalConsole", () => {
     const {
       safeInspector,
-      safeVM
+      safeVM,
+      utilGet
     } = shared.module
 
-    return (safeInspector && safeInspector.console) ||
-      new safeVM.Script("console").runInNewContext()
+    const originalConsole = utilGet(safeInspector, "console")
+
+    return typeof originalConsole === "function"
+      ? originalConsole
+      : new safeVM.Script("console").runInNewContext()
   })
 
   setDeferred(shared, "proxyNativeSourceText", () => {
