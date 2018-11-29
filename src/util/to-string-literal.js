@@ -17,7 +17,7 @@ function init() {
     ["`", /\\?`/g]
   ])
 
-  const escapeSeparatorsMap = new Map([
+  const escapedSeparatorsMap = new Map([
     ["\u2028", "\\u2028"],
     ["\u2029", "\\u2029"]
   ])
@@ -44,7 +44,7 @@ function init() {
   }
 
   function replaceSeparators(match) {
-    return "\\" + escapeSeparatorsMap.get(match)
+    return "\\" + escapedSeparatorsMap.get(match)
   }
 
   return toStringLiteral
