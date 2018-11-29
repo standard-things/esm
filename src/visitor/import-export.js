@@ -32,9 +32,11 @@ function init() {
     }
 
     reset(options) {
-      this.addedImportExport = false
+      this.addedDynamicImport = false
+      this.addedExport = false
+      this.addedImport = false
       this.addedImportMeta = false
-      this.addedNsImport = false
+      this.addedNamespaceImport = false
       this.assignableBindings = null
       this.changed = false
       this.dependencySpecifiers = null
@@ -95,6 +97,7 @@ function init() {
       // Support dynamic import:
       // import("mod")
       this.changed = true
+      this.addedDynamicImport = true
 
       overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
       path.call(this, "visitWithoutReset", "arguments")
@@ -115,7 +118,7 @@ function init() {
       // import defaultName, * as name from "mod"
       // import "mod"
       this.changed =
-      this.addedImportExport = true
+      this.addedImport = true
 
       const node = path.getValue()
       const request = node.source.value
@@ -139,7 +142,7 @@ function init() {
           importedName = "default"
         } else {
           importedName = "*"
-          this.addedNsImport = true
+          this.addedNamespaceImport = true
         }
 
         if (! Reflect.has(specifierMap, importedName)) {
@@ -209,7 +212,7 @@ function init() {
       // Support re-exporting an imported module:
       // export * from "mod"
       this.changed =
-      this.addedImportExport = true
+      this.addedExport = true
 
       const { exportedFrom, runtimeName } = this
       const node = path.getValue()
@@ -235,7 +238,7 @@ function init() {
       }
 
       this.changed =
-      this.addedImportExport = true
+      this.addedExport = true
 
       const node = path.getValue()
       const { declaration } = node
@@ -314,7 +317,7 @@ function init() {
       }
 
       this.changed =
-      this.addedImportExport = true
+      this.addedExport = true
 
       const {
         assignableBindings,

@@ -10,7 +10,7 @@ function init() {
 
   class EvalVisitor extends Visitor {
     reset(options) {
-      this.addedImportExport = false
+      this.addedExport = false
       this.changed = false
       this.magicString = null
       this.possibleIndexes = null
@@ -18,7 +18,7 @@ function init() {
       this.strict = false
 
       if (options !== void 0) {
-        this.addedImportExport = options.addedImportExport
+        this.addedExport = options.addedExport
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -54,7 +54,7 @@ function init() {
         .prependLeft(callee.end, "(" + code)
         .prependRight(end, ")")
 
-      if (this.addedImportExport) {
+      if (this.addedExport) {
         magicString
           .prependLeft(start, runtimeName + ".u(")
           .prependRight(end, ")")

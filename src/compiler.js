@@ -161,14 +161,22 @@ function init() {
         throw e
       }
 
-      const { addedImportExport } = importExportVisitor
+      const {
+        addedDynamicImport,
+        addedExport,
+        addedImportMeta,
+        addedNamespaceImport,
+        addedImport
+      } = importExportVisitor
 
-      if (addedImportExport ||
-          importExportVisitor.addedImportMeta) {
+      if (addedExport ||
+          addedImportMeta ||
+          addedImport) {
         sourceType = SOURCE_TYPE_MODULE
       }
 
-      if (importExportVisitor.addedNsImport) {
+      if (addedDynamicImport ||
+          addedNamespaceImport) {
         const { globals } = globalsVisitor
         const possibleGlobalsNames = keys(globals)
         const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
@@ -194,7 +202,7 @@ function init() {
       if (possibleEvalIndexes.length &&
           ! Reflect.has(identifiers, "eval")) {
         evalVisitor.visit(rootPath, {
-          addedImportExport,
+          addedExport,
           magicString,
           possibleIndexes: possibleEvalIndexes,
           runtimeName,
@@ -202,7 +210,7 @@ function init() {
         })
       }
 
-      if (addedImportExport) {
+      if (addedExport) {
         const { assignableBindings } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
@@ -224,7 +232,10 @@ function init() {
             throw e
           }
         }
+      }
 
+      if (addedExport ||
+          addedImport) {
         importExportVisitor.finalizeHoisting()
       }
 
@@ -237,7 +248,8 @@ function init() {
         result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = SOURCE_TYPE_MODULE
 
-        if (addedImportExport) {
+        if (addedExport &&
+            addedImport) {
           const { initedBindings, temporalBindings } = importExportVisitor
 
           result.enforceTDZ = () => {
