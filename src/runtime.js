@@ -182,73 +182,7 @@ const Runtime = {
     return code
   },
 
-  enable(entry, exported) {
-    const mod = entry.module
-    const runtime = mod.exports
-
-    const boundCompileEval = (code) => Runtime.compileEval.call(runtime, code)
-    const boundEvalGlobal = (code) => Runtime.evalGlobal.call(runtime, code)
-
-    Entry.set(mod, entry)
-    Entry.set(exported, entry)
-
-    entry.exports = exported
-
-    setDeferred(runtime, "meta", () => {
-      const { id } = entry
-
-      return {
-        __proto__: null,
-        url: isFileOrigin(id) ? id : getURLFromFilePath(id)
-      }
-    })
-
-    runtime._runResult = void 0
-    runtime.addDefaultValue = Runtime.addDefaultValue
-    runtime.addExportFromSetter = Runtime.addExportFromSetter
-    runtime.addExportGetters = Runtime.addExportGetters
-    runtime.addNamespaceSetter = Runtime.addNamespaceSetter
-    runtime.assertImportedBinding = Runtime.assertImportedBinding
-    runtime.compileEval = boundCompileEval
-    runtime.compileGlobalEval = Runtime.compileGlobalEval
-    runtime.entry = entry
-    runtime.evalGlobal = boundEvalGlobal
-    runtime.global = builtinGlobal
-    runtime.importDynamic = Runtime.importDynamic
-    runtime.importStatic = Runtime.importStatic
-    runtime.initBindings = Runtime.initBindings
-    runtime.run = Runtime.run
-    runtime.throwConstAssignment = Runtime.throwConstAssignment
-    runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
-    runtime.updateBindings = Runtime.updateBindings
-
-    runtime._ = runtime
-    runtime.a = runtime.assertImportedBinding
-    runtime.b = runtime.throwConstAssignment
-    runtime.c = runtime.compileEval
-    runtime.d = runtime.addDefaultValue
-    runtime.e = runtime.evalGlobal
-    runtime.f = runtime.addExportFromSetter
-    runtime.g = runtime.global
-    runtime.i = runtime.importDynamic
-    runtime.j = runtime.initBindings
-    runtime.k = identity
-    runtime.n = runtime.addNamespaceSetter
-    runtime.r = runtime.run
-    runtime.t = runtime.throwUndefinedIdentifier
-    runtime.u = runtime.updateBindings
-    runtime.v = evalIndirect
-    runtime.w = runtime.importStatic
-    runtime.x = runtime.addExportGetters
-
-    return runtime
-  },
-
-  evalGlobal(content) {
-    return evalIndirect(this.compileGlobalEval(content))
-  },
-
-  importDynamic(request) {
+  dynamicImport(request) {
     return new ExPromise((resolvePromise, rejectPromise) => {
       setImmediate(() => {
         try {
@@ -272,7 +206,73 @@ const Runtime = {
     })
   },
 
-  importStatic(request, setterArgsList) {
+  enable(entry, exported) {
+    const mod = entry.module
+    const runtime = mod.exports
+
+    const boundCompileEval = (code) => Runtime.compileEval.call(runtime, code)
+    const boundGlobalEval = (code) => Runtime.globalEval.call(runtime, code)
+
+    Entry.set(mod, entry)
+    Entry.set(exported, entry)
+
+    entry.exports = exported
+
+    setDeferred(runtime, "meta", () => {
+      const { id } = entry
+
+      return {
+        __proto__: null,
+        url: isFileOrigin(id) ? id : getURLFromFilePath(id)
+      }
+    })
+
+    runtime._runResult = void 0
+    runtime.addDefaultValue = Runtime.addDefaultValue
+    runtime.addExportFromSetter = Runtime.addExportFromSetter
+    runtime.addExportGetters = Runtime.addExportGetters
+    runtime.addNamespaceSetter = Runtime.addNamespaceSetter
+    runtime.assertImportedBinding = Runtime.assertImportedBinding
+    runtime.compileEval = boundCompileEval
+    runtime.compileGlobalEval = Runtime.compileGlobalEval
+    runtime.dynamicImport = Runtime.dynamicImport
+    runtime.entry = entry
+    runtime.global = builtinGlobal
+    runtime.globalEval = boundGlobalEval
+    runtime.import = Runtime.import
+    runtime.initBindings = Runtime.initBindings
+    runtime.run = Runtime.run
+    runtime.throwConstAssignment = Runtime.throwConstAssignment
+    runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
+    runtime.updateBindings = Runtime.updateBindings
+
+    runtime._ = runtime
+    runtime.a = runtime.assertImportedBinding
+    runtime.b = runtime.throwConstAssignment
+    runtime.c = runtime.compileEval
+    runtime.d = runtime.addDefaultValue
+    runtime.e = runtime.globalEval
+    runtime.f = runtime.addExportFromSetter
+    runtime.g = runtime.global
+    runtime.i = runtime.dynamicImport
+    runtime.j = runtime.initBindings
+    runtime.k = identity
+    runtime.n = runtime.addNamespaceSetter
+    runtime.r = runtime.run
+    runtime.t = runtime.throwUndefinedIdentifier
+    runtime.u = runtime.updateBindings
+    runtime.v = evalIndirect
+    runtime.w = runtime.import
+    runtime.x = runtime.addExportGetters
+
+    return runtime
+  },
+
+  globalEval(content) {
+    return evalIndirect(this.compileGlobalEval(content))
+  },
+
+  import(request, setterArgsList) {
     return esmImport(this.entry, request, setterArgsList)
   },
 
