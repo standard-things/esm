@@ -21,9 +21,17 @@ function init() {
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
+      const importBindings = keys(top.importedBindings)
 
-      const code =
-        top.insertPrefix +
+      let code = top.insertPrefix
+
+      if (importBindings.length !== 0) {
+        code +=
+          (this.generateVarDeclarations ? "var " : "let ") +
+          importBindings.join(",") + ";"
+      }
+
+      code +=
         toModuleExport(this, this.hoistedExports) +
         this.hoistedImportsString
 
@@ -126,12 +134,10 @@ function init() {
       const { specifiers } = node
       const { temporalBindings } = this
 
-      let code = ""
       let i = -1
       let lastIndex = specifiers.length - 1
 
       for (const specifier of specifiers) {
-        const localName = specifier.local.name
         const { type } = specifier
 
         let importedName
@@ -149,19 +155,13 @@ function init() {
           specifierMap[importedName] = []
         }
 
+        const localName = specifier.local.name
+
         specifierMap[importedName].push(localName)
 
         if (importedName !== "*") {
           temporalBindings[localName] = true
         }
-
-        if (++i === 0) {
-          code += (this.generateVarDeclarations ? "var " : "let ")
-        }
-
-        code +=
-          localName +
-          (i === lastIndex ? ";" : ",")
       }
 
       const importedNames = keys(specifierMap)
@@ -169,7 +169,7 @@ function init() {
 
       addToDependencySpecifiers(this, request)
 
-      code += this.runtimeName + ".w(" + toStringLiteral(request)
+      let code = this.runtimeName + ".w(" + toStringLiteral(request)
 
       if (length > 0) {
         i = -1
