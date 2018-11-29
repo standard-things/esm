@@ -45,6 +45,10 @@ function getTagFromSymbol(object) {
   return object[Symbol.toStringTag]
 }
 
+function has(object, name) {
+  return Object.prototype.hasOwnProperty.call(object, name)
+}
+
 export default () => {
   let objects = [console1, console2, console3]
   let descriptor = Reflect.getOwnPropertyDescriptor(console1, "log")
@@ -57,9 +61,9 @@ export default () => {
   Reflect.deleteProperty(console1, "log")
 
   let deleted = [
-    ! Reflect.has(console1, "log"),
-    ! Reflect.has(console2, "log"),
-    ! Reflect.has(console3, "log")
+    ! has(console1, "log"),
+    ! has(console2, "log"),
+    ! has(console3, "log")
   ]
 
   Reflect.defineProperty(console1, "log", descriptor)

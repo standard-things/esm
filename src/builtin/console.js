@@ -4,6 +4,7 @@ import ENV from "../constant/env.js"
 
 import GenericFunction from "../generic/function.js"
 import GenericObject from "../generic/object.js"
+import OwnProxy from "../own/proxy.js"
 
 import assign from "../util/assign.js"
 import binding from "../binding.js"
@@ -12,6 +13,7 @@ import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
+import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import keys from "../util/keys.js"
 import keysAll from "../util/keys-all.js"
 import maskFunction from "../util/mask-function.js"
@@ -31,14 +33,12 @@ function init() {
   const realProto = RealConsole.prototype
   const realProtoNames = keysAll(realProto)
 
-  let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
-
-  if (isConsoleSymbol === void 0) {
-    isConsoleSymbol = Symbol("kIsConsole")
-  }
-
   const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
+
+  // Assign `console` to a variable so it's not removed by
+  // `babel-plugin-transform-remove-console`.
+  const globalConsole = console
 
   const wrapperMap = new Map([
     ["assert", wrapBuiltin(realProto.assert, assertWrapper)],
@@ -50,6 +50,12 @@ function init() {
     ["trace", wrapBuiltin(realProto.trace)],
     ["warn", wrapBuiltin(realProto.warn)]
   ])
+
+  let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
+
+  if (isConsoleSymbol === void 0) {
+    isConsoleSymbol = Symbol("kIsConsole")
+  }
 
   function assertWrapper(func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
@@ -133,9 +139,9 @@ function init() {
     this[isConsoleSymbol] = true
 
     const { prototype } = Console
-    const names = keys(prototype)
+    const protoNames = keys(prototype)
 
-    for (const name of names) {
+    for (const name of protoNames) {
       const value = this[name]
 
       if (typeof value === "function") {
@@ -180,10 +186,10 @@ function init() {
     const { consoleCall } = binding.inspector
 
     if (typeof consoleCall === "function") {
+      const builtinNames = keys(builtinConsole)
       const emptyConfig = {}
-      const names = keys(builtinConsole)
 
-      for (const name of names) {
+      for (const name of builtinNames) {
         const builtinFunc = builtinConsole[name]
 
         setDeferred(builtinConsole, name, () => {
@@ -207,16 +213,13 @@ function init() {
       }
     }
   } else if (ELECTRON_RENDERER) {
-    // Assign `console` to a variable so it's not removed by
-    // `babel-plugin-transform-remove-console`.
-    const unmungedConsole = console
-    const names = keys(unmungedConsole)
+    const globalNames = keys(globalConsole)
 
-    for (const name of names) {
+    for (const name of globalNames) {
       if (name !== "Console" &&
           has(builtinConsole, name)) {
         // eslint-disable-next-line no-console
-        const consoleFunc = unmungedConsole[name]
+        const consoleFunc = globalConsole[name]
         const builtinFunc = builtinConsole[name]
 
         if (typeof builtinFunc === "function" &&
@@ -227,9 +230,9 @@ function init() {
     }
   }
 
-  const names = keysAll(safeConsole)
+  const safeNames = keysAll(safeConsole)
 
-  for (const name of names) {
+  for (const name of safeNames) {
     if (name === "Console") {
       builtinConsole.Console = Console
     } else if (! has(builtinConsole, name)) {
@@ -243,7 +246,44 @@ function init() {
     })
   }
 
-  return builtinConsole
+  const builtinMethodMap = new Map([
+    [globalConsole.assert, builtinConsole.assert],
+    [globalConsole.debug, builtinConsole.debug],
+    [globalConsole.dir, builtinConsole.dir],
+    [globalConsole.dirxml, builtinConsole.dirxml],
+    [globalConsole.info, builtinConsole.info],
+    [globalConsole.log, builtinConsole.log],
+    [globalConsole.trace, builtinConsole.trace],
+    [globalConsole.warn, builtinConsole.warn]
+  ])
+
+  const proxy = new OwnProxy(globalConsole, {
+    get(target, name, receiver) {
+      const value = Reflect.get(target, name, receiver)
+      const builtinMethod = builtinMethodMap.get(value)
+
+      return builtinMethod === void 0
+        ? value
+        : builtinMethod
+    },
+
+    getOwnPropertyDescriptor(target, name) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+
+      if (isUpdatableDescriptor(descriptor)) {
+        const { value } = descriptor
+        const builtinMethod = builtinMethodMap.get(value)
+
+        if (builtinMethod !== void 0) {
+          descriptor.value = builtinMethod
+        }
+      }
+
+      return descriptor
+    }
+  })
+
+  return proxy
 }
 
 export default shared.inited
