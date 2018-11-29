@@ -10,6 +10,8 @@ function init() {
 
   class AssignmentVisitor extends Visitor {
     reset(options) {
+      this.addedExport = false
+      this.addedImport = false
       this.assignableBindings = null
       this.importedBindings = null
       this.magicString = null
@@ -17,6 +19,8 @@ function init() {
       this.runtimeName = null
 
       if (options !== void 0) {
+        this.addedExport = options.addedExport
+        this.addedImport = options.addedImport
         this.assignableBindings = options.assignableBindings
         this.importedBindings = options.importedBindings
         this.magicString = options.magicString
@@ -47,31 +51,35 @@ function init() {
     const names = getNamesFromPattern(node[childName])
     const { end, start } = node
 
-    for (const name of names) {
-      if (Reflect.has(importedBindings, name) &&
-          ! getShadowed(path, name, shadowedMap)) {
-        // Throw a type error for assignments to imported bindings.
-        overwrite(
-          visitor,
-          start,
-          end,
-          runtimeName + ".b()"
-        )
+    if (visitor.addedImport) {
+      for (const name of names) {
+        if (Reflect.has(importedBindings, name) &&
+            ! getShadowed(path, name, shadowedMap)) {
+          // Throw a type error for assignments to imported bindings.
+          overwrite(
+            visitor,
+            start,
+            end,
+            runtimeName + ".b()"
+          )
+        }
       }
     }
 
-    for (const name of names) {
-      if (assignableBindings[name] === true) {
-        const shadowed = getShadowed(path, name, shadowedMap)
+    if (visitor.addedExport) {
+      for (const name of names) {
+        if (assignableBindings[name] === true) {
+          const shadowed = getShadowed(path, name, shadowedMap)
 
-        if (shadowed === null ||
-            shadowed.type === "FunctionDeclaration")  {
-          // Wrap assignments to exported identifiers.
-          magicString
-            .prependLeft(start, runtimeName + ".u(")
-            .prependRight(end, ")")
+          if (shadowed === null ||
+              shadowed.type === "FunctionDeclaration")  {
+            // Wrap assignments to exported identifiers.
+            magicString
+              .prependLeft(start, runtimeName + ".u(")
+              .prependRight(end, ")")
 
-          return
+            return
+          }
         }
       }
     }

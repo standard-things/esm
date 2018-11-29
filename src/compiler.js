@@ -210,7 +210,8 @@ function init() {
         })
       }
 
-      if (addedExport) {
+      if (addedExport ||
+          addedImport) {
         const { assignableBindings } = importExportVisitor
 
         const possibleIndexes = findIndexes(code, [
@@ -221,6 +222,8 @@ function init() {
         if (possibleIndexes.length) {
           try {
             assignmentVisitor.visit(rootPath, {
+              addedExport,
+              addedImport,
               assignableBindings,
               importedBindings,
               magicString,
@@ -232,10 +235,7 @@ function init() {
             throw e
           }
         }
-      }
 
-      if (addedExport ||
-          addedImport) {
         importExportVisitor.finalizeHoisting()
       }
 
@@ -248,8 +248,7 @@ function init() {
         result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = SOURCE_TYPE_MODULE
 
-        if (addedExport &&
-            addedImport) {
+        if (addedImport) {
           const { initedBindings, temporalBindings } = importExportVisitor
 
           result.enforceTDZ = () => {
