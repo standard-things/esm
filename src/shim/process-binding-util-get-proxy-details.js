@@ -31,7 +31,7 @@ function init() {
       }
 
       try {
-        utilBinding.getProxyDetails = proxyWrap(_getProxyDetails, (target, [value]) => {
+        utilBinding.getProxyDetails = proxyWrap(_getProxyDetails, (_getProxyDetails, [value]) => {
           return getProxyDetails(value)
         })
 
@@ -57,7 +57,8 @@ function init() {
     result = true
 
     try {
-      const proxy = new OwnProxy(getProxyDetails, {})
+      const object = {}
+      const proxy = new OwnProxy(object, object)
 
       result = getProxyDetails(proxy) === void 0
     } catch {}
