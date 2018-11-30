@@ -1,10 +1,10 @@
 import shared from "../shared.js"
 
 function init() {
-  function get(object, name) {
+  function get(object, name, receiver) {
     if (object != null) {
       try {
-        return object[name]
+        return Reflect.get(object, name, receiver)
       } catch {}
     }
   }
