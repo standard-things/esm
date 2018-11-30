@@ -141,7 +141,7 @@ function init() {
     let inspecting = false
 
     const proxy = new OwnProxy(object, {
-      get: (object, name, receiver) => {
+      get(object, name, receiver) {
         if (receiver === proxy) {
           receiver = object
         }
@@ -210,7 +210,7 @@ function init() {
         return value
       },
 
-      getOwnPropertyDescriptor: (object, name) => {
+      getOwnPropertyDescriptor(object, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
 
         if (isUpdatableDescriptor(descriptor)) {

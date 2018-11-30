@@ -74,7 +74,7 @@ function init() {
 
         const scrubber = isESM
           ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
-          : (stack) => scrubStackTrace(stack)
+          : scrubStackTrace
 
         return this.stack = replaceWithout(masked, newString, scrubber)
       },
