@@ -1,7 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
-import proxyWrap from "../util/proxy-wrap.js"
+import nativeTrap from "../util/native-trap.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
@@ -51,12 +51,10 @@ function init() {
       }
 
       try {
-        funcProto.toString = proxyWrap(_toString, function (_toString, args) {
-          const newTarget = new.target
-
-          return newTarget === void 0
-            ? Reflect.apply(toString, this, args)
-            : Reflect.construct(_toString, args, newTarget)
+        funcProto.toString = new OwnProxy(_toString, {
+          apply: nativeTrap((_toString, thisArg, args) => {
+            return Reflect.apply(toString, thisArg, args)
+          })
         })
 
         cache.set(funcProto, true)

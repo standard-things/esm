@@ -1,7 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
-import proxyWrap from "../util/proxy-wrap.js"
+import nativeTrap from "../util/native-trap.js"
 import shared from "../shared.js"
 import silent from "../util/silent.js"
 
@@ -30,9 +30,16 @@ function init() {
           : Reflect.apply(_getProxyDetails, utilBinding, [value])
       }
 
+      const trap = nativeTrap((_getProxyDetails, ...rest) => {
+        const [value] = rest[rest.length - 1]
+
+        return getProxyDetails(value)
+      })
+
       try {
-        utilBinding.getProxyDetails = proxyWrap(_getProxyDetails, (_getProxyDetails, [value]) => {
-          return getProxyDetails(value)
+        utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
+          apply: trap,
+          construct: trap
         })
 
         cache.set(utilBinding, true)

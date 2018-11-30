@@ -24,7 +24,7 @@ import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import isUpdatableSet from "./is-updatable-set.js"
 import keys from "./keys.js"
-import proxyWrap from "./proxy-wrap.js"
+import nativeTrap from "./native-trap.js"
 import shared from "../shared.js"
 
 function init() {
@@ -71,24 +71,18 @@ function init() {
         return wrapper
       }
 
-      wrapper = proxyWrap(func, function (func, args) {
-        const newTarget = new.target
+      wrapper = new OwnProxy(func, {
+        apply: nativeTrap((func, thisArg, args) => {
+          // Check for `entry.esmNamespace` because it's a proxy that native
+          // methods could be invoked on.
+          if (thisArg === proxy ||
+              thisArg === entry.esmMutableNamespace ||
+              thisArg === entry.esmNamespace) {
+            thisArg = exported
+          }
 
-        if (newTarget !== void 0) {
-          return Reflect.construct(func, args, newTarget)
-        }
-
-        let thisArg = this
-
-        // Check for `entry.esmNamespace` because it's a proxy that native
-        // methods could be invoked on.
-        if (thisArg === proxy ||
-            thisArg === entry.esmMutableNamespace ||
-            thisArg === entry.esmNamespace) {
-          thisArg = exported
-        }
-
-        return Reflect.apply(func, thisArg, args)
+          return Reflect.apply(func, thisArg, args)
+        })
       })
 
       cached.wrap.set(func, wrapper)

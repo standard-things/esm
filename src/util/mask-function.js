@@ -6,7 +6,7 @@ import copyProperty from "./copy-property.js"
 import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
-import proxyWrap from "./proxy-wrap.js"
+import nativeTrap from "./native-trap.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
@@ -33,7 +33,7 @@ function init() {
     }
 
     const proxy = new OwnProxy(func, {
-      get(func, name, receiver) {
+      get: nativeTrap((func, name, receiver) => {
         if (name === "toString" &&
             ! has(func, "toString")) {
           return cached.toString
@@ -44,25 +44,19 @@ function init() {
         }
 
         return Reflect.get(func, name, receiver)
-      }
+      })
     })
 
-    const toString = proxyWrap(func.toString, function (_toString, args) {
-      const newTarget = new.target
+    const toString = new OwnProxy(func.toString, {
+      apply: nativeTrap((_toString, thisArg, args) => {
+        if (! Loader.state.package.default.options.debug &&
+            typeof thisArg === "function" &&
+            unwrapProxy(thisArg) === func) {
+          thisArg = cached.source
+        }
 
-      if (newTarget !== void 0) {
-        return Reflect.construct(_toString, args, newTarget)
-      }
-
-      let thisArg = this
-
-      if (! Loader.state.package.default.options.debug &&
-          typeof thisArg === "function" &&
-          unwrapProxy(thisArg) === func) {
-        thisArg = cached.source
-      }
-
-      return Reflect.apply(_toString, thisArg, args)
+        return Reflect.apply(_toString, thisArg, args)
+      })
     })
 
     copyProperty(func, source, "name")
