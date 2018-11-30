@@ -111,6 +111,7 @@ function hook(Mod, parent) {
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
       entry._passthru = false
+      entry.state = STATE_EXECUTION_STARTED
       tryPassthru.call(this, func, args, pkg)
       return
     }

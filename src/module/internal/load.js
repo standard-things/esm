@@ -16,7 +16,6 @@ import realProcess from "../../real/process.js"
 import shared from "../../shared.js"
 
 const {
-  STATE_EXECUTION_STARTED,
   STATE_PARSING_COMPLETED,
   STATE_PARSING_STARTED
 } = ENTRY
@@ -64,7 +63,7 @@ function load(filename, parent, isMain, cache, loader) {
 
   entry.state = parsing
     ? STATE_PARSING_STARTED
-    : STATE_EXECUTION_STARTED
+    : STATE_PARSING_COMPLETED
 
   const { _compile } = child
 

@@ -4,6 +4,7 @@
 
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
+import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
@@ -23,12 +24,17 @@ import stripShebang from "../../util/strip-shebang.js"
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  STATE_INITIAL
+  STATE_INITIAL,
+  STATE_PARSING_COMPLETED
 } = ENTRY
 
 const {
   ELECTRON
 } = ENV
+
+const {
+  MODE_STRICT
+} = PACKAGE
 
 let resolvedArgv
 let useBufferArg
@@ -40,8 +46,14 @@ const useRunInDebugContext = typeof runInDebugContext === "function"
 
 function compile(content, filename) {
   const entry = Entry.get(this)
+  const { state } = entry
 
-  if (entry.state === STATE_INITIAL) {
+  entry.updateFilename(filename)
+
+  if (entry.extname !== ".mjs" &&
+      entry.package.options.mode !== MODE_STRICT &&
+      (state === STATE_INITIAL ||
+       state === STATE_PARSING_COMPLETED)) {
     entry.cacheName = getCacheName(content)
     entry.package = Package.get("")
     entry.runtimeName = shared.runtimeName

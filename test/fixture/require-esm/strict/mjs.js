@@ -1,3 +1,3 @@
-"use module"
+"use strict"
 
 require("../../../fixture/export/abc.mjs")
