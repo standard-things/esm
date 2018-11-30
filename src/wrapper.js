@@ -40,7 +40,11 @@ function init() {
       const func = Wrapper.unwrap(object, name)
 
       const manager = proxyWrap(func, function (func, args) {
-        return Reflect.apply(wrapper, this, [manager, func, args])
+        const newTarget = new.target
+
+        return newTarget === void 0
+          ? Reflect.apply(wrapper, this, [manager, func, args])
+          : Reflect.construct(wrapper, [manager, func, args], newTarget)
       })
 
       Reflect.defineProperty(manager, shared.symbol.wrapper, {

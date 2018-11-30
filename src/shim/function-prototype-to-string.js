@@ -51,8 +51,12 @@ function init() {
       }
 
       try {
-        funcProto.toString = proxyWrap(_toString, function (target, args) {
-          return Reflect.apply(toString, this, args)
+        funcProto.toString = proxyWrap(_toString, function (_toString, args) {
+          const newTarget = new.target
+
+          return newTarget === void 0
+            ? Reflect.apply(toString, this, args)
+            : Reflect.construct(_toString, args, newTarget)
         })
 
         cache.set(funcProto, true)
