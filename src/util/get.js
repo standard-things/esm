@@ -4,7 +4,9 @@ function init() {
   function get(object, name, receiver) {
     if (object != null) {
       try {
-        return Reflect.get(object, name, receiver)
+        return receiver === void 0
+          ? object[name]
+          : Reflect.get(object, name, receiver)
       } catch {}
     }
   }
