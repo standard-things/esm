@@ -3,7 +3,7 @@ import safeCopyProperty from "./safe-copy-property.js"
 import shared from "../shared.js"
 
 function init() {
-  function safeSssignProperties(object) {
+  function safeAssignProperties(object) {
     const { length } = arguments
 
     let i = 0
@@ -20,7 +20,7 @@ function init() {
     return object
   }
 
-  return safeSssignProperties
+  return safeAssignProperties
 }
 
 export default shared.inited
