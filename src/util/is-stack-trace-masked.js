@@ -8,7 +8,7 @@ function init() {
       ? Reflect.getOwnPropertyDescriptor(error, "stack")
       : void 0
 
-    if (descriptor &&
+    if (descriptor !== void 0 &&
         descriptor.configurable &&
         typeof descriptor.get === "function" &&
         typeof descriptor.set === "function" &&

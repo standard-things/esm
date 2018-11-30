@@ -83,7 +83,7 @@ function init() {
     for (const name of reassignableBuiltins) {
       const descriptor = Reflect.getOwnPropertyDescriptor(context, name)
 
-      if (descriptor &&
+      if (descriptor !== void 0 &&
           Reflect.deleteProperty(context, name)) {
         Reflect.defineProperty(context, name, descriptor)
       }

@@ -14,7 +14,7 @@ function init() {
       if (descriptor.configurable ||
           (Reflect.has(descriptor, "writable")
             ? descriptor.writable
-            : descriptor.set
+            : typeof descriptor.set === "function"
           )) {
         return true
       }

@@ -265,7 +265,7 @@ function tryValidate(caller, entry, content, filename) {
 
   const loc = getLocationFromStackTrace(error)
 
-  if (loc &&
+  if (loc !== null &&
       loc.filename !== filename) {
     filename = loc.filename
     content = () => readFile(filename, "utf8")
