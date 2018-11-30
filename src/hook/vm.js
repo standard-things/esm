@@ -36,7 +36,6 @@ import shared from "../shared.js"
 import wrap from "../util/wrap.js"
 
 const {
-  SOURCE_TYPE_MODULE,
   SOURCE_TYPE_UNAMBIGUOUS
 } = COMPILER
 
@@ -314,13 +313,13 @@ function tryValidate(caller, entry, content) {
     return
   }
 
-  if (Loader.state.package.default.options.debug ||
-      isStackTraceMasked(error)) {
-    throw error
+  if (! Loader.state.package.default.options.debug &&
+      ! isStackTraceMasked(error)) {
+    captureStackTrace(error, caller)
+    maskStackTrace(error, content, null, true)
   }
 
-  captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, null, true)
+  throw error
 }
 
 function tryWrapper(func, args, content) {
@@ -332,16 +331,13 @@ function tryWrapper(func, args, content) {
     error = e
   }
 
-  if (Loader.state.package.default.options.debug ||
-      ! isError(error) ||
-      isStackTraceMasked(error)) {
-    throw error
+  if (! Loader.state.package.default.options.debug &&
+      isError(error) &&
+      ! isStackTraceMasked(error)) {
+    maskStackTrace(error, content)
   }
 
-  const isESM = error.sourceType === SOURCE_TYPE_MODULE
-
-  Reflect.deleteProperty(error, "sourceType")
-  throw maskStackTrace(error, content, null, isESM)
+  throw error
 }
 
 export default hook

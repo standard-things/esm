@@ -34,8 +34,14 @@ function init() {
       column = error.column
       lineNum = error.line
 
+      if (isESM === void 0) {
+        isESM = error.inModule
+      }
+
       toExternalError(error)
+
       Reflect.deleteProperty(error, "column")
+      Reflect.deleteProperty(error, "inModule")
       Reflect.deleteProperty(error, "line")
     }
 

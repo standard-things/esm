@@ -47,7 +47,7 @@ function init() {
 
     if (expr.type === "CallExpression" &&
         expr.callee.type === "Import") {
-      throw new errors.ReferenceError(this.input, expr.start, INVALID_LEFT_HAND_SIDE_ASSIGNMENT)
+      throw new errors.ReferenceError(this, expr.start, INVALID_LEFT_HAND_SIDE_ASSIGNMENT)
     }
 
     return Reflect.apply(func, this, args)

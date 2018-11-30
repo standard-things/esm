@@ -401,7 +401,10 @@ function init() {
 
           if (! Reflect.has(identifiers, localName)) {
             throw new errors.SyntaxError(
-              magicString.original,
+              {
+                inModule: true,
+                input: magicString.original
+              },
               specifier.start,
               "Export '" + localName + "' is not defined in module"
             )

@@ -240,11 +240,8 @@ function tryCompileCode(caller, content, options) {
     throw error
   }
 
-  const isESM = error.sourceType === SOURCE_TYPE_MODULE
-
-  Reflect.deleteProperty(error, "sourceType")
   captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, options.filename, isESM)
+  throw maskStackTrace(error, content, options.filename)
 }
 
 function tryValidate(caller, entry, content, filename) {

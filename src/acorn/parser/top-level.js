@@ -112,14 +112,13 @@ function init() {
 
     this.next()
 
-    node.sourceType = this.options.sourceType
     node.top = top
     return this.finishNode(node, "Program")
   }
 
   function raiseRedeclaration(parser, pos, name) {
     throw new errors.SyntaxError(
-      parser.input,
+      parser,
       pos,
       "Identifier '" + name + "' has already been declared"
     )

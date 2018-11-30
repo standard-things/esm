@@ -145,21 +145,16 @@ function init() {
       possibleIndexes.push(...possibleExportIndexes)
       possibleIndexes.sort()
 
-      try {
-        importExportVisitor.visit(rootPath, {
-          generateVarDeclarations: options.generateVarDeclarations,
-          magicString,
-          possibleIndexes,
-          runtimeName,
-          sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
-          strict,
-          top,
-          yieldIndex
-        })
-      } catch (e) {
-        e.sourceType = parserOptions.sourceType
-        throw e
-      }
+      importExportVisitor.visit(rootPath, {
+        generateVarDeclarations: options.generateVarDeclarations,
+        magicString,
+        possibleIndexes,
+        runtimeName,
+        sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
+        strict,
+        top,
+        yieldIndex
+      })
 
       const {
         addedDynamicImport,
@@ -220,20 +215,15 @@ function init() {
         ])
 
         if (possibleIndexes.length) {
-          try {
-            assignmentVisitor.visit(rootPath, {
-              addedExport,
-              addedImport,
-              assignableBindings,
-              importedBindings,
-              magicString,
-              possibleIndexes,
-              runtimeName
-            })
-          } catch (e) {
-            e.sourceType = parserOptions.sourceType
-            throw e
-          }
+          assignmentVisitor.visit(rootPath, {
+            addedExport,
+            addedImport,
+            assignableBindings,
+            importedBindings,
+            magicString,
+            possibleIndexes,
+            runtimeName
+          })
         }
 
         importExportVisitor.finalizeHoisting()

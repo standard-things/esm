@@ -134,7 +134,7 @@ function init() {
       return
     }
 
-    throw new errors.SyntaxError(this.input, pos, message)
+    throw new errors.SyntaxError(this, pos, message)
   }
 
   function unexpected(pos) {
