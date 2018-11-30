@@ -21,15 +21,14 @@ function init() {
     static instances = new WeakMap
 
     constructor(target, handler) {
-      handler = { __proto__: handler }
+      const maskedHandler = { __proto__: handler }
 
-      Reflect.defineProperty(handler, shared.customInspectKey, customInspectDescriptor)
-      Reflect.defineProperty(handler, PACKAGE_PREFIX + ":proxy", markerDescriptor)
-      Object.freeze(handler)
+      Reflect.defineProperty(maskedHandler, shared.customInspectKey, customInspectDescriptor)
+      Reflect.defineProperty(maskedHandler, PACKAGE_PREFIX + ":proxy", markerDescriptor)
 
-      const proxy = new Proxy(target, handler)
+      const proxy = new Proxy(target, maskedHandler)
 
-      OwnProxy.instances.set(proxy, Object.freeze([target, handler]))
+      OwnProxy.instances.set(proxy, [target, maskedHandler])
       return proxy
     }
   }
