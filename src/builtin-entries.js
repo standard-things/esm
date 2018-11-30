@@ -39,13 +39,13 @@ function createEntry(id) {
     )
 
     const proxyFunc = new OwnProxy(func, {
-      get(target, name, receiver) {
+      get(func, name, receiver) {
         if (receiver === exported ||
             receiver === proxyFunc) {
-          receiver = target
+          receiver = func
         }
 
-        const value = Reflect.get(target, name, receiver)
+        const value = Reflect.get(func, name, receiver)
 
         let newValue = value
 
@@ -58,14 +58,14 @@ function createEntry(id) {
         }
 
         if (newValue !== value &&
-            isUpdatableGet(target, name)) {
+            isUpdatableGet(func, name)) {
           return newValue
         }
 
         return value
       },
-      getOwnPropertyDescriptor(target, name) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+      getOwnPropertyDescriptor(func, name) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(func, name)
 
         if (descriptor !== void 0 &&
             descriptor.value === prototype &&
@@ -78,22 +78,22 @@ function createEntry(id) {
     })
 
     const proxyProto = new OwnProxy(prototype, {
-      get(target, name, receiver) {
+      get(prototype, name, receiver) {
         if (receiver === proxyProto) {
-          receiver = target
+          receiver = prototype
         }
 
-        const value = Reflect.get(target, name, receiver)
+        const value = Reflect.get(prototype, name, receiver)
 
         if (value === func &&
-            isUpdatableGet(target, name)) {
+            isUpdatableGet(prototype, name)) {
           return exported
         }
 
         return value
       },
-      getOwnPropertyDescriptor(target, name) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+      getOwnPropertyDescriptor(prototype, name) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(prototype, name)
 
         if (descriptor !== void 0 &&
             descriptor.value === func &&

@@ -2,7 +2,6 @@ import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
 import OwnProxy from "../own/proxy.js"
 
-import captureStackTrace from "../error/capture-stack-trace.js"
 import copyProperty from "./copy-property.js"
 import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
@@ -34,25 +33,27 @@ function init() {
     }
 
     const proxy = new OwnProxy(func, {
-      get: function get(target, name, receiver) {
+      get(func, name, receiver) {
         if (name === "toString" &&
-            ! has(target, "toString")) {
+            ! has(func, "toString")) {
           return cached.toString
         }
 
         if (receiver === proxy) {
-          receiver = target
+          receiver = func
         }
 
-        try {
-          return Reflect.get(target, name, receiver)
-        } catch (e) {
-          throw captureStackTrace(e, get)
-        }
+        return Reflect.get(func, name, receiver)
       }
     })
 
-    const toString = proxyWrap(func.toString, function (target, args) {
+    const toString = proxyWrap(func.toString, function (_toString, args) {
+      const newTarget = new.target
+
+      if (newTarget !== void 0) {
+        return Reflect.construct(_toString, args, newTarget)
+      }
+
       let thisArg = this
 
       if (! Loader.state.package.default.options.debug &&
@@ -61,11 +62,7 @@ function init() {
         thisArg = cached.source
       }
 
-      try {
-        return Reflect.apply(target, thisArg, args)
-      } catch (e) {
-        throw captureStackTrace(e, toString)
-      }
+      return Reflect.apply(_toString, thisArg, args)
     })
 
     copyProperty(func, source, "name")

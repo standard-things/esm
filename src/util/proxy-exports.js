@@ -28,20 +28,6 @@ import proxyWrap from "./proxy-wrap.js"
 import shared from "../shared.js"
 
 function init() {
-  function getToStringTag(target, value) {
-    if (typeof target !== "function" &&
-        typeof value !== "string") {
-      // Section 19.1.3.6: Object.prototype.toString()
-      // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
-      // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
-      const toStringTag = getObjectTag(target).slice(8, -1)
-
-      return toStringTag === "Object" ? value : toStringTag
-    }
-
-    return value
-  }
-
   function proxyExports(entry) {
     const exported = entry.exports
 
@@ -57,13 +43,13 @@ function init() {
       return cached.proxy
     }
 
-    const get = (target, name, receiver) => {
+    const get = (exported, name, receiver) => {
       if (receiver === proxy) {
-        receiver = target
+        receiver = exported
       }
 
-      const hasGetter = getGetter(target, name) !== void 0
-      const value = Reflect.get(target, name, receiver)
+      const hasGetter = getGetter(exported, name) !== void 0
+      const value = Reflect.get(exported, name, receiver)
 
       if (hasGetter) {
         tryUpdateBindings(name, value)
@@ -72,20 +58,26 @@ function init() {
       return value
     }
 
-    const maybeWrap = (target, name, value) => {
+    const maybeWrap = (exported, func) => {
       // Wrap native methods to avoid throwing illegal invocation or
       // incompatible receiver type errors.
-      if (! isNative(value)) {
-        return value
+      if (! isNative(func)) {
+        return func
       }
 
-      let wrapper = cached.wrap.get(value)
+      let wrapper = cached.wrap.get(func)
 
       if (wrapper !== void 0) {
         return wrapper
       }
 
-      wrapper = proxyWrap(value, function (funcTarget, args) {
+      wrapper = proxyWrap(func, function (func, args) {
+        const newTarget = new.target
+
+        if (newTarget !== void 0) {
+          return Reflect.construct(func, args, newTarget)
+        }
+
         let thisArg = this
 
         // Check for `entry.esmNamespace` because it's a proxy that native
@@ -93,14 +85,14 @@ function init() {
         if (thisArg === proxy ||
             thisArg === entry.esmMutableNamespace ||
             thisArg === entry.esmNamespace) {
-          thisArg = target
+          thisArg = exported
         }
 
-        return Reflect.apply(value, thisArg, args)
+        return Reflect.apply(func, thisArg, args)
       })
 
-      cached.wrap.set(value, wrapper)
-      cached.unwrap.set(wrapper, value)
+      cached.wrap.set(func, wrapper)
+      cached.unwrap.set(wrapper, func)
 
       return wrapper
     }
@@ -128,7 +120,7 @@ function init() {
     }
 
     const handler = {
-      defineProperty(target, name, descriptor) {
+      defineProperty(exported, name, descriptor) {
         const { value } = descriptor
 
         if (typeof value === "function") {
@@ -138,7 +130,7 @@ function init() {
         // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
         // throw the appropriate error if something goes wrong.
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
-        SafeObject.defineProperty(target, name, descriptor)
+        SafeObject.defineProperty(exported, name, descriptor)
 
         if (typeof descriptor.get === "function" &&
             typeof handler.get !== "function") {
@@ -151,8 +143,8 @@ function init() {
 
         return true
       },
-      deleteProperty(target, name) {
-        if (Reflect.deleteProperty(target, name)) {
+      deleteProperty(exported, name) {
+        if (Reflect.deleteProperty(exported, name)) {
           if (Reflect.has(entry._namespace, name)) {
             entry.updateBindings(name)
           }
@@ -162,8 +154,8 @@ function init() {
 
         return false
       },
-      set(target, name, value, receiver) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+      set(exported, name, value, receiver) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
         const isUpdatable = isUpdatableSet(descriptor)
 
         if (typeof value === "function") {
@@ -175,17 +167,17 @@ function init() {
         }
 
         if (receiver === proxy) {
-          receiver = target
+          receiver = exported
         }
 
         if (! isUpdatable) {
-          target[name] = value
+          exported[name] = value
           return false
         }
 
         const hasSetter = getSetter(descriptor) !== void 0
 
-        if (Reflect.set(target, name, value, receiver)) {
+        if (Reflect.set(exported, name, value, receiver)) {
           if (hasSetter) {
             entry.updateBindings()
           } else if (Reflect.has(entry._namespace, name)) {
@@ -205,8 +197,8 @@ function init() {
     for (const name of names) {
       const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
 
-      if (descriptor &&
-          descriptor.get) {
+      if (descriptor !== void 0 &&
+          typeof descriptor.get === "function") {
         handler.get = get
         break
       }
@@ -238,8 +230,8 @@ function init() {
     }
 
     if (useWrappers) {
-      handler.get = (target, name, receiver) => {
-        const value = get(target, name, receiver)
+      handler.get = (exported, name, receiver) => {
+        const value = get(exported, name, receiver)
 
         let newValue = value
 
@@ -247,27 +239,27 @@ function init() {
         // `getObjectTag(proxy)` will return "[object Function]",
         // if `proxy` is a function, else "[object Object]".
         if (name === Symbol.toStringTag) {
-          newValue = getToStringTag(target, value)
+          newValue = getToStringTag(exported, value)
         }
 
-        newValue = maybeWrap(target, name, newValue)
+        newValue = maybeWrap(exported, newValue)
 
         if (newValue !== value &&
-            isUpdatableGet(target, name)) {
+            isUpdatableGet(exported, name)) {
           return newValue
         }
 
         return value
       }
 
-      handler.getOwnPropertyDescriptor = (target, name) => {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+      handler.getOwnPropertyDescriptor = (exported, name) => {
+        const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
 
         if (isUpdatableDescriptor(descriptor)) {
           const { value } = descriptor
 
           if (typeof value === "function") {
-            descriptor.value = maybeWrap(target, name, value)
+            descriptor.value = maybeWrap(exported, value)
           }
         }
 
@@ -277,18 +269,18 @@ function init() {
         typeof exported !== "function" &&
         ! Reflect.has(exported, Symbol.toStringTag) &&
         getObjectTag(exported) !== "[object Object]") {
-      handler.get = (target, name, receiver) => {
+      handler.get = (exported, name, receiver) => {
         if (receiver === proxy) {
-          receiver = target
+          receiver = exported
         }
 
-        const value = Reflect.get(target, name, receiver)
+        const value = Reflect.get(exported, name, receiver)
 
         if (name === Symbol.toStringTag) {
-          const newValue = getToStringTag(target, value)
+          const newValue = getToStringTag(exported, value)
 
           if (newValue !== value &&
-              isUpdatableGet(target, name)) {
+              isUpdatableGet(exported, name)) {
             return newValue
           }
         }
@@ -314,6 +306,20 @@ function init() {
       .set(proxy, cached)
 
     return proxy
+  }
+
+  function getToStringTag(exported, value) {
+    if (typeof exported !== "function" &&
+        typeof value !== "string") {
+      // Section 19.1.3.6: Object.prototype.toString()
+      // Step 16: If `Type(tag)` is not `String`, let `tag` be `builtinTag`.
+      // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
+      const toStringTag = getObjectTag(exported).slice(8, -1)
+
+      return toStringTag === "Object" ? value : toStringTag
+    }
+
+    return value
   }
 
   return proxyExports

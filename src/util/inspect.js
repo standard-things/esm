@@ -122,32 +122,32 @@ function init() {
        isModuleNamespaceObject(value))
   }
 
-  function toInspectable(target, options) {
+  function toInspectable(value, options) {
     return {
       [shared.customInspectKey]: (recurseTimes) => {
         const contextAsOptions = assign({}, options)
 
         contextAsOptions.depth = recurseTimes
-        return inspect(target, contextAsOptions)
+        return inspect(value, contextAsOptions)
       }
     }
   }
 
-  function wrap(target, options, customInspect, showProxy) {
-    if (! isWrappable(target)) {
-      return target
+  function wrap(object, options, customInspect, showProxy) {
+    if (! isWrappable(object)) {
+      return object
     }
 
     let inspecting = false
 
-    const proxy = new OwnProxy(target, {
-      get: (target, name, receiver) => {
+    const proxy = new OwnProxy(object, {
+      get: (object, name, receiver) => {
         if (receiver === proxy) {
-          receiver = target
+          receiver = object
         }
 
         const { customInspectKey } = shared
-        const value = Reflect.get(target, name, receiver)
+        const value = Reflect.get(object, name, receiver)
 
         let newValue = value
 
@@ -159,7 +159,7 @@ function init() {
             name !== customInspectKey) {
           if (name === "toString" &&
               typeof value === "function") {
-            newValue = GenericFunction.bind(value, target)
+            newValue = GenericFunction.bind(value, object)
           } else {
             return value
           }
@@ -176,17 +176,17 @@ function init() {
             contextAsOptions.depth = recurseTimes
 
             try {
-              if (target === uninitializedValue) {
-                return Reflect.apply(value, target, [recurseTimes, contextAsOptions])
+              if (object === uninitializedValue) {
+                return Reflect.apply(value, object, [recurseTimes, contextAsOptions])
               }
 
-              if (isModuleNamespaceObject(target)) {
-                return formatNamespaceObject(target, contextAsOptions)
+              if (isModuleNamespaceObject(object)) {
+                return formatNamespaceObject(object, contextAsOptions)
               }
 
               if (! showProxy ||
-                  ! isProxy(target) ||
-                  isOwnProxy(target)) {
+                  ! isProxy(object) ||
+                  isOwnProxy(object)) {
                 if (typeof value !== "function") {
                   contextAsOptions.customInspect = true
                 }
@@ -195,7 +195,7 @@ function init() {
                 return safeInspect(proxy, contextAsOptions)
               }
 
-              return formatProxy(target, contextAsOptions)
+              return formatProxy(object, contextAsOptions)
             } finally {
               inspecting = false
             }
@@ -203,15 +203,15 @@ function init() {
         }
 
         if (newValue !== value &&
-            isUpdatableGet(target, name)) {
+            isUpdatableGet(object, name)) {
           return newValue
         }
 
         return value
       },
 
-      getOwnPropertyDescriptor: (target, name) => {
-        const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+      getOwnPropertyDescriptor: (object, name) => {
+        const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
 
         if (isUpdatableDescriptor(descriptor)) {
           const { value } = descriptor

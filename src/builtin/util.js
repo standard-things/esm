@@ -20,19 +20,21 @@ function init() {
   let builtinTypes
 
   if (isObjectLike(safeTypes)) {
-    const builtinIsModuleNamespaceObject =
-      proxyWrap(safeTypes.isModuleNamespaceObject, toWrapper(isModuleNamespaceObject))
+    const builtinIsModuleNamespaceObject = proxyWrap(
+      safeTypes.isModuleNamespaceObject,
+      toWrapper(isModuleNamespaceObject)
+    )
 
-    const builtinIsProxy = proxyWrap(safeTypes.isProxy, (func, [value]) => {
-      return func(value) &&
+    const builtinIsProxy = proxyWrap(safeTypes.isProxy, (func, [value]) =>
+      func(value) &&
         ! isOwnProxy(value)
-    })
+    )
 
     builtinTypes = GenericObject.create()
 
-    const names = keysAll(safeTypes)
+    const typesNames = keysAll(safeTypes)
 
-    for (const name of names) {
+    for (const name of typesNames) {
       if (name === "isModuleNamespaceObject") {
         builtinTypes.isModuleNamespaceObject = builtinIsModuleNamespaceObject
       } else if (name === "isProxy") {
@@ -52,9 +54,9 @@ function init() {
     : formatWithOptions
 
   const builtinUtil = GenericObject.create()
-  const names = keysAll(realUtil)
+  const utilNames = keysAll(realUtil)
 
-  for (const name of names) {
+  for (const name of utilNames) {
     if (name === "format") {
       builtinUtil.format = builtinFormat
     } else if (name === "formatWithOptions") {

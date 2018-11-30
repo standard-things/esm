@@ -5,11 +5,11 @@ import shared from "../shared.js"
 function init() {
   function proxyWrap(func, wrapper) {
     return new OwnProxy(func, {
-      apply(target, thisArg, args) {
-        return Reflect.apply(wrapper, thisArg, [target, args])
+      apply(func, thisArg, args) {
+        return Reflect.apply(wrapper, thisArg, [func, args])
       },
-      construct(target, args, newTarget) {
-        return Reflect.construct(wrapper, [target, args], newTarget)
+      construct(func, args, newTarget) {
+        return Reflect.construct(wrapper, [func, args], newTarget)
       }
     })
   }

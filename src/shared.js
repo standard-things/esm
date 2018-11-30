@@ -229,7 +229,7 @@ function init() {
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
     try {
       const proxy = new Proxy(SafeBuffer.alloc(0), {
-        get: (target, name) => target[name]
+        get: (buffer, name) => buffer[name]
       })
 
       // Return a result so the test won't be removed by Terser.

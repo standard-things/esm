@@ -17,26 +17,26 @@ function init() {
   }
 
   const handler = {
-    get(target, name, receiver) {
+    get(unsafeGlobal, name, receiver) {
       if (receiver === proxy) {
-        receiver = target
+        receiver = unsafeGlobal
       }
 
-      const value = Reflect.get(target, name, receiver)
+      const value = Reflect.get(unsafeGlobal, name, receiver)
 
       if (Reflect.has(globals, name)) {
         const newValue = globals[name]
 
         if (newValue !== value &&
-            isUpdatableGet(target, name)) {
+            isUpdatableGet(unsafeGlobal, name)) {
           return newValue
         }
       }
 
       return value
     },
-    getOwnPropertyDescriptor(target, name) {
-      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+    getOwnPropertyDescriptor(unsafeGlobal, name) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(unsafeGlobal, name)
 
       if (Reflect.has(globals, name) &&
           isUpdatableDescriptor(descriptor)) {
@@ -45,12 +45,12 @@ function init() {
 
       return descriptor
     },
-    set(target, name, value, receiver) {
+    set(unsafeGlobal, name, value, receiver) {
       if (receiver === proxy) {
-        receiver = target
+        receiver = unsafeGlobal
       }
 
-      if (Reflect.set(target, name, value, receiver)) {
+      if (Reflect.set(unsafeGlobal, name, value, receiver)) {
         if (Reflect.has(globals, name)) {
           Reflect.deleteProperty(globals, name)
 

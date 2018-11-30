@@ -130,9 +130,9 @@ function init() {
   }
 
   const Console = maskFunction(function (...args) {
-    const target = new.target
+    const newTarget = new.target
 
-    if (target === void 0) {
+    if (newTarget === void 0) {
       return Reflect.construct(Console, args)
     }
 
@@ -149,7 +149,7 @@ function init() {
       }
     }
 
-    const result = Reflect.construct(RealConsole, args, target)
+    const result = Reflect.construct(RealConsole, args, newTarget)
     const resultNames = keysAll(result)
 
     for (const name of resultNames) {
@@ -258,8 +258,8 @@ function init() {
   ])
 
   const proxy = new OwnProxy(globalConsole, {
-    get(target, name, receiver) {
-      const value = Reflect.get(target, name, receiver)
+    get(globalConsole, name, receiver) {
+      const value = Reflect.get(globalConsole, name, receiver)
       const builtinMethod = builtinMethodMap.get(value)
 
       return builtinMethod === void 0
@@ -267,8 +267,8 @@ function init() {
         : builtinMethod
     },
 
-    getOwnPropertyDescriptor(target, name) {
-      const descriptor = Reflect.getOwnPropertyDescriptor(target, name)
+    getOwnPropertyDescriptor(globalConsole, name) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(globalConsole, name)
 
       if (isUpdatableDescriptor(descriptor)) {
         const { value } = descriptor

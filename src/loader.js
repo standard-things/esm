@@ -23,9 +23,9 @@ class Loader {
           mainModule: null,
           moduleCache: { __proto__: null },
           scratchCache: new Proxy({ __proto__: null }, {
-            get(target, name) {
-              return Reflect.has(target, name)
-                ? target[name]
+            get(scratchCache, name) {
+              return Reflect.has(scratchCache, name)
+                ? scratchCache[name]
                 : Module._cache[name]
             }
           })
