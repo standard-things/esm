@@ -26,9 +26,12 @@ const {
 const isElectron = has(versions, "electron")
 const isElectronRenderer = isElectron && type === "renderer"
 
-const nativeContent = id.startsWith("internal/")
-  ? getNativeSource("internal/esm/loader")
-  : ""
+let nativeContent = ""
+
+if (typeof id === "string" &&
+    id.startsWith("internal/")) {
+  nativeContent = getNativeSource("internal/esm/loader")
+}
 
 const Module = require("module")
 const { Script } = require("vm")
