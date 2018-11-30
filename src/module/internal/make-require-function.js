@@ -49,12 +49,12 @@ function makeRequireFunction(mod, requirer, resolver) {
   const { name } = entry
 
   let req = function require(request) {
-    if (isOwn) {
-      const exported = ownRequire(request)
+    const exported = isOwn
+      ? ownRequire(request)
+      : void 0
 
-      if (exported !== void 0) {
-        return exported
-      }
+    if (exported !== void 0) {
+      return exported
     }
 
     const { moduleState } = shared
@@ -112,9 +112,7 @@ function makeRequireFunction(mod, requirer, resolver) {
   return req
 }
 
-function isOwnModule(mod) {
-  const { filename } = mod
-
+function isOwnModule({ filename }) {
   return typeof filename === "string" &&
     filename.startsWith(PACKAGE_DIRNAME)
 }
