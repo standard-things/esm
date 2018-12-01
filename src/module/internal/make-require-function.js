@@ -3,7 +3,6 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
 import ENTRY from "../../constant/entry.js"
-import ESM from "../../constant/esm.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
@@ -12,6 +11,7 @@ import Runtime from "../../runtime.js"
 import errors from "../../errors.js"
 import isDataProperty from "../../util/is-data-property.js"
 import isInstalled from "../../util/is-installed.js"
+import isOwnModule from "../../util/is-own-module.js"
 import maskFunction from "../../util/mask-function.js"
 import realGetProxyDetails from "../../real/get-proxy-details.js"
 import realProcess from "../../real/process.js"
@@ -23,18 +23,14 @@ const {
 } = ENTRY
 
 const {
-  PACKAGE_DIRNAME
-} = ESM
-
-const {
   ERR_INVALID_ARG_TYPE
 } = errors
 
-const sourceResolve = realRequire.resolve
-const sourcePaths = sourceResolve && sourceResolve.paths
+const realResolve = realRequire.resolve
+const realPaths = realResolve && realResolve.paths
 const { symbol } = shared
 
-const ownExports = new Map([
+const ownExportsMap = new Map([
   [symbol.entry, Entry],
   [symbol.realGetProxyDetails, realGetProxyDetails],
   [symbol.realRequire, realRequire],
@@ -104,22 +100,17 @@ function makeRequireFunction(mod, requirer, resolver) {
   resolve.paths = paths
 
   if (! isInstalled(mod)) {
-    resolve.paths = maskFunction(paths, sourcePaths)
-    req.resolve = maskFunction(resolve, sourceResolve)
+    resolve.paths = maskFunction(paths, realPaths)
+    req.resolve = maskFunction(resolve, realResolve)
     req = maskFunction(req, realRequire)
   }
 
   return req
 }
 
-function isOwnModule({ filename }) {
-  return typeof filename === "string" &&
-    filename.startsWith(PACKAGE_DIRNAME)
-}
-
 function ownRequire(request) {
   if (typeof request === "symbol") {
-    return ownExports.get(request)
+    return ownExportsMap.get(request)
   }
 }
 
