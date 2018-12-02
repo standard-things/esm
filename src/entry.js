@@ -22,6 +22,7 @@ import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
 import keys from "./util/keys.js"
 import noop from "./util/noop.js"
+import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
@@ -228,7 +229,8 @@ class Entry {
         const exported = this.exports
 
         if (has(exported, name) &&
-            isEnumerable(exported, name)) {
+            (this.builtin ||
+             isEnumerable(exported, name))) {
           return exported[name]
         }
       }
@@ -350,7 +352,11 @@ class Entry {
     }
 
     if (! names) {
-      names = keys(isLoaded ? this._namespace : exported)
+      if (isLoaded) {
+        names = keys(this._namespace)
+      } else {
+        names = this.builtin ? ownPropertyNames(exported) : keys(exported)
+      }
     }
 
     for (const name of names) {
@@ -716,7 +722,8 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
       const exported = entry.exports
 
       if (has(exported, name) &&
-          isEnumerable(exported, name)) {
+          (entry.builtin ||
+           isEnumerable(exported, name))) {
         return Reflect.getOwnPropertyDescriptor(exported, name)
       }
 
@@ -810,7 +817,11 @@ function esmNamespaceGetter(entry) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const { _namespace, type } = entry
+  const {
+    _namespace,
+    builtin,
+    type
+  } = entry
 
   const isCJS = type === TYPE_CJS
   const isPseudo = type === TYPE_PSEUDO
@@ -823,7 +834,7 @@ function getExportByName(entry, name, parentEntry) {
     parentCJS.mutableNamespace
 
   const parentNamedExports =
-    entry.builtin ||
+    builtin ||
     (! parentIsMJS &&
      parentCJS.namedExports)
 
@@ -852,7 +863,8 @@ function getExportByName(entry, name, parentEntry) {
 
         if (name !== Symbol.toStringTag &&
             has(exported, name) &&
-            isEnumerable(exported, name)) {
+            (builtin ||
+             isEnumerable(exported, name))) {
           object = exported
         }
 
