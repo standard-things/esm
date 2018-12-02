@@ -13,6 +13,7 @@ import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
+import ownPropertyNames from "./own-property-names.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
@@ -77,8 +78,7 @@ function init() {
     // Section 8.1.1.5.1: GetBindingValue()
     // Step 5: Throw a reference error if the binding is uninitialized.
     // https://tc39.github.io/ecma262/#sec-module-environment-records-getbindingvalue-n-s
-    const names = Object.getOwnPropertyNames(namespace)
-
+    const names = ownPropertyNames(namespace)
     const object = toModuleNamespaceObject()
 
     for (const name of names) {
