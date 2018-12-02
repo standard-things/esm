@@ -122,14 +122,14 @@ function init() {
         }
       }
 
-      const names = keys(initees)
+      const initeeNames = keys(initees)
 
-      if (names.length !== 0) {
+      if (initeeNames.length !== 0) {
         const { end } = declaration || node
 
         this.magicString.appendRight(
           end,
-          ";" + this.runtimeName + ".j(" + JSON.stringify(names) + ");"
+          ";" + this.runtimeName + ".j(" + JSON.stringify(initeeNames) + ");"
         )
       }
 

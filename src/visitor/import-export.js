@@ -470,14 +470,14 @@ function init() {
         hoistImports(this, node, code)
       }
 
-      const names = keys(initees)
+      const initeeNames = keys(initees)
 
-      if (names.length) {
+      if (initeeNames.length !== 0) {
         const { end } = declaration || node
 
         magicString.appendRight(
           end,
-          ";" + runtimeName + ".j(" + JSON.stringify(names) + ");"
+          ";" + runtimeName + ".j(" + JSON.stringify(initeeNames) + ");"
         )
       }
 
