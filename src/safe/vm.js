@@ -1,7 +1,7 @@
 import copyProperty from "../util/copy-property.js"
 import getPrototypeOf from "../util/get-prototype-of.js"
 import has from "../util/has.js"
-import keysAll from "../util/keys-all.js"
+import ownKeys from "../util/own-keys.js"
 import realVM from "../real/vm.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -15,7 +15,7 @@ function init() {
 
   setProperty(safeVM, "Script", safe(Script))
 
-  const names = keysAll(contextifyProto)
+  const names = ownKeys(contextifyProto)
   const { prototype } = safeVM.Script
 
   for (const name of names) {

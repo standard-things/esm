@@ -1,4 +1,4 @@
-import keysAll from "./keys-all.js"
+import ownKeys from "./own-keys.js"
 import safeCopyProperty from "./safe-copy-property.js"
 import shared from "../shared.js"
 
@@ -10,7 +10,7 @@ function init() {
 
     while (++i < length) {
       const source = arguments[i]
-      const names = keysAll(source)
+      const names = ownKeys(source)
 
       for (const name of names) {
         safeCopyProperty(object, source, name)

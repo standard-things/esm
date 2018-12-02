@@ -15,7 +15,7 @@ import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import keys from "../util/keys.js"
-import keysAll from "../util/keys-all.js"
+import ownKeys from "../util/own-keys.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
@@ -31,7 +31,7 @@ function init() {
 
   const RealConsole = realConsole.Console
   const realProto = RealConsole.prototype
-  const realProtoNames = keysAll(realProto)
+  const realProtoNames = ownKeys(realProto)
 
   const builtinLog = wrapBuiltin(realProto.log)
   const dirOptions = { customInspect: true }
@@ -150,7 +150,7 @@ function init() {
     }
 
     const result = Reflect.construct(RealConsole, args, newTarget)
-    const resultNames = keysAll(result)
+    const resultNames = ownKeys(result)
 
     for (const name of resultNames) {
       if (! Reflect.has(this, name)) {
@@ -230,7 +230,7 @@ function init() {
     }
   }
 
-  const safeNames = keysAll(safeConsole)
+  const safeNames = ownKeys(safeConsole)
 
   for (const name of safeNames) {
     if (name === "Console") {

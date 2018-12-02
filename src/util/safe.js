@@ -1,5 +1,5 @@
 import isObjectLike from "./is-object-like.js"
-import keysAll from "./keys-all.js"
+import ownKeys from "./own-keys.js"
 import safeAssignProperties from "./safe-assign-properties.js"
 import safeCopyProperty from "./safe-copy-property.js"
 import shared from "../shared.js"
@@ -22,7 +22,7 @@ function init() {
       ? class extends Super {}
       : (...args) => Reflect.construct(Super, args)
 
-    const names = keysAll(Super)
+    const names = ownKeys(Super)
     const safeProto = Safe.prototype
 
     for (const name of names) {

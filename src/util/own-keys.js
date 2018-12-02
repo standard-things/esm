@@ -1,15 +1,15 @@
 import shared from "../shared.js"
 
 function init() {
-  function keysAll(object) {
+  function ownKeys(object) {
     return object == null
       ? []
       : Reflect.ownKeys(object)
   }
 
-  return keysAll
+  return ownKeys
 }
 
 export default shared.inited
-  ? shared.module.utilKeysAll
-  : shared.module.utilKeysAll = init()
+  ? shared.module.utilOwnKeys
+  : shared.module.utilOwnKeys = init()

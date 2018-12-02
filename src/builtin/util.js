@@ -7,7 +7,7 @@ import inspect from "../util/inspect.js"
 import isModuleNamespaceObject from "../util/is-module-namespace-object.js"
 import isObjectLike from "../util/is-object-like.js"
 import isOwnProxy from "../util/is-own-proxy.js"
-import keysAll from "../util/keys-all.js"
+import ownKeys from "../util/own-keys.js"
 import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
 import safeUtil from "../safe/util.js"
@@ -32,7 +32,7 @@ function init() {
 
     builtinTypes = GenericObject.create()
 
-    const typesNames = keysAll(safeTypes)
+    const typesNames = ownKeys(safeTypes)
 
     for (const name of typesNames) {
       if (name === "isModuleNamespaceObject") {
@@ -54,7 +54,7 @@ function init() {
     : formatWithOptions
 
   const builtinUtil = GenericObject.create()
-  const utilNames = keysAll(realUtil)
+  const utilNames = ownKeys(realUtil)
 
   for (const name of utilNames) {
     if (name === "format") {

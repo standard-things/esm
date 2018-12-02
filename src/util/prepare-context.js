@@ -5,7 +5,7 @@ import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import instanceOf from "./instance-of.js"
 import isObjectLike from "./is-object-like.js"
-import keysAll from "./keys-all.js"
+import ownKeys from "./own-keys.js"
 import setProperty from "./set-property.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
@@ -54,7 +54,7 @@ function init() {
       return context
     }
 
-    const names = keysAll(defaultGlobal)
+    const names = ownKeys(defaultGlobal)
 
     for (const name of names) {
       let descriptor

@@ -1,5 +1,5 @@
 import copyProperty from "./copy-property.js"
-import keysAll from "./keys-all.js"
+import ownKeys from "./own-keys.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,7 +10,7 @@ function init() {
 
     while (++i < length) {
       const source = arguments[i]
-      const names = keysAll(source)
+      const names = ownKeys(source)
 
       for (const name of names) {
         copyProperty(object, source, name)
