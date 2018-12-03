@@ -198,7 +198,7 @@ const Runtime = {
               resolvePromise(value)
               return true
             }
-          })]])
+          })]], true)
         } catch (e) {
           rejectPromise(toExternalError(e))
         }

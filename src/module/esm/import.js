@@ -4,6 +4,7 @@ import Entry from "../../entry.js"
 import Module from "../../module.js"
 
 import errors from "../../errors.js"
+import esmLoad from "./load.js"
 import esmParse from "./parse.js"
 import esmResolveFilename from "./resolve-filename.js"
 import isPath from "../../util/is-path.js"
@@ -19,7 +20,7 @@ const {
   TYPE_ESM
 } = ENTRY
 
-function esmImport(entry, request, setterArgsList, isExport) {
+function esmImport(entry, request, setterArgsList, isDynamic) {
   const { compileData } = entry
 
   const dependencySpecifiers = compileData === null
@@ -34,7 +35,9 @@ function esmImport(entry, request, setterArgsList, isExport) {
       dependencySpecifiers[request].entry !== null)  {
     childEntry = dependencySpecifiers[request].entry
   } else {
-    childEntry = tryParse(request, entry)
+    childEntry = isDynamic
+      ? tryPhase(esmParse, request, entry)
+      : tryPhase(esmLoad, request, entry)
   }
 
   if (childEntry !== null) {
@@ -46,7 +49,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
       throw ERR_INVALID_ESM_FILE_EXTENSION(child)
     }
 
-    childEntry.addSetters(setterArgsList, entry, isExport)
+    childEntry.addSetters(setterArgsList, entry)
   }
 
   const exported = tryRequire(request, entry)
@@ -56,7 +59,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
     childEntry = getEntryFrom(request, exported)
     child = childEntry.module
     entry.children[childEntry.name] = childEntry
-    childEntry.addSetters(setterArgsList, entry, isExport)
+    childEntry.addSetters(setterArgsList, entry)
   }
 
   let mockEntry = null
@@ -67,7 +70,7 @@ function esmImport(entry, request, setterArgsList, isExport) {
 
     // Update the mock entry before the original child entry so dynamic import
     // requests are resolved with the mock entry instead of the child entry.
-    mockEntry.addSetters(setterArgsList, entry, isExport)
+    mockEntry.addSetters(setterArgsList, entry)
     mockEntry.loaded()
     mockEntry.updateBindings()
   }
@@ -101,7 +104,7 @@ function getEntryFrom(request, exported) {
   return Entry.get(child)
 }
 
-function tryParse(request, entry) {
+function tryPhase(phase, request, entry) {
   const { moduleState } = shared
 
   let error
@@ -111,7 +114,7 @@ function tryParse(request, entry) {
   moduleState.requireDepth += 1
 
   try {
-    childEntry = esmParse(request, entry.module)
+    childEntry = phase(request, entry.module)
     threw = false
   } catch (e) {
     error = e
