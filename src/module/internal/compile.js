@@ -34,7 +34,6 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  STATE_PARSING_STARTED,
   TYPE_CJS,
   TYPE_ESM
 } = ENTRY
@@ -112,10 +111,8 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (parsing) {
     if (entry.type === TYPE_ESM) {
-      if (entry.state === STATE_PARSING_STARTED) {
-        tryValidate(caller, entry, content, filename)
-        entry.initNamespace()
-      }
+      tryValidate(caller, entry, content, filename)
+      entry.initNamespace()
     } else if (typeof fallback === "function") {
       const defaultPkg = Loader.state.package.default
       const { mainModule } = Loader.state.module
