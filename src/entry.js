@@ -11,6 +11,7 @@ import copyProperty from "./util/copy-property.js"
 import errors from "./errors.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleName from "./util/get-module-name.js"
+import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import isEnumerable from "./util/is-enumerable.js"
@@ -354,7 +355,7 @@ class Entry {
       if (isLoaded) {
         names = keys(this._namespace)
       } else {
-        names = this.builtin ? ownPropertyNames(exported) : keys(exported)
+        names = this.builtin ? getBuiltinExportNames(exported) : keys(exported)
       }
     }
 
@@ -812,6 +813,24 @@ function esmNamespaceGetter(entry) {
 
     return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
   }
+}
+
+function getBuiltinExportNames(exported) {
+  const names = []
+  const possibleNames = ownPropertyNames(exported)
+  const proto = getPrototypeOf(exported)
+
+  for (const name of possibleNames) {
+    if (! isEnumerable(exported, name) &&
+        Reflect.has(proto, name) &&
+        ! isEnumerable(proto, name)) {
+      continue
+    }
+
+    names.push(name)
+  }
+
+  return names
 }
 
 function getExportByName(entry, name, parentEntry) {
