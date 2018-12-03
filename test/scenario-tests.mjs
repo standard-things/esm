@@ -99,6 +99,15 @@ describe("scenario tests", function () {
     .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
 
+  it("should work with lit-node", () =>
+    node([
+      "-r", pkgPath,
+      "-r", "lit-node/register",
+      path.resolve("fixture/scenario/lit-node/index.md")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("lit-node:true")))
+  )
+
   it("should work with module-alias", () =>
     node([
       path.resolve("fixture/scenario/module-alias")
