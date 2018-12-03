@@ -213,7 +213,7 @@ class Package {
     this.range = range
   }
 
-  clone()  {
+  clone() {
     const cloned = assign({ __proto__: Package.prototype }, this)
 
     cloned.options = assign({}, cloned.options)
