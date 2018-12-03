@@ -148,13 +148,13 @@ function init() {
       return childNames
     }
 
-    const noComputed =
-      value.type !== "Property" ||
-      ! value.computed
+    childNames = []
 
     const names = keys(value)
 
-    childNames = []
+    const noComputed =
+      value.type !== "Property" ||
+      ! value.computed
 
     for (const name of names) {
       if (noComputed &&

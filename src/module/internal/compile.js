@@ -154,7 +154,7 @@ function tryCompileCached(entry, filename) {
 
   let error
   let result
-  let threw = false
+  let threw = true
 
   entry.state = STATE_EXECUTION_STARTED
 
@@ -183,15 +183,15 @@ function tryCompileCached(entry, filename) {
 
         // Eventually, we will call this in the instantiate phase.
         _runResult.next()
-
         result = _runResult.next().value
       }
     } else {
       result = mod._compile(source, filename)
     }
+
+    threw = false
   } catch (e) {
     error = e
-    threw = true
   }
 
   if (! threw) {

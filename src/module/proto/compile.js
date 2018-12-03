@@ -187,12 +187,13 @@ function compile(content, filename) {
     ? Reflect.apply(inspectorWrapper, void 0, [compiledWrapper, exported, ...args])
     : Reflect.apply(compiledWrapper, exported, args)
 
+  entry.state = STATE_EXECUTION_COMPLETED
+
   if (noDepth) {
     moduleState.statFast =
     moduleState.statSync = null
   }
 
-  entry.state = STATE_EXECUTION_COMPLETED
   return result
 }
 

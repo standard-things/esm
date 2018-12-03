@@ -90,10 +90,6 @@ function init() {
         possibleIndexes.length
       )
 
-      let ast
-      let error
-      let threw = true
-
       if ((sourceType === SOURCE_TYPE_SCRIPT ||
           sourceType === SOURCE_TYPE_UNAMBIGUOUS) &&
           ! possibleChanges) {
@@ -106,12 +102,15 @@ function init() {
         strict: options.strict
       }
 
+      let ast
+      let error
+      let threw = true
+
       try {
         ast = Parser.parse(code, parserOptions)
         threw = false
       } catch (e) {
         error = e
-        error.sourceType = parserOptions.sourceType
       }
 
       if (threw &&

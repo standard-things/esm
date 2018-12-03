@@ -106,15 +106,15 @@ function tryParse(request, entry) {
 
   let error
   let childEntry = null
-  let threw = false
+  let threw = true
 
   moduleState.requireDepth += 1
 
   try {
     childEntry = esmParse(request, entry.module)
+    threw = false
   } catch (e) {
     error = e
-    threw = true
   }
 
   moduleState.requireDepth -= 1

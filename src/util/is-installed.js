@@ -11,9 +11,7 @@ function init() {
     ? /[\\/]node_modules[\\/]/
     : /\/node_modules\//
 
-  function isInstalled(mod) {
-    const { filename } = mod
-
+  function isInstalled({ filename }) {
     return typeof filename === "string" &&
       nodeModulesRegExp.test(filename)
   }

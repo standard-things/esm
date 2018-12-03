@@ -40,6 +40,7 @@ const {
 } = COMPILER
 
 const {
+  STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
   TYPE_ESM
@@ -101,8 +102,6 @@ function hook(vm) {
       entry.initNamespace()
     }
 
-    entry.state = STATE_EXECUTION_STARTED
-
     const code =
       "(()=>{" +
         'var g=Function("return this")(),' +
@@ -121,7 +120,11 @@ function hook(vm) {
       "})();" +
       compileData.code
 
+    entry.state = STATE_EXECUTION_STARTED
+
     const result = tryWrapper.call(vm, func, [code, scriptOptions], content)
+
+    entry.state = STATE_EXECUTION_COMPLETED
 
     if (result.cachedDataProduced) {
       compileData.scriptData = result.cachedData
