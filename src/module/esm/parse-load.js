@@ -4,7 +4,6 @@ import load from "./load.js"
 import parse from "./parse.js"
 
 const {
-  STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   STATE_PARSING_COMPLETED
 } = ENTRY
@@ -15,10 +14,6 @@ function parseLoad(request, parent, isMain) {
   if (entry.state < STATE_EXECUTION_STARTED) {
     entry.state = STATE_PARSING_COMPLETED
     load(request, parent, isMain)
-  }
-
-  if (entry.module.loaded) {
-    entry.state = STATE_EXECUTION_COMPLETED
   }
 
   return entry

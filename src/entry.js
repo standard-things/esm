@@ -40,7 +40,6 @@ const {
   SETTER_TYPE_NAMESPACE,
   SETTER_TYPE_STATIC_IMPORT,
   STATE_INITIAL,
-  STATE_EXECUTION_COMPLETED,
   TYPE_CJS,
   TYPE_ESM,
   TYPE_PSEUDO,
@@ -480,7 +479,6 @@ class Entry {
     shared.entry.skipExports.delete(this.name)
 
     this.initNamespace()
-    this.state = STATE_EXECUTION_COMPLETED
     return this._loaded = LOAD_COMPLETED
   }
 

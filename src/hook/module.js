@@ -111,7 +111,6 @@ function hook(Mod, parent) {
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
       entry._passthru = false
-      entry.state = STATE_EXECUTION_STARTED
       tryPassthru.call(this, func, args, pkg)
       return
     }
@@ -136,10 +135,7 @@ function hook(Mod, parent) {
       entry.cacheName = cacheName
     }
 
-    const compileFallback = () => {
-      entry.state = STATE_EXECUTION_STARTED
-      return tryPassthru.call(this, func, args, pkg)
-    }
+    const compileFallback = () => tryPassthru.call(this, func, args, pkg)
 
     const compileWrapper = (content, filename) => {
       if (shouldOverwrite) {
