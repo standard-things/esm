@@ -36,6 +36,7 @@ import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 
 const {
+  STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED
 } = ENTRY
 
@@ -107,16 +108,34 @@ function hook(Mod, parent) {
     const entry = Entry.get(mod)
     const pkg = entry.package
 
+    const compileFallback = () => {
+      entry.state = STATE_EXECUTION_STARTED
+      tryPassthru.call(this, func, args, pkg)
+      entry.state = STATE_EXECUTION_COMPLETED
+    }
+
     if (entry._passthru ||
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
       entry._passthru = false
-      tryPassthru.call(this, func, args, pkg)
+      compileFallback()
       return
     }
 
     const { cache, cachePath } = pkg
     const { _compile } = mod
+
+    const compileWrapper = (content, filename) => {
+      if (shouldOverwrite) {
+        if (shouldRestore) {
+          mod._compile = _compile
+        } else {
+          Reflect.deleteProperty(mod, "_compile")
+        }
+      }
+
+      return compile(manager, entry, content, filename, compileFallback)
+    }
 
     let { cacheName, mtime } = entry
 
@@ -131,22 +150,6 @@ function hook(Mod, parent) {
         filename,
         packageOptions: pkg.options
       })
-
-      entry.cacheName = cacheName
-    }
-
-    const compileFallback = () => tryPassthru.call(this, func, args, pkg)
-
-    const compileWrapper = (content, filename) => {
-      if (shouldOverwrite) {
-        if (shouldRestore) {
-          mod._compile = _compile
-        } else {
-          Reflect.deleteProperty(mod, "_compile")
-        }
-      }
-
-      return compile(manager, entry, content, filename, compileFallback)
     }
 
     entry.cacheName = cacheName

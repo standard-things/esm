@@ -32,6 +32,7 @@ const {
 } = COMPILER
 
 const {
+  STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   STATE_PARSING_STARTED,
   TYPE_CJS,
@@ -156,8 +157,6 @@ function tryCompileCached(entry, filename) {
   let result
   let threw = true
 
-  entry.state = STATE_EXECUTION_STARTED
-
   try {
     const async = useAsync(entry)
 
@@ -172,10 +171,11 @@ function tryCompileCached(entry, filename) {
         compileData.changed) {
       const runtime = Runtime.enable(entry, GenericObject.create())
 
-      result = mod._compile(source, filename)
-
       if (isESM &&
           ! async) {
+        entry.state = STATE_EXECUTION_STARTED
+        mod._compile(source, filename)
+
         // Debuggers may wrap `Module#_compile()` with
         // `process.binding("inspector").callAndPauseOnStart()`
         // and not forward the return value.
@@ -183,10 +183,16 @@ function tryCompileCached(entry, filename) {
 
         // Eventually, we will call this in the instantiate phase.
         _runResult.next()
+
         result = _runResult.next().value
+        entry.state = STATE_EXECUTION_COMPLETED
       }
-    } else {
+    }
+
+    if (entry.state < STATE_EXECUTION_STARTED) {
+      entry.state = STATE_EXECUTION_STARTED
       result = mod._compile(source, filename)
+      entry.state = STATE_EXECUTION_COMPLETED
     }
 
     threw = false

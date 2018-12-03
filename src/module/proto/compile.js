@@ -22,8 +22,6 @@ import shared from "../../shared.js"
 import stripShebang from "../../util/strip-shebang.js"
 
 const {
-  STATE_EXECUTION_COMPLETED,
-  STATE_EXECUTION_STARTED,
   STATE_INITIAL,
   STATE_PARSING_COMPLETED
 } = ENTRY
@@ -36,23 +34,22 @@ const {
   MODE_STRICT
 } = PACKAGE
 
-let resolvedArgv
-let useBufferArg
-let useRunInContext
-
 const runInDebugContext = getSilent(realVM, "runInDebugContext")
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
 
+let resolvedArgv
+let useBufferArg
+let useRunInContext
+
 function compile(content, filename) {
   const entry = Entry.get(this)
   const { state } = entry
-
-  entry.updateFilename(filename)
+  const isInit = state === STATE_INITIAL
 
   if (entry.extname !== ".mjs" &&
       entry.package.options.mode !== MODE_STRICT &&
-      (state === STATE_INITIAL ||
+      (isInit ||
        state === STATE_PARSING_COMPLETED)) {
     entry.cacheName = getCacheName(content)
     entry.package = Package.get("")
@@ -63,7 +60,9 @@ function compile(content, filename) {
     try {
       result = _compile(compile, entry, content, filename)
     } finally {
-      entry.state = STATE_INITIAL
+      if (isInit) {
+        entry.state = STATE_INITIAL
+      }
     }
 
     return result
@@ -181,13 +180,9 @@ function compile(content, filename) {
     moduleState.statSync = new Map
   }
 
-  entry.state = STATE_EXECUTION_STARTED
-
   const result = inspectorWrapper
     ? Reflect.apply(inspectorWrapper, void 0, [compiledWrapper, exported, ...args])
     : Reflect.apply(compiledWrapper, exported, args)
-
-  entry.state = STATE_EXECUTION_COMPLETED
 
   if (noDepth) {
     moduleState.statFast =
