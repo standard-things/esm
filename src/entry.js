@@ -44,6 +44,7 @@ const {
   TYPE_CJS,
   TYPE_ESM,
   TYPE_PSEUDO,
+  TYPE_WASM,
   UPDATE_TYPE_INIT,
   UPDATE_TYPE_LIVE
 } = ENTRY
@@ -435,21 +436,16 @@ class Entry {
       }
     }
 
-    if (this.type === TYPE_ESM) {
-      const exported = this.exports
-      const { getters } = this
-      const names = keys(exported)
+    const { type } = this
 
-      for (const name of names) {
-        if (! Reflect.has(getters, name)) {
-          this.addGetter(name, () => this.namespace[name])
-        }
-      }
+    if (type === TYPE_ESM ||
+        type === TYPE_WASM) {
+      this.assignExportsToNamespace()
 
       if (this.package.options.cjs.interop &&
           this.extname !== ".mjs" &&
-          ! Reflect.has(getters, "__esModule")) {
-        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+          ! Reflect.has(this.getters, "__esModule")) {
+        Reflect.defineProperty(this.exports, "__esModule", pseudoDescriptor)
       }
     } else {
       const exported = mod.exports
@@ -475,9 +471,8 @@ class Entry {
 
       this.exports = newExported
       this.assignExportsToNamespace()
+      shared.entry.skipExports.delete(this.name)
     }
-
-    shared.entry.skipExports.delete(this.name)
 
     this.initNamespace()
     return this._loaded = LOAD_COMPLETED
