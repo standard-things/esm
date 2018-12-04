@@ -104,7 +104,7 @@ function getEntryFrom(request, exported) {
   return Entry.get(child)
 }
 
-function tryPhase(phase, request, entry) {
+function tryPhase(phase, request, parentEntry) {
   const { moduleState } = shared
 
   let error
@@ -114,7 +114,7 @@ function tryPhase(phase, request, entry) {
   moduleState.requireDepth += 1
 
   try {
-    childEntry = phase(request, entry.module)
+    childEntry = phase(request, parentEntry.module)
     threw = false
   } catch (e) {
     error = e
@@ -123,7 +123,7 @@ function tryPhase(phase, request, entry) {
   moduleState.requireDepth -= 1
 
   if (threw &&
-      (entry.extname === ".mjs" ||
+      (parentEntry.extname === ".mjs" ||
        error.code !== "MODULE_NOT_FOUND")) {
     throw error
   }
@@ -131,18 +131,18 @@ function tryPhase(phase, request, entry) {
   return childEntry
 }
 
-function tryRequire(request, entry) {
+function tryRequire(request, parentEntry) {
   const { moduleState } = shared
 
-  entry._require = TYPE_ESM
+  parentEntry._require = TYPE_ESM
   moduleState.requireDepth += 1
 
   let exported
 
   try {
-    exported = entry.module.require(request)
+    exported = parentEntry.module.require(request)
   } finally {
-    entry._require = TYPE_CJS
+    parentEntry._require = TYPE_CJS
     moduleState.requireDepth -= 1
   }
 
