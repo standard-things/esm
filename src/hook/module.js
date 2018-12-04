@@ -31,6 +31,7 @@ import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
 import set from "../util/set.js"
+import setGetter from "../util/set-getter.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import { sep } from "../safe/path.js"
 import shared from "../shared.js"
@@ -38,7 +39,7 @@ import shared from "../shared.js"
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  TYPE_PSEUDO
+  TYPE_WASM
 } = ENTRY
 
 const {
@@ -291,18 +292,24 @@ function wasmCompiler(mod, filename) {
   } = WebAssembly
 
   const wasmMod = new wasmModule(readFile(filename))
+  const descriptions = wasmModule.imports(wasmMod)
+  const imported = { __proto__: null }
 
-  const imported = wasmModule
-    .imports(wasmMod)
-    .reduce((object, specifier) => {
-      const request = specifier.module
+  for (const description of descriptions) {
+    const request = description.module
 
-      object[request] = esmLoad(request, null).module.exports
-      return object
-    }, { __proto__: null })
+    imported[request] = esmLoad(request, null).module.exports
+  }
 
-  mod.exports = new wasmInstance(wasmMod, imported).exports
-  Entry.get(mod).type = TYPE_PSEUDO
+  const exported = { __proto__: null }
+  const readonlyExports = new wasmInstance(wasmMod, imported).exports
+
+  for (const name in readonlyExports) {
+    setGetter(exported, name, () => readonlyExports[name])
+  }
+
+  mod.exports = exported
+  Entry.get(mod).type = TYPE_WASM
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
