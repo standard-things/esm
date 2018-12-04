@@ -20,7 +20,8 @@ const ENTRY = {
   STATE_EXECUTION_COMPLETED: 6,
   TYPE_CJS: 1,
   TYPE_ESM: 2,
-  TYPE_PSEUDO: 3
+  TYPE_PSEUDO: 3,
+  TYPE_WASM: 4
 }
 
 export default ENTRY
