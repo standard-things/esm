@@ -3,7 +3,7 @@ import OwnProxy from "../own/proxy.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
 import shared from "../shared.js"
-import unwrapProxy from "../util/unwrap-proxy.js"
+import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
 function init() {
   const Shim = {
@@ -30,7 +30,7 @@ function init() {
 
         if (proxyNativeSourceText &&
             isOwnProxy(thisArg)) {
-          thisArg = unwrapProxy(thisArg)
+          thisArg = unwrapOwnProxy(thisArg)
         }
 
         try {
@@ -43,7 +43,7 @@ function init() {
 
         if (isOwnProxy(thisArg)) {
           try {
-            return Reflect.apply(_toString, unwrapProxy(thisArg), [])
+            return Reflect.apply(_toString, unwrapOwnProxy(thisArg), [])
           } catch {}
         }
 

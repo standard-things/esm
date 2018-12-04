@@ -10,7 +10,7 @@ import nativeTrap from "./native-trap.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
-import unwrapProxy from "./unwrap-proxy.js"
+import unwrapOwnProxy from "./unwrap-own-proxy.js"
 
 function init() {
   function maskFunction(func, source) {
@@ -51,7 +51,7 @@ function init() {
       apply: nativeTrap((_toString, thisArg, args) => {
         if (! Loader.state.package.default.options.debug &&
             typeof thisArg === "function" &&
-            unwrapProxy(thisArg) === func) {
+            unwrapOwnProxy(thisArg) === func) {
           thisArg = cached.source
         }
 
