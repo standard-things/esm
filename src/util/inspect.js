@@ -8,6 +8,7 @@ import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
+import isModuleNamespaceObjectLike from "./is-module-namespace-object-like.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
@@ -16,8 +17,7 @@ import isUpdatableGet from "./is-updatable-get.js"
 import ownPropertyNames from "./own-property-names.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
-import toModuleNamespaceObject from "./to-module-namespace-object.js"
-import unwrapOwnProxy from "./unwrap-own-proxy.js"
+import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
 
 function init() {
   const PROXY_PREFIX = "Proxy ["
@@ -60,7 +60,7 @@ function init() {
 
     if (! isWrappable(value) ||
         (result.indexOf(PROXY_PREFIX) === -1 &&
-         ! isModuleNamespaceObject(value))) {
+         ! isModuleNamespaceObjectLike(value))) {
       return result
     }
 
@@ -80,11 +80,11 @@ function init() {
     // Step 5: Throw a reference error if the binding is uninitialized.
     // https://tc39.github.io/ecma262/#sec-module-environment-records-getbindingvalue-n-s
     const names = ownPropertyNames(namespace)
-    const object = toModuleNamespaceObject()
+    const object = toRawModuleNamespaceObject()
 
     for (const name of names) {
       try {
-        object[name] = unwrapOwnProxy(namespace[name])
+        object[name] = namespace[name]
       } catch (e) {
         object[name] = uninitializedValue
       }
@@ -120,7 +120,7 @@ function init() {
       (typeof value === "function" ||
        Array.isArray(value) ||
        getObjectTag(value) === "[object Object]" ||
-       isModuleNamespaceObject(value))
+       isModuleNamespaceObjectLike(value))
   }
 
   function toInspectable(value, options) {
