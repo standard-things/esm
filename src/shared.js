@@ -148,7 +148,7 @@ function init() {
     // Node < 10 doesn't support `Function#toString()` of proxied functions.
     // https://node.green/#ESNEXT-candidate--stage-3--Function-prototype-toString-revision
     try {
-      return typeof funcToString.call(dummyProxy) === "string"
+      return funcToString.call(dummyProxy)
     } catch {}
 
     return ""
