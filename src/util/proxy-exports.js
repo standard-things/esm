@@ -118,7 +118,9 @@ function init() {
         const { value } = descriptor
 
         if (typeof value === "function") {
-          descriptor.value = cached.unwrap.get(value) || value
+          const unwrapped = cached.unwrap.get(value)
+
+          descriptor.value = unwrapped === void 0 ? value : unwrapped
         }
 
         // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
@@ -153,7 +155,8 @@ function init() {
         const isUpdatable = isUpdatableSet(descriptor)
 
         if (typeof value === "function") {
-          const newValue = cached.unwrap.get(value) || value
+          const unwrapped = cached.unwrap.get(value)
+          const newValue = unwrapped === void 0 ? value : unwrapped
 
           if (isUpdatable) {
             value = newValue
