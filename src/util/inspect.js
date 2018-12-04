@@ -17,6 +17,7 @@ import ownPropertyNames from "./own-property-names.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toModuleNamespaceObject from "./to-module-namespace-object.js"
+import unwrapOwnProxy from "./unwrap-own-proxy.js"
 
 function init() {
   const PROXY_PREFIX = "Proxy ["
@@ -83,7 +84,7 @@ function init() {
 
     for (const name of names) {
       try {
-        object[name] = namespace[name]
+        object[name] = unwrapOwnProxy(namespace[name])
       } catch (e) {
         object[name] = uninitializedValue
       }
