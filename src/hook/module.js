@@ -37,7 +37,8 @@ import shared from "../shared.js"
 
 const {
   STATE_EXECUTION_COMPLETED,
-  STATE_EXECUTION_STARTED
+  STATE_EXECUTION_STARTED,
+  TYPE_PSEUDO
 } = ENTRY
 
 const {
@@ -301,6 +302,7 @@ function wasmCompiler(mod, filename) {
     }, { __proto__: null })
 
   mod.exports = new wasmInstance(wasmMod, imported).exports
+  Entry.get(mod).type = TYPE_PSEUDO
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
