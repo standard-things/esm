@@ -718,7 +718,14 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
       if (has(exported, name) &&
           (entry.builtin ||
            isEnumerable(exported, name))) {
-        return Reflect.getOwnPropertyDescriptor(exported, name)
+        const exportDescriptor = Reflect.getOwnPropertyDescriptor(exported, name)
+
+        // Section 9.5.5: [[GetOwnProperty]]()
+        // Step 17: Throw a type error if the target descriptor is configurable
+        // but the resulting descriptor is not.
+        // https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p
+        exportDescriptor.configurable = descriptor.configurable
+        return exportDescriptor
       }
 
       descriptor.value = handler.get(namespace, name)
