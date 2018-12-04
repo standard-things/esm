@@ -19,7 +19,8 @@ import realRequire from "../../real/require.js"
 import shared from "../../shared.js"
 
 const {
-  TYPE_ESM
+  TYPE_ESM,
+  TYPE_WASM
 } = ENTRY
 
 const {
@@ -40,9 +41,12 @@ const ownExportsMap = new Map([
 
 function makeRequireFunction(mod, requirer, resolver) {
   const entry = Entry.get(mod)
-  const isESM = entry.type === TYPE_ESM
+  const { name, type } = entry
   const isOwn = isOwnModule(mod)
-  const { name } = entry
+
+  const shouldCheckExports =
+    type !== TYPE_ESM &&
+    type !== TYPE_WASM
 
   let req = function require(request) {
     const exported = isOwn
@@ -55,11 +59,11 @@ function makeRequireFunction(mod, requirer, resolver) {
 
     const { moduleState } = shared
 
-    const skipExports =
-      ! isESM &&
-      ! isDataProperty(mod, "exports")
+    if (shouldCheckExports &&
+        ! isDataProperty(mod, "exports")) {
+      shared.entry.skipExports.add(name)
+    }
 
-    shared.entry.skipExports.set(name, skipExports)
     moduleState.requireDepth += 1
 
     try {

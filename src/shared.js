@@ -58,7 +58,7 @@ function init() {
   const shared = {
     entry: {
       cache: new WeakMap,
-      skipExports: new Map
+      skipExports: new Set
     },
     external: __external__,
     inited: false,
