@@ -225,8 +225,10 @@ function hook(Mod, parent) {
     Loader.state.module.extensions[ext] = _extensions[ext]
   }
 
-  _extensions[".wasm"] =
-  Loader.state.module.extensions[".wasm"] = wasmCompiler
+  if (shared.support.wasm) {
+    _extensions[".wasm"] =
+    Loader.state.module.extensions[".wasm"] = wasmCompiler
+  }
 }
 
 function mjsCompiler(mod, filename) {

@@ -50,7 +50,7 @@ const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
 const emptyArray = []
-const strictExts = [".mjs", ".js", ".json", ".node", ".wasm"]
+const strictExts = [".mjs", ".js", ".json", ".node"]
 const strictFields = ["main"]
 const strictExtsLookup = new Set(strictExts)
 

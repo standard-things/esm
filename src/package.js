@@ -78,7 +78,8 @@ const defaultOptions = {
   force: false,
   mainFields: ["main"],
   mode: "strict",
-  sourceMap: void 0
+  sourceMap: void 0,
+  wasm: false
 }
 
 const autoOptions = {
@@ -426,6 +427,14 @@ function createOptions(value) {
     options.sourceMap = !! sourceMap
   } else if (sourceMap !== void 0) {
     throw new ERR_INVALID_ESM_OPTION("sourceMap", sourceMap)
+  }
+
+  const wasmOption = options.wasm
+
+  if (isFlag(wasmOption)) {
+    options.wasm = !! wasmOption
+  } else {
+    throw new ERR_INVALID_ESM_OPTION("wasm", wasmOption)
   }
 
   return options
