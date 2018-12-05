@@ -60,11 +60,9 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-const exts = [".js", ".mjs"]
+const exts = [".js", ".mjs", ".wasm"]
 const importExportRegExp = /^.*?\b(?:im|ex)port\b/
-
-const sourceExtsJs = RealModule._extensions[".js"]
-const sourceExtsMjs = RealModule._extensions[".mjs"] || sourceExtsJs
+const realExtsJS = RealModule._extensions[".js"]
 
 function hook(Mod, parent) {
   const { _extensions } = Mod
@@ -87,20 +85,24 @@ function hook(Mod, parent) {
   }
 
   Loader.state.package.default = defaultPkg
-
   Module._extensions = _extensions
 
-  function managerWrapper(manager, func, args) {
-    const [, filename] = args
-    const pkg = Package.from(filename)
-    const wrapped = Wrapper.find(_extensions, ".js", relaxRange(pkg.range))
+  const jsManager = createManager(".js")
+  const wasmManager = createManager(".wasm")
 
-    return wrapped
-      ? Reflect.apply(wrapped, this, [manager, func, args])
-      : tryPassthru.call(this, func, args, pkg)
+  function createManager(ext) {
+    return function managerWrapper(manager, func, args) {
+      const [, filename] = args
+      const pkg = Package.from(filename)
+      const wrapped = Wrapper.find(_extensions, ext, relaxRange(pkg.range))
+
+      return wrapped
+        ? Reflect.apply(wrapped, this, [manager, func, args])
+        : tryPassthru.call(this, func, args, pkg)
+    }
   }
 
-  function methodWrapper(manager, func, args) {
+  function jsWrapper(manager, func, args) {
     const [mod, filename] = args
     const exported = mod.exports
 
@@ -192,12 +194,33 @@ function hook(Mod, parent) {
     }
   }
 
+  function wasmWrapper(manager, func, args) {
+    const [mod, filename] = args
+    const pkg = Entry.get(mod).package
+
+    return pkg.options.wasm
+      ? wasmCompiler(mod, filename)
+      : tryPassthru.call(this, func, args, pkg)
+  }
+
   for (const ext of exts) {
+    const extIsWASM = ext === ".wasm"
+
+    if (extIsWASM) {
+      if (! shared.support.wasm) {
+        continue
+      }
+
+      if (! Reflect.has(_extensions, ext)) {
+        _extensions[ext] = realExtsJS
+      }
+    }
+
     const extIsMJS = ext === ".mjs"
 
     if (extIsMJS &&
         ! Reflect.has(_extensions, ext)) {
-      _extensions[ext] = maskFunction(mjsCompiler, sourceExtsMjs)
+      _extensions[ext] = maskFunction(mjsCompiler, realExtsJS)
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, ext)
@@ -207,7 +230,7 @@ function hook(Mod, parent) {
       ! has(extCompiler, shared.symbol.mjs)
 
     if (passthru &&
-        extIsMJS) {
+      extIsMJS) {
       try {
         extCompiler()
       } catch (e) {
@@ -218,16 +241,14 @@ function hook(Mod, parent) {
       }
     }
 
-    Wrapper.manage(_extensions, ext, managerWrapper)
-    Wrapper.wrap(_extensions, ext, methodWrapper)
+    const manager = extIsWASM ? wasmManager : jsManager
+    const wrapper = extIsWASM ? wasmWrapper : jsWrapper
+
+    Wrapper.manage(_extensions, ext, manager)
+    Wrapper.wrap(_extensions, ext, wrapper)
 
     passthruMap.set(extCompiler, passthru)
     Loader.state.module.extensions[ext] = _extensions[ext]
-  }
-
-  if (shared.support.wasm) {
-    _extensions[".wasm"] =
-    Loader.state.module.extensions[".wasm"] = wasmCompiler
   }
 }
 
@@ -293,9 +314,11 @@ function wasmCompiler(mod, filename) {
     Module:wasmModule
   } = WebAssembly
 
+  const entry = Entry.get(mod)
+  const imported = { __proto__: null }
+
   const wasmMod = new wasmModule(readFile(filename))
   const descriptions = wasmModule.imports(wasmMod)
-  const imported = { __proto__: null }
 
   for (const description of descriptions) {
     const request = description.module
@@ -310,8 +333,13 @@ function wasmCompiler(mod, filename) {
     setGetter(exported, name, () => readonlyExports[name])
   }
 
+  Entry.delete(mod.exports, entry)
+  Entry.set(exported, entry)
+
+  entry.type = TYPE_WASM
+
+  entry.exports =
   mod.exports = exported
-  Entry.get(mod).type = TYPE_WASM
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
