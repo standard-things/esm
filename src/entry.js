@@ -335,8 +335,9 @@ class Entry {
     const isLoaded = this._loaded === LOAD_COMPLETED
 
     if (! isLoaded &&
-        exported &&
+        exported != null &&
         exported.__esModule &&
+        this.type === TYPE_CJS &&
         this.package.options.cjs.interop) {
       this.type = TYPE_PSEUDO
     }
