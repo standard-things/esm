@@ -1007,6 +1007,8 @@ function mergeProperty(entry, otherEntry, key) {
     }
   } else if (key === "children") {
     assign(entry.children, value)
+  } else if (key === "exports") {
+    entry[key] = value
   } else if (key === "getters") {
     for (const name in value) {
       entry.addGetter(name, value[name])
