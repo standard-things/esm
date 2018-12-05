@@ -46,7 +46,7 @@ describe("output tests", () => {
         .trimRight()
 
       const actual = result.code
-        .replace(/\u200d/g, "")
+        .replace(/\u200D/g, "")
         .replace(/[ \t]+$/gm, "")
         .trimRight()
 

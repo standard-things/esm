@@ -4,10 +4,10 @@ import shared from "../shared.js"
 
 function init() {
   const {
-    ZERO_WIDTH_NOBREAK_SPACE
+    ZERO_WIDTH_JOINER
   } = CHAR
 
-  const WITHOUT_TOKEN = ZERO_WIDTH_NOBREAK_SPACE + "WITHOUT" + ZERO_WIDTH_NOBREAK_SPACE
+  const WITHOUT_TOKEN = ZERO_WIDTH_JOINER + "WITHOUT" + ZERO_WIDTH_JOINER
 
   function replaceWithout(string, without, replacer) {
     if (typeof string !== "string" ||

@@ -8,7 +8,7 @@ function init() {
   } = ESM
 
   const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
-  const runtimeRegExp = /\w+\u200d\.(\w+)(\.)?/g
+  const runtimeRegExp = /\w+\u200D\.(\w+)(\.)?/g
   const traceRegExp = /(\n +at .+)+$/
 
   function scrubStackTrace(stack) {
