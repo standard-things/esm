@@ -1,5 +1,5 @@
 // Error messages are based on V8.
-// https://github.com/v8/v8/blob/master/src/messages.h
+// https://github.com/v8/v8/blob/master/src/message-template.h
 
 const MESSAGE = {
   ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION: "await is only valid in async function",
