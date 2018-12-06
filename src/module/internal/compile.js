@@ -21,7 +21,6 @@ import isOwnPath from "../../util/is-own-path.js"
 import isError from "../../util/is-error.js"
 import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
-import readFile from "../../fs/read-file.js"
 import shared from "../../shared.js"
 import toString from "../../util/to-string.js"
 
@@ -223,9 +222,10 @@ function tryCompileCached(entry, filename) {
     filename = loc.filename
   }
 
-  const content = () => readFile(filename, "utf8")
-
-  throw maskStackTrace(error, content, filename, isESM)
+  throw maskStackTrace(error, {
+    filename,
+    inModule: isESM
+  })
 }
 
 function tryCompileCode(caller, content, options) {
@@ -244,7 +244,11 @@ function tryCompileCode(caller, content, options) {
   }
 
   captureStackTrace(error, caller)
-  throw maskStackTrace(error, content, options.filename)
+
+  throw maskStackTrace(error, {
+    content,
+    filename: options.filename
+  })
 }
 
 function tryValidate(caller, entry, content, filename) {
@@ -267,11 +271,15 @@ function tryValidate(caller, entry, content, filename) {
 
   if (loc !== null &&
       loc.filename !== filename) {
+    content = null
     filename = loc.filename
-    content = () => readFile(filename, "utf8")
   }
 
-  throw maskStackTrace(error, content, filename, true)
+  throw maskStackTrace(error, {
+    content,
+    filename,
+    inModule: true
+  })
 }
 
 function useAsync(entry) {

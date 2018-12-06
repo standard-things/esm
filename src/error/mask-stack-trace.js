@@ -1,11 +1,15 @@
+import WASM from "../constant/wasm.js"
+
 import Module from "../module.js"
 
 import decorateStackTrace from "./decorate-stack-trace.js"
+import { extname } from "../safe/path.js"
 import get from "../util/get.js"
 import getModuleURL from "../util/get-module-url.js"
 import getSilent from "../util/get-silent.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
+import readFile from "../fs/read-file.js"
 import replaceWithout from "../util/replace-without.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import shared from "../shared.js"
@@ -13,20 +17,28 @@ import toExternalError from "../util/to-external-error.js"
 import toString from "../util/to-string.js"
 
 function init() {
+  const {
+    MAGIC_COOKIE
+  } = WASM
+
   const arrowRegExp = /^(.+)\n( *\^+)\n(\n)?/m
   const atNameRegExp = /^( *at (?:.+? \()?)(.+?)(?=:\d+)/gm
   const blankRegExp = /^\s*$/
   const headerRegExp = /^(.+?):(\d+)(?=\n)/
 
-  function maskStackTrace(error, content, filename, isESM) {
+  function maskStackTrace(error, options = {}) {
     if (! isError(error)) {
       return error
     }
 
-    decorateStackTrace(error)
-
     let column
     let lineNum
+
+    let {
+      content,
+      filename,
+      inModule
+    } = options
 
     const fromParser = isParseError(error)
 
@@ -34,8 +46,8 @@ function init() {
       column = error.column
       lineNum = error.line
 
-      if (isESM === void 0) {
-        isESM = error.inModule
+      if (inModule === void 0) {
+        inModule = error.inModule
       }
 
       toExternalError(error)
@@ -66,13 +78,24 @@ function init() {
         const name = toString(get(this, "name"))
         const newString = tryErrorToString(this)
 
+        if (typeof content !== "string" &&
+            typeof filename === "string" &&
+            extname(filename) !== ".wasm") {
+          content = readFile(filename, "utf8")
+        }
+
+        if (typeof content !== "string" ||
+            content.startsWith(MAGIC_COOKIE)) {
+          content = null
+        }
+
         let masked = stack.replace(oldString, newString)
 
         masked = fromParser
           ? maskParserStack(masked, name, message, lineNum, column, content, filename)
           : maskEngineStack(masked, content, filename)
 
-        const scrubber = isESM
+        const scrubber = inModule
           ? (stack) => fileNamesToURLs(scrubStackTrace(stack))
           : scrubStackTrace
 
@@ -87,7 +110,7 @@ function init() {
       }
     })
 
-    return error
+    return decorateStackTrace(error)
   }
 
   function maskEngineStack(stack, content, filename) {
@@ -101,10 +124,6 @@ function init() {
 
     const header = match[0]
     const lineNum = +match[2]
-
-    if (typeof content === "function") {
-      content = content(filename)
-    }
 
     let contentLines
     let contentLine
@@ -176,10 +195,6 @@ function init() {
 
     if (typeof filename === "string") {
       spliceArgs.push(filename + ":" + lineNum)
-    }
-
-    if (typeof content === "function") {
-      content = content(filename)
     }
 
     if (typeof content === "string") {

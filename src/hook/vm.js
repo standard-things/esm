@@ -319,7 +319,11 @@ function tryValidate(caller, entry, content) {
   if (! Loader.state.package.default.options.debug &&
       ! isStackTraceMasked(error)) {
     captureStackTrace(error, caller)
-    maskStackTrace(error, content, null, true)
+
+    maskStackTrace(error, {
+      content,
+      inModule: true
+    })
   }
 
   throw error
@@ -337,7 +341,7 @@ function tryWrapper(func, args, content) {
   if (! Loader.state.package.default.options.debug &&
       isError(error) &&
       ! isStackTraceMasked(error)) {
-    maskStackTrace(error, content)
+    maskStackTrace(error, { content })
   }
 
   throw error

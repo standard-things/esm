@@ -1,5 +1,3 @@
-import { extname, sep } from "../safe/path.js"
-
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
 import ESM from "../constant/esm.js"
@@ -32,6 +30,7 @@ import readFile from "../fs/read-file.js"
 import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
+import { sep } from "../safe/path.js"
 import set from "../util/set.js"
 import setGetter from "../util/set-getter.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
@@ -60,10 +59,6 @@ const {
 const {
   ERR_REQUIRE_ESM
 } = errors
-
-// The encoding of a WASM module starts with a 4-byte magic cookie.
-// https://webassembly.github.io/spec/core/binary/modules.html#binary-module
-const WASM_MAGIC_COOKIE = "\0asm"
 
 const exts = [".js", ".mjs", ".wasm"]
 const importExportRegExp = /^.*?\b(?:im|ex)port\b/
@@ -308,23 +303,7 @@ function tryPassthru(func, args, pkg) {
     filename = loc.filename
   }
 
-  const content = () => {
-    let possibleContent = null
-
-    if (typeof filename === "string" &&
-        extname(filename) !== ".wasm") {
-      possibleContent = readFile(filename, "utf8")
-    }
-
-    if (typeof possibleContent === "string" &&
-        ! possibleContent.startsWith(WASM_MAGIC_COOKIE)) {
-      return possibleContent
-    }
-
-    return null
-  }
-
-  throw maskStackTrace(error, content, filename)
+  throw maskStackTrace(error, { filename })
 }
 
 function wasmCompiler(mod, filename) {
