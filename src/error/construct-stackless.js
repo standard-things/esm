@@ -1,14 +1,22 @@
+import getBuiltinErrorConstructor from "../error/get-builtin-error-constructor.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
   function constructStackless(ErrorCtor, args) {
-    const { stackTraceLimit } = Error
+    const BuiltinError = getBuiltinErrorConstructor(ErrorCtor.prototype)
+    const descriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "stackTraceLimit")
 
-    Error.stackTraceLimit = 0
+    setProperty(BuiltinError, "stackTraceLimit", 0)
 
     const error = Reflect.construct(ErrorCtor, args)
 
-    Error.stackTraceLimit = stackTraceLimit
+    if (descriptor === void 0) {
+      Reflect.deleteProperty(BuiltinError, "stackTraceLimit")
+    } else {
+      Reflect.defineProperty(BuiltinError, "stackTraceLimit", descriptor)
+    }
+
     return error
   }
 
