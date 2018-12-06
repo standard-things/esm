@@ -266,7 +266,6 @@ function init() {
         ? value
         : builtinMethod
     },
-
     getOwnPropertyDescriptor(globalConsole, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(globalConsole, name)
 

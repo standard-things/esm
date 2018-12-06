@@ -47,7 +47,6 @@ const Runtime = {
       this.initBindings(["default"])
     }
   },
-
   addExportFromSetter(importedName, exportedName = importedName) {
     return createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
       const { entry } = this
@@ -61,11 +60,9 @@ const Runtime = {
       return Reflect.has(getters, exportedName)
     })
   },
-
   addExportGetters(getterArgsList) {
     this.entry.addGetters(getterArgsList)
   },
-
   addNamespaceSetter() {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
@@ -106,7 +103,6 @@ const Runtime = {
       }
     })
   },
-
   assertImportedBinding: function assertImportedBinding(name, value) {
     if (this.entry.importedBindings[name] !== true) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, assertImportedBinding)
@@ -114,7 +110,6 @@ const Runtime = {
 
     return value
   },
-
   compileEval(content) {
     if (typeof content !== "string") {
       return content
@@ -134,7 +129,6 @@ const Runtime = {
       topLevelReturn: cjs.topLevelReturn
     }).code
   },
-
   compileGlobalEval(content) {
     if (typeof content !== "string") {
       return content
@@ -181,7 +175,6 @@ const Runtime = {
 
     return code
   },
-
   dynamicImport(request) {
     return new ExPromise((resolvePromise, rejectPromise) => {
       setImmediate(() => {
@@ -205,7 +198,6 @@ const Runtime = {
       })
     })
   },
-
   enable(entry, exported) {
     const mod = entry.module
     const runtime = mod.exports
@@ -267,34 +259,27 @@ const Runtime = {
 
     return runtime
   },
-
   globalEval(content) {
     return evalIndirect(this.compileGlobalEval(content))
   },
-
   import(request, setterArgsList) {
     return esmImport(this.entry, request, setterArgsList)
   },
-
   initBindings(names) {
     this.entry.updateBindings(names, UPDATE_TYPE_INIT)
   },
-
   run(moduleWrapper) {
     const { entry } = this
     const runner =  entry.type === TYPE_ESM ? runESM : runCJS
 
     return this._runResult = runner(entry, moduleWrapper)
   },
-
   throwConstAssignment: function throwConstAssignment() {
     throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)
   },
-
   throwUndefinedIdentifier: function throwUndefinedIdentifier(name) {
     throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndefinedIdentifier)
   },
-
   updateBindings(valueToPassThrough) {
     this.entry.updateBindings(null, UPDATE_TYPE_LIVE)
 

@@ -210,7 +210,6 @@ function init() {
 
         return value
       },
-
       getOwnPropertyDescriptor(object, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
 
