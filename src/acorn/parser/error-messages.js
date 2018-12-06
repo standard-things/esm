@@ -31,7 +31,7 @@ function init() {
   const PARSER_IMPORT_EXPORT_OUTSIDE_MODULE = "'import' and 'export' may appear only with 'sourceType: module'"
   const PARSER_INVALID_ESCAPED_RESERVED_WORD = "Escape sequence in keyword "
 
-  const messages = new Set([
+  const messageLookup = new Set([
     ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION,
     ILLEGAL_HTML_COMMENT,
     ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
@@ -50,7 +50,7 @@ function init() {
     UNTERMINATED_TEMPLATE
   ])
 
-  const replacements = new Map([
+  const replacementMap = new Map([
     ["'return' outside of function", ILLEGAL_RETURN_STATEMENT],
     ["Binding arguments in strict mode", UNEXPECTED_EVAL_OR_ARGUMENTS],
     ["Binding await in strict mode", UNEXPECTED_RESERVED_WORD],
@@ -120,8 +120,8 @@ function init() {
   }
 
   function raise(pos, message) {
-    if (replacements.has(message)) {
-      message = replacements.get(message)
+    if (replacementMap.has(message)) {
+      message = replacementMap.get(message)
     } else if (message === PARSER_IMPORT_EXPORT_INVALID_LEVEL ||
                message === PARSER_IMPORT_EXPORT_OUTSIDE_MODULE) {
       message = UNEXPECTED_TOKEN + " " + this.type.label
@@ -129,7 +129,7 @@ function init() {
       message = message.replace(PARSER_DUPLICATE_EXPORT, ENGINE_DUPLICATE_EXPORT)
     } else if (message.startsWith(PARSER_INVALID_ESCAPED_RESERVED_WORD)) {
       message = INVALID_ESCAPED_RESERVED_WORD
-    } else if (! messages.has(message) &&
+    } else if (! messageLookup.has(message) &&
         ! message.startsWith(UNEXPECTED_TOKEN)) {
       return
     }
