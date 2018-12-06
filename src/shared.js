@@ -30,11 +30,11 @@ function getShared() {
 }
 
 function init() {
+  const FuncToString = Function.prototype.toString
+
   const dummyProxy = new Proxy(class {}, {
     [PACKAGE_PREFIX]: 1
   })
-
-  const funcToString = Function.prototype.toString
 
   const support = {
     wasm: typeof WebAssembly === "object" && WebAssembly !== null
@@ -148,7 +148,7 @@ function init() {
     // Node < 10 doesn't support `Function#toString()` of proxied functions.
     // https://node.green/#ESNEXT-candidate--stage-3--Function-prototype-toString-revision
     try {
-      return funcToString.call(dummyProxy)
+      return FuncToString.call(dummyProxy)
     } catch {}
 
     return ""

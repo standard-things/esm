@@ -30,10 +30,10 @@ function init() {
   } = ENV
 
   const RealConsole = realConsole.Console
-  const realProto = RealConsole.prototype
-  const realProtoNames = ownKeys(realProto)
+  const RealProto = RealConsole.prototype
+  const RealProtoNames = ownKeys(RealProto)
 
-  const builtinLog = wrapBuiltin(realProto.log)
+  const builtinLog = wrapBuiltin(RealProto.log)
   const dirOptions = { customInspect: true }
 
   // Assign `console` to a variable so it's not removed by
@@ -41,14 +41,14 @@ function init() {
   const globalConsole = console
 
   const wrapperMap = new Map([
-    ["assert", wrapBuiltin(realProto.assert, assertWrapper)],
+    ["assert", wrapBuiltin(RealProto.assert, assertWrapper)],
     ["debug", builtinLog],
-    ["dir", wrapBuiltin(realProto.dir, dirWrapper)],
+    ["dir", wrapBuiltin(RealProto.dir, dirWrapper)],
     ["dirxml", builtinLog],
     ["info", builtinLog],
     ["log", builtinLog],
-    ["trace", wrapBuiltin(realProto.trace)],
-    ["warn", wrapBuiltin(realProto.warn)]
+    ["trace", wrapBuiltin(RealProto.trace)],
+    ["warn", wrapBuiltin(RealProto.warn)]
   ])
 
   let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
@@ -161,19 +161,19 @@ function init() {
 
   const { prototype } = Console
 
-  for (const name of realProtoNames) {
+  for (const name of RealProtoNames) {
     const value = wrapperMap.get(name)
 
     if (value !== void 0) {
       prototype[name] = value
     } else if (name !== "constructor") {
-      copyProperty(prototype, realProto, name)
+      copyProperty(prototype, RealProto, name)
     }
   }
 
   const builtinConsole = new Console(stdout, stderr)
 
-  for (const name of realProtoNames) {
+  for (const name of RealProtoNames) {
     if (! has(builtinConsole, name)) {
       copyProperty(builtinConsole, prototype, name)
     }

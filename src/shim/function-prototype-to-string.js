@@ -8,14 +8,14 @@ import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 function init() {
   const Shim = {
     enable(context) {
+      const FuncProto = context.Function.prototype
       const cache = shared.memoize.shimFunctionPrototypeToString
-      const funcProto = context.Function.prototype
 
-      if (check(funcProto, cache)) {
+      if (check(FuncProto, cache)) {
         return context
       }
 
-      const _toString = funcProto.toString
+      const _toString = FuncProto.toString
       const { proxyNativeSourceText } = shared
 
       const NATIVE_SOURCE_TEXT =
@@ -51,21 +51,21 @@ function init() {
       }
 
       try {
-        funcProto.toString = new OwnProxy(_toString, {
+        FuncProto.toString = new OwnProxy(_toString, {
           apply: nativeTrap((_toString, thisArg, args) => {
             return Reflect.apply(toString, thisArg, args)
           })
         })
 
-        cache.set(funcProto, true)
+        cache.set(FuncProto, true)
       } catch {}
 
       return context
     }
   }
 
-  function check(funcProto, cache) {
-    let result = cache.get(funcProto)
+  function check(FuncProto, cache) {
+    let result = cache.get(FuncProto)
 
     if (typeof result === "boolean") {
       return result
@@ -74,7 +74,7 @@ function init() {
     result = true
 
     try {
-      const { toString } = funcProto
+      const { toString } = FuncProto
 
       if (typeof toString === "function") {
         const proxy = new OwnProxy(toString, {})
@@ -85,7 +85,7 @@ function init() {
       result = false
     }
 
-    cache.set(funcProto, result)
+    cache.set(FuncProto, result)
     return result
   }
 

@@ -11,7 +11,7 @@ import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
-const funcHasInstance = Function.prototype[Symbol.hasInstance]
+const FuncHasInstance = Function.prototype[Symbol.hasInstance]
 
 function createEntry(id) {
   const mod = builtinModules[id]
@@ -35,7 +35,7 @@ function createEntry(id) {
 
         return instanceOf(instance, this)
       },
-      funcHasInstance
+      FuncHasInstance
     )
 
     const proxyFunc = new OwnProxy(func, {

@@ -6,17 +6,17 @@ import shared from "../shared.js"
 
 function init() {
   const ExFunction = shared.external.Function
-  const exFuncSuper = getPrototypeOf(ExFunction)
-  const exFuncProtoSuper = getPrototypeOf(ExFunction.prototype)
+  const ExFuncSuper = getPrototypeOf(ExFunction)
+  const ExFuncProtoSuper = getPrototypeOf(ExFunction.prototype)
 
   function toExternalFunction(func) {
-    setPrototypeOf(func, exFuncSuper)
+    setPrototypeOf(func, ExFuncSuper)
 
     if (has(func, "prototype")) {
       const { prototype } = func
 
       if (isObjectLike(prototype)) {
-        setPrototypeOf(prototype, exFuncProtoSuper)
+        setPrototypeOf(prototype, ExFuncProtoSuper)
       }
     }
 
