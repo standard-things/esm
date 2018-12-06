@@ -1,6 +1,7 @@
 import ESM from "./constant/esm.js"
 
 import captureStackTrace from "./error/capture-stack-trace.js"
+import constructStackless from "./error/construct-stackless.js"
 import get from "./util/get.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleURL from "./util/get-module-url.js"
@@ -24,7 +25,7 @@ function init() {
   } = shared.external
 
   const errors = {}
-  const messages = new Map
+  const templateMap = new Map
 
   addBuiltinError("ERR_CONST_ASSIGNMENT", constAssignment, ExTypeError)
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
@@ -49,19 +50,19 @@ function init() {
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
 
-  function addBuiltinError(code, messageHandler, Super) {
+  function addBuiltinError(code, template, Super) {
     errors[code] = createBuiltinErrorClass(Super, code)
-    messages.set(code, messageHandler)
+    templateMap.set(code, template)
   }
 
-  function addLegacyError(code, messageHandler, Super) {
+  function addLegacyError(code, template, Super) {
     errors[code] = createLegacyErrorClass(Super, code)
-    messages.set(code, messageHandler)
+    templateMap.set(code, template)
   }
 
-  function addNodeError(code, messageHandler, Super) {
+  function addNodeError(code, template, Super) {
     errors[code] = createNodeErrorClass(Super, code)
-    messages.set(code, messageHandler)
+    templateMap.set(code, template)
   }
 
   function createBuiltinErrorClass(Super, code) {
@@ -69,10 +70,15 @@ function init() {
       const { length } = args
       const last = length ? args[length - 1] : null
       const beforeFunc = typeof last === "function" ? args.pop() : null
-      const messageTemplate = messages.get(code)
-      const error = new Super(messageTemplate(...args))
+      const template = templateMap.get(code)
+      const message = template(...args)
 
-      if (beforeFunc !== null) {
+      let error
+
+      if (beforeFunc === null) {
+        error = new Super(message)
+      } else {
+        error = constructStackless(Super, [message])
         captureStackTrace(error, beforeFunc)
       }
 
@@ -96,8 +102,8 @@ function init() {
 
   function createLegacyErrorClass(Super, code) {
     return function LegacyError(...args) {
-      const messageTemplate = messages.get(code)
-      const error = new Super(messageTemplate(...args))
+      const template = templateMap.get(code)
+      const error = new Super(template(...args))
 
       error.code = code
       return error
@@ -107,8 +113,8 @@ function init() {
   function createNodeErrorClass(Super, code) {
     return class NodeError extends Super {
       constructor(...args) {
-        const messageTemplate = messages.get(code)
-        super(messageTemplate(...args))
+        const template = templateMap.get(code)
+        super(template(...args))
 
         if (code === "MODULE_NOT_FOUND") {
           this.code = code
