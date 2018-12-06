@@ -1,5 +1,6 @@
 import ENTRY from "../../constant/entry.js"
 
+import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
 
@@ -136,7 +137,7 @@ function validateDependencies(entry) {
     } else if (! namedExports) {
       for (const exportedName of childExportedNames) {
         if (exportedName !== "default") {
-          throw new ERR_EXPORT_MISSING(childEntry.module, exportedName)
+          throw constructStackless(ERR_EXPORT_MISSING, [childEntry.module, exportedName])
         }
       }
     }
@@ -168,9 +169,9 @@ function validateExportedName(entry, exportedName, seen) {
     const childEntry = dependencySpecifiers[request].entry
 
     if (exportedStars.indexOf(request) === -1) {
-      throw new ERR_EXPORT_CYCLE(mod, exportedName)
+      throw constructStackless(ERR_EXPORT_CYCLE, [mod, exportedName])
     } else if (childEntry.compileData.exportedSpecifiers[exportedName] !== true) {
-      throw new ERR_EXPORT_MISSING(mod, exportedName)
+      throw constructStackless(ERR_EXPORT_MISSING, [mod, exportedName])
     }
   } else if (Reflect.has(exportedSpecifiers, exportedName)) {
     if (exportedSpecifier) {
@@ -188,7 +189,7 @@ function validateExportedName(entry, exportedName, seen) {
         }
       }
     } else {
-      throw new ERR_EXPORT_STAR_CONFLICT(mod, exportedName)
+      throw constructStackless(ERR_EXPORT_STAR_CONFLICT, [mod, exportedName])
     }
   } else {
     let throwExportMissing = true
@@ -204,7 +205,7 @@ function validateExportedName(entry, exportedName, seen) {
     }
 
     if (throwExportMissing) {
-      throw new ERR_EXPORT_MISSING(mod, exportedName)
+      throw constructStackless(ERR_EXPORT_MISSING, [mod, exportedName])
     }
   }
 }

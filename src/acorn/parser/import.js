@@ -12,6 +12,7 @@
 
 import MESSAGE from "../../constant/message.js"
 
+import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../parse/errors.js"
 import lookahead from "../../parse/lookahead.js"
 import shared from "../../shared.js"
@@ -47,7 +48,11 @@ function init() {
 
     if (expr.type === "CallExpression" &&
         expr.callee.type === "Import") {
-      throw new errors.ReferenceError(this, expr.start, INVALID_LEFT_HAND_SIDE_ASSIGNMENT)
+      throw constructStackless(errors.ReferenceError, [
+        this,
+        expr.start,
+        INVALID_LEFT_HAND_SIDE_ASSIGNMENT
+      ])
     }
 
     return Reflect.apply(func, this, args)

@@ -1,3 +1,4 @@
+import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../parse/errors.js"
 import getIdentifiersFromPattern from "../../parse/get-identifiers-from-pattern.js"
 import shared from "../../shared.js"
@@ -117,11 +118,11 @@ function init() {
   }
 
   function raiseRedeclaration(parser, pos, name) {
-    throw new errors.SyntaxError(
+    throw constructStackless(errors.SyntaxError, [
       parser,
       pos,
       "Identifier '" + name + "' has already been declared"
-    )
+    ])
   }
 
   return Plugin
