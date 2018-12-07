@@ -217,10 +217,6 @@ function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {
 
     const lookupPaths = resolveLookupPaths(request, fakeParent, skipGlobalPaths)
 
-    if (paths.indexOf(fromPath) === -1) {
-      paths.push(fromPath)
-    }
-
     for (const lookupPath of lookupPaths) {
       if (paths.indexOf(lookupPath) === -1) {
         paths.push(lookupPath)

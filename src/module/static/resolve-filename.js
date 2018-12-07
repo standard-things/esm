@@ -115,10 +115,6 @@ function resolveLookupPathsFrom(request, fromPaths) {
 
     const lookupPaths = Module._resolveLookupPaths(request, fakeParent, true)
 
-    if (paths.indexOf(fromPath) === -1) {
-      paths.push(fromPath)
-    }
-
     for (const lookupPath of lookupPaths) {
       if (paths.indexOf(lookupPath) === -1) {
         paths.push(lookupPath)
