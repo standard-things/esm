@@ -8,7 +8,6 @@ import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Runtime from "../../runtime.js"
 
-import errors from "../../errors.js"
 import isDataProperty from "../../util/is-data-property.js"
 import isInstalled from "../../util/is-installed.js"
 import isOwnModule from "../../util/is-own-module.js"
@@ -17,15 +16,12 @@ import realGetProxyDetails from "../../real/get-proxy-details.js"
 import realProcess from "../../real/process.js"
 import realRequire from "../../real/require.js"
 import shared from "../../shared.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   TYPE_ESM,
   TYPE_WASM
 } = ENTRY
-
-const {
-  ERR_INVALID_ARG_TYPE
-} = errors
 
 const realResolve = realRequire.resolve
 const realPaths = realResolve && realResolve.paths
@@ -74,18 +70,12 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   function resolve(request, options) {
-    if (typeof request !== "string") {
-      throw new ERR_INVALID_ARG_TYPE("request", "string", request)
-    }
-
+    validateString(request, "request")
     return resolver.call(mod, request, options)
   }
 
   function paths(request) {
-    if (typeof request !== "string") {
-      throw new ERR_INVALID_ARG_TYPE("request", "string", request)
-    }
-
+    validateString(request, "request")
     return Module._resolveLookupPaths(request, mod, true)
   }
 

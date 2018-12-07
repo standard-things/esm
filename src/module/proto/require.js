@@ -10,20 +10,18 @@ import Module from "../../module.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import isMJS from "../../path/is-mjs.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   TYPE_ESM
 } = ENTRY
 
 const {
-  ERR_INVALID_ARG_TYPE,
   ERR_INVALID_ARG_VALUE
 } = errors
 
 const req = function require(request) {
-  if (typeof request !== "string") {
-    throw new ERR_INVALID_ARG_TYPE("request", "string", request)
-  }
+  validateString(request, "request")
 
   if (request === "") {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")

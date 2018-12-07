@@ -39,7 +39,6 @@ const {
 } = PACKAGE
 
 const {
-  ERR_INVALID_ARG_TYPE,
   ERR_INVALID_PROTOCOL,
   ERR_MODULE_RESOLUTION_LEGACY,
   ERR_UNKNOWN_FILE_EXTENSION,
@@ -55,10 +54,6 @@ const strictFields = ["main"]
 const strictExtsLookup = new Set(strictExts)
 
 function resolveFilename(request, parent, isMain, options) {
-  if (typeof request !== "string") {
-    throw new ERR_INVALID_ARG_TYPE("request", "string")
-  }
-
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
