@@ -92,9 +92,9 @@
     "test262-parser": "^2.0.7",
     "trash": "^4.3.0",
     "ts-node": "^7.0.1",
-    "typescript": "^3.2.1",
+    "typescript": "^3.2.2",
     "unused-webpack-plugin": "2.2.0",
-    "webpack": "^4.27.0",
+    "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2",
     "yargs": "^12.0.5"
