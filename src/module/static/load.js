@@ -60,8 +60,8 @@ function load(request, parent, isMain) {
   })
 
   if (! loaderCalled &&
-      parentEntry !== null &&
       entry.type === TYPE_ESM &&
+      parentEntry !== null &&
       parentEntry.package.options.mode === MODE_STRICT) {
     throw new ERR_REQUIRE_ESM(filename)
   }
