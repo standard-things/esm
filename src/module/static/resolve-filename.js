@@ -6,6 +6,7 @@ import ENV from "../../constant/env.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
+import RealModule from "../../real/module.js"
 import SafeModule from "../../safe/module.js"
 
 import builtinLookup from "../../builtin-lookup.js"
@@ -15,6 +16,7 @@ import errors from "../../errors.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
+import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
 import staticFindPath from "./find-path.js"
 import staticResolveLookupPaths from "./resolve-lookup-paths.js"
@@ -27,7 +29,7 @@ const {
   MODULE_NOT_FOUND
 } = errors
 
-function resolveFilename(request, parent, isMain, options) {
+const resolveFilename = maskFunction(function (request, parent, isMain, options) {
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
@@ -104,7 +106,7 @@ function resolveFilename(request, parent, isMain, options) {
   }
 
   throw new MODULE_NOT_FOUND(request)
-}
+}, RealModule._resolveFilename)
 
 function resolveLookupPathsFrom(request, fromPaths) {
   const fakeParent = new Module("")

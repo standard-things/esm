@@ -8,9 +8,11 @@ import CHAR_CODE from "../../constant/char-code.js"
 import ENV from "../../constant/env.js"
 
 import GenericArray from "../../generic/array.js"
+import RealModule from "../../real/module.js"
 import SafeModule from "../../safe/module.js"
 
 import isSep from "../../path/is-sep.js"
+import maskFunction from "../../util/mask-function.js"
 
 const {
   BACKWARD_SLASH,
@@ -28,7 +30,7 @@ const nmChars = Array.prototype
 
 const nmLength = nmChars.length
 
-function nodeModulePaths(from) {
+const nodeModulePaths = maskFunction(function (from) {
   // Electron and Muon patch `Module_nodeModulePaths()` to remove paths outside the app.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
@@ -87,6 +89,6 @@ function nodeModulePaths(from) {
   }
 
   return paths
-}
+}, RealModule._nodeModulePaths)
 
 export default nodeModulePaths

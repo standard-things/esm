@@ -9,6 +9,7 @@ import PACKAGE from "../../constant/package.js"
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
+import RealModule from "../../real/module.js"
 
 import _compile from "../internal/compile.js"
 import binding from "../../binding.js"
@@ -16,6 +17,7 @@ import { dirname } from "../../safe/path.js"
 import getCacheName from "../../util/get-cache-name.js"
 import getSilent from "../../util/get-silent.js"
 import makeRequireFunction from "../internal/make-require-function.js"
+import maskFunction from "../../util/mask-function.js"
 import realProcess from "../../real/process.js"
 import realVM from "../../real/vm.js"
 import shared from "../../shared.js"
@@ -34,6 +36,8 @@ const {
   MODE_STRICT
 } = PACKAGE
 
+const RealProto = RealModule.prototype
+
 const runInDebugContext = getSilent(realVM, "runInDebugContext")
 
 const useRunInDebugContext = typeof runInDebugContext === "function"
@@ -42,7 +46,7 @@ let resolvedArgv
 let useBufferArg
 let useRunInContext
 
-function compile(content, filename) {
+const compile = maskFunction(function (content, filename) {
   const entry = Entry.get(this)
   const { state } = entry
   const isInit = state === STATE_INITIAL
@@ -190,6 +194,6 @@ function compile(content, filename) {
   }
 
   return result
-}
+}, RealProto._compile)
 
 export default compile

@@ -3,11 +3,13 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import GenericArray from "../../generic/array.js"
+import RealModule from "../../real/module.js"
 
 import _resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import builtinLookup from "../../builtin-lookup.js"
+import maskFunction from "../../util/mask-function.js"
 
-function resolveLookupPaths(request, parent, newReturn) {
+const resolveLookupPaths = maskFunction(function (request, parent, newReturn) {
   if (builtinLookup.has(request)) {
     return newReturn ? null : GenericArray.of(request, GenericArray.of())
   }
@@ -15,6 +17,6 @@ function resolveLookupPaths(request, parent, newReturn) {
   const paths = _resolveLookupPaths(request, parent)
 
   return newReturn ? paths : GenericArray.of(request, paths)
-}
+}, RealModule._resolveLookupPaths)
 
 export default resolveLookupPaths

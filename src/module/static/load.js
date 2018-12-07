@@ -8,11 +8,13 @@ import PACKAGE from "../../constant/package.js"
 import Entry from "../../entry.js"
 import Loader from "../../loader.js"
 import Module from "../../module.js"
+import RealModule from "../../real/module.js"
 
 import _load from "../internal/load.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import loader from "../cjs/loader.js"
+import maskFunction from "../../util/mask-function.js"
 import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
 
@@ -29,7 +31,7 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-function load(request, parent, isMain) {
+const load = maskFunction(function (request, parent, isMain) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
 
@@ -67,7 +69,7 @@ function load(request, parent, isMain) {
   }
 
   return entry.module.exports
-}
+}, RealModule._load)
 
 function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
   const mod = entry.module

@@ -3,11 +3,13 @@
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
 import Module from "../../module.js"
+import RealModule from "../../real/module.js"
 
 import { cwd } from "../../safe/process.js"
 import isError from "../../util/is-error.js"
+import maskFunction from "../../util/mask-function.js"
 
-function preloadModules(requests) {
+const preloadModules = maskFunction(function (requests) {
   if (! Array.isArray(requests)) {
     return
   }
@@ -26,6 +28,6 @@ function preloadModules(requests) {
   for (const request of requests) {
     parent.require(request)
   }
-}
+}, RealModule._preloadModules)
 
 export default preloadModules

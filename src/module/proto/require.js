@@ -6,10 +6,12 @@ import ENTRY from "../../constant/entry.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
+import RealModule from "../../real/module.js"
 
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import isMJS from "../../path/is-mjs.js"
+import maskFunction from "../../util/mask-function.js"
 import validateString from "../../util/validate-string.js"
 
 const {
@@ -20,7 +22,9 @@ const {
   ERR_INVALID_ARG_VALUE
 } = errors
 
-const req = function require(request) {
+const RealProto = RealModule.prototype
+
+const req = maskFunction(function (request) {
   validateString(request, "request")
 
   if (request === "") {
@@ -35,6 +39,6 @@ const req = function require(request) {
   }
 
   return Module._load(request, this, false)
-}
+}, RealProto.require)
 
 export default req

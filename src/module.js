@@ -43,26 +43,25 @@ const Module = maskFunction(function (id, parent) {
 
 const _extensions = { __proto__: null }
 const { prototype } = Module
-const realProto = RealModule.prototype
 
 Module._extensions = _extensions
-Module._findPath = maskFunction(staticFindPath, RealModule._findPath)
-Module._initPaths = maskFunction(staticInitPaths, RealModule._initPaths)
-Module._load = maskFunction(staticLoad, RealModule._load)
-Module._nodeModulePaths = maskFunction(staticNodeModulePaths, RealModule._nodeModulePaths)
-Module._preloadModules = maskFunction(staticPreloadModules, RealModule._preloadModules)
-Module._resolveFilename = maskFunction(staticResolveFilename, RealModule._resolveFilename)
-Module._resolveLookupPaths = maskFunction(staticResolveLookupPaths, RealModule._resolveLookupPaths)
+Module._findPath = staticFindPath
+Module._initPaths = staticInitPaths
+Module._load = staticLoad
+Module._nodeModulePaths = staticNodeModulePaths
+Module._preloadModules = staticPreloadModules
+Module._resolveFilename = staticResolveFilename
+Module._resolveLookupPaths = staticResolveLookupPaths
 Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
-Module.createRequireFromPath = maskFunction(staticCreateRequireFromPath, RealModule.createRequireFromPath)
-Module.wrap = maskFunction(staticWrap, RealModule.wrap)
+Module.createRequireFromPath = staticCreateRequireFromPath
+Module.wrap = staticWrap
 Module.wrapper = staticWrapper
 
-prototype._compile = maskFunction(protoCompile, realProto._compile)
+prototype._compile = protoCompile
 prototype.constructor = Module
-prototype.load = maskFunction(protoLoad, realProto.load)
-prototype.require = maskFunction(req, realProto.require)
+prototype.load = protoLoad
+prototype.require = req
 
 // Initialize `Module._extensions` with only the enumerable string keyed
 // properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`
