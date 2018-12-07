@@ -301,20 +301,15 @@ function tryValidate(caller, entry, content) {
   moduleState.parsing = true
 
   let error
-  let threw = true
 
   try {
     esmValidate(entry)
-    threw = false
+    return
   } catch (e) {
     error = e
   }
 
   moduleState.parsing = false
-
-  if (! threw) {
-    return
-  }
 
   if (! Loader.state.package.default.options.debug &&
       ! isStackTraceMasked(error)) {

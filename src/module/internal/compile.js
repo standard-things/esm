@@ -151,7 +151,6 @@ function tryCompileCached(entry, filename) {
 
   let error
   let result
-  let threw = true
 
   try {
     const async = useAsync(entry)
@@ -191,13 +190,9 @@ function tryCompileCached(entry, filename) {
       entry.state = STATE_EXECUTION_COMPLETED
     }
 
-    threw = false
+    return result
   } catch (e) {
     error = e
-  }
-
-  if (! threw) {
-    return result
   }
 
   if (Loader.state.package.default.options.debug ||
@@ -255,7 +250,8 @@ function tryValidate(caller, entry, content, filename) {
   let error
 
   try {
-    return esmValidate(entry)
+    esmValidate(entry)
+    return
   } catch (e) {
     error = e
   }

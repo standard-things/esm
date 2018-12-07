@@ -7,6 +7,7 @@ import errors from "../../errors.js"
 import esmLoad from "./load.js"
 import esmParse from "./parse.js"
 import esmResolveFilename from "./resolve-filename.js"
+import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
 import { resolve } from "../../safe/path.js"
 import shared from "../../shared.js"
@@ -107,28 +108,31 @@ function getEntryFrom(request, exported) {
 function tryPhase(phase, request, parentEntry) {
   const { moduleState } = shared
 
-  let error
-  let childEntry = null
-  let threw = true
-
   moduleState.requireDepth += 1
 
+  let error
+
   try {
-    childEntry = phase(request, parentEntry.module)
-    threw = false
+    return phase(request, parentEntry.module)
   } catch (e) {
     error = e
   }
 
   moduleState.requireDepth -= 1
 
-  if (threw &&
-      (parentEntry.extname === ".mjs" ||
-       error.code !== "MODULE_NOT_FOUND")) {
+  if (parentEntry.extname === ".mjs" ||
+      ! isError(error)) {
     throw error
   }
 
-  return childEntry
+  const { code } = error
+
+  if (code !== "ERR_INVALID_PROTOCOL" &&
+      code !== "MODULE_NOT_FOUND") {
+    throw error
+  }
+
+  return null
 }
 
 function tryRequire(request, parentEntry) {
