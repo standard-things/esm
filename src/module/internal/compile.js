@@ -4,6 +4,7 @@ import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
 import Compiler from "../../caching-compiler.js"
+import Entry from "../../entry.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
@@ -145,6 +146,21 @@ function tryCompileCached(entry, filename) {
   const isESM = compileData.sourceType === SOURCE_TYPE_MODULE
   const mod = entry.module
 
+  const parentEntry = Entry.get(mod.parent)
+  const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
+  const parentIsMJS = parentEntry === null ? false : parentEntry.extname === ".mjs"
+  const parentPkg = parentEntry === null ? null : parentEntry.package
+  const parentPkgOptions = parentPkg === null ? null : parentPkg.options
+
+  if (! isESM &&
+      parentIsESM &&
+      (parentIsMJS ||
+       ! parentPkgOptions.cjs.cache)) {
+    mod.parent = void 0
+  }
+
+  const async = useAsync(entry)
+
   const cjsVars =
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
@@ -153,8 +169,6 @@ function tryCompileCached(entry, filename) {
   let result
 
   try {
-    const async = useAsync(entry)
-
     const source = compileSource(compileData, {
       async,
       cjsVars,
