@@ -3,8 +3,7 @@ import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
-import Compiler from "../../caching-compiler.js"
-import Entry from "../../entry.js"
+import CachingCompiler from "../../caching-compiler.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
@@ -73,7 +72,7 @@ function compile(caller, entry, content, filename, fallback) {
   let { compileData } = entry
 
   if (compileData === null) {
-    compileData = Compiler.from(entry)
+    compileData = CachingCompiler.from(entry)
 
     if (compileData === null ||
         compileData.changed) {
@@ -142,40 +141,26 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function tryCompileCached(entry, filename) {
+  const async = useAsync(entry)
   const { compileData } = entry
   const isESM = compileData.sourceType === SOURCE_TYPE_MODULE
   const mod = entry.module
-
-  const parentEntry = Entry.get(mod.parent)
-  const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
-  const parentIsMJS = parentEntry === null ? false : parentEntry.extname === ".mjs"
-  const parentPkg = parentEntry === null ? null : parentEntry.package
-  const parentPkgOptions = parentPkg === null ? null : parentPkg.options
-
-  if (! isESM &&
-      parentIsESM &&
-      (parentIsMJS ||
-       ! parentPkgOptions.cjs.cache)) {
-    mod.parent = void 0
-  }
-
-  const async = useAsync(entry)
 
   const cjsVars =
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
+  const source = compileSource(compileData, {
+    async,
+    cjsVars,
+    runtimeName: entry.runtimeName,
+    sourceMap: useSourceMap(entry)
+  })
+
   let error
   let result
 
   try {
-    const source = compileSource(compileData, {
-      async,
-      cjsVars,
-      runtimeName: entry.runtimeName,
-      sourceMap: useSourceMap(entry)
-    })
-
     if (isESM ||
         compileData.changed) {
       const runtime = Runtime.enable(entry, GenericObject.create())
@@ -241,7 +226,7 @@ function tryCompileCode(caller, content, options) {
   let error
 
   try {
-    return Compiler.compile(content, options)
+    return CachingCompiler.compile(content, options)
   } catch (e) {
     error = e
   }

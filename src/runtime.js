@@ -1,6 +1,6 @@
 import ENTRY from "./constant/entry.js"
 
-import Compiler from "./caching-compiler.js"
+import CachingCompiler from "./caching-compiler.js"
 import Entry from "./entry.js"
 
 import builtinGlobal from "./builtin/global.js"
@@ -111,6 +111,9 @@ const Runtime = {
     return value
   },
   compileEval(content) {
+    // Section 18.2.1.1: PerformEval()
+    // Setp 2: Only evaluate strings.
+    // https://tc39.github.io/ecma262/#sec-performeval
     if (typeof content !== "string") {
       return content
     }
@@ -119,15 +122,14 @@ const Runtime = {
     const pkg = entry.package
     const { cjs } = pkg.options
 
-    // Section 18.2.1.1: PerformEval()
-    // Setp 2: Only evaluate strings.
-    // https://tc39.github.io/ecma262/#sec-performeval
-    return Compiler.compile(content, {
+    const compileData = CachingCompiler.compile(content, {
       cjsVars: cjs.vars,
       eval: true,
       runtimeName: entry.runtimeName,
       topLevelReturn: cjs.topLevelReturn
-    }).code
+    })
+
+    return compileData.code
   },
   compileGlobalEval(content) {
     if (typeof content !== "string") {
@@ -139,7 +141,7 @@ const Runtime = {
     const { cjs } = pkg.options
     const { runtimeName } = entry
 
-    const compileData = Compiler.compile(content, {
+    const compileData = CachingCompiler.compile(content, {
       cjsVars: cjs.vars,
       eval: true,
       runtimeName,

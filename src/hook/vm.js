@@ -2,7 +2,7 @@ import COMPILER from "../constant/compiler.js"
 import ENTRY from "../constant/entry.js"
 import ENV from "../constant/env.js"
 
-import Compiler from "../caching-compiler.js"
+import CachingCompiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
@@ -78,7 +78,7 @@ function hook(vm) {
       : null
 
     if (compileData === null) {
-      compileData = tryWrapper(Compiler.compile, [
+      compileData = tryWrapper(CachingCompiler.compile, [
         content,
         {
           cjsVars: true,
