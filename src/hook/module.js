@@ -3,7 +3,6 @@ import ENV from "../constant/env.js"
 import ESM from "../constant/esm.js"
 import PACKAGE from "../constant/package.js"
 
-import Compiler from "../caching-compiler.js"
 import Entry from "../entry.js"
 import Loader from "../loader.js"
 import Module from "../module.js"
@@ -12,14 +11,10 @@ import RealModule from "../real/module.js"
 import Wrapper from "../wrapper.js"
 
 import compile from "../module/internal/compile.js"
-import encodeId from "../util/encode-id.js"
 import errors from "../errors.js"
 import esmLoad from "../module/esm/load.js"
 import get from "../util/get.js"
-import getCacheName from "../util/get-cache-name.js"
-import getCacheStateHash from "../util/get-cache-state-hash.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
-import getMtime from "../fs/get-mtime.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
 import isObjectLike from "../util/is-object-like.js"
@@ -30,7 +25,6 @@ import readFile from "../fs/read-file.js"
 import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
-import { sep } from "../safe/path.js"
 import set from "../util/set.js"
 import setGetter from "../util/set-getter.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
@@ -126,7 +120,6 @@ function hook(Mod, parent) {
       return
     }
 
-    const { cache, cachePath } = pkg
     const { _compile } = mod
 
     const compileWrapper = (content, filename) => {
@@ -141,37 +134,6 @@ function hook(Mod, parent) {
       return compile(manager, entry, content, filename, compileFallback)
     }
 
-    let { cacheName, mtime } = entry
-
-    if (mtime === -1) {
-      mtime =
-      entry.mtime = getMtime(filename)
-    }
-
-    if (cacheName === null) {
-      cacheName = getCacheName(mtime, {
-        cachePath,
-        filename,
-        packageOptions: pkg.options
-      })
-    }
-
-    entry.cacheName = cacheName
-    entry.runtimeName = encodeId("_" + getCacheStateHash(cacheName).slice(0, 3))
-
-    let { compileData } = entry
-
-    if (compileData === null &&
-        cache.compile[cacheName] === null) {
-      compileData = Compiler.from(entry)
-
-      if (compileData === null) {
-        Reflect.deleteProperty(cache.compile, cacheName)
-      } else {
-        compileData.code = readFile(cachePath + sep + cacheName, "utf8") || ""
-      }
-    }
-
     if (shouldOverwrite) {
       mod._compile = compileWrapper
       setPrototypeOf(mod, Module.prototype)
@@ -181,6 +143,8 @@ function hook(Mod, parent) {
         value: compileWrapper
       })
     }
+
+    const { compileData } = entry
 
     if (compileData === null &&
         passthruMap.get(func)) {

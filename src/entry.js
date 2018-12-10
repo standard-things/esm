@@ -1,16 +1,22 @@
-import { basename, extname } from "./safe/path.js"
+import { basename, extname, sep } from "./safe/path.js"
 
+import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
 
+import CachingCompiler from "./caching-compiler.js"
 import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
 import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import copyProperty from "./util/copy-property.js"
+import encodeId from "./util/encode-id.js"
 import errors from "./errors.js"
+import getCacheName from "./util/get-cache-name.js"
+import getCacheStateHash from "./util/get-cache-state-hash.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleName from "./util/get-module-name.js"
+import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
@@ -25,6 +31,7 @@ import keys from "./util/keys.js"
 import noop from "./util/noop.js"
 import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
+import readFile from "./fs/read-file.js"
 import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
@@ -48,6 +55,10 @@ const {
   UPDATE_TYPE_INIT,
   UPDATE_TYPE_LIVE
 } = ENTRY
+
+const {
+  SOURCE_TYPE_MODULE
+} = COMPILER
 
 const {
   ERR_EXPORT_MISSING,
@@ -82,14 +93,10 @@ class Entry {
     this.basename = null
     // The builtin module indicator.
     this.builtin = false
-    // The cache name of the module.
-    this.cacheName = null
     // The child entries of the module.
     this.children = { __proto__: null }
     // The circular import indicator.
     this.circular = false
-    // The source compilation data of the module.
-    this.compileData = null
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
     // The mutable namespace object CJS importers receive.
@@ -116,24 +123,72 @@ class Entry {
     this.importedBindings = { __proto__: null }
     // The module the entry is managing.
     this.module = mod
-    // The mtime of the module.
-    this.mtime = -1
     // The name of the module.
     this.name = null
     // The package data of the module.
     this.package = Package.from(mod)
     // The `module.parent` entry.
     this.parent = null
-    // The name of the runtime identifier.
-    this.runtimeName = null
     // Setters for assigning to local variables in parent modules.
     this.setters = { __proto__: null }
     // Initialize empty namespace setter so they're merged properly.
     this.setters["*"] = []
     // The state of the module.
     this.state = STATE_INITIAL
+
+    // The cache name of the module.
+    setDeferred(this, "cacheName", () => {
+      const pkg = this.package
+
+      return getCacheName(this.mtime, {
+        cachePath: pkg.cachePath,
+        filename: this.filename,
+        packageOptions: pkg.options
+      })
+    })
+
+    // The source compilation data of the module.
+    setDeferred(this, "compileData", () => {
+      const { cacheName } = this
+      const { cache, cachePath } = this.package
+      const compileDatas = cache.compile
+
+      if (compileDatas[cacheName] !== null) {
+        return null
+      }
+
+      const result = CachingCompiler.from(this)
+
+      if (result === null) {
+        Reflect.deleteProperty(compileDatas, cacheName)
+      } else {
+        result.code = readFile(cachePath + sep + cacheName, "utf8") || ""
+      }
+
+      return result
+    })
+
+    // The mtime of the module.
+    setDeferred(this, "mtime", () => {
+      return getMtime(this.filename)
+    })
+
+    // The name of the runtime identifier.
+    setDeferred(this, "runtimeName", () => {
+      return encodeId("_" + getCacheStateHash(this.cacheName).slice(0, 3))
+    })
+
     // The entry type of the module.
-    this.type = TYPE_CJS
+    setDeferred(this, "type", () => {
+      const { compileData } = this
+
+      if (compileData !== null &&
+          compileData.sourceType === SOURCE_TYPE_MODULE) {
+        return TYPE_ESM
+      }
+
+      return TYPE_CJS
+    })
 
     this.updateFilename(true)
   }
