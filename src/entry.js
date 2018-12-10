@@ -151,16 +151,10 @@ class Entry {
     setDeferred(this, "compileData", () => {
       const { cacheName } = this
       const { cache, cachePath } = this.package
-      const compileDatas = cache.compile
-
-      if (compileDatas[cacheName] !== null) {
-        return null
-      }
-
       const compileData = CachingCompiler.from(this)
 
       if (compileData === null) {
-        Reflect.deleteProperty(compileDatas, cacheName)
+        Reflect.deleteProperty(cache.compile, cacheName)
       } else if (compileData.changed) {
         const content = readFile(cachePath + sep + cacheName, "utf8")
 

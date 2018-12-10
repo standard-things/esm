@@ -33,7 +33,6 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -95,17 +94,20 @@ function compile(caller, entry, content, filename, fallback) {
         topLevelReturn: cjs.topLevelReturn
       })
 
-      entry.type = compileData.sourceType === SOURCE_TYPE_MODULE
-        ? TYPE_ESM
-        : TYPE_CJS
-
       compileData.scriptData = scriptData
+
+      if (compileData.sourceType === SOURCE_TYPE_MODULE) {
+        entry.type = TYPE_ESM
+      }
 
       entry.compileData =
       pkg.cache.compile[cacheName] = compileData
-    } else {
-      compileData.code = content
     }
+  }
+
+  if (compileData !== null &&
+      compileData.code === null) {
+    compileData.code = content
   }
 
   if (parsing) {
