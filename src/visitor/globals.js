@@ -28,7 +28,7 @@ function init() {
         this.runtimeName = options.runtimeName
       }
 
-      if (this.globals == null) {
+      if (this.globals === null) {
         this.globals = assign({ __proto__: null }, defaultGlobals)
       }
     }
