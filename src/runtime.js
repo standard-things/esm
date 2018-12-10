@@ -312,7 +312,9 @@ function createSetter(type, setter) {
 
 function runCJS(entry, moduleWrapper) {
   const mod = entry.module
-  const exported = mod.exports = entry.exports
+  const exported = entry.exports
+
+  mod.exports = exported
 
   return Reflect.apply(moduleWrapper, exported, [
     exported,
@@ -322,7 +324,9 @@ function runCJS(entry, moduleWrapper) {
 
 function runESM(entry, moduleWrapper) {
   const mod = entry.module
-  const exported = mod.exports = entry.exports
+  const exported = entry.exports
+
+  mod.exports = exported
 
   Reflect.defineProperty(mod, "loaded", {
     configurable: true,
