@@ -27,9 +27,9 @@ function load(filename, parent, isMain, cache, loader) {
   let mod = cache[filename]
 
   if (mod !== void 0) {
-    const children = parent && parent.children
+    const children = parent != null && parent.children
 
-    if (children &&
+    if (Array.isArray(children) &&
         GenericArray.indexOf(children, mod) === -1) {
       GenericArray.push(children, mod)
     }

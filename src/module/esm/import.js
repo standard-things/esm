@@ -162,7 +162,7 @@ function tryResolveFilename(request, parent) {
   } catch {}
 
   if (isPath(request)) {
-    const parentFilename = parent && parent.filename
+    const parentFilename = parent != null && parent.filename
 
     return typeof parentFilename === "string"
       ? resolve(parentFilename, request)
