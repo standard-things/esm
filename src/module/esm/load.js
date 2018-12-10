@@ -64,27 +64,28 @@ function load(request, parent, isMain) {
   } else if (parsing) {
     cache = scratchCache
   } else if (Reflect.has(scratchCache, request)) {
-    const child = scratchCache[request]
+    const mod = scratchCache[request]
 
     if (isUnexposed &&
-        Entry.get(child).type === TYPE_ESM) {
+        Entry.get(mod).type === TYPE_ESM) {
       cache = moduleCache
     }
 
-    cache[request] = child
+    cache[request] = mod
     Reflect.deleteProperty(scratchCache, request)
   }
 
   return _load(request, parent, isMain, cache, (entry) => {
-    const child = entry.module
+    const mod = entry.module
 
-    cache[request] = child
+    cache[request] = mod
 
     if (parentEntry !== null) {
       parentEntry.children[entry.name] = entry
     }
 
-    if (! parsing) {
+    if (! parsing ||
+        entry.compileData !== null) {
       const isESM = entry.type === TYPE_ESM
 
       if (! isESM) {
@@ -100,7 +101,7 @@ function load(request, parent, isMain) {
           parentIsESM &&
           (parentIsMJS ||
            ! parentPkgOptions.cjs.cache)) {
-        child.parent = void 0
+        mod.parent = void 0
       }
     }
 

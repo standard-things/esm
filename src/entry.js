@@ -344,10 +344,10 @@ class Entry {
     return this.addGetter(exportedName, otherGetter)
   }
 
-  addSetter(name, localNames, setter, parent) {
+  addSetter(name, localNames, setter, parentEntry) {
     setter.last = void 0
     setter.localNames = localNames
-    setter.parent = parent
+    setter.parent = parentEntry
 
     if (! has(setter, "type")) {
       setter.type = SETTER_TYPE_STATIC_IMPORT
@@ -372,9 +372,9 @@ class Entry {
     return this
   }
 
-  addSetters(argsList, parent) {
+  addSetters(argsList, parentEntry) {
     for (const [name, localNames, setter] of argsList) {
-      this.addSetter(name, localNames, setter, parent)
+      this.addSetter(name, localNames, setter, parentEntry)
     }
 
     return this

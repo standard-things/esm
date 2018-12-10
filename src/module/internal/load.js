@@ -24,39 +24,39 @@ function load(filename, parent, isMain, cache, loader) {
   const { parsing } = shared.moduleState
 
   let entry
-  let child = cache[filename]
+  let mod = cache[filename]
 
-  if (child !== void 0) {
+  if (mod !== void 0) {
     const children = parent && parent.children
 
     if (children &&
-        GenericArray.indexOf(children, child) === -1) {
-      GenericArray.push(children, child)
+        GenericArray.indexOf(children, mod) === -1) {
+      GenericArray.push(children, mod)
     }
 
-    entry = Entry.get(child)
+    entry = Entry.get(mod)
 
     if (parsing ||
-        child.loaded ||
+        mod.loaded ||
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
   } else if (Reflect.has(builtinEntries, filename)) {
     return builtinEntries[filename]
   } else {
-    child = new Module(filename, parent)
+    mod = new Module(filename, parent)
 
-    child.filename = isFileOrigin(filename)
+    mod.filename = isFileOrigin(filename)
       ? getFilePathfromURL(filename)
       : filename
 
     if (isMain) {
       Loader.state.module.mainModule =
-      realProcess.mainModule = child
-      child.id = "."
+      realProcess.mainModule = mod
+      mod.id = "."
     }
 
-    entry = Entry.get(child)
+    entry = Entry.get(mod)
     entry.id = filename
     entry.parent = Entry.get(parent)
   }
@@ -65,17 +65,17 @@ function load(filename, parent, isMain, cache, loader) {
     ? STATE_PARSING_STARTED
     : STATE_PARSING_COMPLETED
 
-  const { _compile } = child
+  const { _compile } = mod
 
-  child._compile = (content, filename) => {
-    Reflect.deleteProperty(child, "_compile")
+  mod._compile = (content, filename) => {
+    Reflect.deleteProperty(mod, "_compile")
 
     const symbol = shared.symbol._compile
-    const func = typeof child[symbol] === "function"
-      ? child[symbol]
+    const func = typeof mod[symbol] === "function"
+      ? mod[symbol]
       : _compile
 
-    return Reflect.apply(func, child, [content, filename])
+    return Reflect.apply(func, mod, [content, filename])
   }
 
   loader(entry)

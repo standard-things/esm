@@ -188,12 +188,14 @@ const Runtime = {
             request = request + ""
           }
 
-          esmImport(this.entry, request, [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
+          const setterArgsList = [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
               resolvePromise(value)
               return true
             }
-          })]], true)
+          })]]
+
+          esmImport(request, this.entry, setterArgsList, true)
         } catch (e) {
           rejectPromise(toExternalError(e))
         }
@@ -265,7 +267,7 @@ const Runtime = {
     return evalIndirect(this.compileGlobalEval(content))
   },
   import(request, setterArgsList) {
-    return esmImport(this.entry, request, setterArgsList)
+    return esmImport(request, this.entry, setterArgsList)
   },
   initBindings(names) {
     this.entry.updateBindings(names, UPDATE_TYPE_INIT)
