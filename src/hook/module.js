@@ -146,11 +146,15 @@ function hook(Mod, parent) {
 
     const { compileData } = entry
 
-    if (compileData === null &&
+    const isCached =
+      compileData !== null &&
+      compileData.changed
+
+    if (! isCached &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {
-      const content = compileData
+      const content = isCached
         ? compileData.code
         : readFile(filename, "utf8")
 

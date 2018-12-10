@@ -157,15 +157,17 @@ class Entry {
         return null
       }
 
-      const result = CachingCompiler.from(this)
+      const compileData = CachingCompiler.from(this)
 
-      if (result === null) {
+      if (compileData === null) {
         Reflect.deleteProperty(compileDatas, cacheName)
-      } else {
-        result.code = readFile(cachePath + sep + cacheName, "utf8") || ""
+      } else if (compileData.changed) {
+        const content = readFile(cachePath + sep + cacheName, "utf8")
+
+        compileData.code = content === null ? "" : content
       }
 
-      return result
+      return compileData
     })
 
     // The mtime of the module.

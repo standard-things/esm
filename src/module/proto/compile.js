@@ -79,7 +79,11 @@ const compile = maskFunction(function (content, filename) {
   let cachedData
 
   if (compileData !== null) {
-    cachedData = compileData.scriptData || void 0
+    const { scriptData } = compileData
+
+    if (scriptData !== null) {
+      cachedData = scriptData
+    }
   }
 
   let scriptOptions
