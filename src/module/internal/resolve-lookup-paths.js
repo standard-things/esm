@@ -23,12 +23,12 @@ const {
 
 let availableModulesPath
 
-function resolveLookupPaths(request, parent, skipGlobalPaths) {
-  const parentFilename = parent != null && parent.filename
+function resolveLookupPaths(request, parent = null, skipGlobalPaths) {
+  const parentFilename = parent !== null && parent.filename
 
   // Look outside if not a relative path.
   if (! isRelative(request)) {
-    const parentPaths = parent != null && parent.paths
+    const parentPaths = parent !== null && parent.paths
 
     const paths = parentPaths
       ? GenericArray.from(parentPaths)

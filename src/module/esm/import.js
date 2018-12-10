@@ -152,7 +152,7 @@ function tryRequire(request, parentEntry) {
   return exported
 }
 
-function tryResolveFilename(request, parent) {
+function tryResolveFilename(request, parent = null) {
   try {
     return esmResolveFilename(request, parent)
   } catch {}
@@ -162,7 +162,7 @@ function tryResolveFilename(request, parent) {
   } catch {}
 
   if (isPath(request)) {
-    const parentFilename = parent != null && parent.filename
+    const parentFilename = parent !== null && parent.filename
 
     return typeof parentFilename === "string"
       ? resolve(parentFilename, request)
