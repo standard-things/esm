@@ -47,12 +47,9 @@ const resolveFilename = maskFunction(function (request, parent, isMain, options)
 
   let fromPath
 
-  if (parentEntry !== null) {
-    parentEntry.updateFilename()
-  }
-
   if (parentEntry !== null &&
       ! isAbs) {
+    parentEntry.updateFilename()
     fromPath = parentEntry.dirname
   } else {
     fromPath = ""
