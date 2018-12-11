@@ -29,13 +29,13 @@ function init() {
     let match = headerRegExp.exec(stack)
 
     if (match !== null) {
-      const [, filename, lineNum] = match
+      const [, filename, lineNumber] = match
 
       if (isFilename(filename)) {
         return {
           column: 0,
           filename,
-          line: lineNum
+          line: lineNumber
         }
       }
     }
@@ -46,7 +46,7 @@ function init() {
       const [
         ,
         filename,
-        lineNum,
+        lineNumber,
         column
       ] = match
 
@@ -54,7 +54,7 @@ function init() {
         return {
           column,
           filename,
-          line: lineNum
+          line: lineNumber
         }
       }
     }

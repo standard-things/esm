@@ -32,7 +32,7 @@ function init() {
     }
 
     let column
-    let lineNum
+    let lineNumber
 
     let {
       content,
@@ -44,7 +44,7 @@ function init() {
 
     if (fromParser) {
       column = error.column
-      lineNum = error.line
+      lineNumber = error.line
 
       if (inModule === void 0) {
         inModule = error.inModule
@@ -92,7 +92,7 @@ function init() {
         let masked = stack.replace(oldString, newString)
 
         masked = fromParser
-          ? maskParserStack(masked, name, message, lineNum, column, content, filename)
+          ? maskParserStack(masked, name, message, lineNumber, column, content, filename)
           : maskEngineStack(masked, content, filename)
 
         const scrubber = inModule
@@ -123,13 +123,13 @@ function init() {
     }
 
     const header = match[0]
-    const lineNum = +match[2]
+    const lineNumber = +match[2]
 
     let contentLines
     let contentLine
 
     if (typeof content === "string") {
-      const lineIndex = lineNum - 1
+      const lineIndex = lineNumber - 1
 
       contentLines = content.split("\n")
 
@@ -150,7 +150,7 @@ function init() {
         return ""
       }
 
-      if (lineNum === 1) {
+      if (lineNumber === 1) {
         const wrapper = getSilent(Module, "wrapper")
 
         if (Array.isArray(wrapper)) {
@@ -198,16 +198,16 @@ function init() {
   //
   // <type>: <message>
   //   ...
-  function maskParserStack(stack, name, message, lineNum, column, content, filename) {
+  function maskParserStack(stack, name, message, lineNumber, column, content, filename) {
     const spliceArgs = [0, 1]
 
     if (typeof filename === "string") {
-      spliceArgs.push(filename + ":" + lineNum)
+      spliceArgs.push(filename + ":" + lineNumber)
     }
 
     if (typeof content === "string") {
       const contentLines = content.split("\n")
-      const lineIndex = lineNum - 1
+      const lineIndex = lineNumber - 1
 
       if (lineIndex < contentLines.length) {
         let decoratorArrow = "^"
@@ -246,8 +246,8 @@ function init() {
     return prefix + getModuleURL(name)
   }
 
-  function replaceHeader(match, name, lineNum) {
-    return getModuleURL(name) + ":" + lineNum
+  function replaceHeader(match, name, lineNumber) {
+    return getModuleURL(name) + ":" + lineNumber
   }
 
   function tryErrorToString(error) {
