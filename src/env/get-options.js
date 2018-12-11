@@ -24,8 +24,8 @@ function init() {
     let options = ESM_OPTIONS.trim()
 
     if (isPath(options)) {
-      options = readFile(resolve(options), "utf8") || ""
-      options = options.trim()
+      options = readFile(resolve(options), "utf8")
+      options = options === null ? "" : options.trim()
     }
 
     if (options === "") {

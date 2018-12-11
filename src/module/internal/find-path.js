@@ -240,9 +240,10 @@ function tryFilename(filename, isMain) {
 }
 
 function tryPackage(dirPath, fields, exts, isMain) {
-  const json = readPackage(dirPath, fields) || ""
+  const json = readPackage(dirPath, fields)
 
-  if (json === "") {
+  if (json === null ||
+      json === "") {
     return json
   }
 

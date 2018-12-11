@@ -27,18 +27,19 @@ function init() {
     }
 
     const jsonPath = dirPath + sep + "package.json"
-    const jsonString = readFile(jsonPath, "utf8") || ""
+    const jsonContent = readFile(jsonPath, "utf8")
 
-    if (jsonString === "" ||
+    if (jsonContent === null ||
+        jsonContent === "" ||
         (fieldsLength === 1 &&
-        fields[0] === "main" &&
-        ! mainFieldRegExp.test(jsonString))) {
+         fields[0] === "main" &&
+         ! mainFieldRegExp.test(jsonContent))) {
       return null
     }
 
     try {
       cached =
-        SafeJSON.parse(jsonString) ||
+        SafeJSON.parse(jsonContent) ||
         GenericObject.create()
     } catch (e) {
       e.path = jsonPath

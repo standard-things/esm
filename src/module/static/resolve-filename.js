@@ -92,7 +92,11 @@ const resolveFilename = maskFunction(function (request, parent, isMain, options)
     paths = Module._resolveLookupPaths(request, parent, true)
   }
 
-  const foundPath = Module._findPath(request, paths, isMain) || ""
+  let foundPath = Module._findPath(request, paths, isMain)
+
+  if (foundPath === false) {
+    foundPath = ""
+  }
 
   if (foundPath !== "") {
     if (cacheKey !== void 0) {

@@ -129,8 +129,16 @@ function init() {
     let contentLine
 
     if (typeof content === "string") {
+      const lineIndex = lineNum - 1
+
       contentLines = content.split("\n")
-      contentLine = contentLines[lineNum - 1] || ""
+
+      if (lineIndex > -1 &&
+          lineIndex < contentLines.length) {
+        contentLine = contentLines[lineIndex]
+      } else {
+        contentLine = ""
+      }
     }
 
     let arrowFound = false
