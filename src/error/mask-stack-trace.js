@@ -78,17 +78,6 @@ function init() {
         const name = toString(get(this, "name"))
         const newString = tryErrorToString(this)
 
-        if (typeof content !== "string" &&
-            typeof filename === "string" &&
-            extname(filename) !== ".wasm") {
-          content = readFile(filename, "utf8")
-        }
-
-        if (typeof content !== "string" ||
-            content.startsWith(MAGIC_COOKIE)) {
-          content = null
-        }
-
         let masked = stack.replace(oldString, newString)
 
         masked = fromParser
@@ -123,21 +112,31 @@ function init() {
     }
 
     const header = match[0]
+    const scriptFilename = match[1]
     const lineNumber = +match[2]
+    const useDecoratorLine = scriptFilename !== filename
 
     let contentLines
     let contentLine
 
-    if (typeof content === "string") {
-      const lineIndex = lineNumber - 1
+    if (! useDecoratorLine) {
+      if (typeof content !== "string" &&
+          extname(filename) !== ".wasm") {
+        content = readFile(filename, "utf8")
+      }
 
-      contentLines = content.split("\n")
+      if (typeof content === "string" &&
+          ! content.startsWith(MAGIC_COOKIE)) {
+        const lineIndex = lineNumber - 1
 
-      if (lineIndex > -1 &&
-          lineIndex < contentLines.length) {
-        contentLine = contentLines[lineIndex]
-      } else {
-        contentLine = ""
+        contentLines = content.split("\n")
+
+        if (lineIndex > -1 &&
+            lineIndex < contentLines.length) {
+          contentLine = contentLines[lineIndex]
+        } else {
+          contentLine = ""
+        }
       }
     }
 
@@ -145,6 +144,10 @@ function init() {
 
     stack = stack.replace(arrowRegExp, (match, decoratorLine, decoratorArrow, decoratorNewline = "") => {
       arrowFound = true
+
+      if (useDecoratorLine) {
+        contentLine = decoratorLine
+      }
 
       if (typeof contentLine !== "string") {
         return ""
@@ -188,12 +191,12 @@ function init() {
     return stack
   }
 
-  // Transform parser stack contentLines from:
-  // <type>: <message> (<contentLine>:<column>)
+  // Transform parser stack trace from:
+  // <type>: <message> (<lineNumber>:<column>)
   //   ...
   // to:
-  // path/to/file.js:<contentLine>
-  // <contentLine of code, from the original source, where the error occurred>
+  // path/to/file.js:<lineNumber>
+  // <line of code, from the original source, where the error occurred>
   // <column indicator arrow>
   //
   // <type>: <message>
@@ -203,6 +206,10 @@ function init() {
 
     if (typeof filename === "string") {
       spliceArgs.push(filename + ":" + lineNumber)
+
+      if (typeof content !== "string") {
+        content = readFile(filename, "utf8")
+      }
     }
 
     if (typeof content === "string") {
@@ -246,8 +253,8 @@ function init() {
     return prefix + getModuleURL(name)
   }
 
-  function replaceHeader(match, name, lineNumber) {
-    return getModuleURL(name) + ":" + lineNumber
+  function replaceHeader(match, filename, lineNumber) {
+    return getModuleURL(filename) + ":" + lineNumber
   }
 
   function tryErrorToString(error) {
