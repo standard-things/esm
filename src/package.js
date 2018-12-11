@@ -237,7 +237,9 @@ class Package {
       }))
     }
 
-    return getInfo(dirPath, forceOptions) || pkgState.default
+    const result = getInfo(dirPath, forceOptions)
+
+    return result === null ? pkgState.default : result
   }
 
   static from(request, forceOptions) {

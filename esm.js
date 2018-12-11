@@ -10,11 +10,11 @@ const globalThis = (function () {
 
 const {
   apply,
-  defineProperty,
-  has
+  defineProperty
 } = Reflect
 
 const { freeze } = Object
+const { hasOwnProperty } = Object.prototype
 const { type, versions } = process
 
 const {
@@ -58,11 +58,22 @@ if (typeof jest === "object" && jest !== null &&
 }
 
 function getNativeSource(thePath) {
+  let source
+
   try {
-    return require("internal/bootstrap/loaders").NativeModule._source[thePath] || ""
+    const { _source } = require("internal/bootstrap/loaders").NativeModule
+
+    if (has(_source, thePath)) {
+      source = _source[thePath]
+    }
   } catch (e) {}
 
-  return ""
+  return typeof source === "string" ? source : ""
+}
+
+function has(object, name) {
+  return object != null &&
+    apply(hasOwnProperty, object, [name])
 }
 
 function loadESM() {
@@ -189,8 +200,16 @@ if (nativeContent !== "") {
   }
 } else {
   cachePath = __dirname + sep + "node_modules" + sep + ".cache" + sep + "esm"
-  cachedData = readFile(cachePath + sep + ".data.blob") || void 0
-  content = readFile(__dirname + sep + "esm" + sep + "loader.js", "utf8") || ""
+  cachedData = readFile(cachePath + sep + ".data.blob")
+  content = readFile(__dirname + sep + "esm" + sep + "loader.js", "utf8")
+
+  if (cachedData === null) {
+    cachedData = void 0
+  }
+
+  if (content === null) {
+    content = ""
+  }
 
   scriptOptions = {
     __proto__: null,
@@ -233,7 +252,7 @@ shared = loadESM()
 if (cachePath !== "") {
   const { dir } = shared.package
 
-  if (! Reflect.has(dir, cachePath)) {
+  if (! has(dir, cachePath)) {
     dir[cachePath] = {
       buffer: cachedData,
       compile: {
