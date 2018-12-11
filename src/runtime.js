@@ -84,21 +84,18 @@ const Runtime = {
           continue
         }
 
-        if (! Reflect.has(getters, name)) {
-          entry.addGetterFrom(childEntry, name)
+        entry.addGetterFrom(childEntry, name)
 
-          if (isESM ||
-              ! Reflect.has(getters, name) ||
-              ! Reflect.has(otherGetters, name)) {
-            continue
-          }
+        if (! Reflect.has(getters, name) ||
+            ! Reflect.has(otherGetters, name)) {
+          continue
+        }
 
-          const ownerName = getters[name].owner.name
+        const ownerName = getters[name].owner.name
 
-          if (ownerName !== entry.name &&
-              ownerName !== otherGetters[name].owner.name) {
-            entry.addGetter(name, () => ERROR_STAR)
-          }
+        if (ownerName !== entry.name &&
+            ownerName !== otherGetters[name].owner.name) {
+          entry.addGetter(name, () => ERROR_STAR)
         }
       }
     })
