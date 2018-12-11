@@ -7,13 +7,16 @@ import assign from "./assign.js"
 import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
+import isError from "./is-error.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isModuleNamespaceObjectLike from "./is-module-namespace-object-like.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
+import isStackTraceMasked from "./is-stack-trace-masked.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
+import maskStackTrace from "../error/mask-stack-trace.js"
 import ownPropertyNames from "./own-property-names.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
@@ -54,6 +57,7 @@ function init() {
       options.depth = depth
     }
 
+    args[0] = prepareValue(value)
     args[1] = options
 
     const result = Reflect.apply(safeInspect, this, args)
@@ -123,6 +127,15 @@ function init() {
        isModuleNamespaceObjectLike(value))
   }
 
+  function prepareValue(value) {
+    if (isError(value) &&
+        ! isStackTraceMasked(value)) {
+      maskStackTrace(value)
+    }
+
+    return value
+  }
+
   function toInspectable(value, options) {
     return {
       [shared.customInspectKey]: (recurseTimes) => {
@@ -138,6 +151,9 @@ function init() {
     if (! isWrappable(object)) {
       return object
     }
+
+    const objectIsProxy = isProxy(object)
+    const objectIsOwnProxy = isOwnProxy(object)
 
     let inspecting = false
 
@@ -161,8 +177,6 @@ function init() {
           if (name === "toString" &&
               typeof value === "function") {
             newValue = GenericFunction.bind(value, object)
-          } else {
-            return value
           }
         } else {
           newValue = (...args) => {
@@ -186,8 +200,8 @@ function init() {
               }
 
               if (! showProxy ||
-                  ! isProxy(object) ||
-                  isOwnProxy(object)) {
+                  ! objectIsProxy ||
+                  objectIsOwnProxy) {
                 if (typeof value !== "function") {
                   contextAsOptions.customInspect = true
                 }
@@ -208,7 +222,7 @@ function init() {
           return newValue
         }
 
-        return value
+        return prepareValue(value)
       },
       getOwnPropertyDescriptor(object, name) {
         const descriptor = Reflect.getOwnPropertyDescriptor(object, name)
