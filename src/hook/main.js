@@ -13,7 +13,7 @@ import relaxRange from "../util/relax-range.js"
 function hook(Mod) {
   function managerWrapper(manager, func, args) {
     const [, mainPath] = realProcess.argv
-    const filename = tryResolveFilename(mainPath)
+    const filename = tryResolveFilename(mainPath, null, true)
     const pkg = Package.from(filename)
     const wrapped = Wrapper.find(Mod, "runMain", relaxRange(pkg.range))
 
@@ -24,7 +24,7 @@ function hook(Mod) {
 
   function methodWrapper() {
     const [, mainPath] = realProcess.argv
-    const filename = tryResolveFilename(mainPath)
+    const filename = tryResolveFilename(mainPath, null, true)
     const defaultPkg = Loader.state.package.default
     const dirPath = dirname(filename)
 
@@ -46,17 +46,17 @@ function hook(Mod) {
     }
   }
 
-  function tryResolveFilename(request) {
+  function tryResolveFilename(request, parent, isMain) {
     let error
 
     try {
-      return esmResolveFilename(request, null, true)
+      return esmResolveFilename(request, parent, isMain)
     } catch (e) {
       error = e
     }
 
     try {
-      return Module._resolveFilename(request, null, true)
+      return Module._resolveFilename(request, parent, isMain)
     } catch {}
 
     throw error

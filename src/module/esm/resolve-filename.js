@@ -181,7 +181,7 @@ function resolveFilename(request, parent, isMain, options) {
     throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
   }
 
-  foundPath = Module._resolveFilename(request, parent, isMain, options) || ""
+  foundPath = tryLegacyResolveFilename(request, parent, isMain, options)
 
   if (foundPath !== "") {
     if (cjsPaths) {
@@ -225,6 +225,14 @@ function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {
   }
 
   return paths
+}
+
+function tryLegacyResolveFilename(request, parent, isMain, options) {
+  try {
+    return Module._resolveFilename(request, parent, isMain, options)
+  } catch {}
+
+  return ""
 }
 
 export default resolveFilename

@@ -57,7 +57,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic) {
 
   if (entry === null) {
     // Create the child entry for unresolved mocked requests.
-    entry = getEntryFrom(request, exported)
+    entry = getEntryFrom(request, exported, parentEntry)
     mod = entry.module
     parentEntry.children[entry.name] = entry
     entry.addSetters(setterArgsList, parentEntry)
@@ -68,7 +68,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic) {
   if (mod.exports !== exported) {
     // Update the mock entry before the original child entry so dynamic import
     // requests are resolved with the mock entry instead of the child entry.
-    mockEntry = getEntryFrom(request, exported)
+    mockEntry = getEntryFrom(request, exported, parentEntry)
     parentEntry.children[entry.name] = mockEntry
     mockEntry.addSetters(setterArgsList, parentEntry)
     mockEntry.loaded()
@@ -85,14 +85,14 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic) {
   }
 }
 
-function getEntryFrom(request, exported) {
+function getEntryFrom(request, exported, parentEntry) {
   const entry = shared.entry.cache.get(exported)
 
   if (entry !== void 0) {
     return entry
   }
 
-  const filename = tryResolveFilename(request)
+  const filename = tryResolveFilename(request, parentEntry.module, false)
   const mod = new Module(filename)
 
   if (isPath(filename)) {
@@ -152,17 +152,17 @@ function tryRequire(request, parentEntry) {
   return exported
 }
 
-function tryResolveFilename(request, parent = null) {
+function tryResolveFilename(request, parent, isMain) {
   try {
-    return esmResolveFilename(request, parent)
+    return esmResolveFilename(request, parent, isMain)
   } catch {}
 
   try {
-    return Module._resolveFilename(request, parent)
+    return Module._resolveFilename(request, parent, isMain)
   } catch {}
 
   if (isPath(request)) {
-    const parentFilename = parent !== null && parent.filename
+    const parentFilename = parent.filename
 
     return typeof parentFilename === "string"
       ? resolve(parentFilename, request)

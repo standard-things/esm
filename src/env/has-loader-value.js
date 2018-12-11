@@ -31,7 +31,7 @@ function init() {
           return true
         }
       } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&
-          isOwnPath(tryResolveFilename(value, rootModule))) {
+          isOwnPath(tryResolveFilename(value, rootModule, false))) {
         return true
       }
     } else if (isObjectLike(value)) {
@@ -47,13 +47,13 @@ function init() {
     return false
   }
 
-  function tryResolveFilename(request, parent) {
+  function tryResolveFilename(request, parent, isMain) {
     try {
-      return esmResolveFilename(request, parent)
+      return esmResolveFilename(request, parent, isMain)
     } catch {}
 
     try {
-      return Module._resolveFilename(request, parent)
+      return Module._resolveFilename(request, parent, isMain)
     } catch {}
 
     return ""
