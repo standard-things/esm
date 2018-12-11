@@ -5,11 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 })
 
 const _text = require("./text.js")
-
 const _text2 = _interopRequireDefault(_text)
 
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj }
+function _interopRequireDefault(object) {
+  return object && object.__esModule ? object : { default: object }
 }
 
 exports.default = _text2.default
