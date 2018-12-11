@@ -255,7 +255,7 @@ class Package {
   }
 
   static set(dirPath, pkg) {
-    Loader.state.package.cache.get(dirPath, pkg || null)
+    Loader.state.package.cache.set(dirPath, pkg)
   }
 }
 
