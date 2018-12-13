@@ -79,8 +79,6 @@ class Entry {
   constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
-    // The module filename.
-    this._filename = null
     // The loading state of the module.
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
