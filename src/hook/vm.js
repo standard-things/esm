@@ -261,7 +261,11 @@ function createAddBuiltinModules(entry) {
       writable: true
     })
 
-    setProperty(context, "process", req("process"))
+    Reflect.defineProperty(context, "process", {
+      configurable: true,
+      value: req("process"),
+      writable: true
+    })
 
     for (const name of lazyModules) {
       const set = function (value) {
