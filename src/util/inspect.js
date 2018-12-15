@@ -28,8 +28,12 @@ function init() {
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
-    [shared.customInspectKey]: (recurseTimes, context) => {
-      return context.stylize("<uninitialized>", "special")
+    [shared.customInspectKey]: (recurseTimes, { colors }) => {
+      const string = "<uninitialized>"
+
+      return colors
+        ? stylize(string, "special")
+        : string
     }
   }
 
@@ -134,6 +138,19 @@ function init() {
     }
 
     return value
+  }
+
+  function stylize(string, styleType) {
+    const { colors, styles } = shared.module.utilInspect
+    const style = styles[styleType]
+
+    if (style === void 0) {
+      return string
+    }
+
+    const [foregroundCode, backgroundCode] = colors[style]
+
+    return "\u001b[" + foregroundCode + "m" + string + "\u001b[" + backgroundCode + "m"
   }
 
   function toInspectable(value, options) {
