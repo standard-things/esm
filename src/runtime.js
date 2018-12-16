@@ -1,6 +1,7 @@
 import ENTRY from "./constant/entry.js"
 
 import CachingCompiler from "./caching-compiler.js"
+import Loader from "./loader.js"
 import Entry from "./entry.js"
 
 import builtinGlobal from "./builtin/global.js"
@@ -9,8 +10,11 @@ import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
+import isError from "./util/is-error.js"
 import isFileOrigin from "./util/is-file-origin.js"
+import isStackTraceMasked from "./util/is-stack-trace-masked.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
+import maskStackTrace from "./error/mask-stack-trace.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import setProperty from "./util/set-property.js"
@@ -194,6 +198,12 @@ const Runtime = {
 
           esmImport(request, this.entry, setterArgsList, true)
         } catch (e) {
+          if (! Loader.state.package.default.options.debug &&
+              isError(e) &&
+              ! isStackTraceMasked(e)) {
+            maskStackTrace(e, { inModule: true })
+          }
+
           rejectPromise(toExternalError(e))
         }
       })
