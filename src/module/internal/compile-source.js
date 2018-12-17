@@ -24,9 +24,10 @@ function init() {
   }
 
   function compileCJS(compileData, options) {
+    let { changed } = compileData
     let content = compileData.code
 
-    if (compileData.changed) {
+    if (changed) {
       const { runtimeName } = options
 
       const returnRun = options.return === void 0
@@ -42,13 +43,15 @@ function init() {
         content +
         "\n}))"
     } else if (options.async) {
+      changed = true
       content =
         "(async () => { " +
         stripShebang(content) +
         "\n})();"
     }
 
-    if (options.sourceMap) {
+    if (changed &&
+        options.sourceMap) {
       content += createInlineSourceMap(content, compileData.filename)
     }
 
