@@ -8,7 +8,7 @@ const {
   STATE_PARSING_COMPLETED
 } = ENTRY
 
-function parse(request, parent, isMain) {
+function parse(request, parent, isMain, preload) {
   const { moduleState } = shared
 
   moduleState.parsing = true
@@ -16,7 +16,7 @@ function parse(request, parent, isMain) {
   let entry
 
   try {
-    entry = load(request, parent, isMain)
+    entry = load(request, parent, isMain, preload)
   } finally {
     moduleState.parsing = false
   }

@@ -21,7 +21,7 @@ const {
   TYPE_ESM
 } = ENTRY
 
-function load(request, parent, isMain) {
+function load(request, parent, isMain, preload) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
   const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
@@ -75,7 +75,11 @@ function load(request, parent, isMain) {
     Reflect.deleteProperty(scratchCache, request)
   }
 
-  return _load(request, parent, isMain, cache, (entry) => {
+  let loaderCalled = false
+
+  const entry = _load(request, parent, isMain, cache, (entry) => {
+    loaderCalled = true
+
     const mod = entry.module
 
     cache[request] = mod
@@ -105,16 +109,27 @@ function load(request, parent, isMain) {
       }
     }
 
+    if (typeof preload === "function") {
+      preload(entry)
+    }
+
     tryLoader(entry, cache, request, filename, parentEntry)
   })
+
+  if (! loaderCalled &&
+      typeof preload === "function") {
+    preload(entry)
+  }
+
+  return entry
 }
 
-function tryLoader(entry, cache, cacheKey, filename, parentEntry, preload) {
+function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
   let error
   let threw = true
 
   try {
-    loader(entry, filename, parentEntry, preload)
+    loader(entry, filename, parentEntry)
     threw = false
   } catch (e) {
     error = e
