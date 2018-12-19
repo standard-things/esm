@@ -2,6 +2,7 @@ import Module from "./module.js"
 
 import builtinConsole from "./builtin/console.js"
 import builtinIds from "./builtin-ids.js"
+import builtinTimers from "./builtin/timers.js"
 import builtinUtil from "./builtin/util.js"
 import builtinVM from "./builtin/vm.js"
 import realRequire from "./real/require.js"
@@ -13,20 +14,12 @@ const builtinModules = { __proto__: null }
 const cache = shared.memoize.builtinModules
 
 function getExports(id) {
-  if (id === "console") {
-    return builtinConsole
-  }
-
-  if (id === "module") {
-    return Module
-  }
-
-  if (id === "util") {
-    return builtinUtil
-  }
-
-  if (id === "vm") {
-    return builtinVM
+  switch (id) {
+    case "console": return builtinConsole
+    case "module": return Module
+    case "timers": return builtinTimers
+    case "util": return builtinUtil
+    case "vm": return builtinVM
   }
 
   return unwrapProxy(realRequire(id))
