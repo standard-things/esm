@@ -9,7 +9,6 @@ import isObjectLike from "../util/is-object-like.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import ownKeys from "../util/own-keys.js"
 import proxyWrap from "../util/proxy-wrap.js"
-import realUtil from "../real/util.js"
 import safeUtil from "../safe/util.js"
 import shared from "../shared.js"
 import toWrapper from "../util/to-wrapper.js"
@@ -20,6 +19,8 @@ function init() {
   let builtinTypes
 
   if (isObjectLike(safeTypes)) {
+    builtinTypes = GenericObject.create()
+
     const builtinIsModuleNamespaceObject = proxyWrap(
       safeTypes.isModuleNamespaceObject,
       toWrapper(isModuleNamespaceObject)
@@ -29,8 +30,6 @@ function init() {
       func(value) &&
         ! isOwnProxy(value)
     )
-
-    builtinTypes = GenericObject.create()
 
     const typesNames = ownKeys(safeTypes)
 
@@ -54,7 +53,7 @@ function init() {
     : formatWithOptions
 
   const builtinUtil = GenericObject.create()
-  const utilNames = ownKeys(realUtil)
+  const utilNames = ownKeys(safeUtil)
 
   for (const name of utilNames) {
     if (name === "format") {
@@ -64,7 +63,8 @@ function init() {
     } else if (name === "inspect") {
       builtinUtil.inspect =
       shared.module.utilInspect = builtinInspect
-    } else if (name === "types") {
+    } else if (name === "types" &&
+        builtinTypes !== void 0) {
       builtinUtil.types = builtinTypes
     } else {
       copyProperty(builtinUtil, safeUtil, name)
