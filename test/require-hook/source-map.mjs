@@ -15,24 +15,24 @@ export default () => {
   ]
 
   for (const name of optionNames) {
-    const esmRequire = makeRequire(module, {
+    const { cache, extensions } = makeRequire(module, {
       force: true,
       [name]: true
     })
 
-    const { cache, extensions } = esmRequire
-    const mod = new Module("<mock>")
+    const assertSourceMappingURL = (filename, expected) => {
+      const mod = new Module("<mock>")
 
-    mod._compile = (content) => {
-      assert.ok(content.includes("sourceMappingURL"))
+      mod._compile = (content) => {
+        assert.strictEqual(content.includes("sourceMappingURL"), expected)
+      }
+
+      mod.exports = {}
+      Reflect.deleteProperty(cache, filename)
+      extensions[".js"](mod, filename)
     }
 
-    mod.exports = {}
-    Reflect.deleteProperty(cache, defPath)
-    extensions[".js"](mod, defPath)
-
-    mod.exports = {}
-    Reflect.deleteProperty(cache, dynPath)
-    extensions[".js"](mod, dynPath)
+    assertSourceMappingURL(defPath, false)
+    assertSourceMappingURL(dynPath, true)
   }
 }
