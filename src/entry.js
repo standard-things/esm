@@ -127,6 +127,8 @@ class Entry {
     this.package = Package.from(mod)
     // The `module.parent` entry.
     this.parent = null
+    // The runtime object reference.
+    this.runtime = null
     // Setters for assigning to local variables in parent modules.
     this.setters = { __proto__: null }
     // Initialize empty namespace setter so they're merged properly.

@@ -210,6 +210,10 @@ const Runtime = {
     })
   },
   enable(entry, exported) {
+    if (entry.runtime !== null) {
+      return entry.runtime
+    }
+
     const mod = entry.module
     const runtime = mod.exports
 
@@ -268,7 +272,7 @@ const Runtime = {
     runtime.w = runtime.import
     runtime.x = runtime.addExportGetters
 
-    return runtime
+    return entry.runtime = runtime
   },
   globalEval(content) {
     return evalIndirect(this.compileGlobalEval(content))
