@@ -254,12 +254,17 @@ function init() {
         type = expression.type
       }
 
-      const name = id
-        ? id.name
-        : runtimeName + "anonymous"
+      if (id === void 0) {
+        id = null
+      }
 
-      if (type === "FunctionDeclaration" ||
-          (id && type === "ClassDeclaration")) {
+      const name = id === null
+        ? runtimeName + "anonymous"
+        : id.name
+
+      if ((id !== null &&
+           type === "ClassDeclaration") ||
+          type === "FunctionDeclaration") {
         // Support exporting default function declarations:
         // export default function named() {}
         if (id === null) {
@@ -340,10 +345,16 @@ function init() {
 
       if (declaration !== null) {
         const pairs = []
-        const { id, type } = declaration
+        const { type } = declaration
         const isClassDecl = type === "ClassDeclaration"
 
-        if (id &&
+        let { id } = declaration
+
+        if (id === void 0) {
+          id = null
+        }
+
+        if (id !== null &&
             (isClassDecl ||
              type === "FunctionDeclaration")) {
           // Support exporting named class and function declarations:
