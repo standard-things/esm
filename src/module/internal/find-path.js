@@ -250,8 +250,9 @@ function tryPackage(dirPath, fields, exts, isMain) {
   for (const field of fields) {
     const filename = tryField(dirPath, json[field], exts, isMain)
 
-    if (field === "main" ||
-        ! isMJS(filename)) {
+    if (filename !== "" &&
+        (field === "main" ||
+         ! isMJS(filename))) {
       return filename
     }
   }
