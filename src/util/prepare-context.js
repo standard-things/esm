@@ -104,11 +104,28 @@ function init() {
       }
     }
 
+    const { length } = builtinNames
+
+    if (length === 0) {
+      return context
+    }
+
+    const lastIndex = length - 1
+
     const realmBuiltins = new Script(
       "({" +
-      builtinNames
-        .map(toBuiltinPropertySnippet)
-        .join(",") +
+      (() => {
+        let code = ""
+        let i = -1
+
+        while (++i < length) {
+          code +=
+            toBuiltinPropertySnippet(builtinNames[i]) +
+            (i === lastIndex ? "" : ",")
+        }
+
+        return code
+      })() +
       "})"
     ).runInContext(context)
 
