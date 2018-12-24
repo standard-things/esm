@@ -1,3 +1,4 @@
+import escapeRegExp from "./escape-regexp.js"
 import isProxy from "./is-proxy.js"
 import shared from "../shared.js"
 
@@ -10,11 +11,10 @@ function init() {
   // compare other native methods against. Escape special RegExp characters
   // and remove method identifiers before converting the template to a regexp.
   const markerRegExp = /toString|(function ).*?(?=\\\()/g
-  const specialCharRegExp = /[\\^$.*+?()[\]{}|]/g
+
   const nativeRegExp = RegExp(
     "^" +
-    toString.call(toString)
-      .replace(specialCharRegExp, "\\$&")
+    escapeRegExp(toString.call(toString))
       .replace(markerRegExp, "$1.*?") +
     "$"
   )
