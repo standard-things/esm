@@ -1,5 +1,6 @@
 import CHAR_CODE from "../constant/char-code.js"
 
+import escapeRegExp from "../util/escape-regexp.js"
 import shared from "../shared.js"
 
 function init() {
@@ -9,12 +10,31 @@ function init() {
 
   function findIndexes(code, identifiers) {
     const indexes = []
+    const { length } = identifiers
 
-    if (identifiers.length === 0) {
+    if (length === 0) {
       return indexes
     }
 
-    const pattern = new RegExp("\\b(?:" + identifiers.join("|") + ")\\b", "g")
+    const lastIndex = length - 1
+
+    const pattern = new RegExp(
+      "\\b(?:" +
+      (() => {
+        let i = -1
+        let source = ""
+
+        while (++i < length) {
+          source +=
+            escapeRegExp(identifiers[i]) +
+            (i === lastIndex ? "" : "|")
+        }
+
+        return source
+      })() +
+      ")\\b",
+      "g"
+    )
 
     let match
 

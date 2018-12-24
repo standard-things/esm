@@ -2,6 +2,7 @@ import ESM from "../constant/esm.js"
 
 import OwnProxy from "../own/proxy.js"
 
+import escapeRegExp from "../util/escape-regexp.js"
 import { inspect } from "../safe/util.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
@@ -11,11 +12,9 @@ function init() {
     PACKAGE_PREFIX
   } = ESM
 
-  let inspectDepth = 0
-
   const endMarkerRegExp = new RegExp(
     "[\\[\"']" +
-    PACKAGE_PREFIX +
+    escapeRegExp(PACKAGE_PREFIX) +
     ":proxy['\"\\]]\\s*:\\s*1\\s*\\}\\s*.?$"
   )
 
@@ -40,6 +39,8 @@ function init() {
     showHidden: true,
     showProxy: true
   }
+
+  let inspectDepth = 0
 
   function isOwnProxy(value) {
     return OwnProxy.instances.has(value) ||
