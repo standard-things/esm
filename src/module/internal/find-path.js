@@ -46,11 +46,11 @@ function findPath(request, paths, isMain, fields, exts) {
   }
 
   if (fields) {
-    cacheKey += "\0" + (fields.length === 1 ? fields[0] : GenericArray.join(fields))
+    cacheKey += "\0" + (fields.length === 1 ? fields[0] : fields.join())
   }
 
   if (exts) {
-    cacheKey += "\0" + (exts.length === 1 ? exts[0] : GenericArray.join(exts))
+    cacheKey += "\0" + (exts.length === 1 ? exts[0] : exts.join())
   }
 
   const cache = shared.memoize.moduleInternalFindPath

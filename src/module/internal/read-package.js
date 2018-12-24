@@ -1,4 +1,3 @@
-import GenericArray from "../../generic/array.js"
 import GenericObject from "../../generic/object.js"
 import SafeJSON from "../../safe/json.js"
 
@@ -12,12 +11,12 @@ function init() {
 
   function readPackage(dirPath, fields) {
     const cache = shared.memoize.moduleInternalReadPackage
-    const fieldsLength = fields ? fields.length : 0
+    const fieldsLength = fields === void 0 ? 0 : fields.length
 
     let cacheKey = dirPath
 
     if (fieldsLength > 0) {
-      cacheKey += "\0" + (fieldsLength === 1 ? fields[0] : GenericArray.join(fields))
+      cacheKey += "\0" + (fieldsLength === 1 ? fields[0] : fields.join())
     }
 
     let cached = cache.get(cacheKey)
