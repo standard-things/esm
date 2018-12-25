@@ -32,9 +32,68 @@ function init() {
           importBindings.join(",") + ";"
       }
 
-      code +=
-        toModuleExport(this, this.hoistedExports) +
-        this.hoistedImportsString
+      code += toModuleExport(this, this.hoistedExports)
+
+      const { importSpecifierMap, runtimeName } = this
+
+      for (const request in importSpecifierMap) {
+        code += runtimeName + ".w(" + toStringLiteral(request)
+
+        let setterArgsList = ""
+
+        const importedNames = keys(importSpecifierMap[request].imports)
+
+        addToDependencySpecifiers(this, request)
+
+        for (const importedName of importedNames) {
+          const localNames = importSpecifierMap[request].imports[importedName]
+          const valueParam = safeName("v", localNames)
+
+          addToDependencySpecifiers(this, request, importedName)
+
+          setterArgsList +=
+            (setterArgsList === "" ? "" : ",") +
+            '["' +
+            importedName + '",' +
+            (importedName === "*"
+              ? "null"
+              : '["' + localNames.join('","') + '"]'
+            ) +
+            ",function(" + valueParam + "){" +
+            // Multiple local variables become a compound assignment.
+            localNames.join("=") + "=" + valueParam +
+            "}]"
+        }
+
+        const reexportedNames = keys(importSpecifierMap[request].reexports)
+
+        for (const reexportedName of reexportedNames) {
+          const localNames = importSpecifierMap[request].reexports[reexportedName]
+
+          for (const localName of localNames) {
+            addToDependencySpecifiers(this, request, localName)
+
+            setterArgsList +=
+              (setterArgsList === "" ? "" : ",") +
+              '["' +
+              localName + '",null,' +
+              runtimeName + '.f("' + localName + '","' + reexportedName +
+              '")]'
+          }
+        }
+
+        if (importSpecifierMap[request].star) {
+          setterArgsList +=
+            (setterArgsList === "" ? "" : ",") +
+            '["*",null,' + runtimeName + ".n()]"
+        }
+
+        if (setterArgsList !== "") {
+          code += ",[" + setterArgsList + "]"
+        }
+
+        code += ");"
+      }
 
       this.magicString.prependLeft(top.insertIndex, code)
       this.yieldIndex += code.length
@@ -56,6 +115,7 @@ function init() {
       this.generateVarDeclarations = false
       this.hoistedExports = null
       this.hoistedImportsString = ""
+      this.importSpecifierMap = null
       this.initedBindings = null
       this.magicString = null
       this.possibleIndexes = null
@@ -77,6 +137,7 @@ function init() {
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
+        this.importSpecifierMap = { __proto__: null }
         this.initedBindings = { __proto__: null }
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
@@ -129,14 +190,19 @@ function init() {
       this.changed =
       this.addedImport = true
 
+      const { importSpecifierMap, temporalBindings } = this
       const node = path.getValue()
       const request = node.source.value
-      const specifierMap = { __proto__: null }
       const { specifiers } = node
-      const { temporalBindings } = this
 
-      let i = -1
-      let lastIndex = specifiers.length - 1
+      if (! Reflect.has(importSpecifierMap, request)) {
+        importSpecifierMap[request] = {
+          __proto__: null,
+          imports: { __proto__: null },
+          reexports: { __proto__: null },
+          star: false
+        }
+      }
 
       for (const specifier of specifiers) {
         const { type } = specifier
@@ -152,57 +218,20 @@ function init() {
           this.addedNamespaceImport = true
         }
 
-        if (! Reflect.has(specifierMap, importedName)) {
-          specifierMap[importedName] = []
+        if (! Reflect.has(importSpecifierMap[request].imports, importedName)) {
+          importSpecifierMap[request].imports[importedName] = []
         }
 
         const localName = specifier.local.name
 
-        specifierMap[importedName].push(localName)
+        importSpecifierMap[request].imports[importedName].push(localName)
 
         if (importedName !== "*") {
           temporalBindings[localName] = true
         }
       }
 
-      const importedNames = keys(specifierMap)
-      const { length } = importedNames
-
-      addToDependencySpecifiers(this, request)
-
-      let code = this.runtimeName + ".w(" + toStringLiteral(request)
-
-      if (length > 0) {
-        i = -1
-        lastIndex = length - 1
-        code += ",["
-
-        for (const importedName of importedNames) {
-          const localNames = specifierMap[importedName]
-          const valueParam = safeName("v", localNames)
-
-          code +=
-            '["' +
-            importedName + '",' +
-            (importedName === "*"
-              ? "null"
-              : '["' + localNames.join('","') + '"]'
-            ) +
-            ",function(" + valueParam + "){" +
-            // Multiple local variables become a compound assignment.
-            localNames.join("=") + "=" + valueParam +
-            "}]" +
-            (++i === lastIndex ? "" : ",")
-
-          addToDependencySpecifiers(this, request, importedName)
-        }
-
-        code += "]"
-      }
-
-      code += ");"
-
-      hoistImports(this, node, code)
+      hoistImports(this, node)
     }
 
     visitExportAllDeclaration(path) {
@@ -215,13 +244,20 @@ function init() {
       this.changed =
       this.addedExport = true
 
-      const { exportedFrom, runtimeName } = this
+      const { exportedFrom, importSpecifierMap } = this
       const node = path.getValue()
       const request = node.source.value
 
-      const code =
-        runtimeName + ".w(" + toStringLiteral(request) +
-        ',[["*",null,' + runtimeName + ".n()]]);"
+      if (! Reflect.has(importSpecifierMap, request)) {
+        importSpecifierMap[request] = {
+          __proto__: null,
+          imports: { __proto__: null },
+          reexports: { __proto__: null },
+          star: false
+        }
+      }
+
+      importSpecifierMap[request].star = true
 
       if (! Reflect.has(exportedFrom, request)) {
         exportedFrom[request] = []
@@ -229,8 +265,7 @@ function init() {
 
       this.exportedStars.push(request)
 
-      addToDependencySpecifiers(this, request)
-      hoistImports(this, node, code)
+      hoistImports(this, node)
     }
 
     visitExportDefaultDeclaration(path) {
@@ -289,7 +324,9 @@ function init() {
           // https://tc39.github.io/ecma262/#sec-exports-runtime-semantics-evaluation
           prefix = "const " + name + "="
           suffix = ";" + runtimeName + ".d(" + name + ");"
-        } else if (type === "SequenceExpression") {
+        }
+
+        if (type === "SequenceExpression") {
           // If the exported expression is a comma-separated sequence expression
           // it may not include the vital parentheses, so we should wrap the
           // expression with parentheses to make sure it's treated as a single
@@ -297,6 +334,12 @@ function init() {
           // arguments.
           prefix += "("
           suffix = ")" + suffix
+        } else {
+          const localName = id === null
+            ? "void 0"
+            : name
+
+          this.hoistedExports.push(["default", localName])
         }
 
         overwrite(this, node.start, declaration.start, "")
@@ -444,14 +487,17 @@ function init() {
           exportedFrom[request] = []
         }
 
+        const { importSpecifierMap } = this
         const fromNames = exportedFrom[request]
-        const lastIndex = specifiers.length - 1
 
-        let code = runtimeName + ".w(" + toStringLiteral(request)
-        let i = -1
-        let setterArgsList = ""
-
-        addToDependencySpecifiers(this, request)
+        if (! Reflect.has(importSpecifierMap, request)) {
+          importSpecifierMap[request] = {
+            __proto__: null,
+            imports: { __proto__: null },
+            reexports: { __proto__: null },
+            star: false
+          }
+        }
 
         for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
@@ -459,12 +505,11 @@ function init() {
             ? "*"
             : specifier.local.name
 
-          setterArgsList +=
-            '["' +
-            localName + '",null,' +
-            runtimeName + '.f("' + localName + '","' + exportedName +
-            '")]' +
-            (++i === lastIndex ? "" : ",")
+          if (! Reflect.has(importSpecifierMap[request].reexports, exportedName)) {
+            importSpecifierMap[request].reexports[exportedName] = []
+          }
+
+          importSpecifierMap[request].reexports[exportedName].push(localName)
 
           if (exportedName === localName) {
             fromNames.push([exportedName])
@@ -473,13 +518,9 @@ function init() {
           }
 
           exportedNames.push(exportedName)
-
-          addToDependencySpecifiers(this, request, localName)
         }
 
-        code += ",[" + setterArgsList + "]);"
-
-        hoistImports(this, node, code)
+        hoistImports(this, node)
       }
 
       const initeeNames = keys(initees)
@@ -537,8 +578,7 @@ function init() {
     }
   }
 
-  function hoistImports(visitor, node, code) {
-    visitor.hoistedImportsString += code
+  function hoistImports(visitor, node) {
     preserveLine(visitor, node)
   }
 
@@ -582,11 +622,13 @@ function init() {
   function toModuleExport(visitor, pairs) {
     let code = ""
 
-    if (pairs.length === 0) {
+    const { length } = pairs
+
+    if (length === 0) {
       return code
     }
 
-    const lastIndex = pairs.length - 1
+    const lastIndex = length - 1
 
     let i = -1
 
