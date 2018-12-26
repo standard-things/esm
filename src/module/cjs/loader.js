@@ -3,12 +3,15 @@ import PACKAGE from "../../constant/package.js"
 import Module from "../../module.js"
 
 import findCompilerExtension from "../internal/find-compiler-extension.js"
+import shared from "../../shared.js"
 
 const {
   MODE_STRICT
 } = PACKAGE
 
 function loader(entry, filename, parentEntry) {
+  const { parsing } = shared.moduleState
+
   entry.updateFilename(filename)
 
   let ext = findCompilerExtension(Module._extensions, entry)
@@ -33,8 +36,11 @@ function loader(entry, filename, parentEntry) {
     entry._passthru = false
   }
 
-  mod.loaded = true
-  entry.loaded()
+  if (! parsing &&
+      ! mod.loaded) {
+    mod.loaded = true
+    entry.loaded()
+  }
 }
 
 export default loader
