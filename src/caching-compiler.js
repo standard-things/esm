@@ -8,7 +8,6 @@ import ESM from "./constant/esm.js"
 import Compiler from "./compiler.js"
 import GenericBuffer from "./generic/buffer.js"
 
-import assign from "./util/assign.js"
 import exists from "./fs/exists.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
 import isMJS from "./path/is-mjs.js"
@@ -67,12 +66,7 @@ function init() {
       const result = {
         changed: false,
         code: null,
-        dependencySpecifiers: null,
         enforceTDZ: noop,
-        exportedFrom: null,
-        exportedNames: null,
-        exportedSpecifiers: null,
-        exportedStars: null,
         filename: null,
         mtime: -1,
         scriptData: null,
@@ -96,13 +90,7 @@ function init() {
       if (length > 6 &&
           result.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
-        result.dependencySpecifiers = meta[6]
-        result.exportedFrom = assign({ __proto__: null }, meta[7])
-        result.exportedNames = meta[8]
-        result.exportedStars = meta[9]
-        result.yieldIndex = +meta[10]
-        result.dependencySpecifiers = inflateDependencySpecifiers(result)
-        result.exportedSpecifiers = inflateExportedSpecifiers(result)
+        result.yieldIndex = +meta[6]
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -124,11 +112,6 @@ function init() {
 
     if (options.eval) {
       return result
-    }
-
-    if (result.sourceType === SOURCE_TYPE_MODULE) {
-      result.dependencySpecifiers = inflateDependencySpecifiers(result)
-      result.exportedSpecifiers = inflateExportedSpecifiers(result)
     }
 
     result.filename = options.filename
@@ -153,52 +136,6 @@ function init() {
     }
 
     pendingWrites[cachePath][cacheName] = result
-    return result
-  }
-
-  function deflateDependencySpecifiers(compileData) {
-    const { dependencySpecifiers } = compileData
-    const result = { __proto__: null }
-
-    for (const request in dependencySpecifiers) {
-      result[request] = dependencySpecifiers[request].exportedNames
-    }
-
-    return result
-  }
-
-  function inflateDependencySpecifiers(compileData) {
-    const { dependencySpecifiers } = compileData
-    const result = { __proto__: null }
-
-    for (const request in dependencySpecifiers) {
-      result[request] = {
-        entry: null,
-        exportedNames: dependencySpecifiers[request]
-      }
-    }
-
-    return result
-  }
-
-  function inflateExportedSpecifiers(compileData) {
-    const result = { __proto__: null }
-
-    for (const exportedName of compileData.exportedNames) {
-      result[exportedName] = true
-    }
-
-    const { exportedFrom } = compileData
-
-    for (const request in exportedFrom) {
-      for (const names of exportedFrom[request]) {
-        result[names[0]] = {
-          local: names[names.length - 1],
-          request
-        }
-      }
-    }
-
     return result
   }
 
@@ -348,10 +285,6 @@ function init() {
               mtime,
               sourceType,
               normalize(relative(cachePath, filename)),
-              deflateDependencySpecifiers(compileData),
-              compileData.exportedFrom,
-              compileData.exportedNames,
-              compileData.exportedStars,
               compileData.yieldIndex
             )
           }

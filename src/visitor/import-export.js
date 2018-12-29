@@ -43,13 +43,9 @@ function init() {
 
         const importedNames = keys(importSpecifierMap[request].imports)
 
-        addToDependencySpecifiers(this, request)
-
         for (const importedName of importedNames) {
           const localNames = importSpecifierMap[request].imports[importedName]
           const valueParam = safeName("v", localNames)
-
-          addToDependencySpecifiers(this, request, importedName)
 
           setterArgsList +=
             (setterArgsList === "" ? "" : ",") +
@@ -71,8 +67,6 @@ function init() {
           const localNames = importSpecifierMap[request].reexports[reexportedName]
 
           for (const localName of localNames) {
-            addToDependencySpecifiers(this, request, localName)
-
             setterArgsList +=
               (setterArgsList === "" ? "" : ",") +
               '["' +
@@ -107,10 +101,6 @@ function init() {
       this.addedNamespaceImport = false
       this.assignableBindings = null
       this.changed = false
-      this.dependencySpecifiers = null
-      this.exportedFrom = null
-      this.exportedNames = null
-      this.exportedStars = null
       this.firstLineBreakPos = -1
       this.generateVarDeclarations = false
       this.hoistedExports = null
@@ -130,10 +120,6 @@ function init() {
         const { magicString } = options
 
         this.assignableBindings = { __proto__: null }
-        this.dependencySpecifiers = { __proto__: null }
-        this.exportedFrom = { __proto__: null }
-        this.exportedNames = []
-        this.exportedStars = []
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
@@ -244,7 +230,7 @@ function init() {
       this.changed =
       this.addedExport = true
 
-      const { exportedFrom, importSpecifierMap } = this
+      const { importSpecifierMap } = this
       const node = path.getValue()
       const request = node.source.value
 
@@ -258,12 +244,6 @@ function init() {
       }
 
       importSpecifierMap[request].star = true
-
-      if (! Reflect.has(exportedFrom, request)) {
-        exportedFrom[request] = []
-      }
-
-      this.exportedStars.push(request)
 
       hoistImports(this, node)
     }
@@ -354,7 +334,6 @@ function init() {
         this.assignableBindings[name] = true
       }
 
-      this.exportedNames.push("default")
       this.initedBindings.default = isInitable(declaration)
 
       path.call(this, "visitWithoutReset", "declaration")
@@ -370,7 +349,6 @@ function init() {
 
       const {
         assignableBindings,
-        exportedNames,
         initedBindings,
         magicString,
         runtimeName
@@ -412,7 +390,6 @@ function init() {
             assignableBindings[name] = true
           }
 
-          exportedNames.push(name)
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
           const changeable = isChangeable(node)
@@ -437,7 +414,6 @@ function init() {
                 }
               }
 
-              exportedNames.push(name)
               pairs.push([name, name])
             }
           }
@@ -472,7 +448,6 @@ function init() {
 
           assignableBindings[localName] = true
 
-          exportedNames.push(exportedName)
           pairs.push([exportedName, localName])
         }
 
@@ -480,15 +455,8 @@ function init() {
       } else {
         // Support re-exporting specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
-        const { exportedFrom } = this
-        const request = source.value
-
-        if (! Reflect.has(exportedFrom, request)) {
-          exportedFrom[request] = []
-        }
-
         const { importSpecifierMap } = this
-        const fromNames = exportedFrom[request]
+        const request = source.value
 
         if (! Reflect.has(importSpecifierMap, request)) {
           importSpecifierMap[request] = {
@@ -510,14 +478,6 @@ function init() {
           }
 
           importSpecifierMap[request].reexports[exportedName].push(localName)
-
-          if (exportedName === localName) {
-            fromNames.push([exportedName])
-          } else {
-            fromNames.push([exportedName, localName])
-          }
-
-          exportedNames.push(exportedName)
         }
 
         hoistImports(this, node)
@@ -549,22 +509,6 @@ function init() {
 
         overwrite(this, meta.start, meta.end, this.runtimeName + "._")
       }
-    }
-  }
-
-  function addToDependencySpecifiers(visitor, request, exportedName) {
-    const { dependencySpecifiers } = visitor
-
-    if (! Reflect.has(dependencySpecifiers, request)) {
-      dependencySpecifiers[request] = []
-    }
-
-    const exportedNames = dependencySpecifiers[request]
-
-    if (exportedName &&
-        exportedName !== "*" &&
-        exportedNames.indexOf(exportedName) === -1) {
-      exportedNames.push(exportedName)
     }
   }
 
