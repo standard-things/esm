@@ -314,13 +314,13 @@ function init() {
           // arguments.
           prefix += "("
           suffix = ")" + suffix
-        } else {
-          const localName = id === null
-            ? "void 0"
-            : name
-
-          this.hoistedExports.push(["default", localName])
         }
+
+        const localName = id === null
+          ? "void 0"
+          : name
+
+        this.hoistedExports.push(["default", localName])
 
         overwrite(this, node.start, declaration.start, "")
         overwrite(this, declaration.end, node.end, "")
