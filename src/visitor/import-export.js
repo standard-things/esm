@@ -446,7 +446,7 @@ function init() {
           }
 
           if (! Reflect.has(initedBindings, localName)) {
-            initees[localName] =
+            initees[exportedName] =
             initedBindings[localName] = true
           }
 
