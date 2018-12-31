@@ -21,7 +21,7 @@ function init() {
 
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
-      const { top } = this
+      const { exportedNames, top } = this
       const importBindings = keys(top.importedBindings)
 
       let code = top.insertPrefix
@@ -63,6 +63,8 @@ function init() {
 
         const reexportedNames = keys(importSpecifierMap[request].reexports)
 
+        exportedNames.push(...reexportedNames)
+
         for (const reexportedName of reexportedNames) {
           const localNames = importSpecifierMap[request].reexports[reexportedName]
 
@@ -101,6 +103,7 @@ function init() {
       this.addedNamespaceImport = false
       this.assignableBindings = null
       this.changed = false
+      this.exportedNames = null
       this.firstLineBreakPos = -1
       this.generateVarDeclarations = false
       this.hoistedExports = null
@@ -120,6 +123,7 @@ function init() {
         const { magicString } = options
 
         this.assignableBindings = { __proto__: null }
+        this.exportedNames = []
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
@@ -572,6 +576,7 @@ function init() {
       return code
     }
 
+    const { exportedNames } = visitor
     const lastIndex = length - 1
 
     let i = -1
@@ -579,6 +584,8 @@ function init() {
     code += visitor.runtimeName + ".x(["
 
     for (const [exportedName, localName] of pairs) {
+      exportedNames.push(exportedName)
+
       code +=
         '["' + exportedName + '",()=>' +
         localName +

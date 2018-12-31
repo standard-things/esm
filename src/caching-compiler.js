@@ -67,6 +67,7 @@ function init() {
         changed: false,
         code: null,
         enforceTDZ: noop,
+        exportedNames: null,
         filename: null,
         mtime: -1,
         scriptData: null,
@@ -90,7 +91,8 @@ function init() {
       if (length > 6 &&
           result.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
-        result.yieldIndex = +meta[6]
+        result.exportedNames = meta[6]
+        result.yieldIndex = +meta[7]
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -285,6 +287,7 @@ function init() {
               mtime,
               sourceType,
               normalize(relative(cachePath, filename)),
+              compileData.exportedNames,
               compileData.yieldIndex
             )
           }
