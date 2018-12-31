@@ -6,12 +6,12 @@ function init() {
     if (isObject(mod)) {
       const { filename, id } = mod
 
-      if (typeof filename === "string") {
-        return filename
-      }
-
       if (typeof id === "string") {
         return id
+      }
+
+      if (typeof filename === "string") {
+        return filename
       }
     }
 
