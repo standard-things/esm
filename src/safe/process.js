@@ -23,9 +23,11 @@ function init() {
   }
 
   if (isObjectLike(config) &&
+      has(config, "variables") &&
       isObjectLike(config.variables) &&
-      has(config.variables, "v8_enable_inspector")) {
-    safeConfig.variables.v8_enable_inspector = config.variables.v8_enable_inspector
+      has(config.variables, "v8_enable_inspector") &&
+      config.variables.v8_enable_inspector) {
+    safeConfig.variables.v8_enable_inspector = 1
   }
 
   setProperty(safeProcess, "argv", safe(argv))

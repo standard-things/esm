@@ -1,5 +1,6 @@
 import getFlags from "../env/get-flags.js"
 import getOptions from "../env/get-options.js"
+import hasInspector from "../env/has-inspector.js"
 import isBrave from "../env/is-brave.js"
 import isCheck from "../env/is-check.js"
 import isCLI from "../env/is-cli.js"
@@ -28,6 +29,7 @@ setDeferred(ENV, "ELECTRON", isElectron)
 setDeferred(ENV, "ELECTRON_RENDERER", isElectronRenderer)
 setDeferred(ENV, "EVAL", isEval)
 setDeferred(ENV, "FLAGS", getFlags)
+setDeferred(ENV, "HAS_INSPECTOR", hasInspector)
 setDeferred(ENV, "INTERNAL", isInternal)
 setDeferred(ENV, "JEST", isJest)
 setDeferred(ENV, "NDB", isNdb)

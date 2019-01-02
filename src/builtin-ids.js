@@ -1,20 +1,15 @@
-import ENV from "./constant/env.js"
-
 import binding from "./binding.js"
+import getFlags from "./env/get-flags.js"
 import shared from "./shared.js"
 
 function init() {
-  const {
-    FLAGS
-  } = ENV
-
   let ids = __non_webpack_module__.constructor.builtinModules
 
   if (Array.isArray(ids) &&
       Object.isFrozen(ids)) {
     ids = Array.from(ids)
   } else {
-    const { exposeInternals } = FLAGS
+    const { exposeInternals } = getFlags()
 
     ids = []
 

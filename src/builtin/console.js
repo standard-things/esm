@@ -1,4 +1,4 @@
-import { config, stderr, stdout } from "../safe/process.js"
+import { stderr, stdout } from "../safe/process.js"
 
 import ENV from "../constant/env.js"
 
@@ -26,7 +26,8 @@ import toString from "../util/to-string.js"
 function init() {
   const {
     ELECTRON_RENDERER,
-    FLAGS
+    FLAGS,
+    HAS_INSPECTOR
   } = ENV
 
   const RealConsole = realConsole.Console
@@ -181,7 +182,7 @@ function init() {
 
   Reflect.setPrototypeOf(builtinConsole, GenericObject.create())
 
-  if (config.variables.v8_enable_inspector &&
+  if (HAS_INSPECTOR &&
       FLAGS.inspect) {
     const { consoleCall } = binding.inspector
 
