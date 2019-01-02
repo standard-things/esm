@@ -71,6 +71,7 @@ function load(filename, parent = null, isMain, cache, loader) {
     Reflect.deleteProperty(mod, "_compile")
 
     const symbol = shared.symbol._compile
+
     const func = typeof mod[symbol] === "function"
       ? mod[symbol]
       : _compile

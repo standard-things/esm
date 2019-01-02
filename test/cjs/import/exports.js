@@ -48,6 +48,7 @@ export default () => {
 
   ns = createNamespace({ a: "a", default: "default" })
   assert.strictEqual(aOfPseudo, "a")
+
   assert.strictEqual(defaultPseudo, "default")
   assert.deepStrictEqual(nsPseudo, ns)
 

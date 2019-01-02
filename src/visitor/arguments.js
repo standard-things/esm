@@ -51,6 +51,7 @@ function init() {
           isTypeOf &&
           ! getShadowed(path, name, shadowedMap)) {
         this.changed = true
+
         overwrite(this, node.start, node.end, "void " + runtimeName)
         return
       }
