@@ -56,12 +56,7 @@ function init() {
       const result = {
         changed: false,
         code,
-        dependencySpecifiers: null,
         enforceTDZ: noop,
-        exportedFrom: null,
-        exportedNames: null,
-        exportedSpecifiers: null,
-        exportedStars: null,
         live: false,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
@@ -231,10 +226,6 @@ function init() {
       if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
         sourceType = SOURCE_TYPE_SCRIPT
       } else if (sourceType === SOURCE_TYPE_MODULE) {
-        result.dependencySpecifiers = importExportVisitor.dependencySpecifiers
-        result.exportedFrom = importExportVisitor.exportedFrom
-        result.exportedNames = importExportVisitor.exportedNames
-        result.exportedStars = importExportVisitor.exportedStars
         result.sourceType = SOURCE_TYPE_MODULE
 
         if (addedImport) {
