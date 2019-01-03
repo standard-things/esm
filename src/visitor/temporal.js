@@ -78,6 +78,7 @@ function init() {
       const { initedBindings } = this
 
       if (initedBindings.default !== true) {
+        this.changed =
         initedBindings.default = true
 
         const node = path.getValue()
@@ -125,6 +126,8 @@ function init() {
       const initeeNames = keys(initees)
 
       if (initeeNames.length !== 0) {
+        this.changed = true
+
         const { end } = declaration || node
 
         this.magicString.appendRight(
