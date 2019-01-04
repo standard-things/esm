@@ -154,7 +154,6 @@ function init() {
         addedDynamicImport,
         addedExport,
         addedImportMeta,
-        addedNamespaceImport,
         addedImport
       } = importExportVisitor
 
@@ -165,7 +164,7 @@ function init() {
       }
 
       if (addedDynamicImport ||
-          addedNamespaceImport) {
+          addedImport) {
         const { globals } = globalsVisitor
         const possibleGlobalsNames = keys(globals)
         const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)

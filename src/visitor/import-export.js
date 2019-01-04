@@ -98,7 +98,6 @@ function init() {
       this.addedExport = false
       this.addedImport = false
       this.addedImportMeta = false
-      this.addedNamespaceImport = false
       this.assignableBindings = null
       this.changed = false
       this.firstLineBreakPos = -1
@@ -201,7 +200,6 @@ function init() {
           importedName = "default"
         } else {
           importedName = "*"
-          this.addedNamespaceImport = true
         }
 
         if (! Reflect.has(importSpecifierMap[request].imports, importedName)) {
