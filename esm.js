@@ -43,7 +43,7 @@ const {
 } = Script.prototype
 
 const { sep } = require("path")
-const { readFileSync } = require("fs")
+const fs = require("fs")
 
 const esmModule = new Module(id)
 
@@ -87,7 +87,7 @@ function makeRequireFunction(mod, options) {
 
 function readFile(filename, options) {
   try {
-    return readFileSync(filename, options)
+    return fs.readFileSync(filename, options)
   } catch (e) {}
 
   return null
