@@ -16,7 +16,6 @@ import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
 import captureStackTrace from "../error/capture-stack-trace.js"
-import { config } from "../safe/process.js"
 import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
@@ -50,6 +49,7 @@ const {
  CHECK,
  EVAL,
  FLAGS,
+ HAS_INSPECTOR,
  INTERNAL,
  REPL
 } = ENV
@@ -240,7 +240,7 @@ function createAddBuiltinModules(entry) {
 
   const { length } = lazyModules
 
-  if (config.variables.v8_enable_inspector) {
+  if (HAS_INSPECTOR) {
     lazyModules.push("inspector")
   }
 
