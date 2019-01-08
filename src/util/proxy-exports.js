@@ -177,7 +177,7 @@ function init() {
         if (Reflect.set(exported, name, value, receiver)) {
           if (hasSetter) {
             entry.updateBindings()
-          } else if (Reflect.has(entry._namespace, name)) {
+          } else if (Reflect.has(entry.namespace, name)) {
             entry.updateBindings(name)
           }
 
