@@ -1267,8 +1267,13 @@ describe("miscellaneous tests", () => {
         .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
     )
 
-    it("should not error importing a non-ambiguous export", () =>
-      import("./misc/import/non-ambiguous.mjs")
+    it("should not error importing a non-ambiguous ESM export", () =>
+      import("./misc/import/non-ambiguous-esm.js")
+        .then((ns) => ns.default())
+    )
+
+    it("should not error importing a non-ambiguous CJS export", () =>
+      import("./misc/import/non-ambiguous-cjs.js")
         .then((ns) => ns.default())
     )
 
@@ -1321,10 +1326,11 @@ describe("miscellaneous tests", () => {
     it("should error when importing or re-exporting a conflicted star exports", () =>
       Promise
         .all([
-          "./fixture/import/star-conflict.js",
-          "./fixture/import/star-conflict.mjs",
-          "./fixture/export/star-conflict.js",
-          "./fixture/export/star-conflict.mjs"
+          "./fixture/import/abc-star-conflict.js",
+          "./fixture/import/abc-star-conflict.mjs",
+          "./fixture/export/abc-star-conflict.js",
+          "./fixture/export/def-star-conflict.js",
+          "./fixture/export/abc-star-conflict.mjs"
         ]
         .map((request) =>
           import(request)
