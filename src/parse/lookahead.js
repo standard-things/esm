@@ -8,7 +8,7 @@ function init() {
   function lookahead({ input, pos }) {
     flyweight.input = input
     flyweight.pos = pos
-    flyweight.nextToken()
+    flyweight.next()
     return flyweight
   }
 
