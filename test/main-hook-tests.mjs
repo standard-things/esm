@@ -6,13 +6,9 @@ import fs from "fs-extra"
 import path from "path"
 import trash from "../script/trash.js"
 
-const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
-const canUseExperimentalModules =
-  isV8 &&
-  SemVer.satisfies(process.version, ">=8.5.0")
-
+const canUseExperimentalModules = SemVer.satisfies(process.version, ">=8.5.0")
 const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")

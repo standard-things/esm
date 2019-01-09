@@ -11,10 +11,7 @@ import repl from "repl"
 import require from "./require.js"
 import vm from "vm"
 
-const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
-
-const canRunInContext = isV8
 
 const esmPath = path.resolve("../esm.js")
 const indexPath = path.resolve("../index.js")
@@ -109,10 +106,6 @@ describe("REPL hook tests", () => {
   })
 
   it("should work with a non-global context", function () {
-    if (! canRunInContext) {
-      this.skip()
-    }
-
     const r = repl.start({})
     const code = 'import { default as localAssert } from "assert"'
 
@@ -127,10 +120,6 @@ describe("REPL hook tests", () => {
   })
 
   it("should use a plain object for `module.exports`", function () {
-    if (! canRunInContext) {
-      this.skip()
-    }
-
     const r = repl.start({})
     const code = "var exports = module.exports"
 
@@ -143,10 +132,6 @@ describe("REPL hook tests", () => {
   })
 
   it("should support importing `.json` files", function (done) {
-    if (! canRunInContext) {
-      this.skip()
-    }
-
     const r = repl.start({})
 
     const code = [

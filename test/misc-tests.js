@@ -16,10 +16,8 @@ import util from "util"
 const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 
 const isDebug = !! ESM_OPTIONS.debug
-const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
-const canTestBridgeExports = isV8
 const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
 const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
 const canTestUtilTypes = Reflect.has(util, "types")

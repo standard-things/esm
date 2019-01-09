@@ -7,10 +7,7 @@ import globby from "globby"
 import path from "path"
 import test262Parser from "test262-parser"
 
-const isV8 = Reflect.has(process.versions, "v8")
-
 const canRunTest262 =
-  isV8 &&
   process.execArgv.includes("--harmony") &&
   SemVer.satisfies(process.version, ">=10.3.0")
 

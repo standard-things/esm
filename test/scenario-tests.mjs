@@ -7,10 +7,8 @@ import path from "path"
 import trash from "../script/trash.js"
 
 const isTravis = Reflect.has(process.env, "TRAVIS")
-const isV8 = Reflect.has(process.versions, "v8")
 const isWin = process.platform === "win32"
 
-const canTestJest = isV8
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! isTravis
 const canTestSqreen = SemVer.satisfies(process.version, "<11")
@@ -285,12 +283,6 @@ describe("scenario tests", function () {
   })
 
   describe("should work with jest", () => {
-    before(function () {
-      if (! canTestJest) {
-        this.skip()
-      }
-    })
-
     it("should carry over the context object of jest", function () {
       const dirPath = path.resolve("fixture/scenario/jest-context")
       const configPath = path.resolve(dirPath, "jest.config.json")
