@@ -57,9 +57,11 @@ function init() {
         changed: false,
         code,
         enforceTDZ: noop,
-        live: false,
+        filename: null,
+        mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
+        topLevelAwait: null,
         yieldIndex: 0
       }
 
@@ -292,6 +294,7 @@ function init() {
         setDeferred(result, "code", () =>  magicString.toString())
       }
 
+      result.topLevelAwait = top.firstAwaitOutsideFunction
       result.yieldIndex = yieldIndex
       return result
     }
