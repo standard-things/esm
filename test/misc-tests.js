@@ -423,12 +423,18 @@ describe("miscellaneous tests", () => {
             ),
           import(id5)
             .then(assert.fail)
-            .catch((e) =>
-              checkErrorStack(e, [
-                getURLFromFilePath(id5) + ":1",
-                "SyntaxError: Missing export name 'NOT_EXPORTED' in ES module: " + abcURL
-              ].join("\n"))
-            ),
+            .catch((e) => {
+              if (isDebug) {
+                assert.ok(true)
+              } else {
+                checkErrorStack(e, [
+                  getURLFromFilePath(id5) + ":1",
+                  'import { NOT_EXPORTED } from "../export/abc.mjs"',
+                  "",
+                  "SyntaxError: Missing export name 'NOT_EXPORTED' in ES module: " + abcURL
+                ].join("\n"))
+              }
+            }),
           import(id6)
             .then(assert.fail)
             .catch((e) =>
@@ -991,18 +997,16 @@ describe("miscellaneous tests", () => {
       Promise
         .all([
           import("./fixture/export/star-pseudo.mjs")
-            .then((ns) => {
-              assert.deepStrictEqual(ns, createNamespace({}))
-            }),
+            .then((ns) => assert.deepStrictEqual(ns, createNamespace({}))),
           import("./fixture/export/default/pseudo.mjs")
-            .then((ns) => {
+            .then((ns) =>
               assert.deepStrictEqual(ns, createNamespace({
                 default: {
                   a: "a",
                   default: "default"
                 }
               }))
-            })
+            )
         ])
     )
   })
@@ -1227,7 +1231,7 @@ describe("miscellaneous tests", () => {
             .all([
               import("./fixture/require-esm/strict/js.js")
                 .then(assert.fail)
-                .catch((e) => assert.ok(e instanceof SyntaxError)),
+                .catch((e) => checkError(e, "ERR_REQUIRE_ESM")),
               import("./fixture/require-esm/strict/mjs.js")
                 .then(assert.fail)
                 .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
@@ -1398,9 +1402,9 @@ describe("miscellaneous tests", () => {
         .map((request) =>
           import(request)
             .then(assert.fail)
-            .catch((e) => {
+            .catch(({ message }) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
-              assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
+              assert.ok(message.startsWith("Missing export name 'NOT_EXPORTED'"))
             })
         ))
     )
@@ -1414,14 +1418,9 @@ describe("miscellaneous tests", () => {
         .map((request) =>
           import(request)
             .then(assert.fail)
-            .catch((e) => {
+            .catch(({ message }) => {
               assert.strictEqual(global.loadCount, 1)
-
-              if (canTestBridgeExports) {
-                assert.ok(e.message.startsWith("Missing export name 'NOT_EXPORTED'"))
-              } else {
-                assert.ok(true)
-              }
+              assert.ok(message.startsWith("Missing export name 'NOT_EXPORTED'"))
             })
         ))
     )
