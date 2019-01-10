@@ -9,13 +9,13 @@ function init() {
 
   function createClass(Super) {
     class AcornError extends Super {
-      constructor({ inModule, input }, pos, message) {
+      constructor(parser, pos, message) {
         super(message)
 
-        const { column, line } = getLineInfo(input, pos)
+        const { column, line } = getLineInfo(parser.input, pos)
 
         this.column = column
-        this.inModule = inModule
+        this.inModule = parser.inModule
         this.line = line
       }
     }
