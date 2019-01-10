@@ -75,17 +75,17 @@ function init() {
       ? true
       : options.return
 
+    const yieldCode = "yield;" + runtimeName + ".s();"
     const { yieldIndex } = compileData
 
-    if (! async &&
-        yieldIndex !== -1) {
+    if (yieldIndex !== -1) {
       if (yieldIndex === 0) {
-        code = "yield;" + code
+        code = yieldCode + code
       } else {
         code =
           code.slice(0, yieldIndex) +
           (code.charCodeAt(yieldIndex - 1) === SEMICOLON ? "" : ";") +
-          "yield;" +
+          yieldCode +
           code.slice(yieldIndex)
       }
     }
@@ -99,8 +99,7 @@ function init() {
       (returnRun ? "return " : "") +
       runtimeName + ".r((" +
       (async ? "async " :  "") +
-      "function" +
-      (async ? "" : " *") +
+      "function *" +
       "(" +
       (cjsVars
         ? "exports,require"
