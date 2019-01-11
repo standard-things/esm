@@ -59,14 +59,7 @@ function init() {
   }
 
   function compileESM(compileData, options) {
-    let { code } = compileData
-
-    if (! compileData.changed) {
-      code = stripShebang(code)
-    }
-
     const {
-      async,
       cjsVars,
       runtimeName
     } = options
@@ -77,6 +70,18 @@ function init() {
 
     const yieldCode = "yield;" + runtimeName + ".s();"
     const { yieldIndex } = compileData
+
+    let { async } = options
+
+    if (compileData.topLevelAwait === null) {
+      async = false
+    }
+
+    let { code } = compileData
+
+    if (! compileData.changed) {
+      code = stripShebang(code)
+    }
 
     if (yieldIndex !== -1) {
       if (yieldIndex === 0) {
@@ -98,7 +103,10 @@ function init() {
       ) +
       (returnRun ? "return " : "") +
       runtimeName + ".r((" +
-      (async ? "async " :  "") +
+      (async
+        ? "async "
+        :  ""
+      ) +
       "function *" +
       "(" +
       (cjsVars
