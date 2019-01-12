@@ -14,7 +14,8 @@ function init() {
   }
 
   function parseAwait(func, args) {
-    if (! this.inFunction &&
+    if (! this.inAsync &&
+        ! this.inFunction &&
         this.firstAwaitOutsideFunction === null) {
       this.firstAwaitOutsideFunction = getLineInfo(this.input, this.start)
     }
@@ -23,7 +24,9 @@ function init() {
   }
 
   function parseForStatement(func, args) {
-    if (this.firstAwaitOutsideFunction !== null) {
+    if (this.inAsync ||
+        this.inFunction ||
+        this.firstAwaitOutsideFunction !== null) {
       return Reflect.apply(func, this, args)
     }
 
@@ -32,7 +35,6 @@ function init() {
     const result = Reflect.apply(func, this, args)
 
     if (node.await &&
-        ! this.inFunction &&
         this.firstAwaitOutsideFunction === null) {
       this.firstAwaitOutsideFunction = getLineInfo(this.input, start)
     }

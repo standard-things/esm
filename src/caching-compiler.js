@@ -59,8 +59,6 @@ function init() {
         return null
       }
 
-      let sourceType = SOURCE_TYPE_SCRIPT
-
       const { length } = meta
 
       const result = {
@@ -68,14 +66,26 @@ function init() {
         code: null,
         enforceTDZ: noop,
         filename: null,
+        firstAwaitOutsideFunction: null,
         mtime: -1,
         scriptData: null,
-        sourceType,
+        sourceType: SOURCE_TYPE_SCRIPT,
         yieldIndex: -1
       }
 
       if (length > 2) {
-        let filename = meta[5]
+        const deflatedFirstAwaitOutsideFunction = meta[5]
+
+        let firstAwaitOutsideFunction = null
+
+        if (deflatedFirstAwaitOutsideFunction !== null) {
+          firstAwaitOutsideFunction = [
+            deflatedFirstAwaitOutsideFunction[0],
+            deflatedFirstAwaitOutsideFunction[1]
+          ]
+        }
+
+        let filename = meta[6]
 
         if (filename) {
           filename = resolve(cachePath, filename)
@@ -83,14 +93,15 @@ function init() {
 
         result.changed = !! meta[2]
         result.filename = filename
+        result.firstAwaitOutsideFunction = firstAwaitOutsideFunction
         result.mtime = +meta[3]
         result.sourceType = +meta[4]
       }
 
-      if (length > 6 &&
+      if (length > 7 &&
           result.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
-        result.yieldIndex = +meta[6]
+        result.yieldIndex = +meta[7]
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -264,11 +275,21 @@ function init() {
         if (compileData) {
           const {
             filename,
+            firstAwaitOutsideFunction,
             mtime,
             sourceType
           } = compileData
 
           const changed = +compileData.changed
+
+          let deflatedFirstAwaitOutsideFunction = null
+
+          if (firstAwaitOutsideFunction !== null) {
+            deflatedFirstAwaitOutsideFunction = [
+              firstAwaitOutsideFunction.column,
+              firstAwaitOutsideFunction.line
+            ]
+          }
 
           if (sourceType === SOURCE_TYPE_SCRIPT) {
             if (changed) {
@@ -276,6 +297,7 @@ function init() {
                 changed,
                 mtime,
                 sourceType,
+                deflatedFirstAwaitOutsideFunction,
                 normalize(relative(cachePath, filename))
               )
             }
@@ -284,6 +306,7 @@ function init() {
               changed,
               mtime,
               sourceType,
+              deflatedFirstAwaitOutsideFunction,
               normalize(relative(cachePath, filename)),
               compileData.yieldIndex
             )

@@ -259,8 +259,13 @@ if (cachePath !== "") {
         __proto__: null,
         esm: {
           changed: false,
+          code: null,
+          filename: null,
+          firstAwaitOutsideFunction: null,
+          mtime: -1,
           scriptData: cachedData || null,
-          sourceType: 1
+          sourceType: 1,
+          yieldIndex: -1
         }
       },
       map: { __proto__: null }

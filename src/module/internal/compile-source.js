@@ -73,7 +73,7 @@ function init() {
 
     let { async } = options
 
-    if (compileData.topLevelAwait === null) {
+    if (compileData.firstAwaitOutsideFunction === null) {
       async = false
     }
 
