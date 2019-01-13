@@ -1,7 +1,6 @@
 import ENTRY from "../../constant/entry.js"
 
 import load from "./load.js"
-import shared from "../../shared.js"
 
 const {
   STATE_EXECUTION_STARTED,
@@ -9,17 +8,7 @@ const {
 } = ENTRY
 
 function parse(request, parent, isMain, preload) {
-  const { moduleState } = shared
-
-  moduleState.parsing = true
-
-  let entry
-
-  try {
-    entry = load(request, parent, isMain, preload)
-  } finally {
-    moduleState.parsing = false
-  }
+  const entry = load(request, parent, isMain, preload)
 
   if (entry.compileData !== null &&
       entry.state < STATE_EXECUTION_STARTED) {
