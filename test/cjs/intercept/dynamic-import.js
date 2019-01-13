@@ -37,7 +37,7 @@ module.exports = () => {
   return new Promise((resolve) => setImmediate(() => {
     Module.prototype.require = oldRequire
 
-    assert.deepStrictEqual(intercepted.sort(), expected)
+    assert.deepStrictEqual(intercepted, expected)
     resolve()
   }))
 }
