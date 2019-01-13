@@ -64,7 +64,11 @@ function init() {
     args[0] = prepareValue(value)
     args[1] = options
 
-    const result = Reflect.apply(safeInspect, this, args)
+    let result = ""
+
+    try {
+      result = Reflect.apply(safeInspect, this, args)
+    } catch {}
 
     if (! isWrappable(value) ||
         (result.indexOf(PROXY_PREFIX) === -1 &&
