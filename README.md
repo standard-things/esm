@@ -173,6 +173,12 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
+  <td valign="top"><code>"wasm":</code></td>
+  <td>
+    <p>A boolean for experimental <a href="https://nodejs.org/docs/latest/api/globals.html#globals_webassembly">WebAssembly</a> module support.</p>
+  </td>
+</tr>
+<tr>
   <td colspan="2"><code>}</code></td>
 </tr>
 </table>
