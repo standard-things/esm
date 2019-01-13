@@ -9,6 +9,8 @@ import Package from "./package.js"
 import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
+import assignToModuleNamespaceObject from "./util/assign-to-module-namespace-object.js"
+import constructStackless from "./error/construct-stackless.js"
 import copyProperty from "./util/copy-property.js"
 import encodeId from "./util/encode-id.js"
 import errors from "./errors.js"
@@ -28,7 +30,6 @@ import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
 import keys from "./util/keys.js"
-import noop from "./util/noop.js"
 import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
@@ -61,7 +62,6 @@ const {
 } = COMPILER
 
 const {
-  ERR_EXPORT_MISSING,
   ERR_EXPORT_STAR_CONFLICT,
   ERR_NS_ASSIGNMENT,
   ERR_NS_DEFINITION,
@@ -70,6 +70,8 @@ const {
   ERR_NS_REDEFINITION,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
+
+const INITIAL_VALUE = {}
 
 const pseudoDescriptor = {
   value: true
@@ -83,6 +85,14 @@ class Entry {
     this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
+    // The raw mutable namespace object for CJS importers.
+    this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: void 0 })
+    // The raw namespace object for CJS importers.
+    this._cjsNamespace = toRawModuleNamespaceObject({ default: void 0 })
+    // The raw mutable namespace object for ESM importers.
+    this._esmMutableNamespace = toRawModuleNamespaceObject()
+    // The raw namespace object for ESM importers.
+    this._esmNamespace = toRawModuleNamespaceObject()
     // The passthru indicator for `module._compile()`.
     this._passthru = false
     // The load type for `module.require()`.
@@ -95,18 +105,18 @@ class Entry {
     this.children = { __proto__: null }
     // The circular import indicator.
     this.circular = false
+    // The mutable namespace object CJS importers receive.
+    this.cjsMutableNamespace = createMutableNamespaceProxy(this, this._cjsMutableNamespace)
+    // The namespace object CJS importers receive.
+    this.cjsNamespace = createImmutableNamespaceProxy(this, this._cjsNamespace)
+    // The mutable namespace object ESM importers receive.
+    this.esmMutableNamespace = createMutableNamespaceProxy(this, this._esmMutableNamespace)
+    // The namespace object ESM importers receive.
+    this.esmNamespace = createImmutableNamespaceProxy(this, this._esmNamespace)
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
-    // The mutable namespace object CJS importers receive.
-    this.cjsMutableNamespace = this.namespace
-    // The namespace object CJS importers receive.
-    this.cjsNamespace = this.namespace
     // The module dirname.
     this.dirname = null
-    // The mutable namespace object ESM importers receive.
-    this.esmMutableNamespace = this.namespace
-    // The namespace object ESM importers receive.
-    this.esmNamespace = this.namespace
     // The `module.exports` value at the time the module loaded.
     this.exports = mod.exports
     // The module extname.
@@ -140,12 +150,15 @@ class Entry {
 
     // The cache name of the module.
     setDeferred(this, "cacheName", () => {
-      const pkg = this.package
+      const {
+        cachePath,
+        options:packageOptions
+      } = this.package
 
       return getCacheName(this.mtime, {
-        cachePath: pkg.cachePath,
+        cachePath,
         filename: this.filename,
-        packageOptions: pkg.options
+        packageOptions
       })
     })
 
@@ -160,7 +173,8 @@ class Entry {
       } else if (compileData.changed) {
         const content = readFile(cachePath + sep + cacheName, "utf8")
 
-        compileData.code = content === null ? "" : content
+        compileData.code =
+        compileData.codeWithoutTDZ = content === null ? "" : content
       }
 
       return compileData
@@ -184,6 +198,35 @@ class Entry {
           compileData.sourceType === SOURCE_TYPE_MODULE) {
         return TYPE_ESM
       }
+
+      const proxy = new OwnProxy(this._namespace, {
+        get: (_namespace, name, receiver) => {
+          const exported = this.exports
+
+          if (name === "default") {
+            return exported
+          }
+
+          let object = _namespace
+
+          if (name !== Symbol.toStringTag &&
+              has(exported, name) &&
+              (this.builtin ||
+               isEnumerable(exported, name))) {
+            object = exported
+          }
+
+          if (receiver === proxy) {
+            receiver = object
+          }
+
+          return Reflect.get(object, name, receiver)
+        }
+      })
+
+      this.exports = proxyExports(this)
+      this.namespace = proxy
+      this.updateNamespaces()
 
       return TYPE_CJS
     })
@@ -244,24 +287,14 @@ class Entry {
       type
     } = this
 
-    const isESM = type === TYPE_ESM
-
-    if (isESM &&
-        this.compileData.exportedSpecifiers[name] === false) {
-      // Skip getters for conflicted export specifiers.
-      return this
-    }
-
-    const inited = Reflect.has(getters, name)
-
     getters[name] = getter
+
+    if (! has(getter, "id")) {
+      getter.id = name
+    }
 
     if (! has(getter, "owner")) {
       getter.owner = this
-    }
-
-    if (inited) {
-      return this
     }
 
     const descriptor = {
@@ -294,7 +327,7 @@ class Entry {
       }
     }
 
-    if (isESM &&
+    if (type === TYPE_ESM &&
         name === "default") {
       const value = tryGetter(getter)
 
@@ -310,6 +343,7 @@ class Entry {
     }
 
     Reflect.defineProperty(_namespace, name, descriptor)
+
     return this
   }
 
@@ -321,19 +355,19 @@ class Entry {
     return this
   }
 
+  updateNamespaces() {
+    cjsNamespaceUpdate(this, this._cjsMutableNamespace)
+    cjsNamespaceUpdate(this, this._cjsNamespace)
+    esmNamespaceUpdate(this, this._esmMutableNamespace)
+    esmNamespaceUpdate(this, this._esmNamespace)
+  }
+
   addGetterFrom(otherEntry, importedName, exportedName = importedName) {
-    const { getters } = this
-    const otherGetters = otherEntry.getters
-
-    if (Reflect.has(getters, exportedName) ||
-        (importedName !== "*" &&
-         ! Reflect.has(otherGetters, importedName))) {
-      return this
-    }
-
     if (importedName === "*") {
       return this.addGetter(exportedName, () => otherEntry.esmNamespace)
     }
+
+    const otherGetters = otherEntry.getters
 
     let otherGetter = otherGetters[importedName]
 
@@ -343,11 +377,18 @@ class Entry {
       otherGetter.owner = otherEntry
     }
 
+    if (otherGetter === void 0) {
+      otherGetter = () => otherEntry.getters[importedName]()
+      otherGetter.owner = otherEntry
+      otherGetter.id = importedName
+      otherGetter.deferred = true
+    }
+
     return this.addGetter(exportedName, otherGetter)
   }
 
   addSetter(name, localNames, setter, parentEntry) {
-    setter.last = void 0
+    setter.last = name === "default" ? void 0 : INITIAL_VALUE
     setter.localNames = localNames
     setter.parent = parentEntry
 
@@ -363,7 +404,7 @@ class Entry {
 
     settersMap[name].push(setter)
 
-    const { importedBindings } = this
+    const { importedBindings } = parentEntry
 
     for (const name of localNames) {
       if (! Reflect.has(importedBindings, name)) {
@@ -384,29 +425,18 @@ class Entry {
 
   assignExportsToNamespace(names) {
     const exported = this.exports
-    const { getters } = this
+    const isCJS = this.type === TYPE_CJS
     const isLoaded = this._loaded === LOAD_COMPLETED
 
-    if (! isLoaded &&
-        exported != null &&
-        exported.__esModule &&
-        this.type === TYPE_CJS &&
-        this.package.options.cjs.interop) {
-      this.type = TYPE_PSEUDO
-    }
-
-    const isCJS = this.type === TYPE_CJS
-
-    if (isCJS &&
-        ! Reflect.has(getters, "default")) {
-      this.addGetter("default", () => this.namespace.default)
-    }
-
-    if (! isObjectLike(exported)) {
+    if ((isCJS &&
+         ! this.module.loaded) ||
+        ! isObjectLike(exported)) {
       return
     }
 
-    if (! names) {
+    const { getters } = this
+
+    if (names === void 0) {
       if (isLoaded) {
         names = keys(this._namespace)
       } else {
@@ -423,58 +453,12 @@ class Entry {
     }
   }
 
-  initNamespace() {
-    this.initNamespace = noop
-
-    if (this.type === TYPE_ESM) {
-      const { _namespace } = this
-      const { exportedSpecifiers } = this.compileData
-
-      for (const exportedName in exportedSpecifiers) {
-        if (exportedSpecifiers[exportedName] !== false &&
-            ! Reflect.has(_namespace, exportedName)) {
-          _namespace[exportedName] = void 0
-        }
-      }
-    }
-
-    setDeferred(this, "cjsMutableNamespace", function () {
-      return createMutableNamespaceProxy(
-        this,
-        cjsNamespaceGetter(this),
-        cjsNamespaceSource(this)
-      )
-    })
-
-    setDeferred(this, "cjsNamespace", function () {
-      return createImmutableNamespaceProxy(
-        this,
-        cjsNamespaceGetter(this),
-        cjsNamespaceSource(this)
-      )
-    })
-
-    setDeferred(this, "esmMutableNamespace", function () {
-      return createMutableNamespaceProxy(
-        this,
-        esmNamespaceGetter(this)
-      )
-    })
-
-    setDeferred(this, "esmNamespace", function () {
-      return createImmutableNamespaceProxy(
-        this,
-        esmNamespaceGetter(this)
-      )
-    })
-  }
-
   loaded() {
     if (this._loaded !== LOAD_INCOMPLETE) {
       return this._loaded
     }
 
-    let mod = this.module
+    const mod = this.module
 
     if (! mod.loaded) {
       return this._loaded = LOAD_INCOMPLETE
@@ -485,7 +469,7 @@ class Entry {
     const { children } = this
 
     for (const name in children) {
-      if (children[name].loaded() === LOAD_INCOMPLETE) {
+      if (! children[name].module.loaded) {
         return this._loaded = LOAD_INCOMPLETE
       }
     }
@@ -494,6 +478,7 @@ class Entry {
 
     if (type === TYPE_ESM ||
         type === TYPE_WASM) {
+      this._loaded = LOAD_COMPLETED
       this.assignExportsToNamespace()
 
       if (this.package.options.cjs.interop &&
@@ -523,13 +508,36 @@ class Entry {
         return this._loaded = LOAD_INCOMPLETE
       }
 
+      if (newExported != null &&
+          newExported.__esModule &&
+          this.type === TYPE_CJS &&
+          this.package.options.cjs.interop) {
+        this.namespace = this._namespace
+        this.type = TYPE_PSEUDO
+      }
+
       this.exports = newExported
-      this.assignExportsToNamespace()
+      this._loaded = LOAD_COMPLETED
+
+      if (this.type === TYPE_CJS) {
+        if (! Reflect.has(this.getters, "default")) {
+          this.addGetter("default", () => this.namespace.default)
+        }
+
+        this.exports = proxyExports(this)
+      }
+
+      this.assignExportsToNamespace(keys(newExported))
       shared.entry.skipExports.delete(this.name)
     }
 
-    this.initNamespace()
-    return this._loaded = LOAD_COMPLETED
+    this.updateNamespaces()
+
+    Object.seal(this._cjsNamespace)
+    Object.seal(this._esmNamespace)
+
+    // finalize ns here
+    return this._loaded
   }
 
   merge(otherEntry) {
@@ -542,7 +550,52 @@ class Entry {
     return this
   }
 
-  updateBindings(names, type) {
+  resumeChildren() {
+    const { children } = this
+
+    for (const name in children) {
+      const childEntry = children[name]
+
+      if (childEntry.running === false) {
+        const { runtime } = childEntry
+
+        if (runtime !== null &&
+            runtime._runResult !== void 0 &&
+            childEntry.module !== this.module &&
+            childEntry._loaded !== LOAD_COMPLETED) {
+          childEntry.running = true
+          runtime._runResult.next()
+          childEntry.running = false
+          childEntry.module.loaded = true
+        }
+
+        if (childEntry.done) {
+          childEntry.done()
+        } else {
+          childEntry.loaded()
+          childEntry.updateBindings(null, UPDATE_TYPE_INIT)
+        }
+      }
+    }
+  }
+
+  updateBindings(names, type, seen) {
+    const shouldUpdateParents =
+      this.circular ||
+      type === UPDATE_TYPE_INIT ||
+      type === UPDATE_TYPE_LIVE
+
+    if (shouldUpdateParents) {
+      if (seen !== void 0 &&
+        seen.has(this)) {
+        return
+      } else if (seen === void 0) {
+        seen = new Set
+      }
+
+      seen.add(this)
+    }
+
     if (typeof names === "string") {
       names = [names]
     }
@@ -551,30 +604,25 @@ class Entry {
     // setters might need to run.
     let parentsMap
 
-    const shouldUpdateParents =
-      this.circular ||
-      type === UPDATE_TYPE_INIT ||
-      type === UPDATE_TYPE_LIVE
-
     this._changed = false
 
     runGetters(this, names)
     runSetters(this, names, (setter) => {
-      if (! shouldUpdateParents) {
-        return
-      }
-
       const parentEntry = setter.parent
       const { importedBindings } = parentEntry
 
-      if (parentsMap === void 0) {
-        parentsMap = { __proto__: null }
+      if (setter.last !== ERROR_GETTER) {
+        for (const name of setter.localNames) {
+          importedBindings[name] = true
+        }
       }
 
-      parentsMap[parentEntry.name] = parentEntry
+      if (shouldUpdateParents) {
+        if (parentsMap === void 0) {
+          parentsMap = { __proto__: null }
+        }
 
-      for (const name of setter.localNames) {
-        importedBindings[name] = true
+        parentsMap[parentEntry.name] = parentEntry
       }
     }, type)
 
@@ -585,7 +633,10 @@ class Entry {
     // then we must re-run any setters registered by that parent module.
     if (shouldUpdateParents) {
       for (const id in parentsMap) {
-        parentsMap[id].updateBindings(null, UPDATE_TYPE_LIVE)
+        const parentEntry = parentsMap[id]
+
+        parentEntry.loaded()
+        parentEntry.updateBindings(null, UPDATE_TYPE_LIVE, seen)
       }
     }
 
@@ -636,33 +687,42 @@ class Entry {
   }
 }
 
-function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
+function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   handler.get = function get(namespace, name, receiver) {
-    const sourceNamespace = source.namespace
+    const { getters } = entry
+    const isESM = entry.type === TYPE_ESM
 
-    if (entry.type === TYPE_ESM) {
-      const getter = entry.getters[name]
-
-      if (getter) {
-        getter()
-      } else if (typeof name === "string" &&
-          Reflect.has(sourceNamespace, name)) {
-        throw new ERR_UNDEFINED_IDENTIFIER(name, get)
-      }
+    if (isESM &&
+        Reflect.has(getters, name)) {
+      getters[name]()
+    } else if ((isESM ||
+         entry._loaded !== LOAD_COMPLETED) &&
+        typeof name === "string" &&
+        Reflect.has(namespace, name)) {
+      throw new ERR_UNDEFINED_IDENTIFIER(name, get)
     }
+
+    if (! isESM &&
+        name === "default" &&
+        (namespace === entry._cjsNamespace ||
+         namespace === entry._cjsMutableNamespace)) {
+      return entry.exports
+    }
+
+    const object = entry.namespace
 
     if (receiver === proxy) {
-      receiver = sourceNamespace
+      receiver = object
     }
 
-    return Reflect.get(sourceNamespace, name, receiver)
+    return Reflect.get(object, name, receiver)
   }
 
   handler.getOwnPropertyDescriptor = (namespace, name) => {
     const descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
 
     if (descriptor) {
-      descriptor.value = handler.get(namespace, name)
+      descriptor.value = handler.get(entry.namespace, name)
     }
 
     return descriptor
@@ -670,11 +730,11 @@ function assignCommonNamespaceHandlerTraps(handler, entry, source, proxy) {
 
   handler.has = (namespace, name) => {
     return name === shared.symbol.namespace ||
-      Reflect.has(source.namespace, name)
+      Reflect.has(namespace, name)
   }
 }
 
-function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
+function assignImmutableNamespaceHandlerTraps(handler, entry) {
   "use sloppy"
 
   handler.defineProperty = (namespace, name, descriptor) => {
@@ -688,7 +748,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
       return false
     }
 
-    if (Reflect.has(source.namespace, name)) {
+    if (Reflect.has(namespace, name)) {
       throw new ERR_NS_REDEFINITION(entry.module, name)
     } else {
       throw new ERR_NS_DEFINITION(entry.module, name)
@@ -712,7 +772,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
       return false
     }
 
-    if (Reflect.has(source.namespace, name)) {
+    if (Reflect.has(namespace, name)) {
       throw new ERR_NS_ASSIGNMENT(entry.module, name)
     }
 
@@ -720,14 +780,13 @@ function assignImmutableNamespaceHandlerTraps(handler, entry, source) {
   }
 }
 
-function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
+function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   handler.defineProperty = (namespace, name, descriptor) => {
     SafeObject.defineProperty(entry.exports, name, descriptor)
 
-    if (Reflect.has(source.namespace, name)) {
-      entry
-        .addGetter(name, () => entry.namespace[name])
-        .updateBindings(name)
+    if (Reflect.has(namespace, name)) {
+      entry.addGetter(name, () => entry.namespace[name])
+      entry.updateBindings(name)
     }
 
     return true
@@ -735,10 +794,9 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
 
   handler.deleteProperty = (namespace, name) => {
     if (Reflect.deleteProperty(entry.exports, name)) {
-      if (Reflect.has(source.namespace, name)) {
-        entry
-          .addGetter(name, () => entry.namespace[name])
-          .updateBindings(name)
+      if (Reflect.has(namespace, name)) {
+        entry.addGetter(name, () => entry.namespace[name])
+        entry.updateBindings(name)
       }
 
       return true
@@ -754,7 +812,8 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
       const value = Reflect.get(namespace, name, receiver)
       const newValue = get(namespace, name, receiver)
 
-      if (newValue !== value &&
+      if ((value === INITIAL_VALUE ||
+           newValue !== value) &&
           isUpdatableGet(namespace, name)) {
         return newValue
       }
@@ -801,10 +860,9 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
     }
 
     if (Reflect.set(exported, name, value, receiver)) {
-      if (Reflect.has(source.namespace, name)) {
-        entry
-          .addGetter(name, () => entry.namespace[name])
-          .updateBindings(name)
+      if (Reflect.has(entry.namespace, name)) {
+        entry.addGetter(name, () => entry.namespace[name])
+        entry.updateBindings(name)
       }
 
       return true
@@ -814,61 +872,33 @@ function assignMutableNamespaceHandlerTraps(handler, entry, source, proxy) {
   }
 }
 
-function cjsNamespaceGetter(entry) {
-  return (object, name) => {
-    return name === "default"
-      ? object[name]
-      : Reflect.getOwnPropertyDescriptor(entry.exports, name).value
-  }
+function cjsNamespaceUpdate(entry, namespace) {
+  namespace.default = entry.exports
 }
 
-function cjsNamespaceSource(entry) {
-  return {
-    namespace: toRawModuleNamespaceObject({
-      default: entry.module.exports
-    })
-  }
+function esmNamespaceUpdate(entry, namespace) {
+  assignToModuleNamespaceObject(namespace, entry.namespace, () => INITIAL_VALUE)
 }
 
-function createImmutableNamespaceProxy(entry, getter, source = entry) {
+function createImmutableNamespaceProxy(entry, namespace) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Namespace objects should be sealed.
   // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
   const handler = initNamespaceHandler()
-  const namespace = Object.seal(createNamespace(source, getter))
   const proxy = new OwnProxy(namespace, handler)
 
-  assignCommonNamespaceHandlerTraps(handler, entry, source, proxy)
-  assignImmutableNamespaceHandlerTraps(handler, entry, source)
+  assignCommonNamespaceHandlerTraps(handler, entry, proxy)
+  assignImmutableNamespaceHandlerTraps(handler, entry)
   return proxy
 }
 
-function createNamespace(source, getter) {
-  return toRawModuleNamespaceObject(source.namespace, getter)
-}
-
-function createMutableNamespaceProxy(entry, getter, source = entry) {
+function createMutableNamespaceProxy(entry, namespace) {
   const handler = initNamespaceHandler()
-  const namespace = createNamespace(source, getter)
   const proxy = new OwnProxy(namespace, handler)
 
-  assignCommonNamespaceHandlerTraps(handler, entry, source, proxy)
-  assignMutableNamespaceHandlerTraps(handler, entry, source, proxy)
+  assignCommonNamespaceHandlerTraps(handler, entry, proxy)
+  assignMutableNamespaceHandlerTraps(handler, entry, proxy)
   return proxy
-}
-
-function esmNamespaceGetter(entry) {
-  return (object, name) => {
-    const { type } = entry
-
-    if (type === TYPE_ESM ||
-        (type === TYPE_CJS &&
-         name === "default")) {
-      return object[name]
-    }
-
-    return Reflect.getOwnPropertyDescriptor(entry.exports, name).value
-  }
 }
 
 function getBuiltinExportNames(exported) {
@@ -890,12 +920,7 @@ function getBuiltinExportNames(exported) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const {
-    _namespace,
-    builtin,
-    type
-  } = entry
-
+  const { type } = entry
   const isCJS = type === TYPE_CJS
   const isPseudo = type === TYPE_PSEUDO
 
@@ -907,7 +932,7 @@ function getExportByName(entry, name, parentEntry) {
     parentCJS.mutableNamespace
 
   const parentNamedExports =
-    builtin ||
+    entry.builtin ||
     (! parentIsMJS &&
      parentCJS.namedExports)
 
@@ -920,38 +945,6 @@ function getExportByName(entry, name, parentEntry) {
      ! parentNamedExports) ||
     (isPseudo &&
      parentIsMJS)
-
-  if (isCJS &&
-      parentNamedExports &&
-      entry.namespace === _namespace) {
-    const proxy = new OwnProxy(_namespace, {
-      get(_namespace, name, receiver) {
-        const exported = proxyExports(entry)
-
-        if (name === "default") {
-          return exported
-        }
-
-        let object = _namespace
-
-        if (name !== Symbol.toStringTag &&
-            has(exported, name) &&
-            (builtin ||
-             isEnumerable(exported, name))) {
-          object = exported
-        }
-
-        if (receiver === proxy) {
-          receiver = object
-        }
-
-        return Reflect.get(object, name, receiver)
-      }
-    })
-
-    // Lazily assign proxied namespace object.
-    entry.namespace = proxy
-  }
 
   if (name === "*") {
     if (noMutableNamespace) {
@@ -973,47 +966,29 @@ function getExportByName(entry, name, parentEntry) {
       : entry.cjsMutableNamespace.default
   }
 
-  const { getters } = entry
+  const getter = entry.getters[name]
 
-  if ((noNamedExports &&
-       name !== "default") ||
-      (entry._loaded === LOAD_COMPLETED &&
-       ! Reflect.has(getters, name))) {
-    // Remove problematic setter to unblock subsequent imports.
-    Reflect.deleteProperty(entry.setters, name)
-    throw new ERR_EXPORT_MISSING(entry.module, name)
-  }
-
-  const getter = getters[name]
-
-  if (getter) {
+  if (typeof getter === "function") {
     return getter()
   }
 }
 
 function getExportByNameFast(entry, name, parentEntry) {
-  if (name === "*") {
-    const parentMutableNamespace =
-      parentEntry.extname !== ".mjs" &&
-      parentEntry.package.options.cjs.mutableNamespace
-
-    const noMutableNamespace =
-      ! parentMutableNamespace ||
-      entry.extname === ".mjs"
-
-    return noMutableNamespace
-      ? entry.esmNamespace
-      : entry.esmMutableNamespace
+  if (name !== "*") {
+    return tryGetter(entry.getters[name])
   }
 
-  if (entry._loaded === LOAD_COMPLETED &&
-      ! Reflect.has(entry.getters, name)) {
-    // Remove problematic setter to unblock subsequent imports.
-    Reflect.deleteProperty(entry.setters, name)
-    throw new ERR_EXPORT_MISSING(entry.module, name)
-  }
+  const parentMutableNamespace =
+    parentEntry.extname !== ".mjs" &&
+    parentEntry.package.options.cjs.mutableNamespace
 
-  return entry._namespace[name]
+  const noMutableNamespace =
+    ! parentMutableNamespace ||
+    entry.extname === ".mjs"
+
+  return noMutableNamespace
+    ? entry.esmNamespace
+    : entry.esmMutableNamespace
 }
 
 function initNamespaceHandler() {
@@ -1091,13 +1066,14 @@ function runGetter(entry, name) {
   const { _namespace } = entry
   const getter = entry.getters[name]
 
-  const value = getter
+  const value = typeof getter === "function"
     ? tryGetter(getter)
     : ERROR_GETTER
 
-  if (value !== ERROR_GETTER &&
-      ! (Reflect.has(_namespace, name) &&
-         Object.is(_namespace[name], value))) {
+  if (value === ERROR_STAR) {
+    Reflect.deleteProperty(_namespace, name)
+  } else if (! Reflect.has(_namespace, name) ||
+      ! Object.is(_namespace[name], value)) {
     entry._changed = true
     _namespace[name] = value
   }
@@ -1144,10 +1120,9 @@ function runSetter(entry, name, callback, updateType) {
       value = getExportByName(entry, name, parentEntry)
     }
 
-    if (value === ERROR_GETTER) {
-      value = void 0
-    } else if (value === ERROR_STAR) {
-      throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
+    if (value === ERROR_STAR) {
+      setters.splice(length, 1)
+      throw constructStackless(ERR_EXPORT_STAR_CONFLICT, [entry.module, name])
     }
 
     const { last, type } = setter
@@ -1164,7 +1139,8 @@ function runSetter(entry, name, callback, updateType) {
         isExportNs) {
       setter.last = value
 
-      const result = setter(value, entry)
+      const setterValue = value === ERROR_GETTER ? void 0 : value
+      const result = setter(setterValue, entry)
 
       if (result) {
         if (isDynamicImport) {
@@ -1193,9 +1169,11 @@ function runSetters(entry, names, callback, updateType) {
 }
 
 function tryGetter(getter) {
-  try {
-    return getter()
-  } catch {}
+  if (typeof getter === "function") {
+    try {
+      return getter()
+    } catch {}
+  }
 
   return ERROR_GETTER
 }

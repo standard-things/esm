@@ -1,6 +1,7 @@
 import COMPILER from "../../constant/compiler.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
+import MESSAGE from "../../constant/message.js"
 import PACKAGE from "../../constant/package.js"
 
 import CachingCompiler from "../../caching-compiler.js"
@@ -10,6 +11,7 @@ import Runtime from "../../runtime.js"
 
 import captureStackTrace from "../../error/capture-stack-trace.js"
 import compileSource from "./compile-source.js"
+import errors from "../../parse/errors.js"
 import esmValidate from "../esm/validate.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
@@ -21,6 +23,7 @@ import isOwnPath from "../../util/is-own-path.js"
 import isError from "../../util/is-error.js"
 import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
+import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 import toString from "../../util/to-string.js"
 
@@ -33,6 +36,8 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_INSTANTIATION_COMPLETED,
+  STATE_INSTANTIATION_STARTED,
   TYPE_ESM
 } = ENTRY
 
@@ -42,6 +47,10 @@ const {
   FLAGS,
   NDB
 } = ENV
+
+const {
+  ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION
+} = MESSAGE
 
 const {
   MODE_ALL,
@@ -107,14 +116,30 @@ function compile(caller, entry, content, filename, fallback) {
 
   if (compileData !== null &&
       compileData.code === null) {
-    compileData.code = content
+    compileData.code =
+    compileData.codeWithoutTDZ = content
   }
 
   if (parsing) {
     if (entry.type === TYPE_ESM) {
-      tryValidate(caller, entry, content, filename)
-      entry.initNamespace()
-    } else if (typeof fallback === "function") {
+      const result = tryCompileCached(entry, filename)
+
+      if (isDescendant(entry, entry)) {
+        entry.circular = true
+      } else {
+        compileData.code = compileData.codeWithoutTDZ
+      }
+
+      entry.updateBindings()
+      entry.updateNamespaces()
+
+      Object.seal(entry._cjsNamespace)
+      Object.seal(entry._esmNamespace)
+
+      return result
+    }
+
+    if (typeof fallback === "function") {
       const defaultPkg = Loader.state.package.default
       const { mainModule } = Loader.state.module
       const parentEntry = entry.parent
@@ -137,63 +162,175 @@ function compile(caller, entry, content, filename, fallback) {
         }
       }
     }
-  } else {
-    return tryCompileCached(entry, filename)
   }
+
+  return tryCompileCached(entry, filename)
+}
+
+function isDescendant(entry, parentEntry, seen) {
+  if (entry.builtin ||
+      entry.type !== TYPE_ESM) {
+    return false
+  }
+
+  const parentName = parentEntry.name
+
+  if (seen !== void 0 &&
+      seen.has(parentName)) {
+    return false
+  } else if (seen === void 0) {
+    seen = new Set
+  }
+
+  seen.add(parentName)
+
+  const { children } = parentEntry
+  const { name } = entry
+
+  for (const childName in children) {
+    if (childName === name ||
+        isDescendant(entry, children[childName], seen)) {
+      return true
+    }
+  }
+
+  return false
 }
 
 function tryCompileCached(entry, filename) {
+  const { parsing } = shared.moduleState
   const async = useAsync(entry)
   const { compileData } = entry
-  const isESM = compileData.sourceType === SOURCE_TYPE_MODULE
+  const isESM = entry.type === TYPE_ESM
   const mod = entry.module
 
   const cjsVars =
     entry.package.options.cjs.vars &&
     entry.extname !== ".mjs"
 
-  const source = compileSource(compileData, {
-    async,
-    cjsVars,
-    runtimeName: entry.runtimeName,
-    sourceMap: useSourceMap(entry)
-  })
+  let { runtime } = entry
+
+  if (isESM ||
+      compileData.changed) {
+    runtime = Runtime.enable(entry, GenericObject.create())
+  } else if (runtime === null) {
+    runtime = entry.runtime = {}
+  }
 
   let error
   let result
+  let threw = false
 
-  try {
-    if (isESM ||
-        compileData.changed) {
-      const runtime = Runtime.enable(entry, GenericObject.create())
+  if (! parsing) {
+    entry.state = STATE_EXECUTION_STARTED
+  }
 
-      if (isESM &&
-          ! async) {
-        entry.state = STATE_EXECUTION_STARTED
-        mod._compile(source, filename)
+  const firstPass = runtime._runResult === void 0
 
-        // Debuggers may wrap `Module#_compile()` with
-        // `process.binding("inspector").callAndPauseOnStart()`
-        // and not forward the return value.
-        const { _runResult } = runtime
+  if (firstPass) {
+    const source = compileSource(compileData, {
+      async,
+      cjsVars,
+      runtimeName: entry.runtimeName,
+      sourceMap: useSourceMap(entry)
+    })
 
-        // Eventually, we will call this in the instantiate phase.
-        _runResult.next()
+    entry.running = true
 
-        result = _runResult.next().value
-        entry.state = STATE_EXECUTION_COMPLETED
+    try {
+      if (isESM) {
+        result = mod._compile(source, filename)
+      } else {
+        const { _compile } = mod
+
+        runtime._runResult = (function *() {
+          yield
+          entry.state = STATE_EXECUTION_STARTED
+          return Reflect.apply(_compile, mod, [source, filename])
+        })()
       }
+    } catch (e) {
+      threw = true
+      error = e
     }
 
-    if (entry.state < STATE_EXECUTION_STARTED) {
-      entry.state = STATE_EXECUTION_STARTED
-      result = mod._compile(source, filename)
+    entry.running = false
+  }
+
+  // Debuggers may wrap `Module#_compile()` with
+  // `process.binding("inspector").callAndPauseOnStart()`
+  // and not forward the return value.
+  const { _runResult } = runtime
+
+  if (! threw &&
+      ! parsing &&
+      firstPass) {
+    entry.running = true
+
+    try {
+      _runResult.next()
+    } catch (e) {
+      threw = true
+      error = e
+    }
+
+    entry.running = false
+  }
+
+  if (! threw &&
+      ! entry.running) {
+    const { firstAwaitOutsideFunction } = compileData
+
+    entry.running = true
+
+    try {
+      if (async &&
+          isESM &&
+          firstAwaitOutsideFunction !== null &&
+          ! isObjectEmpty(entry._namespace)) {
+        const error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
+
+        error.inModule = true
+        error.column = firstAwaitOutsideFunction.column
+        error.line = firstAwaitOutsideFunction.line
+        throw error
+      }
+
+      result = _runResult.next().value
+    } catch (e) {
+      threw = true
+      error = e
+    }
+
+    entry.running = false
+  }
+
+  if (! threw) {
+    if (! parsing) {
       entry.state = STATE_EXECUTION_COMPLETED
     }
 
+    if (isESM) {
+      Reflect.defineProperty(mod, "loaded", {
+        configurable: true,
+        enumerable: true,
+        get: () => false,
+        set(value) {
+          if (value) {
+            setProperty(this, "loaded", value)
+            entry.updateBindings()
+            entry.loaded()
+          }
+        }
+      })
+    } else if (! parsing &&
+        firstPass) {
+      entry.module.loaded = true
+      entry.loaded()
+      entry.updateBindings()
+    }
+
     return result
-  } catch (e) {
-    error = e
   }
 
   if (Loader.state.package.default.options.debug ||
@@ -282,15 +419,13 @@ function tryValidate(caller, entry, content, filename) {
 function useAsync(entry) {
   return entry.package.options.await &&
     shared.support.await &&
-    entry.extname !== ".mjs" &&
-    isObjectEmpty(entry.compileData.exportedSpecifiers)
+    entry.extname !== ".mjs"
 }
 
 function useSourceMap(entry) {
   const { sourceMap } = entry.package.options
 
-  return sourceMap !== false &&
-    (sourceMap ||
+  return (sourceMap ||
      DEVELOPMENT ||
      ELECTRON_RENDERER ||
      NDB ||

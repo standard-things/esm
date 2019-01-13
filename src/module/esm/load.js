@@ -6,6 +6,7 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../internal/load.js"
+import builtinEntries from "../../builtin-entries.js"
 import builtinLookup from "../../builtin-lookup.js"
 import { dirname } from "../../safe/path.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
@@ -18,7 +19,8 @@ import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 
 const {
-  TYPE_ESM
+  TYPE_ESM,
+  UPDATE_TYPE_LIVE
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
@@ -77,36 +79,38 @@ function load(request, parent, isMain, preload) {
 
   let loaderCalled = false
 
+  const sanitize = (entry) => {
+    const isESM = entry.type === TYPE_ESM
+
+    if (! isESM) {
+      isUnexposed = false
+    }
+
+    if (isMain &&
+        isUnexposed) {
+      Reflect.deleteProperty(realProcess, "mainModule")
+      builtinEntries.process.updateBindings(["mainModule"], UPDATE_TYPE_LIVE)
+    }
+
+    if (! isESM &&
+        parentIsESM &&
+        (parentIsMJS ||
+          ! parentPkgOptions.cjs.cache)) {
+      entry.module.parent = void 0
+    }
+  }
+
   const entry = _load(request, parent, isMain, cache, (entry) => {
     loaderCalled = true
 
-    const mod = entry.module
-
-    cache[request] = mod
+    cache[request] = entry.module
 
     if (parentEntry !== null) {
       parentEntry.children[entry.name] = entry
     }
 
-    if (! parsing ||
-        entry.compileData !== null) {
-      const isESM = entry.type === TYPE_ESM
-
-      if (! isESM) {
-        isUnexposed = false
-      }
-
-      if (isMain &&
-          isUnexposed) {
-        Reflect.deleteProperty(realProcess, "mainModule")
-      }
-
-      if (! isESM &&
-          parentIsESM &&
-          (parentIsMJS ||
-           ! parentPkgOptions.cjs.cache)) {
-        mod.parent = void 0
-      }
+    if (! parsing) {
+      sanitize(entry)
     }
 
     if (typeof preload === "function") {
@@ -115,6 +119,10 @@ function load(request, parent, isMain, preload) {
 
     tryLoader(entry, cache, request, filename, parentEntry)
   })
+
+  if (parsing) {
+    sanitize(entry)
+  }
 
   if (! loaderCalled &&
       typeof preload === "function") {

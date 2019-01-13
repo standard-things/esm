@@ -2,53 +2,67 @@ import ENTRY from "../../constant/entry.js"
 
 import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
-import esmLoad from "./load.js"
 
 const {
-  STATE_PARSING_COMPLETED,
+  SETTER_TYPE_EXPORT_FROM,
   TYPE_ESM
 } = ENTRY
 
 const {
   ERR_EXPORT_CYCLE,
-  ERR_EXPORT_MISSING,
-  ERR_EXPORT_STAR_CONFLICT
+  ERR_EXPORT_MISSING
 } = errors
 
 function validate(entry) {
-  parseDependencies(entry)
-  resolveExportedStars(entry)
+  if (entry.validated) {
+    // return
+  }
+
+  entry.validated = true
+
   validateDependencies(entry)
 
-  if (isDescendant(entry, entry)) {
-    entry.circular = true
-    entry.compileData.enforceTDZ()
+  const { children } = entry
+
+  for (const childName in children) {
+    const childEntry = children[childName]
+
+    if (childEntry.type === TYPE_ESM &&
+        ! childEntry.validated) {
+      validate(childEntry)
+    }
   }
 }
 
-function isDescendant(entry, parentEntry, seen) {
-  if (entry.builtin ||
-      entry.type !== TYPE_ESM) {
-    return false
+function getSetterIndex(setters, parentEntry) {
+  const { length } = setters
+
+  let i = -1
+
+  while (++i < length) {
+    if (setters[i].parent === parentEntry) {
+      return i
+    }
   }
 
-  const parentName = parentEntry.name
+  return -1
+}
+
+function isCyclicalExport(entry, exportedName, seen) {
+  const { name, setters } = entry
 
   if (seen !== void 0 &&
-      seen.has(parentName)) {
-    return false
+      seen.has(name)) {
+    return true
   } else if (seen === void 0) {
     seen = new Set
   }
 
-  seen.add(parentName)
+  seen.add(name)
 
-  const { children } = parentEntry
-  const { name } = entry
-
-  for (const childName in children) {
-    if (childName === name ||
-        isDescendant(entry, children[childName], seen)) {
+  for (const setter of setters[exportedName]) {
+    if (setter.type === SETTER_TYPE_EXPORT_FROM &&
+        isCyclicalExport(setter.parent, setter.exportedName, seen)) {
       return true
     }
   }
@@ -56,156 +70,83 @@ function isDescendant(entry, parentEntry, seen) {
   return false
 }
 
-function parseDependencies(entry) {
-  const { dependencySpecifiers } = entry.compileData
-  const mod = entry.module
-
-  for (const request in dependencySpecifiers) {
-    const childEntry = esmLoad(request, mod)
-
-    dependencySpecifiers[request].entry =
-    entry.children[childEntry.name] = childEntry
-
-    if (! childEntry.builtin &&
-        childEntry.state < STATE_PARSING_COMPLETED) {
-      childEntry.state = STATE_PARSING_COMPLETED
-    }
-  }
-}
-
-function resolveExportedStars(entry) {
-  const { compileData } = entry
-  const { dependencySpecifiers, exportedSpecifiers } = compileData
-
-  for (const request of compileData.exportedStars) {
-    const childEntry = dependencySpecifiers[request].entry
-
-    if (childEntry === null ||
-        childEntry.builtin ||
-        childEntry.type !== TYPE_ESM) {
-      continue
-    }
-
-    for (const exportedName in childEntry.compileData.exportedSpecifiers) {
-      if (exportedName === "default") {
-        continue
-      }
-
-      if (Reflect.has(exportedSpecifiers, exportedName)) {
-        const exportedSpecifier = exportedSpecifiers[exportedName]
-
-        if (typeof exportedSpecifier !== "boolean" &&
-            exportedSpecifier.request !== request) {
-          // Export specifier is conflicted.
-          exportedSpecifiers[exportedName] = false
-        }
-      } else {
-        // Export specifier is imported.
-        exportedSpecifiers[exportedName] = {
-          local: exportedName,
-          request
-        }
-      }
-    }
-  }
-}
-
 function validateDependencies(entry) {
-  const { dependencySpecifiers } = entry.compileData
+  const { children } = entry
 
   const namedExports =
     entry.package.options.cjs.namedExports &&
     entry.extname !== ".mjs"
 
-  for (const request in dependencySpecifiers) {
-    const {
-      entry:childEntry,
-      exportedNames:childExportedNames
-    } = dependencySpecifiers[request]
+  for (const name in children) {
+    const childEntry = children[name]
 
-    if (childEntry === null ||
-        childEntry.builtin) {
+    if (childEntry.builtin) {
       continue
     }
 
-    if (childEntry.type === TYPE_ESM) {
-      resolveExportedStars(childEntry)
+    const settersMap = childEntry.setters
 
-      for (const exportedName of childExportedNames) {
-        validateExportedName(childEntry, exportedName)
+    if (childEntry.type === TYPE_ESM) {
+      const { getters } = childEntry
+
+      for (const exportedName in settersMap) {
+        if (exportedName === "*") {
+          continue
+        }
+
+        if (Reflect.has(getters, exportedName)) {
+          let getter = getters[exportedName]
+
+          if (! getter.deferred) {
+            continue
+          }
+
+          const seen = new Set
+
+          while (getter !== void 0 && getter.deferred) {
+            if (seen.has(getter)) {
+              getter = void 0
+            } else {
+              seen.add(getter)
+              getter = getter.owner.getters[getter.id]
+            }
+          }
+
+          if (getter) {
+            getters[exportedName] = getter
+            continue
+          }
+        }
+
+        const setters = settersMap[exportedName]
+        const setterIndex = getSetterIndex(setters, entry)
+
+        if (setterIndex !== -1) {
+          const ErrCtor = isCyclicalExport(childEntry, exportedName)
+            ? ERR_EXPORT_CYCLE
+            : ERR_EXPORT_MISSING
+
+          // Remove problematic setter to unblock subsequent imports.
+          setters.splice(setterIndex, 1)
+          throw constructStackless(ErrCtor, [childEntry.module, exportedName])
+        }
       }
     } else if (! namedExports) {
-      for (const exportedName of childExportedNames) {
-        if (exportedName !== "default") {
+      for (const exportedName in settersMap) {
+        if (exportedName === "*" ||
+            exportedName === "default") {
+          continue
+        }
+
+        const setters = settersMap[exportedName]
+        const setterIndex = getSetterIndex(setters, entry)
+
+        if (setterIndex !== -1) {
+          // Remove problematic setter to unblock subsequent imports.
+          setters.splice(setterIndex, 1)
           throw constructStackless(ERR_EXPORT_MISSING, [childEntry.module, exportedName])
         }
       }
-    }
-  }
-}
-
-function validateExportedName(entry, exportedName, seen) {
-  if (entry.builtin ||
-      entry.type !== TYPE_ESM ||
-      exportedName === "*") {
-    return
-  }
-
-  const { compileData, name } = entry
-  const mod = entry.module
-
-  const {
-    dependencySpecifiers,
-    exportedSpecifiers,
-    exportedStars
-  } = compileData
-
-  const exportedSpecifier = exportedSpecifiers[exportedName]
-
-  if (seen !== void 0 &&
-      seen.has(name) &&
-      exportedSpecifier !== true) {
-    const { request } = exportedSpecifier
-    const childEntry = dependencySpecifiers[request].entry
-
-    if (exportedStars.indexOf(request) === -1) {
-      throw constructStackless(ERR_EXPORT_CYCLE, [mod, exportedName])
-    } else if (childEntry.compileData.exportedSpecifiers[exportedName] !== true) {
-      throw constructStackless(ERR_EXPORT_MISSING, [mod, exportedName])
-    }
-  } else if (Reflect.has(exportedSpecifiers, exportedName)) {
-    if (exportedSpecifier) {
-      if (exportedSpecifier !== true) {
-        const { local, request } = exportedSpecifier
-        const childEntry = dependencySpecifiers[request].entry
-
-        if (childEntry !== null) {
-          if (seen === void 0) {
-            seen = new Set
-          }
-
-          seen.add(name)
-          validateExportedName(childEntry, local, seen)
-        }
-      }
-    } else {
-      throw constructStackless(ERR_EXPORT_STAR_CONFLICT, [mod, exportedName])
-    }
-  } else {
-    let throwExportMissing = true
-
-    for (const request of exportedStars) {
-      const childEntry = dependencySpecifiers[request].entry
-
-      if (childEntry === null ||
-          childEntry.type !== TYPE_ESM) {
-        throwExportMissing = false
-        break
-      }
-    }
-
-    if (throwExportMissing) {
-      throw constructStackless(ERR_EXPORT_MISSING, [mod, exportedName])
     }
   }
 }

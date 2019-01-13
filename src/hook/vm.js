@@ -99,7 +99,6 @@ function hook(vm) {
 
     if (entry.type === TYPE_ESM) {
       tryValidate(manager, entry, content)
-      entry.initNamespace()
     }
 
     const code =
@@ -160,6 +159,7 @@ function hook(vm) {
     entry.addBuiltinModules = createAddBuiltinModules(entry)
     entry.package = Package.get("")
     entry.require = makeRequireFunction(mod)
+    entry.runtime = null
     entry.runtimeName = shared.runtimeName
 
     setPrototypeOf(mod, Module.prototype)

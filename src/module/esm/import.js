@@ -3,10 +3,12 @@ import ENTRY from "../../constant/entry.js"
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 
+import cjsValidate from "../cjs/validate.js"
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
 import esmParse from "./parse.js"
 import esmResolveFilename from "./resolve-filename.js"
+import esmValidate from "./validate.js"
 import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
 import { resolve } from "../../safe/path.js"
@@ -18,31 +20,46 @@ const {
 
 const {
   TYPE_CJS,
-  TYPE_ESM
+  TYPE_ESM,
+  UPDATE_TYPE_INIT
 } = ENTRY
 
-function esmImport(request, parentEntry, setterArgsList, isDynamic) {
-  const { compileData } = parentEntry
+function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
+  const { moduleState } = shared
+  const { parsing } = moduleState
 
-  const dependencySpecifiers = compileData === null
-    ? null
-    : compileData.dependencySpecifiers
-
-  let mod = null
   let entry = null
 
-  if (dependencySpecifiers !== null &&
-      Reflect.has(dependencySpecifiers, request) &&
-      dependencySpecifiers[request].entry !== null)  {
-    entry = dependencySpecifiers[request].entry
+  if (parsing ||
+      isDynamic) {
+    if (isDynamic) {
+      moduleState.parsing = true
+    }
+
+    try {
+      entry = tryPhase(esmParse, request, parentEntry, (entry) => {
+        parentEntry.children[entry.name] = entry
+        entry.addSetters(setterArgsList, parentEntry)
+      })
+    } finally {
+      if (isDynamic) {
+        moduleState.parsing = false
+
+        if (entry !== null &&
+            entry.type === TYPE_ESM) {
+          esmValidate(entry)
+        }
+      }
+    }
   } else {
-    entry = isDynamic
-      ? tryPhase(esmParse, request, parentEntry)
-      : tryPhase(esmLoad, request, parentEntry)
+    entry = tryPhase(esmLoad, request, parentEntry, (entry) => {
+      parentEntry.children[entry.name] = entry
+      entry.addSetters(setterArgsList, parentEntry)
+    })
   }
 
   if (entry !== null) {
-    mod = entry.module
+    const mod = entry.module
 
     if (parentEntry.extname === ".mjs" &&
         entry.type === TYPE_ESM &&
@@ -50,39 +67,78 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic) {
       throw ERR_INVALID_ESM_FILE_EXTENSION(mod)
     }
 
-    entry.addSetters(setterArgsList, parentEntry)
+    if (parsing) {
+      entry.done = done
+    }
   }
 
-  const exported = tryRequire(request, parentEntry)
+  if (parsing) {
+    if (entry === null) {
+      const exported = tryRequire(request, parentEntry)
+      // Create the child entry for unresolved mocked requests.
+      entry = getEntryFrom(request, exported, parentEntry)
+      parentEntry.children[entry.name] = entry
+      entry.addSetters(setterArgsList, parentEntry)
+    }
 
-  if (entry === null) {
-    // Create the child entry for unresolved mocked requests.
-    entry = getEntryFrom(request, exported, parentEntry)
-    mod = entry.module
-    parentEntry.children[entry.name] = entry
-    entry.addSetters(setterArgsList, parentEntry)
+    return
   }
 
-  let mockEntry = null
+  let doneCalled = false
 
-  if (mod.exports !== exported) {
-    // Update the mock entry before the original child entry so dynamic import
-    // requests are resolved with the mock entry instead of the child entry.
-    mockEntry = getEntryFrom(request, exported, parentEntry)
-    parentEntry.children[entry.name] = mockEntry
-    mockEntry.addSetters(setterArgsList, parentEntry)
-    mockEntry.loaded()
-    mockEntry.updateBindings()
+  function done() {
+    if (doneCalled) {
+      return
+    }
+
+    doneCalled = true
+
+    let mod
+
+    const exported = tryRequire(request, parentEntry)
+
+    if (entry !== null) {
+      mod = entry.module
+
+      if (entry.type === TYPE_ESM) {
+        cjsValidate(entry)
+      }
+    }
+
+    if (parentEntry.id === "<repl>") {
+      cjsValidate(parentEntry)
+    }
+
+    if (entry === null) {
+      // Create the child entry for unresolved mocked requests.
+      entry = getEntryFrom(request, exported, parentEntry)
+      mod = entry.module
+      parentEntry.children[entry.name] = entry
+      entry.addSetters(setterArgsList, parentEntry)
+    }
+
+    let mockEntry = null
+
+    if (mod.exports !== exported) {
+      // Update the mock entry before the original child entry so dynamic import
+      // requests are resolved with the mock entry instead of the child entry.
+      mockEntry = getEntryFrom(request, exported, parentEntry)
+      parentEntry.children[entry.name] = mockEntry
+      mockEntry.addSetters(setterArgsList, parentEntry)
+    }
+
+    if (mockEntry === null) {
+      entry.loaded()
+      entry.updateBindings(null, UPDATE_TYPE_INIT)
+    } else {
+      // Update the mock entry after the original child entry so static import
+      // requests are updated with mock entry setters last.
+      mockEntry.loaded()
+      mockEntry.updateBindings(null, UPDATE_TYPE_INIT)
+    }
   }
 
-  entry.loaded()
-  entry.updateBindings()
-
-  if (mockEntry !== null) {
-    // Update the mock entry after the original child entry so static import
-    // requests are updated with mock entry setters last.
-    mockEntry.updateBindings()
-  }
+  done()
 }
 
 function getEntryFrom(request, exported, parentEntry) {
@@ -104,7 +160,7 @@ function getEntryFrom(request, exported, parentEntry) {
   return Entry.get(mod)
 }
 
-function tryPhase(phase, request, parentEntry) {
+function tryPhase(phase, request, parentEntry, preload) {
   const { moduleState } = shared
 
   moduleState.requireDepth += 1
@@ -112,7 +168,11 @@ function tryPhase(phase, request, parentEntry) {
   let error
 
   try {
-    return phase(request, parentEntry.module)
+    const entry = phase(request, parentEntry.module, false, preload)
+
+    entry.updateBindings()
+
+    return entry
   } catch (e) {
     error = e
   }

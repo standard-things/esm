@@ -5,6 +5,7 @@ import Loader from "./loader.js"
 import Entry from "./entry.js"
 
 import builtinGlobal from "./builtin/global.js"
+import cjsValidate from "./module/cjs/validate.js"
 import errors from "./errors.js"
 import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
@@ -17,7 +18,6 @@ import makeRequireFunction from "./module/internal/make-require-function.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
 import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
-import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toExternalError from "./util/to-external-error.js"
 
@@ -52,17 +52,15 @@ const Runtime = {
     }
   },
   addExportFromSetter(importedName, exportedName = importedName) {
-    return createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
+    const setter = createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
       const { entry } = this
-      const { getters } = entry
-
-      if (Reflect.has(getters, exportedName)) {
-        return false
-      }
 
       entry.addGetterFrom(childEntry, importedName, exportedName)
-      return Reflect.has(getters, exportedName)
+      return Reflect.has(entry.getters, exportedName)
     })
+
+    setter.exportedName = exportedName
+    return setter
   },
   addExportGetters(getterArgsList) {
     this.entry.addGetters(getterArgsList)
@@ -70,36 +68,59 @@ const Runtime = {
   addNamespaceSetter() {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
-      const { getters } = entry
+      const { getters, name } = entry
       const isESM = entry.type === TYPE_ESM
-      const otherGetters = childEntry.getters
-      const otherType = childEntry.type
+
+      const {
+        getters:childGetters,
+        type:childType
+      } = childEntry
 
       if ((isESM &&
-           otherType !== TYPE_ESM &&
+           childType !== TYPE_ESM &&
            entry.extname === ".mjs") ||
-          (otherType === TYPE_CJS &&
+          (childType === TYPE_CJS &&
            ! childEntry.package.options.cjs.namedExports)) {
         return
       }
 
-      for (const name in childEntry._namespace) {
-        if (name === "default") {
+      for (const exportedName in childEntry._namespace) {
+        if (exportedName === "default") {
           continue
         }
 
-        entry.addGetterFrom(childEntry, name)
+        let getter
+        let ownerName
 
-        if (! Reflect.has(getters, name) ||
-            ! Reflect.has(otherGetters, name)) {
+        if (Reflect.has(getters, exportedName)) {
+          getter = getters[exportedName]
+          ownerName = getter.owner.name
+
+          if (name === ownerName) {
+            continue
+          }
+        }
+
+        if (! Reflect.has(childGetters, exportedName)) {
           continue
         }
 
-        const ownerName = getters[name].owner.name
+        const childOwnerName = childGetters[exportedName].owner.name
 
-        if (ownerName !== entry.name &&
-            ownerName !== otherGetters[name].owner.name) {
-          entry.addGetter(name, () => ERROR_STAR)
+        if (getter === void 0 ||
+            ownerName === childOwnerName) {
+          entry.addGetterFrom(childEntry, exportedName)
+
+          if (! Reflect.has(getters, exportedName)) {
+            continue
+          }
+        }
+
+        ownerName = getters[exportedName].owner.name
+
+        if (ownerName !== name &&
+            ownerName !== childOwnerName) {
+          entry.addGetter(exportedName, () => ERROR_STAR)
         }
       }
     })
@@ -189,9 +210,22 @@ const Runtime = {
             request = request + ""
           }
 
+          let timerId
+          let theEntry
+          let theValue
+
           const setterArgsList = [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
-              resolvePromise(value)
+              theEntry = childEntry
+              theValue = value
+
+              if (timerId === void 0) {
+                timerId = setImmediate(() => {
+                  cjsValidate(theEntry)
+                  resolvePromise(theValue)
+                })
+              }
+
               return true
             }
           })]]
@@ -248,6 +282,7 @@ const Runtime = {
     runtime.globalEval = boundGlobalEval
     runtime.import = Runtime.import
     runtime.initBindings = Runtime.initBindings
+    runtime.resumeChildren = Runtime.resumeChildren
     runtime.run = Runtime.run
     runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
@@ -266,6 +301,7 @@ const Runtime = {
     runtime.k = identity
     runtime.n = runtime.addNamespaceSetter
     runtime.r = runtime.run
+    runtime.s = runtime.resumeChildren
     runtime.t = runtime.throwUndefinedIdentifier
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
@@ -282,6 +318,9 @@ const Runtime = {
   },
   initBindings(names) {
     this.entry.updateBindings(names, UPDATE_TYPE_INIT)
+  },
+  resumeChildren() {
+    this.entry.resumeChildren()
   },
   run(moduleWrapper) {
     const { entry } = this
@@ -338,18 +377,6 @@ function runESM(entry, moduleWrapper) {
   const exported = entry.exports
 
   mod.exports = exported
-
-  Reflect.defineProperty(mod, "loaded", {
-    configurable: true,
-    enumerable: true,
-    get: () => false,
-    set(value) {
-      if (value) {
-        setProperty(this, "loaded", value)
-        entry.updateBindings().loaded()
-      }
-    }
-  })
 
   if (entry.package.options.cjs.vars &&
       entry.extname !== ".mjs") {
