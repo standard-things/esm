@@ -641,9 +641,6 @@ describe("compiler tests", () => {
 
       for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
-
-        result.enforceTDZ()
-
         const actual = result.code.split("\n").pop()
 
         assert.strictEqual(actual, compiled[index])
@@ -670,9 +667,6 @@ describe("compiler tests", () => {
 
       for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
-
-        result.enforceTDZ()
-
         const actual = result.code.split("\n").pop()
 
         assert.strictEqual(actual, line)

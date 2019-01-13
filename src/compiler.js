@@ -5,6 +5,7 @@ import MagicString from "./magic-string.js"
 import Parser from "./parser.js"
 
 import argumentsVisitor from "./visitor/arguments.js"
+import ascendingComparator from "./util/ascending-comparator.js"
 import assignmentVisitor from "./visitor/assignment.js"
 import evalVisitor from "./visitor/eval.js"
 import defaults from "./util/defaults.js"
@@ -14,7 +15,6 @@ import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
 import isObjectEmpty from "./util/is-object-empty.js"
 import keys from "./util/keys.js"
-import noop from "./util/noop.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
@@ -56,7 +56,7 @@ function init() {
       const result = {
         changed: false,
         code,
-        enforceTDZ: noop,
+        codeWithoutTDZ: code,
         filename: null,
         firstAwaitOutsideFunction: null,
         mtime: -1,
@@ -139,7 +139,7 @@ function init() {
       let yieldIndex = top.insertIndex
 
       possibleIndexes.push(...possibleExportIndexes)
-      possibleIndexes.sort()
+      possibleIndexes.sort(ascendingComparator)
 
       importExportVisitor.visit(rootPath, {
         generateVarDeclarations: options.generateVarDeclarations,
@@ -229,31 +229,6 @@ function init() {
       } else if (sourceType === SOURCE_TYPE_MODULE) {
         result.sourceType = SOURCE_TYPE_MODULE
 
-        if (addedImport) {
-          const { initedBindings, temporalBindings } = importExportVisitor
-
-          result.enforceTDZ = () => {
-            const possibleIndexes = findIndexes(code, keys(temporalBindings))
-
-            possibleIndexes.push(...possibleExportIndexes)
-            possibleIndexes.sort()
-
-            result.enforceTDZ = noop
-
-            temporalVisitor.visit(rootPath, {
-              initedBindings,
-              magicString,
-              possibleIndexes,
-              runtimeName,
-              temporalBindings
-            })
-
-            if (temporalVisitor.changed) {
-              result.code = magicString.toString()
-            }
-          }
-        }
-
         if (! options.cjsVars) {
           const possibleNames = []
 
@@ -289,9 +264,31 @@ function init() {
           evalVisitor.changed ||
           globalsVisitor.changed ||
           importExportVisitor.changed) {
-        result.changed = true
         yieldIndex = importExportVisitor.yieldIndex
-        setDeferred(result, "code", () =>  magicString.toString())
+
+        result.changed = true
+        result.code =
+        result.codeWithoutTDZ = magicString.toString()
+      }
+
+      if (addedImport) {
+        const { initedBindings, temporalBindings } = importExportVisitor
+        const possibleIndexes = findIndexes(code, keys(temporalBindings))
+
+        possibleIndexes.push(...possibleExportIndexes)
+        possibleIndexes.sort(ascendingComparator)
+
+        temporalVisitor.visit(rootPath, {
+          initedBindings,
+          magicString,
+          possibleIndexes,
+          runtimeName,
+          temporalBindings
+        })
+
+        if (temporalVisitor.changed) {
+          result.code = magicString.toString()
+        }
       }
 
       result.firstAwaitOutsideFunction = top.firstAwaitOutsideFunction

@@ -13,7 +13,6 @@ import getCachePathHash from "./util/get-cache-path-hash.js"
 import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
-import noop from "./util/noop.js"
 import normalize from "./path/normalize.js"
 import parseJSON from "./util/parse-json.js"
 import realProcess from "./real/process.js"
@@ -64,7 +63,7 @@ function init() {
       const result = {
         changed: false,
         code: null,
-        enforceTDZ: noop,
+        codeWithoutTDZ: null,
         filename: null,
         firstAwaitOutsideFunction: null,
         mtime: -1,
