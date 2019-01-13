@@ -41,10 +41,10 @@ describe("output tests", () => {
         sourceType: test.actual.sourceType
       })
 
-      // Remove zero-width joiners and trim lines.
       const expected = test.expected.content
         .trimRight()
 
+      // Remove zero-width joiners and trim lines.
       const actual = result.code
         .replace(/\u200D/g, "")
         .replace(/[ \t]+$/gm, "")

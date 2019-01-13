@@ -1,4 +1,4 @@
-let assert;_.w("assert",[["default",["assert"],function(v){assert=v}]]);
+let assert;_.x([["default",()=>_.t("_anonymous")]]);_.w("assert",[["default",["assert"],function(v){assert=v}]]);
 
 
 
@@ -13,5 +13,5 @@ const _anonymous=() =>
 {
   const error = new Error // Line 14.
   const line = error.stack.match(/:(\d+)/)[1]
-  assert.strictEqual(line, "14")
-};_.d(_anonymous);
+  _.a("assert",assert).strictEqual(line, "14")
+};_.d(_anonymous);_.j(["default"]);

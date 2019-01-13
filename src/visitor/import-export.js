@@ -315,7 +315,7 @@ function init() {
         }
 
         const localName = id === null
-          ? "void 0"
+          ? runtimeName + ".t(" + toStringLiteral(name) + ")"
           : name
 
         this.hoistedExports.push(["default", localName])
