@@ -471,6 +471,10 @@ function init() {
             ? "*"
             : specifier.local.name
 
+          if (! Reflect.has(initees, exportedName)) {
+            initees[exportedName] = true
+          }
+
           if (! Reflect.has(importSpecifierMap[request].reexports, exportedName)) {
             importSpecifierMap[request].reexports[exportedName] = []
           }
