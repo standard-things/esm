@@ -58,6 +58,7 @@ ESM of [tomorrow](https://github.com/nodejs/modules).
 
 Out of the box `esm` just works, no configuration necessary, and supports:
 
+* Passing all applicable [test262](https://github.com/tc39/test262) compliance tests
 * [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import)/[`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
 * [`import.meta`](https://github.com/tc39/proposal-import-meta)
 * [Dynamic `import`](https://github.com/tc39/proposal-dynamic-import)
