@@ -11,7 +11,6 @@ const isWin = process.platform === "win32"
 
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! isTravis
-const canTestSqreen = SemVer.satisfies(process.version, "<11")
 
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
@@ -148,6 +147,15 @@ describe("scenario tests", function () {
       path.resolve("fixture/scenario/postcss")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
+  )
+
+  it("should work with sqreen", () =>
+    node([
+      "-r", pkgPath,
+      "-r", "sqreen",
+      path.resolve("fixture/scenario/sqreen")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
   )
 
   it("should work with ts-node", () =>
@@ -512,22 +520,5 @@ describe("scenario tests", function () {
           assert.ok(stdout.includes("pm2-babel:true"))
         })
     })
-  })
-
-  describe("should work with sqreen", () => {
-    before(function () {
-      if (! canTestSqreen) {
-        this.skip()
-      }
-    })
-
-    it("should work with sqreen", () =>
-      node([
-        "-r", pkgPath,
-        "-r", "sqreen",
-        path.resolve("fixture/scenario/sqreen")
-      ], envAuto)
-      .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
-    )
   })
 })

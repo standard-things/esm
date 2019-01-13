@@ -97,7 +97,8 @@ function validateDependencies(entry) {
         if (Reflect.has(getters, exportedName)) {
           let getter = getters[exportedName]
 
-          if (! getter.deferred) {
+          if (! getter.deferred ||
+              getter.owner.type !== TYPE_ESM) {
             continue
           }
 

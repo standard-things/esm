@@ -53,10 +53,7 @@ const Runtime = {
   },
   addExportFromSetter(importedName, exportedName = importedName) {
     const setter = createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
-      const { entry } = this
-
-      entry.addGetterFrom(childEntry, importedName, exportedName)
-      return Reflect.has(entry.getters, exportedName)
+      this.entry.addGetterFrom(childEntry, importedName, exportedName)
     })
 
     setter.exportedName = exportedName
