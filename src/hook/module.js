@@ -12,7 +12,7 @@ import Wrapper from "../wrapper.js"
 
 import compile from "../module/internal/compile.js"
 import errors from "../errors.js"
-import esmLoad from "../module/esm/load.js"
+import esmParseLoad from "../module/esm/parse-load.js"
 import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
@@ -288,8 +288,9 @@ function wasmCompiler(mod, filename) {
 
   for (const description of descriptions) {
     const request = description.module
+    const entry = esmParseLoad(request, null)
 
-    imported[request] = esmLoad(request, null).module.exports
+    imported[request] = entry.module.exports
   }
 
   const exported = { __proto__: null }
