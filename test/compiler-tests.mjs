@@ -499,6 +499,34 @@ describe("compiler tests", () => {
     }
   })
 
+  it("should not instrument shadowed console identifiers", () => {
+    const lines = [
+      'import console from "a"',
+      'import * as console from "a"',
+      "export let console = {}",
+      "let console = {}",
+      "let a = (console) =>"
+    ]
+
+    lines.forEach((line) => {
+      const code = [
+        line,
+        "console"
+      ].join("\n")
+
+      for (const sourceType of sourceTypes) {
+        if (sourceType === SCRIPT &&
+            /(im|ex)port/.test(code)) {
+          continue
+        }
+
+        const result = Compiler.compile(code, { sourceType })
+
+        assert.strictEqual(result.code.includes("_.g"), false)
+      }
+    })
+  })
+
   it("should wrap eval use", () => {
     const lines = [
       "eval",
