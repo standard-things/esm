@@ -131,10 +131,7 @@ function compile(caller, entry, content, filename, fallback) {
       }
 
       entry.updateBindings()
-      entry.updateNamespaces()
-
-      Object.seal(entry._cjsNamespace)
-      Object.seal(entry._esmNamespace)
+      entry.finalizeNamespace()
 
       return result
     }

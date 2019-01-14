@@ -9,7 +9,6 @@ import Package from "./package.js"
 import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
-import assignToModuleNamespaceObject from "./util/assign-to-module-namespace-object.js"
 import constructStackless from "./error/construct-stackless.js"
 import copyProperty from "./util/copy-property.js"
 import encodeId from "./util/encode-id.js"
@@ -81,10 +80,8 @@ class Entry {
   constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
-    // The loading state of the module.
+    // The loaded state of the module.
     this._loaded = LOAD_INCOMPLETE
-    // The raw namespace object without proxied exports.
-    this._namespace = toRawModuleNamespaceObject()
     // The raw mutable namespace object for CJS importers.
     this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: void 0 })
     // The raw namespace object for CJS importers.
@@ -93,6 +90,10 @@ class Entry {
     this._esmMutableNamespace = toRawModuleNamespaceObject()
     // The raw namespace object for ESM importers.
     this._esmNamespace = toRawModuleNamespaceObject()
+    // The raw namespace object without proxied exports.
+    this._namespace = toRawModuleNamespaceObject()
+    // The finalized state of the namespace object.
+    this._namespaceFinalized = false
     // The passthru indicator for `module._compile()`.
     this._passthru = false
     // The load type for `module.require()`.
@@ -226,7 +227,6 @@ class Entry {
 
       this.exports = proxyExports(this)
       this.namespace = proxy
-      this.updateNamespaces()
 
       return TYPE_CJS
     })
@@ -355,13 +355,6 @@ class Entry {
     return this
   }
 
-  updateNamespaces() {
-    cjsNamespaceUpdate(this, this._cjsMutableNamespace)
-    cjsNamespaceUpdate(this, this._cjsNamespace)
-    esmNamespaceUpdate(this, this._esmMutableNamespace)
-    esmNamespaceUpdate(this, this._esmNamespace)
-  }
-
   addGetterFrom(otherEntry, importedName, exportedName = importedName) {
     if (importedName === "*") {
       return this.addGetter(exportedName, () => otherEntry.esmNamespace)
@@ -453,6 +446,37 @@ class Entry {
     }
   }
 
+  finalizeNamespace() {
+    if (this._namespaceFinalized === true) {
+      return this
+    }
+
+    this._namespaceFinalized = true
+
+    // Table 29: Internal Slots of Module Namespace Exotic Objects
+    // Properties should be assigned in `Array#sort()` order.
+    // https://tc39.github.io/ecma262/#table-29
+    const names = keys(this.namespace).sort()
+
+    for (const name of names) {
+      this._esmNamespace[name] =
+      this._esmMutableNamespace[name] = INITIAL_VALUE
+    }
+
+    // Section 9.4.6: Module Namespace Exotic Objects
+    // Namespace objects should be sealed.
+    // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
+    Object.seal(this._esmNamespace)
+
+    if (this.type !== TYPE_ESM) {
+      this._cjsNamespace.default =
+      this._cjsMutableNamespace.default = INITIAL_VALUE
+      Object.seal(this._cjsNamespace)
+    }
+
+    return this
+  }
+
   loaded() {
     if (this._loaded !== LOAD_INCOMPLETE) {
       return this._loaded
@@ -474,10 +498,8 @@ class Entry {
       }
     }
 
-    const { type } = this
-
-    if (type === TYPE_ESM ||
-        type === TYPE_WASM) {
+    if (this.type === TYPE_ESM ||
+        this.type === TYPE_WASM) {
       this._loaded = LOAD_COMPLETED
       this.assignExportsToNamespace()
 
@@ -531,12 +553,8 @@ class Entry {
       shared.entry.skipExports.delete(this.name)
     }
 
-    this.updateNamespaces()
+    this.finalizeNamespace()
 
-    Object.seal(this._cjsNamespace)
-    Object.seal(this._esmNamespace)
-
-    // finalize ns here
     return this._loaded
   }
 
@@ -870,14 +888,6 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     return false
   }
-}
-
-function cjsNamespaceUpdate(entry, namespace) {
-  namespace.default = entry.exports
-}
-
-function esmNamespaceUpdate(entry, namespace) {
-  assignToModuleNamespaceObject(namespace, entry.namespace, () => INITIAL_VALUE)
 }
 
 function createImmutableNamespaceProxy(entry, namespace) {
