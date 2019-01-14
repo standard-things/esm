@@ -66,14 +66,13 @@ const Runtime = {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
       const { getters, name } = entry
-      const isESM = entry.type === TYPE_ESM
 
       const {
         getters:childGetters,
         type:childType
       } = childEntry
 
-      if ((isESM &&
+      if ((entry.type === TYPE_ESM &&
            childType !== TYPE_ESM &&
            entry.extname === ".mjs") ||
           (childType === TYPE_CJS &&

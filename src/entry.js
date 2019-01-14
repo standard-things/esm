@@ -304,8 +304,10 @@ class Entry {
       set: null
     }
 
-    if (type === TYPE_CJS &&
-        name === "default") {
+    const isDefault = name === "default"
+
+    if (isDefault &&
+        type === TYPE_CJS) {
       descriptor.get = () => this.exports
 
       descriptor.set = function (value) {
@@ -327,8 +329,8 @@ class Entry {
       }
     }
 
-    if (type === TYPE_ESM &&
-        name === "default") {
+    if (isDefault &&
+        type === TYPE_ESM) {
       const value = tryGetter(getter)
 
       // Give default exported anonymous functions the name "default".
@@ -418,16 +420,16 @@ class Entry {
 
   assignExportsToNamespace(names) {
     const exported = this.exports
-    const isCJS = this.type === TYPE_CJS
-    const isLoaded = this._loaded === LOAD_COMPLETED
+    const { type } = this
 
-    if ((isCJS &&
+    if ((type !== TYPE_ESM &&
          ! this.module.loaded) ||
         ! isObjectLike(exported)) {
       return
     }
 
     const { getters } = this
+    const isLoaded = this._loaded === LOAD_COMPLETED
 
     if (names === void 0) {
       if (isLoaded) {
@@ -436,6 +438,8 @@ class Entry {
         names = this.builtin ? getBuiltinExportNames(exported) : keys(exported)
       }
     }
+
+    const isCJS = type === TYPE_CJS
 
     for (const name of names) {
       if (! (isCJS &&
