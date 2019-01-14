@@ -52,6 +52,7 @@ function init() {
     ["warn", wrapBuiltin(RealProto.warn)]
   ])
 
+  let builtinMethodMap
   let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
 
   if (isConsoleSymbol === void 0) {
@@ -87,6 +88,23 @@ function init() {
         return value
       }
     }
+  }
+
+  function getBuiltinMethodMap() {
+    if (builtinMethodMap !== void 0) {
+      return builtinMethodMap
+    }
+
+    return builtinMethodMap = new Map([
+      [globalConsole.assert, builtinConsole.assert],
+      [globalConsole.debug, builtinConsole.debug],
+      [globalConsole.dir, builtinConsole.dir],
+      [globalConsole.dirxml, builtinConsole.dirxml],
+      [globalConsole.info, builtinConsole.info],
+      [globalConsole.log, builtinConsole.log],
+      [globalConsole.trace, builtinConsole.trace],
+      [globalConsole.warn, builtinConsole.warn]
+    ])
   }
 
   function toCustomInspectable(value) {
@@ -247,21 +265,10 @@ function init() {
     })
   }
 
-  const builtinMethodMap = new Map([
-    [globalConsole.assert, builtinConsole.assert],
-    [globalConsole.debug, builtinConsole.debug],
-    [globalConsole.dir, builtinConsole.dir],
-    [globalConsole.dirxml, builtinConsole.dirxml],
-    [globalConsole.info, builtinConsole.info],
-    [globalConsole.log, builtinConsole.log],
-    [globalConsole.trace, builtinConsole.trace],
-    [globalConsole.warn, builtinConsole.warn]
-  ])
-
   const proxy = new OwnProxy(globalConsole, {
     get(globalConsole, name, receiver) {
       const value = Reflect.get(globalConsole, name, receiver)
-      const builtinMethod = builtinMethodMap.get(value)
+      const builtinMethod = getBuiltinMethodMap().get(value)
 
       return builtinMethod === void 0
         ? value
@@ -272,7 +279,7 @@ function init() {
 
       if (isUpdatableDescriptor(descriptor)) {
         const { value } = descriptor
-        const builtinMethod = builtinMethodMap.get(value)
+        const builtinMethod = getBuiltinMethodMap().get(value)
 
         if (builtinMethod !== void 0) {
           descriptor.value = builtinMethod
