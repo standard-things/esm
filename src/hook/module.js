@@ -112,10 +112,10 @@ function hook(Mod, parent) {
       entry.state = STATE_EXECUTION_COMPLETED
     }
 
-    if (entry._passthru ||
+    if (entry._passthruCompile ||
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
-      entry._passthru = false
+      entry._passthruCompile = false
       compileFallback()
       return
     }

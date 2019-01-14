@@ -19,7 +19,6 @@ import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
 
 const {
-  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -36,8 +35,8 @@ const load = maskFunction(function (request, parent, isMain) {
   const parentEntry = Entry.get(parent)
 
   if (parentEntry !== null &&
-      parentEntry._require === TYPE_ESM) {
-    parentEntry._require = TYPE_CJS
+      parentEntry._passthruRequire) {
+    parentEntry._passthruRequire = false
     return esmLoad(request, parent, isMain).module.exports
   }
 

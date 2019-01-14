@@ -34,7 +34,7 @@ const req = maskFunction(function (request) {
   const parentEntry = isMJS(this.filename) ? Entry.get(this) : null
 
   if (parentEntry !== null &&
-      parentEntry._require === TYPE_ESM) {
+      parentEntry._passthruRequire) {
     return esmLoad(request, this, false).module.exports
   }
 

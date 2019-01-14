@@ -19,7 +19,6 @@ const {
 } = errors
 
 const {
-  TYPE_CJS,
   TYPE_ESM,
   UPDATE_TYPE_INIT
 } = ENTRY
@@ -197,7 +196,7 @@ function tryPhase(phase, request, parentEntry, preload) {
 function tryRequire(request, parentEntry) {
   const { moduleState } = shared
 
-  parentEntry._require = TYPE_ESM
+  parentEntry._passthruRequire = true
   moduleState.requireDepth += 1
 
   let exported
@@ -205,7 +204,7 @@ function tryRequire(request, parentEntry) {
   try {
     exported = parentEntry.module.require(request)
   } finally {
-    parentEntry._require = TYPE_CJS
+    parentEntry._passthruRequire = false
     moduleState.requireDepth -= 1
   }
 

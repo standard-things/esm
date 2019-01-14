@@ -23,7 +23,7 @@ function loader(entry, filename, parentEntry) {
   if (ext === ".mjs" ||
       (parentEntry !== null &&
        parentEntry.package.options.mode === MODE_STRICT)) {
-    entry._passthru = true
+    entry._passthruCompile = true
   }
 
   const mod = entry.module
@@ -33,7 +33,7 @@ function loader(entry, filename, parentEntry) {
   try {
     Module._extensions[ext](mod, filename)
   } finally {
-    entry._passthru = false
+    entry._passthruCompile = false
   }
 
   if (! parsing &&

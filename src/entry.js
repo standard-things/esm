@@ -95,9 +95,9 @@ class Entry {
     // The finalized state of the namespace object.
     this._namespaceFinalized = false
     // The passthru indicator for `module._compile()`.
-    this._passthru = false
-    // The load type for `module.require()`.
-    this._require = TYPE_CJS
+    this._passthruCompile = false
+    // The passthru indicator for `module.require()`.
+    this._passthruRequire = false
     // The module basename.
     this.basename = null
     // The builtin module indicator.
