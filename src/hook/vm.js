@@ -15,8 +15,6 @@ import Wrapper from "../wrapper.js"
 import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
-import captureStackTrace from "../error/capture-stack-trace.js"
-import esmValidate from "../module/esm/validate.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
@@ -41,8 +39,7 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  STATE_PARSING_STARTED,
-  TYPE_ESM
+  STATE_PARSING_STARTED
 } = ENTRY
 
 const {
@@ -96,10 +93,6 @@ function hook(vm) {
     }
 
     entry.state = STATE_PARSING_STARTED
-
-    if (entry.type === TYPE_ESM) {
-      tryValidate(manager, entry, content)
-    }
 
     const code =
       "(()=>{" +
@@ -297,35 +290,6 @@ function createTryWrapper(func, content) {
   return wrap(func, function (func, args) {
     return tryWrapper.call(this, func, args, content)
   })
-}
-
-function tryValidate(caller, entry, content) {
-  const { moduleState } = shared
-
-  moduleState.parsing = true
-
-  let error
-
-  try {
-    esmValidate(entry)
-    return
-  } catch (e) {
-    error = e
-  }
-
-  moduleState.parsing = false
-
-  if (! Loader.state.package.default.options.debug &&
-      ! isStackTraceMasked(error)) {
-    captureStackTrace(error, caller)
-
-    maskStackTrace(error, {
-      content,
-      inModule: true
-    })
-  }
-
-  throw error
 }
 
 function tryWrapper(func, args, content) {
