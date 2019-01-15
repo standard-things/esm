@@ -105,14 +105,6 @@ class Entry {
     this.children = { __proto__: null }
     // The circular import indicator.
     this.circular = false
-    // The mutable namespace object CJS importers receive.
-    this.cjsMutableNamespace = createMutableNamespaceProxy(this, this._cjsMutableNamespace)
-    // The namespace object CJS importers receive.
-    this.cjsNamespace = createImmutableNamespaceProxy(this, this._cjsNamespace)
-    // The mutable namespace object ESM importers receive.
-    this.esmMutableNamespace = createMutableNamespaceProxy(this, this._esmMutableNamespace)
-    // The namespace object ESM importers receive.
-    this.esmNamespace = createImmutableNamespaceProxy(this, this._esmNamespace)
     // The namespace object which may have proxied exports.
     this.namespace = this._namespace
     // The module dirname.
@@ -162,6 +154,16 @@ class Entry {
       })
     })
 
+    // The mutable namespace object CJS importers receive.
+    setDeferred(this, "cjsMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._cjsMutableNamespace)
+    })
+
+    // The namespace object CJS importers receive.
+    setDeferred(this, "cjsNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._cjsNamespace)
+    })
+
     // The source compilation data of the module.
     setDeferred(this, "compileData", () => {
       const { cacheName } = this
@@ -172,12 +174,23 @@ class Entry {
         Reflect.deleteProperty(cache.compile, cacheName)
       } else if (compileData.changed) {
         const content = readFile(cachePath + sep + cacheName, "utf8")
+        const code = content === null ? "" : content
 
-        compileData.code =
-        compileData.codeWithoutTDZ = content === null ? "" : content
+        compileData.code = code
+        compileData.codeWithoutTDZ = code
       }
 
       return compileData
+    })
+
+    // The mutable namespace object ESM importers receive.
+    setDeferred(this, "esmMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._esmMutableNamespace)
+    })
+
+    // The namespace object ESM importers receive.
+    setDeferred(this, "esmNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._esmNamespace)
     })
 
     // The mtime of the module.
