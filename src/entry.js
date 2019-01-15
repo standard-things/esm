@@ -714,11 +714,17 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const { getters } = entry
     const isESM = entry.type === TYPE_ESM
 
-    if (isESM &&
-        Reflect.has(getters, name)) {
-      getters[name]()
-    } else if ((isESM ||
-         entry._loaded !== LOAD_COMPLETED) &&
+    let errored
+
+    if (isESM) {
+      errored =
+        ! Reflect.has(getters, name) ||
+        getters[name]() === ERROR_GETTER
+    } else {
+      errored = entry._loaded !== LOAD_COMPLETED
+    }
+
+    if (errored &&
         typeof name === "string" &&
         Reflect.has(namespace, name)) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, get)

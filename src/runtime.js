@@ -22,6 +22,7 @@ import shared from "./shared.js"
 import toExternalError from "./util/to-external-error.js"
 
 const {
+  ERROR_GETTER,
   ERROR_STAR,
   LOAD_COMPLETED,
   SETTER_TYPE_DYNAMIC_IMPORT,
@@ -265,6 +266,7 @@ const Runtime = {
     })
 
     runtime._runResult = void 0
+    runtime.ERROR_GETTER = ERROR_GETTER
     runtime.addDefaultValue = Runtime.addDefaultValue
     runtime.addExportFromSetter = Runtime.addExportFromSetter
     runtime.addExportGetters = Runtime.addExportGetters
@@ -296,6 +298,7 @@ const Runtime = {
     runtime.j = runtime.initBindings
     runtime.k = identity
     runtime.n = runtime.addNamespaceSetter
+    runtime.o = runtime.ERROR_GETTER
     runtime.r = runtime.run
     runtime.s = runtime.resumeChildren
     runtime.t = runtime.throwUndefinedIdentifier
