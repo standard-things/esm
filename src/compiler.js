@@ -54,6 +54,7 @@ function init() {
 
       const result = {
         changed: false,
+        circular: 0,
         code,
         codeWithoutTDZ: code,
         filename: null,
@@ -288,10 +289,14 @@ function init() {
         if (temporalVisitor.changed) {
           result.code = magicString.toString()
         }
+
+        result.circular = -1
       }
 
       result.firstAwaitOutsideFunction = top.firstAwaitOutsideFunction
+      result.sourceType = sourceType
       result.yieldIndex = yieldIndex
+
       return result
     }
   }

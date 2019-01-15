@@ -62,6 +62,7 @@ function init() {
 
       const result = {
         changed: false,
+        circular: 0,
         code: null,
         codeWithoutTDZ: null,
         filename: null,
@@ -100,7 +101,8 @@ function init() {
       if (length > 7 &&
           result.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
-        result.yieldIndex = +meta[7]
+        result.circular = +meta[7]
+        result.yieldIndex = +meta[8]
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -307,6 +309,7 @@ function init() {
               sourceType,
               deflatedFirstAwaitOutsideFunction,
               normalize(relative(cachePath, filename)),
+              compileData.circular,
               compileData.yieldIndex
             )
           }

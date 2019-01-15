@@ -124,7 +124,11 @@ function compile(caller, entry, content, filename, fallback) {
     if (entry.type === TYPE_ESM) {
       const result = tryCompileCached(entry, filename)
 
-      if (isDescendant(entry, entry)) {
+      if (compileData.circular === -1) {
+        compileData.circular = isDescendant(entry, entry) ? 1 : 0
+      }
+
+      if (compileData.circular === 1) {
         entry.circular = true
       } else {
         compileData.code = compileData.codeWithoutTDZ
