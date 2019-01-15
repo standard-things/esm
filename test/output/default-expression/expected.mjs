@@ -1,4 +1,4 @@
-_.x([["default",()=>_.t("_anonymous")]]);let value = 0
+_.x([["default",()=>_.o]]);let value = 0
 
 // This default expression will evaluate to 0 if the parentheses are
 // mistakenly stripped away.

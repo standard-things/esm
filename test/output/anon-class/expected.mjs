@@ -1,4 +1,4 @@
-_.x([["default",()=>_.t("_anonymous")]]);const _anonymous=class {
+_.x([["default",()=>_.o]]);const _anonymous=class {
   constructor(value) {
     this.value = value
   }
