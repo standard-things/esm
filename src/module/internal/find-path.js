@@ -163,13 +163,9 @@ function findPath(request, paths, isMain, fields, exts) {
         fields = mainFields
       }
 
-      if (useRealpath) {
-        thePath = realpath(thePath)
-      }
-
       filename =
         tryPackage(thePath, fields, exts, isMain) ||
-        tryExtensions(resolve(thePath, "index"), exts, isMain)
+        tryExtensions(thePath + sep + "index", exts, isMain)
     }
 
     if (filename !== "") {
@@ -202,7 +198,7 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 
   return tryFilename(thePath, isMain) ||
     tryExtensions(thePath, exts, isMain) ||
-    tryExtensions(resolve(thePath, "index"), exts, isMain)
+    tryExtensions(thePath + sep + "index", exts, isMain)
 }
 
 function tryFilename(filename, isMain) {
