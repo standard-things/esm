@@ -87,9 +87,9 @@ function init() {
         possibleIndexes.length
       )
 
-      if ((sourceType === SOURCE_TYPE_SCRIPT ||
-          sourceType === SOURCE_TYPE_UNAMBIGUOUS) &&
-          ! possibleChanges) {
+      if (! possibleChanges &&
+          (sourceType === SOURCE_TYPE_SCRIPT ||
+           sourceType === SOURCE_TYPE_UNAMBIGUOUS)) {
         return result
       }
 
@@ -112,10 +112,9 @@ function init() {
 
       if (threw &&
           sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
+        sourceType = SOURCE_TYPE_SCRIPT
         parserOptions.allowReturnOutsideFunction = true
-
-        sourceType =
-        parserOptions.sourceType = SOURCE_TYPE_SCRIPT
+        parserOptions.sourceType = sourceType
 
         try {
           ast = Parser.parse(code, parserOptions)
@@ -159,10 +158,14 @@ function init() {
         addedImport
       } = importExportVisitor
 
-      if (addedExport ||
-          addedImportMeta ||
-          addedImport) {
-        sourceType = SOURCE_TYPE_MODULE
+      if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
+        if (addedExport ||
+            addedImportMeta ||
+            addedImport) {
+          sourceType = SOURCE_TYPE_MODULE
+        } else {
+          sourceType = SOURCE_TYPE_SCRIPT
+        }
       }
 
       if (addedDynamicImport ||
@@ -224,39 +227,34 @@ function init() {
         importExportVisitor.finalizeHoisting()
       }
 
-      if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
-        sourceType = SOURCE_TYPE_SCRIPT
-      } else if (sourceType === SOURCE_TYPE_MODULE) {
-        result.sourceType = SOURCE_TYPE_MODULE
+      if (sourceType === SOURCE_TYPE_MODULE &&
+          ! options.cjsVars) {
+        const possibleNames = []
 
-        if (! options.cjsVars) {
-          const possibleNames = []
+        const names = [
+          "__dirname",
+          "__filename",
+          "arguments",
+          "exports",
+          "module",
+          "require"
+        ]
 
-          const names = [
-            "__dirname",
-            "__filename",
-            "arguments",
-            "exports",
-            "module",
-            "require"
-          ]
-
-          for (const name of names) {
-            if (! Reflect.has(importedBindings, name)) {
-              possibleNames.push(name)
-            }
+        for (const name of names) {
+          if (! Reflect.has(importedBindings, name)) {
+            possibleNames.push(name)
           }
+        }
 
-          const possibleIndexes = findIndexes(code, possibleNames)
+        const possibleIndexes = findIndexes(code, possibleNames)
 
-          if (possibleIndexes.length) {
-            argumentsVisitor.visit(rootPath, {
-              magicString,
-              possibleIndexes,
-              runtimeName,
-              top
-            })
-          }
+        if (possibleIndexes.length) {
+          argumentsVisitor.visit(rootPath, {
+            magicString,
+            possibleIndexes,
+            runtimeName,
+            top
+          })
         }
       }
 
