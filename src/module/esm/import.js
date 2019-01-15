@@ -62,12 +62,10 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
   }
 
   if (entry !== null) {
-    const mod = entry.module
-
     if (parentEntry.extname === ".mjs" &&
         entry.type === TYPE_ESM &&
         entry.extname !== ".mjs") {
-      throw ERR_INVALID_ESM_FILE_EXTENSION(mod)
+      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
     }
 
     if (parsing) {
@@ -97,48 +95,30 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
     doneCalled = true
 
-    let mod
-
     const exported = tryRequire(request, parentEntry)
-
-    if (entry !== null) {
-      mod = entry.module
-
-      if (entry.type === TYPE_ESM) {
-        cjsValidate(entry)
-      }
-    }
-
-    if (parentEntry.id === "<repl>") {
-      cjsValidate(parentEntry)
-    }
 
     if (entry === null) {
       // Create the child entry for unresolved mocked requests.
       entry = getEntryFrom(request, exported, parentEntry)
-      mod = entry.module
       parentEntry.children[entry.name] = entry
       entry.addSetters(setterArgsList, parentEntry)
     }
 
-    let mockEntry = null
+    if (entry.module.exports !== exported) {
+      const { name } = entry
 
-    if (mod.exports !== exported) {
-      // Update the mock entry before the original child entry so dynamic import
-      // requests are resolved with the mock entry instead of the child entry.
-      mockEntry = getEntryFrom(request, exported, parentEntry)
-      parentEntry.children[entry.name] = mockEntry
-      mockEntry.addSetters(setterArgsList, parentEntry)
+      entry = getEntryFrom(request, exported, parentEntry)
+      parentEntry.children[name] = entry
+      entry.addSetters(setterArgsList, parentEntry)
     }
 
-    if (mockEntry === null) {
-      entry.loaded()
-      entry.updateBindings(null, UPDATE_TYPE_INIT)
-    } else {
-      // Update the mock entry after the original child entry so static import
-      // requests are updated with mock entry setters last.
-      mockEntry.loaded()
-      mockEntry.updateBindings(null, UPDATE_TYPE_INIT)
+    entry.loaded()
+    entry.updateBindings(null, UPDATE_TYPE_INIT)
+
+    if (parentEntry.id === "<repl>") {
+      cjsValidate(parentEntry)
+    } else if (entry.type === TYPE_ESM) {
+      cjsValidate(entry)
     }
   }
 
