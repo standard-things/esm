@@ -2,8 +2,6 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
-import ENTRY from "../../constant/entry.js"
-
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import RealModule from "../../real/module.js"
@@ -13,10 +11,6 @@ import esmLoad from "../esm/load.js"
 import isMJS from "../../path/is-mjs.js"
 import maskFunction from "../../util/mask-function.js"
 import validateString from "../../util/validate-string.js"
-
-const {
-  TYPE_ESM
-} = ENTRY
 
 const {
   ERR_INVALID_ARG_VALUE
