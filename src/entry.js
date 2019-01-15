@@ -481,7 +481,7 @@ class Entry {
     const names = keys(this.namespace).sort()
 
     for (const name of names) {
-      this._esmNamespace[name] =
+      this._esmNamespace[name] = INITIAL_VALUE
       this._esmMutableNamespace[name] = INITIAL_VALUE
     }
 
@@ -491,7 +491,7 @@ class Entry {
     Object.seal(this._esmNamespace)
 
     if (this.type !== TYPE_ESM) {
-      this._cjsNamespace.default =
+      this._cjsNamespace.default = INITIAL_VALUE
       this._cjsMutableNamespace.default = INITIAL_VALUE
       Object.seal(this._cjsNamespace)
     }
@@ -714,7 +714,7 @@ class Entry {
     }
 
     if (typeof modFilename !== "string") {
-      this.basename =
+      this.basename = ""
       this.extname = ""
       return
     }

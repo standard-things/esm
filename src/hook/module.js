@@ -281,8 +281,16 @@ function wasmCompiler(mod, filename) {
   } = WebAssembly
 
   const entry = Entry.get(mod)
-  const imported = { __proto__: null }
+  const exported = { __proto__: null }
 
+  Entry.delete(mod.exports, entry)
+  Entry.set(exported, entry)
+
+  mod.exports = exported
+  entry.exports = exported
+  entry.type = TYPE_WASM
+
+  const imported = { __proto__: null }
   const wasmMod = new wasmModule(readFile(filename))
   const descriptions = wasmModule.imports(wasmMod)
 
@@ -293,20 +301,11 @@ function wasmCompiler(mod, filename) {
     imported[request] = entry.module.exports
   }
 
-  const exported = { __proto__: null }
   const readonlyExports = new wasmInstance(wasmMod, imported).exports
 
   for (const name in readonlyExports) {
     setGetter(exported, name, () => readonlyExports[name])
   }
-
-  Entry.delete(mod.exports, entry)
-  Entry.set(exported, entry)
-
-  entry.type = TYPE_WASM
-
-  entry.exports =
-  mod.exports = exported
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {

@@ -172,7 +172,7 @@ function init() {
       // import defaultName, { export1, [ , [...] ] } from "mod"
       // import defaultName, * as name from "mod"
       // import "mod"
-      this.changed =
+      this.changed = true
       this.addedImport = true
 
       const { importSpecifierMap, temporalBindings } = this
@@ -225,7 +225,7 @@ function init() {
 
       // Support re-exporting an imported module:
       // export * from "mod"
-      this.changed =
+      this.changed = true
       this.addedExport = true
 
       const { importSpecifierMap } = this
@@ -251,7 +251,7 @@ function init() {
         return
       }
 
-      this.changed =
+      this.changed = true
       this.addedExport = true
 
       const node = path.getValue()
@@ -342,7 +342,7 @@ function init() {
         return
       }
 
-      this.changed =
+      this.changed = true
       this.addedExport = true
 
       const {
@@ -405,7 +405,7 @@ function init() {
 
               if (! Reflect.has(initedBindings, name)) {
                 if (initable) {
-                  initees[name] =
+                  initees[name] = true
                   initedBindings[name] = true
                 } else {
                   initedBindings[name] = false
@@ -440,7 +440,7 @@ function init() {
           }
 
           if (! Reflect.has(initedBindings, localName)) {
-            initees[exportedName] =
+            initees[exportedName] = true
             initedBindings[localName] = true
           }
 
@@ -506,7 +506,7 @@ function init() {
 
       if (meta.name === "import") {
         // Support import.meta.
-        this.changed =
+        this.changed = true
         this.addedImportMeta = true
 
         overwrite(this, meta.start, meta.end, this.runtimeName + "._")

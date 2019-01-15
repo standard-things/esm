@@ -264,9 +264,11 @@ function init() {
           importExportVisitor.changed) {
         yieldIndex = importExportVisitor.yieldIndex
 
+        const codeWithoutTDZ = magicString.toString()
+
         result.changed = true
-        result.code =
-        result.codeWithoutTDZ = magicString.toString()
+        result.code = codeWithoutTDZ
+        result.codeWithoutTDZ = codeWithoutTDZ
       }
 
       if (addedImport) {

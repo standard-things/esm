@@ -51,9 +51,9 @@ function load(filename, parent = null, isMain, cache, loader) {
       : filename
 
     if (isMain) {
-      Loader.state.module.mainModule =
-      realProcess.mainModule = mod
       mod.id = "."
+      realProcess.mainModule = mod
+      Loader.state.module.mainModule = mod
     }
 
     entry = Entry.get(mod)

@@ -193,7 +193,7 @@ const compile = maskFunction(function (content, filename) {
     : Reflect.apply(compiledWrapper, exported, args)
 
   if (noDepth) {
-    moduleState.statFast =
+    moduleState.statFast = null
     moduleState.statSync = null
   }
 

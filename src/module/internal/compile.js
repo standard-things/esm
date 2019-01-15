@@ -109,14 +109,14 @@ function compile(caller, entry, content, filename, fallback) {
         entry.type = TYPE_ESM
       }
 
-      entry.compileData =
+      entry.compileData = compileData
       pkg.cache.compile[cacheName] = compileData
     }
   }
 
   if (compileData !== null &&
       compileData.code === null) {
-    compileData.code =
+    compileData.code = content
     compileData.codeWithoutTDZ = content
   }
 

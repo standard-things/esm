@@ -66,10 +66,8 @@ function init() {
   const Plugin = {
     enable(parser) {
       parser.parseExprList = parseExprList
-
-      parser.raise =
+      parser.raise = raise
       parser.raiseRecoverable = raise
-
       parser.unexpected = unexpected
       return parser
     }

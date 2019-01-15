@@ -118,7 +118,7 @@ function resolveFilename(request, parent, isMain, options) {
 
   if (parentEntry !== null &&
       parentEntry.extname === ".mjs") {
-    autoMode =
+    autoMode = false
     cjsPaths = false
     fields = strictFields
   }

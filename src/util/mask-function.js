@@ -68,8 +68,8 @@ function init() {
       let proto = has(func, "prototype") ? func.prototype : void 0
 
       if (! isObjectLike(proto)) {
-        proto =
-        func.prototype = GenericObject.create()
+        proto = GenericObject.create()
+        func.prototype = proto
       }
 
       proto.constructor = proxy

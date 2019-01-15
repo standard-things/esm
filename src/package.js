@@ -170,7 +170,7 @@ class Package {
         }
 
         if (isCacheInvalid) {
-          hasBuffer =
+          hasBuffer = false
           hasMap = false
 
           compileDatas = { __proto__: null }

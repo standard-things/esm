@@ -197,8 +197,8 @@ export default () => {
   proxyValue = regexp1.test
   rawValue = regexp3.test
 
-  regexp1[Symbol.toStringTag] =
   regexp1.test = 1
+  regexp1[Symbol.toStringTag] = 1
   updated = [regexp1.test, regexp2.test, regexp3.test, test]
   Reflect.deleteProperty(regexp1, "test")
 

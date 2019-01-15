@@ -84,7 +84,7 @@ function init() {
           prefix = "("
           suffix = ")"
         } else {
-          prefix =
+          prefix = ""
           suffix = ""
         }
 

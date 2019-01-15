@@ -8,23 +8,20 @@ function init() {
 
   const Plugin = {
     enable(parser) {
-      parser.isDirectiveCandidate =
+      parser.isDirectiveCandidate = alwaysFalse
       parser.strictDirective = alwaysFalse
-
       parser.isSimpleParamList = alwaysTrue
-
-      parser.adaptDirectivePrologue =
-      parser.checkParams =
-      parser.checkPatternErrors =
-      parser.checkPatternExport =
-      parser.checkPropClash =
-      parser.checkVariableExport =
-      parser.checkYieldAwaitInDefaultParams =
-      parser.declareName =
-      parser.invalidStringToken =
-      parser.validateRegExpFlags =
+      parser.adaptDirectivePrologue = noop
+      parser.checkParams = noop
+      parser.checkPatternErrors = noop
+      parser.checkPatternExport = noop
+      parser.checkPropClash = noop
+      parser.checkVariableExport = noop
+      parser.checkYieldAwaitInDefaultParams = noop
+      parser.declareName = noop
+      parser.invalidStringToken = noop
+      parser.validateRegExpFlags = noop
       parser.validateRegExpPattern = noop
-
       parser.checkExpressionErrors = checkExpressionErrors
       parser.enterScope = enterScope
       return parser

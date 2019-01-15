@@ -112,9 +112,10 @@ function createEntry(id) {
 
   entry.builtin = true
 
-  exported =
-  entry.exports =
-  mod.exports = proxyExports(entry)
+  exported = proxyExports(entry)
+
+  entry.exports = exported
+  mod.exports = exported
 
   if (isFunc &&
       id === "module") {

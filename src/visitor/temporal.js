@@ -61,7 +61,7 @@ function init() {
           prefix = "("
           suffix = ")"
         } else {
-          prefix =
+          prefix = ""
           suffix = ""
         }
 
@@ -78,7 +78,7 @@ function init() {
       const { initedBindings } = this
 
       if (initedBindings.default !== true) {
-        this.changed =
+        this.changed = true
         initedBindings.default = true
 
         const node = path.getValue()
@@ -106,7 +106,7 @@ function init() {
           const { name } = declaration.id
 
           if (initedBindings[name] !== true) {
-            initees[name] =
+            initees[name] = true
             initedBindings[name] = true
           }
         } else if (type === "VariableDeclaration") {
@@ -115,7 +115,7 @@ function init() {
 
             for (const name of names) {
               if (initedBindings[name] !== true) {
-                initees[name] =
+                initees[name] = true
                 initedBindings[name] = true
               }
             }

@@ -112,7 +112,7 @@ function init() {
         result.scriptData = GenericBuffer.slice(cache.buffer, offsetStart, offsetEnd)
       }
 
-      entry.compileData =
+      entry.compileData = result
       cache.compile[cacheName] = result
 
       return result
@@ -170,10 +170,11 @@ function init() {
       if (! dirty &&
           ! noCacheDir) {
         dirty =
-        cache.dirty =
           NYC ||
           !! parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
           exists(resolve(cachePath, "../@babel/register"))
+
+        cache.dirty = dirty
       }
 
       if (dirty ||
@@ -236,11 +237,11 @@ function init() {
             const meta = map[cacheName]
 
             if (meta !== void 0) {
-              meta[0] =
+              meta[0] = -1
               meta[1] = -1
             }
 
-            scriptData =
+            scriptData = null
             compileData.scriptData = null
           }
         }
@@ -388,7 +389,7 @@ function init() {
     let { cjsVars, topLevelReturn } = options
 
     if (isMJS(options.filename)) {
-      cjsVars =
+      cjsVars = void 0
       topLevelReturn = void 0
     }
 

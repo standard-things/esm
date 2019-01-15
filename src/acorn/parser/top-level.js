@@ -93,7 +93,7 @@ function init() {
             raiseRedeclaration(this, id.start, name)
           }
 
-          funcs[name] =
+          funcs[name] = true
           identifiers[name] = true
         }
       } else if (type === "ImportDeclaration") {
@@ -104,7 +104,7 @@ function init() {
             raiseRedeclaration(this, local.start, name)
           }
 
-          identifiers[name] =
+          identifiers[name] = true
           importedBindings[name] = true
         }
       }

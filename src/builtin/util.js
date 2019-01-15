@@ -61,7 +61,7 @@ function init() {
     } else if (name === "formatWithOptions") {
       builtinUtil.formatWithOptions = builtinFormatWithOptions
     } else if (name === "inspect") {
-      builtinUtil.inspect =
+      builtinUtil.inspect = builtinInspect
       shared.module.utilInspect = builtinInspect
     } else if (name === "types" &&
         builtinTypes !== void 0) {
