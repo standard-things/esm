@@ -40,6 +40,7 @@ import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js
 const {
   ERROR_GETTER,
   ERROR_STAR,
+  INITIAL_VALUE,
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
@@ -69,8 +70,6 @@ const {
   ERR_NS_REDEFINITION,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
-
-const INITIAL_VALUE = {}
 
 const pseudoDescriptor = {
   value: true
