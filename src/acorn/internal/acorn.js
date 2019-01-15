@@ -16,7 +16,7 @@ function init() {
           const acorn = realRequire("internal/deps/acorn/dist/acorn")
 
           acornParse.enable(acorn)
-        } catch (e) {}
+        } catch {}
       }
     }
   }

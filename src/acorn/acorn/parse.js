@@ -40,7 +40,7 @@ function init() {
       try {
         ast = Parser.parse(code, options)
         threw = false
-      } catch (e) {}
+      } catch {}
     }
 
     if (threw) {
