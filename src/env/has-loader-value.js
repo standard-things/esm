@@ -2,6 +2,7 @@ import { extname, sep } from "../safe/path.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 
+import Loader from "../loader.js"
 import Module from "../module.js"
 
 import esmResolveFilename from "../module/esm/resolve-filename.js"
@@ -48,15 +49,38 @@ function init() {
   }
 
   function tryResolveFilename(request, parent, isMain) {
-    try {
-      return esmResolveFilename(request, parent, isMain)
-    } catch {}
+    const entryState = shared.entry
+    const entryCache = entryState.cache
+
+    const pkgState = Loader.state.package
+    const pkgCache = pkgState.cache
+
+    entryState.cache = new WeakMap
+    pkgState.cache = new Map
+
+    let result
+    let threw = true
 
     try {
-      return Module._resolveFilename(request, parent, isMain)
+      result = esmResolveFilename(request, parent, isMain)
+      threw = false
     } catch {}
 
-    return ""
+    if (threw) {
+      try {
+        result = Module._resolveFilename(request, parent, isMain)
+        threw = false
+      } catch {}
+    }
+
+    entryState.cache = entryCache
+    pkgState.cache = pkgCache
+
+    if (threw) {
+      return ""
+    }
+
+    return result
   }
 
   return hasLoaderValue

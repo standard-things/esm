@@ -17,12 +17,16 @@ function init() {
 
     const args = argv.slice(2)
 
-    let filename
-    let nodeModulesIndex = -1
+    if (args.length === 0) {
+      return false
+    }
 
-    if (args.length) {
-      filename = realpath(argv[1])
-      nodeModulesIndex = normalize(filename).lastIndexOf("/node_modules/")
+    const filename = realpath(argv[1])
+    const nodeModulesIndex = normalize(filename).lastIndexOf("/node_modules/")
+
+    if (nodeModulesIndex === -1 ||
+        ! hasLoaderArg(args)) {
+      return false
     }
 
     const entryState = shared.entry
@@ -36,11 +40,8 @@ function init() {
 
     let result = false
 
-    // From a package like Mocha.
-    if (nodeModulesIndex !== -1 &&
-        hasLoaderArg(args) &&
-        (Package.get(cwd()) !== null ||
-         Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
+    if (Package.get(cwd()) !== null ||
+        Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null) {
       result = true
     }
 
