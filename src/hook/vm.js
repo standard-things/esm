@@ -68,6 +68,9 @@ function hook(vm) {
     const compileDatas = entry.package.cache.compile
     const { runtimeName } = entry
 
+    entry._cjsValidated = false
+    entry._esmValidated = false
+    entry._validation.clear()
     entry.cacheName = cacheName
 
     let compileData = Reflect.has(compileDatas, cacheName)
