@@ -1,5 +1,6 @@
 import { argv, cwd } from "../safe/process.js"
 
+import Loader from "../loader.js"
 import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
@@ -24,15 +25,29 @@ function init() {
       nodeModulesIndex = normalize(filename).lastIndexOf("/node_modules/")
     }
 
+    const entryState = shared.entry
+    const entryCache = entryState.cache
+
+    const pkgState = Loader.state.package
+    const pkgCache = pkgState.cache
+
+    entryState.cache = new WeakMap
+    pkgState.cache = new Map
+
+    let result = false
+
     // From a package like Mocha.
     if (nodeModulesIndex !== -1 &&
         hasLoaderArg(args) &&
         (Package.get(cwd()) !== null ||
          Package.get(filename.slice(0, nodeModulesIndex + 1)) !== null)) {
-      return true
+      result = true
     }
 
-    return false
+    entryState.cache = entryCache
+    pkgState.cache = pkgCache
+
+    return result
   }
 
   return isSideloaded
