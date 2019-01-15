@@ -14,11 +14,11 @@ const {
 } = errors
 
 function validate(entry) {
-  if (entry.validated) {
-    // return
+  if (entry._esmValidated) {
+    return
   }
 
-  entry.validated = true
+  entry._esmValidated = true
 
   validateDependencies(entry)
 
@@ -27,8 +27,7 @@ function validate(entry) {
   for (const childName in children) {
     const childEntry = children[childName]
 
-    if (childEntry.type === TYPE_ESM &&
-        ! childEntry.validated) {
+    if (childEntry.type === TYPE_ESM) {
       validate(childEntry)
     }
   }
@@ -84,6 +83,7 @@ function validateDependencies(entry) {
       continue
     }
 
+    const cache = childEntry._validation
     const settersMap = childEntry.setters
 
     if (childEntry.type === TYPE_ESM) {
@@ -94,11 +94,21 @@ function validateDependencies(entry) {
           continue
         }
 
+        const cached = cache.get(exportedName)
+
+        if (cached === true) {
+          continue
+        }
+
         if (Reflect.has(getters, exportedName)) {
           let getter = getters[exportedName]
 
-          if (! getter.deferred ||
-              getter.owner.type !== TYPE_ESM) {
+          if (getter.owner.type !== TYPE_ESM) {
+            continue
+          }
+
+          if (! getter.deferred) {
+            cache.set(exportedName, true)
             continue
           }
 
@@ -115,9 +125,12 @@ function validateDependencies(entry) {
 
           if (getter) {
             getters[exportedName] = getter
+            cache.set(exportedName, true)
             continue
           }
         }
+
+        cache.set(exportedName, false)
 
         const setters = settersMap[exportedName]
         const setterIndex = getSetterIndex(setters, entry)
@@ -138,6 +151,8 @@ function validateDependencies(entry) {
             exportedName === "default") {
           continue
         }
+
+        cache.set(exportedName, false)
 
         const setters = settersMap[exportedName]
         const setterIndex = getSetterIndex(setters, entry)

@@ -1,11 +1,23 @@
+import ENTRY from "../../constant/entry.js"
+
 import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
+
+const {
+  TYPE_ESM
+} = ENTRY
 
 const {
   ERR_EXPORT_MISSING
 } = errors
 
 function validate(entry) {
+  if (entry._cjsValidated) {
+    return
+  }
+
+  entry._cjsValidated = true
+
   const { children } = entry
 
   const namedExports =
@@ -15,10 +27,12 @@ function validate(entry) {
   for (const name in children) {
     const childEntry = children[name]
 
-    if (! namedExports) {
+    if (! namedExports &&
+        childEntry.type !== TYPE_ESM) {
       continue
     }
 
+    const cache = childEntry._validation
     const { getters } = childEntry
     const settersMap = childEntry.setters
 
@@ -27,10 +41,17 @@ function validate(entry) {
         continue
       }
 
+      const cached = cache.get(exportedName)
+
+      if (cached === true) {
+        continue
+      }
+
       if (Reflect.has(getters, exportedName)) {
         let getter = getters[exportedName]
 
         if (! getter.deferred) {
+          cache.set(exportedName, true)
           continue
         }
 
@@ -47,9 +68,12 @@ function validate(entry) {
 
         if (getter) {
           getters[exportedName] = getter
+          cache.set(exportedName, true)
           continue
         }
       }
+
+      cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
       const setterIndex = getSetterIndex(setters, entry)

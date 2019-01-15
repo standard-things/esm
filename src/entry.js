@@ -85,10 +85,14 @@ class Entry {
     this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: void 0 })
     // The raw namespace object for CJS importers.
     this._cjsNamespace = toRawModuleNamespaceObject({ default: void 0 })
+    // The CJS validation indicator.
+    this._cjsValidated = false
     // The raw mutable namespace object for ESM importers.
     this._esmMutableNamespace = toRawModuleNamespaceObject()
     // The raw namespace object for ESM importers.
     this._esmNamespace = toRawModuleNamespaceObject()
+    // The ESM validation indicator.
+    this._esmValidated = false
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
@@ -97,6 +101,8 @@ class Entry {
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
     this._passthruRequire = false
+    // The import validation cache.
+    this._validation = new Map
     // The module basename.
     this.basename = null
     // The builtin module indicator.
