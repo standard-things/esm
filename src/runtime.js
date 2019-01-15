@@ -315,7 +315,7 @@ const Runtime = {
     return esmImport(request, this.entry, setterArgsList)
   },
   initBindings(names) {
-    this.entry.updateBindings(names, UPDATE_TYPE_INIT)
+    this.entry.updateBindings(names)
   },
   resumeChildren() {
     this.entry.resumeChildren()

@@ -41,6 +41,10 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
         entry.addSetters(setterArgsList, parentEntry)
       })
     } finally {
+      if (entry !== null) {
+        entry.updateBindings()
+      }
+
       if (isDynamic) {
         moduleState.parsing = false
 
@@ -74,6 +78,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
   if (parsing) {
     if (entry === null) {
       const exported = tryRequire(request, parentEntry)
+
       // Create the child entry for unresolved mocked requests.
       entry = getEntryFrom(request, exported, parentEntry)
       parentEntry.children[entry.name] = entry
@@ -167,11 +172,7 @@ function tryPhase(phase, request, parentEntry, preload) {
   let error
 
   try {
-    const entry = phase(request, parentEntry.module, false, preload)
-
-    entry.updateBindings()
-
-    return entry
+    return phase(request, parentEntry.module, false, preload)
   } catch (e) {
     error = e
   }

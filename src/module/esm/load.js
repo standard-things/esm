@@ -6,7 +6,6 @@ import Module from "../../module.js"
 import Package from "../../package.js"
 
 import _load from "../internal/load.js"
-import builtinEntries from "../../builtin-entries.js"
 import builtinLookup from "../../builtin-lookup.js"
 import { dirname } from "../../safe/path.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
@@ -19,8 +18,7 @@ import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 
 const {
-  TYPE_ESM,
-  UPDATE_TYPE_LIVE
+  TYPE_ESM
 } = ENTRY
 
 function load(request, parent, isMain, preload) {
@@ -89,7 +87,6 @@ function load(request, parent, isMain, preload) {
     if (isMain &&
         isUnexposed) {
       Reflect.deleteProperty(realProcess, "mainModule")
-      builtinEntries.process.updateBindings(["mainModule"], UPDATE_TYPE_LIVE)
     }
 
     if (! isESM &&
