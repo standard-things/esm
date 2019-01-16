@@ -264,6 +264,7 @@ if (cachePath !== "") {
         __proto__: null,
         esm: {
           changed: false,
+          circular: 0,
           code: null,
           filename: null,
           firstAwaitOutsideFunction: null,
