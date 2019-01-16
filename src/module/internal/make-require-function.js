@@ -6,6 +6,7 @@ import ENTRY from "../../constant/entry.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
+import Package from "../../package.js"
 import Runtime from "../../runtime.js"
 
 import isDataProperty from "../../util/is-data-property.js"
@@ -29,6 +30,7 @@ const { symbol } = shared
 
 const ownExportsMap = new Map([
   [symbol.entry, Entry],
+  [symbol.package, Package],
   [symbol.realGetProxyDetails, realGetProxyDetails],
   [symbol.realRequire, realRequire],
   [symbol.runtime, Runtime],
