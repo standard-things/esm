@@ -62,10 +62,8 @@ Out of the box `esm` just works, no configuration necessary, and supports:
 * [`import`](https://ponyfoo.com/articles/es6-modules-in-depth#import)/[`export`](https://ponyfoo.com/articles/es6-modules-in-depth#export)
 * [`import.meta`](https://github.com/tc39/proposal-import-meta)
 * [Dynamic `import`](https://github.com/tc39/proposal-dynamic-import)
-* [Improved errors](https://github.com/standard-things/esm/wiki/improved-errors)
 * [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values)
-* [Loading `.mjs` files as ESM](https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#32-determining-if-source-is-an-es-module)
-* [The file URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
+* [File URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
 * Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
 * Node [`--check`](https://nodejs.org/api/cli.html#cli_c_check) flag _(Node 10+)_
 
@@ -74,11 +72,11 @@ Options
 
 Specify options with one of the following:
 
-* The `"esm"` field in `package.json`
+* `"esm"` field in `package.json`
 * CJS/ESM in an `.esmrc.js` or `.esmrc.mjs` file
 * [JSON6](https://github.com/d3x0r/json6) in an `.esmrc` or `.esmrc.json` file
 * JSON6 or file path in the `ESM_OPTIONS` environment variable
-* The `ESM_DISABLE_CACHE` environment variable
+* `ESM_DISABLE_CACHE` environment variable
 
 <table>
 <tr>
@@ -87,7 +85,7 @@ Specify options with one of the following:
 <tr>
   <td valign="top"><code>"await":</code></td>
   <td>
-    <p>A boolean for top-level <a href="https://node.green/#ES2017-features-async-functions-await"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>.</p>
+    <p>A boolean for top-level <a href="https://node.green/#ES2018-features-Asynchronous-Iterators-async-generators"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>. <em>(Node 10+)</em></p>
   </td>
 </tr>
 <tr>
@@ -166,16 +164,16 @@ Specify options with one of the following:
   <td>
     <p>A string mode:</p>
     <ul>
-      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM</li>
-      <li><code>"all"</code> script files are treated as ESM</li>
-      <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM</li>
+      <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM.</li>
+      <li><code>"all"</code> script files are treated as ESM.</li>
+      <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM.</li>
     </ul>
   </td>
 </tr>
 <tr>
   <td valign="top"><code>"wasm":</code></td>
   <td>
-    <p>A boolean for experimental <a href="https://nodejs.org/docs/latest/api/globals.html#globals_webassembly">WebAssembly</a> module support.</p>
+    <p>A boolean for <a href="https://nodejs.org/api/globals.html#globals_webassembly">WebAssembly</a> module support. <em>(Node 8+)</em></p>
   </td>
 </tr>
 <tr>
@@ -236,7 +234,7 @@ Tips
   [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/), and
   [`ts-node`](https://github.com/TypeStrong/ts-node#programmatic).
 
-* Load `esm` with the “node-args” options of<br>
+* Load `esm` with “node-args" options of:<br>
   - [`node-tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
   - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags): `--node-args="-r esm"`
 
