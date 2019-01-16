@@ -107,7 +107,6 @@ function tryRequire(request) {
 const jestEnvironmentHooks = { __proto__: null }
 
 function jestTransform(content, filename, { cwd, testEnvironment }) {
-
   if (! has(jestEnvironmentHooks, cwd)) {
     jestEnvironmentHooks[cwd] = {
       compile: { __proto__: null },
