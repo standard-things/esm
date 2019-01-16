@@ -58,17 +58,22 @@ if (typeof jest === "object" && jest !== null &&
 }
 
 function getNativeSource(thePath) {
-  let source
+  let result
 
   try {
-    const { _source } = require("internal/bootstrap/loaders").NativeModule
+    const { internalBinding } = require("internal/bootstrap/loaders")
+    const natives = internalBinding("natives")
 
-    if (has(_source, thePath)) {
-      source = _source[thePath]
+    if (has(natives, thePath)) {
+      result = natives[thePath]
     }
   } catch (e) {}
 
-  return typeof source === "string" ? source : ""
+  if (typeof result === "string") {
+    return result
+  }
+
+  return ""
 }
 
 function has(object, name) {
