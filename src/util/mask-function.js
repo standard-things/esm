@@ -33,7 +33,7 @@ function init() {
     }
 
     const proxy = new OwnProxy(func, {
-      get: nativeTrap((func, name, receiver) => {
+      get: (func, name, receiver) => {
         if (name === "toString" &&
             ! has(func, "toString")) {
           return cached.toString
@@ -44,7 +44,7 @@ function init() {
         }
 
         return Reflect.get(func, name, receiver)
-      })
+      }
     })
 
     const toString = new OwnProxy(func.toString, {
