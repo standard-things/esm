@@ -1,8 +1,7 @@
 import ESM from "../constant/esm.js"
 
 import md5 from "./md5.js"
-import normalize from "../path/normalize.js"
-import { relative } from "../safe/path.js"
+import relative from "../path/relative.js"
 import shared from "../shared.js"
 
 function init() {
@@ -17,12 +16,12 @@ function init() {
 
     let pathHash = EMPTY_MD5_HASH
 
-    if (cachePath &&
+    if (typeof cachePath === "string" &&
         typeof filename === "string") {
       // While MD5 isn't suitable for verification of untrusted data,
       // it's great for revving files. See Sufian Rhazi's post for more details.
       // https://blog.risingstack.com/automatic-cache-busting-for-your-css/
-      pathHash = md5(normalize(relative(cachePath, filename)))
+      pathHash = md5(relative(cachePath, filename))
     }
 
     const stateHash = md5(

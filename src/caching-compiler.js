@@ -1,4 +1,4 @@
-import { sep, relative, resolve } from "./safe/path.js"
+import { sep, resolve } from "./safe/path.js"
 
 import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
@@ -13,9 +13,9 @@ import getCachePathHash from "./util/get-cache-path-hash.js"
 import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
-import normalize from "./path/normalize.js"
 import parseJSON from "./util/parse-json.js"
 import realProcess from "./real/process.js"
+import relative from "./path/relative.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
 import writeFile from "./fs/write-file.js"
@@ -300,7 +300,7 @@ function init() {
                 mtime,
                 sourceType,
                 deflatedFirstAwaitOutsideFunction,
-                normalize(relative(cachePath, filename))
+                relative(cachePath, filename)
               )
             }
           } else {
@@ -309,7 +309,7 @@ function init() {
               mtime,
               sourceType,
               deflatedFirstAwaitOutsideFunction,
-              normalize(relative(cachePath, filename)),
+              relative(cachePath, filename),
               compileData.circular,
               compileData.yieldIndex
             )
