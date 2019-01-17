@@ -356,10 +356,9 @@ function tryCompileCached(entry, filename) {
     filename = loc.filename
   }
 
-  throw maskStackTrace(error, {
-    filename,
-    inModule: isESM
-  })
+  maskStackTrace(error, { filename, inModule: isESM })
+
+  throw error
 }
 
 function tryCompileCode(caller, content, options) {
@@ -378,11 +377,9 @@ function tryCompileCode(caller, content, options) {
   }
 
   captureStackTrace(error, caller)
+  maskStackTrace(error, { content, filename: options.filename })
 
-  throw maskStackTrace(error, {
-    content,
-    filename: options.filename
-  })
+  throw error
 }
 
 function tryValidate(caller, entry, content, filename) {
@@ -410,11 +407,13 @@ function tryValidate(caller, entry, content, filename) {
     filename = loc.filename
   }
 
-  throw maskStackTrace(error, {
+  maskStackTrace(error, {
     content,
     filename,
     inModule: true
   })
+
+  throw error
 }
 
 function useAsync(entry) {

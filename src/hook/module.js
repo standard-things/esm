@@ -271,7 +271,9 @@ function tryPassthru(func, args, pkg) {
     filename = loc.filename
   }
 
-  throw maskStackTrace(error, { filename })
+  maskStackTrace(error, { filename })
+
+  throw error
 }
 
 function wasmCompiler(mod, filename) {
