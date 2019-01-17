@@ -9,17 +9,17 @@ function init() {
     FORWARD_SLASH
   } = CHAR_CODE
 
-  const isWin = isWin32()
+  const WIN32 = isWin32()
 
   function isSep(value) {
     if (typeof value === "number") {
       return value === FORWARD_SLASH ||
-        (isWin &&
+        (WIN32 &&
          value === BACKWARD_SLASH)
     }
 
     return value === "/" ||
-      (isWin &&
+      (WIN32 &&
        value === "\\")
   }
 
