@@ -61,39 +61,14 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     })
   }
 
-  if (entry !== null) {
-    if (parentEntry.extname === ".mjs" &&
-        entry.type === TYPE_ESM &&
-        entry.extname !== ".mjs") {
-      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
-    }
+  let finalizeCalled = false
 
-    if (parsing) {
-      entry.done = done
-    }
-  }
-
-  if (parsing) {
-    if (entry === null) {
-      const exported = tryRequire(request, parentEntry)
-
-      // Create the child entry for unresolved mocked requests.
-      entry = getEntryFrom(request, exported, parentEntry)
-      parentEntry.children[entry.name] = entry
-      entry.addSetters(setterArgsList, parentEntry)
-    }
-
-    return
-  }
-
-  let doneCalled = false
-
-  function done() {
-    if (doneCalled) {
+  function finalize() {
+    if (finalizeCalled) {
       return
     }
 
-    doneCalled = true
+    finalizeCalled = true
 
     const exported = tryRequire(request, parentEntry)
 
@@ -122,7 +97,30 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     }
   }
 
-  done()
+  if (entry !== null) {
+    if (parentEntry.extname === ".mjs" &&
+        entry.type === TYPE_ESM &&
+        entry.extname !== ".mjs") {
+      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
+    }
+
+    if (parsing) {
+      entry._finalize = finalize
+    }
+  }
+
+  if (parsing) {
+    if (entry === null) {
+      const exported = tryRequire(request, parentEntry)
+
+      // Create the child entry for unresolved mocked requests.
+      entry = getEntryFrom(request, exported, parentEntry)
+      parentEntry.children[entry.name] = entry
+      entry.addSetters(setterArgsList, parentEntry)
+    }
+  } else {
+    finalize()
+  }
 }
 
 function getEntryFrom(request, exported, parentEntry) {

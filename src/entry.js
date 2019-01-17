@@ -93,6 +93,8 @@ class Entry {
     this._esmNamespace = toRawModuleNamespaceObject()
     // The ESM validation indicator.
     this._esmValidated = false
+    // The entry finalization handler.
+    this._finalize = null
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
@@ -615,8 +617,8 @@ class Entry {
           childEntry.module.loaded = true
         }
 
-        if (childEntry.done) {
-          childEntry.done()
+        if (typeof childEntry._finalize === "function") {
+          childEntry._finalize()
         } else {
           childEntry.loaded()
           childEntry.updateBindings(null, UPDATE_TYPE_INIT)
