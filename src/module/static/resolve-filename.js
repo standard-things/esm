@@ -29,7 +29,7 @@ const {
   MODULE_NOT_FOUND
 } = errors
 
-const resolveFilename = maskFunction(function (request, parent, isMain, options) {
+const resolveFilename = maskFunction(function (request, parent, isMain = false, options) {
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js

@@ -53,7 +53,7 @@ const strictExts = [".mjs", ".js", ".json", ".node"]
 const strictFields = ["main"]
 const strictExtsLookup = new Set(strictExts)
 
-function resolveFilename(request, parent, isMain, options) {
+function resolveFilename(request, parent, isMain = false, options) {
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js

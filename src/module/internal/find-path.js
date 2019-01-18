@@ -38,7 +38,7 @@ const mainFields = ["main"]
 let resolveSymlinks = ! preserveSymlinks
 let resolveSymlinksMain = ! preserveSymlinksMain
 
-function findPath(request, paths, isMain, fields, exts) {
+function findPath(request, paths, isMain = false, fields, exts) {
   let cacheKey = request
 
   if (paths) {

@@ -20,7 +20,7 @@ const {
   STATE_PARSING_STARTED
 } = ENTRY
 
-function load(filename, parent = null, isMain, cache, loader) {
+function load(filename, parent = null, isMain = false, cache, loader) {
   const { parsing } = shared.moduleState
 
   let entry

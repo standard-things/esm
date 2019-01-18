@@ -22,7 +22,7 @@ const {
   TYPE_ESM
 } = ENTRY
 
-function load(request, parent, isMain, preload) {
+function load(request, parent, isMain = false, preload) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
   const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
