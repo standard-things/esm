@@ -2,6 +2,7 @@ import Module from "./module.js"
 import Package from "./package.js"
 
 import esmExtensions from "./module/esm/extensions.js"
+import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 
@@ -20,7 +21,7 @@ class Loader {
         module: {
           extensions: esmExtensions,
           globalPaths: Array.from(Module.globalPaths),
-          mainModule: null,
+          mainModule: realProcess.mainModule,
           moduleCache: { __proto__: null },
           scratchCache: new Proxy({ __proto__: null }, {
             get(scratchCache, name) {
