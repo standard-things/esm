@@ -9,11 +9,11 @@ import esmMath, {
   add as esmAdd,
   addBound as esmAddBound,
   picked as esmPicked
-} from "./"
+} from "./math-esm.js"
 
 test("test", (t) => {
   t.is(cjsAdd, esmAdd)
   t.is(cjsAddBound, esmAddBound)
-  t.deepEqual(cjsMath, esmMath)
-  t.deepEqual(cjsMath, esmPicked)
+  t.deepEqual(esmMath, cjsMath)
+  t.deepEqual(esmPicked, cjsMath)
 })

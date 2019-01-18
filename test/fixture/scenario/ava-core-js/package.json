@@ -1,0 +1,10 @@
+{
+  "name": "ava-core-js",
+  "private": true,
+  "ava": {
+    "require": [
+      "../../../../",
+      "core-js/fn/array/flatten"
+    ]
+  }
+}

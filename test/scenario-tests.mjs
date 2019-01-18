@@ -12,6 +12,7 @@ const isWin = process.platform === "win32"
 const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! isTravis
 
+const avaPath = path.resolve("../node_modules/ava/cli.js")
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
@@ -55,12 +56,6 @@ describe("scenario tests", function () {
           ])
         )
     , Promise.resolve())
-  )
-
-  it("should work with ava", () =>
-    exec("ava", [
-      path.resolve("fixture/scenario/ava/test.js")
-    ], envAuto)
   )
 
   it("should expose babel errors", () =>
@@ -174,34 +169,6 @@ describe("scenario tests", function () {
       ))
   )
 
-  it("should work with ava and nyc", () => {
-    const dirPath = path.resolve("fixture/scenario/ava-nyc")
-    const cwdPath = path.resolve(dirPath, "cwd.js")
-    const avaPattern = path.resolve(dirPath, "test.js")
-
-    return exec("nyc", [
-      "--cwd", dirPath,
-      "-i", cwdPath,
-      "ava", avaPattern
-    ], envAuto)
-  })
-
-  it("should work with ava, nyc, and tsc", () => {
-    const dirPath = path.resolve("fixture/scenario/ava-nyc-tsc")
-    const cwdPath = path.resolve(dirPath, "cwd.js")
-    const avaPattern = path.resolve(dirPath, "test.js")
-
-    return exec("tsc", [
-        "--project", dirPath
-      ])
-      .then(() => exec("nyc", [
-        "--cwd", dirPath,
-        "-i", cwdPath,
-        "-i", pkgPath,
-        "ava", avaPattern
-      ], envAuto))
-  })
-
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve("fixture/scenario/babel-mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")
@@ -254,6 +221,62 @@ describe("scenario tests", function () {
     ], envAuto)
   )
 
+  describe("should work with ava", () => {
+    it("should work from the `esm` bridge", () =>
+      exec("ava", [
+        path.resolve("fixture/scenario/ava/bridge.test.js")
+      ], envAuto)
+    )
+
+    it("should work from the Node CLI", () =>
+      node([
+        "-r", pkgPath,
+        avaPath,
+        path.resolve("fixture/scenario/ava/cli.test.js")
+      ], envAuto)
+    )
+
+    it("should work with ava and core-js", () => {
+      const dirPath = path.resolve("fixture/scenario/ava-core-js")
+      const cwdPath = path.resolve(dirPath, "cwd.js")
+      const avaPattern = path.resolve(dirPath, "test.js")
+
+      return node([
+        "-r", cwdPath,
+        avaPath,
+        avaPattern
+      ], envAuto)
+    })
+
+    it("should work with ava and nyc", () => {
+      const dirPath = path.resolve("fixture/scenario/ava-nyc")
+      const cwdPath = path.resolve(dirPath, "cwd.js")
+      const avaPattern = path.resolve(dirPath, "test.js")
+
+      return exec("nyc", [
+        "--cwd", dirPath,
+        "-i", cwdPath,
+        "ava", avaPattern
+      ], envAuto)
+    })
+
+    it("should work with ava, nyc, and tsc", () => {
+      const dirPath = path.resolve("fixture/scenario/ava-nyc-tsc")
+      const cwdPath = path.resolve(dirPath, "cwd.js")
+      const avaPattern = path.resolve(dirPath, "test.js")
+
+      return exec("tsc", [
+          "--project", dirPath
+        ])
+        .then(() => exec("nyc", [
+          "--cwd", dirPath,
+          "-i", cwdPath,
+          "-i", pkgPath,
+          "ava", avaPattern
+        ], envAuto))
+    })
+  })
+
   describe("should work with babel plugins", () => {
     it("should work from the `esm` bridge", () =>
       node([
@@ -266,7 +289,7 @@ describe("scenario tests", function () {
       node([
         "-r", pkgPath,
         "-r", "@babel/register",
-        path.resolve("fixture/scenario/babel-flow")
+        path.resolve("fixture/scenario/babel-flow/main.js")
       ])
       .then(({ stdout }) => assert.ok(stdout.includes("babel-flow:true")))
     )

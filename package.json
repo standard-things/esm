@@ -55,6 +55,7 @@
     "babel-plugin-transform-remove-debugger": "^6.9.4",
     "bluebird": "^3.5.3",
     "chai": "^4.2.0",
+    "core-js": "^2.6.2",
     "download": "^7.1.0",
     "eslint": "^5.12.0",
     "eslint-plugin-import": "^2.14.0",
