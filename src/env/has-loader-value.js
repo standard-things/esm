@@ -3,9 +3,8 @@ import { extname, sep } from "../safe/path.js"
 import CHAR_CODE from "../constant/char-code.js"
 
 import Loader from "../loader.js"
-import Module from "../module.js"
 
-import esmResolveFilename from "../module/esm/resolve-filename.js"
+import dualResolveFilename from "../module/internal/dual-resolve-filename.js"
 import isObjectLike from "../util/is-object-like.js"
 import isOwnPath from "../util/is-own-path.js"
 import isPath from "../util/is-path.js"
@@ -32,7 +31,7 @@ function init() {
           return true
         }
       } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&
-          isOwnPath(tryResolveFilename(value, rootModule, false))) {
+          isOwnPath(tryDualResolveFilename(value, rootModule, false))) {
         return true
       }
     } else if (isObjectLike(value)) {
@@ -48,7 +47,7 @@ function init() {
     return false
   }
 
-  function tryResolveFilename(request, parent, isMain) {
+  function tryDualResolveFilename(request, parent, isMain) {
     const entryState = shared.entry
     const entryCache = entryState.cache
 
@@ -62,16 +61,9 @@ function init() {
     let threw = true
 
     try {
-      result = esmResolveFilename(request, parent, isMain)
+      result = dualResolveFilename(request, parent, isMain)
       threw = false
     } catch {}
-
-    if (threw) {
-      try {
-        result = Module._resolveFilename(request, parent, isMain)
-        threw = false
-      } catch {}
-    }
 
     entryState.cache = entryCache
     pkgState.cache = pkgCache

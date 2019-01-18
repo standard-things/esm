@@ -4,10 +4,10 @@ import Entry from "../../entry.js"
 import Module from "../../module.js"
 
 import cjsValidate from "../cjs/validate.js"
+import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
 import esmParse from "./parse.js"
-import esmResolveFilename from "./resolve-filename.js"
 import esmValidate from "./validate.js"
 import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
@@ -130,7 +130,7 @@ function getEntryFrom(request, exported, parentEntry) {
     return entry
   }
 
-  const filename = tryResolveFilename(request, parentEntry.module, false)
+  const filename = tryDualResolveFilename(request, parentEntry.module, false)
   const mod = new Module(filename)
 
   if (isPath(filename)) {
@@ -140,6 +140,22 @@ function getEntryFrom(request, exported, parentEntry) {
   mod.exports = exported
   mod.loaded = true
   return Entry.get(mod)
+}
+
+function tryDualResolveFilename(request, parent, isMain) {
+  try {
+    return dualResolveFilename(request, parent, isMain)
+  } catch {}
+
+  if (isPath(request)) {
+    const parentFilename = parent.filename
+
+    return typeof parentFilename === "string"
+      ? resolve(parentFilename, request)
+      : resolve(request)
+  }
+
+  return request
 }
 
 function tryPhase(phase, request, parentEntry, preload) {
@@ -188,26 +204,6 @@ function tryRequire(request, parentEntry) {
   }
 
   return exported
-}
-
-function tryResolveFilename(request, parent, isMain) {
-  try {
-    return esmResolveFilename(request, parent, isMain)
-  } catch {}
-
-  try {
-    return Module._resolveFilename(request, parent, isMain)
-  } catch {}
-
-  if (isPath(request)) {
-    const parentFilename = parent.filename
-
-    return typeof parentFilename === "string"
-      ? resolve(parentFilename, request)
-      : resolve(request)
-  }
-
-  return request
 }
 
 export default esmImport

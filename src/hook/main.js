@@ -4,8 +4,8 @@ import Package from "../package.js"
 import Wrapper from "../wrapper.js"
 
 import { dirname } from "../safe/path.js"
+import dualResolveFilename from "../module/internal/dual-resolve-filename.js"
 import esmParseLoad from "../module/esm/parse-load.js"
-import esmResolveFilename from "../module/esm/resolve-filename.js"
 import getSilent from "../util/get-silent.js"
 import realProcess from "../real/process.js"
 import relaxRange from "../util/relax-range.js"
@@ -13,7 +13,7 @@ import relaxRange from "../util/relax-range.js"
 function hook(Mod) {
   function managerWrapper(manager, func, args) {
     const [, mainPath] = realProcess.argv
-    const filename = tryResolveFilename(mainPath, null, true)
+    const filename = dualResolveFilename(mainPath, null, true)
     const pkg = Package.from(filename)
     const wrapped = Wrapper.find(Mod, "runMain", relaxRange(pkg.range))
 
@@ -24,7 +24,7 @@ function hook(Mod) {
 
   function methodWrapper() {
     const [, mainPath] = realProcess.argv
-    const filename = tryResolveFilename(mainPath, null, true)
+    const filename = dualResolveFilename(mainPath, null, true)
     const defaultPkg = Loader.state.package.default
     const dirPath = dirname(filename)
 
@@ -44,22 +44,6 @@ function hook(Mod) {
     if (typeof _tickCallback === "function") {
       Reflect.apply(_tickCallback, realProcess, [])
     }
-  }
-
-  function tryResolveFilename(request, parent, isMain) {
-    let error
-
-    try {
-      return esmResolveFilename(request, parent, isMain)
-    } catch (e) {
-      error = e
-    }
-
-    try {
-      return Module._resolveFilename(request, parent, isMain)
-    } catch {}
-
-    throw error
   }
 
   Wrapper.manage(Mod, "runMain", managerWrapper)

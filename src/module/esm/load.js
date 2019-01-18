@@ -8,6 +8,7 @@ import Package from "../../package.js"
 import _load from "../internal/load.js"
 import builtinLookup from "../../builtin-lookup.js"
 import { dirname } from "../../safe/path.js"
+import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import isMJS from "../../path/is-mjs.js"
@@ -34,7 +35,7 @@ function load(request, parent, isMain, preload) {
   if (parentPkgOptions &&
       parentPkgOptions.cjs.paths &&
       ! parentIsMJS) {
-    filename = tryResolveFilename(request, parent, isMain)
+    filename = dualResolveFilename(request, parent, isMain)
   } else {
     filename = resolveFilename(request, parent, isMain)
   }
@@ -158,22 +159,6 @@ function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
       }
     }
   }
-}
-
-function tryResolveFilename(request, parent, isMain) {
-  let error
-
-  try {
-    return resolveFilename(request, parent, isMain)
-  } catch (e) {
-    error = e
-  }
-
-  try {
-    return Module._resolveFilename(request, parent, isMain)
-  } catch {}
-
-  throw error
 }
 
 export default load
