@@ -39,18 +39,28 @@ let resolveSymlinks = ! preserveSymlinks
 let resolveSymlinksMain = ! preserveSymlinksMain
 
 function findPath(request, paths, isMain = false, fields, exts) {
-  let cacheKey = request
+  let cacheKey = request + "\0"
 
   if (paths) {
-    cacheKey += "\0" + (paths.length === 1 ? paths[0] : GenericArray.join(paths))
+    cacheKey += paths.length === 1 ? paths[0] : GenericArray.join(paths)
   }
+
+  cacheKey += "\0"
 
   if (fields) {
-    cacheKey += "\0" + (fields.length === 1 ? fields[0] : fields.join())
+    cacheKey += fields.length === 1 ? fields[0] : fields.join()
   }
 
+  cacheKey += "\0"
+
   if (exts) {
-    cacheKey += "\0" + (exts.length === 1 ? exts[0] : exts.join())
+    cacheKey += exts.length === 1 ? exts[0] : exts.join()
+  }
+
+  cacheKey += "\0"
+
+  if (isMain) {
+    cacheKey += "1"
   }
 
   const cache = shared.memoize.moduleInternalFindPath

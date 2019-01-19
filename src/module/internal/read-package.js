@@ -13,10 +13,10 @@ function init() {
     const cache = shared.memoize.moduleInternalReadPackage
     const fieldsLength = fields === void 0 ? 0 : fields.length
 
-    let cacheKey = dirPath
+    let cacheKey = dirPath + "\0"
 
     if (fieldsLength > 0) {
-      cacheKey += "\0" + (fieldsLength === 1 ? fields[0] : fields.join())
+      cacheKey += fieldsLength === 1 ? fields[0] : fields.join()
     }
 
     let cached = cache.get(cacheKey)
