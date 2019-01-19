@@ -114,8 +114,8 @@ function createEntry(id) {
 
   exported = proxyExports(entry)
 
-  entry.exports = exported
   mod.exports = exported
+  entry.exports = exported
 
   if (isFunc &&
       id === "module") {
@@ -123,6 +123,7 @@ function createEntry(id) {
   }
 
   entry.loaded()
+
   return entry
 }
 

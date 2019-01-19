@@ -28,6 +28,7 @@ export default () => {
       }
 
       mod.exports = {}
+
       Reflect.deleteProperty(cache, filename)
       extensions[".js"](mod, filename)
     }

@@ -133,12 +133,13 @@ function getEntryFrom(request, exported, parentEntry) {
   const filename = tryDualResolveFilename(request, parentEntry.module, false)
   const mod = new Module(filename)
 
+  mod.exports = exported
+  mod.loaded = true
+
   if (isPath(filename)) {
     mod.filename = filename
   }
 
-  mod.exports = exported
-  mod.loaded = true
   return Entry.get(mod)
 }
 
