@@ -33,6 +33,7 @@ const Module = maskFunction(function (id, parent) {
   this.id = id
   this.loaded = false
   this.parent = parent
+  this.paths = void 0
 
   const children = parent ? parent.children : null
 
