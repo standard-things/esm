@@ -41,7 +41,7 @@ function hook(parent) {
     const exported = entry.module.exports
 
     if (entry.type !== TYPE_CJS) {
-      shared.entry.bridged.set(exported, entry)
+      shared.bridged.set(exported, entry)
     }
 
     return exported

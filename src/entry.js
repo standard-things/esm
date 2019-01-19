@@ -272,10 +272,13 @@ class Entry {
       Entry.set(mod, entry)
     } else if (entry._loaded === LOAD_COMPLETED &&
         entry.type === TYPE_CJS) {
-      const found = shared.entry.bridged.get(entry.module.exports)
+      const { bridged } = shared
+      const exported = entry.module.exports
+      const found = bridged.get(exported)
 
       if (found !== void 0) {
         entry = found
+        bridged.delete(exported)
         Entry.set(mod, entry)
       }
     }
