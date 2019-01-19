@@ -6,17 +6,19 @@ function init() {
 
   const backwardSlashRegExp = /\\/g
 
-  function normalize(filename) {
-    if (typeof filename !== "string") {
-      return ""
-    }
-
-    return WIN32
-      ? filename.replace(backwardSlashRegExp, "/")
-      : filename
+  function posixNormalize(filename) {
+    return typeof filename === "string"
+      ? filename
+      : ""
   }
 
-  return normalize
+  function win32Normalize(filename) {
+    return typeof filename === "string"
+      ? filename.replace(backwardSlashRegExp, "/")
+      : ""
+  }
+
+  return WIN32 ? win32Normalize : posixNormalize
 }
 
 export default shared.inited
