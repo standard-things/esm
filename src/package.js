@@ -20,7 +20,6 @@ import isCacheName from "./util/is-cache-name.js"
 import isFile from "./util/is-file.js"
 import isJSON from "./path/is-json.js"
 import isObject from "./util/is-object.js"
-import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
 import parseJSON from "./util/parse-json.js"
 import parseJSON6 from "./util/parse-json6.js"
@@ -278,7 +277,7 @@ function createCJS(value) {
     return assign(options, defaultCJS)
   }
 
-  if (isObjectLike(value)) {
+  if (isObject(value)) {
     const possibleNames = keys(value)
 
     for (const name of possibleNames) {
