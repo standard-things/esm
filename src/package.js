@@ -565,7 +565,10 @@ function readInfo(dirPath, forceOptions) {
       const { moduleState } = shared
       const { parsing } = moduleState
 
-      pkg = new Package(dirPath, RANGE_ALL, { cache: Package.createOptions(forceOptions).cache })
+      pkg = new Package(dirPath, RANGE_ALL, {
+        cache: Package.createOptions(forceOptions).cache
+      })
+
       moduleState.parsing = false
       cache.set(dirPath, pkg)
 
@@ -638,7 +641,7 @@ function readInfo(dirPath, forceOptions) {
     }
   }
 
-  if (pkg) {
+  if (pkg !== void 0) {
     pkg.range = range
     return pkg
   }
