@@ -63,7 +63,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
   let finalizeCalled = false
 
-  function finalize() {
+  const finalize = () => {
     if (finalizeCalled) {
       return
     }
