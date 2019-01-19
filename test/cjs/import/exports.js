@@ -10,6 +10,7 @@ import defaultNull, * as nsNull from "../../fixture/cjs/export/null.js"
 import defaultNumber, * as nsNumber from "../../fixture/cjs/export/number.js"
 import defaultObject, { a as aOfObject } from "../../fixture/cjs/export/object.js"
 import defaultPseudo, { a as aOfPseudo } from "../../fixture/cjs/export/pseudo.js"
+import defaultReExport from "../../fixture/cjs/export/re-export.js"
 import defaultUndefined, * as nsUndefined from "../../fixture/cjs/export/undefined.js"
 import * as nsFunction from "../../fixture/cjs/export/function.js"
 import * as nsGetSet from "../../fixture/cjs/export/get-set.js"
@@ -51,6 +52,8 @@ export default () => {
 
   assert.strictEqual(defaultPseudo, "default")
   assert.deepStrictEqual(nsPseudo, ns)
+
+  assert.deepStrictEqual(defaultReExport, { a: "re-export-nested" })
 
   ns = createNamespace({ default: defaultUndefined })
   assert.strictEqual(defaultUndefined, void 0)
