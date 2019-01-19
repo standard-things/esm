@@ -127,6 +127,10 @@ function load(request, parent, isMain = false, preload) {
     preload(entry)
   }
 
+  if (parentEntry !== null) {
+    parentEntry._lastChild = entry
+  }
+
   return entry
 }
 

@@ -95,6 +95,8 @@ class Entry {
     this._esmValidated = false
     // The entry finalization handler.
     this._finalize = null
+    // The last child entry loaded.
+    this._lastChild = null
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.

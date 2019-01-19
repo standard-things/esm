@@ -67,6 +67,10 @@ const load = maskFunction(function (request, parent, isMain) {
     throw new ERR_REQUIRE_ESM(filename)
   }
 
+  if (parentEntry !== null) {
+    parentEntry._lastChild = entry
+  }
+
   return entry.module.exports
 }, RealModule._load)
 
