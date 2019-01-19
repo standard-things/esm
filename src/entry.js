@@ -1100,9 +1100,7 @@ function runGetter(entry, name) {
   const { _namespace } = entry
   const getter = entry.getters[name]
 
-  const value = typeof getter === "function"
-    ? tryGetter(getter)
-    : ERROR_GETTER
+  const value = tryGetter(getter)
 
   if (value === ERROR_STAR) {
     Reflect.deleteProperty(_namespace, name)
@@ -1203,11 +1201,9 @@ function runSetters(entry, names, callback, updateType) {
 }
 
 function tryGetter(getter) {
-  if (typeof getter === "function") {
-    try {
-      return getter()
-    } catch {}
-  }
+  try {
+    return getter()
+  } catch {}
 
   return ERROR_GETTER
 }
