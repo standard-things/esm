@@ -1145,31 +1145,27 @@ function runSetter(entry, name, callback, updateType) {
     const setter = setters[length]
     const parentEntry = setter.parent
 
-    let value
-
-    if (isESM) {
-      value = getExportByNameFast(entry, name, parentEntry)
-    } else {
-      value = getExportByName(entry, name, parentEntry)
-    }
+    const value = isESM
+      ? getExportByNameFast(entry, name, parentEntry)
+      : getExportByName(entry, name, parentEntry)
 
     if (value === ERROR_STAR) {
       setters.splice(length, 1)
       throw constructStackless(ERR_EXPORT_STAR_CONFLICT, [entry.module, name])
     }
 
-    const { last, type } = setter
-    const changed = type !== SETTER_TYPE_DYNAMIC_IMPORT && ! Object.is(last, value)
+    const { type } = setter
+    const changed = type !== SETTER_TYPE_DYNAMIC_IMPORT && ! Object.is(setter.last, value)
     const isDynamicImport = isLoaded && type === SETTER_TYPE_DYNAMIC_IMPORT
     const isExportFrom = type === SETTER_TYPE_EXPORT_FROM
     const isExportNs = isNsChanged && type === SETTER_TYPE_NAMESPACE
     const isInit = updateType === UPDATE_TYPE_INIT
 
     if (changed ||
-        isInit ||
         isDynamicImport ||
         isExportFrom ||
-        isExportNs) {
+        isExportNs ||
+        isInit) {
       setter.last = value
 
       const setterValue = value === ERROR_GETTER ? void 0 : value
