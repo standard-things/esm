@@ -2,14 +2,11 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/helpers.js
 
-import ENTRY from "../../constant/entry.js"
-
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
 import Runtime from "../../runtime.js"
 
-import isDataProperty from "../../util/is-data-property.js"
 import isInstalled from "../../util/is-installed.js"
 import isOwnModule from "../../util/is-own-module.js"
 import maskFunction from "../../util/mask-function.js"
@@ -18,11 +15,6 @@ import realProcess from "../../real/process.js"
 import realRequire from "../../real/require.js"
 import shared from "../../shared.js"
 import validateString from "../../util/validate-string.js"
-
-const {
-  TYPE_ESM,
-  TYPE_WASM
-} = ENTRY
 
 const realResolve = realRequire.resolve
 const realPaths = realResolve && realResolve.paths
@@ -38,13 +30,7 @@ const ownExportsMap = new Map([
 ])
 
 function makeRequireFunction(mod, requirer, resolver) {
-  const entry = Entry.get(mod)
-  const { name, type } = entry
   const isOwn = isOwnModule(mod)
-
-  const shouldCheckExports =
-    type !== TYPE_ESM &&
-    type !== TYPE_WASM
 
   let req = function require(request) {
     const exported = isOwn
@@ -56,11 +42,6 @@ function makeRequireFunction(mod, requirer, resolver) {
     }
 
     const { moduleState } = shared
-
-    if (shouldCheckExports &&
-        ! isDataProperty(mod, "exports")) {
-      shared.entry.skipExports.add(name)
-    }
 
     moduleState.requireDepth += 1
 

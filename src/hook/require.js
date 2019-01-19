@@ -1,3 +1,5 @@
+import ENTRY from "../constant/entry.js"
+
 import Loader from "../loader.js"
 import Package from "../package.js"
 
@@ -5,9 +7,13 @@ import { dirname } from "../safe/path.js"
 import errors from "../errors.js"
 import dualResolveFilename from "../module/internal/dual-resolve-filename.js"
 import esmParseLoad from "../module/esm/parse-load.js"
-import esmResolveFilename from "../module/esm/resolve-filename.js"
 import makeRequireFunction from "../module/internal/make-require-function.js"
+import shared from "../shared.js"
 import validateString from "../util/validate-string.js"
+
+const {
+  TYPE_CJS
+} = ENTRY
 
 const {
   ERR_INVALID_ARG_VALUE
@@ -31,11 +37,18 @@ function hook(parent) {
       Package.set(dirPath, defaultPkg.clone())
     }
 
-    return esmParseLoad(request, parent, false).module.exports
+    const entry = esmParseLoad(request, parent, false)
+    const exported = entry.module.exports
+
+    if (entry.type !== TYPE_CJS) {
+      shared.entry.bridged.set(exported, entry)
+    }
+
+    return exported
   }
 
   function resolver(request, options) {
-    return esmResolveFilename(request, parent, false, options)
+    return dualResolveFilename(request, parent, false, options)
   }
 
   const req = makeRequireFunction(parent, requirer, resolver)

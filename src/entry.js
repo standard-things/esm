@@ -263,28 +263,21 @@ class Entry {
       return null
     }
 
-    const { cache, skipExports } = shared.entry
-    const name = getModuleName(mod)
+    const { cache } = shared.entry
 
-    let exported
-    let useExports = false
+    let entry = cache.get(mod)
 
-    if (! skipExports.has(name)) {
-      exported = mod.exports
-      useExports = isObjectLike(exported)
-    }
-
-    let entry = cache.get(useExports ? exported : mod)
-
-    if (! entry &&
-        useExports) {
-      entry = cache.get(mod)
-    }
-
-    if (! entry) {
+    if (entry === void 0) {
       entry = new Entry(mod)
       Entry.set(mod, entry)
-      Entry.set(exported, entry)
+    } else if (entry._loaded === LOAD_COMPLETED &&
+        entry.type === TYPE_CJS) {
+      const found = shared.entry.bridged.get(entry.module.exports)
+
+      if (found !== void 0) {
+        entry = found
+        Entry.set(mod, entry)
+      }
     }
 
     return entry
@@ -539,26 +532,20 @@ class Entry {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
-      const exported = mod.exports
-
       this.merge(Entry.get(mod))
 
       const newMod = this.module
-      const newExported = newMod.exports
 
       if (newMod !== mod) {
         Entry.delete(mod, this)
         Entry.set(newMod, this)
       }
 
-      if (newExported !== exported) {
-        Entry.delete(exported, this)
-        Entry.set(newExported, this)
-      }
-
       if (! newMod.loaded) {
         return this._loaded = LOAD_INCOMPLETE
       }
+
+      const newExported = newMod.exports
 
       if (newExported != null &&
           newExported.__esModule &&
@@ -580,7 +567,6 @@ class Entry {
       }
 
       this.assignExportsToNamespace(keys(newExported))
-      shared.entry.skipExports.delete(this.name)
     }
 
     this.finalizeNamespace()

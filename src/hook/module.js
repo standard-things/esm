@@ -17,7 +17,6 @@ import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isObjectLike from "../util/is-object-like.js"
 import isStackTraceMasked from "../util/is-stack-trace-masked.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -98,9 +97,8 @@ function hook(Mod, parent) {
 
   function jsWrapper(manager, func, args) {
     const [mod, filename] = args
-    const exported = mod.exports
 
-    const shouldOverwrite = ! Entry.has(isObjectLike(exported) ? exported : mod)
+    const shouldOverwrite = ! Entry.has(mod)
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
     const entry = Entry.get(mod)
@@ -284,9 +282,6 @@ function wasmCompiler(mod, filename) {
 
   const entry = Entry.get(mod)
   const exported = { __proto__: null }
-
-  Entry.delete(mod.exports, entry)
-  Entry.set(exported, entry)
 
   mod.exports = exported
   entry.exports = exported

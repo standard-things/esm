@@ -251,7 +251,6 @@ const Runtime = {
     const boundGlobalEval = (code) => Runtime.globalEval.call(runtime, code)
 
     Entry.set(mod, entry)
-    Entry.set(exported, entry)
 
     entry.exports = exported
 
