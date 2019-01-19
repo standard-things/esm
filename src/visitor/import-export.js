@@ -61,17 +61,18 @@ function init() {
             "}]"
         }
 
-        const reexportedNames = keys(importSpecifierMap[request].reexports)
+        const { reExports } = importSpecifierMap[request]
+        const reExportedNames = keys(reExports)
 
-        for (const reexportedName of reexportedNames) {
-          const localNames = importSpecifierMap[request].reexports[reexportedName]
+        for (const reExportedName of reExportedNames) {
+          const localNames = reExports[reExportedName]
 
           for (const localName of localNames) {
             setterArgsList +=
               (setterArgsList === "" ? "" : ",") +
               '["' +
               localName + '",null,' +
-              runtimeName + '.f("' + localName + '","' + reexportedName +
+              runtimeName + '.f("' + localName + '","' + reExportedName +
               '")]'
           }
         }
@@ -184,7 +185,7 @@ function init() {
         importSpecifierMap[request] = {
           __proto__: null,
           imports: { __proto__: null },
-          reexports: { __proto__: null },
+          reExports: { __proto__: null },
           star: false
         }
       }
@@ -236,7 +237,7 @@ function init() {
         importSpecifierMap[request] = {
           __proto__: null,
           imports: { __proto__: null },
-          reexports: { __proto__: null },
+          reExports: { __proto__: null },
           star: false
         }
       }
@@ -460,7 +461,7 @@ function init() {
           importSpecifierMap[request] = {
             __proto__: null,
             imports: { __proto__: null },
-            reexports: { __proto__: null },
+            reExports: { __proto__: null },
             star: false
           }
         }
@@ -475,11 +476,13 @@ function init() {
             initees[exportedName] = true
           }
 
-          if (! Reflect.has(importSpecifierMap[request].reexports, exportedName)) {
-            importSpecifierMap[request].reexports[exportedName] = []
+          const { reExports } = importSpecifierMap[request]
+
+          if (! Reflect.has(reExports, exportedName)) {
+            reExports[exportedName] = []
           }
 
-          importSpecifierMap[request].reexports[exportedName].push(localName)
+          reExports[exportedName].push(localName)
         }
 
         hoistImports(this, node)
