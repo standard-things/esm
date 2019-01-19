@@ -124,12 +124,6 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 }
 
 function getEntryFrom(request, exported, parentEntry) {
-  const entry = shared.entry.cache.get(exported)
-
-  if (entry !== void 0) {
-    return entry
-  }
-
   const filename = tryDualResolveFilename(request, parentEntry.module, false)
   const mod = new Module(filename)
 
