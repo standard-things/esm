@@ -53,6 +53,7 @@ const {
   TYPE_ESM,
   TYPE_PSEUDO,
   TYPE_WASM,
+  UPDATE_TYPE_DEFAULT,
   UPDATE_TYPE_INIT,
   UPDATE_TYPE_LIVE
 } = ENTRY
@@ -618,7 +619,7 @@ class Entry {
     }
   }
 
-  updateBindings(names, type, seen) {
+  updateBindings(names, type = UPDATE_TYPE_DEFAULT, seen) {
     const shouldUpdateParents =
       this.circular ||
       type === UPDATE_TYPE_INIT ||
@@ -675,7 +676,7 @@ class Entry {
         const parentEntry = parentsMap[id]
 
         parentEntry.loaded()
-        parentEntry.updateBindings(null, UPDATE_TYPE_LIVE, seen)
+        parentEntry.updateBindings(null, type, seen)
       }
     }
 
