@@ -694,7 +694,7 @@ class Entry {
 
     if (! force &&
         this.filename === mod.filename) {
-      return
+      return this
     }
 
     const modDirname = getModuleDirname(mod)
@@ -707,20 +707,18 @@ class Entry {
     if (modDirname === "") {
       this.basename = modFilename
       this.extname = ""
-      return
-    }
-
-    if (typeof modFilename !== "string") {
+    } else if (typeof modFilename !== "string") {
       this.basename = ""
       this.extname = ""
-      return
+    } else {
+      this.basename = modDirname === "."
+        ? basename(modFilename)
+        : modFilename.slice(modDirname.length + 1)
+
+      this.extname = extname(modFilename)
     }
 
-    this.basename = modDirname === "."
-      ? basename(modFilename)
-      : modFilename.slice(modDirname.length + 1)
-
-    this.extname = extname(modFilename)
+    return this
   }
 }
 
