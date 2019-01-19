@@ -291,7 +291,7 @@ class Entry {
   }
 
   static set(value, entry) {
-    if (isObjectLike(value)) {
+    if (isObject(value)) {
       shared.entry.cache.set(value, entry)
     }
   }
