@@ -45,21 +45,24 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
   const isAbs = isAbsolute(request)
   const parentEntry = Entry.get(parent)
 
-  let fromPath
-
-  if (parentEntry !== null &&
-      ! isAbs) {
+  if (parentEntry !== null) {
     parentEntry.updateFilename()
-    fromPath = parentEntry.dirname
-  } else {
-    fromPath = ""
   }
 
-  const cache = shared.memoize.moduleStaticResolveFilename
+  let fromPath
 
+  if (isAbs) {
+    fromPath = dirname(request)
+  } else {
+    fromPath = parentEntry === null ? "" : parentEntry.dirname
+  }
+
+  let cache
   let cacheKey
 
   if (! isObject(options)) {
+    cache = shared.memoize.moduleStaticResolveFilename
+
     cacheKey =
       request + "\0" +
       fromPath + "\0" +
@@ -72,10 +75,6 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
     }
   }
 
-  if (isAbs) {
-    fromPath = dirname(request)
-  }
-
   const isRel = ! isAbs && isRelative(request)
   const isPath = isAbs || isRel
 
@@ -85,7 +84,7 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
       Module._findPath === staticFindPath &&
       Module._resolveLookupPaths === staticResolveLookupPaths) {
     paths = [fromPath]
-  } else if (cacheKey === void 0 &&
+  } else if (cache === void 0 &&
       Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths)
   } else {
@@ -99,7 +98,7 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
   }
 
   if (foundPath !== "") {
-    if (cacheKey !== void 0) {
+    if (cache !== void 0) {
       cache.set(cacheKey, foundPath)
     }
 

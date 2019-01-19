@@ -69,24 +69,24 @@ function resolveFilename(request, parent, isMain = false, options) {
   const isAbs = isAbsolute(request)
   const parentEntry = Entry.get(parent)
 
-  let fromPath
-
   if (parentEntry !== null) {
     parentEntry.updateFilename()
   }
 
-  if (! isAbs &&
-      parentEntry !== null) {
-    fromPath = parentEntry.dirname
+  let fromPath
+
+  if (isAbs) {
+    fromPath = dirname(request)
   } else {
-    fromPath = ""
+    fromPath = parentEntry === null ? "" : parentEntry.dirname
   }
 
-  const cache = shared.memoize.moduleESMResolveFilename
-
+  let cache
   let cacheKey
 
   if (! isObject(options)) {
+    cache = shared.memoize.moduleESMResolveFilename
+
     cacheKey =
       request + "\0" +
       fromPath + "\0" +
@@ -97,10 +97,6 @@ function resolveFilename(request, parent, isMain = false, options) {
     if (cached !== void 0) {
       return cached
     }
-  }
-
-  if (isAbs) {
-    fromPath = dirname(request)
   }
 
   const isRel = ! isAbs && isRelative(request)
@@ -162,7 +158,10 @@ function resolveFilename(request, parent, isMain = false, options) {
 
     if (foundPath === "" &&
         builtinLookup.has(decoded)) {
-      cache.set(cacheKey, decoded)
+      if (cache !== void 0) {
+        cache.set(cacheKey, decoded)
+      }
+
       return decoded
     }
   }
@@ -174,7 +173,10 @@ function resolveFilename(request, parent, isMain = false, options) {
         isJS(foundPath) ||
         isMJS(foundPath) ||
         strictExtsLookup.has(extname(foundPath))) {
-      cache.set(cacheKey, foundPath)
+      if (cache !== void 0) {
+        cache.set(cacheKey, foundPath)
+      }
+
       return foundPath
     }
 
@@ -185,7 +187,10 @@ function resolveFilename(request, parent, isMain = false, options) {
 
   if (foundPath !== "") {
     if (cjsPaths) {
-      cache.set(cacheKey, foundPath)
+      if (cache !== void 0) {
+        cache.set(cacheKey, foundPath)
+      }
+
       return foundPath
     }
 
