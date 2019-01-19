@@ -125,7 +125,12 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
 function getEntryFrom(request, exported, parentEntry) {
   const filename = tryDualResolveFilename(request, parentEntry.module, false)
-  const mod = new Module(filename)
+
+  let mod = Module._cache[filename]
+
+  if (mod === void 0) {
+    mod = new Module(filename)
+  }
 
   mod.exports = exported
   mod.loaded = true
