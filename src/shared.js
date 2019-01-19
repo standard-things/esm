@@ -72,7 +72,7 @@ function init() {
       moduleInternalReadPackage: new Map,
       moduleStaticResolveFilename: new Map,
       shimFunctionPrototypeToString: new WeakMap,
-      shimProcessBindingUtilGetProxyDetails: new WeakMap,
+      shimProcessBindingUtilGetProxyDetails: new Map,
       utilGetProxyDetails: new WeakMap,
       utilMaskFunction: new WeakMap,
       utilMaxSatisfying: new Map,
