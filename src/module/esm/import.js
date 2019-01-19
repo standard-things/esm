@@ -73,13 +73,10 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     const exported = tryRequire(request, parentEntry)
 
     if (entry === null) {
-      // Create the child entry for unresolved mocked requests.
       entry = getEntryFrom(request, exported, parentEntry)
       parentEntry.children[entry.name] = entry
       entry.addSetters(setterArgsList, parentEntry)
-    }
-
-    if (entry.module.exports !== exported) {
+    } else if (! Object.is(entry.module.exports, exported)) {
       const { name } = entry
 
       entry = getEntryFrom(request, exported, parentEntry)
@@ -113,7 +110,6 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     if (entry === null) {
       const exported = tryRequire(request, parentEntry)
 
-      // Create the child entry for unresolved mocked requests.
       entry = getEntryFrom(request, exported, parentEntry)
       parentEntry.children[entry.name] = entry
       entry.addSetters(setterArgsList, parentEntry)
@@ -124,13 +120,15 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 }
 
 function getEntryFrom(request, exported, parentEntry) {
-  const filename = tryDualResolveFilename(request, parentEntry.module, false)
+  const { _lastChild } = parentEntry
 
-  let mod = Module._cache[filename]
-
-  if (mod === void 0) {
-    mod = new Module(filename)
+  if (_lastChild !== null &&
+      Object.is(_lastChild.module.exports, exported)) {
+    return _lastChild
   }
+
+  const filename = tryDualResolveFilename(request, parentEntry.module, false)
+  const mod = new Module(filename)
 
   mod.exports = exported
   mod.loaded = true
