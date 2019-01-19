@@ -627,8 +627,8 @@ class Entry {
 
     if (shouldUpdateParents) {
       if (seen !== void 0 &&
-        seen.has(this)) {
-        return
+          seen.has(this)) {
+        return this
       } else if (seen === void 0) {
         seen = new Set
       }
