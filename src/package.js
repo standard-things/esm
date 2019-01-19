@@ -469,7 +469,7 @@ function getInfo(dirPath, forceOptions) {
   if (cache.has(dirPath)) {
     pkg = cache.get(dirPath)
 
-    if (! forceOptions ||
+    if (forceOptions === void 0 ||
         pkg !== null) {
       return pkg
     }
@@ -532,7 +532,7 @@ function isFlag(value) {
     value === 1
 }
 
-function readInfo(dirPath, forceOptions = false) {
+function readInfo(dirPath, forceOptions) {
   let pkg
   let optionsPath = dirPath + sep + ESMRC_FILENAME
 
@@ -586,7 +586,7 @@ function readInfo(dirPath, forceOptions = false) {
 
   let parentPkg
 
-  if (! forceOptions &&
+  if (forceOptions === void 0 &&
       pkgJSON === null) {
     if (optionsFound) {
       parentPkg = getInfo(dirname(dirPath))
@@ -610,7 +610,7 @@ function readInfo(dirPath, forceOptions = false) {
 
   let range
 
-  if (forceOptions) {
+  if (forceOptions !== void 0) {
     range = RANGE_ALL
   } else if (parentPkg) {
     range = parentPkg.range
@@ -643,7 +643,7 @@ function readInfo(dirPath, forceOptions = false) {
     return pkg
   }
 
-  if (forceOptions &&
+  if (forceOptions !== void 0 &&
       ! optionsFound) {
     optionsFound = true
     options = forceOptions
