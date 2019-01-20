@@ -1,6 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 
 import shared from "../shared.js"
+import unescapeQuotes from "./unescape-quotes.js"
 
 function init() {
   const {
@@ -8,10 +9,7 @@ function init() {
     QUOTE
   } = CHAR_CODE
 
-  const escapedDoubleQuoteRegExp = /\\"/g
-  const escapedSingleQuoteRegExp = /\\'/g
-
-  function stripQuotes(string) {
+  function stripQuotes(string, quoteCode) {
     if (typeof string !== "string") {
       return ""
     }
@@ -19,24 +17,23 @@ function init() {
     const startCode = string.charCodeAt(0)
     const endCode = string.charCodeAt(string.length - 1)
 
-    const isDoubleQuoted =
-      startCode === QUOTE &&
-      endCode === QUOTE
+    if (quoteCode === void 0) {
+      if (startCode === APOSTROPHE &&
+          endCode === APOSTROPHE) {
+        quoteCode = APOSTROPHE
+      } else if (startCode === QUOTE &&
+          endCode === QUOTE) {
+        quoteCode = QUOTE
+      }
+    }
 
-    const isSingleQuoted =
-      startCode === APOSTROPHE &&
-      endCode === APOSTROPHE
-
-    if (! isDoubleQuoted &&
-        ! isSingleQuoted) {
+    if (quoteCode === void 0) {
       return string
     }
 
     const unquoted = string.slice(1, -1)
 
-    return isDoubleQuoted
-      ? unquoted.replace(escapedDoubleQuoteRegExp, '"')
-      : unquoted.replace(escapedSingleQuoteRegExp, "'")
+    return unescapeQuotes(unquoted, quoteCode)
   }
 
   return stripQuotes

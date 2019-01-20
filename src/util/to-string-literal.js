@@ -1,5 +1,6 @@
 import CHAR_CODE from "../constant/char-code.js"
 
+import escapeQuotes from "./escape-quotes.js"
 import toString from "./to-string.js"
 import shared from "../shared.js"
 import stripQuotes from "./strip-quotes.js"
@@ -11,17 +12,12 @@ function init() {
 
   const separatorsRegExp = /[\u2028\u2029]/g
 
-  const escapeRegExpMap = new Map([
-    ['"', /\\?"/g],
-    ["'", /\\?'/g]
-  ])
-
   const escapedSeparatorsMap = new Map([
     ["\u2028", "\\u2028"],
     ["\u2029", "\\u2029"]
   ])
 
-  function toStringLiteral(value, quote = '"') {
+  function toStringLiteral(value, quoteCode = QUOTE) {
     let string = JSON.stringify(value)
 
     if (typeof string !== "string") {
@@ -30,15 +26,15 @@ function init() {
 
     string = string.replace(separatorsRegExp, replaceSeparators)
 
-    if (quote === '"' &&
+    if (quoteCode === QUOTE &&
         string.charCodeAt(0) === QUOTE) {
       return string
     }
 
-    const unquoted = stripQuotes(string)
-    const escaped = unquoted.replace(escapeRegExpMap.get(quote), "\\" + quote)
+    const quote = String.fromCharCode(quoteCode)
+    const unquoted = stripQuotes(string, quoteCode)
 
-    return quote + escaped + quote
+    return quote + escapeQuotes(unquoted, quoteCode) + quote
   }
 
   function replaceSeparators(match) {

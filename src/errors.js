@@ -1,3 +1,4 @@
+import CHAR_CODE from "./constant/char-code.js"
 import ESM from "./constant/esm.js"
 
 import captureStackTrace from "./error/capture-stack-trace.js"
@@ -13,6 +14,10 @@ import toString from "./util/to-string.js"
 import toStringLiteral from "./util/to-string-literal.js"
 
 function init() {
+  const {
+    APOSTROPHE
+  } = CHAR_CODE
+
   const {
     PACKAGE_VERSION
   } = ESM
@@ -143,7 +148,7 @@ function init() {
   function stringifyName(name) {
     return typeof name === "symbol"
       ? toString(name)
-      : toStringLiteral(name, "'")
+      : toStringLiteral(name, APOSTROPHE)
   }
 
   function truncInspect(value) {
@@ -194,7 +199,7 @@ function init() {
 
   function invalidPkgOption(name, value, unquoted) {
     return "The esm@" + PACKAGE_VERSION + " option " +
-      (unquoted ? toString(name) : toStringLiteral(name, "'")) +
+      (unquoted ? toString(name) : toStringLiteral(name, APOSTROPHE)) +
       " is invalid. Received " + truncInspect(value)
   }
 
@@ -204,7 +209,7 @@ function init() {
   }
 
   function missingCJS(request) {
-    return "Cannot find module " + toStringLiteral(request, "'")
+    return "Cannot find module " + toStringLiteral(request, APOSTROPHE)
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {

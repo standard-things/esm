@@ -33,6 +33,7 @@ import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
 
 const {
+  APOSTROPHE,
   DOT
 } = CHAR_CODE
 
@@ -288,13 +289,13 @@ function createCJS(value) {
           options[name] = !! optionsValue
         } else {
           throw new ERR_INVALID_ESM_OPTION(
-            "cjs[" + toStringLiteral(name, "'") + "]",
+            "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
             optionsValue,
             true
           )
         }
       } else {
-        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, "'") + "]")
+        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
       }
     }
 
