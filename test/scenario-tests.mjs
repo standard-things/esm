@@ -228,13 +228,14 @@ describe("scenario tests", function () {
       ], envAuto)
     )
 
-    it("should work from the Node CLI", () =>
-      node([
+    it("should work from the Node CLI", () => {
+      const avaPattern = path.resolve("fixture/scenario/ava/cli.test.js")
+
+      return node([
         "-r", pkgPath,
-        avaPath,
-        path.resolve("fixture/scenario/ava/cli.test.js")
+        avaPath, avaPattern
       ], envAuto)
-    )
+    })
 
     it("should work with ava and core-js", () => {
       const dirPath = path.resolve("fixture/scenario/ava-core-js")
@@ -243,8 +244,7 @@ describe("scenario tests", function () {
 
       return node([
         "-r", cwdPath,
-        avaPath,
-        avaPattern
+        avaPath, avaPattern
       ], envAuto)
     })
 

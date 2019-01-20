@@ -1,7 +1,7 @@
 import assert from "assert"
 import { log } from "console"
 import { script } from "lab"
-import { add } from "./"
+import add from "../../math/add.esm.js"
 
 const lab = script()
 

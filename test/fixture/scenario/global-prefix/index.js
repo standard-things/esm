@@ -1,7 +1,7 @@
 "use strict"
 
-require("global-prefix")
-
 const { log } = console
+
+require("global-prefix")
 
 log("global-prefix:true")

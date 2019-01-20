@@ -1,6 +1,6 @@
 import assert from "assert"
-import add from "./add.mjs"
 import { log } from "console"
+import add from "../../math/add.mjs"
 
 assert.strictEqual(add(1, 2), 3)
 

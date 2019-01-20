@@ -2,7 +2,7 @@
 import assert from "assert"
 import { log } from "console"
 import { script } from "lab"
-import { add } from "./"
+import add from "./add.flow.js"
 
 const lab = script()
 

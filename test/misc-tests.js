@@ -1272,12 +1272,12 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not error importing a non-ambiguous ESM export", () =>
-      import("./misc/import/non-ambiguous-esm.js")
+      import("./misc/import/non-ambiguous.esm.js")
         .then((ns) => ns.default())
     )
 
     it("should not error importing a non-ambiguous CJS export", () =>
-      import("./misc/import/non-ambiguous-cjs.js")
+      import("./misc/import/non-ambiguous.cjs.js")
         .then((ns) => ns.default())
     )
 

@@ -1,7 +1,7 @@
 "use strict"
 
-test("test", () => {
-  const { log } = console
+const { log } = console
 
-  expect(() => log()).not.toThrow()
+test("test", () => {
+  expect(() => log("")).not.toThrow()
 })
