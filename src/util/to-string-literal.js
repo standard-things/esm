@@ -2,19 +2,18 @@ import CHAR_CODE from "../constant/char-code.js"
 
 import toString from "./to-string.js"
 import shared from "../shared.js"
+import stripQuotes from "./strip-quotes.js"
 
 function init() {
   const {
     QUOTE
   } = CHAR_CODE
 
-  const escapedDoubleQuoteRegExp = /\\"/g
   const separatorsRegExp = /[\u2028\u2029]/g
 
   const escapeRegExpMap = new Map([
     ['"', /\\?"/g],
-    ["'", /\\?'/g],
-    ["`", /\\?`/g]
+    ["'", /\\?'/g]
   ])
 
   const escapedSeparatorsMap = new Map([
@@ -36,9 +35,8 @@ function init() {
       return string
     }
 
-    const unquoted = string.slice(1, -1)
-    const unescaped = unquoted.replace(escapedDoubleQuoteRegExp, '"')
-    const escaped = unescaped.replace(escapeRegExpMap.get(quote), "\\" + quote)
+    const unquoted = stripQuotes(string)
+    const escaped = unquoted.replace(escapeRegExpMap.get(quote), "\\" + quote)
 
     return quote + escaped + quote
   }
