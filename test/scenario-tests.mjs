@@ -99,7 +99,7 @@ describe("scenario tests", function () {
 
     return node([
       "-r", cwdPath,
-      jasminePath, "--config=" + configPath,
+      jasminePath, "--config=" + configPath
     ], envAuto)
   })
 
@@ -107,7 +107,7 @@ describe("scenario tests", function () {
     node([
       "-r", pkgPath,
       "-r", "lit-node/register",
-      path.resolve("fixture/scenario/lit-node/index.md")
+      path.resolve("fixture/scenario/lit-node")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("lit-node:true")))
   )
