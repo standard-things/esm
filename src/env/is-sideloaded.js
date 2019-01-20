@@ -4,6 +4,7 @@ import Loader from "../loader.js"
 import Package from "../package.js"
 
 import hasLoaderArg from "./has-loader-arg.js"
+import isJasmine from "./is-jasmine.js"
 import isNyc from "./is-nyc.js"
 import normalize from "../path/normalize.js"
 import realpath from "../fs/realpath.js"
@@ -11,7 +12,8 @@ import shared from "../shared.js"
 
 function init() {
   function isSideloaded() {
-    if (isNyc()) {
+    if (isJasmine() ||
+        isNyc()) {
       return true
     }
 
