@@ -223,10 +223,14 @@ Tips
 
 ### Loading
 
-* The [`jasmine`](https://jasmine.github.io/) test runner does not have a
-  mechanism to load `esm`. However, `esm` can load a bootstrap file that
-  programmaticly runs tests following their
-  [library usage example](https://jasmine.github.io/setup/nodejs.html#a-simple-example-using-the-library).
+* Load `esm` for [`jasmine`](https://jasmine.github.io/) using the
+  [“helpers” field](https://jasmine.github.io/setup/nodejs.html#configuration)
+  of `jasmine.json`.
+  ```json
+  "helpers": [
+    "node_modules/esm"
+  ]
+  ```
 
 * Load `esm` before loaders/monitors like
   [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html),
