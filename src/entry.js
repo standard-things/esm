@@ -672,11 +672,17 @@ class Entry {
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
     if (shouldUpdateParents) {
+      let parentUpdateType = type
+
+      if (parentUpdateType !== UPDATE_TYPE_DEFAULT) {
+        parentUpdateType = UPDATE_TYPE_LIVE
+      }
+
       for (const id in parentsMap) {
         const parentEntry = parentsMap[id]
 
         parentEntry.loaded()
-        parentEntry.updateBindings(null, type, seen)
+        parentEntry.updateBindings(null, parentUpdateType, seen)
       }
     }
 
