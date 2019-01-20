@@ -619,11 +619,11 @@ class Entry {
     }
   }
 
-  updateBindings(names, type = UPDATE_TYPE_DEFAULT, seen) {
+  updateBindings(names, updateType = UPDATE_TYPE_DEFAULT, seen) {
     const shouldUpdateParents =
       this.circular ||
-      type === UPDATE_TYPE_INIT ||
-      type === UPDATE_TYPE_LIVE
+      updateType === UPDATE_TYPE_LIVE ||
+      updateType === UPDATE_TYPE_INIT
 
     if (shouldUpdateParents &&
         seen !== void 0 &&
@@ -659,7 +659,7 @@ class Entry {
 
         parentsMap[parentEntry.name] = parentEntry
       }
-    }, type)
+    }, updateType)
 
     this._changed = false
 
@@ -667,7 +667,7 @@ class Entry {
       return this
     }
 
-    let parentUpdateType = type
+    let parentUpdateType = updateType
 
     if (parentUpdateType !== UPDATE_TYPE_DEFAULT) {
       parentUpdateType = UPDATE_TYPE_LIVE
