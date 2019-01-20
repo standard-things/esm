@@ -223,20 +223,20 @@ Tips
 
 ### Loading
 
-* Load `esm` for [`jasmine`](https://jasmine.github.io/) using the
-  [“helpers” field](https://jasmine.github.io/setup/nodejs.html#configuration)
-  of `jasmine.json`.
-  ```json
-  "helpers": [
-    "node_modules/esm"
-  ]
-  ```
-
 * Load `esm` before loaders/monitors like
   [`@babel/register`](https://babeljs.io/docs/en/next/babel-register.html),
   [`newrelic`](https://github.com/newrelic/node-newrelic),
   [`sqreen`](https://docs.sqreen.io/sqreen-for-nodejs/getting-started-2/), and
   [`ts-node`](https://github.com/TypeStrong/ts-node#programmatic).
+
+* Load `esm` for [`jasmine`](https://jasmine.github.io/) using the
+  [“helpers” field](https://jasmine.github.io/setup/nodejs.html#configuration)
+  in `jasmine.json`:
+  ```json
+  "helpers": [
+    "node_modules/esm"
+  ]
+  ```
 
 * Load `esm` with “node-args" options of:<br>
   - [`node-tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
