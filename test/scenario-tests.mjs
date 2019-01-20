@@ -13,6 +13,7 @@ const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
 const canTestPM2 = ! isTravis
 
 const avaPath = path.resolve("../node_modules/ava/cli.js")
+const jasminePath = path.resolve("../node_modules/jasmine/bin/jasmine.js")
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
 const labPath = path.resolve("../node_modules/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
@@ -90,6 +91,17 @@ describe("scenario tests", function () {
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
+
+  it("should work with jasmine", () => {
+    const dirPath = path.resolve("fixture/scenario/jasmine-helpers")
+    const configPath = path.resolve(dirPath, "jasmine.json")
+    const cwdPath = path.resolve(dirPath, "cwd.js")
+
+    return node([
+      "-r", cwdPath,
+      jasminePath, "--config=" + configPath,
+    ], envAuto)
+  })
 
   it("should work with lit-node", () =>
     node([
