@@ -293,9 +293,9 @@ function wasmCompiler(mod, filename) {
 
   for (const description of descriptions) {
     const request = description.module
-    const entry = esmParseLoad(request, null)
+    const childEntry = esmParseLoad(request, mod)
 
-    imported[request] = entry.module.exports
+    imported[request] = childEntry.module.exports
   }
 
   const readonlyExports = new wasmInstance(wasmMod, imported).exports
