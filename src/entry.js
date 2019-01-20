@@ -625,15 +625,10 @@ class Entry {
       type === UPDATE_TYPE_INIT ||
       type === UPDATE_TYPE_LIVE
 
-    if (shouldUpdateParents) {
-      if (seen !== void 0 &&
-          seen.has(this)) {
-        return this
-      } else if (seen === void 0) {
-        seen = new Set
-      }
-
-      seen.add(this)
+    if (shouldUpdateParents &&
+        seen !== void 0 &&
+        seen.has(this)) {
+      return this
     }
 
     if (typeof names === "string") {
@@ -668,22 +663,30 @@ class Entry {
 
     this._changed = false
 
+    if (parentsMap === void 0) {
+      return this
+    }
+
+    let parentUpdateType = type
+
+    if (parentUpdateType !== UPDATE_TYPE_DEFAULT) {
+      parentUpdateType = UPDATE_TYPE_LIVE
+    }
+
+    if (seen === void 0) {
+      seen = new Set
+    }
+
+    seen.add(this)
+
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    if (shouldUpdateParents) {
-      let parentUpdateType = type
+    for (const id in parentsMap) {
+      const parentEntry = parentsMap[id]
 
-      if (parentUpdateType !== UPDATE_TYPE_DEFAULT) {
-        parentUpdateType = UPDATE_TYPE_LIVE
-      }
-
-      for (const id in parentsMap) {
-        const parentEntry = parentsMap[id]
-
-        parentEntry.loaded()
-        parentEntry.updateBindings(null, parentUpdateType, seen)
-      }
+      parentEntry.loaded()
+      parentEntry.updateBindings(null, parentUpdateType, seen)
     }
 
     return this
