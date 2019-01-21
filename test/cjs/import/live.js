@@ -301,36 +301,4 @@ export default () => {
     Reflect.deleteProperty(def1, "d")
     def1.d = rawValue
   }
-
-  assert.throws(
-    () => abcNs.d = "d",
-    /TypeError: Cannot add/
-  )
-
-  assert.throws(
-    () => Object.defineProperty(abcNs, "d", {
-      configurable: true,
-      enumerable: true,
-      value: "d",
-      writable: true
-    }),
-    /TypeError: Cannot define/
-  )
-
-  assert.throws(
-    () => Object.defineProperty(abcNs, "a", {
-      configurable: true,
-      enumerable: true,
-      value: 1,
-      writable: true
-    }),
-    /TypeError: Cannot redefine/
-  )
-
-  assert.throws(
-    () => delete abcNs.a,
-    /TypeError: Cannot delete/
-  )
-
-  assert.strictEqual(delete abcNs.d, true)
 }

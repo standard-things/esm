@@ -46,5 +46,37 @@ export default () => {
       () => Object.freeze(ns),
       /TypeError: Cannot redefine/
     )
+
+    assert.throws(
+      () => ns.d = "d",
+      /TypeError: Cannot add/
+    )
+
+    assert.throws(
+      () => Object.defineProperty(ns, "d", {
+        configurable: true,
+        enumerable: true,
+        value: "d",
+        writable: true
+      }),
+      /TypeError: Cannot define/
+    )
+
+    assert.throws(
+      () => Object.defineProperty(ns, "a", {
+        configurable: true,
+        enumerable: true,
+        value: 1,
+        writable: true
+      }),
+      /TypeError: Cannot redefine/
+    )
+
+    assert.throws(
+      () => delete ns.a,
+      /TypeError: Cannot delete/
+    )
+
+    assert.strictEqual(delete ns.d, true)
   }
 }
