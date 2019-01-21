@@ -17,7 +17,9 @@ import isPreloaded from "../env/is-preloaded.js"
 import isPrint from "../env/is-print.js"
 import isREPL from "../env/is-repl.js"
 import isRunkit from "../env/is-runkit.js"
+import isTink from "../env/is-tink.js"
 import isWin32 from "../env/is-win32.js"
+import isYarnPnP from "../env/is-yarn-pnp.js"
 import setDeferred from "../util/set-deferred.js"
 
 const ENV = {}
@@ -41,6 +43,8 @@ setDeferred(ENV, "PRELOADED", isPreloaded)
 setDeferred(ENV, "PRINT", isPrint)
 setDeferred(ENV, "REPL", isREPL)
 setDeferred(ENV, "RUNKIT", isRunkit)
+setDeferred(ENV, "TINK", isTink)
 setDeferred(ENV, "WIN32", isWin32)
+setDeferred(ENV, "YARN_PNP", isYarnPnP)
 
 export default ENV
