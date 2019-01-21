@@ -60,3 +60,33 @@ test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-ex
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-strict.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/import-meta-is-an-ordinary-object.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/not-accessible-from-direct-eval.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/escape-sequence-meta.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-array-destructuring-expr.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-assignment-expr.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-for-await-of-loop.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-for-in-loop.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-for-of-loop.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-object-destructuring-expr.js
+
+# IMPORT.META 🚧 (currently unsupported)
+test/language/expressions/import.meta/syntax/invalid-assignment-target-update-expr.js
