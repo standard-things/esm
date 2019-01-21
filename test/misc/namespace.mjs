@@ -41,5 +41,10 @@ export default () => {
     } else {
       assert.ok(true)
     }
+
+    assert.throws(
+      () => Object.freeze(ns),
+      /TypeError: Cannot redefine/
+    )
   }
 }
