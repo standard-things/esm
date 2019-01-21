@@ -1018,16 +1018,20 @@ function getExportByName(entry, name, parentEntry) {
       : entry.cjsMutableNamespace.default
   }
 
-  const getter = entry.getters[name]
+  const { getters } = entry
 
-  if (typeof getter === "function") {
-    return getter()
-  }
+  return Reflect.has(getters, name)
+    ? tryGetter(getters[name])
+    : ERROR_GETTER
 }
 
 function getExportByNameFast(entry, name, parentEntry) {
   if (name !== "*") {
-    return tryGetter(entry.getters[name])
+    const { getters } = entry
+
+    return Reflect.has(getters, name)
+      ? tryGetter(getters[name])
+      : ERROR_GETTER
   }
 
   const parentMutableNamespace =
@@ -1116,8 +1120,7 @@ function mergeProperty(entry, otherEntry, key) {
 
 function runGetter(entry, name) {
   const { _namespace } = entry
-  const getter = entry.getters[name]
-  const value = tryGetter(getter)
+  const value = tryGetter(entry.getters[name])
 
   if (value === ERROR_STAR) {
     Reflect.deleteProperty(_namespace, name)
