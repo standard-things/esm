@@ -393,9 +393,10 @@ class Entry {
 
     if (otherGetter === void 0) {
       otherGetter = () => otherEntry.getters[importedName]()
-      otherGetter.owner = otherEntry
-      otherGetter.id = importedName
       otherGetter.deferred = true
+      otherGetter.id = importedName
+      otherGetter.owner = otherEntry
+
     }
 
     return this.addGetter(exportedName, otherGetter)
@@ -1115,7 +1116,6 @@ function mergeProperty(entry, otherEntry, key) {
 function runGetter(entry, name) {
   const { _namespace } = entry
   const getter = entry.getters[name]
-
   const value = tryGetter(getter)
 
   if (value === ERROR_STAR) {
