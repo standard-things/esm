@@ -27,16 +27,30 @@ const {
 } = CHAR_CODE
 
 const {
-  FLAGS
+  FLAGS,
+  TINK,
+  YARN_PNP
 } = ENV
 
-const { isFile } = Stats.prototype
-const { preserveSymlinks, preserveSymlinksMain } = FLAGS
+const {
+  preserveSymlinks,
+  preserveSymlinksMain
+} = FLAGS
 
+const { isFile } = Stats.prototype
 const mainFields = ["main"]
 
-let resolveSymlinks = ! preserveSymlinks
-let resolveSymlinksMain = ! preserveSymlinksMain
+const preserveAllSymlinks =
+  TINK ||
+  YARN_PNP
+
+const resolveSymlinks =
+  ! preserveAllSymlinks &&
+  ! preserveSymlinks
+
+const resolveSymlinksMain =
+  ! preserveAllSymlinks &&
+  ! preserveSymlinksMain
 
 function findPath(request, paths, isMain = false, fields, exts) {
   let cacheKey = request + "\0"
