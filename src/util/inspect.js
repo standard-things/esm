@@ -70,11 +70,7 @@ function init() {
     args[0] = prepareValue(value)
     args[1] = options
 
-    let result = ""
-
-    try {
-      result = Reflect.apply(safeInspect, this, args)
-    } catch {}
+    const result = Reflect.apply(tryInspect, this, args)
 
     if (! isWrappable(value) ||
         (result.indexOf(PROXY_PREFIX) === -1 &&
@@ -101,17 +97,7 @@ function init() {
     const object = toRawModuleNamespaceObject()
 
     for (const name of names) {
-      let value = uninitializedValue
-
-      try {
-        const nsValue = namespace[name]
-
-        if (nsValue !== ERROR_GETTER) {
-          value = nsValue
-        }
-      } catch {}
-
-      object[name] = value
+      object[name] = tryGet(namespace, name)
     }
 
     const result = inspect(object, context)
@@ -178,6 +164,26 @@ function init() {
         return inspect(value, contextAsOptions)
       }
     }
+  }
+
+  function tryGet(object, name) {
+    try {
+      const value = Reflect.get(object, name)
+
+      if (value !== ERROR_GETTER) {
+        return value
+      }
+    } catch {}
+
+    return uninitializedValue
+  }
+
+  function tryInspect(...args) {
+    try {
+      return Reflect.apply(safeInspect, this, args)
+    } catch {}
+
+    return ""
   }
 
   function wrap(object, options, customInspect, showProxy) {
