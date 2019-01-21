@@ -6,8 +6,8 @@ import Package from "../package.js"
 import hasLoaderArg from "./has-loader-arg.js"
 import isJasmine from "./is-jasmine.js"
 import isNyc from "./is-nyc.js"
-import normalize from "../path/normalize.js"
 import realpath from "../fs/realpath.js"
+import { sep } from "../safe/path.js"
 import shared from "../shared.js"
 
 function init() {
@@ -24,7 +24,7 @@ function init() {
     }
 
     const filename = realpath(argv[1])
-    const nodeModulesIndex = normalize(filename).lastIndexOf("/node_modules/")
+    const nodeModulesIndex = filename.lastIndexOf(sep + "node_modules" + sep)
 
     if (nodeModulesIndex === -1 ||
         ! hasLoaderArg(args)) {
