@@ -172,7 +172,7 @@ function init() {
           return false
         }
 
-        const hasSetter = getSetter(descriptor) !== void 0
+        const hasSetter = getSetter(exported, name) !== void 0
 
         if (Reflect.set(exported, name, value, receiver)) {
           if (hasSetter) {
