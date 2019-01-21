@@ -101,13 +101,17 @@ function init() {
     const object = toRawModuleNamespaceObject()
 
     for (const name of names) {
-      try {
-        const value = namespace[name]
+      let value = uninitializedValue
 
-        object[name] = value === ERROR_GETTER ? uninitializedValue : value
-      } catch {
-        object[name] = uninitializedValue
-      }
+      try {
+        const nsValue = namespace[name]
+
+        if (nsValue !== ERROR_GETTER) {
+          value = nsValue
+        }
+      } catch {}
+
+      object[name] = value
     }
 
     const result = inspect(object, context)
