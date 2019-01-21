@@ -17,6 +17,7 @@ const testDirs = [
   "harness",
   "test/language/export",
   "test/language/expressions/dynamic-import",
+  "test/language/expressions/import.meta",
   "test/language/import",
   "test/language/module-code"
 ]
