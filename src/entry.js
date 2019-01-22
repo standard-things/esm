@@ -175,14 +175,11 @@ class Entry {
 
     // The source compilation data of the module.
     setDeferred(this, "compileData", () => {
-      const { cacheName } = this
-      const { cache, cachePath } = this.package
       const compileData = CachingCompiler.from(this)
 
-      if (compileData === null) {
-        Reflect.deleteProperty(cache.compile, cacheName)
-      } else if (compileData.changed) {
-        const content = readFile(cachePath + sep + cacheName, "utf8")
+      if (compileData !== null &&
+          compileData.changed) {
+        const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
         const code = content === null ? "" : content
 
         compileData.code = code
