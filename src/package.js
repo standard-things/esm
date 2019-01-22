@@ -82,7 +82,7 @@ const defaultOptions = {
   wasm: false
 }
 
-const autoOptions = {
+const zeroConfigOptions = {
   cjs: {
     cache: true,
     extensions: true,
@@ -338,11 +338,11 @@ function createOptions(value) {
   }
 
   if (names.indexOf("cjs") === -1) {
-    options.cjs = autoOptions.cjs
+    options.cjs = zeroConfigOptions.cjs
   }
 
   if (names.indexOf("mode") === -1) {
-    options.mode = autoOptions.mode
+    options.mode = zeroConfigOptions.mode
   }
 
   const cjsOptions = createCJS(options.cjs)
