@@ -266,7 +266,6 @@ class Entry {
 
     if (entry === void 0) {
       entry = new Entry(mod)
-      Entry.set(mod, entry)
     } else if (entry._loaded === LOAD_COMPLETED &&
         entry.type === TYPE_CJS) {
       const { bridged } = shared
@@ -276,20 +275,23 @@ class Entry {
       if (found !== void 0) {
         entry = found
         bridged.delete(exported)
-        Entry.set(mod, entry)
       }
+    }
+
+    if (entry !== void 0) {
+      Entry.set(mod, entry)
     }
 
     return entry
   }
 
-  static has(value) {
-    return shared.entry.cache.has(value)
+  static has(mod) {
+    return shared.entry.cache.has(mod)
   }
 
-  static set(value, entry) {
-    if (isObject(value)) {
-      shared.entry.cache.set(value, entry)
+  static set(mod, entry) {
+    if (isObject(mod)) {
+      shared.entry.cache.set(mod, entry)
     }
   }
 
