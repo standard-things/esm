@@ -203,10 +203,15 @@ function init() {
     const node = parser.startNode()
 
     node.meta = parser.parseIdent(true)
+
     parser.expect(tt.dot)
+
+    const { containsEsc } = parser
+
     node.property = parser.parseIdent(true)
 
-    if (node.property.name !== "meta") {
+    if (containsEsc ||
+        node.property.name !== "meta") {
       parser.raise(node.property.start, UNEXPECTED_IDENTIFIER)
     } else if (! parser.inModule) {
       parser.raise(node.meta.start, ILLEGAL_IMPORT_META_OUTSIDE_MODULE)
