@@ -139,7 +139,7 @@ class Entry {
     // The paused state of the entry generator.
     this.running = false
     // The `module.parent` entry.
-    this.parent = null
+    this.parent = Entry.get(mod.parent)
     // The runtime object reference.
     this.runtime = null
     // Setters for assigning to local variables in parent modules.

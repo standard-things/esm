@@ -50,15 +50,13 @@ function load(filename, parent = null, isMain = false, cache, loader) {
       ? getFilePathfromURL(filename)
       : filename
 
+    entry = Entry.get(mod)
+
     if (isMain) {
       mod.id = "."
       realProcess.mainModule = mod
       Loader.state.module.mainModule = mod
     }
-
-    entry = Entry.get(mod)
-    entry.id = filename
-    entry.parent = Entry.get(parent)
   }
 
   entry.state = parsing
