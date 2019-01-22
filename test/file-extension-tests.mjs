@@ -80,7 +80,7 @@ describe("file extension tests", () => {
         import(request)
           .then(assert.fail)
           .catch((e) => {
-            assert.ok(e.message.startsWith("Cannot load ES module"))
+            assert.ok(e.message.startsWith("Cannot load module"))
           })
       ))
   )

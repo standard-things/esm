@@ -431,7 +431,8 @@ describe("miscellaneous tests", () => {
                   getURLFromFilePath(id5) + ":1",
                   'import { NOT_EXPORTED } from "../export/abc.mjs"',
                   "",
-                  "SyntaxError: Missing export name 'NOT_EXPORTED' in ES module: " + abcURL
+                  "The requested module '" + abcURL +
+                  "' does not provide an export named 'NOT_EXPORTED'"
                 ].join("\n"))
               }
             }),
@@ -1075,8 +1076,8 @@ describe("miscellaneous tests", () => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
                 e.message,
-                "Detected cycle while resolving name 'x2' in ES module: " +
-                getURLFromFilePath(path.resolve("fixture/cycle/detected/direct/b.mjs"))
+                "Detected cycle while resolving name 'x2' in '" +
+                getURLFromFilePath(path.resolve("fixture/cycle/detected/direct/b.mjs")) + "'"
               )
             }),
           import("./fixture/cycle/detected/indirect/a.mjs")
@@ -1085,8 +1086,9 @@ describe("miscellaneous tests", () => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
                 e.message,
-                "Missing export name 'x2' in ES module: " +
-                getURLFromFilePath(path.resolve("fixture/cycle/detected/indirect/b.mjs"))
+                "The requested module '" +
+                getURLFromFilePath(path.resolve("fixture/cycle/detected/indirect/b.mjs")) +
+                "' does not provide an export named 'x2'"
               )
             }),
           import("./fixture/cycle/detected/self/a.mjs")
@@ -1095,8 +1097,8 @@ describe("miscellaneous tests", () => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
                 e.message,
-                "Detected cycle while resolving name 'x' in ES module: " +
-                getURLFromFilePath(path.resolve("fixture/cycle/detected/self/a.mjs"))
+                "Detected cycle while resolving name 'x' in '" +
+                getURLFromFilePath(path.resolve("fixture/cycle/detected/self/a.mjs")) + "'"
               )
             })
         ])
@@ -1204,7 +1206,7 @@ describe("miscellaneous tests", () => {
         .then(assert.fail)
         .catch((e) => {
           assert.ok(e instanceof SyntaxError)
-          assert.ok(e.message.startsWith("Missing export"))
+          assert.ok(e.message.includes("does not provide an export"))
         })
     )
 
@@ -1341,7 +1343,7 @@ describe("miscellaneous tests", () => {
             .then(assert.fail)
             .catch((e) => {
               assert.ok(e instanceof SyntaxError)
-              assert.ok(e.message.startsWith("Conflicting indirect export"))
+              assert.ok(e.message.includes("contains conflicting star exports"))
             })
         ))
     )
@@ -1404,7 +1406,7 @@ describe("miscellaneous tests", () => {
             .then(assert.fail)
             .catch(({ message }) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
-              assert.ok(message.startsWith("Missing export name 'NOT_EXPORTED'"))
+              assert.ok(message.includes("does not provide an export named 'NOT_EXPORTED'"))
             })
         ))
     )
@@ -1420,7 +1422,7 @@ describe("miscellaneous tests", () => {
             .then(assert.fail)
             .catch(({ message }) => {
               assert.strictEqual(global.loadCount, 1)
-              assert.ok(message.startsWith("Missing export name 'NOT_EXPORTED'"))
+              assert.ok(message.includes("does not provide an export named 'NOT_EXPORTED'"))
             })
         ))
     )

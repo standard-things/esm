@@ -165,17 +165,17 @@ function init() {
 
   function exportCycle(request, name) {
     return "Detected cycle while resolving name '" + name +
-      "' in ES module: " + getModuleURL(request)
+      "' in '" + getModuleURL(request) + "'"
   }
 
   function exportMissing(request, name) {
-    return "Missing export name '" + name +
-      "' in ES module: " + getModuleURL(request)
+    return "The requested module '" + getModuleURL(request) +
+      "' does not provide an export named '" + name + "'"
   }
 
   function exportStarConflict(request, name) {
-    return "Conflicting indirect export name '" + name +
-      "' in ES module: " + getModuleURL(request)
+    return "The requested module '" + getModuleURL(request) +
+      "' contains conflicting star exports for name '" + name + "'"
   }
 
   function invalidArgType(name, expected, actual) {
@@ -194,7 +194,7 @@ function init() {
   }
 
   function invalidExtension(request) {
-    return "Cannot load ES module from .mjs: " + getModuleURL(request)
+    return "Cannot load module from .mjs: " + getModuleURL(request)
   }
 
   function invalidPkgOption(name, value, unquoted) {
@@ -243,7 +243,7 @@ function init() {
   }
 
   function requireESM(request) {
-    return "Must use import to load ES module: " + getModuleURL(request)
+    return "Must use import to load module: " + getModuleURL(request)
   }
 
   function unknownFileExtension(filename) {
