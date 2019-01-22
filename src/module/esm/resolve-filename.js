@@ -31,7 +31,8 @@ const {
 } = CHAR_CODE
 
 const {
-  ELECTRON
+  ELECTRON,
+  YARN_PNP
 } = ENV
 
 const {
@@ -64,6 +65,10 @@ function resolveFilename(request, parent, isMain = false, options) {
 
   if (builtinLookup.has(request)) {
     return request
+  }
+
+  if (YARN_PNP) {
+    return Module._resolveFilename(request, parent, isMain, options)
   }
 
   const isAbs = isAbsolute(request)
