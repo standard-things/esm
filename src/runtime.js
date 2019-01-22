@@ -2,7 +2,6 @@ import ENTRY from "./constant/entry.js"
 
 import CachingCompiler from "./caching-compiler.js"
 import Loader from "./loader.js"
-import Entry from "./entry.js"
 
 import builtinGlobal from "./builtin/global.js"
 import cjsValidate from "./module/cjs/validate.js"
@@ -249,8 +248,6 @@ const Runtime = {
 
     const boundCompileEval = (code) => Runtime.compileEval.call(runtime, code)
     const boundGlobalEval = (code) => Runtime.globalEval.call(runtime, code)
-
-    Entry.set(mod, entry)
 
     entry.exports = exported
 
