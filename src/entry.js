@@ -151,15 +151,12 @@ class Entry {
 
     // The cache name of the module.
     setDeferred(this, "cacheName", () => {
-      const {
-        cachePath,
-        options:packageOptions
-      } = this.package
+      const pkg = this.package
 
       return getCacheName(this.mtime, {
-        cachePath,
+        cachePath: pkg.cachePath,
         filename: this.filename,
-        packageOptions
+        packageOptions: pkg.options
       })
     })
 
