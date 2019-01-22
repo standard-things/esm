@@ -765,7 +765,9 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
   "use sloppy"
 
   handler.defineProperty = (namespace, name, descriptor) => {
-    if (descriptor.writable !== false &&
+    if (! (descriptor.writable === false &&
+           ! Reflect.has(descriptor, "value") &&
+           Reflect.has(namespace, name)) &&
         Reflect.defineProperty(namespace, name, descriptor)) {
       return name === Symbol.toStringTag ||
         Reflect.has(entry.importedBindings, name) ||
