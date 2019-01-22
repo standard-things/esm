@@ -2,7 +2,6 @@ import "./binding.js"
 import "./module/internal/make-require-function.js"
 import "./safe/buffer.js"
 import "./safe/crypto.js"
-import "./safe/path.js"
 import "./safe/process.js"
 import "./safe/util.js"
 import "./safe/vm.js"
@@ -31,6 +30,7 @@ import processHook from "./hook/process.js"
 import realProcess from "./real/process.js"
 import realVM from "./real/vm.js"
 import requireHook from "./hook/require.js"
+import { sep } from "./safe/path.js"
 import shared from "./shared.js"
 import vmHook from "./hook/vm.js"
 
@@ -41,12 +41,15 @@ const {
   FLAGS,
   INTERNAL,
   PRELOADED,
-  REPL
+  REPL,
+  YARN_PNP
 } = ENV
 
 const {
   ERR_INVALID_ARG_TYPE
 } = errors
+
+const YARN_PNP_FILENAME = ".pnp.js"
 
 let exported
 
@@ -84,6 +87,24 @@ if (shared.inited &&
 
     if (! isInstalled(mod)) {
       processHook(realProcess)
+    }
+
+    if (YARN_PNP) {
+      const { _cache } = Module
+
+      for (const name in _cache) {
+        if (name.endsWith(sep + YARN_PNP_FILENAME)) {
+          Reflect.deleteProperty(_cache, name)
+          break
+        }
+      }
+
+      for (const request of FLAGS.preloadModules) {
+        if (request.endsWith(sep + YARN_PNP_FILENAME)) {
+          Module._preloadModules([request])
+          break
+        }
+      }
     }
 
     return requireHook(mod)
