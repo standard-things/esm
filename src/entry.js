@@ -8,9 +8,7 @@ import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
 import SafeObject from "./safe/object.js"
 
-import assign from "./util/assign.js"
 import constructStackless from "./error/construct-stackless.js"
-import copyProperty from "./util/copy-property.js"
 import encodeId from "./util/encode-id.js"
 import errors from "./errors.js"
 import getCacheName from "./util/get-cache-name.js"
@@ -539,30 +537,17 @@ class Entry {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     } else {
-      this.merge(Entry.get(mod))
+      const exported = mod.exports
 
-      const newMod = this.module
-
-      if (newMod !== mod) {
-        Entry.delete(mod, this)
-        Entry.set(newMod, this)
-      }
-
-      if (! newMod.loaded) {
-        return this._loaded = LOAD_INCOMPLETE
-      }
-
-      const newExported = newMod.exports
-
-      if (newExported != null &&
-          newExported.__esModule &&
+      if (exported != null &&
+          exported.__esModule &&
           this.type === TYPE_CJS &&
           this.package.options.cjs.interop) {
         this.namespace = this._namespace
         this.type = TYPE_PSEUDO
       }
 
-      this.exports = newExported
+      this.exports = exported
       this._loaded = LOAD_COMPLETED
 
       if (this.type === TYPE_CJS) {
@@ -573,22 +558,12 @@ class Entry {
         this.exports = proxyExports(this)
       }
 
-      this.assignExportsToNamespace(keys(newExported))
+      this.assignExportsToNamespace(keys(exported))
     }
 
     this.finalizeNamespace()
 
     return this._loaded
-  }
-
-  merge(otherEntry) {
-    if (otherEntry !== this) {
-      for (const name in otherEntry) {
-        mergeProperty(this, otherEntry, name)
-      }
-    }
-
-    return this
   }
 
   resumeChildren() {
@@ -1074,48 +1049,6 @@ function isCalledFromStrictCode() {
   }
 
   return false
-}
-
-function mergeProperty(entry, otherEntry, key) {
-  if (key === "cjsMutableNamespace" ||
-      key === "cjsNamespace" ||
-      key === "esmMutableNamespace" ||
-      key === "esmNamespace") {
-    return copyProperty(entry, otherEntry, key)
-  }
-
-  const value = otherEntry[key]
-
-  if (key ===  "_loaded") {
-    if (value > entry._loaded) {
-      entry._loaded = value
-    }
-  } else if (key === "children") {
-    assign(entry.children, value)
-  } else if (key === "exports") {
-    entry[key] = value
-  } else if (key === "getters") {
-    for (const name in value) {
-      entry.addGetter(name, value[name])
-    }
-  } else if (key === "setters") {
-    const settersMap = entry[key]
-
-    for (const name in value) {
-      const setters = settersMap[name]
-      const newSetters = settersMap[name] = value[name]
-
-      for (const setter of setters) {
-        if (newSetters.indexOf(setter) === -1) {
-          newSetters.push(setter)
-        }
-      }
-    }
-  } else if (value != null) {
-    entry[key] = value
-  }
-
-  return entry
 }
 
 function runGetter(entry, name) {
