@@ -255,10 +255,6 @@ class Entry {
     this.updateFilename(true)
   }
 
-  static delete(value) {
-    shared.entry.cache.delete(value)
-  }
-
   static get(mod) {
     if (! isObject(mod)) {
       return null
