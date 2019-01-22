@@ -59,7 +59,7 @@ function resolveFilename(request, parent, isMain = false, options) {
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js
   if (ELECTRON &&
       bundledLookup.has(request)) {
-    return SafeModule._resolveFilename(request)
+    return SafeModule._resolveFilename(request, parent, isMain, options)
   }
 
   if (builtinLookup.has(request)) {
