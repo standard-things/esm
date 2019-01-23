@@ -35,8 +35,6 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  STATE_INSTANTIATION_COMPLETED,
-  STATE_INSTANTIATION_STARTED,
   TYPE_ESM
 } = ENTRY
 
@@ -141,15 +139,14 @@ function compile(caller, entry, content, filename, fallback) {
 
     if (typeof fallback === "function") {
       const defaultPkg = Loader.state.package.default
-      const { mainModule } = Loader.state.module
       const parentEntry = entry.parent
       const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
       const parentPkg = parentEntry === null ? null : parentEntry.package
 
       if (! parentIsESM &&
-          entry.module !== mainModule &&
           (pkg === defaultPkg ||
-           parentPkg === defaultPkg)) {
+           parentPkg === defaultPkg) &&
+          entry.module !== Loader.state.module.mainModule) {
         const frames = getStackFrames(new Error)
 
         for (const frame of frames) {
@@ -293,6 +290,7 @@ function tryCompileCached(entry, filename) {
         error.inModule = true
         error.column = firstAwaitOutsideFunction.column
         error.line = firstAwaitOutsideFunction.line
+
         throw error
       }
 
