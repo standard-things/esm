@@ -11,6 +11,7 @@ function init() {
 
   function parseFunctionParams(func, args) {
     const [node] = args
+
     node.functionParamsStart = this.start
     return Reflect.apply(func, this, args)
   }
