@@ -285,7 +285,9 @@ function tryCompileCached(entry, filename) {
           isESM &&
           firstAwaitOutsideFunction !== null &&
           ! isObjectEmpty(entry._namespace)) {
-        const error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
+        const error = new errors.SyntaxError({
+          input: ""
+        }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
 
         error.inModule = true
         error.column = firstAwaitOutsideFunction.column
