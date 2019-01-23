@@ -37,8 +37,7 @@ const {
 
 const {
   STATE_EXECUTION_COMPLETED,
-  STATE_EXECUTION_STARTED,
-  STATE_PARSING_STARTED
+  STATE_EXECUTION_STARTED
 } = ENTRY
 
 const {
@@ -93,8 +92,6 @@ function hook(vm) {
         ! Reflect.has(scriptOptions, "cachedData")) {
       scriptOptions.cachedData = compileData.scriptData
     }
-
-    entry.state = STATE_PARSING_STARTED
 
     const code =
       "(()=>{" +
