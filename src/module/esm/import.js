@@ -7,7 +7,6 @@ import cjsValidate from "../cjs/validate.js"
 import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
-import esmParse from "./parse.js"
 import esmValidate from "./validate.js"
 import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
@@ -20,6 +19,8 @@ const {
 
 const {
   TYPE_ESM,
+  STATE_EXECUTION_STARTED,
+  STATE_PARSING_COMPLETED,
   UPDATE_TYPE_INIT
 } = ENTRY
 
@@ -28,40 +29,12 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
   const { parsing } = moduleState
 
   let entry = null
-
-  if (parsing ||
-      isDynamic) {
-    if (isDynamic) {
-      moduleState.parsing = true
-    }
-
-    try {
-      entry = tryPhase(esmParse, request, parentEntry, (entry) => {
-        parentEntry.children[entry.name] = entry
-        entry.addSetters(setterArgsList, parentEntry)
-      })
-    } finally {
-      if (entry !== null) {
-        entry.updateBindings()
-      }
-
-      if (isDynamic) {
-        moduleState.parsing = false
-
-        if (entry !== null &&
-            entry.type === TYPE_ESM) {
-          esmValidate(entry)
-        }
-      }
-    }
-  } else {
-    entry = tryPhase(esmLoad, request, parentEntry, (entry) => {
-      parentEntry.children[entry.name] = entry
-      entry.addSetters(setterArgsList, parentEntry)
-    })
-  }
-
   let finalizeCalled = false
+
+  const addChild = (entry, childEntry, name = childEntry.name) => {
+    entry.children[name] = childEntry
+    childEntry.addSetters(setterArgsList, entry)
+  }
 
   const finalize = () => {
     if (finalizeCalled) {
@@ -74,14 +47,12 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
     if (entry === null) {
       entry = getEntryFrom(request, exported, parentEntry)
-      parentEntry.children[entry.name] = entry
-      entry.addSetters(setterArgsList, parentEntry)
+      addChild(parentEntry, entry)
     } else if (! Object.is(entry.module.exports, exported)) {
       const { name } = entry
 
       entry = getEntryFrom(request, exported, parentEntry)
-      parentEntry.children[name] = entry
-      entry.addSetters(setterArgsList, parentEntry)
+      addChild(parentEntry, entry, name)
     }
 
     entry.loaded()
@@ -94,16 +65,35 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     }
   }
 
-  if (entry !== null) {
-    if (parentEntry.extname === ".mjs" &&
-        entry.type === TYPE_ESM &&
-        entry.extname !== ".mjs") {
-      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
+  const preload = (entry) => addChild(parentEntry, entry)
+
+  if (parsing ||
+      isDynamic) {
+    if (isDynamic) {
+      moduleState.parsing = true
     }
 
-    if (parsing) {
-      entry._finalize = finalize
+    try {
+      entry = tryLoad(request, parentEntry, preload)
+    } finally {
+      if (isDynamic) {
+        moduleState.parsing = false
+      }
     }
+
+    if (entry !== null) {
+      entry.updateBindings()
+
+      if (entry.type === TYPE_ESM) {
+        esmValidate(entry)
+      }
+
+      if (entry.state < STATE_EXECUTION_STARTED) {
+        entry.state = STATE_PARSING_COMPLETED
+      }
+    }
+  } else {
+    entry = tryLoad(request, parentEntry, preload)
   }
 
   if (parsing) {
@@ -111,10 +101,21 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
       const exported = tryRequire(request, parentEntry)
 
       entry = getEntryFrom(request, exported, parentEntry)
-      parentEntry.children[entry.name] = entry
-      entry.addSetters(setterArgsList, parentEntry)
+      addChild(parentEntry, entry)
     }
-  } else {
+
+    entry._finalize = finalize
+  }
+
+  if (entry !== null) {
+    if (parentEntry.extname === ".mjs" &&
+        entry.type === TYPE_ESM &&
+        entry.extname !== ".mjs") {
+      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
+    }
+  }
+
+  if (! parsing) {
     finalize()
   }
 }
@@ -156,7 +157,7 @@ function tryDualResolveFilename(request, parent, isMain) {
   return request
 }
 
-function tryPhase(phase, request, parentEntry, preload) {
+function tryLoad(request, parentEntry, preload) {
   const { moduleState } = shared
 
   moduleState.requireDepth += 1
@@ -164,7 +165,7 @@ function tryPhase(phase, request, parentEntry, preload) {
   let error
 
   try {
-    return phase(request, parentEntry.module, false, preload)
+    return esmLoad(request, parentEntry.module, false, preload)
   } catch (e) {
     error = e
   }

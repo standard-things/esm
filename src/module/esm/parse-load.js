@@ -3,7 +3,6 @@ import ENTRY from "../../constant/entry.js"
 import cjsValidate from "../cjs/validate.js"
 import esmValidate from "./validate.js"
 import load from "./load.js"
-import parse from "./parse.js"
 import shared from "../../shared.js"
 
 const {
@@ -20,10 +19,12 @@ function parseLoad(request, parent, isMain) {
   let entry
 
   try {
-    entry = parse(request, parent, isMain)
+    entry = load(request, parent, isMain)
   } finally {
     moduleState.parsing = false
   }
+
+  entry.updateBindings()
 
   if (entry.type === TYPE_ESM) {
     esmValidate(entry)
@@ -31,12 +32,12 @@ function parseLoad(request, parent, isMain) {
 
   if (entry.state < STATE_EXECUTION_STARTED) {
     entry.state = STATE_PARSING_COMPLETED
+  }
 
-    load(request, parent, isMain)
+  load(request, parent, isMain)
 
-    if (entry.type === TYPE_ESM) {
-      cjsValidate(entry)
-    }
+  if (entry.type === TYPE_ESM) {
+    cjsValidate(entry)
   }
 
   return entry
