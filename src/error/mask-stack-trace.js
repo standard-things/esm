@@ -50,12 +50,12 @@ function init() {
         inModule = error.inModule
       }
 
-      toExternalError(error)
-
       Reflect.deleteProperty(error, "column")
       Reflect.deleteProperty(error, "inModule")
       Reflect.deleteProperty(error, "line")
     }
+
+    toExternalError(error)
 
     const stack = get(error, "stack")
 
@@ -99,7 +99,9 @@ function init() {
       }
     })
 
-    return decorateStackTrace(error)
+    decorateStackTrace(error)
+
+    return error
   }
 
   function maskEngineStack(stack, content, filename) {

@@ -150,7 +150,9 @@ describe("dynamic import tests", () => {
     ]
 
     for (const line of lines) {
-      assert.throws(() => Compiler.compile(line), SyntaxError)
+      assert.throws(
+        () => Compiler.compile(line),
+        /SyntaxError/)
     }
   })
 
@@ -162,7 +164,10 @@ describe("dynamic import tests", () => {
     ]
 
     for (const line of lines) {
-      assert.throws(() => Compiler.compile(line), SyntaxError)
+      assert.throws(
+        () => Compiler.compile(line),
+        /SyntaxError/
+      )
     }
   })
 })

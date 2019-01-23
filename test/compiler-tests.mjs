@@ -158,7 +158,7 @@ describe("compiler tests", () => {
           hint,
           sourceType: UNAMBIGUOUS
         }),
-        SyntaxError
+        /SyntaxError/
       )
     }
   })
