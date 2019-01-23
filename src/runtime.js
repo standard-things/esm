@@ -232,19 +232,19 @@ const Runtime = {
             request = request + ""
           }
 
+          let lastEntry
+          let lastValue
           let timerId
-          let theEntry
-          let theValue
 
           const setterArgsList = [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
-              theEntry = childEntry
-              theValue = value
+              lastEntry = childEntry
+              lastValue = value
 
               if (timerId === void 0) {
                 timerId = setImmediate(() => {
-                  cjsValidate(theEntry)
-                  resolvePromise(theValue)
+                  cjsValidate(lastEntry)
+                  resolvePromise(lastValue)
                 })
               }
 
