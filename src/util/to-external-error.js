@@ -1,5 +1,4 @@
 import getPrototypeOf from "./get-prototype-of.js"
-import isOwnError from "./is-own-error.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
@@ -25,7 +24,7 @@ function init() {
   ])
 
   function toExternalError(error) {
-    if (isOwnError(error)) {
+    if (error instanceof Error) {
       const { name } = getPrototypeOf(error)
       const proto = protoMap.get(name)
 
