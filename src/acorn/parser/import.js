@@ -22,6 +22,7 @@ import wrap from "../../util/wrap.js"
 function init() {
   const {
     ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
+    INVALID_ESCAPED_RESERVED_WORD,
     INVALID_LEFT_HAND_SIDE_ASSIGNMENT,
     UNEXPECTED_IDENTIFIER,
     UNEXPECTED_STRING,
@@ -45,13 +46,35 @@ function init() {
 
   function checkLVal(func, args) {
     const [expr] = args
+    const exprType = expr.type
+    const { start } = expr
 
-    if (expr.type === "CallExpression" &&
+    if (exprType === "CallExpression" &&
         expr.callee.type === "Import") {
       throw constructStackless(errors.ReferenceError, [
         this,
-        expr.start,
+        start,
         INVALID_LEFT_HAND_SIDE_ASSIGNMENT
+      ])
+    }
+
+    if (exprType === "MetaProperty" &&
+        expr.meta.name === "import" &&
+        expr.property.name === "meta") {
+      const { type } = this
+
+      let ErrorCtor = errors.SyntaxError
+
+      if ((type === tt.eq ||
+           type === tt.incDec) &&
+          this.input.slice(this.lastTokStart, this.lastTokEnd) === "meta") {
+        ErrorCtor = errors.ReferenceError
+      }
+
+      throw constructStackless(ErrorCtor, [
+        this,
+        start,
+        "import.meta is not a valid assignment target"
       ])
     }
 
@@ -128,9 +151,10 @@ function init() {
   }
 
   function parseNew(func, args) {
-    const { type } = lookahead(this)
+    const next = lookahead(this)
 
-    if (type === tt._import) {
+    if (next.type === tt._import &&
+        lookahead(next).type === tt.parenL) {
       this.unexpected()
     }
 
@@ -201,20 +225,23 @@ function init() {
 
   function parseImportMetaPropertyAtom(parser) {
     const node = parser.startNode()
+    const meta = parser.parseIdent(true)
 
-    node.meta = parser.parseIdent(true)
+    node.meta = meta
 
     parser.expect(tt.dot)
 
     const { containsEsc } = parser
+    const property = parser.parseIdent(true)
 
-    node.property = parser.parseIdent(true)
+    node.property = property
 
-    if (containsEsc ||
-        node.property.name !== "meta") {
-      parser.raise(node.property.start, UNEXPECTED_IDENTIFIER)
+    if (property.name !== "meta") {
+      parser.raise(property.start, UNEXPECTED_IDENTIFIER)
+    } else if (containsEsc) {
+      parser.raise(property.start, INVALID_ESCAPED_RESERVED_WORD)
     } else if (! parser.inModule) {
-      parser.raise(node.meta.start, ILLEGAL_IMPORT_META_OUTSIDE_MODULE)
+      parser.raise(meta.start, ILLEGAL_IMPORT_META_OUTSIDE_MODULE)
     }
 
     return parser.finishNode(node, "MetaProperty")
