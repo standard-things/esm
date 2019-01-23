@@ -3,8 +3,7 @@ import ESM from "../constant/esm.js"
 import Loader from "../loader.js"
 import Wrapper from "../wrapper.js"
 
-import isError from "../util/is-error.js"
-import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
 
@@ -25,8 +24,7 @@ function hook(process) {
     const [error] = args
 
     if (! Loader.state.package.default.options.debug &&
-        isError(error) &&
-        ! isStackTraceMasked(error)) {
+        isStackTraceMaskable(error)) {
       maskStackTrace(error)
     }
 

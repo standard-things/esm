@@ -9,13 +9,12 @@ import assign from "./assign.js"
 import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
-import isError from "./is-error.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isModuleNamespaceObjectLike from "./is-module-namespace-object-like.js"
 import isObjectLike from "./is-object-like.js"
 import isOwnProxy from "./is-own-proxy.js"
 import isProxy from "./is-proxy.js"
-import isStackTraceMasked from "./is-stack-trace-masked.js"
+import isStackTraceMaskable from "./is-stack-trace-maskable.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
@@ -134,8 +133,7 @@ function init() {
   }
 
   function prepareValue(value) {
-    if (isError(value) &&
-        ! isStackTraceMasked(value)) {
+    if (isStackTraceMaskable(value)) {
       maskStackTrace(value)
     }
 

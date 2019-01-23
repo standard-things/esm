@@ -10,9 +10,8 @@ import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
-import isError from "./util/is-error.js"
 import isFileOrigin from "./util/is-file-origin.js"
-import isStackTraceMasked from "./util/is-stack-trace-masked.js"
+import isStackTraceMaskable from "./util/is-stack-trace-maskable.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
 import setDeferred from "./util/set-deferred.js"
@@ -147,16 +146,16 @@ const Runtime = {
       }).code
     } catch (e) {
       if (! Loader.state.package.default.options.debug &&
-          isError(e) &&
-          ! isStackTraceMasked(e)) {
+          isStackTraceMaskable(e)) {
         maskStackTrace(e, {
           content,
           filename: "eval",
           inModule: entry.type === TYPE_ESM
         })
+      } else {
+        toExternalError(e)
       }
 
-      toExternalError(e)
       throw e
     }
   },
@@ -186,16 +185,16 @@ const Runtime = {
       code = compileData.code
     } catch (e) {
       if (! Loader.state.package.default.options.debug &&
-          isError(e) &&
-          ! isStackTraceMasked(e)) {
+          isStackTraceMaskable(e)) {
         maskStackTrace(e, {
           content,
           filename: "eval",
           inModule: entry.type === TYPE_ESM
         })
+      } else {
+        toExternalError(e)
       }
 
-      toExternalError(e)
       throw e
     }
 
@@ -256,12 +255,13 @@ const Runtime = {
           esmImport(request, this.entry, setterArgsList, true)
         } catch (e) {
           if (! Loader.state.package.default.options.debug &&
-              isError(e) &&
-              ! isStackTraceMasked(e)) {
+              isStackTraceMaskable(e)) {
             maskStackTrace(e, { inModule: true })
+          } else {
+            toExternalError(e)
           }
 
-          rejectPromise(toExternalError(e))
+          rejectPromise(e)
         }
       })
     })

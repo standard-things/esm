@@ -17,7 +17,7 @@ import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
 import isError from "../util/is-error.js"
-import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import readFile from "../fs/read-file.js"
@@ -232,8 +232,7 @@ function tryPassthru(func, args, pkg) {
   }
 
   if (Loader.state.package.default.options.debug ||
-      ! isError(error) ||
-      isStackTraceMasked(error)) {
+      ! isStackTraceMaskable(error)) {
     throw error
   }
 

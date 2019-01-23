@@ -20,11 +20,11 @@ import getStackFrames from "../../error/get-stack-frames.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
 import isOwnPath from "../../util/is-own-path.js"
-import isError from "../../util/is-error.js"
-import isStackTraceMasked from "../../util/is-stack-trace-masked.js"
+import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
+import toExternalError from "../../util/to-external-error.js"
 import toString from "../../util/to-string.js"
 
 const {
@@ -335,8 +335,7 @@ function tryCompileCached(entry, filename) {
   }
 
   if (Loader.state.package.default.options.debug ||
-      ! isError(error) ||
-      isStackTraceMasked(error)) {
+      ! isStackTraceMaskable(error)) {
     throw error
   }
 
@@ -371,13 +370,12 @@ function tryCompileCode(caller, content, options) {
   }
 
   if (Loader.state.package.default.options.debug ||
-      ! isError(error) ||
-      isStackTraceMasked(error)) {
-    throw error
+      ! isStackTraceMaskable(error)) {
+    toExternalError(error)
+  } else {
+    captureStackTrace(error, caller)
+    maskStackTrace(error, { content, filename: options.filename })
   }
-
-  captureStackTrace(error, caller)
-  maskStackTrace(error, { content, filename: options.filename })
 
   throw error
 }
@@ -393,7 +391,9 @@ function tryValidate(caller, entry, content, filename) {
   }
 
   if (Loader.state.package.default.options.debug ||
-      isStackTraceMasked(error)) {
+      ! isStackTraceMaskable(error)) {
+    toExternalError(error)
+
     throw error
   }
 

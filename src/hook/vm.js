@@ -18,8 +18,7 @@ import assign from "../util/assign.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
-import isError from "../util/is-error.js"
-import isStackTraceMasked from "../util/is-stack-trace-masked.js"
+import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import makeRequireFunction from "../module/internal/make-require-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import proxyWrap from "../util/proxy-wrap.js"
@@ -305,8 +304,7 @@ function tryWrapper(func, args, content) {
   }
 
   if (! Loader.state.package.default.options.debug &&
-      isError(error) &&
-      ! isStackTraceMasked(error)) {
+      isStackTraceMaskable(error)) {
     maskStackTrace(error, { content })
   }
 

@@ -3,10 +3,12 @@ import isNative from "./is-native.js"
 import shared from "../shared.js"
 
 function init() {
-  function isStackTraceMasked(error) {
-    const descriptor = isError(error)
-      ? Reflect.getOwnPropertyDescriptor(error, "stack")
-      : void 0
+  function isStackTraceMaskable(error) {
+    if (! isError(error)) {
+      return false
+    }
+
+    const descriptor = Reflect.getOwnPropertyDescriptor(error, "stack")
 
     if (descriptor !== void 0 &&
         descriptor.configurable === true &&
@@ -15,15 +17,15 @@ function init() {
         typeof descriptor.set === "function" &&
         ! isNative(descriptor.get) &&
         ! isNative(descriptor.set)) {
-      return true
+      return false
     }
 
-    return false
+    return true
   }
 
-  return isStackTraceMasked
+  return isStackTraceMaskable
 }
 
 export default shared.inited
-  ? shared.module.utilIsStackTraceMasked
-  : shared.module.utilIsStackTraceMasked = init()
+  ? shared.module.utilIsStackTraceMaskable
+  : shared.module.utilIsStackTraceMaskable = init()
