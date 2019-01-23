@@ -47,6 +47,8 @@ const {
   SETTER_TYPE_NAMESPACE,
   SETTER_TYPE_STATIC_IMPORT,
   STATE_INITIAL,
+  STATE_EXECUTION_COMPLETED,
+  STATE_EXECUTION_STARTED,
   TYPE_CJS,
   TYPE_ESM,
   TYPE_PSEUDO,
@@ -564,25 +566,28 @@ class Entry {
     for (const name in children) {
       const childEntry = children[name]
 
-      if (childEntry.running === false) {
-        const { runtime } = childEntry
+      if (childEntry.running === true) {
+        continue
+      }
 
-        if (runtime !== null &&
-            runtime._runResult !== void 0 &&
-            childEntry.module !== this.module &&
-            childEntry._loaded !== LOAD_COMPLETED) {
-          childEntry.running = true
-          runtime._runResult.next()
-          childEntry.running = false
-          childEntry.module.loaded = true
-        }
+      const { runtime } = childEntry
 
-        if (typeof childEntry._finalize === "function") {
-          childEntry._finalize()
-        } else {
-          childEntry.loaded()
-          childEntry.updateBindings(null, UPDATE_TYPE_INIT)
-        }
+      if (runtime !== null &&
+          runtime._runResult !== void 0 &&
+          childEntry.state < STATE_EXECUTION_STARTED) {
+        childEntry.state = STATE_EXECUTION_STARTED
+        childEntry.running = true
+        runtime._runResult.next()
+        childEntry.running = false
+        childEntry.module.loaded = true
+        childEntry.state = STATE_EXECUTION_COMPLETED
+      }
+
+      if (typeof childEntry._finalize === "function") {
+        childEntry._finalize()
+      } else {
+        childEntry.loaded()
+        childEntry.updateBindings(null, UPDATE_TYPE_INIT)
       }
     }
   }
