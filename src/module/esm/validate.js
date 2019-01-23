@@ -136,13 +136,13 @@ function validateDependencies(entry) {
         const setterIndex = getSetterIndex(setters, entry)
 
         if (setterIndex !== -1) {
-          const ErrCtor = isCyclicalExport(childEntry, exportedName)
+          const ErrorCtor = isCyclicalExport(childEntry, exportedName)
             ? ERR_EXPORT_CYCLE
             : ERR_EXPORT_MISSING
 
           // Remove problematic setter to unblock subsequent imports.
           setters.splice(setterIndex, 1)
-          throw constructStackless(ErrCtor, [childEntry.module, exportedName])
+          throw constructStackless(ErrorCtor, [childEntry.module, exportedName])
         }
       }
     } else if (! namedExports) {
