@@ -4,7 +4,6 @@ import Runtime from "../build/runtime.js"
 
 import assert from "assert"
 import createNamespace from "./create-namespace.js"
-import isPlainObject from "./is-plain-object.js"
 import fs from "fs-extra"
 import path from "path"
 import repl from "repl"
@@ -125,7 +124,7 @@ describe("REPL hook tests", () => {
 
     r.context = context
     r.eval(code, context, "repl", () => {
-      assert.ok(isPlainObject(context.exports))
+      assert.strictEqual(Reflect.getPrototypeOf(context.exports), Object.prototype)
     })
 
     r.close()

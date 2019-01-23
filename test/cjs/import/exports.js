@@ -1,6 +1,5 @@
 import assert from "assert"
 import createNamespace from "../../create-namespace.js"
-import isPlainObject from "../../is-plain-object.js"
 import defaultArray, * as nsArray from "../../fixture/cjs/export/array.js"
 import defaultClass, * as nsClass from "../../fixture/cjs/export/class.js"
 import defaultDefault, * as nsDefault from "../../fixture/cjs/export/default.js"
@@ -44,16 +43,10 @@ export default () => {
   assert.strictEqual(defaultNumber, 1)
   assert.deepStrictEqual(nsNumber, ns)
 
-  assert.deepStrictEqual(defaultObject, { a: "a" })
-  assert.strictEqual(aOfObject, "a")
-
   ns = createNamespace({ a: "a", default: "default" })
   assert.strictEqual(aOfPseudo, "a")
-
   assert.strictEqual(defaultPseudo, "default")
   assert.deepStrictEqual(nsPseudo, ns)
-
-  assert.deepStrictEqual(defaultReExport, { a: "re-export-nested" })
 
   ns = createNamespace({ default: defaultUndefined })
   assert.strictEqual(defaultUndefined, void 0)
@@ -65,6 +58,11 @@ export default () => {
   ns = createNamespace({})
   assert.deepStrictEqual(nsPseudoEmpty, ns)
 
-  assert.ok(isPlainObject(defaultEmpty))
   assert.strictEqual(nsGetSet.safe, "safe get")
+  assert.strictEqual(Reflect.getPrototypeOf(defaultEmpty), Object.prototype)
+
+  assert.deepStrictEqual(defaultObject, { a: "a" })
+  assert.strictEqual(aOfObject, "a")
+
+  assert.deepStrictEqual(defaultReExport, { a: "re-export-nested" })
 }
