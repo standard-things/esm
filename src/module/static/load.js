@@ -30,7 +30,7 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-const load = maskFunction(function (request, parent, isMain) {
+const load = maskFunction(function (request, parent, isMain = false) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
 

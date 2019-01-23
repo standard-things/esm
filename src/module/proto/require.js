@@ -29,10 +29,10 @@ const req = maskFunction(function (request) {
 
   if (parentEntry !== null &&
       parentEntry._passthruRequire) {
-    return esmLoad(request, this, false).module.exports
+    return esmLoad(request, this).module.exports
   }
 
-  return Module._load(request, this, false)
+  return Module._load(request, this)
 }, RealProto.require)
 
 export default req
