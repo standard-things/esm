@@ -722,7 +722,10 @@ describe("miscellaneous tests", () => {
 
       Reflect.deleteProperty(require.cache, abcPath)
 
-      assert.throws(() => require(abcPath), SyntaxError)
+      assert.throws(
+        () => require(abcPath),
+        SyntaxError
+      )
     })
 
     it("should not support modified `require.extensions` in ESM", () => {
