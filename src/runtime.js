@@ -136,17 +136,29 @@ const Runtime = {
     }
 
     const { entry } = this
-    const pkg = entry.package
-    const { cjs } = pkg.options
+    const { cjs } = entry.package.options
 
-    const compileData = CachingCompiler.compile(content, {
-      cjsVars: cjs.vars,
-      eval: true,
-      runtimeName: entry.runtimeName,
-      topLevelReturn: cjs.topLevelReturn
-    })
+    try {
+      return CachingCompiler.compile(content, {
+        cjsVars: cjs.vars,
+        eval: true,
+        runtimeName: entry.runtimeName,
+        topLevelReturn: cjs.topLevelReturn
+      }).code
+    } catch (e) {
+      if (! Loader.state.package.default.options.debug &&
+          isError(e) &&
+          ! isStackTraceMasked(e)) {
+        maskStackTrace(e, {
+          content,
+          filename: "eval",
+          inModule: entry.type === TYPE_ESM
+        })
+      }
 
-    return compileData.code
+      toExternalError(e)
+      throw e
+    }
   },
   compileGlobalEval(content) {
     if (typeof content !== "string") {
@@ -154,24 +166,40 @@ const Runtime = {
     }
 
     const { entry } = this
-    const pkg = entry.package
-    const { cjs } = pkg.options
+    const { cjs } = entry.package.options
     const { runtimeName } = entry
 
-    const compileData = CachingCompiler.compile(content, {
-      cjsVars: cjs.vars,
-      eval: true,
-      runtimeName,
-      topLevelReturn: cjs.topLevelReturn
-    })
+    let code
 
-    if (! compileData.changed) {
-      return content
+    try {
+      const compileData = CachingCompiler.compile(content, {
+        cjsVars: cjs.vars,
+        eval: true,
+        runtimeName,
+        topLevelReturn: cjs.topLevelReturn
+      })
+
+      if (! compileData.changed) {
+        return content
+      }
+
+      code = compileData.code
+    } catch (e) {
+      if (! Loader.state.package.default.options.debug &&
+          isError(e) &&
+          ! isStackTraceMasked(e)) {
+        maskStackTrace(e, {
+          content,
+          filename: "eval",
+          inModule: entry.type === TYPE_ESM
+        })
+      }
+
+      toExternalError(e)
+      throw e
     }
 
     const { unsafeGlobal } = shared
-
-    let { code } = compileData
 
     if (Reflect.has(unsafeGlobal, runtimeName)) {
       return code
