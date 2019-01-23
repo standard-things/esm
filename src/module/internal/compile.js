@@ -12,7 +12,6 @@ import Runtime from "../../runtime.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
 import compileSource from "./compile-source.js"
 import errors from "../../parse/errors.js"
-import esmValidate from "../esm/validate.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
@@ -380,42 +379,6 @@ function tryCompileCode(caller, content, options) {
   throw error
 }
 
-function tryValidate(caller, entry, content, filename) {
-  let error
-
-  try {
-    esmValidate(entry)
-    return
-  } catch (e) {
-    error = e
-  }
-
-  if (Loader.state.package.default.options.debug ||
-      ! isStackTraceMaskable(error)) {
-    toExternalError(error)
-
-    throw error
-  }
-
-  captureStackTrace(error, caller)
-
-  const loc = getLocationFromStackTrace(error)
-
-  if (loc !== null &&
-      loc.filename !== filename) {
-    content = null
-    filename = loc.filename
-  }
-
-  maskStackTrace(error, {
-    content,
-    filename,
-    inModule: true
-  })
-
-  throw error
-}
-
 function useAsync(entry) {
   return entry.package.options.await &&
     shared.support.await &&
@@ -423,14 +386,15 @@ function useAsync(entry) {
 }
 
 function useSourceMap(entry) {
-  const { sourceMap } = entry.package.options
+  if (DEVELOPMENT ||
+      ELECTRON_RENDERER ||
+      NDB ||
+      FLAGS.inspect ||
+      entry.package.options.sourceMap) {
+    return getSourceMappingURL(entry.compileData.code) === ""
+  }
 
-  return (sourceMap ||
-     DEVELOPMENT ||
-     ELECTRON_RENDERER ||
-     NDB ||
-     FLAGS.inspect) &&
-    ! getSourceMappingURL(entry.compileData.code)
+  return false
 }
 
 export default compile
