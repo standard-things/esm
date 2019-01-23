@@ -6,7 +6,6 @@ import load from "./load.js"
 import shared from "../../shared.js"
 
 const {
-  STATE_EXECUTION_STARTED,
   STATE_PARSING_COMPLETED,
   TYPE_ESM
 } = ENTRY
@@ -30,7 +29,7 @@ function parseLoad(request, parent, isMain) {
     esmValidate(entry)
   }
 
-  if (entry.state < STATE_EXECUTION_STARTED) {
+  if (entry.state < STATE_PARSING_COMPLETED) {
     entry.state = STATE_PARSING_COMPLETED
   }
 

@@ -19,7 +19,6 @@ const {
 
 const {
   TYPE_ESM,
-  STATE_EXECUTION_STARTED,
   STATE_PARSING_COMPLETED,
   UPDATE_TYPE_INIT
 } = ENTRY
@@ -67,8 +66,8 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
   const preload = (entry) => addChild(parentEntry, entry)
 
-  if (parsing ||
-      isDynamic) {
+  if (isDynamic ||
+      parsing) {
     if (isDynamic) {
       moduleState.parsing = true
     }
@@ -88,7 +87,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
         esmValidate(entry)
       }
 
-      if (entry.state < STATE_EXECUTION_STARTED) {
+      if (entry.state < STATE_PARSING_COMPLETED) {
         entry.state = STATE_PARSING_COMPLETED
       }
     }
@@ -107,12 +106,11 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     entry._finalize = finalize
   }
 
-  if (entry !== null) {
-    if (parentEntry.extname === ".mjs" &&
-        entry.type === TYPE_ESM &&
-        entry.extname !== ".mjs") {
-      throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
-    }
+  if (parentEntry.extname === ".mjs" &&
+      entry !== null &&
+      entry.type === TYPE_ESM &&
+      entry.extname !== ".mjs") {
+    throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
   }
 
   if (! parsing) {

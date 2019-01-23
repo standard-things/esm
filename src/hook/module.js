@@ -290,6 +290,8 @@ function wasmCompiler(mod, filename) {
   const wasmMod = new wasmModule(readFile(filename))
   const descriptions = wasmModule.imports(wasmMod)
 
+  entry.state = STATE_EXECUTION_STARTED
+
   for (const description of descriptions) {
     const request = description.module
     const childEntry = esmParseLoad(request, mod)
@@ -298,6 +300,8 @@ function wasmCompiler(mod, filename) {
   }
 
   const readonlyExports = new wasmInstance(wasmMod, imported).exports
+
+  entry.state = STATE_EXECUTION_COMPLETED
 
   for (const name in readonlyExports) {
     setGetter(exported, name, () => readonlyExports[name])

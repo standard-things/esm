@@ -1,3 +1,5 @@
+import ENTRY from "./constant/entry.js"
+
 import Entry from "./entry.js"
 import OwnProxy from "./own/proxy.js"
 
@@ -10,6 +12,10 @@ import maskFunction from "./util/mask-function.js"
 import proxyExports from "./util/proxy-exports.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
+
+const {
+  STATE_EXECUTION_COMPLETED
+} = ENTRY
 
 const FuncHasInstance = Function.prototype[Symbol.hasInstance]
 
@@ -116,6 +122,7 @@ function createEntry(id) {
 
   mod.exports = exported
   entry.exports = exported
+  entry.state = STATE_EXECUTION_COMPLETED
 
   if (isFunc &&
       id === "module") {

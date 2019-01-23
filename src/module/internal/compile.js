@@ -242,7 +242,6 @@ function tryCompileCached(entry, filename) {
 
         runtime._runResult = (function *() {
           yield
-          entry.state = STATE_EXECUTION_STARTED
           return Reflect.apply(_compile, mod, [source, filename])
         })()
       }
