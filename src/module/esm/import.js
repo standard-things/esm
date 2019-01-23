@@ -126,7 +126,7 @@ function getEntryFrom(request, exported, parentEntry) {
     return _lastChild
   }
 
-  const filename = tryDualResolveFilename(request, parentEntry.module, false)
+  const filename = tryDualResolveFilename(request, parentEntry.module)
   const mod = new Module(filename)
 
   mod.exports = exported
