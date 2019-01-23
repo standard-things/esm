@@ -20,14 +20,14 @@ const {
   STATE_PARSING_STARTED
 } = ENTRY
 
-function load(filename, parent = null, isMain = false, cache, loader) {
+function load(filename, parent, isMain = false, cache, loader) {
   const { parsing } = shared.moduleState
 
   let entry
   let mod = cache[filename]
 
   if (mod !== void 0) {
-    const children = parent !== null && parent.children
+    const children = parent != null && parent.children
 
     if (Array.isArray(children) &&
         GenericArray.indexOf(children, mod) === -1) {

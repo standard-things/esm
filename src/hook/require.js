@@ -37,7 +37,7 @@ function hook(parent) {
       Package.set(dirPath, defaultPkg.clone())
     }
 
-    const entry = esmParseLoad(request, parent, false)
+    const entry = esmParseLoad(request, parent)
     const exported = entry.module.exports
 
     if (entry.type !== TYPE_CJS) {

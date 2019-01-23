@@ -115,7 +115,7 @@ function load(request, parent, isMain = false, preload) {
       preload(entry)
     }
 
-    tryLoader(entry, cache, request, filename, parentEntry)
+    tryLoader(entry, filename, parentEntry, cache, request)
   })
 
   if (parsing) {
@@ -134,7 +134,7 @@ function load(request, parent, isMain = false, preload) {
   return entry
 }
 
-function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
+function tryLoader(entry, filename, parentEntry, cache, cacheKey) {
   let error
   let threw = true
 

@@ -23,7 +23,7 @@ const {
 
 let availableModulesPath
 
-function resolveLookupPaths(request, parent = null, skipGlobalPaths) {
+function resolveLookupPaths(request, parent = null, skipGlobalPaths = false) {
   const parentFilename = parent !== null && parent.filename
 
   // Look outside if not a relative path.

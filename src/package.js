@@ -573,7 +573,7 @@ function readInfo(dirPath, forceOptions) {
       cache.set(dirPath, pkg)
 
       try {
-        pkg.options = Package.createOptions(esmParseLoad(optionsPath, null, false).module.exports)
+        pkg.options = Package.createOptions(esmParseLoad(optionsPath, null).module.exports)
       } finally {
         moduleState.parsing = parsing
         cache.set(dirPath, null)
