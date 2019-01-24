@@ -262,9 +262,8 @@ function tryFilename(filename, isMain) {
 function tryPackage(dirPath, fields, exts, isMain) {
   const json = readPackage(dirPath, fields)
 
-  if (json === null ||
-      json === "") {
-    return json
+  if (json === null) {
+    return ""
   }
 
   for (const field of fields) {
