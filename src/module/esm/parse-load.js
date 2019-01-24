@@ -23,22 +23,24 @@ function parseLoad(request, parent, isMain) {
     moduleState.parsing = false
   }
 
-  const isESM = entry.type === TYPE_ESM
+  entry.updateBindings()
 
   if (entry.state < STATE_PARSING_COMPLETED) {
     entry.state = STATE_PARSING_COMPLETED
   }
 
-  entry.updateBindings()
+  if (entry.state === STATE_PARSING_COMPLETED) {
+    const isESM = entry.type === TYPE_ESM
 
-  if (isESM) {
-    esmValidate(entry)
-  }
+    if (isESM) {
+      esmValidate(entry)
+    }
 
-  load(request, parent, isMain)
+    load(request, parent, isMain)
 
-  if (isESM) {
-    cjsValidate(entry)
+    if (isESM) {
+      cjsValidate(entry)
+    }
   }
 
   return entry

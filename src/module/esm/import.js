@@ -88,6 +88,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
       }
 
       if (isDynamic &&
+          entry.state === STATE_PARSING_COMPLETED &&
           entry.type === TYPE_ESM) {
         esmValidate(entry)
       }
