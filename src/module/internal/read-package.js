@@ -1,4 +1,3 @@
-import GenericObject from "../../generic/object.js"
 import SafeJSON from "../../safe/json.js"
 
 import isObject from "../../util/is-object.js"
