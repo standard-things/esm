@@ -76,7 +76,7 @@ function validate(entry) {
       cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
-      const setterIndex = getSetterIndex(setters, entry)
+      const setterIndex = setters.findIndex(({ parent }) => parent === entry)
 
       if (setterIndex !== -1) {
         // Remove problematic setter to unblock subsequent imports.
@@ -85,20 +85,6 @@ function validate(entry) {
       }
     }
   }
-}
-
-function getSetterIndex(setters, parentEntry) {
-  const { length } = setters
-
-  let i = -1
-
-  while (++i < length) {
-    if (setters[i].parent === parentEntry) {
-      return i
-    }
-  }
-
-  return -1
 }
 
 export default validate

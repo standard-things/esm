@@ -33,22 +33,8 @@ function validate(entry) {
   }
 }
 
-function getSetterIndex(setters, parentEntry) {
-  const { length } = setters
-
-  let i = -1
-
-  while (++i < length) {
-    if (setters[i].parent === parentEntry) {
-      return i
-    }
-  }
-
-  return -1
-}
-
 function isCyclicalExport(entry, exportedName, seen) {
-  const { name, setters } = entry
+  const { name } = entry
 
   if (seen !== void 0 &&
       seen.has(name)) {
@@ -59,7 +45,7 @@ function isCyclicalExport(entry, exportedName, seen) {
 
   seen.add(name)
 
-  for (const setter of setters[exportedName]) {
+  for (const setter of entry.setters[exportedName]) {
     if (setter.type === SETTER_TYPE_EXPORT_FROM &&
         isCyclicalExport(setter.parent, setter.exportedName, seen)) {
       return true
@@ -133,7 +119,7 @@ function validateDependencies(entry) {
         cache.set(exportedName, false)
 
         const setters = settersMap[exportedName]
-        const setterIndex = getSetterIndex(setters, entry)
+        const setterIndex = setters.findIndex(({ parent }) => parent === entry)
 
         if (setterIndex !== -1) {
           const ErrorCtor = isCyclicalExport(childEntry, exportedName)
@@ -155,7 +141,7 @@ function validateDependencies(entry) {
         cache.set(exportedName, false)
 
         const setters = settersMap[exportedName]
-        const setterIndex = getSetterIndex(setters, entry)
+        const setterIndex = setters.findIndex(({ parent }) => parent === entry)
 
         if (setterIndex !== -1) {
           // Remove problematic setter to unblock subsequent imports.
