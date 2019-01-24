@@ -1017,44 +1017,35 @@ describe("miscellaneous tests", () => {
 
     it("should not cache `Module._findPath()` misses", () => {
       const dirPath = path.resolve("fixture/find-path")
+      const jsonPath = path.resolve(dirPath, "package.json")
+      const mainPath = path.resolve(dirPath, "main.js")
+      const originalContent = fs.readFileSync(jsonPath, "utf8")
 
-      return Promise
-        .resolve()
-        .then(() => {
-          const filename = path.resolve(dirPath, "main.js")
-          const paths = [dirPath]
+      let actual = []
 
-          const jsonContent = '"main"\n'
-          const jsonPath = path.resolve(dirPath, "package.json")
+      fs.writeFileSync(jsonPath, '"main"\n', "utf8")
 
-          fs.writeFileSync(jsonPath, jsonContent, "utf8")
+      actual.push(Module._findPath(dirPath, [dirPath]))
 
-          assert.strictEqual(Module._findPath(dirPath, paths), false)
+      fs.writeFileSync(jsonPath, '{"main":"main.js"}', "utf8")
 
-          fs.writeFileSync(jsonPath, '{"main":"main.js"}', "utf8")
+      actual.push(Module._findPath(dirPath, [dirPath]))
 
-          const found = Module._findPath(dirPath, paths)
+      fs.writeFileSync(jsonPath, originalContent, "utf8")
 
-          fs.writeFileSync(jsonPath, jsonContent, "utf8")
+      assert.deepStrictEqual(actual, [false, mainPath])
 
-          assert.strictEqual(found, filename)
+      const createdPath = path.resolve(dirPath, "created")
+      const indexPath = path.resolve(createdPath, "index.js")
 
-          fs.writeFileSync(jsonPath, jsonContent, "utf8")
-        })
-        .then(() => {
-          const createdPath = path.resolve(dirPath, "created")
-          const filename = path.resolve(createdPath, "index.js")
-          const paths = [createdPath]
+      assert.strictEqual(Module._findPath(indexPath, [createdPath]), false)
 
-          assert.strictEqual(Module._findPath(filename, paths), false)
+      fs.ensureFileSync(indexPath, "", "utf8")
 
-          fs.ensureFileSync(filename, "", "utf8")
+      actual = Module._findPath(indexPath, [createdPath])
 
-          const found = Module._findPath(filename, paths)
-
-          return trash(createdPath)
-            .then(() => assert.strictEqual(found, filename))
-        })
+      return trash(createdPath)
+        .then(() => assert.strictEqual(actual, indexPath))
     })
   })
 
