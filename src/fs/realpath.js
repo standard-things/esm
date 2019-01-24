@@ -40,7 +40,10 @@ function init() {
       ? realpathNative(thePath)
       : realpathFallback(thePath)
 
-    cache.set(thePath, cached)
+    if (cached !== "") {
+      cache.set(thePath, cached)
+    }
+
     return cached
   }
 
