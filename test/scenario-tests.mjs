@@ -436,6 +436,22 @@ describe("scenario tests", function () {
     })
   })
 
+  describe("should work with sinon", () => {
+    it("should work in auto mode", () =>
+      node([
+        path.resolve("fixture/scenario/sinon/auto.js")
+      ], envAuto)
+      .then(({ stdout }) => assert.ok(stdout.includes("sinon:true")))
+    )
+
+    it("should throw exception in strict mode", () =>
+      node([
+        path.resolve("fixture/scenario/sinon/strict.js")
+      ], envAuto)
+      .then(({ stdout }) => assert.ok(stdout.includes("TypeError: ES Modules cannot be stubbed")))
+    )
+  })
+
   describe("should work with pm2", () => {
     before(function () {
       if (! canTestPM2) {

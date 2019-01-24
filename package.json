@@ -86,6 +86,7 @@
     "postcss": "^7.0.14",
     "require-inject": "^1.4.4",
     "semver": "^5.6.0",
+    "sinon": "^7.2.3",
     "sleep": "^5.2.4",
     "sqreen": "^1.29.0",
     "strip-ansi": "^5.0.0",
