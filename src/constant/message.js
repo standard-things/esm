@@ -8,6 +8,7 @@ const MESSAGE = {
   ILLEGAL_NEW_TARGET: "new.target expression is not allowed here",
   ILLEGAL_RETURN_STATEMENT: "Illegal return statement",
   INVALID_ESCAPED_RESERVED_WORD: "Keyword must not contain escaped characters",
+  INVALID_IMPORT_META_ASSIGNMENT: "'import.meta' is not a valid assignment target",
   INVALID_LEFT_HAND_SIDE_ASSIGNMENT: "Invalid left-hand side in assignment",
   INVALID_OR_UNEXPECTED_TOKEN: "Invalid or unexpected token",
   UNEXPECTED_EOS: "Unexpected end of input",

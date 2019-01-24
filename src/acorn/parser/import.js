@@ -23,6 +23,7 @@ function init() {
   const {
     ILLEGAL_IMPORT_META_OUTSIDE_MODULE,
     INVALID_ESCAPED_RESERVED_WORD,
+    INVALID_IMPORT_META_ASSIGNMENT,
     INVALID_LEFT_HAND_SIDE_ASSIGNMENT,
     UNEXPECTED_IDENTIFIER,
     UNEXPECTED_STRING,
@@ -74,7 +75,7 @@ function init() {
       throw constructStackless(ErrorCtor, [
         this,
         start,
-        "import.meta is not a valid assignment target"
+        INVALID_IMPORT_META_ASSIGNMENT
       ])
     }
 
@@ -82,9 +83,7 @@ function init() {
   }
 
   function parseExport(func, args) {
-    const { type } = lookahead(this)
-
-    if (type !== tt.star) {
+    if (lookahead(this).type !== tt.star) {
       return Reflect.apply(func, this, args)
     }
 
