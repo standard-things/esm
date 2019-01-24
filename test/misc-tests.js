@@ -11,6 +11,7 @@ import * as fsNs from "fs"
 import path from "path"
 import require from "./require.js"
 import stream from "stream"
+import trash from "../script/trash.js"
 import util from "util"
 
 const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
@@ -1013,6 +1014,48 @@ describe("miscellaneous tests", () => {
             )
         ])
     )
+
+    it("should not cache `Module._findPath()` misses", () => {
+      const dirPath = path.resolve("fixture/find-path")
+
+      return Promise
+        .resolve()
+        .then(() => {
+          const filename = path.resolve(dirPath, "main.js")
+          const paths = [dirPath]
+
+          const jsonContent = '"main"\n'
+          const jsonPath = path.resolve(dirPath, "package.json")
+
+          fs.writeFileSync(jsonPath, jsonContent, "utf8")
+
+          assert.strictEqual(Module._findPath(dirPath, paths), false)
+
+          fs.writeFileSync(jsonPath, '{"main":"main.js"}', "utf8")
+
+          const found = Module._findPath(dirPath, paths)
+
+          fs.writeFileSync(jsonPath, jsonContent, "utf8")
+
+          assert.strictEqual(found, filename)
+
+          fs.writeFileSync(jsonPath, jsonContent, "utf8")
+        })
+        .then(() => {
+          const createdPath = path.resolve(dirPath, "created")
+          const filename = path.resolve(createdPath, "index.js")
+          const paths = [createdPath]
+
+          assert.strictEqual(Module._findPath(filename, paths), false)
+
+          fs.ensureFileSync(filename, "", "utf8")
+
+          const found = Module._findPath(filename, paths)
+
+          return trash(createdPath)
+            .then(() => assert.strictEqual(found, filename))
+        })
+    })
   })
 
   describe("spec compliance", () => {

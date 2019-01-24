@@ -13,6 +13,7 @@
 /src/vendor
 /test/env/prefix/bin
 /test/env/prefix/node
+/test/fixture/find-path/created
 /test/fixture/unsafe-characters\[*\].mjs
 /test/fixture/main-hook/symlink/symlink.js
 /test/fixture/main-hook/symlink/symlink.mjs
