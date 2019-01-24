@@ -27,7 +27,7 @@ const canTestWorker = SemVer.satisfies(process.version, ">=10.5.0")
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g
 
-const pkgPath = path.resolve("../index.js")
+const indexPath = path.resolve("../index.js")
 const pkgJSON = fs.readJSONSync("../package.json")
 
 const abcPath = path.resolve("fixture/export/abc.mjs")
@@ -243,7 +243,7 @@ describe("miscellaneous tests", () => {
         .then((ns) => ns.default())
     )
 
-    it("should support ESM in `Module#_compile`", () => {
+    it("should support ESM in `Module#_compile()`", () => {
       const mod = new Module
 
       mod._compile('export const a = "a"', "filename")
@@ -479,22 +479,27 @@ describe("miscellaneous tests", () => {
     it("should mask stack traces", () =>
       import("./fixture/error/import.mjs")
         .then(assert.fail)
-        .catch((e) => assert.strictEqual(e.stack.includes(pkgPath), false))
+        .catch((e) => assert.strictEqual(e.stack.includes(indexPath), false))
     )
   })
 
   describe("Node rules", () => {
-    it("should support requests with trailing backslashes in Windows", function () {
-      if (! isWin) {
-        this.skip()
-      }
+    it("should find `.mjs` before `.js` in ESM", () =>
+      Promise
+        .all([
+          "./fixture/ext/priority",
+          "ext-priority"
+        ]
+        .map((request) =>
+          import(request)
+            .then((ns) => assert.strictEqual(ns.default, ".mjs"))
+        ))
+    )
 
-      const request = ".\\node_modules\\ext-priority\\"
-
-      assert.doesNotThrow(() => require(request))
-
-      return import(request)
-    })
+    it("should find `.js` before `.mjs` with `options.cjs.paths`", () =>
+      import("./cjs/ext/priority.js")
+        .then((ns) => ns.default())
+    )
 
     it("should find a file before a package", () => {
       const actual = require.resolve("./fixture/paths/file")
@@ -539,21 +544,6 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it('should not resolve non-local "." requests with `require`', () => {
-      try {
-        require(".")
-        assert.fail()
-      } catch (e) {
-        checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
-      }
-    })
-
-    it('should not resolve non-local "." requests with `import`', () =>
-      import(".")
-        .then(assert.fail)
-        .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
-    )
-
     it("should resolve non-local dependencies with `require`", () => {
       const requests = [
         "home-node-libraries",
@@ -581,21 +571,6 @@ describe("miscellaneous tests", () => {
             assert.ok(ns.default(request))
           }
         })
-    )
-
-    it("should not resolve non-local dependencies with `import`", () =>
-      Promise
-        .all([
-          "home-node-libraries",
-          "home-node-modules",
-          "node-path",
-          "prefix-path"
-        ]
-        .map((request) =>
-          import(request)
-            .then(assert.fail)
-            .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
-        ))
     )
 
     it("should resolve non-local dependencies with `require.resolve`", () => {
@@ -651,6 +626,36 @@ describe("miscellaneous tests", () => {
         })
     )
 
+    it('should not resolve non-local "." requests with `require`', () => {
+      try {
+        require(".")
+        assert.fail()
+      } catch (e) {
+        checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
+      }
+    })
+
+    it('should not resolve non-local "." requests with `import`', () =>
+      import(".")
+        .then(assert.fail)
+        .catch((e) => checkLegacyErrorProps(e, "MODULE_NOT_FOUND"))
+    )
+
+    it("should not resolve non-local dependencies with `import`", () =>
+      Promise
+        .all([
+          "home-node-libraries",
+          "home-node-modules",
+          "node-path",
+          "prefix-path"
+        ]
+        .map((request) =>
+          import(request)
+            .then(assert.fail)
+            .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+        ))
+    )
+
     it("should support `options` in `require.resolve`", () => {
       const paths = [path.resolve("fixture/paths")]
       const actual = require.resolve("a", { paths })
@@ -695,23 +700,6 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it("should find `.mjs` before `.js` in ESM", () =>
-      Promise
-        .all([
-          "./fixture/ext/priority",
-          "ext-priority"
-        ]
-        .map((request) =>
-          import(request)
-            .then((ns) => assert.strictEqual(ns.default, ".mjs"))
-        ))
-    )
-
-    it("should find `.js` before `.mjs` with `options.cjs.paths`", () =>
-      import("./cjs/ext/priority.js")
-        .then((ns) => ns.default())
-    )
-
     it("should support modified `require.extensions` in CJS", () => {
       require.extensions[".mjs"] = () => ({})
 
@@ -750,6 +738,18 @@ describe("miscellaneous tests", () => {
       return import(filename)
         .then(assert.fail)
         .catch((e) => checkError(e, "ERR_MODULE_RESOLUTION_LEGACY"))
+    })
+
+    it("should support requests with trailing backslashes in Windows", function () {
+      if (! isWin) {
+        this.skip()
+      }
+
+      const request = ".\\node_modules\\ext-priority\\"
+
+      assert.doesNotThrow(() => require(request))
+
+      return import(request)
     })
 
     it("should support requests containing safe characters in ESM", () =>
