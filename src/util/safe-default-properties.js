@@ -1,3 +1,4 @@
+import get from "./get.js"
 import has from "./has.js"
 import ownKeys from "./own-keys.js"
 import safeCopyProperty from "./safe-copy-property.js"
@@ -15,8 +16,8 @@ function init() {
 
       for (const name of names) {
         if (has(source, name) &&
-            (object[name] === void 0 ||
-            ! has(object, name))) {
+            (! has(object, name) ||
+             get(object, name) === void 0)) {
           safeCopyProperty(object, source, name)
         }
       }
