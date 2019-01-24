@@ -1,10 +1,12 @@
 import { dirname, extname } from "../../safe/path.js"
 
 import CHAR_CODE from "../../constant/char-code.js"
+import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 import Package from "../../package.js"
 import SafeModule from "../../safe/module.js"
@@ -21,6 +23,7 @@ import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
+import maskStackTrace from "../../error/mask-stack-trace.js"
 import parseURL from "../../util/parse-url.js"
 import resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import shared from "../../shared.js"
@@ -29,6 +32,10 @@ import staticNodeModulePaths from "../static/node-module-paths.js"
 const {
   FORWARD_SLASH
 } = CHAR_CODE
+
+const {
+  TYPE_ESM
+} = ENTRY
 
 const {
   ELECTRON,
@@ -141,7 +148,11 @@ function resolveFilename(request, parent, isMain = false, options) {
     if (foundPath === "" &&
         parsed.protocol !== "file:" &&
         ! localhostRegExp.test(request)) {
-      throw new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
+      const error = new ERR_INVALID_PROTOCOL(parsed.protocol, "file:")
+
+      maybeMaskStackTrace(error, parentEntry)
+
+      throw error
     }
 
     if (foundPath !== "") {
@@ -185,7 +196,11 @@ function resolveFilename(request, parent, isMain = false, options) {
       return foundPath
     }
 
-    throw new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
+    const error = new ERR_UNKNOWN_FILE_EXTENSION(foundPath)
+
+    maybeMaskStackTrace(error, parentEntry)
+
+    throw error
   }
 
   foundPath = tryLegacyResolveFilename(request, parent, isMain, options)
@@ -199,10 +214,18 @@ function resolveFilename(request, parent, isMain = false, options) {
       return foundPath
     }
 
-    throw new ERR_MODULE_RESOLUTION_LEGACY(request, fromPath, foundPath)
+    const error = new ERR_MODULE_RESOLUTION_LEGACY(request, fromPath, foundPath)
+
+    maybeMaskStackTrace(error, parentEntry)
+
+    throw error
   }
 
-  throw new MODULE_NOT_FOUND(request)
+  const error = new MODULE_NOT_FOUND(request)
+
+  maybeMaskStackTrace(error, parentEntry)
+
+  throw error
 }
 
 function _resolveFilename(request, parent, isMain, options, fields, exts, skipGlobalPaths) {
@@ -216,6 +239,17 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
   }
 
   return findPath(request, paths, isMain, fields, exts)
+}
+
+function maybeMaskStackTrace(error, parentEntry) {
+  if (! Loader.state.package.default.options.debug) {
+    maskStackTrace(error, {
+      filename: parentEntry === null ? void 0 : parentEntry.filename,
+      inModule: parentEntry === null ? void 0 : parentEntry.type === TYPE_ESM
+    })
+  }
+
+  return error
 }
 
 function resolveLookupPathsFrom(request, fromPaths, skipGlobalPaths) {

@@ -2,9 +2,11 @@
 // Copyright Node.js contributors. Released under MIT license:
 // https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js
 
+import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
 
 import Entry from "../../entry.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 import RealModule from "../../real/module.js"
 import SafeModule from "../../safe/module.js"
@@ -17,9 +19,14 @@ import isAbsolute from "../../path/is-absolute.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
 import maskFunction from "../../util/mask-function.js"
+import maskStackTrace from "../../error/mask-stack-trace.js"
 import shared from "../../shared.js"
 import staticFindPath from "./find-path.js"
 import staticResolveLookupPaths from "./resolve-lookup-paths.js"
+
+const {
+  TYPE_ESM
+} = ENTRY
 
 const {
   ELECTRON
@@ -105,7 +112,16 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
     return foundPath
   }
 
-  throw new MODULE_NOT_FOUND(request)
+  const error = new MODULE_NOT_FOUND(request)
+
+  if (! Loader.state.package.default.options.debug) {
+    maskStackTrace(error, {
+      filename: parentEntry === null ? void 0 : parentEntry.filename,
+      inModule: parentEntry === null ? void 0 : parentEntry.type === TYPE_ESM
+    })
+  }
+
+  throw error
 }, RealModule._resolveFilename)
 
 function resolveLookupPathsFrom(request, fromPaths) {
