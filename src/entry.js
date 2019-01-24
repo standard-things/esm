@@ -47,7 +47,6 @@ const {
   SETTER_TYPE_NAMESPACE,
   SETTER_TYPE_STATIC_IMPORT,
   STATE_INITIAL,
-  STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   TYPE_CJS,
   TYPE_ESM,
@@ -575,12 +574,10 @@ class Entry {
       if (runtime !== null &&
           runtime._runResult !== void 0 &&
           childEntry.state < STATE_EXECUTION_STARTED) {
-        childEntry.state = STATE_EXECUTION_STARTED
         childEntry.running = true
         runtime._runResult.next()
         childEntry.running = false
         childEntry.module.loaded = true
-        childEntry.state = STATE_EXECUTION_COMPLETED
       }
 
       if (typeof childEntry._finalize === "function") {
