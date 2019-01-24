@@ -156,6 +156,13 @@ describe("scenario tests", function () {
     .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
 
+  it("should work with sinon", () =>
+    node([
+      path.resolve("fixture/scenario/sinon")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("sinon:true")))
+  )
+
   it("should work with sqreen", () =>
     node([
       "-r", pkgPath,
@@ -434,22 +441,6 @@ describe("scenario tests", function () {
       ], envAuto)
       .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
     })
-  })
-
-  describe("should work with sinon", () => {
-    it("should work in auto mode", () =>
-      node([
-        path.resolve("fixture/scenario/sinon/auto.js")
-      ], envAuto)
-      .then(({ stdout }) => assert.ok(stdout.includes("sinon:true")))
-    )
-
-    it("should throw exception in strict mode", () =>
-      node([
-        path.resolve("fixture/scenario/sinon/strict.js")
-      ], envAuto)
-      .then(({ stdout }) => assert.ok(stdout.includes("TypeError: ES Modules cannot be stubbed")))
-    )
   })
 
   describe("should work with pm2", () => {
