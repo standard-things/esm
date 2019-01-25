@@ -10,7 +10,8 @@ import isError from "../../util/is-error.js"
 import maskFunction from "../../util/mask-function.js"
 
 const preloadModules = maskFunction(function (requests) {
-  if (! Array.isArray(requests)) {
+  if (! Array.isArray(requests) ||
+      requests.length === 0) {
     return
   }
 

@@ -19,6 +19,7 @@ import Shim from "./shim.js"
 import builtinVM from "./builtin/vm.js"
 import errors from "./errors.js"
 import globalHook from "./hook/global.js"
+import hasLoaderValue from "./env/has-loader-value.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
 import isOwnPath from "./util/is-own-path.js"
@@ -157,7 +158,15 @@ if (shared.inited &&
       }
     }
 
-    Module._preloadModules(FLAGS.preloadModules)
+    const preloads = []
+
+    for (const request of FLAGS.preloadModules) {
+      if (! hasLoaderValue(request)) {
+        preloads.push(request)
+      }
+    }
+
+    Module._preloadModules(preloads)
   }
 }
 
