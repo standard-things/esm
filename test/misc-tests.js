@@ -1080,6 +1080,15 @@ describe("miscellaneous tests", () => {
         .then((value) => assert.strictEqual(value, "thenable"))
     )
 
+    it("should support namespace objects of cyclical CJS modules", () =>
+      Promise
+        .all([
+          "./cycle/immutable/a.mjs",
+          "./cycle/mutable/a.js"
+        ]
+        .map((request) => import(request)))
+    )
+
     it("should have a top-level `this` of `undefined`", () =>
       import("./misc/this.mjs")
         .then((ns) => ns.default())
