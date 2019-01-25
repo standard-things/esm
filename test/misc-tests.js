@@ -1145,9 +1145,10 @@ describe("miscellaneous tests", () => {
       const code = `
         Promise
           .all([
-            import("./fixture/export/abc.mjs"),
-            import("./fixture/export/def.js")
-          ])
+            "./fixture/export/abc.mjs",
+            "./fixture/export/def.js"
+          ]
+          .map((request) => import(request)))
       `
 
       return Promise
