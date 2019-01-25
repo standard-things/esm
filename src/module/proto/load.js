@@ -29,12 +29,12 @@ const load = maskFunction(function (filename) {
     const otherEntry = Entry.get(scratchCache[id])
 
     if (entry !== otherEntry) {
-      entry = otherEntry
-      entry.exports = this.exports
-      entry.module = this
-      entry.parent = parentEntry
+      otherEntry.exports = this.exports
+      otherEntry.module = this
+      otherEntry.parent = parentEntry
 
-      Entry.set(this, entry)
+      entry = otherEntry
+      Entry.set(this, otherEntry)
       Reflect.deleteProperty(scratchCache, id)
     }
   }
