@@ -26,7 +26,9 @@ function load(filename, parent, isMain = false, cache, loader) {
   let entry
   let mod = cache[filename]
 
-  if (mod !== void 0) {
+  const found = mod !== void 0
+
+  if (found) {
     const children = parent != null && parent.children
 
     if (Array.isArray(children) &&
@@ -63,18 +65,20 @@ function load(filename, parent, isMain = false, cache, loader) {
     ? STATE_PARSING_STARTED
     : STATE_PARSING_COMPLETED
 
-  const { _compile } = mod
+  if (! found) {
+    const { _compile } = mod
 
-  mod._compile = (content, filename) => {
-    Reflect.deleteProperty(mod, "_compile")
+    mod._compile = (content, filename) => {
+      Reflect.deleteProperty(mod, "_compile")
 
-    const symbol = shared.symbol._compile
+      const symbol = shared.symbol._compile
 
-    const func = typeof mod[symbol] === "function"
-      ? mod[symbol]
-      : _compile
+      const func = typeof mod[symbol] === "function"
+        ? mod[symbol]
+        : _compile
 
-    return Reflect.apply(func, mod, [content, filename])
+      return Reflect.apply(func, mod, [content, filename])
+    }
   }
 
   loader(entry)

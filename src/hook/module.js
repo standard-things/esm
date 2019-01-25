@@ -114,7 +114,14 @@ function hook(Mod, parent) {
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
       entry._passthruCompile = false
-      compileFallback()
+      return compileFallback()
+    }
+
+    const { compileData, runtime } = entry
+
+    if (runtime !== null &&
+        runtime._runResult !== void 0) {
+      compile(manager, entry, compileData.code, filename, compileFallback)
       return
     }
 
@@ -142,21 +149,12 @@ function hook(Mod, parent) {
       })
     }
 
-    const { compileData } = entry
-
-    const isCached =
-      compileData !== null &&
-      compileData.changed
-
-    if (! isCached &&
+    if ((compileData === null ||
+         ! compileData.changed) &&
         passthruMap.get(func)) {
-      tryPassthru.call(this, func, args, pkg)
+      return tryPassthru.call(this, func, args, pkg)
     } else {
-      const content = isCached
-        ? compileData.code
-        : readFile(filename, "utf8")
-
-      mod._compile(content, filename)
+      mod._compile(readFile(filename, "utf8"), filename)
     }
   }
 
