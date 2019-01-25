@@ -32,6 +32,7 @@ import shared from "../shared.js"
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_PARSING_STARTED,
   TYPE_WASM
 } = ENTRY
 
@@ -283,11 +284,12 @@ function wasmCompiler(mod, filename) {
 
   mod.exports = exported
   entry.exports = exported
+  entry.state = STATE_PARSING_STARTED
   entry.type = TYPE_WASM
 
-  const imported = { __proto__: null }
   const wasmMod = new wasmModule(readFile(filename))
   const descriptions = wasmModule.imports(wasmMod)
+  const imported = { __proto__: null }
 
   entry.state = STATE_EXECUTION_STARTED
 
@@ -298,12 +300,12 @@ function wasmCompiler(mod, filename) {
     imported[request] = childEntry.module.exports
   }
 
-  const readonlyExports = new wasmInstance(wasmMod, imported).exports
+  const wasmExported = new wasmInstance(wasmMod, imported).exports
 
   entry.state = STATE_EXECUTION_COMPLETED
 
-  for (const name in readonlyExports) {
-    setGetter(exported, name, () => readonlyExports[name])
+  for (const name in wasmExported) {
+    setGetter(exported, name, () => wasmExported[name])
   }
 }
 
