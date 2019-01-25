@@ -262,8 +262,9 @@ class Entry {
 
     if (entry === void 0) {
       entry = new Entry(mod)
-    } else if (entry.type === TYPE_CJS &&
-        entry._loaded === LOAD_COMPLETED) {
+    } else if (entry._loaded === LOAD_COMPLETED &&
+        // Don't check `entry.type` first so that its value can be deferred.
+        entry.type === TYPE_CJS) {
       const { bridged } = shared
       const exported = entry.module.exports
       const found = bridged.get(exported)
@@ -377,8 +378,8 @@ class Entry {
 
     let otherGetter = otherGetters[importedName]
 
-    if (this.extname === ".mjs" &&
-        otherEntry.type !== TYPE_ESM) {
+    if (otherEntry.type !== TYPE_ESM &&
+        this.extname === ".mjs") {
       otherGetter = () => otherEntry.cjsNamespace[importedName]
       otherGetter.owner = otherEntry
     }
