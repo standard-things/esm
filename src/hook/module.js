@@ -98,10 +98,7 @@ function hook(Mod, parent) {
 
   function jsWrapper(manager, func, args) {
     const [mod, filename] = args
-
     const shouldOverwrite = ! Entry.has(mod)
-    const shouldRestore = shouldOverwrite && has(mod, "_compile")
-
     const entry = Entry.get(mod)
     const pkg = entry.package
 
@@ -128,6 +125,7 @@ function hook(Mod, parent) {
     }
 
     const { _compile } = mod
+    const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
     const compileWrapper = (content, filename) => {
       if (shouldOverwrite) {
