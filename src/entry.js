@@ -262,8 +262,8 @@ class Entry {
 
     if (entry === void 0) {
       entry = new Entry(mod)
-    } else if (entry._loaded === LOAD_COMPLETED &&
-        entry.type === TYPE_CJS) {
+    } else if (entry.type === TYPE_CJS &&
+        entry._loaded === LOAD_COMPLETED) {
       const { bridged } = shared
       const exported = entry.module.exports
       const found = bridged.get(exported)
@@ -440,17 +440,15 @@ class Entry {
       return
     }
 
-    const { getters } = this
-    const isLoaded = this._loaded === LOAD_COMPLETED
-
     if (names === void 0) {
-      if (isLoaded) {
+      if (this._loaded === LOAD_COMPLETED) {
         names = keys(this._namespace)
       } else {
         names = this.builtin ? getBuiltinExportNames(exported) : keys(exported)
       }
     }
 
+    const { getters } = this
     const isCJS = type === TYPE_CJS
 
     for (const name of names) {
@@ -541,8 +539,8 @@ class Entry {
         this.type = TYPE_PSEUDO
       }
 
-      this.exports = exported
       this._loaded = LOAD_COMPLETED
+      this.exports = exported
 
       if (this.type === TYPE_CJS) {
         if (! Reflect.has(this.getters, "default")) {
@@ -708,7 +706,7 @@ class Entry {
 }
 
 function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
-  handler.get = function get(namespace, name, receiver) {
+  handler.get = (namespace, name, receiver) => {
     const { getters } = entry
     const isESM = entry.type === TYPE_ESM
 
@@ -725,7 +723,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     if (errored &&
         typeof name === "string" &&
         Reflect.has(namespace, name)) {
-      throw new ERR_UNDEFINED_IDENTIFIER(name, get)
+      throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
     }
 
     if (! isESM &&
@@ -834,12 +832,12 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
     return false
   }
 
-  const { get } = handler
+  const oldGet = handler.get
 
-  if (typeof get === "function") {
+  if (typeof oldGet === "function") {
     handler.get = (namespace, name, receiver) => {
       const value = Reflect.get(namespace, name, receiver)
-      const newValue = get(namespace, name, receiver)
+      const newValue = oldGet(namespace, name, receiver)
 
       if ((value === INITIAL_VALUE ||
            newValue !== value) &&
