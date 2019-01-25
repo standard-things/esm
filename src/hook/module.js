@@ -106,15 +106,30 @@ function hook(Mod, parent) {
 
     const compileFallback = () => {
       entry.state = STATE_EXECUTION_STARTED
-      tryPassthru.call(this, func, args, pkg)
+
+      let error
+      let threw = true
+
+      try {
+        tryPassthru.call(this, func, args, pkg)
+        threw = false
+      } catch (e) {
+        error = e
+      }
+
       entry.state = STATE_EXECUTION_COMPLETED
+
+      if (threw) {
+        throw error
+      }
     }
 
     if (entry._passthruCompile ||
         (shouldOverwrite &&
          entry.extname === ".mjs")) {
       entry._passthruCompile = false
-      return compileFallback()
+      compileFallback()
+      return
     }
 
     const { compileData, runtime } = entry
@@ -136,7 +151,7 @@ function hook(Mod, parent) {
         }
       }
 
-      return compile(manager, entry, content, filename, compileFallback)
+      compile(manager, entry, content, filename, compileFallback)
     }
 
     if (shouldOverwrite) {
@@ -152,7 +167,7 @@ function hook(Mod, parent) {
     if ((compileData === null ||
          ! compileData.changed) &&
         passthruMap.get(func)) {
-      return tryPassthru.call(this, func, args, pkg)
+      tryPassthru.call(this, func, args, pkg)
     } else {
       mod._compile(readFile(filename, "utf8"), filename)
     }
