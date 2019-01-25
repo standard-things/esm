@@ -16,8 +16,7 @@ import realProcess from "../../real/process.js"
 import shared from "../../shared.js"
 
 const {
-  STATE_PARSING_COMPLETED,
-  STATE_PARSING_STARTED
+  STATE_PARSING_COMPLETED
 } = ENTRY
 
 function load(filename, parent, isMain = false, cache, loader) {
@@ -60,10 +59,6 @@ function load(filename, parent, isMain = false, cache, loader) {
       Loader.state.module.mainModule = mod
     }
   }
-
-  entry.state = parsing
-    ? STATE_PARSING_STARTED
-    : STATE_PARSING_COMPLETED
 
   if (! found) {
     const { _compile } = mod

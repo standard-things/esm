@@ -35,6 +35,8 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_PARSING_COMPLETED,
+  STATE_PARSING_STARTED,
   TYPE_ESM
 } = ENTRY
 
@@ -218,9 +220,9 @@ function tryCompileCached(entry, filename) {
   let result
   let threw = false
 
-  if (! parsing) {
-    entry.state = STATE_EXECUTION_STARTED
-  }
+  entry.state = parsing
+    ? STATE_PARSING_STARTED
+    : STATE_EXECUTION_STARTED
 
   const firstPass = runtime._runResult === void 0
 
@@ -305,9 +307,9 @@ function tryCompileCached(entry, filename) {
   }
 
   if (! threw) {
-    if (! parsing) {
-      entry.state = STATE_EXECUTION_COMPLETED
-    }
+    entry.state = parsing
+      ? STATE_PARSING_COMPLETED
+      : STATE_EXECUTION_COMPLETED
 
     if (isESM) {
       Reflect.defineProperty(mod, "loaded", {

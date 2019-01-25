@@ -83,10 +83,6 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     if (entry !== null) {
       entry.updateBindings()
 
-      if (entry.state < STATE_PARSING_COMPLETED) {
-        entry.state = STATE_PARSING_COMPLETED
-      }
-
       if (isDynamic &&
           entry.state === STATE_PARSING_COMPLETED &&
           entry.type === TYPE_ESM) {

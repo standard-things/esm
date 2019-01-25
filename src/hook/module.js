@@ -106,22 +106,8 @@ function hook(Mod, parent) {
 
     const compileFallback = () => {
       entry.state = STATE_EXECUTION_STARTED
-
-      let error
-      let threw = true
-
-      try {
-        tryPassthru.call(this, func, args, pkg)
-        threw = false
-      } catch (e) {
-        error = e
-      }
-
+      tryPassthru.call(this, func, args, pkg)
       entry.state = STATE_EXECUTION_COMPLETED
-
-      if (threw) {
-        throw error
-      }
     }
 
     if (entry._passthruCompile ||

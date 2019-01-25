@@ -25,10 +25,6 @@ function parseLoad(request, parent, isMain) {
 
   entry.updateBindings()
 
-  if (entry.state < STATE_PARSING_COMPLETED) {
-    entry.state = STATE_PARSING_COMPLETED
-  }
-
   if (entry.state === STATE_PARSING_COMPLETED) {
     const isESM = entry.type === TYPE_ESM
 
