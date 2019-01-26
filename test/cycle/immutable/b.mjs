@@ -6,6 +6,6 @@ const ns = getNS()
 
 assert.strictEqual(inspect(ns), "[Module] { default: <uninitialized> }")
 assert.strictEqual(Reflect.isExtensible(ns), true)
-assert.strictEqual(Reflect.defineProperty(ns, "a", { value: 1 }), false)
+assert.strictEqual(Reflect.defineProperty(ns, "b", { value: "b" }), false)
 assert.strictEqual(inspect(ns), "[Module] { default: <uninitialized> }")
 assert.strictEqual(Reflect.preventExtensions(ns), false)
