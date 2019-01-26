@@ -80,8 +80,6 @@ class Entry {
   constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
-    // The loaded state of the module.
-    this._loaded = LOAD_INCOMPLETE
     // The raw mutable namespace object for CJS importers.
     this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: void 0 })
     // The raw namespace object for CJS importers.
@@ -94,6 +92,8 @@ class Entry {
     this._finalize = null
     // The last child entry loaded.
     this._lastChild = null
+    // The loaded state of the module.
+    this._loaded = LOAD_INCOMPLETE
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
@@ -116,8 +116,6 @@ class Entry {
     this.children = { __proto__: null }
     // The circular import indicator.
     this.circular = false
-    // The namespace object which may have proxied exports.
-    this.namespace = this._namespace
     // The module dirname.
     this.dirname = null
     // The `module.exports` value at the time the module loaded.
@@ -136,12 +134,14 @@ class Entry {
     this.module = mod
     // The name of the module.
     this.name = null
+    // The namespace object which may have proxied exports.
+    this.namespace = this._namespace
     // The package data of the module.
     this.package = Package.from(mod)
-    // The paused state of the entry generator.
-    this.running = false
     // The `module.parent` entry.
     this.parent = Entry.get(mod.parent)
+    // The paused state of the entry generator.
+    this.running = false
     // The runtime object reference.
     this.runtime = null
     // Setters for assigning to local variables in parent modules.
