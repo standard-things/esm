@@ -1,9 +1,9 @@
 import ENTRY from "../../constant/entry.js"
 
-import cjsValidate from "../cjs/validate.js"
-import esmValidate from "./validate.js"
 import load from "./load.js"
 import shared from "../../shared.js"
+import validateDeep from "./validate-deep.js"
+import validateShallow from "./validate-shallow.js"
 
 const {
   STATE_PARSING_COMPLETED,
@@ -29,13 +29,13 @@ function parseLoad(request, parent, isMain) {
     const isESM = entry.type === TYPE_ESM
 
     if (isESM) {
-      esmValidate(entry)
+      validateDeep(entry)
     }
 
     load(request, parent, isMain)
 
     if (isESM) {
-      cjsValidate(entry)
+      validateShallow(entry)
     }
   }
 

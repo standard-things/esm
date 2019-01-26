@@ -11,12 +11,12 @@ const {
   ERR_EXPORT_MISSING
 } = errors
 
-function validate(entry) {
-  if (entry._cjsValidated) {
+function validateShallow(entry) {
+  if (entry._validatedShallow) {
     return
   }
 
-  entry._cjsValidated = true
+  entry._validatedShallow = true
 
   const { children } = entry
 
@@ -87,4 +87,4 @@ function validate(entry) {
   }
 }
 
-export default validate
+export default validateShallow

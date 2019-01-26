@@ -4,7 +4,6 @@ import CachingCompiler from "./caching-compiler.js"
 import Loader from "./loader.js"
 
 import builtinGlobal from "./builtin/global.js"
-import cjsValidate from "./module/cjs/validate.js"
 import errors from "./errors.js"
 import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
@@ -18,6 +17,7 @@ import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
 import toExternalError from "./util/to-external-error.js"
+import validateShallow from "./module/esm/validate-shallow.js"
 
 const {
   ERROR_GETTER,
@@ -243,7 +243,7 @@ const Runtime = {
 
               if (timerId === void 0) {
                 timerId = setImmediate(() => {
-                  cjsValidate(lastEntry)
+                  validateShallow(lastEntry)
                   resolvePromise(lastValue)
                 })
               }

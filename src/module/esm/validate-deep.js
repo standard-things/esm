@@ -13,12 +13,12 @@ const {
   ERR_EXPORT_MISSING
 } = errors
 
-function validate(entry) {
-  if (entry._esmValidated) {
+function validateDeep(entry) {
+  if (entry._validatedDeep) {
     return
   }
 
-  entry._esmValidated = true
+  entry._validatedDeep = true
 
   validateDependencies(entry)
 
@@ -28,7 +28,7 @@ function validate(entry) {
     const childEntry = children[childName]
 
     if (childEntry.type === TYPE_ESM) {
-      validate(childEntry)
+      validateDeep(childEntry)
     }
   }
 }
@@ -39,7 +39,9 @@ function isCyclicalExport(entry, exportedName, seen) {
   if (seen !== void 0 &&
       seen.has(name)) {
     return true
-  } else if (seen === void 0) {
+  }
+
+  if (seen === void 0) {
     seen = new Set
   }
 
@@ -153,4 +155,4 @@ function validateDependencies(entry) {
   }
 }
 
-export default validate
+export default validateDeep

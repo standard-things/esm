@@ -3,15 +3,15 @@ import ENTRY from "../../constant/entry.js"
 import Entry from "../../entry.js"
 import Module from "../../module.js"
 
-import cjsValidate from "../cjs/validate.js"
 import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import errors from "../../errors.js"
 import esmLoad from "./load.js"
-import esmValidate from "./validate.js"
 import isError from "../../util/is-error.js"
 import isPath from "../../util/is-path.js"
 import { resolve } from "../../safe/path.js"
 import shared from "../../shared.js"
+import validateDeep from "./validate-deep.js"
+import validateShallow from "./validate-shallow.js"
 
 const {
   ERR_INVALID_ESM_FILE_EXTENSION
@@ -58,9 +58,9 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     entry.updateBindings(null, UPDATE_TYPE_INIT)
 
     if (parentEntry.id === "<repl>") {
-      cjsValidate(parentEntry)
+      validateShallow(parentEntry)
     } else if (entry.type === TYPE_ESM) {
-      cjsValidate(entry)
+      validateShallow(entry)
     }
   }
 
@@ -86,7 +86,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
       if (isDynamic &&
           entry.state === STATE_PARSING_COMPLETED &&
           entry.type === TYPE_ESM) {
-        esmValidate(entry)
+        validateDeep(entry)
       }
     }
   } else {

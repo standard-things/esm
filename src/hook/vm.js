@@ -66,8 +66,8 @@ function hook(vm) {
     const compileDatas = entry.package.cache.compile
     const { runtimeName } = entry
 
-    entry._cjsValidated = false
-    entry._esmValidated = false
+    entry._validatedDeep = false
+    entry._validatedShallow = false
     entry._validation.clear()
     entry.cacheName = cacheName
 
