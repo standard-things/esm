@@ -481,7 +481,7 @@ function getInfo(dirPath, forceOptions) {
   }
 
   if (defaultPkg &&
-      defaultPkg.options.force === true) {
+      defaultPkg.options.force) {
     // Clone the default package to avoid the parsing phase fallback path
     // of module/internal/compile.
     pkg = defaultPkg.clone()

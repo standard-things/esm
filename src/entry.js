@@ -462,7 +462,7 @@ class Entry {
   }
 
   finalizeNamespace() {
-    if (this._namespaceFinalized === true) {
+    if (this._namespaceFinalized) {
       return this
     }
 
@@ -565,7 +565,7 @@ class Entry {
     for (const name in children) {
       const childEntry = children[name]
 
-      if (childEntry.running === true) {
+      if (childEntry.running) {
         continue
       }
 
