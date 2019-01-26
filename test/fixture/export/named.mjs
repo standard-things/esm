@@ -1,6 +1,6 @@
-const foo = "foo"
 const bar = "bar"
 const baz = "baz"
+const foo = "foo"
 
 export { foo }
 export { bar, baz }
