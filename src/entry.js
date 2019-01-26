@@ -711,14 +711,13 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const { getters } = entry
     const isESM = entry.type === TYPE_ESM
 
-    let errored
+    let errored = ! entry._namespaceFinalized
 
-    if (isESM) {
+    if (isESM &&
+        ! errored) {
       errored =
         ! Reflect.has(getters, name) ||
         getters[name]() === ERROR_GETTER
-    } else {
-      errored = entry._loaded !== LOAD_COMPLETED
     }
 
     if (errored &&
@@ -759,8 +758,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   }
 
   handler.preventExtensions = () => {
-    return entry.type === TYPE_ESM ||
-      entry._loaded === LOAD_COMPLETED
+    return entry._namespaceFinalized
   }
 }
 
@@ -768,8 +766,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
   "use sloppy"
 
   handler.defineProperty = (namespace, name, descriptor) => {
-    if ((entry.type === TYPE_ESM ||
-         entry._loaded === LOAD_COMPLETED) &&
+    if (entry._namespaceFinalized &&
         ! (descriptor.writable === false &&
            ! Reflect.has(descriptor, "value") &&
            Reflect.has(namespace, name)) &&
@@ -817,8 +814,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
 
 function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   handler.defineProperty = (namespace, name, descriptor) => {
-    if (entry.type !== TYPE_ESM &&
-        entry._loaded !== LOAD_COMPLETED) {
+    if (! entry._namespaceFinalized) {
       return false
     }
 
