@@ -1083,8 +1083,8 @@ describe("miscellaneous tests", () => {
     it("should support namespace objects of cyclical CJS modules", () =>
       Promise
         .all([
-          "./cycle/immutable/a.mjs",
-          "./cycle/mutable/a.js"
+          "./cycle/namespace/immutable/a.mjs",
+          "./cycle/namespace/mutable/a.js"
         ]
         .map((request) => import(request)))
     )
