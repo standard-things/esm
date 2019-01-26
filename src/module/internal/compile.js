@@ -191,7 +191,9 @@ function isDescendant(entry, parentEntry, seen) {
   if (seen !== void 0 &&
       seen.has(parentName)) {
     return false
-  } else if (seen === void 0) {
+  }
+
+  if (seen === void 0) {
     seen = new Set
   }
 
