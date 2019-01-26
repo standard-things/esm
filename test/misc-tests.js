@@ -1083,8 +1083,17 @@ describe("miscellaneous tests", () => {
     it("should support namespace objects of cyclical CJS modules", () =>
       Promise
         .all([
-          "./cycle/namespace/immutable/a.mjs",
-          "./cycle/namespace/mutable/a.js"
+          "./cycle/namespace/immutable/cjs/a.mjs",
+          "./cycle/namespace/mutable/cjs/a.js"
+        ]
+        .map((request) => import(request)))
+    )
+
+    it("should defer finalization of ESM namespace objects containing re-exports of CJS modules", () =>
+      Promise
+        .all([
+          "./cycle/namespace/immutable/re-export/a.mjs",
+          "./cycle/namespace/mutable/re-export/a.js"
         ]
         .map((request) => import(request)))
     )
