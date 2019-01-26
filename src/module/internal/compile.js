@@ -133,8 +133,22 @@ function compile(caller, entry, content, filename, fallback) {
         compileData.code = compileData.codeWithoutTDZ
       }
 
+      const { children } = entry
+
+      let shouldFinalize = true
+
+      for (const name in children) {
+        if (children[name].type !== TYPE_ESM) {
+          shouldFinalize = false
+          break
+        }
+      }
+
       entry.updateBindings()
-      entry.finalizeNamespace()
+
+      if (shouldFinalize) {
+        entry.finalizeNamespace()
+      }
 
       return result
     }
