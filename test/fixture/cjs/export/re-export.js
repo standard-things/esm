@@ -1,5 +1,5 @@
 "use strict"
 
-module.exports = require("./re-exort-nested")
+module.exports = require("./re-export-nested")
 
 require("./empty.js")

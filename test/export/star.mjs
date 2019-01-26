@@ -1,7 +1,7 @@
 import assert from "assert"
 import createNamespace from "../create-namespace.js"
 import def, { a, b } from "../fixture/export/star-with-default.mjs"
-import { c, d } from "../fixture/export/star-from/a.mjs"
+import { c, d } from "../fixture/export/star-from-default/a.mjs"
 import * as ns from "../fixture/export/star-without-default.mjs"
 
 export default () => {

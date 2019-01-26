@@ -1,3 +1,3 @@
-export * from "./d.js"
+export { default as d } from "./d.js"
 export * from "./e.mjs"
-export * from "./f.js"
+export { default as f } from "./f.js"

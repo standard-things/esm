@@ -15,6 +15,7 @@ import * as nsFunction from "../../fixture/cjs/export/function.js"
 import * as nsGetSet from "../../fixture/cjs/export/get-set.js"
 import * as nsPseudo from "../../fixture/cjs/export/pseudo.js"
 import * as nsPseudoEmpty from "../../fixture/cjs/export/pseudo-empty.js"
+import * as nsStarMixed from "../../fixture/cjs/export/star-mixed"
 
 export default () => {
   let ns = createNamespace({ 0: "a", default: defaultArray })
@@ -58,11 +59,13 @@ export default () => {
   ns = createNamespace({})
   assert.deepStrictEqual(nsPseudoEmpty, ns)
 
+  ns = createNamespace({ a: "a", b: "b", c: "c", d: "d", e: "e" })
+  assert.deepStrictEqual(nsStarMixed, ns)
+
   assert.strictEqual(nsGetSet.safe, "safe get")
   assert.strictEqual(Reflect.getPrototypeOf(defaultEmpty), Object.prototype)
 
   assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
-
-  assert.deepStrictEqual(defaultReExport, { a: "re-export-nested" })
+  assert.deepStrictEqual(defaultReExport, {})
 }
