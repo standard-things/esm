@@ -16,7 +16,7 @@ const skiplistPath = path.resolve(fixturePath, "skiplist")
 const test262Path = path.resolve("vendor/test262")
 const wrapperPath = path.resolve(fixturePath, "wrapper.js")
 
-const skipRegExp = /^(#.*)\n([^#\n].*)/gm
+const parseRegExp = /^(#.*)\n([^#\n].*)/gm
 const skiplist = parseSkiplist(skiplistPath)
 
 const test262Tests = globby.sync([
@@ -42,7 +42,7 @@ function parseSkiplist(filename) {
 
   let match
 
-  while ((match = skipRegExp.exec(content))) {
+  while ((match = parseRegExp.exec(content))) {
     let [, comment, filename] = match
 
     filename = path.resolve(test262Path, filename)
