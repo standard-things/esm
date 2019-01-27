@@ -42,6 +42,8 @@ const {
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
+  NAMESPACE_FINALIZATION_COMPLETED,
+  NAMESPACE_FINALIZATION_INCOMPLETE,
   SETTER_TYPE_DYNAMIC_IMPORT,
   SETTER_TYPE_EXPORT_FROM,
   SETTER_TYPE_NAMESPACE,
@@ -97,7 +99,7 @@ class Entry {
     // The raw namespace object without proxied exports.
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
-    this._namespaceFinalized = false
+    this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
     // The passthru indicator for `module._compile()`.
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
@@ -462,11 +464,11 @@ class Entry {
   }
 
   finalizeNamespace() {
-    if (this._namespaceFinalized) {
+    if (this._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED) {
       return this
     }
 
-    this._namespaceFinalized = true
+    this._namespaceFinalized = NAMESPACE_FINALIZATION_COMPLETED
 
     // Table 29: Internal Slots of Module Namespace Exotic Objects
     // Properties should be assigned in `Array#sort()` order.
@@ -711,7 +713,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const { getters } = entry
     const isESM = entry.type === TYPE_ESM
 
-    let errored = ! entry._namespaceFinalized
+    let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
 
     if (isESM &&
         ! errored) {
@@ -758,7 +760,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   }
 
   handler.preventExtensions = () => {
-    return entry._namespaceFinalized
+    return entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED
   }
 }
 
@@ -766,7 +768,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
   "use sloppy"
 
   handler.defineProperty = (namespace, name, descriptor) => {
-    if (entry._namespaceFinalized &&
+    if (entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED &&
         ! (descriptor.writable === false &&
            ! Reflect.has(descriptor, "value") &&
            Reflect.has(namespace, name)) &&
@@ -814,7 +816,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
 
 function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   handler.defineProperty = (namespace, name, descriptor) => {
-    if (! entry._namespaceFinalized) {
+    if (entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED) {
       return false
     }
 

@@ -23,10 +23,11 @@ const {
   ERROR_GETTER,
   ERROR_STAR,
   LOAD_COMPLETED,
+  NAMESPACE_FINALIZATION_COMPLETED,
+  NAMESPACE_FINALIZATION_DEFERRED,
   SETTER_TYPE_DYNAMIC_IMPORT,
   SETTER_TYPE_EXPORT_FROM,
   SETTER_TYPE_NAMESPACE,
-  TYPE_CJS,
   TYPE_ESM,
   UPDATE_TYPE_LIVE
 } = ENTRY
@@ -51,7 +52,14 @@ const Runtime = {
   },
   addExportFromSetter(importedName, exportedName = importedName) {
     const setter = createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
-      this.entry.addGetterFrom(childEntry, importedName, exportedName)
+      const { entry } = this
+
+      if (childEntry.type !== TYPE_ESM &&
+          entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED) {
+        entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
+      }
+
+      entry.addGetterFrom(childEntry, importedName, exportedName)
     })
 
     setter.exportedName = exportedName
@@ -62,20 +70,28 @@ const Runtime = {
   },
   addNamespaceSetter() {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
+      const childGetters = childEntry.getters
+      const childIsESM = childEntry.type === TYPE_ESM
+
       const { entry } = this
       const { getters, name } = entry
 
-      const {
-        getters:childGetters,
-        type:childType
-      } = childEntry
+      const parentNamedExports =
+        entry.extname !== ".mjs" &&
+        entry.package.options.cjs.namedExports
 
-      if ((entry.type === TYPE_ESM &&
-           childType !== TYPE_ESM &&
-           entry.extname === ".mjs") ||
-          (childType === TYPE_CJS &&
-           ! childEntry.package.options.cjs.namedExports)) {
+      const noNamedExports =
+        ! childEntry.builtin &&
+        ! parentNamedExports &&
+        ! childIsESM
+
+      if (noNamedExports) {
         return
+      }
+
+      if (! childIsESM &&
+          entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED) {
+        entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
       }
 
       for (const exportedName in childEntry._namespace) {

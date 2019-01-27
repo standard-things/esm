@@ -33,6 +33,7 @@ const {
 } = COMPILER
 
 const {
+  NAMESPACE_FINALIZATION_DEFERRED,
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   STATE_PARSING_COMPLETED,
@@ -133,20 +134,9 @@ function compile(caller, entry, content, filename, fallback) {
         compileData.code = compileData.codeWithoutTDZ
       }
 
-      const { children } = entry
-
-      let shouldFinalize = true
-
-      for (const name in children) {
-        if (children[name].type !== TYPE_ESM) {
-          shouldFinalize = false
-          break
-        }
-      }
-
       entry.updateBindings()
 
-      if (shouldFinalize) {
+      if (entry._namespaceFinalized !== NAMESPACE_FINALIZATION_DEFERRED) {
         entry.finalizeNamespace()
       }
 
