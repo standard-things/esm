@@ -956,8 +956,6 @@ function getBuiltinExportNames(exported) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const { type } = entry
-
   const parentCJS = parentEntry.package.options.cjs
   const parentIsMJS = parentEntry.extname === ".mjs"
 
@@ -976,7 +974,7 @@ function getExportByName(entry, name, parentEntry) {
   const noNamedExports =
     ! entry.builtin &&
     ! parentNamedExports &&
-    type !== TYPE_ESM
+    entry.type !== TYPE_ESM
 
   if (name === "*") {
     if (noMutableNamespace) {
@@ -991,11 +989,8 @@ function getExportByName(entry, name, parentEntry) {
   }
 
   if (noNamedExports &&
-      type !== TYPE_CJS &&
       name === "default") {
-    return noMutableNamespace
-      ? entry.cjsNamespace.default
-      : entry.cjsMutableNamespace.default
+    return entry.exports
   }
 
   const { getters } = entry
