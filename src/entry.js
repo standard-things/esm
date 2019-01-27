@@ -960,45 +960,45 @@ function getExportByName(entry, name, parentEntry) {
   const parentCJS = parentEntry.package.options.cjs
   const parentIsMJS = parentEntry.extname === ".mjs"
 
-  const parentMutableNamespace =
-    ! parentIsMJS &&
-    parentCJS.mutableNamespace
-
   const parentNamedExports =
     ! parentIsMJS &&
     parentCJS.namedExports
-
-  const noMutableNamespace =
-    ! parentMutableNamespace ||
-    entry.extname === ".mjs"
 
   const noNamedExports =
     ! entry.builtin &&
     ! parentNamedExports &&
     entry.type !== TYPE_ESM
 
-  if (name === "*") {
-    if (noMutableNamespace) {
-      return noNamedExports
-        ? entry.cjsNamespace
-        : entry.esmNamespace
-    }
-
-    return noNamedExports
-      ? entry.cjsMutableNamespace
-      : entry.esmMutableNamespace
-  }
-
   if (noNamedExports &&
       name === "default") {
     return entry.exports
   }
 
-  const { getters } = entry
+  if (name !== "*") {
+    const { getters } = entry
 
-  return Reflect.has(getters, name)
-    ? tryGetter(getters[name])
-    : ERROR_GETTER
+    return Reflect.has(getters, name)
+      ? tryGetter(getters[name])
+      : ERROR_GETTER
+  }
+
+  const parentMutableNamespace =
+    ! parentIsMJS &&
+    parentCJS.mutableNamespace
+
+  const noMutableNamespace =
+    ! parentMutableNamespace ||
+    entry.extname === ".mjs"
+
+  if (noMutableNamespace) {
+    return noNamedExports
+      ? entry.cjsNamespace
+      : entry.esmNamespace
+  }
+
+  return noNamedExports
+    ? entry.cjsMutableNamespace
+    : entry.esmMutableNamespace
 }
 
 function getExportByNameFast(entry, name, parentEntry) {
