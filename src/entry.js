@@ -759,8 +759,9 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
       Reflect.has(namespace, name)
   }
 
-  handler.preventExtensions = () => {
-    return entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED
+  handler.preventExtensions = (namespace) => {
+    return entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED &&
+      Reflect.preventExtensions(namespace)
   }
 }
 
