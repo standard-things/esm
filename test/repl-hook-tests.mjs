@@ -94,9 +94,9 @@ describe("REPL hook tests", () => {
       }
     })
 
-    r.eval('import { NOT_EXPORTED } from "path"', (error1) => {
+    r.eval('import { NOT_EXPORTED } from "path"', ({ message }) => {
       r.eval('import { join } from "path"', (error2) => {
-        assert.ok(error1.message.includes("does not provide an export"))
+        assert.ok(message.includes("does not provide an export"))
         assert.strictEqual(error2, null)
       })
     })

@@ -296,8 +296,8 @@ function tryCompileCached(entry, filename) {
           input: ""
         }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
 
-        error.inModule = true
         error.column = firstAwaitOutsideFunction.column
+        error.inModule = true
         error.line = firstAwaitOutsideFunction.line
 
         throw error
