@@ -1089,7 +1089,16 @@ describe("miscellaneous tests", () => {
         .map((request) => import(request)))
     )
 
-    it("should defer finalization of ESM namespace objects containing re-exports of CJS modules", () =>
+    it("should not defer finalization of ESM namespace objects", () =>
+      Promise
+        .all([
+          "./cycle/namespace/immutable/no-re-export-cjs/a.mjs",
+          "./cycle/namespace/mutable/no-re-export-cjs/a.js"
+        ]
+        .map((request) => import(request)))
+    )
+
+    it("should defer finalization of ESM namespace objects containing re-exports of non-ES modules", () =>
       Promise
         .all([
           "./cycle/namespace/immutable/re-export/a.mjs",
