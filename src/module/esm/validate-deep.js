@@ -24,8 +24,8 @@ function validateDeep(entry) {
 
   const { children } = entry
 
-  for (const childName in children) {
-    const childEntry = children[childName]
+  for (const name in children) {
+    const childEntry = children[name]
 
     if (childEntry.type === TYPE_ESM) {
       validateDeep(childEntry)
@@ -58,18 +58,19 @@ function isCyclicalExport(entry, exportedName, seen) {
 }
 
 function validateDependencies(entry) {
-  const { children } = entry
-
-  const namedExports =
+  const parentNamedExports =
     entry.package.options.cjs.namedExports &&
     entry.extname !== ".mjs"
+
+  const { children } = entry
 
   for (const name in children) {
     const childEntry = children[name]
 
-    if (childEntry.builtin) {
-      continue
-    }
+    const noNamedExports =
+      ! childEntry.builtin &&
+      ! parentNamedExports &&
+      childEntry.type !== TYPE_ESM
 
     const cache = childEntry._validation
     const settersMap = childEntry.setters
@@ -133,7 +134,7 @@ function validateDependencies(entry) {
           throw constructStackless(ErrorCtor, [childEntry.module, exportedName])
         }
       }
-    } else if (! namedExports) {
+    } else if (noNamedExports) {
       for (const exportedName in settersMap) {
         if (exportedName === "*" ||
             exportedName === "default") {

@@ -18,17 +18,21 @@ function validateShallow(entry) {
 
   entry._validatedShallow = true
 
-  const { children } = entry
-
-  const namedExports =
+  const parentNamedExports =
     entry.package.options.cjs.namedExports &&
     entry.extname !== ".mjs"
+
+  const { children } = entry
 
   for (const name in children) {
     const childEntry = children[name]
 
-    if (! namedExports &&
-        childEntry.type !== TYPE_ESM) {
+    const noNamedExports =
+      ! childEntry.builtin &&
+      ! parentNamedExports &&
+      childEntry.type !== TYPE_ESM
+
+    if (noNamedExports) {
       continue
     }
 
