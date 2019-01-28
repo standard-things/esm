@@ -32,7 +32,7 @@ describe("test builtin modules", function () {
         runMainLoader(dirPath)
       ])
       .then(([builtin, loader]) =>
-        assert.strictEqual(builtin.stdout, loader.stdout)
+        assert.strictEqual(loader.stdout, builtin.stdout)
       )
   })
 })

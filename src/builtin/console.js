@@ -1,5 +1,3 @@
-import { stderr, stdout } from "../safe/process.js"
-
 import ENV from "../constant/env.js"
 
 import GenericFunction from "../generic/function.js"
@@ -14,11 +12,13 @@ import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
+import isUpdatableGet from "../util/is-updatable-get.js"
 import keys from "../util/keys.js"
 import ownKeys from "../util/own-keys.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
+import safeProcess from "../safe/process.js"
 import setDeferred from "../util/set-deferred.js"
 import shared from "../shared.js"
 import toString from "../util/to-string.js"
@@ -36,6 +36,7 @@ function init() {
 
   const builtinLog = wrapBuiltin(RealProto.log)
   const dirOptions = { customInspect: true }
+  const safeConsoleSymbols = Object.getOwnPropertySymbols(safeConsole)
 
   // Assign `console` to a variable so it's not removed by
   // `babel-plugin-transform-remove-console`.
@@ -53,14 +54,38 @@ function init() {
   ])
 
   let builtinMethodMap
-  let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
+  let isConsoleSymbol = findByRegExp(safeConsoleSymbols, /IsConsole/i)
 
-  if (isConsoleSymbol === void 0) {
+  if (typeof isConsoleSymbol !== "symbol") {
     isConsoleSymbol = Symbol("kIsConsole")
   }
 
   function assertWrapper(func, [expression, ...rest]) {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
+  }
+
+  function createConsole({ stderr, stdout }) {
+    const args = RealConsole.length === 2
+      ? [stdout, stderr]
+      : [{ stderr, stdout }]
+
+    const builtinConsole = Reflect.construct(Console, args)
+    const { prototype } = Console
+
+    for (const name of RealProtoNames) {
+      if (isKeyAssignable(name) &&
+          ! has(builtinConsole, name)) {
+        copyProperty(builtinConsole, prototype, name)
+      }
+    }
+
+    Reflect.setPrototypeOf(builtinConsole, GenericObject.create())
+
+    return builtinConsole
+  }
+
+  function defaultWrapper(func, args) {
+    return Reflect.apply(func, this, transform(args, toCustomInspectable))
   }
 
   function dirWrapper(func, [object, options]) {
@@ -76,10 +101,6 @@ function init() {
         return builtinUtil.inspect(object, contextAsOptions)
       }
     }, dirOptions])
-  }
-
-  function defaultWrapper(func, args) {
-    return Reflect.apply(func, this, transform(args, toCustomInspectable))
   }
 
   function findByRegExp(array, regexp) {
@@ -107,6 +128,11 @@ function init() {
     ])
   }
 
+  function isKeyAssignable(name) {
+    return name !== "Console" &&
+      name !== "constructor"
+  }
+
   function toCustomInspectable(value) {
     if (! isObjectLike(value)) {
       return value
@@ -132,6 +158,14 @@ function init() {
     }
 
     return array
+  }
+
+  function tryCreateConsole(processObject) {
+    try {
+      return createConsole(processObject)
+    } catch {}
+
+    return null
   }
 
   function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
@@ -181,24 +215,25 @@ function init() {
   const { prototype } = Console
 
   for (const name of RealProtoNames) {
-    const value = wrapperMap.get(name)
+    if (! isKeyAssignable(name)) {
+      continue
+    }
 
-    if (value !== void 0) {
-      prototype[name] = value
-    } else if (name !== "constructor") {
+    const wrapped = wrapperMap.get(name)
+
+    if (wrapped !== void 0 &&
+        Reflect.getOwnPropertyDescriptor(RealProto, name).writable === true) {
+      prototype[name] = wrapped
+    } else {
       copyProperty(prototype, RealProto, name)
     }
   }
 
-  const builtinConsole = new Console(stdout, stderr)
+  const builtinConsole = tryCreateConsole(safeProcess)
 
-  for (const name of RealProtoNames) {
-    if (! has(builtinConsole, name)) {
-      copyProperty(builtinConsole, prototype, name)
-    }
+  if (builtinConsole === null) {
+    return realConsole
   }
-
-  Reflect.setPrototypeOf(builtinConsole, GenericObject.create())
 
   if (HAS_INSPECTOR &&
       FLAGS.inspect) {
@@ -209,6 +244,10 @@ function init() {
       const emptyConfig = {}
 
       for (const name of builtinNames) {
+        if (! isKeyAssignable(name)) {
+          continue
+        }
+
         const builtinFunc = builtinConsole[name]
 
         setDeferred(builtinConsole, name, () => {
@@ -235,16 +274,17 @@ function init() {
     const globalNames = keys(globalConsole)
 
     for (const name of globalNames) {
-      if (name !== "Console" &&
-          has(builtinConsole, name)) {
-        // eslint-disable-next-line no-console
-        const consoleFunc = globalConsole[name]
-        const builtinFunc = builtinConsole[name]
+      if (! isKeyAssignable(name) ||
+          ! has(builtinConsole, name)) {
+        continue
+      }
 
-        if (typeof builtinFunc === "function" &&
-            typeof consoleFunc === "function") {
-          builtinConsole[name] = consoleFunc
-        }
+      const consoleFunc = globalConsole[name]
+      const builtinFunc = builtinConsole[name]
+
+      if (typeof builtinFunc === "function" &&
+          typeof consoleFunc === "function") {
+        builtinConsole[name] = consoleFunc
       }
     }
   }
@@ -254,12 +294,13 @@ function init() {
   for (const name of safeNames) {
     if (name === "Console") {
       builtinConsole.Console = Console
-    } else if (! has(builtinConsole, name)) {
+    } else if (isKeyAssignable(name) &&
+        ! has(builtinConsole, name)) {
       copyProperty(builtinConsole, safeConsole, name)
     }
   }
 
-  if (!  has(Console, Symbol.hasInstance)) {
+  if (! has(Console, Symbol.hasInstance)) {
     Reflect.defineProperty(Console, Symbol.hasInstance, {
       value: (instance) => instance[isConsoleSymbol]
     })
@@ -270,9 +311,12 @@ function init() {
       const value = Reflect.get(globalConsole, name, receiver)
       const builtinMethod = getBuiltinMethodMap().get(value)
 
-      return builtinMethod === void 0
-        ? value
-        : builtinMethod
+      if (builtinMethod !== void 0 &&
+          isUpdatableGet(globalConsole, name)) {
+        return builtinMethod
+      }
+
+      return value
     },
     getOwnPropertyDescriptor(globalConsole, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(globalConsole, name)
