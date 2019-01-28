@@ -163,13 +163,13 @@ function init() {
           }
         }
 
-        if (receiver === proxy) {
-          receiver = exported
-        }
-
         if (! isUpdatable) {
           exported[name] = value
           return false
+        }
+
+        if (receiver === proxy) {
+          receiver = exported
         }
 
         const hasSetter = getSetter(exported, name) !== void 0
