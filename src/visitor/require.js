@@ -25,8 +25,8 @@ function init() {
         return
       }
 
-      if (getShadowed(path, "require", shadowedMap) ||
-          node.arguments.length === 0) {
+      if (node.arguments.length === 0 ||
+          getShadowed(path, "require", shadowedMap)) {
         return
       }
 
