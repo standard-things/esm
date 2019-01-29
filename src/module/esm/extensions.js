@@ -19,6 +19,7 @@ extensions[".json"] = function (mod, filename) {
     mod.exports = SafeJSON.parse(content)
   } catch (e) {
     e.message = filename + ": " + toString(e.message)
+
     throw e
   }
 }

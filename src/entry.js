@@ -244,7 +244,6 @@ class Entry {
         }
       })
 
-      this.exports = proxyExports(this)
       this.namespace = proxy
 
       return TYPE_CJS

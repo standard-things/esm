@@ -29,7 +29,7 @@ import shared from "../shared.js"
 
 function init() {
   function proxyExports(entry) {
-    const exported = entry.exports
+    const exported = entry.module.exports
 
     if (! isObjectLike(exported)) {
       return exported
