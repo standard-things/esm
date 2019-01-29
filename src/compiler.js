@@ -83,11 +83,10 @@ function init() {
       const possibleEvalIndexes = findIndexes(code, ["eval"])
       const possibleIndexes = findIndexes(code, ["import"])
 
-      const possibleChanges = !! (
-        possibleExportIndexes.length ||
-        possibleEvalIndexes.length ||
-        possibleIndexes.length
-      )
+      const possibleChanges =
+        possibleExportIndexes.length !== 0 ||
+        possibleEvalIndexes.length !== 0 ||
+        possibleIndexes.length !== 0
 
       if (! possibleChanges &&
           (sourceType === SOURCE_TYPE_SCRIPT ||
@@ -174,28 +173,24 @@ function init() {
           addedImport) {
         const { globals } = globalsVisitor
         const possibleGlobalsNames = keys(globals)
-        const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
 
-        if (possibleGlobalsIndexes.length !== 0) {
-          for (const name of possibleGlobalsNames) {
-            if (Reflect.has(identifiers, name)) {
-              Reflect.deleteProperty(globals, name)
-            }
+        for (const name of possibleGlobalsNames) {
+          if (Reflect.has(identifiers, name)) {
+            Reflect.deleteProperty(globals, name)
           }
+        }
 
-          if (! isObjectEmpty(globals)) {
-            globalsVisitor.visit(rootPath, {
-              globals,
-              magicString,
-              possibleIndexes: possibleGlobalsIndexes,
-              runtimeName
-            })
-          }
+        if (! isObjectEmpty(globals)) {
+          globalsVisitor.visit(rootPath, {
+            globals,
+            magicString,
+            possibleIndexes: findIndexes(code, possibleGlobalsNames),
+            runtimeName
+          })
         }
       }
 
-      if (possibleEvalIndexes.length !== 0 &&
-          ! Reflect.has(identifiers, "eval")) {
+      if (! Reflect.has(identifiers, "eval")) {
         evalVisitor.visit(rootPath, {
           addedExport,
           magicString,
@@ -208,13 +203,9 @@ function init() {
       if (addedExport ||
           addedImport) {
         if (options.cjsVars) {
-          const possibleRequireIndexes = findIndexes(code, ["require"])
-
-          if (possibleRequireIndexes.length !== 0) {
-            requireVisitor.visit(rootPath, {
-              possibleIndexes: possibleRequireIndexes
-            })
-          }
+          requireVisitor.visit(rootPath, {
+            possibleIndexes: findIndexes(code, ["require"])
+          })
         }
 
         const { assignableBindings } = importExportVisitor
@@ -223,22 +214,18 @@ function init() {
           ? {}
           : top.importedBindings
 
-        const possibleAssignmentIndexes = findIndexes(code, [
-          ...keys(importedBindings),
-          ...keys(assignableBindings)
-        ])
-
-        if (possibleAssignmentIndexes.length !== 0) {
-          assignmentVisitor.visit(rootPath, {
-            addedExport,
-            addedImport,
-            assignableBindings,
-            importedBindings,
-            magicString,
-            possibleIndexes: possibleAssignmentIndexes,
-            runtimeName
-          })
-        }
+        assignmentVisitor.visit(rootPath, {
+          addedExport,
+          addedImport,
+          assignableBindings,
+          importedBindings,
+          magicString,
+          possibleIndexes: findIndexes(code, [
+            ...keys(importedBindings),
+            ...keys(assignableBindings)
+          ]),
+          runtimeName
+        })
 
         importExportVisitor.finalizeHoisting()
       }
@@ -256,26 +243,22 @@ function init() {
           require: true
         }
 
-        const possibleNames = []
+        const undeclaredNames = []
 
         for (const name in undeclaredIdentifiers) {
           if (Reflect.has(identifiers, name)) {
             Reflect.deleteProperty(undeclaredIdentifiers, name)
           } else {
-            possibleNames.push(name)
+            undeclaredNames.push(name)
           }
         }
 
-        const possibleArgumentsIndexes = findIndexes(code, possibleNames)
-
-        if (possibleArgumentsIndexes.length) {
-          argumentsVisitor.visit(rootPath, {
-            magicString,
-            possibleIndexes: possibleArgumentsIndexes,
-            runtimeName,
-            undeclaredIdentifiers
-          })
-        }
+        argumentsVisitor.visit(rootPath, {
+          magicString,
+          possibleIndexes: findIndexes(code, undeclaredNames),
+          runtimeName,
+          undeclaredIdentifiers
+        })
       }
 
       if (argumentsVisitor.changed ||

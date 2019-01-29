@@ -68,10 +68,14 @@ function init() {
     visit(rootPath, options) {
       this.reset(options)
 
-      const possibleIndexes = this.possibleIndexes || []
+      const { possibleIndexes } = this
+
+      if (! Array.isArray(possibleIndexes) ||
+          possibleIndexes.length === 0) {
+        return
+      }
 
       this.possibleEnd = possibleIndexes.length
-      this.possibleIndexes = possibleIndexes
       this.possibleStart = 0
 
       this.visitWithoutReset(rootPath)
