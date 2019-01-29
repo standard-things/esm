@@ -45,9 +45,7 @@ function cleanJS() {
 function cleanPackageJSON() {
   const content = fs.readFileSync(pkgPath, "utf8")
 
-  process.once("exit", () => {
-    fs.outputFileSync(pkgPath, content)
-  })
+  process.once("exit", () => fs.outputFileSync(pkgPath, content))
 
   const pkgJSON = JSON.parse(content)
 
