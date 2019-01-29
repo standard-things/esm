@@ -12,10 +12,10 @@ function init() {
   function setProperty(object, name, value) {
     if (isObjectLike(object)) {
       dataDescriptor.value = value
-      Reflect.defineProperty(object, name, dataDescriptor)
+      return Reflect.defineProperty(object, name, dataDescriptor)
     }
 
-    return object
+    return false
   }
 
   return setProperty
