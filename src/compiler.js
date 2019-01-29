@@ -229,19 +229,22 @@ function init() {
 
       if (sourceType === SOURCE_TYPE_MODULE &&
           ! options.cjsVars) {
+        const undeclaredIdentifiers = {
+          __proto__: null,
+          __dirname: true,
+          __filename: true,
+          arguments: true,
+          exports: true,
+          module: true,
+          require: true
+        }
+
         const possibleNames = []
 
-        const names = [
-          "__dirname",
-          "__filename",
-          "arguments",
-          "exports",
-          "module",
-          "require"
-        ]
-
-        for (const name of names) {
-          if (! Reflect.has(importedBindings, name)) {
+        for (const name in undeclaredIdentifiers) {
+          if (Reflect.has(identifiers, name)) {
+            Reflect.deleteProperty(undeclaredIdentifiers, name)
+          } else {
             possibleNames.push(name)
           }
         }
@@ -253,7 +256,7 @@ function init() {
             magicString,
             possibleIndexes,
             runtimeName,
-            top
+            undeclaredIdentifiers
           })
         }
       }

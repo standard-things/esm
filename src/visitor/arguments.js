@@ -15,50 +15,34 @@ function init() {
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
-      this.top = null
+      this.undeclaredIdentifiers = null
 
       if (options !== void 0) {
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
-        this.top = options.top
+        this.undeclaredIdentifiers = options.undeclaredIdentifiers
       }
     }
 
     visitIdentifier(path) {
       const node = path.getValue()
       const { name } = node
-      const isArgs = name === "arguments"
 
-      if (! isArgs &&
-          name !== "__dirname" &&
-          name !== "__filename" &&
-          name !== "exports" &&
-          name !== "module" &&
-          name !== "require") {
+      if (! Reflect.has(this.undeclaredIdentifiers, name) ||
+          ! isIdentifer(node, parent) ||
+          getShadowed(path, name, shadowedMap)) {
         return
       }
 
       const parent = path.getParentNode()
       const { runtimeName } = this
-      const { type } = parent
 
-      const isTypeOf =
-        type === "UnaryExpression" &&
-        parent.operator === "typeof"
-
-      if (isArgs &&
-          isTypeOf &&
-          ! getShadowed(path, name, shadowedMap)) {
+      if (parent.type === "UnaryExpression" &&
+          parent.operator === "typeof") {
         this.changed = true
 
         overwrite(this, node.start, node.end, "void " + runtimeName)
-        return
-      }
-
-      if (isTypeOf ||
-          ! isIdentifer(node, parent) ||
-          getShadowed(path, name, shadowedMap)) {
         return
       }
 
