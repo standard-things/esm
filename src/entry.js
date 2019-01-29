@@ -515,21 +515,34 @@ class Entry {
       }
     }
 
-    const isWASM = this.type === TYPE_WASM
+    if (this.type === TYPE_ESM ||
+        this.type === TYPE_WASM) {
+      let exported = this.exports
 
-    if (isWASM ||
-        this.type === TYPE_ESM) {
-      const exported = this.exports
-      const names = isWASM ? keys(exported) : void 0
+      const names = keys(exported)
 
       this._loaded = LOAD_COMPLETED
       this.namespace = this._namespace
       this.assignExportsToNamespace(names)
 
       if (this.package.options.cjs.interop &&
-          this.extname !== ".mjs" &&
-          ! Reflect.has(this.getters, "__esModule")) {
-        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+          this.extname !== ".mjs") {
+        if (names.length === 1 &&
+            names[0] === "default") {
+          const exportedDefault = exported.default
+
+          if (isObjectLike(exportedDefault) &&
+              ! has(exportedDefault, "default") &&
+              setProperty(exportedDefault, "default", exportedDefault)) {
+            exported = exportedDefault
+            this.exports = exportedDefault
+            this.module.exports = exportedDefault
+          }
+        }
+
+        if (! has(exported, "__esModule")) {
+          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+        }
       }
     } else {
       const exported = mod.exports
