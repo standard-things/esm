@@ -46,6 +46,7 @@ function init() {
     mjs: Symbol.for(PACKAGE_PREFIX + ':Module._extensions[".mjs"]'),
     namespace: Symbol.for(PACKAGE_PREFIX + ":namespace"),
     package: Symbol.for(PACKAGE_PREFIX + ":package"),
+    proxy: Symbol.for(PACKAGE_PREFIX + ":proxy"),
     realGetProxyDetails: Symbol.for(PACKAGE_PREFIX + ":realGetProxyDetails"),
     realRequire: Symbol.for(PACKAGE_PREFIX + ":realRequire"),
     runtime: Symbol.for(PACKAGE_PREFIX + ":runtime"),

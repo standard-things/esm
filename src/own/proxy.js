@@ -1,12 +1,6 @@
-import ESM from "../constant/esm.js"
-
 import shared from "../shared.js"
 
 function init() {
-  const {
-    PACKAGE_PREFIX
-  } = ESM
-
   const customInspectDescriptor = {
     value: () => "{}"
   }
@@ -24,7 +18,7 @@ function init() {
       const maskedHandler = { __proto__: handler }
 
       Reflect.defineProperty(maskedHandler, shared.customInspectKey, customInspectDescriptor)
-      Reflect.defineProperty(maskedHandler, PACKAGE_PREFIX + ":proxy", markerDescriptor)
+      Reflect.defineProperty(maskedHandler, shared.symbol.proxy, markerDescriptor)
 
       const proxy = new Proxy(target, maskedHandler)
 
