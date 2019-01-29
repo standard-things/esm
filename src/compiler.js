@@ -15,6 +15,7 @@ import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
 import isObjectEmpty from "./util/is-object-empty.js"
 import keys from "./util/keys.js"
+import requireVisitor from "./visitor/require.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
 import temporalVisitor from "./visitor/temporal.js"
@@ -50,6 +51,7 @@ function init() {
       evalVisitor.reset()
       globalsVisitor.reset()
       importExportVisitor.reset()
+      requireVisitor.reset()
       temporalVisitor.reset()
 
       const result = {
@@ -127,7 +129,7 @@ function init() {
       }
 
       const { strict, top } = ast
-      const { identifiers, importedBindings } = top
+      const { identifiers } = top
       const { runtimeName } = options
 
       Reflect.deleteProperty(ast, "top")
@@ -174,7 +176,7 @@ function init() {
         const possibleGlobalsNames = keys(globals)
         const possibleGlobalsIndexes = findIndexes(code, possibleGlobalsNames)
 
-        if (possibleGlobalsIndexes.length) {
+        if (possibleGlobalsIndexes.length !== 0) {
           for (const name of possibleGlobalsNames) {
             if (Reflect.has(identifiers, name)) {
               Reflect.deleteProperty(globals, name)
@@ -192,7 +194,7 @@ function init() {
         }
       }
 
-      if (possibleEvalIndexes.length &&
+      if (possibleEvalIndexes.length !== 0 &&
           ! Reflect.has(identifiers, "eval")) {
         evalVisitor.visit(rootPath, {
           addedExport,
@@ -205,21 +207,35 @@ function init() {
 
       if (addedExport ||
           addedImport) {
+        if (options.cjsVars) {
+          const possibleRequireIndexes = findIndexes(code, ["require"])
+
+          if (possibleRequireIndexes.length !== 0) {
+            requireVisitor.visit(rootPath, {
+              possibleIndexes: possibleRequireIndexes
+            })
+          }
+        }
+
         const { assignableBindings } = importExportVisitor
 
-        const possibleIndexes = findIndexes(code, [
+        const importedBindings = requireVisitor.found
+          ? {}
+          : top.importedBindings
+
+        const possibleAssignmentIndexes = findIndexes(code, [
           ...keys(importedBindings),
           ...keys(assignableBindings)
         ])
 
-        if (possibleIndexes.length) {
+        if (possibleAssignmentIndexes.length !== 0) {
           assignmentVisitor.visit(rootPath, {
             addedExport,
             addedImport,
             assignableBindings,
             importedBindings,
             magicString,
-            possibleIndexes,
+            possibleIndexes: possibleAssignmentIndexes,
             runtimeName
           })
         }
@@ -231,6 +247,7 @@ function init() {
           ! options.cjsVars) {
         const undeclaredIdentifiers = {
           __proto__: null,
+          // eslint-disable-next-line sort-keys
           __dirname: true,
           __filename: true,
           arguments: true,
@@ -249,12 +266,12 @@ function init() {
           }
         }
 
-        const possibleIndexes = findIndexes(code, possibleNames)
+        const possibleArgumentsIndexes = findIndexes(code, possibleNames)
 
-        if (possibleIndexes.length) {
+        if (possibleArgumentsIndexes.length) {
           argumentsVisitor.visit(rootPath, {
             magicString,
-            possibleIndexes,
+            possibleIndexes: possibleArgumentsIndexes,
             runtimeName,
             undeclaredIdentifiers
           })
@@ -276,15 +293,15 @@ function init() {
 
       if (addedImport) {
         const { initedBindings, temporalBindings } = importExportVisitor
-        const possibleIndexes = findIndexes(code, keys(temporalBindings))
+        const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
 
-        possibleIndexes.push(...possibleExportIndexes)
-        possibleIndexes.sort(ascendingComparator)
+        possibleTemporalIndexes.push(...possibleExportIndexes)
+        possibleTemporalIndexes.sort(ascendingComparator)
 
         temporalVisitor.visit(rootPath, {
           initedBindings,
           magicString,
-          possibleIndexes,
+          possibleIndexes: possibleTemporalIndexes,
           runtimeName,
           temporalBindings
         })
