@@ -42,6 +42,8 @@ function init() {
           parent.operator === "typeof") {
         this.changed = true
 
+        // Use `runtimeName` as the voided expression for content sniffing
+        // based on the presence of the runtime identifier.
         overwrite(this, node.start, node.end, "void " + runtimeName)
         return
       }
