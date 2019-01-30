@@ -283,6 +283,7 @@ if (cachePath !== "") {
   }
 }
 
+// The legacy symbol used for `esm` export detection.
 defineProperty(makeRequireFunction, shared.symbol.package, {
   __proto__: null,
   value: true
@@ -291,6 +292,11 @@ defineProperty(makeRequireFunction, shared.symbol.package, {
 defineProperty(makeRequireFunction, shared.customInspectKey, {
   __proto__: null,
   value: () => "esm enabled"
+})
+
+defineProperty(makeRequireFunction, "esm:package", {
+  __proto__: null,
+  value: true
 })
 
 defineProperty(makeRequireFunction, "process", {
