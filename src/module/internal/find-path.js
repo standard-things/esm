@@ -187,9 +187,11 @@ function findPath(request, paths, isMain = false, fields, exts) {
         fields = mainFields
       }
 
-      filename =
-        tryPackage(thePath, fields, exts, isMain) ||
-        tryExtensions(thePath + sep + "index", exts, isMain)
+      filename = tryPackage(thePath, fields, exts, isMain)
+
+      if (filename === "") {
+        filename = tryExtensions(thePath + sep + "index", exts, isMain)
+      }
     }
 
     if (filename !== "") {
@@ -205,7 +207,7 @@ function tryExtensions(thePath, exts, isMain) {
   for (const ext of exts) {
     const filename = tryFilename(thePath + ext, isMain)
 
-    if (filename) {
+    if (filename !== "") {
       return filename
     }
   }
@@ -220,9 +222,17 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 
   const thePath = resolve(dirPath, fieldPath)
 
-  return tryFilename(thePath, isMain) ||
-    tryExtensions(thePath, exts, isMain) ||
-    tryExtensions(thePath + sep + "index", exts, isMain)
+  let filename = tryFilename(thePath, isMain)
+
+  if (filename === "") {
+    filename = tryExtensions(thePath, exts, isMain)
+  }
+
+  if (filename === "") {
+    filename = tryExtensions(thePath + sep + "index", exts, isMain)
+  }
+
+  return filename
 }
 
 function tryFilename(filename, isMain) {
