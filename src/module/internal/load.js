@@ -25,9 +25,9 @@ function load(filename, parent, isMain = false, cache, loader) {
   let entry
   let mod = cache[filename]
 
-  const found = mod !== void 0
+  const foundMod = mod !== void 0
 
-  if (found) {
+  if (foundMod) {
     const children = parent != null && parent.children
 
     if (Array.isArray(children) &&
@@ -60,7 +60,7 @@ function load(filename, parent, isMain = false, cache, loader) {
     }
   }
 
-  if (! found) {
+  if (! foundMod) {
     const { _compile } = mod
 
     mod._compile = (content, filename) => {

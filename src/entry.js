@@ -266,10 +266,10 @@ class Entry {
         entry.type === TYPE_CJS) {
       const { bridged } = shared
       const exported = entry.module.exports
-      const found = bridged.get(exported)
+      const foundEntry = bridged.get(exported)
 
-      if (found !== void 0) {
-        entry = found
+      if (foundEntry !== void 0) {
+        entry = foundEntry
         bridged.delete(exported)
       }
     }

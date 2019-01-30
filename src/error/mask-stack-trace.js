@@ -142,10 +142,10 @@ function init() {
       }
     }
 
-    let arrowFound = false
+    let foundArrow = false
 
     stack = stack.replace(arrowRegExp, (match, decoratorLine, decoratorArrow, decoratorNewline = "") => {
-      arrowFound = true
+      foundArrow = true
 
       if (useDecoratorLine) {
         contentLine = decoratorLine
@@ -176,7 +176,7 @@ function init() {
         : contentLine + (contentLine ? "\n\n" : "\n")
     })
 
-    if (arrowFound) {
+    if (foundArrow) {
       return stack
     }
 
