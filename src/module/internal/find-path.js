@@ -236,13 +236,11 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 }
 
 function tryFilename(filename, isMain) {
-  let isSymLink = false
   let rc = -1
-  let stat = null
 
   if (isJS(filename) ||
       isMJS(filename)) {
-    stat = statSync(filename)
+    let stat = statSync(filename)
 
     if (stat !== null) {
       rc = Reflect.apply(isFile, stat, []) ? 0 : 1
@@ -259,14 +257,9 @@ function tryFilename(filename, isMain) {
     ? resolveSymlinksMain
     : resolveSymlinks
 
-  if (useRealpath &&
-      (stat === null ||
-       stat.nlink > 1 ||
-       isSymLink)) {
-    return realpath(filename)
-  }
-
-  return filename
+  return useRealpath
+    ? realpath(filename)
+    : filename
 }
 
 function tryPackage(dirPath, fields, exts, isMain) {
