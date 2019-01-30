@@ -395,7 +395,7 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parentEntry) {
-    setter.last = name === "default" ? void 0 : INITIAL_VALUE
+    setter.last = INITIAL_VALUE
     setter.localNames = localNames
     setter.parent = parentEntry
 
