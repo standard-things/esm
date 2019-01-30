@@ -16,6 +16,7 @@ import importExportVisitor from "./visitor/import-export.js"
 import isObjectEmpty from "./util/is-object-empty.js"
 import keys from "./util/keys.js"
 import requireVisitor from "./visitor/require.js"
+import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
 import temporalVisitor from "./visitor/temporal.js"
@@ -58,7 +59,7 @@ function init() {
         changed: false,
         circular: 0,
         code,
-        codeWithoutTDZ: code,
+        codeWithTDZ: null,
         filename: null,
         firstAwaitOutsideFunction: null,
         mtime: -1,
@@ -267,31 +268,33 @@ function init() {
           importExportVisitor.changed) {
         yieldIndex = importExportVisitor.yieldIndex
 
-        const codeWithoutTDZ = magicString.toString()
-
         result.changed = true
-        result.code = codeWithoutTDZ
-        result.codeWithoutTDZ = codeWithoutTDZ
+        result.code = magicString.toString()
       }
 
       if (addedImport) {
+        // Pick `importExportVisitor` properties outside of the `codeWithTDZ`
+        // getter/setter to preserve their values.
         const { initedBindings, temporalBindings } = importExportVisitor
-        const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
 
-        possibleTemporalIndexes.push(...possibleExportIndexes)
-        possibleTemporalIndexes.sort(ascendingComparator)
+        setDeferred(result, "codeWithTDZ", () => {
+          const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
 
-        temporalVisitor.visit(rootPath, {
-          initedBindings,
-          magicString,
-          possibleIndexes: possibleTemporalIndexes,
-          runtimeName,
-          temporalBindings
+          possibleTemporalIndexes.push(...possibleExportIndexes)
+          possibleTemporalIndexes.sort(ascendingComparator)
+
+          temporalVisitor.visit(rootPath, {
+            initedBindings,
+            magicString,
+            possibleIndexes: possibleTemporalIndexes,
+            runtimeName,
+            temporalBindings
+          })
+
+          return temporalVisitor.changed
+            ? magicString.toString()
+            : null
         })
-
-        if (temporalVisitor.changed) {
-          result.code = magicString.toString()
-        }
 
         result.circular = -1
       }

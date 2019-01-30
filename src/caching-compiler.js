@@ -64,7 +64,7 @@ function init() {
         changed: false,
         circular: 0,
         code: null,
-        codeWithoutTDZ: null,
+        codeWithTDZ: null,
         filename: null,
         firstAwaitOutsideFunction: null,
         mtime: -1,

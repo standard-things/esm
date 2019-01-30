@@ -669,7 +669,7 @@ describe("compiler tests", () => {
 
       for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
-        const actual = result.code.split("\n").pop()
+        const actual = result.codeWithTDZ.split("\n").pop()
 
         assert.strictEqual(actual, compiled[index])
       }
@@ -695,9 +695,8 @@ describe("compiler tests", () => {
 
       for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
-        const actual = result.code.split("\n").pop()
 
-        assert.strictEqual(actual, line)
+        assert.strictEqual(result.codeWithTDZ, null)
       }
     }
   })

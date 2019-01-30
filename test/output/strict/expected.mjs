@@ -5,5 +5,5 @@ const _anonymous=() => {
     return this
   })()
 
-  _.a("assert",assert).strictEqual(typeof that, "undefined")
-};_.d(_anonymous);_.j(["default"]);
+  assert.strictEqual(typeof that, "undefined")
+};_.d(_anonymous);

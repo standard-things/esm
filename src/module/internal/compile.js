@@ -117,12 +117,11 @@ function compile(caller, entry, content, filename, fallback) {
   if (compileData !== null &&
       compileData.code === null) {
     compileData.code = content
-    compileData.codeWithoutTDZ = content
   }
 
   if (parsing) {
     if (entry.type === TYPE_ESM) {
-      const result = tryCompileCached(entry, filename)
+      let result = tryCompileCached(entry, filename)
 
       if (compileData.circular === -1) {
         compileData.circular = isDescendant(entry, entry) ? 1 : 0
@@ -130,8 +129,16 @@ function compile(caller, entry, content, filename, fallback) {
 
       if (compileData.circular === 1) {
         entry.circular = true
-      } else {
-        compileData.code = compileData.codeWithoutTDZ
+        entry.module.exports = GenericObject.create()
+        entry.runtime = null
+
+        const { codeWithTDZ } = compileData
+
+        if (codeWithTDZ !== null) {
+          compileData.code = codeWithTDZ
+        }
+
+        result = tryCompileCached(entry, filename)
       }
 
       entry.updateBindings()
@@ -215,11 +222,14 @@ function tryCompileCached(entry, filename) {
 
   let { runtime } = entry
 
-  if (isESM ||
-      compileData.changed) {
-    runtime = Runtime.enable(entry, GenericObject.create())
-  } else if (runtime === null) {
-    runtime = entry.runtime = {}
+  if (runtime === null) {
+    if (isESM ||
+        compileData.changed) {
+      runtime = Runtime.enable(entry, GenericObject.create())
+    } else {
+      runtime = GenericObject.create()
+      entry.runtime = runtime
+    }
   }
 
   let error

@@ -181,10 +181,8 @@ class Entry {
       if (compileData !== null &&
           compileData.changed) {
         const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
-        const code = content === null ? "" : content
 
-        compileData.code = code
-        compileData.codeWithoutTDZ = code
+        compileData.code = content === null ? "" : content
       }
 
       return compileData
