@@ -544,7 +544,11 @@ class Entry {
         }
       }
     } else {
-      const exported = mod.exports
+      let exported = mod.exports
+
+      const names = keys(exported)
+
+      this._loaded = LOAD_COMPLETED
 
       if (exported != null &&
           exported.__esModule &&
@@ -554,18 +558,16 @@ class Entry {
         this.type = TYPE_PSEUDO
       }
 
-      this._loaded = LOAD_COMPLETED
-      this.exports = exported
-
       if (this.type === TYPE_CJS) {
         if (! Reflect.has(this.getters, "default")) {
           this.addGetter("default", () => this.namespace.default)
         }
 
-        this.exports = proxyExports(this)
+        exported = proxyExports(this)
       }
 
-      this.assignExportsToNamespace(keys(exported))
+      this.exports = exported
+      this.assignExportsToNamespace(names)
     }
 
     this.finalizeNamespace()
