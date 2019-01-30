@@ -22,7 +22,6 @@ const { symbol } = shared
 
 const ownExportsMap = new Map([
   [symbol.entry, Entry],
-  [symbol.package, Package],
   [symbol.realGetProxyDetails, realGetProxyDetails],
   [symbol.realRequire, realRequire],
   [symbol.runtime, Runtime],
