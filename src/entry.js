@@ -514,8 +514,7 @@ class Entry {
 
     if (this.type === TYPE_ESM ||
         this.type === TYPE_WASM) {
-      let exported = this.exports
-
+      const exported = this.exports
       const names = keys(exported)
 
       this._loaded = LOAD_COMPLETED
@@ -526,18 +525,8 @@ class Entry {
           this.extname !== ".mjs") {
         if (names.length === 1 &&
             names[0] === "default") {
-          const exportedDefault = exported.default
-
-          if (isObjectLike(exportedDefault) &&
-              ! has(exportedDefault, "default") &&
-              setProperty(exportedDefault, "default", exportedDefault)) {
-            exported = exportedDefault
-            this.exports = exportedDefault
-            this.module.exports = exportedDefault
-          }
-        }
-
-        if (! has(exported, "__esModule")) {
+          this.module.exports = exported.default
+        } else if (! Reflect.has(this.getters, "__esModule")) {
           Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
         }
       }

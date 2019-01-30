@@ -7,7 +7,7 @@ export default () => {
     mainFields: ["module", "main"]
   })
 
-  assert.strictEqual(esmRequire("main-fields").default, "module")
+  assert.strictEqual(esmRequire("main-fields"), "module")
   assert.ok(esmRequire.resolve("main-fields").endsWith("module.js"))
 
   assert.strictEqual(esmRequire("main-fields-mjs").default, "main")

@@ -57,7 +57,7 @@ function init() {
   const utilBinding = {}
 
   const shared = {
-    bridged: new WeakMap,
+    bridged: new Map,
     entry: {
       cache: new WeakMap
     },
