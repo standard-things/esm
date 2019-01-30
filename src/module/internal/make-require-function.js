@@ -4,7 +4,6 @@
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
-import Package from "../../package.js"
 import Runtime from "../../runtime.js"
 
 import isInstalled from "../../util/is-installed.js"
