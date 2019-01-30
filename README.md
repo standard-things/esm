@@ -113,7 +113,7 @@ Specify options with one of the following:
       <tr>
         <td valign="top"><code>"interop":</code></td>
         <td>
-          <p>A boolean for <code>__esModule</code> interoperability.</p>
+          <p>A boolean for <code>__esModule</code> and <code>require</code> interoperability.</p>
         </td>
       </tr>
       <tr>
