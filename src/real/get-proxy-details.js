@@ -1,17 +1,13 @@
 import binding from "../binding.js"
-import realRequire from "./require.js"
+import safeRequire from "../safe/require.js"
 import shared from "../shared.js"
 
 function init() {
-  let realGetProxyDetails
+  let realGetProxyDetails = safeRequire(shared.symbol.realGetProxyDetails)
 
-  try {
-    realGetProxyDetails = realRequire(shared.symbol.realGetProxyDetails)
-
-    if (typeof realGetProxyDetails === "function") {
-      return realGetProxyDetails
-    }
-  } catch {}
+  if (typeof realGetProxyDetails === "function") {
+    return realGetProxyDetails
+  }
 
   let useGetProxyDetails
 
