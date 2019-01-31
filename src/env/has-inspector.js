@@ -1,6 +1,7 @@
 import builtinLookup from "../builtin-lookup.js"
 import { config } from "../safe/process.js"
-import realRequire from "../real/require.js"
+import isObjectLike from "../util/is-object-like.js"
+import safeRequire from "../safe/require.js"
 import shared from "../shared.js"
 
 function init() {
@@ -9,15 +10,10 @@ function init() {
       return true
     }
 
-    if (builtinLookup.has("inspector")) {
-      // An `ERR_INSPECTOR_NOT_AVAILABLE` error may be thrown on initialization.
-      try {
-        realRequire("inspector")
-        return true
-      } catch {}
-    }
-
-    return false
+    // Use `safeRequire()` because an `ERR_INSPECTOR_NOT_AVAILABLE` error may
+    // be thrown on initialization.
+    return builtinLookup.has("inspector") &&
+      isObjectLike(safeRequire("inspector"))
   }
 
   return hasInspector
