@@ -35,6 +35,7 @@ function init() {
   setProperty(safeProcess, "env", safe(env))
   setProperty(safeProcess, "execArgv", safe(execArgv))
   setProperty(safeProcess, "versions", safe(versions))
+
   return safeProcess
 }
 

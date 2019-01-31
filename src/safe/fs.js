@@ -12,6 +12,7 @@ function init() {
   }
 
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
+
   return safeFs
 }
 

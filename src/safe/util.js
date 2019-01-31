@@ -32,6 +32,7 @@ function init() {
 
   setProperty(safeUtil, "customInspectSymbol", custom)
   setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
+
   return safeUtil
 }
 
