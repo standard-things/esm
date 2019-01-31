@@ -68,11 +68,9 @@ function getNativeSource(thePath) {
     }
   } catch (e) {}
 
-  if (typeof result === "string") {
-    return result
-  }
-
-  return ""
+  return typeof result === "string"
+    ? result
+    : ""
 }
 
 function has(object, name) {
@@ -95,12 +93,6 @@ function readFile(filename, options) {
   } catch (e) {}
 
   return null
-}
-
-function tryRequire(request) {
-  try {
-    return require(request)
-  } catch (e) {}
 }
 
 let cachedData
