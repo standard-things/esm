@@ -1,7 +1,5 @@
 /* eslint strict: off, node/no-unsupported-features: ["error", { version: 6 }] */
 
-const JEST_EVAL_RESULT_VARIABLE = "Object.<anonymous>"
-
 const globalThis = (function () {
   // Reference `this` before `Function()` to prevent CSP errors for unsafe-eval.
   // Fallback to `Function()` when Node is invoked with `--strict`.
@@ -102,92 +100,6 @@ function tryRequire(request) {
   try {
     return require(request)
   } catch (e) {}
-}
-
-const jestEnvironmentHooks = { __proto__: null }
-
-function jestTransform(content, filename, { cwd, testEnvironment }) {
-  if (! has(jestEnvironmentHooks, cwd)) {
-    jestEnvironmentHooks[cwd] = {
-      compile: { __proto__: null },
-      loader: makeRequireFunction(module)
-    }
-  }
-
-  const Environment = tryRequire(testEnvironment)
-
-  if (typeof Environment !== "function") {
-    return
-  }
-
-  const { loader } = jestEnvironmentHooks[cwd]
-  const { runScript } = Environment.prototype
-  const runtimeName = "_"
-  const { symbol } = shared
-
-  const {
-    CachingCompiler,
-    moduleInternalCompileSource
-  } = shared.module
-
-  const Entry = loader(symbol.entry)
-  const Runtime = loader(symbol.runtime)
-
-  const compileData = CachingCompiler.compile(content, {
-    cjsVars: true,
-    filename,
-    runtimeName,
-    sourceType: 3
-  })
-
-  jestEnvironmentHooks[cwd].compile[filename] = compileData
-
-  const isESM = compileData.sourceType === 2
-
-  const code = moduleInternalCompileSource(compileData, {
-    cjsVars: true,
-    runtimeName
-  })
-
-  if (! has(jestEnvironmentHooks[cwd], testEnvironment)) {
-    jestEnvironmentHooks[testEnvironment] = true
-
-    Environment.prototype.runScript = function (...args) {
-      const scriptResult = Reflect.apply(runScript, this, args)
-      const wrapper = scriptResult[JEST_EVAL_RESULT_VARIABLE]
-
-      scriptResult[JEST_EVAL_RESULT_VARIABLE] = function (...args) {
-        const [mod] = args
-        const entry = Entry.get(mod)
-
-        entry.compileData = jestEnvironmentHooks[cwd].compile[entry.filename]
-        entry.runtimeName = runtimeName
-        entry.type = isESM ? 2 : 1
-
-        const runtime = Runtime.enable(entry, {})
-
-        let moduleResult = Reflect.apply(wrapper, this, args)
-
-        if (isESM) {
-          // Debuggers may wrap `Module#_compile()` with
-          // `process.binding("inspector").callAndPauseOnStart()`
-          // and not forward the return value.
-          const { _runResult } = runtime
-
-          // Eventually, we will call this in the instantiate phase.
-          _runResult.next()
-
-          moduleResult = _runResult.next().value
-        }
-
-        return moduleResult
-      }
-
-      return scriptResult
-    }
-  }
-
-  return { code }
 }
 
 let cachedData
@@ -297,11 +209,6 @@ defineProperty(makeRequireFunction, shared.customInspectKey, {
 defineProperty(makeRequireFunction, "esm:package", {
   __proto__: null,
   value: true
-})
-
-defineProperty(makeRequireFunction, "process", {
-  __proto__: null,
-  value: jestTransform
 })
 
 freeze(makeRequireFunction)
