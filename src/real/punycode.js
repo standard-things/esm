@@ -1,12 +1,19 @@
 import builtinLookup from "../builtin-lookup.js"
-import realRequire from "./require.js"
+import isObjectLike from "../util/is-object-like.js"
+import safeRequire from "../safe/require.js"
 import shared from "../shared.js"
 import unwrapProxy from "../util/unwrap-proxy.js"
 
 function init() {
-  return builtinLookup.has("punycode")
-    ? unwrapProxy(realRequire("punycode"))
-    : null
+  if (! builtinLookup.has("punycode")) {
+    return
+  }
+
+  const realPunycode = safeRequire("punycode")
+
+  if (isObjectLike(realPunycode)) {
+    return unwrapProxy(realPunycode)
+  }
 }
 
 export default shared.inited
