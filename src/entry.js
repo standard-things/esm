@@ -19,6 +19,7 @@ import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
+import hasIn from "./util/has-in.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -27,6 +28,7 @@ import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
 import keys from "./util/keys.js"
+import keysIn from "./util/keys-in.js"
 import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
@@ -227,10 +229,12 @@ class Entry {
 
           let object = _namespace
 
-          if (name !== Symbol.toStringTag &&
-              has(exported, name) &&
-              (this.builtin ||
-               isEnumerable(exported, name))) {
+          if (name === "then") {
+            if (has(exported, name)) {
+              object = exported
+            }
+          } else if (name !== Symbol.toStringTag &&
+              hasExportsObjectKey(this, name)) {
             object = exported
           }
 
@@ -326,12 +330,8 @@ class Entry {
       }
     } else {
       descriptor.get = () => {
-        const exported = this.exports
-
-        if (has(exported, name) &&
-            (this.builtin ||
-             isEnumerable(exported, name))) {
-          return exported[name]
+        if (hasExportsObjectKey(this, name)) {
+          return this.exports[name]
         }
       }
 
@@ -431,25 +431,20 @@ class Entry {
   }
 
   assignExportsToNamespace(names) {
-    const exported = this.exports
     const { type } = this
 
     if ((type !== TYPE_ESM &&
          ! this.module.loaded) ||
-        ! isObjectLike(exported)) {
+        ! isObjectLike(this.exports)) {
       return
-    }
-
-    if (names === void 0) {
-      if (this._loaded === LOAD_COMPLETED) {
-        names = keys(this._namespace)
-      } else {
-        names = this.builtin ? getBuiltinExportNames(exported) : keys(exported)
-      }
     }
 
     const { getters } = this
     const isCJS = type === TYPE_CJS
+
+    if (names === void 0) {
+      names = getExportsObjectKeys(this)
+    }
 
     for (const name of names) {
       if (! (isCJS &&
@@ -873,9 +868,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     let value
 
-    if (has(exported, name) &&
-        (entry.builtin ||
-         isEnumerable(exported, name))) {
+    if (hasExportsObjectKey(entry, name)) {
       const exportedDescriptor = Reflect.getOwnPropertyDescriptor(exported, name)
       const exportedGet = exportedDescriptor.get
 
@@ -937,24 +930,6 @@ function createMutableNamespaceProxy(entry, namespace) {
   assignCommonNamespaceHandlerTraps(handler, entry, proxy)
   assignMutableNamespaceHandlerTraps(handler, entry, proxy)
   return proxy
-}
-
-function getBuiltinExportNames(exported) {
-  const names = []
-  const possibleNames = ownPropertyNames(exported)
-  const proto = getPrototypeOf(exported)
-
-  for (const name of possibleNames) {
-    if (! isEnumerable(exported, name) &&
-        Reflect.has(proto, name) &&
-        ! isEnumerable(proto, name)) {
-      continue
-    }
-
-    names.push(name)
-  }
-
-  return names
 }
 
 function getExportByName(entry, name, parentEntry) {
@@ -1022,6 +997,65 @@ function getExportByNameFast(entry, name, parentEntry) {
   return noMutableNamespace
     ? entry.esmNamespace
     : entry.esmMutableNamespace
+}
+
+function getExportsObjectKeys(entry) {
+  if (entry._loaded === LOAD_COMPLETED) {
+    return keys(entry._namespace)
+  }
+
+  const exported = entry.exported
+
+  if (entry.extname === ".mjs") {
+    return keys(exported)
+  }
+
+  if (! entry.builtin) {
+    return keysIn(exported)
+  }
+
+  const possibleNames = ownPropertyNames(exported)
+  const proto = getPrototypeOf(exported)
+  const result = []
+
+  for (const name of possibleNames) {
+    if (! isEnumerable(exported, name) &&
+        hasIn(proto, name) &&
+        ! isEnumerable(proto, name)) {
+      continue
+    }
+
+    result.push(name)
+  }
+
+  return result
+}
+
+function hasExportsObjectKey(entry, name) {
+  const exported = entry.exports
+
+  if (entry.extname === ".mjs") {
+    return has(exported, name) &&
+      isEnumerable(exported, name)
+  }
+
+  if (! entry.builtin) {
+    return hasIn(exported, name)
+  }
+
+  if (! has(exported, name)) {
+    return false
+  }
+
+  const proto = getPrototypeOf(exported)
+
+  if (! isEnumerable(exported, name) &&
+      hasIn(proto, name) &&
+      ! isEnumerable(proto, name)) {
+    return false
+  }
+
+  return true
 }
 
 function initNamespaceHandler() {
