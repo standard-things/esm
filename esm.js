@@ -13,6 +13,7 @@ const {
 
 const { freeze } = Object
 const { hasOwnProperty } = Object.prototype
+const symbolFor = Symbol.for
 const { type, versions } = process
 
 const {
@@ -206,7 +207,7 @@ defineProperty(makeRequireFunction, shared.customInspectKey, {
   value: () => "esm enabled"
 })
 
-defineProperty(makeRequireFunction, "esm:package", {
+defineProperty(makeRequireFunction, symbolFor("esm:package"), {
   __proto__: null,
   value: true
 })
