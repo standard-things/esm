@@ -1,7 +1,8 @@
 import ENV from "../../constant/env.js"
 
 import acornParse from "../acorn/parse.js"
-import realRequire from "../../real/require.js"
+import isObjectLike from "../../util/is-object-like.js"
+import safeRequire from "../../safe/require.js"
 import shared from "../../shared.js"
 
 function init() {
@@ -11,12 +12,18 @@ function init() {
 
   const Plugin = {
     enable() {
-      if (INTERNAL) {
-        try {
-          const acorn = realRequire("internal/deps/acorn/dist/acorn")
+      if (! INTERNAL) {
+        return
+      }
 
-          acornParse.enable(acorn)
-        } catch {}
+      let acorn = safeRequire("internal/deps/acorn/acorn/dist/acorn")
+
+      if (! isObjectLike(acorn)) {
+        acorn = safeRequire("internal/deps/acorn/dist/acorn")
+      }
+
+      if (isObjectLike(acorn)) {
+        acornParse.enable(acorn)
       }
     }
   }

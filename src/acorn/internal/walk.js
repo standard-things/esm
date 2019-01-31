@@ -1,7 +1,8 @@
 import ENV from "../../constant/env.js"
 
 import acornWalkDynamicImport from "../walk/dynamic-import.js"
-import realRequire from "../../real/require.js"
+import isObjectLike from "../../util/is-object-like.js"
+import safeRequire from "../../safe/require.js"
 import shared from "../../shared.js"
 
 function init() {
@@ -11,12 +12,18 @@ function init() {
 
   const Plugin = {
     enable() {
-      if (INTERNAL) {
-        try {
-          const walk = realRequire("internal/deps/acorn/dist/walk")
+      if (! INTERNAL) {
+        return
+      }
 
-          acornWalkDynamicImport.enable(walk)
-        } catch (e) {}
+      let walk = safeRequire("internal/deps/acorn/acorn-walk/dist/walk")
+
+      if (!isObjectLike(walk)) {
+        walk = safeRequire("internal/deps/acorn/dist/walk")
+      }
+
+      if (isObjectLike(walk)) {
+        acornWalkDynamicImport.enable(walk)
       }
     }
   }
