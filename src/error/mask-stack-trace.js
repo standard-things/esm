@@ -78,7 +78,7 @@ function init() {
         const name = toString(get(this, "name"))
         const newString = tryErrorToString(this)
 
-        let masked = stack.replace(oldString, newString)
+        let masked = stack.replace(oldString, () => newString)
 
         masked = fromParser
           ? maskParserStack(masked, name, message, lineNumber, column, content, filename)

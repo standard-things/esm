@@ -253,7 +253,7 @@ function tryPassthru(func, args, pkg) {
       const stack = get(error, "stack")
 
       if (typeof stack === "string") {
-        set(error, "stack", stack.replace(message, newMessage))
+        set(error, "stack", stack.replace(message, () => newMessage))
       }
     }
 

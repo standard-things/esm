@@ -18,7 +18,7 @@ function init() {
     const result = replacer(string.replace(without, WITHOUT_TOKEN))
 
     return typeof result === "string"
-      ? result.replace(WITHOUT_TOKEN, without)
+      ? result.replace(WITHOUT_TOKEN, () => without)
       : string
   }
 
