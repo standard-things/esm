@@ -72,9 +72,10 @@ const Runtime = {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
       const childIsESM = childEntry.type === TYPE_ESM
+      const childIsLoaded = childEntry._loaded === LOAD_COMPLETED
 
       if (! childIsESM &&
-          childEntry._loaded !== LOAD_COMPLETED) {
+          ! childIsLoaded) {
         entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
         return
       }
@@ -82,9 +83,9 @@ const Runtime = {
       const childGetters = childEntry.getters
       const { getters, name } = entry
 
-      const namespace = childIsESM
-        ? childEntry._namespace
-        : childEntry.getExportByName("*", entry)
+      const namespace = childIsLoaded
+        ? childEntry.getExportByName("*", entry)
+        : childEntry._namespace
 
       for (const exportedName in namespace) {
         if (exportedName === "default") {
