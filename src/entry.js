@@ -98,9 +98,9 @@ class Entry {
     // The finalized state of the namespace object.
     this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
     // The raw mutable namespace object for non-ESM importers.
-    this._partialMutableNamespace = toRawModuleNamespaceObject()
+    this._partialMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The raw namespace object for non-ESM importers.
-    this._partialNamespace = toRawModuleNamespaceObject()
+    this._partialNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The passthru indicator for `module._compile()`.
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
@@ -958,6 +958,7 @@ function getExportByName(entry, name, parentEntry) {
     parentCJS.namedExports
 
   const noNamedExports =
+    ! entry.builtin &&
     ! parentNamedExports &&
     entry.type !== TYPE_ESM
 

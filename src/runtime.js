@@ -81,6 +81,7 @@ const Runtime = {
         entry.package.options.cjs.namedExports
 
       const noNamedExports =
+        ! childEntry.builtin &&
         ! parentNamedExports &&
         ! childIsESM
 
