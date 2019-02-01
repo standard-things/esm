@@ -70,31 +70,23 @@ const Runtime = {
   },
   addNamespaceSetter() {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
-      const childGetters = childEntry.getters
+      const { entry } = this
       const childIsESM = childEntry.type === TYPE_ESM
 
-      const { entry } = this
-      const { getters, name } = entry
-
-      const parentNamedExports =
-        entry.extname !== ".mjs" &&
-        entry.package.options.cjs.namedExports
-
-      const noNamedExports =
-        ! childEntry.builtin &&
-        ! parentNamedExports &&
-        ! childIsESM
-
-      if (noNamedExports) {
+      if (! childIsESM &&
+          childEntry._loaded !== LOAD_COMPLETED) {
+        entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
         return
       }
 
-      if (! childIsESM &&
-          entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED) {
-        entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
-      }
+      const childGetters = childEntry.getters
+      const { getters, name } = entry
 
-      for (const exportedName in childEntry._namespace) {
+      const namespace = childIsESM
+        ? childEntry._namespace
+        : childEntry.getExportByName("*", entry)
+
+      for (const exportedName in namespace) {
         if (exportedName === "default") {
           continue
         }
