@@ -152,7 +152,7 @@ class Entry {
     // Initialize empty namespace setter so they're merged properly.
     this.setters["*"] = []
     // The state of the module.
-    this.state = STATE_INITIAL
+    this.state = mod.loaded ? STATE_EXECUTION_COMPLETED : STATE_INITIAL
 
     // The cache name of the module.
     setDeferred(this, "cacheName", () => {
@@ -476,6 +476,9 @@ class Entry {
         }
 
         names.sort()
+
+        Reflect.deleteProperty(this._partialMutableNamespace, "default")
+        Reflect.deleteProperty(this._partialNamespace, "default")
 
         for (const name of names) {
           this._partialMutableNamespace[name] = INITIAL_VALUE
