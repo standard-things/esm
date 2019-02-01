@@ -66,15 +66,17 @@ function validateDependencies(entry) {
 
   for (const name in children) {
     const childEntry = children[name]
+    const childIsESM = childEntry.type === TYPE_ESM
 
     const noNamedExports =
+      ! childEntry.builtin &&
       ! parentNamedExports &&
-      childEntry.type !== TYPE_ESM
+      ! childIsESM
 
     const cache = childEntry._validation
     const settersMap = childEntry.setters
 
-    if (childEntry.type === TYPE_ESM) {
+    if (childIsESM) {
       const { getters } = childEntry
 
       for (const exportedName in settersMap) {
