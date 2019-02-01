@@ -73,11 +73,11 @@ function init() {
 
       wrapper = new OwnProxy(func, {
         apply: nativeTrap((func, thisArg, args) => {
-          // Check for `entry.esmNamespace` because it's a proxy that native
-          // methods could be invoked on.
+          // Check for `entry.completeNamespace` because it's a proxy that
+          // native methods could be invoked on.
           if (thisArg === proxy ||
-              thisArg === entry.esmMutableNamespace ||
-              thisArg === entry.esmNamespace) {
+              thisArg === entry.completeMutableNamespace ||
+              thisArg === entry.completeNamespace) {
             thisArg = exported
           }
 

@@ -83,14 +83,10 @@ class Entry {
   constructor(mod) {
     // The namespace object change indicator.
     this._changed = false
-    // The raw mutable namespace object for CJS importers.
-    this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
-    // The raw namespace object for CJS importers.
-    this._cjsNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The raw mutable namespace object for ESM importers.
-    this._esmMutableNamespace = toRawModuleNamespaceObject()
+    this._completeMutableNamespace = toRawModuleNamespaceObject()
     // The raw namespace object for ESM importers.
-    this._esmNamespace = toRawModuleNamespaceObject()
+    this._completeNamespace = toRawModuleNamespaceObject()
     // The entry finalization handler.
     this._finalize = null
     // The last child entry loaded.
@@ -101,6 +97,10 @@ class Entry {
     this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
     this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
+    // The raw mutable namespace object for non-ESM importers.
+    this._partialMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
+    // The raw namespace object for non-ESM importers.
+    this._partialNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The passthru indicator for `module._compile()`.
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
@@ -165,16 +165,6 @@ class Entry {
       })
     })
 
-    // The mutable namespace object CJS importers receive.
-    setDeferred(this, "cjsMutableNamespace", () => {
-      return createMutableNamespaceProxy(this, this._cjsMutableNamespace)
-    })
-
-    // The namespace object CJS importers receive.
-    setDeferred(this, "cjsNamespace", () => {
-      return createImmutableNamespaceProxy(this, this._cjsNamespace)
-    })
-
     // The source compilation data of the module.
     setDeferred(this, "compileData", () => {
       const compileData = CachingCompiler.from(this)
@@ -189,19 +179,29 @@ class Entry {
       return compileData
     })
 
-    // The mutable namespace object ESM importers receive.
-    setDeferred(this, "esmMutableNamespace", () => {
-      return createMutableNamespaceProxy(this, this._esmMutableNamespace)
+    // The mutable namespace object that ESM importers receive.
+    setDeferred(this, "completeMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._completeMutableNamespace)
     })
 
-    // The namespace object ESM importers receive.
-    setDeferred(this, "esmNamespace", () => {
-      return createImmutableNamespaceProxy(this, this._esmNamespace)
+    // The namespace object that ESM importers receive.
+    setDeferred(this, "completeNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._completeNamespace)
     })
 
     // The mtime of the module.
     setDeferred(this, "mtime", () => {
       return getMtime(this.filename)
+    })
+
+    // The mutable namespace object that non-ESM importers receive.
+    setDeferred(this, "partialMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._partialMutableNamespace)
+    })
+
+    // The namespace object that non-ESM importers receive.
+    setDeferred(this, "partialNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._partialNamespace)
     })
 
     // The name of the runtime identifier.
@@ -361,7 +361,7 @@ class Entry {
 
   addGetterFrom(otherEntry, importedName, exportedName = importedName) {
     if (importedName === "*") {
-      return this.addGetter(exportedName, () => otherEntry.esmNamespace)
+      return this.addGetter(exportedName, () => otherEntry.completeNamespace)
     }
 
     const otherGetters = otherEntry.getters
@@ -370,7 +370,7 @@ class Entry {
 
     if (otherEntry.type !== TYPE_ESM &&
         this.extname === ".mjs") {
-      otherGetter = () => otherEntry.cjsNamespace[importedName]
+      otherGetter = () => otherEntry.partialNamespace[importedName]
       otherGetter.owner = otherEntry
     }
 
@@ -461,17 +461,17 @@ class Entry {
     const names = keys(this.namespace).sort()
 
     for (const name of names) {
-      this._esmNamespace[name] = INITIAL_VALUE
-      this._esmMutableNamespace[name] = INITIAL_VALUE
+      this._completeMutableNamespace[name] = INITIAL_VALUE
+      this._completeNamespace[name] = INITIAL_VALUE
     }
 
     // Section 9.4.6: Module Namespace Exotic Objects
     // Namespace objects should be sealed.
     // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
-    Object.seal(this._esmNamespace)
+    Object.seal(this._completeNamespace)
 
     if (this.type !== TYPE_ESM) {
-      Object.seal(this._cjsNamespace)
+      Object.seal(this._partialNamespace)
     }
 
     return this
@@ -718,8 +718,8 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
 
     if (! isESM &&
         name === "default" &&
-        (namespace === entry._cjsNamespace ||
-         namespace === entry._cjsMutableNamespace)) {
+        (namespace === entry._partialMutableNamespace ||
+         namespace === entry._partialNamespace)) {
       return entry.exports
     }
 
@@ -961,13 +961,13 @@ function getExportByName(entry, name, parentEntry) {
 
   if (noMutableNamespace) {
     return noNamedExports
-      ? entry.cjsNamespace
-      : entry.esmNamespace
+      ? entry.partialNamespace
+      : entry.completeNamespace
   }
 
   return noNamedExports
-    ? entry.cjsMutableNamespace
-    : entry.esmMutableNamespace
+    ? entry.partialMutableNamespace
+    : entry.completeMutableNamespace
 }
 
 function getExportByNameFast(entry, name, parentEntry) {
@@ -988,8 +988,8 @@ function getExportByNameFast(entry, name, parentEntry) {
     entry.extname === ".mjs"
 
   return noMutableNamespace
-    ? entry.esmNamespace
-    : entry.esmMutableNamespace
+    ? entry.completeNamespace
+    : entry.completeMutableNamespace
 }
 
 function getExportsObjectKeys(entry, exported = entry.exports) {
