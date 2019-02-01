@@ -222,4 +222,16 @@ describe("main hook tests", function () {
           })
       , Promise.resolve())
   })
+
+  it("should work with symlinked packages", () =>
+    fs
+      .ensureSymlink(
+        "./fixture/main-hook/package/module-1",
+        "./fixture/main-hook/package/module-2/node_modules/module-1"
+      )
+      .then(() =>
+        runMain("./fixture/main-hook/package/index.js")
+      )
+      .then(({ stdout }) => assert.ok(stdout.includes("package:true")))
+  )
 })
