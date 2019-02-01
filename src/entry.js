@@ -466,31 +466,26 @@ class Entry {
     // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
     Object.seal(this._completeNamespace)
 
-    if (this.type !== TYPE_ESM) {
-      if (this.builtin) {
-        const exported = this.exports
-        const names = keys(exported)
-
-        if (! has(exported, "default")) {
-          names.push("default")
-        }
-
-        names.sort()
-
-        Reflect.deleteProperty(this._partialMutableNamespace, "default")
-        Reflect.deleteProperty(this._partialNamespace, "default")
-
-        for (const name of names) {
-          this._partialMutableNamespace[name] = INITIAL_VALUE
-          this._partialNamespace[name] = INITIAL_VALUE
-        }
-      } else {
-        this._partialMutableNamespace.default = INITIAL_VALUE
-        this._partialNamespace.default = INITIAL_VALUE
-      }
-
-      Object.seal(this._partialNamespace)
+    if (this.type === TYPE_ESM) {
+      return this
     }
+
+    if (this.builtin) {
+      const names = keys(this.exports)
+
+      names.push("default")
+      names.sort()
+
+      Reflect.deleteProperty(this._partialMutableNamespace, "default")
+      Reflect.deleteProperty(this._partialNamespace, "default")
+
+      for (const name of names) {
+        this._partialMutableNamespace[name] = INITIAL_VALUE
+        this._partialNamespace[name] = INITIAL_VALUE
+      }
+    }
+
+    Object.seal(this._partialNamespace)
 
     return this
   }
