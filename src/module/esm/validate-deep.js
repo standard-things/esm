@@ -20,14 +20,98 @@ function validateDeep(entry) {
 
   entry._validatedDeep = true
 
-  validateDependencies(entry)
-
   const { children } = entry
+
+  const parentNamedExports =
+    entry.extname !== ".mjs" &&
+    entry.package.options.cjs.namedExports
 
   for (const name in children) {
     const childEntry = children[name]
 
-    if (childEntry.type === TYPE_ESM) {
+    if (childEntry.builtin) {
+      continue
+    }
+
+    const childIsESM = childEntry.type === TYPE_ESM
+
+    if (! childIsESM &&
+        parentNamedExports) {
+      continue
+    }
+
+    const cache = childEntry._validation
+    const { getters } = childEntry
+    const settersMap = childEntry.setters
+
+    for (const exportedName in settersMap) {
+      if (exportedName === "*" ||
+          (! childIsESM &&
+           exportedName === "default")) {
+        continue
+      }
+
+      const cached = childIsESM
+        ? cache.get(exportedName)
+        : void 0
+
+      if (cached === true) {
+        continue
+      }
+
+      if (childIsESM &&
+          Reflect.has(getters, exportedName)) {
+        let getter = getters[exportedName]
+
+        if (getter.owner.type !== TYPE_ESM) {
+          continue
+        }
+
+        if (! getter.deferred) {
+          cache.set(exportedName, true)
+          continue
+        }
+
+        const seen = new Set
+
+        while (getter !== void 0 && getter.deferred) {
+          if (seen.has(getter)) {
+            getter = void 0
+          } else {
+            seen.add(getter)
+            getter = getter.owner.getters[getter.id]
+          }
+        }
+
+        if (getter !== void 0) {
+          getters[exportedName] = getter
+          cache.set(exportedName, true)
+          continue
+        }
+      }
+
+      cache.set(exportedName, false)
+
+      const setters = settersMap[exportedName]
+      const setterIndex = setters.findIndex(({ parent }) => parent === entry)
+
+      if (setterIndex !== -1) {
+        const ErrorCtor = isCyclicalExport(childEntry, exportedName)
+          ? ERR_EXPORT_CYCLE
+          : ERR_EXPORT_MISSING
+
+        // Remove problematic setter to unblock subsequent imports.
+        setters.splice(setterIndex, 1)
+        throw constructStackless(ErrorCtor, [childEntry.module, exportedName])
+      }
+    }
+  }
+
+  for (const name in children) {
+    const childEntry = children[name]
+
+    if (! childEntry.builtin &&
+        childEntry.type === TYPE_ESM) {
       validateDeep(childEntry)
     }
   }
@@ -55,106 +139,6 @@ function isCyclicalExport(entry, exportedName, seen) {
   }
 
   return false
-}
-
-function validateDependencies(entry) {
-  const parentNamedExports =
-    entry.extname !== ".mjs" &&
-    entry.package.options.cjs.namedExports
-
-  const { children } = entry
-
-  for (const name in children) {
-    const childEntry = children[name]
-    const childIsESM = childEntry.type === TYPE_ESM
-
-    const noNamedExports =
-      ! childEntry.builtin &&
-      ! parentNamedExports &&
-      ! childIsESM
-
-    const cache = childEntry._validation
-    const settersMap = childEntry.setters
-
-    if (childIsESM) {
-      const { getters } = childEntry
-
-      for (const exportedName in settersMap) {
-        if (exportedName === "*") {
-          continue
-        }
-
-        const cached = cache.get(exportedName)
-
-        if (cached === true) {
-          continue
-        }
-
-        if (Reflect.has(getters, exportedName)) {
-          let getter = getters[exportedName]
-
-          if (getter.owner.type !== TYPE_ESM) {
-            continue
-          }
-
-          if (! getter.deferred) {
-            cache.set(exportedName, true)
-            continue
-          }
-
-          const seen = new Set
-
-          while (getter !== void 0 && getter.deferred) {
-            if (seen.has(getter)) {
-              getter = void 0
-            } else {
-              seen.add(getter)
-              getter = getter.owner.getters[getter.id]
-            }
-          }
-
-          if (getter) {
-            getters[exportedName] = getter
-            cache.set(exportedName, true)
-            continue
-          }
-        }
-
-        cache.set(exportedName, false)
-
-        const setters = settersMap[exportedName]
-        const setterIndex = setters.findIndex(({ parent }) => parent === entry)
-
-        if (setterIndex !== -1) {
-          const ErrorCtor = isCyclicalExport(childEntry, exportedName)
-            ? ERR_EXPORT_CYCLE
-            : ERR_EXPORT_MISSING
-
-          // Remove problematic setter to unblock subsequent imports.
-          setters.splice(setterIndex, 1)
-          throw constructStackless(ErrorCtor, [childEntry.module, exportedName])
-        }
-      }
-    } else if (noNamedExports) {
-      for (const exportedName in settersMap) {
-        if (exportedName === "*" ||
-            exportedName === "default") {
-          continue
-        }
-
-        cache.set(exportedName, false)
-
-        const setters = settersMap[exportedName]
-        const setterIndex = setters.findIndex(({ parent }) => parent === entry)
-
-        if (setterIndex !== -1) {
-          // Remove problematic setter to unblock subsequent imports.
-          setters.splice(setterIndex, 1)
-          throw constructStackless(ERR_EXPORT_MISSING, [childEntry.module, exportedName])
-        }
-      }
-    }
-  }
 }
 
 export default validateDeep
