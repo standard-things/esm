@@ -110,8 +110,7 @@ function validateDeep(entry) {
   for (const name in children) {
     const childEntry = children[name]
 
-    if (! childEntry.builtin &&
-        childEntry.type === TYPE_ESM) {
+    if (childEntry.type === TYPE_ESM) {
       validateDeep(childEntry)
     }
   }

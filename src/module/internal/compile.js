@@ -178,8 +178,7 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function isDescendant(entry, parentEntry, seen) {
-  if (entry.builtin ||
-      entry.type !== TYPE_ESM) {
+  if (entry.type !== TYPE_ESM) {
     return false
   }
 
