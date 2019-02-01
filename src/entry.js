@@ -28,7 +28,6 @@ import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
 import keys from "./util/keys.js"
-import keysIn from "./util/keys-in.js"
 import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
@@ -85,9 +84,9 @@ class Entry {
     // The namespace object change indicator.
     this._changed = false
     // The raw mutable namespace object for CJS importers.
-    this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: void 0 })
+    this._cjsMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The raw namespace object for CJS importers.
-    this._cjsNamespace = toRawModuleNamespaceObject({ default: void 0 })
+    this._cjsNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
     // The raw mutable namespace object for ESM importers.
     this._esmMutableNamespace = toRawModuleNamespaceObject()
     // The raw namespace object for ESM importers.
@@ -229,12 +228,8 @@ class Entry {
 
           let object = _namespace
 
-          if (name === "then") {
-            if (has(exported, name)) {
-              object = exported
-            }
-          } else if (name !== Symbol.toStringTag &&
-              hasExportsObjectKey(this, name)) {
+          if (name !== Symbol.toStringTag &&
+              has(_namespace, name)) {
             object = exported
           }
 
@@ -329,11 +324,7 @@ class Entry {
         setProperty(this, name, value)
       }
     } else {
-      descriptor.get = () => {
-        if (hasExportsObjectKey(this, name)) {
-          return this.exports[name]
-        }
-      }
+      descriptor.get = () => this.exports[name]
 
       descriptor.set = (value) => {
         this.exports[name] = value
@@ -443,7 +434,9 @@ class Entry {
     const isCJS = type === TYPE_CJS
 
     if (names === void 0) {
-      names = getExportsObjectKeys(this)
+      names = this._loaded === LOAD_COMPLETED
+        ? keys(this._namespace)
+        : getExportsObjectKeys(this)
     }
 
     for (const name of names) {
@@ -478,8 +471,6 @@ class Entry {
     Object.seal(this._esmNamespace)
 
     if (this.type !== TYPE_ESM) {
-      this._cjsNamespace.default = INITIAL_VALUE
-      this._cjsMutableNamespace.default = INITIAL_VALUE
       Object.seal(this._cjsNamespace)
     }
 
@@ -509,8 +500,7 @@ class Entry {
 
     if (this.type === TYPE_ESM ||
         this.type === TYPE_WASM) {
-      const exported = this.exports
-      const names = keys(exported)
+      const names = getExportsObjectKeys(this)
 
       this._loaded = LOAD_COMPLETED
       this.namespace = this._namespace
@@ -518,6 +508,8 @@ class Entry {
 
       if (this.package.options.cjs.interop &&
           this.extname !== ".mjs") {
+        const exported = this.exports
+
         if (names.length === 1 &&
             names[0] === "default") {
           this.module.exports = exported.default
@@ -528,7 +520,7 @@ class Entry {
     } else {
       let exported = mod.exports
 
-      const names = keys(exported)
+      const names = getExportsObjectKeys(this, exported)
 
       this._loaded = LOAD_COMPLETED
 
@@ -868,13 +860,14 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     let value
 
-    if (hasExportsObjectKey(entry, name)) {
+    if (has(exported, name)) {
       const exportedDescriptor = Reflect.getOwnPropertyDescriptor(exported, name)
-      const exportedGet = exportedDescriptor.get
 
-      value = typeof exportedGet === "function"
-        ? tryGetter(exportedGet)
-        : exportedDescriptor.value
+      if (Reflect.has(exportedDescriptor, "value")) {
+        value = exportedDescriptor.value
+      } else if (typeof exportedDescriptor.get === "function") {
+        value = tryGetter(exportedDescriptor.get)
+      }
     } else {
       value = handler.get(namespace, name)
     }
@@ -999,29 +992,26 @@ function getExportByNameFast(entry, name, parentEntry) {
     : entry.esmMutableNamespace
 }
 
-function getExportsObjectKeys(entry) {
-  if (entry._loaded === LOAD_COMPLETED) {
-    return keys(entry._namespace)
-  }
+function getExportsObjectKeys(entry, exported = entry.exports) {
+  const { type } = entry
 
-  const exported = entry.exported
-
-  if (entry.extname === ".mjs") {
+  if (type === TYPE_ESM ||
+      type === TYPE_WASM) {
     return keys(exported)
   }
 
-  if (! entry.builtin) {
-    return keysIn(exported)
-  }
-
+  const isFunc = typeof exported === "function"
   const possibleNames = ownPropertyNames(exported)
   const proto = getPrototypeOf(exported)
   const result = []
 
   for (const name of possibleNames) {
     if (! isEnumerable(exported, name) &&
-        hasIn(proto, name) &&
-        ! isEnumerable(proto, name)) {
+        (name === "__esModule" ||
+         (isFunc &&
+          name === "prototype") ||
+         (hasIn(proto, name) &&
+          ! isEnumerable(proto, name)))) {
       continue
     }
 
@@ -1029,33 +1019,6 @@ function getExportsObjectKeys(entry) {
   }
 
   return result
-}
-
-function hasExportsObjectKey(entry, name) {
-  const exported = entry.exports
-
-  if (entry.extname === ".mjs") {
-    return has(exported, name) &&
-      isEnumerable(exported, name)
-  }
-
-  if (! entry.builtin) {
-    return hasIn(exported, name)
-  }
-
-  if (! has(exported, name)) {
-    return false
-  }
-
-  const proto = getPrototypeOf(exported)
-
-  if (! isEnumerable(exported, name) &&
-      hasIn(proto, name) &&
-      ! isEnumerable(proto, name)) {
-    return false
-  }
-
-  return true
 }
 
 function initNamespaceHandler() {

@@ -23,7 +23,7 @@ export default () => {
   assert.deepStrictEqual(defaultArray, ["a"])
   assert.deepStrictEqual(nsArray, ns)
 
-  ns = createNamespace({ default: defaultClass })
+  ns = createNamespace({ a: "a", default: defaultClass })
   assert.strictEqual(typeof defaultClass, "function")
   assert.deepStrictEqual(nsClass, ns)
 
