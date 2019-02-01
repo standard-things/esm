@@ -1,11 +1,5 @@
-import ENTRY from "../../constant/entry.js"
-
 import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
-
-const {
-  TYPE_ESM
-} = ENTRY
 
 const {
   ERR_EXPORT_MISSING
@@ -18,27 +12,14 @@ function validateShallow(entry) {
 
   entry._validatedShallow = true
 
-  const parentNamedExports =
-    entry.extname !== ".mjs" &&
-    entry.package.options.cjs.namedExports
-
   const { children } = entry
 
   for (const name in children) {
     const childEntry = children[name]
-
-    const noNamedExports =
-      ! childEntry.builtin &&
-      ! parentNamedExports &&
-      childEntry.type !== TYPE_ESM
-
-    if (noNamedExports) {
-      continue
-    }
-
     const cache = childEntry._validation
-    const { getters } = childEntry
     const settersMap = childEntry.setters
+
+    let namespace
 
     for (const exportedName in settersMap) {
       if (exportedName === "*") {
@@ -51,30 +32,13 @@ function validateShallow(entry) {
         continue
       }
 
-      if (Reflect.has(getters, exportedName)) {
-        let getter = getters[exportedName]
+      if (namespace === void 0) {
+        namespace = childEntry.getExportByName("*", entry)
+      }
 
-        if (! getter.deferred) {
-          cache.set(exportedName, true)
-          continue
-        }
-
-        const seen = new Set
-
-        while (getter !== void 0 && getter.deferred) {
-          if (seen.has(getter)) {
-            getter = void 0
-          } else {
-            seen.add(getter)
-            getter = getter.owner.getters[getter.id]
-          }
-        }
-
-        if (getter) {
-          getters[exportedName] = getter
-          cache.set(exportedName, true)
-          continue
-        }
+      if (Reflect.has(namespace, exportedName)) {
+        cache.set(exportedName, true)
+        continue
       }
 
       cache.set(exportedName, false)
