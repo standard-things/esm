@@ -495,6 +495,12 @@ class Entry {
     return this
   }
 
+  getExportByName(name, parentEntry) {
+    return this.type === TYPE_ESM
+      ? getExportByNameFast(this, name, parentEntry)
+      : getExportByName(this, name, parentEntry)
+  }
+
   loaded() {
     if (this._loaded !== LOAD_INCOMPLETE) {
       return this._loaded
@@ -1103,7 +1109,6 @@ function runSetter(entry, name, callback, updateType) {
     return
   }
 
-  const isESM = entry.type === TYPE_ESM
   const isLoaded = entry._loaded === LOAD_COMPLETED
   const isNsChanged = entry._changed
 
@@ -1111,11 +1116,7 @@ function runSetter(entry, name, callback, updateType) {
 
   while (length--) {
     const setter = setters[length]
-    const parentEntry = setter.parent
-
-    const value = isESM
-      ? getExportByNameFast(entry, name, parentEntry)
-      : getExportByName(entry, name, parentEntry)
+    const value = entry.getExportByName(name, setter.parent)
 
     if (value === ERROR_STAR) {
       setters.splice(length, 1)
