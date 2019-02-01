@@ -98,9 +98,9 @@ class Entry {
     // The finalized state of the namespace object.
     this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
     // The raw mutable namespace object for non-ESM importers.
-    this._partialMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
+    this._partialMutableNamespace = toRawModuleNamespaceObject()
     // The raw namespace object for non-ESM importers.
-    this._partialNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
+    this._partialNamespace = toRawModuleNamespaceObject()
     // The passthru indicator for `module._compile()`.
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
@@ -422,16 +422,12 @@ class Entry {
   }
 
   assignExportsToNamespace(names) {
-    const { type } = this
-
-    if ((type !== TYPE_ESM &&
-         ! this.module.loaded) ||
-        ! isObjectLike(this.exports)) {
+    if (! isObjectLike(this.exports)) {
       return
     }
 
     const { getters } = this
-    const isCJS = type === TYPE_CJS
+    const isCJS = this.type === TYPE_CJS
 
     if (names === void 0) {
       names = this._loaded === LOAD_COMPLETED
@@ -471,6 +467,25 @@ class Entry {
     Object.seal(this._completeNamespace)
 
     if (this.type !== TYPE_ESM) {
+      if (this.builtin) {
+        const exported = this.exports
+        const names = keys(exported)
+
+        if (! has(exported, "default")) {
+          names.push("default")
+        }
+
+        names.sort()
+
+        for (const name of names) {
+          this._partialMutableNamespace[name] = INITIAL_VALUE
+          this._partialNamespace[name] = INITIAL_VALUE
+        }
+      } else {
+        this._partialMutableNamespace.default = INITIAL_VALUE
+        this._partialNamespace.default = INITIAL_VALUE
+      }
+
       Object.seal(this._partialNamespace)
     }
 
@@ -934,7 +949,6 @@ function getExportByName(entry, name, parentEntry) {
     parentCJS.namedExports
 
   const noNamedExports =
-    ! entry.builtin &&
     ! parentNamedExports &&
     entry.type !== TYPE_ESM
 
@@ -1074,7 +1088,7 @@ function runGetters(entry, names) {
         runGetter(entry, name)
       }
     }
-  } else {
+  } else if (entry.module.loaded) {
     entry.assignExportsToNamespace(names)
   }
 }

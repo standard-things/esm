@@ -68,7 +68,6 @@ function validateDependencies(entry) {
     const childEntry = children[name]
 
     const noNamedExports =
-      ! childEntry.builtin &&
       ! parentNamedExports &&
       childEntry.type !== TYPE_ESM
 
