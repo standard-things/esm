@@ -59,8 +59,8 @@ function isCyclicalExport(entry, exportedName, seen) {
 
 function validateDependencies(entry) {
   const parentNamedExports =
-    entry.package.options.cjs.namedExports &&
-    entry.extname !== ".mjs"
+    entry.extname !== ".mjs" &&
+    entry.package.options.cjs.namedExports
 
   const { children } = entry
 

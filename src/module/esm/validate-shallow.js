@@ -19,8 +19,8 @@ function validateShallow(entry) {
   entry._validatedShallow = true
 
   const parentNamedExports =
-    entry.package.options.cjs.namedExports &&
-    entry.extname !== ".mjs"
+    entry.extname !== ".mjs" &&
+    entry.package.options.cjs.namedExports
 
   const { children } = entry
 
