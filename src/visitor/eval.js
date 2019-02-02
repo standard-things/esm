@@ -10,15 +10,15 @@ function init() {
 
   class EvalVisitor extends Visitor {
     reset(options) {
-      this.addedExport = false
       this.changed = false
+      this.instrumentUpdateBindings = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
       this.strict = false
 
       if (options !== void 0) {
-        this.addedExport = options.addedExport
+        this.instrumentUpdateBindings = options.instrumentUpdateBindings
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -54,7 +54,7 @@ function init() {
         .prependLeft(callee.end, "(" + code)
         .prependRight(end, ")")
 
-      if (this.addedExport) {
+      if (this.instrumentUpdateBindings) {
         magicString
           .prependLeft(start, runtimeName + ".u(")
           .prependRight(end, ")")
