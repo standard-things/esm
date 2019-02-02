@@ -754,7 +754,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   handler.getOwnPropertyDescriptor = (namespace, name) => {
     const descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
 
-    if (descriptor) {
+    if (descriptor !== void 0) {
       descriptor.value = handler.get(entry.namespace, name)
     }
 
