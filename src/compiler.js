@@ -82,12 +82,12 @@ function init() {
 
       const possibleExportIndexes = findIndexes(code, ["export"])
       const possibleEvalIndexes = findIndexes(code, ["eval"])
-      const possibleIndexes = findIndexes(code, ["import"])
+      const possibleImportExportIndexes = findIndexes(code, ["import"])
 
       const possibleChanges =
         possibleExportIndexes.length !== 0 ||
         possibleEvalIndexes.length !== 0 ||
-        possibleIndexes.length !== 0
+        possibleImportExportIndexes.length !== 0
 
       if (! possibleChanges &&
           (sourceType === SOURCE_TYPE_SCRIPT ||
@@ -139,13 +139,13 @@ function init() {
 
       let yieldIndex = top.insertIndex
 
-      possibleIndexes.push(...possibleExportIndexes)
-      possibleIndexes.sort(ascendingComparator)
+      possibleImportExportIndexes.push(...possibleExportIndexes)
+      possibleImportExportIndexes.sort(ascendingComparator)
 
       importExportVisitor.visit(rootPath, {
         generateVarDeclarations: options.generateVarDeclarations,
         magicString,
-        possibleIndexes,
+        possibleIndexes: possibleImportExportIndexes,
         runtimeName,
         sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
         strict,
@@ -193,7 +193,7 @@ function init() {
 
       if (! Reflect.has(identifiers, "eval")) {
         evalVisitor.visit(rootPath, {
-          addedExport,
+          instrumentUpdateBindings: addedExport,
           magicString,
           possibleIndexes: possibleEvalIndexes,
           runtimeName,
@@ -201,35 +201,46 @@ function init() {
         })
       }
 
+      let possibleAssignableBindingsIndexes
+
       if (addedExport ||
           addedImport) {
+        const { assignableBindings } = importExportVisitor
+
+        possibleAssignableBindingsIndexes = findIndexes(code, keys(assignableBindings))
+
         if (options.cjsVars) {
           requireVisitor.visit(rootPath, {
             possibleIndexes: findIndexes(code, ["require"])
           })
         }
 
-        const { assignableBindings } = importExportVisitor
+        const foundRequire = requireVisitor.found
         const { importedBindings } = top
 
+        let possibleAssignmentIndexes = possibleAssignableBindingsIndexes
+
+        if (! foundRequire) {
+          possibleAssignmentIndexes = findIndexes(code, keys(importedBindings))
+          possibleAssignmentIndexes.push(...possibleAssignableBindingsIndexes)
+          possibleAssignmentIndexes.sort(ascendingComparator)
+        }
+
         assignmentVisitor.visit(rootPath, {
-          addedExport,
-          addedImport,
           assignableBindings,
           importedBindings,
+          instrumentImportBindingAssignments: ! foundRequire,
+          instrumentNestedAssignments: true,
           magicString,
-          possibleIndexes: findIndexes(code, [
-            ...keys(requireVisitor.found ? null : importedBindings),
-            ...keys(assignableBindings)
-          ]),
+          possibleIndexes: possibleAssignmentIndexes,
           runtimeName
         })
 
         importExportVisitor.finalizeHoisting()
       }
 
-      if (sourceType === SOURCE_TYPE_MODULE &&
-          ! options.cjsVars) {
+      if (! options.cjsVars &&
+          sourceType === SOURCE_TYPE_MODULE) {
         const undeclaredIdentifiers = {
           __proto__: null,
           // eslint-disable-next-line sort-keys
@@ -272,13 +283,25 @@ function init() {
       if (addedImport) {
         // Pick `importExportVisitor` properties outside of the `codeWithTDZ`
         // getter/setter to preserve their values.
-        const { initedBindings, temporalBindings } = importExportVisitor
+        const {
+          assignableBindings,
+          initedBindings,
+          temporalBindings
+        } = importExportVisitor
 
         setDeferred(result, "codeWithTDZ", () => {
           const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
 
           possibleTemporalIndexes.push(...possibleExportIndexes)
           possibleTemporalIndexes.sort(ascendingComparator)
+
+          assignmentVisitor.visit(rootPath, {
+            assignableBindings,
+            instrumentTopLevelAssignments: true,
+            magicString,
+            possibleIndexes: possibleAssignableBindingsIndexes,
+            runtimeName
+          })
 
           temporalVisitor.visit(rootPath, {
             initedBindings,
