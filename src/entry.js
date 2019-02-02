@@ -517,6 +517,8 @@ class Entry {
       }
     }
 
+    const { cjs } = this.package.options
+
     if (this.type === TYPE_ESM ||
         this.type === TYPE_WASM) {
       const names = getExportsObjectKeys(this)
@@ -525,31 +527,41 @@ class Entry {
       this.namespace = this._namespace
       this.assignExportsToNamespace(names)
 
-      if (this.package.options.cjs.interop &&
-          this.extname !== ".mjs") {
-        const exported = this.exports
+      if (this.extname !== ".mjs") {
+        const exportDefaultOnly =
+          cjs.interop &&
+          names.length === 1 &&
+          names[0] === "default"
 
-        if (names.length === 1 &&
-            names[0] === "default") {
-          this.module.exports = exported.default
-        } else if (! Reflect.has(this.getters, "__esModule")) {
-          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+        if (! exportDefaultOnly &&
+            cjs.mutableNamespace) {
+          this.module.exports = proxyExports(this)
+        }
+
+        if (cjs.interop) {
+          const exported = this.exports
+
+          if (exportDefaultOnly) {
+            this.module.exports = exported.default
+          } else if (! Reflect.has(this.getters, "__esModule")) {
+            Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+          }
         }
       }
     } else {
       let exported = mod.exports
 
-      const names = getExportsObjectKeys(this, exported)
-
       this._loaded = LOAD_COMPLETED
 
-      if (exported != null &&
+      if (cjs.interop &&
+          exported != null &&
           exported.__esModule &&
-          this.type === TYPE_CJS &&
-          this.package.options.cjs.interop) {
+          this.type === TYPE_CJS) {
         this.namespace = this._namespace
         this.type = TYPE_PSEUDO
       }
+
+      const names = getExportsObjectKeys(this, exported)
 
       if (this.type === TYPE_CJS) {
         if (! Reflect.has(this.getters, "default")) {
