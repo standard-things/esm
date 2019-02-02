@@ -870,7 +870,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
       const exported = entry.exports
       const value = oldGet(namespace, name, receiver)
 
-      if (hasIn(exported, name)) {
+      if (has(exported, name)) {
         const newValue = Reflect.get(entry.exports, name, receiver)
 
         if ((value === INITIAL_VALUE ||
