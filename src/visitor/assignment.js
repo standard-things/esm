@@ -1,7 +1,6 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import getShadowed from "../parse/get-shadowed.js"
 import isShadowed from "../parse/is-shadowed.js"
 import isTopLevel from "../parse/is-top-level.js"
 import overwrite from "../parse/overwrite.js"
@@ -13,19 +12,21 @@ function init() {
 
   class AssignmentVisitor extends Visitor {
     reset(options) {
-      this.addedExport = false
-      this.addedImport = false
       this.assignableBindings = null
       this.importedBindings = null
+      this.instrumentImportBindingAssignments = false
+      this.instrumentNestedAssignments = false
+      this.instrumentTopLevelAssignments = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
 
       if (options !== void 0) {
-        this.addedExport = options.addedExport
-        this.addedImport = options.addedImport
         this.assignableBindings = options.assignableBindings
         this.importedBindings = options.importedBindings
+        this.instrumentImportBindingAssignments = options.instrumentImportBindingAssignments
+        this.instrumentNestedAssignments = options.instrumentNestedAssignments
+        this.instrumentTopLevelAssignments = options.instrumentTopLevelAssignments
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -54,7 +55,7 @@ function init() {
     const names = getNamesFromPattern(node[childName])
     const { end, start } = node
 
-    if (visitor.addedImport) {
+    if (visitor.instrumentImportBindingAssignments) {
       for (const name of names) {
         if (Reflect.has(importedBindings, name) &&
             ! isShadowed(path, name, shadowedMap)) {
@@ -69,14 +70,25 @@ function init() {
       }
     }
 
-    if (visitor.addedExport) {
+    const {
+      instrumentNestedAssignments,
+      instrumentTopLevelAssignments
+    } = visitor
+
+    if (instrumentNestedAssignments ||
+        instrumentTopLevelAssignments) {
+      const instrumentBoth =
+        instrumentNestedAssignments &&
+        instrumentTopLevelAssignments
+
       for (const name of names) {
         if (assignableBindings[name] === true &&
-            ! isTopLevel(path, name, topLevelMap)) {
-          const shadowed = getShadowed(path, name, shadowedMap)
-
-          if (shadowed === null ||
-              shadowed.type === "FunctionDeclaration")  {
+            ! isShadowed(path, name, shadowedMap)) {
+          if (instrumentBoth ||
+              (instrumentNestedAssignments &&
+               ! isTopLevel(path, name, topLevelMap)) ||
+              (instrumentTopLevelAssignments &&
+               isTopLevel(path, name, topLevelMap))) {
             // Wrap assignments to exported identifiers.
             magicString
               .prependLeft(start, runtimeName + ".u(")
