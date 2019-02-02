@@ -3,11 +3,13 @@ import Visitor from "../visitor.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import getShadowed from "../parse/get-shadowed.js"
 import isShadowed from "../parse/is-shadowed.js"
+import isTopLevel from "../parse/is-top-level.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
   const shadowedMap = new Map
+  const topLevelMap = new Map
 
   class AssignmentVisitor extends Visitor {
     reset(options) {
@@ -69,7 +71,8 @@ function init() {
 
     if (visitor.addedExport) {
       for (const name of names) {
-        if (assignableBindings[name] === true) {
+        if (assignableBindings[name] === true &&
+            ! isTopLevel(path, name, topLevelMap)) {
           const shadowed = getShadowed(path, name, shadowedMap)
 
           if (shadowed === null ||
@@ -79,7 +82,7 @@ function init() {
               .prependLeft(start, runtimeName + ".u(")
               .prependRight(end, ")")
 
-            return
+            break
           }
         }
       }
