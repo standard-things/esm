@@ -283,11 +283,7 @@ function init() {
       if (addedImport) {
         // Pick `importExportVisitor` properties outside of the `codeWithTDZ`
         // getter/setter to preserve their values.
-        const {
-          assignableBindings,
-          initedBindings,
-          temporalBindings
-        } = importExportVisitor
+        const { assignableBindings, temporalBindings } = importExportVisitor
 
         setDeferred(result, "codeWithTDZ", () => {
           const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
@@ -304,7 +300,6 @@ function init() {
           })
 
           temporalVisitor.visit(rootPath, {
-            initedBindings,
             magicString,
             possibleIndexes: possibleTemporalIndexes,
             runtimeName,

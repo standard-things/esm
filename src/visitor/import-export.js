@@ -106,7 +106,6 @@ function init() {
       this.hoistedExports = null
       this.hoistedImportsString = ""
       this.importSpecifierMap = null
-      this.initedBindings = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
@@ -124,7 +123,6 @@ function init() {
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
         this.importSpecifierMap = { __proto__: null }
-        this.initedBindings = { __proto__: null }
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -258,15 +256,9 @@ function init() {
       const node = path.getValue()
       const { declaration } = node
       const { magicString, runtimeName } = this
+      const { type } = declaration
 
-      let { id, type } = declaration
-
-      if (type === "ParenthesizedExpression") {
-        const { expression } = declaration
-
-        id = expression.id
-        type = expression.type
-      }
+      let { id } = declaration
 
       if (id === void 0) {
         id = null
@@ -333,8 +325,6 @@ function init() {
         this.assignableBindings[name] = true
       }
 
-      this.initedBindings.default = isInitable(declaration)
-
       path.call(this, "visitWithoutReset", "declaration")
     }
 
@@ -346,13 +336,7 @@ function init() {
       this.changed = true
       this.addedExport = true
 
-      const {
-        assignableBindings,
-        initedBindings,
-        magicString,
-        runtimeName
-      } = this
-
+      const { assignableBindings, magicString } = this
       const node = path.getValue()
 
       const {
@@ -361,56 +345,33 @@ function init() {
         specifiers
       } = node
 
-      const initees = { __proto__: null }
-
       if (declaration !== null) {
         const pairs = []
         const { type } = declaration
-        const isClassDecl = type === "ClassDeclaration"
 
-        let { id } = declaration
-
-        if (id === void 0) {
-          id = null
-        }
-
-        if (id !== null &&
-            (isClassDecl ||
-             type === "FunctionDeclaration")) {
+        if (type === "ClassDeclaration" ||
+            type === "FunctionDeclaration") {
           // Support exporting named class and function declarations:
           // export function named() {}
-          const { name } = id
+          const { name } = declaration.id
 
+          assignableBindings[name] = true
+          pairs.push([name, name])
+        } else if (type === "VariableDeclaration") {
           // Skip adding declared names to `this.assignableBindings` if the
           // declaration is a const-kinded VariableDeclaration, because the
           // assignmentVisitor doesn't need to worry about changes to these
           // variables.
-          if (isChangeable(node)) {
-            assignableBindings[name] = true
-          }
-
-          pairs.push([name, name])
-        } else if (type === "VariableDeclaration") {
           const changeable = isChangeable(node)
 
           // Support exporting variable lists:
           // export let name1, name2, ..., nameN
-          for (const { id, init } of declaration.declarations) {
-            const initable = isInitable(init)
+          for (const { id } of declaration.declarations) {
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
               if (changeable) {
                 assignableBindings[name] = true
-              }
-
-              if (! Reflect.has(initedBindings, name)) {
-                if (initable) {
-                  initees[name] = true
-                  initedBindings[name] = true
-                } else {
-                  initedBindings[name] = false
-                }
               }
 
               pairs.push([name, name])
@@ -440,11 +401,6 @@ function init() {
             ])
           }
 
-          if (! Reflect.has(initedBindings, localName)) {
-            initees[exportedName] = true
-            initedBindings[localName] = true
-          }
-
           assignableBindings[localName] = true
 
           pairs.push([exportedName, localName])
@@ -472,10 +428,6 @@ function init() {
             ? "*"
             : specifier.local.name
 
-          if (! Reflect.has(initees, exportedName)) {
-            initees[exportedName] = true
-          }
-
           const { reExports } = importSpecifierMap[request]
 
           if (! Reflect.has(reExports, exportedName)) {
@@ -486,17 +438,6 @@ function init() {
         }
 
         hoistImports(this, node)
-      }
-
-      const initeeNames = keys(initees)
-
-      if (initeeNames.length !== 0) {
-        const { end } = declaration || node
-
-        magicString.appendRight(
-          end,
-          ";" + runtimeName + ".j(" + JSON.stringify(initeeNames) + ");"
-        )
       }
 
       if (declaration !== null) {
@@ -540,26 +481,13 @@ function init() {
     }
 
     if (type === "ExportNamedDeclaration" &&
-        declaration &&
+        declaration !== null &&
         declaration.type === "VariableDeclaration" &&
         declaration.kind === "const") {
       return false
     }
 
     return true
-  }
-
-  function isInitable(node) {
-    if (node === null) {
-      return true
-    }
-
-    const { type } = node
-
-    return type === "CallExpression" ||
-      type === "Identifier" ||
-      type === "MemberExpression" ||
-      type === "SequenceExpression"
   }
 
   function safeName(name, localNames) {

@@ -13,14 +13,12 @@ function init() {
   class TemporalVisitor extends Visitor {
     reset(options) {
       this.changed = false
-      this.initedBindings = null
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
       this.temporalBindings = null
 
       if (options !== void 0) {
-        this.initedBindings = options.initedBindings
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -75,16 +73,15 @@ function init() {
     }
 
     visitExportDefaultDeclaration(path) {
-      const { initedBindings } = this
+      const node = path.getValue()
+      const { declaration } = node
 
-      if (initedBindings.default !== true) {
+      if (declaration.type !== "FunctionDeclaration") {
+        // Instrument for non-hoisted values.
         this.changed = true
-        initedBindings.default = true
-
-        const node = path.getValue()
 
         this.magicString.appendRight(
-          node.declaration.end,
+          declaration.end,
           this.runtimeName + '.j(["default"]);'
         )
       }
@@ -94,32 +91,36 @@ function init() {
 
     visitExportNamedDeclaration(path) {
       const node = path.getValue()
-      const { declaration } = node
-      const { initedBindings } = this
-
+      const { declaration, specifiers } = node
       const initees = { __proto__: null }
 
       if (declaration !== null) {
         const { type } = declaration
 
         if (type === "ClassDeclaration") {
-          const { name } = declaration.id
-
-          if (initedBindings[name] !== true) {
-            initees[name] = true
-            initedBindings[name] = true
-          }
+          initees[declaration.id.name] = true
         } else if (type === "VariableDeclaration") {
+          // Instrument for exported variable lists:
+          // export let name1, name2, ..., nameN
           for (const { id } of declaration.declarations) {
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
-              if (initedBindings[name] !== true) {
-                initees[name] = true
-                initedBindings[name] = true
-              }
+              initees[name] = true
             }
           }
+        }
+      } else if (node.source === null) {
+        // Instrument for exported specifiers:
+        // export { name1, name2, ..., nameN }
+        for (const specifier of specifiers) {
+          initees[specifier.exported.name] = true
+        }
+      } else {
+        // Instrument for re-exported specifiers of an imported module:
+        // export { name1, name2, ..., nameN } from "mod"
+        for (const specifier of specifiers) {
+          initees[specifier.exported.name] = true
         }
       }
 
