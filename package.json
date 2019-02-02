@@ -90,7 +90,7 @@
     "sleep": "^5.2.4",
     "sqreen": "^1.29.0",
     "strip-ansi": "^5.0.0",
-    "terser": "^3.14.1",
+    "terser": "3.14.1",
     "terser-webpack-plugin": "^1.2.1",
     "test262-parser": "^2.0.7",
     "trash": "^4.3.0",
