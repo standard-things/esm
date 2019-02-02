@@ -1,3 +1,3 @@
 import { log } from "console"
 
-log("symlink:true")
+log("symlink-file:true")

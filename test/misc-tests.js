@@ -253,9 +253,9 @@ describe("miscellaneous tests", () => {
     })
   })
 
-  describe("package.json", () => {
-    it("should be enabled for third-party packages", () =>
-      import("third-party")
+  describe("packages", () => {
+    it("should load packages written in ESM syntax.", () =>
+      import("esm-syntax")
     )
 
     it("should support .esmrc options", () =>
@@ -323,9 +323,9 @@ describe("miscellaneous tests", () => {
     it("should support esm as package dependencies", () =>
       Promise
         .all([
-          "dependencies",
-          "dev-dependencies",
-          "peer-dependencies"
+          "dependencies-field",
+          "dev-dependencies-field",
+          "peer-dependencies-field"
         ]
         .map((request) => import(request)))
     )

@@ -201,7 +201,7 @@ describe("main hook tests", function () {
       for (const destName of destNames) {
         const args = flag ? [flag] : []
 
-        args.push("-r", "../", "./fixture/main-hook/symlink/" + destName)
+        args.push("-r", "../", "./fixture/main-hook/symlink/file/" + destName)
         runs.push(args)
       }
     }
@@ -212,26 +212,25 @@ describe("main hook tests", function () {
           .then(() => {
             const destPath = args[args.length - 1]
             const ext = path.extname(destPath)
-            const srcPath = "./fixture/main-hook/symlink/real" + ext
+            const srcPath = "./fixture/main-hook/symlink/file/real" + ext
 
             return fs
               .ensureSymlink(srcPath, destPath)
               .then(() => node(args))
-              .then(({ stdout }) => assert.ok(stdout.includes("symlink:true")))
-              .then(() => fs.remove(destPath))
+              .then(({ stdout }) => assert.ok(stdout.includes("symlink-file:true")))
+              .then(() => trash(destPath))
           })
       , Promise.resolve())
   })
 
-  it("should work with symlinked packages", () =>
-    fs
-      .ensureSymlink(
-        "./fixture/main-hook/package/module-1",
-        "./fixture/main-hook/package/module-2/node_modules/module-1"
-      )
-      .then(() =>
-        runMain("./fixture/main-hook/package/index.js")
-      )
-      .then(({ stdout }) => assert.ok(stdout.includes("package:true")))
-  )
+  it("should work with symlinked packages", () => {
+    const destPath = "./node_modules/symlink"
+    const srcPath = "./node_modules/real"
+
+    return fs
+      .ensureSymlink(srcPath, destPath)
+      .then(() => runMain("./fixture/main-hook/symlink/package"))
+      .then(({ stdout }) => assert.ok(stdout.includes("symlink-package:true")))
+      .then(() => trash(destPath))
+  })
 })

@@ -2,4 +2,4 @@
 
 const { log } = console
 
-log("symlink:true")
+log("symlink-file:true")
