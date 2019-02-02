@@ -35,9 +35,11 @@ function init() {
         return result !== null
       }
 
+      const isFuncExpr = type === "FunctionExpression"
+
       const isNonArrowFunc =
-        type === "FunctionDeclaration" ||
-        type === "FunctionExpression"
+        isFuncExpr ||
+        type === "FunctionDeclaration"
 
       if (isArgs &&
           isNonArrowFunc) {
@@ -78,7 +80,7 @@ function init() {
         }
       }
 
-      if (isNonArrowFunc) {
+      if (isFuncExpr) {
         const { id } = parent
 
         // Exported function declarations may not have an id.
