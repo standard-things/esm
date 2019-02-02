@@ -4,13 +4,13 @@ import shared from "../shared.js"
 function init() {
   function getNamesFromPattern(pattern) {
     const identifiers = getIdentifiersFromPattern(pattern)
-    const names = []
+    const result = []
 
     for (const { name } of identifiers) {
-      names.push(name)
+      result.push(name)
     }
 
-    return names
+    return result
   }
 
   return getNamesFromPattern

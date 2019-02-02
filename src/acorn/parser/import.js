@@ -118,7 +118,9 @@ function init() {
     }
 
     node.source = this.parseExprAtom()
+
     this.semicolon()
+
     return this.finishNode(node, finishType)
   }
 
@@ -219,6 +221,7 @@ function init() {
     const node = parser.startNode()
 
     parser.expect(tt._import)
+
     return parser.finishNode(node, "Import")
   }
 

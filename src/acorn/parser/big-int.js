@@ -16,6 +16,7 @@ function init() {
     enable(parser) {
       parser.readNumber = wrap(parser.readNumber, readNumber)
       parser.readRadixNumber = wrap(parser.readRadixNumber, readRadixNumber)
+
       return parser
     }
   }
@@ -32,10 +33,12 @@ function init() {
     if (parser.readInt(radix) !== null &&
         input.charCodeAt(parser.pos) === LOWERCASE_N) {
       ++parser.pos
+
       return parser.finishToken(tt.num, null)
     }
 
     parser.pos = pos
+
     return null
   }
 

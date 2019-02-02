@@ -23,6 +23,7 @@ function init() {
     enable(parser) {
       parser.readToken_lt_gt = wrap(parser.readToken_lt_gt, readToken_lt_gt)
       parser.readToken_plus_min = wrap(parser.readToken_plus_min, readToken_plus_min)
+
       return parser
     }
   }
@@ -62,7 +63,7 @@ function init() {
           next === HYPHEN_MINUS &&
           input.charCodeAt(pos + 2) === RIGHT_ANGLE_BRACKET &&
           (lastTokEnd === 0 ||
-            lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
+           lineBreakRegExp.test(input.slice(lastTokEnd, pos)))) {
         this.raise(pos, ILLEGAL_HTML_COMMENT)
       }
     }

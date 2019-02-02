@@ -5,6 +5,7 @@ function init() {
   const Plugin = {
     enable(parser) {
       parser.parseFunctionParams = wrap(parser.parseFunctionParams, parseFunctionParams)
+
       return parser
     }
   }
@@ -13,6 +14,7 @@ function init() {
     const [node] = args
 
     node.functionParamsStart = this.start
+
     return Reflect.apply(func, this, args)
   }
 

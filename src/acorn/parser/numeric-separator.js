@@ -17,6 +17,7 @@ function init() {
   const Plugin = {
     enable(parser) {
       parser.readInt = readInt
+
       return parser
     }
   }

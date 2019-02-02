@@ -6,6 +6,7 @@ function init() {
     enable(parser) {
       parser.parseLiteral = parseLiteral
       parser.parseTemplateElement = parseTemplateElement
+
       return parser
     }
   }
@@ -15,7 +16,9 @@ function init() {
 
     node.raw = ""
     node.value = value
+
     this.next()
+
     return this.finishNode(node, "Literal")
   }
 
@@ -28,7 +31,9 @@ function init() {
     }
 
     this.next()
+
     node.tail = this.type === tt.backQuote
+
     return this.finishNode(node, "TemplateElement")
   }
 

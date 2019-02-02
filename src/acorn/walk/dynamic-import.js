@@ -9,6 +9,7 @@ function init() {
   const Plugin = {
     enable(walk) {
       walk.base.Import = noop
+
       return walk
     }
   }

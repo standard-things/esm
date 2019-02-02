@@ -14,7 +14,9 @@ function init() {
     flyweight.input = parser.input
     flyweight.pos = parser.pos
     flyweight.strict = parser.strict
+
     flyweight.next()
+
     return flyweight
   }
 

@@ -13,12 +13,13 @@ function init() {
     const { type } = parent
 
     if (type === "Property") {
-      return parent.computed || parent.shorthand
+      return parent.computed ||
+        parent.shorthand
     }
 
     if (((type === "AssignmentExpression" ||
           type === "AssignmentPattern") &&
-          parent.left === node) ||
+         parent.left === node) ||
         type === "BreakStatement" ||
         type === "ContinueStatement" ||
         type === "ImportDefaultSpecifier" ||

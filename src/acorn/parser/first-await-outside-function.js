@@ -9,6 +9,7 @@ function init() {
       parser.firstAwaitOutsideFunction = null
       parser.parseAwait = wrap(parser.parseAwait, parseAwait)
       parser.parseForStatement = wrap(parser.parseForStatement, parseForStatement)
+
       return parser
     }
   }

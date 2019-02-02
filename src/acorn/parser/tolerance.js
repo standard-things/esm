@@ -24,6 +24,7 @@ function init() {
       parser.validateRegExpPattern = noop
       parser.checkExpressionErrors = checkExpressionErrors
       parser.enterScope = enterScope
+
       return parser
     }
   }

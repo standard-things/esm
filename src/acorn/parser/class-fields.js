@@ -17,6 +17,7 @@ function init() {
     enable(parser) {
       parser.getTokenFromCode = wrap(parser.getTokenFromCode, getTokenFromCode)
       parser.parseClassElement = wrap(parser.parseClassElement, parseClassElement)
+
       return parser
     }
   }
@@ -29,6 +30,7 @@ function init() {
     }
 
     ++this.pos
+
     return this.finishToken(tt.name, this.readWord1())
   }
 
@@ -59,6 +61,7 @@ function init() {
 
     this.finishNode(node, "FieldDefinition")
     this.semicolon()
+
     return node
   }
 

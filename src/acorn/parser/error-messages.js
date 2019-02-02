@@ -69,6 +69,7 @@ function init() {
       parser.raise = raise
       parser.raiseRecoverable = raise
       parser.unexpected = unexpected
+
       return parser
     }
   }

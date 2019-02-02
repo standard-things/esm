@@ -36,8 +36,9 @@ function init() {
 
     while (this.type !== tt.eof) {
       const stmt = this.parseStatement(null, true, exported)
+      const { expression } = stmt
 
-      let { expression, type } = stmt
+      let { type } = stmt
 
       if (! inited) {
         // Avoid hoisting above string literal expression statements such as
@@ -116,6 +117,7 @@ function init() {
 
     top.firstAwaitOutsideFunction = this.firstAwaitOutsideFunction
     node.top = top
+
     return this.finishNode(node, "Program")
   }
 
