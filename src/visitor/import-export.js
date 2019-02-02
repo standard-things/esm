@@ -268,9 +268,7 @@ function init() {
         ? runtimeName + "anonymous"
         : id.name
 
-      if ((id !== null &&
-           type === "ClassDeclaration") ||
-          type === "FunctionDeclaration") {
+      if (type === "FunctionDeclaration") {
         // Support exporting default function declarations:
         // export default function named() {}
         if (id === null) {
