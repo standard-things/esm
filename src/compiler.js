@@ -210,10 +210,7 @@ function init() {
         }
 
         const { assignableBindings } = importExportVisitor
-
-        const importedBindings = requireVisitor.found
-          ? {}
-          : top.importedBindings
+        const { importedBindings } = top
 
         assignmentVisitor.visit(rootPath, {
           addedExport,
@@ -222,7 +219,7 @@ function init() {
           importedBindings,
           magicString,
           possibleIndexes: findIndexes(code, [
-            ...keys(importedBindings),
+            ...keys(requireVisitor.found ? null : importedBindings),
             ...keys(assignableBindings)
           ]),
           runtimeName
