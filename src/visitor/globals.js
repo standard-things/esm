@@ -1,8 +1,8 @@
 import Visitor from "../visitor.js"
 
 import assign from "../util/assign.js"
-import getShadowed from "../parse/get-shadowed.js"
 import isIdentifer from "../parse/is-identifier.js"
+import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
@@ -47,7 +47,7 @@ function init() {
       if ((type === "UnaryExpression" &&
            parent.operator === "typeof") ||
           ! isIdentifer(node, parent) ||
-          getShadowed(path, name, shadowedMap)) {
+          isShadowed(path, name, shadowedMap)) {
         return
       }
 

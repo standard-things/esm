@@ -1,7 +1,7 @@
 import Visitor from "../visitor.js"
 
-import getShadowed from "../parse/get-shadowed.js"
 import isIdentifer from "../parse/is-identifier.js"
+import isShadowed from "../parse/is-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
@@ -31,7 +31,7 @@ function init() {
 
       if (! Reflect.has(this.undeclaredIdentifiers, name) ||
           ! isIdentifer(node, parent) ||
-          getShadowed(path, name, shadowedMap)) {
+          isShadowed(path, name, shadowedMap)) {
         return
       }
 

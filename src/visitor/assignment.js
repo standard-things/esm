@@ -2,6 +2,7 @@ import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import getShadowed from "../parse/get-shadowed.js"
+import isShadowed from "../parse/is-shadowed.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
@@ -54,7 +55,7 @@ function init() {
     if (visitor.addedImport) {
       for (const name of names) {
         if (Reflect.has(importedBindings, name) &&
-            ! getShadowed(path, name, shadowedMap)) {
+            ! isShadowed(path, name, shadowedMap)) {
           // Throw a type error for assignments to imported bindings.
           overwrite(
             visitor,

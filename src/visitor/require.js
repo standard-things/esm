@@ -1,6 +1,6 @@
 import Visitor from "../visitor.js"
 
-import getShadowed from "../parse/get-shadowed.js"
+import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
 function init() {
@@ -26,7 +26,7 @@ function init() {
       }
 
       if (node.arguments.length === 0 ||
-          getShadowed(path, "require", shadowedMap)) {
+          isShadowed(path, "require", shadowedMap)) {
         return
       }
 
