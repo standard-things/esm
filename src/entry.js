@@ -835,7 +835,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
       entry.updateBindings(name)
     }
 
-    return true
+    return Reflect.isExtensible(namespace)
   }
 
   handler.deleteProperty = (namespace, name) => {
@@ -845,7 +845,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
         entry.updateBindings(name)
       }
 
-      return true
+      return Reflect.isExtensible(namespace)
     }
 
     return false
@@ -855,13 +855,20 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
   if (typeof oldGet === "function") {
     handler.get = (namespace, name, receiver) => {
-      const value = Reflect.get(namespace, name, receiver)
-      const newValue = oldGet(namespace, name, receiver)
+      const exported = entry.exports
+      const value = oldGet(namespace, name, receiver)
 
-      if ((value === INITIAL_VALUE ||
-           newValue !== value) &&
-          isUpdatableGet(namespace, name)) {
-        return newValue
+      if (hasIn(exported, name)) {
+        const newValue = Reflect.get(entry.exports, name, receiver)
+
+        if ((value === INITIAL_VALUE ||
+             newValue !== value) &&
+            (name !== "default" ||
+             (namespace !== entry._completeMutableNamespace &&
+              namespace !== entry._partialMutableNamespace)) &&
+            isUpdatableGet(namespace, name)) {
+          return newValue
+        }
       }
 
       return value
@@ -869,9 +876,11 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   }
 
   handler.getOwnPropertyDescriptor = (namespace, name) => {
-    const descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
+    let descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
 
-    if (! isUpdatableDescriptor(descriptor)) {
+    if (descriptor === void 0
+        ? ! Reflect.isExtensible(namespace)
+        : ! isUpdatableDescriptor(descriptor)) {
       return descriptor
     }
 
@@ -886,12 +895,32 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
         value = exportedDescriptor.value
       } else if (typeof exportedDescriptor.get === "function") {
         value = tryGetter(exportedDescriptor.get)
+
+        if (value === ERROR_GETTER) {
+          return descriptor
+        }
+      }
+
+      if (descriptor === void 0) {
+        // Section 9.5.5: [[GetOwnProperty]]()
+        // Step 17: Throw a type error if the resulting descriptor is
+        // non-configurable while the target descriptor is `undefined` or
+        // configurable.
+        // https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-getownproperty-p
+        return {
+          configurable: true,
+          enumerable: exportedDescriptor.enumerable,
+          value,
+          writable:
+            exportedDescriptor.writable === true ||
+            typeof exportedDescriptor.set === "function"
+        }
       }
     } else {
-      value = handler.get(namespace, name)
+      value = handler.get(entry.namespace, name)
     }
 
-    if (value !== ERROR_GETTER) {
+    if (descriptor !== void 0) {
       descriptor.value = value
     }
 
