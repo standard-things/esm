@@ -57,7 +57,7 @@
     "chai": "^4.2.0",
     "core-js": "^2.6.3",
     "download": "^7.1.0",
-    "eslint": "^5.12.1",
+    "eslint": "^5.13.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^7.0.1",
     "execa": "^1.0.0",
