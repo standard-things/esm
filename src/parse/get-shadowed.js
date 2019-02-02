@@ -5,7 +5,7 @@ function init() {
   function getShadowed(path, name, map) {
     const isArgs = name === "arguments"
 
-    let shadowed = null
+    let result = null
 
     path.getParentNode((parent) => {
       const { type } = parent
@@ -13,11 +13,11 @@ function init() {
       if (type === "WithStatement") {
         const node = path.getValue()
 
-        shadowed = parent.object === node
+        result = parent.object === node
           ? null
           : parent
 
-        return shadowed
+        return result !== null
       }
 
       let cache = map.get(parent)
@@ -30,7 +30,9 @@ function init() {
       let cached = cache.get(name)
 
       if (cached !== void 0) {
-        return shadowed = cached
+        result = cached
+
+        return result !== null
       }
 
       const isNonArrowFunc =
@@ -39,9 +41,10 @@ function init() {
 
       if (isArgs &&
           isNonArrowFunc) {
-        shadowed = parent
-        cache.set(name, shadowed)
-        return shadowed
+        result = parent
+        cache.set(name, result)
+
+        return true
       }
 
       if (type === "BlockStatement") {
@@ -52,9 +55,10 @@ function init() {
 
               for (const varName of varNames) {
                 if (varName === name) {
-                  shadowed = declaration
-                  cache.set(name, shadowed)
-                  return shadowed
+                  result = declaration
+                  cache.set(name, result)
+
+                  return true
                 }
               }
             }
@@ -67,9 +71,10 @@ function init() {
 
         if (param !== null &&
             param.name === name) {
-          shadowed = param
-          cache.set(name, shadowed)
-          return shadowed
+          result = param
+          cache.set(name, result)
+
+          return true
         }
       }
 
@@ -80,9 +85,10 @@ function init() {
         // For example, `export default function () {}`.
         if (id !== null &&
             id.name === name) {
-          shadowed = parent
-          cache.set(name, shadowed)
-          return shadowed
+          result = parent
+          cache.set(name, result)
+
+          return true
         }
       }
 
@@ -92,18 +98,18 @@ function init() {
           const [paramName] = getNamesFromPattern(param)
 
           if (paramName === name) {
-            shadowed = param
-            cache.set(name, shadowed)
-            return shadowed
+            result = param
+            cache.set(name, result)
+
+            return true
           }
         }
       }
 
-      cache.set(name, shadowed)
-      return shadowed
+      cache.set(name, null)
     })
 
-    return shadowed
+    return result
   }
 
   return getShadowed
