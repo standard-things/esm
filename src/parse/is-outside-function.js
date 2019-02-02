@@ -1,7 +1,7 @@
 import shared from "../shared.js"
 
 function init() {
-  function isTopLevel(path, name, map) {
+  function isOutsideFunction(path, name, map) {
     let result = false
 
     path.getParentNode((parent) => {
@@ -29,7 +29,9 @@ function init() {
 
       cache.set(name, false)
 
-      if (type === "BlockStatement") {
+      if (type === "ArrowFunctionExpression" ||
+          type === "FunctionDeclaration" ||
+          type === "FunctionExpression") {
         return true
       }
     })
@@ -37,9 +39,9 @@ function init() {
     return result
   }
 
-  return isTopLevel
+  return isOutsideFunction
 }
 
 export default shared.inited
-  ? shared.module.parseIsTopLevel
-  : shared.module.parseIsTopLevel = init()
+  ? shared.module.parseIsOutsideFunction
+  : shared.module.parseIsOutsideFunction = init()

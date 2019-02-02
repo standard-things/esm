@@ -230,7 +230,7 @@ function init() {
           assignableBindings,
           importedBindings,
           instrumentImportBindingAssignments: ! foundRequire,
-          instrumentNestedAssignments: true,
+          instrumentInsideFunctions: true,
           magicString,
           possibleIndexes: possibleAssignmentIndexes,
           runtimeName
@@ -297,7 +297,7 @@ function init() {
 
           assignmentVisitor.visit(rootPath, {
             assignableBindings,
-            instrumentTopLevelAssignments: true,
+            instrumentOutsideFunctions: true,
             magicString,
             possibleIndexes: possibleAssignableBindingsIndexes,
             runtimeName

@@ -2,21 +2,21 @@ import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import isShadowed from "../parse/is-shadowed.js"
-import isTopLevel from "../parse/is-top-level.js"
+import isOutsideFunction from "../parse/is-outside-function.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
+  const scopeMap = new Map
   const shadowedMap = new Map
-  const topLevelMap = new Map
 
   class AssignmentVisitor extends Visitor {
     reset(options) {
       this.assignableBindings = null
       this.importedBindings = null
       this.instrumentImportBindingAssignments = false
-      this.instrumentNestedAssignments = false
-      this.instrumentTopLevelAssignments = false
+      this.instrumentInsideFunctions = false
+      this.instrumentOutsideFunctions = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
@@ -25,8 +25,8 @@ function init() {
         this.assignableBindings = options.assignableBindings
         this.importedBindings = options.importedBindings
         this.instrumentImportBindingAssignments = options.instrumentImportBindingAssignments
-        this.instrumentNestedAssignments = options.instrumentNestedAssignments
-        this.instrumentTopLevelAssignments = options.instrumentTopLevelAssignments
+        this.instrumentInsideFunctions = options.instrumentInsideFunctions
+        this.instrumentOutsideFunctions = options.instrumentOutsideFunctions
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
@@ -71,24 +71,24 @@ function init() {
     }
 
     const {
-      instrumentNestedAssignments,
-      instrumentTopLevelAssignments
+      instrumentInsideFunctions,
+      instrumentOutsideFunctions
     } = visitor
 
-    if (instrumentNestedAssignments ||
-        instrumentTopLevelAssignments) {
+    if (instrumentInsideFunctions ||
+        instrumentOutsideFunctions) {
       const instrumentBoth =
-        instrumentNestedAssignments &&
-        instrumentTopLevelAssignments
+        instrumentInsideFunctions &&
+        instrumentOutsideFunctions
 
       for (const name of names) {
         if (assignableBindings[name] === true &&
             ! isShadowed(path, name, shadowedMap)) {
           if (instrumentBoth ||
-              (instrumentNestedAssignments &&
-               ! isTopLevel(path, name, topLevelMap)) ||
-              (instrumentTopLevelAssignments &&
-               isTopLevel(path, name, topLevelMap))) {
+              (instrumentInsideFunctions &&
+               ! isOutsideFunction(path, name, scopeMap)) ||
+              (instrumentOutsideFunctions &&
+               isOutsideFunction(path, name, scopeMap))) {
             // Wrap assignments to exported identifiers.
             magicString
               .prependLeft(start, runtimeName + ".u(")
