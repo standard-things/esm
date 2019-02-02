@@ -1,7 +1,7 @@
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import getShadowed from "../parse/get-shadowed.js"
+import isShadowed from "../parse/is-shadowed.js"
 import keys from "../util/keys.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
@@ -33,7 +33,7 @@ function init() {
       const { name } = node
 
       if (! Reflect.has(this.temporalBindings, name) ||
-          getShadowed(path, name, shadowedMap)) {
+          isShadowed(path, name, shadowedMap)) {
         return
       }
 
