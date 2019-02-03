@@ -270,60 +270,6 @@ function clearBabelCache(cachePath) {
   }
 }
 
-function createCJS(value) {
-  const defaultCJS = Package.defaultOptions.cjs
-  const options = {}
-
-  if (value === void 0) {
-    return assign(options, defaultCJS)
-  }
-
-  if (! isObject(value)) {
-    const names = keys(defaultCJS)
-    const optionsValue = !! value
-
-    for (const name of names) {
-      options[name] = optionsValue
-    }
-
-    return options
-  }
-
-  const possibleNames = keys(value)
-
-  let allFalse = true
-
-  for (const name of possibleNames) {
-    if (Reflect.has(defaultCJS, name)) {
-      const optionsValue = value[name]
-
-      if (isFlag(optionsValue)) {
-        const flagValue = !! optionsValue
-
-        if (flagValue) {
-          allFalse = false
-        }
-
-        options[name] = flagValue
-      } else {
-        throw new ERR_INVALID_ESM_OPTION(
-          "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
-          optionsValue,
-          true
-        )
-      }
-    } else {
-      throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
-    }
-  }
-
-  const source = allFalse
-    ? zeroConfigOptions.cjs
-    : defaultCJS
-
-  return defaults(options, source)
-}
-
 function createOptions(value) {
   const { defaultOptions } = Package
   const names = []
@@ -357,7 +303,7 @@ function createOptions(value) {
     options.mode = zeroConfigOptions.mode
   }
 
-  const cjsOptions = createCJS(options.cjs)
+  const cjsOptions = createOptionsCJS(options.cjs)
 
   defaults(options, defaultOptions)
   options.cjs = cjsOptions
@@ -452,6 +398,60 @@ function createOptions(value) {
   }
 
   return options
+}
+
+function createOptionsCJS(value) {
+  const defaultCJS = Package.defaultOptions.cjs
+  const options = {}
+
+  if (value === void 0) {
+    return assign(options, defaultCJS)
+  }
+
+  if (! isObject(value)) {
+    const names = keys(defaultCJS)
+    const optionsValue = !! value
+
+    for (const name of names) {
+      options[name] = optionsValue
+    }
+
+    return options
+  }
+
+  const possibleNames = keys(value)
+
+  let allFalse = true
+
+  for (const name of possibleNames) {
+    if (Reflect.has(defaultCJS, name)) {
+      const optionsValue = value[name]
+
+      if (isFlag(optionsValue)) {
+        const flagValue = !! optionsValue
+
+        if (flagValue) {
+          allFalse = false
+        }
+
+        options[name] = flagValue
+      } else {
+        throw new ERR_INVALID_ESM_OPTION(
+          "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
+          optionsValue,
+          true
+        )
+      }
+    } else {
+      throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
+    }
+  }
+
+  const source = allFalse
+    ? zeroConfigOptions.cjs
+    : defaultCJS
+
+  return defaults(options, source)
 }
 
 function findRoot(dirPath) {
