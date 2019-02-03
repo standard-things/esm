@@ -983,8 +983,8 @@ function getExportByName(entry, name, parentEntry) {
   const parentIsMJS = parentEntry.extname === ".mjs"
 
   const parentNamedExports =
-    ! parentIsMJS &&
-    parentCJS.namedExports
+    parentCJS.namedExports &&
+    ! parentIsMJS
 
   const noNamedExports =
     ! entry.builtin &&
@@ -1005,8 +1005,8 @@ function getExportByName(entry, name, parentEntry) {
   }
 
   const parentMutableNamespace =
-    ! parentIsMJS &&
-    parentCJS.mutableNamespace
+    parentCJS.mutableNamespace &&
+    ! parentIsMJS
 
   const noMutableNamespace =
     ! parentMutableNamespace ||
@@ -1033,8 +1033,8 @@ function getExportByNameFast(entry, name, parentEntry) {
   }
 
   const parentMutableNamespace =
-    parentEntry.extname !== ".mjs" &&
-    parentEntry.package.options.cjs.mutableNamespace
+    parentEntry.package.options.cjs.mutableNamespace &&
+    parentEntry.extname !== ".mjs"
 
   const noMutableNamespace =
     ! parentMutableNamespace ||

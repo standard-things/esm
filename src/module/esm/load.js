@@ -91,9 +91,9 @@ function load(request, parent, isMain = false, preload) {
     }
 
     if (! isESM &&
-        parentIsESM &&
         (parentIsMJS ||
-         ! parentCJS.cache)) {
+         (parentIsESM &&
+          ! parentCJS.cache))) {
       entry.module.parent = void 0
     }
   }

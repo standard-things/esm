@@ -51,8 +51,8 @@ const compile = maskFunction(function (content, filename) {
   const { state } = entry
   const isInit = state === STATE_INITIAL
 
-  if (entry.extname !== ".mjs" &&
-      entry.package.options.mode !== MODE_STRICT &&
+  if (entry.package.options.mode !== MODE_STRICT &&
+      entry.extname !== ".mjs" &&
       (isInit ||
        state === STATE_PARSING_COMPLETED)) {
     entry.cacheName = getCacheName(content)

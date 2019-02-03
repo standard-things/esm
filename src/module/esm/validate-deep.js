@@ -23,8 +23,8 @@ function validateDeep(entry) {
   const { children } = entry
 
   const parentNamedExports =
-    entry.extname !== ".mjs" &&
-    entry.package.options.cjs.namedExports
+    entry.package.options.cjs.namedExports &&
+    entry.extname !== ".mjs"
 
   for (const name in children) {
     const childEntry = children[name]

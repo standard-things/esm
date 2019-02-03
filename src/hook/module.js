@@ -193,8 +193,8 @@ function hook(Mod, parent) {
       typeof extCompiler === "function" &&
       ! has(extCompiler, shared.symbol.mjs)
 
-    if (passthru &&
-      extIsMJS) {
+    if (extIsMJS &&
+        passthru) {
       try {
         extCompiler()
       } catch (e) {

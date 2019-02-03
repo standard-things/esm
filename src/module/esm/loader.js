@@ -40,7 +40,7 @@ function loader(entry, filename, parentEntry) {
   if (! mod.paths) {
     if (parentEntry.type !== TYPE_ESM ||
         (entry.package.options.cjs.paths &&
-         ext !== ".mjs")) {
+         entry.extname !== ".mjs")) {
       mod.paths = Module._nodeModulePaths(entry.dirname)
     } else {
       mod.paths = staticNodeModulePaths(entry.dirname)
