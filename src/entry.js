@@ -426,14 +426,14 @@ class Entry {
       return
     }
 
-    const { getters } = this
-    const isCJS = this.type === TYPE_CJS
-
     if (names === void 0) {
       names = this._loaded === LOAD_COMPLETED
         ? keys(this._namespace)
         : getExportsObjectKeys(this)
     }
+
+    const { getters } = this
+    const isCJS = this.type === TYPE_CJS
 
     for (const name of names) {
       if (! (isCJS &&
@@ -564,10 +564,7 @@ class Entry {
       const names = getExportsObjectKeys(this, exported)
 
       if (this.type === TYPE_CJS) {
-        if (! Reflect.has(this.getters, "default")) {
-          this.addGetter("default", () => this.namespace.default)
-        }
-
+        this.addGetter("default", () => this.namespace.default)
         exported = proxyExports(this)
       }
 
