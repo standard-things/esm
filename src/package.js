@@ -278,38 +278,38 @@ function createCJS(value) {
     return assign(options, defaultCJS)
   }
 
-  if (isObject(value)) {
-    const possibleNames = keys(value)
+  if (! isObject(value)) {
+    const names = keys(defaultCJS)
+    const optionsValue = !! value
 
-    for (const name of possibleNames) {
-      if (Reflect.has(defaultCJS, name)) {
-        const optionsValue = value[name]
-
-        if (isFlag(optionsValue)) {
-          options[name] = !! optionsValue
-        } else {
-          throw new ERR_INVALID_ESM_OPTION(
-            "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
-            optionsValue,
-            true
-          )
-        }
-      } else {
-        throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
-      }
+    for (const name of names) {
+      options[name] = optionsValue
     }
 
-    return defaults(options, defaultCJS)
+    return options
   }
 
-  const names = keys(defaultCJS)
-  const optionsValue = !! value
+  const possibleNames = keys(value)
 
-  for (const name of names) {
-    options[name] = optionsValue
+  for (const name of possibleNames) {
+    if (Reflect.has(defaultCJS, name)) {
+      const optionsValue = value[name]
+
+      if (isFlag(optionsValue)) {
+        options[name] = !! optionsValue
+      } else {
+        throw new ERR_INVALID_ESM_OPTION(
+          "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
+          optionsValue,
+          true
+        )
+      }
+    } else {
+      throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
+    }
   }
 
-  return options
+  return defaults(options, defaultCJS)
 }
 
 function createOptions(value) {
