@@ -141,8 +141,6 @@ class Entry {
     this.namespace = this._namespace
     // The package data of the module.
     this.package = Package.from(mod)
-    // The `module.parent` entry.
-    this.parent = Entry.get(mod.parent)
     // The paused state of the entry generator.
     this.running = false
     // The runtime object reference.

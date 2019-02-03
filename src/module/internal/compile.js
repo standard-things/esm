@@ -5,6 +5,7 @@ import MESSAGE from "../../constant/message.js"
 import PACKAGE from "../../constant/package.js"
 
 import CachingCompiler from "../../caching-compiler.js"
+import Entry from "../../entry.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
@@ -60,10 +61,11 @@ const {
 const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
+  const mod = entry.module
   const pkg = entry.package
   const { options } = pkg
-  const { mode } = options
   const { parsing } = shared.moduleState
+  const pkgMode = options.mode
 
   let hint = SOURCE_TYPE_SCRIPT
   let sourceType = SOURCE_TYPE_SCRIPT
@@ -71,9 +73,9 @@ function compile(caller, entry, content, filename, fallback) {
   if (entry.extname === ".mjs") {
     hint = SOURCE_TYPE_MODULE
     sourceType = SOURCE_TYPE_MODULE
-  } else if (mode === MODE_ALL) {
+  } else if (pkgMode === MODE_ALL) {
     sourceType = SOURCE_TYPE_MODULE
-  } else if (mode === MODE_AUTO) {
+  } else if (pkgMode === MODE_AUTO) {
     sourceType = SOURCE_TYPE_UNAMBIGUOUS
   }
 
@@ -129,8 +131,8 @@ function compile(caller, entry, content, filename, fallback) {
 
       if (compileData.circular === 1) {
         entry.circular = true
-        entry.module.exports = GenericObject.create()
         entry.runtime = null
+        mod.exports = GenericObject.create()
 
         const { codeWithTDZ } = compileData
 
@@ -152,14 +154,13 @@ function compile(caller, entry, content, filename, fallback) {
 
     if (typeof fallback === "function") {
       const defaultPkg = Loader.state.package.default
-      const parentEntry = entry.parent
+      const parentEntry = Entry.get(mod.parent)
       const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
       const parentPkg = parentEntry === null ? null : parentEntry.package
 
       if (! parentIsESM &&
           (pkg === defaultPkg ||
-           parentPkg === defaultPkg) &&
-          entry.module !== Loader.state.module.mainModule) {
+           parentPkg === defaultPkg)) {
         const frames = getStackFrames(new Error)
 
         for (const frame of frames) {
