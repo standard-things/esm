@@ -25,15 +25,14 @@ const {
 function load(request, parent, isMain = false, preload) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
+  const parentCJS = parentEntry === null ? null : parentEntry.package.options.cjs
   const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
   const parentIsMJS = parentEntry === null ? false : parentEntry.extname === ".mjs"
-  const parentPkg = parentEntry === null ? null : parentEntry.package
-  const parentPkgOptions = parentPkg === null ? null : parentPkg.options
 
   let filename
 
-  if (parentPkgOptions &&
-      parentPkgOptions.cjs.paths &&
+  if (parentEntry !== null &&
+      parentCJS.paths &&
       ! parentIsMJS) {
     filename = dualResolveFilename(request, parent, isMain)
   } else {
@@ -49,15 +48,16 @@ function load(request, parent, isMain = false, preload) {
 
   const isExtMJS = isMJS(filename)
   const pkg = Package.from(filename)
+  const { cjs } = pkg.options
   const queryFragment = getURLQueryFragment(request)
   const { moduleCache, scratchCache } = Loader.state.module
 
   let cache = Module._cache
-  let isUnexposed = ! pkg.options.cjs.cache
+  let isUnexposed = ! cjs.cache
 
-  request = queryFragment
-    ? getURLFromFilePath(filename) + queryFragment
-    : filename
+  request = queryFragment === ""
+    ? filename
+    : getURLFromFilePath(filename) + queryFragment
 
   if (isExtMJS ||
       Reflect.has(moduleCache, request)) {
@@ -93,7 +93,7 @@ function load(request, parent, isMain = false, preload) {
     if (! isESM &&
         parentIsESM &&
         (parentIsMJS ||
-          ! parentPkgOptions.cjs.cache)) {
+         ! parentCJS.cache)) {
       entry.module.parent = void 0
     }
   }
