@@ -54,7 +54,7 @@ const Runtime = {
       const { entry } = this
 
       if (entry._loaded === LOAD_COMPLETED) {
-        return
+        return true
       }
 
       if (childEntry.type !== TYPE_ESM &&
@@ -76,7 +76,7 @@ const Runtime = {
       const { entry } = this
 
       if (entry._loaded === LOAD_COMPLETED) {
-        return
+        return true
       }
 
       const childIsLoaded = childEntry._loaded === LOAD_COMPLETED

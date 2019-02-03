@@ -1169,18 +1169,15 @@ function runSetter(entry, name, callback, updateType) {
       setter.last = value
 
       const setterValue = value === ERROR_GETTER ? void 0 : value
-      const result = setter(setterValue, entry)
 
-      if (result) {
-        if (isDynamicImport) {
-          setters.splice(length, 1)
-        }
-      } else if (isExportFrom &&
-          ! changed) {
-        continue
+      if (setter(setterValue, entry)) {
+        setters.splice(length, 1)
       }
 
-      callback(setter)
+      if (changed ||
+          ! isExportFrom) {
+        callback(setter)
+      }
     }
   }
 }
