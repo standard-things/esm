@@ -15,7 +15,7 @@
 /test/env/prefix/node
 /test/fixture/find-path/created
 /test/fixture/unsafe-characters\[*\].mjs
-/test/fixture/main-hook/symlink/symlink.js
-/test/fixture/main-hook/symlink/symlink.mjs
+/test/fixture/main-hook/symlink/file/symlink.*js
 /test/fixture/scenario/ava-nyc-tsc/*.js
+/test/node_modules/symlink
 /test/vendor
