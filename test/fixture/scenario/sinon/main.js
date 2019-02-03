@@ -11,6 +11,16 @@ assert.throws(
 
 sinon.stub(mutable, "default").returns(4)
 
+require = require("../../../../")(module)
+
+const reMutable = require("../../math/add.esm.js")
+
 assert.strictEqual(mutable.default(1, 2), 4)
+assert.strictEqual(reMutable.default(1, 2), 4)
+
+reMutable.default.returns(8)
+
+assert.strictEqual(mutable.default(1, 2), 8)
+assert.strictEqual(reMutable.default(1, 2), 8)
 
 log("sinon:true")

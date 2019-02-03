@@ -1,0 +1,5 @@
+{
+  cjs: {
+    interop: false
+  }
+}
