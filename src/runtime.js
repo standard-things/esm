@@ -23,7 +23,6 @@ const {
   ERROR_GETTER,
   ERROR_STAR,
   LOAD_COMPLETED,
-  NAMESPACE_FINALIZATION_COMPLETED,
   NAMESPACE_FINALIZATION_DEFERRED,
   SETTER_TYPE_DYNAMIC_IMPORT,
   SETTER_TYPE_EXPORT_FROM,
@@ -54,8 +53,12 @@ const Runtime = {
     const setter = createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
       const { entry } = this
 
+      if (entry._loaded === LOAD_COMPLETED) {
+        return
+      }
+
       if (childEntry.type !== TYPE_ESM &&
-          entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED) {
+          childEntry._loaded !== LOAD_COMPLETED) {
         entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
       }
 
@@ -71,11 +74,15 @@ const Runtime = {
   addNamespaceSetter() {
     return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
-      const childIsESM = childEntry.type === TYPE_ESM
+
+      if (entry._loaded === LOAD_COMPLETED) {
+        return
+      }
+
       const childIsLoaded = childEntry._loaded === LOAD_COMPLETED
 
-      if (! childIsESM &&
-          ! childIsLoaded) {
+      if (! childIsLoaded &&
+          childEntry.type !== TYPE_ESM) {
         entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
         return
       }
