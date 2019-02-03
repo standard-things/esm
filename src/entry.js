@@ -867,13 +867,12 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
       const value = oldGet(namespace, name, receiver)
 
       if (has(exported, name)) {
-        const newValue = Reflect.get(entry.exports, name, receiver)
+        const newValue = Reflect.get(exported, name, receiver)
 
         if ((value === INITIAL_VALUE ||
              newValue !== value) &&
-            (name !== "default" ||
-             (namespace !== entry._completeMutableNamespace &&
-              namespace !== entry._partialMutableNamespace)) &&
+            (entry.type !== TYPE_CJS ||
+             name !== "default") &&
             isUpdatableGet(namespace, name)) {
           return newValue
         }
