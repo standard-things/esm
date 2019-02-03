@@ -291,12 +291,20 @@ function createCJS(value) {
 
   const possibleNames = keys(value)
 
+  let allFalse = true
+
   for (const name of possibleNames) {
     if (Reflect.has(defaultCJS, name)) {
       const optionsValue = value[name]
 
       if (isFlag(optionsValue)) {
-        options[name] = !! optionsValue
+        const flagValue = !! optionsValue
+
+        if (flagValue) {
+          allFalse = false
+        }
+
+        options[name] = flagValue
       } else {
         throw new ERR_INVALID_ESM_OPTION(
           "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
@@ -309,7 +317,11 @@ function createCJS(value) {
     }
   }
 
-  return defaults(options, defaultCJS)
+  const source = allFalse
+    ? zeroConfigOptions.cjs
+    : defaultCJS
+
+  return defaults(options, source)
 }
 
 function createOptions(value) {
