@@ -421,7 +421,7 @@ function createOptionsCJS(value) {
 
   const possibleNames = keys(value)
 
-  let allFalse = true
+  let useZeroConfig = true
 
   for (const name of possibleNames) {
     if (Reflect.has(defaultCJS, name)) {
@@ -430,8 +430,9 @@ function createOptionsCJS(value) {
       if (isFlag(optionsValue)) {
         const flagValue = !! optionsValue
 
-        if (flagValue) {
-          allFalse = false
+        if (flagValue &&
+            name !== "topLevelReturn") {
+          useZeroConfig = false
         }
 
         options[name] = flagValue
@@ -447,11 +448,11 @@ function createOptionsCJS(value) {
     }
   }
 
-  const source = allFalse
+  const defaultSource = useZeroConfig
     ? zeroConfigOptions.cjs
     : defaultCJS
 
-  return defaults(options, source)
+  return defaults(options, defaultSource)
 }
 
 function findRoot(dirPath) {

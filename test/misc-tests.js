@@ -329,6 +329,15 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) => import(request)))
     )
+
+    it("should merge `options.cjs` of all `false` against zero-config defaults", () =>
+      Promise
+        .all([
+          "./fixture/options-auto/inverse",
+          "./fixture/options-auto/top-level-return"
+        ]
+        .map((request) => import(request)))
+    )
   })
 
   describe("errors", () => {
