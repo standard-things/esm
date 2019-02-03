@@ -726,12 +726,11 @@ class Entry {
 
 function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   handler.get = (namespace, name, receiver) => {
-    const { getters } = entry
-    const isESM = entry.type === TYPE_ESM
+    const { getters, type } = entry
 
     let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
 
-    if (isESM &&
+    if (entry.type === TYPE_ESM &&
         ! errored) {
       errored =
         ! Reflect.has(getters, name) ||
@@ -744,10 +743,10 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
     }
 
-    if (! isESM &&
+    // Treat pseudo ES modules like CJS within `.mjs` files.
+    if (type === TYPE_PSEUDO &&
         name === "default" &&
-        (namespace === entry._partialMutableNamespace ||
-         namespace === entry._partialNamespace)) {
+        namespace === entry._partialNamespace) {
       return entry.exports
     }
 
