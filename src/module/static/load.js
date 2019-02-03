@@ -13,9 +13,7 @@ import RealModule from "../../real/module.js"
 import _load from "../internal/load.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
-import loader from "../cjs/loader.js"
 import maskFunction from "../../util/mask-function.js"
-import protoLoad from "../proto/load.js"
 import shared from "../../shared.js"
 
 const {
@@ -40,6 +38,10 @@ const load = maskFunction(function (request, parent, isMain = false) {
     return esmLoad(request, parent, isMain).module.exports
   }
 
+  const parentIsStrict =
+    parentEntry !== null &&
+    parentEntry.package.options.mode === MODE_STRICT
+
   const filename = Module._resolveFilename(request, parent, isMain)
   const { scratchCache } = Loader.state.module
 
@@ -57,13 +59,18 @@ const load = maskFunction(function (request, parent, isMain = false) {
   const entry = _load(filename, parent, isMain, cache, (entry) => {
     loaderCalled = true
     cache[filename] = entry.module
-    tryLoader(entry, cache, filename, filename, parentEntry)
+
+    if (parentIsStrict ||
+        entry.extname === ".mjs") {
+      entry._passthruCompile = true
+    }
+
+    tryLoader(entry, cache, filename, filename)
   })
 
   if (! loaderCalled &&
-      entry.type === TYPE_ESM &&
-      parentEntry !== null &&
-      parentEntry.package.options.mode === MODE_STRICT) {
+      parentIsStrict &&
+      entry.type === TYPE_ESM) {
     throw new ERR_REQUIRE_ESM(filename)
   }
 
@@ -74,18 +81,13 @@ const load = maskFunction(function (request, parent, isMain = false) {
   return entry.module.exports
 }, RealModule._load)
 
-function tryLoader(entry, cache, cacheKey, filename, parentEntry) {
+function tryLoader(entry, cache, cacheKey, filename) {
   const mod = entry.module
 
   let threw = true
 
   try {
-    if (mod.load === protoLoad) {
-      loader(entry, filename, parentEntry)
-    } else {
-      mod.load(filename)
-    }
-
+    mod.load(filename)
     threw = false
   } finally {
     if (threw) {

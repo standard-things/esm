@@ -20,7 +20,6 @@ const load = maskFunction(function (filename) {
   let entry = Entry.get(this)
 
   const { id } = entry
-  const parentEntry = entry.parent
   const { scratchCache } = Loader.state.module
 
   // Reassociate entries from the parse phase for modules created
@@ -31,7 +30,6 @@ const load = maskFunction(function (filename) {
     if (entry !== otherEntry) {
       otherEntry.exports = this.exports
       otherEntry.module = this
-      otherEntry.parent = parentEntry
 
       entry = otherEntry
       Entry.set(this, otherEntry)
@@ -39,7 +37,7 @@ const load = maskFunction(function (filename) {
     }
   }
 
-  loader(entry, filename, parentEntry)
+  loader(entry, filename)
 }, RealProto.load)
 
 export default load
