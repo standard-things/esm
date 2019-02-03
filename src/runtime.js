@@ -104,19 +104,11 @@ const Runtime = {
           }
         }
 
-        if (! Reflect.has(childGetters, exportedName)) {
-          continue
-        }
-
         const childOwnerName = childGetters[exportedName].owner.name
 
         if (getter === void 0 ||
             ownerName === childOwnerName) {
           entry.addGetterFrom(childEntry, exportedName)
-
-          if (! Reflect.has(getters, exportedName)) {
-            continue
-          }
         }
 
         ownerName = getters[exportedName].owner.name
