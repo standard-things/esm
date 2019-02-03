@@ -69,13 +69,13 @@ describe("main hook tests", function () {
     ]
     .reduce((promise, ESM_OPTIONS) =>
       promise
-        .then(() => runMain("./fixture/options/env", { ESM_OPTIONS }))
+        .then(() => runMain("./fixture/main-hook/options/env", { ESM_OPTIONS }))
         .then(({ stdout }) => assert.ok(stdout.includes("esm-options:true")))
     , Promise.resolve())
   )
 
   it("should support `ESM_OPTIONS` environment variable with `options.cache`", () => {
-    const execPath = path.resolve("fixture/options/env-cache")
+    const execPath = path.resolve("fixture/main-hook/options/env-cache")
     const cachePath = path.resolve(execPath, ".cache")
 
     return trash(cachePath)
@@ -88,7 +88,7 @@ describe("main hook tests", function () {
   })
 
   it("should support `ESM_OPTIONS` environment variable with `options.mainFields`", () =>
-    runMain("./fixture/options/env-main-fields", {
+    runMain("./fixture/main-hook/options/env-main-fields", {
       ESM_OPTIONS: "{mainFields:['module']}"
     })
     .then(({ stdout }) => assert.ok(stdout.includes("esm-options-main-fields:true")))

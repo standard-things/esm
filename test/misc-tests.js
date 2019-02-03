@@ -253,8 +253,8 @@ describe("miscellaneous tests", () => {
     })
   })
 
-  describe("packages", () => {
-    it("should load packages written in ESM syntax.", () =>
+  describe("options", () => {
+    it("should load packages written in ESM syntax with no options.", () =>
       import("esm-syntax")
     )
 
@@ -944,7 +944,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `module.parent`", () =>
-      import("./fixture/options/cjs-cache/parent/off/parent.js")
+      import("./fixture/options-cjs-cache/parent/off/parent.js")
         .then(({ child, parent }) => {
           assert.ok(parent.parent)
           assert.ok(Reflect.has(child, "parent"))
@@ -953,7 +953,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
-      import("./fixture/options/cjs-cache/parent/on/parent.js")
+      import("./fixture/options-cjs-cache/parent/on/parent.js")
         .then(({ child, parent }) => {
           assert.ok(parent.parent)
           assert.ok(child.parent)
@@ -961,7 +961,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () =>
-      import("./fixture/options/cjs-cache/parent/on/parent.mjs")
+      import("./fixture/options-cjs-cache/parent/on/parent.mjs")
         .then(({ child }) => {
           assert.ok(Reflect.has(child, "parent"))
           assert.strictEqual(typeof child.parent, "undefined")
@@ -969,7 +969,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should not expose ESM in `require.cache`", () => {
-      const filename = path.resolve("fixture/options/cjs-cache/require/out/index.js")
+      const filename = path.resolve("fixture/options-cjs-cache/require/out/index.js")
 
       Reflect.deleteProperty(require.cache, filename)
 
@@ -978,7 +978,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should expose ESM in `require.cache` with `options.cjs.cache`", () => {
-      const filename = path.resolve("fixture/options/cjs-cache/require/in/index.js")
+      const filename = path.resolve("fixture/options-cjs-cache/require/in/index.js")
 
       Reflect.deleteProperty(require.cache, filename)
 

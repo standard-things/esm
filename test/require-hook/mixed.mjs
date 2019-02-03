@@ -18,10 +18,10 @@ export default () => {
     mode: "strict"
   })
 
-  assert.doesNotThrow(() => allRequire("./fixture/options/all"))
+  assert.doesNotThrow(() => allRequire("./fixture/require-hook/options/all"))
   assert.ok(Reflect.has(global, "this"))
   assert.strictEqual(global.this, "undefined")
 
-  assert.doesNotThrow(() => cjsRequire("./fixture/options/cjs"))
-  assert.doesNotThrow(() => mjsRequire("./fixture/options/mjs"))
+  assert.doesNotThrow(() => cjsRequire("./fixture/require-hook/options/cjs"))
+  assert.doesNotThrow(() => mjsRequire("./fixture/require-hook/options/mjs"))
 }
