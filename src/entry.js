@@ -383,10 +383,13 @@ class Entry {
   }
 
   addSetter(name, localNames, setter, parentEntry) {
-    setter.exportedName = null
     setter.last = INITIAL_VALUE
     setter.localNames = localNames
     setter.owner = parentEntry
+
+    if (! has(setter, "exportedName")) {
+      setter.exportedName = null
+    }
 
     if (! has(setter, "type")) {
       setter.type = SETTER_TYPE_STATIC_IMPORT
