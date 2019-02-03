@@ -898,10 +898,10 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     const exported = entry.exports
 
-    let value
-
     if (has(exported, name)) {
       const exportedDescriptor = Reflect.getOwnPropertyDescriptor(exported, name)
+
+      let value
 
       if (Reflect.has(exportedDescriptor, "value")) {
         value = exportedDescriptor.value
@@ -928,12 +928,10 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
             typeof exportedDescriptor.set === "function"
         }
       }
-    } else {
-      value = handler.get(entry.namespace, name)
-    }
 
-    if (descriptor !== void 0) {
       descriptor.value = value
+    } else if (descriptor !== void 0) {
+      descriptor.value = handler.get(entry.namespace, name)
     }
 
     return descriptor
