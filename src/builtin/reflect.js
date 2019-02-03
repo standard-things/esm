@@ -6,42 +6,6 @@ import maskFunction from "../util/mask-function.js"
 import shared from "../shared.js"
 
 function init() {
-  function defineProperty(target, name, descriptor)  {
-    try {
-      return Reflect.defineProperty(target, name, descriptor)
-    } catch (e) {
-      if (isModuleNamespaceObject(target)) {
-        return false
-      }
-
-      throw e
-    }
-  }
-
-  function deleteProperty(target, name)  {
-    try {
-      return Reflect.deleteProperty(target, name)
-    } catch (e) {
-      if (isModuleNamespaceObject(target)) {
-        return false
-      }
-
-      throw e
-    }
-  }
-
-  function set(target, name, value, receiver) {
-    try {
-      return Reflect.set(target, name, value, receiver)
-    } catch (e) {
-      if (isModuleNamespaceObject(target)) {
-        return false
-      }
-
-      throw e
-    }
-  }
-
   const ExReflect = shared.external.Reflect
 
   const {
@@ -50,20 +14,36 @@ function init() {
     set: exSet
   } = ExReflect
 
+  function wrapBuiltin(builtinFunc) {
+    return maskFunction(function (...args) {
+      const [target] = args
+
+      try {
+        return Reflect.apply(builtinFunc, this, args)
+      } catch (e) {
+        if (isModuleNamespaceObject(target)) {
+          return false
+        }
+
+        throw e
+      }
+    }, builtinFunc)
+  }
+
   const BuiltinReflect = GenericObject.create()
 
   assignProperties(BuiltinReflect, ExReflect)
 
   if (typeof exDefineProperty === "function") {
-    BuiltinReflect.defineProperty = maskFunction(defineProperty, exDefineProperty)
+    BuiltinReflect.defineProperty = wrapBuiltin(exDefineProperty)
   }
 
   if (typeof exDeleteProperty === "function") {
-    BuiltinReflect.deleteProperty = maskFunction(deleteProperty, exDeleteProperty)
+    BuiltinReflect.deleteProperty = wrapBuiltin(exDeleteProperty)
   }
 
   if (typeof exSet === "function") {
-    BuiltinReflect.set = maskFunction(set, exSet)
+    BuiltinReflect.set = wrapBuiltin(exSet)
   }
 
   return BuiltinReflect
