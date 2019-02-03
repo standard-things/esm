@@ -93,7 +93,7 @@ function validateDeep(entry) {
       cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
-      const setterIndex = setters.findIndex(({ parent }) => parent === entry)
+      const setterIndex = setters.findIndex(({ owner }) => owner === entry)
 
       if (setterIndex !== -1) {
         const ErrorCtor = isCyclicalExport(childEntry, exportedName)
@@ -132,7 +132,7 @@ function isCyclicalExport(entry, exportedName, seen) {
 
   for (const setter of entry.setters[exportedName]) {
     if (setter.type === SETTER_TYPE_EXPORT_FROM &&
-        isCyclicalExport(setter.parent, setter.exportedName, seen)) {
+        isCyclicalExport(setter.owner, setter.exportedName, seen)) {
       return true
     }
   }

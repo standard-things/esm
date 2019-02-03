@@ -44,7 +44,7 @@ function validateShallow(entry) {
       cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
-      const setterIndex = setters.findIndex(({ parent }) => parent === entry)
+      const setterIndex = setters.findIndex(({ owner }) => owner === entry)
 
       if (setterIndex !== -1) {
         // Remove problematic setter to unblock subsequent imports.

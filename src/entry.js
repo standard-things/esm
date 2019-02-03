@@ -377,7 +377,6 @@ class Entry {
       otherGetter.deferred = true
       otherGetter.id = importedName
       otherGetter.owner = otherEntry
-
     }
 
     return this.addGetter(exportedName, otherGetter)
@@ -386,7 +385,7 @@ class Entry {
   addSetter(name, localNames, setter, parentEntry) {
     setter.last = INITIAL_VALUE
     setter.localNames = localNames
-    setter.parent = parentEntry
+    setter.owner = parentEntry
 
     if (! has(setter, "type")) {
       setter.type = SETTER_TYPE_STATIC_IMPORT
@@ -631,7 +630,7 @@ class Entry {
 
     runGetters(this, names)
     runSetters(this, names, (setter) => {
-      const parentEntry = setter.parent
+      const parentEntry = setter.owner
       const { importedBindings } = parentEntry
 
       if (setter.last !== ERROR_GETTER) {
@@ -1144,7 +1143,7 @@ function runSetter(entry, name, callback, updateType) {
 
   while (length--) {
     const setter = setters[length]
-    const value = entry.getExportByName(name, setter.parent)
+    const value = entry.getExportByName(name, setter.owner)
 
     if (value === ERROR_STAR) {
       setters.splice(length, 1)
