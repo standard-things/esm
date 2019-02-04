@@ -57,13 +57,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     entry.loaded()
     entry.updateBindings(null, UPDATE_TYPE_INIT)
 
-    if (parentEntry.id === "<repl>") {
-      const { children } = parentEntry
-
-      for (const name in children) {
-        validateShallow(children[name], parentEntry)
-      }
-    }
+    validateShallow(entry, parentEntry)
   }
 
   const preload = (entry) => addChild(parentEntry, entry)

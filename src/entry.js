@@ -579,7 +579,6 @@ class Entry {
 
   resumeChildren() {
     const { children } = this
-    const isESM = this.type === TYPE_ESM
 
     for (const name in children) {
       const childEntry = children[name]
@@ -606,9 +605,7 @@ class Entry {
       } else {
         childEntry.loaded()
         childEntry.updateBindings(null, UPDATE_TYPE_INIT)
-      }
 
-      if (isESM) {
         validateShallow(childEntry, this)
       }
     }
