@@ -185,13 +185,10 @@ function isDescendant(entry, parentEntry, seen) {
 
   const parentName = parentEntry.name
 
-  if (seen !== void 0 &&
-      seen.has(parentName)) {
-    return false
-  }
-
   if (seen === void 0) {
     seen = new Set
+  } else if (seen.has(parentName)) {
+    return false
   }
 
   seen.add(parentName)
