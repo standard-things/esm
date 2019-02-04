@@ -978,19 +978,12 @@ function createMutableNamespaceProxy(entry, namespace) {
 }
 
 function getExportByName(entry, name, parentEntry) {
-  const parentCJS = parentEntry.package.options.cjs
   const parentIsMJS = parentEntry.extname === ".mjs"
+  const { type } = entry
 
-  const parentNamedExports =
-    parentCJS.namedExports &&
-    ! parentIsMJS
-
-  const noNamedExports =
-    ! entry.builtin &&
-    ! parentNamedExports &&
-    entry.type !== TYPE_ESM
-
-  if (noNamedExports &&
+  if ((type === TYPE_CJS ||
+       (type === TYPE_PSEUDO &&
+        parentIsMJS)) &&
       name === "default") {
     return entry.exports
   }
@@ -1003,21 +996,31 @@ function getExportByName(entry, name, parentEntry) {
       : ERROR_GETTER
   }
 
+  const parentCJS = parentEntry.package.options.cjs
+
+  const parentNamedExports =
+    parentCJS.namedExports &&
+    ! parentIsMJS
+
   const parentMutableNamespace =
     parentCJS.mutableNamespace &&
     ! parentIsMJS
 
-  const noMutableNamespace =
+  const useImmutableNamespace =
     ! parentMutableNamespace ||
     entry.extname === ".mjs"
 
-  if (noMutableNamespace) {
-    return noNamedExports
+  const usePartialNamespace =
+    ! parentNamedExports &&
+    type !== TYPE_ESM
+
+  if (useImmutableNamespace) {
+    return usePartialNamespace
       ? entry.partialNamespace
       : entry.completeNamespace
   }
 
-  return noNamedExports
+  return usePartialNamespace
     ? entry.partialMutableNamespace
     : entry.completeMutableNamespace
 }
@@ -1035,11 +1038,11 @@ function getExportByNameFast(entry, name, parentEntry) {
     parentEntry.package.options.cjs.mutableNamespace &&
     parentEntry.extname !== ".mjs"
 
-  const noMutableNamespace =
+  const useImmutableNamespace =
     ! parentMutableNamespace ||
     entry.extname === ".mjs"
 
-  return noMutableNamespace
+  return useImmutableNamespace
     ? entry.completeNamespace
     : entry.completeMutableNamespace
 }
