@@ -1689,7 +1689,7 @@ describe("miscellaneous tests", () => {
     )
   })
 
-  describe("Workers support", () => {
+  describe("workers support", () => {
     before(function () {
       if (! canTestWorker) {
         this.skip()
@@ -1726,6 +1726,20 @@ describe("miscellaneous tests", () => {
           .on("error", reject)
           .on("exit", createOnExit(reject))
       )
+    )
+  })
+
+  describe("instrumentation", () => {
+    const zeroWidthJoinerRegExp = /\u200D/
+
+    it("should instrument binding access in circular modules", () =>
+      import("./fixture/instrumentation/cycle.mjs")
+        .then((ns) => assert.ok(zeroWidthJoinerRegExp.test(ns.default)))
+    )
+
+    it("should not instrument binding access in non-circular modules", () =>
+      import("./fixture/instrumentation/non-cycle.mjs")
+        .then((ns) => assert.strictEqual(zeroWidthJoinerRegExp.test(ns.default), false))
     )
   })
 })
