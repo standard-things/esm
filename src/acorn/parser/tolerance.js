@@ -12,6 +12,7 @@ function init() {
       parser.strictDirective = alwaysFalse
       parser.isSimpleParamList = alwaysTrue
       parser.adaptDirectivePrologue = noop
+      parser.checkLocalExport = noop
       parser.checkParams = noop
       parser.checkPatternErrors = noop
       parser.checkPatternExport = noop

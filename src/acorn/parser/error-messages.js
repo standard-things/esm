@@ -55,7 +55,7 @@ function init() {
     ["'return' outside of function", ILLEGAL_RETURN_STATEMENT],
     ["Binding arguments in strict mode", UNEXPECTED_EVAL_OR_ARGUMENTS],
     ["Binding await in strict mode", UNEXPECTED_RESERVED_WORD],
-    ["Can not use keyword 'await' outside an async function", ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION],
+    ["Cannot use keyword 'await' outside an async function", ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION],
     ["The keyword 'await' is reserved", UNEXPECTED_RESERVED_WORD],
     ["The keyword 'yield' is reserved", UNEXPECTED_STRICT_MODE_RESERVED_WORD],
     ["Unterminated string constant", INVALID_OR_UNEXPECTED_TOKEN],
