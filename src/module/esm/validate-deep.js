@@ -19,24 +19,26 @@ function init() {
     ERR_EXPORT_MISSING
   } = errors
 
-  function validateDeep(entry) {
-    if (entry._validatedDeep) {
-      return
-    }
-
-    entry._validatedDeep = true
-
+  function validateDeep(entry, seen) {
     const { children } = entry
 
     for (const name in children) {
       validate(children[name], entry)
     }
 
+    if (seen === void 0) {
+      seen = new Set
+    } else if (seen.has(entry)) {
+      return
+    }
+
+    seen.add(entry)
+
     for (const name in children) {
       const entry = children[name]
 
       if (entry.type === TYPE_ESM) {
-        validateDeep(entry)
+        validateDeep(entry, seen)
       }
     }
   }
@@ -44,13 +46,10 @@ function init() {
   function isCyclicalExport(entry, exportedName, seen) {
     const { name } = entry
 
-    if (seen !== void 0 &&
-        seen.has(name)) {
-      return true
-    }
-
     if (seen === void 0) {
       seen = new Set
+    } else if (seen.has(name)) {
+      return true
     }
 
     seen.add(name)
