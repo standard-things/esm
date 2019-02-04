@@ -1476,7 +1476,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error when importing non-exported binding before ESM code execution", () =>
+    it("should error for non-exported binding of ES modules before code execution", () =>
       [
         "./fixture/import/missing/export/cjs.mjs",
         "./fixture/import/missing/export/esm.mjs",
@@ -1497,7 +1497,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error when importing non-exported binding after CJS code execution", () =>
+    it("should error for non-exported binding of uncached CJS modules after code execution", () =>
       [
         "./fixture/cjs/missing/export/cjs.js",
         "./fixture/cjs/missing/export/bridge.js"
@@ -1515,6 +1515,24 @@ describe("miscellaneous tests", () => {
                 assert.ok(message.includes("does not provide an export"))
               })
           })
+      , Promise.resolve())
+    )
+
+    it("should error for non-exported binding of cached CJS modules before code execution", () =>
+      [
+        "./fixture/cjs/missing/export/cjs.js",
+        "./fixture/cjs/missing/export/bridge.js"
+      ]
+      .reduce((promise, request) =>
+        promise
+          .then(() =>
+            import(request)
+              .then(assert.fail)
+              .catch(({ message }) => {
+                assert.strictEqual(Reflect.has(global, "loadCount"), false)
+                assert.ok(message.includes("does not provide an export"))
+              })
+          )
       , Promise.resolve())
     )
 
