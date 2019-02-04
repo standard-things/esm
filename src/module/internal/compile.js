@@ -179,26 +179,21 @@ function compile(caller, entry, content, filename, fallback) {
 }
 
 function isDescendant(entry, parentEntry, seen) {
-  if (entry.type !== TYPE_ESM) {
-    return false
-  }
-
-  const parentName = parentEntry.name
-
   if (seen === void 0) {
     seen = new Set
-  } else if (seen.has(parentName)) {
+  } else if (seen.has(parentEntry)) {
     return false
   }
 
-  seen.add(parentName)
+  seen.add(parentEntry)
 
   const { children } = parentEntry
-  const { name } = entry
 
-  for (const childName in children) {
-    if (childName === name ||
-        isDescendant(entry, children[childName], seen)) {
+  for (const name in children) {
+    const childEntry = children[name]
+
+    if (entry === childEntry ||
+        isDescendant(entry, childEntry, seen)) {
       return true
     }
   }
