@@ -66,6 +66,7 @@ const defaultOptions = {
   cache: true,
   cjs: {
     cache: false,
+    dedefault: false,
     esModule: false,
     extensions: false,
     mutableNamespace: false,
@@ -85,6 +86,7 @@ const defaultOptions = {
 const zeroConfigOptions = {
   cjs: {
     cache: true,
+    dedefault: false,
     esModule: true,
     extensions: true,
     mutableNamespace: true,
@@ -416,7 +418,9 @@ function createOptionsCJS(value) {
     const optionsValue = !! value
 
     for (const name of names) {
-      options[name] = optionsValue
+      if (! isExplicitName(name)) {
+        options[name] = optionsValue
+      }
     }
 
     return options
@@ -434,7 +438,7 @@ function createOptionsCJS(value) {
         const flagValue = !! optionsValue
 
         if (flagValue &&
-            name !== "topLevelReturn") {
+            ! isExplicitName(name)) {
           useZeroConfig = false
         }
 
@@ -540,6 +544,11 @@ function getRoot(dirPath) {
   }
 
   return cached
+}
+
+function isExplicitName(name) {
+  return name === "dedefault" ||
+    name === "topLevelReturn"
 }
 
 function isFlag(value) {

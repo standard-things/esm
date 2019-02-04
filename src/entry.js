@@ -549,22 +549,21 @@ class Entry {
         const exportDefaultOnly =
           cjs.esModule &&
           names.length === 1 &&
-          names[0] === "default" &&
-          isObjectLike(exported.default)
+          names[0] === "default"
 
-        if (! exportDefaultOnly &&
-            cjs.mutableNamespace) {
+        if (cjs.mutableNamespace &&
+            ! exportDefaultOnly) {
           this.module.exports = proxyExports(this)
         }
 
-        if (cjs.esModule) {
-          const exported = this.exports
+        const exported = this.exports
 
-          if (exportDefaultOnly) {
-            this.module.exports = exported.default
-          } else if (! Reflect.has(this.getters, "__esModule")) {
-            Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
-          }
+        if (cjs.dedefault &&
+            exportDefaultOnly) {
+          this.module.exports = exported.default
+        } else if (cjs.esModule &&
+            ! Reflect.has(this.getters, "__esModule")) {
+          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
         }
       }
     }

@@ -159,7 +159,7 @@ describe("scenario tests", function () {
   it("should work with sinon", () =>
     node([
       path.resolve("fixture/scenario/sinon")
-    ])
+    ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("sinon:true")))
   )
 
