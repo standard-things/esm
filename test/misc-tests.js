@@ -1099,7 +1099,7 @@ describe("miscellaneous tests", () => {
         .then((value) => assert.strictEqual(value, "thenable"))
     )
 
-    it("should support namespace objects of cyclical CJS modules", () =>
+    it("should support namespace objects of circular CJS modules", () =>
       Promise
         .all([
           "./cycle/namespace/immutable/cjs/a.mjs",
@@ -1141,7 +1141,7 @@ describe("miscellaneous tests", () => {
         .then((actual) => assert.deepStrictEqual(actual, [abcNs, defNs]))
     )
 
-    it("should support cyclical dynamic imports", () =>
+    it("should support circular dynamic imports", () =>
       Promise
         .all([
           "./fixture/cycle/dynamic-import/a.js",
