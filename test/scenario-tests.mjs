@@ -67,7 +67,7 @@ describe("scenario tests", function () {
     ])
     .then(assert.fail)
     .catch(({ stderr }) => {
-      assert.ok(stderr.includes("Support for the experimental syntax 'importMeta' isn't currently enabled"))
+      assert.ok(stderr.includes("'importMeta' isn't currently enabled"))
     })
   )
 

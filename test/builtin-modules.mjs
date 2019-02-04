@@ -4,35 +4,36 @@ import path from "path"
 
 const testPath = path.resolve(".")
 
-function node(args) {
+const envAuto = {
+  ESM_OPTIONS: "{cjs:true,mode:'auto'}"
+}
+
+function node(args, env) {
   return execa(process.execPath, args, {
     cwd: testPath,
+    env,
     reject: false
   })
 }
 
-function runMainBuiltin(filename) {
-  return node([filename])
-}
-
-function runMainLoader(filename) {
+function runMain(filename, env) {
   return node([
     "-r", "../",
     filename
-  ])
+  ], env)
 }
 
-describe("test builtin modules", function () {
-  it("should inspect values with `console.log`", function () {
+describe("test builtin modules", () => {
+  it("should inspect values with `console.log()`", () => {
     const dirPath = path.resolve("fixture/builtin-modules/console")
 
     return Promise
       .all([
-        runMainBuiltin(dirPath),
-        runMainLoader(dirPath)
+        node([dirPath]),
+        runMain(dirPath)
       ])
-      .then(([builtin, loader]) =>
+      .then(([builtin, loader]) => {
         assert.strictEqual(loader.stdout, builtin.stdout)
-      )
+      })
   })
 })

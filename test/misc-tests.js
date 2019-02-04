@@ -112,12 +112,12 @@ function getURLFromFilePath(filename) {
 describe("miscellaneous tests", () => {
   describe("builtin modules", () => {
     it("should load builtin modules", () =>
-      import("./misc/builtin/load.mjs")
+      import("./misc/builtin/load-uncached.mjs")
         .then((ns) => ns.default())
     )
 
     it("should fire setters if already loaded", () =>
-      import("./misc/builtin/loaded.mjs")
+      import("./misc/builtin/load-cached.mjs")
         .then((ns) => ns.default())
     )
 
@@ -1480,7 +1480,7 @@ describe("miscellaneous tests", () => {
             .then(assert.fail)
             .catch(({ message }) => {
               assert.strictEqual(Reflect.has(global, "loadCount"), false)
-              assert.ok(message.includes("does not provide an export named 'NOT_EXPORTED'"))
+              assert.ok(message.includes("does not provide an export"))
             })
         ))
     )
@@ -1496,7 +1496,7 @@ describe("miscellaneous tests", () => {
             .then(assert.fail)
             .catch(({ message }) => {
               assert.strictEqual(global.loadCount, 1)
-              assert.ok(message.includes("does not provide an export named 'NOT_EXPORTED'"))
+              assert.ok(message.includes("does not provide an export"))
             })
         ))
     )

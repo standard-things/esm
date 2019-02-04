@@ -49,12 +49,6 @@ function runMain(filename, env) {
   ], env)
 }
 
-function runNode(filename, env) {
-  return node([
-    filename
-  ], env)
-}
-
 describe("cache tests", function () {
   this.timeout(0)
 
@@ -103,7 +97,7 @@ describe("cache tests", function () {
 
   describe("should create cache", () => {
     it("should work from the `esm` bridge", () =>
-      runNode(fixturePath)
+      node([fixturePath])
         .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
         .then(() => assert.strictEqual(countFiles(loaderCachePath), expectedCacheCount))
     )
@@ -133,7 +127,7 @@ describe("cache tests", function () {
 
   describe("should support `options.cache` paths", () => {
     it("should work from the `esm` bridge", () =>
-      runNode(fixturePath, {
+      node([fixturePath], {
         ESM_OPTIONS: '{cache:"' + fixtureCachePath + '"}'
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
@@ -151,7 +145,7 @@ describe("cache tests", function () {
 
   describe("should create cache when enabled", () => {
     it("should work from the `esm` bridge", () =>
-      runNode(fixturePath, {
+      node([fixturePath], {
         ESM_OPTIONS: "{cache:1}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
@@ -169,7 +163,7 @@ describe("cache tests", function () {
 
   describe("should not create cache when disabled", () => {
     it("should work from the `esm` bridge", () =>
-      runNode(fixturePath, {
+      node([fixturePath], {
         ESM_OPTIONS: "{cache:0}"
       })
       .then(({ stdout }) => assert.ok(stdout.includes("cache:true")))
