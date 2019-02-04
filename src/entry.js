@@ -106,10 +106,6 @@ class Entry {
     this._passthruCompile = false
     // The passthru indicator for `module.require()`.
     this._passthruRequire = false
-    // The deep import validation state of the module.
-    this._validatedDeep = false
-    // The shallow import validation state of the module.
-    this._validatedShallow = false
     // The import validation cache.
     this._validation = new Map([["*", true]])
     // The module basename.
