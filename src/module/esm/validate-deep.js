@@ -2,65 +2,102 @@ import ENTRY from "../../constant/entry.js"
 
 import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
+import shared from "../../shared.js"
 
-const {
-  LOAD_COMPLETED,
-  NAMESPACE_FINALIZATION_DEFERRED,
-  SETTER_TYPE_EXPORT_FROM,
-  TYPE_CJS,
-  TYPE_ESM,
-  TYPE_PSEUDO
-} = ENTRY
+function init() {
+  const {
+    LOAD_COMPLETED,
+    NAMESPACE_FINALIZATION_DEFERRED,
+    SETTER_TYPE_EXPORT_FROM,
+    TYPE_CJS,
+    TYPE_ESM,
+    TYPE_PSEUDO
+  } = ENTRY
 
-const {
-  ERR_EXPORT_CYCLE,
-  ERR_EXPORT_MISSING
-} = errors
+  const {
+    ERR_EXPORT_CYCLE,
+    ERR_EXPORT_MISSING
+  } = errors
 
-function validateDeep(entry) {
-  if (entry._validatedDeep) {
-    return
+  function validateDeep(entry) {
+    if (entry._validatedDeep) {
+      return
+    }
+
+    entry._validatedDeep = true
+
+    const { children } = entry
+
+    for (const name in children) {
+      validate(children[name], entry)
+    }
+
+    for (const name in children) {
+      const entry = children[name]
+
+      if (entry.type === TYPE_ESM) {
+        validateDeep(entry)
+      }
+    }
   }
 
-  entry._validatedDeep = true
+  function isCyclicalExport(entry, exportedName, seen) {
+    const { name } = entry
 
-  const { children } = entry
-
-  const parentIsMJS = entry.extname === ".mjs"
-
-  const parentNamedExports =
-    entry.package.options.cjs.namedExports &&
-    ! parentIsMJS
-
-  for (const name in children) {
-    const childEntry = children[name]
-
-    if (childEntry._namespaceFinalized === NAMESPACE_FINALIZATION_DEFERRED) {
-      continue
+    if (seen !== void 0 &&
+        seen.has(name)) {
+      return true
     }
 
-    const childType = childEntry.type
-    const childIsCJS = childType === TYPE_CJS
-    const childIsESM = childType === TYPE_ESM
-    const childIsPseudo = childType === TYPE_PSEUDO
-    const childIsLoaded = childEntry._loaded === LOAD_COMPLETED
+    if (seen === void 0) {
+      seen = new Set
+    }
+
+    seen.add(name)
+
+    for (const setter of entry.setters[exportedName]) {
+      if (setter.type === SETTER_TYPE_EXPORT_FROM &&
+          isCyclicalExport(setter.owner, setter.exportedName, seen)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  function validate(entry, parentEntry) {
+    const parentIsMJS = parentEntry.extname === ".mjs"
+
+    const parentNamedExports =
+      parentEntry.package.options.cjs.namedExports &&
+      ! parentIsMJS
+
+    if (entry._namespaceFinalized === NAMESPACE_FINALIZATION_DEFERRED) {
+      return
+    }
+
+    const { type } = entry
+    const isCJS = type === TYPE_CJS
+    const isESM = type === TYPE_ESM
+    const isPseudo = type === TYPE_PSEUDO
+    const isLoaded = entry._loaded === LOAD_COMPLETED
 
     const defaultOnly =
-      (childIsCJS &&
-       ! parentNamedExports &&
-       ! childEntry.builtin) ||
-      (childIsPseudo &&
-       parentIsMJS)
+      (isCJS &&
+      ! parentNamedExports &&
+      ! entry.builtin) ||
+      (isPseudo &&
+      parentIsMJS)
 
-    if (! childIsESM &&
+    if (! isESM &&
         ! defaultOnly &&
-        ! childIsLoaded) {
-      continue
+        ! isLoaded) {
+      return
     }
 
-    const cache = childEntry._validation
-    const { getters } = childEntry
-    const settersMap = childEntry.setters
+    const cache = entry._validation
+    const { getters } = entry
+    const settersMap = entry.setters
 
     let namespace
 
@@ -77,9 +114,9 @@ function validateDeep(entry) {
       }
 
       if (namespace === void 0) {
-        namespace = childIsLoaded
-          ? childEntry.getExportByName("*", entry)
-          : childEntry._namespace
+        namespace = isLoaded
+          ? entry.getExportByName("*", parentEntry)
+          : entry._namespace
       }
 
       if (Reflect.has(namespace, exportedName)) {
@@ -118,51 +155,23 @@ function validateDeep(entry) {
       cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
-      const setterIndex = setters.findIndex(({ owner }) => owner === entry)
+      const setterIndex = setters.findIndex(({ owner }) => owner === parentEntry)
 
       if (setterIndex !== -1) {
-        const ErrorCtor = isCyclicalExport(childEntry, exportedName)
+        const ErrorCtor = isCyclicalExport(entry, exportedName)
           ? ERR_EXPORT_CYCLE
           : ERR_EXPORT_MISSING
 
         // Remove problematic setter to unblock subsequent imports.
         setters.splice(setterIndex, 1)
-        throw constructStackless(ErrorCtor, [childEntry.module, exportedName])
+        throw constructStackless(ErrorCtor, [entry.module, exportedName])
       }
     }
   }
 
-  for (const name in children) {
-    const childEntry = children[name]
-
-    if (childEntry.type === TYPE_ESM) {
-      validateDeep(childEntry)
-    }
-  }
+  return validateDeep
 }
 
-function isCyclicalExport(entry, exportedName, seen) {
-  const { name } = entry
-
-  if (seen !== void 0 &&
-      seen.has(name)) {
-    return true
-  }
-
-  if (seen === void 0) {
-    seen = new Set
-  }
-
-  seen.add(name)
-
-  for (const setter of entry.setters[exportedName]) {
-    if (setter.type === SETTER_TYPE_EXPORT_FROM &&
-        isCyclicalExport(setter.owner, setter.exportedName, seen)) {
-      return true
-    }
-  }
-
-  return false
-}
-
-export default validateDeep
+export default shared.inited
+  ? shared.module.moduleEsmValidateDeep
+  : shared.module.moduleEsmValidateDeep = init()
