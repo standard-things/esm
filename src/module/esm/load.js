@@ -146,7 +146,7 @@ function tryLoader(entry, filename, parentEntry, cache, cacheKey) {
     throw e
   } finally {
     if (threw) {
-      if (cache === Loader.state.module.moduleCache) {
+      if (entry.type === TYPE_ESM) {
         // Unlike CJS, ESM errors are preserved for subsequent loads.
         Reflect.defineProperty(cache, cacheKey, {
           configurable: true,
