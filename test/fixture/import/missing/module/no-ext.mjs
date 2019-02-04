@@ -1,2 +1,2 @@
-import "../../../load-count.mjs#import/missing/module/no-ext.mjs"
+import "../../../load-count.mjs"
 import "./MISSING_MODULE"

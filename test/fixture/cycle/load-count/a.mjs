@@ -1,2 +1,2 @@
-import "../../load-count.mjs#cycle/load-count/a.mjs"
+import "../../load-count.mjs"
 import "./a.mjs"

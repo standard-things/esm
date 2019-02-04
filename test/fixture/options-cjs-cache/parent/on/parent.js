@@ -1,4 +1,4 @@
-import child from "./child.js#parent.js"
+import child from "./child.js"
 
 const parent = module
 

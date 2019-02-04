@@ -10,6 +10,7 @@ import * as fsExtraNs from "fs-extra"
 import * as fsNs from "fs"
 import path from "path"
 import require from "./require.js"
+import resetState from "./reset-state.js"
 import stream from "stream"
 import trash from "../script/trash.js"
 import util from "util"
@@ -39,6 +40,7 @@ const abcNs = createNamespace({
   default: "default"
 })
 
+const defPath = path.resolve("fixture/export/def.js")
 const defNs = createNamespace({
   default: { d: "d", e: "e", f: "f" }
 })
@@ -933,7 +935,7 @@ describe("miscellaneous tests", () => {
       .reduce((promise, request) =>
         promise
           .then(() => {
-            Reflect.deleteProperty(global, "loadCount")
+            resetState()
             return import(request)
               .then(assert.fail)
               .catch((e) =>
@@ -948,7 +950,7 @@ describe("miscellaneous tests", () => {
                     }
                   })
               )
-            })
+          })
       , Promise.resolve())
     )
 
@@ -964,6 +966,8 @@ describe("miscellaneous tests", () => {
     it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
       import("./fixture/options-cjs-cache/parent/on/parent.js")
         .then(({ child, parent }) => {
+          Reflect.deleteProperty(require.cache, child.filename)
+
           assert.ok(parent.parent)
           assert.ok(child.parent)
         })
@@ -972,6 +976,8 @@ describe("miscellaneous tests", () => {
     it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () =>
       import("./fixture/options-cjs-cache/parent/on/parent.mjs")
         .then(({ child }) => {
+          Reflect.deleteProperty(require.cache, child.filename)
+
           assert.ok(Reflect.has(child, "parent"))
           assert.strictEqual(typeof child.parent, "undefined")
         })
@@ -1333,11 +1339,7 @@ describe("miscellaneous tests", () => {
       ]
       .reduce((promise, request) =>
         promise
-          .then(() => {
-            Reflect.deleteProperty(global, "loadCount")
-            Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
-            return import(request)
-          })
+          .then(() => import(request))
           .then(() => assert.strictEqual(global.loadCount, 1))
       , Promise.resolve())
     )
@@ -1461,7 +1463,11 @@ describe("miscellaneous tests", () => {
           import(request)
             .then(assert.fail)
             .catch((e) => {
-              assert.strictEqual(Reflect.has(global, "loadCount"), false)
+              const actual = Reflect.has(global, "loadCount")
+
+              resetState()
+
+              assert.strictEqual(actual, false)
               checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
             })
         ))
@@ -1479,7 +1485,11 @@ describe("miscellaneous tests", () => {
           import(request)
             .then(assert.fail)
             .catch(({ message }) => {
-              assert.strictEqual(Reflect.has(global, "loadCount"), false)
+              const actual = Reflect.has(global, "loadCount")
+
+              resetState()
+
+              assert.strictEqual(actual, false)
               assert.ok(message.includes("does not provide an export"))
             })
         ))
@@ -1491,14 +1501,17 @@ describe("miscellaneous tests", () => {
           "./fixture/cjs/missing/export/cjs.js",
           "./fixture/cjs/missing/export/bridge.js"
         ]
-        .map((request) =>
-          import(request)
+        .map((request) => {
+          Reflect.deleteProperty(require.cache, abcPath)
+          Reflect.deleteProperty(require.cache, defPath)
+
+          return import(request)
             .then(assert.fail)
             .catch(({ message }) => {
               assert.strictEqual(global.loadCount, 1)
               assert.ok(message.includes("does not provide an export"))
             })
-        ))
+        }))
     )
 
     it("should error when setting an imported identifier", () =>

@@ -1,4 +1,4 @@
-import child from "./child.js#parent.mjs"
+import child from "./child.js"
 
 export {
   child

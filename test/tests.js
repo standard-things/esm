@@ -1,5 +1,4 @@
-import path from "path"
-import require from "./require.js"
+import resetState from "./reset-state.js"
 
 import "./cache-tests.js"
 import "./compiler-tests.mjs"
@@ -23,21 +22,4 @@ import "./repl-hook-tests.mjs"
 import "./scenario-tests.mjs"
 import "./test262.mjs"
 
-const extensions = Object.assign({}, require.extensions)
-
-beforeEach(() => {
-  Reflect.deleteProperty(global, "customError")
-  Reflect.deleteProperty(global, "loadCount")
-  Reflect.deleteProperty(global, "this")
-
-  Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.js"))
-  Reflect.deleteProperty(require.cache, path.resolve("fixture/load-count.mjs"))
-
-  const names = Object.keys(require.extensions)
-
-  for (const name of names) {
-    Reflect.deleteProperty(require.extensions, name)
-  }
-
-  Object.assign(require.extensions, extensions)
-})
+beforeEach(resetState)
