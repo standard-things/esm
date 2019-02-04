@@ -520,8 +520,28 @@ class Entry {
 
     const { cjs } = this.package.options
 
-    if (this.type === TYPE_ESM ||
-        this.type === TYPE_WASM) {
+    if (this.type === TYPE_CJS) {
+      let exported = mod.exports
+
+      this._loaded = LOAD_COMPLETED
+
+      if (cjs.interop &&
+          exported != null &&
+          exported.__esModule) {
+        this.namespace = this._namespace
+        this.type = TYPE_PSEUDO
+      }
+
+      const names = getExportsObjectKeys(this, exported)
+
+      if (this.type === TYPE_CJS) {
+        this.addGetter("default", () => this.namespace.default)
+        exported = proxyExports(this)
+      }
+
+      this.exports = exported
+      this.assignExportsToNamespace(names)
+    } else {
       const names = getExportsObjectKeys(this)
 
       this._loaded = LOAD_COMPLETED
@@ -549,28 +569,6 @@ class Entry {
           }
         }
       }
-    } else {
-      let exported = mod.exports
-
-      this._loaded = LOAD_COMPLETED
-
-      if (cjs.interop &&
-          exported != null &&
-          exported.__esModule &&
-          this.type === TYPE_CJS) {
-        this.namespace = this._namespace
-        this.type = TYPE_PSEUDO
-      }
-
-      const names = getExportsObjectKeys(this, exported)
-
-      if (this.type === TYPE_CJS) {
-        this.addGetter("default", () => this.namespace.default)
-        exported = proxyExports(this)
-      }
-
-      this.exports = exported
-      this.assignExportsToNamespace(names)
     }
 
     this.finalizeNamespace()
@@ -731,8 +729,8 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
 
     let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
 
-    if (entry.type === TYPE_ESM &&
-        ! errored) {
+    if (! errored &&
+        entry.type === TYPE_ESM) {
       errored =
         ! Reflect.has(getters, name) ||
         getters[name]() === ERROR_GETTER
