@@ -742,10 +742,10 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
     }
 
-    // Treat pseudo ES modules like CJS within `.mjs` files.
     if (type === TYPE_PSEUDO &&
         name === "default" &&
         namespace === entry._partialNamespace) {
+      // Treat like CJS within `.mjs` files.
       return entry.exports
     }
 
