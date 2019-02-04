@@ -937,20 +937,20 @@ describe("miscellaneous tests", () => {
           .then(() => {
             resetState()
             return import(request)
-              .then(assert.fail)
-              .catch((e) =>
-                import(request)
-                  .then(assert.fail)
-                  .catch((re) => {
-                    if (re.code === "ERR_ASSERTION") {
-                      assert.fail()
-                    } else {
-                      assert.strictEqual(e, re)
-                      assert.strictEqual(global.loadCount, 1)
-                    }
-                  })
-              )
           })
+          .then(assert.fail)
+          .catch((e) =>
+            import(request)
+              .then(assert.fail)
+              .catch((re) => {
+                if (re.code === "ERR_ASSERTION") {
+                  assert.fail()
+                } else {
+                  assert.strictEqual(e, re)
+                  assert.strictEqual(global.loadCount, 1)
+                }
+              })
+          )
       , Promise.resolve())
     )
 
@@ -963,25 +963,29 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it("should expose ESM in `module.parent` with `options.cjs.cache`", () =>
-      import("./fixture/options-cjs-cache/parent/on/parent.js")
-        .then(({ child, parent }) => {
-          Reflect.deleteProperty(require.cache, child.filename)
+    it("should expose ESM in `module.parent` with `options.cjs.cache`", () => {
+      const filename = path.resolve("fixture/options-cjs-cache/parent/on/child.js")
 
+      Reflect.deleteProperty(require.cache, filename)
+
+      return import("./fixture/options-cjs-cache/parent/on/parent.js")
+        .then(({ child, parent }) => {
           assert.ok(parent.parent)
           assert.ok(child.parent)
         })
-    )
+    })
 
-    it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () =>
-      import("./fixture/options-cjs-cache/parent/on/parent.mjs")
+    it("should not expose ESM in `module.parent` with `options.cjs.cache` in `.mjs` files", () => {
+      const filename = path.resolve("fixture/options-cjs-cache/parent/on/child.js")
+
+      Reflect.deleteProperty(require.cache, filename)
+
+      return import("./fixture/options-cjs-cache/parent/on/parent.mjs")
         .then(({ child }) => {
-          Reflect.deleteProperty(require.cache, child.filename)
-
           assert.ok(Reflect.has(child, "parent"))
           assert.strictEqual(typeof child.parent, "undefined")
         })
-    )
+    })
 
     it("should not expose ESM in `require.cache`", () => {
       const filename = path.resolve("fixture/options-cjs-cache/require/out/index.js")
@@ -1452,66 +1456,66 @@ describe("miscellaneous tests", () => {
     )
 
     it("should error for missing modules before ESM code execution", () =>
-      Promise
-        .all([
-          "./fixture/import/missing/module/cjs.mjs",
-          "./fixture/import/missing/module/esm.mjs",
-          "./fixture/import/missing/module/no-ext.mjs",
-          "./fixture/cycle/missing/module/a.mjs"
-        ]
-        .map((request) =>
-          import(request)
-            .then(assert.fail)
-            .catch((e) => {
-              const actual = Reflect.has(global, "loadCount")
-
-              resetState()
-
-              assert.strictEqual(actual, false)
-              checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
-            })
-        ))
+      [
+        "./fixture/import/missing/module/cjs.mjs",
+        "./fixture/import/missing/module/esm.mjs",
+        "./fixture/import/missing/module/no-ext.mjs",
+        "./fixture/cycle/missing/module/a.mjs"
+      ]
+      .reduce((promise, request) =>
+        promise
+          .then(() => {
+            resetState()
+            return import(request)
+          })
+          .then(assert.fail)
+          .catch((e) => {
+            assert.strictEqual(Reflect.has(global, "loadCount"), false)
+            checkLegacyErrorProps(e, "MODULE_NOT_FOUND")
+          })
+      , Promise.resolve())
     )
 
     it("should error when importing non-exported binding before ESM code execution", () =>
-      Promise
-        .all([
+      [
         "./fixture/import/missing/export/cjs.mjs",
         "./fixture/import/missing/export/esm.mjs",
         "./fixture/cjs/missing/export/esm.js",
         "./fixture/cycle/missing/export/a.mjs"
-        ]
-        .map((request) =>
-          import(request)
-            .then(assert.fail)
-            .catch(({ message }) => {
-              const actual = Reflect.has(global, "loadCount")
-
-              resetState()
-
-              assert.strictEqual(actual, false)
-              assert.ok(message.includes("does not provide an export"))
-            })
-        ))
+      ]
+      .reduce((promise, request) =>
+        promise
+          .then(() => {
+            resetState()
+            return import(request)
+          })
+          .then(assert.fail)
+          .catch(({ message }) => {
+            assert.strictEqual(Reflect.has(global, "loadCount"), false)
+            assert.ok(message.includes("does not provide an export"))
+          })
+      , Promise.resolve())
     )
 
     it("should error when importing non-exported binding after CJS code execution", () =>
-      Promise
-        .all([
-          "./fixture/cjs/missing/export/cjs.js",
-          "./fixture/cjs/missing/export/bridge.js"
-        ]
-        .map((request) => {
-          Reflect.deleteProperty(require.cache, abcPath)
-          Reflect.deleteProperty(require.cache, defPath)
+      [
+        "./fixture/cjs/missing/export/cjs.js",
+        "./fixture/cjs/missing/export/bridge.js"
+      ]
+      .reduce((promise, request) =>
+        promise
+          .then(() => {
+            Reflect.deleteProperty(require.cache, abcPath)
+            Reflect.deleteProperty(require.cache, defPath)
 
-          return import(request)
-            .then(assert.fail)
-            .catch(({ message }) => {
-              assert.strictEqual(global.loadCount, 1)
-              assert.ok(message.includes("does not provide an export"))
-            })
-        }))
+            return import(request)
+              .then(assert.fail)
+              .catch(({ message }) => {
+                assert.strictEqual(global.loadCount, 1)
+                assert.ok(message.includes("does not provide an export"))
+              })
+          })
+      , Promise.resolve())
     )
 
     it("should error when setting an imported identifier", () =>
