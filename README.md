@@ -105,15 +105,15 @@ Specify options with one of the following:
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"extensions":</code></td>
+        <td valign="top"><code>"esModule":</code></td>
         <td>
-          <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
+          <p>A boolean for <code>__esModule</code> and <code>require</code> interoperability.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"interop":</code></td>
+        <td valign="top"><code>"extensions":</code></td>
         <td>
-          <p>A boolean for <code>__esModule</code> and <code>require</code> interoperability.</p>
+          <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
         </td>
       </tr>
       <tr>

@@ -66,8 +66,8 @@ const defaultOptions = {
   cache: true,
   cjs: {
     cache: false,
+    esModule: false,
     extensions: false,
-    interop: false,
     mutableNamespace: false,
     namedExports: false,
     paths: false,
@@ -85,8 +85,8 @@ const defaultOptions = {
 const zeroConfigOptions = {
   cjs: {
     cache: true,
+    esModule: true,
     extensions: true,
-    interop: true,
     mutableNamespace: true,
     namedExports: true,
     paths: true,
@@ -286,6 +286,9 @@ function createOptions(value) {
       if (Reflect.has(defaultOptions, name)) {
         names.push(name)
         options[name] = value[name]
+      } else if (name === "interop" &&
+          possibleNames.indexOf("esModule") === -1) {
+        options.esModule = value.interop
       } else if (name === "sourcemap" &&
           possibleNames.indexOf("sourceMap") === -1) {
         options.sourceMap = value.sourcemap

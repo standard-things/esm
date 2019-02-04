@@ -1005,7 +1005,7 @@ describe("miscellaneous tests", () => {
         .then(() => assert.strictEqual(Reflect.has(require.cache, filename), true))
     })
 
-    it("should add `module.exports.__esModule` to ES modules with `options.cjs.interop`", () => {
+    it("should add `module.exports.__esModule` to ES modules with `options.cjs.esModule`", () => {
       const exported = require("./fixture/cjs/export/nothing.js")
       const descriptor = Reflect.getOwnPropertyDescriptor(exported, "__esModule")
 

@@ -522,7 +522,7 @@ class Entry {
 
       this._loaded = LOAD_COMPLETED
 
-      if (cjs.interop &&
+      if (cjs.esModule &&
           exported != null &&
           exported.__esModule) {
         this.namespace = this._namespace
@@ -547,16 +547,17 @@ class Entry {
 
       if (this.extname !== ".mjs") {
         const exportDefaultOnly =
-          cjs.interop &&
+          cjs.esModule &&
           names.length === 1 &&
-          names[0] === "default"
+          names[0] === "default" &&
+          isObjectLike(exported.default)
 
         if (! exportDefaultOnly &&
             cjs.mutableNamespace) {
           this.module.exports = proxyExports(this)
         }
 
-        if (cjs.interop) {
+        if (cjs.esModule) {
           const exported = this.exports
 
           if (exportDefaultOnly) {
