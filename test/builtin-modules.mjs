@@ -1,6 +1,10 @@
+import SemVer from "semver"
+
 import assert from "assert"
 import execa from "execa"
 import path from "path"
+
+const canTestFsPromises = SemVer.satisfies(process.version, ">=10")
 
 const testPath = path.resolve(".")
 
@@ -37,7 +41,11 @@ describe("test builtin modules", () => {
       })
   })
 
-  it("should not provided exports for non-enumerable properties", () => {
+  it("should not provide exports for non-enumerable properties", function () {
+    if (! canTestFsPromises) {
+      this.skip()
+    }
+
     const filename = path.resolve("fixture/builtin-modules/fs.mjs")
 
     return runMain(filename, envAuto)
@@ -47,7 +55,11 @@ describe("test builtin modules", () => {
       })
   })
 
-  it("should provided exports for non-enumerable properties with `options.cjs.namedExports`", () => {
+  it("should provide exports for non-enumerable properties with `options.cjs.namedExports`", function () {
+    if (! canTestFsPromises) {
+      this.skip()
+    }
+
     const filename = path.resolve("fixture/builtin-modules/fs.js")
 
     return runMain(filename, envAuto)
