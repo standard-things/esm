@@ -24,7 +24,7 @@ function runMain(filename, env) {
 }
 
 describe("test builtin modules", () => {
-  it("should inspect values with `console.log()`", () => {
+  it("should inspect values in `console` logs", () => {
     const dirPath = path.resolve("fixture/builtin-modules/console")
 
     return Promise
@@ -34,6 +34,26 @@ describe("test builtin modules", () => {
       ])
       .then(([builtin, loader]) => {
         assert.strictEqual(loader.stdout, builtin.stdout)
+      })
+  })
+
+  it("should not provided exports for non-enumerable properties", () => {
+    const filename = path.resolve("fixture/builtin-modules/fs.mjs")
+
+    return runMain(filename, envAuto)
+      .then(({ stderr, stdout }) => {
+        assert.ok(stderr.includes("does not provide an export"))
+        assert.strictEqual(stdout, "")
+      })
+  })
+
+  it("should provided exports for non-enumerable properties with `options.cjs.namedExports`", () => {
+    const filename = path.resolve("fixture/builtin-modules/fs.js")
+
+    return runMain(filename, envAuto)
+      .then(({ stderr, stdout }) => {
+        assert.strictEqual(stderr.includes("does not provide an export"), false)
+        assert.ok(stdout.includes("enumerable:true"))
       })
   })
 })
