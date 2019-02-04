@@ -150,7 +150,7 @@ function init() {
 
     const [foregroundCode, backgroundCode] = colors[style]
 
-    return "\u001b[" + foregroundCode + "m" + string + "\u001b[" + backgroundCode + "m"
+    return "\u001B[" + foregroundCode + "m" + string + "\u001B[" + backgroundCode + "m"
   }
 
   function toInspectable(value, options) {
