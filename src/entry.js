@@ -110,7 +110,7 @@ class Entry {
     // The shallow import validation state of the module.
     this._validatedShallow = false
     // The import validation cache.
-    this._validation = new Map
+    this._validation = new Map([["*", true]])
     // The module basename.
     this.basename = null
     // The builtin module indicator.

@@ -22,10 +22,6 @@ function validateShallow(entry) {
     let namespace
 
     for (const exportedName in settersMap) {
-      if (exportedName === "*") {
-        continue
-      }
-
       const cached = cache.get(exportedName)
 
       if (cached === true) {
