@@ -4,8 +4,12 @@ import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
 
 const {
+  LOAD_COMPLETED,
+  NAMESPACE_FINALIZATION_DEFERRED,
   SETTER_TYPE_EXPORT_FROM,
-  TYPE_ESM
+  TYPE_CJS,
+  TYPE_ESM,
+  TYPE_PSEUDO
 } = ENTRY
 
 const {
@@ -22,21 +26,35 @@ function validateDeep(entry) {
 
   const { children } = entry
 
+  const parentIsMJS = entry.extname === ".mjs"
+
   const parentNamedExports =
     entry.package.options.cjs.namedExports &&
-    entry.extname !== ".mjs"
+    ! parentIsMJS
 
   for (const name in children) {
     const childEntry = children[name]
 
-    if (childEntry.builtin) {
+    if (childEntry._namespaceFinalized === NAMESPACE_FINALIZATION_DEFERRED) {
       continue
     }
 
-    const childIsESM = childEntry.type === TYPE_ESM
+    const childType = childEntry.type
+    const childIsCJS = childType === TYPE_CJS
+    const childIsESM = childType === TYPE_ESM
+    const childIsPseudo = childType === TYPE_PSEUDO
+    const childIsLoaded = childEntry._loaded === LOAD_COMPLETED
+
+    const defaultOnly =
+      (childIsCJS &&
+       ! parentNamedExports &&
+       ! childEntry.builtin) ||
+      (childIsPseudo &&
+       parentIsMJS)
 
     if (! childIsESM &&
-        parentNamedExports) {
+        ! defaultOnly &&
+        ! childIsLoaded) {
       continue
     }
 
@@ -44,26 +62,33 @@ function validateDeep(entry) {
     const { getters } = childEntry
     const settersMap = childEntry.setters
 
+    let namespace
+
     for (const exportedName in settersMap) {
-      if (exportedName === "*" ||
-          (! childIsESM &&
-           exportedName === "default")) {
+      if (defaultOnly &&
+          exportedName === "default") {
         continue
       }
 
-      const cached = childIsESM
-        ? cache.get(exportedName)
-        : void 0
+      const cached = cache.get(exportedName)
 
       if (cached === true) {
         continue
       }
 
-      if (childIsESM &&
-          Reflect.has(getters, exportedName)) {
+      if (namespace === void 0) {
+        namespace = childIsLoaded
+          ? childEntry.getExportByName("*", entry)
+          : childEntry._namespace
+      }
+
+      if (Reflect.has(namespace, exportedName)) {
         let getter = getters[exportedName]
 
-        if (getter.owner.type !== TYPE_ESM) {
+        const { owner } = getter
+
+        if (owner.type !== TYPE_ESM &&
+            owner._loaded !== LOAD_COMPLETED) {
           continue
         }
 
