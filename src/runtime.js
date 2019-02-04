@@ -17,7 +17,6 @@ import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
 import toExternalError from "./util/to-external-error.js"
-import validateShallow from "./module/esm/validate-shallow.js"
 
 const {
   ERROR_GETTER,
@@ -240,20 +239,15 @@ const Runtime = {
             request = request + ""
           }
 
-          let lastEntry
           let lastValue
           let timerId
 
           const setterArgsList = [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
-              lastEntry = childEntry
               lastValue = value
 
               if (timerId === void 0) {
-                timerId = setImmediate(() => {
-                  validateShallow(lastEntry)
-                  resolvePromise(lastValue)
-                })
+                timerId = setImmediate(() => resolvePromise(lastValue))
               }
 
               return true

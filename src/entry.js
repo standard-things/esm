@@ -35,6 +35,7 @@ import setDeferred from "./util/set-deferred.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
+import validateShallow from "./module/esm/validate-shallow.js"
 
 const {
   ERROR_GETTER,
@@ -578,6 +579,7 @@ class Entry {
 
   resumeChildren() {
     const { children } = this
+    const isESM = this.type === TYPE_ESM
 
     for (const name in children) {
       const childEntry = children[name]
@@ -604,6 +606,10 @@ class Entry {
       } else {
         childEntry.loaded()
         childEntry.updateBindings(null, UPDATE_TYPE_INIT)
+      }
+
+      if (isESM) {
+        validateShallow(childEntry, this)
       }
     }
   }
