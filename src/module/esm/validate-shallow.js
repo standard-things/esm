@@ -1,23 +1,15 @@
 import constructStackless from "../../error/construct-stackless.js"
 import errors from "../../errors.js"
+import shared from "../../shared.js"
 
-const {
-  ERR_EXPORT_MISSING
-} = errors
+function init() {
+  const {
+    ERR_EXPORT_MISSING
+  } = errors
 
-function validateShallow(entry) {
-  if (entry._validatedShallow) {
-    return
-  }
-
-  entry._validatedShallow = true
-
-  const { children } = entry
-
-  for (const name in children) {
-    const childEntry = children[name]
-    const cache = childEntry._validation
-    const settersMap = childEntry.setters
+  function validateShallow(entry, parentEntry) {
+    const cache = entry._validation
+    const settersMap = entry.setters
 
     let namespace
 
@@ -29,7 +21,7 @@ function validateShallow(entry) {
       }
 
       if (namespace === void 0) {
-        namespace = childEntry.getExportByName("*", entry)
+        namespace = entry.getExportByName("*", parentEntry)
       }
 
       if (Reflect.has(namespace, exportedName)) {
@@ -40,15 +32,19 @@ function validateShallow(entry) {
       cache.set(exportedName, false)
 
       const setters = settersMap[exportedName]
-      const setterIndex = setters.findIndex(({ owner }) => owner === entry)
+      const setterIndex = setters.findIndex(({ owner }) => owner === parentEntry)
 
       if (setterIndex !== -1) {
         // Remove problematic setter to unblock subsequent imports.
         setters.splice(setterIndex, 1)
-        throw constructStackless(ERR_EXPORT_MISSING, [childEntry.module, exportedName])
+        throw constructStackless(ERR_EXPORT_MISSING, [entry.module, exportedName])
       }
     }
   }
+
+  return validateShallow
 }
 
-export default validateShallow
+export default shared.inited
+  ? shared.module.moduleEsmValidateShallow
+  : shared.module.moduleEsmValidateShallow = init()
