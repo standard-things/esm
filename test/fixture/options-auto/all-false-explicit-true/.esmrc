@@ -1,0 +1,9 @@
+{
+  cjs: {
+    cache: false,
+    dedefault: true,
+    esModule: false,
+    topLevelReturn: true
+  },
+  debug: true
+}

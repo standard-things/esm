@@ -1,0 +1,7 @@
+{
+  cjs: {
+    cache: false,
+    esModule: false
+  },
+  debug: true
+}
