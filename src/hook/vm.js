@@ -52,23 +52,23 @@ const {
 function hook(vm) {
   let entry
 
-  function managerWrapper(manager, func, args) {
+  function managerWrapper(manager, createScript, args) {
     const wrapped = Wrapper.find(vm, "createScript", "*")
 
-    return Reflect.apply(wrapped, this, [manager, func, args])
+    return Reflect.apply(wrapped, this, [manager, createScript, args])
   }
 
-  function methodWrapper(manager, func, [content, scriptOptions]) {
+  function methodWrapper(manager, createScript, [content, scriptOptions]) {
     scriptOptions = assign({}, scriptOptions)
     scriptOptions.produceCachedData = true
 
     const cacheName = getCacheName(content)
+    const compileDatas = entry.package.cache.compile
     const { runtimeName } = entry
 
-    entry._validation.clear()
-    entry.cacheName = cacheName
-
-    let compileData = CachingCompiler.from(entry)
+    let compileData = Reflect.has(compileDatas, cacheName)
+      ? compileDatas[cacheName]
+      : null
 
     if (compileData === null) {
       const compilerOptions = {
@@ -81,9 +81,7 @@ function hook(vm) {
       }
 
       compileData = tryWrapper(CachingCompiler.compile, [content, compilerOptions], content)
-
-      entry.compileData = compileData
-      entry.package.cache.compile[cacheName] = compileData
+      compileDatas[cacheName] = compileData
     } else if (compileData.scriptData !== null &&
         scriptOptions.produceCachedData &&
         ! Reflect.has(scriptOptions, "cachedData")) {
@@ -108,19 +106,29 @@ function hook(vm) {
       "})();" +
       compileData.code
 
-    entry.state = STATE_EXECUTION_STARTED
+    const runInWrapper = function (runInFunc, args) {
+      entry._validation.clear()
+      entry.cacheName = cacheName
+      entry.compileData = compileData
+      entry.state = STATE_EXECUTION_STARTED
 
-    const result = tryWrapper.call(vm, func, [code, scriptOptions], content)
+      const result = tryWrapper.call(this, runInFunc, args, content)
 
-    entry.state = STATE_EXECUTION_COMPLETED
+      entry.state = STATE_EXECUTION_COMPLETED
 
-    if (result.cachedDataProduced) {
-      compileData.scriptData = result.cachedData
+      return result
     }
 
-    result.runInContext = createTryWrapper(result.runInContext, content)
-    result.runInThisContext = createTryWrapper(result.runInThisContext, content)
-    return result
+    const script = tryWrapper.call(vm, createScript, [code, scriptOptions], content)
+
+    if (script.cachedDataProduced) {
+      compileData.scriptData = script.cachedData
+    }
+
+    script.runInContext = wrap(script.runInContext, runInWrapper)
+    script.runInThisContext = wrap(script.runInThisContext, runInWrapper)
+
+    return script
   }
 
   function setupCheck() {
@@ -280,12 +288,6 @@ function createAddBuiltinModules(entry) {
       })
     }
   }
-}
-
-function createTryWrapper(func, content) {
-  return wrap(func, function (func, args) {
-    return tryWrapper.call(this, func, args, content)
-  })
 }
 
 function tryWrapper(func, args, content) {
