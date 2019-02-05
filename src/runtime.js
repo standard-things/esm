@@ -148,8 +148,7 @@ const Runtime = {
       return CachingCompiler.compile(content, {
         cjsVars: cjs.vars,
         eval: true,
-        runtimeName: entry.runtimeName,
-        topLevelReturn: cjs.topLevelReturn
+        runtimeName: entry.runtimeName
       }).code
     } catch (e) {
       if (! Loader.state.package.default.options.debug &&
@@ -181,8 +180,7 @@ const Runtime = {
       const compileData = CachingCompiler.compile(content, {
         cjsVars: cjs.vars,
         eval: true,
-        runtimeName,
-        topLevelReturn: cjs.topLevelReturn
+        runtimeName
       })
 
       if (! compileData.changed) {

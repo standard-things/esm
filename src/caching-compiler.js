@@ -396,10 +396,12 @@ function init() {
     const { runtimeName } = options
 
     if (options.eval) {
+      // Set `topLevelReturn` to `true` so that the "Illegal return statement"
+      // syntax error will occur within `eval()`.
       return {
         cjsVars,
         runtimeName,
-        topLevelReturn
+        topLevelReturn: true
       }
     }
 
