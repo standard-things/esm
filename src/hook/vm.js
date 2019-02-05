@@ -63,28 +63,27 @@ function hook(vm) {
     scriptOptions.produceCachedData = true
 
     const cacheName = getCacheName(content)
-    const compileDatas = entry.package.cache.compile
     const { runtimeName } = entry
 
     entry._validation.clear()
     entry.cacheName = cacheName
 
-    let compileData = Reflect.has(compileDatas, cacheName)
-      ? compileDatas[cacheName]
-      : null
+    let compileData = CachingCompiler.from(entry)
 
     if (compileData === null) {
-      compileData = tryWrapper(CachingCompiler.compile, [
-        content,
-        {
-          cjsVars: true,
-          generateVarDeclarations: true,
-          pragmas: false,
-          runtimeName,
-          sourceType: SOURCE_TYPE_UNAMBIGUOUS,
-          strict: false
-        }
-      ])
+      const compilerOptions = {
+        cjsVars: true,
+        generateVarDeclarations: true,
+        pragmas: false,
+        runtimeName,
+        sourceType: SOURCE_TYPE_UNAMBIGUOUS,
+        strict: false
+      }
+
+      compileData = tryWrapper(CachingCompiler.compile, [content, compilerOptions], content)
+
+      entry.compileData = compileData
+      entry.package.cache.compile[cacheName] = compileData
     } else if (compileData.scriptData !== null &&
         scriptOptions.produceCachedData &&
         ! Reflect.has(scriptOptions, "cachedData")) {
