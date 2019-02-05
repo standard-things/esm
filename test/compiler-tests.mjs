@@ -19,7 +19,9 @@ describe("compiler tests", () => {
     }))
 
     assert.throws(
-      () => Compiler.compile("return", { sourceType: MODULE }),
+      () => Compiler.compile("return", {
+        sourceType: MODULE
+      }),
       /SyntaxError: Illegal return statement/
     )
   })
