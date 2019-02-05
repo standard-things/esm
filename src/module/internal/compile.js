@@ -107,12 +107,12 @@ function compile(caller, entry, content, filename, fallback) {
 
       compileData.scriptData = scriptData
 
+      entry.compileData = compileData
+      pkg.cache.compile[cacheName] = compileData
+
       if (compileData.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
       }
-
-      entry.compileData = compileData
-      pkg.cache.compile[cacheName] = compileData
     }
   }
 
@@ -363,7 +363,10 @@ function tryCompileCached(entry, filename) {
     filename = loc.filename
   }
 
-  maskStackTrace(error, { filename, inModule: isESM })
+  maskStackTrace(error, {
+    filename,
+    inModule: isESM
+  })
 
   throw error
 }
@@ -382,7 +385,11 @@ function tryCompileCode(caller, content, options) {
     toExternalError(error)
   } else {
     captureStackTrace(error, caller)
-    maskStackTrace(error, { content, filename: options.filename })
+
+    maskStackTrace(error, {
+      content,
+      filename: options.filename
+    })
   }
 
   throw error
