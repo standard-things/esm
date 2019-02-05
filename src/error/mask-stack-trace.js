@@ -9,6 +9,7 @@ import getModuleURL from "../util/get-module-url.js"
 import getSilent from "../util/get-silent.js"
 import isError from "../util/is-error.js"
 import isParseError from "../util/is-parse-error.js"
+import isPath from "../util/is-path.js"
 import readFile from "../fs/read-file.js"
 import replaceWithout from "../util/replace-without.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
@@ -116,10 +117,13 @@ function init() {
     const header = match[0]
     const scriptFilename = match[1]
     const lineNumber = +match[2]
-    const useDecoratorLine = scriptFilename !== filename
 
     let contentLines
     let contentLine
+
+    let useDecoratorLine =
+      isPath(scriptFilename) &&
+      scriptFilename !== filename
 
     if (! useDecoratorLine) {
       if (typeof content !== "string" &&
@@ -139,6 +143,8 @@ function init() {
         } else {
           contentLine = ""
         }
+      } else {
+        useDecoratorLine = true
       }
     }
 
