@@ -335,8 +335,17 @@ describe("miscellaneous tests", () => {
     it("should merge `options.cjs` of all `false` against zero-config defaults", () =>
       Promise
         .all([
-          "./fixture/options-auto/inverse",
+          "./fixture/options-auto/dedefault",
           "./fixture/options-auto/top-level-return"
+        ]
+        .map((request) => import(request)))
+    )
+
+    it("should merge `options.cjs` explicit fields against zero-config defaults", () =>
+      Promise
+        .all([
+          "./fixture/options-auto/explicit-false",
+          "./fixture/options-auto/explicit-true"
         ]
         .map((request) => import(request)))
     )

@@ -1,0 +1,7 @@
+{
+  cjs: {
+    dedefault: true,
+    topLevelReturn: true
+  },
+  debug: true
+}

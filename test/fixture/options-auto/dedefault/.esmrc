@@ -1,0 +1,6 @@
+{
+  cjs: {
+    dedefault: true
+  },
+  debug: true
+}
