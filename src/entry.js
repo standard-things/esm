@@ -20,6 +20,7 @@ import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
 import hasIn from "./util/has-in.js"
+import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
@@ -783,13 +784,9 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
 
   handler.defineProperty = (namespace, name, descriptor) => {
     if (entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED &&
-        ! (descriptor.writable === false &&
-           ! Reflect.has(descriptor, "value") &&
-           Reflect.has(namespace, name)) &&
-        Reflect.defineProperty(namespace, name, descriptor)) {
-      return name === Symbol.toStringTag ||
-        Reflect.has(entry.importedBindings, name) ||
-        descriptor.value === void 0
+        Reflect.has(namespace, name) &&
+        isDescriptorMatch(Reflect.getOwnPropertyDescriptor(namespace, name), descriptor)) {
+      return Reflect.defineProperty(namespace, name, descriptor)
     }
 
     if (! isCalledFromStrictCode()) {
