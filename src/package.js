@@ -233,9 +233,13 @@ class Package {
 
     if (dirPath === "" &&
         ! cache.has("")) {
+      // Set `topLevelReturn` to `true` so that the "Illegal return statement"
+      // syntax error will occur within the REPL.
       cache.set("", new Package("", PACKAGE_RANGE, {
         cache: false,
-        cjs: true
+        cjs: {
+          topLevelReturn: true
+        }
       }))
     }
 
