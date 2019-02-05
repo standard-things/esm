@@ -1005,17 +1005,23 @@ describe("miscellaneous tests", () => {
         .then(() => assert.strictEqual(Reflect.has(require.cache, filename), true))
     })
 
-    it("should add `module.exports.__esModule` to ES modules with `options.cjs.esModule`", () => {
-      const exported = require("./fixture/cjs/export/nothing.js")
-      const descriptor = Reflect.getOwnPropertyDescriptor(exported, "__esModule")
+    it("should add `module.exports.__esModule` to ES modules with `options.cjs.esModule`", () =>
+      [
+        "./fixture/options-cjs-es-module/es-module",
+        "./fixture/options-cjs-es-module/interop"
+      ]
+      .map((request) => {
+        const exported = require(request)
+        const descriptor = Reflect.getOwnPropertyDescriptor(exported, "__esModule")
 
-      assert.deepStrictEqual(descriptor, {
-        configurable: false,
-        enumerable: false,
-        value: true,
-        writable: false
+        assert.deepStrictEqual(descriptor, {
+          configurable: false,
+          enumerable: false,
+          value: true,
+          writable: false
+        })
       })
-    })
+    )
 
     it("should treat pseudo modules as CJS in `.mjs` files", () =>
       Promise

@@ -275,8 +275,7 @@ function clearBabelCache(cachePath) {
 function createOptions(value) {
   const { defaultOptions } = Package
   const names = []
-
-  let options = {}
+  const options = {}
 
   if (typeof value === "string") {
     names.push("mode")
@@ -288,9 +287,6 @@ function createOptions(value) {
       if (Reflect.has(defaultOptions, name)) {
         names.push(name)
         options[name] = value[name]
-      } else if (name === "interop" &&
-          possibleNames.indexOf("esModule") === -1) {
-        options.esModule = value.interop
       } else if (name === "sourcemap" &&
           possibleNames.indexOf("sourceMap") === -1) {
         options.sourceMap = value.sourcemap
@@ -311,6 +307,7 @@ function createOptions(value) {
   const cjsOptions = createOptionsCJS(options.cjs)
 
   defaults(options, defaultOptions)
+
   options.cjs = cjsOptions
 
   const awaitOption = options.await
@@ -426,32 +423,41 @@ function createOptionsCJS(value) {
     return options
   }
 
+  const names = []
   const possibleNames = keys(value)
-
-  let useZeroConfig = true
 
   for (const name of possibleNames) {
     if (Reflect.has(defaultCJS, name)) {
-      const optionsValue = value[name]
-
-      if (isFlag(optionsValue)) {
-        const flagValue = !! optionsValue
-
-        if (flagValue &&
-            ! isExplicitName(name)) {
-          useZeroConfig = false
-        }
-
-        options[name] = flagValue
-      } else {
-        throw new ERR_INVALID_ESM_OPTION(
-          "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
-          optionsValue,
-          true
-        )
-      }
+      names.push(name)
+      options[name] = value[name]
+    } else if (name === "interop" &&
+        possibleNames.indexOf("esModule") === -1) {
+      options.esModule = value.interop
     } else {
       throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")
+    }
+  }
+
+  let useZeroConfig = true
+
+  for (const name of names) {
+    const optionsValue = options[name]
+
+    if (isFlag(optionsValue)) {
+      const flagValue = !! optionsValue
+
+      if (flagValue &&
+          ! isExplicitName(name)) {
+        useZeroConfig = false
+      }
+
+      options[name] = flagValue
+    } else {
+      throw new ERR_INVALID_ESM_OPTION(
+        "cjs[" + toStringLiteral(name, APOSTROPHE) + "]",
+        optionsValue,
+        true
+      )
     }
   }
 
