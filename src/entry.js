@@ -19,7 +19,6 @@ import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
-import hasIn from "./util/has-in.js"
 import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObject from "./util/is-object.js"
@@ -1061,7 +1060,7 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
         (name === "__esModule" ||
          (isFunc &&
           name === "prototype") ||
-         (hasIn(proto, name) &&
+         (has(proto, name) &&
           ! isEnumerable(proto, name)))) {
       continue
     }
