@@ -929,12 +929,11 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   }
 
   handler.set = (namespace, name, value, receiver) => {
-    const exported = entry.exports
-
-    if (! isUpdatableSet(exported, name)) {
-      exported[name] = value
+    if (! isUpdatableSet(namespace, name)) {
       return false
     }
+
+    const exported = entry.exports
 
     if (receiver === proxy) {
       receiver = exported

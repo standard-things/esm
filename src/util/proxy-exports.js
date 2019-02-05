@@ -151,21 +151,16 @@ function init() {
         return false
       },
       set(exported, name, value, receiver) {
-        const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
-        const isUpdatable = isUpdatableSet(descriptor)
-
-        if (typeof value === "function") {
-          const unwrapped = cached.unwrap.get(value)
-          const newValue = unwrapped === void 0 ? value : unwrapped
-
-          if (isUpdatable) {
-            value = newValue
-          }
+        if (! isUpdatableSet(exported, name)) {
+          return false
         }
 
-        if (! isUpdatable) {
-          exported[name] = value
-          return false
+        const unwrapped = typeof value === "function"
+          ? cached.unwrap.get(value)
+          : void 0
+
+        if (unwrapped !== void 0) {
+          value = unwrapped
         }
 
         if (receiver === proxy) {
