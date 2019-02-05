@@ -415,9 +415,9 @@ function createOptionsCJS(value) {
     const optionsValue = !! value
 
     for (const name of names) {
-      if (! isExplicitName(name)) {
-        options[name] = optionsValue
-      }
+      options[name] = isExplicitName(name)
+        ? false
+        : optionsValue
     }
 
     return options
