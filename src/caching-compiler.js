@@ -46,7 +46,7 @@ function init() {
         return compileAndWrite(code, options)
       }
 
-      return compileAndCache(code, options)
+      return compile(code, options)
     },
     from(entry) {
       const { cache, cachePath } = entry.package
@@ -119,7 +119,7 @@ function init() {
     }
   }
 
-  function compileAndCache(code, options) {
+  function compile(code, options) {
     const result = Compiler.compile(code, toCompileOptions(options))
 
     if (options.eval) {
@@ -133,7 +133,7 @@ function init() {
 
   function compileAndWrite(code, options) {
     const { cacheName, cachePath } = options
-    const result = compileAndCache(code, options)
+    const result = compile(code, options)
 
     if (! cacheName ||
         ! cachePath ||
