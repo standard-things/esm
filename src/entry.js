@@ -838,7 +838,8 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
       entry.updateBindings(name)
     }
 
-    return Reflect.isExtensible(namespace)
+    return Reflect.isExtensible(namespace) ||
+      Reflect.defineProperty(namespace, name, descriptor)
   }
 
   handler.deleteProperty = (namespace, name) => {
