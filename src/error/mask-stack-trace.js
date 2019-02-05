@@ -122,8 +122,8 @@ function init() {
     let contentLine
 
     let useDecoratorLine =
-      isPath(scriptFilename) &&
-      scriptFilename !== filename
+      scriptFilename !== filename &&
+      isPath(scriptFilename)
 
     if (! useDecoratorLine) {
       if (typeof content !== "string" &&
