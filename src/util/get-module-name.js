@@ -7,6 +7,11 @@ function init() {
       const { filename, id } = mod
 
       if (typeof id === "string") {
+        if (id === "." &&
+            typeof filename === "string") {
+          return filename
+        }
+
         return id
       }
 
