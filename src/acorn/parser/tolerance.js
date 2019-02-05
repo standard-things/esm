@@ -48,6 +48,7 @@ function init() {
     if (scope === void 0) {
       scope = {
         flags,
+        functions: [],
         lexical: [],
         var: []
       }
