@@ -18,6 +18,7 @@ import Shim from "./shim.js"
 
 import builtinVM from "./builtin/vm.js"
 import errors from "./errors.js"
+import getModuleName from "./util/get-module-name.js"
 import globalHook from "./hook/global.js"
 import hasLoaderValue from "./env/has-loader-value.js"
 import isInstalled from "./util/is-installed.js"
@@ -73,7 +74,11 @@ if (shared.inited &&
       }
     } else {
       options = Package.createOptions(options)
-      cacheKey = JSON.stringify(options)
+
+      cacheKey = JSON.stringify({
+        name: getModuleName(mod),
+        options
+      })
     }
 
     if (cacheKey !== void 0) {
