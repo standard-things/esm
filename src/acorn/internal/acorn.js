@@ -19,6 +19,8 @@ function init() {
       let acorn = safeRequire("internal/deps/acorn/acorn/dist/acorn")
 
       if (! isObjectLike(acorn)) {
+        // TODO: Remove fallback when https://github.com/nodejs/node/pull/25844
+        // is merged.
         acorn = safeRequire("internal/deps/acorn/dist/acorn")
       }
 
