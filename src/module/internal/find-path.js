@@ -32,11 +32,6 @@ const {
   YARN_PNP
 } = ENV
 
-const {
-  preserveSymlinks,
-  preserveSymlinksMain
-} = FLAGS
-
 const { isFile } = Stats.prototype
 const mainFields = ["main"]
 
@@ -46,11 +41,11 @@ const preserveAllSymlinks =
 
 const resolveSymlinks =
   ! preserveAllSymlinks &&
-  ! preserveSymlinks
+  ! FLAGS.preserveSymlinks
 
 const resolveSymlinksMain =
   ! preserveAllSymlinks &&
-  ! preserveSymlinksMain
+  ! FLAGS.preserveSymlinksMain
 
 function findPath(request, paths, isMain = false, fields, exts) {
   let cacheKey = request + "\0"
