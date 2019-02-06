@@ -21,11 +21,17 @@ function init() {
     setDeferred(flags, "experimentalREPLAwait", () => matches(commandArgs, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(commandArgs, "--experimental-worker"))
     setDeferred(flags, "exposeInternals", () => matches(commandArgs, /^--expose[-_]internals$/))
+    setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.*)?$/))
+    setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
+    setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
+    setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))
+    setDeferred(flags, "strict", () => matches(commandArgs, "--strict"))
+
     setDeferred(flags, "inspect", () => {
       return flags.inspectBrk ||
         matches(commandArgs, /^--(?:debug|inspect)(?:=.*)?$/)
     })
-    setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.*)?$/))
+
     setDeferred(flags, "preloadModules", () => {
       const { length } = commandArgs
       const requireRegExp = /^(?:--require|-r)$/
@@ -41,10 +47,6 @@ function init() {
 
       return result
     })
-    setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
-    setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
-    setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))
-    setDeferred(flags, "strict", () => matches(commandArgs, "--strict"))
 
     return flags
   }
