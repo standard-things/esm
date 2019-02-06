@@ -20,13 +20,15 @@ function init() {
   ]
 
   const map = new Map([
+    // Used to enhance `console` calls in the Chrome inspector.
+    ["inspector", [
+      "consoleCall"
+    ]],
+    // Used for supplemental enhancements.
+    // eslint-disable-next-line sort-keys
     ["fs", [
       "internalModuleStat",
       "realpath"
-    ]],
-    ["inspector", [
-      "callAndPauseOnStart",
-      "consoleCall"
     ]],
     ["util", [
       "decorated_private_symbol",
