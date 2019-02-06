@@ -12,10 +12,8 @@ import Package from "../../package.js"
 import RealModule from "../../real/module.js"
 
 import _compile from "../internal/compile.js"
-import binding from "../../binding.js"
 import { dirname } from "../../safe/path.js"
 import getCacheName from "../../util/get-cache-name.js"
-import getSilent from "../../util/get-silent.js"
 import makeRequireFunction from "../internal/make-require-function.js"
 import maskFunction from "../../util/mask-function.js"
 import realProcess from "../../real/process.js"
@@ -29,7 +27,8 @@ const {
 } = ENTRY
 
 const {
-  ELECTRON
+  ELECTRON,
+  FLAGS
 } = ENV
 
 const {
@@ -38,22 +37,17 @@ const {
 
 const RealProto = RealModule.prototype
 
-const runInDebugContext = getSilent(realVM, "runInDebugContext")
-
-const useRunInDebugContext = typeof runInDebugContext === "function"
-
-let resolvedArgv
 let useBufferArg
 let useRunInContext
 
 const compile = maskFunction(function (content, filename) {
   const entry = Entry.get(this)
   const { state } = entry
-  const isInit = state === STATE_INITIAL
+  const isInitial = state === STATE_INITIAL
 
   if (entry.package.options.mode !== MODE_STRICT &&
       entry.extname !== ".mjs" &&
-      (isInit ||
+      (isInitial ||
        state === STATE_PARSING_COMPLETED)) {
     entry.cacheName = getCacheName(content)
     entry.package = Package.get("")
@@ -64,7 +58,7 @@ const compile = maskFunction(function (content, filename) {
     try {
       result = _compile(compile, entry, content, filename)
     } finally {
-      if (isInit) {
+      if (isInitial) {
         entry.state = STATE_INITIAL
       }
     }
@@ -74,7 +68,11 @@ const compile = maskFunction(function (content, filename) {
 
   const { cacheName, compileData } = entry
   const { cachePath } = entry.package
-  const wrappedContent = Module.wrap(stripShebang(content))
+
+  const wrappedContent = Module.wrap(
+    (FLAGS.inspectBrk ? "debugger;" : "") +
+    stripShebang(content)
+  )
 
   let cachedData
 
@@ -129,33 +127,10 @@ const compile = maskFunction(function (content, filename) {
     })
   }
 
-  let inspectorWrapper = null
-
   if (realProcess._breakFirstLine &&
       realProcess._eval == null) {
-    if (resolvedArgv === void 0) {
-      // Lazily resolve `process.argv[1]` which is needed for setting the
-      // breakpoint when Node is called with the --inspect-brk flag.
-      const argv = realProcess.argv[1]
-
-      // Enter the REPL if no file path argument is provided.
-      resolvedArgv = argv
-        ? Module._resolveFilename(argv)
-        : "repl"
-    }
-
-    // Set breakpoint on module start.
-    if (filename === resolvedArgv) {
-      Reflect.deleteProperty(realProcess, "_breakFirstLine")
-      inspectorWrapper = binding.inspector.callAndPauseOnStart
-
-      if (useRunInDebugContext &&
-          typeof inspectorWrapper !== "function") {
-        const Debug = runInDebugContext("Debug")
-
-        Debug.setBreakPoint(compiledWrapper, 0, 0)
-      }
-    }
+    // Remove legacy breakpoint indicator.
+    Reflect.deleteProperty(realProcess, "_breakFirstLine")
   }
 
   const exported = this.exports
@@ -188,9 +163,7 @@ const compile = maskFunction(function (content, filename) {
     moduleState.statSync = new Map
   }
 
-  const result = inspectorWrapper
-    ? Reflect.apply(inspectorWrapper, void 0, [compiledWrapper, exported, ...args])
-    : Reflect.apply(compiledWrapper, exported, args)
+  const result = Reflect.apply(compiledWrapper, exported, args)
 
   if (noDepth) {
     moduleState.statFast = null
