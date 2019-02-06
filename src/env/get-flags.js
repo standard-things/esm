@@ -21,7 +21,11 @@ function init() {
     setDeferred(flags, "experimentalREPLAwait", () => matches(commandArgs, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(commandArgs, "--experimental-worker"))
     setDeferred(flags, "exposeInternals", () => matches(commandArgs, /^--expose[-_]internals$/))
-    setDeferred(flags, "inspect", () => matches(commandArgs, /^--(?:debug|inspect)(?:-brk)?(?:=.*)?$/))
+    setDeferred(flags, "inspect", () => {
+      return flags.inspectBrk ||
+        matches(commandArgs, /^--(?:debug|inspect)(?:=.*)?$/)
+    })
+    setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.*)?$/))
     setDeferred(flags, "preloadModules", () => {
       const { length } = commandArgs
       const requireRegExp = /^(?:--require|-r)$/
