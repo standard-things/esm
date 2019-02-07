@@ -12,8 +12,10 @@ import Package from "../../package.js"
 import RealModule from "../../real/module.js"
 
 import _compile from "../internal/compile.js"
+import createInlineSourceMap from "../../util/create-inline-source-map.js"
 import { dirname } from "../../safe/path.js"
 import getCacheName from "../../util/get-cache-name.js"
+import getSourceMappingURL from "../../util/get-source-mapping-url.js"
 import makeRequireFunction from "../internal/make-require-function.js"
 import maskFunction from "../../util/mask-function.js"
 import realProcess from "../../real/process.js"
@@ -27,8 +29,7 @@ const {
 } = ENTRY
 
 const {
-  ELECTRON,
-  FLAGS
+  ELECTRON
 } = ENV
 
 const {
@@ -37,6 +38,7 @@ const {
 
 const RealProto = RealModule.prototype
 
+let resolvedArgv
 let useBufferArg
 let useRunInContext
 
@@ -66,13 +68,35 @@ const compile = maskFunction(function (content, filename) {
     return result
   }
 
-  const { cacheName, compileData } = entry
-  const { cachePath } = entry.package
+  let preparedContent = stripShebang(content)
 
-  const wrappedContent = Module.wrap(
-    (FLAGS.inspectBrk ? "debugger;" : "") +
-    stripShebang(content)
-  )
+  if (realProcess._breakFirstLine &&
+      realProcess._eval == null) {
+    if (resolvedArgv === void 0) {
+      // Lazily resolve `process.argv[1]` which is needed for setting the
+      // breakpoint when Node is called with the --inspect-brk flag.
+      const argv = realProcess.argv[1]
+
+      // Enter the REPL if no file path argument is provided.
+      resolvedArgv = argv
+        ? Module._resolveFilename(argv)
+        : "repl"
+    }
+
+    // Set breakpoint on module start.
+    if (filename === resolvedArgv) {
+      // Remove legacy breakpoint indicator.
+      Reflect.deleteProperty(realProcess, "_breakFirstLine")
+
+      if (getSourceMappingURL(preparedContent) === "") {
+        preparedContent += createInlineSourceMap(filename, preparedContent)
+      }
+
+      preparedContent = "debugger;" + preparedContent
+    }
+  }
+
+  const { compileData } = entry
 
   let cachedData
 
@@ -99,9 +123,11 @@ const compile = maskFunction(function (content, filename) {
     }
   }
 
-  const script = new realVM.Script(wrappedContent, scriptOptions)
+  const { cachePath } = entry.package
+  const script = new realVM.Script(Module.wrap(preparedContent), scriptOptions)
 
   if (cachePath !== "") {
+    const { cacheName } = entry
     const { pendingScripts } = shared
 
     if (! Reflect.has(pendingScripts, cachePath)) {
@@ -115,32 +141,11 @@ const compile = maskFunction(function (content, filename) {
     useRunInContext = shared.unsafeGlobal !== shared.defaultGlobal
   }
 
-  let compiledWrapper
-
-  if (useRunInContext) {
-    compiledWrapper = script.runInContext(shared.unsafeContext, {
-      filename
-    })
-  } else {
-    compiledWrapper = script.runInThisContext({
-      filename
-    })
-  }
-
-  if (realProcess._breakFirstLine &&
-      realProcess._eval == null) {
-    // Remove legacy breakpoint indicator.
-    Reflect.deleteProperty(realProcess, "_breakFirstLine")
-  }
-
   const exported = this.exports
-  const { moduleState } = shared
-  const noDepth = moduleState.requireDepth === 0
-  const req = makeRequireFunction(this)
 
   const args = [
     exported,
-    req,
+    makeRequireFunction(this),
     this,
     filename,
     dirname(filename)
@@ -158,10 +163,17 @@ const compile = maskFunction(function (content, filename) {
     }
   }
 
+  const { moduleState } = shared
+  const noDepth = moduleState.requireDepth === 0
+
   if (noDepth) {
     moduleState.statFast = new Map
     moduleState.statSync = new Map
   }
+
+  const compiledWrapper = useRunInContext
+    ? script.runInContext(shared.unsafeContext, { filename })
+    : script.runInThisContext({ filename })
 
   const result = Reflect.apply(compiledWrapper, exported, args)
 
