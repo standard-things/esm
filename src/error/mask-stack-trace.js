@@ -127,6 +127,7 @@ function init() {
 
     if (! useDecoratorLine) {
       if (typeof content !== "string" &&
+          typeof filename === "string" &&
           extname(filename) !== ".wasm") {
         content = readFile(filename, "utf8")
       }
