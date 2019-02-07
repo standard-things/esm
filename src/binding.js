@@ -20,20 +20,26 @@ function init() {
   ]
 
   const map = new Map([
-    // Used to enhance `console` calls in the Chrome inspector.
-    ["inspector", [
-      "consoleCall"
-    ]],
-    // Used for supplemental enhancements.
-    // eslint-disable-next-line sort-keys
     ["fs", [
+      // Used for faster directory, file, and existence checks.
       "internalModuleStat",
+      // Used for native `realpath()` calls in Node < 9.2.0.
       "realpath"
     ]],
+    ["inspector", [
+      // Used to combine `esm` and global `console` methods without adding to
+      // the call stack.
+      "consoleCall"
+    ]],
     ["util", [
+      // Used as the stack trace decoration indicator in Node 7+.
       "decorated_private_symbol",
+      // Used to get the unwrapped object and proxy handler.
       "getProxyDetails",
+      // Used for more secure environment variable retrieval in Node 10+.
       "safeGetenv",
+      // Used to decorate stack traces until
+      // https://github.com/nodejs/node/pull/23926 is merged.
       "setHiddenValue"
     ]]
   ])
