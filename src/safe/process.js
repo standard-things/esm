@@ -51,6 +51,7 @@ export const {
   execArgv,
   platform,
   stderr,
+  stdin,
   stdout,
   type,
   version,
