@@ -297,9 +297,15 @@ function init() {
 
     const wrapped = wrapperMap.get(name)
 
-    if (wrapped !== void 0 &&
-        Reflect.getOwnPropertyDescriptor(RealProto, name).writable === true) {
-      prototype[name] = wrapped
+    if (wrapped !== void 0) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(RealProto, name)
+
+      Reflect.defineProperty(prototype, name, {
+        configurable: descriptor.configurable,
+        enumerable: descriptor.enumerable,
+        value: wrapped,
+        writable: descriptor.writable
+      })
     } else {
       copyProperty(prototype, RealProto, name)
     }
