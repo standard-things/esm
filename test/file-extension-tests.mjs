@@ -4,11 +4,11 @@ import assert from "assert"
 import require from "./require.js"
 
 describe("file extension tests", () => {
-  it("should not error loading extensionless files with `require`", () => {
+  it("should not error loading extensionless files with `require()`", () => {
     require("./fixture/ext/no-ext-cjs")
   })
 
-  it("should not error loading unknown extensions with `require`", () => {
+  it("should not error loading unknown extensions with `require()`", () => {
     require("./fixture/ext/a.js.unknown")
   })
 

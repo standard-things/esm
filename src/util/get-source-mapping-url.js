@@ -1,4 +1,4 @@
-// Inspired by `findMagicComment`.
+// Inspired by `findMagicComment()`.
 // https://chromium.googlesource.com/v8/v8.git/+/master/src/inspector/search-util.cc
 
 import CHAR_CODE from "../constant/char-code.js"

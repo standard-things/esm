@@ -28,7 +28,7 @@ function init() {
       return result
     }
 
-    // Similar to `FastPath.prototype.call`, except that the value obtained by
+    // Similar to `FastPath.prototype.call()`, except that the value obtained by
     // `this.getValue()` should be array-like. The `visitor` method is called
     // with a reference to this path object for each element of the array.
     each(visitor, methodName) {

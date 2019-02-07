@@ -52,7 +52,7 @@ Object.keys(console).forEach((name) => {
   }
 })
 
-// Suppress unhandled `Promise` rejection warnings.
+// Suppress unhandled promise rejection warnings.
 process.on("unhandledRejection", () => {})
 
 import(testFilename)

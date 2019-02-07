@@ -281,8 +281,8 @@ function init() {
       }
     }
 
-    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor` trap can be
-    // removed and the `get` trap can be conditionally dropped for `exported`
+    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor()` trap can be
+    // removed and the `get()` trap can be conditionally dropped for `exported`
     // values that return "[object Function]" or "[object Object]" from
     // `getObjectTag(exported)`.
     const proxy = new OwnProxy(exported, handler)
