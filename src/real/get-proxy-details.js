@@ -1,4 +1,5 @@
 import binding from "../binding.js"
+import isObjectLike from "../util/is-object-like.js"
 import safeRequire from "../safe/require.js"
 import shared from "../shared.js"
 
@@ -11,13 +12,17 @@ function init() {
 
   let useGetProxyDetails
 
+  // Define as a function expression in case it is ever proxy wrapped in the future.
   realGetProxyDetails = function (value) {
     if (useGetProxyDetails === void 0) {
       useGetProxyDetails = typeof binding.util.getProxyDetails === "function"
     }
 
-    if (useGetProxyDetails) {
-      return binding.util.getProxyDetails(value)
+    if (useGetProxyDetails &&
+        isObjectLike(value)) {
+      try {
+        return binding.util.getProxyDetails(value)
+      } catch {}
     }
   }
 
