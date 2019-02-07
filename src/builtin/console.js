@@ -53,7 +53,6 @@ function init() {
     ["warn", wrapBuiltin(RealProto.warn)]
   ])
 
-  let builtinMethodMap
   let isConsoleSymbol = findByRegExp(safeConsoleSymbols, /IsConsole/i)
 
   if (typeof isConsoleSymbol !== "symbol") {
@@ -64,24 +63,118 @@ function init() {
     return Reflect.apply(func, this, [expression, ...transform(rest, toCustomInspectable)])
   }
 
+  function createBuiltinConsole() {
+    const builtinConsole = tryCreateConsole(safeProcess)
+
+    if (builtinConsole === null) {
+      return realConsole
+    }
+
+    if (HAS_INSPECTOR &&
+        FLAGS.inspect) {
+      const { consoleCall } = binding.inspector
+      const useConsoleCall = typeof consoleCall === "function"
+
+      const { originalConsole } = shared
+      const originalNames = keys(originalConsole)
+      const emptyConfig = useConsoleCall ? {} : null
+
+      for (const name of originalNames) {
+        if (! isKeyAssignable(name)) {
+          continue
+        }
+
+        const originalFunc = originalConsole[name]
+
+        if (typeof originalFunc === "function") {
+          const builtinFunc = builtinConsole[name]
+
+          if (useConsoleCall &&
+              typeof builtinFunc === "function" &&
+              has(builtinConsole, name)) {
+            setDeferred(builtinConsole, name, () => {
+              // Use `consoleCall()` to combine `builtinFunc()` and
+              // `originalFunc()` without adding to the call stack.
+              return GenericFunction.bind(
+                consoleCall,
+                void 0,
+                originalFunc,
+                builtinFunc,
+                emptyConfig
+              )
+            })
+          } else {
+            builtinConsole[name] = originalFunc
+          }
+        }
+      }
+    } else if (ELECTRON_RENDERER) {
+      const globalNames = keys(globalConsole)
+
+      for (const name of globalNames) {
+        if (! isKeyAssignable(name)) {
+          continue
+        }
+
+        const consoleFunc = globalConsole[name]
+
+        if (typeof consoleFunc === "function") {
+          builtinConsole[name] = consoleFunc
+        }
+      }
+    }
+
+    const safeNames = ownKeys(safeConsole)
+
+    for (const name of safeNames) {
+      if (name === "Console") {
+        builtinConsole.Console = Console
+      } else if (isKeyAssignable(name) &&
+          ! has(builtinConsole, name)) {
+        copyProperty(builtinConsole, safeConsole, name)
+      }
+    }
+
+    if (! has(Console, Symbol.hasInstance)) {
+      Reflect.defineProperty(Console, Symbol.hasInstance, {
+        value: (instance) => instance[isConsoleSymbol]
+      })
+    }
+
+    return builtinConsole
+  }
+
+  function createBuiltinMethodMap(builtinConsole) {
+    return new Map([
+      [globalConsole.assert, builtinConsole.assert],
+      [globalConsole.debug, builtinConsole.debug],
+      [globalConsole.dir, builtinConsole.dir],
+      [globalConsole.dirxml, builtinConsole.dirxml],
+      [globalConsole.info, builtinConsole.info],
+      [globalConsole.log, builtinConsole.log],
+      [globalConsole.trace, builtinConsole.trace],
+      [globalConsole.warn, builtinConsole.warn]
+    ])
+  }
+
   function createConsole({ stderr, stdout }) {
     const args = RealConsole.length === 2
       ? [stdout, stderr]
       : [{ stderr, stdout }]
 
-    const builtinConsole = Reflect.construct(Console, args)
+    const newConsole = Reflect.construct(Console, args)
     const { prototype } = Console
 
     for (const name of RealProtoNames) {
       if (isKeyAssignable(name) &&
-          ! has(builtinConsole, name)) {
-        copyProperty(builtinConsole, prototype, name)
+          ! has(newConsole, name)) {
+        copyProperty(newConsole, prototype, name)
       }
     }
 
-    Reflect.setPrototypeOf(builtinConsole, GenericObject.create())
+    Reflect.setPrototypeOf(newConsole, GenericObject.create())
 
-    return builtinConsole
+    return newConsole
   }
 
   function defaultWrapper(func, args) {
@@ -109,23 +202,6 @@ function init() {
         return value
       }
     }
-  }
-
-  function getBuiltinMethodMap() {
-    if (builtinMethodMap !== void 0) {
-      return builtinMethodMap
-    }
-
-    return builtinMethodMap = new Map([
-      [globalConsole.assert, builtinConsole.assert],
-      [globalConsole.debug, builtinConsole.debug],
-      [globalConsole.dir, builtinConsole.dir],
-      [globalConsole.dirxml, builtinConsole.dirxml],
-      [globalConsole.info, builtinConsole.info],
-      [globalConsole.log, builtinConsole.log],
-      [globalConsole.trace, builtinConsole.trace],
-      [globalConsole.warn, builtinConsole.warn]
-    ])
   }
 
   function isKeyAssignable(name) {
@@ -229,84 +305,9 @@ function init() {
     }
   }
 
-  const builtinConsole = tryCreateConsole(safeProcess)
+  let builtinConsole
+  let builtinMethodMap
 
-  if (builtinConsole === null) {
-    return realConsole
-  }
-
-  if (HAS_INSPECTOR &&
-      FLAGS.inspect) {
-    const { consoleCall } = binding.inspector
-    const useConsoleCall = typeof consoleCall === "function"
-
-    const { originalConsole } = shared
-    const originalNames = keys(originalConsole)
-    const emptyConfig = useConsoleCall ? {} : null
-
-    for (const name of originalNames) {
-      if (! isKeyAssignable(name)) {
-        continue
-      }
-
-      const originalFunc = originalConsole[name]
-
-      if (typeof originalFunc === "function") {
-        const builtinFunc = builtinConsole[name]
-
-        if (useConsoleCall &&
-            typeof builtinFunc === "function" &&
-            has(builtinConsole, name)) {
-          setDeferred(builtinConsole, name, () => {
-            // Use `consoleCall()` to combine `builtinFunc()` and
-            // `originalFunc()` without adding to the call stack.
-            return GenericFunction.bind(
-              consoleCall,
-              void 0,
-              originalFunc,
-              builtinFunc,
-              emptyConfig
-            )
-          })
-        } else {
-          builtinConsole[name] = originalFunc
-        }
-      }
-    }
-  } else if (ELECTRON_RENDERER) {
-    const globalNames = keys(globalConsole)
-
-    for (const name of globalNames) {
-      if (! isKeyAssignable(name)) {
-        continue
-      }
-
-      const consoleFunc = globalConsole[name]
-
-      if (typeof consoleFunc === "function") {
-        builtinConsole[name] = consoleFunc
-      }
-    }
-  }
-
-  const safeNames = ownKeys(safeConsole)
-
-  for (const name of safeNames) {
-    if (name === "Console") {
-      builtinConsole.Console = Console
-    } else if (isKeyAssignable(name) &&
-        ! has(builtinConsole, name)) {
-      copyProperty(builtinConsole, safeConsole, name)
-    }
-  }
-
-  if (! has(Console, Symbol.hasInstance)) {
-    Reflect.defineProperty(Console, Symbol.hasInstance, {
-      value: (instance) => instance[isConsoleSymbol]
-    })
-  }
-
-  // Wrap `globalConsole` in a proxy until Node 12.
   const proxy = new OwnProxy(globalConsole, {
     get(globalConsole, name, receiver) {
       if (receiver === proxy) {
@@ -314,11 +315,18 @@ function init() {
       }
 
       const value = Reflect.get(globalConsole, name, receiver)
-      const builtinMethod = getBuiltinMethodMap().get(value)
 
-      if (builtinMethod !== void 0 &&
-          isUpdatableGet(globalConsole, name)) {
-        return builtinMethod
+      if (isUpdatableGet(globalConsole, name)) {
+        if (builtinConsole === void 0) {
+          builtinConsole = createBuiltinConsole()
+          builtinMethodMap = createBuiltinMethodMap(builtinConsole)
+        }
+
+        const builtinMethod = builtinMethodMap.get(value)
+
+        if (builtinMethod !== void 0) {
+          return builtinMethod
+        }
       }
 
       return value
@@ -327,7 +335,12 @@ function init() {
       const descriptor = Reflect.getOwnPropertyDescriptor(globalConsole, name)
 
       if (isUpdatableDescriptor(descriptor)) {
-        const builtinMethod = getBuiltinMethodMap().get(descriptor.value)
+        if (builtinConsole === void 0) {
+          builtinConsole = createBuiltinConsole()
+          builtinMethodMap = createBuiltinMethodMap(builtinConsole)
+        }
+
+        const builtinMethod = builtinMethodMap.get(descriptor.value)
 
         if (builtinMethod !== void 0) {
           descriptor.value = builtinMethod
