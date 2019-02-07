@@ -1,8 +1,7 @@
 import CHAR_CODE from "../../constant/char-code.js"
 import COMPILER from "../../constant/compiler.js"
 
-import createSourceMap from "../../util/create-source-map.js"
-import encodeURI from "../../util/encode-uri.js"
+import createInlineSourceMap from "../../util/create-inline-source-map.js"
 import shared from "../../shared.js"
 import stripShebang from "../../util/strip-shebang.js"
 
@@ -52,7 +51,7 @@ function init() {
 
     if (changed &&
         options.sourceMap) {
-      content += createInlineSourceMap(content, compileData.filename)
+      content += createInlineSourceMap(compileData.filename, content)
     }
 
     return content
@@ -118,15 +117,10 @@ function init() {
       "\n}))"
 
     if (options.sourceMap) {
-      content += createInlineSourceMap(content, compileData.filename)
+      content += createInlineSourceMap(compileData.filename, content)
     }
 
     return content
-  }
-
-  function createInlineSourceMap(content, filename) {
-    return "//# sourceMappingURL=data:application/json;charset=utf-8," +
-      encodeURI(createSourceMap(filename, content))
   }
 
   return compileSource
