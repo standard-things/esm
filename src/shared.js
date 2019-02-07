@@ -272,14 +272,7 @@ function init() {
   })
 
   setDeferred(utilBinding, "hiddenKeyType", () => {
-    const {
-      safeProcess,
-      utilSatisfies
-    } = shared.module
-
-    return utilSatisfies(safeProcess.version, "<7")
-      ? "string"
-      : typeof utilBinding.errorDecoratedSymbol
+    return typeof utilBinding.errorDecoratedSymbol
   })
 
   // eslint-disable-next-line no-global-assign
