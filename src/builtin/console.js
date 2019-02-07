@@ -238,52 +238,52 @@ function init() {
   if (HAS_INSPECTOR &&
       FLAGS.inspect) {
     const { consoleCall } = binding.inspector
+    const useConsoleCall = typeof consoleCall === "function"
 
-    if (typeof consoleCall === "function") {
-      const builtinNames = keys(builtinConsole)
-      const emptyConfig = {}
+    const { originalConsole } = shared
+    const originalNames = keys(originalConsole)
+    const emptyConfig = useConsoleCall ? {} : null
 
-      for (const name of builtinNames) {
-        if (! isKeyAssignable(name)) {
-          continue
-        }
+    for (const name of originalNames) {
+      if (! isKeyAssignable(name)) {
+        continue
+      }
 
+      const originalFunc = originalConsole[name]
+
+      if (typeof originalFunc === "function") {
         const builtinFunc = builtinConsole[name]
 
-        setDeferred(builtinConsole, name, () => {
-          const { originalConsole } = shared
-          const originalFunc = originalConsole[name]
-
-          if (typeof builtinFunc !== "function" ||
-              typeof originalFunc !== "function" ||
-              ! has(originalConsole, name)) {
-            return builtinFunc
-          }
-
-          return GenericFunction.bind(
-            consoleCall,
-            void 0,
-            originalFunc,
-            builtinFunc,
-            emptyConfig
-          )
-        })
+        if (useConsoleCall &&
+            typeof builtinFunc === "function" &&
+            has(builtinConsole, name)) {
+          setDeferred(builtinConsole, name, () => {
+            // Use `consoleCall()` to combine `builtinFunc()` and
+            // `originalFunc()` without adding to the call stack.
+            return GenericFunction.bind(
+              consoleCall,
+              void 0,
+              originalFunc,
+              builtinFunc,
+              emptyConfig
+            )
+          })
+        } else {
+          builtinConsole[name] = originalFunc
+        }
       }
     }
   } else if (ELECTRON_RENDERER) {
     const globalNames = keys(globalConsole)
 
     for (const name of globalNames) {
-      if (! isKeyAssignable(name) ||
-          ! has(builtinConsole, name)) {
+      if (! isKeyAssignable(name)) {
         continue
       }
 
       const consoleFunc = globalConsole[name]
-      const builtinFunc = builtinConsole[name]
 
-      if (typeof builtinFunc === "function" &&
-          typeof consoleFunc === "function") {
+      if (typeof consoleFunc === "function") {
         builtinConsole[name] = consoleFunc
       }
     }
