@@ -6,6 +6,7 @@ import GenericFunction from "../generic/function.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
+import builtinEntries from "../builtin-entries.js"
 import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
@@ -125,11 +126,15 @@ function init() {
   }
 
   function isWrappable(value) {
-    return isObjectLike(value) &&
-      (typeof value === "function" ||
-       Array.isArray(value) ||
-       getObjectTag(value) === "[object Object]" ||
-       isModuleNamespaceObjectLike(value))
+    if (! isObjectLike(value)) {
+      return false
+    }
+
+    return typeof value === "function" ||
+      Array.isArray(value) ||
+      Reflect.has(value, Symbol.toStringTag) ||
+      value === builtinEntries.process.module.exports ||
+      getObjectTag(value) === "[object Object]"
   }
 
   function prepareValue(value) {
