@@ -306,8 +306,13 @@ function init() {
     })
   }
 
+  // Wrap `globalConsole` in a proxy until Node 12.
   const proxy = new OwnProxy(globalConsole, {
     get(globalConsole, name, receiver) {
+      if (receiver === proxy) {
+        receiver = globalConsole
+      }
+
       const value = Reflect.get(globalConsole, name, receiver)
       const builtinMethod = getBuiltinMethodMap().get(value)
 
@@ -322,8 +327,7 @@ function init() {
       const descriptor = Reflect.getOwnPropertyDescriptor(globalConsole, name)
 
       if (isUpdatableDescriptor(descriptor)) {
-        const { value } = descriptor
-        const builtinMethod = getBuiltinMethodMap().get(value)
+        const builtinMethod = getBuiltinMethodMap().get(descriptor.value)
 
         if (builtinMethod !== void 0) {
           descriptor.value = builtinMethod
