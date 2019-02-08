@@ -112,6 +112,14 @@ describe("scenario tests", function () {
     .then(({ stdout }) => assert.ok(stdout.includes("lit-node:true")))
   )
 
+  it("should work with mocha", () =>
+    exec("mocha", [
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/mocha")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("mocha:true")))
+  )
+
   it("should work with module-alias", () =>
     node([
       path.resolve("fixture/scenario/module-alias")
