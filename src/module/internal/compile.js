@@ -93,7 +93,7 @@ function compile(caller, entry, content, filename, fallback) {
         ? compileData.scriptData
         : null
 
-      compileData = tryCompile(caller, content, {
+      compileData = tryCompile(caller, entry, content, {
         cacheName,
         cachePath: pkg.cachePath,
         cjsVars: cjs.vars,
@@ -221,7 +221,7 @@ function isDescendant(entry, parentEntry, seen) {
   return false
 }
 
-function tryCompile(caller, content, options) {
+function tryCompile(caller, entry, content, options) {
   let error
 
   try {
@@ -229,6 +229,8 @@ function tryCompile(caller, content, options) {
   } catch (e) {
     error = e
   }
+
+  entry.state = STATE_EXECUTION_COMPLETED
 
   if (Loader.state.package.default.options.debug ||
       ! isStackTraceMaskable(error)) {
@@ -386,6 +388,8 @@ function tryRun(entry, filename) {
 
     return result
   }
+
+  entry.state = STATE_EXECUTION_COMPLETED
 
   if (Loader.state.package.default.options.debug ||
       ! isStackTraceMaskable(error)) {
