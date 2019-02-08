@@ -211,16 +211,14 @@ Tips
 ### Bundling
 
 * For bundlers like [`webpack`](https://webpack.js.org/), [`parcel-bundler`](https://parceljs.org/),
-  and [`browserify`](http://browserify.org/) add a “module” field to `package.json`
-  pointing to the main ES module.
+  and [`browserify`](http://browserify.org/)+[`esmify`](https://github.com/mattdesl/esmify)
+  add a “module” field to `package.json` pointing to the main ES module.
   ```json
   "main": "index.js",
   "module": "main.js"
   ```
 
   :bulb: This is automagically done with `npm init esm` or `yarn create esm`.
-
-* Use [`esmify`](https://github.com/mattdesl/esmify) with `browserify`.
 
 ### Extensions
 
