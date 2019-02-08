@@ -37,6 +37,7 @@ const {
   NAMESPACE_FINALIZATION_DEFERRED,
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_INITIAL,
   STATE_PARSING_COMPLETED,
   STATE_PARSING_STARTED,
   TYPE_ESM
@@ -64,7 +65,6 @@ function compile(caller, entry, content, filename, fallback) {
   const mod = entry.module
   const pkg = entry.package
   const { options } = pkg
-  const { parsing } = shared.moduleState
   const pkgMode = options.mode
 
   let hint = SOURCE_TYPE_SCRIPT
@@ -93,7 +93,7 @@ function compile(caller, entry, content, filename, fallback) {
         ? compileData.scriptData
         : null
 
-      compileData = tryCompileCode(caller, content, {
+      compileData = tryCompile(caller, content, {
         cacheName,
         cachePath: pkg.cachePath,
         cjsVars: cjs.vars,
@@ -121,9 +121,25 @@ function compile(caller, entry, content, filename, fallback) {
     compileData.code = content
   }
 
-  if (parsing) {
-    if (entry.type === TYPE_ESM) {
-      let result = tryCompileCached(entry, filename)
+  const isESM = entry.type === TYPE_ESM
+  const { moduleState } = shared
+
+  let isSideloaded = false
+
+  if (! moduleState.parsing) {
+    if (isESM &&
+        entry.state === STATE_INITIAL) {
+      isSideloaded = true
+      entry.state = STATE_PARSING_STARTED
+      moduleState.parsing = true
+    } else {
+      return tryRun(entry, filename)
+    }
+  }
+
+  if (isESM) {
+    try {
+      let result = tryRun(entry, filename)
 
       if (compileData.circular === -1) {
         compileData.circular = isDescendant(entry, entry) ? 1 : 0
@@ -140,7 +156,7 @@ function compile(caller, entry, content, filename, fallback) {
           compileData.code = codeWithTDZ
         }
 
-        result = tryCompileCached(entry, filename)
+        result = tryRun(entry, filename)
       }
 
       entry.updateBindings()
@@ -149,33 +165,37 @@ function compile(caller, entry, content, filename, fallback) {
         entry.finalizeNamespace()
       }
 
-      return result
+      if (! isSideloaded) {
+        return result
+      }
+    } finally {
+      if (isSideloaded) {
+        moduleState.parsing = false
+      }
     }
+  } else if (typeof fallback === "function") {
+    const defaultPkg = Loader.state.package.default
+    const parentEntry = Entry.get(mod.parent)
+    const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
+    const parentPkg = parentEntry === null ? null : parentEntry.package
 
-    if (typeof fallback === "function") {
-      const defaultPkg = Loader.state.package.default
-      const parentEntry = Entry.get(mod.parent)
-      const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
-      const parentPkg = parentEntry === null ? null : parentEntry.package
+    if (! parentIsESM &&
+        (pkg === defaultPkg ||
+          parentPkg === defaultPkg)) {
+      const frames = getStackFrames(new Error)
 
-      if (! parentIsESM &&
-          (pkg === defaultPkg ||
-           parentPkg === defaultPkg)) {
-        const frames = getStackFrames(new Error)
+      for (const frame of frames) {
+        const framePath = frame.getFileName()
 
-        for (const frame of frames) {
-          const framePath = frame.getFileName()
-
-          if (isAbsolute(framePath) &&
-              ! isOwnPath(framePath)) {
-            return fallback()
-          }
+        if (isAbsolute(framePath) &&
+            ! isOwnPath(framePath)) {
+          return fallback()
         }
       }
     }
   }
 
-  return tryCompileCached(entry, filename)
+  return tryRun(entry, filename)
 }
 
 function isDescendant(entry, parentEntry, seen) {
@@ -201,8 +221,33 @@ function isDescendant(entry, parentEntry, seen) {
   return false
 }
 
-function tryCompileCached(entry, filename) {
-  const { parsing } = shared.moduleState
+function tryCompile(caller, content, options) {
+  let error
+
+  try {
+    return CachingCompiler.compile(content, options)
+  } catch (e) {
+    error = e
+  }
+
+  if (Loader.state.package.default.options.debug ||
+      ! isStackTraceMaskable(error)) {
+    toExternalError(error)
+  } else {
+    captureStackTrace(error, caller)
+
+    maskStackTrace(error, {
+      content,
+      filename: options.filename
+    })
+  }
+
+  throw error
+}
+
+function tryRun(entry, filename) {
+  const { moduleState } = shared
+  const { parsing } = moduleState
   const async = useAsync(entry)
   const { compileData } = entry
   const isESM = entry.type === TYPE_ESM
@@ -367,30 +412,6 @@ function tryCompileCached(entry, filename) {
     filename,
     inModule: isESM
   })
-
-  throw error
-}
-
-function tryCompileCode(caller, content, options) {
-  let error
-
-  try {
-    return CachingCompiler.compile(content, options)
-  } catch (e) {
-    error = e
-  }
-
-  if (Loader.state.package.default.options.debug ||
-      ! isStackTraceMaskable(error)) {
-    toExternalError(error)
-  } else {
-    captureStackTrace(error, caller)
-
-    maskStackTrace(error, {
-      content,
-      filename: options.filename
-    })
-  }
 
   throw error
 }
