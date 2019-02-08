@@ -10,6 +10,7 @@ import getURLFromFilePath from "./util/get-url-from-file-path.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isFileOrigin from "./util/is-file-origin.js"
+import isPath from "./util/is-path.js"
 import isStackTraceMaskable from "./util/is-stack-trace-maskable.js"
 import makeRequireFunction from "./module/internal/make-require-function.js"
 import maskStackTrace from "./error/mask-stack-trace.js"
@@ -282,9 +283,17 @@ const Runtime = {
     setDeferred(runtime, "meta", () => {
       const { id } = entry
 
+      let url = null
+
+      if (isFileOrigin(id)) {
+        url = id
+      } else if (isPath(id)) {
+        url = getURLFromFilePath(id)
+      }
+
       return {
         __proto__: null,
-        url: isFileOrigin(id) ? id : getURLFromFilePath(id)
+        url
       }
     })
 
