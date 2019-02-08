@@ -212,7 +212,7 @@ Tips
 
 * For bundlers like [`browserify`](http://browserify.org/)+[`esmify`](https://github.com/mattdesl/esmify),
   [`parcel-bundler`](https://parceljs.org/), and [`webpack`](https://webpack.js.org/)
-  add a “module” field to `package.json` pointing to the main ES module.
+  add a `"module"` field to `package.json` pointing to the main ES module.
   ```json
   "main": "index.js",
   "module": "main.js"
@@ -234,8 +234,8 @@ Tips
   [`ts-node`](https://github.com/TypeStrong/ts-node#programmatic).
 
 * Load `esm` for [`jasmine`](https://jasmine.github.io/) using the
-  [“helpers” field](https://jasmine.github.io/setup/nodejs.html#configuration)
-  in `jasmine.json`:
+  [`"helpers"`](https://jasmine.github.io/setup/nodejs.html#configuration)
+  field in `jasmine.json`:
   ```json
   "helpers": [
     "node_modules/esm"
@@ -255,6 +255,5 @@ Tips
   [`tape`](https://github.com/substack/tape#preloading-modules), and
   [`webpack`](https://webpack.js.org/api/cli/#config-options).
 
-  :bulb: By Node’s rules, builtin `require` cannot sideload `.mjs` files.
-  However, with `esm`, ES modules can be sideloaded as `.js` files or `.mjs`
-  files may be loaded with dynamic `import`.
+  :bulb: Builtin `require` cannot sideload `.mjs` files. However, `.js` files
+  can be sideloaded or `.mjs` files may be loaded with dynamic `import`.
