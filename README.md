@@ -64,7 +64,7 @@ Out of the box `esm` just works, no configuration necessary, and supports:
 * [Dynamic `import`](https://github.com/tc39/proposal-dynamic-import)
 * [Live bindings](https://ponyfoo.com/articles/es6-modules-in-depth#bindings-not-values)
 * [File URI scheme](https://en.wikipedia.org/wiki/File_URI_scheme)
-* Node [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script) and [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
+* Node `stdin`, [`--eval`](https://nodejs.org/api/cli.html#cli_e_eval_script), [`--print`](https://nodejs.org/api/cli.html#cli_p_print_script) flags
 * Node [`--check`](https://nodejs.org/api/cli.html#cli_c_check) flag _(Node 10+)_
 
 Options
