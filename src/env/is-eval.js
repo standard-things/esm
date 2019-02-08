@@ -11,23 +11,16 @@ function init() {
       return true
     }
 
-    const { length } = argv
-
-    if (length > 1 ||
+    if (argv.length !== 1 ||
         ! isPreloaded()) {
       return false
     }
 
     const flags = getFlags()
 
-    if (length === 1 &&
-        flags.eval) {
-      return true
-    }
-
-    return length === 0 &&
-      ! stdin.isTTY &&
-      ! flags.interactive
+    return flags.eval ||
+      (! stdin.isTTY &&
+       ! flags.interactive)
   }
 
   return isEval
