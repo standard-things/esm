@@ -330,28 +330,26 @@ function tryRun(entry, filename) {
     entry.running = false
   }
 
+  const { firstAwaitOutsideFunction } = compileData
+
+  if (! threw &&
+      ! entry.running &&
+      async &&
+      isESM &&
+      firstAwaitOutsideFunction !== null &&
+      ! isObjectEmpty(entry._namespace)) {
+    threw = true
+    error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
+    error.column = firstAwaitOutsideFunction.column
+    error.inModule = true
+    error.line = firstAwaitOutsideFunction.line
+  }
+
   if (! threw &&
       ! entry.running) {
-    const { firstAwaitOutsideFunction } = compileData
-
     entry.running = true
 
     try {
-      if (async &&
-          isESM &&
-          firstAwaitOutsideFunction !== null &&
-          ! isObjectEmpty(entry._namespace)) {
-        const error = new errors.SyntaxError({
-          input: ""
-        }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
-
-        error.column = firstAwaitOutsideFunction.column
-        error.inModule = true
-        error.line = firstAwaitOutsideFunction.line
-
-        throw error
-      }
-
       result = _runResult.next().value
     } catch (e) {
       threw = true
