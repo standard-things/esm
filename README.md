@@ -210,8 +210,8 @@ Tips
 
 ### Bundling
 
-* For bundlers like [`webpack`](https://webpack.js.org/), [`parcel-bundler`](https://parceljs.org/),
-  and [`browserify`](http://browserify.org/)+[`esmify`](https://github.com/mattdesl/esmify)
+* For bundlers like [`browserify`](http://browserify.org/)+[`esmify`](https://github.com/mattdesl/esmify),
+  [`parcel-bundler`](https://parceljs.org/), and [`webpack`](https://webpack.js.org/)
   add a “module” field to `package.json` pointing to the main ES module.
   ```json
   "main": "index.js",
