@@ -16,14 +16,12 @@ import Package from "./package.js"
 import RealModule from "./real/module.js"
 import Shim from "./shim.js"
 
-import builtinVM from "./builtin/vm.js"
 import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import globalHook from "./hook/global.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
 import isSideloaded from "./env/is-sideloaded.js"
-import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import pnp from "./pnp.js"
@@ -120,20 +118,8 @@ if (shared.inited &&
     processHook(realProcess)
   }
 
-  if (EVAL) {
-    RealModule.prototype._compile = Module.prototype._compile
-  }
-
   if (INTERNAL) {
     globalHook(shared.unsafeGlobal)
-  }
-
-  if (REPL) {
-    const names = keys(builtinVM)
-
-    for (const name of names) {
-      builtinVM[name] = realVM[name]
-    }
   }
 
   if (PRELOADED &&

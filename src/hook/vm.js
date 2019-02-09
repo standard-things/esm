@@ -8,6 +8,7 @@ import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
+import RealModule from "../real/module.js"
 import { REPLServer } from "../safe/repl.js"
 import Runtime from "../runtime.js"
 import Wrapper from "../wrapper.js"
@@ -15,6 +16,7 @@ import Wrapper from "../wrapper.js"
 import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
+import builtinVM from "../builtin/vm.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import inspect from "../util/inspect.js"
@@ -169,6 +171,8 @@ function hook(vm) {
       setupEntry(shared.unsafeGlobal.module)
       return vm.createScript(code, options).runInThisContext(options)
     })
+
+    RealModule.prototype._compile = Module.prototype._compile
   }
 
   function setupREPL() {
@@ -186,6 +190,8 @@ function hook(vm) {
         return context
       })
     }
+
+    builtinVM.createScript = vm.createScript
 
     if (INTERNAL &&
         FLAGS.experimentalREPLAwait) {
