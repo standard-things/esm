@@ -20,20 +20,18 @@ import builtinVM from "./builtin/vm.js"
 import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
 import globalHook from "./hook/global.js"
-import hasLoaderValue from "./env/has-loader-value.js"
 import isInstalled from "./util/is-installed.js"
 import isObject from "./util/is-object.js"
-import isOwnPath from "./util/is-own-path.js"
 import isSideloaded from "./env/is-sideloaded.js"
 import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
 import pnp from "./pnp.js"
+import pnpHook from "./hook/pnp.js"
 import processHook from "./hook/process.js"
 import realProcess from "./real/process.js"
 import realVM from "./real/vm.js"
 import requireHook from "./hook/require.js"
-import { sep } from "./safe/path.js"
 import shared from "./shared.js"
 import vmHook from "./hook/vm.js"
 
@@ -41,7 +39,6 @@ const {
   CHECK,
   CLI,
   EVAL,
-  FLAGS,
   INTERNAL,
   PRELOADED,
   REPL,
@@ -51,8 +48,6 @@ const {
 const {
   ERR_INVALID_ARG_TYPE
 } = errors
-
-const YARN_PNP_FILENAME = ".pnp.js"
 
 let exported
 
@@ -97,22 +92,7 @@ if (shared.inited &&
     }
 
     if (YARN_PNP) {
-      const { _cache } = Module
-
-      for (const name in _cache) {
-        if (name.endsWith(sep + YARN_PNP_FILENAME)) {
-          Reflect.deleteProperty(_cache, name)
-          break
-        }
-      }
-
-      for (const request of FLAGS.preloadModules) {
-        if (request.endsWith(sep + YARN_PNP_FILENAME)) {
-          Module._preloadModules([request])
-          pnp._resolveFilename = Module._resolveFilename
-          break
-        }
-      }
+      pnpHook(pnp)
     }
 
     return requireHook(mod)
@@ -156,43 +136,9 @@ if (shared.inited &&
     }
   }
 
-  if (PRELOADED) {
-    const { _cache } = Module
-
-    for (const name in _cache) {
-      if (! isOwnPath(name)) {
-        Reflect.deleteProperty(_cache, name)
-      }
-    }
-
-    const { preloadModules } = FLAGS
-    const { length } = preloadModules
-    const preloads = []
-
-    let i = -1
-    let pnpIndex = -1
-
-    while (++i < length) {
-      const request = preloadModules[i]
-
-      if (! hasLoaderValue(request)) {
-        if (request.endsWith(sep + YARN_PNP_FILENAME)) {
-          pnpIndex = i
-        }
-
-        preloads.push(request)
-      }
-    }
-
-    if (pnpIndex !== -1) {
-      const pos = pnpIndex + 1
-
-      Module._preloadModules(preloads.slice(0, pos))
-      pnp._resolveFilename = Module._resolveFilename
-      Module._preloadModules(preloads.slice(pos))
-    } else {
-      Module._preloadModules(preloads)
-    }
+  if (PRELOADED &&
+      YARN_PNP) {
+    pnpHook(pnp)
   }
 }
 
