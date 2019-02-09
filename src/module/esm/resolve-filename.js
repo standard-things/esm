@@ -25,6 +25,7 @@ import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import parseURL from "../../util/parse-url.js"
+import pnp from "../../pnp.js"
 import resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import shared from "../../shared.js"
 import staticNodeModulePaths from "../static/node-module-paths.js"
@@ -75,7 +76,7 @@ function resolveFilename(request, parent, isMain = false, options) {
   }
 
   if (YARN_PNP) {
-    return Module._resolveFilename(request, parent, isMain, options)
+    return pnp._resolveFilename(request, parent, isMain, options)
   }
 
   const isAbs = isAbsolute(request)

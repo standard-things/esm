@@ -28,6 +28,7 @@ import isSideloaded from "./env/is-sideloaded.js"
 import keys from "./util/keys.js"
 import mainHook from "./hook/main.js"
 import moduleHook from "./hook/module.js"
+import pnp from "./pnp.js"
 import processHook from "./hook/process.js"
 import realProcess from "./real/process.js"
 import realVM from "./real/vm.js"
@@ -108,6 +109,7 @@ if (shared.inited &&
       for (const request of FLAGS.preloadModules) {
         if (request.endsWith(sep + YARN_PNP_FILENAME)) {
           Module._preloadModules([request])
+          pnp._resolveFilename = Module._resolveFilename
           break
         }
       }
@@ -163,15 +165,34 @@ if (shared.inited &&
       }
     }
 
+    const { preloadModules } = FLAGS
+    const { length } = preloadModules
     const preloads = []
 
-    for (const request of FLAGS.preloadModules) {
+    let i = -1
+    let pnpIndex = -1
+
+    while (++i < length) {
+      const request = preloadModules[i]
+
       if (! hasLoaderValue(request)) {
+        if (request.endsWith(sep + YARN_PNP_FILENAME)) {
+          pnpIndex = i
+        }
+
         preloads.push(request)
       }
     }
 
-    Module._preloadModules(preloads)
+    if (pnpIndex !== -1) {
+      const pos = pnpIndex + 1
+
+      Module._preloadModules(preloads.slice(0, pos))
+      pnp._resolveFilename = Module._resolveFilename
+      Module._preloadModules(preloads.slice(pos))
+    } else {
+      Module._preloadModules(preloads)
+    }
   }
 }
 
