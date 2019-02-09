@@ -2,9 +2,9 @@ import SafeJSON from "../../safe/json.js"
 
 import { readFileSync } from "../../safe/fs.js"
 import safeProcess from "../../safe/process.js"
-import toString from "../../util/to-string.js"
 import stripBOM from "../../util/strip-bom.js"
 import toNamespacedPath from "../../path/to-namespaced-path.js"
+import toString from "../../util/to-string.js"
 
 const extensions = { __proto__: null }
 
