@@ -80,6 +80,7 @@ function init() {
 
     options.customInspect = true
     options.showProxy = false
+
     args[0] = wrap(value, options, customInspect, showProxy)
 
     return Reflect.apply(safeInspect, this, args)
@@ -189,10 +190,18 @@ function init() {
     return ""
   }
 
-  function wrap(object, options, customInspect, showProxy) {
+  function wrap(object, options, customInspect, showProxy, seen) {
     if (! isWrappable(object)) {
       return object
     }
+
+    if (seen === void 0) {
+      seen = new Set
+    } else if (seen.has(object)) {
+      return object
+    }
+
+    seen.add(object)
 
     const objectIsProxy = isProxy(object)
     const objectIsOwnProxy = isOwnProxy(object)
@@ -273,7 +282,7 @@ function init() {
           const { value } = descriptor
 
           if (isObjectLike(value)) {
-            descriptor.value = wrap(value, options, customInspect, showProxy)
+            descriptor.value = wrap(value, options, customInspect, showProxy, seen)
           }
         }
 
