@@ -17,13 +17,13 @@ function init() {
 
   const encodeCharsRegExp = /[?#]/g
 
-  const encodeCharMap = {
-    "#": "%23",
-    "?": "%3F"
-  }
+  const encodeCharMap = new Map([
+    ["#", "%23"],
+    ["?", "%3F"]
+  ])
 
   function encodeChar(char) {
-    return encodeCharMap[char]
+    return encodeCharMap.get(char)
   }
 
   function getURLFromFilePath(filename) {
