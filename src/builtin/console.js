@@ -245,17 +245,21 @@ function init() {
   }
 
   function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
-    return maskFunction(function (...args) {
-      const { customInspect } = defaultInspectOptions
+    const object = {
+      method(...args) {
+        const { customInspect } = defaultInspectOptions
 
-      defaultInspectOptions.customInspect = true
+        defaultInspectOptions.customInspect = true
 
-      try {
-        return Reflect.apply(wrapper, this, [builtinFunc, args])
-      } finally {
-        defaultInspectOptions.customInspect = customInspect
+        try {
+          return Reflect.apply(wrapper, this, [builtinFunc, args])
+        } finally {
+          defaultInspectOptions.customInspect = customInspect
+        }
       }
-    }, builtinFunc)
+    }
+
+    return maskFunction(object.method, builtinFunc)
   }
 
   const Console = maskFunction(function (...args) {
