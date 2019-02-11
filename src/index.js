@@ -80,6 +80,8 @@ if (shared.inited &&
     }
 
     if (options !== void 0) {
+      // Resolve the package configuration with forced `options` and cache
+      // in `Loader.state.package.cache` after `Loader.state` is initialized.
       Package.from(mod, options)
     }
 
