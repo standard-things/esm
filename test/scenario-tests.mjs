@@ -9,7 +9,7 @@ import trash from "../script/trash.js"
 const isTravis = Reflect.has(process.env, "TRAVIS")
 const isWin = process.platform === "win32"
 
-const canTestLab = SemVer.satisfies(process.version, ">=7.6.0")
+const canTestLab = SemVer.satisfies(process.version, ">=7.6")
 const canTestPM2 = ! isTravis
 
 const avaPath = path.resolve("../node_modules/ava/cli.js")

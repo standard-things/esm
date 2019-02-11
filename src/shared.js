@@ -256,7 +256,7 @@ function init() {
       utilSatisfies
     } = shared.module
 
-    return utilSatisfies(safeProcess.version, ">=9.2.0")
+    return utilSatisfies(safeProcess.version, ">=9.2")
   })
 
   setDeferred(support, "replShowProxy", () => {

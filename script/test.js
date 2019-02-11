@@ -49,7 +49,7 @@ const keptPaths = [
 
 const nodeArgs = []
 
-if (SemVer.satisfies(process.version, ">=10.5.0")) {
+if (SemVer.satisfies(process.version, ">=10.5")) {
   nodeArgs.push("--experimental-worker")
 }
 

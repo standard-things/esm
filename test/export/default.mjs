@@ -23,8 +23,8 @@ import reExport from "../fixture/export/default/re-export.mjs"
 import { reExportNamed } from "../fixture/export/default/re-export-named.mjs"
 import undefinedValue from "../fixture/export/default/undefined.mjs"
 
-const canGenerateNamesFromVars = SemVer.satisfies(process.version, ">=6.5.0")
-const canTestAsyncFunctions = SemVer.satisfies(process.version, ">=7.6.0")
+const canGenerateNamesFromVars = SemVer.satisfies(process.version, ">=6.5")
+const canTestAsyncFunctions = SemVer.satisfies(process.version, ">=7.6")
 const canTestAsyncGenerators = SemVer.satisfies(process.version, ">=10")
 
 export default () => {

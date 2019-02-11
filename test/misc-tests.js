@@ -20,10 +20,10 @@ const ESM_OPTIONS = JSON6.parse(process.env.ESM_OPTIONS || "{}")
 const isDebug = !! ESM_OPTIONS.debug
 const isWin = process.platform === "win32"
 
-const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8.0")
-const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
+const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8")
+const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5")
 const canTestUtilTypes = Reflect.has(util, "types")
-const canTestWorker = SemVer.satisfies(process.version, ">=10.5.0")
+const canTestWorker = SemVer.satisfies(process.version, ">=10.5")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
 const slashRegExp = /[\\/]/g

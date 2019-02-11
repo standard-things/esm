@@ -9,7 +9,7 @@ import test262Parser from "test262-parser"
 
 const canRunTest262 =
   process.execArgv.includes("--harmony") &&
-  SemVer.satisfies(process.version, ">=10.3.0")
+  SemVer.satisfies(process.version, ">=10.3")
 
 const fixturePath = path.resolve("test262")
 const skiplistPath = path.resolve(fixturePath, "skiplist")

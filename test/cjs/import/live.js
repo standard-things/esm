@@ -31,7 +31,7 @@ const path3 = require("path")
 const process3 = require("process")
 const regexp3 = require("../../fixture/cjs/export/regexp.js")
 
-const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5.0")
+const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5")
 
 function funcToString(func) {
   return Function.prototype.toString.call(func)

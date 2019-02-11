@@ -8,8 +8,8 @@ import trash from "../script/trash.js"
 
 const isWin = process.platform === "win32"
 
-const canUseExperimentalModules = SemVer.satisfies(process.version, ">=8.5.0")
-const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3.0")
+const canUseExperimentalModules = SemVer.satisfies(process.version, ">=8.5")
+const canUsePreserveSymlinks = SemVer.satisfies(process.version, ">=6.3")
 
 const fileProtocol = "file://" + (isWin ? "/" : "")
 

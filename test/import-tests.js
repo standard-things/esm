@@ -1,6 +1,6 @@
 import SemVer from "semver"
 
-const canTestLiveBinding = SemVer.satisfies(process.version, ">=6.2.0")
+const canTestLiveBinding = SemVer.satisfies(process.version, ">=6.2")
 
 describe("import declaration tests", () => {
   it("should support same symbol as different locals", () =>
