@@ -187,6 +187,15 @@ function init() {
     return false
   })
 
+  setDeferred(support, "consoleOptions", () => {
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
+
+    return utilSatisfies(safeProcess.version, ">=10")
+  })
+
   setDeferred(support, "createCachedData", () => {
     const { safeVM } = shared.module
 

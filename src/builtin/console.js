@@ -150,9 +150,9 @@ function init() {
   }
 
   function createConsole({ stderr, stdout }) {
-    const args = RealConsole.length === 2
-      ? [stdout, stderr]
-      : [{ stderr, stdout }]
+    const args = shared.support.consoleOptions
+      ? [{ stderr, stdout }]
+      : [stdout, stderr]
 
     const newConsole = Reflect.construct(Console, args)
     const { prototype } = Console
