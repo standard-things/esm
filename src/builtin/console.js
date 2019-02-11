@@ -34,26 +34,14 @@ function init() {
   const RealProto = RealConsole.prototype
   const RealProtoNames = ownKeys(RealProto)
 
-  const builtinLog = wrapBuiltin(RealProto.log)
   const dirOptions = { customInspect: true }
-  const safeConsoleSymbols = Object.getOwnPropertySymbols(safeConsole)
+  const wrapperMap = createWrapperMap(RealProto)
 
   // Assign `console` to a variable so it's not removed by
   // `babel-plugin-transform-remove-console`.
   const globalConsole = console
 
-  const wrapperMap = new Map([
-    ["assert", wrapBuiltin(RealProto.assert, assertWrapper)],
-    ["debug", builtinLog],
-    ["dir", wrapBuiltin(RealProto.dir, dirWrapper)],
-    ["dirxml", builtinLog],
-    ["info", builtinLog],
-    ["log", builtinLog],
-    ["trace", wrapBuiltin(RealProto.trace)],
-    ["warn", wrapBuiltin(RealProto.warn)]
-  ])
-
-  let isConsoleSymbol = findByRegExp(safeConsoleSymbols, /IsConsole/i)
+  let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
 
   if (typeof isConsoleSymbol !== "symbol") {
     isConsoleSymbol = Symbol("kIsConsole")
@@ -116,10 +104,10 @@ function init() {
           continue
         }
 
-        const consoleFunc = globalConsole[name]
+        const globalFunc = globalConsole[name]
 
-        if (typeof consoleFunc === "function") {
-          builtinConsole[name] = consoleFunc
+        if (typeof globalFunc === "function") {
+          builtinConsole[name] = globalFunc
         }
       }
     }
@@ -145,16 +133,20 @@ function init() {
   }
 
   function createBuiltinMethodMap(builtinConsole) {
-    return new Map([
-      [globalConsole.assert, builtinConsole.assert],
-      [globalConsole.debug, builtinConsole.debug],
-      [globalConsole.dir, builtinConsole.dir],
-      [globalConsole.dirxml, builtinConsole.dirxml],
-      [globalConsole.info, builtinConsole.info],
-      [globalConsole.log, builtinConsole.log],
-      [globalConsole.trace, builtinConsole.trace],
-      [globalConsole.warn, builtinConsole.warn]
-    ])
+    const names = keys(builtinConsole)
+    const result = new Map
+
+    for (const name of names) {
+      const builtinFunc = builtinConsole[name]
+      const globalFunc = globalConsole[name]
+
+      if (typeof builtinFunc === "function" &&
+          typeof globalFunc === "function") {
+        result.set(globalFunc, builtinFunc)
+      }
+    }
+
+    return result
   }
 
   function createConsole({ stderr, stdout }) {
@@ -177,8 +169,37 @@ function init() {
     return newConsole
   }
 
+  function createWrapperMap(RealProto) {
+    const builtinLog = wrapBuiltin(RealProto.log, logWrapper)
+
+    const result = new Map([
+      ["assert", wrapBuiltin(RealProto.assert, assertWrapper)],
+      ["debug", builtinLog],
+      ["dir", wrapBuiltin(RealProto.dir, dirWrapper)],
+      ["dirxml", builtinLog],
+      ["info", builtinLog],
+      ["log", builtinLog],
+      ["trace", wrapBuiltin(RealProto.trace)],
+      ["warn", wrapBuiltin(RealProto.warn)]
+    ])
+
+    const names = keys(RealProto)
+
+    for (const name of names) {
+      if (! result.has(name)) {
+        const realFunc = RealProto[name]
+
+        if (typeof realFunc === "function") {
+          result.set(name, wrapBuiltin(realFunc))
+        }
+      }
+    }
+
+    return result
+  }
+
   function defaultWrapper(func, args) {
-    return Reflect.apply(func, this, transform(args, toCustomInspectable))
+    return Reflect.apply(func, this, args)
   }
 
   function dirWrapper(func, [object, options]) {
@@ -207,6 +228,10 @@ function init() {
   function isKeyAssignable(name) {
     return name !== "Console" &&
       name !== "constructor"
+  }
+
+  function logWrapper(func, args) {
+    return Reflect.apply(func, this, transform(args, toCustomInspectable))
   }
 
   function toCustomInspectable(value) {
@@ -275,10 +300,10 @@ function init() {
     const protoNames = keys(prototype)
 
     for (const name of protoNames) {
-      const value = this[name]
+      const protoFunc = this[name]
 
-      if (typeof value === "function") {
-        this[name] = GenericFunction.bind(value, this)
+      if (typeof protoFunc === "function") {
+        this[name] = GenericFunction.bind(protoFunc, this)
       }
     }
 
@@ -301,7 +326,9 @@ function init() {
 
     const wrapped = wrapperMap.get(name)
 
-    if (wrapped !== void 0) {
+    if (wrapped === void 0) {
+      copyProperty(prototype, RealProto, name)
+    } else {
       const descriptor = Reflect.getOwnPropertyDescriptor(RealProto, name)
 
       Reflect.defineProperty(prototype, name, {
@@ -310,8 +337,6 @@ function init() {
         value: wrapped,
         writable: descriptor.writable
       })
-    } else {
-      copyProperty(prototype, RealProto, name)
     }
   }
 
