@@ -151,6 +151,21 @@ describe("miscellaneous tests", () => {
       assert.strictEqual(actual.sub, "sub")
     })
 
+    it("should not have constructable `console` methods", () => {
+      const names = Object.keys(console)
+
+      for (const name of names) {
+        const func = console[name]
+
+        if (typeof func === "function") {
+          assert.throws(
+            () => new func,
+            TypeError
+          )
+        }
+      }
+    })
+
     it("should support `Module`", () => {
       const actual = new Module
 
