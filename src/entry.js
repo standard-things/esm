@@ -976,14 +976,18 @@ function getExportByName(entry, name, parentEntry) {
   const parentIsMJS = parentEntry.extname === ".mjs"
   const { type } = entry
 
-  if ((type === TYPE_CJS ||
-       (type === TYPE_PSEUDO &&
-        parentIsMJS)) &&
-      name === "default") {
-    return entry.exports
-  }
-
   if (name !== "*") {
+    if (entry._loaded !== LOAD_COMPLETED) {
+      return ERROR_GETTER
+    }
+
+    if ((type === TYPE_CJS ||
+         (type === TYPE_PSEUDO &&
+          parentIsMJS)) &&
+        name === "default") {
+      return entry.exports
+    }
+
     const { getters } = entry
 
     return Reflect.has(getters, name)
