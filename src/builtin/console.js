@@ -270,6 +270,8 @@ function init() {
   }
 
   function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
+    // Define method with shorthand syntax so it's non-constructable.
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions#Method_definitions_are_not_constructable
     const object = {
       method(...args) {
         const { customInspect } = defaultInspectOptions
