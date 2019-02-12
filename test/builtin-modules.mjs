@@ -29,12 +29,12 @@ function runMain(filename, env) {
 
 describe("test builtin modules", () => {
   it("should inspect values in `console` logs", () => {
-    const dirPath = path.resolve("fixture/builtin-modules/console")
+    const filename = path.resolve("fixture/builtin-modules/console-inspect.js")
 
     return Promise
       .all([
-        node([dirPath]),
-        runMain(dirPath)
+        node([filename]),
+        runMain(filename)
       ])
       .then(([builtin, loader]) => {
         assert.strictEqual(loader.stdout, builtin.stdout)
@@ -46,7 +46,7 @@ describe("test builtin modules", () => {
       this.skip()
     }
 
-    const filename = path.resolve("fixture/builtin-modules/fs.mjs")
+    const filename = path.resolve("fixture/builtin-modules/non-enumerable.mjs")
 
     return runMain(filename, envAuto)
       .then(({ stderr, stdout }) => {
@@ -60,12 +60,12 @@ describe("test builtin modules", () => {
       this.skip()
     }
 
-    const filename = path.resolve("fixture/builtin-modules/fs.js")
+    const filename = path.resolve("fixture/builtin-modules/non-enumerable.js")
 
     return runMain(filename, envAuto)
       .then(({ stderr, stdout }) => {
         assert.strictEqual(stderr.includes("does not provide an export"), false)
-        assert.ok(stdout.includes("enumerable:true"))
+        assert.ok(stdout.includes("non-enumerable:true"))
       })
   })
 })
