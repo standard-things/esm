@@ -459,15 +459,15 @@ describe("compiler tests", () => {
     ]
 
     const compiled = [
-      "_.g.console",
+      "console",
       "_.g.console.a(b)",
       '_.g.console["a"](b)',
-      "new _.g.console.Console(a)",
-      "class C extends _.g.console.Console {}",
-      "const a = { console:_.g.console }",
-      "const a = { [_.g.console]: _.g.console }",
-      "const a = { console() { _.g.console } }",
-      "const a = () => _.g.console"
+      "new console.Console(a)",
+      "class C extends console.Console {}",
+      "const a = { console }",
+      "const a = { [console]: console }",
+      "const a = { console() { console } }",
+      "const a = () => console"
     ]
 
     lines.forEach((line, index) => {

@@ -33,36 +33,57 @@ function init() {
       }
     }
 
-    visitIdentifier(path) {
+    visitCallExpression(path) {
       const node = path.getValue()
-      const { name } = node
+      const { callee } = node
+
+      if (callee.type !== "MemberExpression") {
+        this.visitChildren(path)
+        return
+      }
+
+      const { object } = callee
+      const { name } = object
 
       if (! Reflect.has(this.globals, name)) {
+        this.visitChildren(path)
+        return
+      }
+
+      const args = node.arguments
+
+      if (args.length === 0) {
         return
       }
 
       const parent = path.getParentNode()
-      const { type } = parent
 
-      if ((type === "UnaryExpression" &&
-           parent.operator === "typeof") ||
-          ! isIdentifer(node, parent) ||
+      if (! isIdentifer(object, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
 
-      this.changed = true
+      if (name === "console") {
+        let skip = true
 
-      let code = this.runtimeName + ".g."
-      let pos = node.start
+        for (const { type } of args) {
+          if (type !== "Literal" &&
+              type !== "TemplateLiteral") {
+            skip = false
+            break
+          }
+        }
 
-      if (type === "Property" &&
-          parent.shorthand) {
-        code = ":" + code + name
-        pos = node.end
+        if (skip) {
+          return
+        }
       }
 
-      this.magicString.prependLeft(pos, code)
+      this.changed = true
+
+      this.magicString.prependLeft(object.start, this.runtimeName + ".g.")
+
+      path.call(this, "visitWithoutReset", "arguments")
     }
   }
 
