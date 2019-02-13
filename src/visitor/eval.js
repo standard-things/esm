@@ -43,7 +43,7 @@ function init() {
       // eval(code)
       this.changed = true
 
-      const { end, start } = node
+      const { end } = node
       const { magicString, runtimeName } = this
 
       const code = this.strict
@@ -56,7 +56,7 @@ function init() {
 
       if (this.instrumentUpdateBindings) {
         magicString
-          .prependLeft(start, runtimeName + ".u(")
+          .prependLeft(node.start, runtimeName + ".u(")
           .prependRight(end, ")")
       }
 
