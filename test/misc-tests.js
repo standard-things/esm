@@ -1,9 +1,9 @@
-import { Console } from "console"
 import JSON6 from "json-6"
 import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
+import console from "console"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import * as fsExtraNs from "fs-extra"
@@ -129,6 +129,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should support `console.Console`", () => {
+      const { Console } = console
       const actual = new Console(process.stdout)
 
       assert.ok(actual instanceof Console)
@@ -136,6 +137,8 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support subclassing `console.Console`", () => {
+      const { Console } = console
+
       class Sub extends Console {
         constructor(...args) {
           super(...args)
