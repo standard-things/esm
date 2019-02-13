@@ -138,13 +138,12 @@ function init() {
       const node = path.getValue()
       const { callee } = node
 
-      if (node.arguments.length === 0) {
-        path.call(this, "visitWithoutReset", "callee")
+      if (callee.type !== "Import") {
+        this.visitChildren(path)
         return
       }
 
-      if (callee.type !== "Import") {
-        this.visitChildren(path)
+      if (node.arguments.length === 0) {
         return
       }
 
