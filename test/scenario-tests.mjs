@@ -196,6 +196,22 @@ describe("scenario tests", function () {
       ))
   )
 
+  it("should work with webpack", () => {
+    const dirPath = path.resolve("fixture/scenario/webpack")
+    const configPath = path.resolve(dirPath, "webpack.config.js")
+    const entryPath = path.resolve(dirPath, "index.js")
+    const outputPath = path.resolve(dirPath, "output.js")
+
+    return exec("webpack", [
+      "--config-register", pkgPath,
+      "--config", configPath,
+      "--entry", entryPath,
+      "--mode", "production",
+      "--output", outputPath
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("webpack:true")))
+  })
+
   it("should work with babel, mocha, and nyc", () => {
     const dirPath = path.resolve("fixture/scenario/babel-mocha-nyc")
     const cwdPath = path.resolve(dirPath, "cwd.js")

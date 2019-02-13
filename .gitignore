@@ -17,5 +17,6 @@
 /test/fixture/unsafe-characters\[*\].mjs
 /test/fixture/main-hook/symlink/file/symlink.*js
 /test/fixture/scenario/ava-nyc-tsc/*.js
+/test/fixture/scenario/webpack/output.js
 /test/node_modules/symlink
 /test/vendor
