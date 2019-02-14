@@ -40,7 +40,7 @@ function init() {
       parser.parseExprAtom = wrap(parser.parseExprAtom, parseExprAtom)
       parser.parseNew = wrap(parser.parseNew, parseNew)
       parser.parseStatement = wrap(parser.parseStatement, parseStatement)
-      parser.parseSubscripts = wrap(parser.parseSubscripts, parseSubscripts)
+      parser.parseSubscript = wrap(parser.parseSubscript, parseSubscript)
       return parser
     }
   }
@@ -162,7 +162,7 @@ function init() {
     return Reflect.apply(func, this, args)
   }
 
-  function parseSubscripts(func, args) {
+  function parseSubscript(func, args) {
     const [base, startPos, startLoc] = args
 
     if (base.type === "Import" &&
