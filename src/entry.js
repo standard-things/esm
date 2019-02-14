@@ -399,7 +399,7 @@ class Entry {
 
     if (names === void 0) {
       names = this._loaded === LOAD_COMPLETED
-        ? keys(this.namespace)
+        ? keys(this.getters)
         : getExportsObjectKeys(this)
     }
 
@@ -410,7 +410,7 @@ class Entry {
       if (! (isCJS &&
              name === "default") &&
           ! Reflect.has(getters, name)) {
-        this.addGetter(name, () => this.namespace[name])
+        this.addGetter(name, () => this.exports[name])
       }
     }
   }
@@ -504,7 +504,7 @@ class Entry {
       const names = getExportsObjectKeys(this, exported)
 
       if (this.type === TYPE_CJS) {
-        this.addGetter("default", () => this.namespace.default)
+        this.addGetter("default", () => this.exports)
         exported = proxyExports(this)
       }
 
@@ -804,7 +804,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
     SafeObject.defineProperty(entry.exports, name, descriptor)
 
     if (Reflect.has(namespace, name)) {
-      entry.addGetter(name, () => entry.namespace[name])
+      entry.addGetter(name, () => entry.exports[name])
       entry.updateBindings(name)
     }
 
@@ -815,7 +815,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   handler.deleteProperty = (namespace, name) => {
     if (Reflect.deleteProperty(entry.exports, name)) {
       if (Reflect.has(namespace, name)) {
-        entry.addGetter(name, () => entry.namespace[name])
+        entry.addGetter(name, () => entry.exports[name])
         entry.updateBindings(name)
       }
 
@@ -911,7 +911,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     if (Reflect.set(exported, name, value, receiver)) {
       if (Reflect.has(namespace, name)) {
-        entry.addGetter(name, () => entry.namespace[name])
+        entry.addGetter(name, () => entry.exports[name])
         entry.updateBindings(name)
       }
 
