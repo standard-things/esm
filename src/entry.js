@@ -701,11 +701,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
 
     if (descriptor !== void 0) {
-      const { getters } = entry
-
-      descriptor.value = Reflect.has(getters, name)
-        ? getters[name]()
-        : handler.get(namespace, name)
+      descriptor.value = handler.get(namespace, name)
     }
 
     return descriptor
@@ -865,11 +861,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
       descriptor.value = value
     } else if (descriptor !== void 0) {
-      const { getters } = entry
-
-      descriptor.value = Reflect.has(getters, name)
-        ? getters[name]()
-        : handler.get(namespace, name)
+      descriptor.value = handler.get(namespace, name)
     }
 
     return descriptor
@@ -1054,12 +1046,14 @@ function isCalledFromStrictCode() {
 
 function runGetter(entry, name) {
   const exported = entry.exports
-  const value = tryGetter(entry.getters[name])
+  const { getters } = entry
+  const value = tryGetter(getters[name])
 
   if (value === ERROR_STAR) {
     Reflect.deleteProperty(exported, name)
+    Reflect.deleteProperty(getters, name)
   } else if (! Reflect.has(exported, name) ||
-      ! Object.is(exported[name], value)) {
+             ! Object.is(exported[name], value)) {
     entry._changed = true
     exported[name] = value
   }
