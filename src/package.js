@@ -292,7 +292,7 @@ function createOptions(value) {
         names.push(name)
         options[name] = value[name]
       } else if (name === "sourcemap" &&
-          possibleNames.indexOf("sourceMap") === -1) {
+                 possibleNames.indexOf("sourceMap") === -1) {
         options.sourceMap = value.sourcemap
       } else {
         throw new ERR_UNKNOWN_ESM_OPTION(name)
@@ -378,10 +378,10 @@ function createOptions(value) {
       mode === "all") {
     options.mode = MODE_ALL
   } else if (mode === MODE_AUTO ||
-      mode === "auto") {
+             mode === "auto") {
     options.mode = MODE_AUTO
   } else if (mode === MODE_STRICT ||
-      mode === "strict") {
+             mode === "strict") {
     options.mode = MODE_STRICT
   } else {
     throw new ERR_INVALID_ESM_OPTION("mode", mode)
@@ -435,7 +435,7 @@ function createOptionsCJS(value) {
       names.push(name)
       options[name] = value[name]
     } else if (name === "interop" &&
-        possibleNames.indexOf("esModule") === -1) {
+               possibleNames.indexOf("esModule") === -1) {
       options.esModule = value.interop
     } else {
       throw new ERR_UNKNOWN_ESM_OPTION("cjs[" + toStringLiteral(name, APOSTROPHE) + "]")

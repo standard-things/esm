@@ -108,13 +108,13 @@ if (shared.inited &&
   if (CHECK) {
     vmHook(realVM)
   } else if (EVAL ||
-      REPL) {
+             REPL) {
     moduleHook(Module)
     processHook(realProcess)
     vmHook(realVM)
   } else if (CLI ||
-      INTERNAL ||
-      isSideloaded()) {
+             INTERNAL ||
+             isSideloaded()) {
     moduleHook(RealModule)
     mainHook(RealModule)
     processHook(realProcess)

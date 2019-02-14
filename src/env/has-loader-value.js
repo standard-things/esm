@@ -31,7 +31,7 @@ function init() {
           return true
         }
       } else if (value.charCodeAt(0) !== HYPHEN_MINUS &&
-          isOwnPath(tryDualResolveFilename(value, rootModule, false))) {
+                 isOwnPath(tryDualResolveFilename(value, rootModule, false))) {
         return true
       }
     } else if (isObjectLike(value)) {

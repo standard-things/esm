@@ -75,7 +75,7 @@ import(testFilename)
     if (type === "string") {
       name = e
     } else if (type === "object" &&
-        e !== null) {
+               e !== null) {
       const { constructor } = e
       const errorMessage = e.message
       const errorName = constructor ? constructor.name : e.name

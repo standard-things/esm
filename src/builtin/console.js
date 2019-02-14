@@ -118,7 +118,7 @@ function init() {
       if (name === "Console") {
         builtinConsole.Console = Console
       } else if (isKeyAssignable(name) &&
-          ! has(builtinConsole, name)) {
+                 ! has(builtinConsole, name)) {
         copyProperty(builtinConsole, safeConsole, name)
       }
     }

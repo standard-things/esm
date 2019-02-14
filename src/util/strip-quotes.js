@@ -22,7 +22,7 @@ function init() {
           endCode === APOSTROPHE) {
         quoteCode = APOSTROPHE
       } else if (startCode === QUOTE &&
-          endCode === QUOTE) {
+                 endCode === QUOTE) {
         quoteCode = QUOTE
       }
     }

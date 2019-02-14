@@ -224,7 +224,7 @@ function init() {
             value === shared.module.utilInspect) {
           newValue = realUtil.inspect
         } else if (inspecting ||
-            name !== customInspectKey) {
+                   name !== customInspectKey) {
           if (name === "toString" &&
               typeof value === "function") {
             newValue = GenericFunction.bind(value, object)

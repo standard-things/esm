@@ -231,7 +231,7 @@ function init() {
           if (scriptData) {
             compileData.scriptData = scriptData
           } else if (cachedData &&
-              script.cachedDataRejected) {
+                     script.cachedDataRejected) {
             changed = true
 
             const meta = map[cacheName]
@@ -339,7 +339,7 @@ function init() {
           if (compileData) {
             scriptData = compileData.scriptData
           } else if (offsetStart !== -1 &&
-              offsetEnd !== -1) {
+                     offsetEnd !== -1) {
             scriptData = GenericBuffer.slice(buffer, offsetStart, offsetEnd)
           }
         }

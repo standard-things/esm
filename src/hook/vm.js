@@ -85,8 +85,8 @@ function hook(vm) {
       compileData = tryWrapper(CachingCompiler.compile, [content, compilerOptions], content)
       compileDatas[cacheName] = compileData
     } else if (compileData.scriptData !== null &&
-        scriptOptions.produceCachedData &&
-        ! Reflect.has(scriptOptions, "cachedData")) {
+               scriptOptions.produceCachedData &&
+               ! Reflect.has(scriptOptions, "cachedData")) {
       scriptOptions.cachedData = compileData.scriptData
     }
 

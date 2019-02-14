@@ -130,7 +130,7 @@ function init() {
     } else if (message.startsWith(PARSER_INVALID_ESCAPED_RESERVED_WORD)) {
       message = INVALID_ESCAPED_RESERVED_WORD
     } else if (! messageLookup.has(message) &&
-        ! message.startsWith(UNEXPECTED_TOKEN)) {
+               ! message.startsWith(UNEXPECTED_TOKEN)) {
       return
     }
 

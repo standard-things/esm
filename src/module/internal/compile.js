@@ -378,7 +378,7 @@ function tryRun(entry, filename) {
         }
       })
     } else if (! parsing &&
-        firstPass) {
+               firstPass) {
       entry.module.loaded = true
       entry.loaded()
       entry.updateBindings()

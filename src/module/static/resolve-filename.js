@@ -92,7 +92,7 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
       Module._resolveLookupPaths === staticResolveLookupPaths) {
     paths = [fromPath]
   } else if (cache === void 0 &&
-      Array.isArray(options.paths)) {
+             Array.isArray(options.paths)) {
     paths = resolveLookupPathsFrom(request, options.paths)
   } else {
     paths = Module._resolveLookupPaths(request, parent, true)

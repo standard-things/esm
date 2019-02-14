@@ -64,7 +64,7 @@ function init() {
       builtinUtil.inspect = builtinInspect
       shared.module.utilInspect = builtinInspect
     } else if (name === "types" &&
-        builtinTypes !== void 0) {
+               builtinTypes !== void 0) {
       builtinUtil.types = builtinTypes
     } else {
       copyProperty(builtinUtil, safeUtil, name)

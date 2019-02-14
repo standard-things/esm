@@ -226,8 +226,8 @@ class Entry {
     if (entry === void 0) {
       entry = new Entry(mod)
     } else if (entry._loaded === LOAD_COMPLETED &&
-        // Don't check `entry.type` first so that its value can be deferred.
-        entry.type === TYPE_CJS) {
+               // Don't check `entry.type` first so that its value can be deferred.
+               entry.type === TYPE_CJS) {
       const { bridged } = shared
       const exported = entry.module.exports
       const foundEntry = bridged.get(exported)
@@ -500,7 +500,7 @@ class Entry {
             exportDefaultOnly) {
           this.module.exports = exported.default
         } else if (cjs.esModule &&
-            ! Reflect.has(this.getters, "__esModule")) {
+                   ! Reflect.has(this.getters, "__esModule")) {
           Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
         }
       }

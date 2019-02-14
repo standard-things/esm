@@ -84,7 +84,7 @@ function findPath(request, paths, isMain = false, fields, exts) {
   if (isAbs) {
     paths = [""]
   } else if (! Array.isArray(paths) ||
-      paths.length === 0) {
+             paths.length === 0) {
     return ""
   }
 

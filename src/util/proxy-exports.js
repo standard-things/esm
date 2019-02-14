@@ -261,9 +261,9 @@ function init() {
         return descriptor
       }
     } else if (builtin &&
-        typeof exported !== "function" &&
-        ! Reflect.has(exported, Symbol.toStringTag) &&
-        getObjectTag(exported) !== "[object Object]") {
+               typeof exported !== "function" &&
+               ! Reflect.has(exported, Symbol.toStringTag) &&
+               getObjectTag(exported) !== "[object Object]") {
       handler.get = (exported, name, receiver) => {
         if (receiver === proxy) {
           receiver = exported
