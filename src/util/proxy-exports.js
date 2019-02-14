@@ -92,7 +92,7 @@ function init() {
     }
 
     const tryUpdateBindings = (name, value) => {
-      if (! Reflect.has(entry._namespace, name)) {
+      if (! Reflect.has(entry.namespace, name)) {
         entry.updateBindings()
         return
       }
@@ -133,7 +133,8 @@ function init() {
           handler.get = get
         }
 
-        if (Reflect.has(entry._namespace, name)) {
+        if (Reflect.has(entry.namespace, name)) {
+          entry.addGetter(name, () => entry.exports[name])
           entry.updateBindings(name)
         }
 
@@ -141,7 +142,8 @@ function init() {
       },
       deleteProperty(exported, name) {
         if (Reflect.deleteProperty(exported, name)) {
-          if (Reflect.has(entry._namespace, name)) {
+          if (Reflect.has(entry.namespace, name)) {
+            entry.addGetter(name, () => entry.exports[name])
             entry.updateBindings(name)
           }
 
@@ -170,10 +172,11 @@ function init() {
         const hasSetter = getSetter(exported, name) !== void 0
 
         if (Reflect.set(exported, name, value, receiver)) {
-          if (hasSetter) {
+          if (Reflect.has(entry.namespace, name)) {
+            entry.addGetter(name, () => entry.exports[name])
+            entry.updateBindings(hasSetter ? void 0 : name)
+          } else if (hasSetter) {
             entry.updateBindings()
-          } else if (Reflect.has(entry.namespace, name)) {
-            entry.updateBindings(name)
           }
 
           return true

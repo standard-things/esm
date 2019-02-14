@@ -337,7 +337,7 @@ function tryRun(entry, filename) {
       async &&
       isESM &&
       firstAwaitOutsideFunction !== null &&
-      ! isObjectEmpty(entry._namespace)) {
+      ! isObjectEmpty(entry.namespace)) {
     threw = true
     error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
     error.column = firstAwaitOutsideFunction.column

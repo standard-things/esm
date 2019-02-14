@@ -94,8 +94,6 @@ class Entry {
     this._lastChild = null
     // The loaded state of the module.
     this._loaded = LOAD_INCOMPLETE
-    // The raw namespace object without proxied exports.
-    this._namespace = toRawModuleNamespaceObject()
     // The finalized state of the namespace object.
     this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
     // The raw mutable namespace object for non-ESM importers.
@@ -134,8 +132,8 @@ class Entry {
     this.module = mod
     // The name of the module.
     this.name = null
-    // The namespace object which may have proxied exports.
-    this.namespace = this._namespace
+    // The raw namespace object.
+    this.namespace = toRawModuleNamespaceObject()
     // The package data of the module.
     this.package = Package.from(mod)
     // The paused state of the entry generator.
@@ -213,31 +211,6 @@ class Entry {
         return TYPE_ESM
       }
 
-      const proxy = new OwnProxy(this._namespace, {
-        get: (_namespace, name, receiver) => {
-          const exported = this.exports
-
-          if (name === "default") {
-            return exported
-          }
-
-          let object = _namespace
-
-          if (name !== Symbol.toStringTag &&
-              has(_namespace, name)) {
-            object = exported
-          }
-
-          if (receiver === proxy) {
-            receiver = object
-          }
-
-          return Reflect.get(object, name, receiver)
-        }
-      })
-
-      this.namespace = proxy
-
       return TYPE_CJS
     })
 
@@ -287,7 +260,7 @@ class Entry {
 
   addGetter(name, getter) {
     const {
-      _namespace,
+      namespace,
       getters,
       type
     } = this
@@ -341,7 +314,7 @@ class Entry {
       }
     }
 
-    Reflect.defineProperty(_namespace, name, descriptor)
+    Reflect.defineProperty(namespace, name, descriptor)
 
     return this
   }
@@ -356,7 +329,7 @@ class Entry {
 
   addGetterFrom(otherEntry, importedName, exportedName = importedName) {
     if (importedName === "*") {
-      return this.addGetter(exportedName, () => otherEntry.completeNamespace)
+      return this.addGetter(exportedName, () => otherEntry.getExportByName("*", this))
     }
 
     const otherGetters = otherEntry.getters
@@ -426,7 +399,7 @@ class Entry {
 
     if (names === void 0) {
       names = this._loaded === LOAD_COMPLETED
-        ? keys(this._namespace)
+        ? keys(this.namespace)
         : getExportsObjectKeys(this)
     }
 
@@ -525,7 +498,6 @@ class Entry {
       if (cjs.esModule &&
           exported != null &&
           exported.__esModule) {
-        this.namespace = this._namespace
         this.type = TYPE_PSEUDO
       }
 
@@ -542,7 +514,6 @@ class Entry {
       const names = getExportsObjectKeys(this)
 
       this._loaded = LOAD_COMPLETED
-      this.namespace = this._namespace
       this.assignExportsToNamespace(names)
 
       if (this.extname !== ".mjs") {
@@ -939,7 +910,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
     }
 
     if (Reflect.set(exported, name, value, receiver)) {
-      if (Reflect.has(entry.namespace, name)) {
+      if (Reflect.has(namespace, name)) {
         entry.addGetter(name, () => entry.namespace[name])
         entry.updateBindings(name)
       }
@@ -1105,15 +1076,15 @@ function isCalledFromStrictCode() {
 }
 
 function runGetter(entry, name) {
-  const { _namespace } = entry
+  const { namespace } = entry
   const value = tryGetter(entry.getters[name])
 
   if (value === ERROR_STAR) {
-    Reflect.deleteProperty(_namespace, name)
-  } else if (! Reflect.has(_namespace, name) ||
-      ! Object.is(_namespace[name], value)) {
+    Reflect.deleteProperty(namespace, name)
+  } else if (! Reflect.has(namespace, name) ||
+      ! Object.is(namespace[name], value)) {
     entry._changed = true
-    _namespace[name] = value
+    namespace[name] = value
   }
 }
 

@@ -115,7 +115,7 @@ function init() {
       if (namespace === void 0) {
         namespace = isLoaded
           ? entry.getExportByName("*", parentEntry)
-          : entry._namespace
+          : entry.namespace
       }
 
       if (Reflect.has(namespace, exportedName)) {

@@ -92,7 +92,7 @@ const Runtime = {
 
       const namespace = childIsLoaded
         ? childEntry.getExportByName("*", entry)
-        : childEntry._namespace
+        : childEntry.namespace
 
       for (const exportedName in namespace) {
         if (exportedName === "default") {
