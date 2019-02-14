@@ -32,7 +32,6 @@ import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
 import setDeferred from "./util/set-deferred.js"
-import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
 import validateShallow from "./module/esm/validate-shallow.js"
@@ -132,8 +131,6 @@ class Entry {
     this.module = mod
     // The name of the module.
     this.name = null
-    // The raw namespace object.
-    this.namespace = toRawModuleNamespaceObject()
     // The package data of the module.
     this.package = Package.from(mod)
     // The paused state of the entry generator.
@@ -259,11 +256,7 @@ class Entry {
   }
 
   addGetter(name, getter) {
-    const {
-      namespace,
-      getters,
-      type
-    } = this
+    const { getters, type } = this
 
     getters[name] = getter
 
@@ -275,32 +268,8 @@ class Entry {
       getter.owner = this
     }
 
-    const descriptor = {
-      configurable: true,
-      enumerable: true,
-      get: null,
-      set: null
-    }
-
-    const isDefault = name === "default"
-
-    if (isDefault &&
-        type === TYPE_CJS) {
-      descriptor.get = () => this.exports
-
-      descriptor.set = function (value) {
-        setProperty(this, name, value)
-      }
-    } else {
-      descriptor.get = () => this.exports[name]
-
-      descriptor.set = (value) => {
-        this.exports[name] = value
-      }
-    }
-
-    if (isDefault &&
-        type === TYPE_ESM) {
+    if (type === TYPE_ESM &&
+        name === "default") {
       const value = tryGetter(getter)
 
       // Give default exported anonymous functions the name "default".
@@ -313,8 +282,6 @@ class Entry {
         })
       }
     }
-
-    Reflect.defineProperty(namespace, name, descriptor)
 
     return this
   }
@@ -425,7 +392,7 @@ class Entry {
     // Table 29: Internal Slots of Module Namespace Exotic Objects
     // Properties should be assigned in `Array#sort()` order.
     // https://tc39.github.io/ecma262/#table-29
-    const names = keys(this.namespace).sort()
+    const names = keys(this.getters).sort()
 
     for (const name of names) {
       this._completeMutableNamespace[name] = INITIAL_VALUE
@@ -719,20 +686,26 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
       return entry.exports
     }
 
-    const object = entry.namespace
-
-    if (receiver === proxy) {
-      receiver = object
+    if (Reflect.has(getters, name)) {
+      return getters[name]()
     }
 
-    return Reflect.get(object, name, receiver)
+    if (receiver === proxy) {
+      receiver = namespace
+    }
+
+    return Reflect.get(namespace, name, receiver)
   }
 
   handler.getOwnPropertyDescriptor = (namespace, name) => {
     const descriptor = Reflect.getOwnPropertyDescriptor(namespace, name)
 
     if (descriptor !== void 0) {
-      descriptor.value = handler.get(entry.namespace, name)
+      const { getters } = entry
+
+      descriptor.value = Reflect.has(getters, name)
+        ? getters[name]()
+        : handler.get(namespace, name)
     }
 
     return descriptor
@@ -892,7 +865,11 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
       descriptor.value = value
     } else if (descriptor !== void 0) {
-      descriptor.value = handler.get(entry.namespace, name)
+      const { getters } = entry
+
+      descriptor.value = Reflect.has(getters, name)
+        ? getters[name]()
+        : handler.get(namespace, name)
     }
 
     return descriptor
@@ -1076,15 +1053,15 @@ function isCalledFromStrictCode() {
 }
 
 function runGetter(entry, name) {
-  const { namespace } = entry
+  const exported = entry.exports
   const value = tryGetter(entry.getters[name])
 
   if (value === ERROR_STAR) {
-    Reflect.deleteProperty(namespace, name)
-  } else if (! Reflect.has(namespace, name) ||
-      ! Object.is(namespace[name], value)) {
+    Reflect.deleteProperty(exported, name)
+  } else if (! Reflect.has(exported, name) ||
+      ! Object.is(exported[name], value)) {
     entry._changed = true
-    namespace[name] = value
+    exported[name] = value
   }
 }
 
