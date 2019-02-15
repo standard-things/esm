@@ -448,29 +448,15 @@ describe("compiler tests", () => {
     }
   })
 
-  it("should instrument console use", () => {
+  it("should transform `console` calls with identifier arguments", () => {
     const lines = [
-      "console",
       "console.a(b)",
-      'console["a"](b)',
-      "new console.Console(a)",
-      "class C extends console.Console {}",
-      "const a = { console }",
-      "const a = { [console]: console }",
-      "const a = { console() { console } }",
-      "const a = () => console"
+      'console["a"](b)'
     ]
 
     const compiled = [
-      "console",
       "_.g.console.a(b)",
-      '_.g.console["a"](b)',
-      "new console.Console(a)",
-      "class C extends console.Console {}",
-      "const a = { console }",
-      "const a = { [console]: console }",
-      "const a = { console() { console } }",
-      "const a = () => console"
+      '_.g.console["a"](b)'
     ]
 
     lines.forEach((line, index) => {
@@ -488,23 +474,31 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should not instrument console in a typeof expression", () => {
-    const line = "typeof console"
+  it("should not transform other `console` use", () => {
+    const lines = [
+      "console",
+      "console.log('a', 'b')",
+      'console.log("a", "b")',
+      "console.log(`a`, `b`)",
+      "new console.Console(a)",
+      "class C extends console.Console {}",
+      "typeof console",
+      "const a = { console }",
+      "const a = { [console]: console }",
+      "const a = { console() { console } }",
+      "const a = () => console"
+    ]
 
-    const code = [
-      "",
-      line
-    ].join("\n")
+    lines.forEach((line) => {
+      for (const sourceType of sourceTypes) {
+        const result = Compiler.compile(line, { sourceType })
 
-    for (const sourceType of sourceTypes) {
-      const result = Compiler.compile(code, { sourceType })
-      const actual = result.code.split("\n").pop()
-
-      assert.strictEqual(actual, line)
-    }
+        assert.strictEqual(result.code, line)
+      }
+    })
   })
 
-  it("should not instrument shadowed console identifiers", () => {
+  it("should not transform shadowed `console` identifiers", () => {
     const lines = [
       'import console from "a"',
       'import * as console from "a"',
