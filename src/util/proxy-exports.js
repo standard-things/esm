@@ -226,6 +226,10 @@ function init() {
 
     if (useWrappers) {
       handler.get = (exported, name, receiver) => {
+        if (receiver === proxy) {
+          receiver = exported
+        }
+
         const value = get(exported, name, receiver)
 
         let newValue = value
