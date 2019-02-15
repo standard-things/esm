@@ -30,7 +30,8 @@ import toString from "../../util/to-string.js"
 const {
   SOURCE_TYPE_MODULE,
   SOURCE_TYPE_SCRIPT,
-  SOURCE_TYPE_UNAMBIGUOUS
+  SOURCE_TYPE_UNAMBIGUOUS,
+  TRANSFORMS_EVAL
 } = COMPILER
 
 const {
@@ -40,6 +41,7 @@ const {
   STATE_INITIAL,
   STATE_PARSING_COMPLETED,
   STATE_PARSING_STARTED,
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -79,6 +81,9 @@ function compile(caller, entry, content, filename, fallback) {
     sourceType = SOURCE_TYPE_UNAMBIGUOUS
   }
 
+  const defaultPkg = Loader.state.package.default
+  const isDefaultPkg = pkg === defaultPkg
+
   let { compileData } = entry
 
   if (compileData === null) {
@@ -112,6 +117,15 @@ function compile(caller, entry, content, filename, fallback) {
 
       if (compileData.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
+      }
+
+      if (isDefaultPkg &&
+          entry.type === TYPE_CJS &&
+          compileData.transforms === TRANSFORMS_EVAL) {
+        // Under the default package configuration, discard changes for CJS
+        // modules with only `eval()` transformations.
+        compileData.code = content
+        compileData.transforms = 0
       }
     }
   }
@@ -174,14 +188,13 @@ function compile(caller, entry, content, filename, fallback) {
       }
     }
   } else if (typeof fallback === "function") {
-    const defaultPkg = Loader.state.package.default
     const parentEntry = Entry.get(mod.parent)
     const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
     const parentPkg = parentEntry === null ? null : parentEntry.package
 
     if (! parentIsESM &&
-        (pkg === defaultPkg ||
-          parentPkg === defaultPkg)) {
+        (isDefaultPkg ||
+         parentPkg === defaultPkg)) {
       const frames = getStackFrames(new Error)
 
       for (const frame of frames) {
