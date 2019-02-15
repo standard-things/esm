@@ -310,6 +310,29 @@ describe("scenario tests", function () {
       ], envAuto)
     })
 
+    it("should work with ava and sinon", () => {
+      const dirPath = path.resolve("fixture/scenario/ava-sinon")
+      const cwdPath = path.resolve(dirPath, "cwd.js")
+      const avaPattern = path.resolve(dirPath, "test.js")
+
+      return node([
+        "-r", cwdPath,
+        avaPath, avaPattern
+      ], envAuto)
+    })
+
+    it("should work with ava, nyc, and sinon", () => {
+      const dirPath = path.resolve("fixture/scenario/ava-nyc-sinon")
+      const cwdPath = path.resolve(dirPath, "cwd.js")
+      const avaPattern = path.resolve(dirPath, "test.js")
+
+      return exec("nyc", [
+        "--cwd", dirPath,
+        "-i", cwdPath,
+        "ava", avaPattern
+      ], envAuto)
+    })
+
     it("should work with ava, nyc, and tsc", () => {
       const dirPath = path.resolve("fixture/scenario/ava-nyc-tsc")
       const cwdPath = path.resolve(dirPath, "cwd.js")

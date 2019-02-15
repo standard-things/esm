@@ -1,0 +1,9 @@
+{
+  "name": "ava-nyc-sinon",
+  "private": true,
+  "ava": {
+    "require": [
+      "../../../../"
+    ]
+  }
+}
