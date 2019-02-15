@@ -157,10 +157,10 @@ function init() {
       })
 
       const importExportTransforms = importExportVisitor.transforms
-      const transformsDynamicImport = importExportTransforms & TRANSFORMS_DYNAMIC_IMPORT
-      const transformsExport = importExportTransforms & TRANSFORMS_EXPORT
-      const transformsImport = importExportTransforms & TRANSFORMS_IMPORT
-      const transformsImportMeta = importExportTransforms & TRANSFORMS_IMPORT_META
+      const transformsDynamicImport = (importExportTransforms & TRANSFORMS_DYNAMIC_IMPORT) !== 0
+      const transformsExport = (importExportTransforms & TRANSFORMS_EXPORT) !== 0
+      const transformsImport = (importExportTransforms & TRANSFORMS_IMPORT) !== 0
+      const transformsImportMeta = (importExportTransforms & TRANSFORMS_IMPORT_META) !== 0
 
       if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
         if (transformsExport ||
@@ -321,13 +321,11 @@ function init() {
 
           const temporalTransforms = temporalVisitor.transforms
 
-          if (temporalTransforms === 0) {
-            return null
-          }
-
           result.transforms |= temporalTransforms
 
-          return magicString.toString()
+          return (temporalTransforms & TRANSFORMS_TEMPORALS) === 0
+            ? null
+            : magicString.toString()
         })
 
         result.circular = -1
