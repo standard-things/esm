@@ -191,10 +191,7 @@ function init() {
     const names = builtin ? null : keys(exported)
 
     for (const name of names) {
-      const descriptor = Reflect.getOwnPropertyDescriptor(exported, name)
-
-      if (descriptor !== void 0 &&
-          typeof descriptor.get === "function") {
+      if (typeof Reflect.getOwnPropertyDescriptor(exported, name).get === "function") {
         handler.get = get
         break
       }
