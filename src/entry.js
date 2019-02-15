@@ -1,6 +1,5 @@
 import { basename, extname, sep } from "./safe/path.js"
 
-import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
 
 import CachingCompiler from "./caching-compiler.js"
@@ -62,10 +61,6 @@ const {
   UPDATE_TYPE_INIT,
   UPDATE_TYPE_LIVE
 } = ENTRY
-
-const {
-  SOURCE_TYPE_MODULE
-} = COMPILER
 
 const {
   ERR_EXPORT_STAR_CONFLICT,
@@ -145,6 +140,8 @@ class Entry {
     this.setters["*"] = []
     // The state of the module.
     this.state = mod.loaded ? STATE_EXECUTION_COMPLETED : STATE_INITIAL
+    // The entry type of the module.
+    this.type = TYPE_CJS
 
     // The cache name of the module.
     setDeferred(this, "cacheName", () => {
@@ -201,18 +198,6 @@ class Entry {
       return encodeId("_" + getCacheStateHash(this.cacheName).slice(0, 3))
     })
 
-    // The entry type of the module.
-    setDeferred(this, "type", () => {
-      const { compileData } = this
-
-      if (compileData !== null &&
-          compileData.sourceType === SOURCE_TYPE_MODULE) {
-        return TYPE_ESM
-      }
-
-      return TYPE_CJS
-    })
-
     this.updateFilename(true)
   }
 
@@ -227,9 +212,8 @@ class Entry {
 
     if (entry === void 0) {
       entry = new Entry(mod)
-    } else if (entry._loaded === LOAD_COMPLETED &&
-               // Don't check `entry.type` first so that its value can be deferred.
-               entry.type === TYPE_CJS) {
+    } else if (entry.type === TYPE_CJS &&
+               entry._loaded === LOAD_COMPLETED) {
       const { bridged } = shared
       const exported = entry.module.exports
       const foundEntry = bridged.get(exported)

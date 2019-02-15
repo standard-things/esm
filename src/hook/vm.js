@@ -34,12 +34,15 @@ import shared from "../shared.js"
 import wrap from "../util/wrap.js"
 
 const {
+  SOURCE_TYPE_MODULE,
   SOURCE_TYPE_UNAMBIGUOUS
 } = COMPILER
 
 const {
   STATE_EXECUTION_COMPLETED,
-  STATE_EXECUTION_STARTED
+  STATE_EXECUTION_STARTED,
+  TYPE_CJS,
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -113,6 +116,7 @@ function hook(vm) {
       entry.cacheName = cacheName
       entry.compileData = compileData
       entry.state = STATE_EXECUTION_STARTED
+      entry.type = compileData.sourceType === SOURCE_TYPE_MODULE ? TYPE_ESM : TYPE_CJS
 
       const result = tryWrapper.call(this, runInFunc, args, content)
 
