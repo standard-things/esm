@@ -164,6 +164,13 @@ describe("scenario tests", function () {
     .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
 
+  it("should work with rewire", () =>
+    node([
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/rewire")
+    ], envAuto)
+  )
+
   it("should work with sinon", () =>
     node([
       path.resolve("fixture/scenario/sinon")
