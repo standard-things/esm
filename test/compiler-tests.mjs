@@ -125,14 +125,14 @@ describe("compiler tests", () => {
 
   it('should support the "use module" directive', () => {
     const datas = [
-      { code: "'use module';\"use script\";import'a'", hint: MODULE },
-      { code: "'use module';\"use script\";import.meta", hint: MODULE },
-      { code: '"use module";\'use script\';import"a"', hint: MODULE },
-      { code: '"use module";\'use script\';import.meta', hint: MODULE },
       { code: "'use module';\"use script\";import'a'" },
       { code: "'use module';\"use script\";import.meta" },
       { code: '"use module";\'use script\';import"a"' },
-      { code: '"use module";\'use script\';import.meta' }
+      { code: '"use module";\'use script\';import.meta' },
+      { code: "'use module';\"use script\";import'a'", hint: MODULE },
+      { code: "'use module';\"use script\";import.meta", hint: MODULE },
+      { code: '"use module";\'use script\';import"a"', hint: MODULE },
+      { code: '"use module";\'use script\';import.meta', hint: MODULE }
     ]
 
     for (const { code, hint } of datas) {
@@ -526,7 +526,7 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should wrap eval use", () => {
+  it("should wrap `eval()` use", () => {
     const lines = [
       "eval",
       "function a(b, c = 1, ...d) { return eval }",
@@ -585,7 +585,7 @@ describe("compiler tests", () => {
     })
   })
 
-  it("should not wrap shadowed eval", () => {
+  it("should not wrap shadowed `eval()`", () => {
     const lines = [
       "function a(eval) { eval = eval }",
       "function a(...eval) { eval = eval }",
@@ -603,7 +603,7 @@ describe("compiler tests", () => {
     }
   })
 
-  it("should not wrap eval in a typeof expression", () => {
+  it("should not wrap `eval()` in `typeof` expressions", () => {
     const line = "typeof eval"
 
     const code = [
@@ -619,7 +619,7 @@ describe("compiler tests", () => {
     }
   })
 
-  it("should not wrap eval in a with statement", () => {
+  it("should not wrap `eval()` in `with` statements", () => {
     const code = [
       "",
       "with (eval) { eval = eval }"
