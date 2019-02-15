@@ -1762,16 +1762,16 @@ describe("miscellaneous tests", () => {
     )
   })
 
-  describe("instrumentation", () => {
+  describe("transforms", () => {
     const zeroWidthJoinerRegExp = /\u200D/
 
-    it("should instrument binding access in circular modules", () =>
-      import("./fixture/instrumentation/cycle.mjs")
+    it("should wrap binding access in circular modules", () =>
+      import("./fixture/transform/cycle.mjs")
         .then((ns) => assert.ok(zeroWidthJoinerRegExp.test(ns.default)))
     )
 
-    it("should not instrument binding access in non-circular modules", () =>
-      import("./fixture/instrumentation/non-cycle.mjs")
+    it("should not wrap binding access in non-circular modules", () =>
+      import("./fixture/transform/non-cycle.mjs")
         .then((ns) => assert.strictEqual(zeroWidthJoinerRegExp.test(ns.default), false))
     )
   })
