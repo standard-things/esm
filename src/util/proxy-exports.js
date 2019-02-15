@@ -11,6 +11,7 @@ import isMap from "./is-map.js"
 import isMapIterator from "./is-map-iterator.js"
 import isNative from "./is-native.js"
 import isNumberObject from "./is-number-object.js"
+import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
 import isRegExp from "./is-regexp.js"
@@ -265,7 +266,7 @@ function init() {
         return descriptor
       }
     } else if (builtin &&
-               typeof exported !== "function" &&
+               isObject(exported) &&
                ! Reflect.has(exported, Symbol.toStringTag) &&
                getObjectTag(exported) !== "[object Object]") {
       handler.get = (exported, name, receiver) => {
