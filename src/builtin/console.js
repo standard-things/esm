@@ -17,6 +17,7 @@ import keys from "../util/keys.js"
 import ownKeys from "../util/own-keys.js"
 import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
+import safe from "../util/safe.js"
 import safeConsole from "../safe/console.js"
 import safeProcess from "../safe/process.js"
 import setDeferred from "../util/set-deferred.js"
@@ -40,6 +41,7 @@ function init() {
   // Assign `console` to a variable so it's not removed by
   // `babel-plugin-transform-remove-console`.
   const globalConsole = console
+  const safeGlobalConsole = safe(globalConsole)
 
   let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
 
@@ -97,14 +99,14 @@ function init() {
         }
       }
     } else if (ELECTRON_RENDERER) {
-      const globalNames = keys(globalConsole)
+      const globalNames = keys(safeGlobalConsole)
 
       for (const name of globalNames) {
         if (! isKeyAssignable(name)) {
           continue
         }
 
-        const globalFunc = globalConsole[name]
+        const globalFunc = safeGlobalConsole[name]
 
         if (typeof globalFunc === "function") {
           builtinConsole[name] = globalFunc
@@ -138,7 +140,7 @@ function init() {
 
     for (const name of names) {
       const builtinFunc = builtinConsole[name]
-      const globalFunc = globalConsole[name]
+      const globalFunc = safeGlobalConsole[name]
 
       if (typeof builtinFunc === "function" &&
           typeof globalFunc === "function") {
