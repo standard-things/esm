@@ -22,6 +22,7 @@ import toExternalError from "./util/to-external-error.js"
 const {
   ERROR_GETTER,
   ERROR_STAR,
+  GETTER_TYPE_STAR_CONFLICT,
   LOAD_COMPLETED,
   NAMESPACE_FINALIZATION_DEFERRED,
   SETTER_TYPE_DYNAMIC_IMPORT,
@@ -50,7 +51,7 @@ const Runtime = {
     }
   },
   addExportFromSetter(importedName, exportedName = importedName) {
-    const setter = createSetter(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
+    const setter = createAccessor(SETTER_TYPE_EXPORT_FROM, (value, childEntry) => {
       const { entry } = this
 
       if (entry._loaded === LOAD_COMPLETED) {
@@ -72,7 +73,7 @@ const Runtime = {
     this.entry.addGetters(getterArgsList)
   },
   addNamespaceSetter() {
-    return createSetter(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
+    return createAccessor(SETTER_TYPE_NAMESPACE, (value, childEntry) => {
       const { entry } = this
 
       if (entry._loaded === LOAD_COMPLETED) {
@@ -122,7 +123,7 @@ const Runtime = {
 
         if (ownerName !== name &&
             ownerName !== childOwnerName) {
-          entry.addGetter(exportedName, () => ERROR_STAR)
+          entry.addGetter(exportedName, createAccessor(GETTER_TYPE_STAR_CONFLICT, () => ERROR_STAR))
         }
       }
     })
@@ -241,7 +242,7 @@ const Runtime = {
           let lastValue
           let timerId
 
-          const setterArgsList = [["*", null, createSetter(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
+          const setterArgsList = [["*", null, createAccessor(SETTER_TYPE_DYNAMIC_IMPORT, (value, childEntry) => {
             if (childEntry._loaded === LOAD_COMPLETED) {
               lastValue = value
 
@@ -385,9 +386,9 @@ const Runtime = {
   }
 }
 
-function createSetter(type, setter) {
-  setter.type = type
-  return setter
+function createAccessor(type, accessor) {
+  accessor.type = type
+  return accessor
 }
 
 function runCJS(entry, moduleWrapper) {

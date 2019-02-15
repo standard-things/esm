@@ -39,16 +39,18 @@ import validateShallow from "./module/esm/validate-shallow.js"
 const {
   ERROR_GETTER,
   ERROR_STAR,
+  GETTER_TYPE_DEFAULT,
+  GETTER_TYPE_STAR_CONFLICT,
   INITIAL_VALUE,
   LOAD_COMPLETED,
   LOAD_INCOMPLETE,
   LOAD_INDETERMINATE,
   NAMESPACE_FINALIZATION_COMPLETED,
   NAMESPACE_FINALIZATION_INCOMPLETE,
+  SETTER_TYPE_DEFAULT,
   SETTER_TYPE_DYNAMIC_IMPORT,
   SETTER_TYPE_EXPORT_FROM,
   SETTER_TYPE_NAMESPACE,
-  SETTER_TYPE_STATIC_IMPORT,
   STATE_INITIAL,
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
@@ -256,10 +258,6 @@ class Entry {
   }
 
   addGetter(name, getter) {
-    const { getters, type } = this
-
-    getters[name] = getter
-
     if (! has(getter, "id")) {
       getter.id = name
     }
@@ -268,7 +266,11 @@ class Entry {
       getter.owner = this
     }
 
-    if (type === TYPE_ESM &&
+    if (! has(getter, "type")) {
+      getter.type = GETTER_TYPE_DEFAULT
+    }
+
+    if (this.type === TYPE_ESM &&
         name === "default") {
       const value = tryGetter(getter)
 
@@ -282,6 +284,8 @@ class Entry {
         })
       }
     }
+
+    this.getters[name] = getter
 
     return this
   }
@@ -329,7 +333,7 @@ class Entry {
     }
 
     if (! has(setter, "type")) {
-      setter.type = SETTER_TYPE_STATIC_IMPORT
+      setter.type = SETTER_TYPE_DEFAULT
     }
 
     const settersMap = this.setters
@@ -392,11 +396,14 @@ class Entry {
     // Table 29: Internal Slots of Module Namespace Exotic Objects
     // Properties should be assigned in `Array#sort()` order.
     // https://tc39.github.io/ecma262/#table-29
-    const names = keys(this.getters).sort()
+    const { getters } = this
+    const names = keys(getters).sort()
 
     for (const name of names) {
-      this._completeMutableNamespace[name] = INITIAL_VALUE
-      this._completeNamespace[name] = INITIAL_VALUE
+      if (getters[name].type !== GETTER_TYPE_STAR_CONFLICT) {
+        this._completeMutableNamespace[name] = INITIAL_VALUE
+        this._completeNamespace[name] = INITIAL_VALUE
+      }
     }
 
     // Section 9.4.6: Module Namespace Exotic Objects
@@ -1045,15 +1052,18 @@ function isCalledFromStrictCode() {
 }
 
 function runGetter(entry, name) {
-  const exported = entry.exports
-  const { getters } = entry
-  const value = tryGetter(getters[name])
+  const getter = entry.getters[name]
 
-  if (value === ERROR_STAR) {
-    Reflect.deleteProperty(exported, name)
-    Reflect.deleteProperty(getters, name)
-  } else if (! Reflect.has(exported, name) ||
-             ! Object.is(exported[name], value)) {
+  if (getter === void 0 ||
+      getter.type === GETTER_TYPE_STAR_CONFLICT) {
+    return
+  }
+
+  const exported = entry.exports
+  const value = tryGetter(getter)
+
+  if (! Reflect.has(exported, name) ||
+      ! Object.is(exported[name], value)) {
     entry._changed = true
     exported[name] = value
   }
@@ -1078,7 +1088,7 @@ function runGetters(entry, names) {
 function runSetter(entry, name, callback, updateType) {
   const setters = entry.setters[name]
 
-  if (! setters) {
+  if (setters === void 0) {
     return
   }
 
