@@ -15,9 +15,9 @@ function hook(process) {
   function exceptionManagerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(process, "_fatalException", PACKAGE_RANGE)
 
-    return wrapped
-      ? Reflect.apply(wrapped, this, [manager, func, args])
-      : Reflect.apply(func, this, args)
+    return wrapped === null
+      ? Reflect.apply(func, this, args)
+      : Reflect.apply(wrapped, this, [manager, func, args])
   }
 
   function exceptionMethodWrapper(manager, func, args) {
@@ -34,9 +34,9 @@ function hook(process) {
   function warningManagerWrapper(manager, func, args) {
     const wrapped = Wrapper.find(process, "emitWarning", PACKAGE_RANGE)
 
-    return wrapped
-      ? Reflect.apply(wrapped, this, [manager, func, args])
-      : Reflect.apply(func, this, args)
+    return wrapped === null
+      ? Reflect.apply(func, this, args)
+      : Reflect.apply(wrapped, this, [manager, func, args])
   }
 
   function warningMethodWrapper(manager, func, args) {

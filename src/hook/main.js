@@ -17,9 +17,9 @@ function hook(Mod) {
     const pkg = Package.from(filename)
     const wrapped = Wrapper.find(Mod, "runMain", relaxRange(pkg.range))
 
-    return wrapped
-      ? Reflect.apply(wrapped, this, [manager, func, args])
-      : Reflect.apply(func, this, args)
+    return wrapped === null
+      ? Reflect.apply(func, this, args)
+      : Reflect.apply(wrapped, this, [manager, func, args])
   }
 
   function methodWrapper() {

@@ -90,9 +90,9 @@ function hook(Mod, parent) {
       const pkg = Package.from(filename)
       const wrapped = Wrapper.find(_extensions, ext, relaxRange(pkg.range))
 
-      return wrapped
-        ? Reflect.apply(wrapped, this, [manager, func, args])
-        : tryPassthru.call(this, func, args, pkg)
+      return wrapped === null
+        ? tryPassthru.call(this, func, args, pkg)
+        : Reflect.apply(wrapped, this, [manager, func, args])
     }
   }
 
