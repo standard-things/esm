@@ -4,7 +4,6 @@ import FastPath from "./fast-path.js"
 import MagicString from "./magic-string.js"
 import Parser from "./parser.js"
 
-import argumentsVisitor from "./visitor/arguments.js"
 import ascendingComparator from "./util/ascending-comparator.js"
 import assignmentVisitor from "./visitor/assignment.js"
 import evalVisitor from "./visitor/eval.js"
@@ -13,19 +12,24 @@ import findIndexes from "./parse/find-indexes.js"
 import globalsVisitor from "./visitor/globals.js"
 import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
-import isObjectEmpty from "./util/is-object-empty.js"
 import keys from "./util/keys.js"
 import requireVisitor from "./visitor/require.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import stripShebang from "./util/strip-shebang.js"
 import temporalVisitor from "./visitor/temporal.js"
+import undeclaredVisitor from "./visitor/undeclared.js"
 
 function init() {
   const {
     SOURCE_TYPE_MODULE,
     SOURCE_TYPE_SCRIPT,
-    SOURCE_TYPE_UNAMBIGUOUS
+    SOURCE_TYPE_UNAMBIGUOUS,
+    TRANSFORMS_DYNAMIC_IMPORT,
+    TRANSFORMS_EXPORT,
+    TRANSFORMS_IMPORT,
+    TRANSFORMS_IMPORT_META,
+    TRANSFORMS_TEMPORALS
   } = COMPILER
 
   const defaultOptions = {
@@ -47,16 +51,15 @@ function init() {
       code = stripShebang(code)
       options = Compiler.createOptions(options)
 
-      argumentsVisitor.reset()
       assignmentVisitor.reset()
       evalVisitor.reset()
       globalsVisitor.reset()
       importExportVisitor.reset()
       requireVisitor.reset()
       temporalVisitor.reset()
+      undeclaredVisitor.reset()
 
       const result = {
-        changed: false,
         circular: 0,
         code,
         codeWithTDZ: null,
@@ -65,6 +68,7 @@ function init() {
         mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
+        transforms: 0,
         yieldIndex: 0
       }
 
@@ -128,8 +132,8 @@ function init() {
       }
 
       const { strict, top } = ast
-      const { identifiers } = top
       const { runtimeName } = options
+      const topIdentifiers = top.identifiers
 
       Reflect.deleteProperty(ast, "top")
 
@@ -152,58 +156,66 @@ function init() {
         yieldIndex
       })
 
-      const {
-        addedDynamicImport,
-        addedExport,
-        addedImportMeta,
-        addedImport
-      } = importExportVisitor
+      const importExportTransforms = importExportVisitor.transforms
+      const transformsDynamicImport = importExportTransforms & TRANSFORMS_DYNAMIC_IMPORT
+      const transformsExport = importExportTransforms & TRANSFORMS_EXPORT
+      const transformsImport = importExportTransforms & TRANSFORMS_IMPORT
+      const transformsImportMeta = importExportTransforms & TRANSFORMS_IMPORT_META
 
       if (sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
-        if (addedExport ||
-            addedImportMeta ||
-            addedImport) {
+        if (transformsExport ||
+            transformsImportMeta ||
+            transformsImport) {
           sourceType = SOURCE_TYPE_MODULE
         } else {
           sourceType = SOURCE_TYPE_SCRIPT
         }
       }
 
-      if (addedDynamicImport ||
-          addedImport) {
-        const { globals } = globalsVisitor
-        const possibleGlobalsNames = keys(globals)
-
-        for (const name of possibleGlobalsNames) {
-          if (Reflect.has(identifiers, name)) {
-            Reflect.deleteProperty(globals, name)
-          }
+      if (transformsDynamicImport ||
+          transformsImport) {
+        const globals = {
+          __proto__: null,
+          Reflect: true,
+          console: true
         }
 
-        if (! isObjectEmpty(globals)) {
-          globalsVisitor.visit(rootPath, {
-            globals,
-            magicString,
-            possibleIndexes: findIndexes(code, possibleGlobalsNames),
-            runtimeName
-          })
+        const possibleGlobalsNames = []
+
+        if (Reflect.has(topIdentifiers, "console")) {
+          Reflect.deleteProperty(globals, "console")
+        } else {
+          possibleGlobalsNames.push("console")
         }
+
+        if (Reflect.has(topIdentifiers, "Reflect")) {
+          Reflect.deleteProperty(globals, "Reflect")
+        } else {
+          possibleGlobalsNames.push("Reflect")
+        }
+
+        globalsVisitor.visit(rootPath, {
+          globals,
+          magicString,
+          possibleIndexes: findIndexes(code, possibleGlobalsNames),
+          runtimeName
+        })
       }
 
-      if (! Reflect.has(identifiers, "eval")) {
+      if (! Reflect.has(topIdentifiers, "eval")) {
         evalVisitor.visit(rootPath, {
-          instrumentUpdateBindings: addedExport,
           magicString,
           possibleIndexes: possibleEvalIndexes,
           runtimeName,
-          strict
+          strict,
+          transformUpdateBindings: transformsExport
         })
       }
 
       let possibleAssignableBindingsIndexes
 
-      if (addedExport ||
-          addedImport) {
+      if (transformsExport ||
+          transformsImport) {
         const { assignableBindings } = importExportVisitor
 
         possibleAssignableBindingsIndexes = findIndexes(code, keys(assignableBindings))
@@ -228,11 +240,11 @@ function init() {
         assignmentVisitor.visit(rootPath, {
           assignableBindings,
           importedBindings,
-          instrumentImportBindingAssignments: ! foundRequire,
-          instrumentInsideFunctions: true,
           magicString,
           possibleIndexes: possibleAssignmentIndexes,
-          runtimeName
+          runtimeName,
+          transformImportBindingAssignments: ! foundRequire,
+          transformInsideFunctions: true
         })
 
         importExportVisitor.finalizeHoisting()
@@ -240,7 +252,7 @@ function init() {
 
       if (! options.cjsVars &&
           sourceType === SOURCE_TYPE_MODULE) {
-        const undeclaredIdentifiers = {
+        const undeclared = {
           __proto__: null,
           // eslint-disable-next-line sort-keys
           __dirname: true,
@@ -253,33 +265,35 @@ function init() {
 
         const undeclaredNames = []
 
-        for (const name in undeclaredIdentifiers) {
-          if (Reflect.has(identifiers, name)) {
-            Reflect.deleteProperty(undeclaredIdentifiers, name)
+        for (const name in undeclared) {
+          if (Reflect.has(topIdentifiers, name)) {
+            Reflect.deleteProperty(undeclared, name)
           } else {
             undeclaredNames.push(name)
           }
         }
 
-        argumentsVisitor.visit(rootPath, {
+        undeclaredVisitor.visit(rootPath, {
           magicString,
           possibleIndexes: findIndexes(code, undeclaredNames),
           runtimeName,
-          undeclaredIdentifiers
+          undeclared
         })
       }
 
-      if (argumentsVisitor.changed ||
-          evalVisitor.changed ||
-          globalsVisitor.changed ||
-          importExportVisitor.changed) {
+      result.transforms =
+        evalVisitor.transforms |
+        globalsVisitor.transforms |
+        importExportTransforms |
+        undeclaredVisitor.transforms
+
+      if (result.transforms !== 0) {
         yieldIndex = importExportVisitor.yieldIndex
 
-        result.changed = true
         result.code = magicString.toString()
       }
 
-      if (addedImport) {
+      if (transformsImport) {
         // Pick `importExportVisitor` properties outside of the `codeWithTDZ`
         // getter/setter to preserve their values.
         const { assignableBindings, temporalBindings } = importExportVisitor
@@ -292,10 +306,10 @@ function init() {
 
           assignmentVisitor.visit(rootPath, {
             assignableBindings,
-            instrumentOutsideFunctions: true,
             magicString,
             possibleIndexes: possibleAssignableBindingsIndexes,
-            runtimeName
+            runtimeName,
+            transformOutsideFunctions: true
           })
 
           temporalVisitor.visit(rootPath, {
@@ -305,9 +319,15 @@ function init() {
             temporalBindings
           })
 
-          return temporalVisitor.changed
-            ? magicString.toString()
-            : null
+          const temporalTransforms = temporalVisitor.transforms
+
+          if (temporalTransforms === 0) {
+            return null
+          }
+
+          result.transforms |= temporalTransforms
+
+          return magicString.toString()
         })
 
         result.circular = -1

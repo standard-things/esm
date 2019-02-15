@@ -162,7 +162,7 @@ class Entry {
       const compileData = CachingCompiler.from(this)
 
       if (compileData !== null &&
-          compileData.changed) {
+          compileData.transforms !== 0) {
         const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
 
         compileData.code = content === null ? "" : content

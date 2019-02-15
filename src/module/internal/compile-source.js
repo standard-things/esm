@@ -23,7 +23,7 @@ function init() {
   }
 
   function compileCJS(compileData, options) {
-    let { changed } = compileData
+    let changed = compileData.transforms !== 0
     let content = compileData.code
 
     if (changed) {
@@ -78,7 +78,7 @@ function init() {
 
     let { code } = compileData
 
-    if (! compileData.changed) {
+    if (compileData.transforms === 0) {
       code = stripShebang(code)
     }
 

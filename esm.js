@@ -167,7 +167,6 @@ if (cachePath !== "") {
       compile: {
         __proto__: null,
         esm: {
-          changed: false,
           circular: 0,
           code: null,
           codeWithTDZ: null,
@@ -176,6 +175,7 @@ if (cachePath !== "") {
           mtime: -1,
           scriptData: cachedData || null,
           sourceType: 1,
+          transforms: 0,
           yieldIndex: -1
         }
       },

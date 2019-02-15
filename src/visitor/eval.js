@@ -1,3 +1,5 @@
+import COMPILER from "../constant/compiler.js"
+
 import Visitor from "../visitor.js"
 
 import isIdentifer from "../parse/is-identifier.js"
@@ -6,23 +8,27 @@ import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    TRANSFORMS_EVAL
+  } = COMPILER
+
   const shadowedMap = new Map
 
   class EvalVisitor extends Visitor {
     reset(options) {
-      this.changed = false
-      this.instrumentUpdateBindings = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
       this.strict = false
+      this.transforms = 0
+      this.transformUpdateBindings = false
 
       if (options !== void 0) {
-        this.instrumentUpdateBindings = options.instrumentUpdateBindings
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
         this.strict = options.strict
+        this.transformUpdateBindings = options.transformUpdateBindings
       }
     }
 
@@ -41,7 +47,7 @@ function init() {
 
       // Support direct eval:
       // eval(code)
-      this.changed = true
+      this.transforms |= TRANSFORMS_EVAL
 
       const { end } = node
       const { magicString, runtimeName } = this
@@ -54,7 +60,7 @@ function init() {
         .prependLeft(callee.end, "(" + code)
         .prependRight(end, ")")
 
-      if (this.instrumentUpdateBindings) {
+      if (this.transformUpdateBindings) {
         magicString
           .prependLeft(node.start, runtimeName + ".u(")
           .prependRight(end, ")")
@@ -85,7 +91,7 @@ function init() {
       // o.e = eval
       // f(eval)
       // (0, eval)(code)
-      this.changed = true
+      this.transforms |= TRANSFORMS_EVAL
 
       const { end, start } = node
       const { runtimeName } = this

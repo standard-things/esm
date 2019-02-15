@@ -16,7 +16,11 @@ import toStringLiteral from "../util/to-string-literal.js"
 
 function init() {
   const {
-    SOURCE_TYPE_MODULE
+    SOURCE_TYPE_MODULE,
+    TRANSFORMS_DYNAMIC_IMPORT,
+    TRANSFORMS_EXPORT,
+    TRANSFORMS_IMPORT,
+    TRANSFORMS_IMPORT_META
   } = COMPILER
 
   class ImportExportVisitor extends Visitor {
@@ -95,12 +99,7 @@ function init() {
     }
 
     reset(options) {
-      this.addedDynamicImport = false
-      this.addedExport = false
-      this.addedImport = false
-      this.addedImportMeta = false
       this.assignableBindings = null
-      this.changed = false
       this.firstLineBreakPos = -1
       this.generateVarDeclarations = false
       this.hoistedExports = null
@@ -113,6 +112,7 @@ function init() {
       this.strict = false
       this.temporalBindings = null
       this.top = null
+      this.transforms = 0
       this.yieldIndex = 0
 
       if (options !== void 0) {
@@ -149,8 +149,7 @@ function init() {
 
       // Support dynamic import:
       // import("mod")
-      this.changed = true
-      this.addedDynamicImport = true
+      this.transforms |= TRANSFORMS_DYNAMIC_IMPORT
 
       overwrite(this, callee.start, callee.end, this.runtimeName + ".i")
       path.call(this, "visitWithoutReset", "arguments")
@@ -170,8 +169,7 @@ function init() {
       // import defaultName, { export1, [ , [...] ] } from "mod"
       // import defaultName, * as name from "mod"
       // import "mod"
-      this.changed = true
-      this.addedImport = true
+      this.transforms |= TRANSFORMS_IMPORT
 
       const { importSpecifierMap, temporalBindings } = this
       const node = path.getValue()
@@ -223,8 +221,7 @@ function init() {
 
       // Support re-exporting an imported module:
       // export * from "mod"
-      this.changed = true
-      this.addedExport = true
+      this.transforms |= TRANSFORMS_EXPORT
 
       const { importSpecifierMap } = this
       const node = path.getValue()
@@ -249,8 +246,7 @@ function init() {
         return
       }
 
-      this.changed = true
-      this.addedExport = true
+      this.transforms |= TRANSFORMS_EXPORT
 
       const node = path.getValue()
       const { declaration } = node
@@ -332,8 +328,7 @@ function init() {
         return
       }
 
-      this.changed = true
-      this.addedExport = true
+      this.transforms |= TRANSFORMS_EXPORT
 
       const { assignableBindings, magicString } = this
       const node = path.getValue()
@@ -449,8 +444,7 @@ function init() {
 
       if (meta.name === "import") {
         // Support import.meta.
-        this.changed = true
-        this.addedImportMeta = true
+        this.transforms |= TRANSFORMS_IMPORT_META
 
         overwrite(this, meta.start, meta.end, this.runtimeName + "._")
       }

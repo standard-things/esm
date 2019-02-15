@@ -61,7 +61,6 @@ function init() {
       const { length } = meta
 
       const result = {
-        changed: false,
         circular: 0,
         code: null,
         codeWithTDZ: null,
@@ -70,6 +69,7 @@ function init() {
         mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
+        transforms: 0,
         yieldIndex: -1
       }
 
@@ -91,11 +91,11 @@ function init() {
           filename = resolve(cachePath, filename)
         }
 
-        result.changed = !! meta[2]
         result.filename = filename
         result.firstAwaitOutsideFunction = firstAwaitOutsideFunction
         result.mtime = +meta[3]
         result.sourceType = +meta[4]
+        result.transforms = +meta[2]
       }
 
       if (length > 7 &&
@@ -137,7 +137,7 @@ function init() {
 
     if (! cacheName ||
         ! cachePath ||
-        ! result.changed) {
+        result.transforms === 0) {
       return result
     }
 
@@ -279,10 +279,9 @@ function init() {
             filename,
             firstAwaitOutsideFunction,
             mtime,
-            sourceType
+            sourceType,
+            transforms
           } = compileData
-
-          const changed = +compileData.changed
 
           let deflatedFirstAwaitOutsideFunction = null
 
@@ -294,9 +293,9 @@ function init() {
           }
 
           if (sourceType === SOURCE_TYPE_SCRIPT) {
-            if (changed) {
+            if (transforms !== 0) {
               meta.push(
-                changed,
+                transforms,
                 mtime,
                 sourceType,
                 deflatedFirstAwaitOutsideFunction,
@@ -305,7 +304,7 @@ function init() {
             }
           } else {
             meta.push(
-              changed,
+              transforms,
               mtime,
               sourceType,
               deflatedFirstAwaitOutsideFunction,

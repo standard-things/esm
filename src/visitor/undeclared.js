@@ -1,3 +1,5 @@
+import COMPILER from "../constant/compiler.js"
+
 import Visitor from "../visitor.js"
 
 import isIdentifer from "../parse/is-identifier.js"
@@ -7,21 +9,25 @@ import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    TRANSFORMS_UNDECLARED
+  } = COMPILER
+
   const shadowedMap = new Map
 
-  class ArgumentsVisitor extends Visitor {
+  class UndeclaredVisitor extends Visitor {
     reset(options) {
-      this.changed = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
-      this.undeclaredIdentifiers = null
+      this.transforms = 0
+      this.undeclared = null
 
       if (options !== void 0) {
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
-        this.undeclaredIdentifiers = options.undeclaredIdentifiers
+        this.undeclared = options.undeclared
       }
     }
 
@@ -29,7 +35,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (! Reflect.has(this.undeclaredIdentifiers, name) ||
+      if (! Reflect.has(this.undeclared, name) ||
           ! isIdentifer(node, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return
@@ -40,7 +46,7 @@ function init() {
 
       if (parent.type === "UnaryExpression" &&
           parent.operator === "typeof") {
-        this.changed = true
+        this.transforms |= TRANSFORMS_UNDECLARED
 
         // Use `runtimeName` as the voided expression for content sniffing
         // based on the presence of the runtime identifier.
@@ -49,7 +55,7 @@ function init() {
       }
 
       maybeIdentifier(path, (node, parent) => {
-        this.changed = true
+        this.transforms |= TRANSFORMS_UNDECLARED
 
         const { end, start } = node
 
@@ -84,9 +90,9 @@ function init() {
     }
   }
 
-  return new ArgumentsVisitor
+  return new UndeclaredVisitor
 }
 
 export default shared.inited
-  ? shared.module.visitorArguments
-  : shared.module.visitorArguments = init()
+  ? shared.module.visitorUndeclared
+  : shared.module.visitorUndeclared = init()

@@ -85,7 +85,7 @@ function compile(caller, entry, content, filename, fallback) {
     compileData = CachingCompiler.from(entry)
 
     if (compileData === null ||
-        compileData.changed) {
+        compileData.transforms !== 0) {
       const { cacheName } = entry
       const { cjs } = options
 
@@ -263,7 +263,7 @@ function tryRun(entry, filename) {
 
   if (runtime === null) {
     if (isESM ||
-        compileData.changed) {
+        compileData.transforms !== 0) {
       runtime = Runtime.enable(entry, GenericObject.create())
     } else {
       runtime = GenericObject.create()

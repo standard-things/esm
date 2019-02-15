@@ -185,7 +185,7 @@ const Runtime = {
         runtimeName
       })
 
-      if (! compileData.changed) {
+      if (compileData.transforms === 0) {
         return content
       }
 
@@ -315,7 +315,7 @@ const Runtime = {
     runtime.resumeChildren = Runtime.resumeChildren
     runtime.run = Runtime.run
     runtime.throwConstAssignment = Runtime.throwConstAssignment
-    runtime.throwUndefinedIdentifier = Runtime.throwUndefinedIdentifier
+    runtime.throwUndeclared = Runtime.throwUndeclared
     runtime.updateBindings = Runtime.updateBindings
 
     runtime._ = runtime
@@ -333,7 +333,7 @@ const Runtime = {
     runtime.o = ERROR_GETTER
     runtime.r = runtime.run
     runtime.s = runtime.resumeChildren
-    runtime.t = runtime.throwUndefinedIdentifier
+    runtime.t = runtime.throwUndeclared
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
     runtime.w = runtime.import
@@ -362,8 +362,8 @@ const Runtime = {
   throwConstAssignment: function throwConstAssignment() {
     throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)
   },
-  throwUndefinedIdentifier: function throwUndefinedIdentifier(name) {
-    throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndefinedIdentifier)
+  throwUndeclared: function throwUndeclared(name) {
+    throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndeclared)
   },
   updateBindings(valueToPassThrough) {
     this.entry.updateBindings(null, UPDATE_TYPE_LIVE)

@@ -150,7 +150,7 @@ function hook(Mod, parent) {
     }
 
     if ((compileData === null ||
-         ! compileData.changed) &&
+         compileData.transforms === 0) &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {

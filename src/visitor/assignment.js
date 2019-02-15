@@ -14,22 +14,22 @@ function init() {
     reset(options) {
       this.assignableBindings = null
       this.importedBindings = null
-      this.instrumentImportBindingAssignments = false
-      this.instrumentInsideFunctions = false
-      this.instrumentOutsideFunctions = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
+      this.transformImportBindingAssignments = false
+      this.transformInsideFunctions = false
+      this.transformOutsideFunctions = false
 
       if (options !== void 0) {
         this.assignableBindings = options.assignableBindings
         this.importedBindings = options.importedBindings
-        this.instrumentImportBindingAssignments = options.instrumentImportBindingAssignments
-        this.instrumentInsideFunctions = options.instrumentInsideFunctions
-        this.instrumentOutsideFunctions = options.instrumentOutsideFunctions
         this.magicString = options.magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
+        this.transformImportBindingAssignments = options.transformImportBindingAssignments
+        this.transformInsideFunctions = options.transformInsideFunctions
+        this.transformOutsideFunctions = options.transformOutsideFunctions
       }
     }
 
@@ -55,7 +55,7 @@ function init() {
     const names = getNamesFromPattern(node[childName])
     const { end, start } = node
 
-    if (visitor.instrumentImportBindingAssignments) {
+    if (visitor.transformImportBindingAssignments) {
       for (const name of names) {
         if (Reflect.has(importedBindings, name) &&
             ! isShadowed(path, name, shadowedMap)) {
@@ -71,23 +71,23 @@ function init() {
     }
 
     const {
-      instrumentInsideFunctions,
-      instrumentOutsideFunctions
+      transformInsideFunctions,
+      transformOutsideFunctions
     } = visitor
 
-    if (instrumentInsideFunctions ||
-        instrumentOutsideFunctions) {
+    if (transformInsideFunctions ||
+        transformOutsideFunctions) {
       const instrumentBoth =
-        instrumentInsideFunctions &&
-        instrumentOutsideFunctions
+        transformInsideFunctions &&
+        transformOutsideFunctions
 
       for (const name of names) {
         if (assignableBindings[name] === true &&
             ! isShadowed(path, name, shadowedMap)) {
           if (instrumentBoth ||
-              (instrumentInsideFunctions &&
+              (transformInsideFunctions &&
                ! isOutsideFunction(path, name, scopeMap)) ||
-              (instrumentOutsideFunctions &&
+              (transformOutsideFunctions &&
                isOutsideFunction(path, name, scopeMap))) {
             // Wrap assignments to exported identifiers.
             magicString

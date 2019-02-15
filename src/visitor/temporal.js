@@ -1,3 +1,5 @@
+import COMPILER from "../constant/compiler.js"
+
 import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
@@ -8,15 +10,19 @@ import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    TRANSFORMS_TEMPORALS
+  } = COMPILER
+
   const shadowedMap = new Map
 
   class TemporalVisitor extends Visitor {
     reset(options) {
-      this.changed = false
       this.magicString = null
       this.possibleIndexes = null
       this.runtimeName = null
       this.temporalBindings = null
+      this.transforms = 0
 
       if (options !== void 0) {
         this.magicString = options.magicString
@@ -38,7 +44,7 @@ function init() {
       const { magicString, runtimeName } = this
 
       maybeIdentifier(path, (node, parent) => {
-        this.changed = true
+        this.transforms |= TRANSFORMS_TEMPORALS
 
         const { end, start } = node
 
@@ -78,7 +84,7 @@ function init() {
 
       if (declaration.type !== "FunctionDeclaration") {
         // Instrument for non-hoisted values.
-        this.changed = true
+        this.transforms |= TRANSFORMS_TEMPORALS
 
         this.magicString.appendRight(
           declaration.end,
@@ -127,7 +133,7 @@ function init() {
       const initeeNames = keys(initees)
 
       if (initeeNames.length !== 0) {
-        this.changed = true
+        this.transforms |= TRANSFORMS_TEMPORALS
 
         const { end } = declaration || node
 
