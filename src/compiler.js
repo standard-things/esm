@@ -68,11 +68,10 @@ function init() {
         yieldIndex: 0
       }
 
-      let { hint, sourceType } = options
+      let { sourceType } = options
 
-      if (options.pragmas &&
-          sourceType === SOURCE_TYPE_UNAMBIGUOUS) {
-        if (hint === SOURCE_TYPE_MODULE ||
+      if (options.pragmas) {
+        if (options.hint === SOURCE_TYPE_MODULE ||
             hasPragma(code, "use module")) {
           sourceType = SOURCE_TYPE_MODULE
         } else if (hasPragma(code, "use script")) {

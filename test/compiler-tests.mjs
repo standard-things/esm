@@ -54,23 +54,26 @@ describe("compiler tests", () => {
   })
 
   it("should support `options.sourceType` of MODULE", () => {
-    const lines = [
-      "1+2",
-      "1+2//import",
-      "1+2//import.meta",
-      '"use module";1+2',
-      "'use module';1+2",
-      '"use script";1+2',
-      "'use script';1+2",
-      "import'a'",
-      'import"a"',
-      "import.meta"
+    const datas = [
+      { code: "1+2", sourceType: MODULE },
+      { code: "1+2//import", sourceType: MODULE },
+      { code: "1+2//import.meta", sourceType: MODULE },
+      { code: '"use module";1+2', sourceType: MODULE },
+      { code: "'use module';1+2", sourceType: MODULE },
+      { code: '"use script";1+2', sourceType: SCRIPT },
+      { code: "'use script';1+2", hint: MODULE, sourceType: MODULE },
+      { code: "import'a'", sourceType: MODULE },
+      { code: 'import"a"', sourceType: MODULE },
+      { code: "import.meta", sourceType: MODULE }
     ]
 
-    for (const line of lines) {
-      const result = Compiler.compile(line, { sourceType: MODULE })
+    for (const { code, hint, sourceType } of datas) {
+      const result = Compiler.compile(code, {
+        hint,
+        sourceType: MODULE
+      })
 
-      assert.strictEqual(result.sourceType, MODULE)
+      assert.strictEqual(result.sourceType, sourceType)
     }
   })
 
