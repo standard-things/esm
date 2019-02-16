@@ -30,8 +30,36 @@ function init() {
     TypeError: ExTypeError
   } = shared.external
 
-  const errors = {}
   const templateMap = new Map
+
+  const errors = {
+    MODULE_NOT_FOUND: function (request, parent) {
+      const requireStack = []
+      const seen = new Set
+
+      while (parent != null &&
+             ! seen.has(parent)) {
+        seen.add(parent)
+        requireStack.push(getModuleName(parent))
+        parent = parent.parent
+      }
+
+      let message = "Cannot find module " + toStringLiteral(request, APOSTROPHE)
+
+      if (requireStack.length !== 0) {
+        message +=
+          "\nRequire stack:\n- " +
+          requireStack.join("\n- ")
+      }
+
+      const error = new ExError(message)
+
+      error.code = "MODULE_NOT_FOUND"
+      error.requireStack = requireStack
+
+      return error
+    }
+  }
 
   addBuiltinError("ERR_CONST_ASSIGNMENT", constAssignment, ExTypeError)
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
@@ -53,33 +81,6 @@ function init() {
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
-
-  errors.MODULE_NOT_FOUND = function (request, parent) {
-    const requireStack = []
-    const seen = new Set
-
-    while (parent != null &&
-           ! seen.has(parent)) {
-      seen.add(parent)
-      requireStack.push(getModuleName(parent))
-      parent = parent.parent
-    }
-
-    let message = "Cannot find module " + toStringLiteral(request, APOSTROPHE)
-
-    if (requireStack.length !== 0) {
-      message +=
-        "\nRequire stack:\n- " +
-        requireStack.join("\n- ")
-    }
-
-    const error = new ExError(message)
-
-    error.code = "MODULE_NOT_FOUND"
-    error.requireStack = requireStack
-
-    return error
-  }
 
   function addBuiltinError(code, template, Super) {
     errors[code] = createBuiltinErrorClass(Super, code)
@@ -253,16 +254,16 @@ function init() {
     return "Must use import to load module: " + getModuleURL(request)
   }
 
+  function undefinedIdentifier(name) {
+    return name + " is not defined"
+  }
+
   function unknownFileExtension(filename) {
     return "Unknown file extension: " + filename
   }
 
   function unknownPkgOption(name) {
     return "Unknown esm@" + PACKAGE_VERSION + " option: " + name
-  }
-
-  function undefinedIdentifier(name) {
-    return name + " is not defined"
   }
 
   return errors
