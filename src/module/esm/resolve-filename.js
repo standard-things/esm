@@ -222,7 +222,7 @@ function resolveFilename(request, parent, isMain = false, options) {
     throw error
   }
 
-  const error = new MODULE_NOT_FOUND(request)
+  const error = new MODULE_NOT_FOUND(request, parent)
 
   maybeMaskStackTrace(error, parentEntry)
 

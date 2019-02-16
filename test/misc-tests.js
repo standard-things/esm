@@ -46,7 +46,7 @@ const defNs = createNamespace({
 })
 
 function checkError(error, code) {
-  const message = error.message
+  const { message } = error
 
   checkErrorProps(error, code, message)
   checkErrorCustomProps(error, code, message)
@@ -58,13 +58,11 @@ function checkErrorCustomProps(error, code, message) {
 
   assert.strictEqual(error.code, "ERR_CUSTOM")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-  assert.deepStrictEqual(Object.keys(error), ["code"])
 
   error.name = "Custom"
 
   assert.strictEqual(error.name, "Custom")
   assert.strictEqual(error.toString(), "Custom: " + message)
-  assert.deepStrictEqual(Object.keys(error), ["code", "name"])
 
   Reflect.deleteProperty(error, "code")
   Reflect.deleteProperty(error, "name")
@@ -74,12 +72,6 @@ function checkErrorProps(error, code, message) {
   assert.strictEqual(error.code, code)
   assert.strictEqual(error.name, "Error [" + code + "]")
   assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-
-  const sampleError = new Error("x")
-  const actual = Object.getOwnPropertyNames(error).sort()
-  const expected = Object.getOwnPropertyNames(sampleError).sort()
-
-  assert.deepStrictEqual(actual, expected)
   assert.deepStrictEqual(Object.keys(error), [])
   assert.deepStrictEqual(Object.getOwnPropertySymbols(error), [])
 }
@@ -87,23 +79,17 @@ function checkErrorProps(error, code, message) {
 function checkErrorStack(error, startsWith) {
   const stack = error.stack.replace(/\r\n/g, "\n")
 
-  assert.ok(stack.startsWith(startsWith) || stack.startsWith("SyntaxError:"))
+  assert.ok(
+    stack.startsWith(startsWith) ||
+    stack.startsWith("SyntaxError:")
+  )
 }
 
 function checkLegacyErrorProps(error, code) {
   assert.strictEqual(error.code, code)
   assert.strictEqual(error.name, "Error")
   assert.strictEqual(error.toString(), "Error: " + error.message)
-
-  const sampleError = new Error("x")
-
-  sampleError.code = "ERR_CODE"
-
-  const actual = Object.getOwnPropertyNames(error).sort()
-  const expected = Object.getOwnPropertyNames(sampleError).sort()
-
-  assert.deepStrictEqual(actual, expected)
-  assert.deepStrictEqual(Object.keys(error), ["code"])
+  assert.notDeepStrictEqual(Object.keys(error), [])
   assert.deepStrictEqual(Object.getOwnPropertySymbols(error), [])
 }
 

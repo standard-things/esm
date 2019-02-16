@@ -112,7 +112,7 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
     return foundPath
   }
 
-  const error = new MODULE_NOT_FOUND(request)
+  const error = new MODULE_NOT_FOUND(request, parent)
 
   if (! Loader.state.package.default.options.debug) {
     maskStackTrace(error, {

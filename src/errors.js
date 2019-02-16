@@ -5,6 +5,7 @@ import captureStackTrace from "./error/capture-stack-trace.js"
 import constructStackless from "./error/construct-stackless.js"
 import get from "./util/get.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
+import getModuleName from "./util/get-module-name.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
 import set from "./util/set.js"
@@ -46,8 +47,6 @@ function init() {
   addBuiltinError("ERR_UNDEFINED_IDENTIFIER", undefinedIdentifier, ExReferenceError)
   addBuiltinError("ERR_UNKNOWN_ESM_OPTION", unknownPkgOption, ExError)
 
-  addLegacyError("MODULE_NOT_FOUND", missingCJS, ExError)
-
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
@@ -55,13 +54,35 @@ function init() {
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
 
-  function addBuiltinError(code, template, Super) {
-    errors[code] = createBuiltinErrorClass(Super, code)
-    templateMap.set(code, template)
+  errors.MODULE_NOT_FOUND = function (request, parent) {
+    const requireStack = []
+    const seen = new Set
+
+    while (parent != null &&
+           ! seen.has(parent)) {
+      seen.add(parent)
+      requireStack.push(getModuleName(parent))
+      parent = parent.parent
+    }
+
+    let message = "Cannot find module " + toStringLiteral(request, APOSTROPHE)
+
+    if (requireStack.length !== 0) {
+      message +=
+        "\nRequire stack:\n- " +
+        requireStack.join("\n- ")
+    }
+
+    const error = new ExError(message)
+
+    error.code = "MODULE_NOT_FOUND"
+    error.requireStack = requireStack
+
+    return error
   }
 
-  function addLegacyError(code, template, Super) {
-    errors[code] = createLegacyErrorClass(Super, code)
+  function addBuiltinError(code, template, Super) {
+    errors[code] = createBuiltinErrorClass(Super, code)
     templateMap.set(code, template)
   }
 
@@ -101,16 +122,6 @@ function init() {
        }
       }
 
-      return error
-    }
-  }
-
-  function createLegacyErrorClass(Super, code) {
-    return function LegacyError(...args) {
-      const template = templateMap.get(code)
-      const error = new Super(template(...args))
-
-      error.code = code
       return error
     }
   }
@@ -206,10 +217,6 @@ function init() {
   function invalidProtocol(protocol, expected) {
     return "Protocol '" + protocol +
       "' not supported. Expected '" + expected + "'"
-  }
-
-  function missingCJS(request) {
-    return "Cannot find module " + toStringLiteral(request, APOSTROPHE)
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {
