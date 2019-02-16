@@ -1,5 +1,7 @@
 import SemVer from "semver"
 
+import assert from "assert"
+
 const canTestLiveBinding = SemVer.satisfies(process.version, ">=6.2")
 
 describe("import declaration tests", () => {
@@ -31,4 +33,13 @@ describe("import declaration tests", () => {
     return import("./cjs/import/live.js")
       .then((ns) => ns.default())
   })
+
+  it("should not swallow getter errors of CJS modules", () =>
+    import("./fixture/cjs/import/getter-error.js")
+      .then(assert.fail)
+      .catch((e) => {
+        assert.ok(e instanceof ReferenceError)
+        assert.strictEqual(e.message, "unsafe getter")
+      })
+  )
 })

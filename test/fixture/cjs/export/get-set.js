@@ -1,6 +1,6 @@
 "use strict"
 
-let safe = "safe get"
+let safe = "safe getter"
 
 module.exports = {
   get safe() {
@@ -10,6 +10,6 @@ module.exports = {
     safe = value
   },
   get unsafe() {
-    throw new ReferenceError("unsafe")
+    throw new ReferenceError("unsafe getter")
   }
 }

@@ -922,7 +922,7 @@ function getExportByName(entry, name, parentEntry) {
     const { getters } = entry
 
     return Reflect.has(getters, name)
-      ? tryGetter(getters[name])
+      ? getters[name]()
       : ERROR_GETTER
   }
 

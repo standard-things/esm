@@ -63,8 +63,12 @@ export default () => {
   ns = createNamespace({ a: "a", b: "b", c: "c", d: "d", e: "e" })
   assert.deepStrictEqual(nsStarMixed, ns)
 
-  assert.strictEqual(nsGetSet.safe, "safe get")
-  assert.strictEqual(nsGetSet.unsafe, void 0)
+  assert.strictEqual(nsGetSet.safe, "safe getter")
+
+  assert.throws(
+    () => nsGetSet.unsafe,
+    /ReferenceError: unsafe getter/
+  )
 
   assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
