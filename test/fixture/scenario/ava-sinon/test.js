@@ -1,11 +1,11 @@
 import test from "ava"
-import { recapitalize } from "./restring.js"
 import { stub } from "sinon"
-import * as ns from "./string.js"
+import * as ns from "../../math/math.esm.js"
+import { nsAdd } from "./ns-math.js"
 
 test("test", (t) => {
-  stub(ns, "capitalize").callsFake((string) => string.toUpperCase())
+  stub(ns, "add").returns(4)
 
-  t.is(ns.capitalize("abc"), "ABC")
-  t.is(recapitalize("def"), "DEF")
+  t.is(ns.add(1, 2), 4)
+  t.is(nsAdd(1, 2), 4)
 })

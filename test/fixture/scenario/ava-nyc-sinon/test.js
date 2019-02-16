@@ -1,11 +1,11 @@
 import test from "ava"
 import sinon from "sinon"
-import log from "./log.js"
+import reConsole from "./console.js"
 
 test("test", (t) => {
   sinon.spy(console, "log")
 
-  log("a")
+  reConsole.log("spy")
 
-  t.is(console.log.callCount, 1)
+  t.is(reConsole.log.callCount, 1)
 })
