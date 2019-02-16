@@ -230,7 +230,6 @@ describe("main hook tests", function () {
     return fs
       .ensureSymlink(srcPath, destPath)
       .then(() => runMain("./fixture/main-hook/symlink/package"))
-      .then(({ stdout }) => assert.ok(stdout.includes("symlink-package:true")))
       .then(() => trash(destPath))
   })
 })

@@ -1,5 +1,4 @@
 import assert from "assert"
-import { log } from "console"
 import { stub } from "sinon"
 import * as immutable from "../../math/math.mjs"
 import * as mutable from "../../math/math.esm.js"
@@ -22,5 +21,3 @@ stub(reMutable, "add").returns(8)
 
 assert.strictEqual(mutable.add(1, 2), 8)
 assert.strictEqual(reMutable.add(1, 2), 8)
-
-log("sinon:true")

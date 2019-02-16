@@ -75,7 +75,6 @@ describe("scenario tests", function () {
     node([
       path.resolve("fixture/scenario/esmod-pmb/test.node.js")
     ])
-    .then(({ stdout }) => assert.ok(stdout.includes("esmod-pmb:true")))
   )
 
   it("should work with express", () =>
@@ -144,7 +143,6 @@ describe("scenario tests", function () {
       "-r", "newrelic",
       dirPath
     ])
-    .then(({ stdout }) => assert.ok(stdout.includes("newrelic:true")))
   })
 
   it("should work with nyc", () => {
@@ -161,7 +159,6 @@ describe("scenario tests", function () {
     node([
       path.resolve("fixture/scenario/postcss")
     ])
-    .then(({ stdout }) => assert.ok(stdout.includes("postcss:true")))
   )
 
   it("should work with rewire", () =>
@@ -175,7 +172,6 @@ describe("scenario tests", function () {
     node([
       path.resolve("fixture/scenario/sinon")
     ], envAuto)
-    .then(({ stdout }) => assert.ok(stdout.includes("sinon:true")))
   )
 
   it("should work with sqreen", () =>
@@ -184,7 +180,6 @@ describe("scenario tests", function () {
       "-r", "sqreen",
       path.resolve("fixture/scenario/sqreen")
     ], envAuto)
-    .then(({ stdout }) => assert.ok(stdout.includes("sqreen:true")))
   )
 
   it("should work with ts-node", () =>
@@ -216,7 +211,6 @@ describe("scenario tests", function () {
       "--mode", "production",
       "--output", outputPath
     ], envAuto)
-    .then(({ stdout }) => assert.ok(stdout.includes("webpack:true")))
   })
 
   it("should work with babel, mocha, and nyc", () => {
@@ -473,28 +467,20 @@ describe("scenario tests", function () {
       }
     })
 
-    it("should work with lab", function () {
-      const dirPath = path.resolve("fixture/scenario/lab")
-      const labPattern = path.resolve(dirPath, "test.js")
-
-      return node([
+    it("should work with lab", () =>
+      node([
         "-r", pkgPath,
-        labPath, labPattern
+        labPath, path.resolve("fixture/scenario/lab/test.js")
       ], envAuto)
-      .then(({ stdout }) => assert.ok(stdout.includes("lab:true")))
-    })
+    )
 
-    it("should work with lab and @babel/register", function () {
-      const dirPath = path.resolve("fixture/scenario/lab-babel")
-      const labPattern = path.resolve(dirPath, "test.js")
-
-      return node([
+    it("should work with lab and @babel/register", () =>
+      node([
         "-r", pkgPath,
         "-r", "@babel/register",
-        labPath, labPattern
+        labPath, path.resolve("fixture/scenario/lab-babel/test.js")
       ], envAuto)
-      .then(({ stdout }) => assert.ok(stdout.includes("lab-babel:true")))
-    })
+    )
   })
 
   describe("should work with pm2", () => {
