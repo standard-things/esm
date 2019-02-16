@@ -1,11 +1,13 @@
 let rootModule = __non_webpack_module__
+let { parent } = rootModule
 
 const seen = new Set
 
-while (rootModule.parent != null &&
-       ! seen.has(rootModule.parent)) {
-  rootModule = rootModule.parent
-  seen.add(rootModule)
+while (parent != null &&
+       ! seen.has(parent)) {
+  seen.add(parent)
+  rootModule = parent
+  parent = rootModule.parent
 }
 
 export default rootModule
