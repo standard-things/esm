@@ -54,6 +54,7 @@ export default () => {
   assert.deepStrictEqual(nsUndefined, ns)
 
   ns = createNamespace({ default: {} })
+  assert.strictEqual(Reflect.getPrototypeOf(defaultEmpty), Object.prototype)
   assert.deepStrictEqual(nsEmpty, ns)
 
   ns = createNamespace({})
@@ -63,7 +64,7 @@ export default () => {
   assert.deepStrictEqual(nsStarMixed, ns)
 
   assert.strictEqual(nsGetSet.safe, "safe get")
-  assert.strictEqual(Reflect.getPrototypeOf(defaultEmpty), Object.prototype)
+  assert.strictEqual(nsGetSet.unsafe, void 0)
 
   assert.deepStrictEqual(defaultObject, { a: "a" })
   assert.strictEqual(aOfObject, "a")
