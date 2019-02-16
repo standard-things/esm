@@ -1,7 +1,5 @@
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
-import ENTRY from "../constant/entry.js"
-
 import GenericFunction from "../generic/function.js"
 import OwnProxy from "../own/proxy.js"
 
@@ -25,10 +23,6 @@ import shared from "../shared.js"
 import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
 
 function init() {
-  const {
-    ERROR_GETTER
-  } = ENTRY
-
   const PROXY_PREFIX = "Proxy ["
 
   const nonWhitespaceRegExp = /\S/
@@ -172,11 +166,7 @@ function init() {
 
   function tryGet(object, name) {
     try {
-      const value = Reflect.get(object, name)
-
-      if (value !== ERROR_GETTER) {
-        return value
-      }
+      return Reflect.get(object, name)
     } catch {}
 
     return uninitializedValue
