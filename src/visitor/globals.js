@@ -76,7 +76,7 @@ function init() {
         }
 
         this.transforms |= TRANSFORMS_CONSOLE
-      } else if (name === "reflect") {
+      } else if (name === "Reflect") {
         this.transforms |= TRANSFORMS_REFLECT
       }
 
