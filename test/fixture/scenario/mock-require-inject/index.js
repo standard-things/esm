@@ -10,23 +10,19 @@ let pass = false
 let threw = false
 
 const mockFs = {
-  default: "fs",
-  mocked: true
+  default: "fs"
 }
 
 const mockPath = {
-  default: "path",
-  mocked: true
+  default: "path"
 }
 
 const mockReal2 = {
-  default: "mock2",
-  mocked: true
+  default: "mock2"
 }
 
 const mockReal3 = {
-  default: "mock3",
-  mocked: true
+  default: "mock3"
 }
 
 const mockUtil = {
@@ -56,8 +52,7 @@ import("./load.js")
       fs: mockFs,
       path: pathNs,
       real1: {
-        default: "mock1",
-        mocked: true
+        default: "mock1"
       },
       real2: mockReal2,
       real3: {
