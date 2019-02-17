@@ -161,6 +161,13 @@ describe("scenario tests", function () {
     ])
   )
 
+  it("should work with proxyquire", () =>
+    node([
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/proxyquire")
+    ], envAuto)
+  )
+
   it("should work with rewire", () =>
     node([
       "-r", pkgPath,
