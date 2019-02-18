@@ -224,14 +224,16 @@ function init() {
           })
         }
 
-        const foundRequire = requireVisitor.found
         const { importedBindings } = top
+
+        const transformImportBindingAssignments =
+          ! requireVisitor.found &&
+          importedBindings.size !== 0
 
         let possibleAssignmentIndexes = possibleAssignableBindingsIndexes
 
-        if (! foundRequire) {
-          possibleAssignmentIndexes = findIndexes(code, [...importedBindings])
-          possibleAssignmentIndexes.push(...possibleAssignableBindingsIndexes)
+        if (transformImportBindingAssignments) {
+          possibleAssignmentIndexes.push(...findIndexes(code, [...importedBindings]))
           possibleAssignmentIndexes.sort(ascendingComparator)
         }
 
@@ -241,7 +243,7 @@ function init() {
           magicString,
           possibleIndexes: possibleAssignmentIndexes,
           runtimeName,
-          transformImportBindingAssignments: ! foundRequire,
+          transformImportBindingAssignments,
           transformInsideFunctions: true
         })
 
