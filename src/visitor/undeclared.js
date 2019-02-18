@@ -35,7 +35,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (! Reflect.has(this.undeclared, name) ||
+      if (! this.undeclared.has(name) ||
           ! isIdentifer(node, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return

@@ -6,7 +6,6 @@ import constructStackless from "../error/construct-stackless.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
-import keys from "../util/keys.js"
 import { lineBreakRegExp } from "../acorn.js"
 import overwrite from "../parse/overwrite.js"
 import preserveChild from "../parse/preserve-child.js"
@@ -26,36 +25,39 @@ function init() {
   class ImportExportVisitor extends Visitor {
     finalizeHoisting() {
       const { top } = this
-      const importBindings = keys(top.importedBindings)
+      const { importedBindings } = top
 
       let code = top.insertPrefix
 
-      if (importBindings.length !== 0) {
+      if (importedBindings.size !== 0) {
         code +=
           (this.generateVarDeclarations ? "var " : "let ") +
-          importBindings.join(",") + ";"
+          [...importedBindings].join(",") + ";"
       }
 
       code += toModuleExport(this, this.hoistedExports)
 
       const { importSpecifierMap, runtimeName } = this
+      const requests = [...importSpecifierMap.keys()]
 
-      for (const request in importSpecifierMap) {
+      for (const request of requests) {
         code += runtimeName + ".w(" + toStringLiteral(request)
 
         let setterArgsList = ""
 
-        const importedNames = keys(importSpecifierMap[request].imports)
+        const map = importSpecifierMap.get(request)
+        const { imports } = map
+        const importsNames = [...imports.keys()]
 
-        for (const importedName of importedNames) {
-          const localNames = importSpecifierMap[request].imports[importedName]
+        for (const importsName of importsNames) {
+          const localNames = imports.get(importsName)
           const valueParam = safeName("v", localNames)
 
           setterArgsList +=
             (setterArgsList === "" ? "" : ",") +
             '["' +
-            importedName + '",' +
-            (importedName === "*"
+            importsName + '",' +
+            (importsName === "*"
               ? "null"
               : '["' + localNames.join('","') + '"]'
             ) +
@@ -65,23 +67,23 @@ function init() {
             "}]"
         }
 
-        const { reExports } = importSpecifierMap[request]
-        const reExportedNames = keys(reExports)
+        const { reExports } = map
+        const reExportsNames = [...reExports.keys()]
 
-        for (const reExportedName of reExportedNames) {
-          const localNames = reExports[reExportedName]
+        for (const reExportsName of reExportsNames) {
+          const localNames = reExports.get(reExportsName)
 
           for (const localName of localNames) {
             setterArgsList +=
               (setterArgsList === "" ? "" : ",") +
               '["' +
               localName + '",null,' +
-              runtimeName + '.f("' + localName + '","' + reExportedName +
+              runtimeName + '.f("' + localName + '","' + reExportsName +
               '")]'
           }
         }
 
-        if (importSpecifierMap[request].star) {
+        if (map.star) {
           setterArgsList +=
             (setterArgsList === "" ? "" : ",") +
             '["*",null,' + runtimeName + ".n()]"
@@ -118,17 +120,17 @@ function init() {
       if (options !== void 0) {
         const { magicString } = options
 
-        this.assignableBindings = { __proto__: null }
+        this.assignableBindings = new Set
         this.firstLineBreakPos = magicString.original.search(lineBreakRegExp)
         this.generateVarDeclarations = options.generateVarDeclarations
         this.hoistedExports = []
-        this.importSpecifierMap = { __proto__: null }
+        this.importSpecifierMap = new Map
         this.magicString = magicString
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
         this.sourceType = options.sourceType
         this.strict = options.strict
-        this.temporalBindings = { __proto__: null }
+        this.temporalBindings = new Set
         this.top = options.top
         this.yieldIndex = options.yieldIndex
       }
@@ -176,38 +178,41 @@ function init() {
       const request = node.source.value
       const { specifiers } = node
 
-      if (! Reflect.has(importSpecifierMap, request)) {
-        importSpecifierMap[request] = {
-          __proto__: null,
-          imports: { __proto__: null },
-          reExports: { __proto__: null },
-          star: false
-        }
+      let map = importSpecifierMap.get(request)
+
+      if (map === void 0) {
+        map = createImportSpecifierMap()
+        importSpecifierMap.set(request, map)
       }
+
+      const { imports } = map
 
       for (const specifier of specifiers) {
         const { type } = specifier
 
-        let importedName
+        let importsName
 
         if (type === "ImportSpecifier") {
-          importedName = specifier.imported.name
+          importsName = specifier.imported.name
         } else if (type === "ImportDefaultSpecifier") {
-          importedName = "default"
+          importsName = "default"
         } else {
-          importedName = "*"
+          importsName = "*"
         }
 
-        if (! Reflect.has(importSpecifierMap[request].imports, importedName)) {
-          importSpecifierMap[request].imports[importedName] = []
+        let localNames = imports.get(importsName)
+
+        if (localNames === void 0) {
+          localNames = []
+          imports.set(importsName, localNames)
         }
 
         const localName = specifier.local.name
 
-        importSpecifierMap[request].imports[importedName].push(localName)
+        localNames.push(localName)
 
-        if (importedName !== "*") {
-          temporalBindings[localName] = true
+        if (importsName !== "*") {
+          temporalBindings.add(localName)
         }
       }
 
@@ -227,16 +232,14 @@ function init() {
       const node = path.getValue()
       const request = node.source.value
 
-      if (! Reflect.has(importSpecifierMap, request)) {
-        importSpecifierMap[request] = {
-          __proto__: null,
-          imports: { __proto__: null },
-          reExports: { __proto__: null },
-          star: false
-        }
+      let map = importSpecifierMap.get(request)
+
+      if (map === void 0) {
+        map = createImportSpecifierMap()
+        importSpecifierMap.set(request, map)
       }
 
-      importSpecifierMap[request].star = true
+      map.star = true
 
       hoistImports(this, node)
     }
@@ -317,7 +320,7 @@ function init() {
       }
 
       if (id !== null) {
-        this.assignableBindings[name] = true
+        this.assignableBindings.add(name)
       }
 
       path.call(this, "visitWithoutReset", "declaration")
@@ -349,7 +352,7 @@ function init() {
           // export function named() {}
           const { name } = declaration.id
 
-          assignableBindings[name] = true
+          assignableBindings.add(name)
           pairs.push([name, name])
         } else if (type === "VariableDeclaration") {
           // Skip adding declared names to `this.assignableBindings` if the
@@ -365,7 +368,7 @@ function init() {
 
             for (const name of names) {
               if (changeable) {
-                assignableBindings[name] = true
+                assignableBindings.add(name)
               }
 
               pairs.push([name, name])
@@ -377,14 +380,14 @@ function init() {
       } else if (source === null) {
         // Support exporting specifiers:
         // export { name1, name2, ..., nameN }
-        const { identifiers } = this.top
         const pairs = []
+        const topIdentifiers = this.top.identifiers
 
         for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
           const localName = specifier.local.name
 
-          if (! Reflect.has(identifiers, localName)) {
+          if (! topIdentifiers.has(localName)) {
             throw constructStackless(errors.SyntaxError, [
               {
                 inModule: true,
@@ -395,7 +398,7 @@ function init() {
             ])
           }
 
-          assignableBindings[localName] = true
+          assignableBindings.add(localName)
 
           pairs.push([exportedName, localName])
         }
@@ -407,28 +410,29 @@ function init() {
         const { importSpecifierMap } = this
         const request = source.value
 
-        if (! Reflect.has(importSpecifierMap, request)) {
-          importSpecifierMap[request] = {
-            __proto__: null,
-            imports: { __proto__: null },
-            reExports: { __proto__: null },
-            star: false
-          }
+        let map = importSpecifierMap.get(request)
+
+        if (map === void 0) {
+          map = createImportSpecifierMap()
+          importSpecifierMap.set(request, map)
         }
 
         for (const specifier of specifiers) {
           const exportedName = specifier.exported.name
+          const { reExports } = map
+
+          let localNames = reExports.get(exportedName)
+
+          if (localNames === void 0) {
+            localNames = []
+            reExports.set(exportedName, localNames)
+          }
+
           const localName = specifier.type === "ExportNamespaceSpecifier"
             ? "*"
             : specifier.local.name
 
-          const { reExports } = importSpecifierMap[request]
-
-          if (! Reflect.has(reExports, exportedName)) {
-            reExports[exportedName] = []
-          }
-
-          reExports[exportedName].push(localName)
+          localNames.push(localName)
         }
 
         hoistImports(this, node)
@@ -448,6 +452,14 @@ function init() {
 
         overwrite(this, meta.start, meta.end, this.runtimeName + "._")
       }
+    }
+  }
+
+  function createImportSpecifierMap() {
+    return {
+      imports: new Map,
+      reExports: new Map,
+      star: false
     }
   }
 

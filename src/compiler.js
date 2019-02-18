@@ -12,7 +12,6 @@ import findIndexes from "./parse/find-indexes.js"
 import globalsVisitor from "./visitor/globals.js"
 import hasPragma from "./parse/has-pragma.js"
 import importExportVisitor from "./visitor/import-export.js"
-import keys from "./util/keys.js"
 import requireVisitor from "./visitor/require.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
@@ -174,22 +173,21 @@ function init() {
 
       if (transformsDynamicImport ||
           transformsImport) {
-        const globals = {
-          __proto__: null,
-          Reflect: true,
-          console: true
-        }
+        const globals = new Set([
+          "Reflect",
+          "console"
+        ])
 
         const possibleGlobalsNames = []
 
-        if (Reflect.has(topIdentifiers, "console")) {
-          Reflect.deleteProperty(globals, "console")
+        if (topIdentifiers.has("console")) {
+          globals.delete("console")
         } else {
           possibleGlobalsNames.push("console")
         }
 
-        if (Reflect.has(topIdentifiers, "Reflect")) {
-          Reflect.deleteProperty(globals, "Reflect")
+        if (topIdentifiers.has("Reflect")) {
+          globals.delete("Reflect")
         } else {
           possibleGlobalsNames.push("Reflect")
         }
@@ -202,7 +200,7 @@ function init() {
         })
       }
 
-      if (! Reflect.has(topIdentifiers, "eval")) {
+      if (! topIdentifiers.has("eval")) {
         evalVisitor.visit(rootPath, {
           magicString,
           possibleIndexes: possibleEvalIndexes,
@@ -218,7 +216,7 @@ function init() {
           transformsImport) {
         const { assignableBindings } = importExportVisitor
 
-        possibleAssignableBindingsIndexes = findIndexes(code, keys(assignableBindings))
+        possibleAssignableBindingsIndexes = findIndexes(code, [...assignableBindings])
 
         if (options.cjsVars) {
           requireVisitor.visit(rootPath, {
@@ -232,7 +230,7 @@ function init() {
         let possibleAssignmentIndexes = possibleAssignableBindingsIndexes
 
         if (! foundRequire) {
-          possibleAssignmentIndexes = findIndexes(code, keys(importedBindings))
+          possibleAssignmentIndexes = findIndexes(code, [...importedBindings])
           possibleAssignmentIndexes.push(...possibleAssignableBindingsIndexes)
           possibleAssignmentIndexes.sort(ascendingComparator)
         }
@@ -252,23 +250,21 @@ function init() {
 
       if (! options.cjsVars &&
           sourceType === SOURCE_TYPE_MODULE) {
-        const undeclared = {
-          __proto__: null,
-          // eslint-disable-next-line sort-keys
-          __dirname: true,
-          __filename: true,
-          arguments: true,
-          exports: true,
-          module: true,
-          require: true
-        }
+        const possibleNames = [
+          "__dirname",
+          "__filename",
+          "arguments",
+          "exports",
+          "module",
+          "require"
+        ]
 
+        const undeclared = new Set
         const undeclaredNames = []
 
-        for (const name in undeclared) {
-          if (Reflect.has(topIdentifiers, name)) {
-            Reflect.deleteProperty(undeclared, name)
-          } else {
+        for (const name of possibleNames) {
+          if (! topIdentifiers.has(name)) {
+            undeclared.add(name)
             undeclaredNames.push(name)
           }
         }
@@ -299,7 +295,7 @@ function init() {
         const { assignableBindings, temporalBindings } = importExportVisitor
 
         setDeferred(result, "codeWithTDZ", () => {
-          const possibleTemporalIndexes = findIndexes(code, keys(temporalBindings))
+          const possibleTemporalIndexes = findIndexes(code, [...temporalBindings])
 
           possibleTemporalIndexes.push(...possibleExportIndexes)
           possibleTemporalIndexes.sort(ascendingComparator)

@@ -57,7 +57,7 @@ function init() {
 
     if (visitor.transformImportBindingAssignments) {
       for (const name of names) {
-        if (Reflect.has(importedBindings, name) &&
+        if (importedBindings.has(name) &&
             ! isShadowed(path, name, shadowedMap)) {
           // Throw a type error for assignments to imported bindings.
           overwrite(
@@ -82,7 +82,7 @@ function init() {
         transformOutsideFunctions
 
       for (const name of names) {
-        if (assignableBindings[name] === true &&
+        if (assignableBindings.has(name) &&
             ! isShadowed(path, name, shadowedMap)) {
           if (instrumentBoth ||
               (transformInsideFunctions &&

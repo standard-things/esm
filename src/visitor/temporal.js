@@ -4,7 +4,6 @@ import Visitor from "../visitor.js"
 
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
 import isShadowed from "../parse/is-shadowed.js"
-import keys from "../util/keys.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
 import shared from "../shared.js"
@@ -36,7 +35,7 @@ function init() {
       const node = path.getValue()
       const { name } = node
 
-      if (! Reflect.has(this.temporalBindings, name) ||
+      if (! this.temporalBindings.has(name) ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
@@ -98,13 +97,13 @@ function init() {
     visitExportNamedDeclaration(path) {
       const node = path.getValue()
       const { declaration, specifiers } = node
-      const initees = { __proto__: null }
+      const initees = new Set
 
       if (declaration !== null) {
         const { type } = declaration
 
         if (type === "ClassDeclaration") {
-          initees[declaration.id.name] = true
+          initees.add(declaration.id.name)
         } else if (type === "VariableDeclaration") {
           // Instrument for exported variable lists:
           // export let name1, name2, ..., nameN
@@ -112,7 +111,7 @@ function init() {
             const names = getNamesFromPattern(id)
 
             for (const name of names) {
-              initees[name] = true
+              initees.add(name)
             }
           }
         }
@@ -120,26 +119,24 @@ function init() {
         // Instrument for exported specifiers:
         // export { name1, name2, ..., nameN }
         for (const specifier of specifiers) {
-          initees[specifier.exported.name] = true
+          initees.add(specifier.exported.name)
         }
       } else {
         // Instrument for re-exported specifiers of an imported module:
         // export { name1, name2, ..., nameN } from "mod"
         for (const specifier of specifiers) {
-          initees[specifier.exported.name] = true
+          initees.add(specifier.exported.name)
         }
       }
 
-      const initeeNames = keys(initees)
-
-      if (initeeNames.length !== 0) {
+      if (initees.size !== 0) {
         this.transforms |= TRANSFORMS_TEMPORALS
 
         const { end } = declaration || node
 
         this.magicString.appendRight(
           end,
-          ";" + this.runtimeName + ".j(" + JSON.stringify(initeeNames) + ");"
+          ";" + this.runtimeName + ".j(" + JSON.stringify([...initees]) + ");"
         )
       }
 

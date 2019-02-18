@@ -42,7 +42,7 @@ function init() {
       const { object } = callee
       const { name } = object
 
-      if (! Reflect.has(this.globals, name)) {
+      if (! this.globals.has(name)) {
         this.visitChildren(path)
         return
       }

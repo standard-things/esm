@@ -18,15 +18,15 @@ function init() {
     }
 
     const { body } = node
-    const exported = { __proto__: null }
-    const funcs = { __proto__: null }
-    const identifiers = { __proto__: null }
-    const importedBindings = { __proto__: null }
+    const exported = {}
+    const funcs = new Set
+    const topIdentifiers = new Set
+    const importedBindings = new Set
     const { inModule } = this
 
     const top = {
       firstAwaitOutsideFunction: null,
-      identifiers,
+      identifiers: topIdentifiers,
       importedBindings,
       insertIndex: node.start,
       insertPrefix: ""
@@ -70,18 +70,18 @@ function init() {
             const { name } = id
 
             if (inModule &&
-                Reflect.has(funcs, name)) {
+                funcs.has(name)) {
               raiseRedeclaration(this, id.start, name)
             }
 
-            identifiers[name] = true
+            topIdentifiers.add(name)
           }
         }
       } else if (type === "ClassDeclaration") {
         const { id } = object
 
         if (id !== null) {
-          identifiers[id.name] = true
+          topIdentifiers.add(id.name)
         }
       } else if (type === "FunctionDeclaration") {
         const { id } = object
@@ -90,23 +90,23 @@ function init() {
           const { name } = id
 
           if (inModule &&
-              Reflect.has(identifiers, name)) {
+              topIdentifiers.has(name)) {
             raiseRedeclaration(this, id.start, name)
           }
 
-          funcs[name] = true
-          identifiers[name] = true
+          funcs.add(name)
+          topIdentifiers.add(name)
         }
       } else if (type === "ImportDeclaration") {
         for (const { local } of object.specifiers) {
           const { name } = local
 
-          if (Reflect.has(importedBindings, name)) {
+          if (importedBindings.has(name)) {
             raiseRedeclaration(this, local.start, name)
           }
 
-          identifiers[name] = true
-          importedBindings[name] = true
+          importedBindings.add(name)
+          topIdentifiers.add(name)
         }
       }
 
