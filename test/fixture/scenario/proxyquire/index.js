@@ -3,8 +3,8 @@ import proxyquire from "proxyquire"
 
 const a = proxyquire
   .load("./a.js", {
-    "path": {
-      "extname": () => "c"
+    path: {
+      extname: () => "c"
     },
     "./b.js": "b"
   })
