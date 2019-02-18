@@ -4,6 +4,7 @@ import ESM from "../constant/esm.js"
 import PACKAGE from "../constant/package.js"
 
 import Entry from "../entry.js"
+import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
@@ -278,7 +279,7 @@ function wasmCompiler(mod, filename) {
   } = WebAssembly
 
   const entry = Entry.get(mod)
-  const exported = { __proto__: null }
+  const exported = GenericObject.create()
 
   mod.exports = exported
   entry.exports = exported
@@ -287,7 +288,10 @@ function wasmCompiler(mod, filename) {
 
   const wasmMod = new wasmModule(readFile(filename))
   const descriptions = wasmModule.imports(wasmMod)
-  const imported = { __proto__: null }
+
+  // Use a `null` [[Prototype]] for `importObject` because the lookup includes
+  // inherited properties.
+  const importObject = { __proto__: null }
 
   entry.state = STATE_EXECUTION_STARTED
 
@@ -295,10 +299,10 @@ function wasmCompiler(mod, filename) {
     const request = description.module
     const childEntry = esmParseLoad(request, mod)
 
-    imported[request] = childEntry.module.exports
+    importObject[request] = childEntry.module.exports
   }
 
-  const wasmExported = new wasmInstance(wasmMod, imported).exports
+  const wasmExported = new wasmInstance(wasmMod, importObject).exports
 
   entry.state = STATE_EXECUTION_COMPLETED
 
