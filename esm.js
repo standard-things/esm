@@ -161,12 +161,13 @@ shared = loadESM()
 if (cachePath !== "") {
   const { dir } = shared.package
 
-  if (! has(dir, cachePath)) {
-    dir[cachePath] = {
+  let cache = dir.get(cachePath)
+
+  if (cache === void 0) {
+    cache = {
       buffer: cachedData,
-      compile: {
-        __proto__: null,
-        esm: {
+      compile: new Map([
+        ["esm", {
           circular: 0,
           code: null,
           codeWithTDZ: null,
@@ -177,16 +178,24 @@ if (cachePath !== "") {
           sourceType: 1,
           transforms: 0,
           yieldIndex: -1
-        }
-      },
-      map: { __proto__: null }
+        }]
+      ]),
+      meta: new Map
     }
+
+    dir.set(cachePath, cache)
   }
 
-  shared.pendingScripts[cachePath] = {
-    __proto__: null,
-    esm: script
+  const { pendingScripts } = shared
+
+  let scripts = pendingScripts.get(cachePath)
+
+  if (scripts === void 0) {
+    scripts = new Map
+    pendingScripts.set(cachePath, scripts)
   }
+
+  scripts.set("esm", script)
 }
 
 // The legacy symbol used for `esm` export detection.

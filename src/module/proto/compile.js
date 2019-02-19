@@ -127,14 +127,16 @@ const compile = maskFunction(function (content, filename) {
   const script = new realVM.Script(Module.wrap(preparedContent), scriptOptions)
 
   if (cachePath !== "") {
-    const { cacheName } = entry
     const { pendingScripts } = shared
 
-    if (! Reflect.has(pendingScripts, cachePath)) {
-      pendingScripts[cachePath] = { __proto__: null }
+    let scripts = pendingScripts.get(cachePath)
+
+    if (scripts === void 0) {
+      scripts = new Map
+      pendingScripts.set(cachePath, scripts)
     }
 
-    pendingScripts[cachePath][cacheName] = script
+    scripts.set(entry.cacheName, script)
   }
 
   if (useRunInContext === void 0) {

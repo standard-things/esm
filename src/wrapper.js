@@ -84,6 +84,7 @@ function init() {
     }
 
     store.set(name, map)
+
     return map
   }
 

@@ -49,10 +49,10 @@ function init() {
       return compile(code, options)
     },
     from(entry) {
-      const { cache, cachePath } = entry.package
+      const pkg = entry.package
+      const { cache } = pkg
       const { cacheName } = entry
-      const { map } = cache
-      const meta = map[cacheName]
+      const meta = cache.meta.get(cacheName)
 
       if (meta === void 0) {
         return null
@@ -88,7 +88,7 @@ function init() {
         let filename = meta[6]
 
         if (filename) {
-          filename = resolve(cachePath, filename)
+          filename = resolve(pkg.cachePath, filename)
         }
 
         result.filename = filename
@@ -113,7 +113,7 @@ function init() {
       }
 
       entry.compileData = result
-      cache.compile[cacheName] = result
+      cache.compile.set(cacheName, result)
 
       return result
     }
@@ -143,11 +143,15 @@ function init() {
 
     const { pendingWrites } = shared
 
-    if (! Reflect.has(pendingWrites, cachePath)) {
-      pendingWrites[cachePath] = { __proto__: null }
+    let compileDatas = pendingWrites.get(cachePath)
+
+    if (compileDatas === void 0) {
+      compileDatas = new Map
+      pendingWrites.set(cachePath, compileDatas)
     }
 
-    pendingWrites[cachePath][cacheName] = result
+    compileDatas.set(cacheName, result)
+
     return result
   }
 
@@ -157,12 +161,11 @@ function init() {
     const { pendingScripts, pendingWrites } = shared
     const { dir } = shared.package
 
-    for (const cachePath in dir) {
+    dir.forEach((cache, cachePath) => {
       if (cachePath === "") {
-        continue
+        return
       }
 
-      const cache = dir[cachePath]
       const noCacheDir = ! mkdirp(cachePath)
 
       let { dirty } = cache
@@ -179,13 +182,13 @@ function init() {
 
       if (dirty ||
           noCacheDir) {
-        Reflect.deleteProperty(dir, cachePath)
-        Reflect.deleteProperty(pendingScripts, cachePath)
-        Reflect.deleteProperty(pendingWrites, cachePath)
+        dir.delete(cachePath)
+        pendingScripts.delete(cachePath)
+        pendingWrites.delete(cachePath)
       }
 
       if (noCacheDir) {
-        continue
+        return
       }
 
       if (dirty) {
@@ -193,25 +196,23 @@ function init() {
         removeFile(cachePath + sep + ".data.blob")
         removeFile(cachePath + sep + ".data.json")
 
-        for (const cacheName in cache.compile) {
+        cache.compile.forEach((compileData, cacheName) => {
           removeFile(cachePath + sep + cacheName)
-        }
+        })
       }
-    }
+    })
 
-    const pendingScriptDatas = { __proto__: null }
+    const pendingScriptDatas = new Map
     const useCreateCachedData = shared.support.createCachedData
 
-    for (const cachePath in pendingScripts) {
-      const cache = dir[cachePath]
+    pendingScripts.forEach((scripts, cachePath) => {
+      const cache = dir.get(cachePath)
       const compileDatas = cache.compile
-      const { map } = cache
-      const scripts = pendingScripts[cachePath]
+      const metas = cache.meta
 
-      for (const cacheName in scripts) {
-        const compileData = compileDatas[cacheName]
-        const cachedData = compileData ? compileData.scriptData : null
-        const script = scripts[cacheName]
+      scripts.forEach((script, cacheName) => {
+        const compileData = compileDatas.get(cacheName)
+        const cachedData = compileData != null ? compileData.scriptData : null
 
         let scriptData
         let changed = false
@@ -234,7 +235,7 @@ function init() {
                      script.cachedDataRejected) {
             changed = true
 
-            const meta = map[cacheName]
+            const meta = metas.get(cacheName)
 
             if (meta !== void 0) {
               meta[0] = -1
@@ -248,33 +249,35 @@ function init() {
 
         if (changed &&
             cacheName !== "") {
-          if (! Reflect.has(pendingScriptDatas, cachePath)) {
-            pendingScriptDatas[cachePath] = { __proto__: null }
+          let scriptDatas = pendingScriptDatas.get(cachePath)
+
+          if (scriptDatas === void 0) {
+            scriptDatas = new Map
+            pendingScriptDatas.set(cachePath, scriptDatas)
           }
 
-          pendingScriptDatas[cachePath][cacheName] = scriptData
+          scriptDatas.set(cacheName, scriptData)
         }
-      }
-    }
+      })
+    })
 
-    for (const cachePath in pendingScriptDatas) {
-      const cache = dir[cachePath]
-      const { buffer, map } = cache
+    pendingScriptDatas.forEach((scriptDatas, cachePath) => {
+      const cache = dir.get(cachePath)
       const compileDatas = cache.compile
-      const scriptDatas = pendingScriptDatas[cachePath]
+      const metas = cache.meta
 
-      for (const cacheName in scriptDatas) {
-        let meta = map[cacheName]
+      scriptDatas.forEach((scriptData, cacheName) => {
+        let meta = metas.get(cacheName)
 
         if (meta !== void 0) {
-          continue
+          return
         }
 
         meta = [-1, -1]
 
-        const compileData = compileDatas[cacheName]
+        const compileData = compileDatas.get(cacheName)
 
-        if (compileData) {
+        if (compileData != null) {
           const {
             filename,
             firstAwaitOutsideFunction,
@@ -315,27 +318,23 @@ function init() {
           }
         }
 
-        map[cacheName] = meta
-      }
+        metas.set(cacheName, meta)
+      })
 
+      const { buffer } = cache
       const buffers = []
+      const jsonMeta = {}
 
       let offset = 0
 
-      for (const cacheName in map) {
-        const meta = map[cacheName]
-
-        if (meta === void 0) {
-          continue
-        }
-
-        const compileData = compileDatas[cacheName]
-        const [offsetStart, offsetEnd] = meta
-
-        let scriptData = scriptDatas[cacheName]
+      metas.forEach((meta, cacheName) => {
+        let scriptData = scriptDatas.get(cacheName)
 
         if (scriptData === void 0) {
-          if (compileData) {
+          const compileData = compileDatas.get(cacheName)
+          const [offsetStart, offsetEnd] = meta
+
+          if (compileData != null) {
             scriptData = compileData.scriptData
           } else if (offsetStart !== -1 &&
                      offsetEnd !== -1) {
@@ -348,40 +347,40 @@ function init() {
           meta[1] = offset += scriptData.length
           buffers.push(scriptData)
         }
-      }
+
+        jsonMeta[cacheName] = meta
+      })
 
       writeFile(cachePath + sep + ".data.blob", GenericBuffer.concat(buffers))
       writeFile(cachePath + sep + ".data.json", JSON.stringify({
-        map,
+        meta: jsonMeta,
         version: PACKAGE_VERSION
       }))
-    }
+    })
 
-    for (const cachePath in pendingWrites) {
-      const contents = pendingWrites[cachePath]
-
-      for (const cacheName in contents) {
-        const { code } = contents[cacheName]
-
+    pendingWrites.forEach((compileDatas, cachePath) => {
+      compileDatas.forEach(({ code }, cacheName) => {
         if (writeFile(cachePath + sep + cacheName, code)) {
           removeExpired(cachePath, cacheName)
         }
-      }
-    }
+      })
+    })
   }
 
   function removeExpired(cachePath, cacheName) {
-    const cache = shared.package.dir[cachePath]
+    const cache = shared.package.dir.get(cachePath)
+    const compileDatas = cache.compile
+    const metas = cache.meta
     const pathHash = getCachePathHash(cacheName)
 
-    for (const otherCacheName in cache) {
+    compileDatas.forEach((compileData, otherCacheName) => {
       if (otherCacheName !== cacheName &&
           otherCacheName.startsWith(pathHash)) {
-        Reflect.deleteProperty(cache.compile, otherCacheName)
-        Reflect.deleteProperty(cache.map, otherCacheName)
+        compileDatas.delete(otherCacheName)
+        metas.delete(otherCacheName)
         removeFile(cachePath + sep + otherCacheName)
       }
-    }
+    })
   }
 
   function toCompileOptions(options = {}) {

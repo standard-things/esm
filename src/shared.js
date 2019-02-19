@@ -92,11 +92,11 @@ function init() {
       statSync: null
     },
     package: {
-      dir: { __proto__: null },
+      dir: new Map,
       root: new Map
     },
-    pendingScripts: { __proto__: null },
-    pendingWrites: { __proto__: null },
+    pendingScripts: new Map,
+    pendingWrites: new Map,
     reloaded: false,
     safeGlobal: __global__,
     support,

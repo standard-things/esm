@@ -113,7 +113,7 @@ function compile(caller, entry, content, filename, fallback) {
       compileData.scriptData = scriptData
 
       entry.compileData = compileData
-      pkg.cache.compile[cacheName] = compileData
+      pkg.cache.compile.set(cacheName, compileData)
 
       if (compileData.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM

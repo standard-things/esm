@@ -37,27 +37,21 @@ function init() {
 
       code += toModuleExport(this, this.hoistedExports)
 
-      const { importSpecifierMap, runtimeName } = this
-      const requests = [...importSpecifierMap.keys()]
+      const { runtimeName } = this
 
-      for (const request of requests) {
+      this.importSpecifierMap.forEach((map, request) => {
         code += runtimeName + ".w(" + toStringLiteral(request)
 
         let setterArgsList = ""
 
-        const map = importSpecifierMap.get(request)
-        const { imports } = map
-        const importsNames = [...imports.keys()]
-
-        for (const importsName of importsNames) {
-          const localNames = imports.get(importsName)
+        map.imports.forEach((localNames, name) => {
           const valueParam = safeName("v", localNames)
 
           setterArgsList +=
             (setterArgsList === "" ? "" : ",") +
             '["' +
-            importsName + '",' +
-            (importsName === "*"
+            name + '",' +
+            (name === "*"
               ? "null"
               : '["' + localNames.join('","') + '"]'
             ) +
@@ -65,23 +59,18 @@ function init() {
             // Multiple local variables become a compound assignment.
             localNames.join("=") + "=" + valueParam +
             "}]"
-        }
+        })
 
-        const { reExports } = map
-        const reExportsNames = [...reExports.keys()]
-
-        for (const reExportsName of reExportsNames) {
-          const localNames = reExports.get(reExportsName)
-
+        map.reExports.forEach((localNames, name) => {
           for (const localName of localNames) {
             setterArgsList +=
               (setterArgsList === "" ? "" : ",") +
               '["' +
               localName + '",null,' +
-              runtimeName + '.f("' + localName + '","' + reExportsName +
+              runtimeName + '.f("' + localName + '","' + name +
               '")]'
           }
-        }
+        })
 
         if (map.star) {
           setterArgsList +=
@@ -94,7 +83,7 @@ function init() {
         }
 
         code += ");"
-      }
+      })
 
       this.magicString.prependLeft(top.insertIndex, code)
       this.yieldIndex += code.length

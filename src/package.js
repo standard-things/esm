@@ -121,34 +121,34 @@ class Package {
 
     const { dir } = shared.package
 
-    if (! Reflect.has(dir, cachePath)) {
+    if (! dir.has(cachePath)) {
       const cache = {
         buffer: null,
         compile: null,
-        map: null
+        meta: null
       }
 
       let buffer = null
-      let compileDatas = { __proto__: null }
-      let map = null
+      let compileDatas = new Map
+      let metas = null
 
-      if (cachePath) {
+      if (cachePath !== "") {
         const cacheNames = readdir(cachePath)
 
         let hasBuffer = false
         let hasDirtyMarker = false
-        let hasMap = false
+        let hasMetas = false
 
         for (const cacheName of cacheNames) {
           if (isCacheName(cacheName)) {
             // Later, we'll change the cached value to its associated compiler result,
             // but for now we merely register that a cache file exists.
-            compileDatas[cacheName] = null
+            compileDatas.set(cacheName, null)
           } else if (cacheName.charCodeAt(0) === DOT) {
             if (cacheName === ".data.blob") {
               hasBuffer = true
             } else if (cacheName === ".data.json") {
-              hasMap = true
+              hasMetas = true
             } else if (cacheName === ".dirty") {
               hasDirtyMarker = true
               break
@@ -159,7 +159,7 @@ class Package {
         let isCacheInvalid = hasDirtyMarker
         let json = null
 
-        if (hasMap &&
+        if (hasMetas &&
             ! isCacheInvalid) {
           json = readJSON(cachePath + sep + ".data.json")
 
@@ -167,15 +167,15 @@ class Package {
             json === null ||
             ! has(json, "version") ||
             json.version !== PACKAGE_VERSION ||
-            ! has(json, "map") ||
-            ! isObject(json.map)
+            ! has(json, "meta") ||
+            ! isObject(json.meta)
         }
 
         if (isCacheInvalid) {
           hasBuffer = false
-          hasMap = false
+          hasMetas = false
 
-          compileDatas = { __proto__: null }
+          compileDatas = new Map
 
           if (hasDirtyMarker) {
             removeFile(cachePath + sep + ".dirty")
@@ -188,9 +188,15 @@ class Package {
           buffer = readFile(cachePath + sep + ".data.blob")
         }
 
-        if (hasMap) {
-          map = json.map
-          Reflect.setPrototypeOf(map, null)
+        if (hasMetas) {
+          const jsonMeta = json.meta
+          const cacheNames = keys(jsonMeta)
+
+          metas = new Map
+
+          for (const cacheName of cacheNames) {
+            metas.set(cacheName, jsonMeta[cacheName])
+          }
         }
       }
 
@@ -198,18 +204,18 @@ class Package {
         buffer = GenericBuffer.alloc(0)
       }
 
-      if (map === null) {
-        map = { __proto__: null }
+      if (metas === null) {
+        metas = new Map
       }
 
       cache.buffer = buffer
       cache.compile = compileDatas
-      cache.map = map
+      cache.meta = metas
 
-      dir[cachePath] = cache
+      dir.set(cachePath, cache)
     }
 
-    this.cache = dir[cachePath]
+    this.cache = dir.get(cachePath)
     this.cachePath = cachePath
     this.dirPath = dirPath
     this.options = options
@@ -220,6 +226,7 @@ class Package {
     const cloned = assign({ __proto__: Package.prototype }, this)
 
     cloned.options = assign({}, cloned.options)
+
     return cloned
   }
 
