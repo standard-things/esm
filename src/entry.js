@@ -123,7 +123,7 @@ class Entry {
     // The unique id for the module cache.
     this.id = mod.id
     // The initialized state of bindings imported by the module.
-    this.importedBindings = { __proto__: null }
+    this.importedBindings = new Map
     // The module the entry is managing.
     this.module = mod
     // The name of the module.
@@ -331,8 +331,8 @@ class Entry {
     const { importedBindings } = parentEntry
 
     for (const name of localNames) {
-      if (! Reflect.has(importedBindings, name)) {
-        importedBindings[name] = false
+      if (! importedBindings.has(name)) {
+        importedBindings.set(name, false)
       }
     }
 
@@ -552,9 +552,8 @@ class Entry {
       names = [names]
     }
 
-    // Lazily-initialized map of parent module names to parent entries whose
-    // setters might need to run.
-    let parentsMap
+    // Lazily initialize set of parent entries whose setters might need to run.
+    let parentEntries
 
     this._changed = false
 
@@ -565,22 +564,22 @@ class Entry {
 
       if (setter.last !== ERROR_GETTER) {
         for (const name of setter.localNames) {
-          importedBindings[name] = true
+          importedBindings.set(name, true)
         }
       }
 
       if (shouldUpdateParents) {
-        if (parentsMap === void 0) {
-          parentsMap = { __proto__: null }
+        if (parentEntries === void 0) {
+          parentEntries = new Set
         }
 
-        parentsMap[parentEntry.name] = parentEntry
+        parentEntries.add(parentEntry)
       }
     }, updateType)
 
     this._changed = false
 
-    if (parentsMap === void 0) {
+    if (parentEntries === void 0) {
       return this
     }
 
@@ -599,12 +598,10 @@ class Entry {
     // If any of the setters updated the bindings of a parent module,
     // or updated local variables that are exported by that parent module,
     // then we must re-run any setters registered by that parent module.
-    for (const id in parentsMap) {
-      const parentEntry = parentsMap[id]
-
+    parentEntries.forEach((parentEntry) => {
       parentEntry.loaded()
       parentEntry.updateBindings(null, parentUpdateType, seen)
-    }
+    })
 
     return this
   }
