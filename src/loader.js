@@ -23,13 +23,7 @@ class Loader {
           globalPaths: Array.from(Module.globalPaths),
           mainModule: realProcess.mainModule,
           moduleCache: { __proto__: null },
-          scratchCache: new Proxy({ __proto__: null }, {
-            get(scratchCache, name) {
-              return Reflect.has(scratchCache, name)
-                ? scratchCache[name]
-                : Module._cache[name]
-            }
-          })
+          scratchCache: { __proto__: null }
         },
         package: {
           cache: new Map,

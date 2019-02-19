@@ -20,10 +20,16 @@ const {
 } = ENTRY
 
 function load(filename, parent, isMain = false, cache, loader) {
+  const loaderModuleState = Loader.state.module
   const { parsing } = shared.moduleState
 
   let entry
   let mod = cache[filename]
+
+  if (mod === void 0 &&
+      cache === loaderModuleState.scratchCache) {
+    mod = Module._cache[filename]
+  }
 
   const foundMod = mod !== void 0
 
@@ -55,8 +61,8 @@ function load(filename, parent, isMain = false, cache, loader) {
 
     if (isMain) {
       mod.id = "."
+      loaderModuleState.mainModule = mod
       realProcess.mainModule = mod
-      Loader.state.module.mainModule = mod
     }
   }
 
