@@ -22,7 +22,7 @@ function init() {
   }
 
   function readBigInt(parser, radix) {
-    const { input, pos } = parser
+    const { pos } = parser
 
     if (typeof radix === "number") {
       parser.pos += 2
@@ -31,7 +31,7 @@ function init() {
     }
 
     if (parser.readInt(radix) !== null &&
-        input.charCodeAt(parser.pos) === LOWERCASE_N) {
+        parser.input.charCodeAt(parser.pos) === LOWERCASE_N) {
       ++parser.pos
 
       return parser.finishToken(tt.num, null)
