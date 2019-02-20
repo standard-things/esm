@@ -105,6 +105,12 @@ Specify options with one of the following:
         </td>
       </tr>
       <tr>
+        <td valign="top"><code>"dedefault":</code></td>
+        <td>
+          <p>A boolean to export a default without the dangling <code>require().default`</code>.</p>
+        </td>
+      </tr>
+      <tr>
         <td valign="top"><code>"esModule":</code></td>
         <td>
           <p>A boolean for <code>__esModule</code> interoperability.</p>
