@@ -6,8 +6,15 @@ import RealModule from "../../real/module.js"
 
 import _findPath from "../internal/find-path.js"
 import maskFunction from "../../util/mask-function.js"
+import validateString from "../../util/validate-string.js"
 
 const findPath = maskFunction(function (request, paths, isMain) {
+  validateString(request, "request")
+
+  if (! Array.isArray(paths)) {
+    paths = []
+  }
+
   const result = _findPath(request, paths, isMain)
 
   return result === "" ? false : result

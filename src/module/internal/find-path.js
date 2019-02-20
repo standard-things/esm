@@ -48,21 +48,19 @@ const resolveSymlinksMain =
   ! FLAGS.preserveSymlinksMain
 
 function findPath(request, paths, isMain = false, fields, exts) {
-  let cacheKey = request + "\0"
+  const pathsLength = paths.length
 
-  if (paths) {
-    cacheKey += paths.length === 1 ? paths[0] : GenericArray.join(paths)
-  }
+  let cacheKey =
+    request + "\0" +
+    (pathsLength === 1 ? paths[0] : GenericArray.join(paths)) + "\0"
 
-  cacheKey += "\0"
-
-  if (fields) {
+  if (fields !== void 0) {
     cacheKey += fields.length === 1 ? fields[0] : fields.join()
   }
 
   cacheKey += "\0"
 
-  if (exts) {
+  if (exts !== void 0) {
     cacheKey += exts.length === 1 ? exts[0] : exts.join()
   }
 
@@ -85,6 +83,29 @@ function findPath(request, paths, isMain = false, fields, exts) {
 
   const isAbs = isAbsolute(request)
 
+  if (! isAbs &&
+      pathsLength === 0) {
+    return ""
+  }
+
+  const requestLength = request.length
+
+  let trailingSlash = requestLength !== 0
+
+  if (trailingSlash) {
+    let code = request.charCodeAt(requestLength - 1)
+
+    if (code === DOT) {
+      code = request.charCodeAt(requestLength - 2)
+
+      if (code === DOT) {
+        code = request.charCodeAt(requestLength - 3)
+      }
+    }
+
+    trailingSlash = isSep(code)
+  }
+
   if (isAbs) {
     if (useRealpath) {
       paths = [dirname(request)]
@@ -92,25 +113,6 @@ function findPath(request, paths, isMain = false, fields, exts) {
     } else {
       paths = [request]
     }
-  } else if (! Array.isArray(paths) ||
-             paths.length === 0) {
-    return ""
-  }
-
-  let trailingSlash = request !== ""
-
-  if (trailingSlash) {
-    let code = request.charCodeAt(request.length - 1)
-
-    if (code === DOT) {
-      code = request.charCodeAt(request.length - 2)
-
-      if (code === DOT) {
-        code = request.charCodeAt(request.length - 3)
-      }
-    }
-
-    trailingSlash = isSep(code)
   }
 
   for (const curPath of paths) {
