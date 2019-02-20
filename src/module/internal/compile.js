@@ -94,9 +94,9 @@ function compile(caller, entry, content, filename, fallback) {
       const { cacheName } = entry
       const { cjs } = options
 
-      const scriptData = compileData
-        ? compileData.scriptData
-        : null
+      const scriptData = compileData === null
+        ? null
+        : compileData.scriptData
 
       compileData = tryCompile(caller, entry, content, {
         cacheName,

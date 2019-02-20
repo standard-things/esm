@@ -164,6 +164,12 @@ if (cachePath !== "") {
   let cache = dir.get(cachePath)
 
   if (cache === void 0) {
+    let scriptData = cachedData
+
+    if (scriptData === void 0) {
+      scriptData = null
+    }
+
     cache = {
       buffer: cachedData,
       compile: new Map([
@@ -174,7 +180,7 @@ if (cachePath !== "") {
           filename: null,
           firstAwaitOutsideFunction: null,
           mtime: -1,
-          scriptData: cachedData || null,
+          scriptData,
           sourceType: 1,
           transforms: 0,
           yieldIndex: -1

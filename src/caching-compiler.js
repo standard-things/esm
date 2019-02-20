@@ -211,27 +211,43 @@ function init() {
       const metas = cache.meta
 
       scripts.forEach((script, cacheName) => {
-        const compileData = compileDatas.get(cacheName)
-        const cachedData = compileData != null ? compileData.scriptData : null
+        let compileData = compileDatas.get(cacheName)
 
-        let scriptData
-        let changed = false
-
-        if (cachedData === null) {
-          scriptData = useCreateCachedData
-            ? script.createCachedData()
-            : script.cachedData
+        if (compileData === void 0) {
+          compileData = null
         }
 
-        if (scriptData &&
+        let cachedData
+
+        if (compileData !== null) {
+          cachedData = compileData.scriptData
+
+          if (cachedData === null) {
+            cachedData = void 0
+          }
+        }
+
+        let changed = false
+        let scriptData = null
+
+        if (cachedData === void 0) {
+          if (useCreateCachedData &&
+              typeof script.createCachedData === "function") {
+            scriptData = script.createCachedData()
+          } else if (script.cachedDataProduced) {
+            scriptData = script.cachedData
+          }
+        }
+
+        if (scriptData !== null &&
             scriptData.length) {
           changed = true
         }
 
-        if (compileData) {
-          if (scriptData) {
+        if (compileData !== null) {
+          if (scriptData !== null) {
             compileData.scriptData = scriptData
-          } else if (cachedData &&
+          } else if (cachedData !== void 0 &&
                      script.cachedDataRejected) {
             changed = true
 
@@ -275,9 +291,13 @@ function init() {
 
         meta = [-1, -1]
 
-        const compileData = compileDatas.get(cacheName)
+        let compileData = compileDatas.get(cacheName)
 
-        if (compileData != null) {
+        if (compileData === void 0) {
+          compileData = null
+        }
+
+        if (compileData !== null) {
           const {
             filename,
             firstAwaitOutsideFunction,
@@ -331,10 +351,17 @@ function init() {
         let scriptData = scriptDatas.get(cacheName)
 
         if (scriptData === void 0) {
-          const compileData = compileDatas.get(cacheName)
+          let compileData = compileDatas.get(cacheName)
+
+          if (compileData === void 0) {
+            compileData = null
+          }
+
           const [offsetStart, offsetEnd] = meta
 
-          if (compileData != null) {
+          scriptData = null
+
+          if (compileData !== null) {
             scriptData = compileData.scriptData
           } else if (offsetStart !== -1 &&
                      offsetEnd !== -1) {
@@ -342,9 +369,10 @@ function init() {
           }
         }
 
-        if (scriptData) {
+        if (scriptData !== null) {
           meta[0] = offset
-          meta[1] = offset += scriptData.length
+          offset += scriptData.length
+          meta[1] = offset
           buffers.push(scriptData)
         }
 
