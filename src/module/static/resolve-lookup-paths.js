@@ -8,8 +8,11 @@ import RealModule from "../../real/module.js"
 import _resolveLookupPaths from "../internal/resolve-lookup-paths.js"
 import builtinLookup from "../../builtin-lookup.js"
 import maskFunction from "../../util/mask-function.js"
+import validateString from "../../util/validate-string.js"
 
-const resolveLookupPaths = maskFunction(function (request, parent, newReturn) {
+const resolveLookupPaths = maskFunction(function (request, parent, newReturn = false) {
+  validateString(request, "request")
+
   if (builtinLookup.has(request)) {
     return newReturn ? null : GenericArray.of(request, GenericArray.of())
   }

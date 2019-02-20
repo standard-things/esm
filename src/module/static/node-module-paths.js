@@ -13,6 +13,7 @@ import SafeModule from "../../safe/module.js"
 
 import isSep from "../../path/is-sep.js"
 import maskFunction from "../../util/mask-function.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   BACKWARD_SLASH,
@@ -31,6 +32,8 @@ const nmChars = Array.prototype
 const nmLength = nmChars.length
 
 const nodeModulePaths = maskFunction(function (from) {
+  validateString(from, "from")
+
   // Electron and Muon patch `Module_nodeModulePaths()` to remove paths outside the app.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js

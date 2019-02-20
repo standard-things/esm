@@ -23,6 +23,7 @@ import maskStackTrace from "../../error/mask-stack-trace.js"
 import shared from "../../shared.js"
 import staticFindPath from "./find-path.js"
 import staticResolveLookupPaths from "./resolve-lookup-paths.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   TYPE_ESM
@@ -37,6 +38,8 @@ const {
 } = errors
 
 const resolveFilename = maskFunction(function (request, parent, isMain = false, options) {
+  validateString(request, "request")
+
   // Electron and Muon patch `Module._resolveFilename()`.
   // https://github.com/electron/electron/blob/master/lib/common/reset-search-paths.js
   // https://github.com/brave/muon/blob/master/lib/common/reset-search-paths.js

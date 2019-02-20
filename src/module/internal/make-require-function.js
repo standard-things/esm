@@ -57,6 +57,7 @@ function makeRequireFunction(mod, requirer, resolver) {
 
   function paths(request) {
     validateString(request, "request")
+
     return Module._resolveLookupPaths(request, mod, true)
   }
 

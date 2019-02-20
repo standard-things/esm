@@ -15,6 +15,7 @@ import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   TYPE_ESM
@@ -29,6 +30,8 @@ const {
 } = errors
 
 const load = maskFunction(function (request, parent, isMain = false) {
+  validateString(request, "request")
+
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
 
