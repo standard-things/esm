@@ -237,6 +237,10 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
     paths = resolveLookupPathsFrom(request, options.paths, skipGlobalPaths)
   } else {
     paths = resolveLookupPaths(request, parent, skipGlobalPaths)
+
+    if (paths === null) {
+      paths = []
+    }
   }
 
   return findPath(request, paths, isMain, fields, exts)
