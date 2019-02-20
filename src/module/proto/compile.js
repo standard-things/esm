@@ -8,8 +8,10 @@ import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
 import Module from "../../module.js"
+import OwnProxy from "../../own/proxy.js"
 import Package from "../../package.js"
 import RealModule from "../../real/module.js"
+import SafeObject from "../../safe/object.js"
 
 import _compile from "../internal/compile.js"
 import createInlineSourceMap from "../../util/create-inline-source-map.js"
@@ -20,7 +22,10 @@ import makeRequireFunction from "../internal/make-require-function.js"
 import maskFunction from "../../util/mask-function.js"
 import realProcess from "../../real/process.js"
 import realVM from "../../real/vm.js"
+import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
+import staticWrap from "../static/wrap.js"
+import staticWrapper from "../static/wrapper.js"
 import stripShebang from "../../util/strip-shebang.js"
 import validateString from "../../util/validate-string.js"
 
@@ -37,10 +42,19 @@ const {
   MODE_STRICT
 } = PACKAGE
 
+const compileFunctionParams = [
+  "exports",
+  "require",
+  "module",
+  "__filename",
+  "__dirname"
+]
+
 const RealProto = RealModule.prototype
 
 let resolvedArgv
 let useBufferArg
+let useLegacyWrapper
 let useRunInContext
 
 const compile = maskFunction(function (content, filename) {
@@ -72,6 +86,62 @@ const compile = maskFunction(function (content, filename) {
     return result
   }
 
+  if (useLegacyWrapper === void 0) {
+    useLegacyWrapper = ! shared.support.vmCompileFunction
+
+    if (! useLegacyWrapper) {
+      const proxy = new OwnProxy(staticWrapper, {
+        defineProperty(staticWrapper, name, descriptor) {
+          useLegacyWrapper = true
+          SafeObject.defineProperty(staticWrapper, name, descriptor)
+
+          return true
+        },
+        set(staticWrapper, name, value, receiver) {
+          useLegacyWrapper = true
+
+          if (receiver === proxy) {
+            receiver = staticWrapper
+          }
+
+          return Reflect.set(staticWrapper, name, value, receiver)
+        }
+      })
+
+      Reflect.defineProperty(Module, "wrap", {
+        configurable: true,
+        enumerable: true,
+        get: () => staticWrap,
+        set(value) {
+          useLegacyWrapper = true
+          setProperty(this, "wrap", value)
+        }
+      })
+
+      Reflect.defineProperty(Module, "wrapper", {
+        configurable: true,
+        enumerable: true,
+        get: () => proxy,
+        set(value) {
+          useLegacyWrapper = true
+          setProperty(this, "wrapper", value)
+        }
+      })
+    }
+  }
+
+  const { compileData } = entry
+
+  let cachedData
+
+  if (compileData !== null) {
+    const { scriptData } = compileData
+
+    if (scriptData !== null) {
+      cachedData = scriptData
+    }
+  }
+
   let preparedContent = stripShebang(content)
 
   if (realProcess._breakFirstLine &&
@@ -100,53 +170,6 @@ const compile = maskFunction(function (content, filename) {
     }
   }
 
-  const { compileData } = entry
-
-  let cachedData
-
-  if (compileData !== null) {
-    const { scriptData } = compileData
-
-    if (scriptData !== null) {
-      cachedData = scriptData
-    }
-  }
-
-  let scriptOptions
-
-  if (shared.support.createCachedData) {
-    scriptOptions = {
-      cachedData,
-      filename
-    }
-  } else {
-    scriptOptions = {
-      cachedData,
-      filename,
-      produceCachedData: true
-    }
-  }
-
-  const { cachePath } = entry.package
-  const script = new realVM.Script(Module.wrap(preparedContent), scriptOptions)
-
-  if (cachePath !== "") {
-    const { pendingScripts } = shared
-
-    let scripts = pendingScripts.get(cachePath)
-
-    if (scripts === void 0) {
-      scripts = new Map
-      pendingScripts.set(cachePath, scripts)
-    }
-
-    scripts.set(entry.cacheName, script)
-  }
-
-  if (useRunInContext === void 0) {
-    useRunInContext = shared.unsafeGlobal !== shared.defaultGlobal
-  }
-
   const exported = this.exports
 
   const args = [
@@ -165,8 +188,62 @@ const compile = maskFunction(function (content, filename) {
     }
 
     if (useBufferArg) {
+      useLegacyWrapper = true
       args.push(shared.external.Buffer)
     }
+  }
+
+  if (useRunInContext === void 0) {
+    useRunInContext = shared.unsafeGlobal !== shared.defaultGlobal
+
+    if (useRunInContext) {
+      useLegacyWrapper = true
+    }
+  }
+
+  let scriptOptions
+
+  if (useLegacyWrapper &&
+      shared.support.createCachedData) {
+    scriptOptions = {
+      cachedData,
+      filename
+    }
+  } else {
+    scriptOptions = {
+      cachedData,
+      filename,
+      produceCachedData: true
+    }
+  }
+
+  let compiledWrapper
+  let script
+
+  if (useLegacyWrapper) {
+    script = new realVM.Script(Module.wrap(preparedContent), scriptOptions)
+
+    compiledWrapper = useRunInContext
+      ? script.runInContext(shared.unsafeContext, { filename })
+      : script.runInThisContext({ filename })
+  } else {
+    script = realVM.compileFunction(preparedContent, compileFunctionParams, scriptOptions)
+    compiledWrapper = script
+  }
+
+  const { cachePath } = entry.package
+
+  if (cachePath !== "") {
+    const { pendingScripts } = shared
+
+    let scripts = pendingScripts.get(cachePath)
+
+    if (scripts === void 0) {
+      scripts = new Map
+      pendingScripts.set(cachePath, scripts)
+    }
+
+    scripts.set(entry.cacheName, script)
   }
 
   const { moduleState } = shared
@@ -176,10 +253,6 @@ const compile = maskFunction(function (content, filename) {
     moduleState.statFast = new Map
     moduleState.statSync = new Map
   }
-
-  const compiledWrapper = useRunInContext
-    ? script.runInContext(shared.unsafeContext, { filename })
-    : script.runInThisContext({ filename })
 
   const result = Reflect.apply(compiledWrapper, exported, args)
 
