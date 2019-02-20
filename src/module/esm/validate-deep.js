@@ -35,10 +35,10 @@ function init() {
     seen.add(entry)
 
     for (const name in children) {
-      const entry = children[name]
+      const childEntry = children[name]
 
-      if (entry.type === TYPE_ESM) {
-        validateDeep(entry, seen)
+      if (childEntry.type === TYPE_ESM) {
+        validateDeep(childEntry, seen)
       }
     }
   }
