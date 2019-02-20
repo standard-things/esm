@@ -79,10 +79,19 @@ function findPath(request, paths, isMain = false, fields, exts) {
     return cached
   }
 
+  const useRealpath = isMain
+    ? resolveSymlinksMain
+    : resolveSymlinks
+
   const isAbs = isAbsolute(request)
 
   if (isAbs) {
-    paths = [""]
+    if (useRealpath) {
+      paths = [dirname(request)]
+      request = basename(request)
+    } else {
+      paths = [request]
+    }
   } else if (! Array.isArray(paths) ||
              paths.length === 0) {
     return ""
@@ -104,38 +113,28 @@ function findPath(request, paths, isMain = false, fields, exts) {
     trailingSlash = isSep(code)
   }
 
-  const useRealpath = isMain
-    ? resolveSymlinksMain
-    : resolveSymlinks
-
-  for (let curPath of paths) {
-    if (typeof curPath === "string" &&
-        curPath !== "" &&
+  for (const curPath of paths) {
+    if (! isAbs &&
         statFast(curPath) !== 1) {
       continue
     }
 
+    let thePath = curPath
+
     if (useRealpath) {
-      if (isAbs) {
-        curPath = dirname(request)
-        request = basename(request)
-      }
+      thePath = realpath(curPath)
 
-      curPath = realpath(curPath)
-
-      if (curPath === "") {
+      if (thePath === "") {
         continue
       }
     }
 
-    let thePath
-
     if (isAbs) {
-      thePath = useRealpath
-        ? curPath + sep + request
-        : request
+      if (useRealpath) {
+        thePath += sep + request
+      }
     } else {
-      thePath = resolve(curPath, request)
+      thePath = resolve(thePath, request)
     }
 
     let rc = -1
@@ -191,6 +190,7 @@ function findPath(request, paths, isMain = false, fields, exts) {
 
     if (filename !== "") {
       cache.set(cacheKey, filename)
+
       return filename
     }
   }
