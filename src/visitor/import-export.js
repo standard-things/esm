@@ -179,14 +179,12 @@ function init() {
       for (const specifier of specifiers) {
         const { type } = specifier
 
-        let importsName
+        let importsName = "*"
 
         if (type === "ImportSpecifier") {
           importsName = specifier.imported.name
         } else if (type === "ImportDefaultSpecifier") {
           importsName = "default"
-        } else {
-          importsName = "*"
         }
 
         let localNames = imports.get(importsName)

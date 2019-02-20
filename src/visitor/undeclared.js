@@ -69,15 +69,12 @@ function init() {
           return
         }
 
-        let prefix
-        let suffix
+        let prefix = ""
+        let suffix = ""
 
         if (parent.type === "NewExpression") {
           prefix = "("
           suffix = ")"
-        } else {
-          prefix = ""
-          suffix = ""
         }
 
         overwrite(

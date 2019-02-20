@@ -109,14 +109,12 @@ class Package {
   constructor(dirPath, range, options) {
     options = Package.createOptions(options)
 
-    let cachePath
+    let cachePath = ""
 
     if (typeof options.cache === "string") {
       cachePath = resolve(dirPath, options.cache)
     } else if (options.cache !== false) {
       cachePath = dirPath + sep + "node_modules" + sep + ".cache" + sep + "esm"
-    } else {
-      cachePath = ""
     }
 
     const { dir } = shared.package

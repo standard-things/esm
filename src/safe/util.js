@@ -9,11 +9,9 @@ function init() {
   const { custom, defaultOptions } = safeUtil.inspect
   const { types } = safeUtil
 
-  let defaultInspectOptions
+  let defaultInspectOptions = defaultOptions
 
-  if (isObjectLike(defaultOptions)) {
-    defaultInspectOptions = defaultOptions
-  } else {
+  if (! isObjectLike(defaultInspectOptions)) {
     defaultInspectOptions = {
       breakLength: 60,
       colors: false,

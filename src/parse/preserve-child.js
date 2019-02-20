@@ -7,7 +7,7 @@ function init() {
     const childStart = child.start
     const parentStart = parent.start
 
-    let indentation
+    let indentation = ""
 
     if (childStart > visitor.firstLineBreakPos) {
       const count = childStart - parentStart
@@ -15,8 +15,6 @@ function init() {
       indentation = count === 7
         ? "       "
         : " ".repeat(count)
-    } else {
-      indentation = ""
     }
 
     return overwrite(visitor, parentStart, childStart, indentation)
