@@ -268,6 +268,15 @@ function init() {
     return utilSatisfies(safeProcess.version, ">=10")
   })
 
+  setDeferred(support, "vmCompileFunction", () => {
+    const {
+      safeProcess,
+      utilSatisfies
+    } = shared.module
+
+    return utilSatisfies(safeProcess.version, ">=10.10")
+  })
+
   setDeferred(utilBinding, "errorDecoratedSymbol", () => {
     const {
       binding,
