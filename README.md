@@ -173,7 +173,7 @@ Specify options with one of the following:
 <tr>
   <td valign="top"><code>"await": false</code></td>
   <td>
-    <p>A boolean for top-level <a href="https://node.green/#ES2018-features-Asynchronous-Iterators-async-generators"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>. <em>(Node 10+)</em></p>
+    <p>A boolean for <a href="https://github.com/tc39/proposal-top-level-await">top-level <code>await</code></a> in modules without ESM exports. <em>(Node 10+)</em></p>
   </td>
 </tr>
 <tr>
