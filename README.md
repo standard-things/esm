@@ -83,13 +83,7 @@ Specify options with one of the following:
   <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
-  <td valign="top"><code>"await":</code></td>
-  <td>
-    <p>A boolean for top-level <a href="https://node.green/#ES2018-features-Asynchronous-Iterators-async-generators"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>. <em>(Node 10+)</em></p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"cjs":</code></td>
+  <td valign="top"><code>"cjs":true</code></td>
   <td>
     <p>A boolean or object for toggling CJS features in ESM.</p>
     <details>
@@ -99,51 +93,57 @@ Specify options with one of the following:
         <td colspan="2"><code>{</code></td>
       </tr>
       <tr>
-        <td valign="top"><code>"cache":</code></td>
+        <td valign="top"><code>"cache":true</code></td>
         <td>
           <p>A boolean for storing ES modules in <code>require.cache</code>.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"dedefault":</code></td>
-        <td>
-          <p>A boolean to export a default without the dangling <code>require().default`</code>.</p>
-        </td>
-      </tr>
-      <tr>
-        <td valign="top"><code>"esModule":</code></td>
+        <td valign="top"><code>"esModule":true</code></td>
         <td>
           <p>A boolean for <code>__esModule</code> interoperability.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"extensions":</code></td>
+        <td valign="top"><code>"extensions":true</code></td>
         <td>
           <p>A boolean for respecting <code>require.extensions</code> in ESM.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"mutableNamespace":</code></td>
+        <td valign="top"><code>"mutableNamespace":true</code></td>
         <td>
           <p>A boolean for mutable <a href="https://ponyfoo.com/articles/es6-modules-in-depth#import-all-the-things">namespace objects</a>.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"namedExports":</code></td>
+        <td valign="top"><code>"namedExports":true</code></td>
         <td>
           <p>A boolean for <a href="https://ponyfoo.com/articles/es6-modules-in-depth#importing-named-exports">importing named exports</a> of CJS modules.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"paths":</code></td>
+        <td valign="top"><code>"paths":true</code></td>
         <td>
           <p>A boolean for following CJS <a href="https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies">path rules</a> in ESM.</p>
         </td>
       </tr>
       <tr>
-        <td valign="top"><code>"vars":</code></td>
+        <td valign="top"><code>"vars":true</code></td>
         <td>
           <p>A boolean for <code>__dirname</code>, <code>__filename</code>, and <code>require</code> in ESM.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"dedefault":false</code></td>
+        <td>
+          <p>A boolean for requiring ES modules without the dangling <code>require().default</code>.</p>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><code>"topLevelReturn":false</code></td>
+        <td>
+          <p>A boolean for top-level <code>return</code> support.</p>
         </td>
       </tr>
       <tr>
@@ -154,19 +154,13 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"force":</code></td>
+  <td valign="top"><code>"mainFields":["main"]</code></td>
   <td>
-    <p>A boolean to apply these options to all module loads.</p>
+    <p>An array of fields checked when importing a package.</p>
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"mainFields":</code></td>
-  <td>
-    <p>An array of fields, e.g. <code>["main"]</code>, checked when importing a package.</p>
-  </td>
-</tr>
-<tr>
-  <td valign="top"><code>"mode":</code></td>
+  <td valign="top"><code>"mode":"auto"</code></td>
   <td>
     <p>A string mode:</p>
     <ul>
@@ -177,7 +171,19 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"wasm":</code></td>
+  <td valign="top"><code>"await": false</code></td>
+  <td>
+    <p>A boolean for top-level <a href="https://node.green/#ES2018-features-Asynchronous-Iterators-async-generators"><code>await</code></a> in modules <a href="https://github.com/mylesborins/proposal-top-level-await/#optional-constraint-top-level-await-can-only-be-used-in-modules-without-exports">without ESM exports</a>. <em>(Node 10+)</em></p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"force":false</code></td>
+  <td>
+    <p>A boolean to apply these options to all module loads.</p>
+  </td>
+</tr>
+<tr>
+  <td valign="top"><code>"wasm":false</code></td>
   <td>
     <p>A boolean for <a href="https://nodejs.org/api/globals.html#globals_webassembly">WebAssembly</a> module support. <em>(Node 8+)</em></p>
   </td>
@@ -195,13 +201,13 @@ DevOpts
   <td colspan="2"><code>{</code></td>
 </tr>
 <tr>
-  <td valign="top"><code>"cache":</code></td>
+  <td valign="top"><code>"cache":true</code></td>
   <td>
     <p>A boolean for toggling cache creation or cache directory path.</p>
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"sourceMap":</code></td>
+  <td valign="top"><code>"sourceMap":false</code></td>
   <td>
     <p>A boolean for including inline source maps.</p>
   </td>
