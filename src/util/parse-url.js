@@ -1,4 +1,4 @@
-import { URL, parse as legacyParse } from "../safe/url.js"
+import { URL, parse } from "../safe/url.js"
 
 import CHAR_CODE from "../constant/char-code.js"
 
@@ -9,7 +9,7 @@ function init() {
     FORWARD_SLASH
   } = CHAR_CODE
 
-  const useStandard = !! URL
+  const useURL = typeof URL === "function"
 
   const legacyNames = [
     "hash",
@@ -22,7 +22,15 @@ function init() {
     "search"
   ]
 
-  function parse(url) {
+  function parseURL(url) {
+    const cache = shared.memoize.utilParseURL
+
+    let cached = cache.get(url)
+
+    if (cached !== void 0) {
+      return cached
+    }
+
     if (typeof url === "string" &&
         url.length > 1 &&
         url.charCodeAt(0) === FORWARD_SLASH &&
@@ -31,11 +39,17 @@ function init() {
       url = "file:" + url
     }
 
-    if (useStandard) {
-      return new URL(url)
-    }
+    cached = useURL
+      ? new URL(url)
+      : legacyFallback(url)
 
-    const result = legacyParse(url)
+    cache.set(url, cached)
+
+    return cached
+  }
+
+  function legacyFallback(url) {
+    const result = parse(url)
 
     for (const name of legacyNames) {
       if (typeof result[name] !== "string") {
@@ -44,20 +58,6 @@ function init() {
     }
 
     return result
-  }
-
-  function parseURL(url) {
-    const cacheKey = typeof url === "string" ? url : ""
-    const cache = shared.memoize.utilParseURL
-
-    let cached = cache.get(cacheKey)
-
-    if (cached === void 0) {
-      cached = parse(url)
-      cache.set(cacheKey, cached)
-    }
-
-    return cached
   }
 
   return parseURL
