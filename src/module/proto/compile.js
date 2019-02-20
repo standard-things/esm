@@ -22,6 +22,7 @@ import realProcess from "../../real/process.js"
 import realVM from "../../real/vm.js"
 import shared from "../../shared.js"
 import stripShebang from "../../util/strip-shebang.js"
+import validateString from "../../util/validate-string.js"
 
 const {
   STATE_INITIAL,
@@ -43,6 +44,9 @@ let useBufferArg
 let useRunInContext
 
 const compile = maskFunction(function (content, filename) {
+  validateString(content, "content")
+  validateString(filename, "filename")
+
   const entry = Entry.get(this)
   const { state } = entry
   const isInitial = state === STATE_INITIAL

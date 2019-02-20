@@ -9,10 +9,13 @@ import RealModule from "../../real/module.js"
 import loader from "../cjs/loader.js"
 import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
+import validateString from "../../util/validate-string.js"
 
 const RealProto = RealModule.prototype
 
 const load = maskFunction(function (filename) {
+  validateString(filename, "filename")
+
   if (this.loaded) {
     throw new shared.external.Error("Module already loaded: " + this.id)
   }
