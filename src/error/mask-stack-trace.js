@@ -73,6 +73,8 @@ function init() {
     Reflect.defineProperty(error, "stack", {
       configurable: true,
       get() {
+        // Prevent re-entering the getter by triggering the setter to convert
+        // `error.stack` from an accessor property to a data property.
         this.stack = ""
 
         const message = toString(get(this, "message"))

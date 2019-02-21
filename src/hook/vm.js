@@ -214,6 +214,8 @@ function hook(vm) {
     const _inspect = realUtil.inspect
 
     setGetter(realUtil, "inspect", function () {
+      // Prevent re-entering the getter by triggering the setter to convert
+      // `util.inspect()` from an accessor property to a data property.
       this.inspect = inspect
 
       // The first getter call occurs in Node's lib/repl.js as an assignment
@@ -276,6 +278,8 @@ function createAddBuiltinModules(entry) {
       Reflect.defineProperty(context, name, {
         configurable: true,
         get() {
+          // Prevent re-entering the getter by triggering the setter to convert
+          // `context[name]` from an accessor property to a data property.
           this[name] = void 0
 
           const exported = req(name)
