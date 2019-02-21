@@ -78,50 +78,44 @@ function init() {
       }
     }
 
-    const builtinDescriptors = new Map
-    const builtinNames = []
+    const descriptors = new Map
 
     for (const name of possibleBuiltins) {
-      if (Reflect.has(context, name)) {
-        builtinDescriptors.set(name, Reflect.getOwnPropertyDescriptor(context, name))
-        builtinNames.push(name)
+      if (has(context, name)) {
+        descriptors.set(name, Reflect.getOwnPropertyDescriptor(context, name))
 
         // Delete shadowed builtins to expose those of its realm.
         Reflect.deleteProperty(context, name)
       }
     }
 
-    const { length } = builtinNames
-
-    if (length === 0) {
+    if (descriptors.size === 0) {
       return context
     }
 
     const realmBuiltins = new Script(
       "({" +
       (() => {
-        const lastIndex = length - 1
+        const names = descriptors.keys()
 
+        let status
         let code = ""
-        let i = -1
 
-        while (++i < length) {
+        do {
+          status = names.next()
+
           code +=
-            toBuiltinPropertySnippet(builtinNames[i]) +
-            (i === lastIndex ? "" : ",")
-        }
+            toBuiltinPropertySnippet(status.value) +
+            (status.done ? "" : ",")
+        } while (! status.done)
 
         return code
       })() +
       "})"
     ).runInContext(context)
 
-    for (const name of builtinNames) {
-      const descriptor = builtinDescriptors.get(name)
-
-      if (descriptor !== void 0) {
-        Reflect.defineProperty(context, name, descriptor)
-      }
+    descriptors.forEach((descriptor, name) => {
+      Reflect.defineProperty(context, name, descriptor)
 
       const builtin = context[name]
       const realmBuiltin = realmBuiltins[name]
@@ -129,7 +123,7 @@ function init() {
       if (builtin === realmBuiltin ||
           ! isObjectLike(builtin) ||
           ! isObjectLike(realmBuiltin)) {
-        continue
+        return
       }
 
       if (name === "Error") {
@@ -166,14 +160,14 @@ function init() {
           }
         }
       }
-    }
+    })
 
     return context
   }
 
   function getDeprecatedGlobalDescriptor(name, context) {
     const depCode = "DEP0016"
-    const depMessage =  "'" + name + "' is deprecated, use 'global'"
+    const depMessage = "'" + name + "' is deprecated, use 'global'"
 
     return {
       configurable: true,
