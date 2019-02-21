@@ -214,11 +214,12 @@ function hook(vm) {
     const _inspect = realUtil.inspect
 
     setGetter(realUtil, "inspect", function () {
-      // The first get occurs in Node's lib/repl.js as an assignment to
-      // `repl.writer()`. It needs to be the original `util.inspect()`
+      this.inspect = inspect
+
+      // The first getter call occurs in Node's lib/repl.js as an assignment
+      // to `repl.writer()`. It needs to be the original `util.inspect()`
       // for ANSI coloring to be enabled.
       // https://github.com/nodejs/node/blob/v9.11.1/lib/repl.js#L377-L382
-      this.inspect = inspect
       return _inspect
     })
 
@@ -264,17 +265,8 @@ function createAddBuiltinModules(entry) {
   return function addBuiltinModules(context) {
     const req = entry.require
 
-    Reflect.defineProperty(context, "console", {
-      configurable: true,
-      value: req("console"),
-      writable: true
-    })
-
-    Reflect.defineProperty(context, "process", {
-      configurable: true,
-      value: req("process"),
-      writable: true
-    })
+    exposeObject(context, "console", req("console"))
+    exposeObject(context, "process", req("process"))
 
     for (const name of lazyModules) {
       const set = function (value) {
@@ -300,6 +292,17 @@ function createAddBuiltinModules(entry) {
       })
     }
   }
+}
+
+function exposeObject(context, name, value) {
+  // Objects exposed on the global object must have the property attributes
+  // { [[Configurable]]: true, [[Enumerable]]: false, [[Writable]]: true }.
+  // https://heycam.github.io/webidl/#es-namespaces
+  Reflect.defineProperty(context, name, {
+    configurable: true,
+    value,
+    writable: true
+  })
 }
 
 function tryWrapper(func, args, content) {
