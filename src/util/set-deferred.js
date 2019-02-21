@@ -13,6 +13,7 @@ const emptyArray = []
 function setDeferred(object, name, getter) {
   setGetter(object, name, function () {
     this[name] = void 0
+
     return this[name] = Reflect.apply(getter, this, emptyArray)
   })
 
