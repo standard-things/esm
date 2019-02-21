@@ -11,17 +11,6 @@ import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
-  const builtinByCtor = new Set([
-    "Array",
-    "BigInt",
-    "Boolean",
-    "Function",
-    "Number",
-    "Object",
-    "RegExp",
-    "String"
-  ])
-
   const possibleBuiltins = [
     "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array",
     "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError",
@@ -94,13 +83,11 @@ function init() {
 
     for (const name of possibleBuiltins) {
       if (Reflect.has(context, name)) {
+        builtinDescriptors.set(name, Reflect.getOwnPropertyDescriptor(context, name))
         builtinNames.push(name)
 
-        if (! builtinByCtor.has(name)) {
-          // Delete shadowed builtins to expose those of its realm.
-          builtinDescriptors.set(name, Reflect.getOwnPropertyDescriptor(context, name))
-          Reflect.deleteProperty(context, name)
-        }
+        // Delete shadowed builtins to expose those of its realm.
+        Reflect.deleteProperty(context, name)
       }
     }
 
@@ -110,11 +97,11 @@ function init() {
       return context
     }
 
-    const lastIndex = length - 1
-
     const realmBuiltins = new Script(
       "({" +
       (() => {
+        const lastIndex = length - 1
+
         let code = ""
         let i = -1
 
@@ -167,9 +154,10 @@ function init() {
 
         if (has(realmBuiltin, "prototype")) {
           const { prototype } = realmBuiltin
-          const builtinProto = builtin.prototype
 
           if (isObjectLike(prototype)) {
+            const builtinProto = builtin.prototype
+
             if (has(builtinProto, "constructor")) {
               prototype.constructor = builtinProto.constructor
             }
