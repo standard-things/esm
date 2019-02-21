@@ -2,14 +2,17 @@ import OwnProxy from "../own/proxy.js"
 
 import builtinEntries from "../builtin-entries.js"
 import builtinReflect from "./reflect.js"
-import isObjectEmpty from "../util/is-object-empty.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import isUpdatableGet from "../util/is-updatable-get.js"
 import shared from "../shared.js"
 
 function init() {
-  const globals = {
-    __proto__: null,
+  const globalsLookup = new Set([
+    "Reflect",
+    "console"
+  ])
+
+  const globalsMap = {
     Reflect: builtinReflect,
     get console() {
       return builtinEntries.console.module.exports
@@ -24,8 +27,8 @@ function init() {
 
       const value = Reflect.get(unsafeGlobal, name, receiver)
 
-      if (Reflect.has(globals, name)) {
-        const newValue = globals[name]
+      if (globalsLookup.has(name)) {
+        const newValue = globalsMap[name]
 
         if (newValue !== value &&
             isUpdatableGet(unsafeGlobal, name)) {
@@ -38,9 +41,9 @@ function init() {
     getOwnPropertyDescriptor(unsafeGlobal, name) {
       const descriptor = Reflect.getOwnPropertyDescriptor(unsafeGlobal, name)
 
-      if (Reflect.has(globals, name) &&
+      if (globalsLookup.has(name) &&
           isUpdatableDescriptor(descriptor)) {
-        descriptor.value = globals[name]
+        descriptor.value = globalsMap[name]
       }
 
       return descriptor
@@ -51,10 +54,10 @@ function init() {
       }
 
       if (Reflect.set(unsafeGlobal, name, value, receiver)) {
-        if (Reflect.has(globals, name)) {
-          Reflect.deleteProperty(globals, name)
+        if (globalsLookup.has(name)) {
+          globalsLookup.delete(name)
 
-          if (isObjectEmpty(globals)) {
+          if (globalsLookup.size === 0) {
             Reflect.deleteProperty(handler, "get")
             Reflect.deleteProperty(handler, "getOwnPropertyDescriptor")
             Reflect.deleteProperty(handler, "set")
