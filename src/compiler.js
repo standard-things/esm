@@ -134,6 +134,9 @@ function init() {
       const { runtimeName } = options
       const topIdentifiers = top.identifiers
 
+      // Delete extraneous properties so they aren't needlessly visited.
+      Reflect.deleteProperty(ast, "inModule")
+      Reflect.deleteProperty(ast, "strict")
       Reflect.deleteProperty(ast, "top")
 
       const magicString = new MagicString(code)
