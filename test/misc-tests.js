@@ -154,10 +154,10 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support `Module`", () => {
-      const actual = new Module
+      const mod = new Module
 
-      assert.ok(actual instanceof Module)
-      assert.strictEqual(actual.constructor, Module)
+      assert.ok(mod instanceof Module)
+      assert.strictEqual(mod.constructor, Module)
     })
 
     it("should support subclassing `stream.Stream`", () => {
