@@ -474,26 +474,24 @@ class Entry {
       this._loaded = LOAD_COMPLETED
       this.assignExportsToNamespace(names)
 
-      if (this.extname !== ".mjs") {
-        const exportDefaultOnly =
-          cjs.esModule &&
-          names.length === 1 &&
-          names[0] === "default"
+      const exportDefaultOnly =
+        cjs.esModule &&
+        names.length === 1 &&
+        names[0] === "default"
 
-        if (cjs.mutableNamespace &&
-            ! exportDefaultOnly) {
-          this.module.exports = proxyExports(this)
-        }
+      if (cjs.mutableNamespace &&
+          ! exportDefaultOnly) {
+        this.module.exports = proxyExports(this)
+      }
 
-        const exported = this.exports
+      const exported = this.exports
 
-        if (cjs.dedefault &&
-            exportDefaultOnly) {
-          this.module.exports = exported.default
-        } else if (cjs.esModule &&
-                   ! Reflect.has(this.getters, "__esModule")) {
-          Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
-        }
+      if (cjs.dedefault &&
+          exportDefaultOnly) {
+        this.module.exports = exported.default
+      } else if (cjs.esModule &&
+                  ! Reflect.has(this.getters, "__esModule")) {
+        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     }
 
