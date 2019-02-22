@@ -1,9 +1,9 @@
+import { Console } from "console"
 import JSON6 from "json-6"
 import Module from "module"
 import SemVer from "semver"
 
 import assert from "assert"
-import console from "console"
 import createNamespace from "./create-namespace.js"
 import fs from "fs-extra"
 import * as fsExtraNs from "fs-extra"
@@ -115,16 +115,13 @@ describe("miscellaneous tests", () => {
     )
 
     it("should support `console.Console`", () => {
-      const { Console } = console
-      const actual = new Console(process.stdout)
+      const console = new Console(process.stdout)
 
-      assert.ok(actual instanceof Console)
-      assert.strictEqual(actual.constructor, Console)
+      assert.ok(console instanceof Console)
+      assert.strictEqual(console.constructor, Console)
     })
 
     it("should support subclassing `console.Console`", () => {
-      const { Console } = console
-
       class Sub extends Console {
         constructor(...args) {
           super(...args)
@@ -132,15 +129,16 @@ describe("miscellaneous tests", () => {
         }
       }
 
-      const actual = new Sub(process.stdout)
+      const console = new Sub(process.stdout)
 
-      assert.ok(actual instanceof Console)
-      assert.ok(actual instanceof Sub)
-      assert.ok(Reflect.has(actual, "_stdout"))
-      assert.strictEqual(actual.sub, "sub")
+      assert.ok(console instanceof Console)
+      assert.ok(console instanceof Sub)
+      assert.ok(Reflect.has(console, "_stdout"))
+      assert.strictEqual(console.sub, "sub")
     })
 
     it("should not have constructable `console` methods", () => {
+      const console = new Console(process.stdout)
       const names = Object.keys(console)
 
       for (const name of names) {
@@ -256,6 +254,43 @@ describe("miscellaneous tests", () => {
       mod.loaded = true
 
       assert.deepEqual(mod.exports, { a: "a" })
+    })
+
+    it("should support overwriting globals", () => {
+      const consoleDescriptor = Reflect.getOwnPropertyDescriptor(global, "console")
+      const reflectDescriptor = Reflect.getOwnPropertyDescriptor(global, "Reflect")
+
+      Reflect.defineProperty(global, "console", {
+        configurable: true,
+        value: {
+          dir() {
+            return "mock"
+          }
+        },
+        writable: true
+      })
+
+      Reflect.defineProperty(global, "Reflect", {
+        configurable: true,
+        value: {
+          get() {
+            return "mock"
+          }
+        },
+        writable: true
+      })
+
+      const object = {}
+
+      const actual = [
+        console.dir(object),
+        Reflect.get(object, "a")
+      ]
+
+      Object.defineProperty(global, "console", consoleDescriptor)
+      Object.defineProperty(global, "Reflect", reflectDescriptor)
+
+      assert.deepStrictEqual(actual, ["mock", "mock"])
     })
   })
 
