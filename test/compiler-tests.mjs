@@ -448,20 +448,36 @@ describe("compiler tests", () => {
     }
   })
 
-  it("should transform `console` calls with identifier arguments", () => {
+  it("should transform `console` references and calls with identifier arguments", () => {
     const lines = [
+      "console",
       "console.a(b)",
-      'console["a"](b)'
+      'console.a("b", c)',
+      'console["a"](b)',
+      "new console.Console(a)",
+      "class C extends console.Console {}",
+      "const a = { console }",
+      "const a = { [console]: console }",
+      "const a = { console() { console } }",
+      "const a = () => console"
     ]
 
     const compiled = [
+      "_.g.console",
       "_.g.console.a(b)",
-      '_.g.console["a"](b)'
+      '_.g.console.a("b", c)',
+      '_.g.console["a"](b)',
+      "new _.g.console.Console(a)",
+      "class C extends _.g.console.Console {}",
+      "const a = { console:_.g.console }",
+      "const a = { [_.g.console]: _.g.console }",
+      "const a = { console() { _.g.console } }",
+      "const a = () => _.g.console"
     ]
 
     lines.forEach((line, index) => {
       const code = [
-        'import * as ns from "a"',
+        'import a from "a"',
         line
       ].join("\n")
 
@@ -476,49 +492,64 @@ describe("compiler tests", () => {
 
   it("should not transform other `console` use", () => {
     const lines = [
-      "console",
-      "console.log('a', 'b')",
-      'console.log("a", "b")',
-      "console.log(`a`, `b`)",
-      "new console.Console(a)",
-      "class C extends console.Console {}",
       "typeof console",
-      "const a = { console }",
-      "const a = { [console]: console }",
-      "const a = { console() { console } }",
-      "const a = () => console"
+      "console.a('b')",
+      'console.a("b", \'c\')',
+      'console.a("b", `c`)'
     ]
 
     lines.forEach((line) => {
-      for (const sourceType of sourceTypes) {
-        const result = Compiler.compile(line, { sourceType })
+      const code = [
+        'import a from "a"',
+        line
+      ].join("\n")
 
-        assert.strictEqual(result.code, line)
+      for (const sourceType of modernTypes) {
+        const result = Compiler.compile(code, { sourceType })
+        const actual = result.code.split("\n").pop()
+
+        assert.strictEqual(actual, line)
       }
     })
   })
 
-  it("should not transform shadowed `console` identifiers", () => {
+  it("should not transform `console` identifiers shadowed by arguments or variables", () => {
     const lines = [
-      'import console from "a"',
-      'import * as console from "a"',
-      "export let console = {}",
-      "let console = {}",
+      "let console = { a() {} }",
       "let a = (console) =>"
     ]
 
     lines.forEach((line) => {
       const code = [
+        'import a from "a"',
+        "{",
         line,
-        "console"
+        "console.a(b)",
+        "}"
       ].join("\n")
 
-      for (const sourceType of sourceTypes) {
-        if (sourceType === SCRIPT &&
-            /(im|ex)port/.test(code)) {
-          continue
-        }
+      for (const sourceType of modernTypes) {
+        const result = Compiler.compile(code, { sourceType })
 
+        assert.strictEqual(result.code.includes("_.g"), false)
+      }
+    })
+  })
+
+  it("should not transform `console` identifiers shadowed by `import` or `export` specifiers", () => {
+    const lines = [
+      'import console from "a"',
+      'import * as console from "a"',
+      "export let console = { a() {} }"
+    ]
+
+    lines.forEach((line) => {
+      const code = [
+        line,
+        "console.a(b)"
+      ].join("\n")
+
+      for (const sourceType of modernTypes) {
         const result = Compiler.compile(code, { sourceType })
 
         assert.strictEqual(result.code.includes("_.g"), false)

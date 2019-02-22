@@ -49,13 +49,7 @@ function init() {
 
       const args = node.arguments
 
-      if (args.length === 0) {
-        return
-      }
-
-      const parent = path.getParentNode()
-
-      if (! isIdentifer(object, parent) ||
+      if (args.length === 0 ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
@@ -83,6 +77,42 @@ function init() {
       this.magicString.prependLeft(object.start, this.runtimeName + ".g.")
 
       path.call(this, "visitWithoutReset", "arguments")
+    }
+
+    visitIdentifier(path) {
+      const node = path.getValue()
+      const { name } = node
+
+      if (! this.globals.has(name)) {
+        return
+      }
+
+      const parent = path.getParentNode()
+      const { type } = parent
+
+      if ((type === "UnaryExpression" &&
+           parent.operator === "typeof") ||
+          ! isIdentifer(node, parent) ||
+          isShadowed(path, name, shadowedMap)) {
+        return
+      }
+
+      if (name === "console") {
+        this.transforms |= TRANSFORMS_CONSOLE
+      } else if (name === "Reflect") {
+        this.transforms |= TRANSFORMS_REFLECT
+      }
+
+      let code = this.runtimeName + ".g."
+      let pos = node.start
+
+      if (type === "Property" &&
+          parent.shorthand) {
+        code = ":" + code + name
+        pos = node.end
+      }
+
+      this.magicString.prependLeft(pos, code)
     }
   }
 
