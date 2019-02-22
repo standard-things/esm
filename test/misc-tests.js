@@ -257,10 +257,11 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support overwriting globals", () => {
+      const { defineProperty } = Reflect
       const consoleDescriptor = Reflect.getOwnPropertyDescriptor(global, "console")
       const reflectDescriptor = Reflect.getOwnPropertyDescriptor(global, "Reflect")
 
-      Reflect.defineProperty(global, "console", {
+      defineProperty(global, "console", {
         configurable: true,
         value: {
           dir() {
@@ -270,7 +271,7 @@ describe("miscellaneous tests", () => {
         writable: true
       })
 
-      Reflect.defineProperty(global, "Reflect", {
+      defineProperty(global, "Reflect", {
         configurable: true,
         value: {
           get() {
@@ -280,15 +281,13 @@ describe("miscellaneous tests", () => {
         writable: true
       })
 
-      const object = {}
-
       const actual = [
-        console.dir(object),
-        Reflect.get(object, "a")
+        console.dir({}),
+        Reflect.get({}, "a")
       ]
 
-      Object.defineProperty(global, "console", consoleDescriptor)
-      Object.defineProperty(global, "Reflect", reflectDescriptor)
+      defineProperty(global, "console", consoleDescriptor)
+      defineProperty(global, "Reflect", reflectDescriptor)
 
       assert.deepStrictEqual(actual, ["mock", "mock"])
     })
