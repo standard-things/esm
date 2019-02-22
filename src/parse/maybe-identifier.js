@@ -1,4 +1,4 @@
-import isIdentifer from "./is-identifier.js"
+import isIdentifier from "./is-identifier.js"
 import shared from "../shared.js"
 
 function init() {
@@ -7,7 +7,7 @@ function init() {
 
     let parent = path.getParentNode()
 
-    if (! isIdentifer(node, parent)) {
+    if (! isIdentifier(node, parent)) {
       return
     }
 

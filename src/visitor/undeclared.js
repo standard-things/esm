@@ -2,7 +2,7 @@ import COMPILER from "../constant/compiler.js"
 
 import Visitor from "../visitor.js"
 
-import isIdentifer from "../parse/is-identifier.js"
+import isIdentifier from "../parse/is-identifier.js"
 import isShadowed from "../parse/is-shadowed.js"
 import maybeIdentifier from "../parse/maybe-identifier.js"
 import overwrite from "../parse/overwrite.js"
@@ -36,7 +36,7 @@ function init() {
       const { name } = node
 
       if (! this.undeclared.has(name) ||
-          ! isIdentifer(node, parent) ||
+          ! isIdentifier(node, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return
       }

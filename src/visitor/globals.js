@@ -2,7 +2,7 @@ import COMPILER from "../constant/compiler.js"
 
 import Visitor from "../visitor.js"
 
-import isIdentifer from "../parse/is-identifier.js"
+import isIdentifier from "../parse/is-identifier.js"
 import isShadowed from "../parse/is-shadowed.js"
 import shared from "../shared.js"
 
@@ -92,7 +92,7 @@ function init() {
 
       if ((type === "UnaryExpression" &&
            parent.operator === "typeof") ||
-          ! isIdentifer(node, parent) ||
+          ! isIdentifier(node, parent) ||
           isShadowed(path, name, shadowedMap)) {
         return
       }
