@@ -475,7 +475,7 @@ class Entry {
       this.assignExportsToNamespace(names)
 
       const exportDefaultOnly =
-        cjs.esModule &&
+        cjs.dedefault &&
         names.length === 1 &&
         names[0] === "default"
 
@@ -486,11 +486,10 @@ class Entry {
 
       const exported = this.exports
 
-      if (cjs.dedefault &&
-          exportDefaultOnly) {
+      if (exportDefaultOnly) {
         this.module.exports = exported.default
       } else if (cjs.esModule &&
-                  ! Reflect.has(this.getters, "__esModule")) {
+                 ! Reflect.has(this.getters, "__esModule")) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
       }
     }
