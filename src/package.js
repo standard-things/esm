@@ -512,6 +512,7 @@ function getInfo(dirPath, forceOptions) {
 
   if (basename(dirPath) === "node_modules") {
     cache.set(dirPath, null)
+
     return null
   }
 
@@ -533,6 +534,7 @@ function getInfo(dirPath, forceOptions) {
   }
 
   cache.set(dirPath, pkg)
+
   return pkg
 }
 

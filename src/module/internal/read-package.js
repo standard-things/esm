@@ -41,6 +41,7 @@ function init() {
 
       if (isObject(result)) {
         cache.set(cacheKey, result)
+
         return result
       }
     } catch (e) {

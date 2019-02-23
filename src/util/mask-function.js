@@ -90,9 +90,8 @@ function init() {
       toString
     }
 
-    cache
-      .set(func, cached)
-      .set(proxy, cached)
+    cache.set(func, cached)
+    cache.set(proxy, cached)
 
     return proxy
   }

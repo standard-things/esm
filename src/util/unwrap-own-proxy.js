@@ -26,6 +26,7 @@ function init() {
     }
 
     cache.set(value, unwrapped)
+
     return unwrapped
   }
 

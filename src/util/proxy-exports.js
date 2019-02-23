@@ -298,9 +298,8 @@ function init() {
       wrap: new WeakMap
     }
 
-    cache
-      .set(exported, cached)
-      .set(proxy, cached)
+    cache.set(exported, cached)
+    cache.set(proxy, cached)
 
     return proxy
   }

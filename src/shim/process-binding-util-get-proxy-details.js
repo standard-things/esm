@@ -71,6 +71,7 @@ function init() {
     } catch {}
 
     cache.set(utilBinding, result)
+
     return result
   }
 

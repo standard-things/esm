@@ -86,6 +86,7 @@ function init() {
     }
 
     cache.set(FuncProto, result)
+
     return result
   }
 
