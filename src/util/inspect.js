@@ -25,6 +25,7 @@ import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
 function init() {
   const PROXY_PREFIX = "Proxy ["
 
+  const emptyObject = {}
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
@@ -44,6 +45,8 @@ function init() {
       return Reflect.apply(safeInspect, this, args)
     }
 
+    value = prepareValue(value)
+
     options = typeof options === "boolean"
       ? { showHidden: true }
       : assign({}, options)
@@ -61,7 +64,7 @@ function init() {
       options.depth = depth
     }
 
-    args[0] = prepareValue(value)
+    args[0] = value
     args[1] = options
 
     const result = Reflect.apply(tryInspect, this, args)
@@ -75,7 +78,9 @@ function init() {
     options.customInspect = true
     options.showProxy = false
 
-    args[0] = wrap(value, options, customInspect, showProxy)
+    value = wrap(value, options, customInspect, showProxy)
+
+    args[0] = value
 
     return Reflect.apply(safeInspect, this, args)
   }
@@ -180,27 +185,29 @@ function init() {
     return ""
   }
 
-  function wrap(object, options, customInspect, showProxy, seen) {
+  function wrap(object, options, customInspect, showProxy, map) {
     if (! isWrappable(object)) {
       return object
     }
 
-    if (seen === void 0) {
-      seen = new Set
-    } else if (seen.has(object)) {
-      return object
+    if (map === void 0) {
+      map = new Map
+    } else {
+      const cached = map.get(object)
+
+      if (cached !== void 0) {
+        return cached
+      }
     }
 
-    seen.add(object)
-
-    const objectIsProxy = isProxy(object)
-    const objectIsOwnProxy = isOwnProxy(object)
-
+    let objectIsProxy
+    let objectIsOwnProxy
     let inspecting = false
 
     const proxy = new OwnProxy(object, {
       get(object, name, receiver) {
-        if (receiver === proxy) {
+        if (receiver === decoyProxy ||
+            receiver === proxy) {
           receiver = object
         }
 
@@ -240,6 +247,14 @@ function init() {
                 return formatNamespaceObject(object, contextAsOptions)
               }
 
+              if (objectIsOwnProxy === void 0) {
+                objectIsOwnProxy = isOwnProxy(object)
+              }
+
+              if (objectIsProxy === void 0) {
+                objectIsProxy = isProxy(object)
+              }
+
               if (! showProxy ||
                   ! objectIsProxy ||
                   objectIsOwnProxy) {
@@ -248,6 +263,7 @@ function init() {
                 }
 
                 contextAsOptions.showProxy = false
+
                 return safeInspect(proxy, contextAsOptions)
               }
 
@@ -272,7 +288,7 @@ function init() {
           const { value } = descriptor
 
           if (isObjectLike(value)) {
-            descriptor.value = wrap(value, options, customInspect, showProxy, seen)
+            descriptor.value = wrap(value, options, customInspect, showProxy, map)
           }
         }
 
@@ -280,7 +296,15 @@ function init() {
       }
     })
 
-    return proxy
+    // Wrap `proxy` in a decoy proxy so that `proxy` will be used as the
+    // unwrapped value to inspect.
+    const decoyProxy = new OwnProxy(proxy, emptyObject)
+
+    map.set(object, decoyProxy)
+    map.set(proxy, decoyProxy)
+    map.set(decoyProxy, decoyProxy)
+
+    return decoyProxy
   }
 
   return inspect
