@@ -3,6 +3,7 @@ import ENV from "./constant/env.js"
 import GenericArray from "./generic/array.js"
 import GenericObject from "./generic/object.js"
 import RealModule from "./real/module.js"
+import SafeModule from "./safe/module.js"
 
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
@@ -23,6 +24,7 @@ import staticWrap from "./module/static/wrap.js"
 import staticWrapper from "./module/static/wrapper.js"
 
 const {
+  ELECTRON,
   JEST
 } = ENV
 
@@ -43,7 +45,6 @@ const Module = maskFunction(function (id, parent) {
 }, RealModule)
 
 const _extensions = { __proto__: null }
-const { prototype } = Module
 
 Module._extensions = _extensions
 Module._findPath = staticFindPath
@@ -57,7 +58,13 @@ Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.createRequireFromPath = staticCreateRequireFromPath
 Module.wrap = staticWrap
-Module.wrapper = staticWrapper
+
+if (! ELECTRON ||
+    ! Array.isArray(SafeModule.wrapper)) {
+  Module.wrapper = staticWrapper
+}
+
+const { prototype } = Module
 
 prototype._compile = protoCompile
 prototype.constructor = Module

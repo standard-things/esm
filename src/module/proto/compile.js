@@ -89,7 +89,9 @@ const compile = maskFunction(function (content, filename) {
   }
 
   if (useLegacyWrapper === void 0) {
-    useLegacyWrapper = ! shared.support.vmCompileFunction
+    useLegacyWrapper =
+      ELECTRON ||
+      ! shared.support.vmCompileFunction
 
     if (! useLegacyWrapper) {
       const proxy = new OwnProxy(staticWrapper, {
@@ -186,11 +188,11 @@ const compile = maskFunction(function (content, filename) {
     args.push(realProcess, shared.unsafeGlobal)
 
     if (useBufferArg === void 0) {
-      useBufferArg = Module.wrap("").indexOf("Buffer") !== -1
+      const { wrap } = Module
 
-      if (useBufferArg) {
-        useLegacyWrapper = true
-      }
+      useBufferArg =
+        typeof wrap === "function" &&
+        String(wrap("")).indexOf("Buffer") !== -1
     }
 
     if (useBufferArg) {
