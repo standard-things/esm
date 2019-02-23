@@ -243,7 +243,7 @@ function tryCompile(caller, entry, content, options) {
     error = e
   }
 
-  entry.state = STATE_EXECUTION_COMPLETED
+  entry.state = STATE_INITIAL
 
   if (Loader.state.package.default.options.debug ||
       ! isStackTraceMaskable(error)) {
@@ -400,7 +400,7 @@ function tryRun(entry, filename) {
     return result
   }
 
-  entry.state = STATE_EXECUTION_COMPLETED
+  entry.state = STATE_INITIAL
 
   if (Loader.state.package.default.options.debug ||
       ! isStackTraceMaskable(error)) {

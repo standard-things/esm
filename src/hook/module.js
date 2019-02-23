@@ -33,6 +33,7 @@ import shared from "../shared.js"
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_INITIAL,
   STATE_PARSING_STARTED,
   TYPE_WASM
 } = ENTRY
@@ -105,8 +106,15 @@ function hook(Mod, parent) {
 
     const compileFallback = () => {
       entry.state = STATE_EXECUTION_STARTED
-      tryPassthru.call(this, func, args, pkg)
-      entry.state = STATE_EXECUTION_COMPLETED
+
+      let threw = true
+
+      try {
+        tryPassthru.call(this, func, args, pkg)
+        threw = false
+      } finally {
+        entry.state = threw ? STATE_INITIAL : STATE_EXECUTION_COMPLETED
+      }
     }
 
     if (entry._passthruCompile ||
@@ -283,31 +291,38 @@ function wasmCompiler(mod, filename) {
 
   mod.exports = exported
   entry.exports = exported
-  entry.state = STATE_PARSING_STARTED
   entry.type = TYPE_WASM
 
-  const wasmMod = new wasmModule(readFile(filename))
-  const descriptions = wasmModule.imports(wasmMod)
+  let threw = true
 
-  // Use a `null` [[Prototype]] for `importObject` because the lookup includes
-  // inherited properties.
-  const importObject = { __proto__: null }
+  try {
+    entry.state = STATE_PARSING_STARTED
 
-  entry.state = STATE_EXECUTION_STARTED
+    const wasmMod = new wasmModule(readFile(filename))
+    const descriptions = wasmModule.imports(wasmMod)
 
-  for (const description of descriptions) {
-    const request = description.module
-    const childEntry = esmParseLoad(request, mod)
+    // Use a `null` [[Prototype]] for `importObject` because the lookup
+    // includes inherited properties.
+    const importObject = { __proto__: null }
 
-    importObject[request] = childEntry.module.exports
-  }
+    entry.state = STATE_EXECUTION_STARTED
 
-  const wasmExported = new wasmInstance(wasmMod, importObject).exports
+    for (const description of descriptions) {
+      const request = description.module
+      const childEntry = esmParseLoad(request, mod)
 
-  entry.state = STATE_EXECUTION_COMPLETED
+      importObject[request] = childEntry.module.exports
+    }
 
-  for (const name in wasmExported) {
-    setGetter(exported, name, () => wasmExported[name])
+    const wasmExported = new wasmInstance(wasmMod, importObject).exports
+
+    for (const name in wasmExported) {
+      setGetter(exported, name, () => wasmExported[name])
+    }
+
+    threw = false
+  } finally {
+    entry.state = threw ? STATE_INITIAL : STATE_EXECUTION_COMPLETED
   }
 }
 
