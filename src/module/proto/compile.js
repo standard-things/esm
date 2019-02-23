@@ -31,7 +31,8 @@ import validateString from "../../util/validate-string.js"
 
 const {
   STATE_INITIAL,
-  STATE_PARSING_COMPLETED
+  STATE_PARSING_COMPLETED,
+  TYPE_ESM
 } = ENTRY
 
 const {
@@ -63,6 +64,7 @@ const compile = maskFunction(function (content, filename) {
 
   const entry = Entry.get(this)
   const { state } = entry
+  const isESM = entry.type === TYPE_ESM
   const isInitial = state === STATE_INITIAL
 
   if (entry.package.options.mode !== MODE_STRICT &&
@@ -185,10 +187,13 @@ const compile = maskFunction(function (content, filename) {
 
     if (useBufferArg === void 0) {
       useBufferArg = Module.wrap("").indexOf("Buffer") !== -1
+
+      if (useBufferArg) {
+        useLegacyWrapper = true
+      }
     }
 
     if (useBufferArg) {
-      useLegacyWrapper = true
       args.push(shared.external.Buffer)
     }
   }
@@ -201,33 +206,31 @@ const compile = maskFunction(function (content, filename) {
     }
   }
 
-  let scriptOptions
-
-  if (useLegacyWrapper &&
-      shared.support.createCachedData) {
-    scriptOptions = {
-      cachedData,
-      filename
-    }
-  } else {
-    scriptOptions = {
-      cachedData,
-      filename,
-      produceCachedData: true
-    }
-  }
-
   let compiledWrapper
   let script
 
-  if (useLegacyWrapper) {
-    script = new realVM.Script(Module.wrap(preparedContent), scriptOptions)
+  if (isESM ||
+      useLegacyWrapper) {
+    preparedContent = isESM
+      ? staticWrap(preparedContent)
+      : Module.wrap(preparedContent)
+
+    script = new realVM.Script(preparedContent, {
+      cachedData,
+      filename,
+      produceCachedData: ! shared.support.createCachedData
+    })
 
     compiledWrapper = useRunInContext
       ? script.runInContext(shared.unsafeContext, { filename })
       : script.runInThisContext({ filename })
   } else {
-    script = realVM.compileFunction(preparedContent, compileFunctionParams, scriptOptions)
+    script = realVM.compileFunction(preparedContent, compileFunctionParams, {
+      cachedData,
+      filename,
+      produceCachedData: true
+    })
+
     compiledWrapper = script
   }
 
