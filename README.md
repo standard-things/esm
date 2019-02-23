@@ -171,7 +171,7 @@ Specify options with one of the following:
   </td>
 </tr>
 <tr>
-  <td valign="top"><code>"await": false</code></td>
+  <td valign="top"><code>"await":false</code></td>
   <td>
     <p>A boolean for <a href="https://github.com/tc39/proposal-top-level-await">top-level <code>await</code></a> in modules without ESM exports. <em>(Node 10+)</em></p>
   </td>
