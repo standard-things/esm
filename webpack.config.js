@@ -98,6 +98,7 @@ const config = {
       }
     ]
   },
+  node: false,
   optimization: {
     minimizer: [
       new TerserPlugin({ terserOptions })
