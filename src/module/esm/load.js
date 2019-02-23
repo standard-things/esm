@@ -143,7 +143,7 @@ function tryLoader(entry, filename, parentEntry, cache, cacheKey) {
     threw = false
   } catch (e) {
     error = e
-    throw e
+    throw error
   } finally {
     if (threw) {
       if (entry.type === TYPE_ESM) {

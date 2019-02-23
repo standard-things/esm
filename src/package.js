@@ -617,8 +617,8 @@ function readInfo(dirPath, forceOptions) {
       try {
         pkg.options = Package.createOptions(esmParseLoad(optionsPath, null).module.exports)
       } finally {
-        moduleState.parsing = parsing
         cache.set(dirPath, null)
+        moduleState.parsing = parsing
       }
     }
   }

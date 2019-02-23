@@ -13,6 +13,7 @@ function parseLoad(request, parent, isMain) {
   const { moduleState } = shared
 
   moduleState.parsing = true
+  moduleState.requireDepth += 1
 
   let entry
 
@@ -20,16 +21,21 @@ function parseLoad(request, parent, isMain) {
     entry = load(request, parent, isMain)
   } finally {
     moduleState.parsing = false
+    moduleState.requireDepth -= 1
   }
 
-  entry.updateBindings()
+  try {
+    entry.updateBindings()
 
-  if (entry.state === STATE_PARSING_COMPLETED) {
-    if (entry.type === TYPE_ESM) {
-      validateDeep(entry)
+    if (entry.state === STATE_PARSING_COMPLETED) {
+      if (entry.type === TYPE_ESM) {
+        validateDeep(entry)
+      }
+
+      load(request, parent, isMain)
     }
-
-    load(request, parent, isMain)
+  } finally {
+    moduleState.requireDepth -= 1
   }
 
   return entry

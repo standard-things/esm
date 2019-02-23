@@ -154,15 +154,22 @@ function tryLoad(request, parentEntry, preload) {
 
   moduleState.requireDepth += 1
 
+  let entry
   let error
+  let threw = true
 
   try {
-    return esmLoad(request, parentEntry.module, false, preload)
+    entry = esmLoad(request, parentEntry.module, false, preload)
+    threw = false
   } catch (e) {
     error = e
   }
 
   moduleState.requireDepth -= 1
+
+  if (! threw) {
+    return entry
+  }
 
   if (parentEntry.extname === ".mjs" ||
       ! isError(error)) {
@@ -180,21 +187,13 @@ function tryLoad(request, parentEntry, preload) {
 }
 
 function tryRequire(request, parentEntry) {
-  const { moduleState } = shared
-
   parentEntry._passthruRequire = true
-  moduleState.requireDepth += 1
-
-  let exported
 
   try {
-    exported = parentEntry.module.require(request)
+    return parentEntry.module.require(request)
   } finally {
     parentEntry._passthruRequire = false
-    moduleState.requireDepth -= 1
   }
-
-  return exported
 }
 
 export default esmImport

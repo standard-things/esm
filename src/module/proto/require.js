@@ -10,6 +10,7 @@ import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
 import isMJS from "../../path/is-mjs.js"
 import maskFunction from "../../util/mask-function.js"
+import shared from "../../shared.js"
 import validateString from "../../util/validate-string.js"
 
 const {
@@ -25,14 +26,22 @@ const req = maskFunction(function (request) {
     throw new ERR_INVALID_ARG_VALUE("request",  request, "must be a non-empty string")
   }
 
-  const parentEntry = isMJS(this.filename) ? Entry.get(this) : null
+  const { moduleState } = shared
 
-  if (parentEntry !== null &&
-      parentEntry._passthruRequire) {
-    return esmLoad(request, this).module.exports
+  moduleState.requireDepth += 1
+
+  try {
+    const parentEntry = isMJS(this.filename) ? Entry.get(this) : null
+
+    if (parentEntry !== null &&
+        parentEntry._passthruRequire) {
+      return esmLoad(request, this).module.exports
+    }
+
+    return Module._load(request, this)
+  } finally {
+    moduleState.requireDepth -= 1
   }
-
-  return Module._load(request, this)
 }, RealProto.require)
 
 export default req

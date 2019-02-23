@@ -35,19 +35,9 @@ function makeRequireFunction(mod, requirer, resolver) {
       ? ownRequire(request)
       : void 0
 
-    if (exported !== void 0) {
-      return exported
-    }
-
-    const { moduleState } = shared
-
-    moduleState.requireDepth += 1
-
-    try {
-      return requirer.call(mod, request)
-    } finally {
-      moduleState.requireDepth -= 1
-    }
+    return exported === void 0
+      ? requirer.call(mod, request)
+      : exported
   }
 
   function resolve(request, options) {
