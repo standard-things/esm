@@ -517,8 +517,8 @@ class Entry {
         childEntry.state = STATE_EXECUTION_STARTED
         childEntry.running = true
         runtime._runResult.next()
-        childEntry.running = false
         childEntry.module.loaded = true
+        childEntry.running = false
         childEntry.state = STATE_EXECUTION_COMPLETED
       }
 
