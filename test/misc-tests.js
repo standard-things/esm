@@ -945,7 +945,7 @@ describe("miscellaneous tests", () => {
         ))
     })
 
-    it("should reevaluate requests with different URL query/fragments", () =>
+    it("should re-evaluate requests with different URL query/fragments", () =>
       import("./fixture/load-count.mjs")
         .then((oldNs) =>
           [
@@ -973,11 +973,11 @@ describe("miscellaneous tests", () => {
         )
     )
 
-    it("should not reevaluate errors in ESM", () =>
+    it("should not re-evaluate errors in ESM", () =>
       [
-        "./fixture/reevaluate-error.mjs",
-        "./fixture/reevaluate-error.mjs?a",
-        "./fixture/reevaluate-error.mjs#a"
+        "./fixture/re-evaluate-error.mjs",
+        "./fixture/re-evaluate-error.mjs?a",
+        "./fixture/re-evaluate-error.mjs#a"
       ]
       .reduce((promise, request) =>
         promise
