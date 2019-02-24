@@ -143,9 +143,9 @@ function compile(caller, entry, content, filename, fallback) {
   if (! moduleState.parsing) {
     if (isESM &&
         entry.state === STATE_INITIAL) {
-      isSideloaded = true
       moduleState.parsing = true
       entry.state = STATE_PARSING_STARTED
+      isSideloaded = true
     } else {
       return tryRun(entry, filename)
     }
@@ -261,8 +261,6 @@ function tryCompile(caller, entry, content, options) {
 }
 
 function tryRun(entry, filename) {
-  const { moduleState } = shared
-  const { parsing } = moduleState
   const async = useAsync(entry)
   const { compileData } = entry
   const isESM = entry.type === TYPE_ESM
@@ -284,6 +282,9 @@ function tryRun(entry, filename) {
     }
   }
 
+  const firstPass = runtime._runResult === void 0
+  const { parsing } = shared.moduleState
+
   let error
   let result
   let threw = false
@@ -291,8 +292,6 @@ function tryRun(entry, filename) {
   entry.state = parsing
     ? STATE_PARSING_STARTED
     : STATE_EXECUTION_STARTED
-
-  const firstPass = runtime._runResult === void 0
 
   if (firstPass) {
     const source = compileSource(compileData, {
