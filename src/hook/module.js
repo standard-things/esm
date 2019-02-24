@@ -13,7 +13,7 @@ import Wrapper from "../wrapper.js"
 
 import compile from "../module/internal/compile.js"
 import errors from "../errors.js"
-import esmParseLoad from "../module/esm/parse-load.js"
+import esmLoad from "../module/esm/load.js"
 import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
@@ -283,13 +283,9 @@ function tryPassthru(func, args, pkg) {
 }
 
 function wasmCompiler(mod, filename) {
-  const {
-    Instance:wasmInstance,
-    Module:wasmModule
-  } = WebAssembly
-
   const entry = Entry.get(mod)
   const exported = GenericObject.create()
+  const { moduleState } = shared
 
   mod.exports = exported
   entry.exports = exported
@@ -298,25 +294,41 @@ function wasmCompiler(mod, filename) {
   let threw = true
 
   try {
+    moduleState.parsing = true
+
     entry.state = STATE_PARSING_STARTED
 
-    const wasmMod = new wasmModule(readFile(filename))
-    const descriptions = wasmModule.imports(wasmMod)
-
-    entry.state = STATE_EXECUTION_STARTED
+    const { children } = entry
+    const wasmMod = new WebAssembly.Module(readFile(filename))
+    const descriptions = WebAssembly.Module.imports(wasmMod)
 
     // Use a `null` [[Prototype]] for `importObject` because the lookup
     // includes inherited properties.
     const importObject = { __proto__: null }
 
     for (const description of descriptions) {
-      const request = description.module
-      const childEntry = esmParseLoad(request, mod)
+      moduleState.requireDepth += 1
 
-      importObject[request] = childEntry.module.exports
+      const request = description.module
+      const childEntry = esmLoad(request, mod)
+
+      moduleState.requireDepth -= 1
+
+      children[childEntry.name] = childEntry
+      importObject[request] = childEntry
     }
 
-    const wasmExported = new wasmInstance(wasmMod, importObject).exports
+    moduleState.parsing = false
+
+    entry.state = STATE_EXECUTION_STARTED
+    entry.resumeChildren()
+
+    for (const request in importObject) {
+      importObject[request] = importObject[request].module.exports
+    }
+
+    const wasmInstance = new WebAssembly.Instance(wasmMod, importObject)
+    const wasmExported = wasmInstance.exports
 
     for (const name in wasmExported) {
       setGetter(exported, name, () => wasmExported[name])
@@ -324,9 +336,12 @@ function wasmCompiler(mod, filename) {
 
     threw = false
   } finally {
-    entry.state = threw
-      ? STATE_INITIAL
-      : STATE_EXECUTION_COMPLETED
+    if (threw) {
+      moduleState.parsing = false
+      entry.state = STATE_INITIAL
+    } else {
+      entry.state = STATE_EXECUTION_COMPLETED
+    }
   }
 }
 
