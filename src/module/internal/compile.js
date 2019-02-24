@@ -144,8 +144,8 @@ function compile(caller, entry, content, filename, fallback) {
     if (isESM &&
         entry.state === STATE_INITIAL) {
       isSideloaded = true
-      entry.state = STATE_PARSING_STARTED
       moduleState.parsing = true
+      entry.state = STATE_PARSING_STARTED
     } else {
       return tryRun(entry, filename)
     }
@@ -373,10 +373,6 @@ function tryRun(entry, filename) {
   }
 
   if (! threw) {
-    entry.state = parsing
-      ? STATE_PARSING_COMPLETED
-      : STATE_EXECUTION_COMPLETED
-
     if (isESM) {
       Reflect.defineProperty(mod, "loaded", {
         configurable: true,
@@ -396,6 +392,10 @@ function tryRun(entry, filename) {
       entry.loaded()
       entry.updateBindings()
     }
+
+    entry.state = parsing
+      ? STATE_PARSING_COMPLETED
+      : STATE_EXECUTION_COMPLETED
 
     return result
   }
