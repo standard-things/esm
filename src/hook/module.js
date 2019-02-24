@@ -113,7 +113,9 @@ function hook(Mod, parent) {
         tryPassthru.call(this, func, args, pkg)
         threw = false
       } finally {
-        entry.state = threw ? STATE_INITIAL : STATE_EXECUTION_COMPLETED
+        entry.state = threw
+          ? STATE_INITIAL
+          : STATE_EXECUTION_COMPLETED
       }
     }
 
@@ -301,11 +303,11 @@ function wasmCompiler(mod, filename) {
     const wasmMod = new wasmModule(readFile(filename))
     const descriptions = wasmModule.imports(wasmMod)
 
+    entry.state = STATE_EXECUTION_STARTED
+
     // Use a `null` [[Prototype]] for `importObject` because the lookup
     // includes inherited properties.
     const importObject = { __proto__: null }
-
-    entry.state = STATE_EXECUTION_STARTED
 
     for (const description of descriptions) {
       const request = description.module
@@ -322,7 +324,9 @@ function wasmCompiler(mod, filename) {
 
     threw = false
   } finally {
-    entry.state = threw ? STATE_INITIAL : STATE_EXECUTION_COMPLETED
+    entry.state = threw
+      ? STATE_INITIAL
+      : STATE_EXECUTION_COMPLETED
   }
 }
 
