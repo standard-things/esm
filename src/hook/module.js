@@ -13,7 +13,7 @@ import Wrapper from "../wrapper.js"
 
 import compile from "../module/internal/compile.js"
 import errors from "../errors.js"
-import esmLoad from "../module/esm/load.js"
+import esmImport from "../module/esm/import.js"
 import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
@@ -306,11 +306,14 @@ function wasmCompiler(mod, filename) {
     // includes inherited properties.
     const importObject = { __proto__: null }
 
-    for (const description of descriptions) {
+    for (const { module:request, name:importedName } of descriptions) {
       moduleState.requireDepth += 1
 
-      const request = description.module
-      const childEntry = esmLoad(request, mod)
+      let childEntry
+
+      esmImport(request, entry, [[importedName, [importedName], (value, otherEntry) => {
+        childEntry = otherEntry
+      }]])
 
       moduleState.requireDepth -= 1
 
