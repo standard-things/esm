@@ -41,6 +41,8 @@ const {
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
+  STATE_PARSING_COMPLETED,
+  STATE_PARSING_STARTED,
   TYPE_CJS,
   TYPE_ESM
 } = ENTRY
@@ -77,6 +79,8 @@ function hook(vm) {
       compileData = null
     }
 
+    entry.state = STATE_PARSING_STARTED
+
     if (compileData === null) {
       const compilerOptions = {
         cjsVars: true,
@@ -94,6 +98,8 @@ function hook(vm) {
                ! Reflect.has(scriptOptions, "cachedData")) {
       scriptOptions.cachedData = compileData.scriptData
     }
+
+    entry.state = STATE_PARSING_COMPLETED
 
     const code =
       "(()=>{" +
@@ -113,24 +119,27 @@ function hook(vm) {
       "})();" +
       compileData.code
 
+    const script = tryWrapper.call(vm, createScript, [code, scriptOptions], content)
+
+    if (script.cachedDataProduced) {
+      compileData.scriptData = script.cachedData
+    }
+
     const runInWrapper = function (runInFunc, args) {
       entry._validation.clear()
       entry.cacheName = cacheName
       entry.compileData = compileData
       entry.state = STATE_EXECUTION_STARTED
-      entry.type = compileData.sourceType === SOURCE_TYPE_MODULE ? TYPE_ESM : TYPE_CJS
+
+      entry.type = compileData.sourceType === SOURCE_TYPE_MODULE
+        ? TYPE_ESM
+        : TYPE_CJS
 
       const result = tryWrapper.call(this, runInFunc, args, content)
 
       entry.state = STATE_EXECUTION_COMPLETED
 
       return result
-    }
-
-    const script = tryWrapper.call(vm, createScript, [code, scriptOptions], content)
-
-    if (script.cachedDataProduced) {
-      compileData.scriptData = script.cachedData
     }
 
     script.runInContext = wrap(script.runInContext, runInWrapper)
