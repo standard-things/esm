@@ -1650,6 +1650,21 @@ describe("miscellaneous tests", () => {
         )
     })
 
+    it("should error when exporting re-declared classes", () => {
+      const filename = path.resolve("fixture/source/re-declared-class.mjs")
+
+      return import(filename)
+        .then(assert.fail)
+        .catch((e) =>
+          checkErrorStack(e, [
+            getURLFromFilePath(filename) + ":3",
+            "export default class A {}",
+            "",
+            "SyntaxError: Identifier 'A' has already been declared"
+          ].join("\n"))
+        )
+    })
+
     it("should error when using top-level `new.target`", () => {
       const filename = path.resolve("fixture/source/new-target.mjs")
 
