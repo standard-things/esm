@@ -511,24 +511,33 @@ class Entry {
 
       const { runtime } = childEntry
 
-      if (runtime !== null &&
-          runtime._runResult !== void 0 &&
-          childEntry.state < STATE_EXECUTION_STARTED) {
-        childEntry.state = STATE_EXECUTION_STARTED
-        childEntry.running = true
-        runtime._runResult.next()
-        childEntry.module.loaded = true
-        childEntry.running = false
-        childEntry.state = STATE_EXECUTION_COMPLETED
-      }
+      let threw = true
 
-      if (typeof childEntry._finalize === "function") {
-        childEntry._finalize()
-      } else {
-        childEntry.loaded()
-        childEntry.updateBindings(null, UPDATE_TYPE_INIT)
+      try {
+        if (runtime !== null &&
+            runtime._runResult !== void 0 &&
+            childEntry.state < STATE_EXECUTION_STARTED) {
+          childEntry.state = STATE_EXECUTION_STARTED
+          childEntry.running = true
+          runtime._runResult.next()
+          childEntry.module.loaded = true
+          childEntry.running = false
+        }
 
-        validateShallow(childEntry, this)
+        if (typeof childEntry._finalize === "function") {
+          childEntry._finalize()
+        } else {
+          childEntry.loaded()
+          childEntry.updateBindings(null, UPDATE_TYPE_INIT)
+
+          validateShallow(childEntry, this)
+        }
+
+        threw = false
+      } finally {
+        childEntry.state = threw
+          ? STATE_INITIAL
+          : STATE_EXECUTION_COMPLETED
       }
     }
   }
