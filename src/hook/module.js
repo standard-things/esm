@@ -34,6 +34,7 @@ const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
   STATE_INITIAL,
+  STATE_PARSING_COMPLETED,
   STATE_PARSING_STARTED,
   TYPE_WASM
 } = ENTRY
@@ -298,7 +299,6 @@ function wasmCompiler(mod, filename) {
 
     entry.state = STATE_PARSING_STARTED
 
-    const { children } = entry
     const wasmMod = new WebAssembly.Module(readFile(filename))
     const descriptions = WebAssembly.Module.imports(wasmMod)
 
@@ -309,25 +309,26 @@ function wasmCompiler(mod, filename) {
     for (const { module:request, name:importedName } of descriptions) {
       moduleState.requireDepth += 1
 
-      let childEntry
-
-      esmImport(request, entry, [[importedName, [importedName], (value, otherEntry) => {
-        childEntry = otherEntry
+      esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
+        importObject[request] = childEntry.name
       }]])
 
       moduleState.requireDepth -= 1
-
-      children[childEntry.name] = childEntry
-      importObject[request] = childEntry
     }
+
+    entry.state = STATE_PARSING_COMPLETED
 
     moduleState.parsing = false
 
     entry.state = STATE_EXECUTION_STARTED
     entry.resumeChildren()
 
+    const { children } = entry
+
     for (const request in importObject) {
-      importObject[request] = importObject[request].module.exports
+      const name = importObject[request]
+
+      importObject[request] = children[name].module.exports
     }
 
     const wasmInstance = new WebAssembly.Instance(wasmMod, importObject)
