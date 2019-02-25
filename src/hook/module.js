@@ -284,76 +284,87 @@ function tryPassthru(func, args, pkg) {
 }
 
 function wasmCompiler(mod, filename) {
+  const content = readFile(filename)
   const entry = Entry.get(mod)
   const exported = GenericObject.create()
   const { moduleState } = shared
 
+  // Use a `null` [[Prototype]] for `importObject` because the lookup
+  // includes inherited properties.
+  const importObject = { __proto__: null }
+
+  moduleState.parsing = true
+
   mod.exports = exported
   entry.exports = exported
+  entry.state = STATE_PARSING_STARTED
   entry.type = TYPE_WASM
 
+  let wasmExported
+  let wasmMod
   let threw = true
 
   try {
-    moduleState.parsing = true
-
-    entry.state = STATE_PARSING_STARTED
-
-    const wasmMod = new WebAssembly.Module(readFile(filename))
-    const descriptions = WebAssembly.Module.imports(wasmMod)
-
-    // Use a `null` [[Prototype]] for `importObject` because the lookup
-    // includes inherited properties.
-    const importObject = { __proto__: null }
-
-    for (const { module:request, name:importedName } of descriptions) {
-      moduleState.requireDepth += 1
-
-      esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
-        importObject[request] = childEntry.name
-      }]])
-
-      moduleState.requireDepth -= 1
-    }
-
-    entry.state = STATE_PARSING_COMPLETED
-
-    moduleState.parsing = false
-
-    entry.state = STATE_EXECUTION_STARTED
-    entry.resumeChildren()
-
-    const { children } = entry
-
-    for (const request in importObject) {
-      const name = importObject[request]
-
-      importObject[request] = children[name].module.exports
-    }
-
-    const wasmInstance = new WebAssembly.Instance(wasmMod, importObject)
-    const wasmExported = wasmInstance.exports
-
-    for (const name in wasmExported) {
-      Reflect.defineProperty(exported, name, {
-        configurable: true,
-        enumerable: true,
-        get: () => wasmExported[name],
-        set(value) {
-          setProperty(exported, name, value)
-        }
-      })
-    }
-
+    wasmMod = wasmParse(entry, content, importObject)
     threw = false
   } finally {
-    if (threw) {
-      moduleState.parsing = false
-      entry.state = STATE_INITIAL
-    } else {
-      entry.state = STATE_EXECUTION_COMPLETED
-    }
+    moduleState.parsing = false
+
+    entry.state = threw
+      ? STATE_INITIAL
+      : STATE_PARSING_COMPLETED
   }
+
+  entry.state = STATE_EXECUTION_STARTED
+
+  threw = true
+
+  try {
+    wasmExported = wasmLoad(entry, wasmMod, importObject)
+    threw = false
+  } finally {
+    entry.state = threw
+      ? STATE_INITIAL
+      : STATE_EXECUTION_COMPLETED
+  }
+
+  for (const name in wasmExported) {
+    Reflect.defineProperty(exported, name, {
+      configurable: true,
+      enumerable: true,
+      get: () => wasmExported[name],
+      set(value) {
+        setProperty(exported, name, value)
+      }
+    })
+  }
+}
+
+function wasmLoad(entry, wasmMod, importObject) {
+  entry.resumeChildren()
+
+  const { children } = entry
+
+  for (const request in importObject) {
+    const name = importObject[request]
+
+    importObject[request] = children[name].module.exports
+  }
+
+  return new WebAssembly.Instance(wasmMod, importObject).exports
+}
+
+function wasmParse(entry, content, importObject) {
+  const wasmMod = new WebAssembly.Module(content)
+  const descriptions = WebAssembly.Module.imports(wasmMod)
+
+  for (const { module:request, name:importedName } of descriptions) {
+    esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
+      importObject[request] = childEntry.name
+    }]])
+  }
+
+  return wasmMod
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {
