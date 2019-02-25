@@ -26,7 +26,7 @@ import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
 import set from "../util/set.js"
-import setGetter from "../util/set-getter.js"
+import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
@@ -335,7 +335,14 @@ function wasmCompiler(mod, filename) {
     const wasmExported = wasmInstance.exports
 
     for (const name in wasmExported) {
-      setGetter(exported, name, () => wasmExported[name])
+      Reflect.defineProperty(exported, name, {
+        configurable: true,
+        enumerable: true,
+        get: () => wasmExported[name],
+        set(value) {
+          setProperty(exported, name, value)
+        }
+      })
     }
 
     threw = false
