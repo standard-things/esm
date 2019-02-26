@@ -64,18 +64,22 @@ const {
 const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
+  const ext = entry.extname
   const mod = entry.module
   const pkg = entry.package
   const { options } = pkg
   const pkgMode = options.mode
 
-  let hint = SOURCE_TYPE_SCRIPT
+  let hint = -1
   let sourceType = SOURCE_TYPE_SCRIPT
 
-  if (entry.extname === ".mjs") {
+  if (ext === ".cjs") {
+    hint = SOURCE_TYPE_SCRIPT
+  } else if (ext === ".mjs") {
     hint = SOURCE_TYPE_MODULE
-    sourceType = SOURCE_TYPE_MODULE
-  } else if (pkgMode === MODE_ALL) {
+  }
+
+  if (pkgMode === MODE_ALL) {
     sourceType = SOURCE_TYPE_MODULE
   } else if (pkgMode === MODE_AUTO) {
     sourceType = SOURCE_TYPE_UNAMBIGUOUS

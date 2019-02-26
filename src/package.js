@@ -14,6 +14,7 @@ import { cwd } from "./safe/process.js"
 import defaults from "./util/defaults.js"
 import errors from "./errors.js"
 import esmParseLoad from "./module/esm/parse-load.js"
+import findPath from "./module/internal/find-path.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
@@ -60,6 +61,9 @@ const {
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_JSON_FILENAME = "package.json"
+
+const emptyArray = []
+const esmrcExts = [".mjs", ".cjs", ".js", ".json"]
 
 const defaultOptions = {
   await: false,
@@ -586,14 +590,8 @@ function readInfo(dirPath, forceOptions) {
 
   if (optionsFound) {
     options = parseJSON6(options)
-  } else if (isFile(optionsPath + ".mjs")) {
-    optionsPath = optionsPath + ".mjs"
-  } else if (isFile(optionsPath + ".js")) {
-    optionsPath = optionsPath + ".js"
-  } else if (isFile(optionsPath + ".json")) {
-    optionsPath = optionsPath + ".json"
   } else {
-    optionsPath = ""
+    optionsPath = findPath(optionsPath, emptyArray, false, esmrcExts)
   }
 
   if (! optionsFound &&

@@ -57,7 +57,7 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-const exts = [".js", ".mjs", ".wasm"]
+const exts = [".js", ".mjs", ".cjs", ".wasm"]
 const importExportRegExp = /^.*?\b(?:im|ex)port\b/
 const realExtsJS = RealModule._extensions[".js"]
 
@@ -180,23 +180,22 @@ function hook(Mod, parent) {
   }
 
   for (const ext of exts) {
-    const extIsWASM = ext === ".wasm"
-
-    if (extIsWASM) {
-      if (! shared.support.wasm) {
-        continue
-      }
-
-      if (! Reflect.has(_extensions, ext)) {
-        _extensions[ext] = realExtsJS
-      }
-    }
-
     const extIsMJS = ext === ".mjs"
 
     if (extIsMJS &&
         ! Reflect.has(_extensions, ext)) {
       _extensions[ext] = maskFunction(mjsCompiler, realExtsJS)
+    }
+
+    const extIsWASM = ext === ".wasm"
+
+    if (extIsWASM &&
+        ! shared.support.wasm) {
+      continue
+    }
+
+    if (! Reflect.has(_extensions, ext)) {
+      _extensions[ext] = realExtsJS
     }
 
     const extCompiler = Wrapper.unwrap(_extensions, ext)

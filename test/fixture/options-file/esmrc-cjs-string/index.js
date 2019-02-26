@@ -1,0 +1,1 @@
+const await = 1

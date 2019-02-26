@@ -324,8 +324,10 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should support .esmrc.js options", () =>
+    it("should support .esmrc.cjs and .esmrc.js options", () =>
       [
+        "./fixture/options-file/esmrc-cjs-object",
+        "./fixture/options-file/esmrc-cjs-string",
         "./fixture/options-file/esmrc-js-object",
         "./fixture/options-file/esmrc-js-string"
       ]

@@ -165,7 +165,7 @@ Specify options with one of the following:
     <p>A string mode:</p>
     <ul>
       <li><code>"auto"</code> detect files with <code>import</code>, <code>import.meta</code>, <code>export</code>,<br><a href="https://github.com/tc39/proposal-modules-pragma"><code>"use module"</code></a>, or <code>.mjs</code> as ESM.</li>
-      <li><code>"all"</code> script files are treated as ESM.</li>
+      <li><code>"all"</code> files besides those with <code>"use script"</code> or <code>.cjs</code> are treated as ESM.</li>
       <li><code>"strict"</code> to treat <strong>only</strong> <code>.mjs</code> files as ESM.</li>
     </ul>
   </td>

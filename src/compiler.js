@@ -34,7 +34,7 @@ function init() {
   const defaultOptions = {
     cjsVars: false,
     generateVarDeclarations: false,
-    hint: SOURCE_TYPE_SCRIPT,
+    hint: -1,
     pragmas: true,
     runtimeName: "_",
     sourceType: SOURCE_TYPE_SCRIPT,
@@ -71,11 +71,16 @@ function init() {
         yieldIndex: 0
       }
 
+      const { hint } = options
+
       let { sourceType } = options
 
-      if (options.pragmas) {
-        if (options.hint === SOURCE_TYPE_MODULE ||
-            hasPragma(code, "use module")) {
+      if (hint === SOURCE_TYPE_SCRIPT) {
+        sourceType = SOURCE_TYPE_SCRIPT
+      } else if (hint === SOURCE_TYPE_MODULE) {
+        sourceType = SOURCE_TYPE_MODULE
+      } else if (options.pragmas) {
+        if (hasPragma(code, "use module")) {
           sourceType = SOURCE_TYPE_MODULE
         } else if (hasPragma(code, "use script")) {
           sourceType = SOURCE_TYPE_SCRIPT
