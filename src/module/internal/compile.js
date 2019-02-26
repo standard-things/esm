@@ -143,9 +143,9 @@ function compile(caller, entry, content, filename, fallback) {
   if (! moduleState.parsing) {
     if (isESM &&
         entry.state === STATE_INITIAL) {
+      isSideloaded = true
       moduleState.parsing = true
       entry.state = STATE_PARSING_STARTED
-      isSideloaded = true
     } else {
       return tryRun(entry, filename)
     }

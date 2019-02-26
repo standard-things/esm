@@ -1107,7 +1107,9 @@ function runSetter(entry, name, callback, updateType) {
         isInit) {
       setter.last = value
 
-      const setterValue = value === ERROR_GETTER ? void 0 : value
+      const setterValue = value === ERROR_GETTER
+        ? void 0
+        : value
 
       if (setter(setterValue, entry)) {
         setters.splice(length, 1)
