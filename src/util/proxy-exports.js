@@ -14,6 +14,7 @@ import isNumberObject from "./is-number-object.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
+import isPromise from "./is-promise.js"
 import isRegExp from "./is-regexp.js"
 import isSet from "./is-set.js"
 import isSetIterator from "./is-set-iterator.js"
@@ -205,6 +206,7 @@ function init() {
         useWrappers = isNative(exported)
       } else if (! isPlainObject(exported)) {
         useWrappers =
+          isPromise(exported) ||
           isMap(exported) ||
           isSet(exported) ||
           isWeakMap(exported) ||
