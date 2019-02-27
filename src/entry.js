@@ -1,4 +1,5 @@
 import { basename, extname, sep } from "./safe/path.js"
+import { isIdentifierChar, isIdentifierStart } from "./acorn.js"
 
 import ENTRY from "./constant/entry.js"
 
@@ -400,9 +401,15 @@ class Entry {
     }
 
     if (this.builtin) {
-      const names = keys(this.exports)
+      const names = ["default"]
+      const possibleNames = keys(this.exports)
 
-      names.push("default")
+      for (const name of possibleNames) {
+        if (isBindingName(name)) {
+          names.push(name)
+        }
+      }
+
       names.sort()
 
       Reflect.deleteProperty(this._partialMutableNamespace, "default")
@@ -983,27 +990,38 @@ function getExportByNameFast(entry, name, parentEntry) {
 function getExportsObjectKeys(entry, exported = entry.exports) {
   const { type } = entry
 
+  let possibleNames
+
   if (type === TYPE_ESM ||
       type === TYPE_WASM) {
-    return keys(exported)
+    possibleNames = keys(exported)
+  } else {
+    const isFunc = typeof exported === "function"
+    const ownNames = ownPropertyNames(exported)
+    const proto = getPrototypeOf(exported)
+
+    possibleNames = []
+
+    for (const name of ownNames) {
+      if (! isEnumerable(exported, name) &&
+          (name === "__esModule" ||
+          (isFunc &&
+            name === "prototype") ||
+          (has(proto, name) &&
+            ! isEnumerable(proto, name)))) {
+        continue
+      }
+
+      possibleNames.push(name)
+    }
   }
 
-  const isFunc = typeof exported === "function"
-  const possibleNames = ownPropertyNames(exported)
-  const proto = getPrototypeOf(exported)
   const result = []
 
   for (const name of possibleNames) {
-    if (! isEnumerable(exported, name) &&
-        (name === "__esModule" ||
-         (isFunc &&
-          name === "prototype") ||
-         (has(proto, name) &&
-          ! isEnumerable(proto, name)))) {
-      continue
+    if (isBindingName(name)) {
+      result.push(name)
     }
-
-    result.push(name)
   }
 
   return result
@@ -1018,6 +1036,28 @@ function initNamespaceHandler() {
     has: null,
     set: null
   }
+}
+
+function isBindingName(name) {
+  if (typeof name !== "string") {
+    return false
+  }
+
+  let i = 0
+
+  if (! isIdentifierStart(name.charCodeAt(i), true)) {
+    return false
+  }
+
+  const { length } = name
+
+  while (++i < length) {
+    if (! isIdentifierChar(name.charCodeAt(i), true)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 function isCalledFromStrictCode() {

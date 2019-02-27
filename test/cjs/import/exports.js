@@ -18,7 +18,7 @@ import * as nsPseudoEmpty from "../../fixture/cjs/export/pseudo-empty.js"
 import * as nsStarMixed from "../../fixture/cjs/export/star-mixed"
 
 export default () => {
-  let ns = createNamespace({ 0: "a", default: defaultArray })
+  let ns = createNamespace({ default: defaultArray })
 
   assert.deepStrictEqual(defaultArray, ["a"])
   assert.deepStrictEqual(nsArray, ns)
