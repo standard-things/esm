@@ -4,7 +4,6 @@ import { readFileSync } from "../../safe/fs.js"
 import safeProcess from "../../safe/process.js"
 import stripBOM from "../../util/strip-bom.js"
 import toNamespacedPath from "../../path/to-namespaced-path.js"
-import toString from "../../util/to-string.js"
 
 const extensions = { __proto__: null }
 
@@ -18,7 +17,7 @@ extensions[".json"] = function (mod, filename) {
   try {
     mod.exports = SafeJSON.parse(content)
   } catch (e) {
-    e.message = filename + ": " + toString(e.message)
+    e.message = filename + ": " + e.message
 
     throw e
   }

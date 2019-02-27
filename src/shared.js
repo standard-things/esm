@@ -233,7 +233,11 @@ function init() {
   })
 
   setDeferred(support, "nativeProxyReceiver", () => {
-    const { SafeBuffer } = shared.module
+    const {
+      SafeBuffer,
+      utilGet,
+      utilToString
+    } = shared.module
 
     // Detect support for invoking native functions with a proxy receiver.
     // https://bugs.chromium.org/p/v8/issues/detail?id=5773
@@ -246,7 +250,7 @@ function init() {
       // https://github.com/terser-js/terser#the-unsafe-compress-option
       return typeof proxy.toString() === "string"
     } catch (e) {
-      return ! /Illegal/.test(e)
+      return ! /Illegal/.test(utilToString(utilGet(e, "message")))
     }
   })
 

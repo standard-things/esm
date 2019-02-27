@@ -270,7 +270,8 @@ function init() {
 
   function tryErrorToString(error) {
     try {
-      return error.name + ": " + error.message
+      return toString(get(error, "name")) + ": " +
+             toString(get(error, "message"))
     } catch {}
 
     return ""

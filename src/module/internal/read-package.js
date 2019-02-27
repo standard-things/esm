@@ -4,7 +4,6 @@ import isObject from "../../util/is-object.js"
 import readFile from "../../fs/read-file.js"
 import { sep } from "../../safe/path.js"
 import shared from "../../shared.js"
-import toString from "../../util/to-string.js"
 
 function init() {
   const mainFieldRegExp = /"main"/
@@ -46,7 +45,7 @@ function init() {
       }
     } catch (e) {
       e.path = jsonPath
-      e.message = "Error parsing " + jsonPath + ": " + toString(e.message)
+      e.message = "Error parsing " + jsonPath + ": " + e.message
       throw e
     }
 
