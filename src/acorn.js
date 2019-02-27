@@ -12,6 +12,11 @@ import {
   skipWhiteSpace as skipWhiteSpaceRegExp
 } from "./vendor/acorn/acorn/src/whitespace.js"
 
+import {
+  isIdentifierChar,
+  isIdentifierStart
+} from "./vendor/acorn/acorn/src/identifier.js"
+
 import { Parser } from "./vendor/acorn/acorn/src/state.js"
 import { getLineInfo } from "./vendor/acorn/acorn/src/locutil.js"
 import { types as tokTypes } from "./vendor/acorn/acorn/src/tokentype.js"
@@ -21,6 +26,8 @@ const literalRegExp = /^(?:'((?:\\.|[^'])*?)'|"((?:\\.|[^"])*?)"|;)/
 export {
   Parser,
   getLineInfo,
+  isIdentifierChar,
+  isIdentifierStart,
   lineBreakRegExp,
   literalRegExp,
   skipWhiteSpaceRegExp,
