@@ -5,7 +5,7 @@ import { versions } from "../safe/process.js"
 function init() {
   function isElectron() {
     return Reflect.has(versions, "electron") ||
-      isBrave()
+           isBrave()
   }
 
   return isElectron

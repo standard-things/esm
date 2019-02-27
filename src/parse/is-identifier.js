@@ -14,7 +14,7 @@ function init() {
 
     if (type === "Property") {
       return parent.computed ||
-        parent.shorthand
+             parent.shorthand
     }
 
     if (((type === "AssignmentExpression" ||

@@ -19,8 +19,8 @@ function init() {
     const flags = getFlags()
 
     return flags.eval ||
-      (! stdin.isTTY &&
-       ! flags.interactive)
+           (! stdin.isTTY &&
+            ! flags.interactive)
   }
 
   return isEval

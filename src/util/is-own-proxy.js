@@ -44,7 +44,7 @@ function init() {
 
   function isOwnProxy(value) {
     return OwnProxy.instances.has(value) ||
-      isOwnProxyFallback(value)
+           isOwnProxyFallback(value)
   }
 
   function isOwnProxyFallback(value) {

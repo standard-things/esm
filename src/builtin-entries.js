@@ -30,7 +30,7 @@ function createEntry(id) {
       function (instance) {
         if (this === exported) {
           return instance instanceof func ||
-            instanceOf(instance, exported)
+                 instanceOf(instance, exported)
         }
 
         return instanceOf(instance, this)

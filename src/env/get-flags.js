@@ -30,7 +30,7 @@ function init() {
 
     setDeferred(flags, "inspect", () => {
       return flags.inspectBrk ||
-        matches(commandArgs, /^--(?:debug|inspect)(?:=.*)?$/)
+             matches(commandArgs, /^--(?:debug|inspect)(?:=.*)?$/)
     })
 
     setDeferred(flags, "preloadModules", () => {

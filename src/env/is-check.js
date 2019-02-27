@@ -8,9 +8,9 @@ function init() {
     const { length } = argv
 
     return (length === 1 ||
-       length === 2) &&
-      getFlags().check &&
-      isPreloaded()
+            length === 2) &&
+           getFlags().check &&
+           isPreloaded()
   }
 
   return isCheck

@@ -396,8 +396,8 @@ describe("miscellaneous tests", () => {
       try {
         require("")
         assert.fail()
-      } catch (e) {
-        assert.strictEqual(e.code, "ERR_INVALID_ARG_VALUE")
+      } catch ({ code }) {
+        assert.strictEqual(code, "ERR_INVALID_ARG_VALUE")
       }
     })
 
@@ -421,8 +421,8 @@ describe("miscellaneous tests", () => {
           try {
             func(request)
             assert.fail()
-          } catch (e) {
-            assert.strictEqual(e.code, "ERR_INVALID_ARG_TYPE")
+          } catch ({ code }) {
+            assert.strictEqual(code, "ERR_INVALID_ARG_TYPE")
           }
         }
       }

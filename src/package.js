@@ -569,13 +569,13 @@ function getRoot(dirPath) {
 
 function isExplicitName(name) {
   return name === "dedefault" ||
-    name === "topLevelReturn"
+         name === "topLevelReturn"
 }
 
 function isFlag(value) {
   return typeof value === "boolean" ||
-    value === 0 ||
-    value === 1
+         value === 0 ||
+         value === 1
 }
 
 function readInfo(dirPath, forceOptions) {

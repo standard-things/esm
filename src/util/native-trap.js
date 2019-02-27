@@ -8,6 +8,7 @@ function init() {
         return Reflect.apply(func, this, args)
       } catch (e) {
         captureStackTrace(e, trap)
+
         throw e
       }
     }

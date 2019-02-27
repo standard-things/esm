@@ -16,7 +16,7 @@ function init() {
     const tag = getObjectTag(value)
 
     return tag === "[object ArrayBuffer]" ||
-      tag === "[object SharedArrayBuffer]"
+           tag === "[object SharedArrayBuffer]"
   }
 }
 

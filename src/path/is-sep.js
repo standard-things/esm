@@ -14,13 +14,13 @@ function init() {
   function isSep(value) {
     if (typeof value === "number") {
       return value === FORWARD_SLASH ||
-        (WIN32 &&
-         value === BACKWARD_SLASH)
+             (WIN32 &&
+              value === BACKWARD_SLASH)
     }
 
     return value === "/" ||
-      (WIN32 &&
-       value === "\\")
+           (WIN32 &&
+            value === "\\")
   }
 
   return isSep

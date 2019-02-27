@@ -79,7 +79,7 @@ function cleanJS() {
 
 function isKept(thePath) {
   return thePath.endsWith(".cache") ||
-    keptPaths.every((dirname) => ! thePath.startsWith(dirname))
+         keptPaths.every((dirname) => ! thePath.startsWith(dirname))
 }
 
 function minifyJS(content) {

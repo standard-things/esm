@@ -703,7 +703,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
 
   handler.has = (namespace, name) => {
     return name === shared.symbol.namespace ||
-      Reflect.has(namespace, name)
+           Reflect.has(namespace, name)
   }
 
   handler.preventExtensions = (namespace) => {
@@ -772,7 +772,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
     }
 
     return Reflect.isExtensible(namespace) ||
-      Reflect.defineProperty(namespace, name, descriptor)
+           Reflect.defineProperty(namespace, name, descriptor)
   }
 
   handler.deleteProperty = (namespace, name) => {

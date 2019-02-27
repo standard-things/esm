@@ -81,7 +81,7 @@ function init() {
 
         result = Reflect.apply(toString, proxy, []) === Reflect.apply(toString, toString, [])
       }
-    } catch (e) {
+    } catch {
       result = false
     }
 

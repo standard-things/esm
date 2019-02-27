@@ -469,7 +469,7 @@ function init() {
       const declType = declaration.type
 
       return declType === "FunctionDeclaration" ||
-        declType === "ClassDeclaration"
+             declType === "ClassDeclaration"
     }
 
     if (type === "ExportNamedDeclaration" &&

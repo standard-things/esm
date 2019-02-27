@@ -135,7 +135,7 @@ function init() {
           value: function (instance) {
             if (this === builtin) {
               return instance instanceof realmBuiltin ||
-                instanceOf(instance, builtin)
+                     instanceOf(instance, builtin)
             }
 
             return instanceOf(instance, this)

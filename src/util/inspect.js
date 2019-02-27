@@ -131,10 +131,10 @@ function init() {
     }
 
     return typeof value === "function" ||
-      Array.isArray(value) ||
-      Reflect.has(value, Symbol.toStringTag) ||
-      value === builtinEntries.process.module.exports ||
-      getObjectTag(value) === "[object Object]"
+           Array.isArray(value) ||
+           Reflect.has(value, Symbol.toStringTag) ||
+           value === builtinEntries.process.module.exports ||
+           getObjectTag(value) === "[object Object]"
   }
 
   function prepareValue(value) {

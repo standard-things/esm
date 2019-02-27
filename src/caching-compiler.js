@@ -387,8 +387,8 @@ function init() {
     })
 
     pendingWrites.forEach((compileDatas, cachePath) => {
-      compileDatas.forEach(({ code }, cacheName) => {
-        if (writeFile(cachePath + sep + cacheName, code)) {
+      compileDatas.forEach((compileData, cacheName) => {
+        if (writeFile(cachePath + sep + cacheName, compileData.code)) {
           removeExpired(cachePath, cacheName)
         }
       })

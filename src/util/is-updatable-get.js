@@ -10,8 +10,8 @@ function init() {
       // or the accessor descriptor has no getter, then the value must be the same.
       // https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver
       return descriptor.configurable === true ||
-        descriptor.writable === true ||
-        typeof descriptor.get === "function"
+             descriptor.writable === true ||
+             typeof descriptor.get === "function"
     }
 
     return true

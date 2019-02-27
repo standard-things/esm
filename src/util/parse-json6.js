@@ -5,7 +5,7 @@ import shared from "../shared.js"
 function init() {
   function parseJSON6(string) {
     return tryParse(string) ||
-      tryParse(quotifyJSON(string))
+           tryParse(quotifyJSON(string))
   }
 
   function tryParse(string) {
