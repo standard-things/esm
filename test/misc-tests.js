@@ -557,8 +557,15 @@ describe("miscellaneous tests", () => {
     )
 
     it("should find `.js` before `.mjs` with `options.cjs.paths`", () =>
-      import("./cjs/ext/priority.js")
-        .then((ns) => ns.default())
+      Promise
+        .all([
+          "./fixture/cjs/ext/import-priority.js",
+          "./fixture/cjs/ext/require-priority.js"
+        ]
+        .map((request) =>
+          import(request)
+            .then((ns) => assert.strictEqual(ns.default, ".js"))
+        ))
     )
 
     it("should find a file before a package", () => {

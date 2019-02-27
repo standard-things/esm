@@ -1,6 +1,0 @@
-{
-  cjs: {
-    paths: true
-  },
-  debug: true
-}

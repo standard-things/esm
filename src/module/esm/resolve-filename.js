@@ -3,7 +3,6 @@ import { dirname, extname } from "../../safe/path.js"
 import CHAR_CODE from "../../constant/char-code.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
-import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
 import Loader from "../../loader.js"
@@ -42,10 +41,6 @@ const {
   ELECTRON,
   YARN_PNP
 } = ENV
-
-const {
-  MODE_AUTO
-} = PACKAGE
 
 const {
   ERR_INVALID_PROTOCOL,
@@ -116,7 +111,6 @@ function resolveFilename(request, parent, isMain = false, options) {
   const isPath = isAbs || isRel
   const pkgOptions = Package.get(fromPath).options
 
-  let autoMode = pkgOptions.mode === MODE_AUTO
   let cjsPaths = pkgOptions.cjs.paths
   let exts = strictExts
   let fields = pkgOptions.mainFields
@@ -127,7 +121,6 @@ function resolveFilename(request, parent, isMain = false, options) {
 
   if (parentEntry !== null &&
       parentEntry.extname === ".mjs") {
-    autoMode = false
     cjsPaths = false
     fields = strictFields
   }
@@ -184,8 +177,7 @@ function resolveFilename(request, parent, isMain = false, options) {
   }
 
   if (foundPath !== "") {
-    if (autoMode ||
-        cjsPaths ||
+    if (cjsPaths ||
         isMain ||
         isJS(foundPath) ||
         isMJS(foundPath) ||
