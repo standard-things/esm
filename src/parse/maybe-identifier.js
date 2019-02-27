@@ -1,4 +1,4 @@
-import isIdentifier from "./is-identifier.js"
+import isBindingIdentifier from "./is-binding-identifier.js"
 import shared from "../shared.js"
 
 function init() {
@@ -7,7 +7,7 @@ function init() {
 
     let parent = path.getParentNode()
 
-    if (! isIdentifier(node, parent)) {
+    if (! isBindingIdentifier(node, parent)) {
       return
     }
 

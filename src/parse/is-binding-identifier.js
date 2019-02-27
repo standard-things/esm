@@ -1,7 +1,7 @@
 import shared from "../shared.js"
 
 function init() {
-  function isIdentifier(node, parent) {
+  function isBindingIdentifier(node, parent) {
     if (node.type !== "Identifier") {
       return false
     }
@@ -32,9 +32,9 @@ function init() {
     return true
   }
 
-  return isIdentifier
+  return isBindingIdentifier
 }
 
 export default shared.inited
-  ? shared.module.parseIsIdentifier
-  : shared.module.parseIsIdentifier = init()
+  ? shared.module.parseIsBindingIdentifier
+  : shared.module.parseIsBindingIdentifier = init()
