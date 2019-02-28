@@ -18,6 +18,7 @@ function init() {
 
     setDeferred(flags, "check", () => matches(commandArgs, /^(?:--check|-c)$/))
     setDeferred(flags, "eval", () => matches(commandArgs, /^(?:--eval|-e)$/))
+    setDeferred(flags, "experimentalPolicy", () => matches(commandArgs, "--experimental-policy"))
     setDeferred(flags, "experimentalREPLAwait", () => matches(commandArgs, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(commandArgs, "--experimental-worker"))
     setDeferred(flags, "exposeInternals", () => matches(commandArgs, /^--expose[-_]internals$/))
