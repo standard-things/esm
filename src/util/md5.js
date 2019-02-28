@@ -1,11 +1,16 @@
-import { createHash } from "../safe/crypto.js"
+import { Hash } from "../safe/crypto.js"
+
 import shared from "../shared.js"
 
 function init() {
   function md5(string) {
-    return createHash("md5")
-      .update(typeof string === "string" ? string : "")
-      .digest("hex")
+    const hash = new Hash("md5")
+
+    if (typeof string === "string") {
+      hash.update(string)
+    }
+
+    return hash.digest("hex")
   }
 
   return md5
