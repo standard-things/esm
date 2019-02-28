@@ -10,9 +10,11 @@ import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
 
+import assign from "../../util/assign.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
 import compileSource from "./compile-source.js"
 import errors from "../../parse/errors.js"
+import esmImport from "../../module/esm/import.js"
 import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
@@ -31,10 +33,12 @@ const {
   SOURCE_TYPE_MODULE,
   SOURCE_TYPE_SCRIPT,
   SOURCE_TYPE_UNAMBIGUOUS,
+  SOURCE_TYPE_WASM,
   TRANSFORMS_EVAL
 } = COMPILER
 
 const {
+  ERROR_GETTER,
   NAMESPACE_FINALIZATION_DEFERRED,
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
@@ -42,7 +46,8 @@ const {
   STATE_PARSING_COMPLETED,
   STATE_PARSING_STARTED,
   TYPE_CJS,
-  TYPE_ESM
+  TYPE_ESM,
+  TYPE_WASM
 } = ENTRY
 
 const {
@@ -77,6 +82,8 @@ function compile(caller, entry, content, filename, fallback) {
     hint = SOURCE_TYPE_SCRIPT
   } else if (ext === ".mjs") {
     hint = SOURCE_TYPE_MODULE
+  } else if (ext === ".wasm") {
+    hint = SOURCE_TYPE_WASM
   }
 
   if (pkgMode === MODE_ALL) {
@@ -91,46 +98,64 @@ function compile(caller, entry, content, filename, fallback) {
   let { compileData } = entry
 
   if (compileData === null) {
+    const { cacheName } = entry
+
     compileData = CachingCompiler.from(entry)
 
     if (compileData === null ||
         compileData.transforms !== 0) {
-      const { cacheName } = entry
-      const { cjs } = options
+      if (hint === SOURCE_TYPE_WASM) {
+        entry.type = TYPE_WASM
 
-      const scriptData = compileData === null
-        ? null
-        : compileData.scriptData
+        compileData = {
+          circular: 0,
+          code: content,
+          codeWithTDZ: null,
+          filename: null,
+          firstAwaitOutsideFunction: null,
+          mtime: -1,
+          scriptData: null,
+          sourceType: hint,
+          transforms: 0,
+          yieldIndex: -1
+        }
+      } else {
+        const { cjs } = options
 
-      compileData = tryCompile(caller, entry, content, {
-        cacheName,
-        cachePath: pkg.cachePath,
-        cjsVars: cjs.vars,
-        filename,
-        hint,
-        mtime: entry.mtime,
-        runtimeName: entry.runtimeName,
-        sourceType,
-        topLevelReturn: cjs.topLevelReturn
-      })
+        const scriptData = compileData === null
+          ? null
+          : compileData.scriptData
 
-      compileData.scriptData = scriptData
+        compileData = tryCompile(caller, entry, content, {
+          cacheName,
+          cachePath: pkg.cachePath,
+          cjsVars: cjs.vars,
+          filename,
+          hint,
+          mtime: entry.mtime,
+          runtimeName: entry.runtimeName,
+          sourceType,
+          topLevelReturn: cjs.topLevelReturn
+        })
+
+        compileData.scriptData = scriptData
+
+        if (compileData.sourceType === SOURCE_TYPE_MODULE) {
+          entry.type = TYPE_ESM
+        }
+
+        if (isDefaultPkg &&
+            entry.type === TYPE_CJS &&
+            compileData.transforms === TRANSFORMS_EVAL) {
+          // Under the default package configuration, discard changes for CJS
+          // modules with only `eval()` transformations.
+          compileData.code = content
+          compileData.transforms = 0
+        }
+      }
 
       entry.compileData = compileData
       pkg.cache.compile.set(cacheName, compileData)
-
-      if (compileData.sourceType === SOURCE_TYPE_MODULE) {
-        entry.type = TYPE_ESM
-      }
-
-      if (isDefaultPkg &&
-          entry.type === TYPE_CJS &&
-          compileData.transforms === TRANSFORMS_EVAL) {
-        // Under the default package configuration, discard changes for CJS
-        // modules with only `eval()` transformations.
-        compileData.code = content
-        compileData.transforms = 0
-      }
     }
   }
 
@@ -139,13 +164,14 @@ function compile(caller, entry, content, filename, fallback) {
     compileData.code = content
   }
 
-  const isESM = entry.type === TYPE_ESM
   const { moduleState } = shared
+  const { type } = entry
+  const isCJS = type === TYPE_CJS
 
   let isSideloaded = false
 
   if (! moduleState.parsing) {
-    if (isESM &&
+    if (! isCJS &&
         entry.state === STATE_INITIAL) {
       isSideloaded = true
       moduleState.parsing = true
@@ -155,7 +181,7 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  if (isESM) {
+  if (! isCJS) {
     try {
       let result = tryRun(entry, filename)
 
@@ -165,16 +191,19 @@ function compile(caller, entry, content, filename, fallback) {
 
       if (compileData.circular === 1) {
         entry.circular = true
-        entry.runtime = null
-        mod.exports = GenericObject.create()
 
-        const { codeWithTDZ } = compileData
+        if (type === TYPE_ESM) {
+          entry.runtime = null
+          mod.exports = GenericObject.create()
 
-        if (codeWithTDZ !== null) {
-          compileData.code = codeWithTDZ
+          const { codeWithTDZ } = compileData
+
+          if (codeWithTDZ !== null) {
+            compileData.code = codeWithTDZ
+          }
+
+          result = tryRun(entry, filename)
         }
-
-        result = tryRun(entry, filename)
       }
 
       entry.updateBindings()
@@ -265,14 +294,9 @@ function tryCompile(caller, entry, content, options) {
 }
 
 function tryRun(entry, filename) {
-  const async = useAsync(entry)
-  const { compileData } = entry
-  const isESM = entry.type === TYPE_ESM
-  const mod = entry.module
-
-  const cjsVars =
-    entry.package.options.cjs.vars &&
-    entry.extname !== ".mjs"
+  const { compileData, type } = entry
+  const isESM = type === TYPE_ESM
+  const isWASM = type === TYPE_WASM
 
   let { runtime } = entry
 
@@ -286,7 +310,9 @@ function tryRun(entry, filename) {
     }
   }
 
+  const async = useAsync(entry)
   const firstPass = runtime._runResult === void 0
+  const mod = entry.module
   const { parsing } = shared.moduleState
 
   let error
@@ -298,18 +324,36 @@ function tryRun(entry, filename) {
     : STATE_EXECUTION_STARTED
 
   if (firstPass) {
-    const source = compileSource(compileData, {
-      async,
-      cjsVars,
-      runtimeName: entry.runtimeName,
-      sourceMap: useSourceMap(entry)
-    })
-
     entry.running = true
 
-    try {
+    if (isWASM) {
+      runtime._runResult = (function *() {
+        // Use a `null` [[Prototype]] for `importObject` because the lookup
+        // includes inherited properties.
+        const importObject = { __proto__: null }
+        const wasmMod = wasmParse(entry, compileData.code, importObject)
+        yield
+        wasmEvaluate(entry, wasmMod, importObject)
+      })()
+    } else {
+      const cjsVars =
+        entry.package.options.cjs.vars &&
+        entry.extname !== ".mjs"
+
+      const source = compileSource(compileData, {
+        async,
+        cjsVars,
+        runtimeName: entry.runtimeName,
+        sourceMap: useSourceMap(entry)
+      })
+
       if (isESM) {
-        result = mod._compile(source, filename)
+        try {
+          result = mod._compile(source, filename)
+        } catch (e) {
+          threw = true
+          error = e
+        }
       } else {
         const { _compile } = mod
 
@@ -318,9 +362,6 @@ function tryRun(entry, filename) {
           return Reflect.apply(_compile, mod, [source, filename])
         })()
       }
-    } catch (e) {
-      threw = true
-      error = e
     }
 
     entry.running = false
@@ -376,7 +417,8 @@ function tryRun(entry, filename) {
   }
 
   if (! threw) {
-    if (isESM) {
+    if (isESM ||
+        isWASM) {
       Reflect.defineProperty(mod, "loaded", {
         configurable: true,
         enumerable: true,
@@ -450,6 +492,57 @@ function useSourceMap(entry) {
   }
 
   return false
+}
+
+function wasmEvaluate(entry, wasmMod, importObject) {
+  entry.resumeChildren()
+
+  const { children } = entry
+
+  for (const request in importObject) {
+    const name = importObject[request]
+
+    importObject[request] = children[name].module.exports
+  }
+
+  const exported = entry.module.exports
+  const wasmInstance = new WebAssembly.Instance(wasmMod, importObject)
+  const wasmExported = assign(GenericObject.create(), wasmInstance.exports)
+
+  entry.exports = wasmExported
+
+  for (const name in wasmExported) {
+    const getter = () => entry.exports[name]
+
+    entry.addGetter(name, getter)
+
+    Reflect.defineProperty(exported, name, {
+      configurable: true,
+      enumerable: true,
+      get: getter,
+      set(value) {
+        setProperty(exported, name, value)
+      }
+    })
+  }
+}
+
+function wasmParse(entry, buffer, importObject) {
+  const wasmMod = new WebAssembly.Module(buffer)
+  const exportDescriptions = WebAssembly.Module.exports(wasmMod)
+  const importDescriptions = WebAssembly.Module.imports(wasmMod)
+
+  for (const { name:exportedName } of exportDescriptions) {
+    entry.addGetter(exportedName, () => ERROR_GETTER)
+  }
+
+  for (const { module:request, name:importedName } of importDescriptions) {
+    esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
+      importObject[request] = childEntry.name
+    }]])
+  }
+
+  return wasmMod
 }
 
 export default compile

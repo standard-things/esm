@@ -4,7 +4,6 @@ import ESM from "../constant/esm.js"
 import PACKAGE from "../constant/package.js"
 
 import Entry from "../entry.js"
-import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
 import Module from "../module.js"
 import Package from "../package.js"
@@ -13,7 +12,6 @@ import Wrapper from "../wrapper.js"
 
 import compile from "../module/internal/compile.js"
 import errors from "../errors.js"
-import esmImport from "../module/esm/import.js"
 import get from "../util/get.js"
 import getLocationFromStackTrace from "../error/get-location-from-stack-trace.js"
 import has from "../util/has.js"
@@ -26,17 +24,13 @@ import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
 import set from "../util/set.js"
-import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
 const {
   STATE_EXECUTION_COMPLETED,
   STATE_EXECUTION_STARTED,
-  STATE_INITIAL,
-  STATE_PARSING_COMPLETED,
-  STATE_PARSING_STARTED,
-  TYPE_WASM
+  STATE_INITIAL
 } = ENTRY
 
 const {
@@ -85,7 +79,6 @@ function hook(Mod, parent) {
   Module._extensions = _extensions
 
   const jsManager = createManager(".js")
-  const wasmManager = createManager(".wasm")
 
   function createManager(ext) {
     return function managerWrapper(manager, func, args) {
@@ -103,6 +96,7 @@ function hook(Mod, parent) {
     const [mod, filename] = args
     const shouldOverwrite = ! Entry.has(mod)
     const entry = Entry.get(mod)
+    const ext = entry.extname
     const pkg = entry.package
 
     const compileFallback = () => {
@@ -122,7 +116,7 @@ function hook(Mod, parent) {
 
     if (entry._passthruCompile ||
         (shouldOverwrite &&
-         entry.extname === ".mjs")) {
+         ext === ".mjs")) {
       entry._passthruCompile = false
       compileFallback()
       return
@@ -161,6 +155,11 @@ function hook(Mod, parent) {
       })
     }
 
+    if (ext === ".wasm") {
+      mod._compile(readFile(filename), filename)
+      return
+    }
+
     if ((compileData === null ||
          compileData.transforms === 0) &&
         passthruMap.get(func)) {
@@ -168,15 +167,6 @@ function hook(Mod, parent) {
     } else {
       mod._compile(readFile(filename, "utf8"), filename)
     }
-  }
-
-  function wasmWrapper(manager, func, args) {
-    const [mod, filename] = args
-    const pkg = Entry.get(mod).package
-
-    return pkg.options.wasm
-      ? wasmCompiler(mod, filename)
-      : tryPassthru.call(this, func, args, pkg)
   }
 
   for (const ext of exts) {
@@ -216,11 +206,8 @@ function hook(Mod, parent) {
       }
     }
 
-    const manager = extIsWASM ? wasmManager : jsManager
-    const wrapper = extIsWASM ? wasmWrapper : jsWrapper
-
-    Wrapper.manage(_extensions, ext, manager)
-    Wrapper.wrap(_extensions, ext, wrapper)
+    Wrapper.manage(_extensions, ext, jsManager)
+    Wrapper.wrap(_extensions, ext, jsWrapper)
 
     passthruMap.set(extCompiler, passthru)
     Loader.state.module.extensions[ext] = _extensions[ext]
@@ -280,90 +267,6 @@ function tryPassthru(func, args, pkg) {
   maskStackTrace(error, { filename })
 
   throw error
-}
-
-function wasmCompiler(mod, filename) {
-  const content = readFile(filename)
-  const entry = Entry.get(mod)
-  const exported = GenericObject.create()
-  const { moduleState } = shared
-
-  // Use a `null` [[Prototype]] for `importObject` because the lookup
-  // includes inherited properties.
-  const importObject = { __proto__: null }
-
-  moduleState.parsing = true
-
-  mod.exports = exported
-  entry.exports = exported
-  entry.state = STATE_PARSING_STARTED
-  entry.type = TYPE_WASM
-
-  let wasmExported
-  let wasmMod
-  let threw = true
-
-  try {
-    wasmMod = wasmParse(entry, content, importObject)
-    threw = false
-  } finally {
-    moduleState.parsing = false
-
-    entry.state = threw
-      ? STATE_INITIAL
-      : STATE_PARSING_COMPLETED
-  }
-
-  entry.state = STATE_EXECUTION_STARTED
-
-  threw = true
-
-  try {
-    wasmExported = wasmLoad(entry, wasmMod, importObject)
-    threw = false
-  } finally {
-    entry.state = threw
-      ? STATE_INITIAL
-      : STATE_EXECUTION_COMPLETED
-  }
-
-  for (const name in wasmExported) {
-    Reflect.defineProperty(exported, name, {
-      configurable: true,
-      enumerable: true,
-      get: () => wasmExported[name],
-      set(value) {
-        setProperty(exported, name, value)
-      }
-    })
-  }
-}
-
-function wasmLoad(entry, wasmMod, importObject) {
-  entry.resumeChildren()
-
-  const { children } = entry
-
-  for (const request in importObject) {
-    const name = importObject[request]
-
-    importObject[request] = children[name].module.exports
-  }
-
-  return new WebAssembly.Instance(wasmMod, importObject).exports
-}
-
-function wasmParse(entry, content, importObject) {
-  const wasmMod = new WebAssembly.Module(content)
-  const descriptions = WebAssembly.Module.imports(wasmMod)
-
-  for (const { module:request, name:importedName } of descriptions) {
-    esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
-      importObject[request] = childEntry.name
-    }]])
-  }
-
-  return wasmMod
 }
 
 Reflect.defineProperty(mjsCompiler, shared.symbol.mjs, {

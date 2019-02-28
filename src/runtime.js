@@ -28,6 +28,7 @@ const {
   SETTER_TYPE_DYNAMIC_IMPORT,
   SETTER_TYPE_EXPORT_FROM,
   SETTER_TYPE_NAMESPACE,
+  TYPE_CJS,
   TYPE_ESM,
   UPDATE_TYPE_LIVE
 } = ENTRY
@@ -58,7 +59,7 @@ const Runtime = {
         return true
       }
 
-      if (childEntry.type !== TYPE_ESM &&
+      if (childEntry.type === TYPE_CJS &&
           childEntry._loaded !== LOAD_COMPLETED) {
         entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
       }

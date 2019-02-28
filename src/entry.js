@@ -429,9 +429,14 @@ class Entry {
   }
 
   getExportByName(name, parentEntry) {
-    return this.type === TYPE_ESM
-      ? getExportByNameFast(this, name, parentEntry)
-      : getExportByName(this, name, parentEntry)
+    const { type } = this
+
+    if (type === TYPE_ESM ||
+        type === TYPE_WASM) {
+      return getExportByNameFast(this, name, parentEntry)
+    }
+
+    return getExportByName(this, name, parentEntry)
   }
 
   loaded() {
@@ -1113,7 +1118,10 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry, names) {
-  if (entry.type === TYPE_ESM) {
+  const { type } = entry
+
+  if (type === TYPE_ESM ||
+      type === TYPE_WASM) {
     if (Array.isArray(names)) {
       for (const name of names) {
         runGetter(entry, name)

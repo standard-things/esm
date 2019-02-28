@@ -77,18 +77,17 @@ function init() {
 
     const { type } = entry
     const isCJS = type === TYPE_CJS
-    const isESM = type === TYPE_ESM
     const isPseudo = type === TYPE_PSEUDO
     const isLoaded = entry._loaded === LOAD_COMPLETED
 
     const defaultOnly =
       (isCJS &&
-      ! parentNamedExports &&
-      ! entry.builtin) ||
+       ! parentNamedExports &&
+       ! entry.builtin) ||
       (isPseudo &&
-      parentIsMJS)
+       parentIsMJS)
 
-    if (! isESM &&
+    if (isCJS &&
         ! defaultOnly &&
         ! isLoaded) {
       return
@@ -123,7 +122,7 @@ function init() {
 
         const { owner } = getter
 
-        if (owner.type !== TYPE_ESM &&
+        if (owner.type === TYPE_CJS &&
             owner._loaded !== LOAD_COMPLETED) {
           continue
         }
