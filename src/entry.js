@@ -1047,20 +1047,21 @@ function initNamespaceHandler() {
 }
 
 function isBindingName(name) {
-  if (typeof name !== "string") {
+  if (typeof name !== "string" ||
+      name.length === 0) {
     return false
   }
 
   let i = 0
 
-  if (! isIdentifierStart(name.charCodeAt(i), true)) {
+  if (! isIdentifierStart(name.codePointAt(i), true)) {
     return false
   }
 
-  const { length } = name
+  let point
 
-  while (++i < length) {
-    if (! isIdentifierChar(name.charCodeAt(i), true)) {
+  while ((point = name.codePointAt(++i)) !== void 0) {
+    if (! isIdentifierChar(point, true)) {
       return false
     }
   }
