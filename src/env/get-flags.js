@@ -16,6 +16,7 @@ function init() {
 
     const flags = {}
 
+    setDeferred(flags, "abortOnUncaughtException", () => matches(commandArgs, "--abort-on-uncaught-exception"))
     setDeferred(flags, "check", () => matches(commandArgs, /^(?:--check|-c)$/))
     setDeferred(flags, "eval", () => matches(commandArgs, /^(?:--eval|-e)$/))
     setDeferred(flags, "experimentalPolicy", () => matches(commandArgs, "--experimental-policy"))
