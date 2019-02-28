@@ -42,7 +42,7 @@ function init() {
 
     locRegExp.lastIndex = 0
 
-    while ((match = locRegExp.exec(stack))) {
+    while ((match = locRegExp.exec(stack)) !== null) {
       const [
         ,
         filename,

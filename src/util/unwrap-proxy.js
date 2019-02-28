@@ -18,7 +18,7 @@ function init() {
     let details
     let unwrapped = value
 
-    while ((details = getProxyDetails(unwrapped))) {
+    while ((details = getProxyDetails(unwrapped)) !== void 0) {
       unwrapped = details[0]
     }
 

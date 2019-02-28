@@ -42,7 +42,7 @@ function parseSkiplist(filename) {
 
   let match
 
-  while ((match = parseRegExp.exec(content))) {
+  while ((match = parseRegExp.exec(content)) !== null) {
     let [, comment, filename] = match
 
     filename = path.resolve(test262Path, filename)

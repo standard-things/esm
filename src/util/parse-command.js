@@ -11,7 +11,7 @@ function init() {
     if (typeof string === "string") {
       let match
 
-      while ((match = parseRegExp.exec(string))) {
+      while ((match = parseRegExp.exec(string)) !== null) {
         result.push(match[0])
       }
     }

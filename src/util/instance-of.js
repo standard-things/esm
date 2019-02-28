@@ -9,7 +9,7 @@ function init() {
     if (isObjectLike(value)) {
       let proto = value
 
-      while ((proto = getPrototypeOf(proto))) {
+      while ((proto = getPrototypeOf(proto)) !== null) {
         if (proto === prototype) {
           return true
         }

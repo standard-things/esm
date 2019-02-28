@@ -38,7 +38,7 @@ function init() {
 
     let match
 
-    while ((match = pattern.exec(code))) {
+    while ((match = pattern.exec(code)) !== null) {
       const { index } = match
 
       // Make sure the match isn't preceded by a `.` character, since that

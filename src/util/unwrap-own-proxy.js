@@ -21,7 +21,7 @@ function init() {
     let details
     let unwrapped = value
 
-    while ((details = instances.get(unwrapped))) {
+    while ((details = instances.get(unwrapped)) !== void 0) {
       unwrapped = details[0]
     }
 
