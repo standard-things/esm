@@ -13,4 +13,9 @@ describe("wasm tests", () => {
     import("./wasm/import.js")
       .then((ns) => ns.default())
   )
+
+  it("should hoist declarations before evaluation", () =>
+    import("./wasm/hoist-declarations.js")
+      .then((ns) => ns.default())
+  )
 })
