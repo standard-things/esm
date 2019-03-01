@@ -1131,12 +1131,12 @@ describe("miscellaneous tests", () => {
   })
 
   describe("spec compliance", () => {
-    it("should establish bindings before the module executes", () =>
+    it("should establish bindings before evaluation", () =>
       import("./misc/bindings.mjs")
         .then((ns) => ns.default())
     )
 
-    it("should hoist declarations before the module executes", () =>
+    it("should hoist declarations before evaluation", () =>
       import("./misc/hoist-declarations.mjs")
         .then((ns) => ns.default())
     )
@@ -1146,7 +1146,7 @@ describe("miscellaneous tests", () => {
         .then((ns) => ns.default())
     )
 
-    it("should execute modules in the correct order", () =>
+    it("should evaluate modules in the correct order", () =>
       import("./misc/order")
         .then((ns) => ns.default())
     )
@@ -1397,7 +1397,7 @@ describe("miscellaneous tests", () => {
         .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
     )
 
-    it("should not execute already loaded modules", () =>
+    it("should not evaluate already loaded modules", () =>
       [
         "./fixture/cjs/load-count",
         "./fixture/cycle/load-count/a.js",
@@ -1410,7 +1410,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should not execute already loaded modules from `require`", () =>
+    it("should not evaluate already loaded modules from `require`", () =>
       import("./fixture/load-count.js")
         .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
     )
@@ -1517,7 +1517,7 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should error for missing modules before ESM code execution", () =>
+    it("should error for missing modules before ESM evaluation", () =>
       [
         "./fixture/import/missing/module/cjs.mjs",
         "./fixture/import/missing/module/esm.mjs",
@@ -1538,7 +1538,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error for non-exported binding of ES modules before code execution", () =>
+    it("should error for non-exported binding of ES modules before evaluation", () =>
       [
         "./fixture/import/missing/export/cjs.mjs",
         "./fixture/import/missing/export/esm.mjs",
@@ -1559,7 +1559,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error for non-exported binding of uncached CJS modules after code execution", () =>
+    it("should error for non-exported binding of uncached CJS modules after evaluation", () =>
       [
         "./fixture/cjs/missing/export/cjs.js",
         "./fixture/cjs/missing/export/bridge.js"
@@ -1580,7 +1580,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error for non-exported binding of cached CJS modules before code execution", () =>
+    it("should error for non-exported binding of cached CJS modules before evaluation", () =>
       [
         "./fixture/cjs/missing/export/cjs.js",
         "./fixture/cjs/missing/export/bridge.js"
