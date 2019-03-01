@@ -22,9 +22,9 @@ import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
-import isBindingName from "./util/is-binding-name.js"
 import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
+import isIdentifierName from "./util/is-identifier-name.js"
 import isObject from "./util/is-object.js"
 import isObjectLike from "./util/is-object-like.js"
 import isOwnPath from "./util/is-own-path.js"
@@ -411,7 +411,7 @@ class Entry {
       const possibleNames = keys(this.exports)
 
       for (const name of possibleNames) {
-        if (isBindingName(name)) {
+        if (isIdentifierName(name)) {
           names.push(name)
         }
       }
@@ -1036,7 +1036,7 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
   const result = []
 
   for (const name of possibleNames) {
-    if (isBindingName(name)) {
+    if (isIdentifierName(name)) {
       result.push(name)
     }
   }

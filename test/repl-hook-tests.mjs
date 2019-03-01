@@ -142,13 +142,9 @@ describe("REPL hook tests", () => {
     r.eval(code, context, "repl", () => {
       context.dynamic
         .then((dynamic) => {
-          const rawPkgNs = Object.assign({
+          const pkgNs = createNamespace(Object.assign({
             default: pkgJSON
-          }, pkgJSON)
-
-          Reflect.deleteProperty(rawPkgNs, "private")
-
-          const pkgNs = createNamespace(rawPkgNs)
+          }, pkgJSON))
 
           assert.deepStrictEqual(dynamic, pkgNs)
           assert.deepStrictEqual(context.static, pkgJSON)

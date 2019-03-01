@@ -1773,15 +1773,29 @@ describe("miscellaneous tests", () => {
         ]
         .map((request) =>
           import(request)
-            .then((ns) => assert.deepStrictEqual(ns, createNamespace({
-              _҇: "_҇",
-              a: "a",
-              b: "b",
-              Ƞ: "Ƞ",
-              ȡ: "ȡ",
-              ಠ_ಠ: "ಠ_ಠ",
-              "𐊧": "𐊧"
-            })))
+            .then((ns) =>
+              assert.deepStrictEqual(ns, createNamespace({
+                _҇: "_҇",
+                a: "a",
+                arguments: "arguments",
+                await: "await",
+                enum: "enum",
+                eval: "eval",
+                implements: "implements",
+                interface: "interface",
+                let: "let",
+                package: "package",
+                private: "private",
+                protected: "protected",
+                public: "public",
+                static: "static",
+                yield: "yield",
+                Ƞ: "Ƞ",
+                ȡ: "ȡ",
+                ಠ_ಠ: "ಠ_ಠ",
+                "𐊧": "𐊧"
+              }))
+            )
         ))
     )
   })

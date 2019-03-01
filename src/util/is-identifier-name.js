@@ -1,24 +1,11 @@
-import {
-  createWordsRegExp,
-  isIdentifierChar,
-  isIdentifierStart,
-  reservedWords
-} from "../acorn.js"
+import { isIdentifierChar, isIdentifierStart } from "../acorn.js"
 
 import shared from "../shared.js"
 
 function init() {
-  const reservedWordsStrictBindRegExp = createWordsRegExp(
-    "await " +
-    reservedWords[6] + " " +
-    reservedWords.strict + " " +
-    reservedWords.strictBind
-  )
-
-  function isBindingName(name) {
+  function isIdentifierName(name) {
     if (typeof name !== "string" ||
-        name.length === 0 ||
-        reservedWordsStrictBindRegExp.test(name)) {
+        name.length === 0) {
       return false
     }
 
@@ -46,9 +33,9 @@ function init() {
     return true
   }
 
-  return isBindingName
+  return isIdentifierName
 }
 
 export default shared.inited
-  ? shared.module.utilIsBindingName
-  : shared.module.utilIsBindingName = init()
+  ? shared.module.utilIsIdentifierName
+  : shared.module.utilIsIdentifierName = init()
