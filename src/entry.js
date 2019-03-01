@@ -1,5 +1,5 @@
 import { basename, extname, sep } from "./safe/path.js"
-import { isIdentifierChar, isIdentifierStart } from "./acorn.js"
+import { createWordsRegExp, isIdentifierChar, isIdentifierStart, reservedWords } from "./acorn.js"
 
 import ENTRY from "./constant/entry.js"
 
@@ -78,6 +78,13 @@ const {
 const pseudoDescriptor = {
   value: true
 }
+
+const reservedWordsStrictBindRegExp = createWordsRegExp(
+  "await " +
+  reservedWords[6] + " " +
+  reservedWords.strict + " " +
+  reservedWords.strictBind
+)
 
 class Entry {
   constructor(mod) {
@@ -1053,7 +1060,8 @@ function initNamespaceHandler() {
 
 function isBindingName(name) {
   if (typeof name !== "string" ||
-      name.length === 0) {
+      name.length === 0 ||
+      reservedWordsStrictBindRegExp.test(name)) {
     return false
   }
 

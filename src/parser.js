@@ -22,6 +22,8 @@ function init() {
     SOURCE_TYPE_SCRIPT
   } = COMPILER
 
+  const reservedWordsRegExp = /^enum$/
+
   const defaultOptions = {
     allowAwaitOutsideFunction: true,
     allowReturnOutsideFunction: false,
@@ -60,7 +62,7 @@ function init() {
         parser.strict = !! strict
 
         if (! parser.strict) {
-          parser.reservedWords = /^enum$/
+          parser.reservedWords = reservedWordsRegExp
         }
       }
 
