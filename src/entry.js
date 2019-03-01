@@ -4,13 +4,6 @@ import {
   sep
 } from "./safe/path.js"
 
-import {
-  createWordsRegExp,
-  isIdentifierChar,
-  isIdentifierStart,
-  reservedWords
-} from "./acorn.js"
-
 import ENTRY from "./constant/entry.js"
 
 import CachingCompiler from "./caching-compiler.js"
@@ -29,6 +22,7 @@ import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
+import isBindingName from "./util/is-binding-name.js"
 import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isObject from "./util/is-object.js"
@@ -88,13 +82,6 @@ const {
 const pseudoDescriptor = {
   value: true
 }
-
-const reservedWordsStrictBindRegExp = createWordsRegExp(
-  "await " +
-  reservedWords[6] + " " +
-  reservedWords.strict + " " +
-  reservedWords.strictBind
-)
 
 class Entry {
   constructor(mod) {
@@ -1066,37 +1053,6 @@ function initNamespaceHandler() {
     has: null,
     set: null
   }
-}
-
-function isBindingName(name) {
-  if (typeof name !== "string" ||
-      name.length === 0 ||
-      reservedWordsStrictBindRegExp.test(name)) {
-    return false
-  }
-
-  let i = 0
-  let point = name.codePointAt(i)
-
-  if (! isIdentifierStart(point, true)) {
-    return false
-  }
-
-  let prevPoint = point
-
-  // Code points higher than U+FFFF, i.e 0xFFFF or 65535 in decimal, belong to
-  // the astral planes which are represented by surrogate pairs and require
-  // incrementing `i` by 2.
-  // https://mathiasbynens.be/notes/javascript-unicode#unicode-basics
-  while ((point = name.codePointAt(i += prevPoint > 0xFFFF ? 2 : 1)) !== void 0) {
-    if (! isIdentifierChar(point, true)) {
-      return false
-    }
-
-    prevPoint = point
-  }
-
-  return true
 }
 
 function isCalledFromStrictCode() {
