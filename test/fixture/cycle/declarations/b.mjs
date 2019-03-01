@@ -4,5 +4,5 @@ function b() {
   return true
 }
 
-export { b }
 export default a()
+export { b }
