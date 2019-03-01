@@ -1,6 +1,10 @@
 import COMPILER from "./constant/compiler.js"
 
-import { Parser as AcornParser } from "./acorn.js"
+import {
+  Parser as AcornParser,
+  createWordsRegExp,
+  reservedWords
+} from "./acorn.js"
 
 import acornParserBigInt from "./acorn/parser/big-int.js"
 import acornParserClassFields from "./acorn/parser/class-fields.js"
@@ -22,7 +26,7 @@ function init() {
     SOURCE_TYPE_SCRIPT
   } = COMPILER
 
-  const reservedWordsRegExp = /^enum$/
+  const reservedWordsRegExp = createWordsRegExp(reservedWords[6])
 
   const defaultOptions = {
     allowAwaitOutsideFunction: true,
