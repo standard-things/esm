@@ -1,0 +1,7 @@
+{
+  cjs: {
+    namedExports: true,
+    paths: true
+  },
+  debug: true
+}

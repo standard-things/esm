@@ -1,0 +1,23 @@
+{
+  "a": "a",
+  "b": "b",
+  "𐊧": "𐊧",
+  "Ƞ": "Ƞ",
+  "ȡ": "ȡ",
+  "_҇": "_҇",
+  "ಠ_ಠ": "ಠ_ಠ",
+  "☃️": "☃️",
+  "arguments": "arguments",
+  "await": "await",
+  "enum": "enum",
+  "eval": "eval",
+  "implements": "implements",
+  "interface": "interface",
+  "let": "let",
+  "package": "package",
+  "private": "private",
+  "protected": "protected",
+  "public": "public",
+  "static": "static",
+  "yield": "yield"
+}

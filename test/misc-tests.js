@@ -1764,6 +1764,26 @@ describe("miscellaneous tests", () => {
     it("should not hang on strings containing '# sourceMappingURL'", () =>
       import("./fixture/source/source-mapping-url-string.mjs")
     )
+
+    it("should ignore non-identifier properties for named exports of CJS and JSON modules", () =>
+      Promise
+        .all([
+          "./fixture/cjs/json/export-identifiers-cjs.js",
+          "./fixture/cjs/json/export-identifiers-json.js"
+        ]
+        .map((request) =>
+          import(request)
+            .then((ns) => assert.deepStrictEqual(ns, createNamespace({
+              _҇: "_҇",
+              a: "a",
+              b: "b",
+              Ƞ: "Ƞ",
+              ȡ: "ȡ",
+              ಠ_ಠ: "ಠ_ಠ",
+              "𐊧": "𐊧"
+            })))
+        ))
+    )
   })
 
   describe("workers support", () => {
