@@ -164,14 +164,16 @@ function compile(caller, entry, content, filename, fallback) {
     compileData.code = content
   }
 
-  const { moduleState } = shared
   const { type } = entry
-  const isCJS = type === TYPE_CJS
+  const isESM = type === TYPE_ESM
+  const isWASM = type === TYPE_WASM
+  const { moduleState } = shared
 
   let isSideloaded = false
 
   if (! moduleState.parsing) {
-    if (! isCJS &&
+    if ((isESM ||
+         isWASM) &&
         entry.state === STATE_INITIAL) {
       isSideloaded = true
       moduleState.parsing = true
@@ -181,7 +183,8 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  if (! isCJS) {
+  if (isESM ||
+      isWASM) {
     try {
       let result = tryRun(entry, filename)
 
