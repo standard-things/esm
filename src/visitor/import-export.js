@@ -100,7 +100,6 @@ function init() {
       this.possibleIndexes = null
       this.runtimeName = null
       this.sourceType = null
-      this.strict = false
       this.temporalBindings = null
       this.top = null
       this.transforms = 0
@@ -118,7 +117,6 @@ function init() {
         this.possibleIndexes = options.possibleIndexes
         this.runtimeName = options.runtimeName
         this.sourceType = options.sourceType
-        this.strict = options.strict
         this.temporalBindings = new Set
         this.top = options.top
         this.yieldIndex = options.yieldIndex

@@ -158,7 +158,6 @@ function init() {
         possibleIndexes: possibleImportExportIndexes,
         runtimeName,
         sourceType: sourceType === SOURCE_TYPE_SCRIPT ? SOURCE_TYPE_SCRIPT : SOURCE_TYPE_MODULE,
-        strict,
         top,
         yieldIndex
       })
