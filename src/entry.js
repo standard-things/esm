@@ -1,5 +1,15 @@
-import { basename, extname, sep } from "./safe/path.js"
-import { createWordsRegExp, isIdentifierChar, isIdentifierStart, reservedWords } from "./acorn.js"
+import {
+  basename,
+  extname,
+  sep
+} from "./safe/path.js"
+
+import {
+  createWordsRegExp,
+  isIdentifierChar,
+  isIdentifierStart,
+  reservedWords
+} from "./acorn.js"
 
 import ENTRY from "./constant/entry.js"
 

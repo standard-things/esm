@@ -1,4 +1,9 @@
-import { basename, dirname, resolve, sep } from "./safe/path.js"
+import {
+  basename,
+  dirname,
+  resolve,
+  sep
+} from "./safe/path.js"
 
 import CHAR_CODE from "./constant/char-code.js"
 import ENV from "./constant/env.js"
