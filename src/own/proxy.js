@@ -1,8 +1,9 @@
 import shared from "../shared.js"
+import toExternalFunction from "../util/to-external-function.js"
 
 function init() {
   const customInspectDescriptor = {
-    value: () => "{}"
+    value: toExternalFunction(() => "{}")
   }
 
   const markerDescriptor = {

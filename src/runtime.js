@@ -18,6 +18,7 @@ import setDeferred from "./util/set-deferred.js"
 import { setImmediate } from "./safe/timers.js"
 import shared from "./shared.js"
 import toExternalError from "./util/to-external-error.js"
+import toExternalFunction from "./util/to-external-function.js"
 
 const {
   ERROR_GETTER,
@@ -216,10 +217,10 @@ const Runtime = {
 
     Reflect.defineProperty(unsafeGlobal, runtimeName, {
       configurable: true,
-      get() {
+      get: toExternalFunction(function () {
         Reflect.deleteProperty(this, runtimeName)
         return runtime
-      }
+      })
     })
 
     code =

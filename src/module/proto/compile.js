@@ -27,6 +27,7 @@ import shared from "../../shared.js"
 import staticWrap from "../static/wrap.js"
 import staticWrapper from "../static/wrapper.js"
 import stripShebang from "../../util/strip-shebang.js"
+import toExternalFunction from "../../util/to-external-function.js"
 import validateString from "../../util/validate-string.js"
 
 const {
@@ -115,21 +116,21 @@ const compile = maskFunction(function (content, filename) {
       Reflect.defineProperty(Module, "wrap", {
         configurable: true,
         enumerable: true,
-        get: () => staticWrap,
-        set(value) {
+        get: toExternalFunction(() => staticWrap),
+        set: toExternalFunction(function (value) {
           useLegacyWrapper = true
           setProperty(this, "wrap", value)
-        }
+        })
       })
 
       Reflect.defineProperty(Module, "wrapper", {
         configurable: true,
         enumerable: true,
-        get: () => proxy,
-        set(value) {
+        get: toExternalFunction(() => proxy),
+        set: toExternalFunction(function (value) {
           useLegacyWrapper = true
           setProperty(this, "wrapper", value)
-        }
+        })
       })
     }
   }

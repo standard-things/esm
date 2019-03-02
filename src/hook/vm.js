@@ -281,13 +281,13 @@ function createAddBuiltinModules(entry) {
     exposeObject(context, "process", req("process"))
 
     for (const name of lazyModules) {
-      const set = function (value) {
+      const set = toExternalFunction(function (value) {
         setProperty(this, name, value)
-      }
+      })
 
       Reflect.defineProperty(context, name, {
         configurable: true,
-        get() {
+        get: toExternalFunction(function () {
           // Prevent re-entering the getter by triggering the setter to convert
           // `context[name]` from an accessor property to a data property.
           this[name] = void 0
@@ -301,7 +301,7 @@ function createAddBuiltinModules(entry) {
           })
 
           return exported
-        },
+        }),
         set
       })
     }

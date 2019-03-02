@@ -21,6 +21,7 @@ import safe from "../util/safe.js"
 import safeConsole from "../safe/console.js"
 import safeProcess from "../safe/process.js"
 import shared from "../shared.js"
+import toExternalFunction from "../util/to-external-function.js"
 import toString from "../util/to-string.js"
 
 function init() {
@@ -124,7 +125,7 @@ function init() {
 
     if (! has(Console, Symbol.hasInstance)) {
       Reflect.defineProperty(Console, Symbol.hasInstance, {
-        value: (instance) => instance[isConsoleSymbol]
+        value: toExternalFunction((instance) => instance[isConsoleSymbol])
       })
     }
 

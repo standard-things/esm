@@ -26,6 +26,7 @@ import satisfies from "../util/satisfies.js"
 import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
+import toExternalFunction from "../util/to-external-function.js"
 
 const {
   STATE_EXECUTION_COMPLETED,
@@ -133,7 +134,7 @@ function hook(Mod, parent) {
     const { _compile } = mod
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
-    const compileWrapper = (content, filename) => {
+    const compileWrapper = toExternalFunction((content, filename) => {
       if (shouldOverwrite) {
         if (shouldRestore) {
           mod._compile = _compile
@@ -143,7 +144,7 @@ function hook(Mod, parent) {
       }
 
       compile(manager, entry, content, filename, compileFallback)
-    }
+    })
 
     if (shouldOverwrite) {
       mod._compile = compileWrapper

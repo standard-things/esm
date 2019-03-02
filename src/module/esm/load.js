@@ -17,6 +17,7 @@ import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
+import toExternalFunction from "../../util/to-external-function.js"
 
 const {
   TYPE_ESM
@@ -151,12 +152,12 @@ function tryLoader(entry, filename, parentEntry, cache, cacheKey) {
         Reflect.defineProperty(cache, cacheKey, {
           configurable: true,
           enumerable: true,
-          get() {
+          get: toExternalFunction(function () {
             throw error
-          },
-          set(value) {
+          }),
+          set: toExternalFunction(function (value) {
             setProperty(this, cacheKey, value)
-          }
+          })
         })
       } else {
         Reflect.deleteProperty(cache, cacheKey)
