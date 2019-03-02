@@ -535,12 +535,12 @@ function wasmParse(entry, buffer, importObject) {
   const exportDescriptions = WebAssembly.Module.exports(wasmMod)
   const importDescriptions = WebAssembly.Module.imports(wasmMod)
 
-  for (const { name:exportedName } of exportDescriptions) {
-    entry.addGetter(exportedName, () => ERROR_GETTER)
+  for (const { name } of exportDescriptions) {
+    entry.addGetter(name, () => ERROR_GETTER)
   }
 
-  for (const { module:request, name:importedName } of importDescriptions) {
-    esmImport(request, entry, [[importedName, [importedName], (value, childEntry) => {
+  for (const { module:request, name } of importDescriptions) {
+    esmImport(request, entry, [[name, [name], (value, childEntry) => {
       importObject[request] = childEntry.name
     }]])
   }
