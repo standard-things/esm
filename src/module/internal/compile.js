@@ -20,6 +20,7 @@ import getLocationFromStackTrace from "../../error/get-location-from-stack-trace
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
 import getStackFrames from "../../error/get-stack-frames.js"
 import isAbsolute from "../../path/is-absolute.js"
+import isIdentifierName from "../../util/is-identifier-name.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
 import isOwnPath from "../../util/is-own-path.js"
 import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
@@ -27,6 +28,7 @@ import maskStackTrace from "../../error/mask-stack-trace.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 import toExternalError from "../../util/to-external-error.js"
+import toExternalFunction from "../../util/to-external-function.js"
 import toString from "../../util/to-string.js"
 
 const {
@@ -509,6 +511,7 @@ function wasmEvaluate(entry, wasmMod, importObject) {
   }
 
   const exported = entry.module.exports
+  const { getters } = entry
   const wasmInstance = new WebAssembly.Instance(wasmMod, importObject)
   const wasmExported = assign(GenericObject.create(), wasmInstance.exports)
 
@@ -517,15 +520,17 @@ function wasmEvaluate(entry, wasmMod, importObject) {
   for (const name in wasmExported) {
     const getter = () => entry.exports[name]
 
-    entry.addGetter(name, getter)
+    if (Reflect.has(getters, name)) {
+      entry.addGetter(name, getter)
+    }
 
     Reflect.defineProperty(exported, name, {
       configurable: true,
       enumerable: true,
-      get: getter,
-      set(value) {
-        setProperty(exported, name, value)
-      }
+      get: toExternalFunction(getter),
+      set: toExternalFunction(function (value) {
+        setProperty(this, name, value)
+      })
     })
   }
 }
@@ -536,7 +541,9 @@ function wasmParse(entry, buffer, importObject) {
   const importDescriptions = WebAssembly.Module.imports(wasmMod)
 
   for (const { name } of exportDescriptions) {
-    entry.addGetter(name, () => ERROR_GETTER)
+    if (isIdentifierName(name)) {
+      entry.addGetter(name, () => ERROR_GETTER)
+    }
   }
 
   for (const { module:request, name } of importDescriptions) {
