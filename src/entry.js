@@ -359,19 +359,16 @@ class Entry {
       return
     }
 
+    const { getters } = this
+
     if (names === void 0) {
       names = this._loaded === LOAD_COMPLETED
-        ? keys(this.getters)
+        ? keys(getters)
         : getExportsObjectKeys(this)
     }
 
-    const { getters } = this
-    const isCJS = this.type === TYPE_CJS
-
     for (const name of names) {
-      if (! (isCJS &&
-             name === "default") &&
-          ! Reflect.has(getters, name)) {
+      if (! Reflect.has(getters, name)) {
         this.addGetter(name, () => this.exports[name])
       }
     }
@@ -685,7 +682,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
 
     if (! errored &&
-        entry.type === TYPE_ESM) {
+        type === TYPE_ESM) {
       errored =
         ! Reflect.has(getters, name) ||
         getters[name]() === ERROR_GETTER
@@ -940,9 +937,8 @@ function getExportByName(entry, name, parentEntry) {
       return ERROR_GETTER
     }
 
-    if ((type === TYPE_CJS ||
-         (type === TYPE_PSEUDO &&
-          parentIsMJS)) &&
+    if ((type === TYPE_PSEUDO &&
+          parentIsMJS) &&
         name === "default") {
       return entry.exports
     }
