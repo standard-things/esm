@@ -23,7 +23,7 @@ import readFile from "../fs/read-file.js"
 import relaxRange from "../util/relax-range.js"
 import toString from "../util/to-string.js"
 import satisfies from "../util/satisfies.js"
-import set from "../util/set.js"
+import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 
@@ -246,12 +246,12 @@ function tryPassthru(func, args, pkg) {
         "Expected esm@" + range +
         ". Using esm@" + PACKAGE_VERSION + ": " + filename
 
-      set(error, "message", newMessage)
+      setProperty(error, "message", newMessage)
 
       const stack = get(error, "stack")
 
       if (typeof stack === "string") {
-        set(error, "stack", stack.replace(message, () => newMessage))
+        setProperty(error, "stack", stack.replace(message, () => newMessage))
       }
     }
 

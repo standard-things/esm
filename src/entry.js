@@ -35,7 +35,6 @@ import keys from "./util/keys.js"
 import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
-import set from "./util/set.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
@@ -477,14 +476,11 @@ class Entry {
       const names = getExportsObjectKeys(this, exported)
 
       if (this.type === TYPE_CJS) {
-        this.addGetter("default", () => this.exports)
-
         exported = proxyExports(this)
-
-        if (this.extname === ".json") {
-          this.type = TYPE_JSON
-          set(mod, "exports", exported)
-        }
+        this.addGetter("default", () => this.exports)
+      } else if (this.type === TYPE_JSON) {
+        exported = proxyExports(this)
+        mod.exports = exported
       }
 
       this.exports = exported

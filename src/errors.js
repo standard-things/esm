@@ -8,7 +8,6 @@ import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleName from "./util/get-module-name.js"
 import getModuleURL from "./util/get-module-url.js"
 import { inspect } from "./safe/util.js"
-import set from "./util/set.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toString from "./util/to-string.js"
@@ -115,7 +114,7 @@ function init() {
         const stack = get(error, "stack")
 
        if (typeof stack === "string") {
-          set(error, "stack",
+          setProperty(error, "stack",
             loc.filename + ":" +
             loc.line + "\n" +
             stack
