@@ -78,17 +78,19 @@ function init() {
 
     const { type } = entry
     const isCJS = type === TYPE_CJS
+    const isJSON = type === TYPE_JSON
     const isLoaded = entry._loaded === LOAD_COMPLETED
 
     const defaultOnly =
       ((isCJS ||
-        type === TYPE_JSON) &&
+        isJSON) &&
        ! parentNamedExports &&
        ! entry.builtin) ||
       (type === TYPE_PSEUDO &&
        parentIsMJS)
 
-    if (isCJS &&
+    if ((isCJS ||
+         isJSON)  &&
         ! defaultOnly &&
         ! isLoaded) {
       return
