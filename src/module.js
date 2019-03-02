@@ -78,7 +78,7 @@ assign(_extensions, RealModule._extensions)
 safeDefaultProperties(Module, RealModule)
 
 if (JEST) {
-  Module._cache = { __proto__: null }
+  Module._cache = __non_webpack_require__.cache
 }
 
 if (! Array.isArray(Module.globalPaths)) {
