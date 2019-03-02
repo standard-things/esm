@@ -20,7 +20,6 @@ import realConsole from "../real/console.js"
 import safe from "../util/safe.js"
 import safeConsole from "../safe/console.js"
 import safeProcess from "../safe/process.js"
-import setDeferred from "../util/set-deferred.js"
 import shared from "../shared.js"
 import toString from "../util/to-string.js"
 
@@ -82,17 +81,15 @@ function init() {
           if (useConsoleCall &&
               typeof builtinFunc === "function" &&
               has(builtinConsole, name)) {
-            setDeferred(builtinConsole, name, () => {
-              // Use `consoleCall()` to combine `builtinFunc()` and
-              // `originalFunc()` without adding to the call stack.
-              return GenericFunction.bind(
-                consoleCall,
-                void 0,
-                originalFunc,
-                builtinFunc,
-                emptyConfig
-              )
-            })
+            // Use `consoleCall()` to combine `builtinFunc()` and
+            // `originalFunc()` without adding to the call stack.
+            builtinConsole[name] = GenericFunction.bind(
+              consoleCall,
+              void 0,
+              originalFunc,
+              builtinFunc,
+              emptyConfig
+            )
           } else {
             builtinConsole[name] = originalFunc
           }
