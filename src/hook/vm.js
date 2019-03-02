@@ -31,6 +31,7 @@ import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
+import toExternalFunction from "../util/to-external-function.js"
 import wrap from "../util/wrap.js"
 
 const {
@@ -222,7 +223,7 @@ function hook(vm) {
 
     const _inspect = realUtil.inspect
 
-    setGetter(realUtil, "inspect", function () {
+    setGetter(realUtil, "inspect", toExternalFunction(function () {
       // Prevent re-entering the getter by triggering the setter to convert
       // `util.inspect()` from an accessor property to a data property.
       this.inspect = inspect
@@ -232,11 +233,11 @@ function hook(vm) {
       // for ANSI coloring to be enabled.
       // https://github.com/nodejs/node/blob/v9.11.1/lib/repl.js#L377-L382
       return _inspect
-    })
+    }))
 
-    setSetter(realUtil, "inspect", function (value) {
+    setSetter(realUtil, "inspect", toExternalFunction(function (value) {
       setProperty(this, "inspect", value)
-    })
+    }))
   }
 
   Wrapper.manage(vm, "createScript", managerWrapper)
