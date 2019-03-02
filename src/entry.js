@@ -821,10 +821,11 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
       if (has(exported, name)) {
         const newValue = Reflect.get(exported, name, receiver)
+        const { type } = entry
 
-        if ((value === INITIAL_VALUE ||
-             newValue !== value) &&
-            (entry.type !== TYPE_CJS ||
+        if (newValue !== value &&
+            ((type !== TYPE_CJS &&
+              type !== TYPE_JSON) ||
              name !== "default") &&
             isUpdatableGet(namespace, name)) {
           return newValue

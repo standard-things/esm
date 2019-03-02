@@ -11,6 +11,7 @@ function init() {
     SETTER_TYPE_EXPORT_FROM,
     TYPE_CJS,
     TYPE_ESM,
+    TYPE_JSON,
     TYPE_PSEUDO
   } = ENTRY
 
@@ -77,14 +78,14 @@ function init() {
 
     const { type } = entry
     const isCJS = type === TYPE_CJS
-    const isPseudo = type === TYPE_PSEUDO
     const isLoaded = entry._loaded === LOAD_COMPLETED
 
     const defaultOnly =
-      (isCJS &&
+      ((isCJS ||
+        type === TYPE_JSON) &&
        ! parentNamedExports &&
        ! entry.builtin) ||
-      (isPseudo &&
+      (type === TYPE_PSEUDO &&
        parentIsMJS)
 
     if (isCJS &&
