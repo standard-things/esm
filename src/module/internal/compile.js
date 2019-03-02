@@ -427,14 +427,14 @@ function tryRun(entry, filename) {
       Reflect.defineProperty(mod, "loaded", {
         configurable: true,
         enumerable: true,
-        get: () => false,
-        set(value) {
+        get: toExternalFunction(() => false),
+        set: toExternalFunction(function (value) {
           if (value) {
             setProperty(this, "loaded", value)
             entry.updateBindings()
             entry.loaded()
           }
-        }
+        })
       })
     } else if (! parsing &&
                firstPass) {
