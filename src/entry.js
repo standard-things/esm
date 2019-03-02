@@ -1003,6 +1003,7 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
   let possibleNames
 
   if (type === TYPE_ESM ||
+      type === TYPE_JSON ||
       type === TYPE_WASM) {
     possibleNames = keys(exported)
   } else {
