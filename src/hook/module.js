@@ -156,12 +156,13 @@ function hook(Mod, parent) {
     }
 
     if (ext === ".wasm") {
-      mod._compile(readFile(filename), filename)
+      compile(manager, entry, readFile(filename), filename, compileFallback)
       return
     }
 
     if ((compileData === null ||
          compileData.transforms === 0) &&
+        this !== Loader.state.module.extensions &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {
