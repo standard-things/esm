@@ -15,6 +15,7 @@ import replaceWithout from "../util/replace-without.js"
 import scrubStackTrace from "./scrub-stack-trace.js"
 import shared from "../shared.js"
 import toExternalError from "../util/to-external-error.js"
+import toExternalFunction from "../util/to-external-function.js"
 import toString from "../util/to-string.js"
 
 function init() {
@@ -72,7 +73,7 @@ function init() {
     // wrapped error object.
     Reflect.defineProperty(error, "stack", {
       configurable: true,
-      get() {
+      get: toExternalFunction(function () {
         // Prevent re-entering the getter by triggering the setter to convert
         // `error.stack` from an accessor property to a data property.
         this.stack = ""
@@ -92,14 +93,14 @@ function init() {
           : scrubStackTrace
 
         return this.stack = replaceWithout(masked, newString, scrubber)
-      },
-      set(value) {
+      }),
+      set: toExternalFunction(function (value) {
         Reflect.defineProperty(this, "stack", {
           configurable: true,
           value,
           writable: true
         })
-      }
+      })
     })
 
     decorateStackTrace(error)
