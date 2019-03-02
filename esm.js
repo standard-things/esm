@@ -49,13 +49,6 @@ const esmModule = new Module(id)
 esmModule.filename = filename
 esmModule.parent = parent
 
-let jestObject
-
-if (typeof jest === "object" && jest !== null &&
-    global.jest !== jest) {
-  jestObject = jest
-}
-
 function getNativeSource(thePath) {
   let result
 
@@ -79,7 +72,7 @@ function has(object, name) {
 }
 
 function loadESM() {
-  compiledESM(require, esmModule, jestObject, shared)
+  compiledESM(require, esmModule, shared)
   return esmModule.exports
 }
 
@@ -130,7 +123,7 @@ if (nativeContent !== "") {
 
 const script = new Script(
   "var __global__ = this;" +
-  "(function (require, module, __jest__, __shared__) { " +
+  "(function (require, module, __shared__) { " +
   content +
   "\n});",
   scriptOptions

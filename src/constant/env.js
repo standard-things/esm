@@ -10,7 +10,6 @@ import isElectronRenderer from "../env/is-electron-renderer.js"
 import isEval from "../env/is-eval.js"
 import isInternal from "../env/is-internal.js"
 import isJasmine from "../env/is-jasmine.js"
-import isJest from "../env/is-jest.js"
 import isNdb from "../env/is-ndb.js"
 import isNyc from "../env/is-nyc.js"
 import isPreloaded from "../env/is-preloaded.js"
@@ -35,7 +34,6 @@ setDeferred(ENV, "FLAGS", getFlags)
 setDeferred(ENV, "HAS_INSPECTOR", hasInspector)
 setDeferred(ENV, "INTERNAL", isInternal)
 setDeferred(ENV, "JASMINE", isJasmine)
-setDeferred(ENV, "JEST", isJest)
 setDeferred(ENV, "NDB", isNdb)
 setDeferred(ENV, "NYC", isNyc)
 setDeferred(ENV, "OPTIONS", getOptions)

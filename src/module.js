@@ -24,8 +24,7 @@ import staticWrap from "./module/static/wrap.js"
 import staticWrapper from "./module/static/wrapper.js"
 
 const {
-  ELECTRON,
-  JEST
+  ELECTRON
 } = ENV
 
 const Module = maskFunction(function (id, parent) {
@@ -46,6 +45,7 @@ const Module = maskFunction(function (id, parent) {
 
 const _extensions = { __proto__: null }
 
+Module._cache = __non_webpack_require__.cache
 Module._extensions = _extensions
 Module._findPath = staticFindPath
 Module._initPaths = staticInitPaths
@@ -76,10 +76,6 @@ prototype.require = req
 // and other meta properties.
 assign(_extensions, RealModule._extensions)
 safeDefaultProperties(Module, RealModule)
-
-if (JEST) {
-  Module._cache = __non_webpack_require__.cache
-}
 
 if (! Array.isArray(Module.globalPaths)) {
   Module._initPaths()
