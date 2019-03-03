@@ -127,7 +127,7 @@ function compile(caller, entry, content, filename, fallback) {
 
         compileData = {
           circular: 0,
-          code: content,
+          code: null,
           codeWithTDZ: null,
           filename: null,
           firstAwaitOutsideFunction: null,
@@ -372,7 +372,7 @@ function tryRun(entry, filename, fallback) {
         // Use a `null` [[Prototype]] for `importObject` because the lookup
         // includes inherited properties.
         const importObject = { __proto__: null }
-        const wasmMod = wasmParse(entry, compileData.code, importObject)
+        const wasmMod = wasmParse(entry, filename, importObject)
         yield
         wasmEvaluate(entry, wasmMod, importObject)
       })()
@@ -647,8 +647,8 @@ function wasmEvaluate(entry, wasmMod, importObject) {
   }
 }
 
-function wasmParse(entry, buffer, importObject) {
-  const wasmMod = new WebAssembly.Module(buffer)
+function wasmParse(entry, filename, importObject) {
+  const wasmMod = new WebAssembly.Module(readFile(filename))
   const exportDescriptions = WebAssembly.Module.exports(wasmMod)
   const importDescriptions = WebAssembly.Module.imports(wasmMod)
 

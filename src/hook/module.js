@@ -127,7 +127,7 @@ function hook(Mod, parent) {
 
     if (runtime !== null &&
         runtime._runResult !== void 0) {
-      compile(manager, entry, compileData.code, filename, compileFallback)
+      compile(manager, entry, null, filename, compileFallback)
       return
     }
 
@@ -156,12 +156,8 @@ function hook(Mod, parent) {
       })
     }
 
-    if (ext === ".wasm") {
-      compile(manager, entry, readFile(filename), filename, compileFallback)
-      return
-    }
-
-    if (ext === ".json") {
+    if (ext === ".json" ||
+        ext === ".wasm") {
       compile(manager, entry, null, filename, compileFallback)
       return
     }
