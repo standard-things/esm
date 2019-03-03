@@ -15,6 +15,7 @@ import assign from "../../util/assign.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
 import compileSource from "./compile-source.js"
 import constructError from "../../error/construct-error.js"
+import emptyArray from "../../util/empty-array.js"
 import errors from "../../parse/errors.js"
 import esmImport from "../../module/esm/import.js"
 import get from "../../util/get.js"
@@ -74,6 +75,8 @@ const {
   MODE_ALL,
   MODE_AUTO
 } = PACKAGE
+
+const STACK_TRACE_LIMIT_TO_GET_OUTSIDE_ESM = 20
 
 const exportsRegExp = /^.*?\bexports\b/
 
@@ -201,7 +204,7 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (useFallback) {
-    const frames = getStackFrames(constructError(Error, [], 20))
+    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT_TO_GET_OUTSIDE_ESM))
 
     for (const frame of frames) {
       const framePath = frame.getFileName()
