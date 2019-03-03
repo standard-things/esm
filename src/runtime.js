@@ -85,7 +85,7 @@ const Runtime = {
       const childIsLoaded = childEntry._loaded === LOAD_COMPLETED
 
       if (! childIsLoaded &&
-          childEntry.type !== TYPE_ESM) {
+          childEntry.type === TYPE_CJS) {
         entry._namespaceFinalized = NAMESPACE_FINALIZATION_DEFERRED
         return
       }
