@@ -17,6 +17,7 @@ import assign from "./util/assign.js"
 import builtinLookup from "./builtin-lookup.js"
 import { cwd } from "./safe/process.js"
 import defaults from "./util/defaults.js"
+import emptyArray from "./util/empty-array.js"
 import errors from "./errors.js"
 import esmParseLoad from "./module/esm/parse-load.js"
 import findPath from "./module/internal/find-path.js"
@@ -67,7 +68,6 @@ const {
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_JSON_FILENAME = "package.json"
 
-const emptyArray = []
 const esmrcExts = [".mjs", ".cjs", ".js", ".json"]
 
 const defaultOptions = {

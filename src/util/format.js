@@ -1,11 +1,10 @@
+import emptyObject from "./empty-object.js"
 import formatWithOptions from "./format-with-options.js"
 import shared from "../shared.js"
 
 function init() {
-  const emptyOptions = {}
-
   function format(...args) {
-    return formatWithOptions(emptyOptions, ...args)
+    return formatWithOptions(emptyObject, ...args)
   }
 
   return format

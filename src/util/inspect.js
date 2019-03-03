@@ -5,6 +5,7 @@ import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
 import builtinEntries from "../builtin-entries.js"
+import emptyObject from "./empty-object.js"
 import getObjectTag from "./get-object-tag.js"
 import getProxyDetails from "./get-proxy-details.js"
 import has from "./has.js"
@@ -25,7 +26,6 @@ import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
 function init() {
   const PROXY_PREFIX = "Proxy ["
 
-  const emptyObject = {}
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {

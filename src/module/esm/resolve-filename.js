@@ -13,6 +13,7 @@ import SafeModule from "../../safe/module.js"
 import builtinLookup from "../../builtin-lookup.js"
 import bundledLookup from "../../bundled-lookup.js"
 import decodeURIComponent from "../../util/decode-uri-component.js"
+import emptyArray from "../../util/empty-array.js"
 import errors from "../../errors.js"
 import findPath from "../internal/find-path.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
@@ -52,7 +53,6 @@ const {
 const localhostRegExp = /^\/\/localhost\b/
 const queryHashRegExp = /[?#].*$/
 
-const emptyArray = []
 const strictExts = [".mjs", ".js", ".json", ".node"]
 const strictFields = ["main"]
 const strictExtsLookup = new Set(strictExts)
