@@ -1664,14 +1664,18 @@ describe("miscellaneous tests", () => {
 
       return import(filename)
         .then(assert.fail)
-        .catch((e) =>
-          checkErrorStack(e, [
-            getURLFromFilePath(filename) + ":3",
-            "export default class A {}",
-            "",
-            "SyntaxError: Identifier 'A' has already been declared"
-          ].join("\n"))
-        )
+        .catch((e) => {
+          if (isDebug) {
+            assert.ok(true)
+          } else {
+            checkErrorStack(e, [
+              getURLFromFilePath(filename) + ":3",
+              "export default class A {}",
+              "",
+              "SyntaxError: Identifier 'A' has already been declared"
+            ].join("\n"))
+          }
+        })
     })
 
     it("should error when using top-level `new.target`", () => {
