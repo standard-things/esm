@@ -6,23 +6,25 @@ function init() {
   const ExError = shared.external.Error
 
   function getBuiltinErrorConstructor(error) {
-    if (error instanceof Error) {
+    if (error instanceof Error ||
+        error === Error.prototype) {
       return Error
     }
 
-    if (error instanceof ExError) {
+    if (error instanceof ExError ||
+        error === ExError.prototype) {
       return ExError
     }
 
     let proto = error
 
     while ((proto = getPrototypeOf(proto)) !== null) {
-      const ctor = proto ? proto.constructor : void 0
+      const Ctor = proto ? proto.constructor : void 0
 
-      if (typeof ctor === "function" &&
-          ctor.name === "Error" &&
-          isNative(ctor)) {
-        return ctor
+      if (typeof Ctor === "function" &&
+          Ctor.name === "Error" &&
+          isNative(Ctor)) {
+        return Ctor
       }
     }
 
