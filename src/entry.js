@@ -478,9 +478,11 @@ class Entry {
       if (this.type === TYPE_CJS) {
         exported = proxyExports(this)
         this.addGetter("default", () => this.exports)
-      } else if (this.type === TYPE_JSON) {
-        exported = proxyExports(this)
-        mod.exports = exported
+
+        if (this.extname === ".json") {
+          this.type = TYPE_JSON
+          mod.exports = exported
+        }
       }
 
       this.exports = exported
