@@ -8,9 +8,9 @@ function init() {
     return types.isPromise
   }
 
-  return function isPromiseFallback(value) {
+  return function isPromise(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Promise]"
+           getObjectTag(value) === "[object Promise]"
   }
 }
 

@@ -8,7 +8,7 @@ function init() {
     return types.isAnyArrayBuffer
   }
 
-  return function isAnyArrayBufferFallback(value) {
+  return function isAnyArrayBuffer(value) {
     if (! isObject(value)) {
       return false
     }

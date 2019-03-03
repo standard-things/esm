@@ -7,7 +7,7 @@ function init() {
     return types.isWeakMap
   }
 
-  return function isWeakMapFallback(value) {
+  return function isWeakMap(value) {
     return getObjectTag(value) === "[object WeakMap]"
   }
 }

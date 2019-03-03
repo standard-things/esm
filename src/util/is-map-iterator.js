@@ -8,9 +8,9 @@ function init() {
     return types.isMapIterator
   }
 
-  return function isMapIteratorFallback(value) {
+  return function isMapIterator(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Map Iterator]"
+           getObjectTag(value) === "[object Map Iterator]"
   }
 }
 

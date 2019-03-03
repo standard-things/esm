@@ -8,9 +8,9 @@ function init() {
     return types.isRegExp
   }
 
-  return function isRegExpFallback(value) {
+  return function isRegExp(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object RegExp]"
+           getObjectTag(value) === "[object RegExp]"
   }
 }
 

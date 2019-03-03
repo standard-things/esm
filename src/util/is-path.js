@@ -4,7 +4,8 @@ import shared from "../shared.js"
 
 function init() {
   function isPath(value) {
-    return isRelative(value) || isAbsolute(value)
+    return isRelative(value) ||
+           isAbsolute(value)
   }
 
   return isPath

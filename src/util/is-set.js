@@ -8,9 +8,9 @@ function init() {
     return types.isSet
   }
 
-  return function isSetFallback(value) {
+  return function isSet(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Set]"
+           getObjectTag(value) === "[object Set]"
   }
 }
 

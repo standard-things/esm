@@ -39,8 +39,8 @@ function init() {
     }
 
     return shared.support.inspectProxies &&
-      isObjectLike(value) &&
-      inspect(value, liteInspectOptions).startsWith("Proxy")
+           isObjectLike(value) &&
+           inspect(value, liteInspectOptions).startsWith("Proxy")
   }
 }
 

@@ -8,9 +8,9 @@ function init() {
     return types.isMap
   }
 
-  return function isMapFallback(value) {
+  return function isMap(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Map]"
+           getObjectTag(value) === "[object Map]"
   }
 }
 

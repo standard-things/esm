@@ -7,7 +7,7 @@ function init() {
     return types.isWeakSet
   }
 
-  return function isWeakSetFallback(value) {
+  return function isWeakSet(value) {
     return getObjectTag(value) === "[object WeakSet]"
   }
 }

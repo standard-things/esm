@@ -8,9 +8,9 @@ function init() {
     return types.isSetIterator
   }
 
-  return function isSetIteratorFallback(value) {
+  return function isSetIterator(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Set Iterator]"
+           getObjectTag(value) === "[object Set Iterator]"
   }
 }
 

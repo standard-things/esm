@@ -8,9 +8,9 @@ function init() {
     return types.isNumberObject
   }
 
-  return function isNumberObjectFallback(value) {
+  return function isNumberObject(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Number]"
+           getObjectTag(value) === "[object Number]"
   }
 }
 

@@ -10,7 +10,7 @@ function init() {
 
   return function isWebAssemblyCompiledModule(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object WebAssembly.Module]"
+           getObjectTag(value) === "[object WebAssembly.Module]"
   }
 }
 

@@ -8,9 +8,9 @@ function init() {
     return types.isDate
   }
 
-  return function isDateFallback(value) {
+  return function isDate(value) {
     return isObject(value) &&
-      getObjectTag(value) === "[object Date]"
+           getObjectTag(value) === "[object Date]"
   }
 }
 
