@@ -2,7 +2,7 @@ import CHAR_CODE from "./constant/char-code.js"
 import ESM from "./constant/esm.js"
 
 import captureStackTrace from "./error/capture-stack-trace.js"
-import constructStackless from "./error/construct-stackless.js"
+import constructError from "./error/construct-error.js"
 import get from "./util/get.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleName from "./util/get-module-name.js"
@@ -104,7 +104,7 @@ function init() {
       if (beforeFunc === null) {
         error = new Super(message)
       } else {
-        error = constructStackless(Super, [message])
+        error = constructError(Super, [message])
         captureStackTrace(error, beforeFunc)
       }
 

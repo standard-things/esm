@@ -1,6 +1,6 @@
 import ENTRY from "../../constant/entry.js"
 
-import constructStackless from "../../error/construct-stackless.js"
+import constructError from "../../error/construct-error.js"
 import errors from "../../errors.js"
 import shared from "../../shared.js"
 
@@ -165,7 +165,7 @@ function init() {
 
         // Remove problematic setter to unblock subsequent imports.
         setters.splice(setterIndex, 1)
-        throw constructStackless(ErrorCtor, [entry.module, exportedName])
+        throw constructError(ErrorCtor, [entry.module, exportedName])
       }
     }
   }

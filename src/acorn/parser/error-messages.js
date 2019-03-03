@@ -1,6 +1,6 @@
 import MESSAGE from "../../constant/message.js"
 
-import constructStackless from "../../error/construct-stackless.js"
+import constructError from "../../error/construct-error.js"
 import errors from "../../parse/errors.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
@@ -134,7 +134,7 @@ function init() {
       return
     }
 
-    throw constructStackless(errors.SyntaxError, [this, pos, message])
+    throw constructError(errors.SyntaxError, [this, pos, message])
   }
 
   function unexpected(pos) {
