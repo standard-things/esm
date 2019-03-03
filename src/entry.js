@@ -358,13 +358,11 @@ class Entry {
       return
     }
 
-    const { getters } = this
-
     if (names === void 0) {
-      names = this._loaded === LOAD_COMPLETED
-        ? keys(getters)
-        : getExportsObjectKeys(this)
+      names = getExportsObjectKeys(this)
     }
+
+    const { getters } = this
 
     for (const name of names) {
       if (! Reflect.has(getters, name)) {
@@ -1102,8 +1100,6 @@ function runGetters(entry, names) {
         runGetter(entry, name)
       }
     }
-  } else if (entry.module.loaded) {
-    entry.assignExportsToNamespace(names)
   }
 }
 
