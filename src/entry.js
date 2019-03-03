@@ -353,24 +353,6 @@ class Entry {
     return this
   }
 
-  assignExportsToNamespace(names) {
-    if (! isObjectLike(this.exports)) {
-      return
-    }
-
-    if (names === void 0) {
-      names = getExportsObjectKeys(this)
-    }
-
-    const { getters } = this
-
-    for (const name of names) {
-      if (! Reflect.has(getters, name)) {
-        this.addGetter(name, () => this.exports[name])
-      }
-    }
-  }
-
   finalizeNamespace() {
     if (this._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED) {
       return this
@@ -473,13 +455,16 @@ class Entry {
 
       const names = getExportsObjectKeys(this, exported)
 
+      for (const name of names) {
+        this.addGetter(name, () => this.exports[name])
+      }
+
       if (this.type === TYPE_CJS) {
         exported = proxyExports(this)
         this.addGetter("default", () => this.exports)
       }
 
       this.exports = exported
-      this.assignExportsToNamespace(names)
     } else if (this.type === TYPE_JSON) {
       this._loaded = LOAD_COMPLETED
 
@@ -1007,7 +992,7 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
       type === TYPE_JSON ||
       type === TYPE_WASM) {
     possibleNames = keys(exported)
-  } else {
+  } else if (isObjectLike(exported)) {
     const isFunc = typeof exported === "function"
     const ownNames = ownPropertyNames(exported)
     const proto = getPrototypeOf(exported)
