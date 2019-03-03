@@ -28,6 +28,7 @@ import isOwnPath from "../../util/is-own-path.js"
 import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
 import keys from "../../util/keys.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
+import readFile from "../../fs/read-file.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
 import stripBOM from "../../util/strip-bom.js"
@@ -120,17 +121,13 @@ function compile(caller, entry, content, filename, fallback) {
         compileData.transforms !== 0) {
       if (isJSON ||
           isWASM) {
-        const code = isJSON
-          ? stripBOM(content)
-          : content
-
         entry.type = isJSON
           ? TYPE_JSON
           : TYPE_WASM
 
         compileData = {
           circular: 0,
-          code,
+          code: content,
           codeWithTDZ: null,
           filename: null,
           firstAwaitOutsideFunction: null,
@@ -215,7 +212,7 @@ function compile(caller, entry, content, filename, fallback) {
       }
     }
 
-    return tryRun(entry, filename)
+    return tryRun(entry, filename, fallback)
   }
 
   const { moduleState } = shared
@@ -231,7 +228,7 @@ function compile(caller, entry, content, filename, fallback) {
       moduleState.parsing = true
       entry.state = STATE_PARSING_STARTED
     } else {
-      return tryRun(entry, filename)
+      return tryRun(entry, filename, fallback)
     }
   }
 
@@ -239,7 +236,7 @@ function compile(caller, entry, content, filename, fallback) {
       isJSON ||
       isWASM) {
     try {
-      let result = tryRun(entry, filename)
+      let result = tryRun(entry, filename, fallback)
 
       if (compileData.circular === -1) {
         compileData.circular = isDescendant(entry, entry) ? 1 : 0
@@ -258,7 +255,7 @@ function compile(caller, entry, content, filename, fallback) {
             compileData.code = codeWithTDZ
           }
 
-          result = tryRun(entry, filename)
+          result = tryRun(entry, filename, fallback)
         }
       }
 
@@ -278,7 +275,7 @@ function compile(caller, entry, content, filename, fallback) {
     }
   }
 
-  return tryRun(entry, filename)
+  return tryRun(entry, filename, fallback)
 }
 
 function isDescendant(entry, parentEntry, seen) {
@@ -330,7 +327,7 @@ function tryCompile(caller, entry, content, options) {
   throw error
 }
 
-function tryRun(entry, filename) {
+function tryRun(entry, filename, fallback) {
   const { compileData, type } = entry
   const isESM = type === TYPE_ESM
   const isJSON = type === TYPE_JSON
@@ -366,7 +363,7 @@ function tryRun(entry, filename) {
 
     if (isJSON)  {
       runtime._runResult = (function *() {
-        const parsed = jsonParse(entry, compileData.code)
+        const parsed = jsonParse(entry, filename, fallback)
         yield
         jsonEvaluate(entry, parsed)
       })()
@@ -551,15 +548,54 @@ function jsonEvaluate(entry, parsed) {
   entry.addGetter("default", () => entry.exports)
 }
 
-function jsonParse(entry, content) {
+function jsonParse(entry, filename, fallback) {
+  const mod = entry.module
+  const exported = mod.exports
+  const { state } = entry
+
+  let useFallback = false
+
+  if (typeof fallback === "function") {
+    const parentEntry = Entry.get(mod.parent)
+
+    useFallback =
+      parentEntry !== null &&
+      parentEntry.package.options.cjs.extensions &&
+      parentEntry.extname !== ".mjs"
+  }
+
+  const content = useFallback
+    ? null
+    : stripBOM(readFile(filename, "utf8"))
+
+  let error
   let parsed
+  let threw = true
 
   try {
-    parsed = SafeJSON.parse(content)
-  } catch (e) {
-    e.message = entry.filename + ": " + e.message
+    if (useFallback) {
+      fallback()
+      parsed = mod.exports
+    } else {
+      parsed = SafeJSON.parse(content)
+    }
 
-    throw e
+    threw = false
+  } catch (e) {
+    error = e
+
+    if (! useFallback) {
+      error.message = filename + ": " + error.message
+    }
+  }
+
+  if (useFallback) {
+    entry.state = state
+    setProperty(mod, "exports", exported)
+  }
+
+  if (threw) {
+    throw error
   }
 
   const names = keys(parsed)

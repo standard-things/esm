@@ -162,7 +162,7 @@ function hook(Mod, parent) {
     }
 
     if (ext === ".json") {
-      compile(manager, entry, readFile(filename, "utf8"), filename, compileFallback)
+      compile(manager, entry, null, filename, compileFallback)
       return
     }
 
