@@ -9,10 +9,12 @@ import Entry from "../../entry.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
+import SafeJSON from "../../safe/json.js"
 
 import assign from "../../util/assign.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
 import compileSource from "./compile-source.js"
+import constructError from "../../error/construct-error.js"
 import errors from "../../parse/errors.js"
 import esmImport from "../../module/esm/import.js"
 import get from "../../util/get.js"
@@ -24,14 +26,17 @@ import isIdentifierName from "../../util/is-identifier-name.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
 import isOwnPath from "../../util/is-own-path.js"
 import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
+import keys from "../../util/keys.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
+import stripBOM from "../../util/strip-bom.js"
 import toExternalError from "../../util/to-external-error.js"
 import toExternalFunction from "../../util/to-external-function.js"
 import toString from "../../util/to-string.js"
 
 const {
+  SOURCE_TYPE_JSON,
   SOURCE_TYPE_MODULE,
   SOURCE_TYPE_SCRIPT,
   SOURCE_TYPE_UNAMBIGUOUS,
@@ -49,6 +54,7 @@ const {
   STATE_PARSING_STARTED,
   TYPE_CJS,
   TYPE_ESM,
+  TYPE_JSON,
   TYPE_WASM
 } = ENTRY
 
@@ -78,14 +84,20 @@ function compile(caller, entry, content, filename, fallback) {
   const pkgMode = options.mode
 
   let hint = -1
+  let isJSON = false
+  let isWASM = false
   let sourceType = SOURCE_TYPE_SCRIPT
 
   if (ext === ".cjs") {
     hint = SOURCE_TYPE_SCRIPT
+  } else if (ext === ".json") {
+    hint = SOURCE_TYPE_JSON
+    isJSON = true
   } else if (ext === ".mjs") {
     hint = SOURCE_TYPE_MODULE
   } else if (ext === ".wasm") {
     hint = SOURCE_TYPE_WASM
+    isWASM = true
   }
 
   if (pkgMode === MODE_ALL) {
@@ -106,12 +118,19 @@ function compile(caller, entry, content, filename, fallback) {
 
     if (compileData === null ||
         compileData.transforms !== 0) {
-      if (hint === SOURCE_TYPE_WASM) {
-        entry.type = TYPE_WASM
+      if (isJSON ||
+          isWASM) {
+        const code = isJSON
+          ? stripBOM(content)
+          : content
+
+        entry.type = isJSON
+          ? TYPE_JSON
+          : TYPE_WASM
 
         compileData = {
           circular: 0,
-          code: content,
+          code,
           codeWithTDZ: null,
           filename: null,
           firstAwaitOutsideFunction: null,
@@ -166,15 +185,46 @@ function compile(caller, entry, content, filename, fallback) {
     compileData.code = content
   }
 
-  const { type } = entry
-  const isESM = type === TYPE_ESM
-  const isWASM = type === TYPE_WASM
+  const isESM = entry.type === TYPE_ESM
+
+  let useFallback = false
+
+  if (! isESM &&
+      ! isWASM &&
+      typeof fallback === "function") {
+    const parentEntry = Entry.get(mod.parent)
+    const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
+    const parentPkg = parentEntry === null ? null : parentEntry.package
+
+    if (! parentIsESM &&
+        (isDefaultPkg ||
+         parentPkg === defaultPkg)) {
+      useFallback = true
+    }
+  }
+
+  if (useFallback) {
+    const frames = getStackFrames(constructError(Error, [], 20))
+
+    for (const frame of frames) {
+      const framePath = frame.getFileName()
+
+      if (isAbsolute(framePath) &&
+          ! isOwnPath(framePath)) {
+        return fallback()
+      }
+    }
+
+    return tryRun(entry, filename)
+  }
+
   const { moduleState } = shared
 
   let isSideloaded = false
 
   if (! moduleState.parsing) {
     if ((isESM ||
+         isJSON ||
          isWASM) &&
         entry.state === STATE_INITIAL) {
       isSideloaded = true
@@ -186,6 +236,7 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (isESM ||
+      isJSON ||
       isWASM) {
     try {
       let result = tryRun(entry, filename)
@@ -197,7 +248,7 @@ function compile(caller, entry, content, filename, fallback) {
       if (compileData.circular === 1) {
         entry.circular = true
 
-        if (type === TYPE_ESM) {
+        if (isESM) {
           entry.runtime = null
           mod.exports = GenericObject.create()
 
@@ -223,25 +274,6 @@ function compile(caller, entry, content, filename, fallback) {
     } finally {
       if (isSideloaded) {
         moduleState.parsing = false
-      }
-    }
-  } else if (typeof fallback === "function") {
-    const parentEntry = Entry.get(mod.parent)
-    const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
-    const parentPkg = parentEntry === null ? null : parentEntry.package
-
-    if (! parentIsESM &&
-        (isDefaultPkg ||
-         parentPkg === defaultPkg)) {
-      const frames = getStackFrames(new Error)
-
-      for (const frame of frames) {
-        const framePath = frame.getFileName()
-
-        if (isAbsolute(framePath) &&
-            ! isOwnPath(framePath)) {
-          return fallback()
-        }
       }
     }
   }
@@ -301,6 +333,7 @@ function tryCompile(caller, entry, content, options) {
 function tryRun(entry, filename) {
   const { compileData, type } = entry
   const isESM = type === TYPE_ESM
+  const isJSON = type === TYPE_JSON
   const isWASM = type === TYPE_WASM
 
   let { runtime } = entry
@@ -331,7 +364,13 @@ function tryRun(entry, filename) {
   if (firstPass) {
     entry.running = true
 
-    if (isWASM) {
+    if (isJSON)  {
+      runtime._runResult = (function *() {
+        const parsed = jsonParse(entry, compileData.code)
+        yield
+        jsonEvaluate(entry, parsed)
+      })()
+    } else if (isWASM) {
       runtime._runResult = (function *() {
         // Use a `null` [[Prototype]] for `importObject` because the lookup
         // includes inherited properties.
@@ -497,6 +536,43 @@ function useSourceMap(entry) {
   }
 
   return false
+}
+
+function jsonEvaluate(entry, parsed) {
+  entry.exports = parsed
+  entry.module.exports = parsed
+
+  const { getters } = entry
+
+  for (const name in getters) {
+    entry.addGetter(name, () => entry.exports[name])
+  }
+
+  entry.addGetter("default", () => entry.exports)
+}
+
+function jsonParse(entry, content) {
+  let parsed
+
+  try {
+    parsed = SafeJSON.parse(content)
+  } catch (e) {
+    e.message = entry.filename + ": " + e.message
+
+    throw e
+  }
+
+  const names = keys(parsed)
+
+  for (const name of names) {
+    if (isIdentifierName(name)) {
+      entry.addGetter(name, () => ERROR_GETTER)
+    }
+  }
+
+  entry.addGetter("default", () => ERROR_GETTER)
+
+  return parsed
 }
 
 function wasmEvaluate(entry, wasmMod, importObject) {

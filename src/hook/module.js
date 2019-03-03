@@ -52,7 +52,7 @@ const {
   ERR_REQUIRE_ESM
 } = errors
 
-const exts = [".js", ".mjs", ".cjs", ".wasm"]
+const exts = [".js", ".json", ".mjs", ".cjs", ".wasm"]
 const importExportRegExp = /^.*?\b(?:im|ex)port\b/
 const realExtsJS = RealModule._extensions[".js"]
 
@@ -158,6 +158,11 @@ function hook(Mod, parent) {
 
     if (ext === ".wasm") {
       compile(manager, entry, readFile(filename), filename, compileFallback)
+      return
+    }
+
+    if (ext === ".json") {
+      compile(manager, entry, readFile(filename, "utf8"), filename, compileFallback)
       return
     }
 

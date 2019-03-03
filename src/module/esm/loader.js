@@ -50,6 +50,7 @@ function loader(entry, filename, parentEntry) {
   if (parsing &&
       ext !== ".cjs" &&
       ext !== ".js" &&
+      ext !== ".json" &&
       ext !== ".mjs" &&
       ext !== ".wasm") {
     entry.state = STATE_PARSING_COMPLETED

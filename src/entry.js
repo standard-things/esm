@@ -463,9 +463,9 @@ class Entry {
     const { cjs } = this.package.options
 
     if (this.type === TYPE_CJS) {
-      let exported = mod.exports
-
       this._loaded = LOAD_COMPLETED
+
+      let exported = mod.exports
 
       if (cjs.esModule &&
           exported != null &&
@@ -478,35 +478,36 @@ class Entry {
       if (this.type === TYPE_CJS) {
         exported = proxyExports(this)
         this.addGetter("default", () => this.exports)
-
-        if (this.extname === ".json") {
-          this.type = TYPE_JSON
-          mod.exports = exported
-        }
       }
 
       this.exports = exported
       this.assignExportsToNamespace(names)
+    } else if (this.type === TYPE_JSON) {
+      this._loaded = LOAD_COMPLETED
+
+      const exported = proxyExports(this)
+
+      this.exports = exported
+      mod.exports = exported
     } else {
       const names = getExportsObjectKeys(this)
-
-      this._loaded = LOAD_COMPLETED
-      this.assignExportsToNamespace(names)
 
       const exportDefaultOnly =
         cjs.dedefault &&
         names.length === 1 &&
         names[0] === "default"
 
+      this._loaded = LOAD_COMPLETED
+
       if (cjs.mutableNamespace &&
           ! exportDefaultOnly) {
-        this.module.exports = proxyExports(this)
+        mod.exports = proxyExports(this)
       }
 
       const exported = this.exports
 
       if (exportDefaultOnly) {
-        this.module.exports = exported.default
+        mod.exports = exported.default
       } else if (cjs.esModule &&
                  ! Reflect.has(this.getters, "__esModule")) {
         Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
