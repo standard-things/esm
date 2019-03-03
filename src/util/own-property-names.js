@@ -1,10 +1,11 @@
+import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
   function ownPropertyNames(object) {
-    return object == null
-      ? []
-      : Object.getOwnPropertyNames(object)
+    return isObjectLike(object)
+      ? Object.getOwnPropertyNames(object)
+      : []
   }
 
   return ownPropertyNames

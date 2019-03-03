@@ -26,7 +26,6 @@ import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isIdentifierName from "./util/is-identifier-name.js"
 import isObject from "./util/is-object.js"
-import isObjectLike from "./util/is-object-like.js"
 import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
@@ -992,7 +991,7 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
       type === TYPE_JSON ||
       type === TYPE_WASM) {
     possibleNames = keys(exported)
-  } else if (isObjectLike(exported)) {
+  } else {
     const isFunc = typeof exported === "function"
     const ownNames = ownPropertyNames(exported)
     const proto = getPrototypeOf(exported)
