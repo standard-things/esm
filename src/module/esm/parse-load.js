@@ -6,8 +6,7 @@ import validateDeep from "./validate-deep.js"
 
 const {
   STATE_PARSING_COMPLETED,
-  TYPE_ESM,
-  TYPE_WASM
+  TYPE_CJS,
 } = ENTRY
 
 function parseLoad(request, parent, isMain) {
@@ -29,10 +28,7 @@ function parseLoad(request, parent, isMain) {
     entry.updateBindings()
 
     if (entry.state === STATE_PARSING_COMPLETED) {
-      const { type } = entry
-
-      if (type === TYPE_ESM ||
-          type === TYPE_WASM) {
+      if (entry.type !== TYPE_CJS) {
         validateDeep(entry)
       }
 

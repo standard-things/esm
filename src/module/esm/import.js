@@ -18,6 +18,7 @@ const {
 } = errors
 
 const {
+  TYPE_CJS,
   TYPE_ESM,
   STATE_PARSING_COMPLETED,
   UPDATE_TYPE_INIT
@@ -81,7 +82,7 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
 
       if (isDynamic &&
           entry.state === STATE_PARSING_COMPLETED &&
-          entry.type === TYPE_ESM) {
+          entry.type !== TYPE_CJS) {
         validateDeep(entry)
       }
     }

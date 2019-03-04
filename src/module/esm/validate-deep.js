@@ -10,7 +10,6 @@ function init() {
     NAMESPACE_FINALIZATION_DEFERRED,
     SETTER_TYPE_EXPORT_FROM,
     TYPE_CJS,
-    TYPE_ESM,
     TYPE_JSON,
     TYPE_PSEUDO
   } = ENTRY
@@ -38,7 +37,7 @@ function init() {
     for (const name in children) {
       const childEntry = children[name]
 
-      if (childEntry.type === TYPE_ESM) {
+      if (childEntry.type !== TYPE_CJS) {
         validateDeep(childEntry, seen)
       }
     }
