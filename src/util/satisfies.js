@@ -1,8 +1,11 @@
 import { satisfies as _satisfies } from "semver"
 import shared from "../shared.js"
-import stripPrereleaseTag from "./strip-prerelease-tag.js"
 
 function init() {
+  const satisfiesOptions = {
+    includePrerelease: true
+  }
+
   function satisfies(version, range) {
     if (typeof version !== "string" ||
         typeof range !== "string") {
@@ -15,7 +18,7 @@ function init() {
     let cached = cache.get(cacheKey)
 
     if (cached === void 0) {
-      cached = _satisfies(stripPrereleaseTag(version), range)
+      cached = _satisfies(version, range, satisfiesOptions)
       cache.set(cacheKey, cached)
     }
 
