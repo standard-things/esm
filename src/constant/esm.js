@@ -1,6 +1,5 @@
 import encodeId from "../util/encode-id.js"
 import setDeferred from "../util/set-deferred.js"
-import stripPrereleaseTag from "../util/strip-prerelease-tag.js"
 
 // The `process.env` properties are replaced at build time.
 // https://webpack.js.org/plugins/environment-plugin/
@@ -11,7 +10,7 @@ const ESM = {
   PACKAGE_DIRNAME: null,
   PACKAGE_FILENAMES: null,
   PACKAGE_PREFIX: encodeId("esm"),
-  PACKAGE_RANGE: stripPrereleaseTag(PACKAGE_VERSION),
+  PACKAGE_RANGE: PACKAGE_VERSION.match(/^[\d.]+/)[0],
   PACKAGE_VERSION
 }
 
