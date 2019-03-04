@@ -64,6 +64,21 @@ function init() {
     return false
   }
 
+  function raiseExportError(entry, exportedName, parentEntry) {
+    const setters = entry.setters[exportedName]
+    const setterIndex = setters.findIndex(({ owner }) => owner === parentEntry)
+
+    if (setterIndex !== -1) {
+      const ErrorCtor = isCyclicalExport(entry, exportedName)
+        ? ERR_EXPORT_CYCLE
+        : ERR_EXPORT_MISSING
+
+      // Remove problematic setter to unblock subsequent imports.
+      setters.splice(setterIndex, 1)
+      throw constructError(ErrorCtor, [entry.module, exportedName])
+    }
+  }
+
   function validate(entry, parentEntry) {
     const parentIsMJS = parentEntry.extname === ".mjs"
 
@@ -77,19 +92,17 @@ function init() {
 
     const { type } = entry
     const isCJS = type === TYPE_CJS
-    const isJSON = type === TYPE_JSON
     const isLoaded = entry._loaded === LOAD_COMPLETED
 
     const defaultOnly =
       ((isCJS ||
-        isJSON) &&
+        type === TYPE_JSON) &&
        ! parentNamedExports &&
        ! entry.builtin) ||
       (type === TYPE_PSEUDO &&
        parentIsMJS)
 
-    if ((isCJS ||
-         isJSON)  &&
+    if (isCJS &&
         ! defaultOnly &&
         ! isLoaded) {
       return
@@ -102,9 +115,13 @@ function init() {
     let namespace
 
     for (const exportedName in settersMap) {
-      if (defaultOnly &&
-          exportedName === "default") {
-        continue
+      if (defaultOnly) {
+        if (exportedName === "*" ||
+            exportedName === "default") {
+          continue
+        }
+
+        raiseExportError(entry, exportedName, parentEntry)
       }
 
       const cached = cache.get(exportedName)
@@ -154,18 +171,7 @@ function init() {
 
       cache.set(exportedName, false)
 
-      const setters = settersMap[exportedName]
-      const setterIndex = setters.findIndex(({ owner }) => owner === parentEntry)
-
-      if (setterIndex !== -1) {
-        const ErrorCtor = isCyclicalExport(entry, exportedName)
-          ? ERR_EXPORT_CYCLE
-          : ERR_EXPORT_MISSING
-
-        // Remove problematic setter to unblock subsequent imports.
-        setters.splice(setterIndex, 1)
-        throw constructError(ErrorCtor, [entry.module, exportedName])
-      }
+      raiseExportError(entry, exportedName, parentEntry)
     }
   }
 
