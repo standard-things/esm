@@ -20,6 +20,7 @@ import shared from "../../shared.js"
 import toExternalFunction from "../../util/to-external-function.js"
 
 const {
+  TYPE_CJS,
   TYPE_ESM
 } = ENTRY
 
@@ -147,8 +148,9 @@ function tryLoader(entry, filename, parentEntry, cache, cacheKey) {
     throw error
   } finally {
     if (threw) {
-      if (entry.type === TYPE_ESM) {
-        // Unlike CJS, ESM errors are preserved for subsequent loads.
+      if (entry.type !== TYPE_CJS) {
+        // Unlike CJS, for other module types errors are preserved for
+        // subsequent loads.
         Reflect.defineProperty(cache, cacheKey, {
           configurable: true,
           enumerable: true,
