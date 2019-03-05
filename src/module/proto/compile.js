@@ -65,7 +65,6 @@ const compile = maskFunction(function (content, filename) {
 
   const entry = Entry.get(this)
   const { state } = entry
-  const isESM = entry.type === TYPE_ESM
   const isInitial = state === STATE_INITIAL
 
   if (entry.package.options.mode !== MODE_STRICT &&
@@ -208,6 +207,8 @@ const compile = maskFunction(function (content, filename) {
       useLegacyWrapper = true
     }
   }
+
+  const isESM = entry.type === TYPE_ESM
 
   let compiledWrapper
   let script
