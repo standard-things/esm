@@ -35,7 +35,8 @@ const {
 } = CHAR_CODE
 
 const {
-  TYPE_ESM
+  TYPE_CJS,
+  TYPE_PSEUDO
 } = ENTRY
 
 const {
@@ -240,10 +241,17 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
 
 function maybeMaskStackTrace(error, parentEntry) {
   if (! Loader.state.package.default.options.debug) {
-    maskStackTrace(error, {
-      filename: parentEntry === null ? void 0 : parentEntry.filename,
-      inModule: parentEntry === null ? void 0 : parentEntry.type === TYPE_ESM
-    })
+    if (parentEntry === null) {
+      maskStackTrace(error)
+    } else {
+      const parentType = parentEntry.type
+
+      maskStackTrace(error, {
+        filename: parentEntry.filename,
+        inModule: parentType !== TYPE_CJS &&
+                  parentType !== TYPE_PSEUDO
+      })
+    }
   }
 
   return error

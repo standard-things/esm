@@ -21,15 +21,15 @@ import toExternalFunction from "../../util/to-external-function.js"
 
 const {
   TYPE_CJS,
-  TYPE_ESM
+  TYPE_PSEUDO
 } = ENTRY
 
 function load(request, parent, isMain = false, preload) {
   const { parsing } = shared.moduleState
   const parentEntry = Entry.get(parent)
   const parentCJS = parentEntry === null ? null : parentEntry.package.options.cjs
-  const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
   const parentIsMJS = parentEntry === null ? false : parentEntry.extname === ".mjs"
+  const parentType = parentEntry === null ? -1 : parentEntry.type
 
   let filename
 
@@ -70,7 +70,7 @@ function load(request, parent, isMain = false, preload) {
     const mod = scratchCache[request]
 
     if (isUnexposed &&
-        Entry.get(mod).type === TYPE_ESM) {
+        Entry.get(mod).type !== TYPE_CJS) {
       cache = moduleCache
     }
 
@@ -81,9 +81,9 @@ function load(request, parent, isMain = false, preload) {
   let loaderCalled = false
 
   const sanitize = (entry) => {
-    const isESM = entry.type === TYPE_ESM
+    const isCJS = entry.type === TYPE_CJS
 
-    if (! isESM) {
+    if (isCJS) {
       isUnexposed = false
     }
 
@@ -92,9 +92,11 @@ function load(request, parent, isMain = false, preload) {
       Reflect.deleteProperty(realProcess, "mainModule")
     }
 
-    if (! isESM &&
+    if (isCJS &&
+        parentEntry !== null &&
         (parentIsMJS ||
-         (parentIsESM &&
+         (parentType !== TYPE_CJS &&
+          parentType !== TYPE_PSEUDO &&
           ! parentCJS.cache))) {
       entry.module.parent = void 0
     }

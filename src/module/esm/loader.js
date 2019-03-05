@@ -9,7 +9,8 @@ import staticNodeModulePaths from "../static/node-module-paths.js"
 
 const {
   STATE_PARSING_COMPLETED,
-  TYPE_ESM
+  TYPE_CJS,
+  TYPE_PSEUDO
 } = ENTRY
 
 function loader(entry, filename, parentEntry) {
@@ -38,7 +39,10 @@ function loader(entry, filename, parentEntry) {
   const mod = entry.module
 
   if (! mod.paths) {
-    if (parentEntry.type !== TYPE_ESM ||
+    const parentType = parentEntry.type
+
+    if (parentType === TYPE_CJS ||
+        parentType === TYPE_PSEUDO ||
         (entry.package.options.cjs.paths &&
          entry.extname !== ".mjs")) {
       mod.paths = Module._nodeModulePaths(entry.dirname)

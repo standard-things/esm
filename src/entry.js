@@ -259,7 +259,10 @@ class Entry {
       getter.type = GETTER_TYPE_DEFAULT
     }
 
-    if (this.type === TYPE_ESM &&
+    const { type } = this
+
+    if (type !== TYPE_CJS &&
+        type !== TYPE_PSEUDO &&
         name === "default") {
       const value = tryGetter(getter)
 
@@ -377,7 +380,10 @@ class Entry {
     // https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects
     Object.seal(this._completeNamespace)
 
-    if (this.type === TYPE_ESM) {
+    const { type } = this
+
+    if (type === TYPE_ESM ||
+        type === TYPE_WASM) {
       return this
     }
 
@@ -918,7 +924,7 @@ function getExportByName(entry, name, parentEntry) {
     }
 
     if ((type === TYPE_PSEUDO &&
-          parentIsMJS) &&
+         parentIsMJS) &&
         name === "default") {
       return entry.exports
     }
@@ -986,11 +992,8 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
 
   let possibleNames
 
-  if (type === TYPE_ESM ||
-      type === TYPE_JSON ||
-      type === TYPE_WASM) {
-    possibleNames = keys(exported)
-  } else {
+  if (type === TYPE_CJS ||
+      type === TYPE_PSEUDO) {
     const isFunc = typeof exported === "function"
     const ownNames = ownPropertyNames(exported)
     const proto = getPrototypeOf(exported)
@@ -1009,6 +1012,8 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
 
       possibleNames.push(name)
     }
+  } else {
+    possibleNames = keys(exported)
   }
 
   const result = []
@@ -1070,10 +1075,7 @@ function runGetter(entry, name) {
 }
 
 function runGetters(entry, names) {
-  const { type } = entry
-
-  if (type === TYPE_ESM ||
-      type === TYPE_WASM) {
+  if (entry.type === TYPE_ESM) {
     if (Array.isArray(names)) {
       for (const name of names) {
         runGetter(entry, name)

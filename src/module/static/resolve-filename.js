@@ -26,7 +26,8 @@ import staticResolveLookupPaths from "./resolve-lookup-paths.js"
 import validateString from "../../util/validate-string.js"
 
 const {
-  TYPE_ESM
+  TYPE_CJS,
+  TYPE_PSEUDO
 } = ENTRY
 
 const {
@@ -118,10 +119,17 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
   const error = new MODULE_NOT_FOUND(request, parent)
 
   if (! Loader.state.package.default.options.debug) {
-    maskStackTrace(error, {
-      filename: parentEntry === null ? void 0 : parentEntry.filename,
-      inModule: parentEntry === null ? void 0 : parentEntry.type === TYPE_ESM
-    })
+    if (parentEntry === null) {
+      maskStackTrace(error)
+    } else {
+      const parentType = parentEntry.type
+
+      maskStackTrace(error, {
+        filename: parentEntry.filename,
+        inModule: parentType !== TYPE_CJS &&
+                  parentType !== TYPE_PSEUDO
+      })
+    }
   }
 
   throw error

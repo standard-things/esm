@@ -516,7 +516,7 @@ function tryRun(entry, filename, fallback) {
 
   maskStackTrace(error, {
     filename,
-    inModule: isESM
+    inModule: entry.type !== TYPE_CJS
   })
 
   throw error

@@ -31,6 +31,7 @@ const {
   SETTER_TYPE_NAMESPACE,
   TYPE_CJS,
   TYPE_ESM,
+  TYPE_PSEUDO,
   UPDATE_TYPE_LIVE
 } = ENTRY
 
@@ -157,10 +158,13 @@ const Runtime = {
     } catch (e) {
       if (! Loader.state.package.default.options.debug &&
           isStackTraceMaskable(e)) {
+        const { type } = entry
+
         maskStackTrace(e, {
           content,
           filename: "eval",
-          inModule: entry.type === TYPE_ESM
+          inModule: type !== TYPE_CJS &&
+                    type !== TYPE_PSEUDO
         })
       } else {
         toExternalError(e)
@@ -195,10 +199,13 @@ const Runtime = {
     } catch (e) {
       if (! Loader.state.package.default.options.debug &&
           isStackTraceMaskable(e)) {
+        const { type } = entry
+
         maskStackTrace(e, {
           content,
           filename: "eval",
-          inModule: entry.type === TYPE_ESM
+          inModule: type !== TYPE_CJS &&
+                    type !== TYPE_PSEUDO
         })
       } else {
         toExternalError(e)

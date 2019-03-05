@@ -6,7 +6,7 @@ import validateDeep from "./validate-deep.js"
 
 const {
   STATE_PARSING_COMPLETED,
-  TYPE_CJS,
+  TYPE_CJS
 } = ENTRY
 
 function parseLoad(request, parent, isMain) {
