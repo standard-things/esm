@@ -204,6 +204,8 @@ function compile(caller, entry, content, filename, fallback) {
   }
 
   if (useFallback) {
+    entry.type = TYPE_CJS
+
     const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT_TO_GET_OUTSIDE_ESM))
 
     for (const frame of frames) {
