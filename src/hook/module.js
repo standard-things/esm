@@ -123,11 +123,18 @@ function hook(Mod, parent) {
       return
     }
 
-    const { compileData, runtime } = entry
+    const { compileData } = entry
 
-    if (runtime !== null &&
-        runtime._runResult !== void 0) {
+    if ((compileData !== null &&
+         compileData.code !== null) ||
+        ext === ".json" ||
+        ext === ".wasm") {
       compile(manager, entry, null, filename, compileFallback)
+      return
+    }
+
+    if (this === Loader.state.module.extensions) {
+      compile(manager, entry, readFile(filename, "utf8"), filename, compileFallback)
       return
     }
 
@@ -156,15 +163,8 @@ function hook(Mod, parent) {
       })
     }
 
-    if (ext === ".json" ||
-        ext === ".wasm") {
-      compile(manager, entry, null, filename, compileFallback)
-      return
-    }
-
     if ((compileData === null ||
          compileData.transforms === 0) &&
-        this !== Loader.state.module.extensions &&
         passthruMap.get(func)) {
       tryPassthru.call(this, func, args, pkg)
     } else {

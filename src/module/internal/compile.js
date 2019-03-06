@@ -29,6 +29,7 @@ import isOwnPath from "../../util/is-own-path.js"
 import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
 import keys from "../../util/keys.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
+import protoCompile from "../proto/compile.js"
 import readFile from "../../fs/read-file.js"
 import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
@@ -395,7 +396,7 @@ function tryRun(entry, filename, fallback) {
 
       if (isESM) {
         try {
-          result = mod._compile(source, filename)
+          result = Reflect.apply(protoCompile, mod, [source, filename])
         } catch (e) {
           threw = true
           error = e

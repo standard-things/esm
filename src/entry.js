@@ -167,7 +167,9 @@ class Entry {
           compileData.transforms !== 0) {
         const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
 
-        compileData.code = content === null ? "" : content
+        if (content !== null) {
+          compileData.code = content
+        }
       }
 
       return compileData
