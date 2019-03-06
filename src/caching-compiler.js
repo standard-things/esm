@@ -31,10 +31,6 @@ function init() {
   } = ENTRY
 
   const {
-    NYC
-  } = ENV
-
-  const {
     PACKAGE_VERSION
   } = ESM
 
@@ -173,7 +169,6 @@ function init() {
       if (! dirty &&
           ! noCacheDir) {
         dirty =
-          NYC ||
           !! parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
           exists(resolve(cachePath, "../@babel/register"))
 
