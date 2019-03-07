@@ -141,7 +141,8 @@ function init() {
       const globalFunc = safeGlobalConsole[name]
 
       if (typeof builtinFunc === "function" &&
-          typeof globalFunc === "function") {
+          typeof globalFunc === "function" &&
+          globalFunc === safeConsole[name]) {
         result.set(globalFunc, builtinFunc)
       }
     }
