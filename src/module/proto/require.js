@@ -35,6 +35,7 @@ const req = maskFunction(function (request) {
 
     if (parentEntry !== null &&
         parentEntry._passthruRequire) {
+      parentEntry._passthruRequire = false
       return esmLoad(request, this).module.exports
     }
 

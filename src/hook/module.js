@@ -119,6 +119,7 @@ function hook(Mod, parent) {
         (shouldOverwrite &&
          ext === ".mjs")) {
       entry._passthruCompile = false
+      entry._ranthruCompile = true
       compileFallback()
       return
     }
@@ -129,11 +130,13 @@ function hook(Mod, parent) {
          compileData.code !== null) ||
         ext === ".json" ||
         ext === ".wasm") {
+      entry._ranthruCompile = true
       compile(manager, entry, null, filename, compileFallback)
       return
     }
 
     if (this === Loader.state.module.extensions) {
+      entry._ranthruCompile = true
       compile(manager, entry, readFile(filename, "utf8"), filename, compileFallback)
       return
     }
@@ -157,6 +160,7 @@ function hook(Mod, parent) {
       mod._compile = compileWrapper
       setPrototypeOf(mod, Module.prototype)
     } else {
+      entry._ranthruCompile = true
       Reflect.defineProperty(mod, shared.symbol._compile, {
         configurable: true,
         value: compileWrapper

@@ -396,7 +396,12 @@ function tryRun(entry, filename, fallback) {
 
       if (isESM) {
         try {
-          result = Reflect.apply(protoCompile, mod, [source, filename])
+          if (entry._ranthruCompile) {
+            result = Reflect.apply(protoCompile, mod, [source, filename])
+          } else {
+            entry._ranthruCompile = true
+            result = mod._compile(source, filename)
+          }
         } catch (e) {
           threw = true
           error = e
