@@ -145,10 +145,10 @@ function hook(Mod, parent) {
     const { _compile } = mod
     const shouldRestore = shouldOverwrite && has(mod, "_compile")
 
-    const compileWrapper = toExternalFunction((content, filename) => {
+    const compileWrapper = toExternalFunction(function (content, filename) {
       if (shouldOverwrite) {
         if (shouldRestore) {
-          mod._compile = _compile
+          setProperty(mod, "_compile", _compile)
         } else {
           Reflect.deleteProperty(mod, "_compile")
         }
@@ -158,10 +158,11 @@ function hook(Mod, parent) {
     })
 
     if (shouldOverwrite) {
-      mod._compile = compileWrapper
+      setProperty(mod, "_compile", compileWrapper)
       setPrototypeOf(mod, Module.prototype)
     } else {
       entry._ranthruCompile = true
+
       Reflect.defineProperty(mod, shared.symbol._compile, {
         configurable: true,
         value: compileWrapper

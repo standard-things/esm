@@ -11,9 +11,12 @@ import Module from "../../module.js"
 
 import builtinEntries from "../../builtin-entries.js"
 import getFilePathfromURL from "../../util/get-file-path-from-url.js"
+import has from "../../util/has.js"
 import isFileOrigin from "../../util/is-file-origin.js"
 import realProcess from "../../real/process.js"
+import setProperty from "../../util/set-property.js"
 import shared from "../../shared.js"
+import toExternalFunction from "../../util/to-external-function.js"
 
 const {
   STATE_PARSING_COMPLETED
@@ -68,21 +71,27 @@ function load(filename, parent, isMain = false, cache, loader) {
 
   if (! foundMod) {
     const { _compile } = mod
+    const shouldRestore = has(mod, "_compile")
 
-    mod._compile = (content, filename) => {
-      Reflect.deleteProperty(mod, "_compile")
+    setProperty(mod, "_compile", toExternalFunction(function (content, filename) {
+      if (shouldRestore) {
+        setProperty(mod, "_compile", _compile)
+      } else {
+        Reflect.deleteProperty(mod, "_compile")
+      }
 
-      const symbol = shared.symbol._compile
+      const compileWrapper = mod[shared.symbol._compile]
 
-      const func = typeof mod[symbol] === "function"
-        ? mod[symbol]
+      const compile = typeof compileWrapper === "function"
+        ? compileWrapper
         : _compile
 
-      return Reflect.apply(func, mod, [content, filename])
-    }
+      return Reflect.apply(compile, this, [content, filename])
+    }))
   }
 
   loader(entry)
+
   return entry
 }
 
