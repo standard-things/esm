@@ -2,7 +2,6 @@ import { sep, resolve } from "./safe/path.js"
 
 import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
-import ENV from "./constant/env.js"
 import ESM from "./constant/esm.js"
 
 import Compiler from "./compiler.js"
