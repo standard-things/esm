@@ -15,11 +15,7 @@ function loader(entry, filename) {
 
   mod.paths = Module._nodeModulePaths(entry.dirname)
 
-  try {
-    Module._extensions[ext](mod, filename)
-  } finally {
-    entry._passthruCompile = false
-  }
+  Module._extensions[ext](mod, filename)
 
   if (! mod.loaded) {
     mod.loaded = true

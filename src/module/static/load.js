@@ -93,6 +93,8 @@ function tryLoader(entry, cache, cacheKey, filename) {
     mod.load(filename)
     threw = false
   } finally {
+    entry._passthruCompile = false
+
     if (threw) {
       Reflect.deleteProperty(cache, cacheKey)
     }
