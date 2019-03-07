@@ -101,8 +101,23 @@ function hook(Mod, parent) {
     const ext = entry.extname
     const pkg = entry.package
 
-    const compileFallback = () => {
+    const compileFallback = (content) => {
       entry.state = STATE_EXECUTION_STARTED
+
+      if (typeof content === "string") {
+        const { _compile } = mod
+        const shouldRestore = has(mod, "_compile")
+
+        setProperty(mod, "_compile", toExternalFunction(function (ignoredContent, filename) {
+          if (shouldRestore) {
+            setProperty(mod, "_compile", _compile)
+          } else {
+            Reflect.deleteProperty(mod, "_compile")
+          }
+
+          return Reflect.apply(_compile, this, [content, filename])
+        }))
+      }
 
       let threw = true
 

@@ -214,7 +214,7 @@ function compile(caller, entry, content, filename, fallback) {
 
       if (isAbsolute(framePath) &&
           ! isOwnPath(framePath)) {
-        return fallback()
+        return fallback(content)
       }
     }
 
