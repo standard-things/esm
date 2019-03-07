@@ -167,10 +167,7 @@ function init() {
 
       if (! dirty &&
           ! noCacheDir) {
-        dirty =
-          !! parseJSON(getEnv("ESM_DISABLE_CACHE")) ||
-          exists(resolve(cachePath, "../@babel/register"))
-
+        dirty = !! parseJSON(getEnv("ESM_DISABLE_CACHE"))
         cache.dirty = dirty
       }
 
