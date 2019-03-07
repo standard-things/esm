@@ -63,11 +63,11 @@ function init() {
     if (HAS_INSPECTOR &&
         FLAGS.inspect) {
       const { consoleCall } = binding.inspector
+      const { originalConsole } = shared
       const useConsoleCall = typeof consoleCall === "function"
 
-      const { originalConsole } = shared
-      const originalNames = keys(originalConsole)
       const emptyConfig = useConsoleCall ? {} : null
+      const originalNames = keys(originalConsole)
 
       for (const name of originalNames) {
         if (! isKeyAssignable(name)) {
