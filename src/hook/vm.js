@@ -31,6 +31,7 @@ import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import setSetter from "../util/set-setter.js"
 import shared from "../shared.js"
+import toExternalError from "../util/to-external-error.js"
 import toExternalFunction from "../util/to-external-function.js"
 import wrap from "../util/wrap.js"
 
@@ -331,6 +332,8 @@ function tryWrapper(func, args, content) {
   if (! Loader.state.package.default.options.debug &&
       isStackTraceMaskable(error)) {
     maskStackTrace(error, { content })
+  } else {
+    toExternalError(error)
   }
 
   throw error

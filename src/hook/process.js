@@ -6,6 +6,7 @@ import Wrapper from "../wrapper.js"
 import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import scrubStackTrace from "../error/scrub-stack-trace.js"
+import toExternalError from "../util/to-external-error.js"
 
 const {
   PACKAGE_RANGE
@@ -26,6 +27,8 @@ function hook(process) {
     if (! Loader.state.package.default.options.debug &&
         isStackTraceMaskable(error)) {
       maskStackTrace(error)
+    } else {
+      toExternalError(error)
     }
 
     return Reflect.apply(func, this, args)

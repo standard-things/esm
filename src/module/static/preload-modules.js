@@ -11,6 +11,7 @@ import isError from "../../util/is-error.js"
 import isStackTraceMaskable from "../../util/is-stack-trace-maskable.js"
 import maskFunction from "../../util/mask-function.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
+import toExternalError from "../../util/to-external-error.js"
 
 const preloadModules = maskFunction(function (requests) {
   if (! Array.isArray(requests) ||
@@ -25,10 +26,7 @@ const preloadModules = maskFunction(function (requests) {
   } catch (e) {
     if (! isError(e) ||
         e.code !== "ENOENT") {
-      if (! Loader.state.package.default.options.debug &&
-          isStackTraceMaskable(e)) {
-        maskStackTrace(e)
-      }
+      maybeMaskStackTrace(e)
 
       throw e
     }
@@ -39,13 +37,19 @@ const preloadModules = maskFunction(function (requests) {
       parent.require(request)
     }
   } catch (e) {
-    if (! Loader.state.package.default.options.debug &&
-        isStackTraceMaskable(e)) {
-      maskStackTrace(e)
-    }
+    maybeMaskStackTrace(e)
 
     throw e
   }
 }, RealModule._preloadModules)
+
+function maybeMaskStackTrace(error) {
+  if (! Loader.state.package.default.options.debug &&
+      isStackTraceMaskable(error)) {
+    maskStackTrace(error)
+  } else {
+    toExternalError(error)
+  }
+}
 
 export default preloadModules
