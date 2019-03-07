@@ -318,16 +318,16 @@ function tryCompile(caller, entry, content, options) {
 
   entry.state = STATE_INITIAL
 
-  if (Loader.state.package.default.options.debug ||
-      ! isStackTraceMaskable(error)) {
-    toExternalError(error)
-  } else {
+  if (! Loader.state.package.default.options.debug &&
+      isStackTraceMaskable(error)) {
     captureStackTrace(error, caller)
 
     maskStackTrace(error, {
       content,
       filename: options.filename
     })
+  } else {
+    toExternalError(error)
   }
 
   throw error
@@ -501,6 +501,8 @@ function tryRun(entry, filename, fallback) {
 
   if (Loader.state.package.default.options.debug ||
       ! isStackTraceMaskable(error)) {
+    toExternalError(error)
+
     throw error
   }
 

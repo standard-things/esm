@@ -119,17 +119,21 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
   const error = new MODULE_NOT_FOUND(request, parent)
 
   if (! Loader.state.package.default.options.debug) {
-    if (parentEntry === null) {
-      maskStackTrace(error)
-    } else {
+    const maskOptions = {
+      filename: null,
+      inModule: false
+    }
+
+    if (parentEntry !== null) {
       const parentType = parentEntry.type
 
-      maskStackTrace(error, {
-        filename: parentEntry.filename,
-        inModule: parentType !== TYPE_CJS &&
-                  parentType !== TYPE_PSEUDO
-      })
+      maskOptions.filename = parentEntry.filename
+      maskOptions.inModule =
+        parentType !== TYPE_CJS &&
+        parentType !== TYPE_PSEUDO
     }
+
+    maskStackTrace(error, maskOptions)
   }
 
   throw error

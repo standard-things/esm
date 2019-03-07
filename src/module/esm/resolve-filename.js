@@ -241,17 +241,21 @@ function _resolveFilename(request, parent, isMain, options, fields, exts, skipGl
 
 function maybeMaskStackTrace(error, parentEntry) {
   if (! Loader.state.package.default.options.debug) {
-    if (parentEntry === null) {
-      maskStackTrace(error)
-    } else {
+    const maskOptions = {
+      filename: null,
+      inModule: false
+    }
+
+    if (parentEntry !== null) {
       const parentType = parentEntry.type
 
-      maskStackTrace(error, {
-        filename: parentEntry.filename,
-        inModule: parentType !== TYPE_CJS &&
-                  parentType !== TYPE_PSEUDO
-      })
+      maskOptions.filename = parentEntry.filename
+      maskOptions.inModule =
+        parentType !== TYPE_CJS &&
+        parentType !== TYPE_PSEUDO
     }
+
+    maskStackTrace(error, maskOptions)
   }
 
   return error

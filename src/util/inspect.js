@@ -1,6 +1,7 @@
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
 import GenericFunction from "../generic/function.js"
+import Loader from "../loader.js"
 import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
@@ -138,7 +139,8 @@ function init() {
   }
 
   function prepareValue(value) {
-    if (isStackTraceMaskable(value)) {
+    if (! Loader.state.package.default.options.debug &&
+        isStackTraceMaskable(value)) {
       maskStackTrace(value)
     }
 
