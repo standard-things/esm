@@ -28,6 +28,7 @@ import isUpdatableSet from "./is-updatable-set.js"
 import keys from "./keys.js"
 import nativeTrap from "./native-trap.js"
 import shared from "../shared.js"
+import toExternalFunction from "./to-external-function.js"
 
 function init() {
   function proxyExports(entry) {
@@ -45,7 +46,7 @@ function init() {
       return cached.proxy
     }
 
-    const get = (exported, name, receiver) => {
+    const get = toExternalFunction((exported, name, receiver) => {
       if (receiver === proxy) {
         receiver = exported
       }
@@ -58,7 +59,7 @@ function init() {
       }
 
       return value
-    }
+    })
 
     const maybeWrap = (exported, func) => {
       // Wrap native methods to avoid throwing illegal invocation or

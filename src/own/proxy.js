@@ -17,13 +17,18 @@ function init() {
 
     constructor(target, handler) {
       const maskedHandler = { __proto__: handler }
+      const proxy = new Proxy(target, maskedHandler)
 
+      Reflect.setPrototypeOf(handler, null)
       Reflect.defineProperty(maskedHandler, shared.customInspectKey, customInspectDescriptor)
       Reflect.defineProperty(maskedHandler, shared.symbol.proxy, markerDescriptor)
 
-      const proxy = new Proxy(target, maskedHandler)
+      for (const name in handler) {
+        toExternalFunction(handler[name])
+      }
 
       OwnProxy.instances.set(proxy, [target, maskedHandler])
+
       return proxy
     }
   }
