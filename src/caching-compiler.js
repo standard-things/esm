@@ -1,4 +1,5 @@
 import { sep, resolve } from "./safe/path.js"
+import { getMaxListeners, once, setMaxListeners } from "./safe/process.js"
 
 import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
@@ -13,10 +14,10 @@ import isMJS from "./path/is-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
 import parseJSON from "./util/parse-json.js"
-import realProcess from "./real/process.js"
 import relative from "./path/relative.js"
 import removeFile from "./fs/remove-file.js"
 import shared from "./shared.js"
+import toExternalFunction from "./util/to-external-function.js"
 import writeFile from "./fs/write-file.js"
 
 function init() {
@@ -151,7 +152,7 @@ function init() {
   }
 
   function onExit() {
-    realProcess.setMaxListeners(Math.max(realProcess.getMaxListeners() - 1, 0))
+    setMaxListeners(Math.max(getMaxListeners() - 1, 0))
 
     const { pendingScripts, pendingWrites } = shared
     const { dir } = shared.package
@@ -443,9 +444,8 @@ function init() {
   // Create cache in an "exit" event handler. "SIGINT" and "SIGTERM" events are
   // not safe to observe because handlers conflict with applications managing
   // "SIGINT" and "SIGTERM" themselves.
-  realProcess
-    .setMaxListeners(realProcess.getMaxListeners() + 1)
-    .once("exit", onExit)
+  setMaxListeners(getMaxListeners() + 1)
+  once("exit", toExternalFunction(onExit))
 
   return CachingCompiler
 }

@@ -1,7 +1,7 @@
 import SafeJSON from "../../safe/json.js"
 
+import { dlopen } from "../../safe/process.js"
 import { readFileSync } from "../../safe/fs.js"
-import safeProcess from "../../safe/process.js"
 import stripBOM from "../../util/strip-bom.js"
 import toNamespacedPath from "../../path/to-namespaced-path.js"
 
@@ -24,7 +24,7 @@ extensions[".json"] = function (mod, filename) {
 }
 
 extensions[".node"] = function (mod, filename) {
-  return safeProcess.dlopen(mod, toNamespacedPath(filename))
+  return dlopen(mod, toNamespacedPath(filename))
 }
 
 export default extensions
