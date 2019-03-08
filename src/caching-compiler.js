@@ -1,5 +1,10 @@
+import {
+  getMaxListeners,
+  once,
+  setMaxListeners
+} from "./safe/process.js"
+
 import { sep, resolve } from "./safe/path.js"
-import { getMaxListeners, once, setMaxListeners } from "./safe/process.js"
 
 import COMPILER from "./constant/compiler.js"
 import ENTRY from "./constant/entry.js"
