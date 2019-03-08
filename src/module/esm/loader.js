@@ -30,10 +30,10 @@ function loader(entry, filename, parentEntry) {
     extensions = Module._extensions
   }
 
-  let ext = findCompilerExtension(extensions, entry)
+  let foundExt = findCompilerExtension(extensions, entry)
 
-  if (ext === "") {
-    ext = ".js"
+  if (foundExt === "") {
+    foundExt = ".js"
   }
 
   const mod = entry.module
@@ -52,16 +52,16 @@ function loader(entry, filename, parentEntry) {
   }
 
   if (parsing &&
-      ext !== ".cjs" &&
-      ext !== ".js" &&
-      ext !== ".json" &&
-      ext !== ".mjs" &&
-      ext !== ".wasm") {
+      foundExt !== ".cjs" &&
+      foundExt !== ".js" &&
+      foundExt !== ".json" &&
+      foundExt !== ".mjs" &&
+      foundExt !== ".wasm") {
     entry.state = STATE_PARSING_COMPLETED
     return
   }
 
-  extensions[ext](mod, filename)
+  extensions[foundExt](mod, filename)
 
   if (! parsing &&
       ! mod.loaded) {
