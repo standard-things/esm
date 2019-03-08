@@ -2,6 +2,7 @@ import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
@@ -50,28 +51,28 @@ function init() {
         return NATIVE_SOURCE_TEXT
       }
 
-      try {
-        FuncProto.toString = new OwnProxy(_toString, {
-          apply: nativeTrap((_toString, thisArg, args) => {
-            return Reflect.apply(toString, thisArg, args)
-          })
+      const proxy = new OwnProxy(_toString, {
+        apply: nativeTrap((_toString, thisArg, args) => {
+          return Reflect.apply(toString, thisArg, args)
         })
+      })
 
+      if (setProperty(FuncProto, "toString", proxy)) {
         cache.set(FuncProto, true)
-      } catch {}
+      }
 
       return context
     }
   }
 
   function check(FuncProto, cache) {
-    let result = cache.get(FuncProto)
+    let cached = cache.get(FuncProto)
 
-    if (typeof result === "boolean") {
-      return result
+    if (cached !== void 0) {
+      return cached
     }
 
-    result = true
+    cached = true
 
     try {
       const { toString } = FuncProto
@@ -79,15 +80,15 @@ function init() {
       if (typeof toString === "function") {
         const proxy = new OwnProxy(toString, {})
 
-        result = Reflect.apply(toString, proxy, []) === Reflect.apply(toString, toString, [])
+        cached = Reflect.apply(toString, proxy, []) === Reflect.apply(toString, toString, [])
       }
     } catch {
-      result = false
+      cached = false
     }
 
-    cache.set(FuncProto, result)
+    cache.set(FuncProto, cached)
 
-    return result
+    return cached
   }
 
   return Shim

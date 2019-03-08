@@ -2,6 +2,7 @@ import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import silent from "../util/silent.js"
 
@@ -36,14 +37,14 @@ function init() {
         return getProxyDetails(value)
       })
 
-      try {
-        utilBinding.getProxyDetails = new OwnProxy(_getProxyDetails, {
-          apply: trap,
-          construct: trap
-        })
+      const proxy = new OwnProxy(_getProxyDetails, {
+        apply: trap,
+        construct: trap
+      })
 
+      if (setProperty(utilBinding, "getProxyDetails", proxy)) {
         cache.set(utilBinding, true)
-      } catch {}
+      }
 
       return context
     }
@@ -55,24 +56,24 @@ function init() {
       return true
     }
 
-    let result = cache.get(utilBinding)
+    let cached = cache.get(utilBinding)
 
-    if (typeof result === "boolean") {
-      return result
+    if (cached !== void 0) {
+      return cached
     }
 
-    result = true
+    cached = true
 
     try {
       const object = {}
       const proxy = new OwnProxy(object, object)
 
-      result = getProxyDetails(proxy) === void 0
+      cached = getProxyDetails(proxy) === void 0
     } catch {}
 
-    cache.set(utilBinding, result)
+    cache.set(utilBinding, cached)
 
-    return result
+    return cached
   }
 
   return Shim
