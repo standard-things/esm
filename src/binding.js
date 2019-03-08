@@ -3,15 +3,12 @@ import GenericFunction from "./generic/function.js"
 import getSilent from "./util/get-silent.js"
 import isObjectLike from "./util/is-object-like.js"
 import keys from "./util/keys.js"
-import noop from "./util/noop.js"
-import realProcess from "./real/process.js"
+import safeProcess from "./safe/process.js"
 import setDeferred from "./util/set-deferred.js"
 import shared from "./shared.js"
 import silent from "./util/silent.js"
 
 function init() {
-  let _binding
-
   const ids = [
     "fs",
     "inspector",
@@ -48,21 +45,8 @@ function init() {
 
   for (const id of ids) {
     setDeferred(binding, id, () => {
-      if (_binding === void 0) {
-        _binding = getSilent(realProcess, "binding")
-
-        if (typeof _binding !== "function") {
-          _binding = noop
-        }
-      }
-
-      const source = silent(() => {
-        try {
-          return Reflect.apply(_binding, realProcess, [id])
-        } catch {}
-      })
-
       const object = {}
+      const source = safeProcess.binding(id)
 
       if (! isObjectLike(source)) {
         return object
