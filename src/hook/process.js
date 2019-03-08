@@ -12,9 +12,9 @@ const {
   PACKAGE_RANGE
 } = ESM
 
-function hook(process) {
+function hook(processObject) {
   function exceptionManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "_fatalException", PACKAGE_RANGE)
+    const wrapped = Wrapper.find(processObject, "_fatalException", PACKAGE_RANGE)
 
     return wrapped === null
       ? Reflect.apply(func, this, args)
@@ -35,7 +35,7 @@ function hook(process) {
   }
 
   function warningManagerWrapper(manager, func, args) {
-    const wrapped = Wrapper.find(process, "emitWarning", PACKAGE_RANGE)
+    const wrapped = Wrapper.find(processObject, "emitWarning", PACKAGE_RANGE)
 
     return wrapped === null
       ? Reflect.apply(func, this, args)
@@ -52,11 +52,11 @@ function hook(process) {
     return Reflect.apply(func, this, args)
   }
 
-  Wrapper.manage(process, "_fatalException", exceptionManagerWrapper)
-  Wrapper.wrap(process, "_fatalException", exceptionMethodWrapper)
+  Wrapper.manage(processObject, "_fatalException", exceptionManagerWrapper)
+  Wrapper.wrap(processObject, "_fatalException", exceptionMethodWrapper)
 
-  Wrapper.manage(process, "emitWarning", warningManagerWrapper)
-  Wrapper.wrap(process, "emitWarning", warningMethodWrapper)
+  Wrapper.manage(processObject, "emitWarning", warningManagerWrapper)
+  Wrapper.wrap(processObject, "emitWarning", warningMethodWrapper)
 }
 
 export default hook
