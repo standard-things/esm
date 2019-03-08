@@ -24,9 +24,19 @@ function loader(entry, filename, parentEntry) {
 
   let { extensions } = Loader.state.module
 
-  if (entry.extname === ".js" ||
-      (parentEntry.package.options.cjs.extensions &&
-       parentEntry.extname !== ".mjs")) {
+  const ext = entry.extname
+  const parentExt = parentEntry.extname
+  const parentType = parentEntry.type
+  const parentIsCJS = parentType === TYPE_CJS
+  const parentIsMJS = parentExt === ".mjs"
+  const parentIsPseudo = parentType === TYPE_PSEUDO
+
+  if (parentIsCJS ||
+      parentIsPseudo ||
+      ext === ".js" ||
+      ((ext === ".cjs" ||
+        parentEntry.package.options.cjs.extensions) &&
+       ! parentIsMJS)) {
     extensions = Module._extensions
   }
 
@@ -39,12 +49,11 @@ function loader(entry, filename, parentEntry) {
   const mod = entry.module
 
   if (! mod.paths) {
-    const parentType = parentEntry.type
-
-    if (parentType === TYPE_CJS ||
-        parentType === TYPE_PSEUDO ||
+    if (parentIsCJS ||
+        parentIsPseudo ||
         (entry.package.options.cjs.paths &&
-         entry.extname !== ".mjs")) {
+         ! parentIsMJS &&
+         ext !== ".mjs")) {
       mod.paths = Module._nodeModulePaths(entry.dirname)
     } else {
       mod.paths = staticNodeModulePaths(entry.dirname)
