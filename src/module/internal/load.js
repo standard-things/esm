@@ -69,26 +69,37 @@ function load(filename, parent, isMain = false, cache, loader) {
     }
   }
 
-  if (! foundMod) {
-    const { _compile } = mod
-    const shouldRestore = has(mod, "_compile")
+  const { compileData } = entry
+  const ext = entry.extname
 
-    setProperty(mod, "_compile", toExternalFunction(function (content, filename) {
-      if (shouldRestore) {
-        setProperty(mod, "_compile", _compile)
-      } else {
-        Reflect.deleteProperty(mod, "_compile")
-      }
+  if (foundMod ||
+      (compileData !== null &&
+       compileData.code !== null) ||
+      ext === ".json" ||
+      ext === ".wasm") {
+    loader(entry)
 
-      const compileWrapper = mod[shared.symbol._compile]
-
-      const compile = typeof compileWrapper === "function"
-        ? compileWrapper
-        : _compile
-
-      return Reflect.apply(compile, this, [content, filename])
-    }))
+    return entry
   }
+
+  const { _compile } = mod
+  const shouldRestore = has(mod, "_compile")
+
+  setProperty(mod, "_compile", toExternalFunction(function (content, filename) {
+    if (shouldRestore) {
+      setProperty(mod, "_compile", _compile)
+    } else {
+      Reflect.deleteProperty(mod, "_compile")
+    }
+
+    const compileWrapper = mod[shared.symbol._compile]
+
+    const compile = typeof compileWrapper === "function"
+      ? compileWrapper
+      : _compile
+
+    return Reflect.apply(compile, this, [content, filename])
+  }))
 
   loader(entry)
 
