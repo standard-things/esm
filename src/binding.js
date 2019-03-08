@@ -28,6 +28,10 @@ function init() {
       // the call stack.
       "consoleCall"
     ]],
+    ["natives",
+      // Use to define `Module.builtinModules` in Node < 9.3.0.
+      void 0
+    ],
     ["util", [
       // Used as the stack trace decoration indicator in Node 7+.
       "decorated_private_symbol",
