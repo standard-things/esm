@@ -1,9 +1,11 @@
 # esm
 
-A fast, production ready, zero-dependency ES module loader for Node 6+!
+A brilliantly simple, babel-less, bundle-less ECMAScript module bridge.
 
+> `esm` is the world’s most advanced ECMAScript module loader.
+It’s production ready, has zero dependencies, and supports Node 6+.
 See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
-and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) for all the details.
+and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) for all the details!
 
 Install
 ---
