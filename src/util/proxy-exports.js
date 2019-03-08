@@ -226,6 +226,11 @@ function init() {
     }
 
     if (useWrappers) {
+      // Once Node < 10 is no longer supported the `getOwnPropertyDescriptor()`
+      // trap can be removed and the `get()` trap can be conditionally dropped
+      // for `exported` values that return "[object Function]" or "[object Object]"
+      // from `getObjectTag(exported)`.
+      // https://bugs.chromium.org/p/v8/issues/detail?id=5773
       handler.get = (exported, name, receiver) => {
         if (receiver === proxy) {
           receiver = exported
@@ -235,10 +240,10 @@ function init() {
 
         let newValue = value
 
-        // Produce a `Symbol.toStringTag` value, otherwise
-        // `getObjectTag(proxy)` will return "[object Function]",
-        // if `proxy` is a function, else "[object Object]".
         if (name === Symbol.toStringTag) {
+          // Produce the `Symbol.toStringTag` value, otherwise
+          // `getObjectTag(proxy)` will return "[object Object]"
+          // for non-function targets.
           newValue = getToStringTag(exported, value)
         }
 
@@ -289,10 +294,6 @@ function init() {
       }
     }
 
-    // Once V8 issue #5773 is fixed, the `getOwnPropertyDescriptor()` trap can be
-    // removed and the `get()` trap can be conditionally dropped for `exported`
-    // values that return "[object Function]" or "[object Object]" from
-    // `getObjectTag(exported)`.
     const proxy = new OwnProxy(exported, handler)
 
     cached = {
