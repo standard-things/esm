@@ -10,7 +10,7 @@ import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
 import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
-import isBound from "../util/is-bound.js"
+import isNativeLike from "../util/is-native-like.js"
 import isObjectLike from "../util/is-object.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import isUpdatableGet from "../util/is-updatable-get.js"
@@ -144,7 +144,8 @@ function init() {
       if (typeof builtinFunc === "function" &&
           typeof globalFunc === "function" &&
           globalFunc === safeConsole[name] &&
-          isBound(globalFunc)) {
+          (name === "Console" ||
+           isNativeLike(globalFunc))) {
         result.set(globalFunc, builtinFunc)
       }
     }

@@ -144,7 +144,8 @@ describe("miscellaneous tests", () => {
       for (const name of names) {
         const func = console[name]
 
-        if (typeof func === "function") {
+        if (typeof func === "function" &&
+            name !== "Console") {
           assert.throws(
             () => new func,
             TypeError
