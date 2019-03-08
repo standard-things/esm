@@ -1,6 +1,7 @@
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
 import GenericFunction from "../generic/function.js"
+import GenericObject from "../generic/object.js"
 import Loader from "../loader.js"
 import OwnProxy from "../own/proxy.js"
 
@@ -22,6 +23,7 @@ import maskStackTrace from "../error/mask-stack-trace.js"
 import ownPropertyNames from "./own-property-names.js"
 import realUtil from "../real/util.js"
 import shared from "../shared.js"
+import toExternalFunction from "./to-external-function.js"
 import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
 
 function init() {
@@ -30,13 +32,14 @@ function init() {
   const nonWhitespaceRegExp = /\S/
 
   const uninitializedValue = {
-    [shared.customInspectKey]: (recurseTimes, { colors }) => {
+    __proto__: null,
+    [shared.customInspectKey]: toExternalFunction((recurseTimes, { colors }) => {
       const string = "<uninitialized>"
 
       return colors
         ? stylize(string, "special")
         : string
-    }
+    })
   }
 
   function inspect(...args) {
@@ -48,25 +51,29 @@ function init() {
 
     value = prepareValue(value)
 
-    options = typeof options === "boolean"
-      ? { showHidden: true }
-      : assign({}, options)
+    const customOptions = GenericObject.create()
 
-    const customInspect = has(options, "customInspect")
-      ? options.customInspect
+    if (typeof options === "boolean") {
+      customOptions.showHidden = true
+    } else {
+      assign(customOptions, options)
+    }
+
+    const customInspect = has(customOptions, "customInspect")
+      ? customOptions.customInspect
       : defaultInspectOptions.customInspect
 
-    const showProxy = has(options, "showProxy")
-      ? options.showProxy
+    const showProxy = has(customOptions, "showProxy")
+      ? customOptions.showProxy
       : defaultInspectOptions.showProxy
 
     if (depth !== void 0 &&
-        ! has(options, "depth")) {
-      options.depth = depth
+        ! has(customOptions, "depth")) {
+      customOptions.depth = depth
     }
 
     args[0] = value
-    args[1] = options
+    args[1] = customOptions
 
     const result = Reflect.apply(tryInspect, this, args)
 
@@ -76,10 +83,10 @@ function init() {
       return result
     }
 
-    options.customInspect = true
-    options.showProxy = false
+    customOptions.customInspect = true
+    customOptions.showProxy = false
 
-    value = wrap(value, options, customInspect, showProxy)
+    value = wrap(value, customOptions, customInspect, showProxy)
 
     args[0] = value
 
@@ -162,12 +169,13 @@ function init() {
 
   function toInspectable(value, options) {
     return {
-      [shared.customInspectKey]: (recurseTimes) => {
-        const contextAsOptions = assign({}, options)
+      __proto__: null,
+      [shared.customInspectKey]: toExternalFunction((recurseTimes) => {
+        const contextAsOptions = assign(GenericObject.create(), options)
 
         contextAsOptions.depth = recurseTimes
         return inspect(value, contextAsOptions)
-      }
+      })
     }
   }
 
@@ -229,12 +237,12 @@ function init() {
             newValue = GenericFunction.bind(value, object)
           }
         } else {
-          newValue = (...args) => {
+          newValue = toExternalFunction((...args) => {
             inspecting = true
 
             let [recurseTimes, context] = args
 
-            const contextAsOptions = assign({}, context)
+            const contextAsOptions = assign(GenericObject.create(), context)
 
             contextAsOptions.customInspect = customInspect
             contextAsOptions.showProxy = showProxy
@@ -273,7 +281,7 @@ function init() {
             } finally {
               inspecting = false
             }
-          }
+          })
         }
 
         if (newValue !== value &&
