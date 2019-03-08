@@ -411,7 +411,10 @@ function tryRun(entry, filename, fallback) {
 
         runtime._runResult = (function *() {
           yield
-          return Reflect.apply(_compile, mod, [source, filename])
+
+          // Avoid V8 tail call optimization bug with --harmony flag in Node 6.
+          // https://bugs.chromium.org/p/v8/issues/detail?id=5322
+          return result = Reflect.apply(_compile, mod, [source, filename])
         })()
       }
     }
