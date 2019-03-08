@@ -131,6 +131,10 @@ function hook(Mod, parent) {
       }
     }
 
+    if (shouldOverwrite) {
+      setPrototypeOf(mod, Module.prototype)
+    }
+
     if (entry._passthruCompile ||
         (shouldOverwrite &&
          ext === ".mjs")) {
@@ -174,7 +178,6 @@ function hook(Mod, parent) {
 
     if (shouldOverwrite) {
       setProperty(mod, "_compile", compileWrapper)
-      setPrototypeOf(mod, Module.prototype)
     } else {
       entry._ranthruCompile = true
 
