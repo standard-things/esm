@@ -75,25 +75,21 @@ function init() {
       }
 
       if (length > 2) {
+        const filename = meta[6]
+
+        if (typeof filename === "string") {
+          result.filename = resolve(pkg.cachePath, filename)
+        }
+
         const deflatedFirstAwaitOutsideFunction = meta[5]
 
-        let firstAwaitOutsideFunction = null
-
         if (deflatedFirstAwaitOutsideFunction !== null) {
-          firstAwaitOutsideFunction = [
-            deflatedFirstAwaitOutsideFunction[0],
-            deflatedFirstAwaitOutsideFunction[1]
-          ]
+          result.firstAwaitOutsideFunction = {
+            column: deflatedFirstAwaitOutsideFunction[0],
+            line: deflatedFirstAwaitOutsideFunction[1]
+          }
         }
 
-        let filename = meta[6]
-
-        if (filename) {
-          filename = resolve(pkg.cachePath, filename)
-        }
-
-        result.filename = filename
-        result.firstAwaitOutsideFunction = firstAwaitOutsideFunction
         result.mtime = +meta[3]
         result.sourceType = +meta[4]
         result.transforms = +meta[2]
@@ -129,6 +125,7 @@ function init() {
 
     result.filename = options.filename
     result.mtime = options.mtime
+
     return result
   }
 
