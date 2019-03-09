@@ -119,16 +119,19 @@ function hook(Mod, parent) {
         }))
       }
 
+      let result
       let threw = true
 
       try {
-        tryPassthru.call(this, func, args, pkg)
+        result = tryPassthru.call(this, func, args, pkg)
         threw = false
       } finally {
         entry.state = threw
           ? STATE_INITIAL
           : STATE_EXECUTION_COMPLETED
       }
+
+      return result
     }
 
     if (shouldOverwrite) {
@@ -139,9 +142,7 @@ function hook(Mod, parent) {
         (shouldOverwrite &&
          ext === ".mjs")) {
       entry._passthruCompile = false
-      entry._ranthruCompile = true
-      compileFallback()
-      return
+      return compileFallback()
     }
 
     const { compileData } = entry
@@ -199,10 +200,10 @@ function hook(Mod, parent) {
     if ((compileData === null ||
          compileData.transforms === 0) &&
         passthruMap.get(func)) {
-      tryPassthru.call(this, func, args, pkg)
-    } else {
-      mod._compile(readFile(filename, "utf8"), filename)
+      return tryPassthru.call(this, func, args, pkg)
     }
+
+    mod._compile(readFile(filename, "utf8"), filename)
   }
 
   for (const ext of exts) {
