@@ -1,5 +1,4 @@
 import GenericObject from "../generic/object.js"
-import Loader from "../loader.js"
 import OwnProxy from "../own/proxy.js"
 
 import copyProperty from "./copy-property.js"
@@ -49,8 +48,7 @@ function init() {
 
     const toString = new OwnProxy(func.toString, {
       apply: nativeTrap((_toString, thisArg, args) => {
-        if (! Loader.state.package.default.options.debug &&
-            typeof thisArg === "function" &&
+        if (typeof thisArg === "function" &&
             unwrapOwnProxy(thisArg) === func) {
           thisArg = cached.source
         }
