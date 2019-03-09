@@ -87,16 +87,21 @@ function load(filename, parent, isMain = false, cache, loader) {
 
   setProperty(mod, "_compile", toExternalFunction(function (content, filename) {
     if (shouldRestore) {
-      setProperty(mod, "_compile", _compile)
+      setProperty(this, "_compile", _compile)
     } else {
-      Reflect.deleteProperty(mod, "_compile")
+      Reflect.deleteProperty(this, "_compile")
     }
 
-    const compileWrapper = mod[shared.symbol._compile]
+    const compileWrapper = has(this, shared.symbol._compile)
+      ? this[shared.symbol._compile]
+      : null
 
-    const compile = typeof compileWrapper === "function"
-      ? compileWrapper
-      : _compile
+    let compile = _compile
+
+    if (typeof compileWrapper === "function") {
+      compile = compileWrapper
+      Reflect.deleteProperty(this, shared.symbol._compile)
+    }
 
     return Reflect.apply(compile, this, [content, filename])
   }))

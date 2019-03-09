@@ -110,9 +110,9 @@ function hook(Mod, parent) {
 
         setProperty(mod, "_compile", toExternalFunction(function (ignoredContent, filename) {
           if (shouldRestore) {
-            setProperty(mod, "_compile", _compile)
+            setProperty(this, "_compile", _compile)
           } else {
-            Reflect.deleteProperty(mod, "_compile")
+            Reflect.deleteProperty(this, "_compile")
           }
 
           return Reflect.apply(_compile, this, [content, filename])
@@ -167,13 +167,22 @@ function hook(Mod, parent) {
     const compileWrapper = toExternalFunction(function (content, filename) {
       if (shouldOverwrite) {
         if (shouldRestore) {
-          setProperty(mod, "_compile", _compile)
+          setProperty(this, "_compile", _compile)
         } else {
-          Reflect.deleteProperty(mod, "_compile")
+          Reflect.deleteProperty(this, "_compile")
         }
       }
 
-      compile(manager, entry, content, filename, compileFallback)
+      const compileWrapper = has(this, shared.symbol._compile)
+        ? this[shared.symbol._compile]
+        : null
+
+      if (typeof compileWrapper === "function") {
+        Reflect.deleteProperty(this, shared.symbol._compile)
+        Reflect.apply(compileWrapper, this, [content, filename])
+      } else {
+        compile(manager, entry, content, filename, compileFallback)
+      }
     })
 
     if (shouldOverwrite) {
