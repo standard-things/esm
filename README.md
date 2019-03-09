@@ -1,11 +1,11 @@
 # esm
 
-A brilliantly simple, babel-less, bundle-less ECMAScript module bridge.
+The brilliantly simple, babel-less, bundle-less ECMAScript module loader.
 
 > `esm` is the world’s most advanced ECMAScript module loader.
-It’s production ready, has zero dependencies, and supports Node 6+.
-See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
-and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) for all the details!
+This fast, production ready, zero dependency loader is all you need to support
+ECMAScript modules in Node 6+. See the release [post](https://medium.com/web-on-the-edge/tomorrows-es-modules-today-c53d29ac448c)
+and [video](https://www.youtube.com/watch?v=JcZ-FzfDq8A#t=5) for details!
 
 Install
 ---
@@ -52,10 +52,7 @@ There are two ways to enable `esm`.
 Features
 ---
 
-The `esm` loader bridges the ESM of [today](https://babeljs.io/) to the
-ESM of [tomorrow](https://github.com/nodejs/modules).
-
-:clap: By default, :100: percent CJS interoperability is enabled so you can get stuff done fast.<br>
+:clap: By default, :100: percent CJS interoperability is enabled so you can get stuff done.<br>
 :lock: `.mjs` files are limited to basic functionality without support for `esm` options.
 
 Out of the box `esm` just works, no configuration necessary, and supports:
@@ -75,7 +72,7 @@ Options
 Specify options with one of the following:
 
 * `"esm"` field in `package.json`
-* CJS/ESM in an `.esmrc.js` or `.esmrc.mjs` file
+* CJS/ESM in an `.esmrc.js`, `.esmrc.cjs`, or `.esmrc.mjs` file
 * [JSON6](https://github.com/d3x0r/json6) in an `.esmrc` or `.esmrc.json` file
 * JSON6 or file path in the `ESM_OPTIONS` environment variable
 * `ESM_DISABLE_CACHE` environment variable
@@ -205,7 +202,7 @@ DevOpts
 <tr>
   <td valign="top"><code>"cache":true</code></td>
   <td>
-    <p>A boolean for toggling cache creation or cache directory path.</p>
+    <p>A boolean for toggling cache creation or a cache directory path.</p>
   </td>
 </tr>
 <tr>
@@ -236,7 +233,7 @@ Tips
 
 ### Extensions
 
-* Enable ESM syntax for [`wallaby.js`](https://wallabyjs.com/) following their
+* Enable `esm` for [`wallaby.js`](https://wallabyjs.com/) following their
   [integration example](https://wallabyjs.com/docs/integration/node.html#es-modules).
 
 ### Loading
@@ -257,8 +254,8 @@ Tips
   ```
 
 * Load `esm` with “node-args" options of:<br>
-  - [`node-tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
   - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags): `--node-args="-r esm"`
+  - [`tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
 
 * Load `esm` with “require” options of
   [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
