@@ -156,7 +156,7 @@ function init() {
   })
 
   setDeferred(shared, "runtimeName", () => {
-    const { safeCrypto } =  shared.module
+    const { safeCrypto } = shared.module
 
     return encodeId(
       "_" +
