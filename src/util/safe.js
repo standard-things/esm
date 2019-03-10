@@ -20,9 +20,13 @@ function init() {
     const Super = value
     const SuperProto = Super.prototype
 
-    const Safe = isObjectLike(SuperProto)
-      ? class extends Super {}
-      : (...args) => Reflect.construct(Super, args)
+    const Safe = function (...args) {
+      const result = Reflect.construct(Super, args)
+
+      setPrototypeOf(result, SafeProto)
+
+      return result
+    }
 
     const names = ownKeys(Super)
 
@@ -32,10 +36,10 @@ function init() {
       }
     }
 
-    const safeProto = Safe.prototype
+    const SafeProto = Safe.prototype
 
-    safeAssignProperties(safeProto, SuperProto)
-    setPrototypeOf(safeProto, null)
+    safeAssignProperties(SafeProto, SuperProto)
+    setPrototypeOf(SafeProto, null)
 
     return Safe
   }
