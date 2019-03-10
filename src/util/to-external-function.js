@@ -10,8 +10,6 @@ function init() {
   const ExFuncProtoSuper = getPrototypeOf(ExFunction.prototype)
 
   function toExternalFunction(func) {
-    setPrototypeOf(func, ExFuncSuper)
-
     if (has(func, "prototype")) {
       const { prototype } = func
 
@@ -19,6 +17,8 @@ function init() {
         setPrototypeOf(prototype, ExFuncProtoSuper)
       }
     }
+
+    setPrototypeOf(func, ExFuncSuper)
 
     return func
   }

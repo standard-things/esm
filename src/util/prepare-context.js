@@ -144,8 +144,6 @@ function init() {
       }
 
       if (typeof realmBuiltin === "function") {
-        setPrototypeOf(realmBuiltin, getPrototypeOf(builtin))
-
         if (has(realmBuiltin, "prototype")) {
           const { prototype } = realmBuiltin
 
@@ -159,6 +157,8 @@ function init() {
             setPrototypeOf(prototype, builtinProto)
           }
         }
+
+        setPrototypeOf(realmBuiltin, getPrototypeOf(builtin))
       }
     })
 
