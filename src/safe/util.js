@@ -6,10 +6,9 @@ import shared from "../shared.js"
 
 function init() {
   const safeUtil = safe(realUtil)
-  const { custom, defaultOptions } = safeUtil.inspect
-  const { types } = safeUtil
+  const { inspect, types } = safeUtil
 
-  let defaultInspectOptions = defaultOptions
+  let defaultInspectOptions = inspect.defaultOptions
 
   if (! isObjectLike(defaultInspectOptions)) {
     defaultInspectOptions = {
@@ -28,7 +27,7 @@ function init() {
     setProperty(safeUtil, "types", safe(types))
   }
 
-  setProperty(safeUtil, "customInspectSymbol", custom)
+  setProperty(safeUtil, "customInspectSymbol", inspect.custom)
   setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
 
   return safeUtil

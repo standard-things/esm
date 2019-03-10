@@ -11,12 +11,11 @@ import shared from "../shared.js"
 function init() {
   const safeVM = safe(realVM)
   const { Script } = safeVM
+  const SafeScript = safe(Script)
+
   const contextifyProto = getPrototypeOf(Script.prototype)
-
-  setProperty(safeVM, "Script", safe(Script))
-
   const names = ownKeys(contextifyProto)
-  const { prototype } = safeVM.Script
+  const { prototype } = SafeScript
 
   for (const name of names) {
     if (! has(prototype, name)) {
@@ -25,6 +24,9 @@ function init() {
   }
 
   setPrototypeOf(prototype, contextifyProto)
+
+  setProperty(safeVM, "Script", SafeScript)
+
   return safeVM
 }
 

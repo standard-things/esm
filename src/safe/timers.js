@@ -2,6 +2,7 @@ import ENV from "../constant/env.js"
 
 import realTimers from "../real/timers.js"
 import safe from "../util/safe.js"
+import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
@@ -10,12 +11,13 @@ function init() {
   } = ENV
 
   const safeTimers = safe(realTimers)
-  const { unsafeGlobal } = shared
 
   if (ELECTRON) {
-    safeTimers.setImmediate = unsafeGlobal.setImmediate
-    safeTimers.setInterval = unsafeGlobal.setInterval
-    safeTimers.setTimeout = unsafeGlobal.setTimeout
+    const { unsafeGlobal } = shared
+
+    setProperty(safeTimers, "setImmediate", unsafeGlobal.setImmediate)
+    setProperty(safeTimers, "setInterval", unsafeGlobal.setInterval)
+    setProperty(safeTimers, "setTimeout", unsafeGlobal.setTimeout)
   }
 
   return safeTimers

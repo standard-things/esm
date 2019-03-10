@@ -12,36 +12,6 @@ import shared from "../shared.js"
 
 function init() {
   const safeProcess = safe(realProcess)
-
-  const {
-    getMaxListeners,
-    once,
-    setMaxListeners
-  } = realProcess
-
-  const {
-    argv,
-    config,
-    dlopen,
-    env,
-    execArgv,
-    versions
-  } = safeProcess
-
-  const safeConfig = {
-    variables: {
-      v8_enable_inspector: 0
-    }
-  }
-
-  if (isObjectLike(config) &&
-      has(config, "variables") &&
-      isObjectLike(config.variables) &&
-      has(config.variables, "v8_enable_inspector") &&
-      config.variables.v8_enable_inspector) {
-    safeConfig.variables.v8_enable_inspector = 1
-  }
-
   const bindingDescriptor = Reflect.getOwnPropertyDescriptor(safeProcess, "binding")
 
   setDeferred(safeProcess, "binding", () => {
@@ -62,15 +32,31 @@ function init() {
     return wrapper
   })
 
-  setProperty(safeProcess, "argv", safe(argv))
+  const { config } = safeProcess
+
+  const safeConfig = {
+    variables: {
+      v8_enable_inspector: 0
+    }
+  }
+
+  if (isObjectLike(config) &&
+      has(config, "variables") &&
+      isObjectLike(config.variables) &&
+      has(config.variables, "v8_enable_inspector") &&
+      config.variables.v8_enable_inspector) {
+    safeConfig.variables.v8_enable_inspector = 1
+  }
+
+  setProperty(safeProcess, "argv", safe(safeProcess.argv))
   setProperty(safeProcess, "config", safeConfig)
-  setProperty(safeProcess, "dlopen", GenericFunction.bind(dlopen, realProcess))
-  setProperty(safeProcess, "env", safe(env))
-  setProperty(safeProcess, "execArgv", safe(execArgv))
-  setProperty(safeProcess, "getMaxListeners", GenericFunction.bind(getMaxListeners, realProcess))
-  setProperty(safeProcess, "once", GenericFunction.bind(once, realProcess))
-  setProperty(safeProcess, "setMaxListeners", GenericFunction.bind(setMaxListeners, realProcess))
-  setProperty(safeProcess, "versions", safe(versions))
+  setProperty(safeProcess, "dlopen", GenericFunction.bind(safeProcess.dlopen, realProcess))
+  setProperty(safeProcess, "env", safe(safeProcess.env))
+  setProperty(safeProcess, "execArgv", safe(safeProcess.execArgv))
+  setProperty(safeProcess, "getMaxListeners", GenericFunction.bind(realProcess.getMaxListeners, realProcess))
+  setProperty(safeProcess, "once", GenericFunction.bind(realProcess.once, realProcess))
+  setProperty(safeProcess, "setMaxListeners", GenericFunction.bind(realProcess.setMaxListeners, realProcess))
+  setProperty(safeProcess, "versions", safe(safeProcess.versions))
 
   return safeProcess
 }

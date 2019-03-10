@@ -5,25 +5,25 @@ import safeCopyProperty from "./safe-copy-property.js"
 import shared from "../shared.js"
 
 function init() {
-  function safe(Super) {
-    if (typeof Super !== "function") {
-      if (Array.isArray(Super)) {
-        return Array.from(Super)
+  function safe(value) {
+    if (typeof value !== "function") {
+      if (Array.isArray(value)) {
+        return Array.from(value)
       }
 
-      if (isObjectLike(Super)) {
-        return safeAssignProperties({}, Super)
-      }
-
-      return Super
+      return isObjectLike(value)
+        ? safeAssignProperties({}, value)
+        : value
     }
 
-    const Safe = isObjectLike(Super.prototype)
+    const Super = value
+    const SuperProto = Super.prototype
+
+    const Safe = isObjectLike(SuperProto)
       ? class extends Super {}
       : (...args) => Reflect.construct(Super, args)
 
     const names = ownKeys(Super)
-    const safeProto = Safe.prototype
 
     for (const name of names) {
       if (name !== "prototype") {
@@ -31,7 +31,9 @@ function init() {
       }
     }
 
-    safeAssignProperties(safeProto, Super.prototype)
+    const safeProto = Safe.prototype
+
+    safeAssignProperties(safeProto, SuperProto)
     Reflect.setPrototypeOf(safeProto, null)
 
     return Safe
