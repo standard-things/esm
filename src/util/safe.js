@@ -18,7 +18,6 @@ function init() {
     }
 
     const Super = value
-    const SuperProto = Super.prototype
 
     const Safe = function (...args) {
       const result = Reflect.construct(Super, args)
@@ -38,7 +37,7 @@ function init() {
 
     const SafeProto = Safe.prototype
 
-    safeAssignProperties(SafeProto, SuperProto)
+    safeAssignProperties(SafeProto, Super.prototype)
     setPrototypeOf(SafeProto, null)
 
     return Safe
