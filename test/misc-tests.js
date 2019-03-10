@@ -1539,6 +1539,25 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
+    it("should error for named exports of CJS and JSON modules before evaluation", () =>
+      [
+        "./fixture/import/missing/named-exports/cjs.mjs",
+        "./fixture/import/missing/named-exports/json.mjs"
+      ]
+      .reduce((promise, request) =>
+        promise
+          .then(() => {
+            resetState()
+            return import(request)
+          })
+          .then(assert.fail)
+          .catch(({ message }) => {
+            assert.strictEqual(Reflect.has(global, "loadCount"), false)
+            assert.ok(message.includes("does not provide an export"))
+          })
+      , Promise.resolve())
+    )
+
     it("should error for non-exported binding of ES modules before evaluation", () =>
       [
         "./fixture/import/missing/export/cjs.mjs",
