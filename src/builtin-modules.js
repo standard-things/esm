@@ -38,7 +38,9 @@ for (const id of builtinIds) {
     mod.exports = getExports(id)
     mod.loaded = true
 
-    if (id !== "module") {
+    if (id !== "console" &&
+        id !== "module" &&
+        id !== "util") {
       cache.set(id, mod)
     }
 

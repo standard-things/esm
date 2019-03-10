@@ -140,7 +140,9 @@ for (const id of builtinIds) {
 
     const entry = createEntry(id)
 
-    if (id !== "module") {
+    if (id !== "console" &&
+        id !== "module" &&
+        id !== "util") {
       cache.set(id, entry)
     }
 
