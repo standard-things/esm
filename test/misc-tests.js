@@ -1558,7 +1558,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should error for non-exported binding of ES modules before evaluation", () =>
+    it("should error for non-exported binding in ES modules before evaluation", () =>
       [
         "./fixture/import/missing/export/cjs.mjs",
         "./fixture/import/missing/export/esm.mjs",
