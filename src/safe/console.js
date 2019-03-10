@@ -1,3 +1,4 @@
+import maskFunction from "../util/mask-function.js"
 import realConsole from "../real/console.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -6,7 +7,10 @@ import shared from "../shared.js"
 function init() {
   const safeConsole = safe(realConsole)
 
-  setProperty(safeConsole, "Console", safe(safeConsole.Console))
+  setProperty(safeConsole, "Console", maskFunction(
+    safe(safeConsole.Console),
+    realConsole.Console)
+  )
 
   return safeConsole
 }
