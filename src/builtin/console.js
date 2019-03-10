@@ -32,12 +32,12 @@ const {
   HAS_INSPECTOR
 } = ENV
 
-const RealConsole = realConsole.Console
-const RealProto = RealConsole.prototype
-const RealProtoNames = ownKeys(RealProto)
+const SafeConsole = safeConsole.Console
+const SafeProto = SafeConsole.prototype
+const SafeProtoNames = ownKeys(SafeProto)
 
 const dirOptions = { customInspect: true }
-const wrapperMap = createWrapperMap(RealProto)
+const wrapperMap = createWrapperMap(SafeProto)
 
 let isConsoleSymbol = findByRegExp(Object.getOwnPropertySymbols(safeConsole), /IsConsole/i)
 
@@ -128,20 +128,20 @@ function createBuiltinConsole() {
   return newBuiltinConsole
 }
 
-function createBuiltinMethodMap(builtinConsole) {
-  const names = keys(builtinConsole)
+function createBuiltinMethodMap(consoleObject) {
+  const names = keys(consoleObject)
   const newBuiltinMethodMap = new Map
 
   for (const name of names) {
-    const builtinFunc = builtinConsole[name]
+    const func = consoleObject[name]
     const globalFunc = safeGlobalConsole[name]
 
-    if (typeof builtinFunc === "function" &&
+    if (typeof func === "function" &&
         typeof globalFunc === "function" &&
         globalFunc === safeConsole[name] &&
         (name === "Console" ||
           isNativeLike(globalFunc))) {
-      newBuiltinMethodMap.set(globalFunc, builtinFunc)
+      newBuiltinMethodMap.set(globalFunc, func)
     }
   }
 
@@ -156,7 +156,7 @@ function createConsole({ stderr, stdout }) {
   const newConsole = Reflect.construct(Console, args)
   const { prototype } = Console
 
-  for (const name of RealProtoNames) {
+  for (const name of SafeProtoNames) {
     if (isKeyAssignable(name) &&
         ! has(newConsole, name)) {
       copyProperty(newConsole, prototype, name)
@@ -168,28 +168,28 @@ function createConsole({ stderr, stdout }) {
   return newConsole
 }
 
-function createWrapperMap(RealProto) {
-  const wrappedLog = wrapBuiltin(RealProto.log, logWrapper)
+function createWrapperMap(consoleObject) {
+  const wrappedLog = wrapBuiltin(consoleObject.log, logWrapper)
 
   const newWrapperMap = new Map([
-    ["assert", wrapBuiltin(RealProto.assert, assertWrapper)],
+    ["assert", wrapBuiltin(consoleObject.assert, assertWrapper)],
     ["debug", wrappedLog],
-    ["dir", wrapBuiltin(RealProto.dir, dirWrapper)],
+    ["dir", wrapBuiltin(consoleObject.dir, dirWrapper)],
     ["dirxml", wrappedLog],
     ["info", wrappedLog],
     ["log", wrappedLog],
-    ["trace", wrapBuiltin(RealProto.trace)],
-    ["warn", wrapBuiltin(RealProto.warn)]
+    ["trace", wrapBuiltin(consoleObject.trace)],
+    ["warn", wrapBuiltin(consoleObject.warn)]
   ])
 
-  const names = keys(RealProto)
+  const names = keys(consoleObject)
 
   for (const name of names) {
     if (! newWrapperMap.has(name)) {
-      const realFunc = RealProto[name]
+      const func = consoleObject[name]
 
-      if (typeof realFunc === "function") {
-        newWrapperMap.set(name, wrapBuiltin(realFunc))
+      if (typeof func === "function") {
+        newWrapperMap.set(name, wrapBuiltin(func))
       }
     }
   }
@@ -310,7 +310,7 @@ const Console = maskFunction(function (...args) {
     }
   }
 
-  const realConsole = Reflect.construct(RealConsole, args, newTarget)
+  const realConsole = Reflect.construct(SafeConsole, args, newTarget)
   const realNames = ownKeys(realConsole)
 
   for (const name of realNames) {
@@ -318,11 +318,11 @@ const Console = maskFunction(function (...args) {
       copyProperty(this, realConsole, name)
     }
   }
-}, RealConsole)
+}, SafeConsole)
 
 const { prototype } = Console
 
-for (const name of RealProtoNames) {
+for (const name of SafeProtoNames) {
   if (! isKeyAssignable(name)) {
     continue
   }
@@ -330,9 +330,9 @@ for (const name of RealProtoNames) {
   const wrapped = wrapperMap.get(name)
 
   if (wrapped === void 0) {
-    copyProperty(prototype, RealProto, name)
+    copyProperty(prototype, SafeProto, name)
   } else {
-    const descriptor = Reflect.getOwnPropertyDescriptor(RealProto, name)
+    const descriptor = Reflect.getOwnPropertyDescriptor(SafeProto, name)
 
     Reflect.defineProperty(prototype, name, {
       configurable: descriptor.configurable,
