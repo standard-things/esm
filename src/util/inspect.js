@@ -51,7 +51,7 @@ function inspect(...args) {
 
   if (! isProxyInspectable(value) ||
       (result.indexOf(PROXY_PREFIX) === -1 &&
-        ! isModuleNamespaceObjectLike(value))) {
+       ! isModuleNamespaceObjectLike(value))) {
     return result
   }
 
