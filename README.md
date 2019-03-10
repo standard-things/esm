@@ -255,7 +255,6 @@ Tips
 
 * Load `esm` with “node-args" options of:<br>
   - [`pm2`](https://pm2.io/doc/en/runtime/reference/pm2-cli/#pm2-flags): `--node-args="-r esm"`
-  - [`tap`](https://www.node-tap.org/cli/): `--node-arg=-r --node-arg=esm`
 
 * Load `esm` with “require” options of
   [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
