@@ -7,6 +7,7 @@ import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
 import nativeTrap from "./native-trap.js"
+import setProperty from "./set-property.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
@@ -58,20 +59,23 @@ function maskFunction(func, source) {
     })
   })
 
-  copyProperty(func, source, "name")
-  setPrototypeOf(func, getPrototypeOf(source))
-
-  const sourceProto = has(source, "prototype") ? source.prototype : void 0
+  const sourceProto = has(source, "prototype")
+    ? source.prototype
+    : void 0
 
   if (isObjectLike(sourceProto)) {
-    let proto = has(func, "prototype") ? func.prototype : void 0
+    let proto = has(func, "prototype")
+      ? func.prototype
+      : void 0
 
-    if (! isObjectLike(proto)) {
+    if (isObjectLike(proto)) {
+      setProperty(proto, "constructor", proxy)
+    } else {
       proto = GenericObject.create()
-      func.prototype = proto
+      proto.constructor = proxy
+      setProperty(func, "prototype", proto)
     }
 
-    proto.constructor = proxy
     setPrototypeOf(proto, getPrototypeOf(sourceProto))
   } else {
     const descriptor = Reflect.getOwnPropertyDescriptor(source, "prototype")
@@ -82,6 +86,9 @@ function maskFunction(func, source) {
       Reflect.defineProperty(func, "prototype", descriptor)
     }
   }
+
+  copyProperty(func, source, "name")
+  setPrototypeOf(func, getPrototypeOf(source))
 
   cached = {
     proxy,
