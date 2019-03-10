@@ -114,15 +114,9 @@ function createBuiltinConsole() {
     if (name === "Console") {
       newBuiltinConsole.Console = Console
     } else if (isKeyAssignable(name) &&
-                ! has(newBuiltinConsole, name)) {
+               ! has(newBuiltinConsole, name)) {
       copyProperty(newBuiltinConsole, safeConsole, name)
     }
-  }
-
-  if (! has(Console, Symbol.hasInstance)) {
-    Reflect.defineProperty(Console, Symbol.hasInstance, {
-      value: toExternalFunction((instance) => instance[isConsoleSymbol])
-    })
   }
 
   return newBuiltinConsole
@@ -341,6 +335,12 @@ for (const name of SafeProtoNames) {
       writable: descriptor.writable
     })
   }
+}
+
+if (! has(Console, Symbol.hasInstance)) {
+  Reflect.defineProperty(Console, Symbol.hasInstance, {
+    value: toExternalFunction((instance) => instance[isConsoleSymbol])
+  })
 }
 
 let builtinConsole
