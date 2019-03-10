@@ -4,6 +4,7 @@
 
 import alwaysTrue from "./util/always-true.js"
 import isObject from "./util/is-object.js"
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 
 function init() {
@@ -84,7 +85,7 @@ function init() {
     }
   }
 
-  Reflect.setPrototypeOf(FastPath.prototype, null)
+  setPrototypeOf(FastPath.prototype, null)
 
   return FastPath
 }

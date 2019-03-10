@@ -35,6 +35,7 @@ import ownPropertyNames from "./util/own-property-names.js"
 import proxyExports from "./util/proxy-exports.js"
 import readFile from "./fs/read-file.js"
 import setDeferred from "./util/set-deferred.js"
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
 import validateShallow from "./module/esm/validate-shallow.js"
@@ -1163,6 +1164,6 @@ function tryGetter(getter) {
   return ERROR_GETTER
 }
 
-Reflect.setPrototypeOf(Entry.prototype, null)
+setPrototypeOf(Entry.prototype, null)
 
 export default Entry

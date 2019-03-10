@@ -35,6 +35,7 @@ import readJSON from "./fs/read-json.js"
 import readJSON6 from "./fs/read-json6.js"
 import readdir from "./fs/readdir.js"
 import removeFile from "./fs/remove-file.js"
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 import toStringLiteral from "./util/to-string-literal.js"
 import { validRange } from "semver"
@@ -710,6 +711,6 @@ function readInfo(dirPath, forceOptions) {
   return new Package(dirPath, range, options)
 }
 
-Reflect.setPrototypeOf(Package.prototype, null)
+setPrototypeOf(Package.prototype, null)
 
 export default Package

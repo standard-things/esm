@@ -4,6 +4,7 @@
 
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 
 function init() {
@@ -176,7 +177,7 @@ function init() {
     return childNames
   }
 
-  Reflect.setPrototypeOf(Visitor.prototype, null)
+  setPrototypeOf(Visitor.prototype, null)
 
   return Visitor
 }

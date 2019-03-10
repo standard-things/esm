@@ -21,6 +21,7 @@ import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import safeGlobalConsole from "../safe/global-console.js"
 import safeProcess from "../safe/process.js"
+import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 import toExternalFunction from "../util/to-external-function.js"
 import toString from "../util/to-string.js"
@@ -162,7 +163,7 @@ function createConsole({ stderr, stdout }) {
     }
   }
 
-  Reflect.setPrototypeOf(newConsole, GenericObject.create())
+  setPrototypeOf(newConsole, GenericObject.create())
 
   return newConsole
 }

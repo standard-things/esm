@@ -1,3 +1,4 @@
+import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 import toExternalFunction from "../util/to-external-function.js"
 
@@ -19,13 +20,14 @@ function init() {
       const maskedHandler = { __proto__: handler }
       const proxy = new Proxy(target, maskedHandler)
 
-      Reflect.setPrototypeOf(handler, null)
-      Reflect.defineProperty(maskedHandler, shared.customInspectKey, customInspectDescriptor)
-      Reflect.defineProperty(maskedHandler, shared.symbol.proxy, markerDescriptor)
+      setPrototypeOf(handler, null)
 
       for (const name in handler) {
         toExternalFunction(handler[name])
       }
+
+      Reflect.defineProperty(maskedHandler, shared.customInspectKey, customInspectDescriptor)
+      Reflect.defineProperty(maskedHandler, shared.symbol.proxy, markerDescriptor)
 
       OwnProxy.instances.set(proxy, [target, maskedHandler])
 
@@ -33,7 +35,7 @@ function init() {
     }
   }
 
-  Reflect.setPrototypeOf(OwnProxy.prototype, null)
+  setPrototypeOf(OwnProxy.prototype, null)
 
   return OwnProxy
 }

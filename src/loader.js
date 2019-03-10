@@ -4,6 +4,7 @@ import Package from "./package.js"
 import esmExtensions from "./module/esm/extensions.js"
 import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 
 class Loader {
@@ -42,6 +43,6 @@ setDeferred(Loader, "state", () =>
   Loader.init(JSON.stringify(Package.createOptions()))
 )
 
-Reflect.setPrototypeOf(Loader.prototype, null)
+setPrototypeOf(Loader.prototype, null)
 
 export default Loader

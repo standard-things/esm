@@ -2,6 +2,7 @@ import isObjectLike from "./is-object-like.js"
 import ownKeys from "./own-keys.js"
 import safeAssignProperties from "./safe-assign-properties.js"
 import safeCopyProperty from "./safe-copy-property.js"
+import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
 function init() {
@@ -34,7 +35,7 @@ function init() {
     const safeProto = Safe.prototype
 
     safeAssignProperties(safeProto, SuperProto)
-    Reflect.setPrototypeOf(safeProto, null)
+    setPrototypeOf(safeProto, null)
 
     return Safe
   }

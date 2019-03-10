@@ -2,6 +2,7 @@
 // Copyright Rich Harris. Released under MIT license:
 // https://github.com/Rich-Harris/magic-string
 
+import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 
 function init() {
@@ -65,7 +66,7 @@ function init() {
     }
   }
 
-  Reflect.setPrototypeOf(Chunk.prototype, null)
+  setPrototypeOf(Chunk.prototype, null)
 
   class MagicString {
     constructor(string) {
@@ -214,7 +215,7 @@ function init() {
     }
   }
 
-  Reflect.setPrototypeOf(MagicString.prototype, null)
+  setPrototypeOf(MagicString.prototype, null)
 
   return MagicString
 }
