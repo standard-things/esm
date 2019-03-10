@@ -304,12 +304,12 @@ const Console = maskFunction(function (...args) {
     }
   }
 
-  const realConsole = Reflect.construct(SafeConsole, args, newTarget)
-  const realNames = ownKeys(realConsole)
+  const newSafeConsole = Reflect.construct(SafeConsole, args, newTarget)
+  const newSafeNames = ownKeys(newSafeConsole)
 
-  for (const name of realNames) {
+  for (const name of newSafeNames) {
     if (! Reflect.has(this, name)) {
-      copyProperty(this, realConsole, name)
+      copyProperty(this, newSafeConsole, name)
     }
   }
 }, SafeConsole)
