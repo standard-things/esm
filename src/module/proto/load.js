@@ -33,6 +33,7 @@ const load = maskFunction(function (filename) {
     if (entry !== otherEntry) {
       otherEntry.exports = this.exports
       otherEntry.module = this
+      otherEntry.runtime = null
 
       entry = otherEntry
       Entry.set(this, otherEntry)
