@@ -12,18 +12,18 @@ function init() {
   const safeVM = safe(realVM)
   const { Script } = safeVM
   const SafeScript = safe(Script)
+  const SafeProto = SafeScript.prototype
 
   const contextifyProto = getPrototypeOf(Script.prototype)
   const names = ownKeys(contextifyProto)
-  const { prototype } = SafeScript
 
   for (const name of names) {
-    if (! has(prototype, name)) {
-      copyProperty(prototype, contextifyProto, name)
+    if (! has(SafeProto, name)) {
+      copyProperty(SafeProto, contextifyProto, name)
     }
   }
 
-  setPrototypeOf(prototype, contextifyProto)
+  setPrototypeOf(SafeProto, contextifyProto)
 
   setProperty(safeVM, "Script", SafeScript)
 

@@ -10,7 +10,7 @@ function init() {
     ELECTRON
   } = ENV
 
-  const { prototype } = Stats
+  const StatsProto = Stats.prototype
 
   function statSync(thePath) {
     if (typeof thePath !== "string") {
@@ -37,7 +37,7 @@ function init() {
       // https://github.com/brave/muon/blob/master/lib/common/asar.js
       if (ELECTRON &&
           ! (cached instanceof Stats)) {
-        setPrototypeOf(cached, prototype)
+        setPrototypeOf(cached, StatsProto)
       }
     } catch {
       cached = null

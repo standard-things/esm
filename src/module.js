@@ -64,12 +64,12 @@ if (! ELECTRON ||
   Module.wrapper = staticWrapper
 }
 
-const { prototype } = Module
+const ModuleProto = Module.prototype
 
-prototype._compile = protoCompile
-prototype.constructor = Module
-prototype.load = protoLoad
-prototype.require = req
+ModuleProto._compile = protoCompile
+ModuleProto.constructor = Module
+ModuleProto.load = protoLoad
+ModuleProto.require = req
 
 // Initialize `Module._extensions` with only the enumerable string keyed
 // properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`

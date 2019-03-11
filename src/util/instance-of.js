@@ -4,13 +4,13 @@ import shared from "../shared.js"
 
 function init() {
   function instanceOf(value, Ctor) {
-    const { prototype } = Ctor
+    const CtorProto = Ctor.prototype
 
     if (isObjectLike(value)) {
       let proto = value
 
       while ((proto = getPrototypeOf(proto)) !== null) {
-        if (proto === prototype) {
+        if (proto === CtorProto) {
           return true
         }
       }

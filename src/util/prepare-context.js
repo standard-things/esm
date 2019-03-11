@@ -117,25 +117,25 @@ function init() {
     descriptors.forEach((descriptor, name) => {
       Reflect.defineProperty(context, name, descriptor)
 
-      const builtin = context[name]
-      const realmBuiltin = realmBuiltins[name]
+      const Builtin = context[name]
+      const RealmBuiltin = realmBuiltins[name]
 
-      if (builtin === realmBuiltin ||
-          ! isObjectLike(builtin) ||
-          ! isObjectLike(realmBuiltin)) {
+      if (Builtin === RealmBuiltin ||
+          ! isObjectLike(Builtin) ||
+          ! isObjectLike(RealmBuiltin)) {
         return
       }
 
       if (name === "Error") {
-        realmBuiltin.prepareStackTrace =
-          (...args) => Reflect.apply(builtin.prepareStackTrace, builtin, args)
+        RealmBuiltin.prepareStackTrace =
+          (...args) => Reflect.apply(Builtin.prepareStackTrace, Builtin, args)
       } else if (name === "Object") {
-        Reflect.defineProperty(builtin, Symbol.hasInstance, {
+        Reflect.defineProperty(Builtin, Symbol.hasInstance, {
           configurable: true,
           value: function (instance) {
-            if (this === builtin) {
-              return instance instanceof realmBuiltin ||
-                     instanceOf(instance, builtin)
+            if (this === Builtin) {
+              return instance instanceof RealmBuiltin ||
+                     instanceOf(instance, Builtin)
             }
 
             return instanceOf(instance, this)
@@ -143,22 +143,22 @@ function init() {
         })
       }
 
-      if (typeof realmBuiltin === "function") {
-        if (has(realmBuiltin, "prototype")) {
-          const { prototype } = realmBuiltin
+      if (typeof RealmBuiltin === "function") {
+        if (has(RealmBuiltin, "prototype")) {
+          const RealmProto = RealmBuiltin.prototype
 
-          if (isObjectLike(prototype)) {
-            const builtinProto = builtin.prototype
+          if (isObjectLike(RealmProto)) {
+            const BuiltinProto = Builtin.prototype
 
-            if (has(builtinProto, "constructor")) {
-              prototype.constructor = builtinProto.constructor
+            if (has(BuiltinProto, "constructor")) {
+              setProperty(RealmProto, "constructor", BuiltinProto.constructor)
             }
 
-            setPrototypeOf(prototype, builtinProto)
+            setPrototypeOf(RealmProto, BuiltinProto)
           }
         }
 
-        setPrototypeOf(realmBuiltin, getPrototypeOf(builtin))
+        setPrototypeOf(RealmBuiltin, getPrototypeOf(Builtin))
       }
     })
 
