@@ -6,11 +6,12 @@ import shared from "../shared.js"
 
 function init() {
   const safeConsole = safe(realConsole)
+  const { Console } = safeConsole
 
   setProperty(safeConsole, "Console", maskFunction(
-    safe(safeConsole.Console),
-    realConsole.Console)
-  )
+    safe(Console),
+    Console
+  ))
 
   return safeConsole
 }
