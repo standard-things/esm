@@ -27,9 +27,9 @@ function init() {
       return result
     }
 
-    const names = ownKeys(Super)
+    const SuperNames = ownKeys(Super)
 
-    for (const name of names) {
+    for (const name of SuperNames) {
       if (name !== "prototype") {
         safeCopyProperty(Safe, Super, name)
       }
