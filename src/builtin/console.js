@@ -21,6 +21,7 @@ import realConsole from "../real/console.js"
 import safeConsole from "../safe/console.js"
 import safeGlobalConsole from "../safe/global-console.js"
 import safeProcess from "../safe/process.js"
+import setProperty from "../util/set-property.js"
 import setPrototypeOf from "../util/set-prototype-of.js"
 import shared from "../shared.js"
 import toExternalFunction from "../util/to-external-function.js"
@@ -80,15 +81,15 @@ function createBuiltinConsole() {
             has(newBuiltinConsole, name)) {
           // Use `consoleCall()` to combine `builtinFunc()` and
           // `originalFunc()` without adding to the call stack.
-          newBuiltinConsole[name] = GenericFunction.bind(
+          setProperty(newBuiltinConsole, name, GenericFunction.bind(
             consoleCall,
             void 0,
             originalFunc,
             builtinFunc,
             emptyConfig
-          )
+          ))
         } else {
-          newBuiltinConsole[name] = originalFunc
+          setProperty(newBuiltinConsole, name, originalFunc)
         }
       }
     }
@@ -103,7 +104,7 @@ function createBuiltinConsole() {
       const globalFunc = safeGlobalConsole[name]
 
       if (typeof globalFunc === "function") {
-        newBuiltinConsole[name] = globalFunc
+        setProperty(newBuiltinConsole, name, globalFunc)
       }
     }
   }
@@ -111,13 +112,13 @@ function createBuiltinConsole() {
   const safeNames = ownKeys(safeConsole)
 
   for (const name of safeNames) {
-    if (name === "Console") {
-      newBuiltinConsole.Console = Console
-    } else if (isKeyAssignable(name) &&
-               ! has(newBuiltinConsole, name)) {
+    if (isKeyAssignable(name) &&
+        ! has(newBuiltinConsole, name)) {
       copyProperty(newBuiltinConsole, safeConsole, name)
     }
   }
+
+  newBuiltinConsole.Console = Console
 
   return newBuiltinConsole
 }
@@ -132,9 +133,8 @@ function createBuiltinMethodMap(consoleObject) {
 
     if (typeof func === "function" &&
         typeof globalFunc === "function" &&
-        globalFunc === safeConsole[name] &&
-        (name === "Console" ||
-          isNativeLike(globalFunc))) {
+        (! isKeyAssignable(name) ||
+         isNativeLike(globalFunc))) {
       newBuiltinMethodMap.set(globalFunc, func)
     }
   }
@@ -143,17 +143,18 @@ function createBuiltinMethodMap(consoleObject) {
 }
 
 function createConsole({ stderr, stdout }) {
-  const args = shared.support.consoleOptions
-    ? [{ stderr, stdout }]
-    : [stdout, stderr]
+  const ConsoleProto = Console.prototype
 
-  const newConsole = Reflect.construct(Console, args)
-  const { prototype } = Console
+  const newConsole = Reflect.construct(Console,
+    shared.support.consoleOptions
+      ? [{ stderr, stdout }]
+      : [stdout, stderr]
+  )
 
   for (const name of SafeProtoNames) {
     if (isKeyAssignable(name) &&
         ! has(newConsole, name)) {
-      copyProperty(newConsole, prototype, name)
+      copyProperty(newConsole, ConsoleProto, name)
     }
   }
 
@@ -179,7 +180,8 @@ function createWrapperMap(consoleObject) {
   const names = keys(consoleObject)
 
   for (const name of names) {
-    if (! newWrapperMap.has(name)) {
+    if (isKeyAssignable(name) &&
+        ! newWrapperMap.has(name)) {
       const func = consoleObject[name]
 
       if (typeof func === "function") {
@@ -221,7 +223,7 @@ function findByRegExp(array, regexp) {
 
 function isKeyAssignable(name) {
   return name !== "Console" &&
-    name !== "constructor"
+         name !== "constructor"
 }
 
 function logWrapper(func, args) {
@@ -271,12 +273,12 @@ function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
     method(...args) {
       const { customInspect } = defaultInspectOptions
 
-      defaultInspectOptions.customInspect = true
+      setProperty(defaultInspectOptions, "customInspect", true)
 
       try {
         return Reflect.apply(wrapper, this, [builtinFunc, args])
       } finally {
-        defaultInspectOptions.customInspect = customInspect
+        setProperty(defaultInspectOptions, "customInspect", customInspect)
       }
     }
   }
@@ -293,14 +295,16 @@ const Console = maskFunction(function (...args) {
 
   this[isConsoleSymbol] = true
 
-  const { prototype } = Console
-  const protoNames = keys(prototype)
+  const ConsoleProto = Console.prototype
+  const ConsoleProtoNames = keys(ConsoleProto)
 
-  for (const name of protoNames) {
-    const protoFunc = this[name]
+  for (const name of ConsoleProtoNames) {
+    if (isKeyAssignable(name)) {
+      const func = this[name]
 
-    if (typeof protoFunc === "function") {
-      this[name] = GenericFunction.bind(protoFunc, this)
+      if (typeof func === "function") {
+        this[name] = GenericFunction.bind(func, this)
+      }
     }
   }
 
@@ -308,13 +312,14 @@ const Console = maskFunction(function (...args) {
   const newSafeNames = ownKeys(newSafeConsole)
 
   for (const name of newSafeNames) {
-    if (! Reflect.has(this, name)) {
+    if (isKeyAssignable(name) &&
+        ! Reflect.has(this, name)) {
       copyProperty(this, newSafeConsole, name)
     }
   }
 }, SafeConsole)
 
-const { prototype } = Console
+const ConsoleProto = Console.prototype
 
 for (const name of SafeProtoNames) {
   if (! isKeyAssignable(name)) {
@@ -324,24 +329,24 @@ for (const name of SafeProtoNames) {
   const wrapped = wrapperMap.get(name)
 
   if (wrapped === void 0) {
-    copyProperty(prototype, SafeProto, name)
+    copyProperty(ConsoleProto, SafeProto, name)
   } else {
     const descriptor = Reflect.getOwnPropertyDescriptor(SafeProto, name)
 
-    Reflect.defineProperty(prototype, name, {
+    Reflect.defineProperty(ConsoleProto, name, {
       configurable: descriptor.configurable,
       enumerable: descriptor.enumerable,
       value: wrapped,
-      writable: descriptor.writable
+      writable:
+        descriptor.writable === true ||
+        typeof descriptor.set === "function"
     })
   }
 }
 
-if (! has(Console, Symbol.hasInstance)) {
-  Reflect.defineProperty(Console, Symbol.hasInstance, {
-    value: toExternalFunction((instance) => instance[isConsoleSymbol])
-  })
-}
+Reflect.defineProperty(Console, Symbol.hasInstance, {
+  value: toExternalFunction((instance) => instance[isConsoleSymbol])
+})
 
 let builtinConsole
 let builtinMethodMap
