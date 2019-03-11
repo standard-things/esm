@@ -610,4 +610,20 @@ describe("scenario tests", function () {
         })
     })
   })
+
+  describe("should work with `util.inspect()`", () => {
+    it("should work from the `esm` bridge without options", () =>
+      node([
+        path.resolve("fixture/scenario/inspect/without-options.js")
+      ])
+      .then(({ stdout }) => assert.ok(stdout.includes("inspect:true")))
+    )
+
+    it("should work from the `esm` bridge with options", () =>
+      node([
+        path.resolve("fixture/scenario/inspect/with-options.js")
+      ])
+      .then(({ stdout }) => assert.ok(stdout.includes("inspect:true")))
+    )
+  })
 })
