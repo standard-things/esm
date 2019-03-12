@@ -63,7 +63,7 @@ function init() {
 
       code = content.charCodeAt(pos + 3)
 
-      if (code !== SPACE ||
+      if (code !== SPACE &&
           code !== TAB) {
         continue
       }
