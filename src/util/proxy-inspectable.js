@@ -18,7 +18,6 @@ import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import ownPropertyNames from "./own-property-names.js"
-import realUtil from "../real/util.js"
 import shared from "../shared.js"
 import toExternalFunction from "./to-external-function.js"
 import toRawModuleNamespaceObject from "./to-raw-module-namespace-object.js"
@@ -30,7 +29,7 @@ function init() {
 
   const uninitializedValue = { __proto__: null }
 
-  function proxyInspectable(object, options, inspect, map) {
+  function proxyInspectable(object, options, map) {
     if (! isProxyInspectable(object)) {
       return object
     }
@@ -64,7 +63,7 @@ function init() {
         if (value === builtinInspect &&
             (name === customInspectKey ||
              name === "inspect")) {
-          newValue = realUtil.inspect
+          newValue = safeInspect
         } else if (inspecting ||
                    name !== customInspectKey) {
           if (name === "toString" &&
@@ -87,12 +86,12 @@ function init() {
             try {
               if (object === uninitializedValue) {
                 return contextAsOptions.colors
-                  ? stylize(UNINITIALIZED_BINDING, "special", inspect)
+                  ? stylize(UNINITIALIZED_BINDING, "special")
                   : UNINITIALIZED_BINDING
               }
 
               if (isModuleNamespaceObject(object)) {
-                return formatNamespaceObject(object, contextAsOptions, inspect)
+                return formatNamespaceObject(object, contextAsOptions)
               }
 
               if (objectIsOwnProxy === void 0) {
@@ -115,7 +114,7 @@ function init() {
                 return safeInspect(proxy, contextAsOptions)
               }
 
-              return formatProxy(object, contextAsOptions, inspect)
+              return formatProxy(object, contextAsOptions)
             } finally {
               inspecting = false
             }
@@ -136,7 +135,7 @@ function init() {
           const { value } = descriptor
 
           if (isObjectLike(value)) {
-            descriptor.value = proxyInspectable(value, options, inspect, map)
+            descriptor.value = proxyInspectable(value, options, map)
           }
         }
 
@@ -155,7 +154,7 @@ function init() {
     return decoyProxy
   }
 
-  function formatNamespaceObject(namespace, context, inspect) {
+  function formatNamespaceObject(namespace, context) {
     // Avoid `Object.keys()` because it calls `[[GetOwnProperty]]()`,
     // which calls `[[Get]]()`, which calls `GetBindingValue()`,
     // which throws for uninitialized bindings.
@@ -170,22 +169,22 @@ function init() {
       object[name] = tryGet(namespace, name)
     }
 
-    const result = inspect(object, context)
+    const result = builtinInspect(object, context)
     const indentation = result.slice(0, result.search(nonWhitespaceRegExp))
     const trimmed = result.slice(result.indexOf("{"), result.lastIndexOf("}") + 1)
 
     return indentation + "[Module] " + trimmed
   }
 
-  function formatProxy(proxy, context, inspect) {
+  function formatProxy(proxy, context) {
     const details = getProxyDetails(proxy)
 
     let object = proxy
 
     if (details !== void 0) {
       object = new Proxy(
-        toInspectable(details[0], context, inspect),
-        toInspectable(details[1], context, inspect)
+        toInspectable(details[0], context),
+        toInspectable(details[1], context)
       )
     }
 
@@ -204,19 +203,19 @@ function init() {
     return value
   }
 
-  function stylize(string, styleType, inspect) {
-    const style = inspect.styles[styleType]
+  function stylize(string, styleType) {
+    const style = builtinInspect.styles[styleType]
 
     if (style === void 0) {
       return string
     }
 
-    const [foregroundCode, backgroundCode] = inspect.colors[style]
+    const [foregroundCode, backgroundCode] = builtinInspect.colors[style]
 
     return "\u001B[" + foregroundCode + "m" + string + "\u001B[" + backgroundCode + "m"
   }
 
-  function toInspectable(value, options, inspect) {
+  function toInspectable(value, options) {
     return {
       __proto__: null,
       [shared.customInspectKey]: toExternalFunction((recurseTimes) => {
@@ -224,7 +223,7 @@ function init() {
 
         contextAsOptions.depth = recurseTimes
 
-        return inspect(value, contextAsOptions)
+        return builtinInspect(value, contextAsOptions)
       })
     }
   }

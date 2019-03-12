@@ -59,7 +59,7 @@ function inspect(...args) {
   customOptions.showProxy = showProxy
 
   options = assign(GenericObject.create(), customOptions)
-  args[0] = proxyInspectable(value, options, inspect)
+  args[0] = proxyInspectable(value, options)
 
   customOptions.customInspect = true
   customOptions.showProxy = false
