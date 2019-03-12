@@ -1,1 +1,1 @@
-require("../dual")
+require("../dual/index.js")

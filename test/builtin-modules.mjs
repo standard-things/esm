@@ -22,7 +22,7 @@ function node(args, env) {
 
 function runMain(filename, env) {
   return node([
-    "-r", "../",
+    "-r", "../index.js",
     filename
   ], env)
 }

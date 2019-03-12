@@ -1,1 +1,1 @@
-import "./nested"
+import "./nested.js"

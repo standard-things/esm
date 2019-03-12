@@ -301,8 +301,8 @@ describe("miscellaneous tests", () => {
 
     it("should support .esmrc options", () =>
       [
-        "./fixture/options-file/esmrc-object",
-        "./fixture/options-file/esmrc-string"
+        "./fixture/options-file/esmrc-object/index.js",
+        "./fixture/options-file/esmrc-string/index.js"
       ]
       .reduce((promise, request) =>
         promise
@@ -314,8 +314,8 @@ describe("miscellaneous tests", () => {
 
     it("should support .esmrc.json options", () =>
       [
-        "./fixture/options-file/esmrc-json-object",
-        "./fixture/options-file/esmrc-json-string"
+        "./fixture/options-file/esmrc-json-object/index.js",
+        "./fixture/options-file/esmrc-json-string/index.js"
       ]
       .reduce((promise, request) =>
         promise
@@ -327,10 +327,10 @@ describe("miscellaneous tests", () => {
 
     it("should support .esmrc.cjs and .esmrc.js options", () =>
       [
-        "./fixture/options-file/esmrc-cjs-object",
-        "./fixture/options-file/esmrc-cjs-string",
-        "./fixture/options-file/esmrc-js-object",
-        "./fixture/options-file/esmrc-js-string"
+        "./fixture/options-file/esmrc-cjs-object/index.js",
+        "./fixture/options-file/esmrc-cjs-string/index.js",
+        "./fixture/options-file/esmrc-js-object/index.js",
+        "./fixture/options-file/esmrc-js-string/index.js"
       ]
       .reduce((promise, request) =>
         promise
@@ -341,15 +341,15 @@ describe("miscellaneous tests", () => {
     )
 
     it("should support .esmrc.mjs options", () =>
-      import("./fixture/options-file/esmrc-mjs")
+      import("./fixture/options-file/esmrc-mjs/index.js")
         .then(assert.fail)
         .catch((e) => assert.ok(e instanceof SyntaxError))
     )
 
     it("should support esm package options", () =>
       [
-        "./fixture/options-file/esm-object",
-        "./fixture/options-file/esm-string"
+        "./fixture/options-file/esm-object/index.js",
+        "./fixture/options-file/esm-string/index.js"
       ]
       .reduce((promise, request) =>
         promise
@@ -360,7 +360,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should apply .esmrc over package.json options", () =>
-      import("./fixture/options-priority")
+      import("./fixture/options-priority/index.js")
     )
 
     it("should support esm as package dependencies", () =>
@@ -376,8 +376,8 @@ describe("miscellaneous tests", () => {
     it("should merge `options.cjs` of all `false` against zero-config defaults", () =>
       Promise
         .all([
-          "./fixture/options-auto/all-false",
-          "./fixture/options-auto/all-false-explicit-true"
+          "./fixture/options-auto/all-false/index.js",
+          "./fixture/options-auto/all-false-explicit-true/index.js"
         ]
         .map((request) => import(request)))
     )
@@ -385,8 +385,8 @@ describe("miscellaneous tests", () => {
     it("should merge `options.cjs` explicit fields against zero-config defaults", () =>
       Promise
         .all([
-          "./fixture/options-auto/explicit-false",
-          "./fixture/options-auto/explicit-true"
+          "./fixture/options-auto/explicit-false/index.js",
+          "./fixture/options-auto/explicit-true/index.js"
         ]
         .map((request) => import(request)))
     )
@@ -626,7 +626,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should resolve non-local dependencies with `require` in ESM", () =>
-      import("./fixture/require-paths")
+      import("./fixture/require-paths/index.js")
         .then((ns) => {
           const requests = [
             "home-node-libraries",
@@ -667,7 +667,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should resolve non-local dependencies with `require.resolve` in ESM", () =>
-      import("./fixture/require-paths")
+      import("./fixture/require-paths/index.js")
         .then((ns) => {
           const datas = [
             {
@@ -732,7 +732,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support `options` in `require.resolve` in ESM", () =>
-      import("./fixture/require-paths")
+      import("./fixture/require-paths/index.js")
         .then((ns) => {
           const paths = [path.resolve("fixture/paths")]
           const actual = ns.default.resolve("a", { paths })
@@ -753,7 +753,7 @@ describe("miscellaneous tests", () => {
     })
 
     it("should support `require.resolve.paths` in ESM", () =>
-      import("./fixture/require-paths")
+      import("./fixture/require-paths/index.js")
         .then((ns) => {
           const expected = [
             path.resolve("fixture/require-paths/node_modules"),
@@ -1118,16 +1118,16 @@ describe("miscellaneous tests", () => {
       assert.deepStrictEqual(actual, [false, mainPath])
 
       const createdPath = path.resolve(dirPath, "created")
-      const indexPath = path.resolve(createdPath, "index.js")
+      const createdFilename = path.resolve(createdPath, "index.js")
 
-      assert.strictEqual(Module._findPath(indexPath, [createdPath]), false)
+      assert.strictEqual(Module._findPath(createdFilename, [createdPath]), false)
 
-      fs.ensureFileSync(indexPath, "", "utf8")
+      fs.ensureFileSync(createdFilename, "", "utf8")
 
-      actual = Module._findPath(indexPath, [createdPath])
+      actual = Module._findPath(createdFilename, [createdPath])
 
       return trash(createdPath)
-        .then(() => assert.strictEqual(actual, indexPath))
+        .then(() => assert.strictEqual(actual, createdFilename))
     })
   })
 
@@ -1148,7 +1148,7 @@ describe("miscellaneous tests", () => {
     )
 
     it("should evaluate modules in the correct order", () =>
-      import("./misc/order")
+      import("./misc/order/index.js")
         .then((ns) => ns.default())
     )
 
@@ -1400,7 +1400,7 @@ describe("miscellaneous tests", () => {
 
     it("should not evaluate already loaded modules", () =>
       [
-        "./fixture/cjs/load-count",
+        "./fixture/cjs/load-count/index.js",
         "./fixture/cycle/load-count/a.js",
         "./fixture/cycle/load-count/a.mjs"
       ]

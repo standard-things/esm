@@ -8,7 +8,7 @@ test("test", () => {
 
   expect(require("./")).toEqual(expected)
 
-  require = require("../../../../")(module)
+  require = require("../../../../index.js")(module)
 
   expect(require("./main.js")).toEqual(expected)
 })

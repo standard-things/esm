@@ -1,7 +1,7 @@
 import Module from "module"
 
 import assert from "assert"
-import makeRequire from "../../"
+import makeRequire from "../../index.js"
 import module from "../module.js"
 import path from "path"
 

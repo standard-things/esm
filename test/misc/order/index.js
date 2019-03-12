@@ -2,9 +2,9 @@ import assert from "assert"
 import cycleTracker from "../../fixture/cycle/order/tracker.js"
 import exportTracker from "../../fixture/export/order/tracker.js"
 import importTracker from "../../fixture/import/order/tracker.js"
-import "../../fixture/cycle/order"
-import "../../fixture/export/order"
-import "../../fixture/import/order"
+import "../../fixture/cycle/order/index.mjs"
+import "../../fixture/export/order/index.js"
+import "../../fixture/import/order/index.mjs"
 
 export default () => {
   const trackers = [

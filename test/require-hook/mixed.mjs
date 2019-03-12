@@ -1,5 +1,5 @@
 import assert from "assert"
-import makeRequire from "../../"
+import makeRequire from "../../index.js"
 import module from "../module.js"
 
 export default () => {
@@ -18,10 +18,10 @@ export default () => {
     mode: "strict"
   })
 
-  assert.doesNotThrow(() => allRequire("./fixture/require-hook/options/all"))
+  assert.doesNotThrow(() => allRequire("./fixture/require-hook/options/all/index.js"))
   assert.ok(Reflect.has(global, "this"))
   assert.strictEqual(global.this, "undefined")
 
-  assert.doesNotThrow(() => cjsRequire("./fixture/require-hook/options/cjs"))
-  assert.doesNotThrow(() => mjsRequire("./fixture/require-hook/options/mjs"))
+  assert.doesNotThrow(() => cjsRequire("./fixture/require-hook/options/cjs/index.js"))
+  assert.doesNotThrow(() => mjsRequire("./fixture/require-hook/options/mjs/index.mjs"))
 }

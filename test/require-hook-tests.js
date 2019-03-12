@@ -20,7 +20,7 @@ describe("require hook tests", () => {
   )
 
   it("should support named exports", () =>
-    import("./require-hook/named-exports")
+    import("./require-hook/named-exports/index.js")
       .then((ns) => ns.default())
   )
 
@@ -35,7 +35,7 @@ describe("require hook tests", () => {
   )
 
   it("should support `options.mainFields`", () =>
-    import("./require-hook/main-fields")
+    import("./require-hook/main-fields/index.js")
       .then((ns) => ns.default())
   )
 

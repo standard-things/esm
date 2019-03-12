@@ -1,7 +1,7 @@
 import assert from "assert"
-import makeRequire from "../../"
+import makeRequire from "../../index.js"
 import module from "../module.js"
-import require from "../require"
+import require from "../require.js"
 
 export default () => {
   const esmRequire = makeRequire(module)

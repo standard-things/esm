@@ -22,7 +22,7 @@ describe("--eval hook tests", function () {
     for (const requireFlag of requireFlags) {
       for (const evalFlag of evalFlags) {
         runs.push([
-          requireFlag, "../",
+          requireFlag, "../index.js",
           evalFlag, [
             'import { log } from "console"',
             'log("eval-hook:true")'
@@ -47,7 +47,7 @@ describe("--eval hook tests", function () {
     for (const requireFlag of requireFlags) {
       for (const printFlag of printFlags) {
         runs.push([
-          requireFlag, "../",
+          requireFlag, "../index.js",
           printFlag, [
             'import { format } from "util"',
             'format("print-hook:%s", true)'

@@ -1,2 +1,2 @@
-import "./dual"
-import "./cjs"
+import "./dual/index.js"
+import "./cjs/index.js"

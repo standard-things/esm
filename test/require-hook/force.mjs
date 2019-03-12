@@ -1,5 +1,5 @@
 import assert from "assert"
-import makeRequire from "../../"
+import makeRequire from "../../index.js"
 import module from "../module.js"
 
 export default () => {
@@ -15,7 +15,7 @@ export default () => {
     mode: "auto"
   })
 
-  assert.doesNotThrow(() => allRequire("./fixture/options-force/all"))
+  assert.doesNotThrow(() => allRequire("./fixture/options-force/all/index.js"))
   assert.ok(Reflect.has(global, "this"))
   assert.strictEqual(global.this, "undefined")
 

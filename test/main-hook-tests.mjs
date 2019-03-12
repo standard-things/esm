@@ -26,7 +26,7 @@ function node(args, env) {
 
 function runMain(filename, env) {
   return node([
-    "-r", "../",
+    "-r", "../index.js",
     filename
   ], env)
 }
@@ -47,7 +47,7 @@ describe("main hook tests", function () {
       for (const flag of otherFlags) {
         const args = flag ? [flag] : []
 
-        args.push(requireFlag, "../", "./fixture/main-hook")
+        args.push(requireFlag, "../index.js", "./fixture/main-hook/index.mjs")
         runs.push(args)
       }
     }
@@ -69,18 +69,19 @@ describe("main hook tests", function () {
     ]
     .reduce((promise, ESM_OPTIONS) =>
       promise
-        .then(() => runMain("./fixture/main-hook/options/env", { ESM_OPTIONS }))
+        .then(() => runMain("./fixture/main-hook/options/env/index.js", { ESM_OPTIONS }))
         .then(({ stdout }) => assert.ok(stdout.includes("esm-options:true")))
     , Promise.resolve())
   )
 
   it("should support `ESM_OPTIONS` environment variable with `options.cache`", () => {
-    const execPath = path.resolve("fixture/main-hook/options/env-cache")
-    const cachePath = path.resolve(execPath, ".cache")
+    const dirPath = path.resolve("fixture/main-hook/options/env-cache")
+    const cachePath = path.resolve(dirPath, ".cache")
+    const filename = path.resolve(dirPath, "index.js")
 
     return trash(cachePath)
       .then(() =>
-        runMain(execPath, {
+        runMain(filename, {
           ESM_OPTIONS:  "{cache:'" + cachePath.replace(/\\/g, "\\\\") + "'}"
         })
       )
@@ -88,7 +89,7 @@ describe("main hook tests", function () {
   })
 
   it("should support `ESM_OPTIONS` environment variable with `options.mainFields`", () =>
-    runMain("./fixture/main-hook/options/env-main-fields", {
+    runMain("./fixture/main-hook/options/env-main-fields/index.js", {
       ESM_OPTIONS: "{mainFields:['module']}"
     })
     .then(({ stdout }) => assert.ok(stdout.includes("esm-options-main-fields:true")))
@@ -128,12 +129,12 @@ describe("main hook tests", function () {
   )
 
   it("should not expose `process.mainModule` in ESM", () =>
-    runMain("./fixture/main-hook/main-module/off")
+    runMain("./fixture/main-hook/main-module/off/index.mjs")
       .then(({ stdout }) => assert.ok(stdout.includes("main-module:false")))
   )
 
   it("should expose `process.mainModule` in ESM with `options.cjs.cache`", () =>
-    runMain("./fixture/main-hook/main-module/on")
+    runMain("./fixture/main-hook/main-module/on/index.mjs")
       .then(({ stdout }) => assert.ok(stdout.includes("main-module:true")))
   )
 
@@ -167,7 +168,7 @@ describe("main hook tests", function () {
       for (const flag of flags) {
         const args = flag ? [flag] : []
 
-        args.push("-r", "../", name)
+        args.push("-r", "../index.js", name)
         runs.push(args)
       }
     }
@@ -201,7 +202,7 @@ describe("main hook tests", function () {
       for (const destName of destNames) {
         const args = flag ? [flag] : []
 
-        args.push("-r", "../", "./fixture/main-hook/symlink/file/" + destName)
+        args.push("-r", "../index.js", "./fixture/main-hook/symlink/file/" + destName)
         runs.push(args)
       }
     }

@@ -139,7 +139,7 @@ test("test", () => {
   checkTypes(bridged)
   checkValues(bridged)
 
-  require = require("../../../../")(module)
+  require = require("../../../../index.js")(module)
 
   const rebridged = require("./main.js")
 

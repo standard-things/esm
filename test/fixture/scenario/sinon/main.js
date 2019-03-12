@@ -9,7 +9,7 @@ assert.throws(
 )
 
 stub(mutable, "add").returns(4)
-require = require("../../../../")(module)
+require = require("../../../../index.js")(module)
 
 const reMutable = require("../../math/math.esm.js")
 

@@ -5,7 +5,7 @@ describe("setter tests", () => {
   )
 
   it("should run setters for untouched CJS modules", () =>
-    import("./setter/untouched")
+    import("./setter/untouched/index.js")
       .then((ns) => ns.default())
   )
 
@@ -15,7 +15,7 @@ describe("setter tests", () => {
   )
 
   it("should not prematurely seal star exports", () =>
-    import("./setter/seal")
+    import("./setter/seal/index.js")
       .then((ns) => ns.default())
   )
 })

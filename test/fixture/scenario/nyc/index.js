@@ -1,7 +1,7 @@
 const assert = require("assert")
 const add1 = require("../../math/math.cjs.js").add
 
-require = require("../../../../")(module)
+require = require("../../../../index.js")(module)
 
 const add2 = require("../../math/math.mjs").add
 

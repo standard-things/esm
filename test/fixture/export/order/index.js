@@ -1,7 +1,7 @@
 import tracker from "./tracker.js"
 import "./a.mjs"
 
-export * from "./b"
+export * from "./b/index.js"
 
 tracker.push("d")
 

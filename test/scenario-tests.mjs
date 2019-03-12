@@ -63,7 +63,7 @@ describe("scenario tests", function () {
     node([
       "-r", pkgPath,
       "-r", "@babel/register",
-      path.resolve("fixture/scenario/babel-error")
+      path.resolve("fixture/scenario/babel-error/index.js")
     ])
     .then(assert.fail)
     .catch(({ stderr }) => {
@@ -79,14 +79,14 @@ describe("scenario tests", function () {
 
   it("should work with express", () =>
     node([
-      path.resolve("fixture/scenario/express")
+      path.resolve("fixture/scenario/express/index.js")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("express:true")))
   )
 
   it("should work with global-prefix", () =>
     node([
-      path.resolve("fixture/scenario/global-prefix")
+      path.resolve("fixture/scenario/global-prefix/index.js")
     ])
     .then(({ stdout }) => assert.ok(stdout.includes("global-prefix:true")))
   )
@@ -136,22 +136,24 @@ describe("scenario tests", function () {
   it("should work with newrelic", () => {
     const dirPath = path.resolve("fixture/scenario/newrelic")
     const cwdPath = path.resolve(dirPath, "cwd.js")
+    const filename = path.resolve(dirPath, "index.js")
 
     return node([
       "-r", pkgPath,
       "-r", cwdPath,
       "-r", "newrelic",
-      dirPath
+      filename
     ])
   })
 
   it("should work with nyc", () => {
     const dirPath = path.resolve("fixture/scenario/nyc")
+    const filename = path.resolve(dirPath, "index.js")
 
     return exec("nyc", [
       "--cwd", dirPath,
       "-i", pkgPath,
-      nodePath, ...defaultNodeArgs, dirPath
+      nodePath, ...defaultNodeArgs, filename
     ])
   })
 

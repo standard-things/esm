@@ -41,7 +41,7 @@ describe("--check hook tests", function () {
       for (const requireFlag of requireFlags) {
         for (const checkFlag of checkFlags) {
           runs.push([
-            requireFlag, "../",
+            requireFlag, "../index.js",
             checkFlag, "./fixture/check-hook/" + basename
           ])
         }
@@ -77,7 +77,7 @@ describe("--check hook tests", function () {
         runs.push([
           "echo '" + code + "' |",
           process.execPath,
-          requireFlag, "../",
+          requireFlag, "../index.js",
           checkFlag
         ].join(" "))
       }
