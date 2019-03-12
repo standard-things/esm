@@ -61,9 +61,9 @@ function init() {
 
         let newValue = value
 
-        if ((name === customInspectKey ||
-             name === "inspect") &&
-            value === builtinInspect) {
+        if (value === builtinInspect &&
+            (name === customInspectKey ||
+             name === "inspect")) {
           newValue = realUtil.inspect
         } else if (inspecting ||
                    name !== customInspectKey) {

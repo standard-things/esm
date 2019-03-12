@@ -120,6 +120,8 @@ function init() {
     const { safeUtil } = shared.module
     const { customInspectSymbol } = safeUtil
 
+    // Node < 6.6.0 uses the property "inspect" as the custom inspection key
+    // instead of the `util.inspect.custom` symbol.
     return typeof customInspectSymbol === "symbol"
       ? customInspectSymbol
       : "inspect"
