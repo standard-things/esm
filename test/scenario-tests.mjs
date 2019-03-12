@@ -168,6 +168,14 @@ describe("scenario tests", function () {
     ], envAuto)
   )
 
+  it("should work with requizzle", () =>
+    node([
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/requizzle")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("requizzle:true")))
+  )
+
   it("should work with rewire", () =>
     node([
       "-r", pkgPath,
