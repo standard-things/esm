@@ -16,6 +16,21 @@ function init() {
 
     while (lineCount === 0 ||
            newlineRegExp.test(content)) {
+      // Each segment has 4 VLQ fields. They are:
+      //  - The starting column index of the current line.
+      //  - The index of the source file.
+      //  - The starting line index in the source that this segment
+      //    corresponds to, relative to the previous value.
+      //  - The starting column index in the source that this segment
+      //    corresponds to, relative to the previous value.
+      //
+      // Integer to VLQ value map:
+      //  0 -> "A"
+      //  1 -> "C"
+      //
+      // For more details see
+      // https://sourcemaps.info/spec.html#h.qz3o9nc69um5 and
+      // https://github.com/Rich-Harris/vlq#what-is-a-vlq-string.
       mapping += (lineCount ? ";" : "") + "AA" + (lineCount ? "C" : "A") + "A"
       lineCount += 1
     }
