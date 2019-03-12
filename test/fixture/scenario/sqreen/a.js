@@ -1,1 +1,1 @@
-export { default } from "./text.js"
+export { default } from "./c.js"

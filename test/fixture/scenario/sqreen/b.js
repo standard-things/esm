@@ -4,11 +4,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 })
 
-const _text = require("./text.js")
-const _text2 = _interopRequireDefault(_text)
+const _c = require("./c.js")
+const _c2 = _interopRequireDefault(_c)
 
 function _interopRequireDefault(object) {
   return object && object.__esModule ? object : { default: object }
 }
 
-exports.default = _text2.default
+exports.default = _c2.default
