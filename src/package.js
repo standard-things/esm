@@ -553,7 +553,7 @@ function getRange(json, name) {
     const object = json[name]
 
     if (has(object, "esm")) {
-      return validRange(object["esm"])
+      return validRange(object.esm)
     }
   }
 
@@ -651,9 +651,20 @@ function readInfo(dirPath, forceOptions) {
     pkgParsed = true
     pkgJSON = parseJSON(pkgJSON)
 
-    if (has(pkgJSON, "esm")) {
+    if (has(pkgJSON, "type") &&
+        pkgJSON.type === "module") {
       optionsFound = true
-      options = pkgJSON["esm"]
+
+      options = {
+        cjs: false,
+        mode: MODE_STRICT
+      }
+    }
+
+    if (! optionsFound &&
+        has(pkgJSON, "esm")) {
+      optionsFound = true
+      options = pkgJSON.esm
     }
   }
 
