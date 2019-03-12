@@ -7,6 +7,7 @@ import ENV from "../../constant/env.js"
 import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
+import Loader from "../../loader.js"
 import Module from "../../module.js"
 import OwnProxy from "../../own/proxy.js"
 import Package from "../../package.js"
@@ -148,8 +149,7 @@ const compile = maskFunction(function (content, filename) {
 
   let preparedContent = stripShebang(content)
 
-  if (realProcess._breakFirstLine &&
-      realProcess._eval == null) {
+  if (Loader.state.module.breakFirstLine) {
     if (resolvedArgv === void 0) {
       // Lazily resolve `process.argv[1]` which is needed for setting the
       // breakpoint when Node is called with the --inspect-brk flag.
@@ -163,6 +163,8 @@ const compile = maskFunction(function (content, filename) {
 
     // Set breakpoint on module start.
     if (filename === resolvedArgv) {
+      Loader.state.module.breakFirstLine = false
+
       // Remove legacy breakpoint indicator.
       Reflect.deleteProperty(realProcess, "_breakFirstLine")
 

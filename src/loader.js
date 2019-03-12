@@ -1,3 +1,5 @@
+import ENV from "./constant/env.js"
+
 import Module from "./module.js"
 import Package from "./package.js"
 
@@ -6,6 +8,10 @@ import realProcess from "./real/process.js"
 import setDeferred from "./util/set-deferred.js"
 import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
+
+const {
+  FLAGS
+} = ENV
 
 class Loader {
   // TODO: Remove this eslint comment when the false positive is resolved.
@@ -20,6 +26,9 @@ class Loader {
     if (cached === void 0) {
       cached = {
         module: {
+          breakFirstLine:
+            FLAGS.inspectBrk &&
+            ! FLAGS.eval,
           extensions: esmExtensions,
           globalPaths: Array.from(Module.globalPaths),
           mainModule: realProcess.mainModule,
