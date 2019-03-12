@@ -113,22 +113,12 @@ function resolveFilename(request, parent, isMain = false, options) {
   const pkgOptions = Package.get(fromPath).options
 
   let cjsPaths = pkgOptions.cjs.paths
-  let exts = strictExts
   let fields = pkgOptions.mainFields
-
-  // Prevent resolving non-local dependencies:
-  // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
-  let skipGlobalPaths = true
 
   if (parentEntry !== null &&
       parentEntry.extname === ".mjs") {
     cjsPaths = false
     fields = strictFields
-  }
-
-  if (cjsPaths) {
-    exts = void 0
-    skipGlobalPaths = false
   }
 
   let foundPath = ""
@@ -157,13 +147,27 @@ function resolveFilename(request, parent, isMain = false, options) {
     let pathname = request.replace(queryHashRegExp, "")
 
     if (! hasEncodedSep(pathname)) {
-      const paths = isAbs ? [""] : [fromPath]
+      const exts = cjsPaths
+        ? void 0
+        : strictExts
+
+      const paths = isAbs
+        ? [""]
+        : [fromPath]
 
       pathname = decodeURIComponent(pathname)
       foundPath = findPath(pathname, paths, isMain, fields, exts)
     }
   } else if (! hasEncodedSep(request)) {
     const decoded = decodeURIComponent(request)
+
+    // Prevent resolving non-local dependencies:
+    // https://github.com/nodejs/node-eps/blob/master/002-es-modules.md#432-removal-of-non-local-dependencies
+    const skipGlobalPaths = ! cjsPaths
+
+    const exts = cjsPaths
+      ? void 0
+      : strictExts
 
     foundPath = _resolveFilename(decoded, parent, isMain, options, fields, exts, skipGlobalPaths)
 
