@@ -1,4 +1,3 @@
-import setProperty from "./set-property.js"
 import shared from "../shared.js"
 import silent from "./silent.js"
 
@@ -6,7 +5,7 @@ function init() {
   function setSilent(object, name, value) {
     silent(() => {
       try {
-        setProperty(object, name, value)
+        object[name] = value
       } catch {}
     })
   }
