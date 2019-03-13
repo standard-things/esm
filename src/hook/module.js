@@ -285,12 +285,20 @@ function tryPassthru(func, args, pkg) {
         "Expected esm@" + range +
         ". Using esm@" + PACKAGE_VERSION + ": " + filename
 
-      setProperty(error, "message", newMessage)
+      Reflect.defineProperty(error, "message", {
+        configurable: true,
+        value: newMessage,
+        writable: true
+      })
 
       const stack = get(error, "stack")
 
       if (typeof stack === "string") {
-        setProperty(error, "stack", stack.replace(message, () => newMessage))
+        Reflect.defineProperty(error, "stack", {
+          configurable: true,
+          value: stack.replace(message, () => newMessage),
+          writable: true
+        })
       }
     }
 

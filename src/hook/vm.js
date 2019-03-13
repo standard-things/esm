@@ -284,7 +284,11 @@ function createAddBuiltinModules(entry) {
 
     for (const name of lazyModules) {
       const set = toExternalFunction(function (value) {
-        setProperty(this, name, value)
+        Reflect.defineProperty(this, name, {
+          configurable: true,
+          value,
+          writable: true
+        })
       })
 
       Reflect.defineProperty(context, name, {

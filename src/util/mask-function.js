@@ -7,7 +7,6 @@ import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import isObjectLike from "./is-object-like.js"
 import nativeTrap from "./native-trap.js"
-import setProperty from "./set-property.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 import shimFunctionPrototypeToString from "../shim/function-prototype-to-string.js"
@@ -68,13 +67,20 @@ function maskFunction(func, source) {
       ? func.prototype
       : void 0
 
-    if (isObjectLike(proto)) {
-      setProperty(proto, "constructor", proxy)
-    } else {
+    if (! isObjectLike(proto)) {
       proto = GenericObject.create()
-      proto.constructor = proxy
-      setProperty(func, "prototype", proto)
+
+      Reflect.defineProperty(func, "prototype", {
+        value: proto,
+        writable: true
+      })
     }
+
+    Reflect.defineProperty(proto, "constructor", {
+      configurable: true,
+      value: proxy,
+      writable: true
+    })
 
     setPrototypeOf(proto, getPrototypeOf(sourceProto))
   } else {

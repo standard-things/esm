@@ -2,7 +2,6 @@ import OwnProxy from "../own/proxy.js"
 
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
-import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
@@ -57,7 +56,11 @@ function init() {
         })
       })
 
-      if (setProperty(FuncProto, "toString", proxy)) {
+      if (Reflect.defineProperty(FuncProto, "toString", {
+            configurable: true,
+            value: proxy,
+            writable: true
+          })) {
         cache.set(FuncProto, true)
       }
 

@@ -6,7 +6,6 @@ import has from "./has.js"
 import instanceOf from "./instance-of.js"
 import isObjectLike from "./is-object-like.js"
 import ownKeys from "./own-keys.js"
-import setProperty from "./set-property.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
@@ -174,7 +173,11 @@ function init() {
       configurable: true,
       get: deprecate(() => context, depMessage, depCode),
       set: deprecate(function (value) {
-        setProperty(this, name, value)
+        Reflect.defineProperty(this, name, {
+          configurable: true,
+          value,
+          writable: true
+        })
       }, depMessage, depCode)
     }
   }
