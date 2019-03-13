@@ -28,7 +28,6 @@ function init() {
     setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
     setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))
-    setDeferred(flags, "strict", () => matches(commandArgs, "--strict"))
 
     setDeferred(flags, "esModuleSpecifierResolution", () => {
       const flagRegExp = /^--es-module-specifier-resolution=(.+)$/
