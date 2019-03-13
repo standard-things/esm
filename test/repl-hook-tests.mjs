@@ -58,18 +58,21 @@ describe("REPL hook tests", () => {
 
   it("should work with a global context", () => {
     const r = repl.start({ useGlobal: true })
-    const code = 'import { default as globalAssert } from "assert"'
     const mod = r.context.module
+
+    Reflect.setPrototypeOf(mod, Module.prototype)
+
     const entry = Entry.get(mod)
 
     entry.addBuiltinModules = () => {}
     entry.require = require
     entry.runtimeName = "_"
 
-    Reflect.setPrototypeOf(mod, Module.prototype)
     Runtime.enable(entry, {})
 
     assert.strictEqual(typeof globalAssert, "undefined")
+
+    const code = 'import { default as globalAssert } from "assert"'
 
     r.eval(code, null, "repl", () => {
       assert.strictEqual(typeof globalAssert, "function")

@@ -171,6 +171,8 @@ function hook(vm) {
   }
 
   function setupEntry(mod) {
+    setPrototypeOf(mod, Module.prototype)
+
     entry = Entry.get(mod)
     entry.addBuiltinModules = createAddBuiltinModules(entry)
     entry.package = Package.get("")
@@ -178,7 +180,6 @@ function hook(vm) {
     entry.runtime = null
     entry.runtimeName = shared.runtimeName
 
-    setPrototypeOf(mod, Module.prototype)
     Runtime.enable(entry, GenericObject.create())
   }
 

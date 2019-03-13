@@ -37,8 +37,8 @@ function init() {
 
     const SafeProto = Safe.prototype
 
-    safeAssignProperties(SafeProto, Super.prototype)
     setPrototypeOf(SafeProto, null)
+    safeAssignProperties(SafeProto, Super.prototype)
 
     return Safe
   }

@@ -151,14 +151,14 @@ function createConsole({ stderr, stdout }) {
       : [stdout, stderr]
   )
 
+  setPrototypeOf(newConsole, GenericObject.create())
+
   for (const name of SafeProtoNames) {
     if (isKeyAssignable(name) &&
         ! has(newConsole, name)) {
       copyProperty(newConsole, ConsoleProto, name)
     }
   }
-
-  setPrototypeOf(newConsole, GenericObject.create())
 
   return newConsole
 }
