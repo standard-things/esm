@@ -176,17 +176,17 @@ function init() {
 
   function exportCycle(request, name) {
     return "Detected cycle while resolving name '" + name +
-      "' in '" + getModuleURL(request) + "'"
+           "' in '" + getModuleURL(request) + "'"
   }
 
   function exportMissing(request, name) {
     return "The requested module '" + getModuleURL(request) +
-      "' does not provide an export named '" + name + "'"
+           "' does not provide an export named '" + name + "'"
   }
 
   function exportStarConflict(request, name) {
     return "The requested module '" + getModuleURL(request) +
-      "' contains conflicting star exports for name '" + name + "'"
+           "' contains conflicting star exports for name '" + name + "'"
   }
 
   function invalidArgType(name, expected, actual) {
@@ -201,7 +201,7 @@ function init() {
 
   function invalidArgValue(name, value, reason = "is invalid") {
     return "The argument '" + name + "' " + reason +
-      ". Received " + truncInspect(value)
+           ". Received " + truncInspect(value)
   }
 
   function invalidExtension(request) {
@@ -210,43 +210,43 @@ function init() {
 
   function invalidPkgOption(name, value, unquoted) {
     return "The esm@" + PACKAGE_VERSION + " option " +
-      (unquoted ? toString(name) : toStringLiteral(name, APOSTROPHE)) +
-      " is invalid. Received " + truncInspect(value)
+           (unquoted ? toString(name) : toStringLiteral(name, APOSTROPHE)) +
+           " is invalid. Received " + truncInspect(value)
   }
 
   function invalidProtocol(protocol, expected) {
     return "Protocol '" + protocol +
-      "' not supported. Expected '" + expected + "'"
+           "' not supported. Expected '" + expected + "'"
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {
     return id + " not found by import in " + fromPath +
-      ". Legacy behavior in require() would have found it at " + foundPath
+           ". Legacy behavior in require() would have found it at " + foundPath
   }
 
   function namespaceAssignment(request, name) {
     return "Cannot assign to read only module namespace property " +
-      stringifyName(name) + " of " + getModuleURL(request)
+           stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceDefinition(request, name) {
     return "Cannot define module namespace property " +
-      stringifyName(name) + " of " + getModuleURL(request)
+           stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceDeletion(request, name) {
     return "Cannot delete module namespace property " +
-      stringifyName(name) + " of " + getModuleURL(request)
+           stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function namespaceExtension(request, name) {
     return "Cannot add module namespace property " +
-      stringifyName(name) + " to " + getModuleURL(request)
+           stringifyName(name) + " to " + getModuleURL(request)
   }
 
   function namespaceRedefinition(request, name) {
     return "Cannot redefine module namespace property " +
-      stringifyName(name) + " of " + getModuleURL(request)
+           stringifyName(name) + " of " + getModuleURL(request)
   }
 
   function requireESM(request) {
