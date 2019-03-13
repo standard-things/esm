@@ -46,6 +46,7 @@ const {
 } = CHAR_CODE
 
 const {
+  FLAGS,
   OPTIONS
 } = ENV
 
@@ -88,9 +89,14 @@ const defaultOptions = {
   debug: false,
   force: false,
   mainFields: ["main"],
-  mode: "strict",
+  mode: MODE_STRICT,
   sourceMap: void 0,
   wasm: false
+}
+
+const moduleTypeOptions = {
+  cjs: false,
+  mode: MODE_STRICT
 }
 
 const zeroConfigOptions = {
@@ -105,7 +111,7 @@ const zeroConfigOptions = {
     topLevelReturn: false,
     vars: true
   },
-  mode: "auto"
+  mode: MODE_AUTO
 }
 
 class Package {
@@ -654,11 +660,7 @@ function readInfo(dirPath, forceOptions) {
     if (has(pkgJSON, "type") &&
         pkgJSON.type === "module") {
       optionsFound = true
-
-      options = {
-        cjs: false,
-        mode: MODE_STRICT
-      }
+      options = moduleTypeOptions
     }
 
     if (! optionsFound &&
@@ -711,7 +713,11 @@ function readInfo(dirPath, forceOptions) {
 
   if (options === true ||
       ! optionsFound) {
-    options = OPTIONS
+    optionsFound = true
+
+    options = FLAGS.type === "module"
+      ? moduleTypeOptions
+      : OPTIONS
   }
 
   if (! pkgParsed &&
