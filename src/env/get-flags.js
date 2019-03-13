@@ -23,12 +23,28 @@ function init() {
     setDeferred(flags, "experimentalREPLAwait", () => matches(commandArgs, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(commandArgs, "--experimental-worker"))
     setDeferred(flags, "exposeInternals", () => matches(commandArgs, /^--expose[-_]internals$/))
-    setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.*)?$/))
+    setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.+)?$/))
     setDeferred(flags, "interactive", () => matches(commandArgs, /^(?:--interactive|-i)$/))
     setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
     setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))
     setDeferred(flags, "strict", () => matches(commandArgs, "--strict"))
+
+    setDeferred(flags, "esModuleSpecifierResolution", () => {
+      const flagRegExp = /^--es-module-specifier-resolution=(.+)$/
+
+      let result = "explicit"
+
+      for (const commandArg of commandArgs) {
+        const match = flagRegExp.exec(commandArg)
+
+        if (match !== null) {
+          result = stripQuotes(match[1])
+        }
+      }
+
+      return result
+    })
 
     setDeferred(flags, "inspect", () => {
       return flags.inspectBrk ||
@@ -36,15 +52,34 @@ function init() {
     })
 
     setDeferred(flags, "preloadModules", () => {
+      const flagRegExp = /^(?:--require|-r)$/
       const { length } = commandArgs
-      const requireRegExp = /^(?:--require|-r)$/
       const result = []
 
       let i = -1
 
       while (++i < length) {
-        if (requireRegExp.test(commandArgs[i])) {
+        if (flagRegExp.test(commandArgs[i])) {
           result.push(stripQuotes(commandArgs[++i]))
+        }
+      }
+
+      return result
+    })
+
+    setDeferred(flags, "type", () => {
+      const aliasRegExp = /^-m$/
+      const flagRegExp = /^--type=(.+)$/
+
+      let result = "commonjs"
+
+      for (const commandArg of commandArgs) {
+        const match = flagRegExp.exec(commandArg)
+
+        if (match !== null) {
+          result = stripQuotes(match[1])
+        } else if (aliasRegExp.test(commandArg)) {
+          result = "module"
         }
       }
 
