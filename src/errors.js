@@ -77,6 +77,7 @@ function init() {
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
+  addNodeError("ERR_INVALID_TYPE_FLAG", invalidTypeFlag, ExTypeError)
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
@@ -217,6 +218,11 @@ function init() {
   function invalidProtocol(protocol, expected) {
     return "Protocol '" + protocol +
            "' not supported. Expected '" + expected + "'"
+  }
+
+  function invalidTypeFlag(actual) {
+    return "Type flag must be one of 'module', 'commonjs'. Received --type=" +
+           actual
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {
