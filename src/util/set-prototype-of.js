@@ -3,11 +3,8 @@ import shared from "../shared.js"
 
 function init() {
   function setPrototypeOf(object, proto) {
-    if (isObjectLike(object)) {
-      Reflect.setPrototypeOf(object, isObjectLike(proto) ? proto : null)
-    }
-
-    return object
+    return isObjectLike(object) &&
+           Reflect.setPrototypeOf(object, isObjectLike(proto) ? proto : null)
   }
 
   return setPrototypeOf
