@@ -144,21 +144,22 @@ function init() {
       }
 
       if (typeof RealmBuiltin === "function") {
+        setPrototypeOf(RealmBuiltin, getPrototypeOf(Builtin))
+
         if (has(RealmBuiltin, "prototype")) {
           const RealmProto = RealmBuiltin.prototype
 
           if (isObjectLike(RealmProto)) {
             const BuiltinProto = Builtin.prototype
 
-            if (has(BuiltinProto, "constructor")) {
-              setProperty(RealmProto, "constructor", BuiltinProto.constructor)
-            }
-
             setPrototypeOf(RealmProto, BuiltinProto)
+
+            if (has(BuiltinProto, "constructor")) {
+              Reflect.defineProperty(RealmProto, "constructor",
+                Reflect.getOwnPropertyDescriptor(BuiltinProto, "constructor"))
+            }
           }
         }
-
-        setPrototypeOf(RealmBuiltin, getPrototypeOf(Builtin))
       }
     })
 
