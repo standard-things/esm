@@ -41,6 +41,7 @@ const {
 
 const {
   ELECTRON,
+  FLAGS,
   YARN_PNP
 } = ENV
 
@@ -147,13 +148,17 @@ function resolveFilename(request, parent, isMain = false, options) {
     let pathname = request.replace(queryHashRegExp, "")
 
     if (! hasEncodedSep(pathname)) {
-      const exts = cjsPaths
-        ? void 0
-        : strictExts
-
       const paths = isAbs
         ? [""]
         : [fromPath]
+
+      let exts
+
+      if (! cjsPaths) {
+        exts = FLAGS.esModuleSpecifierResolution === "explicit"
+          ? emptyArray
+          : strictExts
+      }
 
       pathname = decodeURIComponent(pathname)
       foundPath = findPath(pathname, paths, isMain, fields, exts)
