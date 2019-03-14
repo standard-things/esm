@@ -69,6 +69,8 @@ const {
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_JSON_FILENAME = "package.json"
+const STATE_TYPE_COMMONJS = 1
+const STATE_TYPE_MODULE = 2
 
 const esmrcExts = [".mjs", ".cjs", ".js", ".json"]
 
@@ -264,9 +266,15 @@ class Package {
       }))
     }
 
-    const result = getInfo(dirPath, forceOptions)
+    const result = getInfo(dirPath, {
+      __proto__: null,
+      forceOptions,
+      type: void 0
+    })
 
-    return result === null ? pkgState.default : result
+    return result === null
+      ? pkgState.default
+      : result
   }
 
   static from(request, forceOptions) {
@@ -510,7 +518,7 @@ function findRoot(dirPath) {
     : findRoot(parentPath)
 }
 
-function getInfo(dirPath, forceOptions) {
+function getInfo(dirPath, state) {
   const pkgState = Loader.state.package
   const { cache } = pkgState
   const defaultPkg = pkgState.default
@@ -520,8 +528,8 @@ function getInfo(dirPath, forceOptions) {
   if (cache.has(dirPath)) {
     pkg = cache.get(dirPath)
 
-    if (forceOptions === void 0 ||
-        pkg !== null) {
+    if (pkg !== null ||
+        state.forceOptions === void 0) {
       return pkg
     }
   }
@@ -538,14 +546,14 @@ function getInfo(dirPath, forceOptions) {
     // of module/internal/compile.
     pkg = defaultPkg.clone()
   } else {
-    pkg = readInfo(dirPath, forceOptions)
+    pkg = readInfo(dirPath, state)
   }
 
   if (pkg === null) {
     const parentPath = dirname(dirPath)
 
     if (parentPath !== dirPath) {
-      pkg = getInfo(parentPath)
+      pkg = getInfo(parentPath, state)
     }
   }
 
@@ -590,7 +598,7 @@ function isFlag(value) {
          value === 1
 }
 
-function readInfo(dirPath, forceOptions) {
+function readInfo(dirPath, state) {
   let pkg
   let optionsPath = dirPath + sep + ESMRC_FILENAME
 
@@ -606,8 +614,12 @@ function readInfo(dirPath, forceOptions) {
     optionsPath = findPath(optionsPath, emptyArray, false, esmrcExts)
   }
 
-  if (! optionsFound &&
-      optionsPath) {
+  const { forceOptions } = state
+
+  state.forceOptions = void 0
+
+  if (optionsPath !== "" &&
+      ! optionsFound) {
     optionsFound = true
 
     if (isJSON(optionsPath)) {
@@ -644,51 +656,62 @@ function readInfo(dirPath, forceOptions) {
   if (forceOptions === void 0 &&
       pkgJSON === null) {
     if (optionsFound) {
-      parentPkg = getInfo(dirname(dirPath))
+      parentPkg = getInfo(dirname(dirPath), state)
     } else {
       return null
     }
   }
 
-  let pkgParsed = false
+  const shouldCheckType = state.type === void 0
 
-  if (! optionsFound &&
-      pkgJSON !== null) {
-    pkgParsed = true
+  let pkgParsed = 0
+
+  if (pkgJSON !== null &&
+      (shouldCheckType ||
+       ! optionsFound)) {
     pkgJSON = parseJSON(pkgJSON)
+    pkgParsed = pkgJSON === null ? -1 : 1
 
-    if (has(pkgJSON, "type") &&
-        pkgJSON.type === "module") {
-      optionsFound = true
-      options = moduleTypeOptions
-    }
+    if (pkgParsed === 1) {
+      if (shouldCheckType &&
+          has(pkgJSON, "type") &&
+          pkgJSON.type === "module") {
+        optionsFound = true
+        options = moduleTypeOptions
+        state.type = STATE_TYPE_MODULE
+      } else {
+        state.type = STATE_TYPE_COMMONJS
+      }
 
-    if (! optionsFound &&
-        has(pkgJSON, "esm")) {
-      optionsFound = true
-      options = pkgJSON.esm
+      if (! optionsFound &&
+          has(pkgJSON, "esm")) {
+        optionsFound = true
+        options = pkgJSON.esm
+      }
     }
   }
 
-  let range
+  let range = null
 
   if (forceOptions !== void 0) {
     range = RANGE_ALL
   } else if (parentPkg) {
     range = parentPkg.range
   } else {
-    if (! pkgParsed &&
+    if (pkgParsed === 0 &&
         pkgJSON !== null) {
-      pkgParsed = true
       pkgJSON = parseJSON(pkgJSON)
+      pkgParsed = pkgJSON === null ? -1 : 1
     }
 
     // A package.json may have `esm` in its "devDependencies" object because
     // it expects another package or application to enable ESM loading in
     // production, but needs `esm` during development.
-    range =
-      getRange(pkgJSON, "dependencies") ||
-      getRange(pkgJSON, "peerDependencies")
+    if (pkgParsed === 1) {
+      range =
+        getRange(pkgJSON, "dependencies") ||
+        getRange(pkgJSON, "peerDependencies")
+    }
 
     if (range === null) {
       if (optionsFound ||
@@ -720,7 +743,7 @@ function readInfo(dirPath, forceOptions) {
       : OPTIONS
   }
 
-  if (! pkgParsed &&
+  if (pkgParsed !== 1 &&
       pkgJSON === null) {
     dirPath = getRoot(dirPath)
   }
