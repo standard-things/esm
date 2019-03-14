@@ -77,9 +77,6 @@ function init() {
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
-  addNodeError("ERR_INVALID_ES_MODULE_SPECIFIER_RESOLUTION_FLAG", invalidEsModuleSpecifierResolutionFlag, ExTypeError)
-  addNodeError("ERR_INVALID_REPL_TYPE", invalidREPLType, ExTypeError)
-  addNodeError("ERR_INVALID_TYPE_FLAG", invalidTypeFlag, ExTypeError)
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
   addNodeError("ERR_UNKNOWN_FILE_EXTENSION", unknownFileExtension, ExError)
@@ -164,23 +161,6 @@ function init() {
     }
   }
 
-  function invalidFlagValue(name, value, expected) {
-    const { length } = expected
-    const lastIndex = length - 1
-
-    let i = -1
-    let message = "The " + name + " flag must be one of"
-
-    while (++i < length) {
-      message +=
-        toStringLiteral(expected[i], APOSTROPHE) +
-        (i === lastIndex ? "" : ", ")
-    }
-
-    return message + ". Received " + name + "=" +
-           toStringLiteral(value, APOSTROPHE)
-  }
-
   function stringifyName(name) {
     return typeof name === "symbol"
       ? toString(name)
@@ -229,10 +209,6 @@ function init() {
            ". Received " + truncInspect(value)
   }
 
-  function invalidEsModuleSpecifierResolutionFlag(value, expected) {
-    return invalidFlagValue("--es-module-specifier-resolution", value, expected)
-  }
-
   function invalidExtension(request) {
     return "Cannot load module from .mjs: " + getModuleURL(request)
   }
@@ -246,14 +222,6 @@ function init() {
   function invalidProtocol(protocol, expected) {
     return "Protocol '" + protocol +
            "' not supported. Expected '" + expected + "'"
-  }
-
-  function invalidREPLType() {
-    return "Cannot specify --type for REPL"
-  }
-
-  function invalidTypeFlag(value, expected) {
-    return invalidFlagValue("--type", value, expected)
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {

@@ -1,7 +1,5 @@
 import { env, execArgv } from "../safe/process.js"
 
-import errors from "../errors.js"
-import isREPL from "./is-repl.js"
 import matches from "../util/matches.js"
 import parseCommand from "../util/parse-command.js"
 import setDeferred from "../util/set-deferred.js"
@@ -9,18 +7,6 @@ import shared from "../shared.js"
 import stripQuotes from "../util/strip-quotes.js"
 
 function init() {
-  const {
-    ERR_INVALID_ES_MODULE_SPECIFIER_RESOLUTION_FLAG,
-    ERR_INVALID_REPL_TYPE,
-    ERR_INVALID_TYPE_FLAG
-  } = errors
-
-  const esModuleSpecifierResolutionValues = ["explicit", "node"]
-  const esModuleSpecifierResolutionValuesLookup = new Set(esModuleSpecifierResolutionValues)
-
-  const typeValues = ["module", "commonjs"]
-  const typeValuesLookup = new Set(typeValues)
-
   function getFlags() {
     const commandArgs = parseCommand(env.NODE_OPTIONS)
 
@@ -54,11 +40,6 @@ function init() {
         if (match !== null) {
           result = stripQuotes(match[1])
         }
-      }
-
-      if (result !== void 0 &&
-          ! esModuleSpecifierResolutionValuesLookup.has(result)) {
-        throw new ERR_INVALID_ES_MODULE_SPECIFIER_RESOLUTION_FLAG(result, esModuleSpecifierResolutionValues)
       }
 
       return result
@@ -99,18 +80,6 @@ function init() {
         } else if (aliasRegExp.test(commandArg)) {
           result = "module"
         }
-      }
-
-      if (result === void 0) {
-        return
-      }
-
-      if (! typeValuesLookup.has(result)) {
-        throw new ERR_INVALID_TYPE_FLAG(result, typeValues)
-      }
-
-      if (isREPL()) {
-        throw new ERR_INVALID_REPL_TYPE
       }
 
       return result
