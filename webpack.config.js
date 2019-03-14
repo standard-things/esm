@@ -12,6 +12,10 @@ const {
   NormalModuleReplacementPlugin
 } = webpack
 
+const {
+  ModuleConcatenationPlugin
+} = webpack.optimize
+
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 const OptimizeJsPlugin = require("optimize-js-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
@@ -142,6 +146,7 @@ const config = {
       PACKAGE_FILENAMES,
       PACKAGE_VERSION
     }),
+    new ModuleConcatenationPlugin,
     new NormalModuleReplacementPlugin(
       /acorn[\\/]src[\\/]regexp\.js/,
       path.resolve("src/acorn/replacement/regexp.js")
