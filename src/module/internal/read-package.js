@@ -46,6 +46,7 @@ function init() {
     } catch (e) {
       e.path = jsonPath
       e.message = "Error parsing " + jsonPath + ": " + e.message
+
       throw e
     }
 
