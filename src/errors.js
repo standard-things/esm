@@ -30,8 +30,6 @@ function init() {
   } = shared.external
 
   const templateMap = new Map
-  const validEsModuleSpecifierResolutionValues = ["explicit", "node"]
-  const validTypeValues = ["module", "commonjs"]
 
   const errors = {
     MODULE_NOT_FOUND: function (request, parent) {
@@ -80,6 +78,7 @@ function init() {
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
   addNodeError("ERR_INVALID_ES_MODULE_SPECIFIER_RESOLUTION_FLAG", invalidEsModuleSpecifierResolutionFlag, ExTypeError)
+  addNodeError("ERR_INVALID_REPL_TYPE", invalidREPLType, ExTypeError)
   addNodeError("ERR_INVALID_TYPE_FLAG", invalidTypeFlag, ExTypeError)
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
@@ -230,8 +229,8 @@ function init() {
            ". Received " + truncInspect(value)
   }
 
-  function invalidEsModuleSpecifierResolutionFlag(value) {
-    return invalidFlagValue("--es-module-specifier-resolution", value, validEsModuleSpecifierResolutionValues)
+  function invalidEsModuleSpecifierResolutionFlag(value, expected) {
+    return invalidFlagValue("--es-module-specifier-resolution", value, expected)
   }
 
   function invalidExtension(request) {
@@ -249,8 +248,12 @@ function init() {
            "' not supported. Expected '" + expected + "'"
   }
 
-  function invalidTypeFlag(value) {
-    return invalidFlagValue("--type", value, validTypeValues)
+  function invalidREPLType() {
+    return "Cannot specify --type for REPL"
+  }
+
+  function invalidTypeFlag(value, expected) {
+    return invalidFlagValue("--type", value, expected)
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {
