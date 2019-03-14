@@ -3,6 +3,8 @@ import setProperty from "../util/set-property.js"
 import shared from "../shared.js"
 
 function init() {
+  "use sloppy"
+
   function constructError(ErrorCtor, args, stackTraceLimit = 0) {
     const BuiltinError = getBuiltinErrorConstructor(ErrorCtor.prototype)
     const stackTraceLimitDescriptor = Reflect.getOwnPropertyDescriptor(BuiltinError, "stackTraceLimit")
