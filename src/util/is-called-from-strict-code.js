@@ -4,27 +4,34 @@ import constructError from "../error/construct-error.js"
 import emptyArray from "./empty-array.js"
 import getStackFrames from "../error/get-stack-frames.js"
 import isOwnPath from "./is-own-path.js"
+import shared from "../shared.js"
 
-const {
-  STACK_TRACE_LIMIT
-} = ESM
-
-function isCalledFromStrictCode() {
+function init() {
   "use sloppy"
 
-  const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT))
+  const {
+    STACK_TRACE_LIMIT
+  } = ESM
 
-  for (const frame of frames) {
-    const filename = frame.getFileName()
+  function isCalledFromStrictCode() {
+    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT))
 
-    if (filename &&
-        ! isOwnPath(filename) &&
-        ! frame.isNative()) {
-      return frame.getFunction() === void 0
+    for (const frame of frames) {
+      const filename = frame.getFileName()
+
+      if (filename &&
+          ! isOwnPath(filename) &&
+          ! frame.isNative()) {
+        return frame.getFunction() === void 0
+      }
     }
+
+    return false
   }
 
-  return false
+  return isCalledFromStrictCode
 }
 
-export default isCalledFromStrictCode
+export default shared.inited
+  ? shared.module.utilIsCalledFromStrictCode
+  : shared.module.utilIsCalledFromStrictCode = init()
