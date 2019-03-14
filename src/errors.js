@@ -30,6 +30,8 @@ function init() {
   } = shared.external
 
   const templateMap = new Map
+  const validEsModuleSpecifierResolutionValues = ["explicit", "node"]
+  const validTypeValues = ["module", "commonjs"]
 
   const errors = {
     MODULE_NOT_FOUND: function (request, parent) {
@@ -77,6 +79,7 @@ function init() {
   addNodeError("ERR_INVALID_ARG_TYPE", invalidArgType, ExTypeError)
   addNodeError("ERR_INVALID_ARG_VALUE", invalidArgValue, ExError)
   addNodeError("ERR_INVALID_PROTOCOL", invalidProtocol, ExError)
+  addNodeError("ERR_INVALID_ES_MODULE_SPECIFIER_RESOLUTION_FLAG", invalidEsModuleSpecifierResolutionFlag, ExTypeError)
   addNodeError("ERR_INVALID_TYPE_FLAG", invalidTypeFlag, ExTypeError)
   addNodeError("ERR_MODULE_RESOLUTION_LEGACY", moduleResolutionLegacy, ExError)
   addNodeError("ERR_REQUIRE_ESM", requireESM, ExError)
@@ -162,6 +165,23 @@ function init() {
     }
   }
 
+  function invalidFlagValue(name, value, expected) {
+    const { length } = expected
+    const lastIndex = length - 1
+
+    let i = -1
+    let message = "The " + name + " flag must be one of"
+
+    while (++i < length) {
+      message +=
+        toStringLiteral(expected[i], APOSTROPHE) +
+        (i === lastIndex ? "" : ", ")
+    }
+
+    return message + ". Received " + name + "=" +
+           toStringLiteral(value, APOSTROPHE)
+  }
+
   function stringifyName(name) {
     return typeof name === "symbol"
       ? toString(name)
@@ -210,6 +230,10 @@ function init() {
            ". Received " + truncInspect(value)
   }
 
+  function invalidEsModuleSpecifierResolutionFlag(value) {
+    return invalidFlagValue("--es-module-specifier-resolution", value, validEsModuleSpecifierResolutionValues)
+  }
+
   function invalidExtension(request) {
     return "Cannot load module from .mjs: " + getModuleURL(request)
   }
@@ -225,9 +249,8 @@ function init() {
            "' not supported. Expected '" + expected + "'"
   }
 
-  function invalidTypeFlag(actual) {
-    return "Type flag must be one of 'module', 'commonjs'. Received --type=" +
-           actual
+  function invalidTypeFlag(value) {
+    return invalidFlagValue("--type", value, validTypeValues)
   }
 
   function moduleResolutionLegacy(id, fromPath, foundPath) {
