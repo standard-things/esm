@@ -20,13 +20,12 @@ import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleName from "./util/get-module-name.js"
 import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
-import getStackFrames from "./error/get-stack-frames.js"
 import has from "./util/has.js"
+import isCalledFromStrictCode from "./util/is-called-from-strict-code.js"
 import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isIdentifierName from "./util/is-identifier-name.js"
 import isObject from "./util/is-object.js"
-import isOwnPath from "./util/is-own-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
@@ -1041,24 +1040,6 @@ function initNamespaceHandler() {
     has: null,
     set: null
   }
-}
-
-function isCalledFromStrictCode() {
-  "use sloppy"
-
-  const frames = getStackFrames(new Error)
-
-  for (const frame of frames) {
-    const filename = frame.getFileName()
-
-    if (filename &&
-        ! isOwnPath(filename) &&
-        ! frame.isNative()) {
-      return frame.getFunction() === void 0
-    }
-  }
-
-  return false
 }
 
 function runGetter(entry, name) {
