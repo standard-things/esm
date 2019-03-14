@@ -1,6 +1,7 @@
 import COMPILER from "../../constant/compiler.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
+import ESM from "../../constant/esm.js"
 import MESSAGE from "../../constant/message.js"
 import PACKAGE from "../../constant/package.js"
 
@@ -69,6 +70,10 @@ const {
 } = ENV
 
 const {
+  STACK_TRACE_LIMIT
+} = ESM
+
+const {
   ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION
 } = MESSAGE
 
@@ -76,8 +81,6 @@ const {
   MODE_ALL,
   MODE_AUTO
 } = PACKAGE
-
-const STACK_TRACE_LIMIT_TO_GET_OUTSIDE_ESM = 20
 
 const exportsRegExp = /^.*?\bexports\b/
 
@@ -207,7 +210,7 @@ function compile(caller, entry, content, filename, fallback) {
   if (useFallback) {
     entry.type = TYPE_CJS
 
-    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT_TO_GET_OUTSIDE_ESM))
+    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT))
 
     for (const frame of frames) {
       const framePath = frame.getFileName()
