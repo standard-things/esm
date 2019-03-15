@@ -8,7 +8,12 @@ import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 function init() {
   const Shim = {
     enable(context) {
-      const FuncProto = context.Function.prototype
+      // Avoid a silent fail accessing `context.Function` in Electron 1.
+      const FuncProto = Reflect
+        .getOwnPropertyDescriptor(context, "Function")
+        .value
+        .prototype
+
       const cache = shared.memoize.shimFunctionPrototypeToString
 
       if (check(FuncProto, cache)) {
