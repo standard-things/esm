@@ -10,6 +10,7 @@ import Entry from "../../entry.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
+import SafeJSON from "../../safe/json.js"
 
 import assign from "../../util/assign.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
@@ -36,7 +37,6 @@ import shared from "../../shared.js"
 import stripBOM from "../../util/strip-bom.js"
 import toExternalError from "../../util/to-external-error.js"
 import toExternalFunction from "../../util/to-external-function.js"
-import toExternalObject from "../../util/to-external-object.js"
 import toString from "../../util/to-string.js"
 
 const {
@@ -596,8 +596,7 @@ function jsonParse(entry, filename, fallback) {
       fallback()
       parsed = mod.exports
     } else {
-      parsed = JSON.parse(content)
-      toExternalObject(parsed)
+      parsed = SafeJSON.parse(content)
     }
 
     threw = false
@@ -606,7 +605,6 @@ function jsonParse(entry, filename, fallback) {
 
     if (! useFallback) {
       error.message = filename + ": " + error.message
-      toExternalError(error)
     }
   }
 

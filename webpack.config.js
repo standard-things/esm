@@ -74,9 +74,9 @@ const isProd = /production/.test(ESM_ENV)
 const isTest = /test/.test(ESM_ENV)
 
 const externals = [
-  "Array", "Buffer", "Error", "EvalError", "Function", "Object", "Promise",
-  "RangeError", "ReferenceError", "Reflect", "SyntaxError", "TypeError",
-  "URIError", "eval"
+  "Array", "Buffer", "Error", "EvalError", "Function", "JSON", "Object",
+  "Promise", "RangeError", "ReferenceError", "Reflect", "SyntaxError",
+  "TypeError", "URIError", "eval"
 ]
 
 const hosted = [
