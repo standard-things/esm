@@ -111,6 +111,7 @@ function setupNode() {
   const basePath = path.resolve(nodePath, isWin ? "" : "..")
 
   return trash(basePath)
+    .then(() => Promise.fail.horribly())
     .then(() => fs.ensureLink(process.execPath, nodePath))
 }
 
