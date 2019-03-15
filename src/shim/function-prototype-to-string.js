@@ -6,6 +6,12 @@ import shared from "../shared.js"
 import unwrapOwnProxy from "../util/unwrap-own-proxy.js"
 
 function init() {
+  const { proxyNativeSourceText } = shared
+
+  const NATIVE_SOURCE_TEXT = proxyNativeSourceText === ""
+    ? "function () { [native code] }"
+    : proxyNativeSourceText
+
   const Shim = {
     enable(context) {
       // Avoid a silent fail accessing `context.Function` in Electron 1.
@@ -21,11 +27,6 @@ function init() {
       }
 
       const _toString = FuncProto.toString
-      const { proxyNativeSourceText } = shared
-
-      const NATIVE_SOURCE_TEXT =
-        proxyNativeSourceText ||
-        "function () { [native code] }"
 
       // Section 19.2.3.5: Function.prototype.toString()
       // Step 3: Return "function () { [native code] }" for callable objects.
@@ -33,7 +34,7 @@ function init() {
       const toString = function () {
         let thisArg = this
 
-        if (proxyNativeSourceText &&
+        if (proxyNativeSourceText !== "" &&
             isOwnProxy(thisArg)) {
           thisArg = unwrapOwnProxy(thisArg)
         }
