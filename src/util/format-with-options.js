@@ -1,5 +1,7 @@
 import CHAR_CODE from "../constant/char-code.js"
 
+import SafeJSON from "../safe/json.js"
+
 import assign from "./assign.js"
 import get from "./get.js"
 import inspect from "./inspect.js"
@@ -150,7 +152,7 @@ function inspectAll(array, options) {
 
 function tryStringify(value) {
   try {
-    return JSON.stringify(value)
+    return SafeJSON.stringify(value)
   } catch (e) {
     if (isError(e) &&
         get(e, "name") === "TypeError" &&
