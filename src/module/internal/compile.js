@@ -36,6 +36,7 @@ import shared from "../../shared.js"
 import stripBOM from "../../util/strip-bom.js"
 import toExternalError from "../../util/to-external-error.js"
 import toExternalFunction from "../../util/to-external-function.js"
+import toExternalObject from "../../util/to-external-object.js"
 import toString from "../../util/to-string.js"
 
 const {
@@ -596,6 +597,7 @@ function jsonParse(entry, filename, fallback) {
       parsed = mod.exports
     } else {
       parsed = JSON.parse(content)
+      toExternalObject(parsed)
     }
 
     threw = false
