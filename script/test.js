@@ -1,5 +1,7 @@
 "use strict"
 
+require("p-fatal") // Make unhandled promise rejections fatal on Node v9
+
 const SemVer = require("semver")
 
 const execa = require("execa")
