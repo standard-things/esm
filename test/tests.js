@@ -1,3 +1,4 @@
+import "hard-rejection/register"
 import resetState from "./reset-state.js"
 
 import "./cache-tests.js"
