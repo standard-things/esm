@@ -4,7 +4,11 @@ import isStackTraceMaskable from "./is-stack-trace-maskable.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 
 function prepareValue(value) {
-  if (! Loader.state.package.default.options.debug &&
+  // This function may be called before `Loader.state.package.default` is set.
+  const defaultPkg = Loader.state.package.default
+
+  if ((defaultPkg === null ||
+       ! defaultPkg.options.debug) &&
       isStackTraceMaskable(value)) {
     maskStackTrace(value)
   }
