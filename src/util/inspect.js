@@ -68,8 +68,9 @@ function inspect(...args) {
 }
 
 function prepareValue(value) {
-  if (! Loader.state.package.default.options.debug &&
-      isStackTraceMaskable(value)) {
+  const defaultPkg = Loader.state.package.default || false
+  const defPkgOpt = defaultPkg.options || false
+  if (! defPkgOpt.debug && isStackTraceMaskable(value)) {
     maskStackTrace(value)
   }
 
