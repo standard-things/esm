@@ -1,15 +1,13 @@
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
 import GenericObject from "../generic/object.js"
-import Loader from "../loader.js"
 
 import assign from "./assign.js"
 import has from "./has.js"
 import isModuleNamespaceObjectLike from "./is-module-namespace-object-like.js"
 import isObjectLike from "./is-object-like.js"
 import isProxyInspectable from "./is-proxy-inspectable.js"
-import isStackTraceMaskable from "./is-stack-trace-maskable.js"
-import maskStackTrace from "../error/mask-stack-trace.js"
+import prepareValue from "./prepare-value.js"
 import proxyInspectable from "./proxy-inspectable.js"
 
 const PROXY_PREFIX = "Proxy ["
@@ -65,15 +63,6 @@ function inspect(...args) {
   customOptions.showProxy = false
 
   return Reflect.apply(safeInspect, this, args)
-}
-
-function prepareValue(value) {
-  if (! Loader.state.package.default.options.debug &&
-      isStackTraceMaskable(value)) {
-    maskStackTrace(value)
-  }
-
-  return value
 }
 
 function tryInspect(...args) {
