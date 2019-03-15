@@ -1,12 +1,11 @@
 import CHAR_CODE from "../constant/char-code.js"
 
-import SafeJSON from "../safe/json.js"
-
 import assign from "./assign.js"
 import get from "./get.js"
 import inspect from "./inspect.js"
 import isError from "./is-error.js"
 import shared from "../shared.js"
+import toExternalError from "./to-external-error.js"
 
 const {
   LOWERCASE_D,
@@ -152,12 +151,15 @@ function inspectAll(array, options) {
 
 function tryStringify(value) {
   try {
-    return SafeJSON.stringify(value)
+    return JSON.stringify(value)
   } catch (e) {
-    if (isError(e) &&
-        get(e, "name") === "TypeError" &&
-        get(e, "message") === shared.circularErrorMessage) {
-      return "[Circular]"
+    if (isError(e)) {
+      if (get(e, "name") === "TypeError" &&
+          get(e, "message") === shared.circularErrorMessage) {
+        return "[Circular]"
+      }
+
+      toExternalError(e)
     }
 
     throw e

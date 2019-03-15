@@ -10,7 +10,6 @@ import Entry from "../../entry.js"
 import GenericObject from "../../generic/object.js"
 import Loader from "../../loader.js"
 import Runtime from "../../runtime.js"
-import SafeJSON from "../../safe/json.js"
 
 import assign from "../../util/assign.js"
 import captureStackTrace from "../../error/capture-stack-trace.js"
@@ -596,7 +595,7 @@ function jsonParse(entry, filename, fallback) {
       fallback()
       parsed = mod.exports
     } else {
-      parsed = SafeJSON.parse(content)
+      parsed = JSON.parse(content)
     }
 
     threw = false
@@ -605,6 +604,7 @@ function jsonParse(entry, filename, fallback) {
 
     if (! useFallback) {
       error.message = filename + ": " + error.message
+      toExternalError(error)
     }
   }
 
