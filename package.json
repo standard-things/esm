@@ -95,7 +95,7 @@
     "strip-ansi": "^5.1.0",
     "terser": "^3.17.0",
     "terser-webpack-plugin": "^1.2.3",
-    "test262-parser": "^2.0.7",
+    "test262-parser": "^2.2.0",
     "trash": "^4.3.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.3.3333",
