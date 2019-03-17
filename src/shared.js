@@ -219,7 +219,7 @@ function init() {
     })
 
     return inspected.indexOf(PROXY_PREFIX) !== -1 &&
-      inspected.indexOf(PACKAGE_PREFIX) !== -1
+           inspected.indexOf(PACKAGE_PREFIX) !== -1
   })
 
   setDeferred(support, "lookupShadowed", () => {
@@ -236,7 +236,7 @@ function init() {
     }
 
     return object.__lookupGetter__("a") === void 0 &&
-      object.__lookupSetter__("a") === void 0
+           object.__lookupSetter__("a") === void 0
   })
 
   setDeferred(support, "nativeProxyReceiver", () => {

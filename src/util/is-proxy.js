@@ -18,8 +18,6 @@ function init() {
     PROXY_PREFIX
   } = INSPECT
 
-  let useGetProxyDetails
-
   const liteInspectOptions = {
     breakLength: Infinity,
     colors: false,
@@ -30,6 +28,8 @@ function init() {
     showHidden: false,
     showProxy: true
   }
+
+  let useGetProxyDetails
 
   return function isProxyFallback(value) {
     if (OwnProxy.instances.has(value)) {
