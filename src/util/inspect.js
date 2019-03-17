@@ -1,3 +1,5 @@
+import INSPECT from "../constant/inspect.js"
+
 import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
 
 import GenericObject from "../generic/object.js"
@@ -10,7 +12,9 @@ import isProxyInspectable from "./is-proxy-inspectable.js"
 import prepareValue from "./prepare-value.js"
 import proxyInspectable from "./proxy-inspectable.js"
 
-const PROXY_PREFIX = "Proxy ["
+const {
+  PROXY_PREFIX
+} = INSPECT
 
 function inspect(...args) {
   let [value, options, depth] = args

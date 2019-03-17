@@ -1,7 +1,12 @@
+import INSPECT from "./constant/inspect.js"
 import ESM from "./constant/esm.js"
 
 import encodeId from "./util/encode-id.js"
 import setDeferred from "./util/set-deferred.js"
+
+const {
+  PROXY_PREFIX
+} = INSPECT
 
 const {
   PACKAGE_PREFIX,
@@ -213,7 +218,7 @@ function init() {
       showProxy: true
     })
 
-    return inspected.indexOf("Proxy") !== -1 &&
+    return inspected.indexOf(PROXY_PREFIX) !== -1 &&
       inspected.indexOf(PACKAGE_PREFIX) !== -1
   })
 

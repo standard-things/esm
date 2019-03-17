@@ -1,3 +1,4 @@
+import INSPECT from "../constant/inspect.js"
 import ESM from "../constant/esm.js"
 
 import OwnProxy from "../own/proxy.js"
@@ -8,6 +9,10 @@ import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
+  const {
+    PROXY_PREFIX
+  } = INSPECT
+
   const {
     PACKAGE_PREFIX
   } = ESM
@@ -62,7 +67,7 @@ function init() {
       inspectDepth -= 1
     }
 
-    if (! inspected.startsWith("Proxy")) {
+    if (! inspected.startsWith(PROXY_PREFIX)) {
       return false
     }
 

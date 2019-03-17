@@ -1,3 +1,5 @@
+import INSPECT from "../constant/inspect.js"
+
 import { inspect, types } from "../safe/util.js"
 
 import OwnProxy from "../own/proxy.js"
@@ -11,6 +13,10 @@ function init() {
   if (typeof (types && types.isProxy) === "function") {
     return types.isProxy
   }
+
+  const {
+    PROXY_PREFIX
+  } = INSPECT
 
   let useGetProxyDetails
 
@@ -40,7 +46,7 @@ function init() {
 
     return shared.support.inspectProxies &&
            isObjectLike(value) &&
-           inspect(value, liteInspectOptions).startsWith("Proxy")
+           inspect(value, liteInspectOptions).startsWith(PROXY_PREFIX)
   }
 }
 
