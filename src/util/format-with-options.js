@@ -103,10 +103,6 @@ function formatWithOptions(options, ...args) {
 
     result += segment
     lastPos = i + 1
-
-    if (argsIndex === lastArgsIndex) {
-      break
-    }
   }
 
   if (lastPos === 0) {
