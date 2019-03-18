@@ -49,8 +49,7 @@ function init() {
 
       Reflect.defineProperty(manager, shared.symbol.wrapper, {
         configurable: true,
-        value: func,
-        writable: true
+        value: func
       })
 
       setSilent(object, name, manager)
@@ -93,8 +92,7 @@ function init() {
 
     Reflect.defineProperty(object, shared.symbol.wrapper, {
       configurable: true,
-      value,
-      writable: true
+      value
     })
 
     return value
