@@ -111,17 +111,15 @@ function init() {
       const loc = getLocationFromStackTrace(error)
 
       if (loc !== null) {
-        let stack = get(error, "stack")
+        const stack = get(error, "stack")
 
         if (typeof stack === "string") {
-          stack =
-            loc.filename + ":" +
-            loc.line + "\n" +
-            stack
-
           Reflect.defineProperty(error, "stack", {
             configurable: true,
-            value: stack,
+            value:
+              loc.filename + ":" +
+              loc.line + "\n" +
+              stack,
             writable: true
           })
         }

@@ -5,8 +5,8 @@ import shared from "../shared.js"
 function init() {
   function isModuleNamespaceObject(value) {
     return isObject(value) &&
-      Reflect.has(value, shared.symbol.namespace) &&
-      isOwnProxy(value)
+           Reflect.has(value, shared.symbol.namespace) &&
+           isOwnProxy(value)
   }
 
   return isModuleNamespaceObject

@@ -56,15 +56,13 @@ function init() {
         return NATIVE_SOURCE_TEXT
       }
 
-      const proxy = new OwnProxy(_toString, {
-        apply: nativeTrap((_toString, thisArg, args) => {
-          return Reflect.apply(toString, thisArg, args)
-        })
-      })
-
       if (Reflect.defineProperty(FuncProto, "toString", {
             configurable: true,
-            value: proxy,
+            value: new OwnProxy(_toString, {
+              apply: nativeTrap((_toString, thisArg, args) => {
+                return Reflect.apply(toString, thisArg, args)
+              })
+            }),
             writable: true
           })) {
         cache.set(FuncProto, true)
