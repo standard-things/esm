@@ -543,15 +543,15 @@ function useAsync(entry) {
 }
 
 function useSourceMap(entry) {
-  if (DEVELOPMENT ||
-      ELECTRON_RENDERER ||
-      NDB ||
-      FLAGS.inspect ||
-      entry.package.options.sourceMap) {
-    return getSourceMappingURL(entry.compileData.code) === ""
-  }
+  const { sourceMap } = entry.package.options
 
-  return false
+  return sourceMap !== false &&
+    (sourceMap ||
+     DEVELOPMENT ||
+     ELECTRON_RENDERER ||
+     NDB ||
+     FLAGS.inspect) &&
+    getSourceMappingURL(entry.compileData.code) === ""
 }
 
 function jsonEvaluate(entry, parsed) {
