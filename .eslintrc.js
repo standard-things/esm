@@ -21,16 +21,17 @@ module.exports = {
     parser: "babel-eslint",
     sourceType: "module"
   },
-  plugins: ["import", "node"],
+  plugins: ["babel", "import", "node"],
   root: true,
   rules: {
     "arrow-parens": "error",
     "arrow-spacing": "error",
+    "babel/valid-typeof": "error",
     "brace-style": ["error", "1tbs"],
     "comma-dangle": "error",
     curly: "error",
     "eol-last": "error",
-    "eqeqeq": ["error", "always", { null: "ignore" }],
+    eqeqeq: ["error", "always", { null: "ignore" }],
     "import/no-duplicates": "error",
     "import/no-extraneous-dependencies": ["error", { packageDir: "./" }],
     "import/prefer-default-export": "error",
@@ -56,6 +57,7 @@ module.exports = {
     "space-before-function-paren": ["error", { named: "never" }],
     "space-infix-ops": "error",
     "spaced-comment": ["error", "always", { block: { balanced: true } }],
-    strict: "error"
+    strict: "error",
+    "valid-typeof": "off"
   }
 }
