@@ -3,8 +3,13 @@ import toMatcher from "./to-matcher.js"
 
 function init() {
   function matches(array, pattern) {
-    const length = array ? array.length : 0
-    const matcher = length ? toMatcher(pattern) : null
+    const length = array == null
+      ? 0
+      : array.length
+
+    const matcher = length === 0
+      ? null
+      : toMatcher(pattern)
 
     let i = -1
 

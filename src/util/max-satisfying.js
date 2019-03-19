@@ -12,7 +12,10 @@ function init() {
     }
 
     const cacheKey =
-      (versions.length === 1 ? versions[0] : GenericArray.join(versions)) + "\0" +
+      (versions.length === 1
+        ? versions[0]
+        : GenericArray.join(versions)
+      ) + "\0" +
       range
 
     const cache = shared.memoize.utilMaxSatisfying

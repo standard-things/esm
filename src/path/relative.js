@@ -23,7 +23,9 @@ function init() {
     const toLen = toEnd - toStart
 
     // Compare paths to find the longest common path from root.
-    const length = fromLen < toLen ? fromLen : toLen
+    const length = fromLen < toLen
+      ? fromLen
+      : toLen
 
     let i = -1
     let lastCommonSep = -1
@@ -74,7 +76,9 @@ function init() {
     while (++i <= fromEnd) {
       if (i === fromEnd ||
           from.charCodeAt(i) === FORWARD_SLASH) {
-        out += out.length === 0 ? ".." : "/.."
+        out += out.length === 0
+          ? ".."
+          : "/.."
       }
     }
 
@@ -123,7 +127,9 @@ function init() {
     const toLen = toEnd - toStart
 
     // Compare paths to find the longest common path from root.
-    const length = fromLen < toLen ? fromLen : toLen
+    const length = fromLen < toLen
+      ? fromLen
+      : toLen
 
     let i = -1
     let lastCommonSep = -1
@@ -188,7 +194,9 @@ function init() {
     while (++i <= fromEnd) {
       if (i === fromEnd ||
           from.charCodeAt(i) === BACKWARD_SLASH) {
-        out += out.length === 0 ? ".." : "/.."
+        out += out.length === 0
+          ? ".."
+          : "/.."
       }
     }
 
@@ -207,7 +215,9 @@ function init() {
     return normalize(to.slice(toStart))
   }
 
-  return WIN32 ? win32Relative : posixRelative
+  return WIN32
+    ? win32Relative
+    : posixRelative
 }
 
 export default shared.inited

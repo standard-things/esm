@@ -78,7 +78,10 @@ import(testFilename)
                e !== null) {
       const { constructor } = e
       const errorMessage = e.message
-      const errorName = constructor ? constructor.name : e.name
+
+      const errorName = constructor === void 0
+        ? e.name
+        : constructor.name
 
       if (errorMessage !== void 0) {
         message = String(errorMessage)

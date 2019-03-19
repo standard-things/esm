@@ -57,7 +57,10 @@ function init() {
 
     node.computed = false
     node.key = this.parseIdent(true)
-    node.value = this.eat(tt.eq) ? this.parseExpression() : null
+
+    node.value = this.eat(tt.eq)
+      ? this.parseExpression()
+      : null
 
     this.finishNode(node, "FieldDefinition")
     this.semicolon()

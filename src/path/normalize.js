@@ -18,7 +18,9 @@ function init() {
       : ""
   }
 
-  return WIN32 ? win32Normalize : posixNormalize
+  return WIN32
+    ? win32Normalize
+    : posixNormalize
 }
 
 export default shared.inited

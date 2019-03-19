@@ -83,14 +83,20 @@ function setupTest262() {
         // Follow Test262 guidance for strict mode.
         // https://github.com/tc39/test262/blob/master/INTERPRETING.md#strict-mode
         content =
-          (flags.onlyStrict ? '"use strict";\n' : "") +
+          (flags.onlyStrict
+            ? '"use strict";\n'
+            : ""
+          ) +
           content
 
         const pos = content.indexOf(YAML_END)
 
         const pragma =
           '"use ' +
-          (flags.module ? "module" : "script") +
+          (flags.module
+            ? "module"
+            : "script"
+          ) +
           '";'
 
         if (pos === -1) {

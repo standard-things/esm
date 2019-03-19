@@ -12,7 +12,11 @@ let _trash
 function trash(iterable) {
   return new Promise((resolvePromise) => {
     const paths = Array
-      .from(typeof iterable === "string" ? [iterable] : iterable)
+      .from(
+        typeof iterable === "string"
+          ? [iterable]
+          : iterable
+      )
       .map((thePath) => path.resolve(String(thePath)))
       .filter(fs.existsSync)
 

@@ -27,7 +27,10 @@ function init() {
         while (++i < length) {
           source +=
             escapeRegExp(identifiers[i]) +
-            (i === lastIndex ? "" : "|")
+            (i === lastIndex
+              ? ""
+              : "|"
+            )
         }
 
         return source

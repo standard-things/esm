@@ -123,7 +123,9 @@ function init() {
         if (typeof value === "function") {
           const unwrapped = cached.unwrap.get(value)
 
-          descriptor.value = unwrapped === void 0 ? value : unwrapped
+          descriptor.value = unwrapped === void 0
+            ? value
+            : unwrapped
         }
 
         // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
@@ -190,7 +192,10 @@ function init() {
     }
 
     const { builtin } = entry
-    const names = builtin ? null : keys(exported)
+
+    const names = builtin
+      ? null
+      : keys(exported)
 
     for (const name of names) {
       if (typeof Reflect.getOwnPropertyDescriptor(exported, name).get === "function") {
@@ -316,7 +321,9 @@ function init() {
       // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
       const toStringTag = getObjectTag(exported).slice(8, -1)
 
-      return toStringTag === "Object" ? value : toStringTag
+      return toStringTag === "Object"
+        ? value
+        : toStringTag
     }
 
     return value

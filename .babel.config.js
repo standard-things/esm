@@ -44,7 +44,7 @@ function BabelModePlugin({ types }) {
 
       const { directives } = node
 
-      let length = directives ? directives.length : 0
+      let { length } = directives
 
       while (length--) {
         const { value } = directives[length].value

@@ -48,7 +48,10 @@ function init() {
           const valueParam = safeName("v", localNames)
 
           setterArgsList +=
-            (setterArgsList === "" ? "" : ",") +
+            (setterArgsList === ""
+              ? ""
+              : ","
+            ) +
             '["' +
             name + '",' +
             (name === "*"
@@ -64,7 +67,10 @@ function init() {
         map.reExports.forEach((localNames, name) => {
           for (const localName of localNames) {
             setterArgsList +=
-              (setterArgsList === "" ? "" : ",") +
+              (setterArgsList === ""
+                ? ""
+                : ","
+              ) +
               '["' +
               localName + '",null,' +
               runtimeName + '.f("' + localName + '","' + name +
@@ -74,7 +80,10 @@ function init() {
 
         if (map.star) {
           setterArgsList +=
-            (setterArgsList === "" ? "" : ",") +
+            (setterArgsList === ""
+              ? ""
+              : ","
+            ) +
             '["*",null,' + runtimeName + ".n()]"
         }
 
@@ -506,7 +515,10 @@ function init() {
         '["' + exportedName + '",()=>' +
         localName +
         "]" +
-        (++i === lastIndex ? "" : ",")
+        (++i === lastIndex
+          ? ""
+          : ","
+        )
     }
 
     code += "]);"

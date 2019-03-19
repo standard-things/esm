@@ -63,7 +63,10 @@ function createBuiltinConsole() {
     const { originalConsole } = shared
     const useConsoleCall = typeof consoleCall === "function"
 
-    const emptyConfig = useConsoleCall ? {} : null
+    const emptyConfig = useConsoleCall
+      ? {}
+      : null
+
     const originalNames = keys(originalConsole)
 
     for (const name of originalNames) {

@@ -14,12 +14,16 @@ const resolveLookupPaths = maskFunction(function (request, parent, newReturn = f
   validateString(request, "request")
 
   if (builtinLookup.has(request)) {
-    return newReturn ? null : GenericArray.of(request, GenericArray.of())
+    return newReturn
+      ? null
+      : GenericArray.of(request, GenericArray.of())
   }
 
   const paths = _resolveLookupPaths(request, parent)
 
-  return newReturn ? paths : GenericArray.of(request, paths)
+  return newReturn
+    ? paths
+    : GenericArray.of(request, paths)
 }, RealModule._resolveLookupPaths)
 
 export default resolveLookupPaths

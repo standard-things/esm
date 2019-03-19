@@ -25,7 +25,10 @@ function init() {
 
     if (isPath(options)) {
       options = readFile(resolve(options), "utf8")
-      options = options === null ? "" : options.trim()
+
+      options = options === null
+        ? ""
+        : options.trim()
     }
 
     if (options === "") {

@@ -57,16 +57,23 @@ function findPath(request, paths, isMain = false, fields, exts) {
 
   let cacheKey =
     request + "\0" +
-    (pathsLength === 1 ? paths[0] : GenericArray.join(paths)) + "\0"
+    (pathsLength === 1
+      ? paths[0]
+      : GenericArray.join(paths)
+    ) + "\0"
 
   if (fields !== void 0) {
-    cacheKey += fields.length === 1 ? fields[0] : fields.join()
+    cacheKey += fields.length === 1
+      ? fields[0]
+      : fields.join()
   }
 
   cacheKey += "\0"
 
   if (exts !== void 0) {
-    cacheKey += exts.length === 1 ? exts[0] : exts.join()
+    cacheKey += exts.length === 1
+      ? exts[0]
+      : exts.join()
   }
 
   cacheKey += "\0"

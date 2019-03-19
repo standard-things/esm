@@ -25,7 +25,10 @@ function init() {
       }
 
       const done = index === extIndex
-      const ext = done ? extname : basename.slice(index)
+
+      const ext = done
+        ? extname
+        : basename.slice(index)
 
       if (Reflect.has(extCompilers, ext)) {
         return ext

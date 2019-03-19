@@ -94,8 +94,15 @@ function init() {
   function createBuiltinErrorClass(Super, code) {
     return function BuiltinError(...args) {
       const { length } = args
-      const last = length ? args[length - 1] : null
-      const beforeFunc = typeof last === "function" ? args.pop() : null
+
+      const last = length === 0
+        ? null
+        : args[length - 1]
+
+      const beforeFunc = typeof last === "function"
+        ? args.pop()
+        : null
+
       const template = templateMap.get(code)
       const message = template(...args)
 
@@ -196,7 +203,12 @@ function init() {
     let message = "The '" + name + "' argument must be " + expected
 
     if (arguments.length > 2) {
-      message += ". Received type " + (actual === null ? "null" : typeof actual)
+      message +=
+        ". Received type " +
+        (actual === null
+          ? "null"
+          : typeof actual
+        )
     }
 
     return message
@@ -213,7 +225,10 @@ function init() {
 
   function invalidPkgOption(name, value, unquoted) {
     return "The esm@" + PACKAGE_VERSION + " option " +
-           (unquoted ? toString(name) : toStringLiteral(name, APOSTROPHE)) +
+           (unquoted
+             ? toString(name)
+             : toStringLiteral(name, APOSTROPHE)
+           ) +
            " is invalid. Received " + truncInspect(value)
   }
 

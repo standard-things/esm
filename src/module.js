@@ -36,7 +36,9 @@ const Module = maskFunction(function (id, parent) {
   this.parent = parent
   this.paths = void 0
 
-  const children = parent == null ? null : parent.children
+  const children = parent == null
+    ? null
+    : parent.children
 
   if (Array.isArray(children)) {
     GenericArray.push(children, this)

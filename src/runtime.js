@@ -364,7 +364,10 @@ const Runtime = {
   },
   run(moduleWrapper) {
     const { entry } = this
-    const runner = entry.type === TYPE_ESM ? runESM : runCJS
+
+    const runner = entry.type === TYPE_ESM
+      ? runESM
+      : runCJS
 
     return this._runResult = runner(entry, moduleWrapper)
   },

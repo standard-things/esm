@@ -3,7 +3,8 @@
 const globalThis = (function () {
   // Reference `this` before `Function()` to prevent CSP errors for unsafe-eval.
   // Fallback to `Function()` when Node is invoked with `--strict`.
-  return this || Function("return this")()
+  return this ||
+         Function("return this")()
 })()
 
 const {

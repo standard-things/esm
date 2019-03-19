@@ -17,7 +17,9 @@ const findPath = maskFunction(function (request, paths, isMain) {
 
   const result = _findPath(request, paths, isMain)
 
-  return result === "" ? false : result
+  return result === ""
+    ? false
+    : result
 }, RealModule._findPath)
 
 export default findPath

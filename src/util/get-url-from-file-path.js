@@ -27,7 +27,9 @@ function init() {
   }
 
   function getURLFromFilePath(filename) {
-    let length = typeof filename === "string" ? filename.length : 0
+    let length = typeof filename === "string"
+      ? filename.length
+      : 0
 
     if (length === 0) {
       return "file:///"

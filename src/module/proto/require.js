@@ -31,7 +31,9 @@ const req = maskFunction(function (request) {
   moduleState.requireDepth += 1
 
   try {
-    const parentEntry = isMJS(this.filename) ? Entry.get(this) : null
+    const parentEntry = isMJS(this.filename)
+      ? Entry.get(this)
+      : null
 
     if (parentEntry !== null &&
         parentEntry._passthruRequire) {

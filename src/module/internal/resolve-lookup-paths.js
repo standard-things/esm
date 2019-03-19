@@ -47,7 +47,9 @@ function resolveLookupPaths(request, parent = null, skipGlobalPaths = false) {
       paths.push(availableModulesPath)
     }
 
-    return paths.length ? paths : null
+    return paths.length
+      ? paths
+      : null
   }
 
   if (typeof parentFilename === "string") {

@@ -64,8 +64,8 @@ function parseTest(filename) {
   const { description, negative } = attrs
 
   return {
-    description: description ? description.trim() : "",
-    errorType: negative ? negative.type : void 0,
+    description: description.trim(),
+    errorType: negative === void 0 ? void 0 : negative.type,
     isAsync: !! attrs.flags.async
   }
 }
@@ -94,7 +94,10 @@ describe("test262 tests", function () {
     const description =
       testData.description +
       " (" + path.basename(filename) + ")" +
-      (skipped ? "; " + skipped.reason : "")
+      (skipped
+        ? "; " + skipped.reason
+        : ""
+      )
 
     it(description, function () {
       const { isAsync } = testData

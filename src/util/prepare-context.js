@@ -105,7 +105,10 @@ function init() {
 
           code +=
             toBuiltinPropertySnippet(status.value) +
-            (status.done ? "" : ",")
+            (status.done
+              ? ""
+              : ","
+            )
         } while (! status.done)
 
         return code

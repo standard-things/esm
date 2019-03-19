@@ -6,7 +6,9 @@ function init() {
   function readJSON(filename) {
     const content = readFile(filename, "utf8")
 
-    return content === null ? content : parseJSON(content)
+    return content === null
+      ? null
+      : parseJSON(content)
   }
 
   return readJSON

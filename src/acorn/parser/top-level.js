@@ -59,7 +59,10 @@ function init() {
       if (type === "ExportDefaultDeclaration" ||
           type === "ExportNamedDeclaration") {
         object = stmt.declaration
-        type = object ? object.type : ""
+
+        if (object !== null) {
+          type = object.type
+        }
       }
 
       if (type === "VariableDeclaration") {

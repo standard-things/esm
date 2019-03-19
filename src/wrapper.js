@@ -58,7 +58,9 @@ function init() {
       const manager = silent(() => object[name])
       const symbol = shared.symbol.wrapper
 
-      return has(manager, symbol) ? manager[symbol]  : manager
+      return has(manager, symbol)
+        ? manager[symbol]
+        : manager
     },
     wrap(object, name, wrapper) {
       const map = getOrCreateMap(object, name)

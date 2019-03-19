@@ -35,9 +35,15 @@ function init() {
 
       content =
         "const " + runtimeName + "=exports;" +
-        (returnRun ? "return " : "") +
+        (returnRun
+          ? "return "
+          : ""
+        ) +
         runtimeName + ".r((" +
-        (options.async ? "async " :  "") +
+        (options.async
+          ? "async "
+          :  ""
+        ) +
         "function(exports,require){" +
         content +
         "\n}))"
@@ -100,7 +106,10 @@ function init() {
         ? ""
         : "__dirname=__filename=arguments=exports=module=require=void 0;"
       ) +
-      (returnRun ? "return " : "") +
+      (returnRun
+        ? "return "
+        : ""
+      ) +
       runtimeName + ".r((" +
       (async
         ? "async "

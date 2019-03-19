@@ -19,7 +19,7 @@ function init() {
     let proto = error
 
     while ((proto = getPrototypeOf(proto)) !== null) {
-      const Ctor = proto ? proto.constructor : void 0
+      const Ctor = proto.constructor
 
       if (typeof Ctor === "function" &&
           Ctor.name === "Error" &&

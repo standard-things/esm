@@ -25,7 +25,10 @@ function init() {
   function readInt(radix, length) {
     const start = this.pos
     const hasLength = typeof length === "number"
-    const end = hasLength ? length : Infinity
+
+    const end = hasLength
+      ? length
+      : Infinity
 
     let i = -1
     let total = 0
@@ -61,7 +64,7 @@ function init() {
 
     if (pos === start ||
         (hasLength &&
-         pos - start !== length)) {
+         (pos - start) !== length)) {
       return null
     }
 

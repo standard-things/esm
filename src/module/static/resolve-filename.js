@@ -65,7 +65,9 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
   if (isAbs) {
     fromPath = dirname(request)
   } else {
-    fromPath = parentEntry === null ? "" : parentEntry.dirname
+    fromPath = parentEntry === null
+      ? ""
+      : parentEntry.dirname
   }
 
   let cache
