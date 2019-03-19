@@ -1,3 +1,7 @@
+// Based on `util.formatWithOptions()`.
+// Copyright Node.js contributors. Released under MIT license:
+// https://github.com/nodejs/node/blob/master/lib/internal/util/inspect.js
+
 import CHAR_CODE from "../constant/char-code.js"
 
 import assign from "./assign.js"
@@ -19,131 +23,135 @@ const {
 } = CHAR_CODE
 
 function formatWithOptions(options, ...args) {
-  const [string] = args
+  const [first] = args
   const argsLength = args.length
 
-  if (typeof string !== "string") {
-    return argsLength === 0 ? "" : inspectAll(args, options)
-  }
-
-  if (argsLength === 1) {
-    return string
-  }
-
-  const lastArgsIndex = argsLength - 1
-  const { length } = string
-
-  let altOptions
   let argsIndex = 0
-  let i = -1
-  let lastPos = 0
+  let join = ""
   let result = ""
 
-  while (++i < length) {
-    const code = string.charCodeAt(i)
-
-    if (code !== PERCENT) {
-      continue
+  if (typeof first === "string") {
+    if (argsLength === 1) {
+      return first
     }
 
-    const nextCode = string.charCodeAt(++i)
+    const { length } = first
+    const lastIndex = length - 1
 
-    let segment
+    let altOptions
+    let i = -1
+    let lastPos = 0
 
-    switch (nextCode) {
-      case LOWERCASE_S:
-        segment = String(args[++argsIndex])
-        break
+    while (++i < lastIndex) {
+      if (first.charCodeAt(i) === PERCENT) {
+        const nextCode = first.charCodeAt(++i)
 
-      case LOWERCASE_D:
-        segment = Number(args[++argsIndex]) + ""
-        break
+        if ((argsIndex + 1) !== argsLength) {
+          let segment
 
-      case LOWERCASE_J:
-        segment = tryStringify(args[++argsIndex])
-        break
+          switch (nextCode) {
+            case LOWERCASE_S:
+              segment = String(args[++argsIndex])
+              break
 
-      case PERCENT:
-        segment = "%"
-        break
+            case LOWERCASE_J:
+              segment = tryStringify(args[++argsIndex])
+              break
 
-      case LOWERCASE_I:
-        segment = parseInt(args[++argsIndex]) + ""
-        break
+            case LOWERCASE_D: {
+              const value = args[++argsIndex]
 
-      case LOWERCASE_F:
-        segment = parseFloat(args[++argsIndex]) + ""
-        break
+              if (typeof value === "bigint") {
+                segment = value + "n"
+              } else if (typeof value === "symbol") {
+                segment = "NaN"
+              } else {
+                segment = Number(value) + ""
+              }
 
-      case UPPERCASE_O:
-        segment = inspect(args[++argsIndex], options)
-        break
+              break
+            }
 
-      case LOWERCASE_O:
-        if (altOptions === void 0) {
-          altOptions = assign({}, options, {
-            depth: 4,
-            showHidden: true,
-            showProxy: true
-          })
+            case UPPERCASE_O:
+              segment = inspect(args[++argsIndex], options)
+              break
+
+            case LOWERCASE_O:
+              if (altOptions === void 0) {
+                altOptions = assign({}, options, {
+                  depth: 4,
+                  showHidden: true,
+                  showProxy: true
+                })
+              }
+
+              segment = inspect(args[++argsIndex], altOptions)
+              break
+
+            case LOWERCASE_I: {
+              const value = args[++argsIndex]
+
+              if (typeof value === "bigint") {
+                segment = value + "n"
+              } else if (typeof value === "symbol") {
+                segment = "NaN"
+              } else {
+                segment = parseInt(value) + ""
+              }
+
+              break
+            }
+
+            case LOWERCASE_F: {
+              const value = args[++argsIndex]
+
+              segment = typeof value === "symbol"
+                ? "NaN"
+                : parseFloat(value) + ""
+
+              break
+            }
+
+            case PERCENT:
+              result += first.slice(lastPos, i)
+              lastPos = i + 1
+          }
+
+          if (lastPos !== i - 1) {
+            result += first.slice(lastPos, i - 1)
+          }
+
+          result += segment
+          lastPos = i + 1
+        } else if (nextCode === PERCENT) {
+          result += first.slice(lastPos, i)
+          lastPos = i + 1
         }
-
-        segment = inspect(args[++argsIndex], altOptions)
-        break
-
-      default:
-        continue
+      }
     }
 
-    const endIndex = i - 1
+    if (lastPos !== 0) {
+      ++argsIndex
+      join = " "
 
-    if (lastPos !== endIndex) {
-      result += string.slice(lastPos, endIndex)
-    }
-
-    result += segment
-    lastPos = i + 1
-
-    if (argsIndex === lastArgsIndex) {
-      break
+      if (lastPos < length) {
+        result += first.slice(lastPos)
+      }
     }
   }
 
-  if (lastPos === 0) {
-    result = string
-  } else if (lastPos < length) {
-    result += string.slice(lastPos)
-  }
-
-  while (++argsIndex < argsLength) {
+  while (argsIndex < argsLength) {
     const value = args[argsIndex]
-    const type = typeof value
 
-    result += " "
-
-    if (value === null ||
-        (type !== "object" &&
-         type !== "symbol")) {
-      result += value
-    } else {
-      result += inspect(value, options)
-    }
-  }
-
-  return result
-}
-
-function inspectAll(array, options) {
-  const { length } = array
-  const lastIndex = length - 1
-
-  let i = -1
-  let result = ""
-
-  while (++i < length) {
     result +=
-      inspect(array[i], options) +
-      (i === lastIndex ? "" : " ")
+      join +
+      (typeof value === "string"
+        ? value
+        : inspect(value, options)
+      )
+
+    join = " "
+    ++argsIndex
   }
 
   return result
