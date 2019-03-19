@@ -258,7 +258,7 @@ Tips
 
 * Load `esm` with “require” options of
   [`ava`](https://github.com/avajs/ava/blob/master/docs/recipes/es-modules.md),
-  [`mocha`](https://mochajs.org/#-r---require-module-name),
+  [`mocha`](https://mochajs.org/#-require-module-r-module),
   [`nodemon`](https://nodemon.io/),
   [`nyc`](https://github.com/istanbuljs/nyc#require-additional-modules),
   [`qunit`](https://github.com/qunitjs/qunit/releases/tag/2.6.0),
