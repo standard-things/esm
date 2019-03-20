@@ -148,10 +148,15 @@ const Runtime = {
 
     const { entry } = this
     const { cjs } = entry.package.options
+    const isMJS = entry.extname === ".mjs"
+
+    const cjsVars =
+      cjs.vars &&
+      ! isMJS
 
     try {
       return CachingCompiler.compile(content, {
-        cjsVars: cjs.vars,
+        cjsVars,
         eval: true,
         runtimeName: entry.runtimeName
       }).code
@@ -165,7 +170,7 @@ const Runtime = {
           filename: "eval",
           inModule:
             (! cjs.paths ||
-             entry.extname === ".mjs") &&
+             isMJS) &&
             type !== TYPE_CJS &&
             type !== TYPE_PSEUDO
         })
@@ -183,13 +188,18 @@ const Runtime = {
 
     const { entry } = this
     const { cjs } = entry.package.options
+    const isMJS = entry.extname === ".mjs"
     const { runtimeName } = entry
+
+    const cjsVars =
+      cjs.vars &&
+      ! isMJS
 
     let code
 
     try {
       const compileData = CachingCompiler.compile(content, {
-        cjsVars: cjs.vars,
+        cjsVars,
         eval: true,
         runtimeName
       })
@@ -209,7 +219,7 @@ const Runtime = {
           filename: "eval",
           inModule:
             (! cjs.paths ||
-             entry.extname === ".mjs") &&
+             isMJS) &&
             type !== TYPE_CJS &&
             type !== TYPE_PSEUDO
         })
