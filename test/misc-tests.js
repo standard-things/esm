@@ -114,14 +114,14 @@ describe("miscellaneous tests", () => {
         .then((ns) => ns.default())
     )
 
-    it("should support `console.Console`", () => {
+    it("should support `console.Console()`", () => {
       const console = new Console(process.stdout)
 
       assert.ok(console instanceof Console)
       assert.strictEqual(console.constructor, Console)
     })
 
-    it("should support subclassing `console.Console`", () => {
+    it("should support subclassing `console.Console()`", () => {
       class Sub extends Console {
         constructor(...args) {
           super(...args)
@@ -161,7 +161,7 @@ describe("miscellaneous tests", () => {
       assert.strictEqual(mod.constructor, Module)
     })
 
-    it("should support subclassing `stream.Stream`", () => {
+    it("should support subclassing `stream.Stream()`", () => {
       const Ctors = [
         stream,
         stream.Duplex,
@@ -204,7 +204,7 @@ describe("miscellaneous tests", () => {
       }
     })
 
-    it("should support `util.types.isModuleNamespaceObject`", function () {
+    it("should support `util.types.isModuleNamespaceObject()`", function () {
       if (! canTestUtilTypes) {
         this.skip()
       }
@@ -217,7 +217,7 @@ describe("miscellaneous tests", () => {
       assert.strictEqual(isModuleNamespaceObject(), false)
     })
 
-    it("should support `util.types.isProxy`", function () {
+    it("should support `util.types.isProxy()`", function () {
       if (! canTestUtilTypes) {
         this.skip()
       }
@@ -233,7 +233,7 @@ describe("miscellaneous tests", () => {
   })
 
   describe("integration", () => {
-    it("should support intercepting `require`", () =>
+    it("should support intercepting `require()`", () =>
       import("./cjs/intercept/require.js")
         .then((ns) => ns.default())
     )
@@ -393,7 +393,7 @@ describe("miscellaneous tests", () => {
   })
 
   describe("errors", () => {
-    it("should error when `require` receives an empty `request`", () => {
+    it("should error when `require()` receives an empty `request`", () => {
       try {
         require("")
         assert.fail()
@@ -402,7 +402,7 @@ describe("miscellaneous tests", () => {
       }
     })
 
-    it("should error when `require` methods receive a non-string `request`", () => {
+    it("should error when `require()` methods receive a non-string `request`", () => {
       const funcs = [
         require,
         require.resolve,
@@ -612,7 +612,7 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should resolve non-local dependencies with `require`", () => {
+    it("should resolve non-local dependencies with `require()`", () => {
       const requests = [
         "home-node-libraries",
         "home-node-modules",
@@ -625,7 +625,7 @@ describe("miscellaneous tests", () => {
       }
     })
 
-    it("should resolve non-local dependencies with `require` in ESM", () =>
+    it("should resolve non-local dependencies with `require()` in ESM", () =>
       import("./fixture/require-paths/index.js")
         .then((ns) => {
           const requests = [
@@ -641,7 +641,7 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it("should resolve non-local dependencies with `require.resolve`", () => {
+    it("should resolve non-local dependencies with `require.resolve()`", () => {
       const datas = [
         {
           id: "home-node-libraries",
@@ -666,7 +666,7 @@ describe("miscellaneous tests", () => {
       }
     })
 
-    it("should resolve non-local dependencies with `require.resolve` in ESM", () =>
+    it("should resolve non-local dependencies with `require.resolve()` in ESM", () =>
       import("./fixture/require-paths/index.js")
         .then((ns) => {
           const datas = [
@@ -694,7 +694,7 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it('should not resolve non-local "." requests with `require`', () => {
+    it('should not resolve non-local "." requests with `require()`', () => {
       try {
         require(".")
         assert.fail()
@@ -724,14 +724,14 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should support `options` in `require.resolve`", () => {
+    it("should support `options` in `require.resolve()`", () => {
       const paths = [path.resolve("fixture/paths")]
       const actual = require.resolve("a", { paths })
 
       assert.strictEqual(actual, path.resolve("fixture/paths/node_modules/a/index.js"))
     })
 
-    it("should support `options` in `require.resolve` in ESM", () =>
+    it("should support `options` in `require.resolve()` in ESM", () =>
       import("./fixture/require-paths/index.js")
         .then((ns) => {
           const paths = [path.resolve("fixture/paths")]
@@ -741,7 +741,7 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it("should support `require.resolve.paths`", () => {
+    it("should support `require.resolve.paths()`", () => {
       const expected = [
         path.resolve("node_modules"),
         path.resolve("../node_modules")
@@ -752,7 +752,7 @@ describe("miscellaneous tests", () => {
       assert.deepStrictEqual(actual, expected)
     })
 
-    it("should support `require.resolve.paths` in ESM", () =>
+    it("should support `require.resolve.paths()` in ESM", () =>
       import("./fixture/require-paths/index.js")
         .then((ns) => {
           const expected = [
@@ -1357,7 +1357,7 @@ describe("miscellaneous tests", () => {
         })
     )
 
-    it("should not support loading ESM files from `require`", () =>
+    it("should not support loading ESM files from `require()`", () =>
       Promise
         .all([
           import("./fixture/require-esm/strict/js.js")
@@ -1369,7 +1369,7 @@ describe("miscellaneous tests", () => {
         ])
     )
 
-    it("should not support loading preloaded ESM files from `require`", () =>
+    it("should not support loading preloaded ESM files from `require()`", () =>
       Promise
         .all([
           import("./fixture/export/abc.js"),
@@ -1388,11 +1388,11 @@ describe("miscellaneous tests", () => {
         )
     )
 
-    it("should support loading `.js` ESM files from `require` with `options.cjs`", () =>
+    it("should support loading `.js` ESM files from `require()` with `options.cjs`", () =>
       import("./fixture/require-esm/cjs/js.js")
     )
 
-    it("should not support loading `.mjs` files from `require` with `options.cjs`", () =>
+    it("should not support loading `.mjs` files from `require()` with `options.cjs`", () =>
       import("./fixture/require-esm/cjs/mjs.js")
         .then(assert.fail)
         .catch((e) => checkError(e, "ERR_REQUIRE_ESM"))
@@ -1411,7 +1411,7 @@ describe("miscellaneous tests", () => {
       , Promise.resolve())
     )
 
-    it("should not evaluate already loaded modules from `require`", () =>
+    it("should not evaluate already loaded modules from `require()`", () =>
       import("./fixture/load-count.js")
         .then(() => assert.strictEqual(require("./fixture/load-count.js"), 1))
     )
