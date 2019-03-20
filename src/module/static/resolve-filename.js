@@ -130,7 +130,10 @@ const resolveFilename = maskFunction(function (request, parent, isMain = false, 
       const parentType = parentEntry.type
 
       maskOptions.filename = parentEntry.filename
+
       maskOptions.inModule =
+        (! parentEntry.package.options.cjs.paths ||
+         parentEntry.extname === ".mjs") &&
         parentType !== TYPE_CJS &&
         parentType !== TYPE_PSEUDO
     }

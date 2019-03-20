@@ -116,6 +116,7 @@ function compile(caller, entry, content, filename, fallback) {
 
   const defaultPkg = Loader.state.package.default
   const isDefaultPkg = pkg === defaultPkg
+  const isMJS = entry.extname === ".mjs"
 
   let { compileData } = entry
 
@@ -147,20 +148,33 @@ function compile(caller, entry, content, filename, fallback) {
       } else {
         const { cjs } = options
 
+        const cjsPaths =
+          cjs.paths &&
+          ! isMJS
+
+        const cjsVars =
+          cjs.vars &&
+          ! isMJS
+
         const scriptData = compileData === null
           ? null
           : compileData.scriptData
 
+        const topLevelReturn =
+          cjs.topLevelReturn &&
+          ! isMJS
+
         compileData = tryCompile(caller, entry, content, {
           cacheName,
           cachePath: pkg.cachePath,
-          cjsVars: cjs.vars,
+          cjsPaths,
+          cjsVars,
           filename,
           hint,
           mtime: entry.mtime,
           runtimeName: entry.runtimeName,
           sourceType,
-          topLevelReturn: cjs.topLevelReturn
+          topLevelReturn
         })
 
         compileData.scriptData = scriptData
@@ -196,7 +210,7 @@ function compile(caller, entry, content, filename, fallback) {
   if (! isESM &&
       ! isWASM &&
       typeof fallback === "function") {
-    const parentEntry = Entry.get(mod.parent)
+    const parentEntry = Entry.get(entry.parent)
     const parentIsESM = parentEntry === null ? false : parentEntry.type === TYPE_ESM
     const parentPkg = parentEntry === null ? null : parentEntry.package
 
@@ -340,6 +354,7 @@ function tryRun(entry, filename, fallback) {
   const { compileData, type } = entry
   const isESM = type === TYPE_ESM
   const isJSON = type === TYPE_JSON
+  const isMJS = entry.extname === ".mjs"
   const isWASM = type === TYPE_WASM
 
   let { runtime } = entry
@@ -354,7 +369,9 @@ function tryRun(entry, filename, fallback) {
     }
   }
 
+  const pkg = entry.package
   const async = useAsync(entry)
+  const { cjs } = pkg.options
   const firstPass = runtime._runResult === void 0
   const mod = entry.module
   const { parsing } = shared.moduleState
@@ -387,8 +404,8 @@ function tryRun(entry, filename, fallback) {
       })()
     } else {
       const cjsVars =
-        entry.package.options.cjs.vars &&
-        entry.extname !== ".mjs"
+        cjs.vars &&
+        ! isMJS
 
       const source = compileSource(compileData, {
         async,
@@ -447,6 +464,11 @@ function tryRun(entry, filename, fallback) {
 
   const { firstAwaitOutsideFunction } = compileData
 
+  const inModule =
+    (! cjs.paths ||
+     isMJS) &&
+    entry.type !== TYPE_CJS
+
   if (! threw &&
       ! entry.running &&
       async &&
@@ -456,7 +478,7 @@ function tryRun(entry, filename, fallback) {
     threw = true
     error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
     error.column = firstAwaitOutsideFunction.column
-    error.inModule = true
+    error.inModule = inModule
     error.line = firstAwaitOutsideFunction.line
   }
 
@@ -519,7 +541,7 @@ function tryRun(entry, filename, fallback) {
       (name === "SyntaxError" ||
        (name === "ReferenceError" &&
         exportsRegExp.test(message)))) {
-    entry.package.cache.dirty = true
+    pkg.cache.dirty = true
   }
 
   const loc = getLocationFromStackTrace(error)
@@ -528,10 +550,7 @@ function tryRun(entry, filename, fallback) {
     filename = loc.filename
   }
 
-  maskStackTrace(error, {
-    filename,
-    inModule: entry.type !== TYPE_CJS
-  })
+  maskStackTrace(error, { filename, inModule })
 
   throw error
 }
@@ -575,7 +594,7 @@ function jsonParse(entry, filename, fallback) {
   let useFallback = false
 
   if (typeof fallback === "function") {
-    const parentEntry = Entry.get(mod.parent)
+    const parentEntry = Entry.get(entry.parent)
 
     useFallback =
       parentEntry !== null &&

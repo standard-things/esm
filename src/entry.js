@@ -137,6 +137,8 @@ class Entry {
     this.name = null
     // The package data of the module.
     this.package = Package.from(mod)
+    // The module parent.
+    this.parent = mod.parent
     // The paused state of the entry generator.
     this.running = false
     // The runtime object reference.

@@ -32,6 +32,7 @@ function init() {
   } = COMPILER
 
   const defaultOptions = {
+    cjsPaths: false,
     cjsVars: false,
     generateVarDeclarations: false,
     hint: -1,
@@ -132,11 +133,15 @@ function init() {
       }
 
       if (threw) {
+        if (options.cjsPaths) {
+          error.inModule = false
+        }
+
         throw error
       }
 
+      const { cjsVars, runtimeName } = options
       const { strict, top } = ast
-      const { runtimeName } = options
       const topIdentifiers = top.identifiers
 
       // Delete extraneous properties so they aren't needlessly visited.
@@ -225,7 +230,7 @@ function init() {
 
         possibleAssignableBindingsIndexes = findIndexes(code, [...assignableBindings])
 
-        if (options.cjsVars) {
+        if (cjsVars) {
           requireVisitor.visit(rootPath, {
             possibleIndexes: findIndexes(code, ["require"])
           })
@@ -257,7 +262,7 @@ function init() {
         importExportVisitor.finalizeHoisting()
       }
 
-      if (! options.cjsVars &&
+      if (! cjsVars &&
           sourceType === SOURCE_TYPE_MODULE) {
         const possibleNames = [
           "__dirname",

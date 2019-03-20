@@ -85,6 +85,7 @@ function hook(vm) {
 
     if (compileData === null) {
       const compilerOptions = {
+        cjsPaths: true,
         cjsVars: true,
         generateVarDeclarations: true,
         pragmas: false,

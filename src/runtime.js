@@ -163,8 +163,11 @@ const Runtime = {
         maskStackTrace(e, {
           content,
           filename: "eval",
-          inModule: type !== TYPE_CJS &&
-                    type !== TYPE_PSEUDO
+          inModule:
+            (! cjs.paths ||
+             entry.extname === ".mjs") &&
+            type !== TYPE_CJS &&
+            type !== TYPE_PSEUDO
         })
       } else {
         toExternalError(e)
@@ -204,8 +207,11 @@ const Runtime = {
         maskStackTrace(e, {
           content,
           filename: "eval",
-          inModule: type !== TYPE_CJS &&
-                    type !== TYPE_PSEUDO
+          inModule:
+            (! cjs.paths ||
+             entry.extname === ".mjs") &&
+            type !== TYPE_CJS &&
+            type !== TYPE_PSEUDO
         })
       } else {
         toExternalError(e)
@@ -238,6 +244,8 @@ const Runtime = {
     return code
   },
   dynamicImport(request) {
+    const { entry } = this
+
     return new ExPromise((resolvePromise, rejectPromise) => {
       setImmediate(() => {
         try {
@@ -263,11 +271,15 @@ const Runtime = {
             }
           })]]
 
-          esmImport(request, this.entry, setterArgsList, true)
+          esmImport(request, entry, setterArgsList, true)
         } catch (e) {
           if (! Loader.state.package.default.options.debug &&
               isStackTraceMaskable(e)) {
-            maskStackTrace(e, { inModule: true })
+            maskStackTrace(e, {
+              inModule:
+                ! entry.package.options.cjs.paths ||
+                entry.extname === ".mjs"
+            })
           } else {
             toExternalError(e)
           }

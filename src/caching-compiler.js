@@ -406,9 +406,14 @@ function init() {
   }
 
   function toCompileOptions(options = {}) {
-    let { cjsVars, topLevelReturn } = options
+    let {
+      cjsPaths,
+      cjsVars,
+      topLevelReturn
+    } = options
 
     if (isMJS(options.filename)) {
+      cjsPaths = void 0
       cjsVars = void 0
       topLevelReturn = void 0
     }
@@ -419,6 +424,7 @@ function init() {
       // Set `topLevelReturn` to `true` so that the "Illegal return statement"
       // syntax error will occur within `eval()`.
       return {
+        cjsPaths,
         cjsVars,
         runtimeName,
         topLevelReturn: true
@@ -426,6 +432,7 @@ function init() {
     }
 
     return {
+      cjsPaths,
       cjsVars,
       generateVarDeclarations: options.generateVarDeclarations,
       hint: options.hint,
