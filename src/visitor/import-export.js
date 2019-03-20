@@ -2,7 +2,6 @@ import COMPILER from "../constant/compiler.js"
 
 import Visitor from "../visitor.js"
 
-import constructError from "../error/construct-error.js"
 import encodeId from "../util/encode-id.js"
 import errors from "../parse/errors.js"
 import getNamesFromPattern from "../parse/get-names-from-pattern.js"
@@ -382,14 +381,14 @@ function init() {
           const localName = specifier.local.name
 
           if (! topIdentifiers.has(localName)) {
-            throw constructError(errors.SyntaxError, [
+            throw new errors.SyntaxError(
               {
                 inModule: true,
                 input: magicString.original
               },
               specifier.start,
               "Export '" + localName + "' is not defined in module"
-            ])
+            )
           }
 
           assignableBindings.add(localName)

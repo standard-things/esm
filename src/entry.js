@@ -11,7 +11,6 @@ import OwnProxy from "./own/proxy.js"
 import Package from "./package.js"
 import SafeObject from "./safe/object.js"
 
-import constructError from "./error/construct-error.js"
 import encodeId from "./util/encode-id.js"
 import errors from "./errors.js"
 import getCacheName from "./util/get-cache-name.js"
@@ -1094,7 +1093,8 @@ function runSetter(entry, name, callback, updateType) {
 
     if (value === ERROR_STAR) {
       setters.splice(length, 1)
-      throw constructError(ERR_EXPORT_STAR_CONFLICT, [entry.module, name])
+
+      throw new ERR_EXPORT_STAR_CONFLICT(entry.module, name)
     }
 
     const { type } = setter

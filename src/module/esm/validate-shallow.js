@@ -1,4 +1,3 @@
-import constructError from "../../error/construct-error.js"
 import errors from "../../errors.js"
 import shared from "../../shared.js"
 
@@ -37,7 +36,8 @@ function init() {
       if (setterIndex !== -1) {
         // Remove problematic setter to unblock subsequent imports.
         setters.splice(setterIndex, 1)
-        throw constructError(ERR_EXPORT_MISSING, [entry.module, exportedName])
+
+        throw new ERR_EXPORT_MISSING(entry.module, exportedName)
       }
     }
   }

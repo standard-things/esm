@@ -1,6 +1,5 @@
 import MESSAGE from "../../constant/message.js"
 
-import constructError from "../../error/construct-error.js"
 import errors from "../../parse/errors.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
@@ -134,7 +133,7 @@ function init() {
       return
     }
 
-    throw constructError(errors.SyntaxError, [this, pos, message])
+    throw new errors.SyntaxError(this, pos, message)
   }
 
   function unexpected(pos) {

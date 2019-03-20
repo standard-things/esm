@@ -1,6 +1,5 @@
 import ENTRY from "../../constant/entry.js"
 
-import constructError from "../../error/construct-error.js"
 import errors from "../../errors.js"
 import shared from "../../shared.js"
 
@@ -75,7 +74,8 @@ function init() {
 
       // Remove problematic setter to unblock subsequent imports.
       setters.splice(setterIndex, 1)
-      throw constructError(ErrorCtor, [entry.module, exportedName])
+
+      throw new ErrorCtor(entry.module, exportedName)
     }
   }
 
