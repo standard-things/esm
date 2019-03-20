@@ -74,6 +74,7 @@ function init() {
 
       result.inModule = parser.inModule
       result.strict = parser.strict
+
       return result
     }
   }
@@ -89,6 +90,7 @@ function init() {
     }
 
     options.sourceType = sourceType
+
     return options
   }
 
