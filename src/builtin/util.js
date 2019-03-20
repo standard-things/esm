@@ -45,7 +45,8 @@ if (isObjectLike(safeTypes)) {
 const builtinFormat = proxyWrap(safeUtil.format, toWrapper(format))
 const safeFormatWithOptions = safeUtil.formatWithOptions
 
-const builtinFormatWithOptions = safeFormatWithOptions
+// The `util.formatWithOptions()` method exists in Node 10+.
+const builtinFormatWithOptions = typeof safeFormatWithOptions === "function"
   ? proxyWrap(safeFormatWithOptions, toWrapper(formatWithOptions))
   : formatWithOptions
 
