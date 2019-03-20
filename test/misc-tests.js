@@ -22,6 +22,7 @@ const isWin = process.platform === "win32"
 
 const canTestDuplexInstance = SemVer.satisfies(process.version, ">=6.8")
 const canTestHasInstance = SemVer.satisfies(process.version, ">=6.5")
+const canTestUtilFormatWithOptions = Reflect.has(util, "formatWithOptions")
 const canTestUtilTypes = Reflect.has(util, "types")
 const canTestWorker = SemVer.satisfies(process.version, ">=10.5")
 
@@ -201,6 +202,43 @@ describe("miscellaneous tests", () => {
 
           assert.ok(sub1 instanceof stream)
         }
+      }
+    })
+
+    it("should support `util.format()`", () => {
+      const strings = [
+        "%s%",
+        "%s%%"
+      ]
+
+      for (const string of strings) {
+        assert.strictEqual(util.format(string, 99), "99%")
+      }
+    })
+
+    it("should support `util.formatWithOptions()`", function () {
+      if (! canTestUtilFormatWithOptions) {
+        this.skip()
+      }
+
+      const { formatWithOptions } = util
+
+      let strings = [
+        "%s%",
+        "%s%%"
+      ]
+
+      for (const string of strings) {
+        assert.strictEqual(formatWithOptions({}, string, 99), "99%")
+      }
+
+      strings = [
+        "%O%",
+        "%O%%"
+      ]
+
+      for (const string of strings) {
+        assert.strictEqual(formatWithOptions({ colors: true }, string, 99), "\u001b[33m99\u001b[39m%")
       }
     })
 
