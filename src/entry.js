@@ -524,9 +524,9 @@ class Entry {
 
       const { runtime } = childEntry
 
-      const runResult =
-        runtime !== null &&
-        runtime.runResult
+      const runResult = runtime === null
+        ? void 0
+        : runtime.runResult
 
       let threw = true
 
