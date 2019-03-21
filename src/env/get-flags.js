@@ -19,6 +19,7 @@ function init() {
     setDeferred(flags, "abortOnUncaughtException", () => matches(commandArgs, "--abort-on-uncaught-exception"))
     setDeferred(flags, "check", () => matches(commandArgs, /^(?:--check|-c)$/))
     setDeferred(flags, "eval", () => matches(commandArgs, /^(?:--eval|-e)$/))
+    setDeferred(flags, "experimentalJSONModules", () => matches(commandArgs, "--experimental-json-modules"))
     setDeferred(flags, "experimentalPolicy", () => matches(commandArgs, "--experimental-policy"))
     setDeferred(flags, "experimentalREPLAwait", () => matches(commandArgs, "--experimental-repl-await"))
     setDeferred(flags, "experimentalWorker", () => matches(commandArgs, "--experimental-worker"))
