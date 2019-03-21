@@ -109,9 +109,9 @@ function init() {
       let error
 
       if (beforeFunc === null) {
-        error = new Super(message)
-      } else {
         error = constructError(Super, [message])
+      } else {
+        error = constructError(Super, [message], 0)
         captureStackTrace(error, beforeFunc)
       }
 

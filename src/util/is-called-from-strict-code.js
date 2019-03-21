@@ -1,5 +1,3 @@
-import ESM from "../constant/esm.js"
-
 import constructError from "../error/construct-error.js"
 import emptyArray from "./empty-array.js"
 import getStackFrames from "../error/get-stack-frames.js"
@@ -9,12 +7,8 @@ import shared from "../shared.js"
 function init() {
   "use sloppy"
 
-  const {
-    STACK_TRACE_LIMIT
-  } = ESM
-
   function isCalledFromStrictCode() {
-    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT))
+    const frames = getStackFrames(constructError(Error, emptyArray))
 
     for (const frame of frames) {
       const filename = frame.getFileName()

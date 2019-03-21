@@ -12,7 +12,7 @@ const ESM = {
   PACKAGE_PREFIX: encodeId("esm"),
   PACKAGE_RANGE: PACKAGE_VERSION.match(/^[\d.]+/)[0],
   PACKAGE_VERSION,
-  STACK_TRACE_LIMIT: 20
+  STACK_TRACE_LIMIT: 30
 }
 
 const { filename, parent } = __non_webpack_module__

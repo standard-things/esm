@@ -1,7 +1,6 @@
 import COMPILER from "../../constant/compiler.js"
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
-import ESM from "../../constant/esm.js"
 import MESSAGE from "../../constant/message.js"
 import PACKAGE from "../../constant/package.js"
 
@@ -70,10 +69,6 @@ const {
 } = ENV
 
 const {
-  STACK_TRACE_LIMIT
-} = ESM
-
-const {
   ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION
 } = MESSAGE
 
@@ -82,6 +77,7 @@ const {
   MODE_AUTO
 } = PACKAGE
 
+const dummyParser = { input: "" }
 const exportsRegExp = /^.*?\bexports\b/
 
 function compile(caller, entry, content, filename, fallback) {
@@ -224,7 +220,7 @@ function compile(caller, entry, content, filename, fallback) {
   if (useFallback) {
     entry.type = TYPE_CJS
 
-    const frames = getStackFrames(constructError(Error, emptyArray, STACK_TRACE_LIMIT))
+    const frames = getStackFrames(constructError(Error, emptyArray))
 
     for (const frame of frames) {
       const framePath = frame.getFileName()
@@ -473,7 +469,7 @@ function tryRun(entry, filename, fallback) {
       firstAwaitOutsideFunction !== null &&
       ! isObjectEmpty(entry.getters)) {
     threw = true
-    error = new errors.SyntaxError({ input: "" }, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
+    error = new errors.SyntaxError(dummyParser, ILLEGAL_AWAIT_IN_NON_ASYNC_FUNCTION)
     error.column = firstAwaitOutsideFunction.column
     error.inModule = inModule
     error.line = firstAwaitOutsideFunction.line
