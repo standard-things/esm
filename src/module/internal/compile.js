@@ -372,7 +372,7 @@ function tryRun(entry, filename, fallback) {
   const pkg = entry.package
   const async = useAsync(entry)
   const { cjs } = pkg.options
-  const firstPass = runtime._runResult === void 0
+  const firstPass = runtime.runResult === void 0
   const mod = entry.module
   const { parsing } = shared.moduleState
 
@@ -388,13 +388,13 @@ function tryRun(entry, filename, fallback) {
     entry.running = true
 
     if (isJSON)  {
-      runtime._runResult = (function *() {
+      runtime.runResult = (function *() {
         const parsed = jsonParse(entry, filename, fallback)
         yield
         jsonEvaluate(entry, parsed)
       })()
     } else if (isWASM) {
-      runtime._runResult = (function *() {
+      runtime.runResult = (function *() {
         // Use a `null` [[Prototype]] for `importObject` because the lookup
         // includes inherited properties.
         const importObject = { __proto__: null }
@@ -429,7 +429,7 @@ function tryRun(entry, filename, fallback) {
       } else {
         const { _compile } = mod
 
-        runtime._runResult = (function *() {
+        runtime.runResult = (function *() {
           yield
 
           // Avoid V8 tail call optimization bug with --harmony flag in Node 6.
@@ -442,10 +442,7 @@ function tryRun(entry, filename, fallback) {
     entry.running = false
   }
 
-  // Debuggers may wrap `Module#_compile()` with
-  // `process.binding("inspector").callAndPauseOnStart()`
-  // and not forward the return value.
-  const { _runResult } = runtime
+  const { runResult } = runtime
 
   if (! threw &&
       ! parsing &&
@@ -453,7 +450,7 @@ function tryRun(entry, filename, fallback) {
     entry.running = true
 
     try {
-      _runResult.next()
+      runResult.next()
     } catch (e) {
       threw = true
       error = e
@@ -487,7 +484,7 @@ function tryRun(entry, filename, fallback) {
     entry.running = true
 
     try {
-      result = _runResult.next().value
+      result = runResult.next().value
     } catch (e) {
       threw = true
       error = e

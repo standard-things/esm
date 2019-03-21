@@ -329,7 +329,6 @@ const Runtime = {
       }
     })
 
-    runtime._runResult = void 0
     runtime.addDefaultValue = Runtime.addDefaultValue
     runtime.addExportFromSetter = Runtime.addExportFromSetter
     runtime.addExportGetters = Runtime.addExportGetters
@@ -345,6 +344,7 @@ const Runtime = {
     runtime.initBindings = Runtime.initBindings
     runtime.resumeChildren = Runtime.resumeChildren
     runtime.run = Runtime.run
+    runtime.runResult = void 0
     runtime.throwConstAssignment = Runtime.throwConstAssignment
     runtime.throwUndeclared = Runtime.throwUndeclared
     runtime.updateBindings = Runtime.updateBindings
@@ -391,7 +391,7 @@ const Runtime = {
       ? runESM
       : runCJS
 
-    return this._runResult = runner(entry, moduleWrapper)
+    return this.runResult = runner(entry, moduleWrapper)
   },
   throwConstAssignment: function throwConstAssignment() {
     throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)

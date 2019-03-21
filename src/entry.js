@@ -524,15 +524,18 @@ class Entry {
 
       const { runtime } = childEntry
 
+      const runResult =
+        runtime !== null &&
+        runtime.runResult
+
       let threw = true
 
       try {
-        if (runtime !== null &&
-            runtime._runResult !== void 0 &&
+        if (runResult !== void 0 &&
             childEntry.state < STATE_EXECUTION_STARTED) {
           childEntry.state = STATE_EXECUTION_STARTED
           childEntry.running = true
-          runtime._runResult.next()
+          runResult.next()
           childEntry.module.loaded = true
           childEntry.running = false
         }
