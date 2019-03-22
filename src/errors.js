@@ -7,7 +7,7 @@ import get from "./util/get.js"
 import getLocationFromStackTrace from "./error/get-location-from-stack-trace.js"
 import getModuleName from "./util/get-module-name.js"
 import getModuleURL from "./util/get-module-url.js"
-import { inspect } from "./safe/util.js"
+import inspectTrunc from "./util/inspect-trunc.js"
 import setProperty from "./util/set-property.js"
 import shared from "./shared.js"
 import toString from "./util/to-string.js"
@@ -190,14 +190,6 @@ function init() {
       : toStringLiteral(name, APOSTROPHE)
   }
 
-  function truncInspect(value) {
-    const inspected = inspect(value)
-
-    return inspected.length > 128
-      ? inspected.slice(0, 128) + "..."
-      : inspected
-  }
-
   function constAssignment() {
     return "Assignment to constant variable."
   }
@@ -234,7 +226,7 @@ function init() {
 
   function invalidArgValue(name, value, reason = "is invalid") {
     return "The argument '" + name + "' " + reason +
-           ". Received " + truncInspect(value)
+           ". Received " + inspectTrunc(value)
   }
 
   function invalidExtension(request) {
@@ -247,7 +239,7 @@ function init() {
              ? toString(name)
              : toStringLiteral(name, APOSTROPHE)
            ) +
-           " is invalid. Received " + truncInspect(value)
+           " is invalid. Received " + inspectTrunc(value)
   }
 
   function invalidProtocol(protocol, expected) {
