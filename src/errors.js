@@ -32,16 +32,20 @@ function init() {
   const templateMap = new Map
 
   const errors = {
-    MODULE_NOT_FOUND: function (request, parent) {
-      const requireStack = []
-      const seen = new Set
+    MAIN_NOT_FOUND: function (request, jsonPath) {
+      const error = new ExError(
+        "Cannot find module " + toStringLiteral(request, APOSTROPHE) +
+        '. Please verify that the package.json has a valid "main" entry'
+      )
 
-      while (parent != null &&
-             ! seen.has(parent)) {
-        seen.add(parent)
-        requireStack.push(getModuleName(parent))
-        parent = parent.parent
-      }
+      error.code = "MODULE_NOT_FOUND"
+      error.path = jsonPath
+      error.requestPath = request
+
+      return error
+    },
+    MODULE_NOT_FOUND: function (request, parent) {
+      const requireStack = getStructuredRequireStack(parent)
 
       let message = "Cannot find module " + toStringLiteral(request, APOSTROPHE)
 
@@ -164,6 +168,20 @@ function init() {
         setProperty(this, "name", value)
       }
     }
+  }
+
+  function getStructuredRequireStack(parent) {
+    const stack = []
+    const seen = new Set
+
+    while (parent != null &&
+           ! seen.has(parent)) {
+      seen.add(parent)
+      stack.push(getModuleName(parent))
+      parent = parent.parent
+    }
+
+    return stack
   }
 
   function stringifyName(name) {
