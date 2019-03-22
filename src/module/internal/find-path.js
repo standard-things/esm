@@ -16,6 +16,7 @@ import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 
+import errors from "../../errors.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
@@ -36,6 +37,10 @@ const {
   TINK,
   YARN_PNP
 } = ENV
+
+const {
+  MAIN_NOT_FOUND
+} = errors
 
 const { isFile } = Stats.prototype
 const mainFields = ["main"]
@@ -195,7 +200,7 @@ function findPath(request, paths, isMain = false, fields, exts) {
         fields = mainFields
       }
 
-      filename = tryPackage(thePath, fields, exts, isMain)
+      filename = tryPackage(request, thePath, fields, exts, isMain)
 
       if (filename === "") {
         filename = tryExtensions(thePath + sep + "index", exts, isMain)
@@ -271,7 +276,7 @@ function tryFilename(filename, isMain) {
     : filename
 }
 
-function tryPackage(dirPath, fields, exts, isMain) {
+function tryPackage(request, dirPath, fields, exts, isMain) {
   const json = readPackage(dirPath, fields)
 
   if (json === null) {
@@ -288,7 +293,9 @@ function tryPackage(dirPath, fields, exts, isMain) {
     }
   }
 
-  return ""
+  const jsonPath = dirPath + sep + "package.json"
+
+  throw new MAIN_NOT_FOUND(request, jsonPath)
 }
 
 export default findPath
