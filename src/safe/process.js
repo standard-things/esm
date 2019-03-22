@@ -51,6 +51,7 @@ function init() {
   setProperty(safeProcess, "argv", safe(safeProcess.argv))
   setProperty(safeProcess, "config", safeConfig)
   setProperty(safeProcess, "dlopen", GenericFunction.bind(safeProcess.dlopen, realProcess))
+  setProperty(safeProcess, "emitWarning", GenericFunction.bind(safeProcess.emitWarning, realProcess))
   setProperty(safeProcess, "env", safe(safeProcess.env))
   setProperty(safeProcess, "execArgv", safe(safeProcess.execArgv))
   setProperty(safeProcess, "getMaxListeners", GenericFunction.bind(realProcess.getMaxListeners, realProcess))
@@ -70,6 +71,7 @@ export const {
   config,
   cwd,
   dlopen,
+  emitWarning,
   env,
   execArgv,
   getMaxListeners,
