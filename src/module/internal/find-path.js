@@ -16,7 +16,9 @@ import GenericArray from "../../generic/array.js"
 import Module from "../../module.js"
 import { Stats } from "../../safe/fs.js"
 
+import { emitWarning } from "../../safe/process.js"
 import errors from "../../errors.js"
+import inspectTrunc from "../../util/inspect-trunc.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isJS from "../../path/is-js.js"
 import isMJS from "../../path/is-mjs.js"
@@ -27,8 +29,10 @@ import realpath from "../../fs/realpath.js"
 import shared from "../../shared.js"
 import statFast from "../../fs/stat-fast.js"
 import statSync from "../../fs/stat-sync.js"
+import toStringLiteral from "../../util/to-string-literal.js"
 
 const {
+  APOSTROPHE,
   DOT
 } = CHAR_CODE
 
@@ -201,10 +205,6 @@ function findPath(request, paths, isMain = false, fields, exts) {
       }
 
       filename = tryPackage(request, thePath, fields, exts, isMain)
-
-      if (filename === "") {
-        filename = tryExtensions(thePath + sep + "index", exts, isMain)
-      }
     }
 
     if (filename !== "") {
@@ -280,11 +280,16 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
   const json = readPackage(dirPath, fields)
 
   if (json === null) {
-    return ""
+    return tryExtensions(dirPath + sep + "index", exts, isMain)
   }
 
-  for (const field of fields) {
-    const filename = tryField(dirPath, json[field], exts, isMain)
+  let field
+  let fieldValue
+
+  for (field of fields) {
+    fieldValue = json[field]
+
+    const filename = tryField(dirPath, fieldValue, exts, isMain)
 
     if (filename !== "" &&
         (field === "main" ||
@@ -293,9 +298,22 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
     }
   }
 
+  const foundPath = tryExtensions(dirPath + sep + "index", exts, isMain)
   const jsonPath = dirPath + sep + "package.json"
 
-  throw new MAIN_NOT_FOUND(request, jsonPath)
+  if (foundPath === "") {
+    throw new MAIN_NOT_FOUND(request, jsonPath)
+  }
+
+  if (FLAGS.pendingDeprecation) {
+    emitWarning(
+      "Invalid " + toStringLiteral(field, APOSTROPHE) + " field in " +
+      toStringLiteral(jsonPath, APOSTROPHE) + " of " + inspectTrunc(fieldValue) +
+      ". Please either fix or report it to the module author",
+      "DeprecationWarning",
+      "DEP0XXX"
+    )
+  }
 }
 
 export default findPath
