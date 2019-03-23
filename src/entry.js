@@ -15,9 +15,9 @@ import encodeId from "./util/encode-id.js"
 import errors from "./errors.js"
 import getCacheName from "./util/get-cache-name.js"
 import getCacheStateHash from "./util/get-cache-state-hash.js"
+import getCtime from "./fs/get-ctime.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleName from "./util/get-module-name.js"
-import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
 import has from "./util/has.js"
 import isCalledFromStrictCode from "./util/is-called-from-strict-code.js"
@@ -155,7 +155,7 @@ class Entry {
     setDeferred(this, "cacheName", () => {
       const pkg = this.package
 
-      return getCacheName(this.mtime, {
+      return getCacheName(this.ctime, {
         cachePath: pkg.cachePath,
         filename: this.filename,
         packageOptions: pkg.options
@@ -188,9 +188,9 @@ class Entry {
       return createImmutableNamespaceProxy(this, this._completeNamespace)
     })
 
-    // The mtime of the module.
-    setDeferred(this, "mtime", () => {
-      return getMtime(this.filename)
+    // The ctime of the module.
+    setDeferred(this, "ctime", () => {
+      return getCtime(this.filename)
     })
 
     // The mutable namespace object that non-ESM importers receive.

@@ -65,9 +65,9 @@ function init() {
         circular: 0,
         code: null,
         codeWithTDZ: null,
+        ctime: -1,
         filename: null,
         firstAwaitOutsideFunction: null,
-        mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
         transforms: 0,
@@ -90,7 +90,7 @@ function init() {
           }
         }
 
-        result.mtime = +meta[3]
+        result.ctime = +meta[3]
         result.sourceType = +meta[4]
         result.transforms = +meta[2]
       }
@@ -123,8 +123,8 @@ function init() {
       return result
     }
 
+    result.ctime = options.ctime
     result.filename = options.filename
-    result.mtime = options.mtime
 
     return result
   }
@@ -293,9 +293,9 @@ function init() {
 
         if (compileData !== null) {
           const {
+            ctime,
             filename,
             firstAwaitOutsideFunction,
-            mtime,
             sourceType,
             transforms
           } = compileData
@@ -313,7 +313,7 @@ function init() {
             if (transforms !== 0) {
               meta.push(
                 transforms,
-                mtime,
+                ctime,
                 sourceType,
                 deflatedFirstAwaitOutsideFunction,
                 relative(cachePath, filename)
@@ -322,7 +322,7 @@ function init() {
           } else {
             meta.push(
               transforms,
-              mtime,
+              ctime,
               sourceType,
               deflatedFirstAwaitOutsideFunction,
               relative(cachePath, filename),
