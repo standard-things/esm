@@ -65,12 +65,12 @@ function init() {
           suffix = ")"
         }
 
-        const code =
-          prefix +
-          runtimeName + '.a("' + name + '",' + name + ")" +
-          suffix
-
-        overwrite(this, start, end, code)
+        overwrite(
+          this,
+          start,
+          end,
+          prefix + runtimeName + '.a("' + name + '",' + name + ")" + suffix
+        )
       })
     }
 

@@ -102,8 +102,10 @@ if (shared.inited &&
   exported.inited = true
   exported.reloaded = false
 
+  const { unsafeGlobal } = shared
+
   Shim.enable(shared.safeGlobal)
-  Shim.enable(shared.unsafeGlobal)
+  Shim.enable(unsafeGlobal)
 
   if (CHECK) {
     vmHook(realVM)
@@ -121,7 +123,7 @@ if (shared.inited &&
   }
 
   if (INTERNAL) {
-    globalHook(shared.unsafeGlobal)
+    globalHook(unsafeGlobal)
   }
 
   if (PRELOADED &&

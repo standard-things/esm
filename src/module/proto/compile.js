@@ -177,6 +177,7 @@ const compile = maskFunction(function (content, filename) {
   }
 
   const exported = this.exports
+  const { unsafeGlobal } = shared
 
   const args = [
     exported,
@@ -187,7 +188,7 @@ const compile = maskFunction(function (content, filename) {
   ]
 
   if (ELECTRON) {
-    args.push(realProcess, shared.unsafeGlobal)
+    args.push(realProcess, unsafeGlobal)
 
     if (useBufferArg === void 0) {
       const { wrap } = Module
@@ -203,7 +204,7 @@ const compile = maskFunction(function (content, filename) {
   }
 
   if (useRunInContext === void 0) {
-    useRunInContext = shared.unsafeGlobal !== shared.defaultGlobal
+    useRunInContext = unsafeGlobal !== shared.defaultGlobal
 
     if (useRunInContext) {
       useLegacyWrapper = true
