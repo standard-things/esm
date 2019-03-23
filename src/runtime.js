@@ -397,7 +397,13 @@ const Runtime = {
     throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)
   },
   throwUndeclared: function throwUndeclared(name) {
-    throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndeclared)
+    const { unsafeGlobal } = shared
+
+    if (! Reflect.has(unsafeGlobal, name)) {
+      throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndeclared)
+    }
+
+    return unsafeGlobal[name]
   },
   updateBindings(valueToPassThrough) {
     this.entry.updateBindings(null, UPDATE_TYPE_LIVE)

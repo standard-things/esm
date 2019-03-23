@@ -47,10 +47,7 @@ function init() {
       if (parent.type === "UnaryExpression" &&
           parent.operator === "typeof") {
         this.transforms |= TRANSFORMS_UNDECLARED
-
-        // Use `runtimeName` as the voided expression for content sniffing
-        // based on the presence of the runtime identifier.
-        overwrite(this, node.start, node.end, "void " + runtimeName)
+        overwrite(this, node.start, node.end, runtimeName + ".g." + name)
         return
       }
 
