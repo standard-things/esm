@@ -4,26 +4,28 @@ import shared from "../shared.js"
 import statSync from "../fs/stat-sync.js"
 
 function init() {
-  function getCtime(filename) {
+  const { round } = Math
+
+  function getMtime(filename) {
     if (typeof filename === "string") {
       try {
         const stat = statSync(filename)
-        const { ctimeMs } = stat
+        const { mtimeMs } = stat
 
         // Add 0.5 to avoid rounding down.
         // https://github.com/nodejs/node/pull/12607
-        return typeof ctimeMs === "number"
-          ? Math.round(ctimeMs + 0.5)
-          : GenericDate.getTime(stat.ctime)
+        return typeof mtimeMs === "number"
+          ? round(mtimeMs + 0.5)
+          : GenericDate.getTime(stat.mtime)
       } catch {}
     }
 
     return -1
   }
 
-  return getCtime
+  return getMtime
 }
 
 export default shared.inited
-  ? shared.module.fsGetCtime
-  : shared.module.fsGetCtime = init()
+  ? shared.module.fsGetMtime
+  : shared.module.fsGetMtime = init()
