@@ -204,8 +204,11 @@ class Entry {
           mtime = getStatTimestamp(stat, "mtime")
 
           if (mtime === getStatTimestamp(stat, "birthtime")) {
-            mtime = Date.now()
-            touch(filename, mtime)
+            const now = Date.now()
+
+            if (touch(filename, now)) {
+              mtime = now
+            }
           }
         }
       }
