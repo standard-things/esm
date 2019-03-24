@@ -1,3 +1,4 @@
+import isObjectLike from "../util/is-object-like.js"
 import realFs from "../real/fs.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -11,7 +12,15 @@ function init() {
     ? native
     : void 0
 
-  setProperty(safeFs, "constants", safe(safeFs.constants))
+  let { constants } = safeFs
+
+  if (isObjectLike(constants)) {
+    constants = safe(constants)
+  } else {
+    constants = { O_RDWR: 2 }
+  }
+
+  setProperty(safeFs, "constants", constants)
   setProperty(safeFs, "realpathNativeSync", realpathNativeSync)
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
 
