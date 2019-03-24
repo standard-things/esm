@@ -1,7 +1,8 @@
 import shared from "../shared.js"
 
 function init() {
-  const evalExpRegExp = /\(eval===(\w+\u200D)\.v\?$1\.e:eval\)/g
+  const evalCallExpRegExp = /\(eval===(\w+\u200D)\.v\?\1\.c:\1\.k\)/g
+  const indirectEvalRegExp = /\(eval===(\w+\u200D)\.v\?\1\.e:eval\)/g
   const runtimeRegExp = /\w+\u200D\.(\w+)(\.)?/g
 
   function untransformRuntime(string) {
@@ -10,11 +11,16 @@ function init() {
     }
 
     return string
-      .replace(evalExpRegExp, replaceEvalExp)
+      .replace(evalCallExpRegExp, replaceEvalCallExp)
+      .replace(indirectEvalRegExp, replaceIndirectEval)
       .replace(runtimeRegExp, replaceRuntime)
   }
 
-  function replaceEvalExp() {
+  function replaceEvalCallExp() {
+    return ""
+  }
+
+  function replaceIndirectEval() {
     return "eval"
   }
 
@@ -23,7 +29,8 @@ function init() {
       return "eval" + dot
     }
 
-    if (name === "i") {
+    if (name === "_" ||
+        name === "i") {
       return "import" + dot
     }
 
