@@ -1,6 +1,7 @@
 import ESM from "../constant/esm.js"
 
 import shared from "../shared.js"
+import untransformRuntime from "../util/untransform-runtime.js"
 
 function init() {
   const {
@@ -8,7 +9,6 @@ function init() {
   } = ESM
 
   const columnInfoRegExp = /:1:\d+(?=\)?$)/gm
-  const runtimeRegExp = /\w+\u200D\.(\w+)(\.)?/g
   const traceRegExp = /(\n +at .+)+$/
 
   function scrubStackTrace(stack) {
@@ -27,31 +27,20 @@ function init() {
     const message = stack.slice(0, index)
     const lines = trace.split("\n")
 
-    return message + lines
-      .filter((line) => {
-        for (const filename of PACKAGE_FILENAMES) {
-          if (line.indexOf(filename) !== -1) {
-            return false
+    return message + untransformRuntime(
+      lines
+        .filter((line) => {
+          for (const filename of PACKAGE_FILENAMES) {
+            if (line.indexOf(filename) !== -1) {
+              return false
+            }
           }
-        }
 
-        return true
-      })
-      .join("\n")
-      .replace(columnInfoRegExp, ":1")
-      .replace(runtimeRegExp, replaceRuntime)
-  }
-
-  function replaceRuntime(match, name, dot = "") {
-    if (name === "i") {
-      return "import" + dot
-    }
-
-    if (name === "r") {
-      return "require" + dot
-    }
-
-    return ""
+          return true
+        })
+        .join("\n")
+        .replace(columnInfoRegExp, ":1")
+    )
   }
 
   return scrubStackTrace
