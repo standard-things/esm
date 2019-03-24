@@ -23,12 +23,9 @@ function init() {
     }
   }
 
-  if (isObjectLike(types)) {
-    setProperty(safeUtil, "types", safe(types))
-  }
-
   setProperty(safeUtil, "customInspectSymbol", inspect.custom)
   setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
+  setProperty(safeUtil, "types", safe(types))
 
   return safeUtil
 }

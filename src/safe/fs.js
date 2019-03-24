@@ -7,11 +7,12 @@ function init() {
   const safeFs = safe(realFs)
   const { native } = safeFs.realpathSync
 
-  if (typeof native === "function") {
-    setProperty(safeFs, "realpathNativeSync", native)
-  }
+  const realpathNativeSync = typeof native === "function"
+    ? native
+    : void 0
 
   setProperty(safeFs, "constants", safe(safeFs.constants))
+  setProperty(safeFs, "realpathNativeSync", realpathNativeSync)
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
 
   return safeFs
