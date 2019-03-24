@@ -8,10 +8,10 @@ function init() {
   const safeUtil = safe(realUtil)
   const { inspect, types } = safeUtil
 
-  let defaultInspectOptions = inspect.defaultOptions
+  let { defaultOptions } = inspect
 
-  if (! isObjectLike(defaultInspectOptions)) {
-    defaultInspectOptions = {
+  if (! isObjectLike(defaultOptions)) {
+    defaultOptions = {
       breakLength: 60,
       colors: false,
       compact: true,
@@ -24,7 +24,7 @@ function init() {
   }
 
   setProperty(safeUtil, "customInspectSymbol", inspect.custom)
-  setProperty(safeUtil, "defaultInspectOptions", defaultInspectOptions)
+  setProperty(safeUtil, "defaultInspectOptions", defaultOptions)
   setProperty(safeUtil, "types", safe(types))
 
   return safeUtil
