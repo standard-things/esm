@@ -29,8 +29,10 @@ import processHook from "./hook/process.js"
 import realProcess from "./real/process.js"
 import realVM from "./real/vm.js"
 import requireHook from "./hook/require.js"
+import safeRequire from "./safe/require.js"
 import shared from "./shared.js"
 import shimFunctionPrototypeToString from "./shim/function-prototype-to-string.js"
+import shimPuppeteerExecutionContextPrototypeEvaluateHandle from "./shim/puppeteer-execution-context-prototype-evaluate-handle.js"
 import shimProcessBindingUtilGetProxyDetails from "./shim/process-binding-util-get-proxy-details.js"
 import vmHook from "./hook/vm.js"
 
@@ -48,12 +50,12 @@ const {
   ERR_INVALID_ARG_TYPE
 } = errors
 
+const { safeGlobal, unsafeGlobal } = shared
+
 let exported
 
 if (shared.inited &&
     ! shared.reloaded) {
-  const { unsafeGlobal } = shared
-
   shimFunctionPrototypeToString.enable(unsafeGlobal)
   shimProcessBindingUtilGetProxyDetails.enable(unsafeGlobal)
 
@@ -106,13 +108,16 @@ if (shared.inited &&
   exported.inited = true
   exported.reloaded = false
 
-  const { safeGlobal, unsafeGlobal } = shared
-
   shimFunctionPrototypeToString.enable(safeGlobal)
   shimProcessBindingUtilGetProxyDetails.enable(safeGlobal)
 
   shimFunctionPrototypeToString.enable(unsafeGlobal)
   shimProcessBindingUtilGetProxyDetails.enable(unsafeGlobal)
+
+  if (safeRequire.resolve("puppeteer") !== "") {
+    shimPuppeteerExecutionContextPrototypeEvaluateHandle.enable(safeRequire("puppeteer/lib/ExecutionContext"))
+    shimPuppeteerExecutionContextPrototypeEvaluateHandle.enable(safeRequire("puppeteer/node6/lib/ExecutionContext"))
+  }
 
   if (CHECK) {
     vmHook(realVM)

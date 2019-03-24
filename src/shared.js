@@ -81,6 +81,7 @@ function init() {
       moduleStaticResolveFilename: new Map,
       shimFunctionPrototypeToString: new WeakMap,
       shimProcessBindingUtilGetProxyDetails: new Map,
+      shimPuppeteerExecutionContextPrototypeEvaluateHandle: new WeakMap,
       utilGetProxyDetails: new WeakMap,
       utilMaskFunction: new WeakMap,
       utilMaxSatisfying: new Map,
