@@ -11,6 +11,7 @@ function init() {
     setProperty(safeFs, "realpathNativeSync", native)
   }
 
+  setProperty(safeFs, "constants", safe(safeFs.constants))
   setProperty(safeFs, "Stats", safe(safeFs.Stats))
 
   return safeFs
@@ -21,7 +22,11 @@ const safeFs = shared.inited
   : shared.module.safeFs = init()
 
 export const {
+  closeSync,
+  constants,
+  futimesSync,
   mkdirSync,
+  openSync,
   readdirSync,
   readFileSync,
   realpathSync,
