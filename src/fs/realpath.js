@@ -1,4 +1,4 @@
-import { realpathNativeSync, realpathSync } from "../safe/fs.js"
+import { realpathSync } from "../safe/fs.js"
 
 import ENV from "../constant/env.js"
 
@@ -12,6 +12,8 @@ function init() {
     ELECTRON,
     WIN32
   } = ENV
+
+  const { realpathNativeSync } = shared
 
   const useBuiltin =
     ELECTRON ||

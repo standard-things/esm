@@ -8,7 +8,6 @@ import assign from "../util/assign.js"
 import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
-import { defaultInspectOptions } from "../safe/util.js"
 import has from "../util/has.js"
 import isNativeLike from "../util/is-native-like.js"
 import isObjectLike from "../util/is-object.js"
@@ -274,6 +273,7 @@ function wrapBuiltin(builtinFunc, wrapper = defaultWrapper) {
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Method_definitions#Method_definitions_are_not_constructable
   const object = {
     method(...args) {
+      const { defaultInspectOptions } = shared
       const { customInspect } = defaultInspectOptions
 
       setProperty(defaultInspectOptions, "customInspect", true)

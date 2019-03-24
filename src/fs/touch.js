@@ -8,9 +8,9 @@ import {
 import shared from "../shared.js"
 
 function init() {
-  const {
-    O_RDWR
-  } = constants
+  const O_RDWR = constants === void 0
+    ? 2
+    : constants.O_RDWR
 
   function touch(filename, timestamp = Date.now()) {
     try {

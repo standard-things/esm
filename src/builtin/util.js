@@ -12,6 +12,8 @@ import proxyWrap from "../util/proxy-wrap.js"
 import safeUtil from "../safe/util.js"
 import toWrapper from "../util/to-wrapper.js"
 
+// `util.formatWithOptions()` and `util.types` were added in Node 10.
+const safeFormatWithOptions = safeUtil.formatWithOptions
 const safeTypes = safeUtil.types
 
 let builtinTypes
@@ -42,27 +44,22 @@ if (isObjectLike(safeTypes)) {
   }
 }
 
-const builtinFormat = proxyWrap(safeUtil.format, toWrapper(format))
-const safeFormatWithOptions = safeUtil.formatWithOptions
-
-// The `util.formatWithOptions()` method exists in Node 10+.
-const builtinFormatWithOptions = typeof safeFormatWithOptions === "function"
-  ? proxyWrap(safeFormatWithOptions, toWrapper(formatWithOptions))
-  : formatWithOptions
-
 const builtinUtil = GenericObject.create()
 const utilNames = ownKeys(safeUtil)
 
 for (const name of utilNames) {
   if (name === "format") {
-    builtinUtil.format = builtinFormat
+    builtinUtil.format = proxyWrap(safeUtil.format, toWrapper(format))
   } else if (name === "formatWithOptions") {
-    builtinUtil.formatWithOptions = builtinFormatWithOptions
+    if (typeof safeFormatWithOptions === "function") {
+      builtinUtil.formatWithOptions = proxyWrap(safeFormatWithOptions, toWrapper(formatWithOptions))
+    }
   } else if (name === "inspect") {
     builtinUtil.inspect = builtinInspect
-  } else if (name === "types" &&
-             builtinTypes !== void 0) {
-    builtinUtil.types = builtinTypes
+  } else if (name === "types") {
+    if (builtinTypes !== void 0) {
+      builtinUtil.types = builtinTypes
+    }
   } else {
     copyProperty(builtinUtil, safeUtil, name)
   }

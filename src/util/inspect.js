@@ -1,7 +1,5 @@
 import INSPECT from "../constant/inspect.js"
 
-import { defaultInspectOptions, inspect as safeInspect } from "../safe/util.js"
-
 import GenericObject from "../generic/object.js"
 
 import assign from "./assign.js"
@@ -11,6 +9,8 @@ import isObjectLike from "./is-object-like.js"
 import isProxyInspectable from "./is-proxy-inspectable.js"
 import prepareValue from "./prepare-value.js"
 import proxyInspectable from "./proxy-inspectable.js"
+import { inspect as safeInspect } from "../safe/util.js"
+import shared from "../shared.js"
 
 const {
   PROXY_PREFIX
@@ -32,6 +32,8 @@ function inspect(...args) {
   } else {
     assign(customOptions, options)
   }
+
+  const { defaultInspectOptions } = shared
 
   const customInspect = has(customOptions, "customInspect")
     ? customOptions.customInspect
