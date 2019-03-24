@@ -4,6 +4,11 @@ import shared from "../shared.js"
 
 function init() {
   function isPath(value) {
+    if (typeof value !== "string" ||
+        value.length === 0) {
+      return false
+    }
+
     return isRelative(value) ||
            isAbsolute(value)
   }
