@@ -17,14 +17,15 @@ import getCacheName from "./util/get-cache-name.js"
 import getCacheStateHash from "./util/get-cache-state-hash.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import getModuleName from "./util/get-module-name.js"
-import getMtime from "./fs/get-mtime.js"
 import getPrototypeOf from "./util/get-prototype-of.js"
+import getStatTimestamp from "./fs/get-stat-timestamp.js"
 import has from "./util/has.js"
 import isCalledFromStrictCode from "./util/is-called-from-strict-code.js"
 import isDescriptorMatch from "./util/is-descriptor-match.js"
 import isEnumerable from "./util/is-enumerable.js"
 import isIdentifierName from "./util/is-identifier-name.js"
 import isObject from "./util/is-object.js"
+import isPath from "./util/is-path.js"
 import isUpdatableDescriptor from "./util/is-updatable-descriptor.js"
 import isUpdatableGet from "./util/is-updatable-get.js"
 import isUpdatableSet from "./util/is-updatable-set.js"
@@ -35,7 +36,9 @@ import readFile from "./fs/read-file.js"
 import setDeferred from "./util/set-deferred.js"
 import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
+import statSync from "./fs/stat-sync.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
+import touch from "./fs/touch.js"
 import validateShallow from "./module/esm/validate-shallow.js"
 
 const {
@@ -190,7 +193,24 @@ class Entry {
 
     // The mtime of the module.
     setDeferred(this, "mtime", () => {
-      return getMtime(this.filename)
+      const { filename } = this
+
+      let mtime = -1
+
+      if (isPath(filename)) {
+        const stat = statSync(filename)
+
+        if (stat !== null) {
+          mtime = getStatTimestamp(stat, "mtime")
+
+          if (mtime === getStatTimestamp(stat, "birthtime")) {
+            mtime = Date.now()
+            touch(filename, mtime)
+          }
+        }
+      }
+
+      return mtime
     })
 
     // The mutable namespace object that non-ESM importers receive.
