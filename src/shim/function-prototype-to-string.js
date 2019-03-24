@@ -1,5 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
+import emptyArray from "../util/empty-array.js"
+import emptyObject from "../util/empty-object.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
 import shared from "../shared.js"
@@ -26,21 +28,14 @@ function init() {
         return context
       }
 
-      const _toString = FuncProto.toString
-
-      // Section 19.2.3.5: Function.prototype.toString()
-      // Step 3: Return "function () { [native code] }" for callable objects.
-      // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
-      const toString = function () {
-        let thisArg = this
-
+      const apply = nativeTrap((toString, thisArg) => {
         if (proxyNativeSourceText !== "" &&
             isOwnProxy(thisArg)) {
           thisArg = unwrapOwnProxy(thisArg)
         }
 
         try {
-          return Reflect.apply(_toString, thisArg, [])
+          return Reflect.apply(toString, thisArg, emptyArray)
         } catch (e) {
           if (typeof thisArg !== "function") {
             throw e
@@ -49,20 +44,19 @@ function init() {
 
         if (isOwnProxy(thisArg)) {
           try {
-            return Reflect.apply(_toString, unwrapOwnProxy(thisArg), [])
+            return Reflect.apply(toString, unwrapOwnProxy(thisArg), emptyArray)
           } catch {}
         }
 
+        // Section 19.2.3.5: Function.prototype.toString()
+        // Step 3: Return "function () { [native code] }" for callable objects.
+        // https://tc39.github.io/Function-prototype-toString-revision/#proposal-sec-function.prototype.tostring
         return NATIVE_SOURCE_TEXT
-      }
+      })
 
       if (Reflect.defineProperty(FuncProto, "toString", {
             configurable: true,
-            value: new OwnProxy(_toString, {
-              apply: nativeTrap((_toString, thisArg, args) => {
-                return Reflect.apply(toString, thisArg, args)
-              })
-            }),
+            value: new OwnProxy(FuncProto.toString, { apply }),
             writable: true
           })) {
         cache.set(FuncProto, true)
@@ -85,9 +79,9 @@ function init() {
       const { toString } = FuncProto
 
       if (typeof toString === "function") {
-        const proxy = new OwnProxy(toString, {})
-
-        cached = Reflect.apply(toString, proxy, []) === Reflect.apply(toString, toString, [])
+        cached =
+          Reflect.apply(toString, new OwnProxy(toString, emptyObject), emptyArray) ===
+          Reflect.apply(toString, toString, emptyArray)
       }
     } catch {
       cached = false

@@ -1,5 +1,7 @@
 import OwnProxy from "../own/proxy.js"
 
+import emptyObject from "../util/empty-object.js"
+import isObjectLike from "../util/is-object-like.js"
 import isOwnProxy from "../util/is-own-proxy.js"
 import nativeTrap from "../util/native-trap.js"
 import setProperty from "../util/set-property.js"
@@ -11,38 +13,32 @@ function init() {
     enable(context) {
       const cache = shared.memoize.shimProcessBindingUtilGetProxyDetails
 
-      let _getProxyDetails
+      let getProxyDetails
       let utilBinding
 
       silent(() => {
         try {
           utilBinding = context.process.binding("util")
-          _getProxyDetails = utilBinding.getProxyDetails
+          getProxyDetails = utilBinding.getProxyDetails
         } catch {}
       })
 
-      if (check(utilBinding, _getProxyDetails, cache)) {
+      if (check(utilBinding, getProxyDetails, cache)) {
         return context
       }
 
-      const getProxyDetails = (value) => {
-        return isOwnProxy(value)
-          ? void 0
-          : Reflect.apply(_getProxyDetails, utilBinding, [value])
-      }
-
-      const trap = nativeTrap((_getProxyDetails, ...rest) => {
+      const trap = nativeTrap((getProxyDetails, ...rest) => {
         const [value] = rest[rest.length - 1]
 
-        return getProxyDetails(value)
+        if (! isOwnProxy(value)) {
+          return Reflect.apply(getProxyDetails, utilBinding, [value])
+        }
       })
 
-      const proxy = new OwnProxy(_getProxyDetails, {
-        apply: trap,
-        construct: trap
-      })
-
-      if (setProperty(utilBinding, "getProxyDetails", proxy)) {
+      if (setProperty(utilBinding, "getProxyDetails", new OwnProxy(getProxyDetails, {
+            apply: trap,
+            construct: trap
+          }))) {
         cache.set(utilBinding, true)
       }
 
@@ -51,7 +47,7 @@ function init() {
   }
 
   function check(utilBinding, getProxyDetails, cache) {
-    if (! utilBinding ||
+    if (! isObjectLike(utilBinding) ||
         typeof getProxyDetails !== "function") {
       return true
     }
@@ -65,10 +61,7 @@ function init() {
     cached = true
 
     try {
-      const object = {}
-      const proxy = new OwnProxy(object, object)
-
-      cached = getProxyDetails(proxy) === void 0
+      cached = getProxyDetails(new OwnProxy(emptyObject, emptyObject)) === void 0
     } catch {}
 
     cache.set(utilBinding, cached)
