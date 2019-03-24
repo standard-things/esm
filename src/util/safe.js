@@ -1,4 +1,4 @@
-import isObjectLike from "./is-object-like.js"
+import isObject from "./is-object.js"
 import ownKeys from "./own-keys.js"
 import safeAssignProperties from "./safe-assign-properties.js"
 import safeCopyProperty from "./safe-copy-property.js"
@@ -12,7 +12,7 @@ function init() {
         return Array.from(value)
       }
 
-      return isObjectLike(value)
+      return isObject(value)
         ? safeAssignProperties({}, value)
         : value
     }
