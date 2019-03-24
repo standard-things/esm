@@ -46,18 +46,6 @@ function maskFunction(func, source) {
     }
   })
 
-  const toString = new OwnProxy(func.toString, {
-    apply: nativeTrap((_toString, thisArg, args) => {
-      if (! Loader.state.package.default.options.debug &&
-          typeof thisArg === "function" &&
-          unwrapOwnProxy(thisArg) === func) {
-        thisArg = cached.source
-      }
-
-      return Reflect.apply(_toString, thisArg, args)
-    })
-  })
-
   const sourceProto = has(source, "prototype")
     ? source.prototype
     : void 0
@@ -99,7 +87,17 @@ function maskFunction(func, source) {
   cached = {
     proxy,
     source,
-    toString
+    toString: new OwnProxy(func.toString, {
+      apply: nativeTrap((toString, thisArg, args) => {
+        if (! Loader.state.package.default.options.debug &&
+            typeof thisArg === "function" &&
+            unwrapOwnProxy(thisArg) === func) {
+          thisArg = cached.source
+        }
+
+        return Reflect.apply(toString, thisArg, args)
+      })
+    })
   }
 
   cache.set(func, cached)
