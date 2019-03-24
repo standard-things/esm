@@ -14,7 +14,6 @@ import Loader from "./loader.js"
 import Module from "./module.js"
 import Package from "./package.js"
 import RealModule from "./real/module.js"
-import Shim from "./shim.js"
 
 import errors from "./errors.js"
 import getModuleName from "./util/get-module-name.js"
@@ -31,6 +30,8 @@ import realProcess from "./real/process.js"
 import realVM from "./real/vm.js"
 import requireHook from "./hook/require.js"
 import shared from "./shared.js"
+import shimFunctionPrototypeToString from "./shim/function-prototype-to-string.js"
+import shimProcessBindingUtilGetProxyDetails from "./shim/process-binding-util-get-proxy-details.js"
 import vmHook from "./hook/vm.js"
 
 const {
@@ -51,7 +52,10 @@ let exported
 
 if (shared.inited &&
     ! shared.reloaded) {
-  Shim.enable(shared.unsafeGlobal)
+  const { unsafeGlobal } = shared
+
+  shimFunctionPrototypeToString.enable(unsafeGlobal)
+  shimProcessBindingUtilGetProxyDetails.enable(unsafeGlobal)
 
   exported = (mod, options) => {
     if (! isObject(mod)) {
@@ -102,10 +106,13 @@ if (shared.inited &&
   exported.inited = true
   exported.reloaded = false
 
-  const { unsafeGlobal } = shared
+  const { safeGlobal, unsafeGlobal } = shared
 
-  Shim.enable(shared.safeGlobal)
-  Shim.enable(unsafeGlobal)
+  shimFunctionPrototypeToString.enable(safeGlobal)
+  shimProcessBindingUtilGetProxyDetails.enable(safeGlobal)
+
+  shimFunctionPrototypeToString.enable(unsafeGlobal)
+  shimProcessBindingUtilGetProxyDetails.enable(unsafeGlobal)
 
   if (CHECK) {
     vmHook(realVM)
