@@ -504,11 +504,6 @@ function tryRun(entry, filename, fallback) {
           }
         })
       })
-    } else if (! parsing &&
-               firstPass) {
-      entry.module.loaded = true
-      entry.loaded()
-      entry.updateBindings()
     }
 
     entry.state = parsing
