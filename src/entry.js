@@ -359,8 +359,6 @@ class Entry {
     this.module = mod
     // The name of the module.
     this.name = null
-    // The package data of the module.
-    this.package = Package.from(mod)
     // The module parent.
     this.parent = mod.parent
     // The paused state of the entry generator.
@@ -436,6 +434,11 @@ class Entry {
       }
 
       return mtime
+    })
+
+    // The package data of the module.
+    setDeferred(this, "package", () => {
+      return Package.from(this.module)
     })
 
     // The mutable namespace object that non-ESM importers receive.
