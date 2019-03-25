@@ -61,6 +61,7 @@ const compileFunctionParams = [
 
 const RealProto = RealModule.prototype
 
+let contentPackage
 let resolvedArgv
 let useBufferArg
 let useLegacyWrapper
@@ -78,15 +79,18 @@ const compile = maskFunction(function (content, filename) {
       entry.extname !== ".mjs" &&
       (isInitial ||
        state === STATE_PARSING_COMPLETED)) {
-    const defaultOptions = Loader.state.package.default.options
-    const cjsOptions = assign({}, defaultOptions.cjs)
-    const options = assign({}, defaultOptions)
+    if (contentPackage === void 0) {
+      const defaultOptions = Loader.state.package.default.options
+      const cjsOptions = assign({}, defaultOptions.cjs)
+      const options = assign({}, defaultOptions)
 
-    options.cache = false
-    options.cjs = cjsOptions
+      options.cache = false
+      options.cjs = cjsOptions
+      contentPackage = new Package("", PACKAGE_RANGE, options)
+    }
 
     entry.cacheName = getCacheName(content)
-    entry.package = new Package("", PACKAGE_RANGE, options)
+    entry.package = contentPackage
     entry.runtimeName = shared.runtimeName
 
     let result
