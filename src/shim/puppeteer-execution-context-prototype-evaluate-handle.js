@@ -3,6 +3,7 @@ import OwnProxy from "../own/proxy.js"
 import has from "../util/has.js"
 import isObjectLike from "../util/is-object-like.js"
 import isOwnProxy from "../util/is-own-proxy.js"
+import nativeTrap from "../util/native-trap.js"
 import proxyWrap from "../util/proxy-wrap.js"
 import shared from "../shared.js"
 import untransformRuntime from "../util/untransform-runtime.js"
@@ -38,7 +39,7 @@ function init() {
           })
 
           const toStringProxy = new OwnProxy(pageFunction.toString, {
-            apply(toString, thisArg, args) {
+            apply: nativeTrap((toString, thisArg, args) => {
               if (thisArg === pageFunctionProxy) {
                 thisArg = pageFunction
               }
@@ -48,7 +49,7 @@ function init() {
               return typeof result === "string"
                 ? untransformRuntime(result)
                 : result
-            }
+            })
           })
 
           args[0] = pageFunctionProxy
