@@ -52,7 +52,8 @@ function init() {
     } = visitor
 
     const node = path.getValue()
-    const names = getNamesFromPattern(node[childName])
+    const child = node[childName]
+    const names = getNamesFromPattern(child)
     const { end, start } = node
 
     if (visitor.transformImportBindingAssignments) {
@@ -60,12 +61,28 @@ function init() {
         if (importedBindings.has(name) &&
             ! isShadowed(path, name, shadowedMap)) {
           // Throw a type error for assignments to imported bindings.
+          const { original } = magicString
+          const { right } = node
+
+          let code =
+            runtimeName + ".b(" +
+            JSON.stringify(original.slice(child.start, child.end)) + ',"' +
+            node.operator + '"'
+
+          if (right !== void 0) {
+            code += "," + original.slice(right.start, right.end)
+          }
+
+          code += ")"
+
           overwrite(
             visitor,
             start,
             end,
-            runtimeName + ".b()"
+            code
           )
+
+          break
         }
       }
     }

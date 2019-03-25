@@ -6,6 +6,7 @@ function init() {
   const evalCallExpRegExp = /\(eval===(\w+\u200D)\.v\?\1\.c:\1\.k\)/g
   const indirectEvalRegExp = /\(eval===(\w+\u200D)\.v\?\1\.e:eval\)/g
   const runtimeRegExp = /\w+\u200D\.(\w+)(\.)?/g
+  const throwConstAssignmentRegExp = /\w+\u200D\.b\("(.+?)","(.+?)",?/g
 
   function untransformRuntime(string) {
     if (typeof string !== "string") {
@@ -17,6 +18,7 @@ function init() {
       .replace(assertUndeclaredRegExp, replaceAssert)
       .replace(evalCallExpRegExp, replaceEvalCallExp)
       .replace(indirectEvalRegExp, replaceIndirectEval)
+      .replace(throwConstAssignmentRegExp, replaceThrowConstAssignment)
       .replace(runtimeRegExp, replaceRuntime)
   }
 
@@ -47,6 +49,10 @@ function init() {
     }
 
     return ""
+  }
+
+  function replaceThrowConstAssignment(match, left, operator) {
+    return "(" + left + operator
   }
 
   return untransformRuntime
