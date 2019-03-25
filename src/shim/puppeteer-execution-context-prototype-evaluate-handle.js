@@ -43,7 +43,11 @@ function init() {
                 thisArg = pageFunction
               }
 
-              return untransformRuntime(Reflect.apply(toString, thisArg, args))
+              const result = Reflect.apply(toString, thisArg, args)
+
+              return typeof result === "string"
+                ? untransformRuntime(result)
+                : result
             }
           })
 
