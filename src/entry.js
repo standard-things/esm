@@ -85,153 +85,7 @@ const pseudoDescriptor = {
 
 class Entry {
   constructor(mod) {
-    // The namespace object change indicator.
-    this._changed = false
-    // The raw mutable namespace object for ESM importers.
-    this._completeMutableNamespace = toRawModuleNamespaceObject()
-    // The raw namespace object for ESM importers.
-    this._completeNamespace = toRawModuleNamespaceObject()
-    // The entry finalization handler.
-    this._finalize = null
-    // The last child entry loaded.
-    this._lastChild = null
-    // The loaded state of the module.
-    this._loaded = LOAD_INCOMPLETE
-    // The finalized state of the namespace object.
-    this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
-    // The raw mutable namespace object for non-ESM importers.
-    this._partialMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
-    // The raw namespace object for non-ESM importers.
-    this._partialNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
-    // The passthru indicator for `module._compile()`.
-    this._passthruCompile = false
-    // The passthru indicator for `module.require()`.
-    this._passthruRequire = false
-    // The runthru indicator for `module._compile()`.
-    this._ranthruCompile = false
-    // The import validation cache.
-    this._validation = new Map([["*", true]])
-    // The module basename.
-    this.basename = null
-    // The builtin module indicator.
-    this.builtin = false
-    // The child entries of the module.
-    this.children = { __proto__: null }
-    // The circular import indicator.
-    this.circular = false
-    // The module dirname.
-    this.dirname = null
-    // The `module.exports` value at the time the module loaded.
-    this.exports = mod.exports
-    // The module extname.
-    this.extname = null
-    // The module filename.
-    this.filename = null
-    // Getters for local variables exported by the module.
-    this.getters = { __proto__: null }
-    // The unique id for the module cache.
-    this.id = mod.id
-    // The initialized state of bindings imported by the module.
-    this.importedBindings = new Map
-    // The module the entry is managing.
-    this.module = mod
-    // The name of the module.
-    this.name = null
-    // The package data of the module.
-    this.package = Package.from(mod)
-    // The module parent.
-    this.parent = mod.parent
-    // The paused state of the entry generator.
-    this.running = false
-    // The runtime object reference.
-    this.runtime = null
-    // Setters for assigning to local variables in parent modules.
-    this.setters = { __proto__: null }
-    // Initialize empty namespace setter so they're merged properly.
-    this.setters["*"] = []
-    // The state of the module.
-    this.state = mod.loaded ? STATE_EXECUTION_COMPLETED : STATE_INITIAL
-    // The entry type of the module.
-    this.type = TYPE_CJS
-
-    // The cache name of the module.
-    setDeferred(this, "cacheName", () => {
-      const pkg = this.package
-
-      return getCacheName(this.mtime, {
-        cachePath: pkg.cachePath,
-        filename: this.filename,
-        packageOptions: pkg.options
-      })
-    })
-
-    // The source compilation data of the module.
-    setDeferred(this, "compileData", () => {
-      const compileData = CachingCompiler.from(this)
-
-      if (compileData !== null &&
-          compileData.transforms !== 0) {
-        const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
-
-        if (content !== null) {
-          compileData.code = content
-        }
-      }
-
-      return compileData
-    })
-
-    // The mutable namespace object that ESM importers receive.
-    setDeferred(this, "completeMutableNamespace", () => {
-      return createMutableNamespaceProxy(this, this._completeMutableNamespace)
-    })
-
-    // The namespace object that ESM importers receive.
-    setDeferred(this, "completeNamespace", () => {
-      return createImmutableNamespaceProxy(this, this._completeNamespace)
-    })
-
-    // The mtime of the module.
-    setDeferred(this, "mtime", () => {
-      const { filename } = this
-
-      let mtime = -1
-
-      if (isPath(filename)) {
-        const stat = statSync(filename)
-
-        if (stat !== null) {
-          mtime = getStatTimestamp(stat, "mtime")
-
-          if (mtime === getStatTimestamp(stat, "birthtime")) {
-            const now = Date.now()
-
-            if (touch(filename, now)) {
-              mtime = now
-            }
-          }
-        }
-      }
-
-      return mtime
-    })
-
-    // The mutable namespace object that non-ESM importers receive.
-    setDeferred(this, "partialMutableNamespace", () => {
-      return createMutableNamespaceProxy(this, this._partialMutableNamespace)
-    })
-
-    // The namespace object that non-ESM importers receive.
-    setDeferred(this, "partialNamespace", () => {
-      return createImmutableNamespaceProxy(this, this._partialNamespace)
-    })
-
-    // The name of the runtime identifier.
-    setDeferred(this, "runtimeName", () => {
-      return encodeId("_" + getCacheStateHash(this.cacheName).slice(0, 3))
-    })
-
-    this.updateFilename(true)
+    this.initialize(mod)
   }
 
   static get(mod) {
@@ -450,6 +304,156 @@ class Entry {
     }
 
     return getExportByName(this, name, parentEntry)
+  }
+
+  initialize(mod = this.module) {
+    // The namespace object change indicator.
+    this._changed = false
+    // The raw mutable namespace object for ESM importers.
+    this._completeMutableNamespace = toRawModuleNamespaceObject()
+    // The raw namespace object for ESM importers.
+    this._completeNamespace = toRawModuleNamespaceObject()
+    // The entry finalization handler.
+    this._finalize = null
+    // The last child entry loaded.
+    this._lastChild = null
+    // The loaded state of the module.
+    this._loaded = LOAD_INCOMPLETE
+    // The finalized state of the namespace object.
+    this._namespaceFinalized = NAMESPACE_FINALIZATION_INCOMPLETE
+    // The raw mutable namespace object for non-ESM importers.
+    this._partialMutableNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
+    // The raw namespace object for non-ESM importers.
+    this._partialNamespace = toRawModuleNamespaceObject({ default: INITIAL_VALUE })
+    // The passthru indicator for `module._compile()`.
+    this._passthruCompile = false
+    // The passthru indicator for `module.require()`.
+    this._passthruRequire = false
+    // The runthru indicator for `module._compile()`.
+    this._ranthruCompile = false
+    // The import validation cache.
+    this._validation = new Map([["*", true]])
+    // The module basename.
+    this.basename = null
+    // The builtin module indicator.
+    this.builtin = false
+    // The child entries of the module.
+    this.children = { __proto__: null }
+    // The circular import indicator.
+    this.circular = false
+    // The module dirname.
+    this.dirname = null
+    // The `module.exports` value at the time the module loaded.
+    this.exports = mod.exports
+    // The module extname.
+    this.extname = null
+    // The module filename.
+    this.filename = null
+    // Getters for local variables exported by the module.
+    this.getters = { __proto__: null }
+    // The unique id for the module cache.
+    this.id = mod.id
+    // The initialized state of bindings imported by the module.
+    this.importedBindings = new Map
+    // The module the entry is managing.
+    this.module = mod
+    // The name of the module.
+    this.name = null
+    // The package data of the module.
+    this.package = Package.from(mod)
+    // The module parent.
+    this.parent = mod.parent
+    // The paused state of the entry generator.
+    this.running = false
+    // The runtime object reference.
+    this.runtime = null
+    // Setters for assigning to local variables in parent modules.
+    this.setters = { __proto__: null }
+    // Initialize empty namespace setter so they're merged properly.
+    this.setters["*"] = []
+    // The state of the module.
+    this.state = mod.loaded ? STATE_EXECUTION_COMPLETED : STATE_INITIAL
+    // The entry type of the module.
+    this.type = TYPE_CJS
+
+    // The cache name of the module.
+    setDeferred(this, "cacheName", () => {
+      const pkg = this.package
+
+      return getCacheName(this.mtime, {
+        cachePath: pkg.cachePath,
+        filename: this.filename,
+        packageOptions: pkg.options
+      })
+    })
+
+    // The source compilation data of the module.
+    setDeferred(this, "compileData", () => {
+      const compileData = CachingCompiler.from(this)
+
+      if (compileData !== null &&
+          compileData.transforms !== 0) {
+        const content = readFile(this.package.cachePath + sep + this.cacheName, "utf8")
+
+        if (content !== null) {
+          compileData.code = content
+        }
+      }
+
+      return compileData
+    })
+
+    // The mutable namespace object that ESM importers receive.
+    setDeferred(this, "completeMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._completeMutableNamespace)
+    })
+
+    // The namespace object that ESM importers receive.
+    setDeferred(this, "completeNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._completeNamespace)
+    })
+
+    // The mtime of the module.
+    setDeferred(this, "mtime", () => {
+      const { filename } = this
+
+      let mtime = -1
+
+      if (isPath(filename)) {
+        const stat = statSync(filename)
+
+        if (stat !== null) {
+          mtime = getStatTimestamp(stat, "mtime")
+
+          if (mtime === getStatTimestamp(stat, "birthtime")) {
+            const now = Date.now()
+
+            if (touch(filename, now)) {
+              mtime = now
+            }
+          }
+        }
+      }
+
+      return mtime
+    })
+
+    // The mutable namespace object that non-ESM importers receive.
+    setDeferred(this, "partialMutableNamespace", () => {
+      return createMutableNamespaceProxy(this, this._partialMutableNamespace)
+    })
+
+    // The namespace object that non-ESM importers receive.
+    setDeferred(this, "partialNamespace", () => {
+      return createImmutableNamespaceProxy(this, this._partialNamespace)
+    })
+
+    // The name of the runtime identifier.
+    setDeferred(this, "runtimeName", () => {
+      return encodeId("_" + getCacheStateHash(this.cacheName).slice(0, 3))
+    })
+
+    this.updateFilename(true)
   }
 
   loaded() {
