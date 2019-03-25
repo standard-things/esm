@@ -20,6 +20,8 @@ function init() {
     if (((type === "AssignmentExpression" ||
           type === "AssignmentPattern") &&
          parent.left === node) ||
+        (type === "UpdateExpression" &&
+         parent.argument === node) ||
         type === "BreakStatement" ||
         type === "ContinueStatement" ||
         type === "ImportDefaultSpecifier" ||
