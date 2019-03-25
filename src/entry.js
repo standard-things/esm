@@ -370,7 +370,7 @@ class Entry {
     // Initialize empty namespace setter so they're merged properly.
     this.setters["*"] = []
     // The state of the module.
-    this.state = mod.loaded ? STATE_EXECUTION_COMPLETED : STATE_INITIAL
+    this.state = STATE_INITIAL
     // The entry type of the module.
     this.type = TYPE_CJS
 
