@@ -239,9 +239,13 @@ class Package {
   }
 
   clone() {
+    const { options } = this
+    const cjsOptions = options.cjs
     const cloned = assign({ __proto__: Package.prototype }, this)
+    const clonedOptions = assign({}, options)
 
-    cloned.options = assign({}, cloned.options)
+    clonedOptions.cjs = assign({}, cjsOptions)
+    cloned.options = clonedOptions
 
     return cloned
   }
