@@ -76,8 +76,8 @@ function init() {
 
       wrapper = new OwnProxy(func, {
         apply: nativeTrap((func, thisArg, args) => {
-          // Check for `entry.completeNamespace` because it's a proxy that
-          // native methods could be invoked on.
+          // Check `entry.completeMutableNamespace` and `entry.completeNamespace`
+          // because they're proxies that native methods could be invoked on.
           if (thisArg === proxy ||
               thisArg === entry.completeMutableNamespace ||
               thisArg === entry.completeNamespace) {
@@ -128,8 +128,8 @@ function init() {
             : unwrapped
         }
 
-        // Use `Object.defineProperty` instead of `Reflect.defineProperty` to
-        // throw the appropriate error if something goes wrong.
+        // Use `Object.defineProperty()` instead of `Reflect.defineProperty()`
+        // to throw the appropriate error if something goes wrong.
         // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
         SafeObject.defineProperty(exported, name, descriptor)
 

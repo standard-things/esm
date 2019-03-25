@@ -32,7 +32,7 @@ function maskFunction(func, source) {
   }
 
   const proxy = new OwnProxy(func, {
-    get: (func, name, receiver) => {
+    get(func, name, receiver) {
       if (name === "toString" &&
           ! has(func, "toString")) {
         return cached.toString

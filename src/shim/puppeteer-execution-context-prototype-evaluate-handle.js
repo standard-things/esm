@@ -23,7 +23,7 @@ function init() {
 
         if (typeof pageFunction === "function") {
           const pageFunctionProxy = new OwnProxy(pageFunction, {
-            get: (pageFunction, name, receiver) => {
+            get(pageFunction, name, receiver) {
               if (name === "toString" &&
                   ! has(pageFunction, "toString")) {
                 return toStringProxy
