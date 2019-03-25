@@ -4,6 +4,7 @@ import {
   sep
 } from "./safe/path.js"
 
+import CHAR_CODE from "./constant/char-code.js"
 import ENTRY from "./constant/entry.js"
 
 import CachingCompiler from "./caching-compiler.js"
@@ -36,10 +37,15 @@ import readFile from "./fs/read-file.js"
 import setDeferred from "./util/set-deferred.js"
 import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
+import shimPuppeteerExecutionContextPrototypeEvaluateHandle from "./shim/puppeteer-execution-context-prototype-evaluate-handle.js"
 import statSync from "./fs/stat-sync.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
 import touch from "./fs/touch.js"
 import validateShallow from "./module/esm/validate-shallow.js"
+
+const {
+  UPPERCASE_E
+} = CHAR_CODE
 
 const {
   ERROR_GETTER,
@@ -78,6 +84,10 @@ const {
   ERR_NS_REDEFINITION,
   ERR_UNDEFINED_IDENTIFIER
 } = errors
+
+const PUPPETEER_EXECUTION_CONTEXT_PATH_SEGMENT = sep + "lib" + sep + "ExecutionContext.js"
+const PUPPETEER_PACKAGE_PATH_SEGMENT = sep + "puppeteer" + sep
+const PUPPETEER_UPPERCASE_E_CHAR_OFFSET = -19
 
 const pseudoDescriptor = {
   value: true
@@ -500,6 +510,15 @@ class Entry {
       }
 
       if (this.type === TYPE_CJS) {
+        const { filename } = this
+
+        if (typeof filename === "string" &&
+            filename.charCodeAt(filename.length + PUPPETEER_UPPERCASE_E_CHAR_OFFSET) === UPPERCASE_E &&
+            filename.endsWith(PUPPETEER_EXECUTION_CONTEXT_PATH_SEGMENT) &&
+            filename.indexOf(PUPPETEER_PACKAGE_PATH_SEGMENT) !== -1) {
+          shimPuppeteerExecutionContextPrototypeEvaluateHandle.enable(exported)
+        }
+
         exported = proxyExports(this)
         this.addGetter("default", () => this.exports)
       }
