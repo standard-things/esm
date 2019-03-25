@@ -4,6 +4,7 @@
 
 import ENTRY from "../../constant/entry.js"
 import ENV from "../../constant/env.js"
+import ESM from "../../constant/esm.js"
 import PACKAGE from "../../constant/package.js"
 
 import Entry from "../../entry.js"
@@ -15,6 +16,7 @@ import RealModule from "../../real/module.js"
 import SafeObject from "../../safe/object.js"
 
 import _compile from "../internal/compile.js"
+import assign from "../../util/assign.js"
 import createInlineSourceMap from "../../util/create-inline-source-map.js"
 import { dirname } from "../../safe/path.js"
 import getCacheName from "../../util/get-cache-name.js"
@@ -40,6 +42,10 @@ const {
 const {
   ELECTRON
 } = ENV
+
+const {
+  PACKAGE_RANGE
+} = ESM
 
 const {
   MODE_STRICT
@@ -72,8 +78,15 @@ const compile = maskFunction(function (content, filename) {
       entry.extname !== ".mjs" &&
       (isInitial ||
        state === STATE_PARSING_COMPLETED)) {
+    const defaultOptions = Loader.state.package.default.options
+    const cjsOptions = assign({}, defaultOptions.cjs)
+    const options = assign({}, defaultOptions)
+
+    options.cache = false
+    options.cjs = cjsOptions
+
     entry.cacheName = getCacheName(content)
-    entry.package = Package.get("")
+    entry.package = new Package("", PACKAGE_RANGE, options)
     entry.runtimeName = shared.runtimeName
 
     let result
