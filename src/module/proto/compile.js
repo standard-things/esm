@@ -89,6 +89,7 @@ const compile = maskFunction(function (content, filename) {
       contentPackage = new Package("", PACKAGE_RANGE, options)
     }
 
+    entry.initialize()
     entry.cacheName = getCacheName(content)
     entry.package = contentPackage
     entry.runtimeName = shared.runtimeName
