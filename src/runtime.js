@@ -138,6 +138,15 @@ const Runtime = {
 
     return value
   },
+  assertUndeclared: function assertUndeclared(name) {
+    const { unsafeGlobal } = shared
+
+    if (! Reflect.has(unsafeGlobal, name)) {
+      throw new ERR_UNDEFINED_IDENTIFIER(name, assertUndeclared)
+    }
+
+    return unsafeGlobal[name]
+  },
   compileEval(content) {
     // Section 18.2.1.1: PerformEval()
     // Setp 2: Only evaluate strings.
@@ -334,6 +343,7 @@ const Runtime = {
     runtime.addExportGetters = Runtime.addExportGetters
     runtime.addNamespaceSetter = Runtime.addNamespaceSetter
     runtime.assertImportedBinding = Runtime.assertImportedBinding
+    runtime.assertUndeclared = Runtime.assertUndeclared
     runtime.compileEval = boundCompileEval
     runtime.compileGlobalEval = Runtime.compileGlobalEval
     runtime.dynamicImport = Runtime.dynamicImport
@@ -346,7 +356,6 @@ const Runtime = {
     runtime.run = Runtime.run
     runtime.runResult = void 0
     runtime.throwConstAssignment = Runtime.throwConstAssignment
-    runtime.throwUndeclared = Runtime.throwUndeclared
     runtime.updateBindings = Runtime.updateBindings
 
     runtime._ = runtime
@@ -364,7 +373,7 @@ const Runtime = {
     runtime.o = ERROR_GETTER
     runtime.r = runtime.run
     runtime.s = runtime.resumeChildren
-    runtime.t = runtime.throwUndeclared
+    runtime.t = runtime.assertUndeclared
     runtime.u = runtime.updateBindings
     runtime.v = evalIndirect
     runtime.w = runtime.import
@@ -395,15 +404,6 @@ const Runtime = {
   },
   throwConstAssignment: function throwConstAssignment() {
     throw new ERR_CONST_ASSIGNMENT(throwConstAssignment)
-  },
-  throwUndeclared: function throwUndeclared(name) {
-    const { unsafeGlobal } = shared
-
-    if (! Reflect.has(unsafeGlobal, name)) {
-      throw new ERR_UNDEFINED_IDENTIFIER(name, throwUndeclared)
-    }
-
-    return unsafeGlobal[name]
   },
   updateBindings(valueToPassThrough) {
     this.entry.updateBindings(null, UPDATE_TYPE_LIVE)
