@@ -71,6 +71,7 @@ const Runtime = {
     })
 
     setter.exportedName = exportedName
+
     return setter
   },
   addExportGetters(getterArgsList) {
@@ -428,6 +429,7 @@ const Runtime = {
 
 function createAccessor(type, accessor) {
   accessor.type = type
+
   return accessor
 }
 
