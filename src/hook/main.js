@@ -7,8 +7,11 @@ import { dirname } from "../safe/path.js"
 import dualResolveFilename from "../module/internal/dual-resolve-filename.js"
 import esmParseLoad from "../module/esm/parse-load.js"
 import getSilent from "../util/get-silent.js"
+import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
+import maskStackTrace from "../error/mask-stack-trace.js"
 import realProcess from "../real/process.js"
 import relaxRange from "../util/relax-range.js"
+import toExternalError from "../util/to-external-error.js"
 
 function hook(Mod) {
   function managerWrapper(manager, func, args) {
@@ -34,7 +37,19 @@ function hook(Mod) {
       Package.set(dirPath, defaultPkg.clone())
     }
 
-    esmParseLoad(mainPath, null, true)
+    try {
+      esmParseLoad(mainPath, null, true)
+    } catch (e) {
+      if (! defaultPkg.options.debug &&
+          isStackTraceMaskable(e)) {
+        maskStackTrace(e, { filename })
+      } else {
+        toExternalError(e)
+      }
+
+      throw e
+    }
+
     tickCallback()
   }
 
