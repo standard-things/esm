@@ -39,6 +39,7 @@ import setPrototypeOf from "./util/set-prototype-of.js"
 import shared from "./shared.js"
 import shimPuppeteerExecutionContextPrototypeEvaluateHandle from "./shim/puppeteer-execution-context-prototype-evaluate-handle.js"
 import statSync from "./fs/stat-sync.js"
+import toExternalFunction from "./util/to-external-function.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
 import touch from "./fs/touch.js"
 import validateShallow from "./module/esm/validate-shallow.js"
@@ -519,8 +520,8 @@ class Entry {
           shimPuppeteerExecutionContextPrototypeEvaluateHandle.enable(exported)
         }
 
-        exported = proxyExports(this)
         this.addGetter("default", () => this.exports)
+        exported = proxyExports(this)
       }
 
       this.exports = exported
@@ -529,31 +530,35 @@ class Entry {
 
       const exported = proxyExports(this)
 
-      this.exports = exported
       mod.exports = exported
+      this.exports = exported
     } else {
-      const names = getExportsObjectKeys(this)
+      if (this.extname === ".mjs") {
+        mod.exports = createImmutableExports(this)
+      } else {
+        const exported = mod.exports
+        const names = getExportsObjectKeys(this)
 
-      const exportDefaultOnly =
-        cjs.dedefault &&
-        names.length === 1 &&
-        names[0] === "default"
+        const exportDefaultOnly =
+          cjs.dedefault &&
+          names.length === 1 &&
+          names[0] === "default"
+
+        if (exportDefaultOnly) {
+          mod.exports = exported.default
+        } else {
+          if (cjs.esModule &&
+              ! Reflect.has(this.getters, "__esModule")) {
+            Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
+          }
+
+          mod.exports = cjs.mutableNamespace
+            ? createMutableExports(this)
+            : createImmutableExports(this)
+        }
+      }
 
       this._loaded = LOAD_COMPLETED
-
-      if (cjs.mutableNamespace &&
-          ! exportDefaultOnly) {
-        mod.exports = proxyExports(this)
-      }
-
-      const exported = this.exports
-
-      if (exportDefaultOnly) {
-        mod.exports = exported.default
-      } else if (cjs.esModule &&
-                 ! Reflect.has(this.getters, "__esModule")) {
-        Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
-      }
     }
 
     this.finalizeNamespace()
@@ -733,7 +738,8 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
 
     if (errored &&
         typeof name === "string" &&
-        Reflect.has(namespace, name)) {
+        has(namespace, name) &&
+        isEnumerable(namespace, name)) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
     }
 
@@ -772,7 +778,7 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
 
   handler.preventExtensions = (namespace) => {
     return entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED &&
-      Reflect.preventExtensions(namespace)
+           Reflect.preventExtensions(namespace)
   }
 }
 
@@ -950,6 +956,25 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   }
 }
 
+function createImmutableExports(entry) {
+  const exported = entry.module.exports
+  const handler = initNamespaceHandler()
+  const proxy = new OwnProxy(exported, handler)
+
+  assignCommonNamespaceHandlerTraps(handler, entry, proxy)
+  assignImmutableNamespaceHandlerTraps(handler, entry)
+
+  Reflect.deleteProperty(handler, "has")
+
+  for (const name in handler) {
+    toExternalFunction(handler[name])
+  }
+
+  Object.seal(exported)
+
+  return proxy
+}
+
 function createImmutableNamespaceProxy(entry, namespace) {
   // Section 9.4.6: Module Namespace Exotic Objects
   // Namespace objects should be sealed.
@@ -959,6 +984,28 @@ function createImmutableNamespaceProxy(entry, namespace) {
 
   assignCommonNamespaceHandlerTraps(handler, entry, proxy)
   assignImmutableNamespaceHandlerTraps(handler, entry)
+
+  for (const name in handler) {
+    toExternalFunction(handler[name])
+  }
+
+  return proxy
+}
+
+function createMutableExports(entry) {
+  const exported = entry.module.exports
+  const handler = initNamespaceHandler()
+  const proxy = new OwnProxy(exported, handler)
+
+  assignCommonNamespaceHandlerTraps(handler, entry, proxy)
+  assignMutableNamespaceHandlerTraps(handler, entry, proxy)
+
+  Reflect.deleteProperty(handler, "has")
+
+  for (const name in handler) {
+    toExternalFunction(handler[name])
+  }
+
   return proxy
 }
 
@@ -968,6 +1015,11 @@ function createMutableNamespaceProxy(entry, namespace) {
 
   assignCommonNamespaceHandlerTraps(handler, entry, proxy)
   assignMutableNamespaceHandlerTraps(handler, entry, proxy)
+
+  for (const name in handler) {
+    toExternalFunction(handler[name])
+  }
+
   return proxy
 }
 
@@ -1060,10 +1112,11 @@ function getExportsObjectKeys(entry, exported = entry.exports) {
     for (const name of ownNames) {
       if (! isEnumerable(exported, name) &&
           (name === "__esModule" ||
-          (isFunc &&
+           (isFunc &&
             name === "prototype") ||
-          (has(proto, name) &&
-            ! isEnumerable(proto, name)))) {
+           (has(proto, name) &&
+            ! isEnumerable(proto, name))
+          )) {
         continue
       }
 
