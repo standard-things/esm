@@ -11,6 +11,7 @@ import { dirname } from "../../safe/path.js"
 import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
+import has from "../../util/has.js"
 import isMJS from "../../path/is-mjs.js"
 import loader from "./loader.js"
 import realProcess from "../../real/process.js"
@@ -62,11 +63,11 @@ function load(request, parent, isMain = false, preload) {
     : getURLFromFilePath(filename) + queryFragment
 
   if (isExtMJS ||
-      Reflect.has(moduleCache, request)) {
+      has(moduleCache, request)) {
     cache = moduleCache
   } else if (parsing) {
     cache = scratchCache
-  } else if (Reflect.has(scratchCache, request)) {
+  } else if (has(scratchCache, request)) {
     const mod = scratchCache[request]
 
     if (isUnexposed &&

@@ -323,7 +323,7 @@ function createOptions(value) {
     const possibleNames = keys(value)
 
     for (const name of possibleNames) {
-      if (Reflect.has(defaultOptions, name)) {
+      if (has(defaultOptions, name)) {
         names.push(name)
         options[name] = value[name]
       } else if (name === "sourcemap" &&
@@ -466,7 +466,7 @@ function createOptionsCJS(value) {
   const possibleNames = keys(value)
 
   for (const name of possibleNames) {
-    if (Reflect.has(defaultCJS, name)) {
+    if (has(defaultCJS, name)) {
       names.push(name)
       options[name] = value[name]
     } else if (name === "interop" &&

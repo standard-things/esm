@@ -7,6 +7,7 @@ import builtinGlobal from "./builtin/global.js"
 import errors from "./errors.js"
 import esmImport from "./module/esm/import.js"
 import getURLFromFilePath from "./util/get-url-from-file-path.js"
+import has from "./util/has.js"
 import hasPragma from "./parse/has-pragma.js"
 import identity from "./util/identity.js"
 import isFileOrigin from "./util/is-file-origin.js"
@@ -103,11 +104,10 @@ const Runtime = {
           continue
         }
 
-        let getter
         let ownerName
+        let getter = getters[exportedName]
 
-        if (Reflect.has(getters, exportedName)) {
-          getter = getters[exportedName]
+        if (getter !== void 0) {
           ownerName = getter.owner.name
 
           if (name === ownerName) {
@@ -141,7 +141,7 @@ const Runtime = {
   assertUndeclared: function assertUndeclared(name) {
     const { unsafeGlobal } = shared
 
-    if (! Reflect.has(unsafeGlobal, name)) {
+    if (! has(unsafeGlobal, name)) {
       throw new ERR_UNDEFINED_IDENTIFIER(name, assertUndeclared)
     }
 
@@ -241,7 +241,7 @@ const Runtime = {
 
     const { unsafeGlobal } = shared
 
-    if (Reflect.has(unsafeGlobal, runtimeName)) {
+    if (has(unsafeGlobal, runtimeName)) {
       return code
     }
 

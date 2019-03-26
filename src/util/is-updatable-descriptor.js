@@ -1,3 +1,4 @@
+import has from "./has.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 
@@ -10,7 +11,7 @@ function init() {
     return isObject(descriptor) &&
       (descriptor.configurable === true ||
        descriptor.writable === true) &&
-      Reflect.has(descriptor, "value")
+      has(descriptor, "value")
   }
 
   return isUpdatableDescriptor

@@ -1,6 +1,7 @@
 import ENTRY from "../../constant/entry.js"
 
 import errors from "../../errors.js"
+import has from "../../util/has.js"
 import shared from "../../shared.js"
 
 function init() {
@@ -136,7 +137,7 @@ function init() {
           : getters
       }
 
-      if (Reflect.has(namespace, exportedName)) {
+      if (has(namespace, exportedName)) {
         let getter = getters[exportedName]
 
         const { owner } = getter

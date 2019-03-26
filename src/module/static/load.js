@@ -13,6 +13,7 @@ import RealModule from "../../real/module.js"
 import _load from "../internal/load.js"
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
+import has from "../../util/has.js"
 import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
 import validateString from "../../util/validate-string.js"
@@ -52,7 +53,7 @@ const load = maskFunction(function (request, parent, isMain = false) {
 
   if (parsing) {
     cache = scratchCache
-  } else if (Reflect.has(scratchCache, filename)) {
+  } else if (has(scratchCache, filename)) {
     cache[filename] = scratchCache[filename]
     Reflect.deleteProperty(scratchCache, filename)
   }

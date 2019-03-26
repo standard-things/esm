@@ -6,6 +6,7 @@ import Entry from "../../entry.js"
 import Loader from "../../loader.js"
 import RealModule from "../../real/module.js"
 
+import has from "../../util/has.js"
 import loader from "../cjs/loader.js"
 import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
@@ -27,7 +28,7 @@ const load = maskFunction(function (filename) {
 
   // Reassociate entries from the parse phase for modules created
   // via `new Module()`.
-  if (Reflect.has(scratchCache, id)) {
+  if (has(scratchCache, id)) {
     const otherEntry = Entry.get(scratchCache[id])
 
     if (entry !== otherEntry) {

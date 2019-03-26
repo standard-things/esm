@@ -4,6 +4,7 @@ import SafeObject from "../safe/object.js"
 import getGetter from "./get-getter.js"
 import getObjectTag from "./get-object-tag.js"
 import getSetter from "./get-setter.js"
+import has from "./has.js"
 import isAnyArrayBuffer from "./is-any-array-buffer.js"
 import isDate from "./is-date.js"
 import isExternal from "./is-external.js"
@@ -51,10 +52,10 @@ function init() {
         receiver = exported
       }
 
-      const hasGetter = getGetter(exported, name) !== void 0
+      const hasPropertyGetter = getGetter(exported, name) !== void 0
       const value = Reflect.get(exported, name, receiver)
 
-      if (hasGetter) {
+      if (hasPropertyGetter) {
         tryUpdateBindings(name, value)
       }
 
@@ -95,24 +96,20 @@ function init() {
     }
 
     const tryUpdateBindings = (name, value) => {
-      if (! Reflect.has(entry.getters, name)) {
+      const { getters } = entry
+      const getter = getters[name]
+
+      if (getter === void 0) {
         entry.updateBindings()
         return
       }
-
-      const { getters } = entry
-      const getter = getters[name]
 
       entry.addGetter(name, () => value)
 
       try {
         entry.updateBindings(name)
       } finally {
-        if (typeof getter === "function") {
-          getters[name] = getter
-        } else {
-          Reflect.deleteProperty(getters, name)
-        }
+        getters[name] = getter
       }
     }
 
@@ -138,7 +135,7 @@ function init() {
           handler.get = get
         }
 
-        if (Reflect.has(entry.getters, name)) {
+        if (has(entry.getters, name)) {
           entry.addGetter(name, () => entry.exports[name])
           entry.updateBindings(name)
         }
@@ -147,7 +144,7 @@ function init() {
       },
       deleteProperty(exported, name) {
         if (Reflect.deleteProperty(exported, name)) {
-          if (Reflect.has(entry.getters, name)) {
+          if (has(entry.getters, name)) {
             entry.addGetter(name, () => entry.exports[name])
             entry.updateBindings(name)
           }
@@ -174,13 +171,13 @@ function init() {
           receiver = exported
         }
 
-        const hasSetter = getSetter(exported, name) !== void 0
+        const hasPropertySetter = getSetter(exported, name) !== void 0
 
         if (Reflect.set(exported, name, value, receiver)) {
-          if (Reflect.has(entry.getters, name)) {
+          if (has(entry.getters, name)) {
             entry.addGetter(name, () => entry.exports[name])
-            entry.updateBindings(hasSetter ? void 0 : name)
-          } else if (hasSetter) {
+            entry.updateBindings(hasPropertySetter ? void 0 : name)
+          } else if (hasPropertySetter) {
             entry.updateBindings()
           }
 

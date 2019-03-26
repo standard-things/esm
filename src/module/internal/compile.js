@@ -22,6 +22,7 @@ import get from "../../util/get.js"
 import getLocationFromStackTrace from "../../error/get-location-from-stack-trace.js"
 import getSourceMappingURL from "../../util/get-source-mapping-url.js"
 import getStackFrames from "../../error/get-stack-frames.js"
+import has from "../../util/has.js"
 import isAbsolute from "../../path/is-absolute.js"
 import isIdentifierName from "../../util/is-identifier-name.js"
 import isObjectEmpty from "../../util/is-object-empty.js"
@@ -658,7 +659,7 @@ function wasmEvaluate(entry, wasmMod, importObject) {
   for (const name in wasmExported) {
     const getter = () => entry.exports[name]
 
-    if (Reflect.has(getters, name)) {
+    if (has(getters, name)) {
       entry.addGetter(name, getter)
     }
 

@@ -1,3 +1,4 @@
+import has from "./has.js"
 import isObject from "./is-object.js"
 import shared from "../shared.js"
 
@@ -7,7 +8,7 @@ function init() {
       descriptor.configurable === true &&
       descriptor.enumerable === true &&
       descriptor.writable === true &&
-      Reflect.has(descriptor, "value")
+      has(descriptor, "value")
   }
 
   return isDataPropertyDescriptor

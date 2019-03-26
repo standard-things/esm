@@ -316,7 +316,7 @@ const Console = maskFunction(function (...args) {
 
   for (const name of newSafeNames) {
     if (isKeyAssignable(name) &&
-        ! Reflect.has(this, name)) {
+        ! has(this, name)) {
       copyProperty(this, newSafeConsole, name)
     }
   }

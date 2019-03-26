@@ -1,3 +1,4 @@
+import has from "../util/has.js"
 import isObjectLike from "../util/is-object-like.js"
 import realUtil from "../real/util.js"
 import safe from "../util/safe.js"
@@ -32,7 +33,7 @@ function init() {
 
   shared.defaultInspectOptions = defaultOptions
 
-  if (Reflect.has(safeUtil, "types")) {
+  if (has(safeUtil, "types")) {
     setProperty(safeUtil, "types", safe(safeUtil.types))
   }
 

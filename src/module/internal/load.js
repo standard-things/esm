@@ -51,7 +51,7 @@ function load(filename, parent, isMain = false, cache, loader) {
         entry.state !== STATE_PARSING_COMPLETED) {
       return entry
     }
-  } else if (Reflect.has(builtinEntries, filename)) {
+  } else if (has(builtinEntries, filename)) {
     return builtinEntries[filename]
   } else {
     mod = new Module(filename, parent)

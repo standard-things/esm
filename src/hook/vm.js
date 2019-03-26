@@ -19,6 +19,7 @@ import assign from "../util/assign.js"
 import builtinVM from "../builtin/vm.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
+import has from "../util/has.js"
 import inspect from "../util/inspect.js"
 import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import makeRequireFunction from "../module/internal/make-require-function.js"
@@ -98,7 +99,7 @@ function hook(vm) {
       compileDatas.set(cacheName, compileData)
     } else if (compileData.scriptData !== null &&
                scriptOptions.produceCachedData &&
-               ! Reflect.has(scriptOptions, "cachedData")) {
+               ! has(scriptOptions, "cachedData")) {
       scriptOptions.cachedData = compileData.scriptData
     }
 

@@ -1,3 +1,4 @@
+import has from "../util/has.js"
 import realFs from "../real/fs.js"
 import safe from "../util/safe.js"
 import setProperty from "../util/set-property.js"
@@ -11,7 +12,7 @@ function init() {
     shared.realpathNativeSync = native
   }
 
-  if (Reflect.has(safeFs, "constants")) {
+  if (has(safeFs, "constants")) {
     setProperty(safeFs, "constants", safe(safeFs.constants))
   }
 

@@ -57,7 +57,7 @@ function init() {
       } else if (name === "GLOBAL" ||
                  name === "root") {
         descriptor = getDeprecatedGlobalDescriptor(name, context)
-      } else if (! Reflect.has(context, name)) {
+      } else if (! has(context, name)) {
         descriptor = Reflect.getOwnPropertyDescriptor(defaultGlobal, name)
       }
 

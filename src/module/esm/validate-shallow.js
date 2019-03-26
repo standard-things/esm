@@ -1,4 +1,5 @@
 import errors from "../../errors.js"
+import has from "../../util/has.js"
 import shared from "../../shared.js"
 
 function init() {
@@ -23,7 +24,7 @@ function init() {
         namespace = entry.getExportByName("*", parentEntry)
       }
 
-      if (Reflect.has(namespace, exportedName)) {
+      if (has(namespace, exportedName)) {
         cache.set(exportedName, true)
         continue
       }

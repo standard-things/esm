@@ -210,7 +210,7 @@ function hook(Mod, parent) {
     const extIsMJS = ext === ".mjs"
 
     if (extIsMJS &&
-        ! Reflect.has(_extensions, ext)) {
+        ! has(_extensions, ext)) {
       _extensions[ext] = maskFunction(mjsCompiler, realExtsJS)
     }
 
@@ -221,7 +221,7 @@ function hook(Mod, parent) {
       continue
     }
 
-    if (! Reflect.has(_extensions, ext)) {
+    if (! has(_extensions, ext)) {
       _extensions[ext] = realExtsJS
     }
 

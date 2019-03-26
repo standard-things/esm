@@ -1,3 +1,4 @@
+import has from "../../util/has.js"
 import shared from "../../shared.js"
 
 function init() {
@@ -30,7 +31,7 @@ function init() {
         ? extname
         : basename.slice(index)
 
-      if (Reflect.has(extCompilers, ext)) {
+      if (has(extCompilers, ext)) {
         return ext
       }
 

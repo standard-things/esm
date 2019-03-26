@@ -223,7 +223,7 @@ class Entry {
 
     const settersMap = this.setters
 
-    if (! Reflect.has(settersMap, name)) {
+    if (! has(settersMap, name)) {
       settersMap[name] = []
     }
 
@@ -539,7 +539,7 @@ class Entry {
           mod.exports = exported.default
         } else {
           if (cjs.esModule &&
-              ! Reflect.has(this.getters, "__esModule")) {
+              ! has(this.getters, "__esModule")) {
             Reflect.defineProperty(exported, "__esModule", pseudoDescriptor)
           }
 
@@ -716,14 +716,13 @@ class Entry {
 function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
   handler.get = (namespace, name, receiver) => {
     const { getters } = entry
+    const getter = getters[name]
+    const hasGetter = getter !== void 0
 
-    let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
-
-    if (! errored) {
-      errored =
-        ! Reflect.has(getters, name) ||
-        getters[name]() === ERROR_GETTER
-    }
+    const errored =
+      ! hasGetter ||
+      entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED ||
+      getter() === ERROR_GETTER
 
     if (errored &&
         typeof name === "string" &&
@@ -739,8 +738,8 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
       return entry.exports
     }
 
-    if (Reflect.has(getters, name)) {
-      return getters[name]()
+    if (hasGetter) {
+      return getter()
     }
 
     if (receiver === proxy) {
@@ -776,7 +775,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
 
   handler.defineProperty = (namespace, name, descriptor) => {
     if (entry._namespaceFinalized === NAMESPACE_FINALIZATION_COMPLETED &&
-        Reflect.has(namespace, name) &&
+        has(namespace, name) &&
         isDescriptorMatch(Reflect.getOwnPropertyDescriptor(namespace, name), descriptor)) {
       return Reflect.defineProperty(namespace, name, descriptor)
     }
@@ -785,7 +784,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
       return false
     }
 
-    if (Reflect.has(namespace, name)) {
+    if (has(namespace, name)) {
       throw new ERR_NS_REDEFINITION(entry.module, name)
     } else {
       throw new ERR_NS_DEFINITION(entry.module, name)
@@ -809,7 +808,7 @@ function assignImmutableNamespaceHandlerTraps(handler, entry) {
       return false
     }
 
-    if (Reflect.has(namespace, name)) {
+    if (has(namespace, name)) {
       throw new ERR_NS_ASSIGNMENT(entry.module, name)
     }
 
@@ -825,7 +824,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
     SafeObject.defineProperty(entry.exports, name, descriptor)
 
-    if (Reflect.has(namespace, name)) {
+    if (has(namespace, name)) {
       entry.addGetter(name, () => entry.exports[name])
       entry.updateBindings(name)
     }
@@ -836,7 +835,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
   handler.deleteProperty = (namespace, name) => {
     if (Reflect.deleteProperty(entry.exports, name)) {
-      if (Reflect.has(namespace, name)) {
+      if (has(namespace, name)) {
         entry.addGetter(name, () => entry.exports[name])
         entry.updateBindings(name)
       }
@@ -887,7 +886,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
 
       let value
 
-      if (Reflect.has(exportedDescriptor, "value")) {
+      if (has(exportedDescriptor, "value")) {
         value = exportedDescriptor.value
       } else if (typeof exportedDescriptor.get === "function") {
         value = tryGetter(exportedDescriptor.get)
@@ -933,7 +932,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
     }
 
     if (Reflect.set(exported, name, value, receiver)) {
-      if (Reflect.has(namespace, name)) {
+      if (has(namespace, name)) {
         entry.addGetter(name, () => entry.exports[name])
         entry.updateBindings(name)
       }
@@ -1025,11 +1024,11 @@ function getExportByName(entry, name, parentEntry) {
       return entry.exports
     }
 
-    const { getters } = entry
+    const getter = entry.getters[name]
 
-    return Reflect.has(getters, name)
-      ? getters[name]()
-      : ERROR_GETTER
+    return getter === void 0
+      ? ERROR_GETTER
+      : getter()
   }
 
   const parentCJS = parentEntry.package.options.cjs
@@ -1063,11 +1062,11 @@ function getExportByName(entry, name, parentEntry) {
 
 function getExportByNameFast(entry, name, parentEntry) {
   if (name !== "*") {
-    const { getters } = entry
+    const getter = entry.getters[name]
 
-    return Reflect.has(getters, name)
-      ? tryGetter(getters[name])
-      : ERROR_GETTER
+    return getter === void 0
+      ? ERROR_GETTER
+      : tryGetter(getter)
   }
 
   const parentMutableNamespace =
@@ -1146,7 +1145,7 @@ function runGetter(entry, name) {
   const exported = entry.exports
   const value = tryGetter(getter)
 
-  if (! Reflect.has(exported, name) ||
+  if (! has(exported, name) ||
       ! Object.is(exported[name], value)) {
     entry._changed = true
     exported[name] = value

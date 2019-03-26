@@ -1,3 +1,4 @@
+import has from "./has.js"
 import isDataPropertyDescriptor from "./is-data-property-descriptor.js"
 import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
@@ -12,7 +13,7 @@ function init() {
     const descriptor = Reflect.getOwnPropertyDescriptor(source, name)
 
     if (descriptor !== void 0) {
-      if (Reflect.has(descriptor, "value")) {
+      if (has(descriptor, "value")) {
         const { value } = descriptor
 
         if (Array.isArray(value)) {
@@ -25,7 +26,7 @@ function init() {
       } else {
         descriptor.configurable = true
 
-        if (Reflect.has(descriptor, "writable")) {
+        if (has(descriptor, "writable")) {
           descriptor.writable = true
         }
 
