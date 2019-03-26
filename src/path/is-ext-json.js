@@ -11,7 +11,7 @@ function init() {
     LOWERCASE_S
   } = CHAR_CODE
 
-  function isJSON(filename) {
+  function isExtJSON(filename) {
     if (typeof filename !== "string") {
       return false
     }
@@ -26,9 +26,9 @@ function init() {
       filename.charCodeAt(length - 1) === LOWERCASE_N
   }
 
-  return isJSON
+  return isExtJSON
 }
 
 export default shared.inited
-  ? shared.module.pathIsJSON
-  : shared.module.pathIsJSON = init()
+  ? shared.module.pathIsExtJSON
+  : shared.module.pathIsExtJSON = init()

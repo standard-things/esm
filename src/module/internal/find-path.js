@@ -20,8 +20,8 @@ import { emitWarning } from "../../safe/process.js"
 import errors from "../../errors.js"
 import inspectTrunc from "../../util/inspect-trunc.js"
 import isAbsolute from "../../path/is-absolute.js"
-import isJS from "../../path/is-js.js"
-import isMJS from "../../path/is-mjs.js"
+import isExtJS from "../../path/is-ext-js.js"
+import isExtMJS from "../../path/is-ext-mjs.js"
 import isSep from "../../path/is-sep.js"
 import keys from "../../util/keys.js"
 import readPackage from "./read-package.js"
@@ -163,8 +163,8 @@ function findPath(request, paths, isMain = false, fields, exts) {
     let rc = -1
     let stat = null
 
-    if (isJS(thePath) ||
-        isMJS(thePath)) {
+    if (isExtJS(thePath) ||
+        isExtMJS(thePath)) {
       stat = statSync(thePath)
 
       if (stat !== null) {
@@ -252,8 +252,8 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 function tryFilename(filename, isMain) {
   let rc = -1
 
-  if (isJS(filename) ||
-      isMJS(filename)) {
+  if (isExtJS(filename) ||
+      isExtMJS(filename)) {
     let stat = statSync(filename)
 
     if (stat !== null) {
@@ -293,7 +293,7 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
 
     if (filename !== "" &&
         (field === "main" ||
-         ! isMJS(filename))) {
+         ! isExtMJS(filename))) {
       return filename
     }
   }

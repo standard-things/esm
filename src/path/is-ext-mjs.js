@@ -6,25 +6,27 @@ function init() {
   const {
     DOT,
     LOWERCASE_J,
+    LOWERCASE_M,
     LOWERCASE_S
   } = CHAR_CODE
 
-  function isJS(filename) {
+  function isExtMJS(filename) {
     if (typeof filename !== "string") {
       return false
     }
 
     const { length } = filename
 
-    return length > 3 &&
-      filename.charCodeAt(length - 3) === DOT &&
+    return length > 4 &&
+      filename.charCodeAt(length - 3) === LOWERCASE_M &&
+      filename.charCodeAt(length - 4) === DOT &&
       filename.charCodeAt(length - 2) === LOWERCASE_J &&
       filename.charCodeAt(length - 1) === LOWERCASE_S
   }
 
-  return isJS
+  return isExtMJS
 }
 
 export default shared.inited
-  ? shared.module.pathIsJS
-  : shared.module.pathIsJS = init()
+  ? shared.module.pathIsExtMJS
+  : shared.module.pathIsExtMJS = init()

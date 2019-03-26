@@ -8,7 +8,7 @@ import RealModule from "../../real/module.js"
 
 import errors from "../../errors.js"
 import esmLoad from "../esm/load.js"
-import isMJS from "../../path/is-mjs.js"
+import isExtMJS from "../../path/is-ext-mjs.js"
 import maskFunction from "../../util/mask-function.js"
 import shared from "../../shared.js"
 import validateString from "../../util/validate-string.js"
@@ -31,7 +31,7 @@ const req = maskFunction(function (request) {
   moduleState.requireDepth += 1
 
   try {
-    const parentEntry = isMJS(this.filename)
+    const parentEntry = isExtMJS(this.filename)
       ? Entry.get(this)
       : null
 

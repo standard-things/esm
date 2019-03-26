@@ -1,6 +1,6 @@
 import CHAR_CODE from "../constant/char-code.js"
 
-import isJS from "../path/is-js.js"
+import isExtJS from "../path/is-ext-js.js"
 import shared from "../shared.js"
 
 function init() {
@@ -14,7 +14,7 @@ function init() {
   function isCacheName(value) {
     if (typeof value !== "string" ||
         value.length !== 19 ||
-        ! isJS(value)) {
+        ! isExtJS(value)) {
       return false
     }
 

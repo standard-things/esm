@@ -15,7 +15,7 @@ import GenericBuffer from "./generic/buffer.js"
 
 import exists from "./fs/exists.js"
 import getCachePathHash from "./util/get-cache-path-hash.js"
-import isMJS from "./path/is-mjs.js"
+import isExtMJS from "./path/is-ext-mjs.js"
 import getEnv from "./util/get-env.js"
 import mkdirp from "./fs/mkdirp.js"
 import parseJSON from "./util/parse-json.js"
@@ -412,7 +412,7 @@ function init() {
       topLevelReturn
     } = options
 
-    if (isMJS(options.filename)) {
+    if (isExtMJS(options.filename)) {
       cjsPaths = void 0
       cjsVars = void 0
       topLevelReturn = void 0

@@ -12,7 +12,7 @@ import dualResolveFilename from "../internal/dual-resolve-filename.js"
 import getURLFromFilePath from "../../util/get-url-from-file-path.js"
 import getURLQueryFragment from "../../util/get-url-query-fragment.js"
 import has from "../../util/has.js"
-import isMJS from "../../path/is-mjs.js"
+import isExtMJS from "../../path/is-ext-mjs.js"
 import loader from "./loader.js"
 import realProcess from "../../real/process.js"
 import resolveFilename from "./resolve-filename.js"
@@ -49,7 +49,6 @@ function load(request, parent, isMain = false, preload) {
     request = filename
   }
 
-  const isExtMJS = isMJS(filename)
   const pkg = Package.from(filename)
   const { cjs } = pkg.options
   const queryFragment = getURLQueryFragment(request)
@@ -62,7 +61,7 @@ function load(request, parent, isMain = false, preload) {
     ? filename
     : getURLFromFilePath(filename) + queryFragment
 
-  if (isExtMJS ||
+  if (isExtMJS(filename) ||
       has(moduleCache, request)) {
     cache = moduleCache
   } else if (parsing) {

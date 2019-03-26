@@ -24,8 +24,8 @@ import findPath from "./module/internal/find-path.js"
 import getModuleDirname from "./util/get-module-dirname.js"
 import has from "./util/has.js"
 import isCacheName from "./util/is-cache-name.js"
+import isExtJSON from "./path/is-ext-json.js"
 import isFile from "./util/is-file.js"
-import isJSON from "./path/is-json.js"
 import isObject from "./util/is-object.js"
 import keys from "./util/keys.js"
 import parseJSON from "./util/parse-json.js"
@@ -305,7 +305,7 @@ function clearBabelCache(cachePath) {
   const cacheNames = readdir(babelCachePath)
 
   for (const cacheName of cacheNames) {
-    if (isJSON(cacheName)) {
+    if (isExtJSON(cacheName)) {
       removeFile(babelCachePath + sep + cacheName)
     }
   }
@@ -628,7 +628,7 @@ function readInfo(dirPath, state) {
       ! optionsFound) {
     optionsFound = true
 
-    if (isJSON(optionsPath)) {
+    if (isExtJSON(optionsPath)) {
       options = readJSON6(optionsPath)
     } else {
       const { cache } = Loader.state.package

@@ -19,8 +19,8 @@ import findPath from "../internal/find-path.js"
 import getFilePathFromURL from "../../util/get-file-path-from-url.js"
 import hasEncodedSep from "../../path/has-encoded-sep.js"
 import isAbsolute from "../../path/is-absolute.js"
-import isJS from "../../path/is-js.js"
-import isMJS from "../../path/is-mjs.js"
+import isExtJS from "../../path/is-ext-js.js"
+import isExtMJS from "../../path/is-ext-mjs.js"
 import isObject from "../../util/is-object.js"
 import isRelative from "../../path/is-relative.js"
 import maskStackTrace from "../../error/mask-stack-trace.js"
@@ -189,8 +189,8 @@ function resolveFilename(request, parent, isMain = false, options) {
   if (foundPath !== "") {
     if (cjsPaths ||
         isMain ||
-        isJS(foundPath) ||
-        isMJS(foundPath) ||
+        isExtJS(foundPath) ||
+        isExtMJS(foundPath) ||
         strictExtsLookup.has(extname(foundPath))) {
       if (cache !== void 0) {
         cache.set(cacheKey, foundPath)
