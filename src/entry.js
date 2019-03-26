@@ -533,10 +533,11 @@ class Entry {
       mod.exports = exported
       this.exports = exported
     } else {
+      const exported = mod.exports
+
       if (this.extname === ".mjs") {
-        mod.exports = createImmutableExports(this)
+        mod.exports = createImmutableExportsProxy(this, exported)
       } else {
-        const exported = mod.exports
         const names = getExportsObjectKeys(this)
 
         const exportDefaultOnly =
@@ -553,8 +554,8 @@ class Entry {
           }
 
           mod.exports = cjs.mutableNamespace
-            ? createMutableExports(this)
-            : createImmutableExports(this)
+            ? createMutableExportsProxy(this, exported)
+            : createImmutableExportsProxy(this, exported)
         }
       }
 
@@ -956,8 +957,7 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
   }
 }
 
-function createImmutableExports(entry) {
-  const exported = entry.module.exports
+function createImmutableExportsProxy(entry, exported) {
   const handler = initNamespaceHandler()
   const proxy = new OwnProxy(exported, handler)
 
@@ -992,8 +992,7 @@ function createImmutableNamespaceProxy(entry, namespace) {
   return proxy
 }
 
-function createMutableExports(entry) {
-  const exported = entry.module.exports
+function createMutableExportsProxy(entry, exported) {
   const handler = initNamespaceHandler()
   const proxy = new OwnProxy(exported, handler)
 
