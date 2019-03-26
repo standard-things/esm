@@ -493,11 +493,9 @@ class Entry {
 
     const { cjs } = this.package.options
 
+    let exported = mod.exports
+
     if (this.type === TYPE_CJS) {
-      this._loaded = LOAD_COMPLETED
-
-      let exported = mod.exports
-
       if (cjs.esModule &&
           exported != null &&
           exported.__esModule) {
@@ -526,26 +524,18 @@ class Entry {
 
       this.exports = exported
     } else if (this.type === TYPE_JSON) {
-      this._loaded = LOAD_COMPLETED
-
-      const exported = proxyExports(this)
-
+      exported = proxyExports(this)
       mod.exports = exported
       this.exports = exported
     } else {
-      const exported = mod.exports
-
       if (this.extname === ".mjs") {
         mod.exports = createImmutableExportsProxy(this, exported)
       } else {
         const names = getExportsObjectKeys(this)
 
-        const exportDefaultOnly =
-          cjs.dedefault &&
-          names.length === 1 &&
-          names[0] === "default"
-
-        if (exportDefaultOnly) {
+        if (cjs.dedefault &&
+            names.length === 1 &&
+            names[0] === "default") {
           mod.exports = exported.default
         } else {
           if (cjs.esModule &&
@@ -558,13 +548,11 @@ class Entry {
             : createImmutableExportsProxy(this, exported)
         }
       }
-
-      this._loaded = LOAD_COMPLETED
     }
 
     this.finalizeNamespace()
 
-    return this._loaded
+    return this._loaded = LOAD_COMPLETED
   }
 
   resumeChildren() {
