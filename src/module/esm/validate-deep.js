@@ -22,10 +22,6 @@ function init() {
   function validateDeep(entry, seen) {
     const { children } = entry
 
-    for (const name in children) {
-      validate(children[name], entry)
-    }
-
     if (seen === void 0) {
       seen = new Set
     } else if (seen.has(entry)) {
@@ -40,6 +36,8 @@ function init() {
       if (childEntry.type !== TYPE_CJS) {
         validateDeep(childEntry, seen)
       }
+
+      validate(childEntry, entry)
     }
   }
 

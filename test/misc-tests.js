@@ -1260,8 +1260,8 @@ describe("miscellaneous tests", () => {
               assert.ok(e instanceof SyntaxError)
               assert.strictEqual(
                 e.message,
-                "Detected cycle while resolving name 'x2' in '" +
-                getURLFromFilePath(path.resolve("fixture/cycle/detected/direct/b.mjs")) + "'"
+                "Detected cycle while resolving name 'x1' in '" +
+                getURLFromFilePath(path.resolve("fixture/cycle/detected/direct/a.mjs")) + "'"
               )
             }),
           import("./fixture/cycle/detected/indirect/a.mjs")
@@ -1271,8 +1271,8 @@ describe("miscellaneous tests", () => {
               assert.strictEqual(
                 e.message,
                 "The requested module '" +
-                getURLFromFilePath(path.resolve("fixture/cycle/detected/indirect/b.mjs")) +
-                "' does not provide an export named 'x2'"
+                getURLFromFilePath(path.resolve("fixture/cycle/detected/indirect/a.mjs")) +
+                "' does not provide an export named 'x1'"
               )
             }),
           import("./fixture/cycle/detected/self/a.mjs")
