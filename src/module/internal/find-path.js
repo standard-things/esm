@@ -311,7 +311,7 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
       toStringLiteral(jsonPath, APOSTROPHE) + " of " + inspectTrunc(fieldValue) +
       ". Please either fix or report it to the module author",
       "DeprecationWarning",
-      "DEP0XXX"
+      "DEP0128"
     )
   }
 }
