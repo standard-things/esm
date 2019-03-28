@@ -12,20 +12,12 @@ function init() {
 
   const Plugin = {
     enable() {
-      if (! INTERNAL) {
-        return
-      }
+      if (INTERNAL) {
+        const walk = safeRequire("internal/deps/acorn/acorn-walk/dist/walk")
 
-      let walk = safeRequire("internal/deps/acorn/acorn-walk/dist/walk")
-
-      if (!isObjectLike(walk)) {
-        // TODO: Remove fallback when https://github.com/nodejs/node/pull/25844
-        // is merged.
-        walk = safeRequire("internal/deps/acorn/dist/walk")
-      }
-
-      if (isObjectLike(walk)) {
-        acornWalkDynamicImport.enable(walk)
+        if (isObjectLike(walk)) {
+          acornWalkDynamicImport.enable(walk)
+        }
       }
     }
   }

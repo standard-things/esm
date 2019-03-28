@@ -12,20 +12,12 @@ function init() {
 
   const Plugin = {
     enable() {
-      if (! INTERNAL) {
-        return
-      }
+      if (INTERNAL) {
+        const acorn = safeRequire("internal/deps/acorn/acorn/dist/acorn")
 
-      let acorn = safeRequire("internal/deps/acorn/acorn/dist/acorn")
-
-      if (! isObjectLike(acorn)) {
-        // TODO: Remove fallback when https://github.com/nodejs/node/pull/25844
-        // is merged.
-        acorn = safeRequire("internal/deps/acorn/dist/acorn")
-      }
-
-      if (isObjectLike(acorn)) {
-        acornParse.enable(acorn)
+        if (isObjectLike(acorn)) {
+          acornParse.enable(acorn)
+        }
       }
     }
   }
