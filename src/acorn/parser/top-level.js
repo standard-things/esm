@@ -25,6 +25,7 @@ function init() {
 
     const top = {
       firstAwaitOutsideFunction: null,
+      firstReturnOutsideFunction: null,
       identifiers: topIdentifiers,
       importedBindings,
       insertIndex: node.start,
@@ -118,6 +119,8 @@ function init() {
     this.next()
 
     top.firstAwaitOutsideFunction = this.firstAwaitOutsideFunction
+    top.firstReturnOutsideFunction = this.firstReturnOutsideFunction
+
     node.top = top
 
     return this.finishNode(node, "Program")
