@@ -174,28 +174,28 @@ function findPath(request, paths, isMain = false, fields, exts) {
       rc = statFast(thePath)
     }
 
-    let filename = ""
+    let foundPath = ""
 
     if (! trailingSlash) {
       // If a file.
       if (rc === 0) {
-        filename = useRealpath
+        foundPath = useRealpath
           ? realpath(thePath)
           : thePath
       }
 
-      if (filename === "") {
+      if (foundPath === "") {
         if (exts === void 0) {
           exts = keys(Module._extensions)
         }
 
-        filename = tryExtensions(thePath, exts, isMain)
+        foundPath = tryExtensions(thePath, exts, isMain)
       }
     }
 
     // If a directory.
     if (rc === 1 &&
-        filename === "") {
+        foundPath === "") {
       if (exts === void 0) {
         exts = keys(Module._extensions)
       }
@@ -204,13 +204,13 @@ function findPath(request, paths, isMain = false, fields, exts) {
         fields = mainFields
       }
 
-      filename = tryPackage(request, thePath, fields, exts, isMain)
+      foundPath = tryPackage(request, thePath, fields, exts, isMain)
     }
 
-    if (filename !== "") {
-      cache.set(cacheKey, filename)
+    if (foundPath !== "") {
+      cache.set(cacheKey, foundPath)
 
-      return filename
+      return foundPath
     }
   }
 
@@ -219,10 +219,10 @@ function findPath(request, paths, isMain = false, fields, exts) {
 
 function tryExtensions(thePath, exts, isMain) {
   for (const ext of exts) {
-    const filename = tryFilename(thePath + ext, isMain)
+    const foundPath = tryFilename(thePath + ext, isMain)
 
-    if (filename !== "") {
-      return filename
+    if (foundPath !== "") {
+      return foundPath
     }
   }
 
@@ -236,17 +236,17 @@ function tryField(dirPath, fieldPath, exts, isMain) {
 
   const thePath = resolve(dirPath, fieldPath)
 
-  let filename = tryFilename(thePath, isMain)
+  let foundPath = tryFilename(thePath, isMain)
 
-  if (filename === "") {
-    filename = tryExtensions(thePath, exts, isMain)
+  if (foundPath === "") {
+    foundPath = tryExtensions(thePath, exts, isMain)
   }
 
-  if (filename === "") {
-    filename = tryExtensions(thePath + sep + "index", exts, isMain)
+  if (foundPath === "") {
+    foundPath = tryExtensions(thePath + sep + "index", exts, isMain)
   }
 
-  return filename
+  return foundPath
 }
 
 function tryFilename(filename, isMain) {
@@ -285,21 +285,22 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
 
   let field
   let fieldValue
+  let foundPath
 
   for (field of fields) {
     fieldValue = json[field]
+    foundPath = tryField(dirPath, fieldValue, exts, isMain)
 
-    const filename = tryField(dirPath, fieldValue, exts, isMain)
-
-    if (filename !== "" &&
+    if (foundPath !== "" &&
         (field === "main" ||
-         ! isExtMJS(filename))) {
-      return filename
+         ! isExtMJS(foundPath))) {
+      return foundPath
     }
   }
 
-  const foundPath = tryExtensions(dirPath + sep + "index", exts, isMain)
   const jsonPath = dirPath + sep + "package.json"
+
+  foundPath = tryExtensions(dirPath + sep + "index", exts, isMain)
 
   if (foundPath === "") {
     throw new MAIN_NOT_FOUND(request, jsonPath)
