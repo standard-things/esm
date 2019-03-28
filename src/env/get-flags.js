@@ -28,7 +28,7 @@ function init() {
     setDeferred(flags, "exposeInternals", () => matches(commandArgs, /^--expose[-_]internals$/))
     setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.+)?$/))
     setDeferred(flags, "interactive", () => matches(commandArgs, /^(?:--interactive|-i)$/))
-    setDeferred(flags, "pendingDeprecation", matches(commandArgs, "--pending-deprecation"))
+    setDeferred(flags, "pendingDeprecation", () => matches(commandArgs, "--pending-deprecation"))
     setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
     setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))

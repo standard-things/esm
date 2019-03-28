@@ -314,6 +314,8 @@ function tryPackage(request, dirPath, fields, exts, isMain) {
       "DEP0128"
     )
   }
+
+  return foundPath
 }
 
 export default findPath
