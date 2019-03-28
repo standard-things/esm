@@ -1766,6 +1766,25 @@ describe("miscellaneous tests", () => {
         )
     })
 
+    it("should error when accessing CJS variable binding", () =>
+      Promise
+        .all([
+          "./fixture/source/cjs-var-dirname.mjs",
+          "./fixture/source/cjs-var-exports.mjs",
+          "./fixture/source/cjs-var-filename.mjs",
+          "./fixture/source/cjs-var-module.mjs",
+          "./fixture/source/cjs-var-require.mjs"
+        ]
+        .map((request) =>
+          import(request)
+            .then(assert.fail)
+            .catch((e) => {
+              assert.ok(e instanceof ReferenceError)
+              assert.ok(e.message.includes("is not defined"))
+            })
+        ))
+    )
+
     it("should error when accessing an `arguments` binding", () => {
       const id1 = path.resolve("fixture/source/arguments-top-level.mjs")
       const id2 = path.resolve("fixture/source/arguments-nested.mjs")
