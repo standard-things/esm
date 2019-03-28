@@ -67,6 +67,7 @@ function init() {
         codeWithTDZ: null,
         filename: null,
         firstAwaitOutsideFunction: null,
+        firstReturnOutsideFunction: null,
         mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
@@ -75,7 +76,7 @@ function init() {
       }
 
       if (length > 2) {
-        const filename = meta[6]
+        const filename = meta[7]
 
         if (typeof filename === "string") {
           result.filename = resolve(pkg.cachePath, filename)
@@ -84,10 +85,13 @@ function init() {
         const deflatedFirstAwaitOutsideFunction = meta[5]
 
         if (deflatedFirstAwaitOutsideFunction !== null) {
-          result.firstAwaitOutsideFunction = {
-            column: deflatedFirstAwaitOutsideFunction[0],
-            line: deflatedFirstAwaitOutsideFunction[1]
-          }
+          result.firstAwaitOutsideFunction = inflateLineInfo(deflatedFirstAwaitOutsideFunction)
+        }
+
+        const deflatedFirstReturnOutsideFunction = meta[6]
+
+        if (deflatedFirstReturnOutsideFunction !== null) {
+          result.firstReturnOutsideFunction = inflateLineInfo(deflatedFirstReturnOutsideFunction)
         }
 
         result.mtime = +meta[3]
@@ -98,8 +102,8 @@ function init() {
       if (length > 7 &&
           result.sourceType === SOURCE_TYPE_MODULE) {
         entry.type = TYPE_ESM
-        result.circular = +meta[7]
-        result.yieldIndex = +meta[8]
+        result.circular = +meta[8]
+        result.yieldIndex = +meta[9]
       }
 
       const [offsetStart, offsetEnd] = meta
@@ -151,6 +155,14 @@ function init() {
     compileDatas.set(cacheName, result)
 
     return result
+  }
+
+  function deflateLineInfo({ column, line }) {
+    return [column, line]
+  }
+
+  function inflateLineInfo([column, line]) {
+    return { column, line }
   }
 
   function onExit() {
@@ -295,19 +307,19 @@ function init() {
           const {
             filename,
             firstAwaitOutsideFunction,
+            firstReturnOutsideFunction,
             mtime,
             sourceType,
             transforms
           } = compileData
 
-          let deflatedFirstAwaitOutsideFunction = null
+          const deflatedFirstAwaitOutsideFunction = firstAwaitOutsideFunction === null
+            ? null
+            : deflateLineInfo(firstAwaitOutsideFunction)
 
-          if (firstAwaitOutsideFunction !== null) {
-            deflatedFirstAwaitOutsideFunction = [
-              firstAwaitOutsideFunction.column,
-              firstAwaitOutsideFunction.line
-            ]
-          }
+          const deflatedFirstReturnOutsideFunction = firstReturnOutsideFunction === null
+            ? null
+            : deflateLineInfo(firstReturnOutsideFunction)
 
           if (sourceType === SOURCE_TYPE_SCRIPT) {
             if (transforms !== 0) {
@@ -316,6 +328,7 @@ function init() {
                 mtime,
                 sourceType,
                 deflatedFirstAwaitOutsideFunction,
+                deflatedFirstReturnOutsideFunction,
                 relative(cachePath, filename)
               )
             }
@@ -325,6 +338,7 @@ function init() {
               mtime,
               sourceType,
               deflatedFirstAwaitOutsideFunction,
+              deflatedFirstReturnOutsideFunction,
               relative(cachePath, filename),
               compileData.circular,
               compileData.yieldIndex

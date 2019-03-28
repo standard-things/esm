@@ -136,6 +136,7 @@ function compile(caller, entry, content, filename, fallback) {
           codeWithTDZ: null,
           filename: null,
           firstAwaitOutsideFunction: null,
+          firstReturnOutsideFunction: null,
           mtime: -1,
           scriptData: null,
           sourceType: hint,

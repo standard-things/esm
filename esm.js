@@ -173,6 +173,7 @@ if (cachePath !== "") {
           codeWithTDZ: null,
           filename: null,
           firstAwaitOutsideFunction: null,
+          firstReturnOutsideFunction: null,
           mtime: -1,
           scriptData,
           sourceType: 1,

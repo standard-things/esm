@@ -65,6 +65,7 @@ function init() {
         codeWithTDZ: null,
         filename: null,
         firstAwaitOutsideFunction: null,
+        firstReturnOutsideFunction: null,
         mtime: -1,
         scriptData: null,
         sourceType: SOURCE_TYPE_SCRIPT,
@@ -342,6 +343,7 @@ function init() {
       }
 
       result.firstAwaitOutsideFunction = top.firstAwaitOutsideFunction
+      result.firstReturnOutsideFunction = top.firstReturnOutsideFunction
       result.sourceType = sourceType
       result.yieldIndex = yieldIndex
 
