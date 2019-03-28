@@ -2,11 +2,14 @@ import ENV from "./constant/env.js"
 
 import GenericArray from "./generic/array.js"
 import GenericObject from "./generic/object.js"
+import OwnProxy from "./own/proxy.js"
 import RealModule from "./real/module.js"
 import SafeModule from "./safe/module.js"
+import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
+import isExtNode from "./path/is-ext-node.js"
 import maskFunction from "./util/mask-function.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
@@ -45,9 +48,10 @@ const Module = maskFunction(function (id, parent) {
   }
 }, RealModule)
 
+const _cache = __non_webpack_require__.cache
 const _extensions = { __proto__: null }
 
-Module._cache = __non_webpack_require__.cache
+Module._cache = _cache
 Module._extensions = _extensions
 Module._findPath = staticFindPath
 Module._initPaths = staticInitPaths
@@ -60,6 +64,34 @@ Module.Module = Module
 Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.createRequireFromPath = staticCreateRequireFromPath
 Module.wrap = staticWrap
+
+if (_cache !== RealModule._cache) {
+  Module._cache = new OwnProxy(_cache, {
+    defineProperty(target, name, descriptor) {
+      if (isExtNode(name)) {
+        Reflect.defineProperty(RealModule._cache, name, descriptor)
+      }
+
+      SafeObject.defineProperty(target, name, descriptor)
+
+      return true
+    },
+    deleteProperty(target, name) {
+      if (isExtNode(name)) {
+        Reflect.deleteProperty(RealModule._cache, name)
+      }
+
+      return Reflect.deleteProperty(target, name)
+    },
+    set(target, name, value, receiver) {
+      if (isExtNode(name)) {
+        Reflect.set(RealModule._cache, name, value)
+      }
+
+      return Reflect.set(target, name, value, receiver)
+    }
+  })
+}
 
 if (! ELECTRON ||
     ! Array.isArray(SafeModule.wrapper)) {
