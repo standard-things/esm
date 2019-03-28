@@ -822,6 +822,9 @@ function assignMutableNamespaceHandlerTraps(handler, entry, proxy) {
       return false
     }
 
+    // Use `Object.defineProperty()` instead of `Reflect.defineProperty()`
+    // to throw the appropriate error if something goes wrong.
+    // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
     SafeObject.defineProperty(entry.exports, name, descriptor)
 
     if (has(namespace, name)) {

@@ -116,6 +116,10 @@ const compile = maskFunction(function (content, filename) {
       const proxy = new OwnProxy(staticWrapper, {
         defineProperty(staticWrapper, name, descriptor) {
           useLegacyWrapper = true
+
+          // Use `Object.defineProperty()` instead of `Reflect.defineProperty()`
+          // to throw the appropriate error if something goes wrong.
+          // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
           SafeObject.defineProperty(staticWrapper, name, descriptor)
 
           return true

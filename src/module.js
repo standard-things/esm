@@ -13,7 +13,7 @@ import isExtNode from "./path/is-ext-node.js"
 import maskFunction from "./util/mask-function.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
-import req from "./module/proto/require.js"
+import protoReq from "./module/proto/require.js"
 import safeDefaultProperties from "./util/safe-default-properties.js"
 import staticCreateRequireFromPath from "./module/static/create-require-from-path.js"
 import staticFindPath from "./module/static/find-path.js"
@@ -48,11 +48,11 @@ const Module = maskFunction(function (id, parent) {
   }
 }, RealModule)
 
-const _cache = __non_webpack_require__.cache
-const _extensions = { __proto__: null }
+const { cache } = __non_webpack_require__
+const extensions = { __proto__: null }
 
-Module._cache = _cache
-Module._extensions = _extensions
+Module._cache = cache
+Module._extensions = extensions
 Module._findPath = staticFindPath
 Module._initPaths = staticInitPaths
 Module._load = staticLoad
@@ -65,30 +65,35 @@ Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.createRequireFromPath = staticCreateRequireFromPath
 Module.wrap = staticWrap
 
-if (_cache !== RealModule._cache) {
-  Module._cache = new OwnProxy(_cache, {
-    defineProperty(target, name, descriptor) {
+if (cache !== RealModule._cache) {
+  // Ensure `.node` files are cached in the real `Module._cache`
+  // when `require.cache` is different than `Module._cache`.
+  Module._cache = new OwnProxy(cache, {
+    defineProperty(cache, name, descriptor) {
       if (isExtNode(name)) {
         Reflect.defineProperty(RealModule._cache, name, descriptor)
       }
 
-      SafeObject.defineProperty(target, name, descriptor)
+      // Use `Object.defineProperty()` instead of `Reflect.defineProperty()`
+      // to throw the appropriate error if something goes wrong.
+      // https://tc39.github.io/ecma262/#sec-definepropertyorthrow
+      SafeObject.defineProperty(cache, name, descriptor)
 
       return true
     },
-    deleteProperty(target, name) {
+    deleteProperty(cache, name) {
       if (isExtNode(name)) {
         Reflect.deleteProperty(RealModule._cache, name)
       }
 
-      return Reflect.deleteProperty(target, name)
+      return Reflect.deleteProperty(cache, name)
     },
-    set(target, name, value, receiver) {
+    set(cache, name, value, receiver) {
       if (isExtNode(name)) {
         Reflect.set(RealModule._cache, name, value)
       }
 
-      return Reflect.set(target, name, value, receiver)
+      return Reflect.set(cache, name, value, receiver)
     }
   })
 }
@@ -103,12 +108,12 @@ const ModuleProto = Module.prototype
 ModuleProto._compile = protoCompile
 ModuleProto.constructor = Module
 ModuleProto.load = protoLoad
-ModuleProto.require = req
+ModuleProto.require = protoReq
 
 // Initialize `Module._extensions` with only the enumerable string keyed
 // properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`
 // and other meta properties.
-assign(_extensions, RealModule._extensions)
+assign(extensions, RealModule._extensions)
 safeDefaultProperties(Module, RealModule)
 
 if (! Array.isArray(Module.globalPaths)) {
