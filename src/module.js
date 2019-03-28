@@ -10,6 +10,7 @@ import SafeObject from "./safe/object.js"
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
 import isExtNode from "./path/is-ext-node.js"
+import isObjectLike from "./util/is-object-like.js"
 import maskFunction from "./util/mask-function.js"
 import protoCompile from "./module/proto/compile.js"
 import protoLoad from "./module/proto/load.js"
@@ -48,11 +49,8 @@ const Module = maskFunction(function (id, parent) {
   }
 }, RealModule)
 
-const { cache } = __non_webpack_require__
-const extensions = { __proto__: null }
-
-Module._cache = cache
-Module._extensions = extensions
+Module._cache = __non_webpack_require__.cache
+Module._extensions = { __proto__: null }
 Module._findPath = staticFindPath
 Module._initPaths = staticInitPaths
 Module._load = staticLoad
@@ -65,13 +63,26 @@ Module.builtinModules = Object.freeze(GenericArray.from(builtinIds))
 Module.createRequireFromPath = staticCreateRequireFromPath
 Module.wrap = staticWrap
 
-if (cache !== RealModule._cache) {
+// Initialize `Module._extensions` with only the enumerable string keyed
+// properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`
+// and other meta properties.
+assign(Module._extensions, RealModule._extensions)
+safeDefaultProperties(Module, RealModule)
+
+if (! isObjectLike(Module._cache)) {
+  Module._cache = { __proto__: null }
+}
+
+if (Module._cache !== RealModule._cache) {
   // Ensure `.node` files are cached in the real `Module._cache`
   // when `require.cache` is different than `Module._cache`.
-  Module._cache = new OwnProxy(cache, {
+  Module._cache = new OwnProxy(Module._cache, {
     defineProperty(cache, name, descriptor) {
-      if (isExtNode(name)) {
-        Reflect.defineProperty(RealModule._cache, name, descriptor)
+      const { _cache } = RealModule
+
+      if (isExtNode(name) &&
+          isObjectLike(_cache)) {
+        Reflect.defineProperty(_cache, name, descriptor)
       }
 
       // Use `Object.defineProperty()` instead of `Reflect.defineProperty()`
@@ -82,15 +93,21 @@ if (cache !== RealModule._cache) {
       return true
     },
     deleteProperty(cache, name) {
-      if (isExtNode(name)) {
-        Reflect.deleteProperty(RealModule._cache, name)
+      const { _cache } = RealModule
+
+      if (isExtNode(name) &&
+          isObjectLike(_cache)) {
+        Reflect.deleteProperty(_cache, name)
       }
 
       return Reflect.deleteProperty(cache, name)
     },
     set(cache, name, value, receiver) {
-      if (isExtNode(name)) {
-        Reflect.set(RealModule._cache, name, value)
+      const { _cache } = RealModule
+
+      if (isExtNode(name) &&
+          isObjectLike(_cache)) {
+        Reflect.set(_cache, name, value)
       }
 
       return Reflect.set(cache, name, value, receiver)
@@ -109,12 +126,6 @@ ModuleProto._compile = protoCompile
 ModuleProto.constructor = Module
 ModuleProto.load = protoLoad
 ModuleProto.require = protoReq
-
-// Initialize `Module._extensions` with only the enumerable string keyed
-// properties of `RealModule._extensions` to avoid `shared.symbol.wrapper`
-// and other meta properties.
-assign(extensions, RealModule._extensions)
-safeDefaultProperties(Module, RealModule)
 
 if (! Array.isArray(Module.globalPaths)) {
   Module._initPaths()
