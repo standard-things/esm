@@ -1766,7 +1766,7 @@ describe("miscellaneous tests", () => {
         )
     })
 
-    it("should error when accessing CJS variable binding", () =>
+    it("should error when accessing CJS variables", () =>
       Promise
         .all([
           "./fixture/source/cjs-var-dirname.mjs",
@@ -1785,7 +1785,7 @@ describe("miscellaneous tests", () => {
         ))
     )
 
-    it("should error when accessing an `arguments` binding", () => {
+    it("should error when accessing `arguments`", () => {
       const id1 = path.resolve("fixture/source/arguments-top-level.mjs")
       const id2 = path.resolve("fixture/source/arguments-nested.mjs")
 
