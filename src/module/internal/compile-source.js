@@ -23,15 +23,17 @@ function init() {
   }
 
   function compileCJS(compileData, options) {
+    let { async } = options
     let changed = compileData.transforms !== 0
     let content = compileData.code
 
     if (changed) {
+      const returnRun = compileData.firstReturnOutsideFunction !== null
       const { runtimeName } = options
 
-      const returnRun = options.return === void 0
-        ? true
-        : options.return
+      if (compileData.firstAwaitOutsideFunction === null) {
+        async = false
+      }
 
       content =
         "const " + runtimeName + "=exports;" +
@@ -40,14 +42,14 @@ function init() {
           : ""
         ) +
         runtimeName + ".r((" +
-        (options.async
+        (async
           ? "async "
           :  ""
         ) +
         "function(exports,require){" +
         content +
         "\n}))"
-    } else if (options.async) {
+    } else if (async) {
       changed = true
       content =
         "(async () => { " +
@@ -64,15 +66,8 @@ function init() {
   }
 
   function compileESM(compileData, options) {
-    const {
-      cjsVars,
-      runtimeName
-    } = options
-
-    const returnRun = options.return === void 0
-      ? true
-      : options.return
-
+    const { cjsVars, runtimeName } = options
+    const returnRun = compileData.firstReturnOutsideFunction !== null
     const yieldCode = "yield;" + runtimeName + ".s();"
     const { yieldIndex } = compileData
 
@@ -94,7 +89,10 @@ function init() {
       } else {
         code =
           code.slice(0, yieldIndex) +
-          (code.charCodeAt(yieldIndex - 1) === SEMICOLON ? "" : ";") +
+          (code.charCodeAt(yieldIndex - 1) === SEMICOLON
+            ? ""
+            : ";"
+          ) +
           yieldCode +
           code.slice(yieldIndex)
       }
