@@ -8,6 +8,7 @@ import assign from "./assign.js"
 import get from "./get.js"
 import inspect from "./inspect.js"
 import isError from "./is-error.js"
+import isObject from "./is-object.js"
 import shared from "../shared.js"
 import toExternalError from "./to-external-error.js"
 
@@ -38,7 +39,8 @@ function formatWithOptions(options, ...args) {
     const { length } = first
     const lastIndex = length - 1
 
-    let altOptions
+    let oOptions
+    let sOptions
     let i = -1
     let lastPos = 0
 
@@ -50,9 +52,28 @@ function formatWithOptions(options, ...args) {
           let segment
 
           switch (nextCode) {
-            case LOWERCASE_S:
-              segment = String(args[++argsIndex])
+            case LOWERCASE_S: {
+              const value = args[++argsIndex]
+
+              if (typeof value === "bigint") {
+                segment = value + "n"
+              } else if (isObject(value)) {
+                if (sOptions === void 0) {
+                  sOptions = assign({}, options, {
+                    breakLength: 120,
+                    colors: false,
+                    compact: true,
+                    depth: 0
+                  })
+                }
+
+                segment = inspect(value, sOptions)
+              } else {
+                segment = String(value)
+              }
+
               break
+            }
 
             case LOWERCASE_J:
               segment = tryStringify(args[++argsIndex])
@@ -60,10 +81,11 @@ function formatWithOptions(options, ...args) {
 
             case LOWERCASE_D: {
               const value = args[++argsIndex]
+              const type = typeof value
 
-              if (typeof value === "bigint") {
+              if (type === "bigint") {
                 segment = value + "n"
-              } else if (typeof value === "symbol") {
+              } else if (type === "symbol") {
                 segment = "NaN"
               } else {
                 segment = Number(value) + ""
@@ -77,23 +99,24 @@ function formatWithOptions(options, ...args) {
               break
 
             case LOWERCASE_O:
-              if (altOptions === void 0) {
-                altOptions = assign({}, options, {
+              if (oOptions === void 0) {
+                oOptions = assign({}, options, {
                   depth: 4,
                   showHidden: true,
                   showProxy: true
                 })
               }
 
-              segment = inspect(args[++argsIndex], altOptions)
+              segment = inspect(args[++argsIndex], oOptions)
               break
 
             case LOWERCASE_I: {
               const value = args[++argsIndex]
+              const type = typeof value
 
-              if (typeof value === "bigint") {
+              if (type === "bigint") {
                 segment = value + "n"
-              } else if (typeof value === "symbol") {
+              } else if (type === "symbol") {
                 segment = "NaN"
               } else {
                 segment = parseInt(value) + ""
