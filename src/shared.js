@@ -69,7 +69,6 @@ function init() {
     },
     external: __external__,
     inited: false,
-    initedMs: NaN,
     loader: new Map,
     memoize: {
       builtinEntries: new Map,

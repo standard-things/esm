@@ -41,7 +41,6 @@ import shimPuppeteerExecutionContextPrototypeEvaluateHandle from "./shim/puppete
 import statSync from "./fs/stat-sync.js"
 import toExternalFunction from "./util/to-external-function.js"
 import toRawModuleNamespaceObject from "./util/to-raw-module-namespace-object.js"
-import touch from "./fs/touch.js"
 import validateShallow from "./module/esm/validate-shallow.js"
 
 const {
@@ -426,25 +425,15 @@ class Entry {
     setDeferred(this, "mtime", () => {
       const { filename } = this
 
-      let mtime = -1
-
       if (isPath(filename)) {
         const stat = statSync(filename)
 
         if (stat !== null) {
-          mtime = getStatTimestamp(stat, "mtime")
-
-          if (mtime === getStatTimestamp(stat, "birthtime")) {
-            const { initedMs } = shared
-
-            if (touch(filename, initedMs)) {
-              mtime = initedMs
-            }
-          }
+          return getStatTimestamp(stat, "mtime")
         }
       }
 
-      return mtime
+      return -1
     })
 
     // The package data of the module.
