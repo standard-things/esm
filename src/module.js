@@ -9,6 +9,7 @@ import SafeObject from "./safe/object.js"
 
 import assign from "./util/assign.js"
 import builtinIds from "./builtin-ids.js"
+import getModuleDirname from "./util/get-module-dirname.js"
 import isExtNode from "./path/is-ext-node.js"
 import isObjectLike from "./util/is-object-like.js"
 import maskFunction from "./util/mask-function.js"
@@ -31,7 +32,7 @@ const {
   ELECTRON
 } = ENV
 
-const Module = maskFunction(function (id, parent) {
+const Module = maskFunction(function (id = "", parent) {
   this.children = GenericArray.of()
   this.exports = GenericObject.create()
   this.filename = null
@@ -39,6 +40,7 @@ const Module = maskFunction(function (id, parent) {
   this.loaded = false
   this.parent = parent
   this.paths = void 0
+  this.path = getModuleDirname(this)
 
   const children = parent == null
     ? null

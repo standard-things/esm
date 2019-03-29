@@ -19,7 +19,7 @@ const content = [
 
 const filename = path.resolve(__dirname, "virtual.js")
 const intercepted = []
-const mod = new Module(".")
+const mod = new Module(filename)
 const oldRequire = Module.prototype.require
 
 Module.prototype.require = function (request) {
