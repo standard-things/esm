@@ -17,18 +17,17 @@ const SHARED_SYMBOL = Symbol.for(PACKAGE_PREFIX + "@" + PACKAGE_VERSION + ":shar
 
 function getShared() {
   if (__shared__ !== void 0) {
-    __shared__.inited = true
     __shared__.reloaded = false
+
     return __shared__
   }
 
   try {
-    const shared = __non_webpack_require__(SHARED_SYMBOL)
-
-    shared.reloaded = true
-
     // eslint-disable-next-line no-global-assign
-    return __shared__ = shared
+    __shared__ = __non_webpack_require__(SHARED_SYMBOL)
+    __shared__.reloaded = true
+
+    return __shared__
   } catch {}
 
   return init()
@@ -70,6 +69,7 @@ function init() {
     },
     external: __external__,
     inited: false,
+    initedMs: NaN,
     loader: new Map,
     memoize: {
       builtinEntries: new Map,

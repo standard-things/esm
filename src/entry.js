@@ -435,10 +435,10 @@ class Entry {
           mtime = getStatTimestamp(stat, "mtime")
 
           if (mtime === getStatTimestamp(stat, "birthtime")) {
-            const now = Date.now()
+            const { initedMs } = shared
 
-            if (touch(filename, now)) {
-              mtime = now
+            if (touch(filename, initedMs)) {
+              mtime = initedMs
             }
           }
         }

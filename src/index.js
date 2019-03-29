@@ -104,6 +104,7 @@ if (shared.inited &&
 } else {
   exported = shared
   exported.inited = true
+  exported.initedMs = Date.now()
   exported.reloaded = false
 
   shimFunctionPrototypeToString.enable(safeGlobal)
