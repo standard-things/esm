@@ -708,10 +708,16 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const getter = getters[name]
     const hasGetter = getter !== void 0
 
-    const errored =
-      ! hasGetter ||
-      entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED ||
-      getter() === ERROR_GETTER
+    let getterValue
+    let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
+    let getterCalled = false
+
+    if (! errored &&
+        hasGetter) {
+      getterCalled = true
+      getterValue = getter()
+      errored = getterValue === ERROR_GETTER
+    }
 
     if (errored &&
         typeof name === "string" &&
@@ -728,7 +734,9 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     }
 
     if (hasGetter) {
-      return getter()
+      return getterCalled
+        ? getterValue
+        : getter()
     }
 
     if (receiver === proxy) {
