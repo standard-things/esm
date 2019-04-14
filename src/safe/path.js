@@ -7,7 +7,6 @@ const safePath = shared.inited
   : shared.module.safePath = safe(realPath)
 
 export const {
-  _makeLong,
   basename,
   delimiter,
   dirname,
