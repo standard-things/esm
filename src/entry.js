@@ -709,21 +709,23 @@ function assignCommonNamespaceHandlerTraps(handler, entry, proxy) {
     const hasGetter = getter !== void 0
 
     let getterValue
-    let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
     let getterCalled = false
 
-    if (! errored &&
-        hasGetter) {
-      getterCalled = true
-      getterValue = getter()
-      errored = getterValue === ERROR_GETTER
-    }
-
-    if (errored &&
-        typeof name === "string" &&
+    if (typeof name === "string" &&
         has(namespace, name) &&
         isEnumerable(namespace, name)) {
-      throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
+      let errored = entry._namespaceFinalized !== NAMESPACE_FINALIZATION_COMPLETED
+
+      if (! errored &&
+          hasGetter) {
+        getterCalled = true
+        getterValue = getter()
+        errored = getterValue === ERROR_GETTER
+      }
+
+      if (errored) {
+        throw new ERR_UNDEFINED_IDENTIFIER(name, handler.get)
+      }
     }
 
     if (entry.type === TYPE_PSEUDO &&
