@@ -4,7 +4,7 @@ import assert from "assert"
 import execa from "execa"
 import path from "path"
 
-const canTestFsPromises = SemVer.satisfies(process.version, ">=10")
+const canTestFsPromises = SemVer.satisfies(process.version, ">=10 <11.14")
 
 const testPath = path.resolve(".")
 
