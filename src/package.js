@@ -46,7 +46,6 @@ const {
 } = CHAR_CODE
 
 const {
-  FLAGS,
   OPTIONS
 } = ENV
 
@@ -69,8 +68,6 @@ const {
 
 const ESMRC_FILENAME = ".esmrc"
 const PACKAGE_JSON_FILENAME = "package.json"
-const STATE_TYPE_COMMONJS = 1
-const STATE_TYPE_MODULE = 2
 
 const esmrcExts = [".mjs", ".cjs", ".js", ".json"]
 
@@ -94,11 +91,6 @@ const defaultOptions = {
   mode: MODE_STRICT,
   sourceMap: void 0,
   wasm: false
-}
-
-const moduleTypeOptions = {
-  cjs: false,
-  mode: MODE_STRICT
 }
 
 const zeroConfigOptions = {
@@ -668,32 +660,18 @@ function readInfo(dirPath, state) {
     }
   }
 
-  const shouldCheckType = state.type === void 0
-
   let pkgParsed = 0
 
   if (pkgJSON !== null &&
-      (shouldCheckType ||
-       ! optionsFound)) {
+      ! optionsFound) {
     pkgJSON = parseJSON(pkgJSON)
     pkgParsed = pkgJSON === null ? -1 : 1
 
-    if (pkgParsed === 1) {
-      if (shouldCheckType &&
-          has(pkgJSON, "type") &&
-          pkgJSON.type === "module") {
-        optionsFound = true
-        options = moduleTypeOptions
-        state.type = STATE_TYPE_MODULE
-      } else {
-        state.type = STATE_TYPE_COMMONJS
-      }
-
-      if (! optionsFound &&
-          has(pkgJSON, "esm")) {
-        optionsFound = true
-        options = pkgJSON.esm
-      }
+    if (pkgParsed === 1 &&
+        ! optionsFound &&
+        has(pkgJSON, "esm")) {
+      optionsFound = true
+      options = pkgJSON.esm
     }
   }
 
@@ -743,10 +721,7 @@ function readInfo(dirPath, state) {
   if (options === true ||
       ! optionsFound) {
     optionsFound = true
-
-    options = FLAGS.type === "module"
-      ? moduleTypeOptions
-      : OPTIONS
+    options = OPTIONS
   }
 
   if (pkgParsed !== 1 &&
