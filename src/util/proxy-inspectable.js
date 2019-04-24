@@ -108,7 +108,7 @@ function proxyInspectable(object, options, map) {
 
               contextAsOptions.showProxy = false
 
-              return safeInspect(proxy, contextAsOptions)
+              return safeInspect(decoyProxy, contextAsOptions)
             }
 
             return formatProxy(object, contextAsOptions)
