@@ -35,17 +35,20 @@ function init() {
   }
 
   function parseClassElement(func, args) {
-    if (this.type !== tt.name) {
+    const { type } = this
+
+    if (type !== tt.bracketL &&
+        type !== tt.name) {
       return Reflect.apply(func, this, args)
     }
 
-    const { type } = lookahead(this)
+    const nextType = lookahead(this).type
 
-    if (type === tt.parenL ||
-        type === tt.star ||
-        (type !== tt.braceR &&
-         type !== tt.eq &&
-         type !== tt.semi &&
+    if (nextType === tt.parenL ||
+        nextType === tt.star ||
+        (nextType !== tt.braceR &&
+         nextType !== tt.eq &&
+         nextType !== tt.semi &&
          (this.isContextual("async") ||
           this.isContextual("get") ||
           this.isContextual("set") ||
@@ -55,8 +58,7 @@ function init() {
 
     const node = this.startNode()
 
-    node.computed = false
-    node.key = this.parseIdent(true)
+    this.parsePropertyName(node)
 
     node.value = this.eat(tt.eq)
       ? this.parseExpression()
