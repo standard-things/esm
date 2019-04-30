@@ -18,8 +18,8 @@ matrix:
     - node_js: 11
       env: HARMONY=true
 
-before_install:
-  - npm i -g npm
+# before_install:
+#   - npm i -g npm
 
 script:
  - |
