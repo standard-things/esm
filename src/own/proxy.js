@@ -31,7 +31,14 @@ function init() {
 
       OwnProxy.instances.set(proxy, [target, maskedHandler])
 
-      return proxy
+      // Wrap `proxy` in a decoy proxy so that `proxy` will be used as the
+      // unwrapped inspectable value.
+      const emptyHandler = {}
+      const decoyProxy = new Proxy(proxy, emptyHandler)
+
+      OwnProxy.instances.set(decoyProxy, [proxy, emptyHandler])
+
+      return decoyProxy
     }
   }
 

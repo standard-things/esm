@@ -6,7 +6,6 @@ import OwnProxy from "../own/proxy.js"
 
 import assign from "./assign.js"
 import builtinInspect from "../builtin/inspect.js"
-import emptyObject from "./empty-object.js"
 import getProxyDetails from "./get-proxy-details.js"
 import isModuleNamespaceObject from "./is-module-namespace-object.js"
 import isObjectLike from "./is-object-like.js"
@@ -47,8 +46,7 @@ function proxyInspectable(object, options, map) {
 
   const proxy = new OwnProxy(object, {
     get(object, name, receiver) {
-      if (receiver === decoyProxy ||
-          receiver === proxy) {
+      if (receiver === proxy) {
         receiver = object
       }
 
@@ -108,7 +106,7 @@ function proxyInspectable(object, options, map) {
 
               contextAsOptions.showProxy = false
 
-              return safeInspect(decoyProxy, contextAsOptions)
+              return safeInspect(proxy, contextAsOptions)
             }
 
             return formatProxy(object, contextAsOptions)
@@ -140,15 +138,10 @@ function proxyInspectable(object, options, map) {
     }
   })
 
-  // Wrap `proxy` in a decoy proxy so that `proxy` will be used as the
-  // unwrapped value to inspect.
-  const decoyProxy = new OwnProxy(proxy, emptyObject)
+  map.set(object, proxy)
+  map.set(proxy, proxy)
 
-  map.set(object, decoyProxy)
-  map.set(proxy, decoyProxy)
-  map.set(decoyProxy, decoyProxy)
-
-  return decoyProxy
+  return proxy
 }
 
 function formatNamespaceObject(namespace, context) {
