@@ -5,16 +5,16 @@ os:
   - osx
 
 node_js:
+  - 12
   - 11
   - 10
   - 8
-  - 6.2.0
 
 cache: npm
 
 matrix:
   include:
-    - node_js: 11
+    - node_js: 12
       env: HARMONY=true
 
 before_install:
@@ -22,7 +22,7 @@ before_install:
 
 script:
  - |
-      if [ $TRAVIS_NODE_VERSION = "6.2.0" ]
+      if [ $TRAVIS_NODE_VERSION = "8" ]
       then
         npm run test:prod
       else
