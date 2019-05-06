@@ -1,4 +1,5 @@
 import assert from "assert"
+import createNamespace from "../../../create-namespace.js"
 import * as fsNs from "fs"
 import mock from "mock-require"
 import * as pathNs from "path"
@@ -49,27 +50,27 @@ mock("util", "./util.js")
 import("./load.js")
   .then((ns) => {
     const expected = {
-      fs: mockFs,
+      fs: createNamespace(mockFs),
       path: pathNs,
-      real1: {
+      real1: createNamespace({
         default: "mock1"
-      },
-      real2: mockReal2,
-      real3: {
+      }),
+      real2: createNamespace(mockReal2),
+      real3: createNamespace({
         default: "real3"
-      },
-      util: mockUtil
+      }),
+      util: createNamespace(mockUtil)
     }
 
-    assert.deepEqual(ns, expected)
+    assert.deepEqual(ns, createNamespace(expected))
 
     const exported = requireInject("./load.js", {
       path: mockPath,
       "./real3.js": mockReal3
     })
 
-    expected.path = mockPath
-    expected.real3 = mockReal3
+    expected.path = createNamespace(mockPath)
+    expected.real3 = createNamespace(mockReal3)
 
     assert.deepEqual(exported, expected)
   })
@@ -77,11 +78,11 @@ import("./load.js")
     Promise
       .all([
         import("fs")
-          .then((ns) => assert.deepEqual(ns, mockFs)),
+          .then((ns) => assert.deepEqual(ns, createNamespace(mockFs))),
         import("path")
           .then((ns) => assert.strictEqual(ns, pathNs)),
         import("util")
-          .then((ns) => assert.deepEqual(ns, mockUtil))
+          .then((ns) => assert.deepEqual(ns, createNamespace(mockUtil)))
       ])
   )
   .then(() => {
