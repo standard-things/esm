@@ -16,16 +16,20 @@ import Wrapper from "../wrapper.js"
 import acornInternalAcorn from "../acorn/internal/acorn.js"
 import acornInternalWalk from "../acorn/internal/walk.js"
 import assign from "../util/assign.js"
+import builtinInspect from "../builtin/inspect.js"
 import builtinVM from "../builtin/vm.js"
+import errors from "../errors.js"
 import getCacheName from "../util/get-cache-name.js"
 import getSilent from "../util/get-silent.js"
 import has from "../util/has.js"
-import inspect from "../util/inspect.js"
+import isObject from "../util/is-object.js"
 import isStackTraceMaskable from "../util/is-stack-trace-maskable.js"
 import makeRequireFunction from "../module/internal/make-require-function.js"
+import maskFunction from "../util/mask-function.js"
 import maskStackTrace from "../error/mask-stack-trace.js"
 import proxyWrap from "../util/proxy-wrap.js"
 import realUtil from "../real/util.js"
+import realREPL from "../real/repl.js"
 import rootModule from "../root-module.js"
 import setGetter from "../util/set-getter.js"
 import setProperty from "../util/set-property.js"
@@ -58,6 +62,10 @@ const {
  INTERNAL,
  REPL
 } = ENV
+
+const {
+  ERR_INVALID_ARG_TYPE
+} = errors
 
 function hook(vm) {
   let entry
@@ -204,9 +212,58 @@ function hook(vm) {
       REPLServer.prototype.createContext = proxyWrap(createContext, function () {
         REPLServer.prototype.createContext = createContext
 
+        Reflect.defineProperty(this, "writer", {
+          configurable: true,
+          enumerable: true,
+          get() {
+            return void 0
+          },
+          set(value) {
+            const writer = maskFunction((object) => {
+              return builtinInspect(object, writer.options)
+            }, value)
+
+            writer.options = value.options
+            writer.options.colors = this.useColors
+
+            Reflect.defineProperty(builtinInspect, "replDefaults", {
+              configurable: true,
+              enumerable: true,
+              get() {
+                return writer.options
+              },
+              set(options) {
+                if (! isObject(options)) {
+                  throw new ERR_INVALID_ARG_TYPE("options", "Object", options)
+                }
+
+                return assign(writer.options, options)
+              }
+            })
+
+            setProperty(this, "writer", writer)
+            setProperty(realREPL, "writer", writer)
+
+            return writer
+          }
+        })
+
         const context = Reflect.apply(createContext, this, [])
 
-        setupEntry(context.module)
+        let mod = context.module
+
+        Reflect.defineProperty(shared.unsafeGlobal, "module", {
+          configurable: true,
+          get() {
+            return mod
+          },
+          set(value) {
+            mod = value
+            setupEntry(mod)
+          }
+        })
+
+        setupEntry(mod)
         return context
       })
     }
@@ -221,7 +278,7 @@ function hook(vm) {
 
     // Exit for Node 10+.
     if (shared.support.replShowProxy) {
-      realUtil.inspect = inspect
+      setProperty(realUtil, "inspect", builtinInspect)
       return
     }
 
@@ -230,7 +287,7 @@ function hook(vm) {
     setGetter(realUtil, "inspect", toExternalFunction(function () {
       // Prevent re-entering the getter by triggering the setter to convert
       // `util.inspect()` from an accessor property to a data property.
-      this.inspect = inspect
+      this.inspect = builtinInspect
 
       // The first getter call occurs in Node's lib/repl.js as an assignment
       // to `repl.writer()`. It needs to be the original `util.inspect()`
