@@ -13,11 +13,6 @@
   "engines": {
     "node": ">=6"
   },
-  "husky": {
-    "hooks": {
-      "precommit": "npm run lint"
-    }
-  },
   "scripts": {
     "prelint": "npm run pretest",
     "prepare": "npm run build:prod",
