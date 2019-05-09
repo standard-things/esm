@@ -144,12 +144,23 @@ function init() {
     return class NodeError extends Super {
       constructor(...args) {
         const template = templateMap.get(code)
+
         super(template(...args))
 
-        if (code === "MODULE_NOT_FOUND") {
-          this.code = code
-          this.name = super.name
-        }
+        const name = toString(get(this, "name"))
+
+        // Add the error code to the name to include it in the stack trace.
+        Reflect.defineProperty(this, "name", {
+          configurable: true,
+          value: name + " [" + code + "]",
+          writable: true
+        })
+
+        // Access the stack to generate the error message including the error
+        // code from the name.
+        get(this, "stack")
+        // Reset the name to the actual name.
+        Reflect.deleteProperty(this, "name")
       }
 
       get code() {
@@ -158,14 +169,6 @@ function init() {
 
       set code(value) {
         setProperty(this, "code", value)
-      }
-
-      get name() {
-        return super.name + " [" + code + "]"
-      }
-
-      set name(value) {
-        setProperty(this, "name", value)
       }
     }
   }

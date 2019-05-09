@@ -49,30 +49,9 @@ const defNs = createNamespace({
 function checkError(error, code) {
   const { message } = error
 
-  checkErrorProps(error, code, message)
-  checkErrorCustomProps(error, code, message)
-  checkErrorProps(error, code, message)
-}
-
-function checkErrorCustomProps(error, code, message) {
-  error.code = "ERR_CUSTOM"
-
-  assert.strictEqual(error.code, "ERR_CUSTOM")
-  assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
-
-  error.name = "Custom"
-
-  assert.strictEqual(error.name, "Custom")
-  assert.strictEqual(error.toString(), "Custom: " + message)
-
-  Reflect.deleteProperty(error, "code")
-  Reflect.deleteProperty(error, "name")
-}
-
-function checkErrorProps(error, code, message) {
   assert.strictEqual(error.code, code)
-  assert.strictEqual(error.name, "Error [" + code + "]")
-  assert.strictEqual(error.toString(), "Error [" + code + "]: " + message)
+  assert.strictEqual(error.message, message)
+  assert.strictEqual(error.name, "Error")
   assert.deepStrictEqual(Object.keys(error), [])
   assert.deepStrictEqual(Object.getOwnPropertySymbols(error), [])
 }
