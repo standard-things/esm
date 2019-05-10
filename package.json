@@ -90,6 +90,7 @@
     "require-inject": "^1.4.4",
     "requizzle": "^0.2.1",
     "rewire": "^4.0.1",
+    "rewiremock": "^3.13.6",
     "semver": "^5.7.0",
     "sinon": "^7.3.2",
     "sqreen": "^1.30.1",

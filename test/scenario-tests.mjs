@@ -1,5 +1,4 @@
 import SemVer from "semver"
-
 import assert from "assert"
 import execa from "execa"
 import fs from "fs-extra"
@@ -177,6 +176,13 @@ describe("scenario tests", function () {
       path.resolve("fixture/scenario/rewire")
     ], envAuto)
   )
+
+  it("should work with rewiremock", () => {
+    node([
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/rewiremock")
+    ], envAuto)
+  })
 
   it("should work with sinon", () =>
     node([
