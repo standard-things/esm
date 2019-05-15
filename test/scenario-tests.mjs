@@ -126,6 +126,13 @@ describe("scenario tests", function () {
     .then(({ stdout }) => assert.ok(stdout.includes("module-alias:true")))
   )
 
+  it("should work with native modules", () =>
+    node([
+      path.resolve("fixture/scenario/native")
+    ], envAuto)
+    .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
+  )
+
   it("should work with newrelic", () => {
     const dirPath = path.resolve("fixture/scenario/newrelic")
     const cwdPath = path.resolve(dirPath, "cwd.js")
