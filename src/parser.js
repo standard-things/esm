@@ -43,35 +43,11 @@ function init() {
   ])
 
   const Parser = {
+    create,
     createOptions,
     defaultOptions,
     parse(code, options) {
-      options = Parser.createOptions(options)
-
-      const { strict } = options
-      const parser = new AcornParser(options, code)
-
-      acornParserBigInt.enable(parser)
-      acornParserClassFields.enable(parser)
-      acornParserErrorMessages.enable(parser)
-      acornParserFirstAwaitOutsideFunction.enable(parser)
-      acornParserFirstReturnOutsideFunction.enable(parser)
-      acornParserFunctionParamsStart.enable(parser)
-      acornParserHTMLComment.enable(parser)
-      acornParserImport.enable(parser)
-      acornParserNumericSeparator.enable(parser)
-      acornParserRaw.enable(parser)
-      acornParserTolerance.enable(parser)
-      acornParserTopLevel.enable(parser)
-
-      if (strict !== void 0) {
-        parser.strict = !! strict
-
-        if (! parser.strict) {
-          parser.reservedWords = reservedWordsRegExp
-        }
-      }
-
+      const parser = Parser.create(code, options)
       const result = parser.parse()
 
       result.inModule = parser.inModule
@@ -79,6 +55,36 @@ function init() {
 
       return result
     }
+  }
+
+  function create(code, options) {
+    options = Parser.createOptions(options)
+
+    const { strict } = options
+    const parser = new AcornParser(options, code)
+
+    acornParserBigInt.enable(parser)
+    acornParserClassFields.enable(parser)
+    acornParserErrorMessages.enable(parser)
+    acornParserFirstAwaitOutsideFunction.enable(parser)
+    acornParserFirstReturnOutsideFunction.enable(parser)
+    acornParserFunctionParamsStart.enable(parser)
+    acornParserHTMLComment.enable(parser)
+    acornParserImport.enable(parser)
+    acornParserNumericSeparator.enable(parser)
+    acornParserRaw.enable(parser)
+    acornParserTolerance.enable(parser)
+    acornParserTopLevel.enable(parser)
+
+    if (strict !== void 0) {
+      parser.strict = !! strict
+
+      if (! parser.strict) {
+        parser.reservedWords = reservedWordsRegExp
+      }
+    }
+
+    return parser
   }
 
   function createOptions(value) {

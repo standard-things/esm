@@ -42,21 +42,37 @@ function init() {
       return Reflect.apply(func, this, args)
     }
 
-    const nextType = lookahead(this).type
+    const next = lookahead(this)
+    const nextType = next.type
 
-    if (nextType === tt.parenL ||
-        nextType === tt.star ||
-        (nextType !== tt.braceR &&
-         nextType !== tt.eq &&
-         nextType !== tt.semi &&
-         (this.isContextual("async") ||
-          this.isContextual("get") ||
-          this.isContextual("set") ||
-          this.isContextual("static")))) {
+    if (nextType === tt.parenL) {
       return Reflect.apply(func, this, args)
     }
 
+    if (nextType !== tt.braceR &&
+        nextType !== tt.eq &&
+        nextType !== tt.semi) {
+      if (this.isContextual("async") ||
+          this.isContextual("get") ||
+          this.isContextual("set")) {
+        return Reflect.apply(func, this, args)
+      }
+
+      if (this.isContextual("static")) {
+        next.parsePropertyName(this.startNode())
+
+        if (next.type === tt.parenL) {
+          return Reflect.apply(func, this, args)
+        }
+      }
+    }
+
     const node = this.startNode()
+
+    node.static =
+      nextType !== tt.braceR &&
+      nextType !== tt.eq &&
+      this.eatContextual("static")
 
     this.parsePropertyName(node)
 
