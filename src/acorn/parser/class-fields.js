@@ -59,6 +59,21 @@ function init() {
       }
 
       if (this.isContextual("static")) {
+        if (nextType === tt.star) {
+          return Reflect.apply(func, this, args)
+        }
+
+        const nextNextType = lookahead(next).type
+
+        if (nextNextType !== tt.braceR &&
+            nextNextType !== tt.eq &&
+            nextNextType !== tt.semi &&
+            (next.isContextual("async") ||
+             next.isContextual("get") ||
+             next.isContextual("set"))) {
+          return Reflect.apply(func, this, args)
+        }
+
         next.parsePropertyName(this.startNode())
 
         if (next.type === tt.parenL) {
