@@ -414,6 +414,7 @@ describe("compiler tests", () => {
       "  static async g() {}",
       "  static *h() {}",
       "  static async *i() {}",
+      "  [Symbol.iterator]() {}",
       "  async = 1;",
       "  get = 1",
       "  set = 1",

@@ -1,9 +1,10 @@
 // A loose implementation of class fields syntax.
 // https://github.com/tc39/proposal-class-fields
+// https://github.com/tc39/proposal-static-class-features
 
 import CHAR_CODE from "../../constant/char-code.js"
 
-import lookahead from "../../parse/lookahead.js"
+import branch from "../../parse/branch.js"
 import shared from "../../shared.js"
 import { tokTypes as tt } from "../../acorn.js"
 import wrap from "../../util/wrap.js"
@@ -42,16 +43,20 @@ function init() {
       return Reflect.apply(func, this, args)
     }
 
-    const next = lookahead(this)
-    const nextType = next.type
+    const branched1 = branch(this)
+    const dummyNode = this.startNode()
 
-    if (nextType === tt.parenL) {
+    branched1.parsePropertyName(dummyNode)
+
+    const branched1Type = branched1.type
+
+    if (branched1Type === tt.parenL) {
       return Reflect.apply(func, this, args)
     }
 
-    if (nextType !== tt.braceR &&
-        nextType !== tt.eq &&
-        nextType !== tt.semi) {
+    if (branched1Type !== tt.braceR &&
+        branched1Type !== tt.eq &&
+        branched1Type !== tt.semi) {
       if (this.isContextual("async") ||
           this.isContextual("get") ||
           this.isContextual("set")) {
@@ -59,24 +64,26 @@ function init() {
       }
 
       if (this.isContextual("static")) {
-        if (nextType === tt.star) {
+        if (branched1Type === tt.star) {
           return Reflect.apply(func, this, args)
         }
 
-        const nextNextType = lookahead(next).type
+        const branched2 = branch(branched1)
 
-        if (nextNextType !== tt.braceR &&
-            nextNextType !== tt.eq &&
-            nextNextType !== tt.semi &&
-            (next.isContextual("async") ||
-             next.isContextual("get") ||
-             next.isContextual("set"))) {
+        branched2.parsePropertyName(dummyNode)
+
+        const branched2Type = branched2.type
+
+        if (branched2Type === tt.parenL) {
           return Reflect.apply(func, this, args)
         }
 
-        next.parsePropertyName(this.startNode())
-
-        if (next.type === tt.parenL) {
+        if (branched2Type !== tt.braceR &&
+            branched2Type !== tt.eq &&
+            branched2Type !== tt.semi &&
+            (branched1.isContextual("async") ||
+             branched1.isContextual("get") ||
+             branched1.isContextual("set"))) {
           return Reflect.apply(func, this, args)
         }
       }
@@ -85,8 +92,8 @@ function init() {
     const node = this.startNode()
 
     node.static =
-      nextType !== tt.braceR &&
-      nextType !== tt.eq &&
+      branched1Type !== tt.braceR &&
+      branched1Type !== tt.eq &&
       this.eatContextual("static")
 
     this.parsePropertyName(node)
