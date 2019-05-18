@@ -419,6 +419,10 @@ describe("compiler tests", () => {
       "  get = 1",
       "  set = 1",
       "  static = 1",
+      "  static async = 1;",
+      "  static get = 1",
+      "  static set = 1",
+      "  static static = 1",
       "}"
     ].join("\n")
 
