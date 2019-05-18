@@ -64,7 +64,8 @@ function init() {
       }
 
       if (this.isContextual("static")) {
-        if (branched1Type === tt.star) {
+        if (branched1Type !== tt.bracketL &&
+            branched1Type !== tt.name) {
           return Reflect.apply(func, this, args)
         }
 
