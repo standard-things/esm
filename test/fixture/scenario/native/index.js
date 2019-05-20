@@ -1,4 +1,7 @@
-"use strict"
+import sleep, { usleep } from "sleep"
+import { log } from "console"
 
-require = require("../../../../index.js")(module)
-require("./main.js")
+usleep(0)
+sleep.usleep(0)
+
+log("native:true")

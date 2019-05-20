@@ -128,6 +128,7 @@ describe("scenario tests", function () {
 
   it("should work with native modules", () =>
     node([
+      "-r", pkgPath,
       path.resolve("fixture/scenario/native")
     ], envAuto)
     .then(({ stdout }) => assert.ok(stdout.includes("native:true")))
