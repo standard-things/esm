@@ -5,24 +5,9 @@ import getGetter from "./get-getter.js"
 import getObjectTag from "./get-object-tag.js"
 import getSetter from "./get-setter.js"
 import has from "./has.js"
-import isAnyArrayBuffer from "./is-any-array-buffer.js"
-import isDate from "./is-date.js"
-import isExternal from "./is-external.js"
-import isMap from "./is-map.js"
-import isMapIterator from "./is-map-iterator.js"
-import isNative from "./is-native.js"
-import isNumberObject from "./is-number-object.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
-import isPromise from "./is-promise.js"
-import isRegExp from "./is-regexp.js"
-import isSet from "./is-set.js"
-import isSetIterator from "./is-set-iterator.js"
-import isStringObject from "./is-string-object.js"
-import isWeakMap from "./is-weak-map.js"
-import isWeakSet from "./is-weak-set.js"
-import isWebAssemblyCompiledModule from "./is-web-assembly-compiled-module.js"
 import isUpdatableDescriptor from "./is-updatable-descriptor.js"
 import isUpdatableGet from "./is-updatable-get.js"
 import isUpdatableSet from "./is-updatable-set.js"
@@ -63,9 +48,7 @@ function init() {
     })
 
     const maybeWrap = (exported, func) => {
-      // Wrap native methods to avoid throwing illegal invocation or
-      // incompatible receiver type errors.
-      if (! isNative(func)) {
+      if (typeof func !== "function") {
         return func
       }
 
@@ -201,33 +184,8 @@ function init() {
       }
     }
 
-    let useWrappers = ! shared.support.nativeProxyReceiver
-
     if (! builtin &&
-        ! useWrappers) {
-      if (typeof exported === "function") {
-        useWrappers = isNative(exported)
-      } else if (! isPlainObject(exported)) {
-        useWrappers =
-          isPromise(exported) ||
-          isMap(exported) ||
-          isSet(exported) ||
-          isWeakMap(exported) ||
-          isWeakSet(exported) ||
-          isDate(exported) ||
-          isRegExp(exported) ||
-          ArrayBuffer.isView(exported) ||
-          isAnyArrayBuffer(exported) ||
-          isNumberObject(exported) ||
-          isStringObject(exported) ||
-          isMapIterator(exported) ||
-          isSetIterator(exported) ||
-          isWebAssemblyCompiledModule(exported) ||
-          isExternal(exported)
-      }
-    }
-
-    if (useWrappers) {
+        ! isPlainObject(exported)) {
       // Once Node < 10 is no longer supported the `getOwnPropertyDescriptor()`
       // trap can be removed and the `get()` trap can be conditionally dropped
       // for `exported` values that return "[object Function]" or "[object Object]"
@@ -273,9 +231,9 @@ function init() {
         return descriptor
       }
     } else if (builtin &&
-               isObject(exported) &&
-               ! Reflect.has(exported, Symbol.toStringTag) &&
-               getObjectTag(exported) !== "[object Object]") {
+        isObject(exported) &&
+        ! Reflect.has(exported, Symbol.toStringTag) &&
+        getObjectTag(exported) !== "[object Object]") {
       handler.get = (exported, name, receiver) => {
         if (receiver === proxy) {
           receiver = exported

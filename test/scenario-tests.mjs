@@ -215,6 +215,14 @@ describe("scenario tests", function () {
       ))
   )
 
+  it("should work with unexpected", () =>
+    node([
+      "-r", pkgPath,
+      path.resolve("fixture/scenario/unexpected")
+    ])
+    .then(({ stdout }) => assert.ok(stdout.includes("unexpected:true")))
+  )
+
   it("should work with webpack", () => {
     const dirPath = path.resolve("fixture/scenario/webpack")
     const configPath = path.resolve(dirPath, "webpack.config.js")
