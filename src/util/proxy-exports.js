@@ -184,8 +184,9 @@ function init() {
       }
     }
 
-    if (! builtin &&
-        ! isPlainObject(exported)) {
+    if (! shared.support.nativeProxyReceiver ||
+        (! builtin &&
+         ! isPlainObject(exported))) {
       // Once Node < 10 is no longer supported the `getOwnPropertyDescriptor()`
       // trap can be removed and the `get()` trap can be conditionally dropped
       // for `exported` values that return "[object Function]" or "[object Object]"
