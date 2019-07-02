@@ -1,5 +1,5 @@
 import getPrototypeOf from "../util/get-prototype-of.js"
-import isNative from "../util/is-native.js"
+import isNativeFunction from "../util/is-native-function.js"
 import shared from "../shared.js"
 
 function init() {
@@ -23,7 +23,7 @@ function init() {
 
       if (typeof Ctor === "function" &&
           Ctor.name === "Error" &&
-          isNative(Ctor)) {
+          isNativeFunction(Ctor)) {
         return Ctor
       }
     }

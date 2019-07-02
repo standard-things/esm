@@ -1,5 +1,5 @@
 import isError from "./is-error.js"
-import isNative from "./is-native.js"
+import isNativeFunction from "./is-native-function.js"
 import shared from "../shared.js"
 
 function init() {
@@ -15,8 +15,8 @@ function init() {
         descriptor.enumerable === false &&
         typeof descriptor.get === "function" &&
         typeof descriptor.set === "function" &&
-        ! isNative(descriptor.get) &&
-        ! isNative(descriptor.set)) {
+        ! isNativeFunction(descriptor.get) &&
+        ! isNativeFunction(descriptor.set)) {
       return false
     }
 

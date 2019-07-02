@@ -9,7 +9,7 @@ import binding from "../binding.js"
 import builtinUtil from "./util.js"
 import copyProperty from "../util/copy-property.js"
 import has from "../util/has.js"
-import isNativeLike from "../util/is-native-like.js"
+import isNativeLikeFunction from "../util/is-native-like-function.js"
 import isObjectLike from "../util/is-object.js"
 import isUpdatableDescriptor from "../util/is-updatable-descriptor.js"
 import isUpdatableGet from "../util/is-updatable-get.js"
@@ -136,7 +136,7 @@ function createBuiltinMethodMap(consoleObject) {
     if (typeof func === "function" &&
         typeof globalFunc === "function" &&
         (! isKeyAssignable(name) ||
-         isNativeLike(globalFunc))) {
+         isNativeLikeFunction(globalFunc))) {
       newBuiltinMethodMap.set(globalFunc, func)
     }
   }

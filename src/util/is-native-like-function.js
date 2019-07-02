@@ -11,31 +11,28 @@ function init() {
   // and remove method identifiers before converting the template to a regexp.
   const markerRegExp = /toString|(function ).*?(?=\\\()/g
 
-  const nativeRegExp = RegExp(
+  const nativeFuncRegExp = RegExp(
     "^" +
     escapeRegExp(toString.call(toString))
       .replace(markerRegExp, "$1.*?") +
     "$"
   )
 
-  function isNativeLike(func) {
-    return typeof func === "function" &&
-           tryNativeTest(func)
-  }
-
-  function tryNativeTest(func) {
-    // A try-catch is needed in Node < 10 to avoid a type error when
-    // coercing proxy wrapped functions.
-    try {
-      return nativeRegExp.test(toString.call(func))
-    } catch {}
+  function isNativeLikeFunction(value) {
+    if (typeof value === "function") {
+      // A try-catch is needed in Node < 10 to avoid a type error when
+      // coercing proxy wrapped functions.
+      try {
+        return nativeFuncRegExp.test(toString.call(value))
+      } catch {}
+    }
 
     return false
   }
 
-  return isNativeLike
+  return isNativeLikeFunction
 }
 
 export default shared.inited
-  ? shared.module.utilIsNativeLike
-  : shared.module.utilIsNativeLike = init()
+  ? shared.module.utilIsNativeLikeFunction
+  : shared.module.utilIsNativeLikeFunction = init()
