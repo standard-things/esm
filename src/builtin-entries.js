@@ -28,12 +28,19 @@ function createEntry(id) {
 
     const hasInstance = maskFunction(
       function (instance) {
-        if (this === exported) {
+        let thisArg = this
+
+        if (thisArg === exported ||
+            thisArg === proxyFunc) {
+          thisArg = func
+        }
+
+        if (thisArg === exported) {
           return instance instanceof func ||
                  instanceOf(instance, exported)
         }
 
-        return instanceOf(instance, this)
+        return instanceOf(instance, thisArg)
       },
       FuncHasInstance
     )
