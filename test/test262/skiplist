@@ -1,80 +1,80 @@
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/eval-self-once-script.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-function-await-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-function-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-function-return-await-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-gen-await-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-block-labeled-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-do-while-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-else-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-function-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-if-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/nested-while-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/catch/top-level-import-catch-eval-script-code-target.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/namespace/await-ns-delete-non-exported-no-strict.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/namespace/await-ns-delete-non-exported-strict.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/namespace/default-property-not-set-own.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-no-strict.js
 
-# DYNAMIC IMPORT ⏭️ (not applicable)
+# DYNAMIC IMPORT ⏭️  (not applicable)
 test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-strict.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/instn-resolve-empty-export.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/instn-resolve-empty-import.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/instn-resolve-err-syntax-2.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/instn-resolve-order-depth.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/instn-resolve-order-src.js
 
-# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+# EARLY ERROR ⚙️  (https://github.com/tc39/ecma262/pull/1527)
 test/language/module-code/parse-err-syntax-2.js
