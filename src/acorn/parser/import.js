@@ -51,7 +51,7 @@ function init() {
 
     if (exprType === "CallExpression" &&
         expr.callee.type === "Import") {
-      throw new errors.ReferenceError(
+      throw new errors.SyntaxError(
         this,
         start,
         INVALID_LEFT_HAND_SIDE_ASSIGNMENT
@@ -61,17 +61,7 @@ function init() {
     if (exprType === "MetaProperty" &&
         expr.meta.name === "import" &&
         expr.property.name === "meta") {
-      const { type } = this
-
-      let ErrorCtor = errors.SyntaxError
-
-      if ((type === tt.eq ||
-           type === tt.incDec) &&
-          this.input.slice(this.lastTokStart, this.lastTokEnd) === "meta") {
-        ErrorCtor = errors.ReferenceError
-      }
-
-      throw new ErrorCtor(
+      throw new errors.SyntaxError(
         this,
         start,
         INVALID_IMPORT_META_ASSIGNMENT

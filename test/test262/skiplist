@@ -60,3 +60,21 @@ test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-ex
 
 # DYNAMIC IMPORT ⏭️ (not applicable)
 test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-strict.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/instn-resolve-empty-export.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/instn-resolve-empty-import.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/instn-resolve-err-syntax-2.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/instn-resolve-order-depth.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/instn-resolve-order-src.js
+
+# EARLY ERROR ⚙️ (https://github.com/tc39/ecma262/pull/1527)
+test/language/module-code/parse-err-syntax-2.js
