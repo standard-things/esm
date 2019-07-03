@@ -5,6 +5,9 @@ import getGetter from "./get-getter.js"
 import getObjectTag from "./get-object-tag.js"
 import getSetter from "./get-setter.js"
 import has from "./has.js"
+import isArrowFunction from "./is-arrow-function.js"
+import isBoundFunction from "./is-bound-function.js"
+import isClassLikeFunction from "./is-class-like-function.js"
 import isObject from "./is-object.js"
 import isObjectLike from "./is-object-like.js"
 import isPlainObject from "./is-plain-object.js"
@@ -48,7 +51,10 @@ function init() {
     })
 
     const maybeWrap = (exported, func) => {
-      if (typeof func !== "function") {
+      if (typeof func !== "function" ||
+          isArrowFunction(func) ||
+          isBoundFunction(func) ||
+          isClassLikeFunction(func)) {
         return func
       }
 
