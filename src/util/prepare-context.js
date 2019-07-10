@@ -1,11 +1,11 @@
 import { Script } from "../safe/vm.js"
 
+import allKeys from "./all-keys.js"
 import { deprecate } from "../safe/util.js"
 import getPrototypeOf from "./get-prototype-of.js"
 import has from "./has.js"
 import instanceOf from "./instance-of.js"
 import isObjectLike from "./is-object-like.js"
-import ownKeys from "./own-keys.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
 
@@ -42,7 +42,7 @@ function init() {
       return context
     }
 
-    const names = ownKeys(defaultGlobal)
+    const names = allKeys(defaultGlobal)
 
     for (const name of names) {
       let descriptor

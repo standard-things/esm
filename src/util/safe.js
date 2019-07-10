@@ -1,6 +1,6 @@
+import allKeys from "./all-keys.js"
 import isObject from "./is-object.js"
-import ownKeys from "./own-keys.js"
-import safeAssignProperties from "./safe-assign-properties.js"
+import safeAssignPropertiesIn from "./safe-assign-properties-in.js"
 import safeCopyProperty from "./safe-copy-property.js"
 import setPrototypeOf from "./set-prototype-of.js"
 import shared from "../shared.js"
@@ -13,7 +13,7 @@ function init() {
       }
 
       return isObject(value)
-        ? safeAssignProperties({}, value)
+        ? safeAssignPropertiesIn({}, value)
         : value
     }
 
@@ -27,7 +27,7 @@ function init() {
       return result
     }
 
-    const SuperNames = ownKeys(Super)
+    const SuperNames = allKeys(Super)
 
     for (const name of SuperNames) {
       if (name !== "prototype") {
@@ -38,7 +38,7 @@ function init() {
     const SafeProto = Safe.prototype
 
     setPrototypeOf(SafeProto, null)
-    safeAssignProperties(SafeProto, Super.prototype)
+    safeAssignPropertiesIn(SafeProto, Super.prototype)
 
     return Safe
   }
