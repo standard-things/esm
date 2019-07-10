@@ -1,18 +1,15 @@
 import getPrototypeOf from "./get-prototype-of.js"
-import isObjectLike from "./is-object-like.js"
 import shared from "../shared.js"
 
 function init() {
   function instanceOf(value, Ctor) {
     const CtorProto = Ctor.prototype
 
-    if (isObjectLike(value)) {
-      let proto = value
+    let proto = value
 
-      while ((proto = getPrototypeOf(proto)) !== null) {
-        if (proto === CtorProto) {
-          return true
-        }
+    while ((proto = getPrototypeOf(proto)) !== null) {
+      if (proto === CtorProto) {
+        return true
       }
     }
 
