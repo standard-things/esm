@@ -89,6 +89,10 @@ const PUPPETEER_EXECUTION_CONTEXT_PATH_SEGMENT = sep + "lib" + sep + "ExecutionC
 const PUPPETEER_PACKAGE_PATH_SEGMENT = sep + "puppeteer" + sep
 const PUPPETEER_UPPERCASE_E_CHAR_OFFSET = -19
 
+// Detect packages installed via NPM that have an mtime of
+// 1985-10-26T08:15Z
+const A_LONG_TIME_AGO_MS = new Date("1985-10-27T00:00Z").getTime()
+
 const pseudoDescriptor = {
   value: true
 }
@@ -429,7 +433,12 @@ class Entry {
         const stat = statSync(filename)
 
         if (stat !== null) {
-          return getStatTimestamp(stat, "mtime")
+          // If the mtime is long ago, use the ctime instead.
+          let properTime = getStatTimestamp(stat, "mtime")
+          if (properTime < A_LONG_TIME_AGO_MS) {
+            properTime = getStatTimestamp(stat, "ctime")
+          }
+          return properTime
         }
       }
 
