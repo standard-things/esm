@@ -40,7 +40,7 @@ There are two ways to enable `esm`.
     // ESM syntax is supported.
     export {}
     ```
-    :bulb: These files are automagically created with `npm init esm` or `yarn create esm`.
+    :bulb: These files are automatically created with `npm init esm` or `yarn create esm`.
 
 2. Enable `esm` for local runs:
 
