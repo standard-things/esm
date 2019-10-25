@@ -14,10 +14,6 @@ import validateDeep from "./validate-deep.js"
 import validateShallow from "./validate-shallow.js"
 
 const {
-  ERR_INVALID_ESM_FILE_EXTENSION
-} = errors
-
-const {
   TYPE_CJS,
   TYPE_ESM,
   STATE_PARSING_COMPLETED,
@@ -99,13 +95,6 @@ function esmImport(request, parentEntry, setterArgsList, isDynamic = false) {
     }
 
     entry._finalize = finalize
-  }
-
-  if (parentEntry.extname === ".mjs" &&
-      entry !== null &&
-      entry.type === TYPE_ESM &&
-      entry.extname !== ".mjs") {
-    throw ERR_INVALID_ESM_FILE_EXTENSION(entry.module)
   }
 
   if (! parsing) {

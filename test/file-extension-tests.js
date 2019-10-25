@@ -68,21 +68,4 @@ describe("file extension tests", () => {
   it("should not error requiring unknown extensions", () => {
     require("./fixture/ext/a.unknown-ext-cjs")
   })
-
-  it('should error importing non `.mjs` ES modules from `.mjs` files with `options.mode` of "strict"', () =>
-    import("./fixture/ext/invalid.mjs")
-      .then(assert.fail)
-      .catch((e) => {
-        assert.ok(e instanceof SyntaxError)
-        assert.ok(e.message.startsWith("Unexpected token export"))
-      })
-  )
-
-  it('should error importing non `.mjs` ES modules from `.mjs` files with `options.mode` of "auto"', () =>
-    import("./fixture/cjs/ext/invalid.mjs")
-      .then(assert.fail)
-      .catch(({ message }) => {
-        assert.ok(message.startsWith("Cannot load module"))
-      })
-  )
 })

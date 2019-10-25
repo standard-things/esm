@@ -68,7 +68,6 @@ function init() {
   addBuiltinError("ERR_EXPORT_CYCLE", exportCycle, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_MISSING", exportMissing, ExSyntaxError)
   addBuiltinError("ERR_EXPORT_STAR_CONFLICT", exportStarConflict, ExSyntaxError)
-  addBuiltinError("ERR_INVALID_ESM_FILE_EXTENSION", invalidExtension, ExError)
   addBuiltinError("ERR_INVALID_ESM_OPTION", invalidPkgOption, ExError)
   addBuiltinError("ERR_NS_ASSIGNMENT", namespaceAssignment, ExTypeError)
   addBuiltinError("ERR_NS_DEFINITION", namespaceDefinition, ExTypeError)
@@ -230,10 +229,6 @@ function init() {
   function invalidArgValue(name, value, reason = "is invalid") {
     return "The argument '" + name + "' " + reason +
            ". Received " + inspectTrunc(value)
-  }
-
-  function invalidExtension(request) {
-    return "Cannot load module from .mjs: " + getModuleURL(request)
   }
 
   function invalidPkgOption(name, value, unquoted) {
