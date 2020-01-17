@@ -109,7 +109,7 @@ function init() {
     }
   }
 
-  return new EvalVisitor
+  return new EvalVisitor()
 }
 
 export default shared.inited
