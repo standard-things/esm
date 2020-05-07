@@ -27,6 +27,7 @@ import staticResolveFilename from "./module/static/resolve-filename.js"
 import staticResolveLookupPaths from "./module/static/resolve-lookup-paths.js"
 import staticWrap from "./module/static/wrap.js"
 import staticWrapper from "./module/static/wrapper.js"
+import jsFileLoader from "./shim/module-js-file-loader"
 
 const {
   ELECTRON
@@ -50,6 +51,10 @@ const Module = maskFunction(function (id = "", parent) {
     GenericArray.push(children, this)
   }
 }, RealModule)
+
+// Patch the loader for files with .js extension to prevent default
+// behaviour of erroring on commonjs syntax in dependencies.
+RealModule._extensions[".js"] = jsFileLoader
 
 Module._cache = __non_webpack_require__.cache
 Module._extensions = { __proto__: null }
