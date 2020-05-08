@@ -5,6 +5,8 @@ import execa from "execa"
 import fs from "fs-extra"
 import path from "path"
 
+// Node 12+ has changed how the 'check' capability works and there is no longer an opportunity to hook the loader.
+const canTestThisVersion = SemVer.satisfies(process.version, "<12")
 const canTestWithFilename = SemVer.satisfies(process.version, ">=10")
 const canTestWithStdin = SemVer.satisfies(process.version, ">=8")
 
@@ -28,7 +30,7 @@ describe("--check hook tests", function () {
   this.timeout(0)
 
   it("should support `-c` and `--check` flags with a filename", function () {
-    if (! canTestWithFilename) {
+    if (!canTestThisVersion || !canTestWithFilename) {
       this.skip()
     }
 
@@ -60,7 +62,7 @@ describe("--check hook tests", function () {
   })
 
   it("should support `-c` and `--check` flags with stdin", function () {
-    if (! canTestWithStdin) {
+    if (!canTestThisVersion || !canTestWithStdin) {
       this.skip()
     }
 
@@ -88,6 +90,7 @@ describe("--check hook tests", function () {
         promise
           .then(() => shell(command))
           .then(({ stderr, stdout }) => {
+            stdout = stdout.replace("(node:96872) ExperimentalWarning: The ESM module loader is experimental", "")
             assert.strictEqual(stderr, "")
             assert.strictEqual(stdout, "")
           })
