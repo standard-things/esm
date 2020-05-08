@@ -36,7 +36,7 @@
     "@babel/plugin-transform-flow-strip-types": "^7.4.4",
     "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/polyfill": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-env": "^7.9.6",
     "@babel/register": "^7.4.4",
     "@babel/runtime": "^7.4.5",
     "@std/esm": "^0.25.5",
