@@ -41,7 +41,7 @@
     "@babel/runtime": "^7.4.5",
     "@std/esm": "^0.25.5",
     "@types/node": "^10.14.10",
-    "acorn": "^6.1.1",
+    "acorn": "^7.3.1",
     "ava": "^1.4.1",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
