@@ -1,4 +1,4 @@
 {
   "testEnvironment": "node",
-  "testURL": "file://"
+  "testURL": "http://localhost"
 }

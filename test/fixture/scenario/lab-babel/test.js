@@ -1,6 +1,6 @@
 // @flow
 import assert from "assert"
-import { script } from "lab"
+import { script } from "@hapi/lab"
 import add from "./add.flow.js"
 
 const lab = script()
