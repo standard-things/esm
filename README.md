@@ -41,6 +41,8 @@ There are two ways to enable `esm`.
     export {}
     ```
     :bulb: These files are automagically created with `npm init esm` or `yarn create esm`.
+   
+   CommonJS packages may load ESM-only packages in this manner too.
 
 2. Enable `esm` for local runs:
 
