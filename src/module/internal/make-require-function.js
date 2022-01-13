@@ -12,6 +12,7 @@ import maskFunction from "../../util/mask-function.js"
 import realGetProxyDetails from "../../real/get-proxy-details.js"
 import realProcess from "../../real/process.js"
 import realRequire from "../../real/require.js"
+import esmResolveFilename from "../esm/resolve-filename"
 import shared from "../../shared.js"
 import validateString from "../../util/validate-string.js"
 
@@ -28,6 +29,7 @@ const ownExportsMap = new Map([
 ])
 
 function makeRequireFunction(mod, requirer, resolver) {
+  const entry = Entry.get(mod)
   const isOwn = isOwnModule(mod)
 
   let req = function require(request) {
@@ -52,7 +54,11 @@ function makeRequireFunction(mod, requirer, resolver) {
   }
 
   if (typeof requirer !== "function") {
-    requirer = (request) => mod.require(request)
+    requirer = (request) => {
+      const filename = esmResolveFilename(request, mod, false, entry.package.options)
+
+      return mod.require(filename)
+    }
   }
 
   if (typeof resolver !== "function") {
