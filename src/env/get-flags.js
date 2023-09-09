@@ -29,7 +29,7 @@ function init() {
     setDeferred(flags, "inspectBrk", () => matches(commandArgs, /^--(?:debug|inspect)-brk(?:=.+)?$/))
     setDeferred(flags, "interactive", () => matches(commandArgs, /^(?:--interactive|-i)$/))
     setDeferred(flags, "pendingDeprecation", () => matches(commandArgs, "--pending-deprecation"))
-    setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks"))
+    setDeferred(flags, "preserveSymlinks", () => matches(commandArgs, "--preserve-symlinks") || env.NODE_PRESERVE_SYMLINKS === '1')
     setDeferred(flags, "preserveSymlinksMain", () => matches(commandArgs, "--preserve-symlinks-main"))
     setDeferred(flags, "print", () => matches(commandArgs, /^(?:--print|-pe?)$/))
     setDeferred(flags, "type", () => lastArgMatch(commandArgs, /^--type=(.+)$/))
