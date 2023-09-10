@@ -1,10 +1,5 @@
 "use strict"
 
 module.exports = {
-  presets: [
-    ["@babel/env", {
-      modules: false
-    }]
-  ],
-  sourceMaps: false
+  plugins: [require.resolve('./error.js')]
 }

@@ -3,6 +3,6 @@
     "JEST_CONFIG_GLOBAL": "JEST_CONFIG_GLOBAL_VALUE"
   },
   "testEnvironment": "node",
-  "testURL": "file://",
+  "testURL": "http://localhost",
   "transform": {}
 }

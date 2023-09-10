@@ -1,5 +1,5 @@
 import assert from "assert"
-import { script } from "lab"
+import { script } from "@hapi/lab"
 import { add } from "../../math/math.esm.js"
 
 const lab = script()

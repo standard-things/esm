@@ -32,7 +32,7 @@ function parseLoad(request, parent, isMain) {
         validateDeep(entry)
       }
 
-      load(request, parent, isMain)
+      entry = load(request, parent, isMain)
     }
   } finally {
     moduleState.requireDepth -= 1

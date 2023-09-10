@@ -15,7 +15,7 @@ const canTestPM2 = ! isTravis
 const avaPath = path.resolve("../node_modules/ava/cli.js")
 const jasminePath = path.resolve("../node_modules/jasmine/bin/jasmine.js")
 const jestPath = path.resolve("../node_modules/jest/bin/jest.js")
-const labPath = path.resolve("../node_modules/lab/bin/lab")
+const labPath = path.resolve("../node_modules/@hapi/lab/bin/lab")
 const pkgPath = path.resolve("../index.js")
 const nodePath = path.resolve("env/prefix", isWin ? "node.exe" : "bin/node")
 const testPath = path.resolve(".")
@@ -65,9 +65,8 @@ describe("scenario tests", function () {
       "-r", "@babel/register",
       path.resolve("fixture/scenario/babel-error/index.js")
     ])
-    .then(assert.fail)
-    .catch(({ stderr }) => {
-      assert.ok(stderr.includes("'importMeta' isn't currently enabled"))
+    .then(assert.fail.bind("Call did not fail"), ({ stderr }) => {
+      assert.ok(stderr.includes("BABEL_ERROR"))
     })
   )
 
