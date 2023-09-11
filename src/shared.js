@@ -159,7 +159,7 @@ function init() {
 
     return encodeId(
       "_" +
-      safeCrypto.createHash("md5")
+      safeCrypto.createHash("sha256")
         .update(Date.now().toString())
         .digest("hex")
         .slice(0, 3)
