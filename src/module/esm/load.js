@@ -98,7 +98,10 @@ function load(request, parent, isMain = false, preload) {
          (parentType !== TYPE_CJS &&
           parentType !== TYPE_PSEUDO &&
           ! parentCJS.cache))) {
+
+      try {
       entry.module.parent = void 0
+      } catch {/* jest freezes module */}
     }
   }
 

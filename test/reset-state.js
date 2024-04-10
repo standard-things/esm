@@ -1,16 +1,16 @@
 import path from "path"
-import require from "./require.js"
+import require2 from "./require.js"
 
 const loadCountPathJS = path.resolve("fixture/load-count.js")
 const loadCountPathMJS = path.resolve("fixture/load-count.mjs")
-const originalExtensions = Object.assign({}, require.extensions)
+const originalExtensions = Object.assign({}, require2.extensions)
 
 function resetState() {
   Reflect.deleteProperty(global, "customError")
   Reflect.deleteProperty(global, "loadCount")
   Reflect.deleteProperty(global, "this")
 
-  const { cache, extensions } = require
+  const { cache, extensions } = require2
 
   Reflect.deleteProperty(cache, loadCountPathJS)
   Reflect.deleteProperty(cache, loadCountPathMJS)

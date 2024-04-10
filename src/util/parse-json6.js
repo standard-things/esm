@@ -1,4 +1,4 @@
-import { parse } from "json-6"
+import JSON6 from "json-6"
 import quotifyJSON from "./quotify-json.js"
 import shared from "../shared.js"
 
@@ -12,7 +12,7 @@ function init() {
     if (typeof string === "string" &&
         string.length) {
       try {
-        return parse(string)
+        return JSON6.parse(string)
       } catch {}
     }
 

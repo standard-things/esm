@@ -11,6 +11,7 @@
 /esm
 /node_modules
 /src/vendor
+/test/env/home/.local/share/Trash
 /test/env/prefix/bin
 /test/env/prefix/node
 /test/fixture/find-path/created

@@ -1,4 +1,5 @@
 import "hard-rejection/register"
+import "./mocha.js"
 import resetState from "./reset-state.js"
 
 import "./cache-tests.js"

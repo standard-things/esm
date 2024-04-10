@@ -44,6 +44,10 @@ function BabelModePlugin({ types }) {
 
       const { directives } = node
 
+      if (!directives) {
+        return false;
+      }
+
       let { length } = directives
 
       while (length--) {

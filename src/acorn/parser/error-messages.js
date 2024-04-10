@@ -59,7 +59,7 @@ function init() {
     ["The keyword 'yield' is reserved", UNEXPECTED_STRICT_MODE_RESERVED_WORD],
     ["Unterminated string constant", INVALID_OR_UNEXPECTED_TOKEN],
     ["Unterminated template", UNTERMINATED_TEMPLATE],
-    ["new.target can only be used in functions", ILLEGAL_NEW_TARGET]
+    ["'new.target' can only be used in functions", ILLEGAL_NEW_TARGET]
   ])
 
   const Plugin = {
